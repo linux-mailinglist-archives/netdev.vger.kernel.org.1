@@ -1,497 +1,554 @@
-Return-Path: <netdev+bounces-182609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D7FA8949F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:14:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6445CA894AC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93A7E3A7AD1
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:14:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 805427A2FD8
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C073723AE84;
-	Tue, 15 Apr 2025 07:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C86027587D;
+	Tue, 15 Apr 2025 07:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEJnHv32"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SHAnv5w7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAC118DB2F
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 07:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7972750E4
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 07:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744701295; cv=none; b=hjPZLUGpjSHBAnSNuwNACAQJiOEZnPt3cPwur9qtYDxCxza9aPZj6sivxa5ozH1e5f2vQYKxDZkj6HzR/mY/if7n9nfmOWKcP16z/H8WmhVCxESMxWxvqS8RWfUUHi09RAZFZoyyf0n29a8ZutUjZMS9sc62bDebe89kq6DmTy8=
+	t=1744701380; cv=none; b=WSJYsyDatM/PLumBxMgDaV2FQeNlwbch5GyX3BW7dqFqoRQJfQKiOHWrUN+myESjQ3gg3GPfz3hLgAjJroEkzaL9QxBtkLIz19BJaOS1VQqsKDTo8zMdq2XBlfF0XUKxl0zhR5/GvQtfV/P6oSQWh2Lj1OY+cHg51/PzPM+kFr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744701295; c=relaxed/simple;
-	bh=2WJYR7ekhR52HegxubDr6gAGizIhLchuInyIS9uU5wM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Qh1o77OEqJI4GNdlxVd83AfmNqedZApezNG62YI1/hRwFFn2lUcKXrtJ62gXPFGl2zyNtCWQQaXEJavSaj3kDZtkTuckaUXzwwUan8RaVkpy2NHwV5QUyjHpUBou4oOGaBO1G59fiRdRxbdqtMNZrOuKYKtrRjSZOsxGQvS+DfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEJnHv32; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92A63C4CEDD;
-	Tue, 15 Apr 2025 07:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744701295;
-	bh=2WJYR7ekhR52HegxubDr6gAGizIhLchuInyIS9uU5wM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=OEJnHv32Hk8OiH8q5GI8g+S5Pnsy3GUogpRYZ+SjLWq7ms+t9PxjHjFf/9jh1h6pt
-	 hvhWyPAtHjszA2rFjMHbeyudS/CH0+1MmtGgW8vOcHHzvXsD4SJZzSmP+W09l/matW
-	 v0Ys9qgVs6e+ijuijC4fVaPHXcVTuB0THWBvF8Rw/oNQg6/La50fJuiIRsfT+8w97i
-	 rndPkUHWlkDApgU91KFXpdOJhQZP7gnUemfZ4oP/ZRtWHX0baXWnRbP9a7O1QoYVki
-	 yO4akDYSd8JR2sA79czdwXJl/7r6bE7RH/bN2qLqsMJYYdJzalHiCaNoTku6OEKbPM
-	 meIxOwL0TKSgw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 15 Apr 2025 09:14:34 +0200
-Subject: [PATCH net-next v4] net: airoha: Add matchall filter offload
- support
+	s=arc-20240116; t=1744701380; c=relaxed/simple;
+	bh=n9MhbkoCgjXiklx7Gu6dJsoCzFl44u+5C+qmS9u//9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=n/xxFpHK7wKYIFnYLxUvlTCypo2I7k+esV0oPmAqVk27t0Di0blM+9d5fcZ8uTomtallsY/yMliyaGtR88r8iAhGxfH1o+F6u857QKdzIbc00orDQoJ0IlGKXg70By39wpRIhrIS8ZnPm2G5OZFFk7CibvIi3ch3mEY0PO3fBWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=SHAnv5w7; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-736ab1c43c4so4683141b3a.1
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 00:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1744701377; x=1745306177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=93Y/PcDLHLXdCrqLt2vpFN5+4uiBa0eKmnsl4Fbs4/I=;
+        b=SHAnv5w7qcmlaFX4st9RqUYGwVDmMhrl3lsYXFIAdRq2bnkxRUt0Og9KTbDoHqOlGP
+         dbZqb9NZo4BfHWd8itpqtMKoHKGsp+EGwDJ10Fr8qoKWSCY8qjorUxaNER2qmAVOfUcK
+         CxuySLDEXaJSlAoXdeOHXaVFSKK9cx5YhNyXI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744701377; x=1745306177;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=93Y/PcDLHLXdCrqLt2vpFN5+4uiBa0eKmnsl4Fbs4/I=;
+        b=DMmg/iQXEfXkICIAq5UHiL3b9eUdHtJzLrad/lDIq51DzSRhQEUt+BYAhWB3RiU6GJ
+         j1wErCIP0eSQY5if9uAQWrCY864cyBGhGFmhRhm0XccFGp3BpnRttCir/fCXdZKKtFqA
+         uJxPvzhy3eSvVfQAZrqsSoLf4CfIfG7h/P2ROp26/Mxp+wk2v5RwmgdnR3gUp1AQcv1+
+         i3lF8O1GIoq2H+Khcu4SA99bog2M5eNKYTmlC7alKIdY3y6LBVLoxG9plGIgemYvC6/l
+         2de6uwTC5NZrQQZQU4d2m0xe127FbzA/CY4vICbZsbmHcZnnMP54rSPV9ubvIqhRGAq3
+         h/0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVJIe+oQqHbnE5KD7rfgMaN1yYToUVVFT9L/kPX/gx7w/ohB0xdxgyvFCAL8J91sdFxE4Ou4E4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrURI5G/+sPikQWOlo+hgFxiWiE9QI/S3ZpGkoNDoiiCogGXjp
+	meUJnAlYkTwGFQlMD6psAak5p+ck+IiMHUt4Lfe70vCU5sGZsOaN9p+Y9ztqhg==
+X-Gm-Gg: ASbGncvmUDMbgqw4+Y1r7eHcLAeSSz/mKGmokmUSDUMhWmrv2PmtQevcykhJraXeFJb
+	gqJqbXMMXMJ0IV3mbIjV661hHj+izFB5daJzyuhMHhLJhn1gaYD/tN6737G5VgHRvA7O1msY5Ly
+	/gHfkgwSFRNwwrBaAFhenwB1azEeKaOgTYJrZ4NZSY4MJ83mdl7hJPhv037tBkIbRe+Z/dqqURX
+	QOIy3jIAsVuXI0jIq+8GrK44821t8/zdo1gU4DQcc13fG/3yzugc6Zj0OwWgB2OiJeXb+7sS65Q
+	J0ZI+GY6SIcGHRVoK1MQzBPnnqyCi6j6PBO9KNDE2AAO9qLWsh08w85oCxsfZgwaPMBmWJPmSIM
+	654OkWO9aSFA531asZjfEAPj9jO6JYevv
+X-Google-Smtp-Source: AGHT+IEnueGIDuiq6IcaSey4kNpHaHj/13Oxz+Lx1rzzUoF7NkVQtCgv5SQBZlA2Icu4kQi+ft0JDg==
+X-Received: by 2002:aa7:888d:0:b0:736:ab1d:7ed5 with SMTP id d2e1a72fcca58-73bd0e989eamr18172836b3a.0.1744701376729;
+        Tue, 15 Apr 2025 00:16:16 -0700 (PDT)
+Received: from li-cloudtop.c.googlers.com.com (132.197.125.34.bc.googleusercontent.com. [34.125.197.132])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd230dd17sm7737757b3a.129.2025.04.15.00.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 00:16:16 -0700 (PDT)
+From: Li Li <dualli@chromium.org>
+To: dualli@google.com,
+	corbet@lwn.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	donald.hunter@gmail.com,
+	gregkh@linuxfoundation.org,
+	arve@android.com,
+	tkjos@android.com,
+	maco@android.com,
+	joel@joelfernandes.org,
+	brauner@kernel.org,
+	cmllamas@google.com,
+	surenb@google.com,
+	omosnace@redhat.com,
+	shuah@kernel.org,
+	arnd@arndb.de,
+	masahiroy@kernel.org,
+	bagasdotme@gmail.com,
+	horms@kernel.org,
+	tweek@google.com,
+	paul@paul-moore.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	selinux@vger.kernel.org,
+	selinux-refpolicy@vger.kernel.org,
+	hridya@google.com
+Cc: smoreland@google.com,
+	ynaffit@google.com,
+	kernel-team@android.com
+Subject: [PATCH 1/2] policy,tests: add test for new permission binder:setup_report
+Date: Tue, 15 Apr 2025 00:16:06 -0700
+Message-ID: <20250415071606.3271807-1-dualli@chromium.org>
+X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
+In-Reply-To: <20250415071017.3261009-2-dualli@chromium.org>
+References: <20250415071017.3261009-2-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250415-airoha-hw-rx-ratelimit-v4-1-03458784fbc3@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAFkH/mcC/3XPwQ6CMAwG4FcxOzuzjQ0yT76H8bCwAo0IpiMTQ
- 3h3B14whuPf5P/aTiwAIQR2PkyMIGLAvktBHw+sbFxXA0efMlNCGZFJyx1S3zjevDiNnNwALT5
- w4NJ7LQooCqsMS+UnQYXjCl9vKTcYhp7e654ol+mXTKU9MkouuZWFF1Z5k1f+cgfqoD31VLPFj
- Grr7J4WVXJyq0FX3pnSyj8n2zhS7DpZcgyUyimt05vw48zz/AHVeFddTQEAAA==
-X-Change-ID: 20250319-airoha-hw-rx-ratelimit-1dd407e77925
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Davide Caratti <dcaratti@redhat.com>, Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-Introduce tc matchall filter offload support in airoha_eth driver.
-Matchall hw filter is used to implement hw rate policing via tc action
-police:
+From: Li Li <dualli@google.com>
 
-$tc qdisc add dev eth0 handle ffff: ingress
-$tc filter add dev eth0 parent ffff: matchall action police \
- rate 100mbit burst 1000k drop
+This new test depends on the corresponding kernel patchset
+"binder: report txn errors via generic netlink", which implements a new
+feature "transaction_report" in the kernel binder driver, protected by a
+new permission "binder:setup_report".
 
-The current implementation supports just drop/accept as exceed/notexceed
-actions. Moreover, rate and burst are the only supported configuration
-parameters.
+This test updates the base policy to define this new permission and add
+a new test for it. If the kernel does not support them, the test will be
+skipped.
 
-Reviewed-by: Davide Caratti <dcaratti@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+For testing purpose, you can update the base policy by manually
+modifying your base module, applying the following patch and then running
+the selinux-testsuite as usual.
+
+    sudo semodule -c -E base
+    sed -i.orig \
+    "s/set_context_mgr transfer/set_context_mgr transfer setup_report/" \
+    /usr/share/selinux/devel/include/support/all_perms.spt
+
+    make -C policy load
+    make -C tests test
+    make -C policy unload
+
+Signed-off-by: Li Li <dualli@google.com>
 ---
-Changes in v4:
-- rebase on top of net-next tree
-- Link to v3: https://lore.kernel.org/r/20250410-airoha-hw-rx-ratelimit-v3-1-5ec2a244925e@kernel.org
+ policy/test_binder.te       |  24 ++++
+ tests/binder/.gitignore     |   1 +
+ tests/binder/Makefile       |   2 +-
+ tests/binder/setup_report.c | 277 ++++++++++++++++++++++++++++++++++++
+ tests/binder/test           |  35 +++++
+ 5 files changed, 338 insertions(+), 1 deletion(-)
+ create mode 100644 tests/binder/setup_report.c
 
-Changes in v3:
-- remove duplicated entries configuring REG_PPE_DFT_CPORT0() regs
-- Link to v2: https://lore.kernel.org/r/20250409-airoha-hw-rx-ratelimit-v2-1-694e4fda5c91@kernel.org
-
-Changes in v2:
-- Validate act police mtu parameter
-- Link to v1: https://lore.kernel.org/r/20250407-airoha-hw-rx-ratelimit-v1-1-917d092d56fd@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c  | 273 +++++++++++++++++++++++++++++-
- drivers/net/ethernet/airoha/airoha_eth.h  |   8 +-
- drivers/net/ethernet/airoha/airoha_ppe.c  |   9 +-
- drivers/net/ethernet/airoha/airoha_regs.h |   7 +
- 4 files changed, 286 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 723eba7cfa0cf405dc2ef9248b34bf6af897ceed..c773b5ea9c051ab40ddd5c9ba5a1795ed36e6820 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -527,6 +527,25 @@ static int airoha_fe_init(struct airoha_eth *eth)
- 	/* disable IFC by default */
- 	airoha_fe_clear(eth, REG_FE_CSR_IFC_CFG, FE_IFC_EN_MASK);
+diff --git a/policy/test_binder.te b/policy/test_binder.te
+index 4c7974a..a75979e 100644
+--- a/policy/test_binder.te
++++ b/policy/test_binder.te
+@@ -94,3 +94,27 @@ allow test_binder_client_no_transfer_t test_binder_mgr_t:binder { call };
+ allow test_binder_client_no_transfer_t test_binder_provider_t:binder { call impersonate };
+ allow test_binder_client_no_transfer_t device_t:chr_file { getattr ioctl open read write };
+ allow_map(test_binder_client_no_transfer_t, device_t, chr_file)
++
++#
++################################## Report ###################################
++#
++type test_binder_report_t;
++testsuite_domain_type(test_binder_report_t)
++typeattribute test_binder_report_t binderdomain;
++allow test_binder_report_t self:netlink_generic_socket { create bind read write };
++allow test_binder_report_t self:binder { setup_report };
++
++#
++######################### Report No Generic Netlink #########################
++#
++type test_binder_report_no_genl_t;
++testsuite_domain_type(test_binder_report_no_genl_t)
++typeattribute test_binder_report_no_genl_t binderdomain;
++
++#
++############################# Report No set up ##############################
++#
++type test_binder_report_no_setup_t;
++testsuite_domain_type(test_binder_report_no_setup_t)
++typeattribute test_binder_report_no_setup_t binderdomain;
++allow test_binder_report_no_setup_t self:netlink_generic_socket { create bind read write };
+diff --git a/tests/binder/.gitignore b/tests/binder/.gitignore
+index dc6ce20..ae57d57 100644
+--- a/tests/binder/.gitignore
++++ b/tests/binder/.gitignore
+@@ -3,3 +3,4 @@ check_binderfs
+ manager
+ service_provider
+ client
++setup_report
+diff --git a/tests/binder/Makefile b/tests/binder/Makefile
+index b89d4db..56a5b07 100644
+--- a/tests/binder/Makefile
++++ b/tests/binder/Makefile
+@@ -1,7 +1,7 @@
+ # Required for local building
+ INCLUDEDIR ?= /usr/include
  
-+	airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(0),
-+		     FIELD_PREP(DFT_CPORT_MASK(7), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(6), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(5), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(3), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(2), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(1), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(0), FE_PSE_PORT_CDM1));
-+	airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(1),
-+		     FIELD_PREP(DFT_CPORT_MASK(7), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(6), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(5), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(3), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(2), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(1), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(0), FE_PSE_PORT_CDM2));
-+
- 	/* enable 1:N vlan action, init vlan table */
- 	airoha_fe_set(eth, REG_MC_VLAN_EN, MC_VLAN_EN_MASK);
+-TARGETS = check_binder client manager service_provider
++TARGETS = check_binder client manager service_provider setup_report
+ LDLIBS += -lselinux -lrt
+ DEPS = binder_common.c binder_common.h
  
-@@ -1631,7 +1650,6 @@ static void airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
- 
- 	if (port->id == 3) {
- 		/* FIXME: handle XSI_PCE1_PORT */
--		airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(0),  0x5500);
- 		airoha_fe_rmw(eth, REG_FE_WAN_PORT,
- 			      WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
- 			      FIELD_PREP(WAN0_MASK, HSGMII_LAN_PCIE0_SRCPORT));
-@@ -2109,6 +2127,125 @@ static int airoha_tc_setup_qdisc_ets(struct airoha_gdm_port *port,
- 	}
- }
- 
-+static int airoha_qdma_get_rl_param(struct airoha_qdma *qdma, int queue_id,
-+				    u32 addr, enum trtcm_param_type param,
-+				    u32 *val_low, u32 *val_high)
-+{
-+	u32 idx = QDMA_METER_IDX(queue_id), group = QDMA_METER_GROUP(queue_id);
-+	u32 val, config = FIELD_PREP(RATE_LIMIT_PARAM_TYPE_MASK, param) |
-+			  FIELD_PREP(RATE_LIMIT_METER_GROUP_MASK, group) |
-+			  FIELD_PREP(RATE_LIMIT_PARAM_INDEX_MASK, idx);
+diff --git a/tests/binder/setup_report.c b/tests/binder/setup_report.c
+new file mode 100644
+index 0000000..0c1e651
+--- /dev/null
++++ b/tests/binder/setup_report.c
+@@ -0,0 +1,277 @@
++#include <linux/android/binder_netlink.h>
++#include <linux/genetlink.h>
++#include <sys/socket.h>
 +
-+	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
-+	if (read_poll_timeout(airoha_qdma_rr, val,
-+			      val & RATE_LIMIT_PARAM_RW_DONE_MASK,
-+			      USEC_PER_MSEC, 10 * USEC_PER_MSEC, true, qdma,
-+			      REG_TRTCM_CFG_PARAM(addr)))
-+		return -ETIMEDOUT;
++#include "binder_common.h"
 +
-+	*val_low = airoha_qdma_rr(qdma, REG_TRTCM_DATA_LOW(addr));
-+	if (val_high)
-+		*val_high = airoha_qdma_rr(qdma, REG_TRTCM_DATA_HIGH(addr));
++#define BINDER_MSG_SIZE 1024
 +
-+	return 0;
-+}
++#define GENLMSG_DATA(glh) ((void*)((char*)(glh) + GENL_HDRLEN))
++#define GENLMSG_PAYLOAD(nlh) (NLMSG_PAYLOAD(nlh, 0) - GENL_HDRLEN)
++#define NLA_DATA(nla) ((void*)((char*)(nla) + NLA_HDRLEN))
++#define NLA_NEXT(nla) ((struct nlattr*)((char*)nla + NLA_ALIGN(nla->nla_len)))
 +
-+static int airoha_qdma_set_rl_param(struct airoha_qdma *qdma, int queue_id,
-+				    u32 addr, enum trtcm_param_type param,
-+				    u32 val)
-+{
-+	u32 idx = QDMA_METER_IDX(queue_id), group = QDMA_METER_GROUP(queue_id);
-+	u32 config = RATE_LIMIT_PARAM_RW_MASK |
-+		     FIELD_PREP(RATE_LIMIT_PARAM_TYPE_MASK, param) |
-+		     FIELD_PREP(RATE_LIMIT_METER_GROUP_MASK, group) |
-+		     FIELD_PREP(RATE_LIMIT_PARAM_INDEX_MASK, idx);
-+
-+	airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
-+	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
-+
-+	return read_poll_timeout(airoha_qdma_rr, val,
-+				 val & RATE_LIMIT_PARAM_RW_DONE_MASK,
-+				 USEC_PER_MSEC, 10 * USEC_PER_MSEC, true,
-+				 qdma, REG_TRTCM_CFG_PARAM(addr));
-+}
-+
-+static int airoha_qdma_set_rl_config(struct airoha_qdma *qdma, int queue_id,
-+				     u32 addr, bool enable, u32 enable_mask)
-+{
-+	u32 val;
-+	int err;
-+
-+	err = airoha_qdma_get_rl_param(qdma, queue_id, addr, TRTCM_MISC_MODE,
-+				       &val, NULL);
-+	if (err)
-+		return err;
-+
-+	val = enable ? val | enable_mask : val & ~enable_mask;
-+
-+	return airoha_qdma_set_rl_param(qdma, queue_id, addr, TRTCM_MISC_MODE,
-+					val);
-+}
-+
-+static int airoha_qdma_set_rl_token_bucket(struct airoha_qdma *qdma,
-+					   int queue_id, u32 rate_val,
-+					   u32 bucket_size)
-+{
-+	u32 val, config, tick, unit, rate, rate_frac;
-+	int err;
-+
-+	err = airoha_qdma_get_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+				       TRTCM_MISC_MODE, &config, NULL);
-+	if (err)
-+		return err;
-+
-+	val = airoha_qdma_rr(qdma, REG_INGRESS_TRTCM_CFG);
-+	tick = FIELD_GET(INGRESS_FAST_TICK_MASK, val);
-+	if (config & TRTCM_TICK_SEL)
-+		tick *= FIELD_GET(INGRESS_SLOW_TICK_RATIO_MASK, val);
-+	if (!tick)
-+		return -EINVAL;
-+
-+	unit = (config & TRTCM_PKT_MODE) ? 1000000 / tick : 8000 / tick;
-+	if (!unit)
-+		return -EINVAL;
-+
-+	rate = rate_val / unit;
-+	rate_frac = rate_val % unit;
-+	rate_frac = FIELD_PREP(TRTCM_TOKEN_RATE_MASK, rate_frac) / unit;
-+	rate = FIELD_PREP(TRTCM_TOKEN_RATE_MASK, rate) |
-+	       FIELD_PREP(TRTCM_TOKEN_RATE_FRACTION_MASK, rate_frac);
-+
-+	err = airoha_qdma_set_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+				       TRTCM_TOKEN_RATE_MODE, rate);
-+	if (err)
-+		return err;
-+
-+	val = bucket_size;
-+	if (!(config & TRTCM_PKT_MODE))
-+		val = max_t(u32, val, MIN_TOKEN_SIZE);
-+	val = min_t(u32, __fls(val), MAX_TOKEN_SIZE_OFFSET);
-+
-+	return airoha_qdma_set_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					TRTCM_BUCKETSIZE_SHIFT_MODE, val);
-+}
-+
-+static int airoha_qdma_init_rl_config(struct airoha_qdma *qdma, int queue_id,
-+				      bool enable, enum trtcm_unit_type unit)
-+{
-+	bool tick_sel = queue_id == 0 || queue_id == 2 || queue_id == 8;
-+	enum trtcm_param mode = TRTCM_METER_MODE;
-+	int err;
-+
-+	mode |= unit == TRTCM_PACKET_UNIT ? TRTCM_PKT_MODE : 0;
-+	err = airoha_qdma_set_rl_config(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					enable, mode);
-+	if (err)
-+		return err;
-+
-+	return airoha_qdma_set_rl_config(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					 tick_sel, TRTCM_TICK_SEL);
-+}
-+
- static int airoha_qdma_get_trtcm_param(struct airoha_qdma *qdma, int channel,
- 				       u32 addr, enum trtcm_param_type param,
- 				       enum trtcm_mode_type mode,
-@@ -2273,10 +2410,142 @@ static int airoha_tc_htb_alloc_leaf_queue(struct airoha_gdm_port *port,
- 	return 0;
- }
- 
-+static int airoha_qdma_set_rx_meter(struct airoha_gdm_port *port,
-+				    u32 rate, u32 bucket_size,
-+				    enum trtcm_unit_type unit_type)
-+{
-+	struct airoha_qdma *qdma = port->qdma;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-+		int err;
-+
-+		if (!qdma->q_rx[i].ndesc)
-+			continue;
-+
-+		err = airoha_qdma_init_rl_config(qdma, i, !!rate, unit_type);
-+		if (err)
-+			return err;
-+
-+		err = airoha_qdma_set_rl_token_bucket(qdma, i, rate,
-+						      bucket_size);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int airoha_tc_matchall_act_validate(struct tc_cls_matchall_offload *f)
-+{
-+	const struct flow_action *actions = &f->rule->action;
-+	const struct flow_action_entry *act;
-+
-+	if (!flow_action_has_entries(actions)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "filter run with no actions");
-+		return -EINVAL;
-+	}
-+
-+	if (!flow_offload_has_one_action(actions)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "only once action per filter is supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	act = &actions->entries[0];
-+	if (act->id != FLOW_ACTION_POLICE) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack, "unsupported action");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.exceed.act_id != FLOW_ACTION_DROP) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "invalid exceed action id");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.notexceed.act_id != FLOW_ACTION_ACCEPT) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "invalid notexceed action id");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.notexceed.act_id == FLOW_ACTION_ACCEPT &&
-+	    !flow_action_is_last_entry(actions, act)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "action accept must be last");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.peakrate_bytes_ps || act->police.avrate ||
-+	    act->police.overhead || act->police.mtu) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "peakrate/avrate/overhead/mtu unsupported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int airoha_dev_tc_matchall(struct net_device *dev,
-+				  struct tc_cls_matchall_offload *f)
-+{
-+	enum trtcm_unit_type unit_type = TRTCM_BYTE_UNIT;
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	u32 rate = 0, bucket_size = 0;
-+
-+	switch (f->command) {
-+	case TC_CLSMATCHALL_REPLACE: {
-+		const struct flow_action_entry *act;
-+		int err;
-+
-+		err = airoha_tc_matchall_act_validate(f);
-+		if (err)
-+			return err;
-+
-+		act = &f->rule->action.entries[0];
-+		if (act->police.rate_pkt_ps) {
-+			rate = act->police.rate_pkt_ps;
-+			bucket_size = act->police.burst_pkt;
-+			unit_type = TRTCM_PACKET_UNIT;
-+		} else {
-+			rate = div_u64(act->police.rate_bytes_ps, 1000);
-+			rate = rate << 3; /* Kbps */
-+			bucket_size = act->police.burst;
-+		}
-+		fallthrough;
-+	}
-+	case TC_CLSMATCHALL_DESTROY:
-+		return airoha_qdma_set_rx_meter(port, rate, bucket_size,
-+						unit_type);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int airoha_dev_setup_tc_block_cb(enum tc_setup_type type,
-+					void *type_data, void *cb_priv)
-+{
-+	struct net_device *dev = cb_priv;
-+
-+	if (!tc_can_offload(dev))
-+		return -EOPNOTSUPP;
-+
-+	switch (type) {
-+	case TC_SETUP_CLSFLOWER:
-+		return airoha_ppe_setup_tc_block_cb(dev, type_data);
-+	case TC_SETUP_CLSMATCHALL:
-+		return airoha_dev_tc_matchall(dev, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int airoha_dev_setup_tc_block(struct airoha_gdm_port *port,
- 				     struct flow_block_offload *f)
- {
--	flow_setup_cb_t *cb = airoha_ppe_setup_tc_block_cb;
-+	flow_setup_cb_t *cb = airoha_dev_setup_tc_block_cb;
- 	static LIST_HEAD(block_cb_list);
- 	struct flow_block_cb *block_cb;
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index e82abfc1a67bda7f675342327ae07601d81f2b8f..da5371bcd14732afdeb2430e24bcbddaf9c479f7 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -127,6 +127,11 @@ enum tx_sched_mode {
- 	TC_SCH_WRR2,
- };
- 
-+enum trtcm_unit_type {
-+	TRTCM_BYTE_UNIT,
-+	TRTCM_PACKET_UNIT,
++struct genlmsg {
++    struct nlmsghdr nlh;
++    union {
++        struct genlmsghdr glh;
++        int error;
++    };
++    char buf[BINDER_MSG_SIZE];
 +};
 +
- enum trtcm_param_type {
- 	TRTCM_MISC_MODE, /* meter_en, pps_mode, tick_sel */
- 	TRTCM_TOKEN_RATE_MODE,
-@@ -554,8 +559,7 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 
- void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
- 			  u16 hash);
--int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
--				 void *cb_priv);
-+int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
- struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index d4969c2a03524253ace346dd6d862981ebfb44ed..6e9787c2843bc4f09240a0bbbd1f506c099d615e 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -967,18 +967,13 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
- 	return err;
- }
- 
--int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
--				 void *cb_priv)
-+int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data)
- {
--	struct flow_cls_offload *cls = type_data;
--	struct net_device *dev = cb_priv;
- 	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct flow_cls_offload *cls = type_data;
- 	struct airoha_eth *eth = port->qdma->eth;
- 	int err = 0;
- 
--	if (!tc_can_offload(dev) || type != TC_SETUP_CLSFLOWER)
--		return -EOPNOTSUPP;
--
- 	mutex_lock(&flow_offload_mutex);
- 
- 	if (!eth->npu)
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 8146cde4e8ba370e79b9b1bd87bb66a2caf7649a..29c8f046b9910c371ab4edc34b01f58d7383ae8d 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -283,6 +283,7 @@
- #define PPE_HASH_SEED				0x12345678
- 
- #define REG_PPE_DFT_CPORT0(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x248)
-+#define DFT_CPORT_MASK(_n)			GENMASK(3 + ((_n) << 2), ((_n) << 2))
- 
- #define REG_PPE_DFT_CPORT1(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x24c)
- 
-@@ -691,6 +692,12 @@
- #define REG_TRTCM_DATA_LOW(_n)		((_n) + 0x8)
- #define REG_TRTCM_DATA_HIGH(_n)		((_n) + 0xc)
- 
-+#define RATE_LIMIT_PARAM_RW_MASK	BIT(31)
-+#define RATE_LIMIT_PARAM_RW_DONE_MASK	BIT(30)
-+#define RATE_LIMIT_PARAM_TYPE_MASK	GENMASK(29, 28)
-+#define RATE_LIMIT_METER_GROUP_MASK	GENMASK(27, 26)
-+#define RATE_LIMIT_PARAM_INDEX_MASK	GENMASK(23, 16)
++static void usage(char *progname)
++{
++	fprintf(stderr,
++		"usage:  %s [-n] [-v]\n"
++		"Where:\n\t"
++		"-n  Use the /dev/binderfs name service.\n\t"
++		"-v  Print context and command information.\n\t"
++		"\nNote: Ensure this boolean command is run when "
++		"testing after a reboot:\n\t"
++		"setsebool allow_domain_fd_use=0\n", progname);
++	exit(-1);
++}
 +
- #define REG_TXWRR_MODE_CFG		0x1020
- #define TWRR_WEIGHT_SCALE_MASK		BIT(31)
- #define TWRR_WEIGHT_BASE_MASK		BIT(3)
-
----
-base-commit: 23f09f01b495cc510a19b30b6093fb4cb0284aaf
-change-id: 20250319-airoha-hw-rx-ratelimit-1dd407e77925
-
-Best regards,
++static int sendgenl(int fd, __u32 pid, __u16 nlmsg_type, __u8 cmd, __u16 nla_type,
++		const void* nla_data, __u16 nla_len)
++{
++	if (NLA_ALIGN(nla_len) + NLA_HDRLEN > BINDER_MSG_SIZE) {
++		fprintf(stderr, "Oversized data to send\n");
++		return -ENOMEM;
++	}
++
++	struct genlmsg msg = {
++		.nlh = {
++				.nlmsg_len = NLMSG_LENGTH(GENL_HDRLEN),
++				.nlmsg_type = nlmsg_type,
++				.nlmsg_flags = NLM_F_REQUEST,
++				.nlmsg_seq = 0,
++				.nlmsg_pid = pid,
++		},
++		.glh = {
++			.cmd = cmd,
++			.version = BINDER_FAMILY_VERSION,
++		},
++	};
++
++	struct nlattr* nla = GENLMSG_DATA(&msg.glh);
++	nla->nla_type = nla_type;
++	nla->nla_len = nla_len + NLA_HDRLEN;
++	memcpy(NLA_DATA(nla), nla_data, nla_len);
++	msg.nlh.nlmsg_len += NLA_ALIGN(nla->nla_len);
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK,
++	};
++	int ret = sendto(fd, &msg, msg.nlh.nlmsg_len, 0, (struct sockaddr*)&sa, sizeof(sa));
++	if (ret < 0)
++		fprintf(stderr, "Failed to send (%d %d %d %d): %s\n",
++				nlmsg_type, cmd, nla_type, nla_len, strerror(errno));
++
++	if (verbose)
++		printf("Sent %d / %d bytes to binder netlink\n", ret, msg.nlh.nlmsg_len);
++
++	return ret;
++}
++
++static int sendgenlv(int fd, __u32 pid, __u16 nlmsg_type, __u8 cmd, __u16 nla_type[],
++		const void* nla_data[], __u16 nla_len[], int n)
++{
++	__u32 len = 0;
++	for (int i = 0; i < n; i++)
++		len += NLA_ALIGN(nla_len[i]) + NLA_HDRLEN;
++
++	if (len > BINDER_MSG_SIZE) {
++		fprintf(stderr, "Oversized data to send: %d > %d\n", len, BINDER_MSG_SIZE);
++		return -ENOMEM;
++	}
++
++	struct genlmsg msg = {
++		.nlh = {
++				.nlmsg_len = NLMSG_LENGTH(GENL_HDRLEN),
++				.nlmsg_type = nlmsg_type,
++				.nlmsg_flags = NLM_F_REQUEST,
++				.nlmsg_seq = 0,
++				.nlmsg_pid = pid,
++		},
++		.glh = {
++			.cmd = cmd,
++			.version = BINDER_FAMILY_VERSION,
++		},
++	};
++
++	struct nlattr* nla = GENLMSG_DATA(&msg.glh);
++	for (int i = 0; i < n; i++) {
++		nla->nla_type = nla_type[i];
++		nla->nla_len = nla_len[i] + NLA_HDRLEN;
++		memcpy(NLA_DATA(nla), nla_data[i], nla_len[i]);
++		nla = (struct nlattr*)((char*)(nla) + NLA_ALIGN(nla->nla_len));
++	}
++	msg.nlh.nlmsg_len += len;
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK,
++	};
++
++	int ret = sendto(fd, &msg, msg.nlh.nlmsg_len, 0, (struct sockaddr*)&sa, sizeof(sa));
++	if (ret < 0) {
++		fprintf(stderr, "Failed to send (%d %d %d): %s\n",
++				nlmsg_type, cmd, n, strerror(errno));
++	}
++
++	if (verbose)
++		printf("Sent %d / %d bytes\n", ret, msg.nlh.nlmsg_len);
++
++	return ret;
++}
++
++static int recvgenl(int fd, struct genlmsg* msg, int len)
++{
++	int ret = recv(fd, msg, len, 0);
++	if (verbose) {
++		printf("Received %d\n", ret);
++		printf("nlh: %d %d %d %d %d\n", msg->nlh.nlmsg_len, msg->nlh.nlmsg_type,
++				msg->nlh.nlmsg_flags, msg->nlh.nlmsg_seq, msg->nlh.nlmsg_pid);
++	}
++
++	if (ret < 0) {
++		fprintf(stderr, "Failed to receive %d: %s\n", ret, strerror(errno));
++		return ret;
++	} else if (msg->nlh.nlmsg_type == NLMSG_ERROR) {
++		ret = msg->error;
++		fprintf(stderr, "Error msg received %d: %s\n", ret, strerror(-ret));
++		return ret;
++	} else if (!NLMSG_OK(&msg->nlh, ret)) {
++		fprintf(stderr, "Wrong message data\n");
++		return -EFAULT;
++	}
++
++	return 0;
++}
++
++int main(int argc, char **argv)
++{
++	int fd, opt;
++	pid_t pid;
++	char *context;
++	char *name;
++	__u16 id = 0;
++
++	while ((opt = getopt(argc, argv, "v")) != -1) {
++		switch (opt) {
++		case 'v':
++			verbose = true;
++			break;
++		default:
++			usage(argv[0]);
++		}
++	}
++
++	/* Get our context and pid */
++	if (getcon(&context) < 0) {
++		fprintf(stderr, "Failed to obtain SELinux context\n");
++		exit(-1);
++	}
++	pid = getpid();
++
++	if (verbose) {
++		fprintf(stderr, "Setup report PID: %d Process context %s\n", pid, context);
++	}
++
++	free(context);
++
++	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	if (fd < 0) {
++		fprintf(stderr, "Failed to open socket: %s\n", strerror(errno));
++		exit(151);
++	}
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK, .nl_pid = pid,
++	};
++
++	if (bind(fd, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
++		fprintf(stderr, "Failed to bind socket: %s\n", strerror(errno));
++		exit(152);
++	}
++
++	if (sendgenl(fd, pid, GENL_ID_CTRL, CTRL_CMD_GETFAMILY, CTRL_ATTR_FAMILY_NAME, BINDER_FAMILY_NAME, strlen(BINDER_FAMILY_NAME) + 1) < 0) {
++		fprintf(stderr, "Failed to send CTRL_CMD_GETFAMILY\n");
++		exit(153);
++	}
++
++	struct genlmsg msg;
++	if (recvgenl(fd, &msg, sizeof(msg)) < 0) {
++		fprintf(stderr, "Failed to receive reply of CTRL_CMD_GETFAMILY\n");
++		exit(154);
++	}
++
++	if (msg.glh.cmd != CTRL_CMD_NEWFAMILY) {
++		fprintf(stderr, "Wrong glh cmd %d, expect %d\n", msg.glh.cmd, CTRL_CMD_NEWFAMILY);
++		exit(155);
++	}
++
++	int cur = 0;
++	int payload = GENLMSG_PAYLOAD(&msg.nlh);
++	char* data = GENLMSG_DATA(&msg.glh);
++	while (cur < payload) {
++		if (verbose)
++			printf("Checking NLA payload %d / %d\n", cur, payload);
++		struct nlattr* nla = (struct nlattr*)(data + cur);
++		if (verbose)
++			printf("NLA type / len: %d / %d\n", nla->nla_type, nla->nla_len);
++		cur += NLA_ALIGN(nla->nla_len);
++		switch (nla->nla_type) {
++		case CTRL_ATTR_FAMILY_NAME:
++			name = NLA_DATA(nla);
++			if (verbose)
++				printf("Binder Netlink family name is %s\n", name);
++			break;
++		case CTRL_ATTR_FAMILY_ID:
++			id = *(__u16*)(NLA_DATA(nla));
++			if (verbose)
++				printf("Binder Netlink family id is %d\n", id);
++			break;
++		case CTRL_ATTR_MCAST_GROUPS:
++			if (verbose)
++				printf("Binder Netlink MCAST_GROUP ignored\n");
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!id) {
++		fprintf(stderr, "Failed to get binder netlink family id\n");
++		exit(156);
++	}
++
++	__u32 proc = 0;
++	__u32 flags = 0;
++	__u16 type[3] = { BINDER_A_CMD_CONTEXT, BINDER_A_CMD_PID, BINDER_A_CMD_FLAGS };
++	__u16 len[3] = { strlen(BINDERFS_NAME) + 1, sizeof(proc), sizeof(flags) };
++	const void* buf[3] = { (void*)BINDERFS_NAME, (void*)&proc, (void*)&flags };
++
++	if (verbose)
++		printf("Sending BINDER_CMD_REPORT_SETUP %s %d %d\n", BINDERFS_NAME, proc, flags);
++
++	if (sendgenlv(fd, pid, id, BINDER_CMD_REPORT_SETUP, type, buf, len, 3) < 0) {
++		fprintf(stderr, "Failed to send BINDER_CMD_REPORT_SETUP\n");
++		exit(157);
++	}
++
++	if (recvgenl(fd, &msg, sizeof(msg)) < 0) {
++		fprintf(stderr, "Failed to receive reply of BINDER_CMD_REPORT_SETUP\n");
++		exit(158);
++	}
++
++	if (msg.glh.cmd != BINDER_CMD_REPORT_SETUP) {
++		fprintf(stderr, "Wrong glh cmd %d, expect %d\n", msg.glh.cmd, BINDER_CMD_REPORT_SETUP);
++		exit(159);
++	}
++
++	close(fd);
++
++	return 0;
++}
+diff --git a/tests/binder/test b/tests/binder/test
+index 95af41a..8cba452 100755
+--- a/tests/binder/test
++++ b/tests/binder/test
+@@ -7,6 +7,7 @@ BEGIN {
+ 
+     $test_count      = 0;
+     $test_binder_ctx = 0;
++    $test_binder_transaction_report = 0;
+ 
+     # Allow binder info to be shown.
+     $v = $ARGV[0];
+@@ -57,6 +58,19 @@ BEGIN {
+         $test_binder_ctx = 1;
+         $test_count += 8;
+         $n = "-n";                   # Use /dev/binder-test
++
++        # Check transaction_report feature
++        open my $fh, '<', '/dev/binderfs/features/transaction_report' or warn $!;
++        chomp( my $feature = <$fh> );
++        print "### my $feature\n";
++        $test_binder_transaction_report = int($feature);
++        print "### feature = $test_binder_transaction_report\n";
++        if ( $test_binder_transaction_report eq 0 ) {
++            print "Binder feature transaction report not supported\n";
++        } else {
++            $test_count += 3;
++            print "### test count = $test_count\n";
++        }
+     }
+     elsif ( $result >> 8 eq 3 ) {    # BINDER_VER_ERROR
+         plan skip_all => "Binder kernel/userspace versions differ";
+@@ -176,6 +190,27 @@ if ($test_binder_ctx) {
+     service_end( "service_provider", $sp_pid );
+     service_end( "manager",          $sm_pid );
+ 
++# 9 Verify that authorized process can send generic netlink command to set up binder reports.
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result eq 0 );
++    }
++
++# 10 Verify that unauthorized process can't use generic netlink socket (no genetlink perm).
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_no_genl_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result >> 8 eq 151 );
++    }
++
++# 11 Verify that unauthorized process can't use setup_report command (no setup_report perm).
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_no_setup_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result >> 8 eq 158 );
++    }
++
+     # Cleanup binderfs stuff.
+     system("/bin/sh $basedir/cleanup_binder.sh $v 2>/dev/null");
+ }
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.49.0.604.gff1f9ca942-goog
 
 
