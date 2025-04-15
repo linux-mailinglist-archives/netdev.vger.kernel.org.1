@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-182963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15D6A8A738
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:52:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983D0A8A73B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D09443DA3
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:52:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31F033BE906
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6DA239072;
-	Tue, 15 Apr 2025 18:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A7623958C;
+	Tue, 15 Apr 2025 18:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCrQSAEK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EI65kYFD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752DC238D45;
-	Tue, 15 Apr 2025 18:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E97623957F;
+	Tue, 15 Apr 2025 18:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744743028; cv=none; b=h/0atHOuGjagDbzEjqkChqaRJhIQ04/1VDNggvye9m0bFRKOGx9pF1W3e4krpxP1bxz1GspotDtFaJQNLbg/CZMMjuaHGHjlgFLhfHDjXzeVpEC5gwDGXk9SKHPlcWfrG5mzOj3JLo2oiQkY/be2BK7CNwVaV7eQk8wMFIdiMbU=
+	t=1744743029; cv=none; b=eSf79OjLlWcuAO6Irob0rhPz4Gopo7wnRoHNCBBruE5RG2WoRrLCTmfd1pruFYVYsCQblqzE+BT0EsYdJqc93wjii79v4ceiWVcj5Qoeb6RAUelSW4byrp6ZhXq7XOmNY1IrRy86aIuCAAXDHEb3JbcBitEwsDSeeTYUP2uG5xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744743028; c=relaxed/simple;
-	bh=i96Kyrg01izSj1tfm721taG9uBhVOrp8C74DnVe2tRA=;
+	s=arc-20240116; t=1744743029; c=relaxed/simple;
+	bh=GUxWClb2p560YPhhqW30ElRrwqIgB8V99LnyxuA4BEU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cRn2Ttnu+k7FmUQwZGys8AiEnD0qXGDpovp5VZhpyd33xhakwgNQiXvtnW2vBhs9+/XCkPssm8ww5Pek4/ojQFWNRYtRWHzsfLpnjH1ziXIsQa5m9yACHyj8OwGqVvqeU2dWGbwt97lXz2nNWD+4CG15fcZjLJbOVDac40iIx2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCrQSAEK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B53C4CEF0;
-	Tue, 15 Apr 2025 18:50:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qusGegePVwa3SJjgACe73p5WCIOztZ750c5Lo8+PPvtsdxtHGOszOEESU2paoJo7EEr7HbAvIi0rcwDlxvJtW8bk57R5RIORi2v03YyfJF2KuVUAJU3vMLvqwq9h+I478tPIND1ajFQMQW7raGJH6Q2BlWo9QRoPLZNTbwbyl6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EI65kYFD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076CCC4CEEB;
+	Tue, 15 Apr 2025 18:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744743027;
-	bh=i96Kyrg01izSj1tfm721taG9uBhVOrp8C74DnVe2tRA=;
+	s=k20201202; t=1744743029;
+	bh=GUxWClb2p560YPhhqW30ElRrwqIgB8V99LnyxuA4BEU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=MCrQSAEKMtZ4BFC4CzgKRH3Kiv2Y0+KgoKyYvzwHdKcrSED0OTtY48wdLQygmdo5D
-	 tMxBl933QsVBSutVfivfwp05hujsmARFi22dPQaxjTXmWl7t/odlOW8qV/cFo35sEN
-	 mGf27JpGo4+msI2oOGAyGMxnzgaGUYAskNnmmva0zFUoQMVo+gIG264vG34jqvi3XY
-	 M4f7jKwbZWHW8gkoqrKuB2s70t94x7VhdanoU7t5EWYbAODRdUOALSCt6AZe4fFNBi
-	 UW3fmN57MmQDXDivIlnymPWpCUVkzzEb2MR5EL1SMp3y9rUeAr01079l3B/qzDGxlS
-	 kHUDMDDSTkUJw==
+	b=EI65kYFDUb7skoZvuo3+NCVhsAKSvtLTrK1kGqkmBXmldGubpMjyHMQdz+U3u1Hs5
+	 tnEKJ9ZpEYTh/XaBv8eV9BzQWo6AA8YHCP9STW2rJS9vmf8J8fRR6dhNdq9QQdvPJv
+	 K7Ig77oCP4L38BsHZ4gHLi+6YuSUZXQHiAKvWXlt2tADYOhO+N65N//MTIEF4WLGQH
+	 XZ4ar16UOp94VNd1m2FjCeXHSCytCPg6nSWO3Gy//DXDA0UfnU0M2fXvpnyo91drRL
+	 OtS2SefIZdBJuJL2p500ObCacHRJen/tMTS+dX/3v4gHIg9mFrgpFtJ8eIvpQ0qic+
+	 bf7Qt6JXq30ww==
 From: Jeff Layton <jlayton@kernel.org>
-Date: Tue, 15 Apr 2025 14:49:44 -0400
-Subject: [PATCH v2 6/8] net: add ref_tracker_dir_debugfs() calls for netns
- refcount tracking
+Date: Tue, 15 Apr 2025 14:49:45 -0400
+Subject: [PATCH v2 7/8] ref_tracker: widen the ref_tracker_dir.name field
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250415-reftrack-dbgfs-v2-6-b18c4abd122f@kernel.org>
+Message-Id: <20250415-reftrack-dbgfs-v2-7-b18c4abd122f@kernel.org>
 References: <20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org>
 In-Reply-To: <20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -65,86 +64,44 @@ Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  Jeff Layton <jlayton@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1833; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=i96Kyrg01izSj1tfm721taG9uBhVOrp8C74DnVe2tRA=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBn/qppbntLmbDxuB2097U+Q5euUqeIkoi/TdyB5
- FfsC4m6goOJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ/6qaQAKCRAADmhBGVaC
- FSd9D/9CVyT8Q/Fp/vhtuyXenjQmxmD4fXzq1DXoOlSgFIlUgKQ2ibZzWyRwusZB2X/hC1p3p8s
- 7OSSeEUPl8CCZwMXygiS0MLDphCj7dIPEMKF0Wjl93L1CNMzPYfv8nz73TM9TLdlfE72/qW0KD8
- xWBob+t6r5MqE9JtqQOdJo5Fa6EAvxTfJ4ist22yAFVR9nNqr53KkyadY25dTDWc5SzNaa6dQa9
- ul53LeBkaoi2Gn6zwNQfAaT6mOn6TdRrKiCaMFoK6pEPWW/m9LSa6G5KqtHAowH6rCr2y1e8J4m
- J5NLU5JD8TUn3o+l0vQQev79InxG1Y+Kdm4Lcsz3QXUmhh3lfnLxhoKDg+6NSpdqj3iqjUhw/eK
- D1K/LmIKP3aOanKhBYTj8+dLn3MQY0QI0EMFTsEkVF3P6HSy7kytigxf7pFNtiH3l0YtUTmA4N5
- DqGIWT+M7kwI+VADcLaYXtvJFK3PgpdpyW521TW01Kr2scqwl0A0phtS9OhtJgAFhh6YVEanduQ
- WWitmNVI0EAqlVtP4Z69yhwfvW9l3oeFedI8Y6DzwFYosw152TIaCUFZQJbd0ZMzRqvuNaHH5OZ
- gj6zll4egL01sD74Jfb601ZbZybD8dCLWPORLngFsKG00bze8AwdrwswkWPSQkrBGU5u1qxwB3N
- c6pUbgN4MfL5OAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=696; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=GUxWClb2p560YPhhqW30ElRrwqIgB8V99LnyxuA4BEU=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBn/qppXPDCs9+jWOKGKY9T6cY2KifjDeb9uiA0M
+ Y93TKREGS+JAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ/6qaQAKCRAADmhBGVaC
+ FV4RD/95RrzXlJECwkM8G6ZYl+uwki7wa0ugi/6t+MtEACoCnHy4ceXvya9zbVFkmwR5EyfmMss
+ ArRr1eo3GWhlIuz5KBNwbeJsyzl8ss+kGYXQCqKS3ESWSfUTpLLH03qL/fx8R3UcGASRsGviHDt
+ TkR3Cw6DIozKK2zf9zNeMazmtlRpnRTJk83IgdKtLsjKabiDRPo/QA+PRjDPX88zN42/G1QU1Co
+ V/aUvbEN5iidFu3BJveD7g8YN3VqQjb7sQfsTdNJj+uOpJjJoOT6bYrjTPzK0tUjMK9CTaokhL4
+ 0bg6N3O1ZE2eswL/MjBsSWFS9njYxM3Cit5jt6RhFswd46ZKFT3ccCm6PbOGziKbznhPsc8fx1M
+ wWdYonxL1HP5mKUWXWLXdtRKa3R5vTVEaCTKfj/4do3/ArP88RDA/tKsMwwjU73iPl+4VPjmfT0
+ eLYiFlDDhWRX35TzQ99PqOe9YSQTji5U7y2f4c6sEpV2Fmk94SkMYfiX9l0PgM2NpEbpAvXhAKz
+ iNnNGoISTgMRGWdZWMrtVvPiuwB25dotUfe9go6hyFPKhnRNe9Lf5YgouyJrWtLCkSG20qOVi9E
+ EuJR2Jv2+40IblBh7uiabJr2g+ALFnHqzjkmqo8EOxYn3du8rRaWF7LrhFA09MP7/7wUVJpTORx
+ Qvu5neeCPwMGzXQ==
 X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
  fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-After assigning the inode number to the namespace, use it to create a
-unique name for each netns refcount tracker and register the debugfs
-files for them.
-
-The init_net is registered early in the boot process before the
-ref_tracker dir is created, so add a late_initcall() to register its
-files.
+Currently it's 32 bytes, but with the need to move to unique names for
+debugfs files, that's inadequate. Move to a 64 byte name field.
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- net/core/net_namespace.c | 34 +++++++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+ include/linux/ref_tracker.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 4303f2a4926243e2c0ff0c0387383cd8e0658019..f636eb9b8eba28114fd192d64bcd359a25381988 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -761,12 +761,44 @@ struct net *get_net_ns_by_pid(pid_t pid)
- }
- EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
- 
-+#ifdef CONFIG_NET_NS_REFCNT_TRACKER
-+static void net_ns_net_debugfs(struct net *net)
-+{
-+	char name[32];
-+	size_t len;
-+
-+	len = snprintf(name, sizeof(name), "netns-%u-refcnt", net->ns.inum);
-+	if (len < sizeof(name))
-+		ref_tracker_dir_debugfs(&net->refcnt_tracker, name);
-+
-+	len = snprintf(name, sizeof(name), "netns-%u-notrefcnt", net->ns.inum);
-+	if (len < sizeof(name))
-+		ref_tracker_dir_debugfs(&net->notrefcnt_tracker, name);
-+}
-+
-+static int __init init_net_debugfs(void)
-+{
-+	net_ns_net_debugfs(&init_net);
-+	return 0;
-+}
-+late_initcall(init_net_debugfs);
-+#else
-+static void net_ns_net_debugfs(struct net *net)
-+{
-+}
-+#endif
-+
- static __net_init int net_ns_net_init(struct net *net)
- {
-+	int ret;
-+
- #ifdef CONFIG_NET_NS
- 	net->ns.ops = &netns_operations;
+diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
+index 77a55a32c067216fa02ba349498f53bd289aee0c..be3e43127843f710c22aadb47612e07ce9eeeacd 100644
+--- a/include/linux/ref_tracker.h
++++ b/include/linux/ref_tracker.h
+@@ -21,7 +21,7 @@ struct ref_tracker_dir {
+ #ifdef CONFIG_DEBUG_FS
+ 	struct dentry		*dentry;
  #endif
--	return ns_alloc_inum(&net->ns);
-+	ret = ns_alloc_inum(&net->ns);
-+	if (!ret)
-+		net_ns_net_debugfs(net);
-+	return ret;
- }
+-	char			name[32];
++	char			name[64];
+ #endif
+ };
  
- static __net_exit void net_ns_net_exit(struct net *net)
 
 -- 
 2.49.0
