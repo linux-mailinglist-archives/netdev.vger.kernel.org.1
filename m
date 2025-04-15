@@ -1,108 +1,88 @@
-Return-Path: <netdev+bounces-182809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF25DA89F49
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:22:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C83C5A89F58
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:25:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF363AAF6B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:21:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D778E16A9B2
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD8E284679;
-	Tue, 15 Apr 2025 13:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819DC297A42;
+	Tue, 15 Apr 2025 13:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kdfgPC0f"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFED15336D;
-	Tue, 15 Apr 2025 13:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25172DFA2F;
+	Tue, 15 Apr 2025 13:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744723317; cv=none; b=IRUx7bK3ugbGAxQ6AAT4jRWRauDc9z9crxJ3gv5gty5iLHY9fN7ZUXIdGJxTcBRVzRbZrSG7QrEzmosCA146399o4QJ5Gh8DVWwnU3OIbHllgW8x3KR583hyTnRxfp3U460+PyuKPXPhL/V0acmQF+1UllhB7YOoKN1ji+Mr2A4=
+	t=1744723504; cv=none; b=JmReVqSjUZe3pbhX2L8Zat8kTrK1ocrXnyTetUCr+xQToFwm/Ebw0lKjd1igeUpDdYHBxUA6Txp4cBBKPxQgRdQmWIK6ihuZPWN1Ted9aVzUMzwD7B1Z3WsFCtUH5ZQmuK4OZgqjDsGv69U1WvGxSm1MMNZB9lqtepDfgLyBg2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744723317; c=relaxed/simple;
-	bh=yyGzD61+MYjILrn08mJKN5vTr4czMlsOzuslZ08hNT4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RRApaKFPSmMrEHSUrcX6WdeLXnBI0h7/pWvikMxg/uyWRROIAMFAR/Yr98tQajyX2llD2HkzD5KE75od0erIe68uSSFrki0RoeHJsJsTH2lEjTd2hf6g8VAPhN/hOSFAaOomE+qnR63YU1bVA2Asemq+Ml8SseprzfMMhDUm3As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZcPst3243z6L4vb;
-	Tue, 15 Apr 2025 21:20:34 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6C193140133;
-	Tue, 15 Apr 2025 21:21:52 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Apr
- 2025 15:21:51 +0200
-Date: Tue, 15 Apr 2025 14:21:50 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
-	<benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v13 05/22] cxl: add function for type2 cxl regs setup
-Message-ID: <20250415142150.00000f9d@huawei.com>
-In-Reply-To: <20250414151336.3852990-6-alejandro.lucero-palau@amd.com>
-References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
-	<20250414151336.3852990-6-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1744723504; c=relaxed/simple;
+	bh=lilh6DgEHFAJBHveNzZ1DXag1L6JWH5M/of03MZ64Sg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oscUYVrbtPt2Sz/ountxNt6M/T7UA0W4ana6ZeblIdbmFiuaCWZKX+ifpndUCYiDCCKONQZXGok6820jSqkbLgAqLUXMaHQAK+upr05c/GxXbuNyYU3gE5w31hMiuKg4F+Bbs47AIkrAnt211yPXeBLP0xrV4cu+VkA81oGktpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kdfgPC0f; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=U3ryYnUUuWttb8wAZUQ51mckx1LM5d+Eo8htRMGH8FA=; b=kdfgPC0fvU1og3EXc20ZYPD++8
+	Kvdf22c88XfQwT9AOhEo2ZDiGysNx7CCJGeS0TkwLWCMcliWy5sdwXlUdy7oFEA8iieoQ+I5XwC9Q
+	+xKqi+FxES1keawD/gWowr/PDtVadghvBxB/P913eZWbDCqbIsKwT6nu3FMPySScpUs4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4gHU-009Rwi-Q0; Tue, 15 Apr 2025 15:24:52 +0200
+Date: Tue, 15 Apr 2025 15:24:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fiona Klute <fiona.klute@gmx.de>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-list@raspberrypi.com
+Subject: Re: [PATCH net] net: phy: microchip: force IRQ polling mode for
+ lan88xx
+Message-ID: <d0c0af22-6825-48de-8485-ef294c840f6d@lunn.ch>
+References: <20250414152634.2786447-1-fiona.klute@gmx.de>
+ <24541282-0564-4fb6-8bd1-430f6b1390b0@lunn.ch>
+ <db6b47a1-1a6c-476e-a679-aac3e5117c68@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <db6b47a1-1a6c-476e-a679-aac3e5117c68@gmx.de>
 
-On Mon, 14 Apr 2025 16:13:19 +0100
-alejandro.lucero-palau@amd.com wrote:
+> > Thanks for submitting this. Two nit picks:
+> > 
+> > It needed a Fixes: tag. Probably:
+> > 
+> > Fixes: 792aec47d59d ("add microchip LAN88xx phy driver")
+> Sure, will add that (and a comment) and resend. I wasn't sure if I
+> should add it if I can't pinpoint exactly where the problem was
+> introduced, and it looks like the interrupt handling was changed a bit
+> after.
 
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Create a new function for a type2 device initialising
-> cxl_dev_state struct regarding cxl regs setup and mapping.
-> 
-> Export the capabilities found for checking them against the
-> expected ones by the driver.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> ---
-One trivial thing inline.
+If you can prove interrupt handling did actually work to start with,
+maybe a later commit could be referenced. But i'm not sure it is worth
+the effort.
 
->  drivers/cxl/core/pci.c | 52 ++++++++++++++++++++++++++++++++++++++++++
->  include/cxl/cxl.h      |  4 ++++
->  2 files changed, 56 insertions(+)
-> 
-
->  int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
->  {
->  	int speed, bw;
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index afad8a86c2bc..729544538673 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -231,4 +231,8 @@ struct cxl_dev_state *_cxl_dev_state_create(struct device *dev,
->  struct pci_dev;
->  int cxl_check_caps(struct pci_dev *pdev, unsigned long *expected,
->  		   unsigned long *found);
-> +
-> +struct cxl_memdev_state;
-
-Why have this here?  only cxl_dev_state is used.
-
-> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlmds,
-> +			     unsigned long *caps);
->  #endif /* __CXL_CXL_H__ */
-
+	Andrew
 
