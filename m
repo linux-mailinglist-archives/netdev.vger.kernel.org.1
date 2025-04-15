@@ -1,179 +1,254 @@
-Return-Path: <netdev+bounces-182675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221EFA899C5
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:20:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5224FA899D8
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2637C1670F8
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:20:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54E36167898
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A9D2918DB;
-	Tue, 15 Apr 2025 10:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB0D27FD68;
+	Tue, 15 Apr 2025 10:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="MkFV+lBr";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="KS5my13j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8MwxKKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7404291171;
-	Tue, 15 Apr 2025 10:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E001A2632;
+	Tue, 15 Apr 2025 10:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744712361; cv=none; b=AEGRG6q7FebqWxcEf0KOIGa18SdH+nHnqUowTK27kbq5Lxkmf6Az+mLnTBmCXnNBlpJLmc6J1HlHhzjb4PhihcxqbxHUUSU/8WASU5LfU+9vxTYxso/+iSqR1ydxsC9wZzmTeRcC6spGwxmt3lpBTs8nXUpmFyszI3uv9BE6hpA=
+	t=1744712593; cv=none; b=nGQsn1hlrJg0frlGlsrTpOL0P9SQFeJZIMQvs9EGZxQDPbCCUHTrwgFVrfMaTkm/KjPMF2d54ZwEmf7psqxT8o3lXpIFBmlh4rvddQqjcat6aPvgbAWGeEn/FoQdGMq3Ua40Lz3ul+UOcOBQ+w8rLeDq3OQdtB7UawkMIUx6pIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744712361; c=relaxed/simple;
-	bh=GLxiJlf0l4/8f/3cOIsp8spLAwZmy6rGL3fBo0ibedo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ENKmWS1c2Y9XuLSx7SMNtH9qKxcrDtKABbgQ4SklMaPOhms34KUoe7+n8eRURs6W+nhCsPFAit5LBdKhjy9LegYOjRWPN6GEOM7jL+pctw6XcDCJya7vx7Jl4udfs2Er5kTgHLayN9isis9COjhriq6MROOkFYrR2J5BdV9KKzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=MkFV+lBr; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=KS5my13j reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1744712358; x=1776248358;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L3mgdLsAzzZaK/mOx+qOWZRMUeWUqc13Mm441pFDAiY=;
-  b=MkFV+lBryBJNa6igRNWDBlpagU2YrcuUvlZWeby+D6BMtlBWLga7re+Q
-   OGD7e2TIXUnyrIEy23+T8+HRkmnl2KgB34Nnbmq1HFJXLytAzrttBBu9D
-   il2/Ks3ry6lTiRPIeb+R2qy5OS8NjcAvz/1SLTVz2aht7mL7u9DHGhQ8L
-   T44hoVwfdHpm39KRZuboMquQa8wowu2HujjweBO2fLuJ55Nw1xob0QGIi
-   0GwQXEQczlUgPFiEfF66lp/M9jjxPe2tbx4pSI52RPtMZzDqmBQipa8sN
-   bc9Xs/tVhsFka/f25xRUgvY8AMso9e+Fk7I9X0UM/aGnGK1Usdjbmsl5i
-   A==;
-X-CSE-ConnectionGUID: IwmrXv6VTCSAI3p/xks4FQ==
-X-CSE-MsgGUID: 3bL/W/GHSWOL+S5bi73eFg==
-X-IronPort-AV: E=Sophos;i="6.15,213,1739833200"; 
-   d="scan'208";a="43537792"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 15 Apr 2025 12:19:16 +0200
-X-CheckPoint: {67FE32A5-B-7141A0B0-E6EDEC14}
-X-MAIL-CPID: 5C0A9FF98528448249FF1B25666F25D4_3
-X-Control-Analysis: str=0001.0A00639F.67FE32A3.002A,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DB06016489A;
-	Tue, 15 Apr 2025 12:19:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1744712352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L3mgdLsAzzZaK/mOx+qOWZRMUeWUqc13Mm441pFDAiY=;
-	b=KS5my13jufA8VQYzVUolMCKej6Q6tnssyGOSXTJ5vvYPOztf4WkrwHSB161oYHAaXSR5Di
-	LU0epMxqooehsceu3dwjHl2Te7f8qmll6KsaNXzfcPOEmAqcr1APAsOPDup/VWeZu3J2r/
-	VRahVBSu+/J7QqeEoucuEShtkKDdob90Qex2OofXap8YdqpdwwUollbCo2cVBlYfg7pwHz
-	FYpxJD67+pTSdEZpd4q0U15HUuNstBYn0YdDGFZ8bIfRgFGO2nnkHeNh+t6TstazSpGo2G
-	o7a0U9Ac5NsiMfKrEJn98eJefYeWxc0nD+814nZJxy9Z6c+ckH30du2wfZIj/A==
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>
-Cc: Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux@ew.tq-group.com,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next 4/4] checkpatch: check for comment explaining rgmii(|-rxid|-txid) PHY modes
-Date: Tue, 15 Apr 2025 12:18:04 +0200
-Message-ID: <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	s=arc-20240116; t=1744712593; c=relaxed/simple;
+	bh=klDN7uanomzpPG7T/DWheax52c37vyO3EtaOg7Qv0N0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DT/LfiZ8uR15jjxbiNWm4IyN4eYTUvRo6XeDwXsit9JWX0/AVAp7ALy35UzZAf7Q90VWIk3qKHW162Qm+VV7KKUhhavICE+zcOAp4j+dmckLHDIDHDDHe+h3+KaSnki9DtFv2MD/BUS9y9gXiebY++s25SbeaEEeGnRs6cgFyMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8MwxKKl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CDDEC4CEDD;
+	Tue, 15 Apr 2025 10:23:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744712593;
+	bh=klDN7uanomzpPG7T/DWheax52c37vyO3EtaOg7Qv0N0=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=i8MwxKKlcjgP4yY11TzYkm8R/gD9M/auuZxoyjOlm5O8kUldnm7SSTJxG3xog/eHj
+	 Ffc5PJ4T+0Y4cKNjqfmrtBXzrVO5by82wXa7e4Dqivi3wz5UcnQIQGOATnajifactX
+	 hbOv98T3mshh7BiRw7/qNLdzrrxACqOe4nDIipYkyVBYb6kFjOAX0jWpb3FS7MdNoV
+	 CBPDklubxlMX/aYo1SHi83WdUGNYy/AhFpwzFm288kIrbgs4yqf42XNT9PZy5bf+LH
+	 rDNmot0zZiNPeVe9a2X6YDd0dV8N8twm5g69pv7DBiBAgvGyxw24TYF+jIttchFHk8
+	 Egc1gHUUuwR1g==
+Message-ID: <b697c51c0788e4e462e45a5cc78d3b5c2d01d496.camel@kernel.org>
+Subject: Re: [PATCH 2/4] ref_tracker: add ability to register a file in
+ debugfs for a ref_tracker_dir
+From: Jeff Layton <jlayton@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	 <horms@kernel.org>, Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor
+	 <nathan@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date: Tue, 15 Apr 2025 06:23:10 -0400
+In-Reply-To: <a86aab21-c539-48f5-bad1-25db9b8f3ced@lunn.ch>
+References: <20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org>
+	 <20250414-reftrack-dbgfs-v1-2-f03585832203@kernel.org>
+	 <a86aab21-c539-48f5-bad1-25db9b8f3ced@lunn.ch>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Historially, the RGMII PHY modes specified in Device Trees have been
-used inconsistently, often referring to the usage of delays on the PHY
-side rather than describing the board; many drivers still implement this
-incorrectly.
+On Tue, 2025-04-15 at 01:08 +0200, Andrew Lunn wrote:
+> On Mon, Apr 14, 2025 at 10:45:47AM -0400, Jeff Layton wrote:
+> > Currently, there is no convenient way to see the info that the
+> > ref_tracking infrastructure collects. Add a new function that other
+> > subsystems can optionally call to update the name field in the
+> > ref_tracker_dir and register a corresponding seq_file for it in the
+> > top-level ref_tracker directory.
+> >=20
+> > Also, alter the pr_ostream infrastructure to allow the caller to specif=
+y
+> > a seq_file to which the output should go instead of printing to an
+> > arbitrary buffer or the kernel's ring buffer.
+>=20
+> When i see an Also, or And, or a list in a commit message, i always
+> think, should this be multiple patches?
+>=20
 
-Require a comment in Devices Trees using these modes (usually mentioning
-that the delay is relalized on the PCB), so we can avoid adding more
-incorrect uses (or will at least notice which drivers still need to be
-fixed).
+Sure. I actually had this part in a separate patch earlier, but I don't
+usually like adding functions with no callers and this patch was pretty
+small. I can break it up though.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
----
- Documentation/dev-tools/checkpatch.rst |  9 +++++++++
- scripts/checkpatch.pl                  | 11 +++++++++++
- 2 files changed, 20 insertions(+)
+> >  struct ostream {
+> >  	char *buf;
+> > +	struct seq_file *seq;
+> >  	int size, used;
+> >  };
+> > =20
+> > @@ -73,7 +83,9 @@ struct ostream {
+> >  ({ \
+> >  	struct ostream *_s =3D (stream); \
+> >  \
+> > -	if (!_s->buf) { \
+> > +	if (_s->seq) { \
+> > +		seq_printf(_s->seq, fmt, ##args); \
+> > +	} else if (!_s->buf) { \
+> >  		pr_err(fmt, ##args); \
+> >  	} else { \
+> >  		int ret, len =3D _s->size - _s->used; \
+>=20
+> The pr_ostream() macro is getting pretty convoluted. It currently
+> supports two user cases:
+>=20
+> struct ostream os =3D {}; which means just use pr_err().
+>=20
+> And os.buf points to an allocated buffer and the output should be
+> dumped there.
+>=20
+> You are about to add a third.
+>=20
+> Is it about time this got split up into three helper functions, and
+> you pass one to __ref_tracker_dir_pr_ostream()? Your choice.
+>=20
 
-diff --git a/Documentation/dev-tools/checkpatch.rst b/Documentation/dev-tools/checkpatch.rst
-index abb3ff6820766..8692d3bc155f1 100644
---- a/Documentation/dev-tools/checkpatch.rst
-+++ b/Documentation/dev-tools/checkpatch.rst
-@@ -513,6 +513,15 @@ Comments
- 
-     See: https://lore.kernel.org/lkml/20131006222342.GT19510@leaf/
- 
-+  **UNCOMMENTED_RGMII_MODE**
-+    Historially, the RGMII PHY modes specified in Device Trees have been
-+    used inconsistently, often referring to the usage of delays on the PHY
-+    side rather than describing the board.
-+
-+    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require the clock
-+    signal to be delayed on the PCB; this unusual configuration should be
-+    described in a comment. If they are not (meaning that the delay is realized
-+    internally in the MAC or PHY), "rgmii-id" is the correct PHY mode.
- 
- Commit message
- --------------
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 784912f570e9d..57fcbd4b63ede 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -3735,6 +3735,17 @@ sub process {
- 			}
- 		}
- 
-+# Check for RGMII phy-mode with delay on PCB
-+		if ($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*(phy-mode|phy-connection-type)\s*=\s*"/ &&
-+		    !ctx_has_comment($first_line, $linenr)) {
-+			my $prop = $1;
-+			my $mode = get_quoted_string($line, $rawline);
-+			if ($mode =~ /^"rgmii(?:|-rxid|-txid)"$/) {
-+				CHK("UNCOMMENTED_RGMII_MODE",
-+				    "$prop $mode without comment -- delays on the PCB should be described, otherwise use \"rgmii-id\"\n" . $herecurr);
-+			}
-+		}
-+
- # check for using SPDX license tag at beginning of files
- 		if ($realline == $checklicenseline) {
- 			if ($rawline =~ /^[ \+]\s*\#\!\s*\//) {
--- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
+Maybe? It doesn't seem worth it for this, but I'll take a look.
 
+> > +/**
+> > + * ref_tracker_dir_debugfs - create debugfs file for ref_tracker_dir
+> > + * @dir: ref_tracker_dir to finalize
+> > + * @name: updated name of the ref_tracker_dir
+> > + *
+> > + * In some cases, the name given to a ref_tracker_dir is based on inco=
+mplete information,
+> > + * and may not be unique. Call this to finalize the name of @dir, and =
+create a debugfs
+> > + * file for it.
+>=20
+> Maybe extend the documentation with a comment that is name is not
+> unique within debugfs directory, a warning will be emitted but it is
+> not fatal to the tracker.
+>=20
+
+Ok.
+
+> > + */
+> > +void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir, const char *=
+name)
+> > +{
+> > +	strscpy(dir->name, name, sizeof(dir->name));
+>=20
+> I don't know about this. Should we really overwrite the name passed
+> earlier? Would it be better to treat the name here only as the debugfs
+> filename?
+>=20
+
+I think it's safe. The only thing that currently uses ->name is
+pr_ostream(), AFAICT.
+
+> > +	if (ref_tracker_debug_dir) {
+>=20
+> Not needed
+>=20
+
+If we call debugfs_create_file() and pass in NULL as the parent, it
+will try to create the entry at the root of debugfs. We can get rid of
+this though if we initialize ref_tracker_debug_dir to an ERR_PTR value.
+I'll see about doing that.
+
+> > +		dir->dentry =3D debugfs_create_file(dir->name, S_IFREG | 0400,
+> > +						  ref_tracker_debug_dir, dir,
+> > +						  &ref_tracker_debugfs_fops);
+> > +		if (IS_ERR(dir->dentry)) {
+> > +			pr_warn("ref_tracker: unable to create debugfs file for %s: %pe\n",
+> > +				dir->name, dir->dentry);
+> > +			dir->dentry =3D NULL;
+>=20
+> this last statement should also be unneeded.
+>=20
+
+Only if ref_tracker_debug_dir is initialized to an ERR_PTR.
+--=20
+Jeff Layton <jlayton@kernel.org>
 
