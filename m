@@ -1,115 +1,81 @@
-Return-Path: <netdev+bounces-182945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E4FA8A695
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:17:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2174A8A692
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85BA41901475
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:17:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058B917DABC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5716B22B8CC;
-	Tue, 15 Apr 2025 18:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9317D188A0C;
+	Tue, 15 Apr 2025 18:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtOsYuse"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uScy2vps"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD7222A7F7;
-	Tue, 15 Apr 2025 18:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A1E8BE5;
+	Tue, 15 Apr 2025 18:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744741042; cv=none; b=YdHXvVJWIjBT2mgux6+UEvesEnDV/CMa4x7Lgx6+g8RfsHSledosN+nsJxg0XWgZombjG0gOCEP5wHlXB/YJXXc50DDyVXWG34HeHbSLRMQB1xO+AzO6HqGsbnY8Ggn6i7dffIxX0wsLDFCzLeDFj/Xw/VR9j7McnSgZgG9h2aQ=
+	t=1744741031; cv=none; b=Bhte9ml+Lbd4abr9+4M9EUMRWEWybQeU+tGmZivRqzyS+KRaON/mx/JWfCFoRrztO2LjEZ25kwzKt21V2+h0Q2jxDm3xoOeJQ5zoc/wxURsiXNqRNujaXKTf+MPC/0C4qqoxKlyYIQTy4o12zKuB2OMo45TvTHmjblZ/+DwaFvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744741042; c=relaxed/simple;
-	bh=ocZJph6L/u2MKqtDpqm+Vh7hmxUOZLPnUYeuK1ve9x0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hfowyCkpK/oDYQ1313UXTP+15y3l4Wc7M90Dx7lil0mYypCgdnFkpz+Wn162VKBdDAvvYxeF44FwrAKoLcF43B3SQVm8P0GNcgl1K3RKHV5aZ/68frH2n8GRUmQj2Ebx0FtTHUJZfBpadGL50q1f1IWYFT0sqlJGu2dfc8a91ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtOsYuse; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43ede096d73so41897615e9.2;
-        Tue, 15 Apr 2025 11:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744741037; x=1745345837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=67Er+XwXxGLlCnVI0d56CAbjX4LYeyJfbgsjLuh/a0E=;
-        b=EtOsYusecOYZ3DxoE6bdj+IllhWNsyW1L0yCkDOCmtRk2PdXvUj4wXdMe7cmQa7UzZ
-         Tfvp8feOoN1ut9iNtdOOjf4hVsSHJx7tzziD5J8Of+OmG1cbXnrmt7GHcky7MdB8eCrT
-         JLd87k0XfLSa1LkRtlC93qh6MyxtasBHflm9tm29EsW7zIJk7vw+DRTd3f7kBH9F2iD5
-         7mV3xSoKupIkka+hYoR7hZvImXYgEo7+fJ9sD+0Y5Tw7G2JjoHTodAgg0wHO0UN4AW+g
-         vA7RwX86+TaVt3W5bKvmVU/XTrQrWrkpd2oSBoABjhjuQvwmyDMcM9amfeVN+Ca2MgL/
-         Nb3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744741037; x=1745345837;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=67Er+XwXxGLlCnVI0d56CAbjX4LYeyJfbgsjLuh/a0E=;
-        b=phJNA6KntKM+jwk7Hh57/b0lCAWwQrkAsj2IS59mvIAWa+uwNLHgf8lGia0FEdV6ob
-         59l8Cw8oudhHR4vRkz5pUIJYsVJ8lUAfXhsgnAO1kUcXS1WRb+R/Z1tMzhBfqnJku8Rk
-         C3HILPJ++BRGjxW3y9CggmJiuZbKetUurvIUQMnfDmGXmnPypE6C+GNvCJu0/hz+QwD8
-         kgFJusTA5BWMwzgM0nTEVfYui4MDpkUyzkR/zfO0zCZ+IKuOAoshNAbECldDKVne7P2I
-         Z8mWsgVof+i6yJBgcDHKystKLyzbCmtvxyXm3lo1jvfEoKWyMQP9/DrVZE6jq4JbKdND
-         OEUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOLERdf/0S8H2I8jWCSkT0sUYRGtX0VeFDvEGmmVHHwQGpOXgnvMrJYSVi/nJatJ+kR84=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk3B9HjcQSi9d36OkeIUdUs03Ic4N75SnvF2ZNv8zZ/fSJXIkm
-	g6/kxIAb6iEOHk8OAk26GiIaKshsXRfhXhF3paQ966d2DNw5QRPrbCCN28L1DPvumP+YzTqf8IQ
-	2H10GBIGzGNOsv+714Kbqw+O4+g0=
-X-Gm-Gg: ASbGncsYHclYZ/kZRa9ecQjwmpFeu2i3xuojpHTH4Jh1NrRm/Yk8BZ7IyE8u5pb+2Te
-	7CB+Tlgzd4fw1DDh4xR6iRab/PqlMF03xa0DaOUvKlG3Xsoc2A90Nhob2KfUxTLj3hNTem1gTUs
-	cPMItGMpwy0FcKYizS0FWVnLuaNpRojbMyj8bb
-X-Google-Smtp-Source: AGHT+IGjXUU+FWaYsIt2bC7ab1iLCywdS1jGO6qOlpOLSwxmnPADfhfvREYDAL2blyOXLy4l1c+ebYnERKB73ONZWN4=
-X-Received: by 2002:a05:6000:420d:b0:39a:e71d:ef3f with SMTP id
- ffacd0b85a97d-39ee2729ed1mr400036f8f.5.1744741036515; Tue, 15 Apr 2025
- 11:17:16 -0700 (PDT)
+	s=arc-20240116; t=1744741031; c=relaxed/simple;
+	bh=+S1RkefxSLu0BLjsBF+uTMCQPDl4MeKRRYq4gcDITOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SUGlf7jvK6ISdoA5o6+a1WAhA3rX4wejqSLUxi0VC4z/A8bHZ+a5yV4aDq0OcC1hG1fsa8TYDVtv2ctY7sypdJ2eoKUhNhZ+Qj8IazAjIYUkBFSpL3nqQddWaSGLyWooW3+T3hX9kb7DVvajrh2xSOKeL+aqCQiEtsumRDL0MGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uScy2vps; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC09DC4CEE9;
+	Tue, 15 Apr 2025 18:17:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744741029;
+	bh=+S1RkefxSLu0BLjsBF+uTMCQPDl4MeKRRYq4gcDITOQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uScy2vpsAkathJDSh7Vw2l00N5YC2v2ZPdb7xiQSdSneFfPfgzyOKRaV47UW2B865
+	 U4quEq7VvYyTJ0gYWfP2fZmWya3E9NXRjlJHgmSzAesBXSrN31hX3sk74KWhUyuNCU
+	 kH6q153ptEpFjST6C3l/1UWAfmZPWKgq5/jlA9RCsmYx7Rq09b5dZK6bhStX9kx/1D
+	 yByriTnO9NfFXHJD4eqYb3HsOTNACNwG583t6zfnfH4zRQ8/rYyIT5cgTEkL5T//x6
+	 Iqs8w+agDdkk7cn1htMj4LfxakgsA+ggkwrvTTCimqd0Oi/mKsFhG65Vq1pCKiwLNb
+	 9Sjaibl3wjaeg==
+Date: Tue, 15 Apr 2025 19:17:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v3] rtase: Add ndo_setup_tc support for CBS
+ offload in traffic control setup
+Message-ID: <20250415181705.GC395307@horms.kernel.org>
+References: <20250414034202.7261-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250415173239.39781-1-justin.iurman@uliege.be>
-In-Reply-To: <20250415173239.39781-1-justin.iurman@uliege.be>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 15 Apr 2025 11:17:04 -0700
-X-Gm-Features: ATxdqUHki9UjGURAVBx6GgD3zroPc6PGRy2UZ-sOY23ukpl4qvcO0AbDRwBXAU4
-Message-ID: <CAADnVQ+podS1f4taEg3tFdpp3qDEKmSs5XAU7S+u8-ztMMp=wA@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: lwtunnel: disable BHs when required
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Eduard Zingerman <eddyz87@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Sebastian Sewior <bigeasy@linutronix.de>, 
-	Andrea Mayer <andrea.mayer@uniroma2.it>, Stefano Salsano <stefano.salsano@uniroma2.it>, 
-	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414034202.7261-1-justinlai0215@realtek.com>
 
-On Tue, Apr 15, 2025 at 10:33=E2=80=AFAM Justin Iurman <justin.iurman@ulieg=
-e.be> wrote:
->                 goto drop;
->         }
-> -       lwtstate =3D dst->lwtstate;
->
-> +       lwtstate =3D dst->lwtstate;
->         if (lwtstate->type =3D=3D LWTUNNEL_ENCAP_NONE ||
->             lwtstate->type > LWTUNNEL_ENCAP_MAX)
->                 return 0;
-> @@ -460,10 +469,8 @@ int lwtunnel_input(struct sk_buff *skb)
->                 goto drop;
->
->         return ret;
-> -
->  drop:
->         kfree_skb(skb);
-> -
+On Mon, Apr 14, 2025 at 11:42:02AM +0800, Justin Lai wrote:
+> Add support for ndo_setup_tc to enable CBS offload functionality as
+> part of traffic control configuration for network devices.
+> 
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> ---
+> v1 -> v2:
+> - Add a check to ensure that qopt->queue is within the specified range.
+> - Add a check for qopt->enable and handle it appropriately.
+> 
+> v2 -> v3:
+> - Nothing has changed, and it is simply being posted again now that
+> net-next has reopened.
 
-Don't see the point of seemingly random cleanups, but overall lgtm.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
