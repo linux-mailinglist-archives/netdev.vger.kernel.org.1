@@ -1,60 +1,50 @@
-Return-Path: <netdev+bounces-182855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AEC9A8A296
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:16:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4AEEA8A2B0
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC943A9E3B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:15:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96F357A8CBB
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C863149659;
-	Tue, 15 Apr 2025 15:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CDC2101AE;
+	Tue, 15 Apr 2025 15:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IINH8G3/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfiR6T+A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A032DFA29
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FB7145FE0;
+	Tue, 15 Apr 2025 15:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744730155; cv=none; b=t7K6Rd7Qh3XCJdnXVA6RMl+D08vP0YJ2fP5033RRF9R0omicQiqBG+wq1+t2sGkyhAAtKFThk6+aL1jtezArYZSO+rvX3DzBUMbPTvG8+i7QkVniSFbKX0S154IvHjYOyIFfGh4rhFs+UAHn1PHQmdmEVAd97dLKKiG+W9Iancw=
+	t=1744730998; cv=none; b=X/YOZ+oNbtIGkE7nq1uEEvBvxD4lzGBqB6pT8U7kiPZ3MBFoKyaZD6ALHT6LumOvDA7YJxdLVwLsDMCMkiLEimj9eO8PON5P/rW6PxjsRLgaak5U9D96IQyfdAtqbivc1zpYCs2jJV0/sB/Ry2bMJpOwMquQsKs4iEBgCxQkPdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744730155; c=relaxed/simple;
-	bh=WodU4GOELVP+iaKVHqKuf6yNIusD0gRistMcBTFBnKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ggfTxZe3pE/y3yPA91ueEzufX+HdasJMpLSiWVqCuRGM1lSZhwr89txMYnca+aKmgBVuLz8rtOInTzi9zimUKpFJSU9Q+Edaa+GVcSznth0sAwEEYMIPKbnqiMP3qoGgLFpD2dxN/zYYaNzBe6jeErH5jHr2FaBQQnYUNULoruk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IINH8G3/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C809C4CEEB;
-	Tue, 15 Apr 2025 15:15:54 +0000 (UTC)
+	s=arc-20240116; t=1744730998; c=relaxed/simple;
+	bh=Nb8PuR7yLYMsD7vKccqLdB79LGQ7+UDHzf/LfFpFsOI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Y6b4p3OkbPszi8EoULW1hk5jNvW5kI3uYFM7SE+zeEdprkMNXWs43/PDpnfK0bh4b0OhNRK2zq74gsW7RaPD8kLISqfrlAlbAAPn6a9WFLWweTw2VDjMbDUNAfdau73+ZdgpgPjS6Bemp3R5c/kdb1nWir0V6nmT9Cmx8cFg938=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfiR6T+A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F0A1C4CEEB;
+	Tue, 15 Apr 2025 15:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744730155;
-	bh=WodU4GOELVP+iaKVHqKuf6yNIusD0gRistMcBTFBnKk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IINH8G3/K9fdxmlmCSgqGc91/XqeDBESmF0jlsk6cDbWqJ2x21MpWGd2TcXBTKZCo
-	 XkTygSFaaar6nIzZwiVlMLnqX9lw0jY4srovKtwvt4hXGje0t3TOY+X+e9yjMHGBwc
-	 Iwx6DX1qoeppr5PpFZ72Vx+I2ic7Ff0uJ17kUPDWO72NToG51Od7MXgkaSTlsXZS/P
-	 DbBVMrZuR3aYJsRWaqdvithoUWzP727eQ2+c9/qxb+Xlpvi4XEd0EeNhpVc5S6gDTE
-	 unuiTXOEX8MQ3UTlD+f3ZUoVahFta4lHrsK6Wm4qNGIAKpg1oA3b4igElLEvSSho0r
-	 T27U9sm8I5EyQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot+de1c7d68a10e3f123bdd@syzkaller.appspotmail.com,
-	sdf@fomichev.me,
-	kuniyu@amazon.com
-Subject: [PATCH net] net: don't try to ops lock uninitialized devs
-Date: Tue, 15 Apr 2025 08:15:52 -0700
-Message-ID: <20250415151552.768373-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1744730998;
+	bh=Nb8PuR7yLYMsD7vKccqLdB79LGQ7+UDHzf/LfFpFsOI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sfiR6T+AyBHbCYHylx/cFJ0sCRUnYkuO6iD9AVh9oGPU5RRZnHQmBkqQuVip9LWmH
+	 qV/NDDA7E8tGuU9oRyUisWO4P8NXun6xncrZKE91cauVE1r1Ruppy7ZU15iUSMqb23
+	 SwiT1NgHQyISu0tZFNthVsWbJ8YmCN9KPbY/YcVXaT1KVLaAzQs50wiC95ABORcnbg
+	 oOdCYjBC7n73yOTWvcvFzwDe7JrNdVoDIV1pSgbATduqOkGhTFMPdUJEM4ezcgHyGI
+	 HLrAzYaKM6PD7SmFp+LR1EsMihYrRe1h+YwJ0ZgEOlq58lyYNFKdlVXDFxw3Y7aL1n
+	 IWAUwzDfT6GnQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E853822D55;
+	Tue, 15 Apr 2025 15:30:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,60 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] mptcp: various small and unrelated
+ improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174473103627.2677629.8047021471337613014.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Apr 2025 15:30:36 +0000
+References: <20250413-net-next-mptcp-sched-mib-sft-misc-v2-0-0f83a4350150@kernel.org>
+In-Reply-To: <20250413-net-next-mptcp-sched-mib-sft-misc-v2-0-0f83a4350150@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ thorsten.blum@linux.dev, pizhenwei@bytedance.com
 
-We need to be careful when operating on dev while in rtnl_create_link().
-Some devices (vxlan) initialize netdev_ops in ->newlink, so later on.
-Avoid using netdev_lock_ops(), the device isn't registered so we
-cannot legally call its ops or generate any notifications for it.
+Hello:
 
-netdev_ops_assert_locked_or_invisible() is safe to use, it checks
-registration status first.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reported-by: syzbot+de1c7d68a10e3f123bdd@syzkaller.appspotmail.com
-Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: sdf@fomichev.me
-CC: kuniyu@amazon.com
+On Sun, 13 Apr 2025 11:34:31 +0200 you wrote:
+> Here are various unrelated patches:
+> 
+> - Patch 1: sched: remove unused structure.
+> 
+> - Patch 2: sched: split the validation part, a preparation for later.
+> 
+> - Patch 3: pm: clarify code, not to think there is a possible UaF.
+>   Note: a previous version has already been sent individually to Netdev.
+> 
+> [...]
 
-I wasn't sure whether Kuniyuki is going to send this or he's waiting
-for me to send.. so let me send and get this off my tracking list :)
----
- net/core/dev.c       | 2 ++
- net/core/rtnetlink.c | 5 +----
- 2 files changed, 3 insertions(+), 4 deletions(-)
+Here is the summary with links:
+  - [net-next,v2,1/8] mptcp: sched: remove mptcp_sched_data
+    https://git.kernel.org/netdev/net-next/c/6e83166dd800
+  - [net-next,v2,2/8] mptcp: sched: split validation part
+    https://git.kernel.org/netdev/net-next/c/760ff076695c
+  - [net-next,v2,3/8] mptcp: pm: Return local variable instead of freed pointer
+    https://git.kernel.org/netdev/net-next/c/def9d0958bef
+  - [net-next,v2,4/8] mptcp: pass right struct to subflow_hmac_valid
+    https://git.kernel.org/netdev/net-next/c/60cbf3158513
+  - [net-next,v2,5/8] mptcp: add MPJoinRejected MIB counter
+    https://git.kernel.org/netdev/net-next/c/4ce7fb8de556
+  - [net-next,v2,6/8] selftests: mptcp: validate MPJoinRejected counter
+    https://git.kernel.org/netdev/net-next/c/98dea4fd6315
+  - [net-next,v2,7/8] selftests: mptcp: diag: drop nlh parameter of recv_nlmsg
+    https://git.kernel.org/netdev/net-next/c/f9c7504d3055
+  - [net-next,v2,8/8] selftests: mptcp: use IPPROTO_MPTCP for getaddrinfo
+    https://git.kernel.org/netdev/net-next/c/a862771d1aa4
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 03d20a98f8b7..c5e15701cfb3 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1572,6 +1572,8 @@ EXPORT_SYMBOL(netdev_features_change);
- 
- void netif_state_change(struct net_device *dev)
- {
-+	netdev_ops_assert_locked_or_invisible(dev);
-+
- 	if (dev->flags & IFF_UP) {
- 		struct netdev_notifier_change_info change_info = {
- 			.info.dev = dev,
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 38526210b8fd..bb624fc6ca8a 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3677,11 +3677,8 @@ struct net_device *rtnl_create_link(struct net *net, const char *ifname,
- 				nla_len(tb[IFLA_BROADCAST]));
- 	if (tb[IFLA_TXQLEN])
- 		dev->tx_queue_len = nla_get_u32(tb[IFLA_TXQLEN]);
--	if (tb[IFLA_OPERSTATE]) {
--		netdev_lock_ops(dev);
-+	if (tb[IFLA_OPERSTATE])
- 		set_operstate(dev, nla_get_u8(tb[IFLA_OPERSTATE]));
--		netdev_unlock_ops(dev);
--	}
- 	if (tb[IFLA_LINKMODE])
- 		dev->link_mode = nla_get_u8(tb[IFLA_LINKMODE]);
- 	if (tb[IFLA_GROUP])
+You are awesome, thank you!
 -- 
-2.49.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
