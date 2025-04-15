@@ -1,104 +1,76 @@
-Return-Path: <netdev+bounces-182543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2FB6A890A8
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 02:31:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0B9A890BD
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 02:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47AA517D469
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 00:31:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D57213B0060
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 00:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2A217A2FB;
-	Tue, 15 Apr 2025 00:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5812E552;
+	Tue, 15 Apr 2025 00:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CE6nEiad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qt2Tx2ng"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75C319644B
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 00:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBE918E25;
+	Tue, 15 Apr 2025 00:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744677005; cv=none; b=Gh9NHFz1h9Vvfkez50Nmyw49Mub4SRbKB4lGizApd+wKc6T4pnlvnH1fenC5fIF6/RjAKxRx/FOdkM3ZE/PbgqL/ARrRVPHof+3acGo5iVT8b5TBqH/ylGSGou9z5wd137DpbXEhVwYAZlHCjEJ33fgK/0Mg4WwIwlIlQpJhLck=
+	t=1744677371; cv=none; b=jjxjbCT/RxiP2+YPhbAN6kzX4/dRpJ8Rp/AoZuUGJgUxvNanb0VCdlXx1m1D5pkOE77BRPPHTFbBKTfLBthno2RwuJSRUOwMj+OOUn0E8DL4LEcQAlMoqQB7KDK+LYzfPLMCpXiHKZmQkXQVak7kdALmzPYh7EcVac0TgdA8+Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744677005; c=relaxed/simple;
-	bh=yjpdz4PuIqTD7mEXGatsyIxmp7A6s9XAhTm4vrHfH2s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k3/aimzAMNUl6LbGEw2zT7lPtSIsaXs3WwxX9idyFa8Z2MfVhpTGQAdAvRoiY085l5Ssils+FX//hwddI/YqeGIj8hlKF1AbqZkEjaR+Ho8nN3DYgMnVO1+ql4lOlf22yGW7cIqTcf56EKkA9gZh0+1oKN/FQVCUxAtChEIeegI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CE6nEiad; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E0EC4CEE2;
-	Tue, 15 Apr 2025 00:30:05 +0000 (UTC)
+	s=arc-20240116; t=1744677371; c=relaxed/simple;
+	bh=GuIZ8yrAqUdbPqcAgS2klGxGn5H/kj5wdhij/BBzaaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sJn2i/vHQcpw5vzegySkIPtKVI5kNFp6onbRLdUh//FDwyBAGahrdmY4JnYe3MnBwHKkzsky4qkoBKubj5AJesnCvJKeEgHAMDsdXoGVZok8o2CJzFEJuvHeES4WQywQT9mzgXLRm2vwkcViJv5hmJVwQCtYr3Gp5LROKlOM+vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qt2Tx2ng; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0BB4C4CEE2;
+	Tue, 15 Apr 2025 00:36:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744677005;
-	bh=yjpdz4PuIqTD7mEXGatsyIxmp7A6s9XAhTm4vrHfH2s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CE6nEiad/1W1gBK8pSqbDaMepRZj/zt+jzb/w3Nz54ovwAX29XRmP548oeJdXcgIX
-	 uuxv3syie1V12w+LbBquq0yyQ+DXyuZBfgNS6E9KfyQuIuruyHosRloD84MqEtYRWj
-	 DxcfjdjqJiR5iYjv+9HRMVwtqw4z+O/+rblyG4fxUM64JbKWaNmEsXAbDErzJru2P9
-	 5+w8+E6IjWmj0v87YPBwRYmmeMqvJ5tCxxO2LimaYu8sILZ9rGM28i7WI/hkMmn8Vn
-	 sOESEqhEeurj2hHBGo+4N4wz7XM8GMRlZZD2rsb1Iyhs130qpDf+3yRyT0j3uCOdHP
-	 Bqz4dMs3V61Vw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE54C3822D1A;
-	Tue, 15 Apr 2025 00:30:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1744677371;
+	bh=GuIZ8yrAqUdbPqcAgS2klGxGn5H/kj5wdhij/BBzaaY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qt2Tx2ngxcaDvGpMmql/pIoIGKmeI4nrfjNQnbzNkBqtrN4yruvp7EcgrkyE/id2I
+	 sf6aXHOnFDpdhbTGzaHBVYADa/QJ0//gItLQf5MTRBq6SpDJPLKrz209v1oCOKn1qy
+	 1OVXNHDJg3D/VcbRwou2h6M8filWV4N465iEjGKeSFo4Udvp0PR1r8/Fi71z8Cin0k
+	 sNLlKeyqb54x6GnnLPJ71oYBcOS71MtvlvKJ9v1k3tGLFkLdvqBSEdbru3q82Q3y4p
+	 oRxPkvWy1hrA2erWXCDzCVLAO4ZhRmuVtEgDv6Q/ZPVYnkHCdlDq7bc2y1VVh695TV
+	 w1ZUQSlgBWlew==
+Date: Mon, 14 Apr 2025 17:36:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: <andrew+netdev@lunn.ch>, <brett.creeley@amd.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>,
+ <michal.swiatkowski@linux.intel.com>, <horms@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net 2/5] pds_core: remove extra name description
+Message-ID: <20250414173610.5dc3be9d@kernel.org>
+In-Reply-To: <20250411003209.44053-3-shannon.nelson@amd.com>
+References: <20250411003209.44053-1-shannon.nelson@amd.com>
+	<20250411003209.44053-3-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] =?iso-8859-1?q?net=3A_stmmac=3A_remove_unne?=
-	=?iso-8859-1?q?cessary_initialisation_of_1=B5s?= TIC counter
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174467704323.2083973.2524046763560331419.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Apr 2025 00:30:43 +0000
-References: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
-In-Reply-To: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, jonathanh@nvidia.com, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com, p.zabel@pengutronix.de,
- richardcochran@gmail.com, treding@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 12 Apr 2025 09:05:37 +0100 you wrote:
-> Hi,
+On Thu, 10 Apr 2025 17:32:06 -0700 Shannon Nelson wrote:
+> Fix the kernel-doc complaint
+> include/linux/pds/pds_adminq.h:481: warning: Excess struct member 'name' description in 'pds_core_lif_getattr_comp'
 > 
-> In commit 8efbdbfa9938 ("net: stmmac: Initialize MAC_ONEUS_TIC_COUNTER
-> register"), code to initialise the LPI 1us counter in dwmac4's
-> initialisation was added, making the initialisation in glue drivers
-> unnecessary. This series cleans up the now redundant initialisation.
-> 
-> [...]
+> Fixes: 45d76f492938 ("pds_core: set up device and adminq")
 
-Here is the summary with links:
-  - [net-next,v2,1/5] net: stmmac: dwc-qos: remove tegra_eqos_init()
-    https://git.kernel.org/netdev/net-next/c/dadc3a6be469
-  - [net-next,v2,2/5] net: stmmac: intel: remove eee_usecs_rate and hardware write
-    https://git.kernel.org/netdev/net-next/c/17ec6dbaaed3
-  - [net-next,v2,3/5] net: stmmac: intel-plat: remove eee_usecs_rate and hardware write
-    https://git.kernel.org/netdev/net-next/c/35031c6256f1
-  - [net-next,v2,4/5] net: stmmac: remove eee_usecs_rate
-    https://git.kernel.org/netdev/net-next/c/651f88cb046c
-  - [net-next,v2,5/5] net: stmmac: remove GMAC_1US_TIC_COUNTER definition
-    https://git.kernel.org/netdev/net-next/c/25af74ed68c4
-
-You are awesome, thank you!
+How is this a bug fix? The warnings are only generated on W=1 builds.
+Please be more considerate of folks maintaining stable trees. There's
+no need to waste their time with patches like this.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
