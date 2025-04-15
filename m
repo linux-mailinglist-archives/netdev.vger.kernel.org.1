@@ -1,88 +1,93 @@
-Return-Path: <netdev+bounces-182897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96DF0A8A4C8
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:59:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133BFA8A4C9
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B5937A5F5B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:58:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C68887A490C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58DD29B20D;
-	Tue, 15 Apr 2025 16:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7A129899D;
+	Tue, 15 Apr 2025 16:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="j5McAd8o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vcf2cpB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DAF1E1E1C
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6993617A2F8
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744736339; cv=none; b=g2oWoJh0g6KLTwKKsCU1CTyr21faePyw9R5uVPIJPSGgoT1a1G3ome4Dk23MAc0bJAirj0n82VcvZl0sAqHAHxYA3fdwaSYlN0dJJxVldTjFDQ9irDraJH1+iasmVVuozE9oFhDhn+QFSAF9/btrYtA8zgYg+IT1aOGaBfDzOZQ=
+	t=1744736395; cv=none; b=IfyX8Q81s2EZxlLxlkbP0s/3sIAnjXdwDdlMvBQiy4Q+LDLJx6vhK1a79dvNHbhbQwa/9AM6kvks2SJOXjaC7auQsKpOqG41szCF+YMcPUBrJwFwZCzjGlVScFBq7UAtWM50T0Fx6vGEJWvsEKQ+KOykXnwreT6uC/pDrVTrBOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744736339; c=relaxed/simple;
-	bh=zYQG/gMfEXn8PxRTTI7ZT3MD1hgf985NNexSJSENi/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kO3vP1bhTvYfCn5XAX04WPV+V47WV397VKcEbhwfHr+ZOym7agxiZ9IlLQyvWf2ozUDObOCKe19JU6EIqeKklrnIwlgHB5beZ8yZmaYaXE97+b557hWUH2sFYntuGbWqeOyVLt9YeQ0IGNYkZT0ilD56Ii4yg7R7rN+c+1kwI0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=j5McAd8o; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3yDNLlIaCsPoNcTI2Eq8mEXgCwKrmdSj9j9g1YyQCMY=; b=j5McAd8oFKrJxA64MwIKJ4EALh
-	ydc3qI7rgY9Nmjd22BtY1F15JsLY3EJE7Wo1aNQmPMlPTd/KALLh06wud7GpsCfIoTFYJVrjlEy8M
-	/CXyBmj58IG2sVfsZpY3n3xOmeZV5EnqUN6Wp1EYR9XnBeJIvFFpRQnc91/Cq/KzCqEA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4jcS-009UZf-NY; Tue, 15 Apr 2025 18:58:44 +0200
-Date: Tue, 15 Apr 2025 18:58:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: visconti: convert to
- set_clk_tx_rate() method
-Message-ID: <48bc68b6-d415-46ba-8192-5cbc4b8d263a@lunn.ch>
-References: <E1u4jWi-000rJi-Rg@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1744736395; c=relaxed/simple;
+	bh=QGlq9R0R8qTIYSOTBZMapKKqj5tjqjmL/lpcoOrOJdo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aqIf/naFKJuxcmsXEXaTwhXdiiBseJoc6SMFzSjxGutOdKOKTSJnNjlsbiYaVD5w2XKZJ1qkKwNXMdDj58LVqQtfweZmFmOqH58NveNScFNTMmUj90vGK8D79pE6KuP9p+AhbbIRmt7s1hH8EwXOb1pOzWrrZVrNoBkmHmZ7nsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vcf2cpB2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB09CC4CEE9;
+	Tue, 15 Apr 2025 16:59:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744736394;
+	bh=QGlq9R0R8qTIYSOTBZMapKKqj5tjqjmL/lpcoOrOJdo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Vcf2cpB2Bgs2Bw04iWCBKWo5OkWiDsneKNU1A/aduPKetDy7fK1gohzf0jwNJKwX5
+	 Mvi4hhJUOakDcRxTENLHnI5SdGgZgBNIUxqf3J4LBSNmxemrKMIg0kOZjBltPQft+4
+	 dSEw6jVGAMpo/nCe+dkTlucNrA+5UISpmrMUqWmtd+tJTwyGr/J1XgfxNWzQJgJePy
+	 EnlBCB+GcTjfpFLA0Hl979pGZpqZKnyJRYpJdZGR9r6CmgMXkswlBfArmbMx2PWtql
+	 9dQNTVNLXHQBIhyCfdU+SL1tJe22ke6U+1qNCl0tp7fzDG+j42qsJ7IpXzxa7P+bPb
+	 pFejE3xrnEucg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE693822D55;
+	Tue, 15 Apr 2025 17:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1u4jWi-000rJi-Rg@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] octeon_ep_vf: Remove octep_vf_wq
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174473643278.2707730.12989256432227950338.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Apr 2025 17:00:32 +0000
+References: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
+In-Reply-To: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, srasheed@marvell.com, vburru@marvell.com,
+ sedara@marvell.com, sburla@marvell.com, linux@treblig.org,
+ netdev@vger.kernel.org
 
-On Tue, Apr 15, 2025 at 05:52:48PM +0100, Russell King (Oracle) wrote:
-> Convert visconti to use the set_clk_tx_rate() method. By doing so,
-> the GMAC control register will already have been updated (unlike with
-> the fix_mac_speed() method) so this code can be removed while porting
-> to the set_clk_tx_rate() method.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 14 Apr 2025 17:44:48 +0100 you wrote:
+> commit cb7dd712189f ("octeon_ep_vf: Add driver framework and device
+> initialization") added octep_vf_wq but it has never been used. Remove it.
 > 
-> There is also no need for the spinlock, and has never been - neither
-> fix_mac_speed() nor set_clk_tx_rate() can be called by more than one
-> thread at a time, so the lock does nothing useful.
+> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+> Closes: https://lore.kernel.org/netdev/Z70bEoTKyeBau52q@gallifrey/
+> Signed-off-by: Simon Horman <horms@kernel.org>
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [net-next] octeon_ep_vf: Remove octep_vf_wq
+    https://git.kernel.org/netdev/net-next/c/bbfc077d4572
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
