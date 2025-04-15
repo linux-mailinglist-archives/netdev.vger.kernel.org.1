@@ -1,118 +1,161 @@
-Return-Path: <netdev+bounces-182798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CFBBA89ECE
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:58:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C15A89ED4
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED58E1900848
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B60193AC840
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940AF2973C9;
-	Tue, 15 Apr 2025 12:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B092F2973A2;
+	Tue, 15 Apr 2025 12:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="utNpLyac"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vMSvp3kf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9015828E61D;
-	Tue, 15 Apr 2025 12:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB25F27B51D
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 12:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744721866; cv=none; b=fNvbsWM5DVlfHjyqaghmo/CDA+LWsxbGAMcMpoUO9J9lDPrT9B945vNciUO0zOP3Rr8FdLtHL1OsdUQIqMd8HbyLoYIqowljKcgNA84NMyT+8ZpvnyAmDr7Mb8/sSKEgo9o3bhByENJpmNce2m8/lsn1jhlXE+QObEl+DIYtswc=
+	t=1744721929; cv=none; b=XcvhWrNs+PnmHXFimBtdWmjztGXF9JDUUCuNWkw8b/B6Pw/LstT1SoXJHB3z+2tQVhTS10Q9wYM3WCEFIhjfW40VMFSkZFAmI9IyVKaN1LqaQHbfnBr7CjpIgDEwRE+krBeLPFxK+333/DBNKoLPZTjA9mEoEOoVL/5rzmJnAmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744721866; c=relaxed/simple;
-	bh=2EOO+sAkwFqCxra83O6A2BDPgugA7NN6ZkUL1xXLrbY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iyy2K6Q48HZvngR1JjR12rQ5uh6kQf3Zw1Bf/FFKP5jXsjQDAjLMyZUjpypq5ePi4qr9mA6wcJ/9MIgKhGrUzJ5vEbLegvEu2sP96B7x+5m0i/o9fAVhFh+frvBA0CCHYBKz73tT4oMU9KB4GLAkt3MJ2Inn30YLXipJMfnU0lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=utNpLyac; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/zg+4LuvKN2MfsYaYQDPTMDY3vRum1BuvjjkEVMSOMM=; b=utNpLyacBxVYcE4VG7k4ynrztr
-	ZBf69qa3y5t2IoS/iSjBwfypRhUnM3WBelKCWR4xODoRhm5+CZk6ukSO3TpymSQdE71yemvFAi49c
-	kmH2BrBhX4cgKRtWcDskgGDDpmfpX2xT/loN6Ucwmp+VuXQnUPSac8o1YhnyqNskJMBw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4fr1-009RZD-DL; Tue, 15 Apr 2025 14:57:31 +0200
-Date: Tue, 15 Apr 2025 14:57:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Andy Shevchenko <andy@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
- defs
-Message-ID: <e1389e78-ead0-4180-a652-5dc48a691548@lunn.ch>
-References: <20250409144250.206590-1-ivecera@redhat.com>
- <20250409144250.206590-8-ivecera@redhat.com>
- <df6a57df-8916-4af2-9eee-10921f90ff93@kernel.org>
- <c0ef6dad-ce7e-401c-9ae1-42105fcbf9c4@redhat.com>
- <098b0477-3367-4f96-906b-520fcd95befb@lunn.ch>
- <003bfece-7487-4c65-b4f1-2de59207bd5d@redhat.com>
- <8c5fb149-af25-4713-a9c8-f49b516edbff@lunn.ch>
- <9de10e97-d0fa-4dee-b98a-e4b2a3f7019c@redhat.com>
+	s=arc-20240116; t=1744721929; c=relaxed/simple;
+	bh=pN9nldC3K3CU35BgEMV427S0t04Jyo8q+4oiAAoZZls=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=JI34eaUewrP5eSQAYnjdLJ+iqExp65LJpGQacMFjK4ms/o3F8p9gvxIREsCtoOi6N4cL2IzJz1uZrDWb5eW1CUX+tuaUVkWkCaT1HNbVUd2AMwRw3hhYxh1uRaNJBX9MZAQR8nnJHeiWZZF9T8HoEzWixzpW/5wVCG1q9hnM7so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vMSvp3kf; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NEfpJshR6Sfriowq4GQ0FM8g/G2gger1/qz9A6JvWeQ=; b=vMSvp3kfcZkZz1BBI1ZLsx2tfT
+	7koMQYU6EWjS/2Dmh8m1EgqGu64fQqFBJcNy/6JZGVAjtx7Io4xHV51WYbtrj6JbnBYDHRzH8n7Vh
+	F6jouX8VpsmmvUQiRJjwraVipM6+fkU1/UpmS6mLxee9XvGmPWcm2+47B7lpsPoYDQynkf0E81g3K
+	0HDbnLm1Q4Hf4LnLygsQrUDRWGFIkqKsu9dL2yGacKvx9yI+jZbzGTGUksdnahEXkairEk3FGHtKc
+	k4awzckzgPy2T75Y/B5YcGxhTHnRUEBEaCftXaarDf16IYw0uzfuSyqTQrb2Ef3qyQ7ySRJbFOIh8
+	au1KZ/SQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:52848 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1u4fs5-0008Bw-1i;
+	Tue, 15 Apr 2025 13:58:37 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1u4frU-000nMf-6o; Tue, 15 Apr 2025 13:58:00 +0100
+In-Reply-To: <Z_5WT_jOBgubjWQg@shell.armlinux.org.uk>
+References: <Z_5WT_jOBgubjWQg@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chen-Yu Tsai <wens@csie.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-sunxi@lists.linux.dev,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Samuel Holland <samuel@sholland.org>
+Subject: [PATCH net-next 1/3] net: stmmac: sunxi: convert to set_clk_tx_rate()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9de10e97-d0fa-4dee-b98a-e4b2a3f7019c@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1u4frU-000nMf-6o@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 15 Apr 2025 13:58:00 +0100
 
-> Hi Andrew,
-> the idea looks interesting but there are some caveats and disadvantages.
-> I thought about it but the idea with two regmaps (one for simple registers
-> and one for mailboxes) where the simple one uses implicit locking and
-> mailbox one has locking disabled with explicit locking requirement. There
-> are two main problems:
-> 
-> 1) Regmap cache has to be disabled as it cannot be shared between multiple
-> regmaps... so also page selector cannot be cached.
-> 
-> 2) You cannot mix access to mailbox registers and to simple registers. This
-> means that mailbox accesses have to be wrapped e.g. inside scoped_guard()
-> 
-> The first problem is really pain as I would like to extend later the driver
-> with proper caching (page selector for now).
-> The second one brings only confusions for a developer how to properly access
-> different types of registers.
-> 
-> I think the best approach would be to use just single regmap for all
-> registers with implicit locking enabled and have extra mailbox mutex to
-> protect mailbox registers and ensure atomic operations with them.
-> This will allow to use regmap cache and also intermixing mailbox and simple
-> registers' accesses won't be an issue.
+Convert sunxi to use the set_clk_tx_rate() callback rather than the
+fix_mac_speed() callback.
 
-As i said, it was just an idea, i had no idea if it was a good idea.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 42 +++++++++----------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
-What is important is that the scope of the locking becomes clear,
-unlike what the first version had. So locking has to be pushed down to
-the lower levels so you lock a single register access, or you lock an
-mailbox access.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+index 9f098ff0ff05..a245c223a18f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+@@ -72,28 +72,28 @@ static void sun7i_gmac_exit(struct platform_device *pdev, void *priv)
+ 		regulator_disable(gmac->regulator);
+ }
+ 
+-static void sun7i_fix_speed(void *priv, int speed, unsigned int mode)
++static int sun7i_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
++				 phy_interface_t interface, int speed)
+ {
+-	struct sunxi_priv_data *gmac = priv;
+-
+-	/* only GMII mode requires us to reconfigure the clock lines */
+-	if (gmac->interface != PHY_INTERFACE_MODE_GMII)
+-		return;
+-
+-	if (gmac->clk_enabled) {
+-		clk_disable(gmac->tx_clk);
+-		gmac->clk_enabled = 0;
+-	}
+-	clk_unprepare(gmac->tx_clk);
+-
+-	if (speed == 1000) {
+-		clk_set_rate(gmac->tx_clk, SUN7I_GMAC_GMII_RGMII_RATE);
+-		clk_prepare_enable(gmac->tx_clk);
+-		gmac->clk_enabled = 1;
+-	} else {
+-		clk_set_rate(gmac->tx_clk, SUN7I_GMAC_MII_RATE);
+-		clk_prepare(gmac->tx_clk);
++	struct sunxi_priv_data *gmac = bsp_priv;
++
++	if (interface == PHY_INTERFACE_MODE_GMII) {
++		if (gmac->clk_enabled) {
++			clk_disable(gmac->tx_clk);
++			gmac->clk_enabled = 0;
++		}
++		clk_unprepare(gmac->tx_clk);
++
++		if (speed == 1000) {
++			clk_set_rate(gmac->tx_clk, SUN7I_GMAC_GMII_RGMII_RATE);
++			clk_prepare_enable(gmac->tx_clk);
++			gmac->clk_enabled = 1;
++		} else {
++			clk_set_rate(gmac->tx_clk, SUN7I_GMAC_MII_RATE);
++			clk_prepare(gmac->tx_clk);
++		}
+ 	}
++	return 0;
+ }
+ 
+ static int sun7i_gmac_probe(struct platform_device *pdev)
+@@ -140,7 +140,7 @@ static int sun7i_gmac_probe(struct platform_device *pdev)
+ 	plat_dat->bsp_priv = gmac;
+ 	plat_dat->init = sun7i_gmac_init;
+ 	plat_dat->exit = sun7i_gmac_exit;
+-	plat_dat->fix_mac_speed = sun7i_fix_speed;
++	plat_dat->set_clk_tx_rate = sun7i_set_clk_tx_rate;
+ 	plat_dat->tx_fifo_size = 4096;
+ 	plat_dat->rx_fifo_size = 16384;
+ 
+-- 
+2.30.2
 
-Also, you say this is an MFD partially because GPIOs could be added
-later. I assume that GPIO code would have the same locking issue,
-which suggests the locking should be in the MFD core, not the
-individual drivers stacked on top of it.
-
-	Andrew
 
