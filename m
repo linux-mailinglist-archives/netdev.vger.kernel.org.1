@@ -1,180 +1,93 @@
-Return-Path: <netdev+bounces-182647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040F9A8978F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:10:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C8EA89788
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C8FF1792C9
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217CD3A46C8
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FC827FD4F;
-	Tue, 15 Apr 2025 09:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DAA27B50F;
+	Tue, 15 Apr 2025 09:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="FdYpkC8r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VGKynCSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07E51624CE;
-	Tue, 15 Apr 2025 09:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC971C5F30;
+	Tue, 15 Apr 2025 09:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744708213; cv=none; b=U6rL9J/luxsZK1G2rf+G+py1CBb1g3NqvVtTyrlCqWObPiJsHEX3Tyf0Y4CZ0DxbmBa1OBs6A7e2LbOAU8xkrJKmm6s1Q8Bo1eu7EMp4Xds9tU9qkNdYdOM7WDrx6uPS76XN6PHVzxYI24sLFtQErAZoS9qjUT8MccwS9Oa+ab0=
+	t=1744708195; cv=none; b=gyrT/DaCuRqXDej2shN+6JT56Git5Fym4KgFKAqJdMr40hYz1kIhbFBkMgIMOStURr77KH0HVh4taPHg2sHFOlCU2oNNRj7CUFG2MTwppXgZ31plS+RVRjOVVWLyRo2Ero7Bat3AECNqwoyfuelSRT9NkcqyprU/cyg2aItXeNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744708213; c=relaxed/simple;
-	bh=h2ArVH3qZFGXjdMX8JG6QGs7L/Tfo41LxNCQU2OMTBs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QkO4c7ly+QemX53s724CAgcLryZDoFDR4Q/k2nmIx8XLEPFWEc8DzDaRIjquZPc+EgbBu/5coAQDfQhmsBgasr7rC+2yAePKW22vQrY3t+vyHQz6BwxdLGCUFLg0w8++dMH1Srx7GSpCCxDuXCqwZk9LRdcXoqGtIKSwqhsSsDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=FdYpkC8r; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C9DDF200CCEB;
-	Tue, 15 Apr 2025 11:10:01 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C9DDF200CCEB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1744708202;
-	bh=eQufNntKfiHJqzsIZr8O0/rtd7FT0xn0S2YrcLl34kI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FdYpkC8rMJkBVj1bXwAPxx4JiDcZ6DpAMA0O8lNf+yg8ZnnBcpMcPO5nM4ByYUXeF
-	 bc+p22UWjqM+En1zCAuPgelRf5tHX8ejJRDzMZppiDsDpd+b+SgcZ5c1dbiXL1dCzV
-	 Bl3dagddNHjIcPmrWXmlg8yGo9tC/HetcpDJ10L/WOJ0JThpfYpZ98UsAeLIyQy5Nh
-	 bzkYvijjW8WxwFUyAWctwMe9KK8ul6LHoCQqJxVXMSl8FrmZq60qhb4Y/8T51eaTky
-	 t6NMTw95FwCMwKnxNakpBQeZ7XPpZI4g2KF0BZo78Nc333/aEwez7aXFCbl5b6Sr/f
-	 7HETdTlM25kXA==
-Message-ID: <3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
-Date: Tue, 15 Apr 2025 11:10:01 +0200
+	s=arc-20240116; t=1744708195; c=relaxed/simple;
+	bh=QU0TDnCmOlC5at4GqseuNIx4V0NQRoTnucsnlynPrd4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pZVOdnCYS8AYIYpXIOBmYuo5jytoIkWNvGn/Cn/JeE6x4Sp5Z3NmunRw0L19Q4uwOlAbTnS+oGhteIYLUlkBFfEbWi1KBW76pUDVCLFqKPG0HUKUig33p3tTWRtnezR1q/f9IM4wZPuAQKRIheAbgbPi+AA7Eb0z0YXPD6hLNcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VGKynCSL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49863C4CEDD;
+	Tue, 15 Apr 2025 09:09:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744708195;
+	bh=QU0TDnCmOlC5at4GqseuNIx4V0NQRoTnucsnlynPrd4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VGKynCSL+JOplh35QC6l9uJ9gP/F4OXbsJ+sHvpKT5bSGhOyD/1PkQcfib47Lp3QX
+	 +c4Glv9MbLc+WYYznoYQP6jCS5tvn79tYisMDac962cQRKhTjhhuJASJZWWw8BzE4d
+	 oH7DGxbyH64qqW7rCNUi3ndP/dlHI3u4opc6jvVfW71E5ATqIE7rnw53nQz2WDRE40
+	 zwqCQ79qiW35HC17RrPbtWr9sUyh7t/Htb/9KtoN0+DFlFclPilpLjCe+BEuES5y49
+	 /5Mrt5s66oYJwPx5vSKkI1M9cgpCug0/PN/09hhFvjKVRRudZ22R9wYgxFET6FjiRA
+	 Zvw2J5ilXUuWQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D7D3822D55;
+	Tue, 15 Apr 2025 09:10:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Sebastian Sewior <bigeasy@linutronix.de>,
- Stanislav Fomichev <stfomichev@gmail.com>,
- Network Development <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- bpf <bpf@vger.kernel.org>, Stefano Salsano <stefano.salsano@uniroma2.it>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch> <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
- <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
- <20250404141955.7Rcvv7nB@linutronix.de>
- <85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
- <CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
- <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
- <20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: mdio: Add RTL9300 MDIO driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174470823327.2548774.7369464602426912158.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Apr 2025 09:10:33 +0000
+References: <20250409231554.3943115-1-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20250409231554.3943115-1-chris.packham@alliedtelesis.co.nz>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ sander@svanheule.net, markus.stockhausen@gmx.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-On 4/15/25 02:54, Andrea Mayer wrote:> I have been looking into the 
-behavior of the lwtunnel_xmit() function in both
-> task and softirq contexts. To facilitate this investigation, I have written a
-> simple eBPF program that only prints messages to the trace pipe. This program
-> is attached to the LWT BPF XMIT hook by configuring a route (on my test node)
-> with a destination address (DA) pointing to an external node, referred to as
-> x.x.x.x, within my testbed network.
-> 
-> To trigger that LWT BPF XMIT instance from a softirq context, it is sufficient
-> to receive (on the test node) a packet with a DA matching x.x.x.x. This packet
-> is then processed through the forwarding path, eventually leading to the
-> ip_output() function. Processing ends with a call to ip_finish_output2(), which
-> then calls lwtunnel_xmit().
-> 
-> Below is the stack trace from my testing machine, highlighting the key
-> functions involved in this processing path:
-> 
->   ============================================
->    <IRQ>
->    ...
->    lwtunnel_xmit+0x18/0x3f0
->    ip_finish_output2+0x45a/0xcc0
->    ip_output+0xe2/0x380
->    NF_HOOK.constprop.0+0x7e/0x2f0
->    ip_rcv+0x4bf/0x4d0
->    __netif_receive_skb_one_core+0x11c/0x130
->    process_backlog+0x277/0x980
->    __napi_poll.constprop.0+0x58/0x260
->    net_rx_action+0x396/0x6e0
->    handle_softirqs+0x116/0x640
->    do_softirq+0xa9/0xe0
->    </IRQ>
->   ============================================
-> 
-> Conversely, to trigger lwtunnel_xmit() from the task context, simply ping
-> x.x.x.x on the same testing node. Below is the corresponding stack trace:
-> 
->   ============================================
->    <TASK>
->    ...
->    lwtunnel_xmit+0x18/0x3f0
->    ip_finish_output2+0x45a/0xcc0
->    ip_output+0xe2/0x380
->    ip_push_pending_frames+0x17a/0x200
->    raw_sendmsg+0x9fa/0x1060
->    __sys_sendto+0x294/0x2e0
->    __x64_sys_sendto+0x6d/0x80
->    do_syscall_64+0x64/0x140
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    </TASK>
->   ============================================
-> 
-> So also for the lwtunnel_xmit(), we need to make sure that the functions
-> dev_xmit_recursion{_inc/dec}() and the necessary logic to avoid lwt recursion
-> are protected, i.e. inside a local_bh_{disable/enable} block.
+Hello:
 
-That's correct, and I ended up with the same conclusion as yours on the 
-possible paths for lwtunnel_xmit() depending on the context (task vs 
-irq). Based on your description, we're using a similar approach with 
-eBPF :-) Note that paths are similar for lwtunnel_output() (see below).
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> In a non-preemptible real-time environment (i.e., when !PREEMPT_RT), the
-> in_softirq() expands to softirq_count(), which in turn uses the preempt_count()
-> function. On my x86 architecture, preempt_count() accesses the per-CPU
-> __preempt_count variable.
+On Thu, 10 Apr 2025 11:15:54 +1200 you wrote:
+> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
+> switches with integrated SoC. There are 4 physical SMI interfaces on the
+> RTL9300 however access is done using the switch ports. The driver takes
+> the MDIO bus hierarchy from the DTS and uses this to configure the
+> switch ports so they are associated with the correct PHY. This mapping
+> is also used when dealing with software requests from phylib.
 > 
-> If in_softirq() returns 0, it indicates that no softirqs are currently being
-> processed on the local CPU and BH are not disabled. Therefore, following the
-> logic above, we disable bottom halves (BH) on that particular CPU.
-> 
-> However, there is my opinion an issue that can occur: between the check on
-> in_softirq() and the call to local_bh_disable(), the task may be scheduled on
-> another CPU. As a result, the check on in_softirq() becomes ineffective because
-> we may end up disabling BH on a CPU that is not the one we just checked (with
-> if (in_softirq()) { ... }).
+> [...]
 
-Hmm, I think it's correct... good catch. I went for this solution to (i) 
-avoid useless nested BHs disable calls; and (ii) avoid ending up with a 
-spaghetti graph of possible paths with or without BHs disabled (i.e., 
-with single entry points, namely lwtunnel_xmit() and lwtunnel_output()), 
-which otherwise makes it hard to maintain the code IMO.
+Here is the summary with links:
+  - [net-next] net: mdio: Add RTL9300 MDIO driver
+    https://git.kernel.org/netdev/net-next/c/24e31e474769
 
-So, if we want to follow what Alexei suggests (see his last response), 
-we'd need to disable BHs in both ip_local_out() and ip6_local_out(). 
-These are the common functions which are closest in depth, and so for 
-both lwtunnel_xmit() and lwtunnel_output(). But... at the "cost" of 
-disabling BHs even when it may not be required. Indeed, ip_local_out() 
-and ip6_local_out() both call dst_output(), which one is usually not 
-lwtunnel_output() (and there may not even be a lwtunnel_xmit() to call 
-either).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-The other solution is to always call local_bh_disable() in both 
-lwtunnel_xmit() and lwtunnel_output(), at the cost of disabling BHs when 
-they were already. Which was basically -v1 and received a NACK from Alexei.
 
-At the moment, I'm not sure what's best.
 
