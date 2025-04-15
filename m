@@ -1,126 +1,97 @@
-Return-Path: <netdev+bounces-182869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72837A8A32F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:43:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82DE0A8A34D
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C0C0169DA6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:43:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275E73B2805
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5340296D1C;
-	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BF65789D;
+	Tue, 15 Apr 2025 15:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifTFX7Ua"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cQsvLDgA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4C920E003;
-	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34A126296
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731808; cv=none; b=Nhk12nXV1LuyiPl31+rNeTDM7QvenOBqsgTJ3BXuU6hGyDef0qCfkGQeArXXcZKgYLLjpPk+3j7cLUf8qBQ+c27g6hj/VLZqcDAaIFSB1aKVAakjtJfk/iYssdqio+T2HVwCG7QuT9LsHUJDCgmKi/DPrwnWgl4n1TgdiIAljXo=
+	t=1744731983; cv=none; b=aiBKo5h5hd/C+Z3H2jedOyDLNvqbC4gf+uYMXEx9KGnZsKpJbhW+cM5dEmjyXfGcwYWW7GZOpba4B4zYS0QmA83P30RargbL/sSgYqW+77aWKhWyyTNunqpLlm70XEllrL7YkJdLoB2SArhd0lT1GkAinvLkMrZNK1PB1WxtBbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731808; c=relaxed/simple;
-	bh=ccucVTibC96ZiE4Hr+vlu4U/HFUEw1R8eJ/1QIq1PMQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=elEZ0qfqdlfXCt02D6F/5gNyYObDy9kWUG4qnjzsoSchVzHHj/vYIXwlQ2aj0b8c1Ilu5zHIGUoS1Oj77TcyFllzxxzf6cRbqU/hIKkUf7pSHeauYFntYdXldA4SL4Wv83VDFaVtCOVVhsBL61xsPWrRDJeGRqb4EIi8vgQ8cOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifTFX7Ua; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A4B8C4CEEB;
-	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
+	s=arc-20240116; t=1744731983; c=relaxed/simple;
+	bh=/u9uWnKTxQrsHFPIYOsdVbzDhc5VucRx/+dJWztHkPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I3EmcpN8G+m51DNFzz+O8qlxXnETIL4c3dr18HdCwLlEJ3ivGqXa0ENMp28SJv5gq7rBQ0wXW//eyDS+InLwItlM4Qcd4wyvRgdwROKUI3qh5xvRysKT4yWTeDOwf18WU5FGoeRL4wU8xU2R5H8Gsn2N7hK6NQO4Rdky6L4G55Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cQsvLDgA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53378C4CEEB;
+	Tue, 15 Apr 2025 15:46:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744731808;
-	bh=ccucVTibC96ZiE4Hr+vlu4U/HFUEw1R8eJ/1QIq1PMQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ifTFX7Ua7Nbn0m/QP8+nFy/VLJx29jtfQVfAth5qMaRqnLiKKiVhnU7p2Z2PovKQo
-	 uChH/Esdx8AnHOV3oQ4/4geGq/LY74Y5FmXH2gGpkmhushoEeFh5xReUjl1JFbyQld
-	 syxlCD2xV3YT8wp8aKBwOFZDKCo2L68q4PNPsdlAzBO8Yk9AzTHcMZ0JtzeTdxwp8K
-	 RDju9zjvaGHhktQ7BwU44t5hBezPXGhC/K831x0jH/wk4a+dSK54dr5xPcd7/dxKzC
-	 rkDUNEiWtewS8loLsWu0iGFgdYGCCC8Aa85w7j2huxFBmv4tO26xCpK8tG1U77jTYZ
-	 RqiwlFKmxyy/A==
-Message-ID: <f448fcb8-6330-4517-863f-4bf0a2242313@kernel.org>
-Date: Tue, 15 Apr 2025 08:43:27 -0700
+	s=k20201202; t=1744731983;
+	bh=/u9uWnKTxQrsHFPIYOsdVbzDhc5VucRx/+dJWztHkPI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cQsvLDgAH+8EEWIB3AIU8Q0JLESuUgviyba+V7wdC2cKJn+bSLryltLUHkr3jrBVw
+	 ouo1OAO9j0PcjefIQEi9YIU/C5CNbklbg72ByeupGcScPpNzidE1aGE1zSS55S+xoc
+	 YC543+4GBzG3OwWHuK8iUzHodPR4xx/KjfwL97MxSZNzVhlKzciysGvXIF4Oj8Pvvn
+	 GWnUoyf52mIdilPQ1QfUZctcZ8xiHK5glaItJQyYQPAlh4i4ui8Fx3nTpvR+HNVxGk
+	 lAZGp+LmsQ3AKnZNkGZDZP6pV8JME+8lKowxPSZtbVbQKbTKsx/CtTW0LUtCZWlR7x
+	 HgxdRTaWs281Q==
+Date: Tue, 15 Apr 2025 16:46:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Madhu Chititm <madhu.chittim@intel.com>
+Subject: Re: [PATCH iwl-net] idpf: fix null-ptr-deref in idpf_features_check
+Message-ID: <20250415154620.GY395307@horms.kernel.org>
+References: <20250411160035.9155-1-pavan.kumar.linga@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V4 1/2] net: sched: generalize check for no-queue
- qdisc on TX queue
-Content-Language: en-US
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
-References: <174472463778.274639.12670590457453196991.stgit@firesoul>
- <174472469906.274639.14909448343817900822.stgit@firesoul>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <174472469906.274639.14909448343817900822.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250411160035.9155-1-pavan.kumar.linga@intel.com>
 
-On 4/15/25 7:44 AM, Jesper Dangaard Brouer wrote:
-> The "noqueue" qdisc can either be directly attached, or get default
-> attached if net_device priv_flags has IFF_NO_QUEUE. In both cases, the
-> allocated Qdisc structure gets it's enqueue function pointer reset to
-> NULL by noqueue_init() via noqueue_qdisc_ops.
+On Fri, Apr 11, 2025 at 09:00:35AM -0700, Pavan Kumar Linga wrote:
+> idpf_features_check is used to validate the TX packet. skb header
+> length is compared with the hardware supported value received from
+> the device control plane. The value is stored in the adapter structure
+> and to access it, vport pointer is used. During reset all the vports
+> are released and the vport pointer that the netdev private structure
+> points to is NULL.
 > 
-> This is a common case for software virtual net_devices. For these devices
-> with no-queue, the transmission path in __dev_queue_xmit() will bypass
-> the qdisc layer. Directly invoking device drivers ndo_start_xmit (via
-> dev_hard_start_xmit).  In this mode the device driver is not allowed to
-> ask for packets to be queued (either via returning NETDEV_TX_BUSY or
-> stopping the TXQ).
+> To avoid null-ptr-deref, store the max header length value in netdev
+> private structure. This also helps to cache the value and avoid
+> accessing adapter pointer in hot path.
 > 
-> The simplest and most reliable way to identify this no-queue case is by
-> checking if enqueue == NULL.
+> BUG: kernel NULL pointer dereference, address: 0000000000000068
+> ...
+> RIP: 0010:idpf_features_check+0x6d/0xe0 [idpf]
+> Call Trace:
+>  <TASK>
+>  ? __die+0x23/0x70
+>  ? page_fault_oops+0x154/0x520
+>  ? exc_page_fault+0x76/0x190
+>  ? asm_exc_page_fault+0x26/0x30
+>  ? idpf_features_check+0x6d/0xe0 [idpf]
+>  netif_skb_features+0x88/0x310
+>  validate_xmit_skb+0x2a/0x2b0
+>  validate_xmit_skb_list+0x4c/0x70
+>  sch_direct_xmit+0x19d/0x3a0
+>  __dev_queue_xmit+0xb74/0xe70
+>  ...
 > 
-> The vrf driver currently open-codes this check (!qdisc->enqueue). While
-> functionally correct, this low-level detail is better encapsulated in a
-> dedicated helper for clarity and long-term maintainability.
-> 
-> To make this behavior more explicit and reusable, this patch introduce a
-> new helper: qdisc_txq_has_no_queue(). Helper will also be used by the
-> veth driver in the next patch, which introduces optional qdisc-based
-> backpressure.
-> 
-> This is a non-functional change.
-> 
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> ---
->  drivers/net/vrf.c         |    4 +---
->  include/net/sch_generic.h |    8 ++++++++
->  2 files changed, 9 insertions(+), 3 deletions(-)
-> 
+> Fixes: a251eee62133 ("idpf: add SRIOV support and other ndo_ops")
+> Reviewed-by: Madhu Chititm <madhu.chittim@intel.com>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 
-
->  /* Local traffic destined to local address. Reinsert the packet to rx
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index d48c657191cd..b6c177f7141c 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -803,6 +803,14 @@ static inline bool qdisc_tx_changing(const struct net_device *dev)
->  	return false;
->  }
->  
-> +/* "noqueue" qdisc identified by not having any enqueue, see noqueue_init() */
-> +static inline bool qdisc_txq_has_no_queue(const struct netdev_queue *txq)
-> +{
-> +	struct Qdisc *qdisc = rcu_access_pointer(txq->qdisc);
-> +
-> +	return qdisc->enqueue == NULL;
-
-Did checkpatch not complain that this should be '!qdisc->enqueue' ?
-
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
