@@ -1,292 +1,229 @@
-Return-Path: <netdev+bounces-182969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6FC3A8A74D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:54:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6D3A8A75B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1F991672D2
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:54:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53C477A42FA
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A4722A7F1;
-	Tue, 15 Apr 2025 18:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D1123535B;
+	Tue, 15 Apr 2025 18:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JXapmcKN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8TLLvAI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9691F23236F;
-	Tue, 15 Apr 2025 18:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744743294; cv=fail; b=BTBWroA4IcxLJ7HJv1cuDEyEjx9a4BHBBaVJlgFqzo8vzOF7rJ7t9ZB3HbmcOol176+qzbugGudB3bI8IfUxZGAyjg/GYjeyxqon63V0RpHFLzwIsIaSlLKSkitkAFfIM/lp8RQUV5dHvqup4QabX8zDGAQjIiV9XeNsJJppQzg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744743294; c=relaxed/simple;
-	bh=UyWKqKxmdLlsR317msnhBNcOJbiuQMbOalNMQVC+Lyo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=e4psBpB0IvesuG8vnhPYOVkI5LlOn9zupA2DzG5qPuUzMIhUoFfVboe9ip+ID36b8c1JK7M5qq8wX9NA0aeYB/Eu7ITg6HpE7O7rhOdkZc98X+a9t3kgplYb3XVfHYvB4tfZ2o1Cigg90l/mqHErT1ZJ7QDiZ1r6VUVJLqkF4bs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JXapmcKN; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744743293; x=1776279293;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=UyWKqKxmdLlsR317msnhBNcOJbiuQMbOalNMQVC+Lyo=;
-  b=JXapmcKNizLYpG7uRo3dNqOSMGEq+ba2Na/k/02arW0qRPDpzneH+B5W
-   3BiQIllsuz4OeZTaYZFgMW+Q2Ok5w8u0uRJVvVhvT9CNZynlFkBWJiC+D
-   ZIHD9TPXOsQlGPaLROFL10kzCxQTfVX2COrwkdvtUiekdNyRdAZAfl9SY
-   5R9zALp6R6cHyQYWM3caHPhuysWB/FFhWKmdntl6U4s7o5KYUti31VGrO
-   RsbZObDw8/WLzHtggCduc+oh/RfFMjA7L8XLZVlmKdkYhNWz8XvjXDu9D
-   ygLFRstO3HNkYhkyS2bjJ5MZtasSoDKfdTy4nn4AMGGVbS9i5MVbgYTO+
-   w==;
-X-CSE-ConnectionGUID: gp610C65RNSeOPSJAHyOsQ==
-X-CSE-MsgGUID: AILrX4eIQ9yQ8BVXh9Si/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46357980"
-X-IronPort-AV: E=Sophos;i="6.15,214,1739865600"; 
-   d="scan'208";a="46357980"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 11:54:52 -0700
-X-CSE-ConnectionGUID: hI7W1DpgR7GwFnZPNRs4wQ==
-X-CSE-MsgGUID: y305j7J0SGqoViHT3RrDPw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,214,1739865600"; 
-   d="scan'208";a="135053213"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 11:54:52 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 15 Apr 2025 11:54:51 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 15 Apr 2025 11:54:51 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 15 Apr 2025 11:54:51 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v8vtEXbrHXzoVe3prC63vZcszc0dztvNtFd2IM+1DtQiJ/C4LLRqcf+QfPLHtCMNZHSNfX5OQJRv1gVZOUosWHzCJ1puierimnSiVZ4iMhDFW+U9UVZr5VcQxXwvyvVMl/u1eAH8RHwBJv+gp8kcOgmbSw+KDOtp7UpC5UAUILAR42/UbtK8jhcUt/jWFsgBqb19K71i/edVYyub9UhzRVRxMtb2Bly8/yhfo/RXzCHS5domPYcusJXrbgZYu3kouC6rREVE/T1U9dmDWM52bIFLBstVwzFJAS+D0CrG8n+RrcyD9gESButsiOFZ7fPq53EkneL2GDxGEwb14X/MYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/NGnVqa2p6fty2zNnT40OHnChmABvK59OZd6yvnQBLc=;
- b=B4AX2+J334UK7/jHx5/y465HIqcjVoUq/p2I9QGraBThZERyVjPfCABlrC/u2o4Jsjv6GISRTaFCI5HFkomQN/NHozwKdc9505UoyejyjqSGGcL7jLmcc3iqaAmNshWydWXlrSz2orNLc4DroKxN6FOHkuKO35EkB7sXaphZDrKt48UKgTpqUkhWxelFAb1/NEySZu/4l8c6GyYRrH8Ow5W8ybV1JjctI5xZAKAWZXjb4FKf2Ip52ELjkAHfEVrbQEa739iD9lh9SffecHfD+sGEwfkfZxzT0gXs+YGB9XnbfZ9cl47fBE7AS6nF93X7YB85w/tZyBmarmmpp8DSuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by MW4PR11MB7006.namprd11.prod.outlook.com (2603:10b6:303:22f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.33; Tue, 15 Apr
- 2025 18:54:48 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab%4]) with mapi id 15.20.8632.025; Tue, 15 Apr 2025
- 18:54:47 +0000
-Message-ID: <d397e5c5-e05b-4ec3-bbd6-14f06b33db49@intel.com>
-Date: Tue, 15 Apr 2025 11:54:41 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 14/14] ixd: add devlink support
-To: Larysa Zaremba <larysa.zaremba@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Jiri Pirko
-	<jiri@resnulli.us>, Mustafa Ismail <mustafa.ismail@intel.com>, "Tatyana
- Nikolova" <tatyana.e.nikolova@intel.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Michael Ellerman <mpe@ellerman.id.au>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, "Lee Trager" <lee@trager.us>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, "Sridhar Samudrala"
-	<sridhar.samudrala@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>, Wenjun Wu <wenjun1.wu@intel.com>, Ahmed Zaki
-	<ahmed.zaki@intel.com>, <netdev@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Karlsson,
- Magnus" <magnus.karlsson@intel.com>, Emil Tantilov
-	<emil.s.tantilov@intel.com>, Madhu Chittim <madhu.chittim@intel.com>, "Josh
- Hay" <joshua.a.hay@intel.com>, Milena Olech <milena.olech@intel.com>,
-	<pavan.kumar.linga@intel.com>, "Singhai, Anjali" <anjali.singhai@intel.com>
-References: <20250408124816.11584-1-larysa.zaremba@intel.com>
- <20250408124816.11584-15-larysa.zaremba@intel.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20250408124816.11584-15-larysa.zaremba@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P220CA0021.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:303:115::26) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8076B235348
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 18:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744743584; cv=none; b=NT2Chczeg9p2kLtRGXJbuuxmW+BiMQ7tnXNpyDkvjNMqlkDKbzvL3m+kGVAguIPhbDTgpah36PEfljbaQD7uIfy7T8XKIujs69iWztABTOCcJf5+7jm4sGPCEXwJYOArXca20lZ91NoY8+AR1vvS99rp0P7M6zXOv3napfKOjqY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744743584; c=relaxed/simple;
+	bh=LViciyvOp4geuiDewDE8+XtOvlKmyZPVLRpoMWHTnpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=faFrKsb1M5Fabd6oJAIUvaMk0D98eQ7fB4tSNKoSRwhIGpDRdEgCkHSW/lvyJ5DBpz1DaRTYYPAVKdefZf3t2eeqw0j2GP4Ka2tBHWvaMJGrmRS0HHTRmQAjWAL1gnaoFbc1GVbsXnBen17vopuBEQeRzvwQJZFfPtVU34veVG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8TLLvAI; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2279915e06eso64040485ad.1
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 11:59:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744743582; x=1745348382; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rYPIWNnQ47VdwUIgphoRIocPhIQF2vXGe+HYwcjcoGQ=;
+        b=P8TLLvAIND52fZ8RKoal0XDneE7JbRA5kL5YedygqaVJUkr13ldoAmxWSLhZPdI5kB
+         u3q8TUKohanHy7SE0gitMgbgT9g+VvP0zs6wlyena0o6L2dDKquxKCeijDFN1Ukn9I7Y
+         Sku/GgtPWnHtFtcfzip/wSTIWsujNazljKhYMdWk/oLB1CX6FQl8ATj8a2SLq3XTG9ir
+         9JUsA/Gc5P+AViITMAjDnKcXzFhHOg2uv63oFPUcWX1Q3HjuAs+QHvQIXvCSg/r7fcEz
+         kxX6erRSzk3pXgdQixWPZweh5+YdWrzfGAJF2i4zjymmSzuqoItfbwNh8dD/IBjETx4l
+         7MsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744743582; x=1745348382;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rYPIWNnQ47VdwUIgphoRIocPhIQF2vXGe+HYwcjcoGQ=;
+        b=Zz12oPjfg1lYOM3i4pL3BkMN6X9+6MerD8JEEWLsOeorauU6z8+ERBZfhfeUcoOR6M
+         7NtUqyQbfSNtBqhjiGo6FZs6w7GaDsqTX+QfuQ+AyXG9eWFlZc+40zZyyoHipYS65+Q3
+         NtpuJq7q9bYuKKimNUM37WdMDhMrTvktNVuMKq0OJ86MX01QzUa+JYuOYRZIP8T9fQDJ
+         C3/GEk3aeTCr+Z0JNgP/eA1x/UE9NTIXzzlyKYTwlgmlSCQrJ1IXA5tyWe1eLa4MIHtf
+         cRsZFjLHh+zSAKVTkEenAMf1W8AZ3YxCxspVjtAk/h92+zehEZ61LbW2t1nia4cAW4HJ
+         DwLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpv3Om9isz7cwQlQBWm4H3UwauwlLt7b4P82mGBFwTl/mkKJNVda6jHqqFaOb3MZ6mrz80V1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBhlkw0VukltAYdXYdlJfvZqYiU9eplzCMOOb4rF78GCp8bGtB
+	y9E/0M0v37UHprITUaOdj9xUqFFOTkq0/ekdEfqCk9u3H/gOhwU=
+X-Gm-Gg: ASbGncs3ZaYd/8+r7eaxZXLMwu82v4NOByEvIJ800O4kbt3gka2wfnVhYXWviRem8t6
+	axmmNbHFiX3DymPSAEn3X8BAMB7KoWDhI1mcFhswlS9R/VYv9aB0n7ZaBxBjZgQsxP0Whp9oOJr
+	Pr9GBKy7cFS8QFoD+PgKOcHFmqAQhySpAAqBuIDTjjAcrhrrX+Rc0hSpF/tZzRbhxQiicdZ8xoQ
+	W9DqXDMMRKssWr1PXhsYMlU02Wq2b/VZR7dooAeR3RF36Q+YJbRtJyHkMSrW8PBNJC7R6UJWvKz
+	dgTypqIBE11jerplDjnDcfgh9MqbL6/pcw3w5Tu/yod81EQyzzA=
+X-Google-Smtp-Source: AGHT+IHp7ohCyMtWWO4d0a44TooY1lpAjxvyFUjYHpI+w5Cfc0uXhyat0iSVP575D0MQ/jaGrFCL4g==
+X-Received: by 2002:a17:902:e54b:b0:21f:85d0:828 with SMTP id d9443c01a7336-22c31abc38bmr3404185ad.41.1744743581717;
+        Tue, 15 Apr 2025 11:59:41 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22ac7b8c62dsm121343225ad.95.2025.04.15.11.59.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 11:59:41 -0700 (PDT)
+Date: Tue, 15 Apr 2025 11:59:40 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+	horms@kernel.org, asml.silence@gmail.com, dw@davidwei.uk,
+	sdf@fomichev.me, skhawaja@google.com, simona.vetter@ffwll.ch,
+	kaiyuanz@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: devmem: fix kernel panic when socket close
+ after module unload
+Message-ID: <Z_6snPXxWLmsNHL5@mini-arch>
+References: <20250415092417.1437488-1-ap420073@gmail.com>
+ <CAHS8izMrN4+UuoRy3zUS0-2KJGfUhRVxyeJHEn81VX=9TdjKcg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|MW4PR11MB7006:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64f3331b-6d1a-4a1a-a51a-08dd7c4efe83
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WVdmYTJrMkNTT1IzVEE1ZVBTdVNwbnRQVUJ2eGpnRGhGM3g2ZzdwSGlPM0N5?=
- =?utf-8?B?eDV4Nzl2alJDRlpESUpZQ2hZd1Vmejk1YjlqZE16U3lqVGRJVmJ6eDRNTGpI?=
- =?utf-8?B?YXVCeFVGdmJZOUg2N0RNM2xKdEZFckp1SExyMytKZXQzVEpqZlgyNUxpWnhJ?=
- =?utf-8?B?OTlqM0JQMFFueWZCZitLVzcxb0hDTmNDaWlyQVlDam11MTNSY3c5VFZ3TEUw?=
- =?utf-8?B?dUJYNFJkS240b2F4UlRJcHZvcHRZSXJYd0hDd0NFeno0bXltR3Q2VFVrZmRQ?=
- =?utf-8?B?TDgvcmtNRFlMSE1kVGlNcHZqeVBpOG5pRnZQSzVlaTFtU3VQU0VJemdwTE9B?=
- =?utf-8?B?UzF1TVNxMVh6WFhNYmFybUtobFJnU2h0azcwOTY2dHc4d05LZzBPKzREMngw?=
- =?utf-8?B?ZGtOYnhSRE5oRkFMUFFneUIyNzlsVGJxVzh3NDdoQnMweE1GcXdmeU55OUZL?=
- =?utf-8?B?WjZGcFYvUXkzRVFMZGhydVE1dE1CS0pZNzRLR2tRbzN6aEM0YTBuaFhOWUho?=
- =?utf-8?B?aXlaaTlqT2pSYjEvZTZKL3JZaGZxQTBBYjREYmZCOWhneVBLUVJlYm1rSEox?=
- =?utf-8?B?c0hlVEY4U0RSMDJjaGtScFlWcWlaeVBGaUh5ZE1rWEpaK3hBa1dzRlcyaVJY?=
- =?utf-8?B?V21ONXFOQitnajFNSkxCM2MxYWIrQ0F1S0ZTUVVxTHdIcE10ZkdhMWROS3k5?=
- =?utf-8?B?Um1jY1F0UlIvRmxnN2s1M0tPcEtxL21TZGtHcGdQeTRZSmZzK2pPdnk1eVRL?=
- =?utf-8?B?YUVnWU4yeEdvb0lnNmxiZFFFY1Z3c2xKRVg2Z2xGbm1MV1FDd1dpWFFLdGxT?=
- =?utf-8?B?eUZydU83ZUorOFRhK2FaTENSeU93ZElwVWNMb3hLcEhHUHBLL1Y4VEE5Uisz?=
- =?utf-8?B?UlhZcTBpK2diUEM4TFlESllRVTNGTWFIVVhDS01WazdEdGJDNjE2aHdYWEta?=
- =?utf-8?B?blV1WVBXa2ZYdUdFdDFnNDdhd25kZUdXUi9IOXJVTkY1MmE4ekxLNjlSVzV1?=
- =?utf-8?B?ZFJZMUJNempEai9tQ3NvckMzaHh2V0NrSHdKZmcxT1RwL0s2TlhEZFYweGQy?=
- =?utf-8?B?T0VnajlCd2tCb3pnOWNJLytwdERYa3V2Z0o4VjBPVTlQOFJqQU1JdmVSTXk4?=
- =?utf-8?B?Y1dESmI0QjgzUGZhaFR1Y29hSHA2bDRuTk1hSnFtK3lKNXFKaW1CRGlrb212?=
- =?utf-8?B?NmRuNlU1RFlvYzQvTGl3b284OXhObkh5bGlHMjA1QTJMamtYeUV2bGUvS081?=
- =?utf-8?B?WjlZZ3FkNU81Y2Y4TWRwS1pGOGNLMDZ3WjV4WjNpOGdXMDdkN1FJTmhjQ00y?=
- =?utf-8?B?Z055OTZ4MHpIeXNLRnE4ay9OMnBiTWF0eTZtR25XSmwvNFBUclV3WWIyL2sy?=
- =?utf-8?B?Yzk1SGIrMVVoTGl4Q2VWRSsxMElzb05SSzFQZHNrM2dEZC8xajh1dEIvTUdp?=
- =?utf-8?B?L2crMEpOamRwK0drdnZEekpyeXJpQVo3VnltMW83Vy8vNUpuZ1g0ZXN2ZmpK?=
- =?utf-8?B?OVR3Wi9GTmN1SE1BRE1rR3lQM2dtb0phQisrdngvQkRoZHlYLzNBekFtZ0Rk?=
- =?utf-8?B?dEk2ZkRSZ3kzclZDaWw3V2xPOFcwd3l6eW5lNm4yZ0lZN2dTYWVHaVpaUVd6?=
- =?utf-8?B?cTBxSU1jWmVBVnByL3I4eTIzbG1KYmRZZGlyNE1rY3NxNmFLUnk5T05GSS8z?=
- =?utf-8?B?KzNUcDI1LzJoajh3cWNoTkpibE1LdG5YSVVkcGowZDMzZHZ6Z0QxVko3azVN?=
- =?utf-8?B?TVZieWJpZ2c5M012d2dsd01QRyt5cGEwenh3Y0NialEzWFNuRXZPT3J4STdE?=
- =?utf-8?B?bXdlZHM2NDlWTU5RNHR6VFlZQmMycGcyVC8zcThleERQM0cxMklvYVVjVE01?=
- =?utf-8?B?UHQ5b1E2NDltYUZ4SzV6dzNkb3drMWZEbmRsV0NvdWhralE9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0lMZnY5amU2U0MzUDV6aUd5cDBURFpiRVJMZnZ0ODdzd0Ywd05iUk1UWGdh?=
- =?utf-8?B?eWpEOEd4L0E5WVFDdVBjSXduTHI3Q3hWSGY1M01aMVB6amE0MENYc2J1L2dJ?=
- =?utf-8?B?L095YyttMGtwcCtNVkFaQmZWbFlmMEw2d3hBSGg1UVRvaHZETzd2WjNta1lj?=
- =?utf-8?B?bis5RWxseUtOc2dtQ2hzQTRFbXpEKzVCSmFQU1FpT3ZGWDNJMWNic3FYZzVB?=
- =?utf-8?B?Y1FsQ1ZRYVc1a0RZcUdiNzZidTNjeUdqdDBhN01GYm11VVRXYTNiZ1pDQlJU?=
- =?utf-8?B?WEs1ME1JZ0w0cHBtUXFiUUpWazNuWFRNMStvV0gzMjllSUhlRmRrQzZiRHg4?=
- =?utf-8?B?L2JpcEMvbW9vbjZnK2l1UzVVMUc1RnBpNW5EQUpqVGRiQ3NTaTNwbE5UcWlX?=
- =?utf-8?B?WjU4TDNVUk9ZSlkwajZ6Q0ZVMGcvdGRLQUdTUnlHdUkrRGNrVWJ3ZE53NjRr?=
- =?utf-8?B?UXdIYjVISVA1bm5HYTNWaTlHS3h5Q0VpSGJHZ3M2ejVnUTB3ZFZLcmxYV1N2?=
- =?utf-8?B?YnVua0Y5OW1BejF0K3ExdTQva0t3a2IveHJOZjBzMURDaTNhdE9qaFEwM3Fq?=
- =?utf-8?B?QlVjZk1UVWc5ZmVldE8xVVpMVFhDUE5RQmNndmNrNEZ5dWppZGhoQVhSRWVY?=
- =?utf-8?B?UjRtdzh0QyttNE12Q3lFc085WDJaQUhieE9mZjRhcDIxM3R0UjVoRW5PeVRr?=
- =?utf-8?B?ZmpRQkpmSE1yNTBRVlVjU3RaZTlEVEJtWDlXbTZQQmN2bHdseXNqRXF5RWU2?=
- =?utf-8?B?YkluZk42T1ErcW1HSDRmZjdoR05MMnBjQ2l6ZFJWVW1YUGdFK2daM0JZeGpu?=
- =?utf-8?B?VmlOQlpQdWNTb1FxWWRNeG1Od01zTFlzbjRsNzQxUGpGUW5lZ0RLZFl0VDM1?=
- =?utf-8?B?ZXMvVFB1VnRoZThBa3FtSnNiZjJzQmZlU3l6QXd1SEJYWXRSZXJ5cmgrSUV4?=
- =?utf-8?B?Y0FSZ3I0TVMyckFSUnFJUWpnOUpJMVJabGE3Q0FBdklzTk5pQnFQY09HbjJM?=
- =?utf-8?B?c0JzY1UzMGFOeGYzbk5saEZzaTh5Qi9JZXRQTE5RVkd3TXU5OHRPMGJBRHNq?=
- =?utf-8?B?eDAyUnFraEVOYTBjSitBZXRXTGhMRmpFNFlGengxRHAxN2ZmZThkODg1NlBu?=
- =?utf-8?B?bmRBS2NlZ0hoNDU3Rkp0bWZFMWZBdzlmODRPOW1PTUlPV0U5eG5GSFlXbEpI?=
- =?utf-8?B?TmNQallsR0M3NDZMVVo0NzlXK0xsQWVDaG95UXFkU2d0aDhmemNVQjBUUzdr?=
- =?utf-8?B?QVh1UnJ0Q0MvWGFpNW5RQTlhOVZKY3VkS2p5MEtDVzVnSzVsZVFVbzRjTGNj?=
- =?utf-8?B?VDlUWUYwK1BVRjZnelFFMThqbjJ6M09ROFl1ekJiQ3Byck80M1NteVdLWGcw?=
- =?utf-8?B?SWdIcW1PbHdzQ1dNaGwzdm93Mk1ja1h4RkgvSm9rT0RDUE5uelB1blBaam9l?=
- =?utf-8?B?ajZTR1BMTGZDa3dCWmtvVG1ZU1grbDZHQTZ4bWJMbWxLQyt3b1NWbU8zWkJJ?=
- =?utf-8?B?Z01leEpPczhYSWwwa2ZzT3dkMGlxb0szSzZVdlVIdGx0NFhlQWgvNTVTamZ0?=
- =?utf-8?B?TnpDN1Y3eDRuOTBYbGhXMnIvMk9yTktjdEZPVmk5MDNkOFp6V05MVmh2NmNv?=
- =?utf-8?B?elVhU2tpT0ZqS2RyQ3pjUVJtVCtiL2VzUnBMNG8vclpCdDFtS2dYa1JOVXQ1?=
- =?utf-8?B?Q0ZFREZORHZPNXp0dnhVM1NSUGs3NVZyVjl3WXRGMWVURUNRY2lRWWRJWnRx?=
- =?utf-8?B?UVFsR1l1ZW9jSyt0MEd1SlNtbDBKRlljWGhtRVVDdXUwdThOV2hzTWw2NjIv?=
- =?utf-8?B?cklRdlB3cXVadyt2d01ieDE3QTM1MUhuekFnQmpRMUowTFhNSm9ndUZMN01v?=
- =?utf-8?B?WVpQbHhXL3VDbGJUMWEyZ3ltSFNMaTBzdHNDeG0xMEgzMVhzUEJNNWZReXMy?=
- =?utf-8?B?OE5OeEgzdTRwRWNLWXB4OWowRCsxQ0pKR3h5emRLVWM0TlZMY1dULzFVQ3ZB?=
- =?utf-8?B?TDcrR3B4UEhpcDNDS1hHaUdaeVRQVWVwNyt4cDF0WWI5K21KZk9reS9uaU1u?=
- =?utf-8?B?OXlvSzB0Sithdi81KzNWSm80ZjUrN1g2RklEemt2WGN5MnBZM2tlbkQzWkto?=
- =?utf-8?B?OXovRk1VN2FkN3hwZndJZ0N6M3QrVGNyNVp4Q1M0MitvY282RnB6SWJBVklp?=
- =?utf-8?B?Mmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64f3331b-6d1a-4a1a-a51a-08dd7c4efe83
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 18:54:47.7768
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hOa6yy0eK7Nv+SoztdgppNfLgPha7JpKkjFrS0wyNLxWP1TcrrA/klPuRAOd6dNicRJG9DvNQpojUkgwhSpMmJq6e4HgWecZhW0kPn16E6Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7006
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMrN4+UuoRy3zUS0-2KJGfUhRVxyeJHEn81VX=9TdjKcg@mail.gmail.com>
 
-
-
-On 4/8/2025 5:48 AM, Larysa Zaremba wrote:
-> From: Amritha Nambiar <amritha.nambiar@intel.com>
+On 04/15, Mina Almasry wrote:
+> On Tue, Apr 15, 2025 at 2:24 AM Taehee Yoo <ap420073@gmail.com> wrote:
+> >
+> > Kernel panic occurs when a devmem TCP socket is closed after NIC module
+> > is unloaded.
+> >
+> > This is Devmem TCP unregistration scenarios. number is an order.
+> > (a)socket close    (b)pp destroy    (c)uninstall    result
+> > 1                  2                3               OK
+> > 1                  3                2               (d)Impossible
+> > 2                  1                3               OK
+> > 3                  1                2               (e)Kernel panic
+> > 2                  3                1               (d)Impossible
+> > 3                  2                1               (d)Impossible
+> >
+> > (a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
+> >     closed.
+> > (b) page_pool_destroy() is called when the interface is down.
+> > (c) mp_ops->uninstall() is called when an interface is unregistered.
+> > (d) There is no scenario in mp_ops->uninstall() is called before
+> >     page_pool_destroy().
+> >     Because unregister_netdevice_many_notify() closes interfaces first
+> >     and then calls mp_ops->uninstall().
+> > (e) netdev_nl_sock_priv_destroy() accesses struct net_device.
+> >     But if the interface module has already been removed, net_device
+> >     pointer is invalid, so it causes kernel panic.
+> >
+> > In summary, there are only 3 possible scenarios.
+> >  A. sk close -> pp destroy -> uninstall.
+> >  B. pp destroy -> sk close -> uninstall.
+> >  C. pp destroy -> uninstall -> sk close.
+> >
+> > Case C is a kernel panic scenario.
+> >
+> > In order to fix this problem, it makes netdev_nl_sock_priv_destroy() do
+> > nothing if a module is already removed.
+> > The mp_ops->uninstall() handles these instead.
+> >
+> > The netdev_nl_sock_priv_destroy() iterates binding->list and releases
+> > them all with net_devmem_unbind_dmabuf().
+> > The net_devmem_unbind_dmabuf() has the below steps.
+> > 1. Delete binding from a list.
+> > 2. Call _net_mp_close_rxq() for all rxq's bound to a binding.
+> > 3. Call net_devmem_dmabuf_binding_put() to release resources.
+> >
+> > The mp_ops->uninstall() doesn't need to call _net_mp_close_rxq() because
+> > resources are already released properly when an interface is being down.
+> >
+> > From now on netdev_nl_sock_priv_destroy() will do nothing if a module
+> > has been removed because all bindings are removed from a list by
+> > mp_ops->uninstall().
+> >
+> > netdev_nl_sock_priv_destroy() internally sets mp_ops to NULL.
+> > So mp_ops->uninstall has not been called if devmem TCP socket was
+> > already closed.
+> >
+> > Tests:
+> > Scenario A:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=$!
+> >     sleep 10
+> >     ip link set $interface down
+> >     kill $pid
+> >     modprobe -rv $module
+> >
+> > Scenario B:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=$!
+> >     sleep 10
+> >     ip link set $interface down
+> >     kill $pid
+> >     modprobe -rv $module
+> >
 > 
-> Enable initial support for the devlink interface with the ixd
-> driver. The ixd hardware is a single function PCIe device. So, the
-> PCIe adapter gets its own devlink instance to manage device-wide
-> resources or configuration.
+> Scenario A & B are exactly the same steps?
 > 
-> $ devlink dev show
-> pci/0000:83:00.6
+> > Scenario C:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=$!
+> >     sleep 10
+> >     modprobe -rv $module
+> >     sleep 5
+> >     kill $pid
+> >
+> > Splat looks like:
+> > Oops: general protection fault, probably for non-canonical address 0xdffffc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+> > KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x00000000fffd4fbf]
+> > CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.15.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
+> > Tainted: [B]=BAD_PAGE, [W]=WARN
+> > RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mutex.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locking/mutex.c:746)
+> > Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
+> > RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
+> > RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
+> > RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
+> > RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
+> > R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
+> > R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
+> > FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
+> > PKRU: 55555554
+> > Call Trace:
+> > <TASK>
+> >  ...
+> >  netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator 3))
 > 
-> $ devlink dev info pci/0000:83:00.6
-> pci/0000:83:00.6:
->    driver ixd
->    serial_number 00-a0-c9-ff-ff-23-45-67
->    versions:
->        fixed:
->          device.type MEV
->        running:
->          cp 0.0
->          virtchnl 2.0
+> Line 953 is:
 > 
-> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->   Documentation/networking/devlink/ixd.rst     |  35 +++++++
->   drivers/net/ethernet/intel/ixd/Kconfig       |   1 +
->   drivers/net/ethernet/intel/ixd/Makefile      |   1 +
->   drivers/net/ethernet/intel/ixd/ixd_devlink.c | 105 +++++++++++++++++++
->   drivers/net/ethernet/intel/ixd/ixd_devlink.h |  44 ++++++++
->   drivers/net/ethernet/intel/ixd/ixd_main.c    |  13 ++-
->   6 files changed, 196 insertions(+), 3 deletions(-)
->   create mode 100644 Documentation/networking/devlink/ixd.rst
->   create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.c
->   create mode 100644 drivers/net/ethernet/intel/ixd/ixd_devlink.h
+> netdev_lock(dev);
 > 
-> diff --git a/Documentation/networking/devlink/ixd.rst b/Documentation/networking/devlink/ixd.rst
-> new file mode 100644
-> index 000000000000..81b28ffb00f6
-> --- /dev/null
-> +++ b/Documentation/networking/devlink/ixd.rst
-
-The index needs to be updated as well:
-
-Documentation/networking/devlink/ixd.rst: WARNING: document isn't 
-included in any toctree
-
-Thanks,
-Tony
-
-> @@ -0,0 +1,35 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +===================
-> +ixd devlink support
-> +===================
-> +
-> +This document describes the devlink features implemented by the ``ixd``
-> +device driver.
-> +
-> +Info versions
-
+> Which was introduced by:
+> 
+> commit 42f342387841 ("net: fix use-after-free in the
+> netdev_nl_sock_priv_destroy()") and rolling back a few fixes, it's
+> really introduced by commit 1d22d3060b9b ("net: drop rtnl_lock for
+> queue_mgmt operations").
+> 
+> My first question, does this issue still reproduce if you remove the
+> per netdev locking and go back to relying on rtnl_locking? Or do we
+> crash somewhere else in net_devmem_unbind_dmabuf? If so, where?
+> Looking through the rest of the unbinding code, it's not clear to me
+> any of it actually uses dev, so it may just be the locking...
+ 
+A proper fix, most likely, will involve resetting binding->dev to NULL
+when the device is going away. Replacing rtnl with dev lock exposes the
+fact that we can't assume that the binding->dev is still valid by
+the time we do unbind.
 
