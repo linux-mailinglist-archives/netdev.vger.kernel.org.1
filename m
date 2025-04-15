@@ -1,291 +1,278 @@
-Return-Path: <netdev+bounces-183002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CCACA8A8DF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 22:10:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AAD3A8A8EA
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 22:10:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 987963AEE03
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:09:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B260E1898CBD
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA0F2522A4;
-	Tue, 15 Apr 2025 20:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAFA2528E4;
+	Tue, 15 Apr 2025 20:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="wZWOV3bz";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="v7quyGGP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jp01jsw5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA582505A9
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 20:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A815F1F542A;
+	Tue, 15 Apr 2025 20:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744747802; cv=none; b=lkeZmIQPZXcAuegYUVYVEh7DqSwxjVPwHJZ/cn/MEXxYdCexOtOSHiF5gnycu9/wVvbOOMeVfdBBuXwmxkCHaWDp5leZZOrfklCaPpRIjK4z3spbFCKcFIvUPuhdEPCfgnodJJlEgb1pc9c7srDofmRD9m2JBHXWscNUyXA0Ikw=
+	t=1744747841; cv=none; b=mVM7U5qETjh7+W+cofHrPkDfhwnKYnSFtO4FpR2eZ6FuTPJ2iy3dbFoguEM3rFdSvZ5jgEMVPI6qKJDkATpZV6dX4Jd8IoMZ9yoKrhOzgUw6vQdY0oslGCmOpGxKS2TLltJ3Uy80+CQu+Qdzo2gR6+ahmVb6rVdaAIw29eXc0xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744747802; c=relaxed/simple;
-	bh=6vmvOJz0Rtg8NCJpxE1495KIoRkHP9wy5rbN1IhCJ/M=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=dqQ0gBeGVXYnqP7tmqOWLoKoRRtfRLlYBIWhK/gJ0T5xm432fLZG4p3daPusV1YZY1r34PDWNQkrDNtshWFrv2K0mMzVatRl5exyStm0exDid9BZ3qzAxAZcKNovtqjtdvonTdq2N1OCWIoFLP7E2V+qLZP0ogqzDqM630ttnQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=wZWOV3bz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=v7quyGGP; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9365C13801F4;
-	Tue, 15 Apr 2025 16:09:58 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Tue, 15 Apr 2025 16:09:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1744747798; x=1744834198; bh=PmvRmAL3zeDo/DPtctpSg
-	u9QOlY4+Czidf52UOqaXyc=; b=wZWOV3bzt2R0/Qp53501ndgX1nNlVg3G2m3AO
-	C6qHRZxJ7JoxSOogmM6ibtmtFxxoimTP8Lb+LPBoepgw8+6xFwftuewVZYPLv33+
-	UylInJI7bbFC2yjb3pAOfDz+9J3fy3He0h8+0+yz1dOMlMA+y+2mDRTkX80+6J0B
-	nsVbqu9AgjavDbx8ltFpjpmbozytYTnqz/JWH87BlZr3INDJJhxoo+TJopY4fFzE
-	CABxmwTIGXpnXS7n/oqdLXWaiyerPw23oqX6eOzqMSeNpJRXVKrRRw6AxTP57WXK
-	RyUSfJ1sAn2vcP0fXyXXo6/jpDs+c0bx58QGlwN6NOOpzD8rw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744747798; x=1744834198; bh=PmvRmAL3zeDo/DPtctpSgu9QOlY4+Czidf5
-	2UOqaXyc=; b=v7quyGGPNbVNVI+WppASX39RGXImT/ckiJmVBVtunZpOFsoac+d
-	lObYHHXPSGcNcpOW672nSEkf18FFB58pVkcanC6Ez14LzxbkbYTkSZBfjEDn6raf
-	ig/p8PIQI6dQtr0QSy0JtLt0op14omN1s0qfZj7R6fmtj0OvxIeQahE2v/CRGWoL
-	cV4Sbcja8/MGBna9QJTrsg/YtNev+s6ZZNN6YtQBmJGnSv4+aQeiKlB+WbkK0RIv
-	WH+vTgFwwQAG3PZYSdoGcdt3DEA7YOUG7j+P9Qvo1vQObpdt9h+bulbS34c3AJHJ
-	efmzeipBpamMd9jMbXa9kgr7cQzRVm1mRNQ==
-X-ME-Sender: <xms:Fb3-Z-m9YwlkJ6atzVCPCYu75Pv7zXWZZ8OkBz6mlp5NUTRsStyvWQ>
-    <xme:Fb3-Z11O2QRiqnm9EHuxN8U3QwUYPTy1stu3oHvmz4lqu4Zvu1ugF1F0N6yezb8gP
-    0hwHyWCcou6oCzxDAk>
-X-ME-Received: <xmr:Fb3-Z8pDCijUCeE17w-ofCoIxLfyz7cZ6wKynujv1xRhhb6b2FEp_tHN5cVsfD9wnc1H0A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeggeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertder
-    tddvnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeei
-    veelffduvdevfedtheffffetfeffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphht
-    thhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprhgruggvvghpsheslh
-    hinhhugidrvhhnvghtrdhisghmrdgtohhmpdhrtghpthhtohepihdrmhgrgihimhgvthhs
-    sehovhhnrdhorhhgpdhrtghpthhtoheprghmohhrvghnohiisehrvgguhhgrthdrtghomh
-    dprhgtphhtthhopehhrghlihhusehrvgguhhgrthdrtghomhdprhgtphhtthhopehprhgr
-    uggvvghpsehushdrihgsmhdrtghomhdprhgtphhtthhopeifihhluggvrhesuhhsrdhisg
-    hmrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:Fb3-ZynFYTQzf_Q9TH2_7wlDuQhEmUP6uhtKW2l1x-eiuddle2UgYA>
-    <xmx:Fb3-Z82M07BVHVdqPRCguvcAIXC4cHCdYBiDc_K7UHjBnNVQ4Ji54g>
-    <xmx:Fb3-Z5u9dW7sa-935bh1NmosQhtJ6wxSteyONmGyRsjGv5L2tjQaGA>
-    <xmx:Fb3-Z4WO_HfLXNAqWJ46C43th4w72x0uddQK1SRRGnOA06HWT0muuA>
-    <xmx:Fr3-Z9_9gG923kVE7b-hnz3i2nzD8c5oNmoaeXwowMhWqdW9SJvCSzcX>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 15 Apr 2025 16:09:56 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id E25B09FD38; Tue, 15 Apr 2025 13:09:55 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id DF9D29FC8A;
-	Tue, 15 Apr 2025 13:09:55 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: David Wilder <wilder@us.ibm.com>
-cc: Ilya Maximets <i.maximets@ovn.org>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "pradeeps@linux.vnet.ibm.com" <pradeeps@linux.vnet.ibm.com>,
-    Pradeep Satyanarayana <pradeep@us.ibm.com>,
-    Adrian Moreno Zapata <amorenoz@redhat.com>,
-    Hangbin Liu <haliu@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] bonding: Adding limmited support for ARP
- monitoring with ovs.
-In-reply-to: 
- <MW3PR15MB39135B6B84163690576F95FDFAB02@MW3PR15MB3913.namprd15.prod.outlook.com>
-References: <20250411174906.21022-1-wilder@us.ibm.com>
- <20250411174906.21022-2-wilder@us.ibm.com> <3885709.1744415868@famine>
- <d3f39ab2-8cc2-4e72-9f32-3c8de1825218@ovn.org>
- <MW3PR15MB39135B6B84163690576F95FDFAB02@MW3PR15MB3913.namprd15.prod.outlook.com>
-Comments: In-reply-to David Wilder <wilder@us.ibm.com>
-   message dated "Sun, 13 Apr 2025 02:37:20 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1744747841; c=relaxed/simple;
+	bh=dJMTmdqQ72cO70qaEEev0EvSkDUVmn1Nod8NeWRbBw8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ah9s3+bp29Dd7gRTTmNQsOLwRgIZ2TRMvXNtUvf609FstczoBdRHQlldz2Xbrt2awiGKwQqbCf/jXKyuMJsGZJNchjaeDh2eocmLKk8hgADvUXgZdNj7zrtcZAQarTWXwblYUqaGQ66M1mHa6Bjgult0v3ofkPS9pMGfmPwSHJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jp01jsw5; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30bf3f3539dso379431fa.1;
+        Tue, 15 Apr 2025 13:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744747838; x=1745352638; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SHELFzxVVmsy2zgSKA6PLaix5nlp2CFpgVoQsmmD40s=;
+        b=jp01jsw59l/kh6RdDKzVHKkegIuegYNJz8zFNvW5quyo57XpcwAOMr/w1prWDIUNLw
+         plnpT2Yvc4i/bgTZhqTsKNehIJQrefPIMkfWOkMyEaY6D3Uw2k5n+yGgvzhXNB/raKMc
+         1l/oBiB6/ky68q2PJ/SmGBJr8N7pDr8u44SYolgRtrOmxBgIBHC1cEJMg50CvryDm8E/
+         lW+ugeksfo7IGkqg5jLVEewRqT0qpQ7a4PQmiRSlGNalQueGMVlExK+kgXg/eFZbrMEu
+         NKc+wKy3y2fX9QuKPr7arN1NffxorUg5/HT7xwVwCVp7uralRBC22E+fdMi9pFqXpylz
+         ufZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744747838; x=1745352638;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SHELFzxVVmsy2zgSKA6PLaix5nlp2CFpgVoQsmmD40s=;
+        b=Y7tYVTImAGBpKcYUKxt2Fq3OCN+c04i2XI92kAzmvKTQ+0cDQzIZ7iJrZjmFXHbTQA
+         fi3dfAkjcNfh+olp9VfwEPKpqSUd49r6Vj+ukfrv2rlt3k5AkZEbfuyROgcMtR+Ri9rc
+         yhu1Surl4NQIxx24Ra6vJnY1tExBDi9tEroXf992Na+2ZL29Owjj0t5lzsmP0NyrvRlR
+         WXLNTjZK4TbEC8oWy5qjdFW5e/k9c3OfJ6C0DyLa2Gr6sOsFJBsDGy2dSRQIxnvxkmV2
+         0ENVzZmXm5HCFIX5k0yIOykJ3y50A557iHJSyHc5nZQhJGHVlNRiV0QsPT1G6I4SwWnl
+         JmPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd01zr//KmGabdArWADRcGKkDEaSDYfQpM84sSF07PA9Os21YCZ9nuA7tNg47LwTcuIEfI+JW/8HMPevk=@vger.kernel.org, AJvYcCUpjO2LCLCMN5v7Uus15Q5j6UjG4ru65z9seMnToHgr6SBgffSehsAQ+iBh2bnyLjZW6k0bsRhhbPwy@vger.kernel.org, AJvYcCVPwX/TpjIxIp+klDQsSxa9FTbwFHYsOt5oJLY7bcuxlROOC5ZSZdTNbCbIWxqE7+FOONC0udi1@vger.kernel.org, AJvYcCW5Blj2urWF+XyILI4rCSJ2xN1J1wIdaO0EFUqAvg+1v7s2qF5cuFG0Z2xqtRPnFXxeBWUy0uOVT7e2RJ0J@vger.kernel.org, AJvYcCWp1BFUEkMYlqnFKGH29qirUKcMot9oSa8Z8j7YT48A4A/Er0CXNITGmhjNplKb9zI+ogq3fCdAr7w/@vger.kernel.org, AJvYcCX9+xF9KHwp3yPERXv8S5R3z7KTYbRQ92ZJtO1dldqR/7GbNFaInYEaogHeLGDZUfWJXuqKw1bT7N8w7aPr@vger.kernel.org, AJvYcCXPB31KAREkHQXMyoUbARiZ8v4vTNCX+HG1Fi0AJ/GS9bfDMT/5fzTbdB3oKGtK/RgvzAGElFWcIeZws599nmdt@vger.kernel.org, AJvYcCXYyrC57v9osBS8g5Raq/6ldP4VL5dso/jKwsxKD7PBlzYXoWTp/t9oZhKcRl4lGUtmEwq5b4dN79We7G3J6ik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG4DoccEFagINo/RkLpZxByPY2TeMescus6xMY3MWTtoYzMcbk
+	l6bzEwg0XGsv0og0DF5qREjpojyL2RocDY322290rZz78Z2i5zGYAgY8+9saGA+sfG/rcG37OC8
+	w6p0WRY9A0rzJMQnB7MtLO20DORg=
+X-Gm-Gg: ASbGncsTpzyWxrIKkDaEjuyzyxAaYR6qLPLhD4iTgyuHVeO0zycqlmdsxFL8nGRhS3F
+	3pIfndt2XBUsPjlkDup2WClSLT137dBgdiGjjNsqKH35KACDMCHobaqpiBYgBYtY0gqQcwajPNx
+	RB/MGk28YVWmlAU2NkAgNQhk1A25ipZI4uE6CVIQ==
+X-Google-Smtp-Source: AGHT+IHHpITksB955oQm5ARBuGAcVFAjDyvUs2PTCTEghg3Tq3v8kUReDzyNimxph/3Sw67RckF5NDVyJKnzu5cOggg=
+X-Received: by 2002:a2e:e09:0:b0:30b:9f7b:c186 with SMTP id
+ 38308e7fff4ca-31071be6a50mr16553061fa.1.1744747837350; Tue, 15 Apr 2025
+ 13:10:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4164871.1744747795.1@famine>
+References: <20250409-ptr-as-ptr-v8-0-3738061534ef@gmail.com>
+ <20250409-ptr-as-ptr-v8-6-3738061534ef@gmail.com> <67fe9975.c80a0220.1b5785.66e7@mx.google.com>
+ <CAJ-ks9mzyfvsxkyud_wLXfhLD_zP95bivCQ9i2aC-3ea=Y7+0A@mail.gmail.com> <67fea2d6.050a0220.8fa7f.6690@mx.google.com>
+In-Reply-To: <67fea2d6.050a0220.8fa7f.6690@mx.google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Tue, 15 Apr 2025 16:10:01 -0400
+X-Gm-Features: ATxdqUH2AXGR5D179vLUcxKCqAiKWiqv74mYwXiMQpvC31RtT7QM1E9QIgjYVQU
+Message-ID: <CAJ-ks9=G1ajyT8gwLHyvHW09Z2gG=Geg7LDS6iyRyqx_wyp5Sg@mail.gmail.com>
+Subject: Re: [PATCH v8 6/6] rust: enable `clippy::ref_as_ptr` lint
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Apr 2025 13:09:55 -0700
-Message-ID: <4164872.1744747795@famine>
 
-David Wilder <wilder@us.ibm.com> wrote:
+On Tue, Apr 15, 2025 at 2:18=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
+rote:
+>
+> On Tue, Apr 15, 2025 at 01:58:41PM -0400, Tamir Duberstein wrote:
+> > Hi Boqun, thanks for having a look!
+> >
+> > On Tue, Apr 15, 2025 at 1:37=E2=80=AFPM Boqun Feng <boqun.feng@gmail.co=
+m> wrote:
+> > >
+> > > On Wed, Apr 09, 2025 at 10:47:23AM -0400, Tamir Duberstein wrote:
+> > > > In Rust 1.78.0, Clippy introduced the `ref_as_ptr` lint [1]:
+> > > >
+> > > > > Using `as` casts may result in silently changing mutability or ty=
+pe.
+> > > >
+> > > > While this doesn't eliminate unchecked `as` conversions, it makes s=
+uch
+> > > > conversions easier to scrutinize.  It also has the slight benefit o=
+f
+> > > > removing a degree of freedom on which to bikeshed. Thus apply the
+> > > > changes and enable the lint -- no functional change intended.
+> > > >
+> > > > Link: https://rust-lang.github.io/rust-clippy/master/index.html#ref=
+_as_ptr [1]
+> > > > Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> > > > Link: https://lore.kernel.org/all/D8PGG7NTWB6U.3SS3A5LN4XWMN@proton=
+.me/
+> > > > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> > > > ---
+> > > >  Makefile                 |  1 +
+> > > >  rust/bindings/lib.rs     |  1 +
+> > > >  rust/kernel/device_id.rs |  3 ++-
+> > > >  rust/kernel/fs/file.rs   |  3 ++-
+> > > >  rust/kernel/str.rs       |  6 ++++--
+> > > >  rust/kernel/uaccess.rs   | 10 ++++------
+> > > >  rust/uapi/lib.rs         |  1 +
+> > > >  7 files changed, 15 insertions(+), 10 deletions(-)
+> > > >
+> > > > diff --git a/Makefile b/Makefile
+> > > > index eb5a942241a2..2a16e02f26db 100644
+> > > > --- a/Makefile
+> > > > +++ b/Makefile
+> > > > @@ -485,6 +485,7 @@ export rust_common_flags :=3D --edition=3D2021 =
+\
+> > > >                           -Wclippy::no_mangle_with_rust_abi \
+> > > >                           -Wclippy::ptr_as_ptr \
+> > > >                           -Wclippy::ptr_cast_constness \
+> > > > +                         -Wclippy::ref_as_ptr \
+> > > >                           -Wclippy::undocumented_unsafe_blocks \
+> > > >                           -Wclippy::unnecessary_safety_comment \
+> > > >                           -Wclippy::unnecessary_safety_doc \
+> > > > diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
+> > > > index b105a0d899cc..2b69016070c6 100644
+> > > > --- a/rust/bindings/lib.rs
+> > > > +++ b/rust/bindings/lib.rs
+> > > > @@ -27,6 +27,7 @@
+> > > >  #[allow(dead_code)]
+> > > >  #[allow(clippy::cast_lossless)]
+> > > >  #[allow(clippy::ptr_as_ptr)]
+> > > > +#[allow(clippy::ref_as_ptr)]
+> > > >  #[allow(clippy::undocumented_unsafe_blocks)]
+> > > >  mod bindings_raw {
+> > > >      // Manual definition for blocklisted types.
+> > > > diff --git a/rust/kernel/device_id.rs b/rust/kernel/device_id.rs
+> > > > index 4063f09d76d9..37cc03d1df4c 100644
+> > > > --- a/rust/kernel/device_id.rs
+> > > > +++ b/rust/kernel/device_id.rs
+> > > > @@ -136,7 +136,8 @@ impl<T: RawDeviceId, U, const N: usize> IdTable=
+<T, U> for IdArray<T, U, N> {
+> > > >      fn as_ptr(&self) -> *const T::RawType {
+> > > >          // This cannot be `self.ids.as_ptr()`, as the return point=
+er must have correct provenance
+> > > >          // to access the sentinel.
+> > > > -        (self as *const Self).cast()
+> > > > +        let this: *const Self =3D self;
+> > >
+> > > Hmm.. so this lint usually just requires to use a let statement inste=
+ad
+> > > of as expression when casting a reference to a pointer? Not 100%
+> > > convinced this results into better code TBH..
+> >
+> > The rationale is in the lint description and quoted in the commit
+> > message: "Using `as` casts may result in silently changing mutability
+> > or type.".
+> >
+>
+> Could you show me how you can silently change the mutability or type? A
+> simple try like below doesn't compile:
+>
+>         let x =3D &42;
+>         let ptr =3D x as *mut i32; // <- error
+>         let another_ptr =3D x as *const i64; // <- error
+
+I think the point is that the meaning of an `as` cast can change when
+the type of `x` changes, which can happen at a distance. The example
+shown in the clippy docs uses `as _`, which is where you get into real
+trouble.
+
+> also from the link document you shared, looks like the suggestion is to
+> use core::ptr::from_{ref,mut}(), was this ever considered?
+
+I considered it, but I thought it was ugly. We don't have a linter to
+enforce it, so I'd be surprised if people reached for it.
 
 >
+> > >
+> > > > +        this.cast()
+> > > >      }
+> > > >
+> > > >      fn id(&self, index: usize) -> &T::RawType {
+> > > > diff --git a/rust/kernel/fs/file.rs b/rust/kernel/fs/file.rs
+> > > > index 791f493ada10..559a4bfa123f 100644
+> > > > --- a/rust/kernel/fs/file.rs
+> > > > +++ b/rust/kernel/fs/file.rs
+> > > > @@ -359,12 +359,13 @@ impl core::ops::Deref for File {
+> > > >      type Target =3D LocalFile;
+> > > >      #[inline]
+> > > >      fn deref(&self) -> &LocalFile {
+> > > > +        let this: *const Self =3D self;
+> > > >          // SAFETY: The caller provides a `&File`, and since it is =
+a reference, it must point at a
+> > > >          // valid file for the desired duration.
+> > > >          //
+> > > >          // By the type invariants, there are no `fdget_pos` calls =
+that did not take the
+> > > >          // `f_pos_lock` mutex.
+> > > > -        unsafe { LocalFile::from_raw_file((self as *const Self).ca=
+st()) }
+> > > > +        unsafe { LocalFile::from_raw_file(this.cast()) }
+> > > >      }
+> > > >  }
+> > > >
+> > > > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+> > > > index 40034f77fc2f..75b4a18c67c4 100644
+> > > > --- a/rust/kernel/str.rs
+> > > > +++ b/rust/kernel/str.rs
+> > > > @@ -28,8 +28,9 @@ pub const fn is_empty(&self) -> bool {
+> > > >      /// Creates a [`BStr`] from a `[u8]`.
+> > > >      #[inline]
+> > > >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
+> > > > +        let bytes: *const [u8] =3D bytes;
+> > > >          // SAFETY: `BStr` is transparent to `[u8]`.
+> > > > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
+> > > > +        unsafe { &*(bytes as *const BStr) }
+> > >
+> > >         unsafe { &*(bytes.cast::<BStr>()) }
+> > >
+> > > ? I'm curious why this dodged the other lint (ptr_as_ptr).
+> >
+> > The reason it has to be written this way is that BStr is !Sized, and
+> > `pointer::cast` has an implicit Sized bound.
+> >
+> > Perhaps the lint is smart enough to avoid the suggestion in that case?
+> > Seems like yes:
+> > https://github.com/rust-lang/rust-clippy/blob/d3267e9230940757fde2fcb60=
+8605bf8dbfd85e1/clippy_lints/src/casts/ptr_as_ptr.rs#L36.
+> >
 >
->>>> Adding limited support for the ARP Monitoring feature when ovs is
->>>> configured above the bond. When no vlan tags are used in the configur=
-ation
->>>> or when the tag is added between the bond interface and the ovs bridg=
-e arp
->>>> monitoring will function correctly. The use of tags between the ovs b=
-ridge
->>>> and the routed interface are not supported.
->>>
->>>       Looking at the patch, it isn't really "adding support," but
->>> rather is disabling the "is this IP address configured above the bond"
->>> checks if the bond is a member of an OVS bridge.  It also seems like i=
-t
->>> would permit any ARP IP target, as long as the address is configured
->>> somewhere on the system.
->>>
->>>       Stated another way, the route lookup in bond_arp_send_all() for
->>> the target IP address must return a device, but the logic to match tha=
-t
->>> device to the interface stack above the bond will always succeed if th=
-e
->>> bond is a member of any OVS bridge.
->>>
->>>       For example, given:
->>>
->>> [ eth0, eth1 ] -> bond0 -> ovs-br -> ovs-port IP=3D10.0.0.1
->>> eth2 IP=3D20.0.0.2
->>>
->>>       Configuring arp_ip_target=3D20.0.0.2 on bond0 would apparently
->>> succeed after this patch is applied, and the bond would send ARPs for
->>> 20.0.0.2.
->>>
->>>> For example:
->>>> 1) bond0 -> ovs-br -> ovs-port (x.x.x.x) is supported
->>>> 2) bond0 -> bond0.100 -> ovs-br -> ovs-port (x.x.x.x) is supported.
->>>> 3) bond0 -> ovs-br -> ovs-port -> ovs-port.100 (x.x.x.x) is not suppo=
-rted.
->>>>
->>>> Configurations #1 and #2 were tested and verified to function corectl=
-y.
->>>> In the second configuration the correct vlan tags were seen in the ar=
-p.
->>>
->>>       Assuming that I'm understanding the behavior correctly, I'm not
->>> sure that "if OVS then do whatever" is the right way to go, particular=
-ly
->>> since this would still exhibit mysterious failures if a VLAN is
->>> configured within OVS itself (case 3, above).
->>
->> Note: vlan can also be pushed or removed by the OpenFlow pipeline withi=
-n
->> openvswitch between the ovs-port and the bond0.  So, there is actually =
-no
->> reliable way to detect the correct set of vlan tags that should be used=
-.
->> And also, even if the IP is assigned to the ovs-port that is part of th=
-e
->> same OVS bridge, there is no guarantee that packets routed to that IP c=
-an
->> actually egress from the bond0, as the forwarding rules inside the OVS
->>datapath can be arbitrarily complex.
->>
->> And all that is not limited to OVS even, as the cover letter mentions, =
-TC
->> or nftables in the linux bridge or even eBPF or XDP programs are not th=
-at
->> different complexity-wise and can do most of the same things breaking t=
-he
->> assumptions bonding code makes.
->>
->>>
->>>       I understand that the architecture of OVS limits the ability to
->>> do these sorts of checks, but I'm unconvinced that implementing this
->>> support halfway is going to create more issues than it solves.
+> Oh, I see, so fat pointers get their way from this check? Hmm... however
+> fat pointers also suffer the same problem that ptr_as_ptr prevents,
+> right? How should we avoid that?
 
-	Re-reading my comment, I clearly meant "isn't going to create
-more issues" here.
-
->>>       Lastly, thinking out loud here, I'm generally loathe to add more
->>> options to bonding, but I'm debating whether this would be worth an
->>> "ovs-is-a-black-box" option somewhere, so that users would have to
->>> opt-in to the OVS alternate realm.
->
->> I agree that adding options is almost never a great solution.  But I ha=
-d a
->> similar thought.  I don't think this option should be limited to OVS th=
-ough,
->>as OVS is only one of the cases where the current verification logic is =
-not
->>sufficient.
-
-	Agreed; I wasn't really thinking about the not-OVS cases when I
-wrote that, but whatever is changed, if anything, should be generic.
-
->What if we build on the arp_ip_target setting.  Allow for a list of vlan =
-tags
-> to be appended to each target. Something like: arp_ip_target=3Dx.x.x.x[v=
-lan,vlan,...].
-> If a list of tags is omitted it works as before, if a list is supplied a=
-ssume we know what were doing
-> and use that instead of calling bond_verify_device_path(). An empty list=
- would be valid.
-
-	Hmm, that's ... not too bad; I was thinking more along the lines
-of a "skip the checks" option, but this may be a much cleaner way to do
-it.
-
-	That said, are you thinking that bonding would add the VLAN
-tags, or that some third party would add them?  I.e., are you trying to
-accomodate the case wherein OVS, tc, or whatever, is adding a tag?
-
-	-J
-
->>>
->>>       -J
->>>
->>>> Signed-off-by: David J Wilder <wilder@us.ibm.com>
->>>> Signed-off-by: Pradeep Satyanarayana <pradeeps@linux.vnet.ibm.com>
->>>> ---
->>>> drivers/net/bonding/bond_main.c | 8 +++++++-
->>>> 1 file changed, 7 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bo=
-nd_main.c
->>>> index 950d8e4d86f8..6f71a567ba37 100644
->>>> --- a/drivers/net/bonding/bond_main.c
->>>> +++ b/drivers/net/bonding/bond_main.c
->>>> @@ -3105,7 +3105,13 @@ struct bond_vlan_tag *bond_verify_device_path(=
-struct net_device *start_dev,
->>>>      struct net_device *upper;
->>>>      struct list_head  *iter;
->>>>
->>>> -    if (start_dev =3D=3D end_dev) {
->>>> +    /* If start_dev is an OVS port then we have encountered an openV=
-switch
->>
->> nit: Strange choice to capitalize 'V'.  It should be all lowercase or a=
- full
->> 'Open vSwitch' instead.
->
->>>> +     * bridge and can't go any further. The programming of the switc=
-h table
->>>> +     * will determine what packets will be sent to the bond. We can =
-make no
->>>> +     * further assumptions about the network above the bond.
->>>> +     */
->>>> +
->>>> +    if (start_dev =3D=3D end_dev || netif_is_ovs_port(start_dev)) {
->>>>              tags =3D kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
->>>>              if (!tags)
->>>>                      return ERR_PTR(-ENOMEM);
->>>
->>> ---
->>>       -Jay Vosburgh, jv@jvosburgh.net
->>
->> Best regards, Ilya Maximets.
->
->David Wilder (wilder@us.ibm.com)
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
+Probably the proper solution is to remove the `Sized` bound from
+`pointer::cast`. Short of that, I'm not sure how -- but I don't think
+this deficiency should prevent us from the benefits of this change,
+even if they are a bit limited.
 
