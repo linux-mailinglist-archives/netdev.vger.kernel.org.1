@@ -1,103 +1,119 @@
-Return-Path: <netdev+bounces-182885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010D5A8A43B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:35:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B660A8A45F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11BF51684D0
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:35:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2BE03B5BEC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8B22185A0;
-	Tue, 15 Apr 2025 16:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1387B2918E9;
+	Tue, 15 Apr 2025 16:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yi2BxjzI"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="T5TbKE6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1B015F306;
-	Tue, 15 Apr 2025 16:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847AF1E1DE9
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744734940; cv=none; b=lY2/n8XGqg7s+qiU47rne+VVHlcdKGnyvKHZTz1aaLJEkKxew/aB5MfY80y1sizke4D/5E2pelrbNKNno3dYo7vjJHEyBre9yvtL/62dIjODW66Sk/XvdQK9OJnM/SZepeFe02HzNJyQnX3vt7+4PLy2CCG/XT5upwYuTiROsbg=
+	t=1744735319; cv=none; b=TeJWfINRS1CRzfrakQBTV5mehwElDjYt4B4h10sDzQmJDhJvZH+YJUIp/1RzQCPSuLcQSRHfnNMWMSoi6yUx0Lw/d7nm0kt5AmTynjOrHyQlSL7n/eJg+fe2V7v2XwnApkxOw21kdliynL0oDyb9j1PsR/scZoNclnZSnvCfaYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744734940; c=relaxed/simple;
-	bh=qQPlLCaHQYe+gqLPm35pHARjmiBk4+PpLo1qXkmjFPQ=;
+	s=arc-20240116; t=1744735319; c=relaxed/simple;
+	bh=6X08oSjHVxg0ay21RO4FYzf8ovK9mj9m6qaYm1Wh5Xg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lOMg1ZY2wezGXnEEmDVbl4VHqyZZX4HFVH0xDnSVUqUjr+8OoCxCe8mWwg2s8PXAJO0qdqLSS7Czkt+U/5y4sh37yyUclRmh5HnFYXwVUD241EqhM5nkyGZOK26fZY0txGo1gbs9VZkhC/BXuJelWb7h4BoOvCv2uyTrNKxpcjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yi2BxjzI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221B2C4CEEB;
-	Tue, 15 Apr 2025 16:35:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744734940;
-	bh=qQPlLCaHQYe+gqLPm35pHARjmiBk4+PpLo1qXkmjFPQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yi2BxjzI5SS9GasqB1mrG7VGqf/qr3KLNsPj6olTEq/xwEyFuBJ/CoHDkRfZLCJKl
-	 1wNR0NvBf4CfKpluiko2DxFirtrllqs8Asr7/HLZp/3dCUKp+nTK7MXVjpZmhiRGTA
-	 P8NdCQrfk1p/5EZhfWR/zR3r1OPELisyF6ml5geKUA+1VDQiVWsDQBk14UGhn4/oWB
-	 oovpgwl2GWP7vKpebsgnTLlXUNdCdHsKL6N7AxtUZ3NEyCdxi+E0w9p1L7OZYhMNv1
-	 z01ek110ohyc/yRuFklq1r4sVF+k8Q4AH0lKTb40dQN9n5J3qzSsUx1xocd7ch3iC+
-	 I4hGyaRgW5CpA==
-Date: Tue, 15 Apr 2025 17:35:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH net-next] net: ipconfig: replace strncpy with strscpy
-Message-ID: <20250415163536.GA395307@horms.kernel.org>
-References: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eUCPLf343ktiVQaGAnFNSCjPlpr8gZG3olWe3cQ5bF71g0LgvP7O+dJHjN45RLHDZ75LYvPpf3mE8WLIzZuPxBM5B5pZA64W3MkKk2JASDv0s5kpCdsFJk2X/AIpNzuqvvtOKPpoiBwT9sU5XrKO9lElW8OVSfsfQDs3Rgw2SXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=T5TbKE6b; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4394a823036so57955635e9.0
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 09:41:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744735312; x=1745340112; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Cs0vOMD0XLH3qHqhiDlgbAj78QDdnIWArNDzFriW1/s=;
+        b=T5TbKE6bKYwsIyVqPasi3I84MTOMrs6iPLgWDHzf0wDASDcfCk/G/uy67WdyFGc3HO
+         frxJU2EfU21A39BGTNu3dF9E216JsoDik6yF6R/oXkhJRmzn6c+2CFSaAlUECKeK0bKW
+         dBXKYB8Ygzn0jIY37zddt78yXtlPvwO628rsAbQr9oyF96eXMr37Ai5Sdo4Eyr7kSy+t
+         t3Zm9yBlqUdDsfHjVcitmIoDTCPPPB82b8Ym276iqLs6tBouEKfanAiY1AHxp+3DLYvM
+         F6r2hxJyZ1cRN9A2XM7oPwgjPP2NwOfIg3FHY6LgOglWxxbNdW5KY/KGDUScrHuIiBLA
+         wYBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744735312; x=1745340112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cs0vOMD0XLH3qHqhiDlgbAj78QDdnIWArNDzFriW1/s=;
+        b=pgUrg2NgOcQXfh22U4C/pHRYsJkcX5c+D84kA8f8RrfYOGhAynqP98sCNc9MZ/YUH3
+         dbl4Zys2LC93NpocqKmTljKWso2D/dBVprQakjVYTLXQ9OsD5ssgbGLbvkO6nKd8FMEn
+         ac035HvzWSzV76ijpSUrx9ucOS3HdLvNfRoktolnBDCnMpTXQCcZ2YrSXqGm4EfyZgbf
+         zxuvFLwEo5J3hTR6r6FHuABxWu4vBenqvElmgKngH8Kv/PAAc2fkiO1YnK0cXPF9SeUC
+         0dyyyD+nS0cr31B3aze9ajPGXmk9qSM0ZPKafIDK4EVK9WAE5yluAG2AXPP2EoRktLvN
+         Rb2w==
+X-Gm-Message-State: AOJu0YwGEhbvyVgoJU4IAfptfC8vae503L+jSVAVmQvT3EZuLUZ5zFPC
+	FYgO77NtpsftOdAFUBZVyfvLWVv8SZv2Fj5REMhcgIo6SapOnlWc6bDTrPFb928=
+X-Gm-Gg: ASbGncsXZ/NjoarYSSNJmEiS7nu8AcITjAb7duy68PIxKrjBABcK5rWWYdwqESAou5j
+	eJ4Idfcz5Q45epUo+s1cH7CP1/8PfYg6o0xrrMtoEf0P5kPVTY6S66dSGs+ySVjF07oS8+T/bgQ
+	EOUAutZfAeJOxvXDXrUlJTjiYM/sdfp07blCon1xqHYJsW9UMsIbBEmBlrrn4+/i2qlyXTWvkkg
+	XbdBinL0b/oWfCiCjCUr3uVZC5paDU9YHQp7IY7QoQ15J9iuZS5ZsOvyP8oAnF7w1sts0I80mWF
+	SlVUbkXEH+8qQtqih4QjRGeMenne1JkMiX/NmZ1sFwfaG790+Ory7Oiwb0g=
+X-Google-Smtp-Source: AGHT+IH8lIwCquZ3x8twjDlLrk5VOW4PH8Mwi0Py5RmPDbQcRRaTguKXREVGfgIVQhgZwE6E3UO78A==
+X-Received: by 2002:a05:6000:1847:b0:39c:1424:1cb3 with SMTP id ffacd0b85a97d-39ee27374f5mr172133f8f.5.1744735312552;
+        Tue, 15 Apr 2025 09:41:52 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2338db0dsm220067355e9.7.2025.04.15.09.41.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 09:41:52 -0700 (PDT)
+Date: Tue, 15 Apr 2025 18:41:45 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [RFG] sfc: nvlog and devlink health
+Message-ID: <e3acvyonpwd6eejk6ka2vmkorggtnohc6vfagzix5xkx4jru6o@kf3q3hvasgtx>
+References: <7ec94666-791a-39b2-fffd-eed8b23a869a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7ec94666-791a-39b2-fffd-eed8b23a869a@gmail.com>
 
-On Sat, Apr 12, 2025 at 09:36:23PM +0530, Pranav Tyagi wrote:
-> Replace the deprecated strncpy() with strscpy() as the destination
-> buffer is NUL-terminated and does not require any
-> trailing NUL-padding.
-> 
-> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Tue, Apr 15, 2025 at 04:51:39PM +0200, ecree.xilinx@gmail.com wrote:
+>Solarflare NICs have a flash partition to which the MCPU logs various
+> errors, warnings, and other diagnostic info.  We want to expose this
+> 'nvlog' data, and the best fit we've found so far is devlink health.
+>Reading it is simple enough — plan is to have a reporter whose diagnose
+> method reads the partition and returns the contents (could potentially
+> use dump instead but the extra layer of triggering and saving seems
+> unnecessary).
+>The problem is how to clear it (since it fills up after comparatively
+> few boots, so when debugging field issues you'll usually need to clear
+> it first and then reproduce the issue).
+> DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR is no use here, because it only
+> clears the kernel-saved copy; it doesn't call any driver method.
 
-Thanks,
+Can't it be extended to actually call an optional driver method?
+That would sound fine to me and will solve your problem.
 
-I agree that strscpy() is the correct choice here for
-the reasons you give above.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-> ---
->  net/ipv4/ipconfig.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-> index c56b6fe6f0d7..eb9b32214e60 100644
-> --- a/net/ipv4/ipconfig.c
-> +++ b/net/ipv4/ipconfig.c
-> @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
->  			*v = 0;
->  			if (kstrtou8(client_id, 0, dhcp_client_identifier))
->  				pr_debug("DHCP: Invalid client identifier type\n");
-> -			strncpy(dhcp_client_identifier + 1, v + 1, 251);
-> +			strscpy(dhcp_client_identifier + 1, v + 1, 251);
-
-As an aside, I'm curious to know why the length is 251
-rather than 252 (sizeof(dhcp_client_identifier) -1).
-But that isn't strictly related to this patch.
-
->  			*v = ',';
->  		}
->  		return 1;
-> -- 
-> 2.49.0
-> 
+>The code we've developed internally, that I'm now preparing to submit
+> upstream, handles this by having *two* reporters, 'nvlog' and
+> 'nvlog-clear'; both read the flash in their diagnose method but
+> nvlog-clear additionally clears it afterwards.  It works, but it
+> doesn't feel very clean.
+>Is this approach acceptable?  Is there a better way?
+>
+>-ed
+>
 
