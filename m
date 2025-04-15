@@ -1,168 +1,164 @@
-Return-Path: <netdev+bounces-182729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 586C9A89C72
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:32:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3098A89C70
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C9A01901CF3
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:30:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D3E3B8BFF
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8A82957A2;
-	Tue, 15 Apr 2025 11:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60592296143;
+	Tue, 15 Apr 2025 11:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="Ez5i8jSU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLrpNKzV"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E982951B0
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 11:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900842951DD;
+	Tue, 15 Apr 2025 11:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744716369; cv=none; b=IdVsye8FUvxf3Bhg9VSqW+GlOVDvh6/caDesyvZK1VA3cBbvqY2Z/JRCA7oCto1VtfX7OGFvN+vWbm10RxM419qXQXUsQup/oTOdEpWsWnHkuA8Kd2RYNUpVkLbOlYrB+Q59JCFS6TjQOd0WnT/8p/VPhoyeIImzfDOpLMGQMFE=
+	t=1744716424; cv=none; b=tKj1MGICgPONBItZKRTs8y1McgSxS/CPRBHZqzgBTylbz4YxUMjz/h92JSdEX2XHBxN4gwAxqNqWScskcKLou9hmGvob3yLNr2ZdcDcz1ik4rQWoKDKtZMvLffd246x1wSBBe9BFs9ojdyRiPqzueMMivBLPrmJ2t8yh7e9TNeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744716369; c=relaxed/simple;
-	bh=W5ogA5CLRFcusUg3wn8A0Zn+ui+y7xJIwGnj+L0TEXw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PY9Yt3b3gRNbd9OTMepkd3FBCL4dHo1HuOunk0ikbqeyLWjvhdByThcLL03jEMmDPvhvgYXhvu0Tpcm0Zu0srYrA0H/1OkG478ornlMsOUUxzYuWakHB9VaPHg0Y4hGcZpn6R2jU4ju+s8QT/WQ9biTK1UwHrSKo3fxd65LoJmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=Ez5i8jSU; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id E8221200BFF2;
-	Tue, 15 Apr 2025 13:26:04 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be E8221200BFF2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1744716365;
-	bh=89U50mWWmX6OjZjjRurP0c1g2qKT2amHzBUeWPdoe8g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ez5i8jSU33JdtHTMLvvuZNc6/ScHQ5KMOTXGw+n5ZA7XSD0qMRd/GTBMLK5L/iYbA
-	 qC+upOCfn4O2RAwlX+TonoHQCrIv1+dyvHwXc4w+btdJEzbpOaSxBY3se8zf8PoHsG
-	 c1K7WQokR1q6O5BVsuUbHBILGE0VxyHXQN2u7I2yJ11W3zNFilALmSKrTxeBS7fMXN
-	 1OHLQG/EIjbxc9ZKgwl+KHG5nJQun9kLhO3/LW/s/AxKQ7ckCgCB5Cb5JhE6m3kAVz
-	 GniuPu1F8b7ns/MzLMwuqvm9kKFPab8fmyu2MLPpJz+sQcr8QFefo9yuzSAG7dWRdN
-	 ST214xarHtCzA==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next v2 2/2] net: ipv6: ioam6: fix double reallocation
-Date: Tue, 15 Apr 2025 13:25:54 +0200
-Message-Id: <20250415112554.23823-3-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250415112554.23823-1-justin.iurman@uliege.be>
-References: <20250415112554.23823-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1744716424; c=relaxed/simple;
+	bh=FaCD1PkoKrxS9v1U5rFWElyeE6LW8xfKfPTFbahvHaY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bxEkr8sefGcr+BAK8BVLeZQJ5ezUTGbFg/UPGEEt9Nx7yZPwMNyShB4HjC+HrIELtAPahlj3FcwoRPm7kZcmBSV2l1uDUtxeNR+lvIWkOcjQggsI1lpKii9FIryWJcCjOm8Ro22K4Smw4iiQYYCk/NsOYzJ01BwTzWgc9ULvEwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLrpNKzV; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-399749152b4so3049802f8f.3;
+        Tue, 15 Apr 2025 04:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744716421; x=1745321221; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5iNvyUJ84OrchQt/uudTnU275/tZN5oX4rI5S/XVpaE=;
+        b=mLrpNKzVGLP9uvOkWH5kFsk1EOvIvB1O9AUR/qQ40X+fYa6qJhblhcyLwnQlxOjltz
+         ZwOn4ffPpYhSFIDm/Ljwr8NpfjS2Jl7UXblm0QqNC8NCFRz3V727D1D1OcOIVG+zgbGR
+         p+0lcDzHNd8PMuTwZU1a10gnp87jrTD9QL+9tqh47w9bkHouAlhCuBLV1Kzp/xiRj39Z
+         6BbMwL2GD/tKQi9WmFmzbjtqthZ84X5hciktmA8urYX+141GduJqdbuN7PGYCSoLpdbo
+         r+wGbn3QMmGMsBi88sIpEfjbIAaNYr5j9zR3hUhTy7ZuqQMbyxSrdVO33oy3bZX+X1oY
+         n/4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744716421; x=1745321221;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5iNvyUJ84OrchQt/uudTnU275/tZN5oX4rI5S/XVpaE=;
+        b=Vyei5mR7TyMBO+A7iSowU09RtUZdyEsR/adZnZWxBUU+GwqDGK9Z6UQEwwHjusyM+k
+         1sYzlqol1D7cZjj8BByF0tJgmxeSo5HzTk69yPK1GE41DniCCkLo4NAsshBK2W0dKMXM
+         /egvzE/TtJEzfdYsb8X6DB/qa5G7PVUHXRqiftBHDQG82Kv7l0jn3AiP34q8xl131ArN
+         ztNuIhTsV9Ze1Al9l/SpXthi4UPSdFejbq+ebCwHdUXhbEtu//PeotQnxJPhdhZK3NvU
+         7rsgOFyZHt6JGVpbBMQzjptTWxaLiqRs+jGbnRwuDu4204rK6iXwhN2e/A12f1Kneez5
+         wRGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUb4ZWsXy/e1mR25LiCaiLZq2YqSI0Oa5rvzhdTWKkXPgOdN7J5lxZESmG2qe3f7dICnwhYwpX@vger.kernel.org, AJvYcCVByzcNXt+LicCRqZB13g4gNhh8c+HjrOiw3ied5BQOFkHPytJ64NrwPTDf+K1cvbFo7Hc9KoBVJxxv84Q=@vger.kernel.org, AJvYcCXFSsax7knxxLAfm25ArkBs7il90gJxcd1uB/MQzxJSB4lKiufm3Syy3Yg54esDMvphM9rKA3qiqrfJHg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeRGz799KePKRf5ovnFpoJ/YXU/mnOBcK3Gm+1WaFKnawcPSpr
+	UaMYd6BXaL2dBhLMf6nKx4vf4ppfJxxrybbaFdshTVFvFAyA5zMi
+X-Gm-Gg: ASbGncte0srJ8tn0fiR6jIN6ap+qlUQEA58FeRtGjVLSYIyfTiv2RofGQlBgvKN5Iju
+	c/olKjYLkLalLgorQ0Q6XfCjoG2q5zT/MNOrtqljpkPYb97XJTbKBE3xrog8JBKibdI/HYo1RnL
+	OK2DkEtcfx4Tnce8CG0ubfZOHMmJlb7Fq5UcoGxuXmOcSFmRYk84I5chdN5fujmaerxySRYJvSB
+	iUWlxDWzIdIxq0aJ84G2/a49upaG8s1aZF1i2BACgbxRaMg1ZYdAHLEeYPPzdAYjE2izzuNMDNW
+	F+UppQ+o7EGtmKjCzZwuwVLrN9yv7A0ptmFdKGp3UskOSYyy7sH+jif6R7YZOw==
+X-Google-Smtp-Source: AGHT+IGMq12De2oewFtOUPkn4B9s8mMPlc1IAgczwnQeYBI/+GnxWt2tkhjormePlZdXHT1UTfHavw==
+X-Received: by 2002:a05:6000:40dd:b0:391:13ef:1b1b with SMTP id ffacd0b85a97d-39eaaea8457mr11165434f8f.30.1744716420525;
+        Tue, 15 Apr 2025 04:27:00 -0700 (PDT)
+Received: from [172.27.58.151] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae979615sm14294303f8f.54.2025.04.15.04.26.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Apr 2025 04:27:00 -0700 (PDT)
+Message-ID: <c909292b-68ae-4396-8494-aaa555604168@gmail.com>
+Date: Tue, 15 Apr 2025 14:26:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/1] net/mlx5: Fix null-ptr-deref in
+ mlx5_create_{inner_,}ttc_table()
+To: Henry Martin <bsdhenrymartin@gmail.com>, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, amirtz@nvidia.com, ayal@nvidia.com,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20250411131431.46537-1-bsdhenrymartin@gmail.com>
+ <20250411131431.46537-2-bsdhenrymartin@gmail.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250411131431.46537-2-bsdhenrymartin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-If the dst_entry is the same post transformation (which is a valid use
-case for IOAM), we don't add it to the cache to avoid a reference loop.
-Instead, we use a "fake" dst_entry and add it to the cache as a signal.
-When we read the cache, we compare it with our "fake" dst_entry and
-therefore detect if we're in the special case.
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- net/ipv6/ioam6_iptunnel.c | 41 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 36 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
-index 57200b9991a1..40df8bdfaacd 100644
---- a/net/ipv6/ioam6_iptunnel.c
-+++ b/net/ipv6/ioam6_iptunnel.c
-@@ -38,6 +38,7 @@ struct ioam6_lwt_freq {
- };
- 
- struct ioam6_lwt {
-+	struct dst_entry null_dst;
- 	struct dst_cache cache;
- 	struct ioam6_lwt_freq freq;
- 	atomic_t pkt_cnt;
-@@ -177,6 +178,14 @@ static int ioam6_build_state(struct net *net, struct nlattr *nla,
- 	if (err)
- 		goto free_lwt;
- 
-+	/* This "fake" dst_entry will be stored in a dst_cache, which will call
-+	 * dst_hold() and dst_release() on it. We must ensure that dst_destroy()
-+	 * will never be called. For that, its initial refcount is 1 and +1 when
-+	 * it is stored in the cache. Then, +1/-1 each time we read the cache
-+	 * and release it. Long story short, we're fine.
-+	 */
-+	dst_init(&ilwt->null_dst, NULL, NULL, DST_OBSOLETE_NONE, DST_NOCOUNT);
-+
- 	atomic_set(&ilwt->pkt_cnt, 0);
- 	ilwt->freq.k = freq_k;
- 	ilwt->freq.n = freq_n;
-@@ -356,6 +365,17 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	dst = dst_cache_get(&ilwt->cache);
- 	local_bh_enable();
- 
-+	/* This is how we notify that the destination does not change after
-+	 * transformation and that we need to use orig_dst instead of the cache
-+	 */
-+	if (dst == &ilwt->null_dst) {
-+		dst_release(dst);
-+
-+		dst = orig_dst;
-+		/* keep refcount balance: dst_release() is called at the end */
-+		dst_hold(dst);
-+	}
-+
- 	switch (ilwt->mode) {
- 	case IOAM6_IPTUNNEL_MODE_INLINE:
- do_inline:
-@@ -408,12 +428,19 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
- 
--		/* cache only if we don't create a dst reference loop */
--		if (orig_dst->lwtstate != dst->lwtstate) {
--			local_bh_disable();
-+		/* If the destination is the same after transformation (which is
-+		 * a valid use case for IOAM), then we don't want to add it to
-+		 * the cache in order to avoid a reference loop. Instead, we add
-+		 * our fake dst_entry to the cache as a way to detect this case.
-+		 * Otherwise, we add the resolved destination to the cache.
-+		 */
-+		local_bh_disable();
-+		if (orig_dst->lwtstate == dst->lwtstate)
-+			dst_cache_set_ip6(&ilwt->cache,
-+					  &ilwt->null_dst, &fl6.saddr);
-+		else
- 			dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
--			local_bh_enable();
--		}
-+		local_bh_enable();
- 
- 		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
- 		if (unlikely(err))
-@@ -439,6 +466,10 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- static void ioam6_destroy_state(struct lwtunnel_state *lwt)
- {
-+	/* Since the refcount of per-cpu dst_entry caches will never be 0 (see
-+	 * why above) when our "fake" dst_entry is used, it is not necessary to
-+	 * remove them before calling dst_cache_destroy()
-+	 */
- 	dst_cache_destroy(&ioam6_lwt_state(lwt)->cache);
- }
- 
--- 
-2.34.1
+On 11/04/2025 16:14, Henry Martin wrote:
+> Add NULL check for mlx5_get_flow_namespace() returns in
+> mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() to prevent
+> NULL pointer dereference.
+> 
+> Fixes: 137f3d50ad2a ("net/mlx5: Support matching on l4_type for ttc_table")
+> Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
+> ---
+> V3 -> V4: Fix potential memory leak.
+> V2 -> V3: No functional changes, just gathering the patches in a series.
+> V1 -> V2: Add a empty line after the return statement.
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+> index eb3bd9c7f66e..077fe908bf86 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+> @@ -651,10 +651,16 @@ struct mlx5_ttc_table *mlx5_create_inner_ttc_table(struct mlx5_core_dev *dev,
+>   			MLX5_CAP_NIC_RX_FT_FIELD_SUPPORT_2(dev, inner_l4_type);
+>   		break;
+>   	default:
+> +		kvfree(ttc);
+
+Unrelated change.
+Not described in patch subject or commit message.
+Please introduce in a separate patch.
+
+>   		return ERR_PTR(-EINVAL);
+>   	}
+>   
+>   	ns = mlx5_get_flow_namespace(dev, params->ns_type);
+> +	if (!ns) {
+> +		kvfree(ttc);
+> +		return ERR_PTR(-EOPNOTSUPP);
+> +	}
+> +
+>   	groups = use_l4_type ? &inner_ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
+>   			       &inner_ttc_groups[TTC_GROUPS_DEFAULT];
+>   
+> @@ -724,10 +730,16 @@ struct mlx5_ttc_table *mlx5_create_ttc_table(struct mlx5_core_dev *dev,
+>   			MLX5_CAP_NIC_RX_FT_FIELD_SUPPORT_2(dev, outer_l4_type);
+>   		break;
+>   	default:
+> +		kvfree(ttc);
+
+Same.
+
+>   		return ERR_PTR(-EINVAL);
+>   	}
+>   
+>   	ns = mlx5_get_flow_namespace(dev, params->ns_type);
+> +	if (!ns){
+> +		kvfree(ttc);
+> +		return ERR_PTR(-EOPNOTSUPP);
+> +	}
+> +
+>   	groups = use_l4_type ? &ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
+>   			       &ttc_groups[TTC_GROUPS_DEFAULT];
+>   
 
 
