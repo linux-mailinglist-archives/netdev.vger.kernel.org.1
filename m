@@ -1,150 +1,194 @@
-Return-Path: <netdev+bounces-182741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B884A89CB6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:42:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358B0A89CB9
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F0F9162780
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDFD93A3309
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E741127511B;
-	Tue, 15 Apr 2025 11:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8C52918CF;
+	Tue, 15 Apr 2025 11:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jevSCgSJ"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="noSycIe2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240F34315C;
-	Tue, 15 Apr 2025 11:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C692E1D86F6;
+	Tue, 15 Apr 2025 11:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744717334; cv=none; b=qLL/3pSvoC7eOeCXj4ADi7YCZk+IbHLLym1r+8jEnVvCJFV4bRiofXexudKKelsEu7iEYwFpO3iUImhIbS7BpkVW4zs09bLHKn8TLTZDLxWMGtP95HG7wHRSXm0rrmN+o6YF39VFL5RKAywQljre+bst6A51DhlsCKL3CV15hLQ=
+	t=1744717360; cv=none; b=hgLwPgqt2JUAv3PgXvc3/dG8cpQwaxDr/uK7Ou7xvzo/0Vdg/WzQd0em91b4Tq1zewcm1c2bd955AcMdoDdtYfkIj7chnqPCKvAOFfao0EQq65H0UQHD+f9wjJIuHLtpu5T//VskBQAXZ5fYNMpqcV3U6rI0b4ty/LtKn+lUuv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744717334; c=relaxed/simple;
-	bh=QhfVigsm7SBObuoA8R+qdVnqcMzh35Er9Pjuzdof8Cg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HQkI2Qjly5K6vuNzDK1oY2Rw1M/q59orml2MCe8OSCf0lnCGbKMB+Vu75WSTphO5imWzR4E9+BEb/pVVjOo5+dNbhS4aYKWKQWOhU359flBJGcM6obzLcp7vhMTAzex4DILuSa2s+wXZgY1Olel22CAGPyW+NFKKy01PMhr7UcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jevSCgSJ; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30db2c2c609so58235921fa.3;
-        Tue, 15 Apr 2025 04:42:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744717331; x=1745322131; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i5Dh+LpffC+aAAcZFSD9TChVY9RnBWDvztPr08kGTZ0=;
-        b=jevSCgSJVOBs3KAN76UNweeoMDu8wTEnIztBLhQ4RlXTm36GBX8SB7PBILDMMZDh5j
-         WnsYy2LE8uCF6EBIt+XKcy8mDXYDEPuh69iO4I7q8eJd+cDscnxtO0EYvU0DeelmPm+n
-         Wzqei8bCvT+XZJtV/+EEpcL+Mp1x2w1ZKYxxXcudbHrIikP1lga7NU75fulIN6f/Zkcn
-         IlSEFoctT03M/BDdpvJLs/CbB8FCe3+TuJHZ1Z2SDcbMlCTOR1el4KDht4en5YMz6zxT
-         EfIu9rFBsJjpDZncnOd9IY+02EZFQabnz26lnwtuBg2Ekvdrse4rhHTNcO3SNgKmTHVm
-         JHbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744717331; x=1745322131;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i5Dh+LpffC+aAAcZFSD9TChVY9RnBWDvztPr08kGTZ0=;
-        b=sB3prvYAupi1zYYP36wvThYhkeGDrz7bOFm2IG7Li6R+jxLa4mQgc8W05Yhd7al8OL
-         rlVxwA79mLmteSwyST4N4cOc8DxMlhU7YBMRpRXqSDG0H4LcR4k4m3C7i20bXChW+qFs
-         HrPhqy08QM1TOiXn2+AfULrrDFlayraQECVPOmjnkbde/i2h1b69TW1EGNJiYStscTBS
-         xuX8I+OCCWnCSdK+erun+cmG+MqK07mVG5T8LLiJPsVbVMDd5+L0Ufv8SQNNgNlqAoyW
-         uA+5o7h/iuCq2gB8pUdqVI3V9yy1L1eo/XTsMne4EqFBX3vnwQl9klhFy4+7ePOYDIUG
-         mdvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWlihzKb0UXni5y9KBgGbk8F2W3ILSyxu04oxXFcbAZtIeU4MWc0EYpWqR/N2c04HXzc/C+lDIdJdU6v8=@vger.kernel.org, AJvYcCX/1rPlJW+7Lk1Y9wBRbibHS70JZo+5rXxHroZKAjAQRnXVtVZHUxpwV/snCKPVwCABZ+QRw+Tp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/8aRJbtSyu40lTdXc97U84LKelvEVRrNSW4MzMKGvsiRu8zgv
-	RCN9bGFtWhhu6KU2EA0w2vVhLQoOInug6u9cPDhLFlBEJRyMqYLC
-X-Gm-Gg: ASbGncsnEjXWWj2hIa3Mr2YL5ua/EEsYKmstKdBEaVBnsW7Xt0V0/KFVDZ0zw49kBin
-	D23jk8qrslh5dmFiW906jjeRBHGzswCbTd8GQ+eNx4rJn94S1ZVGRj8oL5331EdKXhbBiGvwD4P
-	CDMB4//+y6PvjGAGuR5xxKiFEniqgWFgpOcN4gpTYOVrscIoKxvbRQbgafvGjdLZw+4GxREsoDZ
-	/iAf/FqH48vjOuOlTmgY/3ZOt4/5ZQGFe2JYrsqP0uj5gfPRaD+1ru7XeGWYnQbwvEwnp5c1WOr
-	2AG3Brv9xiATWMA/krwthPaZIRcDp3HFKNq47QF7BQ2FMfhPrAynrXo=
-X-Google-Smtp-Source: AGHT+IGgU0UJEysNIrkt3zaL7ZSEf7rDssLzS832i8/1eRHg+agGZPnDGAQi/zb5lfvKaIr0Llx4uA==
-X-Received: by 2002:a05:651c:1591:b0:2ff:d0c4:5ffe with SMTP id 38308e7fff4ca-310499fafadmr50535201fa.16.1744717330869;
-        Tue, 15 Apr 2025 04:42:10 -0700 (PDT)
-Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30f465d509bsm19870341fa.84.2025.04.15.04.42.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 04:42:10 -0700 (PDT)
-Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
-	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 53FBg7Tv029170;
-	Tue, 15 Apr 2025 14:42:08 +0300
-Received: (from paul@localhost)
-	by home.paul.comp (8.15.2/8.15.2/Submit) id 53FBg7U4029169;
-	Tue, 15 Apr 2025 14:42:07 +0300
-Date: Tue, 15 Apr 2025 14:42:07 +0300
-From: Paul Fertser <fercerpav@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: kalavakunta.hari.prasad@gmail.com, sam@mendozajonas.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        npeacock@meta.com, akozlov@meta.com, hkalavakunta@meta.com
-Subject: Re: [PATCH net-next v3] net: ncsi: Fix GCPS 64-bit member variables
-Message-ID: <Z/5GD1FYMLt1fHCB@home.paul.comp>
-References: <20250410172247.1932-1-kalavakunta.hari.prasad@gmail.com>
- <Z/j7kdhvMTIt2jgt@home.paul.comp>
- <ed49eed8-3e0f-4bda-aa30-f581005c4865@redhat.com>
+	s=arc-20240116; t=1744717360; c=relaxed/simple;
+	bh=hm8aYJDNxysrMNHyUOe73MjsVB1mTcPsIfiAzmOy0xc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=efCD7Emjhyx7zAGH0oz2AYZzZSMGQGPzBDwjHjnDk4GpC0EsBLOKD5hfNtf3V8mGd/xFVaN/WvUGh5c0+y/uUuA+IkGZS5OnJhEO7YMh6YegDY9EVM6pnvaLUBm2nc3iOoF3OZaHhgl2XMViVPajTm5KHT44903LcBAp/F7asdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=noSycIe2; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1744717355; x=1745322155; i=fiona.klute@gmx.de;
+	bh=hm8aYJDNxysrMNHyUOe73MjsVB1mTcPsIfiAzmOy0xc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=noSycIe2klE5wF2wxN1aVTAOpODVHahFyzTfFMFnLxmuCmqWeivesdQDvwjMHdTr
+	 VuEOUphjfeyyFCTZJRfWUKtMalXrs2BSa/MZPwQdtWU3f2yANfA9sf4mXPoRUa7Qs
+	 gf0mfVxXl1DgNEvBkZ7GfxXMJhvaKvrUK3+6c5V5Y3CvCb1OJHym+j6eQz3ZxB/lr
+	 Vzk8DK2Jd06YC4S2gMeoxaV4xlQbTl/soVkNuj8/DENt464V3FpIvg6Ii8iYv7Taa
+	 VW2YI2dlVK9hbbiKHWi0RCk/k1czVpagyDwEB+g9dUmDxb3ySvX/2VAOhm0oxi07f
+	 /LpKuKXFU6gMa5cmcw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.7.2] ([85.22.115.120]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N0XCw-1t8RQt0V5Y-016GRv; Tue, 15
+ Apr 2025 13:42:35 +0200
+Message-ID: <db6b47a1-1a6c-476e-a679-aac3e5117c68@gmx.de>
+Date: Tue, 15 Apr 2025 13:42:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed49eed8-3e0f-4bda-aa30-f581005c4865@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: microchip: force IRQ polling mode for
+ lan88xx
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+ UNGLinuxDriver@microchip.com, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-list@raspberrypi.com
+References: <20250414152634.2786447-1-fiona.klute@gmx.de>
+ <24541282-0564-4fb6-8bd1-430f6b1390b0@lunn.ch>
+Content-Language: en-US, de-DE-1901, de-DE
+From: Fiona Klute <fiona.klute@gmx.de>
+Autocrypt: addr=fiona.klute@gmx.de; keydata=
+ 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
+In-Reply-To: <24541282-0564-4fb6-8bd1-430f6b1390b0@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Uo9EvfEdp1sqjcgDxKDcHbPyka1TgzjSS1bXs5FwDEZ6eUbVZ40
+ zZMaN4Kf5IGDSEJXR6amBhZVkaMNihDYuXWNRwYCTHzpmlExQ8m2/EPmlrUTYu3rPMTpprw
+ 6xfjyayQjv9nV20ayoUxWAGwE29F/3Gakr5VBOFHeENmTMcbiGdTG9j0aQXykNkdX7nfJ2J
+ oL27TnlLqDrdz2nhiSnAg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:HQYZc/gpNrU=;Z1bJbVssbSJ7Mw4vEkNvLSUlCys
+ sjpsehVnjAksckxW6M7gkImZsK1Ev/dHFvMeUAgsIqgcbPnk2078ldTjALr4TshgRiQa5KMbU
+ NrVDuzewYMNmvyCizZGrk6r6yGeFveoBIly3sMdk7BSW5APLVrSmKBn/LIzuum0RXphOoW5We
+ KjBOiIqKfy8ToeHmglnUfcrLVgzIO4CfFbuj0sPPtJ8GexEFsT2aWPJ6rBR5dYkWLEDFjRwdz
+ SRyNuMxxDcB9GNS/1YF4CE0NAb7l22cSEQVHJfTtVctmFqhisaWDSsWcbe2+viVDEVw7gO0na
+ zzy6mS3AgIJUDvsjTyuF9+J+nWssdHJEzaLz6JWw3Pe/YHoAEsGqqeHJJVRfrtOfU2i6UrC+f
+ 4Ad5jbDK8GpaX8D92jEY70bBwGbHyXHEvxGWhGBO1Dzcf95jNWQIafODi0QqrqKrLYqTPNn6Q
+ cA/ojUIcSiCqU/dB+APlE61l3MOcKQvR0yvvnxxG1igOwubfxCgaj9wxh0cLGZqvC6gVcoQZ/
+ 5ttP8kkN+qYkT3o6Fr9H6TagSJkX0F9w6mGMI0i+W/4x43mSwiwnpwRj5140mW4ZfVP4iGZQk
+ LuAgZ68oDczKND7w2G+se9zhwGSZeI+6SBHqjg8ploihAkSE8PJWnzMWl2zMCBX4ps8DNgv29
+ LH0N2+DgGvXsHpAAT3BkqebWO353ghlywtUNTTHHarsxlIzWBKG7TshLozyBRIdEQk35xZucD
+ 2mXsF1CbW1Lm2oGdhHRF/gms+oxyB4//7xPGEABq43zrBQ62Afw+N7BlPslJLnk2+GtBt5imf
+ kNPOtLTTtuZA8fasXk/yNiB/ghcJXUVKPOYOGJSW9SHEGRl6mqQsE879JAWzNJ2Ovhxlyhm+4
+ rm7mQp9I/Y0vWBTQuCrOBPHz9qC5JdOHyIgQ/hZ6exc3Bh/bUUUhPy0c/n0ilNLLV6NEByELF
+ E4TqjNJefEoL7EwBon3KQP/HKv9odr2U6e8aw8dg4w+qOjrvL6Ft+xinO+VKH5xXxZ0tZsr1k
+ hQUytmlsfhYMx3oM9A9ZDTvezENnUd/tQSiI9dzNJ9mlNyoLYyqfyHPzWDQEVWE8FoS7Jv2+m
+ RvFJvSh6D+Kaly8q37r1S2RsEPTd2OAIlSiyCI64A5Kgb9/Tl9A1fain+dJoLvafjh70w2uti
+ 53kTwVb8CnFbT6z6fDw/tz/9XohLZYmiKO8bYqVN6HJpC6+l7QQ3F2SCjn2NyBLEfra/SUzop
+ bM/7NKljOIff7Vdv366h7+rn7XksKxD5/u4BCe/7earE20/R4kwxZgBJn4/ayCtCVx8Knqc6M
+ i/KA15XB5WD15n4WzMU3zwSnmwP6+1zIhnYlPqGdbO6dzPSM2X2e+6OZvA/jF9Z5Y8cuiGfqh
+ H0DSAk+LUsF/ujG+yu+SYsDL5QOkZV/2UKOZUWuPmiCQq8aaXjoHPaKB0sk6vbhgo0Yu3I8yk
+ mmRtXm6dCHHnu/b+u7if0i4/BMn64w0V91sHwOANs8QhgLfW6UcmbHRQWlsyDWfod95XHAQzG
+ omE7rjvzwK0lmf8FTHo=
 
-Hello Paolo,
+Am 14.04.25 um 17:43 schrieb Andrew Lunn:
+> On Mon, Apr 14, 2025 at 05:26:33PM +0200, Fiona Klute wrote:
+>> With lan88xx based devices the lan78xx driver can get stuck in an
+>> interrupt loop while bringing the device up, flooding the kernel log
+>> with messages like the following:
+>>
+>> lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+>>
+>> Removing interrupt support from the lan88xx PHY driver forces the
+>> driver to use polling instead, which avoids the problem.
+>>
+>> The issue has been observed with Raspberry Pi devices at least since
+>> 4.14 (see [1], bug report for their downstream kernel), as well as
+>> with Nvidia devices [2] in 2020, where disabling polling was the
+>> vendor-suggested workaround (together with the claim that phylib
+>> changes in 4.9 made the interrupt handling in lan78xx incompatible).
+>>
+>> Iperf reports well over 900Mbits/sec per direction with client in
+>> --dualtest mode, so there does not seem to be a significant impact on
+>> throughput (lan88xx device connected via switch to the peer).
+>>
+>> [1] https://github.com/raspberrypi/linux/issues/2447
+>> [2] https://forums.developer.nvidia.com/t/jetson-xavier-and-lan7800-pro=
+blem/142134/11
+>>
+>> Link: https://lore.kernel.org/0901d90d-3f20-4a10-b680-9c978e04ddda@lunn=
+.ch
+>> Signed-off-by: Fiona Klute <fiona.klute@gmx.de>
+>> Cc: kernel-list@raspberrypi.com
+>> Cc: stable@vger.kernel.org
+>
+> Thanks for submitting this. Two nit picks:
+>
+> It needed a Fixes: tag. Probably:
+>
+> Fixes: 792aec47d59d ("add microchip LAN88xx phy driver")
+Sure, will add that (and a comment) and resend. I wasn't sure if I
+should add it if I can't pinpoint exactly where the problem was
+introduced, and it looks like the interrupt handling was changed a bit
+after.
 
-On Tue, Apr 15, 2025 at 01:09:42PM +0200, Paolo Abeni wrote:
-> On 4/11/25 1:22 PM, Paul Fertser wrote:
-> > On Thu, Apr 10, 2025 at 10:22:47AM -0700, kalavakunta.hari.prasad@gmail.com wrote:
-> >> From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
-> >>
-> >> Correct Get Controller Packet Statistics (GCPS) 64-bit wide member
-> >> variables, as per DSP0222 v1.0.0 and forward specs. The Driver currently
-> >> collects these stats, but they are yet to be exposed to the user.
-> >> Therefore, no user impact.
-> >>
-> >> Statistics fixes:
-> >> Total Bytes Received (byte range 28..35)
-> >> Total Bytes Transmitted (byte range 36..43)
-> >> Total Unicast Packets Received (byte range 44..51)
-> >> Total Multicast Packets Received (byte range 52..59)
-> >> Total Broadcast Packets Received (byte range 60..67)
-> >> Total Unicast Packets Transmitted (byte range 68..75)
-> >> Total Multicast Packets Transmitted (byte range 76..83)
-> >> Total Broadcast Packets Transmitted (byte range 84..91)
-> >> Valid Bytes Received (byte range 204..11)
-> >>
-> >> v2:
-> >> - __be64 for all 64 bit GCPS counters
-> >>
-> >> v3:
-> >> - be64_to_cpup() instead of be64_to_cpu()
-> > 
-> > Usually the changelog should go after --- so it's not included in the
-> > final commit message when merged. I hope in this case the maintainers
-> > will take care of this manually so no need to resend unless they ask
-> > to.
-> > 
-> > Other than that,
-> > 
-> > Reviewed-by: Paul Fertser <fercerpav@gmail.com>
-> 
-> @Paul: it's not clear to me if as a consequence of the discussion
-> running on v2 of this patch you prefer reverting back to be64_to_cpu().
-> 
-> The packet alignement should yield to the correct code in both cases.
+Best regards,
+Fiona
 
-But it might produce warnings for the v3 variant so my understanding
-is that v2 is perfect and can be picked up (other than the changelog
-included in the commit message).
-
-Thank you!
 
