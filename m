@@ -1,146 +1,116 @@
-Return-Path: <netdev+bounces-182592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBDCA8941C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 08:46:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BBDFA89440
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 08:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81ABC7A2C05
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 06:45:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 837C07A67A1
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 06:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FF2155382;
-	Tue, 15 Apr 2025 06:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0D6275856;
+	Tue, 15 Apr 2025 06:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjhhvYEa"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Bvxww/GV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693EEF4ED;
-	Tue, 15 Apr 2025 06:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1800E27511C;
+	Tue, 15 Apr 2025 06:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744699606; cv=none; b=T8O43xzO6WngKSk4w5vdgloVgc3FCr6LHWZUTv+xV3IkbSakdVTbwSxoHqywOeXFw0iMluusEE076uDpwmFzjzyG0KeDOM5b4rLmGF7q6VCb4oTeAh6aN85/TgQm2fGKqKRU4WdXJglHEbb9gE92zpsAuuUNRt1sXx+Sltq7/FA=
+	t=1744700177; cv=none; b=Xb7op6o46AVnGWSvKnI+cXMj7I/UmL83B0IoXEV3C2czjeEzSuCzuDEV57C0Vbvjgd1rKAcb+xsWW8a+nb3LDktsdDTVJ1nofF6vjvjqEVbiQb/RxAjGAfGmrjHFBGLgk8n/g3/gGuoMuINq+66vsCHfJ0BhITnmurUlFR/qeF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744699606; c=relaxed/simple;
-	bh=X+fjcr3QhbZUWxscEWsqQ35xAvKhTO6uBrb8u2MD/Kk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M1SrFDCro+CYcYQzZ+I3RM8mjfIyF0kQTDCfwZkjOHlwfTc1Y6zmuFHAHexLa7AESQ5xrAxYHogTfeUv1MD8mDcgujHim/62OP8g9zMHuASa0R6tG7mvR55RQrcqOIf0kp6QpCB8CgwxHA/eiQvwVQmLUZSjW3wsnMyTvkuwB6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjhhvYEa; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso56422075e9.3;
-        Mon, 14 Apr 2025 23:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744699602; x=1745304402; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tf0XHOV7BL5G8XCTnMqntqoer1LQ9IvxtUGe4LQu1Mo=;
-        b=MjhhvYEaFVHqmlbwCSjWG66Z7Q94FWs0x3uoaX30feT3+PRI7OBs+vZTZUWCLurvDw
-         XZziLTkSJgtW+oW8QYVGTDGB732MS7P6p7VUCieBtMXJxzU2mUSEIBzIiTWl97Kft6aZ
-         +Y0JaZd8tggWAwJMTif9R63azefmKVMGprq99isA1H2vi+nKBZQSPRgql7tQxMt2UAxt
-         lco14WtP5cGY3edMnttyEh4ihjC2HEPTWt9KzJ9OJUC3NnMkkACmZwrSM7LFmSk4MNA0
-         Td+/8jMJ+6ixQ21SyshcOGgwZzd6MQR/zWgjpcwqf8dUwYkuiIfySpjrRA3us43BahtQ
-         JBZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744699602; x=1745304402;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tf0XHOV7BL5G8XCTnMqntqoer1LQ9IvxtUGe4LQu1Mo=;
-        b=RFtCg/v6M5fbNX70NdyGcggS+luh0UhEhhVR7trdOn7J91lm9A7STY+K2zWI982VE7
-         +WxOinuGf9sqm/eazuu+yiUU6Hk7nDva3di2wPu/05xudruR/YBH5E4Rnz4lPTgUihbH
-         Q2Y44WdhsRb6ODvJtQCjsN13iEuxbfpi7ouPsLfUnU8zaZ29Wn5/MMYMUhFDc3237yuR
-         rxgvGvnPnIuoyD1D8TESlOhBAZCB40BtMBquPRg6O1W3pNuomVYUuBZ4wGchxM/2/O7e
-         lVjfGLGSm7+xmvMbaoBaBRaCc0DIa+UtGBXUjSguN4+WFfWPpVkyL9VruhLUaHHI0aMw
-         dIeA==
-X-Forwarded-Encrypted: i=1; AJvYcCX5h/+UufzM0XtdBxbW+wG1aDy3b7tHJBT6oORd3/Te5N37lhw8CmpHoOIiqXzmvcDhj+GrVGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxotGiM6SNmqdLEfq9uRXflq2hl0os6rMar/L/nNE7Zy77h2r5i
-	TH5u+9q63uGtVZWL5//0tQ8ulzaw2wmHuDlGg1XKUjmzJetuoN/A
-X-Gm-Gg: ASbGncvLF8G6Hh4z/Miyrp40mJjFeFlEdc0Q2an2oWhOIMKYq5Tc1DFyyHt0RoJr6l9
-	hCA8dnyRrKaeSVm3aEGjztPKEBCElRL62ovAp+QaKf2A7dqWVUgMoOAl+xeNhxRwkOVA1t4T+Nr
-	G6yiN6Uh3JqMpb9Oz8IjjTcicamYOJwsp2CbQLLx/Lwk0pfUTpRtJ2A1So2HcMPj9z0ZPXcJPjJ
-	99FjFL14TtS1G/JX2phbIvAL9YJQLZlsS7h9KvX0LRQBjcxODkFWGmTaLDMpO+nliw0NHympCnv
-	0siCOK4RiCjqy3zquXF4RcbMgCewj9B8P4ESk6ZNx1K9sSlpLqUyliuyvedVwE5B6JFKs3RFXxX
-	ASw==
-X-Google-Smtp-Source: AGHT+IHisxwT86R0m506gtB4OyZvGE9/Dpo7sMqSR/LKHnRC7jBHFDbHx2PM+1aawYyZ6izqHkIuDA==
-X-Received: by 2002:a05:600c:8489:b0:43d:40b0:5b with SMTP id 5b1f17b1804b1-43f3a9a68admr102272625e9.25.1744699602432;
-        Mon, 14 Apr 2025 23:46:42 -0700 (PDT)
-Received: from fedora.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f23572ce4sm198385685e9.30.2025.04.14.23.46.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 23:46:42 -0700 (PDT)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sagi Maimon <maimon.sagi@gmail.com>
-Subject: [PATCH v2] ptp: ocp: fix NULL deref in __handle_s for irig/dcf
-Date: Tue, 15 Apr 2025 09:46:38 +0300
-Message-ID: <20250415064638.130453-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1744700177; c=relaxed/simple;
+	bh=kY17k1KX7khNMb73gd5C1a3E1u6kiXwt9bs8wpFBoxY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=FtyZAdPtgZKjctG7w/anO83Fr0FCo1ll4tYDio2xjudf2A7VO54WjBM1/3IiNYVN9LXgSl65yPsLLEQUngodGtKlQNfiHeCj+wrFD9UjEFyAE1eiBQxZ1s4XiEGqqGRuCRUm0jTe2ZVsMni/cOA9f49raCwVS/9w2FOHJLrfGPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Bvxww/GV; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1744700153; x=1745304953; i=markus.elfring@web.de;
+	bh=kY17k1KX7khNMb73gd5C1a3E1u6kiXwt9bs8wpFBoxY=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Bvxww/GVUKfibmXtaYV55Yx3dRZQJgbiq/ANLgxXpwJaoZHKRWJYQLg0KaeXVxcM
+	 a0gqbcgOecmNfAAuDr3Z6ZAmGpRdq6U7mSSbVfu3KWqtMX/kc5AaiMnW2HWuZXwOg
+	 hja4lN0eKoWAEv3iDxB8uz2oK5kVsiU2QXTIjbFBadwGJ3xo0dKOOz6HDvK9KR4U5
+	 TpfUGUjwPFJEOlOhed5jYaUcafbUXgsN8+0VDUYPzmDQ4kaKuQJROcvlCAZTMyG33
+	 YeG9NS+wRcDTAmI4I7IceQDpBcCsjCk4fsLU0NkF/UEpc0PV9mYD+5jr1jYIGXd2n
+	 05L154a0HqibxXW9cg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.70.24]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MaHSb-1tZ5Lg065d-00QHar; Tue, 15
+ Apr 2025 08:55:53 +0200
+Message-ID: <4f1187eb-ba44-46e4-89db-56c305aa9a83@web.de>
+Date: Tue, 15 Apr 2025 08:55:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: 990492108@qq.com, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Abdun Nihaal
+ <abdun.nihaal@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Bharat Bhushan <bbhushan2@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Sunil Goutham <sgoutham@marvell.com>
+References: <tencent_20ED8A5A99ECCFE616B18F17D8056B5AF707@qq.com>
+Subject: Re: [Patch] octeontx2-pf: fix potential double free in
+ rvu_rep_create()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <tencent_20ED8A5A99ECCFE616B18F17D8056B5AF707@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:xk/lPr3vTTyp/KZAxdyo8lBHYBHlHqHxLLMF9WOLqkN9m+pvoEf
+ /6ds4Ut+P/9tESOhkSPHQC7JNfyrthfb0NVyiYSys9Me5eGKpmSQf/OMc6DQHMswqlFo7xa
+ EQmparSXUrURBz9FmeJD+Nwk1+GuNw5r4Q5wymVJJDBzvh5KHGvmJKdtWgJj+kk3UZNvKY/
+ MO9HoZ+WRQSzAu+HtUP8w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:kKiQUx1c+e4=;GTUxDezLCMlbhahin7+Lx4vuvx7
+ K+Mj5PwXl3avDfh/UfvKVpd62DOfJyXDy67gLY0/ttORFezbXqsGuerXnW0sj4IB5AMqojvZF
+ WLsRWgM0R3oie8KQAwvbG958l5nIPlhZsUEiY4I52IS3+/cyjKjS4EdbZ+5T8iavW8nWEubQn
+ jQ4Saa61H+EF1nDLG9aULcFoCTusWul/9pz63JtgUjXaGVSvyPI2VjRIZwEI1/cFI7DE2cuOz
+ ZLnIZE3yblEHUTL6oMag3r0VilKFTjrJgvlQkT0cMTTZQ6a2ps9mhN8JRMgM9hQlRljKYs/wU
+ TiXrCQJSuDTGDdb/Si+uye1TMxd05zO0g2A0INNdgBmIhUjSb50jZVSrazYN7cCILY7mNnu4j
+ gvmOsh8XEqg4BF9X4PSAVV+emYn78R//zfMGMEOnehFXTPqBOAWbtw99Qg6lI43NuIYWXBF/3
+ vHspPPvX19JWtUGvpjs5TXj3NyertEJid0pS3ZXBLyDnhBfSQtep/UyOprmCbgO6zGl/1lZtG
+ bT36ox7/bkhutqa6ESboWmTTKn74gPix0vnZDOZjr0j5OW3OpjJb6HMPtohGHxTMNjSynAMV6
+ sfDFIrhYIVeSdW/inRrPGtxywmPa92O9y1cuupxxnmudr9UOpirJRGmvipCuZM5Icg3QkZZ8l
+ KQ6KvO6W/BdylhnYhQvQCT14FUw3jRSEp+gpC5LCpqpzjIiuEm+p9msOhzRt6galQ/4tGgWp+
+ 8hqTlrQwWfEnXXeJGRPGjdxHWHTKTY6fbc3UWocEyOZ+Qz49p4uJW/esIi9uw3Tu07/UscgI6
+ TLvq8kCIwpDxmO3G6L5waEoQlD0tcFLh171yNlvGI5M+COx8v5+9vpnJYV4AsYRoUSDATGrVA
+ UTmH/kXJsgs17x/DbmORjNygTLjqopv8At9x0DqtLhf24MSq+OtvpZDGyWMwkINOADgoLHZqU
+ 9NMBpJNe+bZw5jBdUUs0AUrXTq+HjgAXXhJK/wHY/W6JankV3LGjpyefrIdqmzyjfQCYVQQbs
+ XnhAU3LUXB4jI+vtYV5xO24erVmYUOlQDBKUuOKYe4628NJioK9J7t6Y9ZoswxjY/N7yX8M/a
+ +EIfMUISdtwkqh9nzkj/Azh/m8EnjzakufprcOGn20ohN2XIV4t+gwxyrV7PFTG1JbM7kI8KS
+ 60T29EE8bJtIN3jZk4gFE7LJink7MffQW+x5OQ7P8DztqOfiIRAyZ6Gv8DbqRt0YwgWEptGLj
+ zlSWIfXXd7wHzIQUvCiQQ6I7B4rpONPGUtGAKFiZFNwtP2LKv8EgdlXKcrLddkjR+7uHOvrN/
+ 9ndHtv6gLZ9n3Mhcn3DAfhEkDjLtjjiuupuX1BHcZSVjowYMQIYc6VaEnOb1flwdC8N+C0s39
+ jJUlXikFpKbVHya1GbTA35OEsr7B90UrWjrle4K5/JAUx68YUhskRieOVVMJrfwPW24jufaFe
+ s+e8FzVmMQQtuYejQ+N8ba6t6lBQdaqxNJ9+jM093AOZGi0fusdyrYZWMrTf3PnQIzWH2qw==
 
-SMA store/get operations via sysfs can call __handle_signal_outputs
-or __handle_signal_inputs while irig and dcf pointers remain
-uninitialized. This leads to a NULL pointer dereference in
-__handle_s. Add NULL checks for irig and dcf to prevent crashes.
+=E2=80=A6
+> Signed-off-by: cxxz16 <990492108@qq.com>
 
-Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
----
-Addressed comments from Paolo Abeni:
- - https://www.spinics.net/lists/netdev/msg1082406.html
-Changes since v1:
- - Expanded commit message to clarify the NULL dereference scenario.
----
- drivers/ptp/ptp_ocp.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+I guess that an other personal name would be more desirable according to
+the Developer's Certificate of Origin.
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/Documentation/process/submitting-patches.rst?h=3Dv6.15-rc2#n436
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 7945c6be1f7c..4e4a6f465b01 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -2434,15 +2434,19 @@ ptp_ocp_dcf_in(struct ptp_ocp *bp, bool enable)
- static void
- __handle_signal_outputs(struct ptp_ocp *bp, u32 val)
- {
--	ptp_ocp_irig_out(bp, val & 0x00100010);
--	ptp_ocp_dcf_out(bp, val & 0x00200020);
-+	if (bp->irig_out)
-+		ptp_ocp_irig_out(bp, val & 0x00100010);
-+	if (bp->dcf_out)
-+		ptp_ocp_dcf_out(bp, val & 0x00200020);
- }
- 
- static void
- __handle_signal_inputs(struct ptp_ocp *bp, u32 val)
- {
--	ptp_ocp_irig_in(bp, val & 0x00100010);
--	ptp_ocp_dcf_in(bp, val & 0x00200020);
-+	if (bp->irig_out)
-+		ptp_ocp_irig_in(bp, val & 0x00100010);
-+	if (bp->dcf_out)
-+		ptp_ocp_dcf_in(bp, val & 0x00200020);
- }
- 
- static u32
--- 
-2.47.0
-
+Regards,
+Markus
 
