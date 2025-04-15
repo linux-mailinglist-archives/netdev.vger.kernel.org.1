@@ -1,104 +1,127 @@
-Return-Path: <netdev+bounces-182810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82ABA89F51
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:23:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB951A89F45
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 444BC3B5859
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:23:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4103B189FBA2
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841D82951DD;
-	Tue, 15 Apr 2025 13:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7CE2973D7;
+	Tue, 15 Apr 2025 13:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xlH8rjaF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D135336D;
-	Tue, 15 Apr 2025 13:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4231C6FF5;
+	Tue, 15 Apr 2025 13:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744723404; cv=none; b=oqFXeXMK7hquQGiEjJZC6MC/L10Hh3NFMF3XO1EvENUsiFTqj7SLJBFfVGc48kdNyliK73YCgzfmRWSzZiQ/1hEeG/F/PiOQNvIbR1mwbQR+oBu64xRXdVOrh9Ek6vIVdNC5WL8q8vAPwbk0HACem/gasBaJE1dX+cA2MDTnW64=
+	t=1744723247; cv=none; b=i4jDBQ9tq6RSv4PUUjj/7S3N+YDZ+aWET3oWPqQsa4MsAoVC87MVYaP5J7s+K1iy38w48+fJEdAub3Fsbenoi08iLTztzcuyKKGfmmpiPNkJSuOHtFiHUmbRD1u6gIcOiUgvioO6WyGJGTBPrY+9hINAnD8IvYPYYrUw0lA/gyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744723404; c=relaxed/simple;
-	bh=tGhV1+X+h+9xmi8FQ1Hg9Ap2MDTPanUK8M9CHefKtMw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nQPmlz/YsCRTIcxVkhXYYU0vQ5hj+LH43C6T7yNdWCZaIIaEWYkz0lH7B9DMb8L/ZR5mJzriS+LXtp7lzXllnpVqVOfISjw+975601XqQ+/foFwC4/qJtpos9w01d9rMGd34dIfpQjpj8N3f0d7nYMgVNvKxtMRFST4XgNV6LkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinsec.com.cn; spf=none smtp.mailfrom=kylinsec.com.cn; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinsec.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kylinsec.com.cn
-X-QQ-mid: zesmtpsz4t1744723266td17108ae
-X-QQ-Originating-IP: gJ58oqPD7nr+sDT0pA7ndfED1kWY/XOLCuHIBbtbgNw=
-Received: from localhost.localdomain ( [175.9.43.233])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 15 Apr 2025 21:21:04 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6911282797750824797
-From: zhoubowen <zhoubowen@kylinsec.com.cn>
-To: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744723247; c=relaxed/simple;
+	bh=0COEkxB+APvNdF+miKKyOTbBKTDK5TdhHuMca6Jb0OQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ngV3YwHzmFhJskX6m0z24TkP20TkqlYZlCNuJSfPnPi7fqREk+XRRFjSZjzrlRjXeILbI7RSXWwGPPK64vEMn90kEGlD2QjX39oqr8N65vQ0UDJMvhxHDmL+XQyVHkevAmTekUh6+vl0RkyRpIVCIpXWHob2gZ5Mv9pm0rZz5yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xlH8rjaF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zwXoAPOSd7TPYyFwNb3wZwJZIOBKCyO+D+dc+pl8JG0=; b=xlH8rjaFC+RAnQBZCoJmZEEd0E
+	D24kM63bpE+zT98wgG3mJZJIgEhEmxpiIVkYqIai0Gkuqv+z5hDasP9a7SmjGc5rNDr8V0jh5D81O
+	wPKei3YG3MRZttrcOKTXxzyYFNbcxuljK4qjvy2NaKNqo/yDE1FouImJPkQRFRM0Ff5E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4gDE-009RsY-Ta; Tue, 15 Apr 2025 15:20:28 +0200
+Date: Tue, 15 Apr 2025 15:20:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] amd-xgbe: Add device IDs for Hygon 10Gb ethernet controller
-Date: Tue, 15 Apr 2025 21:20:06 +0800
-Message-Id: <20250415132006.11268-1-zhoubowen@kylinsec.com.cn>
-X-Mailer: git-send-email 2.27.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 4/4] checkpatch: check for comment explaining
+ rgmii(|-rxid|-txid) PHY modes
+Message-ID: <9d73f6ac-9fee-446b-b011-e664a7311eca@lunn.ch>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:kylinsec.com.cn:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OQWRW3+3Aar3mhOYzJoo0Ygmexa+2vZZlgm4qFeLztENtD1zbzQ4zWY5
-	K9I99Br6gaC+0UJS6120/jgIAWFwqSU2kSXgdZAdde+1i//DDEYsozy+7z0dHHXM4UFj+D9
-	I8ozPyfKlXjGUIsvQ4OkIx6kaaZAq+FVo03ec6wcxhAHYXQsvrftHdVFLCKsBrn0rzxEeUm
-	UIPxg0qcznoZw95O4Y5KdyGWeFCtnoSND08ZIGY1wuztRxWHERHXtQK8F0w43oliH+UsmBr
-	OCH62+jSenCNKYY7E2LvrP3wUFJ1eLGI98s0VCr5NBE/DxCQOAdnNQ8w6l4SlPTEq4NPQ5x
-	luXUTIRsjUKTKcd17lDhkeeXDFpQ3MzhJl7N4iMEZLCteAVClFKjdpv/3SBKoGecDPXnD9p
-	jAtUYksTPzvO3JGfBhUHT5PM8H9/EWotR+v3V0dv+1imXAdwazRO9N9gGtAEjsR6Cj3K4es
-	eOv7VcQqQqfIJmlOQlecrDm5VktzM4eo7pVpu8+LVGBpLjGBWweNZrK1UnzsUAyW78vNQBx
-	2Gy6NZ7j9B8DCf9mEDWWqsxiIbTFJe/9TB0U7rsEVV1z9tNmtNdomkrHfPnTBEDhEXdcwj1
-	zwXUUnc6uFTV65rUVHhvmhvMWBXdW2YG3oLsiEKStqR3+TJKqKnxuJIWHCemzzPCButsTL3
-	nsC3jgcFMSzm4pUbEb24vEhR9r+sPmRPSA4RtSIDMbw/xpzq+woajJcMIzOr6UPfTo5B/94
-	B+FUbGGf58wuy4yiSBIvFgjuH6qxRXzunUvPnfJZ7Nus3s6QrWUI9EbvqKNEwnNeHLbo7rD
-	k7F3PLPxExSoBntSlc3zUml5Em2zoNkLa+3v9jv7kwitfqKjmwdRgOlFRqyt3jjiNSf5d5B
-	iuS7BLJ1Po+/asBQ26OA4WWvRoooM3HmVjrNThIewHZo5DUcry5zIPZfA+WKMLvv0RH5i0C
-	IwTXw5MYl7Wa0mxRfxm79qB31xjDyRo8e3+gtnutkK2t4pUQkLqNmtk9FxOB6SVTUPKioN/
-	KTOicIeJ+H2Jx/z3ZID0mUn+6XAxGiEOYx0XGmNRfCvxfBO4/m
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
 
-Add device IDs for Hygon 10Gb Ethernet controller.
+> +  **UNCOMMENTED_RGMII_MODE**
+> +    Historially, the RGMII PHY modes specified in Device Trees have been
+> +    used inconsistently, often referring to the usage of delays on the PHY
+> +    side rather than describing the board.
+> +
+> +    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require the clock
+> +    signal to be delayed on the PCB; this unusual configuration should be
+> +    described in a comment. If they are not (meaning that the delay is realized
+> +    internally in the MAC or PHY), "rgmii-id" is the correct PHY mode.
 
-Signed-off-by: zhoubowen <zhoubowen@kylinsec.com.cn>
----
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+It is unclear to me how much ctx_has_comment() will return. Maybe
+include an example here of how it should look. I'm assuming:
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-index f409d7bd1f1e..206ff2e9e3cb 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-@@ -510,6 +510,10 @@ static const struct pci_device_id xgbe_pci_table[] = {
- 	  .driver_data = (kernel_ulong_t)&xgbe_v2a },
- 	{ PCI_VDEVICE(AMD, 0x1459),
- 	  .driver_data = (kernel_ulong_t)&xgbe_v2b },
-+	{ PCI_VDEVICE(HYGON, 0x1458),
-+	  .driver_data = (kernel_ulong_t)&xgbe_v2a },
-+	{ PCI_VDEVICE(HYGON, 0x1459),
-+	  .driver_data = (kernel_ulong_t)&xgbe_v2b },
- 	/* Last entry must be zero */
- 	{ 0, }
- };
--- 
-2.27.0
+/* RGMII delays added via PCB traces */
+&enet2 {
+    phy-mode = "rgmii";
+    status = "okay";
 
+fails, but
+
+&enet2 {
+    /* RGMII delays added via PCB traces */
+    phy-mode = "rgmii";
+    status = "okay";
+
+passes?
+
+>  
+>  Commit message
+>  --------------
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 784912f570e9d..57fcbd4b63ede 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -3735,6 +3735,17 @@ sub process {
+>  			}
+>  		}
+>  
+> +# Check for RGMII phy-mode with delay on PCB
+> +		if ($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*(phy-mode|phy-connection-type)\s*=\s*"/ &&
+
+I don't grok perl. Is this only looking a dtsi files? .dts files
+should also be checked.
+
+Thanks for working on this, it will be very useful.
+
+	Andrew
 
