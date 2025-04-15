@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-182860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C026A8A30F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 445CDA8A310
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 800681631D7
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19D58163426
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF58296D1C;
-	Tue, 15 Apr 2025 15:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFD029A3FE;
+	Tue, 15 Apr 2025 15:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgLeyOsN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ib/1seQy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281A22951C5;
-	Tue, 15 Apr 2025 15:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC2623372C
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731603; cv=none; b=jFuDgg+BGUyLKpw3Sv/dzZUsfYyKfr+mTddxL1kVYBmOCnCc5lkKRuh3dN6ATN8RvY9vS3HpR/inWgrQHZ8wB2pB15qVEJDEUTQt7RMNNV9Dh+PVEbgLEwxfvL/DX9TwRzBBc4lbLebEHwpd6iLynbc4mIWMMzC1D6kXIwRuSW4=
+	t=1744731604; cv=none; b=Mau8AqfyOSgXVAcZbfJsI8Nb4xAg3eOHLgFrPqE5aZhik4JAJIDw4bYON6aHCpcJPj4CwRRIeJaWQtRN6V2xetjkYxs530oLqOe3+tpi31rUDkVwIAzwGMSMcW70borEIG8wSX896ISxGPeNvtbruqJrXeoDG9YskO9lzBqYNjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731603; c=relaxed/simple;
-	bh=9dL+7sxEBn0HqmNk1zwuk8hfwZcm127WopxwN7xJ5nY=;
+	s=arc-20240116; t=1744731604; c=relaxed/simple;
+	bh=7KBpmcvDBu/KzzwX4IoFm1q8sj2SXnAZYc6au3Szlxo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eC831wEi+V4dBoC5lgQTL649j/RbpekYCnRJ2Sxkzky0IcRsGpDgbIuQl1kGazsbWCd/9HZ+qmwJZW+mY9pk2FvyxQMdka4yctyrgKJqV33mT6y79ZhcYXS+Q5vnW2tayA7NFAstK5RLG5NI9HBEaydPHNQFk+halsw8fLO/eQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgLeyOsN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A6EC4CEEB;
-	Tue, 15 Apr 2025 15:40:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Y3AK1gHb1imCgxVwG6Sh18lp8xOXoQP0gAAG6H69bDVQ5/B7uJ+jn6haPIeH8sp/hPAX7HDkKttaezxQmDQ0hSYjN3tBhX07ngQXscR1mPGu6EE0mxvi9jFwtK88KgsBf9gt1MhJADDvHG+Rqa4n9lCP+FcRybJbVl9unKTdWDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ib/1seQy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09A2AC4CEEB;
+	Tue, 15 Apr 2025 15:40:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744731602;
-	bh=9dL+7sxEBn0HqmNk1zwuk8hfwZcm127WopxwN7xJ5nY=;
+	s=k20201202; t=1744731604;
+	bh=7KBpmcvDBu/KzzwX4IoFm1q8sj2SXnAZYc6au3Szlxo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cgLeyOsNuL77AcAcQet4LtelmuE1kxrOn1myljxz/MDL7oI3tEbNlVGujF4V4fKQQ
-	 udQGvZR/carvEm35xXz7hmwgOS5hxmnwM9+ciRK9BgV8loOGRF+QANLq0mjho8cq6Q
-	 4YGfevOcO/slXg+ibjogEttJ0Adc0a0H4axXxFwtTCXB0bSpZs6V8GPH8tdjIMYb4G
-	 kX9V5uAtE9P2fgFNPdfK0KLl7ZP5/qrNDL7S9DpomdygKnBjFllfzd/LsCSQASvmPl
-	 tnA1WyB/kBidYdb1YVT2elTo4MoZBJuoqsnEw1rzepX5dQRBSc9l6E+LqUtY+PUvfL
-	 2kQm0qGIbQjSw==
+	b=ib/1seQyBnL2lBlJq/wLpmIomb86PnfCSgDHWETSzyCFBuhBsvsETHcz3oOgavwgJ
+	 1lUbsKbj5hipvX5b63bclfP3UcSruBOMiVIANaOcJeQtly43wUYehAWMHcAoFk5oKR
+	 7UweC9mSmF1tp/++Xs+3HZoQPEQVkZwemhAJVAsPSvSfGqCR1OHTrlS+PAeao0+UDo
+	 lFgTCdaksFBA2pW5GYxjU4W+pSFvb1I3czQQ9eEsf/I1Tq+0/ZlqEIB+A/S2iEs2ub
+	 RFdJubthdtadfLdV4Y0HzX1mA/sGN2RmSFc6l2Pw3plhqteprwvqD+ZZ/HzzNjfver
+	 ZW9z9fNT1n24g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC543822D55;
-	Tue, 15 Apr 2025 15:40:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BF53822D55;
+	Tue, 15 Apr 2025 15:40:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,58 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/10] net: Introduce nlmsg_payload helper
+Subject: Re: [PATCH v2 net-next 0/4] net: stmmac: anarion: cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174473164049.2680773.4741397198265025853.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Apr 2025 15:40:40 +0000
-References: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
-In-Reply-To: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com,
- kuniyu@amazon.com
+ <174473164174.2680773.17904225005838619235.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Apr 2025 15:40:41 +0000
+References: <Z_zP9BvZlqeq3Ssl@shell.armlinux.org.uk>
+In-Reply-To: <Z_zP9BvZlqeq3Ssl@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Apr 2025 06:24:06 -0700 you wrote:
-> In the current codebase, there are multiple instances where the
-> structure size is checked before assigning it to a Netlink message. This
-> check is crucial for ensuring that the structure is correctly mapped
-> onto the Netlink message, providing a layer of security.
+On Mon, 14 Apr 2025 10:05:56 +0100 you wrote:
+> A series of cleanups to the anarion glue driver.
 > 
-> To streamline this process, Jakub Kicinski suggested creating a helper
-> function, `nlmsg_payload`, which verifies if the structure fits within
-> the message. If it does, the function returns the data; otherwise, it
-> returns NULL. This approach simplifies the code and reduces redundancy.
+> Clean up anarion_config_dt() error handling, printing a human readable
+> error rather than the numeric errno, and use ERR_CAST().
+> 
+> Using a switch statement with incorrect "fallthrough;" for RGMII vs
+> non-RGMII is unnecessary when we have phy_interface_mode_is_rgmii().
+> Convert to use the helper.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/10] netlink: Introduce nlmsg_payload helper
-    https://git.kernel.org/netdev/net-next/c/95d06e92a401
-  - [net-next,v2,02/10] neighbour: Use nlmsg_payload in neightbl_valid_dump_info
-    https://git.kernel.org/netdev/net-next/c/7527efe8a416
-  - [net-next,v2,03/10] neighbour: Use nlmsg_payload in neigh_valid_get_req
-    https://git.kernel.org/netdev/net-next/c/2d1f827f0642
-  - [net-next,v2,04/10] rtnetlink: Use nlmsg_payload in valid_fdb_dump_strict
-    https://git.kernel.org/netdev/net-next/c/77d02290366f
-  - [net-next,v2,05/10] mpls: Use nlmsg_payload in mpls_valid_fib_dump_req
-    https://git.kernel.org/netdev/net-next/c/72be72bea9dc
-  - [net-next,v2,06/10] ipv6: Use nlmsg_payload in inet6_valid_dump_ifaddr_req
-    https://git.kernel.org/netdev/net-next/c/e87187dfbb9f
-  - [net-next,v2,07/10] ipv6: Use nlmsg_payload in inet6_rtm_valid_getaddr_req
-    https://git.kernel.org/netdev/net-next/c/8cf1e30907de
-  - [net-next,v2,08/10] mpls: Use nlmsg_payload in mpls_valid_getroute_req
-    https://git.kernel.org/netdev/net-next/c/69a1ecfe47f0
-  - [net-next,v2,09/10] net: fib_rules: Use nlmsg_payload in fib_valid_dumprule_req
-    https://git.kernel.org/netdev/net-next/c/4c113c803fdc
-  - [net-next,v2,10/10] net: fib_rules: Use nlmsg_payload in fib_{new,del}rule()
-    https://git.kernel.org/netdev/net-next/c/8ff953036110
+  - [net-next,v2,1/4] net: stmmac: anarion: clean up anarion_config_dt() error handling
+    https://git.kernel.org/netdev/net-next/c/c30a45a7e072
+  - [net-next,v2,2/4] net: stmmac: anarion: clean up interface parsing
+    https://git.kernel.org/netdev/net-next/c/a55ec9c811aa
+  - [net-next,v2,3/4] net: stmmac: anarion: use stmmac_pltfr_probe()
+    https://git.kernel.org/netdev/net-next/c/5956527e26ff
+  - [net-next,v2,4/4] net: stmmac: anarion: use devm_stmmac_pltfr_probe()
+    https://git.kernel.org/netdev/net-next/c/a1afabef915c
 
 You are awesome, thank you!
 -- 
