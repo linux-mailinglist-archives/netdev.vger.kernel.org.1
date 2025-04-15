@@ -1,164 +1,123 @@
-Return-Path: <netdev+bounces-182579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2798BA89296
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 05:39:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A98A892AC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 05:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A8221896AC7
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:40:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D43B61898775
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B4B1A23BD;
-	Tue, 15 Apr 2025 03:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82DC5218AB3;
+	Tue, 15 Apr 2025 03:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mh7c+h4g"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="d7BS8tEG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F1C212FAB
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 03:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492441C700B;
+	Tue, 15 Apr 2025 03:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744688387; cv=none; b=b7UaFxJdaKjREkJ4yk0zJAtZ4UwoDykZsM/E6GiBeJ+3IYysKEYZDwCkMluRY8BQJTgkWkPYi7euwfygPMV5ex0vmnXmhRbWbSUVQ7FDqHQ4Dmwi1Fiq9YFilkEqWB6XRmnEnotNlKix+Njf/Z70cKajRgY4vlQ3i3nkxx3CrW8=
+	t=1744689502; cv=none; b=bOVp2FkhWAZ849PdQZ9h8NZZiW75rYq0zmdylPcOmK9ZkGvO3b6LRxGfxooyqMO0ZASW+bv6GUjFFSIeHZxKVeZrII1FYgMokVXe9x5R+djnk3DwVa74yQlR5F2MjdZ/SsJFMJqR1iTE6a538QQ5mdPD8AByLQkrDYfMT46Yu5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744688387; c=relaxed/simple;
-	bh=9xlkwBOx7+55VFb9EgrPtEzotWf95XgwbhSfFB7iIYk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DCjdvBS88h8jM8zhwwhauIx5jalUPdKYdMwUbUVdvyAGmw5ikmfpTwQajoca/he9i/VYcls669wV6XZoSfWR9dSQ4o3ALlljBujtSABo2YrbqdLtpZbwzOPnFcL2bzOFxMxRNxZwJuyoeWGt5CpBIG3jmJ0Fge8iZbnxaDQPtcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mh7c+h4g; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7fd35b301bdso5581234a12.2
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 20:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744688384; x=1745293184; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UwT3Y/QkpZfk2z20zJXmNna8nuzxOd0Il7oUMcoEoNc=;
-        b=mh7c+h4g/lHC02J457DT7PIOf7mReZgOTaftPO3XrS5FuZEcgjFswbCa7LQRWmnG7i
-         gF9LwGIcpEdwhxTahWCtOVEfMGa+0E25x3zVs2Fh/IYk6DaG7cIJU9Y28hynjtdwb6no
-         52sy/CR7vWePdSr5uLRxnuU3bmemUAnSkyZGiajLJ+RisQaA+fiYQ7IwlCmrFUGE4xnf
-         3SxQyDcIdKZuV+k1EtESKDtkfw2eDChaO8wDKpDX/Y5EVrf7c4phc88Oh1gUxDOwnF/B
-         xRYN+syNvaULLDIgNUUMAkEff1JpdywFbvEzK0lFsdbEhDAmtd5hiNzur06dJ/IUmt1t
-         huLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744688384; x=1745293184;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UwT3Y/QkpZfk2z20zJXmNna8nuzxOd0Il7oUMcoEoNc=;
-        b=VzRj7NNGQT/zjbQorNGptyz7ogdB0uTzABaMG3hwORakcGxVdWA30AnUFPlm1jBFRe
-         lR5UMrFeWm30xeaF3Mi6572llLtGbDAhtFCqKBthmv5DPKsZIYE5D+TGXfWW58cm4UT4
-         JjYAM4l6numNbIrgiNqhZVp2sILnKvrSkC7YBjxTUa8yFc0WZDFVNTtC5D+xNYm03YiE
-         rsMzgxbEFRXn7JBV8AVEnC197p0DrZs74g1v0uoeDXRZqeYr7KGd5mnplxFgmRCl0snf
-         Bvz19Qu3xnMi8aAKqbDCcSuI7P6eGWN6j92FhjKrRdYobuEXuQPHjO6v8tJdsNO5xDPh
-         EQAw==
-X-Gm-Message-State: AOJu0Yxbfq//S7mwAw0gg6AFfwHJvjtikLQILDY7mdm31on19fztmTGw
-	Iq2NnOBNJl2bz/lCVavV1XjDb/OgE7pFaMRxgMq9Yacj9p3x9jOPf6UGQQJFuVAtOrx3TsBK9/A
-	T9Nd61W9+mZ8ZfaUowmD58WTIblrg2UHCsRVNMA==
-X-Gm-Gg: ASbGncsv+1mX4Dg26Fj7yUSZkynvw+ZIdB0HKrN6YYhKsyogZ3ragHaUnXBUv4Gg8cT
-	j8jtn1x1FpkNbXcA5nyj8pgkc0d1TK8jV1+80b5AKD5HIJps1SOyuibXpV+bCGsOU4Qzwbo4I4h
-	0fx274SD0kizD0SiVUQ8MZQCY=
-X-Google-Smtp-Source: AGHT+IFPuaQ1S0Nq6WzI4G+HWzkOr4UUAwi7aBcBkCCdmAbuVrV8r4QxGfaumdCrx+jKXQfpAGIseTNwKlDYGy12l10=
-X-Received: by 2002:a17:90b:3eca:b0:2ee:9d49:3ae6 with SMTP id
- 98e67ed59e1d1-30823646c73mr23635926a91.10.1744688384404; Mon, 14 Apr 2025
- 20:39:44 -0700 (PDT)
+	s=arc-20240116; t=1744689502; c=relaxed/simple;
+	bh=8/7OE/PdvhXXx4ntXvRyNwEbGhavbkvSh1I4OENjYd4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Dqrw4Y/Eo9gIOL/QHUe9fcZl9qtnxwIoCjylpHc6FIVEKtEXeDYVX7NBOjY/b1OjrOd+4x1GQBd/H9qNJIWWimMQHN5LNV9UT6Xtkf4v+QNCm+gvLirbAFI8IKn0/pp6UXLjGK7GRaRXjsYEkO4slzr3AcWWi1Ow0TbOAH3Uk3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=d7BS8tEG; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53F3vSDj9559644, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1744689448; bh=8/7OE/PdvhXXx4ntXvRyNwEbGhavbkvSh1I4OENjYd4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=d7BS8tEGrxJz/z1Rizy5jApxZx1ODze1VPoBKsBp5KVV4ArhlMflxy2956t/WVkWY
+	 pZKeTyOprCG15703bCZy0CBfCk421UeI/KIJTfp68S/yFeWi7W9AOSqjRznGvIUCt4
+	 rrUEovxO49FYgFvTnf5NEr9WLPZpNCMpXCpjeZ4Gi3Cz6D/7gjIh9mm3PrQdyVbSjq
+	 QmdrkTTm520HFWDM2mf/ZIo/OK9XiuyuUEJoiL0UjQTN1P2C6nY+9pLxBGWrFfeBQw
+	 O3zQJwOUuhpkWXr21HlY30a6Ee888nhGlcPvUS5kDioJ3qX/DTsLFWpHsfpJ/kJksZ
+	 1w5CZa4Lb9vFw==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53F3vSDj9559644
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Apr 2025 11:57:28 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 15 Apr 2025 11:57:27 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 15 Apr 2025 11:57:17 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Tue, 15 Apr 2025 11:57:17 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>,
+        kernel test robot
+	<lkp@intel.com>
+Subject: RE: [PATCH net] rtase: Fix kernel test robot issue
+Thread-Topic: [PATCH net] rtase: Fix kernel test robot issue
+Thread-Index: AQHbrSDD9CZVAae2F06UCtZ1tmoHg7Oij+6AgAGIZ0A=
+Date: Tue, 15 Apr 2025 03:57:17 +0000
+Message-ID: <4ae769fc0f9f4c26a26f3fb2233ee025@realtek.com>
+References: <20250414093645.21181-1-justinlai0215@realtek.com>
+ <3d5a5a7d-a8fb-4a6a-9f3d-3ea27f9d06e7@lunn.ch>
+In-Reply-To: <3d5a5a7d-a8fb-4a6a-9f3d-3ea27f9d06e7@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Abagail ren <renzezhongucas@gmail.com>
-Date: Tue, 15 Apr 2025 11:39:31 +0800
-X-Gm-Features: ATxdqUEVkSCE_a7FWDtnhT95e1TrjDwcs5IqDUOsocnzSKa39ikq_GPl3BigH_w
-Message-ID: <CALkECRgvg9us9Mp79G-cQ8dOwUA=oHH8jY=Q0ApLNDDNGAg4OQ@mail.gmail.com>
-Subject: [BUG] General protection fault in percpu_counter_add_batch() during
- netns cleanup
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hi maintainers,
+> On Mon, Apr 14, 2025 at 05:36:45PM +0800, Justin Lai wrote:
+> > 1. Fix the compile error reported by the kernel test robot by modifying
+> > the condition used to detect overflow in rtase_calc_time_mitigation.
+> > 2. Fix the compile warning reported by the kernel test robot by
+> > increasing the size of ivec->name.
+> > 3. Fix a type error in min_t.
+>=20
+> Looks like three patches should be used, not one. You can then include
+> the details of what the test robot reported making it easier to
+> understand each fix.
+>=20
+>=20
+>     Andrew
+>=20
+> ---
+> pw-bot: cr
 
-In case the previous message was rejected due to attachments and HTML,
-I am resending this report in plain text format.
+Hi Andrew,
 
-During fuzzing of the Linux kernel, we encountered a general protection
-fault in `percpu_counter_add_batch()` while executing the
-`cleanup_net` workqueue. The crash was triggered during the destruction of a
-network namespace containing a WireGuard interface. This was reproduced
-on kernel version v6.12-rc6.
+Thank you for your response. I will split this patch into three
+separate patches and include the detailed report from the kernel
+test robot.
 
-Crash Details:
-
-Oops: general protection fault, probably for non-canonical address
-0xfc3ffbf11006d3ec: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: maybe wild-memory-access in range [0xe1ffff8880369f60-0xe1ffff8880369f67]
-
-CPU: 0 PID: 10492 Comm: kworker/u8:4 Not tainted 6.12.0-rc6 #2
-Hardware: QEMU Standard PC (i440FX + PIIX, 1996)
-
-RIP: 0010:percpu_counter_add_batch+0x36/0x1f0 lib/percpu_counter.c:98
-Faulting instruction:
-    cmpb $0x0,(%rdx,%rax,1)
-
-Call Trace:
- dst_entries_add                    include/net/dst_ops.h:59
- dst_count_dec                      net/core/dst.c:159
- dst_release                        net/core/dst.c:165
- dst_cache_reset_now                net/core/dst_cache.c:169
- wg_socket_clear_peer_endpoint_src drivers/net/wireguard/socket.c:312
- wg_netns_pre_exit                  drivers/net/wireguard/device.c:423
- ops_pre_exit_list                  net/core/net_namespace.c:163
- cleanup_net                        net/core/net_namespace.c:606
- process_one_work                   kernel/workqueue.c:3229
- worker_thread                      kernel/workqueue.c:3391
- kthread                            kernel/kthread.c:389
- ret_from_fork                      arch/x86/kernel/process.c:147
-
-Reproducer Notes:
-
-The issue was triggered during `netns` teardown while a WireGuard device
-was active. It appears to involve use-after-free of a `percpu_counter`
-structure, likely after its owning peer or device was destroyed.
-
-Environment:
-
- - Kernel: 6.12.0-rc6
- - Platform: QEMU (x86_64)
- - Trigger: `netns` teardown with WireGuard devices present
-
-Related discussion (possible fix?):
-
-Subject: [PATCH net] net: decrease cached dst counters in dst_release
-
-Upstream fix ac888d58869b ("net: do not delay dst_entries_add() in
-dst_release()") moved decrementing the dst count from dst_destroy to
-dst_release to avoid accessing already freed data in case of netns
-dismantle. However, in case CONFIG_DST_CACHE is enabled and OvS+tunnels
-are used, this fix is incomplete, as the same issue will be seen for
-cached dsts:
-
-  Unable to handle kernel paging request at virtual address ffff5aabf6b5c000
-  Call trace:
-   percpu_counter_add_batch+0x3c/0x160 (P)
-   dst_release+0xec/0x108
-   dst_cache_destroy+0x68/0xd8
-   dst_destroy+0x13c/0x168
-   dst_destroy_rcu+0x1c/0xb0
-   rcu_do_batch+0x18c/0x7d0
-   rcu_core+0x174/0x378
-   rcu_core_si+0x18/0x30
-
-Fix this by invalidating the cache, and thus decrementing cached dst
-counters, in dst_release too.
-
-Fixes: d71785ffc7e7 ("net: add dst_cache to ovs vxlan lwtunnel")
-
-If this has already been resolved, I'm sorry for the noise. Please let
-me know if more trace or repro information would be useful.
-
-Best regards,
-Zezhong Ren
+Thanks,
+Justin
 
