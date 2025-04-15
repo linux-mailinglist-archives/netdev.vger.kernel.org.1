@@ -1,231 +1,177 @@
-Return-Path: <netdev+bounces-183048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF31EA8AC01
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:22:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A555A8AC16
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F98C3BD33A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 23:22:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32ED57AA2F7
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 23:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB99C2D8DAB;
-	Tue, 15 Apr 2025 23:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD0E2D8DBC;
+	Tue, 15 Apr 2025 23:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDZKXGII"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WmE3pnvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318552D8DA3;
-	Tue, 15 Apr 2025 23:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744759352; cv=none; b=BoSTYxED4TAFK1wn6qflD4pHofu3bNLrS+EPG3iFBgIh2Axi1eeSaKXVBFZ20H2AeWKhp9W3fIok0kxXdlUnJNwrtCTVDftw2TdzAeG+kDLAarwF6idj2Wn4tO1+2UfewZVtUz95AS9F/xmlITQ2xnU9iScnJWqszM9DN6vwOs0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744759352; c=relaxed/simple;
-	bh=h0R5L6nVvByYez5eHmbu8mdtkQsLFhJhqXTOtvcyBAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ANbJmiqqNJR780s2vfxS7h6yNctaI1Jd8/xfgYz7h+SkAdFamIuYXXCiF5f/TtfAlQuyg0IlBX4Gf9SxSHhiG+NSaKTbpjxd249CDPl3vNCYDbuq+CfqQfQDSd3ThfBItPUnavM4pHUUdLl2GyxrCWPjqZwTwJ03hepgEetXjIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDZKXGII; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b03bc416962so4305975a12.0;
-        Tue, 15 Apr 2025 16:22:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744759350; x=1745364150; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OD+viivAmrV9Ri8tXcGexdXaVsd+qYre9jyq6k6JI+s=;
-        b=iDZKXGIIDp0QdbreRLOwMpP5bdpdNZh5JL8Z4JWjyFkSnrCDYDuNyPogJbYBSfaLcF
-         vRMDsuHazPGgUaa2EwUA1s4rtCVZ20SGYE9ZhPoOHMkwRZGF9+oqJt3qIT9KsNjeSYIH
-         cEXd0teJL5pBMRDX8roXcYAAI3ox8EKZ7kWkfbqzxIsI9ayj6qXOY462DkyHsBX9Be7K
-         a7Op0mI3C9SF6wDlWRCTPUAJKW956INNRWctdFbULdDhwjExpsYBbVy2m8tqo0V8UKQa
-         gCglnvl8DWSUxKPSn6YfzSXE2Dggz+AEAZaUb6oKJgE1570KYKnUavyNfUWRD59cjDow
-         WMvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744759350; x=1745364150;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OD+viivAmrV9Ri8tXcGexdXaVsd+qYre9jyq6k6JI+s=;
-        b=axGkY02Dobhhc4km3gsSK7kY7FUds94cXY7I411GEvPhElGBO2O8Q0O39Aw7NQGbkj
-         F//bQRPZ0J4DhV1JuR5CldZwBlxQ4U5Arbs+4TV2FkraAG4jhubKM2YvlauRynj2bzyB
-         YU5uno/kIJDKJ9EDz31rhj/MKPnRsULwvRwKeVxvwbXcqj3QrLjuyzO/nwuZIiH59aFF
-         HLJxW5dYDvlQh8D1IAHHlkblaTkzb5n16ejy5N7KSc91Bt46Irh6spY2Msr+vqUvy+03
-         WxtmouECSVfy0nTQkKqmmmElbohv3NaEkJtXgaUEDbFVUxYGCn7cTjWSq8VlU9rqBwfh
-         fCtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJq/oWpomfA0C7aawQzGPHoad+S9DgVQpp0zI8tcjuz4lngRHtEPowqQCPq1RDssChK5C0hVAhBZC49Ig=@vger.kernel.org, AJvYcCVyRk995dO0JqnGiEJkib8tUjnSPaq5USgaKFqIsYWGxgP92VHhdnyq6OZWub4/7xWvn3ithz3fmyDiIw==@vger.kernel.org, AJvYcCWEFDamiVrs4L2zjE6Z8P22GkM5Nl26i6oFUTK+HLwNtUXQ+9hVWh80wPjofYZuigzKF3YzdS0H@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG0dP2WNSVJ37d+IbdHIi16WLtuXGPerCGp4W/aWF2BN0BEWAx
-	n4/6fxgdpXpJmFHX/F0OFWAhC3l/eZnTqBVAogElOe58VQpW7+k/00YuGp0KRDeuRXWxcsJTeyE
-	de5HSZy0IQQCfKduzORvjDaFBgTU=
-X-Gm-Gg: ASbGncuTxP7qDhRmF2OWmM5sSL8lPU0HZj6CHVrMaSZVz6Bub/qjAXnLbQwDza/3fDY
-	PakeNBxf+52giPy64yXIdtm3BvXnX8L2fASQkCUMuyyS6HwiUScHoYQ75aeHw+Di95pbqbnqNg7
-	E//zaeJE+y0FCDkTRlhrqHXDia4Bvivicn6KkpuA==
-X-Google-Smtp-Source: AGHT+IFQsC/LtlCHl7jX6jCGG1cUKpJ83xO1W3hXxizLj/9OZJRvgT/SxBeX8k1UK5SbPpc6U6ToeYujQXggHIyGXiA=
-X-Received: by 2002:a17:90b:58c3:b0:2ff:702f:7172 with SMTP id
- 98e67ed59e1d1-3085efeadd5mr1689216a91.33.1744759350389; Tue, 15 Apr 2025
- 16:22:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE141990A7;
+	Tue, 15 Apr 2025 23:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744759801; cv=fail; b=ERYJ2StUSJ0WzHUZSPhp4XtnP6pAMdY6u0g4FcGGNd4m0Avzc5Z72qd7/cTQLV81I9bN0JyUE20d5VtFjwYDUPdptyJ2htx9W2WnA/kjJq0HWkw0tPGewhEdkdViGR210aUSfgsRIiU6nPh4aOjVqaV/Uq/3L8Ab64/uryXKFwc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744759801; c=relaxed/simple;
+	bh=kFcCi1dgN+s5OaAOzsKO1pxsO7twBvPvIbCTJjJhJ78=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ndvhlga6YTh+OSvaI4zt007NPVHRdpEt/sy2slnE1Y02Bip3zGoSM363JMvU6hiE6Q6/NdzxeYFfgcPpScVjp8oWZo36xfhU1b+RpiTqHVcoJLgD9u0ZG3F+17W0ot6RxQFBTT6vvOuk4xIPBdBGmms348BWuIreB2yAaot8dJg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WmE3pnvT; arc=fail smtp.client-ip=40.107.94.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lXZdX7R2LmyweVqqhCi+dLiDhT4Quuv6kjqvcrYCHoMp4BKwuK9Gew4mJ+YpeedCvGpTOWw4b7VvfkTRQXheC83SFJHDcBpWGVmAPSR7vzeYcnV49U4a8KZK5SbWcq0qv3lz2EQhhwXmqkZbcCSqjvcgRyTjaQr4/iViV5+2xP6+/JRQoSPF1mWdfD78JUW5Uh+qI4chU7ldB8gPkyfqV1y5wtd8wh+wkbhDEHwK9G+ped+F8pvCgFSnKFPASDfpWPUYvQHox6V6fRX06hgHUZUfvgAI8G2Cks/iOxCE+Gcf8bFY+7YPT2BhcjzpMBP222z4dE/rd0VOiuAi+AQIqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NHI1W6AmZKnZj3tr3MUhqFxZqscxWNXPz/uwGHGxJM8=;
+ b=YL6JCRRshl0BnltbyadQFfEf+F5vUarZjL2DwFCKVYH2G8Z8v4ecXw4b+yPB1H06BSdhFlso4gmO0Cq+2RiTATwmS6D6oS6xjjIBYCKEFnwXJjQagaNKeQMXjjkAkq2v0Wy6zQaHnZ5oXKhgZGfejX30wQySvZ0jMWsH+NzwWuDbIyR4qnbuMZfiImuqbkNFAnXG0DbtLcQBxfhLsSsFpdWol21uequ2+6wnjRs0H2G/9+FP3Em9CQ64HH+AemOFU4cHw3jKYSy8Tkn3b3UaPhVwzDu2sU6/sUVCGs5wAQeTPyhjO/OEthXw9IY72+0ri/k27/Bx/uZrnKNE6c6ULQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NHI1W6AmZKnZj3tr3MUhqFxZqscxWNXPz/uwGHGxJM8=;
+ b=WmE3pnvTBMehZuDkiGQKO4dolSVeLBf3t8ILNYqhI28REmPUSrRq0iT4wTjX5EYgYYKtRWFfv3ZUEeOO7IIzvEs1Av6fqB8eg0rHcJ+QhUSZQV9dIpYAwqPas3zwydUpwiYKIg2CrU+mgyLE1PFFP7YFaNYoB5zXe2+unXhuzTU=
+Received: from SN7PR04CA0233.namprd04.prod.outlook.com (2603:10b6:806:127::28)
+ by CYYPR12MB8750.namprd12.prod.outlook.com (2603:10b6:930:be::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Tue, 15 Apr
+ 2025 23:29:56 +0000
+Received: from SA2PEPF000015C9.namprd03.prod.outlook.com
+ (2603:10b6:806:127:cafe::48) by SN7PR04CA0233.outlook.office365.com
+ (2603:10b6:806:127::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.15 via Frontend Transport; Tue,
+ 15 Apr 2025 23:29:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF000015C9.mail.protection.outlook.com (10.167.241.199) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8655.12 via Frontend Transport; Tue, 15 Apr 2025 23:29:56 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 15 Apr
+ 2025 18:29:55 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <andrew+netdev@lunn.ch>, <brett.creeley@amd.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<michal.swiatkowski@linux.intel.com>, <horms@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: Shannon Nelson <shannon.nelson@amd.com>
+Subject: [PATCH v3 net 0/4] pds_core: updates and fixes
+Date: Tue, 15 Apr 2025 16:29:27 -0700
+Message-ID: <20250415232931.59693-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c9816983-7162-47e6-8758-2daaa8c8ccc3@linux.ibm.com> <d79d19b3-8dc5-4d2c-900e-a273ce317e24@linux.ibm.com>
-In-Reply-To: <d79d19b3-8dc5-4d2c-900e-a273ce317e24@linux.ibm.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 15 Apr 2025 16:22:18 -0700
-X-Gm-Features: ATxdqUHDtDXg02nyYEfqX04Fjl1FO8dOnsI6GySbXtdgeBeUPsKA4XM8rGso4Mg
-Message-ID: <CAEf4BzbiP2RY1FyRtCJBcmC6_ngjSFua_Vt0zAcZ=AGc-u_7aw@mail.gmail.com>
-Subject: Re: [mainline]Kernel Warnings at kernel/bpf/syscall.c:3374
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Cc: bpf <bpf@vger.kernel.org>, Saket Kumar Bhaskar <skb99@linux.ibm.com>, 
-	Hari Bathini <hbathini@linux.ibm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, linux-next@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C9:EE_|CYYPR12MB8750:EE_
+X-MS-Office365-Filtering-Correlation-Id: e523c700-989c-4ad2-bfab-08dd7c756ea2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1f7tFG6Yt5D8UNs1o9JBsFBL3s/jzL7SIx1UJ6xcG5CwXuBXh7I+ejwnq7o0?=
+ =?us-ascii?Q?fzBQe+7LCGbJmJNF8gKnj4XrPUTeHoH7qnwcB2sfQs4PI0v8g9sRLzZ9b9wb?=
+ =?us-ascii?Q?PutpVhp3rt7YdS0KMRgyPMBga0XEtrLNKldKOTXrzgmh72fmO43IkLrWmLuY?=
+ =?us-ascii?Q?bcMxyFPBdLGyk2NhX3UUFBq/fHqMm0o/Fj1w9Ldll2aTvQlmtc5ra/zRhvFT?=
+ =?us-ascii?Q?5gRitnAMcUFlxlETs8FEK4C7beG0NA/8xl1i+e8bjPR9I2UynuIIZsHaUEE5?=
+ =?us-ascii?Q?E2RoqvrFjP3lUNeLRDNNxyD4TpGZyvku2fPHd9YRju62TqG4uYqjRg5VBrOS?=
+ =?us-ascii?Q?Td7i3mIdb866kYEzFqvxOoQOiHJ2qepx/t2TOM6OCv+OMlGC/h5c+L9yHgM0?=
+ =?us-ascii?Q?MYaDCKE7e/NryLX32xZOMK/c5BK7t2CC158lL+IwUep6eMHG2Ln0FF15p5pu?=
+ =?us-ascii?Q?hR9ecCj+s6vWQxXt9NxL1fmH4K/8VDUQiw3AB5ztAi/XddKH/9HibqbC9nkZ?=
+ =?us-ascii?Q?hppHRrTrIJOpqoRpTE0kB4LRNdJa30pU/cn71CoDrrvjuL4ibrjlNUTni02p?=
+ =?us-ascii?Q?2SoEHPf7fkn9uzOaTEjebYifMqvJOyXjuLXo009AGWr6ZscyBzIzUHwLTB2P?=
+ =?us-ascii?Q?mNlsWd5p6gjnHJ1WY7pBWhuEO403zm6X9QHeGZFxCLz+tLgkF7yiwXBTilaH?=
+ =?us-ascii?Q?XASzzkBjTye0WzzWL7YWN1qsseB6WWKfhBrdqVnvuNIsF+LiZLYRtGVwpEC7?=
+ =?us-ascii?Q?VNIulIlnMJDqbDjyWdL5lUgPr1HGyR0GFAWwV+KD9vs3HIuusH8GpsuM67qU?=
+ =?us-ascii?Q?j/Q3XDA59CRFGgao70mAXglN6Ph1Bho7puIQ4M+GLfsNxGjooMhjY+b9Pr0M?=
+ =?us-ascii?Q?+2dgJ9Bycs+kkodIFhC5kfC+koNvT83bEZyvulcgl4RQCSIIIXseqTRt6zid?=
+ =?us-ascii?Q?umMbIHRpX88ws2rF8peuFhAP/bkBIPBFBUl87lUNI3sQ5N8aSrTk8AO7+hDp?=
+ =?us-ascii?Q?n3ei0tp4/UhoCI/UWmwlmQ2GTMnnrjdIRfHEDSz10heQzVUysFVMltJW0Pup?=
+ =?us-ascii?Q?ShdfEduOZb5EQm9q4A5mXNj1GR9CFpjtwpkEhhyUGgJA4eLEmvhQ5eSO7j/4?=
+ =?us-ascii?Q?xwr/3Pl532oOf+QjCkcL4huB+CjK0t3L2k5mhVkOOsxVOJ6jDwH+RfQu0BZG?=
+ =?us-ascii?Q?BHY1isRCUyrwowM9oGkIFV3eCzjqsXQLxJjBX2Cf76OMnfUeoyKhN5rWjzDS?=
+ =?us-ascii?Q?lphfUxNdq2uUn3AY2QDoWl/o5LnmSN47QDjEg0sopLZbMzOoxKOyWV4deEDw?=
+ =?us-ascii?Q?tnxl0QEbgNmMH9DjUTUXMmeDYqBX/fuKMfPKQxqd4bktbs/eBcQlQOk+3FvD?=
+ =?us-ascii?Q?Aww8Y+eojlpLkNBLyEky8BEeWdR3pyd4zkKC/MTMX/ZmAu4lLumA0cWoPM1q?=
+ =?us-ascii?Q?6xY5Rz23UnE0FwZJH+uaSzg6aBzoDRdGeuBU7OsoL0+5Cwr6CGOzf/xpB6oB?=
+ =?us-ascii?Q?tr2awlsNheOgCCsNlDazQLYtDSy8uGndQOEPh2oyQQAA5rHP0NhGRUrQz31l?=
+ =?us-ascii?Q?RbIGh/nQHwx+mzvNrpI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 23:29:56.4874
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e523c700-989c-4ad2-bfab-08dd7c756ea2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8750
 
-On Wed, Apr 9, 2025 at 9:51=E2=80=AFPM Venkat Rao Bagalkote
-<venkat88@linux.ibm.com> wrote:
->
-> + LKML, netdev
->
-> On 10/04/25 10:17 am, Venkat Rao Bagalkote wrote:
-> > Hello!!
-> >
-> >
-> > I am observing below kernel warnings on IBM Power9 server, while
-> > running bpf selftest on mainline kernel.
-> >
-> > This issue never seen before good commit[1], and seen intermetently
-> > after bad commit[2], and this is not reproducible everytime.
-> >
-> > So likely issue got introduced b/w these two commits.
-> >
-> > [1]GoodCommit: 7f2ff7b6261742ed52aa973ccdf99151b7cc3a50
-> > [2]Bad Commit: 08733088b566b58283f0f12fb73f5db6a9a9de30
-> >
-> >
-> > Traces:
-> >
-> >
-> > [34208.591723] ------------[ cut here ]------------
-> > [34208.591738] WARNING: CPU: 9 PID: 375502 at
-> > kernel/bpf/syscall.c:3374 bpf_tracing_link_release+0x90/0xa0
+This patchset has fixes for issues seen in recent internal testing
+of error conditions and stress handling.
 
-This seems to be due to an error returned from
-bpf_trampoline_unlink_prog(), which can happen for a multitude of
-reasons. If you can reproduce this reasonably easily, it would be nice
-if you can help understand where exactly it's coming from. You could
-try using retsnoop ([0]) for this. Or bpftrace, if you can't use
-retsnoop for some reason.
+Note that the first patch in this series is a leftover from an
+earlier patchset that was abandoned:
+Link: https://lore.kernel.org/netdev/20250129004337.36898-2-shannon.nelson@amd.com/
 
-  [0] https://github.com/anakryiko/retsnoop
+v3:
+ - dropped the kdoc complaint fix, save for later net-next update
 
-> > [34208.591750] Modules linked in: bpf_testmod(OE) 8021q(E) garp(E)
-> > mrp(E) vrf(E) tun(E) rpadlpar_io(E) rpaphp(E) vfat(E) fat(E) isofs(E)
-> > ext4(E) crc16(E) mbcache(E) jbd2(E) nft_masq(E) veth(E) bridge(E)
-> > stp(E) llc(E) overlay(E) bonding(E) nft_fib_inet(E) nft_fib_ipv4(E)
-> > nft_fib_ipv6(E) nft_fib(E) nft_reject_inet(E) nf_reject_ipv4(E)
-> > nf_reject_ipv6(E) nft_reject(E) nft_ct(E) nft_chain_nat(E) rfkill(E)
-> > ip_set(E) mlx5_ib(E) ib_uverbs(E) ib_core(E) mlx5_core(E) mlxfw(E)
-> > psample(E) tls(E) ibmveth(E) pseries_rng(E) sg(E) vmx_crypto(E) drm(E)
-> > fuse(E) dm_mod(E) drm_panel_orientation_quirks(E) xfs(E) lpfc(E)
-> > nvmet_fc(E) nvmet(E) sr_mod(E) sd_mod(E) cdrom(E) nvme_fc(E)
-> > nvme_fabrics(E) ibmvscsi(E) nvme_core(E) scsi_transport_srp(E)
-> > scsi_transport_fc(E) [last unloaded: bpf_test_modorder_x(OE)]
-> > [34208.591838] CPU: 9 UID: 0 PID: 375502 Comm: test_progs-no_a
-> > Tainted: G        W  OE       6.15.0-rc1-ga24588245776 #1 VOLUNTARY
-> > [34208.591848] Tainted: [W]=3DWARN, [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MO=
-DULE
-> > [34208.591852] Hardware name: IBM,8375-42A POWER9 (architected)
-> > 0x4e0202 0xf000005 of:IBM,FW950.80 (VL950_131) hv:phyp pSeries
-> > [34208.591857] NIP:  c00000000049c830 LR: c00000000049c7cc CTR:
-> > 0000000000000070
-> > [34208.591863] REGS: c00000000eb07a60 TRAP: 0700   Tainted: G
-> > W  OE        (6.15.0-rc1-ga24588245776)
-> > [34208.591869] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR:
-> > 84002482  XER: 00000000
-> > [34208.591882] CFAR: c00000000049c7d4 IRQMASK: 0
-> > [34208.591882] GPR00: c00000000049c7cc c00000000eb07d00
-> > c000000001da8100 fffffffffffffff2
-> > [34208.591882] GPR04: 0000000000014ed8 c00000103965d480
-> > c0000003415ca800 c0000000b247c900
-> > [34208.591882] GPR08: 0000000000000000 0000000000000000
-> > c0000000b247c900 0000000000002000
-> > [34208.591882] GPR12: c00000000eb078a8 c000000017ff5300
-> > 0000000000000000 0000000000000000
-> > [34208.591882] GPR16: 0000000000000000 0000000000000000
-> > 0000000000000000 0000000000000000
-> > [34208.591882] GPR20: 0000000000000000 0000000000000000
-> > 0000000000000000 0000000000000000
-> > [34208.591882] GPR24: 0000000000000000 0000000000000000
-> > 0000000000000000 c0000003893d6780
-> > [34208.591882] GPR28: c00000000369a6a0 0000000000000fa4
-> > c00000000135d988 c0000000c224bf00
-> > [34208.591945] NIP [c00000000049c830] bpf_tracing_link_release+0x90/0xa=
-0
-> > [34208.591953] LR [c00000000049c7cc] bpf_tracing_link_release+0x2c/0xa0
-> > [34208.591960] Call Trace:
-> > [34208.591963] [c00000000eb07d00] [c00000000049c7cc]
-> > bpf_tracing_link_release+0x2c/0xa0 (unreliable)
-> > [34208.591973] [c00000000eb07d30] [c00000000049c614]
-> > bpf_link_free+0x94/0x160
-> > [34208.591981] [c00000000eb07d70] [c00000000049c780]
-> > bpf_link_release+0x50/0x70
-> > [34208.591989] [c00000000eb07d90] [c0000000006ee75c] __fput+0x11c/0x3c0
-> > [34208.591997] [c00000000eb07de0] [c0000000006e46bc] sys_close+0x4c/0xa=
-0
-> > [34208.592003] [c00000000eb07e10] [c0000000000325a4]
-> > system_call_exception+0x114/0x300
-> > [34208.592012] [c00000000eb07e50] [c00000000000d05c]
-> > system_call_vectored_common+0x15c/0x2ec
-> > [34208.592020] --- interrupt: 3000 at 0x7fff9c40d8a4
-> > [34208.592030] NIP:  00007fff9c40d8a4 LR: 00007fff9c40d8a4 CTR:
-> > 0000000000000000
-> > [34208.592035] REGS: c00000000eb07e80 TRAP: 3000   Tainted: G
-> > W  OE        (6.15.0-rc1-ga24588245776)
-> > [34208.592041] MSR:  800000000280f033
-> > <SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 48002886  XER: 00000000
-> > [34208.592057] IRQMASK: 0
-> > [34208.592057] GPR00: 0000000000000006 00007fffcce2d650
-> > 00007fff9c527100 0000000000000066
-> > [34208.592057] GPR04: 0000000000000000 0000000000000007
-> > 0000000000000004 00007fff9ce5efc0
-> > [34208.592057] GPR08: 00007fff9ce57908 0000000000000000
-> > 0000000000000000 0000000000000000
-> > [34208.592057] GPR12: 0000000000000000 00007fff9ce5efc0
-> > 0000000000000000 0000000000000000
-> > [34208.592057] GPR16: 0000000000000000 0000000000000000
-> > 0000000000000000 0000000000000000
-> > [34208.592057] GPR20: 0000000000000000 0000000000000000
-> > 0000000000000000 00007fff9ce4f470
-> > [34208.592057] GPR24: 0000000010610b6c 00007fff9ce50000
-> > 00007fffcce2e098 0000000000000001
-> > [34208.592057] GPR28: 00007fffcce2e250 00007fffcce2e088
-> > 0000000000000000 0000000000000066
-> > [34208.592118] NIP [00007fff9c40d8a4] 0x7fff9c40d8a4
-> > [34208.592122] LR [00007fff9c40d8a4] 0x7fff9c40d8a4
-> > [34208.592127] --- interrupt: 3000
-> > [34208.592130] Code: 4bfffc28 60000000 60000000 60000000 38210030
-> > e8010010 ebe1fff8 7c0803a6 4e800020 60000000 60000000 60000000
-> > <0fe00000> 4bffffa4 60000000 60000000
-> > [34208.592152] ---[ end trace 0000000000000000 ]---
-> >
-> >
-> > If you happen to fix this issue, please add below tag.
-> >
-> >
-> > Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-> >
-> >
-> > Regards,
-> >
-> > Venkat.
-> >
->
+v2:
+https://lore.kernel.org/netdev/20250411003209.44053-1-shannon.nelson@amd.com/
+ - dropped patch 5/6 "adminq poll interval", will send for net-next later
+ - updated commit comments and tags
+
+v1:
+https://lore.kernel.org/netdev/20250407225113.51850-1-shannon.nelson@amd.com/
+
+Brett Creeley (3):
+  pds_core: Prevent possible adminq overflow/stuck condition
+  pds_core: handle unsupported PDS_CORE_CMD_FW_CONTROL result
+  pds_core: Remove unnecessary check in pds_client_adminq_cmd()
+
+Shannon Nelson (1):
+  pds_core: make wait_context part of q_info
+
+ drivers/net/ethernet/amd/pds_core/adminq.c  | 23 +++++++--------------
+ drivers/net/ethernet/amd/pds_core/auxbus.c  |  3 ---
+ drivers/net/ethernet/amd/pds_core/core.c    |  5 +----
+ drivers/net/ethernet/amd/pds_core/core.h    |  9 ++++++--
+ drivers/net/ethernet/amd/pds_core/devlink.c |  4 +---
+ 5 files changed, 16 insertions(+), 28 deletions(-)
+
+-- 
+2.17.1
+
 
