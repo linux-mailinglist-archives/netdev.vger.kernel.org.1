@@ -1,104 +1,164 @@
-Return-Path: <netdev+bounces-182578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3970A8928D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 05:33:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2798BA89296
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 05:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9912174365
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:33:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A8221896AC7
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881611F4188;
-	Tue, 15 Apr 2025 03:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B4B1A23BD;
+	Tue, 15 Apr 2025 03:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHyIbpgw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mh7c+h4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1509C78F59;
-	Tue, 15 Apr 2025 03:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F1C212FAB
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 03:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744688029; cv=none; b=gi88DVUl/I+bItK0Sm455r5Pl9NVdsmDJEgr23EzE3D5fIUvldP/vjk26NYm4nhPOt8eC8H+f2GIVpfuUTuhw6QbwVGF3gbJmNp57jpXUUEAt+fTHEpX29IQZ5xpDqr/22+Y6myqLUhO+20wT66ObRpiGQxaKZ+Lf7uWoNHN3Iw=
+	t=1744688387; cv=none; b=b7UaFxJdaKjREkJ4yk0zJAtZ4UwoDykZsM/E6GiBeJ+3IYysKEYZDwCkMluRY8BQJTgkWkPYi7euwfygPMV5ex0vmnXmhRbWbSUVQ7FDqHQ4Dmwi1Fiq9YFilkEqWB6XRmnEnotNlKix+Njf/Z70cKajRgY4vlQ3i3nkxx3CrW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744688029; c=relaxed/simple;
-	bh=PD4IETagEYw9szCMDtrwf/DURPDv6bR2qwauiy9/ewg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qbweHOotuj7g+F2l2c9cIyZp3qoEfVIloTEArWofqSbfPOd2HmPrAO1oVUKbdf8q6QO3t4cgfm/RPfPOVwxMN6WsBWKjMtWVCmCNHnfUwuX7iPvrpSyN8eSDJ+Ud6xqfPArvhJ6Es7WPrhIPB+z+CvTCT7bSihk4BoL6aEODjEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHyIbpgw; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1744688387; c=relaxed/simple;
+	bh=9xlkwBOx7+55VFb9EgrPtEzotWf95XgwbhSfFB7iIYk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DCjdvBS88h8jM8zhwwhauIx5jalUPdKYdMwUbUVdvyAGmw5ikmfpTwQajoca/he9i/VYcls669wV6XZoSfWR9dSQ4o3ALlljBujtSABo2YrbqdLtpZbwzOPnFcL2bzOFxMxRNxZwJuyoeWGt5CpBIG3jmJ0Fge8iZbnxaDQPtcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mh7c+h4g; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223fd89d036so60852035ad.1;
-        Mon, 14 Apr 2025 20:33:47 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7fd35b301bdso5581234a12.2
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 20:39:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744688027; x=1745292827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WGR66RJGijWfsj/Wy3cJYHe1Qxgq0Xxw8JFWHJyYQBo=;
-        b=kHyIbpgwp9Husjvf5Oveqbtp51i8axVRhXMc2rOJv9qphaPj3x+J9bi1Gj79ut3CQs
-         5j9mqprgP9D0CTRur0kc8rVB/bBqpbN1YU/qWaGRRC1CvpQwgL6WopiLpkkxU7JLUXgb
-         1+yOUqs92KM0eyfIeSOScxfTYv9GE1hB3MZC+DGqWlgkb6GXCJC8TZTzQpXT/F/Qh2hB
-         AX7cP6y1aH9bFuQXf7fSaG5qkq4jPxYUiBvLHr2RDloLeZumB1KhG4J+oOFJujZvbmZE
-         eEGRslssZO3l+aSZcxpD6Q0NNM9cTkK3UHKggTT0L0mS2N88J0TzDp2XlWnNwkKhNhl8
-         EjgQ==
+        d=gmail.com; s=20230601; t=1744688384; x=1745293184; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UwT3Y/QkpZfk2z20zJXmNna8nuzxOd0Il7oUMcoEoNc=;
+        b=mh7c+h4g/lHC02J457DT7PIOf7mReZgOTaftPO3XrS5FuZEcgjFswbCa7LQRWmnG7i
+         gF9LwGIcpEdwhxTahWCtOVEfMGa+0E25x3zVs2Fh/IYk6DaG7cIJU9Y28hynjtdwb6no
+         52sy/CR7vWePdSr5uLRxnuU3bmemUAnSkyZGiajLJ+RisQaA+fiYQ7IwlCmrFUGE4xnf
+         3SxQyDcIdKZuV+k1EtESKDtkfw2eDChaO8wDKpDX/Y5EVrf7c4phc88Oh1gUxDOwnF/B
+         xRYN+syNvaULLDIgNUUMAkEff1JpdywFbvEzK0lFsdbEhDAmtd5hiNzur06dJ/IUmt1t
+         huLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744688027; x=1745292827;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WGR66RJGijWfsj/Wy3cJYHe1Qxgq0Xxw8JFWHJyYQBo=;
-        b=rPLjC1jJdhHIVHuqvY9RY0Jc5uAZGff5TW296ic+ic/mnaqCwYKj818U1lCQaa0tsN
-         bLgYvKFBTX3SlRKGvXcX9sKqSCl2pzQuWA/Q0+C44wdnSXgXMr2VSN17YwGJ1rzlo+I2
-         rv0phe9IswR3/4I7IAR/Jk1Ea/wPbj1iRcAoDtxbmwiG9iZ8+qnCcJ5VMAsxRTq5SWES
-         oZnMymKdWzcDE/xID8WUcD6HuGQD4QqzKTnDZ8EYC88AAxVxe+gop2FGNIaWo8ephF0E
-         6rxaYRmOxSqdZx79F9QM4RrHkYucuN0Krse1MCVjHTbLzwZt8U0Lavz5qkFF6/Od0DSY
-         KQNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqUTXbqxSoJffN01CPyR5jxShW73DtEY5+J1KaRz90ZSEid1oKZgnNWapykqWq7xzUEbK+dax/@vger.kernel.org, AJvYcCX91+77CNBAJu5HV42gaVho949MBYLfqwBv5f/Bs13f9lL7lqnvXwyUIJFPvOSLCCSeADqS4Grgj3HAO80=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkD3NP3iK4rTvqCgTUfnpbr/z/0UGvU+XHFlWe2aO1D6XMqh4G
-	z++NuXNq+6mec9PRVbLdCqDIBfEN+KXXzmXFnXOR+5/UsHxWuNdS
-X-Gm-Gg: ASbGncv2xXo9Lxfqm+dtQsptDFyXVXlKDWQqXEi0q0X98MfXXXjCtUgaQ/LttGnEMkQ
-	VNl/Yg8ynBUpDOTyoPk/X2ypH7x4JTxQcYllMyjs6er+reRKdiZfQswUEnEmprBrhELuDB+tVYp
-	aXDhRKPks2lgKOS4ykzO+Q4wVZ38AQmcvShbBJyzIOdfwKwlWaCgW2qbzglj1TnwsvFNC+aVNNv
-	9CI8U1+S0I1Ah2Gd15d6nAWU8prYUcU8alB48gARAQ60GKP/AmRMOhz+GP8hcRvZMLSv2QjG65s
-	i0cc61gUpqrOv5mI2rlQGRU4rkmaHIXe1A==
-X-Google-Smtp-Source: AGHT+IFEtT49JwxKT//1+ehfZkXG08nxRxAg/8YIC+mKqaNvAhLGr7ZaYZFdomZXBvzqrB1kbaIDwA==
-X-Received: by 2002:a17:903:17ce:b0:223:f408:c3f8 with SMTP id d9443c01a7336-22bea4b34a7mr208771025ad.14.1744688027296;
-        Mon, 14 Apr 2025 20:33:47 -0700 (PDT)
-Received: from nsys ([49.37.219.136])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7b9042dsm107193645ad.104.2025.04.14.20.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 20:33:46 -0700 (PDT)
-Date: Tue, 15 Apr 2025 09:03:39 +0530
-From: Abdun Nihaal <abdun.nihaal@gmail.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: Markus.Elfring@web.de, mengyuanlou@net-swift.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, saikrishnag@marvell.com, przemyslaw.kitszel@intel.com, 
-	ecree.xilinx@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: ngbe: fix memory leak in ngbe_probe() error
- path
-Message-ID: <ko45l6sl6eo4pfvac4q5ounmjzhebpyhhzr23ohqphncikcprf@mjhrpukcdww3>
-References: <20250412154927.25908-1-abdun.nihaal@gmail.com>
- <00b401dbadac$7b36f120$71a4d360$@trustnetic.com>
+        d=1e100.net; s=20230601; t=1744688384; x=1745293184;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UwT3Y/QkpZfk2z20zJXmNna8nuzxOd0Il7oUMcoEoNc=;
+        b=VzRj7NNGQT/zjbQorNGptyz7ogdB0uTzABaMG3hwORakcGxVdWA30AnUFPlm1jBFRe
+         lR5UMrFeWm30xeaF3Mi6572llLtGbDAhtFCqKBthmv5DPKsZIYE5D+TGXfWW58cm4UT4
+         JjYAM4l6numNbIrgiNqhZVp2sILnKvrSkC7YBjxTUa8yFc0WZDFVNTtC5D+xNYm03YiE
+         rsMzgxbEFRXn7JBV8AVEnC197p0DrZs74g1v0uoeDXRZqeYr7KGd5mnplxFgmRCl0snf
+         Bvz19Qu3xnMi8aAKqbDCcSuI7P6eGWN6j92FhjKrRdYobuEXuQPHjO6v8tJdsNO5xDPh
+         EQAw==
+X-Gm-Message-State: AOJu0Yxbfq//S7mwAw0gg6AFfwHJvjtikLQILDY7mdm31on19fztmTGw
+	Iq2NnOBNJl2bz/lCVavV1XjDb/OgE7pFaMRxgMq9Yacj9p3x9jOPf6UGQQJFuVAtOrx3TsBK9/A
+	T9Nd61W9+mZ8ZfaUowmD58WTIblrg2UHCsRVNMA==
+X-Gm-Gg: ASbGncsv+1mX4Dg26Fj7yUSZkynvw+ZIdB0HKrN6YYhKsyogZ3ragHaUnXBUv4Gg8cT
+	j8jtn1x1FpkNbXcA5nyj8pgkc0d1TK8jV1+80b5AKD5HIJps1SOyuibXpV+bCGsOU4Qzwbo4I4h
+	0fx274SD0kizD0SiVUQ8MZQCY=
+X-Google-Smtp-Source: AGHT+IFPuaQ1S0Nq6WzI4G+HWzkOr4UUAwi7aBcBkCCdmAbuVrV8r4QxGfaumdCrx+jKXQfpAGIseTNwKlDYGy12l10=
+X-Received: by 2002:a17:90b:3eca:b0:2ee:9d49:3ae6 with SMTP id
+ 98e67ed59e1d1-30823646c73mr23635926a91.10.1744688384404; Mon, 14 Apr 2025
+ 20:39:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00b401dbadac$7b36f120$71a4d360$@trustnetic.com>
+From: Abagail ren <renzezhongucas@gmail.com>
+Date: Tue, 15 Apr 2025 11:39:31 +0800
+X-Gm-Features: ATxdqUEVkSCE_a7FWDtnhT95e1TrjDwcs5IqDUOsocnzSKa39ikq_GPl3BigH_w
+Message-ID: <CALkECRgvg9us9Mp79G-cQ8dOwUA=oHH8jY=Q0ApLNDDNGAg4OQ@mail.gmail.com>
+Subject: [BUG] General protection fault in percpu_counter_add_batch() during
+ netns cleanup
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 15, 2025 at 10:17:04AM +0800, Jiawen Wu wrote:
-> I think this release bug is also present in txgbe driver.
+Hi maintainers,
 
-Thanks for the info. I just sent a patch to fix that here : 
-https://patchwork.kernel.org/project/netdevbpf/patch/20250415032910.13139-1-abdun.nihaal@gmail.com/
+In case the previous message was rejected due to attachments and HTML,
+I am resending this report in plain text format.
 
-Regards,
-Nihaal
+During fuzzing of the Linux kernel, we encountered a general protection
+fault in `percpu_counter_add_batch()` while executing the
+`cleanup_net` workqueue. The crash was triggered during the destruction of a
+network namespace containing a WireGuard interface. This was reproduced
+on kernel version v6.12-rc6.
+
+Crash Details:
+
+Oops: general protection fault, probably for non-canonical address
+0xfc3ffbf11006d3ec: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: maybe wild-memory-access in range [0xe1ffff8880369f60-0xe1ffff8880369f67]
+
+CPU: 0 PID: 10492 Comm: kworker/u8:4 Not tainted 6.12.0-rc6 #2
+Hardware: QEMU Standard PC (i440FX + PIIX, 1996)
+
+RIP: 0010:percpu_counter_add_batch+0x36/0x1f0 lib/percpu_counter.c:98
+Faulting instruction:
+    cmpb $0x0,(%rdx,%rax,1)
+
+Call Trace:
+ dst_entries_add                    include/net/dst_ops.h:59
+ dst_count_dec                      net/core/dst.c:159
+ dst_release                        net/core/dst.c:165
+ dst_cache_reset_now                net/core/dst_cache.c:169
+ wg_socket_clear_peer_endpoint_src drivers/net/wireguard/socket.c:312
+ wg_netns_pre_exit                  drivers/net/wireguard/device.c:423
+ ops_pre_exit_list                  net/core/net_namespace.c:163
+ cleanup_net                        net/core/net_namespace.c:606
+ process_one_work                   kernel/workqueue.c:3229
+ worker_thread                      kernel/workqueue.c:3391
+ kthread                            kernel/kthread.c:389
+ ret_from_fork                      arch/x86/kernel/process.c:147
+
+Reproducer Notes:
+
+The issue was triggered during `netns` teardown while a WireGuard device
+was active. It appears to involve use-after-free of a `percpu_counter`
+structure, likely after its owning peer or device was destroyed.
+
+Environment:
+
+ - Kernel: 6.12.0-rc6
+ - Platform: QEMU (x86_64)
+ - Trigger: `netns` teardown with WireGuard devices present
+
+Related discussion (possible fix?):
+
+Subject: [PATCH net] net: decrease cached dst counters in dst_release
+
+Upstream fix ac888d58869b ("net: do not delay dst_entries_add() in
+dst_release()") moved decrementing the dst count from dst_destroy to
+dst_release to avoid accessing already freed data in case of netns
+dismantle. However, in case CONFIG_DST_CACHE is enabled and OvS+tunnels
+are used, this fix is incomplete, as the same issue will be seen for
+cached dsts:
+
+  Unable to handle kernel paging request at virtual address ffff5aabf6b5c000
+  Call trace:
+   percpu_counter_add_batch+0x3c/0x160 (P)
+   dst_release+0xec/0x108
+   dst_cache_destroy+0x68/0xd8
+   dst_destroy+0x13c/0x168
+   dst_destroy_rcu+0x1c/0xb0
+   rcu_do_batch+0x18c/0x7d0
+   rcu_core+0x174/0x378
+   rcu_core_si+0x18/0x30
+
+Fix this by invalidating the cache, and thus decrementing cached dst
+counters, in dst_release too.
+
+Fixes: d71785ffc7e7 ("net: add dst_cache to ovs vxlan lwtunnel")
+
+If this has already been resolved, I'm sorry for the noise. Please let
+me know if more trace or repro information would be useful.
+
+Best regards,
+Zezhong Ren
 
