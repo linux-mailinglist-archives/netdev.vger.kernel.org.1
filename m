@@ -1,101 +1,120 @@
-Return-Path: <netdev+bounces-182925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1305A8A5C6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:37:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF75FA8A5C8
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27A23BFF7D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:36:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27CF87A6395
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE6A2144DB;
-	Tue, 15 Apr 2025 17:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743772192E3;
+	Tue, 15 Apr 2025 17:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+q+APth"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PIMeBFBv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A67187332;
-	Tue, 15 Apr 2025 17:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855B11B0F23;
+	Tue, 15 Apr 2025 17:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744738597; cv=none; b=GpdZVniuI2OoPk+le7CMSjBH3z5Sa3zTUsCHa+pVTHBM1vfVWVz/GJrB9pS4MKdVu54rThIC9BWkq0hNe9IiwAi7xzGRybyNCgCpA1w4pt3LG+yXeM8wDyOOtQU73w4CYCoI8KYQrSOyUVREDYTuT0et3IYjBZEuNJFXytP9TDI=
+	t=1744738680; cv=none; b=KSchpq/Z/cHDuJGKBAIk8HbdO34iwLJw2/z6wDqLHC1Wu3Zd3xLrCLNsp53OsDXo5wk7mgQZpOlSCM0PjuKRHQ7yQMZfGiqzb7dCN2SFVgiI1xHw08KVgDwH2WZTa7NnxPTrzuzPYqq31TQU04jG/8Sc6qIIULvAfr8kXMwnKTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744738597; c=relaxed/simple;
-	bh=vQM80CjrqyDAdAIX49jvUzOyW6y/t5uTzc2gxi9cQNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fw8kQYp2IRp1DiEJzbWDICiS6QLTFMhfrKx9Mhqxc8z8mJi5wOwEwO5LmFYSTiWC6ClJ9T9ZF/P1pXZ/Jprq/GyK2yZZ8mrE6CmfyhZEUJqbke5GXOHudUSkfXKyQgeW9kNYB+OLhq6c5MgmWBlmifNYrHBCTUav+XLr0mGkAsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+q+APth; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2295d78b433so61870585ad.2;
-        Tue, 15 Apr 2025 10:36:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744738595; x=1745343395; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xw1ymY8+YUQh+JkgWWL+KhMbc5ItGim9yESffQXO5Xo=;
-        b=W+q+APthsAOvtePHHsx7b3dVFyITgeBCKVUCH0QDXme8mTOqj4+yB0X+txQP8HfK7f
-         THbCrq3TpX34TM3vrcuk7V0eZqTK57c6AaFG4hN6Q/DuwuX/haSiy22D0fTV1aSv45vp
-         SopDZnBCpQdMseRcv0qphK3sehkHNBvs1XJLPIjy6ibX+d9c5DxbW8l2hN+9A+nNVo/2
-         D2bdleXKCPjSvFZJ+H7q5zu8PrEWvAFYdJIU9s3hVDFTGSr7AmU8RKCeloOD9fY/iHic
-         22+02ryv4/WJwM03bDn7PoRqsD3LFn3WU9KBCMRlVa9GgT/2n6K2itqfi5VuYlnpqwmR
-         Zbjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744738595; x=1745343395;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xw1ymY8+YUQh+JkgWWL+KhMbc5ItGim9yESffQXO5Xo=;
-        b=hYw/RCFWllUnuHJbofl3dwcOQ5JySdPE2c9RtY8Zvpffqkc0rHP7eU5PGCgjO8iNqP
-         qAUkqOb0pLnOca9LWro1vLmNU2LTYBdM0TzY+vTf4sTWsh5Ab0pupVmdeGMJM7DvXrmt
-         YSRVHKwjCsEBYX5yMi4/6nbjbK44kM836Wp+1v9YjnA/ooK3wIFELXVvMl+Rs65rFvDQ
-         EDLvP3jeM+AYISRufZrmM3Gf+M5FQGK3O/vCy3HhSdAmIO9NFJDm9MJqeO5dC3yJUInM
-         +cGGqaXhaPIFJ7bsezp8O9yxTPMWxjWrZZrBfeIonFGW3Xl6Ife7dAuoiXQMxiRn6gD8
-         Cc/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWrr5Qb+d9u/hx9th02zI/jcwRnC85WPxIusMt+wvlunCWiQ+Qc8uRGIX+YZWsDdEe7k9TrupVv@vger.kernel.org, AJvYcCXmhisbTbtf7CZpOkvK23X+ZQXxdhIiHK7IYEDkmkh5wBno+CRKSZhLzGLi7s4vSmenTcu/WGSnp3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpFTJOaiDpv8A7RLvwp6Bx6eYoOy52zmY2BBr9bfBgdnw8GTAg
-	Ud0RqySn9BXLawHKFDZ7IaPUEYBNrsj4tZefvqzmvIuLg4gfduI=
-X-Gm-Gg: ASbGnctj78kegQESVvn3TAzpATXbM9d9RMnf50WxTAso3K0I6qLb8k6P85xwIqlcx9+
-	b84YrwcKYmGuw3ZZDdUelNf4xd5uEm8OAEK62nyBhkTldx/iJvw8qMvcdI3c2G7XZVI2KzQFPjp
-	x9xImq+SzfmEaQLn74KTLH/Xczuj2TXwB7u3e+CB+wVsO0TuW4Ro5r2SmNhUPzZNPsAyF3nrhLA
-	NIlXtUcX2ZGgYmR5A7cTTU3bSXXFfY/b/C283dxY81GPLoXs+JM6U41Hrtur82X211buYh+rDO6
-	QdDbaDvwruVE/0bH22KZm4eT24R27Nnevgo/qvH5
-X-Google-Smtp-Source: AGHT+IG/K1QhTjF638xgaVlGhZOHwpjSJjWV+kbfa3Z5KpaRK7xi11Jn+aAoTOhZQcQbm8Wlv1d4mw==
-X-Received: by 2002:a17:902:d550:b0:227:eb61:34b8 with SMTP id d9443c01a7336-22c31a00b63mr212945ad.25.1744738595680;
-        Tue, 15 Apr 2025 10:36:35 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-306df08f646sm13484299a91.22.2025.04.15.10.36.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 10:36:35 -0700 (PDT)
-Date: Tue, 15 Apr 2025 10:36:34 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: networking: clarify intended audience of
- netdevices.rst
-Message-ID: <Z_6ZIgn-oSUAYosA@mini-arch>
-References: <20250415172653.811147-1-kuba@kernel.org>
+	s=arc-20240116; t=1744738680; c=relaxed/simple;
+	bh=a7nkIDw2sGWmgsPXcXHwTsn7gVWA1RUyTzV3ZRc3sbM=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=fdXEyyjfcCtw5BjWwfYlyfE8CkamdmjgfQX8bKw382TyUc8NeblCLA4w/UfJsACQ28DEZBPtn37+YCex/eO564yFs5dRdBlAvBaZ/IdDdNcpWKi/cbL72kh9wxPo/GJ8WpmAXmgUSlyKmOZr4dYemWLgxqCT7VcAKzHQ9B2sem0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PIMeBFBv; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250415172653.811147-1-kuba@kernel.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744738675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a7nkIDw2sGWmgsPXcXHwTsn7gVWA1RUyTzV3ZRc3sbM=;
+	b=PIMeBFBvruuq6R536asjJALCz0DhOcAGvJOrSiScQKChlcJ9qirHDtyXRkXVpRUAYdc6Mj
+	rEFq8rXA22aRh2FCPkuExWg7+cHfEDJlHt+g+fFMBHiSeyRpsJtC92isMlek2SdQ5EoD4v
+	fzdejm6kasEe/l2+0I8ULpHQTINUkCs=
+Date: Tue, 15 Apr 2025 17:37:53 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Ihor Solodrai" <ihor.solodrai@linux.dev>
+Message-ID: <b787119e15a218cc10a850f2c774fd328d53ef55@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf] selftests/bpf: remove sockmap_ktls
+ disconnect_after_delete test
+To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+Cc: "Jiayuan Chen" <jiayuan.chen@linux.dev>, "Alexei Starovoitov"
+ <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, "Eduard" <eddyz87@gmail.com>, "bpf"
+ <bpf@vger.kernel.org>, "Network Development" <netdev@vger.kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Mykola Lysenko" <mykolal@fb.com>, "Kernel Team" <kernel-team@meta.com>
+In-Reply-To: <CAADnVQ+5_mqEGnEs-RwBwh7+v2aeCotrbxKRC2qrzoo2hz_1Hw@mail.gmail.com>
+References: <20250415163332.1836826-1-ihor.solodrai@linux.dev>
+ <3cb523bc8eb334cb420508a84f3f1d37543f4253@linux.dev>
+ <02aa843af95ad3413fb37f898007cb17723dd1aa@linux.dev>
+ <CAADnVQ+5_mqEGnEs-RwBwh7+v2aeCotrbxKRC2qrzoo2hz_1Hw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 04/15, Jakub Kicinski wrote:
-> The netdevices doc is dangerously broad. At least make it clear
-> that it's intended for developers, not for users.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On 4/15/25 10:05 AM, Alexei Starovoitov wrote:
+> On Tue, Apr 15, 2025 at 10:01=E2=80=AFAM Ihor Solodrai <ihor.solodrai@l=
+inux.dev> wrote:
+>>
+>> On 4/15/25 9:53 AM, Jiayuan Chen wrote:
+>>> April 16, 2025 at 24:33, "Ihor Solodrai" <ihor.solodrai@linux.dev> wr=
+ote:
+>>>>
+>>>> "sockmap_ktls disconnect_after_delete" test has been failing on BPF =
+CI
+>>>> after recent merges from netdev:
+>>>> * https://github.com/kernel-patches/bpf/actions/runs/14458537639
+>>>> * https://github.com/kernel-patches/bpf/actions/runs/14457178732
+>>>> It happens because disconnect has been disabled for TLS [1], and it
+>>>> renders the test case invalid. Remove it from the suite.
+>>>> [1] https://lore.kernel.org/netdev/20250404180334.3224206-1-kuba@ker=
+nel.org/
+>>>> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+>>>
+>>> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>>>
+>>> The original selftest patch used disconnect to re-produce the endless
+>>> loop caused by tcp_bpf_unhash, which has already been removed.
+>>>
+>>> I hope this doesn't conflict with bpf-next...
+>>
+>> I just tried applying to bpf-next, and it does indeed have a
+>> conflict... Although kdiff3 merged it automatically.
+>>
+>> What's the right way to resolve this? Send for bpf-next?
+>
+> What commit in bpf-next does it conflict with ?
+>
+> In general, avoiding merge conflicts is preferred.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+https://web.git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/comm=
+it/?id=3D05ebde1bcb50a71cd56d8edd3008f53a781146e9
+https://lore.kernel.org/bpf/20250219052015.274405-1-jiayuan.chen@linux.de=
+v/
+
+It adds tests in the same file. The code to delete simply moved.
+
+I think we can avoid conflict by applying 05ebde1bcb50 to bpf first,
+if that's an option (it might depend on other changes, idk).
+Then the version of the patch for bpf-next would apply to both trees.
+
+If not, then apply only to bpf-next, and disable the test on CI?
 
