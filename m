@@ -1,161 +1,266 @@
-Return-Path: <netdev+bounces-182806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0931A89F3A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:18:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EB7AA89F40
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98A9A17B03C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:18:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 907521902287
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29C22973D3;
-	Tue, 15 Apr 2025 13:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42E3297A60;
+	Tue, 15 Apr 2025 13:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bwkMCqtz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TjiiS0uH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB732949F9
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 13:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915D629A3C2
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 13:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744723108; cv=none; b=h9Bo5IVlF12tavPv9FpqJR9E4FLq5/NFZcwUdgUbl7w3iw+NXkjNxlBVctt1CXqnjTept71MT1N7WWiYeHKcXHMcT0pvBlZWP+yGriJXA+kp6ppXl8OnmVtvQz0zt5yrr3NKUGEp/T+9NCMwTIa80cnIx1gf+yTCyuYOXDmA7cA=
+	t=1744723177; cv=none; b=utamM78vYuVdSV9KWqgYtaLMnJnwn5hbCqspHgmZdLO1OjvKkh9m1e86Efp7X5h8G0wFpjTwje533R5cWxf3yErg5Y63Ym35ZApaB93hQ8uMyqNJkNudSrgfv5c97hNLXbsRFQ7YalSYVl2g0cFM6bQib84PhTjsrVxYHIJFWH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744723108; c=relaxed/simple;
-	bh=+2JnfeAYL8QYUi16XZR7BiEwpBTygOgiMGABmI7uDig=;
+	s=arc-20240116; t=1744723177; c=relaxed/simple;
+	bh=e9R32tQBSXYQd8goFfR+Lx7lJByV3tKzSiDQM/hj3JU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U6Lnau0k+hJ38wxRGJ8E3AKS58b09p3cvwvNgG8nk1GtFYep5CL2+MknztEcDoh+htxiOrOISDv6GfW5TkRCNif7X0d7oMBnlUZVrdJG93xatYuJrH5G6dvbmeN/diKdhXh8RqDzVZIScI1CptcrDxPZ/K8oW0thJ5EmYN0kl9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bwkMCqtz; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ntR7DZQBCtsXPX4Hyj53oTxpwC8DF/8Df5GRAVg1Sv/P7flTpkkVBYrIs1l2vwLznYblLJ0Z1yq4V60ooYvrPq0MBunnY1/LTTcn+BSd7lxt/Q66mzAE+sHH+3zjBXzcT+uYswto87emf396C8DV3/zjaXI8q4tlGKmBauuBjzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TjiiS0uH; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744723106;
+	s=mimecast20190719; t=1744723173;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=56Wl7aD/e2nusVltsAJ9dgSuFRtHQKEE2kXljhNlSkg=;
-	b=bwkMCqtzBETlUZLeBz/Bjc/2Bsb0BoPmhnLTfZk9Je3ePK0jt4X2Gl54cw6mc0gkIC1wpN
-	XzS8Nj0TnYEMsJi0NqhrWXiAdPV/zTJ1S1yOnMR1W8GgR+E4/vkwAexWKnEyH5Ruy4/Q7A
-	uYEI8S0IyT5z2jxqqisrhW9T+3IJ9Cw=
+	bh=HDFRVUvYARrrdoMVKwNSz9nrR/1vGVN5NRO4r+H+6kk=;
+	b=TjiiS0uH7PjepR7rcajPBTCLIYGdOXmkFJVyHQGAVk2cVnWtVL0AJFsRl3+pdyVflqITKX
+	PtMf9ratbKcsB2CnfhHsmbeCKeA0FUYNglxqq5klJTvxGQ/mf0sVvEvgs4M1muEVYPNAuV
+	/OsNUWAGser3Vl7T4VGb8G3/kvUQH1M=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-547-8NmqbNFZNxeBxsghvT5Ulw-1; Tue, 15 Apr 2025 09:18:23 -0400
-X-MC-Unique: 8NmqbNFZNxeBxsghvT5Ulw-1
-X-Mimecast-MFC-AGG-ID: 8NmqbNFZNxeBxsghvT5Ulw_1744723102
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912d9848a7so3237128f8f.0
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 06:18:23 -0700 (PDT)
+ us-mta-498-5PwxuRsWPpG60xMDyJoAow-1; Tue, 15 Apr 2025 09:19:32 -0400
+X-MC-Unique: 5PwxuRsWPpG60xMDyJoAow-1
+X-Mimecast-MFC-AGG-ID: 5PwxuRsWPpG60xMDyJoAow_1744723171
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39143311936so2228669f8f.0
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 06:19:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744723102; x=1745327902;
+        d=1e100.net; s=20230601; t=1744723171; x=1745327971;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=56Wl7aD/e2nusVltsAJ9dgSuFRtHQKEE2kXljhNlSkg=;
-        b=ii0b05crGDg87fqW37nRsmwrVkeg1KC8VS7o1O82MtoNly8wKtvgVdcUyI+KBGCPcp
-         +zzi0BuqIkNQ6ZmO6cmiaE7cqr1Cj8sJwjSIQn7vodljNU4KYk08ByjlNwuQYonK2T8G
-         Ez2cguNAfBvkfX2fCqrtt+LgaDNnqXZGftvZYBHxV2lU+3aCs6rMhVqnszZS7Cr+EytS
-         kEnG67rUk5m8jAPHdqxmvgULautYJgT/CkoZOt3tffUKNmlGQR3vcNU4bYNAeteHWjlt
-         sEnXilYOw0nsFXAv+3qGjx0dQlT12H5PqvMIHo71v3lV0vYrcjsyseMaeSXR0LI0El5b
-         CAMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJqMB9HVhawOQYer1n7+7v74ow03sZvAmm8XgZH/V654+Mp2FP+PYuWltOxt5pYgrNWUwFcHw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk0dYetV27ObI6qYLd/i9V29MORwo+ZSOFZztxCRpupEL9Z2iW
-	tlyGcKDRrbKs+VNavr3mm54lPa2kmccsHgKrrj9ob1YuO6whzSuG8q+Cot5VOP0X2c/ni4wj0MN
-	0dHeyRIHy0VsDyRVJDWPtptKAsULF/VLIthN5W98oANwWTor9hLrdmQ==
-X-Gm-Gg: ASbGncvM+MfHy/Lz799BDkoevgb/cNfSlucijYYF/ZvI2TLeiPkPlZvDWne4CCulVG6
-	6Divi2pJSNu/jvjV0q/g1mnRqlTZXk+5KwbLOAEFZ9uyleV1FQP6cPtOkwZ16fVvsAAyiXDfVK3
-	qpZjGgQxqK0R8rgHYDdpoEi+FOusQaZ/8SscsjyqnMhhn67Utq9PO8a1xdoJNBHeAWwYQ7h7Qn1
-	0wTOQhlb0n0GxayE9p0pu0nCqwCCHwRw2cfqG07eDlAxCIunx0BBtNN5ye08xqP8u7TAMuWxZrQ
-	bU1XYF4HXw7/ugkdaw==
-X-Received: by 2002:a5d:59ad:0:b0:38d:fede:54f8 with SMTP id ffacd0b85a97d-39edc30d6ccmr2356124f8f.16.1744723101918;
-        Tue, 15 Apr 2025 06:18:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwioPX2tvWeuXNcwluD612yA09xaQv88aBPnGiEZMhAjoAUBOAI3L4bBrGPmpi0pbUsZgqIA==
-X-Received: by 2002:a5d:59ad:0:b0:38d:fede:54f8 with SMTP id ffacd0b85a97d-39edc30d6ccmr2356058f8f.16.1744723100693;
-        Tue, 15 Apr 2025 06:18:20 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.149.183])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96bdb5sm14012396f8f.21.2025.04.15.06.18.18
+        bh=HDFRVUvYARrrdoMVKwNSz9nrR/1vGVN5NRO4r+H+6kk=;
+        b=cZlG01KZ0i7hNLFfsLMX4MVcUOzEDuGHPw5RGZ9bRVcVPh37bsAGxmQnQ33U+UTHVL
+         OplLq+rtc2iZny/6HBZzF4rmWILd1vQwDmFy/tsvHRdba4WU/GPWwmu79664gIbr8Wc1
+         vMOxZbPkW5aEB/p6sYB2/dpL9XAgeHrgy+f2rUFP1adwCQAAobdmZXyP3gan9jYCZ/1a
+         oySZlSjofKEK6mKtiH+nuLepoQsNQKbrwD5XlyTqdGFy3wpBi2ayHbHVzgY2CsKpGjum
+         ZjQpanNGDOLvSQwEkIs7cWiWYdt8OBL7neNuDW8tRKXa+IhF9erdTOH6uWgB+pDgS3+g
+         srwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8eWXwoTzxvQV7GRfFs4IzUknTecD6gooJ+2J5II10LmJkRKQ9vqAZO2ynclviWGHKNmq579o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlpdKHv3kk4+JRxAktxRLcW4wpyDmElUVLBCqZl31blnvPdIh2
+	Ip5D/Jgo34tluqh2ROCQ62aO/F5CcOA9yp1JiBLpxAVOI6xWva34ahADKKW9BZETwJoU2VQZx4z
+	V15H8bfDSIAivTj6f6LUtntTeQy8mATbsoZwS72FznmmSW2SJMVcXLQ==
+X-Gm-Gg: ASbGncu0jAqGGM+E0fgBcfKqI59WIDFwispTCYcH/4GKHRONnf+QBY/PJv7Jjbu9yie
+	3c1x6Uyamrxoq/6564Fq7vwud8CrQzWS96bQ7TOChVXVS7fgNIb1AdGXhIrBx+Zczxb6D3hpTKN
+	/9nHtiytoqLa0c7q/sBzXZE2G5SooOCQDY6DtIPlLgmYjATM1BAzJAE1FoUNrYCrj/qT6IOICM+
+	Bk5fSBpF0/R4KW8Y9PUChSwupEEqxR1j9ovWorWEK/pcYKa1sqDW8AW9yFwxuXIvaKsoT/QPzHg
+	qiMyTA==
+X-Received: by 2002:a5d:6d82:0:b0:38f:2b77:a9f3 with SMTP id ffacd0b85a97d-39eaaecd9d3mr14812790f8f.43.1744723171088;
+        Tue, 15 Apr 2025 06:19:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH3g59/gkleqCg6T/d47/qE3AgIRCAsXkZY+0Zs8YtzSwtO0Ld+xwTSwCyCTlke980a+IysoQ==
+X-Received: by 2002:a5d:6d82:0:b0:38f:2b77:a9f3 with SMTP id ffacd0b85a97d-39eaaecd9d3mr14812768f8f.43.1744723170724;
+        Tue, 15 Apr 2025 06:19:30 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f206269c8sm217509515e9.16.2025.04.15.06.19.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 06:18:20 -0700 (PDT)
-Date: Tue, 15 Apr 2025 15:18:09 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: bytes_unsent forever elevated (was Re: [PATCH net 2/2]
- vsock/test: Add test for SO_LINGER null ptr deref)
-Message-ID: <wxdauup4s54jjgi55n6m2eylnn2r64rorvsouevo3sivbpmnfb@yf5lt6yk7ro7>
-References: <vsghmgwurw3rxzw32najvwddolmrbroyryquzsoqt5jr3trzif@4rjr7kwlaowa>
- <df2d51fd-03e7-477f-8aea-938446f47864@rbox.co>
- <xafz4xrgpi5m3wedkbhfx6qoqbbpogryxycrvawwzerge3l4t3@d6r6jbnpiyhs>
- <f201fcb6-9db9-4751-b778-50c44c957ef2@rbox.co>
- <hkhwrfz4dzhaco4mb25st5zyfybimchac3zcqsgzmtim53sq5o@o4u6privahp3>
- <aa00af3b-2bb1-4c09-8222-edeec0520ae1@rbox.co>
- <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
- <7566fe52-23b7-46cc-95ef-63cbbd3071a1@rbox.co>
- <kiz4tjwsvauyupixpccqug5wt7tq7g3mld5yy5drpg5zxkmiap@3z625aedysx7>
- <e07fd95c-9a38-4eea-9638-133e38c2ec9b@rbox.co>
+        Tue, 15 Apr 2025 06:19:30 -0700 (PDT)
+Date: Tue, 15 Apr 2025 09:19:26 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] virtio-net: disable delayed refill when pausing rx
+Message-ID: <20250415091917-mutt-send-email-mst@kernel.org>
+References: <20250415074341.12461-1-minhquangbui99@gmail.com>
+ <20250415074341.12461-2-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e07fd95c-9a38-4eea-9638-133e38c2ec9b@rbox.co>
+In-Reply-To: <20250415074341.12461-2-minhquangbui99@gmail.com>
 
-On Fri, Apr 11, 2025 at 04:44:43PM +0200, Michal Luczaj wrote:
->On 4/11/25 15:21, Stefano Garzarella wrote:
->> On Fri, Apr 04, 2025 at 12:06:36AM +0200, Michal Luczaj wrote:
->>> On 4/1/25 12:32, Stefano Garzarella wrote:
->>>> On Tue, Mar 25, 2025 at 02:22:45PM +0100, Michal Luczaj wrote:
->>>>> ...
->>>>> Turns out there's a way to purge the loopback queue before worker processes
->>>>> it (I had no success with g2h). If you win that race, bytes_unsent stays
->>>>> elevated until kingdom come. Then you can close() the socket and watch as
->>>>> it lingers.
->>>>>
->>>>> connect(s)
->>>>>  lock_sock
->>>>>  while (sk_state != TCP_ESTABLISHED)
->>>>>    release_sock
->>>>>    schedule_timeout
->>>>>
->>>>> // virtio_transport_recv_connecting
->>>>> //   sk_state = TCP_ESTABLISHED
->>>>>
->>>>>                                       send(s, 'x')
->>>>>                                         lock_sock
->>>>>                                         virtio_transport_send_pkt_info
->>>>>                                           virtio_transport_get_credit
->>>>>                                    (!)      vvs->bytes_unsent += ret
->>>>>                                           vsock_loopback_send_pkt
->>>>>                                             virtio_vsock_skb_queue_tail
->>>>>                                         release_sock
->>>>>                                       kill()
->>>>>    lock_sock
->>>>>    if signal_pending
->>>>>      vsock_loopback_cancel_pkt
->>>>>        virtio_transport_purge_skbs (!)
->>>>>
->
->So is this something to worry about? The worst consequence I can think of
->is: linger with take place when it should not.
+On Tue, Apr 15, 2025 at 02:43:39PM +0700, Bui Quang Minh wrote:
+> When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
+> napi_disable() on the receive queue's napi. In delayed refill_work, it
+> also calls napi_disable() on the receive queue's napi.  When
+> napi_disable() is called on an already disabled napi, it will sleep in
+> napi_disable_locked while still holding the netdev_lock. As a result,
+> later napi_enable gets stuck too as it cannot acquire the netdev_lock.
+> This leads to refill_work and the pause-then-resume tx are stuck
+> altogether.
+> 
+> This scenario can be reproducible by binding a XDP socket to virtio-net
+> interface without setting up the fill ring. As a result, try_fill_recv
+> will fail until the fill ring is set up and refill_work is scheduled.
+> 
+> This commit adds virtnet_rx_(pause/resume)_all helpers and fixes up the
+> virtnet_rx_resume to disable future and cancel all inflights delayed
+> refill_work before calling napi_disable() to pause the rx.
+> 
+> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 
-Yep, I see. My question is (I think I wrote this last week also), if the 
-socket connected, even though we were interrupted, why do we close it?
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Maybe we need to see what TCP does, but actually as you said, there may 
-be a race with another thread that has already started using the socket 
-after the successful connection.
-
-So would it be better to avoid closing the socket if it is connected, 
-even if it has been interrupted?
-
-Thanks,
-Stefano
+> ---
+>  drivers/net/virtio_net.c | 69 +++++++++++++++++++++++++++++++++-------
+>  1 file changed, 57 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7e4617216a4b..848fab51dfa1 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3342,7 +3342,8 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	return NETDEV_TX_OK;
+>  }
+>  
+> -static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+> +static void __virtnet_rx_pause(struct virtnet_info *vi,
+> +			       struct receive_queue *rq)
+>  {
+>  	bool running = netif_running(vi->dev);
+>  
+> @@ -3352,17 +3353,63 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+>  	}
+>  }
+>  
+> -static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
+> +static void virtnet_rx_pause_all(struct virtnet_info *vi)
+> +{
+> +	int i;
+> +
+> +	/*
+> +	 * Make sure refill_work does not run concurrently to
+> +	 * avoid napi_disable race which leads to deadlock.
+> +	 */
+> +	disable_delayed_refill(vi);
+> +	cancel_delayed_work_sync(&vi->refill);
+> +	for (i = 0; i < vi->max_queue_pairs; i++)
+> +		__virtnet_rx_pause(vi, &vi->rq[i]);
+> +}
+> +
+> +static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+> +{
+> +	/*
+> +	 * Make sure refill_work does not run concurrently to
+> +	 * avoid napi_disable race which leads to deadlock.
+> +	 */
+> +	disable_delayed_refill(vi);
+> +	cancel_delayed_work_sync(&vi->refill);
+> +	__virtnet_rx_pause(vi, rq);
+> +}
+> +
+> +static void __virtnet_rx_resume(struct virtnet_info *vi,
+> +				struct receive_queue *rq,
+> +				bool refill)
+>  {
+>  	bool running = netif_running(vi->dev);
+>  
+> -	if (!try_fill_recv(vi, rq, GFP_KERNEL))
+> +	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+>  		schedule_delayed_work(&vi->refill, 0);
+>  
+>  	if (running)
+>  		virtnet_napi_enable(rq);
+>  }
+>  
+> +static void virtnet_rx_resume_all(struct virtnet_info *vi)
+> +{
+> +	int i;
+> +
+> +	enable_delayed_refill(vi);
+> +	for (i = 0; i < vi->max_queue_pairs; i++) {
+> +		if (i < vi->curr_queue_pairs)
+> +			__virtnet_rx_resume(vi, &vi->rq[i], true);
+> +		else
+> +			__virtnet_rx_resume(vi, &vi->rq[i], false);
+> +	}
+> +}
+> +
+> +static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
+> +{
+> +	enable_delayed_refill(vi);
+> +	__virtnet_rx_resume(vi, rq, true);
+> +}
+> +
+>  static int virtnet_rx_resize(struct virtnet_info *vi,
+>  			     struct receive_queue *rq, u32 ring_num)
+>  {
+> @@ -5959,12 +6006,12 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+>  	if (prog)
+>  		bpf_prog_add(prog, vi->max_queue_pairs - 1);
+>  
+> +	virtnet_rx_pause_all(vi);
+> +
+>  	/* Make sure NAPI is not using any XDP TX queues for RX. */
+>  	if (netif_running(dev)) {
+> -		for (i = 0; i < vi->max_queue_pairs; i++) {
+> -			virtnet_napi_disable(&vi->rq[i]);
+> +		for (i = 0; i < vi->max_queue_pairs; i++)
+>  			virtnet_napi_tx_disable(&vi->sq[i]);
+> -		}
+>  	}
+>  
+>  	if (!prog) {
+> @@ -5996,13 +6043,12 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+>  		vi->xdp_enabled = false;
+>  	}
+>  
+> +	virtnet_rx_resume_all(vi);
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		if (old_prog)
+>  			bpf_prog_put(old_prog);
+> -		if (netif_running(dev)) {
+> -			virtnet_napi_enable(&vi->rq[i]);
+> +		if (netif_running(dev))
+>  			virtnet_napi_tx_enable(&vi->sq[i]);
+> -		}
+>  	}
+>  
+>  	return 0;
+> @@ -6014,11 +6060,10 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+>  			rcu_assign_pointer(vi->rq[i].xdp_prog, old_prog);
+>  	}
+>  
+> +	virtnet_rx_resume_all(vi);
+>  	if (netif_running(dev)) {
+> -		for (i = 0; i < vi->max_queue_pairs; i++) {
+> -			virtnet_napi_enable(&vi->rq[i]);
+> +		for (i = 0; i < vi->max_queue_pairs; i++)
+>  			virtnet_napi_tx_enable(&vi->sq[i]);
+> -		}
+>  	}
+>  	if (prog)
+>  		bpf_prog_sub(prog, vi->max_queue_pairs - 1);
+> -- 
+> 2.43.0
 
 
