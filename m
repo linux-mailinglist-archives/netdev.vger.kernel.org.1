@@ -1,123 +1,102 @@
-Return-Path: <netdev+bounces-182693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EA0A89B5E
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:04:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7133BA89B6F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16C49176B82
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:04:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6ED53B646C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CE927FD6E;
-	Tue, 15 Apr 2025 11:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F15288C84;
+	Tue, 15 Apr 2025 11:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z2liOoDp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MAy+kUu6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811AC2417C8
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 11:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E585D2417C8;
+	Tue, 15 Apr 2025 11:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744715092; cv=none; b=kWuNux/+6MI7AwkJIqeUpY4xjr2iVYShXWUxxLjOwi+FinC1xu6QS8xOsdcfnQZuF7h2Ti5vWzSGyabOlMnR0F1xDFQxKilGWLzgfFpGWIYpERV8lzOdMEGoCK8zFtPuRTAmLwKdlhSSa5QvRgmvKKMUOC6qO1p/fZ20SNWodVA=
+	t=1744715209; cv=none; b=XGvSEhdyEEaHo5DZ3dOJbreI69Uoa9W3P5nTeGQYfJ456L2ojfLd6FrvqASmHgw0uJTuK0YKDSd30yPipp1odRKn0qe31jQqP52Gbr6jtyYGWcZYkIt+bm1J6M7zrN2UCRT8eHb+OLi3UL2flrGyVsglxidr2fYUbQAdyQwsrPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744715092; c=relaxed/simple;
-	bh=GSu6JHo+YSCZ8F3pdRafzygNXm1hMM/Juu0glZnvuCU=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=XrW9z7eKrb1MTGgbGdY74PIBYKGIE3kr995NPUdfXv3bQugrfxQ8m3auZ49nhvqe4VUWIC0TjnEway+1JiWdF4TfIHJAuQ6frzJHbXmML0X8zeOeA1ZNlyS55k7TLR6GfMXBxiX4v+jZ7S7EEq0VPoz1m/avtLAnEFW9sUCtTzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z2liOoDp; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744715209; c=relaxed/simple;
+	bh=Ha0elEjMP6yRTsucjzFgdJXqzOY/qP0SIL9jP1gI9zY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DsvWeaoF5wEKYPH5qsRg7X1GbfJDeShgkO9gOxbGCXyp8LBrimYJkByzY1K3PozsGmC3VqlYRJGmRZFTjdaNjzRAqNGzmotFVAybKIK+WJTLlYrFUbTjQXCWVavcypjFfKn0KbpQUOTo1a5l1KAhpiTbswdQVF4obiosGuzYr6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MAy+kUu6; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DD3D54333F;
+	Tue, 15 Apr 2025 11:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744715205;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=udU7VdwDyMJ3EQPBOEs8+xexnGGNWkNKUrKue8Vn0cU=;
+	b=MAy+kUu6XYprpvyB25g/DO0TGELhc5Rxkkc0RFGGgSdkXUkcI5UK41CK+H08djf1xkeheO
+	sh5NG8p8T4LWiwyRhYNueufUaZziKHiqRrfF3YADbuisMVhNMDpE0a5pRd9XsOouRH9CbW
+	KcH7a+h6rgo/EfumJK+nt1o1MXNBpQ+na70auxJ484YUZgC1KgpXUzxmUPg2GgkBHPTzDR
+	vt048Qh0DbOBar99p6W6IWhdXWbJDMJwG35KLBLtz5G0BSK4ZVEwzdTjCpoX9jQLjDZXo3
+	JipGw4zRJvJeG7IgYW+oUYInFT89xTPDbHvGXwgwiTtBujxC40ZNP4YYCFcm2A==
+Date: Tue, 15 Apr 2025 13:06:42 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray
+ <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
+ Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>, Nishanth Menon
+ <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Tero Kristo
+ <kristo@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 3/4] net: ethernet: ti: am65-cpsw: fixup PHY
+ mode for fixed RGMII TX delay
+Message-ID: <20250415130642.00410100@fedora.home>
+In-Reply-To: <32e0dffa7ea139e7912607a08e391809d7383677.1744710099.git.matthias.schiffer@ew.tq-group.com>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	<32e0dffa7ea139e7912607a08e391809d7383677.1744710099.git.matthias.schiffer@ew.tq-group.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744715078;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fbbEvmW5ERCV6V3g0BQvaj+wv5+2mrjsX8ION5ZUGEQ=;
-	b=Z2liOoDpBAthCTgDeMWcJWeim/QFw+glL9/xaSwlyqtGJyeauIlabk9niKOZMPYjfHgBzh
-	FsYiV11/pKzTpBy0e1rofeZFzFsMBAqsDvD6JxbqiwI4ZSrLm53lP9McBeip/W8BxgW8z9
-	Sbj5KiXaSCi+EbSX9V8bFMtKTZiQO0Q=
-Date: Tue, 15 Apr 2025 11:04:36 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <e60b4acd2780eed0a0f89ee40df32cf518545cc4@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: Introduce tracing
- capability for sockmap
-To: "Cong Wang" <xiyou.wangcong@gmail.com>
-Cc: bpf@vger.kernel.org, mrpre@163.com, "Jakub Sitnicki"
- <jakub@cloudflare.com>, "Steven Rostedt" <rostedt@goodmis.org>, "Alexei
- Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
- "John Fastabend" <john.fastabend@gmail.com>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>,
- "Jiri Olsa" <jolsa@kernel.org>, "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-In-Reply-To: <Z/19S2yMP/2TViMa@pop-os.localdomain>
-References: <20250414161153.14990-1-jiayuan.chen@linux.dev>
- <Z/19S2yMP/2TViMa@pop-os.localdomain>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeffedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeeftdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepheetveefiedvkeejfeekkefffefgtdduteejheekgeeileehkefgfefgveevfffhnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdehpdhrtghpthhtohepmhgrthhthhhirghsrdhstghhihhffhgvrhesvgifrdhtqhdqghhrohhuphdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvm
+ hesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-April 15, 2025 at 05:25, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
+On Tue, 15 Apr 2025 12:18:03 +0200
+Matthias Schiffer <matthias.schiffer@ew.tq-group.com> wrote:
 
->=20
->=20On Tue, Apr 15, 2025 at 12:11:45AM +0800, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> +#ifndef __TRACE_SOCKMAP_HELPER_ONCE_ONLY
-> >  +#define __TRACE_SOCKMAP_HELPER_ONCE_ONLY
-> >  +
-> >  +enum sockmap_direct_type {
-> >  + SOCKMAP_REDIR_NONE =3D 0,
-> >  + SOCKMAP_REDIR_INGRESS,
-> >  + SOCKMAP_REDIR_EGRESS,
-> >  +};
-> >=20
->=20
-> I am curious why you need to define them here since you already pass
-> 'ingress' as a parameter? Is it possible to reuse the BPF_F_INGRESS bit=
-?
-> Thanks!
->
+> All am65-cpsw controllers have a fixed TX delay, so the PHY interface
+> mode must be fixed up to account for this.
+> 
+> Modes that claim to a delay on the PCB can't actually work. Warn people
+> to update their Device Trees if one of the unsupported modes is specified.
+> 
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 
-The lowest bit of skb->_redir being 0 indicates EGRESS, so we cannot use
-the built-in __print_flag for output in this case, since it requires the
-corresponding bit to be set to 1.
+This looks good to me,
 
-We could certainly do this instead:
-'''
-if (act !=3D REDIRECT)
-    redir =3D "none"
-else if (flag & BPF_F_INGRESS)
-    redir =3D "ingress"
-else
-    redir =3D "egress"
-'''
-However, as Steven mentioned earlier, using an enum instead would be bett=
-er
-here for trace_event.
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Of course, we could directly print the hexadecimal value of _redir, but
-that would result in poor readability.
-
-Thanks~
+Maxime
 
