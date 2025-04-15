@@ -1,78 +1,88 @@
-Return-Path: <netdev+bounces-182554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D86A8913B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:25:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A66A8913F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:28:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B24373A6A3A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94B953A9066
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D68E1EDA23;
-	Tue, 15 Apr 2025 01:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EDC1F5616;
+	Tue, 15 Apr 2025 01:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y/hEhMwv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmH07lrM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981D73C463;
-	Tue, 15 Apr 2025 01:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BEE3C463;
+	Tue, 15 Apr 2025 01:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744680353; cv=none; b=g5KfBEQiNVZl7E1XsZzpYqo1Fx4IoihrUjIeju9aNMPS0FPqLWBA6F79BK0eTLF3AhX9JvOdQzwU4xAgx6Sso1BCVZ43W3gCJSOIKEuJiP3kmlUcDJwHvkmw2cC5MplybODDKO0ejmwDCE1v1Jqwt6lbe5NqDxKXn1RUokBE0h4=
+	t=1744680502; cv=none; b=QE7iEJV/h+vU4tTcl6TQO2smvIS1YV0wUNJLF6EbtWkyvsNy6xK/A8L3pA2fLH/mbPrdkZOTU5ewrHfXL+5pzOO/vRlkwfeFG6ibMh7zn5Wlpbe/kK/KwMWgy7uCqfscfKjM955JyqjLH3cFAyTCnELhtVCWWrZm4PybCqmmk3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744680353; c=relaxed/simple;
-	bh=3L5DSr/anAjq8rWMjWVJIGggboFLg0bqXrEZBkvR1MQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gK2bCIE9cCIRkHsT3PF8KBKFBsmQSbYSioEjySIFfXd/cqpTf87+j06vXQFK+Qeca0B9eTwwdFm/nGLsfmCNurK40qGh27/mj7LzgttT1iYvQ41//Vq7uuRaOmCiM78+zq3n4PYXDVIwbh1KylFRMOZqznrZ+dN5PT1ZZx7UOY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y/hEhMwv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UryYSTd8Isjnz2wM5TnUkjl6yKqC9KB3q5AYQ1Y23cM=; b=Y/hEhMwv5TlnUB65S7T+02PL1r
-	mEBh2jgbsv81dWMrNkys99ti5SbA6ADPgDFOzUYctzoCClKOrRNPLnK4YX5LvdBc6TqpC4TzDblJ+
-	VlANMlHYLwNdeqAqjR0s2yRuKtHdzijWPd568gdu88KQba7MtPUoMRFkKkJ2XPxGb7BM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4V3N-009Jnh-47; Tue, 15 Apr 2025 03:25:33 +0200
-Date: Tue, 15 Apr 2025 03:25:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sander@svanheule.net, markus.stockhausen@gmx.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <80c5d0a4-e495-429f-9f8a-27be41e2318b@lunn.ch>
-References: <20250409231554.3943115-1-chris.packham@alliedtelesis.co.nz>
+	s=arc-20240116; t=1744680502; c=relaxed/simple;
+	bh=qOiLzz5Ys8eSSLqOWk5VgHA3ONL6mmYMIxRWgNUdq0w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fQKKc0t6oNJeRBgOf9YRRakABxCcH48FfNa7e1hXSzyhVb85d1ECBDHuYdduQZApm1VOb4nPQtVj4UKWtEeZuUPCjMJo2eGKoJtJK7uF3voyBSP8GAmlnAk3mffs4kjoOqN+d3l5qPFlrElFLUUfiTt7sHntsmfh/Rtka3znNL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmH07lrM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD09C4CEE2;
+	Tue, 15 Apr 2025 01:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744680501;
+	bh=qOiLzz5Ys8eSSLqOWk5VgHA3ONL6mmYMIxRWgNUdq0w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HmH07lrMHaqvYw2TUmzSVnmklXNNFlYxJPI6IJEXLClrjQEwLdeDGu7a5pKuVGjnT
+	 UQHg4viqaE+XD/0YfBHNAzyqIf1q2dOTlRNz+ZS0M2CfEUrGbd+K3zW52t+caMHZzh
+	 NxPV+fGt7E37dD8jmElvwG/HyQfY9Xg6tRn1K3o2Z65urYXd/CRCZUSbZRyHx7gHsp
+	 329nHQ7eSvNZfIz/NcxCPOyzEhXj+dt1vdlUi2CIvaR3rxR0G++WR6FBChvwTMGFj9
+	 u0BcCSav4jHIEN9JwTwAS3vCTEHuyh4DvE9C+4igenTlFtZvaxaG2T9pV7kSu0x+nk
+	 ahGsmqeDHgO+A==
+Date: Mon, 14 Apr 2025 18:28:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
+ <lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
+ <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
+ <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
+ <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
+ Damato <jdamato@fastly.com>
+Subject: Re: [PATCH net-next v10 1/1] hinic3: module initialization and
+ tx/rx logic
+Message-ID: <20250414182820.370e9feb@kernel.org>
+In-Reply-To: <f74da5b6deceacf4e21cd6fa126e88acd3e8b824.1744286279.git.gur.stavi@huawei.com>
+References: <cover.1744286279.git.gur.stavi@huawei.com>
+	<f74da5b6deceacf4e21cd6fa126e88acd3e8b824.1744286279.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409231554.3943115-1-chris.packham@alliedtelesis.co.nz>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 10, 2025 at 11:15:54AM +1200, Chris Packham wrote:
-> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
-> switches with integrated SoC. There are 4 physical SMI interfaces on the
-> RTL9300 however access is done using the switch ports. The driver takes
-> the MDIO bus hierarchy from the DTS and uses this to configure the
-> switch ports so they are associated with the correct PHY. This mapping
-> is also used when dealing with software requests from phylib.
-> 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+On Thu, 10 Apr 2025 15:15:51 +0300 Gur Stavi wrote:
+> +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+> +	if (err) {
+> +		dev_warn(&pdev->dev, "Couldn't set 64-bit DMA mask\n");
+> +		/* try 32 bit DMA mask if 64 bit fails */
+> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+> +		if (err) {
+> +			dev_err(&pdev->dev, "Failed to set DMA mask\n");
+> +			goto err_release_regions;
+> +		}
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Please take a look at commit 004464835bfc ("hinic: Remove useless
+DMA-32 fallback configuration"). This construct was removed in your
+other driver now you're bringing it back.
 
