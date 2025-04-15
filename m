@@ -1,178 +1,100 @@
-Return-Path: <netdev+bounces-182681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE615A89A64
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:37:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20551A89A78
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 795583A37BC
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:36:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 314A717ABD4
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE68A27B4EF;
-	Tue, 15 Apr 2025 10:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ons7m0hO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AA3289376;
+	Tue, 15 Apr 2025 10:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27FE1CEAA3;
-	Tue, 15 Apr 2025 10:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26A31E0E0C
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 10:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744713421; cv=none; b=XdBy9D4ahPnW4kAktUYee3b9SzSoXrgQaxN/Ru5799uyTAsJSWOr3G2V1sZWalcRICHetme0mQVw0QQiBO1xiEz5KJCqM9iDYILBAfMdlKqYDKBSrC9Iz1PSRktQQBDSJYOSFN+dGuX/m/ote7Zw09CzpGeAzVc27NSN+JY2zNk=
+	t=1744713624; cv=none; b=BGoHPJ7B95sVjKHXXrPP6fgnV8IY4NJ/GFvXCPMqHutnN9221Bran+0eqAltP9qcBfdKqO6VG0QnDz5c4lV3IpF3caYjowBVnfKKUJBpgjwE5Uxhgar6I455I9b33P9i9pg4HPDWckwFuNpD23g6GrmhoKi5UGHs9ylQVyKCrRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744713421; c=relaxed/simple;
-	bh=wx4mo1LEKkoBZxLsIQ9KT/z2lr/0ddIEgTR9LY19wIY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPjRDmrTr7v35UqjJ9j3V8mK/e1zBA2jS1ITfS1fN2zg3+vlk5orN97KgRPfWXrSEs1r3GkNhnyYcu+G8rzwJPF2A57IbJ6zf+5ZOiU6huI/jz+KMQg/yRaTyaLY219oQjQYB9fKzHxGX7gVtw6Eo1FgC21N0ydfoLZx4qN0GJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ons7m0hO; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53FAaXB32330796
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Apr 2025 05:36:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1744713394;
-	bh=CM1FfPxfT6qnGQR4NUV0eAkHxH46NNtG6XNVqSWakkc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=ons7m0hOXmjdWeM8ngfIhGEh25WQ/OKmnzeqD8KBWTVxgFA6gcDtM3AkeT+k5TfFa
-	 rm40vZh6RA3UuZ2YVaFCkPVmtG3G+0Aeb6e2N9jqQB5EoK8DKCXkgwIiVc9v5dzOeQ
-	 zpxFFM6SC3gQk4ObqM05Q5ERQP1VlvidXZnpqbv8=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53FAaXrB008560
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 15 Apr 2025 05:36:33 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 15
- Apr 2025 05:36:33 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 15 Apr 2025 05:36:33 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53FAaWR6017032;
-	Tue, 15 Apr 2025 05:36:32 -0500
-Date: Tue, 15 Apr 2025 16:06:31 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Andy Whitcroft <apw@canonical.com>,
-        Dwaipayan Ray
-	<dwaipayanray1@gmail.com>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Joe
- Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-        Nishanth Menon
-	<nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Siddharth Vadapalli
-	<s-vadapalli@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, Tero Kristo
-	<kristo@kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux@ew.tq-group.com>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <6be3bdbe-e87e-4e83-9847-54e52984c645@ti.com>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	s=arc-20240116; t=1744713624; c=relaxed/simple;
+	bh=AgOaXgjLwCqnjPYXHap1rE1GdF6NmnxUolRQOeY/cVw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eZ3vLJ7AZvdFfR/QwDDUOcoapkEctNJpzGxqf5111AnD2HYcOE6y8fsiRzFkZIpBbE0K7v2do/mPhACL6ZZUyRultVAxvBOrsy98hc48SlOomsxBHBeRozyv8TUQw18CiyQlATzZoN7H4A20IH4hWWC2mpwM3A2WR/DjFnF1/ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3d585d76b79so43010395ab.1
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 03:40:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744713622; x=1745318422;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eP7Hz/J1y4fMiyeT9H2f5gML4RT7x+IK4QqchZbfjmI=;
+        b=cPvVlUGnne96cUvM5Zzr64YbJoFG7hXKAiwdFP83TjWJXdYDktylbPFiKZkfljCTrZ
+         +0ojf88vVV90/KQ5eeQwaF5GqCsc6qPY2XDHk7ZFCV3i9Bqkw6/OteiwBK+hoSgjV+b9
+         bJc9sR1+P+4L1q9lFxGxf4pN/D44tQMJ2aWdYz7VdlQDqn5noHSSn+SmxmjWqtDbuPoj
+         xfwCjgfqPJTkgwklgxIWNqRJG6A0QtMBuh7QcTUi6zjYwPZid3u++FZVobnbvjeKDhzA
+         pmtFuDmogIpnJhOsVhkvGj95b7AIKyPyRx805cvZB0pojEhute/qyzbCIB2j/oQVaP+5
+         mGTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOrZUaHZa2HuGtt50Ys+VIVCKZIyfbhz7A5gr6jojSOy7oKqhMTVG3RWgl3IvrareJitnSILQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynJ8tKiFAHcbfuElEKXkMKxyWzX5W1zAgX+mgXeHPvBBshn9Y3
+	1H/Vvi/NFRWQZGaRXoRb96RHkUhzVfUO6+t9y8LYoAR50ZnG0Mg6hUrkVHQ7CCzzlYb4ADdH0Yt
+	kykvblvIIG88pNyHvN2oiB2Myjq3XQ8TMgjZY8MeZPk0XwxLGpjVqOZI=
+X-Google-Smtp-Source: AGHT+IEHG4vd+gOPU+P1DxtVlQAKloyX2pka4ZAGczUOG5c6TwkAdjBAVMq6yK/FEroFMMSUuWTk4+Z5aiy2vMMA/jERtu91CWuz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-Received: by 2002:a05:6e02:2161:b0:3d0:443d:a5c3 with SMTP id
+ e9e14a558f8ab-3d7ec1d9a8amr136253415ab.3.1744713621887; Tue, 15 Apr 2025
+ 03:40:21 -0700 (PDT)
+Date: Tue, 15 Apr 2025 03:40:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67fe3795.050a0220.3483fc.004f.GAE@google.com>
+Subject: [syzbot] Monthly smc report (Apr 2025)
+From: syzbot <syzbot+list9b3d6b0c7970945b664e@syzkaller.appspotmail.com>
+To: jaka@linux.ibm.com, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 15, 2025 at 12:18:01PM +0200, Matthias Schiffer wrote:
-> As discussed [1], the comments for the different rgmii(-*id) modes do not
-> accurately describe what these values mean.
-> 
-> As the Device Tree is primarily supposed to describe the hardware and not
-> its configuration, the different modes need to distinguish board designs
+Hello smc maintainers/developers,
 
-If the Ethernet-Controller (MAC) is integrated in an SoC (as is the case
-with CPSW Ethernet Switch), and, given that "phy-mode" is a property
-added within the device-tree node of the MAC, I fail to understand how
-the device-tree can continue "describing" hardware for different board
-designs using the same SoC (unchanged MAC HW).
+This is a 31-day syzbot report for the smc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/smc
 
-How do we handle situations where a given MAC supports various
-"phy-modes" in HW? Shouldn't "phy-modes" then be a "list" to technically
-descibe the HW? Even if we set aside the "rgmii" variants that this
-series is attempting to address, the CPSW MAC supports "sgmii", "qsgmii"
-and "usxgmii/xfi" as well.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open.
 
-> (if a delay is built into the PCB using different trace lengths); whether
-> a delay is added on the MAC or the PHY side when needed should not matter.
-> 
-> Unfortunately, implementation in MAC drivers is somewhat inconsistent
-> where a delay is fixed or configurable on the MAC side. As a first step
-> towards sorting this out, improve the documentation.
-> 
-> Link: https://lore.kernel.org/lkml/d25b1447-c28b-4998-b238-92672434dc28@lunn.ch/ [1]
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> ---
->  .../bindings/net/ethernet-controller.yaml        | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 45819b2358002..2ddc1ce2439a6 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -74,19 +74,21 @@ properties:
->        - rev-rmii
->        - moca
->  
-> -      # RX and TX delays are added by the MAC when required
-> +      # RX and TX delays are part of the board design (through PCB traces). MAC
-> +      # and PHY must not add delays.
->        - rgmii
->  
-> -      # RGMII with internal RX and TX delays provided by the PHY,
-> -      # the MAC should not add the RX or TX delays in this case
-> +      # RGMII with internal RX and TX delays provided by the MAC or PHY. No
-> +      # delays are included in the board design; this is the most common case
-> +      # in modern designs.
->        - rgmii-id
->  
-> -      # RGMII with internal RX delay provided by the PHY, the MAC
-> -      # should not add an RX delay in this case
-> +      # RGMII with internal RX delay provided by the MAC or PHY. TX delay is
-> +      # part of the board design.
->        - rgmii-rxid
->  
-> -      # RGMII with internal TX delay provided by the PHY, the MAC
-> -      # should not add an TX delay in this case
-> +      # RGMII with internal TX delay provided by the MAC or PHY. RX delay is
-> +      # part of the board design.
+Some of the still happening issues:
 
-Since all of the above is documented in "ethernet-controller.yaml" and
-not "ethernet-phy.yaml", describing what the "MAC" should or shouldn't
-do seems accurate, and modifying it to describe what the "PHY" should or
-shouldn't do seems wrong.
+Ref Crashes Repro Title
+<1> 2917    Yes   possible deadlock in smc_vlan_by_tcpsk
+                  https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
+<2> 76      Yes   possible deadlock in smc_release
+                  https://syzkaller.appspot.com/bug?extid=621fd56ba002faba6392
+<3> 5       Yes   possible deadlock in smc_pnet_find_ism_resource
+                  https://syzkaller.appspot.com/bug?extid=f160105b2817964a0886
 
->        - rgmii-txid
->        - rtbi
->        - smii
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Regards,
-Siddharth.
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
