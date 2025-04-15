@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-183019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CC2A8AB0B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:14:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C81A8AB11
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41FAF1668F7
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 22:13:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676E21749BD
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 22:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAE2275872;
-	Tue, 15 Apr 2025 22:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A03279797;
+	Tue, 15 Apr 2025 22:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dbaCcG1M"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fmJZhQAM"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8D5275114;
-	Tue, 15 Apr 2025 22:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BAD27585B;
+	Tue, 15 Apr 2025 22:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744755195; cv=none; b=L6X9/PpGff6rNOa1CZCg4KeE1P1JTgVUCmrTaykuQmfDzXL+sEq6hVFtEY+LOqcaDQDmGC9mAK3ti9KZXY923dKDoHv4etsR/nA1nhkVTxhPqt0MaqULAnRrFdBfkxRaPATqEd4/sLeJCG1rSxm/+Iv9YppqIO8NqBhL3aR4x6c=
+	t=1744755196; cv=none; b=W+w+TYFrBGRtyQ8BYaCNNSij9UlE5c1O01Cw5IUoB9r6FkJEe6eysO/cq2ig9wgfpw1zkaibJyL7loBEdDFAm3QZ0XZntiJTfm9Sq8oNrwhWVSob3bRkf91A/l6Wj8xoVHzRZ0srTTPV+n4jHmVP0fOFwjHXCtF2yrouIM/zA9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744755195; c=relaxed/simple;
-	bh=3qwdck5MNpmjTF+Lkyp6Pg1gsouLZYzsUc0ojj4Owmw=;
+	s=arc-20240116; t=1744755196; c=relaxed/simple;
+	bh=xPK+3pqHPYmC6OZJ9HFEf3YIau5eeOaAfA9MFC7n0ik=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ir722dLpWQWIVYf12+9nGWfreUFL6tzK725wGqXfsBx4stj3ccPe285NylmYfa5KQ9+X+IGxv1IQtSST9Yc+9DprkoGAO3kU3oPi9omcSBmb00L+RQORwrJ2rj+V7Rni7BS03xjF6E5iY1eu4wJOuIH6SDguJ7m3HQK/Y3hU3/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dbaCcG1M; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=OAceC1kDWDU/xQjHLZ9T/tD6r0txbDTHjm5qbLpLEb3NqdXA6Lcmxyz6tYohuXWDKvxSQlgTWS6u6ErTfiK9XjHfonwiqUn8eAR3ROR7EcTtaONlWkdauCl02IBCdyuOiVovdwAPpL2sE4w1mPM30oFh1yMfIsmKRa06r7OHPdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fmJZhQAM; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744755194; x=1776291194;
+  t=1744755195; x=1776291195;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3qwdck5MNpmjTF+Lkyp6Pg1gsouLZYzsUc0ojj4Owmw=;
-  b=dbaCcG1MMeLQMYDMnaBcmUfd6uryEejnuKAgl4DY5yANPjU6zuNJuiHd
-   Q8JW6QXbbcaQEGxuQXHDg6F6QSpkt0IGu+5EKJYi8yoehc6H40Z6jM1GW
-   wcVNtE1h9877JZL5DG5peiUwb5HBN48bYc4j1COhJebjmVHxKovDfoxd6
-   mgBYghZVKgbViGwCL/OBXSlq5T6GnRg2fGwzMsorqlphvIzE8owmXJVVn
-   J93d4dsobdJ5F3ev+sy8zUPx4KpauDC7GETpOZD2hVkSky6aICyPfG3zM
-   M57w5htXTxEqR02w9MUTrMwIOV6lumjGVotFuqFlGWpvhTqvIfQeZuArn
-   Q==;
-X-CSE-ConnectionGUID: WutQPwfuTT6+fPDAEyUWyw==
-X-CSE-MsgGUID: CubtJjB9R32et0U2QJBN0w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46206639"
+  bh=xPK+3pqHPYmC6OZJ9HFEf3YIau5eeOaAfA9MFC7n0ik=;
+  b=fmJZhQAMVltlkr2QDGH2GD43nPy0V6+NNqUnzqh7bvq+5RdGDntEphi2
+   DD7lKH5U7PuniKErfSrggs8/4QUBn1r3NOIuFM7LY1nwOzwWG5FvC1Byw
+   a78hiXFuuzM7TXg0KEMUhv+IyvhyLiDLoZ5FkM5klQTN8gPRvnlV5DthM
+   p0wwmBFZYs/gzvcO5u3u6Yd62RotbFU7/YRjNAt5DWFzQ1U0ZBWjoU5Ds
+   pEK8nvbvz8WDX7YNxKKDnd8CJv6oakLozBIfTdgWzZWlrguqpEuVVrflq
+   SMeb6EoW46Fg6dfPtQHOBhWnqBUuhtPcSuPTSTnDH5bRDn49qXBXOWUj+
+   w==;
+X-CSE-ConnectionGUID: d9y6oN0KQ2iPKtNVBuLb0g==
+X-CSE-MsgGUID: zzcaLuAKQcudjSyR64ebqA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46206653"
 X-IronPort-AV: E=Sophos;i="6.15,214,1739865600"; 
-   d="scan'208";a="46206639"
+   d="scan'208";a="46206653"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 15:13:08 -0700
-X-CSE-ConnectionGUID: TbvYEzLoSTetHJhuRPBCYg==
-X-CSE-MsgGUID: Zaadrip2Qb2cC3lt55wpjA==
+X-CSE-ConnectionGUID: tFezshmpSzWm4Pn6847FHQ==
+X-CSE-MsgGUID: LN4PeELRRwiQMH4iFXysSg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,214,1739865600"; 
-   d="scan'208";a="131218542"
+   d="scan'208";a="131218546"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa008.jf.intel.com with ESMTP; 15 Apr 2025 15:13:08 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -76,9 +76,9 @@ Cc: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	Bharath R <bharath.r@intel.com>,
 	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Subject: [PATCH net-next v2 06/15] ixgbe: read the OROM version information
-Date: Tue, 15 Apr 2025 15:12:49 -0700
-Message-ID: <20250415221301.1633933-7-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 07/15] ixgbe: read the netlist version information
+Date: Tue, 15 Apr 2025 15:12:50 -0700
+Message-ID: <20250415221301.1633933-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250415221301.1633933-1-anthony.l.nguyen@intel.com>
 References: <20250415221301.1633933-1-anthony.l.nguyen@intel.com>
@@ -92,11 +92,10 @@ Content-Transfer-Encoding: 8bit
 
 From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
 
-Add functions reading the OROM version info and use them
+Add functions reading the netlist version info and use them
 as a part of the setting NVM info procedure.
 
 Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Tested-by: Bharath R <bharath.r@intel.com>
 Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
 Co-developed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
@@ -104,39 +103,37 @@ Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 169 ++++++++++++++++++
- .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  15 ++
- 2 files changed, 184 insertions(+)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 112 ++++++++++++++++++
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  33 ++++++
+ 2 files changed, 145 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 5d15fbd2e1a6..acd4eb8e391f 100644
+index acd4eb8e391f..af88a6afb411 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -2585,6 +2585,35 @@ static int ixgbe_read_nvm_module(struct ixgbe_hw *hw,
+@@ -2585,6 +2585,33 @@ static int ixgbe_read_nvm_module(struct ixgbe_hw *hw,
  	return err;
  }
  
 +/**
-+ * ixgbe_read_orom_module - Read from the active Option ROM module
++ * ixgbe_read_netlist_module - Read data from the netlist module area
 + * @hw: pointer to the HW structure
-+ * @bank: whether to read from active or inactive OROM module
-+ * @offset: offset into the OROM module to read, in words
++ * @bank: whether to read from the active or inactive module
++ * @offset: offset into the netlist to read from
 + * @data: storage for returned word value
 + *
-+ * Read the specified word from the active Option ROM module of the flash.
-+ * Note that unlike the NVM module, the CSS data is stored at the end of the
-+ * module instead of at the beginning.
++ * Read a word from the specified netlist bank.
 + *
 + * Return: the exit code of the operation.
 + */
-+static int ixgbe_read_orom_module(struct ixgbe_hw *hw,
-+				  enum ixgbe_bank_select bank,
-+				  u32 offset, u16 *data)
++static int ixgbe_read_netlist_module(struct ixgbe_hw *hw,
++				     enum ixgbe_bank_select bank,
++				     u32 offset, u16 *data)
 +{
 +	__le16 data_local;
 +	int err;
 +
-+	err = ixgbe_read_flash_module(hw, bank, IXGBE_E610_SR_1ST_OROM_BANK_PTR,
++	err = ixgbe_read_flash_module(hw, bank, IXGBE_E610_SR_NETLIST_BANK_PTR,
 +				      offset * sizeof(data_local),
 +				      (u8 *)&data_local, sizeof(data_local));
 +	if (!err)
@@ -146,195 +143,151 @@ index 5d15fbd2e1a6..acd4eb8e391f 100644
 +}
 +
  /**
-  * ixgbe_get_nvm_css_hdr_len - Read the CSS header length
-  * @hw: pointer to the HW struct
-@@ -2681,6 +2710,141 @@ static int ixgbe_get_nvm_srev(struct ixgbe_hw *hw,
+  * ixgbe_read_orom_module - Read from the active Option ROM module
+  * @hw: pointer to the HW structure
+@@ -2888,6 +2915,86 @@ static int ixgbe_get_nvm_ver_info(struct ixgbe_hw *hw,
  	return 0;
  }
  
 +/**
-+ * ixgbe_get_orom_civd_data - Get the combo version information from Option ROM
++ * ixgbe_get_netlist_info - Read the netlist version information
 + * @hw: pointer to the HW struct
-+ * @bank: whether to read from the active or inactive flash module
-+ * @civd: storage for the Option ROM CIVD data.
++ * @bank: whether to read from the active or inactive flash bank
++ * @netlist: pointer to netlist version info structure
 + *
-+ * Searches through the Option ROM flash contents to locate the CIVD data for
-+ * the image.
++ * Get the netlist version information from the requested bank. Reads the Link
++ * Topology section to find the Netlist ID block and extract the relevant
++ * information into the netlist version structure.
 + *
 + * Return: the exit code of the operation.
 + */
-+static int
-+ixgbe_get_orom_civd_data(struct ixgbe_hw *hw, enum ixgbe_bank_select bank,
-+			 struct ixgbe_orom_civd_info *civd)
++static int ixgbe_get_netlist_info(struct ixgbe_hw *hw,
++				  enum ixgbe_bank_select bank,
++				  struct ixgbe_netlist_info *netlist)
 +{
-+	struct ixgbe_orom_civd_info tmp;
-+	u32 offset;
++	u16 module_id, length, node_count, i;
++	u16 *id_blk;
 +	int err;
 +
-+	/* The CIVD section is located in the Option ROM aligned to 512 bytes.
-+	 * The first 4 bytes must contain the ASCII characters "$CIV".
-+	 * A simple modulo 256 sum of all of the bytes of the structure must
-+	 * equal 0.
++	err = ixgbe_read_netlist_module(hw, bank, IXGBE_NETLIST_TYPE_OFFSET,
++					&module_id);
++	if (err)
++		return err;
++
++	if (module_id != IXGBE_NETLIST_LINK_TOPO_MOD_ID)
++		return -EIO;
++
++	err = ixgbe_read_netlist_module(hw, bank, IXGBE_LINK_TOPO_MODULE_LEN,
++					&length);
++	if (err)
++		return err;
++
++	/* Sanity check that we have at least enough words to store the
++	 * netlist ID block.
 +	 */
-+	for (offset = 0; (offset + SZ_512) <= hw->flash.banks.orom_size;
-+	     offset += SZ_512) {
-+		u8 sum = 0;
-+		u32 i;
++	if (length < IXGBE_NETLIST_ID_BLK_SIZE)
++		return -EIO;
 +
-+		err = ixgbe_read_flash_module(hw, bank,
-+					      IXGBE_E610_SR_1ST_OROM_BANK_PTR,
-+					      offset,
-+					      (u8 *)&tmp, sizeof(tmp));
-+		if (err)
-+			return err;
-+
-+		/* Skip forward until we find a matching signature */
-+		if (memcmp(IXGBE_OROM_CIV_SIGNATURE, tmp.signature,
-+			   sizeof(tmp.signature)))
-+			continue;
-+
-+		/* Verify that the simple checksum is zero */
-+		for (i = 0; i < sizeof(tmp); i++)
-+			sum += ((u8 *)&tmp)[i];
-+
-+		if (sum)
-+			return -EDOM;
-+
-+		*civd = tmp;
-+		return 0;
-+	}
-+
-+	return -ENODATA;
-+}
-+
-+/**
-+ * ixgbe_get_orom_srev - Read the security revision from the OROM CSS header
-+ * @hw: pointer to the HW struct
-+ * @bank: whether to read from active or inactive flash module
-+ * @srev: storage for security revision
-+ *
-+ * Read the security revision out of the CSS header of the active OROM module
-+ * bank.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+static int ixgbe_get_orom_srev(struct ixgbe_hw *hw,
-+			       enum ixgbe_bank_select bank,
-+			       u32 *srev)
-+{
-+	u32 orom_size_word = hw->flash.banks.orom_size / 2;
-+	u32 css_start, hdr_len;
-+	u16 srev_l, srev_h;
-+	int err;
-+
-+	err = ixgbe_get_nvm_css_hdr_len(hw, bank, &hdr_len);
++	err = ixgbe_read_netlist_module(hw, bank, IXGBE_LINK_TOPO_NODE_COUNT,
++					&node_count);
 +	if (err)
 +		return err;
 +
-+	if (orom_size_word < hdr_len)
-+		return -EINVAL;
++	node_count &= IXGBE_LINK_TOPO_NODE_COUNT_M;
 +
-+	/* Calculate how far into the Option ROM the CSS header starts. Note
-+	 * that ixgbe_read_orom_module takes a word offset.
-+	 */
-+	css_start = orom_size_word - hdr_len;
-+	err = ixgbe_read_orom_module(hw, bank,
-+				     css_start + IXGBE_NVM_CSS_SREV_L,
-+				     &srev_l);
++	id_blk = kcalloc(IXGBE_NETLIST_ID_BLK_SIZE, sizeof(*id_blk), GFP_KERNEL);
++	if (!id_blk)
++		return -ENOMEM;
++
++	/* Read out the entire Netlist ID Block at once. */
++	err = ixgbe_read_flash_module(hw, bank, IXGBE_E610_SR_NETLIST_BANK_PTR,
++				      IXGBE_NETLIST_ID_BLK_OFFSET(node_count) *
++				      sizeof(*id_blk), (u8 *)id_blk,
++				      IXGBE_NETLIST_ID_BLK_SIZE *
++				      sizeof(*id_blk));
 +	if (err)
-+		return err;
++		goto free_id_blk;
 +
-+	err = ixgbe_read_orom_module(hw, bank,
-+				     css_start + IXGBE_NVM_CSS_SREV_H,
-+				     &srev_h);
-+	if (err)
-+		return err;
++	for (i = 0; i < IXGBE_NETLIST_ID_BLK_SIZE; i++)
++		id_blk[i] = le16_to_cpu(((__le16 *)id_blk)[i]);
 +
-+	*srev = srev_h << 16 | srev_l;
++	netlist->major = id_blk[IXGBE_NETLIST_ID_BLK_MAJOR_VER_HIGH] << 16 |
++			 id_blk[IXGBE_NETLIST_ID_BLK_MAJOR_VER_LOW];
++	netlist->minor = id_blk[IXGBE_NETLIST_ID_BLK_MINOR_VER_HIGH] << 16 |
++			 id_blk[IXGBE_NETLIST_ID_BLK_MINOR_VER_LOW];
++	netlist->type = id_blk[IXGBE_NETLIST_ID_BLK_TYPE_HIGH] << 16 |
++			id_blk[IXGBE_NETLIST_ID_BLK_TYPE_LOW];
++	netlist->rev = id_blk[IXGBE_NETLIST_ID_BLK_REV_HIGH] << 16 |
++		       id_blk[IXGBE_NETLIST_ID_BLK_REV_LOW];
++	netlist->cust_ver = id_blk[IXGBE_NETLIST_ID_BLK_CUST_VER];
++	/* Read the left most 4 bytes of SHA */
++	netlist->hash = id_blk[IXGBE_NETLIST_ID_BLK_SHA_HASH_WORD(15)] << 16 |
++			id_blk[IXGBE_NETLIST_ID_BLK_SHA_HASH_WORD(14)];
 +
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_get_orom_ver_info - Read Option ROM version information
-+ * @hw: pointer to the HW struct
-+ * @bank: whether to read from the active or inactive flash module
-+ * @orom: pointer to Option ROM info structure
-+ *
-+ * Read Option ROM version and security revision from the Option ROM flash
-+ * section.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+static int ixgbe_get_orom_ver_info(struct ixgbe_hw *hw,
-+				   enum ixgbe_bank_select bank,
-+				   struct ixgbe_orom_info *orom)
-+{
-+	struct ixgbe_orom_civd_info civd;
-+	u32 combo_ver;
-+	int err;
-+
-+	err = ixgbe_get_orom_civd_data(hw, bank, &civd);
-+	if (err)
-+		return err;
-+
-+	combo_ver = le32_to_cpu(civd.combo_ver);
-+
-+	orom->major = (u8)FIELD_GET(IXGBE_OROM_VER_MASK, combo_ver);
-+	orom->patch = (u8)FIELD_GET(IXGBE_OROM_VER_PATCH_MASK, combo_ver);
-+	orom->build = (u16)FIELD_GET(IXGBE_OROM_VER_BUILD_MASK, combo_ver);
-+
-+	return ixgbe_get_orom_srev(hw, bank, &orom->srev);
++free_id_blk:
++	kfree(id_blk);
++	return err;
 +}
 +
  /**
-  * ixgbe_get_nvm_ver_info - Read NVM version information
+  * ixgbe_get_flash_data - get flash data
   * @hw: pointer to the HW struct
-@@ -2768,6 +2932,11 @@ int ixgbe_get_flash_data(struct ixgbe_hw *hw)
+@@ -2937,6 +3044,11 @@ int ixgbe_get_flash_data(struct ixgbe_hw *hw)
  
- 	err = ixgbe_get_nvm_ver_info(hw, IXGBE_ACTIVE_FLASH_BANK,
- 				     &flash->nvm);
+ 	err = ixgbe_get_orom_ver_info(hw, IXGBE_ACTIVE_FLASH_BANK,
+ 				      &flash->orom);
 +	if (err)
 +		return err;
 +
-+	err = ixgbe_get_orom_ver_info(hw, IXGBE_ACTIVE_FLASH_BANK,
-+				      &flash->orom);
++	err = ixgbe_get_netlist_info(hw, IXGBE_ACTIVE_FLASH_BANK,
++				     &flash->netlist);
  	return err;
  }
  
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index cde24cbb6a82..905e6ed179ec 100644
+index 905e6ed179ec..91cc79aab388 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -26,6 +26,11 @@
- #define IXGBE_E610_SR_NETLIST_BANK_PTR		0x46
- #define IXGBE_E610_SR_NETLIST_BANK_SIZE		0x47
+@@ -45,6 +45,39 @@
+ /* Shadow RAM related */
+ #define IXGBE_SR_WORDS_IN_1KB	512
  
-+/* The OROM version topology */
-+#define IXGBE_OROM_VER_PATCH_MASK		GENMASK_ULL(7, 0)
-+#define IXGBE_OROM_VER_BUILD_MASK		GENMASK_ULL(23, 8)
-+#define IXGBE_OROM_VER_MASK			GENMASK_ULL(31, 24)
++/* The Netlist ID Block is located after all of the Link Topology nodes. */
++#define IXGBE_NETLIST_ID_BLK_SIZE		0x30
++#define IXGBE_NETLIST_ID_BLK_OFFSET(n)		IXGBE_NETLIST_LINK_TOPO_OFFSET(0x0004 + 2 * (n))
 +
- /* CSS Header words */
- #define IXGBE_NVM_CSS_HDR_LEN_L			0x02
- #define IXGBE_NVM_CSS_HDR_LEN_H			0x03
-@@ -1017,6 +1022,16 @@ struct ixgbe_hw_caps {
- #define IXGBE_EXT_TOPO_DEV_IMG_PROG_EN	BIT(1)
- } __packed;
- 
-+#define IXGBE_OROM_CIV_SIGNATURE	"$CIV"
++/* netlist ID block field offsets (word offsets) */
++#define IXGBE_NETLIST_ID_BLK_MAJOR_VER_LOW	0x02
++#define IXGBE_NETLIST_ID_BLK_MAJOR_VER_HIGH	0x03
++#define IXGBE_NETLIST_ID_BLK_MINOR_VER_LOW	0x04
++#define IXGBE_NETLIST_ID_BLK_MINOR_VER_HIGH	0x05
++#define IXGBE_NETLIST_ID_BLK_TYPE_LOW		0x06
++#define IXGBE_NETLIST_ID_BLK_TYPE_HIGH		0x07
++#define IXGBE_NETLIST_ID_BLK_REV_LOW		0x08
++#define IXGBE_NETLIST_ID_BLK_REV_HIGH		0x09
++#define IXGBE_NETLIST_ID_BLK_SHA_HASH_WORD(n)	(0x0A + (n))
++#define IXGBE_NETLIST_ID_BLK_CUST_VER		0x2F
 +
-+struct ixgbe_orom_civd_info {
-+	u8 signature[4];	/* Must match ASCII '$CIV' characters */
-+	u8 checksum;		/* Simple modulo 256 sum of all structure bytes must equal 0 */
-+	__le32 combo_ver;	/* Combo Image Version number */
-+	u8 combo_name_len;	/* Length of the unicode combo image version string, max of 32 */
-+	__le16 combo_name[32];	/* Unicode string representing the Combo Image version */
-+};
++/* The Link Topology Netlist section is stored as a series of words. It is
++ * stored in the NVM as a TLV, with the first two words containing the type
++ * and length.
++ */
++#define IXGBE_NETLIST_LINK_TOPO_MOD_ID		0x011B
++#define IXGBE_NETLIST_TYPE_OFFSET		0x0000
++#define IXGBE_NETLIST_LEN_OFFSET		0x0001
 +
- /* Function specific capabilities */
- struct ixgbe_hw_func_caps {
- 	u32 num_allocd_vfs;		/* Number of allocated VFs */
++/* The Link Topology section follows the TLV header. When reading the netlist
++ * using ixgbe_read_netlist_module, we need to account for the 2-word TLV
++ * header.
++ */
++#define IXGBE_NETLIST_LINK_TOPO_OFFSET(n)	((n) + 2)
++#define IXGBE_LINK_TOPO_MODULE_LEN	IXGBE_NETLIST_LINK_TOPO_OFFSET(0x0000)
++#define IXGBE_LINK_TOPO_NODE_COUNT	IXGBE_NETLIST_LINK_TOPO_OFFSET(0x0001)
++#define IXGBE_LINK_TOPO_NODE_COUNT_M		GENMASK_ULL(9, 0)
++
+ /* Firmware Status Register (GL_FWSTS) */
+ #define GL_FWSTS		0x00083048 /* Reset Source: POR */
+ #define GL_FWSTS_EP_PF0		BIT(24)
 -- 
 2.47.1
 
