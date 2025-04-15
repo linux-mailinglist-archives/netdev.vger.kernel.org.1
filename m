@@ -1,88 +1,111 @@
-Return-Path: <netdev+bounces-182555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5A66A8913F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C79A89144
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94B953A9066
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:28:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A970D3A91CC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EDC1F5616;
-	Tue, 15 Apr 2025 01:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C7D200B99;
+	Tue, 15 Apr 2025 01:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmH07lrM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UYdXo+Jo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BEE3C463;
-	Tue, 15 Apr 2025 01:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645F713EFE3;
+	Tue, 15 Apr 2025 01:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744680502; cv=none; b=QE7iEJV/h+vU4tTcl6TQO2smvIS1YV0wUNJLF6EbtWkyvsNy6xK/A8L3pA2fLH/mbPrdkZOTU5ewrHfXL+5pzOO/vRlkwfeFG6ibMh7zn5Wlpbe/kK/KwMWgy7uCqfscfKjM955JyqjLH3cFAyTCnELhtVCWWrZm4PybCqmmk3M=
+	t=1744680540; cv=none; b=pe18JFRM/5z0GRvovR5bopcuA3YgNLW5N+Xpa65jPiMecOAO2btg940LmwDkuuq979pPyXrjtziRmA+BLVuQMbJ9XAZZxbDNmY033bW/uj3nQMBw9RT5TD8Bx2cjhDrEKQYNoeYSqqRCzoVgWOJ8isr0ycrku5BypTT+P6dEQUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744680502; c=relaxed/simple;
-	bh=qOiLzz5Ys8eSSLqOWk5VgHA3ONL6mmYMIxRWgNUdq0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fQKKc0t6oNJeRBgOf9YRRakABxCcH48FfNa7e1hXSzyhVb85d1ECBDHuYdduQZApm1VOb4nPQtVj4UKWtEeZuUPCjMJo2eGKoJtJK7uF3voyBSP8GAmlnAk3mffs4kjoOqN+d3l5qPFlrElFLUUfiTt7sHntsmfh/Rtka3znNL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmH07lrM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD09C4CEE2;
-	Tue, 15 Apr 2025 01:28:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744680501;
-	bh=qOiLzz5Ys8eSSLqOWk5VgHA3ONL6mmYMIxRWgNUdq0w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HmH07lrMHaqvYw2TUmzSVnmklXNNFlYxJPI6IJEXLClrjQEwLdeDGu7a5pKuVGjnT
-	 UQHg4viqaE+XD/0YfBHNAzyqIf1q2dOTlRNz+ZS0M2CfEUrGbd+K3zW52t+caMHZzh
-	 NxPV+fGt7E37dD8jmElvwG/HyQfY9Xg6tRn1K3o2Z65urYXd/CRCZUSbZRyHx7gHsp
-	 329nHQ7eSvNZfIz/NcxCPOyzEhXj+dt1vdlUi2CIvaR3rxR0G++WR6FBChvwTMGFj9
-	 u0BcCSav4jHIEN9JwTwAS3vCTEHuyh4DvE9C+4igenTlFtZvaxaG2T9pV7kSu0x+nk
-	 ahGsmqeDHgO+A==
-Date: Mon, 14 Apr 2025 18:28:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
- <lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
- <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
- <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
- <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
- <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
- Damato <jdamato@fastly.com>
-Subject: Re: [PATCH net-next v10 1/1] hinic3: module initialization and
- tx/rx logic
-Message-ID: <20250414182820.370e9feb@kernel.org>
-In-Reply-To: <f74da5b6deceacf4e21cd6fa126e88acd3e8b824.1744286279.git.gur.stavi@huawei.com>
-References: <cover.1744286279.git.gur.stavi@huawei.com>
-	<f74da5b6deceacf4e21cd6fa126e88acd3e8b824.1744286279.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1744680540; c=relaxed/simple;
+	bh=HRa13erYZk9bATzeDQruOcBrjxMgJ3QAfiCWKOzfm18=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxpbl4bcpvccTvLNWQHcM1YicBMKEh0SJzU4/XNKVEddCVPpQhJewJuedjptIK6wtZwKM8v47FoiwuxH+uTAn8HbFvJERmVC4jfRBlRSlcJzDbOBbidJKn2Apc0+hMYznviiBf5CRnRn9ImUSvu9XFvf7RKbT9cEJ3wUDyfzzFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UYdXo+Jo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oZSUDClmcrLlpebSEps05boU8vn4SHvF/YKvatAXSzI=; b=UYdXo+JoekmZsTER7TvzE8Elzp
+	aMFY3wuSuWdl9XIEX8CLPMtIn+AOjETEevsxYO4NRT9tDOTEp9VbWv3f6pXi8lj8hkHKUGAqVZCCj
+	V5oAvi0b1r4f7XQcJpXyplsCQS5C8F2VcYmePWMPIW/re78lcL1vz94O4fm0kl18wRiY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4V6Y-009Jr8-Hz; Tue, 15 Apr 2025 03:28:50 +0200
+Date: Tue, 15 Apr 2025 03:28:50 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Qasim Ijaz <qasdev00@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/5] net: ch9200: fix uninitialised access bug during
+ mii_nway_restart
+Message-ID: <748d2e6c-68c0-43d4-8464-12e4942c7633@lunn.ch>
+References: <20250412183829.41342-1-qasdev00@gmail.com>
+ <20250412183829.41342-2-qasdev00@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250412183829.41342-2-qasdev00@gmail.com>
 
-On Thu, 10 Apr 2025 15:15:51 +0300 Gur Stavi wrote:
-> +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-> +	if (err) {
-> +		dev_warn(&pdev->dev, "Couldn't set 64-bit DMA mask\n");
-> +		/* try 32 bit DMA mask if 64 bit fails */
-> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-> +		if (err) {
-> +			dev_err(&pdev->dev, "Failed to set DMA mask\n");
-> +			goto err_release_regions;
-> +		}
+On Sat, Apr 12, 2025 at 07:38:25PM +0100, Qasim Ijaz wrote:
+> In mii_nway_restart() during the line:
+> 
+>         bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
+> 
+> The code attempts to call mii->mdio_read which is ch9200_mdio_read().
+> 
+> ch9200_mdio_read() utilises a local buffer, which is initialised
+> with control_read():
+> 
+>         unsigned char buff[2];
+> 
+> However buff is conditionally initialised inside control_read():
+> 
+>         if (err == size) {
+>                 memcpy(data, buf, size);
+>         }
+> 
+> If the condition of "err == size" is not met, then buff remains
+> uninitialised. Once this happens the uninitialised buff is accessed
+> and returned during ch9200_mdio_read():
+> 
+>         return (buff[0] | buff[1] << 8);
+> 
+> The problem stems from the fact that ch9200_mdio_read() ignores the
+> return value of control_read(), leading to uinit-access of buff.
+> 
+> To fix this we should check the return value of control_read()
+> and return early on error. We return 0 on control_read() failure here 
+> because returning a negative may trigger the "bmcr & BMCR_ANENABLE" 
+> check within mii_nway_restart.
+> 
+> Reported-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
+> Closes: https://syzkaller.appspot.com/bug?extid=3361c2d6f78a3e0892f9
+> Tested-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
+> Fixes: 4a476bd6d1d9 ("usbnet: New driver for QinHeng CH9200 devices")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
 
-Please take a look at commit 004464835bfc ("hinic: Remove useless
-DMA-32 fallback configuration"). This construct was removed in your
-other driver now you're bringing it back.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
