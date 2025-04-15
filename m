@@ -1,171 +1,154 @@
-Return-Path: <netdev+bounces-182859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E8BA8A30C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:40:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6C0A8A31C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EE4B7A7389
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:38:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F02297A87E8
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4C20F081;
-	Tue, 15 Apr 2025 15:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE89029B77B;
+	Tue, 15 Apr 2025 15:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kbnes0bU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QgquAFKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D31B23372C
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A437297A60
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731602; cv=none; b=ayvBnzACzV/dEVC3d9cvCRc68sl9oCaKhnNSpii0jyYIvvGxodGh2/xR5SeeE7M1zczde4CYV17eDqNFQqRsefwG59ByfJZ0ZX7dh8rJ2bbEBalx5wlI55t/YfNWaSbVhqo8FX7weyMrYRGte3UnGQMO5irMIOD2RtvELwL1Wx4=
+	t=1744731613; cv=none; b=Ivj1CWUCb0FUjCzICSu5rSurAsr9cd1TKQLQSzFVztO836j+YiwS94k4HPtXFD0bnF9I4JiwYcAljMyr419fl1LnrFcPYEF7yxYa8uSYPeumhuCYo0GmRNT5SFhKOpXl7lOPXaQRmQT9RsbF2PbK4O+ZSFA28HYt7/RqvzI+8pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731602; c=relaxed/simple;
-	bh=qg4wAivsMP8RywXlKYTJ+PIR8bbeDUpnSp0qyvD0CmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PWrUA82hMw887z3RfmKywQ2Caty3HOkv0Xmg2Q3gZRjGDJ9TtCdXvWclplko++5PbGC8nzQXULn72SKvmb/s0wC2LdB8PLlbLOI/eFBpI/5i8Oaz4HjCxdy2C3m8/uoaQl3Mzd8tH8B5yyJanLXH39EKk8M2901cIWyhSiMYnW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kbnes0bU; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2240aad70f2so271275ad.0
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 08:40:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744731600; x=1745336400; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OeIb/X6LUJd0puJOYgEpsyhyK4cnQAwP4cBidqFaUFw=;
-        b=kbnes0bUaqMuFMP/9c3EW5sQRho/oNPuDffvvVO/DHeCOTEtXp3gDs2enSfuDV2wxb
-         FHtlZ8JK0Urjk6Bp7fvh/3FR1ARIw/3NCCbJDAQB+9A7AjZ/kgPfz5ujk/RYsHd5lTUo
-         TSBohTMsY0US/yyIVUjC5LYLIkGsd6ZBvFLpZAzG/JnceQRDV2Aoxukiyvn2UNRjRcVg
-         3w4HE35Bmjr7wvbnD6dCbJREHvj5CyffiSe9GYYRo8Ib7cNjgmNjlfBR4dmK5HyFjBE1
-         fZD+VxVU9V26QR7/xdpiP5dEua0TUdcWTBOeBuKyeVcLXyevH2y5SCdjSTTkJP9AZhzT
-         zOXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744731600; x=1745336400;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OeIb/X6LUJd0puJOYgEpsyhyK4cnQAwP4cBidqFaUFw=;
-        b=H6gRAfNzl2fAJBlTc5UKssprtU0dmy5haLoFmaEvNTs5Bkc3CGzCltjsuuC9+awNXh
-         /xbFs3cLlinnLjdnBaHafh4h211AWceMLP0DP2lgKLWy/Ojpe5xFnKgBea7+vII5s0Ck
-         6sXd77kqjZvkxhESSNGCcSiJqN/7TACur/bp8RhiAIcHoTgZgYQFQ7hm2kLw05rVh3sT
-         D9PaRh8NzhMyQ0n1+q+PfMyHIfVNnChA7j82E5RxJG2vV1XNQn3K7XHFaBlfJFCL4prC
-         NUjGxBFBjOsD4SQ0yMbE0++1aWZi5i/N8qtCfWUn25lHz2dCszdEbbUG1BdBoUAT7zZ/
-         DFTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiP50sAy3N2LA/Z35fF3hxxNySyodiAT3UGpUOEdKb+1u57ZUDW+vv8fD2nhWFZRymGQbTzZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9MEatGjlIXhT/zms3WGt6F0PI4ZBE97IJO4RoZ7cpFO0tdUOH
-	x2cYZ4J/Y9zJV0l2m7EjTWv0cD7lCf1G9c2kvwtXaRc5/xzJc69BXGDYdVhvjMxr0Dq4v9CeJat
-	9tZKlDLKRzk7w6dY+39vEqgroSMndN22xhof6gnJ3iwCR0crVnwCp4ho=
-X-Gm-Gg: ASbGncu3ar1OojnvzTGYd0vBlJNko77RsafsuOoQs8MCK3EiIdMPLUG8SkkyqK5+F8G
-	homJU4mziEitfoq1NXOl2bCDNgreC3mosb0ob74UA65RyFokIZkKp0UYyHYRnKWQ8O/+YSvXYT/
-	ow1UcJ4yjnw4v4e6hLUWDs710=
-X-Google-Smtp-Source: AGHT+IFLhlUUvSgNVTxL04KKX3RG9sx072ZCun2lap9939vdMyJNLUBNnSRPH2j0J6W4S7CVvCvpIa6UIVdzBlU5+P0=
-X-Received: by 2002:a17:902:ef47:b0:21f:40e8:6398 with SMTP id
- d9443c01a7336-22c259d7af2mr3024275ad.26.1744731600188; Tue, 15 Apr 2025
- 08:40:00 -0700 (PDT)
+	s=arc-20240116; t=1744731613; c=relaxed/simple;
+	bh=IuELbAbNuQOztb4igIbOswq2lVtYn0JBz/TNUCHIl4w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iZBPbCB8MEzn6TOos6dcDimPOYRfTLZyHKWW561JPL03pGx7T6LJbwJl2/EOCwJ3I+ALFDev3/sc/sfAZx65kmKzEVME1TbzDLABnp1dRziybUeuUQ0KafmaTRESfag4JGuRjJSaE4o7rai80voCFh76nw2VGDARVfaxHu3dMzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QgquAFKP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C60EC4CEEC;
+	Tue, 15 Apr 2025 15:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744731613;
+	bh=IuELbAbNuQOztb4igIbOswq2lVtYn0JBz/TNUCHIl4w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QgquAFKPU++ITkgOW1xuNi8BAnS/yNJOdQ8Pz3uEltgf73TBvyHBAU0H68WfJqnLy
+	 7clzQTiae2fUIoUMPfEuu1Y354l/mGZF5gE8Uzxe/6ppMlxzc62EBqfX1vE3oboZtK
+	 BcyUfJruSziFE2TgWXYWHGygEcxHCYf21UJ0KyFAiRFJmHckUtI4UnDSI503OdcSUB
+	 YIYWW8LC8gtjk18s5K3IHf2mfyfGN48JDRs0WW3XN/DCE52aeE3OMJfqLV+sBIdPtu
+	 n6voT+VKkZT5FQPL0wvMAAQs1lvc/h3FYph35A+ntQ7I+MVixL5N122a+suI5cSj4E
+	 oK2O2aMzSKRWg==
+Message-ID: <5667bed7-3b22-484e-8e31-9abb8029caee@kernel.org>
+Date: Tue, 15 Apr 2025 08:40:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414013627.GA9161@system.software.com>
-In-Reply-To: <20250414013627.GA9161@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 15 Apr 2025 08:39:47 -0700
-X-Gm-Features: ATxdqUEEAYYuf9kY0rmh0iT4BhHq7nirTrK82B1hkM9j1bmivYLkzqZcnzQa_eo
-Message-ID: <CAHS8izO_9gXzj2sUubyNSQjp-a3h_332pQNRPBtW6bLOXS-XoA@mail.gmail.com>
-Subject: Re: [RFC] shrinking struct page (part of page pool)
-To: Byungchul Park <byungchul@sk.com>, Jesper Dangaard Brouer <hawk@kernel.org>, netdev <netdev@vger.kernel.org>
-Cc: willy@infradead.org, ilias.apalodimas@linaro.org, kernel_team@skhynix.com, 
-	42.hyeyoo@gmail.com, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: fib_rules: Fix iif / oif matching on L3
+ master device
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, horms@kernel.org, hanhuihui5@huawei.com
+References: <20250414172022.242991-1-idosch@nvidia.com>
+ <20250414172022.242991-2-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250414172022.242991-2-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Apr 13, 2025 at 6:36=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> Hi guys,
->
-> I'm looking at network's page pool code to help 'shrinking struct page'
-> project by Matthew Wilcox.  See the following link:
->
->    https://kernelnewbies.org/MatthewWilcox/Memdescs/Path
->
-> My first goal is to remove fields for page pool from struct page like:
->
+On 4/14/25 11:20 AM, Ido Schimmel wrote:
+> Before commit 40867d74c374 ("net: Add l3mdev index to flow struct and
+> avoid oif reset for port devices") it was possible to use FIB rules to
+> match on a L3 domain. This was done by having a FIB rule match on iif /
+> oif being a L3 master device. It worked because prior to the FIB rule
+> lookup the iif / oif fields in the flow structure were reset to the
+> index of the L3 master device to which the input / output device was
+> enslaved to.
+> 
+> The above scheme made it impossible to match on the original input /
+> output device. Therefore, cited commit stopped overwriting the iif / oif
+> fields in the flow structure and instead stored the index of the
+> enslaving L3 master device in a new field ('flowi_l3mdev') in the flow
+> structure.
+> 
+> While the change enabled new use cases, it broke the original use case
+> of matching on a L3 domain. Fix this by interpreting the iif / oif
+> matching on a L3 master device as a match against the L3 domain. In
+> other words, if the iif / oif in the FIB rule points to a L3 master
+> device, compare the provided index against 'flowi_l3mdev' rather than
+> 'flowi_{i,o}if'.
+> 
+> Before cited commit, a FIB rule that matched on 'iif vrf1' would only
+> match incoming traffic from devices enslaved to 'vrf1'. With the
+> proposed change (i.e., comparing against 'flowi_l3mdev'), the rule would
+> also match traffic originating from a socket bound to 'vrf1'. Avoid that
+> by adding a new flow flag ('FLOWI_FLAG_L3MDEV_OIF') that indicates if
+> the L3 domain was derived from the output interface or the input
+> interface (when not set) and take this flag into account when evaluating
+> the FIB rule against the flow structure.
+> 
+> Avoid unnecessary checks in the data path by detecting that a rule
+> matches on a L3 master device when the rule is installed and marking it
+> as such.
+> 
+> Tested using the following script [1].
+> 
+> Output before 40867d74c374 (v5.4.291):
+> 
+> default dev dummy1 table 100 scope link
+> default dev dummy1 table 200 scope link
+> 
+> Output after 40867d74c374:
+> 
+> default dev dummy1 table 300 scope link
+> default dev dummy1 table 300 scope link
+> 
+> Output with this patch:
+> 
+> default dev dummy1 table 100 scope link
+> default dev dummy1 table 200 scope link
+> 
+> [1]
+>  #!/bin/bash
+> 
+>  ip link add name vrf1 up type vrf table 10
+>  ip link add name dummy1 up master vrf1 type dummy
+> 
+>  sysctl -wq net.ipv4.conf.all.forwarding=1
+>  sysctl -wq net.ipv4.conf.all.rp_filter=0
+> 
+>  ip route add table 100 default dev dummy1
+>  ip route add table 200 default dev dummy1
+>  ip route add table 300 default dev dummy1
+> 
+>  ip rule add prio 0 oif vrf1 table 100
+>  ip rule add prio 1 iif vrf1 table 200
+>  ip rule add prio 2 table 300
+> 
+>  ip route get 192.0.2.1 oif dummy1 fibmatch
+>  ip route get 192.0.2.1 iif dummy1 from 198.51.100.1 fibmatch
+> 
+> Fixes: 40867d74c374 ("net: Add l3mdev index to flow struct and avoid oif reset for port devices")
+> Reported-by: hanhuihui <hanhuihui5@huawei.com>
+> Closes: https://lore.kernel.org/netdev/ec671c4f821a4d63904d0da15d604b75@huawei.com/
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  include/net/fib_rules.h |  2 ++
+>  include/net/flow.h      |  1 +
+>  include/net/l3mdev.h    | 27 +++++++++++++++++++++++
+>  net/core/fib_rules.c    | 48 ++++++++++++++++++++++++++++++++++-------
+>  net/l3mdev/l3mdev.c     |  4 +++-
+>  5 files changed, 73 insertions(+), 9 deletions(-)
+> 
 
-Remove them, but put them where? The page above specificies "Split the
-pagepool bump allocator out of struct page, as has been done for, eg,
-slab and ptdesc.", but I'm not familiar what happened with slab and
-ptdesc. Are these fields moving to a different location? Or being
-somehow removed entirely?
+Acked-by: David Ahern <dsahern@kernel.org>
 
->    struct {     /* page_pool used by netstack */
->         /**
->          * @pp_magic: magic value to avoid recycling non
->          * page_pool allocated pages.
->          */
->         unsigned long pp_magic;
->         struct page_pool *pp;
->         unsigned long _pp_mapping_pad;
->         unsigned long dma_addr;
->         atomic_long_t pp_ref_count;
->    };
->
-> Fortunately, many prerequisite works have been done by Mina but I guess
-> he or she has done it for other purpose than 'shrinking struct page'.
->
 
-Yeah, we did it to support non-page memory in the net stack, which is
-quite orthogonal to what you're trying to do AFAICT so far. Looks like
-maybe some implementation details are shared by luck?
-
-> I'd like to just finalize the work so that the fields above can be
-> removed from struct page.  However, I need to resolve a curiousity
-> before starting.
->
->    Network guys already introduced a sperate strcut, struct net_iov,
->    to overlay the interesting fields.  However, another separate struct
->    for system memory might be also needed e.g. struct bump so that
->    struct net_iov and struct bump can be overlayed depending on the
->    source:
->
->    struct bump {
->         unsigned long _page_flags;
->         unsigned long bump_magic;
->         struct page_pool *bump_pp;
->         unsigned long _pp_mapping_pad;
->         unsigned long dma_addr;
->         atomic_long_t bump_ref_count;
->         unsigned int _page_type;
->         atomic_t _refcount;
->    };
->
-> To netwrok guys, any thoughts on it?
-
-Need more details. What does struct bump represent? If it's meant to
-replace the fields used by the page_pool referenced above, then it
-should not have _page_flags, bump_ref_count should be pp_ref_count,
-and should not have _page_type or _refcount.
-
-> To Willy, do I understand correctly your direction?
->
-> Plus, it's a quite another issue but I'm curious, that is, what do you
-> guys think about moving the bump allocator(=3D page pool) code from
-> network to mm?  I'd like to start on the work once gathering opinion
-> from both Willy and network guys.
->
-
-What is the terminology "bump"? Are you wanting to rename page_pool to
-"bump"? What does the new name mean?
-
---=20
-Thanks,
-Mina
 
