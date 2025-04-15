@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-182638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E22BA89725
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:52:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337DAA89771
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C0073B9D62
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 08:52:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D549A3A5EE2
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108C227FD4E;
-	Tue, 15 Apr 2025 08:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4408C27A913;
+	Tue, 15 Apr 2025 09:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IkhkRHik"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WSMbMa7b"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CB71DDC18;
-	Tue, 15 Apr 2025 08:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A0C1EDA24;
+	Tue, 15 Apr 2025 09:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744707125; cv=none; b=WXdW8DB5ek1qiZIK3xfbRkQ2rX+4GpbJlq2WqsB4BD5iq2wxVX3l+NwKB7QIUFQz0xAtIEkeJAhqSUxv+IgcrVGMyu+vAfCVCvq0DSjd5QZAgygfxfQlk4hmiOBWO5SVl4gOf37aoX8iez0Z6hRFZuyRqYtLyphTcA4A1d5Km+I=
+	t=1744707984; cv=none; b=PqdbJMKHrk/chw4349ldQ9SnqyyKbrPAskttrNsGLnnXjy925eEFzEg7wTNJZHfVIfk9RNphziiXev2bkOKFgzNc7DppU2a9WDzfwYgvquk0m56F+RVuGrhUTmB5dnSE0RKHGvX3a+ZFHYN/LP2O17wl3lRFk+VzERRVQlb3FJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744707125; c=relaxed/simple;
-	bh=ftkaAuGCRjpsO4mqkauYH8ETLmjWiU1yTg6k8COK4uc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DaIiUpDLvovZRd0NPQpKxeOllBKUv0lo8kdJpjZC5GSTJqlvsIpEjbhVnrK4hDcqGuVPgVfHqVuTr+1m4b4wyQBymqvgJgQKiPGfH9/Z2wRPFQ/Y5HjNYSpRj49hlA4gPe5PpatQwIQw+NzPGpR+euBl9xQy0PJpDUnFODzG934=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IkhkRHik; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 93FD7432F9;
-	Tue, 15 Apr 2025 08:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744707120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CL4VDDzYo+gIiDyrhm09oNU2W4rD91r8p0855Qcob/Y=;
-	b=IkhkRHikiINIcguI107lZVBvRJLSRvJeEYzQirsoXMKHSpW0g3fDOSv7zHgi8h02xZHWo2
-	S2URt6wwt7ejiiixeYsqqvvc7n55wzcQoBRHxkjlYLSs23jIPrLq5uYOOQs5CfUq3cjU7p
-	6mB96PfCGbV7ukXaKY6bSzaBL87+dWnoGIAc6IvxIyZdXiW+QO3FdSk9ciGG8uFjjJ47jA
-	fyahCviPUBksHml/45jcHQyTI0+hFzWoAizjVHKMd/K4pe8YbRxLXLBmtkvQvyYGRCo7qW
-	x7Hd1/0cCrPc15m95R6CJMiiRv52vX2kvUVXmhN/9c6vefyAYWIP4uDEMAT+8w==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net-next v6 2/2] net: ethtool: phy: Convert the PHY_GET command to generic phy dump
-Date: Tue, 15 Apr 2025 10:51:54 +0200
-Message-ID: <20250415085155.132963-3-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250415085155.132963-1-maxime.chevallier@bootlin.com>
-References: <20250415085155.132963-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1744707984; c=relaxed/simple;
+	bh=7WDKU8Ma/T9AoYhRllnGZ3XEGWfy6pb3mSJUfmtm2LY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ikW03aFwqkFYXmeMeFFbgh+k+wPCYI2HmI6+wvoys2HF7/WME6pP/clcZfq7wiO3u9skdx7zIaQW1hHOCftVs7efGKKAbZux/X2T8Sv5M1BScXANARnPRwcrFl2ndPh1Z1I4tVrgKkEKnsoH3HF7hAxU1mrMqfJexGWud0SMbz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WSMbMa7b; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53F95mjt2436534
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Apr 2025 04:05:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1744707948;
+	bh=h5kvh+PJBUQXNkN1L2HdGd6JfOeVgSq/YRDXpDabNaM=;
+	h=From:To:CC:Subject:Date;
+	b=WSMbMa7b0h3v0Hco3CILMum3NOdurCJz16oklFdlcZ7Cm+kcrIFHCNFYaFZv0saK2
+	 uTRzzMSqFyv2MFSMVdukIgWbWM62rhtmze0N14MitXl1ijgb3tMdAhxlQH23/kR69O
+	 X4QqIi99fLWsdevDR96ip4rO6uOHJgeMXz6AIkLA=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53F95m2l102143
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 15 Apr 2025 04:05:48 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 15
+ Apr 2025 04:05:48 -0500
+Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 15 Apr 2025 04:05:48 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53F95mtF080138;
+	Tue, 15 Apr 2025 04:05:48 -0500
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 53F95ki8010947;
+	Tue, 15 Apr 2025 04:05:47 -0500
+From: Meghana Malladi <m-malladi@ti.com>
+To: <dan.carpenter@linaro.org>, <javier.carrasco.cruz@gmail.com>,
+        <diogo.ivo@siemens.com>, <horms@kernel.org>,
+        <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <richardcochran@gmail.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net v4 0/3] Bug fixes from XDP and perout series
+Date: Tue, 15 Apr 2025 14:35:40 +0530
+Message-ID: <20250415090543.717991-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,475 +83,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeftdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvddtueefvdfhiefgieelfeeggeefiedvueevkedttddvffekleeujedtjeeuteehnecuffhomhgrihhnpegsrghsvgdruggvvhenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvuddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvl
- hdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Now that we have an infrastructure in ethnl for perphy DUMPs, we can get
-rid of the custom ->doit and ->dumpit to deal with PHY listing commands.
+This patch series consists of bug fixes from the XDP series:
+1. Fixes a kernel warning that occurs when bringing down the
+   network interface.
+2. Resolves a potential NULL pointer dereference in the
+   emac_xmit_xdp_frame() function.
+3. Resolves a potential NULL pointer dereference in the
+   icss_iep_perout_enable() function
+   
+v3: https://lore.kernel.org/all/20250328102403.2626974-1-m-malladi@ti.com/
 
-As most of the code was custom, this basically means re-writing how we
-deal with PHY listing.
+Meghana Malladi (3):
+  net: ti: icssg-prueth: Fix kernel warning while bringing down network
+    interface
+  net: ti: icssg-prueth: Fix possible NULL pointer dereference inside
+    emac_xmit_xdp_frame()
+  net: ti: icss-iep: Fix possible NULL pointer dereference for perout
+    request
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V6: No changes
+ drivers/net/ethernet/ti/icssg/icss_iep.c     | 121 +++++++++----------
+ drivers/net/ethernet/ti/icssg/icssg_common.c |   9 +-
+ 2 files changed, 62 insertions(+), 68 deletions(-)
 
- net/ethtool/netlink.c |   9 +-
- net/ethtool/netlink.h |   4 -
- net/ethtool/phy.c     | 342 ++++++++++++------------------------------
- 3 files changed, 101 insertions(+), 254 deletions(-)
 
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index afb609ed515a..db0c1acf116b 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -410,6 +410,7 @@ ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] = {
- 	[ETHTOOL_MSG_MM_SET]		= &ethnl_mm_request_ops,
- 	[ETHTOOL_MSG_TSCONFIG_GET]	= &ethnl_tsconfig_request_ops,
- 	[ETHTOOL_MSG_TSCONFIG_SET]	= &ethnl_tsconfig_request_ops,
-+	[ETHTOOL_MSG_PHY_GET]		= &ethnl_phy_request_ops,
- };
- 
- static struct ethnl_dump_ctx *ethnl_dump_context(struct netlink_callback *cb)
-@@ -1433,10 +1434,10 @@ static const struct genl_ops ethtool_genl_ops[] = {
- 	},
- 	{
- 		.cmd	= ETHTOOL_MSG_PHY_GET,
--		.doit	= ethnl_phy_doit,
--		.start	= ethnl_phy_start,
--		.dumpit	= ethnl_phy_dumpit,
--		.done	= ethnl_phy_done,
-+		.doit	= ethnl_default_doit,
-+		.start	= ethnl_perphy_start,
-+		.dumpit	= ethnl_perphy_dumpit,
-+		.done	= ethnl_perphy_done,
- 		.policy = ethnl_phy_get_policy,
- 		.maxattr = ARRAY_SIZE(ethnl_phy_get_policy) - 1,
- 	},
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index ec6ab5443a6f..91b953924af3 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -499,10 +499,6 @@ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info);
- int ethnl_rss_dump_start(struct netlink_callback *cb);
- int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int ethnl_phy_start(struct netlink_callback *cb);
--int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info);
--int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
--int ethnl_phy_done(struct netlink_callback *cb);
- int ethnl_tsinfo_start(struct netlink_callback *cb);
- int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int ethnl_tsinfo_done(struct netlink_callback *cb);
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index 1f590e8d75ed..68372bef4b2f 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -12,304 +12,154 @@
- #include <net/netdev_lock.h>
- 
- struct phy_req_info {
--	struct ethnl_req_info		base;
--	struct phy_device_node		*pdn;
-+	struct ethnl_req_info base;
- };
- 
--#define PHY_REQINFO(__req_base) \
--	container_of(__req_base, struct phy_req_info, base)
-+struct phy_reply_data {
-+	struct ethnl_reply_data	base;
-+	u32 phyindex;
-+	char *drvname;
-+	char *name;
-+	unsigned int upstream_type;
-+	char *upstream_sfp_name;
-+	unsigned int upstream_index;
-+	char *downstream_sfp_name;
-+};
-+
-+#define PHY_REPDATA(__reply_base) \
-+	container_of(__reply_base, struct phy_reply_data, base)
- 
- const struct nla_policy ethnl_phy_get_policy[ETHTOOL_A_PHY_HEADER + 1] = {
- 	[ETHTOOL_A_PHY_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
- };
- 
--/* Caller holds rtnl */
--static ssize_t
--ethnl_phy_reply_size(const struct ethnl_req_info *req_base,
--		     struct netlink_ext_ack *extack)
-+static int phy_reply_size(const struct ethnl_req_info *req_info,
-+			  const struct ethnl_reply_data *reply_data)
- {
--	struct phy_req_info *req_info = PHY_REQINFO(req_base);
--	struct phy_device_node *pdn = req_info->pdn;
--	struct phy_device *phydev = pdn->phy;
-+	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
- 	size_t size = 0;
- 
--	ASSERT_RTNL();
--
- 	/* ETHTOOL_A_PHY_INDEX */
- 	size += nla_total_size(sizeof(u32));
- 
- 	/* ETHTOOL_A_DRVNAME */
--	if (phydev->drv)
--		size += nla_total_size(strlen(phydev->drv->name) + 1);
-+	if (rep_data->drvname)
-+		size += nla_total_size(strlen(rep_data->drvname) + 1);
- 
- 	/* ETHTOOL_A_NAME */
--	size += nla_total_size(strlen(dev_name(&phydev->mdio.dev)) + 1);
-+	size += nla_total_size(strlen(rep_data->name) + 1);
- 
- 	/* ETHTOOL_A_PHY_UPSTREAM_TYPE */
- 	size += nla_total_size(sizeof(u32));
- 
--	if (phy_on_sfp(phydev)) {
--		const char *upstream_sfp_name = sfp_get_name(pdn->parent_sfp_bus);
--
--		/* ETHTOOL_A_PHY_UPSTREAM_SFP_NAME */
--		if (upstream_sfp_name)
--			size += nla_total_size(strlen(upstream_sfp_name) + 1);
-+	/* ETHTOOL_A_PHY_UPSTREAM_SFP_NAME */
-+	if (rep_data->upstream_sfp_name)
-+		size += nla_total_size(strlen(rep_data->upstream_sfp_name) + 1);
- 
--		/* ETHTOOL_A_PHY_UPSTREAM_INDEX */
-+	/* ETHTOOL_A_PHY_UPSTREAM_INDEX */
-+	if (rep_data->upstream_index)
- 		size += nla_total_size(sizeof(u32));
--	}
- 
- 	/* ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME */
--	if (phydev->sfp_bus) {
--		const char *sfp_name = sfp_get_name(phydev->sfp_bus);
--
--		if (sfp_name)
--			size += nla_total_size(strlen(sfp_name) + 1);
--	}
-+	if (rep_data->downstream_sfp_name)
-+		size += nla_total_size(strlen(rep_data->downstream_sfp_name) + 1);
- 
- 	return size;
- }
- 
--static int
--ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_buff *skb)
-+static int phy_prepare_data(const struct ethnl_req_info *req_info,
-+			    struct ethnl_reply_data *reply_data,
-+			    const struct genl_info *info)
- {
--	struct phy_req_info *req_info = PHY_REQINFO(req_base);
--	struct phy_device_node *pdn = req_info->pdn;
--	struct phy_device *phydev = pdn->phy;
--	enum phy_upstream ptype;
-+	struct phy_link_topology *topo = reply_data->dev->link_topo;
-+	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
-+	struct nlattr **tb = info->attrs;
-+	struct phy_device_node *pdn;
-+	struct phy_device *phydev;
- 
--	ptype = pdn->upstream_type;
-+	/* RTNL is held by the caller */
-+	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
-+				      info->extack);
-+	if (IS_ERR_OR_NULL(phydev))
-+		return -EOPNOTSUPP;
- 
--	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, phydev->phyindex) ||
--	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, dev_name(&phydev->mdio.dev)) ||
--	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, ptype))
--		return -EMSGSIZE;
-+	pdn = xa_load(&topo->phys, phydev->phyindex);
-+	if (!pdn)
-+		return -EOPNOTSUPP;
- 
--	if (phydev->drv &&
--	    nla_put_string(skb, ETHTOOL_A_PHY_DRVNAME, phydev->drv->name))
--		return -EMSGSIZE;
-+	rep_data->phyindex = phydev->phyindex;
-+	rep_data->name = kstrdup(dev_name(&phydev->mdio.dev), GFP_KERNEL);
-+	rep_data->drvname = kstrdup(phydev->drv->name, GFP_KERNEL);
-+	rep_data->upstream_type = pdn->upstream_type;
- 
--	if (ptype == PHY_UPSTREAM_PHY) {
-+	if (pdn->upstream_type == PHY_UPSTREAM_PHY) {
- 		struct phy_device *upstream = pdn->upstream.phydev;
--		const char *sfp_upstream_name;
--
--		/* Parent index */
--		if (nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_INDEX, upstream->phyindex))
--			return -EMSGSIZE;
--
--		if (pdn->parent_sfp_bus) {
--			sfp_upstream_name = sfp_get_name(pdn->parent_sfp_bus);
--			if (sfp_upstream_name &&
--			    nla_put_string(skb, ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,
--					   sfp_upstream_name))
--				return -EMSGSIZE;
--		}
--	}
--
--	if (phydev->sfp_bus) {
--		const char *sfp_name = sfp_get_name(phydev->sfp_bus);
--
--		if (sfp_name &&
--		    nla_put_string(skb, ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,
--				   sfp_name))
--			return -EMSGSIZE;
-+		rep_data->upstream_index = upstream->phyindex;
- 	}
- 
--	return 0;
--}
--
--static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
--				   struct nlattr **tb,
--				   struct netlink_ext_ack *extack)
--{
--	struct phy_link_topology *topo = req_base->dev->link_topo;
--	struct phy_req_info *req_info = PHY_REQINFO(req_base);
--	struct phy_device *phydev;
-+	if (pdn->parent_sfp_bus)
-+		rep_data->upstream_sfp_name = kstrdup(sfp_get_name(pdn->parent_sfp_bus),
-+						      GFP_KERNEL);
- 
--	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PHY_HEADER,
--				      extack);
--	if (!phydev)
--		return 0;
--
--	if (IS_ERR(phydev))
--		return PTR_ERR(phydev);
--
--	if (!topo)
--		return 0;
--
--	req_info->pdn = xa_load(&topo->phys, phydev->phyindex);
-+	if (phydev->sfp_bus)
-+		rep_data->downstream_sfp_name = kstrdup(sfp_get_name(phydev->sfp_bus),
-+							GFP_KERNEL);
- 
- 	return 0;
- }
- 
--int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
-+static int phy_fill_reply(struct sk_buff *skb,
-+			  const struct ethnl_req_info *req_info,
-+			  const struct ethnl_reply_data *reply_data)
- {
--	struct phy_req_info req_info = {};
--	struct nlattr **tb = info->attrs;
--	struct sk_buff *rskb;
--	void *reply_payload;
--	int reply_len;
--	int ret;
--
--	ret = ethnl_parse_header_dev_get(&req_info.base,
--					 tb[ETHTOOL_A_PHY_HEADER],
--					 genl_info_net(info), info->extack,
--					 true);
--	if (ret < 0)
--		return ret;
--
--	rtnl_lock();
--	netdev_lock_ops(req_info.base.dev);
--
--	ret = ethnl_phy_parse_request(&req_info.base, tb, info->extack);
--	if (ret < 0)
--		goto err_unlock;
--
--	/* No PHY, return early */
--	if (!req_info.pdn)
--		goto err_unlock;
--
--	ret = ethnl_phy_reply_size(&req_info.base, info->extack);
--	if (ret < 0)
--		goto err_unlock;
--	reply_len = ret + ethnl_reply_header_size();
--
--	rskb = ethnl_reply_init(reply_len, req_info.base.dev,
--				ETHTOOL_MSG_PHY_GET_REPLY,
--				ETHTOOL_A_PHY_HEADER,
--				info, &reply_payload);
--	if (!rskb) {
--		ret = -ENOMEM;
--		goto err_unlock;
--	}
--
--	ret = ethnl_phy_fill_reply(&req_info.base, rskb);
--	if (ret)
--		goto err_free_msg;
-+	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
- 
--	netdev_unlock_ops(req_info.base.dev);
--	rtnl_unlock();
--	ethnl_parse_header_dev_put(&req_info.base);
--	genlmsg_end(rskb, reply_payload);
--
--	return genlmsg_reply(rskb, info);
--
--err_free_msg:
--	nlmsg_free(rskb);
--err_unlock:
--	netdev_unlock_ops(req_info.base.dev);
--	rtnl_unlock();
--	ethnl_parse_header_dev_put(&req_info.base);
--	return ret;
--}
--
--struct ethnl_phy_dump_ctx {
--	struct phy_req_info	*phy_req_info;
--	unsigned long ifindex;
--	unsigned long phy_index;
--};
--
--int ethnl_phy_start(struct netlink_callback *cb)
--{
--	const struct genl_info *info = genl_info_dump(cb);
--	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
--	int ret;
--
--	BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
--
--	ctx->phy_req_info = kzalloc(sizeof(*ctx->phy_req_info), GFP_KERNEL);
--	if (!ctx->phy_req_info)
--		return -ENOMEM;
--
--	ret = ethnl_parse_header_dev_get(&ctx->phy_req_info->base,
--					 info->attrs[ETHTOOL_A_PHY_HEADER],
--					 sock_net(cb->skb->sk), cb->extack,
--					 false);
--	ctx->ifindex = 0;
--	ctx->phy_index = 0;
--
--	if (ret)
--		kfree(ctx->phy_req_info);
-+	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, rep_data->phyindex) ||
-+	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, rep_data->name) ||
-+	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, rep_data->upstream_type))
-+		return -EMSGSIZE;
- 
--	return ret;
--}
-+	if (rep_data->drvname &&
-+	    nla_put_string(skb, ETHTOOL_A_PHY_DRVNAME, rep_data->drvname))
-+		return -EMSGSIZE;
- 
--int ethnl_phy_done(struct netlink_callback *cb)
--{
--	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
-+	if (rep_data->upstream_index &&
-+	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_INDEX,
-+			rep_data->upstream_index))
-+		return -EMSGSIZE;
- 
--	if (ctx->phy_req_info->base.dev)
--		ethnl_parse_header_dev_put(&ctx->phy_req_info->base);
-+	if (rep_data->upstream_sfp_name &&
-+	    nla_put_string(skb, ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,
-+			   rep_data->upstream_sfp_name))
-+		return -EMSGSIZE;
- 
--	kfree(ctx->phy_req_info);
-+	if (rep_data->downstream_sfp_name &&
-+	    nla_put_string(skb, ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,
-+			   rep_data->downstream_sfp_name))
-+		return -EMSGSIZE;
- 
- 	return 0;
- }
- 
--static int ethnl_phy_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
--				  struct netlink_callback *cb)
-+static void phy_cleanup_data(struct ethnl_reply_data *reply_data)
- {
--	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
--	struct phy_req_info *pri = ctx->phy_req_info;
--	struct phy_device_node *pdn;
--	int ret = 0;
--	void *ehdr;
--
--	if (!dev->link_topo)
--		return 0;
--
--	xa_for_each_start(&dev->link_topo->phys, ctx->phy_index, pdn, ctx->phy_index) {
--		ehdr = ethnl_dump_put(skb, cb, ETHTOOL_MSG_PHY_GET_REPLY);
--		if (!ehdr) {
--			ret = -EMSGSIZE;
--			break;
--		}
--
--		ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_PHY_HEADER);
--		if (ret < 0) {
--			genlmsg_cancel(skb, ehdr);
--			break;
--		}
--
--		pri->pdn = pdn;
--		ret = ethnl_phy_fill_reply(&pri->base, skb);
--		if (ret < 0) {
--			genlmsg_cancel(skb, ehdr);
--			break;
--		}
--
--		genlmsg_end(skb, ehdr);
--	}
-+	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
- 
--	return ret;
-+	kfree(rep_data->drvname);
-+	kfree(rep_data->name);
-+	kfree(rep_data->upstream_sfp_name);
-+	kfree(rep_data->downstream_sfp_name);
- }
- 
--int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
--{
--	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
--	struct net *net = sock_net(skb->sk);
--	struct net_device *dev;
--	int ret = 0;
--
--	rtnl_lock();
--
--	if (ctx->phy_req_info->base.dev) {
--		dev = ctx->phy_req_info->base.dev;
--		netdev_lock_ops(dev);
--		ret = ethnl_phy_dump_one_dev(skb, dev, cb);
--		netdev_unlock_ops(dev);
--	} else {
--		for_each_netdev_dump(net, dev, ctx->ifindex) {
--			netdev_lock_ops(dev);
--			ret = ethnl_phy_dump_one_dev(skb, dev, cb);
--			netdev_unlock_ops(dev);
--			if (ret)
--				break;
--
--			ctx->phy_index = 0;
--		}
--	}
--	rtnl_unlock();
--
--	return ret;
--}
-+const struct ethnl_request_ops ethnl_phy_request_ops = {
-+	.request_cmd		= ETHTOOL_MSG_PHY_GET,
-+	.reply_cmd		= ETHTOOL_MSG_PHY_GET_REPLY,
-+	.hdr_attr		= ETHTOOL_A_PHY_HEADER,
-+	.req_info_size		= sizeof(struct phy_req_info),
-+	.reply_data_size	= sizeof(struct phy_reply_data),
-+
-+	.prepare_data		= phy_prepare_data,
-+	.reply_size		= phy_reply_size,
-+	.fill_reply		= phy_fill_reply,
-+	.cleanup_data		= phy_cleanup_data,
-+};
+base-commit: 8c941f14a694b40a91d381e77bcd334622aa7196
 -- 
-2.49.0
+2.43.0
 
 
