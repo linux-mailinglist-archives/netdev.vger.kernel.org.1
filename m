@@ -1,135 +1,114 @@
-Return-Path: <netdev+bounces-183000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D09A8A8A4
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 21:58:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20317A8A8BF
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 22:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD1087A160E
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:57:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37D63A75E9
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 20:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28306252281;
-	Tue, 15 Apr 2025 19:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AA42512EF;
+	Tue, 15 Apr 2025 20:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h09IQpYj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qlIy1+dC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E8025178B;
-	Tue, 15 Apr 2025 19:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56708250C19
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 20:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744747086; cv=none; b=hNTYD8kYyf3FDVLnZn6NQfs10aswKONWs0CNSyFOmdJCJxnLd3oRoUoLzPNsLD62zugFrLBPQ4oqOZ0RYyaeTN7XpyL21JSeG/tYzmFauoFmuoxvzGyeE+kWHDaP00pp9hEzPTN2ESfch5ItAVazV4pFEs4m7nE53uRh5iFvcLQ=
+	t=1744747372; cv=none; b=QC4icAFK9SQT5hivCAnTPmsVsBAWz2vgdl5p4G30pWlkx9gzaKKQwJoxT0aluxxep84F4pTrhbH3R0gQa6olSLuuANOApeWgI6SOGR06vqWGklw7h3ECtF2sZSrvL4jbYHwOFzrzhObOLbRTa94ZBWBOdQB07nHGk4zRqFr7SkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744747086; c=relaxed/simple;
-	bh=HMRkle/AiWybWCgX3nSxjTcfvrJVFoMThLVLvEnydHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IYUoR5kdNf2PPLUb5T/v2Jj2Dx3Cg+Ya7J6Aj298blqQm15bnbX1+RpyF5MEj7sITuPVlzDxLN3fVVpblQTvFqe2pJni+MvFJzbYN2BicmJIosrmVj6Qg6Wyug+7sJ8cL3tzQipNMk4jTVKQp5AFRcPmM5TAnSYXuuX3XQleH1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h09IQpYj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A05CC4CEE7;
-	Tue, 15 Apr 2025 19:57:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744747085;
-	bh=HMRkle/AiWybWCgX3nSxjTcfvrJVFoMThLVLvEnydHM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h09IQpYjSGa61AoVG6uQFOfNU25QiDXtTZT7efpfcpzGvO3nZJdjvoZBcBksTwxTs
-	 E3zy0YGBDn2cDz5YfYBnlXe6HzQuAkIdKG0UgZo4oLD+/f5Ti1ONfspH307b65JVAo
-	 /F570dLJ7/WjKGgg693TirWeliq+1WsRJgg9WY91ucOF8fGFpjVvc++TWGUU/jjKjS
-	 lbLvUtBd8AMjlC8KZc9uv0d6AEebe/k65dci1J8XpQOd86uhlXAPJ0eUd8RUWlZwPf
-	 FcUiDrWND4WreM58gGaD3UlSdHqwsIBEIOfwGuZnjeealU/sipyV7A3dWoWCGKPWUb
-	 iTUfSVXexX3gg==
-Date: Tue, 15 Apr 2025 20:57:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, richardcochran@gmail.com, glaroque@baylibre.com,
-	schnelle@linux.ibm.com, m-karicheri2@ti.com, s.hauer@pengutronix.de,
-	rdunlap@infradead.org, diogo.ivo@siemens.com, basharath@couthit.com,
-	jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pratheesh@ti.com, prajith@ti.com, vigneshr@ti.com, praneeth@ti.com,
-	srk@ti.com, rogerq@ti.com, krishna@couthit.com, pmohan@couthit.com,
-	mohan@couthit.com
-Subject: Re: [PATCH net-next v5 07/11] net: ti: prueth: Adds support for
- network filters for traffic control supported by PRU-ICSS
-Message-ID: <20250415195756.GI395307@horms.kernel.org>
-References: <20250414113458.1913823-1-parvathi@couthit.com>
- <20250414130237.1915448-8-parvathi@couthit.com>
+	s=arc-20240116; t=1744747372; c=relaxed/simple;
+	bh=qD6//Kkj0pnETTvFRMsrBqIawzEcabzuCL4BTMFPipU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fNDfqtxXo8QQb6bzfks6ad0KjVlJaWYnIbf+cRFQ6gaiSgpd0lDAC58ZCx2W/4mTkJpHBL4Hd+EJpT+Ym77hZ7Cix1gppoLydta/5srq4NZfHlwM/SXpP0MZZKX0av+UUEmkjF+NCg+iwAU1h/k32S1pzsykOSO6xC7Jldqr4QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qlIy1+dC; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <54b3a531-d550-4600-8bd2-1058c8b15023@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744747367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2yO9mrs7WLL0hWNf5rYjcWqI2uD7ZfNQPJN+bLfcwuE=;
+	b=qlIy1+dCxu3lXy6dwaD2R7wAOvElaftWfQo7NuvZDBgsP/7dWFAITY+tO4QXoMm/FM6Rl2
+	cRhM0ZdDcIEcvsnARCbzZAB8NljdRAxWQldvZfzS9mTkSmcbQ7M80CXMp5YXlcarbJq4P2
+	cruvo8XfGZQTkYLQ1a20FlN1WnM+9FY=
+Date: Tue, 15 Apr 2025 16:02:41 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414130237.1915448-8-parvathi@couthit.com>
+Subject: Re: [net-next PATCH v3 03/11] net: pcs: Add subsystem
+To: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
+Cc: upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>,
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org
+References: <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <20250415193323.2794214-4-sean.anderson@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250415193323.2794214-4-sean.anderson@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 14, 2025 at 06:32:33PM +0530, Parvathi Pudi wrote:
-> From: Roger Quadros <rogerq@ti.com>
-> 
-> Driver updates to enable/disable network filters and traffic control
-> features supported by the firmware running on PRU-ICSS.
-> 
-> Control of the following features are now supported:
-> 1. Promiscuous mode
-> 2. Network Storm prevention
-> 3. Multicast filtering and
-> 4. VLAN filtering
-> 
-> Firmware running on PRU-ICSS will go through all these filter checks
-> prior to sending the rx packets to the host.
-> 
-> Ethtool or dev ioctl can be used to enable/disable these features from
-> the user space.
-> 
-> Signed-off-by: Roger Quadros <rogerq@ti.com>
-> Signed-off-by: Andrew F. Davis <afd@ti.com>
-> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-
-...
-
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c b/drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c
-
-...
-
-> +static int icssm_emac_configure_clsflower(struct prueth_emac *emac,
-> +					  struct flow_cls_offload *cls)
+On 4/15/25 15:33, Sean Anderson wrote:
+> +#else /* CONFIG_PCS */
+> +static inline void pcs_put(struct device *dev, struct phylink_pcs *handle)
 > +{
-> +	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
-> +	struct netlink_ext_ack *extack = cls->common.extack;
-> +	const struct flow_action_entry *act;
-> +	int i;
-> +
-> +	flow_action_for_each(i, act, &rule->action) {
-> +		switch (act->id) {
-> +		case FLOW_ACTION_POLICE:
-> +			return icssm_emac_flower_parse_policer
-> +				(emac, extack, cls,
-> +				 act->police.rate_bytes_ps);
-> +		default:
-> +			NL_SET_ERR_MSG_MOD(extack,
-> +					   "Action not supported");
-> +			return -EOPNOTSUPP;
-> +		}
-> +	}
-> +	return -EOPNOTSUPP;
-
-nit: This line cannot be reached.
-     I think you can just remove it.
-
-     Flagged by Smatch.
-
 > +}
+> +
+> +static inline struct phylink_pcs *pcs_get(struct device *dev, const char *id)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static inline struct phylink_pcs *pcs_get_optional(struct device *dev,
+> +						   const char *id)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode(struct device *dev, struct fwnode_handle *fwnode,
+> +		   const char *id)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode_optional(struct device *dev, struct fwnode_handle *fwnode,
+> +			    const char *id)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline struct phylink_pcs *pcs_get_by_dev(struct device *dev,
+> +						 const struct device *pcs_dev)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +#endif
+> +
+> +#endif /* PCS_H */
 
-...
+These should be wrapped with ERR_PTR. Will fix for v4.
+
+--Sean
 
