@@ -1,226 +1,197 @@
-Return-Path: <netdev+bounces-182631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05730A896D4
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:35:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F464A896ED
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 10:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50D59189DCB4
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 08:35:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EC271895538
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 08:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FE51EA7E1;
-	Tue, 15 Apr 2025 08:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AE827A118;
+	Tue, 15 Apr 2025 08:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="GUr3rBan";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="QqK2E6iT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LShLMWXR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28531DE8B0;
-	Tue, 15 Apr 2025 08:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0EA35979;
+	Tue, 15 Apr 2025 08:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744706128; cv=none; b=KGVglo2i55+zgNLdLkg6YbShr6n9qs8yScr1LHByRPZ+2nVdnmgeJ0aMOqSiTCOaKIqREhU4AvFYgdJxPxUW30J11OdDCW0TysDyaX/uPkN83EBugMP8RfSbH/kFxB0xaXL0nHg0Rc21jyhnq2rl+SdsLepRnp6g6frPl/SYj/c=
+	t=1744706450; cv=none; b=J+kYudK1Rby7iQh78BdP9xFLZdeTQX/FTpTaJWuK/pTOkDXgPVNFFDiumIEacb4j4uq/gP+V/eFPGI02Dod1BRyd7CL/54q1UO5jmE0q3T2u5jd1LD+AFo7jy+zOhSPl7J1OXNultqBhTVsT6/6BT3v0eRCWZFv+HWzbxJUeWUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744706128; c=relaxed/simple;
-	bh=i+509ryJKJQmkn9+J/lCIfTtFXalbSn8FjHJ7x/dckQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BuBc789Cr4BpKV/R9SQYo39RzWBuzPW5MBMZ64O/DOz3K1RrIV0EDjvmqPs7UlzdE6mg8zQplFtH3S52PWEH+ycgVGUz0rhG0XpF0hzr+KuEQA6bZX1qNLUN/eElyAS3+rQoFyvGMEaqG9aXXDZdmNYdzlLIgAbF+LAw4ON4XXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=GUr3rBan; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=QqK2E6iT reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1744706124; x=1776242124;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=t7sX4ntKbLpFGtsynu9D4uCV1+s7lyl50jhGsnyH5EU=;
-  b=GUr3rBanGQ+z6Y/EYW1sBGzENbD/GhICIpy9VwwKjJNRC9XJiR13O6cO
-   VQoVvgdb18DQRDAwq8/vNvai7CHODuiHZfhh7q+TDEIWo8f4HSqw/Ybv9
-   0Kz9MYZ3KjBjq5nSbLfYCp8RMZ0Mur3rygT2HRZ/7kCb+IoOTjVUI/Sbj
-   n/qAO7eMsH6lW+nuH5zLQwMIUyh3ZFkHfSHVXt+Y9nzUFnZ+srO11Ld8G
-   ogRGf4yxPLWTAw1GPCySeDoVw3YDO//YiUvhszmKz+IY2EnJcbE5fwrKu
-   aS6pyMewvVDOudeIawgkRsalQIEd6qVeQaO96YAtJyjWiZNno9kTKkuC3
-   w==;
-X-CSE-ConnectionGUID: RY2ljpalTvewaM8Ah5s4qw==
-X-CSE-MsgGUID: OjugpQMXTQyYGi26XPOMJg==
-X-IronPort-AV: E=Sophos;i="6.15,213,1739833200"; 
-   d="scan'208";a="43533980"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 15 Apr 2025 10:35:21 +0200
-X-CheckPoint: {67FE1A48-36-F35B2447-E1635CDE}
-X-MAIL-CPID: 3DD5DC0CAE778B2C95C854D9D45F62CB_1
-X-Control-Analysis: str=0001.0A006368.67FE1A54.0074,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B7523160F46;
-	Tue, 15 Apr 2025 10:35:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1744706116;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t7sX4ntKbLpFGtsynu9D4uCV1+s7lyl50jhGsnyH5EU=;
-	b=QqK2E6iTMSKnfvdua8fvymCLNx14HqN89/DczRZPLmUxlur+6O495MVNwztJS63dbbGHBb
-	rylLV7/Tx88zwe3bseo8u14iYtkwpuPBjCS1gG11vHjb7gWWhQcs4RMPeo7deqlVJ+04bA
-	EI1Shl4XJHH3hWQ5xNzxiUpSzr5ibqMlOV2qkOPfngt3EJBBhGSsUxxlP1C+u3Mn4hqVWF
-	N7kPwRkBEkToycS25O2zrzL1VByIZewhTLYe1RC5VQHlsBAFd8Ls8fQ5RZiMJ/r6k0Ypki
-	fT8AzgFD3sM9qh2orc+yBRR42bmVlU6ekmQ617lLSKwm/T87ou4+EFUaQ1hBWQ==
-Message-ID: <f28d39095f3ed99b6235a6f300d31111f2486f06.camel@ew.tq-group.com>
-Subject: Re: [PATCH net-next 1/2] net: phy: dp83867: remove check of delay
- strap configuration
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux@ew.tq-group.com
-Date: Tue, 15 Apr 2025 10:35:14 +0200
-In-Reply-To: <c0c9cbcaf8bb8fd46d2ca618302bed8caa7bc812.camel@ew.tq-group.com>
-References: 
-	<8013ae5966dd22bcb698c0c09d2fc0912ae7ac25.1744639988.git.matthias.schiffer@ew.tq-group.com>
-	 <c0c9cbcaf8bb8fd46d2ca618302bed8caa7bc812.camel@ew.tq-group.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1744706450; c=relaxed/simple;
+	bh=CNnBGavtM1TabEYHR7zBvpBl6oLEoxMEmYHdJit8cRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZHvlTcmwPwagO4AX62kyhPjANFYp7lEqIWmRy8Pc4cMilBicSJA/5qXIdRKCuCeL/xXYeok7af2FS3AB2wyt4OPHxMstaP5xciGEvzW+URis9iFWkJlbkCRU0W4Wsd1o1YV/yQ+RBbxBZ1X1eeq5RmukYpYWZju3OrvQTfN8FPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LShLMWXR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7B4C4CEDD;
+	Tue, 15 Apr 2025 08:40:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744706449;
+	bh=CNnBGavtM1TabEYHR7zBvpBl6oLEoxMEmYHdJit8cRA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LShLMWXRa5NnUR3tsEns18Eyag2Cdp8/5umuqEO6PPlx0VCBhLDAesKWuuk4C85d5
+	 M4CHQKmVkDdPs9V8OE2UX26zYQov5i9R3XOz/G8d0zG12d5qstXWJiIkH2oifKKvyA
+	 t/LTxoMI1vf/KiqVTFYIVU+qVIKuIIKwEVpi6VVie0iVKJ6XDA4/LPQCOOBKYP9g9M
+	 03BD/5iS+OziB9ObC+KyasD+S6cXdLEuPPRCqXEJKLIc9NvTMprFcC/HortcmWU/Qf
+	 v7vgs84svuOZty4tBGPj4LmJiyUdC94kg4yvXtbl7bCS8ID0MB/dZbKxub4OQIGbnP
+	 1qPTjVFid1qrw==
+Date: Tue, 15 Apr 2025 16:40:34 +0800
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, Jonathan Corbet
+ <corbet@lwn.net>, Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ linux-kernel@vger.kernel.org, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, Kees Cook <kees@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, linux-hardening@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v3 00/33] Implement kernel-doc in Python
+Message-ID: <20250415164014.575c0892@sal.lan>
+In-Reply-To: <Z_4Wjv0hmORIwC_Z@smile.fi.intel.com>
+References: <cover.1744106241.git.mchehab+huawei@kernel.org>
+	<871pu1193r.fsf@trenco.lwn.net>
+	<Z_zYXAJcTD-c3xTe@black.fi.intel.com>
+	<87mscibwm8.fsf@trenco.lwn.net>
+	<Z_4EL2bLm5Jva8Mq@smile.fi.intel.com>
+	<Z_4E0y07kUdgrGQZ@smile.fi.intel.com>
+	<87v7r5sw3a.fsf@intel.com>
+	<Z_4WCDkAhfwF6WND@smile.fi.intel.com>
+	<Z_4Wjv0hmORIwC_Z@smile.fi.intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2025-04-14 at 16:19 +0200, Matthias Schiffer wrote:
-> On Mon, 2025-04-14 at 16:13 +0200, Matthias Schiffer wrote:
-> > The check that intended to handle "rgmii" PHY mode differently from the
-> > other RGMII modes never worked as intended:
-> >=20
-> > - added in commit 2a10154abcb7 ("net: phy: dp83867: Add TI dp83867 phy"=
-):
-> >   logic error caused the condition to always evaluate to true
-> > - changed in commit a46fa260f6f5 ("net: phy: dp83867: Fix warning check
-> >   for setting the internal delay"): now the condition always evaluates
-> >   to false
+Em Tue, 15 Apr 2025 11:19:26 +0300
+Andy Shevchenko <andriy.shevchenko@intel.com> escreveu:
 
-Ah, I just realized that this is not entirely accurate. The condition did n=
-ot
-always evaluate to false, it just incorrectly evaluated to false for rgmii-=
-txid.
-Another thing to fix in v2.
+> On Tue, Apr 15, 2025 at 11:17:12AM +0300, Andy Shevchenko wrote:
+> > On Tue, Apr 15, 2025 at 10:49:29AM +0300, Jani Nikula wrote:  
+> > > On Tue, 15 Apr 2025, Andy Shevchenko <andriy.shevchenko@intel.com> wrote:  
+> > > > On Tue, Apr 15, 2025 at 10:01:04AM +0300, Andy Shevchenko wrote:  
+> > > >> On Mon, Apr 14, 2025 at 09:17:51AM -0600, Jonathan Corbet wrote:  
+> > > >> > Andy Shevchenko <andriy.shevchenko@intel.com> writes:  
+> > > >> > > On Wed, Apr 09, 2025 at 12:30:00PM -0600, Jonathan Corbet wrote:  
+> > > >> > >> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> > > >> > >>   
+> > > >> > >> > This changeset contains the kernel-doc.py script to replace the verable
+> > > >> > >> > kernel-doc originally written in Perl. It replaces the first version and the
+> > > >> > >> > second series I sent on the top of it.  
+> > > >> > >> 
+> > > >> > >> OK, I've applied it, looked at the (minimal) changes in output, and
+> > > >> > >> concluded that it's good - all this stuff is now in docs-next.  Many
+> > > >> > >> thanks for doing this!
+> > > >> > >> 
+> > > >> > >> I'm going to hold off on other documentation patches for a day or two
+> > > >> > >> just in case anything turns up.  But it looks awfully good.  
+> > > >> > >
+> > > >> > > This started well, until it becomes a scripts/lib/kdoc.
+> > > >> > > So, it makes the `make O=...` builds dirty *). Please make sure this doesn't leave
+> > > >> > > "disgusting turd" )as said by Linus) in the clean tree.
+> > > >> > >
+> > > >> > > *) it creates that __pycache__ disaster. And no, .gitignore IS NOT a solution.  
+> > > >> > 
+> > > >> > If nothing else, "make cleandocs" should clean it up, certainly.
+> > > >> > 
+> > > >> > We can also tell CPython to not create that directory at all.  I'll run
+> > > >> > some tests to see what the effect is on the documentation build times;
+> > > >> > I'm guessing it will not be huge...  
+> > > >> 
+> > > >> I do not build documentation at all, it's just a regular code build that leaves
+> > > >> tree dirty.
+> > > >> 
+> > > >> $ python3 --version
+> > > >> Python 3.13.2
+> > > >> 
+> > > >> It's standard Debian testing distribution, no customisation in the code.
+> > > >> 
+> > > >> To reproduce.
+> > > >> 1) I have just done a new build to reduce the churn, so, running make again does nothing;
+> > > >> 2) The following snippet in shell shows the issue
+> > > >> 
+> > > >> $ git clean -xdf
+> > > >> $ git status --ignored
+> > > >> On branch ...
+> > > >> nothing to commit, working tree clean
+> > > >> 
+> > > >> $ make LLVM=-19 O=.../out W=1 C=1 CF=-D__CHECK_ENDIAN__ -j64
+> > > >> make[1]: Entering directory '...'
+> > > >>   GEN     Makefile
+> > > >>   DESCEND objtool
+> > > >>   CALL    .../scripts/checksyscalls.sh
+> > > >>   INSTALL libsubcmd_headers
+> > > >> .pylintrc: warning: ignored by one of the .gitignore files
+> > > >> Kernel: arch/x86/boot/bzImage is ready  (#23)
+> > > >> make[1]: Leaving directory '...'
+> > > >> 
+> > > >> $ touch drivers/gpio/gpiolib-acpi.c
+> > > >> 
+> > > >> $ make LLVM=-19 O=.../out W=1 C=1 CF=-D__CHECK_ENDIAN__ -j64
+> > > >> make[1]: Entering directory '...'
+> > > >>   GEN     Makefile
+> > > >>   DESCEND objtool
+> > > >>   CALL    .../scripts/checksyscalls.sh
+> > > >>   INSTALL libsubcmd_headers
+> > > >> ...
+> > > >>   OBJCOPY arch/x86/boot/setup.bin
+> > > >>   BUILD   arch/x86/boot/bzImage
+> > > >> Kernel: arch/x86/boot/bzImage is ready  (#24)
+> > > >> make[1]: Leaving directory '...'
+> > > >> 
+> > > >> $ git status --ignored
+> > > >> On branch ...
+> > > >> Untracked files:
+> > > >>   (use "git add <file>..." to include in what will be committed)
+> > > >> 	scripts/lib/kdoc/__pycache__/
+> > > >> 
+> > > >> nothing added to commit but untracked files present (use "git add" to track)  
+> > > >
+> > > > FWIW, I repeated this with removing the O=.../out folder completely, so it's
+> > > > fully clean build. Still the same issue.
+> > > >
+> > > > And it appears at the very beginning of the build. You don't need to wait to
+> > > > have the kernel to be built actually.  
+> > > 
+> > > kernel-doc gets run on source files for W=1 builds. See Makefile.build.  
+> > 
+> > Thanks for the clarification, so we know that it runs and we know that it has
+> > an issue.  
+> 
+> Ideal solution what would I expect is that the cache folder should respect
+> the given O=... argument, or disabled at all (but I don't think the latter
+> is what we want as it may slow down the build).
 
+From:
+	https://github.com/python/cpython/commit/b193fa996a746111252156f11fb14c12fd6267e6
+and:
+	https://peps.python.org/pep-3147/
 
-> > - removed in commit 2b892649254f ("net: phy: dp83867: Set up RGMII TX
-> >   delay")
-> >=20
-> > Around the time of the removal, commit c11669a2757e ("net: phy: dp83867=
-:
-> > Rework delay rgmii delay handling") started clearing the delay enable
-> > flags in RGMIICTL (or it would have, if the condition ever evaluated to
-> > true at that time). The change attempted to preserve the historical
-> > behavior of not disabling internal delays with "rgmii" PHY mode and als=
-o
-> > documented this in a comment, but due to a conflict between "Set up
-> > RGMII TX delay" and "Rework delay rgmii delay handling", the behavior
-> > dp83867_verify_rgmii_cfg() warned about (and that was also described in
-> > a commit in dp83867_config_init()) disappeared in the following merge
->=20
-> Ugh, of course I find a mistake in the commit message right after submitt=
-ing the
-> patch - this should read "a comment in ...". I'm going to wait for review=
- and
-> then fix this in v2.
->=20
->=20
-> > of net into net-next in commit b4b12b0d2f02
-> > ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net").
-> >=20
-> > While is doesn't appear that this breaking change was intentional, it
-> > has been like this since 2019, and the new behavior to disable the dela=
-ys
-> > with "rgmii" PHY mode is generally desirable - in particular with MAC
-> > drivers that have to fix up the delay mode, resulting in the PHY driver
-> > not even seeing the same mode that was specified in the Device Tree.
-> >=20
-> > Remove the obsolete check and comment.
-> >=20
-> > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> > ---
-> >  drivers/net/phy/dp83867.c | 32 +-------------------------------
-> >  1 file changed, 1 insertion(+), 31 deletions(-)
-> >=20
-> > diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-> > index 063266cafe9c7..e5b0c1b7be13f 100644
-> > --- a/drivers/net/phy/dp83867.c
-> > +++ b/drivers/net/phy/dp83867.c
-> > @@ -92,11 +92,6 @@
-> >  #define DP83867_STRAP_STS1_RESERVED		BIT(11)
-> > =20
-> >  /* STRAP_STS2 bits */
-> > -#define DP83867_STRAP_STS2_CLK_SKEW_TX_MASK	GENMASK(6, 4)
-> > -#define DP83867_STRAP_STS2_CLK_SKEW_TX_SHIFT	4
-> > -#define DP83867_STRAP_STS2_CLK_SKEW_RX_MASK	GENMASK(2, 0)
-> > -#define DP83867_STRAP_STS2_CLK_SKEW_RX_SHIFT	0
-> > -#define DP83867_STRAP_STS2_CLK_SKEW_NONE	BIT(2)
-> >  #define DP83867_STRAP_STS2_STRAP_FLD		BIT(10)
-> > =20
-> >  /* PHY CTRL bits */
-> > @@ -510,25 +505,6 @@ static int dp83867_verify_rgmii_cfg(struct phy_dev=
-ice *phydev)
-> >  {
-> >  	struct dp83867_private *dp83867 =3D phydev->priv;
-> > =20
-> > -	/* Existing behavior was to use default pin strapping delay in rgmii
-> > -	 * mode, but rgmii should have meant no delay.  Warn existing users.
-> > -	 */
-> > -	if (phydev->interface =3D=3D PHY_INTERFACE_MODE_RGMII) {
-> > -		const u16 val =3D phy_read_mmd(phydev, DP83867_DEVADDR,
-> > -					     DP83867_STRAP_STS2);
-> > -		const u16 txskew =3D (val & DP83867_STRAP_STS2_CLK_SKEW_TX_MASK) >>
-> > -				   DP83867_STRAP_STS2_CLK_SKEW_TX_SHIFT;
-> > -		const u16 rxskew =3D (val & DP83867_STRAP_STS2_CLK_SKEW_RX_MASK) >>
-> > -				   DP83867_STRAP_STS2_CLK_SKEW_RX_SHIFT;
-> > -
-> > -		if (txskew !=3D DP83867_STRAP_STS2_CLK_SKEW_NONE ||
-> > -		    rxskew !=3D DP83867_STRAP_STS2_CLK_SKEW_NONE)
-> > -			phydev_warn(phydev,
-> > -				    "PHY has delays via pin strapping, but phy-mode =3D 'rgmii'\n"
-> > -				    "Should be 'rgmii-id' to use internal delays txskew:%x rxskew:=
-%x\n",
-> > -				    txskew, rxskew);
-> > -	}
-> > -
-> >  	/* RX delay *must* be specified if internal delay of RX is used. */
-> >  	if ((phydev->interface =3D=3D PHY_INTERFACE_MODE_RGMII_ID ||
-> >  	     phydev->interface =3D=3D PHY_INTERFACE_MODE_RGMII_RXID) &&
-> > @@ -836,13 +812,7 @@ static int dp83867_config_init(struct phy_device *=
-phydev)
-> >  		if (ret)
-> >  			return ret;
-> > =20
-> > -		/* If rgmii mode with no internal delay is selected, we do NOT use
-> > -		 * aligned mode as one might expect.  Instead we use the PHY's defau=
-lt
-> > -		 * based on pin strapping.  And the "mode 0" default is to *use*
-> > -		 * internal delay with a value of 7 (2.00 ns).
-> > -		 *
-> > -		 * Set up RGMII delays
-> > -		 */
-> > +		/* Set up RGMII delays */
-> >  		val =3D phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_RGMIICTL);
-> > =20
-> >  		val &=3D ~(DP83867_RGMII_TX_CLK_DELAY_EN | DP83867_RGMII_RX_CLK_DELA=
-Y_EN);
->=20
+It sounds that Python 3.8 and above have a way to specify the cache
+location, via PYTHONPYCACHEPREFIX env var, and via "-X pycache_prefix=path".
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+As the current minimal Python version is 3.9, we can safely use it.
+
+So, maybe this would work:
+
+	make O="../out" PYTHONPYCACHEPREFIX="../out"
+
+or a variant of it:
+
+	PYTHONPYCACHEPREFIX="../out" make O="../out" 
+
+If this works, we can adjust the building system to fill PYTHONPYCACHEPREFIX
+env var when O= is used.
+
+Regards,
+Mauro
 
