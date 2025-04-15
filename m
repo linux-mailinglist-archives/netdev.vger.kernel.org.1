@@ -1,93 +1,217 @@
-Return-Path: <netdev+bounces-182898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133BFA8A4C9
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:00:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48400A8A4D2
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C68887A490C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:58:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42ECB17C976
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7A129899D;
-	Tue, 15 Apr 2025 16:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D5810E9;
+	Tue, 15 Apr 2025 17:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vcf2cpB2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PP8/0JZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6993617A2F8
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDDE4B5AE
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 17:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744736395; cv=none; b=IfyX8Q81s2EZxlLxlkbP0s/3sIAnjXdwDdlMvBQiy4Q+LDLJx6vhK1a79dvNHbhbQwa/9AM6kvks2SJOXjaC7auQsKpOqG41szCF+YMcPUBrJwFwZCzjGlVScFBq7UAtWM50T0Fx6vGEJWvsEKQ+KOykXnwreT6uC/pDrVTrBOA=
+	t=1744736471; cv=none; b=E1zLqmEbUA+hVTmfqb0OAdmiNbh/T4M8T82fEKgUEZYG/lhwtv2rwi/WFsdaTx+SVfZF+8ov6pmfsIKvlhZslMipmyc47Iz9CgzPE5aFrqTs6HYZPVEbn9JbQ2u4035s6crGoGPdiAl3FJG7CKBMGocoukMDWd4R3OrT0q6jZAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744736395; c=relaxed/simple;
-	bh=QGlq9R0R8qTIYSOTBZMapKKqj5tjqjmL/lpcoOrOJdo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aqIf/naFKJuxcmsXEXaTwhXdiiBseJoc6SMFzSjxGutOdKOKTSJnNjlsbiYaVD5w2XKZJ1qkKwNXMdDj58LVqQtfweZmFmOqH58NveNScFNTMmUj90vGK8D79pE6KuP9p+AhbbIRmt7s1hH8EwXOb1pOzWrrZVrNoBkmHmZ7nsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vcf2cpB2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB09CC4CEE9;
-	Tue, 15 Apr 2025 16:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744736394;
-	bh=QGlq9R0R8qTIYSOTBZMapKKqj5tjqjmL/lpcoOrOJdo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Vcf2cpB2Bgs2Bw04iWCBKWo5OkWiDsneKNU1A/aduPKetDy7fK1gohzf0jwNJKwX5
-	 Mvi4hhJUOakDcRxTENLHnI5SdGgZgBNIUxqf3J4LBSNmxemrKMIg0kOZjBltPQft+4
-	 dSEw6jVGAMpo/nCe+dkTlucNrA+5UISpmrMUqWmtd+tJTwyGr/J1XgfxNWzQJgJePy
-	 EnlBCB+GcTjfpFLA0Hl979pGZpqZKnyJRYpJdZGR9r6CmgMXkswlBfArmbMx2PWtql
-	 9dQNTVNLXHQBIhyCfdU+SL1tJe22ke6U+1qNCl0tp7fzDG+j42qsJ7IpXzxa7P+bPb
-	 pFejE3xrnEucg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE693822D55;
-	Tue, 15 Apr 2025 17:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744736471; c=relaxed/simple;
+	bh=HYG9Ydj1CkNJHv3NAdtVSqltgwNIhIWhSRCR+zyDhKc=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=Ux1TfkHYHy/1PCEAMQAF2td2EoFfb30VJt5iRh5jB/0iL6DqVfWC/7ngLXHoCNjS6vNROipYnJlQjica0/vA2ao6UKEHTb465iQGyf5QADNEUDNHrodk0BNWSSOr73Eu192neBt3MukpJBZxekjLFOlDtLv0/m3ld6i+mwyKrJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PP8/0JZ1; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] octeon_ep_vf: Remove octep_vf_wq
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174473643278.2707730.12989256432227950338.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Apr 2025 17:00:32 +0000
-References: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
-In-Reply-To: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, srasheed@marvell.com, vburru@marvell.com,
- sedara@marvell.com, sburla@marvell.com, linux@treblig.org,
- netdev@vger.kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744736456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w2++wc7gpI0tHQBsAwAQSij1voTjj4GtIOJIGp4oiEs=;
+	b=PP8/0JZ1/bymDhLZDb2VwAHNIKWWAk0MIVlaFFGD3CVsnSOv0j/Nb39QM9GrqcB3R8hhHo
+	NgvWBhRupLIwI+4KZ5OorVe8sAQ6+wD1zXJ8Z72T7FKyIBLwa26eRU0faYOyaSdxqHnI3P
+	kCBegkTLqKendtMI8yMsJjZz6nzZxNQ=
+Date: Tue, 15 Apr 2025 17:00:54 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Ihor Solodrai" <ihor.solodrai@linux.dev>
+Message-ID: <02aa843af95ad3413fb37f898007cb17723dd1aa@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf] selftests/bpf: remove sockmap_ktls
+ disconnect_after_delete test
+To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, ast@kernel.org,
+ andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, mykolal@fb.com, kernel-team@meta.com
+In-Reply-To: <3cb523bc8eb334cb420508a84f3f1d37543f4253@linux.dev>
+References: <20250415163332.1836826-1-ihor.solodrai@linux.dev>
+ <3cb523bc8eb334cb420508a84f3f1d37543f4253@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+On 4/15/25 9:53 AM, Jiayuan Chen wrote:
+> April 16, 2025 at 24:33, "Ihor Solodrai" <ihor.solodrai@linux.dev> wrot=
+e:
+>>
+>> "sockmap_ktls disconnect_after_delete" test has been failing on BPF CI
+>> after recent merges from netdev:
+>> * https://github.com/kernel-patches/bpf/actions/runs/14458537639
+>> * https://github.com/kernel-patches/bpf/actions/runs/14457178732
+>> It happens because disconnect has been disabled for TLS [1], and it
+>> renders the test case invalid. Remove it from the suite.
+>> [1] https://lore.kernel.org/netdev/20250404180334.3224206-1-kuba@kerne=
+l.org/
+>> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+>
+> Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>
+> The original selftest patch used disconnect to re-produce the endless
+> loop caused by tcp_bpf_unhash, which has already been removed.
+>
+> I hope this doesn't conflict with bpf-next...
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I just tried applying to bpf-next, and it does indeed have a
+conflict... Although kdiff3 merged it automatically.
 
-On Mon, 14 Apr 2025 17:44:48 +0100 you wrote:
-> commit cb7dd712189f ("octeon_ep_vf: Add driver framework and device
-> initialization") added octep_vf_wq but it has never been used. Remove it.
-> 
-> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
-> Closes: https://lore.kernel.org/netdev/Z70bEoTKyeBau52q@gallifrey/
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] octeon_ep_vf: Remove octep_vf_wq
-    https://git.kernel.org/netdev/net-next/c/bbfc077d4572
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+What's the right way to resolve this? Send for bpf-next?
 
 
+From 21ecc409c7e78e52cbb27296b039c13860ace7fa Mon Sep 17 00:00:00 2001
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+Date: Tue, 15 Apr 2025 09:22:50 -0700
+Subject: [PATCH] selftests/bpf: remove sockmap_ktls disconnect_after_dele=
+te
+ test
+
+"sockmap_ktls disconnect_after_delete" test has been failing on BPF CI
+after recent merges from netdev:
+* https://github.com/kernel-patches/bpf/actions/runs/14458537639
+* https://github.com/kernel-patches/bpf/actions/runs/14457178732
+
+It happens because disconnect has been disabled for TLS [1], and it
+renders the test case invalid. Remove it from the suite.
+
+[1] https://lore.kernel.org/netdev/20250404180334.3224206-1-kuba@kernel.o=
+rg/
+
+Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+---
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 68 -------------------
+ 1 file changed, 68 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tool=
+s/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+index 49b85c1c7552..3044f54b16d6 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
++++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
+@@ -61,72 +61,6 @@ static int create_ktls_pairs(int family, int sotype, i=
+nt *c, int *p)
+ 	return 0;
+ }
+=20
+-static=20int tcp_server(int family)
+-{
+-	int err, s;
+-
+-	s =3D socket(family, SOCK_STREAM, 0);
+-	if (!ASSERT_GE(s, 0, "socket"))
+-		return -1;
+-
+-	err =3D listen(s, SOMAXCONN);
+-	if (!ASSERT_OK(err, "listen"))
+-		return -1;
+-
+-	return s;
+-}
+-
+-static int disconnect(int fd)
+-{
+-	struct sockaddr unspec =3D { AF_UNSPEC };
+-
+-	return connect(fd, &unspec, sizeof(unspec));
+-}
+-
+-/* Disconnect (unhash) a kTLS socket after removing it from sockmap. */
+-static void test_sockmap_ktls_disconnect_after_delete(int family, int ma=
+p)
+-{
+-	struct sockaddr_storage addr =3D {0};
+-	socklen_t len =3D sizeof(addr);
+-	int err, cli, srv, zero =3D 0;
+-
+-	srv =3D tcp_server(family);
+-	if (srv =3D=3D -1)
+-		return;
+-
+-	err =3D getsockname(srv, (struct sockaddr *)&addr, &len);
+-	if (!ASSERT_OK(err, "getsockopt"))
+-		goto close_srv;
+-
+-	cli =3D socket(family, SOCK_STREAM, 0);
+-	if (!ASSERT_GE(cli, 0, "socket"))
+-		goto close_srv;
+-
+-	err =3D connect(cli, (struct sockaddr *)&addr, len);
+-	if (!ASSERT_OK(err, "connect"))
+-		goto close_cli;
+-
+-	err =3D bpf_map_update_elem(map, &zero, &cli, 0);
+-	if (!ASSERT_OK(err, "bpf_map_update_elem"))
+-		goto close_cli;
+-
+-	err =3D setsockopt(cli, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
+-	if (!ASSERT_OK(err, "setsockopt(TCP_ULP)"))
+-		goto close_cli;
+-
+-	err =3D bpf_map_delete_elem(map, &zero);
+-	if (!ASSERT_OK(err, "bpf_map_delete_elem"))
+-		goto close_cli;
+-
+-	err =3D disconnect(cli);
+-	ASSERT_OK(err, "disconnect");
+-
+-close_cli:
+-	close(cli);
+-close_srv:
+-	close(srv);
+-}
+-
+ static void test_sockmap_ktls_update_fails_when_sock_has_ulp(int family,=
+ int map)
+ {
+ 	struct sockaddr_storage addr =3D {};
+@@ -314,8 +248,6 @@ static void run_tests(int family, enum bpf_map_type m=
+ap_type)
+ 	if (!ASSERT_GE(map, 0, "bpf_map_create"))
+ 		return;
+=20
+-=09if (test__start_subtest(fmt_test_name("disconnect_after_delete", fami=
+ly, map_type)))
+-		test_sockmap_ktls_disconnect_after_delete(family, map);
+ 	if (test__start_subtest(fmt_test_name("update_fails_when_sock_has_ulp",=
+ family, map_type)))
+ 		test_sockmap_ktls_update_fails_when_sock_has_ulp(family, map);
+=20
+--=20
+2.49.0
+
+
+>
+> Thanks.
 
