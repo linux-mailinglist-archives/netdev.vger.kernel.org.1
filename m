@@ -1,273 +1,550 @@
-Return-Path: <netdev+bounces-182614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB76EA8956F
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:44:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBFFA89592
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF9927A2728
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:43:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA2D03AB38E
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F8F27A133;
-	Tue, 15 Apr 2025 07:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5550D2147F2;
+	Tue, 15 Apr 2025 07:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="X8FxE2SU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="i+20vQtL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2067.outbound.protection.outlook.com [40.107.223.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC9F268FE6;
-	Tue, 15 Apr 2025 07:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744703067; cv=fail; b=qtUi6o+P/lkSsnDHgAxkVlg3HC1Hs7VfoxMH4TdH+sYGg/G0B+1PkInFDPWJNuhVQXGsqAytgwDJ4uWLIZ3KRlDmGg5sSa7nFB4Boh7x5RFib+VWznOlhGCTppPiRV2ytNgqTp66osDlIhyrWs9yitlsvJ2tQ85TCiLMcIhGp3o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744703067; c=relaxed/simple;
-	bh=KNcZwUeDnJYS0CDkn9AzuO6QF8FNVMcEcqlrs8OAvnU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=USZgIR3B4mzP53e3C1VJTCwgC0xmcPLf5NgWBInl3xCF+6joJaoUYwMsJrs/LSlb0oIeeiGADvY32YEhUEZNUWmKHlNs1TWrRdO1c6hfJefvTXXGVZR7eAjnaqfQe2y0WXTWJiv0cNALZ9E7eWTGhUZ+Jie1tJfwagIgw4XKQhM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=X8FxE2SU; arc=fail smtp.client-ip=40.107.223.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a5Z9oa0cnxULAoCoZFQ1ZaW4UdMM5rzixxunXQq0o5blolppFAOh7G0fqT/1hOfrTBoCBRMmEb1JIKEobmRm3H+yjJEqLK8Ye7GV1tMBKNHum5bufMpTRFcAxx9RwFZZgeDgubnp8aYFHd8iN9SSkEU4NCN9drOMge5hxEcBBPWtFP58NHdnuywXEf+EzGUreA7q8HHBBwpoOKqFZbfXxDu+euu9oDpv0Za8l3socLUPgGtm5aEU0xLCOpkjhseJEaQYI2i38LwlW2irFu2ICuBM7ZHH7KY/o4w2FrkczeWX6lU988kSTuDzQOex2Ar7rQeiP6Lq3OAOBI5o5qs9yA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NtnhSahIx7c8fC6HDpDNYcU0I25Pq0Pp3NBuXhD54qE=;
- b=RIJmxNGfnCWmNkwbRjAT/XtzUslUA1HI/FtFvcQPKQaCDrWfkjplsE5zki7gOX4GDquA0B1GF6DAdqq8+YwmWJ8hPiMmMu+NDsv2Akqkuu2IZH5e0qljjXKecebAQLvnXVvaGKl5k2VI2Vgneh3xIIC9fu9Lt7zyPhS19Y1nS24R6syhSleabxOnm6BQ3FaA+6b+M0n3lPmCTVMyLGXAT3wCbM6Ca6wxy/ZSe8IpC0PPo30C/lG230YsIK6432vnGVxK0kukaZp7ZRN4RnJyEQ1vZ461QkNEApouYjiKJfpz3HxnpUfkF4mkFiBFbDarhC9rmMsvd8eR+QSQfNcSQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NtnhSahIx7c8fC6HDpDNYcU0I25Pq0Pp3NBuXhD54qE=;
- b=X8FxE2SUm59ujIVrmBIMgyh/ufePAkInTWUOLCtOePxRQvRT4VcPYB6gNDX7pDysPV96tgPN+eqs3zlWv9OQncRhg7Sg/UkS+ozhZG6cOaZZ1Vz3Z79HCT/iAcfDEc9ZQj8gHYxwT9NlQArXFIyN2P9JdSwaAKkPU+gQ4VEYors=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com (2603:10b6:208:198::10)
- by MN0PR12MB6246.namprd12.prod.outlook.com (2603:10b6:208:3c2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Tue, 15 Apr
- 2025 07:44:23 +0000
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf]) by MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf%3]) with mapi id 15.20.8632.036; Tue, 15 Apr 2025
- 07:44:22 +0000
-Message-ID: <fe89058c-cd98-4149-a37e-8b8052cffa17@amd.com>
-Date: Tue, 15 Apr 2025 08:44:18 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 04/22] cxl: move register/capability check to driver
-Content-Language: en-US
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
- <20250414151336.3852990-5-alejandro.lucero-palau@amd.com>
- <20250414181833.00003eca@huawei.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20250414181833.00003eca@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DBBPR09CA0036.eurprd09.prod.outlook.com
- (2603:10a6:10:d4::24) To MN2PR12MB4205.namprd12.prod.outlook.com
- (2603:10b6:208:198::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9B32DFA5C
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 07:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744703279; cv=none; b=m+GqW4gOzmFzERJ/dUdJA4nJfxwlGsd60Gi5Pk4oBsYJ35ec0O+wOxge0Mc0Ct1FuXT5EvByITCJl0It11r2I5rqkpdj0b9vlp6cNccxxa1YAHFCwJX1uNbyVoe0oF78TAnflfzLjFfBqh6rOV15hYVXkv2C5wp0cRgtOq8U0Is=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744703279; c=relaxed/simple;
+	bh=/+6RpGL3ITqXB4hemZJq4nHhaoWZM1Ddxrk3BtTz4ZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JIUgLhBWYDMRUAHpLsDu3Tyy+Ol18yAx+gVvB/kRPG4fjhhwlLzmZ6WwMzJGOgst46Azmm8c0+dtaqnWjnnYBwjlZNymojxr51kes8i2j4RuAoV5Dts09IPzMVUTXDd3EGLBLcP1tiT2tU2DgdYlGlJFuKh/s0Nlykgp0oTgdtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=i+20vQtL; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2295d78b433so54251435ad.2
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 00:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1744703277; x=1745308077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ci7iDGlFMRRzvR386dsOgKgNsV3msVqezxNxcA03HRs=;
+        b=i+20vQtLFYiqxCp2QCxJYkYOGrrnGIgprk/xk7WiXbTFrRw1FtnQ6BgTzs0SnCcSnq
+         b04KFeaqX1TO+wdQ5ke+5FLuZCmEucMGwK94JhdTWzPVg2m2R2TylS9bDuihkJ2wCm+O
+         K1SJmxDKrGB5A1mR7x9kXDji70KwsZKtaJYY8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744703277; x=1745308077;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ci7iDGlFMRRzvR386dsOgKgNsV3msVqezxNxcA03HRs=;
+        b=lKJIdciCixclH7Crzy3aTOyM2HOCORG/eAuBoccROfxGxQmIfCkOX+kD5/+C1A2YL4
+         ZG2NBv68uvdzttM3rkJeMfGUoCUvuE5q8UhSMGC+lOR3rBPZAWfpsCX3G28fnwWg9r5O
+         mlnpJRt+9b5LzwEeS++wNJnl4GIcQR0FH88RadgPXDf4NAf4alq2tyCbEsjuCWS2EZKq
+         hl1PS/Vv4ixEOS9ilLGQYXlB9X14bAB9hdAsovRZ3qpvo4OUdocGsXnQER9RM2G6LPMb
+         dUU4Rm0F5jr/xZYXZZJgcmRFN6JdjgYbpyKatdItryiKckJfFUrRzHJY6ayJdkkLyRdB
+         EQ0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVHzFe2ZPaIGpRyFhY+JKnkI+Y41nuA78abO7CCs7Hljm+Vqg5uyFlPCVZhPhqgurnpe5f7omI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywjj4VoNf4PghhMtijo/2r1GVXAKhza/EIOWXUo7NvXDKp/8m7P
+	eP6c6ivO7/MIEniFz+c0qwJqFk8lFN2ge2cILfn7l9+bpmHWBIkRTQinEMVPvg==
+X-Gm-Gg: ASbGncub/k6Ba8BHuWmSZvKder2H8XNkmA2L2QLi2Pif/5UJCAWTmZmg+DE/7A16Pop
+	ApqVSFl3zi/IcXagnUomq63rw/1BAf7l0YZzIRsi3xvMyGZ+DhdY0+GuLA+jppoI0k86r7x4IEe
+	Nl5HHGZ/jOZyUvstZKElXe1bInNww2oRJkACWmmm1/4E+oWnjbGKLBx/OFUBqaQjghIuQ6hDb5K
+	w8oi39QoOJDZ1UTGTEhB6zy4XWOE8VZFanejJ/Q0CI3DMAnkatb9mgYpPTJIyfA0ICwdroUj3/R
+	lNeEjPpTZHilmJHKIQh+QcqquM0Jx3DFhaKs6XCAROshj+ZtjJJ4megjHNqsJldhUW8QnIxjezC
+	KpuUlhhuX2aERSeJqOBpx7mqLJ+4+re3C
+X-Google-Smtp-Source: AGHT+IGeqClpUv+V7r1fn7IROf5BqLGBG3We1PhoEerRraJS+GWM+ME6cDUkxjqJjWXSmSui+1EXog==
+X-Received: by 2002:a17:903:1a0b:b0:216:6283:5a8c with SMTP id d9443c01a7336-22bea4f708amr228854855ad.39.1744703276628;
+        Tue, 15 Apr 2025 00:47:56 -0700 (PDT)
+Received: from li-cloudtop.c.googlers.com.com (132.197.125.34.bc.googleusercontent.com. [34.125.197.132])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd21c2102sm7841550b3a.46.2025.04.15.00.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 00:47:56 -0700 (PDT)
+From: Li Li <dualli@chromium.org>
+To: dualli@google.com,
+	corbet@lwn.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	donald.hunter@gmail.com,
+	gregkh@linuxfoundation.org,
+	arve@android.com,
+	tkjos@android.com,
+	maco@android.com,
+	joel@joelfernandes.org,
+	brauner@kernel.org,
+	cmllamas@google.com,
+	surenb@google.com,
+	omosnace@redhat.com,
+	shuah@kernel.org,
+	arnd@arndb.de,
+	masahiroy@kernel.org,
+	bagasdotme@gmail.com,
+	horms@kernel.org,
+	tweek@google.com,
+	paul@paul-moore.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	selinux@vger.kernel.org,
+	hridya@google.com
+Cc: smoreland@google.com,
+	ynaffit@google.com,
+	kernel-team@android.com
+Subject: [PATCH v2] policy,tests: add test for new permission binder:setup_report
+Date: Tue, 15 Apr 2025 00:47:46 -0700
+Message-ID: <20250415074746.3329673-1-dualli@chromium.org>
+X-Mailer: git-send-email 2.49.0.604.gff1f9ca942-goog
+In-Reply-To: <20250415071606.3271807-1-dualli@chromium.org>
+References: <20250415071606.3271807-1-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4205:EE_|MN0PR12MB6246:EE_
-X-MS-Office365-Filtering-Correlation-Id: 05ac95bc-14fc-4d21-5f01-08dd7bf15609
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V2tpZzlzQXNUeDc5djZRYlkyY3lrL3g5VS9yS2ZTYXVsbGJVV2VuMGhFcXlr?=
- =?utf-8?B?V1pLeDdSSmtJTHBoNDFJVkpEQWV3enVDeUtIdWpkSXhLQTB5Q25TYWpJOWpO?=
- =?utf-8?B?SkpaQ1BYb0o2ZmZSWVpJbDh4LzJqKzRPeXlPN1psOXRKR1dLWHMzSmluQ0Ev?=
- =?utf-8?B?alFKeXBWa3IybERRV21Ha1FlTGlwV0dDL2tBcjhwK1hKTERBeW1YcTNvL2py?=
- =?utf-8?B?c1h5ZDRQanhYalFoaU1FTkJES0loNGN5NStxLzRPZ1MweGZ0R00xeGYzREJO?=
- =?utf-8?B?VUpRVmFpS2IyNW85K2xZMkNLYTlNMjNBRjRNT1dTTW5xL09oYlRpNS83UDgz?=
- =?utf-8?B?c21OUXBRY3VHZUhaU3YvMkdIWnVndHdreGNLUTJ3ZmF2MFFwOEJxNUh5QkJY?=
- =?utf-8?B?SWlqMGx0ZWUvd3RYTVh2YlhDWXhkRkk2Z0wxeGdLajRhdEFEeWRiUG1NRnUz?=
- =?utf-8?B?cEVvTElKUkg3cDB6eXlOM1B4bDJYaWdMOEVHNkt6RTdmL0FNdERWWkx5anlS?=
- =?utf-8?B?bGtheXJwbTZTNWlRRW5uMXBsNzJSMEU5Ymg1bFdvNFV1MGxsR3d3aUozVW9w?=
- =?utf-8?B?cmRnVkx2VmVGMFJuMVBBaXJHM01Vb21CakhOL2RBKy85M1BseXBXNThHcm40?=
- =?utf-8?B?TVhBZFRrRDFjaFRWRHBSYXZraGFndWNmOTlWb2MrMThGR1ZNZ0lGL05lOFho?=
- =?utf-8?B?b244NkxTdGtmNVIwNy9zR1pNdlFzVXkzUU1KRUdiNmxtRGFYdGZBdVI5SlRq?=
- =?utf-8?B?SU40a1l1NWFOTlBHVlFyTktxUXhPTDNLdU5aWk1HeWR6QUJ5TENpclBSRFhV?=
- =?utf-8?B?a0FnR3JLWUVUNkFaVXZpM3NBdzh1cUF5K2FVNWc2M2I2UjNzd2hhb3BXRVR1?=
- =?utf-8?B?YWxxbldOUkI2andRRHBnUzBJQ3NOQ29IcDVsS2FBUnRXcGlOaTRiU2xHSkh4?=
- =?utf-8?B?a3J6WTQ0WHowUjFQck96eiszYy9tUFJqL3U4NHNDRnBxOHd1VEJySGlBbjdU?=
- =?utf-8?B?VWdRU09zM0lhd3hWY3YwVmtzSUV2R2JnQjNCT0xrcFRLYnVsUzFNdkdtcEJT?=
- =?utf-8?B?TjBhUTN2a3o2cFRBNUVYUVArSzkyUkpqMTNONmw3ak5rcXdxWlZ1Z0hodnhU?=
- =?utf-8?B?ekpGdFRTQmJTbHc4dHcrOUxjU0xITnIxYkd1eCtuQmkzbDMweTZLWFBaOFNX?=
- =?utf-8?B?WWFRTmlCdENtZ000UDJ5andueVNMNTIyT3V3alhVVHhsdnh2YlEvVDlRUWZM?=
- =?utf-8?B?SzZyR2E0V0ZxYlJvY0V6UVQ0MkZhV0xjSW0xM08xM0o0SHEwWXVxVFU4Y2Iz?=
- =?utf-8?B?TEZqR0dSVFNoTktHUEFzK1Ntck9qcGc4cTBGbDBKMkhvcEJEVTBxZFYydkJn?=
- =?utf-8?B?V1VJVGYwbk9vOWROQW8rWWYxS0lFc1pSUXhrQ2JnVGtVdUgrUWUyYzB4K1hl?=
- =?utf-8?B?RkZBK2pMZDlCMjdBRTlKbHJuVEl2UE5WeTNpZ3EvSWJwQ3ZEVW1RT3Aybk10?=
- =?utf-8?B?ZW4vU2lONnJ2QzFOMDhQcVlxNzVmWk4rQXJQbVFwajlHSTZHMEVnTGg5cnVM?=
- =?utf-8?B?eWZQTDk3d1YwTmh0TGZwenZtZ0pZR3lJSlV5WmdKdDNHMUg5c0ZVeGxOVzFN?=
- =?utf-8?B?NnIyWWJUMVEvSGMzblZxeVRFeFNHaVE2bUZQMXlNK2t0ZVVkWGdmaDM1ZlMv?=
- =?utf-8?B?R3QxR05mYVJETDRsNkVDV3NqaS9xQk0vcWpqckovMmJlYzFYejUvd2pEVlZI?=
- =?utf-8?B?eTdsMGs0NXh6ekJpb3g4VWNFOUJnTGpvYTY3K0lSOERLNThERXpKdjdaQkNV?=
- =?utf-8?B?WEV4cnh1bm41MmRYWjB6WHhaQzBtM1J5RElMUGlFUnJrbis5VWpTNkd6eEwv?=
- =?utf-8?B?NUt6Z0xyM2xlbXppWEROWUxBcFNkV1hjR2srT0xsZ3I4M0ZlWU5yNjV3RU9O?=
- =?utf-8?Q?QEar02p7WX8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4205.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NXZzcVFucldhSmRoNVRESXFLK1Z4ZlRTMUorRFg5OUxYWHRFUXNZWjh0T1cz?=
- =?utf-8?B?dk90UjRxZDgrUzBER2dUUXdhMysxOUdvLzVNVDFnMEZMQzBVeUpjVmF0NVov?=
- =?utf-8?B?WmVoZUY4M01IODNuNUVTVENJMDhZdXRiaDliS1hzU3FIQy9JckNKMWFIRGN1?=
- =?utf-8?B?d2gvVndNTFUxZkZrVGwrcDlxUk8yaWZjQ2lqL0Rxbmg1eXZXQkpTVkhhRUxz?=
- =?utf-8?B?ZjZZUVRtcEJ3akl4WTAwVnZyM3JOSVQrcjBVVjBERGlsOHRoczBOMUdwYnRl?=
- =?utf-8?B?ZXQvZWpCWFJQejZFUlI5NVJkVHMyRkQwQ25ZQWlyMmhEa1RTbW01OVhEUDF6?=
- =?utf-8?B?eitGL2MrSGxUcEVnbElVU3c1UDQxcU5UaWlsSStvWklSZkZIdkxHcjlVdUl0?=
- =?utf-8?B?WTZEMHVzVHY3TFJmWWZ1NThVR1Y0SnlkQXB2UzVqc1BJZUQxaTF4UXU5TmhS?=
- =?utf-8?B?UjNFenJ5VUdRQzhETkRuTWNHdDlhK1RYYkk3aGxhSzJmS1l3Zi9TRERKTkgr?=
- =?utf-8?B?RmF6MmF1VWYrb3dBcHNwSTJQVnlHRU1tMmxDamxjeUR5Q1VEbUFtNDcvSzU1?=
- =?utf-8?B?bHNOekFwRldLamQ3WGtKRkVJUnRrUU1EUzJNOHZMUjl5UHg3dllEVFdUYldN?=
- =?utf-8?B?R3BHYlBpa2dwMUVFS2JyOHprNTZMWlk0N3BZRDdMb3lXVFVXUTUydFNOVEFI?=
- =?utf-8?B?c0Q4UUU3MjdGTTBuWmo4ZHE2bGxlRjNTTkVISW14UTE4WGhYWkd5UnNrbCtl?=
- =?utf-8?B?cU5ST3hPRUwzS3M5NmRsb2pzaUJiNDV2MTU2N1VBdTZsVlVscVBURFkvZVZ5?=
- =?utf-8?B?Sng3Uk1PVzdySFNmL2czZjZYQzBiOXFOZDdYRFVlWUQ1a1oxcldXSXI4L3dn?=
- =?utf-8?B?eEdOU3l4Mjdjb04wME9ya1lCcWRtTjhlUm1FSytNMnFsV1JadWZ5ZEtjNzlP?=
- =?utf-8?B?NVlsSWxaWDI1cEp1ZFBKbDl6NnBZRnp4RW9IeUpvTjM1VC9OMDZCVkhEQ2s5?=
- =?utf-8?B?cWpzUUxUek1jelVpemxwREZPNWpwYTl5WXpQUFhwWnhQNmZKcHVRZ0RtV0Yr?=
- =?utf-8?B?NDJJY0paV01LbFJITHl4VU1yYm5uZDRZeklSYUp4Slp5Yk51c0hYZnZCeGo2?=
- =?utf-8?B?VkpWK0p2cTJtcC9WVmpLekNkQm91YUNiSWx2bWFuYW5PMWl5NVViL1JnSHV6?=
- =?utf-8?B?dEcxRWNkdUVCL1NYTnhsaFgvMCtYNk9YWG1FSEoveHhtM0Y5VUlJWnlRQnFj?=
- =?utf-8?B?V3JGNmhRdTBKUEhFSDNnK2pKZ3pWUkVjbTdPZzdEU3c3djF1YTU3NlR2OHR4?=
- =?utf-8?B?ZFlEdXlyUmZ3aElhTTBiKzlwV1I3cGdqTU5UQ2lrQmlSOVFBWlVnWk40TWlx?=
- =?utf-8?B?RUR0SEw1SUhGSUpKY1FIc0dMWCtaY3FnakVTeE90SllCTE1NeEczTXRNeFR3?=
- =?utf-8?B?MWFxUTNjTGxnaXM3RWFBMWpvY2xmcFN4VVJIY25zcnpKd09nczlaM2RvRXdI?=
- =?utf-8?B?ZVRWSHRGS1JCTkVqVC9CRjkzY1dQbmR1YkpJT3NsNzV5RWtSTW80dVRHMWZs?=
- =?utf-8?B?ZUJmQWducm5LYVBleklkckhoN2xmNzNnZ1BuNUNuUWFTK01SSlNydTBkcDRu?=
- =?utf-8?B?cElKYnFNSDZNVUxROWpaYmZ6aUlWcGxhWEM3S1RKYTBXV1BWVzdGdHNtTDJR?=
- =?utf-8?B?Z1hFRVRxK2JqdXpSYWNRM25yQVZybTM3WXVsNXRkL3A1Q01LN1ZFVVlKVjFh?=
- =?utf-8?B?WHRMSHd0TkorN1JZREpqSldNVytKNEFJZUxsRjBJQzh2MUdCOWlabHhkWVBh?=
- =?utf-8?B?a2R4azd5VklvNk9lV3ZaU2lncDdQSGxPU1BCemFNR2ttNVo3N1BHM0Vod0pt?=
- =?utf-8?B?SDFtTzlMZzkzbzNrQmM4UmtlelBmSTJ2R1NEeFF2Zzh3YjFMYlFLa21reWlu?=
- =?utf-8?B?RjR6ejl0TmRuWDhlb0owbXVtWkxZaFZtRXE0UlhKSGtuY0FpaytuRUxEL0ZD?=
- =?utf-8?B?dURIZ0hIOVlBbWVSaVBUMjdVaWI2TFhIWWRlNmdFdUpCSXN2bnpKL2EzUmk5?=
- =?utf-8?B?bFFnTjVsdjNpQy92VEJBSkhtVlp6ZWhYcTd5VXVkSkRIS0xWYU9FZjlvN0ZH?=
- =?utf-8?Q?ZwREePUGKZBxBueUI86VNTcr5?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05ac95bc-14fc-4d21-5f01-08dd7bf15609
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4205.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 07:44:22.3628
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XuCNqUfnJysmUCZUlhb+4gIrW1begq1nidnI07p+djkqmOOPFQUSRQdkdWdp/jLTAy3lBt14yr4pJIN5epRZ/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6246
+Content-Transfer-Encoding: 8bit
 
+From: Li Li <dualli@google.com>
 
-On 4/14/25 18:18, Jonathan Cameron wrote:
-> On Mon, 14 Apr 2025 16:13:18 +0100
-> alejandro.lucero-palau@amd.com wrote:
->
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Type3 has some mandatory capabilities which are optional for Type2.
->>
->> In order to support same register/capability discovery code for both
->> types, avoid any assumption about what capabilities should be there, and
->> export the capabilities found for the caller doing the capabilities
->> check based on the expected ones.
->>
->> Add a function for facilitating the report of capabiities missing the
->> expected ones.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Hi Alejandro.
->
-> A request if we end up with a v14 - please add notes on what changed
-> in each patch. It's really handy for reviewers to tell which patches
-> they need to take another look at.   More info that we get from
-> absence of our own tags!
+This new test depends on the corresponding kernel patchset
+"binder: report txn errors via generic netlink", which implements a new
+feature "transaction_report" in the kernel binder driver, protected by a
+new permission "binder:setup_report".
 
+This test updates the base policy to define this new permission and add
+a new test for it. If the kernel does not support them, the test will be
+skipped.
 
-Hi Jonathan,
+For testing purpose, you can update the base policy by manually
+modifying your base module, applying the following patch and then running
+the selinux-testsuite as usual.
 
+    sudo semodule -c -E base
+    sed -i.orig \
+    "s/set_context_mgr transfer/set_context_mgr transfer setup_report/" \
+    /usr/share/selinux/devel/include/support/all_perms.spt
 
-Yes, I'll do so.
+    make -C policy load
+    make -C tests test
+    make -C policy unload
 
+Signed-off-by: Li Li <dualli@google.com>
+---
+ policy/test_binder.te       |  24 ++++
+ tests/binder/.gitignore     |   1 +
+ tests/binder/Makefile       |   2 +-
+ tests/binder/setup_report.c | 277 ++++++++++++++++++++++++++++++++++++
+ tests/binder/test           |  32 +++++
+ 5 files changed, 335 insertions(+), 1 deletion(-)
+ create mode 100644 tests/binder/setup_report.c
 
-> One minor thing inline.
->
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->
+diff --git a/policy/test_binder.te b/policy/test_binder.te
+index 4c7974a..a75979e 100644
+--- a/policy/test_binder.te
++++ b/policy/test_binder.te
+@@ -94,3 +94,27 @@ allow test_binder_client_no_transfer_t test_binder_mgr_t:binder { call };
+ allow test_binder_client_no_transfer_t test_binder_provider_t:binder { call impersonate };
+ allow test_binder_client_no_transfer_t device_t:chr_file { getattr ioctl open read write };
+ allow_map(test_binder_client_no_transfer_t, device_t, chr_file)
++
++#
++################################## Report ###################################
++#
++type test_binder_report_t;
++testsuite_domain_type(test_binder_report_t)
++typeattribute test_binder_report_t binderdomain;
++allow test_binder_report_t self:netlink_generic_socket { create bind read write };
++allow test_binder_report_t self:binder { setup_report };
++
++#
++######################### Report No Generic Netlink #########################
++#
++type test_binder_report_no_genl_t;
++testsuite_domain_type(test_binder_report_no_genl_t)
++typeattribute test_binder_report_no_genl_t binderdomain;
++
++#
++############################# Report No set up ##############################
++#
++type test_binder_report_no_setup_t;
++testsuite_domain_type(test_binder_report_no_setup_t)
++typeattribute test_binder_report_no_setup_t binderdomain;
++allow test_binder_report_no_setup_t self:netlink_generic_socket { create bind read write };
+diff --git a/tests/binder/.gitignore b/tests/binder/.gitignore
+index dc6ce20..ae57d57 100644
+--- a/tests/binder/.gitignore
++++ b/tests/binder/.gitignore
+@@ -3,3 +3,4 @@ check_binderfs
+ manager
+ service_provider
+ client
++setup_report
+diff --git a/tests/binder/Makefile b/tests/binder/Makefile
+index b89d4db..56a5b07 100644
+--- a/tests/binder/Makefile
++++ b/tests/binder/Makefile
+@@ -1,7 +1,7 @@
+ # Required for local building
+ INCLUDEDIR ?= /usr/include
+ 
+-TARGETS = check_binder client manager service_provider
++TARGETS = check_binder client manager service_provider setup_report
+ LDLIBS += -lselinux -lrt
+ DEPS = binder_common.c binder_common.h
+ 
+diff --git a/tests/binder/setup_report.c b/tests/binder/setup_report.c
+new file mode 100644
+index 0000000..0c1e651
+--- /dev/null
++++ b/tests/binder/setup_report.c
+@@ -0,0 +1,277 @@
++#include <linux/android/binder_netlink.h>
++#include <linux/genetlink.h>
++#include <sys/socket.h>
++
++#include "binder_common.h"
++
++#define BINDER_MSG_SIZE 1024
++
++#define GENLMSG_DATA(glh) ((void*)((char*)(glh) + GENL_HDRLEN))
++#define GENLMSG_PAYLOAD(nlh) (NLMSG_PAYLOAD(nlh, 0) - GENL_HDRLEN)
++#define NLA_DATA(nla) ((void*)((char*)(nla) + NLA_HDRLEN))
++#define NLA_NEXT(nla) ((struct nlattr*)((char*)nla + NLA_ALIGN(nla->nla_len)))
++
++struct genlmsg {
++    struct nlmsghdr nlh;
++    union {
++        struct genlmsghdr glh;
++        int error;
++    };
++    char buf[BINDER_MSG_SIZE];
++};
++
++static void usage(char *progname)
++{
++	fprintf(stderr,
++		"usage:  %s [-n] [-v]\n"
++		"Where:\n\t"
++		"-n  Use the /dev/binderfs name service.\n\t"
++		"-v  Print context and command information.\n\t"
++		"\nNote: Ensure this boolean command is run when "
++		"testing after a reboot:\n\t"
++		"setsebool allow_domain_fd_use=0\n", progname);
++	exit(-1);
++}
++
++static int sendgenl(int fd, __u32 pid, __u16 nlmsg_type, __u8 cmd, __u16 nla_type,
++		const void* nla_data, __u16 nla_len)
++{
++	if (NLA_ALIGN(nla_len) + NLA_HDRLEN > BINDER_MSG_SIZE) {
++		fprintf(stderr, "Oversized data to send\n");
++		return -ENOMEM;
++	}
++
++	struct genlmsg msg = {
++		.nlh = {
++				.nlmsg_len = NLMSG_LENGTH(GENL_HDRLEN),
++				.nlmsg_type = nlmsg_type,
++				.nlmsg_flags = NLM_F_REQUEST,
++				.nlmsg_seq = 0,
++				.nlmsg_pid = pid,
++		},
++		.glh = {
++			.cmd = cmd,
++			.version = BINDER_FAMILY_VERSION,
++		},
++	};
++
++	struct nlattr* nla = GENLMSG_DATA(&msg.glh);
++	nla->nla_type = nla_type;
++	nla->nla_len = nla_len + NLA_HDRLEN;
++	memcpy(NLA_DATA(nla), nla_data, nla_len);
++	msg.nlh.nlmsg_len += NLA_ALIGN(nla->nla_len);
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK,
++	};
++	int ret = sendto(fd, &msg, msg.nlh.nlmsg_len, 0, (struct sockaddr*)&sa, sizeof(sa));
++	if (ret < 0)
++		fprintf(stderr, "Failed to send (%d %d %d %d): %s\n",
++				nlmsg_type, cmd, nla_type, nla_len, strerror(errno));
++
++	if (verbose)
++		printf("Sent %d / %d bytes to binder netlink\n", ret, msg.nlh.nlmsg_len);
++
++	return ret;
++}
++
++static int sendgenlv(int fd, __u32 pid, __u16 nlmsg_type, __u8 cmd, __u16 nla_type[],
++		const void* nla_data[], __u16 nla_len[], int n)
++{
++	__u32 len = 0;
++	for (int i = 0; i < n; i++)
++		len += NLA_ALIGN(nla_len[i]) + NLA_HDRLEN;
++
++	if (len > BINDER_MSG_SIZE) {
++		fprintf(stderr, "Oversized data to send: %d > %d\n", len, BINDER_MSG_SIZE);
++		return -ENOMEM;
++	}
++
++	struct genlmsg msg = {
++		.nlh = {
++				.nlmsg_len = NLMSG_LENGTH(GENL_HDRLEN),
++				.nlmsg_type = nlmsg_type,
++				.nlmsg_flags = NLM_F_REQUEST,
++				.nlmsg_seq = 0,
++				.nlmsg_pid = pid,
++		},
++		.glh = {
++			.cmd = cmd,
++			.version = BINDER_FAMILY_VERSION,
++		},
++	};
++
++	struct nlattr* nla = GENLMSG_DATA(&msg.glh);
++	for (int i = 0; i < n; i++) {
++		nla->nla_type = nla_type[i];
++		nla->nla_len = nla_len[i] + NLA_HDRLEN;
++		memcpy(NLA_DATA(nla), nla_data[i], nla_len[i]);
++		nla = (struct nlattr*)((char*)(nla) + NLA_ALIGN(nla->nla_len));
++	}
++	msg.nlh.nlmsg_len += len;
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK,
++	};
++
++	int ret = sendto(fd, &msg, msg.nlh.nlmsg_len, 0, (struct sockaddr*)&sa, sizeof(sa));
++	if (ret < 0) {
++		fprintf(stderr, "Failed to send (%d %d %d): %s\n",
++				nlmsg_type, cmd, n, strerror(errno));
++	}
++
++	if (verbose)
++		printf("Sent %d / %d bytes\n", ret, msg.nlh.nlmsg_len);
++
++	return ret;
++}
++
++static int recvgenl(int fd, struct genlmsg* msg, int len)
++{
++	int ret = recv(fd, msg, len, 0);
++	if (verbose) {
++		printf("Received %d\n", ret);
++		printf("nlh: %d %d %d %d %d\n", msg->nlh.nlmsg_len, msg->nlh.nlmsg_type,
++				msg->nlh.nlmsg_flags, msg->nlh.nlmsg_seq, msg->nlh.nlmsg_pid);
++	}
++
++	if (ret < 0) {
++		fprintf(stderr, "Failed to receive %d: %s\n", ret, strerror(errno));
++		return ret;
++	} else if (msg->nlh.nlmsg_type == NLMSG_ERROR) {
++		ret = msg->error;
++		fprintf(stderr, "Error msg received %d: %s\n", ret, strerror(-ret));
++		return ret;
++	} else if (!NLMSG_OK(&msg->nlh, ret)) {
++		fprintf(stderr, "Wrong message data\n");
++		return -EFAULT;
++	}
++
++	return 0;
++}
++
++int main(int argc, char **argv)
++{
++	int fd, opt;
++	pid_t pid;
++	char *context;
++	char *name;
++	__u16 id = 0;
++
++	while ((opt = getopt(argc, argv, "v")) != -1) {
++		switch (opt) {
++		case 'v':
++			verbose = true;
++			break;
++		default:
++			usage(argv[0]);
++		}
++	}
++
++	/* Get our context and pid */
++	if (getcon(&context) < 0) {
++		fprintf(stderr, "Failed to obtain SELinux context\n");
++		exit(-1);
++	}
++	pid = getpid();
++
++	if (verbose) {
++		fprintf(stderr, "Setup report PID: %d Process context %s\n", pid, context);
++	}
++
++	free(context);
++
++	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	if (fd < 0) {
++		fprintf(stderr, "Failed to open socket: %s\n", strerror(errno));
++		exit(151);
++	}
++
++	struct sockaddr_nl sa = {
++		.nl_family = AF_NETLINK, .nl_pid = pid,
++	};
++
++	if (bind(fd, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
++		fprintf(stderr, "Failed to bind socket: %s\n", strerror(errno));
++		exit(152);
++	}
++
++	if (sendgenl(fd, pid, GENL_ID_CTRL, CTRL_CMD_GETFAMILY, CTRL_ATTR_FAMILY_NAME, BINDER_FAMILY_NAME, strlen(BINDER_FAMILY_NAME) + 1) < 0) {
++		fprintf(stderr, "Failed to send CTRL_CMD_GETFAMILY\n");
++		exit(153);
++	}
++
++	struct genlmsg msg;
++	if (recvgenl(fd, &msg, sizeof(msg)) < 0) {
++		fprintf(stderr, "Failed to receive reply of CTRL_CMD_GETFAMILY\n");
++		exit(154);
++	}
++
++	if (msg.glh.cmd != CTRL_CMD_NEWFAMILY) {
++		fprintf(stderr, "Wrong glh cmd %d, expect %d\n", msg.glh.cmd, CTRL_CMD_NEWFAMILY);
++		exit(155);
++	}
++
++	int cur = 0;
++	int payload = GENLMSG_PAYLOAD(&msg.nlh);
++	char* data = GENLMSG_DATA(&msg.glh);
++	while (cur < payload) {
++		if (verbose)
++			printf("Checking NLA payload %d / %d\n", cur, payload);
++		struct nlattr* nla = (struct nlattr*)(data + cur);
++		if (verbose)
++			printf("NLA type / len: %d / %d\n", nla->nla_type, nla->nla_len);
++		cur += NLA_ALIGN(nla->nla_len);
++		switch (nla->nla_type) {
++		case CTRL_ATTR_FAMILY_NAME:
++			name = NLA_DATA(nla);
++			if (verbose)
++				printf("Binder Netlink family name is %s\n", name);
++			break;
++		case CTRL_ATTR_FAMILY_ID:
++			id = *(__u16*)(NLA_DATA(nla));
++			if (verbose)
++				printf("Binder Netlink family id is %d\n", id);
++			break;
++		case CTRL_ATTR_MCAST_GROUPS:
++			if (verbose)
++				printf("Binder Netlink MCAST_GROUP ignored\n");
++			break;
++		default:
++			break;
++		}
++	}
++
++	if (!id) {
++		fprintf(stderr, "Failed to get binder netlink family id\n");
++		exit(156);
++	}
++
++	__u32 proc = 0;
++	__u32 flags = 0;
++	__u16 type[3] = { BINDER_A_CMD_CONTEXT, BINDER_A_CMD_PID, BINDER_A_CMD_FLAGS };
++	__u16 len[3] = { strlen(BINDERFS_NAME) + 1, sizeof(proc), sizeof(flags) };
++	const void* buf[3] = { (void*)BINDERFS_NAME, (void*)&proc, (void*)&flags };
++
++	if (verbose)
++		printf("Sending BINDER_CMD_REPORT_SETUP %s %d %d\n", BINDERFS_NAME, proc, flags);
++
++	if (sendgenlv(fd, pid, id, BINDER_CMD_REPORT_SETUP, type, buf, len, 3) < 0) {
++		fprintf(stderr, "Failed to send BINDER_CMD_REPORT_SETUP\n");
++		exit(157);
++	}
++
++	if (recvgenl(fd, &msg, sizeof(msg)) < 0) {
++		fprintf(stderr, "Failed to receive reply of BINDER_CMD_REPORT_SETUP\n");
++		exit(158);
++	}
++
++	if (msg.glh.cmd != BINDER_CMD_REPORT_SETUP) {
++		fprintf(stderr, "Wrong glh cmd %d, expect %d\n", msg.glh.cmd, BINDER_CMD_REPORT_SETUP);
++		exit(159);
++	}
++
++	close(fd);
++
++	return 0;
++}
+diff --git a/tests/binder/test b/tests/binder/test
+index 95af41a..bce5b82 100755
+--- a/tests/binder/test
++++ b/tests/binder/test
+@@ -7,6 +7,7 @@ BEGIN {
+ 
+     $test_count      = 0;
+     $test_binder_ctx = 0;
++    $test_binder_transaction_report = 0;
+ 
+     # Allow binder info to be shown.
+     $v = $ARGV[0];
+@@ -57,6 +58,16 @@ BEGIN {
+         $test_binder_ctx = 1;
+         $test_count += 8;
+         $n = "-n";                   # Use /dev/binder-test
++
++        # Check transaction_report feature
++        open my $fh, '<', '/dev/binderfs/features/transaction_report' or warn $!;
++        chomp( my $feature = <$fh> );
++        $test_binder_transaction_report = int($feature);
++        if ( $test_binder_transaction_report eq 0 ) {
++            print "Binder feature transaction report not supported\n";
++        } else {
++            $test_count += 3;
++        }
+     }
+     elsif ( $result >> 8 eq 3 ) {    # BINDER_VER_ERROR
+         plan skip_all => "Binder kernel/userspace versions differ";
+@@ -176,6 +187,27 @@ if ($test_binder_ctx) {
+     service_end( "service_provider", $sp_pid );
+     service_end( "manager",          $sm_pid );
+ 
++# 9 Verify that authorized process can send generic netlink command to set up binder reports.
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result eq 0 );
++    }
++
++# 10 Verify that unauthorized process can't use generic netlink socket (no genetlink perm).
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_no_genl_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result >> 8 eq 151 );
++    }
++
++# 11 Verify that unauthorized process can't use setup_report command (no setup_report perm).
++    if ($test_binder_transaction_report) {
++        $result = system "runcon -t test_binder_report_no_setup_t $basedir/setup_report $v";
++        $ret8 = $result >> 8;
++        ok( $result >> 8 eq 158 );
++    }
++
+     # Cleanup binderfs stuff.
+     system("/bin/sh $basedir/cleanup_binder.sh $v 2>/dev/null");
+ }
+-- 
+2.49.0.604.gff1f9ca942-goog
 
-I'll do that change you suggest below as there will be an v14.
-
-
-Thanks!
-
-
->> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
->> index 0996e228b26a..7d94e81b2e3b 100644
->> --- a/drivers/cxl/pci.c
->> +++ b/drivers/cxl/pci.c
->> @@ -836,6 +836,8 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->>   {
->>   	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
->>   	struct cxl_dpa_info range_info = { 0 };
->> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
-> Trivial but can do
-> 	DECLARE_BITMAP(expected, CXL_MAX_CAPS) = {};
-> to avoid need for the zeroing below.
->
->> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
->>   	struct cxl_memdev_state *mds;
->>   	struct cxl_dev_state *cxlds;
->>   	struct cxl_register_map map;
->> @@ -871,7 +873,19 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->>   
->>   	cxlds->rcd = is_cxl_restricted(pdev);
->>   
->> -	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
->> +	bitmap_zero(expected, CXL_MAX_CAPS);
->> +	bitmap_zero(found, CXL_MAX_CAPS);
->> +
->> +	/*
->> +	 * These are the mandatory capabilities for a Type3 device.
->> +	 * Only checking capabilities used by current Linux drivers.
->> +	 */
->> +	set_bit(CXL_DEV_CAP_HDM, expected);
->> +	set_bit(CXL_DEV_CAP_DEV_STATUS, expected);
->> +	set_bit(CXL_DEV_CAP_MAILBOX_PRIMARY, expected);
->> +	set_bit(CXL_DEV_CAP_MEMDEV, expected);
->> +
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
 
