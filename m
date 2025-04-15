@@ -1,161 +1,107 @@
-Return-Path: <netdev+bounces-182840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F17A8A0DB
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:20:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B210A8A157
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:38:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB90B172EEF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:20:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656C919014EC
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEA520469E;
-	Tue, 15 Apr 2025 14:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823982957C3;
+	Tue, 15 Apr 2025 14:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ItOew7mQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLvh2l++"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6547D183CA6
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 14:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59ACB29117F;
+	Tue, 15 Apr 2025 14:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744726850; cv=none; b=kQUh1qDtQnl/cDsXhz258h0B3pXz94ULx3whTiPuSZMBlAqIzvIme1IYRRdp+LPsm3QzoS+oL6UGPfVeCzGa8Xv7phPqerD9M509i0406obRwFDyTN8BzNmPhsHQioBVXAjTm9QL7b+XMxbFl8Ay+5xc1e5yinweoj4w6jKV81c=
+	t=1744727900; cv=none; b=jPkakJNHitGT47baeQ3Hlr3xB32TZaKckcw6hhQN1D/0cU7nUTYqMoPmCHbdln2rbcbwPMiMZ0zU+Q04eYDp5h27DVFWjLSh9grUtcYPxuadW1E6zMjbgvjKj4YeXPgWWi5XqQy8ikjJNfAfyExacls8HczO2H8EoMd/pBttFT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744726850; c=relaxed/simple;
-	bh=cwQOEcSZeCAijyUJW84gmALURPuFmOtOgI550pIO1BM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t/iOdHbS9I0IzVGJSNI7u7x20LetI3KnxpLZEQ/UwIVbIDuFDlaGITAQTYZYzBGLo5Hlcvfa2mMeTISbdDPuVUVGKjSFc5GmppHDuCbyIakfiOK7ODZw202xwyVqxcK69MM5MAcI/Xg0y/EEcNvFFId4Bbgrqw7d9Bnv4zjwzsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ItOew7mQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744726847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LhJ8etOVT0e0dERbm/nij8W1gSDN13mH7LedwU7K4EI=;
-	b=ItOew7mQE1YqzaklSzAe64q5bMBWT6welOmNT/zCQax8u0ZH9RlHnOhUAFDYVx5ttppxty
-	R0SY1W+xMqkk2YEOIrHxyb6ryI/Bs7vTmi2DDAr/r2jRL1r6dS93QpToAOQeiWUrOLNI/n
-	m2SVjxCHTYlaMTuUEYCe2W3Bozm3i/Y=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-DXdQaDQOOR-mVA71-nnKJQ-1; Tue,
- 15 Apr 2025 10:20:46 -0400
-X-MC-Unique: DXdQaDQOOR-mVA71-nnKJQ-1
-X-Mimecast-MFC-AGG-ID: DXdQaDQOOR-mVA71-nnKJQ_1744726842
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17AA41954B36;
-	Tue, 15 Apr 2025 14:20:42 +0000 (UTC)
-Received: from [10.45.224.188] (unknown [10.45.224.188])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7AE90180175D;
-	Tue, 15 Apr 2025 14:20:36 +0000 (UTC)
-Message-ID: <6369999d-26cb-4e9b-b129-ed89abf35277@redhat.com>
-Date: Tue, 15 Apr 2025 16:20:35 +0200
+	s=arc-20240116; t=1744727900; c=relaxed/simple;
+	bh=ZpM58jgXe8P92kBPX7QG3YnkqxXt6Jj4oTEvwlNQdFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bfnh9mxS3kSv4Fk7CTB8G9QvXP02wABsFMrBmb75Ir+aFuSy4nzHj8d9kjZe2Wicty2griAdhtco6J4Ol0I2CDEgS4aglz3b7ewto+vHISx34yCR2UAFeNqxE9G7wbo0t5yQEZBFegYE4Ra7q2YfkcUBGc6uLRDOwL4iuU+HAd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLvh2l++; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB03C4CEEB;
+	Tue, 15 Apr 2025 14:38:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744727899;
+	bh=ZpM58jgXe8P92kBPX7QG3YnkqxXt6Jj4oTEvwlNQdFw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aLvh2l++VPeBifQEm59TW5nGAWgkqgrhThC69VZ+qGGNKet/quUjw7ZGXXruuqzlP
+	 lkaaH7JvQvawKe+inV2Ll+4rZghPzYQ+tz74EExAZgF7i6MUV+KeuJMTZe5PvRyM8i
+	 CWBNkjomCVpwT2vKF5hnS1DnTA4uZGGf4viZAnFz3pa6QWJ2KNXUEMpVJdJOe4CT1c
+	 Cb/9JHU8PBQD80eXLDzuoMkSK3rW/avVPCt+3D0VTZH6NgKHa/890EPWkN1clv7DgF
+	 kG/fHZIDp/cbDeHEpDPhsYpljSUyJYjmUaKOD/EmhbdT82jZxbXcs824I8I9gqe7IQ
+	 YnDC/jbkyH7kQ==
+Date: Tue, 15 Apr 2025 07:38:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Iurman <justin.iurman@uliege.be>
+Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Sebastian Sewior <bigeasy@linutronix.de>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Network Development
+ <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, bpf
+ <bpf@vger.kernel.org>, Stefano Salsano <stefano.salsano@uniroma2.it>, Paolo
+ Lungaroni <paolo.lungaroni@uniroma2.it>
+Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
+Message-ID: <20250415073818.06ea327c@kernel.org>
+In-Reply-To: <3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
+References: <20250403083956.13946-1-justin.iurman@uliege.be>
+	<Z-62MSCyMsqtMW1N@mini-arch>
+	<cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
+	<CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
+	<20250404141955.7Rcvv7nB@linutronix.de>
+	<85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
+	<CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
+	<d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
+	<20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
+	<3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
- defs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andy Shevchenko <andy@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
- netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250409144250.206590-1-ivecera@redhat.com>
- <20250409144250.206590-8-ivecera@redhat.com>
- <df6a57df-8916-4af2-9eee-10921f90ff93@kernel.org>
- <c0ef6dad-ce7e-401c-9ae1-42105fcbf9c4@redhat.com>
- <098b0477-3367-4f96-906b-520fcd95befb@lunn.ch>
- <003bfece-7487-4c65-b4f1-2de59207bd5d@redhat.com>
- <8c5fb149-af25-4713-a9c8-f49b516edbff@lunn.ch>
- <9de10e97-d0fa-4dee-b98a-e4b2a3f7019c@redhat.com>
- <e1389e78-ead0-4180-a652-5dc48a691548@lunn.ch>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <e1389e78-ead0-4180-a652-5dc48a691548@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
+On Tue, 15 Apr 2025 11:10:01 +0200 Justin Iurman wrote:
+> > However, there is my opinion an issue that can occur: between the check on
+> > in_softirq() and the call to local_bh_disable(), the task may be scheduled on
+> > another CPU. As a result, the check on in_softirq() becomes ineffective because
+> > we may end up disabling BH on a CPU that is not the one we just checked (with
+> > if (in_softirq()) { ... }).  
 
+The context is not affected by migration. The context is fully defined
+by the execution stack.
 
-On 15. 04. 25 2:57 odp., Andrew Lunn wrote:
->> Hi Andrew,
->> the idea looks interesting but there are some caveats and disadvantages.
->> I thought about it but the idea with two regmaps (one for simple registers
->> and one for mailboxes) where the simple one uses implicit locking and
->> mailbox one has locking disabled with explicit locking requirement. There
->> are two main problems:
->>
->> 1) Regmap cache has to be disabled as it cannot be shared between multiple
->> regmaps... so also page selector cannot be cached.
->>
->> 2) You cannot mix access to mailbox registers and to simple registers. This
->> means that mailbox accesses have to be wrapped e.g. inside scoped_guard()
->>
->> The first problem is really pain as I would like to extend later the driver
->> with proper caching (page selector for now).
->> The second one brings only confusions for a developer how to properly access
->> different types of registers.
->>
->> I think the best approach would be to use just single regmap for all
->> registers with implicit locking enabled and have extra mailbox mutex to
->> protect mailbox registers and ensure atomic operations with them.
->> This will allow to use regmap cache and also intermixing mailbox and simple
->> registers' accesses won't be an issue.
+> Hmm, I think it's correct... good catch. I went for this solution to (i) 
+> avoid useless nested BHs disable calls; and (ii) avoid ending up with a 
+> spaghetti graph of possible paths with or without BHs disabled (i.e., 
+> with single entry points, namely lwtunnel_xmit() and lwtunnel_output()), 
+> which otherwise makes it hard to maintain the code IMO.
 > 
-> As i said, it was just an idea, i had no idea if it was a good idea.
+> So, if we want to follow what Alexei suggests (see his last response), 
+> we'd need to disable BHs in both ip_local_out() and ip6_local_out(). 
+> These are the common functions which are closest in depth, and so for 
+> both lwtunnel_xmit() and lwtunnel_output(). But... at the "cost" of 
+> disabling BHs even when it may not be required. Indeed, ip_local_out() 
+> and ip6_local_out() both call dst_output(), which one is usually not 
+> lwtunnel_output() (and there may not even be a lwtunnel_xmit() to call 
+> either).
 > 
-> What is important is that the scope of the locking becomes clear,
-> unlike what the first version had. So locking has to be pushed down to
-> the lower levels so you lock a single register access, or you lock an
-> mailbox access.
-> 
-> Also, you say this is an MFD partially because GPIOs could be added
-> later. I assume that GPIO code would have the same locking issue,
-> which suggests the locking should be in the MFD core, not the
-> individual drivers stacked on top of it.
+> The other solution is to always call local_bh_disable() in both 
+> lwtunnel_xmit() and lwtunnel_output(), at the cost of disabling BHs when 
+> they were already. Which was basically -v1 and received a NACK from Alexei.
 
-To work with GPIO block inside chip you use just simple registers not 
-mailboxes. But it does not matter. The approach above exposes for 
-individual sub-drivers an API (not direct usage of regmap (all registers 
-are exposed by function helpers), helpers to enter/leave "mailbox mode" 
-that locks/unlocks mailbox mutex)...
-
-Something like this
-{
-	...
-	rc = zl3073x_read_id(zldev, &id); // locked implicitly
-	...
-	scoped_guard(zl3073x_mailbox)(zldev) { // enter mailbox 'mode'
-		rc = zl3073x_mb_ref_set(zldev, ref_idx);
-		rc = zl3073x_mb_ref_op(zldev, REF_OP_READ);
-		regmap_wait_poll_timeout(...);
-		rc = zl3073x_mb_ref_freq(zldev, &freq);
-	} // leave mailbox access 'mode'
-	...
-	rc = zl3073x_write_blahblah(zldev, value);
-}
-
-Thanks,
-Ivan
-
+I thought he nacked preempt_disable()
 
