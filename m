@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-182981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8D7A8A80D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 21:33:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7DD4A8A80E
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 21:33:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73CFA7A386B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:32:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170CF3B9926
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FCF23C390;
-	Tue, 15 Apr 2025 19:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B25C24EF9E;
+	Tue, 15 Apr 2025 19:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N1oM4jQ4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S4i6QoMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE215236424
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 19:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BEE24C095
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 19:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744745620; cv=none; b=Bk/Lt0Bodx77IPB+o/OLYWthPRKusMeVnDwqvzNJ05ofjJks/qKhueBYM6Mul4ZANgfVy15GGbAMYZW9AP/7TPpAvIc8bcs2y7gIfKaIyMs+ymb0cl03R36WEC/qwKetGrBie6dksuV1cNgHDEVs6Iu/UzLR+/gzSMPF8+sAHGY=
+	t=1744745623; cv=none; b=m1mAYhYDUieutqHESOD2gup4raq8hf2xrOZwRs8W2yoZ/+3i3qebsDdeykD6Ftp1m7rApPYPOIOe88SL8TvxLYPfYWo9u4P0Pbms0TPBhmpq5zleQiplUfi5A3ZYyjF5M1Fua1NRsvIxZ8EFzJ5ldavPJo0novrI/j4/+2mND7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744745620; c=relaxed/simple;
-	bh=Ts5bo86tTtwh2s23VSxkoMpFV1QQK3cEiprWvTS1MHo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k09kPXJTk1uvBBkld8SY/GnJdo12CEMolSZe9cW2lBaoacu8r5gFloI2+N/cyy4cVPP4KOIfsNCHl3jKrzBO9zSIH4UdRNGtXfLqFwlGoGEOmkEnQKEeFP/dfx+PLd1Fra3n+NAtc/kL75LwRNU14oX/1jA90XAR6JGu1ajHLf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N1oM4jQ4; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1744745623; c=relaxed/simple;
+	bh=TrhRHWH0raP2Nn0FOzui04ieWdZj/uglP4WosiraW04=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mxnUgYExlgBnsFA34rnFSJq7j2bl25/NOAGkhckcyyS1Yb9yXiQx+JqQ5v36zubzW+Q5A0mlaZ9MA6c/aufmCGvUMbvrzps2fiLZq4goQ5EZrW7fVwBY/1P6wMK2qvTze0BOSwugevENPH9tSpWhcDp9e1R1QwMuPbQV/38odgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S4i6QoMM; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744745615;
+	t=1744745618;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=T0s7laNZe+Ra4wMHJ2pL3MTfBGq+kD5jv59e6Nhd28g=;
-	b=N1oM4jQ4Lwu92X2S0t05SGm7yatDoaajqQms2NTdODIoyDLQrtVFgaxaPCaFUGyl80a7PJ
-	/3eLC+yEjKRSjFz69q115+HcJ+BPeEjGZZKWzq8HNID5laWJxe7m7hMGA7zIW5XjdxrAPl
-	rj8kk3uDjUTj0DAomRbaE2mSjGR1v8A=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pXgMEugDRctxHgg/jyxi4WM3BzvrQnLeq2uFf3Ak3YU=;
+	b=S4i6QoMMUeFWnZ04EHW1ZY3DfRCAAiE4mdP/V5SdxQCc/j6uJ1OhACwzmoe7uQRZPGGP1y
+	jgtc13XTCfFfiQL48LX2ldxo4ivw3PhU5qLwB7BeM7CHrmOJq8J9gRfBSPYPeGWgNzz6H1
+	BhysUV/tJ92TGFdj7W0rxDHXFv9UDCY=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -54,36 +56,18 @@ Cc: upstream@airoha.com,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Sean Anderson <sean.anderson@linux.dev>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Joyce Ooi <joyce.ooi@intel.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Rob Herring <robh+dt@kernel.org>,
 	Rob Herring <robh@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michal Simek <michal.simek@amd.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	Robert Hancock <robert.hancock@calian.com>,
-	Saravana Kannan <saravanak@google.com>,
-	UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	devicetree@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [net-next PATCH v3 00/11] Add PCS core support
-Date: Tue, 15 Apr 2025 15:33:12 -0400
-Message-Id: <20250415193323.2794214-1-sean.anderson@linux.dev>
+	devicetree@vger.kernel.org
+Subject: [net-next PATCH v3 01/11] dt-bindings: net: Add Xilinx PCS
+Date: Tue, 15 Apr 2025 15:33:13 -0400
+Message-Id: <20250415193323.2794214-2-sean.anderson@linux.dev>
+In-Reply-To: <20250415193323.2794214-1-sean.anderson@linux.dev>
+References: <20250415193323.2794214-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,127 +77,159 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This series adds support for creating PCSs as devices on a bus with a
-driver (patch 3). As initial users,
+Add a binding for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
+IP. This device is a soft device typically used to adapt between GMII
+and SGMII or 1000BASE-X (possbilty in combination with a serdes).
+pcs-modes reflects the modes available with the as configured when the
+device is synthesized. Multiple modes may be specified if dynamic
+reconfiguration is supported.
 
-- The Lynx PCS (and all of its users) is converted to this system (patch 5)
-- The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
-- The Cadence MACB driver is converted to support external PCSs (namely
-  the Xilinx PCS) (patches 9-10).
+One PCS may contain "shared logic in core" which can be connected to
+other PCSs with "shared logic in example design." This primarily refers
+to clocking resources, allowing a reference clock to be shared by a bank
+of PCSs. To support this, if #clock-cells is defined then the PCS will
+register itself as a clock provider for other PCSs.
 
-To build documentation without errors, this series requires commit
-de258fa8ca8d ("scripts: kernel-doc: fix parsing function-like typedefs
-(again)"), currently applied to docs-next [1].
-
-Care has been taken to ensure backwards-compatibility. The main source
-of this is that many PCS devices lack compatibles and get detected as
-PHYs. To address this, pcs_get_by_fwnode_compat allows drivers to edit
-the devicetree to add appropriate compatibles.
-
-There is another series [2] with the same goal by Christian Marangi. In
-comparison, I believe this series
-
-- Implements a simpler and more-robust method of PCS access.
-- Provides a more-direct upgrade path for existing MAC and PCS drivers.
-
-[1] https://lore.kernel.org/all/e0abb103c73a96d76602d909f60ab8fd6e2fd0bd.1744106242.git.mchehab+huawei@kernel.org/
-[2] https://lore.kernel.org/netdev/20250406221423.9723-1-ansuelsmth@gmail.com/
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
 
 Changes in v3:
 - Add '>' modifier for paragraph to description
-- Adjust axienet_xilinx_pcs_get for changes to pcs_find_fwnode API
-- Drop patches destined for other trees, as they have either already
-  been applied or are no longer necessary.
 - Edit description to reference clocks instead of resets
-- Remove support for #pcs-cells. Upon further investigation, the
-  requested functionality can be accomplished by specifying the PCS's
-  fwnode manually.
-- Select PCS_XILINX unconditionally
 
 Changes in v2:
-- Add fallbacks for pcs_get* and pcs_put
-- Add support for #pcs-cells
 - Change base compatible to just xlnx,pcs
-- Change compatible to just xlnx,pcs
-- Defer devicetree updates for another series
 - Drop #clock-cells description
-- Drop PCS_ALTERA_TSE which was accidentally added while rebasing
 - Move #clock-cells after compatible
-- Move update to macb_pcs_get_state to previous patch
-- Remove outdated comment
 - Remove second example
-- Remove unused variable
-- Remove unused variable lynx_properties
 - Rename pcs-modes to xlnx,pcs-modes
-- Reorder pcs_handle to come before suffix props
 - Reword commit message
-- Rework xilinx_pcs_validate to just clear out half-duplex modes instead
-  of constraining modes based on the interface.
 
-Sean Anderson (10):
-  dt-bindings: net: Add Xilinx PCS
-  net: phylink: Support setting PCS link change callbacks
-  net: pcs: Add subsystem
-  net: pcs: lynx: Convert to an MDIO driver
-  net: phy: Export some functions
-  net: pcs: Add Xilinx PCS driver
-  net: axienet: Convert to use PCS subsystem
-  net: macb: Move most of mac_config to mac_prepare
-  net: macb: Support external PCSs
-  of: property: Add device link support for PCS
-
-Vladimir Oltean (1):
-  net: dsa: ocelot: suppress PHY device scanning on the internal MDIO
-    bus
-
- .../devicetree/bindings/net/xilinx,pcs.yaml   | 114 +++
- Documentation/networking/index.rst            |   1 +
- Documentation/networking/kapi.rst             |   4 +
- Documentation/networking/pcs.rst              | 102 +++
- MAINTAINERS                                   |   8 +
- drivers/net/dsa/ocelot/Kconfig                |   4 +
- drivers/net/dsa/ocelot/felix_vsc9959.c        |  15 +-
- drivers/net/dsa/ocelot/seville_vsc9953.c      |  16 +-
- drivers/net/ethernet/altera/Kconfig           |   2 +
- drivers/net/ethernet/altera/altera_tse_main.c |   7 +-
- drivers/net/ethernet/cadence/macb.h           |   1 +
- drivers/net/ethernet/cadence/macb_main.c      | 229 ++++--
- drivers/net/ethernet/freescale/dpaa/Kconfig   |   2 +-
- drivers/net/ethernet/freescale/dpaa2/Kconfig  |   3 +
- .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  |  11 +-
- drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
- .../net/ethernet/freescale/enetc/enetc_pf.c   |   8 +-
- .../net/ethernet/freescale/enetc/enetc_pf.h   |   1 -
- .../freescale/enetc/enetc_pf_common.c         |   4 +-
- drivers/net/ethernet/freescale/fman/Kconfig   |   4 +-
- .../net/ethernet/freescale/fman/fman_memac.c  |  27 +-
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   3 +
- .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   6 +-
- drivers/net/ethernet/xilinx/Kconfig           |   7 +
- drivers/net/ethernet/xilinx/xilinx_axienet.h  |   4 +-
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 104 +--
- drivers/net/pcs/Kconfig                       |  44 +-
- drivers/net/pcs/Makefile                      |   4 +
- drivers/net/pcs/core.c                        | 690 ++++++++++++++++++
- drivers/net/pcs/pcs-lynx.c                    | 110 +--
- drivers/net/pcs/pcs-xilinx.c                  | 477 ++++++++++++
- drivers/net/phy/mdio_device.c                 |   1 +
- drivers/net/phy/phy_device.c                  |   3 +-
- drivers/net/phy/phylink.c                     |  24 +-
- drivers/of/property.c                         |   2 +
- include/linux/pcs-lynx.h                      |  13 +-
- include/linux/pcs-xilinx.h                    |  15 +
- include/linux/pcs.h                           | 193 +++++
- include/linux/phy.h                           |   1 +
- include/linux/phylink.h                       |  27 +-
- 40 files changed, 1997 insertions(+), 296 deletions(-)
+ .../devicetree/bindings/net/xilinx,pcs.yaml   | 114 ++++++++++++++++++
+ 1 file changed, 114 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/xilinx,pcs.yaml
- create mode 100644 Documentation/networking/pcs.rst
- create mode 100644 drivers/net/pcs/core.c
- create mode 100644 drivers/net/pcs/pcs-xilinx.c
- create mode 100644 include/linux/pcs-xilinx.h
- create mode 100644 include/linux/pcs.h
 
+diff --git a/Documentation/devicetree/bindings/net/xilinx,pcs.yaml b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+new file mode 100644
+index 000000000000..11bbae6936eb
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+@@ -0,0 +1,114 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/xilinx,pcs.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE IP
++
++maintainers:
++  - Sean Anderson <sean.anderson@seco.com>
++
++description: >
++  This is a soft device which implements the PCS and (depending on
++  configuration) PMA layers of an IEEE Ethernet PHY. On the MAC side, it
++  implements GMII. It may have an attached SERDES (internal or external), or
++  may directly use LVDS IO resources. Depending on the configuration, it may
++  implement 1000BASE-X, SGMII, 2500BASE-X, or 2.5G SGMII.
++
++  This device has a notion of "shared logic" such as reset and clocking
++  resources which must be shared between multiple PCSs using the same I/O
++  banks. Each PCS can be configured to have the shared logic in the "core"
++  (instantiated internally and made available to other PCSs) or in the "example
++  design" (provided by another PCS). PCSs with shared logic in the core provide
++  a clock for other PCSs in the same bank.
++
++properties:
++  compatible:
++    items:
++      - const: xlnx,pcs-16.2
++      - const: xlnx,pcs
++
++  reg:
++    maxItems: 1
++
++  "#clock-cells":
++    const: 0
++
++  clocks:
++    items:
++      - description:
++          The reference clock for the PCS. Depending on your setup, this may be
++          the gtrefclk, refclk, clk125m signal, or clocks from another PCS.
++
++  clock-names:
++    const: refclk
++
++  done-gpios:
++    maxItems: 1
++    description:
++      GPIO connected to the reset-done output, if present.
++
++  interrupts:
++    items:
++      - description:
++          The an_interrupt autonegotiation-complete interrupt.
++
++  interrupt-names:
++    const: an
++
++  xlnx,pcs-modes:
++    description:
++      The interfaces that the PCS supports. Multiple interfaces may be
++      specified if dynamic reconfiguration is enabled.
++    oneOf:
++      - const: sgmii
++      - const: 1000base-x
++      - const: 2500base-x
++      - items:
++          - const: sgmii
++          - const: 1000base-x
++
++  reset-gpios:
++    maxItems: 1
++    description:
++      GPIO connected to the reset input.
++
++required:
++  - compatible
++  - reg
++  - xlnx,pcs-modes
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        pcs0: ethernet-pcs@0 {
++            compatible = "xlnx,pcs-16.2", "xlnx,pcs";
++            reg = <0>;
++            #clock-cells = <0>;
++            clocks = <&si570>;
++            clock-names = "refclk";
++            interrupts-extended = <&gic GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++            interrupt-names = "an";
++            reset-gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
++            done-gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
++            xlnx,pcs-modes = "sgmii", "1000base-x";
++        };
++
++        pcs1: ethernet-pcs@1 {
++            compatible = "xlnx,pcs-16.2", "xlnx,pcs";
++            reg = <1>;
++            xlnx,pcs-modes = "sgmii";
++            clocks = <&pcs0>;
++            clock-names = "refclk";
++        };
++    };
 -- 
 2.35.1.1320.gc452695387.dirty
 
