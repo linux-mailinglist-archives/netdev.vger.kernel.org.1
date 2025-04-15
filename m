@@ -1,127 +1,108 @@
-Return-Path: <netdev+bounces-182808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB951A89F45
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF25DA89F49
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4103B189FBA2
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:21:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF363AAF6B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7CE2973D7;
-	Tue, 15 Apr 2025 13:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xlH8rjaF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD8E284679;
+	Tue, 15 Apr 2025 13:21:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4231C6FF5;
-	Tue, 15 Apr 2025 13:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFED15336D;
+	Tue, 15 Apr 2025 13:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744723247; cv=none; b=i4jDBQ9tq6RSv4PUUjj/7S3N+YDZ+aWET3oWPqQsa4MsAoVC87MVYaP5J7s+K1iy38w48+fJEdAub3Fsbenoi08iLTztzcuyKKGfmmpiPNkJSuOHtFiHUmbRD1u6gIcOiUgvioO6WyGJGTBPrY+9hINAnD8IvYPYYrUw0lA/gyY=
+	t=1744723317; cv=none; b=IRUx7bK3ugbGAxQ6AAT4jRWRauDc9z9crxJ3gv5gty5iLHY9fN7ZUXIdGJxTcBRVzRbZrSG7QrEzmosCA146399o4QJ5Gh8DVWwnU3OIbHllgW8x3KR583hyTnRxfp3U460+PyuKPXPhL/V0acmQF+1UllhB7YOoKN1ji+Mr2A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744723247; c=relaxed/simple;
-	bh=0COEkxB+APvNdF+miKKyOTbBKTDK5TdhHuMca6Jb0OQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ngV3YwHzmFhJskX6m0z24TkP20TkqlYZlCNuJSfPnPi7fqREk+XRRFjSZjzrlRjXeILbI7RSXWwGPPK64vEMn90kEGlD2QjX39oqr8N65vQ0UDJMvhxHDmL+XQyVHkevAmTekUh6+vl0RkyRpIVCIpXWHob2gZ5Mv9pm0rZz5yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xlH8rjaF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zwXoAPOSd7TPYyFwNb3wZwJZIOBKCyO+D+dc+pl8JG0=; b=xlH8rjaFC+RAnQBZCoJmZEEd0E
-	D24kM63bpE+zT98wgG3mJZJIgEhEmxpiIVkYqIai0Gkuqv+z5hDasP9a7SmjGc5rNDr8V0jh5D81O
-	wPKei3YG3MRZttrcOKTXxzyYFNbcxuljK4qjvy2NaKNqo/yDE1FouImJPkQRFRM0Ff5E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4gDE-009RsY-Ta; Tue, 15 Apr 2025 15:20:28 +0200
-Date: Tue, 15 Apr 2025 15:20:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next 4/4] checkpatch: check for comment explaining
- rgmii(|-rxid|-txid) PHY modes
-Message-ID: <9d73f6ac-9fee-446b-b011-e664a7311eca@lunn.ch>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	s=arc-20240116; t=1744723317; c=relaxed/simple;
+	bh=yyGzD61+MYjILrn08mJKN5vTr4czMlsOzuslZ08hNT4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RRApaKFPSmMrEHSUrcX6WdeLXnBI0h7/pWvikMxg/uyWRROIAMFAR/Yr98tQajyX2llD2HkzD5KE75od0erIe68uSSFrki0RoeHJsJsTH2lEjTd2hf6g8VAPhN/hOSFAaOomE+qnR63YU1bVA2Asemq+Ml8SseprzfMMhDUm3As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZcPst3243z6L4vb;
+	Tue, 15 Apr 2025 21:20:34 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6C193140133;
+	Tue, 15 Apr 2025 21:21:52 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Apr
+ 2025 15:21:51 +0200
+Date: Tue, 15 Apr 2025 14:21:50 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
+	<benjamin.cheatham@amd.com>
+Subject: Re: [PATCH v13 05/22] cxl: add function for type2 cxl regs setup
+Message-ID: <20250415142150.00000f9d@huawei.com>
+In-Reply-To: <20250414151336.3852990-6-alejandro.lucero-palau@amd.com>
+References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
+	<20250414151336.3852990-6-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-> +  **UNCOMMENTED_RGMII_MODE**
-> +    Historially, the RGMII PHY modes specified in Device Trees have been
-> +    used inconsistently, often referring to the usage of delays on the PHY
-> +    side rather than describing the board.
+On Mon, 14 Apr 2025 16:13:19 +0100
+alejandro.lucero-palau@amd.com wrote:
+
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Create a new function for a type2 device initialising
+> cxl_dev_state struct regarding cxl regs setup and mapping.
+> 
+> Export the capabilities found for checking them against the
+> expected ones by the driver.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+> ---
+One trivial thing inline.
+
+>  drivers/cxl/core/pci.c | 52 ++++++++++++++++++++++++++++++++++++++++++
+>  include/cxl/cxl.h      |  4 ++++
+>  2 files changed, 56 insertions(+)
+> 
+
+>  int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
+>  {
+>  	int speed, bw;
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index afad8a86c2bc..729544538673 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -231,4 +231,8 @@ struct cxl_dev_state *_cxl_dev_state_create(struct device *dev,
+>  struct pci_dev;
+>  int cxl_check_caps(struct pci_dev *pdev, unsigned long *expected,
+>  		   unsigned long *found);
 > +
-> +    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require the clock
-> +    signal to be delayed on the PCB; this unusual configuration should be
-> +    described in a comment. If they are not (meaning that the delay is realized
-> +    internally in the MAC or PHY), "rgmii-id" is the correct PHY mode.
+> +struct cxl_memdev_state;
 
-It is unclear to me how much ctx_has_comment() will return. Maybe
-include an example here of how it should look. I'm assuming:
+Why have this here?  only cxl_dev_state is used.
 
-/* RGMII delays added via PCB traces */
-&enet2 {
-    phy-mode = "rgmii";
-    status = "okay";
+> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlmds,
+> +			     unsigned long *caps);
+>  #endif /* __CXL_CXL_H__ */
 
-fails, but
-
-&enet2 {
-    /* RGMII delays added via PCB traces */
-    phy-mode = "rgmii";
-    status = "okay";
-
-passes?
-
->  
->  Commit message
->  --------------
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index 784912f570e9d..57fcbd4b63ede 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -3735,6 +3735,17 @@ sub process {
->  			}
->  		}
->  
-> +# Check for RGMII phy-mode with delay on PCB
-> +		if ($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*(phy-mode|phy-connection-type)\s*=\s*"/ &&
-
-I don't grok perl. Is this only looking a dtsi files? .dts files
-should also be checked.
-
-Thanks for working on this, it will be very useful.
-
-	Andrew
 
