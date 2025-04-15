@@ -1,169 +1,86 @@
-Return-Path: <netdev+bounces-182895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00952A8A4AD
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:54:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1ABBA8A491
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 167327A62B4
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:52:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1446A3B6D32
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B34129A3D6;
-	Tue, 15 Apr 2025 16:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCF92980AE;
+	Tue, 15 Apr 2025 16:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V/1KUVqN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6Fg9lZLD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1069297A40
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAB4297A40
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744736018; cv=none; b=Po3s3Kt6ICdnY99S1ZcknAONno7GfzIyllC7xAu+PnPr870yOie/OwW47aFojQjZJqe6IbNfQ3s9+8io/rS9BoKnCXxS2/3IHaa/fEqSzzsodnQ0rklkajdp7fK0ZfmfyZJa3mX4BGPj8YC3LKarUoZ9Ns6KS9ubun5S3QTLdE8=
+	t=1744736004; cv=none; b=DuV4d7i7jZq6jfs6fMkgGsGV95daiwtipEGstckCDvs425106u+PcY+uSzdZa4P19NuLCjxEVHD5SRua6iXjInXVr2MC/ebvJv6RoOLeC4DvquvM7X19n7g6Tnp5q0Z6mZwBEuKqdONxxfzuhV3HkChLDGEi9AHMa+/iG+CNcKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744736018; c=relaxed/simple;
-	bh=IyoTweuH+lt9rGlc1YcepqOlfSAHB1hbpGD1P9RFycY=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=NDcPQxpKh8cnpqIVowU0UxeQon2+aFIj1/g5yAxvdNfOPZ1TKef5UuGm/n9hvqp1Ew+WG5L/PDZRjtjwhY1ENkVJHgM6oWRH4Z+0zlb/t1ofwuRF8E6UKDlCxhyDvsfyhKx2RiUYUHOE5NkWzW4qYkHVt0Xp2ztmPDU4p2HhfZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V/1KUVqN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z9uB0KYn8zVxro3kGLqgothoEUdhI7FT8dLFfsszWRQ=; b=V/1KUVqN5tyMZuWSwxLF+0Df7W
-	8b4PwSDTdeIfZwJ4lm3NQl8NoGj/rIhOhxcXXlHJk9+xFZe0owlEXXTsvHVGATBVlTcYHau9r9cAl
-	it5mzTTiFneTVqwlrrWN5h8iNn6sQAXkjVj3ZlYRu+bgb+OQcc7fex3W+I1tzZONMYV0HMwZkJE6j
-	E++SwwuwSJOy2pLjeXtO6wkq6Ad0A9ZPKGWyQ8ATLiRpIVgEw5l0AOcH9Y4QUjEUzLBEaNntkJHFE
-	4R4teUNIieB/WwOMW7ZEKiDvK8nvhn6fmxNMIBe76uklu407AmXFMoYqWM5076NWWqM7cMPa1FwUc
-	unQhKPTw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42580 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u4jXK-00005z-0W;
-	Tue, 15 Apr 2025 17:53:26 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u4jWi-000rJi-Rg; Tue, 15 Apr 2025 17:52:48 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1744736004; c=relaxed/simple;
+	bh=H0l8Wtqgb4i97S+RWZ/ta3rJzU0kuZFJUkKMydBGEb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h55+ZMJa7Mjf4td3nRFLzskTnjgxL58/YsrWqzH70dq5+unAG81zATiZ8AW77z3K3C4jo+ms1Us3LfUZkytSJx5PeLcgJQ+ji5fHqFKtiaEC2RxiKsb2QyJ9lCe3WgWDW1ZjiA/FSQ0x76Ai17QVhUmYbXJql6dlbxqz8fNIYPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6Fg9lZLD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wp/I9Y/Mgjx6GvKWv7wtlhx9b7XZAr2v2596rXTJtC8=; b=6Fg9lZLDnv5vxdgBEO67ohr/1b
+	8mXoiPEDLysESWIrWvdbZb+91akD6+vu950P7lSikqfrTnvCNuWQHtAQUV147k5ZDUO5y8zFOPrst
+	z+UGK5KWMfeiUsjIMJTO3/cq9uJ5lIhxnJNfIkLyFYGLtP7sFQzRWHHGGBwPcPQ5HCp4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4jX9-009UUr-Bt; Tue, 15 Apr 2025 18:53:15 +0200
+Date: Tue, 15 Apr 2025 18:53:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: visconti: convert to set_clk_tx_rate()
- method
+Subject: Re: [PATCH net-next 3/3] net: stmmac: sti: convert to
+ stmmac_pltfr_pm_ops
+Message-ID: <015dfded-fd5c-4596-b89d-3522e38d707e@lunn.ch>
+References: <Z_6Mfx_SrionoU-e@shell.armlinux.org.uk>
+ <E1u4jMo-000rCS-6f@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u4jWi-000rJi-Rg@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 15 Apr 2025 17:52:48 +0100
+In-Reply-To: <E1u4jMo-000rCS-6f@rmk-PC.armlinux.org.uk>
 
-Convert visconti to use the set_clk_tx_rate() method. By doing so,
-the GMAC control register will already have been updated (unlike with
-the fix_mac_speed() method) so this code can be removed while porting
-to the set_clk_tx_rate() method.
+On Tue, Apr 15, 2025 at 05:42:34PM +0100, Russell King (Oracle) wrote:
+> As we now have the plat_dat->init()/plat_dat->exit() populated which
+> have the required functionality on suspend/resume, we can now use
+> stmmac_pltfr_pm_ops which has methods that call these two functions.
+> Switch over to use this.
+> 
+> Doing so also fills in the runtime PM ops and _noirq variants as well.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-There is also no need for the spinlock, and has never been - neither
-fix_mac_speed() nor set_clk_tx_rate() can be called by more than one
-thread at a time, so the lock does nothing useful.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../ethernet/stmicro/stmmac/dwmac-visconti.c   | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index e1de471b215c..2215aef3ef42 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -51,22 +51,16 @@ struct visconti_eth {
- 	u32 phy_intf_sel;
- 	struct clk *phy_ref_clk;
- 	struct device *dev;
--	spinlock_t lock; /* lock to protect register update */
- };
- 
--static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
-+static int visconti_eth_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-+					phy_interface_t interface, int speed)
- {
- 	struct visconti_eth *dwmac = priv;
- 	struct net_device *netdev = dev_get_drvdata(dwmac->dev);
- 	unsigned int val, clk_sel_val = 0;
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&dwmac->lock, flags);
--
--	/* adjust link */
--	val = readl(dwmac->reg + MAC_CTRL_REG);
--	val &= ~(GMAC_CONFIG_PS | GMAC_CONFIG_FES);
--
- 	switch (speed) {
- 	case SPEED_1000:
- 		if (dwmac->phy_intf_sel == ETHER_CONFIG_INTF_RGMII)
-@@ -89,12 +83,9 @@ static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
- 	default:
- 		/* No bit control */
- 		netdev_err(netdev, "Unsupported speed request (%d)", speed);
--		spin_unlock_irqrestore(&dwmac->lock, flags);
- 		return;
- 	}
- 
--	writel(val, dwmac->reg + MAC_CTRL_REG);
--
- 	/* Stop internal clock */
- 	val = readl(dwmac->reg + REG_ETHER_CLOCK_SEL);
- 	val &= ~(ETHER_CLK_SEL_RMII_CLK_EN | ETHER_CLK_SEL_RX_TX_CLK_EN);
-@@ -136,7 +127,7 @@ static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
- 		break;
- 	}
- 
--	spin_unlock_irqrestore(&dwmac->lock, flags);
-+	return 0;
- }
- 
- static int visconti_eth_init_hw(struct platform_device *pdev, struct plat_stmmacenet_data *plat_dat)
-@@ -228,7 +219,6 @@ static int visconti_eth_dwmac_probe(struct platform_device *pdev)
- 	if (!dwmac)
- 		return -ENOMEM;
- 
--	spin_lock_init(&dwmac->lock);
- 	dwmac->reg = stmmac_res.addr;
- 	dwmac->dev = &pdev->dev;
- 
-@@ -237,7 +227,7 @@ static int visconti_eth_dwmac_probe(struct platform_device *pdev)
- 	__set_bit(PHY_INTERFACE_MODE_RMII, plat_dat->supported_interfaces);
- 
- 	plat_dat->bsp_priv = dwmac;
--	plat_dat->fix_mac_speed = visconti_eth_fix_mac_speed;
-+	plat_dat->set_clk_tx_rate = visconti_eth_set_clk_tx_rate;
- 
- 	ret = visconti_eth_clock_probe(pdev, plat_dat);
- 	if (ret)
--- 
-2.30.2
-
+    Andrew
 
