@@ -1,145 +1,151 @@
-Return-Path: <netdev+bounces-182655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 532B7A8985A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:42:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AA7A89885
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F95B16D6CF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:42:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A310174B91
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FFF292932;
-	Tue, 15 Apr 2025 09:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C5828B4E8;
+	Tue, 15 Apr 2025 09:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="HjiPiKLZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ay06r7y9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6060329291C
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 09:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7C91EEA39;
+	Tue, 15 Apr 2025 09:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744710005; cv=none; b=ftym4dyVQ7vwJ/Te+/6MCuTh+g9OIt7130Q3znTB2gUOJNPIZuo0hvLPOGcchWJjir+T1+DaExc+tnJ17ubXDM1vXhlOywTHuCTYlQE/2YjI4J2azfbN+/88ab4K7M6S6geLww+VofsI37wJgPI4edTADkHS3WBBC1LatSMw+oo=
+	t=1744710310; cv=none; b=ZmdwSSNG7TshK2CfB+h1Cjm3OGKOq42yamk19cc5nYsPCgxvSFfF49VEb5LBLli2R+/C8hdb2wYMHTovaYoGROnwogyUlXclSS9xyB0/0Gm2e3TslltHtJjRLjUdTWz41DlLuG48vRTN60S3pl0NVQ8BqrhrP2wffvRkph5YpY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744710005; c=relaxed/simple;
-	bh=zuT+UrwO92mBo3PFOJ4dtbbO5SqyhaBWwQA8C7tLxqM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SuJOH+IsIWw+THwow4U/1i0mrsxQo2uZw6CY3Js1gsj5lRruzZnMFHBIr85j8MXG2VnMsfeBnuNpths/QpOQFldbLOX3IfokOBbJmdPZj+9+y0OU5FZtCRMHti/bln9AI6BhG25U2shDyTnnbxW6+3iJ7MUPzZIAac/omDA4j5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=HjiPiKLZ; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43ed8d32a95so44773375e9.3
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 02:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1744710001; x=1745314801; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OmZOs8Rz2SRsBXQDEu0M9cDNyzZUv/bQ4RbErsr9sHY=;
-        b=HjiPiKLZkwf6zK62xpzE/BHjLc17KsQLkb11QXuRGGD3aVYDGvIMOw/SCm0P92gBKa
-         fZ7HQglzImY6+sKBz5BKRO7S2U2Ic344A2OUnodo6ZAfjg1GJ8ikvmZjwFez81kaeBC0
-         b91cGKAoCUr5ch0nz3t+iyZFAu1TTPfVtqTJYIj3N/Pi34cHGghuAisD4b51x8jfQc2+
-         HfH5jukfAkCdNNW2vVstSb0TN8VI/FflEKJ2bYRJIFbycMtgqKprj3lQhIoVcsHnmuLK
-         Ho6IvOx6nadEtmgFWlrjY3BQs5v9f5kmC4JL3s5DEabClDH5x/4cVbp4cNa6ENRdvuLl
-         QqCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744710001; x=1745314801;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OmZOs8Rz2SRsBXQDEu0M9cDNyzZUv/bQ4RbErsr9sHY=;
-        b=oCy4/LSxQJWAweN5gAMdtH12MUfDO2n30ovOKuWGIwo1/BbwyLLVbf09z+qJwEJGGP
-         4lyfUF5DqqwA4ZazlLHLmUEESB2d1cuitXEWjuGzGO9NbZ2+oiRD4++1KA54wSGxjbME
-         id5/eXdJmqIzPaw9nC7w1PWTnSFUf7gNvlaYm4gv1N+eTHgsZbxmY0ShDibQrci4Jfju
-         +fp8v66BB4Q5P/Z2t3LvZHHDTlTsm3L00FJsO/FT3w2MZmslBUTMFlv/4/R75iWcDhj+
-         p7IBbi1/Bldv7tj3V/hma/+PmNShmdfZCi4dfyfyi/hqupy7FXGdBJgQwxCPfN47amTk
-         fG8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBRhWKJuodOiNzecuUPeUTkfZSJMGM2akCXRiFTzapyj5w129JpOUehrSEuguF4T+9Z7SvHk4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxksKoTN8mYdcKDHTP2z9OdKBuolK6I1zD1Ln+qDSP0BMDfq5ro
-	nR+1a2+BjAXr48AR4lZtgbHIUk+XdGiYWInE4xQAfdf41kK3eI9P3oLK3hGCoSs=
-X-Gm-Gg: ASbGnctT7ZPxIc8lpRvsp0nW5Z1x5hdpucR3MhiWI0fptH7BPvscY3B8ZMvWS9wqufN
-	+U5LSDc6J0yzaRg87Ab6rVRS1UjCATM0EVL7++3J9SpYrsi4V0tE2oWYlCk7I+6lcXxmYh9WSy8
-	qNK4n5ljJADBpxc44V8qTnL3td9jh+IgXvDjyKQlstoHIJU4+lfGbM3GpDBLulrN2jhYYYfKmhB
-	QJAOYbiVfKa0tjBbpmjLpyVM0NXJPDvs0u/81cQ38KIqI32AtkPyhSSfhlPpjz3HsMAhZUOiXsS
-	Sc1Pfo3BeegvIvAubCPlV6u1R+IqxSjrY67wToTZ+MmPIdiLj98HgILcZ5hMNvjYyqx+rS2uD8Y
-	gZaCGVT0=
-X-Google-Smtp-Source: AGHT+IHF2FagMNaFNbqP/pP/Mm5s2FMwRszKIuGZ4NXlyxggm0m0+ymsT1EDLfxfWhc/bLYDwM86og==
-X-Received: by 2002:a05:600c:1f94:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-43f3a925eb1mr132089105e9.7.1744710000434;
-        Tue, 15 Apr 2025 02:40:00 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2066d109sm207839905e9.20.2025.04.15.02.39.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 02:39:59 -0700 (PDT)
-Message-ID: <8b338c8b-9514-43e4-b1b8-3240b3bde798@blackwall.org>
-Date: Tue, 15 Apr 2025 12:39:58 +0300
+	s=arc-20240116; t=1744710310; c=relaxed/simple;
+	bh=wuQTiHjjMrlc9bOLthNDzDOBl+OzWwDb8C1zkuhKIpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBlNlnTRuBrxJf7Mibrk2Td1kv4ktkAbvI0ut0vmtsBvuac9j/2Utl+yJSPyI7YFjLyEB+7xF1DOqJgPJxcHGY/fxdCr1DaJ8eRtBnf+LH2gc6Ow7iPPX6Qee9TbRVeb5CvfbAsskLGIG/N/OI1sXxxWZ+/+QNh4QS2iihe3XmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ay06r7y9; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744710309; x=1776246309;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wuQTiHjjMrlc9bOLthNDzDOBl+OzWwDb8C1zkuhKIpY=;
+  b=Ay06r7y99IeIwYjqT149Wnh3yuif80lbRKyIdINmFMbSTGIamiX1uWqK
+   TvI2ZYwBNAaDPmUyV2hPXVRANZsJfeOb019uf7EA8nlf0b1e3+X4Eiwjq
+   Ja1sUUesV7/4lJdC4GpuVRys6viYeFWhpNqG0cXouAimUErcMYEtTH7GD
+   B6xHwNVCjDt3kFy3oYsZfFvtu0ClOH/b7C9LZDHjYHSXaoy0gpM1iryuF
+   FB0YgJyi8EpalKJ1yDNKKhcuUwmY1lgws8rSSIngai0IrsDQC9UZ2RYyn
+   jzgUtFxvPx4Xy63WCuuocxIwLI8o2CWW+aol2podkjtG93XZFWLllE/cE
+   A==;
+X-CSE-ConnectionGUID: qQyrP4GERJCA+pPajlr5rA==
+X-CSE-MsgGUID: iq8uF/2aSUSFIbc8RjJrRA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11403"; a="68701248"
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="68701248"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 02:44:02 -0700
+X-CSE-ConnectionGUID: Kbt8K22fS9OXTj5GSEkAYA==
+X-CSE-MsgGUID: L1Azbl44TseVUCJuaF8VJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="129924471"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 02:43:58 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1u4cpf-0000000CVTi-2oXf;
+	Tue, 15 Apr 2025 12:43:55 +0300
+Date: Tue, 15 Apr 2025 12:43:55 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net v1 1/1] bnx2: Fix unused data compilation warning
+Message-ID: <Z_4qWxZvZ4RIIhWq@smile.fi.intel.com>
+References: <Z8bcaR9MS7dk8Q0p@smile.fi.intel.com>
+ <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
+ <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
+ <Z8cC_xMScZ9rq47q@smile.fi.intel.com>
+ <20250304083524.3fe2ced4@kernel.org>
+ <CGME20250305100010eucas1p1986206542bc353300aee7ac8d421807f@eucas1p1.samsung.com>
+ <Z8ggoUoKpSPPcs5S@smile.fi.intel.com>
+ <067bd072-eb3f-451a-b1c4-59eae777cf00@samsung.com>
+ <Z9G0QU5Ew3FusrJH@smile.fi.intel.com>
+ <Z_zepIheW2zKq0yg@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: bridge: locally receive all multicast
- packets if IFF_ALLMULTI is set
-To: Shengyu Qu <wiagn233@outlook.com>, idosch@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, bridge@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>
-References: <OSZPR01MB8434308370ACAFA90A22980798B32@OSZPR01MB8434.jpnprd01.prod.outlook.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <OSZPR01MB8434308370ACAFA90A22980798B32@OSZPR01MB8434.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_zepIheW2zKq0yg@smile.fi.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On 4/14/25 13:56, Shengyu Qu wrote:
-> If multicast snooping is enabled, multicast packets may not always end up
-> on the local bridge interface, if the host is not a member of the multicast
-> group. Similar to how IFF_PROMISC allows all packets to be received
-> locally, let IFF_ALLMULTI allow all multicast packets to be received.
-> 
-> OpenWrt uses a user space daemon for DHCPv6/RA/NDP handling, and in relay
-> mode it sets the ALLMULTI flag in order to receive all relevant queries on
-> the network.
-> 
-> This works for normal network interfaces and non-snooping bridges, but not
-> snooping bridges (unless multicast routing is enabled).
-> 
-> Reported-by: Felix Fietkau <nbd@nbd.name>
-> Closes:https://github.com/openwrt/openwrt/issues/15857#issuecomment-2662851243
-> Signed-off-by: Shengyu Qu <wiagn233@outlook.com>
-> ---
-> Changes since v1:
->  - Move to net-next
->  - Changed code according to Nikolay's advice
-> 
-> Changes since v2:
->  - Fix alignment
->  - Remove redundant parenthesis
->  - Add more infomation in commit message
-> ---
->  net/bridge/br_input.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-> index 232133a0fd21..5f6ac9bf1527 100644
-> --- a/net/bridge/br_input.c
-> +++ b/net/bridge/br_input.c
-> @@ -189,7 +189,8 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
->  		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
->  		    br_multicast_querier_exists(brmctx, eth_hdr(skb), mdst)) {
->  			if ((mdst && mdst->host_joined) ||
-> -			    br_multicast_is_router(brmctx, skb)) {
-> +			    br_multicast_is_router(brmctx, skb) ||
-> +			    br->dev->flags & IFF_ALLMULTI) {
->  				local_rcv = true;
->  				DEV_STATS_INC(br->dev, multicast);
->  			}
+On Mon, Apr 14, 2025 at 01:08:36PM +0300, Andy Shevchenko wrote:
+> On Wed, Mar 12, 2025 at 06:20:17PM +0200, Andy Shevchenko wrote:
+> > On Tue, Mar 11, 2025 at 01:51:21PM +0100, Marek Szyprowski wrote:
+> > > On 05.03.2025 11:00, Andy Shevchenko wrote:
+> > > > On Tue, Mar 04, 2025 at 08:35:24AM -0800, Jakub Kicinski wrote:
+> > > >> On Tue, 4 Mar 2025 15:41:19 +0200 Andy Shevchenko wrote:
 
-Thanks,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+...
+
+> > > >> I meant something more like (untested):
+> > > > We are starving for the comment from the DMA mapping people.
+> > > 
+> > > I'm really sorry for this delay. Just got back to the everyday stuff 
+> > > after spending a week in bed recovering from flu...
+> > 
+> > Oh, I hope you feel much better now!
+> > 
+> > ...
+> > 
+> > > >>   #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)
+> > > >>   #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)
+> > > >> -#define dma_unmap_addr(PTR, ADDR_NAME)           (0)
+> > > >> -#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { } while (0)
+> > > >> -#define dma_unmap_len(PTR, LEN_NAME)             (0)
+> > > >> -#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { } while (0)
+> > > >> +#define dma_unmap_addr(PTR, ADDR_NAME)           ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
+> > > >> +#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
+> > > >> +#define dma_unmap_len(PTR, LEN_NAME)             ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
+> > > >> +#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
+> > 
+> > > >> I just don't know how much code out there depends on PTR not
+> > > >> existing if !CONFIG_NEED_DMA_MAP_STATE
+> > > > Brief checking shows that only drivers/net/ethernet/chelsio/* comes
+> > > > with ifdeffery, the rest most likely will fail in the same way
+> > > > (note, overwhelming majority of the users is under the network realm):
+> > > 
+> > > Frankly speaking I wasn't aware of this API till now.
+> > > 
+> > > If got it right the above proposal should work fine. The addr/len names 
+> > > can be optimized out, but the pointer to the container should exist.
+> > 
+> > Thanks for the reply, would you or Jakub will to send a formal patch?
+> > I can test it on my configuration and build.
+> 
+> Any news here? The problem still persist AFAICT.
+
+Thank you, Marek, for the patch, I just have tested it, and it works as
+expected to me.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
