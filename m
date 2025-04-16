@@ -1,243 +1,190 @@
-Return-Path: <netdev+bounces-183511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 008C1A90DE6
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 23:41:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37AC7A90DE8
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 23:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65FD01905073
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 21:41:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43CF8447DD3
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 21:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60998197A8A;
-	Wed, 16 Apr 2025 21:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09706233126;
+	Wed, 16 Apr 2025 21:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cv0P3Qkk"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J4XisQFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1CC22E415
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 21:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24928221DA5
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 21:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744839660; cv=none; b=gXa31n6LabQT7gGRic0xctfezoLFyYZnbP4Mo/lR/rVYOZGSlmxMW/bJFzd80b1PcunkQzjyZ54wUsZKFXjXDiOaug2Kg1qMjyo/tidUsD9Og5WR/RRVtzBWFnzhhS0Of1fpWj7G5Gs6PDInQ2TPbW95cnMdC94eDXghG2h9M5M=
+	t=1744839685; cv=none; b=bORS5bOhlzBWKdez7/s5yQS7QMNwCwHMLRDhqj436M/4VgZKbjUZeLSKAAHeHH0YSHv6aou0/3BbQM4FXPo4QQELe39VnpK6ssLyo9fjhLIyD0/i+72+Tpc4ucYDhv2o3mP/edH1uVr1RoaiSYRHXD5g2VxzZ8szZsG9zDIRG6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744839660; c=relaxed/simple;
-	bh=3O/DlWzUS4KwiP6LLDkYBSwHM0lX4VuHS8MrBTHDEho=;
+	s=arc-20240116; t=1744839685; c=relaxed/simple;
+	bh=lgIR0NTjRYj1kWD3MpcZI1MGDlLiZoLSP07FoelP4dg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yv2pQHSoMoMGSIUqXf4hM14EdnAAOfxhtXJlB6yZCh+gBdVYA3Jrk12+37ZiKnpDiPDfzLFgFefyTsRR3VMmhcE7Omlw28L63zA68wvDINt8j9VB8/Jggjj5wE/GH0CejFSD0aJH0Dkdl4Di+Dqrkdv6Xe4wukAyCJgZySssj9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cv0P3Qkk; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47686580529so962211cf.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 14:40:56 -0700 (PDT)
+	 To:Cc:Content-Type; b=Hxok3/AsT0u292+EDXO+osbYcFgVjeZ4j65iZKfZZggnhM0RXk9Il1FznSwmohiiWtl09R5PgXDlB4JIvvT8mS+u3N22nJs50friKhx4gTPwWxjWLLJGgf8HZIPBgUdCSGqoW6KcbneTLm4htXi+tEaAqQwndbfna8ZloC4Wv3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=J4XisQFN; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5f4d0da2d2cso237706a12.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 14:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744839656; x=1745444456; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dCmul9aNyKE7nwk2BdDP/Vg46lNOgbXRm4PZWkpQFGA=;
-        b=Cv0P3Qkk5wJVFRb9zmrMYurckTAGlUstUlvyzxnu+w+JyxEfh0EXnF1SNT8tg6xrs6
-         7RS1LDLAzk0mgEhMZ4uRoFMT1q2WqpSyKPjUpTeFtHan9FoigsRycQ2bRCw7NfohODXM
-         vQKslPrfl12jhdBDzzZLUJ64hUAGB7A4QWWk5Qub4x7rbhRbxmaiXHq67mb+nbPjI3Wp
-         ilJwlu56V/e7IvmVnPWaNpbSTXTz3zyq9cq8zIDL46HC0RNZ4T6UBwqWQ+Xq0YyZRwUj
-         Lgn8/nKfYlIpfaGZmsQYP2oB6MEWfIz0Gsd36QZJBhCQq4BrkPgXYTCNR0Hh3HQEatHQ
-         yjAQ==
+        d=broadcom.com; s=google; t=1744839682; x=1745444482; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ARIt6moWSrPw7Xs5i2dEfvdiuYjE7pzowxQlklfYgZs=;
+        b=J4XisQFNddBzLobFH4jPYJprR2B/yASvSeATby3xbsJakukWPDzTdS4sZo5YqW/1DL
+         hrXEUT6WCwUDj+9AzXqbts0zeKgqnxkagwSgJz1A9p9ie8jvFj6Pb5ZFTfBB9lSGwMam
+         zSHZeRDtck75dk2Mo13cdB7879jY+8EzofwkM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744839656; x=1745444456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dCmul9aNyKE7nwk2BdDP/Vg46lNOgbXRm4PZWkpQFGA=;
-        b=X8eydQOw9JcJ4ipa9+hcUY+PPilqt6zKT1Kq6Ly1IpQ5TfZ4tPQDr3MfVczko3D/9y
-         /Rbw/ibRxhXPaELoFBxcBh5v/lo848y13BzpwrnvJw/ZUXCgb9Ta7E6qfpV3HHIglTWs
-         VF620kH+u6C7/nVoVxnkg7FMlcDeQo/+C+Xxw5HD01YSvu5mnOsYdGpr00pIiHCZpCV+
-         Na4OW9wqr1tRLNXzpHBZUZyZT7QbMQfDW7DzyMOk5JezBmSNjvBW2J/f2wDIfdutRUKF
-         7HLRj/xfRsMlWe2IfxEzgSHK36n2S/blxbRa4FFRRek10HbLw5mrQ1wCQ9Q0NOMhTXHg
-         uJcg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTHxF6fL9zl0f5KEqI7pykX0dR3TZcLH5VTvQvwHpcZBE3VSAixq6ik0ZLVdvluLP4c1Y4rVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAu9Fch7FQp/Tjlmwx0JfFFEvsHmQdpjRTR2TpeQon9Hs+aLEz
-	4sVnrLCHxRWz0Xx9TEzRAmSb84IbvifmXFqRIZh7JfGKwm7Z2bkoDr6cgNTyWOqlKrsmD/CONNW
-	DAMxQrcP9Tnx7k3WPwQd/K5K37WszG71wX+imAbGXg1z4Smzf6rWN
-X-Gm-Gg: ASbGnct4Z29sjvIIh0raC4SYd1pK0NA6SapOwlEJhGd3pyMDPvRVmh8kspn93Gdeldd
-	URJDORqPlx50MbJTxt087xzYw9HVSWKPfyw7A35GOowdM+v562gjpIfgLV3J6RX+RiXyotROKS6
-	iygFW2fvhMXpjjzJ/CWXogx2ovMvWTnpMogkrc/xCVPU+BEJi84Qsm
-X-Google-Smtp-Source: AGHT+IH1dAmfiL+Vu6bfk9iCwK4N/73fuEuUiYpuTFtYOmxltP1Q2lE0aNv8pNt7DL8QTGiNfI80VelWKdBs4sncrfc=
-X-Received: by 2002:ac8:7dd5:0:b0:476:77ba:f7 with SMTP id d75a77b69052e-47ad81363c4mr43905061cf.34.1744839655779;
- Wed, 16 Apr 2025 14:40:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744839682; x=1745444482;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ARIt6moWSrPw7Xs5i2dEfvdiuYjE7pzowxQlklfYgZs=;
+        b=CHEuq7iLdfhD7r2FtqApnADsYzl/bvm4KDD+GS9F9FJa0lm4GmL8VdKA63o9lzVaHg
+         h+FAXLBUwGcKw8o3fPWo06zpa9dkWZlxZwjUk/BIQoDGZ0OK2qbFav9Be345m1pMPddz
+         BCbHWPvcXcOiN3wDhqGY9D2TokaqV7wAOrq0LNHPA26vZUvouFZE3rTYjnwbC28tpmjM
+         WSENinpZnzUVuBMjwlhHGtR0HaHeK8kjXnTK5OjCaEq6yVAlOWdmAge0GghmQ7oTpK81
+         HURyVO9KE6pkUV+peAZWLm3VwKc5f/k1591WVAqPJQp7zHkDdkTJ1J8D9KiIY+jXtX5w
+         4eKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbGnc1oOe9jHyn8SkRyiotUhtOI+pFe0I40RuUI4R5TBc+QwytVxDB+RQFj01oZVrJwHwFk/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6/qq8LoA8v02ZtLIW/PGUgSVGieMGeYn36fhhlkQlvEa/cOKM
+	P6Bci3gtJZwXwLulJYG6xa8BeJiDvEHOT8w9D7YDwbo9dSTu1mfodZrZ4oAcTGHztR1VhNPVwze
+	bSwGRcIIW7zlp5wLHE2a3oD3VXg8FVL2g22cL
+X-Gm-Gg: ASbGncurc8uvWQij+9Xz+hFKHQqO1ZI8ncSkznCSLv2t3W4eP6St2FZ/qQ5vOzHgq0M
+	lvUe2MT2HY5F7rkofaIp68IjAkNi1Lk5yz5GGtuhNxj5l9s99GuPc8S1GCTyv9UVvXGfVSzHWht
+	Zqgr/66BiZO2IGsjjlxcuSB2Y=
+X-Google-Smtp-Source: AGHT+IFDeueVcM8smEj6+rQ4D6n8ANxsCPEFnIzVnxAR+KwKeQsI0/4Bl1evVw/SRjU7MwAwQrTBayRi6p2md9laP6A=
+X-Received: by 2002:a05:6402:2807:b0:5e5:bfab:524 with SMTP id
+ 4fb4d7f45d1cf-5f4b7344956mr3425001a12.3.1744839682365; Wed, 16 Apr 2025
+ 14:41:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250410175140.10805-3-luizcmpc@gmail.com> <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
- <CAHx7jf-1Hga_tY4-kJ_HNkgkWL6RywCmYhg2yYYX+R+mVwdTvA@mail.gmail.com>
-In-Reply-To: <CAHx7jf-1Hga_tY4-kJ_HNkgkWL6RywCmYhg2yYYX+R+mVwdTvA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 16 Apr 2025 14:40:44 -0700
-X-Gm-Features: ATxdqUEiL4dtQhbygo-rKG6oZd-A0jRVyCO3zZbmD_BOMZyF5unne4fdY3-MHog
-Message-ID: <CANn89i+beuSWok=Z=5gFs2E0JQHyuZrdoaT=orFRzBap_BvVzA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: tcp_acceptable_seq select SND.UNA when SND.WND
- is 0
-To: =?UTF-8?Q?Luiz_Carlos_Mour=C3=A3o_Paes_de_Carvalho?= <luizcmpc@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>
+References: <20250415174818.1088646-1-michael.chan@broadcom.com>
+ <20250415174818.1088646-2-michael.chan@broadcom.com> <20250415201444.61303ce7@kernel.org>
+In-Reply-To: <20250415201444.61303ce7@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 16 Apr 2025 14:41:10 -0700
+X-Gm-Features: ATxdqUG3p6ybl_Menpkc4zGGjhEPJO6eYCirZxBGgWv8O-vKuGm1mC5BL18SEJ8
+Message-ID: <CACKFLi=tvPJXk4zFXxFzWftc-AVU+2m_cg+EFTzs5MSoDoWFaQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] bnxt_en: Change FW message timeout warning
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
+	andrew.gospodarek@broadcom.com, 
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000007a439d0632ec256a"
+
+--0000000000007a439d0632ec256a
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 16, 2025 at 1:52=E2=80=AFPM Luiz Carlos Mour=C3=A3o Paes de Car=
-valho
-<luizcmpc@gmail.com> wrote:
->
-> Hi Paolo,
->
-> The dropped ack is a response to data sent by the peer.
->
-> Peer sends a chunk of data, we ACK with an incorrect SEQ (SND.NXT) that g=
-ets dropped
-> by the peer's tcp_sequence function. Connection only advances when we sen=
-d a RTO.
->
-> Let me know if the following describes the scenario you expected. I'll ad=
-d a packetdrill with
-> the expected interaction to the patch if it makes sense.
->
-> // Tests the invalid SEQs sent by the listener
-> // which are then dropped by the peer.
->
-> `./common/defaults.sh
-> ./common/set_sysctls.py /proc/sys/net/ipv4/tcp_shrink_window=3D0`
->
->     0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
->    +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
->    +0 bind(3, ..., ...) =3D 0
->    +0 listen(3, 1) =3D 0
->
->    +0 < S 0:0(0) win 8 <mss 1000,sackOK,nop,nop,nop,wscale 7>
->    +0 > S. 0:0(0) ack 1 <...>
->   +.1 < . 1:1(0) ack 1 win 8
->    +0 accept(3, ..., ...) =3D 4
->
->    +0 write(4, ..., 990) =3D 990
->    +0 > P. 1:991(990) ack 1
->    +0 < .  1:1(0) ack 991 win 8           // win=3D8 despite buffer being=
- almost full, shrink_window=3D0
->
->    +0 write(4, ..., 100) =3D 100
->    +0 > P. 991:1091(100) ack 1            // SND.NXT=3D1091
->    +0 < .  1:1(0) ack 991 win 0           // failed to queue rx data, RCV=
-.NXT=3D991, RCV.WND=3D0
->
->  +0.1 < P. 1:1001(1000) ack 901 win 0
+On Tue, Apr 15, 2025 at 8:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 
-This 'ack 901' does not seem right ?
+> sysctl_hung_task_timeout_secs is an exported symbol, and it defaults to 1=
+20.
+> Should you not use it in the warning (assuming I understand the intent
+> there)?
+Yes, we have considered that.  This is only printed once at driver
+load time, but the sysctl value can be changed at any time after the
+driver is loaded.  So we just want to use a reasonable value well
+below the default sysctl_hung_task_timeout_secs value as the
+threshold.
 
-Also your fix would not work if 'win 0' was 'win 1' , and/or if the
-initial wscale was 6 instead of 7 ?
+But we can reference and compare with the
+sysctl_hung_task_timeout_secs value if that makes more sense.
 
->    +0 > .  1091:1091(0) ack 1001          // dropped on tcp_sequence, not=
-e that SEQ=3D1091, while (RCV.NXT + RCV.WND)=3D991:
->                                           // if (after(seq, tp->rcv_nxt +=
- tcp_receive_window(tp)))
->                                           //     return SKB_DROP_REASON_T=
-CP_INVALID_SEQUENCE;
+--0000000000007a439d0632ec256a
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-I assume that your patch would change the 1091:1091(0) to 991:991(0) ?
-
-It is not clear if there is a bug here... window reneging is outside
-RFC specs unfortunately,
-as hinted in the tcp_acceptable_seq() comments.
-
->
->  +0.2 > P. 991:1091(100) ack 1001         // this is a RTO, ack accepted
->    +0 < P. 1001:2001(1000) ack 991 win 0  // peer responds, still no spac=
-e available, but has more data to send
->    +0 > .  1091:1091(0) ack 2001          // ack dropped
->
->  +0.3 > P. 991:1091(100) ack 2001         // RTO, ack accepted
->    +0 < .  2001:3001(1000) ack 991 win 0  // still no space available, bu=
-t another chunk of data
->    +0 > .  1091:1091(0) ack 3001          // ack dropped
->
->  +0.6 > P. 991:1091(100) ack 3001         // RTO, ack accepted
->    +0 < .  3001:4001(1000) ack 991 win 0  // no space available, but peer=
- has data to send at all times
->    +0 > .  1091:1091(0) ack 4001          // ack dropped
->
->  +1.2 > P. 991:1091(100) ack 4001         // another probe, accepted
->
->   // this goes on and on. note that the peer always has data just waiting=
- there to be sent,
->   // server acks it, but the ack is dropped because SEQ is incorrect.
->   // only the RTOs are advancing the connection, but are back-offed every=
- time.
->
-> // Reset sysctls
-> `/tmp/sysctl_restore_${PPID}.sh`
->
-> On Tue, Apr 15, 2025 at 8:30=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
->>
->>
->>
->> On 4/10/25 7:50 PM, Luiz Carvalho wrote:
->> > The current tcp_acceptable_seq() returns SND.NXT when the available
->> > window shrinks to less then one scaling factor. This works fine for mo=
-st
->> > cases, and seemed to not be a problem until a slight behavior change t=
-o
->> > how tcp_select_window() handles ZeroWindow cases.
->> >
->> > Before commit 8c670bdfa58e ("tcp: correct handling of extreme memory s=
-queeze"),
->> > a zero window would only be announced when data failed to be consumed,
->> > and following packets would have non-zero windows despite the receiver
->> > still not having any available space. After the commit, however, the
->> > zero window is stored in the socket and the advertised window will be
->> > zero until the receiver frees up space.
->> >
->> > For tcp_acceptable_seq(), a zero window case will result in SND.NXT
->> > being sent, but the problem now arises when the receptor validates the
->> > sequence number in tcp_sequence():
->> >
->> > static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
->> >                                        u32 seq, u32 end_seq)
->> > {
->> >       // ...
->> >       if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
->> >               return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
->> >       // ...
->> > }
->> >
->> > Because RCV.WND is now stored in the socket as zero, using SND.NXT wil=
-l fail
->> > the INVALID_SEQUENCE check: SEG.SEQ <=3D RCV.NXT + RCV.WND. A valid AC=
-K is
->> > dropped by the receiver, correctly, as RFC793 mentions:
->> >
->> >       There are four cases for the acceptability test for an incoming
->> >         segment:
->> >
->> >       Segment Receive  Test
->> >         Length  Window
->> >         ------- -------  -------------------------------------------
->> >
->> >            0       0     SEG.SEQ =3D RCV.NXT
->> >
->> > The ACK will be ignored until tcp_write_wakeup() sends SND.UNA again,
->> > and the connection continues. If the receptor announces ZeroWindow
->> > again, the stall could be very long, as was in my case. Found this out
->> > while giving a shot at bug #213827.
->>
->> The dropped ack causing the stall is a zero window probe from the sender
->> right?
->> Could you please describe the relevant scenario with a pktdrill test?
->>
->> Thanks!
->>
->> Paolo
->>
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIBVFrx5AabRHNRmzXa9i6xsbu/SPblmR
+JGF+7SbUmIe7MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDQx
+NjIxNDEyMlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBAE4De/HpffVK4aen+KXCgTRHyni2ZyX8tVa/PG9Lr1rPzPHu3FIpCGfdB7xCmguoDj6H
+ZAkvRBN5CWUlERji1h0M1RnnMzx73sOsrSA7wFm7ahibIqHaCnM9SYK8AGxXihsMR2YfkwLSFPXm
+FIHYWbCBlZVEruYlItv48j0qGTxSJ8FRmXGfzN8C0Oxy8Hvh7BGSnQlbD5GfU5aHM/OUL78Je6a8
+cVMEZtA7ebioBpzP0i4VNXFwEEJITsp5LZBHrXWiKqn4vpYyayXrqjLHQR7cstpkDvOwApL0gLyj
+XKDeXtMjf/fLDOPcHGzh+U5vVXM434qhHlVdZy6WuoO8zWM=
+--0000000000007a439d0632ec256a--
 
