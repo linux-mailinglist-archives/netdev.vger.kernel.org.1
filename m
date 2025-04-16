@@ -1,96 +1,102 @@
-Return-Path: <netdev+bounces-183135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1022CA8B118
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:50:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD9EA8B11A
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0169F7AD0A2
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 06:49:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 761547AB437
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 06:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596DC21B91F;
-	Wed, 16 Apr 2025 06:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63E11DDC1B;
+	Wed, 16 Apr 2025 06:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W2fGiVfh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jG+97HRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f66.google.com (mail-lf1-f66.google.com [209.85.167.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99403207DF7;
-	Wed, 16 Apr 2025 06:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F161DC9A8
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 06:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744786241; cv=none; b=MUsjE9iG3usVFeAUV4mXg6YsdObG0NL6LJhlxaTLkhONNiQUow9gsotR8HCU41Q3jitN1RYUCpfFuBa/teObC/twwOCIYJ2NWkJtR6f1lqmR5kW1Sg1mvSQJizkugZ1+Gm66wdN8Nv0qhWMMiY2POhif/p4rYudiLlsFR5sCIHo=
+	t=1744786281; cv=none; b=J/NZo3M7SOpr2Jgc8Xq9kPwfaj1pv5c+m6Uov8kxDiQvrlhOu0tHuXYJzA6sWClAkMSULibOaPVK7AvJjH/6tfjX1lWma1fzSMSAeUtgvmAdfHYLqMxPe7qK0bsGFb9s3Ob0dfdlDkcq6f3qxaai5ojrPCu6uhyghWd73R1sLRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744786241; c=relaxed/simple;
-	bh=B1KKRwM2trU1CVGyeOoOABBXy1cregEeykhg280smrw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BWXTjEvHtbZ/SYWQgvtLDngzY9AGoi6N/m0QPFD8/w9Liw+A0Mt/jPyBqYFBwu1woK06p16t0bopsXwEIdOgcYOt4Fd7qGyPBuBsqlM6nH19CoESqqhK2OoayoAfG5ZJiv9qw5/mp8PsSKR3bcHMZPOm9PsMSQtUIadnhiha8CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W2fGiVfh; arc=none smtp.client-ip=209.85.167.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f66.google.com with SMTP id 2adb3069b0e04-5499659e669so7621342e87.3;
-        Tue, 15 Apr 2025 23:50:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744786237; x=1745391037; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=B1KKRwM2trU1CVGyeOoOABBXy1cregEeykhg280smrw=;
-        b=W2fGiVfhV1B9saQZBJnY1ruSh96jkzc71+FKec+HBZo8nuuaBQ5rJoLYW5pyNEQ1Fj
-         NbsJV7VxwED61U+CZdUb31iN2AGkAwdWN5ii6nDwinRzFMcPF/hSoHCG5M5gbIvm4E9X
-         ArXnCNpWGb94BPsaQAbVwq4Oy1T/h2VRnrU54o8ABA7BIOpWRFbDhetrKT+Ok+d4KBsP
-         VAP1/c35P/nHLJUO6AS+ucf9+mRk2wD3UfNSqoYa8kFkCNhFHPlYYtV1TJpbhiW06Yqx
-         fJCUB/V/fBYpFPy8pbYL0gf+nu/W42kxRW1moHKLPXTvkTxmMbyC1NZelNWvQXX/VRR4
-         ZwOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744786237; x=1745391037;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B1KKRwM2trU1CVGyeOoOABBXy1cregEeykhg280smrw=;
-        b=lvp/oln1JERzKkUeuYH/gBGx1c6OltaJSigMsPlZTSzvHaT+0PZHlxr5XDJjWgrvJ5
-         Jcv3FpxNod8CDqcXihlMR/cZOWKwRaRo0CuWWIo52Y0+Tf8rtmqI7MhvLk+0ERM6FseY
-         HE1vrbGtyvtTmEszVr+AHUyHY93DF1Up+0oxF3OoNG7q72IsXEMtK5JND1TdsLvxHK/8
-         P5Hqp4pk4Ek8mfGKUVBkiEFPSHz9FShH1OfHCCmZLUpsbSJxKSXPpwj3laZwCZOoYI2H
-         g1yAKxAmqEgsNY6JtXzNKEnRxYSa3ygrg9DWG3i7G2wXoXI1cqaBTQpZmP312oyEF+wQ
-         OWPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUrYqw9UPHk8AijW3V2AD5IWiJBYy/YVw9FWtHu9LADQqXfFa7NfPVFRf4kekydCXWkvt1yKCX@vger.kernel.org, AJvYcCX3JE77OLO2xAcLwkNAzHYw992CFXzairI+VCSsaeVFcwmZKFyOvh/zdSoaZZJaPi+pqG8nfu/tZ6JaDus=@vger.kernel.org, AJvYcCX3U5Y8RtqPjDdxwId1qVjoursanSE8ko36vE7kHb7kYYVki4SPgv3zWsjFUGwuR//AUVHYB7PhkEbF2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPfshGLWmu7KwDPq9wm4OJ/leSomh9LF5/tJj1SexQjRvrsglR
-	unYM8iPz9bfc6vc1RQcw3A11nuwjOdUOAnxAiMgbwBFeGMqO3MLrtc7ZolPNO7YtyEAB/lhyZxB
-	OA1t3W+jj9rq5X1mgDRx8ah1BCCU=
-X-Gm-Gg: ASbGncsgE9pUV0U8hDPl2E7eeTGTP4Yh5qbG8iEaOHaqozhw224BToGucaOBGl8XyrV
-	1DsK6rnmsZqia15A7sd9oTgRkOURyPbIBUuc/zheh38K9DhF+VVukknUctp8hywc2g6dE/qOZe/
-	0tyMz6jQpUjOBENd0EM5JmfQ==
-X-Google-Smtp-Source: AGHT+IFkUl68vPRq3Eoh7lTjnZsGM+ezWLD4qM9I0vkyVblUK6mahjlvr+SHWNSVM8wd+7zn98YgfcXamDumw7iE2ME=
-X-Received: by 2002:a2e:a5c7:0:b0:30b:c980:c589 with SMTP id
- 38308e7fff4ca-3107f6bf415mr1948791fa.14.1744786237122; Tue, 15 Apr 2025
- 23:50:37 -0700 (PDT)
+	s=arc-20240116; t=1744786281; c=relaxed/simple;
+	bh=GPE42JNp3K3kOZzoJrYnhUZFcengTqlDpPxKgKlLC6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D1wforkBqQbJW1rdQAH63JQrXxLl4I7jtCfixOWK5gINUhSmmVdHSG/nVpZzyUSMH9gp0NlUGpJT3VhTZM76ezh5+tv0Nja98rw0UYNFrcZqRXKuf/dc4lT2x6UhvoIRTYcFa+QcYukkvIHMep7TW/E7yQMki4mvD7LPFJoYGqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jG+97HRD; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744786280; x=1776322280;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GPE42JNp3K3kOZzoJrYnhUZFcengTqlDpPxKgKlLC6E=;
+  b=jG+97HRDP8FklAsMpipb7/65XP8yQoYTo7WzxZqIAQJmwdv0l7vgg8pW
+   0CTrDuWopqjm1AAlg7IqCPe2f8sX2J3/Mo0NcfppwdD0bW1+lwUaYS06r
+   9D188uA1CboAMdujoHCZyc5RtnsEW3mok7MAuHPkZaxSrmLTrbF2cXp20
+   FNMdB3ZkrUrpymxfJsTVk2srsqEPo8OwBlqYpe/+eZW9qVxmwRyY+1tbi
+   Ev0ZVLGncePOyD6w33y1EJYHbAe83iNdr1auhuJVStGRQUxk2OPi8BGp/
+   SVcMN31RnMezUfPGq5Hycd+xFSPiEU4FbZLkAAVBPVYKgb7Vb/A+QBHPD
+   Q==;
+X-CSE-ConnectionGUID: 3QSNdSCuTNmP/L6yVs1l4w==
+X-CSE-MsgGUID: 9Em3VBCaQBq2Rg8oP0XkvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="71712170"
+X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
+   d="scan'208";a="71712170"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:51:19 -0700
+X-CSE-ConnectionGUID: iAN+TeqpTBCxgAx+7dihvg==
+X-CSE-MsgGUID: a+9sM5mHQAev0ZiuLaYwpg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,215,1739865600"; 
+   d="scan'208";a="130887390"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 23:51:17 -0700
+Date: Wed, 16 Apr 2025 08:50:58 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] r8169: refactor chip version detection
+Message-ID: <Z/9TUjJwBZtBRfs5@mev-dev.igk.intel.com>
+References: <1fea533a-dd5a-4198-a9e2-895e11083947@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250415124128.59198-1-bsdhenrymartin@gmail.com>
- <20250415124128.59198-3-bsdhenrymartin@gmail.com> <c0125e86-79f7-4217-832e-44249cae16dd@nvidia.com>
-In-Reply-To: <c0125e86-79f7-4217-832e-44249cae16dd@nvidia.com>
-From: henry martin <bsdhenrymartin@gmail.com>
-Date: Wed, 16 Apr 2025 14:50:28 +0800
-X-Gm-Features: ATxdqUEYO-wItcyAq0JOiMYlpEM-Jg-HBC1uyFcYUgvgHxfq3Kiv3jhkqgwAjWQ
-Message-ID: <CAEnQdOrvtYPghA1=4t9HfP=jSZE=2pHi9jR1mWyJgCNCPEG5Fw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] net/mlx5: Fix memory leak in error path of ttc creation
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, amirtz@nvidia.com, 
-	ayal@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1fea533a-dd5a-4198-a9e2-895e11083947@gmail.com>
 
-> What about just moving the ttc allocation after the switch case?
+On Tue, Apr 15, 2025 at 09:29:34PM +0200, Heiner Kallweit wrote:
+> Refactor chip version detection and merge both configuration tables.
+> Apart from reducing the code by a third, this paves the way for
+> merging chip version handling if only difference is the firmware.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 325 +++++++++-------------
+>  1 file changed, 128 insertions(+), 197 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 8e62b1095..b55a691c5 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
 
-Thanks for the suggestion. Moving the allocation after the switch statement is
-indeed a cleaner approach.
+Nice simplification, thanks
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+[...]
 
