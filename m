@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-183222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4B3A8B6B9
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:24:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88060A8B6BD
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A24E3BC9DF
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:24:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBC701903BC8
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9F8247292;
-	Wed, 16 Apr 2025 10:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317CC247DEA;
+	Wed, 16 Apr 2025 10:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="KSrjpUV1"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3GU8XnvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3322253BB
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AF62253BB
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744799080; cv=none; b=lEUhgz1YzU3BDJaVawMV00YBSSN7G4ycSBB7IveYYDUAeygjeckroAMCJ6bEi26F5uCKlxt7+eBO3tEmgQVHf/qlkvdjbcnkJXCL+F9mT9kyr6P+K3RS1BiXk9bjFHiWhkYPqTYQ/DOkGw4+5LbX0OXtGjLC6e+RvAzoxMMol8E=
+	t=1744799085; cv=none; b=jqvp1fPEuft6kncPaZPXtDRJQLJO0yI9/65owjsyY40k6h+o569ww7ZhFWWHb7L3MZpfx+smSgcKP3LxsAt+mIwW0n2TaO8ElG4nmQqc6dO4Uw/utXNgliUIn75NtRlYfgilj/1EDFogIE4LuStDEWtjwyUESqrwU9/ITE/Jq/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744799080; c=relaxed/simple;
-	bh=omETtGJCALA8J9bjWNY0LRya57dd/a1BqnWH+fRZkjc=;
+	s=arc-20240116; t=1744799085; c=relaxed/simple;
+	bh=bKqoWOiVCChZZntCtwcDy3lN4TbaFAKlEkpw2lMw9Oc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m8jZug1Bj+aHA384MoGNkJLISY9VIQwmr62Kcg/ciZazVICQpKOftfsPSqLfzP6vIlofO3y1Hjm3Ct8uG+OmgADMmG+0m4OAO3btMKagEJKp48iK+gNXfkpzJFwDpOKBu5koKo6H3qKqm0BlosVIYuE0r02NwOkEXAhc9WwRd1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=KSrjpUV1; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=iIxfqyUxxyWPBEIK02bizRffsjfVJBY+CgETKQ7+Mp0t4Awrw7Y8ONdiuesAq4I5cD7JxrUhTR3kHrZAMeR/s8bxnDP5bb2ldC1G5lJ0dlBwgyS/wRQzS7AcYzynwnpizX/QOeTaslF7CRmlQcnEB/GF1yq40loGufs+MLEcsCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=3GU8XnvS; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7394945d37eso5681390b3a.3
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:24:39 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-301302a328bso6482272a91.2
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744799078; x=1745403878; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744799082; x=1745403882; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C4iIKlGhsrCLIi35gr48AEMyyNNnFxBxT5XzC+gCyGo=;
-        b=KSrjpUV1V8IeqYJqnnz8DXPVQySr/lCVsTllp4IRDYQPenitjggvVvJgMAaOF4Q3VW
-         yOVkLS1psXPyRYd6jxYKZ3+YEPaSSHLREq9S0kSr8sDOHTVCowm3bYguuqPLpkKmXoqN
-         6ej9zqCmwFmgig3qXwDIW4ym7O32+NHrfqhS8oWmH4wTNvUW5pM1YSMi0d32+eP+MsTA
-         KuWocZCoAFkXTCMSTLSSvLKNKv3htxrx7oPVkKkVIPDnU7HWViLalQ5jiojRnkN3LdZB
-         gTsIRGyP4xC+A6na6X6wCpXmWkbD9JWyIkpP2Qe9y2cGr+C+2D4tbZmVy9nUwqFDcjsd
-         3PsQ==
+        bh=MZtvdl+5p3OgFbJBXGbjAg9XrQzePGnuE3sWtUwT6Lg=;
+        b=3GU8XnvS42a+vaoHGaPJMq1YeAaMm7CYtZYOal6QzNfjXw4aIkPAsqYHRbNBHlrM9H
+         p9XeitR5z1Ei3slIrJ5B15IY7jBdS1q/dla3EyK7ca9CVJJnnmUL0HIw34jPKld+wPwE
+         itNKcAzhrcKm37npSiKapn+sjrJboD3d3Arl2gNtdx4GMpKOjg+uvo1kn3l1R0LIqb2l
+         zfcz9yF+UT9inRp+1U5Yo3wA7apiwHzCjv0TTNInmpEPm6orTPFSad06c0XZB99Dub0h
+         bOYEUHzYrN2x49A48UK2WhkGBUotV54vVgiWIHt/G2yHvGXjgGqtBuzllp+/XyvjRHa+
+         jSIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744799078; x=1745403878;
+        d=1e100.net; s=20230601; t=1744799082; x=1745403882;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C4iIKlGhsrCLIi35gr48AEMyyNNnFxBxT5XzC+gCyGo=;
-        b=SDRzFcimDxoenApa28puWfP36OTXHSmJfQqsC/icPjRx1AVqXzm44R+OrXyVKRYBhI
-         oO+zsgO3LlBMiYo5LrSbG2yfQ1RV1fwZVu0FRT3Qw2fc1uv1YuagLnd3CxTy0pb8m+uU
-         j6aYKxod7Y3lrl5p1l8/gzJY3QoIIm72mQGJY203+X5xrvipk3Q4b5FGt7oKAfQrJAhC
-         hoJ9wMhVuD/USnRZUkoldhM/r/tpIp7RmdGGt0J7LUoF/Zq5ixPLyvONwZaot9IwXxmz
-         e3QcXelqUj0vh1GwfNDgp39WdnTROZpKa6pAysEknJ5bv4L5LmqgUfRHFpWlJkFHmJDh
-         mK+w==
-X-Gm-Message-State: AOJu0YyBpYHAGXD8HKK0pISFjxVenGIwQbv9qah8ZjyxLl1B4QdinSCl
-	NpRmjI4cIqhQQq8g6Ibh12bMqFis9eQJ9prBDksT3TS4F1DmRIYwcwN524NOYgM5KI2rFcYaToM
+        bh=MZtvdl+5p3OgFbJBXGbjAg9XrQzePGnuE3sWtUwT6Lg=;
+        b=YVdhK5txMlmGElJAXJf7AYZjm01YyuEAF+RMkyJJ+tAJEAmkVlg1+wdJvuRn5cLXD6
+         Jb/NN6SNrBeB27saWQKV86RRGO9YdVlf3CsTuMtnp2NE0tZYPh0VeipSKInkyXL0eOa6
+         KHLzko4H3044kegqwvEjbGdoY9e6dMOwcQ5WhoPzDY41V+26AeLOh/BP438to870IhMV
+         A7x22d2qEzzgdVkCK/3MsIx8oVVgbhw1ABh9keLJ5fjc8Zz1ZMB3GDb86a53BFHKsH1t
+         h/mgXrsPlOd+qT1WOjeqkuDfa9KX+rBTfV+WgmhKdVrPGUgf6xi8e6FlH4HB93TfTUtx
+         6jkg==
+X-Gm-Message-State: AOJu0YwBRKc1UrC3Vx/mLGl15oc4Bh0cKsmKak770sU+w6PvvUImxitl
+	Vkbvfm67dWhCsJUs/ISCuZ1DNM+J30gSCYAqeYoZL34IBfxZJX7w2iI+/XsE7U5AUvzUvMK2F90
 	=
-X-Gm-Gg: ASbGnctpgYh6DMMuvNCpvjQEonNuVd0nPE0W/Y82U4LSQoLf8bbtZiTxYrpxE3wQE5y
-	y7HVFg/dkKgK0fi1mpd0WPbyyIn8JR7eLbfpofLM5aU6W01MTZs5ylO16129Gflr5AVsT2IcAmo
-	OilFmhxymRqEvcMOX7rCObVX8rej2qaS4JmEQ7nyxGvOa/InOosEdG5NlY23dSIN4aYd7li4oyU
-	5vhkZXSWuGqYKao7oBzFH8ThIGVFbgZ98vk/UYVkrI65T8FFfXZb3najfWmXhzuDJBYtFiyBrfs
-	lMZadpcjayRpiRJ9yHGGChN0CljxuU0bvyyRHNQZ906hYDdMBxK3e0m6e6Xh29/r
-X-Google-Smtp-Source: AGHT+IGjkXGjB5u3z5BS/KTAFatBJVj0Cve1uDbJijdbtelQPtXBt4CctdyFqHKnImPMcRjAdhOuAg==
-X-Received: by 2002:a17:90a:da83:b0:2f4:4500:bb4d with SMTP id 98e67ed59e1d1-30863f3046emr1716850a91.20.1744799078159;
-        Wed, 16 Apr 2025 03:24:38 -0700 (PDT)
+X-Gm-Gg: ASbGncvWGslmKdIbHk95qhEJqj/mpo15vXtyN+IcR4D5yR66BQPHSXngjc4X+mq15UT
+	J7EDhmnNHmmi7KjximTjDNGE4oNawn5XvSKC2KpkbkWjaoBA7L73DyWNeZ4h8/7WHguwLkX1w5d
+	O9RcbnjeX1P6AjnXNd9PWF7zAa5LVJVBlZmsvJScdBObI/iN1TwvkvzQ6Zt2BRCLJxWrNowhCaD
+	2XdMn//cbJuorLHVSirY/sLlUrMKH7XOU8H2kX/IaU7gB5JbdNSKRFuTYjxCzVxze+V7Rkj+NZE
+	zIRlap/btCbvRbUHM95YL92SJCfHonOL2wPobl9A9GJSXSm89BeQF5y7oPNaFHjm
+X-Google-Smtp-Source: AGHT+IEkdIlanGMKqGd2VnHhoCjSa3mrivtk1YCunHCiTeilUv7K/VYDrFE76YGweLIqP79PRxa+Iw==
+X-Received: by 2002:a17:90b:384c:b0:2f4:4003:f3d4 with SMTP id 98e67ed59e1d1-30864178c33mr1609017a91.30.1744799081656;
+        Wed, 16 Apr 2025 03:24:41 -0700 (PDT)
 Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c3:dc7b:da12:1e53:d800:3508])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-308613cb765sm1193075a91.43.2025.04.16.03.24.35
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-308613cb765sm1193075a91.43.2025.04.16.03.24.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 03:24:37 -0700 (PDT)
+        Wed, 16 Apr 2025 03:24:41 -0700 (PDT)
 From: Victor Nogueira <victor@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -84,9 +84,9 @@ Cc: jhs@mojatatu.com,
 	toke@redhat.com,
 	gerrard.tai@starlabs.sg,
 	pctammela@mojatatu.com
-Subject: [PATCH net v2 1/5] net_sched: drr: Fix double list add in class with netem as child qdisc
-Date: Wed, 16 Apr 2025 07:24:23 -0300
-Message-ID: <20250416102427.3219655-2-victor@mojatatu.com>
+Subject: [PATCH net v2 2/5] net_sched: hfsc: Fix a UAF vulnerability in class with netem as child qdisc
+Date: Wed, 16 Apr 2025 07:24:24 -0300
+Message-ID: <20250416102427.3219655-3-victor@mojatatu.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250416102427.3219655-1-victor@mojatatu.com>
 References: <20250416102427.3219655-1-victor@mojatatu.com>
@@ -98,49 +98,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As described in Gerrard's report [1], there are use cases where a netem
-child qdisc will make the parent qdisc's enqueue callback reentrant.
-In the case of drr, there won't be a UAF, but the code will add the same
-classifier to the list twice, which will cause memory corruption.
+As described in Gerrard's report [1], we have a UAF case when an hfsc class
+has a netem child qdisc. The crux of the issue is that hfsc is assuming
+that checking for cl->qdisc->q.qlen == 0 guarantees that it hasn't inserted
+the class in the vttree or eltree (which is not true for the netem
+duplicate case).
 
-In addition to checking for qlen being zero, this patch checks whether the
-class was already added to the active_list (cl_is_initialised) before
-adding to the list to cover for the reentrant case.
+This patch checks the n_active class variable to make sure that the code
+won't insert the class in the vttree or eltree twice, catering for the
+reentrant case.
 
 [1] https://lore.kernel.org/netdev/CAHcdcOm+03OD2j6R0=YHKqmy=VgJ8xEOKuP6c7mSgnp-TEJJbw@mail.gmail.com/
 
 Fixes: 37d9cf1a3ce3 ("sched: Fix detection of empty queues in child qdiscs")
+Reported-by: Gerrard Tai <gerrard.tai@starlabs.sg>
 Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 ---
- net/sched/sch_drr.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ net/sched/sch_hfsc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/sched/sch_drr.c b/net/sched/sch_drr.c
-index e0a81d313aa7..b18b7b739deb 100644
---- a/net/sched/sch_drr.c
-+++ b/net/sched/sch_drr.c
-@@ -35,6 +35,11 @@ struct drr_sched {
- 	struct Qdisc_class_hash		clhash;
- };
- 
-+static bool cl_is_initialised(struct drr_class *cl)
-+{
-+	return !list_empty(&cl->alist);
-+}
-+
- static struct drr_class *drr_find_class(struct Qdisc *sch, u32 classid)
- {
- 	struct drr_sched *q = qdisc_priv(sch);
-@@ -357,7 +362,7 @@ static int drr_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
+index ce5045eea065..73b0741ffd99 100644
+--- a/net/sched/sch_hfsc.c
++++ b/net/sched/sch_hfsc.c
+@@ -1564,7 +1564,7 @@ hfsc_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
  		return err;
  	}
  
 -	if (first) {
-+	if (first && !cl_is_initialised(cl)) {
- 		list_add_tail(&cl->alist, &q->active);
- 		cl->deficit = cl->quantum;
- 	}
++	if (first && !cl->cl_nactive) {
+ 		if (cl->cl_flags & HFSC_RSC)
+ 			init_ed(cl, len);
+ 		if (cl->cl_flags & HFSC_FSC)
 -- 
 2.34.1
 
