@@ -1,164 +1,124 @@
-Return-Path: <netdev+bounces-183170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A9A7A8B42C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:43:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 732C7A8B450
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B70444611
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:43:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141493BA989
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3814B230BED;
-	Wed, 16 Apr 2025 08:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4574E22F169;
+	Wed, 16 Apr 2025 08:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lUunA5Yb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aNqFtwSc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB9D2309BE;
-	Wed, 16 Apr 2025 08:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E208C22AE59
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744793011; cv=none; b=BUq4lBZp0YwAWv+cUm/OKI9tOWMZKdwFj2ZnFwFZJlQ+uNuHn7Wh/JTMdXGUMfu3cnDGscwHaVcH6t+vVbkpYpwpWE+kAyyfnsm6VEKsobJckw1kqVpQBfnVEguuBNRYQOXjtjS2NweVKNKDIHX8SY2UC/koZi5BM7eJ3EKDwNE=
+	t=1744793343; cv=none; b=s17gvI0cDMfcZbDheC/1c2qPeZWf8eKmpZtiBr6Gh4VKJdl17t+/824hkGFmSM6IID4lqQ4tNl2qkvX+y9T3UeJjBhgfll+4Hk7G4KOLhXpqjYDWaxGAFrAtNZkwOL99ocz7X/0AO7vTHUmraKPfkRF1QjrKi9a+2Toaett4AFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744793011; c=relaxed/simple;
-	bh=nyUJtYiUjBjYYSAqTLhcIC3VjH6cvjN+MabNE2Z+0KA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P2fSM+/i5DHmh0RCpqqAeHvsWaZ9eXyUaoUG68vAx/zGrR3xLIT4PTH2rlcd1Z7HBkRr8sybLOE4CprK1QfeToOJrwB2esqBq9g+Ob52OWDsH9yUp65Lh3nRyBrgelFUTn2X7Is/f3fJVbVud0GeCnU+StFOk9Jr+209ubrQFE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lUunA5Yb; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso64154955e9.1;
-        Wed, 16 Apr 2025 01:43:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744793007; x=1745397807; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Sjiyx/fN+GWyu9km6Rmgf6dDU0MGkyvJNdC+0C4yHI=;
-        b=lUunA5Yb/8AR7yEf8CX1exs4MoGrD+1uWbQzVe6VbEg5W7pZjm7pcl/7gEUg9Jdq1X
-         /O079IkWh0Q1zR7puqwzAi6WUv5PmocE/yPJVjKob8ipwbRrEH4ZThyMJzxCV6BpS7rb
-         /t3+v7pzhBrNt6qlrOu5AUtQC3AfVDNS0NbwrFJPfMS/zQfkx+tE7nprRJhvTX6mXRms
-         9lgS+MMpOGI7uxPeAFCXTzyk62oVruLIwJ/1NcWnx6jCt4BtGBym2MxwefFuGzFvu3oY
-         GUfZoWFcKbGYm8tl86pcdTumxL6ZY97qkgX/Iy25mz6pReCQRrE1rL9fyJQQjXwGJd5C
-         UC/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744793007; x=1745397807;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Sjiyx/fN+GWyu9km6Rmgf6dDU0MGkyvJNdC+0C4yHI=;
-        b=er75Cmq+XcMkThqkId0f/AktKYVLVR41n4MTDZqLWes5QUOPwFSlPZQSaxFGuj3Sc7
-         t64uPqFoAvx0vezUsCSk+2b+2pZTOcbjX4idLQbghWBeaG1hELZ6nDFtL9IjwoqscvFR
-         EnaKmxZesHYPQsww7RfnMdwknt9pXOW0d7+idsYZYZAtQjpxNfyNue1pkMfwGTiCo6jU
-         z1h9gZWs5qSyuTYoi/hROrjrYNYz4UOasFxKZOoP8qZBZ3vZEkB4y5U4geTZqnUKa3xS
-         hsytFaftkMUN6VfMgHrxRbEOOlrB1tmTaLuOZbRaWZisNC+ph+gZ9zpXv0fIczOgDcib
-         ISjA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/bIlfP60lb4fCKh384R3blEK5vMd/kG2UODrDJHSS3V3qPAqSRn6v4C2PO0RiT4LdTMK6d1JoFXQPcw==@vger.kernel.org, AJvYcCXhJ5ss4HMh4rF75rUzBYQAjIqtgJXR0fsotF9PMexoeqY5R8bSdg3Wc8EGQWRMeDCD9kOIri1Ph5h9kUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy+QLC40Ns7zX8u2GBL/W0M1a8dgr+WVEtU+c6hvL/zadGa4hR
-	YToX27RwyfjoQEKO3YBsa2rIeytIkebcVThcEe/UzuaN8O9rtCzg
-X-Gm-Gg: ASbGncuNoCS8+NT8mH58VMnqMX0p/OJ7SuhcKaEVcyRKy8engs80sBpj/2SDzm3VmZ8
-	w+OOBsRBCNJXJ8fiioErYqo9YbSEVopaCZ0k9kHGV4+xtpWJAi8K1tpUcA6DYZ3ER+omO/pajnM
-	zelBHvAcWNUj2FHm+PTmcIpRlaPrDALGvVWgOFGShvw0mVdNw9IKTdRxwPb5UcFhwymqfGnbaSW
-	pd3N+Kik4oMJ2zDqZLcFbqqdSzwRW9D0pHYagpQoQomp6AXT3eZkZohTfpbzPX+3xujvJbxgvNC
-	y1YNvoLhRYy9OF+VNK5fNwDbDdDbuHMGZ7EBF2usXG4aXAZsfgJguvmaPP0=
-X-Google-Smtp-Source: AGHT+IHpy+sYxBz/Oe4uCHlDqUk4DjWqp50J3JpjBoi6v0tNOLkb64P60xE638/sIU0sdirYCxgssw==
-X-Received: by 2002:a05:600c:45ce:b0:43d:23fe:e8a6 with SMTP id 5b1f17b1804b1-4405d5fccb7mr8045235e9.5.1744793007111;
-        Wed, 16 Apr 2025 01:43:27 -0700 (PDT)
-Received: from [10.80.20.47] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf44577dsm16573027f8f.94.2025.04.16.01.43.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 01:43:26 -0700 (PDT)
-Message-ID: <1f99c69d-42c2-4093-9c13-c0b137994e30@gmail.com>
-Date: Wed, 16 Apr 2025 11:43:23 +0300
+	s=arc-20240116; t=1744793343; c=relaxed/simple;
+	bh=wo5bTTP84bYwAWBSuk6Jk+kr6J9UHNO3BRIkezh0fGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RW8s12Lh78kgSi1zgCdq8ZZP1hJGI35H7Wxv3/p3RAYwBtHeGbyrEqwDRVgeCDHe6CkoSOoXRTsFbfhkzMx+SASgM5AgEPNW36K94RfRgGpHQWCUf+7WzXJ0sVqIQ0fh6KLYMmcrCws1hIPuH1SoCVxUYh6ePR8KAzlrBScGETw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aNqFtwSc; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38713432FF;
+	Wed, 16 Apr 2025 08:48:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744793332;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nVvr6rcLERr5+8C01/FE5xf/NsC+eqK+KOEEzxrbVYA=;
+	b=aNqFtwScR2aN7gwxy5amx2oI7v2jD8cpgZZv8Ro191dnSfpfocQcyVYW4ehTNicBbHMqrR
+	LbQHacS3H3pWbzxK91D1dd5UO+suyf2xsLwPsSz1F8CzQvXfl+ESwCR+gIYbYPVtmvbpyQ
+	3Ih8LqX9JiAGbaEuhjh9NU1pO9ToLrQlkDNhIHNsqB1pM7ZmAMhSU7nJbXuTlawlQi91ED
+	w/79GeciDXzjmLDRzOXjyuqiT3KJ8ypMYC+bHHgipF14uoKwkmtvLzi9RVCEZQauxnoOsf
+	mcyi/i6IAUwo9XL8ViGLzD8vY1yFofN75kHPEf9y1rW8TwOHLG2g27R+dvqqAw==
+Date: Wed, 16 Apr 2025 10:48:49 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH RFC net-next 2/5] ptp: marvell: add core support for
+ Marvell PTP v2.1
+Message-ID: <20250416104849.43374926@kmaincent-XPS-13-7390>
+In-Reply-To: <E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
+References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
+ <E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/2] net/mlx5: Fix null-ptr-deref in
- mlx5_create_{inner_,}ttc_table()
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, amirtz@nvidia.com, ayal@nvidia.com,
- Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- Henry Martin <bsdhenrymartin@gmail.com>, Mark Bloch <mbloch@nvidia.com>
-References: <20250415124128.59198-1-bsdhenrymartin@gmail.com>
- <20250415124128.59198-2-bsdhenrymartin@gmail.com>
- <e0db67c9-8e38-490a-98a2-13c61ef11aa5@nvidia.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <e0db67c9-8e38-490a-98a2-13c61ef11aa5@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdehleefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqheftdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfejveefgeeggefhgfduhfehvdevvdeukeelveejuddvudethfdvudegtdefledunecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddupdhrtghpthhtoheprhhmkhdokhgvrhhnvghlsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtp
+ hhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Fri, 11 Apr 2025 22:26:37 +0100
+Russell King <rmk+kernel@armlinux.org.uk> wrote:
 
+> Provide core support for the Marvell PTP v2.1 implementations, which
+> consist of a TAI (time application interface) and timestamping blocks.
+> This hardware can be found in Marvell 88E151x PHYs, Armada 38x and
+> Armada 37xx (mvneta), as well as Marvell DSA devices.
+>=20
+> Support for both arrival timestamps is supported, we use arrival 1 for
+> PTP peer delay messages, and arrival 0 for all other messages.
+>=20
+> External event capture is also supported.
+>=20
+> PPS output and trigger generation is not supported.
+>=20
+> This core takes inspiration from the existing Marvell 88E6xxx DSA PTP
+> code and DP83640 drivers. Like the original 88E6xxx DSA code, we
+> use a delayed work to keep the cycle counter updated, and a separate
+> delayed work for event capture.
+>=20
+> We expose the ptp clock aux work to allow users to support single and
+> multi-port designs - where there is one Marvell TAI instance and a
+> number of Marvell TS instances.
 
-On 15/04/2025 16:45, Mark Bloch wrote:
-> 
-> 
-> On 15/04/2025 15:41, Henry Martin wrote:
->> Add NULL check for mlx5_get_flow_namespace() returns in
->> mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() to prevent
->> NULL pointer dereference.
->>
->> Fixes: 137f3d50ad2a ("net/mlx5: Support matching on l4_type for ttc_table")
->> Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c | 10 ++++++++++
->>   1 file changed, 10 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
->> index eb3bd9c7f66e..e48afd620d7e 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
->> @@ -655,6 +655,11 @@ struct mlx5_ttc_table *mlx5_create_inner_ttc_table(struct mlx5_core_dev *dev,
->>   	}
->>   
->>   	ns = mlx5_get_flow_namespace(dev, params->ns_type);
->> +	if (!ns) {
->> +		kvfree(ttc);
->> +		return ERR_PTR(-EOPNOTSUPP);
->> +	}
->> +
->>   	groups = use_l4_type ? &inner_ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
->>   			       &inner_ttc_groups[TTC_GROUPS_DEFAULT];
->>   
->> @@ -728,6 +733,11 @@ struct mlx5_ttc_table *mlx5_create_ttc_table(struct mlx5_core_dev *dev,
->>   	}
->>   
->>   	ns = mlx5_get_flow_namespace(dev, params->ns_type);
->> +	if (!ns) {
->> +		kvfree(ttc);
->> +		return ERR_PTR(-EOPNOTSUPP);
->> +	}
->> +
->>   	groups = use_l4_type ? &ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
->>   			       &ttc_groups[TTC_GROUPS_DEFAULT];
->>   
-> 
-> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-> 
-> Mark
-> 
+...
 
-netdev maintainers,
+> +#define MV_PTP_MSGTYPE_DELAY_RESP	9
+> +
+> +/* This defines which incoming or outgoing PTP frames are timestampped */
+> +#define MV_PTP_MSD_ID_TS_EN	(BIT(PTP_MSGTYPE_SYNC) | \
+> +				 BIT(PTP_MSGTYPE_DELAY_REQ) | \
+> +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
+> +/* Direct Sync messages to Arr0 and delay messages to Arr1 */
+> +#define MV_PTP_TS_ARR_PTR	(BIT(PTP_MSGTYPE_DELAY_REQ) | \
+> +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
 
-Note that Mark is covering me while I'm on vacation (for the coming ~10 
-days). Please accordingly honor his submissions and replies for mlx5 
-content.
+Why did you have chosen to use two queues with two separate behavior?
+I have tried using only one queue and the PTP as master behaves correctly
+without all these overrun. It is way better with one queue.
+Maybe it was not the best approach if you want to use the two queues. =20
 
-In case this mail notification is not sufficient, please let us know 
-what extra action is required.
-
-Happy Holidays,
-Tariq
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
