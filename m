@@ -1,163 +1,141 @@
-Return-Path: <netdev+bounces-183299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3A3A9043D
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:21:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23E1A90465
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 098AA1906E9F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:20:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06EB917A9AA
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989E1189B91;
-	Wed, 16 Apr 2025 13:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEC13594A;
+	Wed, 16 Apr 2025 13:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zfx15pH3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQ1QwLih"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF5517A304
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ADF4409
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744809596; cv=none; b=n078lbeRS5s7CesuWAKs3NxcYSa8QaEnAoLRhWfSt268GHV5qID/JLkOaEP6vJ+VPDTsTIFbWLhO3Hk/GQ+So/oWoP/2Dr+84OfkMAFpDkEG8M88QCvT+39sNkX/0PodSp2toFaQNlmu50/GPdRI6yQLH3MBZp1qnlv5Gh5v5d0=
+	t=1744810335; cv=none; b=oGxYk+dhZkcICOrl72oxs6nMK1BGDePVbGO1mVWjnyFfxuU+uCTIo7HHBiFFD0mXX8uzkEmFY93qlWAl8O/zvgMmKjzpDTOh8au08qooK4mbF3lvxQAwgE0SB/ENQHRkQfkaiYe0h3gNCRhJflb3r8j6OzFH2EcED/y1p236fI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744809596; c=relaxed/simple;
-	bh=7Jv4eMqp33u8FvIsIhegCrHiuE/9+7fGsj8gbaBg3N4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KkM49C8d87xsVPFs1wTlQYChMgiGDDKDXyzVRHzTmy/o3HOYPFixX5JtyaLMSn17SQ2pUsZwsQ6BrsnU654Dj7urOp3CN3KRrSIGxgiWBMm4nsA+rJ0vJDGNdsS07w5+gG0qjKne0RyPj9KIzNXdyA3R3wjrLsjc1Nm6yWR6VTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zfx15pH3; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2CDB843858;
-	Wed, 16 Apr 2025 13:19:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744809592;
+	s=arc-20240116; t=1744810335; c=relaxed/simple;
+	bh=+Bprm+jQzK2Qk5tEcCyXJHdixjHkT+diGVHI+2AhPjo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=oZY5h/bVV4inlVJDV999aHjj8hDL25+7uWYZEy07oY67XSrt/jDHnirNfuedFXGJxN4cVWWhi3p/bQcNPGLmQVGj8Y2YmcUzrS3IggcvaR/JIr80iwsnReNjofaP5LJ4iM3o0R4W1SvSasCivn1ylaRSxJx3osiBmqyDMmqZKhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DQ1QwLih; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744810332;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7Jv4eMqp33u8FvIsIhegCrHiuE/9+7fGsj8gbaBg3N4=;
-	b=Zfx15pH33jUU9EQVxOSLQ2OGhbq5O1M4LY8Cg1Ddw2RypSPvS8nZPHlVNnDhgGcAliIVkE
-	sccN8ysQjpyllr95UqwUW3HxEQrokQRCIEouzRW01Uwqcg8OHdDzJF3jtSpKOEtG2rxaqs
-	U0k2/+amo4VzzZDaPa0stcNZ/Aso/gYzEk1ccPvI5j6dFgnAWCsnAzRXSDScK7At0vAfsw
-	9MgT0dIqPoFyCam6wfRjrw/dfJQnBeU8wZjBAZcg8tvMBuMyX7LG7+3OBVMftSXcRMMo6i
-	jmXiNiKbW3tM/hWlvYGkyvaoMvJkkd9N70QQDtg3kUjbjt86TALvzBBzLuqKng==
-Date: Wed, 16 Apr 2025 15:19:49 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/5] Marvell PTP support
-Message-ID: <20250416151949.6bddde35@kmaincent-XPS-13-7390>
-In-Reply-To: <Z_-Lr-w95sX4fLIF@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
-	<Z_-Lr-w95sX4fLIF@shell.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=457zR3h8UGkE04gyb0Jb3zcqH2gPSSk6srV8sYhzz3U=;
+	b=DQ1QwLihPyWjbp7Si0S2HhuN91pN7n8ruzNJyzKq1dZ3xBzBqGAILrIFKjfBqhPOlo8IB7
+	m8LtzusC4ydlkS7SLQsKOC72zlzBf8oXt0HS2BOH9PQSdFla4NRrGRocH8GwHYg+5Abxjg
+	IwEDEbauOgpMNS0lBS3gcLJGcbJG24c=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-Whd61n2pPBqL7h12gRwY-w-1; Wed, 16 Apr 2025 09:32:10 -0400
+X-MC-Unique: Whd61n2pPBqL7h12gRwY-w-1
+X-Mimecast-MFC-AGG-ID: Whd61n2pPBqL7h12gRwY-w_1744810329
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-30c04c54f11so33999301fa.0
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 06:32:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744810328; x=1745415128;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=457zR3h8UGkE04gyb0Jb3zcqH2gPSSk6srV8sYhzz3U=;
+        b=TReLJ+xFekd3+Mt4Ec4sPMj7qKnAT3iYaosoiMjQxCWhDC0DWlbp246i8yfYjVVUh8
+         3KOzFjBGX7ssV9kNua9ywnKv+m+/cDPIdDw0tWK8QXtYkrDxyDau6b/Bx77GPWkV/bFi
+         QdGEEnvQhaHOC7x79ZGh8ZU7sMr8KmaesUDA47TAbNyAgM5Ip95KO95wfepbAxSWHjek
+         DOIxwXwBKIHiNqtMUZ2mT5eru/FjXwOY4a9rifqaSwHuh9TjjGnRSymHfZ/Q2Uujt6BN
+         BjkB8HRuhM6CYgrYlWpQGzitQaOWBsiUt9/yGeoCD7VY4wd/A09HCfyXmGgBq7yr85ug
+         oLgw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRC2CEMPPM/3f7sNUbZDsQ07Qrlzn4HcbVcz0QoAh218IPGOYiCNak6W+W4lhU7HE6mNErWiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOF7LFlPZZUkZsvPyIf0GbeBLNidzmn9SNmRzEffjaN15uiQfI
+	POtmSO1iGBjEn+AgsCe7L6n9YoSTw0i8S7lONZF9mbqDo92UwOOBVbKdExvBxWi3LfKVyclWqA0
+	ST1+SfgnkgRspugV5NiEImx14IxbPlrCVD2kIN1Ex1Q6js5WIUmDdUO0sgvFruw==
+X-Gm-Gg: ASbGncsqNlp64G+UY+7haeE2IgXKMYFTwTqW1WY+SU8Mywh8GHicAoK1/UCV2IEdNJ9
+	fcAm6DqghiPEXYvkxYvdt6GQHF5XW0BfKERaop3rD/F5acGjmg7gHxQHd8WJj+18N8dXDIhjfFN
+	0wtU4pWpZ2Rp4F8Z6FmoJg5EYI2vqHL86pKAv3Og7lpJT4Psl9gl/s73WIZigWssQf1ZVeSWGSI
+	5kaig31MlCvvXPf+hgSAgG/I+rUzWnddvK8znzZz6c+i/gXuynFHPPLfeCeb0MbQLozZKJmGkU6
+	9YWZ5sgE
+X-Received: by 2002:a05:651c:884:b0:30b:a187:44ad with SMTP id 38308e7fff4ca-3107f718b00mr6731571fa.26.1744810328192;
+        Wed, 16 Apr 2025 06:32:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IElnOK3S9qd1KXpmFsBs94VTvypJz/yoSSnw9dvy8ZTso1V7fPWo4L2fDiSjHn120HodO1hjg==
+X-Received: by 2002:a05:651c:884:b0:30b:a187:44ad with SMTP id 38308e7fff4ca-3107f718b00mr6731411fa.26.1744810327763;
+        Wed, 16 Apr 2025 06:32:07 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30f464cc461sm23907401fa.32.2025.04.16.06.32.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 06:32:07 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 2B5101992930; Wed, 16 Apr 2025 15:32:06 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, Jakub
+ Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ tom@herbertland.com, Eric Dumazet <eric.dumazet@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc
+Subject: Re: [PATCH net-next V4 1/2] net: sched: generalize check for
+ no-queue qdisc on TX queue
+In-Reply-To: <174472469906.274639.14909448343817900822.stgit@firesoul>
+References: <174472463778.274639.12670590457453196991.stgit@firesoul>
+ <174472469906.274639.14909448343817900822.stgit@firesoul>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 16 Apr 2025 15:32:05 +0200
+Message-ID: <87wmbki65m.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeigeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepkeefvdejheekhfeiieeuhfdugfelveekueekteffteejfeevteelhefhtdfhuefgnecuffhomhgrihhnpegthhhrohhnohhsrdhukhdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnr
- dgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhgtihhnrdhsrdifohhjthgrshesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 16 Apr 2025 11:51:27 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Jesper Dangaard Brouer <hawk@kernel.org> writes:
 
-> On Fri, Apr 11, 2025 at 10:26:15PM +0100, Russell King (Oracle) wrote:
-> > Hi,
-> >=20
-> > This series is a work in progress, and represents the current state of
-> > things, superseding Kory's patches which were based in a very old
-> > version of my patches - and my patches were subsequently refactored
-> > and further developed about five years ago. Due to them breaking
-> > mvpp2 if merged, there was no point in posting them until such time
-> > that the underlying issues with PTP were resolved - and they now have
-> > been.
-> >=20
-> > Marvell re-uses their PTP IP in several of their products - PHYs,
-> > switches and even some ethernet MACs contain the same IP. It really
-> > doesn't make sense to duplicate the code in each of these use cases.
-> >=20
-> > Therefore, this series introduces a Marvell PTP core that can be
-> > re-used - a TAI module, which handles the global parts of the PTP
-> > core, and the TS module, which handles the per-port timestamping.
-> >=20
-> > I will note at this point that although the Armada 388 TRM states that
-> > NETA contains the same IP, attempts to access the registers returns
-> > zero, and it is not known if that is due to the board missing something
-> > or whether it isn't actually implemented. I do have some early work
-> > re-using this, but when I discovered that the TAI registers read as
-> > zero and wouldn't accept writes, I haven't progressed that.
-> >=20
-> > Today, I have converted the mv88e6xxx DSA code to use the Marvell TAI
-> > module from patch 1, and for the sake of getting the code out there,
-> > I have included the "hacky" patches in this series - with the issues
-> > with DSA VLANs that I reported this evening and subsequently
-> > investigated, I've not had any spare time to properly prepare that
-> > part of this series. (Being usurped from phylink by stmmac - for which
-> > I have a big stack of patches that I can't get out because of being
-> > usurped, and then again by Marvell PTP, and then again by DSA VLAN
-> > stuff... yea, I'm feeling like I have zero time to do anything right
-> > now.) The mv88e6xxx DSA code still needs to be converted to use the
-> > Marvell TS part of patch 1, but I won't be able to test that after
-> > Sunday, and I'm certainly not working on this over this weekend.
-> >=20
-> > Anyway, this is what it is - and this is likely the state of it for
-> > a while yet, because I won't be able to sensibly access the hardware
-> > for testing for an undefined period of time.
-> >=20
-> > The PHY parts seem to work, although not 100% reliably, with the
-> > occasional overrun, particularly on the receive side. I'm not sure
-> > whether this is down to a hardware bug or not, or MDIO driver bug,
-> > because we certainly aren't missing timestamping a SKB. This has been
-> > tested at L2 and L4.
-> >=20
-> > I'm not sure which packets we should be timestamping (remembering
-> > that this is global config across all ports.)
-> > https://chronos.uk/wordpress/wp-content/uploads/TechnicalBrief-IEEE1588=
-v2PTP.pdf
-> > suggests Sync, Delay_req and Delay_resp need to be timestamped,
-> > possibly PDelay_req and PDelay_resp as well, but I haven't seen
-> > those produced by PTPDv2 nor ptp4l.
-> >=20
-> > There's probably other stuff I should mention, but as I've been at
-> > this into the evening for almost every day this week, I'm mentally
-> > exhausted.
-> >=20
-> > Sorry also if this isn't coherent. =20
->=20
-> I've just updated this series for the supported pins flags that was
-> merged into net-next last night.
->=20
-> Kory, if you have any changes you want me to review before sending
-> out the updates, please send soon. Thanks.
+> The "noqueue" qdisc can either be directly attached, or get default
+> attached if net_device priv_flags has IFF_NO_QUEUE. In both cases, the
+> allocated Qdisc structure gets it's enqueue function pointer reset to
+> NULL by noqueue_init() via noqueue_qdisc_ops.
+>
+> This is a common case for software virtual net_devices. For these devices
+> with no-queue, the transmission path in __dev_queue_xmit() will bypass
+> the qdisc layer. Directly invoking device drivers ndo_start_xmit (via
+> dev_hard_start_xmit).  In this mode the device driver is not allowed to
+> ask for packets to be queued (either via returning NETDEV_TX_BUSY or
+> stopping the TXQ).
+>
+> The simplest and most reliable way to identify this no-queue case is by
+> checking if enqueue =3D=3D NULL.
+>
+> The vrf driver currently open-codes this check (!qdisc->enqueue). While
+> functionally correct, this low-level detail is better encapsulated in a
+> dedicated helper for clarity and long-term maintainability.
+>
+> To make this behavior more explicit and reusable, this patch introduce a
+> new helper: qdisc_txq_has_no_queue(). Helper will also be used by the
+> veth driver in the next patch, which introduces optional qdisc-based
+> backpressure.
+>
+> This is a non-functional change.
+>
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Maybe using kdoc in marvell_ts.c. You can copy paste the ones I wrote on th=
-e v2
-of your driver I posted.
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Also don't forget to run checkpatch, patchwork reported errors on your seri=
-es.
-It was not an issue as it was a RFC but it will if you remove it.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
