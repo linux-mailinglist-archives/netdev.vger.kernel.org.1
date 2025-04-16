@@ -1,136 +1,117 @@
-Return-Path: <netdev+bounces-183257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B32A8B7B7
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B42CBA8B7F1
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB0CB1901AB3
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:33:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39D66190526F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A9F207643;
-	Wed, 16 Apr 2025 11:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B663323D2B1;
+	Wed, 16 Apr 2025 11:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sku/zFdj"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="TpKukT0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mr85p00im-hyfv06021401.me.com (mr85p00im-hyfv06021401.me.com [17.58.23.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C932DFA20;
-	Wed, 16 Apr 2025 11:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6533D238D5B
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744803174; cv=none; b=hCt9Mk6xwPcuuNOpI0ysFvaI7T6FDufnTazgg1CO13qONtreA+6whRKGJiTaRHs+d2vue+FSc0IRZy129S+nc3M2yq0bTm5OAWKQrLAMQd9u8x0MtTPEFbjCuAPrtg132AXHkPd19u/cvELEZRQbr6WJXDdzcOD9GNy0+zXUwEU=
+	t=1744804599; cv=none; b=YiPX51s12XpkZ19lPxhBKiLNZNB+MSg7pngyTfpXkLd5H23L7AeDHnFL7Zf2UkJBq3wlxGfFfqbNlVrmE+tKoKvkU/OEOOPAXVMyXlT33vCms6cGXNpqxm/P08asjJSX/g7sDzdz52txMdjug0Ah8I7yMU/ojmGRh6iQ03718Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744803174; c=relaxed/simple;
-	bh=efnmkQJ/5G5/XO5EjFi5krAApWb4IBgDqiS+fcGiNIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qcwfI9uvUNREd4bXp5mONe0XVX8wbU7eK7i0Z1NXm8nI+qvqnHZdDvDAO9ZXq5kDNOfGDC2Dwa3W/7TuLTotX4CAbU/S2mEXYuJePjmK3rt7HVsqKG05xzHxzWwlidlQMfDEBmju7GpLoScc8FlTQB7LAMhdV1OpYI4UgFC+15Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sku/zFdj; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744803173; x=1776339173;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=efnmkQJ/5G5/XO5EjFi5krAApWb4IBgDqiS+fcGiNIk=;
-  b=Sku/zFdj6K8UBPSEEiFUY9OhoDJljGKie+WNIUmtPji8r3RjQpMrclR1
-   jZv8hK6tCu4WcFABwY0eeCc1Sc55Oa/Q7TJi3CnM46DDrNkX+hOer7Qow
-   ZAQIUl6Bu6Ov4rHPWAoijOx1Z/mjV80fAqOtxSIsXXy6LIOaH3o3/ZIE9
-   fKNeVN3rxjtb09F+jQbtmwTD/tHoRkgnpzzDA8iRfCeSOKM3fZ8S48Fdm
-   rcU/1LH/c+gaUyNTIyPz2L6LDisFDNFi5iDxbiF/3skh6Kx0NQCg0Vbnz
-   IweRGq2SGtAGZt5lGFmlHSCv9kgNsGT59DqJPe6ImuiT8QfXZbySpilN1
-   g==;
-X-CSE-ConnectionGUID: nmj/GpeQRQGaBJrGxsbg1A==
-X-CSE-MsgGUID: Q67wEkzLRqalokK7OFjM9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="56524134"
-X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
-   d="scan'208";a="56524134"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 04:32:52 -0700
-X-CSE-ConnectionGUID: RNI6yJ5XRgWgKbqtIFosMg==
-X-CSE-MsgGUID: 639qDp0LT5KT6h9/5/g6QA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
-   d="scan'208";a="135302581"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 04:32:48 -0700
-Date: Wed, 16 Apr 2025 13:32:29 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>
-Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>,
-	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Padmanabh Ratnakar <padmanabh.ratnakar@emulex.com>,
-	Mammatha Edhala <mammatha.edhala@emulex.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH] be2net: Remove potential access to the zero address
-Message-ID: <Z/+VTcHpQMJ3ioCM@mev-dev.igk.intel.com>
-References: <20250416105542.118371-1-a.vatoropin@crpt.ru>
+	s=arc-20240116; t=1744804599; c=relaxed/simple;
+	bh=Asr79hdBye6/Op9VxsHlmcZ3XemC/tJ6P+2y6kQWoGY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MaK1N6lpIG98sZoFRu08PpWdsPgcaSc37FdH7rTBwAj46rFHptkEIaEAvnY/vViz/v36e9UJ8nq5u4S/YO8Ke5cbdKtbusEZOdY6IZxfBmdIuWiUNQYCQOWJxhusari96qbnJeRe4rhp2l3vh71BgEN2EmKVEZHFPPnhOWQ56B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=TpKukT0E; arc=none smtp.client-ip=17.58.23.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; bh=eTmy3xbSTVwp/Klv3cmmlto0T8mRPmeNQAXdIWymQp0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:x-icloud-hme;
+	b=TpKukT0E/8X23sGaBuvkxn032l1VtAxslAw4Yc9EXO6PjDXCs2gA1WkcdyYwbXvSd
+	 oVhdTh2yaQ/Fn37iRSvqfZGLsVh0Yg7eOWJeWsEkhVQHvyUiBV+CqqXx7gNgRh2Bz5
+	 4VxmDxn9Y3Y59zCEsBoDjOUwZV0f1n5IdQo4qUhQgnhvsi1UcknzbL0pzXc3Mi+ZpZ
+	 yxgjpE2BMLuYzrkmw5AdP7MI2Qb+GhTe7G66ncDX0MBpmEmmS120vf3Cpza7fm80eQ
+	 yF/AwyUH3vLMh/Q8fStGR0l1VFj8v4NoJbjGDtBBUPgdcv0Lub8asMdvPftVMdciUT
+	 fzs09XnggCRbQ==
+Received: from mr85p00im-hyfv06021401.me.com (mr85p00im-hyfv06021401.me.com [17.58.23.190])
+	by mr85p00im-hyfv06021401.me.com (Postfix) with ESMTPS id 0E396303839E;
+	Wed, 16 Apr 2025 11:56:35 +0000 (UTC)
+Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-hyfv06021401.me.com (Postfix) with ESMTPSA id 3ED2E3038222;
+	Wed, 16 Apr 2025 11:56:33 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Date: Wed, 16 Apr 2025 19:56:23 +0800
+Subject: [PATCH net-next] net: Delete the outer () duplicated of macro
+ SOCK_SKB_CB_OFFSET definition
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250416105542.118371-1-a.vatoropin@crpt.ru>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250416-fix_net-v1-1-d544c9f3f169@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAOaa/2cC/x2MQQqAIBAAvxJ7TlBLxL4SEZJb7cVCJQTx71nHY
+ YYpEDEQRpi6AgEfinT5BqLvYDutP5CRawySS8VHIdlOefWYmLbWDUpxbYyEVt8Bm/pPM3yBx5x
+ gqfUFHSZdD2MAAAA=
+X-Change-ID: 20250412-fix_net-7aad35507992
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>
+Cc: Zijun Hu <zijun_hu@icloud.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+X-Mailer: b4 0.14.2
+X-Proofpoint-GUID: cjJbOoO6Ma8pLZKNJ6EhNXDo0KX-361Z
+X-Proofpoint-ORIG-GUID: cjJbOoO6Ma8pLZKNJ6EhNXDo0KX-361Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-16_04,2025-04-15_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 bulkscore=0 mlxscore=0 suspectscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2504160098
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-On Wed, Apr 16, 2025 at 10:55:47AM +0000, Ваторопин Андрей wrote:
-> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
-> 
-> At the moment of calling the function be_cmd_get_mac_from_list() with the
-> following parameters:
-> be_cmd_get_mac_from_list(adapter, mac, &pmac_valid, NULL, 
-> 					adapter->if_handle, 0);
+From: Zijun Hu <quic_zijuhu@quicinc.com>
 
-Looks like pmac_valid needs to be false to reach *pmac_id assign.
+For macro SOCK_SKB_CB_OFFSET definition, Delete the outer () duplicated.
 
-> 
-> The parameter "pmac_id" equals NULL.
-> 
-> Then, if "mac_addr_size" equals four bytes, there is a possibility of
-> accessing the zero address via the pointer "pmac_id".
-> 
-> Add an extra check for the pointer "pmac_id" to avoid accessing the zero
-> address.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->        
-> Fixes: e5e1ee894615 ("be2net: Use new implementation of get mac list command")
-> Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
-> ---
->  drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
-> index 51b8377edd1d..be5bbf6881b8 100644
-> --- a/drivers/net/ethernet/emulex/benet/be_cmds.c
-> +++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
-> @@ -3757,7 +3757,7 @@ int be_cmd_get_mac_from_list(struct be_adapter *adapter, u8 *mac,
->  			/* mac_id is a 32 bit value and mac_addr size
->  			 * is 6 bytes
->  			 */
-> -			if (mac_addr_size == sizeof(u32)) {
-> +			if (pmac_id && mac_addr_size == sizeof(u32)) {
->  				*pmac_id_valid = true;
->  				mac_id = mac_entry->mac_addr_id.s_mac_id.mac_id;
->  				*pmac_id = le32_to_cpu(mac_id);
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ include/net/sock.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks for fixing.
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 694f954258d4372ed33d6eb298c4247519df635c..778e550658a73d9ce3016233bb9062b0f5011e0a 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2605,8 +2605,8 @@ struct sock_skb_cb {
+  * using skb->cb[] would keep using it directly and utilize its
+  * alignment guarantee.
+  */
+-#define SOCK_SKB_CB_OFFSET ((sizeof_field(struct sk_buff, cb) - \
+-			    sizeof(struct sock_skb_cb)))
++#define SOCK_SKB_CB_OFFSET (sizeof_field(struct sk_buff, cb) - \
++			    sizeof(struct sock_skb_cb))
+ 
+ #define SOCK_SKB_CB(__skb) ((struct sock_skb_cb *)((__skb)->cb + \
+ 			    SOCK_SKB_CB_OFFSET))
 
-> -- 
-> 2.43.0
+---
+base-commit: ba5560e53dacefddf8c47802b7a30b2e53afdcb8
+change-id: 20250412-fix_net-7aad35507992
+
+Best regards,
+-- 
+Zijun Hu <quic_zijuhu@quicinc.com>
+
 
