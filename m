@@ -1,173 +1,200 @@
-Return-Path: <netdev+bounces-183370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A9FA90838
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:04:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB5F3A9084C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C7DF3B0AED
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:04:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3484D19E0250
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04736207E11;
-	Wed, 16 Apr 2025 16:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E9020C031;
+	Wed, 16 Apr 2025 16:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PCBqdYjf";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L7FVybia"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="1LeyLbrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9910817B4EC;
-	Wed, 16 Apr 2025 16:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897BE1F418B;
+	Wed, 16 Apr 2025 16:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744819452; cv=none; b=q3+GzqvTfYl0kG21e9oz1YMwZ1oxsM3niJKxxTB+ENEpSPHWUTjLKEpFVXvOJlcLQyILPqIbyt1HKfkMa/o++pLPYA9lRaJpoN0FnmYOG//i9OULz5wpv4Vg2S/JKp0wmNXIGrFLZ/H+b0rud94/nVUp4EaLYLJ9szyH3vwJP1k=
+	t=1744819663; cv=none; b=FpR4dfyd6nYH8l85amfL6VSNXVElrkHryblNarLh91/1MZn7FvdkJXsEiSZULBKxp+W7hqWpOBFUH2jCbD5II60nkHBInl6gS3tSaYWh5YwNzWhdHVTUBx/KK00t11jrXKCBnBq2BDulvEsf9A6/F2afWQ5fQuJ0DRos1MQ6Hhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744819452; c=relaxed/simple;
-	bh=ExV+qopSCx6nEjSSIXQgiSqYOJWKXQsUnO9DDfAoE1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lHau9VYRNUSStqcgaUsQmbYtm0thqmVD/W9iAYOxkEOtibMs3oBJyB9Q+lYTjMbdGHQClMjKpAjCpvWwhCyYub7gE7ci2vbB60wzGL8l/DS3benTp6YR9zrlL5407yd8XxwWkaqPdpJ5C3+fTAXzA7AnTlInxAKNByQm0RoU97E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PCBqdYjf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L7FVybia; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id 0E5DA11402AB;
-	Wed, 16 Apr 2025 12:04:08 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Wed, 16 Apr 2025 12:04:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1744819447; x=
-	1744905847; bh=dSpHFaLh+ehYJd+pg1fhaXxmbL6V+XvmhHymYCZ3B8A=; b=P
-	CBqdYjfWtkj3twvlhVkyTK4M71TdsCxiTecsKHEfC/jROKiCKa1n1rbPbaNUQCnB
-	hYz3YQj3uzTq/9t22PCT2daTfF7q/aeDxFeak1vAKy8CjRLEBrmo+AUH8mzvXsNP
-	oKcU8nXK13MwgltwEps3zHoaEOWD5xgiMTfTbBUYhya5dESLGyR32dPiQ5kP1ALo
-	KpJgyScwXxAGgJK164+KOdw+ThRI0RxKZTGY6dngfh89b2wBdKUJKN0wQax9vu6T
-	H+AfZ9PbHLs6ZJImDVOV55lop3JabaJQT+v2mUeFjXRSbDjWYGi4J0LEA1TPHD34
-	mHJ/MdW5s7QdziC0Df8gg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744819447; x=1744905847; bh=dSpHFaLh+ehYJd+pg1fhaXxmbL6V+XvmhHy
-	mYCZ3B8A=; b=L7FVybiaP4ytSd4jTXYyGatuZ6hh8KjMRfXuCAfdqp8TuM/3AjB
-	5iDS2u2jJw2YBpIhp+Kas8zryJCRGHetH8uLEU+5MheXWIpwHxtb1oWjCge1iyna
-	4GT1M1GweeOKLQcyQ3g9pgzdHtwBPEnL6f4rtCw4ayHcS9FcpQ+hIZNrDUgRIHOC
-	c2kLUPR7eocVTfQMEpiDKh1iPhLYNm8UXAGcr7G6f7yvmu1rJNyW6mGHoWabP8kD
-	2C8Bb9Bxa+JUSKP0G+N681tQqOIcHEep18B4C3CX5Jr9QuB+nY5VJQpLN5O48oES
-	gCeA4+7OuXlZRGzMGOrJaEGphDS97BawlPw==
-X-ME-Sender: <xms:9tT_Z5GoC386dAT-X9zwKmW00wMglb8EO7kAHO1qKxgpQmgxrhsVGg>
-    <xme:9tT_Z-UnC_3cIhz4I1fCi6oyJS4eOx_7kx5EDVvxssgI7_1Rcq8xUg2_vxYLPIykQ
-    E-rB-UYVne9tShN68Q>
-X-ME-Received: <xmr:9tT_Z7ISFBhAQSrsvLsTZ5p--02jmNsJqWFJ1ZfmkbyKlQfXK_K-wVDwMk4v>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeikedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnheptddvhffhhfdugfegvdejfeetuddt
-    tdejteehfeejvdeugeffkefhgfffheeuudffnecuffhomhgrihhnpehgihhthhhusgdrtg
-    homhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehs
-    ugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudelpdhmohguvg
-    epshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvght
-    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrges
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-    dprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghp
-    thhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhihrgiirghnoh
-    hvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggv
-    vheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:9tT_Z_FNUybtwEEHxjdgESv01hFeFCTFiehIwm86rWwE9woo_VyWMw>
-    <xmx:9tT_Z_V57j3zUI-tZmgTnQiQQ38f_MMis7B0QV9didZs_2y_bGnqIQ>
-    <xmx:9tT_Z6On3gSY0v0VNqiiSQqwECh5-CNauMDNGbQ3mDUdCXpwI1RILg>
-    <xmx:9tT_Z-1jS3SPPmy0zf44EuIb2G3PSk5gnsd66tVSVptke69GASGEhA>
-    <xmx:99T_Zy2SxRHfqeyDJMj5GB8sf8P-xfhI5uilZHoNfgX-pn3whEzVnaLA>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 16 Apr 2025 12:04:05 -0400 (EDT)
-Date: Wed, 16 Apr 2025 18:04:03 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	steffen.klassert@secunet.com, antony.antony@secunet.com,
-	willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH net-next v26 00/23] Introducing OpenVPN Data Channel
- Offload
-Message-ID: <Z__U881z4XdlkMHW@krikkit>
-References: <20250415-b4-ovpn-v26-0-577f6097b964@openvpn.net>
+	s=arc-20240116; t=1744819663; c=relaxed/simple;
+	bh=aY/7WU4Wj6p/7X+qEWN/caeXB/BiU403FgNaMEmMpIU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQqHFgM2CG07iuA4wSEw8a2s0EpG3xTOgopPTGYlbgyCQVFIQoyyTp3ZnNpF3JxVCu94TA/9ElJk02lPPMscmoUlFYeRnK9OQnOTZ85Vl+soCdK4CG7w2ge7gbIvju+Y3UxK4s4A4+aK4IR4YoYAZRoK1JcqA77bjfiBHKR7wlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=1LeyLbrS; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 35ABD200BFFE;
+	Wed, 16 Apr 2025 18:07:32 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 35ABD200BFFE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1744819652;
+	bh=M92GeyoNqay7R9kooGw994u2oi5JtmL6fm9Rut6IPgw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=1LeyLbrSCsB6xo/1ZOlHLOxk4ay0oTZOisTrI4psU6KEi7zaFkdvqpl/deAFvrA3e
+	 G05ymUpGDKn8nIHi22bU4o4nkWdLARViu5OSQVLIuqyAWzjCrPWGvy2N7MjKddfwTU
+	 b7ZjEqYkW8TGB5XlWjG9/hanyUPcsydUom3MMttbMiV8qQbK2K7QllTocMlVgqI2eq
+	 nfQG8RrUqTmrXdDE+Hes1lJOy0VI7C3kP0t3SwVZCQSBUZdlvb9+4beGV7oA2/L5Od
+	 2CFsRklfIdiV5kMYOrDquiBjCoN0i1gcGZ7zf+o/zo5W17A44Wla8RK0UkM+J1KKXG
+	 g20Gm2fOlrjDA==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	justin.iurman@uliege.be,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	bpf <bpf@vger.kernel.org>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Sebastian Sewior <bigeasy@linutronix.de>,
+	Andrea Mayer <andrea.mayer@uniroma2.it>,
+	Stefano Salsano <stefano.salsano@uniroma2.it>,
+	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+Subject: [PATCH net v3] net: lwtunnel: disable BHs when required
+Date: Wed, 16 Apr 2025 18:07:16 +0200
+Message-Id: <20250416160716.8823-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250415-b4-ovpn-v26-0-577f6097b964@openvpn.net>
+Content-Transfer-Encoding: 8bit
 
-2025-04-15, 13:17:17 +0200, Antonio Quartulli wrote:
-> Notable changes since v25:
-> * removed netdev notifier (was only used for our own devices)
-> * added .dellink implementation to address what was previously
->   done in notifier
-> * removed .ndo_open and moved netif_carrier_off() call to .ndo_init
-> * fixed author in MODULE_AUTHOR()
-> * properly indented checks in ovpn.yaml
-> * switched from TSTATS to DSTATS
-> * removed obsolete comment in ovpn_socket_new()
-> * removed unrelated hunk in ovpn_socket_new()
-> 
-> The latest code can also be found at:
-> 
-> https://github.com/OpenVPN/ovpn-net-next
-> 
-> Thanks a lot!
-> Best Regards,
-> 
-> Antonio Quartulli
-> OpenVPN Inc.
-> 
-> ---
-> Antonio Quartulli (23):
->       net: introduce OpenVPN Data Channel Offload (ovpn)
->       ovpn: add basic netlink support
->       ovpn: add basic interface creation/destruction/management routines
->       ovpn: keep carrier always on for MP interfaces
->       ovpn: introduce the ovpn_peer object
->       ovpn: introduce the ovpn_socket object
->       ovpn: implement basic TX path (UDP)
->       ovpn: implement basic RX path (UDP)
->       ovpn: implement packet processing
->       ovpn: store tunnel and transport statistics
->       ovpn: implement TCP transport
->       skb: implement skb_send_sock_locked_with_flags()
->       ovpn: add support for MSG_NOSIGNAL in tcp_sendmsg
->       ovpn: implement multi-peer support
->       ovpn: implement peer lookup logic
->       ovpn: implement keepalive mechanism
->       ovpn: add support for updating local or remote UDP endpoint
->       ovpn: implement peer add/get/dump/delete via netlink
->       ovpn: implement key add/get/del/swap via netlink
->       ovpn: kill key and notify userspace in case of IV exhaustion
->       ovpn: notify userspace when a peer is deleted
->       ovpn: add basic ethtool support
->       testing/selftests: add test tool and scripts for ovpn module
+v3:
+- removed unrelated code cleanups
+v2:
+- https://lore.kernel.org/netdev/20250415173239.39781-1-justin.iurman@uliege.be/
+v1:
+- https://lore.kernel.org/netdev/20250403083956.13946-1-justin.iurman@uliege.be/
 
-The changes since v25 lgtm:
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+In lwtunnel_{output|xmit}(), dev_xmit_recursion() may be called in
+preemptible scope for PREEMPT kernels. This patch disables BHs before
+calling dev_xmit_recursion(). BHs are re-enabled only at the end, since
+we must ensure the same CPU is used for both dev_xmit_recursion_inc()
+and dev_xmit_recursion_dec() (and any other recursion levels in some
+cases) in order to maintain valid per-cpu counters.
 
+Reported-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com/
+Reported-by: Eduard Zingerman <eddyz87@gmail.com>
+Closes: https://lore.kernel.org/netdev/m2h62qwf34.fsf@gmail.com/
+Fixes: 986ffb3a57c5 ("net: lwtunnel: fix recursion loops")
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+Cc: bpf <bpf@vger.kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Sebastian Sewior <bigeasy@linutronix.de>
+Cc: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: Stefano Salsano <stefano.salsano@uniroma2.it>
+Cc: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+---
+ net/core/lwtunnel.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
+index e39a459540ec..60f27cb4e54f 100644
+--- a/net/core/lwtunnel.c
++++ b/net/core/lwtunnel.c
+@@ -333,6 +333,8 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	local_bh_disable();
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
+@@ -348,8 +350,10 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	lwtstate = dst->lwtstate;
+ 
+ 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+-	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+-		return 0;
++	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
++		ret = 0;
++		goto out;
++	}
+ 
+ 	ret = -EOPNOTSUPP;
+ 	rcu_read_lock();
+@@ -364,11 +368,13 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (ret == -EOPNOTSUPP)
+ 		goto drop;
+ 
+-	return ret;
++	goto out;
+ 
+ drop:
+ 	kfree_skb(skb);
+ 
++out:
++	local_bh_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_output);
+@@ -380,6 +386,8 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	local_bh_disable();
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
+@@ -396,8 +404,10 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	lwtstate = dst->lwtstate;
+ 
+ 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+-	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+-		return 0;
++	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
++		ret = 0;
++		goto out;
++	}
+ 
+ 	ret = -EOPNOTSUPP;
+ 	rcu_read_lock();
+@@ -412,11 +422,13 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	if (ret == -EOPNOTSUPP)
+ 		goto drop;
+ 
+-	return ret;
++	goto out;
+ 
+ drop:
+ 	kfree_skb(skb);
+ 
++out:
++	local_bh_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_xmit);
+@@ -428,6 +440,8 @@ int lwtunnel_input(struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	DEBUG_NET_WARN_ON_ONCE(!in_softirq());
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
 -- 
-Sabrina
+2.34.1
+
 
