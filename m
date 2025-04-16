@@ -1,124 +1,141 @@
-Return-Path: <netdev+bounces-183171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 732C7A8B450
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:49:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4D4A8B453
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141493BA989
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CB0C3A6D68
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4574E22F169;
-	Wed, 16 Apr 2025 08:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CE522D7B7;
+	Wed, 16 Apr 2025 08:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aNqFtwSc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOuenfp6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E208C22AE59
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D3F21D594
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744793343; cv=none; b=s17gvI0cDMfcZbDheC/1c2qPeZWf8eKmpZtiBr6Gh4VKJdl17t+/824hkGFmSM6IID4lqQ4tNl2qkvX+y9T3UeJjBhgfll+4Hk7G4KOLhXpqjYDWaxGAFrAtNZkwOL99ocz7X/0AO7vTHUmraKPfkRF1QjrKi9a+2Toaett4AFY=
+	t=1744793405; cv=none; b=MFniZXCXuW8Xu/yImQoqL/H8H3ewkobZCeEB14m/2t+eiRAev/MG4cz3RzWmhckpitSe9f3u0AvPLwVC/dJxB6CHewXKyBP4rGcbnavasLlV8N5TOJZ8CQH15POzSxBd/uDIlcjLlXdHEDRdKnxAXA/6EWUO3/gN1SIldYmJGLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744793343; c=relaxed/simple;
-	bh=wo5bTTP84bYwAWBSuk6Jk+kr6J9UHNO3BRIkezh0fGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RW8s12Lh78kgSi1zgCdq8ZZP1hJGI35H7Wxv3/p3RAYwBtHeGbyrEqwDRVgeCDHe6CkoSOoXRTsFbfhkzMx+SASgM5AgEPNW36K94RfRgGpHQWCUf+7WzXJ0sVqIQ0fh6KLYMmcrCws1hIPuH1SoCVxUYh6ePR8KAzlrBScGETw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aNqFtwSc; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 38713432FF;
-	Wed, 16 Apr 2025 08:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744793332;
+	s=arc-20240116; t=1744793405; c=relaxed/simple;
+	bh=uVsqcI6VR4kYIU9Kvc9q7+DwU3wcQSKu+J0DQYUcQCY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ri2mIYoShG6CI2vNroBpniHW4+U1xZy4yLkMtli1wmwA44eaY8Iq8siG4viPIUNUiJ4eJ1Pyi3rWXDsi+68syJnKyCt7wDS9EHB0+V/rFUIvPCBS0YQm96lYzJw5xGwWERl1tJTEMIaLKCjWuj4tXQ97eFQz0Wy71eq9nxvgoYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOuenfp6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744793402;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nVvr6rcLERr5+8C01/FE5xf/NsC+eqK+KOEEzxrbVYA=;
-	b=aNqFtwScR2aN7gwxy5amx2oI7v2jD8cpgZZv8Ro191dnSfpfocQcyVYW4ehTNicBbHMqrR
-	LbQHacS3H3pWbzxK91D1dd5UO+suyf2xsLwPsSz1F8CzQvXfl+ESwCR+gIYbYPVtmvbpyQ
-	3Ih8LqX9JiAGbaEuhjh9NU1pO9ToLrQlkDNhIHNsqB1pM7ZmAMhSU7nJbXuTlawlQi91ED
-	w/79GeciDXzjmLDRzOXjyuqiT3KJ8ypMYC+bHHgipF14uoKwkmtvLzi9RVCEZQauxnoOsf
-	mcyi/i6IAUwo9XL8ViGLzD8vY1yFofN75kHPEf9y1rW8TwOHLG2g27R+dvqqAw==
-Date: Wed, 16 Apr 2025 10:48:49 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Russell King <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH RFC net-next 2/5] ptp: marvell: add core support for
- Marvell PTP v2.1
-Message-ID: <20250416104849.43374926@kmaincent-XPS-13-7390>
-In-Reply-To: <E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
- <E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=i2I5fgHi4AiXu6rdQabBdf1PCKc4o/YGmQRFNI+BkBc=;
+	b=DOuenfp6XDNdacG9ncYNTWN/yiKUIa1/1O63Q5DrvHZJjRQ49wZMQJrE4m4Y7+9BOhFtml
+	UEYgf3M7XH9a67T89u+/Kh+VbgK7mPXbQlchKqBVTDjlylW96uKkaXgkpzmayQB3aUEOTK
+	+2rObLEEtk/raygy6onxmzXjTxi+qNo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-6EC-5xx6P3S1LOU4lw1tBg-1; Wed, 16 Apr 2025 04:49:56 -0400
+X-MC-Unique: 6EC-5xx6P3S1LOU4lw1tBg-1
+X-Mimecast-MFC-AGG-ID: 6EC-5xx6P3S1LOU4lw1tBg_1744793395
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3913aaf1e32so3716404f8f.0
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 01:49:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744793395; x=1745398195;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i2I5fgHi4AiXu6rdQabBdf1PCKc4o/YGmQRFNI+BkBc=;
+        b=CNHRLCGyWZnM4pSmsYNKxQLGFh4d2iJ1CAsN1ZfUx+mPh63A8TaQjVCEGnbXUbj2I2
+         ufOz0VdS0nCWuVsT/1ciyujp4naojujkSC0RfwSXwyXtE5lKbnM+HQ0KujEKlY55KIA5
+         sGPhkV5iBsXSlFlQc4rHFMM2aBIR0rr72S1Hhln+B4FNQtpCIchB0yiai0uI3QemzYtc
+         wtOaYu8PoPbOsv+xXOW+sdFoOijyOOlNa/dOOc+X2g/82XX7jCMY5TG5dS7Dg+p9dw6i
+         RIst1FkA4DUt9KT9faPn2hl9OP297qxRQGELapdJoQkrPqA7pjEZ7mW5yL2K3LaGfB2I
+         aK2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXMIIBKF9Ig0xI+moXM7wEtRe/TR8uBBmSWwQ0+VU78i/EQRFtiIYaRZ58V1H9+7BOGkcNPrSY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyc6bR42UDPM+jK/Dr1b2+IPoy2+/yiB3SmcT3IhCdV6Zpo2Il
+	QAVaJpy1ko05RHaeo2NrtEFXs3juS3LhsueI3lQ3+O4BIpDgUA+gADaTT3CSxFtG7FLIMxxwMj/
+	GMPeHC1l7vwQ4duBh8GjXhEwkbzYffudV4ym2rw0LJ2lks+cFhpDwow==
+X-Gm-Gg: ASbGnct6T7XmjM1nK+iB7kEzPkYl7zzzewUi0SGltvXDDf+HVkzzrrYjydIFDFdKm+y
+	zrxn+gMPTPqsqmmSRQDtlXfYFHcYjSWYLTJhYKUXWW6HvNqcvQOCcYwYhSqu+InDlIWYvAl+DL2
+	h0gKh5uFnRb/RnOcuWxYW90JGVRsYQ4HAU+Y5QbGU0PGRAOqgkT49QbHvwmxHe1sBHUxfTHezog
+	Doil+1ladzMiRL2TA0IpzjpmHMwv8cvN0BHUNQjeRoIaMZepqwoY8YJf3LLUkLoG5QMJDQjv5Gy
+	GIPB93vEi/MY5JjvMboitpGFia3NoOIs3/+726U=
+X-Received: by 2002:a5d:47ab:0:b0:391:3406:b4e1 with SMTP id ffacd0b85a97d-39ee5b1638fmr1030845f8f.15.1744793395484;
+        Wed, 16 Apr 2025 01:49:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFM92w3DL3ad2OF53deZd14/W8S4J75EiizNKwhHOFVtgGu3bIFGQysZY2/gSIQ/Ce1S4Zrrg==
+X-Received: by 2002:a5d:47ab:0:b0:391:3406:b4e1 with SMTP id ffacd0b85a97d-39ee5b1638fmr1030820f8f.15.1744793395149;
+        Wed, 16 Apr 2025 01:49:55 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b4d3064sm14458435e9.11.2025.04.16.01.49.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 01:49:54 -0700 (PDT)
+Message-ID: <3e28015e-0ca0-4933-80b5-de45e3c43b11@redhat.com>
+Date: Wed, 16 Apr 2025 10:49:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND v2 net-next 02/14] ipv6: Get rid of RTNL for
+ SIOCDELRT and RTM_DELROUTE.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250414181516.28391-1-kuniyu@amazon.com>
+ <20250414181516.28391-3-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250414181516.28391-3-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdehleefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqheftdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfejveefgeeggefhgfduhfehvdevvdeukeelveejuddvudethfdvudegtdefledunecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddupdhrtghpthhtoheprhhmkhdokhgvrhhnvghlsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtp
- hhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-On Fri, 11 Apr 2025 22:26:37 +0100
-Russell King <rmk+kernel@armlinux.org.uk> wrote:
 
-> Provide core support for the Marvell PTP v2.1 implementations, which
-> consist of a TAI (time application interface) and timestamping blocks.
-> This hardware can be found in Marvell 88E151x PHYs, Armada 38x and
-> Armada 37xx (mvneta), as well as Marvell DSA devices.
->=20
-> Support for both arrival timestamps is supported, we use arrival 1 for
-> PTP peer delay messages, and arrival 0 for all other messages.
->=20
-> External event capture is also supported.
->=20
-> PPS output and trigger generation is not supported.
->=20
-> This core takes inspiration from the existing Marvell 88E6xxx DSA PTP
-> code and DP83640 drivers. Like the original 88E6xxx DSA code, we
-> use a delayed work to keep the cycle counter updated, and a separate
-> delayed work for event capture.
->=20
-> We expose the ptp clock aux work to allow users to support single and
-> multi-port designs - where there is one Marvell TAI instance and a
-> number of Marvell TS instances.
 
-...
+On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
+> Basically, removing an IPv6 route does not require RTNL because
+> the IPv6 routing tables are protected by per table lock.
+> 
+> inet6_rtm_delroute() calls nexthop_find_by_id() to check if the
+> nexthop specified by RTA_NH_ID exists.  nexthop uses rbtree and
+> the top-down walk can be safely performed under RCU.
+> 
+> ip6_route_del() already relies on RCU and the table lock, but we
+> need to extend the RCU critical section a bit more to cover
+> __ip6_del_rt().  For example, nexthop_for_each_fib6_nh() and
+> inet6_rt_notify() needs RCU.
 
-> +#define MV_PTP_MSGTYPE_DELAY_RESP	9
-> +
-> +/* This defines which incoming or outgoing PTP frames are timestampped */
-> +#define MV_PTP_MSD_ID_TS_EN	(BIT(PTP_MSGTYPE_SYNC) | \
-> +				 BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
-> +/* Direct Sync messages to Arr0 and delay messages to Arr1 */
-> +#define MV_PTP_TS_ARR_PTR	(BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
+The last statement is not clear to me. I don't see __ip6_del_rt()
+calling nexthop_for_each_fib6_nh() or inet6_rt_notify() ?!?
 
-Why did you have chosen to use two queues with two separate behavior?
-I have tried using only one queue and the PTP as master behaves correctly
-without all these overrun. It is way better with one queue.
-Maybe it was not the best approach if you want to use the two queues. =20
+Also after this patch we have this chunk in ip6_route_del():
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+	table = fib6_get_table(cfg->fc_nlinfo.nl_net, cfg->fc_table);
+	if (!table)
+		//..
+
+	rcu_read_lock();
+
+which AFAICS should be safe because 'table' is freed only at netns exit
+time, but acquiring the rcu lock after grabbing the rcu protected struct
+is confusing. It should be good adding a comment or moving the rcu lock
+before the lookup (and dropping the RCU lock from fib6_get_table())
+
+Thanks,
+
+Paolo
+
 
