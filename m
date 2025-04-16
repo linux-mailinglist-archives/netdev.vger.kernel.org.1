@@ -1,255 +1,226 @@
-Return-Path: <netdev+bounces-183536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FB8A90F02
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4B4A90F0E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C87323ABF4B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:57:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9775A13C4
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C2824167E;
-	Wed, 16 Apr 2025 22:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C582459CC;
+	Wed, 16 Apr 2025 22:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lhGmIBQz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzDKTpmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165AE242928
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744844282; cv=fail; b=PcIkECfybcZiNtzJcAlDlYi46x8kExlA2ngbJDs3EzUMslHPJv0GRz0mtnGeLV8j3v4SbBc4dFO/CznOKi38dKz5d61nXdTri67IdYv73mPWmCGxOFcWN2+SBRWqKHKutAMIGnQ/wmL/cdTOwILnkwjJ4qoKngi/4j04+6XrD0U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744844282; c=relaxed/simple;
-	bh=OCCeoke+tkRIw0Ursdt6AQwtTxmEJyEA4BxbMMP1rtg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=i1A4VAZJKAw6dsfosHfY27BlACTsX43Dns9dbTxz9eDQv7dptrAyVZY1uK8Vo+6AoCDIdspI+ilH0BHE3L33XsxzE2ctnpckBMpIxrFyb3eJ+3PTyQTSjclNYtCHmiB/sOT0KiNTJd1idReVFXT9a+YGQy8Q+aQezdZT4j2YZaY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lhGmIBQz; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744844281; x=1776380281;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OCCeoke+tkRIw0Ursdt6AQwtTxmEJyEA4BxbMMP1rtg=;
-  b=lhGmIBQz8+iG9LsxhW944Dz6su2Uo2PRX7XVoxl6AOrMOhkyf2HPTpR4
-   nSoge53XbIiIGjnCRqsuEtKlnk1fMvnY5uLDf0blYJdi0gPi7x4JamY1L
-   xO29g/1vFujck3CSFdnNHMkUGu8Ni7DUFB6+17RdVdd8Ml74/D0dwdyui
-   13t4Y5iIfVgQrapr+N3qpVv3/Usfp6utS+VWDR32yeL5pcmw8OhqKZfE9
-   IPFyLEkK7dbDAfuT3y4mizg/Lzsr/blJ4Le1H8fgyQ/gLFY80UDk/a9Ci
-   LHz8U483hMG4uHGoBbfA8KC3NTyPhgyV7EeuL68UJNw9YXC/uu/26xBkG
-   A==;
-X-CSE-ConnectionGUID: tdiVEhGEQqGDayppMjisFA==
-X-CSE-MsgGUID: WHRmeX5UTYO8pltwKb+d1Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="46133091"
-X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
-   d="scan'208";a="46133091"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 15:58:00 -0700
-X-CSE-ConnectionGUID: hPTXHg2iQImkwqSN5GB09Q==
-X-CSE-MsgGUID: OhXMxJu7Q62rmr5Ixhogfw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
-   d="scan'208";a="135609667"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 15:57:59 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 16 Apr 2025 15:57:59 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 16 Apr 2025 15:57:59 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 16 Apr 2025 15:57:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=q6DcRC5TFhTwQwO60SAJW83IVC7HAfm5okigjP2GC4/NbM4r2WNiL+igQXOSLCrZdUD5zjyr8b+yyJ7epGdV4+Uq3vZk9J1HIVwGveJ5yZHpwnxzKJhayDL74npnTHEfhbXw+WkG2glAjUinPZJ/udi8TAk3EHYVoKM3Tsen/3QZVXq3KWUY0WjPsyDcbv4CuVlX7tXVlUJkmozkSWBejygmchOEN6EqCA3W9yM4m0GWooYfa1Ph9Ls5Xoh0GS9YvIezxkvOvL5MZwMA6aVZ6YAcw1Sf34j6yIABTUlUb5J06Df3PeywSKwAaz9CEXQ3ATrBt6NRwB3+7wj1H5dTGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OCCeoke+tkRIw0Ursdt6AQwtTxmEJyEA4BxbMMP1rtg=;
- b=XUSzbAG9ToCfojN3lSE4ov8PSMZo8gbgUhKeOw8OkUbR6Bcy5tux9fEVUnt6T4KXmM17z3wrNr7S4SSzOGZB7VXSn7YFHNzmf/DLf8zM+ZsoQserlYNU+5T7sLdmjkkOpBXATNbxIzoa8UqGa0mTh4PJjHMDyjOYS4WbfvCj3f7z8xmn7Ay15jT2HVZAS+phAEgH43tTbggp+jNPSKCWMjkvIpnv9bfrejx7fWnk48qxAogNIymSORWQnnJeyktRMRjs2EL3NJ9w/tlL6FkOir0bAq++F8x1zxtsrNdBAGPGq8x68NwgQxNx9NmKNJoDxj39KilSriRH95bCpr6hEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH3PPFA061B3868.namprd11.prod.outlook.com (2603:10b6:518:1::d3d) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Wed, 16 Apr
- 2025 22:57:56 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8632.025; Wed, 16 Apr 2025
- 22:57:56 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>, Jaroslav Pulchart
-	<jaroslav.pulchart@gooddata.com>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Damato, Joe"
-	<jdamato@fastly.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>,
-	Zdenek Pesek <zdenek.pesek@gooddata.com>, "Dumazet, Eric"
-	<edumazet@google.com>, Martin Karsten <mkarsten@uwaterloo.ca>, "Zaki, Ahmed"
-	<ahmed.zaki@intel.com>, "Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Michal
- Swiatkowski" <michal.swiatkowski@linux.intel.com>
-Subject: RE: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-Thread-Topic: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-Thread-Index: AQHbrmoYFHYXzwUONkyzBwPhX3SQxbOl4UCAgABufwCAACW4AIAAb/YAgAADpxA=
-Date: Wed, 16 Apr 2025 22:57:56 +0000
-Message-ID: <CO1PR11MB5089E12CAAB57683740044DAD6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com>
- <20250415175359.3c6117c9@kernel.org>
- <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
- <20250416064852.39fd4b8f@kernel.org>
- <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
- <20250416154436.179ba4e9@kernel.org>
-In-Reply-To: <20250416154436.179ba4e9@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|PH3PPFA061B3868:EE_
-x-ms-office365-filtering-correlation-id: 690ed833-60a3-466b-da28-08dd7d3a206e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?K3VSYmpZYWh1RmE4c1hrakZyV1pENUhQMzFjVDdkc0x0bFNJMU5nSnZDSDVQ?=
- =?utf-8?B?NmM1L1BEUHIxQjVOTExVK2M2SUZ3OWNDUDhTUmhCM21tL01Fajk3LytGS1dp?=
- =?utf-8?B?eW9qK3J5cFBUMlVzS1hXdEVDMEtOUkgyM256Umh3R2hMWjY4L2Y4QlM0Ly9I?=
- =?utf-8?B?UHVNdkk2MS9zL3FnalRqVHdYaEd3cnVKdTFrUkdyZzZmc3ZzeFlFcjlObUpL?=
- =?utf-8?B?YTFOQTJ5Q2ovcVRVbFVGV2FPc3VMMk1XVDZEakZqdXhWMlBaVjBkWXlDOWVw?=
- =?utf-8?B?VFBNckJwOWVzbFJLTk1LMW5qeWdPbEprZjNJY055RFA2NVJQb04yMFB5V01L?=
- =?utf-8?B?VTIyVUwxa3JIYjBqVDllbm40RldjRzVFRnFSK3d1L0ZiN21zLzRsKzhJOXU3?=
- =?utf-8?B?aGxYd2o0dWZOY3MrOHpzNTZmU3RHUW80R1VPSGdLaEl2UU1vTlhSWWZjSXZO?=
- =?utf-8?B?d0hoYVY0cDh1WVRSRjhpSDkvZkhldWdmUE5zR1JyTU5Tbkppc01wa0c5Q3hZ?=
- =?utf-8?B?TTU5YmlVL1pNcHZHQk1IaFRDWXRxUE5FU1ovVDNyNGs1SW5tcC9wd0g3R3BR?=
- =?utf-8?B?dDhRR0xSUXNOeFo0MlBFU0RjVDY5VmorUWtUajNUOFZPZk9UTEVFdzRTTkNz?=
- =?utf-8?B?SkVMaGdySUhrM2tuTjBPVFRYWjdUUkhEUlBudnFFNnJ0dm9QdEJhdjduR21E?=
- =?utf-8?B?clZwZ1pGZGEwUG1vM0xnMHBOMzVRS1RsNkYrSXdKZkovWEhZSm92T0FtZVBY?=
- =?utf-8?B?M1Uyek9DS0EwUFp3bUx2UkUyaHlWUFlDUXo4My8vVWJtRFdERjRUVGFwOElX?=
- =?utf-8?B?czU4UGM5K1B6LzQ3US9ibmxxQlFWNlZNK2NGLzMvVGhiQVF3LysxTE5HcGNy?=
- =?utf-8?B?MzNrUjFZUFozbmdJTTJlVWpFcndwZ3B0bTRIS1ErQis0d3AyUTFtTUVab1ZL?=
- =?utf-8?B?TG5TM2JZTVlmVVVsdXJzak43VmIrS0lzOVkzTmZoYUxUMUtFOXpkeFVYSWUw?=
- =?utf-8?B?N1ZoaHFEZEhpNmZ4TktwTFpoUmJkN1ZTQUhNK2lmL1lDeWdtUzMyeEJ5MmtD?=
- =?utf-8?B?a3N4MnZubEg3bHo3cEg5alVKemUvbThuS2laSTlleXI0UDlwWldDMVN6MXBR?=
- =?utf-8?B?YmNsd3R3dUZUQzZyVFRIZlh6REpWYzhrZllxMlRIS2FjY0dIU0srQ3Jham1w?=
- =?utf-8?B?cURSZld4dEhseVJ5eVhnZWdIRUtFOE1venpjdFZsUkNlUnJyYkM5WmtKcWoz?=
- =?utf-8?B?cjNOT25SaXFZeVdYUjFsVm12Z0JSVllMVE0xRGg0OXN3Z0tweFJVaEVwL2xV?=
- =?utf-8?B?bGx5OTkxaUtoOTd3aVd4cm9Jd1F1M0tUeW8raE9VSERISTY0WWtUMGtDOTlw?=
- =?utf-8?B?Yng1elBtWitwL0FDRTJnOXY3SjUzUzJPUUNaMXBsSjVOWldGRHFsajRjdFpY?=
- =?utf-8?B?YlMybStPUVZycFFDSVdVVC9jbHNvT054RFdEaU8ySGYxa3ZCQXdZZlowaGdD?=
- =?utf-8?B?R1BVSUhHbTZZUzNrSDFIYmk4dFNhRE9OOUpkVWNRekxVSU1FNUZQcVZZU0pa?=
- =?utf-8?B?TXVJaXJORktXSzluSGFlZm9KcGMvSTMweUpwaDBROW12OHBkeVdlTE5Xbi9w?=
- =?utf-8?B?c0k3YTEvZ0s5dlVmMjhFRXhaNloyd0NNZG9sZU1CSXMwdU5kK2pzbVBncENG?=
- =?utf-8?B?K3VheCtCLzA4NzJTOEUwbXhIaWpBTUV0TmFaZE0vMm1MM01vWmc3aUlqckZk?=
- =?utf-8?B?SWxrd2MyUE5BTWt4cC9VbkNHQmRxaWp6aEVsQkZuMStXUW1VUkdySGFUNXVI?=
- =?utf-8?B?ZFNiVS91WU15dk9UQkpoZTdHNzhxNXk3eXdjdUc1UXI5MC91QytWMndvNyt4?=
- =?utf-8?B?M0JZRTFOaTdUSXhadCs0NXBzaEZBRzFUc0ZMWWRYTFpaNTVGenFibTNRVnZF?=
- =?utf-8?Q?GSA98Enochg=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WGs4MGJIeWtnYW1uSWl0OFpRdE11NnpDU2paVDVINlZQUDdHS3IxYlNhU3hn?=
- =?utf-8?B?WlFiNVdZQzZLd0N5NzJJcGJjcUc4Z0VId2FUaHJLUDVrYVdtZ1E5TVNwTHhl?=
- =?utf-8?B?QVpGWUxYTFRKWGdtYWlObFpIMHFkYmhhTmw1eWxOVU5XbVkxK0xiZjlPNzVD?=
- =?utf-8?B?ZXJtT1BMOGxnOVNiQk1OZ0g3RnVXSElCUmd4UXpEcG9NdEFwTER0aXdjT1dI?=
- =?utf-8?B?WUtvMTVhQ2UzaXFUcEt1ODVEU2hvd29KT0lyb1Arc0VCRTQweCtWTC9udHJy?=
- =?utf-8?B?ak9vUjB4NmVWY1FESUV6UVVOK3Z6R2ErdmhtMVFJT3JYYkdsdUlucklKQXF3?=
- =?utf-8?B?ZkZURzFqcFRvTkpUZ0FKbzVKTzdsL3dZRXVOOTJRYzJyeW1vMnZ2UGV5cjk5?=
- =?utf-8?B?V2ZBdTRMQ3RKbWZlVjNhTnVLZmdJbG1wc0EvTG0zV2E2Y1BOM1pUckY0Wnhp?=
- =?utf-8?B?b1dTRUJGTmx3RnkwenBzTzVoNmpIZmNmT0JhZ2VlTS9JUzZIV3gvUWRxQzgz?=
- =?utf-8?B?VkVMTTI0WjIrL3JHQkZJZ3hHNWdaS2JlS2NHc2xQY3l2MXV1bVEvQ3hYLzU0?=
- =?utf-8?B?SXBEeEVlTTJEYllXbFhUWFhERHlLdmxFS0t2NUgvRUNZdTNMOU5hOWpyM211?=
- =?utf-8?B?TzBnc01FR3ZzZ0FneUlNOGNCUytuQmFuV0k1TmNBTGl5b1hiRnllbkpKMHpZ?=
- =?utf-8?B?N2lENnpnbGI0WndDcS90RW5MdWlDUXN4R1BuM2NYaSs0RzFvWENLWkx1SzZY?=
- =?utf-8?B?UTF5cmdMUHBkQjdqV2Z0cWlsZ0hjclpMbU9iZzBMYjZ3WkQwQ2FGa2RWNTA5?=
- =?utf-8?B?UktUUnFGdnlCaGRVd1RBWmkxaEdSSlB1dXZuamhLZUJjZ3hTM2pRQUxUZXI1?=
- =?utf-8?B?YVJ6SWRrWUw3dXdaeFIwc0trRlk0eCtRZ04vL3FxT1c0S2h4RFVENlhTVGNR?=
- =?utf-8?B?Wm41NWI5SldIaU50UGRVOC93UzRvLzhUMHZ2RksreVBGZ3BGVHcyNzVIVGdO?=
- =?utf-8?B?WjQyVTlCalZKVW5nU2RjU1RRR3VVRXBjWE1uS29RclBQZStHZGVWWjl4bnpU?=
- =?utf-8?B?SVZPM0ZPZ2NZZktmV0Z3Nnk1QS9zMi9vSGZZajRhMWZmWGlQakp2RmxUM3ZS?=
- =?utf-8?B?ZGdJWnBaZk9zd2h3UU1SZ1FxbjRzY2VvODNpTGhOY21NSkpWVURYUzQ3Y1FU?=
- =?utf-8?B?dDQ1Mm4vbTdzcnhvaWJwYm9UVXdoc2R1UFpqbXpuQkZIWU5sSkRVMWpnRXRW?=
- =?utf-8?B?Mzg4VlpoZDVacVB6cDNGM2oxOGtHZy9rU05TY2RIYWlaaGxKSkF2R3BuMS9t?=
- =?utf-8?B?Y0dNbTI2anJwT2hjV2FFK3U5d2xwOXgxL3JrcEsxWnd6ZU1pd0hwZTJLcnpo?=
- =?utf-8?B?SEpVYm1EUFg1N1ZZdUdsWERxM1NGQnhKZm5ENHFuTWhJSE5meS80aks0MW5p?=
- =?utf-8?B?OEdERSsxU0hxR0VuM3J1cmttUzZNQjdYVHlxcy9BWkpZbjIyUjZZekJmelFh?=
- =?utf-8?B?ajVBTktwNTVFR3RLQkp1QTV2YTBNZEYrdmIyMDF6WnNxcW9aVi95WFkyVkNG?=
- =?utf-8?B?b3l6d0RTOG5TMk13MFVxbmlBLzZhMmRNaXR2YTdWSklkWENJenZPa0NJV3pJ?=
- =?utf-8?B?M096VW9GdUFtbkR4cjNBT0ZTYmovUEd4TzZ2VC8yR3o0ejBuT3JOL21jRlhU?=
- =?utf-8?B?Snk3K3g2a3FyV1BBOWtzZFhtaW1zbkpuWWx0bUtET083TTNYZ0lNSGxUVEJI?=
- =?utf-8?B?ZVh2S0ZGTXhPSkhUV3Z4L2lBY3daZFpLekxyYVRGUEI2Szd6dGtrVWNzTnc2?=
- =?utf-8?B?MW1uMkVrM1dGTlFweEFBNldrRk1oUUNrVjRVZDZLOEZpSWVVTVJVWTAyUU5l?=
- =?utf-8?B?YzBNN0dIejZqUGhrRkRXUGRwYzUvU05NVmxCYkEvdEw5VzU3VXlwVW5Da1gr?=
- =?utf-8?B?MzlMOXl5aElmSnZldzhMZU16WTFMbm0vbE9VOTVzTnhraHBZSTJRc1d6blJs?=
- =?utf-8?B?Qkc4N3hER2Q2cHJrT2tlLzBDdkRYNXpvNVNNOW5mbzBBWDVtMkRpclNXYWhP?=
- =?utf-8?B?elRlQTNrV3VDMWpWNkptS2p4ZVVMUDhDWTJBS1lLUnl3dU8vNEowMGlDUXV5?=
- =?utf-8?B?bEd0QXQ2b0o3NUdYVDhYWmxNaUxOR2RvQWlISjh6eEFKY05ydmNKeE1QdW1u?=
- =?utf-8?B?c1E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4AF230D3D
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744844354; cv=none; b=YepvJQXKRAoTx5MtZGJVKVtZKDvZ2tE4cktPmG8st5I8GLzwt9CFtGUJ8524yuZWO6dXNjytH0dXDUJQB+TWEFHNrVqoPRYSbFhcDANeVQlXEGg+A9hROVXPLL6VvImfi3ewCAhkTcDAY7HNIdEtF8rf/gGiKMxO3AQebaFcsMs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744844354; c=relaxed/simple;
+	bh=PCZDrRIitwuPg/cYCFIv/f+a1MWim1CT9jONkhNF8Ss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lCvwI344jkYIJ6ElY8d6KWJnNhj89UJ4veqQMtpcBGzsxPx08V5z5Aaqnk5/WKZ5EanONbBm6hUUqMLSE/Hea329wcvS5CWDJ7tHW0qM0rxUYhF1y2PNiQqs6ZPD2luHj8KjlOmrcjc884dHSUROtJktr3ynloOjEW1XwTXK3O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzDKTpmr; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39ee5a5bb66so89389f8f.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:59:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744844351; x=1745449151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PCZDrRIitwuPg/cYCFIv/f+a1MWim1CT9jONkhNF8Ss=;
+        b=jzDKTpmr9KaZrgTqumxeN4xhXnVJ9OFpH9zGXjJi6K7eddIn3Fxq+nr08Rs/xNXYsO
+         lftjHLy6stiKMbgX9dzibbcLDO3ubP89c+NVd+8C8HBiKY1PoDCEq4bIM7Uf1l6uJl5u
+         t3GRHPIIag+LNHE1Cw22blP99S8sgd/gb7I4sV2LB4hr+cWYyBE/bkRLLP7ZVMio1ZUR
+         6ICHgs+TTDy4/N+WMr91V3cq6r5lVefSlQcFOLHxy1g5BTSqiVJL+SFJCbjJc67H+3xG
+         ZPVAmIxc5kXt9Ne1QNRc0oOIUnKkQ9GWlEoq26VGEPtQ+nnoOBs2OVDLERZj+yVjP4fz
+         iZYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744844351; x=1745449151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PCZDrRIitwuPg/cYCFIv/f+a1MWim1CT9jONkhNF8Ss=;
+        b=k+JnCBLLK0cq5szHoWMW4V5VeHRYR8whh+mZ4Bxi69va///L7ZI6Znsn2w4d37cWrn
+         cjirlQAsw04SCCSRiJOD7H2fsArg6lROwthwR9ajMINvQdf21UY1HXcXh+n8yZ1/SnSY
+         b7YNo+II3C+oT7v/EatzTwBBp8B+ztOD6dpIlCZkJXg0qlcdAlFtvQx69XmnOt7G8ckE
+         uJ8MI6/k8iUyFxQ2n+OM/H1vs2pxBKCmTZrLK7vlU90lonpJpDzSQ0gXu64nVj8X8Msc
+         KZ0ikdel+n+YBBio7LqZfoDshNU7MclLCuasapN6Go85PYx1pIrVPSvDS0zYO5npct+l
+         gIFw==
+X-Gm-Message-State: AOJu0Yx5tX9eWKNnHXzRWqst8pDPxhXkl2afGF0SzqebRps0La4auaS0
+	d7KZRl7vBqzGKsvJkPz7jofEn9RPwI/v8eRAQJwA0QyLTAcNZZvcZNNrvtr7+GMapF/fYsQE8UP
+	TGAkeENiNaWF9a8kSp7oDh2TfKGw=
+X-Gm-Gg: ASbGncvpeUyORvSUa6PBMwbXXp4unGjeYXtKwmc9RyVdadrSnUTVGDcgaep1FlyVn0g
+	H9n9MqQISt7nMIk04p0DODgPvp7F5cCc9jeEKPhdpjD8PODUGm6u5GQytT1x3yBCtMBmhT4wW2o
+	n/2iNEUp41aCYpTSXkyh68lNhDh50751VXKYeWoTaWl1+VQ88kQxxPHHA=
+X-Google-Smtp-Source: AGHT+IFSASf9SELikYKA50k0jiQLpQwnFPAi6UmYO45Q8r0puEA5ABeJBhyViCLgS+EZAEoKFZTtQrM7E1TdGjo0PRM=
+X-Received: by 2002:a05:6000:1863:b0:391:2f2f:818 with SMTP id
+ ffacd0b85a97d-39ee5b11297mr3477203f8f.9.1744844350597; Wed, 16 Apr 2025
+ 15:59:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 690ed833-60a3-466b-da28-08dd7d3a206e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2025 22:57:56.1548
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8olmmh+oB0YIEJB7pfaUTp2naw69fR6OB6zgLS/ldjsmjKcaL2KtRbgIxXDgp4NxNOxkoPs4gsMLCJon4bsgbaRVxLFbq3Mc5Dam1pWE8gI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPFA061B3868
-X-OriginatorOrg: intel.com
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+ <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
+ <Z__URcfITnra19xy@shell.armlinux.org.uk> <CAKgT0UcgZpE4CMDmnR2V2GTz3tyd+atU-mgMqiHesZVXN8F_+g@mail.gmail.com>
+ <aAACyQ494eO4LFQD@shell.armlinux.org.uk> <aAANe/qMWIRY2K5l@shell.armlinux.org.uk>
+In-Reply-To: <aAANe/qMWIRY2K5l@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 16 Apr 2025 15:58:33 -0700
+X-Gm-Features: ATxdqUFLZWLfZLYONo7LsmlJwpM6i1vkupsjwY5ua88IFJow0MM9rhz8MDWbzvs
+Message-ID: <CAKgT0UeY1xHvxXm8YDJ6MArgwcgu2Dkw3PBTg=m0XK7Hi-XrXw@mail.gmail.com>
+Subject: Re: [net-next PATCH 2/2] net: phylink: Fix issues with link balancing
+ w/ BMC present
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSW50ZWwtd2lyZWQtbGFu
-IDxpbnRlbC13aXJlZC1sYW4tYm91bmNlc0Bvc3Vvc2wub3JnPiBPbiBCZWhhbGYgT2YgSmFrdWIN
-Cj4gS2ljaW5za2kNCj4gU2VudDogV2VkbmVzZGF5LCBBcHJpbCAxNiwgMjAyNSAzOjQ1IFBNDQo+
-IFRvOiBKYXJvc2xhdiBQdWxjaGFydCA8amFyb3NsYXYucHVsY2hhcnRAZ29vZGRhdGEuY29tPg0K
-PiBDYzogS2l0c3plbCwgUHJ6ZW15c2xhdyA8cHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNvbT47
-IERhbWF0bywgSm9lDQo+IDxqZGFtYXRvQGZhc3RseS5jb20+OyBpbnRlbC13aXJlZC1sYW5AbGlz
-dHMub3N1b3NsLm9yZzsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsNCj4gTmd1eWVuLCBBbnRob255
-IEwgPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgSWdvciBSYWl0cw0KPiA8aWdvckBnb29k
-ZGF0YS5jb20+OyBEYW5pZWwgU2VjaWsgPGRhbmllbC5zZWNpa0Bnb29kZGF0YS5jb20+OyBaZGVu
-ZWsgUGVzZWsNCj4gPHpkZW5lay5wZXNla0Bnb29kZGF0YS5jb20+OyBEdW1hemV0LCBFcmljIDxl
-ZHVtYXpldEBnb29nbGUuY29tPjsgTWFydGluDQo+IEthcnN0ZW4gPG1rYXJzdGVuQHV3YXRlcmxv
-by5jYT47IFpha2ksIEFobWVkIDxhaG1lZC56YWtpQGludGVsLmNvbT47DQo+IEN6YXBuaWssIEx1
-a2FzeiA8bHVrYXN6LmN6YXBuaWtAaW50ZWwuY29tPjsgTWljaGFsIFN3aWF0a293c2tpDQo+IDxt
-aWNoYWwuc3dpYXRrb3dza2lAbGludXguaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW0ludGVs
-LXdpcmVkLWxhbl0gSW5jcmVhc2VkIG1lbW9yeSB1c2FnZSBvbiBOVU1BIG5vZGVzIHdpdGggSUNF
-DQo+IGRyaXZlciBhZnRlciB1cGdyYWRlIHRvIDYuMTMueSAocmVncmVzc2lvbiBpbiBjb21taXQg
-NDkyYTA0NDUwOGFkKQ0KPiANCj4gT24gV2VkLCAxNiBBcHIgMjAyNSAxODowMzo1MiArMDIwMCBK
-YXJvc2xhdiBQdWxjaGFydCB3cm90ZToNCj4gPiA+IEZXSVcgeW91IGNhbiBhbHNvIHRyeSB0aGUg
-dG9vbHMvbmV0L3lubC9zYW1wbGVzL3BhZ2UtcG9vbA0KPiA+ID4gYXBwbGljYXRpb24sIG5vdCBz
-dXJlIGlmIEludGVsIE5JQ3MgaW5pdCBwYWdlIHBvb2xzIGFwcHJvcHJpYXRlbHkNCj4gPiA+IGJ1
-dCB0aGlzIHdpbGwgc2hvdyB5b3UgZXhhY3RseSBob3cgbXVjaCBtZW1vcnkgaXMgc2l0dGluZyBv
-biBSeCByaW5ncw0KPiA+ID4gb2YgdGhlIGRyaXZlciAoYW5kIGluIG5ldCBzb2NrZXQgYnVmZmVy
-cykuDQo+ID4NCj4gPiBJJ20gbm90IGZhbWlsaWFyIHdpdGggdGhlIHBhZ2UtcG9vbCB0b29sLCBJ
-IHRyeSB0byBidWlsZCBpdCwgcnVuIGl0DQo+ID4gYW5kIG5vdGhpbmcgaXMgc2hvd24uIEFueSBo
-aW50L21lbnVhbCBob3cgdG8gdXNlIGl0Pw0KPiANCj4gSXQncyBwcmV0dHkgZHVtYiwgeW91IHJ1
-biBpdCBhbmQgaXQgdGVsbHMgeW91IGhvdyBtdWNoIG1lbW9yeSBpcw0KPiBhbGxvY2F0ZWQgYnkg
-UnggcGFnZSBwb29scy4gQ29tbWl0IG1lc3NhZ2UgaGFzIGFuIGV4YW1wbGU6DQo+IGh0dHBzOi8v
-d2ViLmdpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90b3J2YWxkcy9saW51
-eC5naXQvY29tbWl0Lz9pDQo+IGQ9NjM3NTY3ZTRhM2VmNmY2YTVmZmE0ODc4MTIwN2QyNzAyNjVm
-N2U2OA0KDQpVbmZvcnR1bmF0ZWx5LCBJIGRvbid0IHRoaW5rIGljZSBoYXMgbWlncmF0ZWQgdG8g
-cGFnZSBwb29sIGp1c3QgeWV0IOKYuQ0K
+On Wed, Apr 16, 2025 at 1:05=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Wed, Apr 16, 2025 at 08:19:38PM +0100, Russell King (Oracle) wrote:
+> > So, when a Linux network driver probes, it starts out in administrative
+> > state *DOWN*. When the administrator configures the network driver,
+> > .ndo_open is called, which is expected to configure the network adapter=
+.
+> >
+> > Part of that process is to call phylink_start() as one of the last
+> > steps, which detects whether the link is up or not. If the link is up,
+> > then phylink will call netif_carrier_on() and .mac_link_up(). This
+> > tells the core networking layers that the network interface is now
+> > ready to start sending packets, and it will begin queueing packets for
+> > the network driver to process - not before.
+> >
+> > Prior to .ndo_open being called, the networking layers do not expect
+> > traffic from the network device no matter what physical state the
+> > media link is in. If .ndo_open fails, the same applies - no traffic is
+> > expected to be passed to the core network layers from the network
+> > layers because as far as the network stack is concerned, the interface
+> > is still administratively down.
+> >
+> > Thus, the fact that your BMC thinks that the link is up is irrelevant.
+> >
+> > So, start off in a state that packet activity is suspended even if the
+> > link is up at probe time. Only start packet activity (reception and
+> > transmission) once .mac_link_up() has been called. Stop that activity
+> > when .mac_link_down() is subsequently called.
+> >
+> > There have been lots of NICs out there where the physical link doesn't
+> > follow the adminstrative state of the network interface. This is not a
+> > problem. It may be desirable that it does, but a desire is not the same
+> > as "it must".
+>
+> Let me be crystal clear on this.
+>
+> Phylink has a contract with all existing users. That contract is:
+>
+> Initial state: link down.
+>
+> Driver calls phylink_start() in its .ndo_open method.
+>
+> Phylink does configuration of the PHY and link according to the
+> chosen link parameters by calling into the MAC, PCS, and phylib as
+> appropriate.
+>
+> If the link is then discovered to be up (it might have been already
+> up before phylink_start() was called), phylink will call the various
+> components such as PCS and MAC to inform them that the link is now up.
+> This will mean calling the .mac_link_up() method. Otherwise (if the
+> link is discovered to be down when the interface is brought up) no
+> call to either .mac_link_up() nor .mac_link_down() will be made.
+>
+> If the link _subsequently_ goes down, then phylink deals with that
+> and calls .mac_link_down() - only if .mac_link_up() was previously
+> called (that's one of the bugs you discovered, that on resume it
+> gets called anyway. I've submitted a fix for that contract breach,
+> which only affects a very small number of drivers - stmmac, ucc_geth
+> and your fbnic out of 22 total ethernet users plus however many DSA
+> users we have.)
+>
+> Only if .mac_link_down() has been called, if the link subsequently
+> comes back up, then the same process happens as before resulting in
+> .mac_link_up() being called.
+>
+> If the interface is taken down, then .mac_link_down() will be called
+> if and only if .mac_link_up() had been called.
+>
+> The ordering of .mac_link_up() / .mac_link_down() is a strict
+> contract term with phylink users.
+>
+> The reason for this contract: phylink users may have ordering
+> requirements.
+>
+> For example, on mac_link_down(), they may wait for packet activity to
+> stop, and then place the MAC in reset. If called without a previous
+> .mac_link_up call, the wait stage may time out due to the MAC being
+> in reset. (Ocelot may suffer with this.)
+>
+> Another example is fs_enet which also relies on this strict ordering
+> as described above.
+>
+> There could be others - there are some that call into firmware on
+> calls to .mac_link_up() / .mac_link_down() and misordering those
+> depends on what the firmware is doing, which we have no visibility
+> of.
+>
+> As I stated, this is the contract that phylink gave to users, and
+> the contract still stands, and can't be broken to behave differently
+> (e.g. calling .mac_link_down() after phylink_start() without an
+> intervening call to .mac_link_up()) otherwise existing users will
+> break. Bugs that go against that contract will be fixed, but the
+> contract will not be intentionally broken.
+
+The issue is as that stands the contract is inherently broken if a BMC
+is present.
+
+1. There is still the link loss during the phylink_start issue which
+will essentially leave the MAC up if the link fails. This will cause
+the Tx FIFO on the NIC to essentially be left to hang without flushing
+out the stale packets that may have queued up when the link dropped.
+This is one of the reasons why the mac_link_down call still needs to
+propagate all the way back down to the hardware.
+
+2. We already have precedent for the link being up when WOL is in use.
+One concern I would have with your patch is if it will impact that or
+not. I suspected part of the mac_link_down is related to cleaning up
+something related to the link setup for WOL configuring the link for
+some speed.
+
+3. While it may be a part of the contract, isn't there some way we can
+"renegotiate the terms"? The fact is in the case of our driver we are
+essentially doing a hand-off from FW to the OS for the link when we
+call ndo_open. When we are done in ndo_stop we hand ownership back
+over to the firmware. Those hand-offs need to be free of link bounces.
+This pattern looks very much like the WOL setup with the only
+exception being trying to avoid these link bounces. I'm just wondering
+if there isn't some way we can add a phylink_config value indicating
+that there is a BMC present on the link so we can handle those cases.
+The general idea would be to update my patch so instead of
+pl->link_balanced being just set to false in suspend and at creation
+time we could essentially just set it to "pl->link_balanced =3D
+!pl->config.mac_bmc_handoff".
+
+The fact is the code with the diff I provided did everything I needed.
+I could load/unload and ifconfig up/down the driver all day and it
+didn't drop a packet. As it stood the definition of the mac_config
+code more or less called out that we weren't supposed to change things
+unless we needed to and I had followed that. I suspect the overall
+change should be small, smaller now following your fix of the message
+issue, and it shouldn't impact anything other than our driver if I add
+the config flag checks.
 
