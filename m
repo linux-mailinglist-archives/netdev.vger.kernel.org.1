@@ -1,89 +1,82 @@
-Return-Path: <netdev+bounces-183250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64E8A8B773
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:10:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7778A8B778
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD841189C67C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:10:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BB416946A
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C22723C8AE;
-	Wed, 16 Apr 2025 11:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CA222D4E0;
+	Wed, 16 Apr 2025 11:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DuDwEREC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cPuFYyqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA59236435
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BCD221272
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744801798; cv=none; b=U+Ni5gPm8no8zjUq5I2GG3dYjINK/7Sm+saJYlod4NNY7Z2uhO++SiCnQMA4gH3E76eAqyXmzxJ06R0VXgwYsLTkW20MSktPN0hBEzm6+1ToNVsdmibiCrtwumUwXDDD1bG9Vjo78PjNnpN6ZRy1ojbYHMXg8XMAh8y8oymd0pY=
+	t=1744801921; cv=none; b=J1bhFWVfpzblpx4lkz73vgmNlYVdKW4yuWXmKxMwHMGPBHQzknTLhY8yNZIFeI4SWzvMwFOiiTzzLOm8AkOyFzquOWanMwZEc4LchQOCmKQr0Z0g5wzrlCLgKVIem56FWNFamdystmEt1D6YyCcOCIDvyRROK2E2CgXVXolVGq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744801798; c=relaxed/simple;
-	bh=N300ZpabVRj6F4flL8Lfrs8xgF7O+jgFOpCvVDz4jH4=;
+	s=arc-20240116; t=1744801921; c=relaxed/simple;
+	bh=FKmeJMfgYCjB+D9B9MWeCTSf48/JaXRoDQiPlUgJizw=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uYpJaLqYJwn2e6KLtXsGz6rqBXXr4NbV2Yq/OQooekq+X8YdXs5OWxcvbzGLx1PZfe9NcZZ9efE/XG/KiEUhG8iTjPEm/b4S34ezlsGWbqnEw1hafIvy4v6ofos0UUcFLVxHJV9mJJakOMszJkhhY/HD2Xbf7ZaHzE+SmdcnJzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DuDwEREC; arc=none smtp.client-ip=209.85.221.46
+	 Content-Disposition; b=F4TWNUIiXOGyVqdBwyjUL6bIN6smAaKZZ2YDWrHK9dZ8e0Y8f2s9rOpQudvxBkVRjbEmPMvL3FYdufWL6v7fOMfl7sHD0xgpl4FlaMTYs55isHqnR3ndOoJtj1bbiecDbAuf43Zvyxhynax7AM23OPnvhohhINfg/mQgEIOXXOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cPuFYyqB; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-39ee5ac4321so408458f8f.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 04:09:56 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39ee651e419so188817f8f.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 04:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744801795; x=1745406595; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1744801917; x=1745406717; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=uUVn1E+5MASZtQAbRE/tz2lbT/kj3f2AwNu2uqycOxQ=;
-        b=DuDwERECZX0nUED+9+NujIw+A2beToU3fyaa8eXcft6lO+jp+kPOgPq7F31HXa7l9a
-         XPM93rbFlwG16nQAv/+ng4suDAKiSkD3/CfNow3+YYjUmY3JJVEN80pfjyk5lDCkBwkK
-         G5Qu66G70QhKi4ttbcbHWFbyuYWtfHnezgWcSU5EjNpog0Y01QyLUhfkp3O8Ul8/m7PE
-         FJy56mZiZIO8SQ7ZbRrfrV14fpvHVcqrGSm6bvdAJm0Iv04IXkQlaWAew0RhDd9cg+yU
-         AaVx7M1b2IdhxLZBTfWYXtsOxB7PTy+uXaRxLqQqDZEL5cXj9e7t/mzNQmFVTskO5Z2V
-         L2AA==
+        bh=dCW5gjcHYExgz0vojGj0sgwI7z9g+RGoZwHSXfOPi1k=;
+        b=cPuFYyqBQpRpYD8dsZKpgvWHcC1NPwLGDxNgFH/1DFdXmg05uDXfXbd9B9I2uY98mF
+         jV6CHDkrCKighv7hSwQItbGCZVW8P3nMichafZ/6NN0W4uET/ck/niJa/pdv/0kfaBQZ
+         ub2xtKwVLYaBPxMKWX1A3rGH9eSf6AhREB9g4G61OHB5ulc8RBHq68aHAhLnFfdbUle7
+         yANH8YHubPfc8qSsqGG9X3sagUUm5KM6GbJMk4qYew8zm6L4X275LDXqQWsarQlTDx30
+         eP55OVDAR6Tham7ppDsBeMd82gLsmpXBDshA+3FNlKfmfHz2q8VqW7AI1rKlXWDmCYgl
+         8mVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744801795; x=1745406595;
+        d=1e100.net; s=20230601; t=1744801917; x=1745406717;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uUVn1E+5MASZtQAbRE/tz2lbT/kj3f2AwNu2uqycOxQ=;
-        b=kBIkZMRz+3HXH3xgr454tZ3J9coyNKEEyfq1V85YUpTa4Ctuuycz3txF9JMhuWokNx
-         gsi5cF8NrxchiaHdTV3GpHcbURYc++nJ3S/EUfa/O5FUTXZ2RH7V+WaNEoki+ePeXg6c
-         x1lnaELsNbMjbCBSJteR0MmCuExQhRP/EcCcchxJ6KWLBP4nb5vriUC4l7rFjtah4oXV
-         JtCE+9yXI3TxvsUSkRF+o3pEoob630C1VC2kyEQlnfKl2cp4+YARL26ygjAstaOTqcW/
-         Rf6L7BrXzwsq+tVrbH85ajxphl7zjr3QLPCb46h4VnrqLrc8SCS8W/JR7lD4bHkQatsh
-         rTnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhY2AkVyAuW4ykg0ZI6CWetzzFiXdKrsb+zrWhyhTpT+oRgCJswcewNjRkR3N+rtGKHeuwhlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqFJZbVplc3y5U24Xi8rDqa2V3C9BTtFGmrYJRbeNt261n8y9D
-	uvmQI19IhvsTBemem2U1pHAgG1tABjgLGICkokDoNFuYxxjp5XM9upnoULJ6p2C2T4JM5RKcmKY
-	k
-X-Gm-Gg: ASbGncsCF8MxO+1QR2my26r4k+oCh5Mn4CZrpwThbQ8Q8JpDVeO0JqQOzrPjLaimrVR
-	epdjsxDHoJtQXYLtMyi5u6B8uwDH8HFxX88aCFQLglxgvrx/Z62Jw9z6ROeKr/3CnZxRZjDvAl/
-	baMtBFJS63KGwEcsrtSobYUddFmuBOFMUjC+9+Va+OTqZ2cHT0Ur/v8x/9hDuYPm9AuZ5sU1uZB
-	3VLhkXYoUF1tpY7MaLf8lEdjdPkHo7dMQGTN2dT/m4YtxEaE6BooHSheh/JWTE7+QN8GsYOPqXc
-	TtHf9Jx99EvSmNlJRqbBM+ThgbR+xOLw3WLCdNeXleBaQw==
-X-Google-Smtp-Source: AGHT+IGnbNlOdz2yVZBXGlqvERaHySPWwtoWVnzqqpbftBIEbIEdovohdZb+YF7/4pgI9k2rY2uGfA==
-X-Received: by 2002:a05:6000:248a:b0:391:2bcc:11f2 with SMTP id ffacd0b85a97d-39ee5b10fb5mr1551778f8f.1.1744801794634;
-        Wed, 16 Apr 2025 04:09:54 -0700 (PDT)
+        bh=dCW5gjcHYExgz0vojGj0sgwI7z9g+RGoZwHSXfOPi1k=;
+        b=orPwB5ddZfWKRulxFnKJGA5sskDI2mtS3SjvXgVkDP0u4LNazx4Dy02XpG0OvxJ5kC
+         usIDjn4S2D6J3d86lfYA1n6C8gm+yoNYImoeZXg9M4W8koevWos4Q1K1a8bY3VJb2Hoq
+         WWi8m7ACskInMA67w2pSqVJPtVag2M6z4LhaVOJwz+AyvjrREoDJO/e21j/SA/a249qZ
+         YGS1q4kzL38hKLWgUJkc0vvAARPjFZQEzyEgD3jElFurrpm0QFmO9rsS9aHIAjrUvGMa
+         YOqzhlw5PvuzX7GjaKve6baJDMun11RuFh++t/CySBf4VFYBJCAXo0WEQlKX5iyrEQ4Z
+         czFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTDZaLkBcbcBiim6iO1821als360JI9BM0VwLeopaJdIRSpQ0KyJkqN6nVnP7he9ksN/18Pew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIUm7T5X7Wo2GyAJdOKQaYqVAqeAVz43S8v3wJOnMcX99wqbVa
+	uIcD3Xst9ovIkK51Xav4ONIogcFP/rzVaoyl78eR7Vzt0ZYlx9YNyQRJ7r40ZTY=
+X-Gm-Gg: ASbGnctdeyESafLGQcqya85AI/YlqNhPD5YPyt6pslZ9rY5Uof+eC+qYU0EQYhOoxvr
+	EGBDe0zbWbYMOy8VZVRTt5cx/Olxr5/2pmDE5D0CukKWwSfzzsqb43FG8748Ht2MH15jBs3NPVl
+	V6ikC388I9lVLrnUmpNHpv5yDDG4pA0r0lpxcLocga3286cxVsyQWZxc3g9nCD4xtGy/L8OiYXl
+	eFmO0emvTekn1qaS5SqSSb4WVeu4+Cc6i9V8DRtVJVJZ4a9vlvqewSHUu+keEXBhOHRa17klUjc
+	bLYVQddjKiyng2oTbTKmObV+HMiIF+PWsPc9k/jI8mVyPw==
+X-Google-Smtp-Source: AGHT+IFLY3a2I8m1IAlrZQXFVVgxEQKK6slZVGIdWQLlUGF3b2KJNdebo6Nb8tggxPByawK3HCEPWQ==
+X-Received: by 2002:a05:6000:228a:b0:39c:3475:b35a with SMTP id ffacd0b85a97d-39ee5b32418mr1521456f8f.28.1744801917451;
+        Wed, 16 Apr 2025 04:11:57 -0700 (PDT)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39eaf445742sm17013298f8f.95.2025.04.16.04.09.53
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39eae96e912sm17094499f8f.31.2025.04.16.04.11.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 04:09:54 -0700 (PDT)
-Date: Wed, 16 Apr 2025 14:09:51 +0300
+        Wed, 16 Apr 2025 04:11:56 -0700 (PDT)
+Date: Wed, 16 Apr 2025 14:11:53 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: David Howells <dhowells@redhat.com>
-Cc: Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next] rxrpc: rxgk: Set error code in
- rxgk_yfs_decode_ticket()
-Message-ID: <Z_-P_1iLDWksH1ik@stanley.mountain>
+Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org
+Subject: [bug report] rxrpc: rxgk: Implement the yfs-rxgk security class
+ (GSSAPI)
+Message-ID: <Z_-QeaIsAPU0n1eR@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,34 +85,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
 
-Propagate the error code if key_alloc() fails.  Don't return
-success.
+Hello David Howells,
 
-Fixes: 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-It's not totally clear if these patch prefixes are real things or just
-a cat walking across the keyboard.  "rxrxpc: gk: yfs-rxgk"  Really?
-We expect people to believe these are real?
----
- net/rxrpc/rxgk_app.c | 1 +
- 1 file changed, 1 insertion(+)
+Commit 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security
+class (GSSAPI)") from Apr 11, 2025 (linux-next), leads to the
+following Smatch static checker warning:
 
-diff --git a/net/rxrpc/rxgk_app.c b/net/rxrpc/rxgk_app.c
-index 6206a84395b8..b94b77a1c317 100644
---- a/net/rxrpc/rxgk_app.c
-+++ b/net/rxrpc/rxgk_app.c
-@@ -141,6 +141,7 @@ int rxgk_yfs_decode_ticket(struct rxrpc_connection *conn, struct sk_buff *skb,
- 			KEY_ALLOC_NOT_IN_QUOTA, NULL);
- 	if (IS_ERR(key)) {
- 		_leave(" = -ENOMEM [alloc %ld]", PTR_ERR(key));
-+		ret = PTR_ERR(key);
- 		goto error;
- 	}
- 
--- 
-2.47.2
+	net/rxrpc/rxgk.c:501 rxgk_verify_packet_integrity()
+	error: uninitialized symbol 'ac'.
 
+net/rxrpc/rxgk.c
+    467 static int rxgk_verify_packet_integrity(struct rxrpc_call *call,
+    468                                         struct rxgk_context *gk,
+    469                                         struct sk_buff *skb)
+    470 {
+    471         struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+    472         struct rxgk_header *hdr;
+    473         struct krb5_buffer metadata;
+    474         unsigned int offset = sp->offset, len = sp->len;
+    475         size_t data_offset = 0, data_len = len;
+    476         u32 ac;
+    477         int ret = -ENOMEM;
+    478 
+    479         _enter("");
+    480 
+    481         crypto_krb5_where_is_the_data(gk->krb5, KRB5_CHECKSUM_MODE,
+    482                                       &data_offset, &data_len);
+    483 
+    484         hdr = kzalloc(sizeof(*hdr), GFP_NOFS);
+    485         if (!hdr)
+    486                 return -ENOMEM;
+    487 
+    488         hdr->epoch        = htonl(call->conn->proto.epoch);
+    489         hdr->cid        = htonl(call->cid);
+    490         hdr->call_number = htonl(call->call_id);
+    491         hdr->seq        = htonl(sp->hdr.seq);
+    492         hdr->sec_index        = htonl(call->security_ix);
+    493         hdr->data_len        = htonl(data_len);
+    494 
+    495         metadata.len = sizeof(*hdr);
+    496         metadata.data = hdr;
+    497         ret = rxgk_verify_mic_skb(gk->krb5, gk->rx_Kc, &metadata,
+    498                                   skb, &offset, &len, &ac);
+    499         kfree(hdr);
+    500         if (ret == -EPROTO) {
+--> 501                 rxrpc_abort_eproto(call, skb, ac,
+
+This is a false positive in Smatch, but why is only -EPROTO handled and
+not other error codes?  It could be intentional, but it's hard for me to
+be sure because I don't know the code well.
+
+    502                                    rxgk_abort_1_verify_mic_eproto);
+    503         } else {
+    504                 sp->offset = offset;
+    505                 sp->len = len;
+    506         }
+    507 
+    508         rxgk_put(gk);
+    509         _leave(" = %d", ret);
+    510         return ret;
+    511 }
+
+regards,
+dan carpenter
 
