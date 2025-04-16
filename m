@@ -1,197 +1,152 @@
-Return-Path: <netdev+bounces-183090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32AA7A8AD76
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E917A8AD96
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C5516D055
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:15:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6422217F6DB
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F72211A2A;
-	Wed, 16 Apr 2025 01:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CB522759D;
+	Wed, 16 Apr 2025 01:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="V8jbW0Ym";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mg5KYN3H"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Rd3j35hj"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DE5211704;
-	Wed, 16 Apr 2025 01:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84278226D1E
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 01:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744766119; cv=none; b=UFFBsAAr5VV+fSz2S9ciiP/Tq4QJCrjAb/1AwWdYpC7+ulz3/b5cdtGcPDa44zoSU0q3PRLz05AD3mUVLfHHHjd4sCE5pOi0M6qgWGH+nIaeGOWBef/aU315bodeQKGv49YQ5moIOEY4ySvu/gebk9E1w+u2QvYCcSFScSi4R5Q=
+	t=1744767573; cv=none; b=Y6lVMGDcr8mLKRcI710XSWJliNLWgyljb8DT6vAn/Sh8YDLhoHNXOfvjfMOdZL2ZHx9X1Jc0Rl3xzqUDzkFT5E82/PF38MPrS3zxgkiT2TqO8Eyoq4Xxj6O/442q0eIKSz0dA5f+iOanhWrqHby0QRS3JVjKPcmrwP980hy3Qw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744766119; c=relaxed/simple;
-	bh=LbR/HO1xEgWhqjMGIMXVt/qdUpBIhy50VbWTpdakICs=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=TFK11aVsFGigKA1fCJyynxnGSO7MPO47Ju/f+upIWZ/dUs6LpdlaUgEHMaQCBe4bJDRFY2D4RxJIiNTr1vhRTZmERnqJjpoxHpCKtW4uPfy+eGKuZG3JnnS1UJexSeiE20A40cCcCkBB17SlNqEFzQ8q98MhIZI0RLoh753+r/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=V8jbW0Ym; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mg5KYN3H; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 6F3581140189;
-	Tue, 15 Apr 2025 21:15:14 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Tue, 15 Apr 2025 21:15:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1744766114; x=1744852514; bh=jnBIm/5tJ4NzfihYdPrUq
-	zBTp2e3zOqRSopkwUkiu88=; b=V8jbW0YmedV1RrcpdViZQB+sIk9kbI6Jx1/jx
-	V7uWn3ALJdup97PQjc+jJoDx/gP6oopqtN/Vp0TK49LFH7v65RGzQnI0Swbjh6vn
-	9sjJP3+1DSgWzm1lawMounN1EZ9z4U3XpzxZWT0vXnP+Xr9EOVArTlOTWpbK+J2H
-	FYwdnZbNzlv2P0aKXbfrodna7nwjR5Vi5vKzNwy0bauksaZ4poKGeJcGTMNCzyKD
-	AWFyxR9AJy3RlYaXCrxXNOLYYLZdkJTbcZJSH5f+30Y3SZTtWPpolAiZ1kATU8+J
-	PeXDom/k/MoD3IKYJTWCqYTgUwndM7rGR9oFW3BgdaKYUkpeA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744766114; x=1744852514; bh=jnBIm/5tJ4NzfihYdPrUqzBTp2e3zOqRSop
-	kwUkiu88=; b=mg5KYN3HCnVIzIAMTJPpK6780M/Fp4qBDKnCAI7mlnoqgfntmS3
-	z0PcqpxIgQ0pCsJ5S4Y+jQN90zZ/kr7TBAE19GfMQyB0VDcbVzpN8pGWmX2H+Vvr
-	CWzIDovsyIeeXKqMqg0LhlwO9Frz8hWmkfMC6vCvBSLTYBXgG/eOEJ4FvTQtWqLK
-	VU4YA7TprJwem1fu+hzl9OfRj+V/eeCppeiYcIMpHBVjO0sPKUCS7yP+B4p6BdTy
-	kErmncuxsIheBTqHowHftCcJjLgdFG36cXHUxXNA+7XFehbbhjBW1VKSmIgjaxoU
-	8mBRASDLKGIHcqhMbvHAjl5uaEcgcYatFcw==
-X-ME-Sender: <xms:oQT_Z7r0R2Ex9_fu82WNymrM3go1eAs98EqgNA9LNfzZ2UxvejCZ7w>
-    <xme:oQT_Z1pr8EA883QYNf25LPqWZavwP9k5GGzQ7CfFCUniLZv5uks1BEW8-b1rt7M5S
-    O9mBj4jBVNBuNB4E3o>
-X-ME-Received: <xmr:oQT_Z4PpKKEwpM9-2k4pL1mq9BLFsqORshwg2O92vLgvajoHThxnysv5wxd4jyG2MW72wA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdehtddvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertder
-    tddvnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeei
-    veelffduvdevfedtheffffetfeffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphht
-    thhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgriihorhessghlrg
-    gtkhifrghllhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhs
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
-    pegtrhgrthhiuhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvg
-    guhhgrthdrtghomh
-X-ME-Proxy: <xmx:oQT_Z-6K3oOm8X1i3wQBeba6-yep9HX0QAQ4ORVXZa8_xBUv6lT3iA>
-    <xmx:oQT_Z66_PspOnYT3HtBJ6eNyvbGiw_Tjfd8sha0_1PAHC3kZqorC_A>
-    <xmx:oQT_Z2iNPJY3bXpQCo_gitWZYXdZhzpa_Gk61pIR0pFGgOt7h4iZKQ>
-    <xmx:oQT_Z842UV0jZbXuj2Z-YEkLb1JRa0jrpnmsJLFGFzVm6le3owMaZQ>
-    <xmx:ogT_ZwWQ93gElikdbVI-4oTJDu-iThqCSUvhZzEoIXhnWQnptNOVe92I>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 15 Apr 2025 21:15:13 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id B5C589FD38; Tue, 15 Apr 2025 18:15:12 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id B2CA39FC8A;
-	Tue, 15 Apr 2025 18:15:12 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 net] bonding: use permanent address for MAC swapping if
- device address is same
-In-reply-to: <Z_yl7tQne6YTcU6S@fedora>
-References: <20250401090631.8103-1-liuhangbin@gmail.com>
- <3383533.1743802599@famine> <Z_OcP36h_XOhAfjv@fedora>
- <Z_yl7tQne6YTcU6S@fedora>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Mon, 14 Apr 2025 06:06:38 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1744767573; c=relaxed/simple;
+	bh=dTnq697UHqs4Zk+ACZjnV/VcHC+rw4zE0mnepumyuk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AR6WEylruhAVjQBU22cdKPWF9PG0FHYQr17J/vR3tN0Qj8LAP9BK9rH/HxV8Ddp5L19fOSM238GpYM3iCk2dqytgsLq8qQGI8wl5gbdTsjwDIM2e9RHKcAdI19xwXCIuyPHBMbrUB8i6wD89FuD+xbV6cq2VP4SWiSQtvKrQ6rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Rd3j35hj; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-225477548e1so60597465ad.0
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 18:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1744767571; x=1745372371; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RJHYVgEVoY4PsMLuoYWXVUdOXZM3Dp29HRy62pgdjTw=;
+        b=Rd3j35hj2xWKtfhMqhHMNAyTmBxwCMjG38v86slF2193sI6XYQ3R7BZzGIkyyrrXvw
+         KjPujaFoaPJTfcIaC3qSvqccdLRhnVOTT42VgJIzOiAsY2n0CX07lkUG4OIOSiDZBPYi
+         kkPXVxdfAOOWh1OCAi9L0DdNGQvztq6IDnciM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744767571; x=1745372371;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RJHYVgEVoY4PsMLuoYWXVUdOXZM3Dp29HRy62pgdjTw=;
+        b=u6praN1PEwUiQ7mfxSBQdgQ6r04/BgVfpCsgiPMY7bH5F8D4lH1BkFeXu/Djc+FB1i
+         Mds9oJvwdNXumBFq/+1V0nOkFjQxjsBC9RXOPqqcC66251kLdqSmmmFkz9qbg3J/3PKT
+         riV1HdJMqVulIM21rWrAAVeo7kCuSWmpjfUC+nlrvU9dRqVTKY1EYrulzvACTRm5ESsB
+         BqNlg+frenxp5VmeZjMu7UwAGJJ1d3xtJ5Yd3bjP1TmOZMfGplcHnW8mqtPe4abxP9Ts
+         6W6bcywn/IQpllZS0ThbS7PBzLUety7Pxx0oszyt8WpNstdL7JUXR77mbPOxRDXAhJeF
+         m94g==
+X-Gm-Message-State: AOJu0Yx/qQOloPzlEN19uB6kkGLXK8Q5bAyDQ/WqJCvERf2yUBSDGMKl
+	K2kgOkIRlcPATLcdk5wAaOmbxSClXcH8aQgrtkjiaTqEIvGYfD1QAOCa93ubd+o=
+X-Gm-Gg: ASbGncvMvgEYZISdy/G81b//GJxnl+swcx4UCbd50jbWrwGgxp8RdqKpMsT+/CX2Dox
+	MalNBfN3M147oddLcoK5ey43KEn4azjAyDnQ4TZQ/NLI3aESHOZP5fknRV9tIlrUYd4Vq79Fvrl
+	ul+c5flnMTejPeLQXOi+hz2CJiD8NL1d1APL8IIuBo2FOZG4LeJmP6QxExF7Bh20GdDIhH2fz3D
+	Ef21C6VhDqfIohx9Kn1qUYzc+t+u0W+j9Zg6cknfQvcI1MrN3YWXgn+Zm1goceHRvrh/8+7qkuN
+	W3UU/P2lhPbiJVT/lPFIjPfS76pKtRqH3cABCw8L/qnmX5ozthzsl/wPPB/yRtlcfQN0LyuU+1h
+	hFA39G7GVCK7l
+X-Google-Smtp-Source: AGHT+IGal5XUm/5ZjIJym+rt2yFc1Nr3o7jD6J3I/S17PgjABrDnWFW2YF0A1YKdPmsdX90xjsLVeQ==
+X-Received: by 2002:a17:902:db05:b0:224:160d:3f54 with SMTP id d9443c01a7336-22c31a84ec4mr19284785ad.31.1744767570671;
+        Tue, 15 Apr 2025 18:39:30 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c33fe4de0sm2097415ad.212.2025.04.15.18.39.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 18:39:30 -0700 (PDT)
+Date: Tue, 15 Apr 2025 18:39:27 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC net 0/1] Fix netdevim to correctly mark NAPI IDs
+Message-ID: <Z_8KT7LYUgyZQhI-@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+References: <20250329000030.39543-1-jdamato@fastly.com>
+ <20250331133615.32bd59b8@kernel.org>
+ <Z-sX6cNBb-mFMhBx@LQ3V64L9R2>
+ <20250331163917.4204f85d@kernel.org>
+ <Z_613wmrKRu4R-IP@LQ3V64L9R2>
+ <20250415171154.0382c7f7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4177945.1744766112.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 Apr 2025 18:15:12 -0700
-Message-ID: <4177946.1744766112@famine>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250415171154.0382c7f7@kernel.org>
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Tue, Apr 15, 2025 at 05:11:54PM -0700, Jakub Kicinski wrote:
+> On Tue, 15 Apr 2025 12:39:11 -0700 Joe Damato wrote:
+> > On Mon, Mar 31, 2025 at 04:39:17PM -0700, Jakub Kicinski wrote:
+> > > Up to you. The patch make me wonder how many other corner cases / bugs
+> > > we may be missing in drivers. And therefore if we shouldn't flesh out
+> > > more device-related tests. But exercising the core code makes sense
+> > > in itself so no strong feelings.  
+> > 
+> > Sorry to revive this old thread, but I have a bit of time to get
+> > this fixed now. I have a patch for netdevsim but am trying to figure
+> > out what the best way to write a test for this is.
+> > 
+> > Locally, I've hacked up a tools/testing/selftests/drivers/net/napi_id.py
+> > 
+> > I'm using NetDrvEpEnv, but am not sure: is there an easy way in
+> > Python to run stuff in a network namespace? Is there an example I
+> > can look at?
+> > 
+> > In my Python code, I was thinking that I'd call fork and have each
+> > python process (client and server) set their network namespace
+> > according to the NetDrvEpEnv cfg... but wasn't sure if there was a
+> > better/easier way ?
+> > 
+> > It looks like tools/testing/selftests/net/rds/test.py uses
+> > LoadLibrary to call setns before creating a socket.
+> > 
+> > Should I go in that direction too?
+> 
+> Why do you need a netns? The NetDrvEpEnv will create one for you
+> automatically and put one side of the netdevsim into it.
+> Do you mean that you need to adjust that other endpoint?
+> It's done the same way as if it was a remote machine:
+> 
+> 	cmd(..., host=cfg.remote)
 
->Hi Jay,
->On Mon, Apr 07, 2025 at 09:35:03AM +0000, Hangbin Liu wrote:
->> > 	So this patch's change wouldn't actually resolve the MAC
->> > conflict until a failover takes place?  I.e., if we only do step 4 bu=
-t
->> > not step 5 or 6, eth0 and eth1 will both have the same MAC address.  =
-Am
->> > I understanding correctly?
->> =
+Maybe I'm just thinking about it wrong and/or describing it poorly.
 
->> Yes, you are right. At step 4, there is no failover, so eth0 is still u=
-sing
->> it's own mac address. How about set the mac at enslave time, with this =
-we
->> can get correct mac directly. e.g.
->
->Any comments for the new approach?
+The idea was that napi_id.py test forks. One process does a
+listen()/accept() and the other does a connect(). The accept side
+checks that the napi ID is non-zero. For that to work, both
+processes need their netdevsims to be able to talk to each other.
 
-	Sorry, just getting back to this.
+> If you really need a netnes check out
+> tools/testing/selftests/net/lib/py/netns.py
 
->Thanks
->Hangbin
->> =
-
->> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
-_main.c
->> index 950d8e4d86f8..0d4e1ddd900d 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -2120,6 +2120,24 @@ int bond_enslave(struct net_device *bond_dev, st=
-ruct net_device *slave_dev,
->>  			slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n"=
-, res);
->>  			goto err_restore_mtu;
->>  		}
->> +	} else if (bond->params.fail_over_mac =3D=3D BOND_FOM_FOLLOW &&
->> +		   BOND_MODE(bond) =3D=3D BOND_MODE_ACTIVEBACKUP &&
->> +		   memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_le=
-n) =3D=3D 0) {
->> +		/* Set slave to current active slave's permanent mac address to
->> +		 * avoid duplicate mac address.
->> +		 */
->> +		curr_active_slave =3D rcu_dereference(bond->curr_active_slave);
->> +		if (curr_active_slave) {
->> +			memcpy(ss.__data, curr_active_slave->perm_hwaddr,
->> +			       curr_active_slave->dev->addr_len);
->> +			ss.ss_family =3D slave_dev->type;
->> +			res =3D dev_set_mac_address(slave_dev, (struct sockaddr *)&ss,
->> +					extack);
->> +			if (res) {
->> +				slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n=
-", res);
->> +				goto err_restore_mtu;
->> +			}
->> +		}
-
-	Is this in replacement of the prior patch (that does stuff
-during failover), or in addition to?
-
-	I'm asking because in the above, if there is no
-curr_active_slave, e.g., all interfaces in the bond are down, the above
-would permit MAC conflict in the absence of logic in failover to resolve
-things.
-
-	-J
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
+I'll take a look, but I'm probably just missing something about how
+to properly use NetDrvEpEnv.
 
