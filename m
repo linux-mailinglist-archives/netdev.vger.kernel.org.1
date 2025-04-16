@@ -1,91 +1,103 @@
-Return-Path: <netdev+bounces-183062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19B6A8ACC4
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 02:38:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904C0A8ACC8
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 02:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB491442511
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:38:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62CDF7A2532
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4311C84B1;
-	Wed, 16 Apr 2025 00:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD641D5CD1;
+	Wed, 16 Apr 2025 00:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UvL+SwAj"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DtQ6yEeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6994B81E
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5661CD208
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744763908; cv=none; b=c/PmMMos7nXJ6XrTq0rDKpKsSMRMlN3ZyNt1p8qLegImZyMMqKprY/B+dEtUFio4KeiQNJbYmB/eCydF24OFuxApHX9LHuEITvy3fMbRz3TTTDaf6mX05qlsBkLZcW9vm3KRiFLoFeg8JMJjMkVovpu/9qh6vg0Xe74mXUgu438=
+	t=1744764194; cv=none; b=ofASuQYLdF98FE+x811hKrk47Vy6qI9Slh6pgR0RP2ASZDmtALJyf+SJMuiDA/L7wn/BFXF8NJpUaZgP3dMS30+NbGbVla45THhMbBMUgV8dVtKNwm4iOcyt2JAFyKSDcSOhMBKaf9m5F7vrNY7+qIuAqPYxy9dOVRDpx9A2CwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744763908; c=relaxed/simple;
-	bh=WBPzNKVtE1nyZ+2Kdt0CRnXSwsIKjP5hrrS9znxUWyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BMQXTDmsBookaNTgYdXrHXJcjR09heVJj1XqSgEVBssAv30S76EDAP8KV/yCOPwEGkSFl6Ef+aQDDFkqFhcZsQmjUQSTsBlJGBku+rZw628WYtb9OiS50uTh1bjZZm3fv9+1Dsj8j4Mcb/iH80A7r++I9qD2T3fJyZt0U57Qi80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvL+SwAj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F12DC4CEE7;
-	Wed, 16 Apr 2025 00:38:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744763907;
-	bh=WBPzNKVtE1nyZ+2Kdt0CRnXSwsIKjP5hrrS9znxUWyU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UvL+SwAjlnrfg1dVItVytp5lH7C1v6mnR+qPpMGguJ+1qvZIVJFRArhyfRuSiuR4I
-	 4RzJQXOCjYcOS++HYHxjgozlFyWDaQuatb6e/SGRr7AywXSHVOYOFe5nXMkgZqUHi5
-	 wu0br1F95E3MyEaz7aFLgJGepulcK6MJQPB+JJZ57/eJrNvj2UG2HdR9vt1V2WncSg
-	 Mp+UIPfLy3QaO274OgrQKtOrGFBkULGXPShuqseKZA+v8TtQfQDNIKE2x7NzrrvKa/
-	 XEcauCeYLJXjSwCFW4F4gWQz553NQnTjMacCXtRQrtZSGcngpKqNgF7simfQMnbmmZ
-	 JJDOgxG+iAIbw==
-Date: Tue, 15 Apr 2025 17:38:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chen Yufeng <chenyufeng@iie.ac.cn>
-Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH]nfc: replace improper check device_is_registered() in
- nfc_se_io()
-Message-ID: <20250415173826.6b264206@kernel.org>
-In-Reply-To: <20250415025436.203-1-chenyufeng@iie.ac.cn>
-References: <962edb17-a861-4e23-b878-fcc1fd5ac006@kernel.org>
-	<20250415025436.203-1-chenyufeng@iie.ac.cn>
+	s=arc-20240116; t=1744764194; c=relaxed/simple;
+	bh=Ru81sSTS5rSeKtkx0AiOc7XjI7qOWO2SkUPVZEXYWvE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QK9J61KvovVPGlR5hzCwKg0ROL+au29vNYBrHx3+MyumHTk3rbO/lAnG1m4PjTAUNKdwWArzmvFcCrizAnEW2QDYa7IJmdxh6gnjMMYeH3DeTej54POkRMTyoOelnUpnVztVwxb44XxC3vwzMle0LSVSw7eNV+OUxTyfIytOuh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DtQ6yEeu; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744764194; x=1776300194;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hgOFb0JOrIbHbZFiTQsch8DmQMphhTCIt0QRhsfjtrk=;
+  b=DtQ6yEeuCJOhBF/EeRbGfjGxjGe38PCFaj8jWOc5J99ocMc62BVr00Z6
+   IbZBNThHblX+JAfni7tyDtMBZUW8O46+ZhMeuc+jdfhZBWLI/23IrQ76A
+   aKFASEeOxfZbFQHq3WeD7/jwyLBy/BtDpQCxCOO5ZJtMCBp9pBuyvyZqM
+   E=;
+X-IronPort-AV: E=Sophos;i="6.15,214,1739836800"; 
+   d="scan'208";a="735932563"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 00:43:09 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:38917]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
+ id 4683a17b-1cea-4fb4-a465-7ec71159e984; Wed, 16 Apr 2025 00:43:07 +0000 (UTC)
+X-Farcaster-Flow-ID: 4683a17b-1cea-4fb4-a465-7ec71159e984
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 00:43:04 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.88.149.87) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 00:43:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/7] neighbour: Convert RTM_GETNEIGH and RTM_{GET,SET}NEIGHTBL to RCU.
+Date: Tue, 15 Apr 2025 17:41:23 -0700
+Message-ID: <20250416004253.20103-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, 15 Apr 2025 10:54:36 +0800 Chen Yufeng wrote:
-> > On 14/04/2025 16:11, Chen Yufeng wrote:  
-> > > A patch similar to commit da5c0f119203 ("nfc: replace improper check device_is_registered() in netlink related functions")  
-> 
-> > Please wrap commit message according to Linux coding style / submission
-> > process (neither too early nor over the limit):
-> > https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597  
-> 
-> Thanks for your reply!
-> I have reorganized commit message as follows.
-> 
-> A patch similar to commit da5c0f119203 ("nfc: replace improper check 
-> device_is_registered() in netlink related functions").
-> 
-> The nfc_se_io() function in the NFC subsystem suffers from a race 
-> condition similar to previously reported issues in other netlink-related 
-> functions. The function checks device status using device_is_registered(),
-> but this check can race with device unregistration despite being protected
-> by device_lock.
-> 
-> This patch also uses bool variable dev->shutting_down instead of
-> device_is_registered() to judge whether the nfc device is registered,
-> which is well synchronized.
+Patch 1 - 4 moves validations and skb allocation in neigh_get()
+as prep for patch 5, which converts RTM_GETNEIGH to RCU.
 
-You're also missing a Fixes tag
+Patch 6 & 7 converts RTM_GETNEIGHTBL and RTM_SETNEIGHTBL to RCU,
+which requires almost nothing.
+
+
+Kuniyuki Iwashima (7):
+  neighbour: Make neigh_valid_get_req() return ndmsg.
+  neighbour: Move two validations from neigh_get() to
+    neigh_valid_get_req().
+  neighbour: Allocate skb in neigh_get().
+  neighbour: Move neigh_find_table() to neigh_get().
+  neighbour: Convert RTM_GETNEIGH to RCU.
+  neighbour: Convert RTM_GETNEIGHTBL to RCU.
+  neighbour: Convert RTM_SETNEIGHTBL to RCU.
+
+ net/core/neighbour.c | 208 +++++++++++++++++++++----------------------
+ 1 file changed, 101 insertions(+), 107 deletions(-)
+
 -- 
-pw-bot: cr
+2.49.0
+
 
