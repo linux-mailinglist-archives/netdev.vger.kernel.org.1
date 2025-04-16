@@ -1,106 +1,152 @@
-Return-Path: <netdev+bounces-183210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1D2A8B695
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:18:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A3EA8B648
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90AC9442E45
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:18:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B845A355C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F46238C10;
-	Wed, 16 Apr 2025 10:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2705241681;
+	Wed, 16 Apr 2025 09:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGeF9fPD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3JO/kKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955D4238143
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5D6237186
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744798683; cv=none; b=BrVZzkllEu1ibDP9du+z0Sscf6bbQBesEvJ6pa23+h9UicZQb/5ZwxXSTmaPOqP2nRnwW1tssbVjq6oGzUflJp0Wqhad8YbUZoAxZ8uDtwvWzGxEEuuwLmxwMV3IqRTIZQ3o2f/LGLSQwDzPe80bXEMpyaT2WpU+DXYN49AillA=
+	t=1744797450; cv=none; b=DfLo5G6BFCogcWOkE6pfVSO3t1EAnb6AHAAWQUb2WtHrZeXCD39MLBy8cIlC6NeAZj9+235WWyGyU78q3KLvgAoXtHD5TErKwyVabJ517A99ZLbF6KR9s47PMs8Lvja/QcQ3dpCDkACbD20ueTTTYYH1ev4MGtlUmGKrGL3nFdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744798683; c=relaxed/simple;
-	bh=C1k2/gZ40S7BcZysMnJymxOOvTPVUIB1dnYGNJX/9JE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=QC/OaB4JV4t2ghCESjx0P/GeGhFXGwyU3HASX33L7tl9Nz2U75kkCvdg/SKQAYn5OuQ706sEJ3vNGDCgKJrTljHQKa2w1Q7CiUfcm2LTy4s7wX2UVvA+X9NXllG9+nlWjqveDS9V7DqRrt0ahiiRW9iN9cGo3+3fNap8EJseNKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGeF9fPD; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3913b539aabso3988668f8f.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:18:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744798680; x=1745403480; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C1k2/gZ40S7BcZysMnJymxOOvTPVUIB1dnYGNJX/9JE=;
-        b=KGeF9fPDGspKhVCH3M7gcYqzLebN+SZGnUI8YVDEbDGjNDUpU7XpRgXq/CBYIFTnkK
-         DyOq7YLmMTjkgm//zMTS/15p7L0wkBW0COsdrJ5d04VflnzBQc/jelscRcDVDcwXG8mu
-         DZ6ucscMg3A7i9H53J3XMfNer71AjB5TO2c1M9oYN4jhHu+m4Yt1CsWk+sRO1kBL+Zv+
-         PN0zQwtj7eXqXQqfEeOUoHkhBA9v3xlnhBS/Sf4AnU3COqrj8d3KK+tE5AzN88KwN6RE
-         W9JAKqG1e9urdK8k+o5NPqWDqek37VF3xpMMWm51x6I7kc2zc3E6Zgy/R5/MGaqkz/ej
-         YHSA==
+	s=arc-20240116; t=1744797450; c=relaxed/simple;
+	bh=IGYhZNRAwMnjGB4VmCpjX141Ek5+hdy6KimBsGTC2ds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uyre7KB41I+ix20kRk+Q/agF6F8lWlkeUOxEZCDGjgkDBQj24sFZEkQY/CCY0M69r+tEd70tOL3skCFgZ1Wd1nd5l8a2kVIxE9uL4rR5Hj5HSzhVDtktHoOMSMBRmcB0HndDNrff93jJYcKh8+iwPkmJ4VaYl+BhnihSzHcYGCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3JO/kKc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744797447;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z/xc/nuTCCFwa/m4E/cXK10OwMX3zR6vXhX1Jh7hiL8=;
+	b=O3JO/kKc7jjHtLxEsTkxyU8CNi/NNJ+rnZumS7gkyyqBlywxeFnyKnlk1+7xltaudVX2/P
+	jhoEx0jlN2tvK6wWzRqv6ilh6QHvxllOBGd8aJCrLgwl1m83vjwFExgvOtaGUsCtDyX2o7
+	UTQr9AebRbqfxpTG7Kp+vCdPNzxO5nU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-MGV5hjS8OeCP8qsNFCAp4w-1; Wed, 16 Apr 2025 05:57:26 -0400
+X-MC-Unique: MGV5hjS8OeCP8qsNFCAp4w-1
+X-Mimecast-MFC-AGG-ID: MGV5hjS8OeCP8qsNFCAp4w_1744797445
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d08915f61so38539235e9.2
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:57:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744798680; x=1745403480;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C1k2/gZ40S7BcZysMnJymxOOvTPVUIB1dnYGNJX/9JE=;
-        b=lrP4ukD6YSwfISZYXOdBPRiiBrjueSlAKLQmHS8huNnKqa7ooLrSuj0BZTa44pfHDp
-         gZQoKdyP2uvHDKB7LujORpmaR0RwqQgdLeCOycLI5SuyfRy92zXh/MFyOx4p3QbBeSoK
-         lD+rXoQmnnnaUeX0oEhnziKfd3KOPwlEgmGRZYNfYWzWfApqnirTYqdnpA5HV9EthEez
-         SkCoqjuqKt60hWAZeEiFhkTueXkVmAfNCmMEPJAtxuo9jM7hgN0NbGRdDI7+B9ZVuCxU
-         9xFxC1VPMfRhGSsgxDQkE05E4d2NQEur8vNKpRRqqLrVpcvCmK0sz92e6FMqUyVk3DP8
-         lyQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUth5RY+sZhKhL3b6c3yQ2jJwF+jeGRAuQG/HBneH4jSQJc+PA/IzODZilEdOUJ/UoWcQl7vOk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1jBXUim4l+jDIUm3Sy+CtgS51SrEryZsEhPvJl/5VBcmowaxa
-	lrNgM7EaZ0c3tr1UA6FYh2Ji0Fr0Z+AaBS2YWzp4j3sn7iMGsSbNJWPYyw==
-X-Gm-Gg: ASbGncsq+JF+cKQhIJB1gsXqYJLc1pags6btvQXRhErxZv2KsZ4mZUvnuWq52xSI4AH
-	mfGx4NKKpJiyJXWqNTJTMddKuaaR2MqtlD2oJ/BQ8+tZvetuf0EsdfqMMcJI/xwqu5tS336AUHL
-	T5pTPeuAtqTuG1raU7Jd86PfdfOfKmR1T9SLMjDdBtgDNx2qVwI8PVmIHxRrE7eO4HMsBIebCL7
-	Mf3Tw6DiYugxbUd5vVWg6TYtRmZEfPgkjMaq4HXYGfbEe7yeTOFZUx+ykJMu4hKQA9oewK2IHza
-	hwRxrTDrWsc6pEWT3LcjgLN43yn57xG3T1akvo8dqiU6Z783gxwT4F2qPQ==
-X-Google-Smtp-Source: AGHT+IGZpQCu9mlpcO0YEMH+gk4snM0zm7eVUbrYizcPlIpgM5Fo9VkDDO0yx8ow0Vw4gxxAiy/nSQ==
-X-Received: by 2002:a5d:64c8:0:b0:391:43cb:43fa with SMTP id ffacd0b85a97d-39ee5badbdemr1282580f8f.51.1744798679499;
-        Wed, 16 Apr 2025 03:17:59 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:e94a:d61b:162d:e77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96c074sm16351396f8f.28.2025.04.16.03.17.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 03:17:58 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  daniel@iogearbox.net,  sdf@fomichev.me,  jacob.e.keller@intel.com
-Subject: Re: [PATCH net 2/8] tools: ynl-gen: move local vars after the
- opening bracket
-In-Reply-To: <20250414211851.602096-3-kuba@kernel.org> (Jakub Kicinski's
-	message of "Mon, 14 Apr 2025 14:18:45 -0700")
-Date: Wed, 16 Apr 2025 10:56:15 +0100
-Message-ID: <m27c3kmnuo.fsf@gmail.com>
-References: <20250414211851.602096-1-kuba@kernel.org>
-	<20250414211851.602096-3-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        d=1e100.net; s=20230601; t=1744797445; x=1745402245;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z/xc/nuTCCFwa/m4E/cXK10OwMX3zR6vXhX1Jh7hiL8=;
+        b=Ln+tZABEYczccyWcXDX2QsUOlYGNq66Kk65vmEuZXNEksq8Zdxrmup0AfjWi22He10
+         dHGyqd1nLJt5HT9DG+NVtbdewtDx1USaK7LKpviwUiet6ym9CiJ6nhHv2P4gPEIK6Hdc
+         1QtAR3DPfw5EI0JLQsasjfP2NyxOTks+7A+v9R1F/eYI2GbBokrnFplMTYy/SiFhCl2e
+         KJCPnkFMkrtqkAscvAzuLDhxGjMfgum8XDob1sJ9XmzP9mk7bK9b6il9BBLLDnhF3gXQ
+         ztdwjrHSMwGecXmBpyZfWnX9fUqZpK2fjW87pXH5eGLKLnw5HaTGnUdOgDUbN59ofNPI
+         U69w==
+X-Forwarded-Encrypted: i=1; AJvYcCX7OMlkClwb4+nGcTVZPo6PMCo2PLAy4YMyTHKi944l4EBPAIV24Xr7LBT2whq+hQwFxkcMWa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXlO90q5YdNc6nbeGYZUir3pzoKZCgoaubeNp84FCwfRm4hP1J
+	eMI/m/PdmxegfnWYyHbyxSpBVPLSsamHMjAySatkhk9DouVRgh2npCl6DO3ISZ2nns6syAm2GYv
+	JZbT7jSbDgITKd9Ux2RFPGurWMWCuWGnwg/ogWDKH9HhShu1MzOMtIQ==
+X-Gm-Gg: ASbGncvizw/lW34anxymhAtjrxBC/Oza7jd7GWiXWKwYIb7DKuQKkIUpRIfhrIXssao
+	IEhh799uWjnpV/lmYqoejuVjP5r4PWYrkmWfREXlEP8Byt1NzbdDwW6gryM4znTxDzC/AjAuAke
+	mo232d1OvXG0c11h+L8Dy6uMmEh+19PQuUGR6HjIsVe0okMxVw0H2KQRq9CPy7nvrQZ1snLA9Ty
+	+jhHL5iM19dLePcAbhHm52MoPjPUmthvY/ahLuetCoLgvwfNYYH5fHtp9ANOkF2y+mKpCSUiZ6M
+	sNN/XFo5Ojq2IDIwMjRTnredG40PDXzfNFWYASA=
+X-Received: by 2002:a05:600c:3d0a:b0:43d:683:8caa with SMTP id 5b1f17b1804b1-4405d62773dmr14071595e9.15.1744797444937;
+        Wed, 16 Apr 2025 02:57:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEu5aphSLSLjKUkLkOfXLho1fHF8HQeDhk0u+Agx4Eqc7CCJUXdai4sWV9MvJWlocFoBC/lg==
+X-Received: by 2002:a05:600c:3d0a:b0:43d:683:8caa with SMTP id 5b1f17b1804b1-4405d62773dmr14071245e9.15.1744797444546;
+        Wed, 16 Apr 2025 02:57:24 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b50b964sm16015505e9.27.2025.04.16.02.57.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 02:57:24 -0700 (PDT)
+Message-ID: <c9bee472-c94e-4878-8cc2-1512b2c54db5@redhat.com>
+Date: Wed, 16 Apr 2025 11:57:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND v2 net-next 10/14] ipv6: Factorise
+ ip6_route_multipath_add().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250414181516.28391-1-kuniyu@amazon.com>
+ <20250414181516.28391-11-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250414181516.28391-11-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 49eea7e1e2da..c026f8fe5f78 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -5315,29 +5315,131 @@ struct rt6_nh {
+>  	struct fib6_info *fib6_info;
+>  	struct fib6_config r_cfg;
+>  	struct list_head next;
+> +	int weight;
+>  };
+>  
+> -static int ip6_route_info_append(struct list_head *rt6_nh_list,
+> -				 struct fib6_info *rt,
+> -				 struct fib6_config *r_cfg)
+> +static void ip6_route_mpath_info_cleanup(struct list_head *rt6_nh_list)
+>  {
+> -	struct rt6_nh *nh;
+> -	int err = -EEXIST;
+> +	struct rt6_nh *nh, *nh_next;
+>  
+> -	list_for_each_entry(nh, rt6_nh_list, next) {
+> -		/* check if fib6_info already exists */
+> -		if (rt6_duplicate_nexthop(nh->fib6_info, rt))
+> -			return err;
+> +	list_for_each_entry_safe(nh, nh_next, rt6_nh_list, next) {
+> +		struct fib6_info *rt = nh->fib6_info;
+> +
+> +		if (rt) {
+> +			free_percpu(rt->fib6_nh->nh_common.nhc_pcpu_rth_output);
+> +			free_percpu(rt->fib6_nh->rt6i_pcpu);
+> +			ip_fib_metrics_put(rt->fib6_metrics);
+> +			kfree(rt);
+> +		}
+> +
+> +		list_del(&nh->next);
 
-> The "function writing helper" tries to put local variables
-> between prototype and the opening bracket. Clearly wrong,
-> but up until now nothing actually uses it to write local
-> vars so it wasn't noticed.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Somewhat unrelated, but the field 'next' has IMHO a quite misleading
+name, and it would be great to rename it to something else ('list'),
+could you please consider including such change?
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Thanks,
+
+Paolo
+
+
 
