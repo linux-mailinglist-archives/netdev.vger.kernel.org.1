@@ -1,136 +1,174 @@
-Return-Path: <netdev+bounces-183325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3854A9059A
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:10:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EDD4A90610
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 862A97ADA10
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:09:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80536189B576
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BDD1DC04A;
-	Wed, 16 Apr 2025 14:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32741E9907;
+	Wed, 16 Apr 2025 14:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="w1gCc6/U"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VkmcCs9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F771B042E
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 14:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D581422087
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 14:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744812051; cv=none; b=lgTalcTZlnWsK0k2MDuVAnPZv/cdlSjXr+R2L7cSD8bw07y/WU6LNxhaps2ooLDbnYQm1s3vYY34hN/3HPLSU/MP4x9INljcqGu/AE8hNF5/Uk8dn7Yn5rs6aHJANfhEj+6eTKNYBlKb7fGkwVve9GDXh2gMEREksrfF502oKPk=
+	t=1744812754; cv=none; b=JpEZe0HOYsdg0OcligL6O+WJVqHf6X2E+926JqmHac/YkLGVl8+4C1vD67rJyjnLAk1/rwLTIhtjU5CRcmz0YxzMMqWLCCZvq2XZZ3ZlHxx39fix5eO392/kb1p/J8hVh1xkxK7awFpHe8Nqu5AxQo/n+JivSzEmHPjbuBF1/6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744812051; c=relaxed/simple;
-	bh=oraib7zOH3boZOyNP2NfBNntBUxMqQyjHvBjd3k1yD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tW63iyPfBtYGPVnL6jnEi64YiUSjIn25oqmwG3ted3ivKUPZbySAc9LiK+/f6ROZeVg9+3wgFWr20iS1oF7kQNfrJnkBra59IF3pzrAjwnCdtv1Z+Ip9K7wv88TrK/kODpuDXgPhdec83ktUeowrajiNxBPrGNElfJc8aMJ2SK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=w1gCc6/U; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-60208b7a6d6so1803400eaf.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 07:00:48 -0700 (PDT)
+	s=arc-20240116; t=1744812754; c=relaxed/simple;
+	bh=2s+qLk2U3a+EzOH4m6ZiaOfpEOAjo8wCD95K5dsr6SQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=go1p1P35LNtrML3NvE7YictFIsTWXSivfd+DL0F3+HUarhvh7SL+SwlUz+OAXD8z4pda6sAqpvS5K5571oT2aLdoEywkd42381wuqNP7+5IuqVQ9YyNmfTQbWxOEhdo8D9aGXFGODwNCemjkmZc/EPN4XxuCDo9a0Yk0umFnf4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VkmcCs9B; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso1278280266b.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 07:12:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744812048; x=1745416848; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1744812751; x=1745417551; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=5Q+VK6lwMdiK2HjCiZaR6gJ7FPBmf+K3pu4U+CKGrnE=;
-        b=w1gCc6/U2h/yrWWJRHTJ6Z2ks8qcNTTcblhULrxT7c5wizXcgLpSt9Tdb2PqrZ6RQd
-         cHVc9VBDkiFF61iRYlUIcOhIaHL5vrFmxiENNiDHZOtNUbix9kSI0uBuhBcPnPSMBdNj
-         6Ois+PEvSPyjCf1JCpou+jwGgD5C9CKEk6ecbmJBGsiGCFQaiMVkQmXzLu01hJ2ImGN7
-         49gDtHOCnNy4ANo+fuWBFoKad9HFv+gYsPOTK2ERabEiRIyeiICidml6RjpEMzlgx9hH
-         vx5myo8GOwvi/wIO6a2yBIuQ/cywYZiVeG9gRWghgbLGpUAV0+GkEdrfhVYY6E8Ik5/+
-         ZR6w==
+        bh=sUYZgkfwAV78Z4x6r6/5N0tlL1jns0sl3ZPFzocprKs=;
+        b=VkmcCs9Byf2fe2P01TRhezSxy3aWn4/VnpyluGcQLz/QK4mqzkcrbvSm4Aqf35jROY
+         sFI79E2teXnNFDAVZhDZ+CDTJLZ2m0iyl10aA2z0S85xLLAQgWATgFFeVMel8YEPxL2g
+         zpUZ9UoSZhTre/9zTeHLyr6w4bWX8zFFOESTtkRI4diz/Qi2Okzk28awMuANOdYF1/GL
+         qP4k/+YM3Cy37kSd/r1pFe3RFg4MCeIx4NzQP2KyAZRC0tkAyuBUgW+fpzYa9YP16tL4
+         pDNLzRslwQPyZOdUe2/MAELuULIO/KEuuzyeIfAiT/HP90Ug8tWGnW9wXl1RgrarpWz9
+         RQKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744812048; x=1745416848;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1744812751; x=1745417551;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Q+VK6lwMdiK2HjCiZaR6gJ7FPBmf+K3pu4U+CKGrnE=;
-        b=TrTyvt85dMSjDaebyQSqJVknCP/sVdVnB32Klw7E0F2wFboOYGG9u0I9jKMsNrJ0uX
-         xblk79Ea9fQ5oQCAEXNHoLmBtJXJCK3O55pcJmx031Vc0USUM1yFKzsEZ4CEVCqh/QpF
-         J/gku5IKCfY90faryqSe7mOhH1QcUcpCTaQkpCAgty6imw9rVkcE7Wra1s8txcJtfJeD
-         akEJyGo/4t3pBZS7hNZzQpQ34EotC0ShLZmj1k1MFV0CwNQnzWWa0fhHFJ4jXbzUH2TX
-         9GGQATwvUdnEQ3k6DbX6u1PfOWJg4DkvwE9FulFEWntqGkudi9Iwmk2VQg6uFtLKYPtY
-         xbrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsl6VueikOYqjxfZO7cXecOQhEnd5q4odCAqqUNSZnx4nozlY3K1RKOA87+wgqgbRJcvHLMdI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBD9POEK0TCULUcod+sRyspOicpvBJzPmwEL3PRt7LlfIslmfW
-	g6NRLUgzTfpYyTR7FldaIYRXHmAlRT5Co0yyg4gxL8fFHhfUC7ZTz4rCNejMiEkLcBmZr8e60U4
-	6qw==
-X-Gm-Gg: ASbGncuCTKJx7QIUXR7BF9EndJl2Sj55rwFE5eirvyAJkz2VtSVXQlkH2cddtf8vQj2
-	qgrxrqNcY2sVhcZtxeU5bLPJyuyhd8eJM28ju6edkIcSOtpkX9yI/n5VbEb1mrHvCEswWbWQJU1
-	VD/rVtEd4sVY8EHrqzycdqfzzjHlnr0krDIkzOtOlsLE2umlB1qTcbcRTRJBJCutDolNzQrLLAu
-	ki8DoL9Pss84i1b++R0Qemc1AtzZvd9tNbN4BYETv4AdosKoCQ8LZe/uy1/xcEA+2i8BOApCqDZ
-	E3hPtGyklWEn8E5VbUqfYfizi84U2VtOOPUIIwPowcOS5obvh7ck0iYp1uCWAVQuOYX/wrqkC0D
-	IT18eMp+RnLM=
-X-Google-Smtp-Source: AGHT+IFQ3LNuBEeENP6A6Anhn9u1qTz/q6X7tw3M5Uh4kB5k5N0rlo6OPU1WKAj+SEWvfKT946CJJw==
-X-Received: by 2002:a05:6820:c90:b0:603:f1b5:ca02 with SMTP id 006d021491bc7-604a92b004cmr1088895eaf.6.1744812046420;
-        Wed, 16 Apr 2025 07:00:46 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c3:dc7b:da12:1e53:d800:3508? ([2804:7f1:e2c3:dc7b:da12:1e53:d800:3508])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-604a5b6379dsm347281eaf.2.2025.04.16.07.00.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 07:00:45 -0700 (PDT)
-Message-ID: <8272f999-fe55-4afb-894a-57a7cc161473@mojatatu.com>
-Date: Wed, 16 Apr 2025 11:00:35 -0300
+        bh=sUYZgkfwAV78Z4x6r6/5N0tlL1jns0sl3ZPFzocprKs=;
+        b=SsWWlZvOxfmUpLj4rmdP5cTyjuEu5nl5PlPSiHJOCY9L40wcdg0ZEhsCNI1j6O7wXo
+         4JGLv8xADyJdmBM0MXyBWizkwhpynYpyt1lid/5KGqd9F93XmRvS7SQ3LaM5Q23Y5gHF
+         BFhtyQ/FIpMKQ9oWzKap8KwZDi+eBrEcr1r86I3mMTefEa/WbRi4eYKkfJJZDzL+Fugw
+         zb5nJGimIJCY13NM3ZbBaBFZAMzdoc6t0nrYR0WhXk38CRMlDip+4F1U7qnsA0kq/d7V
+         86rCb9FGtc10XI76N3rM3saL/iiB5U3kFrqOCH862a4tXDF30l9N2DkwE/EiEPq1iS1l
+         dMlA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+e/KaXnem5JfVrOfD0/AlyJlhVichjNFDnWM53eXfLbi63rSA6ojYb3dayqT6hhFSX2/TuLg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOL/fHT2l25ncdXrPxkg5/gZVOeGvIxA1FacGrPSA0BFdTkZls
+	ldmYr5d48dWPGxCfeXk9Q0vB8YT8K4HuA3co8+sJVoZhjF+ofpVulHo8L2Bd/MY=
+X-Gm-Gg: ASbGncu7IpPs9qb7hw5pnL06oTbPyUCXr3XpvNSV/+kS9cddrqak5wktBofNxz25NS4
+	5xyoeRQsLQbeSBDbhUx9TmSGJT/+tF/hWiKanhxE1M2vQwJ/XTLkOaYPn88163Sp8T4Ax8oqFO5
+	r/6ybe28WH9rncp/Iy2A/O9ez3gtNPq+qf7hmqSLvCZFHJoj3DPKjx6fghyF459v9ARWEhn4yDQ
+	4QsLikj/6OlKqzmARF1puYh1llbfSjZ2kcwR1RdsBCvBzrI01diN3CpVTdsqKVQT/2KPg4AHrBF
+	wNnYVng4leHk2tzAx7AN1lyvhH5urjiXHGSgP4GeGMwdqg==
+X-Google-Smtp-Source: AGHT+IEJ1ZeANIwHFuDY6t3y6GnlsaIDC5gJg8oKFtln1tdudBv3h9RxhlbJSv4sZ46zKC2jgRE1hA==
+X-Received: by 2002:a17:906:6a0d:b0:aca:ea78:6415 with SMTP id a640c23a62f3a-acb42cfbe1bmr189059066b.56.1744812750744;
+        Wed, 16 Apr 2025 07:12:30 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5f36ef61911sm8536186a12.32.2025.04.16.07.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 07:12:27 -0700 (PDT)
+Date: Wed, 16 Apr 2025 17:12:24 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-afs@lists.infradead.org, netdev@vger.kernel.org
+Subject: [bug report] rxrpc: rxgk: Implement the yfs-rxgk security class
+ (GSSAPI)
+Message-ID: <Z_-6yKUdJO0yDe9-@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 net-next 2/5] selftests/tc-testing: Add selftests for
- qdisc DualPI2
-To: Jakub Kicinski <kuba@kernel.org>, chia-yu.chang@nokia-bell-labs.com
-Cc: xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
- pabeni@redhat.com, jhs@mojatatu.com, stephen@networkplumber.org,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250415124317.11561-1-chia-yu.chang@nokia-bell-labs.com>
- <20250415124317.11561-3-chia-yu.chang@nokia-bell-labs.com>
- <20250416065223.4e4c4379@kernel.org>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20250416065223.4e4c4379@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 4/16/25 10:52, Jakub Kicinski wrote:
-> On Tue, 15 Apr 2025 14:43:14 +0200 chia-yu.chang@nokia-bell-labs.com
-> wrote:
->> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->>
->> Update configuration of tc-tests and preload DualPI2 module for self-tests,
->> and add folloiwng self-test cases for DualPI2:
->>
->>    Test a4c7: Create DualPI2 with default setting
->>    Test 2130: Create DualPI2 with typical_rtt and max_rtt
->>    Test 90c1: Create DualPI2 with max_rtt
->>    Test 7b3c: Create DualPI2 with any_ect option
->>    Test 49a3: Create DualPI2 with overflow option
->>    Test d0a1: Create DualPI2 with drop_enqueue option
->>    Test f051: Create DualPI2 with no_split_gso option
-> 
-> it appears applying this causes the tdc test runner to break,
-> could you take a look?
-> 
-> https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/79725/1-tdc-sh/stdout
+Hello David Howells,
 
-It seems like the breakage happens because the iproute2 patch
-is not in yet. I applied the iproute2 patch locally and the
-tests succeeded. The next iteration should run with it applied
-so the breakage should stop.
+Commit 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security
+class (GSSAPI)") from Apr 11, 2025 (linux-next), leads to the
+following Smatch static checker warning:
 
-cheers,
-Victor
+	net/rxrpc/rxgk_app.c:240 rxgk_extract_token()
+	error: uninitialized symbol 'ec'.
+
+net/rxrpc/rxgk_app.c
+    180 int rxgk_extract_token(struct rxrpc_connection *conn, struct sk_buff *skb,
+    181                        unsigned int token_offset, unsigned int token_len,
+    182                        struct key **_key)
+    183 {
+    184         const struct krb5_enctype *krb5;
+    185         const struct krb5_buffer *server_secret;
+    186         struct crypto_aead *token_enc = NULL;
+    187         struct key *server_key;
+    188         unsigned int ticket_offset, ticket_len;
+    189         u32 kvno, enctype;
+    190         int ret, ec;
+    191 
+    192         struct {
+    193                 __be32 kvno;
+    194                 __be32 enctype;
+    195                 __be32 token_len;
+    196         } container;
+    197 
+    198         /* Decode the RXGK_TokenContainer object.  This tells us which server
+    199          * key we should be using.  We can then fetch the key, get the secret
+    200          * and set up the crypto to extract the token.
+    201          */
+    202         if (skb_copy_bits(skb, token_offset, &container, sizeof(container)) < 0)
+    203                 return rxrpc_abort_conn(conn, skb, RXGK_PACKETSHORT, -EPROTO,
+    204                                         rxgk_abort_resp_tok_short);
+    205 
+    206         kvno                = ntohl(container.kvno);
+    207         enctype                = ntohl(container.enctype);
+    208         ticket_len        = ntohl(container.token_len);
+    209         ticket_offset        = token_offset + sizeof(container);
+    210 
+    211         if (xdr_round_up(ticket_len) > token_len - 3 * 4)
+    212                 return rxrpc_abort_conn(conn, skb, RXGK_PACKETSHORT, -EPROTO,
+    213                                         rxgk_abort_resp_tok_short);
+    214 
+    215         _debug("KVNO %u", kvno);
+    216         _debug("ENC  %u", enctype);
+    217         _debug("TLEN %u", ticket_len);
+    218 
+    219         server_key = rxrpc_look_up_server_security(conn, skb, kvno, enctype);
+    220         if (IS_ERR(server_key))
+    221                 goto cant_get_server_key;
+    222 
+    223         down_read(&server_key->sem);
+    224         server_secret = (const void *)&server_key->payload.data[2];
+    225         ret = rxgk_set_up_token_cipher(server_secret, &token_enc, enctype, &krb5, GFP_NOFS);
+    226         up_read(&server_key->sem);
+    227         key_put(server_key);
+    228         if (ret < 0)
+    229                 goto cant_get_token;
+    230 
+    231         /* We can now decrypt and parse the token/ticket.  This allows us to
+    232          * gain access to K0, from which we can derive the transport key and
+    233          * thence decode the authenticator.
+    234          */
+    235         ret = rxgk_decrypt_skb(krb5, token_enc, skb,
+    236                                &ticket_offset, &ticket_len, &ec);
+                                                                    ^^^
+ec is only sometimes set here.
+
+    237         crypto_free_aead(token_enc);
+    238         token_enc = NULL;
+--> 239         if (ret < 0)
+    240                 return rxrpc_abort_conn(conn, skb, ec, ret,
+                                                           ^^
+This is Undefined Behavior.
+
+    241                                         rxgk_abort_resp_tok_dec);
+    242 
+    243         ret = conn->security->default_decode_ticket(conn, skb, ticket_offset,
+    244                                                     ticket_len, _key);
+    245         if (ret < 0)
+
+regards,
+dan carpenter
 
