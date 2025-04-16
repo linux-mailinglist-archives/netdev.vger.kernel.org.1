@@ -1,155 +1,136 @@
-Return-Path: <netdev+bounces-183256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8394FA8B7B1
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:30:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B32A8B7B7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 081303BEF8B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:29:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB0CB1901AB3
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B4423D2BA;
-	Wed, 16 Apr 2025 11:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A9F207643;
+	Wed, 16 Apr 2025 11:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QxFpLY36"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sku/zFdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50C31E5B7D
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C932DFA20;
+	Wed, 16 Apr 2025 11:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744803004; cv=none; b=TT5nLBwYCWb0wuTTgg5DE5X93vHPj3gXqXgpadfEpWa6lr6r0z+9O5qTziWWpqkvWJHzvIUdwb4V06SpCEcWqBhQqDFyHqFD00KO/Wa3SsqIYEFPcr6rzH91+SX33h+Qi08Eyuo6zcxBw0KL4kptVUqYWAy+m4bzDRZbuyyADNA=
+	t=1744803174; cv=none; b=hCt9Mk6xwPcuuNOpI0ysFvaI7T6FDufnTazgg1CO13qONtreA+6whRKGJiTaRHs+d2vue+FSc0IRZy129S+nc3M2yq0bTm5OAWKQrLAMQd9u8x0MtTPEFbjCuAPrtg132AXHkPd19u/cvELEZRQbr6WJXDdzcOD9GNy0+zXUwEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744803004; c=relaxed/simple;
-	bh=OjGOcMClYqNlLex2fBnE6FzvSS+RJVTgH2eVGsrOqjo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=jMmBqeDo229eNGCGI1dPCqfVoeUZVI02lmB/+6/Q8eh38r/NU7iqnVFQqZmpgyeCMUo7dJu6PBChvSGfvl/Rz9LLlIXmOm798VKGUFWjKt5F7Xpdd9Hf234GTwCQq0sUekFPVNd38LWrJu4SVrPT8LUu20bJfxqI9P2xbDOsgaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=QxFpLY36; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250416112958euoutp013ce620ed5497db35229f7b09d44524f8~2yRVKkIzP1212512125euoutp01e
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:29:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250416112958euoutp013ce620ed5497db35229f7b09d44524f8~2yRVKkIzP1212512125euoutp01e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1744802998;
-	bh=+rfveBj9GE4cfZwlls5aVeex988AmgxoRWVksvLkYnY=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=QxFpLY36CVkUv8XaBxwCZbsU2WwmCg4glbeVDTLsxxqu0g/nBSL8pw3kuMvcBP0FE
-	 gjKt87kp/8oLjNeP7tzFZDfKw2EBW+XgK7Kh4EOQT4hp3z3wYOsVnqnu4gg/HvklKP
-	 vjK52A0H3OOHHxPh0ZPZkCH1Ocghgc2HAWctkUs4=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20250416112957eucas1p2ce83ea39dd70f7e1c02c7c8472f821b6~2yRTxydEW0440004400eucas1p2v;
-	Wed, 16 Apr 2025 11:29:57 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id E7.18.20821.5B49FF76; Wed, 16
-	Apr 2025 12:29:57 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250416112956eucas1p1977ffda6af7fa81c3e46cadc93c30de3~2yRTOGMi61410114101eucas1p1s;
-	Wed, 16 Apr 2025 11:29:56 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20250416112956eusmtrp2cbd3c9539b11e9d2f8ab61ba62d284f5~2yRTNjBYb0434704347eusmtrp2S;
-	Wed, 16 Apr 2025 11:29:56 +0000 (GMT)
-X-AuditID: cbfec7f2-b09c370000005155-44-67ff94b50700
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id F4.74.19654.4B49FF76; Wed, 16
-	Apr 2025 12:29:56 +0100 (BST)
-Received: from panorka.. (unknown [106.210.135.126]) by eusmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250416112955eusmtip230ef002cc48935b9994d9fe67c9d3190~2yRSSCajO0284402844eusmtip27;
-	Wed, 16 Apr 2025 11:29:55 +0000 (GMT)
-From: "e.kubanski" <e.kubanski@partner.samsung.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, "e.kubanski"
-	<e.kubanski@partner.samsung.com>
-Subject: [PATCH v2 bpf] xsk: Fix offset calculation in unaligned mode
-Date: Wed, 16 Apr 2025 13:29:25 +0200
-Message-Id: <20250416112925.7501-1-e.kubanski@partner.samsung.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744803174; c=relaxed/simple;
+	bh=efnmkQJ/5G5/XO5EjFi5krAApWb4IBgDqiS+fcGiNIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qcwfI9uvUNREd4bXp5mONe0XVX8wbU7eK7i0Z1NXm8nI+qvqnHZdDvDAO9ZXq5kDNOfGDC2Dwa3W/7TuLTotX4CAbU/S2mEXYuJePjmK3rt7HVsqKG05xzHxzWwlidlQMfDEBmju7GpLoScc8FlTQB7LAMhdV1OpYI4UgFC+15Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sku/zFdj; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744803173; x=1776339173;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=efnmkQJ/5G5/XO5EjFi5krAApWb4IBgDqiS+fcGiNIk=;
+  b=Sku/zFdj6K8UBPSEEiFUY9OhoDJljGKie+WNIUmtPji8r3RjQpMrclR1
+   jZv8hK6tCu4WcFABwY0eeCc1Sc55Oa/Q7TJi3CnM46DDrNkX+hOer7Qow
+   ZAQIUl6Bu6Ov4rHPWAoijOx1Z/mjV80fAqOtxSIsXXy6LIOaH3o3/ZIE9
+   fKNeVN3rxjtb09F+jQbtmwTD/tHoRkgnpzzDA8iRfCeSOKM3fZ8S48Fdm
+   rcU/1LH/c+gaUyNTIyPz2L6LDisFDNFi5iDxbiF/3skh6Kx0NQCg0Vbnz
+   IweRGq2SGtAGZt5lGFmlHSCv9kgNsGT59DqJPe6ImuiT8QfXZbySpilN1
+   g==;
+X-CSE-ConnectionGUID: nmj/GpeQRQGaBJrGxsbg1A==
+X-CSE-MsgGUID: Q67wEkzLRqalokK7OFjM9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="56524134"
+X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
+   d="scan'208";a="56524134"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 04:32:52 -0700
+X-CSE-ConnectionGUID: RNI6yJ5XRgWgKbqtIFosMg==
+X-CSE-MsgGUID: 639qDp0LT5KT6h9/5/g6QA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
+   d="scan'208";a="135302581"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 04:32:48 -0700
+Date: Wed, 16 Apr 2025 13:32:29 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: =?utf-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?= <a.vatoropin@crpt.ru>
+Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Padmanabh Ratnakar <padmanabh.ratnakar@emulex.com>,
+	Mammatha Edhala <mammatha.edhala@emulex.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH] be2net: Remove potential access to the zero address
+Message-ID: <Z/+VTcHpQMJ3ioCM@mev-dev.igk.intel.com>
+References: <20250416105542.118371-1-a.vatoropin@crpt.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupjleLIzCtJLcpLzFFi42LZduznOd2tU/6nGxxdLWax9f0qFosHs5cy
-	W+xaN5PZ4vKuOWwWN48/Z7FYcegEu8WxBWIO7B47Z91l91i85yWTx6ZVnWweB9/tYfL4vEku
-	gDWKyyYlNSezLLVI3y6BK2PJ8atMBZ/YK84/XcPYwHierYuRk0NCwETix45Z7F2MXBxCAisY
-	JX7c6WGFcL4wSqzeeA/K+cwocW9nGzNMy+/LIO0gieWMEn1zpkE5Lxkl7hzdwQRSxSZgLNH0
-	fT8LiC0iYCGxadE3sFHMArMYJZbs2QWU4OAQFnCVuPAxGaSGRUBVYt+/mUAb2Dl4BZwkdsVC
-	7JKX2H/wLNheXgFBiZMzn4BNZAaKN2+dzQwyUUJgIYfE4m1zWCEaXCTuzbsD9ZuwxKvjW9gh
-	bBmJ/zvnM0E0NDNKzJrZyQ7h9DBKrLl6hRHkHgkBa4m1J21BTGYBTYn1u/Qhoo4SW68VQ5h8
-	EjfeCkKcwCcxadt0Zogwr0RHmxDEIh2JGxefQy2Vkvg+czMLhO0h8eXcZrBPhARiJaYcnMg6
-	gVFhFpLHZiF5bBbCCQsYmVcxiqeWFuempxYb5qWW6xUn5haX5qXrJefnbmIEJpnT/45/2sE4
-	99VHvUOMTByMhxglOJiVRHjPmf9LF+JNSaysSi3Kjy8qzUktPsQozcGiJM67aH9rupBAemJJ
-	anZqakFqEUyWiYNTqoHJ0+PgnyV75Y24TgfnHPotxZVcL3NJ/n9rpYrUx8NfVBViK06lzdOO
-	Uj/DrnWEp45n08VzByYmr/692GBJfPSvD84Fllqrn79+d3HbRX6tzU5ewbu2skyd26XWbvjt
-	Wvxabe+Qap+1n7cFm343fs1UsdJW7lfiCtv5TAJPt9pLW2f7V2qmcBiss7TJMPxwdO+j5kj7
-	GfHrlqzl2Ko2UUxv8bf2nRX7Cg/IRN/YfaaurSxfs6Vpi5yIvML+vNVaGtPvzvp4emtU+olf
-	dgEsqi/szjz7k/nSbvvjHc23d6xI4nj/s3bJNvatR98rL5tR+Wmdg8+uLw4SnqHsfz9ONqt7
-	6vI3/t+Gz64pD8KPPrH/p8RSnJFoqMVcVJwIACUrs+6hAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsVy+t/xe7pbpvxPN1gwQ9ti6/tVLBYPZi9l
-	tti1biazxeVdc9gsbh5/zmKx4tAJdotjC8Qc2D12zrrL7rF4z0smj02rOtk8Dr7bw+TxeZNc
-	AGuUnk1RfmlJqkJGfnGJrVK0oYWRnqGlhZ6RiaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsaS
-	41eZCj6xV5x/uoaxgfE8WxcjJ4eEgInE78sgNheHkMBSRonLk14yQiSkJP6s+8MMYQtL/LnW
-	BVX0nFHi7ssJTCAJNgFjiabv+1lAbBEBK4kHt/8xgxQxC8xjlJizaz1rFyMHh7CAq8SFj8kg
-	NSwCqhL7/s0EqmHn4BVwktgVCzFeXmL/wbNgq3gFBCVOznwCNpEZKN68dTbzBEa+WUhSs5Ck
-	FjAyrWIUSS0tzk3PLTbSK07MLS7NS9dLzs/dxAgM723Hfm7Zwbjy1Ue9Q4xMHIyHGCU4mJVE
-	eM+Z/0sX4k1JrKxKLcqPLyrNSS0+xGgKdN1EZinR5HxghOWVxBuaGZgamphZGphamhkrifOy
-	XTmfJiSQnliSmp2aWpBaBNPHxMEp1cDUI7nl08WZp2ZaZj1RTCmeOen993Kf7DcMCnHb1fPq
-	0mVKQxfv3NEn8lmUr/jDViXhG/v/xE/4zdxyfNFjmy1Wcy54LJn6V1Gk/ovGFbaZq6IWrvj3
-	dn9X4OzUXXHGnn8Fem/frBGxXqPbGHcyJaZ+3hKdRQ0BrcFsYouS/7wxUrD8p/Vy3zqhzTXy
-	t36/YLJJ+apYExJi6DXLULaxbeOlxmsfdv2cLnSppP9R57Zlsv7POufcKjOzW9Pm/vHRWrn0
-	S2GrdGbeSlP4IMJzZ46G9QvJG+KRXnt4F8cxsXMc3t4cKsxj0VHMUaZrN0HmvnuVT9tRJT0+
-	lk9SkpaS19SqHxsf2lIc8u+1wbHL1wuVWIozEg21mIuKEwE9HsxB+AIAAA==
-X-CMS-MailID: 20250416112956eucas1p1977ffda6af7fa81c3e46cadc93c30de3
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250416112956eucas1p1977ffda6af7fa81c3e46cadc93c30de3
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20250416112956eucas1p1977ffda6af7fa81c3e46cadc93c30de3
-References: <CGME20250416112956eucas1p1977ffda6af7fa81c3e46cadc93c30de3@eucas1p1.samsung.com>
+In-Reply-To: <20250416105542.118371-1-a.vatoropin@crpt.ru>
 
-Bring back previous offset calculation behaviour
-in AF_XDP unaligned umem mode.
+On Wed, Apr 16, 2025 at 10:55:47AM +0000, Ваторопин Андрей wrote:
+> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
+> 
+> At the moment of calling the function be_cmd_get_mac_from_list() with the
+> following parameters:
+> be_cmd_get_mac_from_list(adapter, mac, &pmac_valid, NULL, 
+> 					adapter->if_handle, 0);
 
-In unaligned mode, upper 16 bits should contain
-data offset, lower 48 bits should contain
-only specific chunk location without offset.
+Looks like pmac_valid needs to be false to reach *pmac_id assign.
 
-Remove pool->headroom duplication into 48bit address.
+> 
+> The parameter "pmac_id" equals NULL.
+> 
+> Then, if "mac_addr_size" equals four bytes, there is a possibility of
+> accessing the zero address via the pointer "pmac_id".
+> 
+> Add an extra check for the pointer "pmac_id" to avoid accessing the zero
+> address.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>        
+> Fixes: e5e1ee894615 ("be2net: Use new implementation of get mac list command")
+> Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
+> ---
+>  drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
+> index 51b8377edd1d..be5bbf6881b8 100644
+> --- a/drivers/net/ethernet/emulex/benet/be_cmds.c
+> +++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
+> @@ -3757,7 +3757,7 @@ int be_cmd_get_mac_from_list(struct be_adapter *adapter, u8 *mac,
+>  			/* mac_id is a 32 bit value and mac_addr size
+>  			 * is 6 bytes
+>  			 */
+> -			if (mac_addr_size == sizeof(u32)) {
+> +			if (pmac_id && mac_addr_size == sizeof(u32)) {
+>  				*pmac_id_valid = true;
+>  				mac_id = mac_entry->mac_addr_id.s_mac_id.mac_id;
+>  				*pmac_id = le32_to_cpu(mac_id);
 
-Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-Fixes: bea14124bacb ("xsk: Get rid of xdp_buff_xsk::orig_addr")
----
- include/net/xsk_buff_pool.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for fixing.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 7f0a75d6563d..b3699a848844 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -232,8 +232,8 @@ static inline u64 xp_get_handle(struct xdp_buff_xsk *xskb,
- 		return orig_addr;
- 
- 	offset = xskb->xdp.data - xskb->xdp.data_hard_start;
--	orig_addr -= offset;
- 	offset += pool->headroom;
-+	orig_addr -= offset;
- 	return orig_addr + (offset << XSK_UNALIGNED_BUF_OFFSET_SHIFT);
- }
- 
--- 
-2.34.1
-
+> -- 
+> 2.43.0
 
