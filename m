@@ -1,142 +1,192 @@
-Return-Path: <netdev+bounces-183447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A8DA90B4A
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93BB6A90B4F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA6EF3BD80C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:29:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13FFC3AF714
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65AC221D94;
-	Wed, 16 Apr 2025 18:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2DC222585;
+	Wed, 16 Apr 2025 18:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GLIuSvsp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dkc+DPri"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2A0219A68
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB051FECA1;
+	Wed, 16 Apr 2025 18:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744828190; cv=none; b=ZU5i9mz0xfx3J4IWBEjo95cXpDStWewy6ysa1+BzlWMtSZW1X78Q3kaL8HG1OcGDw6g1QyatXYp3wCcGuoIiTHc08rbGQq4mO7IaQuhpSJZPxJ+2QCFvn3C1IbD7VYRuUGTzJyND8ll4kN3wEyj5Ng9KXWjcmkCvbHUC2FNW/1g=
+	t=1744828244; cv=none; b=WK5CUfRc/o0C0TjCzBlsVDSLMC4cAorGeDb71BMXLk7eO4zqQzQ1sfDym1oJj1TAb27wQpahtKD+ylBQKu9Z/7D/0XShKV/SuGgsAgvRd6XKFg4Wn1d/YNDGgsbvgxWp8N9Bq/fmp/6teLOGwRpwji6HJqtZd9X0Mh9ZkE2cqSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744828190; c=relaxed/simple;
-	bh=7izFUHwou8CGTKQBC+Pj5lbCiJDPpF4vHPruu69zHJQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AJ6jTZN7laCTJZsTsPBc6nyXzmQaSThA7T4sCpqwcFTETcUOlyjkaZbtLveDt5TT7VYnFpEj9/3Ks0717xZuDBLJBaSXnJn8hdJ8ebY77a0Gwz3Vtvxg9xr//E7OrjLQKWh40SrM2jiaWsLih4vkLzSOzWyZNvceGebVzVDQonQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GLIuSvsp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744828188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwx5WjZbeRXciIDl7fHepP+WhVSAom/fNWecyvJ7Kms=;
-	b=GLIuSvsp1trp0B5lWVIZaq1OlTEI8CP4LrtmRp2DCn07bejcbm9Hf3SbqJgj15tw3Vka0O
-	h9zXkGd84wdIV190rn+SopqxxB8MnGu8ELGrfN698FaWsGR7/4NRAGD8/nwznGUEI0DMxZ
-	x9vxyCoGfT0TyeWSw1cvG4F7ymeFdR0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-BOxMkQBSOOSRGQBJt7kNJw-1; Wed, 16 Apr 2025 14:29:46 -0400
-X-MC-Unique: BOxMkQBSOOSRGQBJt7kNJw-1
-X-Mimecast-MFC-AGG-ID: BOxMkQBSOOSRGQBJt7kNJw_1744828186
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e5c03580aaso5498809a12.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 11:29:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744828185; x=1745432985;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bwx5WjZbeRXciIDl7fHepP+WhVSAom/fNWecyvJ7Kms=;
-        b=jMGfP2GhJRD8jiziC0RkbXUw7Xqwuhv8iNpOTmqNC5GobJ4j6/yg+zdCuGXpwdfU0i
-         IUJevWDEPnCgpp+R8rjUd4jYKVL/P5BUXnbEBRFVTFHBsaqOujLsulGZlp+PtpBZUhwz
-         vU/cE+0zecd3bs2rIBQLgjG7NGcKcvxdkLwNi1yMIfkFuEW611/oywX9C8WBgT5KBHew
-         uECrdSBwnnISujNp/WZ4Y2Suju8zuLODEZJxuihwyVoBq9OtG7f11V0kwngc9QpwC9+A
-         ggNPuK0DL8CgNg/MvoeB86pt4AZwlLm0js2U/ClDzGsXJ11E/bTJHAa7sLTwydK8xW7W
-         1bIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVARhEyR1E7D3jb1/5q4PeRbo7BCaTpOX6UkH4grWt4/VUbxsbVS+v7aQFnqmSdNPKi7UUXsmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlCdlq6PSWlytV9eEWocLNfmpWbQYSjjgYNgjSWLAPlm3amkNt
-	RI4VC/shS8/Smo+H0aiPIN8zuXg+phb4UNhP8MOebP1aYCZZGBvXMPtGW2DAw90SJh1EYLQoTP8
-	EgQy1lkNFRccYxelmhJPATZUuX1UuIHYE3Fz2rBse+1Xeci4hFe/gMRADOAsOL6j0cTR1Ye7W6l
-	iRWM99QxRJ+eoY3pyNjbtypXIPcscR
-X-Gm-Gg: ASbGncu39E09H0iGMttG2lMmDXp4XsBEy/RmU0l21o02SJ4PKiGE6fCf9pc5Mg6D5BR
-	15lGaGWrdhfqDdYj8oGxrnFIGoKaEYkPbBF6WTfG3ciRzsEMeTCEV5JXMp1YsHhxwqV1fNBGWTU
-	/xnsT6/uw+s79H8OFDezCt26I=
-X-Received: by 2002:a05:6402:3512:b0:5ec:96a6:e1cd with SMTP id 4fb4d7f45d1cf-5f4b71ea271mr2425974a12.2.1744828185634;
-        Wed, 16 Apr 2025 11:29:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGF/O1rE4UuagKpLxQYRmJg58OWmw/yYHcF3mGNfOJqHYqMB1tcEn3p6wwEn2otzHPid/a/IRWXPHhHp9kWxYU=
-X-Received: by 2002:a05:6402:3512:b0:5ec:96a6:e1cd with SMTP id
- 4fb4d7f45d1cf-5f4b71ea271mr2425953a12.2.1744828185248; Wed, 16 Apr 2025
- 11:29:45 -0700 (PDT)
+	s=arc-20240116; t=1744828244; c=relaxed/simple;
+	bh=FtZSOzbuxkOduJR1lakYFkXwUTsnS2uQuQ6BlIYoafM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=NanVpM53Qz+h/favyzowllalVOU0aAfGpbazkeEPll+3f/stCBYcfDBkvnbhhVMC9/x5e50ktkVT5aGhiM293su0bLAOPh2ks5D9SxnBMuCEVm5m5GW+c6gw1pQHPt74it6B3M5ggqvzbgjHhfHgUrQ8jEJ7RZ1/bTmd3m0RiZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dkc+DPri; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C38A1C4CEE2;
+	Wed, 16 Apr 2025 18:30:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744828244;
+	bh=FtZSOzbuxkOduJR1lakYFkXwUTsnS2uQuQ6BlIYoafM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Dkc+DPribskYpXulLARA2qfxHuOKnPJK522qjkDfC/CvWJYDCSqq2JIQVX6SGeAx5
+	 Od5OH8ivxowsjOo8w7qwHhHndrJk1olCkfwgOlyEgygqOKc5JjlHhhTXiFOKoLFY00
+	 PqjWbZqJl5SktRxWcreUspNGLmdvffIteF3Xc83EbP2DoK09twzCLyF26YckI6HbIH
+	 1EvofkN5gdneQ1L6yvndjw3jOjEab8ReFwlNXKZGZdJXOj9RZ1tlH0UG0qrPntj2LZ
+	 gHCAf1l2lhuo0zxLHC7oYStPBuB8z/xb4wC0ZkkUe1GajfHarPCLBiDkrx7FS57EIV
+	 Qwr4SimLxB3RQ==
+Date: Wed, 16 Apr 2025 13:30:42 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
+	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Shivamurthy Shastri <shivamurthy.shastri@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH 1/2] PCI: hv: enable pci_hyperv to allow dynamic vector
+ allocation
+Message-ID: <20250416183042.GA75515@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416162144.670760-1-ivecera@redhat.com> <20250416162144.670760-3-ivecera@redhat.com>
- <174482532098.3485034.14305412993449574460.robh@kernel.org>
-In-Reply-To: <174482532098.3485034.14305412993449574460.robh@kernel.org>
-From: Ivan Vecera <ivecera@redhat.com>
-Date: Wed, 16 Apr 2025 20:29:33 +0200
-X-Gm-Features: ATxdqUFxjsZ_qFD__UPQiAZpI42mRoG1aY9Q_T20uCxi5IG-wqWWDZ5JjJEfrNM
-Message-ID: <CAAVpwAurYhW1Eyw7C_gPY0cTrQJrw7o_FL3-npLdWsxE=FGXkg@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 2/8] dt-bindings: dpll: Add support for
- Microchip Azurite chip family
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Kees Cook <kees@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
-	linux-hardening@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
-	Jiri Pirko <jiri@resnulli.us>, Andy Shevchenko <andy@kernel.org>, devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1744817766-3134-1-git-send-email-shradhagupta@linux.microsoft.com>
 
-On Wed, Apr 16, 2025 at 7:42=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org>=
- wrote:
->
->
-> On Wed, 16 Apr 2025 18:21:38 +0200, Ivan Vecera wrote:
-> > Add DT bindings for Microchip Azurite DPLL chip family. These chips
-> > provides up to 5 independent DPLL channels, 10 differential or
-> > single-ended inputs and 10 differential or 20 single-ended outputs.
-> > It can be connected via I2C or SPI busses.
-> >
-> > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> > ---
-> > v1->v3:
-> > * single file for both i2c & spi
-> > * 5 compatibles for all supported chips from the family
-> > ---
-> >  .../bindings/dpll/microchip,zl30731.yaml      | 115 ++++++++++++++++++
-> >  1 file changed, 115 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl=
-30731.yaml
-> >
->
-> My bot found errors running 'make dt_binding_check' on your patch:
->
-> yamllint warnings/errors:
->
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/d=
-pll/microchip,zl30731.yaml: $id: Cannot determine base path from $id, relat=
-ive path/filename doesn't match actual path or filename
->          $id: http://devicetree.org/schemas/dpll/microchip,zl3073x.yaml
+[+to Thomas]
 
-Oops, my bad... I forgot to update $id after rename of the file...
-Will fix.
+On Wed, Apr 16, 2025 at 08:36:06AM -0700, Shradha Gupta wrote:
+> For supporting dynamic MSI vector allocation by pci controllers, enabling
+> the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN is not enough, msix_prepare_msi_desc()
+> to prepare the desc is needed. Export pci_msix_prepare_desc() to allow pci
+> controllers like pci-hyperv to support dynamic MSI vector allocation.
+> Also, add the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN and use
+> pci_msix_prepare_desc() in pci_hyperv controller
 
-Thanks,
-Ivan
+Follow capitalization convention for subject line.  Probably remove
+"pci_hyperv" since it already contains "PCI: hv" and add something
+about MSI-X.
 
+s/pci/PCI/
+
+s/MSI vector/MSI-X vector/ since the context says you're concerned
+with MSI-X.
+
+This requires an ack from Thomas; moved him to "To:" line.
+
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Long Li <longli@microsoft.com>
+> ---
+>  drivers/pci/controller/pci-hyperv.c | 7 +++++--
+>  drivers/pci/msi/irqdomain.c         | 5 +++--
+>  include/linux/msi.h                 | 2 ++
+>  3 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
+> index ac27bda5ba26..f2fa6bdb6bb8 100644
+> --- a/drivers/pci/controller/pci-hyperv.c
+> +++ b/drivers/pci/controller/pci-hyperv.c
+> @@ -598,7 +598,8 @@ static unsigned int hv_msi_get_int_vector(struct irq_data *data)
+>  	return cfg->vector;
+>  }
+>  
+> -#define hv_msi_prepare		pci_msi_prepare
+> +#define hv_msi_prepare			pci_msi_prepare
+> +#define hv_msix_prepare_desc		pci_msix_prepare_desc
+>  
+>  /**
+>   * hv_arch_irq_unmask() - "Unmask" the IRQ by setting its current
+> @@ -727,6 +728,7 @@ static void hv_arch_irq_unmask(struct irq_data *data)
+>  #define FLOW_HANDLER		NULL
+>  #define FLOW_NAME		NULL
+>  #define hv_msi_prepare		NULL
+> +#define hv_msix_prepare_desc	NULL
+>  
+>  struct hv_pci_chip_data {
+>  	DECLARE_BITMAP(spi_map, HV_PCI_MSI_SPI_NR);
+> @@ -2063,6 +2065,7 @@ static struct irq_chip hv_msi_irq_chip = {
+>  static struct msi_domain_ops hv_msi_ops = {
+>  	.msi_prepare	= hv_msi_prepare,
+>  	.msi_free	= hv_msi_free,
+> +	.prepare_desc	= hv_msix_prepare_desc,
+>  };
+>  
+>  /**
+> @@ -2084,7 +2087,7 @@ static int hv_pcie_init_irq_domain(struct hv_pcibus_device *hbus)
+>  	hbus->msi_info.ops = &hv_msi_ops;
+>  	hbus->msi_info.flags = (MSI_FLAG_USE_DEF_DOM_OPS |
+>  		MSI_FLAG_USE_DEF_CHIP_OPS | MSI_FLAG_MULTI_PCI_MSI |
+> -		MSI_FLAG_PCI_MSIX);
+> +		MSI_FLAG_PCI_MSIX | MSI_FLAG_PCI_MSIX_ALLOC_DYN);
+>  	hbus->msi_info.handler = FLOW_HANDLER;
+>  	hbus->msi_info.handler_name = FLOW_NAME;
+>  	hbus->msi_info.data = hbus;
+> diff --git a/drivers/pci/msi/irqdomain.c b/drivers/pci/msi/irqdomain.c
+> index d7ba8795d60f..43129aa6d6c7 100644
+> --- a/drivers/pci/msi/irqdomain.c
+> +++ b/drivers/pci/msi/irqdomain.c
+> @@ -222,13 +222,14 @@ static void pci_irq_unmask_msix(struct irq_data *data)
+>  	pci_msix_unmask(irq_data_get_msi_desc(data));
+>  }
+>  
+> -static void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> -				  struct msi_desc *desc)
+> +void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> +			   struct msi_desc *desc)
+>  {
+>  	/* Don't fiddle with preallocated MSI descriptors */
+>  	if (!desc->pci.mask_base)
+>  		msix_prepare_msi_desc(to_pci_dev(desc->dev), desc);
+>  }
+> +EXPORT_SYMBOL_GPL(pci_msix_prepare_desc);
+>  
+>  static const struct msi_domain_template pci_msix_template = {
+>  	.chip = {
+> diff --git a/include/linux/msi.h b/include/linux/msi.h
+> index 86e42742fd0f..d5864d5e75c2 100644
+> --- a/include/linux/msi.h
+> +++ b/include/linux/msi.h
+> @@ -691,6 +691,8 @@ struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
+>  					     struct irq_domain *parent);
+>  u32 pci_msi_domain_get_msi_rid(struct irq_domain *domain, struct pci_dev *pdev);
+>  struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev);
+> +void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> +			   struct msi_desc *desc);
+>  #else /* CONFIG_PCI_MSI */
+>  static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
+>  {
+> -- 
+> 2.34.1
+> 
 
