@@ -1,65 +1,69 @@
-Return-Path: <netdev+bounces-183409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37446A909A9
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:11:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6990A909AD
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:12:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 272A01888A83
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C2003A712A
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3513217651;
-	Wed, 16 Apr 2025 17:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5663120DD4D;
+	Wed, 16 Apr 2025 17:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FKV154VC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="m2CQSBML"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8422215F58;
-	Wed, 16 Apr 2025 17:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1B92153EF
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 17:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744823486; cv=none; b=e2sNykYsv+ukjkdAbzHyZaTCaVodg8J51cuoNr8bNE856HE2eQTW18fz07gY+3ovIn6in3Ly6OMfN7eC1saQwbbleTd0tu6NEJfc91ACz3YETe2dueMiDDqrDWLJbmXMc0mpUpIBU0nNRkmbd9MdWDGhm/2SEnnln3PUKn3gDJA=
+	t=1744823535; cv=none; b=kfq0tNNyNlk/bJqUlukxf6hg/c89YskKzsX0kqBkXWzaNmju+kKPvn3hbrN4byhMokxacVCDBRoM7wJLTqGXKQUftP7lAtpQ4oWYwbZAUaz5Xgdq57BpdctMzBuD6kfb8LpiPmy3yQI5cv3+Ryzx+HQm2URZkn79XWoxUIUslIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744823486; c=relaxed/simple;
-	bh=skWqHxqYGGmOuvoixGIuo+FphnkgtdJftOmi9b4Z+4A=;
+	s=arc-20240116; t=1744823535; c=relaxed/simple;
+	bh=LnQyD9HTayIJOgilaa+LKDHInj0rkIYpNtOigaPMGl0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f+kkIaWqucbCUNzB9s6DWx1MUC7eFg+jXfm10kQooJ1S1Tdi/yZVNV51loDzuEatH07kZZcy6I/nd6mF6rllaFgYnd7LwA65NqM6c8pqQqVz7vL+5CNKJzh8YPJZ6hilw89g5yhSiuM/Zc3yMng607o177KQnLjDXMWFqIjbGdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FKV154VC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PwH0xQ4TGHfYspbMLh4NhtU8AvejjRlDTyqMnMx+8PA=; b=FKV154VCzY5M6jCgFvLpavuq5M
-	ptyRaHLtLQ6QPAP3fVgzkmxeuejMrccAq+aNcewvAK73Xr/jarzm3G/L6gTC8VO/iV0XseXlJfMe9
-	VJt58BSvwSMKuWWw55ps1PZmH2tcyNXld0OwxMJw4DhyQs1xy7vqFSsW0crGYeP4Shh4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u56I1-009g7N-O3; Wed, 16 Apr 2025 19:11:09 +0200
-Date: Wed, 16 Apr 2025 19:11:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 3/8] mfd: Add Microchip ZL3073x support
-Message-ID: <8fc9856a-f2be-4e14-ac15-d2d42efa9d5d@lunn.ch>
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-4-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M18FEA6c4zmHvgEUqSxgy8+GMIMRxi0L38/MiHe7hKae9uLtxHovefByr1J42a5xhKjfYGqzT+UJZ3UcLvLi9VwmCFpESvoANDK4tuoJ5PPknVNt7WzeZh8fotBR6PWrrw4k3p/SlkF+HPYGyhIMrDSgMe98Mo4BGSjjuyRD9QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=m2CQSBML; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=foWBq1/OXyHVLIvge7zfATW17FUJ1mGcnzhenOmL5Sc=; b=m2CQSBMLU4UUtBFBo913PapkDI
+	l273CoyRB610NZppmeQnZIjtqpzoLdxtVkzB/32oCSOd8Vy3UnB8wgXamaZNoy1PjL2xrHOWnrtrr
+	aa8WhOns9LYetRdMz4PpZDRxzocbqlJAOOb3nZFgT56zlO5X0fAVb0F522kiAZ/HJZynt0LOIVIJM
+	FYXlxg3XzFgrO3gl5js3yEdSFufzFCmHMktWJMdAYvjORPGeQ97OjG67vM53tJkOH/Rft8cN4MTP1
+	0rfUVfQs5LEiy3AmbHGN5J7LinJ9gn6mYX0Yib6CJwFQPsxrMFcDZtNgj6Q4yhMjv6W23SAo6+ctY
+	nNE5vKvQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50646)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u56It-0001hu-0i;
+	Wed, 16 Apr 2025 18:12:03 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u56Iq-0001ZY-2L;
+	Wed, 16 Apr 2025 18:12:00 +0100
+Date: Wed, 16 Apr 2025 18:12:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [net-next PATCH 2/2] net: phylink: Fix issues with link
+ balancing w/ BMC present
+Message-ID: <Z//k4PUTWXo3+IBh@shell.armlinux.org.uk>
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+ <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
+ <Z__URcfITnra19xy@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,101 +72,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416162144.670760-4-ivecera@redhat.com>
+In-Reply-To: <Z__URcfITnra19xy@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> +++ b/include/linux/mfd/zl3073x_regs.h
-> @@ -0,0 +1,105 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __LINUX_MFD_ZL3073X_REGS_H
-> +#define __LINUX_MFD_ZL3073X_REGS_H
-> +
-> +#include <asm/byteorder.h>
-> +#include <linux/lockdep.h>
+On Wed, Apr 16, 2025 at 05:01:09PM +0100, Russell King (Oracle) wrote:
+> On Wed, Apr 16, 2025 at 08:29:00AM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> > 
+> > This change is meant to address the fact that there are link imbalances
+> > introduced when using phylink on a system with a BMC. Specifically there
+> > are two issues.
+> > 
+> > The first issue is that if we lose link after the first call to
+> > phylink_start but before it gets to the phylink_resolve we will end up with
+> > the phylink interface assuming the link was always down and not calling
+> > phylink_link_down resulting in a stuck interface.
+> 
+> That is intentional.
+> 
+> phylink strictly orders .mac_link_down and .mac_link_up, and starts from
+> an initial position that the link _will_ be considered to be down. So,
+> it is intentional that .mac_link_down will _never_ be called after
+> phylink_start().
+> 
+> > The second issue is that when a BMC is present we are currently forcing the
+> > link down. This results in us bouncing the link for a fraction of a second
+> > and that will result in dropped packets for the BMC.
+> 
+> ... but you don't explain how that happens.
+> 
+> > The third issue is just an extra "Link Down" message that is seen when
+> > calling phylink_resume. This is addressed by identifying that the link
+> > isn't balanced and just not displaying the down message in such a case.
+> 
+> Hmm, this one is an error, but is not as simple as "don't print the
+> message" as it results in a violation of the rule I mentioned above.
+> We need phylink_suspend() to record the state of the link at that
+> point, and avoid calling phylink_link_down() if the link was down
+> prior to suspend.
 
-lockdep?
+Okay, confirmed on nvidia Jetson Xavier NX:
 
-> +#include <linux/mfd/zl3073x.h>
-> +#include <linux/regmap.h>
-> +#include <linux/types.h>
-> +#include <linux/unaligned.h>
-> +
-> +/* Registers are mapped at offset 0x100 */
-> +#define ZL_RANGE_OFF	       0x100
-> +#define ZL_PAGE_SIZE	       0x80
-> +#define ZL_REG_ADDR(_pg, _off) (ZL_RANGE_OFF + (_pg) * ZL_PAGE_SIZE + (_off))
-> +
-> +/**************************
-> + * Register Page 0, General
-> + **************************/
-> +
-> +/*
-> + * Register 'id'
-> + * Page: 0, Offset: 0x01, Size: 16 bits
-> + */
-> +#define ZL_REG_ID ZL_REG_ADDR(0, 0x01)
-> +
-> +static inline __maybe_unused int
-> +zl3073x_read_id(struct zl3073x_dev *zldev, u16 *value)
-> +{
-> +	__be16 temp;
-> +	int rc;
-> +
-> +	rc = regmap_bulk_read(zldev->regmap, ZL_REG_ID, &temp, sizeof(temp));
-> +	if (rc)
-> +		return rc;
-> +
-> +	*value = be16_to_cpu(temp);
-> +	return rc;
-> +}
+[   11.838132] dwc-eth-dwmac 2490000.ethernet eth0: Adding VLAN ID 0 is not supported
+[   15.299757] dwc-eth-dwmac 2490000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
 
-It seems odd these are inline functions in a header file.
+LAN cable was unplugged:
+[   50.436587] dwc-eth-dwmac 2490000.ethernet eth0: Link is Down
 
-> +
-> +/*
-> + * Register 'revision'
-> + * Page: 0, Offset: 0x03, Size: 16 bits
-> + */
-> +#define ZL_REG_REVISION ZL_REG_ADDR(0, 0x03)
-> +
-> +static inline __maybe_unused int
-> +zl3073x_read_revision(struct zl3073x_dev *zldev, u16 *value)
-> +{
-> +	__be16 temp;
-> +	int rc;
-> +
-> +	rc = regmap_bulk_read(zldev->regmap, ZL_REG_REVISION, &temp,
-> +			      sizeof(temp));
-> +	if (rc)
-> +		return rc;
-> +
-> +	*value = be16_to_cpu(temp);
-> +	return rc;
-> +}
-> +
-> +/*
-> + * Register 'fw_ver'
-> + * Page: 0, Offset: 0x05, Size: 16 bits
-> + */
-> +#define ZL_REG_FW_VER ZL_REG_ADDR(0, 0x05)
-> +
-> +static inline __maybe_unused int
-> +zl3073x_read_fw_ver(struct zl3073x_dev *zldev, u16 *value)
-> +{
-> +	__be16 temp;
-> +	int rc;
-> +
-> +	rc = regmap_bulk_read(zldev->regmap, ZL_REG_FW_VER, &temp,
-> +			      sizeof(temp));
-> +	if (rc)
-> +		return rc;
-> +
-> +	*value = be16_to_cpu(temp);
-> +	return rc;
-> +}
+Then the system was suspended using rtcwake for 3 seconds:
 
-Seems like it would make sense to add a zl3073x_read_b16() helper.
-Then all these functions become one liners.
+[   54.736849] dwc-eth-dwmac 2490000.ethernet eth0: No Safety Features support found
+[   54.736898] dwc-eth-dwmac 2490000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+[   54.741078] dwc-eth-dwmac 2490000.ethernet eth0: Link is Down
 
-	Andrew
+This shouldn't happen. With the patch I posted, this second "Link is Down"
+message is not printed, and .mac_link_down() will not be called.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
