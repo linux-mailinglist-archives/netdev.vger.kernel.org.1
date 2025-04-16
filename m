@@ -1,127 +1,122 @@
-Return-Path: <netdev+bounces-183183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64863A8B4E4
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:13:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B83A8B4F8
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A1B3BD88D
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:13:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5FE1903394
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F29621348;
-	Wed, 16 Apr 2025 09:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C532822B8CC;
+	Wed, 16 Apr 2025 09:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYXFKxWg"
+	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="JloMLQRK";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="OH5Ks1Xc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx.wizmail.org (mx.wizmail.org [85.158.153.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E90233D7B
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87572343AE
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744794825; cv=none; b=Qn9hajqdEqVe6taSRtZs49pfKGk7gC1g6uoanKxiQr0ii/g3AB9bQANS5LtOCVjmnjx8/6jmYyy9ZX6WYv45IMge/IxGc3u4X7kViOj06h30F9C9CzcbXfG5It0+2q50gfW7biHR3CURJfKSK5vLXoRSuZRVZiEnQZwOayiawWQ=
+	t=1744794929; cv=none; b=E2Ttl+i0sYHIui8CaeRcRXomvPwgUHPgtLVVG4E3Igo+U7OubryRlvw0Z9/S0A3Mw6EUs9A3M1v87Ex6zybSSwDTcGghB8sPZmf/XAXWdtDf4BvbEymf/lzv8QIGSw6GqDgVRcMgE4FwmyajilIfzbvp9pj9Pqyf+98cEdKb9zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744794825; c=relaxed/simple;
-	bh=1pCpjKGQrA4A8Sx9e1mDtYC2ppHwHr+Iv3fJRBiUo4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n22fzIVTkCXrWz7K6XfrTFHPOLvPL4TseFKKmhUTyvo0OVfv95LdXfNSNCzNKfiTY0heeH9+cxauXrGkyRAqULBn1e94gX23vGDKj8RRCfyNLmiRD3rafHMz9I6q7bE/nffDqQqthl9F5ppDMakjHThjTnPlJsrn2pIfwcbTpss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fYXFKxWg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744794822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uvCVmxNSJLqdG6xiuVPZpYQtkVRsxxGzg4o7yJUPVaI=;
-	b=fYXFKxWgDBWHopN8qRxnXvUqkoVvYD3K4BVn8LCeS+Ljz8riDrRXv9X75Cj5VeSppBJbpO
-	nokseTG+/opi10JHUAgnVjet60fxw+FG56d3BhHSZxwysJaNc14PRqq3Xn+zWIhoNq7dSc
-	UrRq4IivkN5CrMJSb3ITtPBIA54GpKQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-133-z0SrRcAFOBm4UA8lmVkCKw-1; Wed, 16 Apr 2025 05:13:40 -0400
-X-MC-Unique: z0SrRcAFOBm4UA8lmVkCKw-1
-X-Mimecast-MFC-AGG-ID: z0SrRcAFOBm4UA8lmVkCKw_1744794820
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d5ca7c86aso38763005e9.0
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:13:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744794820; x=1745399620;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uvCVmxNSJLqdG6xiuVPZpYQtkVRsxxGzg4o7yJUPVaI=;
-        b=Scrx6qTHkYUU20a947ya2y3qE4bidzZuulYGFWKvg3wzJlgbRWfEIHySQ+ZUSH2TDW
-         rOs1StSef4N1UWP0WHsR2LazwDunxxnw5bkFJmnvjXEwMqXehI5Vc5fRp7Vhp1X2K8Bq
-         vX4Hn74vyKQfDTG2+vGq9gJOHHkXQ2TPw/imR8BqonG/VKf/xhpD/zhp4sXQ6fWKb8gM
-         sxr5ZZA962AuXMyFuEJN8Z18jhWL6jlOjvp6tBhtem/NuaDyt/o+4qe9X61Dq0XbEhJ0
-         zdKzRegxi8ERzo3NtiZg+7QZq69umvAFb2Lf9gKKTBfF+rfBQucNbuIDSPBJzXzmz8yq
-         rKkA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIccqjPKJRDfKYOfCzuWm4dRoqWOWcJi3YkBdoYoEm9SUJVIhthrgqbOqFmzzCQJQpKGY9Ga4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhJt/owreYNjlBZyETIzlUv6AwLJnUJsovE+drpRG0O46skv7u
-	YAd0/2mlmIk0M9ebwL6lnWm3sEeGsQOBQEYsfOkjYbn6WuyQZXBGq84MtOlw7VGfKD3TxVgHxpZ
-	6yz7bojNqFMCCoG0Opt1y/TlBp2d6xeXrwYMXJxEoCYjjz7ZdG8IjTA==
-X-Gm-Gg: ASbGncu8RREfmH32x10HstCIdhn4RMqDkkA4RNuEfve6exKbSQYjI2q7+AM/xf6F+CG
-	ue92ZRYGQaE+HcEuXXFKjf7CnBz2wH0lfEdf4Ln1aS0lRvlysuPmJxZUmrBYlkkdoP3BWmXWhJb
-	uOQn+7tmcorfipR9o+qSAoKYZ4bDPpaehwU+Fu0LmvjWmSCQtZpqMUAITA9QGh/k3Lmy2IEVlCv
-	QrufBV7gUoEf9e1VVuvFanFNBVFSo4GEBKT5mQ4/vMF9SzZD9nNMaBEX9CEBR9rzr5A9Ngx5jXq
-	85g5Q5pOOfjoryzk0eBCpHQBmcF52zTHMH7oHMQ=
-X-Received: by 2002:a5d:6d83:0:b0:391:4999:776c with SMTP id ffacd0b85a97d-39ee5ba00a8mr1037617f8f.40.1744794819833;
-        Wed, 16 Apr 2025 02:13:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEdqEISuOOHaPFl1UFIGCdx+GyfBJY216X9t/2yGkeLjF4tkEGeNZIM0E8clzxQAd7Knyoa/A==
-X-Received: by 2002:a5d:6d83:0:b0:391:4999:776c with SMTP id ffacd0b85a97d-39ee5ba00a8mr1037587f8f.40.1744794819468;
-        Wed, 16 Apr 2025 02:13:39 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b58cb6csm15256555e9.27.2025.04.16.02.13.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 02:13:39 -0700 (PDT)
-Message-ID: <f27f9cd5-6823-4aa8-90c8-5c24c9d30a8d@redhat.com>
-Date: Wed, 16 Apr 2025 11:13:38 +0200
+	s=arc-20240116; t=1744794929; c=relaxed/simple;
+	bh=e1kGme04fjYTT1rNU07Od94ybjOWJE/2CRbtUQWimlg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SMJipTvtSzNQHpZGjuqfKtWctq0O1y8K3zdiVWapggSw6rrAAWYdGMU+lDTBmpDdT+97S+bElJsTMQq5sfNTvohNQKjbsJFtT9eHD1W9SqcYcqc8VgHj/+hCspW/qzXVLCRcHdlciD14jdn74psXDnQ5Pr6rbFnzJ0+jQAE5xBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=JloMLQRK; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=OH5Ks1Xc; arc=none smtp.client-ip=85.158.153.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:MIME-Version:References
+	:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
+	Autocrypt; bh=qNzaVqcVtXirrY+7TYF8guTvKnQI5PGfhGZldiD9I90=; b=JloMLQRK7o4vnLu
+	PdiKxyIkSuDZTSo438zpYCZxNqu22Jm08G3grGJR3IU9DNVWW45EY0Dn68Yjx05o9vXzMBQ==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
+	; s=r202001; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
+	Autocrypt; bh=qNzaVqcVtXirrY+7TYF8guTvKnQI5PGfhGZldiD9I90=; b=OH5Ks1XcY1Mm7k5
+	H9RHBJBbCQP0rshFZ9KbbfSVj2VPZFaDtp5grDyetU4/BbeuQn33GR0sc7nrmbXSjAX7ms1/TdTKp
+	HUk8uNi+TKsWaDE1SC9zYRWrOhLDTV8S0Z/D+sKYv5MLfn9Ei3H8yUmp5ME0Wu7Fz53OtG55ixeOi
+	GL0++HHUoW4uhrQVuJKrsJIhTu/nWx6SXxj0V1Vr3RmHT28HOJfwZuZwuwe7hO33Ekih5b+Ov4CLF
+	7iZybElBbfJYB++2fwa8c2noxjnqYGoUo9dy1MFa5ygzoDEWGhLtSxPY0w8fALu1ToQytbb62OSh5
+	uzgBca1CGxPoOqQf1hA==;
+Authentication-Results: wizmail.org;
+	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
+	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
+Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain)
+	by www.wizmail.org (Exim 4.98.114)
+	(TLS1.3) tls TLS_AES_256_GCM_SHA384
+	with esmtpsa
+	id 1u4yrb-00000001gvL-3ztT
+	(return-path <jgh@exim.org>);
+	Wed, 16 Apr 2025 09:15:24 +0000
+From: Jeremy Harris <jgh@exim.org>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	ncardwell@google.com,
+	Jeremy Harris <jgh@exim.org>
+Subject: [RESEND PATCH 1/2] TCP: note received valid-cookie Fast Open option
+Date: Wed, 16 Apr 2025 10:15:13 +0100
+Message-ID: <20250416091513.7875-1-jgh@exim.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250416090836.7656-1-jgh@exim.org>
+References: <20250416090836.7656-1-jgh@exim.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v2 net-next 05/14] ipv6: Move nexthop_find_by_id()
- after fib6_info_alloc().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250414181516.28391-1-kuniyu@amazon.com>
- <20250414181516.28391-6-kuniyu@amazon.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250414181516.28391-6-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain) with esmtpsa
 
-On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
-> We will get rid of RTNL from RTM_NEWROUTE and SIOCADDRT.
-> 
-> Then, we must perform two lookups for nexthop and dev under RCU
-> to guarantee their lifetime.
-> 
-> ip6_route_info_create() calls nexthop_find_by_id() first if
-> RTA_NH_ID is specified, and then allocates struct fib6_info.
-> 
-> nexthop_find_by_id() must be called under RCU, but we do not want
-> to use GFP_ATOMIC for memory allocation here, which will be likely
-> to fail in ip6_route_multipath_add().
-> 
-> Let's move nexthop_find_by_id() after the memory allocation so
-> that we can later split ip6_route_info_create() into two parts:
-> the sleepable part and the RCU part.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Jeremy Harris <jgh@exim.org>
+---
+ include/linux/tcp.h     | 3 ++-
+ net/ipv4/tcp_fastopen.c | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 1669d95bb0f9..a96c38574bce 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -385,7 +385,8 @@ struct tcp_sock {
+ 		syn_fastopen:1,	/* SYN includes Fast Open option */
+ 		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
+ 		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
+-		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
++		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
++		syn_fastopen_in:1; /* Received SYN includes Fast Open option */
+ 
+ 	u8	keepalive_probes; /* num of allowed keep alive probes	*/
+ 	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
+diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+index 1a6b1bc54245..004d0024cd98 100644
+--- a/net/ipv4/tcp_fastopen.c
++++ b/net/ipv4/tcp_fastopen.c
+@@ -401,6 +401,7 @@ struct sock *tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
+ 				}
+ 				NET_INC_STATS(sock_net(sk),
+ 					      LINUX_MIB_TCPFASTOPENPASSIVE);
++				tcp_sk(child)->syn_fastopen_in = 1;
+ 				return child;
+ 			}
+ 			NET_INC_STATS(sock_net(sk),
+-- 
+2.49.0
 
 
