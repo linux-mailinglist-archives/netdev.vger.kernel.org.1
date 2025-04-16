@@ -1,136 +1,173 @@
-Return-Path: <netdev+bounces-183152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73222A8B357
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:21:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073F8A8B359
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541723A4D6F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:20:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47922189F543
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D66C26AEC;
-	Wed, 16 Apr 2025 08:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919F322D7A7;
+	Wed, 16 Apr 2025 08:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Dhx5jdtU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YHJEPI2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3465199FAB
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2726158520;
+	Wed, 16 Apr 2025 08:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744791657; cv=none; b=kkwA4dfY04tYY2GO7nJc7DjvXegFa/eMfFn3HTLfgxe8eiMeF/w/hm4UdA6lDeWP7PyXu8ALvQvDJu+OHTjxLAYRNngVg6Uc6ZHBUF5jUIMul6rjkzbFaxnKatpF2KJtOHI4jiRqhmVfm90ZCmmG2XkfPMLTfweTJGUjUcyvAac=
+	t=1744791715; cv=none; b=u9KoRSzIB3r8tnMb6BrbkDUNR1GcMU3sAuoZSJ7FWJDJDfGRkE2/YSKNSurE5o8N6AaCY57rK9KYWRnGRfFtJxnnAJX+q4LqjxCV1zGOsWHK1V40emzquo16hzpcN7tJ6sG49mWg4zbkzBmzUiKY2I39OYrMqW//PonWq6ktu68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744791657; c=relaxed/simple;
-	bh=3FDmJj1M4qcbECNJRvLs5dFm6VzeOfOqrPS+aE7hkns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTWRGohH8a4UspagTmZdiqSYBYSBzscmyhFNkt3ir5QIOB+NjoRvO7cIwW3Hdfb6zjTlE3yUggR3NW3kwvnjbbO7GuZ+/Hhf1eeqw3vvkb4kcQSy1o9Nzb0XPf0pGcTaI3nld5XqRM3kCv2EOqtBJbZruq622Adz50+b8BPR3/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Dhx5jdtU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=URwBuCbS6/neY6AV6CFvJFFAf/PObTEbrh2Q/19p6+0=; b=Dhx5jdtUk0jK2Karpqm4mt9/dP
-	ozAsmNP8yHltiUVF1HqvFV+DJ1hNVy7pSEa9SRoRCOjoLJE+rjKQw5Kvuot4psTRt9Jv7ACkmJ9dp
-	tqg87Jfh2arIdiureSuR7lKJe6u/SE3S4y1taSx61dIO4TdudScqo4Y5d7lRy5Bebcj65hyxU58Z1
-	WvUbymB5Sgu6zqpQBb7DWuqop1+RTIG57QACukwxxHK9TiW7VkuzL640shud4iS5blZGWTtu1f1GB
-	U1OQVCEVbH5SvaFawlZi1m/SzLGIgcEgT8NHKh7nsLAqAxplleH4ru+9ijTyJTwAwovAhwBPdP1G6
-	FuO3O1ew==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38076)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4y0i-0000uI-1K;
-	Wed, 16 Apr 2025 09:20:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4y0d-0001FI-0V;
-	Wed, 16 Apr 2025 09:20:39 +0100
-Date: Wed, 16 Apr 2025 09:20:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 0/5] net: stmmac: socfpga: fix init ordering and
- cleanups
-Message-ID: <Z_9oVrAOnInrhb6z@shell.armlinux.org.uk>
-References: <Z_6JaPBiGu_RB4xN@shell.armlinux.org.uk>
- <20250416095343.1820272f@fedora.home>
+	s=arc-20240116; t=1744791715; c=relaxed/simple;
+	bh=VWW+FjoSMr2BVYRu/X2g0WXpS/3nXWF7DuGik59WEqM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hUDJBfAw3GilSrFZ8GT73Q5cf0LoF1p8Q8hHK8Yxb9+upJ1LSxCE8jYERgd6ohY44Xb4pfLEZzqvqkOhcim/cNVkw74Q8lRcnn6rhr5FavymNdgtZX3BtV9wJ3ypHOsv10pOrz4uuy7ZojaG6Q2aXdgZeDbF/uy5kw0dW5ZVeFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YHJEPI2j; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-3105ef2a06cso34213671fa.2;
+        Wed, 16 Apr 2025 01:21:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744791711; x=1745396511; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kSn8ywScBr2S49CSRan+oKzZUY5sWQo+CXS/MBhnnS8=;
+        b=YHJEPI2jpEGnXGKs3WKdJVTs9+qUCkJ+DeUJbJR71TRFQbTTiP/myzYk3wqINlXZeT
+         YhoF5rUeIyqYMbrr4MfUp+16qTU6EBYxVnRhlF/Ts3np3DI2/b17n/IaYOPZcrDT4t+L
+         Mz9i4sV0RJuCtsKLBVeS2ocxoONyrfV1GhRgrWoTd5p5mvV0WWgyGlZS2JYjZequoKeE
+         7qXsVLrl+ZTFwI6QofHHcK7+W0hmCDouL63K/Yh7k7SNpX1F8UP800YBHnARV1HKsXIb
+         G6INo7F3G5kDZhyw3Emfa0IFE4rEqc0ctztSCJ7Jv+2/ZwmLSeVsL7UIlsZbzaOW+eZy
+         bPpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744791711; x=1745396511;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kSn8ywScBr2S49CSRan+oKzZUY5sWQo+CXS/MBhnnS8=;
+        b=OEwAp4uq4eCv5qL2fwgWE4x63mnHTzNzRnrH77C8gRflDLst4Emxto8Mi3mMdaoVBV
+         66nmzTwGKhsmccmdPJtDSj544ruI+OeG8BK3W4/vlhlrx8AqZ7IF2ejUvg63CRele6+R
+         Za1OM3fsaU1rfkX9By7QA6C5gJrAjRcYUnMnt2kC0l8MeSaOg2/6ijgpTSboz2J7HXUs
+         sJWSnWRA96SkUQU41RHBlY4rgG/fK9W4huOz1NqXHypWqqt56g782xyKW/haeQyuUROr
+         TTRuYg3CgLiFVt6b9swSYTebx7rjsunST2SRpJW5i+P/ZpLSyOpPCCN8nvKXeOhuIe4Z
+         Mvcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTxHzXGYLDKkeINdPrrggMFczDzBpaUdqzhmQuNys+RzkrtHk7/LySc+Vj3VQj/xG7ePNyaYnS@vger.kernel.org, AJvYcCVVJz6ZGRjEeU8LFVbNSiUard0dTjnLtui/5llJllk/9lefOclgEdq4Rv4ElDCNn5/hi33HbpER4vODW+mV@vger.kernel.org, AJvYcCW4Ns0c7TK4IcNYy3RyEZikJAbWspEQOie6fzjLA70bPKoHwKjG5LmZdljjxZmxSP/uSuP4MrOcxdYc@vger.kernel.org, AJvYcCW6Kl+6QojfNHkcgWyoTUOnA0A1+6k74YGxjruiUz/1YMeE9ENLDKU5Rm0fK0bq29aW9IGU4ManHeAg@vger.kernel.org, AJvYcCW88VFWmEDZB3buERNox57NSO88rdEEfmSynXGhZwCI5tP//hp515EcwXsWNqwc/3o+1DAVacD7vQJ8@vger.kernel.org, AJvYcCXv01/HEfkFgQ9Szw677HWSzYXHU+oUMhhcvDX8KFj15G/0DpHUb+MpNe61nOPNQzkNvRl10wH4BjY1@vger.kernel.org
+X-Gm-Message-State: AOJu0YylZriNctxEJd+YeJ8L0/V2CTxigrWUTThYOVk64LZAualfNvkS
+	6F5NIn4Z7n7DxW8QUddOG95mxweWwSn9MFbF80ESrw+SlyMFdwPW
+X-Gm-Gg: ASbGncs2s1eOq84mBGZuepupi+YPw2ycfTNzFD6iPNjbnm1wFVdJxqlCHF2DE62uxiY
+	jtVvIRtVf3SEdApuockyvsx/JIpy7xz5YnakKaPk/6pN64hhAM6HzIRPJb2u7uf5cjdolCYbuFD
+	ev0HhN/f/bYR0qRMvRTlUt77/jv1sjQJ9Y0CN4IbqU03hL2UUO3TNcC/tHG055NmeJ04tfm6dZp
+	0Xqhqbk4VremRXHRwJSreo9wnQrIjnPlHQLoj94NdYPjuSI9qimtZ4fBn3B9suTVsesyob8HGFU
+	pfXz5bdrwPKaR8ikY5XF/vn6tLswZAVhDsqtJgIAipP/GYIxoh5K
+X-Google-Smtp-Source: AGHT+IHs8w/edsjtM3rOM3Yclg32oaNqFZGls9C6H68akxr8+2plKYYeBm64f3z6Q4QArp+Lekmm2g==
+X-Received: by 2002:a2e:8404:0:b0:30c:aae:6d4a with SMTP id 38308e7fff4ca-3107f718b7bmr2182291fa.26.1744791710377;
+        Wed, 16 Apr 2025 01:21:50 -0700 (PDT)
+Received: from NB-GIGA003.letovo.school ([5.194.95.139])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30f465f7b20sm23025391fa.97.2025.04.16.01.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 01:21:49 -0700 (PDT)
+From: Alexey Charkov <alchark@gmail.com>
+Subject: [PATCH 00/13] ARM: vt8500: DT bindings and dts updates
+Date: Wed, 16 Apr 2025 12:21:25 +0400
+Message-Id: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416095343.1820272f@fedora.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIVo/2cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDEwNL3fLcEt3SgpTEktRiXVMLQ4NkM1NDI9NUEyWgjoKi1LTMCrBp0bG
+ 1tQD/e5EXXQAAAA==
+X-Change-ID: 20250409-wmt-updates-5810c65125e4
+To: Krzysztof Kozlowski <krzk@kernel.org>, 
+ Andi Shyti <andi.shyti@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Ulf Hansson <ulf.hansson@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, 
+ Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pwm@vger.kernel.org, Alexey Charkov <alchark@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1744791712; l=3242;
+ i=alchark@gmail.com; s=20250416; h=from:subject:message-id;
+ bh=VWW+FjoSMr2BVYRu/X2g0WXpS/3nXWF7DuGik59WEqM=;
+ b=OE98dlaCoHtAdZilXLnTnuUMVF49Z4hZHmnAalJtuuKjjULVM27W5tpvrpJQD1KM7AV/MZCRX
+ fNJJtvtC0pHDBujTVpynkLYIbwLLeVLKIXeMo4GnDqOoMsFzt4LL7uX
+X-Developer-Key: i=alchark@gmail.com; a=ed25519;
+ pk=ltKbQzKLTJPiDgPtcHxdo+dzFthCCMtC3V9qf7+0rkc=
 
-On Wed, Apr 16, 2025 at 09:53:43AM +0200, Maxime Chevallier wrote:
-> I've given this a try and unfortunately :
+Convert some more VT8500 related textual DT binding descriptions to
+YAML schema, do minor dts correctness fixes, and add a DT for the
+board I'm actually testing those on (VIA APC Rock).
 
-Great, someone with hardware, and who responds to patches! :)
+While at that, also describe the PL310 L2 cache controller present on
+WM8850/WM8950.
 
-> This is only to get the phymode, maybe we should do like dwmac_imx
-> and store a pointer to plat_dat into struct dwmac_socfpga, so that we
-> can get it back in dwmac_init ? I've tried with the patch below and it
-> does solve the issue, but maybe you have a better approach.
+Note that this series is based upon Krzysztof's linux-dt/for-next
 
-Yes, but I don't think we need such a big patch:
+Signed-off-by: Alexey Charkov <alchark@gmail.com>
+---
+Alexey Charkov (13):
+      dt-bindings: i2c: i2c-wmt: Convert to YAML
+      dt-bindings: interrupt-controller: via,vt8500-intc: Convert to YAML
+      dt-bindings: mmc: vt8500-sdmmc: Convert to YAML
+      dt-bindings: net: via-rhine: Convert to YAML
+      dt-bindings: pwm: vt8500-pwm: Convert to YAML
+      dt-bindings: timer: via,vt8500-timer: Convert to YAML
+      dt-bindings: arm: vt8500: Add VIA APC Rock/Paper boards
+      ARM: dts: vt8500: Add node address and reg in CPU nodes
+      ARM: dts: vt8500: Move memory nodes to board dts and fix addr/size
+      ARM: dts: vt8500: Use generic compatibles for EHCI
+      ARM: dts: vt8500: Use generic node name for the SD/MMC controller
+      ARM: dts: vt8500: Add VIA APC Rock/Paper board
+      ARM: dts: vt8500: Add L2 cache controller on WM8850/WM8950
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ Documentation/devicetree/bindings/arm/vt8500.yaml  | 19 ++++---
+ Documentation/devicetree/bindings/i2c/i2c-wmt.txt  | 24 ---------
+ .../devicetree/bindings/i2c/wm,wm8505-i2c.yaml     | 47 +++++++++++++++++
+ .../interrupt-controller/via,vt8500-intc.txt       | 16 ------
+ .../interrupt-controller/via,vt8500-intc.yaml      | 47 +++++++++++++++++
+ .../devicetree/bindings/mmc/vt8500-sdmmc.txt       | 23 --------
+ .../devicetree/bindings/mmc/wm,wm8505-sdhc.yaml    | 61 ++++++++++++++++++++++
+ .../devicetree/bindings/net/via,vt8500-rhine.yaml  | 41 +++++++++++++++
+ .../devicetree/bindings/net/via-rhine.txt          | 17 ------
+ .../devicetree/bindings/pwm/via,vt8500-pwm.yaml    | 43 +++++++++++++++
+ .../devicetree/bindings/pwm/vt8500-pwm.txt         | 18 -------
+ .../devicetree/bindings/timer/via,vt8500-timer.txt | 15 ------
+ .../bindings/timer/via,vt8500-timer.yaml           | 36 +++++++++++++
+ MAINTAINERS                                        |  7 ++-
+ arch/arm/boot/dts/vt8500/Makefile                  |  3 +-
+ arch/arm/boot/dts/vt8500/vt8500-bv07.dts           |  5 ++
+ arch/arm/boot/dts/vt8500/vt8500.dtsi               | 12 ++---
+ arch/arm/boot/dts/vt8500/wm8505-ref.dts            |  5 ++
+ arch/arm/boot/dts/vt8500/wm8505.dtsi               | 14 ++---
+ arch/arm/boot/dts/vt8500/wm8650-mid.dts            |  5 ++
+ arch/arm/boot/dts/vt8500/wm8650.dtsi               | 14 ++---
+ arch/arm/boot/dts/vt8500/wm8750-apc8750.dts        |  5 ++
+ arch/arm/boot/dts/vt8500/wm8750.dtsi               | 14 ++---
+ arch/arm/boot/dts/vt8500/wm8850-w70v2.dts          |  5 ++
+ arch/arm/boot/dts/vt8500/wm8850.dtsi               | 23 +++++---
+ arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts       | 21 ++++++++
+ arch/arm/boot/dts/vt8500/wm8950.dtsi               | 11 ++++
+ 27 files changed, 386 insertions(+), 165 deletions(-)
+---
+base-commit: 62db22c2af6ce306943df5de6f5198ea9bd3d47b
+change-id: 20250409-wmt-updates-5810c65125e4
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 8e6d780669b9..59f90b123c5b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -50,6 +50,7 @@ struct socfpga_dwmac {
- 	u32	reg_offset;
- 	u32	reg_shift;
- 	struct	device *dev;
-+	struct plat_stmmacenet_data *plat_dat;
- 	struct regmap *sys_mgr_base_addr;
- 	struct reset_control *stmmac_rst;
- 	struct reset_control *stmmac_ocp_rst;
-@@ -233,10 +234,7 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
- 
- static int socfpga_get_plat_phymode(struct socfpga_dwmac *dwmac)
- {
--	struct net_device *ndev = dev_get_drvdata(dwmac->dev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--
--	return priv->plat->mac_interface;
-+	return dwmac->plat_dat->mac_interface;
- }
- 
- static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
-@@ -490,6 +488,7 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	 */
- 	dwmac->stmmac_rst = plat_dat->stmmac_rst;
- 	dwmac->ops = ops;
-+	dwmac->plat_dat = plat_dat;
- 
- 	plat_dat->bsp_priv = dwmac;
- 	plat_dat->fix_mac_speed = socfpga_dwmac_fix_mac_speed;
-
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Alexey Charkov <alchark@gmail.com>
+
 
