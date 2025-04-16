@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-183353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D3EA907BF
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:29:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63685A907C1
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E59DB5A1876
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:29:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B7B8163671
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BEC20DD42;
-	Wed, 16 Apr 2025 15:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0970520A5C2;
+	Wed, 16 Apr 2025 15:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkArxdwr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJNTDSnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE04C20DD7E
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0B207A06
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744817337; cv=none; b=DEnOUVEw9Pm2GlszkT9LCrdRrTf1rw8CZlgUzA+IFvkh0kkVNk7ptGUjScuIPiJydty6wtIwq/ByVtKI6PY/ysTI3XLePK3OfCy/2bAGvFywKcMLsgq2JwRitF5pao8Hx1/oJnTzMP/O1DrNfM2iGiUWpo4Kt+7biSpKy2xCnX4=
+	t=1744817343; cv=none; b=XF5AshVH9nfrNIQuBMSrbpQVMxMNZTV6LRkhAyYyNBZ6F4gu9Fxdspx9kWXUYUENdA5TYN2m4TRGZFcUt+ACe/OLCSDMnmG2dm4RCQMSUl0FJUY6XZw8Ev2toWxwq2vhg9hy9EJPoBVl8WhIgImk/eYgCT7ymin7ZuBF3YGju2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744817337; c=relaxed/simple;
-	bh=joTiQadMm/fKwVonH08uwRfHQB7B5N+dtEcPIwzpxi0=;
+	s=arc-20240116; t=1744817343; c=relaxed/simple;
+	bh=oYVCWGy1hQTp/Qo7gB9o3fNjJ8KjSuYr8vc8sHjChKw=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oFlxD1p/vrFHKwSi/fMZFrqzkYP2wUSnmjRqeK7bKRMycerRDkLTL8hAn1AiYGGLPvK3WkQ8htBA1rm/t/37MrAZ7RKwkrovqlqY/Wjk9t3u899wB6FXD+hV0FwgIKtQ8iZmJmNrC3esT4JZj5dLAUADamelNltO3jsYn7QAA8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkArxdwr; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version:Content-Type; b=SkmT79MB1EkdGUr8QfJyqVAAMtPIIXLffDZP5V7lIsii+pfwlqUzO+aqHHpv2SgV+nlen6WAdv41G9pXOwyfxt7BHBrUOsBcKfCowk3HEog2QZzA/GBTPcKCRwCwOLjzZiiQMkPi3o1jOaE6xzNJQik+R4caW6MxiEfIVeHohmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GJNTDSnL; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-736e52948ebso7963238b3a.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:28:55 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-227b828de00so66660375ad.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:29:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744817335; x=1745422135; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744817341; x=1745422141; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=EqWXTqWgCVDPGe+5NTCx/6JeOXpwSyATZnQsdQbR9E4=;
-        b=YkArxdwrcmiuEbtbrn0Ad9Ix7sd7XoBKi+TU5RRJ/WQ+HXD+PuCcq2MT+3bjHdh+oA
-         CtAvA3TPyxD5SbW30+UWVAC1+/13o5eQ0obnCKAirybn3BjR4KJo3z/96Bn+0WUw62cm
-         eVGUt2nReEB4yPoIm5Pq0XWhR2zWoRHG5cEthNE6CBUfP4ymoQbbR4pZ8b9FMHU2kQHb
-         SKLYKIk2lXeINcO/8Lvqi7ieo+Fnf0OcVouPv4U40zx1gpfvnn+hn+5BvjEUVmwPoDL3
-         0jwZ1VZSbjPknzLYlAlT2IxhkGKsufQL1iocuFrp7RqQT0Kt/tkyiGMv/COt4XyS6Yr8
-         VsLA==
+        bh=cjIPEpBHZsLJAGzzgyfjTAzSgVkOowHvw7Ct8eAojvs=;
+        b=GJNTDSnLmVlFxEGVsBMmIHZ7A/Sa3KSxwS0uWv3U+VqlZLuKamAbaqgaTTyZ6avrUa
+         cCzfnjRfwU4L/++GsBPvtYOHNOeku+I6B+46K2lZQT90KchlHhhLGzX1leS0gNojJVC9
+         60ezDSx5YitTzhpDzbj7xDSNq3UkDF33fTI17+ofZsfdz1X/5eqAFUwZCxytgPIs27b4
+         arlTPAJ92CRrAbe6Q0VjQ8v2cYhqILA8ClAhw04GGsr+xg3Ixw3uCUUyEFHZ+ClNUgNA
+         C5wpESVLCO1nOWx3OhfQ0qFhgLzzGM9C+Hzrtqy9pVEtLGo9Q9LhuC9uGGGifnESe5bi
+         2rVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744817335; x=1745422135;
+        d=1e100.net; s=20230601; t=1744817341; x=1745422141;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EqWXTqWgCVDPGe+5NTCx/6JeOXpwSyATZnQsdQbR9E4=;
-        b=f4yp2/YOWJtBcHfh1TmlSvvDd88NclItkg34YSM39CEHDuJxa7TErLmbqLHI3JZ4Oh
-         bcObdc08n4BK3GU7laIviyaTNOcELZRz/3yEtbdmwLtre5aNef3MWsiHI86zX3I3F1Hv
-         q5u2P6sxksKa6FWC3T0Qv5J27v9KCXQBNTkysLivA3h7ozHtGnNKKE2bjYgP8APvkvv1
-         i9L7LR4cC8f4519MmeAYf9MmnXkxSNRLQH9hF41jNKWU3zwz2drNZ4jUwNdVS5CgaeYn
-         WsfKVpbCLr9mTcUHLEm+XZBtA+rGbvIlXZY2TluILAb/paSHSSJtoAWzY3bAQqsOjHhR
-         mh4A==
-X-Gm-Message-State: AOJu0YyjH2YN1d8P7MZJ0oxNduWxGtPcGhsHwlfLi3RSPLL/+xKnFMPt
-	aN+6MZ0iJiRupe8f4Cphzje8KEy1nUoPgc7eb6oBBVC81Ddt0BzN
-X-Gm-Gg: ASbGncu/b3ak7Tm4gdBG8tA8Vnbx7q5Dob2fYco8odtlXh2JzZbyGVMW9vrodLo2elg
-	9PaWz5QgFbsQjAkza9oqYoiZqlnaB6hd/lCp8TC/vbBYv37mxp25suF1MIdjsrF/INp1br+zUhH
-	8n6D0GIaQaJ/u6kggbDdx3lBWWJWoPD4xdLIvnpL91sa2Ua/zKAerSbV2GIajt6Vlk1HfKAhP8Q
-	sUvsA3kLs3Yvuo3xe6X6o3rauiNT0SW7nkfnigNertSiMyKuI3Itz0re9BLPHXj+OG1e6Hzlui5
-	jzajzp6s67mPSgbhid/cCLVDUy17LZUBSpuMXOA4j07El96E1QJFOgXh2Q1Hq4cG6qI/aL1sOTQ
+        bh=cjIPEpBHZsLJAGzzgyfjTAzSgVkOowHvw7Ct8eAojvs=;
+        b=fl75iP5FGDUsuRWEtMsnrRdHhcd+o5UsJ343TMfxUmGJ/dqIO2mZC5qSyOkddHq70b
+         jJ1wGBKLmvFnI2ZAa6YnF1pV9Me++ftAM8sB2wy8LxJGiyqAs0+0BQEVYzB46Rt3HpUY
+         Je6fOYvNbCcXwZj3tOsaj2Tc13hs2lGF+NPkyG7J1Pu3TSpuw7n1OUhY8GuPjKE22iAM
+         0KJ+MsdiPKlNaWy0BnIYoDy7WpU72CAtKABgWHZFtE6xwOVRoZeW5wqqDCvthp2fkCOe
+         +hGxcZ0xa0letYl7cL8Xfou2JkKkioNfEnL7nDZt8jDwNhUVHw1jfDtcTzFHQdP2d0Gt
+         aj0g==
+X-Gm-Message-State: AOJu0YxGtq4D0iAR4Sq3TUX/RW0lOSOWcoQB8fFolY+zbHyLiSHTfdW4
+	aGWfDRcqlIiM7YZDJfLDnH4ax82OchunJCqYCsbfLO5E/sAzBsyW
+X-Gm-Gg: ASbGncvyvZZcBFOBo5nQ12H9vaUvl/jlj8jjJlSiw2PuD6t6xXLHC7Ka0SxFFLFMiJq
+	LFnI6qf+0/dpi68iVaie1oTA1jcdKcYfwMkuOgFzecS0dCwvdCUTAiZvK1XuBuS9veL5WnbaqUr
+	zgDC4lrqS/cDb8MVAPQv/2db5ZXZlVzZcLQNfyBmBgCS4WsqYwGBFaD9nOj4/9Z6BZgUQwGLQkZ
+	DwnKM18hNnoOZoQlgTFBx/oi32KzHdSMXPbVy4Vq5f0TfrQtDpOWCZv7VXqgOKHeW29XBxblfJL
+	DkKmWs0tmZmXtEmJEWzIDTq7QCor850Llq/wu/zmvh3d+CytWQ1K2jJLFhdPwZsnq0UeCsGseug
 	=
-X-Google-Smtp-Source: AGHT+IE6VKQ6w1DlQktcswo0TOSy33wR5gvnKoHL0AV7DsgIMKFqcaLnENKpWevRsiNWNlM5SIFINw==
-X-Received: by 2002:a05:6a00:4516:b0:736:5b85:a911 with SMTP id d2e1a72fcca58-73c26700592mr3981308b3a.8.1744817334929;
-        Wed, 16 Apr 2025 08:28:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFAIbcOSgx7xFz65Vs0c6MEWkVylBHZBNAdXO5CUt/7l5hyjgPJSAdRXB67A2z2qw7Su2aYA==
+X-Received: by 2002:a17:903:2a85:b0:220:c4e8:3b9f with SMTP id d9443c01a7336-22c357acd80mr39289535ad.0.1744817341541;
+        Wed, 16 Apr 2025 08:29:01 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd230de19sm10518990b3a.124.2025.04.16.08.28.54
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c33ef063fsm15476035ad.26.2025.04.16.08.29.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 08:28:54 -0700 (PDT)
-Subject: [net-next PATCH 1/2] net: phylink: Drop unused defines for
- SUPPORTED/ADVERTISED_INTERFACES
+        Wed, 16 Apr 2025 08:29:01 -0700 (PDT)
+Subject: [net-next PATCH 2/2] net: phylink: Fix issues with link balancing w/
+ BMC present
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
  davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Date: Wed, 16 Apr 2025 08:28:53 -0700
+Date: Wed, 16 Apr 2025 08:29:00 -0700
 Message-ID: 
- <174481733345.986682.8252879138577629245.stgit@ahduyck-xeon-server.home.arpa>
+ <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -97,38 +97,98 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-The defines for SUPPORTED_INTERFACES and ADVERTISED_INTERFACES both appear
-to be unused. I couldn't find anything that actually references them in the
-original diff that added them and it seems like they have persisted despite
-using deprecated defines that aren't supposed to be used as per the
-ethtool.h header that defines the bits they are composed of.
+This change is meant to address the fact that there are link imbalances
+introduced when using phylink on a system with a BMC. Specifically there
+are two issues.
 
-Since they are unused, and not supposed to be used anymore I am just
-dropping the lines of code since they seem to just be occupying space.
+The first issue is that if we lose link after the first call to
+phylink_start but before it gets to the phylink_resolve we will end up with
+the phylink interface assuming the link was always down and not calling
+phylink_link_down resulting in a stuck interface.
+
+The second issue is that when a BMC is present we are currently forcing the
+link down. This results in us bouncing the link for a fraction of a second
+and that will result in dropped packets for the BMC.
+
+The third issue is just an extra "Link Down" message that is seen when
+calling phylink_resume. This is addressed by identifying that the link
+isn't balanced and just not displaying the down message in such a case.
+
+To resolve these issues this change introduces a new boolean variable
+link_balanced. This value will be set to 0 initially when we create the
+phylink interface, and again when we bring down the link and unbalance it
+in phylink_suspend. When it is set to 0 it will force us to trigger the
+phylink_link_up/down call which will have us write to the hardware. As a
+result we can avoid the two issues and it should not rearm without another
+call to phylink_suspend.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/phy/phylink.c |    7 -------
- 1 file changed, 7 deletions(-)
+ drivers/net/phy/phylink.c |   18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index b68369e2342b..942ce114dabd 100644
+index 942ce114dabd..2b9ab343942e 100644
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
-@@ -24,13 +24,6 @@
- #include "sfp.h"
- #include "swphy.h"
+@@ -45,6 +45,7 @@ struct phylink {
+ 	struct phylink_pcs *pcs;
+ 	struct device *dev;
+ 	unsigned int old_link_state:1;
++	unsigned int link_balanced:1;
  
--#define SUPPORTED_INTERFACES \
--	(SUPPORTED_TP | SUPPORTED_MII | SUPPORTED_FIBRE | \
--	 SUPPORTED_BNC | SUPPORTED_AUI | SUPPORTED_Backplane)
--#define ADVERTISED_INTERFACES \
--	(ADVERTISED_TP | ADVERTISED_MII | ADVERTISED_FIBRE | \
--	 ADVERTISED_BNC | ADVERTISED_AUI | ADVERTISED_Backplane)
+ 	unsigned long phylink_disable_state; /* bitmask of disables */
+ 	struct phy_device *phydev;
+@@ -1553,7 +1554,8 @@ static void phylink_link_down(struct phylink *pl)
+ 
+ 	pl->mac_ops->mac_link_down(pl->config, pl->act_link_an_mode,
+ 				   pl->cur_interface);
+-	phylink_info(pl, "Link is Down\n");
++	if (pl->link_balanced)
++		phylink_info(pl, "Link is Down\n");
+ }
+ 
+ static bool phylink_link_is_up(struct phylink *pl)
+@@ -1658,12 +1660,13 @@ static void phylink_resolve(struct work_struct *w)
+ 	if (pl->major_config_failed)
+ 		link_state.link = false;
+ 
+-	if (link_state.link != cur_link_state) {
++	if (link_state.link != cur_link_state || !pl->link_balanced) {
+ 		pl->old_link_state = link_state.link;
+ 		if (!link_state.link)
+ 			phylink_link_down(pl);
+ 		else
+ 			phylink_link_up(pl, link_state);
++		pl->link_balanced = true;
+ 	}
+ 	if (!link_state.link && retrigger) {
+ 		pl->link_failed = false;
+@@ -2546,6 +2549,7 @@ void phylink_suspend(struct phylink *pl, bool mac_wol)
+ 			netif_carrier_off(pl->netdev);
+ 		else
+ 			pl->old_link_state = false;
++		pl->link_balanced = false;
+ 
+ 		/* We do not call mac_link_down() here as we want the
+ 		 * link to remain up to receive the WoL packets.
+@@ -2596,16 +2600,6 @@ void phylink_resume(struct phylink *pl)
+ 	if (test_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state)) {
+ 		/* Wake-on-Lan enabled, MAC handling */
+ 
+-		/* Call mac_link_down() so we keep the overall state balanced.
+-		 * Do this under the state_mutex lock for consistency. This
+-		 * will cause a "Link Down" message to be printed during
+-		 * resume, which is harmless - the true link state will be
+-		 * printed when we run a resolve.
+-		 */
+-		mutex_lock(&pl->state_mutex);
+-		phylink_link_down(pl);
+-		mutex_unlock(&pl->state_mutex);
 -
- enum {
- 	PHYLINK_DISABLE_STOPPED,
- 	PHYLINK_DISABLE_LINK,
+ 		/* Re-apply the link parameters so that all the settings get
+ 		 * restored to the MAC.
+ 		 */
 
 
 
