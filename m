@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-183122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0BA0A8AEC5
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 05:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F31BAA8AEFE
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 06:28:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 910C1443424
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:57:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14890440D1B
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 04:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE5C229B2A;
-	Wed, 16 Apr 2025 03:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6768229B03;
+	Wed, 16 Apr 2025 04:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxtXUTiE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VyEWX1XQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2852227EB2;
-	Wed, 16 Apr 2025 03:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770BC228C86;
+	Wed, 16 Apr 2025 04:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744775811; cv=none; b=Spzwv3o7K53BLTwHXRWG7FXcuGABVOrLVPIZCQVMwDUJKT83TAebz3KIDTpVsa5Cf0cdjYPfTuZsC8SRlRFoAOuM5A2BQuK2rqLoJK1NB1obuDPXn09+f47ySch2lR/Ga6vbC/UrR6roAnl33BC58T5adriXeZLLzZ46FHWcSjk=
+	t=1744777632; cv=none; b=UN6sMarx6AXw7zVYvfLGVGDdofHYtI27nOu+BeGl7tTBJPYr30MyCuL5hAIIXzvdBPiYhzV7lhQQMz8RiREX6Xt6aSUb8Ok0bGRAi/p72HwTR/6UuVqDGBSDzYISEskdxFB5PUXmHt6I2+M3+phAa1RItulv9aKCHQgyD3VdDBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744775811; c=relaxed/simple;
-	bh=srYclNAF6hwGXM90kzTLH+JNUxLwQVKujXYqQkal3Oo=;
+	s=arc-20240116; t=1744777632; c=relaxed/simple;
+	bh=W7Voch1+j4hseVkaXNSIgcrVP+fBZoaIxH+l4PLXxjE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rtPjunLx9D6ysvXF1LsgYLCIHh6/YVAxCBbN5qgO7kky+kguKPJ4MjN0Ls7Siv3DGPQIxlRjbwntP5cIcn2BI4LX70p51DIBKCzhwHBTsEjuP9F7h04RM5Fu2IdM0eInBGHxsbgJ6hOQfEEFRQp5qegHLnoRXc7l0Y1gpOpVoR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxtXUTiE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7199C4CEE2;
-	Wed, 16 Apr 2025 03:56:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=d3HyAo5or+z8O2N5XbLn2RSSuFevf/dZpyJlrV1qmbHjqGWNln+lApGjoFvnJIbh3wRzFrOQNMrLPSQXjcrdUBeY2pTx7jAPmoXjW+PTCspb5/ROdORixx4cl+csZ/jxz8sO9RYJPQu/iQ3elNSFFyuhILkASaiEMlna53vSqMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VyEWX1XQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20038C4CEE2;
+	Wed, 16 Apr 2025 04:27:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744775810;
-	bh=srYclNAF6hwGXM90kzTLH+JNUxLwQVKujXYqQkal3Oo=;
+	s=k20201202; t=1744777631;
+	bh=W7Voch1+j4hseVkaXNSIgcrVP+fBZoaIxH+l4PLXxjE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jxtXUTiEjkmm9XCs6bB73TMkMX6Q59nAHZdi2EqXeAKDvADK/395w8sM8BEhDj77F
-	 mhZHU2Ncp4Xo8BKwnmjiAWAMJnBXigVNFStxY7EJOINx030L+K7aCRyqrcbAMCOHoG
-	 vc62WRUD8Fp12X1F4J5u+Ffyo57F69ZYyC4AHTPtP4qIjnH1IODA/xuK4bYoxIZ13K
-	 t7VgOBrUhm0WgAdl623qWo1FQhesf2c4vLx0l/0Dyecnj3oDhJvP5xyWS5X5LZVt2c
-	 YrRezHfNjhRqHOhdn4or1UkyG+EIZmPgyoXlpDcQmEBsOkbJYIomb0h4XnQlF9GUM3
-	 uTiYBViafUJhg==
-Date: Tue, 15 Apr 2025 20:56:48 -0700
+	b=VyEWX1XQDYIgd3Wx2060YIKWdVLbIis3o96RWRP//C8p63CLQ/9vzB8fHW3kPvVXB
+	 kXmbhMXmTEX+n4jLaXn1k1eoRqukZ8KPrcLm0IMAPfbqY5FOoXupzVXXRrqZ4E6X/z
+	 H77AGG8LlZd4G8wC7ZSqpW7zU6dbCpJrnKsyvEj1KGdTfn0pF5Va5Q87rlRf9CC7dz
+	 Brt7ytIcNyXzvVcrXlvWotssMpfvcNlcBBkjpJKy0rWfZrpjM1VsQiFZw9LggGySlJ
+	 FD349Ye/93dz6StnkZn7HwtFur6V8R4364Y6g/AHtfVN0cFLu2CKCVkgRQs3LLmwgm
+	 hWhyPPUXUfOZg==
+Date: Tue, 15 Apr 2025 21:27:09 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Qasim Ijaz <qasdev00@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
- stable@vger.kernel.org
-Subject: Re: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on
- non-zero PHY ID
-Message-ID: <20250415205648.4aa937c9@kernel.org>
-In-Reply-To: <20250415205230.01f56679@kernel.org>
-References: <20250412183829.41342-1-qasdev00@gmail.com>
-	<20250412183829.41342-6-qasdev00@gmail.com>
-	<b49e6c21-8e0a-4e54-86eb-c18f1446c430@lunn.ch>
-	<20250415205230.01f56679@kernel.org>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: virtualization@lists.linux.dev, "Michael S . Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "David S . Miller"
+ <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] selftests: net: add a virtio_net deadlock
+ selftest
+Message-ID: <20250415212709.39eafdb5@kernel.org>
+In-Reply-To: <20250415074341.12461-4-minhquangbui99@gmail.com>
+References: <20250415074341.12461-1-minhquangbui99@gmail.com>
+	<20250415074341.12461-4-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,32 +68,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Apr 2025 20:52:30 -0700 Jakub Kicinski wrote:
-> On Tue, 15 Apr 2025 03:35:07 +0200 Andrew Lunn wrote:
-> > > @@ -182,7 +182,7 @@ static int ch9200_mdio_read(struct net_device *netdev, int phy_id, int loc)
-> > >  		   __func__, phy_id, loc);
-> > >  
-> > >  	if (phy_id != 0)
-> > > -		return -ENODEV;
-> > > +		return 0;    
-> > 
-> > An actually MDIO bus would return 0xffff is asked to read from a PHY
-> > which is not on the bus. But i've no idea how the ancient mii code
-> > handles this.
-> > 
-> > If this code every gets updated to using phylib, many of the changes
-> > you are making will need reverting because phylib actually wants to
-> > see the errors. So i'm somewhat reluctant to make changes like this.  
-> 
-> Right.
-> 
-> I mean most of the patches seem to be adding error checking, unlike
-> this one, but since Qasim doesn't have access to this HW they are
-> more likely to break stuff than fix. I'm going to apply the first
-> patch, Qasim if you'd like to clean up the rest I think it should
-> be done separately without the Fixes tags, if at all.
+On Tue, 15 Apr 2025 14:43:41 +0700 Bui Quang Minh wrote:
+> +def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
+> +    # Probe for support
+> +    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
+> +    if xdp.ret == 255:
+> +        raise KsftSkipEx('AF_XDP unsupported')
+> +    elif xdp.ret > 0:
+> +        raise KsftFailEx('unable to create AF_XDP socket')
+> +
+> +    return bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} {xdp_queue_id}',
+> +               ksft_wait=3)
+> +
+> +def check_xdp_bind(cfg):
+> +    ip(f"link set dev %s xdp obj %s sec xdp" %
+> +       (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
+> +    ip(f"link set dev %s xdp off" % cfg.ifname)
+> +
+> +def check_rx_resize(cfg, queue_size = 128):
+> +    rx_ring = _get_rx_ring_entries(cfg)
+> +    ethtool(f"-G %s rx %d" % (cfg.ifname, queue_size))
+> +    ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
 
-Ah, no, patch 1 also does return 0. Hm. Maybe let's propagate the real
-error to silence the syzbot error and if someone with access to the HW
-comes along they can try to move this driver to more modern infra?
+Unfortunately this doesn't work on a basic QEMU setup:
+
+# ethtool -G eth0 rx 128
+[   15.680655][  T287] virtio_net virtio2 eth0: resize rx fail: rx queue index: 0 err: -2
+netlink error: No such file or directory
+
+Is there a way to enable more capable virtio_net with QEMU?
 
