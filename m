@@ -1,116 +1,146 @@
-Return-Path: <netdev+bounces-183194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C868A8B53C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:24:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256D4A8B566
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CA491904A8C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:24:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CE3A7A4170
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA28227E88;
-	Wed, 16 Apr 2025 09:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D38220693;
+	Wed, 16 Apr 2025 09:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XlSxPNTp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="igEpVuor"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49D321D3F4
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA112260C
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744795419; cv=none; b=azg15L7/9xF7TshYP8s2kF2sqavq0QY0jAUGz9C4RerR+yVrMEQHkggLQcljdWAH2N2qG+JKketOiO6wzut0JB7zvNSTRI/im5nvggKXLXcClFSnoTs5t3EBFBo8oG2T2VXSMPd3zPDTLbDzRRbUW373bWShvKKafOZc6w9m2Gw=
+	t=1744795929; cv=none; b=nUGV8ZbIi7GIxiRRoQWsGvUgCYRG0yIezdc7Y5C0DidFUsQwAZzOovpwQUH2F9qnJJ6CX/SvCH5NowZYQnhRooF3+dw6qozcbCqWlOvx3FukZX39NyvjJTg/7k0vW2RnvOlS8D39KUhd787pa2Gd4wRdrfd6VEM1G9/1s2ds4og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744795419; c=relaxed/simple;
-	bh=aQARw0r5jwsZxnY/PcJzIvLUU2cVyj4CIAvdit1QmGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r8z6BKAogFrWrTb/etqOTxTASOUsWps3P+dfo8k2mwbNzgQ8qZUstFtur+zToNR5fnxk8jU4UbRr9ZQDfSNABpUKgYEmp6cweXSXyjaxeecp3UZDlsRMoUCmx/Hhoe2RWtvddYo64Rb0AfrlLW+UfzGRHzCq64atSVKSwrtKZUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XlSxPNTp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744795416;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QAqvI/C2fuFiXzVmzEC2R1KgB3LYPmYKQDzm57373Xc=;
-	b=XlSxPNTpsbPFoy8IQLkT/dYlw0cnmTzgzNSRYeykIRBfA59ebFDvRXYkTR/nw9A+U6kPZO
-	lPO5ieZJdBkPjuyxaRZsKhKezej3JbpFXn5ERZLxLzfDJXJJUnt0JW6yuYUR28rjQmHrKY
-	zq25zYX+QQtS3Q82HJQl8SHS1kWoLJo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-456-L29dVo8COta4PYBF4ZCPpQ-1; Wed, 16 Apr 2025 05:23:35 -0400
-X-MC-Unique: L29dVo8COta4PYBF4ZCPpQ-1
-X-Mimecast-MFC-AGG-ID: L29dVo8COta4PYBF4ZCPpQ_1744795414
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf172ffe1so51845545e9.3
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:23:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744795414; x=1745400214;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QAqvI/C2fuFiXzVmzEC2R1KgB3LYPmYKQDzm57373Xc=;
-        b=dzJzpqUU85KK7XtTkKPbdYyg+hG9M1A/a8hu9roKbKfEkfbCF54xCiP7H9RXa/agGY
-         2vFEdOYf41LBk0Aqgdq7RUpaXWaMQ9zhljw4tgwUa+HmAxzokrd4SeEVvv3fKmAK5Ls+
-         FRU1Baupqq9TFrckD08VtwZWKycGFW8H03rFgYh8WKJk3O8uLo8Rav9KtVYMtt15nFyN
-         c96Wq8yOCJwjPjzEeLv90hBoBis6ZDerbbjgrtH6FfuP10qe6mUVDOAYMLnk7C8xntnG
-         qR3/gBmjmUkdzwBpd5Vm3uY81P3GddzsDpz+7NtsL3H22qyTJ9W+/IVTCCuHuqcfEVeJ
-         2yLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVmfKQvP196UjlpGKgQ42CnVKg6zDGPktszg1VeR7p8jgqZSljoBtvMeMpdsh9yIZn+Ti8czQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO+FZ4WbJharWcn+2XK/T+bTmGxkNkwKXhXgYdUPgRKCdTYh//
-	U+KlvZ803NzAhEXsCsecwenVLDtuxarhtpOdmvpa64daGLVfgZQJYheKNDtYAuq2uXk5P56VZ5q
-	rJ+pi7mjB9QSsLJHR6o/Okd6C5YvS/SiJiDg73a4tid699cHEd+kxyQ==
-X-Gm-Gg: ASbGnctFYC752x9eAWcN6ixLDQgTfFy3ZLZuxpIBb25rsM0+cI7siZGj8rc5UmEULn+
-	HYN7iTUC/UVCVgfBVXnHSg/T6qj4ptfjelDVtCaydYlK6HNDrgc5QIdAk891uiFOo0JY4LW9WVu
-	mWSgprSfp/Yngx9LzzM/RwJ2f4YWs8gmLZJ5H1htmr+wDVTU1x4xuuAoZHZ2PNIwtXshU19pbO8
-	i5Z1zwD7dlJeWIyV74fdMyYaH41l9qHI+6SZPZBRJJpned7XZsHeCXxKSHo7R0xkpFaFndic5ln
-	Bqni7FxTX9mEbm3wtIBiImgk9Ix09H3wwF1v3Q0=
-X-Received: by 2002:a05:600c:c07:b0:43d:fa59:be39 with SMTP id 5b1f17b1804b1-4405d6bfd5bmr9354565e9.33.1744795414127;
-        Wed, 16 Apr 2025 02:23:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3HKPRsmzIW7RTPhj1CUzbI3RkTRupJ0Crfwa5nDETw8xZ2UxgXhmInSnalWsyilLxEMw7vw==
-X-Received: by 2002:a05:600c:c07:b0:43d:fa59:be39 with SMTP id 5b1f17b1804b1-4405d6bfd5bmr9354315e9.33.1744795413687;
-        Wed, 16 Apr 2025 02:23:33 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96c123sm17127510f8f.36.2025.04.16.02.23.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 02:23:33 -0700 (PDT)
-Message-ID: <917877cc-414f-48c5-a9b3-0cda1fca09da@redhat.com>
-Date: Wed, 16 Apr 2025 11:23:32 +0200
+	s=arc-20240116; t=1744795929; c=relaxed/simple;
+	bh=SqNLD2seLZpye58gORKXZH1fUKMkd249tBAXxnkOndc=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=RZoI63lqab4j8zLmzkqT/Q0P94FZjRvRe3uHuu2VayYh72wciEBynZJJADa1ftmW93CMGkhXSYciXVgzdj0sioGpgW5BtCqrJjOyqEQd7+tLU2Qexl5h6hgDRv7EJMa23bc1ju7W3n/nUHvYLvtsY3v94zmhpNuORX55hE03VtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=igEpVuor; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=z8hTSVnlcCC2WOnj66TO/Zt9nedPd+37sOl0zL+RseU=; b=igEpVuorQvaIJ8+pFRIrHtcx44
+	jL0x/18UHS0Qq3GD77v4CTo36XPUl+HVlaCn7+8o2OBRyp6Ah1IrEIl9ZsMMkyL+7UmkyzgLsFjXK
+	agP5bsLJob3UoJ7UVlk/gW2Artuh/H2ip2MlPPGPoF8t6IXddNHF5TkWd+U2zNo78vs1Iiz/cyUYL
+	ZpB1Hj0UcJG43GweTZcwr6wdLtjf5Bj72/gpZzjpQT8B1xdHaNv9OW2BnVbchGg7xsyvulxlsW2nv
+	hV/uJq3sJerrU3kAKmltwEMNoZ9OKH1djovgusfkhkPeZrHf0uw7ANZ/FllQmJn5BO7vMbKhXR7pF
+	cTsOzhIQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33546 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1u4z7g-0000yb-0e;
+	Wed, 16 Apr 2025 10:32:00 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1u4z74-000xBc-R0; Wed, 16 Apr 2025 10:31:22 +0100
+In-Reply-To: <Z_95AM64tt_4ri1j@shell.armlinux.org.uk>
+References: <Z_95AM64tt_4ri1j@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 1/5] net: stmmac: socfpga: init dwmac->stmmac_rst
+ before registration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v2 net-next 07/14] ipv6: Preallocate
- rt->fib6_nh->rt6i_pcpu in ip6_route_info_create().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250414181516.28391-1-kuniyu@amazon.com>
- <20250414181516.28391-8-kuniyu@amazon.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250414181516.28391-8-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1u4z74-000xBc-R0@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 16 Apr 2025 10:31:22 +0100
 
-On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
-> ip6_route_info_create_nh() will be called under RCU.
-> 
-> Then, fib6_nh_init() is also under RCU, but per-cpu memory allocation
-> is very likely to fail with GFP_ATOMIC while bluk-adding IPv6 routes
+Initialisation/setup after registration is a bug. This is the first of
+two patches fixing this in socfpga.
 
-oops, I forgot a very minor nit:               ^^^^ bulk
+dwmac->stmmac_rst is initialised from the stmmac plat_dat's stmmac_rst
+member, which is itself initialised by devm_stmmac_probe_config_dt().
+Therefore, this can be initialised before we call stmmac_dvr_probe().
+Move it there.
 
-/P
+dwmac->stmmac_rst is used by the set_phy_mode() method.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 116855658559..bcdb25ee2a33 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -442,8 +442,6 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 	struct device		*dev = &pdev->dev;
+ 	int			ret;
+ 	struct socfpga_dwmac	*dwmac;
+-	struct net_device	*ndev;
+-	struct stmmac_priv	*stpriv;
+ 	const struct socfpga_dwmac_ops *ops;
+ 
+ 	ops = device_get_match_data(&pdev->dev);
+@@ -479,7 +477,13 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	/* The socfpga driver needs to control the stmmac reset to set the phy
++	 * mode. Create a copy of the core reset handle so it can be used by
++	 * the driver later.
++	 */
++	dwmac->stmmac_rst = plat_dat->stmmac_rst;
+ 	dwmac->ops = ops;
++
+ 	plat_dat->bsp_priv = dwmac;
+ 	plat_dat->fix_mac_speed = socfpga_dwmac_fix_mac_speed;
+ 	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
+@@ -493,15 +497,6 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ndev = platform_get_drvdata(pdev);
+-	stpriv = netdev_priv(ndev);
+-
+-	/* The socfpga driver needs to control the stmmac reset to set the phy
+-	 * mode. Create a copy of the core reset handle so it can be used by
+-	 * the driver later.
+-	 */
+-	dwmac->stmmac_rst = stpriv->plat->stmmac_rst;
+-
+ 	ret = ops->set_phy_mode(dwmac);
+ 	if (ret)
+ 		goto err_dvr_remove;
+-- 
+2.30.2
 
 
