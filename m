@@ -1,193 +1,168 @@
-Return-Path: <netdev+bounces-183376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF2DA9087B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:15:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A51A90883
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90594432F9
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:15:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36707189FD9F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570AA214235;
-	Wed, 16 Apr 2025 16:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDBD20101D;
+	Wed, 16 Apr 2025 16:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qUEAw2Re"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1D4211A26
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0891C27
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744820092; cv=none; b=QqDFFKgMgJXtZ6qt1RfmDW3GT0sZVZ48e5t9SSN9+RkY0/GxawgpG1PZkWXwsFZffhdAKK0fJ/hH1s05FDo36MB2E2ErzrmEDQ7IhUMIQbFHFFV0DW+Pgz2TbsiCq7z+mvOVFJQUsR2cRdSADVqg46bLXyn6WM4Ucud25PS23Hg=
+	t=1744820206; cv=none; b=CxvXasUrbuYkplm44g8f/q0uWABYyonEkRsn4aYgN+AH0Qhhv36Hep7qJRd/d+WIe6rDlObvfOSv/+xxPg/g9nhjyKVx4zbYB66Aof3bgowAymSiylz+8h8B1Cou7FcGxyRadpqeSKHq7++V1TieoYcRoyrU3NdHQYKpuHeko/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744820092; c=relaxed/simple;
-	bh=m7JdAv/gR2wOm1IwxWiecnlj3I4dJwl5VssYK1xzS+k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IK6dRUkIPANK/Ura1wFvFwMvjgk5O29HaEN0WcuzyBXZFvvpwZVDcN2ljQyqag6aD4DhZ8jRloj4Hy4VGMTY7oCi9mcqAa1Uy3OnsQRDzvmAo/W1+er/BXpYhY5spQ9dRnnRh/gdttlvZpbnj/rfqI0xrmrQpUzp0vMWOxLVY0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u55PN-0002G3-D7; Wed, 16 Apr 2025 18:14:41 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1744820206; c=relaxed/simple;
+	bh=WxGPIaBP7SlPU61ycn7EkEPDTts+Y13/cRgO7QAtjzo=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=rC0ar+Lzx7M5kp/dbEzBd0zzKWHubaNWisf4OzN8UkmILg2rUGmH9IZyj15xlxi8mFspTvfW45lCaQLryY0Y2QVjPv9XYJ48gb4/F/odm5P9rgoEn0Qa4XRvpy4/lxRemj0271zrGMetiyV49dRON5uTAwF/cdze6w1QjbPD0wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qUEAw2Re; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=VRBSzzTdTZPbtyBVErfwZjzgy20zrDVRX0f0olerif8=; b=qUEAw2Reaohe8sc7oRBy00DJ32
+	GXAoeL+a38VB4j4MubUevig8m0ncLbNTIL9VgIu5u312bKVQ6VRdEKiLvnQcM4oByicCEdQEjXVUW
+	1nvDVRvDxY5H2iumJelDTrvAY2k92P+lqHzsl7int97RZag3zhDep4Er3uJM1b21GXEA40QeDX5XV
+	Xf1VLE1Q5NcYuxrdr4qmCXzapCD+7n5EC76qNkHW+Kz/Vgp3fjuwroqMLaTt/Swuu12VXSuJY2J1Q
+	EppttgljDQg9FWfGjQ7SVQdC8lPrcUSpVlj/I/+Rpa6KNJW+nB6iK37yEkZ6LmfemjKu2ED3HCT+m
+	7EOb03yQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36598 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u55PN-000c9K-0W;
-	Wed, 16 Apr 2025 18:14:41 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u55PN-00CGQn-0J;
-	Wed, 16 Apr 2025 18:14:41 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1u55RH-0001ce-0u;
+	Wed, 16 Apr 2025 17:16:39 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1u55Qf-0016RN-PA; Wed, 16 Apr 2025 17:16:01 +0100
+In-Reply-To: <Z__URcfITnra19xy@shell.armlinux.org.uk>
+References: <Z__URcfITnra19xy@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
+	Joakim Zhang <qiangqing.zhang@nxp.com>,
 	netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v1 4/4] net: selftest: add PHY loopback tests with HW checksum offload
-Date: Wed, 16 Apr 2025 18:14:39 +0200
-Message-Id: <20250416161439.2922994-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250416161439.2922994-1-o.rempel@pengutronix.de>
-References: <20250416161439.2922994-1-o.rempel@pengutronix.de>
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net] net: phylink: fix suspend/resume with WoL enabled and
+ link down
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 16 Apr 2025 17:16:01 +0100
 
-Introduce two new PHY loopback tests that validate hardware checksum
-offload functionality using UDP and TCP packets. These tests set
-csum_mode = CHECKSUM_PARTIAL, allowing the NIC to compute transport
-checksums.
+When WoL is enabled, we update the software state in phylink to
+indicate that the link is down, and disable the resolver from
+bringing the link back up.
 
-Tests are only executed if the device advertises NETIF_F_HW_CSUM
-support. If not, they are skipped with -EOPNOTSUPP.
+On resume, we attempt to bring the overall state into consistency
+by calling the .mac_link_down() method, but this is wrong if the
+link was already down, as phylink strictly orders the .mac_link_up()
+and .mac_link_down() methods - and this would break that ordering.
 
-Also register the tests under descriptive names in the test list.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Fixes: f97493657c63 ("net: phylink: add suspend/resume support")
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- net/core/selftests.c | 80 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
 
-diff --git a/net/core/selftests.c b/net/core/selftests.c
-index 5d7ff6f829b5..07140242a390 100644
---- a/net/core/selftests.c
-+++ b/net/core/selftests.c
-@@ -538,6 +538,79 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
- 	return __net_test_loopback(ndev, &attr);
- }
+To fix the suspend/resume with link down, this is what I think we
+should do. Untested at the moment.
+
+ drivers/net/phy/phylink.c | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 69ca765485db..d2c59ee16ebc 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -81,6 +81,7 @@ struct phylink {
+ 	unsigned int pcs_state;
  
-+/**
-+ * net_test_phy_loopback_udp_hwcsum - PHY loopback test using UDP with HW
-+ *                                    checksum
-+ * @ndev: The network device to test
-+ *
-+ * Sends and receives a UDP packet through the device's internal PHY loopback
-+ * path. The packet is configured for hardware checksum offload
-+ * (CHECKSUM_PARTIAL), allowing the NIC to compute the transport checksum.
-+ *
-+ * Expected packet path:
-+ *   Test code → MAC driver → MAC HW → xMII → PHY →
-+ *   internal PHY loopback → xMII → MAC HW → MAC driver → test code
-+ *
-+ * The test frame includes Ethernet (14B), IPv4 (20B), UDP (8B), and a
-+ * small payload (13B), totaling 55 bytes before MAC padding/FCS. Most
-+ * MACs pad this to the minimum Ethernet payload (60 bytes before FCS).
-+ *
-+ * If the device does not support NETIF_F_HW_CSUM, the test is skipped
-+ * and -EOPNOTSUPP is returned.
-+ *
-+ * Returns 0 on success, or negative error code on failure.
-+ */
-+static int net_test_phy_loopback_udp_hwcsum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
-+
-+	if (!(ndev->features & NETIF_F_HW_CSUM))
-+		return -EOPNOTSUPP;
-+
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = false;
-+	attr.csum_mode = NET_TEST_CHECKSUM_PARTIAL;
-+
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
-+/**
-+ * net_test_phy_loopback_tcp_hwcsum - PHY loopback test using TCP with HW
-+ *                                    checksum
-+ * @ndev: The network device to test
-+ *
-+ * Sends and receives a TCP packet through the device's internal PHY loopback
-+ * path. The packet is configured for hardware checksum offload
-+ * (CHECKSUM_PARTIAL), allowing the NIC to compute the transport checksum.
-+ *
-+ * Expected packet path:
-+ *   Test code → MAC driver → MAC HW → xMII → PHY →
-+ *   internal PHY loopback → xMII → MAC HW → MAC driver → test code
-+ *   (via packet_type handler)
-+ *
-+ * The test frame includes Ethernet (14B), IPv4 (20B), TCP (20B),
-+ * and a small payload (13B), totaling 67 bytes before FCS.
-+ * No additional padding is required.
-+ *
-+ * If the device does not support NETIF_F_HW_CSUM, the test is skipped
-+ * and -EOPNOTSUPP is returned.
-+ *
-+ * Returns 0 on success, or negative error code on failure.
-+ */
-+static int net_test_phy_loopback_tcp_hwcsum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
-+
-+	if (!(ndev->features & NETIF_F_HW_CSUM))
-+		return -EOPNOTSUPP;
-+
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = true;
-+	attr.csum_mode = NET_TEST_CHECKSUM_PARTIAL;
-+
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
- static const struct net_test {
- 	char name[ETH_GSTRING_LEN];
- 	int (*fn)(struct net_device *ndev);
-@@ -561,6 +634,13 @@ static const struct net_test {
- 	}, {
- 		.name = "PHY loopback TCP (SW csum)    ",
- 		.fn = net_test_phy_loopback_tcp,
-+	}, {
-+		/* Conditional HW checksum tests */
-+		.name = "PHY loopback UDP (HW csum)    ",
-+		.fn = net_test_phy_loopback_udp_hwcsum,
-+	}, {
-+		.name = "PHY loopback TCP (HW csum)    ",
-+		.fn = net_test_phy_loopback_tcp_hwcsum,
- 	}, {
- 		/* This test should be done after all PHY loopback test */
- 		.name = "PHY internal loopback, disable",
+ 	bool link_failed;
++	bool suspend_link_up;
+ 	bool major_config_failed;
+ 	bool mac_supports_eee_ops;
+ 	bool mac_supports_eee;
+@@ -2545,14 +2546,16 @@ void phylink_suspend(struct phylink *pl, bool mac_wol)
+ 		/* Stop the resolver bringing the link up */
+ 		__set_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state);
+ 
+-		/* Disable the carrier, to prevent transmit timeouts,
+-		 * but one would hope all packets have been sent. This
+-		 * also means phylink_resolve() will do nothing.
+-		 */
+-		if (pl->netdev)
+-			netif_carrier_off(pl->netdev);
+-		else
++		pl->suspend_link_up = phylink_link_is_up(pl);
++		if (pl->suspend_link_up) {
++			/* Disable the carrier, to prevent transmit timeouts,
++			 * but one would hope all packets have been sent. This
++			 * also means phylink_resolve() will do nothing.
++			 */
++			if (pl->netdev)
++				netif_carrier_off(pl->netdev);
+ 			pl->old_link_state = false;
++		}
+ 
+ 		/* We do not call mac_link_down() here as we want the
+ 		 * link to remain up to receive the WoL packets.
+@@ -2603,15 +2606,18 @@ void phylink_resume(struct phylink *pl)
+ 	if (test_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state)) {
+ 		/* Wake-on-Lan enabled, MAC handling */
+ 
+-		/* Call mac_link_down() so we keep the overall state balanced.
+-		 * Do this under the state_mutex lock for consistency. This
+-		 * will cause a "Link Down" message to be printed during
+-		 * resume, which is harmless - the true link state will be
+-		 * printed when we run a resolve.
+-		 */
+-		mutex_lock(&pl->state_mutex);
+-		phylink_link_down(pl);
+-		mutex_unlock(&pl->state_mutex);
++		if (pl->suspend_link_up) {
++			/* Call mac_link_down() so we keep the overall state
++			 * balanced. Do this under the state_mutex lock for
++			 * consistency. This will cause a "Link Down" message
++			 * to be printed during resume, which is harmless -
++			 * the true link state will be printed when we run a
++			 * resolve.
++			 */
++			mutex_lock(&pl->state_mutex);
++			phylink_link_down(pl);
++			mutex_unlock(&pl->state_mutex);
++		}
+ 
+ 		/* Re-apply the link parameters so that all the settings get
+ 		 * restored to the MAC.
 -- 
-2.39.5
+2.30.2
 
 
