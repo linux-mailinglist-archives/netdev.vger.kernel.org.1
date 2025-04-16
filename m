@@ -1,290 +1,176 @@
-Return-Path: <netdev+bounces-183144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21448A8B275
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:42:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68B01A8B28C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2974217A338
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 07:42:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF965A02EE
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 07:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F0422D7A5;
-	Wed, 16 Apr 2025 07:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291CE22DF96;
+	Wed, 16 Apr 2025 07:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="R/HD9uNG";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="M/MtMDua"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlBnJ4A8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020551A8F9E;
-	Wed, 16 Apr 2025 07:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633EF21E086
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 07:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744789340; cv=none; b=mDTl6FYVh2PHOaxMFm2m/ydiKFr3XxQXeVzwSPI0HU7VR+9g318zcaGgI05xhTZXpUIYaoUmLnePAjHAjSo0HW8BdJlQFm1fAUzpd/6YIhR+1WbDi54iY4F2X91oYFYxY8IFDrxDsTOQk3ZFwIk+Hsiw3Fl6ahbHWsaJDOfxTfQ=
+	t=1744789620; cv=none; b=RjKgy7tQ8siSWuV5WJVrYML1OXxNZ1f2+nA3s397Y+odYmG0eVE50rjHuPtp3RLNH5QX2VvPFof9TdfOF1MOiD/ZaEeoPXj6N+nWAPoNDQDUlCrYgYFV7RQtT1hTv2Q2GcdsZ55lltXQmAFb+m5hAABlSF9V0pZ1yZLGOUOoPPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744789340; c=relaxed/simple;
-	bh=v25A/wzR9AvhuS5vVybL2FLQ/7j++SzyiyIA+8jlU2k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=l8HIUzewH8pF7+72Tagv6d8hfExYyRxT4IsAt1B91jr99M2zhvUcZeCY2AFBgNRxYpn9fCjTTuSVB0/Lw0TN7pNWenupEwnYcf7qt422iBPNUUQwUJMsFaPM9l3VgFVCNM0owgKZuxgfVc+URCi7XePDwE4skXj4w45gOqpG/Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=R/HD9uNG; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=M/MtMDua reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1744789336; x=1776325336;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=+ic5Mzuh+6gVyT/cjuEACzFs09tFVLNoZJQMRkUzWw0=;
-  b=R/HD9uNG9Ij3qanrkoyfoyhaK6uFcjpFnLb+oxnyODn4zqPbYvWEnaZw
-   gJHjWGw912FcIdS1xYqcL02oxMq3VV3XwLCUxfsO2rbnrf1dh21ZX+cgH
-   VG4e2LQzDDIFyez6qSlV2jgiyHyM/6xxzvfo+/cg4MRS7bgFZjGMMQ6WY
-   T6Wdmb8Co/mCLEZA3CcP4PRfe1bcgyZo4zoquOSMDOTGW8xvHWKK3v1Vf
-   owLrFBejHJk+f8f4U2RYb4DuGciKld3xvYUqX6FsLXuIvSeVpECJQS0Kk
-   msPpX1qZaPr6wdX836aL94TOzaCG9+6KVolZD+bFKhTBy18eQk3PiuByJ
-   A==;
-X-CSE-ConnectionGUID: OjJQBx9WQeiBmnGab79m3A==
-X-CSE-MsgGUID: vRI8Fz7rRtunAMcO6SuQeQ==
-X-IronPort-AV: E=Sophos;i="6.15,215,1739833200"; 
-   d="scan'208";a="43559009"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 16 Apr 2025 09:42:11 +0200
-X-CheckPoint: {67FF5F53-32-B1D34AC3-DEA5B19F}
-X-MAIL-CPID: 25AC1741F08C06D9D92310D82C1FB32A_4
-X-Control-Analysis: str=0001.0A006375.67FF5F50.0006,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 90B6216C05B;
-	Wed, 16 Apr 2025 09:41:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1744789327;
+	s=arc-20240116; t=1744789620; c=relaxed/simple;
+	bh=Woiis248jlZyFcV6c0KJ2XRceoaJiE3r8gMR3OmXAq4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pSb2dSet82BAQgpcKWI1IdwIG+stcI8FQWUGowt30Dn55STudsaKclnOITK3lKfCTFphenGVDGtTSzL1FZYOMItB3lZYuyNQC9/993g3+1+yslpfGiKz+TYavR65pGJU3mi2+W4oaASpw9HN/FJzR4MIZrlyVrK9EurWGnZ2GEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GlBnJ4A8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744789617;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+ic5Mzuh+6gVyT/cjuEACzFs09tFVLNoZJQMRkUzWw0=;
-	b=M/MtMDuaCVsUrYg5k5jSsiYw7QkR3zAqIlGVppUaVxHxGhZSpjRagHzYaOR33GUa8B/+mr
-	V0FP85KaNypEdgNHGjWgg18wvlwCMundEPoMouXH05+EG5WFuimPHIA/3nNpAThr8zngt5
-	hgxfuLtggXzYfTbkZk80kjc3AdMVR9+048TRxIpdYQbjiU/I04wf2jgTfzLF9tA0JON6Xs
-	UKMpKEdOQSQInAg7V41UNqv+dSFfmCplvt49UiPQH9t/ivMVl+bLeNNRh4BP+NRvebEmok
-	5qeOCHH4lDDZYwUKOOA/YOz/Gs5IE/v2U/UOIr/fin+QjLjJPw2pvYkyHKwTsA==
-Message-ID: <b53fba84c8435859a40288f3a12db40685b8863a.camel@ew.tq-group.com>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray
- <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
- Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>, Nishanth Menon
- <nm@ti.com>,  Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros
- <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Date: Wed, 16 Apr 2025 09:41:57 +0200
-In-Reply-To: <5d74d4b2-f442-4cb8-910e-cb1cc7eb2b3d@ti.com>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
-	 <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
-	 <6be3bdbe-e87e-4e83-9847-54e52984c645@ti.com>
-	 <cd483b43465d6e50b75f0b11d0fae57251cdc3db.camel@ew.tq-group.com>
-	 <5d74d4b2-f442-4cb8-910e-cb1cc7eb2b3d@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	bh=3uuzpXIRkdIf9HgwyCsnLAQ1Zty68iXHOJ7gPJ3rwGI=;
+	b=GlBnJ4A82S2FEJ+0jM23oiVDR9vJvrPTaapV2htlUObIhbPTRXyo4wbEFBFsWUBU9rcbWh
+	bwSOWFJaUe0HEGPpiAXiGthuY7J5KuKyG50x0SktoBz/R/qZi/pypa0fQPHtqaArpzNZ14
+	6I86jF9NUk1XhSyyZS5FHnMbfVpmRgo=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-22-1rWZKnKQNUWg_8LF_QTVqQ-1; Wed, 16 Apr 2025 03:46:55 -0400
+X-MC-Unique: 1rWZKnKQNUWg_8LF_QTVqQ-1
+X-Mimecast-MFC-AGG-ID: 1rWZKnKQNUWg_8LF_QTVqQ_1744789615
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-22c31b55ac6so9608735ad.0
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:46:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744789615; x=1745394415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3uuzpXIRkdIf9HgwyCsnLAQ1Zty68iXHOJ7gPJ3rwGI=;
+        b=cGLuKfQe1BkEcwjw8ilC322lZ2WtO3EosY54XUcpHT88rlMNqqJ+f0wh3WAlicOnpJ
+         Cp48UACwGW5Mhkm14foA1lKkYgsq4Itonvs4aSYrbeC4UrrzQ07z+/1wt9gStKyh7Ma3
+         SX/qZxA0VZ0bzlwo3nkPdhg0niUjr1QFDf1HfU+CPqxAJ0v95zEAvN/0ukDSwyPAIvGj
+         Tu6c0XfXC1XyobMLBmkv5GYJfQk2fALKlq2hEOsHVm09fLiCsVHKIaGIdzPVGIqkRkn2
+         lZ/A/afRIQoNYtfW13vft8tLxB4nXhrFYkjnqJn8wPsZAbotUjsg+oOYC0whWlBselza
+         0w0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVRflStGye2kMP3+gfEG/3Wya9TpfC3mHU63oi3yP3gdJLf2iNFIDOMINfU9/spz+1f1VkuS10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhXNEt7ek8ZD3vD2enSn9la9eX0vDNVhMAQCJHU0bLVRoYFpfC
+	FGk7VHggBkNiTfpnV6P0lRoAsf9UXNAfX8PHZQtdiPJZZcF/d+tSdCnFJBxIkDsQ2Pc7hHywSBi
+	JeD6jMAOMQby6YLACkxf5cnzKTl+n3SIdA4jXiJ0LtxFofbc/fyGWR7hjZeEIFOR0sFslBU5TG2
+	/PUNuWl1NRZzDAcnBbKqLdJ1XvLfii
+X-Gm-Gg: ASbGnct3kpUc0EOgyUOSDRqWoHdDQSfQbXj5OIpIDnSDJpMMKB8LSEeY9gplh+8zPmp
+	67dhuJwWNDx7xMXmBsF1ulOdr163/DsDT+osu9DW1oKa7WskanLNppVXEQJDo3n/rLIvi
+X-Received: by 2002:a17:903:32c9:b0:21f:52e:939e with SMTP id d9443c01a7336-22c35912212mr15797685ad.28.1744789614841;
+        Wed, 16 Apr 2025 00:46:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErjgPg3L39vqGFFK6Rdj2WvOpVA1dDcQP124r0ZOZ4IRpEvlOKOgz7Fujmr5sSexyffpGWZnI6AM2k2Ni2zcE=
+X-Received: by 2002:a17:903:32c9:b0:21f:52e:939e with SMTP id
+ d9443c01a7336-22c35912212mr15797285ad.28.1744789614412; Wed, 16 Apr 2025
+ 00:46:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20250415074341.12461-1-minhquangbui99@gmail.com>
+ <20250415074341.12461-4-minhquangbui99@gmail.com> <20250415212709.39eafdb5@kernel.org>
+ <1603c373-024d-4ec2-b655-b9e7fb942bba@gmail.com>
+In-Reply-To: <1603c373-024d-4ec2-b655-b9e7fb942bba@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 16 Apr 2025 15:46:42 +0800
+X-Gm-Features: ATxdqUHhk7SJXf3iQ5yHeMNHj2FuWUp_PAPo48ZoR1bRo43UlB38GKCpvPtEiUA
+Message-ID: <CACGkMEvceXT+=HJRRe6D3Zk3k40E2ADJiXNb4qqAYm=PZnxNpQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] selftests: net: add a virtio_net deadlock selftest
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev, 
+	"Michael S . Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2025-04-15 at 17:25 +0530, Siddharth Vadapalli wrote:
->=20
-> On Tue, Apr 15, 2025 at 01:28:48PM +0200, Matthias Schiffer wrote:
-> > On Tue, 2025-04-15 at 16:06 +0530, Siddharth Vadapalli wrote:
-> > >=20
-> > > On Tue, Apr 15, 2025 at 12:18:01PM +0200, Matthias Schiffer wrote:
-> > > > As discussed [1], the comments for the different rgmii(-*id) modes =
-do not
-> > > > accurately describe what these values mean.
-> > > >=20
-> > > > As the Device Tree is primarily supposed to describe the hardware a=
-nd not
-> > > > its configuration, the different modes need to distinguish board de=
-signs
-> > >=20
-> > > If the Ethernet-Controller (MAC) is integrated in an SoC (as is the c=
-ase
-> > > with CPSW Ethernet Switch), and, given that "phy-mode" is a property
-> > > added within the device-tree node of the MAC, I fail to understand ho=
-w
-> > > the device-tree can continue "describing" hardware for different boar=
-d
-> > > designs using the same SoC (unchanged MAC HW).
-> >=20
-> > The setting is part of the MAC node, but it is always set in the board =
-DTS,
-> > together with assigning a PHY to the MAC.
->=20
-> The MAC is the same independent of which board it is used in. So are we
-> really describing the "MAC" or configuring the "MAC"? Isn't it the PHY
-> along with the PCB lines on a given board that determine how the "MAC"
-> should be "configured" to make the combination of "MAC" + "PHY"
-> functional together?
->=20
-> >=20
-> > > How do we handle situations where a given MAC supports various
-> > > "phy-modes" in HW? Shouldn't "phy-modes" then be a "list" to technica=
-lly
-> > > descibe the HW? Even if we set aside the "rgmii" variants that this
-> > > series is attempting to address, the CPSW MAC supports "sgmii", "qsgm=
-ii"
-> > > and "usxgmii/xfi" as well.
-> >=20
-> > This is not about PHY mode support of the MAC, but the mode to be used =
-on a
-> > particular board. I would not expect a board to use multiple different
-> > interfaces with a single PHY (and if such cases exist, I consider them =
-out of
->=20
-> For a fixed PHY, the MAC will be "configured" to operate in a set of
-> modes supported by the PHY. The HW description is coming from the PHY
-> that has been "fixed", and not the MAC. But the "phy-mode" property
-> resides within the device-tree node of the MAC and not the PHY. So are
-> we still "describing" the MAC when it is the "PHY" that introduces the
-> limitation or requires the MAC to be configured for a particular
-> "phy-mode"?
-
-The phy-mode property does not describe the MAC, but how MAC and PHY are
-connected. The MAC node just happens to be where this information is placed=
- in
-the Device Tree (Using graph nodes to describe the connection between MAC a=
-nd
-PHY seems like overkill...)
-
-Also note that (as I understand it) I'm not changing anything, I'm updating=
- the
-documentation to reflect what has been the intended behavior already. Pleas=
-e see
-the previous discussion with Andrew that I linked, where he convinced me th=
-at
-this is the correct approach.
-
->=20
-> > scope for this patch series).
-> >=20
-> > >=20
-> > > > (if a delay is built into the PCB using different trace lengths); w=
-hether
-> > > > a delay is added on the MAC or the PHY side when needed should not =
-matter.
-> > > >=20
-> > > > Unfortunately, implementation in MAC drivers is somewhat inconsiste=
-nt
-> > > > where a delay is fixed or configurable on the MAC side. As a first =
-step
-> > > > towards sorting this out, improve the documentation.
->=20
-> While this patch is improving the documentation and making it consistent
-> when it comes to the description of "rgmii" by stating that the "MAC"
-> shouldn't add a delay, for the remaining cases, as to who adds the delay
-> and whether or not the MAC should add a delay has been left open.
-> Existing documentation clarifies what the MAC should do for each case
-> except "rgmii" which is being fixed by your patch.
-
-Andrew specifically asked to leave it open in the DT bindings whether MAC o=
-r PHY
-add the delay, and it might differ between drivers (and different operating
-systems using the same Device Tree).
-
-Whether the MAC should add a required delay in cases where it's configurabl=
-e is
-an interesting question - not one of the Device Tree bindings, but of drive=
-r
-implementation.
-
-On Linux, there currently isn't a way for the MAC driver to query from the =
-PHY
-whether it could include the delays itself. My assumption is that most PHYs
-either don't have internal delays, or the delays are configurable. If this =
-is
-the case, having the MAC add them in internal-delay modes and not adding th=
-em on
-the PHY side would be the best default (also for PHY-less/fixed-link setups=
-,
-which should be handled like a PHY without internal delay capabilities.)
-
-@Andrew, does the above seem correct to you?
-
-Best,
-Matthias
-
-
->=20
-> > > >=20
-> > > > Link: https://lore.kernel.org/lkml/d25b1447-c28b-4998-b238-92672434=
-dc28@lunn.ch/ [1]
-> > > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com=
+On Wed, Apr 16, 2025 at 2:54=E2=80=AFPM Bui Quang Minh <minhquangbui99@gmai=
+l.com> wrote:
 >
-> > > > ---
-> > > >  .../bindings/net/ethernet-controller.yaml        | 16 +++++++++---=
-----
-> > > >  1 file changed, 9 insertions(+), 7 deletions(-)
-> > > >=20
-> > > > diff --git a/Documentation/devicetree/bindings/net/ethernet-control=
-ler.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> > > > index 45819b2358002..2ddc1ce2439a6 100644
-> > > > --- a/Documentation/devicetree/bindings/net/ethernet-controller.yam=
-l
-> > > > +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yam=
-l
-> > > > @@ -74,19 +74,21 @@ properties:
-> > > >        - rev-rmii
-> > > >        - moca
-> > > > =20
-> > > > -      # RX and TX delays are added by the MAC when required
-> > > > +      # RX and TX delays are part of the board design (through PCB=
- traces). MAC
-> > > > +      # and PHY must not add delays.
-> > > >        - rgmii
-> > > > =20
-> > > > -      # RGMII with internal RX and TX delays provided by the PHY,
-> > > > -      # the MAC should not add the RX or TX delays in this case
-> > > > +      # RGMII with internal RX and TX delays provided by the MAC o=
-r PHY. No
-> > > > +      # delays are included in the board design; this is the most =
-common case
-> > > > +      # in modern designs.
-> > > >        - rgmii-id
-> > > > =20
-> > > > -      # RGMII with internal RX delay provided by the PHY, the MAC
-> > > > -      # should not add an RX delay in this case
-> > > > +      # RGMII with internal RX delay provided by the MAC or PHY. T=
-X delay is
-> > > > +      # part of the board design.
-> > > >        - rgmii-rxid
-> > > > =20
-> > > > -      # RGMII with internal TX delay provided by the PHY, the MAC
-> > > > -      # should not add an TX delay in this case
-> > > > +      # RGMII with internal TX delay provided by the MAC or PHY. R=
-X delay is
-> > > > +      # part of the board design.
->=20
-> [...]
->=20
-> Regards,
-> Siddharth.
+> On 4/16/25 11:27, Jakub Kicinski wrote:
+> > On Tue, 15 Apr 2025 14:43:41 +0700 Bui Quang Minh wrote:
+> >> +def setup_xsk(cfg, xdp_queue_id =3D 0) -> bkg:
+> >> +    # Probe for support
+> >> +    xdp =3D cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=3DFalse=
+)
+> >> +    if xdp.ret =3D=3D 255:
+> >> +        raise KsftSkipEx('AF_XDP unsupported')
+> >> +    elif xdp.ret > 0:
+> >> +        raise KsftFailEx('unable to create AF_XDP socket')
+> >> +
+> >> +    return bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} {xdp_=
+queue_id}',
+> >> +               ksft_wait=3D3)
+> >> +
+> >> +def check_xdp_bind(cfg):
+> >> +    ip(f"link set dev %s xdp obj %s sec xdp" %
+> >> +       (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
+> >> +    ip(f"link set dev %s xdp off" % cfg.ifname)
+> >> +
+> >> +def check_rx_resize(cfg, queue_size =3D 128):
+> >> +    rx_ring =3D _get_rx_ring_entries(cfg)
+> >> +    ethtool(f"-G %s rx %d" % (cfg.ifname, queue_size))
+> >> +    ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
+> > Unfortunately this doesn't work on a basic QEMU setup:
+> >
+> > # ethtool -G eth0 rx 128
+> > [   15.680655][  T287] virtio_net virtio2 eth0: resize rx fail: rx queu=
+e index: 0 err: -2
+> > netlink error: No such file or directory
+> >
+> > Is there a way to enable more capable virtio_net with QEMU?
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+What's the qemu command line and version?
+
+Resize depends on queue_reset which should be supported from Qemu 7.2
+
+>
+> I guess that virtio-pci-legacy is used in your setup.
+
+Note that modern devices are used by default.
+
+>
+> Here is how I setup virtio-net with Qemu
+>
+>      -netdev tap,id=3Dhostnet1,vhost=3Don,script=3D$NETWORK_SCRIPT,downsc=
+ript=3Dno \
+>      -device
+> virtio-net-pci,netdev=3Dhostnet1,iommu_platform=3Don,disable-legacy=3Don =
+\
+>
+> The iommu_platform=3Don is necessary to make vring use dma API which is a
+> requirement to enable xsk_pool in virtio-net (XDP socket will be in
+> zerocopy mode for this case). Otherwise, the XDP socket will fallback to
+> copy mode, xsk_pool is not enabled in virtio-net that makes the
+> probability to reproduce bug to be very small. Currently, when you don't
+> have iommu_platform=3Don, you can pass the test even before the fix, so I
+> think I will try to harden the selftest to make it return skip in this ca=
+se.
+
+I would like to keep the resize test as it doesn't require iommu_platform.
+
+Thanks
+
+>
+> Thanks,
+> Quang Minh.
+>
+
 
