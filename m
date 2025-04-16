@@ -1,149 +1,116 @@
-Return-Path: <netdev+bounces-183191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22D37A8B533
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:23:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C868A8B53C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 384701791E4
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:23:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CA491904A8C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C646523496B;
-	Wed, 16 Apr 2025 09:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA28227E88;
+	Wed, 16 Apr 2025 09:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J5rqLzdX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XlSxPNTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1023F236456
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49D321D3F4
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744795379; cv=none; b=UhVDJCI03yfGh3EJynoSqjTB/wZ13EuejhVcpTAHKPE75D8L3BJPoL4W+IUoqdliCSlZvjwxl85UHhB06yWIDM4HWCWkUWJEoi2yxjmbBn7Iuo5ybVYoKlZSeOxvuoytQBR1cxEYz9UDG5jA4UZkk/6B/TjFma/A8H16FMBz6U8=
+	t=1744795419; cv=none; b=azg15L7/9xF7TshYP8s2kF2sqavq0QY0jAUGz9C4RerR+yVrMEQHkggLQcljdWAH2N2qG+JKketOiO6wzut0JB7zvNSTRI/im5nvggKXLXcClFSnoTs5t3EBFBo8oG2T2VXSMPd3zPDTLbDzRRbUW373bWShvKKafOZc6w9m2Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744795379; c=relaxed/simple;
-	bh=9AaagRoUGMmuG3v/XLXqgtNoP+syY3mCOivkxE8R+NQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rd0LuXbeBTGXtlL7iSSRBD/TqTu9Q1qM5ZwpBClnsVYbEIjek7KA5r94YIqK8lhDTvrJJkMq0NvRMl5GnEOGl+BmDT9US0hxeJ5vD3uJarnwqKIAUCa5iigEzq8LIWyLozfe3GVbt6+0BObCH4yW8Zpb5WAqzx9zFhGaAEGhXOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J5rqLzdX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+WPslgCeRTES35qN9Ie4Wit2sF445ZU+qKH4X7tw5Ac=; b=J5rqLzdX8fMcZrYm9uLB0w84WM
-	8MIgz/Z3U8BVkLn6KD1A2ghhR/nQesnbQ6/5n9J5Hk0Sut+QFvJa8bcHSAiDhJKMlayD4xN8SIq5D
-	n6i1Aq01mM0K2D4giwpoVDEPGcuMKOWHsLeKNbHnGyn0sLagHShG/Xd9/VCmOG1q6568X7Peo0pLd
-	LBWjLXWP38b8a1krNaY8RRxBq50vS9fKfNHbZKuS95eJ6+OIlRVtiwCfsjyG/tWqrTBYrV7GkDRqD
-	oofFfBUZC0ZAeG4NORCaSvPw0DaJwtjjfNrzga90FRUEZOuX48P8moV+Up8UPO7qJPuZ4tcLJpz2K
-	i01gWQ2Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36116)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4yyo-0000xj-2B;
-	Wed, 16 Apr 2025 10:22:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4yym-0001HR-02;
-	Wed, 16 Apr 2025 10:22:48 +0100
-Date: Wed, 16 Apr 2025 10:22:47 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH RFC net-next 2/5] ptp: marvell: add core support for
- Marvell PTP v2.1
-Message-ID: <Z_9252w9vWiGysiF@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
- <E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
- <20250416104849.43374926@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1744795419; c=relaxed/simple;
+	bh=aQARw0r5jwsZxnY/PcJzIvLUU2cVyj4CIAvdit1QmGU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r8z6BKAogFrWrTb/etqOTxTASOUsWps3P+dfo8k2mwbNzgQ8qZUstFtur+zToNR5fnxk8jU4UbRr9ZQDfSNABpUKgYEmp6cweXSXyjaxeecp3UZDlsRMoUCmx/Hhoe2RWtvddYo64Rb0AfrlLW+UfzGRHzCq64atSVKSwrtKZUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XlSxPNTp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744795416;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QAqvI/C2fuFiXzVmzEC2R1KgB3LYPmYKQDzm57373Xc=;
+	b=XlSxPNTpsbPFoy8IQLkT/dYlw0cnmTzgzNSRYeykIRBfA59ebFDvRXYkTR/nw9A+U6kPZO
+	lPO5ieZJdBkPjuyxaRZsKhKezej3JbpFXn5ERZLxLzfDJXJJUnt0JW6yuYUR28rjQmHrKY
+	zq25zYX+QQtS3Q82HJQl8SHS1kWoLJo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-456-L29dVo8COta4PYBF4ZCPpQ-1; Wed, 16 Apr 2025 05:23:35 -0400
+X-MC-Unique: L29dVo8COta4PYBF4ZCPpQ-1
+X-Mimecast-MFC-AGG-ID: L29dVo8COta4PYBF4ZCPpQ_1744795414
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf172ffe1so51845545e9.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:23:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744795414; x=1745400214;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QAqvI/C2fuFiXzVmzEC2R1KgB3LYPmYKQDzm57373Xc=;
+        b=dzJzpqUU85KK7XtTkKPbdYyg+hG9M1A/a8hu9roKbKfEkfbCF54xCiP7H9RXa/agGY
+         2vFEdOYf41LBk0Aqgdq7RUpaXWaMQ9zhljw4tgwUa+HmAxzokrd4SeEVvv3fKmAK5Ls+
+         FRU1Baupqq9TFrckD08VtwZWKycGFW8H03rFgYh8WKJk3O8uLo8Rav9KtVYMtt15nFyN
+         c96Wq8yOCJwjPjzEeLv90hBoBis6ZDerbbjgrtH6FfuP10qe6mUVDOAYMLnk7C8xntnG
+         qR3/gBmjmUkdzwBpd5Vm3uY81P3GddzsDpz+7NtsL3H22qyTJ9W+/IVTCCuHuqcfEVeJ
+         2yLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmfKQvP196UjlpGKgQ42CnVKg6zDGPktszg1VeR7p8jgqZSljoBtvMeMpdsh9yIZn+Ti8czQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO+FZ4WbJharWcn+2XK/T+bTmGxkNkwKXhXgYdUPgRKCdTYh//
+	U+KlvZ803NzAhEXsCsecwenVLDtuxarhtpOdmvpa64daGLVfgZQJYheKNDtYAuq2uXk5P56VZ5q
+	rJ+pi7mjB9QSsLJHR6o/Okd6C5YvS/SiJiDg73a4tid699cHEd+kxyQ==
+X-Gm-Gg: ASbGnctFYC752x9eAWcN6ixLDQgTfFy3ZLZuxpIBb25rsM0+cI7siZGj8rc5UmEULn+
+	HYN7iTUC/UVCVgfBVXnHSg/T6qj4ptfjelDVtCaydYlK6HNDrgc5QIdAk891uiFOo0JY4LW9WVu
+	mWSgprSfp/Yngx9LzzM/RwJ2f4YWs8gmLZJ5H1htmr+wDVTU1x4xuuAoZHZ2PNIwtXshU19pbO8
+	i5Z1zwD7dlJeWIyV74fdMyYaH41l9qHI+6SZPZBRJJpned7XZsHeCXxKSHo7R0xkpFaFndic5ln
+	Bqni7FxTX9mEbm3wtIBiImgk9Ix09H3wwF1v3Q0=
+X-Received: by 2002:a05:600c:c07:b0:43d:fa59:be39 with SMTP id 5b1f17b1804b1-4405d6bfd5bmr9354565e9.33.1744795414127;
+        Wed, 16 Apr 2025 02:23:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3HKPRsmzIW7RTPhj1CUzbI3RkTRupJ0Crfwa5nDETw8xZ2UxgXhmInSnalWsyilLxEMw7vw==
+X-Received: by 2002:a05:600c:c07:b0:43d:fa59:be39 with SMTP id 5b1f17b1804b1-4405d6bfd5bmr9354315e9.33.1744795413687;
+        Wed, 16 Apr 2025 02:23:33 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96c123sm17127510f8f.36.2025.04.16.02.23.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 02:23:33 -0700 (PDT)
+Message-ID: <917877cc-414f-48c5-a9b3-0cda1fca09da@redhat.com>
+Date: Wed, 16 Apr 2025 11:23:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416104849.43374926@kmaincent-XPS-13-7390>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND v2 net-next 07/14] ipv6: Preallocate
+ rt->fib6_nh->rt6i_pcpu in ip6_route_info_create().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250414181516.28391-1-kuniyu@amazon.com>
+ <20250414181516.28391-8-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250414181516.28391-8-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 16, 2025 at 10:48:49AM +0200, Kory Maincent wrote:
-> On Fri, 11 Apr 2025 22:26:37 +0100
-> Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> > Provide core support for the Marvell PTP v2.1 implementations, which
-> > consist of a TAI (time application interface) and timestamping blocks.
-> > This hardware can be found in Marvell 88E151x PHYs, Armada 38x and
-> > Armada 37xx (mvneta), as well as Marvell DSA devices.
-> > 
-> > Support for both arrival timestamps is supported, we use arrival 1 for
-> > PTP peer delay messages, and arrival 0 for all other messages.
-> > 
-> > External event capture is also supported.
-> > 
-> > PPS output and trigger generation is not supported.
-> > 
-> > This core takes inspiration from the existing Marvell 88E6xxx DSA PTP
-> > code and DP83640 drivers. Like the original 88E6xxx DSA code, we
-> > use a delayed work to keep the cycle counter updated, and a separate
-> > delayed work for event capture.
-> > 
-> > We expose the ptp clock aux work to allow users to support single and
-> > multi-port designs - where there is one Marvell TAI instance and a
-> > number of Marvell TS instances.
+On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
+> ip6_route_info_create_nh() will be called under RCU.
 > 
-> ...
-> 
-> > +#define MV_PTP_MSGTYPE_DELAY_RESP	9
-> > +
-> > +/* This defines which incoming or outgoing PTP frames are timestampped */
-> > +#define MV_PTP_MSD_ID_TS_EN	(BIT(PTP_MSGTYPE_SYNC) | \
-> > +				 BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> > +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
-> > +/* Direct Sync messages to Arr0 and delay messages to Arr1 */
-> > +#define MV_PTP_TS_ARR_PTR	(BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> > +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
-> 
-> Why did you have chosen to use two queues with two separate behavior?
-> I have tried using only one queue and the PTP as master behaves correctly
-> without all these overrun. It is way better with one queue.
-> Maybe it was not the best approach if you want to use the two queues.  
+> Then, fib6_nh_init() is also under RCU, but per-cpu memory allocation
+> is very likely to fail with GFP_ATOMIC while bluk-adding IPv6 routes
 
-First, both queues have the same behaviour.
+oops, I forgot a very minor nit:               ^^^^ bulk
 
-Second, because they *aren't* queues as they can only stamp one message.
-The sync messages come from the master on a regular basis. The delay
-response messages come from the master in response to a delay request
-message, the timing of which is determined by the local slave.
+/P
 
-If the local end sends a delay request just at the point that the master
-sends a sync message causing the master to immediately follow the sync
-message with the delay response message, then we could get an overrun
-on a single queue - because we'll stamp the sync message and if we don't
-read the timestamp quickly enough, the stamp registers will be busy
-preventing the timestamp of the delay response being captured.
-
-With the overruns that I've seen, they've always been on the second
-"queue" and have always been for a sequence number several in the past
-beyond the point that the overrun has been reported. However, the
-packet which the sequence number matches had already been received -
-and several others have also been received. I've been wondering if it's
-a hardware bug, or maybe it's something other bits of the kernel is
-doing wrong.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
