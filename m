@@ -1,324 +1,130 @@
-Return-Path: <netdev+bounces-183245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B234A8B72F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:55:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8874A8B738
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F4444556E
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:55:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6E01904A42
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADEB235BFF;
-	Wed, 16 Apr 2025 10:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6C0236440;
+	Wed, 16 Apr 2025 10:58:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cj/BDpNY"
+	dkim=pass (2048-bit key) header.d=crpt.ru header.i=@crpt.ru header.b="NVEFSfYY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.crpt.ru (mail1.crpt.ru [91.236.205.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0201E7C24;
-	Wed, 16 Apr 2025 10:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC28207643;
+	Wed, 16 Apr 2025 10:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.236.205.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744800898; cv=none; b=d9WJhSGoJixkyhIO9HzdpUkR5U2VYNx3EIJUJ9F14qHRSS1pQVxRX1xJzuXNcbcjONJ/HSTzCZytKI5kuoLesWzpVTnOoTIdSymihI/TJoViQbrabAZgPyuIDPePxHs2AqKAQ8rpWy1g7oB3HmWXhkLaSP1c1BokzNUZ0v3ZmsA=
+	t=1744801081; cv=none; b=cT+cwt398KbWfezlBWQTZqRiaLDTtmme/ssdUhtxQLrGiDXs6sq0ftR0hqFsu3jQKNPOX8/TK9QjyKapLMK39yCWkSAnaM7dWXg2EPoJk5iobvIBhTeNyNNWDPqo0zsGqiF854I55FnxSm8wtiXPz9xAyCRPCfZt51t17Rz71Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744800898; c=relaxed/simple;
-	bh=7JN6snAw2lrK/X6VkKve41wf57owbc2L0SobKwitddE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=N6YFAUjOn/apXCDw5NtoSFiqa00WLH6y8dfyG+dKTMTlXZACiHnrJd2EJVkY9P+fBDnlcOE5DBuP0BkwLHEKeCBqs9dhI/wFdQXnblLvdlY7rGKY+cBgEPDgDWFX0bNylsYDUtAeODGLw8tNFLzuSaiHTJV1++YmQfaVhGQFmHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cj/BDpNY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801BEC4CEE2;
-	Wed, 16 Apr 2025 10:54:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744800897;
-	bh=7JN6snAw2lrK/X6VkKve41wf57owbc2L0SobKwitddE=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=cj/BDpNYbphHzJEiLNFlvYm/GFcN98+FI2ZMAotiQ+7iud0nIMOvFnIxmc0pwY1gA
-	 jVLzyaSW9VJq6/x1pXj1QwlOluMrDtVvGJOrTWGXHd+qKgAvOKc6N8aVB3jDLW4YoM
-	 vTBoLZ9KX8lE0PttueVMsJVjoWmFmOcCElXGkatr31RC41/lY5fTwIQWylqNU7dP62
-	 vbgFzIh2gJmY75eSU7i8/CfD5hDJcH4ibpUGi4t8beoGygnT/CmsXAZfB1fqs5mhpA
-	 +2gLEfipmQ3BzLEdaeJJ/EucRiUlHTSB3FK9rb2FyKsHrhxWip2oQTGpV2s9CODEe5
-	 STEzAfRW2LSug==
-Message-ID: <6ee047d4-f3de-4c25-aaae-721221dc3003@kernel.org>
-Date: Wed, 16 Apr 2025 12:54:51 +0200
+	s=arc-20240116; t=1744801081; c=relaxed/simple;
+	bh=HznOvf2q9H/C46tfchJ/aD5F5paEir7+2Bx1MbpEdgI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Zg2CJWbMOt+8/cQ1/Ixgs3k/VpCrPO+VGsMIiK84LMBm0f0R3APKheT/AaEeXcwwHs7J/emDKvruoLdj20g6dLLPkwPuxpO2yTtSo3OghYICrS0qB65eIed062aDz1n9cUWqXg417e2jLPWh5GtNjTQ/e0B37iqjVs5YdiBbjTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crpt.ru; spf=pass smtp.mailfrom=crpt.ru; dkim=pass (2048-bit key) header.d=crpt.ru header.i=@crpt.ru header.b=NVEFSfYY; arc=none smtp.client-ip=91.236.205.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crpt.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crpt.ru
+Received: from mail.crpt.ru ([192.168.60.4])
+	by mail.crpt.ru  with ESMTP id 53GAtloh003741-53GAtloj003741
+	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=OK);
+	Wed, 16 Apr 2025 13:55:47 +0300
+Received: from EX2.crpt.local (192.168.60.4) by ex2.crpt.local (192.168.60.4)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Wed, 16 Apr
+ 2025 13:55:47 +0300
+Received: from EX2.crpt.local ([192.168.60.4]) by EX2.crpt.local
+ ([192.168.60.4]) with mapi id 15.01.2507.044; Wed, 16 Apr 2025 13:55:47 +0300
+From: =?koi8-r?B?98HUz9LP0MnOIOHOxNLFyg==?= <a.vatoropin@crpt.ru>
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>
+CC: =?koi8-r?B?98HUz9LP0MnOIOHOxNLFyg==?= <a.vatoropin@crpt.ru>, "Sriharsha
+ Basavapatna" <sriharsha.basavapatna@broadcom.com>, Somnath Kotur
+	<somnath.kotur@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Padmanabh
+ Ratnakar" <padmanabh.ratnakar@emulex.com>, Mammatha Edhala
+	<mammatha.edhala@emulex.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH] be2net: Remove potential access to the zero address
+Thread-Topic: [PATCH] be2net: Remove potential access to the zero address
+Thread-Index: AQHbrr4bomvL6pb+ekyghxTxcqhCrw==
+Date: Wed, 16 Apr 2025 10:55:47 +0000
+Message-ID: <20250416105542.118371-1-a.vatoropin@crpt.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-kse-serverinfo: EX2.crpt.local, 9
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: Clean, bases: 4/15/2025 10:00:00 PM
+x-kse-attachment-filter-triggered-rules: Clean
+x-kse-attachment-filter-triggered-filters: Clean
+x-kse-bulkmessagesfiltering-scan-result: protection disabled
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] net: pse-pd: Add Si3474 PSE controller driver
-To: Piotr Kubik <piotr.kubik@adtran.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <a92be603-7ad4-4dd3-b083-548658a4448a@adtran.com>
- <93d3bbf0-742c-41d4-83c6-6d94a0dd779c@adtran.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <93d3bbf0-742c-41d4-83c6-6d94a0dd779c@adtran.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-FEAS-Client-IP: 192.168.60.4
+X-FE-Policy-ID: 2:4:0:SYSTEM
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; d=crpt.ru; s=crpt.ru; c=relaxed/relaxed;
+ h=from:to:cc:subject:date:message-id:content-type:mime-version;
+ bh=LVTDQyH7Qyb01X8CRX4auq695ATpkQuo7XLe5Vt7aQ8=;
+ b=NVEFSfYYWNrpEPwYTySZyWzg5qUA0VmnWQ9yJfMhTv9pCgV31jmzu0a99dBM0FlJ4JYO7fVmrJ11
+	Dmh+iS3Ew+BCXbzPmXGnR01DCOjSLBj6kAZu46e1iGmryIHT3TlRld3qVw1Y+vKdqmK1B5VjMW2s
+	UqDvf31ONW5k+TJHj1ACGft3vv1ujgVuyRjtnzh0XvWXRFhtRazls7BRD7YjmaqXfAGAvSTYEl7v
+	xqSLxGPp26xLY+US/H95YVCbpZQ+y1CaRHYNcqhPkxAPPUUz/yucDuUY8ah5gACEfbrTG+Bo+boG
+	fvZD/ZMTtfv+aD77NxrP5HZnSTAyl8epyBow4Q==
 
-On 16/04/2025 12:47, Piotr Kubik wrote:
-> From: Piotr Kubik <piotr.kubik@adtran.com>
-> 
-> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
-> controller.
-> 
-> Based on the TPS23881 driver code.
-> 
-> Driver supports basic features of Si3474 IC:
-> - get port status,
-> - get port power,
-> - get port voltage,
-> - enable/disable port power.
-> 
-> Only 4p configurations are supported at this moment.
-> 
-> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
-> ---
->  drivers/net/pse-pd/Kconfig  |  10 +
->  drivers/net/pse-pd/Makefile |   1 +
->  drivers/net/pse-pd/si3474.c | 477 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 488 insertions(+)
->  create mode 100644 drivers/net/pse-pd/si3474.c
+From: Andrey Vatoropin <a.vatoropin@crpt.ru>
 
-Please put bindings before their user (see DT submitting patches)
+At the moment of calling the function be_cmd_get_mac_from_list() with the
+following parameters:
+be_cmd_get_mac_from_list(adapter, mac, &pmac_valid, NULL,=20
+					adapter->if_handle, 0);
 
-> 
-> diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
-> index 7fab916a7f46..6d2fef6c2602 100644
-> --- a/drivers/net/pse-pd/Kconfig
-> +++ b/drivers/net/pse-pd/Kconfig
-> @@ -41,4 +41,14 @@ config PSE_TPS23881
-> 
->           To compile this driver as a module, choose M here: the
->           module will be called tps23881.
-> +
-> +config PSE_SI3474
-> +       tristate "Si3474 PSE controller"
-> +       depends on I2C
-> +       help
-> +         This module provides support for Si3474 regulator based Ethernet
-> +         Power Sourcing Equipment.
-> +
-> +         To compile this driver as a module, choose M here: the
-> +         module will be called si3474.
->  endif
-> diff --git a/drivers/net/pse-pd/Makefile b/drivers/net/pse-pd/Makefile
-> index 9d2898b36737..b33b4d905cd5 100644
-> --- a/drivers/net/pse-pd/Makefile
-> +++ b/drivers/net/pse-pd/Makefile
-> @@ -6,3 +6,4 @@ obj-$(CONFIG_PSE_CONTROLLER) += pse_core.o
->  obj-$(CONFIG_PSE_REGULATOR) += pse_regulator.o
->  obj-$(CONFIG_PSE_PD692X0) += pd692x0.o
->  obj-$(CONFIG_PSE_TPS23881) += tps23881.o
-> +obj-$(CONFIG_PSE_SI3474) += si3474.o
-> \ No newline at end of file
+The parameter "pmac_id" equals NULL.
 
-1. Warnin ghere
-2. Don't add your entries to the end but in more-or-less alphabetically
-sorted place.
+Then, if "mac_addr_size" equals four bytes, there is a possibility of
+accessing the zero address via the pointer "pmac_id".
 
-> diff --git a/drivers/net/pse-pd/si3474.c b/drivers/net/pse-pd/si3474.c
-> new file mode 100644
-> index 000000000000..a2b4b8bff393
-> --- /dev/null
-> +++ b/drivers/net/pse-pd/si3474.c
-> @@ -0,0 +1,477 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Driver for the Skyworks Si3474 PoE PSE Controller
-> + *
-> + */
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/delay.h>
-> +#include <linux/i2c.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/pse-pd/pse.h>
-> +
-> +#define SI3474_MAX_CHANS 8
-> +
-> +#define MANUFACTURER_ID 0x08
-> +#define IC_ID 0x05
-> +#define SI3474_DEVICE_ID (MANUFACTURER_ID << 3 | IC_ID)
-> +
-> +/* Misc registers */
-> +#define VENDOR_IC_ID_REG 0x1B
-> +#define TEMPERATURE_REG 0x2C
-> +#define FIRMWARE_REVISION_REG 0x41
-> +#define CHIP_REVISION_REG 0x43
-> +
-> +/* Main status registers */
-> +#define POWER_STATUS_REG 0x10
-> +#define PB_POWER_ENABLE_REG 0x19
-> +
-> +/* PORTn Current */
-> +#define PORT1_CURRENT_LSB_REG 0x30
-> +
-> +/* PORTn Current [mA], return in [nA] */
-> +/* 1000 * ((PORTn_CURRENT_MSB << 8) + PORTn_CURRENT_LSB) / 16384 */
-> +#define SI3474_NA_STEP (1000 * 1000 * 1000 / 16384)
-> +
-> +/* VPWR Voltage */
-> +#define VPWR_LSB_REG 0x2E
-> +#define VPWR_MSB_REG 0x2F
-> +
-> +/* PORTn Voltage */
-> +#define PORT1_VOLTAGE_LSB_REG 0x32
-> +
-> +/* VPWR Voltage [V], return in [uV] */
-> +/* 60 * (( VPWR_MSB << 8) + VPWR_LSB) / 16384 */
-> +#define SI3474_UV_STEP (1000 * 1000 * 60 / 16384)
-> +
-> +struct si3474_port_desc {
-> +       u8 chan[2];
-> +       bool is_4p;
-> +};
-> +
-> +struct si3474_priv {
-> +       struct i2c_client *client;
-> +       struct pse_controller_dev pcdev;
-> +       struct device_node *np;
-> +       struct si3474_port_desc port[SI3474_MAX_CHANS];
-> +};
-> +
-> +static struct si3474_priv *to_si3474_priv(struct pse_controller_dev *pcdev)
-> +{
-> +       return container_of(pcdev, struct si3474_priv, pcdev);
-> +}
-> +
-> +static int si3474_pi_get_admin_state(struct pse_controller_dev *pcdev,
-> int id,
+Add an extra check for the pointer "pmac_id" to avoid accessing the zero
+address.
 
-Your patchset is corrupted
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+      =20
+Fixes: e5e1ee894615 ("be2net: Use new implementation of get mac list comman=
+d")
+Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
+---
+ drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +                                    struct pse_admin_state *admin_state)
-> +{
-> +       struct si3474_priv *priv = to_si3474_priv(pcdev);
-> +       struct i2c_client *client = priv->client;
-> +       bool enabled = FALSE;
-
-I believe it is "false", not FALSE.
-
-
-...
-
-> +
-> +       if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-> +               dev_err(dev, "i2c check functionality failed\n");
-> +               return -ENXIO;
-> +       }
-> +
-> +       priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-> +       if (!priv)
-> +               return -ENOMEM;
-> +
-> +       ret = i2c_smbus_read_byte_data(client, VENDOR_IC_ID_REG);
-> +       if (ret < 0)
-> +               return ret;
-> +
-> +       if (ret != SI3474_DEVICE_ID) {
-> +               dev_err(dev, "Wrong device ID: 0x%x\n", ret);
-> +               return -ENXIO;
-> +       }
-> +
-> +       ret = i2c_smbus_read_byte_data(client, FIRMWARE_REVISION_REG);
-> +       if (ret < 0)
-> +               return ret;
-> +       fw_version = ret;
-> +
-> +       ret = i2c_smbus_read_byte_data(client, CHIP_REVISION_REG);
-> +       if (ret < 0)
-> +               return ret;
-> +
-> +       dev_info(&client->dev, "Chip revision: 0x%x, firmware version: 0x%x\n",
-> +                ret, fw_version);
-
-dev_dbg, don't pollute dmesg on success.
-
-> +
-> +       priv->client = client;
-> +       i2c_set_clientdata(client, priv);
-> +       priv->np = dev->of_node;
-> +
-> +       priv->pcdev.owner = THIS_MODULE;
-> +       priv->pcdev.ops = &si3474_ops;
-> +       priv->pcdev.dev = dev;
-> +       priv->pcdev.types = ETHTOOL_PSE_C33;
-> +       priv->pcdev.nr_lines = SI3474_MAX_CHANS;
-> +       ret = devm_pse_controller_register(dev, &priv->pcdev);
-> +       if (ret) {
-> +               return dev_err_probe(dev, ret,
-> +                                    "Failed to register PSE controller\n");
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +static const struct i2c_device_id si3474_id[] = {{"si3474"}, {}};
-
-Use existing kernel style for such arrays.
-
-
-
-Best regards,
-Krzysztof
+diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethe=
+rnet/emulex/benet/be_cmds.c
+index 51b8377edd1d..be5bbf6881b8 100644
+--- a/drivers/net/ethernet/emulex/benet/be_cmds.c
++++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
+@@ -3757,7 +3757,7 @@ int be_cmd_get_mac_from_list(struct be_adapter *adapt=
+er, u8 *mac,
+ 			/* mac_id is a 32 bit value and mac_addr size
+ 			 * is 6 bytes
+ 			 */
+-			if (mac_addr_size =3D=3D sizeof(u32)) {
++			if (pmac_id && mac_addr_size =3D=3D sizeof(u32)) {
+ 				*pmac_id_valid =3D true;
+ 				mac_id =3D mac_entry->mac_addr_id.s_mac_id.mac_id;
+ 				*pmac_id =3D le32_to_cpu(mac_id);
+--=20
+2.43.0
 
