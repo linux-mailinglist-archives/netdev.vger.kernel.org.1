@@ -1,105 +1,286 @@
-Return-Path: <netdev+bounces-183520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571E7A90E89
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:19:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0540CA90E9E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7013C446EEE
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:19:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 624A119077BE
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31491225A3C;
-	Wed, 16 Apr 2025 22:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935FC23C8A1;
+	Wed, 16 Apr 2025 22:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSLP5NHu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjo92FIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D8F2135AC;
-	Wed, 16 Apr 2025 22:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A0189478
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744841953; cv=none; b=l8kEclvJxapFVGjD5Pceph6cBJvaQvYgHJBvN0i8loqnL9b+tcZA8WMLi32oSX0hUvkbD9fwYz0+dgPcYtrkch2+US/WRQ4oII8FmNeAAz6WjiIKJfW8sF/Px9DxkrbZ9efG2HEBqB/akwjB6RGG02vA76g2u7vM8FC8VozzuMk=
+	t=1744842643; cv=none; b=utzBZbAcReZByEFNDS8WnLwljOPCy3bJBGyzGvrxS7dbcvdPgkNZpkhEsnyXx9P/H7Q9V8j0d20uiaa3ORTCJs4ko8PX6iBUReVrwnO8TgcjMDz5SkNj29nP4CCdfVqNy1htrdGjp6ENnTBcd05dFM/dbq2quDaXPeTZMe9wuO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744841953; c=relaxed/simple;
-	bh=JxjGlO8io3o7nQA//oy7HKFVNPtQVrdR0OgOA+KwBco=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bKVlSpJL7WK3SRQZsBcQvBfvNU4eZ6ulrC//BsVmH+WL7LKlbf/ijiH6diDhzX9X/NXv/5A5DtDDGE2sWrK7tRyQ+AkTvsoWU/vC5+ga2waDKTRtb+bnzgaDavHVoXEIccorGwPOWnKRXiaKcC+asQkU23ImE2rgYWnKYWuqdhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSLP5NHu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA17C4CEE2;
-	Wed, 16 Apr 2025 22:19:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744841952;
-	bh=JxjGlO8io3o7nQA//oy7HKFVNPtQVrdR0OgOA+KwBco=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WSLP5NHu5iw2+GoSncRSbxr2XcbnTPvdJvucfjQ6Uz0ET4qWnFk5zNzRF4NiJn35P
-	 V0r2lEtDQh6wNpCeby0GWl8ExkitEoSeSS8IiDn7WZR1RupyWeF1sde83R4ApwEpT+
-	 I7EkZgsDp01MJvIxSebEUKDXYU7YkxTkdIXUA0g8XibvkIN89DCdLLyGQT8bxE+VSX
-	 NfvHmGHTRWUqEEWRLM3HhvAWRrR5oCJf8t2lGpE8ANEk2T3rvo1bPX2ukbQcug3zgO
-	 euRhWt9dMwpIlk1Ynzya5dqbGQ0zUUqD7APhN6BpRp5/ya2KOJCNzYr65EzQ2foXGY
-	 gFiMtOy+uX0QQ==
-Date: Wed, 16 Apr 2025 15:19:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: chia-yu.chang@nokia-bell-labs.com, xandfury@gmail.com,
- netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
- jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
- ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Subject: Re: [PATCH v11 net-next 2/5] selftests/tc-testing: Add selftests
- for qdisc DualPI2
-Message-ID: <20250416151910.6eaaf506@kernel.org>
-In-Reply-To: <8272f999-fe55-4afb-894a-57a7cc161473@mojatatu.com>
-References: <20250415124317.11561-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250415124317.11561-3-chia-yu.chang@nokia-bell-labs.com>
-	<20250416065223.4e4c4379@kernel.org>
-	<8272f999-fe55-4afb-894a-57a7cc161473@mojatatu.com>
+	s=arc-20240116; t=1744842643; c=relaxed/simple;
+	bh=A9qD1AwjWAJwZd+t7BkF8OYJMG0FuwP/APZWtWU4i0U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RwVDWBEhFV3InIIyRvMUYnRC4fcy/olruNtZpAv0PcZ/CFi6Q2coIdThc62YE9qYE75HkoLl4pg/7Gsret4GXzAG66tl2F5cEP4uxBdPNvFpkCW00akiVFgSbFpgKapsUUlv0ycCGzJG8IXR5hkuNrS8HgSNWurgJyiYdMYQS7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjo92FIX; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-86feb848764so53026241.0
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744842639; x=1745447439; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IWRpPegm0xw7P1qXisGI09VxqFc+fU84o/BMDei3onQ=;
+        b=mjo92FIXzVWKVMQFpndRGrML4T1N3mClpeoM8U/hOViCJTKuIouhsgfmJQa6G+lJFt
+         u5It8FL3r/zIUNL4cY5raf1ZoR6M4F+KCBTyckA4iwwyo7huIIa9sgL8G9re7yMg4nV3
+         eiCIpm+yCeVZ3WfI8hzEF8+iYgOdycwx6VDWKR7LnfpUdZg8polFu/b+nQc1oPBERv7G
+         psxJQEAOV003nLkLSKUhWyGkd4iTnqea5DQoQAirMAmrfQ3xLJ4TLEyvs9Eaj4FwNQUW
+         zHebj9HEdXhf3ABzNHRjU/wc24CG9EvuQRY4a/OYGpZisN1Zb0BzTnDhq7QskuxCirMp
+         ZEQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744842639; x=1745447439;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IWRpPegm0xw7P1qXisGI09VxqFc+fU84o/BMDei3onQ=;
+        b=rKX8OrcPodO1xvxumk4pakEXQve2uct+P2z8LAllSl+Z22hBPj3S1ThJeIAexFOkmI
+         yhMswdStVF4tvUHe21NSOOJdSszxxYb8mlGAjcTJj67kPP/b52q8Niq56jO8sobZLChi
+         wSZhNDy7DorUGKVdC7pjSmsRDUMmWvJ2JQHL0pnx/pbrLAZt5UzFCW83iUhWnuMGNL45
+         KmC0RIdO9Nqq2Bd+oLMH8aV+ApNMqE3GvyJxnKaEyKL/xw74DZwpeMJwmrNtnnw3Rk5h
+         Y7ky1YgEU/mCIds4iWYXWnrhPEXPPJNK45KiitAVLEdHqPTqJBVbeZVncaBhKK9UUH8O
+         tfHA==
+X-Forwarded-Encrypted: i=1; AJvYcCV3Bf2DWSCJQk568voToQbIVQInxJ/1nctEW2InFX71Hy5Rv7pEmBMo4Gpjt0ABn2bQukhagt8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx79KhUfmmUHp8A2O2ton0bpM8O9/js1ZeGdOkyGus8RZPw1Fri
+	bnKeiOCgt1+LWv85gw3gyV1QLC/qA7ua36JAvDQsIXpuNgKNONixyitReU9m2OYql+xyS3DAAtw
+	SsRoyqbTCenekCaG2TW+WJACHxpM=
+X-Gm-Gg: ASbGncvQLXDzwwL5NFwRqXeM2hD26NN/vBngRfJdleVWrFrPDZ6z21G0ZptoYN3eNm3
+	iBKMWiVU1sPmatC35+1p+GYV7Qgdxn3DPMUz0Xh/cEqT2qM8B9ALRuOrmV8J3vMS31vYBVSy9dj
+	FKnikx+I/8NKlzRQANZ/yBHKEKDhwCdpwVtRb8dGPnU6N0/SMEEp66
+X-Google-Smtp-Source: AGHT+IEDZvuLsOk+TliJf8k9Vs2Ol/3ejwipfxjqX23YdhssEkjQviwWHQVLKqQBeVjStg/0z7o3PDLFzdv23DBKATA=
+X-Received: by 2002:a05:6102:5f0b:b0:4c2:ffc8:93d9 with SMTP id
+ ada2fe7eead31-4cb591e6fa2mr2663136137.9.1744842639215; Wed, 16 Apr 2025
+ 15:30:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250410175140.10805-3-luizcmpc@gmail.com> <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
+ <CAHx7jf-1Hga_tY4-kJ_HNkgkWL6RywCmYhg2yYYX+R+mVwdTvA@mail.gmail.com> <CANn89i+beuSWok=Z=5gFs2E0JQHyuZrdoaT=orFRzBap_BvVzA@mail.gmail.com>
+In-Reply-To: <CANn89i+beuSWok=Z=5gFs2E0JQHyuZrdoaT=orFRzBap_BvVzA@mail.gmail.com>
+From: =?UTF-8?Q?Luiz_Carlos_Mour=C3=A3o_Paes_de_Carvalho?= <luizcmpc@gmail.com>
+Date: Wed, 16 Apr 2025 19:30:27 -0300
+X-Gm-Features: ATxdqUFFpRlIAHMZjHZ3Ylqg70YGnRTiALPQVzLRvHJOcPc2kNdtIQmdL3qD_cg
+Message-ID: <CAHx7jf807SHbTZhF4LeWsesSPnYxeE6vO37vTGXp+dr-65JP+w@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: tcp_acceptable_seq select SND.UNA when SND.WND
+ is 0
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 16 Apr 2025 11:00:35 -0300 Victor Nogueira wrote:
-> On 4/16/25 10:52, Jakub Kicinski wrote:
-> > On Tue, 15 Apr 2025 14:43:14 +0200 chia-yu.chang@nokia-bell-labs.com
-> > wrote:  
-> >> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Wed, Apr 16, 2025 at 6:40=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Apr 16, 2025 at 1:52=E2=80=AFPM Luiz Carlos Mour=C3=A3o Paes de C=
+arvalho
+> <luizcmpc@gmail.com> wrote:
+> >
+> > Hi Paolo,
+> >
+> > The dropped ack is a response to data sent by the peer.
+> >
+> > Peer sends a chunk of data, we ACK with an incorrect SEQ (SND.NXT) that=
+ gets dropped
+> > by the peer's tcp_sequence function. Connection only advances when we s=
+end a RTO.
+> >
+> > Let me know if the following describes the scenario you expected. I'll =
+add a packetdrill with
+> > the expected interaction to the patch if it makes sense.
+> >
+> > // Tests the invalid SEQs sent by the listener
+> > // which are then dropped by the peer.
+> >
+> > `./common/defaults.sh
+> > ./common/set_sysctls.py /proc/sys/net/ipv4/tcp_shrink_window=3D0`
+> >
+> >     0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> >    +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> >    +0 bind(3, ..., ...) =3D 0
+> >    +0 listen(3, 1) =3D 0
+> >
+> >    +0 < S 0:0(0) win 8 <mss 1000,sackOK,nop,nop,nop,wscale 7>
+> >    +0 > S. 0:0(0) ack 1 <...>
+> >   +.1 < . 1:1(0) ack 1 win 8
+> >    +0 accept(3, ..., ...) =3D 4
+> >
+> >    +0 write(4, ..., 990) =3D 990
+> >    +0 > P. 1:991(990) ack 1
+> >    +0 < .  1:1(0) ack 991 win 8           // win=3D8 despite buffer bei=
+ng almost full, shrink_window=3D0
+> >
+> >    +0 write(4, ..., 100) =3D 100
+> >    +0 > P. 991:1091(100) ack 1            // SND.NXT=3D1091
+> >    +0 < .  1:1(0) ack 991 win 0           // failed to queue rx data, R=
+CV.NXT=3D991, RCV.WND=3D0
+> >
+> >  +0.1 < P. 1:1001(1000) ack 901 win 0
+>
+> This 'ack 901' does not seem right ?
+
+It's indeed incorrect, the bug still occurs if it were 991. Sorry for that.
+
+>
+> Also your fix would not work if 'win 0' was 'win 1' , and/or if the
+> initial wscale was 6 instead of 7 ?
+
+It indeed does not work if win=3D1, but that's unlikely to happen unless
+you enable shrink_window, and probably
+suggests the mentioned loss of precision.
+
+Now, regarding the scale, it does happen with wscale=3D6 if your second
+write sends < 64 bytes.
+This is true with any other scale. Would happen if it were wscale=3D1
+and the second write sent 2 bytes, etc.
+
+Happens as far as SND.NXT - (SND.UNA + SND.WND) < 1 << wscale.
+
+>
+> >    +0 > .  1091:1091(0) ack 1001          // dropped on tcp_sequence, n=
+ote that SEQ=3D1091, while (RCV.NXT + RCV.WND)=3D991:
+> >                                           // if (after(seq, tp->rcv_nxt=
+ + tcp_receive_window(tp)))
+> >                                           //     return SKB_DROP_REASON=
+_TCP_INVALID_SEQUENCE;
+>
+> I assume that your patch would change the 1091:1091(0) to 991:991(0) ?
+
+Precisely.
+
+>
+> It is not clear if there is a bug here... window reneging is outside
+> RFC specs unfortunately,
+> as hinted in the tcp_acceptable_seq() comments.
+
+Yeah, that got me thinking as well, but although it isn't covered by
+the RFC, the behavior did change since
+8c670bdfa58e ("tcp: correct handling of extreme memory squeeze"),
+which is a relatively recent patch (Jan 2025).
+Currently, the connection could stall indefinitely, which seems
+unwanted. I would be happy to search for other
+solutions if you have anything come to mind, though.
+
+The way I see it, the stack shouldn't be sending invalid ACKs that are
+known to be incorrect.
+
+>
+> >
+> >  +0.2 > P. 991:1091(100) ack 1001         // this is a RTO, ack accepte=
+d
+> >    +0 < P. 1001:2001(1000) ack 991 win 0  // peer responds, still no sp=
+ace available, but has more data to send
+> >    +0 > .  1091:1091(0) ack 2001          // ack dropped
+> >
+> >  +0.3 > P. 991:1091(100) ack 2001         // RTO, ack accepted
+> >    +0 < .  2001:3001(1000) ack 991 win 0  // still no space available, =
+but another chunk of data
+> >    +0 > .  1091:1091(0) ack 3001          // ack dropped
+> >
+> >  +0.6 > P. 991:1091(100) ack 3001         // RTO, ack accepted
+> >    +0 < .  3001:4001(1000) ack 991 win 0  // no space available, but pe=
+er has data to send at all times
+> >    +0 > .  1091:1091(0) ack 4001          // ack dropped
+> >
+> >  +1.2 > P. 991:1091(100) ack 4001         // another probe, accepted
+> >
+> >   // this goes on and on. note that the peer always has data just waiti=
+ng there to be sent,
+> >   // server acks it, but the ack is dropped because SEQ is incorrect.
+> >   // only the RTOs are advancing the connection, but are back-offed eve=
+ry time.
+> >
+> > // Reset sysctls
+> > `/tmp/sysctl_restore_${PPID}.sh`
+> >
+> > On Tue, Apr 15, 2025 at 8:30=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
 > >>
-> >> Update configuration of tc-tests and preload DualPI2 module for self-tests,
-> >> and add folloiwng self-test cases for DualPI2:
 > >>
-> >>    Test a4c7: Create DualPI2 with default setting
-> >>    Test 2130: Create DualPI2 with typical_rtt and max_rtt
-> >>    Test 90c1: Create DualPI2 with max_rtt
-> >>    Test 7b3c: Create DualPI2 with any_ect option
-> >>    Test 49a3: Create DualPI2 with overflow option
-> >>    Test d0a1: Create DualPI2 with drop_enqueue option
-> >>    Test f051: Create DualPI2 with no_split_gso option  
-> > 
-> > it appears applying this causes the tdc test runner to break,
-> > could you take a look?
-> > 
-> > https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/79725/1-tdc-sh/stdout  
-> 
-> It seems like the breakage happens because the iproute2 patch
-> is not in yet. I applied the iproute2 patch locally and the
-> tests succeeded. The next iteration should run with it applied
-> so the breakage should stop.
-
-Thank you! returned the patches to the queue, 
-the net-next-2025-04-17--00-00 branch should have them again.
-
+> >>
+> >> On 4/10/25 7:50 PM, Luiz Carvalho wrote:
+> >> > The current tcp_acceptable_seq() returns SND.NXT when the available
+> >> > window shrinks to less then one scaling factor. This works fine for =
+most
+> >> > cases, and seemed to not be a problem until a slight behavior change=
+ to
+> >> > how tcp_select_window() handles ZeroWindow cases.
+> >> >
+> >> > Before commit 8c670bdfa58e ("tcp: correct handling of extreme memory=
+ squeeze"),
+> >> > a zero window would only be announced when data failed to be consume=
+d,
+> >> > and following packets would have non-zero windows despite the receiv=
+er
+> >> > still not having any available space. After the commit, however, the
+> >> > zero window is stored in the socket and the advertised window will b=
+e
+> >> > zero until the receiver frees up space.
+> >> >
+> >> > For tcp_acceptable_seq(), a zero window case will result in SND.NXT
+> >> > being sent, but the problem now arises when the receptor validates t=
+he
+> >> > sequence number in tcp_sequence():
+> >> >
+> >> > static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
+> >> >                                        u32 seq, u32 end_seq)
+> >> > {
+> >> >       // ...
+> >> >       if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
+> >> >               return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+> >> >       // ...
+> >> > }
+> >> >
+> >> > Because RCV.WND is now stored in the socket as zero, using SND.NXT w=
+ill fail
+> >> > the INVALID_SEQUENCE check: SEG.SEQ <=3D RCV.NXT + RCV.WND. A valid =
+ACK is
+> >> > dropped by the receiver, correctly, as RFC793 mentions:
+> >> >
+> >> >       There are four cases for the acceptability test for an incomin=
+g
+> >> >         segment:
+> >> >
+> >> >       Segment Receive  Test
+> >> >         Length  Window
+> >> >         ------- -------  -------------------------------------------
+> >> >
+> >> >            0       0     SEG.SEQ =3D RCV.NXT
+> >> >
+> >> > The ACK will be ignored until tcp_write_wakeup() sends SND.UNA again=
+,
+> >> > and the connection continues. If the receptor announces ZeroWindow
+> >> > again, the stall could be very long, as was in my case. Found this o=
+ut
+> >> > while giving a shot at bug #213827.
+> >>
+> >> The dropped ack causing the stall is a zero window probe from the send=
+er
+> >> right?
+> >> Could you please describe the relevant scenario with a pktdrill test?
+> >>
+> >> Thanks!
+> >>
+> >> Paolo
+> >>
 
