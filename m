@@ -1,139 +1,154 @@
-Return-Path: <netdev+bounces-183362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34BC7A90812
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:54:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C8BA90818
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE9C174C4C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:54:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136CD164C9D
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FAE20B1F5;
-	Wed, 16 Apr 2025 15:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BC91F193D;
+	Wed, 16 Apr 2025 15:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CYsB7iLF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLY5I+tu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9001F193D;
-	Wed, 16 Apr 2025 15:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3024335BA
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744818885; cv=none; b=YBUVOpp6Otg1poRmAGFikienfeA0t9yxMlzoyKyr/wsQ2sVxylEfFkapMDjF7PJX4Ik8EOAGoz/1hzIII+RX2vKsWEmpYJllUsi5NqwAC+YRULS2OTQWAeNNJVRmvuMyx2q5GT8MMLcDvfMhuwp7A3NjR2AMeyBtXtzw8SUdqnU=
+	t=1744818946; cv=none; b=Y0MqZqgrV2p5mu5HHG2ycTFzHbdIeGb4yTFillINmaPpM9FFZK8/OGA2NZIpX2gvLOX36o2lK7hltg2R8Nw/nTIyWa+UjALV03UNxiWgSSy7Mt3E9JSplfS/cNpHrys8SbYO4m2UJ2qrQ6uc/mKnteDdOulOmiUO4Pr0viqovqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744818885; c=relaxed/simple;
-	bh=BK6yw88CCQMOuS+aZ2Cf0kz3xcaYu31IAHaHB7+z3cw=;
+	s=arc-20240116; t=1744818946; c=relaxed/simple;
+	bh=dfwF5GJl4IxlOW7ntQ9dhIcO0/jyuEl/v2DpwfVSskk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4oZu9xVFXBRgOKJcFHrXbI7dDzqqWc46H3ZlgFA5NBZfJTQbxGvJzKMpAUL0ha0BHGs8dC2yjnark5FtC4L4+Dm8vES+YFefV0gFoF886YGjTjbyxztcKEwaV9hmsao+bQ+b5QzRVnJejT9UGaopLM/gbhoBiU53SKnzez/ebE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CYsB7iLF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EF83C4CEE2;
-	Wed, 16 Apr 2025 15:54:43 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ihEiHP1Sr9isJyh7L4ovWBJEa7ed816NOkEgs6RgkuqxNZ7R5/nx/QMxIrnWKcsXtnTArSReBgcbyDDoB2phtjFt7FVCQbkWAO/ZBzLDYrirl9glhEqO7c+cx9Lq4POTAUsvm7DgeHUS4fI6+MK4IQ4j3rd7/73a1EzKWh/NAyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLY5I+tu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C4EC4CEE2;
+	Wed, 16 Apr 2025 15:55:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744818883;
-	bh=BK6yw88CCQMOuS+aZ2Cf0kz3xcaYu31IAHaHB7+z3cw=;
+	s=k20201202; t=1744818945;
+	bh=dfwF5GJl4IxlOW7ntQ9dhIcO0/jyuEl/v2DpwfVSskk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CYsB7iLFu7CRO3Le0pvmC1k268EFLWH7CYrVAhgxHXz/hQKlGrhkytRRyfxhrFRLa
-	 kLWtrgRIFCVezFrhVYZi/slKn9mmAhE5BNzwbioipRzXvxBRe20qSGWRYEoBVVOn4C
-	 EHs3j8eTEtQA7Y1GrcktDJQf0XFLzKInpzctB45OjBhPa2rSJmMnw1aUcZjTSYAK6s
-	 CiSdKNvuxd/I+GZEiYg3us08A1t4SeJm1Z+KQq8BkAxgxhMAYAFQZ/tbuLHPWbWvlI
-	 i4d9EwJSJCI4WiRJ34sJF0ZXuEn3EmuFUh8xOpPzpJWwrT7Oh77TTOUTXNZWnb8eyN
-	 kDLHP3E9Of9dA==
-Date: Wed, 16 Apr 2025 10:54:42 -0500
-From: Rob Herring <robh@kernel.org>
-To: Alexey Charkov <alchark@gmail.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=LLY5I+tuao6fwDQvZPHDtYmSj1Tb7PKWvE7Z2LXwMkKf6O7gC/Besn0YPcgLvkGar
+	 h4+iNchY9Lsym8n9OSalRKeYeAoGNAKeDbAkaWXz+v3jA/CP5rOdXd9yyAo3rPbPwj
+	 0MzL/ge6E8JFrxMlgVWRxYp5veFtCK/caNGSUnNFblZhNWW/yZuG8Z6UcZmCN0ehzC
+	 uSE844QvUdP4HtWSS9KJV6ypGAHWubtp1NhTZWNIxecHwL1xtQZuzqSl8QrO0Rv6yD
+	 Cgz+t1+3GtsOfXW8JhAT5XKC0nTUAFUyxhI+moBa8tL4V98sOIFwfMxJtufDq1PzeP
+	 QfJWMt48C7jpg==
+Date: Wed, 16 Apr 2025 17:55:42 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pwm@vger.kernel.org
-Subject: Re: [PATCH 00/13] ARM: vt8500: DT bindings and dts updates
-Message-ID: <20250416155442.GA3255418-robh@kernel.org>
-References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Add missing filed to ppe_mbox_data
+ struct
+Message-ID: <Z__S_m9fBEKmoos1@lore-desk>
+References: <20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org>
+ <20250416154144.GT395307@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Vm+HhZE4wwBkQ3HG"
+Content-Disposition: inline
+In-Reply-To: <20250416154144.GT395307@horms.kernel.org>
+
+
+--Vm+HhZE4wwBkQ3HG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 16, 2025 at 12:21:25PM +0400, Alexey Charkov wrote:
-> Convert some more VT8500 related textual DT binding descriptions to
-> YAML schema, do minor dts correctness fixes, and add a DT for the
-> board I'm actually testing those on (VIA APC Rock).
-> 
-> While at that, also describe the PL310 L2 cache controller present on
-> WM8850/WM8950.
-> 
-> Note that this series is based upon Krzysztof's linux-dt/for-next
-> 
-> Signed-off-by: Alexey Charkov <alchark@gmail.com>
-> ---
-> Alexey Charkov (13):
->       dt-bindings: i2c: i2c-wmt: Convert to YAML
->       dt-bindings: interrupt-controller: via,vt8500-intc: Convert to YAML
->       dt-bindings: mmc: vt8500-sdmmc: Convert to YAML
->       dt-bindings: net: via-rhine: Convert to YAML
->       dt-bindings: pwm: vt8500-pwm: Convert to YAML
->       dt-bindings: timer: via,vt8500-timer: Convert to YAML
->       dt-bindings: arm: vt8500: Add VIA APC Rock/Paper boards
->       ARM: dts: vt8500: Add node address and reg in CPU nodes
->       ARM: dts: vt8500: Move memory nodes to board dts and fix addr/size
->       ARM: dts: vt8500: Use generic compatibles for EHCI
->       ARM: dts: vt8500: Use generic node name for the SD/MMC controller
->       ARM: dts: vt8500: Add VIA APC Rock/Paper board
->       ARM: dts: vt8500: Add L2 cache controller on WM8850/WM8950
-> 
->  Documentation/devicetree/bindings/arm/vt8500.yaml  | 19 ++++---
->  Documentation/devicetree/bindings/i2c/i2c-wmt.txt  | 24 ---------
->  .../devicetree/bindings/i2c/wm,wm8505-i2c.yaml     | 47 +++++++++++++++++
->  .../interrupt-controller/via,vt8500-intc.txt       | 16 ------
->  .../interrupt-controller/via,vt8500-intc.yaml      | 47 +++++++++++++++++
->  .../devicetree/bindings/mmc/vt8500-sdmmc.txt       | 23 --------
->  .../devicetree/bindings/mmc/wm,wm8505-sdhc.yaml    | 61 ++++++++++++++++++++++
->  .../devicetree/bindings/net/via,vt8500-rhine.yaml  | 41 +++++++++++++++
->  .../devicetree/bindings/net/via-rhine.txt          | 17 ------
->  .../devicetree/bindings/pwm/via,vt8500-pwm.yaml    | 43 +++++++++++++++
->  .../devicetree/bindings/pwm/vt8500-pwm.txt         | 18 -------
->  .../devicetree/bindings/timer/via,vt8500-timer.txt | 15 ------
->  .../bindings/timer/via,vt8500-timer.yaml           | 36 +++++++++++++
->  MAINTAINERS                                        |  7 ++-
->  arch/arm/boot/dts/vt8500/Makefile                  |  3 +-
->  arch/arm/boot/dts/vt8500/vt8500-bv07.dts           |  5 ++
->  arch/arm/boot/dts/vt8500/vt8500.dtsi               | 12 ++---
->  arch/arm/boot/dts/vt8500/wm8505-ref.dts            |  5 ++
->  arch/arm/boot/dts/vt8500/wm8505.dtsi               | 14 ++---
->  arch/arm/boot/dts/vt8500/wm8650-mid.dts            |  5 ++
->  arch/arm/boot/dts/vt8500/wm8650.dtsi               | 14 ++---
->  arch/arm/boot/dts/vt8500/wm8750-apc8750.dts        |  5 ++
->  arch/arm/boot/dts/vt8500/wm8750.dtsi               | 14 ++---
->  arch/arm/boot/dts/vt8500/wm8850-w70v2.dts          |  5 ++
->  arch/arm/boot/dts/vt8500/wm8850.dtsi               | 23 +++++---
->  arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts       | 21 ++++++++
->  arch/arm/boot/dts/vt8500/wm8950.dtsi               | 11 ++++
->  27 files changed, 386 insertions(+), 165 deletions(-)
-> ---
-> base-commit: 62db22c2af6ce306943df5de6f5198ea9bd3d47b
+> On Tue, Apr 15, 2025 at 09:27:21AM +0200, Lorenzo Bianconi wrote:
+> > The official Airoha EN7581 firmware requires adding max_packet filed in
+> > ppe_mbox_data struct while the unofficial one used to develop the Airoha
+> > EN7581 flowtable offload does not require this field. This patch fixes
+> > just a theoretical bug since the Airoha EN7581 firmware is not posted to
+> > linux-firware or other repositories (e.g. OpenWrt) yet.
+> >=20
+> > Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  drivers/net/ethernet/airoha/airoha_npu.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/eth=
+ernet/airoha/airoha_npu.c
+> > index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c=
+3611b4a154d19bc2c 100644
+> > --- a/drivers/net/ethernet/airoha/airoha_npu.c
+> > +++ b/drivers/net/ethernet/airoha/airoha_npu.c
+> > @@ -104,6 +104,7 @@ struct ppe_mbox_data {
+> >  			u8 xpon_hal_api;
+> >  			u8 wan_xsi;
+> >  			u8 ct_joyme4;
+> > +			u8 max_packet;
+> >  			int ppe_type;
+> >  			int wan_mode;
+> >  			int wan_sel;
+>=20
+> Hi Lorenzo,
+>=20
+> I'm a little confused by this.
+>=20
+> As I understand it ppe_mbox_data is sent as the data of a mailbox message
+> send to the device.  But by adding the max_packet field the layout is
+> changed. The size of the structure changes. And perhaps more importantly
+> the offset of fields after max_packet, e.g.  wan_mode, change.
+>=20
+> Looking at how this is used, f.e. in the following code, I'm unclear on
+> how this change is backwards compatible.
 
-I could not apply this series for testing. What base is this? It is 
-unknown to anything I have. Please use most recent rc1 unless you have 
-a dependency then use recent linux-next or a branch in it.
+you are right Simon, this change is not backwards compatible but the fw is
+not publicly available yet and the official fw version will use this new la=
+yout
+(the previous one was just a private version I used to develop the driver).
+Can we use this simple approach or do you think we should differentiate the=
+ two
+firmware version in some way? (even if the previous one will never be used).
 
-Rob
+Regards,
+Lorenzo
+
+>=20
+> static int airoha_npu_ppe_init(struct airoha_npu *npu)
+> {
+>         struct ppe_mbox_data ppe_data =3D {
+>                 .func_type =3D NPU_OP_SET,
+>                 .func_id =3D PPE_FUNC_SET_WAIT_HWNAT_INIT,
+>                 .init_info =3D {
+>                         .ppe_type =3D PPE_TYPE_L2B_IPV4_IPV6,
+>                         .wan_mode =3D QDMA_WAN_ETHER,
+>                 },
+>         };
+>=20
+>         return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
+>                                    sizeof(struct ppe_mbox_data));
+> }
+
+--Vm+HhZE4wwBkQ3HG
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ//S/gAKCRA6cBh0uS2t
+rGtIAP0a0nDJnt9xlhk00XoqLts5Lx7FkrJmgGFM4xHwaFzmfgD/Qj/RZUt8ixXy
+r90iuK6aFvdqeduSdanLNu9LRkQC6go=
+=dH3c
+-----END PGP SIGNATURE-----
+
+--Vm+HhZE4wwBkQ3HG--
 
