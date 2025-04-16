@@ -1,268 +1,226 @@
-Return-Path: <netdev+bounces-183497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91248A90D7D
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:58:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813A4A90D83
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 503A67A6E82
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:57:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBA041907CF7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2887F23F295;
-	Wed, 16 Apr 2025 20:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5939A232792;
+	Wed, 16 Apr 2025 20:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iNISd2gT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdIBDBh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7358923957D
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380B91FF1B0
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744837090; cv=none; b=bo2FxvZ7uyewx8nUrFezVnJbDRB5aO+CKi9gyz9bZ+wy7G798iSWxRqukHUq9wwMRNH1gsHvebSlOai04ftj5j/TC1PP6LSVbleSTqiAmBkCFcAFBUjaLbcNHDh/+AmzAitivMtg++/QWFwN9qvwcsmgte1yP6pcHqD7CfH78VA=
+	t=1744837162; cv=none; b=dBng9GENvAIMdNiIJ1f9qGDhTxNUJJVdI055kJpJ1cJIt/XYSDkOQRibbsRlIRbYgcIiPFc/KGY503gWgVrMcvMZSL33uJdkuw2k2Py3taAkmIN/CowuSLE12yKPRNb3ysSyrO3P3OBdrx8nVOzuit2oWfkiRaa9K8ghJOpqJhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744837090; c=relaxed/simple;
-	bh=VbMynqj0gCWtKiOdleD0OHdYvNAgwsQPRyAXkvcLp9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z/1mt6sJKw2rTJICCG+sJBIGV984cz2q8wurjf8OqVsbOd8ogVKgqueqPfXhXL6VFpcPdT2Ico2f5NtIB1RBfqjLZfh5XtMJAo6ZAw8moj92PtUY6cqqvA9WUtvjjzslPmug3ZLd8IJVn7QWvFnD/5kZFOyQ5NM7Y0TbPEjACUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iNISd2gT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53GGsq7Y018279;
-	Wed, 16 Apr 2025 20:58:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=kV0hQaWmProlhsKXE
-	TMeWh5cXOWX/R2Wb2mnJiZJ5Zo=; b=iNISd2gTisB7UMoYSpGldwrHKqetG1J4B
-	H7zKrQE5wZu/73qSl20LdaRhQF/pa4ScnJaZcdfr7MQwkrQ+LAIQRxc0M2JugPDr
-	JAxYS0sdIdSkbxYXfuOPlINSz9donXZJFEPen5mi23Ymx69yHy8hytkbsDtBBtA3
-	UYJ3TjH1e3dc/u8/Mj1FVrs/oiycU4IcQzHvbAUqbwugvgJTklcfHuv9ghLZ9A/k
-	IhpXc0NrVRAvhKtU9jlJ5H3hS+VD4Z2YZX5O5b4esygcBEarujUSRB7PIR83nuWK
-	FxmZcXwM9E2orld72TylWpgbTtM5kT+h82bPBa6f6v9yUSILbd+4g==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 461y1gease-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Apr 2025 20:58:00 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53GIT2wp017199;
-	Wed, 16 Apr 2025 20:57:59 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46040m26kg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Apr 2025 20:57:59 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53GKvwx328115710
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Apr 2025 20:57:58 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE4445805D;
-	Wed, 16 Apr 2025 20:57:58 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 89A3158059;
-	Wed, 16 Apr 2025 20:57:58 +0000 (GMT)
-Received: from d.attlocal.net (unknown [9.61.183.42])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 16 Apr 2025 20:57:58 +0000 (GMT)
-From: Dave Marquardt <davemarq@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: michal.swiatkowski@linux.intel.com, horms@kernel.org,
-        Dave Marquardt <davemarq@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH net-next v3 3/3] net: ibmveth: added KUnit tests for some buffer pool functions
-Date: Wed, 16 Apr 2025 15:57:51 -0500
-Message-ID: <20250416205751.66365-4-davemarq@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250416205751.66365-1-davemarq@linux.ibm.com>
-References: <20250416205751.66365-1-davemarq@linux.ibm.com>
+	s=arc-20240116; t=1744837162; c=relaxed/simple;
+	bh=IBCtM4W5KQm0VIXhhgxKkcnr89rBb+zyKpougE+2sAY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G5deewxJf0ceSMsp6tEniTyTHtLR8HOV9cpUYo7qVavktQbi/US5xPAXw5GLDItxHKrXSSKsAsjs4e1djbE3NVJp+4ICvQ047cFB7bZoHl/ewz0c91Jx/F1ANpSxvp6Uu5GTCnrGkz106qY4p8ktPdPUxrXd4GmPDJtewbmdJDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UdIBDBh6; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-86fab198f8eso44770241.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744837158; x=1745441958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fXE/9C66AFaMxZnOf2usyfKl+C3GS8D2aGdJg640enA=;
+        b=UdIBDBh66lG86/zeyPFnnOfj0WuOai1bM2urRQxN3AhVVw/F8zZ25wVnSQO2FM7Hd1
+         wiFUdXvzYku1EKxw0oH83YBFUAbRV60B/SmYyIGRrgOdQX/Crh5prS2IxWuZTyzepGnM
+         lwUrrJ9qftCUeFyhIwb51E3Jruw0U33GqZKg5/s0hR+gZxnrVv/lj5mLqyNHqrWnIn3W
+         Ug3M67kuqgUQJBGdYIJX01Bq4MSSLWWvK9Jk6qsevhtwY0nek+vrLUhVi2Wh9i6Dcjr9
+         6OBu1sRcFu8035Suh4DgZnGnNJLnX5KFegVzpn5mu2pR2Q/9fcril6EqG226x+Z1LBRo
+         8ieA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744837158; x=1745441958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fXE/9C66AFaMxZnOf2usyfKl+C3GS8D2aGdJg640enA=;
+        b=msGabqLt14BQ2n+/NDPSMUcGcpvHNfAhd9o+s5FxMLOefT/7n85XKidDDurvUSZAe5
+         gHNYcC5+X6ZvfI2N77Ykh+EbJTvIjHOIkVYNz7l6aYmpOmeSxHNV4kVeh3gyOfOG0a67
+         JueWlwWpiuRJOQzB6VjUF+iS0ApqtV4q2Id9oKo4cf0IFxnYmLtwaeqyY3VyTw5G8Ut3
+         deyPcFXZNmpU8K7TC4CYHWIfkkIc2uvuhvQ/UfkbF/Bn1H/G84ZF/zVFUrm5MonF3XIG
+         jqggBQ8qqZ2+LYh9U2VkG7n/0Tmbdv8nXKKJBQO6M4cxqITKcvCl5W6lIV17ULJn/amf
+         MeHQ==
+X-Gm-Message-State: AOJu0YyJCfmopSmfnuE/y32bXo4ctfGufPIdtclM5sd6bF1f/ofWIWl0
+	ecFxMO9cDesg8X1PA61gVUCmJTHUnWPp9LGskVooDjj3dLqLsVAKP1Js51gRjTUWRkCrkxgPvs5
+	UwoLpaDkq6QEOkOeLlewL/mUE2nQ=
+X-Gm-Gg: ASbGncviOkjdKseeFNIRQQamU3xscd2Ybjb+Et9GfHoCKCtf7LOLgAps6IN2BZ4wLJy
+	dpGiFfUvGvoWN8qO4MdN8aNrNs0EHIwHK7d+MEfXjk+Md4FieDrSsQjKYd7zVGvhvI8oFcPsMTo
+	v0zc4bmeKdu61XynYvRbpVJuK3Cf7itvQvW9eEedeOgGdDYZU0G3DiiCR3XHPzvDo=
+X-Google-Smtp-Source: AGHT+IG928ltOQHmXyGCIWtK1xhVIFJ74ZYrkuDVdQ5SIr2z2KUoJf9ItT9crq3QD+XAlKFR5h1Aa7W3G1Ro/dqRJdc=
+X-Received: by 2002:a05:6102:3b09:b0:4c3:6a7e:c9f3 with SMTP id
+ ada2fe7eead31-4cb591b80b8mr2503396137.3.1744837157970; Wed, 16 Apr 2025
+ 13:59:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xKsnmu60IicYoaQ5qWz93aI8qKpv5e_M
-X-Proofpoint-GUID: xKsnmu60IicYoaQ5qWz93aI8qKpv5e_M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-16_08,2025-04-15_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2504160168
+References: <20250410175140.10805-3-luizcmpc@gmail.com> <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
+In-Reply-To: <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
+From: =?UTF-8?Q?Luiz_Carlos_Mour=C3=A3o_Paes_de_Carvalho?= <luizcmpc@gmail.com>
+Date: Wed, 16 Apr 2025 17:59:05 -0300
+X-Gm-Features: ATxdqUGYSOG-_gdgCmvZjzvNHMn6DiK2rPIdOlbz8HV2oqfdg3n6sQSr9IM5QGg
+Message-ID: <CAHx7jf_kZhR__FU--grcZgVd3bC4SZXScn3CJJBZBpspv9GSnQ@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: tcp_acceptable_seq select SND.UNA when SND.WND
+ is 0
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Added KUnit tests for ibmveth_remove_buffer_from_pool and
-ibmveth_rxq_get_buffer under new IBMVETH_KUNIT_TEST config option.
+Hi Paolo,
 
-Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
----
- drivers/net/ethernet/ibm/Kconfig   |  13 +++
- drivers/net/ethernet/ibm/ibmveth.c | 125 +++++++++++++++++++++++++++++
- 2 files changed, 138 insertions(+)
+The dropped ack is a response to data sent by the peer.
 
-diff --git a/drivers/net/ethernet/ibm/Kconfig b/drivers/net/ethernet/ibm/Kconfig
-index c0c112d95b89..4f4b23465c47 100644
---- a/drivers/net/ethernet/ibm/Kconfig
-+++ b/drivers/net/ethernet/ibm/Kconfig
-@@ -27,6 +27,19 @@ config IBMVETH
- 	  To compile this driver as a module, choose M here. The module will
- 	  be called ibmveth.
- 
-+config IBMVETH_KUNIT_TEST
-+	bool "KUnit test for IBM LAN Virtual Ethernet support" if !KUNIT_ALL_TESTS
-+	depends on KUNIT
-+	depends on KUNIT=y && IBMVETH=y
-+	default KUNIT_ALL_TESTS
-+	help
-+	  This builds unit tests for the IBM LAN Virtual Ethernet driver.
-+
-+	  For more information on KUnit and unit tests in general, please refer
-+	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  If unsure, say N.
-+
- source "drivers/net/ethernet/ibm/emac/Kconfig"
- 
- config EHEA
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 59158284ec43..e56cfc82ddd0 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -2040,3 +2040,128 @@ static void __exit ibmveth_module_exit(void)
- 
- module_init(ibmveth_module_init);
- module_exit(ibmveth_module_exit);
-+
-+#ifdef CONFIG_IBMVETH_KUNIT_TEST
-+#include <kunit/test.h>
-+
-+/**
-+ * ibmveth_reset_kunit - reset routine for running in KUnit environment
-+ *
-+ * @w: pointer to work_struct embedded in adapter structure
-+ *
-+ * Context: Called in the KUnit environment. Does nothing.
-+ *
-+ * Return: void
-+ */
-+static void ibmveth_reset_kunit(struct work_struct *w)
-+{
-+	netdev_dbg(NULL, "reset_kunit starting\n");
-+	netdev_dbg(NULL, "reset_kunit complete\n");
-+}
-+
-+/**
-+ * ibmveth_remove_buffer_from_pool_test - unit test for some of
-+ *                                        ibmveth_remove_buffer_from_pool
-+ * @test: pointer to kunit structure
-+ *
-+ * Tests the error returns from ibmveth_remove_buffer_from_pool.
-+ * ibmveth_remove_buffer_from_pool also calls WARN_ON, so dmesg should be
-+ * checked to see that these warnings happened.
-+ *
-+ * Return: void
-+ */
-+static void ibmveth_remove_buffer_from_pool_test(struct kunit *test)
-+{
-+	struct ibmveth_adapter *adapter = kunit_kzalloc(test, sizeof(*adapter), GFP_KERNEL);
-+	struct ibmveth_buff_pool *pool;
-+	u64 correlator;
-+
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, adapter);
-+
-+	INIT_WORK(&adapter->work, ibmveth_reset_kunit);
-+
-+	/* Set sane values for buffer pools */
-+	for (int i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++)
-+		ibmveth_init_buffer_pool(&adapter->rx_buff_pool[i], i,
-+					 pool_count[i], pool_size[i],
-+					 pool_active[i]);
-+
-+	pool = &adapter->rx_buff_pool[0];
-+	pool->skbuff = kunit_kcalloc(test, pool->size, sizeof(void *), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pool->skbuff);
-+
-+	correlator = ((u64)IBMVETH_NUM_BUFF_POOLS << 32) | 0;
-+	KUNIT_EXPECT_EQ(test, -EINVAL, ibmveth_remove_buffer_from_pool(adapter, correlator, false));
-+	KUNIT_EXPECT_EQ(test, -EINVAL, ibmveth_remove_buffer_from_pool(adapter, correlator, true));
-+
-+	correlator = ((u64)0 << 32) | adapter->rx_buff_pool[0].size;
-+	KUNIT_EXPECT_EQ(test, -EINVAL, ibmveth_remove_buffer_from_pool(adapter, correlator, false));
-+	KUNIT_EXPECT_EQ(test, -EINVAL, ibmveth_remove_buffer_from_pool(adapter, correlator, true));
-+
-+	correlator = (u64)0 | 0;
-+	pool->skbuff[0] = NULL;
-+	KUNIT_EXPECT_EQ(test, -EFAULT, ibmveth_remove_buffer_from_pool(adapter, correlator, false));
-+	KUNIT_EXPECT_EQ(test, -EFAULT, ibmveth_remove_buffer_from_pool(adapter, correlator, true));
-+}
-+
-+/**
-+ * ibmveth_rxq_get_buffer_test - unit test for ibmveth_rxq_get_buffer
-+ * @test: pointer to kunit structure
-+ *
-+ * Tests ibmveth_rxq_get_buffer. ibmveth_rxq_get_buffer also calls WARN_ON for
-+ * the NULL returns, so dmesg should be checked to see that these warnings
-+ * happened.
-+ *
-+ * Return: void
-+ */
-+static void ibmveth_rxq_get_buffer_test(struct kunit *test)
-+{
-+	struct ibmveth_adapter *adapter = kunit_kzalloc(test, sizeof(*adapter), GFP_KERNEL);
-+	struct sk_buff *skb = kunit_kzalloc(test, sizeof(*skb), GFP_KERNEL);
-+	struct ibmveth_buff_pool *pool;
-+
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, adapter);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb);
-+
-+	INIT_WORK(&adapter->work, ibmveth_reset_kunit);
-+
-+	adapter->rx_queue.queue_len = 1;
-+	adapter->rx_queue.index = 0;
-+	adapter->rx_queue.queue_addr = kunit_kzalloc(test, sizeof(struct ibmveth_rx_q_entry),
-+						     GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, adapter->rx_queue.queue_addr);
-+
-+	/* Set sane values for buffer pools */
-+	for (int i = 0; i < IBMVETH_NUM_BUFF_POOLS; i++)
-+		ibmveth_init_buffer_pool(&adapter->rx_buff_pool[i], i,
-+					 pool_count[i], pool_size[i],
-+					 pool_active[i]);
-+
-+	pool = &adapter->rx_buff_pool[0];
-+	pool->skbuff = kunit_kcalloc(test, pool->size, sizeof(void *), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, pool->skbuff);
-+
-+	adapter->rx_queue.queue_addr[0].correlator = (u64)IBMVETH_NUM_BUFF_POOLS << 32 | 0;
-+	KUNIT_EXPECT_PTR_EQ(test, NULL, ibmveth_rxq_get_buffer(adapter));
-+
-+	adapter->rx_queue.queue_addr[0].correlator = (u64)0 << 32 | adapter->rx_buff_pool[0].size;
-+	KUNIT_EXPECT_PTR_EQ(test, NULL, ibmveth_rxq_get_buffer(adapter));
-+
-+	pool->skbuff[0] = skb;
-+	adapter->rx_queue.queue_addr[0].correlator = (u64)0 << 32 | 0;
-+	KUNIT_EXPECT_PTR_EQ(test, skb, ibmveth_rxq_get_buffer(adapter));
-+}
-+
-+static struct kunit_case ibmveth_test_cases[] = {
-+	KUNIT_CASE(ibmveth_remove_buffer_from_pool_test),
-+	KUNIT_CASE(ibmveth_rxq_get_buffer_test),
-+	{}
-+};
-+
-+static struct kunit_suite ibmveth_test_suite = {
-+	.name = "ibmveth-kunit-test",
-+	.test_cases = ibmveth_test_cases,
-+};
-+
-+kunit_test_suite(ibmveth_test_suite);
-+#endif
--- 
-2.49.0
+Peer sends a chunk of data, we ACK with an incorrect SEQ (SND.NXT)
+that gets dropped
+by the peer's tcp_sequence function. Connection only advances when we
+send a RTO.
 
+Let me know if the following describes the scenario you expected. I'll
+add a packetdrill with
+the expected interaction to the patch if it makes sense.
+
+// Tests the invalid SEQs sent by the listener
+// which are then dropped by the client.
+
+`./common/defaults.sh
+./common/set_sysctls.py /proc/sys/net/ipv4/tcp_shrink_window=3D0`
+
+    0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+   +0 bind(3, ..., ...) =3D 0
+   +0 listen(3, 1) =3D 0
+
+   +0 < S 0:0(0) win 8 <mss 1000,sackOK,nop,nop,nop,wscale 7>
+   +0 > S. 0:0(0) ack 1 <...>
+  +.1 < . 1:1(0) ack 1 win 8
+   +0 accept(3, ..., ...) =3D 4
+
+   +0 write(4, ..., 990) =3D 990
+   +0 > P. 1:991(990) ack 1
+   +0 < .  1:1(0) ack 991 win 8           // win=3D8 despite buffer
+being almost full, shrink_window=3D0
+
+   +0 write(4, ..., 100) =3D 100
+   +0 > P. 991:1091(100) ack 1            // SND.NXT=3D1091
+   +0 < .  1:1(0) ack 991 win 0           // failed to queue rx data,
+RCV.NXT=3D991, RCV.WND=3D0
+
+ +0.1 < P. 1:1001(1000) ack 901 win 0
+   +0 > .  1091:1091(0) ack 1001          // dropped on tcp_sequence,
+note that SEQ=3D1091, while (RCV.NXT + RCV.WND)=3D991:
+                                          // if (after(seq,
+tp->rcv_nxt + tcp_receive_window(tp)))
+                                          //     return
+SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+
+ +0.2 > P. 991:1091(100) ack 1001         // this is a RTO, ack accepted
+   +0 < P. 1001:2001(1000) ack 991 win 0  // peer responds, still no
+space available, but has more data to send
+   +0 > .  1091:1091(0) ack 2001          // ack dropped
+
+ +0.3 > P. 991:1091(100) ack 2001         // RTO, ack accepted
+   +0 < .  2001:3001(1000) ack 991 win 0  // still no space available,
+but another chunk of data
+   +0 > .  1091:1091(0) ack 3001          // ack dropped
+
+ +0.6 > P. 991:1091(100) ack 3001         // RTO, ack accepted
+   +0 < .  3001:4001(1000) ack 991 win 0  // no space available, but
+peer has data to send at all times
+   +0 > .  1091:1091(0) ack 4001          // ack dropped
+
+ +1.2 > P. 991:1091(100) ack 4001         // another probe, accepted
+
+  // this goes on and on. note that the peer always has data just
+waiting there to be sent,
+  // server acks it, but the ack is dropped because SEQ is incorrect.
+  // only the probes are advancing the connection, but are back-offed
+every time.
+
+// Reset sysctls
+`/tmp/sysctl_restore_${PPID}.sh`
+
+Luiz Carvalho
+
+On Tue, Apr 15, 2025 at 8:30=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+>
+>
+> On 4/10/25 7:50 PM, Luiz Carvalho wrote:
+> > The current tcp_acceptable_seq() returns SND.NXT when the available
+> > window shrinks to less then one scaling factor. This works fine for mos=
+t
+> > cases, and seemed to not be a problem until a slight behavior change to
+> > how tcp_select_window() handles ZeroWindow cases.
+> >
+> > Before commit 8c670bdfa58e ("tcp: correct handling of extreme memory sq=
+ueeze"),
+> > a zero window would only be announced when data failed to be consumed,
+> > and following packets would have non-zero windows despite the receiver
+> > still not having any available space. After the commit, however, the
+> > zero window is stored in the socket and the advertised window will be
+> > zero until the receiver frees up space.
+> >
+> > For tcp_acceptable_seq(), a zero window case will result in SND.NXT
+> > being sent, but the problem now arises when the receptor validates the
+> > sequence number in tcp_sequence():
+> >
+> > static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
+> >                                        u32 seq, u32 end_seq)
+> > {
+> >       // ...
+> >       if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
+> >               return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+> >       // ...
+> > }
+> >
+> > Because RCV.WND is now stored in the socket as zero, using SND.NXT will=
+ fail
+> > the INVALID_SEQUENCE check: SEG.SEQ <=3D RCV.NXT + RCV.WND. A valid ACK=
+ is
+> > dropped by the receiver, correctly, as RFC793 mentions:
+> >
+> >       There are four cases for the acceptability test for an incoming
+> >         segment:
+> >
+> >       Segment Receive  Test
+> >         Length  Window
+> >         ------- -------  -------------------------------------------
+> >
+> >            0       0     SEG.SEQ =3D RCV.NXT
+> >
+> > The ACK will be ignored until tcp_write_wakeup() sends SND.UNA again,
+> > and the connection continues. If the receptor announces ZeroWindow
+> > again, the stall could be very long, as was in my case. Found this out
+> > while giving a shot at bug #213827.
+>
+> The dropped ack causing the stall is a zero window probe from the sender
+> right?
+> Could you please describe the relevant scenario with a pktdrill test?
+>
+> Thanks!
+>
+> Paolo
+>
 
