@@ -1,126 +1,139 @@
-Return-Path: <netdev+bounces-183406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B02A90992
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:04:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5130EA90996
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55433168947
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:04:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC30C3AFCE4
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5647920DD40;
-	Wed, 16 Apr 2025 17:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awnWpg25"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C66215F7C;
+	Wed, 16 Apr 2025 17:06:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3246B195FE8
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 17:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCF221517B;
+	Wed, 16 Apr 2025 17:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744823093; cv=none; b=mOljN4T82VOeh5Mr/8Av0opOXrlrsReQMTvsSeD5NbxMJRe2qZ6dmVUZRAILFc/sARBFz4QfrGfl9ptuA+l0NrCOwjdrvwXxkK6TI3jG/+znAw6xJGjAungoF0mwKZlpgW01GMYSpTCcw+2hIL0Vb5wA1mfapSrIVKk0n5ofSW8=
+	t=1744823183; cv=none; b=dswdJ0vePdQTMzp8aWSZ320/DHlz91pcI9yyxAI/WAvE35OwH8d/LxLOadYjQJTFaPL2EjmDZCMf34afoewxkSQkWx4l0XkpxOtmYv3mGXPgl87H42OciigPJmT1Pp0bzuaNVvGAyi/9IkcBwaP3T+UF5+otUF+x0P7DB44iyyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744823093; c=relaxed/simple;
-	bh=X+hdtTE3I9nqlJM1Kle+k2xO66KF4y9d+l1InnmbIiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OFIE0kfrk4ukyDuEmerrm6Cyq5/G7gVhyYabh3UDiN/7Z9upPoUTr/JtxehEPRu5Fq+1vRlvQSrZuadpLECELCmJl+vX8SDl80ajGyD+iKYNZJ+eTws0LWtqEN9ox3IWiX5nGXm1vRbVi5P0O5Z+aNQlCXc7WPb0/bQaQToqXfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awnWpg25; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0242C4CEE2;
-	Wed, 16 Apr 2025 17:04:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744823091;
-	bh=X+hdtTE3I9nqlJM1Kle+k2xO66KF4y9d+l1InnmbIiY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=awnWpg25stPGEkodW2n6rnQ3VmVbQtYG8CCZIlZiliFhJs+7xUGxTVNYwRtZvAmJm
-	 yNpebVgMFRsUHholtmTylAm/4Th5ePfNID6jHsIkEPlBJMet3GGkIfEKgCNgSwGGVc
-	 TdleW0HW23lgmrc5+EA8yXUTZKsFdQ2yONvZs2yiC4xrRnJOD/p83Bo4s8K5gxpi9R
-	 IOsjBMM1EdXotdADKeszaGnEH6TapkcQ6v3nLUL7Kx4ZYM8xKH6adys86BhHPsXmQ4
-	 qg0moAdibw6QADJc1jxLzUbeBG8u2fNQhmUb94fc+NkERqTRZsYsSjH/YQuNGLWQmh
-	 ONEPE20yPI4aw==
-Date: Wed, 16 Apr 2025 18:04:47 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Add missing filed to ppe_mbox_data
- struct
-Message-ID: <20250416170447.GU395307@horms.kernel.org>
-References: <20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org>
- <20250416154144.GT395307@horms.kernel.org>
- <Z__S_m9fBEKmoos1@lore-desk>
+	s=arc-20240116; t=1744823183; c=relaxed/simple;
+	bh=d0f/eZxJsYBPNzP+ypgNu+3Y2vNYtC0mQ/V9+GgyiiY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QPPmP+UM6kowS2FyGDxEN4NAb+F5b/12TV3fLjvF9UBt98zL4qPjJR0FJOWud2mx1TV4xgk83VbaT1LIB8u+CfQC4OstpYlFuZSSeSEj03XxFxbtN/uGl+hEH0a5ed/kxOJnTgaCeD+Ahpa7ucHnsxZTuFAXEwQC4+reA58chhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e677f59438so10322956a12.2;
+        Wed, 16 Apr 2025 10:06:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744823180; x=1745427980;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FT7KrIUQ+zDqya9cxR8Wwm/RYrGSzwBKh8Xo9H7htOg=;
+        b=nEPOWlShfqahKQtNBeY3rucDmD9pzvxpSNvyKIFv9TR+UG7zHFv/StIR0NSdutM9cC
+         vkHWpe0a0wSBKCuUHSkxsuUp/Lzlv8AKSqFh9/XDCwuO8V1ROvU8wqeX+AqZqfYzWQlk
+         QE+o+E90WiBL28oM4UQ2ei+ymzZnAaCUHMvSrUtcECkyITAypjvF1vqREa7PsRyIf0+C
+         HtHk9Ndmx66xOWMCvpZ95rJpLEEf103CnWCz1Oeb0Ik8bTwtFzidSY8G//EgC/bpY7UW
+         i8V/o8WBiV0bOYeqmWVLiUGoAK2XmEk00Jwbo7HOtbhyeGeC7xjOyIb65xvM/Teq5ee/
+         BtSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGdIGZqoMUxziQw22zgG3F9Y9glJem6nOslDIsJQlAuYc1nGiaaYesJToLsfLTan7JZ1tnkOecsCrMWDM=@vger.kernel.org, AJvYcCXsS0cMUdRVhPPEr4fzkrerorfWjvLCXREKJmfeYJS2AHU0pnwN2FmTZLuzV18oJAczaIZZnDN0xovpiaC3o01+zbRZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ/wixi7METYFxBmEXVBqgSubK3VjIVM1jaovNtKMp9CxmrPFO
+	B7j0MeMIq5Aqk5q/7fJUs1VoJrq+eONUQ7Mas0kYCBr6PCEZpEyc
+X-Gm-Gg: ASbGnct93a0x+LGZUtB/pIrNHakIWHLVkkLeMeDbl0ErhzbFZGJwxG+ve7p44hLv5Vc
+	zHDySZEYbFHu8tqgU+inbnJUSQ164SaiB1eI4ofn8eh13OAC9XZxjTZHmVnCZef8tAQNHLCpuLJ
+	3OarIFiQ40Ct2O1wRWmBAPVE+pCHsJ7oXV7TDdrPIc+bHJkWvz1PWC9id8t1vt6/gHrSJ+w2LJ6
+	8nW3I6nYsMI0iVX7VYnElnO0hCVmdjV3ILMOm3kTM2pBI4jqKbxti2J2nVVOtgjlUzGGsz3Gg3X
+	Pk0+LaDprfdTmdAtx9CjXaj7cyMMRV4=
+X-Google-Smtp-Source: AGHT+IE46/jYtgnagWUq61/qNPpt6WU70ixrUVCo1T58uk5wl7XVhFk+rPViX3UF3CcLvypIq25TSA==
+X-Received: by 2002:a05:6402:3490:b0:5e5:bfab:51f with SMTP id 4fb4d7f45d1cf-5f4b6df5c7cmr2542173a12.0.1744823179647;
+        Wed, 16 Apr 2025 10:06:19 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36ee54d8fsm8850935a12.12.2025.04.16.10.06.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 10:06:19 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 16 Apr 2025 10:06:12 -0700
+Subject: [PATCH net-next] trace: tcp: Add const qualifier to skb parameter
+ in tcp_probe event
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z__S_m9fBEKmoos1@lore-desk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250416-tcp_probe-v1-1-1edc3c5a1cb8@debian.org>
+X-B4-Tracking: v=1; b=H4sIAIPj/2cC/x3MWwqAIBAF0K0M9zvB3uFWIqJsqvkxUYlA2nvQW
+ cDJiByEIwxlBL4lyuVgqCwI9lzcwUo2GEKlq1Y3ZaeS9bMP18pK66au+832w9KiIPjAuzz/NcJ
+ xUo6fhOl9P8T7gqRlAAAA
+X-Change-ID: 20250416-tcp_probe-004337dc78a5
+To: Eric Dumazet <edumazet@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1057; i=leitao@debian.org;
+ h=from:subject:message-id; bh=d0f/eZxJsYBPNzP+ypgNu+3Y2vNYtC0mQ/V9+GgyiiY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn/+OKru1t39LuwcXgqrOsIm8r8vW5na2pFwQVt
+ k2vZ4db8NqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ//jigAKCRA1o5Of/Hh3
+ bZEHD/4tWh2Qvw/qIU8EA/nnuzjl3TEwife+HTbot1I8APw8xLC8ySLIbbulMMtgd6jTvsY4iUG
+ GMtaSGj2B2u6+o05sLaKiYDEnYcZrD9LGs10/+CSr14VnBGDFU1IaiEyr4yH4iYzD/gVkFxnQCk
+ 0sSpxMHUCxbOnFs1H0Lybc3Um7iKiJazCCRGSjfzPrW0U2WE2YRYYeHYqPE8mFq4zYXkhD65pGH
+ lAPf6z+5OoE2PB/2yKvVtv1tpBCnjMRDsNW+/jfHD4eBTpckk0CYPCPJneT5D33uMi19BHB/EcR
+ 0FClBeTMqT2ZHRcE1mvdrYdZN5BsmH0JwdByhkISjkWQYQop3xEcgy52FJOAQ8jxxSPYb39MJjF
+ zeeMSOVW9jDV2oEXceB+MzGgMKYOp0CJeVK7RpDNub7acKbotYRek60RjN1qw2dBF038mTMrCoS
+ t41Rpd7IRR5eJKkXySNt9GNvs2hZuI+2ImUwyJaLznStPKT4efHYtsDDBTGj8igDflF4Pa8jX1m
+ 6itgrh6m9a0IR/tUIVQdK/4lAk2ziOJFNAgOba09QX2xe0kO+oErG79ZLtzx+L6FfrojI0MxNFp
+ IJX+dRgZ+I3h5IgOQZE9G6WXkHZcUK7TmmAKgLlCJZNz8MMJwiYmlZRyDZzma/OGih2TAGOx4cz
+ 5NmmU0NU1Nr7xiw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Wed, Apr 16, 2025 at 05:55:42PM +0200, Lorenzo Bianconi wrote:
-> > On Tue, Apr 15, 2025 at 09:27:21AM +0200, Lorenzo Bianconi wrote:
-> > > The official Airoha EN7581 firmware requires adding max_packet filed in
-> > > ppe_mbox_data struct while the unofficial one used to develop the Airoha
-> > > EN7581 flowtable offload does not require this field. This patch fixes
-> > > just a theoretical bug since the Airoha EN7581 firmware is not posted to
-> > > linux-firware or other repositories (e.g. OpenWrt) yet.
-> > > 
-> > > Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
-> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > ---
-> > >  drivers/net/ethernet/airoha/airoha_npu.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-> > > index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c3611b4a154d19bc2c 100644
-> > > --- a/drivers/net/ethernet/airoha/airoha_npu.c
-> > > +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> > > @@ -104,6 +104,7 @@ struct ppe_mbox_data {
-> > >  			u8 xpon_hal_api;
-> > >  			u8 wan_xsi;
-> > >  			u8 ct_joyme4;
-> > > +			u8 max_packet;
-> > >  			int ppe_type;
-> > >  			int wan_mode;
-> > >  			int wan_sel;
-> > 
-> > Hi Lorenzo,
-> > 
-> > I'm a little confused by this.
-> > 
-> > As I understand it ppe_mbox_data is sent as the data of a mailbox message
-> > send to the device.  But by adding the max_packet field the layout is
-> > changed. The size of the structure changes. And perhaps more importantly
-> > the offset of fields after max_packet, e.g.  wan_mode, change.
-> > 
-> > Looking at how this is used, f.e. in the following code, I'm unclear on
-> > how this change is backwards compatible.
-> 
-> you are right Simon, this change is not backwards compatible but the fw
-> is not publicly available yet and the official fw version will use this
-> new layout (the previous one was just a private version I used to develop
-> the driver).  Can we use this simple approach or do you think we should
-> differentiate the two firmware version in some way? (even if the previous
-> one will never be used).
+Change the tcp_probe tracepoint to accept a const struct sk_buff
+parameter instead of a non-const one. This improves type safety and
+better reflects that the skb is not modified within the tracepoint
+implementation.
 
-Hi Lorenzo,
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Sending this for net-next to avoid bringing this to stable tree, which
+would make backport harder for not a big benefit.
+---
+ include/trace/events/tcp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sorry, I misunderstood the commit message.
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 75d3d53a3832c..53e878fa14d14 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -293,7 +293,7 @@ DECLARE_TRACE(tcp_cwnd_reduction_tp,
+ 
+ TRACE_EVENT(tcp_probe,
+ 
+-	TP_PROTO(struct sock *sk, struct sk_buff *skb),
++	TP_PROTO(struct sock *sk, const struct sk_buff *skb),
+ 
+ 	TP_ARGS(sk, skb),
+ 
 
-Yes, I think this simple approach is fine if there is no
-compatibility issue wrt firmwares we can reasonably expect
-in the wild. Which seems to be the case here.
+---
+base-commit: 40ad72f88a65814ffeb1ab362074c6f8c4dc3f61
+change-id: 20250416-tcp_probe-004337dc78a5
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
 
