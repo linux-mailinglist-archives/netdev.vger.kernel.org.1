@@ -1,87 +1,76 @@
-Return-Path: <netdev+bounces-183151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F439A8B302
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:12:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73222A8B357
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 484F4443037
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:12:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541723A4D6F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE1122FE05;
-	Wed, 16 Apr 2025 08:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D66C26AEC;
+	Wed, 16 Apr 2025 08:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="a4k/I7Nx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Dhx5jdtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C51722F169
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3465199FAB
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744791156; cv=none; b=Ro4oRBLPXumrR7Ym34da0YV3/xn3Ay/IxdTS6fxavQTw0A9dvAi+1/Ht4fdO2XJgnaa4XPYfoLnz6A7sYXJvakaarBPEICn62lIGPkE9x+zupVpATD7jJl3+jwL05sY0qRzGOKOVURXVmZ///uawIywGvBDKE2msbTOH/Rj4xcg=
+	t=1744791657; cv=none; b=kkwA4dfY04tYY2GO7nJc7DjvXegFa/eMfFn3HTLfgxe8eiMeF/w/hm4UdA6lDeWP7PyXu8ALvQvDJu+OHTjxLAYRNngVg6Uc6ZHBUF5jUIMul6rjkzbFaxnKatpF2KJtOHI4jiRqhmVfm90ZCmmG2XkfPMLTfweTJGUjUcyvAac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744791156; c=relaxed/simple;
-	bh=UqpYDKEGBNrCP4IDpHxnNSRgmJd86ZMFLlHPoSsuwB0=;
+	s=arc-20240116; t=1744791657; c=relaxed/simple;
+	bh=3FDmJj1M4qcbECNJRvLs5dFm6VzeOfOqrPS+aE7hkns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZRO+4Hk3N5j92z2mR9sENmkm5BGAW1erw99vVXT9HrUjEa7Zftkw7XrI89jvfKHgPn0sn91Bf3MWCda1njNs7PPqjoUVQk2nrxsrYwXfLxkzB5ieexxMjEcNS2ba8XNUDb/aU020WLULHWBCJpQcxBJpiqLX6o6KcWK41//zPUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=a4k/I7Nx; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-39149bccb69so6344129f8f.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 01:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744791152; x=1745395952; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H/4bHaraL4n/P0iTE+QqqFajLDyDWyG2jsQgWhbDjMQ=;
-        b=a4k/I7NxfE+MLqX6uttNSUyfNND1IYa04gaTanD+jFTxoEmHv1Pny+Kk8nnpZwJuFw
-         wfYL0AIECiNy0eiv4FiYtI/a36+rwPoIV/n1iQco6OH8YbpXkdcB/7Kgiv6lePpvb7Qv
-         IkhEEMDfgT8+3/MquUa/UR8RgyrBLKhoV6XOil5C7lWa9MqOAthzBKNZONwtY+RW12wz
-         47P8ZGGy+BSY1Pl1LSkvdGkRe0ssXeFm4keYjgCQfGf6QDsJJSWS4tY6oLhwSGUdu9NZ
-         XPAnpqsFsy1pd2uxdamq9FkT/XfDqtUIOiAgbkjEgdUxG+AQBlyE1ww+Azfi21Rx9oD1
-         xQSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744791152; x=1745395952;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H/4bHaraL4n/P0iTE+QqqFajLDyDWyG2jsQgWhbDjMQ=;
-        b=QKADv3Fi4/hQbshSgR8HgfVYF8g+H5zWbu4LOOFszfSKRHIW8AnWCdkRRZfvCAb0St
-         eWz4gGleXCYqyggsgPstlffTxyfynBBkU8EoZXeLXP+0h8OTz9sSEGFbo4Ou/N3jCMCL
-         a+shrK91unkcoG6E2NBxA9hUbwcdG2Ik1Gj0PV6JTwPNeOabvDn5INdJBA9C/8WQyLSN
-         erWia1VUqR/F+IIbjyThdsCMe5gwfhkjAGRDVsl9V89pEHPrH1aBMaOiW379EX5CpcBI
-         /cy6+vIWuUhAFc7v4ztlkiTDfpphIa6E2QE3VOTh8Y4xjETqtEHyN+XB2WNwK4vPyGJA
-         e3Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfMmnvqbt3ZQQorhY0SK6jz2nm9pHfgVXIITrJ6Up4PbARwNtt/6mM3NnMZC1K9RY2tZaDVeg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMWORLXfiaqtoip1G78tDgXNnXQQnutWFyICgj4MryzomMRsnR
-	K76ejqzLTGr2sPJ+VMmRkaUSAHZcHEVRt6d+bqYtyT8f7+l+DHfxmWWI+cEHr2Y=
-X-Gm-Gg: ASbGncsaOZLRxvBp4scJM1jkV4PcVbSVSmWBtX+Hagb9t+2zhevMzZNC0izHX7wd4uj
-	ZsGqePf7jr5Qb3j9gKIRqM4IBSBIfXW/SrL3Fh+PEgZ7+lr7TkpGdj1o7wzjiYhmfRbp13DRzjL
-	Yc7VMTFT52Ph2tdVJRsUPvIjrDCPaYFpCS+Sn/HiQvIBXRZA2MW4FFtG2Paps344heaJk9mvNRx
-	2kjCcSW/citGJS97XreY5kkDMRBUdEvbpG1mlAiAqWyiLkTu1VajpCgl9Mg7x21nzkDsCjVAQyj
-	XvUzNWm2xHclsLnlRUQ0Byd1PUEFcjm5XP8zCxOLhp3Ipenb7wfYkA==
-X-Google-Smtp-Source: AGHT+IGxaQcIkGTI0aBQCrdg5Mdz1bajPY1DljdFhlFnwzhWRIuUx+MIrx6GZMLHMpwt9t1FLRkhxA==
-X-Received: by 2002:a05:6000:18a7:b0:39c:2c38:4599 with SMTP id ffacd0b85a97d-39ee5b9ee51mr819435f8f.48.1744791151941;
-        Wed, 16 Apr 2025 01:12:31 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39ee6010449sm515446f8f.9.2025.04.16.01.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 01:12:31 -0700 (PDT)
-Date: Wed, 16 Apr 2025 10:12:21 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev, 
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, 
-	aleksandr.loktionov@intel.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v1 0/3] dpll: add ref-sync pins feature
-Message-ID: <6ss5qghishcbbbmj6ifitafl6fnbfhnw6crrkitgunays4qtqv@ixvlqemyij6x>
-References: <20250415175115.1066641-1-arkadiusz.kubalewski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BTWRGohH8a4UspagTmZdiqSYBYSBzscmyhFNkt3ir5QIOB+NjoRvO7cIwW3Hdfb6zjTlE3yUggR3NW3kwvnjbbO7GuZ+/Hhf1eeqw3vvkb4kcQSy1o9Nzb0XPf0pGcTaI3nld5XqRM3kCv2EOqtBJbZruq622Adz50+b8BPR3/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Dhx5jdtU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=URwBuCbS6/neY6AV6CFvJFFAf/PObTEbrh2Q/19p6+0=; b=Dhx5jdtUk0jK2Karpqm4mt9/dP
+	ozAsmNP8yHltiUVF1HqvFV+DJ1hNVy7pSEa9SRoRCOjoLJE+rjKQw5Kvuot4psTRt9Jv7ACkmJ9dp
+	tqg87Jfh2arIdiureSuR7lKJe6u/SE3S4y1taSx61dIO4TdudScqo4Y5d7lRy5Bebcj65hyxU58Z1
+	WvUbymB5Sgu6zqpQBb7DWuqop1+RTIG57QACukwxxHK9TiW7VkuzL640shud4iS5blZGWTtu1f1GB
+	U1OQVCEVbH5SvaFawlZi1m/SzLGIgcEgT8NHKh7nsLAqAxplleH4ru+9ijTyJTwAwovAhwBPdP1G6
+	FuO3O1ew==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38076)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u4y0i-0000uI-1K;
+	Wed, 16 Apr 2025 09:20:44 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u4y0d-0001FI-0V;
+	Wed, 16 Apr 2025 09:20:39 +0100
+Date: Wed, 16 Apr 2025 09:20:38 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 0/5] net: stmmac: socfpga: fix init ordering and
+ cleanups
+Message-ID: <Z_9oVrAOnInrhb6z@shell.armlinux.org.uk>
+References: <Z_6JaPBiGu_RB4xN@shell.armlinux.org.uk>
+ <20250416095343.1820272f@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,77 +79,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250415175115.1066641-1-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20250416095343.1820272f@fedora.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Tue, Apr 15, 2025 at 07:51:12PM +0200, arkadiusz.kubalewski@intel.com wrote:
->Allow to bind two pins and become a single source of clock signal, where
->first of the pins is carring the base frequency and second provides SYNC
->pulses.
+On Wed, Apr 16, 2025 at 09:53:43AM +0200, Maxime Chevallier wrote:
+> I've given this a try and unfortunately :
 
-This is not enough. Could you please provide more details about this.
-Motivation is needed. Also, from the examples below looks like you allow
-to bind 2 pins, in async way. Would make sense to bind more than 2 pins
-together?
+Great, someone with hardware, and who responds to patches! :)
 
-Honestly, I don't understand what this is about.
+> This is only to get the phymode, maybe we should do like dwmac_imx
+> and store a pointer to plat_dat into struct dwmac_socfpga, so that we
+> can get it back in dwmac_init ? I've tried with the patch below and it
+> does solve the issue, but maybe you have a better approach.
 
+Yes, but I don't think we need such a big patch:
 
->
->Verify pins bind state/capabilities:
->$ ./tools/net/ynl/pyynl/cli.py \
-> --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-get \
-> --json '{"id":0}'
->{'board-label': 'CVL-SDP22',
-> 'id': 0,
-> [...]
-> 'reference-sync': [{'id': 1, 'state': 'disconnected'}],
-> [...]}
->
->Bind the pins by setting connected state between them:
->$ ./tools/net/ynl/pyynl/cli.py \
-> --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-set \
-> --json '{"id":0, "reference-sync":{"id":1, "state":"connected"}}'
->
->Verify pins bind state:
->$ ./tools/net/ynl/pyynl/cli.py \
-> --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-get \
-> --json '{"id":0}'
->{'board-label': 'CVL-SDP22',
-> 'id': 0,
-> [...]
-> 'reference-sync': [{'id': 1, 'state': 'connected'}],
-> [...]}
->
->Unbind the pins by setting disconnected state between them:
->$ ./tools/net/ynl/pyynl/cli.py \
-> --spec Documentation/netlink/specs/dpll.yaml \
-> --do pin-set \
-> --json '{"id":0, "reference-sync":{"id":1, "state":"disconnected"}}'
->
->
->Arkadiusz Kubalewski (3):
->  dpll: add reference-sync netlink attribute
->  dpll: add reference sync get/set
->  ice: add ref-sync dpll pins
->
-> Documentation/netlink/specs/dpll.yaml         |  19 ++
-> drivers/dpll/dpll_core.c                      |  27 +++
-> drivers/dpll/dpll_core.h                      |   1 +
-> drivers/dpll/dpll_netlink.c                   | 188 ++++++++++++++++--
-> drivers/dpll/dpll_nl.c                        |  10 +-
-> drivers/dpll/dpll_nl.h                        |   1 +
-> .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
-> drivers/net/ethernet/intel/ice/ice_dpll.c     | 186 +++++++++++++++++
-> include/linux/dpll.h                          |  10 +
-> include/uapi/linux/dpll.h                     |   1 +
-> 10 files changed, 425 insertions(+), 20 deletions(-)
->
->
->base-commit: 420aabef3ab5fa743afb4d3d391f03ef0e777ca8
->-- 
->2.38.1
->
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 8e6d780669b9..59f90b123c5b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -50,6 +50,7 @@ struct socfpga_dwmac {
+ 	u32	reg_offset;
+ 	u32	reg_shift;
+ 	struct	device *dev;
++	struct plat_stmmacenet_data *plat_dat;
+ 	struct regmap *sys_mgr_base_addr;
+ 	struct reset_control *stmmac_rst;
+ 	struct reset_control *stmmac_ocp_rst;
+@@ -233,10 +234,7 @@ static int socfpga_dwmac_parse_data(struct socfpga_dwmac *dwmac, struct device *
+ 
+ static int socfpga_get_plat_phymode(struct socfpga_dwmac *dwmac)
+ {
+-	struct net_device *ndev = dev_get_drvdata(dwmac->dev);
+-	struct stmmac_priv *priv = netdev_priv(ndev);
+-
+-	return priv->plat->mac_interface;
++	return dwmac->plat_dat->mac_interface;
+ }
+ 
+ static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
+@@ -490,6 +488,7 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 	 */
+ 	dwmac->stmmac_rst = plat_dat->stmmac_rst;
+ 	dwmac->ops = ops;
++	dwmac->plat_dat = plat_dat;
+ 
+ 	plat_dat->bsp_priv = dwmac;
+ 	plat_dat->fix_mac_speed = socfpga_dwmac_fix_mac_speed;
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
