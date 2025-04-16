@@ -1,115 +1,172 @@
-Return-Path: <netdev+bounces-183230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C07A8B6D3
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:34:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E09A8B6D7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75E041902F0D
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:34:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AF381903BC1
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D1B1FE471;
-	Wed, 16 Apr 2025 10:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E302C221DA7;
+	Wed, 16 Apr 2025 10:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s0bh0Bpd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023B61BC9E2
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6F4238D45
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744799667; cv=none; b=l6Yw2PiIszdfcVVKWs3cO0QryV2SCSKY12wMkWvlfwbEIvDU7LZDf7FzEm2Cxb0jHmX/OCOvArYM2jxbGxkodCy5NHuVqcaRGx5D+qG3jD9YClkhxgux+SBrU8HhHCY93VQHBJX+U8TEzHqGyCLo8/vk7FEj3LniuirRx24WsQo=
+	t=1744799735; cv=none; b=R1WgC5Ct8AWvbjyVyc9m1nslP/LPSXKO6dQG0I2nNi78lOc6zTJRn7X9/U9g/KbBX8Tj9Knu4MdoVn+FXjukkNH9L6IYqhJZPcwwpSEt4DqMlV50RnRpQvw5yD+QYMlMcpdvd5BWq1Vr5YvJJJrLcjA0XGfJ9E1lRHxtRVC/JSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744799667; c=relaxed/simple;
-	bh=cH35qVjrcnkulPMSh0e8mOB5TGNIM8hCT14BHgdo2DU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VdRVe+GOj/oB8sZKtICaMU9MrBSd8FCRqQ2LsGK2YM0GomoWHvL//0W4IcNEDgXSZ5vSLRYT5q0aQ9v/lIzUxECerw0loc2gSt00feeWD93DTeo8rF9yEVjcHOTXre8H7upsRYHY87Aid2934Kb5MoBT6jyAPGGR55vlW/9eQzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-70433283ba7so62751087b3.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:34:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744799665; x=1745404465;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cH35qVjrcnkulPMSh0e8mOB5TGNIM8hCT14BHgdo2DU=;
-        b=obHTFJvh8wr3e3aHq3TfCHpnQtSpB3QJG4L1ixIV6/JtAQ2A7/3QnqdQ3DTne6MEXW
-         gO+10/TklaPWrdT4YLnGSXwiuJlhOaiqh6CUFBcQQQwceWr+94PpHv9htGPy30jkUyv5
-         TuJskUfVWxLQXDd1o9BzUGZZuZw9lsGlzKVFzOHwsLzXtTnurCHnStyV5iIRc5qFAVjx
-         0C+oC+GefSvl2Xt+Y/n8wRIV2sWe2LWjmtW2PwZbUhKcdMuN+TFV/WawyGCkDLazT9+F
-         iMF2PmNr5l+v4ZA4EGYWPbtACBMYJW7FE9DVJ6aFEQXJ5D0C1jrRt7w898XxAUpu0lOk
-         0RFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuG7ccxTBSHMUDx9nRdY0sv1dXladrN/WFHeapDTfAA6lhIfaZeU8sxeJylHr95ges0RbTgEQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbdLau17kD/6IYVS9nhGtnc2xUsqC822i/boD0zA03KA4yrpAk
-	qp2jhBehCtb2iU1NxWirleQ08eai60Y4IHu7kVcxefB9BaXlA7UT2G4mq8nx
-X-Gm-Gg: ASbGncuRStuNGNbMqli5b5TWFXK/KuWWpLnm+NYYGGTzf3NiKDZcgBqkWQgNh9kL+bU
-	837vdd7YNBJf2nrFlvdvNNWPxJe4CfNHlhKZ7AXl/WOxDQfzPrW6jO36pWOiOrl0ARLsktG+l1q
-	wTvUzmHUwqe5b3WNBAYHWHmvSnOyLnUUrwpmXVTZWG87Ottpf3LU73TbRcacru/JQlVW11HkBpZ
-	6avW3Khzkb3jNA1CgeYR+YIXZ/WzCR82BLopNHY3hlv48T1C26tB+QnJPbT+nYQlJX8UHstlh7o
-	N+rhJgRdoXBp76bClOzeijlf3x1AmKbqioCVbHWWjt/ASX4ilqFK6M0YbuL55TPI5X3cqysNGLr
-	SJw==
-X-Google-Smtp-Source: AGHT+IHaZOGqgzTYrjMgtPe5AC+PuWyX/Y5cIY5Iw2chZH0F5y9OvOj4MyWOlzvZ7RV40nxxojSxgg==
-X-Received: by 2002:a05:690c:6809:b0:6ef:5013:bfd9 with SMTP id 00721157ae682-706b3276583mr18387857b3.10.1744799664668;
-        Wed, 16 Apr 2025 03:34:24 -0700 (PDT)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7053e37180csm40627147b3.75.2025.04.16.03.34.23
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 03:34:23 -0700 (PDT)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e6dea30465aso5548925276.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:34:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW/WRcavL9Ks8QMz7lN6ndIJt/okAXFg5gIj3ioQzPjVs8EBUwNAIxUAbjlhv4GpHrgyR5lU2g=@vger.kernel.org
-X-Received: by 2002:a05:6902:138f:b0:e6d:df8b:4658 with SMTP id
- 3f1490d57ef6-e7275e016ffmr1615820276.34.1744799663143; Wed, 16 Apr 2025
- 03:34:23 -0700 (PDT)
+	s=arc-20240116; t=1744799735; c=relaxed/simple;
+	bh=A625GxETBQiWpns00F3hsYBYUdJKWiduJkv9pWDvB/8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TH2C7ldTQGy/EDIVq/v6F6f5Mpp2ok9nohHboGUsMeZQgYW/lfAMlqKMLkbpj47DhqMqaLGMu+SLTXyB29gTM2DF59/u729a1G5ylGtOkFV8zn8wOgbJB9XpSFijyefat7YfhB10NHVQSIRD83C7ZXduxfNsSEFPWrqsab5E/Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s0bh0Bpd; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <507eb775-d7df-4dd2-a7d1-626d5a51c1de@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744799721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QspB9LX1pO0MySulBBzyvthxCUpy5u5bLOXGfquKjvw=;
+	b=s0bh0BpdqAM+iGHgvIf3IzcUJS78f0G04cHOeJi94ZVwIsZJCLZP9fWn5BNi0K/tg5daHp
+	gmDF2pfUHsfK0eJaIBfl8Ku8nXUQUj3xyhIHZKcVbmLii90p5QZqOzjA/kWS655dLP17Hb
+	pujMWZJp6skk71jr3evkml5qT0RbzRI=
+Date: Wed, 16 Apr 2025 11:35:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174471593618.5319.11061380619817212706.reportbug@localhost>
- <CAMw=ZnTZeodMmFFtc9ft39qMn2ffzM7jyWs_bqnp15_qmijYQg@mail.gmail.com> <9fc9360d-dc85-4486-a1a8-347495376165@debian.org>
-In-Reply-To: <9fc9360d-dc85-4486-a1a8-347495376165@debian.org>
-From: Luca Boccassi <bluca@debian.org>
-Date: Wed, 16 Apr 2025 11:34:12 +0100
-X-Gmail-Original-Message-ID: <CAMw=ZnSZZgjN3asWLO9BvHTXDeiAf=Peo23sSvZRQbds3vWP=w@mail.gmail.com>
-X-Gm-Features: ATxdqUGC8u4feNCRvZWx7_1aGnVGBsZY1hPCS7ELYMOoqNeTL6Lw69wjwCcdvMk
-Message-ID: <CAMw=ZnSZZgjN3asWLO9BvHTXDeiAf=Peo23sSvZRQbds3vWP=w@mail.gmail.com>
-Subject: Re: Bug#1103242: /bin/ip: "ip mon" does not exit when output is gone
-To: David Ahern <dsahern@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>
-Cc: 1103242@bugs.debian.org, Simon Richter <sjr@debian.org>, 
-	Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: jonathan.lemon@gmail.com, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250414085412.117120-1-maimon.sagi@gmail.com>
+ <b6aea926-ebb6-48fe-a1be-6f428a648eae@linux.dev>
+ <CAMuE1bG_+qj++Q0OXfBe3Z_aA-zFj3nmzr9CHCuKJ_Jr19oWEg@mail.gmail.com>
+ <aa9a1485-0a0b-442b-b126-a00ee5d4801c@linux.dev>
+ <CAMuE1bETL1+sGo9wq46O=Ad-_aa8xNLK0kWC63Mm5rTFdebp=w@mail.gmail.com>
+ <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev>
+ <CAMuE1bHsPeaokc-_qR4Ai8o=b3Qpbosv6MiR5_XufyRTtE4QFQ@mail.gmail.com>
+ <44b67f86-ed27-49e8-9e15-917fa2b75a60@linux.dev>
+ <CAMuE1bFk=LFTWfu8RFJeSoPtjO8ieJDdEHhHpKYr4QxqB-7BBg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAMuE1bFk=LFTWfu8RFJeSoPtjO8ieJDdEHhHpKYr4QxqB-7BBg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 16 Apr 2025 at 00:06, Simon Richter <sjr@debian.org> wrote:
->
-> Hi,
->
-> On 15.04.25 23:35, Luca Boccassi wrote:
->
-> >> I started "ip mon" in the background, and closed the shell and the terminal.
->
-> >> The "ip" command is still running, receiving netlink messages and writing to
-stdout, receiving EIO for this attempt.
->
-> >> Monitor mode should probably exit when it cannot write output.
->
-> > Isn't this normal behaviour? IE, if I do 'sleep infinity &' and close
-> > the terminal, it will likewise hang around
->
-> Yes, but "sleep" will eventually exit, and doesn't produce output, so it
-> doesn't have an opportunity to notice that stdout has been revoked.
->
-> And since the only function in monitor mode is to produce this output,
-> it can just exit here.
+On 16/04/2025 07:33, Sagi Maimon wrote:
+> On Mon, Apr 14, 2025 at 4:55 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 14/04/2025 14:43, Sagi Maimon wrote:
+>>> On Mon, Apr 14, 2025 at 4:01 PM Vadim Fedorenko
+>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>
+>>>> On 14/04/2025 12:38, Sagi Maimon wrote:
+>>>>> On Mon, Apr 14, 2025 at 2:09 PM Vadim Fedorenko
+>>>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>>>
+>>>>>> On 14/04/2025 11:56, Sagi Maimon wrote:
+>>>>>>> On Mon, Apr 14, 2025 at 12:37 PM Vadim Fedorenko
+>>>>>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>>>>>
+>>>>>>>> On 14/04/2025 09:54, Sagi Maimon wrote:
+>>>>>>>>> Sysfs signal show operations can invoke _signal_summary_show before
+>>>>>>>>> signal_out array elements are initialized, causing a NULL pointer
+>>>>>>>>> dereference. Add NULL checks for signal_out elements to prevent kernel
+>>>>>>>>> crashes.
+>>>>>>>>>
+>>>>>>>>> Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and update sysfs nodes")
+>>>>>>>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+>>>>>>>>> ---
+>>>>>>>>>       drivers/ptp/ptp_ocp.c | 3 +++
+>>>>>>>>>       1 file changed, 3 insertions(+)
+>>>>>>>>>
+>>>>>>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+>>>>>>>>> index 7945c6be1f7c..4c7893539cec 100644
+>>>>>>>>> --- a/drivers/ptp/ptp_ocp.c
+>>>>>>>>> +++ b/drivers/ptp/ptp_ocp.c
+>>>>>>>>> @@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
+>>>>>>>>>           bool on;
+>>>>>>>>>           u32 val;
+>>>>>>>>>
+>>>>>>>>> +     if (!bp->signal_out[nr])
+>>>>>>>>> +             return;
+>>>>>>>>> +
+>>>>>>>>>           on = signal->running;
+>>>>>>>>>           sprintf(label, "GEN%d", nr + 1);
+>>>>>>>>>           seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
+>>>>>>>>
+>>>>>>>> That's not correct, the dereference of bp->signal_out[nr] happens before
+>>>>>>>> the check. But I just wonder how can that even happen?
+>>>>>>>>
+>>>>>>> The scenario (our case): on ptp_ocp_adva_board_init we
+>>>>>>> initiate only signals 0 and 1 so 2 and 3 are NULL.
+>>>>>>> Later ptp_ocp_summary_show runs on all 4 signals and calls _signal_summary_show
+>>>>>>> when calling signal 2 or 3  the dereference occurs.
+>>>>>>> can you please explain: " the dereference of bp->signal_out[nr] happens before
+>>>>>>> the check", where exactly? do you mean in those lines:
+>>>>>>> struct signal_reg __iomem *reg = bp->signal_out[nr]->mem;
+>>>>>>        ^^^
+>>>>>> yes, this is the line which dereferences the pointer.
+>>>>>>
+>>>>>> but in case you have only 2 pins to configure, why the driver exposes 4
+>>>>>> SMAs? You can simply adjust the attributes (adva_timecard_attrs).
+>>>>>>
+>>>>> I can (and will) expose only 2 sma in adva_timecard_attrs, but still
+>>>>> ptp_ocp_summary_show runs
+>>>>> on all 4 signals and not only on the on that exposed, is it not a bug?
+>>>>
+>>>> Yeah, it's a bug, but different one, and we have to fix it other way.
+>>>>
+>>> Do you want to instruct me how to fix it , or will you fix it?
+>>
+>> well, the original device structure was not designed to have the amount
+>> of SMAs less than 4. We have to introduce another field to store actual
+>> amount of SMAs to work with, and adjust the code to check the value. The
+>> best solution would be to keep maximum amount of 4 SMAs in the structure
+>> but create a helper which will init new field and will have
+>> BUILD_BUG_ON() to prevent having more SMAs than fixed size array for
+>> them. That will solve your problem, but I will need to check it on the
+>> HW we run.
+>>
+> just to be clear you will write the fix and test it on your HW, so you
+> don't want me to write the fix?
 
-I see - then this is more like a feature request than a
-packaging/downstream regression/issue.
+Well, it would be great if you can write the code which will make SMA
+functions flexible to the amount of pin the HW has. All our HW has fixed
+amount of 4 pins that's why the driver was coded with constants. Now
+your hardware has slightly different amount of pins, so it needs
+adjustments to the driver to work properly. I just want to be sure that
+any adjustments will not break my HW - that's what I meant saying I'll
+test it.
 
-Stephen, David, what do you think about the above request?
+>>>>>>> struct ptp_ocp_signal *signal = &bp->signal[nr];
+>>>>>>>> I believe the proper fix is to move ptp_ocp_attr_group_add() closer to
+>>>>>>>> the end of ptp_ocp_adva_board_init() like it's done for other boards.
+>>>>>>>>
+>>>>>>>> --
+>>>>>>>> pw-bot: cr
+>>>>>>
+>>>>
+>>
+
 
