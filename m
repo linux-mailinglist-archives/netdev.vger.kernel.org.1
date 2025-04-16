@@ -1,76 +1,73 @@
-Return-Path: <netdev+bounces-183280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 689D1A8B918
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC782A8B91B
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF8E43A4A56
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:31:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 464073A4AEB
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10802184E;
-	Wed, 16 Apr 2025 12:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A809B139E;
+	Wed, 16 Apr 2025 12:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SNZ459T/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QXdLb91T"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32656137E
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 12:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B8C137E
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 12:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744806678; cv=none; b=SWPP5AtIgSZjlCf6c5tyGaLR0xBSpI3yK+QZH2cVVdKQYVUK2q0ZrmIpKUTjPC03GK3jb19g+QJ0wKR/zatJfA35jLiSV4PYuGny5sHdY5MepFysZUyerChlRoqEmQK8wHwMsli0dSviMgBOltrvUZBp4VH5ol+AsqhXb+8e6Ak=
+	t=1744806706; cv=none; b=PiT3IrExNMXUP7IwI7xn4vtAmHIYcRHaWhB9HHwSrTBF8y8VFGJSLoMCy2K5lon7TNTFiQnTga8PbGBC1pJ4H1pdo1Kjcjs/FEf6nR52kdk/2liwXVbRUiVcZCzvaqT6hc++E18VCZLxt0TuWeaP+Ny+bJMCsZ71hyjNJocHeVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744806678; c=relaxed/simple;
-	bh=5Qz1a1hLJguPDmWy9wwHQpir+uBVg115AKIxeerp2JI=;
+	s=arc-20240116; t=1744806706; c=relaxed/simple;
+	bh=M+1ZqX0IsGptnDdColfBXH8Pgv16F3ISQ26twKIHh1w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VRbPgacCBxqd4iiqRrLjjJFlfpPhDAJzkw31i4xtDH8lVvwAwiX+fF/FYbYj1Kwzlwmk1EDtRHf0qtdcfjdk/vbCHWce6oBp9c92DRvgosB2/z5cC2K6iJDp5xyD7v/QOOl77DRPRSk7x32viOQqS0me62eUkLZATQMTzhQ58aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SNZ459T/; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=MPGmEq5S0C+GKrsICtYapEnyQ8WLFQFRmzfJwPnVqhPBFPMoVdgmJs2PY7yGIVUAC32SXA5dMahgz/xU4BjyB2f+NW5nBwP91vLnm0uPCh2UcQYYnAsreSvxJSXgaKwYYIe2ECgmifFbfe0J4tW424280d3MeLl7JtdWwZZEy2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QXdLb91T; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744806676; x=1776342676;
+  t=1744806705; x=1776342705;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5Qz1a1hLJguPDmWy9wwHQpir+uBVg115AKIxeerp2JI=;
-  b=SNZ459T/ullf6HxoONMuel9amVOx87Y3WQuqNU/gYOHiVjovEoxPaQIN
-   ix+TxGxdX5makNiquQPv0VkYq/mLmM24UnY0MTtz1W6g7HKmtGT4nuMmX
-   y/+4vsd6CQ8qMbH+gj7cNgNEUi5f3cQfYTH3ZvpWkwMoBhms8RBgqGDLo
-   ETinbbbSWo+Ikmw7etuEzmbYfldkdrqmshBPcRgxI73X3weR2rVEygt7U
-   GxEXRTXju49j0HcR9PlkZsQASuB+UGMI9AA9LfuUFuZ/izpxMPrcUwQKk
-   XJY3/2G3jgFOegkdYlwa8ms9F/r8DAks6ndStEiXHRc/mEC8KByJEPo6X
-   Q==;
-X-CSE-ConnectionGUID: rcvxUBhFQOS3f4xQT5Iw+Q==
-X-CSE-MsgGUID: VxF1qdviRvSLp1ZrR5coqw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="46232622"
+  bh=M+1ZqX0IsGptnDdColfBXH8Pgv16F3ISQ26twKIHh1w=;
+  b=QXdLb91TNOSKOrZBX3IUVaxG9lI0ovnj3SfSGBFdVFUBjKCu6hvmdpDi
+   fgoCk90FvYKd3w5zeBhEfA8rwJ6R3/RF1EgZ6XRoBvSKOIU9HfJ5c47BB
+   moeXZkFS9uuMxMUCqBb87qS9k7KQASQuE0EhZkfthcuYggOYVbseDVosW
+   VWYSRx/yw7Z+M2sPbCpzBZGKNQpT3TJ2yrne+v10+Cye8YeHYnQsogkue
+   rpkVY2C+g4ade0GSvcVjvqHpz8/kU77Je/zJaVKjtCtt6yhSk97joEGyx
+   hivVxV08BLSEz+ngHJW83ZNMb6x6S6zZiJbR81TVZEYPUvtcU/wor+PSi
+   A==;
+X-CSE-ConnectionGUID: iBemI3bfSceByDgcJcvS4g==
+X-CSE-MsgGUID: AInqMGCwRpyqZ32Nql6H1A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="46232690"
 X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
-   d="scan'208";a="46232622"
+   d="scan'208";a="46232690"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 05:31:13 -0700
-X-CSE-ConnectionGUID: 4s7DldAYQ5+blrQjgDs7Dg==
-X-CSE-MsgGUID: UU4q4eJ5QJ+v4fUW6wGpTQ==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 05:31:44 -0700
+X-CSE-ConnectionGUID: OY0kKujGRFaFDU1TFlWr+A==
+X-CSE-MsgGUID: Zm3OnXM3R3uaCyuEkLOtww==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
-   d="scan'208";a="130480005"
+   d="scan'208";a="130480052"
 Received: from gklab-003-014.igk.intel.com ([10.211.116.96])
-  by fmviesa007.fm.intel.com with ESMTP; 16 Apr 2025 05:31:11 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 16 Apr 2025 05:31:43 -0700
 From: Milena Olech <milena.olech@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
 	Milena Olech <milena.olech@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH v12 iwl-next 06/11] idpf: add mailbox access to read PTP clock time
-Date: Wed, 16 Apr 2025 14:19:11 +0200
-Message-ID: <20250416122142.86176-15-milena.olech@intel.com>
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH v12 iwl-next 07/11] idpf: add cross timestamping
+Date: Wed, 16 Apr 2025 14:19:14 +0200
+Message-ID: <20250416122142.86176-18-milena.olech@intel.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250416122142.86176-2-milena.olech@intel.com>
 References: <20250416122142.86176-2-milena.olech@intel.com>
@@ -82,306 +79,329 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the access to read PTP clock is specified as mailbox, the driver
-needs to send virtchnl message to perform PTP actions. Message is sent
-using idpf_mbq_opc_send_msg_to_peer_drv mailbox opcode, with the parameters
-received during PTP capabilities negotiation.
+Add cross timestamp support through virtchnl mailbox messages and directly,
+through PCIe BAR registers. Cross timestamping assumes that both system
+time and device clock time values are cached simultaneously, what is
+triggered by HW. Feature is enabled for both ARM and x86 archs.
 
-Add functions to recognize PTP messages, move them to dedicated secondary
-mailbox, read the PTP clock time and cross timestamp using mailbox
-messages.
-
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Milena Olech <milena.olech@intel.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
 ---
-v9 -> v10: remove cross timestamping
+v9 -> v10: add a separate patch for cross timestamping
 
- .../ethernet/intel/idpf/idpf_controlq_api.h   |  3 ++
- drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 33 +++++++++++++
- drivers/net/ethernet/intel/idpf/idpf_ptp.h    | 34 ++++++++++++++
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 47 +++++++++++++++++++
- .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   | 47 +++++++++++++++++++
- 5 files changed, 164 insertions(+)
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 139 ++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  18 ++-
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  55 ++++++-
+ 3 files changed, 210 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
-index e8e046ef2f0d..9642494a67d8 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
-@@ -123,9 +123,12 @@ struct idpf_ctlq_info {
- /**
-  * enum idpf_mbx_opc - PF/VF mailbox commands
-  * @idpf_mbq_opc_send_msg_to_cp: used by PF or VF to send a message to its CP
-+ * @idpf_mbq_opc_send_msg_to_peer_drv: used by PF or VF to send a message to
-+ *				       any peer driver
-  */
- enum idpf_mbx_opc {
- 	idpf_mbq_opc_send_msg_to_cp		= 0x0801,
-+	idpf_mbq_opc_send_msg_to_peer_drv	= 0x0804,
- };
- 
- /* API supported for control queue management */
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-index cb27a8ee3acc..5ea9d672a159 100644
+index 5ea9d672a159..c00f0a03ccab 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-@@ -92,6 +92,37 @@ static u64 idpf_ptp_read_src_clk_reg_direct(struct idpf_adapter *adapter,
- 	return ((u64)hi << 32) | lo;
+@@ -41,6 +41,13 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
+ 	ptp->get_dev_clk_time_access = idpf_ptp_get_access(adapter,
+ 							   direct,
+ 							   mailbox);
++
++	/* Get the cross timestamp */
++	direct = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME;
++	mailbox = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME_MB;
++	ptp->get_cross_tstamp_access = idpf_ptp_get_access(adapter,
++							   direct,
++							   mailbox);
  }
  
+ /**
+@@ -150,6 +157,129 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
+ 	return 0;
+ }
+ 
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER) || IS_ENABLED(CONFIG_X86)
 +/**
-+ * idpf_ptp_read_src_clk_reg_mailbox - Read the main timer value through mailbox
++ * idpf_ptp_get_sync_device_time_direct - Get the cross time stamp values
++ *					  directly
 + * @adapter: Driver specific private structure
-+ * @sts: Optional parameter for holding a pair of system timestamps from
-+ *	 the system clock. Will be ignored when NULL is given.
-+ * @src_clk: Returned main timer value in nanoseconds unit
-+ *
-+ * Return: 0 on success, -errno otherwise.
++ * @dev_time: 64bit main timer value
++ * @sys_time: 64bit system time value
 + */
-+static int idpf_ptp_read_src_clk_reg_mailbox(struct idpf_adapter *adapter,
-+					     struct ptp_system_timestamp *sts,
-+					     u64 *src_clk)
++static void idpf_ptp_get_sync_device_time_direct(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
 +{
-+	struct idpf_ptp_dev_timers clk_time;
++	u32 dev_time_lo, dev_time_hi, sys_time_lo, sys_time_hi;
++	struct idpf_ptp *ptp = adapter->ptp;
++
++	spin_lock(&ptp->read_dev_clk_lock);
++
++	idpf_ptp_enable_shtime(adapter);
++
++	dev_time_lo = readl(ptp->dev_clk_regs.dev_clk_ns_l);
++	dev_time_hi = readl(ptp->dev_clk_regs.dev_clk_ns_h);
++
++	sys_time_lo = readl(ptp->dev_clk_regs.sys_time_ns_l);
++	sys_time_hi = readl(ptp->dev_clk_regs.sys_time_ns_h);
++
++	*dev_time = ((u64)dev_time_hi << 32) | dev_time_lo;
++	*sys_time = ((u64)sys_time_hi << 32) | sys_time_lo;
++
++	spin_unlock(&ptp->read_dev_clk_lock);
++}
++
++/**
++ * idpf_ptp_get_sync_device_time_mailbox - Get the cross time stamp values
++ *					   through mailbox
++ * @adapter: Driver specific private structure
++ * @dev_time: 64bit main timer value expressed in nanoseconds
++ * @sys_time: 64bit system time value expressed in nanoseconds
++ *
++ * Return: a pair of cross timestamp values on success, -errno otherwise.
++ */
++static int idpf_ptp_get_sync_device_time_mailbox(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
++{
++	struct idpf_ptp_dev_timers cross_time;
 +	int err;
 +
-+	/* Read the system timestamp pre PHC read */
-+	ptp_read_system_prets(sts);
-+
-+	err = idpf_ptp_get_dev_clk_time(adapter, &clk_time);
++	err = idpf_ptp_get_cross_time(adapter, &cross_time);
 +	if (err)
 +		return err;
 +
-+	/* Read the system timestamp post PHC read */
-+	ptp_read_system_postts(sts);
++	*dev_time = cross_time.dev_clk_time_ns;
++	*sys_time = cross_time.sys_time_ns;
 +
-+	*src_clk = clk_time.dev_clk_time_ns;
++	return err;
++}
++
++/**
++ * idpf_ptp_get_sync_device_time - Get the cross time stamp info
++ * @device: Current device time
++ * @system: System counter value read synchronously with device time
++ * @ctx: Context provided by timekeeping code
++ *
++ * Return: the device and the system clocks time read simultaneously on success,
++ * -errno otherwise.
++ */
++static int idpf_ptp_get_sync_device_time(ktime_t *device,
++					 struct system_counterval_t *system,
++					 void *ctx)
++{
++	struct idpf_adapter *adapter = ctx;
++	u64 ns_time_dev, ns_time_sys;
++	int err;
++
++	switch (adapter->ptp->get_cross_tstamp_access) {
++	case IDPF_PTP_NONE:
++		return -EOPNOTSUPP;
++	case IDPF_PTP_DIRECT:
++		idpf_ptp_get_sync_device_time_direct(adapter, &ns_time_dev,
++						     &ns_time_sys);
++		break;
++	case IDPF_PTP_MAILBOX:
++		err =  idpf_ptp_get_sync_device_time_mailbox(adapter,
++							     &ns_time_dev,
++							     &ns_time_sys);
++		if (err)
++			return err;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	*device = ns_to_ktime(ns_time_dev);
++
++#if IS_ENABLED(CONFIG_X86)
++	system->cs_id = CSID_X86_ART;
++#else
++	system->cs_id = CSID_ARM_ARCH_COUNTER;
++#endif /* CONFIG_X86 */
++	system->cycles = ns_time_sys;
++	system->use_nsecs = true;
 +
 +	return 0;
 +}
 +
- /**
-  * idpf_ptp_read_src_clk_reg - Read the main timer value
-  * @adapter: Driver specific private structure
-@@ -107,6 +138,8 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
- 	switch (adapter->ptp->get_dev_clk_time_access) {
- 	case IDPF_PTP_NONE:
- 		return -EOPNOTSUPP;
-+	case IDPF_PTP_MAILBOX:
-+		return idpf_ptp_read_src_clk_reg_mailbox(adapter, sts, src_clk);
- 	case IDPF_PTP_DIRECT:
- 		*src_clk = idpf_ptp_read_src_clk_reg_direct(adapter, sts);
- 		break;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-index 955d697e51ab..b536c1cdbb2e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-@@ -52,6 +52,19 @@ enum idpf_ptp_access {
- 	IDPF_PTP_MAILBOX,
- };
- 
 +/**
-+ * struct idpf_ptp_secondary_mbx - PTP secondary mailbox
-+ * @peer_mbx_q_id: PTP mailbox queue ID
-+ * @peer_id: Peer ID for PTP Device Control daemon
-+ * @valid: indicates whether secondary mailblox is supported by the Control
-+ *	   Plane
++ * idpf_ptp_get_crosststamp - Capture a device cross timestamp
++ * @info: the driver's PTP info structure
++ * @cts: The memory to fill the cross timestamp info
++ *
++ * Capture a cross timestamp between the system time and the device PTP hardware
++ * clock.
++ *
++ * Return: cross timestamp value on success, -errno on failure.
 + */
-+struct idpf_ptp_secondary_mbx {
-+	u16 peer_mbx_q_id;
-+	u16 peer_id;
-+	bool valid:1;
-+};
++static int idpf_ptp_get_crosststamp(struct ptp_clock_info *info,
++				    struct system_device_crosststamp *cts)
++{
++	struct idpf_adapter *adapter = idpf_ptp_info_to_adapter(info);
++
++	return get_device_system_crosststamp(idpf_ptp_get_sync_device_time,
++					     adapter, NULL, cts);
++}
++#endif /* CONFIG_ARM_ARCH_TIMER || CONFIG_X86 */
 +
  /**
-  * struct idpf_ptp - PTP parameters
-  * @info: structure defining PTP hardware capabilities
-@@ -62,6 +75,7 @@ enum idpf_ptp_access {
-  * @caps: PTP capabilities negotiated with the Control Plane
-  * @get_dev_clk_time_access: access type for getting the device clock time
-  * @rsv: reserved bits
-+ * @secondary_mbx: parameters for using dedicated PTP mailbox
-  * @read_dev_clk_lock: spinlock protecting access to the device clock read
-  *		       operation executed by the HW latch
-  */
-@@ -74,6 +88,7 @@ struct idpf_ptp {
- 	u32 caps;
- 	enum idpf_ptp_access get_dev_clk_time_access:2;
- 	u32 rsv:30;
-+	struct idpf_ptp_secondary_mbx secondary_mbx;
- 	spinlock_t read_dev_clk_lock;
- };
+  * idpf_ptp_gettimex64 - Get the time of the clock
+  * @info: the driver's PTP info structure
+@@ -192,6 +322,15 @@ static void idpf_ptp_set_caps(const struct idpf_adapter *adapter)
  
-@@ -91,11 +106,23 @@ idpf_ptp_info_to_adapter(const struct ptp_clock_info *info)
- 	return ptp->adapter;
+ 	info->owner = THIS_MODULE;
+ 	info->gettimex64 = idpf_ptp_gettimex64;
++
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER)
++	info->getcrosststamp = idpf_ptp_get_crosststamp;
++#elif IS_ENABLED(CONFIG_X86)
++	if (pcie_ptm_enabled(adapter->pdev) &&
++	    boot_cpu_has(X86_FEATURE_ART) &&
++	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
++		info->getcrosststamp = idpf_ptp_get_crosststamp;
++#endif /* CONFIG_ARM_ARCH_TIMER */
  }
  
-+/**
-+ * struct idpf_ptp_dev_timers - System time and device time values
-+ * @sys_time_ns: system time value expressed in nanoseconds
-+ * @dev_clk_time_ns: device clock time value expressed in nanoseconds
-+ */
-+struct idpf_ptp_dev_timers {
-+	u64 sys_time_ns;
-+	u64 dev_clk_time_ns;
-+};
+ /**
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+index b536c1cdbb2e..b605e779f922 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+@@ -21,6 +21,8 @@ struct idpf_ptp_cmd {
+  * @dev_clk_ns_h: high part of the device clock register
+  * @phy_clk_ns_l: low part of the PHY clock register
+  * @phy_clk_ns_h: high part of the PHY clock register
++ * @sys_time_ns_l: low part of the system time register
++ * @sys_time_ns_h: high part of the system time register
+  * @cmd: PTP command register
+  * @phy_cmd: PHY command register
+  * @cmd_sync: PTP command synchronization register
+@@ -34,6 +36,10 @@ struct idpf_ptp_dev_clk_regs {
+ 	void __iomem *phy_clk_ns_l;
+ 	void __iomem *phy_clk_ns_h;
+ 
++	/* System time */
++	void __iomem *sys_time_ns_l;
++	void __iomem *sys_time_ns_h;
 +
- #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- int idpf_ptp_init(struct idpf_adapter *adapter);
- void idpf_ptp_release(struct idpf_adapter *adapter);
- int idpf_ptp_get_caps(struct idpf_adapter *adapter);
+ 	/* Command */
+ 	void __iomem *cmd;
+ 	void __iomem *phy_cmd;
+@@ -74,6 +80,7 @@ struct idpf_ptp_secondary_mbx {
+  * @dev_clk_regs: the set of registers to access the device clock
+  * @caps: PTP capabilities negotiated with the Control Plane
+  * @get_dev_clk_time_access: access type for getting the device clock time
++ * @get_cross_tstamp_access: access type for the cross timestamping
+  * @rsv: reserved bits
+  * @secondary_mbx: parameters for using dedicated PTP mailbox
+  * @read_dev_clk_lock: spinlock protecting access to the device clock read
+@@ -87,7 +94,8 @@ struct idpf_ptp {
+ 	struct idpf_ptp_dev_clk_regs dev_clk_regs;
+ 	u32 caps;
+ 	enum idpf_ptp_access get_dev_clk_time_access:2;
+-	u32 rsv:30;
++	enum idpf_ptp_access get_cross_tstamp_access:2;
++	u32 rsv:28;
+ 	struct idpf_ptp_secondary_mbx secondary_mbx;
+ 	spinlock_t read_dev_clk_lock;
+ };
+@@ -123,6 +131,8 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter);
  void idpf_ptp_get_features_access(const struct idpf_adapter *adapter);
-+int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
-+			      struct idpf_ptp_dev_timers *dev_clk_time);
+ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 			      struct idpf_ptp_dev_timers *dev_clk_time);
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time);
  #else /* CONFIG_PTP_1588_CLOCK */
  static inline int idpf_ptp_init(struct idpf_adapter *adapter)
  {
-@@ -112,5 +139,12 @@ static inline int idpf_ptp_get_caps(struct idpf_adapter *adapter)
- static inline void
- idpf_ptp_get_features_access(const struct idpf_adapter *adapter) { }
+@@ -146,5 +156,11 @@ idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 	return -EOPNOTSUPP;
+ }
  
 +static inline int
-+idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
-+			  struct idpf_ptp_dev_timers *dev_clk_time)
++idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			struct idpf_ptp_dev_timers *cross_time)
 +{
 +	return -EOPNOTSUPP;
 +}
-+
  #endif /* CONFIG_PTP_1588_CLOCK */
  #endif /* _IDPF_PTP_H */
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index a55ff20895ed..139d19353e28 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -154,6 +154,50 @@ static int idpf_mb_clean(struct idpf_adapter *adapter)
- 	return err;
- }
- 
-+#if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
-+/**
-+ * idpf_ptp_is_mb_msg - Check if the message is PTP-related
-+ * @op: virtchnl opcode
-+ *
-+ * Return: true if msg is PTP-related, false otherwise.
-+ */
-+static bool idpf_ptp_is_mb_msg(u32 op)
-+{
-+	switch (op) {
-+	case VIRTCHNL2_OP_PTP_GET_DEV_CLK_TIME:
-+	case VIRTCHNL2_OP_PTP_GET_CROSS_TIME:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
-+/**
-+ * idpf_prepare_ptp_mb_msg - Prepare PTP related message
-+ *
-+ * @adapter: Driver specific private structure
-+ * @op: virtchnl opcode
-+ * @ctlq_msg: Corresponding control queue message
-+ */
-+static void idpf_prepare_ptp_mb_msg(struct idpf_adapter *adapter, u32 op,
-+				    struct idpf_ctlq_msg *ctlq_msg)
-+{
-+	/* If the message is PTP-related and the secondary mailbox is available,
-+	 * send the message through the secondary mailbox.
-+	 */
-+	if (!idpf_ptp_is_mb_msg(op) || !adapter->ptp->secondary_mbx.valid)
-+		return;
-+
-+	ctlq_msg->opcode = idpf_mbq_opc_send_msg_to_peer_drv;
-+	ctlq_msg->func_id = adapter->ptp->secondary_mbx.peer_mbx_q_id;
-+	ctlq_msg->host_id = adapter->ptp->secondary_mbx.peer_id;
-+}
-+#else /* !CONFIG_PTP_1588_CLOCK */
-+static void idpf_prepare_ptp_mb_msg(struct idpf_adapter *adapter, u32 op,
-+				    struct idpf_ctlq_msg *ctlq_msg)
-+{ }
-+#endif /* CONFIG_PTP_1588_CLOCK */
-+
- /**
-  * idpf_send_mb_msg - Send message over mailbox
-  * @adapter: Driver specific private structure
-@@ -197,6 +241,9 @@ int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
- 
- 	ctlq_msg->opcode = idpf_mbq_opc_send_msg_to_cp;
- 	ctlq_msg->func_id = 0;
-+
-+	idpf_prepare_ptp_mb_msg(adapter, op, ctlq_msg);
-+
- 	ctlq_msg->data_len = msg_size;
- 	ctlq_msg->cookie.mbx.chnl_opcode = op;
- 	ctlq_msg->cookie.mbx.chnl_retval = 0;
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
-index c3c6b920f277..79bd2585703b 100644
+index 79bd2585703b..e51fa16d13cd 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
-@@ -29,6 +29,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+@@ -28,6 +28,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 		.send_buf.iov_len = sizeof(send_ptp_caps_msg),
  		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
  	};
++	struct virtchnl2_ptp_cross_time_reg_offsets cross_tstamp_offsets;
  	struct virtchnl2_ptp_clk_reg_offsets clock_offsets;
-+	struct idpf_ptp_secondary_mbx *scnd_mbx;
+ 	struct idpf_ptp_secondary_mbx *scnd_mbx;
  	struct idpf_ptp *ptp = adapter->ptp;
- 	enum idpf_ptp_access access_type;
- 	u32 temp_offset;
-@@ -50,6 +51,16 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+@@ -66,7 +67,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
  
- 	ptp->caps = le32_to_cpu(recv_ptp_caps_msg->caps);
+ 	access_type = ptp->get_dev_clk_time_access;
+ 	if (access_type != IDPF_PTP_DIRECT)
+-		return 0;
++		goto cross_tstamp;
  
-+	scnd_mbx = &ptp->secondary_mbx;
-+	scnd_mbx->peer_mbx_q_id = le16_to_cpu(recv_ptp_caps_msg->peer_mbx_q_id);
+ 	clock_offsets = recv_ptp_caps_msg->clk_offsets;
+ 
+@@ -85,6 +86,22 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 	temp_offset = le32_to_cpu(clock_offsets.cmd_sync_trigger);
+ 	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
+ 
++cross_tstamp:
++	access_type = ptp->get_cross_tstamp_access;
++	if (access_type != IDPF_PTP_DIRECT)
++		return 0;
 +
-+	/* if the ptp_mb_q_id holds invalid value (0xffff), the secondary
-+	 * mailbox is not supported.
-+	 */
-+	scnd_mbx->valid = scnd_mbx->peer_mbx_q_id != 0xffff;
-+	if (scnd_mbx->valid)
-+		scnd_mbx->peer_id = recv_ptp_caps_msg->peer_id;
++	cross_tstamp_offsets = recv_ptp_caps_msg->cross_time_offsets;
 +
- 	/* Determine the access type for the PTP features */
- 	idpf_ptp_get_features_access(adapter);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_l);
++	ptp->dev_clk_regs.sys_time_ns_l = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_h);
++	ptp->dev_clk_regs.sys_time_ns_h = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.cmd_sync_trigger);
++	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
++
+ 	return 0;
+ }
  
-@@ -76,3 +87,39 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+@@ -123,3 +140,39 @@ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
  
  	return 0;
  }
 +
 +/**
-+ * idpf_ptp_get_dev_clk_time - Send virtchnl get device clk time message
++ * idpf_ptp_get_cross_time - Send virtchnl get cross time message
 + * @adapter: Driver specific private structure
-+ * @dev_clk_time: Pointer to the device clock structure where the value is set
++ * @cross_time: Pointer to the device clock structure where the value is set
 + *
-+ * Send virtchnl get time message to get the time of the clock.
++ * Send virtchnl get cross time message to get the time of the clock and the
++ * system time.
 + *
 + * Return: 0 on success, -errno otherwise.
 + */
-+int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
-+			      struct idpf_ptp_dev_timers *dev_clk_time)
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time)
 +{
-+	struct virtchnl2_ptp_get_dev_clk_time get_dev_clk_time_msg;
++	struct virtchnl2_ptp_get_cross_time cross_time_msg;
 +	struct idpf_vc_xn_params xn_params = {
-+		.vc_op = VIRTCHNL2_OP_PTP_GET_DEV_CLK_TIME,
-+		.send_buf.iov_base = &get_dev_clk_time_msg,
-+		.send_buf.iov_len = sizeof(get_dev_clk_time_msg),
-+		.recv_buf.iov_base = &get_dev_clk_time_msg,
-+		.recv_buf.iov_len = sizeof(get_dev_clk_time_msg),
++		.vc_op = VIRTCHNL2_OP_PTP_GET_CROSS_TIME,
++		.send_buf.iov_base = &cross_time_msg,
++		.send_buf.iov_len = sizeof(cross_time_msg),
++		.recv_buf.iov_base = &cross_time_msg,
++		.recv_buf.iov_len = sizeof(cross_time_msg),
 +		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
 +	};
 +	int reply_sz;
-+	u64 dev_time;
 +
 +	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
 +	if (reply_sz < 0)
 +		return reply_sz;
-+	if (reply_sz != sizeof(get_dev_clk_time_msg))
++	if (reply_sz != sizeof(cross_time_msg))
 +		return -EIO;
 +
-+	dev_time = le64_to_cpu(get_dev_clk_time_msg.dev_time_ns);
-+	dev_clk_time->dev_clk_time_ns = dev_time;
++	cross_time->dev_clk_time_ns = le64_to_cpu(cross_time_msg.dev_time_ns);
++	cross_time->sys_time_ns = le64_to_cpu(cross_time_msg.sys_time_ns);
 +
 +	return 0;
 +}
