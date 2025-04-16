@@ -1,121 +1,115 @@
-Return-Path: <netdev+bounces-183365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0460A90830
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:01:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711FAA90831
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFCB919E0C13
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:01:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B54219E0ACC
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB8B211494;
-	Wed, 16 Apr 2025 16:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6703188596;
+	Wed, 16 Apr 2025 16:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ceJY0ajc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FqYd/Hol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418FC1487F6
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2DD191
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744819252; cv=none; b=RrKJir+zdKJdbO18ZPs/fZXbulckfTS/FFB+dh0JTjSUAmbhg2YcyWB5adODI3Md+CLmXJRuQ8R9Hnf7Lbb8FZALYr6s5wSOCaIAknZ59i4h/MIhRWOMRLVVfhjQBXKF4PFk4KQshAxIgrRS/eGD3mN0nH1JbIjbOKXjF/fX5Cw=
+	t=1744819279; cv=none; b=LecKNGYAamH9krKEK0dWJE4YorbrbvtApHvC+4uNz11K9SNsXcPd3d9srC1w3j8R7u4/urWY3oAB9Aig/mfE5HQfdPPqEq2hb2osgUXXIHRdQotyUiSFEExpLA9b+uM8k8cnXd+pDKdZXKqzcHTT2pq8RRp9ggDAwT771KQLXpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744819252; c=relaxed/simple;
-	bh=OQ2LUVURG5ZBoCwWh5loGiUwdSTfHuVc1849YbckkqU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qbT2aLmdmDYzv0ZoLgIj3A2b63uzcb2M21l/DIvi/kzOSonTq4FL9oTdxPMNu6iNTkWSwyWIm+wv4Fhy5IuGgo+aT4dzIhHyMHLBpJFsMpERFYTlo3uh/0hxWCErNqTgqa4uawz4k64BUJj8FWztkLm4VF51rJWnqREziep8Vlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ceJY0ajc; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-549963b5551so8064893e87.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:00:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1744819248; x=1745424048; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fBPmcg0bFH2XY3Hin8L4B6RZDr/nTgPQCfRGMZTM/dg=;
-        b=ceJY0ajcpp4Etwtg/oRJQk7GiAqywh6FqfWax9RM6aOqARUGEnt1SyS4osZjvEebcO
-         S3Uc/Vd7j2Ujy9gXs87Qer/GFW0/C7rdE/cLOsVyRIKcDSxwaeV0Ygqvlf2JrMOd59br
-         Q9da2Oq5TZXBUk2wENpmLSlwtySz5sEe5k3SI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744819248; x=1745424048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fBPmcg0bFH2XY3Hin8L4B6RZDr/nTgPQCfRGMZTM/dg=;
-        b=VwfRfSr6lW6JbfY9OhnVljZkA9FLiBt3zcjS4oYNu5/D9HNvp2S4m3nvm5a1Nrmlr4
-         3xu8likrmfinymUB44C5H2EYXdZnAc2MSg0z77lXgQuLTaq3yKVMyMNBXTItxPVje2sY
-         +7lRNDhP7OAVjh5dpopFkf2y6qMPON3GWSZxdEC34G35AMi55xkDsDQtX2vLnXzInk7Z
-         cvPP2PilArQ63FdArYRu41nj/B/f4Ty8uObbkpOisomMHwDhD00WdOUbQzCHWWohd2gA
-         F8YzAmHVf2Tt5a2Z0uinq/LTYgpLPkeRmrIe2sjjPUi8loFH+VnE1S/Cj8zfWVqYTHOs
-         3bEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYT1XgyPfLAmhYerofe3iDrtGLrKhKl3mtg6Abys/H7r0wYr3Yeu+YElhR9bfKqhSX5zRoKog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJUcMXXyA6wXluRwBVLhyBKeURfQmBCfPdh5ksHQKoSTPAEmKb
-	jgu0V5IrITwG5oO2HJ4mQVPsF+FSAasUQuM49eD80ncRlbNd61pOXet29xXgDRzIN9ZHDBR58yo
-	74PsCGoQt7K0/6Osrlx6+09Ek4wPPjQciWrRC
-X-Gm-Gg: ASbGncsBYzIfgjkCGj1Nfusf/ZD9pbkQCsL3UL0JXOnBsyEo7Ia1eXE6ufrdP+ZPM5A
-	flTZKUd6tb09rEtaCxS1akD8jupY0pbuNZ0K/3U2E3qXAAk/GH02J7x9BOAdgpu7coRbF2f//kN
-	cQzVuqiNcpEO5JRx0fAVE4wOfffDweLqlY
-X-Google-Smtp-Source: AGHT+IFlK7R096/+OAh92R+N0wIujqmp0uU3OFtKyNa2K1gFmEshtOax20fuvbKOa8HxCYGz77KZC4LpcqUinUZDXA8=
-X-Received: by 2002:a05:6512:1090:b0:549:912a:d051 with SMTP id
- 2adb3069b0e04-54d64798c06mr830233e87.0.1744819248030; Wed, 16 Apr 2025
- 09:00:48 -0700 (PDT)
+	s=arc-20240116; t=1744819279; c=relaxed/simple;
+	bh=d01E0bLTofe6K57AiS2Mi1MBFuBDQCIzV6cTe8KJFyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8A+g1eASvkD//Nsjt/DtF4t9CjFdOpDYPedCsGgP6WqYB1hGNMvhSYcT9A37egqHCw3tWywD5Pz7rJ4NRH98uuggV/UmzpaKmVEW836MIB9IBVqHs2NiPdVJSQDCl6p9O4RoWfGJ3zuaWqmpUYqyRERvThjqALGObAlvHo/+Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FqYd/Hol; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=j5mDVNAmoCdKRWGtUvfdn9c9HuB+HG77LP79TJaol8o=; b=FqYd/HolRsF0CN0nkEwsYLq/3P
+	VWTKGYY/yDxnuk/ldLZlskJhalweVEukzKUJXTy7N63oJKLxEoihEb5YqhZ4c28ET2zzRHEZW7/3q
+	1Yx5tBbihyedgPYgzSz0x8NiS3DrXbOub2BDP0m2aAcpO/1cazSIMlQdOs6B7eQOVVSnvsaZv8sW/
+	OEblhIJ1QOjqVuDleG/82Ak6ef3jxVYkXLHXC3yBNRaFDOf4+Uqf+GvkxpipLqq45fS1BGkPXRbwI
+	gKsrwm3gOzeX55mFbNl/yXPiZms3/Na0mvuNNsBNaK29NN5swyMXHPDr+O+q053AzNg0pD1z6eGcF
+	jsdFZLLQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48410)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u55CJ-0001bI-33;
+	Wed, 16 Apr 2025 17:01:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u55CH-0001WT-2Q;
+	Wed, 16 Apr 2025 17:01:09 +0100
+Date: Wed, 16 Apr 2025 17:01:09 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [net-next PATCH 2/2] net: phylink: Fix issues with link
+ balancing w/ BMC present
+Message-ID: <Z__URcfITnra19xy@shell.armlinux.org.uk>
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+ <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250415071017.3261009-1-dualli@chromium.org> <20250415071017.3261009-2-dualli@chromium.org>
- <69763528-bb00-44c5-a3ce-8c30530b29ee@schaufler-ca.com>
-In-Reply-To: <69763528-bb00-44c5-a3ce-8c30530b29ee@schaufler-ca.com>
-From: Li Li <dualli@chromium.org>
-Date: Wed, 16 Apr 2025 09:00:36 -0700
-X-Gm-Features: ATxdqUEvTcc4Mrcasz-DJMu04qcEN1mqV4hfHibSLmGFJSE6dIDY98ewYmt9cyM
-Message-ID: <CANBPYPgfW+3jeTPZmpHfkgr=hX8sRkMLgrEeLFYa6rOPftXeFg@mail.gmail.com>
-Subject: Re: [PATCH v17 1/3] lsm, selinux: Add setup_report permission to binder
-To: Casey Schaufler <casey@schaufler-ca.com>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
-	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
-	brauner@kernel.org, cmllamas@google.com, surenb@google.com, 
-	omosnace@redhat.com, shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org, 
-	bagasdotme@gmail.com, horms@kernel.org, tweek@google.com, paul@paul-moore.com, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, selinux@vger.kernel.org, hridya@google.com, 
-	smoreland@google.com, ynaffit@google.com, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thank you Casey! I'll resend this specific patch to linux-security-module l=
-ist.
+On Wed, Apr 16, 2025 at 08:29:00AM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> This change is meant to address the fact that there are link imbalances
+> introduced when using phylink on a system with a BMC. Specifically there
+> are two issues.
+> 
+> The first issue is that if we lose link after the first call to
+> phylink_start but before it gets to the phylink_resolve we will end up with
+> the phylink interface assuming the link was always down and not calling
+> phylink_link_down resulting in a stuck interface.
 
-Should I include the other 2 binder patches as well as they are using
-this new permission?
+That is intentional.
 
-On Tue, Apr 15, 2025 at 9:13=E2=80=AFAM Casey Schaufler <casey@schaufler-ca=
-.com> wrote:
->
-> On 4/15/2025 12:10 AM, Li Li wrote:
-> > From: Thi=C3=A9baud Weksteen <tweek@google.com>
-> >
-> > Introduce a new permission "setup_report" to the "binder" class.
-> > This persmission controls the ability to set up the binder generic
-> > netlink driver to report certain binder transactions.
-> >
-> > Signed-off-by: Thi=C3=A9baud Weksteen <tweek@google.com>
-> > Signed-off-by: Li Li <dualli@google.com>
-> > ---
-> >  include/linux/lsm_hook_defs.h       |  1 +
-> >  include/linux/security.h            |  6 ++++++
-> >  security/security.c                 | 13 +++++++++++++
->
-> This patch needs to be sent to the linux-security-module list.
->
+phylink strictly orders .mac_link_down and .mac_link_up, and starts from
+an initial position that the link _will_ be considered to be down. So,
+it is intentional that .mac_link_down will _never_ be called after
+phylink_start().
+
+> The second issue is that when a BMC is present we are currently forcing the
+> link down. This results in us bouncing the link for a fraction of a second
+> and that will result in dropped packets for the BMC.
+
+... but you don't explain how that happens.
+
+> The third issue is just an extra "Link Down" message that is seen when
+> calling phylink_resume. This is addressed by identifying that the link
+> isn't balanced and just not displaying the down message in such a case.
+
+Hmm, this one is an error, but is not as simple as "don't print the
+message" as it results in a violation of the rule I mentioned above.
+We need phylink_suspend() to record the state of the link at that
+point, and avoid calling phylink_link_down() if the link was down
+prior to suspend.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
