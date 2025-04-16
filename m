@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-183068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55885A8ACF3
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 02:45:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EE16A8ACF4
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 02:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C4619012AD
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:45:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72B4A173F44
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 00:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD0640849;
-	Wed, 16 Apr 2025 00:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7753597A;
+	Wed, 16 Apr 2025 00:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vsAqeJ5y"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cJGlncdd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08953597A
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E19EEBA
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744764311; cv=none; b=nM+kc3msfYV3yUnB8e43tWM/tmxYQvJNy9lJUvA1v/kkYCWnYJ7qOZMoayJvMAUdI+Zv089zRlJapC+Vdv9iqTG+hCkvnU86xTc6O9sOAgF3P1HPatXpqPBTGIH6a4X6kSuhjcABj99TaNLfZ1KEHhoE/6Ln65tWbWUezYraxYs=
+	t=1744764331; cv=none; b=AM5l5tbaB1j8YgK5YNbdwplrZXLiJgsKVZDtYGHWETHtfOBYlP8vJ7GtNZ0nQAOa20zvR51ItvVNsc4RuKzqCzRYnD02Dp2Nw+1MtgAOJskezwirG8mOfqAaKq1CUTYeuu30dh0rbQzwkJGqjpo0nnLE2TAoSqgjEm6XX6M2EBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744764311; c=relaxed/simple;
-	bh=qlr6dwZe1eURJVDFw6FJt21Pf8dCbJtGoExxLL1wAw8=;
+	s=arc-20240116; t=1744764331; c=relaxed/simple;
+	bh=HdACo15NhDeRZztql1AbEgyX6TKNcRS8Ck6BU8o76zA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rPXoxUWmIbbSVEqSUOJVmcpzlOIV7oGo7J1hesqvSqwzN+lbHvmgxVqkgLQiv+oZE5ZlZH3RAZ5XgPlyCP5WNauaRx1QEcsH4OCHVv1aGCsEqSzAt2f9kd5BeAx2lZCYEnKvEA0A+zE8cN0ssuKGjsiYrDK9mlxeKxIZaNwiMJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vsAqeJ5y; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=iQKKgwmPUlm87UZ+/TDyeUX0qbksgUllU8WOmGP0CjhD3tKjYWfKx1SlS4O403yefekqfxwnHrok0rD3D2YmlIy6Q/70clkz3z+Bb2GKmCVshXpeYIIgb6woSuSDwjtetTKZtbMOtT61afkZnNson4h03s/E6HdP2r4yTAV3fjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cJGlncdd; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744764310; x=1776300310;
+  t=1744764330; x=1776300330;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DgA+VDBbKmBr8t5bM9EQpFFlYL3Pl9KpkFxx+KN15Ss=;
-  b=vsAqeJ5yesqwVcXhasT1fwwSTPxsw9ozvBCFR6DW7jZxniWkxoGXuzs/
-   xYbSjyxgzWUa2+b82l4qqFUx1b7JGYYNomX3kY/DER4NA2DCKaJYF6BgL
-   U+AWHzKoWsQk2CJWtC9MScMCRm4jrWIFOzW5JVELtCFiaT1XUgbrZezn1
-   c=;
+  bh=56o2gpWyG/VuM4YTHVcOv7rJ+NKtVQA1Xe3dAPnjnU0=;
+  b=cJGlncdd+2LLc8J+xksfFFyacRwCIwj5h3/NZONG08r11kW51m/VyUeV
+   9ltA2mjYgkP9PV9lYE3tZXWkBp10meevm8Fj0LAMxcLT2bysmHNL8iZJ2
+   dqAWQB7lMgz94eTb/KH6gZ7Fy3ooJiguqq4WK8VkXoi6Ot7HkzQgLB2fx
+   0=;
 X-IronPort-AV: E=Sophos;i="6.15,214,1739836800"; 
-   d="scan'208";a="489740476"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 00:45:06 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:38949]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.57:2525] with esmtp (Farcaster)
- id b5eb12bc-ff5b-4b16-908d-5dcdf75dd10c; Wed, 16 Apr 2025 00:45:05 +0000 (UTC)
-X-Farcaster-Flow-ID: b5eb12bc-ff5b-4b16-908d-5dcdf75dd10c
+   d="scan'208";a="187738359"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 00:45:29 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:34956]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.120:2525] with esmtp (Farcaster)
+ id d149aedd-8fa7-4316-81cb-0f6f2215d067; Wed, 16 Apr 2025 00:45:29 +0000 (UTC)
+X-Farcaster-Flow-ID: d149aedd-8fa7-4316-81cb-0f6f2215d067
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 16 Apr 2025 00:45:04 +0000
+ Wed, 16 Apr 2025 00:45:27 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.88.149.87) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 16 Apr 2025 00:45:01 +0000
+ Wed, 16 Apr 2025 00:45:25 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 5/7] neighbour: Convert RTM_GETNEIGH to RCU.
-Date: Tue, 15 Apr 2025 17:41:28 -0700
-Message-ID: <20250416004253.20103-6-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 6/7] neighbour: Convert RTM_GETNEIGHTBL to RCU.
+Date: Tue, 15 Apr 2025 17:41:29 -0700
+Message-ID: <20250416004253.20103-7-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250416004253.20103-1-kuniyu@amazon.com>
 References: <20250416004253.20103-1-kuniyu@amazon.com>
@@ -77,13 +77,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
+X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Only __dev_get_by_index() is the RTNL dependant in neigh_get().
+neightbl_dump_info() calls neightbl_fill_info() and
+neightbl_fill_param_info() for each neigh_tables[] entry.
 
-Let's replace it with dev_get_by_index_rcu() and convert RTM_GETNEIGH
-to RCU.
+Both functions rely on the table lock (read_lock_bh(&tbl->lock)),
+so RTNL is not needed.
+
+Let's fetch the table under RCU and convert RTM_GETNEIGHTBL to RCU.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
@@ -91,48 +94,42 @@ Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 58a6821dae3d..698999398747 100644
+index 698999398747..817f0bdc1861 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -2948,6 +2948,8 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	if (!skb)
- 		return -ENOBUFS;
+@@ -2467,10 +2467,12 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 	family = ((struct rtgenmsg *)nlmsg_data(nlh))->rtgen_family;
  
 +	rcu_read_lock();
 +
- 	tbl = neigh_find_table(ndm->ndm_family);
- 	if (!tbl) {
- 		NL_SET_ERR_MSG(extack, "Unsupported family in header for neighbor get request");
-@@ -2964,7 +2966,7 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	dst = nla_data(tb[NDA_DST]);
+ 	for (tidx = 0; tidx < NEIGH_NR_TABLES; tidx++) {
+ 		struct neigh_parms *p;
  
- 	if (ndm->ndm_ifindex) {
--		dev = __dev_get_by_index(net, ndm->ndm_ifindex);
-+		dev = dev_get_by_index_rcu(net, ndm->ndm_ifindex);
- 		if (!dev) {
- 			NL_SET_ERR_MSG(extack, "Unknown device ifindex");
- 			err = -ENODEV;
-@@ -2999,8 +3001,11 @@ static int neigh_get(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 			goto err;
+-		tbl = rcu_dereference_rtnl(neigh_tables[tidx]);
++		tbl = rcu_dereference(neigh_tables[tidx]);
+ 		if (!tbl)
+ 			continue;
+ 
+@@ -2504,6 +2506,8 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 		neigh_skip = 0;
  	}
- 
+ out:
 +	rcu_read_unlock();
 +
- 	return rtnl_unicast(skb, net, pid);
- err:
-+	rcu_read_unlock();
- 	kfree_skb(skb);
- 	return err;
- }
-@@ -3800,7 +3805,7 @@ static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] __initconst = {
- 	{.msgtype = RTM_NEWNEIGH, .doit = neigh_add},
+ 	cb->args[0] = tidx;
+ 	cb->args[1] = nidx;
+ 
+@@ -3806,7 +3810,8 @@ static const struct rtnl_msg_handler neigh_rtnl_msg_handlers[] __initconst = {
  	{.msgtype = RTM_DELNEIGH, .doit = neigh_delete},
  	{.msgtype = RTM_GETNEIGH, .doit = neigh_get, .dumpit = neigh_dump_info,
--	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
-+	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
- 	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info},
+ 	 .flags = RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
+-	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info},
++	{.msgtype = RTM_GETNEIGHTBL, .dumpit = neightbl_dump_info,
++	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
  	{.msgtype = RTM_SETNEIGHTBL, .doit = neightbl_set},
  };
+ 
 -- 
 2.49.0
 
