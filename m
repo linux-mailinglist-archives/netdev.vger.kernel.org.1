@@ -1,132 +1,140 @@
-Return-Path: <netdev+bounces-183517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB1C2A90E73
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:10:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 295B3A90E78
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D6B3A878F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:10:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5062C1903DD3
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B551323E337;
-	Wed, 16 Apr 2025 22:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B5724888D;
+	Wed, 16 Apr 2025 22:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SyrZe/5y"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="DZy4ur4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CF014B950;
-	Wed, 16 Apr 2025 22:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43FC723E337
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744841433; cv=none; b=XPclIf44Z9uR+7ZJAj9xjmJhIcLH2SGeYn4XXb2n6OW8lN+zSdON4sjLH+4mGCfYL9stPQnoKyPtEArGTpuKSXgEXJb3mWhsnN1wsOJXoBisRe370v/GZjmQKXftYJbTClnj8uGXEG6StvUIccJmWoeQboIqYysbq+v6EHBfb98=
+	t=1744841574; cv=none; b=XG0uAxb1c1hq2z1yQ9WNWeRrGlYIjzvvEn7kwEDpMGS8duejEl7xX0DiyG4D51OktstqSw6bShAQKfB9mcKE2ymQ6wN8IBSEIqKcR3e49LtvzCGuTfS95vCQ3LQ6TQESfbrlQZosMyOAtr69Mkd7o1zMdLr0mW6RGWAME0WtUnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744841433; c=relaxed/simple;
-	bh=Y5AU4mf8TUi/WGax8QOVgpoVXa9qANocM2ytobVxq90=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jHXqmVlDToY8iqwW4mRpc6NJD8KqT892nP+k5BKBBqMM0nswXurUmWczsShP4RB5wlirJ2/mEYyZki15ZJ9Siwe0disyO5iYuk80B3BirhrP7VZHx3LjU3YL7OZ7scrFFYVckigbHMTleCnLyix+EL4BaJTklheS0werNMHwXMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SyrZe/5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50179C4CEE2;
-	Wed, 16 Apr 2025 22:10:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744841433;
-	bh=Y5AU4mf8TUi/WGax8QOVgpoVXa9qANocM2ytobVxq90=;
+	s=arc-20240116; t=1744841574; c=relaxed/simple;
+	bh=qyZE63j0d2voV/G7WS3qaxVb9wlgL4RcIeSQSdW2Ax4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=On9AK/yI6GRYkNvQ2wC1JDsTJUogEIJV1z5d1ilkqNx2UOWo6J0kVmmyr+tG/+QA68+AVmNnKJgXL05v2UKVd7MYSpJRz31FD9wYHTiWfpxnOIQWum+qeamvv/KmmyN6v9IBnMY1h3Ze9I33mrUE4tIhimbvOsaoNYgN5scxY9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=DZy4ur4X; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 3771B2C030A;
+	Thu, 17 Apr 2025 10:12:42 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1744841562;
+	bh=zAjFq0x7xF/IjFaQL1u6DO3Ifg7t+tCKOWceVPvynI8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=SyrZe/5yZ9BYxUqVV0dSXe8nmVrIxdksnf4SVPWdNkcNrk35XnLSv4KQqHp+yyBwq
-	 CD7wLEFBuTPUo9wq294Dzl6wF/jQ2nFyawCY1TZo2KWpR+evktMnh8BO5/497Or0eB
-	 uMO7izgT+pNbjVqVQAKKdgdAebCnD6o1DzCjb5KCfiJASuMpYkUzco+G1DVXMbPl9M
-	 fMU5VUkgcYqkyu8TBNl8GHHrDdQEt79KXu7UpfD1E5ZAPzjZIpTQ3wd6rmtu2EWtbx
-	 OiSGTSPx/1MPZgaiGbCwqdydAwz5NPzsEdUl2tDDLPN7z0VFMenSWXEYEWiJoNNAsj
-	 JgNUXMT6sOpBw==
-From: Kees Cook <kees@kernel.org>
-To: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Cc: Kees Cook <kees@kernel.org>,
-	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=DZy4ur4XcsjoL13gV0HLq47lWFFRJR2LSWsZYrLX2MbIE/eZ9Hai5cIs0fOaNXmkn
+	 hzJ1rJMyd1e2zmHTe0TtGgUWGxd6Y5E03opAVUPIl9I/SBZXikOtmnE0/KU0pFYBFk
+	 78XM6lbEfYJ9mKhTg2f4pdmyqDOM0OYvokvyArKITlVFAPWpND1+UqKdMKrkzofPdF
+	 Idzu9kTqjs/29bhc859kjn2SHOtH0grqyVQG+tRQFRfn/nz+jGqPKU/ywcZzS1PNcK
+	 5+2kX+rOsSTXiCrlxbWUR9BTVmYr0kwbiLfZ+RFeKSOU63Uv47YxhCX5j4loN61dpx
+	 9JZHlC+31tXhA==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B68002b5a0000>; Thu, 17 Apr 2025 10:12:42 +1200
+Received: from rutgerk-dl.ws.atlnz.lc (rutgerk-dl.ws.atlnz.lc [10.33.23.32])
+	by pat.atlnz.lc (Postfix) with ESMTP id 149AE13EDA9;
+	Thu, 17 Apr 2025 10:12:42 +1200 (NZST)
+Received: by rutgerk-dl.ws.atlnz.lc (Postfix, from userid 1868)
+	id 093D33C0671; Thu, 17 Apr 2025 10:12:42 +1200 (NZST)
+From: Rutger van Kruiningen <rutger.vankruiningen@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Rutger van Kruiningen <rutger.vankruiningen@alliedtelesis.co.nz>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] emulex/benet: Annotate flash_cookie as nonstring
-Date: Wed, 16 Apr 2025 15:10:29 -0700
-Message-Id: <20250416221028.work.967-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH v0] net: ethtool: Only set supplied eee ethtool settings
+Date: Thu, 17 Apr 2025 10:12:30 +1200
+Message-ID: <20250416221230.1724319-1-rutger.vankruiningen@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2658; i=kees@kernel.org; h=from:subject:message-id; bh=Y5AU4mf8TUi/WGax8QOVgpoVXa9qANocM2ytobVxq90=; b=owGbwMvMwCVmps19z/KJym7G02pJDBkMWlc37BIsktx2QbF9tv++hYmVIf9ea5rb9LydEHpt7 qPXJxtOdJSyMIhxMciKKbIE2bnHuXi8bQ93n6sIM4eVCWQIAxenAExEVIaR4UJWQpnYoX6jzvS7 154dn9LGKjFzzZonnabW/m2bNXfyPGT4p7v8dV3RwXXf9rVM4txU5HjmAX+QYJOQaMp1rp0pnCp +HAA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=W+WbVgWk c=1 sm=1 tr=0 ts=68002b5a a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=XR8D0OoHHMoA:10 a=hMUjD3Yoj6wRdRaDZV0A:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-GCC 15's new -Wunterminated-string-initialization notices that the 32
-character "flash_cookie" (which is not used as a C-String)
-needs to be marked as "nonstring":
+Originally all ethtool eee setting updates were attempted even if the
+settings were not supplied, causing a null pointer crash.
 
-drivers/net/ethernet/emulex/benet/be_cmds.c:2618:51: warning: initializer-string for array of 'char' truncates NUL terminator but destination lacks 'nonstring' attribute (17 chars into 16 available) [-Wunterminated-string-initialization]
- 2618 | static char flash_cookie[2][16] = {"*** SE FLAS", "H DIRECTORY *** "};
-      |                                                   ^~~~~~~~~~~~~~~~~~
+Add check for each eee setting and only update if it exists.
 
-Add this annotation, avoid using a multidimensional array, but keep the
-string split (with a comment about why). Additionally mark it const
-and annotate the "cookie" member that is being memcmp()ed against as
-nonstring too.
-
-Signed-off-by: Kees Cook <kees@kernel.org>
+Signed-off-by: Rutger van Kruiningen <rutger.vankruiningen@alliedtelesis.=
+co.nz>
 ---
-Cc: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Cc: Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>
-Cc: Somnath Kotur <somnath.kotur@broadcom.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
----
- drivers/net/ethernet/emulex/benet/be_cmds.c | 6 +++++-
- drivers/net/ethernet/emulex/benet/be_cmds.h | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ net/ethtool/eee.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
-index 51b8377edd1d..adb441b36581 100644
---- a/drivers/net/ethernet/emulex/benet/be_cmds.c
-+++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
-@@ -2615,7 +2615,11 @@ static int be_cmd_get_flash_crc(struct be_adapter *adapter, u8 *flashed_crc,
- 	return status;
- }
- 
--static char flash_cookie[2][16] = {"*** SE FLAS", "H DIRECTORY *** "};
-+/*
-+ * Since the cookie is text, add a parsing-skipped space to keep it from
-+ * ever being matched on storage holding this source file.
-+ */
-+static const char flash_cookie[32] __nonstring = "*** SE FLAS" "H DIRECTORY *** ";
- 
- static bool phy_flashing_required(struct be_adapter *adapter)
- {
-diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.h b/drivers/net/ethernet/emulex/benet/be_cmds.h
-index d70818f06be7..5e2d3ddb5d43 100644
---- a/drivers/net/ethernet/emulex/benet/be_cmds.h
-+++ b/drivers/net/ethernet/emulex/benet/be_cmds.h
-@@ -1415,7 +1415,7 @@ struct flash_section_entry {
- } __packed;
- 
- struct flash_section_info {
--	u8 cookie[32];
-+	u8 cookie[32] __nonstring;
- 	struct flash_section_hdr fsec_hdr;
- 	struct flash_section_entry fsec_entry[32];
- } __packed;
--- 
-2.34.1
+diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
+index bf398973eb8a..1b4831ff9a75 100644
+--- a/net/ethtool/eee.c
++++ b/net/ethtool/eee.c
+@@ -137,17 +137,26 @@ ethnl_set_eee(struct ethnl_req_info *req_info, stru=
+ct genl_info *info)
+ 	if (ret < 0)
+ 		return ret;
+=20
+-	ret =3D ethnl_update_bitset(eee.advertised,
+-				  __ETHTOOL_LINK_MODE_MASK_NBITS,
+-				  tb[ETHTOOL_A_EEE_MODES_OURS],
+-				  link_mode_names, info->extack, &mod);
+-	if (ret < 0)
+-		return ret;
+-	ethnl_update_bool(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
+-	ethnl_update_bool(&eee.tx_lpi_enabled, tb[ETHTOOL_A_EEE_TX_LPI_ENABLED]=
+,
+-			  &mod);
+-	ethnl_update_u32(&eee.tx_lpi_timer, tb[ETHTOOL_A_EEE_TX_LPI_TIMER],
+-			 &mod);
++	if (tb[ETHTOOL_A_EEE_MODES_OURS]) {
++		ret =3D ethnl_update_bitset(eee.advertised,
++					  __ETHTOOL_LINK_MODE_MASK_NBITS,
++					  tb[ETHTOOL_A_EEE_MODES_OURS],
++					  link_mode_names, info->extack, &mod);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (tb[ETHTOOL_A_EEE_ENABLED])
++		ethnl_update_bool(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
++
++	if (tb[ETHTOOL_A_EEE_TX_LPI_ENABLED])
++		ethnl_update_bool(&eee.tx_lpi_enabled, tb[ETHTOOL_A_EEE_TX_LPI_ENABLED=
+],
++				  &mod);
++
++	if (tb[ETHTOOL_A_EEE_TX_LPI_TIMER])
++		ethnl_update_u32(&eee.tx_lpi_timer, tb[ETHTOOL_A_EEE_TX_LPI_TIMER],
++				 &mod);
++
+ 	if (!mod)
+ 		return 0;
+=20
+--=20
+2.49.0
 
 
