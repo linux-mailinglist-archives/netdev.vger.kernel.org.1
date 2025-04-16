@@ -1,127 +1,112 @@
-Return-Path: <netdev+bounces-183219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED09A8B6A4
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:20:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CAA2A8B6B7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE9313AA0AB
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:20:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CACD21904553
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931482459D7;
-	Wed, 16 Apr 2025 10:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5162459EE;
+	Wed, 16 Apr 2025 10:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrtGfKNu"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCA02417EF
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE76238177
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744798829; cv=none; b=tBb6pufDZtZRwju5+kz/NZDP8WkRDLjlkF7E5qdn5SIVzZdTyx3Iz5foAol3vCg04L8Xur6SqiofMadMUziRTF7kEbVkAbS2FNZcNS0rRI+HTChQmoTaJ1KuNaJo3IwxVhRu7XzPyQjmvLZo0zl801GAAacF3HTQH2t0v+0MVzc=
+	t=1744799052; cv=none; b=krokVq/Lx/qRO6UhdXEIZJ0/in22j1QXKMBum57MVyuBffJa6Dxcrpo4ysMp5jB+B1dR425GeD0P2Wp46xLn6hye4LvT02vN7BMQfHmWdigHRebk888rDBaxBstQHQ1NYeXnXe6DGRKCaKf31/QMnrjLSZSUtVmxQgEUkebVORo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744798829; c=relaxed/simple;
-	bh=v08iT7nLrXY1m+7NkyJo8rZEFMUUUlTKmYi3g4MRK3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rN277NlVR36/OX5y7XefPB2aolB8JO2OqDBoPKSFGXMUgfVWrMpS2FkJEhiTBaj14L6Y2lLih5/zN6Xxu/uEQra9NgBQGXSDtioT6Qajijtx35KJdR620sqKGhLHn9LNRdu3CwOslKouPKiPs/zwB1O8C3rC8dGBssorCbRxyKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-21-67ff8464fd92
-Date: Wed, 16 Apr 2025 19:20:15 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: willy@infradead.org, ilias.apalodimas@linaro.org,
-	almasrymina@google.com, kernel_team@skhynix.com,
-	42.hyeyoo@gmail.com, linux-mm@kvack.org, hawk@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [RFC] shrinking struct page (part of page pool)
-Message-ID: <20250416102015.GA5520@system.software.com>
-References: <20250414013627.GA9161@system.software.com>
- <20250414015207.GA50437@system.software.com>
- <20250414163002.166d1a36@kernel.org>
+	s=arc-20240116; t=1744799052; c=relaxed/simple;
+	bh=I5Ptylv8SBDHZDbjw+8WMGIUfiGxfXIOk+66TH1hNsE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=ZXg4KpFs7/qnJhBAy41NcNaA0R57fILbEIXPdkF/smeT942qMfcd+rr4CPxG9DrzkWfoWv7NIKajDoQ7NM10CE2Fiiw8fIPX01YxC42aJS7PuHILkFA33FnnH65WD+fyYIS7n0vxObqgqzNjvXEvXeELkfXxbhIY7dSll43fnk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PrtGfKNu; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso349246f8f.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:24:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744799049; x=1745403849; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=058rmNB1d7FYsoEWN5Di82TAeB+tFSqtrwWam7p5lo8=;
+        b=PrtGfKNup71x+cLk4xKNfXM0KbctBQpk3l0IoYSqcxmi1t/5zFZeU/y4GBunLivmqP
+         HjhKxRAKiRu3heiK9Hb2Ghv0624ElkBCZnJxs7v/j7EX9xvQLuFiOZk4MYxQnFd5x9A1
+         OR8P1lRZBEMruN4yK45HDJyWUBMT6jTSWCENF7+e03kwZqENWAqOcmgTqqf0kmOZjQCr
+         svpOzgHDGwVcju548o3nACEdZFZIchf+VXCOkdlbHjMuZ9mUI1Xt4Pp3FIPXBv2cBbiS
+         pNAO17HBgbrCiwGwKFg47cK1A0EVh56AUIJy2ytxIKo5YZRrGcYWpdvci2ZHhrTLPTG9
+         i0DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744799049; x=1745403849;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=058rmNB1d7FYsoEWN5Di82TAeB+tFSqtrwWam7p5lo8=;
+        b=aQURpILeYUeOl5l+wyCjOeuelBpWPs46lL3O1nQSnpCHXYkP7eNKdbq/Oh3mI+KX6P
+         Jpje9yGYR8Xjvad5+vfqAC8EIYx6eRyR84y3Kmry5CbEZ63RhG1Om1NpN+Vhjum1jQ6J
+         vkVWWVS5Ds9CYKRQBo2iaZjsEEbqcijtQ02WNIkbkRGah1X+eAv9RhReNbx1b1DHnzUq
+         fKYNsAprQj/F5DVaFLRBqjMOlJkd9FhZKZRUJOrlQQD4hdT8Vi7H2sTlwhUFL5uIXI1G
+         aeGJ0SE/SM/R41df9V3QiZ7pjlcKPwBuXZ5RKxx2F5PcGsA9ZwKKEjZT2LURWZ4/oAdB
+         KiNA==
+X-Gm-Message-State: AOJu0YwsZGNijeGcGQBdvflVBmUAJ2j4loJOr8zJhrhV8cx2hv7O5E04
+	P5GxB0pdlx6IIQ7w5Pl42pmXIW3dpBOK6pE4e/fFgcT8eKCuFxsqJyihSg==
+X-Gm-Gg: ASbGncu1Q00FNB67+R56deRcUnfEXoc8OPezHODSI9tSbUaZW6cP29Yx46W6upI4k11
+	eGWrDF/1ezonK8xJoAfZAtgEsRAHaxneL+H1Nz+xH0Rt6jmSgoq0ljl+8jFkOLvtlrWSn3j4S8x
+	HWn05DgeMTBfx4FjtXuqaoQCN+8P2Yqkzrk0NzL2/0MRDe71qKmCdu/81q23I8dO/peER14Zsht
+	tO5sLmZdnwOIhv0SBFRk8BwP/Yy/S9ggQEmrhbyq4X5FiFdY2HvLvALg6Tldq7sX6/gnGHVUG8d
+	eGvdpf08NXqL9TBXXt/85cauyn1HrAOMPc7+x8LR+rKPiJQ8j/MmWO3CvLIaqZeXDumzqu8zjDu
+	OB5zf9rykGTUA2WXbLPWZx8SDgXdc
+X-Google-Smtp-Source: AGHT+IFEU5hH2c9BG3rfkye/87VVc1FjXF5m4h/K0ANVkmCx0HamDV5Rf9qE1OLACn4gQCRIr95SNw==
+X-Received: by 2002:a05:6000:1ac9:b0:39c:266b:feec with SMTP id ffacd0b85a97d-39ee5e9a72cmr1201173f8f.7.1744799048815;
+        Wed, 16 Apr 2025 03:24:08 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96400dsm16965071f8f.11.2025.04.16.03.24.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 03:24:08 -0700 (PDT)
+Subject: Re: [RFG] sfc: nvlog and devlink health
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org
+References: <7ec94666-791a-39b2-fffd-eed8b23a869a@gmail.com>
+ <e3acvyonpwd6eejk6ka2vmkorggtnohc6vfagzix5xkx4jru6o@kf3q3hvasgtx>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <96e8acf9-dbd9-6512-423e-22f52919475f@gmail.com>
+Date: Wed, 16 Apr 2025 11:24:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414163002.166d1a36@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrELMWRmVeSWpSXmKPExsXC9ZZnoW5Ky/90gw27NC0m9hhYrP5RYbGn
-	fTuzRW/Lb2aLC9v6WC3urfnPanFsgZjF7x9z2Bw4PHbOusvusWBTqcfmFVoem1Z1snls+jSJ
-	3ePOtT1sHp83yQWwR3HZpKTmZJalFunbJXBl/Gnfy1hwWKDicM8F5gbGCzxdjJwcEgImEh3t
-	M5hh7PbGf0wgNouAqsTdZd1gcTYBdYkbN36C2SICKhItm2eydDFycTAL7GWUuDL/BlhCWMBG
-	YvuPuawgNq+AucSDnUfZQYqEBHoZJaZcvsICkRCUODnzCZjNLKAlcePfS6BtHEC2tMTyfxwg
-	YU4BQ4lbj/rYQGxRAWWJA9uOM4HMkRDYwyax9cFPVohLJSUOrrjBMoFRYBaSsbOQjJ2FMHYB
-	I/MqRqHMvLLcxMwcE72MyrzMCr3k/NxNjMCQX1b7J3oH46cLwYcYBTgYlXh4I+L/pQuxJpYV
-	V+YeYpTgYFYS4T1nDhTiTUmsrEotyo8vKs1JLT7EKM3BoiTOa/StPEVIID2xJDU7NbUgtQgm
-	y8TBKdXAmHxY7m7goRS2RwmXYlVqbCa9D1Ip2S+z/ujnLq7C1Oa2Fh/Fd1N6JvDwf/5fltf4
-	/Efi0vKmixbGR18V5WQ1tX1NevqzMeBOfOvNTQuEX36uN5P0XpXevUte24/D7o1GyZx7Mv2c
-	AiXf3I5fz9L+/HL7xODF6VeCHV79s79V72L0pex2lEyvEktxRqKhFnNRcSIAVL83BHUCAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsXC5WfdrJvS8j/d4FGfnMXEHgOL1T8qLPa0
-	b2e26G35zWxxeO5JVosL2/pYLe6t+c9qcWyBmMXvH3PYHDg9ds66y+6xYFOpx+YVWh6bVnWy
-	eWz6NInd4861PWwei198YPL4vEkugCOKyyYlNSezLLVI3y6BK+NP+17GgsMCFYd7LjA3MF7g
-	6WLk5JAQMJFob/zHBGKzCKhK3F3WzQxiswmoS9y48RPMFhFQkWjZPJOli5GLg1lgL6PElfk3
-	wBLCAjYS23/MZQWxeQXMJR7sPMoOUiQk0MsoMeXyFRaIhKDEyZlPwGxmAS2JG/9eAm3jALKl
-	JZb/4wAJcwoYStx61McGYosKKEsc2HacaQIj7ywk3bOQdM9C6F7AyLyKUSQzryw3MTPHVK84
-	O6MyL7NCLzk/dxMjMICX1f6ZuIPxy2X3Q4wCHIxKPLwR8f/ShVgTy4orcw8xSnAwK4nwnjMH
-	CvGmJFZWpRblxxeV5qQWH2KU5mBREuf1Ck9NEBJITyxJzU5NLUgtgskycXBKNTByiJx63FPC
-	Lp7ous/5rsGSwiN9CkZnZ5ktCPvzMf5/9fxFT2Zse9qWz8Npk1wo+3yzks+k8pcREmIPnV97
-	OHTZBnCaT/OyuDL9sOrvf8pLDbbXsz0xYbHoEtberuRs3Hf2U0vCoXjHrVtsTi5zEao70bDD
-	y1fTj3niM4P9E2bO3FOt/3b9ollKLMUZiYZazEXFiQA/WoffXAIAAA==
-X-CFilter-Loop: Reflected
+In-Reply-To: <e3acvyonpwd6eejk6ka2vmkorggtnohc6vfagzix5xkx4jru6o@kf3q3hvasgtx>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 14, 2025 at 04:30:02PM -0700, Jakub Kicinski wrote:
-> On Mon, 14 Apr 2025 10:52:07 +0900 Byungchul Park wrote:
-> > > Fortunately, many prerequisite works have been done by Mina but I guess
-> > > he or she has done it for other purpose than 'shrinking struct page'.
-> > > 
-> > > I'd like to just finalize the work so that the fields above can be
-> > > removed from struct page.  However, I need to resolve a curiousity
-> > > before starting.
+On 15/04/2025 17:41, Jiri Pirko wrote:
+> Tue, Apr 15, 2025 at 04:51:39PM +0200, ecree.xilinx@gmail.com wrote:
+>> DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR is no use here, because it only
+>> clears the kernel-saved copy; it doesn't call any driver method.
 > 
-> I don't understand what the question is but FWIW from my perspective
-> the ZC APIs are fairly contained, or at least we tried to make sure
-> that net_iov pages cannot reach random parts of the stack.
-> 
-> Replacing all uses of struct page would require converting much more
-> of the stack, AFAIU. But that's best discussed over posted patches.
+> Can't it be extended to actually call an optional driver method?
+> That would sound fine to me and will solve your problem.
 
-Okay.  Let's discuss it once posting patches.
-
-> > >    Network guys already introduced a sperate strcut, struct net_iov,
-> > >    to overlay the interesting fields.  However, another separate struct
-> > >    for system memory might be also needed e.g. struct bump so that
-> > >    struct net_iov and struct bump can be overlayed depending on the
-> > >    source:
-> > > 
-> > >    struct bump {
-> > > 	unsigned long _page_flags;
-> > > 	unsigned long bump_magic;
-> > > 	struct page_pool *bump_pp;
-> > > 	unsigned long _pp_mapping_pad;
-> > > 	unsigned long dma_addr;
-> > > 	atomic_long_t bump_ref_count;
-> > > 	unsigned int _page_type;
-> > > 	atomic_t _refcount;
-> > >    };
-> > > 
-> > > To netwrok guys, any thoughts on it?
-> > > To Willy, do I understand correctly your direction?
-> > > 
-> > > Plus, it's a quite another issue but I'm curious, that is, what do you
-> > > guys think about moving the bump allocator(= page pool) code from
-> > > network to mm?  I'd like to start on the work once gathering opinion
-> > > from both Willy and network guys.
-> 
-> I don't see any benefit from moving page pool to MM. It is quite
-> networking specific. But we can discuss this later. Moving code
-> is trivial, it should not be the initial focus.
-
-I think so.
-
-	Byungchul
+Would that be "diagnose"/"dump clear" or "dump"/"dump clear"?
+The former is weird, are you sure it's not a misuse of the API to
+ have "dump clear" clear something that's not a dump?  I feel like
+ extending the devlink core to support a semantic mismatch /
+ layering violation might raise a few eyebrows.
+The latter just doesn't work as (afaict) calling dump twice
+ without an intervening clear won't get updated output, and users
+ might want to read again without erasing.
 
