@@ -1,571 +1,249 @@
-Return-Path: <netdev+bounces-183548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E14A90FB7
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 01:37:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9548A90FD0
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 01:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F36E3BAF43
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 23:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2422173C14
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 23:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E411F24C094;
-	Wed, 16 Apr 2025 23:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BA524C071;
+	Wed, 16 Apr 2025 23:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="ZELccGuc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ficWAry+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2060.outbound.protection.outlook.com [40.107.244.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A4824BC18
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 23:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744846605; cv=none; b=soMoGENrlg8ydeSP1DyH2BFqU/JfRNGy0jQkuYEd6YC/utMdQt7hZppgZUR2O5x2ZN+Vm0kzoik9FLfFqfn0dDhGbMjZg696vwooteHdmhIqCgdO0n72P7A2z3JBtVanilWg6p/yvyNPwM8dYfOZh/5sEZ6ukz0DXIyj5Z+i4hU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744846605; c=relaxed/simple;
-	bh=cNXWBHt6J7e3H+76Mh3BMIenbMHu29MKu1h73tRrASw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kf5tvY9M588tCdta49C2b8SsJjXf25s2X9umVIYwEqFdpk3OE3MwpdKR8+rvQfer8byoC6Wkf6GagXbh4vhO5rohp6f6pVHRo4N1kIQ+ZuJ8IzO39AQrwUAUE3voPMqyOxgGBVOmCf8JtILIuFW1O3/yTctWMt5XPcpRPhPLd5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=ZELccGuc; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ff6ce72844so16450a91.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:36:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744846602; x=1745451402; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KaKbW65uYaVDYGMsoIHJ/fjnTr1nbMz9f/dqAmx8e2I=;
-        b=ZELccGucxnpTCVvo1Ht84YYFVTsAPEOEJye/ZhHcitv0MRM7yPhIeP+CRVbJ5Mm25+
-         ZvJnruVfqFuw8WHiYb6bjYxubrP5x0R9rqKO+yVxGL/+fc2JRFvGwy3beDUJ7SQa5yWr
-         Jmr1e4nVGz5O6j3TfmwqJhWPfbI/jCq4fW9l6h4hyc9UADeRFYkfnFyNSE0IXrGu6Bqk
-         UTFfx5eoaFoO2OFWW7lgSlKEL6mfMouAdm0Q+NRmuH6jA7J38ydEQvXSEBvsr3MFLND8
-         ZqGlYIugzURnVGTJzRGup4LEPd/SZv7t4roV7fAGxj4TTVNuoykuFqzWV60z0mwQRKVd
-         x1Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744846602; x=1745451402;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KaKbW65uYaVDYGMsoIHJ/fjnTr1nbMz9f/dqAmx8e2I=;
-        b=KvjsiphgFNEuvVZWc3/FIzG2fRTYbaozQMu9aDLFtSgB+3fw+4qLMm6pFDfhBeX4Zi
-         sgnyExFp8O4bqQ/Ltm0hmde6hRnKoXPzJnbPgLwXT+4YMQ0YZP9rhI68UmNESU1HBWdf
-         2jI8R/i/A4BN62GFHManPnQt5i9tyAlS1MRzB6mCqIrLVbio+nhnrAQmpNNx0C9FP/h+
-         Mx9DNAIv8Fpza/4jv8b948SeAQDhHz2N0q3R+9RBvnrFDWGEPgogNEHWEzfYP7WF9cfw
-         Mt5/klOozqHZ4N+E8js7870SN9oGwXtV3hfM+LX3HVM0NNTLSqExBHVsRvOEZtZNlj0M
-         pxVA==
-X-Gm-Message-State: AOJu0YyEvBdhQAf9K2KIFccr8TCC1/0A+GsUIwoWtuw+9T5Ki2KigPRU
-	rFr+sfjSJwxWC+hbs2OXxLfw671N/JGhF5JYPDa7NC9fsF0N98r2P1xKeuDbfG/xLK2lGf60HzD
-	f2oM=
-X-Gm-Gg: ASbGncu2dslHGaTK2o89jGZdQsDbf4bOOj4F5fQX+ZHn4JPxuLjhWGS13Y2L5Z+0LyP
-	mHi+5wRQoZsaN0p6iD5qEvpVi7VfQjzneXFUNUEI2Du43XRuw3c80SwKowlkVFyfSNsexcHe8JT
-	K4n1puHRdJ5nqZEXLYNuaGbtW+ldyZX6mrBdUI0dGDckOHEjv7kQEv9P3vkP7qRTdpxBayz4nGg
-	bFilbZrfbBM69qXkmIg8Ruc8iJSPa8GVqUIpUr/eBBKRuVnj8L3uNjpFKTS5n0E+03fHTlkpXGc
-	PJ72DchpqzsALtWDRRWtd4T1ZBBkDQ==
-X-Google-Smtp-Source: AGHT+IFf63WdRkCfzoK77laaTth6DZfn8jJCLkZYiZ/b23U1tlcuwiEslKOaodFkbuHHBlp53LGlbQ==
-X-Received: by 2002:a17:90b:3852:b0:306:b6ae:4d7a with SMTP id 98e67ed59e1d1-3086efc52c0mr413353a91.3.1744846601791;
-        Wed, 16 Apr 2025 16:36:41 -0700 (PDT)
-Received: from t14.. ([2001:5a8:4528:b100:b7fc:bdc8:4289:858f])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-308611d6166sm2269251a91.7.2025.04.16.16.36.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 16:36:41 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Aditi Ghag <aditi.ghag@isovalent.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [PATCH v3 bpf-next 6/6] selftests/bpf: Add tests for bucket resume logic in UDP socket iterators
-Date: Wed, 16 Apr 2025 16:36:21 -0700
-Message-ID: <20250416233622.1212256-7-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250416233622.1212256-1-jordan@jrife.io>
-References: <20250416233622.1212256-1-jordan@jrife.io>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6319221F07;
+	Wed, 16 Apr 2025 23:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744847930; cv=fail; b=GpeY+YGrywbJimD+pk1PlGrZHo+5X5lZ0da/9bvzSnUXY+TsDSQM/Dh1LM0Kn95gfV6WBZiIUGkqgtsmoIsozYIepgNex6r71JD+a/TS6MTCzeIVqwiiLtinHQzVWij1w0wxBZOwHLiU7QdKZny1Pa+irBNPEudF9Dp/xKKfuTc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744847930; c=relaxed/simple;
+	bh=53f4kSH0IoTnHSQDQciPh7sVjm1q8EscXoYlj2256po=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZjYptPAXl82k1HJS0jqEaL4gdhc/vQafVb8pf9MpK3akgRyaYFyp0CEm/dhLbhvb9RIpFyspu8w3YPOGE8KZmxePVTajGzic9JA186z4aeeUFKILMvOwhoo8908v56R9RhnpfZ5WR99WqmdBjp7agFcXdRML6+DlcY2Fbmyrslg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ficWAry+; arc=fail smtp.client-ip=40.107.244.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hzLc6belCbjGF3AjsFRtW5xykLCAUuQMBdNUppJd0JAbhbInWu0q0TRwIvACZk1PVc6j9ct/TtmEHgiuJesISOQOt9Lr3eUy+p5CRrzPRfEfE++T1aPXiKSV4UKYD3pCpApM9MIu7F/xXSkoHEvAv8cL3oCF97nhLApTJCRSak/TTCSk4uDoGQs3qBHzX2hSGf0FXAGhRVkqrMFm9YwBORTNqTGdoCf1C0nz1HGDhUrfCYCwJd+mkzIH+Wt8lV0JrJ08UQdUzzv2iXWtOSQnpI/Y45sjTTWAWHYHBoDW6x7tJiPXadeFb7V4a4OS+PRWBjuf93C8FD19mCz3B0u2wQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=53f4kSH0IoTnHSQDQciPh7sVjm1q8EscXoYlj2256po=;
+ b=T1V/PPvVs2aUuGWDFu0yWJebxj0eCNHbUYkUJr7cMNn2Ep72abl+pg7KTZyJJ7ZmkKCM7iFw3qbzpIncFfaID40E8OBbhRcPg3RUNiif7ZGATrV9Ryhrs+DynHg3m9U6CKGVAL6TV7nOCq4d9pAJYQJwV8mSMHXDgmPJC+3Bqfni1u2q33QwR04ohxvVrDGnw7aZ+Ao7vxal/Z0Vi1fBHmb1Ll2ddpTbXPMIFWj0hkYs1rEfMz/g13iV893urUpJJKEuF6R5tfQQYOZAqI+Zq1CHm/JN6O6XqzHAZEnKBVWAAUt7tD753+gEFCD1oqlXsNY2SancaySltCt9iKGGsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=53f4kSH0IoTnHSQDQciPh7sVjm1q8EscXoYlj2256po=;
+ b=ficWAry+LlfkkBqsIgXtehLKXpu2WPAgdrBlYb7B9EdPQtAaNuhUFHdgs0w6cFHdI7R6h0wRP1YalddfhjNY7lhgty++TRAkoS+FAxZSGr7VStdSOCy0iT2sdA7tkvUCqctA+BYJ6ccTdh4m8avpYpRAlVXhO1A5dB8onSvWo3hH9ySvE9jsJp4QP8V+LMpOqw8Bz+9SZHP79qIURHwREzXXSB+v3yvRtFNgG/g4CeAlt/jN/OT2S03oxGz5OYL+AEiPjZtIswrwsXdbj+9d13MriwlSbV1N56VUHnKeitlUkhS1KwxW3KGQlTSlyV0hHxyYf70Odgz6nD7qwkOdiA==
+Received: from DM6PR12MB4313.namprd12.prod.outlook.com (2603:10b6:5:21e::17)
+ by IA0PR12MB8981.namprd12.prod.outlook.com (2603:10b6:208:484::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.22; Wed, 16 Apr
+ 2025 23:58:45 +0000
+Received: from DM6PR12MB4313.namprd12.prod.outlook.com
+ ([fe80::4d58:4bbc:90a5:1f13]) by DM6PR12MB4313.namprd12.prod.outlook.com
+ ([fe80::4d58:4bbc:90a5:1f13%3]) with mapi id 15.20.8632.035; Wed, 16 Apr 2025
+ 23:58:45 +0000
+From: Sean Hefty <shefty@nvidia.com>
+To: "Ziemba, Ian" <ian.ziemba@hpe.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: Bernard Metzler <BMT@zurich.ibm.com>, Roland Dreier
+	<roland@enfabrica.net>, Nikolay Aleksandrov <nikolay@enfabrica.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "shrijeet@enfabrica.net"
+	<shrijeet@enfabrica.net>, "alex.badea@keysight.com"
+	<alex.badea@keysight.com>, "eric.davis@broadcom.com"
+	<eric.davis@broadcom.com>, "rip.sohan@amd.com" <rip.sohan@amd.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>, "winston.liu@keysight.com"
+	<winston.liu@keysight.com>, "dan.mihailescu@keysight.com"
+	<dan.mihailescu@keysight.com>, Kamal Heib <kheib@redhat.com>,
+	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>, Dave Miller
+	<davem@redhat.com>, "andrew.tauferner@cornelisnetworks.com"
+	<andrew.tauferner@cornelisnetworks.com>, "welch@hpe.com" <welch@hpe.com>,
+	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "kuba@kernel.org"
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: RE: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Thread-Topic: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Thread-Index:
+ AQHbjuwVUw9AWIkXnUa8bbJSM0sPK7N6v4MAgAgXf4CAAAnsgIABEwYAgAAgrcCAAYj9gIAAAVBQgAARqYCAAABpoIABaOyAgAaJkiCAAUvLgIAAK6TwgABCwQCABHrAgIAAgVrAgARv/wCADl708A==
+Date: Wed, 16 Apr 2025 23:58:45 +0000
+Message-ID:
+ <DM6PR12MB4313339425CB8921299AB9CCBDBD2@DM6PR12MB4313.namprd12.prod.outlook.com>
+References:
+ <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
+ <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+QTD7ihtQSYI0bl@nvidia.com>
+ <DM6PR12MB43137AE666F19784D2832030BDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+Qi+XxYizfhr06P@nvidia.com>
+ <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+VSFRFG1gIbGsLQ@nvidia.com>
+ <DM6PR12MB431332A6407547B225849F88BDAD2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401130413.GB291154@nvidia.com>
+ <DM6PR12MB43130D3131B760AF2A0C569ABDAC2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401193920.GD325917@nvidia.com>
+ <56088224-14ce-4289-bd98-1c47d09c0f76@hpe.com>
+ <DM6PR12MB4313B2D54F3CA0F84336EB71BDA82@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <c1b9d002-85f5-420e-b452-d6f2a11720d4@hpe.com>
+In-Reply-To: <c1b9d002-85f5-420e-b452-d6f2a11720d4@hpe.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB4313:EE_|IA0PR12MB8981:EE_
+x-ms-office365-filtering-correlation-id: 4f1f4bde-1374-438c-3637-08dd7d429f93
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|10070799003|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?Y2JsR0FDak5YcFY2N2hFSlUyR1JqK0RJaFEzS2hWUDhka0VzMFFUT211WEEv?=
+ =?utf-8?B?dW5VTmpEZkpJQngvK25hMjlCVVI4cWhGN1kwV1ArL2twem9XM0pPUUJ6YjQ0?=
+ =?utf-8?B?QUhnMUlXd2huZ1o4dkRrSkpNVWEyam1Qdml2dkUvcXE1c1RyeFlESzdkWFRI?=
+ =?utf-8?B?S0Z1N0R3ZFQ5a2JpaDBXLzJaV1pEUGJKR1JsT3VyWTZMbUF5cHBHMVFoSkw1?=
+ =?utf-8?B?UVhLU3gzcXJvNXJMcDhkTUhYNVF4Q1Jqb0JYWUZ1RFZkcHlJNlFhMGd5UzR0?=
+ =?utf-8?B?R1B0V3NSRFB6S3ppS1BJYmw2Yi9EQ1ZVLzZLU3E0akZ6b3NVQVBvbk9STCto?=
+ =?utf-8?B?MU1ZUHNYR3IvMWJpNFR4cUdXWEw5RWNlWGtJRU1raEQ2MjlITHZtcU1vY3pV?=
+ =?utf-8?B?RkY1RForcGpZSDVERnB6SWY1M2lGcGk4UjBlRnNyS25UR0VSaUZvYllFRXdG?=
+ =?utf-8?B?V2E0T01oMnA5Rm5CN0IwOGRmZU9tdmhvUkorVjJlWkF2dDlpYjNGUm9FZGZR?=
+ =?utf-8?B?Vk5FQzdPd0F6NHJJc0dFMXRBbDBhYzluRmVXR3hOdUU4b3JLRzY4T1hyWlpG?=
+ =?utf-8?B?bU9iMHA5TVEzQVFYcGozL3dqUWZpZC9WNGZtM2x1UW9zdVUxdDVYSXVaaEVH?=
+ =?utf-8?B?VnNJdldXSEh2dEtFRG4xL2hPamgxQ1B5NnJVQ21kZS9LbWNlSHlOZDhqMzJE?=
+ =?utf-8?B?Mnc5cjVTYjlSb3JudXRjOUsrbldOeHBEYXlSNFEyd0EwNENjdE1oQTFQL3BN?=
+ =?utf-8?B?c0M4U1lQYkhEamthSi82eHN1eVJINmVmakNoc2Jza0NyZFdxUnB4Y3F4VmVK?=
+ =?utf-8?B?dHVTUFFzVTJMaWQ5UVZBdUJEWmFSK3E2QjJGYlgvWm5KR1Rmd3o1YWFLUnYr?=
+ =?utf-8?B?Q1BYUlljUnZkQ2RCcTRjVFpyTE9iN0tBUnJ3ajlnM1dIL01YYTNDMitUdjVx?=
+ =?utf-8?B?SGdxNWtXbm9nN2ZBMWZobG5ZeEhsdjg4Y3RQcWxQOVRVblFqME50WStFZlJ5?=
+ =?utf-8?B?S0xlMXI5V0o5ZTh4RjU3RFVKZnI4RW5iVTQzRm5yNXlKaytpY1F1VjZyK3FB?=
+ =?utf-8?B?akU5bkVvZHRSbXNPQXlvaksyMTZLaWdZSk1DZHM3SlN2Qm9pcG9leU14dnpN?=
+ =?utf-8?B?NDdQdHNZVC9ScDNzK2VVcWV6MmRqMXpRN21LL1I4bGxXZ0NnWFFvMDdKK3Rh?=
+ =?utf-8?B?NDd4ZHhyNkw5Rng2SWdEbm8yZmhXQ2UwcEdYT3BoYytBQmcrc3FNNmNuWWtF?=
+ =?utf-8?B?eWt6TVFlbTZiYnh0RURqOFpmTDFUZUM3SjY2Rzg2aWdmaXJEclFJTUd6VjI3?=
+ =?utf-8?B?RlZEWFRPdjdpUThzVUVqeXMrT2F4cU4yZlZYUUtMZ0JaZXBYMGFEcC9mTnB4?=
+ =?utf-8?B?U2hFNHlldytuTXNicTRsUHd3WEg4R0FzNVJvemVlV1MrZzk0YWZTWlJ2WmRY?=
+ =?utf-8?B?akNacGExKzRjTUt4cVU1R0hGdWZmMHltaWJEbXFHR0JMd3U1WmpUbVM5RTFH?=
+ =?utf-8?B?Z1p3Z0htTGFBSXh5dnNSa3lLUnQ5WmlYT002dmhuZDdNV3FKWG5Vci9mNlVh?=
+ =?utf-8?B?dXl6T2xMV1JKcU1EM2pWa0h1QlhQWm9YRmt0dHk1Wkw0RG41Mk8xeXBrdCtU?=
+ =?utf-8?B?eEJhVzdTR2RGeUhTVG1PQjM2N29McTdjYXdmeUV0UGlxbDU1NTBDR3hGZ0pl?=
+ =?utf-8?B?RzBmWStMVlk1Sm1pTHoyV0pXc2hSazlCRXJETWc1eW9wamdCWFFIWFBWQ2Vl?=
+ =?utf-8?B?dzh0Y1E4aG5rWDZ5OTVpUUlSTXNFdU0rRmJWMWNlcUs2cjR3YWhHZlJxQXZx?=
+ =?utf-8?B?RlZCOFgzU3lnMmpCQkFxZjJNWmlvdlVEbUg3NXF5M0lwODdyemIrNy95Zmdm?=
+ =?utf-8?B?UHpIU1d0MUlCYkIxS3NiRldGWlV5Zk03K2ZRK3I2dEwrWERmbHVVaUMvYnox?=
+ =?utf-8?B?dTEzQzRHcG43NUh3WEM1andoQzFoaG5FNUhXVGFqcWdDTWlyTjd0SlJoSTlR?=
+ =?utf-8?B?MExuL0FJOWd3PT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4313.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Q0twVnRNTHZlcklEMDFZOGNWcEJ4ZVlXTTZjdWdNV3pwUHYralFhcm9USXpW?=
+ =?utf-8?B?a2kvdzRnKzJmcG0wM0hJQTN5WmdNRzRnd29XdzJQbnpuRUhyQVRDNGJPakpx?=
+ =?utf-8?B?Ly9TR0dibWN5a1NHbVZnMWJoUTduZGlqWVk0M1RjaWVMcTRLWVBlcDJLcjlD?=
+ =?utf-8?B?NkhnbTh6ckZRNGwrV2Q4VU8zSGFwOEJzQmdSNE14V0IyQVFKYURjYWJvdTdE?=
+ =?utf-8?B?WEt3NTNFeWFaREJWdUpQdmsvT0hMdXVsWTVMMThUSm0xU3hEWjVtNldmaXZ3?=
+ =?utf-8?B?ZGJGdXkrUWdZZVNDSDErVW5HVE1CU1ZPZHphNmFVbXFDb1JjemM1emNObzNN?=
+ =?utf-8?B?MXNYOWZQQ1hIYitEMis4ZnNLTHlDWTNuQ0JGZVU2bC82U0gvb1pyRDZFYlVo?=
+ =?utf-8?B?Y1Z4a2xQU0YzaXF6aEMranNLSU1oUlBJTW1xMUZXT2hOQWx5QTJHMUd2WVpW?=
+ =?utf-8?B?WFZMaHByQVpKcHVmaFkzeXl1bGZhakVYZGRxeDgxV3dRTXMzWTdzMTNTcVB5?=
+ =?utf-8?B?VmJuRGw5MlFNd1Q5djJiV2RKMEtiYUkwY0dUZGtTMGNpQzQraGc2SXJxb1p4?=
+ =?utf-8?B?dk9FYjVxTVp1OGhNZTJYdkJSNlZJS1JTTnBTTFF6enRoalhDRU9KcVdpbkdF?=
+ =?utf-8?B?bjdBcWpUdEJtWGE2YVJPb28raWEyd3VISUlKait4YzVRN0dBdEVZajNpc2s1?=
+ =?utf-8?B?ZDRsdDFEaFc3WVA4QjFIV2RkSkkxK3RoZGpwSDVITHZWNFlPeFJIVWhBbFBh?=
+ =?utf-8?B?K2crSFZIUjQwUDI2NTZtdzkzWDFkeVpPUDRMT05uMldDMEpEZXVLQnUyU2NK?=
+ =?utf-8?B?S0dxbnM4cUtOODF3dXdlalV3Q0szZzhQakpDMnpFcDh0OFJOWTVOek9xbGpU?=
+ =?utf-8?B?YlBBQTg1MzZvNEYyaDExcFNRK1pJVDNqV1JXd0t3T3Q2NThyNVFsUE1NaEZq?=
+ =?utf-8?B?ZlNJTmlIM2I5MEF4NVN1MDg3UHJ0bXNwQUxSZ01xZllaYk5UQWVMdUMxcGFD?=
+ =?utf-8?B?K3ArT3lOaUptK05zMjRBa3J0OThiYW1FTHBNbGM5Y2Z5L2JKMDZpbUF4UVpJ?=
+ =?utf-8?B?c3VEenFEaWxwaDR2V1M2RGlHdjRZdXFvN0VDYzRYV2NNdDYyV1JEanA5cFVH?=
+ =?utf-8?B?VCtMQ0k5d1Z3K1NYTUFuR2ZIQTRwbW9sWUxURUg3aDlTNjJQN3liNUtqNzNk?=
+ =?utf-8?B?UExqMmpBR0YrU21PQW52WXk0RGdSWGEwN0pib2RPc1hLaWVPU1lKSFNwVjlx?=
+ =?utf-8?B?WUtDMGZ1YUdmbGljNFlyOVFiU3E3czZpSEVCWHcyTHlDNXFIOVBMaHlwc3RK?=
+ =?utf-8?B?cFN4Q0ZoTC9pYXQySk5HbDRIQkZaaWM4ZmR0dW5HZlhQWFhoVFdWV2c2Rmhr?=
+ =?utf-8?B?WmlUWHlpY2ZaQmRaL051TzdXZUk3c2JmL3Z1Rk9rVC85SmFSb3Y4M25DdTg2?=
+ =?utf-8?B?YzBLS2dZUXJwK3FVekttSE1hM0EwWWhETk5BRTVYZzJkV013eXhNNE4wQVA2?=
+ =?utf-8?B?SG5ER1VLbjlvSGJyVkp2dVpPUlNRR2dQdS9TTmNhLzhoZmkzNGxBT3RmNWg0?=
+ =?utf-8?B?bU0ycEl0aFZ5T0FLQnpCcDNCQ0tkeUlxVkxYcnNBR3hEQzhNRUdLTGNJekpt?=
+ =?utf-8?B?L1prWXlkOURIUStUVTBBN3dUV1JNNVcwUGNRNTFETTZ6VFBKMG5KZ0t3c1BU?=
+ =?utf-8?B?cm9VaHVScERCY1dYWnpuRW9xOGpQVkJRS2dJVmk4bHBTWS9SaTFCUWNoT0F4?=
+ =?utf-8?B?WkIwdGVQdStOdC8wakc4c25qM2NWQ1BnZFU2a05qSEx2MUVzU0IxdklKTEpa?=
+ =?utf-8?B?dE1LMEIrSDVsdDVwYUlybnMwNFdIVTdWTmVGNUtzeDM1bmFhL1FHb1MrY0tI?=
+ =?utf-8?B?akljbkprL081QnFXNUl5NHNoelZlVStHOC9lQkU3eXNwVitna2FPODZ0QlRk?=
+ =?utf-8?B?MkxNbHJUdEtiQVdTb3hGaHRuY1o5NHArbHQxM1pyYXhmc2pQd2poY1RKQXc0?=
+ =?utf-8?B?MElsbDVmZ1hkWEJHYkRJZTZlMTNEamg4M05PT0hhYk9lNi85dm5qb3NZSzBJ?=
+ =?utf-8?B?bjZ6N3ZYaWEvNTVNMnRFMVNLeis2SGM4TEV1NmRRMU9zc0pRR1F3a2sxZXBI?=
+ =?utf-8?Q?Yko3wCUQSoBMDMKZ8nh31GLtL?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4313.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f1f4bde-1374-438c-3637-08dd7d429f93
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2025 23:58:45.4729
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oStMZCuaRe67JkbjGxQ1vGg9+0W/u6iJ9HKmidA77Q7Et16Qx8nH3o7q23c92hT6hqKg2ZM9FaPEds9GRe8DLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8981
 
-Introduce a set of tests that exercise various bucket resume scenarios:
-
-* remove_seen resumes iteration after removing a socket from the bucket
-  that we've already processed. Before, with the offset-based approach,
-  this test would have skipped an unseen socket after resuming
-  iteration. With the cookie-based approach, we now see all sockets
-  exactly once.
-* remove_unseen exercises the condition where the next socket that we
-  would have seen is removed from the bucket before we resume iteration.
-  This tests the scenario where we need to scan past the first cookie in
-  our remembered cookies list to find the socket from which to resume
-  iteration.
-* remove_all exercises the condition where all sockets we remembered
-  were removed from the bucket to make sure iteration terminates and
-  returns no more results.
-* add_some exercises the condition where a few, but not enough to
-  trigger a realloc, sockets are added to the head of the current bucket
-  between reads. Before, with the offset-based approach, this test would
-  have repeated sockets we've already seen. With the cookie-based
-  approach, we now see all sockets exactly once.
-* force_realloc exercises the condition that we need to realloc the
-  batch on a subsequent read, since more sockets than can be held in the
-  current batch array were added to the current bucket. This exercies
-  the logic inside bpf_iter_udp_realloc_batch that copies cookies into
-  the new batch to make sure nothing is skipped or repeated.
-
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 414 ++++++++++++++++++
- 1 file changed, 414 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index 74dbe91806a0..218c7258c0e0 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -7,6 +7,7 @@
- 
- #define TEST_NS "sock_iter_batch_netns"
- 
-+static const int init_batch_size = 16;
- static const int nr_soreuse = 4;
- 
- struct iter_out {
-@@ -14,6 +15,418 @@ struct iter_out {
- 	__u64 cookie;
- } __packed;
- 
-+struct sock_count {
-+	__u64 cookie;
-+	int count;
-+};
-+
-+static int insert(__u64 cookie, struct sock_count counts[], int counts_len)
-+{
-+	int insert = -1;
-+	int i = 0;
-+
-+	for (; i < counts_len; i++) {
-+		if (!counts[i].cookie) {
-+			insert = i;
-+		} else if (counts[i].cookie == cookie) {
-+			insert = i;
-+			break;
-+		}
-+	}
-+	if (insert < 0)
-+		return insert;
-+
-+	counts[insert].cookie = cookie;
-+	counts[insert].count++;
-+
-+	return counts[insert].count;
-+}
-+
-+static int read_n(int iter_fd, int n, struct sock_count counts[],
-+		  int counts_len)
-+{
-+	struct iter_out out;
-+	int nread = 1;
-+	int i = 0;
-+
-+	for (; nread > 0 && (n < 0 || i < n); i++) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_EQ(nread, sizeof(out), "nread"))
-+			break;
-+		ASSERT_GE(insert(out.cookie, counts, counts_len), 0, "insert");
-+	}
-+
-+	ASSERT_TRUE(n < 0 || i == n, "n < 0 || i == n");
-+
-+	return i;
-+}
-+
-+static __u64 socket_cookie(int fd)
-+{
-+	__u64 cookie;
-+	socklen_t cookie_len = sizeof(cookie);
-+
-+	if (!ASSERT_OK(getsockopt(fd, SOL_SOCKET, SO_COOKIE, &cookie,
-+				  &cookie_len), "getsockopt(SO_COOKIE)"))
-+		return 0;
-+	return cookie;
-+}
-+
-+static bool was_seen(int fd, struct sock_count counts[], int counts_len)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int i = 0;
-+
-+	for (; cookie && i < counts_len; i++)
-+		if (cookie == counts[i].cookie)
-+			return true;
-+
-+	return false;
-+}
-+
-+static int get_seen_socket(int *fds, struct sock_count counts[], int n)
-+{
-+	int i = 0;
-+
-+	for (; i < n; i++)
-+		if (was_seen(fds[i], counts, n))
-+			return i;
-+	return -1;
-+}
-+
-+static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
-+{
-+	int i, nread, iter_fd;
-+	int nth_sock_idx = -1;
-+	struct iter_out out;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+		return -1;
-+
-+	for (; n >= 0; n--) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_GE(nread, 1, "nread"))
-+			goto done;
-+	}
-+
-+	for (i = 0; i < fds_len && nth_sock_idx < 0; i++)
-+		if (fds[i] >= 0 && socket_cookie(fds[i]) == out.cookie)
-+			nth_sock_idx = i;
-+done:
-+	close(iter_fd);
-+	return nth_sock_idx;
-+}
-+
-+static int get_seen_count(int fd, struct sock_count counts[], int n)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int count = 0;
-+	int i = 0;
-+
-+	for (; cookie && !count && i < n; i++)
-+		if (cookie == counts[i].cookie)
-+			count = counts[i].count;
-+
-+	return count;
-+}
-+
-+static void check_n_were_seen_once(int *fds, int fds_len, int n,
-+				   struct sock_count counts[], int counts_len)
-+{
-+	int seen_once = 0;
-+	int seen_cnt;
-+	int i = 0;
-+
-+	for (; i < fds_len; i++) {
-+		/* Skip any sockets that were closed or that weren't seen
-+		 * exactly once.
-+		 */
-+		if (fds[i] < 0)
-+			continue;
-+		seen_cnt = get_seen_count(fds[i], counts, counts_len);
-+		if (seen_cnt && ASSERT_EQ(seen_cnt, 1, "seen_cnt"))
-+			seen_once++;
-+	}
-+
-+	ASSERT_EQ(seen_once, n, "seen_once");
-+}
-+
-+static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
-+			int *socks, int socks_len, struct sock_count *counts,
-+			int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Close a socket we've already seen to remove it from the bucket. */
-+	close_idx = get_seen_socket(socks, counts, counts_len);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the last socket wasn't skipped and that there were no
-+	 * repeats.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_unseen(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close what would be the next socket in the bucket to exercise the
-+	 * condition where we need to skip past the first cookie we remembered.
-+	 */
-+	close_idx = get_nth_socket(socks, socks_len, link, 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the remaining sockets were seen exactly once and that we
-+	 * didn't repeat the socket that was already seen.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_all(int family, int sock_type, const char *addr,
-+		       __u16 port, int *socks, int socks_len,
-+		       struct sock_count *counts, int counts_len,
-+		       struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx, i;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close all remaining sockets to exhaust the list of saved cookies and
-+	 * exit without putting any sockets into the batch on the next read.
-+	 */
-+	for (i = 0; i < socks_len - 1; i++) {
-+		close_idx = get_nth_socket(socks, socks_len, link, 1);
-+		if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+			return;
-+		close(socks[close_idx]);
-+		socks[close_idx] = -1;
-+	}
-+
-+	/* Make sure there are no more sockets returned */
-+	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
-+}
-+
-+static void add_some(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Double the number of sockets in the bucket. */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each of the original sockets was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	free_fds(new_socks, socks_len);
-+}
-+
-+static void force_realloc(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socket just to initialize the batch. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Double the number of sockets in the bucket to force a realloc on the
-+	 * next read.
-+	 */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each socket from the first set was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	free_fds(new_socks, socks_len);
-+}
-+
-+struct test_case {
-+	void (*test)(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd);
-+	const char *description;
-+	int init_socks;
-+	int max_socks;
-+	int sock_type;
-+	int family;
-+};
-+
-+static struct test_case resume_tests[] = {
-+	{
-+		.description = "udp: resume after removing a seen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_seen,
-+	},
-+	{
-+		.description = "udp: resume after removing one unseen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_unseen,
-+	},
-+	{
-+		.description = "udp: resume after removing all unseen sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_all,
-+	},
-+	{
-+		.description = "udp: resume after adding a few sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET so that new sockets are added to the head of the
-+		 * bucket's list.
-+		 */
-+		.family = AF_INET,
-+		.test = add_some,
-+	},
-+	{
-+		.description = "udp: force a realloc to occur",
-+		.init_socks = init_batch_size,
-+		.max_socks = init_batch_size * 2,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET6 so that new sockets are added to the tail of the
-+		 * bucket's list, needing to be added to the next batch to force
-+		 * a realloc.
-+		 */
-+		.family = AF_INET6,
-+		.test = force_realloc,
-+	},
-+};
-+
-+static void do_resume_test(struct test_case *tc)
-+{
-+	static const __u16 port = 10001;
-+	struct bpf_link *link = NULL;
-+	struct sock_iter_batch *skel;
-+	struct sock_count *counts;
-+	int err, iter_fd = -1;
-+	const char *addr;
-+	int local_port;
-+	int *fds;
-+
-+	counts = calloc(tc->max_socks, sizeof(*counts));
-+	if (!counts)
-+		return;
-+	skel = sock_iter_batch__open();
-+	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
-+		return;
-+
-+	/* Prepare a bucket of sockets in the kernel hashtable */
-+	addr = tc->family == AF_INET6 ? "::1" : "127.0.0.1";
-+	fds = start_reuseport_server(tc->family, tc->sock_type, addr, port, 0,
-+				     tc->init_socks);
-+	if (!ASSERT_OK_PTR(fds, "start_reuseport_server"))
-+		goto done;
-+	local_port = get_socket_local_port(*fds);
-+	if (!ASSERT_GE(local_port, 0, "get_socket_local_port"))
-+		goto done;
-+	skel->rodata->ports[0] = ntohs(local_port);
-+	skel->rodata->sf = tc->family;
-+
-+	err = sock_iter_batch__load(skel);
-+	if (!ASSERT_OK(err, "sock_iter_batch__load"))
-+		goto done;
-+
-+	link = bpf_program__attach_iter(tc->sock_type == SOCK_STREAM ?
-+					skel->progs.iter_tcp_soreuse :
-+					skel->progs.iter_udp_soreuse,
-+					NULL);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		goto done;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+		goto done;
-+
-+	tc->test(tc->family, tc->sock_type, addr, port, fds, tc->init_socks,
-+		 counts, tc->max_socks, link, iter_fd);
-+done:
-+	free(counts);
-+	free_fds(fds, tc->init_socks);
-+	if (iter_fd >= 0)
-+		close(iter_fd);
-+	bpf_link__destroy(link);
-+	sock_iter_batch__destroy(skel);
-+}
-+
-+static void do_resume_tests(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(resume_tests); i++) {
-+		if (test__start_subtest(resume_tests[i].description)) {
-+			do_resume_test(&resume_tests[i]);
-+		}
-+	}
-+}
-+
- static void do_test(int sock_type, bool onebyone)
- {
- 	int err, i, nread, to_read, total_read, iter_fd = -1;
-@@ -135,6 +548,7 @@ void test_sock_iter_batch(void)
- 		do_test(SOCK_DGRAM, true);
- 		do_test(SOCK_DGRAM, false);
- 	}
-+	do_resume_tests();
- 	close_netns(nstoken);
- 
- done:
--- 
-2.43.0
-
+PiA+IFRoZXJlJ3MgZGlzY3Vzc2lvbiBvbiBkZWZpbmluZyB0aGlzIHJlbGF0aW9uc2hpcDoNCj4g
+Pg0KPiA+IEpvYiA8LSAwLi5uIC0tLSAxIC0+IFBEDQo+ID4NCj4gPiBJIGNhbid0IHRoaW5rIG9m
+IGEgdGVjaG5pY2FsIHJlYXNvbiB3aHkgdGhhdCdzIG5lZWRlZC4NCj4gDQo+IEZyb20gbXkgVUUg
+cGVyc3BlY3RpdmUsIEkgYWdyZWUuIFVFIG5lZWRzIHRvIHNoYXJlIGpvYiBJRHMgYWNyb3NzIHBy
+b2Nlc3Nlcw0KPiB3aGlsZSBzdGlsbCBoYXZpbmcgaW50ZXItcHJvY2VzcyBpc29sYXRpb24gZm9y
+IHRoaW5ncyBsaWtlIGxvY2FsIG1lbW9yeQ0KPiByZWdpc3RyYXRpb25zLg0KDQpXZSBzZWVtIHN0
+dWNrIG9uIHRoaXMuICBIZXJlJ3MgYSBzcGVjaWZpYyBwcm9wb3NhbCB0aGF0IEknbSBjb25zaWRl
+cmluZzoNCg0KMS4gRGVmaW5lIGEgZGV2aWNlIGxldmVsICdzZWN1cml0eSBrZXknLiAgVGhlIHNr
+ZXkgZW5jYXBzdWxhdGVzIGVuY3J5cHRpb24gYXR0cmlidXRlcy4NCiAgICBUaGUgc2tleSBtYXkg
+YmUgc2hhcmVkIGJldHdlZW4gcHJvY2Vzc2VzLg0KMi4gRGVmaW5lIGEgZGV2aWNlIGxldmVsICdq
+b2InLCBvciBtYXliZSBtb3JlIGdlbmVyaWMgJ2NvbW11bmljYXRpb24gZG9tYWluJyouDQogICAg
+QSBqb2Igb2JqZWN0IGlzIGFzc29jaWF0ZWQgd2l0aCBhIHRyYW5zcG9ydCBwcm90b2NvbCBhbmQg
+dGhlc2Ugb3B0aW9uYWwgYXR0cmlidXRlczoNCiAgICBhZGRyZXNzLCBqb2IgaWQgKHJlcXVpcmVk
+IGZvciBVRVQpLCBhbmQgc2VjdXJpdHkga2V5Lg0KICAgIFRoZSBqb2Igb2JqZWN0IG1heSBiZSBz
+aGFyZWQgYmV0d2VlbiBwcm9jZXNzZXMuDQozLiBEZWZpbmUgYSBQRCBsZXZlbCAnam9iIGtleScu
+ICBUaGUgam9iIGtleSByZWZlcmVuY2VzIGEgc2luZ2xlIGpvYiBvYmplY3QuDQogICAgTXVsdGlw
+bGUgam9iIGtleXMgbWF5IGJlIGNyZWF0ZWQgdW5kZXIgYSBzaW5nbGUgUEQsIGlmIGVhY2ggcmVm
+ZXJlbmNlcyBhIHNlcGFyYXRlIGpvYi4NCjQuIFN1cHBvcnQgY3JlYXRpbmcgTVJzIHRoYXQgcmVm
+ZXJlbmNlIGpvYiBrZXlzLg0KDQpXZSBjYW4gc2hhcmUgam9iIElEcyBhY3Jvc3MgcHJvY2Vzc2Vz
+IHdpdGggcHJvY2Vzcy1sZXZlbCBpc29sYXRpb24gb2YgTVJzLiAgVGhlIHNlY3VyaXR5IG1vZGVs
+IGNhbiBiZSB2aWV3ZWQgYXMgbWVldGluZyB0aGVzZSBjaGVja3M6DQoNCkVuZHBvaW50IElEIChR
+UE4pIC0+IGVuZHBvaW50IChRUCkgLT4gUEQNCmpvYiBJRCAtPiBqb2Iga2V5IC0+IFBEDQpya2V5
+IC0+IE1SIC0+IFBEICAgIG9yICAgIHJrZXkgLT4gTVIgLT4gam9iIGtleSAtPiBQRA0KbGtleSAt
+PiBNUiAtPiBQRCAgICBvciAgICBsa2V5IC0+IE1SIC0+IGpvYiBrZXkgLT4gUEQgKD8pDQoNCihP
+dGhlciBmaWVsZHMgY2FycmllZCBpbiB0aGUgaGVhZGVycyBhcmUgbmVlZGVkIHRvIG1ha2UgdGhl
+c2UgbWFwcGluZ3MsIGJ1dCB0aGUgY29uY2VwdCBpcyB0aGUgc2FtZSkuICBBY2Nlc3MgaXMgYWxs
+b3dlZCBpZiB0aGUgUERzIGFuZCBqb2Iga2V5cyAoaWYgYXBwbGljYWJsZSkgbWF0Y2guICBUaGUg
+ZW5kcG9pbnQgY2FuIG9ubHkgc2VuZCB0byBqb2JzIGFzc29jaWF0ZWQgd2l0aCB0aGUgc2FtZSBQ
+RC4gIEUuZy4gYSBqa2V5IGlzIHNwZWNpZmllZCBpbiB0aGUgV1IuICBUaGUgZW5kcG9pbnQgY2Fu
+IGJlIGNvbmZpZ3VyZWQgdG8gcmVjZWl2ZSBmcm9tIGFueSBqb2Igb3Igb25seSB0aG9zZSBqb2Jz
+IGFzc29jaWF0ZWQgd2l0aCB0aGUgc2FtZSBQRC4gIEUuZy4gT24gcmVjZWl2ZXMsIGVuZm9yY2Ug
+dGhlIHNlY29uZCBjaGVjayBvciBub3QuICBJIGFtIHVuc3VyZSBvZiB0aGUgbGtleSAtPiBqb2Ig
+a2V5IGNoZWNrLg0KDQpJZiBhIE5JQyBvciBlbmRwb2ludCBvbmx5IHN1cHBvcnRzIGEgc2luZ2xl
+IGpvYiwgdGhlIGpvYiBrZXkgaXMgY29uY2VwdHVhbGx5IGlkZW50aWNhbCB0byB0aGUgUEQuICAo
+QW4gZW5kcG9pbnQgY2FuIG9ubHkgcmVjZWl2ZSBmcm9tIHRoZSBhc3NpZ25lZCBqb2IpLg0KDQoq
+IFRoZSBqb2IgbWF5IGFsc28gYmUgdXNlZCB0byBzdG9yZSBhbmQgcGVlciBhZGRyZXNzZXMgYmV0
+d2VlbiBwcm9jZXNzZXMuICBUaGF0IGlzLCBpdCBhY3RzIGxpa2UgYSBsaWJmYWJyaWMgYWRkcmVz
+cyB2ZWN0b3IgcmVzdHJpY3RlZCB0byBhIHNpbmdsZSBhdXRob3JpemF0aW9uIGtleSBvciBubyBr
+ZXkuICAoQ29udmVyc2VseSwgYSBsaWJmYWJyaWMgQVYgbWFwcyB0byBtdWx0aXBsZSBqb2Igb2Jq
+ZWN0cywgc2VwYXJhdGVkIGJ5IGF1dGhfa2V5KS4gIFRvIHJlZmxlY3QgYSBtb3JlIGdlbmVyaWMg
+dXNlLCBJIHdvdWxkIGNvbnNpZGVyIGNhbGxpbmcgaXQgYSAnY29tbSBkb21haW4nLCByYXRoZXIg
+dGhhbiBhIGpvYi4NCg0KLSBTZWFuDQo=
 
