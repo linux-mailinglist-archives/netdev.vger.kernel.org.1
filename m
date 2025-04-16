@@ -1,201 +1,263 @@
-Return-Path: <netdev+bounces-183491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C54A90D06
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:22:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F95A90D1C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54D2D7A7FA3
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:21:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAB19188560E
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E45A22A4E4;
-	Wed, 16 Apr 2025 20:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B62522A7E1;
+	Wed, 16 Apr 2025 20:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="l6tl+LfK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QFxaxi3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAFD21506C
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744834928; cv=none; b=BepZO4OPbTTRTMXuktRSf90mvc34t97eLDOprAuxuvINd4hJ0ALL4zZYmWwuMC0b4Lsa31W7KJQ0hcDY5nSZEO1lYe6tkfBIDUcD21BiqmzEHBg5kXiDWfiI7xLwUeOVz5/ZWgnbvTqXc7JXMUjKFLOmWbtDr9P7KI4NZr3beZk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744834928; c=relaxed/simple;
-	bh=YVNHzuF/FXivch+ALQNRCf8wamVj9nSiQ0vXbzvFBLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XBQhYdtyuZDQ7TIqSdIaKOkNn1sg8KlDDLQtcOTu4Eg2+OaNGdCbBXCJQ7ShLnsZDMtVnL/vzsdA5qGaGhBEFFHDyja/h6WQeoKVjrYbWTkplT6+OWaq92/vgIsVHRzMU7fLEGmKwX/DxOYedg7XBoYnk8sIWHE/DhUmjMufgYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=l6tl+LfK; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53G9mJr8003636
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:22:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	4nWdh5ji9JkbTEF4QgyJQmaNVYWFSQtMEy/xVq3CxYA=; b=l6tl+LfKddZLhr4j
-	qgeNiBYdZ8y4QMhxdprwajlq3ZQ7YZU2NsgmsEdsE5ui0Q3y2MRWBLH1lCp9MkEi
-	n4ElNvylXByAoR7l2fdYApHpXFe2HfpHzK8LZfAvDQQt0daDa4H5y1VYwiMDJEBC
-	woYYV9HpGBfpZDDY+6jCmuHi1/KAlppnrAwshjaAUCeWOFKmyjEP3FDXdpqXdiGr
-	ONwg9T62Bnn2iVjRbjKWFn6zd04dmZ1bKAvhaDWFvFbJKqEaMb4uXkkPGwITWdrf
-	+u3cSvaGJ2OtgfEcBedfRnwcc50rL8rJeyaofdkQLeHpn/bynKBMNlapxCwHZiRT
-	+Nxbew==
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4628rv9yx0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:22:05 +0000 (GMT)
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f2af3128b0so1848526d6.0
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:22:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744834924; x=1745439724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4nWdh5ji9JkbTEF4QgyJQmaNVYWFSQtMEy/xVq3CxYA=;
-        b=bej7y6kiBW4jXaGGjqFKjZmpQk60FaxR7vg1SjIGcH88rG4XhoZB1oAvIppdg1tiRS
-         2FR9LzHzXV1DBbN72tn+0waEaqriyG7JXqx44oxbqoig/sktWilHD109VwOwVDm9E9jL
-         1BQcwjF+Fc2KF5dTzhcAR3WDbarP0d6N0hgGR7bWiqvqHQXKxvwY3aOwh3y65+iy7DrX
-         QvyxXyXO7z5bdgChIBVOIFVtMVkPqzSQ1PtkATp/BDayuRdOBfqLbQxoALZgN0Bh0CzK
-         9RUg/o6RdgHKgdjb4MJSivOBnZtpndrxNxKwesAZREucJLVksSLHd2vdM+1/xFL8uEcr
-         AtHw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYzXy9COPC+QPXQ7YCqabt0DBzEoO+0cLmgTpFodC/3lRkcSWiceT+UYInNq97pOgLLiE0a4s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbfQ7S8ngt9KF53vPGZFbskxMG1tWMLJQniR4SavRaVzHPewvB
-	f1T8y3z4KSpLSIa3+0FRpLFRnmkR9VKX7rvYOGet1cSM6m6SPK0dexeEbJdrdiUgxCmflAxN6T3
-	i7G0u2tkeJKGgjTxoEdlRK4fDWcSYSYM2zAK2dTk4GJnASjM3zBQm0ZphMr5E6R2CkOTFN7AIVd
-	CVvL0o5FelMs0UX73OzkRGGuM95ZWjbw==
-X-Gm-Gg: ASbGnctZAN0BlAOLhSwrxcWDn+17KXY7CYHbwc84jZN2wU/4AV7GhFuLgahkw3gD7uN
-	vtBtB3CvdJrkzKdNvnhBsqnneoGeV5C/VfK4Z6wIDpabyv9u/87v2cQLUwxnG28Bes4re2tph3T
-	RgBE3xwDidMMc5S0wAIAsNDVM=
-X-Received: by 2002:a05:6214:2349:b0:6e8:9bcd:bba6 with SMTP id 6a1803df08f44-6f2b2f23a80mr46433616d6.7.1744834924250;
-        Wed, 16 Apr 2025 13:22:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEeGLdGR0YgFgD2FAz7aWV7l8ut1T8Q2JdrmnAC3JUhfTtg6DgpkAKUxMRdrbUctmQFbUtWk2kUQU2IvJXuUk0=
-X-Received: by 2002:a05:6214:2349:b0:6e8:9bcd:bba6 with SMTP id
- 6a1803df08f44-6f2b2f23a80mr46433326d6.7.1744834923950; Wed, 16 Apr 2025
- 13:22:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140F922A4E4;
+	Wed, 16 Apr 2025 20:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744835211; cv=fail; b=kWXnYUQGnEaTjyGidVHuP7lPHdSrdVSB9d8oH/21Q3LvB9cM6r1miObbmJslj6R+7/vVwX/lIpMzo6gsJFWwi8Us1bLheZxKc752Tgn4lgiHt/LFHE/g6O2MKfUWlrFwtexFhvBhXhS9IHhqvejv7UB3ILzbYoDrtRCW5ni4uDQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744835211; c=relaxed/simple;
+	bh=JMmJhHvSc6mNAv9CslEu9R50WJWfMhTpF/CF24BJ/Kc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=sko5EiBwoYyU5l5E2KeR3SQqUbpJ6izz+5Me7Au1PMlkad2X4doGdmPKeV8rX1sUXmwg5YrJVBacVx20gmvSBR1CDf4QJ9t9IICqjyJtV6ReC7RILF4MvbbE4UG7pMVTShgwZazFNWj3Jo/grSgKHsU4+c0Z45giL4aaasQiBe8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QFxaxi3t; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744835209; x=1776371209;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JMmJhHvSc6mNAv9CslEu9R50WJWfMhTpF/CF24BJ/Kc=;
+  b=QFxaxi3toHsFXOEPDfeUdJJ4ODKM0Y/B7/z0lN7hmXfeDLuovtLDtvTK
+   /zpSebFCkltgeHheAoMyTgjVfS/zEiOaITWuVLtIS/md3XIh39Eff3GRT
+   e3xrDi4+Du9bnOW4prL7vErhylZtJpuwfSv2s+tUlbhxZQrEx+z4lI6Mc
+   D8jE+rMdh4fikc3gSrp8DJnzXm0prDgQF6U+Xp3XVfnHc4ZdZwMkqxE5s
+   31KAshP/gBCaWSEZTLJ6HLm98jQOP+Y1px/zO/yPW0CkbiVKHyIkHK3FF
+   f6jvVgbgL4CFmLjst+Ns2YSSDzVjowJShBH1OqYVoEMbwqtfj/ABkRuJx
+   w==;
+X-CSE-ConnectionGUID: SWoUINphQYSRII+4tPUOgQ==
+X-CSE-MsgGUID: 3PYWtEfQR4e/gwIphGdqTQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="46416957"
+X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
+   d="scan'208";a="46416957"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 13:26:49 -0700
+X-CSE-ConnectionGUID: LAjieJFrTZO4jKRKFNV3xw==
+X-CSE-MsgGUID: sHNUNu5PSOGfqSg4nPayrw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,217,1739865600"; 
+   d="scan'208";a="135761150"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 13:26:49 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 16 Apr 2025 13:26:48 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 16 Apr 2025 13:26:48 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 16 Apr 2025 13:26:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vpe2KbCUJHq6avXJz1EEyYS1//2JyHSqX0OLlowJ3hWHrO2TwQstR000eyTqgSismVKalMgATuLuP43/ScybR7vJFwy02uEl4ozhQZWYNrIdGc2bWiMHRILKXn1vb6IXXexFsODPgXvtpLTYyHpxOxav7onzG5pN6bWzNqS1xjdRPe2AAvRzyKy2GCqVQtc3dX7wEcrqnq/B94GDZh0SyUdkLt8IXIVfbwkGUkuVycNDqkm+scGa2Rr1o47OHS6dXd7yIvKC6nrTVb5Rtfu2s3QZ8MfrQAo+LWUQWCdWfjdhBIN5OqaKRa9LKil4F0sgL2E0YIL80ddWbejVKkbSbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+vtjzXRoRbVheHQFX7eoPrIF0WZSrvbMKEdQ6/GvSz0=;
+ b=UkLUzZjDYOA/y4sqrsUZwVsGa8opOQS6gkZEQP7sFdRZLISA9dPGmZtj6FySAhyeN9B+vuaT4nfBE/6YBgdFpt0f5WEgtDKTC0d4uJJjmZbMSX0xzq8yys5nK8ICEZ0M6vW91AMAQQtgMOGJgbrA8FH1jATpZcAzil+uk36Me3ACuZWYsGrErr8/l/nZt2KTyBJ1sWMgsC9fsTk1haqlKyFPglrqQfPVfhqokbhekfCoNPxWeS0eIP9ixEO9XYkiozSdGp1wMvh73r6NfSV7RyLj24Ep6kE8882yYvzIUAWZoF4P4OiWGymsb+V+jUwV8inU6fIZG+ogE3aCoNPNFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Wed, 16 Apr
+ 2025 20:26:44 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8632.025; Wed, 16 Apr 2025
+ 20:26:44 +0000
+Message-ID: <07549649-3712-47b9-917b-c5001f9761cb@intel.com>
+Date: Wed, 16 Apr 2025 13:26:43 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] octeon_ep_vf: Resolve netdevice usage count issue
+To: Sathesh B Edara <sedara@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, Veerasenareddy Burru
+	<vburru@marvell.com>, Shinas Rasheed <srasheed@marvell.com>, Satananda Burla
+	<sburla@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20250416102533.9959-1-sedara@marvell.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20250416102533.9959-1-sedara@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0125.namprd04.prod.outlook.com
+ (2603:10b6:303:84::10) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
- <20250408233118.21452-4-ryazanov.s.a@gmail.com> <CAFEp6-2MxMohojOeSPzcuP_Fs0fps1EBGHKGcoHSUt+9fMLqJQ@mail.gmail.com>
- <0e061258-b7d1-47ca-b0d2-5e8a815136af@gmail.com>
-In-Reply-To: <0e061258-b7d1-47ca-b0d2-5e8a815136af@gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Wed, 16 Apr 2025 22:21:53 +0200
-X-Gm-Features: ATxdqUE6R9UxUkBhSDL7fk5XCpoXaZE6IkGKkYSqYFHTxAb6hW1ZwPRfqb9s6WI
-Message-ID: <CAFEp6-0s21Xo7bGW9OYwwBGcKE7-W8hv8BUbh_CQScPfbrWniw@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/6] net: wwan: core: split port unregister and stop
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-ORIG-GUID: SOP-I2L8_fv9uY2S5XtxT3u6UWwHFAwh
-X-Authority-Analysis: v=2.4 cv=RbSQC0tv c=1 sm=1 tr=0 ts=6800116d cx=c_pps a=UgVkIMxJMSkC9lv97toC5g==:117 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=pGLkceISAAAA:8 a=8tMkpneb8U_0UXTVT7oA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
-X-Proofpoint-GUID: SOP-I2L8_fv9uY2S5XtxT3u6UWwHFAwh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-16_08,2025-04-15_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- suspectscore=0 adultscore=0 impostorscore=0 clxscore=1015 bulkscore=0
- phishscore=0 priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504160166
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MN6PR11MB8102:EE_
+X-MS-Office365-Filtering-Correlation-Id: 456a27fc-50f2-4139-3b61-08dd7d250122
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VHRybGduKzhDaVVMZFhzNFVpVWxQR1VXSENLNHU2WEl4NUdiUzZEQTB6QXF5?=
+ =?utf-8?B?N1g4U3JnZEpaRGV3S2hSYUlidzcrRHlSOFdraVdVdVdLL0VoK1ArdWVTNWZs?=
+ =?utf-8?B?NDVDZHozdXovenVxYmplc1BuYUhFSXhndEY0cTBzekxzVkk0Y0ZaS2lmb0hm?=
+ =?utf-8?B?cDBlMFVIL0RPNzduTVlTdFpjblFwS0h2UGlIZllvb3UydGNybksxMDVkZUUv?=
+ =?utf-8?B?bmp5MWwveDA3UWM2dmI4cWUxK3dkSlpNMGgzcm11UnNUTU1YMkttNmh3N21u?=
+ =?utf-8?B?Qnp3V2cyTU9ubXQwN3lvbmNiQ25mUmtVQUFVWi9qK3BmVGR1SDdGWENVeEpM?=
+ =?utf-8?B?TXlqVVFwWUNHdG02ZzRiU1dUWGNmK2l0RnZuWGpqUlBrdW44VTZvT0tOcy9s?=
+ =?utf-8?B?OWNDTUJydFErVFNMRWlST0RNNDhmQ2RMREZHQlJTS1RFU0pjaUhqVXFvYU53?=
+ =?utf-8?B?aGwwQ3dxV0dIR2dTM3NIU0hDZTlrZlFYU0NIWG9NZndia0dqVGZPK014Qmsr?=
+ =?utf-8?B?ajBMN2pMUGxnSGV6SmNPZ3o4b2RkaHMwY1AvRjEvMWthMGFXYkozSXZrbnNJ?=
+ =?utf-8?B?aEg3Q0hROFhCNmdKM04zei9vR2w4TkFDNTVEMHN5QlYrcGs2U2VXSWl5akpq?=
+ =?utf-8?B?N0I0d1hSQ2pTQU4xbzNreC9HVUdZS1grL3AzbFFRaUlqaGZpWnYxTDkrU01y?=
+ =?utf-8?B?d2NvbC91TGZ1aUI4UzNXcjBPK3pZNEplWjVjUDU2ZHBydytMM2YvRmtTN3Qw?=
+ =?utf-8?B?c25GbDh2d0lEdXpMblhYS2NqQTIwelZuTDlGa3JTejhQWVFMSGZQaHNzNy9E?=
+ =?utf-8?B?dlN6dlBBbXRXZlNpU0dES2JKVXJxUjZMUzBnT2R4TC8ybVZNdlA1Y1BpSS9a?=
+ =?utf-8?B?QkJ2WkQ0ajNoQkJXelB0WlJzZHpPYTFhZjQyUS93NUpzeERjdXNpYnArdXNF?=
+ =?utf-8?B?ejFva2pyQUlCTmtsTVpnT1gxTzVaVVoyUTgzM0M4eE1ZRXd5bFQ1ZHZCV0d6?=
+ =?utf-8?B?dVE4c2E3U0IrS0FwYWhjSVJLQjRyd2cyQnlkc1hObzM5Rml5LzE0Z0pPZlhD?=
+ =?utf-8?B?VlU3QmttcjNQdEVubVd2RmhXQWZKVU4yalR1QmdtekxPbnkyM2JaUDNTZnlK?=
+ =?utf-8?B?K21jOEZxMlhMUkhxWWRGcXN2RytzZHJ5V3cyZ3VGYmZDRVROS0d6RVhENTlY?=
+ =?utf-8?B?OGNGUTIvL2d4cXFiSlFlU0pRY1kvK0dnZ2hxNGp6dlkzWlh6Tm5tM3lYUXVI?=
+ =?utf-8?B?ZlgxNkxEc2t2LzkxSnhrcmE3S2RONkxDU3R1VVpPeHl1Z084RVdGN3BpV3pD?=
+ =?utf-8?B?L3Fydmp0cTRjaFRJVkFuZW55ejhjVW1wOE15OEN0bERtVXNaTWp0RmdES205?=
+ =?utf-8?B?aEd3ZFVVNWE5SUdHN3VqTWFwKzRsNDE3MnRJcVJJV3lET1FCc1JKdFlTa3h5?=
+ =?utf-8?B?dmlsR1VHUlRvOVdJZ2w2ZWtTTlRlTG1nd1pJY0poNW1nclBtQ3lqcmpnY2tG?=
+ =?utf-8?B?WGlncHkyc0dseUVVM0YzWmREbWIyamZHVlM1bUtCZnN3N3ZTYU1ZTTk4VXVZ?=
+ =?utf-8?B?Zjk2SElScXZPemdXSFBMV0tXYkdJVWdHMWM4a3RpeUxGV3YySkxVc1dCOG1E?=
+ =?utf-8?B?QThHLy9HMVk5NUxHcUhqamd5S3pEYnlxTnU0ZTRtSTdjYmRuQVBaNWgzdmFh?=
+ =?utf-8?B?V0xnYnRQc21NcDUvUE1FaUJudGUzRVE2YndraHFtTHRhOU9KYlRQbllwVkRu?=
+ =?utf-8?B?WW9QU3NIVUs3YjY4M2ZHUXVUSFBKZk1uYWNYNnV1SzRoUXJ0bnZ6WjVJUndV?=
+ =?utf-8?B?UGxxTk5NNThXb1g1ZE9JTGoyQk9waUNxQWFaSmthQ2w2ZEpuQnFUWHcvdUtI?=
+ =?utf-8?B?cFphWEJJajczSThGUU8xZ2hsSzc3SVR3WWhmVW9wbjdmbjlwZnlrNDFjV1c2?=
+ =?utf-8?Q?wsV63LG3KtE=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cGlKQlRkbHJUS3lpOFZqOUhIeVhlb25TeTUzbVRhSFl0Q1pmTFFDS2NVSURK?=
+ =?utf-8?B?cjVTelZySnMyVEpLcFNiT2thK0Joamd3VnNGV3lSOFNwZXgzcTZYcXp6VHl3?=
+ =?utf-8?B?R3AyKzk0cG1GK09ialVVWHVDRTd5a1I5K0ZDK3lIczhPNVJ5U1MxVndQQ0Zm?=
+ =?utf-8?B?clJJTHBkTnV1Ym5yNzIzL0hsd0xTZ3ZDZkNYaUJqZDY4VDhtNTBjeTc0b2sz?=
+ =?utf-8?B?TDl0eGlvLzY3MTM4cFJtS0N3UTlweS85UDdzbERxMjROa3hZVGExWnFWcHNI?=
+ =?utf-8?B?WUVBbUk2b0dGeGJCNVlKQysvN1Y1ajFiaVo4VU9mamVHL1BycEtVTTNuSWhF?=
+ =?utf-8?B?UHZaQU5Nd1ZvMitkWWgrTEszQkVvUFBXaC9OUUdjMEFHMXBXM29RTmxjQUV1?=
+ =?utf-8?B?eTBOMzZiNWlsWjhSVXFFKzlmcW1ZL0RFOGYzeExXNFZvR2JEV0J2aHhUM3ZE?=
+ =?utf-8?B?T3FqT0J4K3NteGRDOU95LzF4emtPcVJnSm13cHVXY1oyOHF4eDVoY3ljcVNo?=
+ =?utf-8?B?MVBEbCtmcGJyd2IwYWdCNUNaS3JuUmJ2dzROcnZTSGRPdHpkd3RvWFVJM2Y0?=
+ =?utf-8?B?R3B2MVo1ZWR4dlFwdDNOd0E4YzhocncwQzduSmZ0TzROV21jdTU4S25BVXZH?=
+ =?utf-8?B?QnN4WDV0dzhDZmZvTTJWeVZtOTZVbEVwL04yZUc0SEZWSm9nMTNPd0lHdTFX?=
+ =?utf-8?B?MVFjRjI5dHJNVExIRWw3WmNuRFZYazR5QmFkN2ZIUDVpc0tJYzRzSk9YYUhD?=
+ =?utf-8?B?d2RSc05rS1JwSHpRSys5a3pzSGV1cEtTWFdrSyszajAycmNBSEhOQVZCdUgx?=
+ =?utf-8?B?K0c4TGswZHZqaWtsK3o1Y3VTbkpHd2pocEdhQ09ERGpaL1BPc2R2aWgrU0tx?=
+ =?utf-8?B?bVdXelVOMGVhSFJlVHhKQ2NJalhTbThlalBjYWtjV040YTY1L1VVZ0g3TG9Y?=
+ =?utf-8?B?OSs5QXFYd1FzK05UTkhaYW1qVUppU2x3U3BPclFieWVvMG40TVc0aDFDamtm?=
+ =?utf-8?B?aC9Idm52RXhJbU1mSnZ1djludUtHMDhKQU5jbXUrYzBIRzBRYmJtaU42ZHFK?=
+ =?utf-8?B?cXNWWklkZjd3TUZ3eVpJOWIrcWtnUUkxdmpLcExKb1FkZ05KeVlHUVRuMjcz?=
+ =?utf-8?B?ZWxoOWI0b20xeFprNmFrTnJvcHlONlpialZIL0tWei9oWE5odkJNMXI1YXJI?=
+ =?utf-8?B?R1plSnk2UjlRQ3BDRjNBZ2NGTFI4SWpTcVk0bjBkd2ViS2ZBTWFVTFVvQXJs?=
+ =?utf-8?B?UHRUS0gwOFhLbkRJaHBCSnpZamVXbFlHL0N5RTlyckNjSXlkWTNwZDR4MGhj?=
+ =?utf-8?B?bjRSako0QlJCeTZjd1prS0JPZUdkQThwMlgwZEFIeDlVc3NhTzd4eHIwd29x?=
+ =?utf-8?B?MUJ2d2t2Zlo5ZHVRdFJZTzBPSC9nUHd6K1ZjSi9oRVhDOFJEVFE1cDdZSk0z?=
+ =?utf-8?B?UzdEY1E3MTFqdHNHL3AxVU12cnlFNWxxTFlTcFI2bVl6SXAvcHM5dldKL2s0?=
+ =?utf-8?B?QUhSaXNLTi9aYjd6TndxQ2E1Vk1wSHdwbjNVN0Q4SWJ6RGtLdkFXaUNZaUF2?=
+ =?utf-8?B?dGhuVmRpUXRvUnVsWXMvdXFXeHlkeU5TalVralJPZHhnZ05zamNMQzRvUGpi?=
+ =?utf-8?B?dkUyTUU2aVU0Y1JkMG1PTUJ1UWl4aytONUtXaUViZEl3R25vTElkSXJ3VThj?=
+ =?utf-8?B?SE9TL2h0RlhRN2x3dVpzWnJPYUJ2NURpWVQ0RVlXbzhLN0VqRHJIbElZSW5l?=
+ =?utf-8?B?Ym1tNkpJMldha2JQUXkxUU1IT01FS3Q1Tzhzckg0SjhYMDRMTDd0aEMyUUcx?=
+ =?utf-8?B?azdtakpLNDFOTG9Ed090MzlHVjlUYlhvdXRLMHdFWUdDMzZQWHlYNlRDOWVh?=
+ =?utf-8?B?c2NNS284R2Nkd3RDTHJnVVhJREcxcld5NC9qS0piYWoyNUQxeStiVU5RVGJ2?=
+ =?utf-8?B?Y1k2b3hpOEptWThUY1IwRVRmczhJOVZkY0syU2lMNGlxMW1lUUlZTXRoaDdN?=
+ =?utf-8?B?T0tHdGhZRzZNWmlqZlhzenZUQ1FDQkd4ZGEzelB4elZKaXU1cHFrVnF4UU05?=
+ =?utf-8?B?d1ZGUjlyKzBvZjM4STh5THU2N1o4M3J1SmRycW1YVTF1OWlaYlU4enFVV09T?=
+ =?utf-8?B?b0Zib0szS093VU5CU2pNQllOcWMreEV3UWlEUWh1Z05pWlpxZFYrL1kzR3Fu?=
+ =?utf-8?B?aWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 456a27fc-50f2-4139-3b61-08dd7d250122
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2025 20:26:44.4042
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vvFOAtVHXEKQtd7CA+r4QX4yPNev2KK0WSNtTz1YTeeMDhUSTYRfRlty7sGcl3nwwrRWNZdY7D7HY0rL5izuzjgBspp4c16FpF5OJnvandc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8102
+X-OriginatorOrg: intel.com
 
-On Mon, Apr 14, 2025 at 11:33=E2=80=AFPM Sergey Ryazanov <ryazanov.s.a@gmai=
-l.com> wrote:
->
-> On 14.04.2025 21:54, Loic Poulain wrote:
-> > On Wed, Apr 9, 2025 at 1:31=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gm=
-ail.com> wrote:
-> >>
-> >> Upcoming GNSS (NMEA) port type support requires exporting it via the
-> >> GNSS subsystem. On another hand, we still need to do basic WWAN core
-> >> work: call the port stop operation, purge queues, release the parent
-> >> WWAN device, etc. To reuse as much code as possible, split the port
-> >> unregistering function into the deregistration of a regular WWAN port
-> >> device, and the common port tearing down code.
-> >>
-> >> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> >> ---
-> >>   drivers/net/wwan/wwan_core.c | 21 ++++++++++++++++-----
-> >>   1 file changed, 16 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core=
-.c
-> >> index 045246d7cd50..439a57bc2b9c 100644
-> >> --- a/drivers/net/wwan/wwan_core.c
-> >> +++ b/drivers/net/wwan/wwan_core.c
-> >> @@ -486,6 +486,18 @@ static int wwan_port_register_wwan(struct wwan_po=
-rt *port)
-> >>          return 0;
-> >>   }
-> >>
-> >> +/* Unregister regular WWAN port (e.g. AT, MBIM, etc) */
-> >> +static void wwan_port_unregister_wwan(struct wwan_port *port)
-> >
-> > Wouldn't it be simpler to name it  `wwan_port_unregister` ?
->
-> I came with this complex name for a symm>
-> >> +{
-> >> +       struct wwan_device *wwandev =3D to_wwan_dev(port->dev.parent);
-> >> +
-> >> +       dev_set_drvdata(&port->dev, NULL);
-> >> +
-> >> +       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&po=
-rt->dev));
-> >> +
-> >> +       device_unregister(&port->dev);
-> >> +}
-> >> +
-> >>   struct wwan_port *wwan_create_port(struct device *parent,
-> >>                                     enum wwan_port_type type,
-> >>                                     const struct wwan_port_ops *ops,
-> >> @@ -542,18 +554,17 @@ void wwan_remove_port(struct wwan_port *port)
-> >>          struct wwan_device *wwandev =3D to_wwan_dev(port->dev.parent)=
-;
-> >>
-> >>          mutex_lock(&port->ops_lock);
-> >> -       if (port->start_count)
-> >> +       if (port->start_count) {
-> >>                  port->ops->stop(port);
-> >> +               port->start_count =3D 0;
-> >> +       }
-> >>          port->ops =3D NULL; /* Prevent any new port operations (e.g. =
-from fops) */
-> >>          mutex_unlock(&port->ops_lock);
-> >>
-> >>          wake_up_interruptible(&port->waitqueue);
-> >> -
-> >>          skb_queue_purge(&port->rxq);
-> >> -       dev_set_drvdata(&port->dev, NULL);
-> >>
-> >> -       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&po=
-rt->dev));
-> >> -       device_unregister(&port->dev);
-> >> +       wwan_port_unregister_wwan(port);
-> >>
-> >>          /* Release related wwan device */
-> >>          wwan_remove_dev(wwandev);
-> >> --
-> >> 2.45.3
-> >>
->etry purpose. The next patch
-> going to introduce wwan_port_unregister_gnss() handler.
->
-> The prefix indicates the module and the suffix indicates the type of the
-> unregistering port.
 
-Ok, fair enough.
+
+On 4/16/2025 3:25 AM, Sathesh B Edara wrote:
+> The netdevice usage count increases during transmit queue timeouts
+> because netdev_hold is called in ndo_tx_timeout, scheduling a task
+> to reinitialize the card. Although netdev_put is called at the end
+> of the scheduled work, rtnl_unlock checks the reference count during
+> cleanup. This could cause issues if transmit timeout is called on
+> multiple queues. Therefore, netdev_hold and netdev_put have been removed.
+> 
+> Fixes: cb7dd712189f ("octeon_ep_vf: Add driver framework and device initialization")
+> Signed-off-by: Sathesh B Edara <sedara@marvell.com>
+> ---
+> Changes:
+> V3:
+>   - Added more description to commit message
+> V2:
+>   - Removed redundant call
+> 
+>  drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> index 18c922dd5fc6..5d033bc66bdf 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> @@ -819,7 +819,6 @@ static void octep_vf_tx_timeout_task(struct work_struct *work)
+>  		octep_vf_open(netdev);
+>  	}
+>  	rtnl_unlock();
+> -	netdev_put(netdev, NULL);
+>  }
+>  
+>  /**
+> @@ -834,7 +833,6 @@ static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+>  {
+>  	struct octep_vf_device *oct = netdev_priv(netdev);
+>  
+> -	netdev_hold(netdev, NULL, GFP_ATOMIC);
+>  	schedule_work(&oct->tx_timeout_task);
+>  }
+I guess the thought was that we need to hold because we scheduled a work
+item?
+
+Presumably the driver would simply cancel_work_sync() on this timeout
+task before it attempts to release its own reference on the netdev, so
+this really doesn't protect anything.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+>  
+
 
