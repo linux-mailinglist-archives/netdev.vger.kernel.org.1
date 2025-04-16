@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-183414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C189A909B9
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:15:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D869DA909B4
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 831CD7AC0DE
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:14:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5C3F7ABD89
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4950A21770D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CEC4217651;
 	Wed, 16 Apr 2025 17:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l34SkYT6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NL9JNhNT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFC3216E1B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0133F2165EA;
 	Wed, 16 Apr 2025 17:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744823700; cv=none; b=Nz9KDSu/taWOrM3+u00ICOTfVVmvaI2pKWZG0NN+FEP/b5jxKOFK/HmwDTCXfCCI7N+PY0x9MhbfXbV1zMF2vW0puyo71qPV79bQhECQAnTTZWEJQLy1+pYb5NyZYT1Dh8zBBJMfDSOE06aoFAXKw6Vh8FuInohi5BoIsFwcAXw=
+	t=1744823700; cv=none; b=T00YmATsXuFENsq2oUFbqFWq/1h4icqPF2x/UABVOmku58Paw0kjNKm/xwZd7+2GfAifW4fbi0gVrkRlgyaKnkkC7hXmgR5mduS1P/WFlxR62NUu/LVNfiGL4CR7FcA1HAzW9kFoegjimi2DmOy2pGet6W8Lj7hZKjZPE1mWEWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744823700; c=relaxed/simple;
-	bh=cFwspKEdNzMDgmNkSYSyp+e+y0BEh+uJjdRR5wLf1ig=;
+	bh=JLUFW7xVWi5uAyw4AeqyqswOikhB6O7KFDradTNh2Q0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L1LnzM+2AHs+eyXfxQFHQQL98ZTQXJnBuQLSVxSW6nsLYZI9gxDP2ztjVgXdJRgYxf4tAp0UViaMM6v3wG52LWhF8LdzUfgR5G9Ap2LFynEg4+0DEWqYaGKxYZgxQqDqLUMO57FNH0aICvv03Mro0ymNgWZ2wwSeT4ph9Npm2PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l34SkYT6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BE36C4CEE4;
+	 In-Reply-To:To:Cc; b=LIZFu32k4DLFp7mWsOTk/9w1yifty2gywLVwfSJYP7wqVOe2dI4VTcpffp85TVIBshCnjqzgT5LrqqS0dJxPouvOpZ25f3+3kT1FpVDScnXEYadBit/2Gg0+vg33zI/1J6cs5PxJGmiqdi5oQpBido9gXQU8Enq16PeN6c6SviI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NL9JNhNT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7CBFC4CEF5;
 	Wed, 16 Apr 2025 17:14:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744823699;
-	bh=cFwspKEdNzMDgmNkSYSyp+e+y0BEh+uJjdRR5wLf1ig=;
+	bh=JLUFW7xVWi5uAyw4AeqyqswOikhB6O7KFDradTNh2Q0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=l34SkYT6OzVvBAGqrofLd36W52hRzPw+/yVSoFhglycwwfUupVnsE0hphBAg9dlzK
-	 z0YuKDWx5ZN/wOyZMQiUgbxx+b/164rvF5tZFLlz3WDYYCWdi0Nj6monLgbslMwpmR
-	 DtKsjJ7dGlyrh2kVywtahVNia+uG5Vu84jo5lOYsv89Hd75DHCVnS8d+BxWJJKR134
-	 YDvb5lygAZO+g95vD7z8Ggs6WN/15w5EsbovSH6kNICCd34fVZdDAaeiEKB5dAWh+H
-	 VIdC+GXT7j/6f4YAg31fZ6OnmaYqCIMiuXqxGzuC5pc3aEGuYdVsCD39FCJAors4PK
-	 wiNJPYZcssgaw==
+	b=NL9JNhNTZnALJIA7V2MHslvyr3ctAS4AXhJDDL5jP17Xg5DGakUmULSTDMJFO5X+D
+	 0JxL6aupXqBehDkA6Z0sCuJUwUxsTJRvd66wTHfJOp1dQLv7Xpmum5rcIa2SHV32OU
+	 UQYaE30V1cdmUEq9igkX8DamkJU6tmpMXPIoREuwrOD/BNrS6VKUsnpTetmvinSO9R
+	 CcmsHkneqQQUv52aApi9vtsDPa+NSPKQVeRoP6kjvSA6AyyyFykX40Hwq5RBPjVF9K
+	 rutsiX++UNTIkHhdUwTc9iKmbU9kXXGcrMxqU5mpkaaaRtr97WP3xL15wGeSQexlJT
+	 2i5Xq+kcPDkhg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D37C369C7;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4ECC369C9;
 	Wed, 16 Apr 2025 17:14:59 +0000 (UTC)
 From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Wed, 16 Apr 2025 19:14:48 +0200
-Subject: [PATCH net-next v3 2/4] dt-bindings: net: dp83822: add constraints
- for mac-termination-ohms
+Date: Wed, 16 Apr 2025 19:14:49 +0200
+Subject: [PATCH net-next v3 3/4] net: phy: Add helper for getting MAC
+ termination resistance
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250416-dp83822-mac-impedance-v3-2-028ac426cddb@liebherr.com>
+Message-Id: <20250416-dp83822-mac-impedance-v3-3-028ac426cddb@liebherr.com>
 References: <20250416-dp83822-mac-impedance-v3-0-028ac426cddb@liebherr.com>
 In-Reply-To: <20250416-dp83822-mac-impedance-v3-0-028ac426cddb@liebherr.com>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
@@ -68,13 +68,14 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Davis <afd@ti.com>
 Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
- Dimitri Fedrau <dima.fedrau@gmail.com>
+ Dimitri Fedrau <dima.fedrau@gmail.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1744823698; l=1043;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1744823698; l=2028;
  i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=7BGE9tLp93J171J2FMQIe9ov/36XBFIFpQ/JiCi+QRk=;
- b=4I4GSYv9VJSa6JnkgkwdunnyRsu48D4YMC+tlSYhLrhhWW74kjNAHiycTFCavsjRpRaeOnR81
- QtWOY7xs/R8Cl1wSiciNSdgVaQVE5QmmgS3xVlZadhaULjNuf8AhPC+
+ bh=/Fzsr/MDdwggR68hmMYpD2e1XBjCEnFaHjMzV6fLczs=;
+ b=CArExZsnBMLPb47XmDpyue2G8JsTUSRt+ct01dNLMn9+fQlppo5ZA3VG3+QSLD9R2bGDNg3zh
+ arH3MAWbODaCUlyke20Yqo7v34abi0g/xTIN6zuCPdBPJfsfprSFmvF
 X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
  pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
 X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
@@ -84,35 +85,56 @@ Reply-To: dimitri.fedrau@liebherr.com
 
 From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 
-Property mac-termination-ohms is defined in ethernet-phy.yaml. Add allowed
-values for the property.
+Add helper which returns the MAC termination resistance value. Modifying
+the resistance to an appropriate value can reduce signal reflections and
+therefore improve signal quality.
 
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 ---
- Documentation/devicetree/bindings/net/ti,dp83822.yaml | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/phy/phy_device.c | 15 +++++++++++++++
+ include/linux/phy.h          |  3 +++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-index 50c24248df266f1950371b950cd9c4d417835f97..28a0bddb9af940e79a7a768a35ef588e28ec5bd4 100644
---- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-+++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-@@ -122,6 +122,9 @@ properties:
-       - free-running
-       - recovered
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index cc6c209fe702293c25e619899a699a53638f0f66..f85c172c446c56e1da1d13baa18c581f2213dcc5 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2975,6 +2975,21 @@ int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
+ }
+ EXPORT_SYMBOL_GPL(phy_get_tx_amplitude_gain);
  
-+  mac-termination-ohms:
-+    enum: [43, 44, 46, 48, 50, 53, 55, 58, 61, 65, 69, 73, 78, 84, 91, 99]
++/**
++ * phy_get_mac_termination - stores MAC termination in @val
++ * @phydev: phy_device struct
++ * @dev: pointer to the devices device struct
++ * @val: MAC termination
++ *
++ * Returns: 0 on success, < 0 on failure
++ */
++int phy_get_mac_termination(struct phy_device *phydev, struct device *dev,
++			    u32 *val)
++{
++	return phy_get_u32_property(dev, "mac-termination-ohms", val);
++}
++EXPORT_SYMBOL_GPL(phy_get_mac_termination);
 +
- required:
-   - reg
+ static int phy_led_set_brightness(struct led_classdev *led_cdev,
+ 				  enum led_brightness value)
+ {
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index fb755358d965b728d502bfc1c0d6e5a6b779f1ef..066a28a4b64b25a7c6033a3bb1e3bc48b20c96dc 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2040,6 +2040,9 @@ int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
+ 			      enum ethtool_link_mode_bit_indices linkmode,
+ 			      u32 *val);
  
-@@ -137,6 +140,7 @@ examples:
-         rx-internal-delay-ps = <1>;
-         tx-internal-delay-ps = <1>;
-         ti,gpio2-clk-out = "xi";
-+        mac-termination-ohms = <43>;
-       };
-     };
++int phy_get_mac_termination(struct phy_device *phydev, struct device *dev,
++			    u32 *val);
++
+ void phy_resolve_pause(unsigned long *local_adv, unsigned long *partner_adv,
+ 		       bool *tx_pause, bool *rx_pause);
  
 
 -- 
