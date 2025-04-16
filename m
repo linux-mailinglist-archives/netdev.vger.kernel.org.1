@@ -1,60 +1,79 @@
-Return-Path: <netdev+bounces-183329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530F6A90611
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:20:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E4FA9061C
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C18D91663E7
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:16:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F42F1891026
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5B9204C2F;
-	Wed, 16 Apr 2025 14:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gCF36gjW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAB5205519;
+	Wed, 16 Apr 2025 14:14:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75679202F9C
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 14:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8628D192D68;
+	Wed, 16 Apr 2025 14:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744812841; cv=none; b=CCQNwYgO/2FstdrWi8Fs+v/OU/OcNhKBQr7Q1tNPll6oMcf/82TOoVS65VHI8g32deX99oc5maNCWVlnvTA+X6Av0nCAXj5DnyX9loMQXrd1EhSgNR38xS6kYMLne1lRjMnlWKmkXwpiK8WwxDWOEVvwXzhoR2htsBNIju4xbzA=
+	t=1744812852; cv=none; b=W8u9eV/esLiCVMRIl3bphG/3C7qoznDa1dNN6SX0edZ8sQ/DPnYcEJkvd+XMyLE+R2xAWY1oddLzbeLMVZH7o3sf8AhCS+J907CpFXmpjWUYQSwKn/bXU7zQn9xZBrJkBFrk5GfzJfdmoI1/GM6krkwJl5lk0qdgxqNpgNdFp8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744812841; c=relaxed/simple;
-	bh=aJM9KtZjGWJx3V9hGn+9ONXAzT0iVKDyKmibJWyTCWQ=;
+	s=arc-20240116; t=1744812852; c=relaxed/simple;
+	bh=P8RyqmbFkaSkJG3Ix7pdpJZrWqUmUydL79exEYIicoM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=magPkIPO0M9+2wx6FqjXJ9lpw/FogbhWJ52GTLsyD8EsLt41xtAETCKOs8Yo3RLI8smI8bNWQImGXuZY6AnPPqFVsT1wXuIeGjOK6DwmuxUdIAgwqItbBvjaq4HEBINusTgBh6gu7sb2xF0LLlyfcPLBwh4mraf/fEPJFEA/h5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gCF36gjW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEE9FC4CEEF;
-	Wed, 16 Apr 2025 14:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744812839;
-	bh=aJM9KtZjGWJx3V9hGn+9ONXAzT0iVKDyKmibJWyTCWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gCF36gjWDBWobW2M4aOqBQ1Lg2rRzhKxPtqbTmcsgUd+/r/4OOWaJRE4S8C9++mIz
-	 ZSsOI6LqzmrUasu06ITWrhVfEJEtp9eElUqxNY7b4hlXt7pPcVmhBi+4mPSkQOX3h5
-	 remycygUerrWrsUgNaLMry/qkDeWZpAZSDIjOClUpQ8m5YEc0srQlfs/nCJkJx0uZQ
-	 AnmgkA5cJWGvQAz98mcfJ7H8UYT5W2DlaMWo+poJKL7PEhLNnZTwUUW2N5Pkx+ETUz
-	 Wu5VtvcpIbUaJjcLYI4ljb4m0Pp3Izvhd5w7AhKacOGSJJ1BBXWmVZpmmvN9ejcVwE
-	 Izy7AzBw1WV3A==
-Date: Wed, 16 Apr 2025 16:13:55 +0200
-From: Niklas Cassel <cassel@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	netdev@vger.kernel.org,
-	Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-Subject: Re: [PATCH] r8169: do not call rtl8169_down() twice on shutdown
-Message-ID: <Z_-7I26WVApG98Ej@ryzen>
-References: <20250415095335.506266-2-cassel@kernel.org>
- <4f8d3018-d7e5-47e5-b99d-550f8a4011ee@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iy8XAcCVVqPWJ4LihS9JeyGdPAnFOZORvmOQh4gF/6XehZ+OTX8seC0uvTj+VmlYfSBImYvqX/iD0lboSy6Z/IiBzIdERvn1fzHpgKspFYQqsp4/zHJi7yxrg9eydhLfJR6Q/D/OaAqOqolgYxr0i5QrqivVEn7jk4gl+8Yw9Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5f435c9f2f9so5195726a12.1;
+        Wed, 16 Apr 2025 07:14:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744812848; x=1745417648;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aQgHDDXnnzWRzJaD14GNyp8/kByAyC6tvTlmaDv4JQU=;
+        b=kBU0ozp/u6yQMyHiesVVqPGZcXCmmqcJsS2PttCIqVDFzRrs1YKUG50/CPmnuyO0rt
+         da8iad6DJkkwY6IMq9Zz5C2Oo+y99NWhVAJWtpeXpkxt01IDK05RjXurpbBmEeN/0ARi
+         7Je1aaf7N5bCeBu6aCKNlu3CbST3tr5o/Yesb2voiLb40hLZoVhYjYCeZlKn6x0vpJNI
+         hgx75579qZ9m58dLAnJuuWK37EAeKB/1bt1/oim2hwWdX2y8RjFhYtrf7PMDqwmow5ht
+         z0viyClTo4HAfdoM4xGIsr1xF62F+5hOwZy0YVPru1cb7cbwuO1PjzZgnWe7G7CCGd3m
+         28Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXFUS/kRK1dJeTQps1of4HC/TM6N3zBsc4XAWR49/N+7ImImJuPEjWfrcwrp/cQ+Ov+Uofp3b1@vger.kernel.org, AJvYcCV/k8dOtcNscr50sxDcFwchadBLpWHOXFGX/h93ul873HMk+tgm3jXS1HYHdRHmi3RrnVllyBpgtNYkq0M=@vger.kernel.org, AJvYcCWLD88mM9aAcwnChlnbOgk5sOBlSJG9LcnC4lwwbcK5H201nH+pis1dK9Q/PqBgG49fS9nX@vger.kernel.org
+X-Gm-Message-State: AOJu0YymdQA7Y4rwCUFTS7PZGITPBw2UoyE4olHu4qvo5hwwVpXq8NB/
+	26CwtrwMwtAVV39aEw21fOeAcIXWRL6eXaDeTliV4qKiUsiQW8tt
+X-Gm-Gg: ASbGncuM+mzatgapFxXqvwUP1jrK99O16UTWs1d8wsMKTzSTX5ZrcYqZUKpjWnElLmg
+	pFQCf7yNaDFMgXR3exZ109Wodpxx/JOVLMNUro9MqadG0DgxL3L2MSu6BuTJu/RwTWN/boFnTVI
+	fgJ0crj0AJuwb3Nh2Ga/w0Xof9+tFMnP4adCZcfGIJHPxUDO0K3nKO6WwrUJn1jdGu9NuHbVpM3
+	jd4bUtP4TomDOpscjgnCOSv7y84+MgkIuu3XB6k0MI3ioXR5PrVUv6jMutSC4Q4eSGJbUzel+eE
+	+XaP39AE6Rpmo7D9NERUp7Fe7nsIhmk=
+X-Google-Smtp-Source: AGHT+IF/gy9/45ncvysC9Q/2W6qeo7ZVy26R66Z4JYMUvVjVlHXtwBR64Y2bD+mMPpEWZZIP4NNGtg==
+X-Received: by 2002:a17:906:c108:b0:aca:d4f0:2b9f with SMTP id a640c23a62f3a-acb42875ecbmr212168066b.10.1744812847353;
+        Wed, 16 Apr 2025 07:14:07 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb3cdeb9f7sm133316866b.58.2025.04.16.07.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Apr 2025 07:14:06 -0700 (PDT)
+Date: Wed, 16 Apr 2025 07:14:04 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
+	aeh@meta.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	edumazet@google.com, jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Uladzislau Rezki <urezki@gmail.com>, rcu@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] Introduce simple hazard pointers for lockdep
+Message-ID: <Z/+7LMnQqtV+mnJ+@gmail.com>
+References: <20250414060055.341516-1-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,122 +82,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4f8d3018-d7e5-47e5-b99d-550f8a4011ee@gmail.com>
+In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
 
-On Tue, Apr 15, 2025 at 08:48:53PM +0200, Heiner Kallweit wrote:
-> On 15.04.2025 11:53, Niklas Cassel wrote:
-> > For a PCI controller driver with a .shutdown() callback, we will see the
-> > following warning:
-> 
-> I saw the related mail thread, IIRC it was about potential new code.
-> Is this right? Or do we talk about existing code? Then it would have
-> to be treated as fix.
+Hi Boqun,
 
-The qcom PCIe controller driver wants to add a .shutdown callback:
-https://lore.kernel.org/linux-pci/tb6kkyfgpemzacfwbg45otgcrg5ltj323y6ufjy3bw3rgri7uf@vrmmtueyg7su/T/#t
+On Sun, Apr 13, 2025 at 11:00:47PM -0700, Boqun Feng wrote:
 
-In that shutdown callback, they want to call dw_pcie_host_deinit(),
-which will call pci_stop_root_bus().
+> Overall it looks promising to me, but I would like to see how it
+> performs in the environment of Breno. Also as Paul always reminds me:
+> buggy code usually run faster, so please take a look in case I'm missing
+> something ;-) Thanks!
 
-Looking at other PCIe controller drivers:
-$ git grep -p pci_stop_root_bus
+Thanks for the patchset. I've confirmed that the wins are large on my
+environment, but, at the same magnitute of synchronize_rcu_expedited().
 
-There seems to be a lot of PCIe controller drivers that call
-pci_stop_root_bus(), but they all do it from the .remove() callback,
-not from the .shutdown() callback.
+Here are the numbers I got:
 
-Actually, I can't see any existing PCIe controller driver that calls
-pci_stop_root_bus() from the .shutdown() callback.
+	6.15-rc1 (upstream)
+		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
+		real	0m3.986s
+		user	0m0.001s
+		sys	0m0.093s
 
-So perhaps we should hold off with this patch.
-
-Adding the qcom folks to CC.
+	Your patchset on top of 6.15-rc1
+		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
+		real	0m0.072s
+		user	0m0.001s
+		sys	0m0.070s
 
 
-Kind regards,
-Niklas
+	My original proposal of using synchronize_rcu_expedited()[1]
+		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
+		real	0m0.074s
+		user	0m0.001s
+		sys	0m0.061s
 
+Link: https://lore.kernel.org/all/20250321-lockdep-v1-1-78b732d195fb@debian.org/ [1]
 
-> 
-> Existence of a shutdown callback itself is not the problem, the problem is
-> that all PCI bus devices are removed as part of shutdown handling for this
-> specific controller driver.
-> 
-> > [   12.020111] called from state HALTED
-> > [   12.020459] WARNING: CPU: 7 PID: 229 at drivers/net/phy/phy.c:1630 phy_stop+0x134/0x1a0
-> > 
-> > This is because rtl8169_down() (which calls phy_stop()) is called twice
-> > during shutdown.
-> > 
-> > First time:
-> > [   23.827764] Call trace:
-> > [   23.827765]  show_stack+0x20/0x40 (C)
-> > [   23.827774]  dump_stack_lvl+0x60/0x80
-> > [   23.827778]  dump_stack+0x18/0x24
-> > [   23.827782]  rtl8169_down+0x30/0x2a0
-> > [   23.827788]  rtl_shutdown+0xb0/0xc0
-> > [   23.827792]  pci_device_shutdown+0x3c/0x88
-> > [   23.827797]  device_shutdown+0x150/0x278
-> > [   23.827802]  kernel_restart+0x4c/0xb8
-> > 
-> > Second time:
-> > [   23.841468] Call trace:
-> > [   23.841470]  show_stack+0x20/0x40 (C)
-> > [   23.841478]  dump_stack_lvl+0x60/0x80
-> > [   23.841483]  dump_stack+0x18/0x24
-> > [   23.841486]  rtl8169_down+0x30/0x2a0
-> > [   23.841492]  rtl8169_close+0x64/0x100
-> > [   23.841496]  __dev_close_many+0xbc/0x1f0
-> > [   23.841502]  dev_close_many+0x94/0x160
-> > [   23.841505]  unregister_netdevice_many_notify+0x160/0x9d0
-> > [   23.841510]  unregister_netdevice_queue+0xf0/0x100
-> > [   23.841515]  unregister_netdev+0x2c/0x58
-> > [   23.841519]  rtl_remove_one+0xa0/0xe0
-> > [   23.841524]  pci_device_remove+0x4c/0xf8
-> > [   23.841528]  device_remove+0x54/0x90
-> > [   23.841534]  device_release_driver_internal+0x1d4/0x238
-> > [   23.841539]  device_release_driver+0x20/0x38
-> > [   23.841544]  pci_stop_bus_device+0x84/0xe0
-> > [   23.841548]  pci_stop_bus_device+0x40/0xe0
-> > [   23.841552]  pci_stop_root_bus+0x48/0x80
-> > [   23.841555]  dw_pcie_host_deinit+0x34/0xe0
-> > [   23.841559]  rockchip_pcie_shutdown+0x20/0x38
-> > [   23.841565]  platform_shutdown+0x2c/0x48
-> > [   23.841571]  device_shutdown+0x150/0x278
-> > [   23.841575]  kernel_restart+0x4c/0xb8
-> > 
-> > Add a netif_device_present() guard around the rtl8169_down() call in
-> > rtl8169_close(), to avoid rtl8169_down() from being called twice.
-> > 
-> > This matches how e.g. e1000e_close() has a netif_device_present() guard
-> > around the e1000e_down() call.
-> > 
-> This approach has at least two issues:
-> 
-> 1. Likely it breaks WoL, because now phy_detach() is called.
-> 2. r8169 shutdown callback sets device to D3hot, PCI core wakes it up again
->    for the remove callback. Now it's left in D0.
-> 
-> I'll also spend a few thoughts on how to solve this best.
-> 
-> > Signed-off-by: Niklas Cassel <cassel@kernel.org>
-> > ---
-> >  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> > index 4eebd9cb40a3..0300a06ae260 100644
-> > --- a/drivers/net/ethernet/realtek/r8169_main.c
-> > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> > @@ -4879,7 +4879,8 @@ static int rtl8169_close(struct net_device *dev)
-> >  	pm_runtime_get_sync(&pdev->dev);
-> >  
-> >  	netif_stop_queue(dev);
-> > -	rtl8169_down(tp);
-> > +	if (netif_device_present(tp->dev))
-> > +		rtl8169_down(tp);
-> >  	rtl8169_rx_clear(tp);
-> >  
-> >  	free_irq(tp->irq, tp);
-> 
+Thanks for working on it,
+--breno
 
