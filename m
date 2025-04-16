@@ -1,127 +1,218 @@
-Return-Path: <netdev+bounces-183322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EF9A9059D
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:10:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F6DA905AC
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 313AF464375
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:08:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8FF16A680
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6672C219A79;
-	Wed, 16 Apr 2025 13:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4C722156A;
+	Wed, 16 Apr 2025 14:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R83jD2XH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZdym7W6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10481FCFEE
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEF71FF1C7;
+	Wed, 16 Apr 2025 14:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744811911; cv=none; b=ZvWy+B4PgMfb2RU7TdaervfIWUms9jGd3DqSiJf7q4/HzXa2zr/5czjvWXjHU8hWXxI3oVs6+Snix7Yku//bnmpSviVAd0Sai3Gpyab7p+EBGGqSbaWzZYFgLqbLOmy+ZIQR9KiOSO8+CSZfCEp31HVjuxRO7y9xJ74NdMQrRGI=
+	t=1744812006; cv=none; b=TdoVWMcuLu528EeDdCJ8CKom1XNOIfi9ATt5X1ll+GFHbj9IoVs530BKR76yS5FaBezRUolrk8mK+lnzi+2FbltNFkNVtKXGGQYJ8OKJ4IQO7revJ3RxOy3BOL771Qjpr8maSGiaNLCcU7K4e4lZHozO7Roe+E1Flp0n95sodT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744811911; c=relaxed/simple;
-	bh=8EM9BruECeiQqpmSu5JthfQXoLeNBFmHqAhot8Jq1Xs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fB8yX811JFTE5VGXEdMwsFZUoCtS71DY90mLGURmNf9fnepIuZLbPUZAzI30oFid329MV8J27ip+O3DryBj7anoffle1S3dGAsPV5d3+NLBwpJe1NLr6yMAWB2jZltouAWwZUaevDS+fVBQS0TbBcroVl+J2YUszI/9v7tGUc7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R83jD2XH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744811908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1N10mZ+kpKiQYbX+sNKEw8ESo27Q4EehsQAThfgN6Kc=;
-	b=R83jD2XH/vF/LWCJIPb8Nv1BXQCJPM+aQX4LtgwJoSX/scr+8rkNJoi3WHc2hk58BQkiDK
-	KZnjb6kzLo2HHxCZ+bt5stVsWL+Epn9a4vbdJzJarY9MTsXmra777lifDQtKfaAPED9Qpf
-	vLHYwhOpmJB9d2898tXY1XUH9De2KJw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-213-8In7otUmMkm92a4_fp-0uw-1; Wed, 16 Apr 2025 09:58:27 -0400
-X-MC-Unique: 8In7otUmMkm92a4_fp-0uw-1
-X-Mimecast-MFC-AGG-ID: 8In7otUmMkm92a4_fp-0uw_1744811906
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac31adc55e4so546467966b.3
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 06:58:27 -0700 (PDT)
+	s=arc-20240116; t=1744812006; c=relaxed/simple;
+	bh=luuZwnA57py/IT0wbmPZ1ZWYUmQInFWtDeYolOtf3Do=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NnOOq9qrPizMPl4MgpDNadxUi+ktoCMRe6Mqmi4PKO/yvI+VKQhUUfues+o1ogb8YGO0VnIGobhYMw8bDwijmdbHHHrj2sT9ADAGsUt19ZZLr3k4L82Uq8sP1ziCiQMZNV5uj6XEJ0K/EZJ9goO+yF835RiALMxNZOZttmTm12c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZdym7W6; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e6f4b3ebe5so11825691a12.0;
+        Wed, 16 Apr 2025 07:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744812002; x=1745416802; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IUgvm+DiPpmDjC2mORrvt+5jPl+d2nrcr0fpozEFS0o=;
+        b=AZdym7W6Je0cYSGQ5CDVv9gjbcqfNwb/w8VNxxPhsYpi8o9t68xIDw5ya2xFpCcw8v
+         llUEMIweqKhqAVNr47RQkOxhuCokp0UwOu8Z3EdffpsVbgK3Xb0scaQHHkAqVQ9YkCkM
+         ESY70AxFIRJwns4HorI9ju8GYoalH0+ytjNfQP5FVZEwrAR0fok9fEeiOWbG6GsXzw4l
+         eQB92/2P2AtlkY/h6z3OCKrrduOo24nEN/UVHhYldnDBvTzMswym2TeWy2Hi1z1zG6NY
+         frBKlBf8uhAjiUfsdctssdk1Db+3LsqayXhpiZzbNBWyHxezp+VSsIuoKSTFBJdCrE3T
+         iZrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744811906; x=1745416706;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1N10mZ+kpKiQYbX+sNKEw8ESo27Q4EehsQAThfgN6Kc=;
-        b=sGdEIKeF96Ogarzr+u1F97sF2vL5qoEh9PLW2KrlVuq2SjVaVOgAc91MJcVMDM3kuh
-         7j+TUMdxdDY/nDE1EtNCvW0qS+uqhV71KsTnuSxLyRCLGrm1Se5cMzt66nV0ILKZs8LT
-         hyQ0povMnOf1gPt/NcczB3P6yMpAZ9xZY7qYnesxA4SWZ8HoBdycFG8yxS/io3TVgp4l
-         TJlebE/U7diHdUiAPsWK6BNKXJyI8JBY6CvmwF0dIBNWR9fS9xusPXQN7i2oek9AAhWs
-         7P29KlYLg9S1/BZaNMvlJJZOYAN7ZM3A4Bnmq6wXWaGMB8DkjtI6tj8cF0XLByD7JR61
-         Wbjw==
-X-Gm-Message-State: AOJu0Yxn7ZgFl2GBYZoKcDpGYJk8qXTznZ3+kZnTeJK2SEcmgJ1kZYi7
-	jCP3r6A8jfbDqbBFLX98mQbBq97FnLzJG6YoTUCF4tI+S74sCxrD8s2FhzCGje40cFlBod1td6/
-	+Je5OPX1ome/E9kvCBeAf7IFy6zc6PcoUG4tkbnB85IOEiTXi7pyCSQ==
-X-Gm-Gg: ASbGnctn85v0M/SQ9YIY97AvEmHhT3Tc86E4U3PN7RKIDCqAmsfYToUSUmPq894u+a9
-	ssjpVKEnopTsu3paJjJj+OACFUmKh0BLJgozMl8ve3vPep4urFC1jSc6/P3BaQQ2lmVt5atStBr
-	x7QsMx5gBsTyvZKMVVHZ+lV2XvBIPv1ZmhZErQ4hC8vTtPt0YS3+SJn7GbZkhu7a1hhbKcP/0S4
-	VZE1024EbKCaP3w8Hv0sNbs7UlrgbB/mjOn5kphJj3wdHDP2NKoL8a5iz6kRuHKkC9/UzCmJ+e1
-	uoJjaySn/BJtMvpUuN2M8QVUAKxdKO1QI48m
-X-Received: by 2002:a17:907:9494:b0:acb:349d:f909 with SMTP id a640c23a62f3a-acb42a50028mr161011466b.31.1744811906204;
-        Wed, 16 Apr 2025 06:58:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzy9DzmjmdBXDssMZ4LwJxwTRh/bRvt8RWJJn9qTge4GJkEWLxrIw1aLgJPYwpUtVRtYJYQA==
-X-Received: by 2002:a17:907:9494:b0:acb:349d:f909 with SMTP id a640c23a62f3a-acb42a50028mr161009266b.31.1744811905828;
-        Wed, 16 Apr 2025 06:58:25 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb3d128583sm136615866b.98.2025.04.16.06.58.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 06:58:25 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 31E07199293F; Wed, 16 Apr 2025 15:58:24 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, tom@herbertland.com, Eric
- Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org,
- makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
-Subject: Re: [PATCH net-next V4 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-In-Reply-To: <20250416063813.75fb83dc@kernel.org>
-References: <174472463778.274639.12670590457453196991.stgit@firesoul>
- <174472470529.274639.17026526070544068280.stgit@firesoul>
- <20250416063813.75fb83dc@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 16 Apr 2025 15:58:24 +0200
-Message-ID: <87r01si4xr.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1744812002; x=1745416802;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IUgvm+DiPpmDjC2mORrvt+5jPl+d2nrcr0fpozEFS0o=;
+        b=vu/lJQaPJOTbyfm58LEImWy5aNDNU6JjpZO/MIIA5g+lcb2yK71i6NjCEgHc/+0P1v
+         SdCZnuSnGpBKA1GIdnaFCyZY8vemotwlfdtFlK9YkFZpY/S4FyBVRyxEOb2uAHGXGuV8
+         VtOjLYUHHKRcE/SyyRpxz2JyJXwPakqjMW1UQI02EqWAI8OG9RkF3vIFH1wM5cC7OqTk
+         wY8KOc3nNG4AFDzZb2LafOAvXmrttyz7nTqLWL5mUAiCNX3xYxaIiaZVNll/33dlxVFB
+         lGtIL6fb6u7Im2xJ/Yc6WpEi2jdfdDaQ1CJ+tdTNX/I4AacyxHYWr9m0bKLdWayB+J4a
+         9nAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdvaObVQB8qbqUIw5i6LvOncKL6XGZ2ApkuzVcHimIM6OIBryF1vSNkm4y22vShEmWR9NxkSHn@vger.kernel.org, AJvYcCXgCmqk3hjNM6nxJ30QnfyYhJgN97pUwy9yewOCepTMxZuwCs1YnLTWbrRRgSoIdO6s8j8j1ooo50bubeM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyISnh+pJEdNWqukeapcxHT8pRqLtO71jkDoDIS4IEUjwolIvjS
+	Oeg2cwlu9+tk7igpsjfMM+NJp1QNtbG9qSFWx5UCwRzSOUBO428GB24P9TDp/SHDAYKCTSbSr69
+	p4+JMapfqHlSIeuetNW2eatYoUIs=
+X-Gm-Gg: ASbGncv5Rg2aNzOlD6RV5d76hVhQ2tTUNlWpICmd0EexmmA+sONxQAM9NivzZ/wRfHW
+	IQvFkiH2Wr1McwYGepGAf+zm3usgCKnheidCTsm3AJ78CcSPp00xTqT/Xjoa/bgZKRbMEJhNWkV
+	Fi7I8KVjDfGwwVmxXoS2HA
+X-Google-Smtp-Source: AGHT+IFybF67oGA69tGhjx227ggX9ZUR73/3iBTjwBDtuR4eg/2zNDJZjb1T1t5XXyD0pv+unM3x1++ujHfZ4rHc6yY=
+X-Received: by 2002:a17:907:7b87:b0:ac7:f2b9:ec3b with SMTP id
+ a640c23a62f3a-acb428748d0mr160511966b.4.1744812002038; Wed, 16 Apr 2025
+ 07:00:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250414085412.117120-1-maimon.sagi@gmail.com>
+ <b6aea926-ebb6-48fe-a1be-6f428a648eae@linux.dev> <CAMuE1bG_+qj++Q0OXfBe3Z_aA-zFj3nmzr9CHCuKJ_Jr19oWEg@mail.gmail.com>
+ <aa9a1485-0a0b-442b-b126-a00ee5d4801c@linux.dev> <CAMuE1bETL1+sGo9wq46O=Ad-_aa8xNLK0kWC63Mm5rTFdebp=w@mail.gmail.com>
+ <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev> <CAMuE1bHsPeaokc-_qR4Ai8o=b3Qpbosv6MiR5_XufyRTtE4QFQ@mail.gmail.com>
+ <44b67f86-ed27-49e8-9e15-917fa2b75a60@linux.dev> <CAMuE1bFk=LFTWfu8RFJeSoPtjO8ieJDdEHhHpKYr4QxqB-7BBg@mail.gmail.com>
+ <507eb775-d7df-4dd2-a7d1-626d5a51c1de@linux.dev>
+In-Reply-To: <507eb775-d7df-4dd2-a7d1-626d5a51c1de@linux.dev>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Wed, 16 Apr 2025 16:59:33 +0300
+X-Gm-Features: ATxdqUFIjnpeuKHyLdCEt5PwV7Ym-YP21Nq8a5H3aqMI-LdF0ngvFWyHmxIZvzM
+Message-ID: <CAMuE1bFLB24ELFOSG=v+0hxJ+a+KGNWc8=Z3=kbXOs03PtLFOA@mail.gmail.com>
+Subject: Re: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: jonathan.lemon@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> On Tue, 15 Apr 2025 15:45:05 +0200 Jesper Dangaard Brouer wrote:
->> In production, we're seeing TX drops on veth devices when the ptr_ring
->> fills up. This can occur when NAPI mode is enabled, though it's
->> relatively rare. However, with threaded NAPI - which we use in
->> production - the drops become significantly more frequent.
+On Wed, Apr 16, 2025 at 1:35=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
 >
-> It splats:
+> On 16/04/2025 07:33, Sagi Maimon wrote:
+> > On Mon, Apr 14, 2025 at 4:55=E2=80=AFPM Vadim Fedorenko
+> > <vadim.fedorenko@linux.dev> wrote:
+> >>
+> >> On 14/04/2025 14:43, Sagi Maimon wrote:
+> >>> On Mon, Apr 14, 2025 at 4:01=E2=80=AFPM Vadim Fedorenko
+> >>> <vadim.fedorenko@linux.dev> wrote:
+> >>>>
+> >>>> On 14/04/2025 12:38, Sagi Maimon wrote:
+> >>>>> On Mon, Apr 14, 2025 at 2:09=E2=80=AFPM Vadim Fedorenko
+> >>>>> <vadim.fedorenko@linux.dev> wrote:
+> >>>>>>
+> >>>>>> On 14/04/2025 11:56, Sagi Maimon wrote:
+> >>>>>>> On Mon, Apr 14, 2025 at 12:37=E2=80=AFPM Vadim Fedorenko
+> >>>>>>> <vadim.fedorenko@linux.dev> wrote:
+> >>>>>>>>
+> >>>>>>>> On 14/04/2025 09:54, Sagi Maimon wrote:
+> >>>>>>>>> Sysfs signal show operations can invoke _signal_summary_show be=
+fore
+> >>>>>>>>> signal_out array elements are initialized, causing a NULL point=
+er
+> >>>>>>>>> dereference. Add NULL checks for signal_out elements to prevent=
+ kernel
+> >>>>>>>>> crashes.
+> >>>>>>>>>
+> >>>>>>>>> Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and updat=
+e sysfs nodes")
+> >>>>>>>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> >>>>>>>>> ---
+> >>>>>>>>>       drivers/ptp/ptp_ocp.c | 3 +++
+> >>>>>>>>>       1 file changed, 3 insertions(+)
+> >>>>>>>>>
+> >>>>>>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> >>>>>>>>> index 7945c6be1f7c..4c7893539cec 100644
+> >>>>>>>>> --- a/drivers/ptp/ptp_ocp.c
+> >>>>>>>>> +++ b/drivers/ptp/ptp_ocp.c
+> >>>>>>>>> @@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s, =
+struct ptp_ocp *bp, int nr)
+> >>>>>>>>>           bool on;
+> >>>>>>>>>           u32 val;
+> >>>>>>>>>
+> >>>>>>>>> +     if (!bp->signal_out[nr])
+> >>>>>>>>> +             return;
+> >>>>>>>>> +
+> >>>>>>>>>           on =3D signal->running;
+> >>>>>>>>>           sprintf(label, "GEN%d", nr + 1);
+> >>>>>>>>>           seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%=
+llu pol:%d",
+> >>>>>>>>
+> >>>>>>>> That's not correct, the dereference of bp->signal_out[nr] happen=
+s before
+> >>>>>>>> the check. But I just wonder how can that even happen?
+> >>>>>>>>
+> >>>>>>> The scenario (our case): on ptp_ocp_adva_board_init we
+> >>>>>>> initiate only signals 0 and 1 so 2 and 3 are NULL.
+> >>>>>>> Later ptp_ocp_summary_show runs on all 4 signals and calls _signa=
+l_summary_show
+> >>>>>>> when calling signal 2 or 3  the dereference occurs.
+> >>>>>>> can you please explain: " the dereference of bp->signal_out[nr] h=
+appens before
+> >>>>>>> the check", where exactly? do you mean in those lines:
+> >>>>>>> struct signal_reg __iomem *reg =3D bp->signal_out[nr]->mem;
+> >>>>>>        ^^^
+> >>>>>> yes, this is the line which dereferences the pointer.
+> >>>>>>
+> >>>>>> but in case you have only 2 pins to configure, why the driver expo=
+ses 4
+> >>>>>> SMAs? You can simply adjust the attributes (adva_timecard_attrs).
+> >>>>>>
+> >>>>> I can (and will) expose only 2 sma in adva_timecard_attrs, but stil=
+l
+> >>>>> ptp_ocp_summary_show runs
+> >>>>> on all 4 signals and not only on the on that exposed, is it not a b=
+ug?
+> >>>>
+> >>>> Yeah, it's a bug, but different one, and we have to fix it other way=
+.
+> >>>>
+> >>> Do you want to instruct me how to fix it , or will you fix it?
+> >>
+> >> well, the original device structure was not designed to have the amoun=
+t
+> >> of SMAs less than 4. We have to introduce another field to store actua=
+l
+> >> amount of SMAs to work with, and adjust the code to check the value. T=
+he
+> >> best solution would be to keep maximum amount of 4 SMAs in the structu=
+re
+> >> but create a helper which will init new field and will have
+> >> BUILD_BUG_ON() to prevent having more SMAs than fixed size array for
+> >> them. That will solve your problem, but I will need to check it on the
+> >> HW we run.
+> >>
+> > just to be clear you will write the fix and test it on your HW, so you
+> > don't want me to write the fix?
 >
-> [ 5319.025772][ C1] dump_stack_lvl (lib/dump_stack.c:123) 
-> [ 5319.025786][ C1] lockdep_rcu_suspicious (kernel/locking/lockdep.c:6866) 
-> [ 5319.025797][ C1] veth_xdp_rcv (drivers/net/veth.c:907 (discriminator 9)) 
-> [ 5319.025850][ C1] veth_poll (drivers/net/veth.c:977)
-
-I believe the way to silence this one is to use:
-
-rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-
-instead of just rcu_dereference()
-
--Toke
-
+> Well, it would be great if you can write the code which will make SMA
+> functions flexible to the amount of pin the HW has. All our HW has fixed
+> amount of 4 pins that's why the driver was coded with constants. Now
+> your hardware has slightly different amount of pins, so it needs
+> adjustments to the driver to work properly. I just want to be sure that
+> any adjustments will not break my HW - that's what I meant saying I'll
+> test it.
+>
+Just to be clear (correct me please if I am wrong):
+I will write the code, then create a patch and upstream to the vanilla
+you will test my change on your HW and only then approve the patch
+> >>>>>>> struct ptp_ocp_signal *signal =3D &bp->signal[nr];
+> >>>>>>>> I believe the proper fix is to move ptp_ocp_attr_group_add() clo=
+ser to
+> >>>>>>>> the end of ptp_ocp_adva_board_init() like it's done for other bo=
+ards.
+> >>>>>>>>
+> >>>>>>>> --
+> >>>>>>>> pw-bot: cr
+> >>>>>>
+> >>>>
+> >>
+>
 
