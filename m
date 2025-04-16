@@ -1,124 +1,159 @@
-Return-Path: <netdev+bounces-183330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E4FA9061C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:21:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E20A9061E
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 16:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F42F1891026
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67089168891
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAB5205519;
-	Wed, 16 Apr 2025 14:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05BF1F9A89;
+	Wed, 16 Apr 2025 14:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="JLKUSSSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8628D192D68;
-	Wed, 16 Apr 2025 14:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988811F8724;
+	Wed, 16 Apr 2025 14:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744812852; cv=none; b=W8u9eV/esLiCVMRIl3bphG/3C7qoznDa1dNN6SX0edZ8sQ/DPnYcEJkvd+XMyLE+R2xAWY1oddLzbeLMVZH7o3sf8AhCS+J907CpFXmpjWUYQSwKn/bXU7zQn9xZBrJkBFrk5GfzJfdmoI1/GM6krkwJl5lk0qdgxqNpgNdFp8Y=
+	t=1744812983; cv=none; b=SkzMMyLWr2Dl1pwfwoOxJUA5EGLAbFQpogQQQUdkxAA/ZFNxDke6T+TPJRuqmaS1r1oUN18yeSr2TlOo1u0o5Eb6P37mRoyhgGkKphs3CV0pkk39AXnxnJxNLZgQrkdiveGw2u5ZoxV2/rLjZBFQbwmrnEI8qkuC+ASEKiH1d20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744812852; c=relaxed/simple;
-	bh=P8RyqmbFkaSkJG3Ix7pdpJZrWqUmUydL79exEYIicoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iy8XAcCVVqPWJ4LihS9JeyGdPAnFOZORvmOQh4gF/6XehZ+OTX8seC0uvTj+VmlYfSBImYvqX/iD0lboSy6Z/IiBzIdERvn1fzHpgKspFYQqsp4/zHJi7yxrg9eydhLfJR6Q/D/OaAqOqolgYxr0i5QrqivVEn7jk4gl+8Yw9Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5f435c9f2f9so5195726a12.1;
-        Wed, 16 Apr 2025 07:14:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744812848; x=1745417648;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aQgHDDXnnzWRzJaD14GNyp8/kByAyC6tvTlmaDv4JQU=;
-        b=kBU0ozp/u6yQMyHiesVVqPGZcXCmmqcJsS2PttCIqVDFzRrs1YKUG50/CPmnuyO0rt
-         da8iad6DJkkwY6IMq9Zz5C2Oo+y99NWhVAJWtpeXpkxt01IDK05RjXurpbBmEeN/0ARi
-         7Je1aaf7N5bCeBu6aCKNlu3CbST3tr5o/Yesb2voiLb40hLZoVhYjYCeZlKn6x0vpJNI
-         hgx75579qZ9m58dLAnJuuWK37EAeKB/1bt1/oim2hwWdX2y8RjFhYtrf7PMDqwmow5ht
-         z0viyClTo4HAfdoM4xGIsr1xF62F+5hOwZy0YVPru1cb7cbwuO1PjzZgnWe7G7CCGd3m
-         28Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXFUS/kRK1dJeTQps1of4HC/TM6N3zBsc4XAWR49/N+7ImImJuPEjWfrcwrp/cQ+Ov+Uofp3b1@vger.kernel.org, AJvYcCV/k8dOtcNscr50sxDcFwchadBLpWHOXFGX/h93ul873HMk+tgm3jXS1HYHdRHmi3RrnVllyBpgtNYkq0M=@vger.kernel.org, AJvYcCWLD88mM9aAcwnChlnbOgk5sOBlSJG9LcnC4lwwbcK5H201nH+pis1dK9Q/PqBgG49fS9nX@vger.kernel.org
-X-Gm-Message-State: AOJu0YymdQA7Y4rwCUFTS7PZGITPBw2UoyE4olHu4qvo5hwwVpXq8NB/
-	26CwtrwMwtAVV39aEw21fOeAcIXWRL6eXaDeTliV4qKiUsiQW8tt
-X-Gm-Gg: ASbGncuM+mzatgapFxXqvwUP1jrK99O16UTWs1d8wsMKTzSTX5ZrcYqZUKpjWnElLmg
-	pFQCf7yNaDFMgXR3exZ109Wodpxx/JOVLMNUro9MqadG0DgxL3L2MSu6BuTJu/RwTWN/boFnTVI
-	fgJ0crj0AJuwb3Nh2Ga/w0Xof9+tFMnP4adCZcfGIJHPxUDO0K3nKO6WwrUJn1jdGu9NuHbVpM3
-	jd4bUtP4TomDOpscjgnCOSv7y84+MgkIuu3XB6k0MI3ioXR5PrVUv6jMutSC4Q4eSGJbUzel+eE
-	+XaP39AE6Rpmo7D9NERUp7Fe7nsIhmk=
-X-Google-Smtp-Source: AGHT+IF/gy9/45ncvysC9Q/2W6qeo7ZVy26R66Z4JYMUvVjVlHXtwBR64Y2bD+mMPpEWZZIP4NNGtg==
-X-Received: by 2002:a17:906:c108:b0:aca:d4f0:2b9f with SMTP id a640c23a62f3a-acb42875ecbmr212168066b.10.1744812847353;
-        Wed, 16 Apr 2025 07:14:07 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:4::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb3cdeb9f7sm133316866b.58.2025.04.16.07.14.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 07:14:06 -0700 (PDT)
-Date: Wed, 16 Apr 2025 07:14:04 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
-	aeh@meta.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	edumazet@google.com, jhs@mojatatu.com, kernel-team@meta.com,
-	Erik Lundgren <elundgren@meta.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Uladzislau Rezki <urezki@gmail.com>, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH 0/8] Introduce simple hazard pointers for lockdep
-Message-ID: <Z/+7LMnQqtV+mnJ+@gmail.com>
-References: <20250414060055.341516-1-boqun.feng@gmail.com>
+	s=arc-20240116; t=1744812983; c=relaxed/simple;
+	bh=7Axh52coiOI0JKbFKrbXVFHvbqfMz5ZjGnycArF5irU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=X6DfWKppLklFgiI3YRQ4TTIuj7zHGaFAzzwO6LhVng5Dq0DLtL6sWP4DNw7Q2/RfJV+l/Dh9ANe0d/ATFqupf4NAOpEwUGbXKZ+kadC7wessO2K+hdrt6ffuyqXODfpFBoC82sKVYCfgtSuWZZTzxGU3vgfRyuFxVilEUza4a20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=JLKUSSSr; arc=none smtp.client-ip=212.227.126.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1744812946; x=1745417746; i=christian@heusel.eu;
+	bh=tKvDn5Ua0J+JdrBJCtSOPWhyIypPlWKpqTtOxhNcG2E=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:
+	 MIME-Version:Content-Type:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=JLKUSSSrz57grczY/IZYd7uOZ/KZDhu2LfCe/yBsTCeypwCvcYqZO4gThZLLCi2N
+	 AkLRXfdUHzystbaQPbnHZPo4SHmeyX6MfsnYTaaMzKSsrcpyuI+x20RR0q7BH+da5
+	 CK7KoJw0NcHNkWIgr3ZzJ26yjZOkSpIZzAGEiffdxX5OFyHHAD+kSCRetvlesgq6N
+	 9LmNCOJuKTKJQUJuWnDk8BHdyOPO4gJzGvq/h6CHhBRt+mbyTDJYc1iD5L4LYgsgI
+	 b6e59USXtHtmwtz1jQmoiwlGKQSAyuPpzSTdFuVoyJFadq+cRwG4QVk5Nrr6mXBM7
+	 oXMJD18jw2Xo3NzrqQ==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([80.187.65.171]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1M5wTr-1txbQn1gQl-00Ahgn; Wed, 16 Apr 2025 16:15:46 +0200
+Date: Wed, 16 Apr 2025 16:15:40 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: ubomir Rintel <lkundrak@v3.sk>, Jakub Kicinski <kuba@kernel.org>
+Cc: michal.pecio@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, regressions@lists.linux.dev
+Subject: [REGRESSION][BISECTED] USB tethering broken after 67d1a8956d2d
+Message-ID: <e0df2d85-1296-4317-b717-bd757e3ab928@heusel.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dpdgofzlybgncae3"
 Content-Disposition: inline
-In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
+X-Provags-ID: V03:K1:M1cGX4HvEWB6CveN0yndWMzqbLMNgEtlLw4dlX+1LMpDNhPo/3U
+ h97aHpaX2K068ENHwSRaQ+VmNPOjAVTnOXbKzbcbGhZEwIw4hnVzz1VvEk1yBA9yRu4jxdP
+ MRwHAKr+nEv0ynx2HoldplTwkSiMWf8wBxk7A40kVDADeLnWJt9mAORhS+xWG/caHmAHxE9
+ mrlkIWU4Dfe34gk3liLaA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:g7VIWmAnTB4=;aOXjj6VplxltSQP2SQCN/TnO6Bh
+ Oc5YXd5y1iSsI8mPE+b7A3rKVerMgoqMnvuekqA1DRy0+suUtQrtt/Ki3piTFON8Xk+q+NtuI
+ Bkbmz88oqMZeEA0ioXSLHPNd0kuxjoDTD+Is4UCrtEUl8MYbTYEjvGWViNMm/ND+SA/LdWvXa
+ 04/JCnFSCe0TaVIP1pAda9aJ+FV5Lbja6akDMJC6DDY/CYaCi8991dweYrSgqE9VDkLiqdaMb
+ RAz3yJZ3DuBkIEZ8BHGPL7Lu39R/UYXS0ZqMo/EASaKoT/mksUdQZE6xKRpXbyxCkMCo0MChQ
+ J2MAME2BUsOVvUlYZgdnJ3A2UVz5B1iH0Z5DblVl/ZLPlNsZNi8YKkp1bYFhYDm6TVogOZCxG
+ 00Rzu4Fhfgll474I/25+gkdgAFj9cB1nD0fEBRvZjfr93CNiih09Zs5GEL7162pMHZjBKMo5e
+ VFbxzmPoOgLonzLUOPpX3TS2y8+PF/3TszSA6C7Sjxbg2XqJAw814osmaQbbtlhEg5ws4Pvqz
+ b/umLLy18GSj70y8Bp/FCLl7FNeC9YiMfLFuUdquDu5NN3trvnZLclPE4gDK+zutwqad3WEST
+ /JZbPierTG+8+15ItM9e1ldHzC7UzAwSrZc5PknVsTC2rSBRLZ7MISwXgO+o6Gw0rGGgkBpbm
+ yi2b6I8S+aRvZ8pXHS1MCOrEqTpwh5LdXzBiEKYXvT2zfk0CCJayLFBifY25q2SznbJV9RY8P
+ 95fZ5Mu1LRhuPwW7AUQLQGoESWX5DcpGaY2c866BTT5gqtDbuhDFXDi/mVN/HcMQaDbHcVty1
+ 3owisgkbZA3WzDeEdZQKtMLMwkyxro9RE/A295OJlnNKBt9dsx2qZc7iAfRgascGgZbZhqxBl
+ mVynxIMEQgpEbfeKrL+dglRq2Pd4U1eWmRHH3DJw4evdLSpAK13NullIVZFYD1ty/ZDBoVDLP
+ GCeR9zGjWk5XWRA4NQNPMYtbRxiY5CJmna/tyopbLYhRX7o1is5EQ8SbR8RHFRu3v+vhvepJI
+ nn9ffoYjwVui/EdaTkbOqsbnxmVKDXMs4KAOHbAJz92n5r8DSXJw1CXE1TEAfJwdOht10qSCH
+ qwIFdTThPh0jsdNjtnDBxLn9WkEPF7NkqlbFY6fqeV00+98tUau0K2CeI9rzfEg9Lh4+gcTAD
+ opb8iOp/TQw81G9BzgcNcwxFjyRu5b5K+wew3zETfH/9bQPmeSIo0mkd2k8goS7o8Mng9CSmI
+ vaN9EeZMfjb/6OA2ReTwx/PgKh060ZCRX4NKMwmBGGEKR4bJKzD99k8GrfLTs95lAbspXHOS7
+ N2KC9soLh/JQRU+jny4Z5o6oO8MmfBkg8dCPQH3O4wN2bsKwaJUEY99TQkEajfvhXuVv2yknf
+ XTu9lfaZ4xUiN6Buc/lR+CcG5G7g8YHx7xrE8=
 
-Hi Boqun,
 
-On Sun, Apr 13, 2025 at 11:00:47PM -0700, Boqun Feng wrote:
+--dpdgofzlybgncae3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: [REGRESSION][BISECTED] USB tethering broken after 67d1a8956d2d
+MIME-Version: 1.0
 
-> Overall it looks promising to me, but I would like to see how it
-> performs in the environment of Breno. Also as Paul always reminds me:
-> buggy code usually run faster, so please take a look in case I'm missing
-> something ;-) Thanks!
+Hello everyone,
 
-Thanks for the patchset. I've confirmed that the wins are large on my
-environment, but, at the same magnitute of synchronize_rcu_expedited().
+I have recently noticed multiple issues popping up in the Arch Linux
+Support fora and in the Gentoo bugtracker (see links below) where people
+could not use USB tethering anymore after upgrading to 6.14.2.
 
-Here are the numbers I got:
+Micha=C5=82 Pecio on the Kernel Bugzilla eyeballed the issue within the
+mainline kernel tree to the following commit (that was backported to
+stable):
 
-	6.15-rc1 (upstream)
-		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
-		real	0m3.986s
-		user	0m0.001s
-		sys	0m0.093s
+    67d1a8956d2d ("rndis_host: Flag RNDIS modems as WWAN devices")
 
-	Your patchset on top of 6.15-rc1
-		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
-		real	0m0.072s
-		user	0m0.001s
-		sys	0m0.070s
+The error is still present in the latest mainline release 6.15-rc2 and
+reverting the culprit on top of mainline fixes the issue.
 
+Also the issue (as stated above) is already reported on the Kernel
+Bugzilla but it seems like none of the actual developers has spotted it
+yet, hence I'm amplifying it to the mailing lists.
 
-	My original proposal of using synchronize_rcu_expedited()[1]
-		# time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
-		real	0m0.074s
-		user	0m0.001s
-		sys	0m0.061s
+I have attached a dmesg output from a good boot (6.15-rc2 with the patch
+reverted) and one from where the failure occurs (regular 6.15-rc2). I'm
+happy to test any debug patches or provide more information if needed.
 
-Link: https://lore.kernel.org/all/20250321-lockdep-v1-1-78b732d195fb@debian.org/ [1]
+Greeting,
+Chris
 
-Thanks for working on it,
---breno
+---
+
+#regzbot introduced: 67d1a8956d2d
+#regzbot title: rndis_host: USB tethering broken
+#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=3D220002
+#regzbot link: https://bugs.gentoo.org/953555
+#regzbot link: https://bbs.archlinux.org/viewtopic.php?id=3D304892
+
+--dpdgofzlybgncae3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmf/u4wACgkQwEfU8yi1
+JYUweA//fIBxW7+VlDgryoJTXkcwMN+yqBtXA5y6rbEGziJlPoTkPscIY1WxKCge
+DmGmuExalZTmOKJrECUgpg1bvDOt+ykXcZuih058lgSUwXGcijDww7m1+rEcRjQ7
+WMenwzpEtK7EQ1hgVkm8dxrHW2XjDDT4rrm18W/Ne0KDoUzfvAUP1xqnF6VJ7H7u
+tB2F5lEhN2qHq7Ax9+Fh3Rb3BcNEn/niz0tysMn2FJTSXFujDaTcuUUqh9Kfrq3a
+i2OM4cPE9kI2IO8yka2s5W5Z16Srl0Y+ljXo3shjiNoUV1CPRlJen+3PYuT2xfq7
+iKLqEBkrbTep7SfNpDSKiDvt2LsNy3uJePXtMyzLkt9wV7vnhs2J5Dq5Wt7EpZV0
+NjfTCWx8Syl/YbL1NqvwIoZn5D3eVWprdVz24b6rZf4dRK3itBnFG9uRt4LBN4aZ
+bfyWxIpCkIyEBLiqCfgrl/ya57rto0rvrY4PUuFDIyuVfdQhkrk9SASQ2gxt2TPE
+K4CJkMbBteYzRlkBSWokJPL/EvU1C9cCIo90K8QH35wGUYcTeV8d84tcEfNKgxES
+SO4yTWlG7Sh4w8pimjQsNGvLN+IXoVo1ZZRJik7Y6bpBLjHZqdOhblHoQwiYGxrp
+edj/rbJnGDH/bfLPyXvwS4rR/bEUAwiyTIUlGgT4V3y9Fkfg6aA=
+=JY64
+-----END PGP SIGNATURE-----
+
+--dpdgofzlybgncae3--
 
