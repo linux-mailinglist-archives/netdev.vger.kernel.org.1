@@ -1,181 +1,138 @@
-Return-Path: <netdev+bounces-183452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E4DA90B68
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:38:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA13DA90B6D
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:39:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF7E17E71B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:38:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 454103B3FEC
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73771223704;
-	Wed, 16 Apr 2025 18:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8022221F06;
+	Wed, 16 Apr 2025 18:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="ozEUG8Vr"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Qqo1+7bO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.universe-factory.net (osgiliath.universe-factory.net [141.95.161.142])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B153221F07;
-	Wed, 16 Apr 2025 18:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.161.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4B2222B0;
+	Wed, 16 Apr 2025 18:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744828713; cv=none; b=Mbnsp91LUeZdH4eOHMxvb5W/HpO2X3MFbmChRafVR46X7GjK1jOYxegPCbvrFEZboDI+GhnY+Idcmj+7KejGhF+fOyahLrADrwE6ZO4b2CT0zcuj6E3swBXcl3FjOI18fhph7QcpsgmM/NfQ2DXXmFQivnBmtZ5Elv12EmA2I+g=
+	t=1744828751; cv=none; b=E4JaEXN0r3fsdfKqQjwrCNxD0sj0CPhRBuvVl4nqu6kUJo6+C86SOw8gziiODN/I4hb+VYZ7T1FBK2/I3nsAE99ET3tFl4KxdKfMY4BADOzVPrEJL00FDyoUnYNcR6vJYBRHQBtSNnZ9hDkVk1+QolxKWr4ONEo1yYnvQl3NMHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744828713; c=relaxed/simple;
-	bh=zglIdbC5Tg511EtnlgXHyL4QiGFnusIxv7OoZEMwEus=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hVCcXEuh0OKKoyRLKHSeBe2kQQdEXQyzq8zcQJMXDxOlt2dmnNgGQ4kzVuW5IqY+MXMVaeKfdp1lEiZK75tsLLmPpq3va+/KF5rhMGHiPO5hH1NY80nJFs+Gqi0NsuvzbRqIogpDhaffOLhULcr75aW4Y/alFWckDuhblSiOkoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=ozEUG8Vr; arc=none smtp.client-ip=141.95.161.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=universe-factory.net;
-	s=dkim; t=1744828700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XJDMhfldMO0Uz3R/dGP3WNaSTXv6Xbup3WKyLVrNux4=;
-	b=ozEUG8Vr2QfwYFS+57Y9O4FqUK/BOGKXxyq/rOt5lZ9faT2TiZ7a2d/6UGtkqXJUmgMaI1
-	6eQ2VhSY4KeJ1DW/t3zwmXo2rG9ur51Xff01bYip8xRp4Kwu36BqOxZEO34mMR7L3+qG9D
-	G2oNytgQb8LUo83t2NMQ7zxHSV6wyufZ6junDEn377pxXa4WgZddpTVQlD5u3rlDvBiu8i
-	4vh+XXMlkeT0djG6Ms3UFFFNdFxD+QfHzT5cgCjtLuV4ka27tJ9QQcAps+Ux4ouuJs4Fz1
-	wMSAJ43F+60H1VV2I4icLvMNHVaBcOh6NcUsY5pPcmDs3GdpZ9UBHVLz+GeqEQ==
-Authentication-Results: mail.universe-factory.net;
-	auth=pass smtp.mailfrom=mschiffer@universe-factory.net
-To: Marek Lindner <marek.lindner@mailbox.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Matthias Schiffer <mschiffer@universe-factory.net>
-Subject: [PATCH batadv stable v2] batman-adv: fix duplicate MAC address check
-Date: Wed, 16 Apr 2025 20:37:56 +0200
-Message-ID: <0a3f663c380e8371932cbf157cde18f8ff93c400.1744449181.git.mschiffer@universe-factory.net>
+	s=arc-20240116; t=1744828751; c=relaxed/simple;
+	bh=g6p8wSF/Di9t0vl6klobyNO8oa8BX+pSLfq24fDqHcE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=RC3RkXWJUzflOXejGJP/G6xJBU+3Bw0dzjFhSwYkQhcELqkJjIb4pSwUyxB9IpGfeyFWGDV/eMo1dn3daOZGi834kLBt5rIzegJsKCOgZCitsUJzcvJItX/bxsGLszS8OxkGjmrT79G3yP0j5bLORMN4FuZBYNiotxgDTQomBuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Qqo1+7bO; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1744828735; x=1745433535; i=markus.elfring@web.de;
+	bh=g6p8wSF/Di9t0vl6klobyNO8oa8BX+pSLfq24fDqHcE=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Qqo1+7bOhEUNCmPWfSJaiYKepVNs2GIP3Gi+3WHkEacsCIBn/wf5uWEO74OQrc9r
+	 3BIFiZTG5c2v/ebtibMG6dGbhERYwhdXbUxx0+80V40RgbxKZhZnfy46a+uJjkzEH
+	 riL3VW490/2G88P8aLksTaIi/XuTjdNxiFBSA4eKzBCq4TA7JG1lZWcifUaGzSKEm
+	 uafnv00wCiyuzy65iFUBst7QdQG4fujjg0sUx8rNYc3wxfkn5fqOEg5/uO+JcObXh
+	 2y9zVI1Ew8KCBLfH0xw6yWjUH+xZE+x7XRXCaogTgBxXwHasqvO5RdiUJZQpfAcvC
+	 2VRIYrh/ndwbPQirFQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.13]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N4vNe-1t4Btj2Xcy-017Qj4; Wed, 16
+ Apr 2025 20:38:55 +0200
+Message-ID: <9ae2b1be-0bd7-42f6-b8e3-4786e22cb271@web.de>
+Date: Wed, 16 Apr 2025 20:38:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: -
+User-Agent: Mozilla Thunderbird
+To: Henry Martin <bsdhenrymartin@gmail.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20250416092243.65573-1-bsdhenrymartin@gmail.com>
+Subject: Re: [PATCH v6 0/2] net/mlx5: Fix NULL dereference and memory leak in
+ ttc_table creation
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250416092243.65573-1-bsdhenrymartin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:mSLhQutZM4kqZTgdGPHo7i+HhbSjqvmSPg7vsFks+Q/ivxn9jKc
+ xEf8IatYt/MlmtUZoyy4OxUk2hFPsvzn0fBjQcg9f62/Dr/69z73Zh14kFhrnW0pyk11tGP
+ Nv3Rte12nHWDViJ6U+vV55a1cGSRgE1giMop7LyWkoA+VYXL660jfHxd+yrh0dEfGoteS4q
+ UtWQ7Gh2s6NLk/ketLuFg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:lsMTTt34LZw=;ocFmzeWH/texmyqBHNCWwchc6vd
+ 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
+ FOqlo52zIIhYY=
 
-batadv_check_known_mac_addr() is both too lenient and too strict:
+> This patch series addresses two issues in =E2=80=A6
 
-- It is called from batadv_hardif_add_interface(), which means that it
-  checked interfaces that are not used for batman-adv at all. Move it
-  to batadv_hardif_enable_interface(). Also, restrict it to hardifs of
-  the same mesh interface; different mesh interfaces should not interact
-  at all. The batadv_check_known_mac_addr() argument is changed from
-  `struct net_device` to `struct batadv_hard_iface` to achieve this.
-- The check only cares about hardifs in BATADV_IF_ACTIVE and
-  BATADV_IF_TO_BE_ACTIVATED states, but interfaces in BATADV_IF_INACTIVE
-  state should be checked as well, or the following steps will not
-  result in a warning then they should:
+It would have been helpful to extend patch version descriptions accordingl=
+y.
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/Documentation/process/submitting-patches.rst?h=3Dv6.15-rc2#n310
 
-  - Add two interfaces in down state with different MAC addresses to
-    a mesh as hardifs
-  - Change the MAC addresses so they conflict
-  - Set interfaces to up state
-
-  Now there will be two active hardifs with the same MAC address, but no
-  warning. Fix by only ignoring hardifs in BATADV_IF_NOT_IN_USE state.
-
-The RCU lock can be dropped, as we're holding RTNL anyways when the
-function is called.
-
-Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
-Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
----
-v2: do not change pr_warn to netdev_warn in the patch for stable
-
- net/batman-adv/hard-interface.c | 31 ++++++++++++++++++-------------
- 1 file changed, 18 insertions(+), 13 deletions(-)
-
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index f145f9662653..d099434d3dfa 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -506,28 +506,32 @@ batadv_hardif_is_iface_up(const struct batadv_hard_iface *hard_iface)
- 	return false;
- }
- 
--static void batadv_check_known_mac_addr(const struct net_device *net_dev)
-+static void batadv_check_known_mac_addr(const struct batadv_hard_iface *hard_iface)
- {
--	const struct batadv_hard_iface *hard_iface;
-+	const struct net_device *mesh_iface = hard_iface->mesh_iface;
-+	const struct batadv_hard_iface *tmp_hard_iface;
- 
--	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->if_status != BATADV_IF_ACTIVE &&
--		    hard_iface->if_status != BATADV_IF_TO_BE_ACTIVATED)
-+	if (!mesh_iface)
-+		return;
-+
-+	list_for_each_entry(tmp_hard_iface, &batadv_hardif_list, list) {
-+		if (tmp_hard_iface == hard_iface)
-+			continue;
-+
-+		if (tmp_hard_iface->mesh_iface != mesh_iface)
- 			continue;
- 
--		if (hard_iface->net_dev == net_dev)
-+		if (tmp_hard_iface->if_status == BATADV_IF_NOT_IN_USE)
- 			continue;
- 
--		if (!batadv_compare_eth(hard_iface->net_dev->dev_addr,
--					net_dev->dev_addr))
-+		if (!batadv_compare_eth(tmp_hard_iface->net_dev->dev_addr,
-+					hard_iface->net_dev->dev_addr))
- 			continue;
- 
- 		pr_warn("The newly added mac address (%pM) already exists on: %s\n",
--			net_dev->dev_addr, hard_iface->net_dev->name);
-+			hard_iface->net_dev->dev_addr, tmp_hard_iface->net_dev->name);
- 		pr_warn("It is strongly recommended to keep mac addresses unique to avoid problems!\n");
- 	}
--	rcu_read_unlock();
- }
- 
- /**
-@@ -764,6 +768,8 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
- 			    hard_iface->net_dev->name, hardif_mtu,
- 			    required_mtu);
- 
-+	batadv_check_known_mac_addr(hard_iface);
-+
- 	if (batadv_hardif_is_iface_up(hard_iface))
- 		batadv_hardif_activate_interface(hard_iface);
- 	else
-@@ -902,7 +908,6 @@ batadv_hardif_add_interface(struct net_device *net_dev)
- 
- 	batadv_v_hardif_init(hard_iface);
- 
--	batadv_check_known_mac_addr(hard_iface->net_dev);
- 	kref_get(&hard_iface->refcount);
- 	list_add_tail_rcu(&hard_iface->list, &batadv_hardif_list);
- 	batadv_hardif_generation++;
-@@ -989,7 +994,7 @@ static int batadv_hard_if_event(struct notifier_block *this,
- 		if (hard_iface->if_status == BATADV_IF_NOT_IN_USE)
- 			goto hardif_put;
- 
--		batadv_check_known_mac_addr(hard_iface->net_dev);
-+		batadv_check_known_mac_addr(hard_iface);
- 
- 		bat_priv = netdev_priv(hard_iface->mesh_iface);
- 		bat_priv->algo_ops->iface.update_mac(hard_iface);
--- 
-2.49.0
-
+Regards,
+Markus
 
