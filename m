@@ -1,135 +1,226 @@
-Return-Path: <netdev+bounces-183178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010D0A8B4C1
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:08:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF072A8B4C4
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8358E3B8A36
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:08:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403CC16EEB2
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD4F233D87;
-	Wed, 16 Apr 2025 09:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9171B236426;
+	Wed, 16 Apr 2025 09:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihoIMBG+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmgFrpnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F1A233D7B
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BE0235345;
+	Wed, 16 Apr 2025 09:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744794397; cv=none; b=OeJEQR7FOLzDqJbdqQu7GDfbIfNahZxsT1NgaJL6Q5YDEFhk47TEA94RkQqVOhv8po3HmMf6cS6h0/90BFil6eAwPvLRYLT73cQ1/1kiXx5AVaHS/V1f+ZV8eMh1KpGHJjJdBWuxRJ4Xs8RO0zsfwB8VMlQOmrzXS8CVX6Jtkk0=
+	t=1744794429; cv=none; b=QuTkXHDwm/ti3/9QsmjK9g7KXHCAbibKUYP2tVXz+1RfAoavIru67y6JFhKlxP3qfAua4CQKiVgvsdru0Ce1xgov6mRqmKazf6b7ZVVLzV0KSIVWpSoz4VRf90nGiN/JZp/KQZggTuDpj+X3uB1ruw58NKjrZ5cTixBTN63SD4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744794397; c=relaxed/simple;
-	bh=9J82hBUkPM21iE1p39RUCImvkqg8gQ8FIiqrohWzfTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nFXJPm/OE3yhtutK3Yd6xE/Olt6W88d4rWRGldPMXlnHI52ZU7j/zI22AXqANmpCNMByU25lYyobX8RoynAYi5C0WV+Cg6izTCBDDJWadqfW3K7wbLarYty6vnM2f8RBfVaBUVgozILdMy6dus35oPE86SVWDU/Zm14KX4yxTjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ihoIMBG+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744794394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JZh6IEn5cuIyPxe+Y2bawmt3X8/HXdLk3GL/xB6zHTQ=;
-	b=ihoIMBG+bj3lnnS4o68E4qOLYZ9Tg5CPg5ofp5PqTlQGwZ8RIEAeHcHVV+Gn29u/aLe1ok
-	OwtLuqplXZWKkpNhvv59d2IxGEpwOp8bjz8tRwpYYHQIt6E2/gJUUJMgLnfqWoz3DR5R8E
-	fVVL20YTdlkzIkkuBnzL2A7yXZX3Nxk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-241-bhvYolwdPteTSeIxuRYr4A-1; Wed, 16 Apr 2025 05:06:33 -0400
-X-MC-Unique: bhvYolwdPteTSeIxuRYr4A-1
-X-Mimecast-MFC-AGG-ID: bhvYolwdPteTSeIxuRYr4A_1744794392
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912a0439afso2697690f8f.3
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:06:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744794392; x=1745399192;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZh6IEn5cuIyPxe+Y2bawmt3X8/HXdLk3GL/xB6zHTQ=;
-        b=wPLmPoHbaM//GE76S78AWbJX+sNtNSW3M9W7rxF5zbp2sZTJ7XLb1tUVJWMHCr4Ri5
-         nRKn4ILjaNVpzcm41EGExJMfuRQYfxlqiV9jqGe2nJOmmL0K5Fpo2RXQruYpt41hLCPm
-         KQQ8zy78wM13ett7QRsjG93oq/An6ESTuNk6cIOPtEieAFE2ceif04THJz1sfO0vIM/9
-         tEqJq+3NHYJSXRYIURqORCyc0UCZHuGmqnzdFZRyDXu6dsiipTwxDcJETzPsMdoV3yhW
-         6b+vEe3ai6KdBiXjKUuVAJ93XOme8ZJKW1MCFwVZazIcbS+D1ljTeJpM7DWZr14xS/a4
-         ZusQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUU2XA5ptPKMPJ1Z6nbV4D0TY0fN+Cx6yY6I7nc87Y++1Q7x9YJYyfFr7nBLmxFRgyU2YTANos=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhjy8A0Gjf56YVLcCB69qGkwlc5GtiYFvN1VHNfVL3qa2ST3tW
-	2HcG2dfMzHsuF5jGV+HO0khMJMMbJJ1c/pQ8qEw1C4Q5tt5zy8VtwQjA/h4pnMMik3mhwn9gVfW
-	F5hUacKihPXeUfaAS3YIU8R7QQR3ku4LovIhRmEl9J9QDhw9tyXnMJQ==
-X-Gm-Gg: ASbGnctGUYe4asB8Rd9wGfPk2duC7lTf/d4bgToMQDdaEteSm51ER9ETPMITHCbyePG
-	dx1kS4Ug17LYDYu76b6g/do8Y3X2le754zPemakT/ER6j7nDGZGczIruBft77h3zjGEu9kRKHGe
-	FRshXrjWkc6Ub92U5OjyNcwjl0olgRq1/ywWAOnesI2rq07cf4alpcQcJGiwo6g4WZWdT1AkUul
-	pbDa9QOuh2Dq6ffAY5y7drM+VyMmKl1gT7swEYaMa935LNdAWbpbKCeN/rlQ9q4+75apgFVvb5/
-	3bVRxMEsVxL+2B4z+bocF1RZu1OjiipeTsQYOOE=
-X-Received: by 2002:a5d:6da1:0:b0:391:952:c728 with SMTP id ffacd0b85a97d-39ee5b11279mr934659f8f.4.1744794392456;
-        Wed, 16 Apr 2025 02:06:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAWpUG28BpFbFdYI3Kxxv4egX8ITb6HhtoR+vUI5J8OyLwI5+Oa1SugpAM7yuKkQBNkKPOwg==
-X-Received: by 2002:a5d:6da1:0:b0:391:952:c728 with SMTP id ffacd0b85a97d-39ee5b11279mr934638f8f.4.1744794392142;
-        Wed, 16 Apr 2025 02:06:32 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae9807b7sm16628571f8f.60.2025.04.16.02.06.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 02:06:31 -0700 (PDT)
-Message-ID: <1c382acc-d823-47e9-902d-42606d64daf1@redhat.com>
-Date: Wed, 16 Apr 2025 11:06:30 +0200
+	s=arc-20240116; t=1744794429; c=relaxed/simple;
+	bh=aS76//CkpHphM+5vU47H6mSdOiGK7gfAzI6mpLJ7h/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9bZWg0hIh5SmWkSxZEJ8XUQ4Aimbx7mXNqLwLFckjV5iUHwMiICqJuyTs0K6/8ib9PwfBvKYywjFiLzgbxeqPufFCMMUKPs9pM7uaEHVXeG2Ho448juhHSbLVvXh8Lp6FMRXYAajv4KEEENnACb8+NprShg9I5e1n1gVEzRq58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmgFrpnO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CBE8C4CEE2;
+	Wed, 16 Apr 2025 09:07:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744794428;
+	bh=aS76//CkpHphM+5vU47H6mSdOiGK7gfAzI6mpLJ7h/A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmgFrpnOVJMwK7jZwRrTBccyaVktATEyzxBzSZ0sEbs/tV1XivEFMlu3YWUfz5OBK
+	 DxxDmBEZUr135pyQbvUT49+b9U5KZL+UjAgpiyCu5zr5/ECa5r9FAd9O678aKc+ozS
+	 EI9rpg0KZclVh3UE3tMC2sRC1qHIg+iuCPjHVUuSBjVDXKk2YFrKtwna6YCZ9RKGzp
+	 ji52/CvuuSZ1Gi5SznbsrzlULpVnRxI0Yfpk3NTTE83OPoIxSzsrNcglnAI8qRkbq5
+	 ottuiLKMUTHXUub5zmwKt8gQk9RQRB8T3euHbhMJMuO7LyDBpg+bz3vHC9xltUDox3
+	 xc5J6y8EmWx/Q==
+Date: Wed, 16 Apr 2025 10:07:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, ij@kernel.org,
+	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Subject: Re: [PATCH v3 net-next 05/15] tcp: accecn: add AccECN rx byte
+ counters
+Message-ID: <20250416090701.GK395307@horms.kernel.org>
+References: <20250414131315.97456-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250414131315.97456-6-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v2 net-next 04/14] ipv6: Check GATEWAY in
- rtm_to_fib6_multipath_config().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250414181516.28391-1-kuniyu@amazon.com>
- <20250414181516.28391-5-kuniyu@amazon.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250414181516.28391-5-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250414131315.97456-6-chia-yu.chang@nokia-bell-labs.com>
 
-On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
-> In ip6_route_multipath_add(), we call rt6_qualify_for_ecmp() for each
-> entry.  If it returns false, the request fails.
+On Mon, Apr 14, 2025 at 03:13:05PM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Ilpo Järvinen <ij@kernel.org>
 > 
-> rt6_qualify_for_ecmp() returns false if either of the conditions below
-> is true:
+> These counters track IP ECN field payload byte sums for all
+> arriving (acceptable) packets. The AccECN option (added by
+> a later patch in the series) echoes these counters back to
+> sender side.
 > 
->   1. f6i->fib6_flags has RTF_ADDRCONF
->   2. f6i->nh is not NULL
->   3. f6i->fib6_nh->fib_nh_gw_family is AF_UNSPEC
+> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  include/linux/tcp.h      |  1 +
+>  include/net/tcp.h        | 18 +++++++++++++++++-
+>  net/ipv4/tcp.c           |  3 ++-
+>  net/ipv4/tcp_input.c     | 13 +++++++++----
+>  net/ipv4/tcp_minisocks.c |  3 ++-
+>  5 files changed, 31 insertions(+), 7 deletions(-)
 > 
-> 1 is unnecessary because rtm_to_fib6_config() never sets RTF_ADDRCONF
-> to cfg->fc_flags.
-> 
-> 2. is equivalent with cfg->fc_nh_id.
-> 
-> 3. can be replaced by checking RTF_GATEWAY in the base and each multipath
-> entry because AF_INET6 is set to f6i->fib6_nh->fib_nh_gw_family only when
-> cfg.fc_is_fdb is true or RTF_GATEWAY is set, but the former is always
-> false.
-> 
-> Let's perform the equivalent checks in rtm_to_fib6_multipath_config().
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index af38fff24aa4..9cbfefd693e3 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -303,6 +303,7 @@ struct tcp_sock {
+>  	u32	delivered;	/* Total data packets delivered incl. rexmits */
+>  	u32	delivered_ce;	/* Like the above but only ECE marked packets */
+>  	u32	received_ce;	/* Like the above but for rcvd CE marked pkts */
+> +	u32	received_ecn_bytes[3];
+>  	u8	received_ce_pending:4, /* Not yet transmit cnt of received_ce */
+>  		unused2:4;
+>  	u32	app_limited;	/* limited until "delivered" reaches this val */
 
-It's unclear to me the 'why'???
+...
 
-Thanks,
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 73f8cc715bff..278990dba721 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -5092,6 +5092,7 @@ static void __init tcp_struct_check(void)
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered);
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered_ce);
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, received_ce);
+> +	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, received_ecn_bytes);
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
+>  	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
+> @@ -5099,7 +5100,7 @@ static void __init tcp_struct_check(void)
+>  	/* 32bit arches with 8byte alignment on u64 fields might need padding
+>  	 * before tcp_clock_cache.
+>  	 */
+> -	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 97 + 7);
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 109 + 3);
 
-Paolo
+Hi Ilpo,
 
+I think that incrementing 97 to 109 is correct, as 12 bytes have been
+added to this group.
+
+However, I do not think it is correct to decrement 7 to 3.
+
+On, at least, x86_64, x86_32 and arm64 that decrement does not
+cause any problems. (I assume it is also fine without the rest of this
+patch).
+
+But on (32-bit) ARM, this causes the assertion to fail.
+This is because on ARM an extra 4-byte hole is added just after pred_flags.
+And the assertion checks an upper bound on the size of the group.
+
+I assume this extra hole is due to alignment requirements.
+In any case on ARM, with this patch applied, pahole shows
+the group looking like this:
+
+        __u8                       __cacheline_group_begin__tcp_sock_write_txrx[0]; /*  1869     0 */
+
+        /* XXX 3 bytes hole, try to pack */
+
+        __be32                     pred_flags;           /*  1872     4 */
+
+        /* XXX 4 bytes hole, try to pack */
+
+        u64                        tcp_clock_cache;      /*  1880     8 */
+        u64                        tcp_mstamp;           /*  1888     8 */
+        u32                        rcv_nxt;              /*  1896     4 */
+        u32                        snd_nxt;              /*  1900     4 */
+        u32                        snd_una;              /*  1904     4 */
+        u32                        window_clamp;         /*  1908     4 */
+        u32                        srtt_us;              /*  1912     4 */
+        u32                        packets_out;          /*  1916     4 */
+        /* --- cacheline 30 boundary (1920 bytes) --- */
+        u32                        snd_up;               /*  1920     4 */
+        u32                        delivered;            /*  1924     4 */
+        u32                        delivered_ce;         /*  1928     4 */
+        u32                        received_ce;          /*  1932     4 */
+        u32                        received_ecn_bytes[3]; /*  1936    12 */
+        u8                         received_ce_pending:4; /*  1948: 0  1 */
+        u8                         unused2:4;            /*  1948: 4  1 */
+
+        /* XXX 3 bytes hole, try to pack */
+
+        u32                        app_limited;          /*  1952     4 */
+        u32                        rcv_wnd;              /*  1956     4 */
+        struct tcp_options_received rx_opt;              /*  1960    24 */
+        /* --- cacheline 31 boundary (1984 bytes) --- */
+        u8                         nonagle:4;            /*  1984: 0  1 */
+        u8                         rate_app_limited:1;   /*  1984: 4  1 */
+
+        /* XXX 3 bits hole, try to pack */
+
+        __u8                       __cacheline_group_end__tcp_sock_write_txrx[0]; /*  1985     0 */
+
+So we are now at 3 cache lines. And perhaps it is worth trying to pack
+things a bit. Or perhaps that becomes tricky to get right across
+different architectures. I didn't explore that.
+
+But, taking the naive approach: with the following update, tcp.c compiles
+compiles with allmodconfig on x86_64, x86_32, ARM and arm64 (I did not test
+others).
+
+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 109 + 7);
+
+For the record, gcc 14.2.0 reports this problem as:
+
+  CC      net/ipv4/tcp.o
+In file included from <command-line>:
+In function 'tcp_struct_check',
+    inlined from 'tcp_init' at net/ipv4/tcp.c:5133:2:
+././include/linux/compiler_types.h:557:45: error: call to '__compiletime_assert_
+1403' declared with attribute error: BUILD_BUG_ON failed: offsetof(struct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct tcp_sock, __cacheline_group_begin__tcp_sock_write_txrx) > 109 + 3
+  557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |                                             ^
+././include/linux/compiler_types.h:538:25: note: in definition of macro '__compiletime_assert'
+  538 |                         prefix ## suffix();                             \
+      |                         ^~~~~~
+././include/linux/compiler_types.h:557:9: note: in expansion of macro '_compiletime_assert'
+  557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+   50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+      |         ^~~~~~~~~~~~~~~~
+./include/linux/cache.h:160:9: note: in expansion of macro 'BUILD_BUG_ON'
+  160 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP) - \
+      |         ^~~~~~~~~~~~
+net/ipv4/tcp.c:5103:9: note: in expansion of macro 'CACHELINE_ASSERT_GROUP_SIZE'
+ 5103 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 109 + 3);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+...
+
+-- 
+pw-bot: changes-requested
 
