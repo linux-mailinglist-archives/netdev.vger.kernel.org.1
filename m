@@ -1,229 +1,152 @@
-Return-Path: <netdev+bounces-183262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB607A8B7F9
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:59:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D21A8B80F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 493C01905531
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:59:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7FF6175EE7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F8423BFA3;
-	Wed, 16 Apr 2025 11:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873F924729E;
+	Wed, 16 Apr 2025 11:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="BDsxXtE8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="TFJXzkSX"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC1B22A1D5;
-	Wed, 16 Apr 2025 11:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4153243947;
+	Wed, 16 Apr 2025 11:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744804735; cv=none; b=ols+ZSVZP/AEbXvIMrxt5KZOQK+vZE7l40Lkqt1EFOmY6sarWuK9vMgjio6hHNBSkqRCwGxPXlhDvYhEijmLUkEYS6WSaVGWRhytFpUX+9wEtBf0iV6rk01UZ7mkH7giy0r73yrPsASjj9d7dLYWGcHkjyqhETyEcO2a1gyBm/Y=
+	t=1744804772; cv=none; b=cVevKldSuc2d2fl4D/QPlRUIfEOIfOH4iBxyQke4pwNpNOUu2RTu4yzodDVkPevAKwfstiWZH9V+tmvIenxUpqWB2s9xLYjJusFya6Sw8LULTFW/agUEcq/f2RKHYnuf5bR/GZO/yWs1Jf+Uf/RL92WYwuTwmpcM3AXo/nGqPYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744804735; c=relaxed/simple;
-	bh=LSLJn4Y3NHxbkC24XiSwtDfDkGTqa8EMqgKQ7ZHDZcE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EnqABNYP0a4w38UC91F/xt4PBcwUUORQ/vAi4E+qG0k3tQfhfKbeDgD22S1hJPEC/JUdcPtPM0Q0+FqLRv7bipv0LHPFG6Ns/spRGTf5zh5zQ5qlejJ9QIA7iT8kG4zgHfQrGUehMrrWJpie+jNoqmzQxLNw0MHwxyDKqAvmfKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=BDsxXtE8; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53GBwNZJ13220261, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1744804703; bh=LSLJn4Y3NHxbkC24XiSwtDfDkGTqa8EMqgKQ7ZHDZcE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=BDsxXtE8Tb/YcxnHFIy0wjoAhzGlt6spqy6czmIcUh5muYYcqOKUw7yZnOpRJl3gQ
-	 KHLFxVVjvY04m5t8j4L2FaZYDaQj9slzEb/bB83CCjUo2Qxu9RK+r5TMivKj/aiuHE
-	 cUmtHeuc7Nl6Gajrgo9XNC3EApb+aHyrCMu1fB+2LbzIJN4j+JsRrap+MbN53UBzfV
-	 zmK8hUrj8VJC/MYbNUorfm1msz+eOP1wAVmQNf7XjM+X3zUPmiLDgZw23em1LuNwkl
-	 CJoSaKk7LbaUb1q/ehXrZbZGWzBT9kKwEVa3JA2gH3ZkOqNUnAFuWxS+FaSe2XVQqU
-	 o/4Wk192+pnCA==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53GBwNZJ13220261
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Apr 2025 19:58:23 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 16 Apr 2025 19:58:24 +0800
-Received: from RTDOMAIN (172.21.210.70) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 16 Apr
- 2025 19:58:23 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net-next v4] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
-Date: Wed, 16 Apr 2025 19:57:57 +0800
-Message-ID: <20250416115757.28156-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744804772; c=relaxed/simple;
+	bh=0S1TuGfoaihaP6GM7Hh8LwcX9IT6mQyo/HUSvfpb9WE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=O5tzkIH/0lX6l+yIWY5UT4iLMMNq68hbL4U2x/i8z7nWlogiq1ndz72W6sEBzZkmjiNaVgpCzKbbZfeasO73WrcAu9QCoc9CDH/SJzoEQFQnnksbYUFXGbUBrhyMXAMaon5rad0sMVt2gQ/0SuBpbyWut/uvVidgNb1WFFGux6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=TFJXzkSX; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3XF1ouON7r19OevKldtRbjX0yHgsiXwfPXmVLBz5tEU=; b=TFJXzkSXznU2jJl8JPOsr2VVRp
+	DjP8dl//vWxLNxcq+iTwxTVjJmlfe9KhHZyS7mQhY9ZSBYLmVk5XN+eRikwxZ6rZn+vYddIUEgVk3
+	0GUMusS7Ydxjta7FsBpm8dUOBnCszM2Yidtr0UVThJt3yLaHU79vBOCWYoT3J6vuSmgq/CYZIB0Gg
+	0RYbx8XIv0vrZYslVgm3PyM4xGB7di1mPpocCSqyrn4yV5hsEeag2gnsXxwqV1lNnWjm4ElBbOfKf
+	xCE28OtPn9mcvIEfqe4Ec0+pCDLCckTePJSIB6EjX737yZyktIA7cs96ow6SFoWS7s18z8hx/CgyC
+	2gB3Te2g==;
+Received: from [122.175.9.182] (port=57370 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1u51QB-000000006nZ-2HHQ;
+	Wed, 16 Apr 2025 17:29:15 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id D1FBE1781A82;
+	Wed, 16 Apr 2025 17:29:03 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id B22C7178247C;
+	Wed, 16 Apr 2025 17:29:03 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id KVGCnqemXVdZ; Wed, 16 Apr 2025 17:29:03 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 759F31781A82;
+	Wed, 16 Apr 2025 17:29:03 +0530 (IST)
+Date: Wed, 16 Apr 2025 17:29:03 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	glaroque <glaroque@baylibre.com>, schnelle <schnelle@linux.ibm.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, s hauer <s.hauer@pengutronix.de>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	basharath <basharath@couthit.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1593029669.1081007.1744804743217.JavaMail.zimbra@couthit.local>
+In-Reply-To: <5e394736-00c6-4671-a55e-6019ce245b01@lunn.ch>
+References: <20250414113458.1913823-1-parvathi@couthit.com> <20250414130237.1915448-6-parvathi@couthit.com> <5e394736-00c6-4671-a55e-6019ce245b01@lunn.ch>
+Subject: Re: [PATCH net-next v5 05/11] net: ti: prueth: Adds ethtool support
+ for ICSSM PRUETH Driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds ethtool support for ICSSM PRUETH Driver
+Thread-Index: PiT+QqjjmPdkikvvwOrwQ08G5r5VPQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Add support for ndo_setup_tc to enable CBS offload functionality as
-part of traffic control configuration for network devices, where CBS
-is applied from the CPU to the switch. More specifically, CBS is
-applied at the GMAC in the topmost architecture diagram.
+Hi,
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-v1 -> v2:
-- Add a check to ensure that qopt->queue is within the specified range.
-- Add a check for qopt->enable and handle it appropriately.
+>> +static int icssm_emac_get_link_ksettings(struct net_device *ndev,
+>> +					 struct ethtool_link_ksettings *ecmd)
+>> +{
+>> +	return phy_ethtool_get_link_ksettings(ndev, ecmd);
+>> +}
+>> +
+> 
+>> +static int
+>> +icssm_emac_set_link_ksettings(struct net_device *ndev,
+>> +			      const struct ethtool_link_ksettings *ecmd)
+>> +{
+>> +	return phy_ethtool_set_link_ksettings(ndev, ecmd);
+>> +}
+> 
+>> +/* Ethtool support for EMAC adapter */
+>> +const struct ethtool_ops emac_ethtool_ops = {
+>> +	.get_drvinfo = icssm_emac_get_drvinfo,
+>> +	.get_link_ksettings = icssm_emac_get_link_ksettings,
+>> +	.set_link_ksettings = icssm_emac_set_link_ksettings,
+> 
+> The wrappers don't do anything, so why not just use
+> phy_ethtool_get_link_ksettings() and phy_ethtool_set_link_ksettings()
+> directly?
+> 
+> 	Andrew
 
-v2 -> v3:
-- Nothing has changed, and it is simply being posted again now that
-net-next has reopened.
+Yes, the wrapper API does the same. We will clean this in the next version.
 
-v3 -> v4
-- Modify the commit message to include a description of the location
-where CBS is applied.
----
- drivers/net/ethernet/realtek/rtase/rtase.h    | 15 +++++
- .../net/ethernet/realtek/rtase/rtase_main.c   | 60 +++++++++++++++++++
- 2 files changed, 75 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index 2bbfcad613ab..498cfe4d0cac 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -170,6 +170,7 @@ enum rtase_registers {
- #define RTASE_TC_MODE_MASK GENMASK(11, 10)
- 
- 	RTASE_TOKSEL      = 0x2046,
-+	RTASE_TXQCRDT_0   = 0x2500,
- 	RTASE_RFIFONFULL  = 0x4406,
- 	RTASE_INT_MITI_TX = 0x0A00,
- 	RTASE_INT_MITI_RX = 0x0A80,
-@@ -259,6 +260,12 @@ union rtase_rx_desc {
- #define RTASE_VLAN_TAG_MASK     GENMASK(15, 0)
- #define RTASE_RX_PKT_SIZE_MASK  GENMASK(13, 0)
- 
-+/* txqos hardware definitions */
-+#define RTASE_1T_CLOCK            64
-+#define RTASE_1T_POWER            10000000
-+#define RTASE_IDLESLOPE_INT_SHIFT 25
-+#define RTASE_IDLESLOPE_INT_MASK  GENMASK(31, 25)
-+
- #define RTASE_IVEC_NAME_SIZE (IFNAMSIZ + 10)
- 
- struct rtase_int_vector {
-@@ -294,6 +301,13 @@ struct rtase_ring {
- 	u64 alloc_fail;
- };
- 
-+struct rtase_txqos {
-+	int hicredit;
-+	int locredit;
-+	int idleslope;
-+	int sendslope;
-+};
-+
- struct rtase_stats {
- 	u64 tx_dropped;
- 	u64 rx_dropped;
-@@ -313,6 +327,7 @@ struct rtase_private {
- 
- 	struct page_pool *page_pool;
- 	struct rtase_ring tx_ring[RTASE_NUM_TX_QUEUE];
-+	struct rtase_txqos tx_qos[RTASE_NUM_TX_QUEUE];
- 	struct rtase_ring rx_ring[RTASE_NUM_RX_QUEUE];
- 	struct rtase_counters *tally_vaddr;
- 	dma_addr_t tally_paddr;
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 2aacc1996796..6251548d50ff 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1661,6 +1661,65 @@ static void rtase_get_stats64(struct net_device *dev,
- 	stats->rx_length_errors = tp->stats.rx_length_errors;
- }
- 
-+static void rtase_set_hw_cbs(const struct rtase_private *tp, u32 queue)
-+{
-+	u32 idle = tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
-+	u32 val, i;
-+
-+	val = u32_encode_bits(idle / RTASE_1T_POWER, RTASE_IDLESLOPE_INT_MASK);
-+	idle %= RTASE_1T_POWER;
-+
-+	for (i = 1; i <= RTASE_IDLESLOPE_INT_SHIFT; i++) {
-+		idle *= 2;
-+		if ((idle / RTASE_1T_POWER) == 1)
-+			val |= BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
-+
-+		idle %= RTASE_1T_POWER;
-+	}
-+
-+	rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val);
-+}
-+
-+static int rtase_setup_tc_cbs(struct rtase_private *tp,
-+			      const struct tc_cbs_qopt_offload *qopt)
-+{
-+	int queue = qopt->queue;
-+
-+	if (queue < 0 || queue >= tp->func_tx_queue_num)
-+		return -EINVAL;
-+
-+	if (!qopt->enable) {
-+		tp->tx_qos[queue].hicredit = 0;
-+		tp->tx_qos[queue].locredit = 0;
-+		tp->tx_qos[queue].idleslope = 0;
-+		tp->tx_qos[queue].sendslope = 0;
-+
-+		rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, 0);
-+	} else {
-+		tp->tx_qos[queue].hicredit = qopt->hicredit;
-+		tp->tx_qos[queue].locredit = qopt->locredit;
-+		tp->tx_qos[queue].idleslope = qopt->idleslope;
-+		tp->tx_qos[queue].sendslope = qopt->sendslope;
-+
-+		rtase_set_hw_cbs(tp, queue);
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type type,
-+			  void *type_data)
-+{
-+	struct rtase_private *tp = netdev_priv(dev);
-+
-+	switch (type) {
-+	case TC_SETUP_QDISC_CBS:
-+		return rtase_setup_tc_cbs(tp, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static netdev_features_t rtase_fix_features(struct net_device *dev,
- 					    netdev_features_t features)
- {
-@@ -1696,6 +1755,7 @@ static const struct net_device_ops rtase_netdev_ops = {
- 	.ndo_change_mtu = rtase_change_mtu,
- 	.ndo_tx_timeout = rtase_tx_timeout,
- 	.ndo_get_stats64 = rtase_get_stats64,
-+	.ndo_setup_tc = rtase_setup_tc,
- 	.ndo_fix_features = rtase_fix_features,
- 	.ndo_set_features = rtase_set_features,
- };
--- 
-2.34.1
-
+Thanks and Regards,
+Parvathi.
 
