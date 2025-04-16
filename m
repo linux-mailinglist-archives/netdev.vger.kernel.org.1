@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-183214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F372AA8B69A
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:18:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E117A8B676
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB6927A3AB4
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:17:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D745A5A004F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27AC2472A8;
-	Wed, 16 Apr 2025 10:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B3F2356C3;
+	Wed, 16 Apr 2025 10:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGj4+/98"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ev55wIti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4573423BD0B
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F675236430
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744798689; cv=none; b=afAcaENUUAj1JagF9irHaGLnrFSUGVR20RSDjaTrRk+6JhRphMzmZOR+VL/BzoGeEpB8k7ERDUkHOJPZ9KN5PWjaM0JHWYtyeFYK6dL4onZNJMGBJDXuQN2TiRpxEUoRCSKu8DLAjBHRDy5CjSahsl970NK/1McaOjiRX/wsUnU=
+	t=1744798226; cv=none; b=h9JZrGgVcOO5MjYWZbb1jerzXR/gsh/rigSCpZ8kJbalSJotLd56s1NwMSh5JuIK/GYKSSwmwZJIpAHqdqM5l/qPOq3H7U699r2sq6gGQM5KNf12p9/LXMFaFN5iGP3mxNtYHgyPtL+fYWCdwP2sTwh2zqBAOinmQ8NPJ+hfssk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744798689; c=relaxed/simple;
-	bh=lKwGTrGnL73k4+AUdIs98CJ3weTFUSNv9T+NqjGq8rA=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=rrL+eoFfxaANho29mCwgbKPrP3s+k8R1kWagPlcZJr72DBLWDmuVWAKRk0d/hiaTCFEg6My05G5tSO8Vk6nBBuz4ELdsHgQvBPaQ+VYNhoQS8oGuaUFNTd6/WhzvKpwSWkZ3WvdNHbY93x0Qfn/otiIPVplrs3vS/sq1IGB3XtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGj4+/98; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3913b539aabso3988770f8f.2
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:18:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744798686; x=1745403486; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lKwGTrGnL73k4+AUdIs98CJ3weTFUSNv9T+NqjGq8rA=;
-        b=OGj4+/98lIxIlimVcRyEo8zl835lRk7kK3K8SJCYjH2TLZcIK8SAHNKUJ2EYK8ZU58
-         /bNOnmDIJVXhTeXnhtZP82n4vDO97CsrcYSDFnKMGvuzZvsUj2VZSBB0kZos1jkJKOYM
-         P+/X3X5C2HEYn8VAuU0CA0rT/aZIufYP3d+u+O/JSSLOY+h0B0T4KDz/inclwCerA8bE
-         H0MozneLvCqLwpkRe0nWWt7dNY91l8MNFkgtYy1Yu9YuZYnWiMMNiDujV/dB4CtfC6og
-         OLCD7j6fyPUldKFCgJfGm3tZSNW+sBwRNO2bgC2P4qYE+jFJldikMSCjeEngEcFqTTsY
-         VJcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744798686; x=1745403486;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lKwGTrGnL73k4+AUdIs98CJ3weTFUSNv9T+NqjGq8rA=;
-        b=Yqqg/EmA5zEgwppIJs9duBbJyk+9Totuxri0NczPzFlZBqrZQtTmpiFihplYAcYjLG
-         j3T9nuIPPo++XuJ+RQGVBM/6yrdhN3L3PWpElnyPLePnWHkC9iemNQrzmp8fY3A9Yib+
-         zUPMXZ4XLrOfki/s/1mP+6G14ewZOJz5xUSsHOm1RYaUGcFHn7WvFuwWD2Ic/0t1EDLX
-         vHqxIdd/HP7PsE92PoAHHCj7WB42EvVPpfATA/t8xOsWSpdSXWZ9e/qu/0IKGQHcY9Oj
-         nDvYDARswPymv3fs/SqWUZiQXcF9OBjTlm+7Vn9YvHjdJZ/SYn//ooLDseacgyN4BNgE
-         Qk2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWw330PYsDVl0z8QAFzMv5eX6D5eLqQxt2ZuswmFf5fX+BaMy5zevriLjC2Bg1xHyWCHEABOIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9ofRujjITrljY+6Bduy68lqwJ0+DmfTnJJV+1gvBGvA5V54gV
-	EILSV1vZT8gnj540qDqMRduk+Q1LenWrewu+XIdShd+x4zbnW06y
-X-Gm-Gg: ASbGnctaeWngeAEVFDMVvp0q19rO79V5ymeYyD8Gsw0mVtUXpP7ZWSwKV53K069Hkx1
-	EK68eUzeAN2XlR4uX2iVOdad+D37sFskchyGyBbofx0L/u7Py++Z2XGVaL3KGF+pxM0wnDxkhaP
-	36FBoJm9WJkibRMGdlJxxI8+EcbJkzcQR8HWDWKlpxD6C8tLLIuaGP4mtKInXnFe9kwHdRW3Lea
-	/M++pQ3uBPGG5D7q8i1S7Q5Mgn9OkreE+2VQJNNMXSVQNEl3WYDEURy0yRWSaBRfn8uU0g4+xhv
-	2rXq9nA9248epfmzJlpMnewsGBCkFpl/uGdIMdhqDVMWObKlq0FAzT7OAA==
-X-Google-Smtp-Source: AGHT+IFxNCXEdXy6TeWX7NdE6djPhEW6zL3zDmuUmTnWwrnNGIP5kQKicjKfguNS02NP+xkdVml1ew==
-X-Received: by 2002:a5d:598e:0:b0:391:1222:b444 with SMTP id ffacd0b85a97d-39ee5b17cdbmr1182177f8f.20.1744798686541;
-        Wed, 16 Apr 2025 03:18:06 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:e94a:d61b:162d:e77])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b54579fsm16877225e9.40.2025.04.16.03.18.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Apr 2025 03:18:06 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  daniel@iogearbox.net,  sdf@fomichev.me,  jacob.e.keller@intel.com
-Subject: Re: [PATCH net 5/8] netlink: specs: rt-link: add an attr layer
- around alt-ifname
-In-Reply-To: <20250414211851.602096-6-kuba@kernel.org> (Jakub Kicinski's
-	message of "Mon, 14 Apr 2025 14:18:48 -0700")
-Date: Wed, 16 Apr 2025 11:08:54 +0100
-Message-ID: <m2plhcl8p5.fsf@gmail.com>
-References: <20250414211851.602096-1-kuba@kernel.org>
-	<20250414211851.602096-6-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1744798226; c=relaxed/simple;
+	bh=UcUGcOK+S4LsFTHnlbRzxrJbrmT2OLrU0stB78O8tp0=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=e5hau6cIpEuaHAz4ggFPe3S6KVUV5tbyYFo69LifCGk7q6X5rdp5q2eiyxqI1nWw8gkyoAxbARLRIEnRCSEAd9jE6CMja3wVHMxJ2VFiyex0Yv0qcepVYucIZTIFTCAG+BKCDdH7UBsxG+frj6zjh+1Yx3OcXnMEvKAiF8DPoyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ev55wIti; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qiJY99ai7mGDr2FC9ZGU82aOrwFyMKWX9y0r6QczlqM=; b=ev55wIti9sjkf3oCexLnb5YgA9
+	R5WFBviTDjeT1r6A31bJxkwq2J1FXwdT8bKtrzAfM4VxqH5iklJwHzIr9gDt72WD8RECSkQYy1dwb
+	OnHHcSXJ6qjXAOjIYix1PyTsgxLw0eXKiKRtSyDy/jPcIcKFtEFPHJqqeAFpsc3EyULQxhek18hIK
+	Nr8Yijxe1F+TxA3GO5kOFBNH3SKhpelPQPQmCs4RFzPdhzgbt8GJRIVrZYfEV6cvg9Yh0+ZqhHCjk
+	tpz6i4XvzAoJOT/VrmWWJ5SpFFiTq+MSfw5RGcFaONxXrsgCMIANsSve0Os43g0YmH68rbZSHtTQx
+	8pwGmbfw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33274 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1u4zic-00011J-2A;
+	Wed, 16 Apr 2025 11:10:10 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1u4zi1-000xHh-57; Wed, 16 Apr 2025 11:09:33 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: [PATCH net-next] net: stmmac: dwc-qos: use PHY clock-stop capability
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1u4zi1-000xHh-57@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 16 Apr 2025 11:09:33 +0100
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Use the PHY clock-stop capability when programming the MAC LPI mode,
+which allows the transmit clock to the PHY to be gated. Tested on the
+Jetson Xavier NX platform.
 
-> alt-ifname attr is directly placed in requests (as an alternative
-> to ifname) but in responses its wrapped up in IFLA_PROP_LIST
-> and only there is may be multi-attr. See rtnl_fill_prop_list().
->
-> Fixes: b2f63d904e72 ("doc/netlink: Add spec for rt link messages")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index 583b5c071cd1..fa900b4991d0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -252,7 +252,8 @@ static int tegra_eqos_probe(struct platform_device *pdev,
+ 	plat_dat->fix_mac_speed = tegra_eqos_fix_speed;
+ 	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+ 	plat_dat->bsp_priv = eqos;
+-	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE;
++	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE |
++			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP;
+ 
+ 	return 0;
+ 
+-- 
+2.30.2
+
 
