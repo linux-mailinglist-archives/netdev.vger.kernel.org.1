@@ -1,167 +1,124 @@
-Return-Path: <netdev+bounces-183344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70047A90726
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:01:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D193A90729
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4AA0188F66E
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10B70189A9CA
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEE91EF0A1;
-	Wed, 16 Apr 2025 15:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5B31FC11F;
+	Wed, 16 Apr 2025 15:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="JzOUhwCL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SydVNaLL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCD41A5B9C
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 15:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C84A1FAC23;
+	Wed, 16 Apr 2025 15:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744815685; cv=none; b=e8mcYHwNC9X/ZE9r2VfZ0E3DEIkuAZ3rSmQUWTpk/bhbyoYTNKLiv91iWhapOnH9QtCFkRpCP/H1nmAQgRFZYc/Grj8v3sIXinno/vXerFcrMP43cxgfd1kfH5UYvikAeCiT2uDmZnRbHv6/jGWmc44eMzHkehV2LFeo016WdjA=
+	t=1744815688; cv=none; b=Fn8+5xITLoaqy0watWA4aG+F3nVlFeq7nYvE0/Ww9DTQQ1D9nv9LSyJMMxY+VrpqRw6pyuqRFXNmWJkkzW4LQAzMkZtApd2J3UwoGGYIfL+C3dnthG+QSsHBtzedvkygD0ptsu7iNlqlY1UVULz38XQHmtG4EVXIkEox4zB7VFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744815685; c=relaxed/simple;
-	bh=cWd6IcCN81CfclAQUQHHjlEp3V9ol7bfnOyeCwgyfaw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SAEUeQzjSw6Tb1ehUI1hp+jx50lNSvi9QEGrQGEOakltAdGpQeSl7Zt4GoINBVsqaM3iXZ21b6hLU3IelUmOJEd0eIcuEoKaPUG+B5irtPgPlVixZbbzQvMgDvepYfDw87jEXKr506GGv4JgY/7LB6J17tEgU+zXhDvfvD1KgOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=JzOUhwCL; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53GCuRst016019;
-	Wed, 16 Apr 2025 08:01:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=JOSk4TRIkKYvRIpeBC
-	P4f9Y33H9niFs80w6Xer+4F3A=; b=JzOUhwCL+WreRe7PS6hgZDwW5cXTUpm0pZ
-	iRXj7v1lUT04CFFbKJEZdzjbWAx3rdpwtLTsTx1jOGzTW9Che9mFJSM4WCR8Gd7c
-	UsZ0up7e8K3IUGJTQkwQAjx3t5qyknlXG6ZlLwKVesOvU7sNwVUUley/wTv6uwNu
-	0AaJf5Q81ra14lTS4WgThNTrCuSLyvabvTZR4K08Ax4bHZuvzigxzj3ilSifvRt5
-	E6jz3aRG73snFKQp8rlMOyKEJgqYkNdMAsIaeTZfTOYxOxH59ZWYdvBrUTFtwxHE
-	LMAr0qNU+SU1vXMqm8XBnKFmUfNafnTw7+inYdA0c9ucpgL8KhBA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4623ts3rxq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 16 Apr 2025 08:01:14 -0700 (PDT)
-Received: from devvm31871.cln0.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 16 Apr 2025 15:01:11 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Michael Chan
-	<michael.chan@broadcom.com>,
-        Pavan Chebbi <pavan.chebbi@broadcom.com>,
-        Jakub
- Kicinski <kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net] bnxt_en: improve TX timestamping FIFO configuration
-Date: Wed, 16 Apr 2025 08:00:57 -0700
-Message-ID: <20250416150057.3904571-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1744815688; c=relaxed/simple;
+	bh=vl7iPlZCQbv2e58LMMtyYnM2QEyrQoMAueg8Yzr1VwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BsbJ3UO6qM1fMVJYrrzFdb+pvaE9yr4H0NmqMN//8vjqUIVhoq60E6CTRjLUDqmrPtqSoHWqVJpsG+IoRHfvhEWgWuW7QlGaEieyyl8zSAy6obCLx28BNQAHzv9uUBJWG2wv+7bCwbM3T65dSqMVvwu5e6krBQ5c3MIy2mjL+OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SydVNaLL; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30c416cdcc0so60458661fa.2;
+        Wed, 16 Apr 2025 08:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744815684; x=1745420484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XEA4bMgoWkNAjdVq+sKhszOqmVBDfX3d4YkLfqOPUFo=;
+        b=SydVNaLL5Y2Du+6hQJ3P6yig6+Luj6eiWXQVBzKs17YDrM9Lm4hPNyVlwuqzQoN86g
+         tHjrzUdEpBgr7HMrovqO/lXjd3bEtaA0qTkwlaCaLweQiW5Wwuti9QXpTUqLMasJ8NOW
+         wBuIOPvdhMrxxegrLI0xD4urq077qFMliLVoGb0MNTsf46NVz0WHfrv3w86Wc/XmFnih
+         L2Z5dqypBwB2oFfxfndaDnrg5kDldgqogELJk5qEPnjFgeBvHBUyOjuXQXiGjOIbTdR5
+         xl4Gg0+QCl33yPtp/9PCP9j8J97GO0Y39vJ3meUpo0SMl6OpNzznGWCXTOgaFOMjEXHR
+         FoHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744815684; x=1745420484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XEA4bMgoWkNAjdVq+sKhszOqmVBDfX3d4YkLfqOPUFo=;
+        b=vLBC1vWEeHwCEOXnziNWkyvvTD4khqjJq+CXRVhXP2jzXeS1Nveq5/+/9xLZ+UBbp/
+         eFOB0XmoKSdVpadBvQ7ProG37GhT+N6mr88w9ZGr0gqDYQHrBPJPA8HBtaKCPtnL8ZKI
+         Tybu84zCKZa7nNbyAp45M4W93V8a+4ksPpwEw2J33BeZ133gYtwTlGpUGT4EMi/99TA7
+         lQoab+Qk9V8isPrkCUoALqfSuUORPj+MYiqtJSBEYMeelfGbXbbQXq6DD9Y/8vSSYFWR
+         sPXV8D+LnE+FZPdITBsgMfy4IKF0npM4LvaOVb9irHOFcd5buHj3osf0WASZsoisONCT
+         7h5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV9vPiiKHzKld5A5rTEumVfsyNBhIb9+eP56/lZC440MqHIMlSVnyZJhaUUzRCEI5OEBy5DjbKL@vger.kernel.org, AJvYcCWPtuFElSJr1PTYv9uTVxV5TjZ85BdNQm3pZJ/L5hO1EWYk0F2vHVgx030QqQo7TpeCKUVkhzP9Iu8WBEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmwI++Isqi+kslMsDTnRKO1bd8UbB9o0+05vNL6U2WP/oGY9wB
+	uJJqr61Sg5ed5qiYyXkbBMdiDYT/KCkIneoFGE6aEftWGDSZdMDtuKNMr38C6x0DOqYWHJiu2oI
+	r2y6EscrKc6JneuLDmVjSvMDZMxk=
+X-Gm-Gg: ASbGncuzEZRpO5kGlOq+m4P6FBjPqggEuyFFw1ErNAo9i1i7INHyk/t+MVJ4sN6OVST
+	4wiixFm+k8gwYjEG6O6q7uDiTcPc35RpbT5BLQU3auW0a0NJQ19UUfkOEoKvjD7F/oi3lDw8Z1O
+	5bEkFvGme+AD9UcgIoBsw/KmUbsDUEJ8OAN/7CVEW1TAqStdYuEoLPvwScUOo6JO24rw==
+X-Google-Smtp-Source: AGHT+IHxPF/SyvfM4nKlYbpB7R3CCIgdNgXKO8k/2PeWF2tVp39aX1c6NsGRhUXtrCeIRNYx4l7pgCDsOTfa+nDbWbE=
+X-Received: by 2002:a2e:9a0b:0:b0:30b:cceb:1e71 with SMTP id
+ 38308e7fff4ca-3107f6bf07bmr10316081fa.9.1744815683949; Wed, 16 Apr 2025
+ 08:01:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: UVAJdFsbeUY-TSI92eWzNsvUREu8bMlx
-X-Proofpoint-ORIG-GUID: UVAJdFsbeUY-TSI92eWzNsvUREu8bMlx
-X-Authority-Analysis: v=2.4 cv=M+lNKzws c=1 sm=1 tr=0 ts=67ffc63a cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=XR8D0OoHHMoA:10 a=VabnemYjAAAA:8 a=fINLlK_q-lFes1NT6p8A:9 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-16_04,2025-04-15_01,2024-11-22_01
+References: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
+ <20250415163536.GA395307@horms.kernel.org> <20250415171927.5108d252@kernel.org>
+ <20250416111727.GO395307@horms.kernel.org>
+In-Reply-To: <20250416111727.GO395307@horms.kernel.org>
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Date: Wed, 16 Apr 2025 20:31:18 +0530
+X-Gm-Features: ATxdqUEJHVF7jhvx1Yuewr4b-DfNrQF96QOpK1ztbrFqXIqR6UoHQf3WrImSbOA
+Message-ID: <CAH4c4jJpfztu9mEBv_p8ACOa=h-WSTa+vJ45U0GUZ_nf0WsiRA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ipconfig: replace strncpy with strscpy
+To: Simon Horman <horms@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, skhan@linuxfoundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reconfiguration of netdev may trigger close/open procedure which can
-break FIFO status by adjusting the amount of empty slots for TX
-timestamps. But it is not really needed because timestamps for the
-packets sent over the wire still can be retrieved. On the other side,
-during netdev close procedure any skbs waiting for TX timestamps can be
-leaked because there is no cleaning procedure called. Free skbs waiting
-for TX timestamps when closing netdev.
+On Wed, Apr 16, 2025 at 4:47=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Tue, Apr 15, 2025 at 05:19:27PM -0700, Jakub Kicinski wrote:
+> > On Tue, 15 Apr 2025 17:35:36 +0100 Simon Horman wrote:
+> > > > @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
+> > > >                   *v =3D 0;
+> > > >                   if (kstrtou8(client_id, 0, dhcp_client_identifier=
+))
+> > > >                           pr_debug("DHCP: Invalid client identifier=
+ type\n");
+> > > > -                 strncpy(dhcp_client_identifier + 1, v + 1, 251);
+> > > > +                 strscpy(dhcp_client_identifier + 1, v + 1, 251);
+> > >
+> > > As an aside, I'm curious to know why the length is 251
+> > > rather than 252 (sizeof(dhcp_client_identifier) -1).
+> > > But that isn't strictly related to this patch.
+> >
+> > Isn't this because strncpy() doesn't nul-terminate, and since this is a
+> > static variable if we use len - 1 we guarantee that there will be a nul=
+l
+> > byte at the end? If we switch to strscpy we'll make the max string len
+> > 1 char shorter.
+>
+> Yes, that makes sense to me.
+> And so I think the patch should also increase 251 to 252.
 
-Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX packets to 4")
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 23 +++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
- 3 files changed, 26 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c8e3468eee61..45d178586316 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3517,6 +3517,8 @@ static void bnxt_free_skbs(struct bnxt *bp)
- {
- 	bnxt_free_tx_skbs(bp);
- 	bnxt_free_rx_skbs(bp);
-+	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-+		bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
- }
- 
- static void bnxt_init_ctx_mem(struct bnxt_ctx_mem_type *ctxm, void *p, int len)
-@@ -12797,8 +12799,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	/* VF-reps may need to be re-opened after the PF is re-opened */
- 	if (BNXT_PF(bp))
- 		bnxt_vf_reps_open(bp);
--	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
--		WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
- 	bnxt_ptp_init_rtc(bp, true);
- 	bnxt_ptp_cfg_tstamp_filters(bp);
- 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 2d4e19b96ee7..39dc4f1f651a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -794,6 +794,29 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
- 	return HZ;
- }
- 
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
-+{
-+	struct bnxt_ptp_tx_req *txts_req;
-+	u16 cons = ptp->txts_cons;
-+
-+	/* make sure ptp aux worker finished with
-+	 * possible BNXT_STATE_OPEN set
-+	 */
-+	ptp_cancel_worker_sync(ptp->ptp_clock);
-+
-+	spin_lock_bh(&ptp->ptp_tx_lock);
-+	ptp->tx_avail = BNXT_MAX_TX_TS;
-+	while (cons != ptp->txts_prod) {
-+		txts_req = &ptp->txts_req[cons];
-+		if (!IS_ERR_OR_NULL(txts_req->tx_skb))
-+			dev_kfree_skb_any(txts_req->tx_skb);
-+		cons = NEXT_TXTS(cons);
-+	}
-+	ptp->txts_cons = cons;
-+	spin_unlock_bh(&ptp->ptp_tx_lock);
-+	ptp_schedule_worker(ptp->ptp_clock, 0);
-+}
-+
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod)
- {
- 	spin_lock_bh(&ptp->ptp_tx_lock);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index a95f05e9c579..0481161d26ef 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -162,6 +162,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
- void bnxt_ptp_reapply_pps(struct bnxt *bp);
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
- int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
- void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
- int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
--- 
-2.47.1
-
+Thanks for pointing that out. I appreciate the feedback
+and will send an updated version with the suggested change.
+Regards
 
