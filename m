@@ -1,174 +1,443 @@
-Return-Path: <netdev+bounces-183477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4456A90CBB
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:05:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59E7DA90CBD
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D4A87AAE6F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626181761C2
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE9522655E;
-	Wed, 16 Apr 2025 20:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247C522687B;
+	Wed, 16 Apr 2025 20:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="juAXe9Pd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+ads7lG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C90189915
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 20:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED466189915;
+	Wed, 16 Apr 2025 20:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744833924; cv=none; b=FIAnVgayucfUgVTE0j+2o9heSYBJ4YXrDtPHjueA2K0cf71oKSWNNAO8IFzYE5iOs0tZhsXcXJQzmqaFeF+0Z7zDOSbnHqVEqyiY5ndd1q2rH+t/Aw0aIKMKwRBJ65ZCje1onLxJe5D0tPLr/t+UAwDx93SK7ExXAnLdO8c+fOA=
+	t=1744834124; cv=none; b=lpcjd8wQpXN0+6PO9ioL54sqpPnW88FtlGus4oxaeUFjGusmX/rLaHVgWkmM5auzP1wEAdFvxLgzFt/P8PyVKVZCezTBBwMvA2x9Uvt+HoVi6klnYIRlCzaR+60mTJv4L71lkrNsfk4TnMNkNwwMxrHEpftCOqbs8KKRyysb+YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744833924; c=relaxed/simple;
-	bh=DesI0ZdCoUDCynYy9G0+AI7PwSwmjPpqYhtRuEo8BNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1Y1MAYwcR5+VoHzpKOKm/+vNxopcX6KjYs+1xTxvvn91r3bSY0jWdx2MEftUa7mTitO3K4ebElbqSFgERWm7Saq4T2CeDjusm5b9GuQqOvChwaQshqadhtixZT5OENy4G7Qpjzno6lTPI8JNyTqZN3jtJjGoZ+IsjqbuhCZm7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=juAXe9Pd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rpdoC1q/CcJTaZYytbzGXhIOK+sgf3JysdRuJ15cWNE=; b=juAXe9PdIVTOrcWboJQBKPffGP
-	O+MFDi28/mYwLa8UN1MK0Tomoz8MQe5uQ1sAeC1AaHMqTOSFvcMXTrFF2JWlwOrNLf0PkAXmOinQy
-	SlsVgZCrSrxhSg/dI4Efcq3wIvmdo0+LK13kRpUNmzYK5HA5PHvDwpuWpK+xcoAh/K+URsdZI3EXJ
-	TRxxek9Xpkv6eRJFVCiEdgNXGiU/Rk5lArJkKuflcT3MymMGj2q6ZQ1P5D7XXJ9VLqTZVxzyUH397
-	Z94c6J8yFMrRr9VqThnTgSSD5O4kZOSoxqPkpiWB18o+EyTg6z1HyntYZsL5wUBe7rnhm3wCuiJTq
-	ETpyX/Xg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55258)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u590Y-0001t2-0b;
-	Wed, 16 Apr 2025 21:05:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u590V-0001hX-2u;
-	Wed, 16 Apr 2025 21:05:15 +0100
-Date: Wed, 16 Apr 2025 21:05:15 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [net-next PATCH 2/2] net: phylink: Fix issues with link
- balancing w/ BMC present
-Message-ID: <aAANe/qMWIRY2K5l@shell.armlinux.org.uk>
-References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
- <174481734008.986682.1350602067856870465.stgit@ahduyck-xeon-server.home.arpa>
- <Z__URcfITnra19xy@shell.armlinux.org.uk>
- <CAKgT0UcgZpE4CMDmnR2V2GTz3tyd+atU-mgMqiHesZVXN8F_+g@mail.gmail.com>
- <aAACyQ494eO4LFQD@shell.armlinux.org.uk>
+	s=arc-20240116; t=1744834124; c=relaxed/simple;
+	bh=myn9l6kJUr4LlnxmB5t1FTNKJEK82xQpx8D8fFOMGOQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pD/OgpTEVuz3stp0vqnREdGawvRudW6URgc408NFu/+U+06KjGPop7677Ideo/3vxi8QkK0NDQJEcIVyzMxFXUACctfxTIifPrCpQWC3alIdC9tkVTGP2daLFQnMEaMCnSTuvclBxj0dGW04dNncLu4OgpboFHF8DsR5ELmyze8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+ads7lG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D90E4C4CEE2;
+	Wed, 16 Apr 2025 20:08:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744834123;
+	bh=myn9l6kJUr4LlnxmB5t1FTNKJEK82xQpx8D8fFOMGOQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=P+ads7lGKJ1lCvha1d5WHeYFNeu5qDF0MK3SXLkZWK1vKCoGrXTrZFYYEjFYQHW9S
+	 FhfZKOfhGhJVwSpHts3AoiQH9gyri77Ykcm14PNFy1YrTYUZrFinQi0s/Om/JrrfD7
+	 Ssj2qqPIvuYHtympM4+gLhUr7vzRBV11KDrxwN96E8qfMA2PKkQoqEp72p0/bs3cQz
+	 L8Dy3LFdIz/iK5EbP/89TyHzvGCkkYxhz3UEqmEoI4D1VF0LYlft/0G3WmT2fAqrfu
+	 leuFwfvgo5vg0aeowu2Hl5KnXJixbM2Q6ooALWbz/qaR5cdtYW73Ybpsnf7AaocuqM
+	 j01mBXu72g1WA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	m.grzeschik@pengutronix.de,
+	jv@jvosburgh.net,
+	willemdebruijn.kernel@gmail.com,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	nhorman@tuxdriver.com,
+	kernelxing@tencent.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	idosch@nvidia.com,
+	gnault@redhat.com,
+	petrm@nvidia.com,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next] net: add UAPI to the header guard in various network headers
+Date: Wed, 16 Apr 2025 13:08:40 -0700
+Message-ID: <20250416200840.1338195-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAACyQ494eO4LFQD@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 16, 2025 at 08:19:38PM +0100, Russell King (Oracle) wrote:
-> So, when a Linux network driver probes, it starts out in administrative
-> state *DOWN*. When the administrator configures the network driver,
-> .ndo_open is called, which is expected to configure the network adapter.
-> 
-> Part of that process is to call phylink_start() as one of the last
-> steps, which detects whether the link is up or not. If the link is up,
-> then phylink will call netif_carrier_on() and .mac_link_up(). This
-> tells the core networking layers that the network interface is now
-> ready to start sending packets, and it will begin queueing packets for
-> the network driver to process - not before.
-> 
-> Prior to .ndo_open being called, the networking layers do not expect
-> traffic from the network device no matter what physical state the
-> media link is in. If .ndo_open fails, the same applies - no traffic is
-> expected to be passed to the core network layers from the network
-> layers because as far as the network stack is concerned, the interface
-> is still administratively down.
-> 
-> Thus, the fact that your BMC thinks that the link is up is irrelevant.
-> 
-> So, start off in a state that packet activity is suspended even if the
-> link is up at probe time. Only start packet activity (reception and
-> transmission) once .mac_link_up() has been called. Stop that activity
-> when .mac_link_down() is subsequently called.
-> 
-> There have been lots of NICs out there where the physical link doesn't
-> follow the adminstrative state of the network interface. This is not a
-> problem. It may be desirable that it does, but a desire is not the same
-> as "it must".
+fib_rule, ip6_tunnel, and a whole lot of if_* headers lack the customary
+_UAPI in the header guard. Without it YNL build can't protect from in tree
+and system headers both getting included. YNL doesn't need most of these
+but it's annoying to have to fix them one by one.
 
-Let me be crystal clear on this.
+Note that header installation strips this _UAPI prefix so this should
+result in no change to the end user.
 
-Phylink has a contract with all existing users. That contract is:
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: m.grzeschik@pengutronix.de
+CC: jv@jvosburgh.net
+CC: willemdebruijn.kernel@gmail.com
+CC: magnus.karlsson@intel.com
+CC: maciej.fijalkowski@intel.com
+CC: nhorman@tuxdriver.com
+CC: kernelxing@tencent.com
+CC: jhs@mojatatu.com
+CC: xiyou.wangcong@gmail.com
+CC: jiri@resnulli.us
+CC: idosch@nvidia.com
+CC: gnault@redhat.com
+CC: petrm@nvidia.com
+CC: bpf@vger.kernel.org
+---
+ include/uapi/linux/fib_rules.h    | 4 ++--
+ include/uapi/linux/if_addr.h      | 4 ++--
+ include/uapi/linux/if_addrlabel.h | 4 ++--
+ include/uapi/linux/if_alg.h       | 6 +++---
+ include/uapi/linux/if_arcnet.h    | 6 +++---
+ include/uapi/linux/if_bonding.h   | 6 +++---
+ include/uapi/linux/if_fc.h        | 6 +++---
+ include/uapi/linux/if_hippi.h     | 6 +++---
+ include/uapi/linux/if_packet.h    | 4 ++--
+ include/uapi/linux/if_plip.h      | 4 ++--
+ include/uapi/linux/if_slip.h      | 4 ++--
+ include/uapi/linux/if_x25.h       | 6 +++---
+ include/uapi/linux/if_xdp.h       | 6 +++---
+ include/uapi/linux/ip6_tunnel.h   | 4 ++--
+ include/uapi/linux/net_dropmon.h  | 4 ++--
+ include/uapi/linux/net_tstamp.h   | 6 +++---
+ include/uapi/linux/netlink_diag.h | 4 ++--
+ include/uapi/linux/pkt_cls.h      | 4 ++--
+ include/uapi/linux/pkt_sched.h    | 4 ++--
+ 19 files changed, 46 insertions(+), 46 deletions(-)
 
-Initial state: link down.
-
-Driver calls phylink_start() in its .ndo_open method.
-
-Phylink does configuration of the PHY and link according to the
-chosen link parameters by calling into the MAC, PCS, and phylib as
-appropriate.
-
-If the link is then discovered to be up (it might have been already
-up before phylink_start() was called), phylink will call the various
-components such as PCS and MAC to inform them that the link is now up.
-This will mean calling the .mac_link_up() method. Otherwise (if the
-link is discovered to be down when the interface is brought up) no
-call to either .mac_link_up() nor .mac_link_down() will be made.
-
-If the link _subsequently_ goes down, then phylink deals with that
-and calls .mac_link_down() - only if .mac_link_up() was previously
-called (that's one of the bugs you discovered, that on resume it
-gets called anyway. I've submitted a fix for that contract breach,
-which only affects a very small number of drivers - stmmac, ucc_geth
-and your fbnic out of 22 total ethernet users plus however many DSA
-users we have.)
-
-Only if .mac_link_down() has been called, if the link subsequently
-comes back up, then the same process happens as before resulting in
-.mac_link_up() being called.
-
-If the interface is taken down, then .mac_link_down() will be called
-if and only if .mac_link_up() had been called.
-
-The ordering of .mac_link_up() / .mac_link_down() is a strict
-contract term with phylink users.
-
-The reason for this contract: phylink users may have ordering
-requirements.
-
-For example, on mac_link_down(), they may wait for packet activity to
-stop, and then place the MAC in reset. If called without a previous
-.mac_link_up call, the wait stage may time out due to the MAC being
-in reset. (Ocelot may suffer with this.)
-
-Another example is fs_enet which also relies on this strict ordering
-as described above.
-
-There could be others - there are some that call into firmware on
-calls to .mac_link_up() / .mac_link_down() and misordering those
-depends on what the firmware is doing, which we have no visibility
-of.
-
-As I stated, this is the contract that phylink gave to users, and
-the contract still stands, and can't be broken to behave differently
-(e.g. calling .mac_link_down() after phylink_start() without an
-intervening call to .mac_link_up()) otherwise existing users will
-break. Bugs that go against that contract will be fixed, but the
-contract will not be intentionally broken.
-
+diff --git a/include/uapi/linux/fib_rules.h b/include/uapi/linux/fib_rules.h
+index 2df6e4035d50..418c4be697ad 100644
+--- a/include/uapi/linux/fib_rules.h
++++ b/include/uapi/linux/fib_rules.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __LINUX_FIB_RULES_H
+-#define __LINUX_FIB_RULES_H
++#ifndef _UAPI__LINUX_FIB_RULES_H
++#define _UAPI__LINUX_FIB_RULES_H
+ 
+ #include <linux/types.h>
+ #include <linux/rtnetlink.h>
+diff --git a/include/uapi/linux/if_addr.h b/include/uapi/linux/if_addr.h
+index 1c392dd95a5e..aa7958b4e41d 100644
+--- a/include/uapi/linux/if_addr.h
++++ b/include/uapi/linux/if_addr.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __LINUX_IF_ADDR_H
+-#define __LINUX_IF_ADDR_H
++#ifndef _UAPI__LINUX_IF_ADDR_H
++#define _UAPI__LINUX_IF_ADDR_H
+ 
+ #include <linux/types.h>
+ #include <linux/netlink.h>
+diff --git a/include/uapi/linux/if_addrlabel.h b/include/uapi/linux/if_addrlabel.h
+index d1f5974c76e1..e69db764fbba 100644
+--- a/include/uapi/linux/if_addrlabel.h
++++ b/include/uapi/linux/if_addrlabel.h
+@@ -8,8 +8,8 @@
+  *	YOSHIFUJI Hideaki @ USAGI/WIDE <yoshfuji@linux-ipv6.org>
+  */
+ 
+-#ifndef __LINUX_IF_ADDRLABEL_H
+-#define __LINUX_IF_ADDRLABEL_H
++#ifndef _UAPI__LINUX_IF_ADDRLABEL_H
++#define _UAPI__LINUX_IF_ADDRLABEL_H
+ 
+ #include <linux/types.h>
+ 
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index 0824fbc026a1..b35871cbeed7 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -11,8 +11,8 @@
+  *
+  */
+ 
+-#ifndef _LINUX_IF_ALG_H
+-#define _LINUX_IF_ALG_H
++#ifndef _UAPI_LINUX_IF_ALG_H
++#define _UAPI_LINUX_IF_ALG_H
+ 
+ #include <linux/types.h>
+ 
+@@ -58,4 +58,4 @@ struct af_alg_iv {
+ #define ALG_OP_DECRYPT			0
+ #define ALG_OP_ENCRYPT			1
+ 
+-#endif	/* _LINUX_IF_ALG_H */
++#endif	/* _UAPI_LINUX_IF_ALG_H */
+diff --git a/include/uapi/linux/if_arcnet.h b/include/uapi/linux/if_arcnet.h
+index b122cfac7128..473569eaf692 100644
+--- a/include/uapi/linux/if_arcnet.h
++++ b/include/uapi/linux/if_arcnet.h
+@@ -14,8 +14,8 @@
+  *              2 of the License, or (at your option) any later version.
+  */
+ 
+-#ifndef _LINUX_IF_ARCNET_H
+-#define _LINUX_IF_ARCNET_H
++#ifndef _UAPI_LINUX_IF_ARCNET_H
++#define _UAPI_LINUX_IF_ARCNET_H
+ 
+ #include <linux/types.h>
+ #include <linux/if_ether.h>
+@@ -127,4 +127,4 @@ struct archdr {
+ 	} soft;
+ };
+ 
+-#endif				/* _LINUX_IF_ARCNET_H */
++#endif				/* _UAPI_LINUX_IF_ARCNET_H */
+diff --git a/include/uapi/linux/if_bonding.h b/include/uapi/linux/if_bonding.h
+index d174914a837d..3bcc03f3aa4f 100644
+--- a/include/uapi/linux/if_bonding.h
++++ b/include/uapi/linux/if_bonding.h
+@@ -41,8 +41,8 @@
+  *      - added definitions for various XOR hashing policies
+  */
+ 
+-#ifndef _LINUX_IF_BONDING_H
+-#define _LINUX_IF_BONDING_H
++#ifndef _UAPI_LINUX_IF_BONDING_H
++#define _UAPI_LINUX_IF_BONDING_H
+ 
+ #include <linux/if.h>
+ #include <linux/types.h>
+@@ -152,4 +152,4 @@ enum {
+ };
+ #define BOND_3AD_STAT_MAX (__BOND_3AD_STAT_MAX - 1)
+ 
+-#endif /* _LINUX_IF_BONDING_H */
++#endif /* _UAPI_LINUX_IF_BONDING_H */
+diff --git a/include/uapi/linux/if_fc.h b/include/uapi/linux/if_fc.h
+index 3e3173282cc3..ff5ab92d16c2 100644
+--- a/include/uapi/linux/if_fc.h
++++ b/include/uapi/linux/if_fc.h
+@@ -18,8 +18,8 @@
+  *		as published by the Free Software Foundation; either version
+  *		2 of the License, or (at your option) any later version.
+  */
+-#ifndef _LINUX_IF_FC_H
+-#define _LINUX_IF_FC_H
++#ifndef _UAPI_LINUX_IF_FC_H
++#define _UAPI_LINUX_IF_FC_H
+ 
+ #include <linux/types.h>
+ 
+@@ -49,4 +49,4 @@ struct fcllc {
+ 	__be16 ethertype;		/* ether type field */
+ };
+ 
+-#endif	/* _LINUX_IF_FC_H */
++#endif	/* _UAPI_LINUX_IF_FC_H */
+diff --git a/include/uapi/linux/if_hippi.h b/include/uapi/linux/if_hippi.h
+index 785a1452a66c..42c4ffd11dae 100644
+--- a/include/uapi/linux/if_hippi.h
++++ b/include/uapi/linux/if_hippi.h
+@@ -20,8 +20,8 @@
+  *		2 of the License, or (at your option) any later version.
+  */
+  
+-#ifndef _LINUX_IF_HIPPI_H
+-#define _LINUX_IF_HIPPI_H
++#ifndef _UAPI_LINUX_IF_HIPPI_H
++#define _UAPI_LINUX_IF_HIPPI_H
+ 
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
+@@ -151,4 +151,4 @@ struct hippi_hdr {
+ 	struct hippi_snap_hdr	snap;
+ } __attribute__((packed));
+ 
+-#endif	/* _LINUX_IF_HIPPI_H */
++#endif	/* _UAPI_LINUX_IF_HIPPI_H */
+diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
+index 1d2718dd9647..6cd1d7a41dfb 100644
+--- a/include/uapi/linux/if_packet.h
++++ b/include/uapi/linux/if_packet.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __LINUX_IF_PACKET_H
+-#define __LINUX_IF_PACKET_H
++#ifndef _UAPI__LINUX_IF_PACKET_H
++#define _UAPI__LINUX_IF_PACKET_H
+ 
+ #include <asm/byteorder.h>
+ #include <linux/types.h>
+diff --git a/include/uapi/linux/if_plip.h b/include/uapi/linux/if_plip.h
+index 495a366112f2..054d86a9c6e6 100644
+--- a/include/uapi/linux/if_plip.h
++++ b/include/uapi/linux/if_plip.h
+@@ -9,8 +9,8 @@
+  *
+  */
+  
+-#ifndef _LINUX_IF_PLIP_H
+-#define _LINUX_IF_PLIP_H
++#ifndef _UAPI_LINUX_IF_PLIP_H
++#define _UAPI_LINUX_IF_PLIP_H
+ 
+ #include <linux/sockios.h>
+ 
+diff --git a/include/uapi/linux/if_slip.h b/include/uapi/linux/if_slip.h
+index 65937be53103..299bf7adc862 100644
+--- a/include/uapi/linux/if_slip.h
++++ b/include/uapi/linux/if_slip.h
+@@ -6,8 +6,8 @@
+  *	KISS TNC driver.
+  */
+  
+-#ifndef __LINUX_SLIP_H
+-#define __LINUX_SLIP_H
++#ifndef _UAPI__LINUX_SLIP_H
++#define _UAPI__LINUX_SLIP_H
+ 
+ #define		SL_MODE_SLIP		0
+ #define		SL_MODE_CSLIP		1
+diff --git a/include/uapi/linux/if_x25.h b/include/uapi/linux/if_x25.h
+index 3a5938e38370..861cfa983db4 100644
+--- a/include/uapi/linux/if_x25.h
++++ b/include/uapi/linux/if_x25.h
+@@ -13,8 +13,8 @@
+  *  GNU General Public License for more details.
+  */
+ 
+-#ifndef _IF_X25_H
+-#define _IF_X25_H
++#ifndef _UAPI_IF_X25_H
++#define _UAPI_IF_X25_H
+ 
+ #include <linux/types.h>
+ 
+@@ -24,4 +24,4 @@
+ #define X25_IFACE_DISCONNECT	0x02
+ #define X25_IFACE_PARAMS	0x03
+ 
+-#endif /* _IF_X25_H */
++#endif /* _UAPI_IF_X25_H */
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 42869770776e..44f2bb93e7e6 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -7,8 +7,8 @@
+  *	      Magnus Karlsson <magnus.karlsson@intel.com>
+  */
+ 
+-#ifndef _LINUX_IF_XDP_H
+-#define _LINUX_IF_XDP_H
++#ifndef _UAPI_LINUX_IF_XDP_H
++#define _UAPI_LINUX_IF_XDP_H
+ 
+ #include <linux/types.h>
+ 
+@@ -180,4 +180,4 @@ struct xdp_desc {
+ /* TX packet carries valid metadata. */
+ #define XDP_TX_METADATA (1 << 1)
+ 
+-#endif /* _LINUX_IF_XDP_H */
++#endif /* _UAPI_LINUX_IF_XDP_H */
+diff --git a/include/uapi/linux/ip6_tunnel.h b/include/uapi/linux/ip6_tunnel.h
+index 0245269b037c..85182a839d42 100644
+--- a/include/uapi/linux/ip6_tunnel.h
++++ b/include/uapi/linux/ip6_tunnel.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef _IP6_TUNNEL_H
+-#define _IP6_TUNNEL_H
++#ifndef _UAPI_IP6_TUNNEL_H
++#define _UAPI_IP6_TUNNEL_H
+ 
+ #include <linux/types.h>
+ #include <linux/if.h>		/* For IFNAMSIZ. */
+diff --git a/include/uapi/linux/net_dropmon.h b/include/uapi/linux/net_dropmon.h
+index 84f622a66a7a..9dd41c2f58a6 100644
+--- a/include/uapi/linux/net_dropmon.h
++++ b/include/uapi/linux/net_dropmon.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __NET_DROPMON_H
+-#define __NET_DROPMON_H
++#ifndef _UAPI__NET_DROPMON_H
++#define _UAPI__NET_DROPMON_H
+ 
+ #include <linux/types.h>
+ #include <linux/netlink.h>
+diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+index 383213de612a..a93e6ea37fb3 100644
+--- a/include/uapi/linux/net_tstamp.h
++++ b/include/uapi/linux/net_tstamp.h
+@@ -7,8 +7,8 @@
+  *
+  */
+ 
+-#ifndef _NET_TIMESTAMPING_H
+-#define _NET_TIMESTAMPING_H
++#ifndef _UAPI_NET_TIMESTAMPING_H
++#define _UAPI_NET_TIMESTAMPING_H
+ 
+ #include <linux/types.h>
+ #include <linux/socket.h>   /* for SO_TIMESTAMPING */
+@@ -216,4 +216,4 @@ struct sock_txtime {
+ 	__u32			flags;	/* as defined by enum txtime_flags */
+ };
+ 
+-#endif /* _NET_TIMESTAMPING_H */
++#endif /* _UAPI_NET_TIMESTAMPING_H */
+diff --git a/include/uapi/linux/netlink_diag.h b/include/uapi/linux/netlink_diag.h
+index dfa61be43d2f..ff28200204bb 100644
+--- a/include/uapi/linux/netlink_diag.h
++++ b/include/uapi/linux/netlink_diag.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __NETLINK_DIAG_H__
+-#define __NETLINK_DIAG_H__
++#ifndef _UAPI__NETLINK_DIAG_H__
++#define _UAPI__NETLINK_DIAG_H__
+ 
+ #include <linux/types.h>
+ 
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index 2c32080416b5..490821364165 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __LINUX_PKT_CLS_H
+-#define __LINUX_PKT_CLS_H
++#ifndef _UAPI__LINUX_PKT_CLS_H
++#define _UAPI__LINUX_PKT_CLS_H
+ 
+ #include <linux/types.h>
+ #include <linux/pkt_sched.h>
+diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+index 25a9a47001cd..9ea874395717 100644
+--- a/include/uapi/linux/pkt_sched.h
++++ b/include/uapi/linux/pkt_sched.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef __LINUX_PKT_SCHED_H
+-#define __LINUX_PKT_SCHED_H
++#ifndef _UAPI__LINUX_PKT_SCHED_H
++#define _UAPI__LINUX_PKT_SCHED_H
+ 
+ #include <linux/const.h>
+ #include <linux/types.h>
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.49.0
+
 
