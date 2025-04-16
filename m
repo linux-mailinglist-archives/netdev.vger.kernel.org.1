@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-183081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BFD4A8AD23
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:00:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 656B9A8AD33
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC017441F85
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:00:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF80F19041AC
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 01:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C7A1FF5E3;
-	Wed, 16 Apr 2025 00:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D5D1DDC1A;
+	Wed, 16 Apr 2025 01:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSnC9P3R"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ic2JqSDZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3BF1FF1B4;
-	Wed, 16 Apr 2025 00:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C51C8BE5;
+	Wed, 16 Apr 2025 01:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744765197; cv=none; b=YKZ9yvaRIyqJpMXiIDwr9DVcueJyerXPhcW4HMvlh71V0X69K453Ayhk1dhBDS1Kw3ts+I5/AhCepwdbp6UC2QWJdb6eLsDez32LxgvDrygRECopEpYKoudqBVxMj8MKNBs2IQ9WRtiII/ur8xKAH8nhRni+VkDCpXbfeBInrnI=
+	t=1744765261; cv=none; b=lkVpzGvNYmED++4+KDI5k0ri6xlH6XZnr2V9n6G8aHIAiJ0YlLtZiwhxO3txDIn2ywxsSv6jYcxLqzSD2xntHvD+4q9k0fa3JABQWxZTScnjAurqHT8D6Gaw3xN0jpNqE5KIO0WXfN6EoJbG2rD95QaS1nagoMjO5+jTd807m4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744765197; c=relaxed/simple;
-	bh=151ygcNcMsIrFJplJv9MnBQOAdO53zCmpNtyrWa+quA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dQAL67UIcz5MVtWpxnu/BYEFj5tw4SmynUJQxCakZtHxArcWU99/QJA+D1TP612PYxx3oMBGQCiqou8NOpKnRke2DaMGNrsJiP7yp0FzG+G43cN6+YJIs/jL4zru4+yWckGI5Ewce8fgG8FEwzdhdYG9GRNTOnuShKf1bMwy0lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSnC9P3R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C61C4CEEB;
-	Wed, 16 Apr 2025 00:59:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744765197;
-	bh=151ygcNcMsIrFJplJv9MnBQOAdO53zCmpNtyrWa+quA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QSnC9P3Rr+Kfd0txBvFl7NiYvSHdTIhA+belTHNgD0yzB8wKinm0IpPBHyz9SsYye
-	 LywxoCGvyO/B6SFafA1vrkCSGzYLIh8jXEbVYI+ViIX3xVMOWTT3/DBI+8sEzZ2gLu
-	 cgnr546LFuT4L9q6Baq4iL9oiyQKkggHqwfSP1f3rwe6SYADAiETUfJuNNNloyaub9
-	 b6w/V2huI0AhuM+F7ydpNpKa9fRgC40Rh/l7IDt8FUXSqYrtvN5rXbk/bdqks/PbBU
-	 3BedhfjgT1beI+lvuWZUD4jYfP5GAHh3i8/KLtJSFSHlJVPFDTqTS1y4VidH5i9oIl
-	 0u9XdfeoZhqSQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1EE3822D4B;
-	Wed, 16 Apr 2025 01:00:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744765261; c=relaxed/simple;
+	bh=hdDMC3t4z6iQ3U9D+DxOWeLvYWCrPGUBbYQep7YFNRA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qChF003xWRbvKXIwZWMn99LEPUSiIbid+X5xb0kn+jpz7SFI5PtbCNoy5jqmvddUPBgFduBDPws0zGZIRgvpDdY6iicqzv5HIOJ5b7ZRmhK3edLKyQPmqtxrFSMdUgEziNmHt8FTL3fX8cnvI6SjOY4zjC62kYGuYQ7gz2hit0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ic2JqSDZ; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744765261; x=1776301261;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LNC2NUQZoQKRcriMrmjGn2B1GzRVxPIEFN7hK/2izxA=;
+  b=ic2JqSDZFaE0he3/rBh99sajl+ZYp0SIxfOzBXp5fPPdwQM+V31HXfpH
+   jCsHS7ImWbg1wy6qAynXBuq0jbjmiuQLZDDyqF7xvczozsIQKe9Q7kEQo
+   xSxZk2agSZu8oLklo6QuinkUq+ni5YhJPDhedRBPTQYFsa21c//25NZl9
+   g=;
+X-IronPort-AV: E=Sophos;i="6.15,214,1739836800"; 
+   d="scan'208";a="396201453"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 01:00:59 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:53041]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
+ id b519ef6e-3b62-4e0d-a481-f37b717d2bd7; Wed, 16 Apr 2025 01:00:58 +0000 (UTC)
+X-Farcaster-Flow-ID: b519ef6e-3b62-4e0d-a481-f37b717d2bd7
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 01:00:57 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.88.149.87) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 16 Apr 2025 01:00:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <kernel-team@meta.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 4/8] ipv4: Use nlmsg_payload in devinet file
+Date: Tue, 15 Apr 2025 18:00:45 -0700
+Message-ID: <20250416010046.23273-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250415-nlmsg_v2-v1-4-a1c75d493fd7@debian.org>
+References: <20250415-nlmsg_v2-v1-4-a1c75d493fd7@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,45 +76,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: bridge: locally receive all multicast
- packets if IFF_ALLMULTI is set
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174476523524.2834710.11784912594036142552.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Apr 2025 01:00:35 +0000
-References: <OSZPR01MB8434308370ACAFA90A22980798B32@OSZPR01MB8434.jpnprd01.prod.outlook.com>
-In-Reply-To: <OSZPR01MB8434308370ACAFA90A22980798B32@OSZPR01MB8434.jpnprd01.prod.outlook.com>
-To: Shengyu Qu <wiagn233@outlook.com>
-Cc: razor@blackwall.org, idosch@nvidia.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- nbd@nbd.name
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA002.ant.amazon.com (10.13.139.53) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 14 Apr 2025 18:56:01 +0800 you wrote:
-> If multicast snooping is enabled, multicast packets may not always end up
-> on the local bridge interface, if the host is not a member of the multicast
-> group. Similar to how IFF_PROMISC allows all packets to be received
-> locally, let IFF_ALLMULTI allow all multicast packets to be received.
+From: Breno Leitao <leitao@debian.org>
+Date: Tue, 15 Apr 2025 12:28:55 -0700
+> Leverage the new nlmsg_payload() helper to avoid checking for message
+> size and then reading the nlmsg data.
 > 
-> OpenWrt uses a user space daemon for DHCPv6/RA/NDP handling, and in relay
-> mode it sets the ALLMULTI flag in order to receive all relevant queries on
-> the network.
-> 
-> [...]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Here is the summary with links:
-  - [net-next,v3] net: bridge: locally receive all multicast packets if IFF_ALLMULTI is set
-    https://git.kernel.org/netdev/net-next/c/a496d2f0fd61
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
