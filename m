@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-183277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 343ABA8B903
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:28:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D6BA8B908
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 776FF18916EC
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:28:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D7053AB54E
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936E424889F;
-	Wed, 16 Apr 2025 12:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98460221272;
+	Wed, 16 Apr 2025 12:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="glWcQhDU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iqLfqMOP"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878812472B0;
-	Wed, 16 Apr 2025 12:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162BC2327A1
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 12:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744806471; cv=none; b=qZBlT0oNGyGPiXNljfDMLal2mQwfhFQbs2kumjGFQ0pK8LWsTrUpgR660xe8Jkrll57wdVADIAyEUZl65oZVaRuc5m+syPbyRhdrF8N+EBRYGqFhfbE/XU659cacB37cx8eB2dcoAzr86zJ+OU0LrNagAInV0/A51vDUVcL9Dr4=
+	t=1744806511; cv=none; b=cG9A4PNLTdh5RlwNNB8R+nAlKOCITlUsb9TqEDmnUEvJoxPDR6ZHiLF+9BBmSIQYc4v7cil850UGNm9n9YMYxw7QfEn2HpMdCWCzx5UCK+q7qprUQS4OAPVWfP0FF2K0AXpl/nQ1HpMhR2IugkBgEXaR43TtMnGZ3OEIwqeFHwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744806471; c=relaxed/simple;
-	bh=2Z9dMh3cUftNywdxpqLdiZhzIykbnecaYABQWReuukc=;
+	s=arc-20240116; t=1744806511; c=relaxed/simple;
+	bh=rkNqZzsqsytXu4XNRnjvbpXulGrjKfBIYaKK7CA9Vgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PpSSYJ+jFqLB6EE1QdOzOgboez8k5eggUDsFGGGKt9hECi6trLjespJ7nJUkJ5LdiwI1QGIcdqo2Zx7PLBoMrZ0RIaptV91VxLPd+IEGvimzjkELAMvhZgTCrvXo2FMKtOYsC/ezoDNqa/1CXqJnUw3kOn/cae3ddJvn9IC82EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=glWcQhDU; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xtxh3pjkvc4I6dhpltGeiAVF6GugCOPsBCER8sYeLNDCH1zbpyCY0BizNmNWrbPtbgLSWqeJBgplJbN4/+XrZpDIn42YNfLp2Kuym1tmgJaqXI2BSwQYQw0hZcLGXovHWoGY2B9TnL80MJU3zG1wfpuqAu4RGK34gRNFVxFYMoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iqLfqMOP; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,28 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=M6LZ4xvneSkqTz22l3dMKDkqWPVz423Fwa7KsioWGuA=; b=glWcQhDU7brC7S3hO/V50YBI06
-	VnjiupGMv6jbZ+aQIKjz2lzfyyldKifS+Dohd+2omPCSVsilyPi0iHjFgp/qCIXeqg4Z57ONQ1u0v
-	bcRxmL2mht1t1baiQinA8cC1MwRbseAE5DxgbA6Tp14Aelkj4ugbrgOkPYsAWhON1S28=;
+	bh=MLeqxcCuX3BoT7U+FhDZa/UKFjGcWR5LVHuvgMXj9MA=; b=iqLfqMOPWoffq199Gd/V5c66wg
+	CBrB0Kj4NnLc4sKIpIgvttRQfduIi4E9m4MKJjBijUcIl6btI73w5wN8VacxCEkuOvYI1c7JgEVMx
+	S6Umj5FJcBENd8Y5GmjAUnLN7m85/3sIlyEv8qKq4B+MOi6xcwiX4dXew97/tZpNq0eU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u51rc-009cKD-AE; Wed, 16 Apr 2025 14:27:36 +0200
-Date: Wed, 16 Apr 2025 14:27:36 +0200
+	id 1u51sK-009cLA-2K; Wed, 16 Apr 2025 14:28:20 +0200
+Date: Wed, 16 Apr 2025 14:28:20 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Fiona Klute <fiona.klute@gmx.de>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	"David S . Miller" <davem@davemloft.net>,
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-list@raspberrypi.com
-Subject: Re: [PATCH net v2] net: phy: microchip: force IRQ polling mode for
- lan88xx
-Message-ID: <89826aa3-adc6-4278-a85a-b72ba8132add@lunn.ch>
-References: <20250416102413.30654-1-fiona.klute@gmx.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: mediatek: stop initialising
+ plat->mac_interface
+Message-ID: <c952e3ac-58d2-4913-a006-c8e9215e9d2e@lunn.ch>
+References: <E1u4zyh-000xVE-PG@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,36 +70,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250416102413.30654-1-fiona.klute@gmx.de>
+In-Reply-To: <E1u4zyh-000xVE-PG@rmk-PC.armlinux.org.uk>
 
-On Wed, Apr 16, 2025 at 12:24:13PM +0200, Fiona Klute wrote:
-> With lan88xx based devices the lan78xx driver can get stuck in an
-> interrupt loop while bringing the device up, flooding the kernel log
-> with messages like the following:
+On Wed, Apr 16, 2025 at 11:26:47AM +0100, Russell King (Oracle) wrote:
+> Mediatek doesn't make use of mac_interface, and none of the in-tree
+> DT files use the mac-mode property. Therefore, mac_interface already
+> follows phy_interface. Remove this unnecessary assignment.
 > 
-> lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
-> 
-> Removing interrupt support from the lan88xx PHY driver forces the
-> driver to use polling instead, which avoids the problem.
-> 
-> The issue has been observed with Raspberry Pi devices at least since
-> 4.14 (see [1], bug report for their downstream kernel), as well as
-> with Nvidia devices [2] in 2020, where disabling polling was the
-> vendor-suggested workaround (together with the claim that phylib
-> changes in 4.9 made the interrupt handling in lan78xx incompatible).
-> 
-> Iperf reports well over 900Mbits/sec per direction with client in
-> --dualtest mode, so there does not seem to be a significant impact on
-> throughput (lan88xx device connected via switch to the peer).
-> 
-> [1] https://github.com/raspberrypi/linux/issues/2447
-> [2] https://forums.developer.nvidia.com/t/jetson-xavier-and-lan7800-problem/142134/11
-> 
-> Link: https://lore.kernel.org/0901d90d-3f20-4a10-b680-9c978e04ddda@lunn.ch
-> Fixes: 792aec47d59d ("add microchip LAN88xx phy driver")
-> Signed-off-by: Fiona Klute <fiona.klute@gmx.de>
-> Cc: kernel-list@raspberrypi.com
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
