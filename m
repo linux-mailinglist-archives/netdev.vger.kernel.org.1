@@ -1,123 +1,135 @@
-Return-Path: <netdev+bounces-183177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A4CA8B4B7
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:06:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010D0A8B4C1
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 598287AC89B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8358E3B8A36
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5DBE230D0D;
-	Wed, 16 Apr 2025 09:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD4F233D87;
+	Wed, 16 Apr 2025 09:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ROrmdjIb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihoIMBG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A77321348;
-	Wed, 16 Apr 2025 09:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F1A233D7B
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 09:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744794332; cv=none; b=bvLuSJMdWnlKAwkuPQ7szFsSmTuQN6PGa9NagkPi+0yyVugOZtJ3jmauIyrVY7E7+D6Sx0XEMcssFNdhjTs0Yddgv4FbimKLy4bBmKsOr6TSuqhCzwK134gN4zLAi8hz7RlZhqj6H10C5MrOBlMVpboijc/q/+nOnI614dcsKi4=
+	t=1744794397; cv=none; b=OeJEQR7FOLzDqJbdqQu7GDfbIfNahZxsT1NgaJL6Q5YDEFhk47TEA94RkQqVOhv8po3HmMf6cS6h0/90BFil6eAwPvLRYLT73cQ1/1kiXx5AVaHS/V1f+ZV8eMh1KpGHJjJdBWuxRJ4Xs8RO0zsfwB8VMlQOmrzXS8CVX6Jtkk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744794332; c=relaxed/simple;
-	bh=uMEWrCr78cmv0MuAdTeAQGXVKQxOSKaTL/7Tz6bCxOs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AeK/tTRcRrGG3oJW9CmE2Thhku/QdL9C+A3GT9PThTPoY8pDnpxNi1LiCTWGJKbHWQXZfenwPSgpFEqclPBDdF48h7ohQHLZT1oEuAdeItRtfI5PV/aucaOL0DbTZKDXQD2ihcUARmQqyhft631rcSIMN3uMYOU/bLjPLKJE3ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ROrmdjIb; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id D4C0120606;
-	Wed, 16 Apr 2025 11:05:27 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YQcQYRyHQdEo; Wed, 16 Apr 2025 11:05:25 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 8DEE720842;
-	Wed, 16 Apr 2025 11:05:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 8DEE720842
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1744794325;
-	bh=MJrDaKdfNbtRshuh/vBRKkh3LN3w8BO8t5Sxeu32lbw=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ROrmdjIboXoD+2c+PXqeh8M1HiYoAfuSINfR02ioI2pn4hncqT2jZPNMyzXUSmM2z
-	 75pDC9mXUKgp/5+hKu0Gctd3F3e9wjgJrEzLkCVwR2L5zcoasPE0ImVhXlCzu/knVs
-	 7bgGTTu80W4A6JT/tZ2z7l8theayBIU8aWDfhwzqlmqhhU0SXERfhHrk8uH1mwOi/l
-	 VZmXtJrR2FOalQ66/ZnPCLMgQVBPEy/O3LabnPgOrixX8WEkgD8CvcktMvPxvPAFUu
-	 lrLutAHupZlIYWF7ve66xrjRNZdHQLOeDtbehrAblvHTP42buJ84VTG3kLYyW/vu7I
-	 X7bSWeBfAn9Fg==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 16 Apr 2025 11:05:25 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 16 Apr
- 2025 11:05:24 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id C07713182D28; Wed, 16 Apr 2025 11:05:24 +0200 (CEST)
-Date: Wed, 16 Apr 2025 11:05:24 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Cosmin Ratiu <cratiu@nvidia.com>, <netdev@vger.kernel.org>, Hangbin Liu
-	<liuhangbin@gmail.com>, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Nikolay
- Aleksandrov" <razor@blackwall.org>, Simon Horman <horms@kernel.org>, "Saeed
- Mahameed" <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ayush Sawal
-	<ayush.sawal@chelsio.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat
- Bhushan <bbhushan2@marvell.com>, Louis Peens <louis.peens@corigine.com>,
-	"Leon Romanovsky" <leonro@nvidia.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 0/6] xfrm & bonding: Correct use of
- xso.real_dev
-Message-ID: <Z/9y1GR5RGxp+UZ1@gauss3.secunet.de>
-References: <20250411074958.2858496-1-cratiu@nvidia.com>
- <Z/zfWKfhR0GcuCki@gauss3.secunet.de>
- <20250414095147.02800774@kernel.org>
+	s=arc-20240116; t=1744794397; c=relaxed/simple;
+	bh=9J82hBUkPM21iE1p39RUCImvkqg8gQ8FIiqrohWzfTo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nFXJPm/OE3yhtutK3Yd6xE/Olt6W88d4rWRGldPMXlnHI52ZU7j/zI22AXqANmpCNMByU25lYyobX8RoynAYi5C0WV+Cg6izTCBDDJWadqfW3K7wbLarYty6vnM2f8RBfVaBUVgozILdMy6dus35oPE86SVWDU/Zm14KX4yxTjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ihoIMBG+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744794394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JZh6IEn5cuIyPxe+Y2bawmt3X8/HXdLk3GL/xB6zHTQ=;
+	b=ihoIMBG+bj3lnnS4o68E4qOLYZ9Tg5CPg5ofp5PqTlQGwZ8RIEAeHcHVV+Gn29u/aLe1ok
+	OwtLuqplXZWKkpNhvv59d2IxGEpwOp8bjz8tRwpYYHQIt6E2/gJUUJMgLnfqWoz3DR5R8E
+	fVVL20YTdlkzIkkuBnzL2A7yXZX3Nxk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-241-bhvYolwdPteTSeIxuRYr4A-1; Wed, 16 Apr 2025 05:06:33 -0400
+X-MC-Unique: bhvYolwdPteTSeIxuRYr4A-1
+X-Mimecast-MFC-AGG-ID: bhvYolwdPteTSeIxuRYr4A_1744794392
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912a0439afso2697690f8f.3
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 02:06:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744794392; x=1745399192;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JZh6IEn5cuIyPxe+Y2bawmt3X8/HXdLk3GL/xB6zHTQ=;
+        b=wPLmPoHbaM//GE76S78AWbJX+sNtNSW3M9W7rxF5zbp2sZTJ7XLb1tUVJWMHCr4Ri5
+         nRKn4ILjaNVpzcm41EGExJMfuRQYfxlqiV9jqGe2nJOmmL0K5Fpo2RXQruYpt41hLCPm
+         KQQ8zy78wM13ett7QRsjG93oq/An6ESTuNk6cIOPtEieAFE2ceif04THJz1sfO0vIM/9
+         tEqJq+3NHYJSXRYIURqORCyc0UCZHuGmqnzdFZRyDXu6dsiipTwxDcJETzPsMdoV3yhW
+         6b+vEe3ai6KdBiXjKUuVAJ93XOme8ZJKW1MCFwVZazIcbS+D1ljTeJpM7DWZr14xS/a4
+         ZusQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUU2XA5ptPKMPJ1Z6nbV4D0TY0fN+Cx6yY6I7nc87Y++1Q7x9YJYyfFr7nBLmxFRgyU2YTANos=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywhjy8A0Gjf56YVLcCB69qGkwlc5GtiYFvN1VHNfVL3qa2ST3tW
+	2HcG2dfMzHsuF5jGV+HO0khMJMMbJJ1c/pQ8qEw1C4Q5tt5zy8VtwQjA/h4pnMMik3mhwn9gVfW
+	F5hUacKihPXeUfaAS3YIU8R7QQR3ku4LovIhRmEl9J9QDhw9tyXnMJQ==
+X-Gm-Gg: ASbGnctGUYe4asB8Rd9wGfPk2duC7lTf/d4bgToMQDdaEteSm51ER9ETPMITHCbyePG
+	dx1kS4Ug17LYDYu76b6g/do8Y3X2le754zPemakT/ER6j7nDGZGczIruBft77h3zjGEu9kRKHGe
+	FRshXrjWkc6Ub92U5OjyNcwjl0olgRq1/ywWAOnesI2rq07cf4alpcQcJGiwo6g4WZWdT1AkUul
+	pbDa9QOuh2Dq6ffAY5y7drM+VyMmKl1gT7swEYaMa935LNdAWbpbKCeN/rlQ9q4+75apgFVvb5/
+	3bVRxMEsVxL+2B4z+bocF1RZu1OjiipeTsQYOOE=
+X-Received: by 2002:a5d:6da1:0:b0:391:952:c728 with SMTP id ffacd0b85a97d-39ee5b11279mr934659f8f.4.1744794392456;
+        Wed, 16 Apr 2025 02:06:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFAWpUG28BpFbFdYI3Kxxv4egX8ITb6HhtoR+vUI5J8OyLwI5+Oa1SugpAM7yuKkQBNkKPOwg==
+X-Received: by 2002:a5d:6da1:0:b0:391:952:c728 with SMTP id ffacd0b85a97d-39ee5b11279mr934638f8f.4.1744794392142;
+        Wed, 16 Apr 2025 02:06:32 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae9807b7sm16628571f8f.60.2025.04.16.02.06.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Apr 2025 02:06:31 -0700 (PDT)
+Message-ID: <1c382acc-d823-47e9-902d-42606d64daf1@redhat.com>
+Date: Wed, 16 Apr 2025 11:06:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250414095147.02800774@kernel.org>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND v2 net-next 04/14] ipv6: Check GATEWAY in
+ rtm_to_fib6_multipath_config().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250414181516.28391-1-kuniyu@amazon.com>
+ <20250414181516.28391-5-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250414181516.28391-5-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 14, 2025 at 09:51:47AM -0700, Jakub Kicinski wrote:
-> On Mon, 14 Apr 2025 12:11:36 +0200 Steffen Klassert wrote:
-> > I'm still a bit skeptical about the bonding offloads itself as
-> > mentioned here:
-> > 
-> > https://lore.kernel.org/all/ZsbkdzvjVf3GiYHa@gauss3.secunet.de/
+On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
+> In ip6_route_multipath_add(), we call rt6_qualify_for_ecmp() for each
+> entry.  If it returns false, the request fails.
 > 
-> So am I, FWIW.
+> rt6_qualify_for_ecmp() returns false if either of the conditions below
+> is true:
 > 
-> > but I'm OK with this particular pachset.
-> > 
-> > How should we merge this patchset? It touches several subsystems,
-> > including xfrm. I'm fine merging it through the ipsec-next tree,
-> > but would be also ok if it goes though the net-next tree if
-> > that's easier.
+>   1. f6i->fib6_flags has RTF_ADDRCONF
+>   2. f6i->nh is not NULL
+>   3. f6i->fib6_nh->fib_nh_gw_family is AF_UNSPEC
 > 
-> No strong preference, but I think xfrm tree makes most sense.
-> It touches a few other directories but all code here is xfrm
-> related.
+> 1 is unnecessary because rtm_to_fib6_config() never sets RTF_ADDRCONF
+> to cfg->fc_flags.
+> 
+> 2. is equivalent with cfg->fc_nh_id.
+> 
+> 3. can be replaced by checking RTF_GATEWAY in the base and each multipath
+> entry because AF_INET6 is set to f6i->fib6_nh->fib_nh_gw_family only when
+> cfg.fc_is_fdb is true or RTF_GATEWAY is set, but the former is always
+> false.
+> 
+> Let's perform the equivalent checks in rtm_to_fib6_multipath_config().
 
-Ok, I'll take them into ipsec-next.
+It's unclear to me the 'why'???
+
+Thanks,
+
+Paolo
+
 
