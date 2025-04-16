@@ -1,153 +1,324 @@
-Return-Path: <netdev+bounces-183244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2972EA8B729
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B234A8B72F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:55:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 295684455C5
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:51:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F4444556E
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12655238D45;
-	Wed, 16 Apr 2025 10:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADEB235BFF;
+	Wed, 16 Apr 2025 10:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H172t79u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cj/BDpNY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCA8235345
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 10:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0201E7C24;
+	Wed, 16 Apr 2025 10:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744800700; cv=none; b=m610rs+/C8luRTVxLyksUg8nEcZ6bvPO22/s1dxuHiWGHho0V02Ip8l7aAQ1HOB03Caf+McoTW20kHE679ZkUJybM0YmQUC+dag955tLB6SQIdsN+qccx2j8Du0JpnEg7jorFS8AJbsHMXfLhnSFuvuIRjquwHbeMEDu3+jBjUA=
+	t=1744800898; cv=none; b=d9WJhSGoJixkyhIO9HzdpUkR5U2VYNx3EIJUJ9F14qHRSS1pQVxRX1xJzuXNcbcjONJ/HSTzCZytKI5kuoLesWzpVTnOoTIdSymihI/TJoViQbrabAZgPyuIDPePxHs2AqKAQ8rpWy1g7oB3HmWXhkLaSP1c1BokzNUZ0v3ZmsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744800700; c=relaxed/simple;
-	bh=8ltgJaWDDMfnGDhWTTVhAdQ26cUmkN+X9NC44eD+530=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mdOFd7/oh6Qem6icOUxhg15qPVtYKsxS8ItFfIJ3E2wK681XhfkF0hsUdMKN/yYM63kVsNCvg95oqxAvX8B4OttWjrwW6l/QW7jTWy2f+LykpAxIPC0q4Qd5yKsgms41/zLIEAJV+5Za7BltWwSaMnY9+lDB6V7y+TKN0Cilawg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H172t79u; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=acDB+MT9pv2e9KI2UzjPLtfLETXFbYRx016W6dXovVI=; b=H172t79ubc2c1YjBg4uU9Sj9gb
-	J0xd9Cm9VLfiITiAzSxH+MkiGfFTKt3iS0aojoegV3lguMAr2m36Mlf88gtvgHIaL97gqMnlQ5tVR
-	BqJNFrfPkGDF3wC2fwNFXPwdMUeZP6HWmV1+nwtKRlpGeXi5sNrHik5yM1XDhdSzPoB2Vz7uLM+pT
-	gqT/8aBn82JUsB3RitRnfv/D8GE1ZM/2701fVp/8y5SQbkGE9o/vQRDfWQcny1NiP8ZaaTHDJXN3d
-	1pPQ7PxHTMRN+ZMa+RocQHgD21BDwAqJ2knh/qqkEoLL09OPVzDkv6HFqgP6jnWL59JYiDR7UKMn4
-	w7VU8L0A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46762)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u50Md-0001CR-1Q;
-	Wed, 16 Apr 2025 11:51:31 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u50MZ-0001L8-1U;
-	Wed, 16 Apr 2025 11:51:27 +0100
-Date: Wed, 16 Apr 2025 11:51:27 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/5] Marvell PTP support
-Message-ID: <Z_-Lr-w95sX4fLIF@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
+	s=arc-20240116; t=1744800898; c=relaxed/simple;
+	bh=7JN6snAw2lrK/X6VkKve41wf57owbc2L0SobKwitddE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=N6YFAUjOn/apXCDw5NtoSFiqa00WLH6y8dfyG+dKTMTlXZACiHnrJd2EJVkY9P+fBDnlcOE5DBuP0BkwLHEKeCBqs9dhI/wFdQXnblLvdlY7rGKY+cBgEPDgDWFX0bNylsYDUtAeODGLw8tNFLzuSaiHTJV1++YmQfaVhGQFmHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cj/BDpNY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801BEC4CEE2;
+	Wed, 16 Apr 2025 10:54:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744800897;
+	bh=7JN6snAw2lrK/X6VkKve41wf57owbc2L0SobKwitddE=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=cj/BDpNYbphHzJEiLNFlvYm/GFcN98+FI2ZMAotiQ+7iud0nIMOvFnIxmc0pwY1gA
+	 jVLzyaSW9VJq6/x1pXj1QwlOluMrDtVvGJOrTWGXHd+qKgAvOKc6N8aVB3jDLW4YoM
+	 vTBoLZ9KX8lE0PttueVMsJVjoWmFmOcCElXGkatr31RC41/lY5fTwIQWylqNU7dP62
+	 vbgFzIh2gJmY75eSU7i8/CfD5hDJcH4ibpUGi4t8beoGygnT/CmsXAZfB1fqs5mhpA
+	 +2gLEfipmQ3BzLEdaeJJ/EucRiUlHTSB3FK9rb2FyKsHrhxWip2oQTGpV2s9CODEe5
+	 STEzAfRW2LSug==
+Message-ID: <6ee047d4-f3de-4c25-aaae-721221dc3003@kernel.org>
+Date: Wed, 16 Apr 2025 12:54:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] net: pse-pd: Add Si3474 PSE controller driver
+To: Piotr Kubik <piotr.kubik@adtran.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <a92be603-7ad4-4dd3-b083-548658a4448a@adtran.com>
+ <93d3bbf0-742c-41d4-83c6-6d94a0dd779c@adtran.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <93d3bbf0-742c-41d4-83c6-6d94a0dd779c@adtran.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 11, 2025 at 10:26:15PM +0100, Russell King (Oracle) wrote:
-> Hi,
+On 16/04/2025 12:47, Piotr Kubik wrote:
+> From: Piotr Kubik <piotr.kubik@adtran.com>
 > 
-> This series is a work in progress, and represents the current state of
-> things, superseding Kory's patches which were based in a very old
-> version of my patches - and my patches were subsequently refactored
-> and further developed about five years ago. Due to them breaking
-> mvpp2 if merged, there was no point in posting them until such time
-> that the underlying issues with PTP were resolved - and they now have
-> been.
+> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
+> controller.
 > 
-> Marvell re-uses their PTP IP in several of their products - PHYs,
-> switches and even some ethernet MACs contain the same IP. It really
-> doesn't make sense to duplicate the code in each of these use cases.
+> Based on the TPS23881 driver code.
 > 
-> Therefore, this series introduces a Marvell PTP core that can be
-> re-used - a TAI module, which handles the global parts of the PTP
-> core, and the TS module, which handles the per-port timestamping.
+> Driver supports basic features of Si3474 IC:
+> - get port status,
+> - get port power,
+> - get port voltage,
+> - enable/disable port power.
 > 
-> I will note at this point that although the Armada 388 TRM states that
-> NETA contains the same IP, attempts to access the registers returns
-> zero, and it is not known if that is due to the board missing something
-> or whether it isn't actually implemented. I do have some early work
-> re-using this, but when I discovered that the TAI registers read as
-> zero and wouldn't accept writes, I haven't progressed that.
+> Only 4p configurations are supported at this moment.
 > 
-> Today, I have converted the mv88e6xxx DSA code to use the Marvell TAI
-> module from patch 1, and for the sake of getting the code out there,
-> I have included the "hacky" patches in this series - with the issues
-> with DSA VLANs that I reported this evening and subsequently
-> investigated, I've not had any spare time to properly prepare that
-> part of this series. (Being usurped from phylink by stmmac - for which
-> I have a big stack of patches that I can't get out because of being
-> usurped, and then again by Marvell PTP, and then again by DSA VLAN
-> stuff... yea, I'm feeling like I have zero time to do anything right
-> now.) The mv88e6xxx DSA code still needs to be converted to use the
-> Marvell TS part of patch 1, but I won't be able to test that after
-> Sunday, and I'm certainly not working on this over this weekend.
-> 
-> Anyway, this is what it is - and this is likely the state of it for
-> a while yet, because I won't be able to sensibly access the hardware
-> for testing for an undefined period of time.
-> 
-> The PHY parts seem to work, although not 100% reliably, with the
-> occasional overrun, particularly on the receive side. I'm not sure
-> whether this is down to a hardware bug or not, or MDIO driver bug,
-> because we certainly aren't missing timestamping a SKB. This has been
-> tested at L2 and L4.
-> 
-> I'm not sure which packets we should be timestamping (remembering
-> that this is global config across all ports.)
-> https://chronos.uk/wordpress/wp-content/uploads/TechnicalBrief-IEEE1588v2PTP.pdf
-> suggests Sync, Delay_req and Delay_resp need to be timestamped,
-> possibly PDelay_req and PDelay_resp as well, but I haven't seen
-> those produced by PTPDv2 nor ptp4l.
-> 
-> There's probably other stuff I should mention, but as I've been at
-> this into the evening for almost every day this week, I'm mentally
-> exhausted.
-> 
-> Sorry also if this isn't coherent.
+> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
+> ---
+>  drivers/net/pse-pd/Kconfig  |  10 +
+>  drivers/net/pse-pd/Makefile |   1 +
+>  drivers/net/pse-pd/si3474.c | 477 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 488 insertions(+)
+>  create mode 100644 drivers/net/pse-pd/si3474.c
 
-I've just updated this series for the supported pins flags that was
-merged into net-next last night.
+Please put bindings before their user (see DT submitting patches)
 
-Kory, if you have any changes you want me to review before sending
-out the updates, please send soon. Thanks.
+> 
+> diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
+> index 7fab916a7f46..6d2fef6c2602 100644
+> --- a/drivers/net/pse-pd/Kconfig
+> +++ b/drivers/net/pse-pd/Kconfig
+> @@ -41,4 +41,14 @@ config PSE_TPS23881
+> 
+>           To compile this driver as a module, choose M here: the
+>           module will be called tps23881.
+> +
+> +config PSE_SI3474
+> +       tristate "Si3474 PSE controller"
+> +       depends on I2C
+> +       help
+> +         This module provides support for Si3474 regulator based Ethernet
+> +         Power Sourcing Equipment.
+> +
+> +         To compile this driver as a module, choose M here: the
+> +         module will be called si3474.
+>  endif
+> diff --git a/drivers/net/pse-pd/Makefile b/drivers/net/pse-pd/Makefile
+> index 9d2898b36737..b33b4d905cd5 100644
+> --- a/drivers/net/pse-pd/Makefile
+> +++ b/drivers/net/pse-pd/Makefile
+> @@ -6,3 +6,4 @@ obj-$(CONFIG_PSE_CONTROLLER) += pse_core.o
+>  obj-$(CONFIG_PSE_REGULATOR) += pse_regulator.o
+>  obj-$(CONFIG_PSE_PD692X0) += pd692x0.o
+>  obj-$(CONFIG_PSE_TPS23881) += tps23881.o
+> +obj-$(CONFIG_PSE_SI3474) += si3474.o
+> \ No newline at end of file
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+1. Warnin ghere
+2. Don't add your entries to the end but in more-or-less alphabetically
+sorted place.
+
+> diff --git a/drivers/net/pse-pd/si3474.c b/drivers/net/pse-pd/si3474.c
+> new file mode 100644
+> index 000000000000..a2b4b8bff393
+> --- /dev/null
+> +++ b/drivers/net/pse-pd/si3474.c
+> @@ -0,0 +1,477 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Driver for the Skyworks Si3474 PoE PSE Controller
+> + *
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/delay.h>
+> +#include <linux/i2c.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/pse-pd/pse.h>
+> +
+> +#define SI3474_MAX_CHANS 8
+> +
+> +#define MANUFACTURER_ID 0x08
+> +#define IC_ID 0x05
+> +#define SI3474_DEVICE_ID (MANUFACTURER_ID << 3 | IC_ID)
+> +
+> +/* Misc registers */
+> +#define VENDOR_IC_ID_REG 0x1B
+> +#define TEMPERATURE_REG 0x2C
+> +#define FIRMWARE_REVISION_REG 0x41
+> +#define CHIP_REVISION_REG 0x43
+> +
+> +/* Main status registers */
+> +#define POWER_STATUS_REG 0x10
+> +#define PB_POWER_ENABLE_REG 0x19
+> +
+> +/* PORTn Current */
+> +#define PORT1_CURRENT_LSB_REG 0x30
+> +
+> +/* PORTn Current [mA], return in [nA] */
+> +/* 1000 * ((PORTn_CURRENT_MSB << 8) + PORTn_CURRENT_LSB) / 16384 */
+> +#define SI3474_NA_STEP (1000 * 1000 * 1000 / 16384)
+> +
+> +/* VPWR Voltage */
+> +#define VPWR_LSB_REG 0x2E
+> +#define VPWR_MSB_REG 0x2F
+> +
+> +/* PORTn Voltage */
+> +#define PORT1_VOLTAGE_LSB_REG 0x32
+> +
+> +/* VPWR Voltage [V], return in [uV] */
+> +/* 60 * (( VPWR_MSB << 8) + VPWR_LSB) / 16384 */
+> +#define SI3474_UV_STEP (1000 * 1000 * 60 / 16384)
+> +
+> +struct si3474_port_desc {
+> +       u8 chan[2];
+> +       bool is_4p;
+> +};
+> +
+> +struct si3474_priv {
+> +       struct i2c_client *client;
+> +       struct pse_controller_dev pcdev;
+> +       struct device_node *np;
+> +       struct si3474_port_desc port[SI3474_MAX_CHANS];
+> +};
+> +
+> +static struct si3474_priv *to_si3474_priv(struct pse_controller_dev *pcdev)
+> +{
+> +       return container_of(pcdev, struct si3474_priv, pcdev);
+> +}
+> +
+> +static int si3474_pi_get_admin_state(struct pse_controller_dev *pcdev,
+> int id,
+
+Your patchset is corrupted
+
+> +                                    struct pse_admin_state *admin_state)
+> +{
+> +       struct si3474_priv *priv = to_si3474_priv(pcdev);
+> +       struct i2c_client *client = priv->client;
+> +       bool enabled = FALSE;
+
+I believe it is "false", not FALSE.
+
+
+...
+
+> +
+> +       if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+> +               dev_err(dev, "i2c check functionality failed\n");
+> +               return -ENXIO;
+> +       }
+> +
+> +       priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +       if (!priv)
+> +               return -ENOMEM;
+> +
+> +       ret = i2c_smbus_read_byte_data(client, VENDOR_IC_ID_REG);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       if (ret != SI3474_DEVICE_ID) {
+> +               dev_err(dev, "Wrong device ID: 0x%x\n", ret);
+> +               return -ENXIO;
+> +       }
+> +
+> +       ret = i2c_smbus_read_byte_data(client, FIRMWARE_REVISION_REG);
+> +       if (ret < 0)
+> +               return ret;
+> +       fw_version = ret;
+> +
+> +       ret = i2c_smbus_read_byte_data(client, CHIP_REVISION_REG);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       dev_info(&client->dev, "Chip revision: 0x%x, firmware version: 0x%x\n",
+> +                ret, fw_version);
+
+dev_dbg, don't pollute dmesg on success.
+
+> +
+> +       priv->client = client;
+> +       i2c_set_clientdata(client, priv);
+> +       priv->np = dev->of_node;
+> +
+> +       priv->pcdev.owner = THIS_MODULE;
+> +       priv->pcdev.ops = &si3474_ops;
+> +       priv->pcdev.dev = dev;
+> +       priv->pcdev.types = ETHTOOL_PSE_C33;
+> +       priv->pcdev.nr_lines = SI3474_MAX_CHANS;
+> +       ret = devm_pse_controller_register(dev, &priv->pcdev);
+> +       if (ret) {
+> +               return dev_err_probe(dev, ret,
+> +                                    "Failed to register PSE controller\n");
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static const struct i2c_device_id si3474_id[] = {{"si3474"}, {}};
+
+Use existing kernel style for such arrays.
+
+
+
+Best regards,
+Krzysztof
 
