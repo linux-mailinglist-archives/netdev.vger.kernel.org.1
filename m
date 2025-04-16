@@ -1,132 +1,269 @@
-Return-Path: <netdev+bounces-183537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424FFA90F0C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:59:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291D8A90F10
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 01:01:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB7217AF38
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 22:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35B48444B83
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 23:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FEB92459D5;
-	Wed, 16 Apr 2025 22:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E836922371B;
+	Wed, 16 Apr 2025 23:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="fuvoqj1z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBMhcYhL"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic307-16.consmr.mail.ne1.yahoo.com (sonic307-16.consmr.mail.ne1.yahoo.com [66.163.190.39])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F4824339C
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39541B0F23
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 23:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744844347; cv=none; b=pJYilj1W/z5/Hfsh3M/dTLoLnV3SLhlvOZjt1LsufPtpa1cYYM9UesWrLnc6LauJbCFoA/xo9jFKLFhTV4IL0mpeZlNobLWVaeQkTE1iPYdyguSpD1bNejS9v47S4NTr3pVYmcwdYfaNq852IGeHeO2zFIl7sWF3hLnTLyHNTKQ=
+	t=1744844461; cv=none; b=ikGdx101JoDEl3199FTMo/IYqyDq65YgBvIB4as081yFnTFBrAyvp6Fdzq4iHwhksTIDGO9ckBqRu3RmkkondiUgQKmJl1RiCvV2WfeeeqDSEC6gVkv9xREaylaPZST2PbpfKGAh6Fq8WUrXRJbWxmV/ZJwbDW4b5c6p/69Y2Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744844347; c=relaxed/simple;
-	bh=9KGTJBAij2oJilXXLjoLd9nWdXIAyABvDLZ7oyKnyoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nexmbY610bDw3UJS6IrNDVew9rtS1fYsIaFYWLZCmwewLGj0uR87kcAFYNLJ99rtArM11p9ljqj0gfGVmfkDcFsP4JaS9+wuVLbx3q+WwnLdZ3YX9r4lZSt4HEuVoayiAHo9PZ+9mvvnpp0/XdyjdRTbYhBfHofilAbONWLCM6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=fuvoqj1z; arc=none smtp.client-ip=66.163.190.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744844338; bh=aGhH9OXD7DZEVuR+8ZNRXBzr6PP4/lToJ3C5tvpSAB4=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=fuvoqj1zmz1QFkOs/EDdj5G0hmjpq8SF61gTLKxsq3THKwOd4pOdR55uCP0e51+FE+MuHjOTPL0y4kInTeT1YGSyPWgzvKrcjdTeZ0hUOZy4YLtQch+2SFsZaQ9O1CqPR1N+Ruz0GciA1zHf07xtEYmpgEV+HLV7TH1WspoAIMb2aNMWQD9OWs8xp9s3Dra+yeCb98FgqfXquJ0dM9fKrYQf0fWAWjtjs9QcpufqDf+sRVQZZgAS5axFrREfjAfM16T6YjK/Xzfpy89gbV1jNWDaVbexcQtyqiQO4tIcMsIJWsXd4FV62LFOKgZlAiJRt7aezgEcoVndBTbsVz8zHQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744844338; bh=uDpuVIXd+YfIBqzoLzJTaMMjY7bpSWXkm8Z9PgZr2yV=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=ZWUl3Fx7wZnl9r6UcqvADvWMswB3szjeCS8LeSkG0EG+f5UUPdSOxtW+cS8MSUnx09irbCxZ1z0NIv6HA473PcvcngF2376bzEgDxNch8oyxOU7BIIUCHXNoUPCFRlpCStOVWRfPsZw1ImBRy39fna3ebG6BTh+52j0Iy2t373t2f9vICtYQlZEpWJTtHbN2iNSZ+F7Z699n/OUt4jIT6yzFwrXRrFVDwlQlK6RlmFjUnHx0ZIn5sFhRmUBAGW6sn6+6tw6hnGYWgNtbx1SGBGGXjbltghhJ1PeMeGsvUcqRIf2fFdOeqm7+3Oc6DK1r78rvG8EIv8fw2RiSpIbSag==
-X-YMail-OSG: kx_iWJUVM1myVH8yXC0jEiI4TgDGfgJfea.sTiMalmSa37QuWTha1LcqYrN5_Iv
- TmFK1VJqY.hrotmVVGEOH12q3mYVEIqhSk4ZsOug7b9heMNhUiuzw1xtgkzCWocU7o33paNqhkyl
- MQPX_lEN8BHtCxcDFvYxbJGmbbLZkp3s4430ErNXCWDazLMdvXsWQjpKXdU_FKuAXXQzfojIksv9
- SgInQ3hnslzZM2alDUJ.ibsqRHzbSnMkm2pDdkxf9m1MWgAu29PKSXsXQGZwKDlqTMv0JTkQ.8HR
- koWepITHaNo7FWhTxw059qm0cP7BN77vfOtHdlA2wmKiZX9eN2QDlVjSMSBcqUrZ5YcflXSNHzwg
- ON7l0pJr4thWfDYAMk_H_26tprlvRBpAr.XZT._H2s8JkHxL..qIQRjx6D9m0wSsbOGN3dNEX1Jl
- 3T6x07NPHo6ca84kIRHXEnYT8z9TfNIKiaTatNIKaDbY4qDO8d9WpSCvwv4XqA16lz1FvbUptKlD
- nUl7FaDdF3ehQDkuo5mvQCP1vtVC5QM7lTS1YHYWHPGHOV8EwQchrK0VGsSA7mO0cQXNJSurf2Uj
- uxih0wXPuUh5piT1K83dcjhHz0OU_hxFthufJOh9oIUXTy969ZGP6CAtMcr6tHbSzY6KOovVbNGx
- w8I.Ht58JCGq7H2uI5VVcz35BPzGUG02rUAdxvFbz94vshjbUbI7wt9pL3hBMAMy89I3415xFl9w
- pHqmTHE7V0EIPqlwVoCMN2QV4ss1S8tsj3VTPSpPwEDAaZVoW3eflFpiGmPUTXo25KzmWpqQBM.k
- PoS3DxYvUNq.knU4jQVZ6QuTkRVF1Xw7Rt5dmmn.QbdMxoGOIl0huavCSWHEs2GaHbrx3rOR7HwS
- hQD.7DlS6ZU2BtFELXyurpZxqoFAxWIUTekPskSPys7EXu8HC8pHIqDQc_A4sH1kZ1.ePX2AsohH
- Sm3hdNaTYOiPY1MjYG_LguedQsnKIi2Ex8rV0Lh5r90ztnd_6mU4hbvsjgWZkXZuN9weuIW6npVd
- xl2cGAFfdUNRbQx6SXckVpM4jxAy77DsKabEVyhpDPIscHAwxodM_oSzLxzcePgCE3XAiE8x8q.O
- _2dgFeStsFtV1uIhSjrOk.6Z6xPmWeljoPAB4eF.DQr7opkuh4JsyVhPgfI3yiv1amV2P6nW.7pR
- l544iWl_OfiyBcVKvn8BPVX.b0psWD3xOyKjOxhogViEBBltnlVgylKWFh_.FM3Uisn8g6NJNVAf
- stPH9YUzRztGUNNkfuLn0l0nnbPhtF07Kg19RGOvvtOe5gZ8Q4rEYtPG2S9g.PvEa5BWmlNCvBBW
- 3HmHmB1Z1tV7tNpuAKBf77HdKNK09eSS1NlloLYtZagT8ixEnXmYOrVtpMDLoN3dJJHyjsKzK27W
- qC.O9oGROM59REVDLAD6kCOMvE6aqlKpt6BKk.tAKal2lsvr2NUNXZcJ7MJlzxxnzZtcXYtYeuV.
- iBuOA1buBJObQNror2vM0TM9SBU0ncN5IiCtkC1NqsheDF3xsqvO8x4pUkxTH4XmRNrg.cU3s0Wi
- qjXPgUKd5wWmGlA4k3BalfCBoHwL0tQmSq4_rEdE9I7VmVQZsHxC17BOVHfvNpJ8YWxQsmG5PPQ5
- kZZ1OBfOP7nF_Psc9rgM6vkSE748hwkSWyLKpmp56etLQVQUyUbQOTQHNMmeLP2EER1yEQKoP2gm
- Nr2VJPm2hsEQHNc195kPrRXGg8tUgcsS68I.5Qzj5oY0P6Yc8SyJU_4XdKn_WKF_oI.g1NpO3lwV
- paqgkbVYKPEkrnt6HdE9L3Ar0XjYpHJHyQ8.ixZ5V_Gjfo4PbpcpYaIhZmj6NwAtGPpL0C3.I5hI
- EMY8ptGZ8JYOCPRJJWRTjeWTLpT43TzDexV_qpM0jyMNLOiCizy62zmZ5JdudjZJubSWy29EK.ss
- 3BM3ju6U5UHRE.eIsy6V_Q3tUtRWSJHTNT7xhYkY3phyTpBK6Q.YRHg1vkZs1LdQhnSTA3wvJv2v
- N8TX2Flx2.xAbkRzdb8ND27yRYyR8eEGd8ZNcpAQzNGi4pfOPRToHL.qnOCVQx0Yt.boF09hClNW
- 2i83KKtcISfFUFiiu8B95nYukdAyXsk0pT4En4afHyzk8RKFUpdWPNdM9tGJSpJVkCvNZ2kgJQNv
- VUea0_M5QgVVg89CtEEy4Rl9W8k6Q_wu1qBZtqiYAHvL7y18mh13AbsXd.OKyrYzwFDrr1C9faod
- CVYg9oo6Ke1YGZGUo1D9D97jb6nPw1lCQ1EAAIdZv1C2aLI2r600_eJM4v80vs7VG1jY-
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: f3096bb7-d5e1-4278-b87b-771935d0acca
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Wed, 16 Apr 2025 22:58:58 +0000
-Received: by hermes--production-gq1-74d64bb7d7-5qmwx (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 74ea1250be9b6111ec046bddcc0a667c;
-          Wed, 16 Apr 2025 22:58:54 +0000 (UTC)
-Message-ID: <9a4b0f45-1eb5-4eb7-b120-6b50ea0d4835@schaufler-ca.com>
-Date: Wed, 16 Apr 2025 15:58:54 -0700
+	s=arc-20240116; t=1744844461; c=relaxed/simple;
+	bh=EKWQCWDUZx4qHwi8chMThxHbn8mkRL7OFYxk3eiVn8o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gjyvmVCYbdM6m4LJ5pJau1IwOG9ljX8kkiHBg2nFHaHblx5oSxVtfi+XTblz8lyi2DxS2c0NTx7cvLarZAIYH/TqyLujE56GjXfE7l2O7g6DgWCzyAaZkoPa6lsGcwcTFv+set8279h5zCXPNmIP4qoQztyYrSgdNPFBZf+AkuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aBMhcYhL; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4774193fdffso2229511cf.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 16:00:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744844459; x=1745449259; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tP3orIY5lTAbQwWPTCPGFz88tYuHiHszruRj+XK4zJk=;
+        b=aBMhcYhLUlApc+EemMLkUF9TrfK6iv4qqV1WjmRg2GggQd1O65WCfp8n87Q50daZ3E
+         /AQ8zVbJlittYjO+EcqIf+8wegY/qGZkOcAafnYYrGTYccxdqMXGZ0XU+GFoB/3i9F0E
+         bZ1g78hHrBlKuQmhf+kPC8jiaouhf5dQzRkjP2Z/Hj8j5rV19IuRzpoSIxQizRemOZCs
+         MDO+Ebrqogc2lYluHZE++mEHO7SxCQMEwuCgw5jf/wSwnxbNVXr1f2CWNYhXotH6xzMs
+         baqrlyAcnqtE9su5Eyu9/f98v5Vdk7j/7y0uutWanrskqZ4x1u+4MdQSaWLr6QbQZyPX
+         JEfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744844459; x=1745449259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tP3orIY5lTAbQwWPTCPGFz88tYuHiHszruRj+XK4zJk=;
+        b=rzdrjyQdacCWJ8iGpBewDtWD0xDKuMm6pfjF0gTUbSKkA90wz5gj4lNYhKQ56oI3wz
+         /63fo1AT8kwQUXW1o9A1XZklbEg7p4MTlCElPTXhuBIceAZ6bab5WunKw4kuLQKCQjQQ
+         vZYOeVSFW/kf6g4Uq8vC7Yh5qiRVrGZghdx0P/sZbIr5tcjQwf/NWtsDiKCXc01n0w58
+         ei5XrTZQpKjZGkMgRZ8/3QW67vOH9p0RCckIGPchF9g1GufTSWQcoJTbK6t471vYbHtZ
+         lh3rCCCeZ8uHeZdoGW/qFGXYtyr8+6csxUiZ91zGz4gP0jVIx4uPOnj8VV8FSSw2oVdc
+         p3Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4PX01M67gxfKZ/wIip9AmBHNap7TePzwhecW7FILpjcmBUEM4Nkx5HCGpqNSmCzAxH/x39fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywfnj0dSGDM61cJTHXLsCiISdrbG8QZosWLJT4+GmWP8AKKO5Qu
+	EEbCbEUkpzEhWFJxGm5axHA9uC7QCq/qtdseLuUpw8kb7P9Qof1je6uMcA0mxWy434mHz/+asq4
+	ljJcVj6AKbrM9INgxwWqy9VhHrjWGCjdKa3cz
+X-Gm-Gg: ASbGncvRdUJRhEI+ulXdf7rRGvvy1muGlu/WZUVZ8Ztlo4bGoZzrrlOQR7SGxDojlTm
+	Tgd3ybK5hMYtBiPyxieURW7rwQEbWdPzzGV4SkG8LnO8x0kEJcUe+yK9nY5pRqqlYGXEw62b7s1
+	ay44kfzZdwXi8XkdHnWHYAVaZ7CCbuMHibEa2Q214NVmmf9CCQ3MCM
+X-Google-Smtp-Source: AGHT+IE4BgJWjdoWOVtbFg3nBuU6Dk1HIezy9XhJ5nQ+kRuVf1aMSWegZs3bZBpdB1uDckJTNrjknc8oAIm7OkbmFyM=
+X-Received: by 2002:ac8:5811:0:b0:477:6f1f:e1d6 with SMTP id
+ d75a77b69052e-47ad809743dmr60636481cf.3.1744844458401; Wed, 16 Apr 2025
+ 16:00:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 1/3] lsm, selinux: Add setup_report permission to
- binder
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com,
- tkjos@android.com, maco@android.com, joel@joelfernandes.org,
- brauner@kernel.org, cmllamas@google.com, surenb@google.com,
- omosnace@redhat.com, shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org,
- bagasdotme@gmail.com, horms@kernel.org, tweek@google.com,
- paul@paul-moore.com, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org, selinux@vger.kernel.org,
- hridya@google.com, smoreland@google.com, ynaffit@google.com,
- kernel-team@android.com, Casey Schaufler <casey@schaufler-ca.com>
-References: <20250415071017.3261009-1-dualli@chromium.org>
- <20250415071017.3261009-2-dualli@chromium.org>
- <69763528-bb00-44c5-a3ce-8c30530b29ee@schaufler-ca.com>
- <CANBPYPgfW+3jeTPZmpHfkgr=hX8sRkMLgrEeLFYa6rOPftXeFg@mail.gmail.com>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <CANBPYPgfW+3jeTPZmpHfkgr=hX8sRkMLgrEeLFYa6rOPftXeFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.23665 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+References: <20250410175140.10805-3-luizcmpc@gmail.com> <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
+ <CAHx7jf-1Hga_tY4-kJ_HNkgkWL6RywCmYhg2yYYX+R+mVwdTvA@mail.gmail.com>
+ <CANn89i+beuSWok=Z=5gFs2E0JQHyuZrdoaT=orFRzBap_BvVzA@mail.gmail.com>
+ <CAHx7jf807SHbTZhF4LeWsesSPnYxeE6vO37vTGXp+dr-65JP+w@mail.gmail.com>
+ <CANn89i+75pe6-xQUpnL3K8pD7frgPiqbKmruuDUZ_wUzAeAtzw@mail.gmail.com>
+ <CANn89iKTTapH58UFpF-Ui7JAUOCt1_xin2e0ugMWEgy8vpdgMg@mail.gmail.com> <CAHx7jf_brd2KYyPnMS7pdTUzqm+x8WVToTAo=xRB3fMVGHf1TQ@mail.gmail.com>
+In-Reply-To: <CAHx7jf_brd2KYyPnMS7pdTUzqm+x8WVToTAo=xRB3fMVGHf1TQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 16 Apr 2025 16:00:47 -0700
+X-Gm-Features: ATxdqUFAR-5kdIVFWRCSSJX5bpcSrdq-Cc1gQszmRHVZmeSTV_7R0-uW1K_MGtY
+Message-ID: <CANn89iL=S+pKz5GDfHR7x6BoFd_-2G_txV4ZXR7AWKeLNAR1HA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: tcp_acceptable_seq select SND.UNA when SND.WND
+ is 0
+To: =?UTF-8?Q?Luiz_Carlos_Mour=C3=A3o_Paes_de_Carvalho?= <luizcmpc@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/16/2025 9:00 AM, Li Li wrote:
-> Thank you Casey! I'll resend this specific patch to linux-security-module list.
+On Wed, Apr 16, 2025 at 3:49=E2=80=AFPM Luiz Carlos Mour=C3=A3o Paes de Car=
+valho
+<luizcmpc@gmail.com> wrote:
 >
-> Should I include the other 2 binder patches as well as they are using
-> this new permission?
-
-I would appreciate it. Context can be pretty important. Sometimes 
-"why" an LSM hook is being added impacts who reviews it.
-
+> On Wed, Apr 16, 2025 at 7:37=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Wed, Apr 16, 2025 at 3:32=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Wed, Apr 16, 2025 at 3:30=E2=80=AFPM Luiz Carlos Mour=C3=A3o Paes =
+de Carvalho
+> > > <luizcmpc@gmail.com> wrote:
+> > > >
+> > > > On Wed, Apr 16, 2025 at 6:40=E2=80=AFPM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Wed, Apr 16, 2025 at 1:52=E2=80=AFPM Luiz Carlos Mour=C3=A3o P=
+aes de Carvalho
+> > > > > <luizcmpc@gmail.com> wrote:
+> > > > > >
+> > > > > > Hi Paolo,
+> > > > > >
+> > > > > > The dropped ack is a response to data sent by the peer.
+> > > > > >
+> > > > > > Peer sends a chunk of data, we ACK with an incorrect SEQ (SND.N=
+XT) that gets dropped
+> > > > > > by the peer's tcp_sequence function. Connection only advances w=
+hen we send a RTO.
+> > > > > >
+> > > > > > Let me know if the following describes the scenario you expecte=
+d. I'll add a packetdrill with
+> > > > > > the expected interaction to the patch if it makes sense.
+> > > > > >
+> > > > > > // Tests the invalid SEQs sent by the listener
+> > > > > > // which are then dropped by the peer.
+> > > > > >
+> > > > > > `./common/defaults.sh
+> > > > > > ./common/set_sysctls.py /proc/sys/net/ipv4/tcp_shrink_window=3D=
+0`
+> > > > > >
+> > > > > >     0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> > > > > >    +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> > > > > >    +0 bind(3, ..., ...) =3D 0
+> > > > > >    +0 listen(3, 1) =3D 0
+> > > > > >
+> > > > > >    +0 < S 0:0(0) win 8 <mss 1000,sackOK,nop,nop,nop,wscale 7>
+> > > > > >    +0 > S. 0:0(0) ack 1 <...>
+> > > > > >   +.1 < . 1:1(0) ack 1 win 8
+> > > > > >    +0 accept(3, ..., ...) =3D 4
+> > > > > >
+> > > > > >    +0 write(4, ..., 990) =3D 990
+> > > > > >    +0 > P. 1:991(990) ack 1
+> > > > > >    +0 < .  1:1(0) ack 991 win 8           // win=3D8 despite bu=
+ffer being almost full, shrink_window=3D0
+> > > > > >
+> > > > > >    +0 write(4, ..., 100) =3D 100
+> > > > > >    +0 > P. 991:1091(100) ack 1            // SND.NXT=3D1091
+> > > > > >    +0 < .  1:1(0) ack 991 win 0           // failed to queue rx=
+ data, RCV.NXT=3D991, RCV.WND=3D0
+> > > > > >
+> > > > > >  +0.1 < P. 1:1001(1000) ack 901 win 0
+> > > > >
+> > > > > This 'ack 901' does not seem right ?
+> > > >
+> > > > It's indeed incorrect, the bug still occurs if it were 991. Sorry f=
+or that.
+> > > >
+> > > > >
+> > > > > Also your fix would not work if 'win 0' was 'win 1' , and/or if t=
+he
+> > > > > initial wscale was 6 instead of 7 ?
+> > > >
+> > > > It indeed does not work if win=3D1, but that's unlikely to happen u=
+nless
+> > > > you enable shrink_window, and probably
+> > > > suggests the mentioned loss of precision.
+> > > >
+> > > > Now, regarding the scale, it does happen with wscale=3D6 if your se=
+cond
+> > > > write sends < 64 bytes.
+> > > > This is true with any other scale. Would happen if it were wscale=
+=3D1
+> > > > and the second write sent 2 bytes, etc.
+> > > >
+> > > > Happens as far as SND.NXT - (SND.UNA + SND.WND) < 1 << wscale.
+> > > >
+> > > > >
+> > > > > >    +0 > .  1091:1091(0) ack 1001          // dropped on tcp_seq=
+uence, note that SEQ=3D1091, while (RCV.NXT + RCV.WND)=3D991:
+> > > > > >                                           // if (after(seq, tp-=
+>rcv_nxt + tcp_receive_window(tp)))
+> > > > > >                                           //     return SKB_DRO=
+P_REASON_TCP_INVALID_SEQUENCE;
+> > > > >
+> > > > > I assume that your patch would change the 1091:1091(0) to 991:991=
+(0) ?
+> > > >
+> > > > Precisely.
+> > > >
+> > > > >
+> > > > > It is not clear if there is a bug here... window reneging is outs=
+ide
+> > > > > RFC specs unfortunately,
+> > > > > as hinted in the tcp_acceptable_seq() comments.
+> > > >
+> > > > Yeah, that got me thinking as well, but although it isn't covered b=
+y
+> > > > the RFC, the behavior did change since
+> > > > 8c670bdfa58e ("tcp: correct handling of extreme memory squeeze"),
+> > > > which is a relatively recent patch (Jan 2025).
+> > > > Currently, the connection could stall indefinitely, which seems
+> > > > unwanted. I would be happy to search for other
+> > > > solutions if you have anything come to mind, though.
+> > > >
+> > > > The way I see it, the stack shouldn't be sending invalid ACKs that =
+are
+> > > > known to be incorrect.
+> > >
+> > > These are not ACK, but sequence numbers. They were correct when initi=
+ally sent.
 >
-> On Tue, Apr 15, 2025 at 9:13 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
->> On 4/15/2025 12:10 AM, Li Li wrote:
->>> From: Thiébaud Weksteen <tweek@google.com>
->>>
->>> Introduce a new permission "setup_report" to the "binder" class.
->>> This persmission controls the ability to set up the binder generic
->>> netlink driver to report certain binder transactions.
->>>
->>> Signed-off-by: Thiébaud Weksteen <tweek@google.com>
->>> Signed-off-by: Li Li <dualli@google.com>
->>> ---
->>>  include/linux/lsm_hook_defs.h       |  1 +
->>>  include/linux/security.h            |  6 ++++++
->>>  security/security.c                 | 13 +++++++++++++
->> This patch needs to be sent to the linux-security-module list.
->>
+> Yes, I meant invalid ACK packets, with "incorrect" sequence numbers
+> (more advanced than they should have been for this specific ZeroWindow
+> scenario). The server has enough knowledge to know what the other peer
+> expects (the RFC 793 quote in the original message), thus the "known
+> to be incorrect". I am, however, new to the spec and stack.
+>
+> >
+> > You might try to fix the issue on the other side of the connection,
+> > the one doing reneging...
+>
+> Would that be adjusting tcp_sequence as per RFC 793, page 69?
+>
+>         If the RCV.WND is zero, no segments will be acceptable, but
+>         special allowance should be made to accept valid ACKs, URGs and
+>         RSTs.
+>
+> My initial idea was to change tcp_sequence slightly to pass the test
+> if RCV.WND is 0. My assessment was that it could go against the
+> mentioned test (SEG.SEQ =3D RCV.NXT), and would also require some bigger
+> changes to tcp_validate_incoming as tcp_rcv_established would still
+> need to drop the SKB but process the ACK. I'd be happy to give it a
+> shot anyway.
+
+Please do not focus on RWIN 0, but more generally.
+
+If a peer sent a ACK @seq WIN (@X << wscale), at some point in the past,
+then it should accept any SEQ _before_  @seq + (@X << wscale),
+especially from a pure ACK packet.
+
+Reneging (ie decrease RWIN) makes sense as a way to deal with memory stress=
+,
+but should allow pure acks to be accepted if there sequence is not too
+far in the future.
+
+tcp_receive_window(const struct tcp_sock *tp)
+...
+s32 win =3D tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt;
+
+
+...
+if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
+    return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+
+
+-->
+
+if (after(seq, max_admissible_seq(tp))
+    return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+
+Reneging would no retract max_admissible_seq() as far as
+tcp_sequence() is concerned.
 
