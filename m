@@ -1,222 +1,354 @@
-Return-Path: <netdev+bounces-183440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F222FA90AB7
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:02:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D4AA90ABB
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 639665A3007
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:02:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5703A366A
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9E0215F72;
-	Wed, 16 Apr 2025 18:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73DB204598;
+	Wed, 16 Apr 2025 18:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="UqwfOgw6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bZLxmOyZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020091.outbound.protection.outlook.com [52.101.46.91])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59EC7207E05;
-	Wed, 16 Apr 2025 18:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.91
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744826553; cv=fail; b=MfymGAFwVm1LEnkYNUZ8leQeY4u1ZtOFGzMqq8p0xgfVaI0MgGxG7eiqvMFvVlOgiyYkl1cXQl7AXFOvDdfB+LHX9xgBGKbopm3yqClMfU867nOAZ9B3Js/WHBuNnEuK104E+rhatXnQyPn810LueE5mRbi4HR80zwWW9FBWazA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744826553; c=relaxed/simple;
-	bh=phSrrm33mFgR/AdxRaH3+toHGmmdJV8q7qDB8TylZno=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lIrONYXHTP0zepTse2JgoQxF8lN7F5i407LHkbLhL6C+vNO6FvPiycfLHshe5TgGzXnRr1AFbmIb4AUJIPFNGNEdwM+CPSaQO8jo9CedS5PKKYvPqA+8qhaSJkWZoGj6QajcA0iYbXNtnYpFqimwPI27cCdEjwyDidlIFQ736JU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=UqwfOgw6; arc=fail smtp.client-ip=52.101.46.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u7rGVp9sJ0knug4e9gS6o2Ol/njpkobdEcMKu8VFD7BNYPRf+dz/RMXPBJPkiUswonDl6OEVZYqtHlNOImVEtYZ1AV7qdeXLo+c93XhRvGQUydR5f5FeuA/JvnANWVnsG0j09qYBPI0WAaUsJn29eRs9u8VGgzPiuWgUYyJjxfg3SjkcyKGc3gUYCFgfhKt7+d/pnaSH6xQG+q8QT4qLoViuH+22QHzqUMzlT/JIRTTX9nYihH1jIgdQiCH75c1rBo+TRzC73jmHWdbrm57qiQqn6sWfcifIRZQk9qrjSPe+ceBOuNwuQNBmSc2WTsSnSS3kdm9huW+LU2bmH4uMwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uEmnaOaukf6PR4tuWJdjJ9B8vBdwQXx+TaVGnTtWSZk=;
- b=K86xBs0D74MV7aKOrKE+rOTRNRGBT1OmrtASVuzcCDspvEkBjvxXTRDpVUrXkWgykI4nYrFS2CjaOED6fdJfPCeviRO/Ox8s/QDL5m+YXCO5QZ2BNDf207QSZBnta06kW9Yr7WEVi/AHPGVpLgDpkojCpOMqRb1St+YJd/IT/v1gl3Dk+7pmPkoRdxqzklKDOSUi+wv8YaDNdUfXv1ftSoIJWT/Rph1bCE0Fs5gcvppagfoqneGp4+89ZxJ3L75nGYIj6sZUQ3qjpYBE+QTuJVnxivToOfTxCYpZpxbVKmSeSq6ZrWBE0JxT9Qbi1JfuZBNfM6Bkzm3P/ogAtjH42g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uEmnaOaukf6PR4tuWJdjJ9B8vBdwQXx+TaVGnTtWSZk=;
- b=UqwfOgw6xYHVSn+bkspxgKCSY7sMV163cMVJFiLHAHGJltGAkjWWSnYEWYikmQHEAH/09GsnGuhm7UztS9Bms3hZiVZLsKq1C8GBzH1ufISl2AVWzo8MBzo/sKzFSAtqF/Ki+hQ8iyWFjUlxEMQb548knbDAAqoBc+vWaX6EYsw=
-Received: from SA6PR21MB4231.namprd21.prod.outlook.com (2603:10b6:806:412::20)
- by SA6PR21MB4461.namprd21.prod.outlook.com (2603:10b6:806:429::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.8; Wed, 16 Apr
- 2025 18:02:28 +0000
-Received: from SA6PR21MB4231.namprd21.prod.outlook.com
- ([fe80::5c62:d7c6:4531:3aff]) by SA6PR21MB4231.namprd21.prod.outlook.com
- ([fe80::5c62:d7c6:4531:3aff%6]) with mapi id 15.20.8655.012; Wed, 16 Apr 2025
- 18:02:28 +0000
-From: Long Li <longli@microsoft.com>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>, Konstantin Taranov
-	<kotaranov@microsoft.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Haiyang
- Zhang <haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, Dexuan Cui
-	<decui@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"jgg@ziepe.ca" <jgg@ziepe.ca>, "leon@kernel.org" <leon@kernel.org>
-CC: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH rdma-next v2 1/3] RDMA/mana_ib: Access remote atomic for
- MRs
-Thread-Topic: [PATCH rdma-next v2 1/3] RDMA/mana_ib: Access remote atomic for
- MRs
-Thread-Index: AQHbrRuzDDNwd+F7X0qAM7xd6dupAbOmmSAA
-Date: Wed, 16 Apr 2025 18:02:28 +0000
-Message-ID:
- <SA6PR21MB4231BC133C6EBAAADB6CFC59CEBD2@SA6PR21MB4231.namprd21.prod.outlook.com>
-References: <1744621234-26114-1-git-send-email-kotaranov@linux.microsoft.com>
- <1744621234-26114-2-git-send-email-kotaranov@linux.microsoft.com>
-In-Reply-To: <1744621234-26114-2-git-send-email-kotaranov@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1a8db992-639c-4918-8d49-7fced70c553e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-04-16T18:02:09Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA6PR21MB4231:EE_|SA6PR21MB4461:EE_
-x-ms-office365-filtering-correlation-id: ed99ed7f-42b6-4849-a9b0-08dd7d10da0e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018|921020;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?QpPUeVTgj2iTgh+qm1lLy6NZMqi1kxoBZw/I/zCu6jluOkPoI9kJiOoBbxbz?=
- =?us-ascii?Q?dCHrItuUJARb7+Iw0MMmDSv4h3LgbbVOvkKLrDS/YBpj+/6BFlBBZ7Ony6qz?=
- =?us-ascii?Q?spIEAzBRVViWB7Tm4cKHCLGcj2jNgyrilIBHm/+c4CPbALOOIZA9gL5EeOv3?=
- =?us-ascii?Q?/JKAe/MTl7fFYAaS5YlrGx/CEgKaUJhSKLToYx5d+tmgoR+f/9B0joi4ISJV?=
- =?us-ascii?Q?Uj/WeqpePDFdSyPC7LH/BnUgP1L6Yi0xNPZ5JXSeXD7C/u2I54uvRruWP42O?=
- =?us-ascii?Q?qJolblnOZY1fRKiN49DUgMsFoH0NUcMhzLlAsnVT33Bnh7ArIiNSf0lXi1Qr?=
- =?us-ascii?Q?p/gQHXy52gRDMwOhachVYRtgmfwXqrz4CVOl0Z0uIHeHunSJofwX3Bi4iU4+?=
- =?us-ascii?Q?OUKgQ1/Fj4rS9MX5xdHZEvmjbDseyiJJskM+PY3LWg35o+sK1oppRxzyyw5z?=
- =?us-ascii?Q?t9wWL834y4haUckpnsZt28kVE0jeF5tM+D2mK9iJlYTnmwnQ5nZyZ1TkWdOQ?=
- =?us-ascii?Q?FFSDyYLM4YcKApB7aMkFPrJOH0lFIweiSjFe7r5nmgD3qJULCj84x6tpOKdv?=
- =?us-ascii?Q?+12hP62XXYDkjudO4pT64JK2JvwBqBXikIsbwLkHH7zyX9bzbfF/2SdYbJdm?=
- =?us-ascii?Q?KSHUVu9K9dOAKDrOD/ShYt6BxnS06/lom6DPV1N9T0SmLlk1fJFj9m4mX63L?=
- =?us-ascii?Q?DXtd5dZk5PdnFD8o1PV37MoN0oz6wfG0UFsxFc9s8I1kWodJ1JVNhyUoj7aI?=
- =?us-ascii?Q?A89VQx5GSXOJrrtPdB8CjqE761JwV4/zxGGBklKGSSZ14isQ5co5utxCIfP6?=
- =?us-ascii?Q?OEYnqPqhoVaHCBYNQF40zm83+eiJXJv2kDJM9hm6Sezbh5zUZpKfWZBlXd52?=
- =?us-ascii?Q?jg/mjndVXjiQfsouUI2SWbXrzz3qD2D5XL177qRsggclCgzkqn9PvUyYLziw?=
- =?us-ascii?Q?FMc4RuEVGEUIYLrIAk5NUic8MJiM0H7LIofuss7BK6QALcpTyEGx9X3Mwa5q?=
- =?us-ascii?Q?FaABrVqiswRem+H3trjnFKEdOb+E1pJmKxB1KvL0kk4jxEMvKbqhre+2M0iJ?=
- =?us-ascii?Q?7j9t7T+mL1Je1yPua8Cu8kf1S+IslpeJVqkttD/AafZD1AKGTk8/ZMWj2jxp?=
- =?us-ascii?Q?vqtWKFlsvOTXx2Sk1M8/YM/sTyoTzMY1ty0Haiswt7I/WUgaZtqwSYzFMWe0?=
- =?us-ascii?Q?qoXmoPSj8e8hjs35dZncj3ICoCwGxY2LV7RI8M2+swcprACWXWGUiAsQQlgl?=
- =?us-ascii?Q?jfrCFWnul6jQ9ehWGG+sgqhpreTOVy6iCbMvOg3nPYF0sNq9lgNE8Y71rg2S?=
- =?us-ascii?Q?8L6cI0vY/EwAlfX9jP6exj1L8xMQhZRQj8TUIUI+2yCwWAb5L0WoudnnQbaG?=
- =?us-ascii?Q?O45hc3h9Ll08/kj2zclrMENO+8GNEzCY7QghgaOb7e9jZ5EsqRTPsbMNDedD?=
- =?us-ascii?Q?4Yw/twlqZEWsOJLuFtnkcIb+HzaS/ChpwrvM8HFxsdu0tvdprvzmYMHF+pUj?=
- =?us-ascii?Q?FR7ViOBoNN1pnbg=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR21MB4231.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018)(921020);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?wwpr4MfCK3Qn5GO8f6rCaNSUeeHgLQ3D59oXdPDmZxy2SgyILN7kvEfKJWvN?=
- =?us-ascii?Q?kuKyI8d9xw98LKExfDy0mIyeNINK+kg4HRkLWy/+qEz8xeIuSUJa5+dwiWVD?=
- =?us-ascii?Q?nz+UGKjI6Mu49nBOVdTMCUlIszNXhuskzTULrS8JLqzulEwRuoeLNZOPn2v2?=
- =?us-ascii?Q?z6jJARDJkIcRd9U26m4eU0QgIXrQeHlLSzuHmVjja7LEBUISOjZ6CO5fvO7H?=
- =?us-ascii?Q?pHmwusuLYzB6m0LUunrd0sSqkSfF7Eqml4RAg3PssDtHCay+wUSe7CV4HV0c?=
- =?us-ascii?Q?JFMhgAVLgqVb9wHlaa2f6vKFYFfHZK3h9Hoj4KYrRxola9gohoGK0UcqIcIw?=
- =?us-ascii?Q?W9N+htaBrR5r1txlAZjzE+a26zbfyBnv0yzezvljCKi4L7a5he923iEWcLSR?=
- =?us-ascii?Q?gKJ/1DQy2OWbZ9/2YIHpSIfA6cqLUabHlqBzAa3NSWccNZGGOaLy+JvpeNvm?=
- =?us-ascii?Q?/a/WIwRs3rCO0bdAmg6uo/mUysChj9C6otknDhMyZ99VgbjodgZ47Trfjh9s?=
- =?us-ascii?Q?edyQRjBgXZl2vGG+dkDAuLXm84ZXjFxlS90CIkKrolzC7xK+BRJkv2D1dha4?=
- =?us-ascii?Q?U0vekcPub+x7Ajy/girRHu4vZBhprZ39WZYmJREg3t0xXXUzQl1mbewb8b12?=
- =?us-ascii?Q?+SsdKRa5bZhXiA0PGDP9am3VL+WdV7mZmyqAg0+yQx5RkUN6I3LFioUrXg83?=
- =?us-ascii?Q?y4pRozIXPRL6Pc48K2i70N8AQ2UJkA6z439mvQg1toeHQ5zUVSRcq1r/Qmcl?=
- =?us-ascii?Q?/7kU3qqFmYxmHMfW5dl1CVYflrI+cHZ84/UgNHTEs+stWqXP2nl1J9FpOjWU?=
- =?us-ascii?Q?vsqkuTJCvjhf+yK5g+LZ5SketWprABuQIgS5OhyWuVzdUWVUQmC1gUYIrA8n?=
- =?us-ascii?Q?HlWvZJCqES149vj0xMrKviEZu+NJ8xaQbx5DjcVAOX7L2DovfCD2+7wd0Mzk?=
- =?us-ascii?Q?MSpuRslxxnEMPlbgn6P+3KYE71ExbNJvdqft51ollSx6AFPO8S17TMXQKeSw?=
- =?us-ascii?Q?q1wl0DSf8SuIUg8nOydKD1eKMV+Oy1N8ATELFJ3VjWIO0VUJ0eMsKjDPp9YD?=
- =?us-ascii?Q?S/PWEbOL7X8NyzzrTSpw0sbFpF8+yIIh3JfNWgb/klQ2gyFNelo62ksouR/Q?=
- =?us-ascii?Q?cpw6EMaYQurGbarePODGYn+Ti6kp2WZJ+Q9kub6r1KCSCwKGcS3ZtNrpMaV0?=
- =?us-ascii?Q?8bTR9cr0hUg0UeGoqOjxsBEES9chKz4BJSII0RTlAJN6nu9wwkytaauHkYUe?=
- =?us-ascii?Q?oe1/520/ed4cnDGJFTfDnoAGeqKrH/tav/4awTsPCsyvz0OsHhCynj8scoOH?=
- =?us-ascii?Q?xYhBFmmslQ6EVyenm2iP6ZQL2UyRgsxK0zDWsmNnQ+t57kC4dWinJcojCAuz?=
- =?us-ascii?Q?n704yaqqZpVkMUX9xjy4toYUo/Wn/iiukYhU1I7+DkZU7q1kTwl1wfrOLxlN?=
- =?us-ascii?Q?x8WwtmzDxM5NRRmE5G44uE6ymkzOunG92iOxlmGp+hYMzLR8E+aJZGuQ1wKT?=
- =?us-ascii?Q?gZG8uylyLZWQmdwTJQgz5aoThnKMwmX1oTo200S3NLf8249NDZHowg+ftZmb?=
- =?us-ascii?Q?s6z7STKd0dmtvSVxbnKhm0RUX0NoQ5MLZ9yLKe0L?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EAD215F6C
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744826573; cv=none; b=NzY4uq/VuNwl77pXZUL6Wqtjp6LDv0z/PA7iP7KspRDGq/rDXKihzzS6677ycAyADks+dSC1s1QUiwZKv5bp8D6mDdjBJ5D+CiMhJ/gNTzAkbrnzl5a0pwbCEAtW+VpNNNBI1M7/EXv8cx/gUDTrZ1RediG+v34n7fWDNqYxRAM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744826573; c=relaxed/simple;
+	bh=VbyjV1xV3keb5zHv6u5VS//P+QDhOb2P56UX/HT/MQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QPEsqqcGPDlXMnLwfdZlrCr46+rAxCHeD+N0iESSqyOmi9mvVeQCe4zq9+MbnCqrJqQWo4LjTB8vdkhj8XnAO1lEvxWRMJqM/VpRH0047FIL93h7Sr+XDlW9LD1OwEiVLPbD1/ZEMAK1gNQzYA6e3orNcFJSEyPFol4+DKylEU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bZLxmOyZ; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744826568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N0wICEPxoKXEmipCZYFaxtgePit0HW271+fFL4AOW2o=;
+	b=bZLxmOyZSqJIgeH3b8E/IhKnLdC5mDVuFbevye1u2CDLkg4g8giv0pPSr3rix5NVguurWY
+	++44wvKJt2GnLxbqKR0RFVhr3B/F8xJoFTWYCIRdighAPedcQfvfIuy/wlBu8S2bmXe+sY
+	NCjFH85QUZAtGGci4kR+Mi1fw+cGBng=
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>,
+	linux-mm@kvack.org,
+	cgroups@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>
+Subject: [PATCH] memcg: multi-memcg percpu charge cache
+Date: Wed, 16 Apr 2025 11:02:29 -0700
+Message-ID: <20250416180229.2902751-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA6PR21MB4231.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed99ed7f-42b6-4849-a9b0-08dd7d10da0e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2025 18:02:28.7702
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /IQ1O4VxcxF5ZCOAq6ALIvIiHdjy4JfWDqDahte/RKw0EmjnTKY5e22o38w6yU5sZ3+m/A28XEpFhCAuivj/lg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR21MB4461
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> Subject: [PATCH rdma-next v2 1/3] RDMA/mana_ib: Access remote atomic for
-> MRs
->=20
-> From: Konstantin Taranov <kotaranov@microsoft.com>
->=20
-> Add IB_ACCESS_REMOTE_ATOMIC to the valid flags for MRs and use the
-> corresponding flag bit during MR creation in the HW.
->=20
-> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+Memory cgroup accounting is expensive and to reduce the cost, the kernel
+maintains per-cpu charge cache for a single memcg. So, if a charge
+request comes for a different memcg, the kernel will flush the old
+memcg's charge cache and then charge the newer memcg a fixed amount (64
+pages), subtracts the charge request amount and stores the remaining in
+the per-cpu charge cache for the newer memcg.
 
-Reviewed-by: Long Li <longli@microsoft.com>
+This mechanism is based on the assumption that the kernel, for locality,
+keep a process on a CPU for long period of time and most of the charge
+requests from that process will be served by that CPU's local charge
+cache.
 
-> ---
->  drivers/infiniband/hw/mana/mr.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/infiniband/hw/mana/mr.c b/drivers/infiniband/hw/mana=
-/mr.c
-> index f99557e..e4a9f53 100644
-> --- a/drivers/infiniband/hw/mana/mr.c
-> +++ b/drivers/infiniband/hw/mana/mr.c
-> @@ -5,8 +5,8 @@
->=20
->  #include "mana_ib.h"
->=20
-> -#define VALID_MR_FLAGS                                                  =
-       \
-> -	(IB_ACCESS_LOCAL_WRITE | IB_ACCESS_REMOTE_WRITE |
-> IB_ACCESS_REMOTE_READ)
-> +#define VALID_MR_FLAGS (IB_ACCESS_LOCAL_WRITE |
-> IB_ACCESS_REMOTE_WRITE | IB_ACCESS_REMOTE_READ |\
-> +			IB_ACCESS_REMOTE_ATOMIC)
->=20
->  #define VALID_DMA_MR_FLAGS (IB_ACCESS_LOCAL_WRITE)
->=20
-> @@ -24,6 +24,9 @@ mana_ib_verbs_to_gdma_access_flags(int access_flags)
->  	if (access_flags & IB_ACCESS_REMOTE_READ)
->  		flags |=3D GDMA_ACCESS_FLAG_REMOTE_READ;
->=20
-> +	if (access_flags & IB_ACCESS_REMOTE_ATOMIC)
-> +		flags |=3D GDMA_ACCESS_FLAG_REMOTE_ATOMIC;
-> +
->  	return flags;
->  }
->=20
-> --
-> 2.43.0
+However this assumption breaks down for incoming network traffic in a
+multi-tenant machine. We are in the process of running multiple
+workloads on a single machine and if such workloads are network heavy,
+we are seeing very high network memory accounting cost. We have observed
+multiple CPUs spending almost 100% of their time in net_rx_action and
+almost all of that time is spent in memcg accounting of the network
+traffic.
+
+More precisely, net_rx_action is serving packets from multiple workloads
+and is observing/serving mix of packets of these workloads. The memcg
+switch of per-cpu cache is very expensive and we are observing a lot of
+memcg switches on the machine. Almost all the time is being spent on
+charging new memcg and flushing older memcg cache. So, definitely we
+need per-cpu cache that support multiple memcgs for this scenario.
+
+This patch implements a simple (and dumb) multiple memcg percpu charge
+cache. Actually we started with more sophisticated LRU based approach but
+the dumb one was always better than the sophisticated one by 1% to 3%,
+so going with the simple approach.
+
+Some of the design choices are:
+
+1. Fit all caches memcgs in a single cacheline.
+2. The cache array can be mix of empty slots or memcg charged slots, so
+   the kernel has to traverse the full array.
+3. The cache drain from the reclaim will drain all cached memcgs to keep
+   things simple.
+
+To evaluate the impact of this optimization, on a 72 CPUs machine, we
+ran the following workload where each netperf client runs in a different
+cgroup. The next-20250415 kernel is used as base.
+
+ $ netserver -6
+ $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
+
+number of clients | Without patch | With patch
+  6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
+  12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
+  18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
+  24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
+  30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
+  36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
+
+The results show drastic improvement for network intensive workloads.
+
+Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+---
+ mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 91 insertions(+), 37 deletions(-)
+
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 1ad326e871c1..0a02ba07561e 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
+ 	pr_cont(" are going to be killed due to memory.oom.group set\n");
+ }
+ 
++#define NR_MEMCG_STOCK 7
+ struct memcg_stock_pcp {
+ 	local_trylock_t stock_lock;
+-	struct mem_cgroup *cached; /* this never be root cgroup */
+-	unsigned int nr_pages;
++	uint8_t nr_pages[NR_MEMCG_STOCK];
++	struct mem_cgroup *cached[NR_MEMCG_STOCK];
+ 
+ 	struct obj_cgroup *cached_objcg;
+ 	struct pglist_data *cached_pgdat;
+@@ -1809,9 +1810,10 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
+ 			  gfp_t gfp_mask)
+ {
+ 	struct memcg_stock_pcp *stock;
+-	unsigned int stock_pages;
++	uint8_t stock_pages;
+ 	unsigned long flags;
+ 	bool ret = false;
++	int i;
+ 
+ 	if (nr_pages > MEMCG_CHARGE_BATCH)
+ 		return ret;
+@@ -1822,10 +1824,17 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
+ 		return ret;
+ 
+ 	stock = this_cpu_ptr(&memcg_stock);
+-	stock_pages = READ_ONCE(stock->nr_pages);
+-	if (memcg == READ_ONCE(stock->cached) && stock_pages >= nr_pages) {
+-		WRITE_ONCE(stock->nr_pages, stock_pages - nr_pages);
+-		ret = true;
++
++	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
++		if (memcg != READ_ONCE(stock->cached[i]))
++			continue;
++
++		stock_pages = READ_ONCE(stock->nr_pages[i]);
++		if (stock_pages >= nr_pages) {
++			WRITE_ONCE(stock->nr_pages[i], stock_pages - nr_pages);
++			ret = true;
++		}
++		break;
+ 	}
+ 
+ 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
+@@ -1843,21 +1852,30 @@ static void memcg_uncharge(struct mem_cgroup *memcg, unsigned int nr_pages)
+ /*
+  * Returns stocks cached in percpu and reset cached information.
+  */
+-static void drain_stock(struct memcg_stock_pcp *stock)
++static void drain_stock(struct memcg_stock_pcp *stock, int i)
+ {
+-	unsigned int stock_pages = READ_ONCE(stock->nr_pages);
+-	struct mem_cgroup *old = READ_ONCE(stock->cached);
++	struct mem_cgroup *old = READ_ONCE(stock->cached[i]);
++	uint8_t stock_pages;
+ 
+ 	if (!old)
+ 		return;
+ 
++	stock_pages = READ_ONCE(stock->nr_pages[i]);
+ 	if (stock_pages) {
+ 		memcg_uncharge(old, stock_pages);
+-		WRITE_ONCE(stock->nr_pages, 0);
++		WRITE_ONCE(stock->nr_pages[i], 0);
+ 	}
+ 
+ 	css_put(&old->css);
+-	WRITE_ONCE(stock->cached, NULL);
++	WRITE_ONCE(stock->cached[i], NULL);
++}
++
++static void drain_stock_fully(struct memcg_stock_pcp *stock)
++{
++	int i;
++
++	for (i = 0; i < NR_MEMCG_STOCK; ++i)
++		drain_stock(stock, i);
+ }
+ 
+ static void drain_local_stock(struct work_struct *dummy)
+@@ -1874,7 +1892,7 @@ static void drain_local_stock(struct work_struct *dummy)
+ 
+ 	stock = this_cpu_ptr(&memcg_stock);
+ 	drain_obj_stock(stock);
+-	drain_stock(stock);
++	drain_stock_fully(stock);
+ 	clear_bit(FLUSHING_CACHED_CHARGE, &stock->flags);
+ 
+ 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
+@@ -1883,35 +1901,81 @@ static void drain_local_stock(struct work_struct *dummy)
+ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+ {
+ 	struct memcg_stock_pcp *stock;
+-	unsigned int stock_pages;
++	struct mem_cgroup *cached;
++	uint8_t stock_pages;
+ 	unsigned long flags;
++	bool evict = true;
++	int i;
+ 
+ 	VM_WARN_ON_ONCE(mem_cgroup_is_root(memcg));
+ 
+-	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
++	if (nr_pages > MEMCG_CHARGE_BATCH ||
++	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+ 		/*
+-		 * In case of unlikely failure to lock percpu stock_lock
+-		 * uncharge memcg directly.
++		 * In case of larger than batch refill or unlikely failure to
++		 * lock the percpu stock_lock, uncharge memcg directly.
+ 		 */
+ 		memcg_uncharge(memcg, nr_pages);
+ 		return;
+ 	}
+ 
+ 	stock = this_cpu_ptr(&memcg_stock);
+-	if (READ_ONCE(stock->cached) != memcg) { /* reset if necessary */
+-		drain_stock(stock);
+-		css_get(&memcg->css);
+-		WRITE_ONCE(stock->cached, memcg);
++	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
++again:
++		cached = READ_ONCE(stock->cached[i]);
++		if (!cached) {
++			css_get(&memcg->css);
++			WRITE_ONCE(stock->cached[i], memcg);
++		}
++		if (!cached || memcg == READ_ONCE(stock->cached[i])) {
++			stock_pages = READ_ONCE(stock->nr_pages[i]) + nr_pages;
++			WRITE_ONCE(stock->nr_pages[i], stock_pages);
++			if (stock_pages > MEMCG_CHARGE_BATCH)
++				drain_stock(stock, i);
++			evict = false;
++			break;
++		}
+ 	}
+-	stock_pages = READ_ONCE(stock->nr_pages) + nr_pages;
+-	WRITE_ONCE(stock->nr_pages, stock_pages);
+ 
+-	if (stock_pages > MEMCG_CHARGE_BATCH)
+-		drain_stock(stock);
++	if (evict) {
++		i = get_random_u32_below(NR_MEMCG_STOCK);
++		drain_stock(stock, i);
++		goto again;
++	}
+ 
+ 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
+ }
+ 
++static bool is_drain_needed(struct memcg_stock_pcp *stock,
++			    struct mem_cgroup *root_memcg)
++{
++	struct mem_cgroup *memcg;
++	bool flush = false;
++	int i;
++
++	rcu_read_lock();
++
++	if (obj_stock_flush_required(stock, root_memcg)) {
++		flush = true;
++		goto out;
++	}
++
++	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
++		memcg = READ_ONCE(stock->cached[i]);
++		if (!memcg)
++			continue;
++
++		if (READ_ONCE(stock->nr_pages[i]) &&
++		    mem_cgroup_is_descendant(memcg, root_memcg)) {
++			flush = true;
++			break;
++		}
++	}
++out:
++	rcu_read_unlock();
++	return flush;
++}
++
+ /*
+  * Drains all per-CPU charge caches for given root_memcg resp. subtree
+  * of the hierarchy under it.
+@@ -1933,17 +1997,7 @@ void drain_all_stock(struct mem_cgroup *root_memcg)
+ 	curcpu = smp_processor_id();
+ 	for_each_online_cpu(cpu) {
+ 		struct memcg_stock_pcp *stock = &per_cpu(memcg_stock, cpu);
+-		struct mem_cgroup *memcg;
+-		bool flush = false;
+-
+-		rcu_read_lock();
+-		memcg = READ_ONCE(stock->cached);
+-		if (memcg && READ_ONCE(stock->nr_pages) &&
+-		    mem_cgroup_is_descendant(memcg, root_memcg))
+-			flush = true;
+-		else if (obj_stock_flush_required(stock, root_memcg))
+-			flush = true;
+-		rcu_read_unlock();
++		bool flush = is_drain_needed(stock, root_memcg);
+ 
+ 		if (flush &&
+ 		    !test_and_set_bit(FLUSHING_CACHED_CHARGE, &stock->flags)) {
+@@ -1969,7 +2023,7 @@ static int memcg_hotplug_cpu_dead(unsigned int cpu)
+ 	drain_obj_stock(stock);
+ 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
+ 
+-	drain_stock(stock);
++	drain_stock_fully(stock);
+ 
+ 	return 0;
+ }
+-- 
+2.47.1
 
 
