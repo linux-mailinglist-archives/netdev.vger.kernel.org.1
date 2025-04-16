@@ -1,130 +1,158 @@
-Return-Path: <netdev+bounces-183423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F4EA90A05
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:32:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5585A90A08
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3906F189DEAE
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:32:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB2CB44542B
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2777A21517B;
-	Wed, 16 Apr 2025 17:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F1B21771A;
+	Wed, 16 Apr 2025 17:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WVUzN54G"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wYBT/o8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9C533991;
-	Wed, 16 Apr 2025 17:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5F7217673
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 17:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744824747; cv=none; b=YaytRBBanerMaiqfnC6thbl7seUrrhVeCMZl4zfyVnGgRrhRlgVuWbxo7RmbOFnG125UUY9peXlmqUW7CpPvzFcyu3mhXbkEM9nUXc+jpATfOlf3+LQqrRQWuTED547+oOK6xZp9eidvkOVrLMmleEswSuud1TJ6GvxDGNJ5UIc=
+	t=1744824933; cv=none; b=EjJ+9aCqBj52M3oVfA8m79eFRMTGSlQ+ORDS/Rg6pe3K4FZdyZQiR/NGw37Za8K1Z/fYHbdjGLlLPghGDZ3yUFn6WcG1pktngZf9Ve+6oqPrZTtD7Kx/fIL3N2iuwLlG734ocSemiUCm1N3CUKAV6UGWQAWRUmdGCwvRoijX/es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744824747; c=relaxed/simple;
-	bh=HK/ACkCSXH9iBavYefiL3UQ3gNZHnIc01A/zo5ZfKmQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=li0tPulUuVoajLzweXoG15BzS+1SwUk+Y9uRx9gdHP7ZI6yvT+WHR7qVz6Wq+4JaPrkrxWAEMGtLtUNIIH5vu2OQM73X5Jhq/7DUSSC5GJsldLIRni1gkUw/oSS0+/OMO/eqcIVRFnFWtj7PmvioD0MWrWQIzOZdjyWWo6OSS+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WVUzN54G; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5+DmEreLd4tGBrT4AUVKbL/9BUAR7PVq/ro9PvBSOX0=; b=WVUzN54GFucJKC3jngxZF9vCFH
-	PNcDcPqQ7vHirWGZqnYLr6t2ovXiKtRt+J9rSoOm/uCi0TifPVNos7K0ue9oYrjuQEjgTrCcXlQdB
-	8J40V7YNUe7qBnEb7pJ6KSGvtQaqdUnBj+7LhJnfcf+CY3d6W925GtRciteLKgDxl1OI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u56cO-009gHX-JP; Wed, 16 Apr 2025 19:32:12 +0200
-Date: Wed, 16 Apr 2025 19:32:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 5/8] mfd: zl3073x: Add functions to work with
- register mailboxes
-Message-ID: <d286dec9-a544-409d-bf62-d2b84ef6ecd4@lunn.ch>
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-6-ivecera@redhat.com>
+	s=arc-20240116; t=1744824933; c=relaxed/simple;
+	bh=XemuQ0eRYtJvp1uNfDhM3a9CJEZdGiJRLjgEQiFS+k4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=clYvgyQaWjKznujeoK2+UBjgGvsQT0ZR3ckJ/p/XSyezOIGfX1bmks0vPEoKP5zufXqhhHE6ZUxyxLrue+3+/dI20Y1LJS1JXuFTwlulSQSnQW0pF2jQY/0I8UmWvFeutUeV7cPcEVHOBlIT0jAFgPVDODbMnI9wNhPyg69uEDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wYBT/o8r; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d39958c8-4f2f-4aa9-94db-e1f5c3a6b615@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744824926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vptg2Zk8dWJzsw7advTS99WGzx63RloJ7VvDovrVzGs=;
+	b=wYBT/o8rP+HQp69Ha/VhiCl/WEYhOCY3043CuZnDCF+zzF8jsGrDaWOoeTC1fA2oJeCo4L
+	2cbTk4GCM0ueouyQt5GuEQM9WEK9H6f1/GgRgjLwIBw9vKWM7ST0ssmR3Uy4kohbOf89vr
+	UXu+Q0odAEOSIDvCklVU0ltC2J1y2FA=
+Date: Wed, 16 Apr 2025 18:35:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416162144.670760-6-ivecera@redhat.com>
+Subject: Re: [PATCH net] bnxt_en: improve TX timestamping FIFO configuration
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski
+ <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250416150057.3904571-1-vadfed@meta.com>
+ <CACKFLin8=vm8MBBFpFgJv2Jw4Vn_m43cvXZUEMTfhgFnjZ+m1w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CACKFLin8=vm8MBBFpFgJv2Jw4Vn_m43cvXZUEMTfhgFnjZ+m1w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> +/**
-> + * zl3073x_mb_dpll_read - read given DPLL configuration to mailbox
-> + * @zldev: pointer to device structure
-> + * @index: DPLL index
-> + *
-> + * Reads configuration of given DPLL into DPLL mailbox.
-> + *
-> + * Context: Process context. Expects zldev->regmap_lock to be held by caller.
-> + * Return: 0 on success, <0 on error
-> + */
-> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index)
-> +{
-> +	int rc;
+On 16/04/2025 18:03, Michael Chan wrote:
+> On Wed, Apr 16, 2025 at 8:01 AM Vadim Fedorenko <vadfed@meta.com> wrote:
+>>
+>> Reconfiguration of netdev may trigger close/open procedure which can
+>> break FIFO status by adjusting the amount of empty slots for TX
+>> timestamps. But it is not really needed because timestamps for the
+>> packets sent over the wire still can be retrieved. On the other side,
+>> during netdev close procedure any skbs waiting for TX timestamps can be
+>> leaked because there is no cleaning procedure called. Free skbs waiting
+>> for TX timestamps when closing netdev.
+>>
+>> Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX packets to 4")
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  4 ++--
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 23 +++++++++++++++++++
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
+>>   3 files changed, 26 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> index c8e3468eee61..45d178586316 100644
+>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> @@ -3517,6 +3517,8 @@ static void bnxt_free_skbs(struct bnxt *bp)
+>>   {
+>>          bnxt_free_tx_skbs(bp);
+>>          bnxt_free_rx_skbs(bp);
+>> +       if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
+>> +               bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
+> 
+> Since these are TX SKBs, it's slightly more logical if we put this in
+> bnxt_free_tx_skbs().
 
-lockdep_assert_held(zldev->regmap_lock) is stronger than having a
-comment. When talking about i2c and spi devices, it costs nothing, and
-catches bugs early.
+Do you mean to move this chunk to bnxt_free_tx_skbs() ?
+I put it here because the driver has 3 different FIFOs to keep SKBs,
+and it's logical to move PTP FIFO free function out of TX part..
+But have no strong opinion.
 
-> +/*
-> + * Mailbox operations
-> + */
-> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_dpll_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_output_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_output_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_ref_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_ref_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_synth_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_synth_write(struct zl3073x_dev *zldev, u8 index);
+>>   }
+>>
+>>   static void bnxt_init_ctx_mem(struct bnxt_ctx_mem_type *ctxm, void *p, int len)
+> 
+>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> index 2d4e19b96ee7..39dc4f1f651a 100644
+>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> @@ -794,6 +794,29 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+>>          return HZ;
+>>   }
+>>
+>> +void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
+>> +{
+>> +       struct bnxt_ptp_tx_req *txts_req;
+>> +       u16 cons = ptp->txts_cons;
+>> +
+>> +       /* make sure ptp aux worker finished with
+>> +        * possible BNXT_STATE_OPEN set
+>> +        */
+>> +       ptp_cancel_worker_sync(ptp->ptp_clock);
+>> +
+>> +       spin_lock_bh(&ptp->ptp_tx_lock);
+> 
+> I think the spinlock is not needed because bnxt_tx_disable() should
+> have been called already in the close path.
 
-I assume these are the only valid ways to access a mailbox?
+Hmm ... ok, yeah, TX won't be woken up at that moment. I'll remove it.
 
-If so:
+> 
+>> +       ptp->tx_avail = BNXT_MAX_TX_TS;
+>> +       while (cons != ptp->txts_prod) {
+>> +               txts_req = &ptp->txts_req[cons];
+>> +               if (!IS_ERR_OR_NULL(txts_req->tx_skb))
+>> +                       dev_kfree_skb_any(txts_req->tx_skb);
+>> +               cons = NEXT_TXTS(cons);
+> 
+> I think we can remove the similar code we have in bnxt_ptp_clear().
+> We should always go through this path before bnxt_ptp_clear().
 
-> +static inline __maybe_unused int
-> +zl3073x_mb_read_ref_mb_mask(struct zl3073x_dev *zldev, u16 *value)
-> +{
-> +	__be16 temp;
-> +	int rc;
-> +
-> +	lockdep_assert_held(&zldev->mailbox_lock);
-> +	rc = regmap_bulk_read(zldev->regmap, ZL_REG_REF_MB_MASK, &temp,
-> +			      sizeof(temp));
-> +	if (rc)
-> +		return rc;
-> +
-> +	*value = be16_to_cpu(temp);
-> +	return rc;
-> +}
+The difference with bnxt_ptp_clear() code is that this one clears SKBs
+waiting in the queue according to consumer/producer pointers while
+bnxt_ptp_clear() iterates over all slots, a bit more on safe side. 
+Should I adjust this part to check all slots before removing
+bnxt_ptp_clear() FIFO manipulations?
 
-These helpers can be made local to the core. You can then drop the
-lockdep_assert_held() from here, since the only way to access them is
-via the API you defined above, and add the checks in those API
-functions.
+I believe in the normal way of things there should be no need to iterate
+over all slots, but maybe you think of some conditions when we have to
+check all slots?
 
-	Andrew
+> 
+> Thanks for the patch.
+
 
