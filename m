@@ -1,119 +1,154 @@
-Return-Path: <netdev+bounces-183139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA4F9A8B1A6
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:06:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFEDA8B1BC
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAB851904D83
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 07:06:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24F233ADC72
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 07:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1E822B8A7;
-	Wed, 16 Apr 2025 07:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8871C22A4E3;
+	Wed, 16 Apr 2025 07:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="n18/EU8Y"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="ilooAQAb"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BC522B5AA;
-	Wed, 16 Apr 2025 07:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B4D229B17
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 07:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744787082; cv=none; b=QLDmP6l/aJW1lH2IrdE3xToOmkofpxpi9I6Y2jMrOIt7ucqEDqixh6idxOkFTL4x/e0P2TZCNzNAMrljbpUowB1lzYIfUZLZm3dnCU8xU50WJ6vU2Gl/SWGOGEJ9RW+yJMNv2AtrPsR13Vz6zmunF1ILEbJ4Kaeo4/+qfH6Vfrc=
+	t=1744787633; cv=none; b=HIuaty9wrhQfMxlJkhveZr+YjypPARHj7GFSBbZN6Y5yxACbBua4rSq2DZJGIvJD3BZTNg5t5mMg43g9Rb9XOB03tnVybgW7AuJI0dQpuqEpHM/rTFvhd7MJKCHyyTZzxm7JcrB9Er5ycfoOwLkbkB48JH2H6HY5DJuj8e9jbxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744787082; c=relaxed/simple;
-	bh=HS/z4N64pw2j7J+mRowqcRtfuewBz9oZ/SCe+FNi88M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=P16QS69MQq2n1qds4DVWu5dyupjrwZ5jzT4D1IZ1iad+8Xz4G9rUYvSAcW0VJo2zN1nTKmCF2r/62+8GKEAdsIpZXlsj5HrW7B8Puj+VbXY2PVO397YkjxxldAINdUzcnEegAyx8a/vDnJLCkPNyO0lykcbfxeNiLjKG2x4uD4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=n18/EU8Y; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53G749voC2842662, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1744787049; bh=HS/z4N64pw2j7J+mRowqcRtfuewBz9oZ/SCe+FNi88M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=n18/EU8YmpQ0gZurQCDKb6mcdcDzZiwDjj9W1fng3wCxM86JhA4Yu/NUFhrbQlIQL
-	 zlKC370tSMUmdf6rn40ZlXWDcgU6fRbbwT96KPESQqxABWVcFo6gxac5dW+Vs+EvKY
-	 fi7QN8iUoEpWUxZ57bDhSjEGhbGQ7KPJo85JKoy7pf/rhbHnT/swXE8CIZoP/guE+t
-	 IvjZ4EyiNCzHz+A2amiWhXfBxib/usTe1Dj/3PKmPh0pO8ZF7QWDUzfoE4jinw09yh
-	 GwwLS/6M4H69FXl27YmJ0GPBbdBbiaseV8dGupWCOdnDRjnmFKkzx1h8VJ59RpZmkZ
-	 f2Ti/EYnEbQhQ==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53G749voC2842662
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 16 Apr 2025 15:04:09 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 16 Apr 2025 15:04:09 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 16 Apr 2025 15:04:09 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Wed, 16 Apr 2025 15:04:09 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v3] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
-Thread-Topic: [PATCH net-next v3] rtase: Add ndo_setup_tc support for CBS
- offload in traffic control setup
-Thread-Index: AQHbrO80xvliwf3v7k6gHUORMXC8/LOk63SAgADsrVA=
-Date: Wed, 16 Apr 2025 07:04:09 +0000
-Message-ID: <b9fcab27bc6a4d35ba32438623e5b259@realtek.com>
-References: <20250414034202.7261-1-justinlai0215@realtek.com>
- <20250415172303.19022025@kernel.org>
-In-Reply-To: <20250415172303.19022025@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1744787633; c=relaxed/simple;
+	bh=fDqaGhFkh6JXFKvZjvaZXwBrp6VboEd0If3gdo0nOI4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ivy0j8EkzjpihcrETFOJkrUUclnrY7Ft20cisv5ALNFsENQFucSnkYcfvQipHO1NMNrQjPmx4ec2I32puZOBk9yvpkjbqkNa/hj+Q90tI52wO51oq6HXmiog8+ltYWFlaotReYcUAW/1O38LzL4IkhGsXzUxp7sXhrCReu8x7O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=ilooAQAb; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac25d2b2354so1002154266b.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 00:13:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1744787630; x=1745392430; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ytps9MXFkYQg2HKzXOohF8qIk+g98tpzMXPoSm4dxFo=;
+        b=ilooAQAbKqb3NV/CLR4bNJK0XTtTFCZDfGZ5RQu5tO/X+tDUoBH5+QJYjS8RkGQbi+
+         ekXWFA9RuLyBgYlLlTY3KqNtvIJJkijybGYg4n7RNJ+nl68IjsY9Fg/OaYCtB78P4RrU
+         75zG+5GyjlrNhqSIBqZ4OLe2lsfqYLPir0kBY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744787630; x=1745392430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ytps9MXFkYQg2HKzXOohF8qIk+g98tpzMXPoSm4dxFo=;
+        b=Kn+DB4spztgEN//NFxNffJ2Ew9SCXaEXo0bJ4RIXkcTN0PnE0y9tdbFFE5l0b65unR
+         kDWO+huhPHWswDsKq4Qbpk4NFnZb+ORGZl8enMjEpcOVtVwA8ujB1ragR6U7wxdhReQw
+         SPNJmhS2whKH36o61SCuJEOzCgxyY3Fd0kxK028pLX2QiSb58n70Q/Mp+RgVoy9WAy8C
+         unM/YMogzfED8fOkaHppRUUVY0svoZgGsmYVZjLiblYuScwYyCyNzH5leqaQW06wdLrz
+         Sg3DCvXajqte9vGgv2phww3bhtbW85USTrRv2CiGbvwN73uvW/bvh6mOm6oxu2ET4eXT
+         21aw==
+X-Forwarded-Encrypted: i=1; AJvYcCXaCZx59iFLjX/Egbd/X4kZzilpejIKzaFtnjfM5GUa4w4zXyFX+Fzw9VMt1LJ/+DQrUBV+FK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgdPIgwLY9+wX22Rg+e56zsl9yHw+pYxZjkzGVNPCIs0KQ8xTp
+	D2lqDUiQH6l4Zz3elQp6WBYa0kJvSi/iHpSUAVQfin/H9leJc2dKInECj/qigeqg85tGUmEBi1o
+	ZAUSjXgqGZPjQFIp//Yx31qI4xawe5PfVwpOW
+X-Gm-Gg: ASbGncuf6fsb+BBF4XZpY78duj16/iJeg1Oeu6Ule2RsgKm/Tsl1p+58CWxals16FdM
+	TRAp8tQzMoz6KbyZwqDm6eTseg4t1sMR1R/taR28MPFIgGOQlo21Vo/qYPZvVKOCwU05lh5aVh6
+	FJj/a3PNLbdhOmWQL+q4GA66A=
+X-Google-Smtp-Source: AGHT+IHlTpFnMolX4gA/g52IlQ/tj+gId1djCIyzYs3WB7wppB8zFUXCjOn8eLYzAYWPBdKWahOXUFyZX267yJlGJFg=
+X-Received: by 2002:a17:906:dc92:b0:ac7:1350:e878 with SMTP id
+ a640c23a62f3a-acb42ada144mr47984366b.46.1744787629490; Wed, 16 Apr 2025
+ 00:13:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com> <20250415175359.3c6117c9@kernel.org>
+In-Reply-To: <20250415175359.3c6117c9@kernel.org>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Wed, 16 Apr 2025 09:13:23 +0200
+X-Gm-Features: ATxdqUHJ7umUsa5H672lz0ujM37fgVLtcRbHcVnssplk8IlpJ9rF17FKH2YfqGI
+Message-ID: <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
+Subject: Re: Increased memory usage on NUMA nodes with ICE driver after
+ upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, jdamato@fastly.com, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Igor Raits <igor@gooddata.com>, 
+	Daniel Secik <daniel.secik@gooddata.com>, Zdenek Pesek <zdenek.pesek@gooddata.com>, 
+	Eric Dumazet <edumazet@google.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Ahmed Zaki <ahmed.zaki@intel.com>, "Czapnik, Lukasz" <lukasz.czapnik@intel.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> On Mon, 14 Apr 2025 11:42:02 +0800 Justin Lai wrote:
-> > Add support for ndo_setup_tc to enable CBS offload functionality as
-> > part of traffic control configuration for network devices.
->=20
-> This is some semi-switch-like device right? Or am I misremembering?
-> Could you clarify where the limits are applied?
-> From CPU into the switch or on the switch ports?
-> Should be documented in the commit msg.
-> --
-> pw-bot: cr
+st 16. 4. 2025 v 2:54 odes=C3=ADlatel Jakub Kicinski <kuba@kernel.org> naps=
+al:
+>
+> On Tue, 15 Apr 2025 16:38:40 +0200 Przemek Kitszel wrote:
+> > > We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5=
+f
+> > > "ice: Add support for persistent NAPI config".
+> >
+> > thank you for the report and bisection,
+> > this commit is ice's opt-in into using persistent napi_config
+> >
+> > I have checked the code, and there is nothing obvious to inflate memory
+> > consumption in the driver/core in the touched parts. I have not yet
+> > looked into how much memory is eaten by the hash array of now-kept
+> > configs.
+>
+> +1 also unclear to me how that commit makes any difference.
+>
+> Jaroslav, when you say "traced" what do you mean?
+> CONFIG_MEM_ALLOC_PROFILING ?
+>
+> The napi_config struct is just 24B. The queue struct (we allocate
+> napi_config for each queue) is 320B...
 
-Hi Jakub,
+By "traced" I mean using the kernel and checking memory situation on
+numa nodes with and without production load.  Numa nodes, with X810
+NIC, showing a quite less available memory with default queue length
+(num of all cpus) and it needs to be lowered to 1-2 (for unused
+interfaces) and up-to-count of numa node cores on used interfaces to
+make the memory allocation reasonable and server avoiding "kswapd"...
 
-Yes, this device is a switch, and CBS is applied from the CPU to the
-switch. More specifically, CBS is applied at the GMAC in the topmost
-architecture diagram in this driver. I will post a new version and
-add this information to the commit message.
+See "MemFree" on numa 0 + 1 on different/smaller but utilized (running
+VMs + using network) host server with 8 numa nodes (32GB RAM each, 28G
+in Hugepase for VMs and 4GB for host os):
 
-Thanks,
-Justin
+6.13.y vanilla (lot of kswapd0 in background):
+    NUMA nodes:     0       1       2       3       4       5       6      =
+ 7
+    HPTotalGiB:     28      28      28      28      28      28      28     =
+ 28
+    HPFreeGiB:      0       0       0       0       0       0       0      =
+ 0
+    MemTotal:       32220   32701   32701   32686   32701   32701
+32701   32696
+    MemFree:        274     254     1327    1928    1949    2683    2624   =
+ 2769
+6.13.y + Revert (no memory issues at all):
+    NUMA nodes: 0 1 2 3 4 5 6 7
+    HPTotalGiB: 28 28 28 28 28 28 28 28
+    HPFreeGiB: 0 0 0 0 0 0 0 0
+    MemTotal: 32220 32701 32701 32686 32701 32701 32701 32696
+    MemFree: 2213 2438 3402 3108 2846 2672 2592 3063
+
+We need to lower the queue on all X810 interfaces from default (64 in
+this case), to ensure we have memory available for host OS services.
+    ethtool -L em2 combined 1
+    ethtool -L p3p2 combined 1
+    ethtool -L em1 combined 6
+    ethtool -L p3p1 combined 6
+This trick "does not work" without the revert.
 
