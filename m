@@ -1,86 +1,79 @@
-Return-Path: <netdev+bounces-183173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCFB4A8B46C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 10:54:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1748A8B49F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 11:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26100189CF13
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 08:54:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCFF3AB199
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 09:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFD322C336;
-	Wed, 16 Apr 2025 08:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E88B233722;
+	Wed, 16 Apr 2025 09:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnKmpc/3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJbmPB5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0844D5227
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 08:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E020E6E4;
+	Wed, 16 Apr 2025 09:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744793651; cv=none; b=juQjep+5MVOM+uOLs+rUXq9oiIcEFzQLXHHu848ar/aXLK/fOmCFs+IRzMLk7nhf7uEcEvwNuRN1vIjneov8dIz42k1BRBR/5UaHGsxk5/CKyIgqoOMxjohUR1nx4/7GSF1bjYlqYRXNCGMsl+zPnjVmsFZQ8xz0RYnLRexAj3s=
+	t=1744794060; cv=none; b=h67ylQRuB8EBueGUVovYKEhPp/nALMOeWvHd/V0nWCBmh7M31EWtmJLajKFb52SJoXlMA/PLpR6pgxvAWRji8Vtqxh1Wz/414kn/jQkMEUoJU0Bb1GP85r+cwFfkPSeRVVszw/h48WYiCnhtB6LxJCnywuPQxITJI4QCnefSsU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744793651; c=relaxed/simple;
-	bh=cpF8JNxt1Bisma6JsAfdgTEnTqpYDJP+VgAMhMOOv2c=;
+	s=arc-20240116; t=1744794060; c=relaxed/simple;
+	bh=LkkRxVsKuChlvoYMnjLCZHxahJRvcKvpegCE7X/JCx4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kNtaWXwUpCnHh5DmyDszkHTmrtaoovW3kcBmauazUW+aS9WululToKU+jYYDtP5n3pbrAd+qJhAEPWZpT5CNMYcB+2+yTGn3CtBbMYDuLsGSuBw2mq4M1wCJOoBx2ZbaO4hSa6Nh7j1gpquhWF5LWmNK6TPedy+98t27FAm2zbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TnKmpc/3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744793648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9ldgeQck+tJsJgL5VRuAyS9N+Re0CKOApExZWKXiHxc=;
-	b=TnKmpc/3jwPIb7bxMaqt1IkLaUYhaXFVirbPH8c/fwPOL434yNWCxM+jfqH8NapnYvifdz
-	9rac5GFXAkgzdzGH/VTZIdwkbTValK3Jp92u6379BB3w52LPtC/GHnJSYMd3VFJ3Ajn9MN
-	xDUOI/lWuRE/G7X2Yo00+gCLKS9+cYk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-37-9_8vlgPMNqOyjELV5ubiRQ-1; Wed, 16 Apr 2025 04:54:06 -0400
-X-MC-Unique: 9_8vlgPMNqOyjELV5ubiRQ-1
-X-Mimecast-MFC-AGG-ID: 9_8vlgPMNqOyjELV5ubiRQ_1744793646
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39ee54d5a00so217585f8f.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 01:54:06 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=iGzqebanb/Huvp8fHvXszZrpHvFTevuGJAIOnYFjmSNqYeAZRy3+Ee/eDKhCN28IxTKTzHGQMcXPjV+0yjeu54x0EGDl/2Yu4rMIyxYn8UhTqcM+5AV0brM/Jpi7zMF/PXilmsO7qXyZmBwPb08wj7U+Y6In68bUGNNribUSr8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJbmPB5V; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-227b828de00so60574605ad.1;
+        Wed, 16 Apr 2025 02:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744794058; x=1745398858; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MmG5wLnCycwNioKCuXAaZLGjYi/ybga0dH9UjvjLbBQ=;
+        b=aJbmPB5Vncf0a/tUZhWmsq4UGTLJnmKn3/NWRjAz7YvVecQUC4/iQgvypOLZMO8Koi
+         eKazaAILvw/w6rVdOoLU9MTo8p0x11IysAGOEFkERDAvUIZ/YCimHv7pOW2SWyyjFC3U
+         UPeZY8KnftJUbEO81h2MvrBTz2ptJW8umNFFCjnFkzDeRIyuay/ZPCpX1ytBQsljJWEM
+         /jY9YFGE0A7jRYOtLNNHS9rK+4OQI+FDiSDhSHKE31bxxA9fObIEMYdUlp8Wwb8rp8T/
+         AEoBf5Gko6IZ0lMJb9ME8oUcBzBlqbRC72ZpK9Jcv92lH5mZnoCTi0IsC0st4OIDhdwa
+         7QIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744793645; x=1745398445;
+        d=1e100.net; s=20230601; t=1744794058; x=1745398858;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ldgeQck+tJsJgL5VRuAyS9N+Re0CKOApExZWKXiHxc=;
-        b=enOg8O6DrZgkZW6hqsXM09+9rjh/Z0NO5Vl7xZkib/9MdC9WgvPs9Tzk5ILeE8B0Xw
-         eIGvrDs/ddiEsp+G6odw48757ZAGpHSV3vqC/Zqr+5+Gor1eBCq84ZyQHGIl2r/Uy1Kx
-         YmDvR9R7WX4jSHhylOorENf7/HDNov8ls2JQ/pWoiGcjQQ4+vmFVVOIijkQJ751mN3OS
-         tyNT/gfzyaTsVmRhDiEGUNFF23FPVOYx9rngqPuzOB3k9s9M2pE5ZcpKBFAtYNAAY0h2
-         qQLOWh/eXF4yrbJBqunaly2rNxYpiPdYvpnl15lZfbrvIL8rmuViXnkfSb2Qm9/CHlND
-         cGDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLr6h2lS3fdGrx9NPKyE9vEFn8H7vseD1QrcL187nt38Q6k1oMdHyatTPUKkqxcEUPw/F71/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1/Y42USy+EE7Z5jZaI4yVMcj5p4b+5cs41joGJ5ZZp8hDEtJO
-	0lPwIqpbERn8Epfip8AyW8CbEKVnwNjNI/i7Yc+IgbW7WcK7/grv/nQYZ9nrSNtkZWuu28qzzt4
-	mPwKTCrXLSTq3/4kEfmlf0r26sRLHu4TqPurwboiM9y3g05UxlROH6w==
-X-Gm-Gg: ASbGncuBVlKHgzL3vY1hysOypUrnYN5nvt4EpKv0zOthFGI+XpVe53cuLjv0pqd9Ntg
-	xZRzENv6aMTsICO1ycDNOomFq5wbwhd221bw74Th2rzLmJ8c7b0nEX5XL3FNZOtopq38fkLCdoo
-	zk1gagFysDkiHEMOdUTZYQeQ7CmcfBeRWvPdIVkRDOdJGnHRksTpbY4Bp2fNR1MNH/Dh2Nop1H5
-	H1icAF05Vz5NfOzpDS0Ivv8EzBxN1EbtNrBrNfCIo5aRTPkFrnKmwOqEJRDB6Iv6w1juxa6jUF7
-	JIYQyvftTI2l+NvY8ReXd2y7209l0W8FEnhGHpw=
-X-Received: by 2002:a5d:64ed:0:b0:39e:cbc7:ad38 with SMTP id ffacd0b85a97d-39ee5b1d0f5mr965445f8f.32.1744793645640;
-        Wed, 16 Apr 2025 01:54:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQ9IVzSljWiyrYjdXXGC/Mecb+w+DuNxNVf8N7iG96Q4GHBUJ7wBD2J6Ik8IrPIzpFngupGw==
-X-Received: by 2002:a5d:64ed:0:b0:39e:cbc7:ad38 with SMTP id ffacd0b85a97d-39ee5b1d0f5mr965425f8f.32.1744793645339;
-        Wed, 16 Apr 2025 01:54:05 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b58cc4csm14725395e9.25.2025.04.16.01.54.04
+        bh=MmG5wLnCycwNioKCuXAaZLGjYi/ybga0dH9UjvjLbBQ=;
+        b=QndeAT/mlcGwmYkjF5BwwFV9DVWa2OmB9gaUOEYyWm/AzV3NBChO6CXzhiOSLC2npQ
+         LBw+2+CjTXCoMCbQUCaQL3thrvhYkWT+FWmj+hCadsC6yR8z995uC6IXN1vwjsZ/dpB2
+         9d+KEcl0L9nlBQjB/1yp69IVBXG/inG7RavY8LMMzhJxwd1m49i20elsOBqjb+2H+Fph
+         E1Pqegas0IzgHwM7MUxLK/5JIs5D2G2s8g0RBi73SEEvG73kVWYyD9icXS0qutFqv1O7
+         ff+xGtHqCHTpa2Xl9Fup6wvY/7VMquMkMw8weqBnYk9XAtOSgifPiRmdsYOVO/qMGbPL
+         QMiA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBCFlufYl2/qz06ZLUY4DeJs3Hmlr4PWP9msyxU5qFZsWRbL8zAOoWz8P/Bu0twdFWL+y9+IqS@vger.kernel.org, AJvYcCW5RuUmXiCfNXJIlPH9eRhSIstttin/4H1sg4MF0TqSfxgWiaJXCCWNXSwWKZcfAHf4UtQ=@vger.kernel.org, AJvYcCWkg4dW/11ulOxa9qOKgaWqulKPyd+wn+gDLShwzCb6GaTnWDzzxfdbjlZhBgoq1avWsHfLvIIJEGg5SosW@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxeM1Q9PcGibpaAs0ye/HBBqp+9n1uVRLjWQJgLiyqKIWYW5W4
+	++uZVqJySu+MLCHp/uqE2NRIoagW/sC70XHVnmU/9pxEVSYk0LoS
+X-Gm-Gg: ASbGncvN3CFeCZ1mTnFOWahuIY6dEk38M/xqCKBP7eY950rCu5KgU+UFOps4n9yQa1S
+	Y8jAgPZH5TpCbtqWTpOmtDYscsfvvIMMbpvBY77RYci9lHAdE/a7265L9EwkbmlgsXgvd0dLh63
+	b7vfR6iyHV1OjQrZLNKrctezCJIcf9GRW2EYwHvfSKwibHuEZ+02zcmMEjZTCTjhrmfVg90TUYF
+	4PU2CJSJdF8UC+DxLF9X6isWHe19dbbg9shPFV/eqLdT6vtYK6RFe4AqwCzV+BSWp8pm8OB4jZe
+	dyKyrH/Li1/0vFVtpi/2x5EftXlNS+Dw/MLGyieFDebP3mUZukXBrN5Q4Ig=
+X-Google-Smtp-Source: AGHT+IFKvp8JSTcKdJ90nG6KVwZddhuAz0H9jshWa+isMyWM0doLGpZ4rJFIqTTHy7XwTHyjEXrxRg==
+X-Received: by 2002:a17:902:ccc8:b0:22c:2492:b96b with SMTP id d9443c01a7336-22c358d9c65mr20545865ad.15.1744794058037;
+        Wed, 16 Apr 2025 02:00:58 -0700 (PDT)
+Received: from [172.16.0.99] ([113.161.92.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd22f8253sm10208920b3a.93.2025.04.16.02.00.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 01:54:04 -0700 (PDT)
-Message-ID: <a9616e0b-3c22-43ab-a8e3-42c239bc5441@redhat.com>
-Date: Wed, 16 Apr 2025 10:54:03 +0200
+        Wed, 16 Apr 2025 02:00:57 -0700 (PDT)
+Message-ID: <e5369006-1439-4936-9193-3f931f8a6f29@gmail.com>
+Date: Wed, 16 Apr 2025 16:00:51 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,42 +81,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v2 net-next 03/14] ipv6: Move some validation from
- ip6_route_info_create() to rtm_to_fib6_config().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250414181516.28391-1-kuniyu@amazon.com>
- <20250414181516.28391-4-kuniyu@amazon.com>
+Subject: Re: [PATCH v3 3/3] selftests: net: add a virtio_net deadlock selftest
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250415074341.12461-1-minhquangbui99@gmail.com>
+ <20250415074341.12461-4-minhquangbui99@gmail.com>
+ <20250415212709.39eafdb5@kernel.org>
+ <1603c373-024d-4ec2-b655-b9e7fb942bba@gmail.com>
+ <CACGkMEvceXT+=HJRRe6D3Zk3k40E2ADJiXNb4qqAYm=PZnxNpQ@mail.gmail.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250414181516.28391-4-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEvceXT+=HJRRe6D3Zk3k40E2ADJiXNb4qqAYm=PZnxNpQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 4/16/25 14:46, Jason Wang wrote:
+> On Wed, Apr 16, 2025 at 2:54 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>> On 4/16/25 11:27, Jakub Kicinski wrote:
+>>> On Tue, 15 Apr 2025 14:43:41 +0700 Bui Quang Minh wrote:
+>>>> +def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
+>>>> +    # Probe for support
+>>>> +    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
+>>>> +    if xdp.ret == 255:
+>>>> +        raise KsftSkipEx('AF_XDP unsupported')
+>>>> +    elif xdp.ret > 0:
+>>>> +        raise KsftFailEx('unable to create AF_XDP socket')
+>>>> +
+>>>> +    return bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} {xdp_queue_id}',
+>>>> +               ksft_wait=3)
+>>>> +
+>>>> +def check_xdp_bind(cfg):
+>>>> +    ip(f"link set dev %s xdp obj %s sec xdp" %
+>>>> +       (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
+>>>> +    ip(f"link set dev %s xdp off" % cfg.ifname)
+>>>> +
+>>>> +def check_rx_resize(cfg, queue_size = 128):
+>>>> +    rx_ring = _get_rx_ring_entries(cfg)
+>>>> +    ethtool(f"-G %s rx %d" % (cfg.ifname, queue_size))
+>>>> +    ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
+>>> Unfortunately this doesn't work on a basic QEMU setup:
+>>>
+>>> # ethtool -G eth0 rx 128
+>>> [   15.680655][  T287] virtio_net virtio2 eth0: resize rx fail: rx queue index: 0 err: -2
+>>> netlink error: No such file or directory
+>>>
+>>> Is there a way to enable more capable virtio_net with QEMU?
+> What's the qemu command line and version?
+>
+> Resize depends on queue_reset which should be supported from Qemu 7.2
+>
+>> I guess that virtio-pci-legacy is used in your setup.
+> Note that modern devices are used by default.
+>
+>> Here is how I setup virtio-net with Qemu
+>>
+>>       -netdev tap,id=hostnet1,vhost=on,script=$NETWORK_SCRIPT,downscript=no \
+>>       -device
+>> virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on \
+>>
+>> The iommu_platform=on is necessary to make vring use dma API which is a
+>> requirement to enable xsk_pool in virtio-net (XDP socket will be in
+>> zerocopy mode for this case). Otherwise, the XDP socket will fallback to
+>> copy mode, xsk_pool is not enabled in virtio-net that makes the
+>> probability to reproduce bug to be very small. Currently, when you don't
+>> have iommu_platform=on, you can pass the test even before the fix, so I
+>> think I will try to harden the selftest to make it return skip in this case.
+> I would like to keep the resize test as it doesn't require iommu_platform.
 
+Okay, in next version I will force the XDP socket binding to zerocopy to 
+setup xsk_pool. When the binding fails, 2 tests still run but I will 
+print a warning message.
 
-On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
-> ip6_route_info_create() is called from 3 functions:
-> 
->   * ip6_route_add()
->   * ip6_route_multipath_add()
->   * addrconf_f6i_alloc()
-> 
-> addrconf_f6i_alloc() does not need validation for struct fib6_config in
-> ip6_route_info_create().
-> 
-> ip6_route_multipath_add() calls ip6_route_info_create() for multiple
-> routes with slightly different fib6_config instances, which is copied
-> from the base config passed from userspace.  So, we need not validate
-> the same config repeatedly.
-> 
-> Let's move such validation into rtm_to_fib6_config().
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-
+Thanks,
+Quang Minh.
 
