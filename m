@@ -1,60 +1,71 @@
-Return-Path: <netdev+bounces-183301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37C2A90479
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:38:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8A6A9047D
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:39:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D1AC7AD5F2
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:37:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FD85189C064
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203331B3930;
-	Wed, 16 Apr 2025 13:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811B21A23B0;
+	Wed, 16 Apr 2025 13:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYbIniVf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EI7+v9/T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1EB1B042F;
-	Wed, 16 Apr 2025 13:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6E7A32;
+	Wed, 16 Apr 2025 13:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744810695; cv=none; b=h+T6ePbkPiJZe+bJJ6BCBuwGtrsIWMlKUMKr5hmZsCEpkuOFD4wuxFoLqDqJ82HB1SjaFnfSKCGDZhw4bgk2EC0ZScP38WrX8M3dr/GQKP28DfxyoikyZ7yY44F91ZmLEsL/ZkcZiuI5jFt/JZVnxV0m2BkYB9UQWBpjZHGIqSQ=
+	t=1744810738; cv=none; b=a7KbNw+GO9OuUOfoxquT/qDeQ2PpXT/Sg2gLSzrPuGrjjTY+9R5pbSTSa+xQPrEhMFAFPCpemCXTTtB9VZpltxdQoFVOXJGI/gSz1OlrB3b394rDBPWQVuC9iAy5aFAlynaXVHhx7JCqZ1kAkYLmtUWOx19N2bdaasOecEDn9Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744810695; c=relaxed/simple;
-	bh=sdNLl1W288uG9ZDxKVKiy23P3vv4qT3wAIUV4yV8D9I=;
+	s=arc-20240116; t=1744810738; c=relaxed/simple;
+	bh=nrrD3/sSaPsl3a1EqfKuMRRLXEiXUHmBEshVkFhljRY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z3591700hzFcR7ngWob6ZiQp8eMHdbNB3nwJ2QD5ZSIfpQhmVSmKkXgnmhQGXny8Vy6Q6aGWBuX96sUY10Ul7RLDtQJ2CMcX7DBHVJ0PDAnw1t5MMlI5VFEl/+Yr6HvmwNvDO620yH005UceYML3zM/9uUkntkSxHvQM+rnK5xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYbIniVf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C543C4CEE2;
-	Wed, 16 Apr 2025 13:38:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=FUR3kt+otwWlGmUWFxiIJ7viZnweaYa4sh2zhzsRnoC9l+P5w7FlsxsNfajR7SH6Q28N9N3kbqcWPy8OAuuwd6YPfQnAl0spVveBqWuzhZoPE2lwSxCGDz4dVUZStHEqCQiBXtPFVL2kXnHqpZ0eRDeo63GhA8OikIDgAlaXc9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EI7+v9/T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02A17C4CEEA;
+	Wed, 16 Apr 2025 13:38:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744810694;
-	bh=sdNLl1W288uG9ZDxKVKiy23P3vv4qT3wAIUV4yV8D9I=;
+	s=k20201202; t=1744810737;
+	bh=nrrD3/sSaPsl3a1EqfKuMRRLXEiXUHmBEshVkFhljRY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TYbIniVfq32iDZScm88zQcbKRZ86XQ2Ol37pjImGDFMBZdm6xPxj7IUCknV5BNyz9
-	 Ohz/V4EhD9WKM49WTQO4uYu1cSXEp8SDe7+mG/pPLwkpSxakZJ2hz3BR+L3J6qXJ8l
-	 pqBjaEIWx9OKMgPMLurd+oDcwzYc7hF++S8tZwMj3qGJyC2+uM+VZws0nJ4w5KhJA9
-	 h3qTVreui67i9P/ADSZ9xJ5AerpRDvlcGB5WjDMiT0Z4cJJ3+AF33+836kDl/MAjpv
-	 v7NhY/yThNhc1d/VOZi+BnLx+GBx32OiU9EzegiiWeatP4TuTGSGSeWVn/RFDzXi3i
-	 6Yvor/ydo3BjA==
-Date: Wed, 16 Apr 2025 06:38:13 -0700
+	b=EI7+v9/TV3vL8wNZFHf5NwXTl/I+OIoNCxeCgleOMSMSQ2et4YlX2E/CtICiF2aRX
+	 oW/4Id4sKByywPbfG/aMVtG/Yz6mzSPnvXl2qgsmgXLSFguGJM7kQXBF+k8BF1GIN4
+	 ThZ3NCRohH1sv1xyMoYbOtaw0ZOb6F3NrppLlR07Zo+WDcVKWUg5pMJEKTrkuBgExU
+	 gZz5KUkCuI4y1NsrxDznV0Gbp9y/3WlyHjn121kUA2n1+qTCsnrR97CYFi3SpyQJeO
+	 +/nIc8jEkEOxLOCWZx+MQxt08+oXFr7HQg9OEzZXHNTxnFCn+qtGuDHzV8KoVlsfLf
+	 +2x4BlPNPwstA==
+Date: Wed, 16 Apr 2025 06:38:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, tom@herbertland.com, Eric
- Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNl?=
- =?UTF-8?B?bg==?= <toke@toke.dk>, dsahern@kernel.org,
- makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
-Subject: Re: [PATCH net-next V4 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-Message-ID: <20250416063813.75fb83dc@kernel.org>
-In-Reply-To: <174472470529.274639.17026526070544068280.stgit@firesoul>
-References: <174472463778.274639.12670590457453196991.stgit@firesoul>
-	<174472470529.274639.17026526070544068280.stgit@firesoul>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Bryan
+ Whitehead <bryan.whitehead@microchip.com>, UNGLinuxDriver@microchip.com,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, Paul Barker
+ <paul.barker.ct@bp.renesas.com>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
+ <niklas.soderlund@ragnatech.se>, Richard Cochran
+ <richardcochran@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Andrei Botila <andrei.botila@oss.nxp.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/2] net: ptp: driver opt-in for supported
+ PTP ioctl flags
+Message-ID: <20250416063856.3b653d81@kernel.org>
+In-Reply-To: <20250414-jk-supported-perout-flags-v2-0-f6b17d15475c@intel.com>
+References: <20250414-jk-supported-perout-flags-v2-0-f6b17d15475c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,18 +75,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 15 Apr 2025 15:45:05 +0200 Jesper Dangaard Brouer wrote:
-> In production, we're seeing TX drops on veth devices when the ptr_ring
-> fills up. This can occur when NAPI mode is enabled, though it's
-> relatively rare. However, with threaded NAPI - which we use in
-> production - the drops become significantly more frequent.
+On Mon, 14 Apr 2025 14:26:29 -0700 Jacob Keller wrote:
+> Both the PTP_EXTTS_REQUEST(2) and PTP_PEROUT_REQUEST(2) ioctls take flags
+> from userspace to modify their behavior. Drivers are supposed to check
+> these flags, rejecting requests for flags they do not support.
 
-It splats:
-
-[ 5319.025772][ C1] dump_stack_lvl (lib/dump_stack.c:123) 
-[ 5319.025786][ C1] lockdep_rcu_suspicious (kernel/locking/lockdep.c:6866) 
-[ 5319.025797][ C1] veth_xdp_rcv (drivers/net/veth.c:907 (discriminator 9)) 
-[ 5319.025850][ C1] veth_poll (drivers/net/veth.c:977) 
--- 
-pw-bot: cr
+Applied, thanks!
 
