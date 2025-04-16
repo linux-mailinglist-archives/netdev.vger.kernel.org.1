@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-183456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41319A90B9B
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:49:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55CCA90BA5
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFF9F3BF6D0
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60F54483E5
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B186224235;
-	Wed, 16 Apr 2025 18:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A817221F34;
+	Wed, 16 Apr 2025 18:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="R16bdbkw"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AJBkt4XT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C1222370F
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA6E221F32
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744829342; cv=none; b=u+i2VNOLmRmeDuEX84Qpviit4NSCYGQrhjEaLev3NEHAVfCGg/A3oBK/b8LU2s0WAgG+FsO3iFhCh2bRra5vsJdQgJf+2GlKOjx+JYWrqseeTCbVTTrTjLkwapiOx3QCLsl7rX43PWevypI6UyxJ985P3AKWjzW1jEIdK/mrFRE=
+	t=1744829438; cv=none; b=hC8kkONSyg2UwO8pVwLVK3RAQbr0MvBHZbSm0/RPnAB3KWDdqfYlvyX0A4LjlBPVYrt8ZZ1M/b3/jJlTNUq5TdxwAhv00o3UShlJW7pZrokDNyk1li9WU8yyYhE6cp5QXdYAK3TmVZwnbsPAxqvGKtS82WsFcU9lO05oDWP+skY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744829342; c=relaxed/simple;
-	bh=1Leac6S+eSmEK3qalqvuf7i3H0x+mClKFoKhT2+yjKI=;
+	s=arc-20240116; t=1744829438; c=relaxed/simple;
+	bh=RQRZE4UcNr0FROLjRO41yEPlDd3RHCdNoIycTsYZna0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k2MuKaXJ5tBd3RR5vD+cW5TeRxEZzMkm9DdtWpnB2mdbz+cPrxxxSKDc5OiFOnrlA10dMXb0+LZNoYkGgEVpB5g+kztORh5pZICbLyPHHpUN9Xyi78nYCP1yH5lF3/qDHzBct881BSU+NtzCgYAko1vwvQU17SaLqXDgXnEkvT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=R16bdbkw; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=mSx71K1WcAzjFZAweksbohf1u9w6j2weE6jHQHbYFSWtE5VUnCE7/cItWPkwjch17GAT8SUiaQ9Rsv1Xj3eXVOSmK07qZ3GSVvPWYq/uDJQDHduBvx2hJce6056PznsiDtz0J27dN2zP6vba+fJ6FViEqYLpv5r1jM/tUGR+0WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AJBkt4XT; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744829341; x=1776365341;
+  t=1744829437; x=1776365437;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QughziUKnssA9EYlDJ0qYacigZpKcNnqKhAT0i2yDH0=;
-  b=R16bdbkwDca7Om3eL474Tk0JxxxnYixyNJnZoqumxMt/+TU/93LaF8St
-   PjhiqSXtluBTkgRLXWGbCm566o+4RmDgMJYNmwMnPtUzg8cA+3g5ehwCi
-   nAwgmBmvUzgaUbCTwW2/vrKaDRC3S+bTX+mU8f2a6BiqK5RqTWVziY8bw
-   E=;
+  bh=A+Fa6tCcKDP0isuni/bFBzZNWGVbTE6optXqhxcf4zk=;
+  b=AJBkt4XTZ9wnX2b0f0dwo0s3UyUhmnT75jXjPHtqAVkJn+Srm2MXFc8q
+   aTNHOisR87wfLmJzdzrxaAtj1ltzpXYLJFS7yzfA09NvO6TZ6+1tZ27i3
+   uIVihGTQBRluLskThY9lLVSEOj2C9uPs4iOiPz8ah4XfawmB1f8sFdP0M
+   s=;
 X-IronPort-AV: E=Sophos;i="6.15,216,1739836800"; 
-   d="scan'208";a="396467164"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 18:48:57 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:60961]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.154:2525] with esmtp (Farcaster)
- id 143b69cd-7e9f-40f1-a946-007d4d80c421; Wed, 16 Apr 2025 18:48:57 +0000 (UTC)
-X-Farcaster-Flow-ID: 143b69cd-7e9f-40f1-a946-007d4d80c421
+   d="scan'208";a="512114214"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 18:50:30 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:8459]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.169:2525] with esmtp (Farcaster)
+ id 7264ab5c-87a0-41cb-a25f-b3fbbef55f54; Wed, 16 Apr 2025 18:50:29 +0000 (UTC)
+X-Farcaster-Flow-ID: 7264ab5c-87a0-41cb-a25f-b3fbbef55f54
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 16 Apr 2025 18:48:56 +0000
+ Wed, 16 Apr 2025 18:50:27 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.170.18) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 16 Apr 2025 18:48:53 +0000
+ Wed, 16 Apr 2025 18:50:25 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <pabeni@redhat.com>
 CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
 	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
 	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH RESEND v2 net-next 04/14] ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().
-Date: Wed, 16 Apr 2025 11:48:43 -0700
-Message-ID: <20250416184845.293-1-kuniyu@amazon.com>
+Subject: Re: [PATCH RESEND v2 net-next 06/14] ipv6: Split ip6_route_info_create().
+Date: Wed, 16 Apr 2025 11:50:08 -0700
+Message-ID: <20250416185017.588-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <1c382acc-d823-47e9-902d-42606d64daf1@redhat.com>
-References: <1c382acc-d823-47e9-902d-42606d64daf1@redhat.com>
+In-Reply-To: <9903a135-1f30-4a76-9c14-36159eb413d6@redhat.com>
+References: <9903a135-1f30-4a76-9c14-36159eb413d6@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,36 +76,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
+X-ClientProxiedBy: EX19D039UWB001.ant.amazon.com (10.13.138.119) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 From: Paolo Abeni <pabeni@redhat.com>
-Date: Wed, 16 Apr 2025 11:06:30 +0200
+Date: Wed, 16 Apr 2025 11:12:31 +0200
 > On 4/14/25 8:14 PM, Kuniyuki Iwashima wrote:
-> > In ip6_route_multipath_add(), we call rt6_qualify_for_ecmp() for each
-> > entry.  If it returns false, the request fails.
+> > We will get rid of RTNL from RTM_NEWROUTE and SIOCADDRT and rely
+> > on RCU to guarantee dev and nexthop lifetime.
 > > 
-> > rt6_qualify_for_ecmp() returns false if either of the conditions below
-> > is true:
-> > 
-> >   1. f6i->fib6_flags has RTF_ADDRCONF
-> >   2. f6i->nh is not NULL
-> >   3. f6i->fib6_nh->fib_nh_gw_family is AF_UNSPEC
-> > 
-> > 1 is unnecessary because rtm_to_fib6_config() never sets RTF_ADDRCONF
-> > to cfg->fc_flags.
-> > 
-> > 2. is equivalent with cfg->fc_nh_id.
-> > 
-> > 3. can be replaced by checking RTF_GATEWAY in the base and each multipath
-> > entry because AF_INET6 is set to f6i->fib6_nh->fib_nh_gw_family only when
-> > cfg.fc_is_fdb is true or RTF_GATEWAY is set, but the former is always
-> > false.
-> > 
-> > Let's perform the equivalent checks in rtm_to_fib6_multipath_config().
+> > Then, we want to allocate everything as possible before entering
 > 
-> It's unclear to me the 'why'???
+> Then, we want to allocate everything before ...
+> 
+> or
+> 
+> Then, we want to allocate as much as possible before ...
 
-It's just because this validation does not need to be done under RCU.
-Or are you asking why I didn't use rt6_qualify_for_ecmp() ?
+Will use the latter, thanks!
 
