@@ -1,137 +1,115 @@
-Return-Path: <netdev+bounces-183433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7B2A90A49
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:40:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32314A90A53
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 19:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75B2A19063AD
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:40:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9195A3A75F8
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 17:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C73C217673;
-	Wed, 16 Apr 2025 17:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A99D218AC0;
+	Wed, 16 Apr 2025 17:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NXjEZauz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPQ4W11s"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61612185A8
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 17:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F0E202C42;
+	Wed, 16 Apr 2025 17:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744825191; cv=none; b=lugGqNAaPQTXqxONxkTUtONrbCYXzmH/LXKqvityv2JrIVD0QWPacvxozLvw2ofe3d12XHnTGzYN6i/wHW4Pqx3k2ZKFo2yxyazKYr61HPq0XqvhHXliHFUo05RXNvklRtWJQkCr6nE9SHoREPsr0NfOvZEke+5MOBEIMBSuk5g=
+	t=1744825323; cv=none; b=IHGIwZm8D38s1s4gaFdB0Sa+pgOwHuqzBLQSjTrbBn5SyeR1N5YRYUSGO74Ae09fO3/L+3kWJTL4xTfEatAI0vpCfk4YYp5reSRgxp5bszcwzTd2OZE4jmQKWDENRbYlH8//SbgNsC8i9N4GuEuPcKfhaTos+tZgxn+MdniLa8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744825191; c=relaxed/simple;
-	bh=5EihlJmz+hvtbqHQQxm4bPuIUsPwHTbMU80S2BJiEe4=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=DjC1Oe6suwV54pezWLR1nEHCGwpQRmk14NY5ztUZfqQK2JMBHhIYCGJV9TYcAqwVcBSld6cqwwWdk5Q01fGBarT4cuIzuZBqS/S7/xuwMOJgQBlzrjcwRSs5HW8/130n37AAWZBJhhIJUpiHFNhwtKjZFJsaLALFHbI2Hvla/po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NXjEZauz; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744825323; c=relaxed/simple;
+	bh=fzzjNsTOIQf2qJggT3eDFAxMy7Vwudm1uX77sPkiASo=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=VwlqA4RjNyUWJCObGVwrkeNt2y+ktKpxeDR1uNiUmJfBH4IuOiKl5aU3F7Ju2kpDCWFSXsPJX/Iqs51m4WdHlneGTIc7/WhX8iDm7hJ5OKODJ2iaqmXjrNuAxKmleVaXHTIkhstGZukWI5OwS9Gc65ZhKRbgzNtndbA827LcOgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPQ4W11s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8008BC4CEE2;
+	Wed, 16 Apr 2025 17:42:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744825322;
+	bh=fzzjNsTOIQf2qJggT3eDFAxMy7Vwudm1uX77sPkiASo=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=WPQ4W11sZS7Jytt53u2ONx7nl2wIRp0aH2Zb1OKbhyv8Rt3hDjMSAwFznOcm3Ot1Q
+	 VP+AqIOIPUuGBzA4z8oBagF3RX0Tgtze3hCEmvgBG7COkU/pq7l1K/QuOGqFBaGzHj
+	 cDftwuODppthjlk0wQgUfOM/HvOOXxTszo8i0KA71CX0Mo0NFQfLfSf4tQKXTmHs79
+	 IFMvYU9bsa+Vse+nx6j54L33WIPyzpfWSFRujxwvtrAKBEcQKGj4keg6x86xY1oD/4
+	 bmI2JPF8r0UUSYp00OGoPjmyCfPVWo2vfDH01pE9vJfYhvHPTK+G+thF2E1fRiFtxk
+	 vBcUiNlTY+zOA==
+Date: Wed, 16 Apr 2025 12:42:01 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744825186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AyaRmSc9rZnSG9+LAZtlagv4GDwAQvHnpIqE9kkvxHs=;
-	b=NXjEZauzAIHCl827H0c0PclzIHhPXSuxHlT/+ZBrnVpviV/+S996ghCARO2YBY/LkLWIuD
-	y9+Rp7lrttf4GjOA4lHJJX5lMTsSbsrYzp/TJ4mAca1yq0LDeLAXSI8l/pcKVUVFyVDclr
-	e2HsqrF3dGW6cmPvhf6OY0SvE8BvOcM=
-Date: Wed, 16 Apr 2025 17:39:45 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <edd05a3ce17ed40c179a076750261f02cb3e314e@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf] selftests/bpf: mitigate sockmap_ktls
- disconnect_after_delete failure
-To: "Ihor Solodrai" <ihor.solodrai@linux.dev>, ast@kernel.org,
- andrii@kernel.org, daniel@iogearbox.net, eddyz87@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
- pabeni@redhat.com, mykolal@fb.com, kernel-team@meta.com
-In-Reply-To: <20250416170246.2438524-1-ihor.solodrai@linux.dev>
-References: <20250416170246.2438524-1-ihor.solodrai@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, netdev@vger.kernel.org, 
+ Prathosh Satish <Prathosh.Satish@microchip.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Kees Cook <kees@kernel.org>, 
+ Michal Schmidt <mschmidt@redhat.com>, Conor Dooley <conor+dt@kernel.org>, 
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+ linux-hardening@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
+ linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
+ Jiri Pirko <jiri@resnulli.us>, Andy Shevchenko <andy@kernel.org>, 
+ devicetree@vger.kernel.org
+To: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250416162144.670760-3-ivecera@redhat.com>
+References: <20250416162144.670760-1-ivecera@redhat.com>
+ <20250416162144.670760-3-ivecera@redhat.com>
+Message-Id: <174482532098.3485034.14305412993449574460.robh@kernel.org>
+Subject: Re: [PATCH v3 net-next 2/8] dt-bindings: dpll: Add support for
+ Microchip Azurite chip family
 
-April 17, 2025 at 01:02, "Ihor Solodrai" <ihor.solodrai@linux.dev> wrote:
 
->=20
->=20"sockmap_ktls disconnect_after_delete" test has been failing on BPF C=
-I
->=20
->=20after recent merges from netdev:
->=20
->=20* https://github.com/kernel-patches/bpf/actions/runs/14458537639
->=20
->=20* https://github.com/kernel-patches/bpf/actions/runs/14457178732
->=20
->=20It happens because disconnect has been disabled for TLS [1], and it
->=20
->=20renders the test case invalid.
->=20
->=20Removing all the test code creates a conflict between bpf and
->=20
->=20bpf-next, so for now only remove the offending assert [2].
->=20
->=20The test will be removed later on bpf-next.
->=20
->=20[1] https://lore.kernel.org/netdev/20250404180334.3224206-1-kuba@kern=
-el.org/
->=20
->=20[2] https://lore.kernel.org/bpf/cfc371285323e1a3f3b006bfcf74e6cf7ad65=
-258@linux.dev/
->=20
->=20Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
-
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-
-Thanks.
-
+On Wed, 16 Apr 2025 18:21:38 +0200, Ivan Vecera wrote:
+> Add DT bindings for Microchip Azurite DPLL chip family. These chips
+> provides up to 5 independent DPLL channels, 10 differential or
+> single-ended inputs and 10 differential or 20 single-ended outputs.
+> It can be connected via I2C or SPI busses.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->=20
->=20 tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c | 1 -
->=20
->=20 1 file changed, 1 deletion(-)
->=20
->=20diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/=
-tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
->=20
->=20index 2d0796314862..0a99fd404f6d 100644
->=20
->=20--- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
->=20
->=20+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
->=20
->=20@@ -68,7 +68,6 @@ static void test_sockmap_ktls_disconnect_after_dele=
-te(int family, int map)
->=20
->=20 goto close_cli;
->=20
->=20=20
->=20
->  err =3D disconnect(cli);
->=20
-> - ASSERT_OK(err, "disconnect");
->=20
->=20=20
->=20
->  close_cli:
->=20
->=20 close(cli);
->=20
->=20--=20
->=20
-> 2.49.0
->
+> v1->v3:
+> * single file for both i2c & spi
+> * 5 compatibles for all supported chips from the family
+> ---
+>  .../bindings/dpll/microchip,zl30731.yaml      | 115 ++++++++++++++++++
+>  1 file changed, 115 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+> 
+
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml: $id: Cannot determine base path from $id, relative path/filename doesn't match actual path or filename
+ 	 $id: http://devicetree.org/schemas/dpll/microchip,zl3073x.yaml
+ 	file: /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250416162144.670760-3-ivecera@redhat.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
