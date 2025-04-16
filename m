@@ -1,66 +1,64 @@
-Return-Path: <netdev+bounces-183298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CBDA9041C
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:16:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3A3A9043D
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 15:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE5F8A0E9F
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:15:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 098AA1906E9F
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 13:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3464F1DF265;
-	Wed, 16 Apr 2025 13:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989E1189B91;
+	Wed, 16 Apr 2025 13:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="E4TwsWHh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zfx15pH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5B81DED48
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF5517A304
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 13:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744809270; cv=none; b=nD6TmjGTpQuqS37vhM4aCXezaVY1RnKTYVu4M/VHt01U9Hbw+QMLvpnk3fJwb245Qh9eLvLVoVYHCYPIAeU6LIo3K6WytgwmHq/0Kai4EUVFJziLgeDPEf07bgeTLyj46LNla51bGvc1ODT/xSGqWzcsGcFbNK+E3pV4mrEyMsU=
+	t=1744809596; cv=none; b=n078lbeRS5s7CesuWAKs3NxcYSa8QaEnAoLRhWfSt268GHV5qID/JLkOaEP6vJ+VPDTsTIFbWLhO3Hk/GQ+So/oWoP/2Dr+84OfkMAFpDkEG8M88QCvT+39sNkX/0PodSp2toFaQNlmu50/GPdRI6yQLH3MBZp1qnlv5Gh5v5d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744809270; c=relaxed/simple;
-	bh=AVWdr3k/mydjy+dZrAaYEO6Ji+bkva5sveLDPIUeKh8=;
+	s=arc-20240116; t=1744809596; c=relaxed/simple;
+	bh=7Jv4eMqp33u8FvIsIhegCrHiuE/9+7fGsj8gbaBg3N4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZtJ2adVZ6HCzJ8NXzuv9hFvqYfkoNV864KZ0PudQEDh5y+Ai2SBV3AHlkooE8vN6d8xfaPToQXQiFaVktp6Npmlv0H1vpjTUyYHuDFH/ahX8Hmew97JKEHXw07NpqoARdhvd+mcg5OjQHcK456qFSsWmEoooJ0Rv9uReXlNj4wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=E4TwsWHh; arc=none smtp.client-ip=217.70.183.201
+	 MIME-Version:Content-Type; b=KkM49C8d87xsVPFs1wTlQYChMgiGDDKDXyzVRHzTmy/o3HOYPFixX5JtyaLMSn17SQ2pUsZwsQ6BrsnU654Dj7urOp3CN3KRrSIGxgiWBMm4nsA+rJ0vJDGNdsS07w5+gG0qjKne0RyPj9KIzNXdyA3R3wjrLsjc1Nm6yWR6VTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zfx15pH3; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 634DA43B0E;
-	Wed, 16 Apr 2025 13:14:25 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2CDB843858;
+	Wed, 16 Apr 2025 13:19:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744809266;
+	t=1744809592;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+VwrtglluGGLNIPtF57y+K82HxiVQjihULDntyzGWU4=;
-	b=E4TwsWHhtUskNNiIIDDZH6hdv62UIgXDcDTxG7POxfmGcH5FZNnIKQNGWb6qxcQLtvlMJj
-	53jAGaaz65I1NH5B7cT0tW6fBijTQ0PL+RnJljZoOiaOWO17dgjo2nzmMdFgDpIXD9E7BX
-	BoKAkm2+lDWHpbcG3FJ0Lhpdf07XR6Z8Kdb/NbLtPe1k+aku3DSSaRLIxNkB20frg4crxQ
-	CkrvNKXIKEgM84we4lqnHzme8OOCsv8BI2wwa3wEj8qCeR4TOBuQ+Rwv2kP8BxHm7MMWZ+
-	QN8GHZQQt3FME4kr7kFGXm0XKuSnnJ9q6/tN+M1Vh8EnhD/TO5GlsoBpX+P7Zw==
-Date: Wed, 16 Apr 2025 15:14:24 +0200
+	bh=7Jv4eMqp33u8FvIsIhegCrHiuE/9+7fGsj8gbaBg3N4=;
+	b=Zfx15pH33jUU9EQVxOSLQ2OGhbq5O1M4LY8Cg1Ddw2RypSPvS8nZPHlVNnDhgGcAliIVkE
+	sccN8ysQjpyllr95UqwUW3HxEQrokQRCIEouzRW01Uwqcg8OHdDzJF3jtSpKOEtG2rxaqs
+	U0k2/+amo4VzzZDaPa0stcNZ/Aso/gYzEk1ccPvI5j6dFgnAWCsnAzRXSDScK7At0vAfsw
+	9MgT0dIqPoFyCam6wfRjrw/dfJQnBeU8wZjBAZcg8tvMBuMyX7LG7+3OBVMftSXcRMMo6i
+	jmXiNiKbW3tM/hWlvYGkyvaoMvJkkd9N70QQDtg3kUjbjt86TALvzBBzLuqKng==
+Date: Wed, 16 Apr 2025 15:19:49 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH RFC net-next 2/5] ptp: marvell: add core support for
- Marvell PTP v2.1
-Message-ID: <20250416151424.6d4fbe43@kmaincent-XPS-13-7390>
-In-Reply-To: <Z_9252w9vWiGysiF@shell.armlinux.org.uk>
+ <kuba@kernel.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/5] Marvell PTP support
+Message-ID: <20250416151949.6bddde35@kmaincent-XPS-13-7390>
+In-Reply-To: <Z_-Lr-w95sX4fLIF@shell.armlinux.org.uk>
 References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
-	<E1u3LtV-000CP1-2C@rmk-PC.armlinux.org.uk>
-	<20250416104849.43374926@kmaincent-XPS-13-7390>
-	<Z_9252w9vWiGysiF@shell.armlinux.org.uk>
+	<Z_-Lr-w95sX4fLIF@shell.armlinux.org.uk>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -73,85 +71,89 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeigeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddupdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepu
- ggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdeigeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepkeefvdejheekhfeiieeuhfdugfelveekueekteffteejfeevteelhefhtdfhuefgnecuffhomhgrihhnpegthhhrohhnohhsrdhukhdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnr
+ dgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhgtihhnrdhsrdifohhjthgrshesghhmrghilhdrtghomh
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 16 Apr 2025 10:22:47 +0100
+On Wed, 16 Apr 2025 11:51:27 +0100
 "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-> On Wed, Apr 16, 2025 at 10:48:49AM +0200, Kory Maincent wrote:
-> > On Fri, 11 Apr 2025 22:26:37 +0100
-> > Russell King <rmk+kernel@armlinux.org.uk> wrote: =20
-> > > Provide core support for the Marvell PTP v2.1 implementations, which
-> > > consist of a TAI (time application interface) and timestamping blocks.
-> > > This hardware can be found in Marvell 88E151x PHYs, Armada 38x and
-> > > Armada 37xx (mvneta), as well as Marvell DSA devices.
-> > >=20
-> > > Support for both arrival timestamps is supported, we use arrival 1 for
-> > > PTP peer delay messages, and arrival 0 for all other messages.
-> > >=20
-> > > External event capture is also supported.
-> > >=20
-> > > PPS output and trigger generation is not supported.
-> > >=20
-> > > This core takes inspiration from the existing Marvell 88E6xxx DSA PTP
-> > > code and DP83640 drivers. Like the original 88E6xxx DSA code, we
-> > > use a delayed work to keep the cycle counter updated, and a separate
-> > > delayed work for event capture.
-> > >=20
-> > > We expose the ptp clock aux work to allow users to support single and
-> > > multi-port designs - where there is one Marvell TAI instance and a
-> > > number of Marvell TS instances. =20
+> On Fri, Apr 11, 2025 at 10:26:15PM +0100, Russell King (Oracle) wrote:
+> > Hi,
 > >=20
-> > ...
-> >  =20
-> > > +#define MV_PTP_MSGTYPE_DELAY_RESP	9
-> > > +
-> > > +/* This defines which incoming or outgoing PTP frames are timestampp=
-ed */
-> > > +#define MV_PTP_MSD_ID_TS_EN	(BIT(PTP_MSGTYPE_SYNC) | \
-> > > +				 BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> > > +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP))
-> > > +/* Direct Sync messages to Arr0 and delay messages to Arr1 */
-> > > +#define MV_PTP_TS_ARR_PTR	(BIT(PTP_MSGTYPE_DELAY_REQ) | \
-> > > +				 BIT(MV_PTP_MSGTYPE_DELAY_RESP)) =20
+> > This series is a work in progress, and represents the current state of
+> > things, superseding Kory's patches which were based in a very old
+> > version of my patches - and my patches were subsequently refactored
+> > and further developed about five years ago. Due to them breaking
+> > mvpp2 if merged, there was no point in posting them until such time
+> > that the underlying issues with PTP were resolved - and they now have
+> > been.
 > >=20
-> > Why did you have chosen to use two queues with two separate behavior?
-> > I have tried using only one queue and the PTP as master behaves correct=
-ly
-> > without all these overrun. It is way better with one queue.
-> > Maybe it was not the best approach if you want to use the two queues.  =
- =20
+> > Marvell re-uses their PTP IP in several of their products - PHYs,
+> > switches and even some ethernet MACs contain the same IP. It really
+> > doesn't make sense to duplicate the code in each of these use cases.
+> >=20
+> > Therefore, this series introduces a Marvell PTP core that can be
+> > re-used - a TAI module, which handles the global parts of the PTP
+> > core, and the TS module, which handles the per-port timestamping.
+> >=20
+> > I will note at this point that although the Armada 388 TRM states that
+> > NETA contains the same IP, attempts to access the registers returns
+> > zero, and it is not known if that is due to the board missing something
+> > or whether it isn't actually implemented. I do have some early work
+> > re-using this, but when I discovered that the TAI registers read as
+> > zero and wouldn't accept writes, I haven't progressed that.
+> >=20
+> > Today, I have converted the mv88e6xxx DSA code to use the Marvell TAI
+> > module from patch 1, and for the sake of getting the code out there,
+> > I have included the "hacky" patches in this series - with the issues
+> > with DSA VLANs that I reported this evening and subsequently
+> > investigated, I've not had any spare time to properly prepare that
+> > part of this series. (Being usurped from phylink by stmmac - for which
+> > I have a big stack of patches that I can't get out because of being
+> > usurped, and then again by Marvell PTP, and then again by DSA VLAN
+> > stuff... yea, I'm feeling like I have zero time to do anything right
+> > now.) The mv88e6xxx DSA code still needs to be converted to use the
+> > Marvell TS part of patch 1, but I won't be able to test that after
+> > Sunday, and I'm certainly not working on this over this weekend.
+> >=20
+> > Anyway, this is what it is - and this is likely the state of it for
+> > a while yet, because I won't be able to sensibly access the hardware
+> > for testing for an undefined period of time.
+> >=20
+> > The PHY parts seem to work, although not 100% reliably, with the
+> > occasional overrun, particularly on the receive side. I'm not sure
+> > whether this is down to a hardware bug or not, or MDIO driver bug,
+> > because we certainly aren't missing timestamping a SKB. This has been
+> > tested at L2 and L4.
+> >=20
+> > I'm not sure which packets we should be timestamping (remembering
+> > that this is global config across all ports.)
+> > https://chronos.uk/wordpress/wp-content/uploads/TechnicalBrief-IEEE1588=
+v2PTP.pdf
+> > suggests Sync, Delay_req and Delay_resp need to be timestamped,
+> > possibly PDelay_req and PDelay_resp as well, but I haven't seen
+> > those produced by PTPDv2 nor ptp4l.
+> >=20
+> > There's probably other stuff I should mention, but as I've been at
+> > this into the evening for almost every day this week, I'm mentally
+> > exhausted.
+> >=20
+> > Sorry also if this isn't coherent. =20
 >=20
-> First, both queues have the same behaviour.
-
-Yes, I was not clear I was referring to the message type.
-=20
-> Second, because they *aren't* queues as they can only stamp one message.
-> The sync messages come from the master on a regular basis. The delay
-> response messages come from the master in response to a delay request
-> message, the timing of which is determined by the local slave.
+> I've just updated this series for the supported pins flags that was
+> merged into net-next last night.
 >=20
-> If the local end sends a delay request just at the point that the master
-> sends a sync message causing the master to immediately follow the sync
-> message with the delay response message, then we could get an overrun
-> on a single queue - because we'll stamp the sync message and if we don't
-> read the timestamp quickly enough, the stamp registers will be busy
-> preventing the timestamp of the delay response being captured.
+> Kory, if you have any changes you want me to review before sending
+> out the updates, please send soon. Thanks.
 
-Have you already seen such cases?
+Maybe using kdoc in marvell_ts.c. You can copy paste the ones I wrote on th=
+e v2
+of your driver I posted.
 
-> With the overruns that I've seen, they've always been on the second
-> "queue" and have always been for a sequence number several in the past
-> beyond the point that the overrun has been reported. However, the
-> packet which the sequence number matches had already been received -
-> and several others have also been received. I've been wondering if it's
-> a hardware bug, or maybe it's something other bits of the kernel is
-> doing wrong.
-
-Yes, in any case, using two queues like that prevents the PTP master from
-working properly on my board. I will try to investigate the issue.
+Also don't forget to run checkpatch, patchwork reported errors on your seri=
+es.
+It was not an issue as it was a RFC but it will if you remove it.
 
 Regards,
 --=20
