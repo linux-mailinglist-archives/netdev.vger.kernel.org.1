@@ -1,207 +1,254 @@
-Return-Path: <netdev+bounces-183266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A36DA8B838
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:05:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0933A8B8A5
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:14:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC63719059BA
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:05:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0394E5A3979
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD4924A057;
-	Wed, 16 Apr 2025 12:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E57248895;
+	Wed, 16 Apr 2025 12:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="S0yXEdAx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jnqlXNPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB0A238179;
-	Wed, 16 Apr 2025 12:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744805046; cv=none; b=aYiYE45YPJJShL6wqvZwEIT2taSnatFo78uCkPpCDwJ7gpZvxgjT6x+rx4ALD6+RukrTfXWGHdly/v81+2IlsEqzbfjOplIPGIh9p6cMxszSb2tXBbIABoM0Iq/i3D0Q/pKdt+YyVbm3Z1v3gW5eNyXu+cAkvzH1cECN2cCwKP8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744805046; c=relaxed/simple;
-	bh=PFGhtR7a+Zp8eMU6Syuc2ZJohDPwScExVH8rQ3xxB48=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=N3w4Kx3WeQzt/IDKbkqzqzgPDl6ItJzuDiXYGk19ATL9EtCfT8T6Rd8Fr89VTXVeiLppiuUN4UVb3r2fO/4byizDycBMON8wJBFcGF2n6ZCZ/y2npAU+Xwadn3dL+HwAkyzZpgf4HD8qHlgniPzdO63ucFTrxQux5A2xWLOTQTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=S0yXEdAx; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=C+BUdbNu2ogqSwBdGvb9VogReaCcne2HM3cP2/uSto4=; b=S0yXEdAx0AP0GBpAOdQQlzocSe
-	SvaO2kc48XVnolknlLgy5oAUdFWGtCIrYMLcY6JpXIJX1N8TyNE6RpUTnGDwfm63v2rw4HcLdFjvk
-	GT5vbmVIaebvybTuLeHWhHyvZYLIc8xqwGGbw4KeDPwEk8ibctxSBv3UpU/TMTxQRBRkfOj16GAfO
-	yKk6BAG5HDRvLX3thFqAgMQKGU6MhqaoL7WudEOrl86zpMYyGmJoLNqUxpX+cMMZxGsvB8vA4ebpz
-	5y11F7gEhtldOhFmU8112tT7pQLmkWkphdhE0KrC9F4cW0TrIvbWZtOADnf2rE0e6khKH9KUX+/XN
-	4YYz+/xQ==;
-Received: from [122.175.9.182] (port=43055 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1u51Uk-000000006vU-2zvY;
-	Wed, 16 Apr 2025 17:33:59 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 5A4611781A82;
-	Wed, 16 Apr 2025 17:33:51 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 3A604178247C;
-	Wed, 16 Apr 2025 17:33:51 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id hCcSTaFJEKlc; Wed, 16 Apr 2025 17:33:51 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 0520E1781A82;
-	Wed, 16 Apr 2025 17:33:51 +0530 (IST)
-Date: Wed, 16 Apr 2025 17:33:50 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: horms <horms@kernel.org>
-Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
-	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
-	richardcochran <richardcochran@gmail.com>, 
-	glaroque <glaroque@baylibre.com>, schnelle <schnelle@linux.ibm.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, s hauer <s.hauer@pengutronix.de>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	basharath <basharath@couthit.com>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <2114025245.1081083.1744805030927.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250415201552.GJ395307@horms.kernel.org>
-References: <20250414113458.1913823-1-parvathi@couthit.com> <20250414140751.1916719-12-parvathi@couthit.com> <20250415201552.GJ395307@horms.kernel.org>
-Subject: Re: [PATCH net-next v5 11/11] net: ti: prueth: Adds PTP OC Support
- for AM335x and AM437x
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB7E24886A;
+	Wed, 16 Apr 2025 12:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744805405; cv=fail; b=Q+HQFN2F3DFp4Lp731U07INmnj1YZTOuzN16B0PD6f98A+VjREKV+UvzwL4EbNBVLR9Jfnx8mcOETDqFL27lguCThj4k19xVEAJnNu9BeBLV5+jIFxSUFhUUl0XnbedmNiiL/pCv0YgaTZNKNlAMu8W/bYaFS76mxD/YTp8QnbQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744805405; c=relaxed/simple;
+	bh=JaqD0iessxWNq86Qx7x4dVpLJJwCukOcsdIlJ41tfK4=;
+	h=Subject:From:To:CC:References:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZzaPCNcOwy0aEKiJgrbOGTGW9srtYDyYqhGIEikpYZZ9xWSDN+Sa1PkW9XQMVQMQ3BOHtdtLjZcQj/nn2mvkC3fbGAVMvh59l1J3dJiX058xk07pvcq3JFosy5TZb1GlTTUg2oszXzfCvGolzr6rpXea33MbyI+rE+AV41/zgwo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jnqlXNPa; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744805403; x=1776341403;
+  h=subject:from:to:cc:references:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JaqD0iessxWNq86Qx7x4dVpLJJwCukOcsdIlJ41tfK4=;
+  b=jnqlXNPam7bys7qQWc97K7M1C8EBQYqy4jLBWKiOaCIJOb0ffDV0mlBy
+   z5JHTW77sszrg1nk/Zm+IEc17yRbeKy7oobuf5MKMDiuLLflFfKUum0OQ
+   SS5zx14Aq+GGpwIy6sNyUSgQlz99s7mV5KZyHDV2eEb+TR99Ax1wGVNh9
+   5/qDMwmt3dlyR86dySMh+jkeadNVoh5Omk0JEHlswUfDcLgh6WaEsHP+n
+   Gn1bLzWoudtjCseovb5CxOwzW1zEXL2EWFiQoE86NnzIgxStdTb0pSSps
+   2kGJIKJ2i42Te8n7RbnoabwRHdFzoCD6G3x7ms6lvJ7XK3hHhNpeyQIAE
+   A==;
+X-CSE-ConnectionGUID: BuQtpbufTAa0hkfBwq2afA==
+X-CSE-MsgGUID: JI4nQdEwQoaYkQUBjxKR1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="71737553"
+X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
+   d="scan'208";a="71737553"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 05:10:02 -0700
+X-CSE-ConnectionGUID: GVh/gANsT7+9wxMRMNntAw==
+X-CSE-MsgGUID: mXTUbBGNR+WDmim5XFBolg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,216,1739865600"; 
+   d="scan'208";a="130424481"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2025 05:10:03 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 16 Apr 2025 05:10:02 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 16 Apr 2025 05:10:02 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 16 Apr 2025 05:10:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GigDYwvk6Gfn/7DR3unDhaUZRaxAgK4AbYjIaF2yltwT0UOTjAQJmb40j5ZpVn6/dazQfV9QzIiL/nGN+QMEKb6ju0KYJUWc3Cf8sWIFKN21orhck7jOLJgnk7u6CrfT2eAI3+t3CIHxbpZnzHtT7Daz8F4hfFmWwmUXAy9g9mhoPuBg0Y78v+wkvCN+DjcMDJ1zSrz51/zpOHeXbzpPuFrThtV9kNkeeTzwAGJpgmHfHJq3IC+d/uQH/5/n/lyu3yymKfbUbIjPieVjaSxGc2hXqpnIX4UIvySp6IUuTO83ZFGxPJulbqEmRWKkeexPBINWhMCiVa6DmanNlY6Vpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yR3lgDRBAxpbin6FP1zLi6mAXvqwRuDzZ8Km8IBbLYA=;
+ b=Ipi7YXNgvZO7/rw6awwaY84q/BhtmzAetEXbElIBn9lYhvXYNyXu9/hsCwxcgtsOqT9D7twb3DLMn302qjBsEIObaUudeshf9oxsrloxAUqNS8hKLEXEmCYLs5wn7PbJp7jAfI4ALBVi0manGn/ThAhnwqnI63ANDXa0ArVTH0VMq37n8mYQfH4/2HhTZBfodCkHQKz+JM0FqPEZeIPCf/RBcKFpcEVtMNqXvXk4UGml8X1O9OKsJz2E8zKyqYavGngVlbZ8IlUzdQqCJhvFRbGvKobn7LvFaL05ooa1ZfxaUZpD8KgEmsEkMYMTuInBRteH1YsTXxcmZAQ9WcVp2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by SA1PR11MB8574.namprd11.prod.outlook.com (2603:10b6:806:3b1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.28; Wed, 16 Apr
+ 2025 12:09:45 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%2]) with mapi id 15.20.8632.036; Wed, 16 Apr 2025
+ 12:09:45 +0000
+Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on Meteor
+ Lake - 6.14.2
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+To: =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?=
+	<marmarek@invisiblethingslab.com>
+CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <regressions@lists.linux.dev>,
+	<stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>
+References: <Z_z9EjcKtwHCQcZR@mail-itl>
+ <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com> <Z_0GYR8jR-5NWZ9K@mail-itl>
+ <50da66d0-fe66-0563-4d34-7bd2e25695a4@intel.com>
+Message-ID: <b5d72f51-3cd0-aeca-60af-41a20ad59cd5@intel.com>
+Date: Wed, 16 Apr 2025 15:09:39 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <50da66d0-fe66-0563-4d34-7bd2e25695a4@intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL2P290CA0026.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::13) To PH0PR11MB5949.namprd11.prod.outlook.com
+ (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds PTP OC Support for AM335x and AM437x
-Thread-Index: nmUgxGmbBkjbq4ZS0FAvjySn6J19/A==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-
-Hi,
-
-> On Mon, Apr 14, 2025 at 07:37:51PM +0530, Parvathi Pudi wrote:
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> PRU-ICSS IEP module, which is capable of timestamping RX and
->> TX packets at HW level, is used for time synchronization by PTP4L.
->> 
->> This change includes interaction between firmware/driver and user
->> application (ptp4l) with required packet timestamps.
->> 
->> RX SOF timestamp comes along with packet and firmware will rise
->> interrupt with TX SOF timestamp after pushing the packet on to the wire.
->> 
->> IEP driver available in upstream linux as part of ICSSG assumes 64-bit
->> timestamp value from firmware.
->> 
->> Enhanced the IEP driver to support the legacy 32-bit timestamp
->> conversion to 64-bit timestamp by using 2 fields as below:
->> - 32-bit HW timestamp from SOF event in ns
->> - Seconds value maintained in driver.
->> 
->> Currently ordinary clock (OC) configuration has been validated with
->> Linux ptp4l.
->> 
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Andrew F. Davis <afd@ti.com>
->> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
->> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h
->> b/drivers/net/ethernet/ti/icssg/icss_iep.h
->> index 0bdca0155abd..437153350197 100644
->> --- a/drivers/net/ethernet/ti/icssg/icss_iep.h
->> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
->> @@ -47,6 +47,11 @@ enum {
->>  	ICSS_IEP_MAX_REGS,
->>  };
->>  
->> +enum iep_revision {
->> +	IEP_REV_V1_0 = 0,
->> +	IEP_REV_V2_1
->> +};
->> +
->>  /**
->>   * struct icss_iep_plat_data - Plat data to handle SoC variants
->>   * @config: Regmap configuration data
->> @@ -57,11 +62,13 @@ struct icss_iep_plat_data {
->>  	const struct regmap_config *config;
->>  	u32 reg_offs[ICSS_IEP_MAX_REGS];
->>  	u32 flags;
->> +	enum iep_revision iep_rev;
->>  };
-> 
-> Please add iep_rev to the Kernel doc for struct icss_iep_plat_data.
-> 
-> Flagged by ./scripts/kernel-doc -none
-> 
-
-Sure, we will update the documentation in the next version.
-
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
->> b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-> 
-> ...
-> 
->> @@ -337,6 +343,7 @@ enum pruss_device {
->>  struct prueth_private_data {
->>  	enum pruss_device driver_data;
->>  	const struct prueth_firmware fw_pru[PRUSS_NUM_PRUS];
->> +	enum fw_revision fw_rev;
->>  	bool support_lre;
->>  	bool support_switch;
->>  };
-> 
-> And, likewise, please add fw_rev to the Kernel doc for struct
-> prueth_private_data.
-> 
-
-Sure, we will add fw_rev to the Kernel doc in the next version.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|SA1PR11MB8574:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c6fe066-71f0-4c79-338e-08dd7cdf938e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?U0xmVTF4M2Y1Mm9hN0hnbnFoejhUWFVOeGtmWDkwc2NubzVVMTFySXBmcmQ3?=
+ =?utf-8?B?SWRNSGJ2R2VmNUlSRkU2RGU2VklmNjhIeVlub1FEYnV5bFVIN1BDcFlBVUNX?=
+ =?utf-8?B?SzQ1TXEvZXYrMlY1Mk54VFZ5UGJTZVdQWUhEZ0I3bTdKZjQveVJBaTR5Zzhs?=
+ =?utf-8?B?V0JCdTZxTkVnMHBVa3RJZGRKb0xUZmttWTlycXBiYzhQVFZ2UUVKd0srT1FG?=
+ =?utf-8?B?UW5pMXg5TDF2cEZSZkVIYVo1SldVSE5pRjQrN1NEWHhIZ3JmMjI2WWNmMWY3?=
+ =?utf-8?B?Rm5WU0x3bkY0MVRTZ0pZWXJmV3FLU0Z4a1pnVHNKK3hzdVM2MTlDSURhS05C?=
+ =?utf-8?B?dWtrR1pab2FvRFQyemx1VGVFaEhyVXZBdUkvU0t2WUVKZldQQko3cXpXTmpo?=
+ =?utf-8?B?RzFwRFhFSVlmcmpDTjJxSlJjc0FtMnNpSEVIYWcrVWN6ZGhieVh4WVNPTDFI?=
+ =?utf-8?B?WTI0YXBRVXJydGlNT1FnSG1YcU04djU5bEhwejBqdnJjU01xUnVDek5qdWt4?=
+ =?utf-8?B?V0Y0bGt4bHRpZ01TdHcyRTNrZlp6NlJuSTJXUXZBRDBnZURCZVNaYjQxVk1Q?=
+ =?utf-8?B?aFFnck1KQ0ZaaXFvZ0FhSVZ3Snk3NlpYT0p1R3lCVHo4dVdCOHI4TXlEb0Uw?=
+ =?utf-8?B?TkMzVmYrdklZemdJOWFscS9XTEhUUFNudXlLcGZuekF2K0VkU2pscDFLWlRh?=
+ =?utf-8?B?bTNhYWZ4VmVyQ0lSVGNjbjAzM2lBREtHVVpib2ZVZmtOSFFDUEFkK1UrQXdV?=
+ =?utf-8?B?OUtDUjdnZWsvNnQwRFBsay93UDBWNWdCaElocjBtMEdiQi9USTlXTkRxbDls?=
+ =?utf-8?B?alZGOXZyNkpPdS9lTDVkRlVzZXV6cmRyUkxmQTlwQ3dBWSt4OWxiWFluTE8v?=
+ =?utf-8?B?b3htTXRhOXZHa20rb1FkNGZaOFY5OHhxbTNxQW92a1U4YURRTXNmQUxnZWNX?=
+ =?utf-8?B?MEhUMWQrSjBNaWo3Z1Boa05wblBpL1E4Yk1PcWlMKzZrZzZVTG1CSlliREc0?=
+ =?utf-8?B?cTMwUy93VWZEbFFDZGJjdzltUGpMaEE5dTFKVmpLR1JJOW1VTEczVFR3WnBU?=
+ =?utf-8?B?N0d5eHU2VSt2ZFNsdzdjcWNYS1Y4eUJWdFJVbjlES2F3TGI3QitCODkyaHd5?=
+ =?utf-8?B?NW9uRFBPMUozNnRBbDZaUUY3ZHNENEZvMloxN2V1VFlWOHduTWx1eGdMSHRx?=
+ =?utf-8?B?b1ZZa0h2Z21tU24wSnpJYzhveFpISFY4bUR5bk1SZnJ6V1V2bEN5QjF3ZDk1?=
+ =?utf-8?B?TnppcnZqb0RIajZtb2ZHTTVPTUZpM1lVeGZKc0ZWRFphTHpDMW5zT3FNTnps?=
+ =?utf-8?B?ZTFrdW9BZnltSzBldWEwN0dGeGcweEY1MTZBandCenpkN2dMQXRtajhDeHNa?=
+ =?utf-8?B?UDZweFlNTk1jazY5d1ludUN4aXJIVE5IUEg4TXVncVZKUkQ0SVpiZnVYUDhX?=
+ =?utf-8?B?bGhyWmhJdVE1UHpYSk8zbCtucXM2U1Nnd0tIb0JDN242VzJXV2cwYWhRNXRT?=
+ =?utf-8?B?UnlsUjFrblJKQk5vVWdvY3cweFU3Zy8vU1BJdWtXKzJrSW55aUUwcUhOQzFT?=
+ =?utf-8?B?dWtNWWRreWkybzYrY0NFcEFqK2pwSGhLYm8weEJxRkZLam5pRHc1SS8vbzNY?=
+ =?utf-8?B?b1I2NlJXNkEvZ1diaGcyWlZvd1hFMy9hQmZLaThYRU4wd2lhK3hZa25lYk9I?=
+ =?utf-8?B?ckd0R0FVQ3lad1I1cVVPU2ZFeDF5c0ZWR0V5VFJzR29yTElpUVhNejIrOWk3?=
+ =?utf-8?B?WWpCZzZVaGtKT044TkR0ZjdvMUQxbjczZnk1YlRGZzZ0WFd5RDFRRnk3NEkv?=
+ =?utf-8?B?dUExVFhjV0d5cWJLYlJ1WUZ6RW9mbEpmbzFrWEw2QUJtaVFnZkdHZm5IVmZ5?=
+ =?utf-8?B?dlZiUjdtWU8rOVBvM2ljSzBWNnFTVzFKVGR2M1NyZXJnYTVFOWo1a2U4eGpV?=
+ =?utf-8?Q?1eTPMG4qC0M=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXlYb0grS1hnWFJrT0lNSEVjQk9YMFlZL1RySkRwOVl3cWpvWVdzVjhUTm1w?=
+ =?utf-8?B?Tk1xME5JaHVLODBPQmhnNGNqT05CY2ZYcVYyQzQrM0VNa1ZpTEFyU0xNbmUw?=
+ =?utf-8?B?SFFDS3ZwbGt1dit3bDZFUUh0c1ZlWkl6cjJTekpodmtaQW8vM1VTdEtLTVhv?=
+ =?utf-8?B?V0s3U1JMWG9pUzEwQUNKQXV3YktJZzRiRTNSUGNhNEdmUHY3OXU2ckJXd2lu?=
+ =?utf-8?B?cVFKZWxpeWRVY21lMmJiKzk1MmVCbnhqcHZhVlgyRmF5UVVsUzlmMjA3VGFa?=
+ =?utf-8?B?Vk5lRFdrWEpVRG1vaTJ2QUwwbng0cEMrSG1BUkpkQTVISkV5UTBra0NxeVhu?=
+ =?utf-8?B?RkgweU00RHM4eWF2N2VvY3hsTzVkcTRzcjM4d2RiZlVscnNZNE9QOXhHKyt1?=
+ =?utf-8?B?ZWpSeHFXY3pYenJ4eXZremZQMWc5WFVySnlPeGRlOGFuLzFSZFU5TWVTVlV1?=
+ =?utf-8?B?QncvS3JtM2VrOFpMRnhPeXlEZ2RLUEJRZ0Z4bzl4ZndvNUVkbmh4VnVLM0lI?=
+ =?utf-8?B?SU4zckNJZ29VRG83a3M2bUxqbjVrOHk5YXhLQzdJZ2svUXhiblJhVWFDazhS?=
+ =?utf-8?B?cDMydjJ4MEZWcjQxc1pybFJSbE84NDZjVEZqMFpld2xEYm1makd5ZFVmdFk1?=
+ =?utf-8?B?YWhxUW1GN25KdkM5R1VURWxuUTN5QkJHU3NPOVFkditvLzNaeUxnNVFybkl0?=
+ =?utf-8?B?MkVhMkNyWE1PcWY3VkpzUHNRTHJ3UmtNQzBhQ0IrMG82K3lOb1FBdE15cEtI?=
+ =?utf-8?B?MDhjVFE0ZzQ5OURyT1M1VHdBbVV4WDQ4eEszNC9BOG9DcFIyZHdqWXRNR1VS?=
+ =?utf-8?B?dDd5Tkh4MjBsQmpWUk0yRmJmT2hMcXR5QjVRb1U5MVdyWFg3eEM4Q1NTK3Fa?=
+ =?utf-8?B?RFppQ1FiMThDNi9IQTVlcFdxd2VTbFBkcTgxZGZ0RnV5b3BZSkJsUzk5bHhj?=
+ =?utf-8?B?QVhKaElxYUYvdkJCWXlzRnpjSkVRdyt1Q3p4ZEdsd3h1aGF4a28zNVhvcCt6?=
+ =?utf-8?B?LzJyT3NBNTM5eXhpNmhoWktmOXVVSVdkMTk1NmZpMjlHSUVpQ2ZmdFlDeFN4?=
+ =?utf-8?B?czZza2pvREZNcmd2MkQ3OWJxalo0amdVWTRIZlBHNXAzYnptcDUzU0VOZzBZ?=
+ =?utf-8?B?SHB4eXNCSHl5TEZMUUtUK1VqdHliTVRQOWlyTGlGeDg0MkZFdkRJMlpJVkVI?=
+ =?utf-8?B?YW1MbFYwTFpqOTZzK1dtUWJRcENaSmttcU9tSVJ0OFhmMWRYVFJWRTZvV1dL?=
+ =?utf-8?B?OG14bW9JeFBnVlBYTGh5RzhxblR2UWlCUEVjNWhUMmo1SmM4Nm5La1pyb3N1?=
+ =?utf-8?B?dVJkRDE4SFhoWFdhVnVTYW44aXpXVUVnK3BkL09nYi8zTmhWL2NCTmJIRktW?=
+ =?utf-8?B?eGcySnBYcVd1Ukl1VjIzZUdqSmFxazJla2NlaFJ5aWFpN3VrQndBdDltZHg4?=
+ =?utf-8?B?bGt2UVFpRFNjWENXd1VhOFZoRm01eFJDTEZUZWlZSFZFZEJzVDJ1UExmRHRp?=
+ =?utf-8?B?UmYySlRnWVFJa2RMWFlMZnJ0NjZPdXVRaHcya1JDQ2JEMlcyV1lUTlM3d3B0?=
+ =?utf-8?B?MVE5d1JiazBLTTd0VTlhL3dRbFFpTlJzUk42WkRCMFVnT3JZK2dXUTFJUTRM?=
+ =?utf-8?B?OVJaeDFiaDFkbUdFeUc1U0lHZU5KdlVzOW1MNjIvcFdVbmNiQnNPY2FYWGtG?=
+ =?utf-8?B?VEZVckw2bnBzVWZtZXdCZnBPcjRXakVLYXZ1L3B1eEJkQWxCSy9Sam10TVl5?=
+ =?utf-8?B?RmNRdTQ4WEJlajkwNWRaaVFpYit4Ui9lczl3eFpFTDNmRTFuc2RMNVIwb3l3?=
+ =?utf-8?B?blEycG5vWno0M3JGM0dWRndReTBGYUp4QzF0NjBjTEtraTNwQ2lUVGUrZFZr?=
+ =?utf-8?B?T2pmZG9SdTd6amxYamxZQW1PVmpYTUZySHJWSnB0RDJ6eTJ3OGhMV0I1WGJC?=
+ =?utf-8?B?azYrN1lxc0dnWGlpZVVtZkZjZ255TzdXRmZHZHVqa2kvMXJvakNTQUVUWVFs?=
+ =?utf-8?B?UDd3RnRhOG1YRkR6VjM3NzhDR0g4TGIvRWVFbkdKRDRtR0RQbm1mbDZxeGgr?=
+ =?utf-8?B?bDgwcXIvR3IvOFMrOWIyWm1SblJpNWVwN21WQkxKRG9wUzdvRnhMUUdEbWtV?=
+ =?utf-8?B?cjZpdGhOTUpQZUUvY1VLb1ZtVXdzem1KZWVqL2p2cDltWk95ZExBNVBNTFND?=
+ =?utf-8?B?aVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c6fe066-71f0-4c79-338e-08dd7cdf938e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2025 12:09:45.2931
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TXinlloJ6pT2KhxF6IaFOS38wMU0Ug/fRcRXXLWzkRh4ntDLSv5Npq+vLuBa3NwzXJcgzPaZ59jwo7yBSSZh9Psh9qOxGXzadIc2nOVM/g4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8574
+X-OriginatorOrg: intel.com
 
 
-Thanks and Regards,
-Parvathi.
+
+>> And also ethtool output if useful:
+>> Settings for ens7:
+>>     Supported ports: [ TP ]
+>>     Supported link modes:   10baseT/Half 10baseT/Full
+>>                             100baseT/Half 100baseT/Full
+>>                             1000baseT/Full
+>>     Supported pause frame use: Symmetric Receive-only
+>>     Supports auto-negotiation: Yes
+>>     Supported FEC modes: Not reported
+>>     Advertised link modes:  10baseT/Half 10baseT/Full
+>>                             100baseT/Half 100baseT/Full
+>>                             1000baseT/Full
+>>     Advertised pause frame use: Symmetric Receive-only
+>>     Advertised auto-negotiation: Yes
+>>     Advertised FEC modes: Not reported
+>>     Link partner advertised link modes:  10baseT/Half 10baseT/Full
+>>                                          100baseT/Half 100baseT/Full
+>>                                          1000baseT/Full
+>>     Link partner advertised pause frame use: No
+>>     Link partner advertised auto-negotiation: Yes
+>>     Link partner advertised FEC modes: Not reported
+>>     Speed: 1000Mb/s
+>>     Duplex: Full
+>>     Auto-negotiation: on
+>>     Port: Twisted Pair
+>>     PHYAD: 1
+>>     Transceiver: internal
+>>     MDI-X: on (auto)
+>>     Supports Wake-on: d
+>>     Wake-on: d
+>>          Current message level: 0x00000007 (7)
+>>                                 drv probe link
+>>     Link detected: yes
+>>
+>>
+
+Can you please also share the output of ethtool -i? I would like to know 
+the NVM version that you have on your device.
 
