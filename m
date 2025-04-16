@@ -1,218 +1,126 @@
-Return-Path: <netdev+bounces-183285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E27A8B938
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:34:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777CAA8B946
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 14:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684FE189ADB7
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:35:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEC173A78B7
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 12:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208894A24;
-	Wed, 16 Apr 2025 12:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1442B184E;
+	Wed, 16 Apr 2025 12:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HGR7ML/k"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="kn46jmGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE02179A3
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 12:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6F9179A7;
+	Wed, 16 Apr 2025 12:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744806894; cv=none; b=e4ytyVBrurv9L7W3UY1Uko8XO1pkQAAkPr58h6Vn2qZYbwkmMk1DeGHXpbRtqVdDTxiXDf73lcupfU7o3R9VRumM5Z9SL1Id28b/JM80JUG3JLNOxTZ4RIuABBtbYuE1Gfsg/R18Kol/9k4DOJCx1I+QW0Oc1TvspMjE2fdPHR4=
+	t=1744807030; cv=none; b=lLDHlpXZkaWhWLdgxARQ9GshFZgBktCvZ/cSLbfgL7+jqBhkA8fOK2R4FHuG5Cf9w4Xybk9Lk2jW3POP4ZXHELr/o6Z0oFYmbsXmTdeZoqmS/LnjcD+D6DvnFtOZUCxBi8cC4nCVW0jb+Gs+OhH5v9iPlroyvNRFwasn9zEizPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744806894; c=relaxed/simple;
-	bh=MQzAdBu/uMebeOJA/sZbwOp+jPQg3Wn4NmMIMqB48Ak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OjFE13LZgFvc1DlPTPdt4YTVJQMTPqkWoJVW1hNhLnOAIkJCHwhvjJuaKsG8LjJQsNrvr4rXJK0LBHAJMdgjlzkG8xy9KnkMeaOF6EEazs5FJc6FTMmExRfCZT0++E/UnpRW5IB5N6EjQvIxyOikMMsZodM5wf1J29pEKscOesM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HGR7ML/k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6967BC4CEE2;
-	Wed, 16 Apr 2025 12:34:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744806892;
-	bh=MQzAdBu/uMebeOJA/sZbwOp+jPQg3Wn4NmMIMqB48Ak=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HGR7ML/k61FQ1FDw+5qwWmSxs2bICPqLtCebdQiV+rrFlRGCb+cQytXead4oJXV2h
-	 7eS8lqlYz+k7UdzujkSijNg3fM9I6YjNNStBsl1D7L6S2d2l9rLVHLAuXVjZnm9WNP
-	 96ScdzXOCavsO33Vn5AE0SKhnJc0LdEVmVbyUVvb1xleJVr4HEAUW6ZJ/bakNnaFSG
-	 Xihc/B8idKJVFoV9qu1PoknzSE5lzPW+gKN7Fb8/fb9K/SbmJV12W9A++H+DeAi6I5
-	 +/NqWTLBaEJBCGQdMP4kntCh+rb/2WZoeYPQI/Pn5a5YL6uY0Y4MBxETwQ7q9hbFEG
-	 oYUMv8uF8GELA==
-Date: Wed, 16 Apr 2025 13:34:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dave Marquardt <davemarq@linux.ibm.com>
-Cc: netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next v2 1/2] net: ibmveth: make ibmveth use WARN_ON
- instead of BUG_ON
-Message-ID: <20250416123449.GQ395307@horms.kernel.org>
-References: <20250414194016.437838-1-davemarq@linux.ibm.com>
- <20250414194016.437838-2-davemarq@linux.ibm.com>
+	s=arc-20240116; t=1744807030; c=relaxed/simple;
+	bh=nVrH3mtSZEP8fIRoFl5ZEEX1SX/ppwAenWERY9UyFlw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZKVnamGS+TH/YbFBh5dMXYj0Ra5xpg67uKmyE2APDYcZ1LcDdAZNvFbGUMTZAu826bcg7ZPXuVgeYe4+1/2DjdT/NKvQdIvUeKggOkcRMBAJmRHCDZgSo2NDYYp4nuDJnifLI0KnQ4xvDnH81vKj/P2/s8HmBR8dzE60JShk52I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=kn46jmGc; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u520g-002nD1-U9; Wed, 16 Apr 2025 14:36:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=Cfur1eQywpvIitbgUboBvGAu60qJRizrYqb091rvp3w=; b=kn46jmGc0XyVG007rY/V3em+Mv
+	mxOfwHGL4AgAjniU4bLR/KI264VE/uaVYrfN3bPDSs3MNUqiyLGCz20Aqb+G9VIa/C4roqdfIeaFa
+	3pxy0ZuyEtQ3Ar6vcPd1o4ROWiv0ucdMFsU4Gts4xl3sTF01MwZeKvLQ0ZA9VE4g6rACZlTGv4V/6
+	HoW/qR1veXcgyjcP1njnJ8mI71zRSLqIdsFdA8y+n45xYNh6vQPraKqJNQpFCuJ41KXNrvvY9wxn3
+	jdtVsGLm5KcY4p0yIgYgU1b4pyQoKBX5f8ZTW3UjCmZPfdiXVwfSCoqMpC972EEXUVzBL6E52sNvv
+	H6scHFqw==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u520f-0005UK-GS; Wed, 16 Apr 2025 14:36:57 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u520b-008oyA-NX; Wed, 16 Apr 2025 14:36:53 +0200
+Message-ID: <a3ed036f-5153-4d4c-bf71-70b060dd5b2f@rbox.co>
+Date: Wed, 16 Apr 2025 14:36:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414194016.437838-2-davemarq@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
+To: Stefano Garzarella <sgarzare@redhat.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
+ <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
+ <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
+ <hu4kfdobwdhrvlm5egbbfzxjiyi6q32666hpdinywi2fd5kl5j@36dvktqp753a>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <hu4kfdobwdhrvlm5egbbfzxjiyi6q32666hpdinywi2fd5kl5j@36dvktqp753a>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 14, 2025 at 02:40:15PM -0500, Dave Marquardt wrote:
-> Replaced BUG_ON calls with WARN_ON calls with error handling, with
-> calls to a new ibmveth_reset routine, which resets the device. Removed
-> conflicting and unneeded forward declaration.
+On 4/11/25 12:32, Stefano Garzarella wrote:
+> On Thu, Apr 10, 2025 at 12:51:48PM +0200, Paolo Abeni wrote:
+>> On 4/7/25 8:41 PM, Michal Luczaj wrote:
+>>> Change the behaviour of a lingering close(): instead of waiting for all
+>>> data to be consumed, block until data is considered sent, i.e. until worker
+>>> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
+>>
+>> I think it should be better to expand the commit message explaining the
+>> rationale.
 
-To me the most important change here is adding the ibmveth_reset.
-So I would report that in the subject (rather than the WARN_ON) change.
-But perhaps that is just me.
+Sure, will do.
 
+>>> Do linger on shutdown() just as well.
+>>
+>> Why? Generally speaking shutdown() is not supposed to block. I think you
+>> should omit this part.
 > 
-> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmveth.c | 116 ++++++++++++++++++++++++-----
->  drivers/net/ethernet/ibm/ibmveth.h |  65 ++++++++--------
->  2 files changed, 130 insertions(+), 51 deletions(-)
+> I thought the same, but discussing with Michal we discovered this on
+> socket(7) man page:
 > 
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+>    SO_LINGER
+>           Sets or gets the SO_LINGER option.  The argument is a
+>           linger structure.
+> 
+>               struct linger {
+>                   int l_onoff;    /* linger active */
+>                   int l_linger;   /* how many seconds to linger for */
+>               };
+> 
+>           When enabled, a close(2) or shutdown(2) will not return
+>           until all queued messages for the socket have been
+>           successfully sent or the linger timeout has been reached.
+>           Otherwise, the call returns immediately and the closing is
+>           done in the background.  When the socket is closed as part
+>           of exit(2), it always lingers in the background.
+> 
+> In AF_VSOCK we supported SO_LINGER only on close(), but it seems that 
+> shutdown must also do it from the manpage.
 
-...
+Even though shutdown() lingering isn't universally implemented :/
 
-> @@ -370,20 +372,36 @@ static void ibmveth_free_buffer_pool(struct ibmveth_adapter *adapter,
->  	}
->  }
->  
-> -/* remove a buffer from a pool */
-> -static void ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
-> -					    u64 correlator, bool reuse)
-> +/**
-> + * ibmveth_remove_buffer_from_pool - remove a buffer from a pool
-> + * @adapter: adapter instance
-> + * @correlator: identifies pool and index
-> + * @reuse: whether to reuse buffer
-
-The above is the correct way to document function parameters in a Kernel doc.
-
-> + *
-> + * Return:
-> + * * %0       - success
-> + * * %-EINVAL - correlator maps to pool or index out of range
-> + * * %-EFAULT - pool and index map to null skb
-> + */
-> +static int ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
-> +					   u64 correlator, bool reuse)
-
-...
-
-> +/**
-> + * ibmveth_rxq_harvest_buffer - Harvest buffer from pool
-> + *
-> + * @adapter - pointer to adapter
-> + * @reuse   - whether to reuse buffer
-
-But this is not correct. IOW, tooling expects
-f.e. @adapter: ...  rather than @adapter - ...
-
-Flagged by W=1 builds and ./scripts/kernel-doc -none
-
-> + *
-> + * Context: called from ibmveth_poll
-> + *
-> + * Return:
-> + * * %0    - success
-> + * * other - non-zero return from ibmveth_remove_buffer_from_pool
-> + */
-> +static int ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
-> +				      bool reuse)
-
-...
-
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-> index 8468e2c59d7a..b0a2460ec9f9 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.h
-> +++ b/drivers/net/ethernet/ibm/ibmveth.h
-> @@ -134,38 +134,39 @@ struct ibmveth_rx_q {
->  };
->  
->  struct ibmveth_adapter {
-> -    struct vio_dev *vdev;
-> -    struct net_device *netdev;
-> -    struct napi_struct napi;
-> -    unsigned int mcastFilterSize;
-> -    void * buffer_list_addr;
-> -    void * filter_list_addr;
-> -    void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
-> -    unsigned int tx_ltb_size;
-> -    dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
-> -    dma_addr_t buffer_list_dma;
-> -    dma_addr_t filter_list_dma;
-> -    struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
-> -    struct ibmveth_rx_q rx_queue;
-> -    int rx_csum;
-> -    int large_send;
-> -    bool is_active_trunk;
-> -
-> -    u64 fw_ipv6_csum_support;
-> -    u64 fw_ipv4_csum_support;
-> -    u64 fw_large_send_support;
-> -    /* adapter specific stats */
-> -    u64 replenish_task_cycles;
-> -    u64 replenish_no_mem;
-> -    u64 replenish_add_buff_failure;
-> -    u64 replenish_add_buff_success;
-> -    u64 rx_invalid_buffer;
-> -    u64 rx_no_buffer;
-> -    u64 tx_map_failed;
-> -    u64 tx_send_failed;
-> -    u64 tx_large_packets;
-> -    u64 rx_large_packets;
-> -    /* Ethtool settings */
-> +	struct vio_dev *vdev;
-> +	struct net_device *netdev;
-> +	struct napi_struct napi;
-> +	struct work_struct work;
-> +	unsigned int mcastFilterSize;
-> +	void *buffer_list_addr;
-> +	void *filter_list_addr;
-> +	void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
-> +	unsigned int tx_ltb_size;
-> +	dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
-> +	dma_addr_t buffer_list_dma;
-> +	dma_addr_t filter_list_dma;
-> +	struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
-> +	struct ibmveth_rx_q rx_queue;
-> +	int rx_csum;
-> +	int large_send;
-> +	bool is_active_trunk;
-> +
-> +	u64 fw_ipv6_csum_support;
-> +	u64 fw_ipv4_csum_support;
-> +	u64 fw_large_send_support;
-> +	/* adapter specific stats */
-> +	u64 replenish_task_cycles;
-> +	u64 replenish_no_mem;
-> +	u64 replenish_add_buff_failure;
-> +	u64 replenish_add_buff_success;
-> +	u64 rx_invalid_buffer;
-> +	u64 rx_no_buffer;
-> +	u64 tx_map_failed;
-> +	u64 tx_send_failed;
-> +	u64 tx_large_packets;
-> +	u64 rx_large_packets;
-> +	/* Ethtool settings */
->  	u8 duplex;
->  	u32 speed;
->  };
-
-If you would like to update the indentation of this structure
-then please do so in a separate patch which precedes
-adding/removing/chainging fields of the structure.
-
-As it, it's very hard to see the non-formatting changes in this hunk.
-
--- 
-pw-bot: changes-requested
+If I'm reading the code correctly, TCP lingers only on close(). So,
+following the man page on the one hand, mimicking TCP on the other?
 
