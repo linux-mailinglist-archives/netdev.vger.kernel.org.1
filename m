@@ -1,354 +1,149 @@
-Return-Path: <netdev+bounces-183441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32D4AA90ABB
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:03:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B576A90AC0
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 20:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5703A366A
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:02:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05D1C1888342
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 18:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73DB204598;
-	Wed, 16 Apr 2025 18:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE80217673;
+	Wed, 16 Apr 2025 18:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bZLxmOyZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OH6qEwFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EAD215F6C
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8648212FBC
+	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 18:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744826573; cv=none; b=NzY4uq/VuNwl77pXZUL6Wqtjp6LDv0z/PA7iP7KspRDGq/rDXKihzzS6677ycAyADks+dSC1s1QUiwZKv5bp8D6mDdjBJ5D+CiMhJ/gNTzAkbrnzl5a0pwbCEAtW+VpNNNBI1M7/EXv8cx/gUDTrZ1RediG+v34n7fWDNqYxRAM=
+	t=1744826618; cv=none; b=tOryEFYqnBoT+zhix5LPmQdaX0h7DZI4S9pZpo/jWwkqWv9xb1TIkF+KWUapryewVpyb1ladd6GliHS0LQ0SP3N1YBoT+QvYtjlW1EyAzZpyUXpTvzP9qOBSM671UiEUah/sof+CkFJgqQMUqm1njNJ/ANb+Oh0rqRxboJpH2v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744826573; c=relaxed/simple;
-	bh=VbyjV1xV3keb5zHv6u5VS//P+QDhOb2P56UX/HT/MQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QPEsqqcGPDlXMnLwfdZlrCr46+rAxCHeD+N0iESSqyOmi9mvVeQCe4zq9+MbnCqrJqQWo4LjTB8vdkhj8XnAO1lEvxWRMJqM/VpRH0047FIL93h7Sr+XDlW9LD1OwEiVLPbD1/ZEMAK1gNQzYA6e3orNcFJSEyPFol4+DKylEU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bZLxmOyZ; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744826568;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=N0wICEPxoKXEmipCZYFaxtgePit0HW271+fFL4AOW2o=;
-	b=bZLxmOyZSqJIgeH3b8E/IhKnLdC5mDVuFbevye1u2CDLkg4g8giv0pPSr3rix5NVguurWY
-	++44wvKJt2GnLxbqKR0RFVhr3B/F8xJoFTWYCIRdighAPedcQfvfIuy/wlBu8S2bmXe+sY
-	NCjFH85QUZAtGGci4kR+Mi1fw+cGBng=
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1744826618; c=relaxed/simple;
+	bh=JXXLstJzDc6pB6ceGZw9Ys0bNMB2Sx221nOmuQMp/Ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kpzVe94O84GLj95mg1IIx3zKMiNcZgCMO8vuzW1VDOfgOe67KFRZ4+bafIDsKTkhzPbRjSVDCvJhld3O71ZkHtXhwMbT/+4Ng7/r39zK34RHk4pVQ+jgV0R+h/R2pw3U0CKVeqUbCtXxYOU/9cLHfi6ptCDo7Z3Tvi4eMKJOiUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OH6qEwFH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NJezJ3JKJn/lT7bV9zFqb3A9+YwgHaor3OWOH2QhrfY=; b=OH6qEwFHc99Ha7JqwKv7jMP/VA
+	I+OxXNDjHtKYzKMGYs/zxhUe0+ZWnqGJ3zNiAOihoC2jTDMThgiHTw/CTK5z2Ek53gqxTw0/s/dZo
+	uXyj4Qc3NPwaUN392Mhj+9rsbliM7UnI+NhBxZQP+6ztCGKnMGy/ao+69nciB7cP7/Wq4Rkjmi0gA
+	U+aPBkgQKOP9gB4lpCkBPoTe2Jhnjw4V2BKwaitBzQ29vdyQsAJPMs1aKscY52Dh1w7kEcMnUcH+l
+	ZYX/zldrDIY2Zq+zD0eNlVoXMVe80MJ8dGH1NrTgj+qKKmNm0mEAy3h9H9qk/yl66JJr1zhLxSpKZ
+	yefTPZ7w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57022)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u576b-0001lk-0h;
+	Wed, 16 Apr 2025 19:03:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u576W-0001bU-1K;
+	Wed, 16 Apr 2025 19:03:20 +0100
+Date: Wed, 16 Apr 2025 19:03:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>
-Subject: [PATCH] memcg: multi-memcg percpu charge cache
-Date: Wed, 16 Apr 2025 11:02:29 -0700
-Message-ID: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/3] net: stmmac: call phylink_start() and
+ phylink_stop() in XDP functions
+Message-ID: <Z__w52jL05YbqSTW@shell.armlinux.org.uk>
+References: <Z/ozvMMoWGH9o6on@shell.armlinux.org.uk>
+ <E1u3XG6-000EJg-V8@rmk-PC.armlinux.org.uk>
+ <20250414174342.67fe4b1d@kernel.org>
+ <Z_4s5DmCPKB8SUJv@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_4s5DmCPKB8SUJv@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Memory cgroup accounting is expensive and to reduce the cost, the kernel
-maintains per-cpu charge cache for a single memcg. So, if a charge
-request comes for a different memcg, the kernel will flush the old
-memcg's charge cache and then charge the newer memcg a fixed amount (64
-pages), subtracts the charge request amount and stores the remaining in
-the per-cpu charge cache for the newer memcg.
+On Tue, Apr 15, 2025 at 10:54:44AM +0100, Russell King (Oracle) wrote:
+> On Mon, Apr 14, 2025 at 05:43:42PM -0700, Jakub Kicinski wrote:
+> > IIUC this will case a link loss when XDP is installed, if not disregard
+> > the reset of the email.
+> 
+> It will, because the author who added XDP support to stmmac decided it
+> was easier to tear everything down and rebuild, which meant (presumably)
+> that it was necessary to use netif_carrier_off() to stop the net layer
+> queueing packets to the driver. I'm just guessing - I know nothing
+> about XDP, and never knowingly used it.
+> 
+> > Any idea why it's necessary to mess with the link for XDP changes?
+> 
+> Depends what you mean by "link". If you're asking why it messes with
+> netif_carrier_foo(), my best guess is as above. However, phylink
+> drivers are not allowed to mess with the netif_carrier state (as the
+> commit message states.) This is not a new requirement, it's always
+> been this way with phylink, and this pre-dates the addition of XDP
+> to this driver.
+> 
+> As long as the code requires the netif_carrier to be turned off, the
+> only way to guarantee that in a phylink using driver is as per this
+> patch.
+> 
+> I'm guessing that the reason it does this is because it completely
+> takes down the MAC and tx/rx rings to reprogram everything from
+> scratch, and thus any interference from a packet coming in to be
+> transmitted is going to cause problems.
 
-This mechanism is based on the assumption that the kernel, for locality,
-keep a process on a CPU for long period of time and most of the charge
-requests from that process will be served by that CPU's local charge
-cache.
+I'd like the "what do you mean by link" clarified before I update the
+commit message.
 
-However this assumption breaks down for incoming network traffic in a
-multi-tenant machine. We are in the process of running multiple
-workloads on a single machine and if such workloads are network heavy,
-we are seeing very high network memory accounting cost. We have observed
-multiple CPUs spending almost 100% of their time in net_rx_action and
-almost all of that time is spent in memcg accounting of the network
-traffic.
+If you're referring to the carrier state via netif_carrier_off() /
+netif_carrier_on(), then nothing actually changes in that respect
+because the carrier manipulation is being done by the driver today,
+behind phylink's back. That changes to inside phylink with phylink's
+knowledge.
 
-More precisely, net_rx_action is serving packets from multiple workloads
-and is observing/serving mix of packets of these workloads. The memcg
-switch of per-cpu cache is very expensive and we are observing a lot of
-memcg switches on the machine. Almost all the time is being spent on
-charging new memcg and flushing older memcg cache. So, definitely we
-need per-cpu cache that support multiple memcgs for this scenario.
+It is my understanding that netif_carrier_off() / netif_carrier_on()
+get notified to userspace, so this is visible today when XDP changes.
 
-This patch implements a simple (and dumb) multiple memcg percpu charge
-cache. Actually we started with more sophisticated LRU based approach but
-the dumb one was always better than the sophisticated one by 1% to 3%,
-so going with the simple approach.
+If you are referring to the messages that appear on the kernel console,
+then yes, phylink will print those in addition, which actually makes
+it more consistent with what's being reported to userspace.
 
-Some of the design choices are:
+Depending which you are referring to changes what I should say in the
+commit message. E.g.
 
-1. Fit all caches memcgs in a single cacheline.
-2. The cache array can be mix of empty slots or memcg charged slots, so
-   the kernel has to traverse the full array.
-3. The cache drain from the reclaim will drain all cached memcgs to keep
-   things simple.
+"We retain the changes to carrier state, which are already being
+reported to userspace as link loss/link gain events, but we gain
+kernel messages reporting the link state."
 
-To evaluate the impact of this optimization, on a 72 CPUs machine, we
-ran the following workload where each netperf client runs in a different
-cgroup. The next-20250415 kernel is used as base.
+if you're referring to the carrier state. Or maybe:
 
- $ netserver -6
- $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
+"This change will have the side effect of printing link messages to
+the kernel log, even though the physical link hasn't changed state.
+This matches the carrier state."
 
-number of clients | Without patch | With patch
-  6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
-  12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
-  18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
-  24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
-  30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
-  36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
+if you're referring to the additional kernel messages.
 
-The results show drastic improvement for network intensive workloads.
-
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
----
- mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 91 insertions(+), 37 deletions(-)
-
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 1ad326e871c1..0a02ba07561e 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
- 	pr_cont(" are going to be killed due to memory.oom.group set\n");
- }
- 
-+#define NR_MEMCG_STOCK 7
- struct memcg_stock_pcp {
- 	local_trylock_t stock_lock;
--	struct mem_cgroup *cached; /* this never be root cgroup */
--	unsigned int nr_pages;
-+	uint8_t nr_pages[NR_MEMCG_STOCK];
-+	struct mem_cgroup *cached[NR_MEMCG_STOCK];
- 
- 	struct obj_cgroup *cached_objcg;
- 	struct pglist_data *cached_pgdat;
-@@ -1809,9 +1810,10 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
- 			  gfp_t gfp_mask)
- {
- 	struct memcg_stock_pcp *stock;
--	unsigned int stock_pages;
-+	uint8_t stock_pages;
- 	unsigned long flags;
- 	bool ret = false;
-+	int i;
- 
- 	if (nr_pages > MEMCG_CHARGE_BATCH)
- 		return ret;
-@@ -1822,10 +1824,17 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
- 		return ret;
- 
- 	stock = this_cpu_ptr(&memcg_stock);
--	stock_pages = READ_ONCE(stock->nr_pages);
--	if (memcg == READ_ONCE(stock->cached) && stock_pages >= nr_pages) {
--		WRITE_ONCE(stock->nr_pages, stock_pages - nr_pages);
--		ret = true;
-+
-+	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
-+		if (memcg != READ_ONCE(stock->cached[i]))
-+			continue;
-+
-+		stock_pages = READ_ONCE(stock->nr_pages[i]);
-+		if (stock_pages >= nr_pages) {
-+			WRITE_ONCE(stock->nr_pages[i], stock_pages - nr_pages);
-+			ret = true;
-+		}
-+		break;
- 	}
- 
- 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-@@ -1843,21 +1852,30 @@ static void memcg_uncharge(struct mem_cgroup *memcg, unsigned int nr_pages)
- /*
-  * Returns stocks cached in percpu and reset cached information.
-  */
--static void drain_stock(struct memcg_stock_pcp *stock)
-+static void drain_stock(struct memcg_stock_pcp *stock, int i)
- {
--	unsigned int stock_pages = READ_ONCE(stock->nr_pages);
--	struct mem_cgroup *old = READ_ONCE(stock->cached);
-+	struct mem_cgroup *old = READ_ONCE(stock->cached[i]);
-+	uint8_t stock_pages;
- 
- 	if (!old)
- 		return;
- 
-+	stock_pages = READ_ONCE(stock->nr_pages[i]);
- 	if (stock_pages) {
- 		memcg_uncharge(old, stock_pages);
--		WRITE_ONCE(stock->nr_pages, 0);
-+		WRITE_ONCE(stock->nr_pages[i], 0);
- 	}
- 
- 	css_put(&old->css);
--	WRITE_ONCE(stock->cached, NULL);
-+	WRITE_ONCE(stock->cached[i], NULL);
-+}
-+
-+static void drain_stock_fully(struct memcg_stock_pcp *stock)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_MEMCG_STOCK; ++i)
-+		drain_stock(stock, i);
- }
- 
- static void drain_local_stock(struct work_struct *dummy)
-@@ -1874,7 +1892,7 @@ static void drain_local_stock(struct work_struct *dummy)
- 
- 	stock = this_cpu_ptr(&memcg_stock);
- 	drain_obj_stock(stock);
--	drain_stock(stock);
-+	drain_stock_fully(stock);
- 	clear_bit(FLUSHING_CACHED_CHARGE, &stock->flags);
- 
- 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-@@ -1883,35 +1901,81 @@ static void drain_local_stock(struct work_struct *dummy)
- static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
- {
- 	struct memcg_stock_pcp *stock;
--	unsigned int stock_pages;
-+	struct mem_cgroup *cached;
-+	uint8_t stock_pages;
- 	unsigned long flags;
-+	bool evict = true;
-+	int i;
- 
- 	VM_WARN_ON_ONCE(mem_cgroup_is_root(memcg));
- 
--	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
-+	if (nr_pages > MEMCG_CHARGE_BATCH ||
-+	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
- 		/*
--		 * In case of unlikely failure to lock percpu stock_lock
--		 * uncharge memcg directly.
-+		 * In case of larger than batch refill or unlikely failure to
-+		 * lock the percpu stock_lock, uncharge memcg directly.
- 		 */
- 		memcg_uncharge(memcg, nr_pages);
- 		return;
- 	}
- 
- 	stock = this_cpu_ptr(&memcg_stock);
--	if (READ_ONCE(stock->cached) != memcg) { /* reset if necessary */
--		drain_stock(stock);
--		css_get(&memcg->css);
--		WRITE_ONCE(stock->cached, memcg);
-+	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
-+again:
-+		cached = READ_ONCE(stock->cached[i]);
-+		if (!cached) {
-+			css_get(&memcg->css);
-+			WRITE_ONCE(stock->cached[i], memcg);
-+		}
-+		if (!cached || memcg == READ_ONCE(stock->cached[i])) {
-+			stock_pages = READ_ONCE(stock->nr_pages[i]) + nr_pages;
-+			WRITE_ONCE(stock->nr_pages[i], stock_pages);
-+			if (stock_pages > MEMCG_CHARGE_BATCH)
-+				drain_stock(stock, i);
-+			evict = false;
-+			break;
-+		}
- 	}
--	stock_pages = READ_ONCE(stock->nr_pages) + nr_pages;
--	WRITE_ONCE(stock->nr_pages, stock_pages);
- 
--	if (stock_pages > MEMCG_CHARGE_BATCH)
--		drain_stock(stock);
-+	if (evict) {
-+		i = get_random_u32_below(NR_MEMCG_STOCK);
-+		drain_stock(stock, i);
-+		goto again;
-+	}
- 
- 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
- }
- 
-+static bool is_drain_needed(struct memcg_stock_pcp *stock,
-+			    struct mem_cgroup *root_memcg)
-+{
-+	struct mem_cgroup *memcg;
-+	bool flush = false;
-+	int i;
-+
-+	rcu_read_lock();
-+
-+	if (obj_stock_flush_required(stock, root_memcg)) {
-+		flush = true;
-+		goto out;
-+	}
-+
-+	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
-+		memcg = READ_ONCE(stock->cached[i]);
-+		if (!memcg)
-+			continue;
-+
-+		if (READ_ONCE(stock->nr_pages[i]) &&
-+		    mem_cgroup_is_descendant(memcg, root_memcg)) {
-+			flush = true;
-+			break;
-+		}
-+	}
-+out:
-+	rcu_read_unlock();
-+	return flush;
-+}
-+
- /*
-  * Drains all per-CPU charge caches for given root_memcg resp. subtree
-  * of the hierarchy under it.
-@@ -1933,17 +1997,7 @@ void drain_all_stock(struct mem_cgroup *root_memcg)
- 	curcpu = smp_processor_id();
- 	for_each_online_cpu(cpu) {
- 		struct memcg_stock_pcp *stock = &per_cpu(memcg_stock, cpu);
--		struct mem_cgroup *memcg;
--		bool flush = false;
--
--		rcu_read_lock();
--		memcg = READ_ONCE(stock->cached);
--		if (memcg && READ_ONCE(stock->nr_pages) &&
--		    mem_cgroup_is_descendant(memcg, root_memcg))
--			flush = true;
--		else if (obj_stock_flush_required(stock, root_memcg))
--			flush = true;
--		rcu_read_unlock();
-+		bool flush = is_drain_needed(stock, root_memcg);
- 
- 		if (flush &&
- 		    !test_and_set_bit(FLUSHING_CACHED_CHARGE, &stock->flags)) {
-@@ -1969,7 +2023,7 @@ static int memcg_hotplug_cpu_dead(unsigned int cpu)
- 	drain_obj_stock(stock);
- 	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
- 
--	drain_stock(stock);
-+	drain_stock_fully(stock);
- 
- 	return 0;
- }
 -- 
-2.47.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
