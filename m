@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-183112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F90FA8AE5A
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 05:10:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6C2A8AE5B
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 05:10:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFD9F3B0C3E
-	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:09:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0C217E997
+	for <lists+netdev@lfdr.de>; Wed, 16 Apr 2025 03:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB12227E87;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7EE227E90;
 	Wed, 16 Apr 2025 03:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEW1GjdV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SXnvyzUF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A8F1A83E5
-	for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 03:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9AB227E82;
+	Wed, 16 Apr 2025 03:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744772996; cv=none; b=O//CDnT9J01LcAxq9HFwDxkszEWA2H8RXxOHPLP9bwgduFLX+3PBrOZQ/Rbmzgj0VNsT2PcobgGXB1qQDEBdci+jffoAAyHpCjogrLbZulxWMi6NGuBRLVolPlO2l0HnOUX70ttrduWQht+alGipXWKa8vC2kyyxUS525en8o+0=
+	t=1744772996; cv=none; b=M9gC+U892Ar8eQffACtWy2jD2KAROFYTxyvtMhPsN6no44L8W4fVAKo79FGBPu6Jt4oUR66b0cz0S66TrVTBf5uvVZb3t5pIAD9o403wcReSQUGZ3RzlSIhw+cMQOyxjaOCehWlRc7hIQJSBIdDZ7OBJMLuwqlREhlxibUpGnf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744772996; c=relaxed/simple;
-	bh=b/6w5CTcAwCbDukkXfoQ7swoGmg617cjp5MeSUWWOH4=;
+	bh=pjwuOhl+6YnLRO0UJWY97LUYEwC0+mgIl+EW6AZdz3s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sBIH7/gHsc9NIHkEUMfULOQngKSUK1qMOON49Gc2uvAUZZNsUmYz4N+mqKVYYaVnXmzCkDI/AcQWVn1WZ6L0DuZtVPZLkoZWwdiEodcM+I2AXdkzWlSkyX5i5MaWw+sRc83MgZPYsEC4rI27XN3HYg8B8J2f2TqpYZpCB1O2gBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEW1GjdV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF42C4CEE7;
-	Wed, 16 Apr 2025 03:09:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qN2AxiOqTxsrqtpRKLgRyS3EIhadEq4oAlVfzryAwSbfeEEdQuuzPEt4jDskWm2t6+ktU1G6Yb8TzL0iZW+ssZesDSenwjO/ZOPJPkaA21ovx4GeHqSXN4gRSZFttwq0gc1U6NtSTTjWo3+QdWXitRXBP9KTPEr2b9A3F6rpt/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SXnvyzUF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF5FC4CEEB;
+	Wed, 16 Apr 2025 03:09:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744772994;
-	bh=b/6w5CTcAwCbDukkXfoQ7swoGmg617cjp5MeSUWWOH4=;
+	s=k20201202; t=1744772996;
+	bh=pjwuOhl+6YnLRO0UJWY97LUYEwC0+mgIl+EW6AZdz3s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eEW1GjdVcFJNFZW7VWUQfiAnjy1xiVfCBSoBLegVuYeM7i83uEHl18OAmJlJ90YSv
-	 B9lGSApIHvAsRc4u1thaucoztXDcy4PTL/mj8WmecXd9S0gk5YKlKz3wFczP6gPStK
-	 nG6ddncTh0HRd/AJ9EGYTqi3HhYGyPMKe9wftK0N74fXVsSXOK+lKayUoPq4U7SehY
-	 RbPtx31R47nLjE3dc7q/MJLIDX/ORNBxpzL9Wg2ZfvbE4abZoSbzA2WMpJFdn5qMdr
-	 ue612qV6YvKygrkJBt4dkBog9CBBKz9+9IRwbX/V9wrzLJYyO81nVriwXRdh5g/6+n
-	 7q8r9V+MzBQYQ==
+	b=SXnvyzUF3PkfQxd3KY6C5nx9Z7fGtfz7q/PDdxxbjw0UC1s008kRVlDl93zijVNtA
+	 KVz7FG+RMh9Z+FXd6u2o4FJ7i1Vx9qOr8Q9FrUzagsh4mC3z/XoCahfxEzQyZgQkaA
+	 F5tmhBw0dvPPjwahH/qfPfHad7iBDEUFFELtlk4BhKk4XREv4aX33gHU2iHLY3ekOV
+	 L/V/ES9a7ozknm23AqcXMNmOGHjb+7R2AaLbwQF5nd08BfSGHLQnhYvp97rLZxaOni
+	 8hKQRVf3Fd3R39/lOf1iyezpfhCLKvE930/6mioecx1jyrhKv9LDbktKlG+L6FoTwP
+	 bnXBisWu2dbWw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFAA3822D55;
-	Wed, 16 Apr 2025 03:10:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F593822D55;
+	Wed, 16 Apr 2025 03:10:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] fib_rules: Fix iif / oif matching on L3 master device
+Subject: Re: [PATCH net v5] batman-adv: Fix double-hold of meshif when getting
+ enabled
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174477303277.2860234.12893331216079385181.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Apr 2025 03:10:32 +0000
-References: <20250414172022.242991-1-idosch@nvidia.com>
-In-Reply-To: <20250414172022.242991-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
- hanhuihui5@huawei.com
+ <174477303400.2860234.7904751019740013737.git-patchwork-notify@kernel.org>
+Date: Wed, 16 Apr 2025 03:10:34 +0000
+References: <20250414-double_hold_fix-v5-1-10e056324cde@narfation.org>
+In-Reply-To: <20250414-double_hold_fix-v5-1-10e056324cde@narfation.org>
+To: Sven Eckelmann <sven@narfation.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com,
+ syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com,
+ syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com,
+ syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com,
+ syzbot+f37372d86207b3bb2941@syzkaller.appspotmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 14 Apr 2025 20:20:20 +0300 you wrote:
-> Patch #1 fixes a recently reported regression regarding FIB rules that
-> match on iif / oif being a VRF device.
+On Mon, 14 Apr 2025 20:05:37 +0200 you wrote:
+> It was originally meant to replace the dev_hold with netdev_hold. But this
+> was missed in batadv_hardif_enable_interface(). As result, there was an
+> imbalance and a hang when trying to remove the mesh-interface with
+> (previously) active hard-interfaces:
 > 
-> Patch #2 adds test cases to the FIB rules selftest.
-> 
-> Ido Schimmel (2):
->   net: fib_rules: Fix iif / oif matching on L3 master device
->   selftests: fib_rule_tests: Add VRF match tests
+>   unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] net: fib_rules: Fix iif / oif matching on L3 master device
-    https://git.kernel.org/netdev/net/c/2d300ce0b783
-  - [net,2/2] selftests: fib_rule_tests: Add VRF match tests
-    https://git.kernel.org/netdev/net/c/f9c87590ed6a
+  - [net,v5] batman-adv: Fix double-hold of meshif when getting enabled
+    https://git.kernel.org/netdev/net/c/10a77965760c
 
 You are awesome, thank you!
 -- 
