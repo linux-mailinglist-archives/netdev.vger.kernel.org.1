@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-183876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CC9DA927B5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 20:28:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46077A92A0F
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 20:46:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9718F19E0EE5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:28:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29D7A3B0D83
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA02E25F78D;
-	Thu, 17 Apr 2025 18:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9626225485D;
+	Thu, 17 Apr 2025 18:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="waxSSg3n"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Pl1v8hDh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD35E2571D2;
-	Thu, 17 Apr 2025 18:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB613770B;
+	Thu, 17 Apr 2025 18:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744914204; cv=none; b=jXlW4EEsuTMTbhJzMIAEw7omAZjmq0Zk6tQ2VfJg3p0IpUCQAZBcgRiKMJGWa9BgFdkpH1pvFWZ1hyVy5kST1pzc6BUoZamihsNSYjB/OPAoCZ3eCLSn/lGCTSL9Y/x9lyhRJUtFZYECyISfzbQMg9Nw/N0EEl+3JhoSRswunB0=
+	t=1744915391; cv=none; b=NmkEzbcmGw8+p1CGZM5i741SOdXcRVgvY7If0WQja+dmFvLlwG0SGFhWN94d2srSoqGtELvw3QA/ADan3FcP5bGhg52cbyYE61yigeMlR3s94eR2G/6A8RKCpK0VaMIxqmHYHm19Um43YRk6H8ke82GDngTaB0KBtWOw594o9LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744914204; c=relaxed/simple;
-	bh=XZnshW4tv+N58qG6ypzEo+fFEIrhxB4RpLC6FPNdLzI=;
+	s=arc-20240116; t=1744915391; c=relaxed/simple;
+	bh=hDqF6dTxExQg9b3b60B6OeV2TZ32PrG2edBc5/LLV7c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KsWhh/82310GETp5+JdknSmiHxPdPtIqeECy9WSothY0vlUpHCGNdZfAXn5w9aYag/eQ/8RI5UD4spvmugW/rnPrG6CKf0zUa2KZQ9wr7GzeG7A2ZEdoSMCyQxKFoAuOcJABVpDVIter+xqBgMUXlM0dqZ0JSu5ZAwQqZ0enLz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=waxSSg3n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D0A7C4CEE4;
-	Thu, 17 Apr 2025 18:23:23 +0000 (UTC)
+	 MIME-Version; b=VsvJGNPVswwRPgmhgKrfDsuOEA1z1AD6D/6vLSfxicL44JImClHIgIGRkPjzpYhRcrGPKHRcUnCbDh9SKM1fx07V7hNFhS70IKJs6LSMAuwq3IqnJxc5NtiyNkHec0ayDkSGXGDhpPE0veH//X1bxdVqVIdDeW/aZ2bA4xV94Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Pl1v8hDh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CECBDC4CEE4;
+	Thu, 17 Apr 2025 18:43:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1744914204;
-	bh=XZnshW4tv+N58qG6ypzEo+fFEIrhxB4RpLC6FPNdLzI=;
+	s=korg; t=1744915391;
+	bh=hDqF6dTxExQg9b3b60B6OeV2TZ32PrG2edBc5/LLV7c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=waxSSg3nW846ot7lGhTu3TWWqWuelcudZM4GsYz4fg3Zj8sVycx2CbvAYouX47i5s
-	 ManY8EuT67/bZYxbNdDJ5jMfFRLrS3vu2+cukVRgdnysuClUYEBQvbzbFpa2q/8oPR
-	 +dV7ucGRZCc+aMaABQG6PEtCbyNL0/iSkWYl+Bfo=
+	b=Pl1v8hDhOz88R7ddcwC0HJzRbEuQJi0hcliyTkt3aaEgwAiz+uX7K2NGwQcmCanTH
+	 WK6l0S3Fp4V8QTdLFFcXxOb9eEVa0/Br4s4gJhG6RRt11Ku2uIxd9lUmlfZZd5pCp+
+	 P0fsD+pZM7JHk2hpkO94w9dnOv7lrJWJdAkvmg2c=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -50,12 +50,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	Oliver Neukum <oliver@neukum.org>
-Subject: [PATCH 6.13 113/414] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
-Date: Thu, 17 Apr 2025 19:47:51 +0200
-Message-ID: <20250417175115.982181781@linuxfoundation.org>
+Subject: [PATCH 6.12 112/393] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
+Date: Thu, 17 Apr 2025 19:48:41 +0200
+Message-ID: <20250417175112.090976268@linuxfoundation.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250417175111.386381660@linuxfoundation.org>
-References: <20250417175111.386381660@linuxfoundation.org>
+In-Reply-To: <20250417175107.546547190@linuxfoundation.org>
+References: <20250417175107.546547190@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.13-stable review patch.  If anyone has any objections, please let me know.
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
