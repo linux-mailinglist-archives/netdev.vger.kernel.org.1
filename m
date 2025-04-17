@@ -1,122 +1,190 @@
-Return-Path: <netdev+bounces-183614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F66A91491
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:00:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A53AA914A5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F78017D9C8
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 06:59:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6DD3B20E2
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D298A22332D;
-	Thu, 17 Apr 2025 06:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2559621D58F;
+	Thu, 17 Apr 2025 06:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0aTtXrv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jARW79Rp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D99223323
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 06:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CA521D011
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 06:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744873051; cv=none; b=SI/iJc70EFtQd6h0O8xGAvrv5E0CqIrA9qEuPGsE8tKyzSzEAlOs/1GhL8VZpsZt16tNVC0YGfxBHWIb4h+WwJTqVr4CQnv/n/IIQpCNBBTOjIsqi4xAtwdZ8NrAHuLDtVcJpnPQST9vH8tNlJdxX+eNhK3/E+n+0VKWXlFdzws=
+	t=1744873083; cv=none; b=qeNGHjrRPbQU2G2BgCgV6fgVh0tEvaDQ0neRhxVxSfrH1Z/qEiGVbZHbCAH25o8zNjMQXF0ZgKqrXAmM23CqZu3V7mcJ4mnK6qEXP9TAAimsZr9AFKIrKhFWOQgvnO6SK2FyrFyiyvFGWoHtf98gJfIDfHYd6kl5KElS86WR4ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744873051; c=relaxed/simple;
-	bh=jjODyzoHgOaSkMOizAfMka0/yn10076bTRY95dAS8m8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q157LE68VurGF/9eBoxgwPr/2Z/vDo+OlgjJEfn03ks5Zb3zYEkouxBnXo4ieQVLeip8yYteIBdBLw9rBpFmR5iAHluAkuBDEU8KvTnLMfeVhMSJcSI4CZAB+Q8Dy4zuulyiE/bZhkxP43H1RD7zIZSVA8/uPOLtEyUh7SFl8RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c0aTtXrv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744873048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jjODyzoHgOaSkMOizAfMka0/yn10076bTRY95dAS8m8=;
-	b=c0aTtXrvutl860470MPV/z/GeLwDm1Ax8S8u7g3PoGWkurxmWRh1PDayRou3Dwv8vRbgYI
-	whTNwoRNl30orJ2kpUuW6hvNgVZOU5OMK8G0hU2+mBcrIXNrbZnMsEnBQlevA1hr6uuyUW
-	m2ip6Z/eTkU/iGN2OR5S24pLvnuPU1Q=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-437-10hrynEsMFKorXATgZiOpw-1; Thu, 17 Apr 2025 02:57:27 -0400
-X-MC-Unique: 10hrynEsMFKorXATgZiOpw-1
-X-Mimecast-MFC-AGG-ID: 10hrynEsMFKorXATgZiOpw_1744873046
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39c184b20a2so192155f8f.1
-        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 23:57:27 -0700 (PDT)
+	s=arc-20240116; t=1744873083; c=relaxed/simple;
+	bh=mhEAq0m1xvN7q2dDhQg6t9qlEIRwcQcUSWfYwijYQPE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KviyvU7l+4XMifT0kc6my7Kbtu4EO5glnVagEo5YjKvUl3+m0ZSazPcU1fRrpPz9GP2tseqm3SSfALk+ViS5VJc7pMcXLz6nEFxZf3RolVSIpJSNbsT8T57WyfT0ApRqByqFPP5U620Xb9ZTOB6f1IN1DMcpmiQIXcbPzwX2Dds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jARW79Rp; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb1eso803422a12.0
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 23:58:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744873079; x=1745477879; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GH75KHFecluyByKmLplzLLaVbiqXvYH0Wz/IWG30DT8=;
+        b=jARW79RpRzH8rwiVK66s3dGt1skfECACodnLFDFZFFaDBgOSEwaOkYbHlIcQnRrOvy
+         8iq56YZ+V80gQ9iA24IioRIAdAObZqcydjIu8tjfq1fVvwg6oKNj4ezCPnUtSWENo8CW
+         tGtlX3QlCU/w8aACn0WH7mcQ+6JDeztAX08Q+L37Ts3MRXNLam1Tq+O0YBn6KyIxXze0
+         vQLPx1A+YUQ9U4Zh4nPSF7hfgcTpk7PwBJfyLAT5gIwXDUT9sB6qKOYkhSECdcpqUObq
+         NMksw+GX4mxpQwOIvx6RuB7hMv+HtXkiKH1rSGAEDLWpTOGqKaUAYzGf+V77Dlm3RP5P
+         SeRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744873046; x=1745477846;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jjODyzoHgOaSkMOizAfMka0/yn10076bTRY95dAS8m8=;
-        b=gov5kwZJqvNduW2HGL3No078yEYa8nHqo+d0+9KgxUIaUlpnilpce3bODdeAPwJd68
-         T9MdD+lGg6WQuPvhW40TWDSQ7bn4JN85X6ErxaNBNpDZqTjtQ5QC4Z7hB8cz4JtcTfZ7
-         W1hF/lIFEJjAPEOpaIPjS+XakWscOTngri0iK5htclwV+w2iBe5Kbs48vcAPtMzEhsQ0
-         A3cWQR0xsGkYw3xTFgVrfQs52TQjU0LTssq/xujuvozJMNfIzm10h56xFADL/OCU1lom
-         9qivj82/7u0tHCxxBmfPuDboxID1CGryubBrU5OlHrBJ2gJ+sEzBSq7jTSHwZd7TIVrO
-         0tQg==
-X-Gm-Message-State: AOJu0Yx9eDcSrjVuK/iNRkUNveD2geqQR1tjYQ05FJTNLUGJ6CpRapd0
-	atHnOfE+lKnHCRvntV9Fl548fydRXL3R+x4gIsAPJxnetzSDgK+iOnvYZuP3HV7ss4byf/MA6uM
-	s1wMxRnhoCKNyyIafoi/4feg3TgsjgM67Jm+Pq0oMd3EToUB06e1Nqw==
-X-Gm-Gg: ASbGncsUmfl892p71yshAXWEavbvRnbpFp8ucvALeRhYu4GS74TtjQBOn+8KuN7PF0g
-	6ybxggsLEZeFsdRlGNuxgKnFFG2/CNsrxfgnGX5vpluzlvtYmGGZ8PsMETqJygmlTDAlOkYw3Tm
-	NPR9VdAu6bd52L9Hc04wjC6MVN6x9sU7W56zl/JkR4dQ7jvrJb+5tuaLt+CQFeSg8pwNhKCCHnZ
-	57K4lmhNzWp3c1V+ciY7ZRoj4kNIbH4HnSnyW8wjQg9L7YIvLN6TZXx75oxhXcLtkTuzuiiB9MO
-	GI7v6gNbjfYGgycokoYpF77QMcoLYTBEzgk2+4AnXg==
-X-Received: by 2002:a5d:598e:0:b0:39e:e557:7d9 with SMTP id ffacd0b85a97d-39ee5b12f6amr4246225f8f.5.1744873046367;
-        Wed, 16 Apr 2025 23:57:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxeneD4PU1badohm8V9WmJtKj9YkZnOXQdqdLY0Y/Fs91DJ14HKRGByKHiwMz/4SXoc3HdGw==
-X-Received: by 2002:a5d:598e:0:b0:39e:e557:7d9 with SMTP id ffacd0b85a97d-39ee5b12f6amr4246204f8f.5.1744873046049;
-        Wed, 16 Apr 2025 23:57:26 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-55-253.dyn.eolo.it. [146.241.55.253])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf43ce3bsm19526728f8f.66.2025.04.16.23.57.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Apr 2025 23:57:25 -0700 (PDT)
-Message-ID: <67a977bc-a4b9-4c8b-bf2f-9e9e6bb0811e@redhat.com>
-Date: Thu, 17 Apr 2025 08:57:24 +0200
+        d=1e100.net; s=20230601; t=1744873079; x=1745477879;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GH75KHFecluyByKmLplzLLaVbiqXvYH0Wz/IWG30DT8=;
+        b=IcNuJi0Mxk5p/V2egRgz2GMP4f1ZbstIxbbhCIPsIPamNa3WbZDgjqOsrrQsXl2RHv
+         etOTaJ+oNB+CMs4H/iAT2MAhcDx4mP1GePDCTt4Apq3oOgrEro0FaL9QJZhTG1ku8AVg
+         OeHiz9Pqz39/iLe4bh2mALqO0ZbfWBtrDTPOMzD0nXMjAgsNwucTAtehnHmwidcG33FN
+         6KDgjwcv+kSDxhseeChlztNt4fEOXti+QKJlwYdxZAg8u8lWbtDu74MCtKuvWJE6haLd
+         9DtcZZTxsQLX0KKMa3UWHTBcI6cWej4Qur0EixRpnwmCDi9OPDAT+dWlj+EqcpzWB4k6
+         0Gkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfndnGF8/lYPCINofhfco6xwne0QMWoYyJqdkg6c/MchiYqdxRzxeB6vz95CMbs0ceQPx8wpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNZVZlRugni456QbxuB/F8e2OvsyC5SKiezRni52EEcLfmXYoQ
+	xv5+2z0eXp8l1QvEXgMAHHaD0kSc/Q11iGzhqRKVP8deWtdJ2w5yj+KqEfRik0TXcH3S75fYLSU
+	psTycC7yrYQ8HLjO8nj5qQcmZ3Uk=
+X-Gm-Gg: ASbGncvUr38QUlmXEk3zQq4O0tSfldp6DwGS/0oT1UCActYhSYYcq94SvOCcLyNsdPz
+	RzrdmAiKKLMq25iJ4z3zbpFQCQzy15Fme3cE4anoXDpJ32ZYa0WvCxk7UGhjPvvpqEHNaZiZmOP
+	ih8CctWPtjK0lsL4d6iQsS+8AH
+X-Google-Smtp-Source: AGHT+IFh4yOOI2vGQZZtA2Fw/BgTcLAKMk/ns7pNOqI1leNGSZaa95uJQ22wjFlwnloGe8yjBrK5Q9PU4miQTfZz8BU=
+X-Received: by 2002:a05:6402:1913:b0:5ee:498:7898 with SMTP id
+ 4fb4d7f45d1cf-5f4d18aff48mr1468374a12.17.1744873079099; Wed, 16 Apr 2025
+ 23:57:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] udp: Add tracepoint for udp_sendmsg()
-To: Breno Leitao <leitao@debian.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, kuniyu@amazon.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, yonghong.song@linux.dev,
- song@kernel.org, kernel-team@meta.com
-References: <20250416-udp_sendmsg-v1-1-1a886b8733c2@debian.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250416-udp_sendmsg-v1-1-1a886b8733c2@debian.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250415092417.1437488-1-ap420073@gmail.com> <CAHS8izMrN4+UuoRy3zUS0-2KJGfUhRVxyeJHEn81VX=9TdjKcg@mail.gmail.com>
+ <Z_6snPXxWLmsNHL5@mini-arch> <20250415195926.1c3f8aff@kernel.org>
+ <CAMArcTWFbDa5MAZ_iPHOr_jUh0=CurYod74x_2FxF=EAv28WiA@mail.gmail.com> <20250416173525.347f0c90@kernel.org>
+In-Reply-To: <20250416173525.347f0c90@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 17 Apr 2025 15:57:47 +0900
+X-Gm-Features: ATxdqUFkk_b8C_XCX9oOX72PmNEyDfRZjGzK2CxE2kavhWxCLX2wcZYzgvf_mPA
+Message-ID: <CAMArcTXCKA6uBMwah223Y7V152FyWs7R_nJ483j8pehJ1hF4QA@mail.gmail.com>
+Subject: Re: [PATCH net] net: devmem: fix kernel panic when socket close after
+ module unload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, Mina Almasry <almasrymina@google.com>, davem@davemloft.net, 
+	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org, asml.silence@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	skhawaja@google.com, simona.vetter@ffwll.ch, kaiyuanz@google.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/16/25 9:23 PM, Breno Leitao wrote:
-> Add a lightweight tracepoint to monitor UDP send message operations,
-> similar to the recently introduced tcp_sendmsg_locked() trace event in
-> commit 0f08335ade712 ("trace: tcp: Add tracepoint for
-> tcp_sendmsg_locked()")
+On Thu, Apr 17, 2025 at 9:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 17 Apr 2025 00:01:57 +0900 Taehee Yoo wrote:
+> > Thank you so much for a detailed guide :)
+> > I tried what you suggested, then I tested cases A, B, and C.
+> > I can't see any splats from lockdep, kasan, etc.
+> > Also, I checked that bindings are released well by checking
+> > /sys/kernel/debug/dma_buf/bufinfo.
+> > I think this approach works well.
+> > However, I tested this simply. So I'm not sure yet about race condition=
+.
+> > I need more tests targeting race condition.
+> >
+> > I modified the locking order in the netdev_nl_bind_rx_doit().
+> > And modified netdev_nl_sock_priv_destroy() code looks like:
+> >
+> > void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
+> > {
+> >         struct net_devmem_dmabuf_binding *binding;
+> >         struct net_devmem_dmabuf_binding *temp;
+> >         struct net_device *dev;
+> >
+> >         mutex_lock(&priv->lock);
+> >         list_for_each_entry_safe(binding, temp, &priv->bindings, list) =
+{
+>
+> Not sure you can "for each entry safe here. Since you drop the lock in
+> the loop what this helper saves as the "temp" / next struct may be
+> freed by the time we get to it. I think we need:
+>
+>         mutex_lock()
+>         while (!list_empty())
+>                 binding =3D list_first..
+>
+> >                 dev =3D binding->dev;
+> >                 if (dev) {
+>
 
-Why is it needed? what would add on top of a plain perf probe, which
-will be always available for such function with such argument, as the
-function can't be inlined?
+Thanks. I will try to use that you suggested.
 
-Thanks,
+> nit: flip the condition to avoid the indent
+>
+> but I think the condition is too early, we should protect the pointer
+> itself with the same lock as the list. So if the entry is on the list
+> dev must not be NULL.
 
-Paolo
+Yes, I think it would be okay to remove this condition.
 
+>
+> >                         netdev_hold(dev, &priv->dev_tracker, GFP_KERNEL=
+);
+>
+> I think you can declare the tracker on the stack, FWIW
+
+Okay, I will use stack instead.
+
+>
+> >                         mutex_unlock(&priv->lock);
+> >                         netdev_lock(dev);
+> >                         mutex_lock(&priv->lock);
+> >                         if (binding->dev)
+> >                                 net_devmem_unbind_dmabuf(binding);
+>
+> Mina suggests that we should only release the ref from the socket side.
+> I guess that'd be good, it will prevent the binding itself from going
+> away. Either way you need to make sure you hold a ref on the binding.
+> Either by letting mp_dmabuf_devmem_uninstall() be as is, or taking
+> a new ref before you release the socket lock here.
+
+Thanks Mina for the suggestion!
+What I would like to do is like that
+If binding->dev is NULL, it skips locking, but it still keeps calling
+net_devmem_unbind_dmabuf().
+Calling net_devmem_unbind_dmabuf() is safe even if after module unload,
+because binding->bound_rxq is deleted by the uninstall path.
+If bound_rxq is empty, binding->dev will not be accessed.
+The only uninstall side code change is to set binding->dev to NULL and
+add priv->lock.
+This approach was already suggested by Stanislav earlier in this thread.
+
+This is based on an inverse locking order from
+priv lock -> instance lock to instance lock -> priv lock.
+Mina, Stanislav, and Jakub, can you confirm this?
+
+>
+> >                         mutex_unlock(&priv->lock);
+> >                         netdev_unlock(dev);
+> >                         netdev_put(dev, &priv->dev_tracker);
+> >                         mutex_lock(&priv->lock);
+> >                 }
+> >         }
+> >         mutex_unlock(&priv->lock);
+> > }
 
