@@ -1,145 +1,221 @@
-Return-Path: <netdev+bounces-183597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92AC9A912B9
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:36:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C78BA912ED
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7CC5A165D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 05:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 160B7190692E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 05:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8141DF27F;
-	Thu, 17 Apr 2025 05:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6492A1E3DDE;
+	Thu, 17 Apr 2025 05:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVIVUQga"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VX1CNli6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BD41DED6F;
-	Thu, 17 Apr 2025 05:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38F71DF725
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 05:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744868190; cv=none; b=O7KLxucWWO/oYsJYcvIz3Nv8e8pRiEiK5cm3cHDhtCtye36aFTM2XxchXh5JY254idKWNnqhD+9gBwa0Mi1VPh0z4lKFHdErRklrlnxKqwoKtb3zxl7LpDDa07mANndNHTipLY7zKfmfBapflRKpweQaXPml8+XZomBgf+2MQXM=
+	t=1744868556; cv=none; b=Rye7wMgmoIi6aO5L63PtFQbD/26FXyEnoU74PSMM/ilxkIY/RYRdlSooTdfSo8MWjA/dgIVCidRlCz+IJ0vyZTT8+IhLTxjigfXksQ4hb5zfRx7kyIEHQ9Y7S2BbFYy+HOIFHyZgXgf5ECA838X8ff2sjnOyQit9XQAI7Awdzcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744868190; c=relaxed/simple;
-	bh=OS0b2KsauNvvGfkShk9mjUrLdvrCpTHIPPjb1jv7SNY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tqem9djKjRxKYqkNpHR82g5gVyfqKdhEscmEVBLu40r7RBbNZgeHbBkH90+kgXfy7M7ptj9kk0eI9027NTkVACa+FatyeAgppdCpoGslmTChfnRhd4QHouL4ukv95duAJXWpWDsW6/vjfG3KqYMK3/iHKMmlI2yiKh8iyDuci5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVIVUQga; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BCF8C4CEE4;
-	Thu, 17 Apr 2025 05:36:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744868190;
-	bh=OS0b2KsauNvvGfkShk9mjUrLdvrCpTHIPPjb1jv7SNY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pVIVUQgaKxIv4Vsg2DvnV8+yqDzspXRYYrI6prsA7A58vOzMEdcQ5blCfM3Dax/3f
-	 Br0c3U3D8QdIaWLRBlu/pGSVOVcvzmXEhjBu7UAOSMKeH62Qd8+JosyD/HCh+HVmWC
-	 QS/rBaL7MuqdLBH8icXBHN7zxFuBR3my4L4SgSkH0I+5c//XRM7tcf15QCkpzPgQ04
-	 /fs90d9RUD3xWIkeQtRlCF/U24GBA8zKKAJfNE7M5bj1sAatPGwlVWD/ERpdUGIlCs
-	 x8h5XTKlv9sC89IZRGWurswbuE0OQfVBckpjlaMsIf+GWiK69/NVR6Yf4YFu7BCPUl
-	 H2nHzjgxozELw==
-Message-ID: <8feea1ba-2d4a-4898-9882-cf3ec8b03852@kernel.org>
-Date: Thu, 17 Apr 2025 07:36:20 +0200
+	s=arc-20240116; t=1744868556; c=relaxed/simple;
+	bh=XpZS+lby2tKePQURWtRg1jTPKtFRwEIaSrI4eOcvF0E=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=OPVOrlFWahI+sDjiSeESDbrPVVTJJ+optNgR/HOOHd7XmugNFAKaPqRSZQCkOt6lYlCktnAOb5AYdUnNvnJAKOJhE4K7JM/Z1XREdp+N/nNlxKdmz+d7Gb2rYUu+kB9cM6FdXpxq/IgkTdOe93hK5lnmZ1Yo0dogvYWvqtzaE8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VX1CNli6; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so302952a91.1
+        for <netdev@vger.kernel.org>; Wed, 16 Apr 2025 22:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744868553; x=1745473353; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=u9vBZXXH5xklqqIAY+JM/BqTJHdsOIlWi5Ak9420uc0=;
+        b=VX1CNli6ZclCLbnnVlWm8M78h87U3+XeA/iy+M3uPVXtqTe1gEb8A2YzItXB1hZpTQ
+         zpDgQ9O64Hl6+zTLYqScurnSNjpPsm3G6V2dM7w5iPnC/bsAi/VWF5HWYfpNeHugNr8W
+         Ft+Crm5sUGRyKLsrvI60Nt7AbchzsN+a9aHYkuYGXhefuKF96d92mT3C7c7WbdFgwczb
+         NUiRdP6HQKyFipGo1nqYwZuDRdCD3dvCqSPyncxuA/I2Ci/H3nZaF5h8qCBJOEnwasfv
+         xKsm+1UCNOnB+FM0IGJR5XHNuBAyjggiVpI1Z0EtaatJJy5pcl90gHQv+0KDxn4BDqlZ
+         /8lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744868553; x=1745473353;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=u9vBZXXH5xklqqIAY+JM/BqTJHdsOIlWi5Ak9420uc0=;
+        b=LiNsGp1vJTv6o5MHuKDT6pABddKVfpG11otlgx7jqUPCud0FwGwEhKDX3xrGCmkDMA
+         sTIswaO7FajwBAokL4bEp3gz6MF79kXdNRdTRHvVCFVHY/wANIRU4l5qFnBTT1vtQ3mC
+         TV7/h5ThYAmFOdoVR2A/VmXpxKsNRE2Ojk/bcQV5fj2FnOf5TTy0Am8FFeYrPArOiBdY
+         843x8dX8hEDfsKz+LJlCuDYXHTjKIH18COC4HCIbcO7pN1Mcg1lrwSXhfw5ANC9mX+51
+         v9NmWAnVg+HnNfwvN1z+6zJree2ahX98laJcR4f7o3h7iDizbVg2p585hYMUcSBzI7VB
+         IM+A==
+X-Gm-Message-State: AOJu0YwYLwDw44GqR6E+248raVeeUP6SJvuGCYybbhUTpQOo3rQp0aKW
+	Eu6Tli2CeTWlSOr8gtO9CJDJTA2gI5/tAz0BrjPrjDPewqE9grW1nynEXv1VD8RcOnqyVAMdE5P
+	KMST1AiQv4FR5EvnrNv6T9lnmyR0bFb+q
+X-Gm-Gg: ASbGncuP0QLQrxzisrz/jWGcTIYwVTdEG2bZfzG1xJ9CqUFQvve4CCvxKV49xG5wYew
+	84DARjeY70maQAbk0h61p9WUS14JIbngnhy+/rLQzmWbIxTB9r2BJpSutCQ/EEOBLOZdYk1WxZQ
+	nJ6IX0yV/E5kpu8J/cL0odH7kFj0glgjBe5RyBO5CjMxok4zxICDZGiPpF
+X-Google-Smtp-Source: AGHT+IFbufaKsW8u3/j0RsM0jF8acq0+tyKV+9CA0Dd/i1FqbL2uw4LLo+DyjUG2huxNEWfWMq0iuWW+FE2j4XV1E/I=
+X-Received: by 2002:a17:90b:534d:b0:2ff:7b28:a519 with SMTP id
+ 98e67ed59e1d1-30864172548mr6876272a91.30.1744868553322; Wed, 16 Apr 2025
+ 22:42:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/13] ARM: dts: vt8500: Add VIA APC Rock/Paper board
-To: Alexey Charkov <alchark@gmail.com>, Andi Shyti <andi.shyti@kernel.org>,
- Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Ulf Hansson <ulf.hansson@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mmc@vger.kernel.org, netdev@vger.kernel.org, linux-pwm@vger.kernel.org
-References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
- <20250416-wmt-updates-v1-12-f9af689cdfc2@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250416-wmt-updates-v1-12-f9af689cdfc2@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: SIMON BABY <simonkbaby@gmail.com>
+Date: Wed, 16 Apr 2025 22:42:21 -0700
+X-Gm-Features: ATxdqUER0hYodlt7RRRv9bfQNdF97WT7WI4UXBlMepp9bNniGJ3ZH8a1gy9Crzk
+Message-ID: <CAEFUPH2HVZDxLmhqfmiGnFt15KnhpWwRVswMzmTDxY7-zBub2Q@mail.gmail.com>
+Subject: query on hostapd
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 16/04/2025 10:21, Alexey Charkov wrote:
-> diff --git a/arch/arm/boot/dts/vt8500/Makefile b/arch/arm/boot/dts/vt8500/Makefile
-> index 255f4403af91c1d6a22416ab694b8eab44bf98a2..c5a2e57d53af4babe40fe2d79b2f8d9c1ae1b8db 100644
-> --- a/arch/arm/boot/dts/vt8500/Makefile
-> +++ b/arch/arm/boot/dts/vt8500/Makefile
-> @@ -4,4 +4,5 @@ dtb-$(CONFIG_ARCH_VT8500) += \
->  	wm8505-ref.dtb \
->  	wm8650-mid.dtb \
->  	wm8750-apc8750.dtb \
-> -	wm8850-w70v2.dtb
-> +	wm8850-w70v2.dtb \
-> +	wm8950a-apc-rock.dtb
-> diff --git a/arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts b/arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..58b3c8deb4f20ae072bf1381f1dfa5e5adeb414a
-> --- /dev/null
-> +++ b/arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts
-> @@ -0,0 +1,21 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
+Hello team,
+
+I have an issue with hostapd on bridge vlan interface (with marvel DSA ports)
+
+I have a linux bridge interface br0.50 (created using bridge vlan
+filtering with br0 as master bridge) with ports lan1, lan2 and lan5
+(DSA enumerated ports)
+
+br0.50 have an IP address 192.168.50.2/24. The DHCP range for the
+clients is 192.168.50.1 to 192.168.50.100.
+
+Radius server is running on IP 10.20.0.1/24 and lan4 is connected to
+the radius server. lan4 is a member of  br0.40 with IP address
+10.20.0.2/24.
+
+A laptop with client certs is connected to lan3.
+                                                        lan4
+radius server-----------------------------br0.40-----hostapd----lan5----------------------------------------client
+10.20.0.1                                         10.20.0.2
+      br0.50  192.168.50.2
 
 
-Odd license, we don't do GPL v4 in the kernel. We do however dual
-license for bindings and DTS. Why choosing such license? Did you take
-the code from somewhere?
+My hostapd configuration is below:
 
 
-Best regards,
-Krzysztof
+
+oot@sama7g5ek-tdy-sd:~# cat /etc/hostapd.conf
+
+##### hostapd configuration file ##############################################
+
+# Empty lines and lines starting with # are ignored
+
+
+
+# Example configuration file for wired authenticator. See hostapd.conf for
+
+# more details.
+
+
+interface=br0.50
+
+driver=wired
+
+logger_stdout=-1
+
+logger_stdout_level=0
+
+logger_syslog=-1
+
+logger_syslog_level=2
+
+
+
+ieee8021x=1
+
+eap_reauth_period=3600
+
+ap_max_inactivity=86400
+
+
+
+#use_pae_group_addr=1
+
+
+
+
+
+##### RADIUS configuration ####################################################
+
+# for IEEE 802.1X with external Authentication Server, IEEE 802.11
+
+# authentication with external ACL for MAC addresses, and accounting
+
+
+
+# The own IP address of the access point (used as NAS-IP-Address)
+
+#own_ip_addr=127.0.0.1
+
+
+
+# Optional NAS-Identifier string for RADIUS messages. When used, this should be
+
+# a unique to the NAS within the scope of the RADIUS server. For example, a
+
+# fully qualified domain name can be used here.
+
+#nas_identifier=hostapd.teledyne.com
+
+
+
+# RADIUS authentication server
+
+auth_server_addr=10.20.0.1
+
+auth_server_port=1812
+
+auth_server_shared_secret=test123
+
+
+
+
+
+# Enable CRL verification.
+
+# Note: hostapd does not yet support CRL downloading based on CDP. Thus, a
+
+# valid CRL signed by the CA is required to be included in the ca_cert file.
+
+# This can be done by using PEM format for CA certificate and CRL and
+
+# concatenating these into one file. Whenever CRL changes, hostapd needs to be
+
+# restarted to take the new CRL into use.
+
+# 0 = do not verify CRLs (default)
+
+# 1 = check the CRL of the user certificate
+
+# 2 = check all CRLs in the certificate path
+
+check_crl=1
+
+
+I observed that with the above configuration, radius server is not
+receiving any packets ( interface=br0.50)
+If I change interface=lan5 in the hostapd.conf file, I can see radius
+server is receiving packets from hostapd.
+Do you know anything I need to change to work with the bridge vlan
+interface for hostapd ? My design is to have hostapd listen on
+multiple lan interfaces.
+How do we make sure that before the 802.1x authentication is completed
+DHCP packets are not going through? Is this handled by hostapd or do
+we need to manually change the port status or by iptables manually ?
+
+Looking forward to your help.
+
+
+Regards
+Simon
 
