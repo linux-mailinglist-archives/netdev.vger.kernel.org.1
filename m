@@ -1,161 +1,92 @@
-Return-Path: <netdev+bounces-183717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 816EEA91A8A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:20:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48555A91A88
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5F519E560D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:20:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AECDE5A7280
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6160623AE64;
-	Thu, 17 Apr 2025 11:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A1123A9A6;
+	Thu, 17 Apr 2025 11:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="PTv9lybV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JA8x/lHD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A008E23A991
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 11:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.133.245.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB0323A99F;
+	Thu, 17 Apr 2025 11:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744888798; cv=none; b=ZDSCsbHnhm5OaJwBARbop0yVfuOn4JyyekEqHurtgfbu/LsJKjbF+IRHHQ8zrWv3uci3Dt/gXPvcfWUwNRHZfZr99MzWaHh196AjB+HHB5ik6j0fHsSljZvml6pAkzw4ES4UDUJqcpYsN0vZMJT32Ab1D8wxCa7L6a13YbR/5zI=
+	t=1744888797; cv=none; b=m0p+hmsTBFSo8pnhIIAH+Xj4Nm95bFXXq+a3zt7mSdWWR1lIvOByJr4kIvGSj6Ti5jQ4yvOk4m4y066Z608qFIJnrxkH97ogX8FmSvvpZH84cKDc7Ykqhc24WSlzDRT10HnoUTqkg3RnV9TFclk7A+DvB+p0koUuA2sOfGRhDbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744888798; c=relaxed/simple;
-	bh=EaA/y+zhy5Or9j5JTA2kf0Ms6ZLviEs08ZXslBXBvVU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oXw7tSf6ZUzYWowW5kBHlI7eXIY9qYCOOVeBwnlA7m/hfa8RYm0FZQGbvSLA3+CeANHf9n3Gcq01tXy5tzZsinAr1GGNg9j/7Rc3k2Eqkxe0ReiF3LGb5evI53LJ8suwGCFPYlSLMRanyKtQ+lHZQxLN1XXDmDDuLsRPvxn8OQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru; spf=pass smtp.mailfrom=nppct.ru; dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b=PTv9lybV; arc=none smtp.client-ip=195.133.245.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nppct.ru
-Received: from mail.nppct.ru (localhost [127.0.0.1])
-	by mail.nppct.ru (Postfix) with ESMTP id 99FA51C0E85
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 14:19:50 +0300 (MSK)
-Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
-	reason="pass (just generated, assumed good)" header.d=nppct.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:to:subject:subject
-	:user-agent:mime-version:date:date:message-id; s=dkim; t=
-	1744888790; x=1745752791; bh=EaA/y+zhy5Or9j5JTA2kf0Ms6ZLviEs08ZX
-	slBXBvVU=; b=PTv9lybVRA2uUGNVgliJQYa0VIXftBqA7Zh9oRDcq/hGAvqAjTn
-	5cHE10vKiHQdgRmFOe8uUvTnqG3cGLOBrFv8i+oKkrFn2Mz8NqZlspOB4Ks0V0tz
-	BLA75hOoF4GoSY3t72OR/42+Mnf9ixEfOsLrH6uoYJiPEQwpXWji6aWc=
-X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
-Received: from mail.nppct.ru ([127.0.0.1])
-	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id XFy5ZZQlG8zU for <netdev@vger.kernel.org>;
-	Thu, 17 Apr 2025 14:19:50 +0300 (MSK)
-Received: from [172.16.0.185] (unknown [176.59.174.214])
-	by mail.nppct.ru (Postfix) with ESMTPSA id 750791C08C3;
-	Thu, 17 Apr 2025 14:19:37 +0300 (MSK)
-Message-ID: <ff6eed52-5f1f-4070-90dc-8cf057f35e41@nppct.ru>
-Date: Thu, 17 Apr 2025 14:19:36 +0300
+	s=arc-20240116; t=1744888797; c=relaxed/simple;
+	bh=NE5pT/y8MY+0VdoKpg7plUTLCtrjr+cP/H1ACYfg2+c=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MBUnv+VzkVZ3neMr2M4wkTMMjv13KjUfKUE1Ppnf84htJmkv0a4y+blBJui4RKwE5vNqKRIE+LlYeT9zaUF62glD0+o/oFTOXgNwFpzsABtMx6tKlK0Eh+e0wtxP25ITeW56LdGXF8twlsvLM6I6X2KJex74PcgltPDwrVTYRiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JA8x/lHD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B68FC4CEEA;
+	Thu, 17 Apr 2025 11:19:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744888797;
+	bh=NE5pT/y8MY+0VdoKpg7plUTLCtrjr+cP/H1ACYfg2+c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JA8x/lHDYRltmdceVJiaysjVGVEOOZbcIx4zoRWk/R1yT0+eKPDORfJ1WZ7oWYzFY
+	 rKLXCR4IENkBdFFBERmfI4hwq+DS6Px8VBXz1SUgNRerBU64V9Z1lm6zfFZ/tB4/ES
+	 hbGXg92EapzQBL7srrwnoqdO8f1GTyqHlEOXQ+A7FRF5oJ4ihfz750CPx22wwkpL0J
+	 ARb+DpKiahBQc/j7HSF9LHzuuZwxTCuxZcyPuCpJI6zOws/Z0tOaa6zDE7h31fDElJ
+	 gI5jqHVQ5mI5BnG+7+fHjO36KwMrDSekDLjTMYkwGRy6/aOVLzznDIpaFHSJGJCzEJ
+	 x/2mBVO5sNR/A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4C7380664C;
+	Thu, 17 Apr 2025 11:20:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] xen-netfront: handle NULL returned by
- xdp_convert_buff_to_frame()
-To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, xen-devel@lists.xenproject.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- lvc-project@linuxtesting.org, stable@vger.kernel.org
-References: <20250414183403.265943-1-sdl@nppct.ru>
- <20250416175835.687a5872@kernel.org>
- <fa91aad9-f8f3-4b27-81b3-4c963e2e64aa@nppct.ru>
- <0c29a3f9-9e22-4e44-892d-431f06555600@suse.com>
- <452bac2e-2840-4db7-bbf4-c41e94d437a8@nppct.ru>
- <ed8dec2a-f507-49be-a6f3-fb8a91bfef01@suse.com>
- <8264519a-d58a-486e-b3c5-dba400658513@nppct.ru>
- <4679ca25-572b-44aa-bc00-cb9dc1c0080c@suse.com>
-Content-Language: en-US
-From: Alexey <sdl@nppct.ru>
-In-Reply-To: <4679ca25-572b-44aa-bc00-cb9dc1c0080c@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2025-04-16
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174488883552.4039084.17774428301828701540.git-patchwork-notify@kernel.org>
+Date: Thu, 17 Apr 2025 11:20:35 +0000
+References: <20250416210126.2034212-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250416210126.2034212-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
+Hello:
 
-On 17.04.2025 13:23, Jürgen Groß wrote:
-> On 17.04.25 12:06, Alexey wrote:
->>
->> On 17.04.2025 11:51, Juergen Gross wrote:
->>> On 17.04.25 10:45, Alexey wrote:
->>>>
->>>> On 17.04.2025 10:12, Jürgen Groß wrote:
->>>>> On 17.04.25 09:00, Alexey wrote:
->>>>>>
->>>>>> On 17.04.2025 03:58, Jakub Kicinski wrote:
->>>>>>> On Mon, 14 Apr 2025 18:34:01 +0000 Alexey Nepomnyashih wrote:
->>>>>>>>           get_page(pdata);
->>>>>>> Please notice this get_page() here.
->>>>>>>
->>>>>>>>           xdpf = xdp_convert_buff_to_frame(xdp);
->>>>>>>> +        if (unlikely(!xdpf)) {
->>>>>>>> + trace_xdp_exception(queue->info->netdev, prog, act);
->>>>>>>> +            break;
->>>>>>>> +        }
->>>>>> Do you mean that it would be better to move the get_page(pdata) 
->>>>>> call lower,
->>>>>> after checking for NULL in xdpf, so that the reference count is 
->>>>>> only increased
->>>>>> after a successful conversion?
->>>>>
->>>>> I think the error handling here is generally broken (or at least very
->>>>> questionable).
->>>>>
->>>>> I suspect that in case of at least some errors the get_page() is 
->>>>> leaking
->>>>> even without this new patch.
->>>>>
->>>>> In case I'm wrong a comment reasoning why there is no leak should be
->>>>> added.
->>>>>
->>>>>
->>>>> Juergen
->>>>
->>>> I think pdata is freed in xdp_return_frame_rx_napi() -> __xdp_return()
->>>
->>> Agreed. But what if xennet_xdp_xmit() returns an error < 0?
->>>
->>> In this case xdp_return_frame_rx_napi() won't be called.
->>>
->>>
->>> Juergen
->>
->> Agreed. There is no explicit freed pdata in the calling function
->> xennet_get_responses(). Without this, the page referenced by pdata
->> could be leaked.
->>
->> I suggest:
->
-> Could you please merge the two if () blocks, as they share the
-> call of xdp_return_frame_rx_napi() now? Something like:
->
-> if (unlikely(err <= 0)) {
->     if (err < 0)
->         trace_xdp_exception(queue->info->netdev, prog, act);
->     xdp_return_frame_rx_napi(xdpf);
-> }
->
-> Juergen
->
-> P.S.: please don't use HTML in emails
+This pull request was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-I can't do this because xennet_xdp_xmit() can return a value > 0
+On Wed, 16 Apr 2025 17:01:25 -0400 you wrote:
+> The following changes since commit adf6b730fc8dc61373a6ebe527494f4f1ad6eec7:
+> 
+>   Merge tag 'linux-can-fixes-for-6.15-20250415' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can (2025-04-15 20:05:55 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-04-16
+> 
+> [...]
+
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2025-04-16
+    https://git.kernel.org/netdev/net/c/a43ae7cf5542
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
