@@ -1,163 +1,113 @@
-Return-Path: <netdev+bounces-183800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0732FA920D5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:07:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C24A920F4
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EC34188C76C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:07:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08B457B28B1
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9A324E01F;
-	Thu, 17 Apr 2025 15:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445D7253344;
+	Thu, 17 Apr 2025 15:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3oBwfDn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="H3yATVk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F57E2475C7
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 15:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEFB252909
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 15:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744902446; cv=none; b=ZgB/Slb9m5CLPQGtf9AlYgIoKJOqMGiGFXpx/n9e3Bi6xEOVH4M0gmhuYN/1QTgi74VxUodAdwsfSxoukR06Ws9qvofVADxD6lKQlLTleG0ctb+X7/vwZepNbLL4QhfEWbutGhIKEPMBWq/nLeymNNLLT/4p2ecmLSUqFWHEfcI=
+	t=1744902658; cv=none; b=UxpJdCqZDScQHptIjKNilgpdFEQbBHhjtlMJyoF2X1S3yr404/MLuXMet87BDLGHhH1qppY2qg9wUYyv1CoO2h+1hOaosceh4woHVLaP5m8kZcKznD26a7KvHR9OQAKJpAwqwry/xqcoHVjZIyt8U5S0gjpLjiJecXX4Xqj8VHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744902446; c=relaxed/simple;
-	bh=B7XexERuaMMMLPg8aDrwbEfwzYiQp47UuvLtUdrvycw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sOfs+bBunDKAfDlc37ZrFHCQb4ZUT2dkWpOF9slPxaJdLc+CBvkhpwseW6SR053W9aVX34OQQoLBKkoEAIbqmAFlEzvFnzQEs7kRw4hgImp6muoukGeP9Ji4qlPg9Sv1n1p6mMFEGUhEYifpMHrXI0LaZARQd7eawDhaNhWszBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H3oBwfDn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744902443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H0kdA5rFfxf/6wSGoecn+F+bnq14+8ogjP5bxs/pSuI=;
-	b=H3oBwfDnvl5GQG785nShH9I5fi36aiaiJPXnNlx0/oK5L+S5MTBtJurcyp8HB88/Rqop9x
-	IwmgqAFd3BEMlror7RNqNzeS5T1r7L9c/RjYU1B7iv7KKIWtGJNicIHMFIN1HDjriYutQL
-	kkKyEhaWwwHvmSTaZeowfkdoAtODS54=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-547-fCm0jeN6PkOUjWTAnvMrog-1; Thu,
- 17 Apr 2025 11:07:19 -0400
-X-MC-Unique: fCm0jeN6PkOUjWTAnvMrog-1
-X-Mimecast-MFC-AGG-ID: fCm0jeN6PkOUjWTAnvMrog_1744902436
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 504741800980;
-	Thu, 17 Apr 2025 15:07:16 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.64.251])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C9C319560A3;
-	Thu, 17 Apr 2025 15:07:13 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-  netdev@vger.kernel.org,  linux-rt-devel@lists.linux.dev,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Simon Horman <horms@kernel.org>,  Thomas
- Gleixner <tglx@linutronix.de>,  Eelco Chaudron <echaudro@redhat.com>,
-  Ilya Maximets <i.maximets@ovn.org>,  dev@openvswitch.org
-Subject: Re: [PATCH net-next v2 12/18] openvswitch: Move
- ovs_frag_data_storage into the struct ovs_pcpu_storage
-In-Reply-To: <867bb4b6-df27-4948-ab51-9dcc11c04064@redhat.com> (Paolo Abeni's
-	message of "Thu, 17 Apr 2025 10:01:17 +0200")
-References: <20250414160754.503321-1-bigeasy@linutronix.de>
-	<20250414160754.503321-13-bigeasy@linutronix.de>
-	<f7tbjsxfl22.fsf@redhat.com> <20250416164509.FOo_r2m1@linutronix.de>
-	<867bb4b6-df27-4948-ab51-9dcc11c04064@redhat.com>
-Date: Thu, 17 Apr 2025 11:07:11 -0400
-Message-ID: <f7t4iymg734.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1744902658; c=relaxed/simple;
+	bh=LiZgga9x8uNn0x7WdTDXbakOF44Ru5INCev66F2o+Dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JAsaq5LqmKVBDSY4L296UVe9Upfo5vlF2hb3YynJdvaeZC5HQDGJV0j6sMbUnQafvUAnZol9cvMDpczboQ5XyYN+QcbQrBoKow37ZpLjq2Fkp6gyWUpXQi4qnioaXC/o8JrSuFkQGDLTbJ/fwqqPAeTEgQ+PUI1l9oBBEDRRxWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=H3yATVk1; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-227b828de00so10634095ad.1
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 08:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1744902655; x=1745507455; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LiZgga9x8uNn0x7WdTDXbakOF44Ru5INCev66F2o+Dc=;
+        b=H3yATVk10aZqoRI+w4nNhDNAcSrm+D72kf09ipil/lhZBQVG98+L9kHkPcmnSnwazQ
+         2l2q7/rcLpNyHl7W14wjQCbWN87G0IAsm+Yej1cduBZyRY+bLzSw3rdEYxijZFieiE5K
+         4p9sZvZQrU1T5YW0n/Phw1rSXkT4kX9Je/Pl622+TtYHoFzbnncoMrFYet2UFNdX7dEZ
+         Kp5GDmv6d0PucyJocp1zYdAefTVH68d510dC+sFSGKo4O3dpzsf/SX5osPX6hm1NRhbn
+         mn8Q/7MwclR7BEHoMAaKF+jTuamIjIVUOtP2h2aefp90oQRbxnCBj4UUds3GxtLFjNgk
+         ZaBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744902655; x=1745507455;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LiZgga9x8uNn0x7WdTDXbakOF44Ru5INCev66F2o+Dc=;
+        b=gmtghVKCYy6fy4RfMbpCD6Q7liGGZiefAPWhaRSJfba58xI2H3j65FjknTLnnEXOSH
+         UWssr5EzM5qm+syJBR6H2QjbThTsdKu3+rKA/51Sm4I+HLUH1rfAWqXBlDHNwBddQS2A
+         5UXwzWGdEVZF+va4Q1u4PCezzIZQCHTTYJgIzBfVZM1kPPVSk/MrwcXOkz3NiMQX23SQ
+         N7FC4QszxjyIOUpntKDd5wKdmB2FS1J16sX7a8IELDnc6p4/bAlsivObHTD2cxg26g3R
+         4AABm9j/mPLcq/06s/zakBkxf3gjkpIwu1DJVFvE/b5RrfSCWT4K4rSyGuammog4L4jX
+         j6IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPuCyNP7KgC4PEBB1KNs5vVnsGP9bIwOndJy3FHXe0pRMj/QOEUwn1L3Gt7MqhSRy8JLqgtL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR9DMf8p6wHAjczAdzZc8zJwwYWLWy6AUpBc5p+vgna93X+/kn
+	Flb453P4ipquylVJG19GnSZXaeIEs4Caj8kR1ZgWueG9EwBcWWv24OtosHJc060=
+X-Gm-Gg: ASbGnctGWWb7fF/XaLg9FYFyQO5D2SNVikOcVXXL4HaSYeJJNFd3ZI1bKVgn5QTz4+m
+	Y07q4TvC6Y2gvRTo0RSX/dwbsOLA8Xq6UHsqF4bdiDnpIQ+wbMNoQkC4x6AebqtOoAX/vDGi8Ul
+	MmH4s3wrueay7QS2QFcCCHSr0vykut4XoUylBgGItMDg7AbsAu+7Ib+ZkeZQA7UNyese8V3WbRK
+	EgYmJLY0DBc6WOemacgmidlWkO2HgGmVHOQJIMkzfwetcAbHDtyRPMsNTTbZVN6krLd5nzUKVF2
+	nHo+g76rMidx60L89Ri6W9mRX1RAztkm1k8Jn7Pij4f1Yz6qAwQxRr2LtVZ6Au0Y4Jn4heZoNz4
+	aOwKekYZzcoTi1/Vj
+X-Google-Smtp-Source: AGHT+IHIP5FBpE6QRyj07ov+jrBL6Cb9idEsBOVjWQ1/IColpF0qdvEnnkroDFpHC82/JIDmUgRLTQ==
+X-Received: by 2002:a17:902:f642:b0:220:c813:dfd1 with SMTP id d9443c01a7336-22c359734c3mr102186955ad.36.1744902655602;
+        Thu, 17 Apr 2025 08:10:55 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd21c210esm12348763b3a.41.2025.04.17.08.10.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 08:10:55 -0700 (PDT)
+Date: Thu, 17 Apr 2025 08:10:53 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ kent.overstreet@linux.dev, brett.creeley@amd.com,
+ schakrabarti@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+ ssengar@linux.microsoft.com, rosenp@gmail.com, paulros@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: mana: Add sched HTB offload support
+Message-ID: <20250417081053.5b563a92@hermes.local>
+In-Reply-To: <1744876630-26918-3-git-send-email-ernis@linux.microsoft.com>
+References: <1744876630-26918-1-git-send-email-ernis@linux.microsoft.com>
+	<1744876630-26918-3-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Paolo Abeni <pabeni@redhat.com> writes:
+On Thu, 17 Apr 2025 00:57:09 -0700
+Erni Sri Satya Vennela <ernis@linux.microsoft.com> wrote:
 
-> On 4/16/25 6:45 PM, Sebastian Andrzej Siewior wrote:
->> On 2025-04-15 12:26:13 [-0400], Aaron Conole wrote:
->>> I'm going to reply here, but I need to bisect a bit more (though I
->>> suspect the results below are due to 11/18).  When I tested with this
->>> patch there were lots of "unexplained" latency spikes during processing
->>> (note, I'm not doing PREEMPT_RT in my testing, but I guess it would
->>> smooth the spikes out at the cost of max performance).
->>>
->>> With the series:
->>> [SUM]   0.00-300.00 sec  3.28 TBytes  96.1 Gbits/sec  9417             sender
->>> [SUM]   0.00-300.00 sec  3.28 TBytes  96.1 Gbits/sec                  receiver
->>>
->>> Without the series:
->>> [SUM]   0.00-300.00 sec  3.26 TBytes  95.5 Gbits/sec  149             sender
->>> [SUM]   0.00-300.00 sec  3.26 TBytes  95.5 Gbits/sec                  receiver
->>>
->>> And while the 'final' numbers might look acceptable, one thing I'll note
->>> is I saw multiple stalls as:
->>>
->>> [  5]  57.00-58.00  sec   128 KBytes   903 Kbits/sec    0   4.02 MBytes
->>>
->>> But without the patch, I didn't see such stalls.  My testing:
->>>
->>> 1. Install openvswitch userspace and ipcalc
->>> 2. start userspace.
->>> 3. Setup two netns and connect them (I have a more complicated script to
->>>    set up the flows, and I can send that to you)
->>> 4. Use iperf3 to test (-P5 -t 300)
->>>
->>> As I wrote I suspect the locking in 11 is leading to these stalls, as
->>> the data I'm sending shouldn't be hitting the frag path.
->>>
->>> Do these results seem expected to you?
->> 
->> You have slightly better throughput but way more retries. I wouldn't
->> expect that. And then the stall.
->> 
->> Patch 10 & 12 move per-CPU variables around and makes them "static"
->> rather than allocating them at module init time. I would not expect this
->> to have a negative impact.
->> Patch #11 assigns the current thread to a variable and clears it again.
->> The remaining lockdep code disappears. The whole thing runs with BH
->> disabled so no preemption.
->> 
->> I can't explain what you observe here. Unless it is a random glitch
->> please send the script and I try to take a look.
->
-> I also think this series should not have any visible performance impact
-> on not RT OVS tests. @Aaron: could you please double check the results
-> (both the good on unpatched kernel and the bad with the series applied)
-> are reproducible and not due some glitches.
+> Introduce support for HTB qdisc offload in the mana ethernet
+> controller. This controller can offload only one HTB leaf.
+> The HTB leaf supports clamping the bandwidth for egress traffic.
+> It uses the function mana_set_bw_clamp(), which internally calls
+> a HWC command to the hardware to set the speed.
 
-I agree, it doesn't seem like it should.  I guess a v3 is coming, so I
-will retry with that.  I planned to ack 10/18 and 12/18 anyway; even
-without the lock restructure, it seems 'nicer' to have the pcpu
-variables in a single location.
-
-BTW, I am using a slightly modified version of:
-https://gist.github.com/apconole/ed78c9a2e76add9942dc3d6cbcfff4ca
-
-It sets things up similarly to an SDN deployment (although not perfectly
-since I was testing something very special at the time), and I was just
-doing netns->netns testing (so it would go through ct() calls but not
-ct(nat) calls).
-
-> @Sebastian: I think the 'owner' assignment could be optimized out at
-> compile time for non RT build - will likely not matter for performances,
-> but I think it will be 'nicer', could you please update the patches to
-> do that?
->
-> Thanks!
->
-> Paolo
-
+A single leaf is just Token Bucket Filter (TBF).
+Are you just trying to support some vendor config?
 
