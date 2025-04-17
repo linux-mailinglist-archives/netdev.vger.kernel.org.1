@@ -1,204 +1,198 @@
-Return-Path: <netdev+bounces-183625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4470A91548
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:32:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 849D5A91544
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44ABA5A1AA9
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:32:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA4225A031B
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE5A223705;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E9C21ABAC;
 	Thu, 17 Apr 2025 07:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QAphGrvB"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="SVxF1lQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B21521D599;
-	Thu, 17 Apr 2025 07:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2732122257F;
+	Thu, 17 Apr 2025 07:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744874986; cv=none; b=ixbL2zAWkQ5lksyS7v7IOEIlzMecFbQG0eIKqXjRNdrbSI0gxqMuwrb3Nd/VENnDnnoEICiwwLJb4YOWWT+9Z3UessbjZfO0NSu5A1cFCSivlTtQ9YZ0VZsN61tBLPkQ7P7TN/lGuGyjzdKqvq1OtkEgCERG2rhRdhypi01Z0JY=
+	t=1744874986; cv=none; b=qIaY3UmjNn47FS/DVsxLN9u8spK3YL/Mi54BVWfojN4VjYUtNzQ1GdDY9fWg8jGVMJraUDX2ZZ5jOjxRLO0d2p74i2Lcq8nhLM4MElJSAhdOMwyTlch9d8cQBQmD+Z6xO3CToKe6hLT9rSl+AWaVVktP2SuophdxcEIkn/YAj+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744874986; c=relaxed/simple;
-	bh=8TizWOwqu3GwN2fiGsHw8X4OMKIAXAGE1CXOpps+ka0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f/scuB5GseJzNA/Mgqhma93jVyGo5rH1K11OvcP8j1gbeAg48RSw6T/1OJ2yIw8UNrYVIxEa2gja7gVDB7kJv/4SSLbKKmwK+HZPcKoVD3LS+4X5P954+2OrMIJ4I7CFUlzdInfekFPIHD+Zr39HHIAvAgsRlZnybzdkHEeMQpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QAphGrvB; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7376dd56f8fso561702b3a.2;
-        Thu, 17 Apr 2025 00:29:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744874984; x=1745479784; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lJO7LyGExRfq4nKL5SVSlHdNbKD8n5gs12N9jLBapQU=;
-        b=QAphGrvBTit428FaKJPfaL3VfMQLv9HkiC1R9pITU2ZgCK6BHURrnwhs9mja2phxxq
-         CeVE+tBGc1JVlNzvHlcHCL231ZLxr3sKfr0URdZfVv0682Mn4D4dBfcrHtL7wqRyfg+p
-         30EoR8eZAdPt3cmY4qH6hsYIl5vFeuyclidBNHA7d8lKm+p8BDMq4Aziyfn4hqh7CzuX
-         AYvBx+CVk5OvJ81hmelQ+zZI/yvvSysgCRbRa14GgkbF8K6NlyDjX6GCxUXReaiX6FgS
-         8OB35kAtdcDP0ss6IedFHisV/Mhs/UQ1N8uelUlPYE985woIToGQHZ8oAhnN/d9HfAvf
-         YMdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744874984; x=1745479784;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lJO7LyGExRfq4nKL5SVSlHdNbKD8n5gs12N9jLBapQU=;
-        b=dbMfN1Beq4QrPJ0AAdLHEg2OmCv9kVlb8sP+CD+eWUVbYZ7O3eEK4o8F8UkAI6DZ8D
-         KdYWFBi6OVNyZA8cUdhRfiGhX2nEZwWPYUqCH34Z4A0k5N39B0S/2AGWlvocK/SwXm3N
-         zgfXWfFYlBRtkuS7GM43ptgui2LZ8W8CFKjUjs3yNR6H2DT2+qi6Biu1/CjxRpqF7Go0
-         K5ic59furKALyTfu1qvB54QRJe4un6vm5BfVQ/WA7q08NOgN7tLlXbY+twlclf0gqgub
-         f5ly6fVsxOEFIEAuDWNFkIhK/iJ9Mg/I8j2h2iGvdYaN9kuVoGtibP5/ftuVvOu824li
-         rtwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHh5rJfGCsVqWxW1KqerL4M+48hiR7z/jM49KeDQBn1XwXKYraAwWOinGD74j9XrKIspXTp8hx4Wdk2ndD@vger.kernel.org, AJvYcCXitdyxNBb4hUUmiTbOfSiq1+Fjroo19A0k5vvlP4z6wLY6TLjn4EvMvRkuo3CMhQ8jwc4=@vger.kernel.org, AJvYcCXydzeMs/Ggk5nzUg7rE0+pb7YSH6jdJuD+AVYQjjfyZ0yNZ6+cwOaMqmVR0NVjgUFVA45vUWZk@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT8It3L7xD3y3PpCHlMvX/gMDJ9brZCIkuaA2jNTiYXZjrC9vf
-	g2NXPiF6pLxw2Gi3yT57Kh1t7fuYq/9YMFz7OigIWEv/g/KiGHWF
-X-Gm-Gg: ASbGncvsHPh6DY4Wq/EK2ncVBLLYRlr4Ily+W7nbKbCaX+JqrnskNJDA5bCVpi/1het
-	E2Mh1ULGl2u5I5CsJJxpXe+5XBnDSonjgI+iMavuMdqh/C7enXQJt6YgHjIYmvFwWwzwL2mitUG
-	Ab4GFCkbA/3fhrFTh1C3/JI1XHE1xJ5egYHrgSlTTZVDOn4705FLNtHoOBfb8MOcfxgBdIUlaMp
-	EcydvqbqMekvEU45IvSFfyw4l5EPDUoXaWfBJRSEeP+w3BYYWTpXz4uboDiqxfe0DVrdCGyIQRu
-	yAbYp4VmaoxMJLsc0w2fMnNF4jAEXghz8MstbCnVWVpil3TRQKX2nWZL
-X-Google-Smtp-Source: AGHT+IGNH4XYkq81bCriDB/5ZWI5rMHEk/ZZFNYuEACnhmopqi5kSRd+SZ67knR5813pGgdy8GwUJQ==
-X-Received: by 2002:a05:6a00:2985:b0:736:bfc4:ef2c with SMTP id d2e1a72fcca58-73c264bf96amr7064882b3a.0.1744874984214;
-        Thu, 17 Apr 2025 00:29:44 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:ab45:ee9c:5719:f829])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-73bd22f0f3fsm11625344b3a.115.2025.04.17.00.29.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 00:29:43 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: virtualization@lists.linux.dev
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	bh=PuciJA/1VzUYYWM/dSmMyX1p0tlv0mS1Tnp3ikG3nB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jl5+yZ+f09/dwTf7jlL/o7xSCRuLODnaP9Bk33VfOQcHbA/HZhaNc4vMa1/+eyAlqvNWFDgSy3H2ynKZIYPifesU7AZxrCit/XsryanSRDZpEwt9R2IuPv86FqKHRMAY7X8k2voEzde+agkWuFBf3U6PCFq1b2HoNCeLZJIF3f8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=SVxF1lQV; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 8B5E321199C7; Thu, 17 Apr 2025 00:29:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8B5E321199C7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1744874983;
+	bh=Ih6u1qmnMix4sMgOGDS8Es/QJXFN+XfxYG1bS+em/K8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SVxF1lQVXD490/CYtPiLIT3l37PsSpkYbY0Hljk0wsasUb0hRGqEjqnWxo+9y12/H
+	 I9BSMicrSexTIDoMf8Fw6bD6+siZxvuoaVR1GaN6Zn4la8N9Ic28MMehPb4ntzwmeY
+	 jBzHo0Wztw3H96U/M/yPsBJo7pmBgpTO0NowG+fQ=
+Date: Thu, 17 Apr 2025 00:29:43 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-hyperv@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Shivamurthy Shastri <shivamurthy.shastri@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof Wilczy??ski <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH v4 4/4] selftests: net: add a virtio_net deadlock selftest
-Date: Thu, 17 Apr 2025 14:28:06 +0700
-Message-ID: <20250417072806.18660-5-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250417072806.18660-1-minhquangbui99@gmail.com>
-References: <20250417072806.18660-1-minhquangbui99@gmail.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH 1/2] PCI: hv: enable pci_hyperv to allow dynamic vector
+ allocation
+Message-ID: <20250417072943.GA20244@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1744817766-3134-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20250416183042.GA75515@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416183042.GA75515@bhelgaas>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-The selftest reproduces the deadlock scenario when binding/unbinding XDP
-program, XDP socket, rx ring resize on virtio_net interface.
+On Wed, Apr 16, 2025 at 01:30:42PM -0500, Bjorn Helgaas wrote:
+> [+to Thomas]
+> 
+> On Wed, Apr 16, 2025 at 08:36:06AM -0700, Shradha Gupta wrote:
+> > For supporting dynamic MSI vector allocation by pci controllers, enabling
+> > the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN is not enough, msix_prepare_msi_desc()
+> > to prepare the desc is needed. Export pci_msix_prepare_desc() to allow pci
+> > controllers like pci-hyperv to support dynamic MSI vector allocation.
+> > Also, add the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN and use
+> > pci_msix_prepare_desc() in pci_hyperv controller
+> 
+> Follow capitalization convention for subject line.  Probably remove
+> "pci_hyperv" since it already contains "PCI: hv" and add something
+> about MSI-X.
+> 
+> s/pci/PCI/
+> 
+> s/MSI vector/MSI-X vector/ since the context says you're concerned
+> with MSI-X.
+> 
+> This requires an ack from Thomas; moved him to "To:" line.
+>
+Thanks Bjorn. I will work on addressing these.
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- .../testing/selftests/drivers/net/hw/Makefile |  1 +
- .../selftests/drivers/net/hw/virtio_net.py    | 65 +++++++++++++++++++
- 2 files changed, 66 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/virtio_net.py
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 07cddb19ba35..b5af7c1412bf 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -21,6 +21,7 @@ TEST_PROGS = \
- 	rss_ctx.py \
- 	rss_input_xfrm.py \
- 	tso.py \
-+	virtio_net.py \
- 	#
- 
- TEST_FILES := \
-diff --git a/tools/testing/selftests/drivers/net/hw/virtio_net.py b/tools/testing/selftests/drivers/net/hw/virtio_net.py
-new file mode 100755
-index 000000000000..7cad7ab98635
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/virtio_net.py
-@@ -0,0 +1,65 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This is intended to be run on a virtio-net guest interface.
-+# The test binds the XDP socket to the interface without setting
-+# the fill ring to trigger delayed refill_work. This helps to
-+# make it easier to reproduce the deadlock when XDP program,
-+# XDP socket bind/unbind, rx ring resize race with refill_work on
-+# the buggy kernel.
-+#
-+# The Qemu command to setup virtio-net
-+# -netdev tap,id=hostnet1,vhost=on,script=no,downscript=no
-+# -device virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on
-+
-+from lib.py import ksft_exit, ksft_run
-+from lib.py import KsftSkipEx, KsftFailEx
-+from lib.py import NetDrvEnv
-+from lib.py import bkg, ip, cmd, ethtool
-+import re
-+
-+def _get_rx_ring_entries(cfg):
-+    output = ethtool(f"-g {cfg.ifname}").stdout
-+    values = re.findall(r'RX:\s+(\d+)', output)
-+    return int(values[1])
-+
-+def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
-+    # Probe for support
-+    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
-+    if xdp.ret == 255:
-+        raise KsftSkipEx('AF_XDP unsupported')
-+    elif xdp.ret > 0:
-+        raise KsftFailEx('unable to create AF_XDP socket')
-+
-+    try:
-+        xsk_bkg = bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} ' \
-+                      '{xdp_queue_id} -z', ksft_wait=3)
-+        return xsk_bkg
-+    except:
-+        raise KsftSkipEx('Failed to bind XDP socket in zerocopy. ' \
-+                         'Please consider adding iommu_platform=on ' \
-+                         'when setting up virtio-net-pci')
-+
-+def check_xdp_bind(cfg):
-+    ip(f"link set dev %s xdp obj %s sec xdp" %
-+       (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
-+    ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+def check_rx_resize(cfg, queue_size = 128):
-+    rx_ring = _get_rx_ring_entries(cfg)
-+    ethtool(f"-G %s rx %d" % (cfg.ifname, queue_size))
-+    ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
-+
-+def main():
-+    with NetDrvEnv(__file__, nsim_test=False) as cfg:
-+        try:
-+            xsk_bkg = setup_xsk(cfg)
-+        except KsftSkipEx as e:
-+            print(f"WARN: xsk pool is not set up, err: {e}")
-+
-+        ksft_run([check_xdp_bind, check_rx_resize],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.0
-
+Regards,
+Shradha. 
+> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > Reviewed-by: Long Li <longli@microsoft.com>
+> > ---
+> >  drivers/pci/controller/pci-hyperv.c | 7 +++++--
+> >  drivers/pci/msi/irqdomain.c         | 5 +++--
+> >  include/linux/msi.h                 | 2 ++
+> >  3 files changed, 10 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
+> > index ac27bda5ba26..f2fa6bdb6bb8 100644
+> > --- a/drivers/pci/controller/pci-hyperv.c
+> > +++ b/drivers/pci/controller/pci-hyperv.c
+> > @@ -598,7 +598,8 @@ static unsigned int hv_msi_get_int_vector(struct irq_data *data)
+> >  	return cfg->vector;
+> >  }
+> >  
+> > -#define hv_msi_prepare		pci_msi_prepare
+> > +#define hv_msi_prepare			pci_msi_prepare
+> > +#define hv_msix_prepare_desc		pci_msix_prepare_desc
+> >  
+> >  /**
+> >   * hv_arch_irq_unmask() - "Unmask" the IRQ by setting its current
+> > @@ -727,6 +728,7 @@ static void hv_arch_irq_unmask(struct irq_data *data)
+> >  #define FLOW_HANDLER		NULL
+> >  #define FLOW_NAME		NULL
+> >  #define hv_msi_prepare		NULL
+> > +#define hv_msix_prepare_desc	NULL
+> >  
+> >  struct hv_pci_chip_data {
+> >  	DECLARE_BITMAP(spi_map, HV_PCI_MSI_SPI_NR);
+> > @@ -2063,6 +2065,7 @@ static struct irq_chip hv_msi_irq_chip = {
+> >  static struct msi_domain_ops hv_msi_ops = {
+> >  	.msi_prepare	= hv_msi_prepare,
+> >  	.msi_free	= hv_msi_free,
+> > +	.prepare_desc	= hv_msix_prepare_desc,
+> >  };
+> >  
+> >  /**
+> > @@ -2084,7 +2087,7 @@ static int hv_pcie_init_irq_domain(struct hv_pcibus_device *hbus)
+> >  	hbus->msi_info.ops = &hv_msi_ops;
+> >  	hbus->msi_info.flags = (MSI_FLAG_USE_DEF_DOM_OPS |
+> >  		MSI_FLAG_USE_DEF_CHIP_OPS | MSI_FLAG_MULTI_PCI_MSI |
+> > -		MSI_FLAG_PCI_MSIX);
+> > +		MSI_FLAG_PCI_MSIX | MSI_FLAG_PCI_MSIX_ALLOC_DYN);
+> >  	hbus->msi_info.handler = FLOW_HANDLER;
+> >  	hbus->msi_info.handler_name = FLOW_NAME;
+> >  	hbus->msi_info.data = hbus;
+> > diff --git a/drivers/pci/msi/irqdomain.c b/drivers/pci/msi/irqdomain.c
+> > index d7ba8795d60f..43129aa6d6c7 100644
+> > --- a/drivers/pci/msi/irqdomain.c
+> > +++ b/drivers/pci/msi/irqdomain.c
+> > @@ -222,13 +222,14 @@ static void pci_irq_unmask_msix(struct irq_data *data)
+> >  	pci_msix_unmask(irq_data_get_msi_desc(data));
+> >  }
+> >  
+> > -static void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> > -				  struct msi_desc *desc)
+> > +void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> > +			   struct msi_desc *desc)
+> >  {
+> >  	/* Don't fiddle with preallocated MSI descriptors */
+> >  	if (!desc->pci.mask_base)
+> >  		msix_prepare_msi_desc(to_pci_dev(desc->dev), desc);
+> >  }
+> > +EXPORT_SYMBOL_GPL(pci_msix_prepare_desc);
+> >  
+> >  static const struct msi_domain_template pci_msix_template = {
+> >  	.chip = {
+> > diff --git a/include/linux/msi.h b/include/linux/msi.h
+> > index 86e42742fd0f..d5864d5e75c2 100644
+> > --- a/include/linux/msi.h
+> > +++ b/include/linux/msi.h
+> > @@ -691,6 +691,8 @@ struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
+> >  					     struct irq_domain *parent);
+> >  u32 pci_msi_domain_get_msi_rid(struct irq_domain *domain, struct pci_dev *pdev);
+> >  struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev);
+> > +void pci_msix_prepare_desc(struct irq_domain *domain, msi_alloc_info_t *arg,
+> > +			   struct msi_desc *desc);
+> >  #else /* CONFIG_PCI_MSI */
+> >  static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
+> >  {
+> > -- 
+> > 2.34.1
+> > 
 
