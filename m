@@ -1,181 +1,244 @@
-Return-Path: <netdev+bounces-183846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCF5A92381
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:09:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E996CA92390
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E616D465E4B
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C861B60BB5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299C1254AF9;
-	Thu, 17 Apr 2025 17:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88D82550C8;
+	Thu, 17 Apr 2025 17:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Xx2JT3sP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPkwScwO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D300253B59
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928EB186E2E;
+	Thu, 17 Apr 2025 17:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744909728; cv=none; b=dgmsog/R0hTCtkwxhPv1xcVpM6daUBQGDfOlwMxzA68VhZEaYw1F43vxKstmiwL+fooUvXAxCYgnYC7urG/3mopFZ4x8/j0cU0NtImgKnzTGr/1aarI/QciaqRJkhXHVP9cNea1hj3HV0tt9hXeKskNbWAiCTIkDzl7nMoMNMyo=
+	t=1744909983; cv=none; b=S/x3kPBccJi8d/lKAr6RHT6JaDRE4zC/ok5nC/rNVnCTg8gXPJOC18nbWf2BROl2g4dSZJtXj/EcVQN+ctj+5e+rSP142OninT7zzgsq+H7pjhMJCKyNfCFwUfYma/8euvDqg9fvNwAqHIovvdJ5CXhxfC5mTZoOUMR3eNi+C9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744909728; c=relaxed/simple;
-	bh=ySHRGF5C6pTpcOJLBOfIasrnNZGTkhtELQVssUU5/ls=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=KSRlYo1Qq5XgFtNqxjMcZh15cO6tKGGPUPZFdtOly4SL6ScuT3p0es4ebjm1Oi0Z8603JaLkoFnykHvwizQFbbgSIVW9UMWjvFL6bP5g4wK/cielAtc14XCNGfQdjTx8k4e8jvnwgKfgjTwgOtIu+eO3v+GBfN4Eb8Q30IfLAPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Xx2JT3sP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jQ2RDmpRxd/UlVEMitc8xfzDNE1izM57yeWpzmYqHf0=; b=Xx2JT3sPcKmxheT8VmOoRFY0SO
-	Z20onmT3xxDpfbYCjpMPkf6I7+S0PwdHWvboVfy+XgngP5vhKa7vq0BSA3ancFH6pWYmdNHP/+4Q9
-	eeTrddHNbC3o0eve5YljD8/Bd/ENrap542p4YdFB8OTinui5zGS47GHuPc0NRqmL3WB9z8HAsJ4US
-	G2DAoCAtABZ9Bb/7SVqTJIQnpazW64hslK9ng+NRCiosql4AzxfZ9/aStOVvVMgLBVG0+tiZNtT6s
-	aitgKGsq1izatjB5N1pLzOpnTYskaA4Wxif8wROjXzB4+YcJJce6XlQckF1TDQaYRv2Hjv1w69duS
-	WiL5crxw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:52332 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u5Sj2-0007fW-1E;
-	Thu, 17 Apr 2025 18:08:32 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u5SiQ-001I0B-OQ; Thu, 17 Apr 2025 18:07:54 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v3] net: stmmac: visconti: convert to
- set_clk_tx_rate() method
+	s=arc-20240116; t=1744909983; c=relaxed/simple;
+	bh=ze9golB+JCYX8yboRtMyVbur9ZOh65QOaNLGoUZZC00=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5XDOEqyKA9zZjtByn6eYcjGTdwRJL2Hbo9bUGz1LafAgIW4XF8WAnvvX5WSIyI+wrcBHCbn0lbrmEafxumueDyIjbR7wSbTBWJatUDvAO/9Qe+2MhPX3XIcf2mHfXlFDTgbNHSkxNL8WT7IZCrDaIb6H8PDnxa6CUqvezjCT1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hPkwScwO; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c55b53a459so94881885a.3;
+        Thu, 17 Apr 2025 10:13:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744909979; x=1745514779; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MalP9T0FOVBPSQ7hdLh//NHSp0ARkV8JPukt1uR1PUg=;
+        b=hPkwScwO/l1zPn+l0S5MZSdQqT+CKPECSQxw0HBAXCUSYfsKuBjHP9sTDSZNWFOZQD
+         8ATfafQYy4XOsvODr2ItrLRLSGcqZ3pUFZjUbwynFyqhTX4XyhwoJlxJ3G516Ei6ZkjA
+         GmBwi5kPtME5SktnT2/Qmoa7ZuWUZ1kQX9EBxbn20uiuYgZ8aENZ6C3zcZmGVqpcwGQv
+         0BCfxb+1sgsLsr59dOMEcDisVK2JAXoUA4H1P2CRdalW1t7RVb3yOqmP5252aSA/ZKvo
+         +eG0nqqVhDbJ949UbvqWlPj1fr1MfLv16ycmiaj/90xW7KbzOsry3xa6Hw7BIchfAzl3
+         v5yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744909979; x=1745514779;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MalP9T0FOVBPSQ7hdLh//NHSp0ARkV8JPukt1uR1PUg=;
+        b=dYbDfiz6IEzkFj4dFkTulqIbnzpe2rP/bVKzPmncvkyDIIUO5sLWyeeZRux26Zgaf8
+         2xS4O1k6ubdEAhx5DYXAMpgOcvtSheQwgqTWRzp5cZPoGgQG7ots/gVmkU16C+0h8hTJ
+         BWV9rSvrWg/08YHDYDGQfZ6BWwOINKw/7vzZz4GoZQbatBGGs9PkuXykf/A4w9cp8tRl
+         A/Jz19xnevRj4yg1qk2mPVOBcr69eJD4a8RDfVJM1VJTBWCNtN8DwKvxSAh0v+cJnU3a
+         txCgWJE1bJ+B5L3lf/S2sg6YSwUdbuPiTdq+aQDMxAOcOam15TTIJ/YVCoconTPZRebO
+         3RNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURlaUQ1iHJ3FZ7bN170DG18aTmLjoP+Ujrla2KblC9iPSxxBOE8cmu6yyCTL7J973cOsj5VKn4rdcX@vger.kernel.org, AJvYcCWLhzHHxSqfmEMQ1QMNsMiBNGtcJyG5KVldIKV4dbguYl3SU1wqi1vfyG2qlF36gjENJj8ODMX7XdI+Q9If@vger.kernel.org, AJvYcCWcjy+Cv3ALCdc/WnIQp9I/t7sjut+JHUwWpSQ7rgntpUqaZAxeSiQC0g/hH0iZSRQfrFVSyevS@vger.kernel.org, AJvYcCWv3Hfo9qDJz1sQk6JJ/bPchFbmkF+sF9g5HOXuqw6y2ziw8DkJijWAkJ5ebIFF68VwS3BilDEG/My+@vger.kernel.org, AJvYcCX10oApNiTaOsJd+RfTUIRJmuAqUV/eWheCsKXKzm5wHDl5gkP+YLuA4BDBvfiROiGTCXdRFNmq/smR6eg39Ig=@vger.kernel.org, AJvYcCXQ+ua4vuO3NQzKLYh8wKosgnKh0GcVI9mpTXINDoYzEwRMCpZkI00bQtzlJPewURciqsvg/st1ofPohAs=@vger.kernel.org, AJvYcCXp8RHT26cYx9smXODFYnWivF99Kjz7Do/PnyDyYfe5Yw3FQ/ZmklEQWLTlKNqRnyAcDei9nYjjL4iqYlWAQo0J@vger.kernel.org, AJvYcCXzr2IE5vuUiHGoYnXqqeEpd34f4RD8kNjdHuL2b1N4gBpCIrDp5+K7P3ZeKGlLM63DHAGp+NPOD6miow7+@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqsDSu3w7gBNY9AFpqid1L3ChXPEpKiK08TNgV6v/Tju6raMJ/
+	AhBZ+C/jesuN9y0FtT1hGsf/P0CepqyrelaUtLuei8rjcZMfgN3A
+X-Gm-Gg: ASbGnct+q7Fn/ym1QR1jthycJfnW6PlhLyckxYrdrc0k69l2EfdE8skaoXnlECArhY3
+	Cb/0wzyQEOpAtqqEfGYBmXgdbAJlvXCyRk+xdExZO1ttDmTDnuWb1uCBnFRZ62fYjDsZA58UNp0
+	vtAg4n47wsykQPNzl+JI4HmZsuAu9X+9TnBB788l5g0eZiFSMM9BvWTSnBC/Y/3S9u4c+RJO7p0
+	htNRsbKSVU060KtD/vGnwvb/NrQ/RCXCcsQtiuYvUZu3NIA39buKeQ9yTsGRLgV/VIGy5xGp75S
+	yqfdwW8NraocFdMdzQ5j4SIbCZlj7fmaOpgJjK2CJQQ2kyTxYhy/TwdmIiaPDUYUETXPSPyg4Cd
+	3Gx7R4ydkFfWMnpDsteVRzv1UY+Vw1TE=
+X-Google-Smtp-Source: AGHT+IE1U46a7zOOtONq+QwBpax7Ahpds1E61gFA8qmT13V9WuNjWi2ccq8I+2TPW5mk2fqOlsESrw==
+X-Received: by 2002:a05:620a:2409:b0:7c5:cdb5:271b with SMTP id af79cd13be357-7c918fec2d8mr831126785a.15.1744909979301;
+        Thu, 17 Apr 2025 10:12:59 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925a8d2bfsm12902585a.28.2025.04.17.10.12.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 10:12:58 -0700 (PDT)
+Message-ID: <6801369a.050a0220.2b2efe.0e72@mx.google.com>
+X-Google-Original-Message-ID: <aAE2lwwjI9Csr7Kq@winterfell.>
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id A85251200043;
+	Thu, 17 Apr 2025 13:12:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Thu, 17 Apr 2025 13:12:57 -0400
+X-ME-Sender: <xms:mTYBaKtPCX7hTJAXfh3Cy_qkehcb4j40eAV_zC-gJRP9srDYf0yGrw>
+    <xme:mTYBaPepJAsVpiQG0hAtgDrwnJZtShi6JOXMb13sfHgmD6jaupfXdsj1kd_B06aXE
+    UYozOVcM-GE8TOHAQ>
+X-ME-Received: <xmr:mTYBaFygZIhapB2yIA8EpcA9kTa7jOq8q2HtCt2e3PYuqyG3bdPJvIMuJB5itw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdelkeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegoufhushhpvggtthffohhmrghinhculdegledmnecujfgu
+    rhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhunhcuhf
+    gvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtthgv
+    rhhnpeekjefgudefhfeigffghfdtheeggfdtuddvkeejleffheeufeffteetvefgfeeuje
+    enucffohhmrghinhepghhithhhuhgsrdhiohenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrsh
+    honhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghn
+    gheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepge
+    ejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtrghmihhrugesghhmrghilhdr
+    tghomhdprhgtphhtthhopehmrghsrghhihhrohihsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilh
+    drtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthho
+    pegsjhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvg
+    hnnhhordhlohhsshhinhesphhrohhtohhnrdhmvgdprhgtphhtthhopegrrdhhihhnuggs
+    ohhrgheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:mTYBaFNbnly-XmcLgzboyy0blulaxf0g_gvx5OspvUJihMB5uzMr3A>
+    <xmx:mTYBaK84QRzrqbAEIeK_fit7VpwxMszuiY6oBiljD6osiizhHtkHhA>
+    <xmx:mTYBaNX47CQC2l341GOfs0S74VKiJamzlrjNck9b-e-ERxjmbDuOtw>
+    <xmx:mTYBaDfibi2GAvOragNKXULPCEIkgES2H3JOaJeBZwW64PWC01KaMA>
+    <xmx:mTYBaEeI2DwRz__Rqild4X0j7hF0LYyp_jEGBEtNDHFCuDTOSLYyo8y9>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 17 Apr 2025 13:12:56 -0400 (EDT)
+Date: Thu, 17 Apr 2025 10:12:55 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v9 2/6] rust: enable `clippy::ptr_cast_constness` lint
+References: <20250416-ptr-as-ptr-v9-0-18ec29b1b1f3@gmail.com>
+ <20250416-ptr-as-ptr-v9-2-18ec29b1b1f3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u5SiQ-001I0B-OQ@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 17 Apr 2025 18:07:54 +0100
+In-Reply-To: <20250416-ptr-as-ptr-v9-2-18ec29b1b1f3@gmail.com>
 
-Convert visconti to use the set_clk_tx_rate() method. By doing so,
-the GMAC control register will already have been updated (unlike with
-the fix_mac_speed() method) so this code can be removed while porting
-to the set_clk_tx_rate() method.
+On Wed, Apr 16, 2025 at 01:36:06PM -0400, Tamir Duberstein wrote:
+> In Rust 1.72.0, Clippy introduced the `ptr_cast_constness` lint [1]:
+> 
+> > Though `as` casts between raw pointers are not terrible,
+> > `pointer::cast_mut` and `pointer::cast_const` are safer because they
+> > cannot accidentally cast the pointer to another type.
+> 
+> There are only 2 affected sites:
+> - `*mut T as *const U as *mut U` becomes `(*mut T).cast()`
+> - `&self as *const Self as *mut Self` becomes
+>   `core::ptr::from_ref(self).cast_mut()`.
+> 
+> Apply these changes and enable the lint -- no functional change
+> intended.
+> 
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#ptr_cast_constness [1]
+> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+>  Makefile                        | 1 +
+>  rust/kernel/block/mq/request.rs | 4 ++--
+>  rust/kernel/dma.rs              | 2 +-
+>  3 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 5d2931344490..7b85b2a8d371 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -481,6 +481,7 @@ export rust_common_flags := --edition=2021 \
+>  			    -Aclippy::needless_lifetimes \
+>  			    -Wclippy::no_mangle_with_rust_abi \
+>  			    -Wclippy::ptr_as_ptr \
+> +			    -Wclippy::ptr_cast_constness \
+>  			    -Wclippy::undocumented_unsafe_blocks \
+>  			    -Wclippy::unnecessary_safety_comment \
+>  			    -Wclippy::unnecessary_safety_doc \
+> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+> index 4a5b7ec914ef..af5c9ac94f36 100644
+> --- a/rust/kernel/block/mq/request.rs
+> +++ b/rust/kernel/block/mq/request.rs
+> @@ -69,7 +69,7 @@ pub(crate) unsafe fn aref_from_raw(ptr: *mut bindings::request) -> ARef<Self> {
+>          // INVARIANT: By the safety requirements of this function, invariants are upheld.
+>          // SAFETY: By the safety requirement of this function, we own a
+>          // reference count that we can pass to `ARef`.
+> -        unsafe { ARef::from_raw(NonNull::new_unchecked(ptr as *const Self as *mut Self)) }
+> +        unsafe { ARef::from_raw(NonNull::new_unchecked(ptr.cast())) }
+>      }
+>  
+>      /// Notify the block layer that a request is going to be processed now.
+> @@ -155,7 +155,7 @@ pub(crate) fn wrapper_ref(&self) -> &RequestDataWrapper {
+>          // the private data associated with this request is initialized and
+>          // valid. The existence of `&self` guarantees that the private data is
+>          // valid as a shared reference.
+> -        unsafe { Self::wrapper_ptr(self as *const Self as *mut Self).as_ref() }
+> +        unsafe { Self::wrapper_ptr(core::ptr::from_ref(self).cast_mut()).as_ref() }
+>      }
+>  }
+>  
+> diff --git a/rust/kernel/dma.rs b/rust/kernel/dma.rs
+> index f395d1a6fe48..43ecf3c2e860 100644
+> --- a/rust/kernel/dma.rs
+> +++ b/rust/kernel/dma.rs
+> @@ -186,7 +186,7 @@ pub fn alloc_attrs(
+>              dev: dev.into(),
+>              dma_handle,
+>              count,
+> -            cpu_addr: ret.cast(),
+> +            cpu_addr: ret.cast::<T>(),
 
-There is also no need for the spinlock, and has never been - neither
-fix_mac_speed() nor set_clk_tx_rate() can be called by more than one
-thread at a time, so the lock does nothing useful.
+Is this change necessary? The rest looks good to me.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Acked-by: Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../ethernet/stmicro/stmmac/dwmac-visconti.c  | 25 +++++--------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
+Regards,
+Boqun
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index 33cf99797df5..5e6ac82a89b9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -51,21 +51,14 @@ struct visconti_eth {
- 	u32 phy_intf_sel;
- 	struct clk *phy_ref_clk;
- 	struct device *dev;
--	spinlock_t lock; /* lock to protect register update */
- };
- 
--static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
-+static int visconti_eth_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-+					phy_interface_t interface, int speed)
- {
--	struct visconti_eth *dwmac = priv;
-+	struct visconti_eth *dwmac = bsp_priv;
- 	struct net_device *netdev = dev_get_drvdata(dwmac->dev);
- 	unsigned int val, clk_sel_val = 0;
--	unsigned long flags;
--
--	spin_lock_irqsave(&dwmac->lock, flags);
--
--	/* adjust link */
--	val = readl(dwmac->reg + MAC_CTRL_REG);
--	val &= ~(GMAC_CONFIG_PS | GMAC_CONFIG_FES);
- 
- 	switch (speed) {
- 	case SPEED_1000:
-@@ -77,24 +70,19 @@ static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
- 			clk_sel_val = ETHER_CLK_SEL_FREQ_SEL_25M;
- 		if (dwmac->phy_intf_sel == ETHER_CONFIG_INTF_RMII)
- 			clk_sel_val = ETHER_CLK_SEL_DIV_SEL_2;
--		val |= GMAC_CONFIG_PS | GMAC_CONFIG_FES;
- 		break;
- 	case SPEED_10:
- 		if (dwmac->phy_intf_sel == ETHER_CONFIG_INTF_RGMII)
- 			clk_sel_val = ETHER_CLK_SEL_FREQ_SEL_2P5M;
- 		if (dwmac->phy_intf_sel == ETHER_CONFIG_INTF_RMII)
- 			clk_sel_val = ETHER_CLK_SEL_DIV_SEL_20;
--		val |= GMAC_CONFIG_PS;
- 		break;
- 	default:
- 		/* No bit control */
- 		netdev_err(netdev, "Unsupported speed request (%d)", speed);
--		spin_unlock_irqrestore(&dwmac->lock, flags);
--		return;
-+		return -EINVAL;
- 	}
- 
--	writel(val, dwmac->reg + MAC_CTRL_REG);
--
- 	/* Stop internal clock */
- 	val = readl(dwmac->reg + REG_ETHER_CLOCK_SEL);
- 	val &= ~(ETHER_CLK_SEL_RMII_CLK_EN | ETHER_CLK_SEL_RX_TX_CLK_EN);
-@@ -136,7 +124,7 @@ static void visconti_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
- 		break;
- 	}
- 
--	spin_unlock_irqrestore(&dwmac->lock, flags);
-+	return 0;
- }
- 
- static int visconti_eth_init_hw(struct platform_device *pdev, struct plat_stmmacenet_data *plat_dat)
-@@ -228,11 +216,10 @@ static int visconti_eth_dwmac_probe(struct platform_device *pdev)
- 	if (!dwmac)
- 		return -ENOMEM;
- 
--	spin_lock_init(&dwmac->lock);
- 	dwmac->reg = stmmac_res.addr;
- 	dwmac->dev = &pdev->dev;
- 	plat_dat->bsp_priv = dwmac;
--	plat_dat->fix_mac_speed = visconti_eth_fix_mac_speed;
-+	plat_dat->set_clk_tx_rate = visconti_eth_set_clk_tx_rate;
- 
- 	ret = visconti_eth_clock_probe(pdev, plat_dat);
- 	if (ret)
--- 
-2.30.2
-
+>              dma_attrs,
+>          })
+>      }
+> 
+> -- 
+> 2.49.0
+> 
 
