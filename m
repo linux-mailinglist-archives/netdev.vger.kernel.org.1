@@ -1,203 +1,199 @@
-Return-Path: <netdev+bounces-183792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 682F9A91FB5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:31:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101ADA91FCC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60863ACEF5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:31:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B40C19E7FBA
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023AF1B87EE;
-	Thu, 17 Apr 2025 14:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ED824290B;
+	Thu, 17 Apr 2025 14:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j+AMz0FD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="G6amCWHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD0A13AD3F
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 14:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E7815A868
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 14:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744900209; cv=none; b=ppL10DjndhS/6QNFPD8JywarXkKF8lU31kodKu8YciN1hJw/Ja4Sxnzkpa+8LTqRakB9svkaKWDC6kSp/6AN3NEKl7wAyd07vofUE2lzE27ouu9zwbBO3g84PJMyqJt8jyOI4L8pMZja8Saq3fH/XPxz1LOIZrcQGDlS6kgLu1s=
+	t=1744900568; cv=none; b=T7HFcVL6RI2a/VZxs3MlmaoS3RGcUzKLrmaZo8iWsCJWFPGAvJXLJoMpUL0c800BKCMcwMNAvgOMnNTDu/1yzEwpYvFREd+PeHtwXmGEFXG8mGyoIxK3h/UAVLz5V/c8wLMTEY5eIC0HoHQ6yhKH2cdkTi0nN6uh3qhDbPzwKRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744900209; c=relaxed/simple;
-	bh=T+gmBUW9UTFxcwCmoeuqE9IFQehOc6rXr5096aJ1u3w=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=u858KAiQz2RyEqeXJAP6p9ZuQzkgYK11QGEj+JUGDsQAo+XdgXl5NK8Pl9XEN1cF+ndYS4713P7tbkopG3vX7LvvU7AUvZEvik3g+H3H7xoVJkqY0meEEbQEjX1CSHROxbSXqF7yRSqs23zow6PYKihq8vRpLC/XnCBGYCkxj04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j+AMz0FD; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-72d3b48d2ffso706012b3a.2
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:30:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744900207; x=1745505007; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D4YI1ufUTW3giIcsHV0W+gzE22HdLKBPDlMf/viAXnI=;
-        b=j+AMz0FD2KTcn//srOAKH28ZG5eDIjR4YLhg9cAYkToQnPAr6RM9mH/2bVCpynNMMQ
-         h/SYl8Ygg+Kz0MEeSGveqnaWf0TKrmVlWc2N43ISc/rkA0vKpVBI/2euOg2baG6owISr
-         H6rHxpE35FdPqhT+5r2D4HoAocm7yFzF45HUZgWyujXoO331p1StWLiCZbkPJMFbpurM
-         ZMP6POIGUIKclQmnzXN6Orfn5Zr3KN1u6m36+CU184/tfu9UdnSaBFDendyNaMFRfiMQ
-         +jeP0z0AnuzyvPCZEEfdDQsUAiS6h3NwaqqtAiPCadB78/FIHCv0uMvwhKWwn/iRWUKs
-         79ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744900207; x=1745505007;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D4YI1ufUTW3giIcsHV0W+gzE22HdLKBPDlMf/viAXnI=;
-        b=tELeLwBuruTNwGl7JXR/EgrjZqTCL+okB87g4qmPw7+L2JB2EE/WedoPJlJMM28ThZ
-         UBJub5J/Z07IWOBUWr8Cok9qemX0eUcymH6JaSkxPKYZWsV6NV++IJV/JK2bvPPV9Llk
-         Aykio2RUcZwshtBcL0wJ5qaihxYUis46HSDqKbuScEblV0Zbf/0JDjNPgOdiZq0ASZpJ
-         ZwgGhOUGahIdpCta4rq8oqTiJOKtw4efIT157kbDYkTJ5RSu4uJdkCVsfia0rlEmQjta
-         TSaAdG7S9bgac7uMH6BCBGglXcLiSFCikguncylQCwTIrLvOYGHyG78DvuIhJsl4PmTU
-         ldeg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4nQn8qqQ5PfSVzRfSH6uzHM+rYZDia0i/zLYYxBIr0jGobbyj384ssf2VJn73p/QLb481fqQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHT3gEwh5JcV/tkr/6iaJBwVpL4UW+riCYbCsGzroI1ecDbJkS
-	+ArhaYywOBWnWAD/7Fd/7KTGRJor/57IE6jbJKO4JzuXvMfUHOqv
-X-Gm-Gg: ASbGnctm0AkQLXK1ihtt76N4ahUmW472GhojcGr9EUjpmuOc0D0izRUXVeLUAIN6/gW
-	L2zd0I6nXkIPCmJIZ8c899JeqB8FiqhoYkx0fnv7HFNlFqL4eT07Qv1XtnTRPcnRak2/Hs1gJrI
-	OQPZ80J50ZoKxNziICIZZKOf5LnxruhOVLQG4MxcfNZ1J3i8oGJPsWKOzorK3rgY0Q9HIqvfLfA
-	JFHlpmswXUs799kryKBCo34z+s4xl+/qkNDd3xlLC6i+oaU+70rZkd01D0tkEfRGYI8cGMd0Nr3
-	bQCkYNp8I2S+6MtCJaUSWcNUYgwnkRyAKaSmE49TlehoCloS2lmNJ0X53ELeD6+LMWOSJXkU31u
-	S7ZQ8zVpQ0z2BUIHt+ahw
-X-Google-Smtp-Source: AGHT+IFmwOC4JZu93efxaOTzyOX/Q4eN75L1SHnkU0mAWO8pXFiHN2YESHwNgctppEQcLN2NUDpxOw==
-X-Received: by 2002:a05:6a21:9205:b0:1f5:8dea:bb93 with SMTP id adf61e73a8af0-203b3e6db66mr10378284637.7.1744900207430;
-        Thu, 17 Apr 2025 07:30:07 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b0b22217ecasm3055904a12.68.2025.04.17.07.30.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 07:30:06 -0700 (PDT)
-Message-ID: <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
+	s=arc-20240116; t=1744900568; c=relaxed/simple;
+	bh=g4GIEyoKGnYEoIlrmiLj5NrvXyWBIpC0nUqdAYuEV34=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L9MNKrY90hgfsSoKaBBH/WPMQzi7pZczzRBbqhUQMph28DJRQrv1hV834IXuPiFCx5eaI+7yZwlaqg9xll2zbgMe9RkeEY6+8JIyVRn2qiqTTaI8qoCSk01XOhB0EuCLDf8NT4TtP0qOOptCxT20U+Xne+Puvv4m+1GjWJLv4qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=G6amCWHs; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=na3IgQ+IE2L7VcnvxSM9ZbWMv/cejCn8LqRzyVW5wx0=; b=G6amCWHsTr4uB6FY1evXOGH3f8
+	QH0R2CndR7w5Xg4sLUx+0sLa+iPBDV7mHfT6m9VbILXQsmykZRqhnDK7Pilld6MUVDoL/NmPKW7G+
+	28vjvDPgpmJXm5c9COv3sGRFz15mIUYmCUkkloc7z+TmXbszqa3B9R7ghZdUJTDfNkaKCAe6EzYki
+	YJoVIBdjKC8psI859aXhGVu7AfJ7v2lIBv6h/MZ/DaMbuqr3m5KzTr2LcOwdn/F4yo0VNNdPdXr9E
+	Or/poUSvIhw9s24XAf4jSNbQFtRyAAO7k7wa/vxmsdIFLeNiaxWd2GE+bf2tZpTDn3PQSjC0yB9f3
+	9AR2oLHQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53996)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u5QLO-0007Qw-1o;
+	Thu, 17 Apr 2025 15:35:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u5QLM-0002Vn-0F;
+	Thu, 17 Apr 2025 15:35:56 +0100
+Date: Thu, 17 Apr 2025 15:35:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander H Duyck <alexander.duyck@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
 Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled
  and link down
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Andrew Lunn
-	 <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Joakim Zhang
- <qiangqing.zhang@nxp.com>,  netdev@vger.kernel.org, Paolo Abeni
- <pabeni@redhat.com>
-Date: Thu, 17 Apr 2025 07:30:05 -0700
-In-Reply-To: <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
+Message-ID: <aAERy1qnTyTGT-_w@shell.armlinux.org.uk>
 References: <Z__URcfITnra19xy@shell.armlinux.org.uk>
-	 <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+ <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
+ <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 2025-04-16 at 17:16 +0100, Russell King (Oracle) wrote:
-> When WoL is enabled, we update the software state in phylink to
-> indicate that the link is down, and disable the resolver from
-> bringing the link back up.
->=20
-> On resume, we attempt to bring the overall state into consistency
-> by calling the .mac_link_down() method, but this is wrong if the
-> link was already down, as phylink strictly orders the .mac_link_up()
-> and .mac_link_down() methods - and this would break that ordering.
->=20
-> Fixes: f97493657c63 ("net: phylink: add suspend/resume support")
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->=20
-> To fix the suspend/resume with link down, this is what I think we
-> should do. Untested at the moment.
->=20
->  drivers/net/phy/phylink.c | 38 ++++++++++++++++++++++----------------
->  1 file changed, 22 insertions(+), 16 deletions(-)
->=20
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 69ca765485db..d2c59ee16ebc 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -81,6 +81,7 @@ struct phylink {
->  	unsigned int pcs_state;
-> =20
->  	bool link_failed;
-> +	bool suspend_link_up;
->  	bool major_config_failed;
->  	bool mac_supports_eee_ops;
->  	bool mac_supports_eee;
+On Thu, Apr 17, 2025 at 07:30:05AM -0700, Alexander H Duyck wrote:
+> On Wed, 2025-04-16 at 17:16 +0100, Russell King (Oracle) wrote:
+> > When WoL is enabled, we update the software state in phylink to
+> > indicate that the link is down, and disable the resolver from
+> > bringing the link back up.
+> > 
+> > On resume, we attempt to bring the overall state into consistency
+> > by calling the .mac_link_down() method, but this is wrong if the
+> > link was already down, as phylink strictly orders the .mac_link_up()
+> > and .mac_link_down() methods - and this would break that ordering.
+> > 
+> > Fixes: f97493657c63 ("net: phylink: add suspend/resume support")
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> > 
+> > To fix the suspend/resume with link down, this is what I think we
+> > should do. Untested at the moment.
+> > 
+> >  drivers/net/phy/phylink.c | 38 ++++++++++++++++++++++----------------
+> >  1 file changed, 22 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index 69ca765485db..d2c59ee16ebc 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -81,6 +81,7 @@ struct phylink {
+> >  	unsigned int pcs_state;
+> >  
+> >  	bool link_failed;
+> > +	bool suspend_link_up;
+> >  	bool major_config_failed;
+> >  	bool mac_supports_eee_ops;
+> >  	bool mac_supports_eee;
+> 
+> I'm pretty sure this extra bit of state isn't needed.
+> 
+> > @@ -2545,14 +2546,16 @@ void phylink_suspend(struct phylink *pl, bool mac_wol)
+> >  		/* Stop the resolver bringing the link up */
+> >  		__set_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state);
+> >  
+> > -		/* Disable the carrier, to prevent transmit timeouts,
+> > -		 * but one would hope all packets have been sent. This
+> > -		 * also means phylink_resolve() will do nothing.
+> > -		 */
+> > -		if (pl->netdev)
+> > -			netif_carrier_off(pl->netdev);
+> > -		else
+> 
+> This is the only spot where we weren't setting netif_carrier_on/off and
+> old_link_state together. I suspect you could just carry old_link_state
+> without needing to add a new argument. Basically you would just need to
+> drop the "else" portion of this statement.
+> 
+> In the grand scheme of things with the exception of this one spot
+> old_link_state is essentially the actual MAC/PCS link state whereas
+> netif_carrier_off is the administrative state.
 
-I'm pretty sure this extra bit of state isn't needed.
+Sorry to say, but you have that wrong. Neither are the administrative
+state.
 
-> @@ -2545,14 +2546,16 @@ void phylink_suspend(struct phylink *pl, bool mac=
-_wol)
->  		/* Stop the resolver bringing the link up */
->  		__set_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state);
-> =20
-> -		/* Disable the carrier, to prevent transmit timeouts,
-> -		 * but one would hope all packets have been sent. This
-> -		 * also means phylink_resolve() will do nothing.
-> -		 */
-> -		if (pl->netdev)
-> -			netif_carrier_off(pl->netdev);
-> -		else
+> > +		pl->suspend_link_up = phylink_link_is_up(pl);
+> > +		if (pl->suspend_link_up) {
+> > +			/* Disable the carrier, to prevent transmit timeouts,
+> > +			 * but one would hope all packets have been sent. This
+> > +			 * also means phylink_resolve() will do nothing.
+> > +			 */
+> > +			if (pl->netdev)
+> > +				netif_carrier_off(pl->netdev);
+> >  			pl->old_link_state = false;
+> > +		}
+> >  
+> >  		/* We do not call mac_link_down() here as we want the
+> >  		 * link to remain up to receive the WoL packets.
+> > @@ -2603,15 +2606,18 @@ void phylink_resume(struct phylink *pl)
+> >  	if (test_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state)) {
+> >  		/* Wake-on-Lan enabled, MAC handling */
+> >  
+> > -		/* Call mac_link_down() so we keep the overall state balanced.
+> > -		 * Do this under the state_mutex lock for consistency. This
+> > -		 * will cause a "Link Down" message to be printed during
+> > -		 * resume, which is harmless - the true link state will be
+> > -		 * printed when we run a resolve.
+> > -		 */
+> > -		mutex_lock(&pl->state_mutex);
+> > -		phylink_link_down(pl);
+> > -		mutex_unlock(&pl->state_mutex);
+> > +		if (pl->suspend_link_up) {
+> > +			/* Call mac_link_down() so we keep the overall state
+> > +			 * balanced. Do this under the state_mutex lock for
+> > +			 * consistency. This will cause a "Link Down" message
+> > +			 * to be printed during resume, which is harmless -
+> > +			 * the true link state will be printed when we run a
+> > +			 * resolve.
+> > +			 */
+> > +			mutex_lock(&pl->state_mutex);
+> > +			phylink_link_down(pl);
+> > +			mutex_unlock(&pl->state_mutex);
+> > +		}
+> 
+> You should be able to do all of this with just old_link_state. The only
+> thing that would have to change is that you would need to set
+> old_link_state to false after the if statement.
 
-This is the only spot where we weren't setting netif_carrier_on/off and
-old_link_state together. I suspect you could just carry old_link_state
-without needing to add a new argument. Basically you would just need to
-drop the "else" portion of this statement.
+Nope.
 
-In the grand scheme of things with the exception of this one spot
-old_link_state is essentially the actual MAC/PCS link state whereas
-netif_carrier_off is the administrative state.
+> I'm assuming part of the reason for forcing the link down here also has
+> to do with the fact that you are using phylink_mac_initial_config which
+> calls phylink_major_config after this?
 
-> +		pl->suspend_link_up =3D phylink_link_is_up(pl);
-> +		if (pl->suspend_link_up) {
-> +			/* Disable the carrier, to prevent transmit timeouts,
-> +			 * but one would hope all packets have been sent. This
-> +			 * also means phylink_resolve() will do nothing.
-> +			 */
-> +			if (pl->netdev)
-> +				netif_carrier_off(pl->netdev);
->  			pl->old_link_state =3D false;
-> +		}
-> =20
->  		/* We do not call mac_link_down() here as we want the
->  		 * link to remain up to receive the WoL packets.
-> @@ -2603,15 +2606,18 @@ void phylink_resume(struct phylink *pl)
->  	if (test_bit(PHYLINK_DISABLE_MAC_WOL, &pl->phylink_disable_state)) {
->  		/* Wake-on-Lan enabled, MAC handling */
-> =20
-> -		/* Call mac_link_down() so we keep the overall state balanced.
-> -		 * Do this under the state_mutex lock for consistency. This
-> -		 * will cause a "Link Down" message to be printed during
-> -		 * resume, which is harmless - the true link state will be
-> -		 * printed when we run a resolve.
-> -		 */
-> -		mutex_lock(&pl->state_mutex);
-> -		phylink_link_down(pl);
-> -		mutex_unlock(&pl->state_mutex);
-> +		if (pl->suspend_link_up) {
-> +			/* Call mac_link_down() so we keep the overall state
-> +			 * balanced. Do this under the state_mutex lock for
-> +			 * consistency. This will cause a "Link Down" message
-> +			 * to be printed during resume, which is harmless -
-> +			 * the true link state will be printed when we run a
-> +			 * resolve.
-> +			 */
-> +			mutex_lock(&pl->state_mutex);
-> +			phylink_link_down(pl);
-> +			mutex_unlock(&pl->state_mutex);
-> +		}
+Another of phylink's guarantees is that it won't do the mac_config()
+etc with the link up. So, in order to ensure that everything is
+correctly programmed after resume, it needs mac_config() etc called
+which means the link needs to come down first.
 
-You should be able to do all of this with just old_link_state. The only
-thing that would have to change is that you would need to set
-old_link_state to false after the if statement.
-
-I'm assuming part of the reason for forcing the link down here also has
-to do with the fact that you are using phylink_mac_initial_config which
-calls phylink_major_config after this?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
