@@ -1,106 +1,134 @@
-Return-Path: <netdev+bounces-183698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FBCDA9190A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:17:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9EF3A91911
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3E04189F24B
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CC023A958F
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B06282F1;
-	Thu, 17 Apr 2025 10:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86C222422F;
+	Thu, 17 Apr 2025 10:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZqgW4gd"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PeHBBnuV";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zMvFsUCa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113B7226CEE;
-	Thu, 17 Apr 2025 10:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489271D5CF9
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744884911; cv=none; b=CViYP7LG3GOBEV4gQFSZBHku5ygQMSyHSwPIFVH1Hwj4eEwyef0I/4tTXqbG2x+BOHIywVlM996CMPhR7FTSzjm2Sdd0bLcWazTUJfATJGJkRvHNroJmSyEP8DZJQAzwnNN6Y/2qhLGeumwvDYtpYpnukZOf8xmhl+JL/4kq4es=
+	t=1744885105; cv=none; b=bfQ1snqdH1whOYUt5jeEItMYBtAtjC61CyTWKQ6HRXP03j3wQFKO5KUVX9W/hpdSEFLHTxE5PFbVBKFxcPvb9Xv+w0AM/+geNgBlLmTcI2XMDgvxwGvKDheCc2h5Ysd/DVIzxtRXWAJxi6jFgSex6hhJFiebf16RK6XDeejmvLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744884911; c=relaxed/simple;
-	bh=ROmjIK9stdF7h78XYJoFECATRlnOtUjoflDwHaRaxGM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ndezZPvGrjP+y7vP3iKPuPpv1egdUmYGcay4qQWvO7afoIN3uSWr9ihEfYYWawuHLhSc97RnH4/DUe4xj8d3nbAkBGr7QcqeHsspJk/IvA3Ys06f3D7yk9+8Lxf2qkKsw9KgQWoTWyEGq7Fy/XCXnPZ29qjsgrqg+vOriug9NZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZqgW4gd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5096FC4CEED;
-	Thu, 17 Apr 2025 10:15:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744884910;
-	bh=ROmjIK9stdF7h78XYJoFECATRlnOtUjoflDwHaRaxGM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DZqgW4gd0XObqtM0z9Z9ecMrx6bEsGiBN4ThwsHPDgRx2RoGHW7IdiaeM5m5uTiEE
-	 hfb+OxfIgEmHOawRMc5s/1zDzi1UTinbVb6iX+KJhFhe4Iwl7LFZ2UNWauXAljQBin
-	 u1VBufo7XU83Z9CuoU4uskANp79bbkLh65lP/m3LbszfDvBKQBVv4UTrwpGphH7LMu
-	 849qawDsxIRpVF8Xlsh+W/vsArdyuYkzTbMgMdamOplE/hu+0DMJsuiq07gjEoARTQ
-	 U9TSUhAKgy9sOMA31VxmglgTOdJH+laxBsKI/RxAbjE7glAyb6DnzwavB6jpAxm4Uu
-	 0v6I80cA68C0w==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 17 Apr 2025 11:15:02 +0100
-Subject: [PATCH net 2/2] MAINTAINERS: Add s390 networking drivers to
- NETWORKING DRIVERS
+	s=arc-20240116; t=1744885105; c=relaxed/simple;
+	bh=VdnIizSKaKnQaEzVJTxQTMFkT/43s85uJANzeDqLLLs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZUjbI6SEdm0CERJFrKTJFc9/M6b+5sEZYt0ZTxW8FPgAn2QnvDHZ02uDwySEE4nIx+k0jeWLL4pcdJMctIKfeKgDpFZVsVYhm+XEneolO0PnQBTKMaxZNwswBqOjCB1wJptYXbWP4SIMIiZhk/QX09EplZnZXeknFYwaMiZ+2+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PeHBBnuV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zMvFsUCa; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 17 Apr 2025 12:18:20 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1744885102;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pTKpGtLbS7EfzjXuUckXrnmWMsKaCwDfYnf04jixevg=;
+	b=PeHBBnuVdwJSEOWRskO1rqxfDC4ZdBsZRkgr59TSjhlM3osq7E682Uo1mVAkIwsIggvM89
+	RWerwrWAI4vQHDLU736A6gyYrit+pTyW4r8xjyhYFr28TbuP0TKrZDbHRTeI04yT0HCHhZ
+	h+KsAJaQmGaI3IKLLIBlbLrNtwijHhW6DLVtdN7gKpaGMbjbaXJFuj+u5OjDY/+WLDbcWg
+	yelhWaaC8da8Art5XZDXvdhrxnK2YT+9Fi0GdJoAz0ie8VChqSh/Pj58woYrRC9Lxg3Ab/
+	qYVIamNxYbbMYEbGjjbi1ScHsZPeLB4976P95tbY5SvtXAWYFJqj8BsJuKoKyg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1744885102;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pTKpGtLbS7EfzjXuUckXrnmWMsKaCwDfYnf04jixevg=;
+	b=zMvFsUCaGlfEzXnBZumc9i9+cP5BwatNBbFBP6c7XG1ucWta+F6M/bdS1gdp/n6leYB+w7
+	I94JsVxS3vfG4eAQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>, dev@openvswitch.org
+Subject: Re: [PATCH net-next v2 12/18] openvswitch: Move
+ ovs_frag_data_storage into the struct ovs_pcpu_storage
+Message-ID: <20250417101820.Cd0BZc0G@linutronix.de>
+References: <20250414160754.503321-1-bigeasy@linutronix.de>
+ <20250414160754.503321-13-bigeasy@linutronix.de>
+ <f7tbjsxfl22.fsf@redhat.com>
+ <20250416164509.FOo_r2m1@linutronix.de>
+ <867bb4b6-df27-4948-ab51-9dcc11c04064@redhat.com>
+ <20250417090810.ps1WZHQQ@linutronix.de>
+ <94076638-1bc7-4408-b09c-7c51f995d36f@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250417-ism-maint-v1-2-b001be8545ce@kernel.org>
-References: <20250417-ism-maint-v1-0-b001be8545ce@kernel.org>
-In-Reply-To: <20250417-ism-maint-v1-0-b001be8545ce@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Thorsten Winkler <twinkler@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <94076638-1bc7-4408-b09c-7c51f995d36f@redhat.com>
 
-These files are already correctly covered by the S390 NETWORKING DRIVERS
-section. In practice commits for these drivers feed into the Networking
-subsystem. So it seems appropriate to also list them under NETWORKING
-DRIVERS.
+On 2025-04-17 11:48:03 [+0200], Paolo Abeni wrote:
+> 
+> 
+> On 4/17/25 11:08 AM, Sebastian Andrzej Siewior wrote:
+> > On 2025-04-17 10:01:17 [+0200], Paolo Abeni wrote:
+> >> @Sebastian: I think the 'owner' assignment could be optimized out at
+> >> compile time for non RT build - will likely not matter for performances,
+> >> but I think it will be 'nicer', could you please update the patches to
+> >> do that?
+> > 
+> > If we don't assign the `owner' then we can't use the lock even on !RT
+> > because lockdep should complain. What about this then:
+> > 
+> > diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+> > index a3989d450a67f..b8f766978466d 100644
+> > --- a/net/openvswitch/datapath.c
+> > +++ b/net/openvswitch/datapath.c
+> > @@ -294,8 +294,11 @@ void ovs_dp_process_packet(struct sk_buff *skb, struct sw_flow_key *key)
+> >  	sf_acts = rcu_dereference(flow->sf_acts);
+> >  	/* This path can be invoked recursively: Use the current task to
+> >  	 * identify recursive invocation - the lock must be acquired only once.
+> > +	 * Even with disabled bottom halves this can be preempted on PREEMPT_RT.
+> > +	 * Limit the provecc to RT to avoid assigning `owner' if it can be
+> > +	 * avoided.
+> >  	 */
+> > -	if (ovs_pcpu->owner != current) {
+> > +	if (IS_ENABLED(CONFIG_PREEMPT_RT) && ovs_pcpu->owner != current) {
+> >  		local_lock_nested_bh(&ovs_pcpu_storage.bh_lock);
+> >  		ovs_pcpu->owner = current;
+> >  		ovs_pcpu_locked = true;
+> > @@ -687,9 +690,11 @@ static int ovs_packet_cmd_execute(struct sk_buff *skb, struct genl_info *info)
+> >  
+> >  	local_bh_disable();
+> >  	local_lock_nested_bh(&ovs_pcpu_storage.bh_lock);
+> > -	this_cpu_write(ovs_pcpu_storage.owner, current);
+> > +	if (IS_ENABLED(CONFIG_PREEMPT_RT))
+> > +		this_cpu_write(ovs_pcpu_storage.owner, current);
+> 
+> Perhaps implement the above 2 lines in an helper, to keep the code tidy?
+> otherwise LGTM.
 
-This aids developers, and tooling such as get_maintainer.pl
-alike to CC patches to all the appropriate people and mailing lists.
-And is in keeping with an ongoing effort for NETWORKING entries
-in MAINTAINERS to more accurately reflect the way code is maintained.
+I've been thinking about it but the two cases are slightly different.
+Maybe open coding right next to the comment isn't that bad.
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+> Thanks,
+> 
+> Paolo
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fecaf05fb2e7..9dee0e85d32c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16760,6 +16760,7 @@ F:	Documentation/networking/net_cachelines/net_device.rst
- F:	drivers/connector/
- F:	drivers/net/
- F:	drivers/ptp/
-+F:	drivers/s390/net/
- F:	include/dt-bindings/net/
- F:	include/linux/cn_proc.h
- F:	include/linux/etherdevice.h
-@@ -16769,6 +16770,7 @@ F:	include/linux/fddidevice.h
- F:	include/linux/hippidevice.h
- F:	include/linux/if_*
- F:	include/linux/inetdevice.h
-+F:	include/linux/ism.h
- F:	include/linux/netdev*
- F:	include/linux/platform_data/wiznet.h
- F:	include/uapi/linux/cn_proc.h
-
--- 
-2.47.2
-
+Sebastian
 
