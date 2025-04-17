@@ -1,229 +1,133 @@
-Return-Path: <netdev+bounces-183745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7947BA91D1D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ABDDA91D40
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0B4319E6774
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:00:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBFD77A7957
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5040414A639;
-	Thu, 17 Apr 2025 13:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqIQnUAX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79AB245036;
+	Thu, 17 Apr 2025 13:03:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2399F219ED;
-	Thu, 17 Apr 2025 13:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E1224501F;
+	Thu, 17 Apr 2025 13:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744894833; cv=none; b=UFow5QyEDXfxF9KciQFgwzWDQ9O+/cgGgW45jKYBdPu8YEtJlnq7YNXt9siwu/Hvz+gA7pa46kpSw0ZuYk5Wod/c0qyLMaTA7UGXvYK8DzoXd7n7rSh0M/mp4wa7aZsegAdMrID4RQZLwyB5augvupFOEABXHkPZIk5a4SV64qQ=
+	t=1744895020; cv=none; b=DTocFpICiWmNteYWLwZjfrT8FSm46Ap/YgjaQyBpqBbzLcgZo5GARgXCpRnAbIBz4+8Vahk2AwcWdjeQ17iFVrN5S3bB24Aud0LVCEiOL2AS5soW1e0IMF9ktpwTcAyUM9NlTsEhcUYxsQG3RLDHrv8ZP2GImnNTnKnmn+elW/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744894833; c=relaxed/simple;
-	bh=tN6VlwhVY6GBDMPbwg6AndCI7gOWs6KugYPq9CK+uXY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dvzgk++ShpgVAVFnMOaGPdnYvEIB1HvOnX0DpEab8JXZ+0iVyy/WHRZoHY0/p2bhKkMwIlVPv5PCVZQiHALekDKff16vGkCns7bJERJLabsSgFHYReLiUk1Vh52bBj8GdthofiE6lry8ln5QFqLqUUxtqV/F4HW2sriXGxqVxAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqIQnUAX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B652DC4CEE4;
-	Thu, 17 Apr 2025 13:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744894832;
-	bh=tN6VlwhVY6GBDMPbwg6AndCI7gOWs6KugYPq9CK+uXY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sqIQnUAXbunEI71xsjgRpLF2/CBTQPBCebxfpCc2yvzlnXCyEZiI3hocb+oIvVWuL
-	 o5YHKilGWLAZoEEdLG1ntJVOffQtNPm/KACZiHF9F2pr/oJQrBjO1hWntDa+GV+cEF
-	 PMwZdyoz5ZZAA4oT09q8NLXDvucjilg5223kEUpfGE0uLBEFGsAvYKmVYA4s75ArbP
-	 FOfY7ug1G06I7o5Pa+6WiyqqgZL4scIlpqKAp2qY8P8qMkEdkFp7/kTs0vgORoFHQL
-	 2j5TIqwNrMLopLDfnfyf8Zqi7Z0yPvig+Ept/d8Nu+7cnOZzM4IznebdRoVDPMMjS6
-	 RC5W81WW7Kb+g==
-Message-ID: <12d6fe78-6638-4340-83a1-70b6e77b4d38@kernel.org>
-Date: Thu, 17 Apr 2025 15:00:27 +0200
+	s=arc-20240116; t=1744895020; c=relaxed/simple;
+	bh=T+ps6p7M8ebPsM11Xfj3wVjAN0VKOEWdhkwtXjUccAA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sabBt0MDrQ91l0Cq0G3Ylq82YeH6bUalMNXFfkQy8sI5R9l4is9w1T/+yCSYyVsNKl45oEsPlptx4bzVsjYLXf4fEkR+FlrEHi72yg/z6kjaOd89AtCdrCqmhFfPVp0Fle9Kzkc9Q3OD1dFMFTyKsen8+st4GK8RXL8LcPhQV7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e5e0caa151so1323101a12.0;
+        Thu, 17 Apr 2025 06:03:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744895017; x=1745499817;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N1EkkU34BT5hACl4uOWIOXWOLkG9A0MlKIENWBE2PKU=;
+        b=dMvYhTuCVg2TpBTjWujW4/6xDQQsaRf9cxq4kW4urqscw9z1VkhgPeqDMMXHLTaZlh
+         OC5ocSrQMxY0NdoCqQXf8STMbQKWQtWSMrnyWDEdwjoYjsq4MjxLAt6ML8qZNnLARB72
+         LWpfdGoEQDVQkc6+8IWUa0mISkyyp6Vao7v5sL2ypG+ZWL/dtzlSKDevNFX10EBZCK7L
+         vWEI+Z8VGQI6BA7gtRawRGHwENa0PXZEZFB0ZXwrHZ7jOx+AZiu8ZwMurRFnLgN0VMVu
+         EIediPCBuO0dra65HxqheqOIdBbhEj5o1MDmdHDtHrQPaWYgtICkFMd3ny2PNhvpqtDK
+         Y66g==
+X-Forwarded-Encrypted: i=1; AJvYcCU6vYbrpm+ZW5OC/E6k0niAVE3Y9OJi5orvZdr5wTkLY52JR7KDzcJmJ7XCMmSgT4bWlf8V9J/U6YuhKBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9IQbXbm9mprKJ6XSq7FcBW7cNqRKUAtRM8y6l/iS0fngkkK94
+	hUk+kitpw8oV/RhAVC1KsA9WKrbBBzXWASLLsGFvpV50Ukr7JN9l
+X-Gm-Gg: ASbGncu5KDy/K8yVVD0iGiMCk9dHmQR+CYRa83Xn+SQCAmk7/Xj6GW2I5bURoQdEAJw
+	ZPffzcC3xO942iOeRBu59V4tIuofXF6LmjqWIrPCW8is4z3oU2Hl7lFaGr5NcA79bbmLVc3Oi+A
+	dOuxUehi4bBR57pKSJ/wiabYULBUCXCSOBvQebHcyR+KhlTbNRaa9SGIPbPJrvUhtu0uwgdy2tV
+	v3/3EyQXabaGQ3LQRYkdjFV+hCYBrm5Z5oowHuQFWu0F6vnca6jNAPVl6gu8vFaiXmbvgfN5Opb
+	BMBAI3+BDfhS/iqB/oOA/umrE+C/A5Q=
+X-Google-Smtp-Source: AGHT+IGiqpGlwXUdGelyy0NvS+TlZoScu9aEQ85awOeVl4i6U0V/rmW0rDD5wfIPRBFLytGdR3ryWg==
+X-Received: by 2002:a05:6402:84c:b0:5e5:bdfe:6bfb with SMTP id 4fb4d7f45d1cf-5f4b748b5cfmr4061377a12.16.1744895016764;
+        Thu, 17 Apr 2025 06:03:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:1::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36f068a5asm9940239a12.34.2025.04.17.06.03.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 06:03:36 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/2] net: Adopting nlmsg_payload() (final series)
+Date: Thu, 17 Apr 2025 06:03:06 -0700
+Message-Id: <20250417-nlmsg_v3-v1-0-9b09d9d7e61d@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V4 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-To: Toshiaki Makita <toshiaki.makita1@gmail.com>
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
- kernel-team@cloudflare.com, phil@nwl.cc, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>
-References: <174472463778.274639.12670590457453196991.stgit@firesoul>
- <174472470529.274639.17026526070544068280.stgit@firesoul>
- <882f14f9-99e7-44ac-a325-ad809bf0ccff@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <882f14f9-99e7-44ac-a325-ad809bf0ccff@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAr8AGgC/x3MUQqDMBAFwKss79tAklatuYqUUvRVF+q2JCKCe
+ PdC5wBzoDArC5IcyNy06MeQJFSCYX7aRKcjkiD6WPtraJ29lzI9touLw41NF2r6sUUl+Ga+dP9
+ XPYyrM+4r7uf5A9Fbke5kAAAA
+X-Change-ID: 20250417-nlmsg_v3-2c8e6915e0d7
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ kuniyu@amazon.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=984; i=leitao@debian.org;
+ h=from:subject:message-id; bh=T+ps6p7M8ebPsM11Xfj3wVjAN0VKOEWdhkwtXjUccAA=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoAPwmfbYz2PYxEueKJG17zwupQL3zG0w3yttZL
+ f25Zt0BBiqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaAD8JgAKCRA1o5Of/Hh3
+ bf6KD/wOssjT3oKonCAyEcBgZ9rEIaIa6BChVDxQCGhhZd4UXURDGg287qq7K3I2SSbKe2z7GtA
+ EFiKqGoQVUgojZkVF4acL7ZCdh6QC60nv15Oa7So7NpkTE+xQxWFwH+V/aERDdC/941p1HWZ1ci
+ 7j2718nNGQcSacgNg+ejUCepp8/xDU07DaIKFeK4nfZHe9UXHxCO98GEW29rc6FslmbrZgVLej1
+ pFo9tyQu0vPGNg1XoAVgGCjz2WLHre2albKrcl3luCk1odZIh2uVV4ZtbB3edvK23QEWZN50ugg
+ C6wuvgAUfbA2cwt4ffLEwHPZOYYI9LKnWcef7tbGPAizePBh+6wNb9GOJJoKrrxT7SVHmkuSE1w
+ yqK2HIPKY0M4afIKaYe38fnQi8UpIQ95IfPHeRM1ny6FaAto9c91bwOCXPHOnSoubWikzc4V0rw
+ p2mPudsCuFIXVHL3v7Quyoc9w/0DjRqNgptUElRoa/po4f7DY0CtALgKrtR56l8jG95N/BysOEV
+ XHq2bC5+02Yzst/WdL5Ed1C86AUOBVD7fKCMs72pbjVty8/KZdnacWvad0r2eYF2RsW7R6P7UUJ
+ 5ijbvLaCm1UTECQ2MsnNhiWNSJFUyGIfPflXgkHNZqaN8s/V+XjbjJASjTb0+iinKJdjSFuFQ9a
+ kPu0mPJdvDRgFRQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
+This patchset marks the final step in converting users to the new
+nlmsg_payload() function. It addresses the last two files that were not
+converted in previous series, specifically updating the following
+functions:
 
+	neigh_valid_dump_req
+	rtnl_valid_dump_ifinfo_req
+	rtnl_valid_getlink_req
+	valid_fdb_get_strict
+	valid_bridge_getlink_req
+	rtnl_valid_stats_req
+	rtnl_mdb_valid_dump_req
 
-On 16/04/2025 14.44, Toshiaki Makita wrote:
-> On 2025/04/15 22:45, Jesper Dangaard Brouer wrote:
->> In production, we're seeing TX drops on veth devices when the ptr_ring
->> fills up. This can occur when NAPI mode is enabled, though it's
->> relatively rare. However, with threaded NAPI - which we use in
->> production - the drops become significantly more frequent.
->>
->> The underlying issue is that with threaded NAPI, the consumer often runs
->> on a different CPU than the producer. This increases the likelihood of
->> the ring filling up before the consumer gets scheduled, especially under
->> load, leading to drops in veth_xmit() (ndo_start_xmit()).
->>
->> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
->> ring is full, signaling the qdisc layer to requeue the packet. The txq
->> (netdev queue) is stopped in this condition and restarted once
->> veth_poll() drains entries from the ring, ensuring coordination between
->> NAPI and qdisc.
->>
->> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
->> the driver retains its original behavior - dropping packets immediately
->> when the ring is full. This avoids unexpected behavior changes in setups
->> without a configured qdisc.
->>
->> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
->> (AQM) to fairly schedule packets across flows and reduce collateral
->> damage from elephant flows.
->>
->> A known limitation of this approach is that the full ring sits in front
->> of the qdisc layer, effectively forming a FIFO buffer that introduces
->> base latency. While AQM still improves fairness and mitigates flow
->> dominance, the latency impact is measurable.
->>
->> In hardware drivers, this issue is typically addressed using BQL (Byte
->> Queue Limits), which tracks in-flight bytes needed based on physical link
->> rate. However, for virtual drivers like veth, there is no fixed bandwidth
->> constraint - the bottleneck is CPU availability and the scheduler's 
->> ability
->> to run the NAPI thread. It is unclear how effective BQL would be in this
->> context.
->>
->> This patch serves as a first step toward addressing TX drops. Future work
->> may explore adapting a BQL-like mechanism to better suit virtual devices
->> like veth.
-> 
-> Thank you for the patch.
-> 
->> Reported-by: Yan Zhai <yan@cloudflare.com>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> ---
->>   drivers/net/veth.c |   49 
->> +++++++++++++++++++++++++++++++++++++++++--------
->>   1 file changed, 41 insertions(+), 8 deletions(-)
->>
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index 7bb53961c0ea..a419d5e198d8 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -308,11 +308,10 @@ static void __veth_xdp_flush(struct veth_rq *rq)
->>   static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
->>   {
->>       if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb))) {
->> -        dev_kfree_skb_any(skb);
->> -        return NET_RX_DROP;
->> +        return NETDEV_TX_BUSY; /* signal qdisc layer */
->>       }
-> 
-> You don't need this braces any more?
-> 
-> if (...)
->      return ...;
-> 
+I would like to extend a big thank you to Kuniyuki Iwashima for his
+invaluable help and review of this effort.
 
-Correct, fixed for V5.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Breno Leitao (2):
+      net: Use nlmsg_payload in neighbour file
+      net: Use nlmsg_payload in rtnetlink file
 
->> -    return NET_RX_SUCCESS;
->> +    return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
->>   }
->>   static int veth_forward_skb(struct net_device *dev, struct sk_buff 
->> *skb,
->> @@ -346,11 +345,11 @@ static netdev_tx_t veth_xmit(struct sk_buff 
->> *skb, struct net_device *dev)
->>   {
->>       struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
->>       struct veth_rq *rq = NULL;
->> -    int ret = NETDEV_TX_OK;
->> +    struct netdev_queue *txq;
->>       struct net_device *rcv;
->>       int length = skb->len;
->>       bool use_napi = false;
->> -    int rxq;
->> +    int ret, rxq;
->>       rcu_read_lock();
->>       rcv = rcu_dereference(priv->peer);
->> @@ -373,17 +372,41 @@ static netdev_tx_t veth_xmit(struct sk_buff 
->> *skb, struct net_device *dev)
->>       }
->>       skb_tx_timestamp(skb);
->> -    if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == 
->> NET_RX_SUCCESS)) {
->> +
->> +    ret = veth_forward_skb(rcv, skb, rq, use_napi);
->> +    switch(ret) {
->> +    case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
->>           if (!use_napi)
->>               dev_sw_netstats_tx_add(dev, 1, length);
->>           else
->>               __veth_xdp_flush(rq);
->> -    } else {
->> +        break;
->> +    case NETDEV_TX_BUSY:
->> +        /* If a qdisc is attached to our virtual device, returning
->> +         * NETDEV_TX_BUSY is allowed.
->> +         */
->> +        txq = netdev_get_tx_queue(dev, rxq);
->> +
->> +        if (qdisc_txq_has_no_queue(txq)) {
->> +            dev_kfree_skb_any(skb);
->> +            goto drop;
->> +        }
->> +        netif_tx_stop_queue(txq);
->> +        /* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
->> +        __skb_push(skb, ETH_HLEN);
->> +        if (use_napi)
->> +            __veth_xdp_flush(rq);
-> 
-> You did not add a packet to the ring.
-> No need for flush here?
+ net/core/neighbour.c |  4 ++--
+ net/core/rtnetlink.c | 25 ++++++++++++-------------
+ 2 files changed, 14 insertions(+), 15 deletions(-)
+---
+base-commit: aa5f7b9bc025408a84c4c1828501b42335b8fd68
+change-id: 20250417-nlmsg_v3-2c8e6915e0d7
 
-IMHO we do need a flush here.
-This is related to the netif_tx_stop_queue(txq) call, that stops the
-TXQ, and that need to be started again by NAPI side.
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
-This is need to handle a very unlikely race, but if the race happens
-then it can cause the TXQ to stay stopped (blocking all traffic).
-
-Given we arrive at NETDEV_TX_BUSY, when ptr_ring is full, it is very
-likely that someone else have called flush and NAPI veth_poll is
-running.  Thus, the extra flush will likely be a no-op as
-rx_notify_masked is true.
-
-The race is that before calling netif_tx_stop_queue(txq) the other CPU
-running NAPI veth_poll manages to NAPI complete and empty the ptr_ring.
-In this case, the flush will avoid race, as it will have an effect as
-rx_notify_masked will be false.
-
-Looking closer at code: There is still a possible race, in veth_poll,
-after calling veth_xdp_rcv() and until rq->rx_notify_masked is set to
-false (via smp_store_mb).  If netif_tx_stop_queue(txq) is executed in
-this window, then we still have the race, where TXQ stays stopped
-forever. (There is a optional call to xdp_do_flush that can increase
-race window).
-
-I'll add something in V5 that also handles the second race window.
-
---Jesper
 
