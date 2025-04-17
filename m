@@ -1,93 +1,82 @@
-Return-Path: <netdev+bounces-183731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB6AA91B5D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:01:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C005A91B99
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2613B7AFCE9
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:00:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4379018857E2
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6815245026;
-	Thu, 17 Apr 2025 12:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB4423A9B1;
+	Thu, 17 Apr 2025 12:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="dGd3KEZd"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QNFdmQ04"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013051.outbound.protection.outlook.com [52.101.72.51])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AECE241691;
-	Thu, 17 Apr 2025 12:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EAF12B93;
+	Thu, 17 Apr 2025 12:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744891248; cv=fail; b=D5Udjt7wi2gmGX44E8UsLtxK900vzcdkXmrrEfsKg94uVr/KXEvidek5ClXKq+sjqJdvV1I8/Rvi00ODIfa5vkTgEd2aAAFkI7dwtlrmsHFXOXnamjqF/Cs9/GqUDrjAFeAy4yuq2Bcmh5xDEBR4qEZH8B99gNbR32CfiQJSGiI=
+	t=1744891661; cv=fail; b=RGSEpkR8x+4MDD8rZnn3erN6Qc+6ohqfPDeHOl+Ry+n/M4mRFy8z+ZH6qx0hL2zrSGv0vUO0qYl7AWWyyDBnaEjc8mG5o1kUkMu0lLmrBTIozZQSe9fx3eCo0vUFDqTXEiLkMWTBIfEmk62z+unqmSZjZ/zxlJFcblUKN5ydOmY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744891248; c=relaxed/simple;
-	bh=UoS7tXu3HJ+aQ6lRYx1/rwCk+WS71bFlnQdJvH8yAQs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XysGHgc/U3N8+W0ZVUsYHyoPjwNgWIZdmhdnkP6raWLj5daKehy5ggbHFhWkx03lDrH2oIkPmDFo86Ma9IWT59w+52vgxMmyKlAkWMI/uL8DIXOrNfxbpdnRBmTZvDFtEh7O8BiylR+vFfI8DwYQXqfS2aoiVf8Kzf+yQ7WLCvM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=dGd3KEZd; arc=fail smtp.client-ip=52.101.72.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1744891661; c=relaxed/simple;
+	bh=Wa00Me+JgnuXpQ5zjQLFHdk8dvR5Ns9Fj5fzrzByOzI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=W1b0fYf7gnNN3xT/w3CPjk4xtYA0ctO8sabuzcIUjLTT53G/8lDUg1fo+1xd30rU7+Pxs+KTzD4J2gy/Gwh+2J09HGo5yxx2WwkpMFQyXlLJ1miw+P84vsdtD9mpQ+fUbyXyiDX9WBOMOEy53Fybmx9N18yDf7iDZYC89GKAZjg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QNFdmQ04; arc=fail smtp.client-ip=40.107.237.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ouGr9soiA81TJnPqLm4Km18FEdBwMHoUQuZZA/O1uKXbUMYU6NPZQEh7uRR9Ro9lQ+9y6FnJnbH+mxUwg1+dAAS+IlItlydhBYtCffpiFLGzabvLs+JiqP8lcyaQn8emosF8SGUNL/0F6fRM3Ap8A3MFKXUyZz+pLs+3xcpGncaTogAHqQ5Xr1HSY2wiBTILV760F/VmxtYQ4Tb255flXf0KaAKL8BrW/2+VGj+Fm4M52FfYD5jiw4LdLIqXjy5dHIQ9v1gYZfCgBBtoNr6ZswqYxccM4h8xc/2fxaAlwIGWaWtUE7jQqiK/J5MaidzLdNsfpbuR5ewl4SKHcoxcjA==
+ b=Ja50o+Jf+x30PKj0Ypsl2umeySwXDczd6elhw8x+MyfocRRClCQ+znROl0dbydllniyqPhn4Ik10FaTHuzJb+B6LgZXqBgzDsnh2OJdLBBd2MNtJq+oMqHLgFqjd8ETA/lgofHGOqzH9IKURK92fmvpmn7iywq1uOiM5fVq6vnzRXLTGN/ifVMAXomiCDBbZMnLMUzPQPJGvcsVI6tTi9XsaoLLK4GztcDpvBqpB6EQlq2sNTyOnM8uuJXGWti56/ITP6ql28H352Ao1lOwA5qBBGaCxYwzvhlf2gdNQmug20Eql2iFYLyAFfl2spDENkHWL3LoET+UE0JA9MOSPUg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4bz3domnVZmTP4CF6LSGVDsJyyc9LXfSQJyooCZ1Rug=;
- b=ee0/prFyjgEF06Dl216pgoKCcvVW7mMNcqwBXAdT0yYIa01F2rNJVQFxB494VqhtLff7nobva7g+xJZohdumgYmhoAhmmVbJzDxTkp2q0EPvg+BY3BrPB5sojaLdnWhBDmKvNI8QQOw3GHlum9qzCZpYKq1aCS79rWYjDGHwCCXpVfL7WFzDAMF70sj4cfrbovtaKt5Hg2jk0qJFTDha9BzWZelQOxcOZnX2TBa9PIv3pi8K31/yoD9nLU3w5wijVUHQDgErBUYqYz5kpcMpp4w6tjXwrjRUUFOhUsz/68lJuEH+dAHGCdvb6ISM1GxlBeu/LPm4EGdyC4lDpCVShg==
+ bh=2lgQ2dRD6Jacod7fftT26ywEkYRS4IJtX3nUDqfDHfI=;
+ b=Y/E+P1Bawknm+b5sTmWPhehxkCY7fy4pk/DjjUXqXtDCm/5dU6697nmDQmcE/aqvjCG8fp7tfvgX+cy+/UlCqdVJaHZXzPvI95cT3sIxbkzO0cYFYKtn7x/utyAshMXj7aC/vf8TEbsc/g8l3ruS28+SCeld7f9XM2UokEMLkYR+fRPTUK6lSyM4wXyRlsp0IC/jcwC76gmmSlgtUJNMH/cIRLXwybM9ajZvPD4p7qG50p8ac6xPKhwaqSJpwtp+AlTLUI8gUYZvEmRkYw+asvrjhCELs0GlpI2p3CEmVkD/O4grWL+2vVrCZjIeqvzNyQ1qBymmQQLfaefOCcY96g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4bz3domnVZmTP4CF6LSGVDsJyyc9LXfSQJyooCZ1Rug=;
- b=dGd3KEZdiXuSV1c5lzpRNtlklGh+fuPWrHhKzjYO+gTetKjfgIQhE18E94mOt+vBbSIlTg3215auN2ILZ1FOoTkNPGbMIvfem7xBItc+gTgvjcvS3uj8C4njdDnbI7/Noqaz04QW02Q959R9kCFTn4gYotGWLNPxnGi9rCfvwTHVv5pJaAGQHnYLuV0vBPpYoC8wnAwW3BDBWwvXVEaigsXACp5DUsA9jmhVWDsUpwflyHEsXcf+kUxlw9jqYxxZfIA40YGTq3F80nIKTJvgg+n3uYS7wNNKNrVqGAmOqTFp0KHRbN44BoIqdTb23UB76A/8ue1YDKicj2f5wU/R2Q==
+ bh=2lgQ2dRD6Jacod7fftT26ywEkYRS4IJtX3nUDqfDHfI=;
+ b=QNFdmQ04zpHTpWWc1tEpcy6YcExoM2tZQkaFHxDFZ024JeUc/3+ZH6FglJ8ijowZ2rXzM73jBVSIJNcwvSFvfHYete1jFv72PDygUYx1YPWf53Ld5EOKqwqAzIKC2L+qN18DSygEF701gmEdtD/AcHBqD+B3x6PgLnALF+msa9A=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GV1PR04MB10560.eurprd04.prod.outlook.com (2603:10a6:150:203::22) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM4PR12MB6374.namprd12.prod.outlook.com (2603:10b6:8:a3::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.22; Thu, 17 Apr
- 2025 12:00:42 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8655.022; Thu, 17 Apr 2025
- 12:00:42 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Vlatko Markovikj <vlatko.markovikj@etas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Toke Hoiland-Jorgensen <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	imx@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net 3/3] net: enetc: fix frame corruption on bpf_xdp_adjust_head/tail() and XDP_PASS
-Date: Thu, 17 Apr 2025 15:00:05 +0300
-Message-Id: <20250417120005.3288549-4-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250417120005.3288549-1-vladimir.oltean@nxp.com>
-References: <20250417120005.3288549-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR09CA0023.eurprd09.prod.outlook.com
- (2603:10a6:20b:5d4::13) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Thu, 17 Apr
+ 2025 12:07:37 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8655.022; Thu, 17 Apr 2025
+ 12:07:37 +0000
+Message-ID: <f31ad04e-90da-4de6-9065-5ff9fd1d20ba@amd.com>
+Date: Thu, 17 Apr 2025 13:07:32 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 05/22] cxl: add function for type2 cxl regs setup
+Content-Language: en-US
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ dave.jiang@intel.com, Ben Cheatham <benjamin.cheatham@amd.com>
+References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
+ <20250414151336.3852990-6-alejandro.lucero-palau@amd.com>
+ <20250415142150.00000f9d@huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20250415142150.00000f9d@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0136.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:193::15) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,218 +84,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GV1PR04MB10560:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c715414-4e4b-4c41-28bd-08dd7da779e9
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM4PR12MB6374:EE_
+X-MS-Office365-Filtering-Correlation-Id: eed645aa-9269-4137-0518-08dd7da87193
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|52116014|7416014|376014|38350700014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3bfM58tKnWDYFnUay9TaC8LmdBkh7ACdT2nv+4nUL6riWbFheWudB239Aw3f?=
- =?us-ascii?Q?p63/yoNcfrwhBMLcatxox5RgG9C+Jd55FWJ8qG4uXIAeSZre6B1DA4ucQL6B?=
- =?us-ascii?Q?Q8ep96WyJBrd1o6gSEUUrYDC15yoCO7dDTG+JdcqUimZpmXcv3O0TBJxODJx?=
- =?us-ascii?Q?JVc6Tfikn8BcanotlT9vN7PFCfndQ148O0oWgvYI9Cl7H2FGkY0xGr8fjc2o?=
- =?us-ascii?Q?6V6SLNd4fo5YA3ao0ZmCC4bZV1RFS4lebk9k4Q53l7OYJhEEpy8MuMb+cFAN?=
- =?us-ascii?Q?7EVmyNRPCNbldDx2licuPy5bS9WLs43lms9yw64PmZ3Yy+m8I8Z9gRUwIsk/?=
- =?us-ascii?Q?G/9Zv/WjmETeHG1iBmNwIgowN0Lcu8XQAijFhPV1QQCi/ZeR7Fb8fCz/Bx9V?=
- =?us-ascii?Q?cqgf3W3im4M+IFw+IBj86PCIzOqLPOG0QRBdOEISy9821ysrQ4o3DITrtAb0?=
- =?us-ascii?Q?wxotk3IkW3CdxgvWqMX6ObmoxpnyMIuMAkhG4JJuEpRShU5LSDjBGISpoOQJ?=
- =?us-ascii?Q?4Uin+IjaCog25o+pjATDH4Y+UovO+ZJZtsjk3rOAuURnVt5Db6FKcvDKWePS?=
- =?us-ascii?Q?kNufI1LCQgStd7pRcCINUnW3TTGdGWY8KdEJnMg8RkIOIKpaBzRPPDiIOIjP?=
- =?us-ascii?Q?Lt7IX++UhOOMhqPu0/YbYCdVG1s22gl8IEEk9MX2gYardF1j2daH+tcnVmoH?=
- =?us-ascii?Q?saHxlpUh09bbJ2mp/A7yYCVHlUSju11eVhSJ1BD+RSbyaJJggOR2lRtr1ztu?=
- =?us-ascii?Q?fpAvdsE2FU1yNzF3siTSnytzJSVuhMMR6qESmi4moknCfPbAkPg/GQuxUGMo?=
- =?us-ascii?Q?O5k1pZfLSNBeXh4OqERYxEedygD7eh8/agZeY89dnrY1wJtw4x53wS7HmNhz?=
- =?us-ascii?Q?iyHXiV/EUeYO/K4gBXfeKEDrllabl+bz/W6qs43sFj7kBALJXHJOef9N45YJ?=
- =?us-ascii?Q?x9HqPKkHv3ZioIEDmj2DZJyctvrVJQDdYaMJYpiAahrY2JIIePsYh1EWgiMg?=
- =?us-ascii?Q?+QPoddkZbk1lCvlw6RSbKTtVcJDNAMBQDYDbZZsMfBgcwWTApj2M8EXN+hPz?=
- =?us-ascii?Q?Mv25MaGU61X67w2WKBVdmiczX61bBpSiZH/LsKPYSSEXnSqRKm5WeR+RM8v/?=
- =?us-ascii?Q?bYppuXXhYKYHED8PHOQuqGhdfuvGvhSHPjtRACHeSn7A4RsyEmjSqVoov+hY?=
- =?us-ascii?Q?08xXcCN9Kaz0h++SLE2ZMJJx3mA/TGrgPgzuU1Bi/aTT6PMo03er7QkAjZPp?=
- =?us-ascii?Q?zrUuE+LNLePbxYzgyTroDh5wHOoBTEAxPjmpFYs0TMKi/EMVEkd1eK4V/9qW?=
- =?us-ascii?Q?Ew/GWJZlH7YfkfhdUDKpK08iWPDo45FIv6AK6yL4NpDTnlAANiezjEIaZ1px?=
- =?us-ascii?Q?d8Zr9jWktyNAYjQZ9Gw0mcFelbp8+4Ylar2ecaCOA+P8anVF1tDyoJxKDK3a?=
- =?us-ascii?Q?GZ5ZTCX4H7vNH6V44rolMGOUpGcgQOexJQIgNNI3pE77d+9YQXVXFw=3D=3D?=
+	=?utf-8?B?TDd6SWFVcEdVRzBvOGE4MWJuaXFoWWVSclo3NWxkSnRKUXlTVXpyMTdGNEE0?=
+ =?utf-8?B?V2pDdDZPblppMnZrTWluYk5Ec0llcHEvOEZpVXhhVW80WjV6QWpzR2Z3QjdQ?=
+ =?utf-8?B?cGQ3ckE4emk0bTRyU2VzSVpZdStHMEJHWUtwWEtqK29nbWVIRzdMT0tSNThD?=
+ =?utf-8?B?bGhOOXpqQnRrQmd4eVE5Q1Yzb0p6dXJ2VFc5QU1zN2g1b3J1SkppbC80U2Rv?=
+ =?utf-8?B?MlRBMzJQdXQ5NUxtR2dmWkh1bkgyM2V4Vk9KcnpCaThvcDFEVUM2NjZlQy9z?=
+ =?utf-8?B?ZXYvb0ZtVUFNcFNDd0hTSTRmOWpRdGUzUTd3QkkyRkc2YnY1clczdi8yTXlu?=
+ =?utf-8?B?Mll0MFlCeGFUWlF4eFZBSFg2aFUxbWx2UEdXUCtSc3N0eTNWMDU4eHhlbUFm?=
+ =?utf-8?B?QUV4M0xnTG9xUDExUU9MdzNSMm1xQUdRenM2Z1NRSVQ4am82VnBCZXhTUFhD?=
+ =?utf-8?B?Mi9wVFNTYzUrWHk2YmtHWnEyRUNObDUvNUt3bVh2QjNSRlNJZTRGNkN4Q3Q0?=
+ =?utf-8?B?Z2lyYlBSUzBKV1BBcWk0dTJGRG1YTHl1ajlROEF1QStLbUljWXQ2N20rYS9h?=
+ =?utf-8?B?SFhtRk1VVFlTS2FNcW5rRXVpVkVTMFduRS9JaWtFdkdqZFRpenJITC9xM1p3?=
+ =?utf-8?B?c0Q3Wld4d2pQREw4TTBVYVFSclVORXRmZkNjekNvQWsyU29mdm04Uy9UcTJq?=
+ =?utf-8?B?NXhTTE5JTGhHaW1nak1idlVtNG9xSWxRZVNyN3RDdlNvd21oRlZ6TGY4YUdp?=
+ =?utf-8?B?dzZLdmU4NzQvdDRTcy9hL0EyWENOTzhNWEpPWnlzblBaQjZneFM3WDc2N3BF?=
+ =?utf-8?B?WEpjY3BWRmNXTkVUYWlWUjBxZlN0NGJ4WEFxTXVJQ1NqOGdZeWtaYWFWekIx?=
+ =?utf-8?B?dDJ2N1B4cW5kOC9mb1U2MVBCUW1Zby83YTNVQ2pDdlR4aDRHSnVRcjQyM0VS?=
+ =?utf-8?B?cnpiL2JNK1FjcEJjcEdXYTAvQjE1MUtyUnhETU9CUmRFbk1WeXNoNVJ6WGVJ?=
+ =?utf-8?B?RklTM0pscTFUNXh0ZHFnN1R1bGduZUlQa0dJSDNZUGJnMUE2QWR0eXlyT01v?=
+ =?utf-8?B?USt6bWZxMmdIaE1wY3hacExURk9RTnNQKy9TVGJScW12dG5HNFlub3VXSkwr?=
+ =?utf-8?B?NDMxN3hUbktCTExJaGQxMDRWVmxkVlc0OURRaUdvdDBXS05iU1I5cnZUbHkv?=
+ =?utf-8?B?UmVTV0FXQkZ3UThoRU03bk1pUFFhVUc5YkhJNERGUmhOMlRjSDVhZ1lvQ1Q4?=
+ =?utf-8?B?TTRCRm5UbC9nNytNdmN6bWhWODZndmROWlZzaFRWRTQvTXdKd3p6V1RKUWUy?=
+ =?utf-8?B?TVdnQkJZcGh3QXRJaHp5RTZ3NjdQNFpRdGhlOHJmYTNCOGFoajlRVTNVaWQ3?=
+ =?utf-8?B?L2ttNGpCWXc0ZThRQ0N1WklEeFhCOGdwdFdLZjRHR1BBSWNsVlRhUEFhS1BK?=
+ =?utf-8?B?Tkx2Wmc0eStrSnVZeXpjMHczWE9iZUFUcC9SZEVvNmRVcFNFR1c0d1pzaVZv?=
+ =?utf-8?B?R1NQb0V5cjE0ZkFWM1dxS01MeWZpS0h6MndzZ3BxanpKR0ZZbkpDWmc2b1JG?=
+ =?utf-8?B?c1hLR2d4czBpQy9uQS9pQlBpVThrMFlTdDhvQVh3bG53eWJYeklMcFFGbEhR?=
+ =?utf-8?B?RElBMG9MdkRtaVBCaWt0OGJRcTZsV2pYdnVkZDgyUXNQc0RVTzd1QnpqeTBL?=
+ =?utf-8?B?bWw2OXVmOCtXS1haV3VBWmNvU0F4QjAvMURLUGt3dUdSMURwU0Rzam8wT3hE?=
+ =?utf-8?B?VHNlanp1U1pveDg2SjRRcjQ5d3RLWTZpNThkZlFIMTk4WnkrOTZaNUFKYWsr?=
+ =?utf-8?B?SWRqQkUwZlNLOE9nbjRhbWp4V1JZMmFXSmF1VThzU0tRbUZkNWQwd2FPcGQz?=
+ =?utf-8?B?U200bmpNWkZYZWNSTGFYYU42YmNXTnY1YTFVaU90ZmI4MEUwcHBrMC9zcXUx?=
+ =?utf-8?Q?YKcQUsbnWA0=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(7416014)(376014)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6EsqalDqGpMZ17kwIsWjePO0yTuvwwif5IxW3hd8LPMMp/PCovgS2+nJZmgq?=
- =?us-ascii?Q?g7gDL/GwEELoyy3TJFCDJdwTzEwk1+e0RC4oHlfY0ThqsN/mIoLekJa1/QCP?=
- =?us-ascii?Q?07nf9V3Tth39hLOhUVd/QkHlhNx4qwRpqRCP8lubDMbP1HY1Bvo55a0uWAwA?=
- =?us-ascii?Q?f91fzGci9ScuxAXsu4zT0gnNNb1NlbH4u9VAsCQ+ZyKCBrv+7nQtsSLAZ8dH?=
- =?us-ascii?Q?OfltsPI78MZ8Qdwb9510aghUbB6DsIY5sJYaX/+vO3mZjlM1umFdlqboquzZ?=
- =?us-ascii?Q?5+ONt6Zu8gs8nQpcgfD0ava2AfQjCZSoIVwRpcZwq9ijKlm1IeKW+IWJiIk4?=
- =?us-ascii?Q?sOX04+8Y6KX8r+3d5uU1uQczfL2wthRUsFEWonuldBaHa9QWobYQcrLZgknO?=
- =?us-ascii?Q?DWlGtLmW2RZX981TrQ08JARZwQzAP7SjlM5cTfThi9Lz0uVzaXG3JtkIeqI8?=
- =?us-ascii?Q?eQU2LcN/OkZZctAE+z4O7wsNknPIk5suznWXkMi4sx7BJMUOUdZCJqqaixSj?=
- =?us-ascii?Q?Yc9LdW86jgog9IfMSPGUWtXlLEZ0oV+o5UJbrYBh5TGXu8pZrA71Wy2ToLow?=
- =?us-ascii?Q?OyE6zPeKP+tAGvSXA+To8PgIYNGqkmhRwGjMqqpEqWQwjtAh14nq46XgZXe2?=
- =?us-ascii?Q?NSvinfprkbCQvv88Rn+rfhHTSmLaKD1YNKM9ZpmyRvHjdRnSIsaeUs9Qllsn?=
- =?us-ascii?Q?R0w9CBjkkh2dwVoHTtRBLWQIznoUTtQgAKN9umRch9BJxli1H5pncJtmUs71?=
- =?us-ascii?Q?a4/TNlfnDX/h8W4Xre8sRsKgBozB01zaPGjonPpKJRiBJFW99Py7Xe9hAlVI?=
- =?us-ascii?Q?bU0tc3R3zdGXRU0Y5cO2O4lEDMeQnrbZS3TPsRKeuSNRX+TRq1R3YQcB5MUq?=
- =?us-ascii?Q?Uh2TVgm70m/FOVeidV3jJeANhGs5I207/VsGkLDfyUd9ERfdgW9iEU+9NTHH?=
- =?us-ascii?Q?/cbuzdcLeHXQWyD8OHo2S366YuzvpH/AQZe/L3yASfYQVhVepbEoVqi/GPkL?=
- =?us-ascii?Q?7l5qGyXLHrv/twwWVsc7xgxD8wUQHGxkINgJEtiqpb9eNmFGuYX0SVlsILH4?=
- =?us-ascii?Q?LAThdh5TBBO/OxKOcUCd1NfyVdZNtGGqSB260/U8v31icqyWgd+2S2Etka70?=
- =?us-ascii?Q?dW8ZSQ8rYiwvwk0p67peKolXMkcKTFz6SzdrAzGKP/vWjvUOx0XALbFHcxuH?=
- =?us-ascii?Q?L8pJ7ATvnoSPdR+t12OHhsRMZKJj2cQEyLY/eLOCMSElmwsipwX8qcSNpOoR?=
- =?us-ascii?Q?DmPu8DemxaAirB5zVM/vv5a3QBv5Ey0ClieSJscZG84WAUHnpVYIn+c1Vnm/?=
- =?us-ascii?Q?F35Ew2ckLUc5NOQ1ML8usZ1WKr80gWS7uhw5QUcjukcx7uDd1rjPWvLjW2tz?=
- =?us-ascii?Q?+CW72zcJuiZ6Wme2DLmUnZm+5Et5P/wZlqOYNrkcyFYjDbsHlfxZY1ORecej?=
- =?us-ascii?Q?FbooqlWYABoQXrk5kvCb+qbFjnEuTYOzKeE0x1XapCPxyfBvy8n89iAWUjux?=
- =?us-ascii?Q?/2wLrr86B/AS2zuhuLehsokancOYk/YY/Z5cBzhWe7IC7KgSNdoXkPX3k4Xz?=
- =?us-ascii?Q?vUm3jyRvbIRzdQYn6oTK3zaF3YGQzmndnyUyU+tQoNfk/HjIi1sKWgOEq6Xk?=
- =?us-ascii?Q?Zg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c715414-4e4b-4c41-28bd-08dd7da779e9
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+	=?utf-8?B?MHhkRFJWYlNQUDdDRktwNkJlWE8xbWg2WkNmVHJYaU1veXZLRW1DeEpBYVFV?=
+ =?utf-8?B?Smx0STNvWlBXVWlWZ2RrSjAxOU5lZ2dDaGM1UzBSY08xOXhmNHduaWpVMjcr?=
+ =?utf-8?B?eGlZYXRsWjV2MkRGSzNDTFVtRXdhdC9CbVh3SktnSmRvdm9xTFZWVXpndjU2?=
+ =?utf-8?B?TW9heHBOVDVBSTErWWZ0RVhJZkJCWmthZmsrS3ZwOGVHdkwzTWM1OGt6Wng5?=
+ =?utf-8?B?b2REdkgyM1JuWE1zblpjRGVSZFp1UXRoY0JRa0MvT2cxZTVqZjhTa0hUbEoy?=
+ =?utf-8?B?ZGI1VWZoUEZkbmxJZEExYjdtN2tkVzd2bVgxK3NZcDdiSUVjWHFtU3NQcW5y?=
+ =?utf-8?B?bTEvZ3RZZlRaKzlOMHBkejVnZXVocElzR05lRExXdDlyOTFDdk84VjVMM1NL?=
+ =?utf-8?B?ellQLytrTUlDdGNybEhiQmRyQ0QzVnJvaWRHTncyUUZFekFTZEdvNllvWUZQ?=
+ =?utf-8?B?OWt0aWtvOWlabVBFMnNCV01KczQ3ZGFVVU81VTlrZ2piN2VxYXk5UWJSd0Nx?=
+ =?utf-8?B?eFZDamVkN3ZGVzYzV0kyQ29pRis5MDFLNmRVQW4wK054NUtmMXhyZjNEVllQ?=
+ =?utf-8?B?bnYxbVExUmRjb0MySE1GR0ZhOWU2cXlwTU5KelR4VUdMNEZuT2h4NWdTSkRP?=
+ =?utf-8?B?LyszdE5ZcEVzOXBhaldxSGdHU3pNR09OVHFRZHI0cU5mMnFVbm9pZnBYWE5N?=
+ =?utf-8?B?bnQ4eFA4dE1keUVieGVXSms2V243TXB3WURnMGNLMVlkYy81bTlYd3dXUUwr?=
+ =?utf-8?B?TjR4K1FVd0VLTkdubk5kTThJaGpibWpwRFdCREhBejJRYlFnVU56ejNsL0Qz?=
+ =?utf-8?B?RUdubFNJUW4zQzlqcmVNMXdPVGRrOElhcm16VEdhWGJEV1FmeW9hZHU0VlRw?=
+ =?utf-8?B?YjE1bFJGbWFZWmk0dlIyNHpIZWd0WFV0M011dHpPaXNhOGQ5WUlHM0FZbFBn?=
+ =?utf-8?B?Mk9ybGxQMkNXS0tlTFczanFXaTZJQjFiVnVROUEwVzZ0L05QK25jMGs1TW1o?=
+ =?utf-8?B?bWlVL3JLVzFsVGk0ejdiZ0VvdE5QQVFmT3FSVGtzYnRtQ0JXc05MVmhFczM5?=
+ =?utf-8?B?UEtEUnBCVGpGbno4TFBmL2x4NzhjVk1uVWdsbGpDSUpWdEI3SzkwR29QS0Nj?=
+ =?utf-8?B?Sjl2RjVIbU10NmRpSVV6SURDZm1IaUFNd0dia3lxSEVKdDk0OUprdWw0dzlO?=
+ =?utf-8?B?VkY0NTVIaEZjak9XVDBNMy9GVnNJQjhCdTRMSWFVL0ZCTkRNMWxmK0IvR2Vt?=
+ =?utf-8?B?WDg1VHB5ZTdJRFNkbE0xY2ZLUmtEamJJYkNZaCtGd0ZqbTBtdmVZdWp1TGIw?=
+ =?utf-8?B?d1JYQlVMdjM2S3FveUZiQ08raitaY3lVdG1Tdk1kNDJmdXVzRExCU1NBWkVD?=
+ =?utf-8?B?QmZmSklycmJiSEk3ZVhZdVpvclJIQmxjZ0hTdjFLS1o1eXRJZW44Mk1lUFhY?=
+ =?utf-8?B?VW9rWmFWQUpJT1NzMDV5RG52b2JtVlY3TGRBUGFNanZ6N1F5MjFoYkN2eWt0?=
+ =?utf-8?B?SnJsYWhCckdWQy9SSVpwVHFhUytJQ1ZPY2wyMFVOUmVJd1FhdU9PdXhDekpU?=
+ =?utf-8?B?M1Zwdlg1eU1HRkhoU3lZMFdSRWh4RkdwWjlQNGEzaFVaOEVCVmcxbEp3VU1I?=
+ =?utf-8?B?V3RCeVZRSXVuZkZaVzNEVVF2WTZMQ0RXVUpNcnlSY0FIOTJNOUFlZFlkNHJt?=
+ =?utf-8?B?K2dkV29ub0h2andjUHhVb25OT1VPRVZMTDMvNHBqVDR6c0tCc1dreEs5cS8w?=
+ =?utf-8?B?ZCtRbkYzYk56MjBBeHY5QytRYTdXeUJEaTlBSWdwUkhvaGdOL2lwQlVDNG4v?=
+ =?utf-8?B?OS93cU1sajVDUytEamhoTXBWLzBvTWE2Y254dmt0Nm9LK0laeUQ0TEJwRlpG?=
+ =?utf-8?B?MkQzMk1xdXFqR29UTHcxbitZaUJvTUdxbVB2YkcyWVZLeWJNSTJzYVRoMUlB?=
+ =?utf-8?B?eE01alE2SmVHeVdEcHFkNUFabWdWakZRaDU3bGhCVWN1eVRvWXJMQzZwRXNi?=
+ =?utf-8?B?bmFOWUpMeVdFakNoUHN0anhLbnFUTXhVRG5oMTFMaDVqOWh3dXAzRFc4dGZT?=
+ =?utf-8?B?cG5lYU1EWkVzS2xNT3QvYWRTYmRrQnNTSGprMVdpR0xGUFNZaFJDaUd0OU9o?=
+ =?utf-8?Q?aWack0+yMHSH/UxJcd3D4PHCd?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eed645aa-9269-4137-0518-08dd7da87193
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 12:00:42.7770
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 12:07:37.5722
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: g2vd87/wmNJjD99mtw5SkGW+Uz7KgveSn/sLC4mPnyg6Wi5eWXitTIIoZHqU4AEViIHxpD2jBCFIHnd4x+s30Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10560
+X-MS-Exchange-CrossTenant-UserPrincipalName: dcDm3Ff0oCa8a5oOUDtyfGnmJlAFf4fdRiBKkNmPDK6DJhDMYsGbNaISilWrI6EtoIlu3n32XtLONOi/m35YUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6374
 
-Vlatko Markovikj reported that XDP programs attached to ENETC do not
-work well if they use bpf_xdp_adjust_head() or bpf_xdp_adjust_tail(),
-combined with the XDP_PASS verdict. A typical use case is to add or
-remove a VLAN tag.
 
-The resulting sk_buff passed to the stack is corrupted, because the
-algorithm used by the driver for XDP_PASS is to unwind the current
-buffer pointer in the RX ring and to re-process the current frame with
-enetc_build_skb() as if XDP hadn't run. That is incorrect because XDP
-may have modified the geometry of the buffer, which we then are
-completely unaware of. We are looking at a modified buffer with the
-original geometry.
+On 4/15/25 14:21, Jonathan Cameron wrote:
+> On Mon, 14 Apr 2025 16:13:19 +0100
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Create a new function for a type2 device initialising
+>> cxl_dev_state struct regarding cxl regs setup and mapping.
+>>
+>> Export the capabilities found for checking them against the
+>> expected ones by the driver.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+>> ---
+> One trivial thing inline.
+>
+>>   drivers/cxl/core/pci.c | 52 ++++++++++++++++++++++++++++++++++++++++++
+>>   include/cxl/cxl.h      |  4 ++++
+>>   2 files changed, 56 insertions(+)
+>>
+>>   int cxl_pci_get_bandwidth(struct pci_dev *pdev, struct access_coordinate *c)
+>>   {
+>>   	int speed, bw;
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index afad8a86c2bc..729544538673 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -231,4 +231,8 @@ struct cxl_dev_state *_cxl_dev_state_create(struct device *dev,
+>>   struct pci_dev;
+>>   int cxl_check_caps(struct pci_dev *pdev, unsigned long *expected,
+>>   		   unsigned long *found);
+>> +
+>> +struct cxl_memdev_state;
+> Why have this here?  only cxl_dev_state is used.
 
-The initial reaction, both from me and from Vlatko, was to shop around
-the kernel for code to steal that would calculate a delta between the
-old and the new XDP buffer geometry, and apply that to the sk_buff too.
-We noticed that veth and generic xdp have such code.
 
-The headroom adjustment is pretty uncontroversial, but what turned out
-severely problematic is the tailroom.
+Right. Some leftover from previous versions.
 
-veth has this snippet:
+Removing it.
 
-		__skb_put(skb, off); /* positive on grow, negative on shrink */
+Thanks
 
-which on first sight looks decent enough, except __skb_put() takes an
-"unsigned int" for the second argument, and the arithmetic seems to only
-work correctly by coincidence. Second issue, __skb_put() contains a
-SKB_LINEAR_ASSERT(). It's not a great pattern to make more widespread.
-The skb may still be nonlinear at that point - it only becomes linear
-later when resetting skb->data_len to zero.
 
-To avoid the above, bpf_prog_run_generic_xdp() does this instead:
-
-		skb_set_tail_pointer(skb, xdp->data_end - xdp->data);
-		skb->len += off; /* positive on grow, negative on shrink */
-
-which is more open-coded, uses lower-level functions and is in general a
-bit too much to spread around in driver code.
-
-Then there is the snippet:
-
-	if (xdp_buff_has_frags(xdp))
-		skb->data_len = skb_shinfo(skb)->xdp_frags_size;
-	else
-		skb->data_len = 0;
-
-One would have expected __pskb_trim() to be the function of choice for
-this task. But it's not used in veth/xdpgeneric because the extraneous
-fragments were _already_ freed by bpf_xdp_adjust_tail() ->
-bpf_xdp_frags_shrink_tail() -> ... -> __xdp_return() - the backing
-memory for the skb frags and the xdp frags is the same, but they don't
-keep individual references.
-
-In fact, that is the biggest reason why this snippet cannot be reused
-as-is, because ENETC temporarily constructs an skb with the original len
-and the original number of frags. Because the extraneous frags are
-already freed by bpf_xdp_adjust_tail() and returned to the page
-allocator, it means the entire approach of using enetc_build_skb() is
-questionable for XDP_PASS. To avoid that, one would need to elevate the
-page refcount of all frags before calling bpf_prog_run_xdp() and drop it
-after XDP_PASS.
-
-There are other things that are missing in ENETC's handling of XDP_PASS,
-like for example updating skb_shinfo(skb)->meta_len.
-
-These are all handled correctly and cleanly in commit 539c1fba1ac7
-("xdp: add generic xdp_build_skb_from_buff()"), added to net-next in
-Dec 2024, and in addition might even be quicker that way. I have a very
-strong preference towards backporting that commit for "stable", and that
-is what is used to fix the handling bugs. It is way too messy to go
-this deep into the guts of an sk_buff from the code of a device driver.
-
-Fixes: d1b15102dd16 ("net: enetc: add support for XDP_DROP and XDP_PASS")
-Reported-by: Vlatko Markovikj <vlatko.markovikj@etas.com>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc.c | 26 +++++++++++---------
- 1 file changed, 15 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index 74721995cb1f..3ee52f4b1166 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -1878,11 +1878,10 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
- 
- 	while (likely(rx_frm_cnt < work_limit)) {
- 		union enetc_rx_bd *rxbd, *orig_rxbd;
--		int orig_i, orig_cleaned_cnt;
- 		struct xdp_buff xdp_buff;
- 		struct sk_buff *skb;
-+		int orig_i, err;
- 		u32 bd_status;
--		int err;
- 
- 		rxbd = enetc_rxbd(rx_ring, i);
- 		bd_status = le32_to_cpu(rxbd->r.lstatus);
-@@ -1897,7 +1896,6 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
- 			break;
- 
- 		orig_rxbd = rxbd;
--		orig_cleaned_cnt = cleaned_cnt;
- 		orig_i = i;
- 
- 		enetc_build_xdp_buff(rx_ring, bd_status, &rxbd, &i,
-@@ -1925,15 +1923,21 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
- 			rx_ring->stats.xdp_drops++;
- 			break;
- 		case XDP_PASS:
--			rxbd = orig_rxbd;
--			cleaned_cnt = orig_cleaned_cnt;
--			i = orig_i;
--
--			skb = enetc_build_skb(rx_ring, bd_status, &rxbd,
--					      &i, &cleaned_cnt,
--					      ENETC_RXB_DMA_SIZE_XDP);
--			if (unlikely(!skb))
-+			skb = xdp_build_skb_from_buff(&xdp_buff);
-+			/* Probably under memory pressure, stop NAPI */
-+			if (unlikely(!skb)) {
-+				enetc_xdp_drop(rx_ring, orig_i, i);
-+				rx_ring->stats.xdp_drops++;
- 				goto out;
-+			}
-+
-+			enetc_get_offloads(rx_ring, orig_rxbd, skb);
-+
-+			/* These buffers are about to be owned by the stack.
-+			 * Update our buffer cache (the rx_swbd array elements)
-+			 * with their other page halves.
-+			 */
-+			enetc_bulk_flip_buff(rx_ring, orig_i, i);
- 
- 			napi_gro_receive(napi, skb);
- 			break;
--- 
-2.34.1
-
+>> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlmds,
+>> +			     unsigned long *caps);
+>>   #endif /* __CXL_CXL_H__ */
 
