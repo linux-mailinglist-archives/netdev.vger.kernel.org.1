@@ -1,161 +1,142 @@
-Return-Path: <netdev+bounces-183676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD5EA91828
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:40:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C06A9182E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:42:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1E6A443678
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F055460C12
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0E7225A3D;
-	Thu, 17 Apr 2025 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F65A226CFD;
+	Thu, 17 Apr 2025 09:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJRO9ygl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CU4FMxi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A460205E00
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 09:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023C322578D;
+	Thu, 17 Apr 2025 09:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744882828; cv=none; b=DMBXkYdBpuqKu99Lpf5KrKnCcLLjwmby8MxkUW6XxwOlAmbHD1C98g6oOgXxl119Zt+ihqou7zxBXDC4MAnBRycxVbRkRa/pGVcULtFjK4VdsBEckvkupUNCV45ktvkfi0gtULAv79ZInJGLJ0KPL4FpIcBfqswP8/O45Dc5WYk=
+	t=1744882921; cv=none; b=VTW8cauHKbxiwmUDtpd2W9PHnYixitxZD072PZxcquAS60bd+bO8LHgVX2V8OcNS5gK4ZhqbLJfhfoYb/3TbCk1mp1IoGryA50LjSQBFBWqlWvKmtJlFnUUMFDlIgYFEScFlAhGA2oMRMQc3yYtJtIA0UZbsOxzFG8KvhXp8LSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744882828; c=relaxed/simple;
-	bh=oztNe+62TOePl7PmTJB2o1KTEoJOYLtNxh9fbyr6Y+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ky1wTFe0v8CCHnQYTsUgcLX5IULSrccLdNWKDUFVGqbEuuw5+kwjaNQWKkwTp23e1jkgqFvUVtTHtB2JpCtIXm+SP4NEsM20/sTP5cuM1NaqMpej32KoJx5YhVlp41i5/xfE4jgXb9mCP7nEV4ZvphKqFeVTVYHFaUWrV8SjswM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJRO9ygl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9105EC4CEEA;
-	Thu, 17 Apr 2025 09:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744882828;
-	bh=oztNe+62TOePl7PmTJB2o1KTEoJOYLtNxh9fbyr6Y+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OJRO9yglH0/zdjfhzDeZN8sEkS11lGoMRTT4JXFciq9R5kPYpEEEFiwJp+jpsBnlk
-	 rbQ/onI1l1Kf08rTseJo6WS7E+0kqc8jdREOERth9Ho9aTWiOO7F3n9KBCUCXohuky
-	 j1f1G+tExB8dTRz7LM/uxgWccBwXpe+2fJ2g4zVPDMCRpvybZv9ffFFCZoZIOhccAZ
-	 BUpzGNMrPS64FVWqHgvumf+rx8IDpt9gjrD/nxMXqGMACxGEnWkUtSDRCoeMIEl+9c
-	 auwqT96IckG9jDk5mG7MHDR63Vnzp35uNO2gLk8tGWbwj0gdaO8FwhJ/B1qDNDmvb+
-	 PMKw1I+5s9A9w==
-Date: Thu, 17 Apr 2025 11:40:25 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744882921; c=relaxed/simple;
+	bh=Axgrubfzs/zW1JzbQxcbdZH/LwxzFYFWlRzlzPZlvBc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ba2Lj7AEEC2SHtXGPSjSkmi0vtlf2lNG7ct40xMtYtS1kuh+4Bk3qdJwWqBr8LA9QVhPUBZ3FCozktVo1U5T0PdcZNW7dRiSvmRv2nXexRgFnQfETjVQF3D8BHFWtRDQAvmVHaLyxio0SMmV9CQEvnioG/JugeWNTN4TBqcO3Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CU4FMxi9; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3031354f134so376167a91.3;
+        Thu, 17 Apr 2025 02:41:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744882919; x=1745487719; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uvSKpQg6AqCSchkTbefy7r55u9161g23HpSQe+CAo3g=;
+        b=CU4FMxi9HgnUMPZolSAAX+Nkh9wF7tX1BV8F+S/tv0BKlcMmOlM67QVIRoKWNuxB9+
+         KIxGlFAgvS3jxmMhO+yJTG0Qnvu7XnrDyA4zMdzH2hryntXOkY/HwhxLYdqvpvdHQKOT
+         PJ8EMVhQ3Avi5cENPBghSho7b8AZSW6s7v53gFrA/AUw5q87kzU9QRihgqmuIn/oDwE9
+         /uXNW9JkOApss+8UvwTM1EmzqMp1SRwtCBXsADqzT9aYrswU3bX+VjnN5k659PYWHxtN
+         6qu+AfV+VKvNDbeUZFfZzV/NU/+pr/PtAyChA4u5v2PWL4IRO7s4+NMJob/H+uof2327
+         eWdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744882919; x=1745487719;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uvSKpQg6AqCSchkTbefy7r55u9161g23HpSQe+CAo3g=;
+        b=Iqy1aK1rx4n7HPC3+j2Ow53dScoTpNJZIllHO1QH3sI+hE4aS0DnrZXP2j+z3eKKn5
+         W/8rFwSzfb6wpOMrCXV+Q65qxndxRUQuEOI60U7863uPJAnuhe6nX8vfbVvhBeHrB+WG
+         hFQ90ZsYbL9Qdi1ol95JEfyJE84OBqkw++H4i1e4PCTLzDNppG2OhZYWIZyapXycbXkL
+         cvDRMB4iIdmciDUwsdsvGcDhXaN8WnxnycBSHd1BU9Wj1YhL51bYKCbm9UWkqKxOCuVD
+         HrZEz1jZ/bSP8jx/jj6gYlpdmFYwsyxJ0uVX1/JYU1s5ebZG04KCoYY60xN38qIy0vek
+         l1Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCUw1PLLc39vme/yqgB1+E6yD6bz3En/mvmqz2nrWIBNG/zC3BW6n0ubKEwq8HO9J0bCEnY1YY9O@vger.kernel.org, AJvYcCXGWUaKhp7RFqlcXi4EFugY3FjI8dfpuQMM8+fXhTcu5kfvEom0G0MGW0TfJKxmV+WP0Cgty5+lBkz+lic=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6jmpOMr8R8nTZKvt1tgKuRfsNOGM2yFB5Pwodp9L0A8dIgTuR
+	IdwA+fW5JAa2+wIfZ9qMgG0zlXsv/seaSLvPFZTZmr3PQ+JDkw6h
+X-Gm-Gg: ASbGncv1gjnCB2SnWJxGpn9gIKqLEVbf5esjK/reAI8ylqB/JhsIvlPu2Js7vxSBifF
+	nNm/MlgOTcb/FSPpNWoEqYYj3xmA/5nWcdt2sbb9yE52UzX45rqcAOvweyLBoNa/t37Eyk+f722
+	7MHEp+NmL2zht82lxaG4zMcSSZek9tTmqCS9PdAQzFvYz61Coi+KzlG0DpSLOCiKrhaIy2kyr81
+	XNCHwzgbTM1cfgvdDHtOypkChtDoek/pIATENgJar262ai4jRn0phAi/7gJmZ3111ROuNjXs8k9
+	LCoR7UtJXw0bJj9c/CpwsBpCH2lDgma2/V/kveU/ntnbvtjzREBibUWb3zO6Mmjv7QfvAIo=
+X-Google-Smtp-Source: AGHT+IHN4Aib5jeb5YC+42bbXiYICwbu3kOvFQE/yidpu5XKQfNjROjzmQPdpx66cwYL1NBoTjfbgQ==
+X-Received: by 2002:a17:90b:50c8:b0:2ff:698d:ef74 with SMTP id 98e67ed59e1d1-3086415c614mr6361358a91.26.1744882919154;
+        Thu, 17 Apr 2025 02:41:59 -0700 (PDT)
+Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([14.139.108.62])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-308613638d9sm3186267a91.42.2025.04.17.02.41.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 02:41:58 -0700 (PDT)
+From: Purva Yeshi <purvayeshi550@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Add missing filed to ppe_mbox_data
- struct
-Message-ID: <aADMiRyhU_Qkc7qn@lore-desk>
-References: <20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org>
- <20250416154144.GT395307@horms.kernel.org>
- <Z__S_m9fBEKmoos1@lore-desk>
- <ba5b4313-6e42-4340-8301-239dac046424@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Purva Yeshi <purvayeshi550@gmail.com>
+Subject: [PATCH] net: ipv4: Fix uninitialized pointer warning in fnhe_remove_oldest
+Date: Thu, 17 Apr 2025 15:11:26 +0530
+Message-Id: <20250417094126.34352-1-purvayeshi550@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="I/38EiJkfegtg/Bb"
-Content-Disposition: inline
-In-Reply-To: <ba5b4313-6e42-4340-8301-239dac046424@redhat.com>
+Content-Transfer-Encoding: 8bit
 
+Fix Smatch-detected issue:
+net/ipv4/route.c:605 fnhe_remove_oldest() error:
+uninitialized symbol 'oldest_p'.
 
---I/38EiJkfegtg/Bb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Initialize oldest_p to NULL to avoid uninitialized pointer warning in
+fnhe_remove_oldest.
 
-> On 4/16/25 5:55 PM, Lorenzo Bianconi wrote:
-> >> On Tue, Apr 15, 2025 at 09:27:21AM +0200, Lorenzo Bianconi wrote:
-> >>> The official Airoha EN7581 firmware requires adding max_packet filed =
-in
-> >>> ppe_mbox_data struct while the unofficial one used to develop the Air=
-oha
-> >>> EN7581 flowtable offload does not require this field. This patch fixes
-> >>> just a theoretical bug since the Airoha EN7581 firmware is not posted=
- to
-> >>> linux-firware or other repositories (e.g. OpenWrt) yet.
-> >>>
-> >>> Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
-> >>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> >>> ---
-> >>>  drivers/net/ethernet/airoha/airoha_npu.c | 1 +
-> >>>  1 file changed, 1 insertion(+)
-> >>>
-> >>> diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/e=
-thernet/airoha/airoha_npu.c
-> >>> index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f2786689622=
-6c3611b4a154d19bc2c 100644
-> >>> --- a/drivers/net/ethernet/airoha/airoha_npu.c
-> >>> +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-> >>> @@ -104,6 +104,7 @@ struct ppe_mbox_data {
-> >>>  			u8 xpon_hal_api;
-> >>>  			u8 wan_xsi;
-> >>>  			u8 ct_joyme4;
-> >>> +			u8 max_packet;
-> >>>  			int ppe_type;
-> >>>  			int wan_mode;
-> >>>  			int wan_sel;
-> >>
-> >> Hi Lorenzo,
-> >>
-> >> I'm a little confused by this.
-> >>
-> >> As I understand it ppe_mbox_data is sent as the data of a mailbox mess=
-age
-> >> send to the device.  But by adding the max_packet field the layout is
-> >> changed. The size of the structure changes. And perhaps more important=
-ly
-> >> the offset of fields after max_packet, e.g.  wan_mode, change.
-> >>
-> >> Looking at how this is used, f.e. in the following code, I'm unclear on
-> >> how this change is backwards compatible.
-> >=20
-> > you are right Simon, this change is not backwards compatible but the fw=
- is
-> > not publicly available yet and the official fw version will use this ne=
-w layout
-> > (the previous one was just a private version I used to develop the driv=
-er).
-> > Can we use this simple approach or do you think we should differentiate=
- the two
-> > firmware version in some way? (even if the previous one will never be u=
-sed).
->=20
-> I think it's better if you clarify the commit message. I read the above
-> as the current (unpatched) code will not work with the official
-> firmware, so bug addressed here does not look theoretical.
+Check that oldest_p is not NULL after the loop to ensure no dereferencing
+of uninitialized pointers.
 
-ack, I will fix it in v2.
+Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+---
+ net/ipv4/route.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Regards,
-Lorenzo
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 753704f75b2c..2e5159127cb9 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -587,7 +587,7 @@ static void fnhe_flush_routes(struct fib_nh_exception *fnhe)
+ 
+ static void fnhe_remove_oldest(struct fnhe_hash_bucket *hash)
+ {
+-	struct fib_nh_exception __rcu **fnhe_p, **oldest_p;
++	struct fib_nh_exception __rcu **fnhe_p, **oldest_p = NULL;
+ 	struct fib_nh_exception *fnhe, *oldest = NULL;
+ 
+ 	for (fnhe_p = &hash->chain; ; fnhe_p = &fnhe->fnhe_next) {
+@@ -601,9 +601,12 @@ static void fnhe_remove_oldest(struct fnhe_hash_bucket *hash)
+ 			oldest_p = fnhe_p;
+ 		}
+ 	}
+-	fnhe_flush_routes(oldest);
+-	*oldest_p = oldest->fnhe_next;
+-	kfree_rcu(oldest, rcu);
++
++	if (oldest_p) {  /* Ensure to have valid oldest_p element */
++		fnhe_flush_routes(oldest);
++		*oldest_p = oldest->fnhe_next;
++		kfree_rcu(oldest, rcu);
++	}
+ }
+ 
+ static u32 fnhe_hashfun(__be32 daddr)
+-- 
+2.34.1
 
->=20
-> Thanks,
->=20
-> Paolo
->=20
-
---I/38EiJkfegtg/Bb
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaADMiQAKCRA6cBh0uS2t
-rJ67AP9cbyNfuXlCcIDCbznlmoFvGbjYrj48AEnIBLv7nvvs5wEAsKnFcqsQrIR+
-qejGeo2uGi0ksWaTIT+CaDF6LBPaBQ8=
-=GURb
------END PGP SIGNATURE-----
-
---I/38EiJkfegtg/Bb--
 
