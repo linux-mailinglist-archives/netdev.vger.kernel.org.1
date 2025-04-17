@@ -1,112 +1,114 @@
-Return-Path: <netdev+bounces-183979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023F8A92E74
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:51:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E102FA92E78
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B79877B3BFE
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:50:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B3987B4312
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D73221F0A;
-	Thu, 17 Apr 2025 23:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F36A2222DB;
+	Thu, 17 Apr 2025 23:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="r1H5HKZc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iz5IW1s7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E868221563
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 23:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDD221506E
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 23:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744933895; cv=none; b=HOAj0eZZj7Pxq4O0iTT214kQAPwLyifoq9gJ9oF9AeRo+rIzTY5tj+M+YH6Jp2kuKmapgHJ5ZEwPJJZz08VbgwmQBpZrGs9SaClFlTQtPCxixRS6aRl7NJdVtRVp6krZn+G+yye6GsufexbPpB0LQW874fzstz2FzNqsn3gWV4w=
+	t=1744934183; cv=none; b=cuvXCgVgTrY0LxUzD5vS2poi/AZWRyVJJFd0Obbrda8nZM733CYN6QztPjvixVuRzK/TLX9kYMNBhyR7ZaBLKhEYrFD4t2Ad3OFvddwNGywgG//LHKqQTryqJzRj6YPANiHnZp+N2KW970/YPQgFHd5ZNi8KFkBKJgNRoMo5W1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744933895; c=relaxed/simple;
-	bh=hM3ABLdRyopw0ewaS+2awyUUr3T3DfSD9iPcUc89vjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bTdCTMwlu+482AYZbD9TYqeJ4VVnfZB9EhaIUtT6+uqdahpOEsTiIAV7rrPvBl/K0cifozoV5TXDj4OtpQyQQBKEOUarmdP93o/Yj4we2sJLeC/y92zg7lq5wjbmwVq793OdUZ6+MDv9Iwgy/togWTaGtSoyzpj+PV9po/Q4tjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=r1H5HKZc; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-224172f32b3so1485795ad.2
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:51:34 -0700 (PDT)
+	s=arc-20240116; t=1744934183; c=relaxed/simple;
+	bh=hXcNvjqqmdQD7NeJInkN2oNSoF4MZOxs/rWBneI8beE=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=CfcFD3Ket1K5mF/PHVmWwmjhjQABVtSNR+RPD7OZQv3n8ybv5PtWOBzkqwKJ04ds/N6B+glHqCM111FbGb0LyaFjjXLGU2x2ygv1Q+7lwT+HhdR3qY4MjUtwzbBIOvmWGoZ5lvrnwL2S05OqeFnwkeUiuC8ixFkIzlIYtFpvtGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iz5IW1s7; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7396f13b750so1506062b3a.1
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:56:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744933894; x=1745538694; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nj/ToSb0r+plwqfjAdpVOCmQpT8fFXkYRr6EIF/VNg4=;
-        b=r1H5HKZc5I6/b1+Uux2+KALv+zXmI+L2MtKpjV0kdjoS1jxYt1c4IauFmhZ59X5v4B
-         k+pQhTSf9HsvUpbWc49+pB2xiDj24WEipWKx+TRqlAdsB7GMNlOCWhbxRSBg97dfpL33
-         VtOsEa2Uc09LOdXH2/7XBvkCFlMMEkgXxff1DRGYhAo/dOfn+Pnu+CKKsR8jim36ay/7
-         sqf32a9xEdXzoQWpajVXFQkWY42veFEPIhNZYnp6ztnQrnrRrlk+LqQp9eN3Opy8defw
-         xqOYx0ADpxdq09hHvoxZWuDOvF6iUJA2X15kwnul5KHQzsZesXwWop69/tq3X3t0S2wB
-         f3kg==
+        d=gmail.com; s=20230601; t=1744934181; x=1745538981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMU2BD0LG1rNlUJ00GvwH9QUeSDku5Oj3mL4kLx1me4=;
+        b=iz5IW1s78O5gcs4t2acCBg+YopM58I39glm/noha19z8e3Dl3TkFzEkewTI6yVixpk
+         M3w+1CkVOYeGYWB+Gr8lYmNID0wb/U4PFN7nEiznatz2CE5T5Rc50refiofl0M/iln8v
+         skWj3P8TlSTK4AtOlxDxFjE7dQf5gI1WvqCy8McEXhA8c1O49csPRz3+4uyA2RHuNOoq
+         HXkBcKuU3qZe2JcB1C3YtGL/At1QPLk6VRDePuDBWkiiQh7j7pJNi1t2XDWfGYsXvheA
+         HYORj8AVVmJ35Mc+8Z4HBcKpEFZ1Y9Dyp3uP0OfhXwyLzVq0MLR83J99d+AJ+DG/Qio9
+         DXow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744933894; x=1745538694;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1744934181; x=1745538981;
+        h=content-transfer-encoding:mime-version:user-agent:message-id:date
+         :cc:to:from:subject:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nj/ToSb0r+plwqfjAdpVOCmQpT8fFXkYRr6EIF/VNg4=;
-        b=S0eAyxVaKUGVgzcKxjOULCdw3trWtgoXOjpCgHfw3XhjKLzbXNCdfqrBgS0f7c85kj
-         ZAOtsKZJrfx/gonXwDQAl38tsYD2fvUABD46sd7rqSxHTL/Wuzqns98a1PG+N0CpOtrd
-         hgsOVm/TTbkUhcMGhVDsrwvLKOJctKE0Gf9BGV+kIr4zpJ9JYXQPb71sxZ3eX9jkNirf
-         nmYCgDIZD+UH2OvbWyeRUrpRNoAC3dTgSRVQZhgPOmyIaYZMwbm72uAn7GIFLh3L2FvJ
-         5mnxP0ypCfaZcAHrsJST/M5juPufhZu1kWXxsyIuEnFLfQt5ovKz4XXvY2on+H7+Ic9e
-         VZ3w==
-X-Forwarded-Encrypted: i=1; AJvYcCWvbGeqwsKvnFJ+huhTPSDKMMF/nGniLyjbdNgABzXritcZm4n5mFAyPGS6mdUcpak8Rv/Os+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7ACm4hxoT48iQPsLzrzZmfGwX0JIbpdrDUR3HAVTnlfkjtzEb
-	OzJhiqYVybErU8HHGJFDYEDal9z2faKqULMCWMDWBSq5lf7V355ZtzPB03f7xTg=
-X-Gm-Gg: ASbGncsEV3Xc1WgBBglaPQ7LN0SrqIwnNYS90481V9CYiVDzsl8pXyLb6BaKbJLgidV
-	2gAkrspxhyGeoPc+ApB0T6PwB2H0oluh4rEhbdcfVNAhrtoAhQmcal7dDXydxBLbHSezAJNnHUz
-	Maq96GfPH5S2QUZqFiehCk1/kzlbhb3jW2KOxmxnTEcqxakE7lU49TFe9Xj1CFGsfm63w3NLNgc
-	YBWLmrYjQY1WVx087HAYCztjNtW/AxWwFxHvg+q0b4CPF0tXjrzrBo6O7QaJBvMVMhN8WqlV3QN
-	zT/a3D6pEcn+Uswn7IkmXvcUlCo=
-X-Google-Smtp-Source: AGHT+IHVVZK0xNoZRKGq4tFkMJsALhDgnbfvJuRYqCyu3BJW3G50lfVa+gBBJrQVQLV34DFGBLXOQw==
-X-Received: by 2002:a05:6a00:3984:b0:736:559f:eca9 with SMTP id d2e1a72fcca58-73dc15d8578mr347501b3a.3.1744933893572;
-        Thu, 17 Apr 2025 16:51:33 -0700 (PDT)
-Received: from t14 ([2001:5a8:4528:b100:2a7b:648e:57e0:a738])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbfaeb7e8sm471094b3a.179.2025.04.17.16.51.32
+        bh=fMU2BD0LG1rNlUJ00GvwH9QUeSDku5Oj3mL4kLx1me4=;
+        b=wkTGoutM5ucsX98OhkPuPuzPlqOJePGtAOP9FD9yL6crGLYD6iHiLebZjuc3cGl0mJ
+         BkDdOdWqkUnyIOCop5+iDRuofsB2l7YVJX1PXCHKhRS/buaOeWkvO/E/a3aAlfyalrM1
+         vX1dkRbbyzgakFcMrgm42IRoeS0OSJ722Ndef9Y6FwbZivrhA0mlMDpCpzioXqLCjWRv
+         P+EPe6dlcQQfOUq1xlO0SiSrIhtEctC213Z7FlkB5IP2WEoDpN2YS477sCLRgLvpZ0jJ
+         edlh7z28AKyEi8ns6gcugfSsaPkLhlyUYOkOz76fsxr9lwCEE2YxA+twK5C93yquPzRh
+         8n4Q==
+X-Gm-Message-State: AOJu0Yy6Ce3G2VxaslCFAG2Jk1VkHLircrYWiLA0Ek4WShLDTZJQLnyw
+	0Zu2pGZ3CDuYcuvXV02+FavSA93SMD0SrlqAgiGl6qrrKF7Iswo8
+X-Gm-Gg: ASbGncvMwTRaTsyNe0Hm1KpbqyoWwhUP2xywt6+hT0zUQK1VBHpCuMvgjVZFGFQbdw9
+	fn3RwYzHowwWUwntW3mIfh0azsHQC/6h7y3otzToGfO7uxNUCaIxa6CAjBCse9q+uUhGT/TMMtY
+	9HOFcmiPUMA66ZAFGrKkE5K3GETkunfTvFFOw/kjykFtYEVKeUgzaj/mHHCVuMGao5XhTqKacyo
+	Wvv2Ia4ltuJJEtn7Vxlg8cTOj9bDE/+jtKRLav8hCZe8I8SI2yYy1yQi6+6D5sNGB3JU7GwnQi8
+	ilBxVRhs2QC22JqOGReKWo9G/ySx4Ww9ZvwP0xyAXifJoDfWTuXWVBJ0oGdZWGg0IIuutYz1CBG
+	FSuGr
+X-Google-Smtp-Source: AGHT+IHNdHwgJkxU/c7he2qR8Emh4wqA9igXjbObp12d2JZSditinXWK0fb7oRM0CYPKysdzrIMYWw==
+X-Received: by 2002:a05:6a00:6c85:b0:736:4e02:c543 with SMTP id d2e1a72fcca58-73dc1497eb0mr844757b3a.9.1744934181209;
+        Thu, 17 Apr 2025 16:56:21 -0700 (PDT)
+Received: from ahduyck-xeon-server.home.arpa ([98.97.39.148])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8e15cesm476367b3a.45.2025.04.17.16.56.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 16:51:33 -0700 (PDT)
-Date: Thu, 17 Apr 2025 16:51:31 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: martin.lau@linux.dev, aditi.ghag@isovalent.com, bpf@vger.kernel.org,
-	daniel@iogearbox.net, netdev@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH v3 bpf-next 2/6] bpf: udp: Make sure iter->batch always
- contains a full bucket snapshot
-Message-ID: <aAGUAztJqwnDQquo@t14>
-References: <42b84ea3-b3c1-4839-acfc-bd182e7af313@linux.dev>
- <20250417233303.37489-1-kuniyu@amazon.com>
+        Thu, 17 Apr 2025 16:56:20 -0700 (PDT)
+Subject: [RFC PATCH 0/2] Add concept of rolling start/stop to phylink
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: linux@armlinux.org.uk
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, kuba@kernel.org
+Date: Thu, 17 Apr 2025 16:56:19 -0700
+Message-ID: 
+ <174493388712.1021855.5688275689821876896.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417233303.37489-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-> > If I read it correctly, the last retry with GFP_ATOMIC is not because of the 
-> > earlier GFP_USER allocation failure but the size of the bucket has changed a lot 
-> > that it is doing one final attempt to get the whole bucket and this requires to 
-> > hold the bucket lock to ensure the size stays the same which then must use 
-> > GFP_ATOMIC.
-> 
-> Ah exactly, when allocation fails, it always returned an error.
-> 
-> Sorry, I should've read code first.
+This is based on the conversations I was having with Russell earlier. I am
+mostly just looking for feedback on if this is a viable approach for this
+or not.
 
-I was about to type out a response, but Martin beat me to it :). Yep,
-GFP_ATOMIC is a necessary side-effect of holding onto the lock to make
-sure the bucket doesn't grow anymore. It's a last resort to make sure
-the batch size is big enough to grab a full bucket snapshot not a last
-resort to allocate memory.
+As it stands I will need to wait for the patches submitted to net to get
+synced back up to net-next so I will likely be waiting several days for
+that. The main thing I am looking for is if this is acceptable so I can go
+back to working on the rest of the driver.
 
--Jordan
+---
+
+Alexander Duyck (2):
+      net: phylink: Add support for link initialization w/ a "rolling start"
+      net: phylink: Extend phylink_suspend to support a "rolling stop"
+
+
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |  5 -----
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |  1 +
+ drivers/net/phy/phylink.c                       | 17 ++++++++++++-----
+ include/linux/phylink.h                         |  4 ++++
+ 4 files changed, 17 insertions(+), 10 deletions(-)
+
+--
+
 
