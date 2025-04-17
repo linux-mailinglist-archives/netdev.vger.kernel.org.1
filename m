@@ -1,122 +1,151 @@
-Return-Path: <netdev+bounces-183589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF30A9117E
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 04:10:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B436A911BC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 04:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 976CD5A314C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 02:09:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 445C8441E4F
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 02:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5ED61BEF97;
-	Thu, 17 Apr 2025 02:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQ9o21z9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC02B1AC882;
+	Thu, 17 Apr 2025 02:41:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6481B4F0A;
-	Thu, 17 Apr 2025 02:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED6620330
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 02:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744855796; cv=none; b=C1qAiGm4N0CnpLOmuudYk6dekBun9OzPYxQ2o3mYebklLCFn812YR+rXrCzYQYwfXq+r26bao9R0qqnPgeZ9Fj/hG8FIZvpEXheDwKjJ2772ug2EYyoRdPuCL/BCFLJUqOIvXov0MenbJahr+N0S5BVNJyGEorKUCbvHaknTRAY=
+	t=1744857680; cv=none; b=XOuQuwgDAPqhJ9gUp2VZLjdbwqXeAX44R1U9q9q9QTEadsur0J0G6aamL4vIlreKaESJLEJtx/gerHOWyXbqMEwrY7+VtXfTuwBJFks/UiijG5y2oG4rLIRZZ8775XCPNFuwwCxzTCQxkCsGDYee+ADKvMbuVKmR1pxGoRdJIdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744855796; c=relaxed/simple;
-	bh=wHr76QDxAEhZIgg5qTMRJYLiwzN19Xu4Le/+lGtj+4g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fGkk3+RWf/WDJoXX99/4j3/00vD/aaByKXGOSrC+38PM4AG2vj7JTVgQeJikVkNlVQWxuBNxTUvAtXl6STzjxV9hLvEJLH11mn43zH1ukUiLe/4/zKRm8nhi+T1UhSYVbgghutKDwB+7feAOfipgD+yTbbzLFxuRadYo3zhda4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQ9o21z9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002A0C4CEE2;
-	Thu, 17 Apr 2025 02:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744855796;
-	bh=wHr76QDxAEhZIgg5qTMRJYLiwzN19Xu4Le/+lGtj+4g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iQ9o21z9HOmDHCvnLSa358y5knRsR0tpZLYmmYayPG0gy+FLk7xLkOrG75Xn3VnpS
-	 y9rhJmMRJUbaUet5aYzUmpwTnY6s5qta0hVdwSTicrrtZOo6UsVlxsWzVlG2kG0hDl
-	 yr1SfrVSJumRSDO7bpzYjKOkdhzh7JNE57NRu/fEQF7rV8vLA+nnTI8sAqPN/gP3+c
-	 tbhW616lyKZtk7//PJSoTmSvTD+kzLUkm7U8TAFV7HW85ei6YHmD7awKWnFsINi7My
-	 nfOz9vBMjZ+JcNCxSu6EnyMRS75BVWPM1217o31eCCpW8JJL6gJuWKrhSCflqxIdmG
-	 yEHDC5B8LoZJQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D333822D5A;
-	Thu, 17 Apr 2025 02:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744857680; c=relaxed/simple;
+	bh=4dSHKMhJP3V7b8BkEzdZu9o4Xh1naOPPFQjpsHv6u8Y=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=h5cLC6UttmFh5JzJmWYEmomezyighCQpckuMbvx4q6IunrXDxOtJPNxedoPmApGRKe76pDJUsbmOMK+Y6greJ26IGHOBnenQwblnZWpheTR1QUdBTo5wPohE3P2i17IJZDQkGVZTdga75lpwz78aWfgGQfGhCMVkCfeBZPNfK7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas6t1744857637t376t63855
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.107.143])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 9468956657044576948
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<horms@kernel.org>,
+	<dlemoal@kernel.org>,
+	<jdamato@fastly.com>,
+	<saikrishnag@marvell.com>,
+	<vadim.fedorenko@linux.dev>,
+	<przemyslaw.kitszel@intel.com>,
+	<ecree.xilinx@gmail.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<mengyuanlou@net-swift.com>
+References: <20250414091022.383328-1-jiawenwu@trustnetic.com>	<20250414091022.383328-2-jiawenwu@trustnetic.com> <20250415173329.27f83c52@kernel.org> <00f201dbae98$edc58b10$c950a130$@trustnetic.com>
+In-Reply-To: <00f201dbae98$edc58b10$c950a130$@trustnetic.com>
+Subject: RE: [PATCH net-next v2 1/2] net: txgbe: Support to set UDP tunnel port
+Date: Thu, 17 Apr 2025 10:40:36 +0800
+Message-ID: <013901dbaf42$194fbcc0$4bef3640$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/15][pull request] ixgbe: Add basic devlink
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174485583401.3565086.14830971497597731589.git-patchwork-notify@kernel.org>
-Date: Thu, 17 Apr 2025 02:10:34 +0000
-References: <20250415221301.1633933-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250415221301.1633933-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- jedrzej.jagielski@intel.com, przemyslaw.kitszel@intel.com, jiri@resnulli.us,
- horms@kernel.org, corbet@lwn.net, linux-doc@vger.kernel.org
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQGLV3gqB/5cQyoCfnN+NjDlZ7u1HwJyCwCfA5LZR8YCDoK887QGHPmQ
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MACXe2l6e7j93G5WIncS7KvUCQTd3LsKBcv6bF17BgAJi4w7BX558HYQ
+	wXTuoNdRk+8/mYeODk5zQnKwqIZ3Zyhy0nl5NdVVutTWV2DlDU4SelmPtYAdoy2FNh75TUV
+	MjBQQ7/rNVGvDFamW7indQ0ocfAu33evVOmlCFdcTZ99B3YK46Aqy4IcLTcyVzaOQ743WiG
+	vyVi+XpBEfS7Vv/scBgXRMaB4m211Tfjfs6Ne6NDEqA0AjT3YOGIIydBV6aXYLYj+a1yv0V
+	5nRAG05Y55BDMWLWQC4JRdlWJIh7Bih3b/8snidVH8NMTVyzNMqgc/VZYEiBaup53ecAvNg
+	TVMWAaOyBv/J4mh8X/02QmUaNTaXzIHatrck/+oX6C1o3QgX7VWXISlkMW8N9w0QvhTrtW0
+	Qm45J2+GrTqNjIvqBAv1h6xmMMFnZdr290DCL7ZjjaPkeb9y+UpwasTY7xYa4aRlcgaOb86
+	pHsW+LhcBff1uoXFNCogqRyh33bXB8WhV9+hAuOGSqihmkPWr9ikDNUEUYHWKltttocmrv+
+	HDTAV9E5Wh51NS6vKuHHYPvJlLTO3RsteIg7YXV41K0C5QAmM8ZMv1V+9Ochu4MvK4Z60cJ
+	/PvN9lA25hTwsOiFEkfiddNrtUzx7oPhHueI//QXzybr+jJ5xe6vFcisN7R4/AeIYND/Zs8
+	bjolvkkJ5csj93zjAbfPCOfucB53L1NSbgu8PUghF/zApYxkK6YAXM22PcUPROTKoPy7yCx
+	FrLkIrMTz/buahJALxAxnF7pzZ0od9cagljucEWLRKqoWK1afjYf2cgSlCls6LQyoq5HERL
+	6U63XSXCmTFk8cg/5scdgT0S2vbDMabU5H+7a3+tiOcd0Z6sVQ2jtl8WX8JaFmqKf+sGGxX
+	JGtMJXbbkz0MfTg7XJOZM3uBertOw7TO3lzwFGSJEsPCAQcx0D+fbi9i90IXR9kYykog1Ja
+	8cJ/7XpsVVW6jOov8lEH8YBhLtngC22WQVxeLiqos7NNXo1R+usJVNcXdXdciT/Iigfw=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
-
-On Tue, 15 Apr 2025 15:12:43 -0700 you wrote:
-> Jedrzej Jagielski says:
+On Wed, Apr 16, 2025 2:30 PM, Jiawen Wu wrote:
+> On Wed, Apr 16, 2025 8:33 AM, Jakub Kicinski wrote:
+> > On Mon, 14 Apr 2025 17:10:21 +0800 Jiawen Wu wrote:
+> > > +	udp_tunnel_nic_reset_ntf(netdev);
+> >
+> > you issue the reset here, without clearing the ports...
+> >
+> > >  	return 0;
+> > >
+> > >  err_free_irq:
+> > > @@ -537,6 +540,87 @@ void txgbe_do_reset(struct net_device *netdev)
+> > >  		txgbe_reset(wx);
+> > >  }
+> > >
+> > > +static int txgbe_udp_tunnel_set(struct net_device *dev, unsigned int table,
+> > > +				unsigned int entry, struct udp_tunnel_info *ti)
+> > > +{
+> > > +	struct wx *wx = netdev_priv(dev);
+> > > +	struct txgbe *txgbe = wx->priv;
+> > > +
+> > > +	switch (ti->type) {
+> > > +	case UDP_TUNNEL_TYPE_VXLAN:
+> > > +		if (txgbe->vxlan_port == ti->port)
+> >
+> > then you ignore the set if the port is already the same.
+> >
+> > Why do you need the udp_tunnel_nic_reset_ntf() call?
+> > Read the kdoc on that function.
+> > It doesn't seem like your NIC loses the state.
+> >
+> > > +			break;
+> > > +
+> > > +		if (txgbe->vxlan_port) {
+> > > +			wx_err(wx, "VXLAN port %d set, not adding port %d\n",
+> > > +			       txgbe->vxlan_port, ti->port);
+> > > +			return -EINVAL;
+> > > +		}
+> >
+> > Why...
+> >
+> > > +		txgbe->vxlan_port = ti->port;
+> > > +		wr32(wx, TXGBE_CFG_VXLAN, ntohs(ti->port));
+> > > +		break;
+> >
+> > > +static const struct udp_tunnel_nic_info txgbe_udp_tunnels = {
+> > > +	.set_port	= txgbe_udp_tunnel_set,
+> > > +	.unset_port	= txgbe_udp_tunnel_unset,
+> > > +	.flags		= UDP_TUNNEL_NIC_INFO_MAY_SLEEP,
+> >
+> > Where do the callbacks sleep?
 > 
-> Create devlink specific directory for more convenient future feature
-> development.
-> 
-> Flashing and reloading are supported only by E610 devices.
-> 
-> [...]
+> I now understand how the "reset" works, it will be changed to
+> UDP_TUNNEL_NIC_INFO_OPEN_ONLY, and use .sync_table to simplify the flow.
 
-Here is the summary with links:
-  - [net-next,v2,01/15] devlink: add value check to devlink_info_version_put()
-    https://git.kernel.org/netdev/net-next/c/8982fc03fd63
-  - [net-next,v2,02/15] ixgbe: wrap netdev_priv() usage
-    https://git.kernel.org/netdev/net-next/c/fd5ef5203ce6
-  - [net-next,v2,03/15] ixgbe: add initial devlink support
-    https://git.kernel.org/netdev/net-next/c/a0285236ab93
-  - [net-next,v2,04/15] ixgbe: add handler for devlink .info_get()
-    https://git.kernel.org/netdev/net-next/c/f6b588af3d57
-  - [net-next,v2,05/15] ixgbe: add E610 functions for acquiring flash data
-    https://git.kernel.org/netdev/net-next/c/5f214150c76d
-  - [net-next,v2,06/15] ixgbe: read the OROM version information
-    https://git.kernel.org/netdev/net-next/c/70db0788a262
-  - [net-next,v2,07/15] ixgbe: read the netlist version information
-    https://git.kernel.org/netdev/net-next/c/904c2b4c0b48
-  - [net-next,v2,08/15] ixgbe: add .info_get extension specific for E610 devices
-    https://git.kernel.org/netdev/net-next/c/8210ff738077
-  - [net-next,v2,09/15] ixgbe: add E610 functions getting PBA and FW ver info
-    https://git.kernel.org/netdev/net-next/c/4654ec6194b2
-  - [net-next,v2,10/15] ixgbe: extend .info_get() with stored versions
-    https://git.kernel.org/netdev/net-next/c/6eae2aeb60b6
-  - [net-next,v2,11/15] ixgbe: add device flash update via devlink
-    https://git.kernel.org/netdev/net-next/c/a0f45672d5e1
-  - [net-next,v2,12/15] ixgbe: add support for devlink reload
-    https://git.kernel.org/netdev/net-next/c/c9e563cae19e
-  - [net-next,v2,13/15] ixgbe: add FW API version check
-    https://git.kernel.org/netdev/net-next/c/b5aae90b6b36
-  - [net-next,v2,14/15] ixgbe: add E610 implementation of FW recovery mode
-    https://git.kernel.org/netdev/net-next/c/29cb3b8d95c7
-  - [net-next,v2,15/15] ixgbe: add support for FW rollback mode
-    https://git.kernel.org/netdev/net-next/c/4811b0c220f2
+But I have a question.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+There are two ethernet chips on the board with four ports eth0~eth3,
+they all use txgbe driver. When I add a VXLAN port for eth0, in fact, all
+4 devices are configured. So I can't add another different VXLAN port
+for eth1~eth3. Is this a fixed behavior of the kernel?
 
 
 
