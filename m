@@ -1,119 +1,121 @@
-Return-Path: <netdev+bounces-183946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1206DA92D28
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:13:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055F3A92D5D
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F198C7A1426
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 22:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB093A9D5C
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 22:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDAF215063;
-	Thu, 17 Apr 2025 22:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1D4218821;
+	Thu, 17 Apr 2025 22:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="eK9Jbj22"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="V63aA7D4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DB0215055
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 22:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E92153DA;
+	Thu, 17 Apr 2025 22:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744927990; cv=none; b=sP3xrUdrLUhdE/z3+VSFFHtktr9RFPubtPejIbP0XK06iixnhtvYLc+gN8knLEr2z0K2rWdPfkgSTVZAzccl3KFTyUMelkatxdIBjsGkSa8HUUk43ypYXRf+XdvcVeSCNy9lvxMk4COzWYPl6CFv/2uccFkdYaBLruFRviletiA=
+	t=1744929759; cv=none; b=MJT5RknZ5vu9ICgMoCyuv47gc1L9BUZ2kw4aNTszW/aI7YB1zUHxPSaO+zOy6MTnG1Q/3bLDscPwjxH4W6Qenok/6Y94p5zsmOfqrlToNcY6zTkbI7JZ+Qb63Ywty0pDJlQb8p6zDL37LUwPhoAoh4FGYEJWry7CzxZhmx4EdMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744927990; c=relaxed/simple;
-	bh=wSArtfjIVmzriW52OyQGGYrpAKNFj13MoavbhgyY7UY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LYSixT501wGG6AZU2/U4KMaFzMIckl5UgaQvR6f0zTX/Vx052Q+iw5yinVv49B04TVnJi9OnGKruKXpKJ8h1zI8toLblQDH+bU8tiOYKeDriXxarAMcAYjZuy/c4bFfNHDjY0dCgtzl1pHJqYB5sn7NdmowEXwFUkm1kk4OyDrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=eK9Jbj22; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-73972a54919so1158547b3a.3
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 15:13:08 -0700 (PDT)
+	s=arc-20240116; t=1744929759; c=relaxed/simple;
+	bh=QdV+tOnzkifghnNjkAqsqt+Ara8JdbkdTNCZR1Zb9L8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WA2Ytf32vJYL/iu+0AEsqjyTsYUtkGc6mKaqFCdcwwHvdK+enIqaYib/kvOqKyWFK+AKe48oQ1WMpqzlNFVMecZvq7CYnYwtEISTv/bhZyipjeog5LBQLvDxivlWI3iBQg0QbCoaPd61/m5XQCC+JR8toSucOksFm9TSvQ3U+Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=V63aA7D4; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744927988; x=1745532788; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VOVLszDddjodAbgAT9v/2dm1cgKHeU/Jr3AgP103Kgk=;
-        b=eK9Jbj22+7vlYw7KsQ4r7fAFLEVBWvJZVVa/SIIuIEvOTC7Ontb0Ng9YLVrsKrTXOU
-         qRlx2pV+KbX9VQycBMDJw6FXVlAp/Jb+/O9Gt9Sls07uuAdPn9loBqonbb1POpBouEXQ
-         qQhslTT/Norvt1ub5VepIxj8BgPy5FbdjG0yNTmEXP4PHjjHKz5ZqWF6eJdi5zT6vlxT
-         eVPTEFbfQ5R8qOFWh5FKGkOFgaILUtZLnFkYVlkz+1P0zvc1MuO+KlKxWvFH6oCpcB7A
-         MA8QpC7RUdwsaSHfJ6NmhRsF7JggGsMFmp9nzaYnYKw4utGHW1Mpi/wK0kkXr+9GZqbM
-         u3Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744927988; x=1745532788;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VOVLszDddjodAbgAT9v/2dm1cgKHeU/Jr3AgP103Kgk=;
-        b=MEjFldGQRGmXS/hupxUVAN6uDj6awa8ZD85xj1f5A6uMvZbZ2SjqH4/fsMPcjvCEgo
-         f2XmHs7IZKSKRbGox0WgQYNqLLe/q9USEbPnBwhThXk8rzT4nOuzADStVXfS/dPScK6H
-         M9/ImGc1FpdTDq5UwRThB36ItQu6jyUB+QVQ+HjkF9W9c0KRgRO/xXMbLR/Gwb1CL3h3
-         ogWcLCpKE9smxU9VQ6PrUWt12NJ6DoIW1SosWN6PSATbQKEk5CmVbdzAU9wP6BQ0dNxo
-         GFaxNyldNGQ3qHZO8RVIOwChy4SYQqhn74XzfOFJtaLHclOfTxDDgQn5Og/AowO4eMLD
-         GDdg==
-X-Gm-Message-State: AOJu0YxskxaIPD1QsOGPXRzPeqsNQNgFKx5quv4fCBCuOdUeZo5ohDAM
-	9jOtcll//oaEuyOWffpwmhFxsRr3gK6jE6wbWPLdB1vMQ0B2/UVJe71leSNgSQ==
-X-Gm-Gg: ASbGncs3m28Plb88hHM8Y2+teLTIyyR60b3NtJVqRUMT8cYvIj5SIHnONPmWpvYe627
-	GDqkPXu0VeK8NN0TN4rGc3OWNF5cOYqZDGW2fWHHe8hHbJfPRzjJbilIVqtDuhHnKNhIj6h672U
-	4g+SjD4Ld+hXw3scat35ZOS/wPjmlPaLlhjUQHTYo0mczCT9cg0ZjNdCQfxX9QOKGHC9/9JD8SQ
-	bAHUTalHgwVW5aJ/EsnpRWBQdZwTFSeMZeOD1nX91ya7AQlpXKFSdQuHngeZPzxS8JjuqAP0hN0
-	lFn4+JpLLo7N6bvshT/w1RIKN0pvEP+bkegTTJQMg1xkQHTZ1F8BqbnMRJqArRx15DPYRoGKE7t
-	kIJInAfbszSk=
-X-Google-Smtp-Source: AGHT+IGF7kAD/NpWdbBAsUKP/oYVOCuoE16wkI7E+/v7/zx/azVnBG40JcFxfVp7fEb0LC0OqkvI3Q==
-X-Received: by 2002:a05:6a00:1495:b0:736:6279:ca25 with SMTP id d2e1a72fcca58-73dc15cf685mr707794b3a.24.1744927988114;
-        Thu, 17 Apr 2025 15:13:08 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c3:dc7b:da12:1e53:d800:3508? ([2804:7f1:e2c3:dc7b:da12:1e53:d800:3508])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf901187sm388095b3a.76.2025.04.17.15.13.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Apr 2025 15:13:07 -0700 (PDT)
-Message-ID: <66475f1e-fc28-4198-ab66-75d4cdb9874c@mojatatu.com>
-Date: Thu, 17 Apr 2025 19:13:03 -0300
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744929758; x=1776465758;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dxOtun6d4VkDycCzxB2Fm4IX16lPOKdGFPLBnUL5PS4=;
+  b=V63aA7D4hVn9Q+sbQYN2QTx+ZBIEEEZLRtKWX8mIF0Z/y3fy2Ab1BPeM
+   9zV1/hqtI+xLuM1Z1mnR7dzI+5jyBx9YRKHxtV8inCsHEwkshmVeeLAY/
+   F1M85OYxu1kPOnyyGA+5LqIKgP2lKL4lHvd55FNAbYB9/C6z24mTmEWGp
+   w=;
+X-IronPort-AV: E=Sophos;i="6.15,220,1739836800"; 
+   d="scan'208";a="512487416"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 22:42:31 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:7878]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.54:2525] with esmtp (Farcaster)
+ id db11a32d-a0e1-4389-9eb0-2f719602d617; Thu, 17 Apr 2025 22:42:31 +0000 (UTC)
+X-Farcaster-Flow-ID: db11a32d-a0e1-4389-9eb0-2f719602d617
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 17 Apr 2025 22:42:29 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 17 Apr 2025 22:42:27 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jordan@jrife.io>
+CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v3 bpf-next 2/6] bpf: udp: Make sure iter->batch always contains a full bucket snapshot
+Date: Thu, 17 Apr 2025 15:41:48 -0700
+Message-ID: <20250417224219.29946-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250416233622.1212256-3-jordan@jrife.io>
+References: <20250416233622.1212256-3-jordan@jrife.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue
- cases
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, toke@redhat.com, gerrard.tai@starlabs.sg,
- pctammela@mojatatu.com, Stephen Hemminger <stephen@networkplumber.org>
-References: <20250416102427.3219655-1-victor@mojatatu.com>
- <aAFVHqypw/snAOwu@pop-os.localdomain>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <aAFVHqypw/snAOwu@pop-os.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB001.ant.amazon.com (10.13.139.148) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 4/17/25 16:23, Cong Wang wrote:
-> On Wed, Apr 16, 2025 at 07:24:22AM -0300, Victor Nogueira wrote:
->> As described in Gerrard's report [1], there are cases where netem can
->> make the qdisc enqueue callback reentrant. Some qdiscs (drr, hfsc, ets,
->> qfq) break whenever the enqueue callback has reentrant behaviour.
->> This series addresses these issues by adding extra checks that cater for
->> these reentrant corner cases. This series has passed all relevant test
->> cases in the TDC suite.
->>
->> [1] https://lore.kernel.org/netdev/CAHcdcOm+03OD2j6R0=YHKqmy=VgJ8xEOKuP6c7mSgnp-TEJJbw@mail.gmail.com/
->>
+From: Jordan Rife <jordan@jrife.io>
+Date: Wed, 16 Apr 2025 16:36:17 -0700
+> Require that iter->batch always contains a full bucket snapshot. This
+> invariant is important to avoid skipping or repeating sockets during
+> iteration when combined with the next few patches. Before, there were
+> two cases where a call to bpf_iter_udp_batch may only capture part of a
+> bucket:
 > 
-> I am wondering why we need to enqueue the duplicate skb before enqueuing
-> the original skb in netem? IOW, why not just swap them?
+> 1. When bpf_iter_udp_realloc_batch() returns -ENOMEM [1].
+> 2. When more sockets are added to the bucket while calling
+>    bpf_iter_udp_realloc_batch(), making the updated batch size
+>    insufficient [2].
+> 
+> In cases where the batch size only covers part of a bucket, it is
+> possible to forget which sockets were already visited, especially if we
+> have to process a bucket in more than two batches. This forces us to
+> choose between repeating or skipping sockets, so don't allow this:
+> 
+> 1. Stop iteration and propagate -ENOMEM up to userspace if reallocation
+>    fails instead of continuing with a partial batch.
+> 2. Retry bpf_iter_udp_realloc_batch() up to two times if we fail to
+>    capture the full bucket. On the third attempt, hold onto the bucket
+>    lock (hslot2->lock) through bpf_iter_udp_realloc_batch() with
+>    GFP_ATOMIC to guarantee that the bucket size doesn't change before
+>    our next attempt. Try with GFP_USER first to improve the chances
+>    that memory allocation succeeds; only use GFP_ATOMIC as a last
+>    resort.
 
-I thought of doing what, I think, you are suggesting, but I was afraid
-of breaking netem. Stephen any comments?
+kvmalloc() tries the kmalloc path, 1. slab and 2. page allocator, and
+if both of them fails, then tries 3. vmalloc().  But, vmalloc() does not
+support GFP_ATOMIC, __kvmalloc_node_noprof() returns at
+!gfpflags_allow_blocking().
 
-cheers,
-Victor
+So, falling back to GFP_ATOMIC is most unlikely to work as the last resort.
+
+GFP_ATOMIC first and falling back to GFP_USER few more times, or not using
+GFP_ATOMIC makes more sense to me.
+
+
 
