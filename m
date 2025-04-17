@@ -1,183 +1,127 @@
-Return-Path: <netdev+bounces-183694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE7BBA918FC
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:16:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A944A918D7
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB88D17CD86
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:16:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 573B24481D5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6098E22DFA0;
-	Thu, 17 Apr 2025 10:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84BC22A817;
+	Thu, 17 Apr 2025 10:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Yz3eXjDe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lyFy02Zs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B1E22D4C3
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E82A1D63D6;
+	Thu, 17 Apr 2025 10:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744884867; cv=none; b=pxg/lby7JRZBdfuTnXAR5g+iTUzHeOYFgztSBmhmnYid6bq+yyQcUZBsNznWl/haSQijtZH/4bmVmP9Ga2Lt57LAk/cjzLS271HYBxB+yU+YQ0c25P9yWBsrp1BG4njOJ/fbst7MF08sfa3YajuoIU2y5X4nPVnblJZEuUIzJxY=
+	t=1744884676; cv=none; b=VZx+OeJlOvRa4UKbI555x+6D+KKahtdpsGKXoUqBNlhAwYXLWAsMjACa/NQoWXEbR5xFA6B95BCPjjdAVAc2fUWDjkW/+9gqqN4Ayi2Cdvpy1LRQmjpKyIQ6RMp5h3+vKF5cVxRr8OVi5ARyvs+UdriQiVckbv/n+HRA0lk2tWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744884867; c=relaxed/simple;
-	bh=bzV6fcWZXtviJFecIdH+4FWEvBdsX5ENw/cnrisySpM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R24nobacuKsrJQN7/Xy3FK1t8ksizB2uwMchJr8r1pfZ/z/IKZEX9bCkERBrIzVPvZH1gykO5Tp1MqWoPc+UtUW4rcpuwlW6M0EajgxrpBSY6042i+So+cRzzfXKDaD/T/COCcH8AzdEKPS3dZeBXnSAFn9U1ZDxxkIc07Cpj2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Yz3eXjDe; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso5769555e9.2
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 03:14:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744884864; x=1745489664; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H4ZB/gV1wmFw+78kuVh8efwdsnURVwVY4fkiwGcxVGQ=;
-        b=Yz3eXjDe6blbBumYvOxojr3qiZ7p7O8HlPXfxAruMrnXxn36QV15uoNh5AIwwDqKHM
-         4sNMOIBu/q9kisSBe8+Q5btd/LC5sgrIPlYsNxNxon6Sr5025LJxjqiPG1uurVb6y9T/
-         WBG06ffPc1hp0N1HdzPyAAUTAJMGTMTcegeX0RdNX1G80n9xryViZl2g3JE9ln8sWhOy
-         I6tpx85z2minaArY8IQX/H0Huc5oT1YP8tXzJiihTKKxcLhgOi2SOK8Jj3en0rejEC4i
-         HtpGSs8kk6futyDqWvjSSg6f7XH6vF+IE4GDQWWtpfCXu6USAelPMVNEkaW6ViGqgTmz
-         rsVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744884864; x=1745489664;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H4ZB/gV1wmFw+78kuVh8efwdsnURVwVY4fkiwGcxVGQ=;
-        b=Fhgh3P5fk2KC0aSSunCCQzixh/sGV/adDC6NGZhlaZIj8U/nXEpu0V76iCs/V4fkk3
-         6DGhISIfb5DaKARUJn71QAAlT2lY9yzlXVNOKbN1EAiyXDp8ihNbT7JDcRGFBomKNNQY
-         N7Nl8FenG/LXyCSz+GsXSJHpzWqXn7dmtNJyfbxmTsXKpufK9pNk6fi9JC9gYEsVcvDV
-         BvgqFG3iOvmzjQQp6vIpQY2axv7Y7SYp7JGC0ADztrHlS24BoslZW8UKVbiaCiEaD/8g
-         AAmvgnWiyQ+nDaAYREGCAKM7ygMY4f/o9D6l3bxyqkXES6PQh4HkyTlWVj4ByfL9WziX
-         XlaA==
-X-Gm-Message-State: AOJu0Yxi9vWuBQsMXypKjG1dbj3zzsqOlQZ9bL/sWi2rwaQRBSTI2zfW
-	tCdCDUgoj/XCMjt2ElkKZN3XLQV4z5rHfuo3Pqv+11YLQ1xTf5P1YwRQxCTR4XTEgG8+60ooyF5
-	7
-X-Gm-Gg: ASbGnctYXULOcpCXm3ZHxqySkvBpOye0pVsh6bvyLFf+62I242KG5lQLinBSQ2gF2GA
-	8Q0l6ffSA2ohNzxfr0chrZXIuwmOjbWg1B7/wOrUGwsHdwrcnp9PVRpLk2phZ+7acu2ppolL8Qh
-	dI5mZqgymS6NDAbnAtBugO+1sl03DpsMnhTDgQ5Bu5Ymox2t5Py565kjxHG0L92Q+8EEo/RCOUY
-	9O2gRQXv5cmR7MRFx6ugnnU5jVjh2cekH6VsL/8yVl5wZFKR8yZ3yGWH4POjAFN87R9dMlHicd6
-	/S9ZF2TacC8Iwo48h2VkY0/XQD2SyjStog==
-X-Google-Smtp-Source: AGHT+IE2ydrjS+s2VPGiUd+ESX6XztTnZ6UUu0zE7sDxXBCOaDZ2wemdMUpdXXH/cHPwFFMTlOI8MQ==
-X-Received: by 2002:a05:600c:b98:b0:43d:3df:42d8 with SMTP id 5b1f17b1804b1-4405d5fcc9emr45146215e9.6.1744884863951;
-        Thu, 17 Apr 2025 03:14:23 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b4d1236sm48383735e9.13.2025.04.17.03.14.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 03:14:23 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	parav@nvidia.com,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: [PATCH net-next v3 3/3] net/mlx5: Expose function UID in devlink info
-Date: Wed, 16 Apr 2025 23:41:33 +0200
-Message-ID: <20250416214133.10582-4-jiri@resnulli.us>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250416214133.10582-1-jiri@resnulli.us>
-References: <20250416214133.10582-1-jiri@resnulli.us>
+	s=arc-20240116; t=1744884676; c=relaxed/simple;
+	bh=OjOyXwwkPkvApQlOY7upCNWh6uL9evvXiu2wCmgHLjM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k+wTpS2S+a33vTOxwzyjOlKx4EZLZusukEgN7EeG+VNG06ze0W0jDtBuggQAcoyLPrMg73UnAK+0Uv8X+u8SPeE6LwekLackqCqgevwi4spzAX+eWSrYVtMp27Mj9bFkueUOebRomSREP2AgSLdFtnLslJzaE20Dj3wP14PHLPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lyFy02Zs; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cJJC6WP3gpZ9K3VX9TT93MWqlpGNyRN7xfN0nAAX5ow=; b=lyFy02Zs99XdoiAkZ/hc5CAzhD
+	YiWUy1eBRdXDgyCSLi+Pqr1lv4YSwKj8r6wjCEIEIoLu/z/rX95dT07toDiLrulNaqFjc1c5qbVhn
+	hizjLWioCaBWkTeKE8r42yWwdh10Q22hupiiju9Z3v0WMdB6hUPI3IFzp1LqVpp34EXIE/RB4SRAN
+	CrVkbklx9/GIp1WNkLMyXIOYLRJsxc10oLD8CihkTabScq1KrtdUoHviFLiY0rKjWD5/xAbEqUFMv
+	a5bnTMsqsqZ+CPCHujM49texrGF0DHB+VrOKUyGJ7yrpByjYN5ahyB60pxoMuKVdPckB2ysBQl9R0
+	2EKY1wNw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50752)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u5MCv-0005Bh-2W;
+	Thu, 17 Apr 2025 11:10:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u5MCm-0002MO-1y;
+	Thu, 17 Apr 2025 11:10:48 +0100
+Date: Thu, 17 Apr 2025 11:10:48 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Frank Sae <Frank.Sae@motor-comm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Parthiban.Veerasooran@microchip.com, linux-kernel@vger.kernel.org,
+	"andrew+netdev @ lunn . ch" <andrew+netdev@lunn.ch>, lee@trager.us,
+	horms@kernel.org, linux-doc@vger.kernel.org, corbet@lwn.net,
+	geert+renesas@glider.be, xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+Subject: Re: [PATCH net-next v4 00/14] yt6801: Add Motorcomm yt6801 PCIe
+ driver
+Message-ID: <aADTqCC7oaXFauOm@shell.armlinux.org.uk>
+References: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
+ <Z_T6vv013jraCzSD@shell.armlinux.org.uk>
+ <da434f13-fb08-4036-96ed-7de579cb9ddc@motor-comm.com>
+ <4fac4c4f-543b-4887-ace9-d264a0e5b0f2@lunn.ch>
+ <4ad68dae-311f-4cdd-a6f8-0229f069ece3@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4ad68dae-311f-4cdd-a6f8-0229f069ece3@motor-comm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Thu, Apr 17, 2025 at 02:06:05PM +0800, Frank Sae wrote:
+> 
+> 
+> On 2025/4/14 04:33, Andrew Lunn wrote:
+> > On Fri, Apr 11, 2025 at 05:50:55PM +0800, Frank Sae wrote:
+> >>
+> >>
+> >> On 2025/4/8 18:30, Russell King (Oracle) wrote:
+> >>> On Tue, Apr 08, 2025 at 05:28:21PM +0800, Frank Sae wrote:
+> >>>> This series includes adding Motorcomm YT6801 Gigabit ethernet driver
+> >>>>  and adding yt6801 ethernet driver entry in MAINTAINERS file.
+> >>>> YT6801 integrates a YT8531S phy.
+> >>>
+> >>> What is different between this and the Designware GMAC4 core supported
+> >>> by drivers/net/ethernet/stmicro/stmmac/ ?
+> >>>
+> >>
+> >> We support more features: NS, RSS, wpi, wol pattern and aspm control.
+> > 
+> > Details please as to why these preventing the stmmac driver from being
+> > used? Our default opinion will be that you will extend that stmmac
+> > driver. In order to change that, you need to give us deep technical
+> > arguments why it cannot be done.
+> > 
+> 
+> After internal discussion, we have decided to temporarily suspend upstream.
+> Thanks again!
 
-Devlink info allows to expose function UID.
-Get the value from PCI VPD and expose it.
+Sorry, but please understand the issue from our side, because the more
+code that's in the kernel tree, the more work that gives maintainers
+who stick around for the long term. Therefore, it is desirable not to
+collect lots of driver code that is only subtly different from each
+other, but require re-use and/or adaption of what is already present.
 
-$ devlink dev info
-pci/0000:08:00.0:
-  driver mlx5_core
-  serial_number e4397f872caeed218000846daa7d2f49
-  board.serial_number MT2314XZ00YA
-  function.uid MT2314XZ00YAMLNXS0D0F0
-  versions:
-      fixed:
-        fw.psid MT_0000000894
-      running:
-        fw.version 28.41.1000
-        fw 28.41.1000
-      stored:
-        fw.version 28.41.1000
-        fw 28.41.1000
-auxiliary/mlx5_core.eth.0:
-  driver mlx5_core.eth
-pci/0000:08:00.1:
-  driver mlx5_core
-  serial_number e4397f872caeed218000846daa7d2f49
-  board.serial_number MT2314XZ00YA
-  function.uid MT2314XZ00YAMLNXS0D0F1
-  versions:
-      fixed:
-        fw.psid MT_0000000894
-      running:
-        fw.version 28.41.1000
-        fw 28.41.1000
-      stored:
-        fw.version 28.41.1000
-        fw 28.41.1000
-auxiliary/mlx5_core.eth.1:
-  driver mlx5_core.eth
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
----
-v2->v3:
-- do not continue in case devlink_info_function_uid_put() returns error
----
- drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-index 42218834183a..403c11694fa9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-@@ -79,6 +79,21 @@ static int mlx5_devlink_serial_numbers_put(struct mlx5_core_dev *dev,
- 			goto end;
- 	}
- 
-+	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "VU", &kw_len);
-+	if (start >= 0) {
-+		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
-+		if (!str) {
-+			err = -ENOMEM;
-+			goto end;
-+		}
-+		end = strchrnul(str, ' ');
-+		*end = '\0';
-+		err = devlink_info_function_uid_put(req, str);
-+		kfree(str);
-+		if (err)
-+			goto end;
-+	}
-+
- end:
- 	kfree(vpd_data);
- 	return err;
 -- 
-2.49.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
