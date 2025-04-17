@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-183826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C24A9226A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:14:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7568FA9227A
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F89A3A372D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:13:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D47593A1031
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D60254862;
-	Thu, 17 Apr 2025 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n3t5H8dG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBFC253944;
+	Thu, 17 Apr 2025 16:16:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17841F463D;
-	Thu, 17 Apr 2025 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1981C22371B;
+	Thu, 17 Apr 2025 16:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744906440; cv=none; b=loAt+4f2GN+ARWQB7wJcFZBGoBsqpj4DS/S/kLNRXaAnndQG5GoD7MVcDFrZAIno0vqdb+E4eXWT1W96MnxdwhB3ws94CFkrE7rTZx2nHP/QI2Or8RirnIQyR3CQt/+cqboqLWiqBWybRyM5rc3TSF+htgvnmjBOFrFRFiu98sE=
+	t=1744906618; cv=none; b=svbW/QcVDPrZemd3kZEETtY1t4RmjJrmoB0dCSZY3jwGmSQHH/mStYNX1gUJP2T0trxZ3AbKzQhkL6snpB/ILLVH50CaZz4a656HznyOq9sBN2dZyeOM7SzPkcFKVkJUWYvux+E1fTHVoa94e6v1HyiYlkNdeoJsk7GUfk1Lwqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744906440; c=relaxed/simple;
-	bh=dF5zKEgbrCzKFWBhVkcf46aE/op9JDA8TSByk+hkA4U=;
+	s=arc-20240116; t=1744906618; c=relaxed/simple;
+	bh=FgUEG+umn1PfV0jboJ5wL1UISyXSNMwvwys2ha0CKWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bVCvlmd/aBVNAd6B/nZWXmrjPbNg/lt1KasP5hwY6CN6GG2qNzR0z1jW6QRA7kdaXqEdsC1tn4rvfeTxH9RaXUH/h5CqmkBEAzKjvKTqLE5/s7jJLYyoqAoTybi8a/lYPz1ZX5XoXS/Rz3apjfTf5mN271cDIwFG70mUE37OHUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n3t5H8dG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F09C4CEE4;
-	Thu, 17 Apr 2025 16:13:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744906440;
-	bh=dF5zKEgbrCzKFWBhVkcf46aE/op9JDA8TSByk+hkA4U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n3t5H8dGUaUqklAbXEvHhseo4XcV2hw4gHpfEy/k0DfICyQ3QTeK21zwgNv0rV/u0
-	 yl4kozrNVlNxW2kq+kVmAR5w7Y8GfVOCnqpfhjQO2DMMT3/wPB8A+18HYYd+9ZhgHv
-	 kjF4qe+Cwcnh136y2EZQEOJm/myjBBo+YpxCbZ/erXNsTh8As0oGeQUdtWuTGEj3A7
-	 5ADgnr/fInKHi5oIvH0T4+pfhbJa9nKFGRF/e34RW0X1h9HdqNn9JsT5EKKgJuw5p6
-	 crYScCIzN2fcDXjTWcuQcgQz1PWP4SPzdMRjkpKz2runtZ+i5KFLZXaWQG7T32zqNh
-	 RgGYGohFwDnhw==
-Date: Thu, 17 Apr 2025 17:13:54 +0100
-From: Lee Jones <lee@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 5/8] mfd: zl3073x: Add functions to work with
- register mailboxes
-Message-ID: <20250417161354.GF372032@google.com>
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-6-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YP3vqFrA7vpS/sYzgq+eizUKWZv8a0W7GnY0PBV6fV4VJA8FDN2Q+Au7jQfoQ4ipgflm07UUwlzkwRy0Kymv3Y0PlWcRzS9TMx7xh4xmCz7SD56U+Qm9pemuSw3dKVv5ThHzmu6pEoygMfBKcebQbm/j58nf6qoOt5NiMje5+2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1u5RsR-000000002Q4-0DCF;
+	Thu, 17 Apr 2025 16:16:49 +0000
+Date: Thu, 17 Apr 2025 17:16:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net v2 4/5] net: ethernet: mtk_eth_soc: net: revise
+ NETSYSv3 hardware configuration
+Message-ID: <aAEpbV-IvbfaPwwL@makrotopia.org>
+References: <8ab7381447e6cdcb317d5b5a6ddd90a1734efcb0.1744764277.git.daniel@makrotopia.org>
+ <28929b5bb2bfd45e040a07c0efefb29e57a77513.1744764277.git.daniel@makrotopia.org>
+ <20250417081055.1bda2ff6@kernel.org>
+ <aAEiCjdJdsqH6EAU@makrotopia.org>
+ <20250417085948.35b0ec5a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250416162144.670760-6-ivecera@redhat.com>
+In-Reply-To: <20250417085948.35b0ec5a@kernel.org>
 
-On Wed, 16 Apr 2025, Ivan Vecera wrote:
+On Thu, Apr 17, 2025 at 08:59:48AM -0700, Jakub Kicinski wrote:
+> On Thu, 17 Apr 2025 16:45:14 +0100 Daniel Golle wrote:
+> > On Thu, Apr 17, 2025 at 08:10:55AM -0700, Jakub Kicinski wrote:
+> > > On Wed, 16 Apr 2025 01:51:42 +0100 Daniel Golle wrote:  
+> > > > +		/* PSE should not drop port8, port9 and port13 packets from WDMA Tx */
+> > > > +		mtk_w32(eth, 0x00002300, PSE_DROP_CFG);
+> > > > +
+> > > > +		/* PSE should drop packets to port8, port9 and port13 on WDMA Rx ring full */  
+> > > 
+> > > nit: please try to wrap at 80 chars. There's really no need to go over
+> > > on comments. Some of us stick to 80 char terminals.   
+> > 
+> > Too late now to send another revision...
+> 
+> I only applied the first 3 :)
 
-> Registers present in page 10 and higher are called mailbox type
-> registers. Each page represents a mailbox and is used to read and write
-> configuration of particular object (dpll, output, reference & synth).
-> 
-> The mailbox page contains mask register that is used to select an index of
-> requested object to work with and semaphore register to indicate what
-> operation is requested.
-> 
-> The rest of registers in the particular register page are latch
-> registers that are filled by the firmware during read operation or by
-> the driver prior write operation.
-> 
-> For read operation the driver...
-> 1) ... updates the mailbox mask register with index of particular object
-> 2) ... sets the mailbox semaphore register read bit
-> 3) ... waits for the semaphore register read bit to be cleared by FW
-> 4) ... reads the configuration from latch registers
-> 
-> For write operation the driver...
-> 1) ... writes the requested configuration to latch registers
-> 2) ... sets the mailbox mask register for the DPLL to be updated
-> 3) ... sets the mailbox semaphore register bit for the write operation
-> 4) ... waits for the semaphore register bit to be cleared by FW
-> 
-> Add functions to read and write mailboxes for all supported object types.
-> 
-> All these functions as well as functions accessing mailbox latch registers
-> (zl3073x_mb_* functions) have to be called with zl3073x_dev->mailbox_lock
-> held and a caller is responsible to take this lock.
-> 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> v1->v3:
-> * dropped ZL3073X_MB_OP macro usage
-> ---
->  drivers/mfd/zl3073x-core.c       | 232 +++++++++++++++++++++++
->  include/linux/mfd/zl3073x.h      |  12 ++
->  include/linux/mfd/zl3073x_regs.h | 304 +++++++++++++++++++++++++++++++
->  3 files changed, 548 insertions(+)
+Perfect, so I'll roll up the remaining two with the changes suggested.
 
-> +/*
-> + * Mailbox operations
-> + */
-> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_dpll_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_output_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_output_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_ref_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_ref_write(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_synth_read(struct zl3073x_dev *zldev, u8 index);
-> +int zl3073x_mb_synth_write(struct zl3073x_dev *zldev, u8 index);
+> 
+> > > > [...]
+> > > > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> > > > index 39709649ea8d1..eaa96c8483b70 100644
+> > > > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> > > > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> > > > @@ -151,7 +151,12 @@
+> > > >  #define PSE_FQFC_CFG1		0x100
+> > > >  #define PSE_FQFC_CFG2		0x104
+> > > >  #define PSE_DROP_CFG		0x108
+> > > > -#define PSE_PPE0_DROP		0x110
+> > > > +#define PSE_PPE_DROP(x)		(0x110 + ((x) * 0x4))
+> > > > +
+> > > > +/* PSE Last FreeQ Page Request Control */
+> > > > +#define PSE_DUMY_REQ		0x10C  
+> > > 
+> > > This really looks like misspelling of DUMMY, is it really supposed 
+> > > to have one 'M' ?  
+> > 
+> > I also thought that when I first saw that and have told MediaTek engineers
+> > about it, they told me that the register is called like that also in their
+> > datasheet and hence they want the name to be consistent in the driver.
+> 
+> Hm, maybe add a comment ? It confused both of us, probably going 
+> to confuse most people later on
 
-Why aren't these being placed into drivers/mailbox?
+Ok, will do and send v3.
 
--- 
-Lee Jones [李琼斯]
+Thank you!
 
