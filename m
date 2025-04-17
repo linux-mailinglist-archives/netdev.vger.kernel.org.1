@@ -1,84 +1,87 @@
-Return-Path: <netdev+bounces-183695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4634A918FD
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:16:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C41A91903
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBF47460E09
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:16:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25B0A5A3CDD
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9461622DFFC;
-	Thu, 17 Apr 2025 10:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C77D230BE3;
+	Thu, 17 Apr 2025 10:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="JST9YclK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5FLQB0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C77A22DFBC;
-	Thu, 17 Apr 2025 10:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6475B230251;
+	Thu, 17 Apr 2025 10:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744884885; cv=none; b=HSS1l3GPuQ7bMejcvvXw2C1DMbCVkwT0D2bWxlez0xFKXt2aWd2NDhuE3JPqAWaOn81kJWYo1C5Zz3f3YzaLvSOjPowemi1vTG+DrJ4FqI/E1UHv1xnBlrrGw+9Q45XF6WuikAhtxcukLXZgRTj7iNLSrYIIci9JStqQXMTppPY=
+	t=1744884907; cv=none; b=s1oCbna9MVeNPRo0yjgcveVxCwFkJ3OkTOOrABunhqaeMFgcyZRP/JAA7t5fF7GzjBSTV+P3A9LcJRFjjarA4MTS7C1f64ZxlnyVqUTmhixFxt5zSs9dZN6bpLXMftpi2i6K633B4sTws35Fz8EJQ8ZPpssWjYmCzAm/2RFKUls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744884885; c=relaxed/simple;
-	bh=+urKNUkM3t2RlrAPTSwC9MS3NCtCtypvl5ACUzDcw/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pzShXuDUhRkI89h55awJfyicjCxmNZah8ELj4+Sv8t4jqL3dw129eD7EqlI6cO8ji/nTKYoO/2T9+1iRG5XTeMIWHtkm1F/VCCF4bnUUVly6ilzJoisoJ9CC8a1rfTniI4zTr26FTLfWEyi29gwJWdyXSXboSJBg8fp1Iw95LwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=JST9YclK; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=TYrZHwXvVeYQH2JRTv8n+wK2dCMJNjDZ2+cJBh164J4=; b=JST9YclKQRfWcVlPcEJIHIFe7Q
-	z+p/HY9UgJGXoed6d/Mojnko6qqqbFxwPbUX5wiLQDUcIcsamYoQynzOwX+qe6d9HOJ2EA1EOeMS7
-	6Bqmz6wQ4zVpsnO/r9LoKRj//gNK3kaPicG09xbbsB2yvBDNQQTEGGMHrx2QPTbbmsy0FVKhN2kEI
-	KWD+3I+fqKBb9J5wEs1MiIczy0oQ3tPho/KIoSt6GS4Yl1gOWjIDOL77m5Kz5QgA2rNAy8H8Wil20
-	a6K6FoEuzMUcsesuQkhsdarRwst3e8bBnGPGppgjTKUmDh+GhnysEDm2rNdeCihVxcELBBeb+E42O
-	D7yMUECA==;
-Received: from 179-125-92-204-dinamico.pombonet.net.br ([179.125.92.204] helo=quatroqueijos)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1u5MGR-000lOr-1N; Thu, 17 Apr 2025 12:14:35 +0200
-Date: Thu, 17 Apr 2025 07:14:28 -0300
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: jianqi.ren.cn@windriver.com
-Cc: gregkh@linuxfoundation.org, stable@vger.kernel.org,
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, sashal@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, yajun.deng@linux.dev,
-	yuehaibing@huawei.com, dan.streetman@canonical.com,
-	steffen.klassert@secunet.com, netdev@vger.kernel.org,
-	i.maximets@ovn.org, kuniyu@amazon.com
-Subject: Re: [PATCH 5.10.y] net: defer final 'struct net' free in netns
- dismantle
-Message-ID: <aADUhH5-ee0Rc_Ap@quatroqueijos>
-References: <20250417075740.1747626-1-jianqi.ren.cn@windriver.com>
+	s=arc-20240116; t=1744884907; c=relaxed/simple;
+	bh=pbwCVLNhfKPOc9gMbfPKZcz5S5UWETVCbtkgMLSzAkM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EN4lgiDL51n3dfXWLNT7yr0h5BGOwLd7Zd6hyg3bRj6l5b6JDTHPfa00IGcCN3Ge3PtR5AUb9wA8qRYjepR4qT/CntpM5RmntRPUOGD1zY//LRhoz2VQDuzOFfaYXWNp+uAj47hRpBwUdF/u+ibVZp/NeIKSIcZ45u0Hl0Jqz2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5FLQB0a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47776C4CEE4;
+	Thu, 17 Apr 2025 10:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744884906;
+	bh=pbwCVLNhfKPOc9gMbfPKZcz5S5UWETVCbtkgMLSzAkM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=i5FLQB0abspUpVM0MKVowCA8rZVhr8C0e9nMdilfm9Tw+r4j06QwjvatnTmhsVWmw
+	 /KCW2U8lMcToBKSjXLk4XWPX9b74Bsi0cZmd3W5t1SK7aQlDA+pr3CwCxjnAAWTnfI
+	 IWzdXlYOjEtHsnm9A1bIjIVPdDHOV49eibPOnwX0AiJZ/yiBndsUpzZBCHsfXH2E7K
+	 73J8WdVhMMBdUUrWXWWfWnkR95zePyP/MFg30npZZMYKhDQHs+oKMciUt7pZ3SYLCK
+	 gann3Mi/EU7uaw8eOXGSipxG5b2c8/nR872A+Y24btWPVHXr4PlON4NxhCNlGqE0U6
+	 JkF4hmVehvFeA==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net 0/2] MAINTAINERS: Update entries for s390 network
+ driver files
+Date: Thu, 17 Apr 2025 11:15:00 +0100
+Message-Id: <20250417-ism-maint-v1-0-b001be8545ce@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417075740.1747626-1-jianqi.ren.cn@windriver.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKTUAGgC/x3MMQqAMAxA0atIZgMqFq1XEYcao2ZolFZEkN7d4
+ vjg81+IHIQjDMULgW+JcmhGXRZAu9ONUZZsaKrGVG3doUSP3oleyEwz9cbanlrI/Rl4led/jaB
+ 8wZTSB+SBhMNgAAAA
+To: Alexandra Winter <wintera@linux.ibm.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Thorsten Winkler <twinkler@linux.ibm.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Thu, Apr 17, 2025 at 03:57:40PM +0800, jianqi.ren.cn@windriver.com wrote:
-> From: Eric Dumazet <edumazet@google.com>
-> 
-> [ Upstream commit 0f6ede9fbc747e2553612271bce108f7517e7a45 ]
-> 
+Update the entries for s390 network driver files to:
 
-I don't see it in 5.15.y. Can you prepare a patch for that branch too?
+* Add include/linux/ism.h to MAINTAINERS
+* Add s390 network driver files to the NETWORKING DRIVERS section
 
-Thanks.
-Cascardo.
+This is to aid developers, and tooling such as get_maintainer.pl alike
+to CC patches to all the appropriate people and mailing lists.  And is
+in keeping with an ongoing effort for NETWORKING entries in MAINTAINERS
+to more accurately reflect the way code is maintained.
+
+---
+Simon Horman (2):
+      MAINTAINERS: Add ism.h to S390 NETWORKING DRIVERS
+      MAINTAINERS: Add s390 networking drivers to NETWORKING DRIVERS
+
+ MAINTAINERS | 3 +++
+ 1 file changed, 3 insertions(+)
+
+base-commit: adf6b730fc8dc61373a6ebe527494f4f1ad6eec7
+
 
