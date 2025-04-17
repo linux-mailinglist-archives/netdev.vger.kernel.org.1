@@ -1,126 +1,84 @@
-Return-Path: <netdev+bounces-183860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED3EA923ED
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:25:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C69A923F0
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3908D3B785B
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:25:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6E50440FFC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9BF2561C5;
-	Thu, 17 Apr 2025 17:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1847F255238;
+	Thu, 17 Apr 2025 17:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cjdJ3BDc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BDfj3BtD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F82F2561A0
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AC314F90;
+	Thu, 17 Apr 2025 17:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744910735; cv=none; b=fTy3mwqPFK4P814Qk/R+v4WgDKZuYbYKUlDG6Q8np+fQPN/5dpAgVpFDTAiFcFs6MmGCncU4fpBZ/XffRIANUIZJKdn2li9BFY5bKbdYfKnSjq654cPftIx6Z0uz3xvY0BEQq7xwrh50ONEKj2ASVSe5s5DtDmk8fz2NkwzRpDI=
+	t=1744910814; cv=none; b=kHIO7orepT2FTF8YgTRp9jK3YhLMSmx776+rRAkFWn4Ud//b5falTVdU65tig42k7s9h1ALQywIvFSzMOTeTp+TB1WrSKQl5XOn/1T/ufjy5kS6hhz3gxFQwu6hGoD9/HXMpe94Ln7BdWBRMNjBCLuNTOc2pZjI2tVQzivkG5Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744910735; c=relaxed/simple;
-	bh=dJxRfYEp2QuH4TryMHj3DfMxIJ06gv4yfAAKnOyob3E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PsWXpeU9KXOR3+0qIYCJl3RmW/eO+q/+v/9Xk3ZUWcM8OfC5A8o/HUN04F3FDZcwNtBsPcBoMC7FYO7NokNTyG3SGjpXCBSSpLdTtJSNnLbANVGECHHS0GLlKoZnyDROXZyYVmN/rpdPJrutkeP5xY3IZ/yah1vp8dU+ABcpApw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cjdJ3BDc; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-73bf1cef6ceso1049587b3a.0
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744910733; x=1745515533; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tsBl+7evj4S3BwRvVEmsLlhXAkdHNshIeD4Nby9HkP0=;
-        b=cjdJ3BDcX6Wg/4peYjhBsB9oVbYakZ7EosV5M77uwbNVnD6d0pbjx5FzBhk6lrG1eE
-         b1X017Rer+1jp3b6+AEoYQQoK1bGzFDH4K3YdOooWwUjbnj5l0cBlYmLQKluefQKqK2L
-         Wx7C8Cbw/9aCmNjY/H98/h6UW/Yfht8Bbph3o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744910733; x=1745515533;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tsBl+7evj4S3BwRvVEmsLlhXAkdHNshIeD4Nby9HkP0=;
-        b=ph6dadZQmE9xWHdSdxUmI0Bb+VFZeJLeZtfTJgKTZCf7S4WrJf/uHuOJUMT/8FoZ8O
-         C0vdnYvWJTuJThHkjvVGRN8p5r4VOFroIsZxjP0t5VIezVOWAYBQaZO7USV0U2AGDMoc
-         pETgfClEsiLB53ATKhOjxqZ0NtZEifMPuOPhQCqmu24PXJ9Qw8hGPNQNX01bPhoco2jO
-         HWObmYqmTN4vxziTBQNNVYLWhnFwt0Zv5U2BaMUSFFiL5AaDnHW9cZNeluMN8i6RIOGJ
-         8VdxorfrzVmNZxbpMQ+ReCZ784i3AmuBf6g/gosIRZMG4hUaJIO0dCYW7YeDC1rdkm4+
-         eTGA==
-X-Gm-Message-State: AOJu0YzWrSgY4mflIPt+gNAOKlUwVYwsImnHuM5L2Y+hN1yrlqyV0/Eo
-	q/I0LbYfFXPNLVLACcyeGp6u3BB/FUYJbbAEwHXercz6yCtRuktw07zJwnhKBA==
-X-Gm-Gg: ASbGncvnoWzzlGyutRLSjxweR05q6+MiI9/UCS/npeBbrZNnyyKQ1aVMenaj/XBuIu0
-	3NP7s5ITCmelMnHmQu81jkQn82sXTaw7dGLFekMtfo1jlmd3AeJzNWaIbjhnBr5o7LNd82dQ448
-	eNr7U8KMbusGz6GI/jxTn1Di94ZETwQrWf2FF7LQEmAbZimItrEDAEGLVP/ZqKDL4FL8oyvVdlL
-	8wrCeEndbLRN4uwwmOhmFZjeThaBN3hymbPwgirN5gOjM6L9QvQCZtS1mkceM98lQeE8XlGFtEh
-	nvu4A+PG+9UppFxAvM/b8bVfS/V6SrUTcqX2bh8u5z/Fk68hhVCxL8seQgsTqKd6olo0o0MPq/l
-	2rCJPyt+p1I/WDL2J
-X-Google-Smtp-Source: AGHT+IEQ2LUOidIoR0KfQGr2KXkDUFN1wC5LDgNuIt7vbrDjVHrSK79cTTPScWJHNU6Adn70J4jqHw==
-X-Received: by 2002:a05:6a00:3001:b0:736:5753:12fd with SMTP id d2e1a72fcca58-73c266b5da4mr9123992b3a.4.1744910733231;
-        Thu, 17 Apr 2025 10:25:33 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8ea9a4sm109879b3a.41.2025.04.17.10.25.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 10:25:32 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Shruti Parab <shruti.parab@broadcom.com>
-Subject: [PATCH net-next v2 4/4] bnxt_en: Remove unused macros in bnxt_ulp.h
-Date: Thu, 17 Apr 2025 10:24:48 -0700
-Message-ID: <20250417172448.1206107-5-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20250417172448.1206107-1-michael.chan@broadcom.com>
-References: <20250417172448.1206107-1-michael.chan@broadcom.com>
+	s=arc-20240116; t=1744910814; c=relaxed/simple;
+	bh=MhwF/BwHo6EQq2Mw/JlLGUsZKi6aWNKmwAb9vucDW6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PvMBf+3fv/GSopxWSR6R6ZC6wgdB9z0lCdevqk9/y+BCy/qnYK3NAMp3cqJYGNG7o+ui4yppkHNsZtTV3RvdXvF9CcjK4eV00QXkEBG24/KFHvT02vyq5Rttp4ql+l7uPafXZoApk24fArGI1TUi1m+7Z3olD1EOiccILtli9sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BDfj3BtD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mwH5L53HDNq+argaP1eYSzJK66XTnQVpZ9LqansbCzs=; b=BDfj3BtDbRYXNvTqh5rzikbE3R
+	CkZNiGTRvdNV0dSi1QUVqpFs3jTX6mtxkjH+rnFnzZipMcEEryYMybNEXbQstbvx7AZOZ80xoMoQX
+	jRfA/0pwoBiEc9hd9jJIOPuq5nRKwYloZV36gZ1Y5OjF13QGLBUnDs5F0dGn/+X5amgU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u5T0f-009oLn-FS; Thu, 17 Apr 2025 19:26:45 +0200
+Date: Thu, 17 Apr 2025 19:26:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Russell King <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Simon Horman <horms@kernel.org>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Dinh Nguyen <dinguyen@kernel.org>
+Subject: Re: [PATCH net] MAINTAINERS: Add entry for Socfpga DWMAC ethernet
+ glue driver
+Message-ID: <03dd6fb9-fb9d-42e2-8f9f-e53c77e34bac@lunn.ch>
+References: <20250416125453.306029-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416125453.306029-1-maxime.chevallier@bootlin.com>
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+On Wed, Apr 16, 2025 at 02:54:48PM +0200, Maxime Chevallier wrote:
+> Socfpga's DWMAC glue comes in a variety of flavours with multiple
+> options when it comes to physical interfaces, making it not so easy to
+> test. Having access to a Cyclone5 with RGMII as well as Lynx PCS
+> variants, add myself as a maintainer to help with reviews and testing.
 
-BNXT_ROCE_ULP and BNXT_MAX_ULP are no longer used.  Remove them to
-clean up the code.
+Thanks for signing up to maintain this, and helping out Russell with
+testing. We need more developers to take ownership of the stmmac glue
+files.
 
-Reviewed-by: Shruti Parab <shruti.parab@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h | 3 ---
- 1 file changed, 3 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-index f6b5efb5e775..7b9dd8ebe4bc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-@@ -10,9 +10,6 @@
- #ifndef BNXT_ULP_H
- #define BNXT_ULP_H
- 
--#define BNXT_ROCE_ULP	0
--#define BNXT_MAX_ULP	1
--
- #define BNXT_MIN_ROCE_CP_RINGS	2
- #define BNXT_MIN_ROCE_STAT_CTXS	1
- 
--- 
-2.30.1
+    Andrew
+
 
 
