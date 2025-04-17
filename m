@@ -1,64 +1,58 @@
-Return-Path: <netdev+bounces-183804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95311A9210D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:13:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEBBA92150
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 676163A6E00
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:13:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69AC19E6852
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C963253333;
-	Thu, 17 Apr 2025 15:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5764253B5C;
+	Thu, 17 Apr 2025 15:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djt00QHq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgK+23Lt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DD72475C7;
-	Thu, 17 Apr 2025 15:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6F0253B57;
+	Thu, 17 Apr 2025 15:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744902808; cv=none; b=PWrtbKId3+EKsGOsu9ZjoDCpiHduRWb6KNndkqDZUnYL1JdZRTvQNWHD7/msvbcYtvJVgLcnWWsxcXSoizFPzZxhULjniehgT+krPk2ZASu4K83IttXZDqoCQF9Ivq1L9C3o5gmFo/nTq/Iy1uted3MoG7Fs/ymfAi3WkVsafrM=
+	t=1744903318; cv=none; b=rKoPTOwIicb8tcY6ukUo85K01TtPZMYGEgS13MLITsXQQYS/Gb9hMP+IoHdbWps59lD7pguuyip5QjUSjTRDTxrtLrKlepfx9rDLEL/0wiIpJpj0qxvAhY8K2/1AQCOAekrb05sCaayDnSkSXXjVYdUPD6WQdkeMKuoTz1OpgBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744902808; c=relaxed/simple;
-	bh=vDbkTIHc0zXTAQW1oy0wD2cr80Dbn7VA7qtXP2ydKjY=;
+	s=arc-20240116; t=1744903318; c=relaxed/simple;
+	bh=cTl/FNwNyU4uOfwGRjIHCxzcBYjmq1mf9Lx59yh315M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=btkcUBaklimByQ9oUA6r9yLsMQcH1Jk7aMT+Ky9NyDnGbwSxpoHWat+xXJl0iLi0am1wcAcv0CoPv/t7YAAJQ1/9cvgm6IKTnvnng4tUIMmIz46KIdIWQcFv6s3ZU5QsHkNPIUbTWFU5Z63hS17aTrWfTX+4mvAOi9/yqrv3xUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djt00QHq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BE8C4CEE4;
-	Thu, 17 Apr 2025 15:13:26 +0000 (UTC)
+	 MIME-Version:Content-Type; b=JtkRkQHQD8YJmgaz+UAKi0WC0yQQp0eesnyX4VMXjDwNcH9sPMsSsypD4DMkMu111W6pXRu37s/mjH1z+SjFZT6dlqCelkXXahKeZwTFQ+AhzE2Myf9U/h++sNMaygG97RE761r70nfuQor8KjtIRguFuqHt3dQsWzItMKpU3L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgK+23Lt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 540BCC4CEED;
+	Thu, 17 Apr 2025 15:21:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744902807;
-	bh=vDbkTIHc0zXTAQW1oy0wD2cr80Dbn7VA7qtXP2ydKjY=;
+	s=k20201202; t=1744903317;
+	bh=cTl/FNwNyU4uOfwGRjIHCxzcBYjmq1mf9Lx59yh315M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=djt00QHqYgsHYUVrBdoVCvURtrC+CMCxIT/lZiGZsqCUApnoRK35Ks6D2PjVB7YMH
-	 bxoP+RxujXuPqfm+YwF4JJAa8E6bN87A10k9iIUnK/s5m6caOsPHBGPMmh9ag08+MD
-	 gAC1EbYxT2s3OHFRLVzHmIzbVbJ60IYZL1xaoeLRLHqJtbn04zy4jwvAr4UGB4dgzB
-	 zEd70H3SChtnOxGKEyqa+CFkGh4owK4d+PsxwWTok1gDGQW8xxJMZFHomRsW0vxNrU
-	 nB7+i2VpZ8i8A4dSwjQaCYERAJKxOaEYJ2QA8desbiVmn2IcqxKlQDC/4nAeQ5f8oS
-	 G0DiHBvBDjuRg==
-Date: Thu, 17 Apr 2025 08:13:25 -0700
+	b=CgK+23LtplkVsjB2QOUFXTggU9lAlk1d5uCGHvpmLVzVM/RBzXfNhnjkUOZW8Roae
+	 IaMUxPvSeTQS1BcA3KqhP0RVR1py94WfLvfJvJeKLKzluznB5feUw0XwVDpBYv9tRy
+	 RcQ4lbs6gZlJoji3Mi9V17xNo3oXO5foH2U/ZnfCcTjYIKNRtHuuBNQfhOuLTCI1oU
+	 xd/ChxkYvnVhLId1wxptSBGfv/xIGK5WJBwYR2hJQoTPzWOWJk5Tj95YJegUyy9wUT
+	 0TxKGBQcdp5ZsBm++T1hFXHNAT2Ssnxwkt7Y5Yo9sCIBoKZMk0+M2k2NKjYweQk2n9
+	 q+lWjtkE+byEA==
+Date: Thu, 17 Apr 2025 08:21:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Florian Fainelli
- <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2 5/5] net: ethernet: mtk_eth_soc: convert cap_bit
- in mtk_eth_muxc struct to u64
-Message-ID: <20250417081325.0e0345ee@kernel.org>
-In-Reply-To: <99177094f957c7ad66116aba0ef877df42590dec.1744764277.git.daniel@makrotopia.org>
-References: <8ab7381447e6cdcb317d5b5a6ddd90a1734efcb0.1744764277.git.daniel@makrotopia.org>
-	<99177094f957c7ad66116aba0ef877df42590dec.1744764277.git.daniel@makrotopia.org>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: <andrew+netdev@lunn.ch>, <brett.creeley@amd.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>,
+ <michal.swiatkowski@linux.intel.com>, <horms@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 net 4/4] pds_core: make wait_context part of q_info
+Message-ID: <20250417082156.5eac67e8@kernel.org>
+In-Reply-To: <20250415232931.59693-5-shannon.nelson@amd.com>
+References: <20250415232931.59693-1-shannon.nelson@amd.com>
+	<20250415232931.59693-5-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,18 +62,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 16 Apr 2025 01:52:03 +0100 Daniel Golle wrote:
-> The capabilities bitfield was converted to a 64-bit value, but a cap_bit
-> in struct mtk_eth_muxc which is used to store a full bitfield (rather
-> than the bit number, as the name would suggest) still holds only a
-> 32-bit value.
+On Tue, 15 Apr 2025 16:29:31 -0700 Shannon Nelson wrote:
+> Make the wait_context a full part of the q_info struct rather
+> than a stack variable that goes away after pdsc_adminq_post()
+> is done so that the context is still available after the wait
+> loop has given up.
 > 
-> Change the type of cap_bit to u64 in order to avoid truncating the
-> bitfield which results in path selection to not work with capabilities
-> above the 32-bit limit.
+> There was a case where a slow development firmware caused
+> the adminq request to time out, but then later the FW finally
+> finished the request and sent the interrupt.  The handler tried
+> to complete_all() the completion context that had been created
+> on the stack in pdsc_adminq_post() but no longer existed.
+> This caused bad pointer usage, kernel crashes, and much wailing
+> and gnashing of teeth.
 
-Could you please be more specific and name a bit or a field that goes
-over 32b? Since this is a fix ideally we'd also have impact to the user
-described in the commit message. But having enough info for the reviewer
-to quickly validate the change is the bare minimum.
+The patch will certainly redirect the access from the stack.
+But since you're already processing the completions under a spin
+lock, is it not possible to safely invalidate the completion
+under the same lock on timeout?
+
+Perhaps not I haven't looked very closely.
+
+> +	wc = &pdsc->adminqcq.q.info[index].wc;
+> +	wc->wait_completion = COMPLETION_INITIALIZER_ONSTACK(wc->wait_completion);
+
+_ONSTACK you say? I don't think it's on the stack any more.
 
