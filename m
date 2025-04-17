@@ -1,77 +1,125 @@
-Return-Path: <netdev+bounces-183823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403A9A9223C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:07:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2AAA92254
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:11:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F695A1CC9
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:07:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 837F31897C80
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3759E253B7E;
-	Thu, 17 Apr 2025 16:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2902A254859;
+	Thu, 17 Apr 2025 16:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+sGNXaQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UXqz1snV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A481B4153
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714A6347B4;
+	Thu, 17 Apr 2025 16:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744906050; cv=none; b=Dd6qQALQdlfl8aQwEm5VpN+tP0QT+CHA8a8d03+5YBpsQgzNOVfmxVK6zz/BjY2RyEdCupRG3g7JuDox6LG093PUcy1dTSZ19cp0nx30CIkjNaF4CEtfyB5Y+KTW+QLE2Bm32/FbBpPZpYY46VYMF/VAfyzqsJRzxlyBoSJ2EYU=
+	t=1744906276; cv=none; b=Ekdmh8D1uMYIi/z1VIQx+5pfceiAMYUYyAkpkcx5cx3QrifS8xg9NTGaoYMaBnBs/qUGXIIs5oJdVP3DpyfEg/ctV9C0k6M9z+9R4q5eX+v3dd357du6m1Tlq+kowMdZXz7CmN4UNVSivKn8wV4Ljt5DlAfxPSjNypSj4dUYtio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744906050; c=relaxed/simple;
-	bh=Wa7gHZln12dvfA4pOGNKpc1rjCEwjtm8F7ok6Kc7dBY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nucXQzALPmCV4jRvTwngzcbtYoN5By4mwVBVEC5PdsxhuIZeb/aXqeuTFPZXaPqbkJZlO0tTGSO1ukId0sTxJ1p47QKmR+i/cfxyXJNXiywALBtcA3fTZXqDHWBijgdoa4Myv8Ie/V/uNymdvcYXOWljdpC2MgL9TAdgCUBbD70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+sGNXaQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 140D8C4CEE4;
-	Thu, 17 Apr 2025 16:07:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744906049;
-	bh=Wa7gHZln12dvfA4pOGNKpc1rjCEwjtm8F7ok6Kc7dBY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E+sGNXaQR7cJzpr5zel8DE7UW9/xQ3Kd0yafK9oAxu1S1dNoCaqATD+q9gCF0913o
-	 bhGk7SIbxKkpT11albXqdzXM2nJwqLA0TpjyrruR2uDuQYkfm5X+EiRXniJpbz1pjW
-	 h2tOLRtDaMugxe1bZD0tmTPQ6kM14O8yyLBABUw9NmDpV6ENS8kgPZkKnSVEAYhMS0
-	 sGYtcjZ0dfOR6nD269cRKYz6Ks11MR0KzBFmL7+pbQN/D0bTEgP105+o3jjoM0L0zf
-	 EBjhk9+cGBBo/ig5D3QCsoPPHOIAl0tq7RYc+xwaWg9xiiB17g2x4HErJqgpzhHw/z
-	 fUOHWn9B6C5kw==
-Date: Thu, 17 Apr 2025 09:07:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, toke@redhat.com, gerrard.tai@starlabs.sg,
- pctammela@mojatatu.com
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant
- enqueue cases
-Message-ID: <20250417090728.5325e724@kernel.org>
-In-Reply-To: <20250416102427.3219655-1-victor@mojatatu.com>
-References: <20250416102427.3219655-1-victor@mojatatu.com>
+	s=arc-20240116; t=1744906276; c=relaxed/simple;
+	bh=0JvHSv/zBfDwIrbND3HHsM5lPGuyvdsrhZLlK7Q+Jbw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UQn2ZNRfKxDqPN/b20ZAKGa3w5WfJwZrTXsGtg3wVoyYZZgfzlssYj+0k5HE0x5wQCDK6muUxHbAcpvhBpAW4UCyVyhvukSb99DzKNDB8JZi569baSiuhTeqoA4P8uVVdNZGPzoY6PI07s3HeQdD/U4AvEBa2FdCmae0c1Z8fSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UXqz1snV; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso1476451f8f.1;
+        Thu, 17 Apr 2025 09:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744906273; x=1745511073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0YoOig2NlT2ugypUY7ub3Z8t3Ukg5TG35rVUrcVY94k=;
+        b=UXqz1snVxb38BHKOg0Z1g4pFXIGQSb7UYvrKkorIWYzefCoQ2IDmwqlcsZmqWJvg3T
+         UXl0HHxo+XlYNohcHlRJnPsiHOY685jblq3kLA9qOtQyR7xlBsKa5e2zIM49I92I1W+l
+         fH/1lLpwZiM7UhDzCPJCWwdGl4SritH11Vu+LMWpN4lyf+F9PSbw66QUf79BqoEPruuG
+         wgStIPD3vxU9KylrMvqiVYANRkScEnpCuikAa0zBsWcbnrRSCtIEUD5yDyssAO6Puaup
+         CqESYGAuuvevBTkr+9moUJRua0RHxeb0lp79Qp2b2kuQnvK+NuZUCudvvPpszOuVBbb+
+         BjcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744906273; x=1745511073;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0YoOig2NlT2ugypUY7ub3Z8t3Ukg5TG35rVUrcVY94k=;
+        b=QJHqIPY1GsmMyIrCdEPR6UtNAABv4OUsRXGoEQ3ij3De7V+VgXklPUJNMZvjBCvsLN
+         hmPSjt5Qpmhja126zNvxdV72qv+BNW35UX3vyo/g4F3PjMgfBYQTSkZRPXbg7KNLrn+2
+         GJcBmIhWh9xft9vjfBFL9e9YqPFkYSG4Dc+0uwqNh67fcWS38JgVDwzQRlUAublv1qyN
+         m4rXFT5kZQAQU5+29KKDqqaMV00JjDGPq0fgvPmXgyUmhTXZi5bc4bkYTr/wjSmv3nwJ
+         5y8F+kUUY0MmSpQrY4ErvrbMzhptX3lgM9o+HpScaCRHJSmks4gAQeLQZII+6m6y0Isi
+         J3fQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhPagfcGDeTqMJD2MPNXomOFyWEbSaqP7xrJzIqPeeaOqg+aGIUxg8cwJBgK+KiF9jkvql4/mPcHPACQz0eLVNOM4=@vger.kernel.org, AJvYcCX1zaqkrwHWZhRWgY36diizvsMXNkpTPCMnUctPgLMBVII9rDuLyLRPC3rHTkNEDsM+ImsEtG2p@vger.kernel.org, AJvYcCXO2t6j9RVlFHCfvtU/jaYGdU2yoZzIe4Wfb1IeH1NF6DGqcF9YtXvT6Y7xdUdTeenJhMyyQNtximB7XxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKsOIiCxi7znK3b0jxe7RepCJ1Wk/U17N7StD+sNdkeF5H9b12
+	53xfpZeu+77CWnRHJLNbtof+EjN2SN+T0ktXU15NIeaGjAad/DN4
+X-Gm-Gg: ASbGncvF8sAv1ekJpxYNx9WDrBxSa2Ety+yBKpdNBAoMM/ES2a7Fz6NXeCOMhIsiYh0
+	po0OiXQPcdpHKILm5NZ0nFzOnRC4VxHw9yuoPfKpXdmfFaUj/j97amA3p5FVPLoGCGjpCNmKzy8
+	gaBl4XlBlLdDy5LXNfTK1lyLJrWjy1XqSH7vJa0zNMEtee6cULYiyC5GyZZgcBefIzuEO+semQs
+	fVHMWisUPqI6A7vBjQNQyoEbZ7hKBK1z1Z2v5VhoLRbxB9xD2hbipduYLs2GoqgEXop04JS4ZQs
+	LZB4MiSEzz5SRldJX5mIbIuYvYol8n1bf8r++JnYWQ==
+X-Google-Smtp-Source: AGHT+IGC8XUS3Me7ine70yCjc2tBMhV+dBWz5fKYCdIg5NPTsQPgafcB1x+Wut8kapX6DuF22rs8gA==
+X-Received: by 2002:a05:6000:2a84:b0:391:21e2:ec3b with SMTP id ffacd0b85a97d-39ef9cc594fmr361937f8f.3.1744906272540;
+        Thu, 17 Apr 2025 09:11:12 -0700 (PDT)
+Received: from localhost ([194.120.133.58])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39eaf43cd69sm20426895f8f.80.2025.04.17.09.11.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 09:11:12 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: dsa: rzn1_a5psw: Make the read-only array offsets static const
+Date: Thu, 17 Apr 2025 17:11:06 +0100
+Message-ID: <20250417161106.490122-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 16 Apr 2025 07:24:22 -0300 Victor Nogueira wrote:
-> As described in Gerrard's report [1], there are cases where netem can
-> make the qdisc enqueue callback reentrant. Some qdiscs (drr, hfsc, ets,
-> qfq) break whenever the enqueue callback has reentrant behaviour.
-> This series addresses these issues by adding extra checks that cater for
-> these reentrant corner cases. This series has passed all relevant test
-> cases in the TDC suite.
+Don't populate the read-only array offsets and md5_init on the stack
+at run time, instead make it static const.
 
-Sorry for asking this question a bit late, but reentrant enqueue seems
-error prone. Is there a clear use case for netem as a child?
-If so should we also add some sort of "capability" to avoid new qdiscs
-falling into the same trap, without giving the problem any thought?
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/dsa/rzn1_a5psw.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
+index 31ea8130a495..df7466d4fe8f 100644
+--- a/drivers/net/dsa/rzn1_a5psw.c
++++ b/drivers/net/dsa/rzn1_a5psw.c
+@@ -337,8 +337,9 @@ static void a5psw_port_rx_block_set(struct a5psw *a5psw, int port, bool block)
+ static void a5psw_flooding_set_resolution(struct a5psw *a5psw, int port,
+ 					  bool set)
+ {
+-	u8 offsets[] = {A5PSW_UCAST_DEF_MASK, A5PSW_BCAST_DEF_MASK,
+-			A5PSW_MCAST_DEF_MASK};
++	static const u8 offsets[] = {
++		A5PSW_UCAST_DEF_MASK, A5PSW_BCAST_DEF_MASK, A5PSW_MCAST_DEF_MASK
++	};
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(offsets); i++)
+-- 
+2.49.0
+
 
