@@ -1,148 +1,110 @@
-Return-Path: <netdev+bounces-183670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E356AA917DF
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:30:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A600A917E1
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 840781908462
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:30:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B768B1907851
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A485225A36;
-	Thu, 17 Apr 2025 09:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D5821ADD6;
+	Thu, 17 Apr 2025 09:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hVycZnPz"
 X-Original-To: netdev@vger.kernel.org
-Received: from spam.asrmicro.com (asrmicro.com [210.13.118.86])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C1C218EB8
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 09:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.13.118.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636AF1898FB
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 09:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744882218; cv=none; b=bQpOpIHujWLJ4Ri8BJCXK/FrCs4RyCcj/FaV5VfrAFmMgUfx379a5uhhqLpUyPyQaTMoMnxoGTlVc+lvaCe2cpRy4Yd3G4z01lKN2aidA7CoN95u/LI1Se/gyAKf4ZNwOWZszRdCnbGtYxdz4tcy7iz60oTkJ2vL+MdVYG8IZpE=
+	t=1744882270; cv=none; b=uFoHstaHxKekXB3sdeYEGyV654+83Jg/mOnmP2xUaWdJPZxzystaSfqN5PiCo55msBPlXFCWU8B5A9acy9rUyYMCZJRsl5mtvpPeXjAd8dwoEnm9eoNLl8nq+g/RTMRdWawoSjQ2dCiWV5vGr6BRF773sFc8GoJrxwNMKyccrpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744882218; c=relaxed/simple;
-	bh=/3cgy1tOPVmp/GwqXQ5b09Rm9iK7C5DYKc0OMkdAHUc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kkVZ3N1MZ3aag4wvNfmWqcwbsA+WM/wCdSeZx+Xur9ovegUjcuMiBPSb+NYPXGosE1raXXiJq0yZ7m2sFTl6xFa5m5Xq905s5RC51zTWWmw0Tf1a+mGo7pUhCFTk1b9ztlNhhKubUINMUzyR0NhYQ1DUmsL2bUEviJroJ+KWy4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com; spf=pass smtp.mailfrom=asrmicro.com; arc=none smtp.client-ip=210.13.118.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asrmicro.com
-Received: from exch03.asrmicro.com (exch03.asrmicro.com [10.1.24.118])
-	by spam.asrmicro.com with ESMTPS id 53H9TuF3001085
-	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=FAIL);
-	Thu, 17 Apr 2025 17:29:56 +0800 (GMT-8)
-	(envelope-from huajianyang@asrmicro.com)
-Received: from localhost (10.26.128.141) by exch03.asrmicro.com (10.1.24.118)
- with Microsoft SMTP Server (TLS) id 15.0.847.32; Thu, 17 Apr 2025 17:29:59
- +0800
-From: Huajian Yang <huajianyang@asrmicro.com>
-To: <pablo@netfilter.org>, <fw@strlen.de>
-CC: <kadlec@netfilter.org>, <razor@blackwall.org>, <idosch@nvidia.com>,
-        <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-        <bridge@lists.linux.dev>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Huajian Yang <huajianyang@asrmicro.com>
-Subject: [PATCH] net: Move specific fragmented packet to slow_path instead of dropping it
-Date: Thu, 17 Apr 2025 17:29:53 +0800
-Message-ID: <20250417092953.8275-1-huajianyang@asrmicro.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1744882270; c=relaxed/simple;
+	bh=F9Y0DmU3wEHCJH5F3T95MiuKcenBBiSBi8gA0omO2Jw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ErtorcZShkpwbEpkagH9WrSd195HrjLt1Gv2ysj0z6CSMbbpiGxByvsLoYkv2mk95/bljvO5UWa/Gj2mNynH3yR4uqhBiHwXas+sGjBAG95OhaGU/VYQtVmIN1ZtX1q8sIh+7C+FI8FPL1CSZ4mDhBhCDieAWoEb3/Z5wstbNVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hVycZnPz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AFEBC4CEE4;
+	Thu, 17 Apr 2025 09:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744882269;
+	bh=F9Y0DmU3wEHCJH5F3T95MiuKcenBBiSBi8gA0omO2Jw=;
+	h=From:Date:Subject:To:Cc:From;
+	b=hVycZnPzum4yr9YF4zE6ZoE1n4jiB7kwZGrvFjJoajF1H/89TXibD7P5tQp7F692c
+	 kmYIs1RFigJ3uAxAtUeaEEjSrwdWb8f00j6CdH17Kq/zBQzrkxRYw8K7SLd+rPtLa4
+	 VeVWaugCImE+1VDru/5y1tFAsTIGnQ1XoaGDhhVHQzF7drAEeq4K7sNxGCEZmt2yj0
+	 d6X4Mz2jfteqN5esQoC9TrE9IPoZEmphntToDgnM3XNd0IkHswztc2W2bRi9oXoxDu
+	 KIIEPuqEg25QybHDIoIH7vhNpbmUzhDthXgVups+MCSxb6Z1uCtzwipUElMg0OWfvi
+	 YNgabBdnzSMRA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 17 Apr 2025 11:30:47 +0200
+Subject: [PATCH net-next v2] net: airoha: Add missing filed to
+ ppe_mbox_data struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: exch02.asrmicro.com (10.1.24.122) To exch03.asrmicro.com
- (10.1.24.118)
-X-DNSRBL: 
-X-SPAM-SOURCE-CHECK: pass
-X-MAIL:spam.asrmicro.com 53H9TuF3001085
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEbKAGgC/4WNQQqDMBBFryKz7pQkRE276j2KSNRRh7aJJCIW8
+ e5Nha67fJ/PextECkwRrtkGgRaO7F0CdcqgHa0bCLlLDEqoXGip0XLwo0VyZW4k9rziNFH9avx
+ ad3a2qHppjOhLbYoWkmUKlE5H4V4lHjnOPryP4CK/68+d/3UvEiVqLUxbiMZeCn17UHD0PPswQ
+ LXv+wcWwJXizwAAAA==
+X-Change-ID: 20250414-airoha-en7581-fix-ppe_mbox_data-2f1880f7486c
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.2
 
-The config NF_CONNTRACK_BRIDGE will change the bridge forwarding for
-fragmented packets.
+The official Airoha EN7581 firmware requires adding max_packet filed in
+ppe_mbox_data struct while the unofficial one used to develop the Airoha
+EN7581 flowtable support does not require this field.
+This patch does not introduce any real backwards compatible issue since
+EN7581 fw is not publicly available in linux-firmware or other
+repositories (e.g. OpenWrt) yet and the official fw version will use this
+new layout. For this reason this change needs to be backported.
 
-The original bridge does not know that it is a fragmented packet and
-forwards it directly, after NF_CONNTRACK_BRIDGE is enabled, function
-nf_br_ip_fragment and br_ip6_fragment will check the headroom.
-
-In original br_forward, insufficient headroom of skb may indeed exist,
-but there's still a way to save the skb in the device driver after
-dev_queue_xmit.So droping the skb will change the original bridge
-forwarding in some cases.
-
-Signed-off-by: Huajian Yang <huajianyang@asrmicro.com>
+Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- net/bridge/netfilter/nf_conntrack_bridge.c | 12 ++++++------
- net/ipv6/netfilter.c                       | 12 ++++++------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+Changes in v2:
+- Add more details to commit log
+- Link to v1: https://lore.kernel.org/r/20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_npu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bridge/netfilter/nf_conntrack_bridge.c b/net/bridge/netfilter/nf_conntrack_bridge.c
-index 816bb0fde718..6482de4d8750 100644
---- a/net/bridge/netfilter/nf_conntrack_bridge.c
-+++ b/net/bridge/netfilter/nf_conntrack_bridge.c
-@@ -60,19 +60,19 @@ static int nf_br_ip_fragment(struct net *net, struct sock *sk,
- 		struct ip_fraglist_iter iter;
- 		struct sk_buff *frag;
- 
--		if (first_len - hlen > mtu ||
--		    skb_headroom(skb) < ll_rs)
-+		if (first_len - hlen > mtu)
- 			goto blackhole;
- 
--		if (skb_cloned(skb))
-+		if (skb_cloned(skb) ||
-+		    skb_headroom(skb) < ll_rs)
- 			goto slow_path;
- 
- 		skb_walk_frags(skb, frag) {
--			if (frag->len > mtu ||
--			    skb_headroom(frag) < hlen + ll_rs)
-+			if (frag->len > mtu)
- 				goto blackhole;
- 
--			if (skb_shared(frag))
-+			if (skb_shared(frag) ||
-+			    skb_headroom(frag) < hlen + ll_rs)
- 				goto slow_path;
- 		}
- 
-diff --git a/net/ipv6/netfilter.c b/net/ipv6/netfilter.c
-index 581ce055bf52..4541836ee3da 100644
---- a/net/ipv6/netfilter.c
-+++ b/net/ipv6/netfilter.c
-@@ -164,20 +164,20 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 		struct ip6_fraglist_iter iter;
- 		struct sk_buff *frag2;
- 
--		if (first_len - hlen > mtu ||
--		    skb_headroom(skb) < (hroom + sizeof(struct frag_hdr)))
-+		if (first_len - hlen > mtu)
- 			goto blackhole;
- 
--		if (skb_cloned(skb))
-+		if (skb_cloned(skb) ||
-+		    skb_headroom(skb) < (hroom + sizeof(struct frag_hdr)))
- 			goto slow_path;
- 
- 		skb_walk_frags(skb, frag2) {
--			if (frag2->len > mtu ||
--			    skb_headroom(frag2) < (hlen + hroom + sizeof(struct frag_hdr)))
-+			if (frag2->len > mtu)
- 				goto blackhole;
- 
- 			/* Partially cloned skb? */
--			if (skb_shared(frag2))
-+			if (skb_shared(frag2) ||
-+			    skb_headroom(frag2) < (hlen + hroom + sizeof(struct frag_hdr)))
- 				goto slow_path;
- 		}
- 
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c3611b4a154d19bc2c 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.c
++++ b/drivers/net/ethernet/airoha/airoha_npu.c
+@@ -104,6 +104,7 @@ struct ppe_mbox_data {
+ 			u8 xpon_hal_api;
+ 			u8 wan_xsi;
+ 			u8 ct_joyme4;
++			u8 max_packet;
+ 			int ppe_type;
+ 			int wan_mode;
+ 			int wan_sel;
+
+---
+base-commit: df8398fb7bb7a0e509200af56b79343aa133b7d6
+change-id: 20250414-airoha-en7581-fix-ppe_mbox_data-2f1880f7486c
+
+Best regards,
 -- 
-2.48.1
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
