@@ -1,56 +1,105 @@
-Return-Path: <netdev+bounces-183837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6DD6A922EB
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:42:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7D2A922F2
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:43:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A5037AB833
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:41:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DF5C464B79
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E541254AFC;
-	Thu, 17 Apr 2025 16:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0AA2550C2;
+	Thu, 17 Apr 2025 16:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="hFP13GVt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B872F35973;
-	Thu, 17 Apr 2025 16:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC9A254B17
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744908146; cv=none; b=nwkrw0hNcAS/mGQyUznGnpKZM0hReCABKyMqHQPFL9PigpuL3h4pMJYxNO5Kn5D7VMvnW+FNEWCR6psfxVWVpRv3+UipaPrhIpi+QPJ/1Iklq6kIcTLTbhunfFZAAWQ8iPk3D4hcQvoJi1mrtIpyOJOiRD8r86hAkbLEeiT1zaE=
+	t=1744908209; cv=none; b=dWmmldF7cjQ3QQ2RPtCLYPc7WVQoie9BtKiFrw+WfoVub4wP6+kjuT8W4Ss7DIyyI3LIhJGSJ+437Sl3FWL2SmGcWVM1LyJR3nhE03SHaKNtRC4afg/jNxA+239nYL162pY9Pj3TZ8CBPuiI38gDLIrEHdh2wSW0VSBcW6MeBro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744908146; c=relaxed/simple;
-	bh=Yk13GbJg6uRZcMPD4wlifpeBZXXXTA/RowAd4MaGLiU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GW6ygcyYw9Bg7nbGvd3vzu4J/w9SSCfyNNaYcv0X/LnqCcxopA9eWhclHIbxjHTxebSaGbHk0RjLDdVxDChFcPP2SuoP8rs0fiAGqm9cfXDLfjuz5Kx1rYaHKTnNO02A76VYL1TfWaoE8HqEuCVLxLb8mg2Ir0m4noOy0hJd4ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1u5SH7-000000002ZV-1ibD;
-	Thu, 17 Apr 2025 16:42:19 +0000
-Date: Thu, 17 Apr 2025 17:42:16 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
+	s=arc-20240116; t=1744908209; c=relaxed/simple;
+	bh=cE0SsJXubMVoO/NUjivTf4Jtt0m+Kx9DZncRgLItiJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDfHnFZ0eQnxxP6ZZ8pGLNoUNq+K82G6R3cgcynAYR/B2SPc9A+xfdZIv6HTmsLfyuxQmKn2uIP/wskLRkxQlXyt6k4ayfvGQzxpJkGF2GMTmxubbm75qOFnlhXd8L9ekXQOsCOyDhNNk0ARfbEDjO+Xr1GgxeQdvMKvZh5oyks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=hFP13GVt; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7369ce5d323so931408b3a.1
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 09:43:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1744908206; x=1745513006; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HJs3R27mGXFnUc6xsOALgXGRVDRyXs8OoUcWIG3enHk=;
+        b=hFP13GVtwYn8MV8aG2khVJWT1njBW5N2uFkrWfNIV4v+CTVErrPkFiBGt6Mnnp+j1j
+         f1bIW6/SyZhCQWNRNuV2paZCvpH4lwtXa2Ww3iSVipiSnrMfqmer2evE1yHz+261x9Vh
+         bsQfyf5nTXFJ+whm6X1eTfJPdePEcOeHYdZsQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744908206; x=1745513006;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HJs3R27mGXFnUc6xsOALgXGRVDRyXs8OoUcWIG3enHk=;
+        b=GGaDKgVn+gjeD6AC0rZFuEN2ebQc0w+z2C/J0FeGEdzgOHYIx1qx2fMeQX7cHfIliw
+         ocwOAr5ezLN2zIh5HLx1YM3PFPkQ38cT3mCyworw068w1gpX5tnU2me70agBiOW9Yd0K
+         Ky0XUklOQ0p4gieL4C37J9Y3C387eQ5U1QH7ribt9PgXXuX1aS8nMZSiJHIemcoxuHFL
+         +PEgsRCquf5GdtnmvCY2SBCQOXKMLllmRqcbQaIkrLO7YNxBvUR8QWXk6jpW9SdblsDy
+         rNBJtvxXus4uCMgYRUDTllfgIZKdwYUf2kMB9v32P6dEpGM7d//eDJnssjFeiV8kKT4y
+         xMJA==
+X-Gm-Message-State: AOJu0Yw7WmWC2WKWl5lOMQ4/5+7kxBSsRntyb5n0KyV78ncV6pRt9Eub
+	HjsCdgCrZbYDgcMAevK22/TlJxLkoKResne/PvNxGUg4r24XKnWekImeT6j6IeU=
+X-Gm-Gg: ASbGncsMvBdZKNf+P5nT1zcOAwERnauw+IWCyHbJjGv9nf4bieS6Tpn9eRDLxB/Y/Mh
+	Q+evs2ZPTGWpCvhl5awRkaWg0ZClQg/msbet+UsJ+9lC+2/QyCN8lmQImb86fYSfp84q3WDK9MX
+	faaTkBjOKSClSiambRTI2m5eDgv3PYplfjFzcPUyzIbpE5RJSeEMHuORScdsBKGt7L/3yxxdUnp
+	U4b+IKXNauxWZgNajnKOOoaVraoyXilDo+IFOu42Ogkw2ED2TbXqhehpSMI8Z6yQsZH84c2FUxq
+	sUuJhsgrtd0hhM/3fGSK/oqOYyrTIn6zU2z9MUgDEfHGXN7/286+1N1sOx6G7i0LAKQnXgTMk2r
+	BqYB2d3Na+ZS1
+X-Google-Smtp-Source: AGHT+IG+XpQJVC4yi6kR32NZ5IA6ihEOayDuhg24CWyM1y1U1cd5X2UW8o/p/Y+LyClf8OSD/ROclA==
+X-Received: by 2002:aa7:88d2:0:b0:735:d89c:4b9f with SMTP id d2e1a72fcca58-73c264c4cb4mr8349614b3a.0.1744908206170;
+        Thu, 17 Apr 2025 09:43:26 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8bf802sm63829b3a.13.2025.04.17.09.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 09:43:25 -0700 (PDT)
+Date: Thu, 17 Apr 2025 09:43:23 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 4/4] selftests: drv-net: Test that NAPI ID is
+ non-zero
+Message-ID: <aAEvq_oLLzboJeIB@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v3] net: ethernet: mtk_eth_soc: convert cap_bit in
-  mtk_eth_muxc struct to u64
-Message-ID: <d6d3f9421baa85cdb7ff56cd06a9fc97ba0a77f9.1744907886.git.daniel@makrotopia.org>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+References: <20250417013301.39228-1-jdamato@fastly.com>
+ <20250417013301.39228-5-jdamato@fastly.com>
+ <20250417064615.10aba96b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,61 +108,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250417064615.10aba96b@kernel.org>
 
-From: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
+On Thu, Apr 17, 2025 at 06:46:15AM -0700, Jakub Kicinski wrote:
+> On Thu, 17 Apr 2025 01:32:42 +0000 Joe Damato wrote:
+> > Test that the SO_INCOMING_NAPI_ID of a network file descriptor is
+> > non-zero. This ensures that either the core networking stack or, in some
+> > cases like netdevsim, the driver correctly sets the NAPI ID.
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >  .../testing/selftests/drivers/net/.gitignore  |  1 +
+> >  tools/testing/selftests/drivers/net/Makefile  |  6 +-
+> >  .../testing/selftests/drivers/net/napi_id.py  | 24 ++++++
+> >  .../selftests/drivers/net/napi_id_helper.c    | 83 +++++++++++++++++++
+> >  4 files changed, 113 insertions(+), 1 deletion(-)
+> >  create mode 100755 tools/testing/selftests/drivers/net/napi_id.py
+> >  create mode 100644 tools/testing/selftests/drivers/net/napi_id_helper.c
+> > 
+> > diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
+> > index ec746f374e85..71bd7d651233 100644
+> > --- a/tools/testing/selftests/drivers/net/.gitignore
+> > +++ b/tools/testing/selftests/drivers/net/.gitignore
+> > @@ -1,2 +1,3 @@
+> >  # SPDX-License-Identifier: GPL-2.0-only
+> >  xdp_helper
+> > +napi_id_helper
+> 
+> sort alphabetically, pls
 
-The capabilities bitfield was converted to a 64-bit value, but a cap_bit
-in struct mtk_eth_muxc which is used to store a full bitfield (rather
-than the bit number, as the name would suggest) still holds only a
-32-bit value.
+Thanks, fixed.
 
-Change the type of cap_bit to u64 in order to avoid truncating the
-bitfield which results in path selection to not work with capabilities
-above the 32-bit limit.
+> > diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
+> > new file mode 100755
+> > index 000000000000..aee6f90be49b
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/drivers/net/napi_id.py
+> > @@ -0,0 +1,24 @@
+> > +#!/usr/bin/env python3
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +from lib.py import ksft_run, ksft_exit
+> > +from lib.py import ksft_eq, NetDrvEpEnv
+> > +from lib.py import bkg, cmd, rand_port, NetNSEnter
+> > +
+> > +def test_napi_id(cfg) -> None:
+> > +    port = rand_port()
+> > +    listen_cmd = f'{cfg.test_dir / "napi_id_helper"} {cfg.addr_v['4']} {port}'
+> 
+> you need to deploy, in case test is running with a real remote machine
+> and the binary has to be copied over:
+> 
+> 	bin_remote = cfg.remote.deploy(cfg.test_dir / "napi_id_helper")
+> 	listen_cmd = f'{bin_remote} {cfg.addr_v['4']} {port}' 
 
-The values currently stored in the cap_bit field are
-MTK_ETH_MUX_GDM1_TO_GMAC1_ESW:
- BIT_ULL(18) | BIT_ULL(5)
+Thanks, fixed.
 
-MTK_ETH_MUX_GMAC2_GMAC0_TO_GEPHY:
- BIT_ULL(19) | BIT_ULL(5) | BIT_ULL(6)
+> > +    with bkg(listen_cmd, ksft_wait=3) as server:
+> > +        with NetNSEnter('net', '/proc/self/ns/'):
+> > +          cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
+> 
+> Like Xiao Liang said, just host=cfg.remote should work.
 
-MTK_ETH_MUX_U3_GMAC2_TO_QPHY:
- BIT_ULL(20) | BIT_ULL(5) | BIT_ULL(6)
+You are both correct; sorry about the noise. I thought I tried this
+last night and it was failing, but clearly I was wrong/something
+else was broken.
 
-MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII:
- BIT_ULL(20) | BIT_ULL(5) | BIT_ULL(7)
+I've fixed this locally and dropped patch 3 which is now
+unnecessary.
 
-MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII:
- BIT_ULL(21) | BIT_ULL(5)
+I think the main outstanding thing is Paolo's feedback which maybe
+(?) is due to a Python version difference? If you have any guidance
+on how to proceed on that, I'd appreciate it [1].
 
-While all those values are currently still within 32-bit boundaries,
-the addition of new capabilities of MT7988 as well as future SoC's
-like MT7987 will exceed them. Also, the use of a 32-bit 'int' type to
-store the result of a BIT_ULL(...) is misleading.
+My guess is that I could rewrite that line to concat the strings
+instead of interpolate and it would work both on Paolo's system and
+mine. Would that be the right way to go?
 
-Fixes: 51a4df60db5c2 ("net: ethernet: mtk_eth_soc: convert caps in mtk_soc_data struct to u64")
-Signed-off-by: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v3: improve commit message, target net-next instead of net tree
-
- drivers/net/ethernet/mediatek/mtk_eth_path.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_path.c b/drivers/net/ethernet/mediatek/mtk_eth_path.c
-index 7c27a19c4d8f4..6fbfb16438a51 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_path.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_path.c
-@@ -14,7 +14,7 @@
- 
- struct mtk_eth_muxc {
- 	const char	*name;
--	int		cap_bit;
-+	u64		cap_bit;
- 	int		(*set_path)(struct mtk_eth *eth, u64 path);
- };
- 
--- 
-2.49.0
+[1]: https://lore.kernel.org/netdev/aAEtSppgCFNd8vr4@LQ3V64L9R2/
 
