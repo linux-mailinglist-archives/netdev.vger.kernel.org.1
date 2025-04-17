@@ -1,122 +1,177 @@
-Return-Path: <netdev+bounces-183599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A56A9133A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:47:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4DAA91350
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:52:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0FBA3A72DA
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 05:46:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C30F1893B9E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 05:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6931DBB0C;
-	Thu, 17 Apr 2025 05:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9581DE2DB;
+	Thu, 17 Apr 2025 05:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="MpbBw2fg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lff+rNjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34255179A7;
-	Thu, 17 Apr 2025 05:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835792DFA4B;
+	Thu, 17 Apr 2025 05:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744868818; cv=none; b=rKSWU6yLo2XIjyrbKVb+1BKeFWUYDgXbEzFM0PgnSK8+BFKmvfiuhljP8XboxaDWtyInDMDNYAeGudL3hjD3QK+BRQ2IDVx2EKiB7a9pVdgH8oPryXmKqhFb3YmVyuFprNqlHgQPFW8vtAp19zi8GV6T3nrc8PjbLk+Hto181Ps=
+	t=1744869156; cv=none; b=SiaBse+mvvvcyqPgc+sOz14Al0IxXt375+7+TW2R/ap4TzoxygZN1UGqnW8LA5WBSj7ejMWI1RuuHs2BLk/BXTjpfar1DRXdH7VExL9XFD7s+r8TNd9sXFMdCUq4HZWyfnMcydVDxTzcmafXHd7uc8gW4f6RI/gnb8m9yjZLkL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744868818; c=relaxed/simple;
-	bh=4oYgM5MCWKU1QZFM9ucaKlFA+1SLFEymDkr9y2UXtGo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=uKUHpK/pdTDswzAH77Mm5fu7ldOfsOC9nOtRb6um3A7rsDMzcvxS/nHRv8EjHOaod0mKdudMgIs1YZb1AOBZUYCS/zr1MWaqVdmxoDPUcQoYRrsEWmsetws0YYH7n5F/f6EwCmbKwRuiu/xT3FFWb2XAVUUzOOERleKx6bkDOY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=MpbBw2fg; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53H5kBp05370839, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1744868772; bh=4oYgM5MCWKU1QZFM9ucaKlFA+1SLFEymDkr9y2UXtGo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=MpbBw2fg9mpTniqSkEyHgL/8joTtsTmpyLO8dB3WBpt7RKwNFSEeYPsKPmyLP+tKt
-	 0YbXRYxYZMeIYbDl/aGdK6z0jMzyJ2Rkp2cxx3i1QwUY1L20a2vcfxOSzuGU5ESdqx
-	 s4mQ5Vqao7Dwh6wJxXywnvx4BFtPOeHvT8aSD+aKxF92q1fcvMFsD1+YgDzdZy0RoI
-	 JkhJNFRllmbeKlf4MNtA1fWl+8y7KWk7fYMg8pn23BLsUI9I7ItoH2fGEMM5JbqlNB
-	 ILKjaJacNJdheY5jpLR0Iw7cQE8+TRkaFj1UKbWUAFJZFI+7ojWmYbPLPexg2Z1VSi
-	 XHgkOzQ22MRGw==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53H5kBp05370839
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 17 Apr 2025 13:46:11 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 17 Apr 2025 13:46:12 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 17 Apr 2025 13:46:11 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Thu, 17 Apr 2025 13:46:11 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "horms@kernel.org" <horms@kernel.org>,
-        Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>,
-        kernel test robot
-	<lkp@intel.com>
-Subject: RE: [PATCH net v2 1/3] rtase: Fix the compile error reported by the kernel test robot
-Thread-Topic: [PATCH net v2 1/3] rtase: Fix the compile error reported by the
- kernel test robot
-Thread-Index: AQHbrs2Kq1M05GT8LEGJNWsOuQL6jbOl0KSAgAGJHbA=
-Date: Thu, 17 Apr 2025 05:46:11 +0000
-Message-ID: <ae94b522ec23485e88f8a01a3e09c57c@realtek.com>
-References: <20250416124534.30167-1-justinlai0215@realtek.com>
- <20250416124534.30167-2-justinlai0215@realtek.com>
- <152c9566-a1bd-4082-9f66-6bbe8ab1eb47@lunn.ch>
-In-Reply-To: <152c9566-a1bd-4082-9f66-6bbe8ab1eb47@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1744869156; c=relaxed/simple;
+	bh=5ZOcrtFfYlg3ZbRJkYNzpERIkmi2m8m/vs8RWTT0uHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dfm4l2QJjyvQfWTXj7rMA7ELQHPWU2YopUqv8UHEvvhvQv8PQjaBjGZYpf5f84hSeEf0iHukhsVoxnHBsgEnd7TMFYAZOtEmSRLBSeB98MBOBH2es9J0zoC1m5IwKgVdUElIyqhhxAr/nrIYDi6B/HR0UcPH183ciItDmnngzGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lff+rNjZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E43AC4CEE4;
+	Thu, 17 Apr 2025 05:52:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744869156;
+	bh=5ZOcrtFfYlg3ZbRJkYNzpERIkmi2m8m/vs8RWTT0uHQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Lff+rNjZ1ZLdPZLB/m/v5IquctpGpnT5YRyTTILaqHvxCXLBkf6tGCxqOmTNuGGYY
+	 jH6paSB+vZp/fBrRtiB+CdUvB4+UvGfmiFyO/2EddR+q8HPDsXSHoLcXvRpYbrSqsq
+	 f7kfSkPeU4a8MsFfRYVEVWKLZBFH8N5U57C1G1DOeHS4NAX6jGJImjKUSsmDsIYjaM
+	 Hb5ueVqB2b0SpLbRFxJRUr1GYuo8dn+7MkjMoKcmHUnZTJBl7t+h4OpIQvQBZUHqok
+	 8gmL/eb7h+MxVVlFJlPenI0NA+wJYWBqzm0pTSoYiqsGkfzHoCq1hxOUv4J6Veii11
+	 vsafG/PeF2Xgw==
+Message-ID: <0b30168d-6969-4385-b184-c2fa69c82390@kernel.org>
+Date: Thu, 17 Apr 2025 07:52:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/5] dt-bindings: net: brcm,asp-v2.0: Add v3.0
+ and remove v2.0
+To: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org
+Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
+ conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, florian.fainelli@broadcom.com
+References: <20250416224815.2863862-1-justin.chen@broadcom.com>
+ <20250416224815.2863862-2-justin.chen@broadcom.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250416224815.2863862-2-justin.chen@broadcom.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->=20
-> On Wed, Apr 16, 2025 at 08:45:32PM +0800, Justin Lai wrote:
-> > Fix the following compile error reported by the kernel test robot by
-> > modifying the condition used to detect overflow in
-> > rtase_calc_time_mitigation.
->=20
-> The Subject: line is not very useful. It is better to talk about what you=
- are fixing,
-> not that a robot reported an issue.
->=20
->     Andrew
->=20
+On 17/04/2025 00:48, Justin Chen wrote:
+> Add asp-v3.0 support. v3.0 is a major revision that reduces
+> the feature set for cost savings. We have a reduced amount of
+> channels and network filters.
+> 
+> Remove asp-v2.0 which was only supported on one SoC that never
+> saw the light of day.
+
+
+That's independent commit with its own justification.
+
+> 
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 > ---
-> pw-bot: cr
+>  .../bindings/net/brcm,asp-v2.0.yaml           | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+> index 660e2ca42daf..21a7f70d220f 100644
+> --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+> +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+> @@ -4,7 +4,7 @@
+>  $id: http://devicetree.org/schemas/net/brcm,asp-v2.0.yaml#
+>  $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  
+> -title: Broadcom ASP 2.0 Ethernet controller
+> +title: Broadcom ASP Ethernet controller
+>  
+>  maintainers:
+>    - Justin Chen <justin.chen@broadcom.com>
+> @@ -15,6 +15,10 @@ description: Broadcom Ethernet controller first introduced with 72165
+>  properties:
+>    compatible:
+>      oneOf:
+> +      - items:
+> +          - enum:
+> +              - brcm,bcm74110-asp
+> +          - const: brcm,asp-v3.0
+>        - items:
+>            - enum:
+>                - brcm,bcm74165b0-asp
+> @@ -23,10 +27,6 @@ properties:
+>            - enum:
+>                - brcm,bcm74165-asp
+>            - const: brcm,asp-v2.1
+> -      - items:
+> -          - enum:
+> -              - brcm,bcm72165-asp
+> -          - const: brcm,asp-v2.0
+>  
+>    "#address-cells":
+>      const: 1
+> @@ -42,8 +42,7 @@ properties:
+>      minItems: 1
+>      items:
+>        - description: RX/TX interrupt
+> -      - description: Port 0 Wake-on-LAN
+> -      - description: Port 1 Wake-on-LAN
+> +      - description: Wake-on-LAN interrupt
 
-Hi Andrew,
+Why all devices now have different interrupts?
 
-Thank you for your response. I will modify the subject and post a new
-version.
-
-Thanks,
-Justin
+Best regards,
+Krzysztof
 
