@@ -1,140 +1,299 @@
-Return-Path: <netdev+bounces-183844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A11FAA92360
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:06:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 094D9A92368
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:07:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFF6B465C81
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:06:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75ED41893C78
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6841255228;
-	Thu, 17 Apr 2025 17:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FA5254AEC;
+	Thu, 17 Apr 2025 17:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qZO7cEJ6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFfpIui8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBB52550B5
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D656635973
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744909587; cv=none; b=Q+iANfkuIV9QAH+S7p7vPYF/jm4/qt3fHV4djw3uHQKSnyft8Ofsj6AvYl0a5XmMWw8XlQEHzsbI0LOEjgF54AP/8ZmLoGxrYyE5qRDxX3MvuRBieI+uB4DY5aBqt2mM+W58ZJsSOW35ZWh7mjK0jYcr7wmSRUlJ8dwF/J+Fx9E=
+	t=1744909645; cv=none; b=Lk4fhi/iToadOmxdXNv5lZZn1IevVqALWURyFHzkeUHHBrfLnzNtr6mqw6jtoFRVg+mHIBeOSz3/jWcRLjUfM71siJzrlx5yTsx8onGfxUcG9rJC0qo1x8qHc1BelO6NBJHiLTdG107Yn0lH2oL182EZZJBuDt8KuC5yk/NIwmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744909587; c=relaxed/simple;
-	bh=/rayCc9ocJT3K1N38tkBInMy2zbXnfq0bzNX+4YFKNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DtVMqY+R7cJtfxkSUPOOzsQgoktnNmuxUEk/0MdwETSNX34gGx1BMZ/EH2cmtPC9SGgzp17rTA0kPkfufitITH2afu+5Iy3xRvfZQ0cR+4dsCAOtclUio6DKmMLIx69WSAudAyoHDp9ybn20fnlCa7qj1NkMBnhMxXl7+A1wICc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qZO7cEJ6; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-736a72220edso1066681b3a.3
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:06:26 -0700 (PDT)
+	s=arc-20240116; t=1744909645; c=relaxed/simple;
+	bh=0DDLMJPWqpyhL3M2KftDw73ZcDQzywRupPNXb/miP6M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c063pLMP6CplVovEc4jC14Ih7oUA7xxAXSzqmVWiJcsXLxzK8f6dPFKIaP7LGpki5jsCulZ+k6swz0R43w43MkVIU5yqdtb/WtL5SJCPyTR8BmzuPW0BcXAm+DQb2GGdql6F5YmvdD9Ypy85RpzjOOXorwlTZQYFR7kYcZdGkYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFfpIui8; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39c1efc4577so681300f8f.0
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1744909585; x=1745514385; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4xXe/XCInddH4WV/KVFfoKsdbwZ1rzQJBQUNYtkK2yw=;
-        b=qZO7cEJ61kijisuzXtc7rEeQIPG/iMvwgr3lCSu75ur8oYjseyjrCQHWJz/tzP+V2y
-         6Ro0qfd2V2tKD+oaGnj2Mfi0dhJF2Uac0JXx/+yyetjj2rU0T46Yh2EtJ7sNxvcrSsuY
-         F6bsto+GohhwqfQoxu2bgUz/ddQcaBsrkRpz4=
+        d=gmail.com; s=20230601; t=1744909642; x=1745514442; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cgvWzRP4Sf5RyzYeEsmO4zIZoF0DA1uT7vyYG4ONbZQ=;
+        b=dFfpIui8dv656ZCRpx3njxsCk5O3yjtBZP7ZcrK6QiX8kncjMOGd4NVkocRST8mNHU
+         GmukCLetn1Z95lRduKwuY1CPMi/pcWfTj69sIn0ITL54/ojgmbVi8IQQnP8R1/Ko4Lye
+         kbvh5UjW5Vm/3l60k1F3mpoz3Rwjddez+zrC36DcI1tMqHvQoSeSNpZH1BK4vdSBQ+0r
+         3uDS0PUexN2AUDeTuk7GameRCK+EN0S0H7D+ql6T9QclitRgzwfq5U9bnR8qwXJwJUht
+         zCW1fSkwTbqOfAJ8hZo7QT4v3Y4fO+orXIYiCZHs+aA18fEEHyVWAnZrUuAON0ZwfdUk
+         TM8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744909585; x=1745514385;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4xXe/XCInddH4WV/KVFfoKsdbwZ1rzQJBQUNYtkK2yw=;
-        b=KsVe9RpvjHctcwikqSyKmQEPNAMfAEkvLsnyocmr7M8CqrKPMmZharC0BhfYIIim0y
-         HpqoYMsKNzlCZgBXB9iHuzFNpgTXt+kuDmNdT5BH2LQNYVomxpYbA1NDp26o02Qh0GU0
-         u05E53AP7EmEeF+Uah3MH7w+qczBU6x7l4cxAw308S61DKRbsvYnxLhxCEg5kp7KrLAu
-         EXBUSRy9oCU2yvf8HCjbJVwP4GKBrFHip+U0PEJnmTZMyGmWN4H/Egp5ACR1gbHC4ImB
-         eo/kZVy+xHcJ/7tVlkUUHizozjPQkrJeLQwT889iweAeF3mohxqikwyVOwd9CjxhaLIV
-         ZGtQ==
-X-Gm-Message-State: AOJu0YyJgi3CVu+1On7p3nKm2WEHgkLe7lbYMCTIe2doD2JlbmxEMgqY
-	mcvFoA0lcqaJcYM2I1SD+eKH7r4w/qHYz7WP/Yr0p8J1S28tGnV/oTenrjwv/hw=
-X-Gm-Gg: ASbGncuzqch//6MCPmyf5z6sHBqJs/8Leo+a7ZyJNm9cpzDhvkxkhZTv+S8u71sVf39
-	qm7exQzFHg3dtVVJ8808UFbW9TdWBPccJhhNG6DieMEazi1UCwpKcUl8PXV9bXdJD3dYFClRCfu
-	BZne4Wwh0ULGJShsHyl8b0jzdNo01mhzZVE+FpWSnlT72V00pwKbWK44OUOOdmToAMZjfrh04Ib
-	beCZrfb2NrLaMLcwvsXMsRfyF0tumvFJRKdcxK1ySkUZDA2qC7uW9IKC0d39W8TaPcZqo4cpkaj
-	zYeJMY6FW6HxAexccJiVgVwTY7suU4SjIMAr6rPB5C5GVOfKeItw9e2U5GrIQ/eGxJZgjICO6Cx
-	XEabCQr4Qr49BMt/Ik0vlBNI=
-X-Google-Smtp-Source: AGHT+IE7lJplDSFz7ARLg9Ar2ZAXnjAKyTmuyKanO9eaaZPdP2fa0Yk5XsKE81dhgmyhqhOavS+vQQ==
-X-Received: by 2002:a05:6a00:710d:b0:73c:3116:cf10 with SMTP id d2e1a72fcca58-73c3116d5f5mr4731684b3a.23.1744909585513;
-        Thu, 17 Apr 2025 10:06:25 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8bf5b9sm93861b3a.19.2025.04.17.10.06.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 10:06:25 -0700 (PDT)
-Date: Thu, 17 Apr 2025 10:06:22 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 4/4] selftests: drv-net: Test that NAPI ID is
- non-zero
-Message-ID: <aAE1DkYpvb1yUp5_@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-References: <20250417013301.39228-1-jdamato@fastly.com>
- <20250417013301.39228-5-jdamato@fastly.com>
- <20250417064615.10aba96b@kernel.org>
- <aAEvq_oLLzboJeIB@LQ3V64L9R2>
- <20250417095310.1adbcbc8@kernel.org>
+        d=1e100.net; s=20230601; t=1744909642; x=1745514442;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cgvWzRP4Sf5RyzYeEsmO4zIZoF0DA1uT7vyYG4ONbZQ=;
+        b=KvGQtcqL4y65EoLvKvcZSt2XWsetfEoRmC1CKLgkCFLIg5tSPu/mTH5ZAXMdPaN59y
+         kHgC0n8uwJ6BL5Ce6AShJ0eo/U63x+8wMHs07Ya0ipgEgSvOJoFHDposNOh1u9qDcDtz
+         bksBlTHwgzX6t9keADwUC3oBUVSaFRQliXLa94dZtRYZoWd4rDuul5Fjs0c9TrpxWJmj
+         KwG/bbdrKCbpYT/LnRu5saZ6sxOF9H91VUbIBc1snE4Ld5XBj5MN5gpbNVMZujXW/zxV
+         4LZNA8KPKnMdYKQaY0x1T8/bUZPIxgfhgN35bVOPOPIESmVSEhNx8S3Ie49GCvE3G94q
+         xucg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0dsMOJ3ZtJoMBlvFoKhyppNi06BqcbG/GijwRErmOq9w0wThKZwX852lVnc8qbr0Nm65SWo8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOd2R/6wXWmCTkmqxrM6+U08xntLs3FqKkA9wHMvqTWEv8B88Z
+	1KjFQqXEGhQzf+ZUd4ISTD5Nchk0ts2p+BLQFD+LeLLVVhIrwAwg6CYkPoezc8mPtDa0kUox8Nl
+	6V4VSUy7hpyIF4V11rr0cege5uJU=
+X-Gm-Gg: ASbGncvdN9ffMG2qXqpVa/vw0xMqgD+8+ZJVQ1/z9YiiWapvYQ+uk9y89x5hIDn+fuZ
+	Lmx2QW2O8toXtlTLZAwd+skMPLhVMJaRG2N76g6dLQXi2YP2WS6aijBPL2dBAtqc1hjEZhFSPS8
+	4FtbjDr20CNufd/s0Gn8qRMGaLo7OGExnW9rcurlpI6IsP73rKDQal4E0=
+X-Google-Smtp-Source: AGHT+IFafFx93D0/kFMTWm6DujlZPuTZZmH54yj3AJAfZkbMh/VCM6MbE7fw5nC06761G81m5A4uSq20wwA0aUc4bsE=
+X-Received: by 2002:a5d:5887:0:b0:391:2a9f:2fcb with SMTP id
+ ffacd0b85a97d-39ef9ee079fmr369836f8f.36.1744909641779; Thu, 17 Apr 2025
+ 10:07:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417095310.1adbcbc8@kernel.org>
+References: <Z__URcfITnra19xy@shell.armlinux.org.uk> <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
+ <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
+ <aAERy1qnTyTGT-_w@shell.armlinux.org.uk> <aAEc3HZbSZTiWB8s@shell.armlinux.org.uk>
+In-Reply-To: <aAEc3HZbSZTiWB8s@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 17 Apr 2025 10:06:45 -0700
+X-Gm-Features: ATxdqUHFJLVYm-YwtDNj2p4gWmnI1Svkbv5rBHV1YITP56j1N1adZD_ICXAC4Hs
+Message-ID: <CAKgT0Uf2a48D7O_OSFV8W7j3DJjn_patFbjRbvktazt9UTKoLQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled and
+ link down
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 17, 2025 at 09:53:10AM -0700, Jakub Kicinski wrote:
-> On Thu, 17 Apr 2025 09:43:23 -0700 Joe Damato wrote:
-> > I think the main outstanding thing is Paolo's feedback which maybe
-> > (?) is due to a Python version difference? If you have any guidance
-> > on how to proceed on that, I'd appreciate it [1].
-> 
-> yes, it's a Python version, I made the same mistake in the past.
-> Older Pythons terminate an fstring too early.
-> Just switch from ' to " inside the fstring, like you would in bash
-> if you wanted to quote a quote character. The two are functionally
-> equivalent.
+On Thu, Apr 17, 2025 at 8:23=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Thu, Apr 17, 2025 at 03:35:56PM +0100, Russell King (Oracle) wrote:
+> > On Thu, Apr 17, 2025 at 07:30:05AM -0700, Alexander H Duyck wrote:
+> > > This is the only spot where we weren't setting netif_carrier_on/off a=
+nd
+> > > old_link_state together. I suspect you could just carry old_link_stat=
+e
+> > > without needing to add a new argument. Basically you would just need =
+to
+> > > drop the "else" portion of this statement.
+> > >
+> > > In the grand scheme of things with the exception of this one spot
+> > > old_link_state is essentially the actual MAC/PCS link state whereas
+> > > netif_carrier_off is the administrative state.
+> >
+> > Sorry to say, but you have that wrong. Neither are the administrative
+> > state.
+>
+> To add to this (sorry, I rushed that reply), old_link_state is used when
+> we aren't bound to a network device, otherwise the netif carrier state
+> is used. Changes in the netif carrier state provoke netlink messages to
+> userspace to inform userspace of changes to the link state.
+>
+> Moreover, it controls whether the network stack queues packets for
+> transmission to the driver, and also whether the transmit watchdog is
+> allowed to time out. It _probably_ also lets the packet schedulers
+> know that the link state has changed.
+>
+> So, the netif carrier state is not "administrative".
 
-OK thanks for the details. Sorry that I am learning Python via
-netdev ;)
+I have always sort of assumed that netif_carrier_on/off was the
+logical AND of the administrative state of the NIC and the state of
+the actual MAC/PCS/PHY. That is why I refer to it as an administrative
+state. You end up with ifconfig up/down toggling netif carrier even if
+the underlying link state hasn't changed. This has been the case for
+many of the high end NICs for a while now, especially for the
+multi-host ones, as the firmware won't change the actual physical
+state of the link. It leaves it in place while the NIC port on the
+host is no longer active.
 
-I did this so it matches the style of the other fstring a few lines
-below:
+> It isn't strictly necessary for old_link_state to remain in sync with
+> the netif carrier state, but it is desirable to avoid errors - but
+> obviously the netif carrier state only exists when we're bound to a
+> network device.
 
--    listen_cmd = f'{bin_remote} {cfg.addr_v['4']} {port}'
-+    listen_cmd = f"{bin_remote} {cfg.addr_v['4']} {port}"
+From what I can tell this is the only spot where the two diverge,
+prior to this patch. The general thought I was having was to update
+the netif_carrier state in the suspend, and then old_link_state in the
+resume. I realize now the concern is that setting the
+phylink_disable_state is essentially the same as setting the link
+down. So really we have 3 states we are tracking,
+netif_carrier_ok/old_link_state, phylink_disable_state, and if we want
+the link state to change while disabled. So we do need one additional
+piece of state in the event that there isn't a netdev in order to
+handle the case where "pl->phylink_disable_state &&
+!!pl->phylink_disable_state =3D=3D pl->old_link_state".
 
-Test works and passes for me on my system, so I'll send the v3
-tonight when I've hit 24 hrs.
+> > > > -         /* Call mac_link_down() so we keep the overall state bala=
+nced.
+> > > > -          * Do this under the state_mutex lock for consistency. Th=
+is
+> > > > -          * will cause a "Link Down" message to be printed during
+> > > > -          * resume, which is harmless - the true link state will b=
+e
+> > > > -          * printed when we run a resolve.
+> > > > -          */
+> > > > -         mutex_lock(&pl->state_mutex);
+> > > > -         phylink_link_down(pl);
+> > > > -         mutex_unlock(&pl->state_mutex);
+> > > > +         if (pl->suspend_link_up) {
+> > > > +                 /* Call mac_link_down() so we keep the overall st=
+ate
+> > > > +                  * balanced. Do this under the state_mutex lock f=
+or
+> > > > +                  * consistency. This will cause a "Link Down" mes=
+sage
+> > > > +                  * to be printed during resume, which is harmless=
+ -
+> > > > +                  * the true link state will be printed when we ru=
+n a
+> > > > +                  * resolve.
+> > > > +                  */
+> > > > +                 mutex_lock(&pl->state_mutex);
+> > > > +                 phylink_link_down(pl);
+> > > > +                 mutex_unlock(&pl->state_mutex);
+> > > > +         }
+> > >
+> > > You should be able to do all of this with just old_link_state. The on=
+ly
+> > > thing that would have to change is that you would need to set
+> > > old_link_state to false after the if statement.
+> >
+> > Nope.
+>
+> And still nope - what we need to know here is what was the link state
+> _before_ we called netif_carrier_off() or set old_link_state to false.
+>
+> I somehow suspect that you don't understand what all this code is trying
+> to do, so let me explain it.
+>
+> In the suspend function, when WoL is enabled, and we're using MAC-based
+> WoL, we need the link to the MAC to remain up, so it can receive packets
+> to check whether they are the appropriate wake packet. However, we don't
+> want packets to be queued for transmission either.
 
-Thanks!
+That is the same as what we are looking for. We aren't queueing any
+packets for transmission ourselves. We just want to leave the MAC
+enabled, however we also want to leave it enabled when we resume.
+
+> So, we have the case where we want to avoid notifying the MAC that the
+> link has gone down, but we also want to call netif_carrier_off() to stop
+> the network stack queueing packets.
+>
+> To achieve this, several things work in unison:
+>
+> - we take the state mutex to prevent the resolver from running while we
+>   fiddle with various state.
+> - we disable the resolver (which, if that's the only thing that happens,
+>   will provoke the resolver to take the link down.)
+> - we lie to the resolver about the link state, by calling
+>   netif_carrier_off() and/or setting old_link_state to false. This
+>   means the resolver believes the link is _already_ down, and thus
+>   because of the strict ordering I've previously mentioned, will *not*
+>   call mac_link_down().
+> - we release the lock.
+>
+> There is now no way that the resolver will call either mac_link_up() or
+> mac_link_down() - which is what we want here.
+
+The part that I think I missed here was that if we set
+phylink_disable_state we then set link_state.link to false in
+phylink_resolve. I wonder if we couldn't just have a flag that sets
+cur_link_state to false in the "if(pl->phylink_disable_state)" case
+and simplify this to indicate we won't force the link down"
+
+> When we resume, we need to unwind this, but taking care that the network
+> layers may need to be reprogrammed. That is done by "completing" the
+> link-down that was done in the suspend function by calling
+> mac_link_down() (which should only have been done if the link wasn't
+> already down - hence depends on state _prior_ to the modifications that
+> phylink_suspend() made.)
+>
+> It can then re-setup the MAC/PCS by calling the config functions, and
+> then release the resolver to then make a decision about the state of
+> the link.
+>
+> With the fix I posted, this guarantees that that the contract I talked
+> about previously is maintained.
+>
+> I'm sorry that this doesn't "fit" your special case, but this is what
+> all users so far expect from phylink.
+
+I wasn't trying to "fit" it so much as understand it. So this worked
+before because you were clearing either netif_carrier_off or
+old_link_state and the resolve function followed the same logic. The
+piece I missed is that setting the bit in phylink_disable_state is
+forcing the link to resolve to false which in turn would call
+mac_link_down if the old state is considered to be up and a netdev
+isn't present.
+
+> Now, how about explaining what's going on in fbnic_mac_link_up_asic()
+> and fbnic_mac_link_down_asic(), and what in there triggers the BMC
+> to press the panic stations do-not-press red buttin?
+
+So fbnic_mac_link_up_asic doesn't trigger any issues. The issues are:
+
+1. In fbnic_mac_link_down_asic we assume that if we are being told
+that the link is down by phylink that it really means the link is down
+and we need to shut off the MAC and flush any packets that are in the
+Tx FIFO. The issue isn't so much the call itself, it is the fact that
+we are being called in phylink_resume to rebalance the link that will
+be going from UP->UP. The rebalancing is introducing an extra down
+step. This could be resolved by adding an extra check to the line in
+phylink_resume that is calling the mac_link_down so that it doesn't
+get triggered and stall the link. In my test code I am now calling it
+"pl->rolling_start".
+
+2. In phylink_start/phylink_resume since we are coming at this from a
+"rolling start" due to the BMC we have the MAC up and the
+netif_carrier in the "off" state. As a result if we end up losing the
+link between mac_prepare and pcs_get_state the MAC gets into a bad
+state where netif_carrier is off, the MAC is stuck in the "up" state,
+and we have stale packets clogging up the Tx FIFO.
+
+As far as the BMC it isn't so much wanting to hit the big red button
+as our platform team. Basically losing of packets is very problematic
+for them, think about ssh sessions that suddenly lock up during boot,
+and they can demonstrate that none of the other vendors that have the
+MAC/PCS/PHY buried in their firmware have this issue. I was really
+hoping to avoid going that route as the whole point of this was to
+keep the code open source and visible.
+
+> If you wish to have confirmation of what netif_carrier does, then I'm
+> sure your co-maintainer and core Linux networking maintainer, Jakub,
+> would be happy to help.
+
+I'm well aware of what netif_carrier does, no need to be patronizing.
+I have been doing this for over 16 years. The difference is for me the
+1G stuff was 16 years ago, most of the stuff I deal with now is 25G or
+higher and multi-host which is a different world with different
+requirements. This is why we are having our communication issues in
+understanding where each other is coming from.
 
