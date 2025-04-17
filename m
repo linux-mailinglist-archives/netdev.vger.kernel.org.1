@@ -1,290 +1,177 @@
-Return-Path: <netdev+bounces-183865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9A2A92408
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:29:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82310A92438
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A63F8A1F88
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:29:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89550169F55
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECACF255248;
-	Thu, 17 Apr 2025 17:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8D12561BD;
+	Thu, 17 Apr 2025 17:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wfo4xO5m"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YSM4B2c5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023F425335A;
-	Thu, 17 Apr 2025 17:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524002550DC
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744910954; cv=none; b=fxnNZv931rbcB9xclkeCf6Xhu3kVvx0WKsnJ9M9yWv8JhyG+Yi8OdJC4cDKZatbrQkgU/UyTKaNkOOWgsQrWwh3bMzBydnamz3d2I6DNnkJHb+UJweAJDW9SIdFlXDuq0UridxpVhql2B0U2mcZHEEy7fOQRkvHsSmZWyy+GlI4=
+	t=1744911631; cv=none; b=cRNYI15pcLxRM9NT35LG6nR14mD1Nsy9kswrSKwGrn0IpcyLIx+iMo6/hglGaZ3fbjdlnd2ZRi+wILIcR/BbseqAVmhk6iwAEUrRUj9g0+hvcdgsXQf+Okw8XcqiaZ0gQTHm4+l6eNXBJn5/QMOshwEm8gvbckq/pGj3BPOZ7yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744910954; c=relaxed/simple;
-	bh=cvY1ls80gICbfPsPMyWc6VX6eeAhPRGV7kiDANTbk5k=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AKD25sF4NwjnijiiNSBYkGnciv6BchJAJ5n4woWEGy48p6M9sfvNoFgXgGKL9n/+o5HeUpCpx4zyzjhb/zICDNRfucT9WLtd8KhiDkpUY0ckE37Kd8QfGbltMOOk2fjB0Q+2FEio/YWK2Ahf/Q6lo3ZB0APJTeSBYd84/aTSzo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wfo4xO5m; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6ecf0e07947so10828406d6.0;
-        Thu, 17 Apr 2025 10:29:12 -0700 (PDT)
+	s=arc-20240116; t=1744911631; c=relaxed/simple;
+	bh=EOInJqz3SSsR3SfMgfEaE59yxaDfxa8aYfQqn0AbCls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hE5yu3IdnKS0LF1/jVs2JuPJzzCRBqEd/OIDncNjqq5FITqLpfTXxNT3WetNlkspn6P7Rzbm7j4DK80XWDCNZ5Rtl5VssA0R1aYSRinfgG20NWobGah8G30/RwTJPmi1H1GLjiDrGokd5QgU+RCLVQFaWfVcIpxcDf6fMXlvvp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YSM4B2c5; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-224341bbc1dso12860535ad.3
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:40:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744910952; x=1745515752; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSQ1spRHIDXyTBieqdfcsIAEuIswLKlLRhvaKNh6hmQ=;
-        b=Wfo4xO5mBXM5O2LVEYvJzFh9uErse2wEyPKe4T/vw/evXWZu7ujo00+/1tjw4MS4ZQ
-         W6oyoD1eT+xz309tQrnwoYZDcmmvXd/oeXukNaPLrexQJXyIprLjd5evpFko1PLUk6QB
-         ZjrW1uQIEpzleeyxIIRyihu3QZb1MsFWaFV2gS9q3J0TcccWyyBLxiOyVuKQMCvcESG5
-         EX9jbGRLKEGcsVjJenEDpKLdGRXy1QaSvy/oF7vL9xzC6Z9Z6PazgMG+LK/JbcsFD3NY
-         jfueeqRkRt1PvXFYs7toIl6qLC0RQS5H5h6JGJ2zcX6XtNvnhySfrJdcczPzgoDQ5WRf
-         IaEg==
+        d=broadcom.com; s=google; t=1744911629; x=1745516429; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dDBg6maTTzuwRDGp8PFv9HLN1q5K7jSth9S5/3WTU6I=;
+        b=YSM4B2c5M3jCwqJtQDAIuTCki7wWCaedPn6hzGViSc62JPcS4GG1B3MF4iYJtEigTe
+         wuNKJY8nzffq0kRW0rO+7+UBrU1hbjNhbsGL9Q1Ld6HWlKItJjHCIlNQPv7DNVazov8F
+         OdT+pzfj9xUF/owXecVXceuomGlBGSvlZ1lKE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744910952; x=1745515752;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pSQ1spRHIDXyTBieqdfcsIAEuIswLKlLRhvaKNh6hmQ=;
-        b=N7WDSIPlzNibWlZ0iU5eQTGB8BN/G9yJ+N2nQxC99gRYUA0s/j7BNXOH/M3ZDTf1Av
-         fWk7FcyX8/K/Usl4irLyvnxILPhotMLmCwkTdnX0682IES68op0TxT9voDFfo2/y34fJ
-         Ggd/3tAy3IqklJYHnK9tvUeypQGEb/IHyZgxbnJWv4zdxZoCclxUPCNsmD6DP4ZoJr78
-         4urcJdgQ9TjxrpZQ5TZ6atsRVYLyodyRratLZgDPiDU6fOl+q1UldcGE4B7hmDibLTBA
-         wCPuL/9dX6u1kDQZzcfzgJo7KXl9pOzOAEd85zzNU7P1PxXTDBAMacj5lwp8vtlqSG+d
-         rxCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzBeZQxklLeKAq4y+uzCfQwzN7WuMExCjD5uVD6kORHuj1dCVm133/YfgHPLig7AuBMZv4qJoeGRlPuJIF@vger.kernel.org, AJvYcCVy2ls+cf0OLce2VxMX4yaYZuxMqpC+OzEhrdEpscYHVTqDPMPY9uby/HEYIfnFvKOGEPhSPAMh7FBgI7ng@vger.kernel.org, AJvYcCW2SGDSKdyqZojUfnEUfduZTtUajVyfaw5suMBpbaTMgJodqyswta1cJyGzLqMrAwGZ657Wd7z5vbqFJDU=@vger.kernel.org, AJvYcCWV/QA4lrAGVoGLA4XG0axPIspRQ5Oa/hg7w3fXsXtHuuFhfIvx6/h2gtnGSD9URwUwmQsVggHXTPJd@vger.kernel.org, AJvYcCWw6aMbCV5rpNFKT4c1AyIXVYGkRZOifTA9mINgys9cTzA0i80FQFc14uhg6woBPAdYXCnGjUufc/JuEEu5WHWF@vger.kernel.org, AJvYcCXAcKQmSwZyZw7JaoBmIMGtwakZ4Oc+Mz5Hs4HN6Y6JqSyaMzusLLGkYLmvr+pCrDuXjxqmssTelinj@vger.kernel.org, AJvYcCXIp6OHoO6nxqhZEttmTyUL60ArY6AomhgYpzDXeN36FiGKFY2toZ4shUDcR30rQA2sZE94xMXa@vger.kernel.org, AJvYcCXvxBrAKFuGxfvlsl8YAybO05bNiaAND+WEviklAbGao+taoGSlRKkR78AHra07PdrvZaT5RfVYvcDFqyQCS/c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkK+7d5eNog90KBC6Ibe61lfes5QZd7jjrn/47kY1L5V5rMxj1
-	5cj2gLuRGaDDYzSZPN9v+VVmz6dtvWqm1zyXBkReRLMLEjo5TDLp
-X-Gm-Gg: ASbGncsjGMymrcL4qCGFRoeN1xeGw8XvNpmn0IbixpQaSsSPXr277Yx0LWARri2lB3Q
-	KbZwvA57cxS/bi3G+n1LR+WsDbeoM3JZPadI+f5mVmvH23VBN084BfkROZK0TOJmXIoFRUoktgm
-	NjTrWuCpq53hE/17JAvE4MU5eOLu7pBxUL3hY1MrXmhQ8zZHt5PZBMriMj6ys3/yfNLPCjT03+0
-	AY35HOuIKST4uM0KVyl18Csl7TzVu4B7gnuEMp6vU+yBqgNNrVIHDeCbo8WegkzvOb+rpVRhhR1
-	1OiU6YvuXJBGXBc2GF97xfw8qQiDlFsWwE/i3qUjGa/UMW+gt02N7oJXm71Uize1xrVyk77sqOU
-	mVyLYyZYjhbkDM7yIbsSnObKj0KB961I=
-X-Google-Smtp-Source: AGHT+IGBADq9qPvv1GmF3HVY3rBXqSEWoPoSmke4fv07LljyRbGPQ0FVYp1KghRKdl4sqaPo7U3Nqw==
-X-Received: by 2002:a05:6214:1316:b0:6e8:ec18:a1be with SMTP id 6a1803df08f44-6f2c26c409cmr12409486d6.7.1744910951815;
-        Thu, 17 Apr 2025 10:29:11 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2af5595sm1459996d6.9.2025.04.17.10.29.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 10:29:11 -0700 (PDT)
-Message-ID: <68013a67.050a0220.8a966.0ee4@mx.google.com>
-X-Google-Original-Message-ID: <aAE6ZG6D2M6DGr2d@winterfell.>
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 2B7B31200043;
-	Thu, 17 Apr 2025 13:29:10 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Thu, 17 Apr 2025 13:29:10 -0400
-X-ME-Sender: <xms:ZjoBaGiPBApOT3KF_cFKmqlP0bbriY55u7x8VYpRa0qowU7KQZinpA>
-    <xme:ZjoBaHCbngiXNmyQlXWezOZ5Bc_fDItA-xjSijhF5X27mIsBYx5vLNmq-g4RjAf3q
-    HIBZ8uGb1KPn3BNKw>
-X-ME-Received: <xmr:ZjoBaOEmz40_zhoT86dRO0JRh_S1te3xyGwFb7aD8S0P7tlTf0SnsHJhSd5P7Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdelkeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnegoufhushhpvggtthffohhmrghinhculdegledmnecujfgu
-    rhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpeeuohhquhhnuc
-    fhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthht
-    vghrnhepkeekheeuudefgeelfedthfduheehkeellefhleegveeljeduheeufeelkeejie
-    egnecuffhomhgrihhnpehgihhthhhusgdrihhopdhkvghrnhgvlhdrohhrghenucevlhhu
-    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvg
-    hsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheeh
-    hedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvg
-    dpnhgspghrtghpthhtohepgeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeht
-    rghmihhrugesghhmrghilhdrtghomhdprhgtphhtthhopehmrghsrghhihhrohihsehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrd
-    hgrgihnhhorhesghhmrghilhdrtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhu
-    ohdrnhgvthdprhgtphhtthhopegsjhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtg
-    homhdprhgtphhtthhopegsvghnnhhordhlohhsshhinhesphhrohhtohhnrdhmvgdprhgt
-    phhtthhopegrrdhhihhnuggsohhrgheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:ZjoBaPQfcbgUf6Yh8VYFMzyHPR0de0KrtNwsOgI0EoaJwSCpSGcmYQ>
-    <xmx:ZjoBaDyXE3R3Pe0e4Lcs8QsUAONUuo-ONw4acJ0XzoE03FenFK-ZWQ>
-    <xmx:ZjoBaN7obfouPd4NCLnREA0UyfouapS6Ixg3HFXOj8RTtj7lrb04Fg>
-    <xmx:ZjoBaAwsSQO1lRMSgp4ADQSdo85_yXrulLD8K-_wB-TpI4cf9HMiUA>
-    <xmx:ZjoBaPhVey_mPsmOnJZOLjB_TA5tgpIB2Y9NYUQT7nBENqG6OlUXuFVS>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 17 Apr 2025 13:29:09 -0400 (EDT)
-Date: Thu, 17 Apr 2025 10:29:08 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v9 5/6] rust: enable `clippy::cast_lossless` lint
-References: <20250416-ptr-as-ptr-v9-0-18ec29b1b1f3@gmail.com>
- <20250416-ptr-as-ptr-v9-5-18ec29b1b1f3@gmail.com>
+        d=1e100.net; s=20230601; t=1744911629; x=1745516429;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dDBg6maTTzuwRDGp8PFv9HLN1q5K7jSth9S5/3WTU6I=;
+        b=Mz3A6ytMOwRIIzGdx6m6ORRLBe7d727OUjc7VzPWNMG0zoOF13Q4rDh6/+fzfbS5gf
+         hzqNZA+OYzZa7avhKaybTCAapl3ThMIRgTUBiZx1GTZdfnrkRVIEqnxES2p9fhQGC3Qm
+         yFZWgkTD2xGfu4ndwUQCtcUVVt3d5RXV14nC3SgKX0Q9Iu0bb2CPPEn9sXjVlg5JQ8Og
+         Qa7Z12gPQxvMdgRvD12PdUII0lS5+L8ynYhRptKisaSjkgg9Jw+u34UbIPC4ykMFkTE/
+         k68VsauXoRID4lW1RDWK6ZxebkjTQGPVwFgBjsq6rHLRePDLYvYzR9zUfUX8Z3PP1q8W
+         n5Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3A8kBGZqCE79a/aizFquVFUD/9q83hmqJAbuTHnkK3JhF7ROmXZ/NGNtOaibw+wqP6JvVDJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEpAJE1+kb/mYW1clYHJexRMOEhpKVX9sQRIBm6r2zbzl4AEkX
+	JsWI37R/LxThDY5QH7jVsnZjfWoa8kRxEXUxuxzp12AIkQ0HA2AGi+TQ3GPSMw==
+X-Gm-Gg: ASbGncvb6bgfwPkvyHb/cP2L5FdgG6jYrhX+j1qbk24sU/oTUNEnGX9G4YEYQuYD2pO
+	Xm+7IhjPkpvGgm5JLHSgUNrBRYeeV3xwvegT+O8SEo+DUVclyoX7mztfNqbhGNYE3a8V8SUzd3D
+	Y5Uk3zJ4QamhyF76NLsMxvCosXXlfKS3IchPajJ8rmrrZySB5d+2PHy7Gfg3EtEUNzIW86zYmZ1
+	At0Ef9tpv8CNHCLQFY3EH5CP0Ur34cRxvtg20wPFBLhmtBNSba4m+38bdBo4V0MfJ0GZlUwvNHz
+	/41y3f+jxv9m0ugSlb4SLNxr7QxO2oRp/XabP14AYoo8qEj7ASfY6VJRPNwbcj2QHg==
+X-Google-Smtp-Source: AGHT+IEUB11sMEKCeB/nFn18cuVrgDnNw9IUYOxedNt+pJ4FJpOjy0YKf25iRAJd2NfgsM5n6/ngmA==
+X-Received: by 2002:a17:902:dac2:b0:21f:4c8b:c4de with SMTP id d9443c01a7336-22c3596dbe6mr88220975ad.42.1744911629482;
+        Thu, 17 Apr 2025 10:40:29 -0700 (PDT)
+Received: from [192.168.68.71] ([136.52.67.200])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bdaad1sm2911915ad.28.2025.04.17.10.40.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Apr 2025 10:40:29 -0700 (PDT)
+Message-ID: <ea48b90d-d01c-46b2-af4d-4c7bdf340f80@broadcom.com>
+Date: Thu, 17 Apr 2025 10:40:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250416-ptr-as-ptr-v9-5-18ec29b1b1f3@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/5] dt-bindings: net: brcm,asp-v2.0: Add v3.0
+ and remove v2.0
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org
+Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
+ conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, florian.fainelli@broadcom.com
+References: <20250416224815.2863862-1-justin.chen@broadcom.com>
+ <20250416224815.2863862-2-justin.chen@broadcom.com>
+ <0b30168d-6969-4385-b184-c2fa69c82390@kernel.org>
+Content-Language: en-US
+From: Justin Chen <justin.chen@broadcom.com>
+In-Reply-To: <0b30168d-6969-4385-b184-c2fa69c82390@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 16, 2025 at 01:36:09PM -0400, Tamir Duberstein wrote:
-> Before Rust 1.29.0, Clippy introduced the `cast_lossless` lint [1]:
+
+
+On 4/16/2025 10:52 PM, Krzysztof Kozlowski wrote:
+> On 17/04/2025 00:48, Justin Chen wrote:
+>> Add asp-v3.0 support. v3.0 is a major revision that reduces
+>> the feature set for cost savings. We have a reduced amount of
+>> channels and network filters.
+>>
+>> Remove asp-v2.0 which was only supported on one SoC that never
+>> saw the light of day.
 > 
-> > Rust’s `as` keyword will perform many kinds of conversions, including
-> > silently lossy conversions. Conversion functions such as `i32::from`
-> > will only perform lossless conversions. Using the conversion functions
-> > prevents conversions from becoming silently lossy if the input types
-> > ever change, and makes it clear for people reading the code that the
-> > conversion is lossless.
 > 
-> While this doesn't eliminate unchecked `as` conversions, it makes such
-> conversions easier to scrutinize.  It also has the slight benefit of
-> removing a degree of freedom on which to bikeshed. Thus apply the
-> changes and enable the lint -- no functional change intended.
+> That's independent commit with its own justification.
 > 
-> Link: https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless [1]
 
-Hmm.. I agree with the solution mentioned from the lint URL, using
-`from()` is better, so..
+Acked
 
-> Suggested-by: Benno Lossin <benno.lossin@proton.me>
-> Link: https://lore.kernel.org/all/D8ORTXSUTKGL.1KOJAGBM8F8TN@proton.me/
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  Makefile                        | 1 +
->  drivers/gpu/drm/drm_panic_qr.rs | 2 +-
->  rust/bindings/lib.rs            | 1 +
->  rust/kernel/net/phy.rs          | 4 ++--
->  rust/uapi/lib.rs                | 1 +
->  5 files changed, 6 insertions(+), 3 deletions(-)
+>>
+>> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+>> ---
+>>   .../bindings/net/brcm,asp-v2.0.yaml           | 19 +++++++++----------
+>>   1 file changed, 9 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>> index 660e2ca42daf..21a7f70d220f 100644
+>> --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>> +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
+>> @@ -4,7 +4,7 @@
+>>   $id: http://devicetree.org/schemas/net/brcm,asp-v2.0.yaml#
+>>   $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   
+>> -title: Broadcom ASP 2.0 Ethernet controller
+>> +title: Broadcom ASP Ethernet controller
+>>   
+>>   maintainers:
+>>     - Justin Chen <justin.chen@broadcom.com>
+>> @@ -15,6 +15,10 @@ description: Broadcom Ethernet controller first introduced with 72165
+>>   properties:
+>>     compatible:
+>>       oneOf:
+>> +      - items:
+>> +          - enum:
+>> +              - brcm,bcm74110-asp
+>> +          - const: brcm,asp-v3.0
+>>         - items:
+>>             - enum:
+>>                 - brcm,bcm74165b0-asp
+>> @@ -23,10 +27,6 @@ properties:
+>>             - enum:
+>>                 - brcm,bcm74165-asp
+>>             - const: brcm,asp-v2.1
+>> -      - items:
+>> -          - enum:
+>> -              - brcm,bcm72165-asp
+>> -          - const: brcm,asp-v2.0
+>>   
+>>     "#address-cells":
+>>       const: 1
+>> @@ -42,8 +42,7 @@ properties:
+>>       minItems: 1
+>>       items:
+>>         - description: RX/TX interrupt
+>> -      - description: Port 0 Wake-on-LAN
+>> -      - description: Port 1 Wake-on-LAN
+>> +      - description: Wake-on-LAN interrupt
 > 
-> diff --git a/Makefile b/Makefile
-> index 57080a64913f..eb5a942241a2 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -476,6 +476,7 @@ export rust_common_flags := --edition=2021 \
->  			    -Wclippy::all \
->  			    -Wclippy::as_ptr_cast_mut \
->  			    -Wclippy::as_underscore \
-> +			    -Wclippy::cast_lossless \
->  			    -Wclippy::ignored_unit_patterns \
->  			    -Wclippy::mut_mut \
->  			    -Wclippy::needless_bitwise_bool \
-> diff --git a/drivers/gpu/drm/drm_panic_qr.rs b/drivers/gpu/drm/drm_panic_qr.rs
-> index f2a99681b998..d28e8f199d11 100644
-> --- a/drivers/gpu/drm/drm_panic_qr.rs
-> +++ b/drivers/gpu/drm/drm_panic_qr.rs
-> @@ -386,7 +386,7 @@ fn next(&mut self) -> Option<Self::Item> {
->          match self.segment {
->              Segment::Binary(data) => {
->                  if self.offset < data.len() {
-> -                    let byte = data[self.offset] as u16;
-> +                    let byte = data[self.offset].into();
-
-	let byte = u16::from(data[self.offset]);
-
-otherwise, the code has not local indicator saying what type the byte
-is, and given its name is "byte" but it's really a `u16`, I think it's
-better we mention the type here.
-
->                      self.offset += 1;
->                      Some((byte, 8))
->                  } else {
-> diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
-> index 0486a32ed314..b105a0d899cc 100644
-> --- a/rust/bindings/lib.rs
-> +++ b/rust/bindings/lib.rs
-> @@ -25,6 +25,7 @@
->  )]
->  
->  #[allow(dead_code)]
-> +#[allow(clippy::cast_lossless)]
->  #[allow(clippy::ptr_as_ptr)]
->  #[allow(clippy::undocumented_unsafe_blocks)]
->  mod bindings_raw {
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index a59469c785e3..abc58b4d1bf4 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> @@ -142,7 +142,7 @@ pub fn is_autoneg_enabled(&self) -> bool {
->          // SAFETY: The struct invariant ensures that we may access
->          // this field without additional synchronization.
->          let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
-> -        bit_field.get(13, 1) == bindings::AUTONEG_ENABLE as u64
-> +        bit_field.get(13, 1) == bindings::AUTONEG_ENABLE.into()
-
-        bit_field.get(13, 1) == u64::from(bindings::AUTONEG_ENABLE)
-
->      }
->  
->      /// Gets the current auto-negotiation state.
-> @@ -426,7 +426,7 @@ impl<T: Driver> Adapter<T> {
->          // where we hold `phy_device->lock`, so the accessors on
->          // `Device` are okay to call.
->          let dev = unsafe { Device::from_raw(phydev) };
-> -        T::match_phy_device(dev) as i32
-> +        T::match_phy_device(dev).into()
-
-	i32::from(T::match_phy_device(dev))
-
-Thoughts? Better be explicit in these cases, IMO.
-
-Regards,
-Boqun
-
->      }
->  
->      /// # Safety
-> diff --git a/rust/uapi/lib.rs b/rust/uapi/lib.rs
-> index f03b7aead35a..d5dab4dfabec 100644
-> --- a/rust/uapi/lib.rs
-> +++ b/rust/uapi/lib.rs
-> @@ -14,6 +14,7 @@
->  #![cfg_attr(test, allow(unsafe_op_in_unsafe_fn))]
->  #![allow(
->      clippy::all,
-> +    clippy::cast_lossless,
->      clippy::ptr_as_ptr,
->      clippy::undocumented_unsafe_blocks,
->      dead_code,
+> Why all devices now have different interrupts?
 > 
-> -- 
-> 2.49.0
-> 
+
+With ASP 2.0 removed, all SoCs will have 2 interrupts now. I need to 
+remove minItems here.
+
+Thanks for the review,
+Justin
+
+> Best regards,
+> Krzysztof
+
 
