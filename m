@@ -1,129 +1,130 @@
-Return-Path: <netdev+bounces-183827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A94FA92271
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:15:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C24A9226A
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A95017D715
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F89A3A372D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4442254B17;
-	Thu, 17 Apr 2025 16:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6ojHJFO"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092C8254865;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D60254862;
 	Thu, 17 Apr 2025 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n3t5H8dG"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17841F463D;
+	Thu, 17 Apr 2025 16:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744906442; cv=none; b=UZDf2n1zUayvLj2MHRxp1nHl5Oa+ElttsXFNIVjrwfUs2xMLKgZML+48fdi6tSKtdo8xGAXD5ro1gNJCZ6Yg1vome4m6f4NY0SoXCSI2j+NCY+Ky7Mxm9O8dPWYy16XIA+pqFy6ipdui2U3AkiiDA5Pqzy4Hl7qA8Y3RGZ0SABA=
+	t=1744906440; cv=none; b=loAt+4f2GN+ARWQB7wJcFZBGoBsqpj4DS/S/kLNRXaAnndQG5GoD7MVcDFrZAIno0vqdb+E4eXWT1W96MnxdwhB3ws94CFkrE7rTZx2nHP/QI2Or8RirnIQyR3CQt/+cqboqLWiqBWybRyM5rc3TSF+htgvnmjBOFrFRFiu98sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744906442; c=relaxed/simple;
-	bh=YCzwwRBpU8uIRwG4lid25+7Je7mDkHsATgpmYDGnbRo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IUe9SgQT5rVOSn9Qal65gcqbnTPubsU6r4uD1WtrqdxoDbLKes1vp+HUkzswxv5vtDdkBMfEnI344qMKMUzxGTeDmecWbhTUxszIkDqFMhLrukeFQQ5F5GEZKmV1nWhdVFJiNZkdyjx9lgxmnRNyVxqstuCpcGAiN5Qih+aDeE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l6ojHJFO; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cfe574976so7845695e9.1;
-        Thu, 17 Apr 2025 09:14:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744906439; x=1745511239; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+N9oL8Syh9HanktdiC8rZhaQzJdfC5gzurJT/+esEes=;
-        b=l6ojHJFOgfAGysAD0IkjNKNqNUPCPNOqYWB03XXzllAn7yweCyW3ax/L/rn3HyTdoJ
-         /S67uKrWPTBMBDUPzOVh2iXi05F88E1cDYPNMol1qpnq17MnZAF8DzhQ8j8WZGJ9m5Hk
-         r3cr/N42bk/RwveHfo0NKY5sRF6eR5DhKeVfjD28VythJLZx2keEojb4JbqAYeSnfcOh
-         T4fs//ii3ThnuIXMfcQqKHpVgELB7GTcXMAlHHSPEYumnsQne6nmHLDA52zrAyZBW9PF
-         6u4lp3gOKYLvpJxwMqyqYJxDJez+3op/8W65LKP5vwGb9cEowM493eISzUkuCQ+yHcQS
-         E7GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744906439; x=1745511239;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+N9oL8Syh9HanktdiC8rZhaQzJdfC5gzurJT/+esEes=;
-        b=up7GlFQkrzf0//BA8TsX6t8xJuB7pS9xlDpWoIGcZo3hz7r6xVV/Bd1PDXPqVjHZ8s
-         U5tpqP1H2VLts215Plh90+CTqJM34fF1XN5DcwkAJK1gG5ITLro6pwwRU5Dep79Zp9Fv
-         8U7z5/w7/Ujb204FLhjDN0uUJ6I1Mp+f92WDMKEIQEe7GdLzdtzEqQwAjXzMYfCGciVV
-         UeNSs8zBsa09xBxSfu8vRRakH8D1TGBF2cfxM3itf68fsPCOyda4nNVAGeL6LJeiw5zQ
-         mzW8F1JdM+Sdbkg0IFBWf8HCow0HiQdaeJys9Zs6+9+4gKeRb6hVBUyPQY11D4Kbb+do
-         /8gw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIvD0uL4JfXDvR3HVGOcT/tH/jk3McpAByPFbIqCcq6DA+CLWJUpdyVvudR37NoSLQPw2z9XrSfzRSmmk=@vger.kernel.org, AJvYcCWrbvI3vi+mruoCBlWKZV3UwzPRSJ1S0XHPabdEbmrBzXXs4JMsgJqmouzeU6MxKuimc3IFJH6p@vger.kernel.org, AJvYcCXihnjW3ERnGhtdhaTHzH52EZkwHkkRA9zTqn+U9JwpBQuv4lZ0TBbOafho9wh9ckKDHafPdoXZW307LHlRwwq4p8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQToBnWDtdSuunSQ2jbsXQRXGC4DWp40NQp2BwlRNyXz9pvaz7
-	cNaqd2ew6hR1haNzdtXGWmqN7nwtbt9Eb8rJYgVSIXIDdTvhhoRo
-X-Gm-Gg: ASbGnctTTKP1fkXuslZPGzAzfyNe67MKxC8WTK1WW4ITMGOHCUI61sOIYnCX60LNxe+
-	R8xgpc+HSpQPVxeWSgyJ0h1gLdhDIS7pATtJxrAcgxov/waqsjB1xng2oHdGTiW5g150j0mFnvk
-	DC3R4TVoFwMCsyvRtqzGsmp0t8frUkFEVMh4WD+H5nM4+Yire6Gouhmv8I2vXgXkf5ajtxbLsRF
-	4CMSm91LuunUt5OH4nIBSgQnv2XGFkmGP6tQNYkMs6PVIh+iX4lyAoGon7FnXptmIFsKd2VjLYO
-	4bTtI2Ztm1y/hAplIH6zkUXGiGeXCbh4Awsg5FZy3A==
-X-Google-Smtp-Source: AGHT+IEKjAUSYNJlTKtNz+WiLYSx9O1vajCtYdzh0IuzBc7i+kI+QT2MiyU85fir+3glkbBBr8zTEg==
-X-Received: by 2002:a05:600c:1e8d:b0:43d:7413:cb3e with SMTP id 5b1f17b1804b1-44069f75556mr590055e9.1.1744906439014;
-        Thu, 17 Apr 2025 09:13:59 -0700 (PDT)
-Received: from localhost ([194.120.133.58])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4405b58cc4csm61812485e9.25.2025.04.17.09.13.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 09:13:58 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next][V2] net: dsa: rzn1_a5psw: Make the read-only array offsets static const
-Date: Thu, 17 Apr 2025 17:13:52 +0100
-Message-ID: <20250417161353.490219-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1744906440; c=relaxed/simple;
+	bh=dF5zKEgbrCzKFWBhVkcf46aE/op9JDA8TSByk+hkA4U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bVCvlmd/aBVNAd6B/nZWXmrjPbNg/lt1KasP5hwY6CN6GG2qNzR0z1jW6QRA7kdaXqEdsC1tn4rvfeTxH9RaXUH/h5CqmkBEAzKjvKTqLE5/s7jJLYyoqAoTybi8a/lYPz1ZX5XoXS/Rz3apjfTf5mN271cDIwFG70mUE37OHUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n3t5H8dG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F09C4CEE4;
+	Thu, 17 Apr 2025 16:13:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744906440;
+	bh=dF5zKEgbrCzKFWBhVkcf46aE/op9JDA8TSByk+hkA4U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n3t5H8dGUaUqklAbXEvHhseo4XcV2hw4gHpfEy/k0DfICyQ3QTeK21zwgNv0rV/u0
+	 yl4kozrNVlNxW2kq+kVmAR5w7Y8GfVOCnqpfhjQO2DMMT3/wPB8A+18HYYd+9ZhgHv
+	 kjF4qe+Cwcnh136y2EZQEOJm/myjBBo+YpxCbZ/erXNsTh8As0oGeQUdtWuTGEj3A7
+	 5ADgnr/fInKHi5oIvH0T4+pfhbJa9nKFGRF/e34RW0X1h9HdqNn9JsT5EKKgJuw5p6
+	 crYScCIzN2fcDXjTWcuQcgQz1PWP4SPzdMRjkpKz2runtZ+i5KFLZXaWQG7T32zqNh
+	 RgGYGohFwDnhw==
+Date: Thu, 17 Apr 2025 17:13:54 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 5/8] mfd: zl3073x: Add functions to work with
+ register mailboxes
+Message-ID: <20250417161354.GF372032@google.com>
+References: <20250416162144.670760-1-ivecera@redhat.com>
+ <20250416162144.670760-6-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250416162144.670760-6-ivecera@redhat.com>
 
-Don't populate the read-only array offsets on the stack at run time,
-instead make it static const.
+On Wed, 16 Apr 2025, Ivan Vecera wrote:
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
+> Registers present in page 10 and higher are called mailbox type
+> registers. Each page represents a mailbox and is used to read and write
+> configuration of particular object (dpll, output, reference & synth).
+> 
+> The mailbox page contains mask register that is used to select an index of
+> requested object to work with and semaphore register to indicate what
+> operation is requested.
+> 
+> The rest of registers in the particular register page are latch
+> registers that are filled by the firmware during read operation or by
+> the driver prior write operation.
+> 
+> For read operation the driver...
+> 1) ... updates the mailbox mask register with index of particular object
+> 2) ... sets the mailbox semaphore register read bit
+> 3) ... waits for the semaphore register read bit to be cleared by FW
+> 4) ... reads the configuration from latch registers
+> 
+> For write operation the driver...
+> 1) ... writes the requested configuration to latch registers
+> 2) ... sets the mailbox mask register for the DPLL to be updated
+> 3) ... sets the mailbox semaphore register bit for the write operation
+> 4) ... waits for the semaphore register bit to be cleared by FW
+> 
+> Add functions to read and write mailboxes for all supported object types.
+> 
+> All these functions as well as functions accessing mailbox latch registers
+> (zl3073x_mb_* functions) have to be called with zl3073x_dev->mailbox_lock
+> held and a caller is responsible to take this lock.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> v1->v3:
+> * dropped ZL3073X_MB_OP macro usage
+> ---
+>  drivers/mfd/zl3073x-core.c       | 232 +++++++++++++++++++++++
+>  include/linux/mfd/zl3073x.h      |  12 ++
+>  include/linux/mfd/zl3073x_regs.h | 304 +++++++++++++++++++++++++++++++
+>  3 files changed, 548 insertions(+)
 
-V2: Fix commit message
+> +/*
+> + * Mailbox operations
+> + */
+> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_dpll_write(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_output_read(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_output_write(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_ref_read(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_ref_write(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_synth_read(struct zl3073x_dev *zldev, u8 index);
+> +int zl3073x_mb_synth_write(struct zl3073x_dev *zldev, u8 index);
 
----
- drivers/net/dsa/rzn1_a5psw.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Why aren't these being placed into drivers/mailbox?
 
-diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-index 31ea8130a495..df7466d4fe8f 100644
---- a/drivers/net/dsa/rzn1_a5psw.c
-+++ b/drivers/net/dsa/rzn1_a5psw.c
-@@ -337,8 +337,9 @@ static void a5psw_port_rx_block_set(struct a5psw *a5psw, int port, bool block)
- static void a5psw_flooding_set_resolution(struct a5psw *a5psw, int port,
- 					  bool set)
- {
--	u8 offsets[] = {A5PSW_UCAST_DEF_MASK, A5PSW_BCAST_DEF_MASK,
--			A5PSW_MCAST_DEF_MASK};
-+	static const u8 offsets[] = {
-+		A5PSW_UCAST_DEF_MASK, A5PSW_BCAST_DEF_MASK, A5PSW_MCAST_DEF_MASK
-+	};
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(offsets); i++)
 -- 
-2.49.0
-
+Lee Jones [李琼斯]
 
