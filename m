@@ -1,213 +1,131 @@
-Return-Path: <netdev+bounces-183709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A5AA919A3
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:47:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5426CA919AC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB4C619E4218
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:47:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43AF516BA16
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248C9226D00;
-	Thu, 17 Apr 2025 10:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22B522FDE4;
+	Thu, 17 Apr 2025 10:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BXYbGfC/";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i3OE926u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYj/IJ4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476331DE3C8
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1025233141
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744886861; cv=none; b=VIq0ei6MdT2GGHYlTWxZINqS/L5Ffl8UblrEN0Q3jsKKkLFLV6XZxpRK2Hh7hrrzUhquRHjC3eU/dvkaPKaTFdDuPFkX4K7+0MzY9oTLG39qpG/fB8WphuCBS8bL/HU6aGcs34cNo56wfgSs9e5R9k9NhyueqsKPkbm/JTZDtjs=
+	t=1744886895; cv=none; b=p2Ttf90S0G7CkzpvAbZekWthGsXEEXhy+03rP8cmO45e7fREEniI/GRxraqj8w1xPKSYw8NIcdcLsRas5BnqcZQfeH5c+c/+P5X51TV6IBcf4JB7Nhem9ZH+w1+XbAgXwuuVzfQmFhc69dPxiFZJn7YNfLM2dcy9pKISY37ayHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744886861; c=relaxed/simple;
-	bh=EXRjzrTP9O8p8sLtyIX1We14XNqb9tDT2QzFmedEDco=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tzsTejUCF3PvB7qDgGSEGNwmyFI+3m5+cAlI6PWVpvYZHcEItVRJAas+9/gXsjoc1nSswzAV3mm0F+Ta4UIPKr8jMFWxJSCYeNnLcPR3ft71IuFpVF4Xy/kY6mgEZHU5Z055HVjlCL49pydiZz8Htz2q3P0Kli8w58XjvnN+0yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BXYbGfC/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=i3OE926u; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 17 Apr 2025 12:47:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744886857;
+	s=arc-20240116; t=1744886895; c=relaxed/simple;
+	bh=XhGacwTcE6A+IWJQpQyCMN16TVH3Z6owtk1R8JSA4+A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kqJu5YxaUuB9eoPs6IXWBPOUgm0g1FTbgHHO6hxg5boOGX2wCrCProuMC7q0wtnJirHhSPrN8UeD+L4XNKgKg7LlT4WZd8of87TLaC62DFpTDgl5BUSkasD0dCxMKOwehfCXivZTm6mmyNO06n6MkQw6I5thbPRiLWyolsmc/ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYj/IJ4R; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744886893;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hAst5GKyyBj/mcMHisU1+LM9XPB4UXnzyH9fIQay3kg=;
-	b=BXYbGfC/QNMTIFB5tCE/QHDsnnw5LHy21MUT+gr7tA0fcoyiJLOcb8oJKzABRMIUuEdHpV
-	2i/3WsISi67t16ixg0Lq5BTtWQvJLNzB4cuhc00nZeMH37AFHnGLGgU48G6OphfZsQkKRG
-	XznpTTpYPi+5ki6IpTpZI93HIow7ZHn1KavU2/OfyOT65kwnL3hz0QdvL/KCamoJCg7575
-	sRaqFl4m30R5SfrCjOOrEuDNm2ViQgzbW9UO+N26BzbR+70VvVOegmiiT5YuVr6my+wUNH
-	vCx46g6Pm0M6qk3/Yr/dmJLbzVcgjeW27Xx/QjvH4WWEpPpdxzxCpAIkMpm5xQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744886857;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hAst5GKyyBj/mcMHisU1+LM9XPB4UXnzyH9fIQay3kg=;
-	b=i3OE926uYDDFmuF2HuiGuSYqJUQqKrpPdCtyjeuBjDfdFCPi3GbtFxw8t6W6JCogf6R4JA
-	9wJ+iL774hgqrtAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH net-next v2 13/18] net/sched: act_mirred: Move the
- recursion counter struct netdev_xmit
-Message-ID: <20250417104736.pD2sMYXv@linutronix.de>
-References: <20250414160754.503321-1-bigeasy@linutronix.de>
- <20250414160754.503321-14-bigeasy@linutronix.de>
- <75e10631-00a3-405a-b4d8-96b422ffbe41@redhat.com>
+	bh=OudEsC2htuXU3a1BRgDOXrN8cqmum79c1G5XjX0b0Ts=;
+	b=CYj/IJ4RRldEBDBj1ag7dWJmTek3U/cRZlHlufqdrMALS1eHyQnNNvuFvVfrRX26Zo3DWY
+	r0etfLnaxRq+pV8mDDyXMJINocfR006S+Zuki1ietbPTpampz201MIXfC2kfTjG+0+TUG8
+	Ozmk8oPjZ32B+HZhfwb6KamXaN4/caU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-635-0FOoV0CrOgGhnIMxQmLvcg-1; Thu, 17 Apr 2025 06:48:11 -0400
+X-MC-Unique: 0FOoV0CrOgGhnIMxQmLvcg-1
+X-Mimecast-MFC-AGG-ID: 0FOoV0CrOgGhnIMxQmLvcg_1744886891
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6ece036a581so12502726d6.1
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 03:48:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744886891; x=1745491691;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OudEsC2htuXU3a1BRgDOXrN8cqmum79c1G5XjX0b0Ts=;
+        b=pntIVLGFDfR0movxfv5r4dNpZ/D24GKjmRFKwNp5LIatHhn7uIrM95w/3mO8L0MK1S
+         2511cc8hcne+b6aazB022exukTuw7+KivMep/UAf2hXMBYoj74KARwSVJBK/fYYlxC7o
+         4AEz+qPRMVN0ImjJHgzR6UnyL1N1XHshkkPok2ydC/5cLtsi53IaREVwBlcwmVfmLqIN
+         8qI2rlBTFaUf8hb3CiKtRoa2d2IjSkXiAKcDvE5HBNz1lpZC35AvVsOHdOcdrk3wW68W
+         51NxG20JEta7w7s+kAUs0t7etH+j42cNhan2ReR9An0H+aE2C905SG3+L4z4ZuGu+Ajl
+         8L+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW1rQRhz6lN2JdoGNaS1rWAIo3syDMyZWbq/N/Ht0W1qh96VQAUnyBVrm7sIGd4571Bo4dLk7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnjV+9ZzCpJP2M1ZqJGR89IkhoBG0qC12ABFzSlBCJu+QgSd4A
+	OAGvl9O2uwXHVjoKpDrsGGrAjYlQzqsk5Ys5xkSPg2z8q7I5V245SQHm3eDX3Phc5zANo0+cHoA
+	6Co37F3OjFYEmXNA+5vT4ARFpMpgUkweA6y4aco0foQynBGGL9+eurw==
+X-Gm-Gg: ASbGnctVJUevhvwxVfrxIRnZV1lOEY4cJlqy5aF+Wu7AIlqdLTEAvhqz+pTUQquvaVw
+	7Nxf8Kj33AauXEr8eZa0/GYgUu6TFMSRbvhIHoKF4hAOcPj55JYo1cBcVMxxW27I1ssT4gUFU9q
+	vzxcCI6jFij+CkibCTGYB+IlfX53uhV7KPIjkc58qU1amPD4hEDzii3y6qbUUDWBR+iXkWqRK/s
+	ZfOyG9piggc5+9zy5kh/TaZ7bhwTG5pkQTDc2bOSLDtbuiDDPfefpMxvxIliA9Tehiq97XYPSHB
+	sMr584h3PptLdsmC1zpHATqy+QsD8Ss0ZKug6jaUcQ==
+X-Received: by 2002:a05:6214:3008:b0:6e8:fa72:be49 with SMTP id 6a1803df08f44-6f2b2f421b9mr65124526d6.12.1744886891276;
+        Thu, 17 Apr 2025 03:48:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFRD2S2lNf87+n5j2F4wP6+GtOIfe7KgdYGkxqrRR5TEwTDQjpW1zM73oytFXas9ITp16LLpQ==
+X-Received: by 2002:a05:6214:3008:b0:6e8:fa72:be49 with SMTP id 6a1803df08f44-6f2b2f421b9mr65124216d6.12.1744886890999;
+        Thu, 17 Apr 2025 03:48:10 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-55-253.dyn.eolo.it. [146.241.55.253])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de982274sm125717616d6.64.2025.04.17.03.48.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Apr 2025 03:48:10 -0700 (PDT)
+Message-ID: <8bfc6c5f-4bfc-4df4-ac52-b96d902a9d7f@redhat.com>
+Date: Thu, 17 Apr 2025 12:48:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <75e10631-00a3-405a-b4d8-96b422ffbe41@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v26 00/23] Introducing OpenVPN Data Channel
+ Offload
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ sd@queasysnail.net, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ steffen.klassert@secunet.com, antony.antony@secunet.com,
+ willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
+References: <20250415-b4-ovpn-v26-0-577f6097b964@openvpn.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250415-b4-ovpn-v26-0-577f6097b964@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-+ Ingo/ PeterZ for sched, see below.
-
-On 2025-04-17 10:29:05 [+0200], Paolo Abeni wrote:
+On 4/15/25 1:17 PM, Antonio Quartulli wrote:
+> Notable changes since v25:
+> * removed netdev notifier (was only used for our own devices)
+> * added .dellink implementation to address what was previously
+>   done in notifier
+> * removed .ndo_open and moved netif_carrier_off() call to .ndo_init
+> * fixed author in MODULE_AUTHOR()
+> * properly indented checks in ovpn.yaml
+> * switched from TSTATS to DSTATS
+> * removed obsolete comment in ovpn_socket_new()
+> * removed unrelated hunk in ovpn_socket_new()
 > 
-> How many of such recursion counters do you foresee will be needed?
-
-I audited the static per-CPU variables and I am done with this series. I
-need to go through the dynamic allocations of per-CPU but I don't expect
-to see any there.
-
-> AFAICS this one does not fit the existing hole anymore; the binary
-> layout before this series is:
+> The latest code can also be found at:
 > 
->  struct netdev_xmit {
->                 /* typedef u16 -> __u16 */ short unsigned int recursion;
->                 /*  2442     2 */
->                 /* typedef u8 -> __u8 */ unsigned char      more;
->                 /*  2444     1 */
->                 /* typedef u8 -> __u8 */ unsigned char
-> skip_txqueue;                /*  2445     1 */
->         } net_xmit; /*  2442     4 */
-> 
->         /* XXX 2 bytes hole, try to pack */
-> 
-> and this series already added 2 u8 fields. Since all the recursion
-> counters could be represented with less than 8 bits, perhaps using a
-> bitfield here could be worthy?!?
+> https://github.com/OpenVPN/ovpn-net-next
 
-The u8 is nice as the CPU can access in one go. The :4 counting fields
-(or so) are usually loaded and shifted so there is a bit more assembly.
-We should be able to shorten "recursion" down to an u8 as goes to 8
-only.
+I think it's finally time to merge this. Thanks Anotonio for your
+patience and persistence and thank you Sabrina for the huge review effort.
 
-I still used holes according to pahole on my RT build (the non-RT
-shouldn't change):
+/P
 
-Before the series:
-task_struct:
-|         /* XXX 5 bits hole, try to pack */
-|         /* Bitfield combined with next fields */
-|
-|         struct netdev_xmit         net_xmit;             /*  2378     4 */
-|
-|         /* XXX 2 bytes hole, try to pack */
-|
-|         long unsigned int          atomic_flags;         /*  2384     8 */
-
-struct netdev_xmit {
-|         u16                        recursion;            /*     0     2 */
-|         u8                         more;                 /*     2     1 */
-|         u8                         skip_txqueue;         /*     3     1 */
-|
-|         /* size: 4, cachelines: 1, members: 3 */
-|         /* last cacheline: 4 bytes */
-
-after the series:
-|         unsigned int               in_nf_duplicate:1;    /*  2376:11  4 */
-|         /* XXX 4 bits hole, try to pack */
-|         /* Bitfield combined with next fields */
-| 
-|         struct netdev_xmit         net_xmit;             /*  2378     6 */
-|         long unsigned int          atomic_flags;         /*  2384     8 */
-
-struct netdev_xmit
-|         u16                        recursion;            /*     0     2 */
-|         u8                         more;                 /*     2     1 */
-|         u8                         skip_txqueue;         /*     3     1 */
-|         u8                         nf_dup_skb_recursion; /*     4     1 */
-|         u8                         sched_mirred_nest;    /*     5     1 */
-| 
-|         /* size: 6, cachelines: 1, members: 5 */
-|         /* last cacheline: 6 bytes */
-
-I don't understand why in the first case there is a warning about a 2
-byte hole while there is a 4 byte hole due to the long alignment.
-After the series there is still a 2 byte hole before atomic_flags.
-
-> In any case I think we need explicit ack from the sched people.
-
-I added PeterZ and Ingo.
-
-> > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> > index 5b38143659249..5f01f567c934d 100644
-> > --- a/net/sched/act_mirred.c
-> > +++ b/net/sched/act_mirred.c
-> > @@ -30,7 +30,29 @@ static LIST_HEAD(mirred_list);
-> >  static DEFINE_SPINLOCK(mirred_list_lock);
-> >  
-> >  #define MIRRED_NEST_LIMIT    4
-> > -static DEFINE_PER_CPU(unsigned int, mirred_nest_level);
-> > +
-> > +#ifndef CONFIG_PREEMPT_RT
-> > +static u8 tcf_mirred_nest_level_inc_return(void)
-> > +{
-> > +	return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest);
-> > +}
-> > +
-> > +static void tcf_mirred_nest_level_dec(void)
-> > +{
-> > +	__this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
-> > +}
-> > +
-> > +#else
-> > +static u8 tcf_mirred_nest_level_inc_return(void)
-> > +{
-> > +	return current->net_xmit.sched_mirred_nest++;
-> > +}
-> > +
-> > +static void tcf_mirred_nest_level_dec(void)
-> > +{
-> > +	current->net_xmit.sched_mirred_nest--;
-> > +}
-> > +#endif
-> 
-> There are already a few of this construct. Perhaps it would be worthy to
-> implement a netdev_xmit() helper returning a ptr to the whole struct and
-> use it to reduce the number of #ifdef
-
-While I introduced this in the beginning, Jakub asked if there would be
-much difference doing this and I said on x86 at least one opcode because
-it replaces "var++" with "get-var, inc-var". I didn't hear back on this
-so I assumed "keep it".
-
-If you want the helper, then just say if you want it at the begin of the
-series, at the end or independent for evaluation purpose and I make it.
-
-> Thanks,
-> 
-> Paolo
-
-Sebastian
 
