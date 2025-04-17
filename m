@@ -1,169 +1,134 @@
-Return-Path: <netdev+bounces-183633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010C4A91588
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:44:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E69D9A9159A
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B16A3B2890
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:44:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AA6C17EFD7
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10E821A458;
-	Thu, 17 Apr 2025 07:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF0422154E;
+	Thu, 17 Apr 2025 07:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RqN3/pFu"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VFTtwG3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020202139DC
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C0021ADA2
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744875894; cv=none; b=NwUiknJrHoM3qmyAXPDjMyU48ICppdPGZRv4q6qkX25dDemo97ChXtUyvbQUsRVNOVQMoz6ABuNmJiI0JAOba2NTD+ITaGqrCfxMND0pD2mmoPmQkppiiG+MqTtvYBBYAWgzGYZ6igFW0hVygcfGs7sfDZVZGBLsVNWUxT7+Bpg=
+	t=1744876008; cv=none; b=U9hYiKjaL90Edzs2oBoV63SJwet5P9boJ500r1ZvYPxJXyz5DdyNCgradS2XBaJwETraqNkj+zBf8ZNJN3V38Z8enQ9W1OiPeAHdqfOpvvqMbml72+b3ARViX2XYT0GfTFYXd/ClRiARH8TY2N+zs/s80h52WESrmXOne6JUD1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744875894; c=relaxed/simple;
-	bh=tslz6DlI/Mm4YFhda6oTOI/VUg3AL5GOdcZku7+10qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IkBhbyhqJHNraR1wyG4U8aXhKmWvU3Q42efZ7E47L3UOTTN+qfn47RkLu+C0Ssks3xAzHVsvBbzU+ly4Yt7ibD6J4/sDoH0eYSslkDppdd6qvNQZkyFklBUakPCiRmwWxc3gaVFIs8acA8nzaTa2RuLqw1cOd7X14918n6uTxpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RqN3/pFu; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744875893; x=1776411893;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tslz6DlI/Mm4YFhda6oTOI/VUg3AL5GOdcZku7+10qg=;
-  b=RqN3/pFu2mtqyrootBI/S3UB2tlKclZpfiMixjc/cgOiMLjORdpOhGDu
-   hPLnJMWL954kTPGtkiTKChxt7oYwEiZriCL7wxvwR/dHVsLS5OpKn67rm
-   nDh/uLozNGQUdRWQpKBfUQvAhWGNUY2Y9zIqXEEXqNft4szi7mts0ooQt
-   YxrlxmTlTTMcQ0eLoRCKFKqvT2rvnNN+L4PFxx4L88id5A5vExqYFaUyT
-   X67WrDMWgYX/2gHzBFiFmptQQW8BsYCwENELGUxp/CovDu1KVPM1pGDWP
-   DsjZItcoh89sMq7qNKi3ufMc+tvMG8yN4yd2XBVoTFLbsCQ7ql6NEXnul
-   g==;
-X-CSE-ConnectionGUID: eEY97FU0SwKG6mp20lhqFw==
-X-CSE-MsgGUID: ApazkKrjQ5+guf7fjbEaaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="50099768"
-X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
-   d="scan'208";a="50099768"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:44:52 -0700
-X-CSE-ConnectionGUID: SECiPiZnTDWrnD/BIEfxOA==
-X-CSE-MsgGUID: oLWOzVShQrCnUO/bkHGTAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
-   d="scan'208";a="130586301"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:44:50 -0700
-Date: Thu, 17 Apr 2025 09:44:32 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dave Marquardt <davemarq@linux.ibm.com>
-Cc: netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
-	horms@kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next v3 1/3] net: ibmveth: Indented struct
- ibmveth_adapter correctly
-Message-ID: <aACxYGS9F8bh5PkG@mev-dev.igk.intel.com>
-References: <20250416205751.66365-1-davemarq@linux.ibm.com>
- <20250416205751.66365-2-davemarq@linux.ibm.com>
+	s=arc-20240116; t=1744876008; c=relaxed/simple;
+	bh=aSvlpjizI/Lrp13Pva6wwkw049E07MN4kZArewmdN8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=paWZVxiqSkC1tvYsd5I2TafaYtxgDn0R7BdvHbYj975aYhFykuGlfHFSua1FKH1ufZygroYuvCmRrd8hqRq5CmYWbCFdl+dvTwtjlXcGlWZbP7TbTo7Jbq818WZ8x33e9WzGZeRJLtAuuQfii3YWWKzZTChAR2Rapi9/gmEpVnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VFTtwG3g; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43d0953d3e1so482145e9.2
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 00:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1744876005; x=1745480805; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OhI+WADkGBk+0ULST+CxSRjnFxvmTJk3SgN2rfV4lm4=;
+        b=VFTtwG3gRxFYqiqBb4UoDyDYv07/9oNjqp9ttYDqkGKVsODrVMpubmH27bvRnDUn+t
+         Ag+ssQv8TEYkPNsuHBFocZlqzpj7qPbqGiTqmRBzJNDQJ43Pax07+Vy7ANVNFRYRitC/
+         lSpC3moImHuR8ryiUJq8CTNsiUGz96Axefhfir4+UW+LgSVtK4qkiqc15t8lWLPNCP5Q
+         jZOLn1JVKzgLKDok9Q3RWEP10zg+myEn7ti4Ni/y3NCy7ZSmWtP6UoBQs2e3ODRF4nms
+         YEo8SVszYIvZWOTL06ow4sZKaJ5RucHZfDzOQmBZG9VZOP41K1gkOzzL1cV+MLuUCnjo
+         5llg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744876005; x=1745480805;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OhI+WADkGBk+0ULST+CxSRjnFxvmTJk3SgN2rfV4lm4=;
+        b=K8jbjrJ96DV107Jqruo5JdyX8Y4fkOwaYj4tgNgAf8nydx/sMtjxA4De62BMsfckzA
+         ftCvuvSqjltg8IAXRq/5FYW/PPvcionBr+aoRt9wjskFdNoO1pGujdxQmudewtSdZS5k
+         fTQLB2bsOrN/dGFRqVe9c1181RqpmJgfi10oSFP/Ra5IVhk63qLh4dtUpfvcKA4zsaYa
+         n1njptUNUz9DYO7YbLNB8ZT6SRi+9wDJuMPwhn55b70YMbI06zP27mABuWDqzZhfwcmB
+         fVl7r2ka8raoyzhPtZd2ddRBDDN0jHQQ8EcY1BYmZCkPAhEpF9i5XT9BseAfwOalAqzk
+         hotg==
+X-Forwarded-Encrypted: i=1; AJvYcCXuidTP6sSDMA3Pa3YZ3ivMHQj3kTFO9ruQfxZDw+CbzuaAgVPgme0iu5ZYKcGXElyB0VGEJG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzamDHrOuKV8jn6wZCFlpp8rZ69LUjGmEqeaq5tGcyabAvRLC1p
+	8BgCo9w+eg8MfuCvJpem+OL0q6aU324kie6rlPn2hqyQ3fqv7stVmWphY2ccoxI=
+X-Gm-Gg: ASbGncvF2/w86btftwVUBBwkd0PfbkH/cx5BgSr9S4kI7DPu9e6vGQmv6Od0xmdHwVo
+	oC8yEkZyXZQZvafDts3hqA+qAlkaKwhJCl+l/z5sCDejR3JYWbAZ0U1SVJrw/DUYqonJIWFn0Gs
+	zKGLdVu035B7ZTvkuby425GIuPIYIP4QUabYcqVaZm3WWTsSSRK7pLeMmVvPc9tISmrTtu5Ej6s
+	hgp57TMFLRbZ+2LffxPOOZi2oAJXvwAzCjXSH2gAbqfCLdSgre9nzc2jGl1cYPG2UMNAIRhAEzD
+	0J7ef7Z1wERAiRUX6zZoW7eaY1Et417RxzxMgzGgD2YrLpoXS/BjHWRXXW00OyBFadioa7o/gLI
+	ZoqqoDg==
+X-Google-Smtp-Source: AGHT+IGFe1ON7uLFnctXLbWHCIx251k2gOzxkcVdUkHVQsZlna6ZhlzZoF22sAc96PoeqkFuh+hKAA==
+X-Received: by 2002:a05:600c:1d15:b0:43b:c938:1d0e with SMTP id 5b1f17b1804b1-44061d9b048mr8672705e9.2.1744876004978;
+        Thu, 17 Apr 2025 00:46:44 -0700 (PDT)
+Received: from kuoka.. (46.150.74.144.lvv.nat.volia.net. [46.150.74.144])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b4c8188sm44102175e9.5.2025.04.17.00.46.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 00:46:44 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH] ptp: Do not enable by default during compile testing
+Date: Thu, 17 Apr 2025 09:46:42 +0200
+Message-ID: <20250417074643.81448-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416205751.66365-2-davemarq@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 16, 2025 at 03:57:49PM -0500, Dave Marquardt wrote:
-> Made struct ibmveth_adapter follow indentation rules
-> 
-> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmveth.h | 64 +++++++++++++++---------------
->  1 file changed, 32 insertions(+), 32 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
-> index 8468e2c59d7a..0f72ce54e7cf 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.h
-> +++ b/drivers/net/ethernet/ibm/ibmveth.h
-> @@ -134,38 +134,38 @@ struct ibmveth_rx_q {
->  };
->  
->  struct ibmveth_adapter {
-> -    struct vio_dev *vdev;
-> -    struct net_device *netdev;
-> -    struct napi_struct napi;
-> -    unsigned int mcastFilterSize;
-> -    void * buffer_list_addr;
-> -    void * filter_list_addr;
-> -    void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
-> -    unsigned int tx_ltb_size;
-> -    dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
-> -    dma_addr_t buffer_list_dma;
-> -    dma_addr_t filter_list_dma;
-> -    struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
-> -    struct ibmveth_rx_q rx_queue;
-> -    int rx_csum;
-> -    int large_send;
-> -    bool is_active_trunk;
-> -
-> -    u64 fw_ipv6_csum_support;
-> -    u64 fw_ipv4_csum_support;
-> -    u64 fw_large_send_support;
-> -    /* adapter specific stats */
-> -    u64 replenish_task_cycles;
-> -    u64 replenish_no_mem;
-> -    u64 replenish_add_buff_failure;
-> -    u64 replenish_add_buff_success;
-> -    u64 rx_invalid_buffer;
-> -    u64 rx_no_buffer;
-> -    u64 tx_map_failed;
-> -    u64 tx_send_failed;
-> -    u64 tx_large_packets;
-> -    u64 rx_large_packets;
-> -    /* Ethtool settings */
-> +	struct vio_dev *vdev;
-> +	struct net_device *netdev;
-> +	struct napi_struct napi;
-> +	unsigned int mcastFilterSize;
-> +	void *buffer_list_addr;
-> +	void *filter_list_addr;
-> +	void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
-> +	unsigned int tx_ltb_size;
-> +	dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
-> +	dma_addr_t buffer_list_dma;
-> +	dma_addr_t filter_list_dma;
-> +	struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
-> +	struct ibmveth_rx_q rx_queue;
-> +	int rx_csum;
-> +	int large_send;
-> +	bool is_active_trunk;
-> +
-> +	u64 fw_ipv6_csum_support;
-> +	u64 fw_ipv4_csum_support;
-> +	u64 fw_large_send_support;
-> +	/* adapter specific stats */
-> +	u64 replenish_task_cycles;
-> +	u64 replenish_no_mem;
-> +	u64 replenish_add_buff_failure;
-> +	u64 replenish_add_buff_success;
-> +	u64 rx_invalid_buffer;
-> +	u64 rx_no_buffer;
-> +	u64 tx_map_failed;
-> +	u64 tx_send_failed;
-> +	u64 tx_large_packets;
-> +	u64 rx_large_packets;
-> +	/* Ethtool settings */
->  	u8 duplex;
->  	u32 speed;
->  };
-> -- 
-> 2.49.0
+Enabling the compile test should not cause automatic enabling of all
+drivers, but only allow to choose to compile them.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+---
+
+For longer rationale:
+https://lore.kernel.org/all/191543a8-2e2e-4ac4-9b2b-d253820a0c9f@app.fastmail.com/
+---
+ drivers/ptp/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+index 07bf7f9aae01..204278eb215e 100644
+--- a/drivers/ptp/Kconfig
++++ b/drivers/ptp/Kconfig
+@@ -44,7 +44,7 @@ config PTP_1588_CLOCK_DTE
+ 	depends on PTP_1588_CLOCK
+ 	depends on NET && HAS_IOMEM
+ 	depends on ARCH_BCM_MOBILE || (ARCH_BCM_IPROC && !(ARCH_BCM_NSP || ARCH_BCM_5301X)) || COMPILE_TEST
+-	default y
++	default y if ARCH_BCM_MOBILE || ARCH_BCM_IPROC
+ 	help
+ 	  This driver adds support for using the Digital timing engine
+ 	  (DTE) in the Broadcom SoC's as a PTP clock.
+@@ -59,7 +59,7 @@ config PTP_1588_CLOCK_QORIQ
+ 	tristate "Freescale QorIQ 1588 timer as PTP clock"
+ 	depends on GIANFAR || FSL_DPAA_ETH || FSL_DPAA2_ETH || FSL_ENETC || FSL_ENETC_VF || COMPILE_TEST
+ 	depends on PTP_1588_CLOCK
+-	default y
++	default y if GIANFAR || FSL_DPAA_ETH || FSL_DPAA2_ETH || FSL_ENETC || FSL_ENETC_VF
+ 	help
+ 	  This driver adds support for using the Freescale QorIQ 1588
+ 	  timer as a PTP clock. This clock is only useful if your PTP
+-- 
+2.45.2
 
 
