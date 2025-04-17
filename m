@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-183894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52869A92BC1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 21:29:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6146AA92BCB
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 21:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 857181B6667A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:29:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0219F1B667E5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158EB1FFC62;
-	Thu, 17 Apr 2025 19:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5615202988;
+	Thu, 17 Apr 2025 19:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IspLDB+V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B04kaKX/"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75266A926;
-	Thu, 17 Apr 2025 19:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387F71F585C;
+	Thu, 17 Apr 2025 19:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744918167; cv=none; b=dV72YtnZ1Ewjj3sfFzRzkiYMqXD//4S+ZuC85GKqYnvNweUATlofw9rYJ/5JXt3VR7whJcBulubokCiBTBVG14OHpwDIoB9QhT3MkXpQDW75YyHNp2XbId5SBsn/3oRSPJWCH+9MvrlirqW71LVgiKd5hiJvqJToHWY1HdPUnxY=
+	t=1744918187; cv=none; b=ckBUXfYDQqKqD3wgXIPaIh7wI8NgXdD3QtiiHPOXzvnVbJA1ro/juegDy4cqbpqaUP6Gf5dpiLo+391qRvKSblQONnZ7sQ9bVDbVRXEYiMA7kWuFQeRtmr+PRyH9G3nMNOiZucLCy94aLbIwbt8A8bbNP90BzniYq+v8I3XARNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744918167; c=relaxed/simple;
-	bh=xCSO+aU3Agp3vem3X3Hyh06hNg3NbiYbcjqXlWntsAQ=;
+	s=arc-20240116; t=1744918187; c=relaxed/simple;
+	bh=BJlGURHE6MemQVjXFAMKrZK6cLY/Pa9rDV0Y3yE9/kM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LeQyu3W6eUyy+Xm7p2huN6YS8uQd8mnoXJVI0WozZuk/2vRw/mCXzpEPxGz+Mgd2lqT39PQKvAuDw94lPk3PZbBZkozGX4ENXMHJ8DujM3bGRcFnAvj2UauwcLniBUwQ8Yz58DptB5GiqWVGuWC4mom0CTsJRsqeJdmZ1DNVi9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IspLDB+V; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=EtkMBp80rEdG+YK/kQGtAwgrAnBYWfiOdwc4TpJvqjMCnS0PJkqmicz2xgMaISGXb4UB6rneF6WwVMd+SQg98Ggod4OgqmIjh0YPaJR91i0y91iyCrm9lQufUkuw+5hcAUzu4i1yxo8QeTjDlttrcIFWk3yb7FZpqYawQ9LFduA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B04kaKX/; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1KdVo7F91S5PkDs6oE07gvBkmD6Ico8AKRIVQJgRk7M=; b=IspLDB+VbgSMCuVEOA9xLcMUri
-	X+D+MRfGX5BXM0Bqj7tpX8Aage33W1Q94WicxdYFiBiERphrWN/srFcbdyMnmNRPFrHGUm75W31Q3
-	TIX4mXgqU6O3/0wfoH5W4fc2k98kFwsKDZqHsMS2VOcEIPnMTvdlUaOym++Ru7RXDoJw=;
+	bh=YYni3/1yasHUrwTdeLkDnxWGmeI3BeQA9igCHa2A0qg=; b=B04kaKX/7xRwyxbgdMBzBGab8j
+	Al3S4pwhaYRPg1+2ag8hWiVJW9j+iisbiiF+yJ36IzIUKsVgppCNYrw0g1lwwdOjIRabNRa2aDBmP
+	KZu7bV/foVoVI3/RfKUfn6lX/4MiIhRG7BZPq2e94tD9dADbibeo6zXWxSzbEVC8eBvE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u5UvG-009p9H-BT; Thu, 17 Apr 2025 21:29:18 +0200
-Date: Thu, 17 Apr 2025 21:29:18 +0200
+	id 1u5Uva-009p9t-8F; Thu, 17 Apr 2025 21:29:38 +0200
+Date: Thu, 17 Apr 2025 21:29:38 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Jeff Layton <jlayton@kernel.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>,
@@ -54,11 +54,10 @@ Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Qasim Ijaz <qasdev00@gmail.com>,
 	Nathan Chancellor <nathan@kernel.org>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] ref_tracker: add ability to register a file in
- debugfs for a ref_tracker_dir
-Message-ID: <9b9329b3-b8b7-4805-a996-837c1d36c37d@lunn.ch>
+Subject: Re: [PATCH v3 6/8] ref_tracker: widen the ref_tracker_dir.name field
+Message-ID: <6ad1f1ae-a912-43ec-aac5-de49e344e9ff@lunn.ch>
 References: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
- <20250417-reftrack-dbgfs-v3-5-c3159428c8fb@kernel.org>
+ <20250417-reftrack-dbgfs-v3-6-c3159428c8fb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,14 +66,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250417-reftrack-dbgfs-v3-5-c3159428c8fb@kernel.org>
+In-Reply-To: <20250417-reftrack-dbgfs-v3-6-c3159428c8fb@kernel.org>
 
-On Thu, Apr 17, 2025 at 09:11:08AM -0400, Jeff Layton wrote:
-> Currently, there is no convenient way to see the info that the
-> ref_tracking infrastructure collects. Add a new function that other
-> subsystems can optionally call to update the name field in the
-> ref_tracker_dir and register a corresponding seq_file for it in the
-> top-level ref_tracker directory.
+On Thu, Apr 17, 2025 at 09:11:09AM -0400, Jeff Layton wrote:
+> Currently it's 32 bytes, but with the need to move to unique names for
+> debugfs files, that won't be enough. Move to a 64 byte name field.
 > 
 > Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
