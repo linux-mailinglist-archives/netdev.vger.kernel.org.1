@@ -1,156 +1,112 @@
-Return-Path: <netdev+bounces-183978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B38A9A92E6E
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:45:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023F8A92E74
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD973447E71
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:45:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B79877B3BFE
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DE2215065;
-	Thu, 17 Apr 2025 23:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D73221F0A;
+	Thu, 17 Apr 2025 23:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Hb1HdVS2"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="r1H5HKZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A3C1A7045;
-	Thu, 17 Apr 2025 23:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E868221563
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 23:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744933530; cv=none; b=NeZw1SgYsE9RU4WYijXLJBkHgeku5GCnuB1V0Sgu4ZCgNzIQBv8o0Dgb0xvKXoQJ4lNsoEd4nyIEZjE+g9ZNhc64EyyeQUVWxvDaHZskqfpUMm8NxGhoWz3GjAA2pBszz50aPOuA2z5VLkzhiPBP3ARqjbS/5seHH0g1PvSvdlU=
+	t=1744933895; cv=none; b=HOAj0eZZj7Pxq4O0iTT214kQAPwLyifoq9gJ9oF9AeRo+rIzTY5tj+M+YH6Jp2kuKmapgHJ5ZEwPJJZz08VbgwmQBpZrGs9SaClFlTQtPCxixRS6aRl7NJdVtRVp6krZn+G+yye6GsufexbPpB0LQW874fzstz2FzNqsn3gWV4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744933530; c=relaxed/simple;
-	bh=PCzMKnJv/m8xqpDMbRazjX5Q4lJGzT8lf4RSG1UTexI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YdNWLVDPEMGcZckvCvpYTnv0rLMV2Wjj+9SnT9zK/+ZlbFcfggR2Wva8kICIXWWtYug0HWakdHSeg3Ikx9bqauZkg74HHpBRZoJAMEv5LLB3Hvdz23ipKWcWQRWrx28wzdYWedocHPGWaErMEGn6Uts1v4zlmkSYocxfcKRbMDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Hb1HdVS2; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1744933895; c=relaxed/simple;
+	bh=hM3ABLdRyopw0ewaS+2awyUUr3T3DfSD9iPcUc89vjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bTdCTMwlu+482AYZbD9TYqeJ4VVnfZB9EhaIUtT6+uqdahpOEsTiIAV7rrPvBl/K0cifozoV5TXDj4OtpQyQQBKEOUarmdP93o/Yj4we2sJLeC/y92zg7lq5wjbmwVq793OdUZ6+MDv9Iwgy/togWTaGtSoyzpj+PV9po/Q4tjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=r1H5HKZc; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-224172f32b3so1485795ad.2
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744933529; x=1776469529;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AVUgy0bGI4UEtR8bg3+HqZzgAwSJS1movKE+5Gy92JY=;
-  b=Hb1HdVS2FuxPhoikFAoSju/QzkXNSP2QVB5Cyy1pxLLFf9pIOxCtgGCI
-   fLrdXAJFSzjuvt5D2XddxDBgIilYyo7LCdn99KEGeqilqmjspP+2Th/7i
-   UvOaZIzxV+M+BF+xhsHH0s0ZbmMCpIVuiGo90zSrihS2EtpEGjDgdzXMV
-   A=;
-X-IronPort-AV: E=Sophos;i="6.15,220,1739836800"; 
-   d="scan'208";a="512497739"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 23:45:22 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:50421]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.65:2525] with esmtp (Farcaster)
- id 00fa4b48-89df-4370-969f-209fed1572de; Thu, 17 Apr 2025 23:45:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 00fa4b48-89df-4370-969f-209fed1572de
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 17 Apr 2025 23:45:21 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 17 Apr 2025 23:45:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jordan@jrife.io>
-CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v3 bpf-next 2/6] bpf: udp: Make sure iter->batch always contains a full bucket snapshot
-Date: Thu, 17 Apr 2025 16:45:04 -0700
-Message-ID: <20250417234511.39315-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250416233622.1212256-3-jordan@jrife.io>
-References: <20250416233622.1212256-3-jordan@jrife.io>
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744933894; x=1745538694; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nj/ToSb0r+plwqfjAdpVOCmQpT8fFXkYRr6EIF/VNg4=;
+        b=r1H5HKZc5I6/b1+Uux2+KALv+zXmI+L2MtKpjV0kdjoS1jxYt1c4IauFmhZ59X5v4B
+         k+pQhTSf9HsvUpbWc49+pB2xiDj24WEipWKx+TRqlAdsB7GMNlOCWhbxRSBg97dfpL33
+         VtOsEa2Uc09LOdXH2/7XBvkCFlMMEkgXxff1DRGYhAo/dOfn+Pnu+CKKsR8jim36ay/7
+         sqf32a9xEdXzoQWpajVXFQkWY42veFEPIhNZYnp6ztnQrnrRrlk+LqQp9eN3Opy8defw
+         xqOYx0ADpxdq09hHvoxZWuDOvF6iUJA2X15kwnul5KHQzsZesXwWop69/tq3X3t0S2wB
+         f3kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744933894; x=1745538694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nj/ToSb0r+plwqfjAdpVOCmQpT8fFXkYRr6EIF/VNg4=;
+        b=S0eAyxVaKUGVgzcKxjOULCdw3trWtgoXOjpCgHfw3XhjKLzbXNCdfqrBgS0f7c85kj
+         ZAOtsKZJrfx/gonXwDQAl38tsYD2fvUABD46sd7rqSxHTL/Wuzqns98a1PG+N0CpOtrd
+         hgsOVm/TTbkUhcMGhVDsrwvLKOJctKE0Gf9BGV+kIr4zpJ9JYXQPb71sxZ3eX9jkNirf
+         nmYCgDIZD+UH2OvbWyeRUrpRNoAC3dTgSRVQZhgPOmyIaYZMwbm72uAn7GIFLh3L2FvJ
+         5mnxP0ypCfaZcAHrsJST/M5juPufhZu1kWXxsyIuEnFLfQt5ovKz4XXvY2on+H7+Ic9e
+         VZ3w==
+X-Forwarded-Encrypted: i=1; AJvYcCWvbGeqwsKvnFJ+huhTPSDKMMF/nGniLyjbdNgABzXritcZm4n5mFAyPGS6mdUcpak8Rv/Os+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7ACm4hxoT48iQPsLzrzZmfGwX0JIbpdrDUR3HAVTnlfkjtzEb
+	OzJhiqYVybErU8HHGJFDYEDal9z2faKqULMCWMDWBSq5lf7V355ZtzPB03f7xTg=
+X-Gm-Gg: ASbGncsEV3Xc1WgBBglaPQ7LN0SrqIwnNYS90481V9CYiVDzsl8pXyLb6BaKbJLgidV
+	2gAkrspxhyGeoPc+ApB0T6PwB2H0oluh4rEhbdcfVNAhrtoAhQmcal7dDXydxBLbHSezAJNnHUz
+	Maq96GfPH5S2QUZqFiehCk1/kzlbhb3jW2KOxmxnTEcqxakE7lU49TFe9Xj1CFGsfm63w3NLNgc
+	YBWLmrYjQY1WVx087HAYCztjNtW/AxWwFxHvg+q0b4CPF0tXjrzrBo6O7QaJBvMVMhN8WqlV3QN
+	zT/a3D6pEcn+Uswn7IkmXvcUlCo=
+X-Google-Smtp-Source: AGHT+IHVVZK0xNoZRKGq4tFkMJsALhDgnbfvJuRYqCyu3BJW3G50lfVa+gBBJrQVQLV34DFGBLXOQw==
+X-Received: by 2002:a05:6a00:3984:b0:736:559f:eca9 with SMTP id d2e1a72fcca58-73dc15d8578mr347501b3a.3.1744933893572;
+        Thu, 17 Apr 2025 16:51:33 -0700 (PDT)
+Received: from t14 ([2001:5a8:4528:b100:2a7b:648e:57e0:a738])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbfaeb7e8sm471094b3a.179.2025.04.17.16.51.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 16:51:33 -0700 (PDT)
+Date: Thu, 17 Apr 2025 16:51:31 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: martin.lau@linux.dev, aditi.ghag@isovalent.com, bpf@vger.kernel.org,
+	daniel@iogearbox.net, netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH v3 bpf-next 2/6] bpf: udp: Make sure iter->batch always
+ contains a full bucket snapshot
+Message-ID: <aAGUAztJqwnDQquo@t14>
+References: <42b84ea3-b3c1-4839-acfc-bd182e7af313@linux.dev>
+ <20250417233303.37489-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417233303.37489-1-kuniyu@amazon.com>
 
-From: Jordan Rife <jordan@jrife.io>
-Date: Wed, 16 Apr 2025 16:36:17 -0700
-> @@ -3454,15 +3460,26 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->  				batch_sks++;
->  			}
->  		}
-> -		spin_unlock_bh(&hslot2->lock);
->  
->  		if (iter->end_sk)
->  			break;
-> +next_bucket:
-> +		/* Somehow the bucket was emptied or all matching sockets were
-> +		 * removed while we held onto its lock. This should not happen.
-> +		 */
-> +		if (WARN_ON_ONCE(!resizes))
-> +			/* Best effort; reset the resize budget and move on. */
-> +			resizes = MAX_REALLOC_ATTEMPTS;
-> +		if (lock)
-> +			spin_unlock_bh(lock);
-> +		lock = NULL;
->  	}
->  
->  	/* All done: no batch made. */
->  	if (!iter->end_sk)
-> -		return NULL;
-> +		goto done;
+> > If I read it correctly, the last retry with GFP_ATOMIC is not because of the 
+> > earlier GFP_USER allocation failure but the size of the bucket has changed a lot 
+> > that it is doing one final attempt to get the whole bucket and this requires to 
+> > hold the bucket lock to ensure the size stays the same which then must use 
+> > GFP_ATOMIC.
+> 
+> Ah exactly, when allocation fails, it always returned an error.
+> 
+> Sorry, I should've read code first.
 
-If we jump here when no UDP socket exists, uninitialised sk is returned.
-Maybe move this condition down below the sk initialisation.
+I was about to type out a response, but Martin beat me to it :). Yep,
+GFP_ATOMIC is a necessary side-effect of holding onto the lock to make
+sure the bucket doesn't grow anymore. It's a last resort to make sure
+the batch size is big enough to grab a full bucket snapshot not a last
+resort to allocate memory.
 
-
-> +
-> +	sk = iter->batch[0];
->  
->  	if (iter->end_sk == batch_sks) {
->  		/* Batching is done for the current bucket; return the first
-> @@ -3471,16 +3488,30 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->  		iter->st_bucket_done = true;
->  		goto done;
->  	}
-> -	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
-> -						    GFP_USER)) {
-> -		resized = true;
-> -		/* After allocating a larger batch, retry one more time to grab
-> -		 * the whole bucket.
-> -		 */
-> -		goto again;
-> +
-> +	/* Somehow the batch size still wasn't big enough even though we held
-> +	 * a lock on the bucket. This should not happen.
-> +	 */
-> +	if (WARN_ON_ONCE(!resizes))
-> +		goto done;
-> +
-> +	resizes--;
-> +	if (resizes) {
-> +		spin_unlock_bh(lock);
-> +		lock = NULL;
-> +	}
-> +	err = bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
-> +					 resizes ? GFP_USER : GFP_ATOMIC);
-> +	if (err) {
-> +		sk = ERR_PTR(err);
-> +		goto done;
->  	}
-> +
-> +	goto again;
->  done:
-> -	return iter->batch[0];
-> +	if (lock)
-> +		spin_unlock_bh(lock);
-> +	return sk;
->  }
->  
+-Jordan
 
