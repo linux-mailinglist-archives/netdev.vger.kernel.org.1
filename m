@@ -1,110 +1,163 @@
-Return-Path: <netdev+bounces-183671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A600A917E1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:31:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86371A917F2
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 11:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B768B1907851
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:31:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 997BE46026D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D5821ADD6;
-	Thu, 17 Apr 2025 09:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42219224AED;
+	Thu, 17 Apr 2025 09:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hVycZnPz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k29KGtt+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636AF1898FB
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 09:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183C71898FB;
+	Thu, 17 Apr 2025 09:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744882270; cv=none; b=uFoHstaHxKekXB3sdeYEGyV654+83Jg/mOnmP2xUaWdJPZxzystaSfqN5PiCo55msBPlXFCWU8B5A9acy9rUyYMCZJRsl5mtvpPeXjAd8dwoEnm9eoNLl8nq+g/RTMRdWawoSjQ2dCiWV5vGr6BRF773sFc8GoJrxwNMKyccrpo=
+	t=1744882366; cv=none; b=gvPELEBsoob70y5sa1GVwb9duF7GXV3pAoZjTd9AcHcOTvHDZ56Wli4oN0Mu6JLMRDp2EBKD6iqdao5SF3V0UcggWrTaiimzAGztsLfzLU6Gr31tQnHUzKxZSfzHi7UJzG4IGu+3nIzhy0Uv1aahYpj9rla5noGGi5UH1LxvAFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744882270; c=relaxed/simple;
-	bh=F9Y0DmU3wEHCJH5F3T95MiuKcenBBiSBi8gA0omO2Jw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ErtorcZShkpwbEpkagH9WrSd195HrjLt1Gv2ysj0z6CSMbbpiGxByvsLoYkv2mk95/bljvO5UWa/Gj2mNynH3yR4uqhBiHwXas+sGjBAG95OhaGU/VYQtVmIN1ZtX1q8sIh+7C+FI8FPL1CSZ4mDhBhCDieAWoEb3/Z5wstbNVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hVycZnPz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AFEBC4CEE4;
-	Thu, 17 Apr 2025 09:31:09 +0000 (UTC)
+	s=arc-20240116; t=1744882366; c=relaxed/simple;
+	bh=Zb/CqSlcOUut/5T3AdDax3Vuf8gXBn3OO7ZVAZMyQUg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cGZ340gwGbXYgIyVzX4fzNUZcj5wDABVjchbOU7L2h14ZLfJ1jyfpH9xVJ1JmpEsF7oZhr2uTbPwTYPGGnbjIjYA5csHP58D3zaZXbjUxT1QFJevDkjMhH5aSuyzuLvdKrMJnZ1Hd13PFTAahRu8UEQBfgbu93qA+oPN7zA0Qzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k29KGtt+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC010C4CEE4;
+	Thu, 17 Apr 2025 09:32:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744882269;
-	bh=F9Y0DmU3wEHCJH5F3T95MiuKcenBBiSBi8gA0omO2Jw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=hVycZnPzum4yr9YF4zE6ZoE1n4jiB7kwZGrvFjJoajF1H/89TXibD7P5tQp7F692c
-	 kmYIs1RFigJ3uAxAtUeaEEjSrwdWb8f00j6CdH17Kq/zBQzrkxRYw8K7SLd+rPtLa4
-	 VeVWaugCImE+1VDru/5y1tFAsTIGnQ1XoaGDhhVHQzF7drAEeq4K7sNxGCEZmt2yj0
-	 d6X4Mz2jfteqN5esQoC9TrE9IPoZEmphntToDgnM3XNd0IkHswztc2W2bRi9oXoxDu
-	 KIIEPuqEg25QybHDIoIH7vhNpbmUzhDthXgVups+MCSxb6Z1uCtzwipUElMg0OWfvi
-	 YNgabBdnzSMRA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 17 Apr 2025 11:30:47 +0200
-Subject: [PATCH net-next v2] net: airoha: Add missing filed to
- ppe_mbox_data struct
+	s=k20201202; t=1744882365;
+	bh=Zb/CqSlcOUut/5T3AdDax3Vuf8gXBn3OO7ZVAZMyQUg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k29KGtt+P3cNQc+suTL3QSw7NZtlc/D5oV3IOKwvRilKlQuSxtukZgM6qdOn5g/gR
+	 2eoWhoA+VMReZUOaT39l2QLQk3UxWwq5ZpB9ZldZrQHV2RZfKEyGoDLHesdcFBvR58
+	 CwTeIUrIcyYIQpIWwzo3NnLrb012+WJfp5R1lBvc0xOYrzssrpvgMsGuPTDdkKiTJv
+	 bXK3ZzrmnmwC2+o0SYC6nJnOIqeeOxYfJrNloFGKu0uqiVnQORcaxzMwdCqri5rAED
+	 DzIE9FHhKYRXzQldjH/VAnrhlw5M3CHapYvwNqNerkdNAVjxszWuTUHdB6PxeER8bk
+	 OBK2oji2EyKvQ==
+Message-ID: <bb7e20d6-9eb9-4fe0-9a73-565dfbd4ed14@kernel.org>
+Date: Thu, 17 Apr 2025 11:32:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAEbKAGgC/4WNQQqDMBBFryKz7pQkRE276j2KSNRRh7aJJCIW8
- e5Nha67fJ/PextECkwRrtkGgRaO7F0CdcqgHa0bCLlLDEqoXGip0XLwo0VyZW4k9rziNFH9avx
- ad3a2qHppjOhLbYoWkmUKlE5H4V4lHjnOPryP4CK/68+d/3UvEiVqLUxbiMZeCn17UHD0PPswQ
- LXv+wcWwJXizwAAAA==
-X-Change-ID: 20250414-airoha-en7581-fix-ppe_mbox_data-2f1880f7486c
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V4 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org,
+ makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
+References: <174472463778.274639.12670590457453196991.stgit@firesoul>
+ <174472470529.274639.17026526070544068280.stgit@firesoul>
+ <87tt6oi50h.fsf@toke.dk>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <87tt6oi50h.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The official Airoha EN7581 firmware requires adding max_packet filed in
-ppe_mbox_data struct while the unofficial one used to develop the Airoha
-EN7581 flowtable support does not require this field.
-This patch does not introduce any real backwards compatible issue since
-EN7581 fw is not publicly available in linux-firmware or other
-repositories (e.g. OpenWrt) yet and the official fw version will use this
-new layout. For this reason this change needs to be backported.
 
-Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Add more details to commit log
-- Link to v1: https://lore.kernel.org/r/20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org
----
- drivers/net/ethernet/airoha/airoha_npu.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c3611b4a154d19bc2c 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -104,6 +104,7 @@ struct ppe_mbox_data {
- 			u8 xpon_hal_api;
- 			u8 wan_xsi;
- 			u8 ct_joyme4;
-+			u8 max_packet;
- 			int ppe_type;
- 			int wan_mode;
- 			int wan_sel;
+On 16/04/2025 15.56, Toke Høiland-Jørgensen wrote:
+> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+> 
+>> In production, we're seeing TX drops on veth devices when the ptr_ring
+>> fills up. This can occur when NAPI mode is enabled, though it's
+>> relatively rare. However, with threaded NAPI - which we use in
+>> production - the drops become significantly more frequent.
+>>
+>> The underlying issue is that with threaded NAPI, the consumer often runs
+>> on a different CPU than the producer. This increases the likelihood of
+>> the ring filling up before the consumer gets scheduled, especially under
+>> load, leading to drops in veth_xmit() (ndo_start_xmit()).
+>>
+>> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
+>> ring is full, signaling the qdisc layer to requeue the packet. The txq
+>> (netdev queue) is stopped in this condition and restarted once
+>> veth_poll() drains entries from the ring, ensuring coordination between
+>> NAPI and qdisc.
+>>
+>> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
+>> the driver retains its original behavior - dropping packets immediately
+>> when the ring is full. This avoids unexpected behavior changes in setups
+>> without a configured qdisc.
+>>
+>> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
+>> (AQM) to fairly schedule packets across flows and reduce collateral
+>> damage from elephant flows.
+>>
+>> A known limitation of this approach is that the full ring sits in front
+>> of the qdisc layer, effectively forming a FIFO buffer that introduces
+>> base latency. While AQM still improves fairness and mitigates flow
+>> dominance, the latency impact is measurable.
+>>
+>> In hardware drivers, this issue is typically addressed using BQL (Byte
+>> Queue Limits), which tracks in-flight bytes needed based on physical link
+>> rate. However, for virtual drivers like veth, there is no fixed bandwidth
+>> constraint - the bottleneck is CPU availability and the scheduler's ability
+>> to run the NAPI thread. It is unclear how effective BQL would be in this
+>> context.
+>>
+>> This patch serves as a first step toward addressing TX drops. Future work
+>> may explore adapting a BQL-like mechanism to better suit virtual devices
+>> like veth.
+>>
+>> Reported-by: Yan Zhai <yan@cloudflare.com>
+>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>> ---
+>>   drivers/net/veth.c |   49 +++++++++++++++++++++++++++++++++++++++++--------
+>>   1 file changed, 41 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+>> index 7bb53961c0ea..a419d5e198d8 100644
+>> --- a/drivers/net/veth.c
+>> +++ b/drivers/net/veth.c
+[...]
+>> @@ -874,9 +897,16 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>>   			struct veth_xdp_tx_bq *bq,
+>>   			struct veth_stats *stats)
+>>   {
+>> +	struct veth_priv *priv = netdev_priv(rq->dev);
+>> +	int queue_idx = rq->xdp_rxq.queue_index;
+>> +	struct netdev_queue *peer_txq;
+>> +	struct net_device *peer_dev;
+>>   	int i, done = 0, n_xdpf = 0;
+>>   	void *xdpf[VETH_XDP_BATCH];
+>>   
+>> +	peer_dev = rcu_dereference(priv->peer);
+>> +	peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
+>> +
+>>   	for (i = 0; i < budget; i++) {
+>>   		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
+>>   
+>> @@ -925,6 +955,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>>   	rq->stats.vs.xdp_packets += done;
+>>   	u64_stats_update_end(&rq->stats.syncp);
+>>   
+>> +	if (unlikely(netif_tx_queue_stopped(peer_txq)))
+>> +		netif_tx_wake_queue(peer_txq);
+>> +
+> 
+> netif_tx_wake_queue() does a test_and_clear_bit() and does nothing if
+> the bit is not set; so does this optimisation really make any
+> difference? :)
 
----
-base-commit: df8398fb7bb7a0e509200af56b79343aa133b7d6
-change-id: 20250414-airoha-en7581-fix-ppe_mbox_data-2f1880f7486c
+Yes, it avoids a function call. As netif_tx_queue_stopped() inlines the
+test_bit() here, and netif_tx_wake_queue() is an exported symbol.
+I'm being very careful that I'm not slowing down the common veth code
+path with this change. Your suggestion is a paper-cut, so I'm not taking
+this advice :-P
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+--Jesper
 
