@@ -1,159 +1,134 @@
-Return-Path: <netdev+bounces-183883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB45A92A9A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 20:53:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FEFA92AFA
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 20:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D37B4A6AD7
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:53:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67E011B6561E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED394259CAD;
-	Thu, 17 Apr 2025 18:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE115257425;
+	Thu, 17 Apr 2025 18:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S0p7/yyS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OaBbzMx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEAD2571A1;
-	Thu, 17 Apr 2025 18:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8079025525C;
+	Thu, 17 Apr 2025 18:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744915872; cv=none; b=hIrmCL74hsPFWL/3MX/a+otBwzx2/MdZp7a8UtbR9w0C6Cs72IKhcRBaCbVIgqGNS15EdeImsXEWq/JT9vyqUT784eSVR009MDb28PybO5gk6MfM6D4S7cyABxuRXe0xN7pMJnLfiqPvKqCfrNtlbI/rONkKzJ8uCwDm2jWWYaM=
+	t=1744916083; cv=none; b=cKHwn5BiQC0fEzKylvNeEtNzbNHTf+H5fbXJheyZCkoNyEUG+4LG98T7fC2kvZZ57Ui4pTmgS29/V3VrfW5qLuhZFOLs3rDsw5qLK3irMfBroOM7WjhYPCaT+HcDevMBi4yFlk3m5+qOUEMtYJVmAiZ2Hg1gAvabXsDyCa2wMFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744915872; c=relaxed/simple;
-	bh=65Vd07+eu4sGros2pqdClyFy6VqYsYQhxtJYsLClcvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d59m1GZwzxyP6B7Du8TFyP4hc4m9zKkeYqW2rRymG24c5DrJLJEzljqB1Hy5VXU8eKLJVtK4xe4Q7PXSDxi0wlOqh7Nd2mmXvA66izbzti8AY37fHevuEFu6mJTXooi1f5MjrX+PjYfD43SovxIJaZDbDPrxiSGh4NxWD04FMH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S0p7/yyS; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-af589091049so897767a12.1;
-        Thu, 17 Apr 2025 11:51:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744915870; x=1745520670; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EbHnfA5ct33ORVZ7TPi/aq+sM7vHxqt+w+RbszLa+gE=;
-        b=S0p7/yySlbVOyHTzdRIheW5hGa3TSTccneyTvBMap0y6Rp+icg1/lmUanOq+JUD4Wo
-         gCFU54RwMiFtql6BFjbnVQchqdQFBEKXqDjT5qh4k0tZOQ/x20mM7SJ9Rk4SWhwR6XgD
-         QXh4iMDW0fbPqRDRn6vN0IZxfoOEsMPXwJPbxjSERjBpKrBGqr5nj0QFl8IkmeJLJjbf
-         AivQd48/tHoPpXX00ZDgbeYPfynnSNgEjlm5tOSIWQd0PN/2ZONd05rtGQrjJKDskjvi
-         Suyi6xS4yWQOq7Ygo8wMeAzVNXEgT5inbFj5ivpLBoSr/HZ6TjlMcZL9fD0LYHLfGuVm
-         jTZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744915870; x=1745520670;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EbHnfA5ct33ORVZ7TPi/aq+sM7vHxqt+w+RbszLa+gE=;
-        b=h95f8U0myTiUvCM1SBXaqDGPtVugPVbZbQvU2dDN/ZfW6uXzPPsdvq7VCQBn2MZKCS
-         hIsiBn9EQEoMMYC0tL+f/iSLd1BJ9Ih9DSAprB21vPnz3yFuIUMXGyQFI+JnHjqjXNsX
-         HYV/wHYLliRcmKl2plBmh0+z2nkvvV+Bt1WT7rLhWdPBexY2ABwpUEGRsRabslFAI2Qq
-         PuwOpplJaM+4uyano7Z6ko++oH+2ZVQ04gcrvXnzI1HezSH7eYuegXLdPBiPYIMIvxwQ
-         pmcylIC2Tt0QN2ZrFs8/LszG0wzTTC9Az2ambG83JYU9uJUpB8viPcHTkrAfDdKD1oj4
-         qq6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUJM1t2QloonbE2FvvyPEv5I2uvlQvZ+CvvLeRwja4RPeRmTYenU2fFQy8p+Lr/HcqLFHGaNp3C@vger.kernel.org, AJvYcCV+j7KyN0mcEN36xD2NK5EK1m9jQEzL5kw1kxO7f7hmHEQH8h69/vGK8Hq79Q21P1CJhHpYwzv2kuBUMQsYuDYOusrJ@vger.kernel.org, AJvYcCWlNcxt0mQKzfZQBZSEs3/7wch9o44Wat64xxP4d2tL/bLTTJrAazkFhLFD0rSHN7uqngr8otJT4Cu7Yn0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSe4sno406GiFyUqdYJvhqShlJaNrlOEH8oSgcT7QC/yNb+U4U
-	4v7DNs6FjURArKXFF4lJa9vkQDd74pXEePJRML/rbZ1BImWD3+qd4Vp5xEur2Fs=
-X-Gm-Gg: ASbGncsqE9rklzLMcuVTNUa/++JjdGx/jspAumQRyrgB3sRGj2i5StqTFeBFnAnP7r/
-	xmnZTmiyNnR/vEYuD4RxzIP8hG7OGyi1IgGJF9xr9wNa5In6Z87dX2suZKrL+LrB+r7fPZtM/Iy
-	LPeORJzSX2On13Nibqvv6npOh1aFlVCvQ1gk2KG7D0U0CXiOJYnO5qyNkUoXTprcb6w7c+AovZG
-	CzNfZBsIAe6kVljKKg/a+vv6SAIScRNgEyU7GqafEWGl9U53OAnhswRFMYXi+fpXT+puwtfH+D8
-	1xXA1JBSV4eOsHQTS7cQZTqPVaiXOcjY9c0gKYDnMmLK
-X-Google-Smtp-Source: AGHT+IFvPh3/w+OkOXKkRlC6hIs8p5S4OKSna69ZSXyEm+nJ0unq0K6ZwOVCOOEtJ2ttLK51bu4ktg==
-X-Received: by 2002:a17:90b:6ce:b0:2f6:dcc9:38e0 with SMTP id 98e67ed59e1d1-3087ba51b57mr233223a91.0.1744915870440;
-        Thu, 17 Apr 2025 11:51:10 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bdaad1sm3615545ad.28.2025.04.17.11.51.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 11:51:09 -0700 (PDT)
-Date: Thu, 17 Apr 2025 11:51:09 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: Introduce tracing
- capability for sockmap
-Message-ID: <aAFNna3T2tzj9VZt@pop-os.localdomain>
-References: <20250414161153.14990-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1744916083; c=relaxed/simple;
+	bh=AijTzh06cU5c+nk761J4Px/pUYybx8GA+cT1GpZPBSY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=T11enXOoelEIDYrN1oRpPk0C1aqJp1N8CY9PJN34FDxR3GP/TgtiIyaqFYk1LIz5T1JwJ0UlXdcdBU2eX7rcyeUn/jN+3e/EJew0yfA5aqCD0B1OU8TPvypi4mVcSf8QfzgAqcalOEbB+OUT7dXwInbCUaqwJMJg8WZr42Tzpuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OaBbzMx7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0024EC4CEE4;
+	Thu, 17 Apr 2025 18:54:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744916083;
+	bh=AijTzh06cU5c+nk761J4Px/pUYybx8GA+cT1GpZPBSY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=OaBbzMx7wr81S6nw8TMu6DA1xBqopq7Lu5bV7a8NXQod/mV+y6D85/CZi0bKTAPrF
+	 9WKe0NN9F8wIXRO9ssu2MMRJt/lVPeiE8i9q8j2EQ/3kT+vbMxf8YqcZIKc6kIKSDQ
+	 EC9+V6jUkruJh0bv/HkxAlbkHjztGgD1Fs0kMSNiEV04qplyRXQSags/buTYAj0gsf
+	 KxuzNNkZcyaGJUgj0wnfdgTxULKG5+m87I8WFbMuStCTlmHJ9Hf7csHv/aTKeJQG20
+	 L3MYUi+cl8u4KpPX1l7nW8G+Fhxd17DYYVK3oef/7YArGd154ViezQzDlVOSQz5Pgy
+	 OEzrJumXrvDHg==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Thu, 17 Apr 2025 14:54:36 -0400
+Subject: [PATCH] sunrpc: allow SOMAXCONN backlogged TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414161153.14990-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250417-svc-somaxconn-v1-1-ff5955cc9f45@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGtOAWgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDE0Nz3eKyZN3i/NzEiuT8vDzdJDMTQ+NkwxRjy6Q0JaCegqLUtMwKsHn
+ RsbW1ALHXlXRfAAAA
+X-Change-ID: 20250417-svc-somaxconn-b6413c1d39bf
+To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neil@brown.name>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1841; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=AijTzh06cU5c+nk761J4Px/pUYybx8GA+cT1GpZPBSY=;
+ b=kA0DAAgBAA5oQRlWghUByyZiAGgBTnHIABBSAm5rypWb7aJhn01WHwwYfkoPVdlpZqGzgxyTt
+ okCMwQAAQgAHRYhBEvA17JEcbKhhOr10wAOaEEZVoIVBQJoAU5xAAoJEAAOaEEZVoIVSuwQANLh
+ 5/I0T3sPM2G8QDNJ5UgxpbEDCcugS15Jhid359XLFBGP/3zBXnK4cfGyGMag/v9W+IMLS5VLJIR
+ Jz+npdjxA4Q6Q3qqKwto7btN/TGgFhf3sXtMqdVcCNNjSWuByrk4E+kXuFA60segh4TzvoMydLK
+ XgG4jlgQW2kpM/NSewn0WQ3F8yEizV3fQe1ijz/uT5FPZKNwMpMTgz3b+GiyU1wEYgS6qUHtq/e
+ obrsLtCarLsQEKWSZKBRESdWAQOwMYMm/1s+J7ZNgkbC98WmwOQbkWB4jSa6mVu2DkYBa3EcCBc
+ 2sy/lxcisIKMMbic0jW+AHJCB5bVSUurQyJ4af7AawiLUDho1tlcqGAI4iHTAw26xFh6EoZ3c0P
+ O1z4UXQihqDU7u2kjxJmmS0DIjWp9y8iVRBxcCdsq/vtH8Fe6AbeardInTVyScRJwlTO++3zDPJ
+ tONtZDeZFP9ARVJtY+QNgH3Pqr85ny2tRj7oXjS+95u9L1spK5ejDqakA9PJG+zjiFPs3x0O1bU
+ zIIbXaEn9r53ujnTf4MddblFib2YeQEohJBe4Xct7+2aBtCPEbbjVo7oVf22T0ZpxLKhd8x27L2
+ tJqLylYdibfraQ8Xr5McsSzQh+4QUsp/n93BZ4NoGylx4N+LC7cQVr3ym2TuqQvEF00eSpFJ/fX
+ VL3Y+
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Tue, Apr 15, 2025 at 12:11:45AM +0800, Jiayuan Chen wrote:
-> Sockmap has the same high-performance forwarding capability as XDP, but
-> operates at Layer 7.
-> 
-> Introduce tracing capability for sockmap, to trace the execution results
-> of BPF programs without modifying the programs themselves, similar to
-> the existing trace_xdp_redirect{_map}.
-> 
-> It is crucial for debugging sockmap programs, especially in production
-> environments.
-> 
-> Additionally, the new header file has to be added to bpf_trace.h to
-> automatically generate tracepoints.
-> 
-> Test results:
-> $ echo "1" > /sys/kernel/tracing/events/sockmap/enable
-> 
-> msg/skb:
-> '''
-> sockmap_redirect: sk=000000000ec02a93, netns=4026531840, inode=318, \
-> family=2, protocol=6, prog_id=59, len=8192, type=msg, action=REDIRECT, \
-> redirect_type=ingress
-> 
-> sockmap_redirect: sk=00000000d5d9c931, netns=4026531840, inode=64731, \
-> family=2, protocol=6, prog_id=91, len=8221, type=skb, action=REDIRECT, \
-> redirect_type=egress
-> 
-> sockmap_redirect: sk=00000000106fc281, netns=4026531840, inode=64729, \
-> family=2, protocol=6, prog_id=94, len=8192, type=msg, action=PASS, \
-> redirect_type=none
-> '''
-> 
-> strparser:
-> '''
-> sockmap_strparser: sk=00000000f15fc1c8, netns=4026531840, inode=52396, \
-> family=2, protocol=6, prog_id=143, in_len=1000, full_len=10
-> '''
-> 
-> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
-> Suggested-by: Cong Wang <xiyou.wangcong@gmail.com>
-> Suggested-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> 
+The connection backlog passed to listen() denotes the number of
+connections that are fully established, but that have not yet been
+accept()ed. If the amount goes above that level, new connection requests
+will be dropped on the floor until the value goes down. If all the knfsd
+threads are bogged down in (e.g.) disk I/O, new connection attempts can
+stall because of this.
 
-Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
+For the same rationale that Trond points out in the userland patch [1],
+ensure that svc_xprt sockets created by the kernel allow SOMAXCONN
+(4096) backlogged connections instead of the 64 that they do today.
 
-Thanks!
+[1]: https://lore.kernel.org/linux-nfs/20240308180223.2965601-1-trond.myklebust@hammerspace.com/
+
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+The backlog was set at 5 in v2.4.0. Neil changed it to 64 in 2002, and
+it's been set to that ever since.
+
+This is particularly needed for servers that are started via the netlink
+interface, so we don't regress the behavior that Trond's patch fixed
+with the sockfd-passing interface.
+---
+ net/sunrpc/svcsock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 72e5a01df3d352582a5c25e0b8081a041e3792ee..60f2883268faf15b8e01a5d12d67a5d01b278a5e 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1542,7 +1542,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
+ 
+ 	if (protocol == IPPROTO_TCP) {
+ 		sk_net_refcnt_upgrade(sock->sk);
+-		if ((error = kernel_listen(sock, 64)) < 0)
++		if ((error = kernel_listen(sock, SOMAXCONN)) < 0)
+ 			goto bummer;
+ 	}
+ 
+
+---
+base-commit: 01bc8a703933a0b7b76e6d6fbc58e4f1d5b64ae5
+change-id: 20250417-svc-somaxconn-b6413c1d39bf
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
