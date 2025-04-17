@@ -1,163 +1,425 @@
-Return-Path: <netdev+bounces-183913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209C4A92C9C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:27:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4493DA92C9E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 23:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98FD619E346D
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 21:27:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BB5C446C59
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 21:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0D120A5CB;
-	Thu, 17 Apr 2025 21:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC3F209F54;
+	Thu, 17 Apr 2025 21:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FATlM6Tl"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="J7MZN0Xl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF131CEADB;
-	Thu, 17 Apr 2025 21:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744925227; cv=none; b=Bxu8B7fCpUSqvLdN4ZMTBvvUj+HVS0ctmsoidrwdBE9aenxAkiSS34kapU/bCihbkX25AhIrUqAt2Z9qAfy1ANu23jSWDEP3OStVb1VPmRSWY31t+SsEqMLkPragx50RnmMu2Ml0k3s+jnWaWMgWt+4lV23Urr0t1D4oKYMoRkQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744925227; c=relaxed/simple;
-	bh=9fGuJ2OM5jP0toDKrO5NG1R37dvyUumeQ+N+uCLWm60=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cg38541KLiaO0DEevEO9mW2EraewJn43BLZnefvSDaT/q/Q6wLI7rqZC+U+b72Q+RnjFn5cH9UaclnT8MWdR7U78QjygI50czqtxY3t0dOTKoFhDZIVSpU7+y4cVXaFFf+YlbbvgIcm1Xyz2txb1Jh4oawgyi15FjoMXWn/8b3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FATlM6Tl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DFD3C4CEE4;
-	Thu, 17 Apr 2025 21:27:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744925227;
-	bh=9fGuJ2OM5jP0toDKrO5NG1R37dvyUumeQ+N+uCLWm60=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=FATlM6TlGM8brzGPM2heWOYXTU94FImSeMBkzutcSyi3cj56oI5prauhJktOE7jTZ
-	 Lx9d/Mdu6DzKLszOfqs11lki32uJxLJuaxoFSqHW2H4KVQqZHttr4EbKQBLx0qpwPD
-	 U/cl9mWH1DhBt/NSjDMGTMZjC6KimeV/5zlJ+0kCWO9Fwb+UZQnB+TilOhvzwy0wiF
-	 wBC73U6SOXTH0V7uuBZR3FxzsHbbbtaCM4Dp3pXTwwlyYCv6x8WBvRsltmaqyCfkk4
-	 UJyuBMEfL86peWFAclyj2K5fHp8wfu9P/Ot+Of+PvUfP/TMSAKQLZlhBSF1uHFEfpA
-	 tM8Rcs+6Fq0yw==
-Message-ID: <c635c6024a18e9a3bd1f3832521f1976377fe314.camel@kernel.org>
-Subject: Re: [PATCH v3 6/8] ref_tracker: widen the ref_tracker_dir.name field
-From: Jeff Layton <jlayton@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	 <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz
-	 <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Date: Thu, 17 Apr 2025 17:27:05 -0400
-In-Reply-To: <6ad1f1ae-a912-43ec-aac5-de49e344e9ff@lunn.ch>
-References: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
-	 <20250417-reftrack-dbgfs-v3-6-c3159428c8fb@kernel.org>
-	 <6ad1f1ae-a912-43ec-aac5-de49e344e9ff@lunn.ch>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.0 (3.56.0-1.fc42) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E38018D63E;
+	Thu, 17 Apr 2025 21:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744925381; cv=fail; b=Bv2esunOp+G/i2fSNpIAMTFTaj+85Sc4mvgkxds13HTQmsr0MMxnhlt5nXO0A4hLmp/T9TviwFLTTXqQT9nIUcuxVIYYOGVJMn8QInOJs58klWIMRarbSKrC4HaeLwTO3OFtuFi7iD1LdHnJ6eH3vpAsTIrZ5KVqjOel8qqlHoY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744925381; c=relaxed/simple;
+	bh=UQomPrVLyAgkECl7KBa6LW+sbOQyJUXX8CIekf2XII4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BQuUMey20mLSf7/0jCulQfPWY6KiOZifUWaYg0B6MRNHrbCaNyq6AZ/oVyh8JcYRdWHrVYHTkmEF0aqbJXifTzZzS73Ujbt4WM1thohRrnm6rpdOPosFyAhqxby1puWbFPwjUWV1iiFdtb2/gzVUorumYNu47Z5Ktd9LWcGFi7w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=J7MZN0Xl; arc=fail smtp.client-ip=40.107.220.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UugsXVBFGSaCibKDdmzYeMsTZbTrRdebYVZhF7F8Hl6DM+7eNZMq0g+YETot25NEzNXY1oy5k8i8P6k/WT5fz1Zs8bidg/PydaURtuVmuTz/w5uHN1q0SAxk3o1BBhqnhmnSFqms2zycf29MsKUdUznYh9nFEEQG3dmcJ5tSHr8QfH/2RopDwJTZei00m2Yw+IKSUY9A/xaapkL3BlODBLAYgAA6yVIHX62Yxe+G9f9INO188MT4HkRskxuqp1HOK/JmKbV7hlaxaWKJky66G0zzbgr1giIRFekD0EGC0xLobybaBdQD2dAmRoVDamalMhh20wu14uUsLgAAxK9XgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TjOYaPOqAb6FZyevTQxrPj2gGXxZwK+blEroHzOhNg0=;
+ b=ftzumG58RoaQ3iG9pz0D3t6rFbAvuWVdZ3rxp9Dw+31bpfI4LqkwR8kp9r5UMhX+2ObRjpAwWHw+odsNirmevf8cluSfeN2LZvRypWaNXm31fKqHrKFD16C1UmslNEm1Xiaal2uKibyjojsgFfKYvz7eCaxNGJS/e3/A2uUqczUAXKtMe/672Yn+vEMTgAphQ2vvmfG4Gozf5/FMRxs82WwWAUL4fFCHn1Bzu+gkM3yIf3WJLTkrnm9+AoAIinDstoW1AqgZn/A2pGpqR0GBhLQ4vedjHJRZf04u0OuY99O7WQ+h4XlmstwxE4gyJ8g3VGUMfCT4yx9TSn1R6wwLSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TjOYaPOqAb6FZyevTQxrPj2gGXxZwK+blEroHzOhNg0=;
+ b=J7MZN0XlZ68fA1yNSPCqXlQbco2UKKK2d4qROIFye+tVCMAfC+ArkLEiwm4pNx/v9DMArkjDFC5c2PIg+keEz8VPvo42LFtBcJMnNEa5oWVJiVUwhktJcJXAnPoFDZOto5TI95jPeQoMOmluhJiFdNW8KhVcK/l/6GAlV+sCBj0=
+Received: from PH2PEPF00003848.namprd17.prod.outlook.com (2603:10b6:518:1::65)
+ by BN7PPFD6BF22047.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6e4) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.36; Thu, 17 Apr
+ 2025 21:29:36 +0000
+Received: from CY4PEPF0000EE36.namprd05.prod.outlook.com
+ (2a01:111:f403:f912::2) by PH2PEPF00003848.outlook.office365.com
+ (2603:1036:903:48::3) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.32 via Frontend Transport; Thu,
+ 17 Apr 2025 21:29:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE36.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8655.12 via Frontend Transport; Thu, 17 Apr 2025 21:29:35 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 17 Apr
+ 2025 16:29:34 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
+ (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 17 Apr
+ 2025 16:29:34 -0500
+Received: from xcbalucerop40x.xilinx.com (10.180.168.240) by
+ SATLEXMB03.amd.com (10.181.40.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 17 Apr 2025 16:29:33 -0500
+From: <alejandro.lucero-palau@amd.com>
+To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>
+Subject: [PATCH v14 00/22] Type2 device basic support
+Date: Thu, 17 Apr 2025 22:29:03 +0100
+Message-ID: <20250417212926.1343268-1-alejandro.lucero-palau@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: None (SATLEXMB05.amd.com: alejandro.lucero-palau@amd.com does
+ not designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE36:EE_|BN7PPFD6BF22047:EE_
+X-MS-Office365-Filtering-Correlation-Id: 37922065-821a-4c3f-0ec6-08dd7df6f36a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WEpya0RFZ0Jsd1lzOFlJNzQ2bG05OWx3Mjh6QUZLalpkeGJWbk5IbWl1Ukc1?=
+ =?utf-8?B?aU1zcEZnQVQ5SlVjZ3Q1K1RTMXJpbGtObFRmaWtOWTg1NCt6T1ZEaXk0blo1?=
+ =?utf-8?B?dWl3NjdndjVwZGRic3BWNHB5YlphMUlFdHVFUEVsUFJIalllSy81NU5tcFlI?=
+ =?utf-8?B?WmRTTXhXZ3MwNjBacndCWnBrdFgxKzZrUUVYVFhTM014aFNRd2hyR1JETlNY?=
+ =?utf-8?B?TmJ6NDdBb25ob01MemkxVldmelpPWFlRc3NkejNqYUhCdGZUQitkU0tZNVR3?=
+ =?utf-8?B?aUNCODFQNHJGdWVrbjVpRzBUemtLZFhIZytJcDB0dGpZcjVVVHViTGc0NnZl?=
+ =?utf-8?B?cXk5QmpNMnJiRjZUb2NiOVdHV01nWGhUc1JXZWUzYnViZmtZTGJYbXZKMTd4?=
+ =?utf-8?B?QVZrTTk3TEIzaUYwZmU3Z3hjbWZSMnV1SUJwaW9nd21sZEhBRU4rRDhZTGVp?=
+ =?utf-8?B?SmZzSElIdlUvQW4zMUt0SmJGbUFWRDRERGg2Y25mTGk1Y1IwKzUvb1pzMFZm?=
+ =?utf-8?B?QnhPZkVpQ0VLYmpxd0JuaksxWFlGOURxY3dlMWVQQnBFM3U5RGpFYzVnM0lK?=
+ =?utf-8?B?MkhXN2hUa25nNlM2K2ZVckVoVEs1NG0ybitycDJGWjFQcmpkcTUxUVI2aG11?=
+ =?utf-8?B?VDlFeEk5ZlRrUHRLL01MeDNoMUlPRk9RVTdOdE9NeUJLM2N2OTd2SVZSYllo?=
+ =?utf-8?B?c0tYMHZ5SkEvOXZyU0R4b241WEswcG44RXNUTjFWS1dWWUdTWnVKRU9zZ2tz?=
+ =?utf-8?B?UnlCbVZXRjllNmdGMEowek03bUVDQlU0NG9wd1JDd1d2RFdQdzc0OFRmT1hY?=
+ =?utf-8?B?N2o4QWFpZFdVUkN4bFZBL3RXQ0hEQXhQMGdwMWFPWjVLZ09FblQydnFMaVMz?=
+ =?utf-8?B?Q3crMXhSSEYzMGVWVDRLNm1vVlhJOGRiK0ZGWG5UUTVoK1MveDVEdHR1VUt6?=
+ =?utf-8?B?R2xDR1Y5YllKTGV4MTc4cDFOeVd6NXFFVXprMHdTYkxsS2l2Y3BZR1NtVkox?=
+ =?utf-8?B?Q3dLaHhyWnk2SDlrMGhsTjRlTk9hNU1oZzJwMXJkTWRxNWh2blVDSHArblFu?=
+ =?utf-8?B?WlV1WW00TWdvR1RVTkdpMnFSSUNRQmhnQmt6bkEwM25TYjUzTER6WEJjQlo4?=
+ =?utf-8?B?bjRLak42WStjWXE1U1kxMlZjSlBYYUF0OTc4Rm5pKzRncHZYZjg4MXRFdGhV?=
+ =?utf-8?B?dVdaaU16aDg4d1BNT3drb1JyMHBlQVRYcE1xQ0dvWVRWZk5CS0pjUXlJRFJr?=
+ =?utf-8?B?d3l1K0xEckg0ei8xVlFXR21IR1prQ1ZURDlTSCtNWUpXRTFuZS8vRk9UM0Ir?=
+ =?utf-8?B?YjBiVWYrS1g5VFZnc2U0T2lkMVBONmN4RVpCd1JtNGlVWXN5ZXJYdEVJc3F6?=
+ =?utf-8?B?UVRCRVQ5dDVkS2Zaa09ZV3h4SlFYN0JubjJyL2hEWHhYbktsQzZ2UlgzOVpK?=
+ =?utf-8?B?SkZRcXkvUld1dTArN2ZKM2V1N3BSK0swREMydjZUaHphTGJZZlRPSGVna2hx?=
+ =?utf-8?B?N0NUc3BkaHF4MnVmWlhLQXFBc0FaS1pVOWc2TjlYK0ZtWEtYaXl6N3YyWkdn?=
+ =?utf-8?B?RkJjbVA0QndvT0krWmxNV2xnSk5tM0tNK21PRWE3b1ZibTBlUVBKc1BxelJC?=
+ =?utf-8?B?OWZOVkk4TU43YkpBa1MrWnhybFd4N0VoVnJCMHI0SFlqeWlPVnQyYzZ1S0hH?=
+ =?utf-8?B?SERHSXVwb1A1R0RhdHk2TnNERno0TXU0TG9ONXNEQ0hJRmxUa2MwbDRaMGMw?=
+ =?utf-8?B?SDZwNFI1VmlUVDFHcG9XRVlNQXErSnNPMEF5WVFiMklxY01oVVNsZ05McXZQ?=
+ =?utf-8?B?NFMzM2NCeWxtY0pZSjhVVm0zc3lKVHlyK29HNlJhQ3ZjdlQxa0RFNEw1S1JJ?=
+ =?utf-8?B?RWlLNTc2ZXFzenZEUStsL2ljdTFoRGlyRUwzQ0w4UHB4Rk5VRW9JUUx5VE1x?=
+ =?utf-8?B?djZHNjQ1YUQzaExXSVdnRldQRTNwZkFiVjNoS0JmdzVJSjMrZXA2aFRtR1Zo?=
+ =?utf-8?B?eGw5aG1VbVB0am1sSjJZR3poMXNsRzJmZWpSbzRhTkxhOGVrd3BUdFgyZU5F?=
+ =?utf-8?B?Q3hSRSs2Z1JXUkJxUDF1Q0pmVFArak0ycFNwQT09?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 21:29:35.4313
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37922065-821a-4c3f-0ec6-08dd7df6f36a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE36.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPFD6BF22047
 
-On Thu, 2025-04-17 at 21:29 +0200, Andrew Lunn wrote:
-> On Thu, Apr 17, 2025 at 09:11:09AM -0400, Jeff Layton wrote:
-> > Currently it's 32 bytes, but with the need to move to unique names for
-> > debugfs files, that won't be enough. Move to a 64 byte name field.
-> >=20
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
->=20
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->=20
+From: Alejandro Lucero <alucerop@amd.com>
+
+v14 changes:
+ - static null initialization of bitmaps (Jonathan Cameron)
+ - Fixing cxl tests (Alison Schofield)
+ - Fixing robot compilation problems
+
+  Patches changed (minor): 1, 4, 6, 13
+
+v13 changes:
+ - using names for headers checking more consistent (Jonathan Cameron)
+ - using helper for caps bit setting (Jonathan Cameron)
+ - provide generic function for reporting missing capabilities (Jonathan Cameron)
+ - rename cxl_pci_setup_memdev_regs to cxl_pci_accel_setup_memdev_regs (Jonathan Cameron)
+ - cxl_dpa_info size to be set by the Type2 driver (Jonathan Cameron)
+ - avoiding rc variable when possible (Jonathan Cameron)
+ - fix spelling (Simon Horman)
+ - use scoped_guard (Dave Jiang)
+ - use enum instead of bool (Dave Jiang)
+ - dropping patch with hardware symbols
+ 
+v12 changes:
+ - use new macro cxl_dev_state_create in pci driver (Ben Cheatham)
+ - add public/private sections in now exported cxl_dev_state struct (Ben
+   Cheatham)
+ - fix cxl/pci.h regarding file name for checking if defined
+ - Clarify capabilities found vs expected in error message. (Ben
+   Cheatham)
+ - Clarify new CXL_DECODER_F flag (Ben Cheatham)
+ - Fix changes about cxl memdev creation support moving code to the
+   proper patch. (Ben Cheatham)
+ - Avoid debug and function duplications (Ben Cheatham)
+ - Fix robot compilation error reported by Simon Horman as well.
+ - Add doc about new param in clx_create_region (Simon Horman).
+
+v11 changes:
+ - Dropping the use of cxl_memdev_state and going back to using
+   cxl_dev_state.
+ - Using a helper for an accel driver to allocate its own cxl-related
+   struct embedding cxl_dev_state.
+ - Exporting the required structs in include/cxl/cxl.h for an accel
+   driver being able to know the cxl_dev_state size required in the
+   previously mentioned helper for allocation.
+ - Avoid using any struct for dpa initialization by the accel driver
+   adding a specific function for creating dpa partitions by accel
+   drivers without a mailbox.
+
+v10 changes:
+ - Using cxl_memdev_state instead of cxl_dev_state for type2 which has a
+   memory after all and facilitates the setup.
+ - Adapt core for using cxl_memdev_state allowing accel drivers to work
+   with them without further awareness of internal cxl structs.
+ - Using last DPA changes for creating DPA partitions with accel driver
+   hardcoding mds values when no mailbox.
+ - capabilities not a new field but built up when current register maps
+   is performed and returned to the caller for checking.
+ - HPA free space supporting interleaving.
+ - DPA free space droping max-min for a simple alloc size.
+
+v9 changes:
+ - adding forward definitions (Jonathan Cameron)
+ - using set_bit instead of bitmap_set (Jonathan Cameron)
+ - fix rebase problem (Jonathan Cameron)
+ - Improve error path (Jonathan Cameron)
+ - fix build problems with cxl region dependency (robot)
+ - fix error path (Simon Horman)
+
+v8 changes:
+ - Change error path labeling inside sfc cxl code (Edward Cree)
+ - Properly handling checks and error in sfc cxl code (Simon Horman)
+ - Fix bug when checking resource_size (Simon Horman)
+ - Avoid bisect problems reordering patches (Edward Cree)
+ - Fix buffer allocation size in sfc (Simon Horman)
+
+v7 changes:
+
+ - fixing kernel test robot complains
+ - fix type with Type3 mandatory capabilities (Zhi Wang)
+ - optimize code in cxl_request_resource (Kalesh Anakkur Purayil)
+ - add sanity check when dealing with resources arithmetics (Fan Ni)
+ - fix typos and blank lines (Fan Ni)
+ - keep previous log errors/warnings in sfc driver (Martin Habets)
+ - add WARN_ON_ONCE if region given is NULL
+
+v6 changes:
+
+ - update sfc mcdi_pcol.h with full hardware changes most not related to 
+   this patchset. This is an automatic file created from hardware design
+   changes and not touched by software. It is updated from time to time
+   and it required update for the sfc driver CXL support.
+ - remove CXL capabilities definitions not used by the patchset or
+   previous kernel code. (Dave Jiang, Jonathan Cameron)
+ - Use bitmap_subset instead of reinventing the wheel ... (Ben Cheatham)
+ - Use cxl_accel_memdev for new device_type created (Ben Cheatham)
+ - Fix construct_region use of rwsem (Zhi Wang)
+ - Obtain region range instead of region params (Allison Schofield, Dave
+   Jiang)
+
+v5 changes:
+
+ - Fix SFC configuration based on kernel CXL configuration
+ - Add subset check for capabilities.
+ - fix region creation when HDM decoders programmed by firmware/BIOS (Ben
+   Cheatham)
+ - Add option for creating dax region based on driver decission (Ben
+   Cheatham)
+ - Using sfc probe_data struct for keeping sfc cxl data
+
+v4 changes:
+  
+ - Use bitmap for capabilities new field (Jonathan Cameron)
+
+ - Use cxl_mem attributes for sysfs based on device type (Dave Jian)
+
+ - Add conditional cxl sfc compilation relying on kernel CXL config (kernel test robot)
+
+ - Add sfc changes in different patches for facilitating backport (Jonathan Cameron)
+
+ - Remove patch for dealing with cxl modules dependencies and using sfc kconfig plus
+   MODULE_SOFTDEP instead.
+
+v3 changes:
+
+ - cxl_dev_state not defined as opaque but only manipulated by accel drivers
+   through accessors.
+
+ - accessors names not identified as only for accel drivers.
+
+ - move pci code from pci driver (drivers/cxl/pci.c) to generic pci code
+   (drivers/cxl/core/pci.c).
+
+ - capabilities field from u8 to u32 and initialised by CXL regs discovering
+   code.
+
+ - add capabilities check and removing current check by CXL regs discovering
+   code.
+
+ - Not fail if CXL Device Registers not found. Not mandatory for Type2.
+
+ - add timeout in acquire_endpoint for solving a race with the endpoint port
+   creation.
+
+ - handle EPROBE_DEFER by sfc driver.
+
+ - Limiting interleave ways to 1 for accel driver HPA/DPA requests.
+
+ - factoring out interleave ways and granularity helpers from type2 region
+   creation patch.
+
+ - restricting region_creation for type2 to one endpoint decoder.
+
+ - add accessor for release_resource.
+
+ - handle errors and errors messages properly.
 
 
-Thanks for the review!
+v2 changes:
 
-It occurs to me that we don't technically need this patch, since
-ref_tracker_dir_debugfs() doesn't overwrite dir->name in this version.
-Perhaps we should drop this patch, or I could define the
-REF_TRACKER_NAMESZ constant and just leave it at 32?
+I have removed the introduction about the concerns with BIOS/UEFI after the
+discussion leading to confirm the need of the functionality implemented, at
+least is some scenarios.
 
---=20
-Jeff Layton <jlayton@kernel.org>
+There are two main changes from the RFC:
+
+1) Following concerns about drivers using CXL core without restrictions, the CXL
+struct to work with is opaque to those drivers, therefore functions are
+implemented for modifying or reading those structs indirectly.
+
+2) The driver for using the added functionality is not a test driver but a real
+one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
+buffers instead of regions inside PCIe BARs.
+
+
+
+RFC:
+
+Current CXL kernel code is focused on supporting Type3 CXL devices, aka memory
+expanders. Type2 CXL devices, aka device accelerators, share some functionalities
+but require some special handling.
+
+First of all, Type2 are by definition specific to drivers doing something and not just
+a memory expander, so it is expected to work with the CXL specifics. This implies the CXL
+setup needs to be done by such a driver instead of by a generic CXL PCI driver
+as for memory expanders. Most of such setup needs to use current CXL core code
+and therefore needs to be accessible to those vendor drivers. This is accomplished
+exporting opaque CXL structs and adding and exporting functions for working with
+those structs indirectly.
+
+Some of the patches are based on a patchset sent by Dan Williams [1] which was just
+partially integrated, most related to making things ready for Type2 but none
+related to specific Type2 support. Those patches based on Dan´s work have Dan´s
+signing as co-developer, and a link to the original patch.
+
+A final note about CXL.cache is needed. This patchset does not cover it at all,
+although the emulated Type2 device advertises it. From the kernel point of view
+supporting CXL.cache will imply to be sure the CXL path supports what the Type2
+device needs. A device accelerator will likely be connected to a Root Switch,
+but other configurations can not be discarded. Therefore the kernel will need to
+check not just HPA, DPA, interleave and granularity, but also the available
+CXL.cache support and resources in each switch in the CXL path to the Type2
+device. I expect to contribute to this support in the following months, and
+it would be good to discuss about it when possible.
+
+[1] https://lore.kernel.org/linux-cxl/98b1f61a-e6c2-71d4-c368-50d958501b0c@intel.com/T/
+
+Alejandro Lucero (22):
+  cxl: add type2 device basic support
+  sfc: add cxl support
+  cxl: move pci generic code
+  cxl: move register/capability check to driver
+  cxl: add function for type2 cxl regs setup
+  sfc: make regs setup with checking and set media ready
+  cxl: support dpa initialization without a mailbox
+  sfc: initialize dpa
+  cxl: prepare memdev creation for type2
+  sfc: create type2 cxl memdev
+  cxl: define a driver interface for HPA free space enumeration
+  sfc: obtain root decoder with enough HPA free space
+  cxl: define a driver interface for DPA allocation
+  sfc: get endpoint decoder
+  cxl: make region type based on endpoint type
+  cxl/region: factor out interleave ways setup
+  cxl/region: factor out interleave granularity setup
+  cxl: allow region creation by type2 drivers
+  cxl: add region flag for precluding a device memory to be used for dax
+  sfc: create cxl region
+  cxl: add function for obtaining region range
+  sfc: support pio mapping based on cxl
+
+ drivers/cxl/core/core.h               |   2 +
+ drivers/cxl/core/hdm.c                |  77 +++++
+ drivers/cxl/core/mbox.c               |  30 +-
+ drivers/cxl/core/memdev.c             |  47 ++-
+ drivers/cxl/core/pci.c                | 146 +++++++++
+ drivers/cxl/core/port.c               |   8 +-
+ drivers/cxl/core/region.c             | 415 +++++++++++++++++++++++---
+ drivers/cxl/core/regs.c               |  37 +--
+ drivers/cxl/cxl.h                     | 111 +------
+ drivers/cxl/cxlmem.h                  | 103 +------
+ drivers/cxl/cxlpci.h                  |  23 +-
+ drivers/cxl/mem.c                     |  25 +-
+ drivers/cxl/pci.c                     | 111 ++-----
+ drivers/cxl/port.c                    |   5 +-
+ drivers/net/ethernet/sfc/Kconfig      |  10 +
+ drivers/net/ethernet/sfc/Makefile     |   1 +
+ drivers/net/ethernet/sfc/ef10.c       |  50 +++-
+ drivers/net/ethernet/sfc/efx.c        |  15 +-
+ drivers/net/ethernet/sfc/efx_cxl.c    | 159 ++++++++++
+ drivers/net/ethernet/sfc/efx_cxl.h    |  40 +++
+ drivers/net/ethernet/sfc/net_driver.h |  12 +
+ drivers/net/ethernet/sfc/nic.h        |   3 +
+ include/cxl/cxl.h                     | 276 +++++++++++++++++
+ include/cxl/pci.h                     |  36 +++
+ tools/testing/cxl/Kbuild              |   1 -
+ tools/testing/cxl/test/mem.c          |   3 +-
+ tools/testing/cxl/test/mock.c         |  17 --
+ 27 files changed, 1346 insertions(+), 417 deletions(-)
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+ create mode 100644 include/cxl/cxl.h
+ create mode 100644 include/cxl/pci.h
+
+
+base-commit: 73c117c17b562213242f432db2ddf1bcc22f39dd
+-- 
+2.34.1
+
 
