@@ -1,277 +1,102 @@
-Return-Path: <netdev+bounces-183648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C26DA91688
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:36:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17AF3A9168E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 966F63AABD1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 08:35:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80AD23B6911
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 08:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EECF2185BE;
-	Thu, 17 Apr 2025 08:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6TjEa+W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D78A22331E;
+	Thu, 17 Apr 2025 08:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24E9184E;
-	Thu, 17 Apr 2025 08:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028CB21C17B
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 08:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744878965; cv=none; b=ZAL1jLp/q4XBdmsdQeC2774+R8VFfc0baWAjU3EZbWiwJSuNWqv1KiXWFWGLmjoTPr0wkVZ8ZGMfNLnOmC0me7bRewto5sMpr5SI0of9jhhDceyZmB23JxPDivY/8shpg3zsTqYxE6Z67TdNF8c9AZshgClMCgRZ5ME6NiuEYNI=
+	t=1744879108; cv=none; b=mG+t6lGWeDZp8OgP7osa8oDQXBdU84wtpR1Y4JE0Uiquw6HhqCzteiq/R8Yl0tZ/S3dCa7VCDVy6EwL4l+JalDgbf7SDgs9k8Wv1dJ93ZZprUcOEGwg8Ai8OS+MOq6Hs7gBmHxIjomILHLfKXskEXGGWYnuYH1m0q6DV92mHm9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744878965; c=relaxed/simple;
-	bh=s2y/8+X4byijBsMJhdGFgV9G5Ctuj92CsBaLWWFN71A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nzIfb3xO+otfsUskv6XfI9Vdck1oHopiuZA68i9QDUSs2a8ev3Lpg4GqQhIw/WRd+SvVIEU2IVi0TxW4X5plkSlQ/IzC2x3WtGuU/u68SkTDzU239DQoYPEJocS7qzyR/i5gACrA07rphD9YyX6S8oXTFpNDINnzJKpwa7ihbXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6TjEa+W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E264C4CEE4;
-	Thu, 17 Apr 2025 08:36:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744878964;
-	bh=s2y/8+X4byijBsMJhdGFgV9G5Ctuj92CsBaLWWFN71A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O6TjEa+WFy2S09KaAMFKRDF6Z5a4jwkvLna42rnYi2b3nD1w+j9N53hy48xnuq1Iv
-	 x9pegG6ClmcDBD8lmw3+lUv3JaHQcy6V++AF4VyfZL/YKKCxTa/IrIeDkxseklmwVZ
-	 m9JCcTTZQz30DwkqGOiI5aoT1a3frAKU3tFJc8WiHj5GTcuYyptBMm7IgXJvpyRJvT
-	 /FLzieSpDgmTZv4HzEo5ZlXzHeQKu/fZilcvxkf5eTpCWAsJZvKaU9Rh/AjowKGhMt
-	 nMRJBqD1BoIK9mPsLoX7kHE4ljb/K57LzNG9NcAzl6yJDJibRwTvXcKUnc20a03c2V
-	 Uv8KhFHsvLkGA==
-Date: Thu, 17 Apr 2025 09:35:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, upstream@airoha.com,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Subject: Re: [net-next PATCH v3 03/11] net: pcs: Add subsystem
-Message-ID: <20250417083559.GA2430521@horms.kernel.org>
-References: <20250415193323.2794214-1-sean.anderson@linux.dev>
- <20250415193323.2794214-4-sean.anderson@linux.dev>
+	s=arc-20240116; t=1744879108; c=relaxed/simple;
+	bh=UH9voSbXHY2ibx2R017hySv+7p94nIaOHgfqFIOkwDg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=em+bn1xlCP+kLvKo80CQWOiY9hx44GXPV396NV7bNiTHddDhTFYUB9J+nQhSG77cAutaCyXzO7M4RQ9YkD9z4k7KzQzd9pl6fUJrpUSho5Z1LfCTCc3fxwsC8yRcgGAdXUYX90Oev0Oxx03vXbxQwUic4KSJVc9Qp/kQkim5tKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d43b460962so10759675ab.2
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 01:38:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744879106; x=1745483906;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZi5ZNPX9S5wyizuS3a6KFqu7CE6UegjxBqKHLcgHyY=;
+        b=OhUfNTrfBb+GSJOCIyD5O9zreQYTPmZH4G8vZso84ix4cmfCv4jQJLoDircPKd+BNG
+         jIvjwn73dPHG/6V+M7xdcn+0ipJViHjM0Bsr+Fm9HpLIBFiC8TMq92V/YzjOIOij6TZo
+         Q4nsV94OEbHNjOPVfjscM7uQBUP42GL4DJhSOIYqCFHDUI90EAE4Qi7iuFuKrrZMsTCc
+         LjwMCmlgHcR8QOb+8JI13SAkebcZXIBjrPOgKo18YkWsf7lLEoLlBQ/6qZp24QFGCMC0
+         +4JsTfvEH0md8CnjwyWCVwFHxaigoFVOgtdqkrDsJAbY1qsiCD1zFu+R0Hr863J9G39r
+         Qc2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnyvi7ZelduxjpxxB4SWy2OOl/b7n47wS9w1PM49lUE0yTNuwjfMAgweb+SbpzH9t4wbLzXaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmQ97zTriy71+whPUwK0rG6hNpXdyHNPHmpHDnC1cfXmls9+d5
+	Ns6z5/rnuiJuitFs94pGo8kaDBqgvrA6yKLCnV56RK9nbyLD5TWvhTNQgrP5zGaD5ONZsDAvTp+
+	+HvpLQydUovaY+qt6SEQJVoz/tabhSjnUirOvCIw+1RO+mpWxf65mPy4=
+X-Google-Smtp-Source: AGHT+IEqoHGrUKvaaGvRUz8O7WU/jvu68WMIVM/pDoMJBtzCXkfzYf8QDQqXQWmtIka0No0EBP92ntn/wxZjPsEbzeLZ6goADD17
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250415193323.2794214-4-sean.anderson@linux.dev>
+X-Received: by 2002:a05:6e02:2402:b0:3d0:4c9c:965f with SMTP id
+ e9e14a558f8ab-3d815b70372mr56966505ab.20.1744879106169; Thu, 17 Apr 2025
+ 01:38:26 -0700 (PDT)
+Date: Thu, 17 Apr 2025 01:38:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6800be02.050a0220.243d89.000f.GAE@google.com>
+Subject: [syzbot] Monthly netfilter report (Apr 2025)
+From: syzbot <syzbot+liste217d44efb9077d8089e@syzkaller.appspotmail.com>
+To: kadlec@netfilter.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 15, 2025 at 03:33:15PM -0400, Sean Anderson wrote:
-> This adds support for getting PCS devices from the device tree. PCS
-> drivers must first register with phylink_register_pcs. After that, MAC
-> drivers may look up their PCS using phylink_get_pcs.
-> 
-> We wrap registered PCSs in another PCS. This wrapper PCS is refcounted
-> and can outlive the wrapped PCS (such as if the wrapped PCS's driver is
-> unbound). The wrapper forwards all PCS callbacks to the wrapped PCS,
-> first checking to make sure the wrapped PCS still exists. This design
-> was inspired by Bartosz Golaszewski's talk at LPC [1].
-> 
-> pcs_get_by_fwnode_compat is a bit hairy, but it's necessary for
-> compatibility with existing drivers, which often attach to (devicetree)
-> nodes directly. We use the devicetree changeset system instead of
-> adding a (secondary) software node because mdio_bus_match calls
-> of_driver_match_device to match devices, and that function only works on
-> devicetree nodes.
-> 
-> [1] https://lpc.events/event/17/contributions/1627/
-> 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Hello netfilter maintainers/developers,
 
-Hi Sean,
+This is a 31-day syzbot report for the netfilter subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/netfilter
 
-Overall this looks quite clean to me.
-Please find minor some nits flagged by tooling below.
+During the period, 0 new issues were detected and 1 were fixed.
+In total, 10 issues are still open and 185 have already been fixed.
 
-> +/**
-> + * struct pcs_wrapper - Wrapper for a registered PCS
-> + * @pcs: the wrapping PCS
-> + * @refcnt: refcount for the wrapper
-> + * @list: list head for pcs_wrappers
-> + * @dev: the device associated with this PCS
-> + * @fwnode: this PCS's firmware node; typically @dev.fwnode
-> + * @wrapped: the backing PCS
-> + */
-> +struct pcs_wrapper {
-> +	struct phylink_pcs pcs;
-> +	refcount_t refcnt;
-> +	struct list_head list;
-> +	struct device *dev;
-> +	struct fwnode_handle *fwnode;
-> +	struct phylink_pcs *wrapped;
-> +};
+Some of the still happening issues:
 
-I think that wrapped needs an __rcu annotation.
+Ref Crashes Repro Title
+<1> 428     Yes   INFO: rcu detected stall in addrconf_rs_timer (6)
+                  https://syzkaller.appspot.com/bug?extid=fecf8bd19c1f78edb255
+<2> 157     Yes   INFO: rcu detected stall in gc_worker (3)
+                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
+<3> 67      Yes   INFO: rcu detected stall in NF_HOOK (2)
+                  https://syzkaller.appspot.com/bug?extid=34c2df040c6cfa15fdfe
+<4> 11      Yes   KMSAN: uninit-value in ip6table_mangle_hook (3)
+                  https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
 
-Flagged by Sparse.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-...
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-> +static int pcs_post_config(struct phylink_pcs *pcs,
-> +			   phy_interface_t interface)
-> +{
-> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-The line above dereferences pcs.
-
-> +	struct phylink_pcs *wrapped;
-> +	int ret, idx;
-> +
-> +	idx = srcu_read_lock(&pcs_srcu);
-> +
-> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
-> +	if (pcs && wrapped->ops->pcs_post_config)
-
-But here it is assumed that pcs may be NULL.
-This does not seem consistent.
-
-Flagged by Smatch.
-
-> +		ret = wrapped->ops->pcs_post_config(wrapped, interface);
-> +	else
-> +		ret = 0;
-> +
-> +	srcu_read_unlock(&pcs_srcu, idx);
-> +	return ret;
-> +}
-
-...
-
-> +/**
-> + * pcs_unregister() - unregister a PCS
-> + * @pcs: a PCS previously registered with pcs_register()
-> + */
-> +void pcs_unregister(struct phylink_pcs *pcs)
-> +{
-> +	struct pcs_wrapper *wrapper;
-> +
-> +	mutex_lock(&pcs_mutex);
-> +	list_for_each_entry(wrapper, &pcs_wrappers, list) {
-> +		if (wrapper->wrapped == pcs)
-
-Assuming that rcu_access_pointer() works with srcu,
-I think that this should be:
-
-		if (rcu_access_pointer(wrapper->wrapped) == pcs)
-
-Also flagged by Sparse
-
-> +			goto found;
-> +	}
-> +
-> +	mutex_unlock(&pcs_mutex);
-> +	WARN(1, "trying to unregister an already-unregistered PCS\n");
-> +	return;
-> +
-> +found:
-> +	list_del(&wrapper->list);
-> +	mutex_unlock(&pcs_mutex);
-> +
-> +	put_device(wrapper->dev);
-> +	fwnode_handle_put(wrapper->fwnode);
-> +	rcu_replace_pointer(wrapper->wrapped, NULL, true);
-> +	synchronize_srcu(&pcs_srcu);
-> +
-> +	if (!wrapper->pcs.poll)
-> +		phylink_pcs_change(&wrapper->pcs, false);
-> +	if (refcount_dec_and_test(&wrapper->refcnt))
-> +		kfree(wrapper);
-> +}
-> +EXPORT_SYMBOL_GPL(pcs_unregister);
-> +
-> +static void devm_pcs_unregister(void *pcs)
-> +{
-> +	pcs_unregister(pcs);
-> +}
-> +
-> +/**
-> + * devm_pcs_register - resource managed pcs_register()
-
-nit: devm_pcs_register_full
-
-     Flagged by W=1 builds, and ./scripts/kernel-doc -none
-
-> + * @dev: device that is registering this PCS
-> + * @fwnode: The PCS's firmware node; typically @dev.fwnode
-> + * @pcs: the PCS to register
-> + *
-> + * Managed pcs_register(). For PCSs registered by this function,
-> + * pcs_unregister() is automatically called on driver detach. See
-> + * pcs_register() for more information.
-> + *
-> + * Return: 0 on success, or -errno on failure
-> + */
-> +int devm_pcs_register_full(struct device *dev, struct fwnode_handle *fwnode,
-
-...
-
-> +/**
-> + * pcs_find_fwnode() - Find a PCS's fwnode
-> + * @mac_node: The fwnode referencing the PCS
-> + * @id: The name of the PCS to get. May be %NULL to get the first PCS.
-> + * @fallback: An optional fallback property to use if pcs-handle is absent
-> + * @optional: Whether the PCS is optional
-> + *
-> + * Find a PCS's fwnode, as referenced by @mac_node. This fwnode can later be
-> + * used with _pcs_get_tail() to get the actual PCS. ``pcs-handle-names`` is
-> + * used to match @id, then the fwnode is found using ``pcs-handle``.
-> + *
-> + * This function is internal to the PCS subsystem from a consumer
-> + * point-of-view. However, it may be used to implement fallbacks for legacy
-> + * behavior in PCS providers.
-> + *
-> + * Return: %NULL if @optional is set and the PCS cannot be found. Otherwise,
-> + * *       returns a PCS if found or an error pointer on failure.
-> + */
-> +struct fwnode_handle *pcs_find_fwnode(const struct fwnode_handle *mac_node,
-> +				      const char *id, const char *fallback,
-> +				      bool optional)
-> +{
-> +	int index;
-> +	struct fwnode_handle *pcs_fwnode;
-
-Reverse xmas tree here please.
-
-Edward Cree's xmastree tool can be helpful:
-https://github.com/ecree-solarflare/xmastree
-
-> +
-> +	if (!mac_node)
-> +		return optional ? NULL : ERR_PTR(-ENODEV);
-> +
-> +	if (id)
-> +		index = fwnode_property_match_string(mac_node,
-> +						     "pcs-handle-names", id);
-> +	else
-> +		index = 0;
-> +
-> +	if (index < 0) {
-> +		if (optional && (index == -EINVAL || index == -ENODATA))
-> +			return NULL;
-> +		return ERR_PTR(index);
-> +	}
-> +
-> +	/* First try pcs-handle, and if that doesn't work try the fallback */
-> +	pcs_fwnode = fwnode_find_reference(mac_node, "pcs-handle", index);
-> +	if (PTR_ERR(pcs_fwnode) == -ENOENT && fallback)
-> +		pcs_fwnode = fwnode_find_reference(mac_node, fallback, index);
-> +	if (optional && !id && PTR_ERR(pcs_fwnode) == -ENOENT)
-> +		return NULL;
-> +	return pcs_fwnode;
-> +}
-> +EXPORT_SYMBOL_GPL(pcs_find_fwnode);
-
-...
+You may send multiple commands in a single email message.
 
