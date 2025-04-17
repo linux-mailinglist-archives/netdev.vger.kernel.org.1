@@ -1,111 +1,145 @@
-Return-Path: <netdev+bounces-183735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4721A91BB8
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:15:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D2AA91BD3
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D031179BA6
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:15:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76D1519E2A9B
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3702C187;
-	Thu, 17 Apr 2025 12:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F1E24290F;
+	Thu, 17 Apr 2025 12:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="XOc9N1kG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3890C23A0
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 12:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6291223E356
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 12:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.133.245.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744892122; cv=none; b=WFaOVG3BqX8vGoI2U/RFDQnuHD1xcyb/0gE7VSp3vwAGKQhuTYwMHvPAuUOpaf1WZ8PiMEtwHuAYxzn8KWwASAAwzLGr7lNmktAVhOiMlpqe4o6EnnqAle6uebwvxuDuaL/n3A+WNuBC5qIYw30YIz6oCYIUgrnWcE/HYX6CWQU=
+	t=1744892512; cv=none; b=XoSpxutQ26kFvoBK57ZZ9KOju8oU4/TM0Cyycj5TqFyTa3of9x2Kr2IpZuz2597VAR9YVAoFTXcWo57DTjSmyYH3dJwrWjb6wwsRiIHY5Ze3kZIFW16xOITf4yNpZT16LuclXp8oxP8b1GHT0CS1gLgft0c/b5604m4YR9U/vd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744892122; c=relaxed/simple;
-	bh=uZ0EqYCWoxFzNr15kvJeEkDL8DapYWZZuEqut9ZUOAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M/JxGT3RT2tgNE5NezvtkmT3JvrIqFjVf/MijNNVhG+KNP6ksJSxa9rPuhyRngyPNuR5dVHQRaXfDalYcLhdNofN2doH08GEU49oAay21SL6Q2un9jS5dDHD9poT4Rnxj/dMVJY+XQXtjx4l/Q2vdRRRH4pbpwvRLwVWNgr8aCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5O8v-0005xj-1O; Thu, 17 Apr 2025 14:14:57 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5O8q-000kPY-0y;
-	Thu, 17 Apr 2025 14:14:52 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5O8q-005xCz-0P;
-	Thu, 17 Apr 2025 14:14:52 +0200
-Date: Thu, 17 Apr 2025 14:14:52 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744892512; c=relaxed/simple;
+	bh=yim53aUfLmVou/JvqKYODc4xwB/wJ3VFd3Zy7HjYysY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P5Mt/n162nyaISwRi3Yo2dnuGons/Okr/C6GUNgrllof3nKJaNOaXwtZqDBwwDEe2DqB6IQlBreN90FPKOtsTid6UQD/M4eqxX/Y8OrtpqJ44IWvUM44nHCo3fDOa/JlpPKKE/wg99SJF2FpwIAMAobCT9wiBfDNqSiyG/71vx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru; spf=pass smtp.mailfrom=nppct.ru; dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b=XOc9N1kG; arc=none smtp.client-ip=195.133.245.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nppct.ru
+Received: from mail.nppct.ru (localhost [127.0.0.1])
+	by mail.nppct.ru (Postfix) with ESMTP id D35AE1C0E8B
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 15:21:43 +0300 (MSK)
+Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
+	reason="pass (just generated, assumed good)" header.d=nppct.ru
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:to:from:from; s=dkim; t=1744892498; x=
+	1745756499; bh=yim53aUfLmVou/JvqKYODc4xwB/wJ3VFd3Zy7HjYysY=; b=X
+	Oc9N1kG+w3/vx99U9s8X5y6758ClWEjdx19507zYFz9q2Do3Y8vk+aqtdbjqvuO0
+	gaYW9Hv7+/VfmiJBmrptxC76ElMdYVcSwt9UQvZErnFNwBoihJsgLDLU5GK2Dz0p
+	tfywXE5fd0bSHBjAhK6xZV+AXrqxCVgNTbgDDGPFBM=
+X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
+Received: from mail.nppct.ru ([127.0.0.1])
+	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id GKj5b9Lc5bUq for <netdev@vger.kernel.org>;
+	Thu, 17 Apr 2025 15:21:38 +0300 (MSK)
+Received: from localhost.localdomain (unknown [87.249.24.51])
+	by mail.nppct.ru (Postfix) with ESMTPSA id B90721C08D8;
+	Thu, 17 Apr 2025 15:21:30 +0300 (MSK)
+From: Alexey Nepomnyashih <sdl@nppct.ru>
+To: Juergen Gross <jgross@suse.com>
+Cc: Alexey Nepomnyashih <sdl@nppct.ru>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 01/13] net: ethtool: Add support for
- ethnl_info_init_ntf helper function
-Message-ID: <aADwvPhq_IwXhg5M@pengutronix.de>
-References: <20250416-feature_poe_port_prio-v8-0-446c39dc3738@bootlin.com>
- <20250416-feature_poe_port_prio-v8-1-446c39dc3738@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	xen-devel@lists.xenproject.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH v2] xen-netfront: handle NULL returned by xdp_convert_buff_to_frame()
+Date: Thu, 17 Apr 2025 12:21:17 +0000
+Message-ID: <20250417122118.1009824-1-sdl@nppct.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250416-feature_poe_port_prio-v8-1-446c39dc3738@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 16, 2025 at 03:44:16PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Introduce support for the ethnl_info_init_ntf helper function to enable
-> initialization of ethtool notifications outside of the netlink.c file.
-> This change allows for more flexible notification handling.
-> 
-> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+The function xdp_convert_buff_to_frame() may return NULL if it fails
+to correctly convert the XDP buffer into an XDP frame due to memory
+constraints, internal errors, or invalid data. Failing to check for NULL
+may lead to a NULL pointer dereference if the result is used later in
+processing, potentially causing crashes, data corruption, or undefined
+behavior.
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+On XDP redirect failure, the associated page must be released explicitly
+if it was previously retained via get_page(). Failing to do so may result
+in a memory leak, as the pages reference count is not decremented.
 
-Thank you!
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
+Cc: stable@vger.kernel.org # v5.9+
+Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
+Signed-off-by: Alexey Nepomnyashih <sdl@nppct.ru>
+---
+ drivers/net/xen-netfront.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
+index 63fe51d0e64d..1d3ff57a6125 100644
+--- a/drivers/net/xen-netfront.c
++++ b/drivers/net/xen-netfront.c
+@@ -985,20 +985,27 @@ static u32 xennet_run_xdp(struct netfront_queue *queue, struct page *pdata,
+ 	act = bpf_prog_run_xdp(prog, xdp);
+ 	switch (act) {
+ 	case XDP_TX:
+-		get_page(pdata);
+ 		xdpf = xdp_convert_buff_to_frame(xdp);
+-		err = xennet_xdp_xmit(queue->info->netdev, 1, &xdpf, 0);
+-		if (unlikely(!err))
+-			xdp_return_frame_rx_napi(xdpf);
+-		else if (unlikely(err < 0))
++		if (unlikely(!xdpf)) {
+ 			trace_xdp_exception(queue->info->netdev, prog, act);
++			break;
++		}
++		get_page(pdata);
++		err = xennet_xdp_xmit(queue->info->netdev, 1, &xdpf, 0);
++		if (unlikely(err <= 0)) {
++			if (err < 0)
++				trace_xdp_exception(queue->info->netdev, prog, act);
++			xdp_return_frame_rx_napi(xdpf);
++		}
+ 		break;
+ 	case XDP_REDIRECT:
+ 		get_page(pdata);
+ 		err = xdp_do_redirect(queue->info->netdev, xdp, prog);
+ 		*need_xdp_flush = true;
+-		if (unlikely(err))
++		if (unlikely(err)) {
+ 			trace_xdp_exception(queue->info->netdev, prog, act);
++			xdp_return_buff(xdp);
++		}
+ 		break;
+ 	case XDP_PASS:
+ 	case XDP_DROP:
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.43.0
+
 
