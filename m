@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-183777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42885A91E5A
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:44:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA86A91E5B
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D292B8A09CB
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11C7019E7934
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A99024E018;
-	Thu, 17 Apr 2025 13:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A474924E004;
+	Thu, 17 Apr 2025 13:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AMgpXdlz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="D1FzhQzV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C1924E00A
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 13:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFA124BBE8
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 13:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744897455; cv=fail; b=bmZkYv6YbOaHMaEImaI7GLmmF+1lmC3cXt7v38uIMD589fGT5TTjPBKjUNx9FT7Ns09HUZlmuf4+QEllQZ4I4A5UNlMydzFMeDzczXDX7eGnWw0N4BhntHi7LKSfTc6guGKGz678D80+S5442eg5EHJtrOGhlCjDQDvilZLXxKQ=
+	t=1744897460; cv=fail; b=nrAGSGq9JniEDbre/51kmB75PJOqx1L9auxFjGczcqjQeoMLOsr6lUH+VzmSbYAv3U2gXqsMk69QaXQKNPLWwWENpg2eBOLvSk0bWrqA8hJqEsykIGj31186DRMgmIAWSQcJ3PgjOufLzWg2IKpvzLtlC6P5zpQ2PHTJ1KmocWU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744897455; c=relaxed/simple;
-	bh=9ULVBoDLV3qpFQNXb3VlHgNIyZJ69NO+goeTqEHio8o=;
+	s=arc-20240116; t=1744897460; c=relaxed/simple;
+	bh=BSIagurI0DK9WTHz0vsXFzdlYe0koJwtpjnwXdRThKI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iW9/oEopvF6i3WyTmxw4DNJxOl134x31bFcKvjCnt6/ZyWu1WzHhBVN27lzTKu/WeXRl8gaA9lV6/NKE4BtftgeBzRATGU65fhRqyghgeSF56j2rhWcQpmGuq+UzEFV4CcVOXo/lGBm40Pf4eJiCoxtfa8Bzo0L0J8DjmAZD04U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AMgpXdlz; arc=fail smtp.client-ip=40.107.237.73
+	 MIME-Version:Content-Type; b=NRhC6uxoUmgajBquKOpJhUBl9JMKLDCP8J+mtOD4Xvt+ypIP54HGVLbwDAdStihf0EwBcfZFEUsupMkfBnm0V6E4rKczaYbL4ham4/yOzCy8bsOU6TFrt10zPSGFI1+wOn16WAhwBT2Gd5Qw94JtNVlxgmHcEAv3ngsqRV/gW1s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=D1FzhQzV; arc=fail smtp.client-ip=40.107.94.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ikhT/7/BPL4aLVNXGzkjsEAhU+DiNqhn7t80Zbx/0GoMTWi1ZNmFZDRdPVhLfYwUUAEPHyapvpCQpXVWh6vkyZLQEjeZ/6GiudUC2E5bzRakwbPPz+249W8sCAhs8muFceww2+6QHL6QcTtGQuGhTuKmhIOrp4vEYJ++yXQx0SuQ4fzRAgvW5GsBiEMd/BEPF5vH3CRKgwWa2/n17l/MP/5VyLFSab60Rq7fOBSLfPddndAf9IXf7mYLA3jagGjeldjoqGIKa99p22ioRwdaMLLfA+3w8MAKN+MdlHlT3Vx6FMsNUNtIIeQqYCtbaonfvN7zS+uKsxCOHV9HMxK4Ew==
+ b=BfePWdWrlTrFm8CgwsMRzb8fPLfZNFFbPuUvcewMOlaQaEye6mgODk+X7Q6b+ZnDUQlQJNMPhphJt9QQqCs6MT7yHlYmGYKjG3j3d5hepD1m5/uBtwNf/6tXnK9JYYcCD/l91tKSCh3h2Sg1WYN9W0zBGHrrC1BWYEZkFBj2RJMqVwpIt1f/YhJqFjqQnJVKDjJhmwSPgW70tCU96FwDuVZWk8qp3GalVVtL4z2Aj00JJ5YoFlVUgUiGvhdGOUszYdJLEW3ajWk9IeUUEwvMOmtL3s1GBWZPhYUGojH9em6J6MzFZab/6rR2sQq70yqT7VGyw3ZMZMrLw3VUgShhHQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TKEe9VIAc0wpm1mHlB1JflNcKAeZUQspuxsv+HsekEo=;
- b=rVxM8qowX+UDcibnoZXAoOp+SQoRfVSEzBTu8xAEwRpESoCqh/vU2u/g9MD2MsYcruyL3WYKtBazHV6UOs0NapHRCN1Fw4z2p/BEJ0fiyUFXGPEFXDrey+oyO7fqgl4vb/fyiVXTTMrXp/WRoTpVrVKZ7TdnOmTMoPnKGRNe/r682t3AO9glQn0RZnYmR6QPbNNKVsH0pvTNMPXkmSSonXx0/uSnxgZxXtWKQOivhERVT7chvMnvZYRFddSCsnt2J+iHyBJm6qC9p3L1hEHFwfhePcUPYDd6Q79Urfd7F5zpdp508iQAF3uh5oKCmXc2WuMlejwYmR2C6SAaAwIwow==
+ bh=g+N+hxbWXSrTpYTm4TRWvDQrj/0LGE9dJgLFZQgjzzw=;
+ b=M6kxvD4BnS7qdRvpqhTRQheAeX+329w0Th5JTax/ehgdigqanP9Q5NUEgM2cog39WAeVob2VPHBLA65LlcUrhMVB2g6YIomJCBgPpPI4UuYlqfk9HrwseO7i1kP/cyIxjFodL56tuky/Zr7pyLJqT1P5uzUwjXykXnW57Y13UoNan421QtFG0H55WkhbI5bHEjm+OGgWP9O0A161/e4gEQE28fIapoAbycbbTn6C+JyD7aThKMcBQft1hcKoS3cavZ0yGbIlNKEa1o3OJ6gR8M4AdVfPUTLGHTmhpJcTTpJG20K3qX3vejPA0iBZWr26i0+e18ImGu20xpTO6pIU7w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TKEe9VIAc0wpm1mHlB1JflNcKAeZUQspuxsv+HsekEo=;
- b=AMgpXdlznw47HTFOHWuGRtWP1iO3Ey9y7IwHFgCdCTZ+nvausSCrmX3swS9i0IS+mrXxtk3smprbrXT/836ycs7lv45sF7iumrrlC0IIwcbkw0LmccT3/4J89JK1vNnkZE0ll1mz//qwPvYQqB5SIUW94Smw71vL8/HZVtPrOwjOLOFLmqLYzibVlmDtDkwx27AaZR/SvEZQpzWIDRrZPG0JnpLe0VkZRIcS3uIgbGltFJx4XROvzIsJk+/TsiGj0qfjK0N7XQ85M49rCfEPusAfurR70jqXbOHK3x6nDq/wpaLkfAB67Fq6vwT9B53UMDW3+wzu8MFmTUH5GPSn4Q==
-Received: from CH5P223CA0023.NAMP223.PROD.OUTLOOK.COM (2603:10b6:610:1f3::28)
- by CY8PR12MB8340.namprd12.prod.outlook.com (2603:10b6:930:7a::5) with
+ bh=g+N+hxbWXSrTpYTm4TRWvDQrj/0LGE9dJgLFZQgjzzw=;
+ b=D1FzhQzVi0dLpWQZUPBGwzcHANtmjXjGNjQzXkdZ1KYf+mFrxqhzvYj/9xGqhBEblP2MwGLgctaDCXhV0zzP2gAR5tDDCrSdDNEh8yubphP+zsXfhdUJc+d2hOWX9Wdbg+YhJHfbiOZerZXgwJO9idmDgb4QbHUmM4+qhZjLEeXtKFXrCCPAGtKy5SEXH5+V+0BP5tiabhdpxBf13wx/pCr/KGbs8lK06EtJ2HJl4nQzU874t4y0yL7n69RLVcJPfyCEi3tG6/ToDiKfQ07/vkdhhFIkc0xDwbQYzGP2J/5Kby4tfzQWWWSUTroHZ6VtY8OESYDod7DEl/oIcBrpvQ==
+Received: from CH0P220CA0025.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:ef::20)
+ by SJ2PR12MB8874.namprd12.prod.outlook.com (2603:10b6:a03:540::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Thu, 17 Apr
- 2025 13:44:07 +0000
-Received: from CH2PEPF0000013B.namprd02.prod.outlook.com
- (2603:10b6:610:1f3:cafe::69) by CH5P223CA0023.outlook.office365.com
- (2603:10b6:610:1f3::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.23 via Frontend Transport; Thu,
- 17 Apr 2025 13:44:07 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Thu, 17 Apr
+ 2025 13:44:13 +0000
+Received: from CH2PEPF0000013C.namprd02.prod.outlook.com
+ (2603:10b6:610:ef:cafe::d0) by CH0P220CA0025.outlook.office365.com
+ (2603:10b6:610:ef::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.18 via Frontend Transport; Thu,
+ 17 Apr 2025 13:44:12 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,17 +64,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF0000013B.mail.protection.outlook.com (10.167.244.68) with Microsoft
+ CH2PEPF0000013C.mail.protection.outlook.com (10.167.244.73) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8655.12 via Frontend Transport; Thu, 17 Apr 2025 13:44:06 +0000
+ 15.20.8655.12 via Frontend Transport; Thu, 17 Apr 2025 13:44:11 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 17 Apr
- 2025 06:43:52 -0700
+ 2025 06:43:57 -0700
 Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 17 Apr
- 2025 06:43:46 -0700
+ 2025 06:43:52 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -84,9 +84,9 @@ CC: Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel
 	<idosch@nvidia.com>, <bridge@lists.linux.dev>, Yong Wang
 	<yongwang@nvidia.com>, Andy Roulin <aroulin@nvidia.com>, Petr Machata
 	<petrm@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 2/3] net: bridge: mcast: update multicast contex when vlan state is changed
-Date: Thu, 17 Apr 2025 15:43:13 +0200
-Message-ID: <0b13864a33090fd1bd6bdee203256d775db0c35e.1744896433.git.petrm@nvidia.com>
+Subject: [PATCH net-next 3/3] selftests: net/bridge : add tests for per vlan snooping with stp state changes
+Date: Thu, 17 Apr 2025 15:43:14 +0200
+Message-ID: <cee6216f125ea6c829e22c879b47a47c14db9af7.1744896433.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1744896433.git.petrm@nvidia.com>
 References: <cover.1744896433.git.petrm@nvidia.com>
@@ -102,204 +102,280 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000013B:EE_|CY8PR12MB8340:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e5e6b25-7700-41f5-35dd-08dd7db5ecac
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000013C:EE_|SJ2PR12MB8874:EE_
+X-MS-Office365-Filtering-Correlation-Id: 465091b6-569f-4288-530d-08dd7db5efb4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?J+dbc7YEph148tmfipyx9a0hRgSD0/P1mVs94TMVpBclD02WL7QCdHzbDxJ4?=
- =?us-ascii?Q?SXPptuUiFIVFbRwSk25PkTt+HjJESP6Zbu0nCfmWIfMElb/l7fXW+lw/LZSt?=
- =?us-ascii?Q?HUVnjaKEpygR6lACrOFJ1Yzm3q3IK5rhe3TwhEHnL8F9THX6P1qqL9bcnNtr?=
- =?us-ascii?Q?6ATYbUDrp0VwOy+hVd37hpbkeGjkR0lm7TYlFRMcyLM1koSmvGcKo0NUi56P?=
- =?us-ascii?Q?exMPBKHAH6A/Pi3yZhwrHHNKjkqOQQM9U+gf687etgZmSk7fP1PVwTo5boUk?=
- =?us-ascii?Q?g4ZZksuVSWqOmtbOdsWy8r6eZphDQDByLk3jfx6pFI1EdLJ4Sz1e5vV/LAhT?=
- =?us-ascii?Q?+y8YgpWC8cILndq0fUEQokHgNTju9/8iUHrYraiUrCQ3ArJy+NvSKPnjwJ9o?=
- =?us-ascii?Q?PkkQBuya3xgXmZsnDKd4W3EZi6AlaF6PnHkOUMfFoGP9GJg49A3m0QAHg9EQ?=
- =?us-ascii?Q?lM2bkVlxZsWw2SO1gfPn2kiPM3O+Bmks7Cuk7LqLd8ILXbfOrXZRgnsyWS/t?=
- =?us-ascii?Q?VIU7CzDtZCVVPk0iUUauTnZKBRmz860KgHh5wiVojVa7hizgQm+cmCR20UNJ?=
- =?us-ascii?Q?CirWlh1CkRZebSlo6Wb/tS2NievcHXRG1eqBfiybnwxuR99S3Ztrg6CajCRJ?=
- =?us-ascii?Q?MTMC6IneJvxQmRoCc+XN8Q9OoVTC/ICFcsLFBaPzClqdjvwbzLKtMJ3qF2yZ?=
- =?us-ascii?Q?BV+4O5rJ6q3WISm89GUN7U/pdoY79CATESpF1ZQs33mG9UgR44/B+MWCzI74?=
- =?us-ascii?Q?sfjRYD1DW1cVPZFtCYSN8WiZFIB9fybuOAH2/cVRvhVam0KRQehxasbLWfNA?=
- =?us-ascii?Q?mppXA/rzro0gslkXu5Jonp4A6erhys6llq647iVJmjqvGF2miMKuj3Yzf1jI?=
- =?us-ascii?Q?Xl7gvTJqonNLh3AHf6RTokl4WRrobjWDNVkS2/Or7wGsg45ePMZl7XX4e8J6?=
- =?us-ascii?Q?El6XU0qImpxrJqXP1XrmHd03FCX5YvwWyuPFIJnjE726ziKUsrxJRmFU37h4?=
- =?us-ascii?Q?QDK/2IloFk+Qn7lEJQGq/PJfRFZsh5J8IBSEGHSOT1xheZbDQ2KFW2lS+jkW?=
- =?us-ascii?Q?hAmE1NhjmIKX0gYcJMbR9sSa/x4HVffyibsU4YiI4FRAykRQ3TpMAYlBzQHK?=
- =?us-ascii?Q?JU/19LaHenwDJpOUhyGl8NS8mnDsum21gNBNqfOeAnT7ph6LN4kT557/FPuN?=
- =?us-ascii?Q?PznRabTlmg+KRMMbqHaJy0PSau5+zYqjLZ+bzdtopPci78fOWZIdGifsuz0y?=
- =?us-ascii?Q?pr99zCY0dqdR48b4G8JpYIO/ZmerECBGVCivKXOhu86uvgvBgnEeEIeQPznc?=
- =?us-ascii?Q?+Fwj/EZv/0VGhdhEzGwMyUj6IfWHh1N3SKuym/1JEFFngn7sRGRbXVqW/jC/?=
- =?us-ascii?Q?FAiUmFvwnWWPHrtlxGy/k+Rjg43REPhvg6PjfyGBRZW/O4yfdbGHTcNnWw+Z?=
- =?us-ascii?Q?YLUcM/6gtJEJSvjyyYdoffOAcyKZITzG9C/Dk5JDlCqQHeWXdAaJi6tOY44y?=
- =?us-ascii?Q?0e34SF58m3HAnMQglVc/efJ0qVuOFI3IoII+?=
+	=?us-ascii?Q?nqCGMeULeg7YgXgR7d2kNWzHcDCO+3pOPZTUMhFwJafT1PeR3BHmM+XZ8zbs?=
+ =?us-ascii?Q?pO8U2CFNT0+d7CyID0jGsUfI7eFIqCLQkIsWQb0PLuc0ELimZDVAec0sjZkZ?=
+ =?us-ascii?Q?xNp58Z4v2LRjZkHPxFW98LfNx4t0LzLPFv17ckd6HKXOoiKrYN839o9h01Hh?=
+ =?us-ascii?Q?y0lWFyUHck5vzGZnQ9CbxnJOFpNmBPCt9aBR/ttY1DvOHKhrxNhbzq0+Koxs?=
+ =?us-ascii?Q?/vfF3cJ843I+yF79TMRoR77y8Cb9cjLa3xSL0BhroP1Rv/4IVdUcmwxMKDEv?=
+ =?us-ascii?Q?qZbXVm0aVaxWyeMVs3HhZJUzArtIghVW1Pn5oOJ3Ad3wsCeQSTJtJfkP3HBl?=
+ =?us-ascii?Q?YznARLVDGuIYCOUDCqUvpNAmGPe/51QtAC5x6FVPfgQCZ+qu7/28zUD4qgwo?=
+ =?us-ascii?Q?B9qs3+hud5wxaAOfl03HQbmHB0FftAbZbsjCjdpyPO7voSt1mYmZvCN2Dyih?=
+ =?us-ascii?Q?7XjTh2SIG2s7EiF0IV574NePE5jpzcioTH7jwvaNj0tli5uudPGSENqmOgto?=
+ =?us-ascii?Q?RTPJYn2NIE6f0kgc7ZswdtSKZ92F/k3L1/QFuzzuGjpv+y92CvNxeOhyUqdw?=
+ =?us-ascii?Q?72tqLjwxU9VXCuqDAjMnwKg5L154VFvebwzFlALS9v9GgsOd+fvb6Gc5QMzW?=
+ =?us-ascii?Q?lkCBzZBGq5H4GGN0GnKzxjpWqw21Vg2eQvQ3/VJ9vNgCZJK2ytZkIv1hX+uF?=
+ =?us-ascii?Q?OdKte2+3fK1oX4NDlNgbJE3+MDPP9zb4FaV1CoLg2pmKVvB3RdfT/O65tSlx?=
+ =?us-ascii?Q?RKv8YfE1OY6pysxwjiNIwn13tk9OihNuPrv7m8xJ7yQjjcyqt8BAHY2oupDz?=
+ =?us-ascii?Q?SKx+yyUNkk3Ek4/Rl3v0vVMOtSgdbVGgESPhdEw21APddCY59TkigmwWKlBg?=
+ =?us-ascii?Q?kTdnWz1Tuoy4R/ecbsvKfGMB+W6M11X8UhiY1lNGjACmGi2nAmfYq/nDcMGw?=
+ =?us-ascii?Q?bQHfL8tOajIGv5TwZiXY28nBqxAcxreLaJ4ilcEBUbnOVuJmBllqiqCbA12I?=
+ =?us-ascii?Q?D5TUnvXsy3ReMVP5UddsZou2Q+pWWK5LBEY69xz565fn+DaHpwqhn41QW5Wk?=
+ =?us-ascii?Q?2xApX/Het6+jnUjbOeACMT1w/o9fG3k+kOP8u9tzlEETncGRRywJHX7vzRZ2?=
+ =?us-ascii?Q?m4Zjgr5TBawgpuoI38W+WHBc6dbGOS1hM1kYfqzLxT/hebJDudd9kY+os88o?=
+ =?us-ascii?Q?lwbG7I2eanYdSJbVsSig12T8ga5EEE2eV1jZ9YU5M4+ot0Q8H21xW2nLL0L9?=
+ =?us-ascii?Q?37q8xqctAYZveSAV3nkKIlEkds7YGUbSyXmTm2Qb6+6Pta+96wW2TxrQgCJi?=
+ =?us-ascii?Q?svxENZ0jORVrRTx5QPQxuejiWi3sib+gdFnnOwk/Yi9ex1VGNZ+iq3gdyabZ?=
+ =?us-ascii?Q?664tpdZWTHp2cWennkV/sANexClVpAU0/Ya2ddogkyQV+uBEMnxtDLhZpDim?=
+ =?us-ascii?Q?d/m0e5yxtIO5P5+RHbvrE0EO+pPniDFfMtSSnH2uNOYFE0JIrly1X4KcaYa0?=
+ =?us-ascii?Q?HjOVF76ULitabQPCqfdvfqu7UeHGViZtLwsg?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 13:44:06.8210
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2025 13:44:11.8956
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e5e6b25-7700-41f5-35dd-08dd7db5ecac
+X-MS-Exchange-CrossTenant-Network-Message-Id: 465091b6-569f-4288-530d-08dd7db5efb4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000013B.namprd02.prod.outlook.com
+	CH2PEPF0000013C.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8340
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8874
 
 From: Yong Wang <yongwang@nvidia.com>
 
-When the vlan STP state is changed, which could be manipulated by
-"bridge vlan" commands, similar to port STP state, this also impacts
-multicast behaviors such as igmp query. In the scenario of per-VLAN
-snooping, there's a need to update the corresponding multicast context
-to re-arm the port query timer when vlan state becomes "forwarding" etc.
+Change ALL_TESTS definition to "test-per-line".
 
-Update br_vlan_set_state() function to enable vlan multicast context
-in such scenario.
-
-Before the patch, the IGMP query does not happen in the last step of the
-following test sequence, i.e. no growth for tx counter:
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
- # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
- # ip link add name swp1 up master br1 type dummy
- # sleep 1
- # bridge vlan set vid 1 dev swp1 state 4
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # sleep 1
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # bridge vlan set vid 1 dev swp1 state 3
- # sleep 2
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
-
-After the patch, the IGMP query happens in the last step of the test:
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
- # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
- # ip link add name swp1 up master br1 type dummy
- # sleep 1
- # bridge vlan set vid 1 dev swp1 state 4
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # sleep 1
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # bridge vlan set vid 1 dev swp1 state 3
- # sleep 2
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-3
+Add the test case of per vlan snooping with port stp state change to
+forwarding and also vlan equivalent case in both bridge_igmp.sh and
+bridge_mld.sh.
 
 Signed-off-by: Yong Wang <yongwang@nvidia.com>
 Reviewed-by: Andy Roulin <aroulin@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- net/bridge/br_mst.c       |  4 ++--
- net/bridge/br_multicast.c | 26 ++++++++++++++++++++++++++
- net/bridge/br_private.h   | 11 ++++++++++-
- 3 files changed, 38 insertions(+), 3 deletions(-)
+ .../selftests/net/forwarding/bridge_igmp.sh   | 80 +++++++++++++++++-
+ .../selftests/net/forwarding/bridge_mld.sh    | 81 ++++++++++++++++++-
+ tools/testing/selftests/net/forwarding/config |  1 +
+ 3 files changed, 154 insertions(+), 8 deletions(-)
 
-diff --git a/net/bridge/br_mst.c b/net/bridge/br_mst.c
-index 1820f09ff59c..3f24b4ee49c2 100644
---- a/net/bridge/br_mst.c
-+++ b/net/bridge/br_mst.c
-@@ -80,10 +80,10 @@ static void br_mst_vlan_set_state(struct net_bridge_vlan_group *vg,
- 	if (br_vlan_get_state(v) == state)
- 		return;
+diff --git a/tools/testing/selftests/net/forwarding/bridge_igmp.sh b/tools/testing/selftests/net/forwarding/bridge_igmp.sh
+index e6a3e04fd83f..d4e7dd659354 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_igmp.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_igmp.sh
+@@ -1,10 +1,24 @@
+ #!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
  
--	br_vlan_set_state(v, state);
--
- 	if (v->vid == vg->pvid)
- 		br_vlan_set_pvid_state(vg, state);
-+
-+	br_vlan_set_state(v, state);
+-ALL_TESTS="v2reportleave_test v3include_test v3inc_allow_test v3inc_is_include_test \
+-	   v3inc_is_exclude_test v3inc_to_exclude_test v3exc_allow_test v3exc_is_include_test \
+-	   v3exc_is_exclude_test v3exc_to_exclude_test v3inc_block_test v3exc_block_test \
+-	   v3exc_timeout_test v3star_ex_auto_add_test"
++ALL_TESTS="
++	v2reportleave_test
++	v3include_test
++	v3inc_allow_test
++	v3inc_is_include_test
++	v3inc_is_exclude_test
++	v3inc_to_exclude_test
++	v3exc_allow_test
++	v3exc_is_include_test
++	v3exc_is_exclude_test
++	v3exc_to_exclude_test
++	v3inc_block_test
++	v3exc_block_test
++	v3exc_timeout_test
++	v3star_ex_auto_add_test
++	v2per_vlan_snooping_port_stp_test
++	v2per_vlan_snooping_vlan_stp_test
++"
+ NUM_NETIFS=4
+ CHECK_TC="yes"
+ TEST_GROUP="239.10.10.10"
+@@ -554,6 +568,64 @@ v3star_ex_auto_add_test()
+ 	v3cleanup $swp2 $TEST_GROUP
  }
  
- int br_mst_set_state(struct net_bridge_port *p, u16 msti, u8 state,
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index ce07fda6a848..7e0b2362b9ee 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -4272,6 +4272,32 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
- #endif
- }
- 
-+void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
++v2per_vlan_snooping_stp_test()
 +{
-+#if IS_ENABLED(CONFIG_BRIDGE_VLAN_FILTERING)
-+	struct net_bridge *br;
++	local is_port=$1
 +
-+	if (!br_vlan_should_use(v))
-+		return;
++	local msg="port"
++	[[ $is_port -ne 1 ]] && msg="vlan"
 +
-+	if (br_vlan_is_master(v))
-+		return;
++	ip link set br0 up type bridge vlan_filtering 1 \
++					mcast_igmp_version 2 \
++					mcast_snooping 1 \
++					mcast_vlan_snooping 1 \
++					mcast_querier 1 \
++					mcast_stats_enabled 1
++	bridge vlan global set vid 1 dev br0 \
++					mcast_snooping 1 \
++					mcast_querier 1 \
++					mcast_query_interval 100 \
++					mcast_startup_query_count 0
++	[[ $is_port -eq 1 ]] && bridge link set dev $swp1 state 0
++	[[ $is_port -ne 1 ]] && bridge vlan set vid 1 dev $swp1 state 4
++	sleep 5
++	local tx_s=$(ip -j -p stats show dev $swp1 \
++			group xstats_slave subgroup bridge suite mcast \
++			| jq '.[]["multicast"]["igmp_queries"]["tx_v2"]')
 +
-+	br = v->port->br;
++	[[ $is_port -eq 1 ]] && bridge link set dev $swp1 state 3
++	[[ $is_port -ne 1 ]] && bridge vlan set vid 1 dev $swp1 state 3
++	sleep 5
++	local tx_e=$(ip -j -p stats show dev $swp1 \
++			group xstats_slave subgroup bridge suite mcast \
++			| jq '.[]["multicast"]["igmp_queries"]["tx_v2"]')
 +
-+	if (!br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
-+		return;
++	RET=0
++	local tx=$(expr $tx_e - $tx_s)
++	test $tx -gt 0
++	check_err $? "No IGMP queries after STP state becomes forwarding"
++	log_test "per vlan snooping with $msg stp state change"
 +
-+	if (br_vlan_state_allowed(state, true))
-+		br_multicast_enable_port_ctx(&v->port_mcast_ctx);
-+
-+	/* Multicast is not disabled for the vlan when it goes in
-+	 * blocking state because the timers will expire and stop by
-+	 * themselves without sending more queries.
-+	 */
-+#endif
++	# restore settings
++	bridge vlan global set vid 1 dev br0 \
++					mcast_querier 0 \
++					mcast_query_interval 12500 \
++					mcast_startup_query_count 2
++	ip link set br0 up type bridge vlan_filtering 0 \
++					mcast_vlan_snooping 0 \
++					mcast_stats_enabled 0
 +}
 +
- void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
- {
- 	struct net_bridge *br;
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 71f351a6ce1b..db1bddb330ff 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -1055,6 +1055,7 @@ void br_multicast_port_ctx_init(struct net_bridge_port *port,
- 				struct net_bridge_vlan *vlan,
- 				struct net_bridge_mcast_port *pmctx);
- void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pmctx);
-+void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state);
- void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on);
- int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
- 				      struct netlink_ext_ack *extack);
-@@ -1521,6 +1522,11 @@ static inline void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pm
- {
- }
- 
-+static inline void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v,
-+						      u8 state)
++v2per_vlan_snooping_port_stp_test()
 +{
++	v2per_vlan_snooping_stp_test 1
 +}
 +
- static inline void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan,
- 						bool on)
- {
-@@ -1881,7 +1887,9 @@ bool br_vlan_global_opts_can_enter_range(const struct net_bridge_vlan *v_curr,
- bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
- 			      const struct net_bridge_vlan *v_opts);
++v2per_vlan_snooping_vlan_stp_test()
++{
++	v2per_vlan_snooping_stp_test 0
++}
++
+ trap cleanup EXIT
  
--/* vlan state manipulation helpers using *_ONCE to annotate lock-free access */
-+/* vlan state manipulation helpers using *_ONCE to annotate lock-free access,
-+ * while br_vlan_set_state() may access data protected by multicast_lock.
-+ */
- static inline u8 br_vlan_get_state(const struct net_bridge_vlan *v)
- {
- 	return READ_ONCE(v->state);
-@@ -1890,6 +1898,7 @@ static inline u8 br_vlan_get_state(const struct net_bridge_vlan *v)
- static inline void br_vlan_set_state(struct net_bridge_vlan *v, u8 state)
- {
- 	WRITE_ONCE(v->state, state);
-+	br_multicast_update_vlan_mcast_ctx(v, state);
+ setup_prepare
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mld.sh b/tools/testing/selftests/net/forwarding/bridge_mld.sh
+index f84ab2e65754..4cacef5a813a 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mld.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mld.sh
+@@ -1,10 +1,23 @@
+ #!/bin/bash
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-ALL_TESTS="mldv2include_test mldv2inc_allow_test mldv2inc_is_include_test mldv2inc_is_exclude_test \
+-	   mldv2inc_to_exclude_test mldv2exc_allow_test mldv2exc_is_include_test \
+-	   mldv2exc_is_exclude_test mldv2exc_to_exclude_test mldv2inc_block_test \
+-	   mldv2exc_block_test mldv2exc_timeout_test mldv2star_ex_auto_add_test"
++ALL_TESTS="
++	mldv2include_test
++	mldv2inc_allow_test
++	mldv2inc_is_include_test
++	mldv2inc_is_exclude_test
++	mldv2inc_to_exclude_test
++	mldv2exc_allow_test
++	mldv2exc_is_include_test
++	mldv2exc_is_exclude_test
++	mldv2exc_to_exclude_test
++	mldv2inc_block_test
++	mldv2exc_block_test
++	mldv2exc_timeout_test
++	mldv2star_ex_auto_add_test
++	mldv2per_vlan_snooping_port_stp_test
++	mldv2per_vlan_snooping_vlan_stp_test
++"
+ NUM_NETIFS=4
+ CHECK_TC="yes"
+ TEST_GROUP="ff02::cc"
+@@ -554,6 +567,66 @@ mldv2star_ex_auto_add_test()
+ 	mldv2cleanup $swp2
  }
  
- static inline u8 br_vlan_get_pvid_state(const struct net_bridge_vlan_group *vg)
++mldv2per_vlan_snooping_stp_test()
++{
++	local is_port=$1
++
++	local msg="port"
++	[[ $is_port -ne 1 ]] && msg="vlan"
++
++	ip link set br0 up type bridge vlan_filtering 1 \
++					mcast_mld_version 2 \
++					mcast_snooping 1 \
++					mcast_vlan_snooping 1 \
++					mcast_querier 1 \
++					mcast_stats_enabled 1
++	bridge vlan global set vid 1 dev br0 \
++					mcast_mld_version 2 \
++					mcast_snooping 1 \
++					mcast_querier 1 \
++					mcast_query_interval 100 \
++					mcast_startup_query_count 0
++
++	[[ $is_port -eq 1 ]] && bridge link set dev $swp1 state 0
++	[[ $is_port -ne 1 ]] && bridge vlan set vid 1 dev $swp1 state 4
++	sleep 5
++	local tx_s=$(ip -j -p stats show dev $swp1 \
++			group xstats_slave subgroup bridge suite mcast \
++			| jq '.[]["multicast"]["mld_queries"]["tx_v2"]')
++	[[ $is_port -eq 1 ]] && bridge link set dev $swp1 state 3
++	[[ $is_port -ne 1 ]] && bridge vlan set vid 1 dev $swp1 state 3
++	sleep 5
++	local tx_e=$(ip -j -p stats show dev $swp1 \
++			group xstats_slave subgroup bridge suite mcast \
++			| jq '.[]["multicast"]["mld_queries"]["tx_v2"]')
++
++	RET=0
++	local tx=$(expr $tx_e - $tx_s)
++	test $tx -gt 0
++	check_err $? "No MLD queries after STP state becomes forwarding"
++	log_test "per vlan snooping with $msg stp state change"
++
++	# restore settings
++	bridge vlan global set vid 1 dev br0 \
++					mcast_querier 0 \
++					mcast_query_interval 12500 \
++					mcast_startup_query_count 2 \
++					mcast_mld_version 1
++	ip link set br0 up type bridge vlan_filtering 0 \
++					mcast_vlan_snooping 0 \
++					mcast_stats_enabled 0
++}
++
++mldv2per_vlan_snooping_port_stp_test()
++{
++	mldv2per_vlan_snooping_stp_test 1
++}
++
++mldv2per_vlan_snooping_vlan_stp_test()
++{
++	mldv2per_vlan_snooping_stp_test 0
++}
++
+ trap cleanup EXIT
+ 
+ setup_prepare
+diff --git a/tools/testing/selftests/net/forwarding/config b/tools/testing/selftests/net/forwarding/config
+index 8d7a1a004b7c..18fd69d8d937 100644
+--- a/tools/testing/selftests/net/forwarding/config
++++ b/tools/testing/selftests/net/forwarding/config
+@@ -1,6 +1,7 @@
+ CONFIG_BRIDGE=m
+ CONFIG_VLAN_8021Q=m
+ CONFIG_BRIDGE_VLAN_FILTERING=y
++CONFIG_BRIDGE_IGMP_SNOOPING=y
+ CONFIG_NET_L3_MASTER_DEV=y
+ CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_NET_VRF=m
 -- 
 2.49.0
 
