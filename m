@@ -1,114 +1,115 @@
-Return-Path: <netdev+bounces-183737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51461A91C16
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0227BA91C1D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5263E7A6EE6
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:27:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DBEC4462B5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD988245020;
-	Thu, 17 Apr 2025 12:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KScbEZzG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B3324EF91;
+	Thu, 17 Apr 2025 12:26:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D21023FC7D;
-	Thu, 17 Apr 2025 12:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E86243958
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 12:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744892782; cv=none; b=U0/qH3NiWL4mCo9ijKQuxYyl8McYiINGzcgpl/oj2mRvo7L9ZYZ1fojB4VUNlRxzicv5Y8s4QkqfXXHa6d44NeffkMhsV/IFfPN5MRfzYw/JHUEcjmlcE3XEDZdPjKOzs7QNKgFcB5oI0RrRW7crtXi5dk+I6QEYmRuhU14X8t8=
+	t=1744892806; cv=none; b=UcAqaaEaIduH35DkaUKDaZrYPjWa+2ZPGQkLmFoUJ9c18qZfZ6uvgJWYKt0GlaB0WfT/ZzQ1UMqMFyyQdZq0La0tVxVc9IEp1pCLzV84hrL5HWhq27ghiSi7Lhftd1XhgklXvlGzCcVkrD97sr9l1yupT8j/AapI1nIeiipemB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744892782; c=relaxed/simple;
-	bh=XShrIqy/F/rO/KKW612V+Cc9f3IOC6YKFgfbvHrhTVw=;
+	s=arc-20240116; t=1744892806; c=relaxed/simple;
+	bh=4BErrztFzhMYlEHn54HA3jkGmjG1cbrPBT2s2/tlpT4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhxIIa80FuiDCQ4HHD87kkNYmNNXipomV0K+En3E8VjaHzFpLeZ6LLU7bUFaIXQlKtxck3LTrMMsxOCC/CtoUV0L6KHUSSo9vx/f+MJJh5eBwy0CZa2fcq1/yS0DeOHim2gIbxKkPZtQSyE7fyZGUiCcYjosCekbuuEJktlg1GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KScbEZzG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BVA8Ut43wC0vlwGEv5MT143tTlJwFfx7Nv9rCtN2oCo=; b=KScbEZzGRMQxUhMbyHSWCWNh/o
-	8v6F3QwmplCDkcgy0Ast0jELZEdhMvg5mGAymRrtGYyO+W5p2O/e/+VvZoXwSAQk9NDACJ8HIWmEE
-	ui3wNRoI6/Z3vuSCpRMhExN/42nau6qdfvUpgPI9ywIRiwuilCBorpRTj0b+SUYd4Yr2h34VcP9Wk
-	TN5nIKO5nLMaOCCfWz4aXFAoOc44Hp9FKoDHnw7rle8FoN9OcgOEz81wrTP5JoClxWV1sPG5pqxST
-	Q5EzrYAVhniiBMa0Zjj3vLehMaUrlQ7xy/lVmn6WsMGFHAo/iJZyC/V8nhS/1Fes/uqnHESH3ZMIH
-	ZLJ5pTtQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56390)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ra8uIGOES+yYyYsU9q1KE4b9QdTGVF3dg3k2KLiNgCxBAW2Rx5Js+DuOo2T4rsIcPFh+5OdP3uqXiwXjOAcQuEjdjJ1N9eKpkVSKnT5aYUWQT3Md+fZt1D+wMoEulm9RsC3+4YdxmfHH1lqP5IlrT4FcnAViggqy36PihluSveA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u5OJp-0001Yv-1v; Thu, 17 Apr 2025 14:26:13 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u5OJj-0007Gc-2R;
-	Thu, 17 Apr 2025 13:26:07 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u5OJa-0002RV-1O;
-	Thu, 17 Apr 2025 13:25:58 +0100
-Date: Thu, 17 Apr 2025 13:25:58 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	(envelope-from <ore@pengutronix.de>)
+	id 1u5OJn-000kQl-2l;
+	Thu, 17 Apr 2025 14:26:11 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u5OJn-005xWZ-2I;
+	Thu, 17 Apr 2025 14:26:11 +0200
+Date: Thu, 17 Apr 2025 14:26:11 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jonathan Corbet <corbet@lwn.net>, Joyce Ooi <joyce.ooi@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
-	Robert Hancock <robert.hancock@calian.com>,
-	Saravana Kannan <saravanak@google.com>,
-	UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next PATCH v3 00/11] Add PCS core support
-Message-ID: <aADzVrN1yb6UOcLh@shell.armlinux.org.uk>
-References: <20250415193323.2794214-1-sean.anderson@linux.dev>
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v8 04/13] net: pse-pd: Add support for PSE power
+ domains
+Message-ID: <aADzY3d7HV4Uhjoy@pengutronix.de>
+References: <20250416-feature_poe_port_prio-v8-0-446c39dc3738@bootlin.com>
+ <20250416-feature_poe_port_prio-v8-4-446c39dc3738@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250415193323.2794214-1-sean.anderson@linux.dev>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250416-feature_poe_port_prio-v8-4-446c39dc3738@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Apr 15, 2025 at 03:33:12PM -0400, Sean Anderson wrote:
-> This series adds support for creating PCSs as devices on a bus with a
-> driver (patch 3). As initial users,
+On Wed, Apr 16, 2025 at 03:44:19PM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Introduce PSE power domain support as groundwork for upcoming port
+> priority features. Multiple PSE PIs can now be grouped under a single
+> PSE power domain, enabling future enhancements like defining available
+> power budgets, port priority modes, and disconnection policies. This
+> setup will allow the system to assess whether activating a port would
+> exceed the available power budget, preventing over-budget states
+> proactively.
+> 
+> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-As per previous, unless I respond (this response not included) then I
-haven't had time to look at it - and today is total ratshit so, not
-today.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
+Thank you!
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
