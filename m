@@ -1,107 +1,117 @@
-Return-Path: <netdev+bounces-183782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 546C3A91EE5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:55:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53423A91EDC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC4A619E8149
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:55:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB2C319E7EDD
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2082F250C00;
-	Thu, 17 Apr 2025 13:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0729024F5A5;
+	Thu, 17 Apr 2025 13:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pTnm5dB7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOdsGfKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E19250BEE;
-	Thu, 17 Apr 2025 13:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A2624EABC;
+	Thu, 17 Apr 2025 13:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744898120; cv=none; b=HSxayQEOmrErAn4cF5Qyc5qaDPmi2V3Z3UUnGKMJymXaWjjRYSeXOWqoDXLYkylNshrTJbFtMNmYg4SJv4V0iBNZUzHAGmLQiAOAhjdoiG5l1v4kBrLNGCsjv8taWnJWKpt1UtbL8Ps0z5wkmq6+JQ2encLN82uRF46q3/gfHCQ=
+	t=1744898107; cv=none; b=KgpB2UxK3FM0kXoh3j2jIJ/H1XZJpZsgRBngbVvjdtsxB2LtMqYTIMhYb1dlXpwy+c1ITIJ6uiVoj6n7YSysKSdaUywOiGKP0RziRYXsfAWZGuO4lNSQN1bNlr0l2xBYs7FlseID95n+aLguyf0Ut9M4+NtQlkLX0uhLxhneokk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744898120; c=relaxed/simple;
-	bh=5lzD0TshOdrR27H/jD0A3Zp1OSldjowmx/m925ghKvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GVBY+08xWT9Eb0RWH2J+00qxxFKuMooS3VOqo93Hg2PmbtOTV+2hAQLS9ls542zGuVpNm1UQJRbWRepA4ce639LzK34KN+TxdH2myXayWmVC7PaMBpayneqeGw/TobId6glql3fP8Wqu4YGO90SQrXOhyFiNad/l2kFmYN6tPgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pTnm5dB7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MfEXm04TR9hSAuPlSBHlDuFQXlICktBrJoOYKmYwNLE=; b=pTnm5dB7K/QYer3+j7qstl9t2m
-	u2mHR3vFF6A70hv4G+0XqpgYbW5aFq90v+P45JkGylwl9eejYw7PIr+FiZrDVtJ4ho7EGqdE1g2yr
-	pYH4yrq67wGX8hDraLxcMH9f/micPho+mv8Deg0ldzXBv/b9R/3+ZUWUQK0fX3ZITMrs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u5Phk-009n2J-NR; Thu, 17 Apr 2025 15:55:00 +0200
-Date: Thu, 17 Apr 2025 15:55:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-	Nathan Sullivan <nathan.sullivan@ni.com>,
-	Josh Cartwright <josh.cartwright@ni.com>,
-	Zach Brown <zach.brown@ni.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Chuanhong Guo <gch981213@gmail.com>,
-	Qingfang Deng <qingfang.deng@siflower.com.cn>,
-	Hao Guan <hao.guan@siflower.com.cn>
-Subject: Re: [PATCH net] net: phy: leds: fix memory leak
-Message-ID: <f9f60754-ef84-483f-bd77-b7bc99aadb27@lunn.ch>
-References: <20250417032557.2929427-1-dqfext@gmail.com>
+	s=arc-20240116; t=1744898107; c=relaxed/simple;
+	bh=kikyls/Flbvvf3iZL5T+aAZQiRp9n1HQT7ciNWS5aG4=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=mXcCuHswq7CKTQFiR//nxcgWiwDTRXu4QSfUBbn6+E7e/RsNWj9rcicXEg94H4r72vZ+54kyYSGo6ZOAmLENqrlnsQssBctKe1O2cnabNha1/VYPRHOzlvhJhkXiYGtVy1MmKRpJtRQY93/hquFLktdAVctS5JXGmvnkmaLhtJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOdsGfKo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29781C4CEEB;
+	Thu, 17 Apr 2025 13:55:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744898107;
+	bh=kikyls/Flbvvf3iZL5T+aAZQiRp9n1HQT7ciNWS5aG4=;
+	h=Subject:From:To:Cc:Date:From;
+	b=iOdsGfKoABtNFQhGJqce6/BZwC45sVmtLczYZs/tEvnqgiXOkUgkk0KpfiE3ebgR7
+	 wO4LFjTXaKV26G+Hm1xw+8YnsEjMRJJxdK+B3RcQYIezP+JoUuRPeuRNariARlj0zO
+	 vgWBbKijfZDADuZx3Cnbg8BhCJSDbWNfGYKkSQhxbWQ1TecmmKMIhPx74O3JGyugLQ
+	 K+X/dmwBysshOM4Y9J66P2qFJVg+xz4k86ot+JtUNlFF6ry0Bqq4AFMOyU1geOOJf4
+	 XdOCQkkzJZBB/v4Gv+gkjnD7h0//0QOxkmW5D46Q06OuOAWgy98Jr4VDa2bAU0E8xj
+	 N6/Y6vY9TvPYA==
+Subject: [PATCH net-next V5 0/2] veth: qdisc backpressure and qdisc check
+ refactor
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ tom@herbertland.com, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc
+Date: Thu, 17 Apr 2025 15:55:02 +0200
+Message-ID: <174489803410.355490.13216831426556849084.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417032557.2929427-1-dqfext@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 17, 2025 at 11:25:56AM +0800, Qingfang Deng wrote:
-> From: Qingfang Deng <qingfang.deng@siflower.com.cn>
-> 
-> A network restart test on a router led to an out-of-memory condition,
-> which was traced to a memory leak in the PHY LED trigger code.
-> 
-> The root cause is misuse of the devm API. The registration function
-> (phy_led_triggers_register) is called from phy_attach_direct, not
-> phy_probe, and the unregister function (phy_led_triggers_unregister)
-> is called from phy_detach, not phy_remove. This means the register and
-> unregister functions can be called multiple times for the same PHY
-> device, but devm-allocated memory is not freed until the driver is
-> unbound.
-> 
-> This also prevents kmemleak from detecting the leak, as the devm API
-> internally stores the allocated pointer.
-> 
-> Fix this by replacing devm_kzalloc/devm_kcalloc with standard
-> kzalloc/kcalloc, and add the corresponding kfree calls in the unregister
-> path.
-> 
-> Fixes: 3928ee6485a3 ("net: phy: leds: Add support for "link" trigger")
-> Fixes: 2e0bc452f472 ("net: phy: leds: add support for led triggers on phy link state change")
-> Signed-off-by: Hao Guan <hao.guan@siflower.com.cn>
-> Signed-off-by: Qingfang Deng <qingfang.deng@siflower.com.cn>
+This patch series addresses TX drops seen on veth devices under load,
+particularly when using threaded NAPI, which is our setup in production.
 
-Thanks for the fix. I agree with Maxime, this looks correct.
+The root cause is that the NAPI consumer often runs on a different CPU
+than the producer. Combined with scheduling delays or simply slower
+consumption, this increases the chance that the ptr_ring fills up before
+packets are drained, resulting in drops from veth_xmit() (ndo_start_xmit()).
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+To make this easier to reproduce, we’ve created a script that sets up a
+test scenario using network namespaces. The script inserts 1000 iptables
+rules in the consumer namespace to slow down packet processing and
+amplify the issue. Reproducer script:
 
-The use of devm_free() should trigger any reviewer to take a closer
-look because it generally means something is wrong.
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_setup01_NAPI_TX_drops.sh
 
-    Andrew
+This series first introduces a helper to detect no-queue qdiscs and then
+uses it in the veth driver to conditionally apply qdisc-level
+backpressure when a real qdisc is attached. The behavior is off by
+default and opt-in, ensuring minimal impact and easy activation.
+
+---
+
+V5:
+ - use rcu_dereference_check to signal that NAPI is a RCU section
+ - whitespace fixes reported by checkpatch.pl
+ - handle unlikely race
+ - Link to V4 https://lore.kernel.org/all/174472463778.274639.12670590457453196991.stgit@firesoul/
+V4:
+ - Check against no-queue instead of no-op qdisc
+ - Link to V3: https://lore.kernel.org/all/174464549885.20396.6987653753122223942.stgit@firesoul/
+V3:
+ - Reorder patches, generalize check for no-op qdisc as first patch
+   - RFC: As testing show this is incorrect
+ - rcu_dereference(priv->peer) in veth_xdp_rcv as this runs in NAPI
+   context rcu_read_lock() is implicit.
+ - Link to V2: https://lore.kernel.org/all/174412623473.3702169.4235683143719614624.stgit@firesoul/
+V2:
+ - Generalize check for no-op qdisc
+ - Link to RFC-V1: https://lore.kernel.org/all/174377814192.3376479.16481605648460889310.stgit@firesoul/
+
+Jesper Dangaard Brouer (2):
+      net: sched: generalize check for no-queue qdisc on TX queue
+      veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
+
+
+ drivers/net/veth.c        | 55 ++++++++++++++++++++++++++++++++-------
+ drivers/net/vrf.c         |  4 +--
+ include/net/sch_generic.h |  8 ++++++
+ 3 files changed, 54 insertions(+), 13 deletions(-)
+
+--
+
 
