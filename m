@@ -1,157 +1,142 @@
-Return-Path: <netdev+bounces-183834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596FBA922D4
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:37:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF31A922D1
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 869C03AFDE1
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C33E16C229
 	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C292550C4;
-	Thu, 17 Apr 2025 16:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UU3XN5/X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C54254850;
+	Thu, 17 Apr 2025 16:37:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BED254850
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8390D7081E;
+	Thu, 17 Apr 2025 16:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744907825; cv=none; b=H0acSWfnVexMaNP9mxWfs11HsiyaRmFNF3otNZcuEG7WfLiqjV69LxV5sD3+3SS2MTNI5y6OLOQQHq/mHbowMXBhi8keY+kXB+WC3X4xQhpdM9su4SztuF82k6Su2B8+3arqMWAasVdQClNa7rBVrHfWLk4LbReAYwUE/JPNJNg=
+	t=1744907819; cv=none; b=RzYIhRN+DZ+nQIALYZ19FtLyZyW0ZJAs2zmKrTD+ZSGMuG/ZVtCyO2vsrIkI+/qtwdrHcb+0X98GU5nF9Vzc9VEtJCs4uIct6kjUxEOS081weEatJe/7Fwl8DkveriWP7EKPAucQbz9sz5MTuyDooyRggw7JI6rWMDu/lisM+HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744907825; c=relaxed/simple;
-	bh=ZB1x85E9TZSV27ACI1YbITPS8W7AaqTCmW3E93K4f0g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qc790/Pje7gYk1+ZSt6LGZd6BWUmQCNVi7z2pHNw5+izffkLVJiYst7La78emag+SJivVKJvZ41erJNCfA4CljlmxvBnMvEDcJi7rnT1Sk63qPsZajM2eAsdjBqqP6BLIW0wNXSF8PpU9i7u5UQ7ZDFKe6Udbe/SIX3rU/nEXq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UU3XN5/X; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744907822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LHtvPer+uhTnTZr30khXohx3R0vSZbxSNnylVoOnq58=;
-	b=UU3XN5/X3jdSqu3Y2uA/QqGOcdyE+AItuWX6/gCWCCLbHQQFj7pstePci8sQjupfbfuoWw
-	lJaneSakwhwnLQUxRVepRYIw4O7JUdXFPEU7/kQ9e4aXqB9EKnTa90r9wu4Vgzv1RSbF+/
-	cyph1MttaEC2T/NAIfZWoh2JUD5Znq0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-t5j63oQ2PAmH5IVFq-QmPQ-1; Thu,
- 17 Apr 2025 12:36:55 -0400
-X-MC-Unique: t5j63oQ2PAmH5IVFq-QmPQ-1
-X-Mimecast-MFC-AGG-ID: t5j63oQ2PAmH5IVFq-QmPQ_1744907812
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6668182FF46;
-	Thu, 17 Apr 2025 16:35:57 +0000 (UTC)
-Received: from [10.44.33.28] (unknown [10.44.33.28])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C28A21956095;
-	Thu, 17 Apr 2025 16:35:52 +0000 (UTC)
-Message-ID: <76f668a7-1cd6-445b-9e62-cb314bdeefa9@redhat.com>
-Date: Thu, 17 Apr 2025 18:35:51 +0200
+	s=arc-20240116; t=1744907819; c=relaxed/simple;
+	bh=H5r7SeuvDiLGsgZFktJlVy5PGtaaiCjlxewcnoMUxtQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lEvdhYcYxuPKaJJJvDE2L4M7s88dR+RvKFoPd3OaBBIcOdwGohhZBfuvL2SyzUhSxXWghT1wmnJdSJqf+susVBtrVK42j0KLhxmrEFJGZkhfnDr5T2F6Vz2Lx5KG/CBeN8wuRh3zxk/8Wx2ibfHm9TTIIr0Yo5luSlxUg0XV8Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Zdk2q3Sm7z6M4W2;
+	Fri, 18 Apr 2025 00:32:51 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 334841400CA;
+	Fri, 18 Apr 2025 00:36:52 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 17 Apr
+ 2025 18:36:51 +0200
+Date: Thu, 17 Apr 2025 17:36:50 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
+Subject: Re: [PATCH v13 11/22] cxl: define a driver interface for HPA free
+ space enumeration
+Message-ID: <20250417173650.00003ee0@huawei.com>
+In-Reply-To: <eb5f16f8-607a-4c71-8f81-5cdb4ff73a75@amd.com>
+References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
+	<20250414151336.3852990-12-alejandro.lucero-palau@amd.com>
+	<20250415145016.00003725@huawei.com>
+	<eb5f16f8-607a-4c71-8f81-5cdb4ff73a75@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 5/8] mfd: zl3073x: Add functions to work with
- register mailboxes
-To: Lee Jones <lee@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-6-ivecera@redhat.com>
- <20250417161354.GF372032@google.com>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20250417161354.GF372032@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
+On Thu, 17 Apr 2025 13:11:00 +0100
+Alejandro Lucero Palau <alucerop@amd.com> wrote:
 
-
-On 17. 04. 25 6:13 odp., Lee Jones wrote:
-> On Wed, 16 Apr 2025, Ivan Vecera wrote:
+> On 4/15/25 14:50, Jonathan Cameron wrote:
+> > On Mon, 14 Apr 2025 16:13:25 +0100
+> > alejandro.lucero-palau@amd.com wrote:
+> >  
+> >> From: Alejandro Lucero <alucerop@amd.com>
+> >>
+> >> CXL region creation involves allocating capacity from device DPA
+> >> (device-physical-address space) and assigning it to decode a given HPA
+> >> (host-physical-address space). Before determining how much DPA to
+> >> allocate the amount of available HPA must be determined. Also, not all
+> >> HPA is created equal, some specifically targets RAM, some target PMEM,
+> >> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
+> >> is host-only (HDM-H).
+> >>
+> >> Wrap all of those concerns into an API that retrieves a root decoder
+> >> (platform CXL window) that fits the specified constraints and the
+> >> capacity available for a new region.
+> >>
+> >> Add a complementary function for releasing the reference to such root
+> >> decoder.
+> >>
+> >> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> >>
+> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>  
+> > One trivial comment inline.
+> >
+> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> >  
+> >> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> >> index 80caaf14d08a..0a9eab4f8e2e 100644
+> >> --- a/drivers/cxl/core/region.c
+> >> +++ b/drivers/cxl/core/region.c
+> >> +static int find_max_hpa(struct device *dev, void *data)
+> >> +{
+> >> +	struct cxlrd_max_context *ctx = data;
+> >> +	struct cxl_switch_decoder *cxlsd;
+> >> +	struct cxl_root_decoder *cxlrd;
+> >> +	struct resource *res, *prev;
+> >> +	struct cxl_decoder *cxld;
+> >> +	resource_size_t max;
+> >> +	int found = 0;
+> >> +
+> >> +	if (!is_root_decoder(dev))
+> >> +		return 0;
+> >> +
+> >> +	cxlrd = to_cxl_root_decoder(dev);
+> >> +	cxlsd = &cxlrd->cxlsd;
+> >> +	cxld = &cxlsd->cxld;
+> >> +
+> >> +	/*
+> >> +	 * None flags are declared as bitmaps but for the sake of better code  
+> > None?  
 > 
->> Registers present in page 10 and higher are called mailbox type
->> registers. Each page represents a mailbox and is used to read and write
->> configuration of particular object (dpll, output, reference & synth).
->>
->> The mailbox page contains mask register that is used to select an index of
->> requested object to work with and semaphore register to indicate what
->> operation is requested.
->>
->> The rest of registers in the particular register page are latch
->> registers that are filled by the firmware during read operation or by
->> the driver prior write operation.
->>
->> For read operation the driver...
->> 1) ... updates the mailbox mask register with index of particular object
->> 2) ... sets the mailbox semaphore register read bit
->> 3) ... waits for the semaphore register read bit to be cleared by FW
->> 4) ... reads the configuration from latch registers
->>
->> For write operation the driver...
->> 1) ... writes the requested configuration to latch registers
->> 2) ... sets the mailbox mask register for the DPLL to be updated
->> 3) ... sets the mailbox semaphore register bit for the write operation
->> 4) ... waits for the semaphore register bit to be cleared by FW
->>
->> Add functions to read and write mailboxes for all supported object types.
->>
->> All these functions as well as functions accessing mailbox latch registers
->> (zl3073x_mb_* functions) have to be called with zl3073x_dev->mailbox_lock
->> held and a caller is responsible to take this lock.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> v1->v3:
->> * dropped ZL3073X_MB_OP macro usage
->> ---
->>   drivers/mfd/zl3073x-core.c       | 232 +++++++++++++++++++++++
->>   include/linux/mfd/zl3073x.h      |  12 ++
->>   include/linux/mfd/zl3073x_regs.h | 304 +++++++++++++++++++++++++++++++
->>   3 files changed, 548 insertions(+)
 > 
->> +/*
->> + * Mailbox operations
->> + */
->> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_dpll_write(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_output_read(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_output_write(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_ref_read(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_ref_write(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_synth_read(struct zl3073x_dev *zldev, u8 index);
->> +int zl3073x_mb_synth_write(struct zl3073x_dev *zldev, u8 index);
+> Not sure you refer to syntax or semantics here. Assuming is the former:
+Just the wording of the comment. I'm not sure what it means.
+
 > 
-> Why aren't these being placed into drivers/mailbox?
+> 
+> No flags fields?
 
-I think the only common thing of this with drivers/mailbox is only the
-name. Mailbox (this comes from datasheet) here is just an atomic way to
-read or write some range of registers.
-
-How can be that used here?
-
-Ivan
+Not following that either.
+> 
+> 
+> >  
+> >> +	 * used here as such, restricting the bitmap size to those bits used by
+> >> +	 * any Type2 device driver requester.
+> >> +	 */  
+> >  
 
 
