@@ -1,134 +1,111 @@
-Return-Path: <netdev+bounces-183560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78951A910D1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 02:38:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E554A910D3
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 02:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66C7D7AF3C5
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:36:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 700A95A3686
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 00:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D5F64A8F;
-	Thu, 17 Apr 2025 00:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4446145348;
+	Thu, 17 Apr 2025 00:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H43/vG4G"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="b39YbBfa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E630374C08
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 00:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8D713AD3F
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 00:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744850127; cv=none; b=UpSLDl3a4FEZD9qKu5zadD6TTE+wNMR+UEFMKIY/QFQ4FQ+oki0UDhbkJZ8LPAZXkj/0tr3mngpnIR0O6q0jIyB+ShOkDnVN90cupmQWqCg48DKpUM+Zkf+2U102i/2qKTyD1hRz/kUDjxlks1XjmgtS7Fk1a+dadtfHT/KTw38=
+	t=1744850208; cv=none; b=B7+AzBkXO32e9wRRMQiQnuvY2XWC6xWGJVGI5mAdLPXD1thAx57chG8lRXdYbMcjj4RnT9/wzJsVeQh9IFf9jk2mpOuGGHG7CgyUtQJvr4D2UL8OcLuWhzEGRSIyCwEp6we7TMPeSgTAFGk0RvR7oc7vMo8GlEdmqwD1S71MqYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744850127; c=relaxed/simple;
-	bh=XT4mhzDEcuidEiVJL+m4x4djSuzdROpZ5SiCxTqbKhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OZxPILjA8Bjka46AeoBNcW4UkQvPmkoMvV+5z1l5pRcW3/B6BDF6TkrZdnavZV4Yvic+8xIGsjIhX1HEJk4+uFsSop84nUWedNt1CIieJmySge8czb8PsO4V/mmFr1zIDaDXxwt0MHtvtFgqKoLvgAgkJlbsmDDZpeeR6CxcoaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H43/vG4G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0877C4CEEC;
-	Thu, 17 Apr 2025 00:35:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744850126;
-	bh=XT4mhzDEcuidEiVJL+m4x4djSuzdROpZ5SiCxTqbKhQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H43/vG4G2JUmVLOOLb6MDfTkRLuxQ3Kr6cYo/bfRRKCXkSbrLCIjvjG/PgQdmBRHb
-	 rzOMeYoCtsZB6TSgLw6Dl25mPeetrvUmjZnJmkPpCLYqe5a88ACgzVoHDH5oQtYT0K
-	 R1nE1FS+xCmP7bAUhx5fAtM4LTOw4QEzPKVV0xPQ13s8Ciji8eRY+zUkO9X6zBzIFV
-	 U6NzSpZdH4KhwpJhZYy3CfEZ5DGacObjcJgcwWcJEJvQ0H1CWpvtD1PD+CIP2vmLEp
-	 v7qr0tfrYuJB1OV3ntZ8CiOcVuW4MG6QVAPclxc0flIar1X34OkAw5x4qGNA1NjS7d
-	 uB07yaUGWWxxA==
-Date: Wed, 16 Apr 2025 17:35:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, Mina Almasry
- <almasrymina@google.com>, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
- asml.silence@gmail.com, dw@davidwei.uk, sdf@fomichev.me,
- skhawaja@google.com, simona.vetter@ffwll.ch, kaiyuanz@google.com,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: devmem: fix kernel panic when socket close
- after module unload
-Message-ID: <20250416173525.347f0c90@kernel.org>
-In-Reply-To: <CAMArcTWFbDa5MAZ_iPHOr_jUh0=CurYod74x_2FxF=EAv28WiA@mail.gmail.com>
-References: <20250415092417.1437488-1-ap420073@gmail.com>
-	<CAHS8izMrN4+UuoRy3zUS0-2KJGfUhRVxyeJHEn81VX=9TdjKcg@mail.gmail.com>
-	<Z_6snPXxWLmsNHL5@mini-arch>
-	<20250415195926.1c3f8aff@kernel.org>
-	<CAMArcTWFbDa5MAZ_iPHOr_jUh0=CurYod74x_2FxF=EAv28WiA@mail.gmail.com>
+	s=arc-20240116; t=1744850208; c=relaxed/simple;
+	bh=lrhUAO2ZO0O7cddUmG8H+oajQEEq4UOcN2sxu6227eY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NvaSPBGQegiohGFOw+LhRRZ8PYkLwma6A1EkyeK6uKoMwYynbB/zcTNZgDO1bwX9dfwDJKYJeh/t6r8y2Q7E7jxuHBHiOKarhbqekL8ixtyUTR09otdrnsTDgUjzgOneDUwxbh0AW3g9lzA3dBL1XE3z8W7CHw1DwjZzfvuxViY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=b39YbBfa; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id D7E982C03DC;
+	Thu, 17 Apr 2025 12:36:43 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1744850203;
+	bh=lrhUAO2ZO0O7cddUmG8H+oajQEEq4UOcN2sxu6227eY=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=b39YbBfaqhM5YByQILxiMMtuTHBfeE5fYrQGsrpdipJ5cRIbaOY0OSNM5DBAZT4Bg
+	 /yiXTSNDTEw7gGD8XpMuiv5UYll1d6D1gc1jSozcYls2QeJeC1CYhhzfI6WEBRnhEd
+	 krXDGYlW9giRlWfJCx2KL37PGck0r8okEu9D1Dr7iHjjnPZ9s6JzbVDtvbgZNwmLCt
+	 h0tZltUTlI5mus3RbBVsfJsP50R6Vah4YjpWg8fGNPmWicXUQk06dCF/jNgHffDI0o
+	 wmEncIbjj14dtU5vIvdtXpFYLp532zc45CmUX6SMBwo1QAAhfB2z82xZZw+f+g13n5
+	 O0kPomOqPMvXg==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B68004d1b0001>; Thu, 17 Apr 2025 12:36:43 +1200
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 17 Apr 2025 12:36:43 +1200
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Thu, 17 Apr 2025 12:36:43 +1200
+From: Rutger van Kruiningen <Rutger.vanKruiningen@alliedtelesis.co.nz>
+To: "andrew@lunn.ch" <andrew@lunn.ch>
+CC: "horms@kernel.org" <horms@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: [PATCH v0] net: ethtool: Only set supplied eee ethtool settings
+Thread-Topic: [PATCH v0] net: ethtool: Only set supplied eee ethtool settings
+Thread-Index: AQHbrxyse1JWtHWT2USdHgkWBWpOW7OmGJ6AgAAhk4A=
+Date: Thu, 17 Apr 2025 00:36:43 +0000
+Message-ID: <19ffa505b6c4341e6c66370fb76f6447b820aacd.camel@alliedtelesis.co.nz>
+References: <20250416221230.1724319-1-rutger.vankruiningen@alliedtelesis.co.nz>
+	 <6694f2c8-cfc8-41ed-9ceb-3e0b10aec6b9@lunn.ch>
+In-Reply-To: <6694f2c8-cfc8-41ed-9ceb-3e0b10aec6b9@lunn.ch>
+Accept-Language: en-US, en-NZ
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1DB9F8F088F3284C912CDE8C7AEAFF97@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=W+WbVgWk c=1 sm=1 tr=0 ts=68004d1b a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=-DMz-g34_tEA:10 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=qZ8f-K6C4Mv00eEDbOsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-On Thu, 17 Apr 2025 00:01:57 +0900 Taehee Yoo wrote:
-> Thank you so much for a detailed guide :)
-> I tried what you suggested, then I tested cases A, B, and C.
-> I can't see any splats from lockdep, kasan, etc.
-> Also, I checked that bindings are released well by checking
-> /sys/kernel/debug/dma_buf/bufinfo.
-> I think this approach works well.
-> However, I tested this simply. So I'm not sure yet about race condition.
-> I need more tests targeting race condition.
-> 
-> I modified the locking order in the netdev_nl_bind_rx_doit().
-> And modified netdev_nl_sock_priv_destroy() code looks like:
-> 
-> void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
-> {
->         struct net_devmem_dmabuf_binding *binding;
->         struct net_devmem_dmabuf_binding *temp;
->         struct net_device *dev;
-> 
->         mutex_lock(&priv->lock);
->         list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
-
-Not sure you can "for each entry safe here. Since you drop the lock in
-the loop what this helper saves as the "temp" / next struct may be 
-freed by the time we get to it. I think we need:
-
-	mutex_lock()
-	while (!list_empty())
-		binding = list_first..
-
->                 dev = binding->dev;
->                 if (dev) {
-
-nit: flip the condition to avoid the indent
-
-but I think the condition is too early, we should protect the pointer
-itself with the same lock as the list. So if the entry is on the list
-dev must not be NULL.
-
->                         netdev_hold(dev, &priv->dev_tracker, GFP_KERNEL);
-
-I think you can declare the tracker on the stack, FWIW
-
->                         mutex_unlock(&priv->lock);
->                         netdev_lock(dev);
->                         mutex_lock(&priv->lock);
->                         if (binding->dev)
->                                 net_devmem_unbind_dmabuf(binding);
-
-Mina suggests that we should only release the ref from the socket side.
-I guess that'd be good, it will prevent the binding itself from going
-away. Either way you need to make sure you hold a ref on the binding.
-Either by letting mp_dmabuf_devmem_uninstall() be as is, or taking
-a new ref before you release the socket lock here.
-
->                         mutex_unlock(&priv->lock);
->                         netdev_unlock(dev);
->                         netdev_put(dev, &priv->dev_tracker);
->                         mutex_lock(&priv->lock);
->                 }
->         }
->         mutex_unlock(&priv->lock);
-> }
+T24gVGh1LCAyMDI1LTA0LTE3IGF0IDAwOjM2ICswMjAwLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
+T24gVGh1LCBBcHIgMTcsIDIwMjUgYXQgMTA6MTI6MzBBTSArMTIwMCwgUnV0Z2VyIHZhbiBLcnVp
+bmluZ2VuDQo+IHdyb3RlOg0KPiA+IE9yaWdpbmFsbHkgYWxsIGV0aHRvb2wgZWVlIHNldHRpbmcg
+dXBkYXRlcyB3ZXJlIGF0dGVtcHRlZCBldmVuIGlmDQo+ID4gdGhlDQo+ID4gc2V0dGluZ3Mgd2Vy
+ZSBub3Qgc3VwcGxpZWQsIGNhdXNpbmcgYSBudWxsIHBvaW50ZXIgY3Jhc2guDQo+ID4gDQo+ID4g
+QWRkIGNoZWNrIGZvciBlYWNoIGVlZSBzZXR0aW5nIGFuZCBvbmx5IHVwZGF0ZSBpZiBpdCBleGlz
+dHMuDQo+IA0KPiBJIHNlZSB3aGF0IHlvdSBtZWFuLCBidXQgaSdtIHNvbWV3aGF0IHN1cnByaXNl
+ZCB3ZSBoYXZlIG5vdCBzZWVuIHRoaXMNCj4gY3Jhc2guIERvIHlvdSBoYXZlIGEgc2ltcGxlIHJl
+cHJvZHVjZXI/IEkganVzdCBkaWQNCj4gDQo+IGV0aHRvb2wgLS1kZWJ1ZyAyNTUgLS1zZXQtZWVl
+IGV0aDAgZWVlIG9uDQo+IA0KPiBhbmQgaXQgZGlkIG5vdCBjcmFzaCwgZGVzcGl0ZToNCj4gDQo+
+IHNlbmRpbmcgZ2VuZXRsaW5rIHBhY2tldCAoNDQgYnl0ZXMpOg0KPiDCoMKgwqAgbXNnIGxlbmd0
+aCA0NCBldGhvb2wgRVRIVE9PTF9NU0dfRUVFX1NFVA0KPiDCoMKgwqAgRVRIVE9PTF9NU0dfRUVF
+X1NFVA0KPiDCoMKgwqDCoMKgwqDCoCBFVEhUT09MX0FfRUVFX0hFQURFUg0KPiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIEVUSFRPT0xfQV9IRUFERVJfREVWX05BTUUgPSAiZXRoMCINCj4gwqDCoMKg
+wqDCoMKgwqAgRVRIVE9PTF9BX0VFRV9FTkFCTEVEID0gb24NCj4gDQo+IFNvIGl0IG9ubHkgcHJv
+dmlkZWQgRVRIVE9PTF9BX0VFRV9FTkFCTEVEIGFuZCBub25lIG9mIHRoZSBvdGhlcnMuDQo+IA0K
+PiDCoMKgwqDCoMKgwqDCoMKgQW5kcmV3DQpTb3JyeSBpdCBzZWVtcyB0aGF0IHRoZXJlIGFjdHVh
+bGx5IGlzbid0IGEgcHJvYmxlbSBoZXJlLiBJIHRob3VnaHQgdGhlDQpidWcgSSBoYWQgd2FzIHJl
+bGF0ZWQgdG8gdGhpcyBidXTCoGl0IG11c3QgaGF2ZSBiZWVuIGZvciBzb21ldGhpbmcgZWxzZQ0K
+YW5kIHdhcyBmaXhlZCBhdCB0aGUgc2FtZSB0aW1lIG9mIGFkZGluZyB0aGlzIGNvZGUuDQoNCllv
+dSBjYW4gZGlzcmVndWFyZCB0aGlzIHBhdGNoLg0KDQpUaGFua3MsIFJ1dGdlci4NCg==
 
