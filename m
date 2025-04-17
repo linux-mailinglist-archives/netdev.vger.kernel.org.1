@@ -1,177 +1,185 @@
-Return-Path: <netdev+bounces-183866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82310A92438
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:40:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24317A92454
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89550169F55
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:40:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5C246256E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8D12561BD;
-	Thu, 17 Apr 2025 17:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CD62566FB;
+	Thu, 17 Apr 2025 17:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YSM4B2c5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PpdWa95P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524002550DC
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E7D253F22
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744911631; cv=none; b=cRNYI15pcLxRM9NT35LG6nR14mD1Nsy9kswrSKwGrn0IpcyLIx+iMo6/hglGaZ3fbjdlnd2ZRi+wILIcR/BbseqAVmhk6iwAEUrRUj9g0+hvcdgsXQf+Okw8XcqiaZ0gQTHm4+l6eNXBJn5/QMOshwEm8gvbckq/pGj3BPOZ7yo=
+	t=1744912046; cv=none; b=OdlNFWOv9+2rbHVtbQzz5Fi9E41RVUuE5AA+/nncTJrHPAbvsuQuq/kHkTuzrCczhggqH9GD90GRpVnK4eGmaYkWftxj8UkFdxaacya5lLojbl0Em/DTDLaAVSOUiF3eHVCnZbMtaNz2mEgQxs/09o0R8u3FPlxJaUcydIEl3e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744911631; c=relaxed/simple;
-	bh=EOInJqz3SSsR3SfMgfEaE59yxaDfxa8aYfQqn0AbCls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hE5yu3IdnKS0LF1/jVs2JuPJzzCRBqEd/OIDncNjqq5FITqLpfTXxNT3WetNlkspn6P7Rzbm7j4DK80XWDCNZ5Rtl5VssA0R1aYSRinfgG20NWobGah8G30/RwTJPmi1H1GLjiDrGokd5QgU+RCLVQFaWfVcIpxcDf6fMXlvvp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YSM4B2c5; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-224341bbc1dso12860535ad.3
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:40:30 -0700 (PDT)
+	s=arc-20240116; t=1744912046; c=relaxed/simple;
+	bh=FwxFh8ZcyF5KMhTQioCw/JJCjLE92okS6+ZFq7YSS8k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LTe+ohyqr0DI5ftjB6oahkzMesE+BHTib06HynFrEWxoOCrIqLpJBSBh9CP/A41v4zk9Xa3Lk3mP61QfTgqV/ukQyJVmUkDsEuZesOpw0fmPA7MM1WHLtc6Aqcbq2wA+20KyJHoOcX2uMxjMSOX3rTZP8uS2fgxbp4e69gMn7aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PpdWa95P; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744911629; x=1745516429; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dDBg6maTTzuwRDGp8PFv9HLN1q5K7jSth9S5/3WTU6I=;
-        b=YSM4B2c5M3jCwqJtQDAIuTCki7wWCaedPn6hzGViSc62JPcS4GG1B3MF4iYJtEigTe
-         wuNKJY8nzffq0kRW0rO+7+UBrU1hbjNhbsGL9Q1Ld6HWlKItJjHCIlNQPv7DNVazov8F
-         OdT+pzfj9xUF/owXecVXceuomGlBGSvlZ1lKE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744911629; x=1745516429;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dDBg6maTTzuwRDGp8PFv9HLN1q5K7jSth9S5/3WTU6I=;
-        b=Mz3A6ytMOwRIIzGdx6m6ORRLBe7d727OUjc7VzPWNMG0zoOF13Q4rDh6/+fzfbS5gf
-         hzqNZA+OYzZa7avhKaybTCAapl3ThMIRgTUBiZx1GTZdfnrkRVIEqnxES2p9fhQGC3Qm
-         yFZWgkTD2xGfu4ndwUQCtcUVVt3d5RXV14nC3SgKX0Q9Iu0bb2CPPEn9sXjVlg5JQ8Og
-         Qa7Z12gPQxvMdgRvD12PdUII0lS5+L8ynYhRptKisaSjkgg9Jw+u34UbIPC4ykMFkTE/
-         k68VsauXoRID4lW1RDWK6ZxebkjTQGPVwFgBjsq6rHLRePDLYvYzR9zUfUX8Z3PP1q8W
-         n5Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3A8kBGZqCE79a/aizFquVFUD/9q83hmqJAbuTHnkK3JhF7ROmXZ/NGNtOaibw+wqP6JvVDJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEpAJE1+kb/mYW1clYHJexRMOEhpKVX9sQRIBm6r2zbzl4AEkX
-	JsWI37R/LxThDY5QH7jVsnZjfWoa8kRxEXUxuxzp12AIkQ0HA2AGi+TQ3GPSMw==
-X-Gm-Gg: ASbGncvb6bgfwPkvyHb/cP2L5FdgG6jYrhX+j1qbk24sU/oTUNEnGX9G4YEYQuYD2pO
-	Xm+7IhjPkpvGgm5JLHSgUNrBRYeeV3xwvegT+O8SEo+DUVclyoX7mztfNqbhGNYE3a8V8SUzd3D
-	Y5Uk3zJ4QamhyF76NLsMxvCosXXlfKS3IchPajJ8rmrrZySB5d+2PHy7Gfg3EtEUNzIW86zYmZ1
-	At0Ef9tpv8CNHCLQFY3EH5CP0Ur34cRxvtg20wPFBLhmtBNSba4m+38bdBo4V0MfJ0GZlUwvNHz
-	/41y3f+jxv9m0ugSlb4SLNxr7QxO2oRp/XabP14AYoo8qEj7ASfY6VJRPNwbcj2QHg==
-X-Google-Smtp-Source: AGHT+IEUB11sMEKCeB/nFn18cuVrgDnNw9IUYOxedNt+pJ4FJpOjy0YKf25iRAJd2NfgsM5n6/ngmA==
-X-Received: by 2002:a17:902:dac2:b0:21f:4c8b:c4de with SMTP id d9443c01a7336-22c3596dbe6mr88220975ad.42.1744911629482;
-        Thu, 17 Apr 2025 10:40:29 -0700 (PDT)
-Received: from [192.168.68.71] ([136.52.67.200])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bdaad1sm2911915ad.28.2025.04.17.10.40.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Apr 2025 10:40:29 -0700 (PDT)
-Message-ID: <ea48b90d-d01c-46b2-af4d-4c7bdf340f80@broadcom.com>
-Date: Thu, 17 Apr 2025 10:40:27 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744912045; x=1776448045;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=sDY8QkKPn4vA0dA2+f1F4PxSaVDjC+Jejdttv8uaVqw=;
+  b=PpdWa95PaKQW/gdBl5GQKTLqj6HnqsgT9HfPfqY7x2a3W6CZplS5y4U8
+   8FvQHhKVy8sTK0YMpTSJdhXqxADrBhUyrxPZeETEvWVJIz2IhDNmz9L/V
+   GtK9L0wsyXgSSj30pKN40oaLKthr9p2Amk/P8AmhHn6MK1R4B1YNdTuB3
+   g=;
+X-IronPort-AV: E=Sophos;i="6.15,219,1739836800"; 
+   d="scan'208";a="816906721"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 17:46:12 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:62183]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.54:2525] with esmtp (Farcaster)
+ id cafafa34-df2b-4deb-9d58-a507365eb40d; Thu, 17 Apr 2025 17:46:10 +0000 (UTC)
+X-Farcaster-Flow-ID: cafafa34-df2b-4deb-9d58-a507365eb40d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 17 Apr 2025 17:46:07 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 17 Apr 2025 17:46:04 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH RESEND v2 net-next 02/14] ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.
+Date: Thu, 17 Apr 2025 10:45:53 -0700
+Message-ID: <20250417174557.65721-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <f2c0341f-8b65-4671-891a-61f6892d6e1c@redhat.com>
+References: <f2c0341f-8b65-4671-891a-61f6892d6e1c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] dt-bindings: net: brcm,asp-v2.0: Add v3.0
- and remove v2.0
-To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org
-Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
- bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
- conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch, florian.fainelli@broadcom.com
-References: <20250416224815.2863862-1-justin.chen@broadcom.com>
- <20250416224815.2863862-2-justin.chen@broadcom.com>
- <0b30168d-6969-4385-b184-c2fa69c82390@kernel.org>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <0b30168d-6969-4385-b184-c2fa69c82390@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-
-
-On 4/16/2025 10:52 PM, Krzysztof Kozlowski wrote:
-> On 17/04/2025 00:48, Justin Chen wrote:
->> Add asp-v3.0 support. v3.0 is a major revision that reduces
->> the feature set for cost savings. We have a reduced amount of
->> channels and network filters.
->>
->> Remove asp-v2.0 which was only supported on one SoC that never
->> saw the light of day.
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Thu, 17 Apr 2025 08:46:01 +0200
+> On 4/16/25 8:45 PM, Kuniyuki Iwashima wrote:
+> > From: Paolo Abeni <pabeni@redhat.com>
+> >> but acquiring the rcu lock after grabbing the rcu protected struct
+> >> is confusing. It should be good adding a comment or moving the rcu lock
+> >> before the lookup (and dropping the RCU lock from fib6_get_table())
+> > 
+> > There are other callers of fib6_get_table(), so I'd move rcu_read_lock()
+> > before it, and will look into them if we can drop it from fib6_get_table().
 > 
-> 
-> That's independent commit with its own justification.
-> 
+> you could provide a RCU-lockless __fib6_get_table() variant, use it
+> here, and with time (outside this series) such helper usage could be
+> extended.
 
-Acked
+I think it's worth a separate patch, but now the number of patches
+is 17, so I'll add a note in the commit message that we don't need
+rcu for fib6_get_table() and will post a follow up series to convert
+the lockless version in some places.
 
->>
->> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
->> ---
->>   .../bindings/net/brcm,asp-v2.0.yaml           | 19 +++++++++----------
->>   1 file changed, 9 insertions(+), 10 deletions(-)
->>
->> diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
->> index 660e2ca42daf..21a7f70d220f 100644
->> --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
->> +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
->> @@ -4,7 +4,7 @@
->>   $id: http://devicetree.org/schemas/net/brcm,asp-v2.0.yaml#
->>   $schema: http://devicetree.org/meta-schemas/core.yaml#
->>   
->> -title: Broadcom ASP 2.0 Ethernet controller
->> +title: Broadcom ASP Ethernet controller
->>   
->>   maintainers:
->>     - Justin Chen <justin.chen@broadcom.com>
->> @@ -15,6 +15,10 @@ description: Broadcom Ethernet controller first introduced with 72165
->>   properties:
->>     compatible:
->>       oneOf:
->> +      - items:
->> +          - enum:
->> +              - brcm,bcm74110-asp
->> +          - const: brcm,asp-v3.0
->>         - items:
->>             - enum:
->>                 - brcm,bcm74165b0-asp
->> @@ -23,10 +27,6 @@ properties:
->>             - enum:
->>                 - brcm,bcm74165-asp
->>             - const: brcm,asp-v2.1
->> -      - items:
->> -          - enum:
->> -              - brcm,bcm72165-asp
->> -          - const: brcm,asp-v2.0
->>   
->>     "#address-cells":
->>       const: 1
->> @@ -42,8 +42,7 @@ properties:
->>       minItems: 1
->>       items:
->>         - description: RX/TX interrupt
->> -      - description: Port 0 Wake-on-LAN
->> -      - description: Port 1 Wake-on-LAN
->> +      - description: Wake-on-LAN interrupt
-> 
-> Why all devices now have different interrupts?
-> 
+Thanks!
 
-With ASP 2.0 removed, all SoCs will have 2 interrupts now. I need to 
-remove minItems here.
-
-Thanks for the review,
-Justin
-
-> Best regards,
-> Krzysztof
-
+---8<---
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 7c87873ae211..e5b28a732796 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -430,6 +430,7 @@ struct fib6_entry_notifier_info {
+  *	exported functions
+  */
+ 
++struct fib6_table *__fib6_get_table(struct net *net, u32 id);
+ struct fib6_table *fib6_get_table(struct net *net, u32 id);
+ struct fib6_table *fib6_new_table(struct net *net, u32 id);
+ struct dst_entry *fib6_rule_lookup(struct net *net, struct flowi6 *fl6,
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index bf727149fdec..ba3e290a9da4 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -265,27 +265,36 @@ struct fib6_table *fib6_new_table(struct net *net, u32 id)
+ }
+ EXPORT_SYMBOL_GPL(fib6_new_table);
+ 
+-struct fib6_table *fib6_get_table(struct net *net, u32 id)
++struct fib6_table *__fib6_get_table(struct net *net, u32 id)
+ {
+-	struct fib6_table *tb;
+ 	struct hlist_head *head;
+-	unsigned int h;
++	struct fib6_table *tb;
+ 
+-	if (id == 0)
++	if (!id)
+ 		id = RT6_TABLE_MAIN;
+-	h = id & (FIB6_TABLE_HASHSZ - 1);
+-	rcu_read_lock();
+-	head = &net->ipv6.fib_table_hash[h];
+-	hlist_for_each_entry_rcu(tb, head, tb6_hlist) {
+-		if (tb->tb6_id == id) {
+-			rcu_read_unlock();
++
++	head = &net->ipv6.fib_table_hash[id & (FIB6_TABLE_HASHSZ - 1)];
++
++	/* Once allocated, fib6_table is not freed until netns dismantle, so
++	 * RCU is not required (but rcu_dereference_raw() is for data-race).
++	 */
++	hlist_for_each_entry_rcu(tb, head, tb6_hlist, true)
++		if (tb->tb6_id == id)
+ 			return tb;
+-		}
+-	}
+-	rcu_read_unlock();
+ 
+ 	return NULL;
+ }
++
++struct fib6_table *fib6_get_table(struct net *net, u32 id)
++{
++	struct fib6_table *tb;
++
++	rcu_read_lock();
++	tb = __fib6_get_table(net, id);
++	rcu_read_unlock();
++
++	return tb;
++}
+ EXPORT_SYMBOL_GPL(fib6_get_table);
+ 
+ static void __net_init fib6_tables_init(struct net *net)
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 237e31f64a4a..af311c19dcc6 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4076,7 +4076,7 @@ static int ip6_route_del(struct fib6_config *cfg,
+ 	struct fib6_node *fn;
+ 	int err = -ESRCH;
+ 
+-	table = fib6_get_table(cfg->fc_nlinfo.nl_net, cfg->fc_table);
++	table = __fib6_get_table(cfg->fc_nlinfo.nl_net, cfg->fc_table);
+ 	if (!table) {
+ 		NL_SET_ERR_MSG(extack, "FIB table does not exist");
+ 		return err;
+---8<---
 
