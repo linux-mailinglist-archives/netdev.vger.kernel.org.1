@@ -1,184 +1,100 @@
-Return-Path: <netdev+bounces-183631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12962A9156F
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:39:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15292A91638
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BECF17592C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:39:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A77C71896B92
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 08:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AA5219A8C;
-	Thu, 17 Apr 2025 07:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177EE22D7BE;
+	Thu, 17 Apr 2025 08:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="n82oSPFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A531C1AC882
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B644A1F8937;
+	Thu, 17 Apr 2025 08:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744875524; cv=none; b=LOcSN/AKfMbJFaKTDzopz7nMjrJ0ohJ7xGjoUPNlnNTalfYD3uK5om5vwBUeLPr66EV2XSmX/qB8meYTEqM9bf3ZYxAuligu00Rr33k/Ovi1MKR6aOvGD1i2YikHCFV2Y8PqDV7C+tHMvRd7qigOyMXLmbYWfLcJZJX6VmDOgxQ=
+	t=1744877576; cv=none; b=frdAc7VUMN+UYMyCvu9uaXrcJKq9mJ3m8wDlNXAPA46LQwHkcowsSfsp0ATaAqs4RdkuXyigwdpgcQA5nnKpYox/453Y6/0sbkCjp8yNUUwXzSX1q2zHrhJXEJjAROQY0NNg5eig5xeise4wbVKETRaSLqcAVsaCiD5ExaqQfFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744875524; c=relaxed/simple;
-	bh=N2pU4lxLznnELwJAQuZJ+ofUI5qfwb3FqbNsy0EfRQY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Oe8a9WtZUgfox7P7UOqJtVa9WbhM6pr90f1tFBCNO0zxmoDzXu0K0OIz0Vl2MI7gYxcwB+PBZVAX5E4S55MWYM6G1M2VhvaYwdhD5ouTfSD5JWtYzMRuge0HCVfDXAFhuC6f4c3tlQUNR/KafCwYaxZ8IumFUfp5lmZvzfHM1u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpsz7t1744875482t49de3eb3
-X-QQ-Originating-IP: IAyjnsusGrq9Fazvc3NVJ67F42pYtTWC/wdji12B2Lg=
-Received: from wxdbg.localdomain.com ( [36.20.107.143])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 17 Apr 2025 15:38:00 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13897518688819981051
-EX-QQ-RecipientCnt: 17
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	dlemoal@kernel.org,
-	jdamato@fastly.com,
-	saikrishnag@marvell.com,
-	vadim.fedorenko@linux.dev,
-	przemyslaw.kitszel@intel.com,
-	ecree.xilinx@gmail.com,
-	rmk+kernel@armlinux.org.uk
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH net-next v3 2/2] net: wangxun: restrict feature flags for tunnel packets
-Date: Thu, 17 Apr 2025 16:03:28 +0800
-Message-Id: <20250417080328.426554-3-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250417080328.426554-1-jiawenwu@trustnetic.com>
-References: <20250417080328.426554-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1744877576; c=relaxed/simple;
+	bh=ausffIwdAWgX2eiDnN/xWkFLcAKEIHmv735KMjP74Hw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlkoEYuCwRA0ySThUpxWEBviji02mmSwrBWJ3EjhyEQWgnWrrjUZuoMKXYZ0eSjqV0X4BA02TT0/IceJDzvB3SP9tNLlzCs5/k1+E9Sl58YEI7OU3NSZQ8qVufuWVm4MkJfmDvRq4YW9xCLtZm2pTidaiGobDm7UhqwesE3O86c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=n82oSPFO; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 4459421199CA; Thu, 17 Apr 2025 01:12:54 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4459421199CA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1744877574;
+	bh=S9VENa3hYgzvatnix+kIlW1E4DfVat/eX1pf1K4UW08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n82oSPFODY+SlcpPsvrOFUo3UtbSq1Mj2qm4eJDFqSQgLHaIiLGrmjexJP2Yhw07z
+	 gMCsNPXswizBJMnIURsGVSXzJJt5VlwlkBNTSgOcJ8V6uNbUtFDq1J9zmb49Y79nAh
+	 3FHjAYj9Mkyv6IfENq6CbvqWUTj/aVCp1ObpA+QY=
+Date: Thu, 17 Apr 2025 01:12:54 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>, KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"brett.creeley@amd.com" <brett.creeley@amd.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"schakrabarti@linux.microsoft.com" <schakrabarti@linux.microsoft.com>,
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"erick.archer@outlook.com" <erick.archer@outlook.com>,
+	"rosenp@gmail.com" <rosenp@gmail.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
+ set_link_ksettings in ethtool for speed
+Message-ID: <20250417081254.GA30387@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
+ <fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
+ <20250325170955.GB23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
+ <20250325122135.14ffa389@kernel.org>
+ <MN0PR21MB3437DA2C43930B08036BB146CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
+ <6396c1f7-756d-476a-833e-7ea35ae41da8@lunn.ch>
+ <MN0PR21MB34376199FAFAE4901EF18E75CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
+ <f2619b80-8d5d-4484-a154-18f902d43d63@lunn.ch>
+ <20250331090822.GA22061@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N+n6UtIkOPCaW05aZpttWrh5PTlXkObNnqtrw8KjWgKUGPmSnOdN2Tfe
-	fd813IqBsfWKLFJ8GPZUFLKKniSU9cKEPT6Co9siCTrAAwIRSv6QUBLx4OFJscV8DnQQs5U
-	75CN5+tfceaStoyTyo4mke8KrWThGbMMRqVYrqMgbdScMkMP6DOGQ+7CVTTOcuNuJNk1P1L
-	d/3cvep1tIpH7BVDEur140FWAIk2mSYwSF7uXxbAQ3yrNMg2B8sMeGCgYKhs0eSoMtnZ+f4
-	aMLgcLu+PxurJcUpnOt4aIKvOwAclg9cjSD7erX1dpktIgNxhwPlF2sYlkUeXlQbhsz87ue
-	fWZm9ouhm5Yl1S0okTutI5q97ImG7RBh/KKetnXv/1iaUOulqCBakIWt6hS+5gX+gSStSWE
-	CIBVh7OsodyZVZC/esFc+JoXoxnyljaxJIN6HVk1rlBrigBnTN6Uvc2tOdw6WUGECzNAZv1
-	7MaZ/xTqaphd6nZKO5Kn8KK/TYevMmaWJ8E7881Vc7xcsm0r+15zZQMauCMCQH3pmwnLr/w
-	QaE8yXaRpPqysw2iktNcgYO6QRwZhMDMDsDn8+78WQ+FX52oROXEL/fglkAaKgmJbLLVvgW
-	YqWptUs3BbC5bxJVEPOSjiehtO8BXp2csKGqr2HxdV1s8bldPZI2svo67YAbn8SLIoD/QKs
-	qMMJK2Of8BcsaOBeNpb2JdiQMcKCa+iz/x6336DJ4/67zZL8d0VFh5XeHEzJ0vX4rpCNnfe
-	ToKwwd2XJNQPMA0d8fCsaQAuv8kNGmAbnvuJ5QTAkB2+f59hNfSERtHjwBRvXd4fNkV9Nc1
-	/woHNNYnrBwm4hS0KGrrrdtSrVzMABSVmh0ZZT/78NC+nYqaem49s6l5mBfGW/3B5bW53u8
-	4tUNtcW7oL8XaQ1aI5UHW6tPbhSJzFNHa1UHQKmPAItfdBuNV80k9DmPzOAPd0H1HhAlFnl
-	qKJFY9r+Dtz8F8O5bd6of7nW6jNgoiurmMm1wnvOwIiGjGrN1LlBR4K3DOC+d0HpVoLidnb
-	3jHfInzQyQbuIcptn2RL+PZlk07VEBY9aZzJxApQ==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331090822.GA22061@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Implement ndo_features_check to restrict Tx checksum offload flags, since
-there are some inner layer length and protocols unsupported.
+I hope this message finds you well.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 27 +++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  3 +++
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  1 +
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
- 4 files changed, 32 insertions(+)
+I wanted to follow up on this patchset I previously submitted. 
+Based on your valuable feedback, I have made modifications 
+and incorporated your suggestions along with my
+previous logic. Please find the updated patchset attached.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 18422b940dbe..2a808afeb414 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3000,6 +3000,33 @@ netdev_features_t wx_fix_features(struct net_device *netdev,
- }
- EXPORT_SYMBOL(wx_fix_features);
- 
-+#define WX_MAX_TUNNEL_HDR_LEN	80
-+netdev_features_t wx_features_check(struct sk_buff *skb,
-+				    struct net_device *netdev,
-+				    netdev_features_t features)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+
-+	if (!skb->encapsulation)
-+		return features;
-+
-+	if (wx->mac.type == wx_mac_em)
-+		return features & ~NETIF_F_CSUM_MASK;
-+
-+	if (unlikely(skb_inner_mac_header(skb) - skb_transport_header(skb) >
-+		     WX_MAX_TUNNEL_HDR_LEN))
-+		return features & ~NETIF_F_CSUM_MASK;
-+
-+	if (skb->inner_protocol_type == ENCAP_TYPE_ETHER &&
-+	    skb->inner_protocol != htons(ETH_P_IP) &&
-+	    skb->inner_protocol != htons(ETH_P_IPV6) &&
-+	    skb->inner_protocol != htons(ETH_P_TEB))
-+		return features & ~(NETIF_F_CSUM_MASK | NETIF_F_GSO_MASK);
-+
-+	return features;
-+}
-+EXPORT_SYMBOL(wx_features_check);
-+
- void wx_set_ring(struct wx *wx, u32 new_tx_count,
- 		 u32 new_rx_count, struct wx_ring *temp_ring)
- {
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-index fdeb0c315b75..919f49999308 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-@@ -33,6 +33,9 @@ void wx_get_stats64(struct net_device *netdev,
- int wx_set_features(struct net_device *netdev, netdev_features_t features);
- netdev_features_t wx_fix_features(struct net_device *netdev,
- 				  netdev_features_t features);
-+netdev_features_t wx_features_check(struct sk_buff *skb,
-+				    struct net_device *netdev,
-+				    netdev_features_t features);
- void wx_set_ring(struct wx *wx, u32 new_tx_count,
- 		 u32 new_rx_count, struct wx_ring *temp_ring);
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index fd102078f5c9..82e27b9cfc9c 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -587,6 +587,7 @@ static const struct net_device_ops ngbe_netdev_ops = {
- 	.ndo_set_rx_mode        = wx_set_rx_mode,
- 	.ndo_set_features       = wx_set_features,
- 	.ndo_fix_features       = wx_fix_features,
-+	.ndo_features_check     = wx_features_check,
- 	.ndo_validate_addr      = eth_validate_addr,
- 	.ndo_set_mac_address    = wx_set_mac,
- 	.ndo_get_stats64        = wx_get_stats64,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 95e5262a1e9c..80e6b01c799b 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -581,6 +581,7 @@ static const struct net_device_ops txgbe_netdev_ops = {
- 	.ndo_set_rx_mode        = wx_set_rx_mode,
- 	.ndo_set_features       = wx_set_features,
- 	.ndo_fix_features       = wx_fix_features,
-+	.ndo_features_check     = wx_features_check,
- 	.ndo_validate_addr      = eth_validate_addr,
- 	.ndo_set_mac_address    = wx_set_mac,
- 	.ndo_get_stats64        = wx_get_stats64,
--- 
-2.27.0
-
+https://lore.kernel.org/lkml/1744876630-26918-1-git-send-email-ernis@linux.microsoft.com/
 
