@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-183858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC60A923EB
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:25:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAFEA923EC
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 19:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D8CE4416D4
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1452819E82A2
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 17:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9AF25525F;
-	Thu, 17 Apr 2025 17:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B5D2561A9;
+	Thu, 17 Apr 2025 17:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NihIWnC5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RHJLbwtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4574D255244
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94626255258
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 17:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744910732; cv=none; b=K7s+hy7zeubDIA8yK8riTD3YqPsHwVZvoQUq7xrGrARwJJIQotfnQgKPkpNQfCu/kOhA723xfaRJLbQHSJzAgFOLZPDg/i4iOnP2xN7yzykEyDyK7mDIyhwaf6VurkQhkd61Co/7GoWdBY18DcGq47X08o1Q9RIMCh7QX5cYq7Y=
+	t=1744910734; cv=none; b=hampoX4g5tCk4gywaNgqo3jZjHmpb25KqVLvfKXHYi7mXj/X44uP/hy2Gw3Ps8KlU/KFWQNtRh1zhAcJH0vol66eJ88lrrEZaQDq7qXvPhcEWkXhxWoHIswhsT8FZCxjwVtgRAjdOuMH0hn5L7KQYM1Hzj27KNuRq027UF68SV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744910732; c=relaxed/simple;
-	bh=P4grIgMcFBx6uX0VhGtxuvQCENvc2Rsj2FroJKBMbDQ=;
+	s=arc-20240116; t=1744910734; c=relaxed/simple;
+	bh=SL9PCqtts6Mv/ggwdLxgp+QFbDaOWxeKY8izfswvdWA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EpfClhLHawwk6NnScnG5bbriQBjjFPm/tGsdH7duV8GB3cjMbYqTgQ3gPDI6IGPahWM4aMYHJDdsB6ILcN95AbaBdTWL7scLW3jIBrwNsqRUoVc6RpitIGKflUaHG4CrkvbOILlxz00s4Z3eG53Yx21Wq7/BgmDVXXsqF+8Fe3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NihIWnC5; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version; b=piFWFbnvjIX4Jq2cbfIDDT6nqPppt8gJ7NQjVdd9NPVbuOXuxyaz1XIlUbmWAn9fxJoIUP5ibwOm4UV+7egZW8lRgmZIax9wMFO9S4I0im+qbEYm4GojtEFDfxi72P91uibRBb7W1DYz/v1RaR2pxY0GPvElui4C7NUQDxMTLEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RHJLbwtq; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7376dd56f60so867628b3a.3
-        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:25:30 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-73712952e1cso1109448b3a.1
+        for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:25:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744910730; x=1745515530; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1744910732; x=1745515532; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YgSwWLJCnsmrTM6Kf/YHkuzpzYvCE+MfEaXp8mEkXW0=;
-        b=NihIWnC5CovRi6FW9hbpl5vmYOo5CNTLXbLpZyQqKv3jzkbfMsLb4Dccw8X47kwLAM
-         qi418byHKRlrNYqB6OI7Xk8LMxMTfSWPki06uuiDxtV2c0Kx2MWzbBnbbA8RoY39taDS
-         RSrbIDFP9THvAMdamLkHPsSrdcjUnEKqYh1RY=
+        bh=r9yHAaw/uQvwxq1qnIfTLfjQQMXVxIDQXkvOd3fiXj0=;
+        b=RHJLbwtq/SyF0ZOturZ+9AkjRbFHzEEKFlZ2QZrNFFIjA585/yW+UOwvnIfTtbVLCw
+         kvGQk1U3y8B83sWoWE2xhrKVOFiJN0i4tQi7f9hEdRJ82aoS32JOiOoaTsWXx9G30ehx
+         gaAAJFDRkkEa80jyaxkPto9A1ssBQDRrfLY7Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744910730; x=1745515530;
+        d=1e100.net; s=20230601; t=1744910732; x=1745515532;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YgSwWLJCnsmrTM6Kf/YHkuzpzYvCE+MfEaXp8mEkXW0=;
-        b=C6ZKkwAWLV8T8D2gGYcPeaqpRb4Ab2AwQBSB2rUAywQW8ZQVQO1HV+aI+Iy+eb4uYK
-         QgHt9q35bqfkSig1Qy2Dw2J3SIcH6Qdzj0ZhaTF0BqASf2t6u06uOQ1itEvLPJd1qSzF
-         UrPXyoJHE3G7cTeB6SW5h44K//NbvfWQ38EUmT5oXBPFamRaW9KGteWU6ECNVCyaBtsF
-         dfM6INQtkA5Yvnsj6IaBOiwz8u/WZepmDpzQTdvRTevvYHae68pFN+LtbeNcuv/2KNiM
-         AbDnXnIhgbsgp/hbaUTWoxmcY5vL4PJgxhGwoboN/lAr7Z3l6PPSomkYbyDdGouzz42L
-         2EJQ==
-X-Gm-Message-State: AOJu0YzViWUSza7jr4h8/UaVho9ROAdaKJAmzjMAmOgDo3lPcau163rp
-	UAn0RDkF0eX6SwTu76X+sIN886KIgNQjX0//Bb9iewfPFf01iFZ43lS69F8KIA==
-X-Gm-Gg: ASbGncvI8iWziHU30jqsI8nbBxT7HD7JFXv4dFeb7T+hNbSqRxxpxVHK4ZRhRyRyFyN
-	nWgcbkITV/3CyBV8CiOIhwQ1ixABvUWX0DGMQ+EzflCk+QPVOscN1JAHX3mi3CjK/JJfFhdtIAX
-	z2AKt73yLzcMEyhsXVvLbqr2IMbOagXjoVelH0t8J1XmIg50B54NfTC1+ngEh9C8lCy14e6+SOS
-	MEhk+HPlCd3rzihFiaJ9kdznm8i59hhBQNxl3p0MtWzi/r+6Jv4rtHXE3AdBs9R45S0rWFNMpJk
-	YI1NPIaxsi1DTMF4oCr9smxqO0mljj/7L9SIhj1n8ESXIdqGFus04ayGgYODfnaVy3JLkk3I+95
-	gkCC9Y2zbSSRPzqg+v9HuOuXxen8=
-X-Google-Smtp-Source: AGHT+IHYGyJuMXA4G4Gwt4hZEjxzc9Kb1hN/hhhnpUtu2ZLQBfdinuXX4/Io7u/iV4dJL28+8bdaUw==
-X-Received: by 2002:a05:6a00:1da6:b0:739:3f55:b23f with SMTP id d2e1a72fcca58-73c2671803fmr8951472b3a.14.1744910730451;
-        Thu, 17 Apr 2025 10:25:30 -0700 (PDT)
+        bh=r9yHAaw/uQvwxq1qnIfTLfjQQMXVxIDQXkvOd3fiXj0=;
+        b=nyGrEv6X/KapUkwZzvQMP60YPLSfsy8nvE93STuH65RSWNw/VkvJlilw984SMz+EZ6
+         CDNB8Dn3TP8IzfvM47/t8PMKMhJIDukTMlVSqH9LppfBcUn+GqShkUlR5wZFCi5A2DpC
+         Kk6O2+rjS0lC33srcb4jcMqQfp85sCqYT9enwSM3SGhyEYNrikk9XT8GXMlXUIYXcxMT
+         gVdRWr8mXl6Smf+5qUwBTsIiEwE8W4c9rjGTo4SRFk5RhLqxoZAFx9M6t34F3mwjPBVM
+         XCJZL3DeiFJUckI+8gYOKU4ElmLH9g+iUdtV7oiuJtGKZ/Pbzez/6jrSAVD6VqAg1UvI
+         EZAw==
+X-Gm-Message-State: AOJu0YwlADvQG7q8GG+x7nrxMpcq927qh42vbu6GkNgnd7I3RFq5zw+Y
+	dFkEKyD9UnfkvKtVC9eCjF31Wpr9c677uECC2go558xOFOvfJBMldV5KWJ1ZmA==
+X-Gm-Gg: ASbGncvZAp0aruFagDUBXf2R91VGLfEW5LJY4pMaSN58OfJ2jzqytzytOgqAqKymmIK
+	KmTLrspOXn/YKHimQ8C+YGPHZOLS/WYSURlCwozYUT6IobF+bZdVfpA3TGeh7wq6Fjk3jNhbDe7
+	XXtLgkTV0ldK5BiKOFaJavKObhMFWq1XZ3g73eDNjIgM06L+ZSHxlcZSI6gtozzGAhxFVRuql0e
+	wrDrjhUOzqMjzGJ2bs5gNUOoda+mNrWrqInDE8zsQV100tJM2Wd6S0/ZsY+lBXS44gLM9/C3te9
+	V1biWAk9hC9DyNjEL31X4Bb5TC7kq2ef1piHKb/tQ7JIXn0Pe9lOm0vxVfON8mNpFqw9oB7pdt+
+	j+zOuy9Yvr4pQWro1
+X-Google-Smtp-Source: AGHT+IFk4jwFBrsca8R3CXEMJkJTSj6F8Gn3J/VDBrkNzWEknghynyJIy32lhDgsZmMsXbsoOojVXw==
+X-Received: by 2002:a05:6a00:23c1:b0:730:9502:d564 with SMTP id d2e1a72fcca58-73c2672479bmr8908636b3a.14.1744910731723;
+        Thu, 17 Apr 2025 10:25:31 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8ea9a4sm109879b3a.41.2025.04.17.10.25.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8ea9a4sm109879b3a.41.2025.04.17.10.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 10:25:30 -0700 (PDT)
+        Thu, 17 Apr 2025 10:25:31 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -78,11 +78,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Shruti Parab <shruti.parab@broadcom.com>,
-	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-Subject: [PATCH net-next v2 2/4] bnxt_en: Report the ethtool coredump length after copying the coredump
-Date: Thu, 17 Apr 2025 10:24:46 -0700
-Message-ID: <20250417172448.1206107-3-michael.chan@broadcom.com>
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next v2 3/4] bnxt_en: Remove unused field "ref_count" in struct bnxt_ulp
+Date: Thu, 17 Apr 2025 10:24:47 -0700
+Message-ID: <20250417172448.1206107-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250417172448.1206107-1-michael.chan@broadcom.com>
 References: <20250417172448.1206107-1-michael.chan@broadcom.com>
@@ -94,54 +94,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shruti Parab <shruti.parab@broadcom.com>
+From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-ethtool first calls .get_dump_flags() to get the dump length.  For
-coredump, the driver calls the FW to get the coredump length (L1).  The
-min. of L1 and the user specified length is then passed to
-.get_dump_data() (L2) to get the coredump.  The actual coredump length
-retrieved by the FW (L3) during .get_dump_data() may be smaller than L1.
-This length discrepancy will trigger a WARN_ON() in
-ethtool_get_dump_data().
+The "ref_count" field in struct bnxt_ulp is unused after
+commit a43c26fa2e6c ("RDMA/bnxt_re: Remove the sriov config callback").
+So we can just remove it now.
 
-ethtool has already vzalloc'ed a buffer with size L1.  Just report
-the coredump length as L2 even though the actual coredump length L3
-may be smaller.  The extra zero padding does not matter.  This will
-prevent the warning that may alarm the user.
-
-For correctness, only do the final length update if there is no error.
-
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 5 -----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h | 1 -
+ 2 files changed, 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-index 5576e7cf8463..9b6489e417fc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
-@@ -496,9 +496,16 @@ static int __bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf,
- 					  start_utc, coredump.total_segs + 1,
- 					  rc);
- 	kfree(coredump.data);
--	*dump_len += sizeof(struct bnxt_coredump_record);
--	if (rc == -ENOBUFS)
-+	if (!rc) {
-+		*dump_len += sizeof(struct bnxt_coredump_record);
-+		/* The actual coredump length can be smaller than the FW
-+		 * reported length earlier.  Use the ethtool provided length.
-+		 */
-+		if (buf_len)
-+			*dump_len = buf_len;
-+	} else if (rc == -ENOBUFS) {
- 		netdev_err(bp->dev, "Firmware returned large coredump buffer\n");
-+	}
- 	return rc;
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+index a8e930d5dbb0..238db9a1aebf 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+@@ -148,7 +148,6 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
+ 	struct net_device *dev = edev->net;
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_ulp *ulp;
+-	int i = 0;
  
+ 	ulp = edev->ulp_tbl;
+ 	netdev_lock(dev);
+@@ -164,10 +163,6 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
+ 	synchronize_rcu();
+ 	ulp->max_async_event_id = 0;
+ 	ulp->async_events_bmap = NULL;
+-	while (atomic_read(&ulp->ref_count) != 0 && i < 10) {
+-		msleep(100);
+-		i++;
+-	}
+ 	mutex_unlock(&edev->en_dev_lock);
+ 	netdev_unlock(dev);
+ 	return;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
+index 7fa3b8d1ebd2..f6b5efb5e775 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
+@@ -50,7 +50,6 @@ struct bnxt_ulp {
+ 	unsigned long	*async_events_bmap;
+ 	u16		max_async_event_id;
+ 	u16		msix_requested;
+-	atomic_t	ref_count;
+ };
+ 
+ struct bnxt_en_dev {
 -- 
 2.30.1
 
