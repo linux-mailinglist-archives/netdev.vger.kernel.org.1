@@ -1,150 +1,107 @@
-Return-Path: <netdev+bounces-183779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2CD9A91E8C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:46:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 546C3A91EE5
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 130688A0E36
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:46:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC4A619E8149
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB14E21A45E;
-	Thu, 17 Apr 2025 13:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2082F250C00;
+	Thu, 17 Apr 2025 13:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTwdbrmV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pTnm5dB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9523384D2B;
-	Thu, 17 Apr 2025 13:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E19250BEE;
+	Thu, 17 Apr 2025 13:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744897577; cv=none; b=BKdSom44jUB+xOqszNVUgK9dfSM13lvqESxu7/VTaL+PLb17n0UsRwiINZi8CVeewdCPjhsBgLLF0AHGFK5HW0B/lH7d5T2W/FX+gM6SnJnlhWwnrYeRZGDJUHBHQFd3PrINdRG/Lz3lA2YYV9RqRPIkuNJMrPsWfPidQcIFSbg=
+	t=1744898120; cv=none; b=HSxayQEOmrErAn4cF5Qyc5qaDPmi2V3Z3UUnGKMJymXaWjjRYSeXOWqoDXLYkylNshrTJbFtMNmYg4SJv4V0iBNZUzHAGmLQiAOAhjdoiG5l1v4kBrLNGCsjv8taWnJWKpt1UtbL8Ps0z5wkmq6+JQ2encLN82uRF46q3/gfHCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744897577; c=relaxed/simple;
-	bh=Jp3P1IDKrogJGTyaRjCD0IYiY+Sdkq83T+tFKxCJJQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SE16Eiul40UqpIwMGttoebrHgzUIHlqaHdRpgZtLBXg+OA3fIvgbPS2sOMIkQ1cfokQJD+SLwqnG/zexZXBg9jzEw+styEm8TRdHUIlSNwGfmsV3JamFMhfSo+N1wSbqSsHRIC7HkNZncuqqvS1X0BRP5I9vHTiTfortEouiQM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTwdbrmV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA693C4CEEA;
-	Thu, 17 Apr 2025 13:46:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744897577;
-	bh=Jp3P1IDKrogJGTyaRjCD0IYiY+Sdkq83T+tFKxCJJQ0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MTwdbrmVnx/M2TbvYbZ1GVcbtAT0j+KoA5FAy3SJuooWpGRktgfCWNigxhu9BEAp6
-	 /5lMiXr2O9F6XsfL2P8GppZp/cknJHc5pg77zkVv1rCK8c2o8VdBJOz3YfGDtMP3+0
-	 GYL0SHYq9V8X/mH58MQAi4h8urcpYfwblYninyUILl8B8fya2kbFTJA0H4rnbCjwp4
-	 ZpI9QH4ppUDY1tZ/dV4fsDty1hXctTShuEpmCwzIrHilcBGNG/JoVTeNFcBEGnji8K
-	 nU0fRLK2sJACJwDkK8aaE04rYAjGxoOk2ktwDuFFKfNKYjmCgGWL3eHiLf1iILyxJe
-	 OMUvaQvq2Dr3g==
-Date: Thu, 17 Apr 2025 06:46:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org (open list),
- linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
- bpf@vger.kernel.org (open list:XDP (eXpress Data
- Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: Re: [PATCH net-next v2 4/4] selftests: drv-net: Test that NAPI ID
- is non-zero
-Message-ID: <20250417064615.10aba96b@kernel.org>
-In-Reply-To: <20250417013301.39228-5-jdamato@fastly.com>
-References: <20250417013301.39228-1-jdamato@fastly.com>
-	<20250417013301.39228-5-jdamato@fastly.com>
+	s=arc-20240116; t=1744898120; c=relaxed/simple;
+	bh=5lzD0TshOdrR27H/jD0A3Zp1OSldjowmx/m925ghKvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVBY+08xWT9Eb0RWH2J+00qxxFKuMooS3VOqo93Hg2PmbtOTV+2hAQLS9ls542zGuVpNm1UQJRbWRepA4ce639LzK34KN+TxdH2myXayWmVC7PaMBpayneqeGw/TobId6glql3fP8Wqu4YGO90SQrXOhyFiNad/l2kFmYN6tPgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pTnm5dB7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MfEXm04TR9hSAuPlSBHlDuFQXlICktBrJoOYKmYwNLE=; b=pTnm5dB7K/QYer3+j7qstl9t2m
+	u2mHR3vFF6A70hv4G+0XqpgYbW5aFq90v+P45JkGylwl9eejYw7PIr+FiZrDVtJ4ho7EGqdE1g2yr
+	pYH4yrq67wGX8hDraLxcMH9f/micPho+mv8Deg0ldzXBv/b9R/3+ZUWUQK0fX3ZITMrs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u5Phk-009n2J-NR; Thu, 17 Apr 2025 15:55:00 +0200
+Date: Thu, 17 Apr 2025 15:55:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+	Nathan Sullivan <nathan.sullivan@ni.com>,
+	Josh Cartwright <josh.cartwright@ni.com>,
+	Zach Brown <zach.brown@ni.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Chuanhong Guo <gch981213@gmail.com>,
+	Qingfang Deng <qingfang.deng@siflower.com.cn>,
+	Hao Guan <hao.guan@siflower.com.cn>
+Subject: Re: [PATCH net] net: phy: leds: fix memory leak
+Message-ID: <f9f60754-ef84-483f-bd77-b7bc99aadb27@lunn.ch>
+References: <20250417032557.2929427-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417032557.2929427-1-dqfext@gmail.com>
 
-On Thu, 17 Apr 2025 01:32:42 +0000 Joe Damato wrote:
-> Test that the SO_INCOMING_NAPI_ID of a network file descriptor is
-> non-zero. This ensures that either the core networking stack or, in some
-> cases like netdevsim, the driver correctly sets the NAPI ID.
+On Thu, Apr 17, 2025 at 11:25:56AM +0800, Qingfang Deng wrote:
+> From: Qingfang Deng <qingfang.deng@siflower.com.cn>
 > 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  .../testing/selftests/drivers/net/.gitignore  |  1 +
->  tools/testing/selftests/drivers/net/Makefile  |  6 +-
->  .../testing/selftests/drivers/net/napi_id.py  | 24 ++++++
->  .../selftests/drivers/net/napi_id_helper.c    | 83 +++++++++++++++++++
->  4 files changed, 113 insertions(+), 1 deletion(-)
->  create mode 100755 tools/testing/selftests/drivers/net/napi_id.py
->  create mode 100644 tools/testing/selftests/drivers/net/napi_id_helper.c
+> A network restart test on a router led to an out-of-memory condition,
+> which was traced to a memory leak in the PHY LED trigger code.
 > 
-> diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
-> index ec746f374e85..71bd7d651233 100644
-> --- a/tools/testing/selftests/drivers/net/.gitignore
-> +++ b/tools/testing/selftests/drivers/net/.gitignore
-> @@ -1,2 +1,3 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  xdp_helper
-> +napi_id_helper
+> The root cause is misuse of the devm API. The registration function
+> (phy_led_triggers_register) is called from phy_attach_direct, not
+> phy_probe, and the unregister function (phy_led_triggers_unregister)
+> is called from phy_detach, not phy_remove. This means the register and
+> unregister functions can be called multiple times for the same PHY
+> device, but devm-allocated memory is not freed until the driver is
+> unbound.
+> 
+> This also prevents kmemleak from detecting the leak, as the devm API
+> internally stores the allocated pointer.
+> 
+> Fix this by replacing devm_kzalloc/devm_kcalloc with standard
+> kzalloc/kcalloc, and add the corresponding kfree calls in the unregister
+> path.
+> 
+> Fixes: 3928ee6485a3 ("net: phy: leds: Add support for "link" trigger")
+> Fixes: 2e0bc452f472 ("net: phy: leds: add support for led triggers on phy link state change")
+> Signed-off-by: Hao Guan <hao.guan@siflower.com.cn>
+> Signed-off-by: Qingfang Deng <qingfang.deng@siflower.com.cn>
 
-sort alphabetically, pls
+Thanks for the fix. I agree with Maxime, this looks correct.
 
-> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-> index 0c95bd944d56..47247c2ef948 100644
-> --- a/tools/testing/selftests/drivers/net/Makefile
-> +++ b/tools/testing/selftests/drivers/net/Makefile
-> @@ -6,9 +6,13 @@ TEST_INCLUDES := $(wildcard lib/py/*.py) \
->  		 ../../net/net_helper.sh \
->  		 ../../net/lib.sh \
->  
-> -TEST_GEN_FILES := xdp_helper
-> +TEST_GEN_FILES := \
-> +	napi_id_helper \
-> +	xdp_helper \
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-like you did here
+The use of devm_free() should trigger any reviewer to take a closer
+look because it generally means something is wrong.
 
-> +# end of TEST_GEN_FILES
->  
->  TEST_PROGS := \
-> +	napi_id.py \
->  	netcons_basic.sh \
->  	netcons_fragmented_msg.sh \
->  	netcons_overflow.sh \
-> diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
-> new file mode 100755
-> index 000000000000..aee6f90be49b
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/napi_id.py
-> @@ -0,0 +1,24 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +from lib.py import ksft_run, ksft_exit
-> +from lib.py import ksft_eq, NetDrvEpEnv
-> +from lib.py import bkg, cmd, rand_port, NetNSEnter
-> +
-> +def test_napi_id(cfg) -> None:
-> +    port = rand_port()
-> +    listen_cmd = f'{cfg.test_dir / "napi_id_helper"} {cfg.addr_v['4']} {port}'
-
-you need to deploy, in case test is running with a real remote machine
-and the binary has to be copied over:
-
-	bin_remote = cfg.remote.deploy(cfg.test_dir / "napi_id_helper")
-	listen_cmd = f'{bin_remote} {cfg.addr_v['4']} {port}' 
-
-> +    with bkg(listen_cmd, ksft_wait=3) as server:
-> +        with NetNSEnter('net', '/proc/self/ns/'):
-> +          cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
-
-Like Xiao Liang said, just host=cfg.remote should work.
-
-> +    ksft_eq(0, server.ret)
-> +
+    Andrew
 
