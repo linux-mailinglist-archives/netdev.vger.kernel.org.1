@@ -1,93 +1,68 @@
-Return-Path: <netdev+bounces-183760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4077A91D88
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:15:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC139A91D86
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF18A7A8B86
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07963462F66
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63F22459EF;
-	Thu, 17 Apr 2025 13:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17B524C07C;
+	Thu, 17 Apr 2025 13:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoqO9GdX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GzO0IxHX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F7E64A98;
-	Thu, 17 Apr 2025 13:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2829524BC18;
+	Thu, 17 Apr 2025 13:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744895562; cv=none; b=VXh+l0eDHZCy4OV/4ILe8SznfSl2TbxI1D3ywll24Auw1h/LnIv4TfRO2N1yKOKT6uVnX+03eXPEd6khaSESww3eb9ziMfA9ncDkuzSY0SUI9Vsrzab9qZA1Zcx7Q5Ntu8aLBupQyCGBqVIQG5kkdSfAOKuk3W+LHbld9vGBh24=
+	t=1744895617; cv=none; b=K3I73XM1OG2EurnkJNoUu75uudC4SQGeqqj5c6sAzhnI/BWDI+PTPQd5O7wZiB65Lsw56xVc+/11c/2KfrO82SQJF4NDTr2lQTRHYR+fN4ArfTvy05ee7MHyQv2028tGSq1GIw8wYwTVyAucINixAaWK0wQCBmTmW65qOzwTf2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744895562; c=relaxed/simple;
-	bh=vMhvBBkKElMyIh7A9PoUjyUtyXpKUsIiYLmszT6LqGA=;
+	s=arc-20240116; t=1744895617; c=relaxed/simple;
+	bh=DzWIUMgO/0aqjQKZLGHzjTpbRlPFNCqYf5Es4PwWA00=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSh3pKFFtsK174HGY4hGcz18TvTCk3Otf9jU+VEpWpM/3L5TqiZeHP7ZxaG4YRhsdB+Q1/Ym7V7Xgi3gdJX+onlgPIsXjRR+9fm5QJtjySRsgF96Fug5tXu0j/14lVVhvzXiboOBK1OwAIKMatmgnR0Ry02pSz/WTsoSQczBv5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoqO9GdX; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so4084885e9.2;
-        Thu, 17 Apr 2025 06:12:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744895559; x=1745500359; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=04TfvKNzSnzlvKlxW6Gwj4q+0nDZMEDnwoinbXJa+Pc=;
-        b=SoqO9GdX1AbQI8RwzrJ86m4XZjPlljgY8bcw8R5iGgRd0XlUUB7k+o8sK8v67/PBY8
-         UQyJIXbqPyipIFzuVRjI0c8KvBQcKzDAkTQOZQ4GPUNkN7MjrJYE2pa6mPKVeNf47ihY
-         9nj65BGL3vumXs90Se1AneZ8hPV2L1AywZ8oUx9QZVrfWdpPq1k7uRdb+dsT6mAO9Lhw
-         Dvl82taR9HrCnHtLaQg+FvnldrTYRMilxmahhQH7droushL9EeJRpyN3XAcRQfYL5Gp3
-         azkbOnsdL0l40Swd6m8h7IRSrGSuOOEmohQzh5LKeKZaSmiXy399zgDfrAtOfIR6mcUU
-         rbcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744895559; x=1745500359;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=04TfvKNzSnzlvKlxW6Gwj4q+0nDZMEDnwoinbXJa+Pc=;
-        b=U4pYWQJlRm6jVp0SmS7vhd9Jzk0Po6ZFZRI5o4UuMxLRIo9yf/TLWLT4EHBu43Kp3g
-         oE5a7DclB2IZcyvi6e1zMzRfArGvlHmWkeaq02M/NaVh8M/dbNitQekeaJAPHl+fzrmg
-         DXm+aXQcG25PmHaiw0yIkG6TiU9gyvG6fzhMtrB0H6NUz1zCXDUEFRWSw3x1TH0+m46V
-         jqEz15C9fFkanht0/m7JPFF+WwE56ZRJ9NGDWjT6f+pN+NCniI8IbNijRBg0vJ+4X/jK
-         ca63p5tRDIZG0z7Y8Lk3CgqSd5kOApTUggdaH6G+s3sG9nyxS5mNL18ULDBnF9alBMwA
-         oyuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVb49t7JXEbajWTByYUECdfNRchS+/gJWoapXAwzQ5NAwkEZ8QhX4XZcHqFtsXhS4V2vDu/sBC@vger.kernel.org, AJvYcCUnnabczafcX1qtuAQdJmthoT4IPIRxIVTSm7ZB9Wkqoo3QeCEMSNOu5UBxSbFmQHJYPfFHFexf@vger.kernel.org, AJvYcCWSRUf2b1e+gKI4TIpBT+5yqwwk0Ke1nW7DvxXKPszeKu4CH/ojW9+vdfxmD+WjXPc+bRvuEvF4pLfk@vger.kernel.org, AJvYcCXhHw0cy/es0DRcmS5A+yFgZxhzhSJguWAydkMcm36wuP7CcxMq2Z4VDLMgsCqsI9DNO+7lKKpdJftRkUE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH1GYjBV+J/DtfbEAo9qE77NtCvxG3agINM/Xh7PJzQE+L+Qz6
-	ROkSvawZnW2tOTL8tJPVPttw8c06TcaY2GI4AgB0lsw/rRn9Dg0c
-X-Gm-Gg: ASbGncvC4XLAwMCjk6WCJ3lVqiNameGjpRzg7DZ96UPQGZCrBmVgcpee0IZZ3BG4ipB
-	r+Iq+Dya96FxAtF/myzLVE/qRpeUXb81q2Kuf+HNtW6KyzURTsIaapTwUfuJc3wu93NJjOFBYgi
-	FiMSGfhKSNKdToDXKl1L6QfRvbJfioP8PxOmRWIR6ht1T3LEdv3aaiB3mu94r9ER/hQMWcjRMwO
-	xAUEqD8OJgR77NNKr0+1B98V1hYCqBC3anAwJOrcO7R6ckKw7E6dmCyL5tBbgp+HzXlsfRbCDn5
-	bjvRoxKT6ru5SqMjyPJFap4R/pehd5nI9afOR24=
-X-Google-Smtp-Source: AGHT+IH0JrGfVzwDr9zTnRtEYBBNuX4yDnsqZwL6HLBEocbCMqO/cqA4N513NL/eSr8dmGL7xM6HIA==
-X-Received: by 2002:a05:600c:384b:b0:43c:e7ae:4bcf with SMTP id 5b1f17b1804b1-4405d5bdb1cmr66066095e9.0.1744895558817;
-        Thu, 17 Apr 2025 06:12:38 -0700 (PDT)
-Received: from gmail.com ([2a02:c7c:6696:8300:30d6:b851:2d62:d3f9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf445737sm19774698f8f.88.2025.04.17.06.12.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 06:12:38 -0700 (PDT)
-Date: Thu, 17 Apr 2025 14:12:36 +0100
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on
- non-zero PHY ID
-Message-ID: <aAD-RDUdJaL_sIqQ@gmail.com>
-References: <20250412183829.41342-1-qasdev00@gmail.com>
- <20250412183829.41342-6-qasdev00@gmail.com>
- <b49e6c21-8e0a-4e54-86eb-c18f1446c430@lunn.ch>
- <20250415205230.01f56679@kernel.org>
- <20250415205648.4aa937c9@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I+encc8OXags7JTMhyKuZcu3S/sMTYufXKCh1f3+9U66/JUXkE0SALEQlpBpiRbHWdbxUCnngsVVxNt8qhWp6dK27YZ4D1xr/xu3Y92gMMV+Th4nned+/lCt57TBQytRqiCfaHKW9TdRefvzlNNTdIQLkrkIVPh/FX/ET+39BEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GzO0IxHX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=kqSGBFvBco4jOMm/RXWM5jN0BSdqtnNtjafj4ponO5E=; b=Gz
+	O0IxHXQWLgWcGyU7z2o4uuOqx/kIuEPNQdLAVlq0CotfEkWnsIPQTIuvoCEKb4Of9OSgaLZidYGav
+	aQeF/gRXD9syYuO/WRiLA60LEu+NEYuFCqu3dDhxsJQ0ltZ4TL9c4RNPRVyGh6mJtsM7hu9PJUc/+
+	KG963Pq+b22gzAg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u5P3J-009mjg-HR; Thu, 17 Apr 2025 15:13:13 +0200
+Date: Thu, 17 Apr 2025 15:13:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 3/8] mfd: Add Microchip ZL3073x support
+Message-ID: <894d4209-4933-49bf-ae4c-34d6a5b1c9f1@lunn.ch>
+References: <20250416162144.670760-1-ivecera@redhat.com>
+ <20250416162144.670760-4-ivecera@redhat.com>
+ <8fc9856a-f2be-4e14-ac15-d2d42efa9d5d@lunn.ch>
+ <CAAVpwAsw4-7n_iV=8aXp7=X82Mj7M-vGAc3f-fVbxxg0qgAQQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,69 +72,87 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250415205648.4aa937c9@kernel.org>
+In-Reply-To: <CAAVpwAsw4-7n_iV=8aXp7=X82Mj7M-vGAc3f-fVbxxg0qgAQQA@mail.gmail.com>
 
-On Tue, Apr 15, 2025 at 08:56:48PM -0700, Jakub Kicinski wrote:
-> On Tue, 15 Apr 2025 20:52:30 -0700 Jakub Kicinski wrote:
-> > On Tue, 15 Apr 2025 03:35:07 +0200 Andrew Lunn wrote:
-> > > > @@ -182,7 +182,7 @@ static int ch9200_mdio_read(struct net_device *netdev, int phy_id, int loc)
-> > > >  		   __func__, phy_id, loc);
-> > > >  
-> > > >  	if (phy_id != 0)
-> > > > -		return -ENODEV;
-> > > > +		return 0;    
-> > > 
-> > > An actually MDIO bus would return 0xffff is asked to read from a PHY
-> > > which is not on the bus. But i've no idea how the ancient mii code
-> > > handles this.
-> > > 
-> > > If this code every gets updated to using phylib, many of the changes
-> > > you are making will need reverting because phylib actually wants to
-> > > see the errors. So i'm somewhat reluctant to make changes like this.  
-> > 
-> > Right.
-> > 
-> > I mean most of the patches seem to be adding error checking, unlike
-> > this one, but since Qasim doesn't have access to this HW they are
-> > more likely to break stuff than fix. I'm going to apply the first
-> > patch, Qasim if you'd like to clean up the rest I think it should
-> > be done separately without the Fixes tags, if at all.
+On Wed, Apr 16, 2025 at 08:19:25PM +0200, Ivan Vecera wrote:
+> On Wed, Apr 16, 2025 at 7:11 PM Andrew Lunn <andrew@lunn.ch> wrote:
 > 
-> Ah, no, patch 1 also does return 0. Hm. Maybe let's propagate the real
-> error to silence the syzbot error and if someone with access to the HW
+>     > +++ b/include/linux/mfd/zl3073x_regs.h
+>     > @@ -0,0 +1,105 @@
+>     > +/* SPDX-License-Identifier: GPL-2.0-only */
+>     > +
+>     > +#ifndef __LINUX_MFD_ZL3073X_REGS_H
+>     > +#define __LINUX_MFD_ZL3073X_REGS_H
+>     > +
+>     > +#include <asm/byteorder.h>
+>     > +#include <linux/lockdep.h>
+> 
+>     lockdep?
+> 
+> 
+> lockdep_assert*() is used in later introduced helpers.
 
-Hi Andrew and Jakub
+nitpicking, but you generally add headers as they are needed.
 
-Since there is uncertainty on whether these patches would break things 
-how about I refactor the patches to instead return what the function 
-already returns, this way we include error handling but maintain consistency 
-with what the function already returns and does so there is no chance of 
-breaking stuff. I think including the error handling would be a good idea
-overall because we have already seen 1 bug where the root cause is insufficient 
-error handling right? Furthermore this driver has not been updated in 4 years, 
-so for the near‑term surely improving these aspects can only be a good thing.
+>     > +#include <linux/mfd/zl3073x.h>
+>     > +#include <linux/regmap.h>
+>     > +#include <linux/types.h>
+>     > +#include <linux/unaligned.h>
+>     > +
+>     > +/* Registers are mapped at offset 0x100 */
+>     > +#define ZL_RANGE_OFF        0x100
+>     > +#define ZL_PAGE_SIZE        0x80
+>     > +#define ZL_REG_ADDR(_pg, _off) (ZL_RANGE_OFF + (_pg) * ZL_PAGE_SIZE +
+>     (_off))
+>     > +
+>     > +/**************************
+>     > + * Register Page 0, General
+>     > + **************************/
+>     > +
+>     > +/*
+>     > + * Register 'id'
+>     > + * Page: 0, Offset: 0x01, Size: 16 bits
+>     > + */
+>     > +#define ZL_REG_ID ZL_REG_ADDR(0, 0x01)
+>     > +
+>     > +static inline __maybe_unused int
+>     > +zl3073x_read_id(struct zl3073x_dev *zldev, u16 *value)
+>     > +{
+>     > +     __be16 temp;
+>     > +     int rc;
+>     > +
+>     > +     rc = regmap_bulk_read(zldev->regmap, ZL_REG_ID, &temp, sizeof
+>     (temp));
+>     > +     if (rc)
+>     > +             return rc;
+>     > +
+>     > +     *value = be16_to_cpu(temp);
+>     > +     return rc;
+>     > +}
+> 
+>     It seems odd these are inline functions in a header file.
+> 
+> 
+> There are going to be used by dpll_zl3073x sub-driver in series part 2.
 
-So now going into the changes:
+The subdriver needs to know the ID, firmware version, etc?
 
-Patch 1: So patch 1 changes mdio_read, we can see that on failure mdio_read 
-already returns a negative of -ENODEV, so for the patch 1 change we can simply 
-just error check control_read by "if (ret < 0) return ret;" This matches 
-the fact that mdio_read already returns a negative so no chance of breaking anything.
+Anyway, look around. How many other MFD, well actually, any sort of
+driver at all, have a bunch of low level helpers as inline functions
+in a header? You are aiming to write a plain boring driver which looks
+like every other driver in Linux....
 
-Patch 2: For patch 2 I will add Cc stable to this patch since kernel test robot 
-flagged it, I assume backporting it would be the right thing to do since the 
-return statement here stops error propagation. Would you like me to add it to the other patches?
+Think about your layering. What does the MFD need to offer to sub
+drivers so they can work? For lower registers, maybe just
+zl3073x_read_u8(), zl3073x_read_u16() & zl3073x_read_read_u32(). Write
+variants as well. Plus the API needed to safely access the mailbox.
+Export these using one of the EXPORT_SYMBOL_GPL() variants, so the sub
+drivers can access them. The #defines for the registers numbers can be
+placed into a shared header file.
 
-Patch 3: For patch 3 the get_mac_address and ch9200_bind function already returns a
-negative on error so my changes don't change what is returned, so this should be fine i think.
+The MFD needs to read the ID, firmware version etc, so it can have
+local implementations of these, but if the sub drivers don't need
+them, don't make them global scope.
 
-Patch 4: For patch 4 it already returns a negative on error via usbnet_get_endpoints() 
-so i hope it is fine as is? Jakub commented on the changed usbnet_get_endpoints() 
-error check, if you want me to revert it back I can do that.
-
-Patch 5: We can drop this.
-
-Andrew and Jakub if you’re happy with this should I resend with these changes?
-
-> comes along they can try to move this driver to more modern infra?
+	Andrew
 
