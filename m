@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-183751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD45A91D63
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:11:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C27AA91D64
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0529418939A1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ED0F3A94E9
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554D8246335;
-	Thu, 17 Apr 2025 13:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1FF248863;
+	Thu, 17 Apr 2025 13:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvQDlgYU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cdXr6BWt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ACD2459EF;
-	Thu, 17 Apr 2025 13:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EF52475E8;
+	Thu, 17 Apr 2025 13:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744895481; cv=none; b=ejRJSNGgbFpIBHMXBK8NNSQoIml0W89tbY/S86JTxveon3GgQRxdSE6bX+8chZa097LFBkMe8x/kJ3csK8PyjFrjla88Q5K0d5zCVnUhVBRD9dhFZiM1Znrx4jV3j/5tNO3Eda4xzprnW97185lfgSXeUE20k1UW9afuKxrFhag=
+	t=1744895482; cv=none; b=FuyNCp1sWz40bTXCQnixKSlzoOQN49Ljn4MVLVpM+7Ro7nCe29ZfWJdI0CYptL/iWb5g1K803W6ZgYerjuShC1W8lJIxpFec+GTxsNyr7p5DLAYfZjJm6HgXhu+O6/pMh+qu0OURRSshqc6hmPTxw7nXCBzKqjDKKrSBrPgq93U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744895481; c=relaxed/simple;
-	bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Yrw8dMzI7jniYfWtMTky7BCXmb642uYTu5m841+AudfEANukWXkAHGZPWGcBIDVkVOqIN+Kj/fw8pnH9o0xs7cIKxvoC+MDXo2dJVinppQ+lT4aAdvD3U5KgKyvJG1SVdOVEj+NsyVux9piZ7ZYgBlf1ohlJbtlu73C4s4iAE6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvQDlgYU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B1BC4CEEB;
-	Thu, 17 Apr 2025 13:11:19 +0000 (UTC)
+	s=arc-20240116; t=1744895482; c=relaxed/simple;
+	bh=20xUNOV/1f6OQhBvCvol1tdYpv6GVoR6PFFok+tmwQk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=I19aHKRNhcVnZC51Kjr19tjTbsgfwSmusv+LoUZ8ow1IrOSqI9IDpIaBChuMnuvcx6RsyoedrjinVHcYj7Zc3MFXybX1MA6Lvlbz5D9QTeRxXPVxgMuAAKqCPRwPcSljMxrwms0tkPHZeF/R1xo+xsSkaTblhKxkiRGAqeHHvug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cdXr6BWt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA931C4CEED;
+	Thu, 17 Apr 2025 13:11:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744895480;
-	bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
-	h=From:Subject:Date:To:Cc:From;
-	b=DvQDlgYUDPe1mX2ENKDI9+XTvQn/iPj1bO2WpAmSsAslei0e4jfLmPCAHc5zimuie
-	 wDGHWgQUOXhRYwviuU2nLgRJ8+e6LzgxEuE4zBTjJwuQYa0P9cK194JIM6581XBhpL
-	 H347j5nuabDiMOE0fOOCzRhUd6MxTbeKoF2o3PE/MZ+0R4Y0DSR9SgSTVHUKqi9Q7J
-	 DvC3GHNqlgtCMiY13tPHKHiNTv/GFNlLgRfMtTSTB46PAqxTjXFZ5FX2QKPQW/FOr4
-	 5xByBWEZHGAdPIG6McNJZcPK6Xqg9OInVAOy5cPDpyuoHeR0HRldhH+atAEB4hq773
-	 p6LtODri6XWAQ==
+	s=k20201202; t=1744895481;
+	bh=20xUNOV/1f6OQhBvCvol1tdYpv6GVoR6PFFok+tmwQk=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=cdXr6BWtLIcEe77YtGzv0Itty185uWz03FMj1RPPlvtjzqeha04gWsXBHdq25jkSq
+	 mcOvdHtxfjA7+6/N1Cl3eirNYB8q1Zko7JyqhwTAcAWZtQGlAFPX/N7JAfKNBqoVw8
+	 fmZRAkc0FpbgMz+F4/yGR89T49JvDy+SL9FIxxg02DWGf28mq6oJS1itnyE/ctxpIO
+	 Z1p7P3b2IbAIP1K6XzZSAzhhG04p9lzWsgufRD0zymf1MCQ42KtTH93nbgiLCds51k
+	 6wbkcUoeUUfa3Q5wwHRAfC/PyUUMxeRK7bcjD4YCYs2FC9xhaxPCkOxV3f7gkOFCSd
+	 sewltmkJbK8PA==
 From: Jeff Layton <jlayton@kernel.org>
-Subject: [PATCH v3 0/8] ref_tracker: add ability to register a debugfs file
- for a ref_tracker_dir
-Date: Thu, 17 Apr 2025 09:11:03 -0400
-Message-Id: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
+Date: Thu, 17 Apr 2025 09:11:04 -0400
+Subject: [PATCH v3 1/8] ref_tracker: don't use %pK in pr_ostream() output
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,12 +51,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAOf9AGgC/2WMywqDMBBFf6XMuinJjKnSVf+jdJHoRINFSyKhR
- fz3RqHQx/LcyzkzRA6eI5x2MwROPvpxyED7HdSdGVoWvskMKFHLQpEI7KZg6l40tnVRUHksLUl
- idAaydM+/f2zByzVz5+M0hufWT2pd36niN5WUkMJJ0pWuCFHSuecw8O0whhbWVsJPX//5mH2rq
- rowtlGI7stfluUFZxaX1+0AAAA=
-X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250417-reftrack-dbgfs-v3-1-c3159428c8fb@kernel.org>
+References: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
+In-Reply-To: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -68,69 +65,67 @@ Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,
  Jeff Layton <jlayton@kernel.org>, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2122; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
- b=kA0DAAgBAA5oQRlWghUByyZiAGgA/e7IMar3vmCgsyCLDC7IMa65WUNtIC07DtMKSrKE0INin
- okCMwQAAQgAHRYhBEvA17JEcbKhhOr10wAOaEEZVoIVBQJoAP3uAAoJEAAOaEEZVoIVMf0P/A/A
- c3HgXO1eZujzv4qdBLZoYLTDgQnOlO9R/Hv5E/0pBxBrvTVOxEc0PlQiI6vofGOJYBrTy0fdE2u
- 83eoJpc8i4KUp1P2IG7g5kUJT1KzOpAL8OyOCb4hAYFS4BalfeSG4AZ460bF8jEqwMqJXnD5FKn
- LsaaixCy2TBDcBZ1n905lYwOq9dS9cYKnb3ndJ976l5kjaX1QN79qXRaaknSK0+o0n7+91CsW+g
- f09/GHlZ2MuweKQ+DWIuQeymUTY5nf1Zb7GL7swnCl+j1yL3QxP6xvK1E9hR/rbjobCiofAd2Za
- qN3W1dcmmTz3BDpqWpcfOsHUgilPgBX9kSA0yMvK3LhI9JfQdhYR+h4pkfuNYZyuR7TqSizpYNh
- qbnuo6ljdKdK4zEj3Yc7UV64kzS4+xr/ellk8AdIHVJ4UZA0t8+sKfqD7YrNgUoeI9u+Fddf02s
- Y7IOPn3Rbb65kKuHm+oGsGUP0mJCmtbuW4kEz4kbk8rV+7BvzJCoF179MivZIDRYjIGAdtJpjtz
- 2Vmm9zVylv2hNV+lxITUdVH+mAcRX+Z4112tMirzXgIQljgcuQO1/dtsoEL59AF6IHkLC/uzPTk
- Jmpqba9WP1X6z22meI3rGr6fthoILMzuEyJzbPvIX/EsnifhVS8t+mE/eNP8nTu95gSS47U+0k0
- jRcib
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1766; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=20xUNOV/1f6OQhBvCvol1tdYpv6GVoR6PFFok+tmwQk=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBoAP31s6P/RrZc8O04lUYQAwdOvxsYoH9JJPd4j
+ GYVdgvCiRSJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaAD99QAKCRAADmhBGVaC
+ FZiSD/4tr5hbBZh+e40PK990MVzHUg4wxVI1U8HoLbCRadsb5C9pcxWotEVVxFjeSA2y8apUhew
+ L8IDtx6Q/jyzYaHF0NnaryScmxNsTitIih3ptoXozVGpms/wVGo2fHQ3wT0jTHCNkWtkvKCa0V9
+ kVGmpPMhHmI4QFzIHdzTcv435jt+KzjJ9znhpFRlRL5hHINLQmbJuK93IZJkpBGcEW/djPtts3j
+ PZnvuS6eGrMhFDqzLVKmbn7Ih0ugs28UNfZgnljHr2U7S1ELL7/rdEWJyOBrKFChjmrixIQEYSd
+ 6jKUsmRbMBLiET7uDXZF3tJFkQoqyfn5UqfBUezpfchTJrPexvLpE+9YaRHRxSqmSA8SJ5qqG2b
+ O3Vz3NH6cM5m1cTalH0lkNfFjI7Rq2W6pfP+aZKvW1X6hhdQvjIzw6mDg4L03S3/SK+Ju+hdA29
+ /YbI3sIlgATbzUBBTv+7HQ+TF2X5lt97H/c0EVAh9DUIV3Ih1/xFWHPbe0ujEkdql2KdhVYV40u
+ sSgtMcQ4sJnpa6BtW9tk0j7jcjbwh75BXh/QjnZALOa7vo0806i4/DjTADd+f7BwW9SNHk+7+jp
+ +ZCMqBqCLJPvSUz4KCG7es1/InvwfJSIBpH/NveIdUAdPKCqkVupCueqck3rX3MLugXHksyVLED
+ cKO12cEQnlUJC+g==
 X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
  fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-I had previously sent some patches to add debugfs files for the net
-namespace refcount trackers, but Andrew convinced me to make this more
-generic and better-integrated into the ref_tracker infrastructure.
+As Thomas Weißschuh points out [1], it is now preferable to use %p
+instead of hashed pointers with printk(), since raw pointers should no
+longer be leaked into the kernel log. Change the ref_tracker
+infrastructure to use %p instead of %pK in its formats.
 
-This adds a new ref_tracker_dir_debugfs() call that subsystems can call
-to finalize the name of their dir and register a debugfs file for it.
-The last two patches add these calls for the netns and netdev
-ref_trackers.
+[1]: https://lore.kernel.org/netdev/20250414-restricted-pointers-net-v1-0-12af0ce46cdd@linutronix.de/
 
+Cc: "Thomas Weißschuh" <thomas.weissschuh@linutronix.de>
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
-Changes in v3:
-- don't overwrite dir->name in ref_tracker_dir_debugfs
-- define REF_TRACKER_NAMESZ and use it when setting name
-- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
+ lib/ref_tracker.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Changes in v2:
-- Add patch to do %pK -> %p conversion in ref_tracker.c
-- Pass in output function to pr_ostream() instead of if statement
-- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
-- Eliminate error handling with debugfs manipulation
-- Incorporate pointer value into netdev name
-- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
+index cf5609b1ca79361763abe5a3a98484a3ee591ff2..de71439e12a3bab6456910986fa611dfbdd97980 100644
+--- a/lib/ref_tracker.c
++++ b/lib/ref_tracker.c
+@@ -96,7 +96,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
+ 
+ 	stats = ref_tracker_get_stats(dir, display_limit);
+ 	if (IS_ERR(stats)) {
+-		pr_ostream(s, "%s@%pK: couldn't get stats, error %pe\n",
++		pr_ostream(s, "%s@%p: couldn't get stats, error %pe\n",
+ 			   dir->name, dir, stats);
+ 		return;
+ 	}
+@@ -107,13 +107,13 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
+ 		stack = stats->stacks[i].stack_handle;
+ 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
+ 			sbuf[0] = 0;
+-		pr_ostream(s, "%s@%pK has %d/%d users at\n%s\n", dir->name, dir,
++		pr_ostream(s, "%s@%p has %d/%d users at\n%s\n", dir->name, dir,
+ 			   stats->stacks[i].count, stats->total, sbuf);
+ 		skipped -= stats->stacks[i].count;
+ 	}
+ 
+ 	if (skipped)
+-		pr_ostream(s, "%s@%pK skipped reports about %d/%d users.\n",
++		pr_ostream(s, "%s@%p skipped reports about %d/%d users.\n",
+ 			   dir->name, dir, skipped, stats->total);
+ 
+ 	kfree(sbuf);
 
----
-Jeff Layton (8):
-      ref_tracker: don't use %pK in pr_ostream() output
-      ref_tracker: add a top level debugfs directory for ref_tracker
-      ref_tracker: have callers pass output function to pr_ostream()
-      ref_tracker: allow pr_ostream() to print directly to a seq_file
-      ref_tracker: add ability to register a file in debugfs for a ref_tracker_dir
-      ref_tracker: widen the ref_tracker_dir.name field
-      net: add ref_tracker_dir_debugfs() calls for netns refcount tracking
-      net: register debugfs file for net_device refcnt tracker
-
- include/linux/ref_tracker.h |  17 ++++-
- lib/ref_tracker.c           | 151 +++++++++++++++++++++++++++++++++++++++-----
- net/core/dev.c              |   6 +-
- net/core/net_namespace.c    |  34 +++++++++-
- 4 files changed, 190 insertions(+), 18 deletions(-)
----
-base-commit: 695caca9345a160ecd9645abab8e70cfe849e9ff
-change-id: 20250413-reftrack-dbgfs-3767b303e2fa
-
-Best regards,
 -- 
-Jeff Layton <jlayton@kernel.org>
+2.49.0
 
 
