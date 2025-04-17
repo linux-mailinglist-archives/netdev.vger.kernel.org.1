@@ -1,173 +1,109 @@
-Return-Path: <netdev+bounces-183790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7F9A91F5C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:19:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35359A91F73
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EE7C3BDB72
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D77C97B183E
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 14:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C139E25179E;
-	Thu, 17 Apr 2025 14:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA502512E3;
+	Thu, 17 Apr 2025 14:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIGnuc9s"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CuZseRVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9AF22A813
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 14:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED27324E4AA;
+	Thu, 17 Apr 2025 14:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744899540; cv=none; b=sFM1R+KLtLiuK64DwzVchRi9Pg6poYnQev/NrxLnODphLYW8rw9j4i0qDqV9XVE0cTtPMV20AqQJjrn5pAvSARoWhkFI5lqhVWqxril2f7CdrVB/K9jsmBIi3vle7VLx4zdICOxQJ13XYyB4IKiBAfoQ8yLJSL35t6c0rrHFvBs=
+	t=1744899752; cv=none; b=psqPfdU61EnQNIqG/LS+Jg7PwyF7DlQf27ECaz4CPWyrtQdSFapk2l6fMnqCxqjgx7yaeDGBmo8unKd4hin1npxtzUCSIIhs/bw4i2hCh3CUxjRI99CgsFGdvxPXa2uMpCLkViJ2HKNkq3ZCwVr+0onuyAtgQ+g1uBZUQimSPlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744899540; c=relaxed/simple;
-	bh=qquF4gAWxlLcl0NloBMan4FuZEm0GYnvDkpACC9vTGA=;
+	s=arc-20240116; t=1744899752; c=relaxed/simple;
+	bh=xrC86xvnJkiy2wsi0KaTZ23wdHmrQQxY6hWpQMlw79Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SbHui3WXn1Fm8tZKK1r9Rz2x+kPUG9yHejFYRsVa7tuQm0iq2gGYn0ScBISIxNanJB4brSRLVBLmrD/u6jvyBTCaDlBKqLnZlXlTbLYbuoJXOkDwi5mfBOZlDjNWzgRnO/jeqCIDyZV3zpuEEmffpomkaGSG6/Gn/TmetjqYhRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIGnuc9s; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744899537;
+	 In-Reply-To:Content-Type; b=GNYMt+itj9KKMMWPatpBTcxAwv5SFuTpn2ueERfq9D7bYU8YJWC6rB+Dve+WW3TMXSetiFYkG8lym9oAdIU0z6ceAUcXfXcjQY9L6HSpNp54u0m9Sn7OhlxP5Uj7H25kD4ydJ5z3LEj6FWS0x7sP4lafft/uBrqYpjVW3I+xu/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CuZseRVi; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <13357f38-f27f-45b5-8c6a-9a7aca41156f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744899737;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kzF6UYdjczKDEkThEfvJNGwHGPfnks2hj7tHch2bIQQ=;
-	b=PIGnuc9sO3Kgl2ujCeIoeIDoQECd8K8/S7T49cAgt3E30VDvgCbbY7EdND9YcM59xQ6zUV
-	ePMVLWda/Htp/5kXPxZpyZdDE2PRbuWqWqMgQGATkRsMdsFYZhMGJTN6zw+OU47PmaxIC9
-	ubUqnLZZNrZkNyEFGDTJ8UyCxHi4ksE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-450-XFk4lmz7PRSOlAP3HKoenA-1; Thu,
- 17 Apr 2025 10:18:55 -0400
-X-MC-Unique: XFk4lmz7PRSOlAP3HKoenA-1
-X-Mimecast-MFC-AGG-ID: XFk4lmz7PRSOlAP3HKoenA_1744899533
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4AD4C180056F;
-	Thu, 17 Apr 2025 14:18:52 +0000 (UTC)
-Received: from [10.44.33.28] (unknown [10.44.33.28])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3CA419560BA;
-	Thu, 17 Apr 2025 14:18:46 +0000 (UTC)
-Message-ID: <ee0b1569-1c01-4e7b-b4a0-ec1de4634e89@redhat.com>
-Date: Thu, 17 Apr 2025 16:18:39 +0200
+	bh=ChiiEwSa59wY7fvBbAy6iv40vz0WXaWqLI1I0LPkf10=;
+	b=CuZseRViZ/RaXnYZOACNcu4na/IG6hHI8dgeNeVVCuTSOVxXCs2ZnGodyZUZUH3dWE7CeK
+	QyjpUmPSSCLfAhMZ96M4KxFeuPaGKkfxb2/X4sadI1tABc+Cmv/RtAjACgO8b4jAiWWp3V
+	8lcI4vehocZ2Igzm1PT46ptOaVKHTGY=
+Date: Thu, 17 Apr 2025 10:22:09 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 5/8] mfd: zl3073x: Add functions to work with
- register mailboxes
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-6-ivecera@redhat.com>
- <d286dec9-a544-409d-bf62-d2b84ef6ecd4@lunn.ch>
- <CAAVpwAvVO7RGLGMXCBxCD35kKCLmZEkeXuERG0C2GHP54kCGJw@mail.gmail.com>
- <8802b276-b6dd-4235-87dd-18b835edb196@lunn.ch>
+Subject: Re: [net-next PATCH v3 00/11] Add PCS core support
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, upstream@airoha.com,
+ Christian Marangi <ansuelsmth@gmail.com>, linux-kernel@vger.kernel.org,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Clark Wang <xiaoning.wang@nxp.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
+ Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Madalin Bucur <madalin.bucur@nxp.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Michal Simek <michal.simek@amd.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Robert Hancock <robert.hancock@calian.com>,
+ Saravana Kannan <saravanak@google.com>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+ devicetree@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com
+References: <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <aADzVrN1yb6UOcLh@shell.armlinux.org.uk>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <8802b276-b6dd-4235-87dd-18b835edb196@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <aADzVrN1yb6UOcLh@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Migadu-Flow: FLOW_OUT
 
+Hi Russell,
 
-
-On 17. 04. 25 3:22 odp., Andrew Lunn wrote:
->>>> +/*
->>>> + * Mailbox operations
->>>> + */
->>>> +int zl3073x_mb_dpll_read(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_dpll_write(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_output_read(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_output_write(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_ref_read(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_ref_write(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_synth_read(struct zl3073x_dev *zldev, u8 index);
->>>> +int zl3073x_mb_synth_write(struct zl3073x_dev *zldev, u8 index);
->>>
->>> I assume these are the only valid ways to access a mailbox?
->>>
->>> If so:
->>>
->>>> +static inline __maybe_unused int
->>>> +zl3073x_mb_read_ref_mb_mask(struct zl3073x_dev *zldev, u16 *value)
->>>> +{
->>>> +     __be16 temp;
->>>> +     int rc;
->>>> +
->>>> +     lockdep_assert_held(&zldev->mailbox_lock);
->>>> +     rc = regmap_bulk_read(zldev->regmap, ZL_REG_REF_MB_MASK, &temp,
->>>> +                           sizeof(temp));
->>>> +     if (rc)
->>>> +             return rc;
->>>> +
->>>> +     *value = be16_to_cpu(temp);
->>>> +     return rc;
->>>> +}
->>>
->>> These helpers can be made local to the core. You can then drop the
->>> lockdep_assert_held() from here, since the only way to access them is
->>> via the API you defined above, and add the checks in those API
->>> functions.
->>
->> This cannot be done this way... the above API just simplifies the
->> operation of read and write latch registers from/to mailbox.
->>
->> Whole operation is described in the commit description.
->>
->> E.g. read something about DPLL1
->> 1. Call zl3073x_mb_dpll_read(..., 1)
->>     This selects DPLL1 in the DPLL mailbox and performs read operation
->> and waits for finish
->> 2. Call zl3073x_mb_read_dpll_mode()
->>     This reads dpll_mode latch register
->>
->> write:
->> 1. Call zl3073x_mb_write_dpll_mode(...)
->>     This writes mode to dpll_mode latch register
->> 2. Call zl3073x_mb_dpll_read(..., 1)
->>     This writes all info from latch registers to DPLL1
->>
->> The point is that between step 1 and 2 nobody else cannot touch
->> latch_registers or mailbox select register and op semaphore.
+On 4/17/25 08:25, Russell King (Oracle) wrote:
+> On Tue, Apr 15, 2025 at 03:33:12PM -0400, Sean Anderson wrote:
+>> This series adds support for creating PCSs as devices on a bus with a
+>> driver (patch 3). As initial users,
 > 
-> Again, think about your layering. What does your lower level mailbox
-> API look like? What does the MFD need to export for a safe API?
-> 
-> So maybe you need zl3073x_mb_read_u8(), zl3073x_mb_read_u16(),
-> zl3073x_mb_read_u32(), as part of your mailbox API. These assert the
-> lock is held.
-> 
-> You could even make zl3073x_mb_read_u8() validate the register is in
-> the upper range, and that zl3073x_read_u8() the register is in the
-> lower range.
+> As per previous, unless I respond (this response not included) then I
+> haven't had time to look at it - and today is total ratshit so, not
+> today.
 
-Yes, this LGTM... Anyway if the MB API would provide reading and writing 
-MBs at once then zl3073x_mb_{read,write}_u* are not necessary as the 
-only caller of these functions is MFD itself and they would be called 
-under MB API that holds the lock.
+Sorry if I resent this too soon. I had another look at the request for
+#pcs-cells [1], and determined that a simpler approach would be
+possible. So I wanted to resend with that change since it would let me
+drop the fwnode_property_get_reference_optional_args patches.
 
-Ivan
+--Sean
 
+[1] https://lore.kernel.org/netdev/e7720741-93c5-450b-99a0-3434a5d535f5@linux.dev/
 
