@@ -1,141 +1,109 @@
-Return-Path: <netdev+bounces-183603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00287A91370
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 08:02:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC045A91393
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 08:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0AF33AE91C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 06:01:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33FD13A5DF7
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 06:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BA61DED5E;
-	Thu, 17 Apr 2025 06:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IetuOzlP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3DC1F12F2;
+	Thu, 17 Apr 2025 06:11:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out28-1.mail.aliyun.com (out28-1.mail.aliyun.com [115.124.28.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103F61DE4F6;
-	Thu, 17 Apr 2025 06:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334A32DFA4B;
+	Thu, 17 Apr 2025 06:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744869714; cv=none; b=bbHPY0TIjeAjZ0tp7qYLNbnhxekc2xWS7M7IUB542MNwvTD6VDej+MQOOyafIw7Q25fkA8H+583TXvlEA2J8dj/xlfJk5ktQiDum4ckexNTVF+2Qz8ee/ddSJxQPKj1F0OpCE0qZpUuZ3WdEw0wnISeZeBbEbKVpD9K4ij2LX1Y=
+	t=1744870301; cv=none; b=PVnaUd2jamsgCrV65C1sppbw67acBk6qXXjaMvVM1HtSUKMYEFXFLvy2D6QTTqRnyurS7NQf5F/rbV4GXjeVr/TN7eH0jJBFBRlfwes6CE8nJpWu75q5JVzBkv27sNc97IpzCbc1qkK7srCSYsSOgTwMB6mfwDeGtVTyn7+vfvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744869714; c=relaxed/simple;
-	bh=KpV+jFENVgflhlgCLLNEqk737rf20tIu6cxYp9KlZII=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uYYNRkmSB3MwXH+YBeD1ZGFCEp6a/Iv3V3BJlr9C7vqmW1i6uWXn6Idr54U6NSo/gn3J1IxWk+uA5EKg9F86rtQCzi+Drkm/MSjaGeR3Z9XDha+smlFWWBegIHnEmsdaV0Rzuy/Ya3HsxyATohTJh/AOowNLXLiPKJLaBUe3N9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IetuOzlP; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4769aef457bso4775121cf.2;
-        Wed, 16 Apr 2025 23:01:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744869712; x=1745474512; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KZZ0OiCh3i8QphKEZyGH0TyGWbIM9TA+BFLKz7OvmdY=;
-        b=IetuOzlPyoGfl2KluHxAmlji4J0yKcLsOuVSIfgdctOtL6PVZoyOS2Sw8iSGlMLcIq
-         jYYsC0CM5u7u4g1RialybjDkr56pIkMkKkArKXr2XnsNl+AfbXOFOtclWJO/OCdX8DJ6
-         utrlnbCnt+CU1wNXrFNlP4dFBLxanj7I/r6Gtb7iQKE+icXC5rLq9cTLao9YTtRmR6a/
-         WQynC6KsrMCKnp6MiJMH6v4g+ZdLEweVah8FUsVmbI7A+sZl5HOJJTT+oS56ZWWGSht1
-         LsTV9STI9I+QCETXnBLqa0C3Q3IG3Bh06t/4efpwYjonPPdGgUaH2993URM0rMR3J9in
-         Z3/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744869712; x=1745474512;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KZZ0OiCh3i8QphKEZyGH0TyGWbIM9TA+BFLKz7OvmdY=;
-        b=rvHQPRwp9gbIESLzl/U5LuEHAr83CyChJijFNJkX+3Esr+c/by0NISksMBhNuq5CCV
-         5L3nUjce4yWjwtOjaqCdl+grE0lU48jQCsgZOO1oa2AyhJWOF3sW4ie8RKYSwfiPRt64
-         zNan6u2aEFcBDYsyPM7RcCGN40An9BD3jkivyA4B98zP0QOVaqZjkklj6uMfJfXV1nhY
-         9Kws2d7BPpOqNlEt/9kN9o7WjWh+sDKcWnCVHYurrb1KeW2m5sER6Q2FPhs2WtU/c8Yf
-         aHH+t145oLcxihH7N3YDJQysQrRFgVs4YjW8+v03uQgiD2K1w/tnuicHv7AUWhOP+gBP
-         qG/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUxNLMa2FYNRsBmhk/GLuVpyz42hi9cPYKyNxuDx+avlE/P0dGsVWfpPom4AdVcngRJgXIxuIv/m44+Mncl@vger.kernel.org, AJvYcCWDwy78k7IrPcMadHtwY+9zO4fkgh1H4XvbFLl0t7/ZzaCwsJdNNnaSrTUUsO2kyPs/m2vfHV3ntVmT@vger.kernel.org, AJvYcCWP6ndmCwalMyhoEBWcAs5yZNquG3nZjjxwyj8A0mv4KxsntuV/mBX4WcLGLRz/0eKL989D+Po9XSpA@vger.kernel.org, AJvYcCX/4re0EbXBedcCH5/zKkO1siKCYQwOg8zueDLchJCIakWsXdfn1GIC8lV0v9LB6xGULf8Q0Cp2QPOn@vger.kernel.org, AJvYcCXUBDOzXuiVK67A3ALMgG/JIFZTVDDtDKiYfwKxiva6H0xHu6q9/IZgBkplfFK0ihEW/V3u7WDT@vger.kernel.org, AJvYcCXtlcExQXLqMJUqNJb5X/rS7oAgcdp+y+vQbYZg5FO6bUy7Y5R0IJOg72SnKufOYYST/eD5GNm+nuPz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7hX8IPJ2LzcMhRJd2byMj5jLyxQ7yru3idTVRY17Wj6J12Pin
-	H0xAI2olWWk3AI1do++m8MmQbcoBkn7dkEXzgB7JIPekurV/rFc0Ui/TtUzTGiZVG5r/13/b+GU
-	HT7EssjMmhX5KTW58Oi+I/DQSx7M=
-X-Gm-Gg: ASbGncuV26qEgRcrPHEdxRLESpyY4ftcQ3cC4ACiUbr8CwhtO980H5DYp/4ca2I3TIp
-	1ZQ+MDCzW01S1MgJ0hQHgQkBxydrP7THXu6K5sAOd4JtuVgtD8S+ecMj/csETk58uHVR5gC19Qq
-	hBG7fcUixhDfrWtfjliFT708KoIyZE03y1gU5AErYKLXZ5ZZjrYh4KK5g=
-X-Google-Smtp-Source: AGHT+IF8tMblL4zzcQke4qYiQBnX4U0VMVjKusdYcCfocK8IStZ6GIbCT+kwGjMmzlxIaiYYv7SzQwcpgCKgqbWryyE=
-X-Received: by 2002:ac8:7d8f:0:b0:476:98d6:141d with SMTP id
- d75a77b69052e-47ad811527fmr75350031cf.32.1744869711825; Wed, 16 Apr 2025
- 23:01:51 -0700 (PDT)
+	s=arc-20240116; t=1744870301; c=relaxed/simple;
+	bh=kgZhkApVvXyr4ZTTDLeZEnQIzIKe2sIDfbZoq5Z1UpE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CESLL0mMJzmfrjyM2mPM7zu/TVpQghy74aZxRDnezN9rSV34uZ+yBG6uXavbqmN4x+Jz2NGDueN45+52vq/Jdx3hEA7VY4i3jtC322CCo0w16bQ/8B325zDwk16Cjq9q9Qpg6059HS/XpwxHXnIbKoaJQV/zsJ6neNrHXbbsgHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.cPFBVRS_1744869966 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Thu, 17 Apr 2025 14:06:07 +0800
+Message-ID: <4ad68dae-311f-4cdd-a6f8-0229f069ece3@motor-comm.com>
+Date: Thu, 17 Apr 2025 14:06:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
- <20250416-wmt-updates-v1-12-f9af689cdfc2@gmail.com> <8feea1ba-2d4a-4898-9882-cf3ec8b03852@kernel.org>
-In-Reply-To: <8feea1ba-2d4a-4898-9882-cf3ec8b03852@kernel.org>
-From: Alexey Charkov <alchark@gmail.com>
-Date: Thu, 17 Apr 2025 10:01:47 +0400
-X-Gm-Features: ATxdqUHbb-NLlWiY3v98GpI67Jq817VdD6NkjDUJu2KmL6qXEllQohh5zOadrGI
-Message-ID: <CABjd4YzkUYE3B7sPCm97NFcv7=nkwQTNFjSiomjCHzTFRDCLZg@mail.gmail.com>
-Subject: Re: [PATCH 12/13] ARM: dts: vt8500: Add VIA APC Rock/Paper board
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andi Shyti <andi.shyti@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@kernel.org>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-i2c@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pwm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 00/14] yt6801: Add Motorcomm yt6801 PCIe
+ driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org,
+ Masahiro Yamada <masahiroy@kernel.org>, Parthiban.Veerasooran@microchip.com,
+ linux-kernel@vger.kernel.org,
+ "andrew+netdev @ lunn . ch" <andrew+netdev@lunn.ch>, lee@trager.us,
+ horms@kernel.org, linux-doc@vger.kernel.org, corbet@lwn.net,
+ geert+renesas@glider.be, xiaogang.fan@motor-comm.com,
+ fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+References: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
+ <Z_T6vv013jraCzSD@shell.armlinux.org.uk>
+ <da434f13-fb08-4036-96ed-7de579cb9ddc@motor-comm.com>
+ <4fac4c4f-543b-4887-ace9-d264a0e5b0f2@lunn.ch>
+Content-Language: en-US
+From: Frank Sae <Frank.Sae@motor-comm.com>
+In-Reply-To: <4fac4c4f-543b-4887-ace9-d264a0e5b0f2@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 17, 2025 at 9:36=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 16/04/2025 10:21, Alexey Charkov wrote:
-> > diff --git a/arch/arm/boot/dts/vt8500/Makefile b/arch/arm/boot/dts/vt85=
-00/Makefile
-> > index 255f4403af91c1d6a22416ab694b8eab44bf98a2..c5a2e57d53af4babe40fe2d=
-79b2f8d9c1ae1b8db 100644
-> > --- a/arch/arm/boot/dts/vt8500/Makefile
-> > +++ b/arch/arm/boot/dts/vt8500/Makefile
-> > @@ -4,4 +4,5 @@ dtb-$(CONFIG_ARCH_VT8500) +=3D \
-> >       wm8505-ref.dtb \
-> >       wm8650-mid.dtb \
-> >       wm8750-apc8750.dtb \
-> > -     wm8850-w70v2.dtb
-> > +     wm8850-w70v2.dtb \
-> > +     wm8950a-apc-rock.dtb
-> > diff --git a/arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts b/arch/arm/bo=
-ot/dts/vt8500/wm8950-apc-rock.dts
-> > new file mode 100644
-> > index 0000000000000000000000000000000000000000..58b3c8deb4f20ae072bf138=
-1f1dfa5e5adeb414a
-> > --- /dev/null
-> > +++ b/arch/arm/boot/dts/vt8500/wm8950-apc-rock.dts
-> > @@ -0,0 +1,21 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
->
->
-> Odd license, we don't do GPL v4 in the kernel. We do however dual
-> license for bindings and DTS. Why choosing such license? Did you take
-> the code from somewhere?
 
-I picked the license identifier of the wm8850.dtsi include, which
-defines most of the functionality for this board. No preference from
-my side, and happy to use whichever license is common practice for
-DTS, but I'm simply not sure how differently licensed files and
-includes combine together - thus the conservative choice to stick to
-what's already there. The original .dtsi was written by Tony Prisk,
-not me.
 
-Best regards,
-Alexey
+On 2025/4/14 04:33, Andrew Lunn wrote:
+> On Fri, Apr 11, 2025 at 05:50:55PM +0800, Frank Sae wrote:
+>>
+>>
+>> On 2025/4/8 18:30, Russell King (Oracle) wrote:
+>>> On Tue, Apr 08, 2025 at 05:28:21PM +0800, Frank Sae wrote:
+>>>> This series includes adding Motorcomm YT6801 Gigabit ethernet driver
+>>>>  and adding yt6801 ethernet driver entry in MAINTAINERS file.
+>>>> YT6801 integrates a YT8531S phy.
+>>>
+>>> What is different between this and the Designware GMAC4 core supported
+>>> by drivers/net/ethernet/stmicro/stmmac/ ?
+>>>
+>>
+>> We support more features: NS, RSS, wpi, wol pattern and aspm control.
+> 
+> Details please as to why these preventing the stmmac driver from being
+> used? Our default opinion will be that you will extend that stmmac
+> driver. In order to change that, you need to give us deep technical
+> arguments why it cannot be done.
+> 
+
+After internal discussion, we have decided to temporarily suspend upstream.
+Thanks again!
+
+>>> Looking at the register layout, it looks very similar. The layout of the
+>>> MAC control register looks similar. The RX queue and PMT registers are
+>>> at the same relative offset. The MDIO registers as well.
+>>>
+>>> Can you re-use the stmmac driver?
+>>>
+>>
+>> I can not re-use the stmmac driver, because pcie and ephy can not work well on
+>> the stmmac driver.
+> 
+> Please could you explain that in detail. What exactly does not work?
+> What is stmmac_pci.c about if not PCI?
+> 
+> 	Andrew
 
