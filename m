@@ -1,142 +1,164 @@
-Return-Path: <netdev+bounces-183833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EF31A922D1
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:37:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BBD8A922E3
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 18:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C33E16C229
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:37:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E526E19E63F7
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 16:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C54254850;
-	Thu, 17 Apr 2025 16:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC21254AFB;
+	Thu, 17 Apr 2025 16:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RGjKPy+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8390D7081E;
-	Thu, 17 Apr 2025 16:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B28254850
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 16:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744907819; cv=none; b=RzYIhRN+DZ+nQIALYZ19FtLyZyW0ZJAs2zmKrTD+ZSGMuG/ZVtCyO2vsrIkI+/qtwdrHcb+0X98GU5nF9Vzc9VEtJCs4uIct6kjUxEOS081weEatJe/7Fwl8DkveriWP7EKPAucQbz9sz5MTuyDooyRggw7JI6rWMDu/lisM+HQ=
+	t=1744908066; cv=none; b=Fb2F6pR3UWpB5JO+vnqwtnf3pvhvatP2nwHdHIdlR8WbNsOt2Q5FBrzSMHt9Kb0GhQfgShbZLG/M0vM0D55AEwTd+etyJUH2VEZ54AU5Mj2l1jGJsCCFdpUPluRSlDx0qAHzejsd4zgFngmb+PsXHV7/fFfGVmizUTNy8IPSa0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744907819; c=relaxed/simple;
-	bh=H5r7SeuvDiLGsgZFktJlVy5PGtaaiCjlxewcnoMUxtQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lEvdhYcYxuPKaJJJvDE2L4M7s88dR+RvKFoPd3OaBBIcOdwGohhZBfuvL2SyzUhSxXWghT1wmnJdSJqf+susVBtrVK42j0KLhxmrEFJGZkhfnDr5T2F6Vz2Lx5KG/CBeN8wuRh3zxk/8Wx2ibfHm9TTIIr0Yo5luSlxUg0XV8Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Zdk2q3Sm7z6M4W2;
-	Fri, 18 Apr 2025 00:32:51 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 334841400CA;
-	Fri, 18 Apr 2025 00:36:52 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 17 Apr
- 2025 18:36:51 +0200
-Date: Thu, 17 Apr 2025 17:36:50 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
-Subject: Re: [PATCH v13 11/22] cxl: define a driver interface for HPA free
- space enumeration
-Message-ID: <20250417173650.00003ee0@huawei.com>
-In-Reply-To: <eb5f16f8-607a-4c71-8f81-5cdb4ff73a75@amd.com>
-References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
-	<20250414151336.3852990-12-alejandro.lucero-palau@amd.com>
-	<20250415145016.00003725@huawei.com>
-	<eb5f16f8-607a-4c71-8f81-5cdb4ff73a75@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1744908066; c=relaxed/simple;
+	bh=Cmws64+ZxMzbbyNXTYJucL/4NmPbYEAODTkS40Qb4zk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U1EDdVzbXNzsWmZhOX07crasQHP7L0d5yJFc8wmhej/YIi0/KSaTkJYA04xzq3Lsq50SLOgn8e8qrKHUVH+Ycc8WkXnP7MwaatXuCAUU3g1ZjFUuDAs1ba+DrwiRTAorvyROoVbkN0+82IHeTmJzN2Zqic1XDeM2KLZIlaVpKkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RGjKPy+c; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744908063;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MVkVweXyhN8uWsQkQsYLwmRjnYv2NnfH0NHhh2MVCeo=;
+	b=RGjKPy+cJ/4A6Z3oor5vF42894pnqi7UEujV+cqXR1rAb7mKfjUZgijIci+FgMsx1TKpE1
+	vZsNfCnAweqWxihMmQUl2XU22Zrod+kXgX4FzQc0H/ZFK5Ep7T2KWGDm3zcOuZP6ELp7uX
+	pNyMQN6+bX5+NfPPOPmK7p5Kod8BT7Q=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-l4RkTimuPlqyfjeKFpSTMQ-1; Thu,
+ 17 Apr 2025 12:40:55 -0400
+X-MC-Unique: l4RkTimuPlqyfjeKFpSTMQ-1
+X-Mimecast-MFC-AGG-ID: l4RkTimuPlqyfjeKFpSTMQ_1744908052
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 920691801BD5;
+	Thu, 17 Apr 2025 16:40:50 +0000 (UTC)
+Received: from [10.44.33.28] (unknown [10.44.33.28])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DBC6B30002C2;
+	Thu, 17 Apr 2025 16:40:45 +0000 (UTC)
+Message-ID: <335003db-49e5-4501-94e5-4e9c6994be7d@redhat.com>
+Date: Thu, 17 Apr 2025 18:40:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+To: Lee Jones <lee@kernel.org>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20250416162144.670760-1-ivecera@redhat.com>
+ <20250416162144.670760-9-ivecera@redhat.com>
+ <20250417162044.GG372032@google.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250417162044.GG372032@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, 17 Apr 2025 13:11:00 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
 
-> On 4/15/25 14:50, Jonathan Cameron wrote:
-> > On Mon, 14 Apr 2025 16:13:25 +0100
-> > alejandro.lucero-palau@amd.com wrote:
-> >  
-> >> From: Alejandro Lucero <alucerop@amd.com>
-> >>
-> >> CXL region creation involves allocating capacity from device DPA
-> >> (device-physical-address space) and assigning it to decode a given HPA
-> >> (host-physical-address space). Before determining how much DPA to
-> >> allocate the amount of available HPA must be determined. Also, not all
-> >> HPA is created equal, some specifically targets RAM, some target PMEM,
-> >> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-> >> is host-only (HDM-H).
-> >>
-> >> Wrap all of those concerns into an API that retrieves a root decoder
-> >> (platform CXL window) that fits the specified constraints and the
-> >> capacity available for a new region.
-> >>
-> >> Add a complementary function for releasing the reference to such root
-> >> decoder.
-> >>
-> >> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
-> >>
-> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>  
-> > One trivial comment inline.
-> >
-> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> >  
-> >> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> >> index 80caaf14d08a..0a9eab4f8e2e 100644
-> >> --- a/drivers/cxl/core/region.c
-> >> +++ b/drivers/cxl/core/region.c
-> >> +static int find_max_hpa(struct device *dev, void *data)
-> >> +{
-> >> +	struct cxlrd_max_context *ctx = data;
-> >> +	struct cxl_switch_decoder *cxlsd;
-> >> +	struct cxl_root_decoder *cxlrd;
-> >> +	struct resource *res, *prev;
-> >> +	struct cxl_decoder *cxld;
-> >> +	resource_size_t max;
-> >> +	int found = 0;
-> >> +
-> >> +	if (!is_root_decoder(dev))
-> >> +		return 0;
-> >> +
-> >> +	cxlrd = to_cxl_root_decoder(dev);
-> >> +	cxlsd = &cxlrd->cxlsd;
-> >> +	cxld = &cxlsd->cxld;
-> >> +
-> >> +	/*
-> >> +	 * None flags are declared as bitmaps but for the sake of better code  
-> > None?  
-> 
-> 
-> Not sure you refer to syntax or semantics here. Assuming is the former:
-Just the wording of the comment. I'm not sure what it means.
 
+On 17. 04. 25 6:20 odp., Lee Jones wrote:
+> On Wed, 16 Apr 2025, Ivan Vecera wrote:
 > 
+>> Register DPLL sub-devices to expose this functionality provided
+>> by ZL3073x chip family. Each sub-device represents one of the provided
+>> DPLL channels.
+>>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>>   drivers/mfd/zl3073x-core.c | 15 +++++++++++++++
+>>   1 file changed, 15 insertions(+)
+>>
+>> diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
+>> index 0bd31591245a2..fda77724a8452 100644
+>> --- a/drivers/mfd/zl3073x-core.c
+>> +++ b/drivers/mfd/zl3073x-core.c
+>> @@ -6,6 +6,7 @@
+>>   #include <linux/device.h>
+>>   #include <linux/export.h>
+>>   #include <linux/math64.h>
+>> +#include <linux/mfd/core.h>
+>>   #include <linux/mfd/zl3073x.h>
+>>   #include <linux/mfd/zl3073x_regs.h>
+>>   #include <linux/module.h>
+>> @@ -774,6 +775,20 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
+>>   	if (rc)
+>>   		return rc;
+>>   
+>> +	/* Add DPLL sub-device cell for each DPLL channel */
+>> +	for (i = 0; i < chip_info->num_channels; i++) {
+>> +		struct mfd_cell dpll_dev = MFD_CELL_BASIC("zl3073x-dpll", NULL,
+>> +							  NULL, 0, i);
 > 
-> No flags fields?
+> Create a static one of these with the maximum amount of channels.
 
-Not following that either.
+Like this?
+
+static const struct mfd_cell dpll_cells[] = {
+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 1),
+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2),
+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 3),
+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 4),
+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 5),
+};
+
+rc = devm_mfd_add_devices(zldev->dev, PLATFORM_DEVID_AUTO, dpll_cells,
+                           chip_info->num_channels, NULL, 0, NULL);
+
+Ivan
 > 
+>> +
+>> +		rc = devm_mfd_add_devices(zldev->dev, PLATFORM_DEVID_AUTO,
+>> +					  &dpll_dev, 1, NULL, 0, NULL);
 > 
-> >  
-> >> +	 * used here as such, restricting the bitmap size to those bits used by
-> >> +	 * any Type2 device driver requester.
-> >> +	 */  
-> >  
+> Then pass chip_info->num_channels as the 4th argument.
+> 
+>> +		if (rc) {
+>> +			dev_err_probe(zldev->dev, rc,
+>> +				      "Failed to add DPLL sub-device\n");
+>> +			return rc;
+>> +		}
+>> +	}
+>> +
+>>   	/* Register the device as devlink device */
+>>   	devlink = priv_to_devlink(zldev);
+>>   	devlink_register(devlink);
+>> -- 
+>> 2.48.1
+>>
+> 
 
 
