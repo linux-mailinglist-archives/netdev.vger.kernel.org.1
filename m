@@ -1,212 +1,129 @@
-Return-Path: <netdev+bounces-183748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B428A91D42
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:05:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260E6A91D4D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70C5F5A76D8
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:04:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E173A7981
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C880F24A04B;
-	Thu, 17 Apr 2025 13:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF982241666;
+	Thu, 17 Apr 2025 13:07:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrV+GUKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9FF2475C7;
-	Thu, 17 Apr 2025 13:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3279F64A98;
+	Thu, 17 Apr 2025 13:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744895023; cv=none; b=cbdRyU3ZtFZllA+vt6NQMbUQ4bFbqOJKFjMQTSHcEZLRj2KTOtA7hfHxrpMza0mTf69CKg1hKfr/gg/qeCGgzlKhmUczkOw5eVoAaKmvAEm2h6cBedJFxj9CCdjJJLRdqT9jfvXDP6PnWlJ4f0aGyx1At3Myce1PRqp/OZ6PyUU=
+	t=1744895271; cv=none; b=B05G8dbCxPJgdghoCzHVbK4zRs2AtpSBhY8391ns1a3sa5IBkuO2zb3IiauFioUNeYy+vul2fcLjgkVkwWhp1UCjN6L7wRdxfliDjFbvO74iOjiKv9R5hu/frLZKVegd49aoqPvYRr617R4OSvLfkIm65Y2h5oLKB3gig9au198=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744895023; c=relaxed/simple;
-	bh=gHW6P2QpI4eEpDjW2tdunMsPSxMg/QdbH4OoYBTuEoM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V3r2UZ2R4PUCdlGJZdUtaFD3KOj5oXqe9OQB5iYgA/RS+NiD4c+bwSXeSjcFMGmfyuvyGhCW2w4dqRZmmimuPH7RNK72SeinEbRzNS2YcH/cad6NwwscsImdA46Gu4CPQcTJRVIj+hXuue312Kt/W8HiYRymZ9eIjwdmxjI5/Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1744895271; c=relaxed/simple;
+	bh=UjV9aC2iKPYoWSiVENtanYjNOx1Slgo6xak/xSRZJqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cUwiJPCcpeKdhaWpSesUa2utLUFHwVnLhVaQq2nu72vksKgZAcICyOUiV8XCAJxw9IA9WAvZhypIoN+bS47OSRI1Jyl91Zq74AYzDLaafi2TXfK3kgomqUFpfSaDB2jqcLYMtvZkXDmY2QHzGsiPCOZmdGRF6m6kKbyKUrYg0Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PrV+GUKg; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso1406877a12.3;
-        Thu, 17 Apr 2025 06:03:41 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-39c2688619bso478020f8f.1;
+        Thu, 17 Apr 2025 06:07:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744895268; x=1745500068; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CdZ/++ZH3GtnA2ccX3OYnMNThHIYKD/1Ho+RU8AFgE4=;
+        b=PrV+GUKglNUrO5zhuW/47jQ9sjWYUlDPbUhbcg/DhXhGI6AZ2T+pdTl1F6TRBACmv/
+         hAne3AFFdVGPwO3YlOQMgy2d5LWkqvDgSnxbP4tH3GKTUbNUNj43RnifWzv9+2R7oMhb
+         +qHSBrsCmh0xnKC2wjNrG3KnaQ96Rm2sLlWWsBi+ZM9R7FOsxDPprC5eSLiY0/6RKf1S
+         Zna/aM22yKns68aetLSKo36qE/gf1CS6by2gsaNKhQcjvTAuUYoz5vvVKK1T9WJSh/Eq
+         Tx6Mw5BkzgdUpUkAI0++fpbZX/BAdGdt//YEXZlJsd2Ig8Umv2tgS32HAaGMnIMnMT3h
+         yDDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744895020; x=1745499820;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AutvC+U3QHOO+X197OHtCyJb0BVhDeo5m3JbUAKORWo=;
-        b=qpOoQIHaYsFgv54J8d1il4c9JPDjU16v16VNjghea1ywu4FsudinOzf6QHSBerDDIm
-         KhcFsylz/04sielEvdpMXb3qCa2ACSHFEGvjQhmeX7P8O8Xlz8ZTtn9FcNwSBPHvDhN/
-         Z7vnU9IO7TzFIKwRIazsFhl59m6KECTlhppCSV8CZlvi9lG/HN/tY1wiXOYSfWgd5Ffe
-         yg5Z8i5KxYSgzdE8qNWuO2bOKBX1UogP4vxrBsVCE9iMt/t5vbXYUv0VhgwINTbcNnVk
-         aBhQbIbbYyWiS7UxhqLxmYHCDBg4x2B6208Eu/xKZk9oSe1XWcsURT+vlE6Qsdyu1KEk
-         HRvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOoq7uPyxQ4mQRqaKXJP3/b/mQBLW0oi87d9oJvqVPdsOe3+cYoxhElM+l/5TMXasAGtxnGCW6+ytkWlA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhGhgFgm0p4f01TpX7epUKKPgVFVoIEhq4sa9mt1/ow+QsUQUq
-	pxN02ifN9uz1bXRtY/xpwWVoxhLaFfauJdDXs+eA73yLLUgq3vqp
-X-Gm-Gg: ASbGncs1Dz8slDT3wJyNXwBASxJ+y3b/fqQWbkLLkZCAHHmKOLDshuDdJUHSwteu5sv
-	DtRqgjHrelmr0uFSaS+cZJpkVm1TPse5htJK7bilgoAN8ohu+7nMl+u216jBjoFmKifOMZV8nA6
-	nMoA7qvn/1BeGx+7nliUyvfUF6pm1QGiNLQlZi4JVsITDzdn5ueWjIGiz5gAVu1ZGKygEiXSnGu
-	yOcpxYOS6PA9GjlooFE8Q/HKBI6Z7ocGoRF+oh9Jjm5rhC9KqTaGmnWaH5N03QTMjOG7ZypI1IV
-	HFafWM9z30H5KLLM3S6sxTFqK9PXWWyrSQLU8x6aug==
-X-Google-Smtp-Source: AGHT+IET++hQzwpLiSXA7X7cR7lGATwouvwe+ipToYpgvPnBvdl+4Lk57vihhbCnYPGP/ljH713DuQ==
-X-Received: by 2002:a17:907:3cd5:b0:ac8:179a:42f5 with SMTP id a640c23a62f3a-acb428f0f9emr496144266b.14.1744895019752;
-        Thu, 17 Apr 2025 06:03:39 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb3cd636adsm293548166b.14.2025.04.17.06.03.39
+        d=1e100.net; s=20230601; t=1744895268; x=1745500068;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CdZ/++ZH3GtnA2ccX3OYnMNThHIYKD/1Ho+RU8AFgE4=;
+        b=cl+E3KzXpMVTo4rQKCu0UfRKQqr6L/cDuoBfalZ7Jt0U7U0AsDgKDyx9SogbIvP3Yz
+         E+kzKdKwAS4Y7+xMFQ6TydoXZMdIfWQrLDg7mSow3fLdUyJZOIU6DymQjyjKob+tN8/C
+         rAa0hx3KNEkFZYlTxogwX+ywzWvPPFsFWqjcRS0uHp8RXVzwckJjKJx9OoPL+ma50yv6
+         sTLtjObzNGGwZlLREivSi+nUqFDh8McsiSxYFH2dGpLwalJ7L0h2lM2iZXoJa45033fa
+         GjlBptQnTmB6k2R2OGtuhXc2qS5X65g8hsGlZJDen4dfAo5lHezP04jaUOmgVF+Pq/57
+         oM7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/xMPWTJOGfhODsNgNeOTsO1sFShTv5L2E5GCiU+lwEWJd+0Os44pwpAL0Qn95AHudzlFDP70akLKaRgw=@vger.kernel.org, AJvYcCU5QgWvlsVR4qo0eRrkVued1OtJ20v00ucwiAenBRgwpC1M5Qr7SdojCD5A91QTZgRDASBWXPUw@vger.kernel.org, AJvYcCWMbziagGpQFUiu1K4CuFs9yt+gpz8jjsjhLPOIAfNbOpMSkvnVL8qOoEaINBdLY+z6s82+Y9c6@vger.kernel.org, AJvYcCWN/jae5NnrvWTDm73RI1OKgvdRMLMWbgzp2TFCmop4b14DXbFaAsK74vnqlFEHfuOJ70+77++WDTrs@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMg1+YgSdCjz1HkLYpguA0CnfwYWOBDAvR0sD04uNAmQ4neqss
+	YCy+9uW5W+HLhp0Ysctg1giNmVkuuTKo2/SA6u280rKsOai0Tz3E
+X-Gm-Gg: ASbGncsxeMPjcum2O4gKlNUrOEQ4Ion39LWRAxKzZmXuzKIspQX8Pff+snEXkiI2pPv
+	U2304EYXo1uYJxWA9E04dVU1GGdLbNVWYQxBDzqJb/jN9/HW1D9fs3QfZmq3i5TQ/pjfYjYIh/t
+	0ESTel/ymZP+WQDAp3oWdSxLQUU0qgwEmDMUVzZ4kvNbb4UY/ZcGrQvkhqWk7EXOek4lo4CAoV3
+	A+Juqjq+0FariZr5OIJWXWa8/ZMq3OJ+lafwKU8sF8tREcqwiTCQeRUoI5hghMvndT3m3yYVelS
+	9ohpExjcNV9mX2YB/bEeh/aTzer+2NTkh2U4XTw=
+X-Google-Smtp-Source: AGHT+IHb8mvMFNp6gOWVQLM5OsbQP1zjX7lIIaNxG4URsFT43g10QOXLplmQlUjGdo3GH+1kBmp/fw==
+X-Received: by 2002:a05:6000:1ac8:b0:39c:266c:421 with SMTP id ffacd0b85a97d-39ee5adbf1fmr4730232f8f.0.1744895266662;
+        Thu, 17 Apr 2025 06:07:46 -0700 (PDT)
+Received: from gmail.com ([2a02:c7c:6696:8300:30d6:b851:2d62:d3f9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4405b53dee0sm52901945e9.33.2025.04.17.06.07.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 06:03:39 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 17 Apr 2025 06:03:08 -0700
-Subject: [PATCH net-next 2/2] net: Use nlmsg_payload in rtnetlink file
+        Thu, 17 Apr 2025 06:07:46 -0700 (PDT)
+Date: Thu, 17 Apr 2025 14:07:38 +0100
+From: Qasim Ijaz <qasdev00@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 4/5] net: ch9200: add missing error handling in
+ ch9200_bind()
+Message-ID: <aAD9GsY02U4dGBJ1@gmail.com>
+References: <20250412183829.41342-1-qasdev00@gmail.com>
+ <20250412183829.41342-5-qasdev00@gmail.com>
+ <20250415204708.13dc3156@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250417-nlmsg_v3-v1-2-9b09d9d7e61d@debian.org>
-References: <20250417-nlmsg_v3-v1-0-9b09d9d7e61d@debian.org>
-In-Reply-To: <20250417-nlmsg_v3-v1-0-9b09d9d7e61d@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- kuniyu@amazon.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>, kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3917; i=leitao@debian.org;
- h=from:subject:message-id; bh=gHW6P2QpI4eEpDjW2tdunMsPSxMg/QdbH4OoYBTuEoM=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoAPwmkQqcPiPmwEcyf55VbWBttQqqnW30qGVfm
- yoobs8PSaiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaAD8JgAKCRA1o5Of/Hh3
- bU6tEACm5bflh9wPvPRjiZ/rRpkuMoJ1cVWxIao4FikcVT10lbSS48bC8UKirwv/N/NO4IBKAoF
- 8mmx/Owj1x57EHbxZ8oTdd2sgfmArWrfrMBMRijpftdJCNvkRWdzIlcfHBZ3GhygTQ3YPMgd8pB
- li2WZRQS3YZpEQdiWm3TRZjVkVLiejWYlBQ505LXoOVhZWj4Nu9znlshLtJNCZsU45WzVdvcCX1
- 8s9zrWKXCWr2GN+cN/kyakYP8P6c+yK4LpUAdtR0Mv6ZQIYbrBJWoiDDk+Zr0HkeU+tXD8qn733
- 8YdGn7IAfYZsa1wbzhHKvvJOsh4koGEE1NwE44Bkfae3GkqcBVkdlcOrHN6W8CgzXmeEq4piSKb
- 9zyNx+J5UwDbaUDwRLK55B6IsWHtJhbLNGzBrcThLbf4cxq0df1y1Cwsao3PswF0KxWFTjYvZ1S
- XcD/zTpoq8fgIXAHyGmgXROCeEe8XQPd0y6RyVlnJeRtjQVE//5SpNi2eMqb4aqRSLiuy/SjT14
- 5wcp4klGdEQfT1N1tKbf/8qIoOSSOl9LERGai/W5C+By8FXNXF2gGDiToSLSUUK0IbW3+hmrt5u
- trSn1gNMA/0NV7Btrup/rwadfJzsLPnti7ooZn3z1mUmThfcB5CXP2W0Lclsqo/VVmj4RWsEcn6
- gXQWubbAIcS03Rw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250415204708.13dc3156@kernel.org>
 
-Leverage the new nlmsg_payload() helper to avoid checking for message
-size and then reading the nlmsg data.
+On Tue, Apr 15, 2025 at 08:47:08PM -0700, Jakub Kicinski wrote:
+> On Sat, 12 Apr 2025 19:38:28 +0100 Qasim Ijaz wrote:
+> >  	retval = usbnet_get_endpoints(dev, intf);
+> > -	if (retval)
+> > +	if (retval < 0)
+> >  		return retval;
+> 
+> This change is unnecessary ? Commit message speaks of control_write(),
+> this is usbnet_get_endpoints().
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/core/rtnetlink.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index f5c018090efc3..3becb79a97c69 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2390,12 +2390,12 @@ static int rtnl_valid_dump_ifinfo_req(const struct nlmsghdr *nlh,
- 	if (strict_check) {
- 		struct ifinfomsg *ifm;
- 
--		if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ifm))) {
-+		ifm = nlmsg_payload(nlh, sizeof(*ifm));
-+		if (!ifm) {
- 			NL_SET_ERR_MSG(extack, "Invalid header for link dump");
- 			return -EINVAL;
- 		}
- 
--		ifm = nlmsg_data(nlh);
- 		if (ifm->__ifi_pad || ifm->ifi_type || ifm->ifi_flags ||
- 		    ifm->ifi_change) {
- 			NL_SET_ERR_MSG(extack, "Invalid values in header for link dump request");
-@@ -4087,7 +4087,8 @@ static int rtnl_valid_getlink_req(struct sk_buff *skb,
- 	struct ifinfomsg *ifm;
- 	int i, err;
- 
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ifm))) {
-+	ifm = nlmsg_payload(nlh, sizeof(*ifm));
-+	if (!ifm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for get link");
- 		return -EINVAL;
- 	}
-@@ -4096,7 +4097,6 @@ static int rtnl_valid_getlink_req(struct sk_buff *skb,
- 		return nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFLA_MAX,
- 					      ifla_policy, extack);
- 
--	ifm = nlmsg_data(nlh);
- 	if (ifm->__ifi_pad || ifm->ifi_type || ifm->ifi_flags ||
- 	    ifm->ifi_change) {
- 		NL_SET_ERR_MSG(extack, "Invalid values in header for get link request");
-@@ -5055,12 +5055,12 @@ static int valid_fdb_get_strict(const struct nlmsghdr *nlh,
- 	struct ndmsg *ndm;
- 	int err, i;
- 
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ndm))) {
-+	ndm = nlmsg_payload(nlh, sizeof(*ndm));
-+	if (!ndm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for fdb get request");
- 		return -EINVAL;
- 	}
- 
--	ndm = nlmsg_data(nlh);
- 	if (ndm->ndm_pad1  || ndm->ndm_pad2  || ndm->ndm_state ||
- 	    ndm->ndm_type) {
- 		NL_SET_ERR_MSG(extack, "Invalid values in header for fdb get request");
-@@ -5327,12 +5327,12 @@ static int valid_bridge_getlink_req(const struct nlmsghdr *nlh,
- 	if (strict_check) {
- 		struct ifinfomsg *ifm;
- 
--		if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ifm))) {
-+		ifm = nlmsg_payload(nlh, sizeof(*ifm));
-+		if (!ifm) {
- 			NL_SET_ERR_MSG(extack, "Invalid header for bridge link dump");
- 			return -EINVAL;
- 		}
- 
--		ifm = nlmsg_data(nlh);
- 		if (ifm->__ifi_pad || ifm->ifi_type || ifm->ifi_flags ||
- 		    ifm->ifi_change || ifm->ifi_index) {
- 			NL_SET_ERR_MSG(extack, "Invalid values in header for bridge link dump request");
-@@ -6224,7 +6224,8 @@ static int rtnl_valid_stats_req(const struct nlmsghdr *nlh, bool strict_check,
- {
- 	struct if_stats_msg *ifsm;
- 
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ifsm))) {
-+	ifsm = nlmsg_payload(nlh, sizeof(*ifsm));
-+	if (!ifsm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for stats dump");
- 		return -EINVAL;
- 	}
-@@ -6232,8 +6233,6 @@ static int rtnl_valid_stats_req(const struct nlmsghdr *nlh, bool strict_check,
- 	if (!strict_check)
- 		return 0;
- 
--	ifsm = nlmsg_data(nlh);
--
- 	/* only requests using strict checks can pass data to influence
- 	 * the dump. The legacy exception is filter_mask.
- 	 */
-@@ -6461,12 +6460,12 @@ static int rtnl_mdb_valid_dump_req(const struct nlmsghdr *nlh,
- {
- 	struct br_port_msg *bpm;
- 
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*bpm))) {
-+	bpm = nlmsg_payload(nlh, sizeof(*bpm));
-+	if (!bpm) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for mdb dump request");
- 		return -EINVAL;
- 	}
- 
--	bpm = nlmsg_data(nlh);
- 	if (bpm->ifindex) {
- 		NL_SET_ERR_MSG(extack, "Filtering by device index is not supported for mdb dump request");
- 		return -EINVAL;
+So this change was done mainly for consistency with the other error checks in the function. 
+Essentially in my one of my previous patches (<https://lore.kernel.org/all/20250317175117.GI688833@kernel.org/>) 
+I was using "if (retval)" for error handling, however after Simon's recommendation to use "if (retval < 0)" I 
+changed this. In this particular function I took Simons advice but then noticed that the 
+usbnet_get_endpoints() check was still using "if (retval)" so I decided to make it the same as the others. 
 
--- 
-2.47.1
+The behaviour is still the same regardless of it we do "if (retval < 0)" or "if (retval)" for 
+checking usbnet_get_endpoints() since it returns 0 on success or negative on failure. 
 
+So in ch9200_bind:
+
+In the first case of "if (retval)", if the usbnet_get_endpoints() function fails 
+and returns negative then we execute this branch and it returns negative, if it 
+succeeds with 0 then the ch9200_bind function continues.
+
+In the second case of "if (retval < 0)", if the usbnet_get_endpoints() function 
+fails and returns negative then we execute this branch and it returns negative, 
+if it succeeds with 0 then ch9200_bind function continues.
+
+If you like I can include this in the patch description for clarity or remove it entirely.
 
