@@ -1,100 +1,169 @@
-Return-Path: <netdev+bounces-183630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F9FA9156C
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:38:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010C4A91588
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA441904EFF
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B16A3B2890
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5696E21ABCA;
-	Thu, 17 Apr 2025 07:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10E821A458;
+	Thu, 17 Apr 2025 07:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JgMatfmv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RqN3/pFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE25219A8C;
-	Thu, 17 Apr 2025 07:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020202139DC
+	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744875521; cv=none; b=jmdDztoOy3lH7EPb8XmFWOVQETm0SC6GEdSSsCN1nSBrteVBS6YreKIYQe8DNQLugK1KAIZVK+wrS6daXngOo9BbVqih70/uSHf4XzgHTMwuHKHcOWhmNq3SUYvcz5E9iBaRQ5p4UwjpSLYsg1LOAKHgmlW6l+nuT2demgX5AZA=
+	t=1744875894; cv=none; b=NwUiknJrHoM3qmyAXPDjMyU48ICppdPGZRv4q6qkX25dDemo97ChXtUyvbQUsRVNOVQMoz6ABuNmJiI0JAOba2NTD+ITaGqrCfxMND0pD2mmoPmQkppiiG+MqTtvYBBYAWgzGYZ6igFW0hVygcfGs7sfDZVZGBLsVNWUxT7+Bpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744875521; c=relaxed/simple;
-	bh=EJoTJ5iX+M3cy1cKrEbfUcGMxWLht9r3wKQYcXdE6U8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gxKT7VvpgvkD7xpDphnmPTXuL1/DrDpTmii9J1VjzmHm3Wcy15AugOcU0/5BE9t0A/ENs5Xm3FGJB6DTM/UtK7yIjciQhnLNRSLUDTbbm7PZ9H0WE6GyyU3z23ijsUell+gFzBgtoBeAcCMsUMbDVT2KiIBwaYvRnrL9legt3oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JgMatfmv; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2FB9A43A54;
-	Thu, 17 Apr 2025 07:38:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744875516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rJGVKPE3wmhJoFU6+S7XBj9IMoZY+TYW8WtG+e6fhFA=;
-	b=JgMatfmv3YDmQc8F1fIpJgHGgZYPCBdpv/izit9gTwKVVmca77MokyDQC6Tlsaz75SuFGI
-	+Shn94z5jdsbt3pBxN/ED+9cBcXDfHv6imd2ZB2VounWucwG4K98VqJjG9faTBBCz7gtSH
-	kwS86gqk2CCLjlmDZwXs9HKB28Fi9Semug/j83Lk1LdCKyiBcOoJFMAm+iLht5RVhN887Y
-	3bIjOVQywto07M2buUoaT9FC23HkNQq4PIRTCSC0gbpSnDvvhN9rZ037zgA5OJZ645OW8n
-	pKpCinFAvT5LB8z6krp5mcmc5tBJOpaTqfGgDMiP13ekjEMxL6M4NJcqyLNk+w==
-Date: Thu, 17 Apr 2025 09:38:34 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Maciej S. Szmigiero"
- <mail@maciej.szmigiero.name>, Nathan Sullivan <nathan.sullivan@ni.com>,
- Josh Cartwright <josh.cartwright@ni.com>, Zach Brown <zach.brown@ni.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Chuanhong Guo
- <gch981213@gmail.com>, Qingfang Deng <qingfang.deng@siflower.com.cn>, Hao
- Guan <hao.guan@siflower.com.cn>
-Subject: Re: [PATCH net] net: phy: leds: fix memory leak
-Message-ID: <20250417093834.4e1d29b6@fedora.home>
-In-Reply-To: <20250417032557.2929427-1-dqfext@gmail.com>
-References: <20250417032557.2929427-1-dqfext@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1744875894; c=relaxed/simple;
+	bh=tslz6DlI/Mm4YFhda6oTOI/VUg3AL5GOdcZku7+10qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IkBhbyhqJHNraR1wyG4U8aXhKmWvU3Q42efZ7E47L3UOTTN+qfn47RkLu+C0Ssks3xAzHVsvBbzU+ly4Yt7ibD6J4/sDoH0eYSslkDppdd6qvNQZkyFklBUakPCiRmwWxc3gaVFIs8acA8nzaTa2RuLqw1cOd7X14918n6uTxpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RqN3/pFu; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744875893; x=1776411893;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tslz6DlI/Mm4YFhda6oTOI/VUg3AL5GOdcZku7+10qg=;
+  b=RqN3/pFu2mtqyrootBI/S3UB2tlKclZpfiMixjc/cgOiMLjORdpOhGDu
+   hPLnJMWL954kTPGtkiTKChxt7oYwEiZriCL7wxvwR/dHVsLS5OpKn67rm
+   nDh/uLozNGQUdRWQpKBfUQvAhWGNUY2Y9zIqXEEXqNft4szi7mts0ooQt
+   YxrlxmTlTTMcQ0eLoRCKFKqvT2rvnNN+L4PFxx4L88id5A5vExqYFaUyT
+   X67WrDMWgYX/2gHzBFiFmptQQW8BsYCwENELGUxp/CovDu1KVPM1pGDWP
+   DsjZItcoh89sMq7qNKi3ufMc+tvMG8yN4yd2XBVoTFLbsCQ7ql6NEXnul
+   g==;
+X-CSE-ConnectionGUID: eEY97FU0SwKG6mp20lhqFw==
+X-CSE-MsgGUID: ApazkKrjQ5+guf7fjbEaaA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="50099768"
+X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
+   d="scan'208";a="50099768"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:44:52 -0700
+X-CSE-ConnectionGUID: SECiPiZnTDWrnD/BIEfxOA==
+X-CSE-MsgGUID: oLWOzVShQrCnUO/bkHGTAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
+   d="scan'208";a="130586301"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:44:50 -0700
+Date: Thu, 17 Apr 2025 09:44:32 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Dave Marquardt <davemarq@linux.ibm.com>
+Cc: netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
+	horms@kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v3 1/3] net: ibmveth: Indented struct
+ ibmveth_adapter correctly
+Message-ID: <aACxYGS9F8bh5PkG@mev-dev.igk.intel.com>
+References: <20250416205751.66365-1-davemarq@linux.ibm.com>
+ <20250416205751.66365-2-davemarq@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdekieekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepughqfhgvgihtsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepl
- hhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416205751.66365-2-davemarq@linux.ibm.com>
 
-On Thu, 17 Apr 2025 11:25:56 +0800
-Qingfang Deng <dqfext@gmail.com> wrote:
-
-> From: Qingfang Deng <qingfang.deng@siflower.com.cn>
+On Wed, Apr 16, 2025 at 03:57:49PM -0500, Dave Marquardt wrote:
+> Made struct ibmveth_adapter follow indentation rules
 > 
-> A network restart test on a router led to an out-of-memory condition,
-> which was traced to a memory leak in the PHY LED trigger code.
+> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
+> ---
+>  drivers/net/ethernet/ibm/ibmveth.h | 64 +++++++++++++++---------------
+>  1 file changed, 32 insertions(+), 32 deletions(-)
 > 
-> The root cause is misuse of the devm API. The registration function
-> (phy_led_triggers_register) is called from phy_attach_direct, not
-> phy_probe, and the unregister function (phy_led_triggers_unregister)
-> is called from phy_detach, not phy_remove. This means the register and
-> unregister functions can be called multiple times for the same PHY
-> device, but devm-allocated memory is not freed until the driver is
-> unbound.
+> diff --git a/drivers/net/ethernet/ibm/ibmveth.h b/drivers/net/ethernet/ibm/ibmveth.h
+> index 8468e2c59d7a..0f72ce54e7cf 100644
+> --- a/drivers/net/ethernet/ibm/ibmveth.h
+> +++ b/drivers/net/ethernet/ibm/ibmveth.h
+> @@ -134,38 +134,38 @@ struct ibmveth_rx_q {
+>  };
+>  
+>  struct ibmveth_adapter {
+> -    struct vio_dev *vdev;
+> -    struct net_device *netdev;
+> -    struct napi_struct napi;
+> -    unsigned int mcastFilterSize;
+> -    void * buffer_list_addr;
+> -    void * filter_list_addr;
+> -    void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
+> -    unsigned int tx_ltb_size;
+> -    dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
+> -    dma_addr_t buffer_list_dma;
+> -    dma_addr_t filter_list_dma;
+> -    struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
+> -    struct ibmveth_rx_q rx_queue;
+> -    int rx_csum;
+> -    int large_send;
+> -    bool is_active_trunk;
+> -
+> -    u64 fw_ipv6_csum_support;
+> -    u64 fw_ipv4_csum_support;
+> -    u64 fw_large_send_support;
+> -    /* adapter specific stats */
+> -    u64 replenish_task_cycles;
+> -    u64 replenish_no_mem;
+> -    u64 replenish_add_buff_failure;
+> -    u64 replenish_add_buff_success;
+> -    u64 rx_invalid_buffer;
+> -    u64 rx_no_buffer;
+> -    u64 tx_map_failed;
+> -    u64 tx_send_failed;
+> -    u64 tx_large_packets;
+> -    u64 rx_large_packets;
+> -    /* Ethtool settings */
+> +	struct vio_dev *vdev;
+> +	struct net_device *netdev;
+> +	struct napi_struct napi;
+> +	unsigned int mcastFilterSize;
+> +	void *buffer_list_addr;
+> +	void *filter_list_addr;
+> +	void *tx_ltb_ptr[IBMVETH_MAX_QUEUES];
+> +	unsigned int tx_ltb_size;
+> +	dma_addr_t tx_ltb_dma[IBMVETH_MAX_QUEUES];
+> +	dma_addr_t buffer_list_dma;
+> +	dma_addr_t filter_list_dma;
+> +	struct ibmveth_buff_pool rx_buff_pool[IBMVETH_NUM_BUFF_POOLS];
+> +	struct ibmveth_rx_q rx_queue;
+> +	int rx_csum;
+> +	int large_send;
+> +	bool is_active_trunk;
+> +
+> +	u64 fw_ipv6_csum_support;
+> +	u64 fw_ipv4_csum_support;
+> +	u64 fw_large_send_support;
+> +	/* adapter specific stats */
+> +	u64 replenish_task_cycles;
+> +	u64 replenish_no_mem;
+> +	u64 replenish_add_buff_failure;
+> +	u64 replenish_add_buff_success;
+> +	u64 rx_invalid_buffer;
+> +	u64 rx_no_buffer;
+> +	u64 tx_map_failed;
+> +	u64 tx_send_failed;
+> +	u64 tx_large_packets;
+> +	u64 rx_large_packets;
+> +	/* Ethtool settings */
+>  	u8 duplex;
+>  	u32 speed;
+>  };
+> -- 
+> 2.49.0
 
-Are there historical reasons for the triggers not to be registered at
-probe time ? I agree with your analysis otherwise.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Maxime
 
