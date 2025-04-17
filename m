@@ -1,140 +1,109 @@
-Return-Path: <netdev+bounces-183702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF7FA91947
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:26:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDC9A9194D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 12:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96C0B7AF604
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:25:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A7144725D
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 10:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1817C22A7EE;
-	Thu, 17 Apr 2025 10:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254A2190485;
+	Thu, 17 Apr 2025 10:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="kcrKepOK";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="hyfmq+8F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wn7ag7pe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.wizmail.org (smtp.wizmail.org [85.158.153.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F340A55
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 10:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FF0A55;
+	Thu, 17 Apr 2025 10:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744885588; cv=none; b=lvaTapCQjN++ae74hHqbbJivh2ViFi12QV1qrOZLUe/8+cywuFt3E0qeXjmwwcaQBSvL17i0/VOW3Ntixt8cWe/c4+K8A2rKUneSMn3ckHsaEMTTBKFP93GwpARHjMrgqXwaiRDbzT6mJohopGGSEryzneHcdwjSMbkxeIFDA0g=
+	t=1744885708; cv=none; b=YaY9n3u8HZnqStrzLXmLdHpPlD9MLjAyXennm1i5xvWV7IbPmE9bbnZrs7jjbqBC+7iHEqzBNsZKhhhOt2kBsl2zoobvFWgz0XhqeskcEbX6lgnQS2zbjHW470qHT/jIfwScsPTL+xR46FWopLlK0PYt3SVlOwlSpHkHUGGQ19s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744885588; c=relaxed/simple;
-	bh=/pr56dnvB2J7fsHAj5aq3zpk0PNHF6JeQjq0U1sS9kw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nuPO+oEprUfYUEp246WGnP2xhM1tHdOoON15khYRWcpnf7ynRp70gCHizHxHlfXpjzZyz6Xnd6X7pSF/fpDsA6ZoOYTi2RyPzEnIJ9olunJhyViD/izmIe5JVDPcQ6Tea3g+PFSHkM2uQit07rgYnV1OJsAhUV95rv0yvXdGTN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=kcrKepOK; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=hyfmq+8F; arc=none smtp.client-ip=85.158.153.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Autocrypt:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive:Autocrypt;
-	bh=+RwE9InggEsni0ynXIiJwfZ1elV+iieI89NSYopSrAw=; b=kcrKepOK0efrNfbdnJo8JdWHWc
-	9RSkYmnUBfABNZ/62k8xqquQZVx7QO51/+RArfJZXHtQAb2k5P4ridcORQAg==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
-	; s=r202001; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:Autocrypt:
-	From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:Sender:
-	Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
-	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
-	List-Owner:List-Archive:Autocrypt;
-	bh=+RwE9InggEsni0ynXIiJwfZ1elV+iieI89NSYopSrAw=; b=hyfmq+8FAxUi8iWvVJIPpQOtOm
-	hOJ1liYDcwzgFb2ODoJ0EiuaoRLFU1K7LMv93EdjdIsEJQ70NeTzovq42pvyVwdNa3KlKxHYj4uty
-	hn9da4JINlI7fztRuhlW/+G+W3S4PacfVv2xK6Morv0slGrDz22Urj3IFQu+/b1POMVTpD7XTt+l2
-	wOmzNp4aEY+TY+gW9yrR5AS/TCW7YMX1MpUAGKa61GpX6pmyLNA7DewypBCyCcmOYKbzFjz6ZFb9j
-	aoJXySPjdLliwvPY42/eFmttrc590opqxPZWTTRIDlsnm1/f0bTjFqnxLZiDAnL+99hA7KAVgUtgG
-	/DYGoTEw==;
-Authentication-Results: wizmail.org;
-	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
-	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
-Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17])
-	by wizmail.org (Exim 4.98.115)
-	(TLS1.3) tls TLS_AES_128_GCM_SHA256
-	with esmtpsa
-	id 1u5MRp-00000002HEB-0IAp
-	(return-path <jgh@exim.org>);
-	Thu, 17 Apr 2025 10:26:21 +0000
-Message-ID: <6054b382-40f8-4718-b1ac-63194b37f333@exim.org>
-Date: Thu, 17 Apr 2025 11:26:09 +0100
+	s=arc-20240116; t=1744885708; c=relaxed/simple;
+	bh=PICkPqUm0CX+9/Dl7pPQQlHEsgy3kQ9EPKX+nFgBVTQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=T41gcMLAkPtjcRQ1xGvEUAdCyApDC4X/oUYSuOgMhWhFZnA7M6COidSL0UjJTGVyqWrT4Vl7n7n6AWi1o7DPCoM24GohYO2mqek2mrJsbsXQvHQAlYvXxRM5XMP6GrbwXJKOVbjm/S6hhvnwcj5OyQ9Tzc8RNjcJLUyW+7XU1K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wn7ag7pe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E78C6C4CEE4;
+	Thu, 17 Apr 2025 10:28:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744885707;
+	bh=PICkPqUm0CX+9/Dl7pPQQlHEsgy3kQ9EPKX+nFgBVTQ=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Wn7ag7pe9Ip88HqglwEIrZL9lWDNUlMT9XRaWFx8nz1sfNAOgUBrR7kyPKoNsfllY
+	 1cRMQaQePBV1JZaUwYYTQgxPV1swHI9Eln3FiI4vwm7zMmcXLp0CIA1Yv9TZlZ5Vd1
+	 qFNpWdmGbmV/CW4AikUzlOC7dhGaX6neThCfCPn8T138lvIYjSXWHxiZzhKHMRc9Fo
+	 nU+SrFVcAOF61qZSPgkuCmkFukcO/Tz7SvMv70SWSsiD6B5mylUTnVUkwIko6AAtYE
+	 WEvQ/q40DyGNY8Nrxekrk9HpAYwRoQh/CETeYkAqlUMrkXp7jJcKX3MQiYXrquQtCp
+	 pyETcG69ukpvw==
+From: Simon Horman <horms@kernel.org>
+Date: Thu, 17 Apr 2025 11:28:23 +0100
+Subject: [PATCH net-next] s390: ism: Pass string literal as format argument
+ of dev_set_name()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH 2/2] TCP: pass accepted-TFO indication through
- getsockopt
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: edumazet@google.com, ncardwell@google.com, netdev@vger.kernel.org
-References: <20250416091538.7902-1-jgh@exim.org>
- <20250416192705.16673-1-kuniyu@amazon.com>
-From: jgh@exim.org
-Content-Language: en-GB
-Autocrypt: addr=jgh@exim.org; keydata=
- xsBNBFWABsQBCADTFfb9EHGGiDel/iFzU0ag1RuoHfL/09z1y7iQlLynOAQTRRNwCWezmqpD
- p6zDFOf1Ldp0EdEQtUXva5g2lm3o56o+mnXrEQr11uZIcsfGIck7yV/y/17I7ApgXMPg/mcj
- ifOTM9C7+Ptghf3jUhj4ErYMFQLelBGEZZifnnAoHLOEAH70DENCI08PfYRRG6lZDB09nPW7
- vVG8RbRUWjQyxQUWwXuq4gQohSFDqF4NE8zDHE/DgPJ/yFy+wFr2ab90DsE7vOYb42y95keK
- tTBp98/Y7/2xbzi8EYrXC+291dwZELMHnYLF5sO/fDcrDdwrde2cbZ+wtpJwtSYPNvVxABEB
- AAHNMkplcmVteSBIYXJyaXMgKEV4aW0gTVRBIE1haW50YWluZXIpIDxqZ2hAZXhpbS5vcmc+
- wsCOBBMBCAA4FiEEqYbzpr1jd9hzCVjevOWMjOQfMt8FAl4kUrYCGwMFCwkIBwIGFQoJCAsC
- BBYCAwECHgECF4AACgkQvOWMjOQfMt+dqAf/bLKl+fzSgRXtW8HALADDAxTwcJKbF+ySo+P6
- 0G5NGGTqYpajbPxER+WpCa1O4pDKs3XU8HyZQx1FhBskYlUyoiFXfFylliGwDXv5IeKdh9VP
- IiWshZuRIJe8DmGclH22vUKdM2ZkRMPspYxIGpJWLnvFGE/97CiJsW39fZotffWszb9nIxBU
- POsNnKhrA3c1pn8kN5PhyfOy5CUwO1xmxlTYpDiAxwXN+emNipxpje/YrTH0JFWDd8Tl4/m8
- DfFpTJdahfxkcF4sQve/DU/aHboB4KSRmDyRqyFj+DX5wp1sfdHX6/gpwwQW3M+lP0wxs0gh
- aFJsKRNh5dQk2m2UPs7ATQRVgAbEAQgA6YSx2ik6EbkfxO0x3qwYgow2rcAmhEzijk2Ns0QU
- KWkN9qfxdlyBi0vAnNu/oK2UikOmV9GTeOzvgBchRxfAx/dCF2RaSUd0W/M4F0/I5y19PAzN
- 9XhAmR50cxYRpTpqulgFJagdxigj1AmNnOHk0V8qFy7Xk8a1wmKI+Ocv2Jr5Wa5aJwTYzwQM
- h4jvyzc/le32bTbDezf1xq5y23HTXzXfkg9RDZmyyfEb8spsYLk8gf5GvSXYxxyKEBCei9eu
- gd4YXwh6bfIgtBj2ZLYvSDJdDaCdNvYyZtyatahHHhAZ+R+UDBp+hauuIl8E7DtUzDVMKVsf
- KY71e8FSMYyPGQARAQABwsB8BBgBCAAmAhsMFiEEqYbzpr1jd9hzCVjevOWMjOQfMt8FAmRa
- a+cFCRKczCMACgkQvOWMjOQfMt8wLQgAuNQkQJlPzkdm/mvKWmEp/MW5SsYROINr21cFqPXY
- y+s8UwiDshe+zuCQfXxxSH8xbQWYEKHOgQx7z0E5x8AppAUj0RoN7GxkPzBdoomfKhx7jV8w
- 43YjjpMFbktM2/44lTaselejQbcGH7jrgFVK0iifeoPS0x2qNE6LhziIU8IWMSLZffXP32+n
- EqMr4m1uKna3j3jt9jQh8ye2oz4VdVy0NbQDVKgMP4b7gShtIq1i0cxJNviyQ+tOANW92I2K
- la6kUvwL6g9ovBVHxf01RBCxE+ppjb9N8y58qzwnP0c5X2UqTIBhfNWKRLonvJ5RQeb3R1ZJ
- QJ5Ek2AV21/7Zw==
-In-Reply-To: <20250416192705.16673-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17]) with esmtpsa
+Message-Id: <20250417-ism-str-fmt-v1-1-9818b029874d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMbXAGgC/x3MTQqAIBBA4avIrBtIKfq5SrQIHWsWWTgSQnj3p
+ OW3eO8FocgkMKsXIj0sfIUK3SiwxxZ2QnbVYFrTt50ekOVESRH9mdDYgbQ202i9g1rckTzn/7Z
+ AoISBcoK1lA9sDpQrZwAAAA==
+To: Alexandra Winter <wintera@linux.ibm.com>, 
+ Thorsten Winkler <twinkler@linux.ibm.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Sven Schnelle <svens@linux.ibm.com>, netdev@vger.kernel.org, 
+ linux-s390@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On 2025/04/16 8:26 PM, Kuniyuki Iwashima wrote:
->> +#define TCPI_OPT_TFO_SEEN	128 /* we accepted a Fast Open option on SYN */
-> 
-> This is the last bit of tcpi_options.
-> 
-> We can add another field at the end of the struct if necessary in
-> the future, but from the cover letter and commit message, I didn't
-> get why this info is needed at per-socket granurality.
+GCC 14.2.0 reports that passing a non-string literal as the
+format argument of dev_set_name() is potentially insecure.
 
-An application is operating at socket granularity.  The provision is
-so that an application can tell what is going on with each one of
-its comms channels independently, rather than (for instance) the
-rolled-up information on the entire system that the existing
-statistics counter offers.
+drivers/s390/net/ism_drv.c: In function 'ism_probe':
+drivers/s390/net/ism_drv.c:615:2: warning: format not a string literal and no format arguments [-Wformat-security]
+  615 |  dev_set_name(&ism->dev, dev_name(&pdev->dev));
+      |  ^~~~~~~~~~~~
 
-> Also, This can be retrieved with BPF.
+It seems to me that as pdev is a PCIE device then the dev_name
+call above should always return the device's BDF, e.g. 00:12.0.
+That this should not contain format escape sequences. And thus
+the current usage is safe.
 
-If I understand correctly, BPF is aimed at sysadminss probing
-or modifying system operations rather than production use by
-an application.  While your point is true, I don't think BPF
-is a good fit.
--- 
-Cheers,
-   Jeremy
+But, it seems better to be safe than sorry. And, as a bonus, compiler
+output becomes less verbose by addressing this issue.
+
+Compile tested only.
+No functional change intended.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/s390/net/ism_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 60ed70a39d2c..b7f15f303ea2 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -611,7 +611,7 @@ static int ism_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	ism->dev.parent = &pdev->dev;
+ 	ism->dev.release = ism_dev_release;
+ 	device_initialize(&ism->dev);
+-	dev_set_name(&ism->dev, dev_name(&pdev->dev));
++	dev_set_name(&ism->dev, "%s", dev_name(&pdev->dev));
+ 	ret = device_add(&ism->dev);
+ 	if (ret)
+ 		goto err_dev;
+
 
