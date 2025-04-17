@@ -1,381 +1,136 @@
-Return-Path: <netdev+bounces-183750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEF1A91D56
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:08:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD45A91D63
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 15:11:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A72A188C188
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0529418939A1
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 13:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0541F463D;
-	Thu, 17 Apr 2025 13:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554D8246335;
+	Thu, 17 Apr 2025 13:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="26hCsLIL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvQDlgYU"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705B017A2E3
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 13:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ACD2459EF;
+	Thu, 17 Apr 2025 13:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744895326; cv=none; b=RVv5m+VBhEp3SkdkJAJID9XFAQb8stLlyHQBMvmEW+ak2CT5nZX6jVQR7Gybt+8ABPWiLQrv/lT/LX81ORGH1Yw0oeiOJd3HprQVKYeFdig2JNZ2K9dyfd1yHCYB1e3snctBR0go953amKfPOTcqCnpjZQkCcuRy+Vyj4wgGdxg=
+	t=1744895481; cv=none; b=ejRJSNGgbFpIBHMXBK8NNSQoIml0W89tbY/S86JTxveon3GgQRxdSE6bX+8chZa097LFBkMe8x/kJ3csK8PyjFrjla88Q5K0d5zCVnUhVBRD9dhFZiM1Znrx4jV3j/5tNO3Eda4xzprnW97185lfgSXeUE20k1UW9afuKxrFhag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744895326; c=relaxed/simple;
-	bh=GFKKlrWih1Tt2S/ck7/sLJ1MXBfFEngFYLt50JUpjf0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A2nTVsC+yg0FsLgrjM97VEQpu+wG1w0P6FiW0X6hgOOPcHeLip/gCOBF1lctRIUrNX3FhSNpH3KmJQlqRwx/tQKjz+xCyjbr5xu726y9KbmAMw26JuTfGOF99wgXhB85DFiFPRbECtSCM3+dKqD6a4frfLquQZN1GnOCy8CBErQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=26hCsLIL; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 5CEC3200BFF2;
-	Thu, 17 Apr 2025 15:08:41 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 5CEC3200BFF2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1744895321;
-	bh=XT/iUE5vP1z0gkdwe5exXFJ8T6boMd4j1DBP1kulJaE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=26hCsLILynSC1OVDsJTmAuC7socJdJ1Vmb5kh84/ddgWbcLR0Xig3CqiQsJxbeCSc
-	 Rl3J7vgaTKDIzXUlM0AekIn7dbepCnsUdPOb+N0pFmJvuQAInWWx6WRa4i7MyDsvD0
-	 6kDRUqo/mDs5r0GLdiUx2LCkKy9VzpAX0yTFz1TGu9pL30SWGXIUvz53RtSXEs5g/t
-	 QA4fHInmpVeUf3NgNC05SLy/K/tAwRkdqQpcIV8oKjpel7cNysrImwoONyuBa1I8sy
-	 63kqAXx07JTWFZfnnXVfP73KNyoi/8c4EKETeqAANUhzvw9TbKT/Gd1o8gJtf+6k5o
-	 mnrKpoyS4H5Ow==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next] selftests: net: kmemleak for lwt dst cache tests
-Date: Thu, 17 Apr 2025 15:08:30 +0200
-Message-Id: <20250417130830.19630-1-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744895481; c=relaxed/simple;
+	bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Yrw8dMzI7jniYfWtMTky7BCXmb642uYTu5m841+AudfEANukWXkAHGZPWGcBIDVkVOqIN+Kj/fw8pnH9o0xs7cIKxvoC+MDXo2dJVinppQ+lT4aAdvD3U5KgKyvJG1SVdOVEj+NsyVux9piZ7ZYgBlf1ohlJbtlu73C4s4iAE6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvQDlgYU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B1BC4CEEB;
+	Thu, 17 Apr 2025 13:11:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744895480;
+	bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=DvQDlgYUDPe1mX2ENKDI9+XTvQn/iPj1bO2WpAmSsAslei0e4jfLmPCAHc5zimuie
+	 wDGHWgQUOXhRYwviuU2nLgRJ8+e6LzgxEuE4zBTjJwuQYa0P9cK194JIM6581XBhpL
+	 H347j5nuabDiMOE0fOOCzRhUd6MxTbeKoF2o3PE/MZ+0R4Y0DSR9SgSTVHUKqi9Q7J
+	 DvC3GHNqlgtCMiY13tPHKHiNTv/GFNlLgRfMtTSTB46PAqxTjXFZ5FX2QKPQW/FOr4
+	 5xByBWEZHGAdPIG6McNJZcPK6Xqg9OInVAOy5cPDpyuoHeR0HRldhH+atAEB4hq773
+	 p6LtODri6XWAQ==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v3 0/8] ref_tracker: add ability to register a debugfs file
+ for a ref_tracker_dir
+Date: Thu, 17 Apr 2025 09:11:03 -0400
+Message-Id: <20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOf9AGgC/2WMywqDMBBFf6XMuinJjKnSVf+jdJHoRINFSyKhR
+ fz3RqHQx/LcyzkzRA6eI5x2MwROPvpxyED7HdSdGVoWvskMKFHLQpEI7KZg6l40tnVRUHksLUl
+ idAaydM+/f2zByzVz5+M0hufWT2pd36niN5WUkMJJ0pWuCFHSuecw8O0whhbWVsJPX//5mH2rq
+ rowtlGI7stfluUFZxaX1+0AAAA=
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2122; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=OUxNWwrgg8j3G4t3OFx/R6btyXfDE8RJw7HclDZsGhs=;
+ b=kA0DAAgBAA5oQRlWghUByyZiAGgA/e7IMar3vmCgsyCLDC7IMa65WUNtIC07DtMKSrKE0INin
+ okCMwQAAQgAHRYhBEvA17JEcbKhhOr10wAOaEEZVoIVBQJoAP3uAAoJEAAOaEEZVoIVMf0P/A/A
+ c3HgXO1eZujzv4qdBLZoYLTDgQnOlO9R/Hv5E/0pBxBrvTVOxEc0PlQiI6vofGOJYBrTy0fdE2u
+ 83eoJpc8i4KUp1P2IG7g5kUJT1KzOpAL8OyOCb4hAYFS4BalfeSG4AZ460bF8jEqwMqJXnD5FKn
+ LsaaixCy2TBDcBZ1n905lYwOq9dS9cYKnb3ndJ976l5kjaX1QN79qXRaaknSK0+o0n7+91CsW+g
+ f09/GHlZ2MuweKQ+DWIuQeymUTY5nf1Zb7GL7swnCl+j1yL3QxP6xvK1E9hR/rbjobCiofAd2Za
+ qN3W1dcmmTz3BDpqWpcfOsHUgilPgBX9kSA0yMvK3LhI9JfQdhYR+h4pkfuNYZyuR7TqSizpYNh
+ qbnuo6ljdKdK4zEj3Yc7UV64kzS4+xr/ellk8AdIHVJ4UZA0t8+sKfqD7YrNgUoeI9u+Fddf02s
+ Y7IOPn3Rbb65kKuHm+oGsGUP0mJCmtbuW4kEz4kbk8rV+7BvzJCoF179MivZIDRYjIGAdtJpjtz
+ 2Vmm9zVylv2hNV+lxITUdVH+mAcRX+Z4112tMirzXgIQljgcuQO1/dtsoEL59AF6IHkLC/uzPTk
+ Jmpqba9WP1X6z22meI3rGr6fthoILMzuEyJzbPvIX/EsnifhVS8t+mE/eNP8nTu95gSS47U+0k0
+ jRcib
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Force the use of kmemleak to check everything's OK and report results
-for each test case. Also, useless sleeps were removed, and the bash
-script was renamed to something that makes more sense. Due to kmemleak,
-some tests may be false negatives. To mitigate that (i.e., to have more
-stable results), the solution of a kmemleak scan at the end (vs. for
-each test) was preferred.
+I had previously sent some patches to add debugfs files for the net
+namespace refcount trackers, but Andrew convinced me to make this more
+generic and better-integrated into the ref_tracker infrastructure.
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+This adds a new ref_tracker_dir_debugfs() call that subsystems can call
+to finalize the name of their dir and register a debugfs file for it.
+The last two patches add these calls for the netns and netdev
+ref_trackers.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- tools/testing/selftests/net/Makefile          |   2 +-
- tools/testing/selftests/net/config            |   2 +
- ..._ref_loop.sh => kmemleak_lwt_dst_cache.sh} | 146 +++++++++++++-----
- 3 files changed, 107 insertions(+), 43 deletions(-)
- rename tools/testing/selftests/net/{lwt_dst_cache_ref_loop.sh => kmemleak_lwt_dst_cache.sh} (66%)
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 6d718b478ed8..eba9dbb5387d 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -105,7 +105,7 @@ TEST_PROGS += bpf_offload.py
- TEST_PROGS += ipv6_route_update_soft_lockup.sh
- TEST_PROGS += busy_poll_test.sh
- TEST_GEN_PROGS += proc_net_pktgen
--TEST_PROGS += lwt_dst_cache_ref_loop.sh
-+TEST_PROGS += kmemleak_lwt_dst_cache.sh
- 
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller netlink-dumps
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 3cfef5153823..8c162da21ac8 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -116,3 +116,5 @@ CONFIG_NETKIT=y
- CONFIG_NET_PKTGEN=m
- CONFIG_IPV6_ILA=m
- CONFIG_IPV6_RPL_LWTUNNEL=y
-+CONFIG_DEBUG_FS=y
-+CONFIG_DEBUG_KMEMLEAK=y
-diff --git a/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh b/tools/testing/selftests/net/kmemleak_lwt_dst_cache.sh
-similarity index 66%
-rename from tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-rename to tools/testing/selftests/net/kmemleak_lwt_dst_cache.sh
-index 881eb399798f..30333f2c83c8 100755
---- a/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-+++ b/tools/testing/selftests/net/kmemleak_lwt_dst_cache.sh
-@@ -5,14 +5,12 @@
- #
- # WARNING
- # -------
--# This is just a dummy script that triggers encap cases with possible dst cache
--# reference loops in affected lwt users (see list below). Some cases are
--# pathological configurations for simplicity, others are valid. Overall, we
--# don't want this issue to happen, no matter what. In order to catch any
--# reference loops, kmemleak MUST be used. The results alone are always blindly
--# successful, don't rely on them. Note that the following tests may crash the
--# kernel if the fix to prevent lwtunnel_{input|output|xmit}() reentry loops is
--# not present.
-+# This script triggers lwt encap use cases, and checks for any dst cache
-+# reference loops in affected lwt users (see list below) thanks to kmemleak.
-+# Some configurations are pathological and some others are valid. Overall, we
-+# don't want this issue to happen, no matter what, so that's why this selftest
-+# exists. Note that this script will probably crash the kernel if commit
-+# 986ffb3a57c5 ("net: lwtunnel: fix recursion loops") is not included.
- #
- # Affected lwt users so far (please update accordingly if needed):
- #  - ila_lwt (output only)
-@@ -21,6 +19,7 @@
- #  - seg6_iptunnel (both input and output)
- 
- source lib.sh
-+KMEMLEAK_PATH="/sys/kernel/debug/kmemleak"
- 
- check_compatibility()
- {
-@@ -106,8 +105,8 @@ setup()
- 	ip -netns $beta link set veth0 up &>/dev/null
- 	ip -netns $beta link set veth1 up &>/dev/null
- 	ip -netns $beta link set lo up &>/dev/null
--	ip -netns $beta route del 2001:db8:2::/64
--	ip -netns $beta route add 2001:db8:2::/64 dev veth1
-+	ip -netns $beta route del 2001:db8:2::/64 &>/dev/null
-+	ip -netns $beta route add 2001:db8:2::/64 dev veth1 &>/dev/null
- 	ip netns exec $beta \
- 		sysctl -wq net.ipv6.conf.all.forwarding=1 &>/dev/null
- 
-@@ -117,115 +116,169 @@ setup()
- 	ip -netns $gamma route add 2001:db8:1::/64 \
- 		via 2001:db8:2::1 dev veth0 &>/dev/null
- 
--	sleep 1
--
- 	ip netns exec $alpha ping6 -c 5 -W 1 2001:db8:2::2 &>/dev/null
- 	if [ $? != 0 ]; then
- 		echo "SKIP: Setup failed."
- 		exit $ksft_skip
- 	fi
--
--	sleep 1
- }
- 
- cleanup()
- {
- 	cleanup_ns $alpha $beta $gamma
- 	[ $ila_lsmod != 0 ] && modprobe -r ila &>/dev/null
-+	kmemleak_clear
-+}
-+
-+name2descr()
-+{
-+	if [ "$1" == "ila" ] || [ "$1" == "ioam6" ]; then
-+		echo "output"
-+	elif [ "$1" == "rpl" ] || [ "$1" == "seg6" ]; then
-+		echo "input + output"
-+	else
-+		echo ""
-+	fi
-+}
-+
-+log_test_passed()
-+{
-+	printf "TEST: %-57s  [ OK ]\n" "$1"
-+	npassed=$((npassed+1))
-+}
-+
-+log_test_skipped()
-+{
-+	printf "TEST: %-57s  [SKIP]\n" "$1"
-+	nskipped=$((nskipped+1))
-+}
-+
-+log_test_failed()
-+{
-+	printf "TEST: %-57s  [FAIL]\n" "$1"
-+	nfailed=$((nfailed+1))
-+}
-+
-+check_result()
-+{
-+	if grep -q "$1" <<< "$2"; then
-+		log_test_failed "$1 ($(name2descr $1))"
-+	else
-+		log_test_passed "$1 ($(name2descr $1))"
-+	fi
-+}
-+
-+kmemleak_clear()
-+{
-+	echo clear > "$KMEMLEAK_PATH"
-+}
-+
-+kmemleak_scan()
-+{
-+	for i in {1..5}; do
-+		echo scan > "$KMEMLEAK_PATH"
-+	done
-+}
-+
-+kmemleak_result()
-+{
-+	local output=$(cat "$KMEMLEAK_PATH")
-+
-+	[ $skip_ila != 0 ] && log_test_skipped "ila ($(name2descr ila))" \
-+			   || check_result "ila" "$output"
-+
-+	[ $skip_ioam6 != 0 ] && log_test_skipped "ioam6 ($(name2descr ioam6))" \
-+			   || check_result "ioam6" "$output"
-+
-+	[ $skip_rpl != 0 ] && log_test_skipped "rpl ($(name2descr rpl))" \
-+			   || check_result "rpl" "$output"
-+
-+	[ $skip_seg6 != 0 ] && log_test_skipped "seg6 ($(name2descr seg6))" \
-+			   || check_result "seg6" "$output"
- }
- 
- run_ila()
- {
- 	if [ $skip_ila != 0 ]; then
--		echo "SKIP: ila (output)"
- 		return
- 	fi
- 
--	ip -netns $beta route del 2001:db8:2::/64
-+	ip -netns $beta route del 2001:db8:2::/64 &>/dev/null
- 	ip -netns $beta route add 2001:db8:2:0:0:0:0:2/128 \
- 		encap ila 2001:db8:2:0 csum-mode no-action ident-type luid \
- 			hook-type output \
- 		dev veth1 &>/dev/null
--	sleep 1
- 
--	echo "TEST: ila (output)"
- 	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
- 
--	ip -netns $beta route del 2001:db8:2:0:0:0:0:2/128
--	ip -netns $beta route add 2001:db8:2::/64 dev veth1
--	sleep 1
-+	ip -netns $beta route del 2001:db8:2:0:0:0:0:2/128 &>/dev/null
-+	ip -netns $beta route add 2001:db8:2::/64 dev veth1 &>/dev/null
- }
- 
- run_ioam6()
- {
- 	if [ $skip_ioam6 != 0 ]; then
--		echo "SKIP: ioam6 (output)"
- 		return
- 	fi
- 
- 	ip -netns $beta route change 2001:db8:2::/64 \
- 		encap ioam6 trace prealloc type 0x800000 ns 1 size 4 \
- 		dev veth1 &>/dev/null
--	sleep 1
- 
--	echo "TEST: ioam6 (output)"
- 	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
-+
-+	ip -netns $beta route change 2001:db8:2::/64 dev veth1 &>/dev/null
- }
- 
- run_rpl()
- {
- 	if [ $skip_rpl != 0 ]; then
--		echo "SKIP: rpl (input)"
--		echo "SKIP: rpl (output)"
- 		return
- 	fi
- 
- 	ip -netns $beta route change 2001:db8:2::/64 \
- 		encap rpl segs 2001:db8:2::2 \
- 		dev veth1 &>/dev/null
--	sleep 1
- 
--	echo "TEST: rpl (input)"
- 	ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
--
--	echo "TEST: rpl (output)"
- 	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
-+
-+	ip -netns $beta route change 2001:db8:2::/64 dev veth1 &>/dev/null
- }
- 
- run_seg6()
- {
- 	if [ $skip_seg6 != 0 ]; then
--		echo "SKIP: seg6 (input)"
--		echo "SKIP: seg6 (output)"
- 		return
- 	fi
- 
- 	ip -netns $beta route change 2001:db8:2::/64 \
- 		encap seg6 mode inline segs 2001:db8:2::2 \
- 		dev veth1 &>/dev/null
--	sleep 1
- 
--	echo "TEST: seg6 (input)"
- 	ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
--
--	echo "TEST: seg6 (output)"
- 	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
--	sleep 1
-+
-+	ip -netns $beta route change 2001:db8:2::/64 dev veth1 &>/dev/null
- }
- 
- run()
- {
-+	kmemleak_clear
-+
- 	run_ila
- 	run_ioam6
- 	run_rpl
- 	run_seg6
-+
-+	kmemleak_scan
-+	kmemleak_result
- }
- 
-+npassed=0
-+nskipped=0
-+nfailed=0
-+
- if [ "$(id -u)" -ne 0 ]; then
- 	echo "SKIP: Need root privileges."
- 	exit $ksft_skip
-@@ -236,6 +289,11 @@ if [ ! -x "$(command -v ip)" ]; then
- 	exit $ksft_skip
- fi
- 
-+if [ ! -e $KMEMLEAK_PATH ]; then
-+	echo "SKIP: Kmemleak not available."
-+	exit $ksft_skip
-+fi
-+
- check_compatibility
- 
- trap cleanup EXIT
-@@ -243,4 +301,8 @@ trap cleanup EXIT
- setup
- run
- 
-+if [ $nfailed != 0 ]; then
-+	exit $ksft_fail
-+fi
-+
- exit $ksft_pass
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+
+---
+Jeff Layton (8):
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: add ability to register a file in debugfs for a ref_tracker_dir
+      ref_tracker: widen the ref_tracker_dir.name field
+      net: add ref_tracker_dir_debugfs() calls for netns refcount tracking
+      net: register debugfs file for net_device refcnt tracker
+
+ include/linux/ref_tracker.h |  17 ++++-
+ lib/ref_tracker.c           | 151 +++++++++++++++++++++++++++++++++++++++-----
+ net/core/dev.c              |   6 +-
+ net/core/net_namespace.c    |  34 +++++++++-
+ 4 files changed, 190 insertions(+), 18 deletions(-)
+---
+base-commit: 695caca9345a160ecd9645abab8e70cfe849e9ff
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
 -- 
-2.34.1
+Jeff Layton <jlayton@kernel.org>
 
 
