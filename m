@@ -1,95 +1,109 @@
-Return-Path: <netdev+bounces-183636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B565A915AE
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:49:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5694A915DE
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 09:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E524019E1743
-	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:49:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E792440DC9
+	for <lists+netdev@lfdr.de>; Thu, 17 Apr 2025 07:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B1E1DE3BA;
-	Thu, 17 Apr 2025 07:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BF32222B0;
+	Thu, 17 Apr 2025 07:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jKRz7xQw"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PbdFh24m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEAC21C9F8
-	for <netdev@vger.kernel.org>; Thu, 17 Apr 2025 07:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706AC21CC7B;
+	Thu, 17 Apr 2025 07:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744876130; cv=none; b=usNpgF3D6O4IF40DKw30uOyFqCHvk9XL/rKJazLMi2Y8EUID41sHFOrLJ/2IRTIdhtp1WYxenJO9zW1hEiUvbsD1f1caVLQM3OkXd37935JAYpkrfPB7xN7WfhtHTUEWkWKxdM9VWo1pe9fgxYVYaXmIcHuLua5zDktGA8l6MAE=
+	t=1744876638; cv=none; b=oLTtBJdOBxIsIUlnhQRd9C3YJPwAhTyCn4dmzmyBggPiVLoKBSwEAYq5yrDwsJrMJqj3T9QvqxBLFSYwcgb5ctVum4/bHoT7ltUGPuRhBwKs5YZEbZDqUBaUU0203ZCg9egG3lB+uxKNoT9aDKd1kNnNML7kJptZ0RASmTUVmbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744876130; c=relaxed/simple;
-	bh=AJDZ7g9e7QmBIngwpIsFAzOeQfTEjm5Sb3aXttAvypM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VIuQAjtUOb9s8J2Ba1aG0NFv0+1MaMqhrdi4RxnFyXGej4YyxkcYy/Qwbr3nC17Ul4BFtSsQnHyuNTShdYQI1EvUNzWVfZV+ifhTRYl/izxJFgtGd/Pfn06dRxD4g0KD4l4YQBLUhzd+kfukVmqjfQ9Z8He7+uijBgXqQQf+Smc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jKRz7xQw; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744876129; x=1776412129;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AJDZ7g9e7QmBIngwpIsFAzOeQfTEjm5Sb3aXttAvypM=;
-  b=jKRz7xQwk/7XAka51FFCU3rs3FFQ9vtdyxKubMaPCzRiFpk3HtzFz17Z
-   E4FKc0hChLzsr+10EeFaBmC6GsHukqj5v0mzC/7V9U8EEFXHhh+PjD4sY
-   D76EV+04Fwm0UL1Eva7NSJtQGH4MauYALhazz1xCHOK3Y6V5+njKT6oGQ
-   u3prZNzCxTXZDpckPwu6vVcpTGzqbJfZCHL3Y1cmEvFuK70Qo+kTpQ4kx
-   DsI8IYM1kQzMqUzZfTlsutjHm9FyIABKpgdnVq3TUUBtuWOJA90hWx5On
-   x48Bwv/BqGD0NL1cvj1UqeKWgr2X6TMAx30W6lkGgcHwK6pHcWIpoe3t4
-   g==;
-X-CSE-ConnectionGUID: N6PVQmmWTTKXtSNHsiXU+Q==
-X-CSE-MsgGUID: vVEAL4W7S2m73EYVdslTZg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11405"; a="34066280"
-X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
-   d="scan'208";a="34066280"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:48:48 -0700
-X-CSE-ConnectionGUID: Ulxf/l1DTvKPfFBNMUKtMw==
-X-CSE-MsgGUID: ojzmiwjyT1abjQjC4jZfTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,218,1739865600"; 
-   d="scan'208";a="131054723"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2025 00:48:47 -0700
-Date: Thu, 17 Apr 2025 09:48:28 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dave Marquardt <davemarq@linux.ibm.com>
-Cc: netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
-	horms@kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next v3 2/3] net: ibmveth: Reset the adapter when
- unexpected states are detected
-Message-ID: <aACyTHFwKonUwLv+@mev-dev.igk.intel.com>
-References: <20250416205751.66365-1-davemarq@linux.ibm.com>
- <20250416205751.66365-3-davemarq@linux.ibm.com>
+	s=arc-20240116; t=1744876638; c=relaxed/simple;
+	bh=13xHlsY61EkSejsLPZ23IxACNJ0NV+gOvYVIBuw6xfU=;
+	h=From:To:Subject:Date:Message-Id; b=tqCCLPzHFw/8TvVqVLVapNY1ihFAJghqSxVFkYbpQTz0owAeAZ9TuTQLYXZI/KpdzVJj59kzwcdKc74RPwgu4pXXkWerO/inD5jsElQEQl6r0KmVZvVUBvPyfdNNLyy1WJR8j3bREyAbPRHoHKTTBd3zBFZz1tWMV/AG9e+NDME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PbdFh24m; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id F04E021199C7; Thu, 17 Apr 2025 00:57:16 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F04E021199C7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1744876636;
+	bh=QCGtOoOPCkFMxU8OEWg52zg84Z5FI97+rF/DHlAjGwY=;
+	h=From:To:Subject:Date:From;
+	b=PbdFh24muPk1natGqOQ4k6H7jzVLFbQAeWwrG2KikkFnaG3JbA1WLfS6qkSmQQ/+7
+	 2/DgbsYOP/orw9824sqs2QeYLsS9zZuubwpxILBhab+yHyEQnOd9ofNRj6NwukLeS4
+	 RE45MXL+lba5uGdZCksVi0W/cWGC3YBAwjaDlTdg=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	kent.overstreet@linux.dev,
+	brett.creeley@amd.com,
+	schakrabarti@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	rosenp@gmail.com,
+	paulros@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH 0/3] net: mana: Add HTB Qdisc offload support
+Date: Thu, 17 Apr 2025 00:57:07 -0700
+Message-Id: <1744876630-26918-1-git-send-email-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416205751.66365-3-davemarq@linux.ibm.com>
 
-On Wed, Apr 16, 2025 at 03:57:50PM -0500, Dave Marquardt wrote:
-> Reset the adapter through new function ibmveth_reset, called in
-> WARN_ON situations. Removed conflicting and unneeded forward
-> declaration.
-> 
-> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmveth.c | 116 ++++++++++++++++++++++++-----
->  drivers/net/ethernet/ibm/ibmveth.h |   1 +
->  2 files changed, 98 insertions(+), 19 deletions(-)
-> 
+Introduce support for HTB Qdisc offload on the mana ethernet 
+controller to enable bandwidth clamping for egress traffic.
 
-Thanks for addressing comments
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+The controller offloads only one HTB leaf to support bandwidth
+clamping on the hardware. This involves calling the function 
+mana_set_bw_clamp() which internally calls a HWC command 
+to the hardware to set the speed.
+
+The minimum supported bandwidth is 100 Mbps, and only multiples
+of 100 Mbps are supported by the hardware. The speed will be reset to
+maximum bandwidth supported by the SKU, when the HTB leaf is deleted.
+
+Also add speed support in mana_get_link_ksettings to display speed in the
+standard port information using ethtool. This involves calling
+mana_query_link_config(), which internally sends a HWC command to
+the hardware to query speed information.
+
+Note that this feature is not supported by all hardware.
+
+Erni Sri Satya Vennela (3):
+  net: mana: Add speed support in mana_get_link_ksettings
+  net: mana: Add sched HTB offload support
+  net: mana: Handle unsupported HWC commands
+
+ .../net/ethernet/microsoft/mana/hw_channel.c  |   4 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 191 ++++++++++++++++++
+ .../ethernet/microsoft/mana/mana_ethtool.c    |   6 +
+ include/net/mana/mana.h                       |  36 ++++
+ 4 files changed, 237 insertions(+)
+
+-- 
+2.34.1
+
 
