@@ -1,135 +1,123 @@
-Return-Path: <netdev+bounces-184221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018FDA93EDB
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 22:27:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A80B9A93EFC
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 22:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E764A074F
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:27:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC34445570
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EBE2397B9;
-	Fri, 18 Apr 2025 20:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B96A22D7A4;
+	Fri, 18 Apr 2025 20:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eXr9MTqd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="karTDHnY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D4B1C2324;
-	Fri, 18 Apr 2025 20:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D377521CA16
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 20:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745008034; cv=none; b=UA13YIQ8+Jil3xWJA5FXnK/6cXpYEO//d1cWBQS6D+6kymY59rbbBX2MfZnojBZUpniVHqh03Ixr+62fbIKKWae27p/3G3I63nrHRrLcakCyPx+5Xmjdn1Xd1F0QhSeDH3KflYuABpMymuY4otbxXf5JlQGxjTtbi4kpuydkVqY=
+	t=1745008711; cv=none; b=fSONc8JkXowMsXjgZVRygBHCT+MbzjoWkj+eV/2qYxVy9WC2pPXw6rui2dx9smx7DJpLg02SCK88/RZQo0AMMXjmpCRVXtSbm7pzJrWjatdS8snvHv0z4sT8XauDq3VQY8TPJIjU+BBscw9ndUMrR5mwrWsf6wuJrCssosm3o4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745008034; c=relaxed/simple;
-	bh=CrhsFFq5IyqJkiDJlv+lg+3v62q3lDf7I+FQDCU5DC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmBIONihiZ6CnG1IwFE2SiVFirV5YITcr3KsN2TZHDmdV6IyP5EHcZrs1JvFagVcOqxt1ogQoU18aDx4R3TXIKTfym2AOkSASAul6ZIvKbXtgkpmaKaVl3hPwHeaFtPPIJiexO1vTfHf3xmAvibMuU3TDqTGlK6td6jywNPespA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eXr9MTqd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=O79Q8up6Gy2hEMjnQITer5PbKSEwN1Pzj/8/BV+JwL4=; b=eXr9MTqdlq9ohs6A/9h4SUfc9g
-	URu7Pe6Rtniim9/50hbZjCEspUSIRrZO5c9vO9opoZKrVynLKH9QDhASi6zX8s/JuB2EXl8pSjeFd
-	4uRDz54ZFiqqTWqM6a9mWuCLl3uFlJ1Ac970YA9oSySo6C68axjiaA/PpkNPO9mijY90=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u5sIZ-009wCP-5d; Fri, 18 Apr 2025 22:26:55 +0200
-Date: Fri, 18 Apr 2025 22:26:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <94075f0a-6e17-4106-879e-3aa5193f9ef2@lunn.ch>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	s=arc-20240116; t=1745008711; c=relaxed/simple;
+	bh=aIrmqHa5CI0Ak9z+4Zu/VK+4ldcvqolXGgSo1dvYUnI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jj9iNJ+f6XpBKn/RP0YJL9BsXderAtOGSlq4Pi/3XsJMlAHTHguGlWTd2ORUeRCcyEa1bKAs/t4aQREk7bsufIY0aikPhw1ESORyybLPsv0tZWg5/winXpEsMc/ln9QaCG+93AIN8Ue/CzpnvZ/kSq5ciB78CRrpKXZxq2dkzLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=karTDHnY; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2264c9d0295so233475ad.0
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 13:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745008709; x=1745613509; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aIrmqHa5CI0Ak9z+4Zu/VK+4ldcvqolXGgSo1dvYUnI=;
+        b=karTDHnYkEQPYXOKtu0PYNi9H/uJqHT1JoFxi8baVtVM3w59sa6XqQhJiFCC/fv74G
+         gK4abuF68r6c+hWWipvN6rvwL9WRfXAp1tKZC7jdzaszQ2RLCAIB+dscJDWagHzZe8I0
+         e9EH7BbVDyex42oqb0Ds69U/4S5I+/uUmLmY3/a0BNECctiYhAjvtmNuZ2BE8zJuP0Aq
+         RjzcX8qk2DKybpkpfAGVHq0YfAU9uWzaBu7lWwAvMjAR2ZP8FshKtTVeMV6d+m5mvaEU
+         ENRZBIMcj6bXyQOYYOD33p8lDRg0tuKW1YAoiLO7rJKyLSw6M1Fv6YE4JkrkiljuUCmi
+         hx3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745008709; x=1745613509;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aIrmqHa5CI0Ak9z+4Zu/VK+4ldcvqolXGgSo1dvYUnI=;
+        b=luHKkhV5wouOIzKCfbKJX3B/P9xh7/jbWAk6Enc8h4AGUZvs3Qe1Ib4KstmtVE2HAt
+         7zGahlRHh72XXwd6U69MxtU9R+lwuHQw22AzISJw4Hud3MhkGVZg25nObPMslI5aqt4I
+         pIQcpXc2VeOZLREipOGsWJvT1I5+TfeRGAog7dD0F3GRSdPmXczcu0N9KHTvaTjHFRS9
+         waBoAsu9zN4Tu8Q4kUHJXXn01tIg567YNq+kW5L0OR+xBle9vz8AHDNOkpHRSmqvzKHw
+         /HAliyeyvkZJnwSGQOEJjfJuhbKvr7JuGyoH7h4Dvy/1vknBKOt1uisdz0Pdi/JOlsW0
+         WX+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX8RoHFLzN58GWY3/uYhMFpczmVPYVHIm5tOlsn4Ypc6+8iPcYyfa7vZIktL6M+thMBYlqFUvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa/F2hSEOT8U/z0JhEg9oyL3Zl+BDUQVZeDFbnOjcdYYoUjF8e
+	lPB37nV5S7zQkLSSz0uBFgq3TG0Icf+yEJdPq9F2Q9L23QFCcf9KJoED0mBLZuhG7ad2wjSK+Vj
+	n/7Pv7NMcTokXZBO7pnanHnZibJ4cdBG/FciW
+X-Gm-Gg: ASbGnctHR1P+4CJDMdZH1DZX13adwjqR16WQ9HiQ+8o0tEYH6lQ59mrpnvUYwfCPx9f
+	88xLrXt3l56lu9I2q9Ds/tCjRcNTqn7FYQOxyGQvBQh7zQZ1FCx7OtCuEg5vRMcULfbRX2oMmIT
+	g+D4kK3Tw2zPxdkPsfFZNcf1AfG1epI/WVKo8tOXRuZPx02/K9uYg=
+X-Google-Smtp-Source: AGHT+IH1klYyCkFXcPaZVue5xKy10d/vSkMRXSKUHfpo3tJxot4DP+QJE3PeUYfZOOoO25RRiZsfdJYuQJBw3s+VdK4=
+X-Received: by 2002:a17:903:3ba4:b0:215:f0c6:4dbf with SMTP id
+ d9443c01a7336-22c52a0c583mr3412795ad.14.1745008708836; Fri, 18 Apr 2025
+ 13:38:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+References: <20250418015317.1954107-1-kuba@kernel.org> <CAHS8izMnK0C0sQpK+5NoL-ETNjJ+6BUhx_Bgq9drViUaic+W1A@mail.gmail.com>
+ <aAJeMtRlBIMGfdN2@mini-arch>
+In-Reply-To: <aAJeMtRlBIMGfdN2@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 18 Apr 2025 13:38:14 -0700
+X-Gm-Features: ATxdqUHxUhBGMDh3dY4v_VrEW1qW8O-QvzLH8aAvyID5oHvtvm_cIwqSY5ihJRs
+Message-ID: <CAHS8izMw=Rfa+AT-xCaUspb-GYvhsE1iugPM=_c-FFD+2KBE7A@mail.gmail.com>
+Subject: Re: [PATCH net] net: fix the missing unlock for detached devices
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org, jdamato@fastly.com, sdf@fomichev.me, ap420073@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 15, 2025 at 12:18:01PM +0200, Matthias Schiffer wrote:
-> As discussed [1], the comments for the different rgmii(-*id) modes do not
-> accurately describe what these values mean.
-> 
-> As the Device Tree is primarily supposed to describe the hardware and not
-> its configuration, the different modes need to distinguish board designs
-> (if a delay is built into the PCB using different trace lengths); whether
-> a delay is added on the MAC or the PHY side when needed should not matter.
-> 
-> Unfortunately, implementation in MAC drivers is somewhat inconsistent
-> where a delay is fixed or configurable on the MAC side. As a first step
-> towards sorting this out, improve the documentation.
-> 
-> Link: https://lore.kernel.org/lkml/d25b1447-c28b-4998-b238-92672434dc28@lunn.ch/ [1]
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> ---
->  .../bindings/net/ethernet-controller.yaml        | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 45819b2358002..2ddc1ce2439a6 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -74,19 +74,21 @@ properties:
->        - rev-rmii
->        - moca
->  
-> -      # RX and TX delays are added by the MAC when required
-> +      # RX and TX delays are part of the board design (through PCB traces). MAC
-> +      # and PHY must not add delays.
->        - rgmii
->  
-> -      # RGMII with internal RX and TX delays provided by the PHY,
-> -      # the MAC should not add the RX or TX delays in this case
-> +      # RGMII with internal RX and TX delays provided by the MAC or PHY. No
-> +      # delays are included in the board design; this is the most common case
-> +      # in modern designs.
->        - rgmii-id
->  
-> -      # RGMII with internal RX delay provided by the PHY, the MAC
-> -      # should not add an RX delay in this case
-> +      # RGMII with internal RX delay provided by the MAC or PHY. TX delay is
-> +      # part of the board design.
->        - rgmii-rxid
->  
-> -      # RGMII with internal TX delay provided by the PHY, the MAC
-> -      # should not add an TX delay in this case
-> +      # RGMII with internal TX delay provided by the MAC or PHY. RX delay is
-> +      # part of the board design.
+On Fri, Apr 18, 2025 at 7:14=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 04/18, Mina Almasry wrote:
+> > On Thu, Apr 17, 2025 at 6:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > >
+> > > The combined condition was left as is when we converted
+> > > from __dev_get_by_index() to netdev_get_by_index_lock().
+> > > There was no need to undo anything with the former, for
+> > > the latter we need an unlock.
+> > >
+> > > Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> >
+> > Reviewed-by: Mina Almasry <almasrymina@google.com>
+>
+> Mina, the same (unlock netedev on !present) needs to happen for
+> https://lore.kernel.org/netdev/20250417231540.2780723-5-almasrymina@googl=
+e.com/
+>
+> Presumably you'll do another repost at some point?
 
-This looks good to me. There is nothing here which is Linux specific.
+Yes, and there is also a lot going on in that series outside of this
+locking point. If the rest of the series looks good and is merged I
+can also look into porting this fix to the tx path as a follow up, if
+acceptable.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+--=20
+Thanks,
+Mina
 
