@@ -1,263 +1,415 @@
-Return-Path: <netdev+bounces-184145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 259EEA93748
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:39:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04D46A93770
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 570721B667AC
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:39:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16712446D11
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4568C27511E;
-	Fri, 18 Apr 2025 12:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9407C274FF4;
+	Fri, 18 Apr 2025 12:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSgW0ree"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rr6Ro8H/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA532750F3;
-	Fri, 18 Apr 2025 12:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8546B2749ED;
+	Fri, 18 Apr 2025 12:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744979927; cv=none; b=eFEMCJF2z4u4AQqWRgPeM3mtaCcGnwqAlYpKyGPlTLcXqlrovsH1t1g6iKqvSoceW0f0PXFWSmW8EwnKbWHerfYcm092Hd3hvS6TLG2Fl5JLttrweYSznghYU8W/g1ElZY8SKoscZlXFb1QySb09ibHZTVYWXLrBD0HZCBMcbzI=
+	t=1744980553; cv=none; b=eCwmNmcVRlt2S0SPY3JsDy52LCODIsumNrjVm8U48Wwy4Xig4S1oZdmjwvWss28nL96rhB9jXMw+k9kTWcTIdLJNYPnBvGpDF91wjHHas5HW0yMXh2fJis8hJemN/GV2viYDVY+Zm17B7gfPR8gxoqnuCMMfIRLjPPXKMsnuvOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744979927; c=relaxed/simple;
-	bh=Sz2OvhT1YtRxCswr5Ix9aIntavDUyOJ8JgBM2MSHo+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DT0aIjFftkumctMky2Iv3lNhuGEFwXq1rpgZPWuEMnProgzG2m2gMHmMqJzwnr0cM1GAeTMY2sQH1mx/r9az+fAYKflcntnYnzVK3v+YFbMkkKgflmBAVEqtzY7SKcyTe0eccyAAAklaluPNijuQ+BzH2UnQgkXTDeyKUwyh1a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSgW0ree; arc=none smtp.client-ip=209.85.160.179
+	s=arc-20240116; t=1744980553; c=relaxed/simple;
+	bh=ifL5XGTurjtY3FVLjp8ndP1nKFqmI+UUOp50pgmxjmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KziiKvCkPPrC6jX2FBPxbUD/X0pDy5f23TEqtoXEi0sOyXP8fuDaTtQQ2pkaBRZnZfDPKQ+O48BJe62Tx5fsYDE6y/7AoXQv5lfKrmCaAa8ZCkuttMfMWL8T9Et3JeoU1uBccjACPI+YPtsL+07tienQQgsXTPVI2rzfWdLBOzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rr6Ro8H/; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4769bbc21b0so17288491cf.2;
-        Fri, 18 Apr 2025 05:38:45 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e8484bb895so525203a12.0;
+        Fri, 18 Apr 2025 05:49:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744979924; x=1745584724; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ex4CZQWgxkClQmKHcyHVLX17Io0C6G4ejKLtSY01Ru4=;
-        b=SSgW0reeY78B1eoSwWx+CkIligLnZ2pFiR1IscalmP2AUFDIpNAgtXrOL9sxzIlV/g
-         K7ld9Sn02yEJ17DEC3wx0w8wFZSlOxgVSOz90fQUNe7Sq/ZmsjaNZUvRee4pRJghlr0a
-         CX2sn4HCQ1i2BmuaJKaKMhehTQgKQxNms7j5ALHgpYE8hlrMKnIyPBYtltEe5SirfWWt
-         F8aIeIl+BzI9UcBgxMmturYw0IaTtvdFhS4hsylyh2iTxxCGFVizQwBlYdEHywd+W5+r
-         kO4DZPPcCUiZgJuvc9vN7xUTCnjZJlkIKKz4OJXIFfmt2op+UPi+ConJNe6GU4OebZ8F
-         AXiA==
+        d=gmail.com; s=20230601; t=1744980550; x=1745585350; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hGm94WkSvEKAT80t6SgDIndlW5MDyMlulTb0cPlczvI=;
+        b=Rr6Ro8H/V7bkLjG43nTL+vqyWc+IYEo88u1+WEGfynXCFW3Pwr/i7EJJc8vWjl6CfB
+         5zUdWB/GJ7k+GrJUURtCQ+CY07FQwg/Kwcpub9OCGxuOlI1Eg1/fP7jeED8sXW12F/d6
+         SD+/9JaGyzf+l+1vjl9Yp4eCtLXtWRnwxf+uBfFxJ9PHFnPduRBCG3vch8KebM47aQzG
+         v7UQyWYjPgtvGjCraXrdB3xu+snw8scaq7mHhzeegXBkUJrAGuDK9Rd4kBXAo/Qlf0fL
+         wZZKBK/Yh4rG7r2h7DsIZ92N9vloUgi88Wnc0KnFuUrQkgGl2JC7BlylL3hymXhf0tnk
+         mgwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744979924; x=1745584724;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ex4CZQWgxkClQmKHcyHVLX17Io0C6G4ejKLtSY01Ru4=;
-        b=U40Dik3n8ZLesvDT3Hbmxe6TicqFA2Bd+PTpkrdruX0W7cI9EqeIQUuhfL25Iqnuce
-         wntF/wArkD1ocWbE7rbkP2F3qlF/4FzBADShpWk1UQWRbAYbSKrXMN5+bKHRP+1Ml8lQ
-         orCo7QyYixtr0pAh/b6MhC/Ihukzj7qjkpBE7ZHBkQgCvaOqYdPE2FU21te2u2P0HS0Z
-         SNzaZ/XMtOziuqN40dTu9jsbXJlHiFoT+5r8IOg3mD6OxVp3OAFJL+unSeP5nqP+jFGS
-         IIRO5FvlQN2mhEA/OrC/aJsqobEMJZGjCShvXDzQ8vuRU9YeD8PCqsNEBO7a+SOMNsm0
-         NQbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAgmzvyuuPg+WsCzFfQZYNJWKcEbQmU8y5zVADdbhvtweYw7xdAhY85ZvMFotx0qLjgTHuo7xNc3nw@vger.kernel.org, AJvYcCUDU6faJciWOAcPzgIxWnUSPlYoRD7iCuwHLLBV2l5/S9BTjDR6FH4JMP6H6/ccAy0u2oN5nB5xzdjvG6Ha@vger.kernel.org, AJvYcCUweMNquWoF9KR2Z8CMboeoWwq/v8DtmVliBfGShLgbzcTb14M+tbWfBsEO+n1nOkvwt7wTu4bBUV8l@vger.kernel.org, AJvYcCV5sVeqbZ8YwWwVF9B0W55cXS8kpgISV399lw38YK8T7Diza/IcougdG+flYWg4YqdW4z6DIQFTdx0g@vger.kernel.org, AJvYcCWd6M+D4M0JXmjXEGfJe4JR7Og5CsyqrjLBA4w3FYWF7KyAnqg++vWC47NIlIG6IVDGdEtODaKcoWqg@vger.kernel.org, AJvYcCXlis+JTjApgiMTliaUXrPPFq2iO8rLrPHfXYKPdFw7u4fl0l6a1n2xiVca4unrjdygGynylxYz@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEwIbWFeN/+J52IVcWjeQ1jt9p9uCvS9SzQ80mwOtCtYuoPpS6
-	T6Fw7HodvkHQMpKTzs8qtGZVKwdhEyVtO2fnJsHwCRxXsiTlTR1FE56asJz6/oGZu173kqOrQGR
-	4uFTgF9RGbbH2nhQ/+WEIkKTA7tA=
-X-Gm-Gg: ASbGncuQwctuvQCU/G9SEZe+VVKuIPsOB3uSs/RYBzyGW5piyQcGIYlWz/W7Yg73nmQ
-	xGyAH13GLuB6MVs6bejro6HFrOx5+gL1X0d6nxeHJuIDCPEBSLokPs2jS1Ppvv03QvvBUUXDzAI
-	NMqueRCsGN8UIbeDV0XVB8vz/iYeEX0VYfjNMUxKQz6rme0AsxMChBvw==
-X-Google-Smtp-Source: AGHT+IGB0+9rYEJMYSumpu6Vzq9goNJmJbJ95NPX/w0TApxD1IhEm9WvTNPQJ7w305XUYtnHZHJIiC78RgW25GjDsKk=
-X-Received: by 2002:a05:622a:1828:b0:476:8225:dac9 with SMTP id
- d75a77b69052e-47aec4c57a5mr39379541cf.45.1744979924108; Fri, 18 Apr 2025
- 05:38:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744980550; x=1745585350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hGm94WkSvEKAT80t6SgDIndlW5MDyMlulTb0cPlczvI=;
+        b=ACoR1TgKzVByHMkBs53ivBHG1+YrYkIh8Ya6PNnQx/JM6MS1IJs1Kg4kG07420UkaQ
+         SjQg2BPLF1PwNtJf+OPv+iiqMr/JAfwKNc9M+Ol7oaG8Url3XzJd+A7ky6jQuf4daaF3
+         l3TJHYFdbXmvjaQYMCOF31EiylE0yikYG4SYX7EMltccGXNaKoqoScr7vo2bHuly0l3a
+         1KTaKgfBqZamZpIPPvMAXRlMX1vXmIRhcoNI8Qfy48kHu+A19EIgnYaE2RweqRsWh46g
+         59YZ4VEtzp7KucAW1SCCqChxHjUknKpXvQLY3BUJlui9HWFjm4XZtCReTbu+B0wO3u4g
+         RGxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUK0uYv/m73dykNpPYlJAUh5m2XP4S9dP149YwE6Avr9XFLhY/ioO9vuGMDPCWujrolryZnTl5o@vger.kernel.org, AJvYcCWw/tYQx9p+EuC2Z+v7sEvRviC9CIoyNHvwqRMQqmUKrIxXDO2lDqLSGU3cRYHNPAYA65jWpMrG2sz5h7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW1J0/wG4T/MgWPPlZ06FnXFU0RcKttGJkOP2eC2v3XSwj6Qxp
+	pi20s0uRGZCoy6sQW/ukqTt9wadoF7zwEvna4/Ogmd64BigeGYPU
+X-Gm-Gg: ASbGncuKXwyhFjlpTrnCIwaqY8Nd9dvqLmJoOles3poxw6gEA6eh1+tJ/3NBSnwHT6m
+	XArfbHUz9rd+8a8IbavztaWFDFzCYRjxK48Bp8jd+E/mgyb9iVDcIdwHKcQX0sraumtwvED1YWz
+	kUkUZtxF0LXcdIEPDTXU+E3vIzp3pYL/qSQsEtFYTm8QLF3B0fgn6h6d3qWfq58XIGB6FA4tt7Q
+	K0h4ylwfo9EMYNg5H80mNGFahj0ihBpn69HcrGG3Wid9sRV9NpOviCELfFRr0HeNy1sRayYrPlW
+	i25MDI5yhv5Nq4LbGH26CVWrWbbk
+X-Google-Smtp-Source: AGHT+IGQJTO3hkOdi85KfZDP/WxTdVuBNdKLUzFgqgk61QYUOpAZhlXhZ2rXm1sjvZVBwnt5nJWcHg==
+X-Received: by 2002:a05:6402:3513:b0:5e0:803c:242a with SMTP id 4fb4d7f45d1cf-5f62860d4afmr803363a12.8.1744980549365;
+        Fri, 18 Apr 2025 05:49:09 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6efadd0asm117605366b.175.2025.04.18.05.49.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 05:49:08 -0700 (PDT)
+Date: Fri, 18 Apr 2025 15:49:05 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, christophe.leroy@csgroup.eu,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v5 net-next 01/14] net: enetc: add initial netc-lib
+ driver to support NTMP
+Message-ID: <20250418124905.2jve2cjzrojjwmyh@skbuf>
+References: <20250411095752.3072696-1-wei.fang@nxp.com>
+ <20250411095752.3072696-1-wei.fang@nxp.com>
+ <20250411095752.3072696-2-wei.fang@nxp.com>
+ <20250411095752.3072696-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
- <20250416-wmt-updates-v1-3-f9af689cdfc2@gmail.com> <20250416201407.GC3811555-robh@kernel.org>
- <CABjd4YyTKquLcYC+DVg_koi3p7AhqwBNiazCiC713DQKjCaBSA@mail.gmail.com>
-In-Reply-To: <CABjd4YyTKquLcYC+DVg_koi3p7AhqwBNiazCiC713DQKjCaBSA@mail.gmail.com>
-From: Alexey Charkov <alchark@gmail.com>
-Date: Fri, 18 Apr 2025 16:38:40 +0400
-X-Gm-Features: ATxdqUHZEjWs_YUTRnLI_mqfQ2sstLgHtYWGD2PkyOOwUEJjeYm4m7FuAwUHjuc
-Message-ID: <CABjd4Yxi4SLqsAk_fb9C=1BW6XjnZ8LQ_JKYu6KZ3TtMS0fnhg@mail.gmail.com>
-Subject: Re: [PATCH 03/13] dt-bindings: mmc: vt8500-sdmmc: Convert to YAML
-To: Rob Herring <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@kernel.org>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-i2c@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pwm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250411095752.3072696-2-wei.fang@nxp.com>
+ <20250411095752.3072696-2-wei.fang@nxp.com>
 
-On Thu, Apr 17, 2025 at 10:25=E2=80=AFAM Alexey Charkov <alchark@gmail.com>=
- wrote:
->
-> On Thu, Apr 17, 2025 at 12:14=E2=80=AFAM Rob Herring <robh@kernel.org> wr=
-ote:
-> >
-> > On Wed, Apr 16, 2025 at 12:21:28PM +0400, Alexey Charkov wrote:
-> > > Rewrite the textual description for the WonderMedia SDMMC controller
-> > > as YAML schema, and switch the filename to follow the compatible
-> > > string.
-> > >
-> > > Signed-off-by: Alexey Charkov <alchark@gmail.com>
-> > > ---
-> > >  .../devicetree/bindings/mmc/vt8500-sdmmc.txt       | 23 --------
-> > >  .../devicetree/bindings/mmc/wm,wm8505-sdhc.yaml    | 61 ++++++++++++=
-++++++++++
-> > >  MAINTAINERS                                        |  1 +
-> > >  3 files changed, 62 insertions(+), 23 deletions(-)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/mmc/vt8500-sdmmc.txt b=
-/Documentation/devicetree/bindings/mmc/vt8500-sdmmc.txt
-> > > deleted file mode 100644
-> > > index d7fb6abb3eb8c87e698ca4f30270c949878f3cbf..000000000000000000000=
-0000000000000000000
-> > > --- a/Documentation/devicetree/bindings/mmc/vt8500-sdmmc.txt
-> > > +++ /dev/null
-> > > @@ -1,23 +0,0 @@
-> > > -* Wondermedia WM8505/WM8650 SD/MMC Host Controller
-> > > -
-> > > -This file documents differences between the core properties describe=
-d
-> > > -by mmc.txt and the properties used by the wmt-sdmmc driver.
-> > > -
-> > > -Required properties:
-> > > -- compatible: Should be "wm,wm8505-sdhc".
-> > > -- interrupts: Two interrupts are required - regular irq and dma irq.
-> > > -
-> > > -Optional properties:
-> > > -- sdon-inverted: SD_ON bit is inverted on the controller
-> > > -
-> > > -Examples:
-> > > -
-> > > -sdhc@d800a000 {
-> > > -     compatible =3D "wm,wm8505-sdhc";
-> > > -     reg =3D <0xd800a000 0x1000>;
-> > > -     interrupts =3D <20 21>;
-> > > -     clocks =3D <&sdhc>;
-> > > -     bus-width =3D <4>;
-> > > -     sdon-inverted;
-> > > -};
-> > > -
-> > > diff --git a/Documentation/devicetree/bindings/mmc/wm,wm8505-sdhc.yam=
-l b/Documentation/devicetree/bindings/mmc/wm,wm8505-sdhc.yaml
-> > > new file mode 100644
-> > > index 0000000000000000000000000000000000000000..a7d962bc13c7ff70b5044=
-8201b0416efc7f787af
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/mmc/wm,wm8505-sdhc.yaml
-> > > @@ -0,0 +1,61 @@
-> > > +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/mmc/wm,wm8505-sdhc.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: WonderMedia SOC SoC SDHCI Controller
-> > > +
-> > > +maintainers:
-> > > +  - Alexey Charkov <alchark@gmail.com>
-> > > +
-> > > +allOf:
-> > > +  - $ref: mmc-controller.yaml#
-> > > +
-> > > +properties:
-> > > +  compatible:
-> > > +    oneOf:
-> > > +      - const: wm,wm8505-sdhc
-> > > +      - items:
-> > > +          - const: wm,wm8650-sdhc
-> > > +          - const: wm,wm8505-sdhc
-> > > +      - items:
-> > > +          - const: wm,wm8750-sdhc
-> > > +          - const: wm,wm8505-sdhc
-> > > +      - items:
-> > > +          - const: wm,wm8850-sdhc
-> > > +          - const: wm,wm8505-sdhc
-> >
-> > Combine the last 3 entries into 1 using 'enum' for the 1st compatible.
->
-> Fair enough, will do.
->
-> > > +
-> > > +  reg:
-> > > +    maxItems: 1
-> > > +
-> > > +  clocks:
-> > > +    maxItems: 1
-> > > +
-> > > +  interrupts:
-> > > +    items:
-> > > +      - description: SDMMC controller interrupt
-> > > +      - description: SDMMC controller DMA interrupt
-> > > +
-> > > +  sdon-inverted:
-> > > +    type: boolean
-> > > +    description: SD_ON bit is inverted on the controller
-> >
-> > This implies I know what the non-inverted state is. If you know, please
-> > state that here.
->
-> This is a tricky one. The only answer I have is "it's inverted in
-> later versions vs. the first version I saw in the wild, and I'm not
-> sure if it's board related or IP version related - nor if the original
-> was active low or high". No docs, no schematics, no vendor left around
-> to chase for answers.
->
-> Will dig around some more and update the description if I succeed in
-> uncovering any further clues :)
+I see this is "Changes requested", so here are some more nitpicks from me.
 
-I've found some extra clues and would like to consult on the best way forwa=
-rd.
+On Fri, Apr 11, 2025 at 05:57:39PM +0800, Wei Fang wrote:
+> Some NETC functionality is controlled using control messages sent to the
+> hardware using BD ring interface with 32B descriptor similar to transmit
+> BD ring used on ENETC. This BD ring interface is referred to as command
+> BD ring. It is used to configure functionality where the underlying
+> resources may be shared between different entities or being too large to
+> configure using direct registers. Therefore, a messaging protocol called
+> NETC Table Management Protocol (NTMP) is provided for exchanging
+> configuration and management information between the software and the
+> hardware using the command BD ring interface.
+> 
+> For i.MX95, NTMP has been upgraded to version 2.0, which is incompatible
+> with LS1028A, because the message formats have been changed.
 
-It turns out (if my understanding of the decompiled binary-only WM8505
-vendor driver is correct) that all chips before (not including) WM8505
-rev. A2 treated their "clock stop" bit (register offset 0x08 a.k.a.
-SDMMC_BUSMODE, bit 0x10 a.k.a. BM_CST in vendor sources, BM_SD_OFF in
-mainline) as "set 1 to disable SD clock", while all the later versions
-treated it as "set 0 to disable SD clock". Which means that there are
-WM8505 based systems that rely on either of those behaviours, while
-any later chips need "set 0 to disable". This is not a board related
-quirk but an on-chip SDMMC controller revision related quirk.
+Can you please add one more sentence clarifying that the LS1028A
+management protocol has been retroactively named NTMP 1.0 and its
+implementation is in enetc_cbdr.c and enetc_tsn.c? The driver, like new
+NETC documentation, refers to NTMP 2.0 as simply "NTMP".
 
-I'd love to switch to a compatible-based logic and drop the
-"sdon-inverted" flag altogether from the binding I'm writing, but here
-are my doubts where I'd love to consult.
+> Therefore, add the netc-lib driver to support NTMP 2.0 to operate various tables.
+> Note that, only MAC address filter table and RSS table are supported at
+> the moment. More tables will be supported in subsequent patches.
+> 
+> It is worth mentioning that the purpose of the netc-lib driver is to
+> provide some NTMP-based generic interfaces for ENETC and NETC Switch
+> drivers. Currently, it only supports the configurations of some tables.
+> Interfaces such as tc flower and debugfs will be added in the future.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> +static int netc_xmit_ntmp_cmd(struct ntmp_user *user, union netc_cbd *cbd)
+> +{
+> +	union netc_cbd *cur_cbd;
+> +	struct netc_cbdr *cbdr;
+> +	int i, err;
+> +	u16 status;
+> +	u32 val;
+> +
+> +	/* Currently only i.MX95 ENETC is supported, and it only has one
+> +	 * command BD ring
+> +	 */
+> +	cbdr = &user->ring[0];
+> +
+> +	spin_lock_bh(&cbdr->ring_lock);
+> +
+> +	if (unlikely(!netc_get_free_cbd_num(cbdr)))
+> +		netc_clean_cbdr(cbdr);
+> +
+> +	i = cbdr->next_to_use;
+> +	cur_cbd = netc_get_cbd(cbdr, i);
+> +	*cur_cbd = *cbd;
+> +	dma_wmb();
+> +
+> +	/* Update producer index of both software and hardware */
+> +	i = (i + 1) % cbdr->bd_num;
+> +	cbdr->next_to_use = i;
+> +	netc_write(cbdr->regs.pir, i);
+> +
+> +	err = read_poll_timeout_atomic(netc_read, val, val == i,
+> +				       10, NETC_CBDR_TIMEOUT, true,
 
-* Looks like WM8505 rev. A2 needs a separate compatible string vs.
-prior WM8505. Can we have something like "wm,wm8505a2-sdhc" and
-"wm,wm8505-sdhc" respectively? WM8505a2 not being an actual chip name,
-but something discoverable by reading its hardware ID from a system
-configuration register at runtime
-* If I introduce new compatible strings for "wm,wm8650-sdhc",
-"wm,wm8750-sdhc", "wm,wm8850-sdhc" and "wm,wm8880-sdhc" in bindings,
-DTS and driver code, then the new driver and new DTB should work fine,
-and the DTS should pass schema checks. New driver code won't work with
-older DTB unless I keep the logic to parse "sdon-inverted" which
-wouldn't be part of the binding. Old driver code would not work with
-newer DTB except for pre-A2 versions of WM8505. Is that acceptable?
-* Existing DTS doesn't differentiate between pre-A2 vs. post-A2
-revisions of WM8505 and is bound to fail on the latter
+Please create a #define for NETC_CBDR_SLEEP_US too.
 
-I realize that breaking backward/forward compatibility is undesirable,
-but frankly these systems seem to have few mainline users, and those
-people who do run mainline on them ought to be compiling the kernel
-and its DTB at the same time, because the firmware doesn't know
-anything about DT and any modern kernel can only be booted in
-"appended DTB" mode. I also don't know of any non-Linux code that
-might be using these device trees.
+> +				       cbdr->regs.cir);
+> +	if (unlikely(err))
+> +		goto cbdr_unlock;
+> +
+> +	dma_rmb();
+> +	/* Get the writeback command BD, because the caller may need
+> +	 * to check some other fields of the response header.
+> +	 */
+> +	*cbd = *cur_cbd;
+> +
+> +	/* Check the writeback error status */
+> +	status = le16_to_cpu(cbd->resp_hdr.error_rr) & NTMP_RESP_ERROR;
+> +	if (unlikely(status)) {
+> +		err = -EIO;
+> +		dev_err(user->dev, "Command BD error: 0x%04x\n", status);
+> +	}
+> +
+> +	netc_clean_cbdr(cbdr);
+> +	dma_wmb();
+> +
+> +cbdr_unlock:
+> +	spin_unlock_bh(&cbdr->ring_lock);
+> +
+> +	return err;
+> +}
+> +
+> +static int ntmp_alloc_data_mem(struct ntmp_dma_buf *data, void **buf_align)
+> +{
+> +	void *buf;
+> +
+> +	buf = dma_alloc_coherent(data->dev, data->size + NTMP_DATA_ADDR_ALIGN,
+> +				 &data->dma, GFP_KERNEL);
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	data->buf = buf;
+> +	*buf_align = PTR_ALIGN(buf, NTMP_DATA_ADDR_ALIGN);
+> +
+> +	return 0;
+> +}
+> +
+> +static void ntmp_free_data_mem(struct ntmp_dma_buf *data)
+> +{
+> +	dma_free_coherent(data->dev, data->size + NTMP_DATA_ADDR_ALIGN,
+> +			  data->buf, data->dma);
+> +}
+> +
+> +static void ntmp_fill_request_hdr(union netc_cbd *cbd, dma_addr_t dma,
+> +				  int len, int table_id, int cmd,
+> +				  int access_method)
+> +{
+> +	dma_addr_t dma_align;
+> +
+> +	memset(cbd, 0, sizeof(*cbd));
+> +	dma_align = ALIGN(dma, NTMP_DATA_ADDR_ALIGN);
+> +	cbd->req_hdr.addr = cpu_to_le64(dma_align);
+> +	cbd->req_hdr.len = cpu_to_le32(len);
+> +	cbd->req_hdr.cmd = cmd;
+> +	cbd->req_hdr.access_method = FIELD_PREP(NTMP_ACCESS_METHOD,
+> +						access_method);
+> +	cbd->req_hdr.table_id = table_id;
+> +	cbd->req_hdr.ver_cci_rr = FIELD_PREP(NTMP_HDR_VERSION,
+> +					     NTMP_HDR_VER2);
+> +	/* For NTMP version 2.0 or later version */
+> +	cbd->req_hdr.npf = cpu_to_le32(NTMP_NPF);
+> +}
+> +
+> +static void ntmp_fill_crd(struct ntmp_cmn_req_data *crd, u8 tblv,
+> +			  u8 qa, u16 ua)
+> +{
+> +	crd->update_act = cpu_to_le16(ua);
+> +	crd->tblv_qact = NTMP_TBLV_QACT(tblv, qa);
+> +}
+> +
+> +static void ntmp_fill_crd_eid(struct ntmp_req_by_eid *rbe, u8 tblv,
+> +			      u8 qa, u16 ua, u32 entry_id)
+> +{
+> +	ntmp_fill_crd(&rbe->crd, tblv, qa, ua);
+> +	rbe->entry_id = cpu_to_le32(entry_id);
+> +}
+> +
+> +static int ntmp_delete_entry_by_id(struct ntmp_user *user, int tbl_id,
+> +				   u8 tbl_ver, u32 entry_id, u32 req_len,
+> +				   u32 resp_len)
+> +{
+> +	struct ntmp_dma_buf data = {.dev = user->dev};
+> +	struct ntmp_req_by_eid *req;
+> +	union netc_cbd cbd;
+> +	u32 len;
+> +	int err;
+> +
+> +	data.size = req_len >= resp_len ? req_len : resp_len;
 
-Any guidance would be much appreciated.
+max(req_len, resp_len)
 
-Best regards,
-Alexey
+It can also be placed as part of the "data" initializer:
+
+	struct ntmp_dma_buf data = {
+		.dev = user->dev,
+		.size = max(req_len, resp_len),
+	};
+
+> +	err = ntmp_alloc_data_mem(&data, (void **)&req);
+> +	if (err)
+> +		return err;
+> +
+> +	ntmp_fill_crd_eid(req, tbl_ver, 0, 0, entry_id);
+> +	len = NTMP_LEN(req_len, resp_len);
+> +	ntmp_fill_request_hdr(&cbd, data.dma, len, tbl_id,
+> +			      NTMP_CMD_DELETE, NTMP_AM_ENTRY_ID);
+> +
+> +	err = netc_xmit_ntmp_cmd(user, &cbd);
+> +	if (err)
+> +		dev_err(user->dev, "Delete table (id: %d) entry failed: %pe",
+> +			tbl_id, ERR_PTR(err));
+
+Could you also print the entry_id?
+
+> +
+> +	ntmp_free_data_mem(&data);
+> +
+> +	return err;
+> +}
+> +
+> +static int ntmp_query_entry_by_id(struct ntmp_user *user, int tbl_id,
+> +				  u32 len, struct ntmp_req_by_eid *req,
+> +				  dma_addr_t dma, bool compare_eid)
+> +{
+> +	struct device *dev = user->dev;
+> +	struct ntmp_cmn_resp_query *resp;
+> +	int cmd = NTMP_CMD_QUERY;
+> +	union netc_cbd cbd;
+> +	u32 entry_id;
+> +	int err;
+> +
+> +	entry_id = le32_to_cpu(req->entry_id);
+> +	if (le16_to_cpu(req->crd.update_act))
+> +		cmd = NTMP_CMD_QU;
+> +
+> +	/* Request header */
+> +	ntmp_fill_request_hdr(&cbd, dma, len, tbl_id, cmd, NTMP_AM_ENTRY_ID);
+> +	err = netc_xmit_ntmp_cmd(user, &cbd);
+> +	if (err) {
+> +		dev_err(dev, "Query table (id: %d) entry failed: %pe\n",
+> +			tbl_id, ERR_PTR(err));
+
+Could you print a string representation of the tbl_id instead? It should
+be more user-friendly if something fails.
+
+static const char *ntmp_table_name(enum ntmp_tbl_id tbl_id)
+{
+	switch (tbl_id) {
+	case NTMP_MAFT_ID:
+		return "MAC Address Filtering";
+	case NTMP_RSST_ID:
+		return "RSS";
+	default:
+		return "unknown";
+	}
+}
+
+Also, similar comment about entry_id being absent here.
+
+> +		return err;
+> +	}
+> +
+> +	/* For a few tables, the first field of their response data is not
+> +	 * entry_id, so directly return success.
+> +	 */
+> +	if (!compare_eid)
+> +		return 0;
+> +
+> +	resp = (struct ntmp_cmn_resp_query *)req;
+> +	if (unlikely(le32_to_cpu(resp->entry_id) != entry_id)) {
+> +		dev_err(dev, "Table (id: %d) query EID: 0x%x, response EID: 0x%x\n",
+> +			tbl_id, entry_id, le32_to_cpu(resp->entry_id));
+> +		return -EIO;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +int ntmp_maft_add_entry(struct ntmp_user *user, u32 entry_id,
+> +			struct maft_entry_data *maft)
+> +{
+> +	struct ntmp_dma_buf data = {.dev = user->dev};
+> +	struct maft_req_add *req;
+> +	union netc_cbd cbd;
+> +	int err;
+> +
+> +	data.size = sizeof(*req);
+
+Same comment about wrapping this into the struct initializer.
+
+> +	err = ntmp_alloc_data_mem(&data, (void **)&req);
+> +	if (err)
+> +		return err;
+> +
+> +	/* Set mac address filter table request data buffer */
+> +	ntmp_fill_crd_eid(&req->rbe, user->tbl.maft_ver, 0, 0, entry_id);
+> +	req->keye = maft->keye;
+> +	req->cfge = maft->cfge;
+> +
+> +	ntmp_fill_request_hdr(&cbd, data.dma, NTMP_LEN(data.size, 0),
+> +			      NTMP_MAFT_ID, NTMP_CMD_ADD, NTMP_AM_ENTRY_ID);
+> +	err = netc_xmit_ntmp_cmd(user, &cbd);
+> +	if (err)
+> +		dev_err(user->dev, "Add MAFT entry failed (%pe)\n",
+> +			ERR_PTR(err));
+> +
+> +	ntmp_free_data_mem(&data);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(ntmp_maft_add_entry);
+> +
+> +int ntmp_maft_query_entry(struct ntmp_user *user, u32 entry_id,
+> +			  struct maft_entry_data *maft)
+> +{
+> +	struct ntmp_dma_buf data = {.dev = user->dev};
+> +	struct maft_resp_query *resp;
+> +	struct ntmp_req_by_eid *req;
+> +	int err;
+> +
+> +	data.size = sizeof(*resp);
+
+Same comment about struct initializer.
+
+> +	err = ntmp_alloc_data_mem(&data, (void **)&req);
+> +	if (err)
+> +		return err;
+> +
+> +	ntmp_fill_crd_eid(req, user->tbl.maft_ver, 0, 0, entry_id);
+> +	err = ntmp_query_entry_by_id(user, NTMP_MAFT_ID,
+> +				     NTMP_LEN(sizeof(*req), data.size),
+> +				     req, data.dma, true);
+> +	if (err)
+> +		goto end;
+> +
+> +	resp = (struct maft_resp_query *)req;
+> +	maft->keye = resp->keye;
+> +	maft->cfge = resp->cfge;
+> +
+> +end:
+> +	ntmp_free_data_mem(&data);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(ntmp_maft_query_entry);
 
