@@ -1,105 +1,140 @@
-Return-Path: <netdev+bounces-184118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4F4A93639
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:00:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E838EA935FE
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E02445C62
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A2A719E7DA2
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 10:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5516270EAA;
-	Fri, 18 Apr 2025 10:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3AC26FDB0;
+	Fri, 18 Apr 2025 10:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bdv0/bXA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qDbGE5sz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A474155C82
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 10:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6317C1DED76
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 10:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744973997; cv=none; b=T/ovlhbDQkP3w9EDeSIXY1ysFkGIgq3mNJYbrMA0aL4yxXRiY/2tkq2ptwPxs8HOM3/r8jTPMgRTpP0jFEZ4nmQ7AluHQ3JofL9hU9P7xhvEDmP0D6njtnRr5eLWk+HH3i5wzWdELuy67ZoOfcI8cb2A33/CDSmweggx5kT0Tm0=
+	t=1744972021; cv=none; b=fNFPH6HLNGREWxQXce55OplXgPT1E9dPAEn9C0fSQFUFwTGDf6gYiOYgvnmwa9B4lQ6A9kg0llDqfZEWnbMld7X8ZFGdfwYeaEUO7oeParU1Ia0iARU+KAu7Dxr1ss4Wjo5/nyW6Zy+O7WxIs8yDMYGmcfOH4To09cndup/k4tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744973997; c=relaxed/simple;
-	bh=JiXwjWY/g8Zcn29jXIMWCOF3/D+1O5PQTJ+QCzs/c+0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=c2EoFEEp9ER8V6CnBtGU+LETIHaQB5ar8aoyKGN2NpvgZfbbNbMcsf9MCvIG0RxFeiDBhDOm0gvCFE9lecuwIJmzxNVDRlJVmO6qG5FGz+ZU84J4rzWckGRJ2HM1yV9haX7rg19ESxXYb50ZQdfh9bdPPa1V02H8ESIA+q07zjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bdv0/bXA; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso12336145e9.3
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 03:59:55 -0700 (PDT)
+	s=arc-20240116; t=1744972021; c=relaxed/simple;
+	bh=AhDMAvR6Y0N0xilTkkBBlrdMlUSttI7hT7pOnKkca7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ubj8L7kXjsqUw5DOit/QZ7cwKHfO5YeybKIti4QNWurbDFyjZpsN1gUG+6RX1Fwsc7hvUzNBzG5tuk9FsVOqNohlmDfW1a0DRzMdB2vOjtOVqWdEbCaGSaoZ5VmbNBcv+Lw8VnpJbya9kosxxbJRNZILicU3pUwYfQEvkn/4w+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qDbGE5sz; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39bf44be22fso1175832f8f.0
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 03:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744973994; x=1745578794; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JiXwjWY/g8Zcn29jXIMWCOF3/D+1O5PQTJ+QCzs/c+0=;
-        b=Bdv0/bXAPncIQcv/axTouasB7XAcH5/rc+Ma7DxbCfnK6VagIQdbMm1Hk74V9V1Yqi
-         2N58KgemOJVh2YMIcixabStyCMRxGdzAOz1h+11gVYEWCJ/C4WdrdmN3vAgc3bxpquI1
-         MU2G/s/2o48HjoiBcNv8sThznDGji5AxKgUJ2fy5PUCAhdJ6hwZ5YSFPVdSq5glP1EEX
-         WvpyfFspS0GHfZfIr+MWp+sYO1/SYsaltZaJDbbmQv8P0qYfG6xfnyp8dvJNfe0DpNjC
-         R9JBiCO168unifNH3LMJiHTBweewe0xre/X6UZ2kRExPSTqwlSn/DuPMqlmueTEG/8Ir
-         4suQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744972017; x=1745576817; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jyF8cUyrsCUAOR5COVOs1K+3uf8aTnMier1Oni0UNDI=;
+        b=qDbGE5szaiRPJm2xhoYcCeq/HB7qVMGG/aDnt2/frbTazIjw+DN73o4Kqpy05f1rEi
+         QDg70ph9QnYiPk/b68inQkz0t1cjWijRClVSIOMwO2/1+BCTxYkQVXUbc4E24XfT8sbh
+         Q33SHDJzApGLRRA3TOVNicC2fm1m52kH7WbLi59FFSIlxqMzk33837kHtrSLdFPdXtYB
+         2eX6m2mOhkLf2CtubmyikCvbKFrpEHMbo+KCs4ojUlNQ6OPJf7Do46kMtgMuqh2QdxMI
+         c3MDrV5pS8nLhOkPm/tjx9U0409W7dAVKUlFqzlvUfdPAdY8XZNULwWljsdfa0r1lTNB
+         7G9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744973994; x=1745578794;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1744972017; x=1745576817;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JiXwjWY/g8Zcn29jXIMWCOF3/D+1O5PQTJ+QCzs/c+0=;
-        b=IybpWGIHRH21+xF+/VQ61beb+83yGfS0ubS5DNHx8VBJ1WsL41WCHPazza/Vl49nAs
-         hzmO567Dgx3IVA/ae5G4uunuuszT7cPTTNoLnTAt+6lapKSRRGwmdcKKu5TuZi/KLxHp
-         LsY14XgGIShGV13DsBpE2z7sug5nYBbty5pXuPsUsyczVURt14fPHf1P5tzJsxdBN9Tk
-         sqZqLUM8amEwr0Us2CEG7J9DxThrU9hysWDUd1w08UNTjxIbwokLM5wYCkktp2RkJBoz
-         u+g6NMn1F7PSE3Gi61KWgJQFcOf2UxjC1ha6pHxe5/1ouhYIOVhiCzXACnEf2WIEePdj
-         6R+w==
-X-Forwarded-Encrypted: i=1; AJvYcCU3x+rqqyvJGeugWaXo0cFkSXJdRhT0XOfWRV6QbT1lf9WFSsM8oo0RIaTEctBDswW6yzjeK6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDnrTvVhD9bqQZV2Lb6bPDrcxsT9vF2A2et/qQogqMOmTgIGjE
-	svntfeAnQVyRogUrAyNKjuBQXE2I+dpaEGsR4vyfvLElj+l9ONai
-X-Gm-Gg: ASbGncuzvp3/a+0TRgPOoYMrxWU6CgZ+ot/+kLLVFjvL7JIlZIri7PwzRd0JFUNZr1u
-	DPqV1nD8ii6bkeNne5nNHEvQIOxgeKbGtFlVly/+VECA5K/H03xRNJhN3/QpNX+ygzexQv9bopV
-	IEFqsZ6T9UwAO9/MAvt6Cc6bw4yBL/lXFUa7x3pNz706I07+q4Qs/2kHETODexZzA/9anXrWSAR
-	0DnXlUhiONr/CQYj/i/qURWqaY7B+9J4kTszZKR2PuPQ1Pv+GLsi+F9+UEgywUlUI+dyUjzwtNN
-	WaKL5vz/9IBfCYxqnm/m2tyHMvApGuC1oxyP6KR1mE17HXR9fs7tK7ZDUIs=
-X-Google-Smtp-Source: AGHT+IGUCNDdMVbqSeCvkbUWoT20AEjvb+wi+ck9ZHPR1/bqqANo4JqbpR7sMTs78qlmXoRiXaWsCg==
-X-Received: by 2002:a05:600c:1554:b0:43c:ee62:33f5 with SMTP id 5b1f17b1804b1-4406ac1fd90mr18550825e9.27.1744973993850;
-        Fri, 18 Apr 2025 03:59:53 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:24a3:599e:cce1:b5db])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d6e034csm17681295e9.39.2025.04.18.03.59.52
+        bh=jyF8cUyrsCUAOR5COVOs1K+3uf8aTnMier1Oni0UNDI=;
+        b=jsN28YngDDQ3fnNl9s/OBF/HReDw1ARBbCrfaRJfa181yUK8X6SZBIjHx/crV1cqyk
+         ciVVtPB8Y1fCrI8Va5es5h9vumBrglX74ofodVuZNhpYdbYmTbEHPXMsm9wGXSLSshi3
+         G81ZUvfckCr7OoegPN5BkqQzLaCDkg2IQacNOnYKo7iLMuUgrx+yNT4BjTfY2j/NNBbK
+         uuslItgf/wTNjw79ArPXJDcrp0q1dxTCeNyQHFu+EFYvptWoyGNPztx7gHF/VR5zwiJE
+         86rdy7wbSKmAhnfHYWgVuI21LRjf06FLidkAq2al/9F1F/LuDiuhczQclyVBDf41TEzU
+         qx7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/Da+QwAeN8NLs1aLggrjGI+MUpTpGleWb2j9YY1hXJ1D2gBVQMrRk48tzwmUSzNdGd+zGg9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoC4+Ci8qm8ra0nySR5xOEbpsJiBtvg2ol0ywHtFB2bjt+CMXM
+	26ZBmQV+TMc+kx4cUyddcSuQmtNkChAYLPnevC+lwfo2LBs7CJwowqIADOhoz1E=
+X-Gm-Gg: ASbGnctn3mQeP3nDnIlW5IqpdwN5FVpwWEEtPIPwXf8yuSFHKjgFtyD/uFRlP9PELxi
+	/diFz7441HBDJ0R1sH74t1We8i++eQzhVtSiF8hg1iU6L+qO58iDQqKr1OzY64ADwaxtTujFMvL
+	a2YL9Xzpv2JAuv2xYRqpaqaA0bGXJPfa3DdHFWeg40w8XZY/xaE4moYePHOQ05CIi6ufuC9xP8+
+	HJg/+VBk7w7b589pBla818OHVP67YBKjvU8COVyGPpkIgQakyJXEcMGbObXO33LHPUqYpTgLZLh
+	GOd6l03fQR1/DH5xg73QjiSuy3mjL0DCiPJTcrBBK+l6D70r
+X-Google-Smtp-Source: AGHT+IFrfOuqMN9uKYocPpw4AsJuXc8TP55qB+tXlKCAM3rgVt50bp9eLIgTn8vJRtoXc+j5m8bU8g==
+X-Received: by 2002:a5d:6d8d:0:b0:390:e889:d1cf with SMTP id ffacd0b85a97d-39efbace2ffmr1486834f8f.37.1744972017548;
+        Fri, 18 Apr 2025 03:26:57 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43cbf1sm2399026f8f.54.2025.04.18.03.26.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 03:59:53 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
+        Fri, 18 Apr 2025 03:26:57 -0700 (PDT)
+Date: Fri, 18 Apr 2025 12:26:50 +0200
+From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org
-Subject: Re: [PATCH net-next 01/12] netlink: specs: allow header properties
- for attribute sets
-In-Reply-To: <20250418021706.1967583-2-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 17 Apr 2025 19:16:55 -0700")
-Date: Fri, 18 Apr 2025 11:20:40 +0100
-Message-ID: <m2a58dkbyf.fsf@gmail.com>
-References: <20250418021706.1967583-1-kuba@kernel.org>
-	<20250418021706.1967583-2-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V2 01/14] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <bctzge47tevxcbbawe7kvbzlygimyxstqiqpptfc63o67g4slc@jenow3ls7fgz>
+References: <20250414195959.1375031-1-saeed@kernel.org>
+ <20250414195959.1375031-2-saeed@kernel.org>
+ <20250416180826.6d536702@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416180826.6d536702@kernel.org>
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> rt-link has a number of disjoint headers, plus it uses attributes
-> of other families (e.g. DPLL). Allow declaring a attribute set
-> as "foreign" by specifying which header its definition is coming
-> from.
+Thu, Apr 17, 2025 at 03:08:26AM +0200, kuba@kernel.org wrote:
+>On Mon, 14 Apr 2025 12:59:46 -0700 Saeed Mahameed wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> Devlink param and health reporter fmsg use attributes with dynamic type
+>> which is determined according to a different type. Currently used values
+>> are NLA_*. The problem is, they are not part of UAPI. They may change
+>> which would cause a break.
+>> 
+>> To make this future safe, introduce a enum that shadows NLA_* values in
+>> it and is part of UAPI.
+>> 
+>> Also, this allows to possibly carry types that are unrelated to NLA_*
+>> values.
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>I don't think you need to expose this in C. I had to solve this
+>problem for rtnl because we nested dpll attrs in link info. Please see:
+>
+>https://github.com/kuba-moo/linux/commit/6faf7a638d0a5ded688a22a1337f56470dca85a3
+>
+>and look at the change for dpll here (sorry IDK how to link to a line :S)
+>
+>https://github.com/kuba-moo/linux/commit/00c8764ebb12f925b6f1daedd5e08e6fac478bfd
+>
+>With that you can add the decode info to the YAML spec for Python et al.
+>but there's no need do duplicate the values. Right now this patch
+>generates a bunch of "missing kdoc" warnings.
+>
+>Ima start sending those changes after the net -> net-next merge,
+>some of the prep had to go to net :(
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+I may be missing something, I don't see how your work is related to
+mine. The problem I'm trying to solve is that kernel sends NLA_* values
+to userspace, without NLA_* being part of UAPI. At any time (even unlikely),
+NLA_* values in kernel may change and that would break the userspace
+suddenly getting different values.
+
+Therefore, I introduce an enum for this. This is how it should have been
+done from day 1, it's a bug in certain sense. Possibility to carry
+non-NLA_* type in this enum is a plus we benefit from later in this
+patchset.
+>
 
