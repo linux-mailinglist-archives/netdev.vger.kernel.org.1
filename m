@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F217A92FC4
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:10:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82BFA92FC5
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2046460F27
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:10:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817081B62F69
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830BC26771F;
-	Fri, 18 Apr 2025 02:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3214267731;
+	Fri, 18 Apr 2025 02:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDLXCb10"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wv1nb967"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E89E267714
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 02:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BB12676D9;
+	Fri, 18 Apr 2025 02:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744942202; cv=none; b=KEdmfJtLUXukVEJOum6bahKSbq2qpMMxL6W2X4/y7Uic+SNh2krrvf5g1rswp5HERGBaaDy8BPBwJZQd5k/b8p3S/NCLA/IpUHBtyWPP7H/t+GZ/dLlN/QZ1VvUt41SK20d5+ZpQMxXz3AmyyieaqRYv2hV93tzSXrtM+25B1aU=
+	t=1744942204; cv=none; b=Ux0o6XpHOs7ZIdwaV/mOa/MBIuSWYN9kUOgDrqzFdOhPHlRie7ByWISR9EV/grEWuouG5IQEVwvKwf4SpKcQuzsiv4XonukqZvmU7CaL8MfrQGSzRgvdbHnMvcbcCcCFi2eDHiBVYn5o/TfkXgXDigTTKlEaWj2XhBMucOMstTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744942202; c=relaxed/simple;
-	bh=GrNXNsg8thhryFhRIZCHfkYBELHVyUHwQRQ/n00IPGk=;
+	s=arc-20240116; t=1744942204; c=relaxed/simple;
+	bh=PpRacgllJKUtEyNh7DV2tgxWNcLsd+Hr9ZdJP3sEvco=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XwoCXoBPq2OK6iYgmyBPwT0oIl9A+e4AdVlkVmWjpoKpjOoYIoUTqG6G1LUYgxIgzoGddW+GnzcM6O1ht4BYR5V1DVshFm5DQzDjiUeDVDesky8/HzlTpn09yxQpf/1EqA6SaW806B6ZRsnjRrwtJRRioFyVqpriAINhPsT5jQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDLXCb10; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D48ABC4CEEA;
-	Fri, 18 Apr 2025 02:10:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GY8QnMTZHjeGOn3IZ0pMotVRGgTkDVQOpnN5g6AGqQ194ofPa2ux8JK57MFXA3vV4i0Sn3BZURoqzCmJzqti61vjgkIBiU8K3vI9ND/LbB9mmFKG+ASu9qt+Yv8K7FiWya8Mwqhy+92I+RSNdBX3Xe+ST7SiZDs/1fwC2fuQF1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wv1nb967; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE02C4CEE4;
+	Fri, 18 Apr 2025 02:10:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744942201;
-	bh=GrNXNsg8thhryFhRIZCHfkYBELHVyUHwQRQ/n00IPGk=;
+	s=k20201202; t=1744942204;
+	bh=PpRacgllJKUtEyNh7DV2tgxWNcLsd+Hr9ZdJP3sEvco=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rDLXCb100h//SVUpdcl4UQ585zMo4am7V5N+BpZ74niCtsqXgpOIRdxVwKJ6I7vq0
-	 ID1qTakmi412HtyqO4khIdD2v+RDbYJd1HHLHNM4e2P8eTrpyQxtjRmmFQobgclXua
-	 Vd3xzZGOURAN2wwZ74EfPc1YfDvROY1EG+VehMMrH/vgKBI0bQnbYVOAbcwujaUn5x
-	 XMFw0JNwHZojNHzr1sBN8FGQgnvhH3+mX7GkM1cKUBSEVNAPxqSrcs1KvoZ8gX8qEW
-	 pU2WLW0d3ZDSLWX2XPhQkerStPNLe27skPsbEjFzuCwa3KI931dhX3ykfcqsWbhTlz
-	 Oc4vnJcWlKMJg==
+	b=Wv1nb967t2rvT83vym2pcqWeKrWtIOY73KhHtf6cYuY5JD5b3sAFQB2oIyvd/jWZc
+	 ANv9AOaSkje8WEHMkzKT+jLBZ/X9UrUFA0XYEIN+S1zfUNckMJU52pmSyGktceYfvT
+	 xvPlegrWctHJD1sEK06ktBQTdIDV9DEp2f6KJryfnahQgEYv/3lb2eI/l/WLuMhRaQ
+	 S5lP7jnCOfZxSDq1g8TpGmtcOHwmlx6ag2zRa3vXZklaAoSfbVd8pOm/DhQnrguL33
+	 lnI59at69bkx71CpXPmdXpamz0sW02u+IXrNVo6aig5bITYPFkv8+NYmJjPiyitVgD
+	 t64t2xFQZgBVg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3483A380AAEB;
-	Fri, 18 Apr 2025 02:10:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC9D380AAEB;
+	Fri, 18 Apr 2025 02:10:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: mediatek: stop initialising
- plat->mac_interface
+Subject: Re: [PATCH] net/mlx5e: ethtool: Fix formatting of
+ ptp_rq0_csum_complete_tail_slow
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174494223974.79616.7693576407987445072.git-patchwork-notify@kernel.org>
-Date: Fri, 18 Apr 2025 02:10:39 +0000
-References: <E1u4zyh-000xVE-PG@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1u4zyh-000xVE-PG@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, matthias.bgg@gmail.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+ <174494224231.79616.3135067905524243512.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Apr 2025 02:10:42 +0000
+References: <20250416020109.work.297-kees@kernel.org>
+In-Reply-To: <20250416020109.work.297-kees@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 16 Apr 2025 11:26:47 +0100 you wrote:
-> Mediatek doesn't make use of mac_interface, and none of the in-tree
-> DT files use the mac-mode property. Therefore, mac_interface already
-> follows phy_interface. Remove this unnecessary assignment.
+On Tue, 15 Apr 2025 19:01:14 -0700 you wrote:
+> The new GCC 15 warning -Wunterminated-string-initialization reports:
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c | 1 -
->  1 file changed, 1 deletion(-)
+> In file included from drivers/net/ethernet/mellanox/mlx5/core/en.h:55,
+>                  from drivers/net/ethernet/mellanox/mlx5/core/en_stats.c:34:
+> drivers/net/ethernet/mellanox/mlx5/core/en_stats.h:57:46: warning: initializer-string for array of 'char' truncates NUL terminator but destination lacks 'nonstring' attribute (33 chars into 32 available) [-Wunterminated-string-initialization]
+>    57 | #define MLX5E_DECLARE_PTP_RQ_STAT(type, fld) "ptp_rq%d_"#fld, offsetof(type, fld)
+>       |                                              ^~~~~~~~~~~
+> drivers/net/ethernet/mellanox/mlx5/core/en_stats.c:2279:11: note: in expansion of macro 'MLX5E_DECLARE_PTP_RQ_STAT'
+>  2279 |         { MLX5E_DECLARE_PTP_RQ_STAT(struct mlx5e_rq_stats, csum_complete_tail_slow) },
+>       |           ^~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: stmmac: mediatek: stop initialising plat->mac_interface
-    https://git.kernel.org/netdev/net-next/c/01be295b485a
+  - net/mlx5e: ethtool: Fix formatting of ptp_rq0_csum_complete_tail_slow
+    https://git.kernel.org/netdev/net-next/c/cfba1d1b61ae
 
 You are awesome, thank you!
 -- 
