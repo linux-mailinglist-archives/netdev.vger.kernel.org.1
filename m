@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-184054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEB6A92FE0
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:19:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E64E6A92FE5
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C515464145
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:19:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391BA3A7DF6
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF782673BD;
-	Fri, 18 Apr 2025 02:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F40267B07;
+	Fri, 18 Apr 2025 02:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SiG/ielD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pp3ts+0Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B55C21930B
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 02:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BDD770E2;
+	Fri, 18 Apr 2025 02:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744942782; cv=none; b=eqbWJjNKxzc//8y844aPeRapHb8u7yn56KADcx5ChwzPj1HAZ8pADqO5JtBBrPV26f83il7B5utgUIILxZp+VpLhNWuLnL6lV5tqQ7TYikEvoaq6BZ+9HpTuchv4vjKpfZzfAH8wthh8oErsfm9o44wiwcAlcaiX1g4IhcrpuuE=
+	t=1744943149; cv=none; b=cVXjyaEaRBovJQ8cMaojnnjJrlWQNMX8RuPJa5ote3IXMl6yeMKMYBFWlgVYm/FEctuJtI875hNwHJHK2h3prK28UaLdAwr6LbU27/c5C/kJOtP0UVeUdJ7eUKth3/oT07XfKvsVmhJttnBaTsgJ5pSGZ1rrD+zNH6Cqqris7vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744942782; c=relaxed/simple;
-	bh=txDyh8MtPv1ophJMkXAfogbeTcEPpSTYlg9rHAD/CI0=;
+	s=arc-20240116; t=1744943149; c=relaxed/simple;
+	bh=1mXDAI/S5vr5p1X81NHt2LdADcBB2pqbWg9JJmWE/es=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UVTXC094C7VLVU53bNy8WmvqG191q9VP35P+8Jqnyqh+X54c4+rrq2IzCA0NaqZ6pZBjnxRY7IkIWfS51LS/GVM1gVQl7S17ooZFQhQLoQHM/uYssvCB8ejoBgR//iw8/QAs43p3iHvSFXp1JOzPopeU948Zv0qRRD043tl1Vw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SiG/ielD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6984C4CEE4;
-	Fri, 18 Apr 2025 02:19:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EuOjUIfMTQ218oAJJG6PBCyeapO8xlEGXMBk4uBJme3mWiXR6Kj6cAmlbiJ+AbHCDj2hbsjBHoSftJniautttTWvgcZBcOctFljOwxDCnx+bQpk/v7Gdia+bj9qgLzPSQgeHFTZMRu+lMHj2yVVyujSzP8lZQT5kYxC6EYtDbsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pp3ts+0Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CB72C4CEE4;
+	Fri, 18 Apr 2025 02:25:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744942781;
-	bh=txDyh8MtPv1ophJMkXAfogbeTcEPpSTYlg9rHAD/CI0=;
+	s=k20201202; t=1744943149;
+	bh=1mXDAI/S5vr5p1X81NHt2LdADcBB2pqbWg9JJmWE/es=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SiG/ielD4htcULb70ZZn0RCFBNzzZw1dpKxpzh6TeOY2puPNlQ1k/i9l0dmk6qMdE
-	 7TnuMWwkzMV9EhYJWbry0T/qW5YJn2FwKka2c8FAMJYlzgiQ+l7QYFpmxqJzpKvRC7
-	 v0flMuQmGZYZP3pwmmABchO7HD9HjkQRtC/MqM8Dw5jd8M/c3TKdW6arQZ/d1kIYmg
-	 TJNxZTB+zs9oGTK3NynxuGFCAJ4HoE1IU76U0BvabceDKfX5TtqdhMOvWqruebXhuv
-	 WEy9BpODfKS2nJFx65RAdIvHIXUnwGUkUqc+qepfp3j6YVrY1ufuRX8zugnH9Wn0+t
-	 Qxs7teDhjHXKQ==
-Date: Thu, 17 Apr 2025 19:19:39 -0700
+	b=Pp3ts+0YHwbbyHdi6Ek0l9DSU7OyxOaHH2/b8ft6hMtPXeJZRn2yKt7h+gIr4OjpX
+	 Gq21S61jaWKTCEtGnBm+ZiQz1iCq31EQtFYDhrZb2FbtUtnNCbUCUmJvbWkhF4jx4r
+	 nARVCbnAuiWia6OZ/29fF4O1V1eXekXnHn/5b0GX1XVQYBulQMinDYg1GCiQk8+dIw
+	 gMvKdYTsgBOOnrrBEg7lcUkUPaYdRKnjkIZsmXlBgmpf0etlfqQ5LGv9o24PY7ZxsC
+	 fh3UtElZkrsesWYI2o25TbsqIDCGevkzA2bF5eeOpcZ2bSwwiBJEXpIrVzqqfOjVBq
+	 i2axsLj+k9QWA==
+Date: Thu, 17 Apr 2025 19:25:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <horms@kernel.org>, <dlemoal@kernel.org>, <jdamato@fastly.com>,
- <saikrishnag@marvell.com>, <vadim.fedorenko@linux.dev>,
- <przemyslaw.kitszel@intel.com>, <ecree.xilinx@gmail.com>,
- <rmk+kernel@armlinux.org.uk>, <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next v3 1/2] net: txgbe: Support to set UDP tunnel
- port
-Message-ID: <20250417191939.1c4c2dde@kernel.org>
-In-Reply-To: <01fb01dbb003$5b920bd0$12b62370$@trustnetic.com>
-References: <20250417080328.426554-1-jiawenwu@trustnetic.com>
-	<20250417080328.426554-2-jiawenwu@trustnetic.com>
-	<20250417165736.15d212ec@kernel.org>
-	<01fb01dbb003$5b920bd0$12b62370$@trustnetic.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Sathesh B Edara <sedara@marvell.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <hgani@marvell.com>,
+ <vimleshk@marvell.com>, Veerasenareddy Burru <vburru@marvell.com>, Shinas
+ Rasheed <srasheed@marvell.com>, Satananda Burla <sburla@marvell.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net v3] octeon_ep_vf: Resolve netdevice usage count
+ issue
+Message-ID: <20250417192547.36a7503e@kernel.org>
+In-Reply-To: <07549649-3712-47b9-917b-c5001f9761cb@intel.com>
+References: <20250416102533.9959-1-sedara@marvell.com>
+	<07549649-3712-47b9-917b-c5001f9761cb@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,36 +66,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 18 Apr 2025 09:44:00 +0800 Jiawen Wu wrote:
-> On Fri, Apr 18, 2025 7:58 AM, Jakub Kicinski wrote:
-> > On Thu, 17 Apr 2025 16:03:27 +0800 Jiawen Wu wrote:  
-> > > @@ -392,6 +393,8 @@ static int txgbe_open(struct net_device *netdev)  
-> >                                  ^^^^^^^^^^  
-> > >
-> > >  	txgbe_up_complete(wx);
-> > >
-> > > +	udp_tunnel_nic_reset_ntf(netdev);  
-> >         ^^^^^^^^^^^^^^^^^^^^^^^^  
-> > >  	return 0;  
-> >   
-> > > +	.flags		= UDP_TUNNEL_NIC_INFO_OPEN_ONLY,  
-> > 
-> > Documentation says:
-> > 
-> >         /* Device only supports offloads when it's open, all ports
-> >          * will be removed before close and re-added after open.
-> >          */
-> >         UDP_TUNNEL_NIC_INFO_OPEN_ONLY   = BIT(1),
-> > 
-> > Are you sure you have to explicitly reset?  
-> 
-> Yes. Stop device will reset hardware, which reset UDP port to the default value.
-> So it has to re-configure the ports.
+On Wed, 16 Apr 2025 13:26:43 -0700 Jacob Keller wrote:
+> > @@ -834,7 +833,6 @@ static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+> >  {
+> >  	struct octep_vf_device *oct = netdev_priv(netdev);
+> >  
+> > -	netdev_hold(netdev, NULL, GFP_ATOMIC);
+> >  	schedule_work(&oct->tx_timeout_task);
+> >  }  
+> I guess the thought was that we need to hold because we scheduled a work
+> item?
 
-My point is that this is basically what the
-UDP_TUNNEL_NIC_INFO_OPEN_ONLY flag already assumes.
-There should be no need to reset if you already told the core 
-with the flag that the device forgets everything when closed.
+Looks like something I would have asked them to do :)
+But it was probably merged before I could review next version ?
 
-Could you retest without the reset_ntf ?
+I mean, passing NULL for the tracker is... quite something.
+
+> Presumably the driver would simply cancel_work_sync() on this timeout
+> task before it attempts to release its own reference on the netdev, so
+> this really doesn't protect anything.
+
+It does, but before unregistering :/
+
+Sathesh, schedule_work() returns a value. You should use it.
 
