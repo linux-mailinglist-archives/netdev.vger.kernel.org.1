@@ -1,196 +1,212 @@
-Return-Path: <netdev+bounces-184238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 880BBA93F8F
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 23:50:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0180FA93F90
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 23:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B66B38E0711
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 21:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86A1C1B604FD
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 21:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8998C231C9F;
-	Fri, 18 Apr 2025 21:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C4223E344;
+	Fri, 18 Apr 2025 21:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RDCUMwXD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S89nhWD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26451ADC8D
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 21:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF42233128
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 21:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745013046; cv=none; b=DLUxgwKevwwDfFxv9OrN0g0eQ5qBlwiZv0YV32hz6si+CyRQ14O5L4crMnmbPbNIvZ75ptNXs6zPj21XZmxM9NZHzwBHFlAoozqD4teqYVYTrV8TrAqXlh2tuHJCKYcYWDYZtmXyiespFEBQKTEWyx0irkzH/lkXEld7w4g8EYM=
+	t=1745013080; cv=none; b=IVFNQ+nmYBs4VEZA474Dz4HfKdkTL8TxvXFzJ97QYHvCfHIm9FO2mbxBfjnwZ41VpmOqrI7yyZqFewOC/f/8Z9MrgiW03xh4L2dH8fBiAAgtAub6jMnsWoO2cTh5xi791mSQ4PmcyB4FEE/rFXnowhOYHB0xdRVch++76Yej9aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745013046; c=relaxed/simple;
-	bh=HagFl7z6xN8I9f+XuudThD+InMc6LpD5Ka4Ma5t57WY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bBEKymCdAXOv1RCJQLWxHyGwTuRTgszhonJWVp5wQXlAQqE3bYFD5knmuRrPJySUmGZmxZ5tyShQAnLu7Bkm1/F0KVgvwLI5ajoK40UH6LZhI8YPi6iBLim/an7FED0Pqjvr1AfsggqkrYOTmkNdP/e946A80yYGmv/K50LVZVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=RDCUMwXD; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1745013080; c=relaxed/simple;
+	bh=GrsHBemAKcPjEp79d7q/z2T/hCj/jYS0Q5kxkPeU1X4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FAzzaqIx5f7oilxC8Xw5edWLNy4Jr9LgmZDtOELXCEo/YQ9Ue1JONcke6El8PNDS+zPxQQKBpa906EsOgkvUb3XB74WJA/3gXButMzoOHqsS+Dg+/ALLpPcae5A2Ol6fF6rmO968zZH1LdGNq4M75Ui5HoZQa7wnIa41NZSWp08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S89nhWD4; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac25d2b2354so344059066b.1
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 14:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1745013041; x=1776549041;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GYDwI99I0Sbxp92gh+m023OrF6q+/dC+bfsOrz7jKeE=;
-  b=RDCUMwXDWUSZ4zhq+apuOyFDQGc4G5JCprhU1M+RhsYCy+j8VCXgG5Dm
-   Xz0QIdbl20XY498ry1MP1WG+ofSS2VkmTDMQ6WZnVfW/ay3yCX6+ulyEV
-   db665nNI5x6UHqtCinmZ2yVbDD7Iadhf4Qb3gLZj6LOJkFcGx0WQGqHEl
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.15,222,1739836800"; 
-   d="scan'208";a="192394243"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 21:50:38 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:51815]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.65:2525] with esmtp (Farcaster)
- id 65b40efd-3af0-438a-9e28-54f2cee39ac7; Fri, 18 Apr 2025 21:50:38 +0000 (UTC)
-X-Farcaster-Flow-ID: 65b40efd-3af0-438a-9e28-54f2cee39ac7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 21:50:38 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 21:50:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, "kernel
- test robot" <oliver.sang@intel.com>
-Subject: [PATCH v1 net-next] net: Fix wild-memory-access in __register_pernet_operations() when CONFIG_NET_NS=n.
-Date: Fri, 18 Apr 2025 14:50:20 -0700
-Message-ID: <20250418215025.87871-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
+        d=gmail.com; s=20230601; t=1745013077; x=1745617877; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xnkI66AmqzeFP1DhNLV2M5NnL/MyznI/HJZBSUSjVOk=;
+        b=S89nhWD4zZMnw46+FY5zys5/JJ5PpGPOB4zsegI9ZZeMxPsllGvDMz8X4sfrVC8oJo
+         jWKYnJjX8L3UIoT8ZmAq524Pm8i4bgP3DoPYFEL5RmRrkpI5rKVWefsl2MiwPcEMWte3
+         I08mYxBjOuPzzy8JkZXYqGRmcLJSKbn+ADyZ8XVqao9W9S78OLvG46gchqpOI1gQRvBu
+         bFd6YqLtF2bsWFy4lXIPW29ZLpjBqbbiZ1bFgv4Xj75pTaTD+GDQnhMWPS//1Da8Nf0b
+         Rnh7BDHoooy8d2antbf8g21/GqlPXu4GD/wDRWJuz4sh54RZOGVLV9xHI4xGFioqZmkO
+         FfwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745013077; x=1745617877;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xnkI66AmqzeFP1DhNLV2M5NnL/MyznI/HJZBSUSjVOk=;
+        b=q4A5BizYDhEACBwmpVfgbXjUD6QOmCKff637hQ60A+N5hCq0RimXN1zdoTA0QgOhJc
+         YlDp5pdp/qW9dBmKtkfP2JoQ07ZsvfY2LhYTvV8Ob3DTGVhELQooq6lOnK8PDww0bWKY
+         18Jz3cgxnLTay4S5Y33c1rAjjKUsgDrt6xd0dpp3t4ZK+zimGCD+1+6TyEV6B55bts9I
+         kjDFb8Abt+4TdMUhKRouPU7CpVPO3dhdujYugGzf+gQ26QMncopaaTcrKuftK+T5WdFy
+         1+dWQhQbhndVF1cUhH6Qsbf5LJ4GS/qKqMK1ZF/62GyJEhXuu6hj1zBtn2Z5IYYvDmco
+         CG1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUiKBlGzTiocWXekRopnyAEaFJzAPw5o/qoKnmAch3iW0Y2wyON/V4a29ameRBppqO1wf4BQKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKpL5WqoTvUjOlwIMzU1/kCqvloPyJ5xNuq2CvopyLCumF1JZ7
+	vITXEplYQ1tg/A3qWe3srO/sfYVy+dIBMgatddYOv00WLWo5IIUA
+X-Gm-Gg: ASbGncu6wJFFwQZAxbbcsUdkLh6yFqbDMOWeRxFA66giBTCu793z5K8oZERjBmfEuBN
+	FruokLHXyGA6u02S2NoGoaoAnis7ecZp5fCQ86ptkSJvrHMmHCNCTWkXsPX6elZfFi00qWHryNy
+	j8J8fN+a0QXPfOap+kkyhYKuDKWmeYu1qIsgsTu6UymJDLEmaIUGuqmt0ZvUezsTAW6yUSy8IZe
+	g/OvH3dulfXGPYG57ODOPfv9ygPc4SY0Kex5j1FOSrwah9zpYNz4EtYtBTrZSWvsA86El98efxs
+	cLu8SRO4eznPtjKqvRQFESPG54GGV4Egb19vc0x4YJAZHJ3Miw8RhgEsrcaZ5ibjtci9h0kkwdy
+	adrM6//uLag79QPnokaEvOR4QfDNgUSdFmQxhgaOcNKNPjOUYzBH8xQaLTNM3XBp/wcNvtb2v+9
+	1ty97g890czooMxXYDCWimzemoLXmORev1P9ppvK7QOW0=
+X-Google-Smtp-Source: AGHT+IG965aWjwot/tkHn0rcpwwRRjuq8Z0SBw25Nv196euYu+oku2K7RtK3EdmZS327/mXLNI0+Pg==
+X-Received: by 2002:a17:907:3fa7:b0:ac7:1350:e878 with SMTP id a640c23a62f3a-acb74d83ca0mr342638466b.46.1745013076370;
+        Fri, 18 Apr 2025 14:51:16 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:a14c:6800:4989:13c4:80b7:6063? (dynamic-2a02-3100-a14c-6800-4989-13c4-80b7-6063.310.pool.telefonica.de. [2a02:3100:a14c:6800:4989:13c4:80b7:6063])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-acb6ef475ccsm169382466b.137.2025.04.18.14.51.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Apr 2025 14:51:15 -0700 (PDT)
+Message-ID: <74a498d0-343f-46f1-ad95-2651d960d657@gmail.com>
+Date: Fri, 18 Apr 2025 23:52:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] r8169: do not call rtl8169_down() twice on shutdown
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ Niklas Cassel <cassel@kernel.org>
+Cc: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>,
+ nic_swsd@realtek.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20250415095335.506266-2-cassel@kernel.org>
+ <4f8d3018-d7e5-47e5-b99d-550f8a4011ee@gmail.com> <Z_-7I26WVApG98Ej@ryzen>
+ <276986c2-7dbe-33e5-3c11-ba8b2b2083a2@oss.qualcomm.com>
+ <Z__U2O2xetryAK_E@ryzen>
+ <jikqc7fz4nmwd3ol4f2uazcjc3zgtbtzcrudhsccmvfm3pjbfk@mkcj6gnkrljj>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <jikqc7fz4nmwd3ol4f2uazcjc3zgtbtzcrudhsccmvfm3pjbfk@mkcj6gnkrljj>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-kernel test robot reported the splat below. [0]
+On 18.04.2025 19:19, Manivannan Sadhasivam wrote:
+> On Wed, Apr 16, 2025 at 06:03:36PM +0200, Niklas Cassel wrote:
+>> Hello Krishna Chaitanya,
+>>
+>> On Wed, Apr 16, 2025 at 09:15:19PM +0530, Krishna Chaitanya Chundru wrote:
+>>> On 4/16/2025 7:43 PM, Niklas Cassel wrote:
+>>>>
+>>>> So perhaps we should hold off with this patch.
+>>>>
+>>> I disagree on this, it might be causing issue with net driver, but we
+>>> might face some other issues as explained above if we don't call
+>>> pci_stop_root_bus().
+>>
+>> When I wrote hold off with this patch, I meant the patch in $subject,
+>> not your patch.
+>>
+>>
+>> When it comes to your patch, I think that the commit log needs to explain
+>> why it is so special.
+>>
+>> Because AFAICT, all other PCIe controller drivers call pci_stop_root_bus()
+>> in the .remove() callback, not in the .shutdown() callback.
+>>
+> 
+> And this driver is special because, it has no 'remove()' callback as it
+> implements an irqchip controller. So we have to shutdown the devices cleanly in
+> the 'shutdown' callback.
+> 
+Doing proper cleanup in a first place is responsibility of the respective bus
+devices (in their shutdown() callback).
 
-Before commit fed176bf3143 ("net: Add ops_undo_single for module
-load/unload."), if CONFIG_NET_NS=n, ops was linked to pernet_list
-only when init_net had not been initialised, and ops was unlinked
-from pernet_list only under the same condition.
+Calling pci_stop_root_bus() in the pci controllers shutdown() causes the bus
+devices to be removed, hence their remove() is called. Typically devices
+don't expect that remove() is called after shutdown(). This may cause issues
+if e.g. shutdown() sets a device to D3cold. remove() won't expect that device
+is inaccessible.
 
-Let's say an ops is loaded before the init_net setup but unloaded
-after that.  Then, the ops remains in pernet_list, which seems odd.
+Another issue is with devices being wake-up sources. If wake-up is enabled,
+then devices configure the wake-up in their shutdown() callback. Calling
+remove() afterwards may reverse parts of the wake-up configuration.
+And I'd expect that most wakeup-capable device disable wakeup in the
+remove() callback. So there's a good chance that the proposed change breaks
+wake-up.
 
-The cited commit added ops_undo_single(), which calls list_add() for
-ops to link it to a temporary list, so a minor change was added to
-__register_pernet_operations() and __unregister_pernet_operations()
-under CONFIG_NET_NS=n to avoid the pernet_list corruption.
+There maybe other side effects I'm not aware of.
 
-However, the corruption must have been left as is.
+IMO a controller drivers shutdown() shall focus on cleanup up its own resources.
 
-When CONFIG_NET_NS=n, pernet_list was used to keep ops registered
-before the init_net setup, and after that, pernet_list was not used
-at all.
-
-This was because some ops annotated with __net_initdata are cleared
-out of memory at some point during boot.
-
-Then, such ops is initialised by POISON_FREE_INITMEM (0xcc), resulting
-in that ops->list.{next,prev} suddenly switches from a valid pointer
-to a weird value, 0xcccccccccccccccc.
-
-To avoid such wild memory access, let's allow the pernet_list
-corruption for CONFIG_NET_NS=n.
-
-[0]:
-Oops: general protection fault, probably for non-canonical address 0xf999959999999999: 0000 [#1] SMP KASAN NOPTI
-KASAN: maybe wild-memory-access in range [0xccccccccccccccc8-0xcccccccccccccccf]
-CPU: 2 UID: 0 PID: 346 Comm: modprobe Not tainted 6.15.0-rc1-00294-ga4cba7e98e35 #85 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:__list_add_valid_or_report (lib/list_debug.c:32)
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 5a 01 00 00 49 39 74 24 08 0f 85 83 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 1f 01 00 00 4c 39 26 0f 85 ab 00 00 00 4c 39 ee
-RSP: 0018:ff11000135b87830 EFLAGS: 00010a07
-RAX: dffffc0000000000 RBX: ffffffffc02223c0 RCX: ffffffff8406fcc2
-RDX: 1999999999999999 RSI: cccccccccccccccc RDI: ffffffffc02223c0
-RBP: ffffffff86064e40 R08: 0000000000000001 R09: fffffbfff0a9f5b5
-R10: ffffffff854fadaf R11: 676552203a54454e R12: ffffffff86064e40
-R13: ffffffffc02223c0 R14: ffffffff86064e48 R15: 0000000000000021
-FS:  00007f6fb0d9e1c0(0000) GS:ff11000858ea0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6fb0eda580 CR3: 0000000122fec005 CR4: 0000000000771ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- <TASK>
- register_pernet_operations (./include/linux/list.h:150 (discriminator 5) ./include/linux/list.h:183 (discriminator 5) net/core/net_namespace.c:1315 (discriminator 5) net/core/net_namespace.c:1359 (discriminator 5))
- register_pernet_subsys (net/core/net_namespace.c:1401)
- inet6_init (net/ipv6/af_inet6.c:535) ipv6
- do_one_initcall (init/main.c:1257)
- do_init_module (kernel/module/main.c:2942)
- load_module (kernel/module/main.c:3409)
- init_module_from_file (kernel/module/main.c:3599)
- idempotent_init_module (kernel/module/main.c:3611)
- __x64_sys_finit_module (./include/linux/file.h:62 ./include/linux/file.h:83 kernel/module/main.c:3634 kernel/module/main.c:3621 kernel/module/main.c:3621)
- do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
- RIP: 0033:0x7f6fb0df7e5d
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
-RSP: 002b:00007fffdc6a8968 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-RAX: ffffffffffffffda RBX: 000055b535721b70 RCX: 00007f6fb0df7e5d
-RDX: 0000000000000000 RSI: 000055b51e44aa2a RDI: 0000000000000004
-RBP: 0000000000040000 R08: 0000000000000000 R09: 000055b535721b30
-R10: 0000000000000004 R11: 0000000000000246 R12: 000055b51e44aa2a
-R13: 000055b535721bf0 R14: 000055b5357220b0 R15: 0000000000000000
- </TASK>
-Modules linked in: ipv6(+) crc_ccitt
-
-Fixes: fed176bf3143 ("net: Add ops_undo_single for module load/unload.")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202504181511.1c3f23e4-lkp@intel.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/core/net_namespace.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 48dd6dc603c9..42ee7fce3d95 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -1314,19 +1314,19 @@ static void __unregister_pernet_operations(struct pernet_operations *ops)
- static int __register_pernet_operations(struct list_head *list,
- 					struct pernet_operations *ops)
- {
--	list_add_tail(&ops->list, list);
--
--	if (!init_net_initialized)
-+	if (!init_net_initialized) {
-+		list_add_tail(&ops->list, list);
- 		return 0;
-+	}
- 
- 	return ops_init(ops, &init_net);
- }
- 
- static void __unregister_pernet_operations(struct pernet_operations *ops)
- {
--	list_del(&ops->list);
--
--	if (init_net_initialized) {
-+	if (!init_net_initialized) {
-+		list_del(&ops->list);
-+	} else {
- 		LIST_HEAD(net_exit_list);
- 
- 		list_add(&init_net.exit_list, &net_exit_list);
--- 
-2.49.0
+> Also do note that the driver core will not call the 'remove()' callback unless
+> the driver as a module is unloaded during poweroff/reboot scenarios. So the
+> controller drivers need to properly power down the devices in their 'shutdown()'
+> callback IMO.
+> 
+>> Doing things differently from all other PCIe controller drivers is usually
+>> a red flag.
+>>
+> 
+> Yes, even if it is the right thing to do ;) But I agree that the commit message
+> needs some improvement.
+> 
+> - Mani
+> 
 
 
