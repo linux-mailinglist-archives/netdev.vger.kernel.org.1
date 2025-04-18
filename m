@@ -1,315 +1,195 @@
-Return-Path: <netdev+bounces-184200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1F9A93B4B
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:50:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63396A93B57
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39B718E2635
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA9331B626FA
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAD521518F;
-	Fri, 18 Apr 2025 16:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED7E215F6A;
+	Fri, 18 Apr 2025 16:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FOkk5dRx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SX1xB9Zg"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2083.outbound.protection.outlook.com [40.107.100.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90926214225;
-	Fri, 18 Apr 2025 16:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744995030; cv=fail; b=uHpKLGPAIhl+5yYc1Rykm7A3VBiC3qnJS7rLKzyNwXWbvbulwDz4TalGlyEnqXqlDZ8sJiL5NsuGCXmtHXZq13WKtZLTyM+iUXuENXDb17f0sBa5WVceI0OCxssF8eCMo1jY9N2ekv2UB0/4vucWX0mtzqU1npiwqgcT56ebH+0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744995030; c=relaxed/simple;
-	bh=tcEk99UlNuxGsQjR7j7DkmkSW0+izkfUkJO5RcFaJTI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QKmgxoBy2vNHuiXaj0x6O4SyTMpOHn6s+FzRnURhtPrg/VcmZyqzooOocEzJuvrvu2JDbuXotY//Ccguy2uTC9IQDCEQ9+64Ml+byi3WasxjzXzuCqoU7g5caVa6UGUV/TTlANJ0vw/VWk9FDz9UqGxYO7RD1wHi1a01WlzqobA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FOkk5dRx; arc=fail smtp.client-ip=40.107.100.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=khZglBvmjINkYPYrz7SAiW9rmtH+FOoR4Aswrwvrfqv1I9B/yMdOMex+dC1lOpg08nCi6odZnOAdcwTbG7LCKv8coS88jJ931P7OwCRC8F6WZVASFtBxL5Xchn+DBFmVo2FvV93MiAwpmMFKVA86JfWCM4aLGc3w8pZNNhzmKKsUz6HgZMvIF34JlTgh1uNTS2+hVmN8dXBW09mFmvY91ttCdEsibA05j6Jq11tGZDuHMhRdMirGCFi7rbqGvodPiZ5vq7Sw90UvWG4X4C2UJVxWIJ0snPh1RmvFPSolrG08SwgL3JIEVVcGf8LHoISg9SjiNQJDA3fmibsfqrjNvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JOMx7JTC/OZeeaYAuUFQEFTVaTsTy9TIZdiHQBCZrbw=;
- b=OzgG3xQcsC7ZlrsTL0AO0XSEKoKb6/lMQq82rP3KmBRuFoOY3ssrCIpARyfFQa5HsrZ5MtcSzo829HDJNWgrPX/4RWg+7A7qSe6go5eKvR7RhXTMOnwiNgpB9EvGa1zLcTqQJZbf5LRYxxtWJAV4mZznSWfivkRCsqsP9gy8j1RqhRlh9VQjXvjIuoZAy2ZdtyCNaLBfaWeFKMd+HBiPkhVViwxKvLnAEbm7e8xwO8AjmPQkK/5Gwhh06WA7MNxEdCCkiDGVhWz9CZJxIv+oJ3zfxIeZPQUrC+yqy2mjYHO8rapR3cvMZE2M4aebbjwyxmRt8THIlzxqao9lxkK0Lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JOMx7JTC/OZeeaYAuUFQEFTVaTsTy9TIZdiHQBCZrbw=;
- b=FOkk5dRxIcK2Da1qnBdz+koirnqDVkKaKWPA/LS6OBxzKVKa7tIZHbIm1EAum2dWnHmuEWxRSTZ5SvJ4GGFue8y5vKcTWVLyS6U1nMAlHMA4dFs0lV6o7FSunyctsR/mPGoVJMLhUWHSfXC0bAEqJPPCcRYbW7PiL/B6Mufw6S8qiAaSerjXPs6Vx9WEwWQ471WkJxM53+Vicp1GIWpUX9A58g55V14JvMgf6Jwd7PwEwfb1Z0JXmMEsmjOn2AUKZHzGev8W/0YUeA14oochGArJ+69TIihnGk1Ty4BmyTaDP7RwROaJJYcvfXFF91i0p0SbWVqZVWBgozHB1Kon5w==
-Received: from DM6PR12MB4313.namprd12.prod.outlook.com (2603:10b6:5:21e::17)
- by IA0PR12MB8975.namprd12.prod.outlook.com (2603:10b6:208:48f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.25; Fri, 18 Apr
- 2025 16:50:25 +0000
-Received: from DM6PR12MB4313.namprd12.prod.outlook.com
- ([fe80::4d58:4bbc:90a5:1f13]) by DM6PR12MB4313.namprd12.prod.outlook.com
- ([fe80::4d58:4bbc:90a5:1f13%3]) with mapi id 15.20.8655.029; Fri, 18 Apr 2025
- 16:50:25 +0000
-From: Sean Hefty <shefty@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: "Ziemba, Ian" <ian.ziemba@hpe.com>, Bernard Metzler <BMT@zurich.ibm.com>,
-	Roland Dreier <roland@enfabrica.net>, Nikolay Aleksandrov
-	<nikolay@enfabrica.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"shrijeet@enfabrica.net" <shrijeet@enfabrica.net>, "alex.badea@keysight.com"
-	<alex.badea@keysight.com>, "eric.davis@broadcom.com"
-	<eric.davis@broadcom.com>, "rip.sohan@amd.com" <rip.sohan@amd.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>, "winston.liu@keysight.com"
-	<winston.liu@keysight.com>, "dan.mihailescu@keysight.com"
-	<dan.mihailescu@keysight.com>, Kamal Heib <kheib@redhat.com>,
-	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>, Dave Miller
-	<davem@redhat.com>, "andrew.tauferner@cornelisnetworks.com"
-	<andrew.tauferner@cornelisnetworks.com>, "welch@hpe.com" <welch@hpe.com>,
-	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
-	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Thread-Topic: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Thread-Index:
- AQHbjuwVUw9AWIkXnUa8bbJSM0sPK7N6v4MAgAgXf4CAAAnsgIABEwYAgAAgrcCAAYj9gIAAAVBQgAARqYCAAABpoIABaOyAgAaJkiCAAUvLgIAAK6TwgABCwQCABHrAgIAAgVrAgARv/wCADl708IAAJ/AAgAAB6bCAAMnAAIAAa3zw
-Date: Fri, 18 Apr 2025 16:50:24 +0000
-Message-ID:
- <DM6PR12MB4313E0C29EA74A94748EBD53BDBF2@DM6PR12MB4313.namprd12.prod.outlook.com>
-References:
- <DM6PR12MB431332A6407547B225849F88BDAD2@DM6PR12MB4313.namprd12.prod.outlook.com>
- <20250401130413.GB291154@nvidia.com>
- <DM6PR12MB43130D3131B760AF2A0C569ABDAC2@DM6PR12MB4313.namprd12.prod.outlook.com>
- <20250401193920.GD325917@nvidia.com>
- <56088224-14ce-4289-bd98-1c47d09c0f76@hpe.com>
- <DM6PR12MB4313B2D54F3CA0F84336EB71BDA82@DM6PR12MB4313.namprd12.prod.outlook.com>
- <c1b9d002-85f5-420e-b452-d6f2a11720d4@hpe.com>
- <DM6PR12MB4313339425CB8921299AB9CCBDBD2@DM6PR12MB4313.namprd12.prod.outlook.com>
- <20250417012300.GC823903@nvidia.com>
- <DM6PR12MB431337B52F88E8E22323E066BDBC2@DM6PR12MB4313.namprd12.prod.outlook.com>
- <20250417133156.GG823903@nvidia.com>
-In-Reply-To: <20250417133156.GG823903@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4313:EE_|IA0PR12MB8975:EE_
-x-ms-office365-filtering-correlation-id: 70b138dc-5d2f-45c0-0441-08dd7e991dd4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?uZ4Rw1/OzWeQYmLERIE2Xk71KoI1osMSUV30ChbHG1Sjfet32UpMPSeCq6qm?=
- =?us-ascii?Q?r4Hoz+jJ7LsQB1DDYIbnWuVT/d73T2p49P+t2WGedbMP8EocBCt50XIdsdF1?=
- =?us-ascii?Q?dPvIJxsTsOYKGEoc85XDEpaGuSXsDlc3MrENa7Jrd95XxqvOc0fFt3Sj7hUS?=
- =?us-ascii?Q?6WjBtikZcRGxDIwYrykKcStlK2Dr8S672+4vjrFQw1UGZ8KiCAn15z0EtTzM?=
- =?us-ascii?Q?e2GmaDcEOpaY5hNKjzXPBa6ZKQmDJMwdBTFeFW7WNQk1XnqtNWo92rHsYfqQ?=
- =?us-ascii?Q?OpxTyJ0JFYs1utFbWfK8Dy771Dzjkm0iHhGXRfxFwrtmKqLpP08d+JZbZm+O?=
- =?us-ascii?Q?HOu2G7sgCE6vNeRdSeRHYU+3zicwWVIr0J1E1BWNANw9ozpMvdLZc7idjOrC?=
- =?us-ascii?Q?zsNZ3LuTaR7/WNN5x0W5MexkSJvgG+0S8SUtUngznskM+RB5ACuRvWpd4mS4?=
- =?us-ascii?Q?sGPOfhnFV4d1GZeU7HplF1OTcWUyaoROyOToZGoETe1X4fze1k/oAW+HF0Og?=
- =?us-ascii?Q?hFUlAxUiy3oLNeTjF6AxRQUbFKcptQHSpUuMJKN8Q0MAl1Z2xful5Fj4kW9V?=
- =?us-ascii?Q?Qerr+YKSXpBJkzZ50RJb7gUbmExam6lhGv26Xf1PXNAIaiD7+RsevYmOJX5U?=
- =?us-ascii?Q?5if6MRJd2UC2duwTtSL7qYfEr0Lq3JLHj6Mb3sOQQwpCwBLXy50l0vl28Hkp?=
- =?us-ascii?Q?0CGxx+fCtNAZNqEwIEUr3IDYNVuLqkWdmShV2PzCmBMAu4qND29zT7c09JnD?=
- =?us-ascii?Q?r6/PSdIaJJDPe4xmRlyUDpUy3A2QUDyexNv94wLb8v/hEGmsSu1ftW/AvDh6?=
- =?us-ascii?Q?Te1A2dv9V4s1/LZSZZjGrzJ092aI5rwgM081g1pN5cE7VQd2rAabJPNTFshz?=
- =?us-ascii?Q?1NcE1+DJ2NdqefThikVK3i3O370gUX7cP97pJJKyid6P47+yJXNDbAZQjH58?=
- =?us-ascii?Q?RlTFaYegFfA4hFMl+L9MkEjkwMCpsrCbYkieMWbT/Kpbwt2Hn2gHTIEB6V02?=
- =?us-ascii?Q?OftEBKJu/D79DShQJDt6XQy+D4LPpmFFEzPeL2R9hFOhMe3BBozBUpWQP/Ic?=
- =?us-ascii?Q?rDc4k9eaEMNY1/McfAl3QidogmHbLM0DSNq1qBOJ5zwHivn041R/qb5uC8zU?=
- =?us-ascii?Q?1Grv/2nahJBSUm1PgPwIQWaP4vXtSQuYvPEHXWMOtQGAfmAdzPjKnubLHvZt?=
- =?us-ascii?Q?b0YwdQQzmIr4Sb7FrgBDfdE2qGT/h3LPH/2y8Lk8e2i0/QDpV22chLbxkNPZ?=
- =?us-ascii?Q?6X4DOq0KMkaske2kWjsw9m+vw/6wH3IURdevMIxbhaO3Q6qkz/+KtwLXRuq3?=
- =?us-ascii?Q?g0rrOo99t4+LJDZnmfu0zhWq/70Q2kc2wlLKlWJUY0d7bc/Ya7UsfmyJhKYT?=
- =?us-ascii?Q?wy/KuLJUifbY7cXJZ+TdZ0Xui7VeKLtJB2X0y8/ejcBKZJna3ZinD5DaDlpH?=
- =?us-ascii?Q?n87I1EXo7N9Wm1Y2NuADDSGkXr6JUyOZEkLuR+a7vEGF9jQ66GNfzpcPj7Mx?=
- =?us-ascii?Q?GbEbqrfyL8pKieo=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4313.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?O0ivOQ0dmju+HDQN0NaL4MiywHk2yASUWDfX1pFBdnMSzHf2c6EBg1vKU8lV?=
- =?us-ascii?Q?JSgH0mYWRa2jxQazra1WkNsWXAqCz41bibznUsA7EmX6XMHMp8HXeAjViS79?=
- =?us-ascii?Q?uX5I9Y/BovshLCT4NliBbiMHntguUzjLCiUHo46DSrdSQOgtT5xttAFYEPdZ?=
- =?us-ascii?Q?Vz6fkvMjKO9C/ekwQOx0+yRQWNSagP1fNtqiICnTcUlsHgIfF3UvTym2g+rI?=
- =?us-ascii?Q?4QEIViorp0TLFTVPfcJ/r6yAq9ViVLnz7eNSQWPIVgLBB8HfJRgEE31VRC2P?=
- =?us-ascii?Q?QxLRnFQJe+KtQsl8y6P+1Kbvs3DUogirTj9yAZqQInRFvm1VIp/06VsSqPq+?=
- =?us-ascii?Q?ME3JPYErjkXfB9APID+5C0C1+sOUvFd60LWTfkkOQRIiY3/4DvbAg4zn0Vhg?=
- =?us-ascii?Q?tS9/AJhUwDWMoF57LGhE5642lSIpQrvh5txczxBpL3fjbTb9UJQctdRNILc9?=
- =?us-ascii?Q?SMPVYiCDw+M3ly4vx7cBnUkH1SQ8q1naG16JtcNlSFnmhxH0LNfjSrMuR+Ws?=
- =?us-ascii?Q?PRFviiSMxw2hIk3IDTCoYMfkEAZm38pc//bWN3jfFoo3bdD25TgXV0hkhPSr?=
- =?us-ascii?Q?NDUgwuXCAIdFdq68DKzefJ4QKgzO6zh7LgHLulLCK2uLqVYRQtZLXgdzrj30?=
- =?us-ascii?Q?s9mGg3Nypustvg9+kcZh7A45bVbWJy0ezu3ZYtzMUXoQdst0OvvW0qQj5sa/?=
- =?us-ascii?Q?Aw9I3wkpyuWHG7GAEkZ44VGcOGNmkDHkish7Aot+X7a+Qil6xeofKO+Y2U1E?=
- =?us-ascii?Q?gzmFi+XDXiuAWSRnRPv83lYYxteHMKbIkAU+yplyFdGukvyx4GeX+YXG3MDO?=
- =?us-ascii?Q?PJkNDtqJvnw0UF5upeX3AL5INbI/g4arf4zI66cvYbSh4IG0drmIL8j3rwZk?=
- =?us-ascii?Q?aenv2PIMG6a4SPTgcgY5AXObIEFnBRKsWi2i8sFZBb91hYX/vNj6QlzLuJ+4?=
- =?us-ascii?Q?Yc3MwgVnrH78P6UYnmv6VSHMhGRbjyfwOUyMQSd4eCpQWHYF52LglgUYyIGw?=
- =?us-ascii?Q?UUgW/45eVfUaMfwaqnJGDo7oK24W4tg3LtP8Mg91IjwCQ3+1yClV1QkV6hht?=
- =?us-ascii?Q?z+0em7kpquhIkusOSJHS3HrFoXjjpJYq04oJm0NxMom2Iu7VImiDRBZLEfrD?=
- =?us-ascii?Q?sH1kSCsVjL4Wyhg4JcKB9IcA1mMb4XADuHjPrsjeQMG7E4cRG94vVlglxaRZ?=
- =?us-ascii?Q?mu4jJaO6iW/eXxGcN0nG4QbhgkAGoXWpu/+SbO9AbZTFvG3daj4sIUuNmL6d?=
- =?us-ascii?Q?nsa6HRyuVhfzb/giYwsea/eGIs0oLQGl4Jr3dGZFc+ywd3cB9NKfgHML1H53?=
- =?us-ascii?Q?0+bBw7VkInRkPdwCSbJ1N5jX79le+O2A2sE/4KVeVP3953SS7XrjjeTPERbE?=
- =?us-ascii?Q?dUoqUg6F3PAe6TlPTX+9lCh+5FDoiRo120iS+m4i9wgHNKZK6JbdMOXDwsq+?=
- =?us-ascii?Q?v8nUIZzN/NS73PHbLC+/isSbY5RWBuJzmD03YIadHBOYyxPx0h+EC/T2RtB5?=
- =?us-ascii?Q?4yuVHcw6u79yvd42YSJEBciMqOHdg+8O1rlFR4KsxrWNGwTEtYFOGTpXywx/?=
- =?us-ascii?Q?9QugjosA8RqvWgIGaSE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D923C1A8F68;
+	Fri, 18 Apr 2025 16:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744995182; cv=none; b=WMR5Z0vDXkdXT4PsGxBnsyEcM88uO6xI8W85tMoaTaWtyI2Inlt4bMaUFjukAmiidM/qa3JrBIwstx0P1mVB/q8AsEMF8A0NYakZRDpxj4n7vIQ3JY2HciFfPuoyPqGFnksAg6y4GVWUg92LASSLqFgQp7FOds5i5L4vcpKak34=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744995182; c=relaxed/simple;
+	bh=7ha/e0G3a8sbA2/WeW5mYHCAMwN/zvWodNX479770bE=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IsWbx9Khtw1Ubl3XGvs78GejPKy39imAofCMC6kYXfLpvZflWB9lHfHJyaMYQSDhB+HNxhleqrXYdCM2iWlll8QUCBR0jToqB3xa9V/9ShC+Vp8gvD5IKfiECwjW/o6f5lhLPfpzvzHi/vo+RrOQQqP3goK7c2DfgOXN61moGSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SX1xB9Zg; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c55500cf80so157236785a.1;
+        Fri, 18 Apr 2025 09:53:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744995180; x=1745599980; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oNw7DSuc1b1b/tQR7WjbohbZojv201rKGbihKbhU4NY=;
+        b=SX1xB9Zg1c7fBqMNIaOqtkStfZQXqminhiSbd8+gPLQOdreNQm/6hGN8Bir3pBTPaO
+         Df0id00b8kfDrUbQeWMSxiFepSlr2qzMZPAkxm8i6AMscwmZBc62mt2ejm2/Xjb1eTvd
+         nHX2eRPpNYsswNCtIW8ul1X/O/MV6htBQSjH+yP/68thKQ9wiSNgjZIdmdvVLyfhmGqG
+         15TmIDo/wA7O43gsLgJ4SSMylo4lSckg0AP+3dICmCqaNN0OH1WG7cexx3uXy6I/+eqn
+         t5L/O0oKzpg6Dcy0CaalqB5VC4WySmqTtadnSxKTzs/uzO0nrIxwSqfyPs6gI+NiivFz
+         mXfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744995180; x=1745599980;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oNw7DSuc1b1b/tQR7WjbohbZojv201rKGbihKbhU4NY=;
+        b=ReJEnXgdVrTcTL5tTwissCpo187GG4K6TqJOo5KIqrkzMfZVA7FWeScus7UzEsZQYE
+         E3yb0ADiHad0B0skLi7++PTmbaFcudDJb2HUEkS8Yx7Hyr9V1aSJfp4zLfElAFMYMt6d
+         RiTlw2BrNLjdhaC1bZkK9JHxrg3deMgWFIARKCiX0Hl3ePrSHL5q/tKObQzFj8LtB+MU
+         1dCvomiQFHH0gQmwgAmgdVTEgrBIQPr4aZYiTyai8uLA3jJwxPhpA8QomuTc/lbSBeay
+         tbl9ngq8d4Mth/RQj+1q1uU48cQIUXCN3ODBgShpDMbcVAlzEdr8nivOSmOOeXc9UjOV
+         kh3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUlRA1Zxx63EeynA7uH7DsGWoU4BgCYoq+Q6og2dGzytS0g6nGYBRMq7fZzLZIVldDOLUdZ99npDp5p@vger.kernel.org, AJvYcCV3JlAhnpFRy0mBTU9kWagkpcYUToZrqpg5vTT9f7TeuuRXlWVLkJknM4Yg+nHOG8Y7L2NvUQK9+A1nv6uspDk=@vger.kernel.org, AJvYcCV9bj4MFi+Y5Mqihwc4S+KZ2OUB/AjT6/3THTtTckdimxKtjai9+grbIwl5l7MNFDMMTmvj04Uk@vger.kernel.org, AJvYcCWG7UCnxjcauMajlA5UYSZlaLhn9R8nabyScAIuvip/LrJV0SrjPYufPlZLyJkk7hlSumzr8tK9i5IeQrt4u5HD@vger.kernel.org, AJvYcCX2xp7QMzYw/7KE46c+y4oxRDriD6Gzqf5T+taJaVq5NggsgSKUmibpvS8xcPWmREaxMT7N4Q/W3j1eX22k@vger.kernel.org, AJvYcCX5SgGWVIijXnyz9KrfY3XtMZpbRz9doW/eoSo2PN/09BDuD2vCDH271uw/eVEJKNbybRWvGKbkKn0a@vger.kernel.org, AJvYcCXApVKTssWHDs+agRT7drR3Zef+qK+OFsakDXXpJ1ZbEMGfDXeTzS/66avBDUSToLxt1/LLwfG1fMeFcTWW@vger.kernel.org, AJvYcCXJ9Dt8R/Df48q9AIDUHH+G+iDjA5ur6VCAoyvsk6n85FdX18dRNe9Kh7EMtlk1pTctkACqc63JtWSdRJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU42sHoI+XxNmH9sxxOuPBe0GC51D7bhXMoppGN0GZK8U1vIQF
+	YGRWa1stm84CeXNEne4WwHVJ/598p8Iu+D918XlV8HYbKqt8wloD
+X-Gm-Gg: ASbGncuqcxThAsGXM5Xoo+4Nk4oqcFq7mVrS6aXpEhy9sRsC8sK+N6Ac+8ZvhWTMC4M
+	ZvgOZXbK/8X9qaoly7s2RTsZyEvTYFUwvUPyJIoNQl06KEI6BnT88ltPjeD+H//pcjUGFb3uL4C
+	1bVlS+kOkczBe8CmV9wT6VExBJp9GK0a7KWIhiMtD/NR4hY1/9kufJ2d5rV2pwQiYkh9yFA50Jm
+	si9EkD4hBMehkV7VRFD4tX5qDk9ljpVfewMMxtXuZneexnqgmjSZxSAMN4APHS/3d+mZXBAShoQ
+	v2R8c9uhTxO8Wu/0LN5MdAM0o4rz91aVWwhZl/kPo4cN5LUrVD0FQhiqU5j+pHv7jGVU9GHRJUZ
+	sexl0Zfd38b6PShuoG6Ik1QYyzZrTVYg=
+X-Google-Smtp-Source: AGHT+IEb3fceJw+dZWVtEoGjTerF7JyoRkbAClnyB6MVaGC4XY7lcq4tKGDfYC7mQk5UEncSaslEvw==
+X-Received: by 2002:a05:620a:3902:b0:7c7:766d:9b00 with SMTP id af79cd13be357-7c928038e23mr627309985a.36.1744995179616;
+        Fri, 18 Apr 2025 09:52:59 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925ac2f27sm124748885a.54.2025.04.18.09.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 09:52:59 -0700 (PDT)
+Message-ID: <6802836b.050a0220.8ee39.6127@mx.google.com>
+X-Google-Original-Message-ID: <aAKDZ5kSMjxy9QnW@winterfell.>
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 186311200043;
+	Fri, 18 Apr 2025 12:52:58 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Fri, 18 Apr 2025 12:52:58 -0400
+X-ME-Sender: <xms:aYMCaGiBRtaR8iknc_xskLJOB8VTs9S1W9JyC1JU5TD15hae7tojww>
+    <xme:aYMCaHClHlgvfEQkHBvmPT2XfNzxJ7wQjwiOGyoT5xa_fr2CiCyhLN2A9Sq8HQb6V
+    A0NEQ-pZuPxMzSkXg>
+X-ME-Received: <xmr:aYMCaOFoT6jyQnGwjLer67uY_MehMXt3Kbe1St3HwspL8N-0cmqDyy0S7euXPg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvieekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegoufhushhpvggtthffohhmrghinhculdegledmnecujfgu
+    rhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhunhcuhf
+    gvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtthgv
+    rhhnpeekjefgudefhfeigffghfdtheeggfdtuddvkeejleffheeufeffteetvefgfeeuje
+    enucffohhmrghinhepghhithhhuhgsrdhiohenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrsh
+    honhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghn
+    gheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepge
+    ejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtrghmihhrugesghhmrghilhdr
+    tghomhdprhgtphhtthhopehmrghsrghhihhrohihsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilh
+    drtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthho
+    pegsjhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvg
+    hnnhhordhlohhsshhinhesphhrohhtohhnrdhmvgdprhgtphhtthhopegrrdhhihhnuggs
+    ohhrgheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:aYMCaPQ5WRQi4ezG9Qk-AFmdDJ__dW_PwpYgl2ZGnixoi8EAPax18A>
+    <xmx:aoMCaDypQhXfoYJdrJ0ZnhgWHOI7v4f6mVFK3ihH5qz7ixHDOWvp3Q>
+    <xmx:aoMCaN6SpH1uY9ZEyhvuonCLQxvKZcFOF3PzFrbkvJY_DtPrWwpkWQ>
+    <xmx:aoMCaAyOS7aoe6ja6OTwTIyHlmPV5JvenWFRBpp2TkM5RdSUgjVhCA>
+    <xmx:aoMCaPgPi-PlrwmNI9mBfcB5Aez3ipK3r0ILVf4aeJraWrdbLNrGh0KC>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 18 Apr 2025 12:52:57 -0400 (EDT)
+Date: Fri, 18 Apr 2025 09:52:55 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v10 4/6] rust: enable `clippy::as_underscore` lint
+References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
+ <20250418-ptr-as-ptr-v10-4-3d63d27907aa@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4313.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70b138dc-5d2f-45c0-0441-08dd7e991dd4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2025 16:50:25.1385
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tyEI6seW8YnSb0lPY+y7W+zwbrAxvxI+9++Wjk3tPtAwa3G785trFRvRGMpPIVNC6GBRgiMkpMBfiB+qwzpydQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8975
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250418-ptr-as-ptr-v10-4-3d63d27907aa@gmail.com>
 
-> On Thu, Apr 17, 2025 at 02:59:58AM +0000, Sean Hefty wrote:
-> > > I think the "Relative Addressing" Ian described is just a PD
-> > > pointing to a single job and all MRs within the PD linked to a single=
- job. Is
-> there more than that?
+On Fri, Apr 18, 2025 at 11:37:20AM -0400, Tamir Duberstein wrote:
+> In Rust 1.63.0, Clippy introduced the `as_underscore` lint [1]:
+> 
+> > The conversion might include lossy conversion or a dangerous cast that
+> > might go undetected due to the type being inferred.
 > >
-> > Relative / absolute addressing is in regard to the endpoint address.
-> > I.e. the equivalent of the QPN.
-> >
-> > With relative addressing, the QPN is relative to the job ID.  So
-> > QPN=3D5 for job=3D2 and QPN=3D5 for job=3D3 may or may not be the same =
-HW
-> > resource.  A HW QP may still belong to multiple jobs, if supported by
-> > the vendor.
->=20
-> Yes, but I think the key distinction is that everything is relative to, o=
-r contained
-> with in the job key so we only have ony job key and every single object
-> touched by a packet must be within that job. That is the same security mo=
-del
-> as PD if the PD has 1 job.
+> > The lint is allowed by default as using `_` is less wordy than always
+> > specifying the type.
+> 
+> Always specifying the type is especially helpful in function call
+> contexts where the inferred type may change at a distance. Specifying
+> the type also allows Clippy to spot more cases of `useless_conversion`.
+> 
+> The primary downside is the need to specify the type in trivial getters.
+> There are 4 such functions: 3 have become slightly less ergonomic, 1 was
+> revealed to be a `useless_conversion`.
+> 
+> While this doesn't eliminate unchecked `as` conversions, it makes such
+> conversions easier to scrutinize.  It also has the slight benefit of
+> removing a degree of freedom on which to bikeshed. Thus apply the
+> changes and enable the lint -- no functional change intended.
+> 
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#as_underscore [1]
+> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
 
-Relative addressing does not constrain the QP to a single job.  QPN=3D5 job=
-=3D2 and QPN=3D4 job=3D3 may be the same HW QP.  There's a per-job table/ha=
-sh/tree used to map QPNs to HW queues.  A multi-port NIC may need separate =
-per-job tables per port.
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 
-(Let's ignore how the QP addressing gets assigned...)
+Regards,
+Boqun
 
-> > As an example, assigning MRs to jobs allows the server to setup RMA
-> > buffers with access restricted to that job.
-> >
-> > I have no idea how the receiver plans to enable sending back a response=
-.
->=20
-> Or get access to the new job id, which seems like a more important questi=
-on
-> for the OS. I think I understand that there must be some privileged entit=
-y that
-> grants fine grained access to jobs, but I have not seen any detail on how=
- that
-> would actually work inside the OS to cover all these cases.
->=20
-> Does this all-listening process have to do some kind of DBUS operation to
-> request access to a job and get back a job FD? Something else? Does anyon=
-e
-> have a plan in mind?
->=20
-> MPI seems to have a more obvious design where the launcher could be
-> privileged and pass a job FD to its children. The global MPI scheduler co=
-uld
-> allocate the network-global job ids. Un priv processes never request a jo=
-b on
-> the fly.
-
-My guess is storage is allocated and configured prior to launching the comp=
-ute nodes using the mechanism being defined.  Once the compute portion of t=
-he job completes, the storage portion of the job is removed.  I have not he=
-ard of a specific plan in this area, however.
-
-> > The second feature is called scalable
-> > endpoints.  A scalable endpoint has multiple receive queues, which are
-> > directly addressable by the peer.  Different jobs could target
-> > different receive queues.
->=20
-> That's just a new queue with different addressing rules. If the new queue=
- is
-> created inside a new PD from it's endpoint are we OK then?
-
-I.. think so.
-
-> > I've gone back and forth between separating and combining the
-> > 'security key' and job objects.  Today I opted for separate, more
-> > focused objects.  Tomorrow, who knows?  Job is where addressing
-> > information goes.
->=20
-> I don't know about combining, but it seems like security key and addressi=
-ng
-> are sub objects of the top level job? Is there any reason to share a secu=
-rity key
-> with two jobs???
-
-I doubt sharing a security key between HPC jobs is needed.  I think of the =
-set of addresses being a component of the top-level job.  Individual addres=
-ses are sub-objects, if that's what you mean.
-
-I was thinking of security key as an independent object, passed as an attri=
-bute when creating the top-level job.  The separation is so a job isn't nee=
-ded to apply encryption to some RDMA QP in the future.  It seems possible t=
-o define security key as a component of the top-level job (and give job a n=
-ew name), rather than an independent object.
-
-> > A separate security key made more sense to me when I considered
-> > applying it to an RC QP.  Additionally, an MPI/AI job may require
-> > multiple job objects, one for each IP address.  (Imagine a system
-> > connected to separate networks, such that the job ID value cannot be
-> > global).  A single security key can be used with all job instances.
->=20
-> I haven't heard any definition of how the job id is actually matched.
-
-I define a job key.  The job key provides a secure way to select the job ID=
- carried in the transport.  A job key references a PD and is specified as p=
-art of any transfer.
-
-A job key may be provided when creating a MR.  If so, the job *ID* is store=
-d with the MR.  The PD of the job key and MR must be the same.
-
-With absolute addressing, the QPN finds the QP through some table/hash/look=
-up.  An rkey locates a MR.  If the MR has a valid job ID associated with it=
-, it's compared with the job ID from the transport.  If those match, the tr=
-ansfer is valid.  This check is in addition to verifying the QP and MR belo=
-ng to the same PD.
-
-With relative addressing, the job ID selects some table/hash, which identif=
-ies the QP.  Job matching is a natural part of mapping the QPN to the QP.  =
-Job related checks against target MRs is the same as above.
-
-There are other ways these checks may be implemented, including tighter res=
-trictions on what MRs a QP may access.  But at least the above checks shoul=
-d hold.
-
-Generalizing the above to remove UET addressing, a QP may either receive fr=
-om any job or only those jobs that it is associated with.  A QP may belong =
-to multiple jobs.  And a MR may be restricted to access by a single job.  V=
-endors may optimize their implementations around which features to support.=
-  E.g. limit a QP to 1 job, no per job MRs, etc.=20
-
-- Sean
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+[...]
 
