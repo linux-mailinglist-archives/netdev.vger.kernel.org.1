@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-184033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B02BDA92FAE
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:05:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4EAA92FB2
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AED98E3D88
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:04:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A26291B61EA5
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7C5267B1A;
-	Fri, 18 Apr 2025 02:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952BE267B99;
+	Fri, 18 Apr 2025 02:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuIGB6Qk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUcXohuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549E3267B0A;
-	Fri, 18 Apr 2025 02:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D5E267B78;
+	Fri, 18 Apr 2025 02:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744941828; cv=none; b=rPiMIN4kVnn/YmyTJrYQOTiQQlhSEh5spNxNg3ekh22b316/1VrYDhzRb9YxeOVHxhfx/ujmL6WyWux8m9Vm/Ivj+fnoJ6CfU/xtqoNHKMHA0/KH3uckZSzI9X/ixPwSXhqKa3woY/G4Ozmhgwy19BvPUk2GZCxZZ/Tqw2fgoU8=
+	t=1744941832; cv=none; b=sk1KephvQ+wzc4NznBAPIaotH8iAPHIHV7vwdpooz6aZjnWdn3IztdybpGG9xbS1U2dd3khu5nr3sTVqJAeRuAoN/JX95Kqj0UAmkKJWpbAGwk409Lw0FvcreQ71mnyxyPwH6KBVkSUSllYOVp4o/SGEBEVjYdEDmi4XzDWDYWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744941828; c=relaxed/simple;
-	bh=oFV/K7nb/DfOUf2KG5EktX/ExqzaexHOs2jE9tXPQn0=;
+	s=arc-20240116; t=1744941832; c=relaxed/simple;
+	bh=stwbP6eVeuzTRSr3iZGE6F9DpxJzF77DXtBhiMt5vQY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h+lKjw34vx8vqrs+pphGvJKxjoBW7PV/ta6q4/KYqaHMV11qntnzKJw2vqLdWptpnJ+96f1wMFyuqBI8tj1XEsQyQK5fQGQCPDhAsgV10vK/uiNZdpP6mLc7iOYsvgN0caXhxYUDQwZmjB5ZE8mYrRgsljBMTawmP+sHqWGEMEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuIGB6Qk; arc=none smtp.client-ip=209.85.160.170
+	 MIME-Version; b=t9hPwG7J25bqkwCd5qfFf1HNchhrqCam/0/DB/qfAYjI5piTDc2rmBHRMRp6EcOaesa0mUNC+Rq9KjOZSIuQpSimUaTrhjzqrn4KpD+Icded217mvBnUY3gXaijR1STCB/KxrlkX8Jcj46Pta8VTtsCMXk6DvpoJM0HUBFd2LqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUcXohuQ; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4768f90bf36so12996191cf.0;
-        Thu, 17 Apr 2025 19:03:45 -0700 (PDT)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e8fce04655so13179126d6.3;
+        Thu, 17 Apr 2025 19:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744941824; x=1745546624; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744941828; x=1745546628; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f46pXV1CPbb98e+1xVuONuWlz41IOjAlpXW+EFXVmMI=;
-        b=YuIGB6QkhqUzL+lxcQXv0Hr6yZIko3+FudwXzYPzCzo7eOHwWQQEJW/Kn3KIbsTSaU
-         TVsvpTIyqNfspHUVkGWnIh/DONUESTEkBg2Zl5egK444N0pJkQNNU78PPRuqdXokUZQy
-         GUq4jsfd+Dr0WVAB1zWtsMm3H+s8By7u/hzm1kaiiTxZ9cumWhW12x3rHKdj8dDC//eW
-         qG27yZWwNLnYVfrSpZa6fPCAmkDHHQjXNnZklTPR+PLxFPyQhnsVbbNmt8Q1hOdOl/fL
-         fNGB4sQ2gVJsxeyvRaPjGlMGo1tVZrxh5JFU7AR430cuh33+YWdm+xRNvj4GZ5eLgxYG
-         Rz+w==
+        bh=VDDoYPYqghJeIrv/vDKp4qmwF4fzguLA9ffg3I4LttQ=;
+        b=cUcXohuQ55NpBxEKUN9OgMy6wg19NyKyNFkakl4WLVSkjlq1vetSDKFr3O1i72UUa1
+         VLwrJXc9N4aBYhmYRDuAS/Hq++0cYvOVwiVNNKFO3iQk15SoRBN+Vc7umRQ75AdRtXdu
+         BEIXGs/9gz5mprg8/uAYNL8nrZZ/QPUP63GmJ+VEkV9xEitmVPxQAhE/FkxShH7Z561T
+         Up7Z59btzbMVgPUcCVBANcSSdGkXE0LaHIVGvT3NNIGpnK9PVTpBrr1z/WN58V58UY6f
+         bqqJJMym1vD718h8YEfd2oZu7uMtK5OUNCfHfoUylrJ58Y4VXHSfBNqbAI/0y+t/Y6Mu
+         fl7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744941824; x=1745546624;
+        d=1e100.net; s=20230601; t=1744941828; x=1745546628;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f46pXV1CPbb98e+1xVuONuWlz41IOjAlpXW+EFXVmMI=;
-        b=CUr0MsuhP/Dh5kRWNg0mewgLbHfvEzO3oWSmjzMhppx73ZOnPHQEyV3AaeCLmvOR+g
-         yhcC55CXTbj9+lJ8FGtShu2/TAbSBbj+PAzTm0HtcxJ0DtLYbM7ytDRvM29cGMHzfOfD
-         /JzabB19HT3N0JxZ1vGc0MqFRITbtBFsyttZyQGoHpudwrCvWNXU91xRqnwgn7cToLNB
-         t4ulqnWk+ooMI9h8f9dvD7aUYOdenuOnv8IkQNgwqaQVk0riPT53JLfMtrJp6PhkljSa
-         mPJeimbZ9TQ/Do3cKIfGC6/gJpapHDjye6qXzC4QKK/oAH1+0m0tE7GmpvangFVvcuV4
-         Tn/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUqzL2RliU1oEObm8pbdzZCBKNNe0DNi0yA09XBJKLO+32Pr1h8k68pw7Ae46g3VpwYVDl1XOqP@vger.kernel.org, AJvYcCV53n7JD9I6U2f1sArDkHsTMYEhI3F95Oyt0A0IS/3dmDI7m6WADHQ/N2TX/j8JHnZgI8yEM2UluZ9Cxy/X@vger.kernel.org, AJvYcCWEq98LKF/gk8eoM08yZvSVumNyYjofBjgPcRD3sPTOCA1oFnqAu5jSuGqgJUSz+MNsxsF5yxiQcH1z@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGb7Z0eEWxIXlWNGqpWrgTjun77k6QGqF8qawkxAPT9MAw0n8e
-	nIKSR/o0LNkKcR2f0Ybd0Nv4jSLJ8BEd4MVdVAyo1ZgQnIq43qET
-X-Gm-Gg: ASbGncssW/vZXMMzG5sMlrPO6YJnN36y0ULSl10YpYYM0nEt0pZSkd7+PNYHBeV2ctv
-	8PYAofJej+ZyZJfSSx9WbZoXqWBTMH1g2XotRZEMsESb/K+XLWR+HVVOwFQPwbEtPQkpphTb3oi
-	6dU7euYV5zuJ3QFHm9ACGeX28GI/wP0OGBB3W2mPDIO8nVEZK+vU0Rt+qN5QIe0VJcwq5Ux+Izz
-	wRNBlAK9EChH0/SNsEvv9TsiYpfyENqwIFxGEn+U0bMghv7k+Uk+C4YPqbsVVc1xJP6N0BLkp2H
-	59GmaDCvM6GmTiLD
-X-Google-Smtp-Source: AGHT+IEa3XTyou6B1UlAXh5StN8SBILf2f9ItYft5UReQN5f88/E9aTkI2S7eGlEvVuC9pFIa/pc3w==
-X-Received: by 2002:a05:6214:1c4e:b0:6e4:3eb1:2bde with SMTP id 6a1803df08f44-6f2c456186emr25975196d6.19.1744941824079;
-        Thu, 17 Apr 2025 19:03:44 -0700 (PDT)
+        bh=VDDoYPYqghJeIrv/vDKp4qmwF4fzguLA9ffg3I4LttQ=;
+        b=EPnaoceXKi5vl9lcoWJS+rB4jAiqzj5HPu4NqaDjtZ/WBINSSC1aNw2Lhk/wK02lcS
+         1Mblc0yMaRCx7FlLCEcqT14SU2D0tBGkfybt7YuYyXgS681/OEMapv27Lm+iuf6UAUp7
+         qEEesvPrC22eOs6giRHCYWsbMms9PfLhx/9dx6nq4l61Ed5jDWlGQwm/ZlGmNcU+O3cH
+         y3OGdEmRCCXOjt4fSPgUDY+a5OJuTiAJT6IZPBtvP8QFTB4KMYMeGAM0F/bvpjR2AEI6
+         qgHcwlpAUk6D3qlnmeuyppCvMLfgLxANqWKpFBXAVPOFQ3VSVZ1UtCy8xvMAIqnE16bO
+         oHYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWS8tK2rUjIaB1e7EaHGV2UOgRwr9J+YhVbmnrJDuFfedmlucIpNoyhA4GImTH+vg9EGaxJjPUL@vger.kernel.org, AJvYcCXlzaAFio2kokpa0Dj00ORHqsXAL6o5/QsLF0uGVSWYIUyO1AuiupguvNdxqpO6RiKPDsv6inzEzacAvXSP@vger.kernel.org, AJvYcCXzVzHt4Dd2AHG1Rt6gisJbdfU4ccrVcbbQEgchLexRPJJFZeBJJKTGzEVaO0aQOQRKiIkg5XFgDaWC@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuKcrNIHoLfsbtOL5n4e7yWAe2OurbvEBkzWkzi80xt7yv/u+G
+	lKaCN6I/cRmwPJIoaZmn+cBUnep+r7q1ii32yIq5NkfzFFU0pk+U
+X-Gm-Gg: ASbGnctulF3S/moFGILXny/+rzUwEA+gFZusemfnC/1tt0q7QfY0P85yCDFcyRPRJfu
+	P9Ywn9vhoYVN0ui19jgQXLwYDDocoOwPB9lLpL6MDNXAYZzCaujc63uSKIknJcgqXqr8jzp0U8L
+	413namlBEHIOTSh9TbewJcHo17f0rITG6g5ckw3F0GqbTKG3g3kPG3mgrNzXNxmeYbnlCaO2MI6
+	jPhVvg9uOM3+CEspZdhZUa2Lq4gDqTpBHvMuwBEA2KQKBqnXyUghuwIb/YokWZMSiO7PcxQIaj4
+	TCSQkKqRc63knzRA
+X-Google-Smtp-Source: AGHT+IGsi5nlj2MDbgxshqbKHMYQIa0a5Dn2p4AZ1hljOnFMjswF5x7rwd6WbMIkCXnI/HJO1OvNFQ==
+X-Received: by 2002:a05:6214:4108:b0:6f2:c181:19db with SMTP id 6a1803df08f44-6f2c4688234mr15600776d6.43.1744941827919;
+        Thu, 17 Apr 2025 19:03:47 -0700 (PDT)
 Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f2c2b32741sm5679966d6.62.2025.04.17.19.03.42
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f2c2b34537sm5663056d6.68.2025.04.17.19.03.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 19:03:42 -0700 (PDT)
+        Thu, 17 Apr 2025 19:03:47 -0700 (PDT)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Michael Turquette <mturquette@baylibre.com>,
 	Stephen Boyd <sboyd@kernel.org>,
@@ -93,9 +93,9 @@ Cc: linux-clk@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Yixun Lan <dlan@gentoo.org>,
 	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH v5 4/5] clk: sophgo: Add PLL clock controller support for SG2044 SoC
-Date: Fri, 18 Apr 2025 10:03:23 +0800
-Message-ID: <20250418020325.421257-5-inochiama@gmail.com>
+Subject: [PATCH v5 5/5] clk: sophgo: Add clock controller support for SG2044 SoC
+Date: Fri, 18 Apr 2025 10:03:24 +0800
+Message-ID: <20250418020325.421257-6-inochiama@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418020325.421257-1-inochiama@gmail.com>
 References: <20250418020325.421257-1-inochiama@gmail.com>
@@ -107,52 +107,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add PLL clock driver and clock definition for SG2044 SoC.
+Add clock driver and clock definition for SG2044 SoC.
 
 Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+Reviewed-by: Chen Wang <unicorn_wang@outlook.com>
 ---
- drivers/clk/sophgo/Kconfig          |  10 +
- drivers/clk/sophgo/Makefile         |   1 +
- drivers/clk/sophgo/clk-sg2044-pll.c | 628 ++++++++++++++++++++++++++++
- 3 files changed, 639 insertions(+)
- create mode 100644 drivers/clk/sophgo/clk-sg2044-pll.c
+ drivers/clk/sophgo/Kconfig      |    9 +
+ drivers/clk/sophgo/Makefile     |    1 +
+ drivers/clk/sophgo/clk-sg2044.c | 1812 +++++++++++++++++++++++++++++++
+ 3 files changed, 1822 insertions(+)
+ create mode 100644 drivers/clk/sophgo/clk-sg2044.c
 
 diff --git a/drivers/clk/sophgo/Kconfig b/drivers/clk/sophgo/Kconfig
-index 8b1367e3a95e..88e60677c7a9 100644
+index 88e60677c7a9..e14e802f28bf 100644
 --- a/drivers/clk/sophgo/Kconfig
 +++ b/drivers/clk/sophgo/Kconfig
-@@ -37,3 +37,13 @@ config CLK_SOPHGO_SG2042_RPGATE
- 	  This clock IP depends on SG2042 Clock Generator because it uses
+@@ -38,6 +38,15 @@ config CLK_SOPHGO_SG2042_RPGATE
  	  clock from Clock Generator IP as input.
  	  This driver provides Gate function for RP.
-+
-+config CLK_SOPHGO_SG2044_PLL
-+	tristate "Sophgo SG2044 PLL clock controller support"
+ 
++config CLK_SOPHGO_SG2044
++	tristate "Sophgo SG2044 clock controller support"
 +	depends on ARCH_SOPHGO || COMPILE_TEST
-+	select MFD_SYSCON
-+	select REGMAP_MMIO
 +	help
-+	  This driver supports the PLL clock controller on the Sophgo
-+	  SG2044 SoC. This controller requires 25M oscillator as input.
-+	  This clock control provides PLL clocks on the SoC.
++	  This driver supports the clock controller on the Sophgo SG2044
++	  SoC. This controller requires mulitple PLL clock as input.
++	  This clock control provides PLL clocks and common clock function
++	  for various IPs on the SoC.
++
+ config CLK_SOPHGO_SG2044_PLL
+ 	tristate "Sophgo SG2044 PLL clock controller support"
+ 	depends on ARCH_SOPHGO || COMPILE_TEST
 diff --git a/drivers/clk/sophgo/Makefile b/drivers/clk/sophgo/Makefile
-index 53506845a044..4a6afa8bdc66 100644
+index 4a6afa8bdc66..26b2fd121582 100644
 --- a/drivers/clk/sophgo/Makefile
 +++ b/drivers/clk/sophgo/Makefile
-@@ -9,3 +9,4 @@ clk-sophgo-cv1800-y		+= clk-cv18xx-pll.o
+@@ -9,4 +9,5 @@ clk-sophgo-cv1800-y		+= clk-cv18xx-pll.o
  obj-$(CONFIG_CLK_SOPHGO_SG2042_CLKGEN)	+= clk-sg2042-clkgen.o
  obj-$(CONFIG_CLK_SOPHGO_SG2042_PLL)	+= clk-sg2042-pll.o
  obj-$(CONFIG_CLK_SOPHGO_SG2042_RPGATE)	+= clk-sg2042-rpgate.o
-+obj-$(CONFIG_CLK_SOPHGO_SG2044_PLL)	+= clk-sg2044-pll.o
-diff --git a/drivers/clk/sophgo/clk-sg2044-pll.c b/drivers/clk/sophgo/clk-sg2044-pll.c
++obj-$(CONFIG_CLK_SOPHGO_SG2044)		+= clk-sg2044.o
+ obj-$(CONFIG_CLK_SOPHGO_SG2044_PLL)	+= clk-sg2044-pll.o
+diff --git a/drivers/clk/sophgo/clk-sg2044.c b/drivers/clk/sophgo/clk-sg2044.c
 new file mode 100644
-index 000000000000..94c0f519ba6d
+index 000000000000..f67f99c926b6
 --- /dev/null
-+++ b/drivers/clk/sophgo/clk-sg2044-pll.c
-@@ -0,0 +1,628 @@
++++ b/drivers/clk/sophgo/clk-sg2044.c
+@@ -0,0 +1,1812 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Sophgo SG2044 PLL clock controller driver
++ * Sophgo SG2044 clock controller driver
 + *
 + * Copyright (C) 2025 Inochi Amaoto <inochiama@gmail.com>
 + */
@@ -171,368 +175,271 @@ index 000000000000..94c0f519ba6d
 +#include <linux/regmap.h>
 +#include <linux/spinlock.h>
 +
-+#include <dt-bindings/clock/sophgo,sg2044-pll.h>
++#include <dt-bindings/clock/sophgo,sg2044-clk.h>
 +
-+/* Low Control part */
-+#define PLL_VCOSEL_MASK		GENMASK(17, 16)
++#define DIV_ASSERT		BIT(0)
++#define DIV_FACTOR_REG_SOURCE	BIT(3)
++#define DIV_BRANCH_EN		BIT(4)
 +
-+/* High Control part */
-+#define PLL_FBDIV_MASK		GENMASK(11, 0)
-+#define PLL_REFDIV_MASK		GENMASK(17, 12)
-+#define PLL_POSTDIV1_MASK	GENMASK(20, 18)
-+#define PLL_POSTDIV2_MASK	GENMASK(23, 21)
++#define DIV_ASSERT_TIME		2
 +
-+#define PLL_CALIBRATE_EN	BIT(24)
-+#define PLL_CALIBRATE_MASK	GENMASK(29, 27)
-+#define PLL_CALIBRATE_DEFAULT	FIELD_PREP(PLL_CALIBRATE_MASK, 2)
-+#define PLL_UPDATE_EN		BIT(30)
-+
-+#define PLL_HIGH_CTRL_MASK	\
-+	(PLL_FBDIV_MASK | PLL_REFDIV_MASK | \
-+	 PLL_POSTDIV1_MASK | PLL_POSTDIV2_MASK | \
-+	 PLL_CALIBRATE_EN | PLL_CALIBRATE_MASK | \
-+	 PLL_UPDATE_EN)
-+
-+#define PLL_HIGH_CTRL_OFFSET	4
-+
-+#define PLL_VCOSEL_1G6		0x2
-+#define PLL_VCOSEL_2G4		0x3
-+
-+#define PLL_LIMIT_FOUTVCO	0
-+#define PLL_LIMIT_FOUT		1
-+#define PLL_LIMIT_REFDIV	2
-+#define PLL_LIMIT_FBDIV		3
-+#define PLL_LIMIT_POSTDIV1	4
-+#define PLL_LIMIT_POSTDIV2	5
-+
-+#define for_each_pll_limit_range(_var, _limit) \
-+	for (_var = (_limit)->min; _var <= (_limit)->max; _var++)
-+
-+struct sg2044_pll_limit {
-+	u64 min;
-+	u64 max;
++struct sg2044_div_internal {
++	u32	offset;
++	u32	initval;
++	u8	shift;
++	u8	width;
++	u16	flags;
 +};
 +
-+struct sg2044_pll_internal {
-+	u32 ctrl_offset;
-+	u32 status_offset;
-+	u32 enable_offset;
++struct sg2044_mux_internal {
++	const u32	*table;
++	u32		offset;
++	u16		shift;
++	u16		flags;
++};
 +
-+	u8 status_lock_bit;
-+	u8 status_updating_bit;
-+	u8 enable_bit;
-+
-+	const struct sg2044_pll_limit *limits;
++struct sg2044_gate_internal {
++	u32	offset;
++	u16	shift;
++	u16	flags;
 +};
 +
 +struct sg2044_clk_common {
 +	struct clk_hw	hw;
-+	struct regmap	*regmap;
++	void __iomem	*base;
 +	spinlock_t	*lock;
 +	unsigned int	id;
 +};
 +
-+struct sg2044_pll {
++struct sg2044_div {
 +	struct sg2044_clk_common	common;
-+	struct sg2044_pll_internal	pll;
-+	unsigned int			syscon_offset;
++	struct sg2044_div_internal	div;
 +};
 +
-+struct sg2044_pll_desc_data {
-+	struct sg2044_clk_common	* const *pll;
-+	u16				num_pll;
++struct sg2044_mux {
++	struct sg2044_clk_common	common;
++	struct sg2044_mux_internal	mux;
++	struct notifier_block		nb;
++	u8				saved_parent;
 +};
 +
-+#define SG2044_SYSCON_PLL_OFFSET	0x98
++struct sg2044_gate {
++	struct sg2044_clk_common	common;
++	struct sg2044_gate_internal	gate;
++};
 +
-+struct sg2044_pll_ctrl {
++struct sg2044_clk_ctrl {
 +	spinlock_t			lock;
 +	struct clk_hw_onecell_data	data;
++};
++
++struct sg2044_clk_desc_data {
++	struct sg2044_clk_common	* const *pll;
++	struct sg2044_clk_common	* const *div;
++	struct sg2044_clk_common	* const *mux;
++	struct sg2044_clk_common	* const *gate;
++	u16				num_pll;
++	u16				num_div;
++	u16				num_mux;
++	u16				num_gate;
 +};
 +
 +#define hw_to_sg2044_clk_common(_hw)					\
 +	container_of((_hw), struct sg2044_clk_common, hw)
 +
-+static inline bool sg2044_clk_fit_limit(u64 value,
-+					const struct sg2044_pll_limit *limit)
-+{
-+	return value >= limit->min && value <= limit->max;
-+}
-+
-+static inline struct sg2044_pll *hw_to_sg2044_pll(struct clk_hw *hw)
++static inline struct sg2044_div *hw_to_sg2044_div(struct clk_hw *hw)
 +{
 +	return container_of(hw_to_sg2044_clk_common(hw),
-+			    struct sg2044_pll, common);
++			    struct sg2044_div, common);
 +}
 +
-+static unsigned long sg2044_pll_calc_vco_rate(unsigned long parent_rate,
-+					      unsigned long refdiv,
-+					      unsigned long fbdiv)
++static u32 sg2044_div_get_reg_div(u32 reg, struct sg2044_div_internal *div)
 +{
-+	u64 numerator = parent_rate * fbdiv;
++	if ((reg & DIV_FACTOR_REG_SOURCE))
++		return (reg >> div->shift) & clk_div_mask(div->width);
 +
-+	return div64_ul(numerator, refdiv);
++	return div->initval == 0 ? 1 : div->initval;
 +}
 +
-+static unsigned long sg2044_pll_calc_rate(unsigned long parent_rate,
-+					  unsigned long refdiv,
-+					  unsigned long fbdiv,
-+					  unsigned long postdiv1,
-+					  unsigned long postdiv2)
++static unsigned long _sg2044_div_recalc_rate(struct sg2044_clk_common *common,
++					     struct sg2044_div_internal *div,
++					     unsigned long parent_rate)
 +{
-+	u64 numerator, denominator;
++	u32 reg = readl(common->base + div->offset);
++	u32 val = sg2044_div_get_reg_div(reg, div);
 +
-+	numerator = parent_rate * fbdiv;
-+	denominator = refdiv * (postdiv1 + 1) * (postdiv2 + 1);
-+
-+	return div64_u64(numerator, denominator);
++	return divider_recalc_rate(&common->hw, parent_rate, val, NULL,
++				   div->flags, div->width);
 +}
 +
-+static unsigned long sg2044_pll_recalc_rate(struct clk_hw *hw,
++static unsigned long sg2044_div_recalc_rate(struct clk_hw *hw,
 +					    unsigned long parent_rate)
 +{
-+	struct sg2044_pll *pll = hw_to_sg2044_pll(hw);
-+	u32 value;
-+	int ret;
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
 +
-+	ret = regmap_read(pll->common.regmap,
-+			  pll->syscon_offset + pll->pll.ctrl_offset + PLL_HIGH_CTRL_OFFSET,
-+			  &value);
-+	if (ret < 0)
-+		return 0;
-+
-+	return sg2044_pll_calc_rate(parent_rate,
-+				    FIELD_GET(PLL_REFDIV_MASK, value),
-+				    FIELD_GET(PLL_FBDIV_MASK, value),
-+				    FIELD_GET(PLL_POSTDIV1_MASK, value),
-+				    FIELD_GET(PLL_POSTDIV2_MASK, value));
++	return _sg2044_div_recalc_rate(&div->common, &div->div,
++				       parent_rate);
 +}
 +
-+static bool pll_is_better_rate(unsigned long target, unsigned long now,
-+			       unsigned long best)
++static int _sg2044_div_determine_rate(struct sg2044_clk_common *common,
++				      struct sg2044_div_internal *div,
++				      struct clk_rate_request *req)
 +{
-+	return abs_diff(target, now) < abs_diff(target, best);
++	if (div->flags & CLK_DIVIDER_READ_ONLY) {
++		u32 reg = readl(common->base + div->offset);
++		u32 val = sg2044_div_get_reg_div(reg, div);
++
++		return divider_ro_determine_rate(&common->hw, req, NULL,
++						 div->width, div->flags,
++						 val);
++	}
++
++	return divider_determine_rate(&common->hw, req, NULL,
++				      div->width, div->flags);
 +}
 +
-+static int sg2042_pll_compute_postdiv(const struct sg2044_pll_limit *limits,
-+				      unsigned long target,
-+				      unsigned long parent_rate,
-+				      unsigned int refdiv,
-+				      unsigned int fbdiv,
-+				      unsigned int *postdiv1,
-+				      unsigned int *postdiv2)
-+{
-+	unsigned int div1, div2;
-+	unsigned long tmp, best_rate = 0;
-+	unsigned int best_div1 = 0, best_div2 = 0;
-+
-+	for_each_pll_limit_range(div2, &limits[PLL_LIMIT_POSTDIV2]) {
-+		for_each_pll_limit_range(div1, &limits[PLL_LIMIT_POSTDIV1]) {
-+			tmp = sg2044_pll_calc_rate(parent_rate,
-+						   refdiv, fbdiv,
-+						   div1, div2);
-+
-+			if (tmp > target)
-+				continue;
-+
-+			if (pll_is_better_rate(target, tmp, best_rate)) {
-+				best_div1 = div1;
-+				best_div2 = div2;
-+				best_rate = tmp;
-+
-+				if (tmp == target)
-+					goto find;
-+			}
-+		}
-+	}
-+
-+find:
-+	if (best_rate) {
-+		*postdiv1 = best_div1;
-+		*postdiv2 = best_div2;
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int sg2044_compute_pll_setting(const struct sg2044_pll_limit *limits,
-+				      unsigned long req_rate,
-+				      unsigned long parent_rate,
-+				      unsigned int *value)
-+{
-+	unsigned int refdiv, fbdiv, postdiv1, postdiv2;
-+	unsigned int best_refdiv, best_fbdiv, best_postdiv1, best_postdiv2;
-+	unsigned long tmp, best_rate = 0;
-+	int ret;
-+
-+	for_each_pll_limit_range(fbdiv, &limits[PLL_LIMIT_FBDIV]) {
-+		for_each_pll_limit_range(refdiv, &limits[PLL_LIMIT_REFDIV]) {
-+			u64 vco = sg2044_pll_calc_vco_rate(parent_rate,
-+							   refdiv, fbdiv);
-+			if (!sg2044_clk_fit_limit(vco, &limits[PLL_LIMIT_FOUTVCO]))
-+				continue;
-+
-+			ret = sg2042_pll_compute_postdiv(limits,
-+							 req_rate, parent_rate,
-+							 refdiv, fbdiv,
-+							 &postdiv1, &postdiv2);
-+			if (ret)
-+				continue;
-+
-+			tmp = sg2044_pll_calc_rate(parent_rate,
-+						   refdiv, fbdiv,
-+						   postdiv1, postdiv2);
-+
-+			if (pll_is_better_rate(req_rate, tmp, best_rate)) {
-+				best_refdiv = refdiv;
-+				best_fbdiv = fbdiv;
-+				best_postdiv1 = postdiv1;
-+				best_postdiv2 = postdiv2;
-+				best_rate = tmp;
-+
-+				if (tmp == req_rate)
-+					goto find;
-+			}
-+		}
-+	}
-+
-+find:
-+	if (best_rate) {
-+		*value = FIELD_PREP(PLL_REFDIV_MASK, best_refdiv) |
-+			 FIELD_PREP(PLL_FBDIV_MASK, best_fbdiv) |
-+			 FIELD_PREP(PLL_POSTDIV1_MASK, best_postdiv1) |
-+			 FIELD_PREP(PLL_POSTDIV2_MASK, best_postdiv2);
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int sg2044_pll_determine_rate(struct clk_hw *hw,
++static int sg2044_div_determine_rate(struct clk_hw *hw,
 +				     struct clk_rate_request *req)
 +{
-+	struct sg2044_pll *pll = hw_to_sg2044_pll(hw);
-+	unsigned int value;
-+	u64 target;
-+	int ret;
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
 +
-+	target = clamp(req->rate, pll->pll.limits[PLL_LIMIT_FOUT].min,
-+		       pll->pll.limits[PLL_LIMIT_FOUT].max);
++	return _sg2044_div_determine_rate(&div->common, &div->div, req);
++}
 +
-+	ret = sg2044_compute_pll_setting(pll->pll.limits, target,
-+					 req->best_parent_rate, &value);
-+	if (ret < 0)
-+		return ret;
++static void sg2044_div_set_reg_div(struct sg2044_clk_common *common,
++				   struct sg2044_div_internal *div,
++				   u32 value)
++{
++	void __iomem *addr = common->base + div->offset;
++	u32 reg;
 +
-+	req->rate = sg2044_pll_calc_rate(req->best_parent_rate,
-+					 FIELD_GET(PLL_REFDIV_MASK, value),
-+					 FIELD_GET(PLL_FBDIV_MASK, value),
-+					 FIELD_GET(PLL_POSTDIV1_MASK, value),
-+					 FIELD_GET(PLL_POSTDIV2_MASK, value));
++	reg = readl(addr);
++
++	/* assert */
++	reg &= ~DIV_ASSERT;
++	writel(reg, addr);
++
++	/* set value */
++	reg = readl(addr);
++	reg &= ~(clk_div_mask(div->width) << div->shift);
++	reg |= (value << div->shift) | DIV_FACTOR_REG_SOURCE;
++	writel(reg, addr);
++
++	/* de-assert */
++	reg |= DIV_ASSERT;
++	writel(reg, addr);
++}
++
++static int sg2044_div_set_rate(struct clk_hw *hw,
++			       unsigned long rate, unsigned long parent_rate)
++{
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
++	u32 value;
++
++	value = divider_get_val(rate, parent_rate, NULL,
++				div->div.width, div->div.flags);
++
++	guard(spinlock_irqsave)(div->common.lock);
++
++	sg2044_div_set_reg_div(&div->common, &div->div, value);
 +
 +	return 0;
 +}
 +
-+static int sg2044_pll_poll_update(struct sg2044_pll *pll)
++static int sg2044_div_enable(struct clk_hw *hw)
 +{
-+	int ret;
-+	unsigned int value;
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
++	void __iomem *addr = div->common.base + div->div.offset;
++	u32 value;
 +
-+	ret = regmap_read_poll_timeout_atomic(pll->common.regmap,
-+					      pll->syscon_offset + pll->pll.status_offset,
-+					      value,
-+					      (value & BIT(pll->pll.status_lock_bit)),
-+					      1, 100000);
-+	if (ret)
-+		return ret;
++	guard(spinlock_irqsave)(div->common.lock);
 +
-+	return regmap_read_poll_timeout_atomic(pll->common.regmap,
-+					       pll->syscon_offset + pll->pll.status_offset,
-+					       value,
-+					       (!(value & BIT(pll->pll.status_updating_bit))),
-+					       1, 100000);
++	value = readl(addr);
++	value |= DIV_BRANCH_EN;
++	writel(value, addr);
++
++	return 0;
 +}
 +
-+static int sg2044_pll_enable(struct sg2044_pll *pll, bool en)
++static void sg2044_div_disable(struct clk_hw *hw)
 +{
-+	if (en) {
-+		if (sg2044_pll_poll_update(pll) < 0)
-+			pr_warn("%s: fail to lock pll\n", clk_hw_get_name(&pll->common.hw));
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
++	void __iomem *addr = div->common.base + div->div.offset;
++	u32 value;
 +
-+		return regmap_set_bits(pll->common.regmap,
-+				       pll->syscon_offset + pll->pll.enable_offset,
-+				       BIT(pll->pll.enable_bit));
++	guard(spinlock_irqsave)(div->common.lock);
++
++	value = readl(addr);
++	value &= ~DIV_BRANCH_EN;
++	writel(value, addr);
++}
++
++static int sg2044_div_is_enabled(struct clk_hw *hw)
++{
++	struct sg2044_div *div = hw_to_sg2044_div(hw);
++
++	return readl(div->common.base + div->div.offset) & DIV_BRANCH_EN;
++}
++
++static const struct clk_ops sg2044_gateable_div_ops = {
++	.enable = sg2044_div_enable,
++	.disable = sg2044_div_disable,
++	.is_enabled = sg2044_div_is_enabled,
++	.recalc_rate = sg2044_div_recalc_rate,
++	.determine_rate = sg2044_div_determine_rate,
++	.set_rate = sg2044_div_set_rate,
++};
++
++static const struct clk_ops sg2044_div_ops = {
++	.recalc_rate = sg2044_div_recalc_rate,
++	.determine_rate = sg2044_div_determine_rate,
++	.set_rate = sg2044_div_set_rate,
++};
++
++static const struct clk_ops sg2044_div_ro_ops = {
++	.recalc_rate = sg2044_div_recalc_rate,
++	.determine_rate = sg2044_div_determine_rate,
++};
++
++static inline struct sg2044_mux *hw_to_sg2044_mux(struct clk_hw *hw)
++{
++	return container_of(hw_to_sg2044_clk_common(hw),
++			    struct sg2044_mux, common);
++}
++
++static inline struct sg2044_mux *nb_to_sg2044_mux(struct notifier_block *nb)
++{
++	return container_of(nb, struct sg2044_mux, nb);
++}
++
++static const u32 sg2044_mux_table[] = {0, 1};
++
++static int sg2044_mux_notifier_cb(struct notifier_block *nb,
++				  unsigned long event,
++				  void *data)
++{
++	struct sg2044_mux *mux = nb_to_sg2044_mux(nb);
++	const struct clk_ops *ops = &clk_mux_ops;
++	struct clk_notifier_data *ndata = data;
++	struct clk_hw *hw = __clk_get_hw(ndata->clk);
++	int ret = 0;
++
++	if (event == PRE_RATE_CHANGE) {
++		mux->saved_parent = ops->get_parent(hw);
++		if (mux->saved_parent)
++			ret = ops->set_parent(hw, 0);
++	} else if (event == POST_RATE_CHANGE) {
++		ret = ops->set_parent(hw, mux->saved_parent);
 +	}
 +
-+	return regmap_clear_bits(pll->common.regmap,
-+				 pll->syscon_offset + pll->pll.enable_offset,
-+				 BIT(pll->pll.enable_bit));
++	return notifier_from_errno(ret);
 +}
 +
-+static int sg2044_pll_update_vcosel(struct sg2044_pll *pll, u64 rate)
++static inline struct sg2044_gate *hw_to_sg2044_gate(struct clk_hw *hw)
 +{
-+	unsigned int sel;
-+
-+	if (rate < U64_C(2400000000))
-+		sel = PLL_VCOSEL_1G6;
-+	else
-+		sel = PLL_VCOSEL_2G4;
-+
-+	return regmap_write_bits(pll->common.regmap,
-+				 pll->syscon_offset + pll->pll.ctrl_offset,
-+				 PLL_VCOSEL_MASK,
-+				 FIELD_PREP(PLL_VCOSEL_MASK, sel));
++	return container_of(hw_to_sg2044_clk_common(hw),
++			    struct sg2044_gate, common);
 +}
-+
-+static int sg2044_pll_set_rate(struct clk_hw *hw,
-+			       unsigned long rate, unsigned long parent_rate)
-+{
-+	struct sg2044_pll *pll = hw_to_sg2044_pll(hw);
-+	unsigned int value;
-+	u64 vco;
-+	int ret;
-+
-+	ret = sg2044_compute_pll_setting(pll->pll.limits, rate,
-+					 parent_rate, &value);
-+	if (ret < 0)
-+		return ret;
-+
-+	vco = sg2044_pll_calc_vco_rate(parent_rate,
-+				       FIELD_GET(PLL_REFDIV_MASK, value),
-+				       FIELD_GET(PLL_FBDIV_MASK, value));
-+
-+	value |= PLL_CALIBRATE_EN;
-+	value |= PLL_CALIBRATE_DEFAULT;
-+	value |= PLL_UPDATE_EN;
-+
-+	guard(spinlock_irqsave)(pll->common.lock);
-+
-+	ret = sg2044_pll_enable(pll, false);
-+	if (ret)
-+		return ret;
-+
-+	sg2044_pll_update_vcosel(pll, vco);
-+
-+	regmap_write_bits(pll->common.regmap,
-+			  pll->syscon_offset + pll->pll.ctrl_offset +
-+			  PLL_HIGH_CTRL_OFFSET,
-+			  PLL_HIGH_CTRL_MASK, value);
-+
-+	sg2044_pll_enable(pll, true);
-+
-+	return ret;
-+}
-+
-+static const struct clk_ops sg2044_pll_ops = {
-+	.recalc_rate = sg2044_pll_recalc_rate,
-+	.determine_rate = sg2044_pll_determine_rate,
-+	.set_rate = sg2044_pll_set_rate,
-+};
-+
-+static const struct clk_ops sg2044_pll_ro_ops = {
-+	.recalc_rate = sg2044_pll_recalc_rate,
-+};
 +
 +#define SG2044_CLK_COMMON_PDATA(_id, _name, _parents, _op, _flags)	\
 +	{								\
@@ -541,182 +448,1400 @@ index 000000000000..94c0f519ba6d
 +		.id = (_id),						\
 +	}
 +
-+#define DEFINE_SG2044_PLL(_id, _name, _parent, _flags,			\
-+			  _ctrl_offset,					\
-+			  _status_offset, _status_lock_bit,		\
-+			  _status_updating_bit,				\
-+			  _enable_offset, _enable_bit,			\
-+			  _limits)					\
-+	struct sg2044_pll _name = {					\
++#define SG2044_CLK_COMMON_PHWS(_id, _name, _parents, _op, _flags)	\
++	{								\
++		.hw.init = CLK_HW_INIT_PARENTS_HW(_name, _parents,	\
++						  _op, (_flags)),	\
++		.id = (_id),						\
++	}
++
++#define DEFINE_SG2044_GATEABLE_DIV(_id, _name, _parent, _flags,		\
++				   _div_offset, _div_shift, _div_width,	\
++				   _div_flags, _div_initval)		\
++	struct sg2044_div _name = {					\
 +		.common	= SG2044_CLK_COMMON_PDATA(_id, #_name, _parent,	\
-+						  &sg2044_pll_ops,	\
++						  &sg2044_gateable_div_ops,\
 +						  (_flags)),		\
-+		.pll = {						\
-+			.ctrl_offset = (_ctrl_offset),			\
-+			.status_offset = (_status_offset),		\
-+			.enable_offset = (_enable_offset),		\
-+			.status_lock_bit = (_status_lock_bit),		\
-+			.status_updating_bit = (_status_updating_bit),	\
-+			.enable_bit = (_enable_bit),			\
-+			.limits = (_limits),				\
++		.div	= {						\
++			.offset		= (_div_offset),		\
++			.initval	= (_div_initval),		\
++			.shift		= (_div_shift),			\
++			.width		= (_div_width),			\
++			.flags		= (_div_flags),			\
 +		},							\
 +	}
 +
-+#define DEFINE_SG2044_PLL_RO(_id, _name, _parent, _flags,		\
-+			     _ctrl_offset,				\
-+			     _status_offset, _status_lock_bit,		\
-+			     _status_updating_bit,			\
-+			     _enable_offset, _enable_bit,		\
-+			     _limits)					\
-+	struct sg2044_pll _name = {					\
-+		.common	= SG2044_CLK_COMMON_PDATA(_id, #_name, _parent,	\
-+						  &sg2044_pll_ro_ops,	\
-+						  (_flags)),		\
-+		.pll = {						\
-+			.ctrl_offset = (_ctrl_offset),			\
-+			.status_offset = (_status_offset),		\
-+			.enable_offset = (_enable_offset),		\
-+			.status_lock_bit = (_status_lock_bit),		\
-+			.status_updating_bit = (_status_updating_bit),	\
-+			.enable_bit = (_enable_bit),			\
-+			.limits = (_limits),				\
++#define DEFINE_SG2044_DIV(_id, _name, _parent, _flags,			\
++			  _div_offset, _div_shift, _div_width,		\
++			  _div_flags, _div_initval)			\
++	struct sg2044_div _name = {					\
++		.common	= SG2044_CLK_COMMON_PHWS(_id, #_name, _parent,	\
++						 &sg2044_div_ops,	\
++						 (_flags)),		\
++		.div	= {						\
++			.offset		= (_div_offset),		\
++			.initval	= (_div_initval),		\
++			.shift		= (_div_shift),			\
++			.width		= (_div_width),			\
++			.flags		= (_div_flags),			\
 +		},							\
 +	}
 +
-+static const struct clk_parent_data osc_parents[] = {
-+	{ .index = 0 },
++#define DEFINE_SG2044_DIV_PDATA(_id, _name, _parent, _flags,		\
++				_div_offset, _div_shift, _div_width,	\
++				_div_flags, _div_initval)		\
++	struct sg2044_div _name = {					\
++		.common	= SG2044_CLK_COMMON_PDATA(_id, #_name, _parent,	\
++						  &sg2044_div_ops,	\
++						  (_flags)),		\
++		.div	= {						\
++			.offset		= (_div_offset),		\
++			.initval	= (_div_initval),		\
++			.shift		= (_div_shift),			\
++			.width		= (_div_width),			\
++			.flags		= (_div_flags),			\
++		},							\
++	}
++
++#define DEFINE_SG2044_DIV_RO(_id, _name, _parent, _flags,		\
++			     _div_offset, _div_shift, _div_width,	\
++			     _div_flags, _div_initval)			\
++	struct sg2044_div _name = {					\
++		.common	= SG2044_CLK_COMMON_PDATA(_id, #_name, _parent,	\
++						  &sg2044_div_ro_ops,	\
++						  (_flags)),		\
++		.div	= {						\
++			.offset		= (_div_offset),		\
++			.initval	= (_div_initval),		\
++			.shift		= (_div_shift),			\
++			.width		= (_div_width),			\
++			.flags		= (_div_flags) | CLK_DIVIDER_READ_ONLY,\
++		},							\
++	}
++
++#define DEFINE_SG2044_MUX(_id, _name, _parent, _flags,			\
++			  _mux_offset, _mux_shift,			\
++			  _mux_table, _mux_flags)			\
++	struct sg2044_mux _name = {					\
++		.common	= SG2044_CLK_COMMON_PDATA(_id, #_name, _parent,	\
++						  &clk_mux_ops, (_flags)),\
++		.mux	= {						\
++			.table		= (_mux_table),			\
++			.offset		= (_mux_offset),		\
++			.shift		= (_mux_shift),			\
++			.flags		= (_mux_flags),			\
++		},							\
++	}
++
++#define DEFINE_SG2044_GATE(_id, _name, _parent, _flags,			\
++			   _gate_offset, _gate_shift, _gate_flags)	\
++	struct sg2044_gate _name = {					\
++		.common	= SG2044_CLK_COMMON_PHWS(_id, #_name, _parent,	\
++						 &clk_gate_ops, (_flags)),\
++		.gate	= {						\
++			.offset		= (_gate_offset),		\
++			.shift		= (_gate_shift),		\
++			.flags		= (_gate_flags),		\
++		},							\
++	}
++
++static const struct clk_parent_data clk_fpll0_parent[] = {
++	{ .fw_name = "fpll0" },
 +};
 +
-+static const struct sg2044_pll_limit pll_limits[] = {
-+	[PLL_LIMIT_FOUTVCO] = {
-+		.min = U64_C(1600000000),
-+		.max = U64_C(3200000000),
-+	},
-+	[PLL_LIMIT_FOUT] = {
-+		.min = U64_C(25000),
-+		.max = U64_C(3200000000),
-+	},
-+	[PLL_LIMIT_REFDIV] = {
-+		.min = U64_C(1),
-+		.max = U64_C(63),
-+	},
-+	[PLL_LIMIT_FBDIV] = {
-+		.min = U64_C(8),
-+		.max = U64_C(1066),
-+	},
-+	[PLL_LIMIT_POSTDIV1] = {
-+		.min = U64_C(0),
-+		.max = U64_C(7),
-+	},
-+	[PLL_LIMIT_POSTDIV2] = {
-+		.min = U64_C(0),
-+		.max = U64_C(7),
-+	},
++static const struct clk_parent_data clk_fpll1_parent[] = {
++	{ .fw_name = "fpll1" },
 +};
 +
-+static DEFINE_SG2044_PLL_RO(CLK_FPLL0, clk_fpll0, osc_parents, CLK_IS_CRITICAL,
-+			    0x58, 0x00, 22, 6,
-+			    0x04, 6, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_FPLL1, clk_fpll1, osc_parents, CLK_IS_CRITICAL,
-+			    0x60, 0x00, 23, 7,
-+			    0x04, 7, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_FPLL2, clk_fpll2, osc_parents, CLK_IS_CRITICAL,
-+			    0x20, 0x08, 16, 0,
-+			    0x0c, 0, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL0, clk_dpll0, osc_parents, CLK_IS_CRITICAL,
-+			    0x68, 0x00, 24, 8,
-+			    0x04, 8, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL1, clk_dpll1, osc_parents, CLK_IS_CRITICAL,
-+			    0x70, 0x00, 25, 9,
-+			    0x04, 9, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL2, clk_dpll2, osc_parents, CLK_IS_CRITICAL,
-+			    0x78, 0x00, 26, 10,
-+			    0x04, 10, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL3, clk_dpll3, osc_parents, CLK_IS_CRITICAL,
-+			    0x80, 0x00, 27, 11,
-+			    0x04, 11, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL4, clk_dpll4, osc_parents, CLK_IS_CRITICAL,
-+			    0x88, 0x00, 28, 12,
-+			    0x04, 12, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL5, clk_dpll5, osc_parents, CLK_IS_CRITICAL,
-+			    0x90, 0x00, 29, 13,
-+			    0x04, 13, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL6, clk_dpll6, osc_parents, CLK_IS_CRITICAL,
-+			    0x98, 0x00, 30, 14,
-+			    0x04, 14, pll_limits);
-+
-+static DEFINE_SG2044_PLL_RO(CLK_DPLL7, clk_dpll7, osc_parents, CLK_IS_CRITICAL,
-+			    0xa0, 0x00, 31, 15,
-+			    0x04, 15, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL0, clk_mpll0, osc_parents, CLK_IS_CRITICAL,
-+			 0x28, 0x00, 16, 0,
-+			 0x04, 0, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL1, clk_mpll1, osc_parents, CLK_IS_CRITICAL,
-+			 0x30, 0x00, 17, 1,
-+			 0x04, 1, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL2, clk_mpll2, osc_parents, CLK_IS_CRITICAL,
-+			 0x38, 0x00, 18, 2,
-+			 0x04, 2, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL3, clk_mpll3, osc_parents, CLK_IS_CRITICAL,
-+			 0x40, 0x00, 19, 3,
-+			 0x04, 3, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL4, clk_mpll4, osc_parents, CLK_IS_CRITICAL,
-+			 0x48, 0x00, 20, 4,
-+			 0x04, 4, pll_limits);
-+
-+static DEFINE_SG2044_PLL(CLK_MPLL5, clk_mpll5, osc_parents, CLK_IS_CRITICAL,
-+			 0x50, 0x00, 21, 5,
-+			 0x04, 5, pll_limits);
-+
-+static struct sg2044_clk_common * const sg2044_pll_commons[] = {
-+	&clk_fpll0.common,
-+	&clk_fpll1.common,
-+	&clk_fpll2.common,
-+	&clk_dpll0.common,
-+	&clk_dpll1.common,
-+	&clk_dpll2.common,
-+	&clk_dpll3.common,
-+	&clk_dpll4.common,
-+	&clk_dpll5.common,
-+	&clk_dpll6.common,
-+	&clk_dpll7.common,
-+	&clk_mpll0.common,
-+	&clk_mpll1.common,
-+	&clk_mpll2.common,
-+	&clk_mpll3.common,
-+	&clk_mpll4.common,
-+	&clk_mpll5.common,
++static const struct clk_parent_data clk_fpll2_parent[] = {
++	{ .fw_name = "fpll2" },
 +};
 +
-+static int sg2044_pll_init_ctrl(struct device *dev, struct regmap *regmap,
-+				struct sg2044_pll_ctrl *ctrl,
-+				const struct sg2044_pll_desc_data *desc)
++static const struct clk_parent_data clk_dpll0_parent[] = {
++	{ .fw_name = "dpll0" },
++};
++
++static const struct clk_parent_data clk_dpll1_parent[] = {
++	{ .fw_name = "dpll1" },
++};
++
++static const struct clk_parent_data clk_dpll2_parent[] = {
++	{ .fw_name = "dpll2" },
++};
++
++static const struct clk_parent_data clk_dpll3_parent[] = {
++	{ .fw_name = "dpll3" },
++};
++
++static const struct clk_parent_data clk_dpll4_parent[] = {
++	{ .fw_name = "dpll4" },
++};
++
++static const struct clk_parent_data clk_dpll5_parent[] = {
++	{ .fw_name = "dpll5" },
++};
++
++static const struct clk_parent_data clk_dpll6_parent[] = {
++	{ .fw_name = "dpll6" },
++};
++
++static const struct clk_parent_data clk_dpll7_parent[] = {
++	{ .fw_name = "dpll7" },
++};
++
++static const struct clk_parent_data clk_mpll0_parent[] = {
++	{ .fw_name = "mpll0" },
++};
++
++static const struct clk_parent_data clk_mpll1_parent[] = {
++	{ .fw_name = "mpll1" },
++};
++
++static const struct clk_parent_data clk_mpll2_parent[] = {
++	{ .fw_name = "mpll2" },
++};
++
++static const struct clk_parent_data clk_mpll3_parent[] = {
++	{ .fw_name = "mpll3" },
++};
++
++static const struct clk_parent_data clk_mpll4_parent[] = {
++	{ .fw_name = "mpll4" },
++};
++
++static const struct clk_parent_data clk_mpll5_parent[] = {
++	{ .fw_name = "mpll5" },
++};
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_AP_SYS_FIXED, clk_div_ap_sys_fixed,
++				  clk_fpll0_parent, 0,
++				  0x044, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_AP_SYS_MAIN, clk_div_ap_sys_main,
++				  clk_mpll0_parent, 0,
++				  0x040, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_RP_SYS_FIXED, clk_div_rp_sys_fixed,
++				  clk_fpll0_parent, 0,
++				  0x050, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_RP_SYS_MAIN, clk_div_rp_sys_main,
++				  clk_mpll1_parent, 0,
++				  0x04c, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_TPU_SYS_FIXED, clk_div_tpu_sys_fixed,
++				  clk_fpll0_parent, 0,
++				  0x058, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  2);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_TPU_SYS_MAIN, clk_div_tpu_sys_main,
++				  clk_mpll2_parent, 0,
++				  0x054, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_NOC_SYS_FIXED, clk_div_noc_sys_fixed,
++				  clk_fpll0_parent, 0,
++				  0x070, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_NOC_SYS_MAIN, clk_div_noc_sys_main,
++				  clk_mpll3_parent, 0,
++				  0x06c, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_VC_SRC0_FIXED, clk_div_vc_src0_fixed,
++				  clk_fpll0_parent, 0,
++				  0x078, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  2);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_VC_SRC0_MAIN, clk_div_vc_src0_main,
++				  clk_mpll4_parent, 0,
++				  0x074, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_VC_SRC1_FIXED, clk_div_vc_src1_fixed,
++				  clk_fpll0_parent, 0,
++				  0x080, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  3);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_VC_SRC1_MAIN, clk_div_vc_src1_main,
++				  clk_mpll5_parent, 0,
++				  0x07c, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_CXP_MAC_FIXED, clk_div_cxp_mac_fixed,
++				  clk_fpll0_parent, 0,
++				  0x088, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  2);
++
++static DEFINE_SG2044_GATEABLE_DIV(CLK_DIV_CXP_MAC_MAIN, clk_div_cxp_mac_main,
++				  clk_fpll1_parent, 0,
++				  0x084, 16, 8,
++				  CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO |
++					CLK_IS_CRITICAL,
++				  1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR0_FIXED, clk_div_ddr0_fixed,
++			    clk_fpll0_parent, 0,
++			    0x124, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR0_MAIN, clk_div_ddr0_main,
++			    clk_dpll0_parent, 0,
++			    0x120, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR1_FIXED, clk_div_ddr1_fixed,
++			    clk_fpll0_parent, 0,
++			    0x12c, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR1_MAIN, clk_div_ddr1_main,
++			    clk_dpll1_parent, 0,
++			    0x128, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR2_FIXED, clk_div_ddr2_fixed,
++			    clk_fpll0_parent, 0,
++			    0x134, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR2_MAIN, clk_div_ddr2_main,
++			    clk_dpll2_parent, 0,
++			    0x130, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR3_FIXED, clk_div_ddr3_fixed,
++			    clk_fpll0_parent, 0,
++			    0x13c, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR3_MAIN, clk_div_ddr3_main,
++			    clk_dpll3_parent, 0,
++			    0x138, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR4_FIXED, clk_div_ddr4_fixed,
++			    clk_fpll0_parent, 0,
++			    0x144, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR4_MAIN, clk_div_ddr4_main,
++			    clk_dpll4_parent, 0,
++			    0x140, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR5_FIXED, clk_div_ddr5_fixed,
++			    clk_fpll0_parent, 0,
++			    0x14c, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR5_MAIN, clk_div_ddr5_main,
++			    clk_dpll5_parent, 0,
++			    0x148, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR6_FIXED, clk_div_ddr6_fixed,
++			    clk_fpll0_parent, 0,
++			    0x154, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR6_MAIN, clk_div_ddr6_main,
++			    clk_dpll6_parent, 0,
++			    0x150, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR7_FIXED, clk_div_ddr7_fixed,
++			    clk_fpll0_parent, 0,
++			    0x15c, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    2);
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_DDR7_MAIN, clk_div_ddr7_main,
++			    clk_dpll7_parent, 0,
++			    0x158, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_TOP_50M, clk_div_top_50m,
++			       clk_fpll0_parent, 0,
++			       0x048, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       40);
++
++static const struct clk_hw *clk_div_top_50m_parent[] = {
++	&clk_div_top_50m.common.hw,
++};
++
++static DEFINE_SG2044_DIV_RO(CLK_DIV_TOP_AXI0, clk_div_top_axi0,
++			    clk_fpll0_parent, 0,
++			    0x118, 16, 8,
++			    CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			    20);
++
++static const struct clk_hw *clk_div_top_axi0_parent[] = {
++	&clk_div_top_axi0.common.hw,
++};
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_TOP_AXI_HSPERI, clk_div_top_axi_hsperi,
++			       clk_fpll0_parent, 0,
++			       0x11c, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       8);
++
++static const struct clk_hw *clk_div_top_axi_hsperi_parent[] = {
++	&clk_div_top_axi_hsperi.common.hw,
++};
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER0, clk_div_timer0,
++			 clk_div_top_50m_parent, 0,
++			 0x0d0, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER1, clk_div_timer1,
++			 clk_div_top_50m_parent, 0,
++			 0x0d4, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER2, clk_div_timer2,
++			 clk_div_top_50m_parent, 0,
++			 0x0d8, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER3, clk_div_timer3,
++			 clk_div_top_50m_parent, 0,
++			 0x0dc, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER4, clk_div_timer4,
++			 clk_div_top_50m_parent, 0,
++			 0x0e0, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER5, clk_div_timer5,
++			 clk_div_top_50m_parent, 0,
++			 0x0e4, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER6, clk_div_timer6,
++			 clk_div_top_50m_parent, 0,
++			 0x0e8, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV(CLK_DIV_TIMER7, clk_div_timer7,
++			 clk_div_top_50m_parent, 0,
++			 0x0ec, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_CXP_TEST_PHY, clk_div_cxp_test_phy,
++			       clk_fpll0_parent, 0,
++			       0x064, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_CXP_TEST_ETH_PHY, clk_div_cxp_test_eth_phy,
++			       clk_fpll2_parent, 0,
++			       0x068, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_C2C0_TEST_PHY, clk_div_c2c0_test_phy,
++			       clk_fpll0_parent, 0,
++			       0x05c, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_C2C1_TEST_PHY, clk_div_c2c1_test_phy,
++			       clk_fpll0_parent, 0,
++			       0x060, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_PCIE_1G, clk_div_pcie_1g,
++			       clk_fpll1_parent, 0,
++			       0x160, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       1);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_UART_500M, clk_div_uart_500m,
++			       clk_fpll0_parent, 0,
++			       0x0cc, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       4);
++
++static DEFINE_SG2044_DIV(CLK_DIV_GPIO_DB, clk_div_gpio_db,
++			 clk_div_top_axi0_parent, 0,
++			 0x0f8, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1000);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_SD, clk_div_sd,
++			       clk_fpll0_parent, 0,
++			       0x110, 16, 16,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       5);
++
++static DEFINE_SG2044_DIV(CLK_DIV_SD_100K, clk_div_sd_100k,
++			 clk_div_top_axi0_parent, 0,
++			 0x114, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1000);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_EMMC, clk_div_emmc,
++			       clk_fpll0_parent, 0,
++			       0x108, 16, 16,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       5);
++
++static DEFINE_SG2044_DIV(CLK_DIV_EMMC_100K, clk_div_emmc_100k,
++			 clk_div_top_axi0_parent, 0,
++			 0x10c, 16, 16,
++			 CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			 1000);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_EFUSE, clk_div_efuse,
++			       clk_fpll0_parent, 0,
++			       0x0f4, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       80);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_TX_ETH0, clk_div_tx_eth0,
++			       clk_fpll0_parent, 0,
++			       0x0fc, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       16);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_PTP_REF_I_ETH0, clk_div_ptp_ref_i_eth0,
++			       clk_fpll0_parent, 0,
++			       0x100, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       40);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_REF_ETH0, clk_div_ref_eth0,
++			       clk_fpll0_parent, 0,
++			       0x104, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       80);
++
++static DEFINE_SG2044_DIV_PDATA(CLK_DIV_PKA, clk_div_pka,
++			       clk_fpll0_parent, 0,
++			       0x0f0, 16, 8,
++			       CLK_DIVIDER_ONE_BASED | CLK_DIVIDER_ALLOW_ZERO,
++			       2);
++
++static const struct clk_parent_data clk_mux_ddr0_parents[] = {
++	{ .hw = &clk_div_ddr0_fixed.common.hw },
++	{ .hw = &clk_div_ddr0_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR0, clk_mux_ddr0,
++			 clk_mux_ddr0_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 7, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr1_parents[] = {
++	{ .hw = &clk_div_ddr1_fixed.common.hw },
++	{ .hw = &clk_div_ddr1_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR1, clk_mux_ddr1,
++			 clk_mux_ddr1_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 8, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr2_parents[] = {
++	{ .hw = &clk_div_ddr2_fixed.common.hw },
++	{ .hw = &clk_div_ddr2_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR2, clk_mux_ddr2,
++			 clk_mux_ddr2_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 9, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr3_parents[] = {
++	{ .hw = &clk_div_ddr3_fixed.common.hw },
++	{ .hw = &clk_div_ddr3_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR3, clk_mux_ddr3,
++			 clk_mux_ddr3_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 10, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr4_parents[] = {
++	{ .hw = &clk_div_ddr4_fixed.common.hw },
++	{ .hw = &clk_div_ddr4_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR4, clk_mux_ddr4,
++			 clk_mux_ddr4_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 11, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr5_parents[] = {
++	{ .hw = &clk_div_ddr5_fixed.common.hw },
++	{ .hw = &clk_div_ddr5_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR5, clk_mux_ddr5,
++			 clk_mux_ddr5_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 12, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr6_parents[] = {
++	{ .hw = &clk_div_ddr6_fixed.common.hw },
++	{ .hw = &clk_div_ddr6_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR6, clk_mux_ddr6,
++			 clk_mux_ddr6_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 13, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_ddr7_parents[] = {
++	{ .hw = &clk_div_ddr7_fixed.common.hw },
++	{ .hw = &clk_div_ddr7_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_DDR7, clk_mux_ddr7,
++			 clk_mux_ddr7_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 14, sg2044_mux_table, CLK_MUX_READ_ONLY);
++
++static const struct clk_parent_data clk_mux_noc_sys_parents[] = {
++	{ .hw = &clk_div_noc_sys_fixed.common.hw },
++	{ .hw = &clk_div_noc_sys_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_NOC_SYS, clk_mux_noc_sys,
++			 clk_mux_noc_sys_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 3, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_tpu_sys_parents[] = {
++	{ .hw = &clk_div_tpu_sys_fixed.common.hw },
++	{ .hw = &clk_div_tpu_sys_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_TPU_SYS, clk_mux_tpu_sys,
++			 clk_mux_tpu_sys_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 2, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_rp_sys_parents[] = {
++	{ .hw = &clk_div_rp_sys_fixed.common.hw },
++	{ .hw = &clk_div_rp_sys_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_RP_SYS, clk_mux_rp_sys,
++			 clk_mux_rp_sys_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 1, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_ap_sys_parents[] = {
++	{ .hw = &clk_div_ap_sys_fixed.common.hw },
++	{ .hw = &clk_div_ap_sys_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_AP_SYS, clk_mux_ap_sys,
++			 clk_mux_ap_sys_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 0, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_vc_src0_parents[] = {
++	{ .hw = &clk_div_vc_src0_fixed.common.hw },
++	{ .hw = &clk_div_vc_src0_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_VC_SRC0, clk_mux_vc_src0,
++			 clk_mux_vc_src0_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 4, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_vc_src1_parents[] = {
++	{ .hw = &clk_div_vc_src1_fixed.common.hw },
++	{ .hw = &clk_div_vc_src1_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_VC_SRC1, clk_mux_vc_src1,
++			 clk_mux_vc_src1_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 5, sg2044_mux_table, 0);
++
++static const struct clk_parent_data clk_mux_cxp_mac_parents[] = {
++	{ .hw = &clk_div_cxp_mac_fixed.common.hw },
++	{ .hw = &clk_div_cxp_mac_main.common.hw },
++};
++
++static DEFINE_SG2044_MUX(CLK_MUX_CXP_MAC, clk_mux_cxp_mac,
++			 clk_mux_cxp_mac_parents,
++			 CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
++			 0x020, 6, sg2044_mux_table, 0);
++
++static const struct clk_hw *clk_gate_ap_sys_parent[] = {
++	&clk_mux_ap_sys.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_AP_SYS, clk_gate_ap_sys,
++			  clk_gate_ap_sys_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 0, 0);
++
++static const struct clk_hw *clk_gate_rp_sys_parent[] = {
++	&clk_mux_rp_sys.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_RP_SYS, clk_gate_rp_sys,
++			  clk_gate_rp_sys_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 2, 0);
++
++static const struct clk_hw *clk_gate_tpu_sys_parent[] = {
++	&clk_mux_tpu_sys.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TPU_SYS, clk_gate_tpu_sys,
++			  clk_gate_tpu_sys_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 3, 0);
++
++static const struct clk_hw *clk_gate_noc_sys_parent[] = {
++	&clk_mux_noc_sys.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_NOC_SYS, clk_gate_noc_sys,
++			  clk_gate_noc_sys_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 8, 0);
++
++static const struct clk_hw *clk_gate_vc_src0_parent[] = {
++	&clk_mux_vc_src0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_VC_SRC0, clk_gate_vc_src0,
++			  clk_gate_vc_src0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 9, 0);
++
++static const struct clk_hw *clk_gate_vc_src1_parent[] = {
++	&clk_mux_vc_src1.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_VC_SRC1, clk_gate_vc_src1,
++			  clk_gate_vc_src1_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 10, 0);
++
++static const struct clk_hw *clk_gate_ddr0_parent[] = {
++	&clk_mux_ddr0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR0, clk_gate_ddr0,
++			  clk_gate_ddr0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 7, 0);
++
++static const struct clk_hw *clk_gate_ddr1_parent[] = {
++	&clk_mux_ddr1.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR1, clk_gate_ddr1,
++			  clk_gate_ddr1_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 8, 0);
++
++static const struct clk_hw *clk_gate_ddr2_parent[] = {
++	&clk_mux_ddr2.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR2, clk_gate_ddr2,
++			  clk_gate_ddr2_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 9, 0);
++
++static const struct clk_hw *clk_gate_ddr3_parent[] = {
++	&clk_mux_ddr3.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR3, clk_gate_ddr3,
++			  clk_gate_ddr3_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 10, 0);
++
++static const struct clk_hw *clk_gate_ddr4_parent[] = {
++	&clk_mux_ddr4.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR4, clk_gate_ddr4,
++			  clk_gate_ddr4_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 11, 0);
++
++static const struct clk_hw *clk_gate_ddr5_parent[] = {
++	&clk_mux_ddr5.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR5, clk_gate_ddr5,
++			  clk_gate_ddr5_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 12, 0);
++
++static const struct clk_hw *clk_gate_ddr6_parent[] = {
++	&clk_mux_ddr6.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR6, clk_gate_ddr6,
++			  clk_gate_ddr6_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 13, 0);
++
++static const struct clk_hw *clk_gate_ddr7_parent[] = {
++	&clk_mux_ddr7.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_DDR7, clk_gate_ddr7,
++			  clk_gate_ddr7_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 14, 0);
++
++static const struct clk_hw *clk_gate_top_50m_parent[] = {
++	&clk_div_top_50m.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TOP_50M, clk_gate_top_50m,
++			  clk_gate_top_50m_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 1, 0);
++
++static const struct clk_hw *clk_gate_sc_rx_parent[] = {
++	&clk_div_top_50m.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_SC_RX, clk_gate_sc_rx,
++			  clk_gate_sc_rx_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 12, 0);
++
++static const struct clk_hw *clk_gate_sc_rx_x0y1_parent[] = {
++	&clk_div_top_50m.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_SC_RX_X0Y1, clk_gate_sc_rx_x0y1,
++			  clk_gate_sc_rx_x0y1_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 13, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_TOP_AXI0, clk_gate_top_axi0,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 5, 0);
++
++static const struct clk_hw *clk_gate_mailbox_intc_parent[] = {
++	&clk_gate_top_axi0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_INTC0, clk_gate_intc0,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 20, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_INTC1, clk_gate_intc1,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 21, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_INTC2, clk_gate_intc2,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 22, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_INTC3, clk_gate_intc3,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 23, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_MAILBOX0, clk_gate_mailbox0,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 16, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_MAILBOX1, clk_gate_mailbox1,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 17, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_MAILBOX2, clk_gate_mailbox2,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 18, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_MAILBOX3, clk_gate_mailbox3,
++			  clk_gate_mailbox_intc_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x020, 19, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_TOP_AXI_HSPERI, clk_gate_top_axi_hsperi,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x008, 6, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_TIMER, clk_gate_apb_timer,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 7, 0);
++
++static const struct clk_hw *clk_gate_timer0_parent[] = {
++	&clk_div_timer0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER0, clk_gate_timer0,
++			  clk_gate_timer0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 8, 0);
++
++static const struct clk_hw *clk_gate_timer1_parent[] = {
++	&clk_div_timer1.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER1, clk_gate_timer1,
++			  clk_gate_timer1_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 9, 0);
++
++static const struct clk_hw *clk_gate_timer2_parent[] = {
++	&clk_div_timer2.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER2, clk_gate_timer2,
++			  clk_gate_timer2_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 10, 0);
++
++static const struct clk_hw *clk_gate_timer3_parent[] = {
++	&clk_div_timer3.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER3, clk_gate_timer3,
++			  clk_gate_timer3_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 11, 0);
++
++static const struct clk_hw *clk_gate_timer4_parent[] = {
++	&clk_div_timer4.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER4, clk_gate_timer4,
++			  clk_gate_timer4_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 12, 0);
++
++static const struct clk_hw *clk_gate_timer5_parent[] = {
++	&clk_div_timer5.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER5, clk_gate_timer5,
++			  clk_gate_timer5_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 13, 0);
++
++static const struct clk_hw *clk_gate_timer6_parent[] = {
++	&clk_div_timer6.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER6, clk_gate_timer6,
++			  clk_gate_timer6_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 14, 0);
++
++static const struct clk_hw *clk_gate_timer7_parent[] = {
++	&clk_div_timer7.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TIMER7, clk_gate_timer7,
++			  clk_gate_timer7_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 15, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_CXP_CFG, clk_gate_cxp_cfg,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 15, 0);
++
++static const struct clk_hw *clk_gate_cxp_mac_parent[] = {
++	&clk_mux_cxp_mac.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_CXP_MAC, clk_gate_cxp_mac,
++			  clk_gate_cxp_mac_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x000, 14, 0);
++
++static const struct clk_hw *clk_gate_cxp_test_phy_parent[] = {
++	&clk_div_cxp_test_phy.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_CXP_TEST_PHY, clk_gate_cxp_test_phy,
++			  clk_gate_cxp_test_phy_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x000, 6, 0);
++
++static const struct clk_hw *clk_gate_cxp_test_eth_phy_parent[] = {
++	&clk_div_cxp_test_eth_phy.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_CXP_TEST_ETH_PHY, clk_gate_cxp_test_eth_phy,
++			  clk_gate_cxp_test_eth_phy_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x000, 7, 0);
++
++static const struct clk_hw *clk_gate_pcie_1g_parent[] = {
++	&clk_div_pcie_1g.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_PCIE_1G, clk_gate_pcie_1g,
++			  clk_gate_pcie_1g_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 15, 0);
++
++static const struct clk_hw *clk_gate_c2c0_test_phy_parent[] = {
++	&clk_div_c2c0_test_phy.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_C2C0_TEST_PHY, clk_gate_c2c0_test_phy,
++			  clk_gate_c2c0_test_phy_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x000, 4, 0);
++
++static const struct clk_hw *clk_gate_c2c1_test_phy_parent[] = {
++	&clk_div_c2c1_test_phy.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_C2C1_TEST_PHY, clk_gate_c2c1_test_phy,
++			  clk_gate_c2c1_test_phy_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x000, 5, 0);
++
++static const struct clk_hw *clk_gate_uart_500m_parent[] = {
++	&clk_div_uart_500m.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_UART_500M, clk_gate_uart_500m,
++			  clk_gate_uart_500m_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 1, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_UART, clk_gate_apb_uart,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 2, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_SPI, clk_gate_apb_spi,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 22, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AHB_SPIFMC, clk_gate_ahb_spifmc,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 5, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_I2C, clk_gate_apb_i2c,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 23, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AXI_DBG_I2C, clk_gate_axi_dbg_i2c,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 3, 0);
++
++static const struct clk_hw *clk_gate_gpio_db_parent[] = {
++	&clk_div_gpio_db.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_GPIO_DB, clk_gate_gpio_db,
++			  clk_gate_gpio_db_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 21, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_GPIO_INTR, clk_gate_apb_gpio_intr,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 20, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_GPIO, clk_gate_apb_gpio,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 19, 0);
++
++static const struct clk_hw *clk_gate_sd_parent[] = {
++	&clk_div_sd.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_SD, clk_gate_sd,
++			  clk_gate_sd_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 3, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AXI_SD, clk_gate_axi_sd,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 2, 0);
++
++static const struct clk_hw *clk_gate_sd_100k_parent[] = {
++	&clk_div_sd_100k.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_SD_100K, clk_gate_sd_100k,
++			  clk_gate_sd_100k_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 4, 0);
++
++static const struct clk_hw *clk_gate_emmc_parent[] = {
++	&clk_div_emmc.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_EMMC, clk_gate_emmc,
++			  clk_gate_emmc_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 0, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AXI_EMMC, clk_gate_axi_emmc,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 31, 0);
++
++static const struct clk_hw *clk_gate_emmc_100k_parent[] = {
++	&clk_div_emmc_100k.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_EMMC_100K, clk_gate_emmc_100k,
++			  clk_gate_emmc_100k_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x008, 1, 0);
++
++static const struct clk_hw *clk_gate_efuse_parent[] = {
++	&clk_div_efuse.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_EFUSE, clk_gate_efuse,
++			  clk_gate_efuse_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 17, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_EFUSE, clk_gate_apb_efuse,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 18, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_SYSDMA_AXI, clk_gate_sysdma_axi,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 0, 0);
++
++static const struct clk_hw *clk_gate_tx_eth0_parent[] = {
++	&clk_div_tx_eth0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_TX_ETH0, clk_gate_tx_eth0,
++			  clk_gate_tx_eth0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 27, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AXI_ETH0, clk_gate_axi_eth0,
++			  clk_div_top_axi_hsperi_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 28, 0);
++
++static const struct clk_hw *clk_gate_ptp_ref_i_eth0_parent[] = {
++	&clk_div_ptp_ref_i_eth0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_PTP_REF_I_ETH0, clk_gate_ptp_ref_i_eth0,
++			  clk_gate_ptp_ref_i_eth0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 29, 0);
++
++static const struct clk_hw *clk_gate_ref_eth0_parent[] = {
++	&clk_div_ref_eth0.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_REF_ETH0, clk_gate_ref_eth0,
++			  clk_gate_ref_eth0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 30, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_RTC, clk_gate_apb_rtc,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 26, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_PWM, clk_gate_apb_pwm,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 25, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_APB_WDT, clk_gate_apb_wdt,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 24, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AXI_SRAM, clk_gate_axi_sram,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 6, 0);
++
++static DEFINE_SG2044_GATE(CLK_GATE_AHB_ROM, clk_gate_ahb_rom,
++			  clk_div_top_axi0_parent,
++			  CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,
++			  0x004, 4, 0);
++
++static const struct clk_hw *clk_gate_pka_parent[] = {
++	&clk_div_pka.common.hw,
++};
++
++static DEFINE_SG2044_GATE(CLK_GATE_PKA, clk_gate_pka,
++			  clk_gate_pka_parent,
++			  CLK_SET_RATE_PARENT,
++			  0x004, 16, 0);
++
++static struct sg2044_clk_common * const sg2044_div_commons[] = {
++	&clk_div_ap_sys_fixed.common,
++	&clk_div_ap_sys_main.common,
++	&clk_div_rp_sys_fixed.common,
++	&clk_div_rp_sys_main.common,
++	&clk_div_tpu_sys_fixed.common,
++	&clk_div_tpu_sys_main.common,
++	&clk_div_noc_sys_fixed.common,
++	&clk_div_noc_sys_main.common,
++	&clk_div_vc_src0_fixed.common,
++	&clk_div_vc_src0_main.common,
++	&clk_div_vc_src1_fixed.common,
++	&clk_div_vc_src1_main.common,
++	&clk_div_cxp_mac_fixed.common,
++	&clk_div_cxp_mac_main.common,
++	&clk_div_ddr0_fixed.common,
++	&clk_div_ddr0_main.common,
++	&clk_div_ddr1_fixed.common,
++	&clk_div_ddr1_main.common,
++	&clk_div_ddr2_fixed.common,
++	&clk_div_ddr2_main.common,
++	&clk_div_ddr3_fixed.common,
++	&clk_div_ddr3_main.common,
++	&clk_div_ddr4_fixed.common,
++	&clk_div_ddr4_main.common,
++	&clk_div_ddr5_fixed.common,
++	&clk_div_ddr5_main.common,
++	&clk_div_ddr6_fixed.common,
++	&clk_div_ddr6_main.common,
++	&clk_div_ddr7_fixed.common,
++	&clk_div_ddr7_main.common,
++	&clk_div_top_50m.common,
++	&clk_div_top_axi0.common,
++	&clk_div_top_axi_hsperi.common,
++	&clk_div_timer0.common,
++	&clk_div_timer1.common,
++	&clk_div_timer2.common,
++	&clk_div_timer3.common,
++	&clk_div_timer4.common,
++	&clk_div_timer5.common,
++	&clk_div_timer6.common,
++	&clk_div_timer7.common,
++	&clk_div_cxp_test_phy.common,
++	&clk_div_cxp_test_eth_phy.common,
++	&clk_div_c2c0_test_phy.common,
++	&clk_div_c2c1_test_phy.common,
++	&clk_div_pcie_1g.common,
++	&clk_div_uart_500m.common,
++	&clk_div_gpio_db.common,
++	&clk_div_sd.common,
++	&clk_div_sd_100k.common,
++	&clk_div_emmc.common,
++	&clk_div_emmc_100k.common,
++	&clk_div_efuse.common,
++	&clk_div_tx_eth0.common,
++	&clk_div_ptp_ref_i_eth0.common,
++	&clk_div_ref_eth0.common,
++	&clk_div_pka.common,
++};
++
++static struct sg2044_clk_common * const sg2044_mux_commons[] = {
++	&clk_mux_ddr0.common,
++	&clk_mux_ddr1.common,
++	&clk_mux_ddr2.common,
++	&clk_mux_ddr3.common,
++	&clk_mux_ddr4.common,
++	&clk_mux_ddr5.common,
++	&clk_mux_ddr6.common,
++	&clk_mux_ddr7.common,
++	&clk_mux_noc_sys.common,
++	&clk_mux_tpu_sys.common,
++	&clk_mux_rp_sys.common,
++	&clk_mux_ap_sys.common,
++	&clk_mux_vc_src0.common,
++	&clk_mux_vc_src1.common,
++	&clk_mux_cxp_mac.common,
++};
++
++static struct sg2044_clk_common * const sg2044_gate_commons[] = {
++	&clk_gate_ap_sys.common,
++	&clk_gate_rp_sys.common,
++	&clk_gate_tpu_sys.common,
++	&clk_gate_noc_sys.common,
++	&clk_gate_vc_src0.common,
++	&clk_gate_vc_src1.common,
++	&clk_gate_ddr0.common,
++	&clk_gate_ddr1.common,
++	&clk_gate_ddr2.common,
++	&clk_gate_ddr3.common,
++	&clk_gate_ddr4.common,
++	&clk_gate_ddr5.common,
++	&clk_gate_ddr6.common,
++	&clk_gate_ddr7.common,
++	&clk_gate_top_50m.common,
++	&clk_gate_sc_rx.common,
++	&clk_gate_sc_rx_x0y1.common,
++	&clk_gate_top_axi0.common,
++	&clk_gate_intc0.common,
++	&clk_gate_intc1.common,
++	&clk_gate_intc2.common,
++	&clk_gate_intc3.common,
++	&clk_gate_mailbox0.common,
++	&clk_gate_mailbox1.common,
++	&clk_gate_mailbox2.common,
++	&clk_gate_mailbox3.common,
++	&clk_gate_top_axi_hsperi.common,
++	&clk_gate_apb_timer.common,
++	&clk_gate_timer0.common,
++	&clk_gate_timer1.common,
++	&clk_gate_timer2.common,
++	&clk_gate_timer3.common,
++	&clk_gate_timer4.common,
++	&clk_gate_timer5.common,
++	&clk_gate_timer6.common,
++	&clk_gate_timer7.common,
++	&clk_gate_cxp_cfg.common,
++	&clk_gate_cxp_mac.common,
++	&clk_gate_cxp_test_phy.common,
++	&clk_gate_cxp_test_eth_phy.common,
++	&clk_gate_pcie_1g.common,
++	&clk_gate_c2c0_test_phy.common,
++	&clk_gate_c2c1_test_phy.common,
++	&clk_gate_uart_500m.common,
++	&clk_gate_apb_uart.common,
++	&clk_gate_apb_spi.common,
++	&clk_gate_ahb_spifmc.common,
++	&clk_gate_apb_i2c.common,
++	&clk_gate_axi_dbg_i2c.common,
++	&clk_gate_gpio_db.common,
++	&clk_gate_apb_gpio_intr.common,
++	&clk_gate_apb_gpio.common,
++	&clk_gate_sd.common,
++	&clk_gate_axi_sd.common,
++	&clk_gate_sd_100k.common,
++	&clk_gate_emmc.common,
++	&clk_gate_axi_emmc.common,
++	&clk_gate_emmc_100k.common,
++	&clk_gate_efuse.common,
++	&clk_gate_apb_efuse.common,
++	&clk_gate_sysdma_axi.common,
++	&clk_gate_tx_eth0.common,
++	&clk_gate_axi_eth0.common,
++	&clk_gate_ptp_ref_i_eth0.common,
++	&clk_gate_ref_eth0.common,
++	&clk_gate_apb_rtc.common,
++	&clk_gate_apb_pwm.common,
++	&clk_gate_apb_wdt.common,
++	&clk_gate_axi_sram.common,
++	&clk_gate_ahb_rom.common,
++	&clk_gate_pka.common,
++};
++
++static void sg2044_clk_fix_init_parent(struct clk_hw **pdata,
++				       const struct clk_init_data *init,
++				       struct clk_hw_onecell_data *data)
++{
++	u8 i;
++	const struct clk_hw *hw;
++	const struct sg2044_clk_common *common;
++
++	for (i = 0; i < init->num_parents; i++) {
++		hw = init->parent_hws[i];
++		common = hw_to_sg2044_clk_common(hw);
++
++		WARN(!data->hws[common->id], "clk %u is not register\n",
++		     common->id);
++		pdata[i] = data->hws[common->id];
++	}
++}
++
++static int sg2044_clk_init_ctrl(struct device *dev, void __iomem *reg,
++				struct sg2044_clk_ctrl *ctrl,
++				const struct sg2044_clk_desc_data *desc)
 +{
 +	int ret, i;
++	struct clk_hw *hw;
 +
 +	spin_lock_init(&ctrl->lock);
 +
-+	for (i = 0; i < desc->num_pll; i++) {
-+		struct sg2044_clk_common *common = desc->pll[i];
-+		struct sg2044_pll *pll = hw_to_sg2044_pll(&common->hw);
++	for (i = 0; i < desc->num_div; i++) {
++		struct sg2044_clk_common *common = desc->div[i];
 +
 +		common->lock = &ctrl->lock;
-+		common->regmap = regmap;
-+		pll->syscon_offset = SG2044_SYSCON_PLL_OFFSET;
++		common->base = reg;
 +
 +		ret = devm_clk_hw_register(dev, &common->hw);
 +		if (ret)
@@ -725,58 +1850,121 @@ index 000000000000..94c0f519ba6d
 +		ctrl->data.hws[common->id] = &common->hw;
 +	}
 +
++	for (i = 0; i < desc->num_mux; i++) {
++		struct sg2044_clk_common *common = desc->mux[i];
++		struct sg2044_mux *mux = hw_to_sg2044_mux(&common->hw);
++		const struct clk_init_data *init = common->hw.init;
++
++		common->lock = &ctrl->lock;
++		common->base = reg;
++
++		hw = devm_clk_hw_register_mux_parent_data_table(dev,
++								init->name,
++								init->parent_data,
++								init->num_parents,
++								init->flags,
++								reg + mux->mux.offset,
++								mux->mux.shift,
++								1,
++								mux->mux.flags,
++								mux->mux.table,
++								&ctrl->lock);
++		if (IS_ERR(hw))
++			return PTR_ERR(hw);
++
++		if (!(mux->mux.flags & CLK_MUX_READ_ONLY)) {
++			mux->nb.notifier_call = sg2044_mux_notifier_cb;
++			ret = devm_clk_notifier_register(dev, hw->clk,
++							 &mux->nb);
++			if (ret < 0)
++				return dev_err_probe(dev, ret,
++						     "%s: failed to register notifier\n",
++						     clk_hw_get_name(hw));
++		}
++
++		ctrl->data.hws[common->id] = hw;
++	}
++
++	for (i = 0; i < desc->num_gate; i++) {
++		struct sg2044_clk_common *common = desc->gate[i];
++		struct sg2044_gate *gate = hw_to_sg2044_gate(&common->hw);
++		const struct clk_init_data *init = common->hw.init;
++		struct clk_hw *parent_hws[1] = { };
++
++		sg2044_clk_fix_init_parent(parent_hws, init, &ctrl->data);
++		common->lock = &ctrl->lock;
++		common->base = reg;
++
++		hw = devm_clk_hw_register_gate_parent_hw(dev, init->name,
++							 parent_hws[0],
++							 init->flags,
++							 reg + gate->gate.offset,
++							 gate->gate.shift,
++							 gate->gate.flags,
++							 &ctrl->lock);
++		if (IS_ERR(hw))
++			return PTR_ERR(hw);
++
++		ctrl->data.hws[common->id] = hw;
++	}
++
 +	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get,
 +					   &ctrl->data);
 +}
 +
-+static int sg2044_pll_probe(struct platform_device *pdev)
++static int sg2044_clk_probe(struct platform_device *pdev)
 +{
 +	struct device *dev = &pdev->dev;
-+	struct sg2044_pll_ctrl *ctrl;
-+	const struct sg2044_pll_desc_data *desc;
-+	struct regmap *regmap;
++	struct sg2044_clk_ctrl *ctrl;
++	const struct sg2044_clk_desc_data *desc;
++	void __iomem *reg;
++	u32 num_clks;
 +
-+	regmap = device_node_to_regmap(pdev->dev.parent->of_node);
-+	if (IS_ERR(regmap))
-+		return dev_err_probe(dev, PTR_ERR(regmap),
-+				     "fail to get the regmap for PLL\n");
++	reg = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(reg))
++		return PTR_ERR(reg);
 +
-+	desc = (const struct sg2044_pll_desc_data *)platform_get_device_id(pdev)->driver_data;
++	desc = device_get_match_data(dev);
 +	if (!desc)
 +		return dev_err_probe(dev, -EINVAL, "no match data for platform\n");
 +
-+	ctrl = devm_kzalloc(dev, struct_size(ctrl, data.hws, desc->num_pll), GFP_KERNEL);
++	num_clks = desc->num_div + desc->num_gate + desc->num_mux;
++
++	ctrl = devm_kzalloc(dev, struct_size(ctrl, data.hws, num_clks), GFP_KERNEL);
 +	if (!ctrl)
 +		return -ENOMEM;
 +
-+	ctrl->data.num = desc->num_pll;
++	ctrl->data.num = num_clks;
 +
-+	return sg2044_pll_init_ctrl(dev, regmap, ctrl, desc);
++	return sg2044_clk_init_ctrl(dev, reg, ctrl, desc);
 +}
 +
-+static const struct sg2044_pll_desc_data sg2044_pll_desc_data = {
-+	.pll = sg2044_pll_commons,
-+	.num_pll = ARRAY_SIZE(sg2044_pll_commons),
++static const struct sg2044_clk_desc_data sg2044_clk_desc_data = {
++	.div = sg2044_div_commons,
++	.mux = sg2044_mux_commons,
++	.gate = sg2044_gate_commons,
++	.num_div = ARRAY_SIZE(sg2044_div_commons),
++	.num_mux = ARRAY_SIZE(sg2044_mux_commons),
++	.num_gate = ARRAY_SIZE(sg2044_gate_commons),
 +};
 +
-+static const struct platform_device_id sg2044_pll_match[] = {
-+	{ .name = "sg2044-pll",
-+	  .driver_data = (unsigned long)&sg2044_pll_desc_data },
++static const struct of_device_id sg2044_clk_match[] = {
++	{ .compatible = "sophgo,sg2044-clk", .data = &sg2044_clk_desc_data },
 +	{ /* sentinel */ }
 +};
-+MODULE_DEVICE_TABLE(platform, sg2044_pll_match);
++MODULE_DEVICE_TABLE(of, sg2044_clk_match);
 +
 +static struct platform_driver sg2044_clk_driver = {
-+	.probe = sg2044_pll_probe,
++	.probe = sg2044_clk_probe,
 +	.driver = {
-+		.name = "sg2044-pll",
++		.name = "sg2044-clk",
++		.of_match_table = sg2044_clk_match,
 +	},
-+	.id_table = sg2044_pll_match,
 +};
 +module_platform_driver(sg2044_clk_driver);
 +
 +MODULE_AUTHOR("Inochi Amaoto <inochiama@gmail.com>");
-+MODULE_DESCRIPTION("Sophgo SG2044 pll clock driver");
++MODULE_DESCRIPTION("Sophgo SG2044 clock driver");
 +MODULE_LICENSE("GPL");
 -- 
 2.49.0
