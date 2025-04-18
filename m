@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-183995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C00A92EA3
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:08:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E0AA92EA4
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BC84A1D14
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:08:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BA044A002E
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E821442C;
-	Fri, 18 Apr 2025 00:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B154A01;
+	Fri, 18 Apr 2025 00:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="f037affS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="b6ErQaSk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD8879EA
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31583C30
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744934896; cv=none; b=C5TPfYDoGKTfzQ/EgrhufaUY3Aiu/4geic4XGD4M1KjWjY8EOLq6lR9NVJRpqujJqjKTCWQ11E7rSntebCZHjL0YNFDGVV/NVYDJEDHjvttv29qyVmZrXSjgzEMYH6F5MzGBQSsm0SE3ll+Nc8ciQGfABwv6m7JTiUS4Wy2Ntg8=
+	t=1744934917; cv=none; b=rOY5aE/Jf3jCIX1nAs+6TP01FvOb7lLspwC2krkZ70U3lrn+OCmkwfKOi/EfyYq8rOq+WOIVwqjqNmjEepUfmVdXwnczwoqSddHTmQnvL76lopeeF24+bNdB5soHEn6Kv9H9wIX8oFL12tXx/1x/Nf77oQdYogJbSegYhCgsGgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744934896; c=relaxed/simple;
-	bh=k/8qX0BNwgh176hMRAi+XVQ3knseryLGwqugBHGY5Lo=;
+	s=arc-20240116; t=1744934917; c=relaxed/simple;
+	bh=XC4DC1youASP2x8nFAqmoT4PbQsEIh5HauJs/aMf70s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b15L/haTR+aFAL1ktmmZJqDN4SruKy+T8ax6QLdITAq1YCsx9EzTfiwfcYi3lhdnXqruxjOkBjk6ePm9yJAqXENtSWsK3Sty5ALuZhpixae3a/jXw3sCcstmE/9I5dm2J58kLUR+0OHYoIaOQM644ixRo+fE9rb5Z7csoWNTgvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=f037affS; arc=none smtp.client-ip=52.119.213.156
+	 MIME-Version:Content-Type; b=U56n6Am/mEjwe9dXdwxu3CHaJm5KTBMk1tEExX5kO8I9DHBUtkC0NXBhX+XUl31BFGqOCTbxPl1yhDdyut1i7UdVcTuuSu0VvxJKOd0zYpaRmXvVLn6Oi91/WbhHA8+IMZsEK3b5QzIhIYYD8rp3wJ5MT2f3b7OuhEpdl8cjV/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=b6ErQaSk; arc=none smtp.client-ip=99.78.197.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744934894; x=1776470894;
+  t=1744934916; x=1776470916;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=x/vIwFPrQWzVaKDGSkoh0hV7FgliOgaH5bk4sHYD+Sc=;
-  b=f037affSWL2Jn/Sl9ltYIkf7+XDilNfnOu+CT55YygCEi7ukGUUDJe7/
-   IHEFEZ6Fw94euAEc+qkTw/zTxOOQhJ0ftY/UcMrOd3+MxpvBdVN94vRtP
-   ktm7FewU+MjeSXhKMo5Fl6x1kHhAraYp2C1yQmkWDcPQGIQhK4uyMUhcs
-   k=;
+  bh=LJZUXxmKaCTUQVVUwy5Cspv1ZWBy26pfo9q0xyLuGN8=;
+  b=b6ErQaSkPw2FLecod1DrlD3G74nboPfmYnU0ADtW5TWkisvjlGuoP+vO
+   xWmkyeGlqfourBBk15bGKA7SwAqEDRfvfaKaslSkQ0IucDpLdsUni1GLQ
+   gZaFdz2tGLfHuxccGc6lIyDVrbEe73X3cZQhtIru71a+cZ69WounZBOQ2
+   g=;
 X-IronPort-AV: E=Sophos;i="6.15,220,1739836800"; 
-   d="scan'208";a="736588014"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:08:13 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:56926]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.20:2525] with esmtp (Farcaster)
- id 4df646f8-28ca-497a-8aa6-08d3e18d79ef; Fri, 18 Apr 2025 00:08:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 4df646f8-28ca-497a-8aa6-08d3e18d79ef
+   d="scan'208";a="41634107"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:08:34 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:38407]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.240:2525] with esmtp (Farcaster)
+ id 8de30197-680b-4b71-aca8-66aeba7cfabd; Fri, 18 Apr 2025 00:08:33 +0000 (UTC)
+X-Farcaster-Flow-ID: 8de30197-680b-4b71-aca8-66aeba7cfabd
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:08:08 +0000
+ Fri, 18 Apr 2025 00:08:32 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:08:05 +0000
+ Fri, 18 Apr 2025 00:08:29 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 08/15] ipv6: Preallocate nhc_pcpu_rth_output in ip6_route_info_create().
-Date: Thu, 17 Apr 2025 17:03:49 -0700
-Message-ID: <20250418000443.43734-9-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 09/15] ipv6: Don't pass net to ip6_route_info_append().
+Date: Thu, 17 Apr 2025 17:03:50 -0700
+Message-ID: <20250418000443.43734-10-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418000443.43734-1-kuniyu@amazon.com>
 References: <20250418000443.43734-1-kuniyu@amazon.com>
@@ -77,69 +77,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
+X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-ip6_route_info_create_nh() will be called under RCU.
+net is not used in ip6_route_info_append() after commit 36f19d5b4f99
+("net/ipv6: Remove extra call to ip6_convert_metrics for multipath case").
 
-It calls fib_nh_common_init() and allocates nhc->nhc_pcpu_rth_output.
-
-As with the reason for rt->fib6_nh->rt6i_pcpu, we want to avoid
-GFP_ATOMIC allocation for nhc->nhc_pcpu_rth_output under RCU.
-
-Let's preallocate it in ip6_route_info_create().
+Let's remove the argument.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/ipv4/fib_semantics.c | 10 ++++++----
- net/ipv6/route.c         |  9 +++++++++
- 2 files changed, 15 insertions(+), 4 deletions(-)
+ net/ipv6/route.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index f68bb9e34c34..5326f1501af0 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -617,10 +617,12 @@ int fib_nh_common_init(struct net *net, struct fib_nh_common *nhc,
- {
- 	int err;
- 
--	nhc->nhc_pcpu_rth_output = alloc_percpu_gfp(struct rtable __rcu *,
--						    gfp_flags);
--	if (!nhc->nhc_pcpu_rth_output)
--		return -ENOMEM;
-+	if (!nhc->nhc_pcpu_rth_output) {
-+		nhc->nhc_pcpu_rth_output = alloc_percpu_gfp(struct rtable __rcu *,
-+							    gfp_flags);
-+		if (!nhc->nhc_pcpu_rth_output)
-+			return -ENOMEM;
-+	}
- 
- 	if (encap) {
- 		struct lwtunnel_state *lwtstate;
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b0ddb73c732e..ea755027cf61 100644
+index ea755027cf61..af11fcaa5cf3 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -3731,10 +3731,19 @@ void fib6_nh_release_dsts(struct fib6_nh *fib6_nh)
+@@ -5317,8 +5317,7 @@ struct rt6_nh {
+ 	struct list_head next;
+ };
  
- static int fib6_nh_prealloc_percpu(struct fib6_nh *fib6_nh, gfp_t gfp_flags)
+-static int ip6_route_info_append(struct net *net,
+-				 struct list_head *rt6_nh_list,
++static int ip6_route_info_append(struct list_head *rt6_nh_list,
+ 				 struct fib6_info *rt,
+ 				 struct fib6_config *r_cfg)
  {
-+	struct fib_nh_common *nhc = &fib6_nh->nh_common;
-+
- 	fib6_nh->rt6i_pcpu = alloc_percpu_gfp(struct rt6_info *, gfp_flags);
- 	if (!fib6_nh->rt6i_pcpu)
- 		return -ENOMEM;
+@@ -5458,8 +5457,7 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
  
-+	nhc->nhc_pcpu_rth_output = alloc_percpu_gfp(struct rtable __rcu *,
-+						    gfp_flags);
-+	if (!nhc->nhc_pcpu_rth_output) {
-+		free_percpu(fib6_nh->rt6i_pcpu);
-+		return -ENOMEM;
-+	}
-+
- 	return 0;
- }
+ 		rt->fib6_nh->fib_nh_weight = rtnh->rtnh_hops + 1;
  
+-		err = ip6_route_info_append(info->nl_net, &rt6_nh_list,
+-					    rt, &r_cfg);
++		err = ip6_route_info_append(&rt6_nh_list, rt, &r_cfg);
+ 		if (err) {
+ 			fib6_info_release(rt);
+ 			goto cleanup;
 -- 
 2.49.0
 
