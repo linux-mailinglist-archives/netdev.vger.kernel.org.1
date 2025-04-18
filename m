@@ -1,97 +1,98 @@
-Return-Path: <netdev+bounces-184155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E763A93830
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:00:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73A7A93834
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E623D4662A2
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:00:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30BBE7B29CB
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486EA42049;
-	Fri, 18 Apr 2025 14:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQ8yd3Bz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95E72940F;
+	Fri, 18 Apr 2025 14:01:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B20127470;
-	Fri, 18 Apr 2025 14:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED358F49
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 14:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744984819; cv=none; b=RjzELhYkQ1XEUQafhb/gRpNAtsUVqfyFZTngaSh0ZMJPXeeADeqwJBh9vi0ynpMPa/ZxcoLISUWGfCyqOgb0gbvQbO2vTF6OCXSDMcdP9PFdG3bOHEfxKQlPwKEGVJLMWbb51R3KGlHxGU2n9TuKbPROjh0UwBkAYT1NN+BQ0VA=
+	t=1744984914; cv=none; b=QkmziYWgyuQ1AoipefpAO1RHP/TJUUff3pLCGczIBOZrPRqI9R6IDnlupt+ltELG2TLKFPRz4FR/OcQJC7cpL1PhbgOW0QjmsLOtICPJx78bAmB5Y/Aj/bVplgg0szTGrVjnqhpuWqdqm8y2+jGGPu3duVQckFVTslaIkyNv1P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744984819; c=relaxed/simple;
-	bh=mU6IHI3+QHPzVGRjkpFASNAQK92ao1ary1xz2qj3Q7M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H4LD8Dhh5TnBqXulkkN+gGujgTMgkah2xvLaDpyn4xzlUgi9v/LphPQtac9eKeVBR5zRYb0m6bNH+ReMq5urpWVxotg0QJ3N6voPcul4jsLu3DUXuVO/rsxl2VNY459oUrlPXveHaPuGsIPOxcmu8VYOyXgT/ZCD9AsBixBVN88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQ8yd3Bz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077F8C4CEE2;
-	Fri, 18 Apr 2025 14:00:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744984818;
-	bh=mU6IHI3+QHPzVGRjkpFASNAQK92ao1ary1xz2qj3Q7M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gQ8yd3BzbaXZ+6b52VgwwK3xmWiAZ0bdj/TRPjg15bZal4YhlOPgF/01U1OzZFtmR
-	 9/Bxp8Bgx38kySYa4y8mkGXKiYFOTByBgT8AS2jVZvBuoUYC4OC86yYIR8T4Rw/FT6
-	 FlcLF4ol2yBuFl5eqIN1WOJDUB6uqCBLpn732HiRbk95U360M2lVDC7MRi99GR4ExJ
-	 VMhS/IyXQoWMTU0HVhW3SGDTqDnv4ESVpxhQIR+8Tm6GJ19oeWMJsMorVxCF4n2uP+
-	 urSRL3Tts/4MlRtDIbkIZbms1A8NsZXqdKR6IA9crjXJvM0e7mMTqkGsqXMBRFBLz2
-	 dkq7KxLMxTkrQ==
-From: cel@kernel.org
-To: Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Trond Myklebust <trond.myklebust@hammerspace.com>
-Subject: Re: [PATCH] sunrpc: allow SOMAXCONN backlogged TCP connections
-Date: Fri, 18 Apr 2025 10:00:13 -0400
-Message-ID: <174498478558.3618.5006356093533762788.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250417-svc-somaxconn-v1-1-ff5955cc9f45@kernel.org>
-References: <20250417-svc-somaxconn-v1-1-ff5955cc9f45@kernel.org>
+	s=arc-20240116; t=1744984914; c=relaxed/simple;
+	bh=+8OdUJwIXjHlLO7MXpVULRrF4daUsJ1JeCYf/lo/0ng=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c+T7FN+W/e2H8rTef/IcHk0a6z9WfYZXR3UYfp9v/kqvSzy6t1/9c7mI8Me1duJdZXuk27l3dDX488GObVF3baTGjaLhnYJy5gzeffXwBE0hLpK34Gov3cx27b57JaXjhUojTo9jy3Nt9tXUDqrKEhRsNVVsfOPFtUiDJW3zcX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn; spf=pass smtp.mailfrom=iie.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
+Received: from localhost.localdomain (unknown [159.226.95.28])
+	by APP-03 (Coremail) with SMTP id rQCowACHNUJGWwJoeHTeCQ--.23559S2;
+	Fri, 18 Apr 2025 22:01:44 +0800 (CST)
+From: Chen Yufeng <chenyufeng@iie.ac.cn>
+To: isdn@linux-pingi.de
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	chenyufeng@iie.ac.cn,
+	netdev@vger.kernel.org
+Subject: [PATCH] cmtp: enforce CAP_NET_RAW for raw sockets in cmtp_sock_create()
+Date: Fri, 18 Apr 2025 22:01:18 +0800
+Message-ID: <20250418140118.1775-1-chenyufeng@iie.ac.cn>
+X-Mailer: git-send-email 2.43.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACHNUJGWwJoeHTeCQ--.23559S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xr4ktw17Wrykur48CF13twb_yoW3Crc_Cw
+	48A3sxWryUta15Zayjk3WUur1kJ34fG3WxCwn5XFZ8Was7Cr4qvr1xGr1fCF1xuayjvFZ7
+	Aw1rGFZ3Ja1xGjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbs8FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
+	Jw1lc2xSY4AK67AK6ry5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI
+	8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
+	xVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
+	8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+	aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43
+	ZEXa7VUjmii3UUUUU==
+X-CM-SenderInfo: xfkh05xxih0wo6llvhldfou0/1tbiBg0QEmgCIt2dTQAAsM
 
-From: Chuck Lever <chuck.lever@oracle.com>
+A patch similar to commit b91ee4aa2a21 ("mISDN: enforce CAP_NET_RAW for 
+ raw sockets").
 
-On Thu, 17 Apr 2025 14:54:36 -0400, Jeff Layton wrote:
-> The connection backlog passed to listen() denotes the number of
-> connections that are fully established, but that have not yet been
-> accept()ed. If the amount goes above that level, new connection requests
-> will be dropped on the floor until the value goes down. If all the knfsd
-> threads are bogged down in (e.g.) disk I/O, new connection attempts can
-> stall because of this.
-> 
-> [...]
+When creating a raw BLUETOOTH socket, CAP_NET_RAW needs to be checked
+first.
 
-Applied to nfsd-testing, thanks!
+Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
+---
+ net/bluetooth/cmtp/sock.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-[1/1] sunrpc: allow SOMAXCONN backlogged TCP connections
-      commit: 1fe4a78475a5203a9ee1d9ede1bc2043cb505382
-
---
-Chuck Lever
+diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
+index 96d49d9fae96..00f944f2863f 100644
+--- a/net/bluetooth/cmtp/sock.c
++++ b/net/bluetooth/cmtp/sock.c
+@@ -206,6 +206,8 @@ static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
+ 
+ 	if (sock->type != SOCK_RAW)
+ 		return -ESOCKTNOSUPPORT;
++	if (!capable(CAP_NET_RAW))
++		return -EPERM;
+ 
+ 	sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &cmtp_proto, kern);
+ 	if (!sk)
+-- 
+2.34.1
 
 
