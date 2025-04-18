@@ -1,207 +1,195 @@
-Return-Path: <netdev+bounces-184169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3868BA938D7
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:49:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60BA4A93901
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A21121B64F65
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:49:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C02F7A488D
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1671A1D5174;
-	Fri, 18 Apr 2025 14:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E051D54FA;
+	Fri, 18 Apr 2025 14:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeVwTiUn"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="cTgOd+XH";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WHCkszTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7090C6BFC0;
-	Fri, 18 Apr 2025 14:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B217EEC8;
+	Fri, 18 Apr 2025 14:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744987767; cv=none; b=m7qQDmOr0PcKLOZDfmSEXxPiHCRdiLu9izrwT/jDtZvcPed8RvxKjJ/n97fDzN0GvXUJ+qRRX5lqxiWHuHDqNqcQhO8eFmggzXMCtTeWhDva1hPOjNrWbsLd/7EaTRTqPU9lrJBAXfjrSposu+grGR71eMarZUhj8KIYl0/fP3k=
+	t=1744988316; cv=none; b=NSNEzXPl+qJZ88H5NPgx65epMA0JDSuK+L7Beq8j1y6jWICVPUtJXAtGk0DlwwIRpy8GSTUOWifSNlWeVPptuwPSmQYXDudxuhj8kly+hyBYR947M07+gnPKyd+2JdxfemCSZDgWh3uMZilzB+HDrGRgs/oWvnTvrc8zyM3I0Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744987767; c=relaxed/simple;
-	bh=FaOJcILnicKDAigLqSzi5DkUputjov+2ox6SQq2QzYs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fU1nYD7TyTZmgQrZf76aE9/Hokqnqyy7DCc+4gqNhQCDVPQ72DbNSA6mnE6/mh9AQcYy2bas2D9hPNPnN4y8nwD3UMLoF5WZXLZcEzsK0tGKnlHe5Lwrpo+Np4f9tgGw73zpI3HyEfkAePi/cc//PS0ELzFYKCWRZ+DkzhhGDp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eeVwTiUn; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c5e39d1db2so100563585a.3;
-        Fri, 18 Apr 2025 07:49:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744987764; x=1745592564; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FaOJcILnicKDAigLqSzi5DkUputjov+2ox6SQq2QzYs=;
-        b=eeVwTiUnBZAAuEzCjjwOgWIWXAhTmlKt1/vLxZxBVNvr0+PFbhnIt2AGcAahSLoJFp
-         gNjQgxvivBzK4S8ls66dmZeV9Gicy58aQ6EaciEQRQ6TVekjMcmCjX34iqA+YD5QGAXM
-         V+DdAhWFtWZgP/du0b3oxTtTKmVmM/fpKscsQUDnbK6vRDMvIAXq3hrZhENXQW2aAukH
-         WanGba4EXgSzDGur1khbZlFF/0CAHY3eA+3zs8kGGXjT95E+GC7M9dhjV0F2nSMA+qdT
-         PUJ1VuESrmn4+ZMc37e6jqVtTHZhkLUELm2OdWG0JMcU01plh68rhoNmdL1i+vd3ZX87
-         c2jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744987764; x=1745592564;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FaOJcILnicKDAigLqSzi5DkUputjov+2ox6SQq2QzYs=;
-        b=fq2Sd+pipDHfloe6Q5zMRWPGNwzSRPeirLSHP2zic/vDuW8LDyRwefD5kHtT27xddC
-         6yDmQ9tSqAGzopB3fw38dAEzoRA7iEFPM0CzZ08opVlsGRnORDKepIpt5c4szcSAd1Nu
-         t+9WCdcGFIbHNbSnpeadUl89qZ8fTW+pbY0QUoZ7UnXrwWH1goLFjpbDsuofaqshpZYK
-         DfnvSOooPg+WSXlKRpnycpysIPnyORLIT8R+duUA0B3zNy3kLNOBOTyEZE3qnvXSKkVH
-         72TuBXv2LmJ7f6KZLqZKSGlvOh5O284ggk9maT5p2jSi/du2j0rSV+i5dhwmTkNClZHa
-         vj9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUiLgZ4C2G6hpP91WFJzXXygiLJYqrrBuzvaHHX7WfWIhva/K2do3Jlg3Mdhkt/63pxX8nDjDqzIrMQWOXOkUXdRl/v@vger.kernel.org, AJvYcCW+xXwB+35zuNuERlfwVKMZBi0FW9XTGCmMcQgU9iwVY5qYZi5qG2TFDorKwB5KhKAFrRvcno+Fcz/baeY=@vger.kernel.org, AJvYcCX6LQMczCH0zyqF7EVR7guw89dmrRvjKU23Asivjr50agQ4xYLBNWDS1gL2ICV9m4WwSBU/Wd01@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3zjl2RR4YmCc2gQcH1eF4BQrwHq0WikQTmS+CoFVUgMg83P5z
-	1xyheLMZbKhWdtKxEQmyI4jcFFgMvpAkHaHZKqr80v2Syd8IG8Ub
-X-Gm-Gg: ASbGncsRoQ7L97yWYV4mMPoJ0nka2M0LRdcXpJvwBFLVFvrPh6OZWjXOEzYYEVPM7MP
-	Vbw6IhYFOfQ0zVnrx0qxjCRvK0LxrcrllpIQxMNq+lpqe5qGLCP7/r2aclAjK1L6clxsPopsvDM
-	/6O9HbpumpnyMWMViNH0I8vCKE8MtYvzZH3eDlE3/PJyakkmj+0cRbeDWLXTvxxEv/BeAmJqfyJ
-	tfomQSbQENCNQAKtdOfod6u1cLKLYex/M7ZKtp390koyBDp97BTR83zhFRaacM5A8eEVwGyV68Z
-	pM4fss58yg/63gW0Et21K3uxtLdNtAcsLQmsVN93JlI6n2YKdYRBmpNQtuPOFgRt2jT63TH0vBT
-	9BtuY6bdqyQJNjNveyxhp
-X-Google-Smtp-Source: AGHT+IFRfBoS8vUxvewHn24Q3Q4yyEdscCT2aX9aSNU+lRYRMOA1xeo2dlIoqR7EJg+gvH6TnNs4ng==
-X-Received: by 2002:a05:620a:1a08:b0:7c9:2612:32db with SMTP id af79cd13be357-7c928043431mr487499785a.49.1744987764205;
-        Fri, 18 Apr 2025 07:49:24 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c925a8d484sm114376285a.31.2025.04.18.07.49.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 07:49:23 -0700 (PDT)
-Date: Fri, 18 Apr 2025 10:49:22 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Song Liu <songliubraving@meta.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Song Liu <songliubraving@meta.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Breno Leitao <leitao@debian.org>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- "kuba@kernel.org" <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- "kuniyu@amazon.com" <kuniyu@amazon.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, 
- "yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
- "song@kernel.org" <song@kernel.org>, 
- Kernel Team <kernel-team@meta.com>
-Message-ID: <68026672df030_1d380329421@willemb.c.googlers.com.notmuch>
-In-Reply-To: <B5B46BE2-C4D8-4AB8-BEBC-E0887C9B175D@fb.com>
-References: <20250416-udp_sendmsg-v1-1-1a886b8733c2@debian.org>
- <67a977bc-a4b9-4c8b-bf2f-9e9e6bb0811e@redhat.com>
- <aADnW6G4X2GScQIF@gmail.com>
- <0f67e414-d39a-4b71-9c9e-7dc027cc4ac3@redhat.com>
- <4D934267-EE73-49DB-BEAF-7550945A38C9@fb.com>
- <680122de92908_166f4f2942a@willemb.c.googlers.com.notmuch>
- <B5B46BE2-C4D8-4AB8-BEBC-E0887C9B175D@fb.com>
-Subject: Re: [PATCH net-next] udp: Add tracepoint for udp_sendmsg()
+	s=arc-20240116; t=1744988316; c=relaxed/simple;
+	bh=to4vLTskpbiKvqT5kJWMbLVAkQC7AU6Qxmy5ZhUwSR8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jlP86auJYOxHNOOL5mJVYkjfMl7JSubHSlZL2WmxdZ1+2CLkm6eTskpZefxBtyLKeRRVmq1n1j6BEmnE/MQ0boaW8SRMuEswjnNE5urH9iJEdOmheb3KLPfx5Qmd3Gtte76lBnHsljBHfkxrYBiNWcPb9161sssernByg0Mrgg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=cTgOd+XH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WHCkszTE; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 1E97411400CD;
+	Fri, 18 Apr 2025 10:58:32 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 18 Apr 2025 10:58:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm1; t=1744988311; x=1745074711; bh=yl
+	is+WEKyd0a3O3HzBDgtcXmAtwOcz5A+3gNAm46UAQ=; b=cTgOd+XHdoOON/wl+T
+	eNNZVXlqe2A5A2Gp3j5fZRxrlYKu3DsgvtmKuHUiwuULrf/rF9lTpUnPglo6Udd5
+	QbeyjS5s+oBlJ7W/wL/04tvgY4TaHGK5uCfdQtCWLoScsh3p6IvldMdi0PIRTEsB
+	49yXG1AtkLZmHGdvHe+YwhPt2nssgpXuyAB3Y7YQuujlaoV7LHxA2kb3fuFKDcNl
+	z3Ev71/BpYK/GMshEIcmD1sECCzmTK9gwtc7BX4OpdQjkNIIzeqqFu0Wu16HxIXA
+	Co7vdyvN/gYfFy8R8U9yx+/XD24gp+FCDWTr8qi5lVqlqaLVIy0KyU18k70YCUBf
+	K4aA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1744988311; x=1745074711; bh=ylis+WEKyd0a3O3HzBDgtcXmAtwO
+	cz5A+3gNAm46UAQ=; b=WHCkszTEaZ0ZZe+EJd08Otx3i65NL0RYUPFiYz//0Edk
+	e6k8g1rpS4KbXb3iYKv/kttSwVqKu46MlF/OFcJ28a05N7lA0C1Y2feL9aRtRMOm
+	1lGm9k7PWGXDA3fsG2nFK7zxiDFK9ARzj+6azTZB34dXixmZfAJnXUexC18qGKJK
+	v1cNDTNWIyu01x4Q7unYA+aNZKmy64Iv3wJBiiSnBNyKErlflrt5B/fRM51GfE9q
+	YYKeJpWOcfHa9NKZ/XPymjPasXduLn9PWBmCUgg2eFRm6jF31mMU+HX2oLd3VVIM
+	qI/3CPbjCsq6N5uw9mc2OQBJdOAsfh1VC8gMzxeDfQ==
+X-ME-Sender: <xms:l2gCaEkbCpEqjZE3OeEatN7FMEVIv5IXcIDtUAttRC15etAo9GMOHQ>
+    <xme:l2gCaD1QE5PB5CMMFjfb2cog4F_TGz946KeWfgVcYJlLQWJ5xg5T_DPwurRF94tW8
+    QYRZXppiCjZpRcio60>
+X-ME-Received: <xmr:l2gCaCpQ7M7mzEMfREtjZsm74u5n8gFT-IJC5RtEvWhcnHf0Ti0NZWtSgwXQOODYtuiR5cHgNF0b8ZtTXeFBd283MQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvgeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdej
+    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
+    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
+    thgvrhhnpeeghfeffeelgefghfdvveduteeufeduhfevteejjeetfedtveeugfeuveffvd
+    duveenucffohhmrghinheprhgvphhorhhtvggurdgtrghtpdhkvghrnhgvlhdrohhrghen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklh
+    grshdrshhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthho
+    peduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnughrvgifsehluhhnnh
+    drtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghp
+    thhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurg
+    hvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehg
+    ohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguihhmrgdr
+    fhgvughrrghusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:l2gCaAlKPwIznXe8KGvncJl51qiCWSrBxxsvJzZlUBY6jMNF-Aam0A>
+    <xmx:l2gCaC1gBhy2CBIc8Aqj3TLw5VMK2x_WiAS8HRbFMHpx5BEuFWDcpQ>
+    <xmx:l2gCaHv9gdmXmjLFdezEmjQr6MVKWeTZXXcqbwbQBKAS8ux2WYbOfA>
+    <xmx:l2gCaOUAFzB-gJMj3um3NUvJXpeItE08uy-g_9GyxL88DNYr_Vn7-g>
+    <xmx:l2gCaHNTJHaaEutR5nXPFvl9FezRBHgfYIsyGvxtT4joUm0Qb0dyE44L>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 18 Apr 2025 10:58:30 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next,v2] net: phy: marvell-88q2xxx: Enable temperature sensor for mv88q211x
+Date: Fri, 18 Apr 2025 16:58:00 +0200
+Message-ID: <20250418145800.2420751-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Song Liu wrote:
-> =
+The temperature sensor enabled for mv88q222x devices also functions for
+mv88q211x based devices. Unify the two devices probe functions to enable
+the sensors for all devices supported by this driver.
 
-> =
+The same oddity as for mv88q222x devices exists, the PHY link must be up
+for a correct temperature reading to be reported.
 
-> > On Apr 17, 2025, at 8:48=E2=80=AFAM, Willem de Bruijn <willemdebruijn=
-.kernel@gmail.com> wrote:
-> > =
+    # cat /sys/class/hwmon/hwmon9/temp1_input
+    -75000
 
-> > Song Liu wrote:
-> >> Hi Paolo, =
+    # ifconfig end5 up
 
-> >> =
+    # cat /sys/class/hwmon/hwmon9/temp1_input
+    59000
 
-> >>> On Apr 17, 2025, at 6:17=E2=80=AFAM, Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> >>> =
+Worth noting is that while the temperature register offsets and layout
+are the same between mv88q211x and mv88q222x devices their names in the
+datasheets are different. This change keeps the mv88q222x names for the
+mv88q211x support.
 
-> >>> On 4/17/25 1:34 PM, Breno Leitao wrote:
-> >>>> On Thu, Apr 17, 2025 at 08:57:24AM +0200, Paolo Abeni wrote:
-> >>>>> On 4/16/25 9:23 PM, Breno Leitao wrote:
-> >>>>>> Add a lightweight tracepoint to monitor UDP send message operati=
-ons,
-> >>>>>> similar to the recently introduced tcp_sendmsg_locked() trace ev=
-ent in
-> >>>>>> commit 0f08335ade712 ("trace: tcp: Add tracepoint for
-> >>>>>> tcp_sendmsg_locked()")
-> >>>>> =
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+---
+* Changes since v1
+- Clarify in commit message that it's the link that must be up for the
+  reporting to work, not just power up. Hopefully this oddity can be
+  solved in the future by patch [1].
 
-> >>>>> Why is it needed? what would add on top of a plain perf probe, wh=
-ich
-> >>>>> will be always available for such function with such argument, as=
- the
-> >>>>> function can't be inlined?
-> >>>> =
+  This change just aligns the mv88q211x with the current mv88q222x
+  behavior.
 
-> >>>> Why this function can't be inlined?
-> >>> =
+1. https://lore.kernel.org/all/20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-0-78b2838a62da@gmail.com/
+---
+ drivers/net/phy/marvell-88q2xxx.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-> >>> Because the kernel need to be able find a pointer to it:
-> >>> =
+diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+index 23e1f0521f54..5c687164b8e0 100644
+--- a/drivers/net/phy/marvell-88q2xxx.c
++++ b/drivers/net/phy/marvell-88q2xxx.c
+@@ -828,6 +828,7 @@ static int mv88q2xxx_leds_probe(struct phy_device *phydev)
+ static int mv88q2xxx_probe(struct phy_device *phydev)
+ {
+ 	struct mv88q2xxx_priv *priv;
++	int ret;
+ 
+ 	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+@@ -835,17 +836,6 @@ static int mv88q2xxx_probe(struct phy_device *phydev)
+ 
+ 	phydev->priv = priv;
+ 
+-	return 0;
+-}
+-
+-static int mv88q222x_probe(struct phy_device *phydev)
+-{
+-	int ret;
+-
+-	ret = mv88q2xxx_probe(phydev);
+-	if (ret)
+-		return ret;
+-
+ 	ret = mv88q2xxx_leds_probe(phydev);
+ 	if (ret)
+ 		return ret;
+@@ -1118,7 +1108,7 @@ static struct phy_driver mv88q2xxx_driver[] = {
+ 		.phy_id_mask		= MARVELL_PHY_ID_MASK,
+ 		.name			= "mv88q2220",
+ 		.flags			= PHY_POLL_CABLE_TEST,
+-		.probe			= mv88q222x_probe,
++		.probe			= mv88q2xxx_probe,
+ 		.get_features		= mv88q2xxx_get_features,
+ 		.config_aneg		= mv88q2xxx_config_aneg,
+ 		.aneg_done		= genphy_c45_aneg_done,
+-- 
+2.49.0
 
-> >>> .sendmsg =3D udp_sendmsg,
-> >>> =
-
-> >>> I'll be really curious to learn how the compiler could inline that.=
-
-> >> =
-
-> >> It is true that functions that are only used via function pointers
-> >> will not be inlined by compilers (at least for those we have tested)=
-.
-> >> For this reason, we do not worry about functions in various
-> >> tcp_congestion_ops. However, udp_sendmsg is also called directly
-> >> by udpv6_sendmsg, so it can still get inlined by LTO. =
-
-> >> =
-
-> >> Thanks,
-> >> Song
-> >> =
-
-> > =
-
-> > I would think that hitting this tracepoint for ipv6_addr_v4mapped
-> > addresses is unintentional and surprising, as those would already
-> > hit udpv6_sendmsg.
-> =
-
-> It is up to the user to decide how these tracepoints should be =
-
-> used. For example, the user may only be interested in =
-
-> udpv6_sendmsg =3D> udp_sendmsg case. Without a tracepoint, the user
-> has to understand whether the compiler inlined this function. =
-
-> =
-
-> > =
-
-> > On which note, any IPv4 change to UDP needs an equivalent IPv6 one.
-> =
-
-> Do you mean we need to also add tracepoints for udpv6_sendmsg?
-
-If there is consensus that a tracepoint at this point is valuable,
-then it should be supported equally for IPv4 and IPv6.
-
-That holds true for all such hooks. No IPv4 only.=
 
