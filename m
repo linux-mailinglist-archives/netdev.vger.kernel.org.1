@@ -1,493 +1,174 @@
-Return-Path: <netdev+bounces-184071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0E9A9315D
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 07:06:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83433A931B7
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 08:07:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB69B188B826
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 05:06:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C6319E2CC6
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 06:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2013267F52;
-	Fri, 18 Apr 2025 05:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD09263C71;
+	Fri, 18 Apr 2025 06:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h0kraM3H"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MxSWsDT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AD71DE8B0;
-	Fri, 18 Apr 2025 05:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07092E40B;
+	Fri, 18 Apr 2025 06:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744952782; cv=none; b=EA29yCrHW72+8z7lUDG5U/dLwnyJi8cDbuL3QYzkNsANUs6w1XoP4AoGuuDh/AyYPt8HmVmOcQBVmedMqr7IqKpEK0fAmAcJSaasE2Z4PhQ5FauqeZajt05aYxtLQER0MjkRBJGSLXzjwMXVdhUT7N+Wk+Gz7d0LcUVSjJJwA7c=
+	t=1744956474; cv=none; b=p7qAIlaRm4u6uWGRFh3MOV+MX/uQrUrTS+kGFeXvKsFPcKpC6Jo8oTHLcnF0H3FtT5C2zJWKiVT29qjwvpl/LdYzvkknv3OWLJvaYRWKZz6NdQeMH8bZGyQg722M/qObtaNsW2+DFAY4ncsXpKpsIE4TVv4qnNSuYQMq1frnxWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744952782; c=relaxed/simple;
-	bh=FcDsxO8PuWpeXpi+j/1c2opSjLUZpj4uBwXlxK3vFw8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XFKYMmuPZEgPP8rlYzVFEfoDa6IgMXgc1MsnN5Nnqpq72YO6iF7kW8h4+IjmeaYKUpspGhz1mg3KnnhNMZ73YMnGhYdklahV9s69jGaw7Up2qObRegcKs1mpIVcIG1ynwQIw2EcEiyLVyhISuscciovGQ5A6PdrDEK3pf6+Vp7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h0kraM3H; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2240b4de12bso23080575ad.2;
-        Thu, 17 Apr 2025 22:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744952777; x=1745557577; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xex5AEcGJGWj6dOdpaDDAlctwWeRYrvWdmFV2CE5qXU=;
-        b=h0kraM3HjBDwHlFScnFpYC2BGmH1HCeLXy2vwuTM7q8eSh2dyxfsE7Vpuo50IT10UO
-         4jtsH+ifeg1bhVnqu1ycx0Ag8Q39gPqYJ+YUST2GcL7ELMG85uX6wiAWn0H6+M5F1a1K
-         76bGseqSBbkHESW7MjTaVy4fL0/aFODg3HF5pH99dSnibWtvMokxEeOCI+NP7Qxvcw75
-         N+D3mu3szARvN1LRRhTS1a/l5FHQi+GNtGkOhl+dwJI1RbyzTLWWPUPlRhn8Dut8WdeT
-         tz+48Lg2qbzFTt1t8a0npq7ouHfvokRLd6yzvuP8LckIZNicwVsmxI5VIDuTyDzbJhNU
-         bsnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744952777; x=1745557577;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xex5AEcGJGWj6dOdpaDDAlctwWeRYrvWdmFV2CE5qXU=;
-        b=dmfko2o/CmxOl7nbypBRocV6vN+0lZdwJiqDFJ1eCSlI8Bg21BZAux6SUM6ogaseu6
-         66VjcFAFv/mA4Qby8XLHS5xY22sybhQLqWjepwmjM1Cwbs0M0ylE6XFYbB4k/KDG7Bhn
-         ViBbbZD3Q5pRhsXSlTHAEBVgfc98BI+qYzM41glEQmqdQmEwElSZco8so/PrWLSM5jXs
-         uPlNjb4x50P+X8VkXJeW0DCYfNzr4VDNG+x/TE+GxCWNAI6ZFrK6ioeWCNdjHzKKu/sX
-         r6xhCUIaYackG9qWBAXJSNXHWULs/D2sXnbR72QlYkrW8gALOt5ng7w9LGmHXnuuDACj
-         o6yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7EYvZzAQ6Bgh9ttGZiPxSXnSK3/pRlbNtPYXsWjP+WwuNTeHS/T8mahJLX3XJ/X9gq49SIdbwizTk90BR/Bfj@vger.kernel.org, AJvYcCW8YrEZM9JD7JIfoEUUD3UAL/iXNEQ/ovSlA7uQf4M9IVkVVrz9DpJPyr7QxqodHt4hLYCxNcEIOYtZqPk=@vger.kernel.org, AJvYcCX36GYlIrldzLYj5INWwQk5EfnGle1UqGRNo1S5VZD/UtHJZ02NKA3qN31ClWmQTgvLizF1ZxgY@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+ey04Hxi8TImqSLkBaUDt6Pcx+9BLqzII6u6SU1hmTP06He1N
-	YwowDCQDzwIRZV+XcEVREPiwbTipeqj6Qb5o10FWzH2+PQxWtQS0uPO89z7I
-X-Gm-Gg: ASbGnctQ3/5gGHVBfJ1LeZpxPMDN2g6vktx29xRcRcnZQJKKOi9jCIX/WBXAVIBRX4w
-	0V3JiP8Fb4d2nT6zANXlgBdBpW4gIfNythtzy7MdYBsya1i9xaZh6yciyktwCXwdje11DpQ7qCR
-	WX/+QWlG26mZssFYenvkZWIOT5ylyUYmXkEg2q1HnNmv6O0BgQKDcwY1C171C6rZPCuy/PYAUPV
-	sVumpHpvOmsXar1RM72Jn1AxBTEOIqvaczBlt/mH/cfUEBHRj6vB0CWHqWnWzeOMehgvGyp05GY
-	GM6dKXqePuA+O6ay9k2hgqHiEm0WOo3NhFAzMg==
-X-Google-Smtp-Source: AGHT+IHAbGhLfu84PEeqZdHsJ6K1Yq3WN2mVSNF4v8KsZRzMJjaeXTUFivP3lVE1bhgaZByvGHaJLQ==
-X-Received: by 2002:a17:902:f68a:b0:21f:1202:f2f5 with SMTP id d9443c01a7336-22c532857admr16973855ad.8.1744952772906;
-        Thu, 17 Apr 2025 22:06:12 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:7::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50fda391sm8947985ad.214.2025.04.17.22.06.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 22:06:12 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Thu, 17 Apr 2025 22:05:53 -0700
-Subject: [PATCH net-next v2] selftests/vsock: add initial vmtest.sh for
- vsock
+	s=arc-20240116; t=1744956474; c=relaxed/simple;
+	bh=f9WnUHLwI7r5PxohoerOyRrhe9IoLi9FojqIHzXvEiU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CXdbKvuDDDqP5U6d3KyXJ8MMooh4uCkB983qWOBQwfnTYOn8gm4QHGNFfdJgEO/g5fWn2M0HXaU8FZMNNXEn+0mtAJWXHyD/sfT1z6r0mMiWe0ZJEHL/eW/282AfHPk2ScztBC/tYFPW32NoUsJh9Zo5ysxkJEkNzFNeDRXF+G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MxSWsDT0; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1C61E1029338D;
+	Fri, 18 Apr 2025 08:07:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1744956462; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=kvjT2AQfxdFmD9bmhbjX7G3FMB2UewEmBGLVIkkuwUE=;
+	b=MxSWsDT0Jcfj/LJtBDs0279/V9e5lZr9Sib0rZLzlbTr5s+oSnzqIcU7uMEJKJoCbcrSbO
+	eCAaNJjfCe8sdoXsIyqOJTY+9NI9rJ5mYUishB5pDNKDLer9FZPF83hckeNXFodrwiWEbr
+	iphYdnRZtsPZc7mjy1n0XaUi6JNjEVbt/DZmk1cV7rZ/No+MTbaUggbavd83bBg0m09Qt9
+	87aK39i0NfkZT4G9IgkIQJu77VF9aXTziWF2maL61cFcBX9EU9kpZreJ4FO7vzik/hBXY7
+	275X5zphccSq1sT0AMuHqHVjTE7TGS6irFMIQSN46XA+LCPmp6yDNcvmCKeu4Q==
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Stefan Wahren <wahrenst@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next v6 0/7] net: mtip: Add support for MTIP imx287 L2 switch driver
+Date: Fri, 18 Apr 2025 08:07:09 +0200
+Message-Id: <20250418060716.3498031-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com>
-X-B4-Tracking: v=1; b=H4sIALDdAWgC/1XNQQqDMBBA0auEWTslM1ZoXfUexUWMo4bWpCQhW
- MS7F7Lr+sP7BySJThL06oAoxSUXPPSKGwV2NX4RdBP0Clhzp1vusKRgX1i2LCnj2BqmiUmzZWg
- UfKLMbq/cE7xk9LJnGBoFq0s5xG/9FKq9klfS/2QhJJzbztxoMuP9Zh/LZtz7YsMGw3meP++6A
- j+yAAAA
-X-Change-ID: 20250325-vsock-vmtest-b3a21d2102c2
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-This commit introduces a new vmtest.sh runner for vsock.
+This patch series adds support for More Than IP's L2 switch driver embedded
+in some NXP's SoCs. This one has been tested on imx287, but is also available
+in the vf610.
 
-It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
-H2G, and loopback. The testing tools from tools/testing/vsock/ are
-reused. Currently, only vsock_test is used.
+In the past there has been performed some attempts to upstream this driver:
 
-VMCI and hyperv support is automatically built, though not used.
+1. The 4.19-cip based one [1]
+2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
+   with NO tag appended.
+3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
+   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
+   the driver uses already configured MAC and PHY to also configure PHY.
 
-Only tested on x86.
+All three approaches were not accepted as eligible for upstreaming.
 
-To run:
+The driver from this series has floowing features:
 
-  $ tools/testing/selftests/vsock/vmtest.sh
+1. It is fully separated from fec_main - i.e. can be used interchangeable
+   with it. To be more specific - one can build them as modules and
+   if required switch between them when e.g. bridge offloading is required.
 
-Future work can include vsock_diag_test.
+   To be more specific:
+        - Use FEC_MAIN: When one needs support for two ETH ports with separate
+          uDMAs used for both and bridging can be realized in SW.
 
-Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
----
-Changes in v2:
-- add kernel oops and warnings checker
-- change testname variable to use FUNCNAME
-- fix spacing in test_vm_server_host_client
-- add -s skip build option to vmtest.sh
-- add test_vm_loopback
-- pass port to vm_wait_for_listener
-- fix indentation in vmtest.sh
-- add vmci and hyperv to config
-- changed whitespace from tabs to spaces in help string
-- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
----
- MAINTAINERS                                |   1 +
- tools/testing/selftests/vsock/.gitignore   |   1 +
- tools/testing/selftests/vsock/config.vsock |  10 +
- tools/testing/selftests/vsock/vmtest.sh    | 306 +++++++++++++++++++++++++++++
- 4 files changed, 318 insertions(+)
+        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
+          attached to switch and bridging shall be offloaded to HW. 
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c3fce441672349f7850c57d788bc1a29b203fba5..f214cf7c4fb59ec67885ee6c81daa44e17c80f5f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25323,6 +25323,7 @@ F:	include/uapi/linux/vm_sockets.h
- F:	include/uapi/linux/vm_sockets_diag.h
- F:	include/uapi/linux/vsockmon.h
- F:	net/vmw_vsock/
-+F:	tools/testing/selftests/vsock/
- F:	tools/testing/vsock/
- 
- VMALLOC
-diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
-new file mode 100644
-index 0000000000000000000000000000000000000000..1950aa8ac68c0831c12c1aaa429da45bbe41e60f
---- /dev/null
-+++ b/tools/testing/selftests/vsock/.gitignore
-@@ -0,0 +1 @@
-+vsock_selftests.log
-diff --git a/tools/testing/selftests/vsock/config.vsock b/tools/testing/selftests/vsock/config.vsock
-new file mode 100644
-index 0000000000000000000000000000000000000000..9e0fb2270e6a2fc0beb5f0d9f0bc37158d0a9d23
---- /dev/null
-+++ b/tools/testing/selftests/vsock/config.vsock
-@@ -0,0 +1,10 @@
-+CONFIG_VSOCKETS=y
-+CONFIG_VSOCKETS_DIAG=y
-+CONFIG_VSOCKETS_LOOPBACK=y
-+CONFIG_VMWARE_VMCI_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS_COMMON=y
-+CONFIG_HYPERV_VSOCKETS=y
-+CONFIG_VMWARE_VMCI=y
-+CONFIG_VHOST_VSOCK=y
-+CONFIG_HYPERV=y
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..61dfcc06223fa7a30cb575cb3f2d01121b3ed3ce
---- /dev/null
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -0,0 +1,306 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
-+#
-+# Dependencies:
-+#		* virtme-ng
-+#		* busybox-static (used by virtme-ng)
-+#		* qemu	(used by virtme-ng)
-+
-+SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-+KERNEL_CHECKOUT=$(realpath ${SCRIPT_DIR}/../../../..)
-+PLATFORM=${PLATFORM:-$(uname -m)}
-+
-+if [[ -z "${QEMU:-}" ]]; then
-+	QEMU=$(which qemu-system-${PLATFORM})
-+fi
-+
-+SKIP_BUILD=0
-+
-+VSOCK_TEST=${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
-+
-+TEST_GUEST_PORT=51000
-+TEST_HOST_PORT=50000
-+TEST_HOST_PORT_LISTENER=50001
-+SSH_GUEST_PORT=22
-+SSH_HOST_PORT=2222
-+VSOCK_CID=1234
-+
-+QEMU_PIDFILE=/tmp/qemu.pid
-+
-+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
-+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
-+# adding an additional port to forward to the device created from "--ssh" and
-+# virtme-init mistakenly sets identical IPs to the ssh device and additional
-+# devices, we instead opt out of using --ssh, add the device manually, and also
-+# add the kernel cmdline options that virtme-init uses to setup the interface.
-+QEMU_OPTS=""
-+QEMU_OPTS="${QEMU_OPTS} -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
-+QEMU_OPTS="${QEMU_OPTS},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
-+QEMU_OPTS="${QEMU_OPTS} -device virtio-net-pci,netdev=n0"
-+QEMU_OPTS="${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=${VSOCK_CID}"
-+QEMU_OPTS="${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
-+KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
-+
-+LOG=${SCRIPT_DIR}/vsock_selftests.log
-+
-+#		Name				Description
-+tests="
-+	vm_server_host_client     Run vsock_test in server mode on the VM and in client mode on the host.
-+	vm_client_host_server     Run vsock_test in client mode on the VM and in server mode on the host.
-+	vm_loopback               Run vsock_test using the loopback transport in the VM.
-+"
-+
-+usage() {
-+	echo
-+	echo "$0 [OPTIONS]"
-+	echo
-+	echo "Options"
-+	echo "  -v: verbose output"
-+	echo "  -s: skip build"
-+	echo
-+	echo "Available tests${tests}"
-+	exit 1
-+}
-+
-+die() {
-+	echo "$*" >&2
-+	exit 1
-+}
-+
-+vm_ssh() {
-+	ssh -q -o UserKnownHostsFile=/dev/null -p 2222 localhost $*
-+	return $?
-+}
-+
-+cleanup() {
-+	if [[ -f "${QEMU_PIDFILE}" ]]; then
-+		pkill -9 -F ${QEMU_PIDFILE} 2>&1 >/dev/null
-+	fi
-+}
-+
-+build() {
-+	log_setup "Building kernel and tests"
-+
-+	pushd ${KERNEL_CHECKOUT} >/dev/null
-+	vng \
-+		--kconfig \
-+		--config ${KERNEL_CHECKOUT}/tools/testing/selftests/vsock/config.vsock
-+	make -j$(nproc)
-+	make -C ${KERNEL_CHECKOUT}/tools/testing/vsock
-+	popd >/dev/null
-+	echo
-+}
-+
-+vm_setup() {
-+	local VNG_OPTS=""
-+	if [[ "${VERBOSE}" = 1 ]]; then
-+		VNG_OPTS="--verbose"
-+	fi
-+	vng \
-+		$VNG_OPTS	\
-+		--run ~/local/linux \
-+		--qemu /bin/qemu-system-x86_64 \
-+		--qemu-opts="${QEMU_OPTS}" \
-+		--user root \
-+		--append "${KERNEL_CMDLINE}" \
-+		--rw  2>&1 >/dev/null &
-+}
-+
-+vm_wait_for_ssh() {
-+	i=0
-+	while [[ true ]]; do
-+		if (( i > 20 )); then
-+			die "Timed out waiting for guest ssh"
-+		fi
-+		vm_ssh -- true
-+		if [[ $? -eq 0 ]]; then
-+			break
-+		fi
-+		i=$(( i + 1 ))
-+		sleep 5
-+	done
-+}
-+
-+wait_for_listener() {
-+	local PORT=$1
-+	local i=0
-+	while ! ss -ltn | grep -q ":${PORT}"; do
-+		if (( i > 30 )); then
-+			die "Timed out waiting for listener on port ${PORT}"
-+		fi
-+		sleep 3
-+		i=$(( i + 1 ))
-+	done
-+}
-+
-+vm_wait_for_listener() {
-+	local port=$1
-+	vm_ssh -- "$(declare -f wait_for_listener); wait_for_listener ${port}"
-+}
-+
-+host_wait_for_listener() {
-+	wait_for_listener ${TEST_HOST_LISTENER_PORT}
-+}
-+
-+log() {
-+	local prefix="$1"
-+	shift
-+
-+	if [[ "$#" -eq 0 ]]; then
-+		cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
-+	else
-+		echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
-+	fi
-+}
-+
-+log_setup() {
-+	log "setup" "$@"
-+}
-+
-+log_host() {
-+	testname=$1
-+	shift
-+	log "test:${testname}:host" "$@"
-+}
-+
-+log_guest() {
-+	testname=$1
-+	shift
-+	log "test:${testname}:guest" "$@"
-+}
-+
-+test_vm_server_host_client() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=server \
-+		--control-port="${TEST_GUEST_PORT}" \
-+		--peer-cid=2 \
-+		2>&1 | log_guest "${testname}" &
-+
-+	vm_wait_for_listener ${TEST_GUEST_PORT}
-+
-+	${VSOCK_TEST}	\
-+		--mode=client	\
-+		--control-host=127.0.0.1	\
-+		--peer-cid="${VSOCK_CID}"	\
-+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
-+
-+	rc=$?
-+}
-+
-+test_vm_client_host_server() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	${VSOCK_TEST}	\
-+		--mode "server" \
-+		--control-port "${TEST_HOST_PORT_LISTENER}" \
-+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
-+
-+	host_wait_for_listener
-+
-+	vm_ssh -- "${VSOCK_TEST}"	\
-+		--mode=client	\
-+		--control-host=10.0.2.2	\
-+		--peer-cid=2	\
-+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
-+
-+	rc=$?
-+}
-+
-+test_vm_loopback() {
-+	local testname="${FUNCNAME[0]#test_}"
-+	local port=60000 # non-forwarded local port
-+
-+	vm_ssh -- ${VSOCK_TEST}	\
-+		--mode=server \
-+		--control-port="${port}" \
-+		--peer-cid="${VSOCK_CID}" &
-+
-+	vm_wait_for_listener ${port}
-+
-+	vm_ssh -- ${VSOCK_TEST}	\
-+		--mode=client	\
-+		--control-host="127.0.0.1" \
-+		--control-port="${port}" \
-+		--peer-cid="${VSOCK_CID}"
-+
-+	rc=$?
-+}
-+
-+run_test() {
-+	unset IFS
-+	local host_oops_cnt_before=$(dmesg | grep -i 'Oops' | wc -l)
-+	local host_warn_cnt_before=$(dmesg --level=warn | wc -l)
-+	local vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
-+	local vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
-+
-+	name=$(echo "${1}" | awk '{ print $1 }')
-+	eval test_"${name}"
-+
-+	local host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${host_oops_cnt_after} -gt ${host_oops_cnt_before} ]]; then
-+		echo "${name}: kernel oops detected on host" | log_host ${name}
-+		rc=1
-+	fi
-+
-+	local host_warn_cnt_after=$(dmesg --level=warn | wc -l)
-+	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
-+		echo "${name}: kernel warning detected on host" | log_host ${name}
-+		rc=1
-+	fi
-+
-+	local vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
-+		echo "${name}: kernel oops detected on vm" | log_host ${name}
-+		rc=1
-+	fi
-+
-+	local vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
-+	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
-+		echo "${name}: kernel warning detected on vm" | log_host ${name}
-+		rc=1
-+	fi
-+}
-+
-+while getopts :hvs o
-+do
-+	case $o in
-+	v) VERBOSE=1;;
-+	s) SKIP_BUILD=1;;
-+	h|*) usage;;
-+	esac
-+done
-+shift $((OPTIND-1))
-+
-+trap cleanup EXIT
-+
-+> ${LOG}
-+if (( SKIP_BUILD != 1 )); then
-+	build
-+fi
-+log_setup "Booting up VM"
-+vm_setup
-+vm_wait_for_ssh
-+log_setup "VM booted up"
-+
-+IFS="
-+"
-+cnt=0
-+for t in ${tests}; do
-+	rc=0
-+	run_test "${t}"
-+	if [[ ${rc} != 0 ]]; then
-+		cnt=$(( cnt + 1 ))
-+	fi
-+done
-+
-+if [[ ${cnt} = 0 ]]; then
-+	echo OK
-+else
-+	echo FAILED: ${cnt}
-+fi
-+echo "Log: ${LOG}"
-+exit ${cnt}
+2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
+   separation at boot time. Port separation is disabled when bridging is
+   required.
 
----
-base-commit: cc04ed502457412960d215b9cd55f0d966fda255
-change-id: 20250325-vsock-vmtest-b3a21d2102c2
+3. Example usage:
+        Configuration:
+        ip link set lan0 up; sleep 1;
+        ip link set lan1 up; sleep 1;
+        ip link add name br0 type bridge;
+        ip link set br0 up; sleep 1;
+        ip link set lan0 master br0;
+        ip link set lan1 master br0;
+        bridge link;
+        ip addr add 192.168.2.17/24 dev br0;
+        ping -c 5 192.168.2.222
 
-Best regards,
+        Removal:
+        ip link set br0 down;
+        ip link delete br0 type bridge;
+        ip link set dev lan1 down
+        ip link set dev lan0 down
+
+4. Limitations:
+        - Driver enables and disables switch operation with learning and ageing.
+        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
+          on purpose, as up till now we didn't had consensus about how the driver
+          shall be added to Linux.
+
+Links:
+[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
+[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
+[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
+
+Lukasz Majewski (7):
+  dt-bindings: net: Add MTIP L2 switch description
+  ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
+  ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
+  net: mtip: The L2 switch driver for imx287
+  ARM: mxs_defconfig: Enable CONFIG_NFS_FSCACHE
+  ARM: mxs_defconfig: Update mxs_defconfig to 6.15-rc1
+  ARM: mxs_defconfig: Enable CONFIG_FEC_MTIP_L2SW to support MTIP L2
+    switch
+
+ .../bindings/net/nxp,imx28-mtip-switch.yaml   |  148 ++
+ MAINTAINERS                                   |    7 +
+ arch/arm/boot/dts/nxp/mxs/imx28-xea.dts       |   56 +
+ arch/arm/boot/dts/nxp/mxs/imx28.dtsi          |    9 +-
+ arch/arm/configs/mxs_defconfig                |   13 +-
+ drivers/net/ethernet/freescale/Kconfig        |    1 +
+ drivers/net/ethernet/freescale/Makefile       |    1 +
+ drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
+ .../net/ethernet/freescale/mtipsw/Makefile    |    3 +
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 1989 +++++++++++++++++
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  788 +++++++
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  120 +
+ .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  449 ++++
+ 13 files changed, 3586 insertions(+), 11 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+
 -- 
-Bobby Eshleman <bobbyeshleman@gmail.com>
+2.39.5
 
 
