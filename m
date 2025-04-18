@@ -1,137 +1,120 @@
-Return-Path: <netdev+bounces-184213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC120A93CCE
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:31:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58461A93DFA
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E91934479AF
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:31:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE6CE7A47D4
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E7F2253F7;
-	Fri, 18 Apr 2025 18:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912A222D797;
+	Fri, 18 Apr 2025 18:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etV9sVuV"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="laDqaqR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE69224228;
-	Fri, 18 Apr 2025 18:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD4122D783
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 18:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745001105; cv=none; b=b/9u3C9omKZg2HaNZsSdTC3Q4gi9Yz0Bz2JZawVY/pbEQtd97DnyzxgEGIUw30UkLSVZBrq+RLdUDwHDFb23pWNRA46uN7nQTnxOkFBszgGz9HMTxKs9D4SGMf5PdG5/xycIV+RmZtBfhspfSlYnzDAlLxqRGqU7VFgEJIwvH+I=
+	t=1745002227; cv=none; b=Y+JW0TqHwUc5PdPqS3JcLBgBauQ/deUQq9Ou6G30KXPf8vkR6tGk7FynTT/q8yR+bCX51RWhDLPINVWUgqf7s0Ta3mtQkDSqVdf316yK1MB4KLJwDfJ+QTY8GVds8HSHSlS6zm+MaU3wYIdJGIp9fnSZNFQqP6eP05Qcy8lVUoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745001105; c=relaxed/simple;
-	bh=9WknNj7arG4qVOlM0mtC8eG1okirSPP4BfX511789ZM=;
+	s=arc-20240116; t=1745002227; c=relaxed/simple;
+	bh=vZL3hJyh6vFF/o6xtjG6d/xD0EdW0x3J5+2caPucxzA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ama64mmVK9psG393ZP+N5HMeg/AipWkIcSiSN/V2/b61N8H6wd3MrLcwJp3QJ/1JFJNAKiqOIIOW1IUpvPAtvhZak1FitGxpu2RMFnSqA6WLCa4Nxuy1A51wN6nKoqykRaELPa0TB9Y1Gm3a4wfkQXeiX6LlaP1/VyXJYNAQCJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etV9sVuV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D2E1C4CEE2;
-	Fri, 18 Apr 2025 18:31:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745001105;
-	bh=9WknNj7arG4qVOlM0mtC8eG1okirSPP4BfX511789ZM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=etV9sVuVVYPu1hl195bLq+oCLril1kpTJti8yaRL2L9ib/Yf8dGUTasI2DN0Z/U06
-	 7fk/D73wkdFOfSZyOCEvcgzCLAJgKcaTy8P2AvjAK8AI+3Q+b02Ek1FJ5AEYVWl6K5
-	 wUmCZpeiee1UPOHGytr++WdH7Zi4nEyhf6CCUq5fpvkr1bp7cD40ShftON4/OIWbvb
-	 QorLxy5eg1uAeQOfa0MtZjQP4yanAtm4RQTWThKqC5X7gSHtXEp8jkIFDP1Th6QJTU
-	 n4QtrHrwts5PQ1ywXG3kSW6YePtikGf3ZRH4QQH55SBMnq3tK2ecu1q82z+/89gfCh
-	 Nh5tN/R9VJc/A==
-Date: Fri, 18 Apr 2025 19:31:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
-	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
-	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, ij@kernel.org,
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Subject: Re: [PATCH v4 net-next 09/15] tcp: accecn: AccECN option
-Message-ID: <20250418183138.GE2676982@horms.kernel.org>
-References: <20250417230029.21905-1-chia-yu.chang@nokia-bell-labs.com>
- <20250417230029.21905-10-chia-yu.chang@nokia-bell-labs.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TRXIRz0PCew6QF6J90jJ3hwL0xlvA8sdL3NABkDVYEpJDMGED6vXVt1mrDI++aBZfLZtIZYV+pEUGiFZPaIkXkQ6VKrxiX92HmYtspmiP7yARAs00UjC5bJTaf06k2//aogxUBzMHSvAOgWznXPtzROQGbfc77Anjkdjnxw2hu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=laDqaqR1; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=vZL3
+	hJyh6vFF/o6xtjG6d/xD0EdW0x3J5+2caPucxzA=; b=laDqaqR1cw4dPfzqNTdB
+	cqyyF4mFm3xVLxlvZeOBUVxYIRdOQlTYp/T1iqL+tnyxXR8UmarFx5WOi1bILSjD
+	cHvyC2clf37L1rFB4fCq7QoK76iHqA18GExPABFY1MS74y1hQ3ovurP4905ATCTn
+	YBuoVgij7VskR4tKDfItYDPT72tHTBZhqq5A223yqvLgUtlTUHBka5wAUUsTzyxb
+	621QjCb5ST88AM6phgqIpExSC6wdQ50+dZMUIEk5TwYfjM2gXw4Rr/DCUl8VV0Ss
+	+j3GmCRrp6NRFbgExHWry7Qz2excDU3g2dqyiOhkesQJk7pyUn3jtiDA9LbbqgyL
+	PQ==
+Received: (qmail 1504095 invoked from network); 18 Apr 2025 20:50:19 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 Apr 2025 20:50:19 +0200
+X-UD-Smtp-Session: l3s3148p1@7opr/REzIscujnsE
+Date: Fri, 18 Apr 2025 20:50:19 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next][V2] net: dsa: rzn1_a5psw: Make the read-only array
+ offsets static const
+Message-ID: <aAKe60hldaTKWu3X@ninjato>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Colin Ian King <colin.i.king@gmail.com>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250417161353.490219-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="JMX6Ix78kIrznwRS"
+Content-Disposition: inline
+In-Reply-To: <20250417161353.490219-1-colin.i.king@gmail.com>
+
+
+--JMX6Ix78kIrznwRS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250417230029.21905-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 18, 2025 at 01:00:23AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
+On Thu, Apr 17, 2025 at 05:13:52PM +0100, Colin Ian King wrote:
+> Don't populate the read-only array offsets on the stack at run time,
+> instead make it static const.
+>=20
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-...
+Works on my RZ/N1D-DB + EB.
 
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Tested-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
-...
 
-> @@ -766,6 +769,47 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  		*ptr++ = htonl(opts->tsecr);
->  	}
->  
-> +	if (OPTION_ACCECN & options) {
-> +		const u8 ect0_idx = INET_ECN_ECT_0 - 1;
-> +		const u8 ect1_idx = INET_ECN_ECT_1 - 1;
-> +		const u8 ce_idx = INET_ECN_CE - 1;
-> +		u32 e0b;
-> +		u32 e1b;
-> +		u32 ceb;
-> +		u8 len;
-> +
-> +		e0b = opts->ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
-> +		e1b = opts->ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
-> +		ceb = opts->ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_OFFSET;
-> +		len = TCPOLEN_ACCECN_BASE +
-> +		      opts->num_accecn_fields * TCPOLEN_ACCECN_PERFIELD;
-> +
-> +		if (opts->num_accecn_fields == 2) {
-> +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> +				       ((e1b >> 8) & 0xffff));
-> +			*ptr++ = htonl(((e1b & 0xff) << 24) |
-> +				       (ceb & 0xffffff));
-> +		} else if (opts->num_accecn_fields == 1) {
-> +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> +				       ((e1b >> 8) & 0xffff));
-> +			leftover_bytes = ((e1b & 0xff) << 8) |
-> +					 TCPOPT_NOP;
-> +			leftover_size = 1;
-> +		} else if (opts->num_accecn_fields == 0) {
-> +			leftover_bytes = (TCPOPT_ACCECN1 << 8) | len;
-> +			leftover_size = 2;
-> +		} else if (opts->num_accecn_fields == 3) {
-> +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> +				       ((e1b >> 8) & 0xffff));
-> +			*ptr++ = htonl(((e1b & 0xff) << 24) |
-> +				       (ceb & 0xffffff));
-> +			*ptr++ = htonl(((e0b & 0xffffff) << 8) |
-> +				       TCPOPT_NOP);
-> +		}
-> +		if (tp)
-> +			tp->accecn_minlen = 0;
+--JMX6Ix78kIrznwRS
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Hi,
+-----BEGIN PGP SIGNATURE-----
 
-I'm sorry if this is a false positive: Smatch flags that here we assume
-that tp might be NULL, while elsewhere in this function tp is dereferenced
-unconditionally. So my question is, can tp be NULL here?
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmgCnucACgkQFA3kzBSg
+KbYmYg//Rxa4VNXB3C1prQNThWW3XX72xsHW1tT9FXDJQOfnS6/L/SKfxf3k4kTy
+UvNuwQHTfX5dW7wO9enukphTnxEGQWyBVnsMu23PWHi5s4r3fIxBQ+sGCTUKxVAS
++MzLcmJ6ckgHAjaoAx0kebID6p+ueqgl3vCwaev3cf+vpG78xdt6PNPTaSHL1U9Z
+jJmNYv4KfD1w7/Am5TXBbDFAe5NXKAMgO+HJTkhh34IpeBZs5En6xZJkQfRyDwfz
+AavYRj6+vJQ+yFunuMahLq6d7QW/sEqMXOBp65iQtfYHwfk+kKbGoY4OBXGKSObc
+NwTHmyvEIj5oIIzgDdbq98HhJv68m9VoSFSFoerCdQMIxFSUnOcwkNj4nvjUp4k4
+qPdFcBcaR+89cY6oSkKO8AXOQgiLevwKzCa8pB+88I4Tfbs9aPWDqQW7XVttzEqz
+zs2n8pn9AaXuqdH6tqLJDqZHgmR7w60l55xBKRu+vIBLmDhMKlttXwI7nxijRJnA
+AaGRr+wvEuZNGolVuKtJsapwLj+ms9AjETLoSwVK8WliQT6C7DU5pL6aMJiUPY0H
+L3vJ1wvvFLs2d+mGB4oJoynZhPG/hBN2yQlo6vb6Bat/Ghs6lJJPwjN2RhP4Hne2
+lxpob3gJajN5ASZKvmEIr7QAbGbiYUDTS0YgNlU9nLP2NqpDufY=
+=qRNC
+-----END PGP SIGNATURE-----
 
-> +	}
-> +
->  	if (unlikely(OPTION_SACK_ADVERTISE & options)) {
->  		*ptr++ = htonl((leftover_bytes << 16) |
->  			       (TCPOPT_SACK_PERM << 8) |
-
-...
+--JMX6Ix78kIrznwRS--
 
