@@ -1,124 +1,140 @@
-Return-Path: <netdev+bounces-184166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23331A938A4
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:26:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4BC5A938AA
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CAEC467228
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AD2C7B124A
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21BE1DE4FB;
-	Fri, 18 Apr 2025 14:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64CBD1A3159;
+	Fri, 18 Apr 2025 14:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pvAQt92z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYflkgTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B22B1DE4D5;
-	Fri, 18 Apr 2025 14:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2BF19ADA4;
+	Fri, 18 Apr 2025 14:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744986285; cv=none; b=MENsZnT5gvKkqXt/FXTHux8X3aW+wvQFlB1aLxSrrss18SdoOs+SqE5i0IvzcWX8MLJqYd8UO5MA+AN7eWA2f4MJy4kCHcqXInQSAvbM0kVNN3scOSFRk7h1g5FiGwbgGAj9Y8W0DurwW4RYqywmJMwT57jRWETe0AcDmlHJS9c=
+	t=1744986605; cv=none; b=eFy4+FyZV1Je7gxE8sIpjR3JtbBKs0YZjsJM4kQFyS9UR0znfKaKqqSJSR8LRHTzS42RvFyC811VAMFy0eEb+8BN9peU1gQe0xjK3nuhOgwDktrS3QJzXf8758H2ECu/jiUQ0ApnHsWXRg/aMKs9AjyyMEYOCfuT4NPlX0pYBkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744986285; c=relaxed/simple;
-	bh=VYc4cFX2kNa24+VMNVEjITkhtJG0EHEVrqimNoAqlQE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZIkBmrlNgeAA/RO/pvnVMEH0isDhDYEiiOtI68dXlsVWtls0SNYo3QPNDBGALOtgH4KFe4SCiz63JQvmuNf/Wz4cghLuFWoe78aVmnBpvRfBj7M/4XNoQ/C+6OsCIhRsslzz8MnSdfigQXcmwJwJmyDsgvOjX3w8CfNNDUOtCqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pvAQt92z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC8CC4CEED;
-	Fri, 18 Apr 2025 14:24:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744986285;
-	bh=VYc4cFX2kNa24+VMNVEjITkhtJG0EHEVrqimNoAqlQE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=pvAQt92zkZx+onsQHNxzRQEupQHp8eFznCGYCeWGmlQfwPYcapTQrbevcMtB3YHQS
-	 uKHS8DnNfTAKAmBtG3h5tvbqE+M5xpACwq/C3Nl+Pk/Yg5QPYsO4szANR4t55XcSnG
-	 i+fSf/hVIyz8HtwFMmG6hqRHuHQoqwCdjR9i5+VIwjFe76xnAeBY4GJC/egbZ2xApF
-	 Ms5Fg2Nb10Cpa0yPn0v2pGYcdHLMVeOBOk0ehnAnziHGSa9MYGWOFgXw2I1X1enUxM
-	 /Ygrx2tB+WJH4jziuM68B6OUCwG5CFzFJ9Vh4C41TRtpUyx1w9ElyFPhBtS8Wnb3bM
-	 1fuVP38JVs4+A==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 18 Apr 2025 10:24:31 -0400
-Subject: [PATCH v4 7/7] net: register debugfs file for net_device refcnt
- tracker
+	s=arc-20240116; t=1744986605; c=relaxed/simple;
+	bh=wUzmH4xqUNFx6Lqx2Itt/tpaeGYM05BZoZ1guKnRXn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DKm70yev4s8pBrMd80zeEzGlrEpUY5wy2wph177IH71Vqi0LaAWz//k8k+AkJxaOkzYJS4fQGKFPlCgjWNq9w4YlVkumMYAFW5OtcdoYovv4/h0DAV48Fa3cvzblzH36u114JiVdKNmOngTncRsK80GIqpzF6lUGpYpLit7pclY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hYflkgTx; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5f37f45e819so317816a12.3;
+        Fri, 18 Apr 2025 07:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744986602; x=1745591402; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jEb+3qqZQ6y0qknhmyqZMe7sYP4AQ+xYtScn/gz9NwM=;
+        b=hYflkgTx6BEiK0mbALMwmYMJvprDRft4ylwPl6KN++Pq0ZG9lMv/z23w6bPVW5l9WK
+         KNhcxWWAHUeZrNALRzJZc8vt8LH257AMg9nhN9wCLeUgRtL3QaSKgQwqATYW/775Rleg
+         AHHtsKJwiRNpHmbVEruly2LQEJ9206cCCcSfj4avsr8Gw5uwZnj/agmHdBhFrgHfgDSI
+         +6wViNH5u7+jIo4NLuJKleXQxNQZD9EoJuPIfsELNVlUfGVQ0WqE/L6AlefYu9Fl2toN
+         8fVvgeFPZjbKA7vuHhpXCbKlFQnFANKgxpRo6sy1MI9ph0AkwfXG9F6THlwA70zj8Q54
+         ccLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744986602; x=1745591402;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jEb+3qqZQ6y0qknhmyqZMe7sYP4AQ+xYtScn/gz9NwM=;
+        b=Z+vIO/5LWae8jjL6h1OdR4OrJG0hxZQ4u0opLwlj0S6eSPKnGORP78iu688s/S8r1x
+         XRaZLEbwFyLU1l9rL0qJnhA7ozgjXXdnPOqA4C4ZYV1978aAFRwEhW8ietZ4pvFVnM0Z
+         c2y/srgZOikZ6UIBdrOkqOfZYj1zBSRT9jrorCZd5jRYtoaouRoW7IVmfvZqUi6JRDoe
+         J04ZMuNq72HAerqcM6j9uhHHGea9KgYAHU+AJXJ90U/g16D8mTAR114FCjgtCDefk3u3
+         ghQdRrRL0fOWu2GchCbaMkHVg/vB8b8DxK7MBfwlCQ5veWpAQiFvOxn/0dSz7oNLbCC7
+         kgAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDlS1bYqh/jLNg7Qm6mC7IENS/hPhiRMRrNNreHxjaWffZDTRkSwIHLLbVX7l6fr1dks1RAEC1esJJi5o=@vger.kernel.org, AJvYcCUr+OtCLFPK09tdMvFtWmRS5f47noHa3/YX7o0APHEAch4G36tagNoBf8uZN79Ndgau3SHnRrqC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1co47s5GJS4ohFpzzu/LNzsKQ6Sx/1rrXinqdkYkq8myEIRIq
+	ILTesK+rfIBhs43D63zhIKJrEzonYwbGagG/x+Vb6dGrGrLFpoRH
+X-Gm-Gg: ASbGnctjgL1svjQQREtXiwRBwCyynf6i3EuTG7ghuPlt9fWhHeZ/vPGaB6IRB/ZjyaO
+	jwMWlOW2MJqiofuh6A+do9n5kLC3l0boxVpyCkIA/1gUCOdAHXgzuVVif3TwO/5ElmCoTKnXNdO
+	jZWSgqLd3L6EEU0cHF8WYkGdIwdSWIFLesGwPeF5vQIz7QlVt1Bx2Wpn8awLLzfxGGj/hX8DkWb
+	5TIURacNsNVFvF6yciJyDkzqcO8lihHFJdncqSaZRSxqAV7H0tl2uQ+qpbQ58PlYOAr0axnLOgm
+	THjSrhgWbc3x8Eru/+w/E8BMuoff
+X-Google-Smtp-Source: AGHT+IGdnYDFhquPDANBW/t8s+v17pRTpxTdgVNlSSlgqLevLyFnxfpZxlTzVSiFWuujrFYTqz760Q==
+X-Received: by 2002:a17:907:6e8d:b0:ac7:2aa7:5ba6 with SMTP id a640c23a62f3a-acb74b2d23emr92002066b.5.1744986601569;
+        Fri, 18 Apr 2025 07:30:01 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6ef41605sm123261366b.124.2025.04.18.07.30.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 07:30:00 -0700 (PDT)
+Date: Fri, 18 Apr 2025 17:29:58 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v5 net-next 04/14] net: enetc: add MAC filtering for
+ i.MX95 ENETC PF
+Message-ID: <20250418142958.6ews5uuoqayc7lof@skbuf>
+References: <20250411095752.3072696-1-wei.fang@nxp.com>
+ <20250411095752.3072696-5-wei.fang@nxp.com>
+ <20250415204238.4e0634f8@kernel.org>
+ <PAXPR04MB85100BB81C6B25BFC69B32B588BD2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250418-reftrack-dbgfs-v4-7-5ca5c7899544@kernel.org>
-References: <20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org>
-In-Reply-To: <20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1306; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=VYc4cFX2kNa24+VMNVEjITkhtJG0EHEVrqimNoAqlQE=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBoAmCic1DxTa7/YRueIIGZpg4utucryKIFa0uLO
- Ib1Lc8GNpuJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaAJgogAKCRAADmhBGVaC
- FYnNEADTvOQjXbqGWzjGC1YCBBgnunz+49uokptG6ejAhHPYiIlqQw2Wy9NFNITxfoNu5BZvs1e
- 1HvUGL86LFtNSOqOfpPDG39kbdSnSnqKlHwUMA2wSqpiKnrkqjPr5E1Jk9USNXIRTXBdF9//uQ2
- 0qbKjyMPYBSAcrn0vwjuAqFv/J0l5FzCRuwSQUU0iMhQeppwTU7imIcVN70vxCc3/Nbc5HXAZH6
- BgFyp4fodJmGYQEBfFz8ruiC7F+Fq1FbGRP8dEOZRtSFHo87+RehHGg5mwNQ2SIRnTy8BBVGEXI
- XVNv1yrheGXJ5An8rxkQzhzT53uYstGCALLbmQQ54AW7eUOSln06ao73YNmu0LbQ4OjXuvDFXta
- O7z0xnX48yme7DuPhBtABT2wqhDKyV0CBN3l2pgf3PYQYDMuCwi+2qzCPFru0PgPvPlN+zKH9lY
- q0gF6UQspx7djjrAqYSYgrtqBk4/UVhH9xWh2PBhwc0JXcGtvzrQJ7w3k9ojuJIew+WHNmtgQ1j
- dPLXbWtbGdzS1ZogoNF9XmLLtNAxdguV/k6hhKmpTZlpGVCTxCBJTMndXfQO56/mwoMfRGQMSfJ
- 8mdZx3tDFqJkX7brojC/iLe+o19gXx1uMFvABFVZpZWldFg4kX9ZdNCVqDQH91wnwYEV23f3tpX
- AqUNLSluMusNfWw==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PAXPR04MB85100BB81C6B25BFC69B32B588BD2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 
-As a nearly-final step in register_netdevice(), finalize the name in the
-refcount tracker, and register a debugfs file for it.
+On Wed, Apr 16, 2025 at 05:16:15AM +0000, Wei Fang wrote:
+> > -----Original Message-----
+> > From: Jakub Kicinski <kuba@kernel.org>
+> > Sent: 2025年4月16日 11:43
+> > To: Wei Fang <wei.fang@nxp.com>
+> > Cc: Claudiu Manoil <claudiu.manoil@nxp.com>; Vladimir Oltean
+> > <vladimir.oltean@nxp.com>; Clark Wang <xiaoning.wang@nxp.com>;
+> > andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> > pabeni@redhat.com; christophe.leroy@csgroup.eu; netdev@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; imx@lists.linux.dev; linuxppc-dev@lists.ozlabs.org;
+> > linux-arm-kernel@lists.infradead.org
+> > Subject: Re: [PATCH v5 net-next 04/14] net: enetc: add MAC filtering for i.MX95
+> > ENETC PF
+> > 
+> > On Fri, 11 Apr 2025 17:57:42 +0800 Wei Fang wrote:
+> > >  	enetc4_pf_netdev_destroy(si);
+> > >  	enetc4_pf_free(pf);
+> > > +	destroy_workqueue(si->workqueue);
+> > 
+> > I think that you need to flush or cancel the work after unregistering
+> > the netdev but before freeing it? The work may access netdev after its
+> > freed.
+> 
+> Yes, you are right, I will improve it. thanks.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- net/core/dev.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 2f7f5fd9ffec7c0fc219eb6ba57d57a55134186e..377a19240f2b774281088d91e7da3e4b6ec52e33 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10834,8 +10834,9 @@ static void netdev_free_phy_link_topology(struct net_device *dev)
-  */
- int register_netdevice(struct net_device *dev)
- {
--	int ret;
- 	struct net *net = dev_net(dev);
-+	char name[NAME_MAX + 1];
-+	int ret;
- 
- 	BUILD_BUG_ON(sizeof(netdev_features_t) * BITS_PER_BYTE <
- 		     NETDEV_FEATURE_COUNT);
-@@ -10994,6 +10995,9 @@ int register_netdevice(struct net_device *dev)
- 	    dev->rtnl_link_state == RTNL_LINK_INITIALIZED)
- 		rtmsg_ifinfo(RTM_NEWLINK, dev, ~0U, GFP_KERNEL, 0, NULL);
- 
-+	/* Register debugfs file for the refcount tracker */
-+	if (snprintf(name, sizeof(name), "netdev-%s@%p", dev->name, dev) < sizeof(name))
-+		ref_tracker_dir_debugfs(&dev->refcnt_tracker, name);
- out:
- 	return ret;
- 
-
--- 
-2.49.0
-
+I think the workqueue creation needs to be handled in
+enetc4_pf_netdev_create() somewhere in between alloc_etherdev_mqs() and
+register_netdev(), so that the workqueue is available as soon as the
+interface is registered, but also so that the workqueue teardown takes
+places naturally where Jakub indicated.
 
