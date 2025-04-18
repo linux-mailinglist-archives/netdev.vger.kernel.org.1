@@ -1,129 +1,120 @@
-Return-Path: <netdev+bounces-184056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94840A93006
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:37:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB9BA93009
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E896C8A49CC
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:36:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADD06448335
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CEE22A7EF;
-	Fri, 18 Apr 2025 02:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA31D267B74;
+	Fri, 18 Apr 2025 02:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OqJeIsTl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D262770E2
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 02:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C49267B12;
+	Fri, 18 Apr 2025 02:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744943816; cv=none; b=RYQfGEOQWV+HLejGulTmSZE88OlgPhe0f5KzodDrZ/pyQ+QmV7x6TAWRIJ+If0jRSWCoeCy0Uko1kVrSPtoZ9aXiolqH5I18Tg5jh2EwVhJ9yNPFMZXQ4HHOaBbKy8yncRpY95iM9C55b5cwVsGGzPPUK1Uk2hESYw5cIBGTQY0=
+	t=1744943905; cv=none; b=V9NkP6HhFry1Myh/kHb5HwtF9pQdz868cB834bZRmk0+bc2Mi/Cu/vIdNcz0hmD3CLeAOQgu5/gdA7M9Hj2j8gm0Rt7LsvOUFwVMpmFZt4uMLLAkyupJMB40A2nshF/cg5WRaxJQmZ1alX8o67cIKv0zsoeF7C+j+izeY+X7ySY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744943816; c=relaxed/simple;
-	bh=8bXjqvJ4M+Xl3uu3qgG8WDuIei7iv919+1X+owbyprg=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jyU7uGqL8w9l72APg9AgDfZ0S6vFPVCjbUDkWl+nwTXGjoDlMJUsfp24qvdd0c6sK/IPcWajPxXk8nx8AQ/c2VGBdYHpEaevod71USRwJir6CctqdAD6E7PIj/8xXNccVRue98wyg7tLw2jXGD/vdWQa9P2EE++VgIqxeMV8cGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas10t1744943769t432t20061
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.64.252])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 10371502986806309605
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>,
-	<andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<pabeni@redhat.com>,
-	<horms@kernel.org>,
-	<dlemoal@kernel.org>,
-	<jdamato@fastly.com>,
-	<saikrishnag@marvell.com>,
-	<vadim.fedorenko@linux.dev>,
-	<przemyslaw.kitszel@intel.com>,
-	<ecree.xilinx@gmail.com>,
-	<rmk+kernel@armlinux.org.uk>,
-	<mengyuanlou@net-swift.com>
-References: <20250417080328.426554-1-jiawenwu@trustnetic.com>	<20250417080328.426554-2-jiawenwu@trustnetic.com>	<20250417165736.15d212ec@kernel.org>	<01fb01dbb003$5b920bd0$12b62370$@trustnetic.com> <20250417191939.1c4c2dde@kernel.org>
-In-Reply-To: <20250417191939.1c4c2dde@kernel.org>
-Subject: RE: [PATCH net-next v3 1/2] net: txgbe: Support to set UDP tunnel port
-Date: Fri, 18 Apr 2025 10:36:08 +0800
-Message-ID: <01fe01dbb00a$a3fdea90$ebf9bfb0$@trustnetic.com>
+	s=arc-20240116; t=1744943905; c=relaxed/simple;
+	bh=w5RzLksqRnl5QxaAsPgtygvTlr1+V8VM+ufHZCm77QA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z7x7W6T4Q/GvldnbKOzZoiMTq8jyNs6ek1mO4hT+o1EZ5bD77uN+PXKsoGXtxZjzS2qQgd83i7N/CR5UYx+sCIgC0nJlsBgYpUVdu74NyvvjKsyQxTZ66ob/MEV0MHzpHoaB1+LhIQGeIjjl4tUAKKB65dxy+2BNVim9FdyeBtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OqJeIsTl; arc=none smtp.client-ip=209.85.215.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so1254994a12.3;
+        Thu, 17 Apr 2025 19:38:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744943903; x=1745548703; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gc9ETUlXAwHL9WYHin7FZ0e7X2RQp7jZ6Z40mw+LncY=;
+        b=OqJeIsTlrAoRG+vOueS0DESJ7JUPRnkuAiXpyGI2j52gPuHBQIW04z7RBDoMx2IAWv
+         Hm9X3eia5Wq7wWJxOgy/xNd4KPdOAgXNG/QB7TIaCf/dkPucqq1ERNc1M4+mb+1xkeyY
+         2gTfUaUd76Ruqj9a/zMxgl239iRKEd9uAqW70A9Z0WPYwhWeyVdQLS6MJ+dDS+WZCUjV
+         8WaHqvHC8cFz0vpGLMHAoxhqeZSLXlQ4HPVI7UQIDv7/A7PFyRwQOwGAIEilmU+ZFgP7
+         9JUwl3CdeyUaxb54El0eHJda7SXxlX1K2eCGN6mZg94GjA9k7pEU3EzvNfTI62Tm1OEd
+         jM0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744943903; x=1745548703;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gc9ETUlXAwHL9WYHin7FZ0e7X2RQp7jZ6Z40mw+LncY=;
+        b=evmQdJG2CYRjMeYUeHUnCFCvRNpribwdHMjSPK41fbfJIzZ3JhQ0CZl3tzr6jAQ+Hf
+         Uv1N+bRUIl27uPulpIPTWASQC9F6qZUVyw3AOsZ9uFxZVIcKZW0PrT4M3rGYcUxzdm4y
+         hHfgosxo4fLhtx2+uwgkZkm0btfDGAgawAc6GXLFZyVAhfRPpyzH4yCNeUznlDW06DwN
+         gxsvBDnuO/5xKglcaXL9dz5P6IpsmaVN8OS/7H2kY0QhOasnVRuDzY5KVsowkytZGmrc
+         6QOicNC6IHF6ZaW+TEuHNSiXrvdXAUQowRHskxj77aU4bLUwi95lByWc/g0nLc7WhXlh
+         7MOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7jwBMvHkElsrHOAPPLTtxe/sLqJMI4zDICH4p6lUMQBkXQzuQD0R0h26+gG6yP3ifGF8dCyx67Ca0k/A=@vger.kernel.org, AJvYcCXkCIII8Kll1oqbEA33tLdPJWEQPexWDj5RAJ7MAp8I6/5OtcBxt4mD85LEaVcPE8ZeqULYb+s03iiwWw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYueHeaZmvh5M1+jHRuo8U5JpQxbhntODUywCW6G6EVkbrI1Jy
+	5WKgUZoeTx8nkNxKtuasczXI6xgBq6SbihQiD2bMrLKSBpQqiyEx
+X-Gm-Gg: ASbGncuIT8AR3NXfQMg/sLX6uChabos9/zf1lMDvsBUVFhS9crt0bD9hUNxHrjDWSy7
+	84DS+7fh5jb4xqynfiEVZf++8Seg78usDYZ96OauapmAcYztvkIHaDSmLIy6WtAEGcqXDjXcZnB
+	Fm9hv8Ck2lVRg/b0KozpbAq3EwyHXOFP9ZfZCqPz7sG8+2a5b0XR9vtabfdpc2DdrkQMXb2iKkh
+	tBvvawTtRAPfOX3OXBUtrqQBV0AKh3iNTrLBDRkAhNNHRD/3jaCCEQFuPAa+rgmB3OVzQGUhgMq
+	GwfmZ7bNicm5V6sWsrjTmz6i8mY1kTAzHPrnrXWf4PIh3yAK/wzBJKOlytVo6G1cp9c+TF5bjO6
+	Z
+X-Google-Smtp-Source: AGHT+IGT2w3OgzSs5lpY0rNfwlOnWnwBmWNqnXJ+x8uQcXegX5dnLjsLQRV8pyAjoCRF8fdFNAnadA==
+X-Received: by 2002:a17:90b:3849:b0:308:637c:74f2 with SMTP id 98e67ed59e1d1-3087bb63144mr1860538a91.17.1744943903434;
+        Thu, 17 Apr 2025 19:38:23 -0700 (PDT)
+Received: from henry.localdomain ([111.202.148.49])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3087df0be00sm189919a91.14.2025.04.17.19.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Apr 2025 19:38:22 -0700 (PDT)
+From: Henry Martin <bsdhenrymartin@gmail.com>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bsdhenrymartin@gmail.com,
+	mbloch@nvidia.com,
+	amirtz@nvidia.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v7 0/2] net/mlx5: Fix NULL dereference and memory leak in ttc_table creation
+Date: Fri, 18 Apr 2025 10:38:12 +0800
+Message-Id: <20250418023814.71789-1-bsdhenrymartin@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHTQdIaykwAzFMEiQKHJOM0w1kQSwKFSxn4AihjOFsBue0lyAGZjbDOs3mG3LA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N2bAIxLK0elnu3u8PoCIhbU+a3GkfOawuqzWiiEoVdGou2d4Xh2wgq8i
-	gyFc6CK4sg3yGyvkqNR4GXiuD8Gio0rzcCJc/+4nwdoEUwVaTieQZTNuoB8LKwraxJbcU+1
-	mF9LVuuygAxKu1ydK0kp0UBnl170M4nZ0/B5mhvKkQ5pkB+skE7mHtBL8REZtir24T+TkCj
-	wt9I4GmL+v0I+byzt2Sn9wtsvQvbT1u4eRR1Xy9GuX2wOUDxvoHIyCq+KuokwD5V3PDFqYi
-	66ww6krGRSQVcN3Nw2dBLvyNYQNZlzBDewHBtVpXnU066b+fpiXvxlan9KEZQH2OzZ8Hy2I
-	Id6J8U2BZaeXzkXezVqndbd2sc5hpHG7/9QIFS7LgFlzWGh1lnjCeX784miFswwn83Hqi5b
-	WkRanSkL3ekIg7wA9v+6sN03anvlHt4iPSn10ccWu9ZF1ZwFlucO+CMr1ERdBQ5QMM/h6wx
-	NqKv1xF71Qr4Nmf6glmLXndtRGyEjVx8EyvGK25UlSMb/6dE5GRaYluM0Q+5OB81aKeV67a
-	yhdLh7bIr3nRjfr+CZbUUv1RH5bzQmc5ke73m0SUGGSahgne20LyiGpHu/jvUCNI8ZDnkqy
-	HVSWT73pOzh2gLZLMzzL74XNkDSG8wloU2zAC1/CrsYof1B7OiqRmSZgBv15zX5ta71ko9P
-	oNzpjzuAjKA8FzIyVp7KsWz5ThKfAZY0dd5lXOajJo1UOHxHb6zem9bDYHfO8YQ4RIirm1P
-	HQoxn/k6lgRsaap/ZM0eP6GG3vXau33W1n0NWOL6lt2KMC78waLrH8pUtaFW7+Xs+nUUU8i
-	ZDEp8Po3+D02QoUTB6PW9pltUrw+5aQGi4Pto4XUVAptGnyvXAAyFHYLl3nLiCpO9jy694T
-	XV740eI+bos0hBCvFjjvOwN5+TwzcDl6iQ6PtX1vC1k1nMFqduudQLhd1nq62ok9J7Wox4R
-	z0fgTfOB+Zk5VHsBsAQmv4aMyWFj9y+946ifT/vXbSe9h1xN+OsoTZ5qIIDRbZI8tcRsGM9
-	zTCSLJDfgK1sTVUARJ1noiUjZJJDM=
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 18, 2025 10:20 AM, Jakub Kicinski wrote:
-> On Fri, 18 Apr 2025 09:44:00 +0800 Jiawen Wu wrote:
-> > On Fri, Apr 18, 2025 7:58 AM, Jakub Kicinski wrote:
-> > > On Thu, 17 Apr 2025 16:03:27 +0800 Jiawen Wu wrote:
-> > > > @@ -392,6 +393,8 @@ static int txgbe_open(struct net_device *netdev)
-> > >                                  ^^^^^^^^^^
-> > > >
-> > > >  	txgbe_up_complete(wx);
-> > > >
-> > > > +	udp_tunnel_nic_reset_ntf(netdev);
-> > >         ^^^^^^^^^^^^^^^^^^^^^^^^
-> > > >  	return 0;
-> > >
-> > > > +	.flags		= UDP_TUNNEL_NIC_INFO_OPEN_ONLY,
-> > >
-> > > Documentation says:
-> > >
-> > >         /* Device only supports offloads when it's open, all ports
-> > >          * will be removed before close and re-added after open.
-> > >          */
-> > >         UDP_TUNNEL_NIC_INFO_OPEN_ONLY   = BIT(1),
-> > >
-> > > Are you sure you have to explicitly reset?
-> >
-> > Yes. Stop device will reset hardware, which reset UDP port to the default value.
-> > So it has to re-configure the ports.
-> 
-> My point is that this is basically what the
-> UDP_TUNNEL_NIC_INFO_OPEN_ONLY flag already assumes.
-> There should be no need to reset if you already told the core
-> with the flag that the device forgets everything when closed.
-> 
-> Could you retest without the reset_ntf ?
+This patch series addresses two issues in the
+mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() functions:
 
-Thanks for the guidance.
-The test result looks the same as before, when I remove reset_ntf.
-I'll fix it in patch v4. :)
+1. A potential NULL pointer dereference if mlx5_get_flow_namespace()
+returns NULL.
 
+2. A memory leak in the error path when ttc_type is invalid (default:
+switch case).
+
+Henry Martin (2):
+  net/mlx5: Fix null-ptr-deref in mlx5_create_{inner_,}ttc_table()
+  net/mlx5: Move ttc allocation after switch case to prevent leaks
+
+ .../ethernet/mellanox/mlx5/core/lib/fs_ttc.c  | 26 +++++++++++++------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+-- 
+2.34.1
 
 
