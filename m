@@ -1,140 +1,173 @@
-Return-Path: <netdev+bounces-184112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E838EA935FE
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:27:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A05A9363A
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A2A719E7DA2
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 10:27:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B1D64473B5
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3AC26FDB0;
-	Fri, 18 Apr 2025 10:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5A12741D1;
+	Fri, 18 Apr 2025 10:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qDbGE5sz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nq0n1yP4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6317C1DED76
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 10:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAB12638B2
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 10:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744972021; cv=none; b=fNFPH6HLNGREWxQXce55OplXgPT1E9dPAEn9C0fSQFUFwTGDf6gYiOYgvnmwa9B4lQ6A9kg0llDqfZEWnbMld7X8ZFGdfwYeaEUO7oeParU1Ia0iARU+KAu7Dxr1ss4Wjo5/nyW6Zy+O7WxIs8yDMYGmcfOH4To09cndup/k4tw=
+	t=1744973998; cv=none; b=pcDfpwWcZutQmSLAhckryQ/GhDjsQ5sulG+RvxcpSuR5lk9ESb+gOQW0ppr2Q1ZEszKh3ZYUrnMlq7Mj4wp2IZT9XWxa9Dpsh7KceFCIYOcC2MPGnA9MpK2RP2WXWIBxUKMQ6a1KX4vEqN7f8Z9hEi1XcGxAS+vOqZo/h9bpDjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744972021; c=relaxed/simple;
-	bh=AhDMAvR6Y0N0xilTkkBBlrdMlUSttI7hT7pOnKkca7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubj8L7kXjsqUw5DOit/QZ7cwKHfO5YeybKIti4QNWurbDFyjZpsN1gUG+6RX1Fwsc7hvUzNBzG5tuk9FsVOqNohlmDfW1a0DRzMdB2vOjtOVqWdEbCaGSaoZ5VmbNBcv+Lw8VnpJbya9kosxxbJRNZILicU3pUwYfQEvkn/4w+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qDbGE5sz; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39bf44be22fso1175832f8f.0
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 03:26:58 -0700 (PDT)
+	s=arc-20240116; t=1744973998; c=relaxed/simple;
+	bh=YKKJTrTDUtM0OMviDTJW8YHqxJ7wDNkTV26gbgLyrvc=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=c6GQRUlRn0XyPbYV8zyJCq9AkbOOCUGM8cLGtn8jtlWGdliAJS3CamP3ZvI5AZuivOnRK+yMWAHTR//O6vUaejQuBTVteE5oBJ+67v3+GmMBUU0RczaDGDPgi78phNZ8Cl5HzH06XX4ByOddrpfc5U10qze3ANEt9MERJEx4NaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nq0n1yP4; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39ee5a5bb66so1089676f8f.3
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 03:59:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744972017; x=1745576817; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jyF8cUyrsCUAOR5COVOs1K+3uf8aTnMier1Oni0UNDI=;
-        b=qDbGE5szaiRPJm2xhoYcCeq/HB7qVMGG/aDnt2/frbTazIjw+DN73o4Kqpy05f1rEi
-         QDg70ph9QnYiPk/b68inQkz0t1cjWijRClVSIOMwO2/1+BCTxYkQVXUbc4E24XfT8sbh
-         Q33SHDJzApGLRRA3TOVNicC2fm1m52kH7WbLi59FFSIlxqMzk33837kHtrSLdFPdXtYB
-         2eX6m2mOhkLf2CtubmyikCvbKFrpEHMbo+KCs4ojUlNQ6OPJf7Do46kMtgMuqh2QdxMI
-         c3MDrV5pS8nLhOkPm/tjx9U0409W7dAVKUlFqzlvUfdPAdY8XZNULwWljsdfa0r1lTNB
-         7G9A==
+        d=gmail.com; s=20230601; t=1744973995; x=1745578795; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i0MFopvdaIziPT+S1ZVRdGOJtd8iyjTMEgbye3ToyyA=;
+        b=nq0n1yP4OxUK7IBvm7dbEXhVkLiCp3xMXIFITcJRz60okwIVeGi+jVFdb7WFehj0oX
+         VWiRjnrbCNQIYf37AhTsev3dZ1GyLkzh/A7k5559tWgVENbgWnQfuR/m2Rz+PXKVeU9K
+         pKZK7+oh5ch4Dp0CZ7NBBz2bAa2VDSpnVmLfQeFs5HHSh1yxPf160rYOwd0LDqmatU8P
+         ByHdxpVpWQCrc2zet2RGnDDk1e6nb5pQ/66G+Pm0Iqnj0c8AWRv7QcgOUEJUjGopj3IX
+         bPXzFcg8/JE9ggN/ok8yoMxgiCK8G3LPRbbjduiwT2ehs2PhNcU1q4j0p+fj8XPbRKuS
+         dyUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744972017; x=1745576817;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1744973995; x=1745578795;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jyF8cUyrsCUAOR5COVOs1K+3uf8aTnMier1Oni0UNDI=;
-        b=jsN28YngDDQ3fnNl9s/OBF/HReDw1ARBbCrfaRJfa181yUK8X6SZBIjHx/crV1cqyk
-         ciVVtPB8Y1fCrI8Va5es5h9vumBrglX74ofodVuZNhpYdbYmTbEHPXMsm9wGXSLSshi3
-         G81ZUvfckCr7OoegPN5BkqQzLaCDkg2IQacNOnYKo7iLMuUgrx+yNT4BjTfY2j/NNBbK
-         uuslItgf/wTNjw79ArPXJDcrp0q1dxTCeNyQHFu+EFYvptWoyGNPztx7gHF/VR5zwiJE
-         86rdy7wbSKmAhnfHYWgVuI21LRjf06FLidkAq2al/9F1F/LuDiuhczQclyVBDf41TEzU
-         qx7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/Da+QwAeN8NLs1aLggrjGI+MUpTpGleWb2j9YY1hXJ1D2gBVQMrRk48tzwmUSzNdGd+zGg9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoC4+Ci8qm8ra0nySR5xOEbpsJiBtvg2ol0ywHtFB2bjt+CMXM
-	26ZBmQV+TMc+kx4cUyddcSuQmtNkChAYLPnevC+lwfo2LBs7CJwowqIADOhoz1E=
-X-Gm-Gg: ASbGnctn3mQeP3nDnIlW5IqpdwN5FVpwWEEtPIPwXf8yuSFHKjgFtyD/uFRlP9PELxi
-	/diFz7441HBDJ0R1sH74t1We8i++eQzhVtSiF8hg1iU6L+qO58iDQqKr1OzY64ADwaxtTujFMvL
-	a2YL9Xzpv2JAuv2xYRqpaqaA0bGXJPfa3DdHFWeg40w8XZY/xaE4moYePHOQ05CIi6ufuC9xP8+
-	HJg/+VBk7w7b589pBla818OHVP67YBKjvU8COVyGPpkIgQakyJXEcMGbObXO33LHPUqYpTgLZLh
-	GOd6l03fQR1/DH5xg73QjiSuy3mjL0DCiPJTcrBBK+l6D70r
-X-Google-Smtp-Source: AGHT+IFrfOuqMN9uKYocPpw4AsJuXc8TP55qB+tXlKCAM3rgVt50bp9eLIgTn8vJRtoXc+j5m8bU8g==
-X-Received: by 2002:a5d:6d8d:0:b0:390:e889:d1cf with SMTP id ffacd0b85a97d-39efbace2ffmr1486834f8f.37.1744972017548;
-        Fri, 18 Apr 2025 03:26:57 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43cbf1sm2399026f8f.54.2025.04.18.03.26.53
+        bh=i0MFopvdaIziPT+S1ZVRdGOJtd8iyjTMEgbye3ToyyA=;
+        b=p0MQw8KkHTNaNjVPaD8NmSDeoRMCrMgq4jQkSI9T/xiymA1prJEgFTXJ4b6SWOBTz8
+         3AmuSKaP0d5p3nw0yDfODrMu+AY/FTtXUgjJdUO0MEHt+9wuhSdpT/had9J1sriw1S8Q
+         AxDV8kQ/M9FExbhzOR8TVO3am8+BnaLwbcpgRGt5spvx7wmUVvBRtvPNSa/Rsov+j9n3
+         WT4UuusBBDbAZimNVyfK56oMo8wK0Qu/E7rExOXfsHLWGxd0cveOwKWOhlD9CBlEFstd
+         wMG7FIwGgvQZ9g6oEV7jOl7Y1lp2YwJHE9ASztCugS4vJkIEmtgS5wUiwvA2hXvnPJp3
+         NFxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWGXTSSSI6kXh1sfRs4rubXhUa4MO4VdQaSjfppUf2vvlQfEF9LmC9rTqyU2q7E9UaCpQQkZyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmN/R5CJcEBBo9M1T3hpCfkrBSZaWOXzJ6om6iLjAcFrPoxN7u
+	rSaZV+K5Qyct0tmATiVTmCHz4GpCEnOAfkxa0AAHSHKqSKb+NtOr
+X-Gm-Gg: ASbGnctG7qNduA6fAiJOvq8Lt4DjEGfeLF85QPFqM4pmW/vR1bq5Bs2VWwbn+2TT1za
+	tYmC8wTRjtzPUeGrdFqK69Lec8LDZrwFygBcWxB2ujl5xaQJJ3LZumkD1M6jJBETJokDOsoUboi
+	oRgbH2tXdPVIUvX60/MVxmUtC16AgcylRF+gZS+DMwQp85vYondAhZFChDkAU8X6f0wlXF/a1jG
+	cFJ84C9Bu8mcaPXl2n83qdXsUdS71kA+Unn2EovFoJH/Y7bsPZ+c4PWDbOQiioZl356oEG6WPcM
+	ZJTeKj56E6ogXaDRNp031tiduB0DmJZfONa/dR1xgoUFYaNgD4ngaCJFwcY=
+X-Google-Smtp-Source: AGHT+IHQAb2FyesdxGHoG5jW7/nLYVAtRIdH9odsif+XXghBjHdBWMkIs/hlVMTxXfuwo/L6moMdXQ==
+X-Received: by 2002:a5d:59ab:0:b0:38d:d701:419c with SMTP id ffacd0b85a97d-39efbace33fmr1583985f8f.41.1744973995193;
+        Fri, 18 Apr 2025 03:59:55 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:24a3:599e:cce1:b5db])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa3a1685sm2462263f8f.0.2025.04.18.03.59.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 03:26:57 -0700 (PDT)
-Date: Fri, 18 Apr 2025 12:26:50 +0200
-From: Jiri Pirko <jiri@resnulli.us>
+        Fri, 18 Apr 2025 03:59:54 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V2 01/14] devlink: define enum for attr types of
- dynamic attributes
-Message-ID: <bctzge47tevxcbbawe7kvbzlygimyxstqiqpptfc63o67g4slc@jenow3ls7fgz>
-References: <20250414195959.1375031-1-saeed@kernel.org>
- <20250414195959.1375031-2-saeed@kernel.org>
- <20250416180826.6d536702@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org
+Subject: Re: [PATCH net-next 02/12] netlink: specs: rt-link: remove the
+ fixed members from attrs
+In-Reply-To: <20250418021706.1967583-3-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 17 Apr 2025 19:16:56 -0700")
+Date: Fri, 18 Apr 2025 11:27:52 +0100
+Message-ID: <m25xj1kbmf.fsf@gmail.com>
+References: <20250418021706.1967583-1-kuba@kernel.org>
+	<20250418021706.1967583-3-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416180826.6d536702@kernel.org>
+Content-Type: text/plain
 
-Thu, Apr 17, 2025 at 03:08:26AM +0200, kuba@kernel.org wrote:
->On Mon, 14 Apr 2025 12:59:46 -0700 Saeed Mahameed wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Devlink param and health reporter fmsg use attributes with dynamic type
->> which is determined according to a different type. Currently used values
->> are NLA_*. The problem is, they are not part of UAPI. They may change
->> which would cause a break.
->> 
->> To make this future safe, introduce a enum that shadows NLA_* values in
->> it and is part of UAPI.
->> 
->> Also, this allows to possibly carry types that are unrelated to NLA_*
->> values.
->
->I don't think you need to expose this in C. I had to solve this
->problem for rtnl because we nested dpll attrs in link info. Please see:
->
->https://github.com/kuba-moo/linux/commit/6faf7a638d0a5ded688a22a1337f56470dca85a3
->
->and look at the change for dpll here (sorry IDK how to link to a line :S)
->
->https://github.com/kuba-moo/linux/commit/00c8764ebb12f925b6f1daedd5e08e6fac478bfd
->
->With that you can add the decode info to the YAML spec for Python et al.
->but there's no need do duplicate the values. Right now this patch
->generates a bunch of "missing kdoc" warnings.
->
->Ima start sending those changes after the net -> net-next merge,
->some of the prep had to go to net :(
+Jakub Kicinski <kuba@kernel.org> writes:
 
-I may be missing something, I don't see how your work is related to
-mine. The problem I'm trying to solve is that kernel sends NLA_* values
-to userspace, without NLA_* being part of UAPI. At any time (even unlikely),
-NLA_* values in kernel may change and that would break the userspace
-suddenly getting different values.
-
-Therefore, I introduce an enum for this. This is how it should have been
-done from day 1, it's a bug in certain sense. Possibility to carry
-non-NLA_* type in this enum is a plus we benefit from later in this
-patchset.
+> The purpose of the attribute list is to list the attributes
+> which will be included in a given message to shrink the objects
+> for families with huge attr spaces. Fixed headers are always
+> present in their entirety (between netlink header and the attrs)
+> so there's no point in listing their members. Current C codegen
+> doesn't expect them and tries to look them up in the attribute space.
 >
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+
+I think my intent when I first wrote this spec was to list the fixed
+header fields that are used or required by each op, not realising the
+intended codegen purpose of the attributes list.
+
+I guess we could add usage details to the doc string for each op.
+
+> ---
+>  Documentation/netlink/specs/rt-link.yaml | 13 -------------
+>  1 file changed, 13 deletions(-)
+>
+> diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
+> index 726dfa083d14..cb7bacbd3d95 100644
+> --- a/Documentation/netlink/specs/rt-link.yaml
+> +++ b/Documentation/netlink/specs/rt-link.yaml
+> @@ -2367,7 +2367,6 @@ protonum: 0
+>          request:
+>            value: 16
+>            attributes: &link-new-attrs
+> -            - ifi-index
+>              - ifname
+>              - net-ns-pid
+>              - net-ns-fd
+> @@ -2399,7 +2398,6 @@ protonum: 0
+>          request:
+>            value: 17
+>            attributes:
+> -            - ifi-index
+>              - ifname
+>      -
+>        name: getlink
+> @@ -2410,7 +2408,6 @@ protonum: 0
+>          request:
+>            value: 18
+>            attributes:
+> -            - ifi-index
+>              - ifname
+>              - alt-ifname
+>              - ext-mask
+> @@ -2418,11 +2415,6 @@ protonum: 0
+>          reply:
+>            value: 16
+>            attributes: &link-all-attrs
+> -            - ifi-family
+> -            - ifi-type
+> -            - ifi-index
+> -            - ifi-flags
+> -            - ifi-change
+>              - address
+>              - broadcast
+>              - ifname
+> @@ -2515,14 +2507,9 @@ protonum: 0
+>        do:
+>          request:
+>            value: 94
+> -          attributes:
+> -            - ifindex
+>          reply:
+>            value: 92
+>            attributes: &link-stats-attrs
+> -            - family
+> -            - ifindex
+> -            - filter-mask
+>              - link-64
+>              - link-xstats
+>              - link-xstats-slave
 
