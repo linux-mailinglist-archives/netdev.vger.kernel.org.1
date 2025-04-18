@@ -1,101 +1,95 @@
-Return-Path: <netdev+bounces-184060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E587EA93018
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:42:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1818AA9301F
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA633A9ABF
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:42:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6117F8E0F0C
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B90267B98;
-	Fri, 18 Apr 2025 02:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE95F23E340;
+	Fri, 18 Apr 2025 02:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcFy89Dy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fsMo7VHy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0162638B2;
-	Fri, 18 Apr 2025 02:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A3F219ED;
+	Fri, 18 Apr 2025 02:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744944166; cv=none; b=rEUrqrfeiLIvP8tUFE+CbaA5tgFkERcyOVnPWD9Gs0w4bueKisocJQaR19DkENPsVhOsSKh1TpepKjp5k7T/1k6GhVOuRNwbBgJAY+CtG5tY6EJttLb44/lKtgWYjEx2rdMxuyryU4tlGFgyxFBuKC2w6F0RhCUOjiPvXuSs6J0=
+	t=1744944622; cv=none; b=pPi0iC+kNtwSs3gqXZ7cSlDpTBfKcEebKQQbArmoOvFgnjN9AZno7d+BDh7Tq3+icwmleW7Yc0vbfqnq8y9OXecPKUPN4hwZKEwTiOe4+mrkoa4QKnZP3GKv6QXObt883amnNgbsZTz6ajgstPCOvErnllOVhirpzvgikTRUDeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744944166; c=relaxed/simple;
-	bh=vCR/txIULWnpJdYgJcGl2dcE/ZHWqbNMeCvb4Pa2QEU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K1qxfT8+v++uOsSw6lZXZG00+tHyc8FhnHqtY/fYw7ApGtkruS+1Tj52Zj+P5LY57iQefwHAlhZRmHS6ecTBkTMAFiMq7qw1oxPyZzhQ8Fyp5N75ISb1wS8UCkG0eYXDV0oF60loj2ZQ3WLJns8+X0BUJeQpNNmMzjShox9qadU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcFy89Dy; arc=none smtp.client-ip=209.85.208.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-30effbfaf4aso14854951fa.3;
-        Thu, 17 Apr 2025 19:42:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744944162; x=1745548962; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCR/txIULWnpJdYgJcGl2dcE/ZHWqbNMeCvb4Pa2QEU=;
-        b=hcFy89Dy4m+wqXZejh1A4f4uHvf6YnyieFR/FAeej3DJTxmsDjeXKl4Md3YzhDTkKM
-         xV9+oMiHdXryRr05pS1GPB66wlqnMXLt0xT+VBPcJh5e6r0BLKHs9liUdPvRAKpR3dz8
-         pN8UN++GNqpFidpZAd4W+kA0qd0yFI61j+4lrCuRYxmz6gbAdB4ZYdA8EJbLz99ZzVDg
-         gVmB+YyoPWy7C3/x+SSj9h/JM8nZ15eg+sxRrRuGFCscEckv/1TmEmhL1Leg5dN6ODXw
-         4QMQXTtAmaWkvgEs9HEynZYx+rY8Ds7eH31s7IZD9OlfsnZZYZ1xwQqxzV5uWti7d3HU
-         sdRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744944162; x=1745548962;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vCR/txIULWnpJdYgJcGl2dcE/ZHWqbNMeCvb4Pa2QEU=;
-        b=W49q+cC1RwJwiMa5Lq5HJDZG8Ufw44UCplSwtma2Tsqym/IAwP8FLntZ+1URQyG6Jm
-         KgwgxIYo5ZSaJ9OxWpRdJXmlNzSH5CulzMZEwVeAtPpQ6LFRRjdAVApjLTDaAoCMykH7
-         9me6gGlPjRmJ8wmcyo6X2IQygyYsIZeKV8U3kyVy4dBp7gqTmUwVoFwQuIS+/f+daVJQ
-         oKo4Khcaq8xAZ+0ZqXUyrUBLEcba4snKvMoOeUj68jwt3E8NYUkI723KhRXRPMEeZ6Bw
-         ojyaDELOLjVUWhPzfc33EG9/sBQxlVhmcqQV5rj//SWh7JAaoezWM8HhMjdl5nlcx252
-         2zuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHxHBggQngmqqah8p5dy9FNIRhkRLnfps66tijccHSgha63MimPPgmEA/zDuF7qtWp05Kf+Eh/@vger.kernel.org, AJvYcCXnx0CuvVKEZJiup6T8NfcRwuBptNWb7H4lX3BuehHU12zbwNUrxDFOr0ifugOlcb5gg1lr2OA3m9IPMg==@vger.kernel.org, AJvYcCXpA9OmhL1Z18MhqnG/PXLaavS/oU0nl6qZaw/rpmjbpvn/FSCwjd6WMGXPTZGBCQL/+KHW021gyaaBUpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwXKfn6tVoIykic5aJRb+RRJlYlMLHQs7aRIyE7OFUyJBJZtSL
-	PnwjaqLnb6fz5NYy/5sWrWoepyeJGtEkgF5Il0pr37zYAac6iTS1jaecVv+sJ5hK4zgsRC85X/p
-	KyOg2yOG+f5z6PrC9CDiTovUt6Ie9dlftzwEWBdzP
-X-Gm-Gg: ASbGnctHkjIfELsWSEgsUNlAdgh/A/gjuszcJ+CfTWLC90O1fiz1rx3y+N/JzUX5bl9
-	m/KJ68EjNgjTXxR6Wxq7eM20oa6eFE3a/LvSW1p65jBkXpIMMLSHXhYDd8ezAN9SvNoI+9EOHHZ
-	+BWrp6RmnaMYwjISgNJZXPng==
-X-Google-Smtp-Source: AGHT+IFEcgZP6o7kgqV2a2nLZkb68A0xRAIqaJpeLsSwKFNGfcH7MsfTkcVH5j0idw/Lai0/XP3hxkoN8nRq68PB2AY=
-X-Received: by 2002:a2e:bcc2:0:b0:310:8595:7a60 with SMTP id
- 38308e7fff4ca-310904c64e5mr3417951fa.5.1744944162045; Thu, 17 Apr 2025
- 19:42:42 -0700 (PDT)
+	s=arc-20240116; t=1744944622; c=relaxed/simple;
+	bh=jGrq8tE+7YaPDd/xmPS8CKHr6eL02Q7LBXtFoqx9d1U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DrSe+rJQs4dsmwWExbJODikG0rLP+grWwoPO42MR5aqgyWshQZ0GRbDbuBijZk9kAwOuVsRE8y6cE+u2MkMOLVOAC5It59d+e+LoNhBStXy7NVrTy+BSACyuVUcDRtDoyABcLEXfNrtpAhYgenXpzpjmIPnax/KaZJy65s4EGGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fsMo7VHy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C47AC4CEE4;
+	Fri, 18 Apr 2025 02:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744944622;
+	bh=jGrq8tE+7YaPDd/xmPS8CKHr6eL02Q7LBXtFoqx9d1U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fsMo7VHygmGy/jQuNAxeTIH45lseIn2JeBjB4QMNT1GDl9g7aJq+jg2+vkyNIy4bF
+	 36U7lQius+JyUfGnb/CTXbr06/HlF0+FAhdfsaSJnXY+In1hXWEecjy/jzhqPRtVB1
+	 xsBl5ofbMAZ10MHk2e6qnZzeImRyi1TjWOEca3YIA2qsSqAhFhqVrw/G39Pe0M4Um3
+	 NCJI5D5FhYfX9sd+7Zp6CQ4yFxhn7n21LNQhf+sCbi1l7iV1efKE2jkd8geIQ5js1z
+	 tio4O0ELJfMMdZRyEmapl6y8Cmb2/IZC+Yf1pfDCe+iJXgjuI1ieUvtrC9OxVKxceG
+	 UeCAgmLfgFglA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D90380AAEB;
+	Fri, 18 Apr 2025 02:51:01 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416092243.65573-1-bsdhenrymartin@gmail.com>
- <20250416092243.65573-3-bsdhenrymartin@gmail.com> <817d5a9f-63c0-40b2-8e97-4a29185c0455@nvidia.com>
- <20250417080422.6a22ff04@kernel.org>
-In-Reply-To: <20250417080422.6a22ff04@kernel.org>
-From: henry martin <bsdhenrymartin@gmail.com>
-Date: Fri, 18 Apr 2025 10:42:35 +0800
-X-Gm-Features: ATxdqUFjqkCj5sFr45-WGuw2jtT8EQMI9lhJK3EB5blO0heLfWj6U4s_Y9kX288
-Message-ID: <CAEnQdOq=JjJRogysZSQho4yAH7WFAyGbCQhXjJFV1f--TArNRQ@mail.gmail.com>
-Subject: Re: [PATCH v6 2/2] net/mlx5: Move ttc allocation after switch case to
- prevent leaks
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mark Bloch <mbloch@nvidia.com>, saeedm@nvidia.com, leon@kernel.org, 
-	tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, michal.swiatkowski@linux.intel.com, 
-	amirtz@nvidia.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] trace: tcp: Add const qualifier to skb parameter
+ in tcp_probe event
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174494466027.88264.11686966435646986323.git-patchwork-notify@kernel.org>
+Date: Fri, 18 Apr 2025 02:51:00 +0000
+References: <20250416-tcp_probe-v1-1-1edc3c5a1cb8@debian.org>
+In-Reply-To: <20250416-tcp_probe-v1-1-1edc3c5a1cb8@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: edumazet@google.com, ncardwell@google.com, kuniyu@amazon.com,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, kernel-team@meta.com
 
-> A bit hard to see from the context but I'm guessing this fixes
-> a memory leak? We need a Fixes tag..
+Hello:
 
-Thanks for the reminder. I've added the Fixes tag in v7.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Regards,
-Henry
+On Wed, 16 Apr 2025 10:06:12 -0700 you wrote:
+> Change the tcp_probe tracepoint to accept a const struct sk_buff
+> parameter instead of a non-const one. This improves type safety and
+> better reflects that the skb is not modified within the tracepoint
+> implementation.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] trace: tcp: Add const qualifier to skb parameter in tcp_probe event
+    https://git.kernel.org/netdev/net-next/c/1df4a945444f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
