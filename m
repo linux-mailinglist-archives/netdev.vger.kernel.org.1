@@ -1,390 +1,213 @@
-Return-Path: <netdev+bounces-184082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9ABA93324
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 09:03:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EE30A93369
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 09:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CDDD16DA13
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 07:02:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9EE68A65F5
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 07:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413AB26B949;
-	Fri, 18 Apr 2025 07:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D22B25A2C8;
+	Fri, 18 Apr 2025 07:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b="bLIfLUnQ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Ptm3xTbY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11012048.outbound.protection.outlook.com [52.101.66.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471842116E0
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 07:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744959658; cv=none; b=MJ2rBLPDHGHkECzvOHE48/H7xxbqFNLVF4ri52URlIGGK55sNSh7o1u4fyvTHfETiDZ+hw8xWShcslRO18FYGZybpS553tdPS0an/6QNeg+6+mVIMYOLRYG0EifNyyMe9RB77iuaisSjf9Ve3RhW8Fw7b/uZdgfiEA0Z1b0YHF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744959658; c=relaxed/simple;
-	bh=ybBxi4WQcURKoE4BxCGqK8VSt1MHM5Lsow1LinLQwcs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=j/op8Xut/tpMN1/6q6q6o9gYDN+AiGjvgciSfxrBAe+DAXDcArBnV5lxLWnhRGiGkp5ca4xs2XzcuiFUGxQzaGP3ck83RjPqhQrKd1Yx0FeV9OMcJlThWUH3muKrM8KhPBZ5tEOeFvN0EL9xauM4pqrnGrvOncCBTLuVPcA4kU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev; spf=pass smtp.mailfrom=orbstack.dev; dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b=bLIfLUnQ; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orbstack.dev
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b03bc416962so1084479a12.0
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:00:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=orbstack.dev; s=google; t=1744959654; x=1745564454; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ag0uHziDOMxcedxURrdSLZ+7TR1r0QSkH/f14RF03UI=;
-        b=bLIfLUnQGqOrz2mgc1onPobAt2MPv8mPRxxVFkKI6iseXFBttbQgASC24y+fSXC3Ok
-         ykVnyBxyLNWUu5YblHtM615ye/HvwPQ7bCGrnr4VLd6BA3ja0oOSGKxHLCKUvpXb9HtF
-         olFU4+JFFVYuxDQFmUKovjX95uacaQxZq1IEqLIrlsBPHXJZuLHazVMAnvKkY4xe4K+4
-         Y7LjDkFTiZM6kbtudzH5HnaLfe2ApVhPq/ZwS2xH5Ws0sUqocnzQmcs1H4Dukv0doBDA
-         g8iuTZyB/Y+65dMC1ZWc7REi6LN6/g2eCiS7cDqNAq7WknnSI9r56q+gOj385QkxVLr6
-         c4zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744959654; x=1745564454;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ag0uHziDOMxcedxURrdSLZ+7TR1r0QSkH/f14RF03UI=;
-        b=lfqCUW/k71D0oOz8pmS9y/Fb1ynC9JDR/dNdGBsXkxo3c7tAODe88hs5ENyVGlKt2R
-         9CA1ocKiOxSuDGhEiqSV5fwUIvOguwBMq0IT6QP7Jny/zSizYKc7qXjiV7YfxFtdW3+a
-         yx9ZA47OWs3Gfd42zX77JoZlkOAbxzY/0vXvT1LSQ/v7SNERg9/7dcHVN+G6fXamHXsw
-         Difoo2qma+AbxWGhF/GNxEj1QHA4zvi76YSa+fXCkoljoAOloQCirNRv3Pt/iHQOS29y
-         PzDpLwssYCuadtjo1AdUoxN9LIDeMMLCCF7xjn81cMi2T57ikOpC0+ZBqPRQx9QcAg4D
-         G+dw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6NyFlj7eW0P2veryTKVYeU244gjKMCjWhgI39sIDVwt7vSmL7pm17oT7MH8KFQx3tlWQKyBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmMkpDgFtWl44uNNvo7rKWg03xR9oojqUygIzvAhKDqMYJWSuv
-	OHvmCH441NORHFax5qPpmWWVabLT6iTJ0ewZStLl8sCi/ScZroc8m87cvWoFQZw=
-X-Gm-Gg: ASbGncv4rYCpNEwLSdlgxh5pGlUrgxzD6klVkB4shJxDamR9ZVHJteQgJ0x1fttNw7P
-	iEBVGGgtsBHPK3dUBcGElslh3C9BKLqnC0/QPgmeFuHLWKu5J8v/ODdPOQKtJSjWgAFGX933k8k
-	obbukORo88Sm58jg7o/8HY8flkqoOQid2i9peO+OTnbtpnLe3oMMd6EEtTl4y8h7hGFeTbilALD
-	P37cLK3OsAYsg7UfIDTyo3aoRI5OPFV38axI/sZUjGqdm7jxKGRwkg5AavupgIixEdhCzXnQB4l
-	rAn9ri19YEHyVgEyk8gGuAR5qin1ZhOFbCIq6P81XnAjoCVNNKUEKvI=
-X-Google-Smtp-Source: AGHT+IHBYom+6rviMqXCW+6sdPcKwAXnTI933w/mVjbBQ303YyLG/DJJKVWOikqiNoclvemSFsRdng==
-X-Received: by 2002:a17:90a:c887:b0:2fa:15ab:4df5 with SMTP id 98e67ed59e1d1-3087bccb042mr2391934a91.34.1744959654237;
-        Fri, 18 Apr 2025 00:00:54 -0700 (PDT)
-Received: from debian.. ([136.24.187.18])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bde283sm11080245ad.6.2025.04.18.00.00.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 00:00:53 -0700 (PDT)
-From: Danny Lin <danny@orbstack.dev>
-To: Matteo Croce <teknoraver@meta.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Danny Lin <danny@orbstack.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4] net: fully namespace net.core.{r,w}mem_{default,max} sysctls
-Date: Fri, 18 Apr 2025 00:00:34 -0700
-Message-ID: <20250418070037.33971-1-danny@orbstack.dev>
-X-Mailer: git-send-email 2.47.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222F835280;
+	Fri, 18 Apr 2025 07:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744961195; cv=fail; b=GEX0sUf6Htvgf0N/LmwnDr4FbxYBuRmdSvGlaFc25MzJlzUXP0ERZhVGHut7dVMgju+nEqqrLaY2PyavC8kfuGiC2NlfhOroe+FR+U9XtwNlMtpZetEplthQowFKx+NTo7zHcg+PEaTmtKRoFhWJu9N/3QIfsFWzmSUPdWQrL6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744961195; c=relaxed/simple;
+	bh=BUwS+jv6+jsKFcZKKKfxl7RPNA2+MKCpmVt3//kc3Bo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DNyLuYC5NTy/rpIGp2p26q/o1aaqoIIEj71OyKkZ+yQ5No5pDjnQzdvznNMAslk7DKIW5nApxv0cqT+hSX69/5Bl0z30lrdpiQMoXnBmrema9lHG4p7KzQCez83EgKhxiFAB9h5i6E/NEHIhuJNoCwTdVgu1RlfJI2bBr78LzUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Ptm3xTbY; arc=fail smtp.client-ip=52.101.66.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qOl8Kbj8qLMP735Y7X8vg8Zxo8JxJQZm4i4rbBB8Y5c9rf0oeYUBtMtY/13u/UzueGS5wOcZk7Cy/2XRPJ4Ec+pTEuXdjWVOaK6JJk8SUI0fVWusm/m5c7d8RarX9KH/o9e/5D+a6wzni9VRn88P3lLVhej6gCD+oRNLBq6vMFQjtBBVPCE+R638paVQ3+JjmySfpQ9TT3wBdBkiUzqSi3PSsr671Mf0bLYcJQZ8nr1z3WozAKNQKCBpCouc0bgT7f8WYRjI6GwSg3hydxzm58lGaWYqI7p43G5ajM1MY3u9xr652i9Y2+Nlwu1pxqddgpnP+THu6FGRZ70UGiAcoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ihTzWP8F+YcjX74TauX4ZWq3/lVt9Yf4Hi5+dXtv0lU=;
+ b=XaQgM6CjirvOOtiJ0vxK0hemD5mVSMKSvRXB7ggQ4gEOuI5iRMD+PtI5Mu5hYklLq373NpUcmZlKxATEjXML5ZYk+Iy2SekGgWrk9vlg0xCUqvOcbAf9NmVPSwhvo+mA9bWFIkEgHdIDTI397Afdw675h5Kzg9hsTO+YsVHryPo28XU92VqLBqecWmJRCc0nZiqhi3/rwmKzUKP8/MPiiZnlCWDAxuoebFcx5LASh9jv52S3MeTtOdLNuKDlx2f8PYcYybSGfkDUiUIM2hOh2PjVGPOe9iq2PcrSKicOzLor/FxV7KRxLz8aYdwFLjifDzLNhQFWrJBWF9en57Ynqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ihTzWP8F+YcjX74TauX4ZWq3/lVt9Yf4Hi5+dXtv0lU=;
+ b=Ptm3xTbYTMp4xti1K71Ag4gMaIIYizxzBhgkmC9V0xXFHvRPh81AyxeyEFHkHIhTeWGRhMmpX69/Cj4iNIBkTJehLIazjg5UKeAxlBZgR1voYIcAMP2YGcWzu4OAwV8FyFHkV/BRJ17gJPQgaYEBSYDd+r40K2O/IbAezD2vTCFcxzeqaR0m01PzdA1s7U4xWw76GJmIze8VsZhFfxm4sb0MvfvnQhV5lWMWlaR6RNgBk0u8oXtbFeDt/Ga5onzjNBx5yOEIXZmGtmr7LxSnokJ51XtjNYoV92JDaKXB87RkBiTqKxookg+1bIbtkCFrb7LRdRccd0hU4hAz0kAZjA==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PA4PR04MB7853.eurprd04.prod.outlook.com (2603:10a6:102:c0::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.22; Fri, 18 Apr
+ 2025 07:26:29 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.8632.030; Fri, 18 Apr 2025
+ 07:26:29 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Vlatko Markovikj <vlatko.markovikj@etas.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Toke Hoiland-Jorgensen <toke@redhat.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Subject: RE: [PATCH net 1/3] net: enetc: register XDP RX queues with frag_size
+Thread-Topic: [PATCH net 1/3] net: enetc: register XDP RX queues with
+ frag_size
+Thread-Index: AQHbr5BVYUCo9x51mEajxafZZLb5V7OpBRVQ
+Date: Fri, 18 Apr 2025 07:26:29 +0000
+Message-ID:
+ <PAXPR04MB8510579F89CB31A054FDFB9188BF2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250417120005.3288549-1-vladimir.oltean@nxp.com>
+ <20250417120005.3288549-2-vladimir.oltean@nxp.com>
+In-Reply-To: <20250417120005.3288549-2-vladimir.oltean@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA4PR04MB7853:EE_
+x-ms-office365-filtering-correlation-id: 15abea8a-8a84-40b8-f951-08dd7e4a55fa
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?zd3we5yD0sG4GPqywWHcgFfrA1CjmIXD1Qd0Fe2DDRePTOSKKjZNhFYg5OZM?=
+ =?us-ascii?Q?gsRCfxflugk3ZvxtcqduTPmJOxivTQHCvChOxb8zk9L6JoaowvCNGIwKE9AN?=
+ =?us-ascii?Q?sq5d1aBPm1JR0FxriSwJuzpR+OnYSx6oNvLdNU+SXBlkEVCOmeLs2xEv215h?=
+ =?us-ascii?Q?3Lzskjf11jR705XLKS6bZZ8unARBg7HFexZemQ6XaGinBszz23XRXvbqha15?=
+ =?us-ascii?Q?Cyf95f7ocPxqn+6jrzkfHJ+cV4UcRy1U/YsEn/8b6WgB7F5VzglIZ2BH5xBY?=
+ =?us-ascii?Q?yXh16ErlQ25DUvFN9OlwTizCnYzHOb+kZPwD5TX0O381MYImlt//A4XW9N91?=
+ =?us-ascii?Q?TsEV8MeNnYW+re3/5SVvP3/a4rT+xxHfOH1CeLNJyXVAZu3lj3HrFHYvMA/Z?=
+ =?us-ascii?Q?AnxIobv/+7d7s1l1vDbrezg0vJiDQE8DpCqGzqW9hFYVr58dlH+oU2PLAHJI?=
+ =?us-ascii?Q?Rpl0JLfWsvCJ8tkXKfGfvwuo6cTxOxPX8KRTK7rH3/i8IMnAZfXNqdYMGXL+?=
+ =?us-ascii?Q?+tyg2NmJRQ8VnIQBAlk91IV1kf+XSd34IgjDU3xtrD+G+7FmxkCKoqsANMAN?=
+ =?us-ascii?Q?yCXFtHMeIwXStKLZBgCltcErlRy3/H+REsOww2ctflR1SRS54Svz8s2T8ly9?=
+ =?us-ascii?Q?69DG/YtqMpKeWMp8d5W3rVQS8cmHdmom1g2+xBRqHnLVvn5MRScFxQ3U1qrb?=
+ =?us-ascii?Q?3fhswxP8PH3OrKYYEHIdehJynyVLgck/Kd+8Pp4exI3aMoNyL3b28PMvXvnz?=
+ =?us-ascii?Q?EJCdUy2BjaQ/+3g7eP8/mI1aO5kWQGqWO5vDNo8Ufw4AGN72735PG92+0nyR?=
+ =?us-ascii?Q?0aRNyLWlEbdwoHIIUjjdVVCibRw00XsNYRpDyV7hnc4g+3fiOGqBfqE7usTP?=
+ =?us-ascii?Q?RVQordOrqcFHs5+f12o/gkqmji3b4D00hknv2q7CZXKQlLCCX3Y+p5WSvALU?=
+ =?us-ascii?Q?XOBgd/ek+SrCzzyBvuCF4tLd7fmfMYyRMUywXexkDyBgAzBSvR4Ybf49MW1m?=
+ =?us-ascii?Q?OHZV6Ho5LgQl2kDMJ7KC3wrwkcLBMjbs3uYPheeN+qi1Rhj8eSFZvXtXb/Z7?=
+ =?us-ascii?Q?c7Mv4RUEbkV7/7ZLqt7ndVprmsJQqsHpi1MWlD/B+3ixKwIFkiDQ6j1Jf3c7?=
+ =?us-ascii?Q?ohtX7KEcDCKitiWu/0gcPu5RowgYygefErikxluuD1DqOrgj1EKrVIiKYJDM?=
+ =?us-ascii?Q?asH1VUpTqS0J67WpMVqTI2LfeUQ3J4ri+hT7p+VThm0PX3Q3EXuBTDXG/OPB?=
+ =?us-ascii?Q?52VwhVBVPP+BQI2zp3NLgpLY/UrBCYZajm5oGgrrF1W7u9ivoopk2aOmbriU?=
+ =?us-ascii?Q?bOi+sTZiLBYk7bxSuJ4PidBNa30QtKy6orGFisght76fGEAnCWx5L5+YBHOo?=
+ =?us-ascii?Q?OrF3iwEWr4l2FTrv8EaUrT8IpY3S59MxZZFnKKdEgPGaQRePo9v/9gksdoKw?=
+ =?us-ascii?Q?WHir628j1tt0bhQ0y00rir6i51/oRRUaxVlr8WynPTP7JsIyKc1Oc29LLByo?=
+ =?us-ascii?Q?jdP1VAKADc2TC44=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Y6b3YxlBLuAzrjGNboJa5+qbvEGux9fdU+V1/PMrH9F+QmjLtyel+FDkY9ka?=
+ =?us-ascii?Q?EWPqw0pSXlhBvc2CEy/WO6f/LOLu0mxM7dFAwTWYg+JfEK6wIaff4eQ7Ayq+?=
+ =?us-ascii?Q?NheJoA8YBuUm0LHA/EQqWnlZkV1g/6/f8eN4D4W+xuH95lVhkEP0F5E4Gecg?=
+ =?us-ascii?Q?8EWZqT2LKiUej27/bgtzarbTj9js6YvZdHAaVTZ8/fSvPWYl5m7QoKO0BpA0?=
+ =?us-ascii?Q?qpUMedUlVwu7zVKDbU+EofoKm7yuNQeQ30lhW59nUNWYeMD07c9BH/NudP4k?=
+ =?us-ascii?Q?UlEc28CEJM75/AKkjMjdk0Bo2FBGUf1ZJ275HKqLuj2jQt1SZbj3XZCtPLQr?=
+ =?us-ascii?Q?FHQh4NfuguqojAAnoQEsvWFgjwcu+vpSPrh9U95eGzmHpxL4pPAoK7FBWQrI?=
+ =?us-ascii?Q?Gb++kTeSFwlr/0nWRx60PbnPTAO6jwN5nXPFmNIYvnNeb4/5jC/2fPx6KpzG?=
+ =?us-ascii?Q?kiDCU+IOMtS85a740Ktctlhvnc0mdGaGvIvgZay5PFZSO5/CAz8BaptIlYjr?=
+ =?us-ascii?Q?nA1+kQzAvtH9AqL3eqHhE6CDWrfAzobrOcTxp1Z3smuab8xQqgdaXgP/XaFA?=
+ =?us-ascii?Q?7L9Tmpcg1aNYa3IrxlUn7xKp/cjiwAKqHcub8uiNVPmXeBQD453VmLNxpUBI?=
+ =?us-ascii?Q?fzhGaiOJ3lozGQjkHguagEkTI98Nd1a6+regEipINK1HpqoXaivYTTWySChb?=
+ =?us-ascii?Q?zqfFYwfOYVcmArGddA28c5hPwfovrquf0a67knpK9QcS9cxST8kg5/XcLS0q?=
+ =?us-ascii?Q?399llN9dOa3o3DNvOssMT8SzyfAhZFSp3mGnELO2OCwEs8BkwFgd9o+UPvv8?=
+ =?us-ascii?Q?3zRfGXqT3njlEY0fNF0c1aIPR55Oh0ZEoRCrCmgbEHvRjUIkiqXtyiHWsGPR?=
+ =?us-ascii?Q?7+4XYZys9PfC0wfDZyu+tXFVkcIemf5MD+cU8B6Jh6lmOMr9EuUrosbaiHBJ?=
+ =?us-ascii?Q?ogvaop1Kb1gcN6i7hO7oj+19cGwLleofy5qhl7/YU0subcVxCzCHz27caBiF?=
+ =?us-ascii?Q?KvxjKgEVJB2HMJXDieatx/mWXkquvDy5lnHj5S3NLlASO/eFKGGzmZ0/rgu7?=
+ =?us-ascii?Q?pg2OT+oUK2nAlfd/sAykL6fz1m6qxsv/niD5r2IjRFaDMuyX2+ossMw8bUhT?=
+ =?us-ascii?Q?FQKZVJwKIlNIyc0gEaPIZH8cbJ/Y4jgqfIdB3jITdWG5rdJxkaZeh5Mm+sYd?=
+ =?us-ascii?Q?hhByJyvLb0/7uk8W31d5WiM/5E9xh5CLmnaGNMSHzQLcCpWO/55/OkNTS+oM?=
+ =?us-ascii?Q?SkyD/zGpJDBDm50xCf1nsIfqud8XAmubE74BTHIHXEuDDJxc5yLMMzPUExVE?=
+ =?us-ascii?Q?dE2zQR5FO2LuYLHg4R+8/HmCllPIHL6P1MTJ4+YWOuBv4lBpVzNF0gieX7GN?=
+ =?us-ascii?Q?M1kdxdvpNdbCqo7EdTB0iF6N17ijOuh9nPM/ae/WIOiOvCVLSdwh0OCBu8RX?=
+ =?us-ascii?Q?mzRYNKYCS/fZEkT97TnO/K9gn1tulhvK+iByAjobE2U0JF0u+0feVcBLeldM?=
+ =?us-ascii?Q?fYuyo2Dsv8YmaWH4QC85ZfwT8duBJFgJMK79Xcjxn+pXdDUc1XjBjZWEa3dU?=
+ =?us-ascii?Q?Be7srKAMnu0nfm/V3zQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15abea8a-8a84-40b8-f951-08dd7e4a55fa
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2025 07:26:29.1589
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X0zw0aHURBcVaxbbRDs9WYack+UBX5IgKLC9vXLKkfL5fSDAZRWbfrMxhUOXiDsszaB6hIsJSzJRtZ6wfAZilQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7853
 
-This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{default,max} namespaced")
-by adding support for writing the sysctls from within net namespaces,
-rather than only reading the values that were set in init_net. These are
-relatively commonly-used sysctls, so programs may try to set them without
-knowing that they're in a container. It can be surprising for such attempts
-to fail with EACCES.
+> At the time when bpf_xdp_adjust_tail() gained support for non-linear
+> buffers, ENETC was already generating this kind of geometry on RX, due
+> to its use of 2K half page buffers. Frames larger than 1472 bytes
+> (without FCS) are stored as multi-buffer, presenting a need for multi
+> buffer support to work properly even in standard MTU circumstances.
+>=20
+> Allow bpf_xdp_frags_increase_tail() to know the allocation size of paged
+> data, so it can safely permit growing the tailroom of the buffer from
+> XDP programs.
+>=20
+> Fixes: bf25146a5595 ("bpf: add frags support to the bpf_xdp_adjust_tail()=
+ API")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  drivers/net/ethernet/freescale/enetc/enetc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
+> b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index 2106861463e4..9b333254c73e 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -3362,7 +3362,8 @@ static int enetc_int_vector_init(struct enetc_ndev_=
+priv
+> *priv, int i,
+>  	bdr->buffer_offset =3D ENETC_RXB_PAD;
+>  	priv->rx_ring[i] =3D bdr;
+>=20
+> -	err =3D xdp_rxq_info_reg(&bdr->xdp.rxq, priv->ndev, i, 0);
+> +	err =3D __xdp_rxq_info_reg(&bdr->xdp.rxq, priv->ndev, i, 0,
+> +				 ENETC_RXB_DMA_SIZE_XDP);
+>  	if (err)
+>  		goto free_vector;
+>=20
+> --
+> 2.34.1
 
-Unlike other net sysctls that were converted to namespaced ones, many
-systems have a sysctl.conf (or other configs) that globally write to
-net.core.rmem_default on boot and expect the value to propagate to
-containers, and programs running in containers may depend on the increased
-buffer sizes in order to work properly. This means that namespacing the
-sysctls and using the kernel default values in each new netns would break
-existing workloads.
+Thanks for this fix.
 
-As a compromise, inherit the initial net.core.*mem_* values from the
-current process' netns when creating a new netns. This is not standard
-behavior for most netns sysctls, but it avoids breaking existing workloads.
-
-Signed-off-by: Danny Lin <danny@orbstack.dev>
----
- include/net/netns/core.h                    |  5 +++++
- include/net/sock.h                          |  6 ------
- net/core/net_namespace.c                    | 21 ++++++++++++++++++
- net/core/sock.c                             | 16 ++++----------
- net/core/sysctl_net_core.c                  | 16 ++++----------
- net/ipv4/ip_output.c                        |  2 +-
- net/ipv4/tcp_output.c                       |  2 +-
- net/netfilter/ipvs/ip_vs_sync.c             |  4 ++--
- tools/testing/selftests/net/netns-sysctl.sh | 24 +++++++++++++++------
- 9 files changed, 55 insertions(+), 41 deletions(-)
-
-diff --git a/include/net/netns/core.h b/include/net/netns/core.h
-index 9b36f0ff0c20..0459523602cb 100644
---- a/include/net/netns/core.h
-+++ b/include/net/netns/core.h
-@@ -17,6 +17,11 @@ struct netns_core {
- 	u8	sysctl_txrehash;
- 	u8	sysctl_tstamp_allow_data;
- 
-+	u32 sysctl_wmem_max;
-+	u32 sysctl_rmem_max;
-+	u32 sysctl_wmem_default;
-+	u32 sysctl_rmem_default;
-+
- #ifdef CONFIG_PROC_FS
- 	struct prot_inuse __percpu *prot_inuse;
- #endif
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8daf1b3b12c6..7aeddba44919 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2849,12 +2849,6 @@ void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
- #define SK_WMEM_MAX		(_SK_MEM_OVERHEAD * _SK_MEM_PACKETS)
- #define SK_RMEM_MAX		(_SK_MEM_OVERHEAD * _SK_MEM_PACKETS)
- 
--extern __u32 sysctl_wmem_max;
--extern __u32 sysctl_rmem_max;
--
--extern __u32 sysctl_wmem_default;
--extern __u32 sysctl_rmem_default;
--
- #define SKB_FRAG_PAGE_ORDER	get_order(32768)
- DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
- 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index b0dfdf791ece..39fe16f1ab72 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -317,6 +317,27 @@ static __net_init void preinit_net_sysctl(struct net *net)
- 	net->core.sysctl_optmem_max = 128 * 1024;
- 	net->core.sysctl_txrehash = SOCK_TXREHASH_ENABLED;
- 	net->core.sysctl_tstamp_allow_data = 1;
-+
-+	/*
-+	 * net.core.{r,w}mem_{default,max} used to be non-namespaced.
-+	 * For backward compatibility, inherit values from the current netns
-+	 * when creating a new one, so that setting them in init_net
-+	 * affects new namespaces like it used to. This avoids causing
-+	 * surprising performance regressions for namespaced applications
-+	 * relying on tuned rmem/wmem.
-+	 */
-+	if (net == &init_net) {
-+		net->core.sysctl_wmem_max = SK_WMEM_MAX;
-+		net->core.sysctl_rmem_max = SK_RMEM_MAX;
-+		net->core.sysctl_wmem_default = SK_WMEM_MAX;
-+		net->core.sysctl_rmem_default = SK_RMEM_MAX;
-+	} else {
-+		struct net *current_net = current->nsproxy->net_ns;
-+		net->core.sysctl_wmem_max = current_net->core.sysctl_wmem_max;
-+		net->core.sysctl_rmem_max = current_net->core.sysctl_rmem_max;
-+		net->core.sysctl_wmem_default = current_net->core.sysctl_wmem_default;
-+		net->core.sysctl_rmem_default = current_net->core.sysctl_rmem_default;
-+	}
- }
- 
- /* init code that must occur even if setup_net() is not called. */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 323892066def..88694cd59abd 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -278,14 +278,6 @@ static struct lock_class_key af_wlock_keys[AF_MAX];
- static struct lock_class_key af_elock_keys[AF_MAX];
- static struct lock_class_key af_kern_callback_keys[AF_MAX];
- 
--/* Run time adjustable parameters. */
--__u32 sysctl_wmem_max __read_mostly = SK_WMEM_MAX;
--EXPORT_SYMBOL(sysctl_wmem_max);
--__u32 sysctl_rmem_max __read_mostly = SK_RMEM_MAX;
--EXPORT_SYMBOL(sysctl_rmem_max);
--__u32 sysctl_wmem_default __read_mostly = SK_WMEM_MAX;
--__u32 sysctl_rmem_default __read_mostly = SK_RMEM_MAX;
--
- DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
- EXPORT_SYMBOL_GPL(memalloc_socks_key);
- 
-@@ -1333,7 +1325,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
- 		 * are treated in BSD as hints
- 		 */
--		val = min_t(u32, val, READ_ONCE(sysctl_wmem_max));
-+		val = min_t(u32, val, READ_ONCE(sock_net(sk)->core.sysctl_wmem_max));
- set_sndbuf:
- 		/* Ensure val * 2 fits into an int, to prevent max_t()
- 		 * from treating it as a negative value.
-@@ -1365,7 +1357,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
- 		 * are treated in BSD as hints
- 		 */
--		__sock_set_rcvbuf(sk, min_t(u32, val, READ_ONCE(sysctl_rmem_max)));
-+		__sock_set_rcvbuf(sk, min_t(u32, val, READ_ONCE(sock_net(sk)->core.sysctl_rmem_max)));
- 		break;
- 
- 	case SO_RCVBUFFORCE:
-@@ -3618,8 +3610,8 @@ void sock_init_data_uid(struct socket *sock, struct sock *sk, kuid_t uid)
- 	timer_setup(&sk->sk_timer, NULL, 0);
- 
- 	sk->sk_allocation	=	GFP_KERNEL;
--	sk->sk_rcvbuf		=	READ_ONCE(sysctl_rmem_default);
--	sk->sk_sndbuf		=	READ_ONCE(sysctl_wmem_default);
-+	sk->sk_rcvbuf		=	READ_ONCE(sock_net(sk)->core.sysctl_rmem_default);
-+	sk->sk_sndbuf		=	READ_ONCE(sock_net(sk)->core.sysctl_wmem_default);
- 	sk->sk_state		=	TCP_CLOSE;
- 	sk->sk_use_task_frag	=	true;
- 	sk_set_socket(sk, sock);
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index c7769ee0d9c5..980f96703264 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -685,12 +685,9 @@ static struct ctl_table netns_core_table[] = {
- 		.extra1		= SYSCTL_ZERO,
- 		.extra2		= SYSCTL_ONE
- 	},
--	/* sysctl_core_net_init() will set the values after this
--	 * to readonly in network namespaces
--	 */
- 	{
- 		.procname	= "wmem_max",
--		.data		= &sysctl_wmem_max,
-+		.data		= &init_net.core.sysctl_wmem_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -698,7 +695,7 @@ static struct ctl_table netns_core_table[] = {
- 	},
- 	{
- 		.procname	= "rmem_max",
--		.data		= &sysctl_rmem_max,
-+		.data		= &init_net.core.sysctl_rmem_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -706,7 +703,7 @@ static struct ctl_table netns_core_table[] = {
- 	},
- 	{
- 		.procname	= "wmem_default",
--		.data		= &sysctl_wmem_default,
-+		.data		= &init_net.core.sysctl_wmem_default,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -714,7 +711,7 @@ static struct ctl_table netns_core_table[] = {
- 	},
- 	{
- 		.procname	= "rmem_default",
--		.data		= &sysctl_rmem_default,
-+		.data		= &init_net.core.sysctl_rmem_default,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -748,13 +745,8 @@ static __net_init int sysctl_core_net_init(struct net *net)
- 			goto err_dup;
- 
- 		for (i = 0; i < table_size; ++i) {
--			if (tbl[i].data == &sysctl_wmem_max)
--				break;
--
- 			tbl[i].data += (char *)net - (char *)&init_net;
- 		}
--		for (; i < table_size; ++i)
--			tbl[i].mode &= ~0222;
- 	}
- 
- 	net->core.sysctl_hdr = register_net_sysctl_sz(net, "net/core", tbl, table_size);
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 6e18d7ec5062..7b7c5e4ea5d8 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1643,7 +1643,7 @@ void ip_send_unicast_reply(struct sock *sk, const struct sock *orig_sk,
- 
- 	sk->sk_protocol = ip_hdr(skb)->protocol;
- 	sk->sk_bound_dev_if = arg->bound_dev_if;
--	sk->sk_sndbuf = READ_ONCE(sysctl_wmem_default);
-+	sk->sk_sndbuf = READ_ONCE(net->core.sysctl_wmem_default);
- 	ipc.sockc.mark = fl4.flowi4_mark;
- 	err = ip_append_data(sk, &fl4, ip_reply_glue_bits, arg->iov->iov_base,
- 			     len, 0, &ipc, &rt, MSG_DONTWAIT);
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 9a6061017114..abc766b3936d 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -241,7 +241,7 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
- 	if (wscale_ok) {
- 		/* Set window scaling on max possible window */
- 		space = max_t(u32, space, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
--		space = max_t(u32, space, READ_ONCE(sysctl_rmem_max));
-+		space = max_t(u32, space, READ_ONCE(sock_net(sk)->core.sysctl_rmem_max));
- 		space = min_t(u32, space, window_clamp);
- 		*rcv_wscale = clamp_t(int, ilog2(space) - 15,
- 				      0, TCP_MAX_WSCALE);
-diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
-index 3402675bf521..62f30d5c25c7 100644
---- a/net/netfilter/ipvs/ip_vs_sync.c
-+++ b/net/netfilter/ipvs/ip_vs_sync.c
-@@ -1280,12 +1280,12 @@ static void set_sock_size(struct sock *sk, int mode, int val)
- 	lock_sock(sk);
- 	if (mode) {
- 		val = clamp_t(int, val, (SOCK_MIN_SNDBUF + 1) / 2,
--			      READ_ONCE(sysctl_wmem_max));
-+			      READ_ONCE(sock_net(sk)->core.sysctl_wmem_max));
- 		sk->sk_sndbuf = val * 2;
- 		sk->sk_userlocks |= SOCK_SNDBUF_LOCK;
- 	} else {
- 		val = clamp_t(int, val, (SOCK_MIN_RCVBUF + 1) / 2,
--			      READ_ONCE(sysctl_rmem_max));
-+			      READ_ONCE(sock_net(sk)->core.sysctl_rmem_max));
- 		sk->sk_rcvbuf = val * 2;
- 		sk->sk_userlocks |= SOCK_RCVBUF_LOCK;
- 	}
-diff --git a/tools/testing/selftests/net/netns-sysctl.sh b/tools/testing/selftests/net/netns-sysctl.sh
-index 45c34a3b9aae..bb6f173a28e2 100755
---- a/tools/testing/selftests/net/netns-sysctl.sh
-+++ b/tools/testing/selftests/net/netns-sysctl.sh
-@@ -20,21 +20,31 @@ fail() {
- setup_ns test_ns
- 
- for sc in {r,w}mem_{default,max}; do
--	# check that this is writable in a netns
-+	initial_value="$(sysctl -n "net.core.$sc")"
-+
-+	# check that this is writable in the init netns
- 	[ -w "/proc/sys/net/core/$sc" ] ||
- 		fail "$sc isn't writable in the init netns!"
- 
--	# change the value in the host netns
-+	# change the value in the init netns
- 	sysctl -qw "net.core.$sc=300000" ||
- 		fail "Can't write $sc in init netns!"
- 
--	# check that the value is read from the init netns
--	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq 300000 ] ||
-+	# check that the value did not change in the test netns
-+	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq "$initial_value" ] ||
- 		fail "Value for $sc mismatch!"
- 
--	# check that this isn't writable in a netns
--	ip netns exec $test_ns [ -w "/proc/sys/net/core/$sc" ] &&
--		fail "$sc is writable in a netns!"
-+	# check that this is also writable in the test netns
-+	ip netns exec $test_ns [ -w "/proc/sys/net/core/$sc" ] ||
-+		fail "$sc isn't writable in the test netns!"
-+
-+	# change the value in the test netns
-+	ip netns exec $test_ns sysctl -qw "net.core.$sc=200000" ||
-+		fail "Can't write $sc in test netns!"
-+
-+	# check that the value is read from the test netns
-+	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq 200000 ] ||
-+		fail "Value for $sc mismatch!"
- done
- 
- echo 'Test passed OK'
--- 
-2.47.2
+Reviewed-by: Wei Fang <wei.fang@nxp.com>
 
 
