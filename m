@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-184127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3782A93642
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:00:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E410A93643
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:01:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F0B644874B
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:00:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C592D4487D2
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C998B275114;
-	Fri, 18 Apr 2025 11:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274FF275853;
+	Fri, 18 Apr 2025 11:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ng3BtWBN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3C6R2S7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1AD211499
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 11:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CA3208970
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 11:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744974010; cv=none; b=nAYsGf9zruVGhxZPE1CZng/EfamqlT3qmYkPE0aZRGeATbee9/hCOuAEoxbgYm6U5438dX9h7R/NMeXYtMCWwcMm1qCew6jJdBKxpHskO3NI0RcVpMAH5OLq5A7/HoUGqfauypf5HdYc1ymqTAI4lyb1XO1phEECsJwVFTjVlw4=
+	t=1744974012; cv=none; b=IR0i/RCHGyYFH+kYGQidoeB+r6S7aZ2E4M6fPFm+pEJUrKUnB11WHd/M+Bow3qmuqgqRRWD6Km5giih0+ThNA9GQscZTsBc7lXXBVMYLNOZ8oIjNNLrCT4xRJbF4y17jKWoSg2djG21OY3+He5PK8Dz2t6H6aaM2xkYFBouHYNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744974010; c=relaxed/simple;
-	bh=l20U+79278iSXJ8uzveqEiS4Bd4MjDaMmtvnhQpRON4=;
+	s=arc-20240116; t=1744974012; c=relaxed/simple;
+	bh=qgl6QWVKM1LFGcN3ceD49QWK+6HvaAsvyiEItREc//A=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=IWfMS/zTCQBMnN+3FHy2h/SuEQNabOIU63qHMvESTHD2zEBl3Hz/xBMPAm3TmPQopuc3GXrCTc8jF555dIFJvU2aN6ppIGw5/Z/6x8H3e3PAWQejYYkHgs8YCxoCLQnJV9bSE/Px0o15QjwfnjIZ3d7qEfyDvLPm6mDJCKopfUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ng3BtWBN; arc=none smtp.client-ip=209.85.221.45
+	 MIME-Version:Content-Type; b=aHL05MOrGm8V6yZcOFCGrTo9OnQZWdUI79SEeZxGjWVNZjn/0IgPWWDnKLXhSu/EXw+rwMHSRYTwDW7MUtUjAbxMyDNzM8xRT+0rKghWrbpEjXkwDTJnUrz/wqAfOiQ2hCaqQI9YquIqIbpOC16cPqq6LVKnMboLj9qC2aagMTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3C6R2S7; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-391342fc0b5so1438982f8f.3
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 04:00:08 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43d07ca6a80so8645755e9.1
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 04:00:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744974007; x=1745578807; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744974009; x=1745578809; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l20U+79278iSXJ8uzveqEiS4Bd4MjDaMmtvnhQpRON4=;
-        b=Ng3BtWBNwxcvgjn9iOtqHrRun/62aIXqc0DEj4MDsbaWvxQS26DBcHcp/aLQ3v3kOX
-         3hRwHh05ZMUAzGSKsvbrVDCsIPd9BFkq7na4Ejcz1v9sHM29LjS+dUtgg4DczANcZYyu
-         oQpLXAGknjMosS9HGZH692nGEBCaL+3UBKc/iGFfbldVqLb7bp5lZff87rsZbRUlM19b
-         fiUKzj18Ey+ppvln73k9QmxsthtrRSy775sUTTk58VG2qUkg2Xb8e4QkEmUUI8nozE37
-         nFkeV4gGqzMi50MPk9IOMx8TlytDMddiSYH6m3ldbSAujWy0tnFk5CDG0YeZvuOVyoyr
-         rbZg==
+        bh=aArCc+ArgaxAUn+zWcdJJNAuMEQ3ejVHUVmQxpLtIRc=;
+        b=e3C6R2S7+u5d8yMCa2HXptlHr98Qk0ovZTexHf4OFBeYRiLVsGB/fgAJBBuXdB02o7
+         4AWny9haMyRzP7CB2iOtf2Big16fpTqwZ75b9kCShoIxz8e0QLdVBj7a2CysLIKTFVlq
+         5JzpcMNtAzPfml+yRFgsg3BIX/LYMtyHnxUY3eO62NO8JgGSZF2ptAG+HnfIoLt5Kvzf
+         2z2edOIPA9/O+WS369S4PcdrJN3kWeUqd/Z6A/t3ahfCmbA9ZmewCkV5bN7pEDzA4IAQ
+         LV+LJlSL8chtkvnCwH7deDxmHruyv/XoAgG5iDqlulfsDFjzauXTRd9O2SevOnLaTt1x
+         O4VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744974007; x=1745578807;
+        d=1e100.net; s=20230601; t=1744974009; x=1745578809;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l20U+79278iSXJ8uzveqEiS4Bd4MjDaMmtvnhQpRON4=;
-        b=cE4y+mEH+EADVyLRFuEDQPiqIRLwNqnTaOCf0wyE/zmqq+EnWcgyeRpu297gLiS6/C
-         IWKtWLRjhpM1QZTWlKg0IsT+13a1/vQTdspJxaX6YNg8ClAlBgBWKodbqEyGDSyG0Laz
-         qzDxYRYzaPd8eWMRNkm8PdqjikRQA49GDTCllqSnPcWsGaZ8W+ozIBMRbR5NG5Qw0OvD
-         fw+OmJpJV/UxftZQ2CFdg6S4kt+yIMVUH/BMVFrugzTF0qDeGQVTUA3u0BKZrIbfIT5N
-         fi6vhwOEmn4OqCwSgH///8whKsRrjaL4t05XoayFh+v4d+4DOLDJBjmkom15J2ooK5d1
-         Ds6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXavB499dOIFQJOe/TWixRMor6bgFnj10WnpLaS5BXBP0kqzSKTvKiJRJSBFJNeNCHPAbfvWHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2nlrMJV1sIjQUB826Y42RyKohcIazoctQp/lBPzmjjcPtWrpf
-	qBENfpT1NxO67tFGaf8By6l9Usy7qohAv9pPGlqw4lRfRkd332eG
-X-Gm-Gg: ASbGnctvXCHHQCZBT83glsgUadrmCZeKkBKPFdaPTCCLQ2ZNytNCx/1DxDJNGgBdd7i
-	gcLQb1W2+ccp4zjDd5nLSkl1P1e8W3d57gpmtSrnfRQu46Pb6Nwl5LRjj2JlwGIKkNc+DUrQakr
-	d/tdawK2EkbHDbdJ/jQ3q3APR7Qjc6ZYOc4WTDXshfxvKY8sd/We9ZiD4F6DSyV/otZaCh3kPFS
-	cVaJ0O0ccZvi43yxX9/pYhqXdFzlOynBV8DmwYptQ/vfz0l+80f3r2wKPSt7Pc/4TPJhvlOXHrX
-	zvQDVZ3wmMLojVyU1jAm/3VLwLxvk2eglSGmC+QUxT61oHQypsUam+RrJCU=
-X-Google-Smtp-Source: AGHT+IEuvG9RZBjVtgKZjEm8CtwgB8U5fVlm58wnI/bQObvPdf6k6j4CRrD2D69iykJgmskyG6Gyaw==
-X-Received: by 2002:a05:6000:184c:b0:391:212:459a with SMTP id ffacd0b85a97d-39efba51004mr1793800f8f.22.1744974007409;
-        Fri, 18 Apr 2025 04:00:07 -0700 (PDT)
+        bh=aArCc+ArgaxAUn+zWcdJJNAuMEQ3ejVHUVmQxpLtIRc=;
+        b=Kxd1ygdL3/8TVgsvGsemlg7zh6dOLELVT1xd5HCY99Sh/Hv7fLneKaoCyouij+upj7
+         4kH8pjO0T3k5G61Z+nicNxG+J2mMvwRO3e293UDdKpvHMBU+biui+bzQw0VhbAoTlR51
+         WrGR33XUV1Zhq+KqQ3Ku8pFovYFt325Ez6uBZo62SYtTzxHC60qmbSsTWmB0/bm/MFdG
+         CrAQd0/A3KfigKokhI5PMw9H6ATPhwb/bXGmCNtLnjFtCc6vqaZOptyXCbiVfEFHvDxU
+         3gea7GcnnoZprVils6QVKtsDixdYds4HZsn+SoZ5FlRU5Iy+yfwLXTDcf18X2eRo2zD2
+         FVow==
+X-Forwarded-Encrypted: i=1; AJvYcCVeSxzDySXWTD5nrY+oMnTcUe+uw+zWtv8iCewB2EaIT0nXmYswv+dQiFlNQqmYHpTTCH5k0Hk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxpilem2Fi6A5LBzeVnRWcTjcFlaRNa2d4o3W7tG09Bs4n00JZa
+	pPjM0IrwE5WvnFu7Gg8MtyENTmHERfGAaqmMsX1HxjV6bxfD/jfY
+X-Gm-Gg: ASbGncs8r4OfYZ1N+szEoilEyfgHAWNVTupYeW7TJsmlnCG3uHGw1bpOfY/T90O+a3e
+	mnXwjL7wvppxS4LKX2IExjrukHMG9UjEIuP44GnlactI5kDmBwy5ZbIauvRmULqLcYN7BiPbVRx
+	LsypsNbduc9YBeYrNVZ5euDBU/TeNZo+PQKhmEmGog+4WusVNnTYW/oBGBMiS0Mpoha4sBexIuY
+	e1zlCYzfGPTFqH/b1RBAKnZx2Fn8WFEfs3xJ73eBSDleYO6FBtnP9t9ZR5+KulSkHmRr9deWXQI
+	xxqII2GBwMRc/MxvvKUz3coyIo0yNevPFjdgpi9mPXqNanMyTaMRe4rGGeE=
+X-Google-Smtp-Source: AGHT+IEhzcuof4Vt9OBrgEq15AC7u3rn5A24yMDcI5iF8ORpknGuNsRTHQAT0sEIu47k65Zw4cWzIQ==
+X-Received: by 2002:a05:600c:1906:b0:43d:fa58:8378 with SMTP id 5b1f17b1804b1-4406ac11581mr16245955e9.33.1744974008713;
+        Fri, 18 Apr 2025 04:00:08 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:24a3:599e:cce1:b5db])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43bef1sm2390266f8f.49.2025.04.18.04.00.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d5a9eb8sm17982135e9.4.2025.04.18.04.00.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 04:00:07 -0700 (PDT)
+        Fri, 18 Apr 2025 04:00:08 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
   pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org
-Subject: Re: [PATCH net-next 10/12] netlink: specs: rt-neigh: make sure
- getneigh is consistent
-In-Reply-To: <20250418021706.1967583-11-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 17 Apr 2025 19:17:04 -0700")
-Date: Fri, 18 Apr 2025 11:45:04 +0100
-Message-ID: <m27c3hiw9b.fsf@gmail.com>
+Subject: Re: [PATCH net-next 11/12] netlink: specs: rtnetlink: correct
+ notify properties
+In-Reply-To: <20250418021706.1967583-12-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 17 Apr 2025 19:17:05 -0700")
+Date: Fri, 18 Apr 2025 11:46:01 +0100
+Message-ID: <m234e5iw7q.fsf@gmail.com>
 References: <20250418021706.1967583-1-kuba@kernel.org>
-	<20250418021706.1967583-11-kuba@kernel.org>
+	<20250418021706.1967583-12-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,10 +94,15 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> The consistency check complains replies to do and dump don't match
-> because dump has no value. It doesn't have to by the schema... but
-> fixing this in code gen would be more code than adjusting the spec.
-> This is rare.
+> The notify property should point at the object the notifications
+> carry, usually the get object, not the cmd which triggers
+> the notification:
+>
+>   notify:
+>     description: Name of the command sharing the reply type with
+>                  this notification.
+>
+> Not treating this as a fix, I think that only C codegen cares.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
