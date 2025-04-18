@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-183986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15B5A92E97
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:05:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA1DA92E99
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0202C1B62C6C
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:06:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E2AD4675E9
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D0B372;
-	Fri, 18 Apr 2025 00:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9D7372;
+	Fri, 18 Apr 2025 00:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iAsOziWP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YxreyFj/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1CC173
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02A710E3
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744934750; cv=none; b=RlQXvhxoUoQJwT6GRgGgZDm97PUlsqNos3InUWFxpo3I3MYeibh6XELXZrQoiEmDxwhO8FYwoKfjVWliDtbl6I7REvoVfUX1S4J2AOjua2Be9GgKSWnoj2WGHwsNE1K8quRINXKKe4FLmBXUvR/xlY8uUHCbpNqCZEXCjYWfqys=
+	t=1744934775; cv=none; b=B6bny2g+3yAASSVVzMo5Zql095v3VjW4CZNDBloMb7v+WtMI+mtBWTl3V6N+KkgFqkx7pY3yemclVPH/mua04j3Y+YBu61gBJv7et7x16/kFZrryZe7ZBMVa/skgIpEwHkufJoTuie//Sd6kYDOq84DaAq4HTOzkuVQr7OEEb1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744934750; c=relaxed/simple;
-	bh=I/QqMJxyxxM0q5+4qJ9cFi0SsQBPz/qcjS8OZwfP1T4=;
+	s=arc-20240116; t=1744934775; c=relaxed/simple;
+	bh=17yaz042v70uixxtwHiT4iDao47Ci0n5dWsP3eCHUnM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cwW53dR0drujg/DRpAtceu3/SmsUgJdU0PzchpmarNAvTxPCBQctCSvAY/iqYu5BmEXSfA5kYtm8xgQ1YSdHq46MtXMbKDdcONJAv/qkImxj+P/cTX1tpq1PHGmWLrBy8djauAinh6hWq92r28/nUbnV8wI6PCPyW1C39hXaquk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=iAsOziWP; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=ddBal4o407VEHhKOoN8WiprrrqSZRXn1x5UFGg3RsSMaurUWdX9SfOOnFnv6F0WPlYKhVGrgL+BBHYvbgJW2fH2Oz+3YlG+cXyMl7AE1yy1+ni0KAIxT4Tvcgeein+Qk/i8ludcNNNEXs7AdKkGSvEeEstgKywCUXSuS2HOpSg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YxreyFj/; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744934749; x=1776470749;
+  t=1744934771; x=1776470771;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=i9LPb3OYIRQ36IQYyd/1zAtQz/QlRdUHsy9gFQabZkw=;
-  b=iAsOziWPPgqvQ91lcA58NT9iarFwcp9+JXKblZ16v4WgLfS50NuNiEBH
-   NN0IWpHUTGHy4br+DCGImRJ5vIjmpxiIFYG9pWEA4JHzuzpa4lkh8UCRW
-   c4e/J7bNa3tPj+geqPM0b5zGRjjkM2pdpu7V255dTD3PmnnYe5i9PLx8Q
-   A=;
+  bh=eC7aoslAjvMHTbit52MU8ZRxsQLhgKp0OyPIG4cKIYg=;
+  b=YxreyFj/cHGcarneqgHyG0nBzCsVMiyY090n/sUqNuDdOonkGmeowZJH
+   uAXEew/RRUWGrDEATAkyxbfWUfl4xf8gFmKuBAWesgwqlE+9JwRcUHid3
+   wmNRlcKK1c567f3Z9nxtaCSskQPFiNExHi+KWCtoJszT1Sr/QFW/IOlg2
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.15,220,1739836800"; 
-   d="scan'208";a="490407402"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:05:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:28306]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.220:2525] with esmtp (Farcaster)
- id 02f02bbd-f3e1-475c-97b6-27deef9c8bca; Fri, 18 Apr 2025 00:05:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 02f02bbd-f3e1-475c-97b6-27deef9c8bca
+   d="scan'208";a="512500936"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:06:10 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:26613]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.20:2525] with esmtp (Farcaster)
+ id 84e25271-5722-4bf1-a20f-019399fedecc; Fri, 18 Apr 2025 00:06:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 84e25271-5722-4bf1-a20f-019399fedecc
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:05:43 +0000
+ Fri, 18 Apr 2025 00:06:07 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:05:41 +0000
+ Fri, 18 Apr 2025 00:06:05 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 02/15] ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.
-Date: Thu, 17 Apr 2025 17:03:43 -0700
-Message-ID: <20250418000443.43734-3-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 03/15] ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
+Date: Thu, 17 Apr 2025 17:03:44 -0700
+Message-ID: <20250418000443.43734-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418000443.43734-1-kuniyu@amazon.com>
 References: <20250418000443.43734-1-kuniyu@amazon.com>
@@ -77,187 +77,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
+X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Basically, removing an IPv6 route does not require RTNL because
-the IPv6 routing tables are protected by per table lock.
+ip6_route_info_create() is called from 3 functions:
 
-inet6_rtm_delroute() calls nexthop_find_by_id() to check if the
-nexthop specified by RTA_NH_ID exists.  nexthop uses rbtree and
-the top-down walk can be safely performed under RCU.
+  * ip6_route_add()
+  * ip6_route_multipath_add()
+  * addrconf_f6i_alloc()
 
-ip6_route_del() already relies on RCU and the table lock, but we
-need to extend the RCU critical section a bit more to cover
-__ip6_del_rt().  For example, nexthop_for_each_fib6_nh() and
-inet6_rt_notify() needs RCU.
+addrconf_f6i_alloc() does not need validation for struct fib6_config in
+ip6_route_info_create().
 
-Let's call nexthop_find_by_id() and __ip6_del_rt() under RCU and
-get rid of RTNL from inet6_rtm_delroute() and SIOCDELRT.
+ip6_route_multipath_add() calls ip6_route_info_create() for multiple
+routes with slightly different fib6_config instances, which is copied
+from the base config passed from userspace.  So, we need not validate
+the same config repeatedly.
 
-Even if the nexthop is removed after rcu_read_unlock() in
-inet6_rtm_delroute(), __remove_nexthop_fib() cleans up the routes
-tied to the nexthop, and ip6_route_del() returns -ESRCH.  So the
-request was at least valid as of nexthop_find_by_id(), and it's just
-a matter of timing.
+Let's move such validation into rtm_to_fib6_config().
 
-Note that we need to pass false to lwtunnel_valid_encap_type_attr().
-The following patches also use the newroute bool.
-
-Note also that fib6_get_table() does not require RCU because once
-allocated fib6_table is not freed until netns dismantle.  I will
-post a follow-up series to convert such callers to RCU-lockless
-version.  [0]
-
-Link: https://lore.kernel.org/netdev/20250417174557.65721-1-kuniyu@amazon.com/ #[0]
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v3: Add a note that fib6_get_table() does not require RCU
-v2: Call __ip6_del_rt() under RCU
----
- net/ipv6/route.c | 48 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 28 insertions(+), 20 deletions(-)
+ net/ipv6/route.c | 79 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 42 insertions(+), 37 deletions(-)
 
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 51f693581b7c..4de7abe5ee02 100644
+index 4de7abe5ee02..23102f37f220 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -4124,9 +4124,9 @@ static int ip6_route_del(struct fib6_config *cfg,
- 			if (rt->nh) {
- 				if (!fib6_info_hold_safe(rt))
- 					continue;
--				rcu_read_unlock();
+@@ -3739,38 +3739,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 	int err = -EINVAL;
+ 	int addr_type;
  
--				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
-+				err =  __ip6_del_rt(rt, &cfg->fc_nlinfo);
-+				break;
- 			}
- 			if (cfg->fc_nh_id)
- 				continue;
-@@ -4141,13 +4141,13 @@ static int ip6_route_del(struct fib6_config *cfg,
- 				continue;
- 			if (!fib6_info_hold_safe(rt))
- 				continue;
--			rcu_read_unlock();
- 
- 			/* if gateway was specified only delete the one hop */
- 			if (cfg->fc_flags & RTF_GATEWAY)
--				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
+-	/* RTF_PCPU is an internal flag; can not be set by userspace */
+-	if (cfg->fc_flags & RTF_PCPU) {
+-		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_PCPU");
+-		goto out;
+-	}
 -
--			return __ip6_del_rt_siblings(rt, cfg);
-+				err = __ip6_del_rt(rt, &cfg->fc_nlinfo);
-+			else
-+				err = __ip6_del_rt_siblings(rt, cfg);
-+			break;
+-	/* RTF_CACHE is an internal flag; can not be set by userspace */
+-	if (cfg->fc_flags & RTF_CACHE) {
+-		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_CACHE");
+-		goto out;
+-	}
+-
+-	if (cfg->fc_type > RTN_MAX) {
+-		NL_SET_ERR_MSG(extack, "Invalid route type");
+-		goto out;
+-	}
+-
+-	if (cfg->fc_dst_len > 128) {
+-		NL_SET_ERR_MSG(extack, "Invalid prefix length");
+-		goto out;
+-	}
+-	if (cfg->fc_src_len > 128) {
+-		NL_SET_ERR_MSG(extack, "Invalid source address length");
+-		goto out;
+-	}
+-#ifndef CONFIG_IPV6_SUBTREES
+-	if (cfg->fc_src_len) {
+-		NL_SET_ERR_MSG(extack,
+-			       "Specifying source address requires IPV6_SUBTREES to be enabled");
+-		goto out;
+-	}
+-#endif
+ 	if (cfg->fc_nh_id) {
+ 		nh = nexthop_find_by_id(net, cfg->fc_nh_id);
+ 		if (!nh) {
+@@ -3835,11 +3803,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
+ 	rt->fib6_src.plen = cfg->fc_src_len;
+ #endif
+ 	if (nh) {
+-		if (rt->fib6_src.plen) {
+-			NL_SET_ERR_MSG(extack, "Nexthops can not be used with source routing");
+-			err = -EINVAL;
+-			goto out_free;
+-		}
+ 		if (!nexthop_get(nh)) {
+ 			NL_SET_ERR_MSG(extack, "Nexthop has been deleted");
+ 			err = -ENOENT;
+@@ -5239,6 +5202,48 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
  		}
  	}
- 	rcu_read_unlock();
-@@ -4516,19 +4516,20 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
  
- 	rtmsg_to_fib6_config(net, rtmsg, &cfg);
- 
--	rtnl_lock();
- 	switch (cmd) {
- 	case SIOCADDRT:
-+		rtnl_lock();
- 		/* Only do the default setting of fc_metric in route adding */
- 		if (cfg.fc_metric == 0)
- 			cfg.fc_metric = IP6_RT_PRIO_USER;
- 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
-+		rtnl_unlock();
- 		break;
- 	case SIOCDELRT:
- 		err = ip6_route_del(&cfg, NULL);
- 		break;
- 	}
--	rtnl_unlock();
-+
- 	return err;
- }
- 
-@@ -5051,7 +5052,8 @@ static const struct nla_policy rtm_ipv6_policy[RTA_MAX+1] = {
- };
- 
- static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
--					struct netlink_ext_ack *extack)
-+					struct netlink_ext_ack *extack,
-+					bool newroute)
- {
- 	struct rtnexthop *rtnh;
- 	int remaining;
-@@ -5085,15 +5087,16 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
- 	} while (rtnh_ok(rtnh, remaining));
- 
- 	return lwtunnel_valid_encap_type_attr(cfg->fc_mp, cfg->fc_mp_len,
--					      extack, true);
-+					      extack, newroute);
- }
- 
- static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			      struct fib6_config *cfg,
- 			      struct netlink_ext_ack *extack)
- {
--	struct rtmsg *rtm;
-+	bool newroute = nlh->nlmsg_type == RTM_NEWROUTE;
- 	struct nlattr *tb[RTA_MAX+1];
-+	struct rtmsg *rtm;
- 	unsigned int pref;
- 	int err;
- 
-@@ -5202,7 +5205,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		cfg->fc_mp = nla_data(tb[RTA_MULTIPATH]);
- 		cfg->fc_mp_len = nla_len(tb[RTA_MULTIPATH]);
- 
--		err = rtm_to_fib6_multipath_config(cfg, extack);
-+		err = rtm_to_fib6_multipath_config(cfg, extack, newroute);
- 		if (err < 0)
- 			goto errout;
- 	}
-@@ -5222,7 +5225,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
- 
- 		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
--						extack, true);
-+						extack, newroute);
- 		if (err < 0)
- 			goto errout;
- 	}
-@@ -5545,15 +5548,20 @@ static int inet6_rtm_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		return err;
- 
--	if (cfg.fc_nh_id &&
--	    !nexthop_find_by_id(sock_net(skb->sk), cfg.fc_nh_id)) {
--		NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
--		return -EINVAL;
-+	if (cfg.fc_nh_id) {
-+		rcu_read_lock();
-+		err = !nexthop_find_by_id(sock_net(skb->sk), cfg.fc_nh_id);
-+		rcu_read_unlock();
-+
-+		if (err) {
-+			NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
-+			return -EINVAL;
++	if (newroute) {
++		/* RTF_PCPU is an internal flag; can not be set by userspace */
++		if (cfg->fc_flags & RTF_PCPU) {
++			NL_SET_ERR_MSG(extack, "Userspace can not set RTF_PCPU");
++			goto errout;
 +		}
- 	}
- 
--	if (cfg.fc_mp)
-+	if (cfg.fc_mp) {
- 		return ip6_route_multipath_del(&cfg, extack);
--	else {
-+	} else {
- 		cfg.fc_delete_all_nh = 1;
- 		return ip6_route_del(&cfg, extack);
- 	}
-@@ -6765,7 +6773,7 @@ static const struct rtnl_msg_handler ip6_route_rtnl_msg_handlers[] __initconst_o
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_NEWROUTE,
- 	 .doit = inet6_rtm_newroute},
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_DELROUTE,
--	 .doit = inet6_rtm_delroute},
-+	 .doit = inet6_rtm_delroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_GETROUTE,
- 	 .doit = inet6_rtm_getroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- };
++
++		/* RTF_CACHE is an internal flag; can not be set by userspace */
++		if (cfg->fc_flags & RTF_CACHE) {
++			NL_SET_ERR_MSG(extack, "Userspace can not set RTF_CACHE");
++			goto errout;
++		}
++
++		if (cfg->fc_type > RTN_MAX) {
++			NL_SET_ERR_MSG(extack, "Invalid route type");
++			goto errout;
++		}
++
++		if (cfg->fc_dst_len > 128) {
++			NL_SET_ERR_MSG(extack, "Invalid prefix length");
++			goto errout;
++		}
++
++#ifdef CONFIG_IPV6_SUBTREES
++		if (cfg->fc_src_len > 128) {
++			NL_SET_ERR_MSG(extack, "Invalid source address length");
++			goto errout;
++		}
++
++		if (cfg->fc_nh_id &&  cfg->fc_src_len) {
++			NL_SET_ERR_MSG(extack, "Nexthops can not be used with source routing");
++			goto errout;
++		}
++#else
++		if (cfg->fc_src_len) {
++			NL_SET_ERR_MSG(extack,
++				       "Specifying source address requires IPV6_SUBTREES to be enabled");
++			goto errout;
++		}
++#endif
++	}
++
+ 	err = 0;
+ errout:
+ 	return err;
 -- 
 2.49.0
 
