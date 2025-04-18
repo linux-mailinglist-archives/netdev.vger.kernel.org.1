@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-184045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D86A92FD6
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54508A92FD7
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:17:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9A901B634F0
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:17:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF3B21B633B0
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B49A267B8D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC58267F42;
 	Fri, 18 Apr 2025 02:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSCZS95n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xx9b5IXq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57965267B85
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 02:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77B3267B98
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 02:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744942639; cv=none; b=Jf8zrQGXPw0jYvJ/PaV67nnX/BgQhh83+S6r3e20rENHZQ0mVsqO5osv5Xew/ioogW9WLTdNYyO9GaTTvPav66+IXsmLjClhqfJxqZbahicclbjKoKUkGvX7YJ5hA/nHf2ntEEyDWSKg8qStDchG/Kx5poEgvoTfbA0S1Uc7nQQ=
+	t=1744942639; cv=none; b=tnuCEDuaX6naPJFiDYgamvJWEgMYhF05nzXeeAq5bnt1mdBtEuomvtPLU53Rzc3e/XsCApEDwSWjyj+M+drqoun3FknVNh+bvECsB0BBL323pI1SDTAN890JvVKOER6Zf9TpuQzheNqpE+Hz8Uerv8Y0pGRfxoSw/mW4q9RB0DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744942639; c=relaxed/simple;
-	bh=4q7GscTnySXqttsVM0VOs66z8TkTCLkmxK90LqMsTVg=;
+	bh=PMSQ7qnFK7wnHEHneabQKw9K7YFrTzmI4TECj1xLcH0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NJSw5OIXSleWPDiBxwBdlDfEbucVe+snnT4zIVKxZeaa0G//B7AiooOI46SPRs42Rv5KgsUoUfCZIqvIsxgiopCt+wdLhN8BBVOT12MEcXJHD815gnv1UniPE9EosP6VAJdnnsiKXsYp0zsnmjTCb6m/isf0U8W+2pcpsRSbiSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSCZS95n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DE89C4CEEA;
+	 MIME-Version; b=s6YEx2rLRZP/SUrjnfyZBRWcmcQeNKF4vDQv0Az4rYMREdnUEVtfabrYWHmcv6l2NfN61+lm6OcXMW/TeRDq6tyBWnDfjydzUsPPMmOIkqy/yDZRNtN8MEZf+nyF4pcRgIvl61tKacnxW+c1jEER0vCoYBDQd6a13TSb516tk3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xx9b5IXq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AD2C4CEF1;
 	Fri, 18 Apr 2025 02:17:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744942637;
-	bh=4q7GscTnySXqttsVM0VOs66z8TkTCLkmxK90LqMsTVg=;
+	s=k20201202; t=1744942638;
+	bh=PMSQ7qnFK7wnHEHneabQKw9K7YFrTzmI4TECj1xLcH0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JSCZS95ntlIoiWIwvF128/nnpKthCvevOcfHv5QuK50jSZI1faPW8kit2zjRioMnT
-	 7kWEWCTdcgD2bec7JK12XArt2HRQhCvY2MCBlogFs/oiK5JGU1sMlWy/KtfdNiPrgp
-	 zCTBnJaiYKMgADiw5ypgvnk2ywFzVfzNjA/m75UiGpEbf8ccXykPueRGRa5aufM1uq
-	 TT4rLy81n5Wachtt8h1jrLvFC7uBt7ML98giKa1y+4fo2O/c+QMNH4RcLjI4GwdD01
-	 H9AZJ5S5Vm8b4aiqbmOK5goaiYNuC143T3hqjkCRzF8VN8UxOlI9JbQxqItQ6NX5CV
-	 YVVinEL3XFIiA==
+	b=Xx9b5IXqeUeOJ9sTe4AY6r9YDLU25+8oZf7WhZtngVASaqRqJiKyR2Qzl4QHETL2R
+	 9M6RTpkZ7sZGEqx+Glk9yX/EW8B/Td3lUPtNr3An/TBgZDUkP6JreugOeHObolZcB8
+	 cUvvW7DowP6twqLwtx82TyXsMRueU35OECX5HYP095hovOuNzYmbIQDWhljyGHKzm7
+	 ObHukoCO+Ha2oddEs95tEVjn9bI/Cv/mcWE4q50rpXPMmM0jtz1AXIPaFGYKoGuC8d
+	 n83IU75UQwClmXds66bbH8lcAvd+bpD6wLmeVIyyx4qfNcnLGKhJi6vsKjH5m70LdR
+	 LTGPw/nr1/ABg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net,
 	donald.hunter@gmail.com
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 03/12] netlink: specs: rt-link: remove if-netnsid from attr list
-Date: Thu, 17 Apr 2025 19:16:57 -0700
-Message-ID: <20250418021706.1967583-4-kuba@kernel.org>
+Subject: [PATCH net-next 04/12] netlink: specs: rt-link: remove duplicated group in attr list
+Date: Thu, 17 Apr 2025 19:16:58 -0700
+Message-ID: <20250418021706.1967583-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418021706.1967583-1-kuba@kernel.org>
 References: <20250418021706.1967583-1-kuba@kernel.org>
@@ -64,11 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-if-netnsid an alias to target-netnsid:
-
-  IFLA_TARGET_NETNSID = IFLA_IF_NETNSID, /* new alias */
-
-We don't have a definition for this attr.
+group is listed twice for newlink.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
@@ -76,17 +72,17 @@ Signed-off-by: Jakub Kicinski <kuba@kernel.org>
  1 file changed, 1 deletion(-)
 
 diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index cb7bacbd3d95..7f411e8cd755 100644
+index 7f411e8cd755..38f439911f94 100644
 --- a/Documentation/netlink/specs/rt-link.yaml
 +++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -2460,7 +2460,6 @@ protonum: 0
-             - xdp
-             - event
-             - new-netnsid
--            - if-netnsid
-             - target-netnsid
-             - carrier-up-count
-             - carrier-down-count
+@@ -2382,7 +2382,6 @@ protonum: 0
+             - txqlen
+             - operstate
+             - linkmode
+-            - group
+             - gso-max-size
+             - gso-max-segs
+             - gro-max-size
 -- 
 2.49.0
 
