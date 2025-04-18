@@ -1,275 +1,245 @@
-Return-Path: <netdev+bounces-184087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F6DA93487
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 10:17:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA6EA934C4
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 10:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 273C93AAF03
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 08:17:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D417A7A630E
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 08:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839FB2505AC;
-	Fri, 18 Apr 2025 08:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9921E26E159;
+	Fri, 18 Apr 2025 08:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FLdzQ/OL"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="m7ymcOlG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92041DFFD
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 08:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744964249; cv=fail; b=VZHjMmC23A2SEDi05JWvucaDt963p+4N9kSfjtJOQF/b55yb9lyWOVmZLMs5gH7B/L2fv43/1ulq5HWPSJU1XL9A5Mm7vSDF5+p6mOcl7/CKJVkEBt2JKfq1QUdXuiq6ZaCC166hi2EzTePS7NgrXt0lm/VDN7Tc5ccpaKDxjvU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744964249; c=relaxed/simple;
-	bh=mBQwRVlopaZFgF/1TCSNlBgnFM9OtNuPaQWTGOzHr1Y=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:MIME-Version; b=P4NyEKODkXN5s+3rDpIk3NJJ+k+e2G+Zx8IJoG49Qov4vu9vrV8NoJAaEY/3740DGE5mjKqLSIGCOceb7JVbEFsAXQI8BklvzmzEfQxO4VdSpFMgu1J8AAJRRu0u0AycfeHtBlXF9n0YIEjg9foC9nu1ocBUg8aS5iO3KJ3KKM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FLdzQ/OL; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744964248; x=1776500248;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=mBQwRVlopaZFgF/1TCSNlBgnFM9OtNuPaQWTGOzHr1Y=;
-  b=FLdzQ/OLHZIaVUEAKwbOFsSSG468V2GWVFBbCuH1ZYKDH7zGzY2fQsct
-   bIajjAnrx/S9ecgztxP2fqAbjFBFlhHTHDIRQpXjGUvtBwGu+J1jgxkjT
-   YFAdV1RQPATEA7MjPf5lCTWJNYmlZdtoopXK8VN/VQSRqJ3szoVKEkMy2
-   PovDM5w6jMfpP4qjbQfLCkULGf+EQraBInbnxVdzlR7WZiO2mC6uVJX+p
-   RQweyWu/TxhlI1ckW0I6LeeBwqQdEQa6n7Ay4XEFBqadGCheKe7T2Jedk
-   PcyN7H1KN8CdLXA4V7ASMpYLH37HDW4TkhJ0w516PRKfExDRB6gtbxapo
-   A==;
-X-CSE-ConnectionGUID: 0QOnsZ4ITzCye4LvspAywA==
-X-CSE-MsgGUID: jThUJhvFRYOvhuJqKaPpsw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11406"; a="56761642"
-X-IronPort-AV: E=Sophos;i="6.15,221,1739865600"; 
-   d="scan'208";a="56761642"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 01:17:27 -0700
-X-CSE-ConnectionGUID: +YJZ/1lWS6WPpg9vF1iv6g==
-X-CSE-MsgGUID: IjFkExm2QQKl8M1QB+ZieA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,221,1739865600"; 
-   d="scan'208";a="131364115"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 01:17:22 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 18 Apr 2025 01:17:21 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 18 Apr 2025 01:17:21 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 18 Apr 2025 01:17:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NF03yq+XazjBpA2FFKTQhDrKgOQriFJeyhUSSmb5mSirHNjIw1bBUXHpfe7oQWRGFzUQdbF5r+Uc3At8hF2qPfiWTXWQyLtvkur6tPbrGVXtULjLjpp91nh0Q5OtUjvK6VVSScVrHUHSimmbFRiUh1tgnkfXStV3Uc3BWCOJUNAL4EXf1JrAWDedDxU2ax0sw/SS+wP3/Gkt99waLWDSHhLy84HFtZk2zrpzb/kKPRmE70Uba8cRVt626dU3wLvAFhmZ6u4UK9t8I0BX+6PmipzrbhWX1WNY1dH/FiVYFa9zGah3ougBvUoshzoaOvzIPXu4N0erfctbFxg3hwhYrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i6rDwLnICRtBzItWwNiRX5TpER5QUtHhIi2QhM/hds4=;
- b=E/7ShpUTgF9DNGpVJi7janMwjpgchnFvMEMD+er9sR+1MzMI9AEksE7ZQ9JvVORCXA9iTHdPa+jTn50dWXTuUYdw8wPgWK6WRl5rkTyjS/TMJTsVoYnXE9u39wrz9SKE/kndKZiEEcmSJB05/G8Ead+OA1KTmla6e+IE3TIXy4WQxxHd896VY4CrzVU9njJGt+vHK/+P4PvotxNopaFRDpSNNH8dTT8KrLfKn972mpILOhbQRmR0u0/o0xgYNq3375i0EuRXwaUVVweKhRmP3DhR9K8VASFh7DVUikXMj75Qrbxz4McJgurrF8vNk47qCGpBZCGSIqn3lAs15XOe8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
- by PH3PPF3ECB6A513.namprd11.prod.outlook.com (2603:10b6:518:1::d19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.26; Fri, 18 Apr
- 2025 08:17:00 +0000
-Received: from LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
- ([fe80::4622:29cf:32b:7e5c%4]) with mapi id 15.20.8632.035; Fri, 18 Apr 2025
- 08:17:00 +0000
-Date: Fri, 18 Apr 2025 16:16:51 +0800
-From: kernel test robot <oliver.sang@intel.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>,
-	<netdev@vger.kernel.org>, <oliver.sang@intel.com>
-Subject: [linux-next:master] [net]  fed176bf31:
- KASAN:maybe_wild-memory-access_in_range[#-#]
-Message-ID: <202504181511.1c3f23e4-lkp@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-ClientProxiedBy: SG2PR02CA0137.apcprd02.prod.outlook.com
- (2603:1096:4:188::17) To LV3PR11MB8603.namprd11.prod.outlook.com
- (2603:10b6:408:1b6::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBAA1DFFD;
+	Fri, 18 Apr 2025 08:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744965742; cv=none; b=G39VMv2HLVkHIXKY2DWX/9pLeOSTFLxwJKj9iZkumhxeR+cJEvTusV8PIGLkXqr/16DnbG/J7/vSjI+TsNZT3+aqgxLAKivu4HBvfBnXBbndGF/eh2Kjf2fNhThgxvHHhLU5PLsUTcO2WyBxkeDgjgeI2+GCzwRMsdfgl6eFioI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744965742; c=relaxed/simple;
+	bh=ClutDN4LogIohfYqtvpgA8jjbMDkk3vdR6aY3nOoq/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eSnCQ2vJei+RrKbnsQhLl7CfEkzTiqSDh08Fetibtbna307acE+AsQAgwhlUGcmZFuLIW+aTV23bWUfMhvyWe/BWcq3KbVU8enVqDZlYK7BMFPqp1jr52KHJXoAzD9KgKCpD9M9sZWPCyOGe2cUXctwWZsCFZv2uds6NciivGQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=m7ymcOlG; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1744965714; x=1745570514; i=wahrenst@gmx.net;
+	bh=bJ/hT/ZT80TdjjDAggi4sJ5+WqriSpJ1jG8o55EVs90=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=m7ymcOlGLY4LffBB2dk7fhesz0jWScNmd8z6l4/oX4H8omR/yeZOGh9jLFqDbuCV
+	 ZUqlk7GhI5mtAItRk3r/EaayIOL9W7TK0ljnf7ZHIXMFc/bqEQwpcMM8mGJGiKTRQ
+	 uYt3ShTItIYdeh9TvwLuzPAplH2U8jiz+23wMnYFQ2TBtK+3RjC6ztWLA2NJoz3wb
+	 WtlVBrzGppOyluHeSQXEcUi6nt1r1K6orvWJrFM57lf91xUXIv4Kh7kYQBqrw8y7f
+	 /F9+TZvw4xjWeAXzHfHAsys34Hhn2L2dSeLv1hWX/6QSVqg0ef9H4d/HLOPxIClBf
+	 udCCp+ogl90khyrdgA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.107] ([37.4.251.153]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N4QwW-1v65gq0gsg-00z3Di; Fri, 18
+ Apr 2025 10:41:54 +0200
+Message-ID: <e4c7662f-4d10-4d45-843d-0a0f3c893a1f@gmx.net>
+Date: Fri, 18 Apr 2025 10:41:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|PH3PPF3ECB6A513:EE_
-X-MS-Office365-Filtering-Correlation-Id: 357d0b0b-990e-4184-04d4-08dd7e5164c4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?HIsCIzbsjis3SXZf0yx7lkxDqNIn04cXdjmS+qkKosm9gQqoFIFQ9AFPkEFl?=
- =?us-ascii?Q?V7sJR+YRW0nu6l9oKFVT0jAvlEgc568ZeoK5YCSt0vtOmCi0WlDMbvxgIMVK?=
- =?us-ascii?Q?UQ5gSL7ng6bn5ZqmzSVgHr7nEpYo7HXRXuHdBofMJL4gXzRy+jqkJFnJWsPb?=
- =?us-ascii?Q?iuMEV4I0eUh1H8Zk50+czH6xW9QwSvaQR/QDC/65yD7zrn6Niy21xWQN+ytZ?=
- =?us-ascii?Q?zlkoMsyF2P9UrO8vHTg1Qj0dtpFpBDNfPthgqPlVhsFd91p2wnuC7Mey14Er?=
- =?us-ascii?Q?hsDOlP2Cy5yKWYkLWAlAIW4xZCB8sf5h2zO02pcBfCvygsotLmUroJ5vM1pQ?=
- =?us-ascii?Q?MLPgEyPEOyVuwOjz2yTjNf0NgN7BteqcMw4E2k6PVcxy0snfNagT1blLbcfh?=
- =?us-ascii?Q?OqL4wPfkxMs2bdL4PPdlXmuYOmKfdTmDwsV8bamIvYEFy1uI5WEKv02QMqsR?=
- =?us-ascii?Q?lxgJ0pXQh6a5SMVtynZfkTmYyM317EYBbGyi4xQkQ4mTIxcd4eISS9v1fP4V?=
- =?us-ascii?Q?3RPP1xJK/zCbPAQ+TRGBw3TCWzjlB1XJk8d8qGwPIq9g9SAIXOETSaCnFbyh?=
- =?us-ascii?Q?/smRBX6Ma/l3Iy2csRvARPGTQhOHcqomBaCKJbWiFIV6EDVKZP660wCYbIoy?=
- =?us-ascii?Q?DOK8SOMeLSPulS6K00kUUEooQHj5ZzxqzRgv4Po7kq5BfOfZMqWGMjP0Z/Ls?=
- =?us-ascii?Q?mQyMOiBeKeJ/i9S8CuEhjFes5V0N4dHSOZ49sPK0QvfdLeV4GZTMSE2hLUps?=
- =?us-ascii?Q?AOjdewFc3mlw4t29N3inZyxSC1jmqUppZ/OlImuYHmf7Y4t5C318iCipsjQt?=
- =?us-ascii?Q?/8zpwRaZ4r8M2BsVZDHcJ3bsWMOFEvd03JRnZMzsYkPGIwAyqEjw3M4fPo8u?=
- =?us-ascii?Q?1Hb4ztzJG9RwsaViAzo+dX2sKRjRpsB2QIW3oZSNT+h4butzUW9P0hn/wjK1?=
- =?us-ascii?Q?2Wm6/X55fr/RmdTwyffIKaAtMi7px1BYY2Us0UkbJUMs7/pKz1Tpgx3ro6I4?=
- =?us-ascii?Q?HxJb0pHYYxDm8aarbx3nWERqlQYpinc0Sj7Ikh/uzbYAaxNGv2KXelb9x8h7?=
- =?us-ascii?Q?nl3807OIV7703PlkZzftjnX0kbInNz/VNOLNV4riVfwFn5IwnXJd+WRZIwgQ?=
- =?us-ascii?Q?5+1bfSPP12NdGkp+egMuuMqF7glkf2cjXl1fQlicE9hCT/jdozKkVYCuAxRG?=
- =?us-ascii?Q?a4ITs1M2MKa3ukv+kLpOpQdPX4xhHnWjOVsYJ/O0P+t61olMvgz+O+/qJzU8?=
- =?us-ascii?Q?bys42aRdEjWRS+22hgn4ICdK+PTKSRh6SZj7MLgE8aumPqEBNq/OsashwQK6?=
- =?us-ascii?Q?M0KQq6NCXMNxGOUlzrbNOLqvtNuEKk9eQfR/TPHRKk6aYTp9EqObnL3aus8Z?=
- =?us-ascii?Q?+Bf9IXClrFnCl7XlMrSp9mcWTdJE?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2pM7kS31sPr8n5m5+18x/cnuxQepyTobbZAMX7QFlm1/ROQcffXWW1Bh39DW?=
- =?us-ascii?Q?CF+XONPMQVh+RjT0P99nJyEWRvgXYuBeLYa61bSR6lwlEKweAB+Y/6VC79xM?=
- =?us-ascii?Q?EIR0op1waItaRTuxgv0d8wEl9k+U4x937lXFNFqSevNJOwUeui0Az99cm+Gn?=
- =?us-ascii?Q?AyolyQe7pxzLfCK6IkIBpzjMOvpGUSz4/9rTUD8uET18tUmD7mCKPlCj2QOe?=
- =?us-ascii?Q?gscKYQbhrJscWD6JdGbro4VtBQF5UCMakA7N/ptDAMAGoZOb7mUTPTEm0/lh?=
- =?us-ascii?Q?DNGc8AqpOs2tH7rszb+Vqc/4GzZtedddJrNf4uh698ynfOdxd84IG1pK+jDM?=
- =?us-ascii?Q?dyESnfYud3DgW9/d0T7Wuyq2Ow7gfuY4zT6wG9NzN2edMKncMT6xUcVwWFfK?=
- =?us-ascii?Q?r7NlPK8jFSC3qNclOk7vM1a7jM2NFOImhv1jzVNevbTTT+FS4BLc+QsoplE/?=
- =?us-ascii?Q?kCy3KiGopXofJpaOvyHy9nCLTUtR0rLJgaaUr+cBEjTHpcz5C0fQidLipETl?=
- =?us-ascii?Q?e2lSSYMFRckC9r+YFlAobJGb8jeTIY01S+myqEnMsTrjSJlJjmfBUKp9bZLM?=
- =?us-ascii?Q?q9C0/lIgqg2HHREK53pidkEPGPXv4OrbJX5pkoAcnECSsL7caLcMC6YsR/nT?=
- =?us-ascii?Q?3Y1FmHyeigCk9CcyZFm9un8aIAcPb+Q2Oe/DbS2cX1+18T1sE1ee5vDC3ouO?=
- =?us-ascii?Q?xAR1B/pGUl6BYMADw4cr688VadKs1OB6sU+INpsaLIEvtS2nFU7LMM4MlRo2?=
- =?us-ascii?Q?CCtnznKuYk3cudZ++7GVKMTuOijxz6iv1Pn2RZ6lfH2y8ZOohP3pttpNDjNw?=
- =?us-ascii?Q?bdJTAqPJdPsXJLKccLSalA3w1hkAIzyHoX2tkQIvgKCoDi1gX6AFmv31eget?=
- =?us-ascii?Q?W6XsLcDiC6alpQxatLB4yiZDGigrAF4OYI4mGcYFqdYqsxQytMvHlcpSIV7z?=
- =?us-ascii?Q?5nQnlELpOhfUWLldZmLSk+lPQ7m3AIBHOz9b1z68wgVh8j218RVhHN3uPhm6?=
- =?us-ascii?Q?1XYpy7KdXzy9ZgWaZoJ8kb3rMGUDLeWKENMgeZnxzeRkt5dhylsRZhA4stXh?=
- =?us-ascii?Q?M1aGcdtrjtuV7YqqyjvZpkx1eFiXv/6a+cMIvd7aQnvJVcEzYhSJrYs4nVk2?=
- =?us-ascii?Q?u6mK82q3Dn7hlV89Woj6mQBqlDNzWy1DGLZskkBT546sQzhzM/cgQ7FVhUtV?=
- =?us-ascii?Q?2JrfRMJqZfNkBTutZZUHl2x3zBvFmPkvhpFvLWkb+CQY2+KpAE1Nyq/Nj59l?=
- =?us-ascii?Q?LL+cC+ikkdbV4JSHN/U5VT6UZch4ektWgf5PhQp7CVVYLZvQzoUsFPa3nTBu?=
- =?us-ascii?Q?uYlgvyFQkeoUJ64+XGMR+/aslZ11btIAMD1IHkwaCDat4S9nTgmKNv67SROf?=
- =?us-ascii?Q?qKLMZPqouMJEtgedQ8KjFH8tl1GOGjXolMa0ElHcUUSKXfLHwJrWw1BfDV5z?=
- =?us-ascii?Q?N/jWOQzWpvynY17DbgdNsiDgfGSEMzdRc0zZRfcga7Ax6GC2jPDRg7+xVhqF?=
- =?us-ascii?Q?Xc8nkVdOvIWv73PQhWqD+Z5WofcxQdJPWJJEWXAQogIFtFQfvutoFACKmxib?=
- =?us-ascii?Q?NLhws5tlwL9uU+EEMvdK8AH9Zay7gAoqDBIieZ2ERvF+sm0xJ3nQEH08dh/h?=
- =?us-ascii?Q?cw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 357d0b0b-990e-4184-04d4-08dd7e5164c4
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2025 08:17:00.5528
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x8jspJ1bnMeJkQX7fJLxHvDgF/OkxvS6TzExZFkZncL4SGU5hZAJW+DnWrzzrGqS4ycmseF4ClH7iiYkianAJw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF3ECB6A513
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v6 1/7] dt-bindings: net: Add MTIP L2 switch
+ description
+To: Lukasz Majewski <lukma@denx.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Simon Horman <horms@kernel.org>
+References: <20250418060716.3498031-1-lukma@denx.de>
+ <20250418060716.3498031-2-lukma@denx.de>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+Autocrypt: addr=wahrenst@gmx.net; keydata=
+ xjMEZ1dOJBYJKwYBBAHaRw8BAQdA7H2MMG3q8FV7kAPko5vOAeaa4UA1I0hMgga1j5iYTTvN
+ IFN0ZWZhbiBXYWhyZW4gPHdhaHJlbnN0QGdteC5uZXQ+wo8EExYIADcWIQT3FXg+ApsOhPDN
+ NNFuwvLLwiAwigUCZ1dOJAUJB4TOAAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEG7C8svCIDCK
+ JQ4BAP4Y9uuHAxbAhHSQf6UZ+hl5BDznsZVBJvH8cZe2dSZ6AQCNgoc1Lxw1tvPscuC1Jd1C
+ TZomrGfQI47OiiJ3vGktBc44BGdXTiQSCisGAQQBl1UBBQEBB0B5M0B2E2XxySUQhU6emMYx
+ f5QR/BrEK0hs3bLT6Hb9WgMBCAfCfgQYFggAJhYhBPcVeD4Cmw6E8M000W7C8svCIDCKBQJn
+ V04kBQkHhM4AAhsMAAoJEG7C8svCIDCKJxoA/i+kqD5bphZEucrJHw77ujnOQbiKY2rLb0pE
+ aHMQoiECAQDVbj827W1Yai/0XEABIr8Ci6a+/qZ8Vz6MZzL5GJosAA==
+In-Reply-To: <20250418060716.3498031-2-lukma@denx.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:puRbuHuDJUL4UBAwlEbPoCXrO7wrkqYvVnLveMrv4XVBg2CsJ0I
+ Fe83jHvHdG8+q9ttRnOffxOpndWldPV5J8JikhvcuWXSKzHJ8jiJseqbXb0MrAqCfD8+i4c
+ YKBDrV7XY8dHoxPleVsn7CV0q6pkw/cnnFFouzX+DwKpVbvtcFhHOfhnVw+xB9+IzxaLz8s
+ sUS9ijySaFcCRt4ncOZsw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:IZ4aqZRe2YY=;zw9fIkzZW/AM236HsrvLO0zuy63
+ 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
 
-
-
-Hello,
-
-kernel test robot noticed "KASAN:maybe_wild-memory-access_in_range[#-#]" on:
-
-commit: fed176bf3143362ac9935e3964949ab6a5c3286b ("net: Add ops_undo_single for module load/unload.")
-https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
-
-[test failed on linux-next/master 5b37f7bfff3b1582c34be8fb23968b226db71ebd]
-
-in testcase: boot
-
-config: x86_64-randconfig-102-20250415
-compiler: gcc-12
-test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-
-(please refer to attached dmesg/kmsg for entire log/backtrace)
-
-
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <oliver.sang@intel.com>
-| Closes: https://lore.kernel.org/oe-lkp/202504181511.1c3f23e4-lkp@intel.com
-
-
-[   26.592836][    T1]     audit=0
-[   26.593311][    T1]     riscv_isa_fallback=1
-[   26.685729][    T1] systemd[1]: RTC configured in localtime, applying delta of 0 minutes to system time.
-[   26.694368][    T1] systemd[1]: Failed to find module 'autofs4'
-[   26.766891][    T1] NET: Registered PF_INET6 protocol family
-[   26.767880][    T1] Oops: general protection fault, probably for non-canonical address 0xf999959999999999: 0000 [#1] KASAN
-[   26.769508][    T1] KASAN: maybe wild-memory-access in range [0xccccccccccccccc8-0xcccccccccccccccf]
-[   26.770938][    T1] CPU: 0 UID: 0 PID: 1 Comm: systemd Not tainted 6.15.0-rc1-00261-gfed176bf3143 #1 PREEMPT(full)
-[ 26.772418][ T1] RIP: 0010:__list_add_valid_or_report (kbuild/obj/consumer/x86_64-randconfig-102-20250415/lib/list_debug.c:32) 
-[ 26.773329][ T1] Code: df 4c 89 f2 48 c1 ea 03 80 3c 02 00 0f 85 1a 01 00 00 49 39 74 24 08 75 65 48 b8 00 00 00 00 00 fc ff df 48 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 e3 00 00 00 4c 39 26 0f 85 83 00 00 00 49 39 f5
-All code
-========
-   0:	df 4c 89 f2          	fisttps -0xe(%rcx,%rcx,4)
-   4:	48 c1 ea 03          	shr    $0x3,%rdx
-   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   c:	0f 85 1a 01 00 00    	jne    0x12c
-  12:	49 39 74 24 08       	cmp    %rsi,0x8(%r12)
-  17:	75 65                	jne    0x7e
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df 
-  23:	48 89 f2             	mov    %rsi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-  2a:*	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)		<-- trapping instruction
-  2e:	0f 85 e3 00 00 00    	jne    0x117
-  34:	4c 39 26             	cmp    %r12,(%rsi)
-  37:	0f 85 83 00 00 00    	jne    0xc0
-  3d:	49 39 f5             	cmp    %rsi,%r13
-
-Code starting with the faulting instruction
-===========================================
-   0:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   4:	0f 85 e3 00 00 00    	jne    0xed
-   a:	4c 39 26             	cmp    %r12,(%rsi)
-   d:	0f 85 83 00 00 00    	jne    0x96
-  13:	49 39 f5             	cmp    %rsi,%r13
-[   26.776069][    T1] RSP: 0000:ffff8881012979e0 EFLAGS: 00210a07
-[   26.776934][    T1] RAX: dffffc0000000000 RBX: ffffffffa0202dc0 RCX: 0000000000000000
-[   26.778058][    T1] RDX: 1999999999999999 RSI: cccccccccccccccc RDI: ffffffffa0202dc0
-[   26.779187][    T1] RBP: ffff888101297a00 R08: 0000000000000001 R09: fffffbfff0c0ab25
-[   26.780302][    T1] R10: ffffffff8605592f R11: ffffffff86055988 R12: ffffffff86471700
-[   26.781417][    T1] R13: ffffffffa0202dc0 R14: ffffffff86471708 R15: cccccccccccccccc
-[   26.782534][    T1] FS:  0000000000000000(0000) GS:0000000000000000(0063) knlGS:00000000f7251840
-[   26.783797][    T1] CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-[   26.784724][    T1] CR2: 00000000f7227f36 CR3: 0000000154a21000 CR4: 00000000000406b0
-[   26.785840][    T1] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   26.786972][    T1] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   26.788088][    T1] Call Trace:
-[   26.788562][    T1]  <TASK>
-[ 26.788987][ T1] register_pernet_operations (kbuild/obj/consumer/x86_64-randconfig-102-20250415/include/linux/list.h:150 (discriminator 5) kbuild/obj/consumer/x86_64-randconfig-102-20250415/include/linux/list.h:183 (discriminator 5) kbuild/obj/consumer/x86_64-randconfig-102-20250415/net/core/net_namespace.c:1296 (discriminator 5) kbuild/obj/consumer/x86_64-randconfig-102-20250415/net/core/net_namespace.c:1340 (discriminator 5)) 
-[ 26.789801][ T1] register_pernet_subsys (kbuild/obj/consumer/x86_64-randconfig-102-20250415/net/core/net_namespace.c:1382) 
-[ 26.790538][ T1] inet6_init (kbuild/obj/consumer/x86_64-randconfig-102-20250415/net/ipv6/af_inet6.c:594) ipv6 
-[ 26.791327][ T1] ? __SCT__tp_func_fib6_table_lookup (kbuild/obj/consumer/x86_64-randconfig-102-20250415/net/ipv6/af_inet6.c:768) ipv6 
-
-
-The kernel config and materials to reproduce are available at:
-https://download.01.org/0day-ci/archive/20250418/202504181511.1c3f23e4-lkp@intel.com
-
-
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+Am 18.04.25 um 08:07 schrieb Lukasz Majewski:
+> This patch provides description of the MTIP L2 switch available in some
+> NXP's SOCs - e.g. imx287.
+>
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> ---
+> Changes for v2:
+> - Rename the file to match exactly the compatible
+>    (nxp,imx287-mtip-switch)
+>
+> Changes for v3:
+> - Remove '-' from const:'nxp,imx287-mtip-switch'
+> - Use '^port@[12]+$' for port patternProperties
+> - Drop status =3D "okay";
+> - Provide proper indentation for 'example' binding (replace 8
+>    spaces with 4 spaces)
+> - Remove smsc,disable-energy-detect; property
+> - Remove interrupt-parent and interrupts properties as not required
+> - Remove #address-cells and #size-cells from required properties check
+> - remove description from reg:
+> - Add $ref: ethernet-switch.yaml#
+>
+> Changes for v4:
+> - Use $ref: ethernet-switch.yaml#/$defs/ethernet-ports and remove alread=
+y
+>    referenced properties
+> - Rename file to nxp,imx28-mtip-switch.yaml
+>
+> Changes for v5:
+> - Provide proper description for 'ethernet-port' node
+>
+> Changes for v6:
+> - Proper usage of
+>    $ref: ethernet-switch.yaml#/$defs/ethernet-ports/patternProperties
+>    when specifying the 'ethernet-ports' property
+> - Add description and check for interrupt-names property
+> ---
+>   .../bindings/net/nxp,imx28-mtip-switch.yaml   | 148 ++++++++++++++++++
+>   1 file changed, 148 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mti=
+p-switch.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch=
+.yaml b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> new file mode 100644
+> index 000000000000..3e2d724074d5
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> @@ -0,0 +1,148 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/nxp,imx28-mtip-switch.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
+> +
+> +maintainers:
+> +  - Lukasz Majewski <lukma@denx.de>
+> +
+> +description:
+> +  The 2-port switch ethernet subsystem provides ethernet packet (L2)
+> +  communication and can be configured as an ethernet switch. It provide=
+s the
+> +  reduced media independent interface (RMII), the management data input
+> +  output (MDIO) for physical layer device (PHY) management.
+> +
+> +properties:
+> +  compatible:
+> +    const: nxp,imx28-mtip-switch
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  phy-supply:
+> +    description:
+> +      Regulator that powers Ethernet PHYs.
+> +
+> +  clocks:
+> +    items:
+> +      - description: Register accessing clock
+> +      - description: Bus access clock
+> +      - description: Output clock for external device - e.g. PHY source=
+ clock
+> +      - description: IEEE1588 timer clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: ipg
+> +      - const: ahb
+> +      - const: enet_out
+> +      - const: ptp
+> +
+> +  interrupts:
+> +    items:
+> +      - description: Switch interrupt
+> +      - description: ENET0 interrupt
+> +      - description: ENET1 interrupt
+> +
+> +  interrupt-names:
+> +    items:
+> +      - const: mtipl2sw
+Sorry for nitpicking, but could we name it similiar to something from=20
+the i.MX28 reference manual like "switch" or "enet_switch"
 
