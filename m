@@ -1,110 +1,140 @@
-Return-Path: <netdev+bounces-184143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F07A9372C
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:35:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3932A93743
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2CD13A6900
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:35:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4199188593A
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3732749F2;
-	Fri, 18 Apr 2025 12:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0D726FDA5;
+	Fri, 18 Apr 2025 12:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVmGAaTa"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B75C26FDA5
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 12:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AA31A3168;
+	Fri, 18 Apr 2025 12:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744979720; cv=none; b=O1QBbyJg0XJ7hfPQBm8KBQO2DN0YulKGPr0XMmoJ1jEkHYDI6ehK9+zj1t9uz0t2MvWsOUgzVPuPs5nVRDiquKJc/Br6e7f9Dz/3wfRV4j+NZ7zxAHZU6ymyms66d7AxSVExMC8O9pqm/5rEvFJzr6CYjwTLEz2yrSzuvI30HrE=
+	t=1744979896; cv=none; b=mk2kToDz+H6SsiszBci6Z/Q5RJ+gljR6JVUKuUTCklPkQ4BNoYOt4nfX/TtT/3ViaWV14hdNpDC6PMqYWklX/N/dB8/PkMg0Jd5NslxqDsL+rWxEAn7owtXiHF1Jg+YYQ7+MKNytdR8K0IwCMpiQvwfnwhhOM6gJCagntaBZ/w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744979720; c=relaxed/simple;
-	bh=xmwFZCDc34oHE5AD99Vf6E43LGCmHVxXRWIjmxgTa98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pqzcJ6KfTfi98pNoJpTt7ctm8gWsrnB1oMzBh5oRsA35UCS/i2OaKkbCStlNj+xb8uFCf19as3vlRWvei9nUuIZ+0JzAc//av4xcCH4GYBt0sYAM5yolwiqcJUVN3vn1I2h0ZV6O0ie+W51P0UDCcsqGYZ/gl670/21V6qgHvkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5kvh-0001rH-NB; Fri, 18 Apr 2025 14:34:49 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5kvh-000uqO-0x;
-	Fri, 18 Apr 2025 14:34:49 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u5kvh-007qLn-0K;
-	Fri, 18 Apr 2025 14:34:49 +0200
-Date: Fri, 18 Apr 2025 14:34:49 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v8 10/13] net: pse-pd: pd692x0: Add support for
- controller and manager power supplies
-Message-ID: <aAJG6bgx_sF60vpk@pengutronix.de>
-References: <20250416-feature_poe_port_prio-v8-0-446c39dc3738@bootlin.com>
- <20250416-feature_poe_port_prio-v8-10-446c39dc3738@bootlin.com>
+	s=arc-20240116; t=1744979896; c=relaxed/simple;
+	bh=wJG98QlVuw7ALXIq2to3ngupDnMlQGXQ6x/DoGA8cz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lg+9iB1ZN5d+x1Ufn7iSzkb06B/mGJYFypFEehYg8NsibE/kziP878nZIJHhAzCjh0AXK2FJZPpQ2PdP69nGQuiUH5adIgeeyI3wTjPm6gwPpA5x3OjFjqRZNjEt/au+GGsa6VDL2uKD0EZMqEv7D4TunZ4gNNujIjCv7esAzQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVmGAaTa; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223fd89d036so22054115ad.1;
+        Fri, 18 Apr 2025 05:38:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744979894; x=1745584694; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2vlMNIYfnE2Db++lxxYMWU3y3wqeJ9gD5/8bodKKoCQ=;
+        b=XVmGAaTaz21rx7R94q2JV5ATzS99qrCezQT00LLnbmBtrnWwPrqV02D7UM1sA4A01S
+         LKDTAWHEYtAp0m8ZPjj+3EOJIgqNDcyR0JtVEle4cLlYO/YnLw+GCPUtIm4sAKjuqd63
+         WgwYEstBK6YHAvrZaVSRW09gQMhfPJH8A2523cgtBivHBoKtRiakdW7LwWCgkmKZBHX9
+         qQdnOL1t3V1kg0G+H3jjiGzyDLptIo2dmfIJUb54OAyoeyCJGhkZW4mNw63ScdW/6gi0
+         lUsgtmrg2Tug+ZWjb+5ZWFdr8Z0w9viek/YXu0l/950wGwbaRoWwM0w6g+OSEhoqjWHE
+         7bmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744979894; x=1745584694;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2vlMNIYfnE2Db++lxxYMWU3y3wqeJ9gD5/8bodKKoCQ=;
+        b=ExAlmd3GkP/Oe6fvdm6J544raveJdnLqNOaLLY5x1aoD7st0WzM4M5HezFh24ZDMsM
+         NFxZuZfS0O/Y+5wGvG5JhHN1KOWdNLWBBWTGgNRsEILWFzhEEy/cwKCkKRuggen1hGr7
+         fY4K2UTG+TAFx6G/8PDKS2lV6IMHaE3MFheEllrn0S0oIw1G22lmJo8ZMTXCMenpGxGJ
+         5qWn6gMI2s6yTsSqdbEfvHgbugjJSy1mwvooQhV/mKwmecxwPWMCLci6eKYDboPUfObM
+         LG48FMv1nCbkuEb3oQOSSKTfHVqOaRx6M71IWWZO1J1kWGCYRCpWUXpaNlwsCUWQio3k
+         YgJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUo6BIiNGou4cE68BKkOFli9qyav7FPnvBeQFliEzjSo/j/+zuQ/Dw6n41yEgeZqXwmjL75Y5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yztq7YgrbNTAENpYGBNveqPv/m6o4EHHCRltbmYJb2r77TdlHNV
+	21kQuH3sxOuA4euLCVb+6hFuC2BUjhDNedBmC4+8F3PFDU2oVLNk
+X-Gm-Gg: ASbGnctPfcIaVAjKh5nsYdyCaFJdIV+alSbvhvx9t2HcXtLoxzZTxWyN103dJGi4xr9
+	EZHFH/E8VOmwrOl/q6gWE4gZGsNZvGL2vJ6zNWxax/BoK8Z2jDxIRWS/sLBPjAsH8jigOox0brW
+	NEeBAKgBgwfudl6XesY2MKimiITd5cs6Kj0DaiwEa3BqpW6b92g4KuF3aqv0lUfXxgxeprwo9p3
+	L59v7jPeAW7e0OaDdcdwqZHnwR14ATXA2wgwbcd+alscGO+51LLPk/Fjne8VMHzpLs3JouHdUdn
+	aAFZZsfyiWBOiAzEqTOn4eZp86BjZU/FyA/ysn0QA05gD/E2N/2tK5q6NB9lPcUHwR6pgNvA70l
+	KMqWO9x5jzfy9qlCpnYafsvIz8ECUnQ==
+X-Google-Smtp-Source: AGHT+IFAcQ3Mm/tx+7/pVONxwfsP2ENWCNyBh54EpyWBTCVVmzDgFJd7I3eGqwSF5T7tGIat/HVrnw==
+X-Received: by 2002:a17:902:d50e:b0:216:6283:5a8c with SMTP id d9443c01a7336-22c53607da5mr34582635ad.39.1744979894208;
+        Fri, 18 Apr 2025 05:38:14 -0700 (PDT)
+Received: from [192.168.99.14] (i60-34-11-52.s41.a013.ap.plala.or.jp. [60.34.11.52])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-73dbf8c04afsm1485644b3a.23.2025.04.18.05.38.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Apr 2025 05:38:13 -0700 (PDT)
+Message-ID: <8265c592-a51f-4b26-9e6d-df69c16aebf4@gmail.com>
+Date: Fri, 18 Apr 2025 21:38:07 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250416-feature_poe_port_prio-v8-10-446c39dc3738@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V5 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>
+References: <174489803410.355490.13216831426556849084.stgit@firesoul>
+ <174489811513.355490.8155513147018728621.stgit@firesoul>
+Content-Language: en-US
+From: Toshiaki Makita <toshiaki.makita1@gmail.com>
+In-Reply-To: <174489811513.355490.8155513147018728621.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 16, 2025 at 03:44:25PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Add support for managing the VDD and VDDA power supplies for the PD692x0
-> PSE controller, as well as the VAUX5 and VAUX3P3 power supplies for the
-> PD6920x PSE managers.
-> 
-> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 2025/04/17 22:55, Jesper Dangaard Brouer wrote:
+...
+> +	case NETDEV_TX_BUSY:
+> +		/* If a qdisc is attached to our virtual device, returning
+> +		 * NETDEV_TX_BUSY is allowed.
+> +		 */
+> +		txq = netdev_get_tx_queue(dev, rxq);
+> +
+> +		if (qdisc_txq_has_no_queue(txq)) {
+> +			dev_kfree_skb_any(skb);
+> +			goto drop;
+> +		}
+> +		netif_tx_stop_queue(txq);
+> +		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
+> +		__skb_push(skb, ETH_HLEN);
+> +		if (use_napi)
+> +			__veth_xdp_flush(rq);
+> +		/* Cancel TXQ stop for very unlikely race */
+> +		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
+> +			netif_tx_wake_queue(txq);
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+xdp_ring is only initialized when use_napi is not NULL.
+Should add "if (use_napi)" ?
 
-Thank you!
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+BTW, you added a check for the ring_empty here. so
+
+if empty:
+   this function starts the queue by itself
+else:
+   it is guaranteed that veth_xdp_rcv() consumes the ring after this point.
+   so the rcv side definitely starts the queue.
+
+With that, __veth_xdp_flush invocation seems to be unnecessary,
+if your concern is starting the queue.
+
+Toshiaki Makita
+
 
