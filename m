@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-184008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9C3A92F15
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 03:15:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3AFA92F3E
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 03:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 867CD4670EA
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:15:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A6371B6525B
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 01:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7428126AF6;
-	Fri, 18 Apr 2025 01:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="GEKxZxYJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082114502B;
+	Fri, 18 Apr 2025 01:25:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3383BBE49;
-	Fri, 18 Apr 2025 01:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94F438DDB;
+	Fri, 18 Apr 2025 01:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744938931; cv=none; b=Zyx1lrrs1hdpRWH68nYUUjrsvvrFXPu4tFVhahYLDGgj6wJEeQRA8pfUKjJtWHPatTZQemNWVBHhs3Ii9Ayd6tAdwPV+jXsnFtEnOYj/kuSOc8DA4KfJQ+Dwk1Jazn1DbiORIKyZ2Zn70kQCO0Qj53aWAJ71jaTkv73fyLBn5Ac=
+	t=1744939516; cv=none; b=HpChLu1wKt6iRw7W13kjlrS9sFv2em5r9FQDU7PsBXpDyI5f8ptdHK91kpzZscUV+sxmkZ2WhA/vu79JMaUCpPK2KHz0Swd4n4IbAAriPGWyh1Mib/0vbIME74l93k+AdY9Bq/2dpLWCBmzfUWiWf/KBAPXsNt255g0jS7YaYlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744938931; c=relaxed/simple;
-	bh=VHf8JfBG6AIoLMfm+JSl6V4eo0qP+ziJCJ0wLtn4u/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XesswhwZG2nTfATEuakCsTVhLdXW32THPEjfXKKcUuQs9Y4yvDFrg+WchVK2V9aGXxF2fJLP5qddRzYELjunn9w4a7l5l9w/Klc5GF8ivPt0vluCKJj/NWyJ2L/EejeIiQGE79ZC4cDdH6B6VpIi5awKYvNUCiQUG6KRnlhqcaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=GEKxZxYJ; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=Ji+yj+AT7eFH1RjLEA2qeCEdj1vp5fWP0T4sC6IhspM=; b=GEKxZxYJ95tenjTs
-	BTjgOaQ1XLlaOmFqRAaWhYuh3j9LK8pp73IfCRf6Y2y7y7MtukjdgN8Wb8623r0GmaFu337S1CdKo
-	o3LBBVE7pPbvA9Ile9f/X6K3ER1q9tck86S2W5PBdmpQsoI4aQbonwKeRscR0qby0CsxJAaB0NPqq
-	HtlIYsN8N+Vx440c0TaakWjrfCx9DqdgE9940rfw3QXID94h80XIFpepOuJOPFOdVWB2EevKH2khr
-	2RaxwFBLpwq/QcmmnF+ncdC2gitfXb9Wum01g7HJbjKA4ZBXYtVqER4yeA2xqrwZW+d0QgE7VYxwP
-	ziGR6z/6TC+ZmvkZ4g==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1u5aKA-00CQ62-13;
-	Fri, 18 Apr 2025 01:15:22 +0000
-From: linux@treblig.org
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] net: 802: Remove unused p8022 code
-Date: Fri, 18 Apr 2025 02:15:19 +0100
-Message-ID: <20250418011519.145320-1-linux@treblig.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1744939516; c=relaxed/simple;
+	bh=Pzb2r00wnq8Ee0+602c09KcWkGB3jnFjn2OjMWlrACg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hI9NjmMEid/D7zagiJWL/0xnGkE4kxjWlFFJRwGAPYw37315/J8L+gdOeU04q2M99v4wgfaVaYjcWS4oaJuvrlTms234jnPar822TqvBsHtHUNZ3iZKeB8G5CXIAo/+L3NBgwST3P1QUY3i+XtYZdo9/oz7l3Sb2S9g/GYlkNLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53I0pgLv032617;
+	Fri, 18 Apr 2025 01:24:17 GMT
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 45ydd1q582-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 18 Apr 2025 01:24:16 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Thu, 17 Apr 2025 18:24:15 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Thu, 17 Apr 2025 18:24:10 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jianqi.ren.cn@windriver.com>, <davem@davemloft.net>,
+        <kuba@kernel.org>, <sashal@kernel.org>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <cascardo@igalia.com>, <yajun.deng@linux.dev>,
+        <yuehaibing@huawei.com>, <dan.streetman@canonical.com>,
+        <steffen.klassert@secunet.com>, <netdev@vger.kernel.org>,
+        <i.maximets@ovn.org>, <kuniyu@amazon.com>
+Subject: [PATCH 5.15.y] net: defer final 'struct net' free in netns dismantle
+Date: Fri, 18 Apr 2025 09:24:09 +0800
+Message-ID: <20250418012409.2059897-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,156 +62,240 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: LZQcCXxRCoyVPrJ1MGLCQvgJ72NDD0sG
+X-Proofpoint-GUID: LZQcCXxRCoyVPrJ1MGLCQvgJ72NDD0sG
+X-Authority-Analysis: v=2.4 cv=HecUTjE8 c=1 sm=1 tr=0 ts=6801a9c0 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=bC-a23v3AAAA:8 a=1XWaLZrsAAAA:8 a=P8mRVJMrAAAA:8 a=20KFwNOVAAAA:8
+ a=vggBfdFIAAAA:8 a=t7CeM3EgAAAA:8 a=sogmP-z4RixR6Pyh5rEA:9 a=-FEs8UIgK8oA:10 a=FO4_E8m0qiDe52t0p3_H:22 a=Vc1QvrjMcIoGonisw6Ob:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-17_07,2025-04-17_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=999 impostorscore=0 suspectscore=0 clxscore=1015
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.21.0-2502280000
+ definitions=main-2504180007
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: Eric Dumazet <edumazet@google.com>
 
-p8022.c defines two external functions, register_8022_client()
-and unregister_8022_client(), the last use of which was removed in
-2018 by
-commit 7a2e838d28cf ("staging: ipx: delete it from the tree")
+[ Upstream commit 0f6ede9fbc747e2553612271bce108f7517e7a45 ]
 
-Remove the p8022.c file, it's corresponding header, and glue
-surrounding it.  There was one place the header was included in vlan.c
-but it didn't use the functions it declared.
+Ilya reported a slab-use-after-free in dst_destroy [1]
 
-There was a comment in net/802/Makefile about checking
-against net/core/Makefile, but that's at least 20 years old and
-there's no sign of net/core/Makefile mentioning it.
+Issue is in xfrm6_net_init() and xfrm4_net_init() :
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+They copy xfrm[46]_dst_ops_template into net->xfrm.xfrm[46]_dst_ops.
+
+But net structure might be freed before all the dst callbacks are
+called. So when dst_destroy() calls later :
+
+if (dst->ops->destroy)
+    dst->ops->destroy(dst);
+
+dst->ops points to the old net->xfrm.xfrm[46]_dst_ops, which has been freed.
+
+See a relevant issue fixed in :
+
+ac888d58869b ("net: do not delay dst_entries_add() in dst_release()")
+
+A fix is to queue the 'struct net' to be freed after one
+another cleanup_net() round (and existing rcu_barrier())
+
+[1]
+
+BUG: KASAN: slab-use-after-free in dst_destroy (net/core/dst.c:112)
+Read of size 8 at addr ffff8882137ccab0 by task swapper/37/0
+Dec 03 05:46:18 kernel:
+CPU: 37 UID: 0 PID: 0 Comm: swapper/37 Kdump: loaded Not tainted 6.12.0 #67
+Hardware name: Red Hat KVM/RHEL, BIOS 1.16.1-1.el9 04/01/2014
+Call Trace:
+ <IRQ>
+dump_stack_lvl (lib/dump_stack.c:124)
+print_address_description.constprop.0 (mm/kasan/report.c:378)
+? dst_destroy (net/core/dst.c:112)
+print_report (mm/kasan/report.c:489)
+? dst_destroy (net/core/dst.c:112)
+? kasan_addr_to_slab (mm/kasan/common.c:37)
+kasan_report (mm/kasan/report.c:603)
+? dst_destroy (net/core/dst.c:112)
+? rcu_do_batch (kernel/rcu/tree.c:2567)
+dst_destroy (net/core/dst.c:112)
+rcu_do_batch (kernel/rcu/tree.c:2567)
+? __pfx_rcu_do_batch (kernel/rcu/tree.c:2491)
+? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4339 kernel/locking/lockdep.c:4406)
+rcu_core (kernel/rcu/tree.c:2825)
+handle_softirqs (kernel/softirq.c:554)
+__irq_exit_rcu (kernel/softirq.c:589 kernel/softirq.c:428 kernel/softirq.c:637)
+irq_exit_rcu (kernel/softirq.c:651)
+sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1049 arch/x86/kernel/apic/apic.c:1049)
+ </IRQ>
+ <TASK>
+asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702)
+RIP: 0010:default_idle (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:743)
+Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 6e ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 0f 00 2d c7 c9 27 00 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90
+RSP: 0018:ffff888100d2fe00 EFLAGS: 00000246
+RAX: 00000000001870ed RBX: 1ffff110201a5fc2 RCX: ffffffffb61a3e46
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffffb3d4d123
+RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed11c7e1835d
+R10: ffff888e3f0c1aeb R11: 0000000000000000 R12: 0000000000000000
+R13: ffff888100d20000 R14: dffffc0000000000 R15: 0000000000000000
+? ct_kernel_exit.constprop.0 (kernel/context_tracking.c:148)
+? cpuidle_idle_call (kernel/sched/idle.c:186)
+default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:118)
+cpuidle_idle_call (kernel/sched/idle.c:186)
+? __pfx_cpuidle_idle_call (kernel/sched/idle.c:168)
+? lock_release (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5848)
+? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4347 kernel/locking/lockdep.c:4406)
+? tsc_verify_tsc_adjust (arch/x86/kernel/tsc_sync.c:59)
+do_idle (kernel/sched/idle.c:326)
+cpu_startup_entry (kernel/sched/idle.c:423 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:202 arch/x86/kernel/smpboot.c:282)
+? __pfx_start_secondary (arch/x86/kernel/smpboot.c:232)
+? soft_restart_cpu (arch/x86/kernel/head_64.S:452)
+common_startup_64 (arch/x86/kernel/head_64.S:414)
+ </TASK>
+Dec 03 05:46:18 kernel:
+Allocated by task 12184:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+__kasan_slab_alloc (mm/kasan/common.c:319 mm/kasan/common.c:345)
+kmem_cache_alloc_noprof (mm/slub.c:4085 mm/slub.c:4134 mm/slub.c:4141)
+copy_net_ns (net/core/net_namespace.c:421 net/core/net_namespace.c:480)
+create_new_namespaces (kernel/nsproxy.c:110)
+unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
+ksys_unshare (kernel/fork.c:3313)
+__x64_sys_unshare (kernel/fork.c:3382)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+Dec 03 05:46:18 kernel:
+Freed by task 11:
+kasan_save_stack (mm/kasan/common.c:48)
+kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
+kasan_save_free_info (mm/kasan/generic.c:582)
+__kasan_slab_free (mm/kasan/common.c:271)
+kmem_cache_free (mm/slub.c:4579 mm/slub.c:4681)
+cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:647)
+process_one_work (kernel/workqueue.c:3229)
+worker_thread (kernel/workqueue.c:3304 kernel/workqueue.c:3391)
+kthread (kernel/kthread.c:389)
+ret_from_fork (arch/x86/kernel/process.c:147)
+ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
+Dec 03 05:46:18 kernel:
+Last potentially related work creation:
+kasan_save_stack (mm/kasan/common.c:48)
+__kasan_record_aux_stack (mm/kasan/generic.c:541)
+insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+__queue_work (kernel/workqueue.c:2340)
+queue_work_on (kernel/workqueue.c:2391)
+xfrm_policy_insert (net/xfrm/xfrm_policy.c:1610)
+xfrm_add_policy (net/xfrm/xfrm_user.c:2116)
+xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+netlink_sendmsg (net/netlink/af_netlink.c:1886)
+sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+ksys_write (fs/read_write.c:736)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+Dec 03 05:46:18 kernel:
+Second to last potentially related work creation:
+kasan_save_stack (mm/kasan/common.c:48)
+__kasan_record_aux_stack (mm/kasan/generic.c:541)
+insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
+__queue_work (kernel/workqueue.c:2340)
+queue_work_on (kernel/workqueue.c:2391)
+__xfrm_state_insert (./include/linux/workqueue.h:723 net/xfrm/xfrm_state.c:1150 net/xfrm/xfrm_state.c:1145 net/xfrm/xfrm_state.c:1513)
+xfrm_state_update (./include/linux/spinlock.h:396 net/xfrm/xfrm_state.c:1940)
+xfrm_add_sa (net/xfrm/xfrm_user.c:912)
+xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
+netlink_rcv_skb (net/netlink/af_netlink.c:2536)
+xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
+netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
+netlink_sendmsg (net/netlink/af_netlink.c:1886)
+sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
+vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+ksys_write (fs/read_write.c:736)
+do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+
+Fixes: a8a572a6b5f2 ("xfrm: dst_entries_init() per-net dst_ops")
+Reported-by: Ilya Maximets <i.maximets@ovn.org>
+Closes: https://lore.kernel.org/netdev/CANn89iKKYDVpB=MtmfH7nyv2p=rJWSLedO5k7wSZgtY_tO8WQg@mail.gmail.com/T/#m02c98c3009fe66382b73cfb4db9cf1df6fab3fbf
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Link: https://patch.msgid.link/20241204125455.3871859-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[Minor conflict resolved due to code context change.]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
- include/net/p8022.h | 16 ------------
- net/802/Makefile    |  5 ++--
- net/802/p8022.c     | 64 ---------------------------------------------
- net/8021q/vlan.c    |  1 -
- 4 files changed, 2 insertions(+), 84 deletions(-)
- delete mode 100644 include/net/p8022.h
- delete mode 100644 net/802/p8022.c
+Verified the build test
+---
+ include/net/net_namespace.h |  1 +
+ net/core/net_namespace.c    | 21 ++++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/p8022.h b/include/net/p8022.h
-deleted file mode 100644
-index a29e224ac498..000000000000
---- a/include/net/p8022.h
-+++ /dev/null
-@@ -1,16 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _NET_P8022_H
--#define _NET_P8022_H
--
--struct net_device;
--struct packet_type;
--struct sk_buff;
--
--struct datalink_proto *
--register_8022_client(unsigned char type,
--		     int (*func)(struct sk_buff *skb,
--				 struct net_device *dev,
--				 struct packet_type *pt,
--				 struct net_device *orig_dev));
--void unregister_8022_client(struct datalink_proto *proto);
--#endif
-diff --git a/net/802/Makefile b/net/802/Makefile
-index bfed80221b8b..99abc29d537c 100644
---- a/net/802/Makefile
-+++ b/net/802/Makefile
-@@ -3,12 +3,11 @@
- # Makefile for the Linux 802.x protocol layers.
- #
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index ff9ecc76d622..c3cc3a465955 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -80,6 +80,7 @@ struct net {
+ 						 * or to unregister pernet ops
+ 						 * (pernet_ops_rwsem write locked).
+ 						 */
++	struct llist_node	defer_free_list;
+ 	struct llist_node	cleanup_list;	/* namespaces on death row */
  
--# Check the p8022 selections against net/core/Makefile.
--obj-$(CONFIG_LLC)	+= p8022.o psnap.o
-+obj-$(CONFIG_LLC)	+= psnap.o
- obj-$(CONFIG_NET_FC)	+=                 fc.o
- obj-$(CONFIG_FDDI)	+=                 fddi.o
- obj-$(CONFIG_HIPPI)	+=                 hippi.o
--obj-$(CONFIG_ATALK)	+= p8022.o psnap.o
-+obj-$(CONFIG_ATALK)	+= psnap.o
- obj-$(CONFIG_STP)	+= stp.o
- obj-$(CONFIG_GARP)	+= garp.o
- obj-$(CONFIG_MRP)	+= mrp.o
-diff --git a/net/802/p8022.c b/net/802/p8022.c
-deleted file mode 100644
-index 78c25168d7c9..000000000000
---- a/net/802/p8022.c
-+++ /dev/null
-@@ -1,64 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *	NET3:	Support for 802.2 demultiplexing off Ethernet
-- *
-- *		Demultiplex 802.2 encoded protocols. We match the entry by the
-- *		SSAP/DSAP pair and then deliver to the registered datalink that
-- *		matches. The control byte is ignored and handling of such items
-- *		is up to the routine passed the frame.
-- *
-- *		Unlike the 802.3 datalink we have a list of 802.2 entries as
-- *		there are multiple protocols to demux. The list is currently
-- *		short (3 or 4 entries at most). The current demux assumes this.
-- */
--#include <linux/module.h>
--#include <linux/netdevice.h>
--#include <linux/skbuff.h>
--#include <linux/slab.h>
--#include <net/datalink.h>
--#include <linux/mm.h>
--#include <linux/in.h>
--#include <linux/init.h>
--#include <net/llc.h>
--#include <net/p8022.h>
--
--static int p8022_request(struct datalink_proto *dl, struct sk_buff *skb,
--			 const unsigned char *dest)
--{
--	llc_build_and_send_ui_pkt(dl->sap, skb, dest, dl->sap->laddr.lsap);
--	return 0;
--}
--
--struct datalink_proto *register_8022_client(unsigned char type,
--					    int (*func)(struct sk_buff *skb,
--							struct net_device *dev,
--							struct packet_type *pt,
--							struct net_device *orig_dev))
--{
--	struct datalink_proto *proto;
--
--	proto = kmalloc(sizeof(*proto), GFP_ATOMIC);
--	if (proto) {
--		proto->type[0]		= type;
--		proto->header_length	= 3;
--		proto->request		= p8022_request;
--		proto->sap = llc_sap_open(type, func);
--		if (!proto->sap) {
--			kfree(proto);
--			proto = NULL;
--		}
--	}
--	return proto;
--}
--
--void unregister_8022_client(struct datalink_proto *proto)
--{
--	llc_sap_put(proto->sap);
--	kfree(proto);
--}
--
--EXPORT_SYMBOL(register_8022_client);
--EXPORT_SYMBOL(unregister_8022_client);
--
--MODULE_DESCRIPTION("Support for 802.2 demultiplexing off Ethernet");
--MODULE_LICENSE("GPL");
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index 41be38264493..06908e37c3d9 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -23,7 +23,6 @@
- #include <linux/slab.h>
- #include <linux/init.h>
- #include <linux/rculist.h>
--#include <net/p8022.h>
- #include <net/arp.h>
- #include <linux/rtnetlink.h>
- #include <linux/notifier.h>
+ #ifdef CONFIG_KEYS
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index 1e9e76c4ff5b..09ba69532273 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -440,11 +440,28 @@ static struct net *net_alloc(void)
+ 	goto out;
+ }
+ 
++static LLIST_HEAD(defer_free_list);
++
++static void net_complete_free(void)
++{
++	struct llist_node *kill_list;
++	struct net *net, *next;
++
++	/* Get the list of namespaces to free from last round. */
++	kill_list = llist_del_all(&defer_free_list);
++
++	llist_for_each_entry_safe(net, next, kill_list, defer_free_list)
++		kmem_cache_free(net_cachep, net);
++
++}
++
+ static void net_free(struct net *net)
+ {
+ 	if (refcount_dec_and_test(&net->passive)) {
+ 		kfree(rcu_access_pointer(net->gen));
+-		kmem_cache_free(net_cachep, net);
++
++		/* Wait for an extra rcu_barrier() before final free. */
++		llist_add(&net->defer_free_list, &defer_free_list);
+ 	}
+ }
+ 
+@@ -628,6 +645,8 @@ static void cleanup_net(struct work_struct *work)
+ 	 */
+ 	rcu_barrier();
+ 
++	net_complete_free();
++
+ 	/* Finally it is safe to free my network namespace structure */
+ 	list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
+ 		list_del_init(&net->exit_list);
 -- 
-2.49.0
+2.34.1
 
 
