@@ -1,117 +1,121 @@
-Return-Path: <netdev+bounces-184130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B3BA93655
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:09:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8680AA9367E
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 13:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BAD216BA9A
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:09:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8771B60AED
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 11:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7512638B2;
-	Fri, 18 Apr 2025 11:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C4A2741CC;
+	Fri, 18 Apr 2025 11:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="BWQezP2Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPM05IST"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243661FC0ED
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 11:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960131FC0ED;
+	Fri, 18 Apr 2025 11:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744974593; cv=none; b=o7q5P+IObPq1uwZVb1ddUtvewBO/Sq1vQya8yeE3XoHA5M2AhVu+huys1MJJ8bZlxAi9tvhICmDse5VcjiKL9IeXhJLbN0J2KMq3Nc6cfNuof+QRUD8es1c0tTrFfNLRCFpHPI5dkT03DXISALrpGQ5sfcMrH8iwNM7TnPgBlI0=
+	t=1744975497; cv=none; b=kEHuebHiu/fNVXIHAlkyMQf4ues7J3tx92ZNKq/LI/jI6OhglfXYDXrenHzA7KUZ/SPBwuTAgN53ALmynM4r2lpGROee7sb8GnfIC4JUGwsPmyEezy6lTycGZzcKY3ATyPvywUHggnQKzazdadkBbBolbRwEQpbA3C7Onr65YR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744974593; c=relaxed/simple;
-	bh=Fi4t0dOtp1flcVqhoQ2RlXXYxZd3os1aw4AUw9OM/6s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pOGyOQs88xG2oYUdffmVxGArQsxiVHrFayEsCcIcH30Q8YI9XcfrVrjrmVMIkGb06doT34N+Jhh17WMKE3AcEWQQ+eArp2xlBsdt+VkoogmxtGZsSiOFRVwSMaANdTqPRcy5HgmBxX5wANdgdXHlOloH4wT58jsxge0whFQ1tPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=BWQezP2Y; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-af50f56b862so1268272a12.1
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 04:09:51 -0700 (PDT)
+	s=arc-20240116; t=1744975497; c=relaxed/simple;
+	bh=QdJJGvEiz5pjNXqTtarXbU7YwPu1LSLqeT8h32rut74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OSqUHsVgMDYcv6L6HC95IQiinoJ2YZnKxy3EbZEQVW4U9cHEUW8ACPA7CnxaGC5mYlohHz7fABX0FzB5xgemc4odyESfuZiT9UkKZ5MDV534WS/el6R8I9rUadsZOO25kRaAPN4xPJwHPDwJLZJRrf9QmSoS8uPUJT+tTvac9oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPM05IST; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so17079575e9.3;
+        Fri, 18 Apr 2025 04:24:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744974591; x=1745579391; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tdUhbH0T6t5beq2qKoJ5PRG1F9USek/zSZIjlkdZiAg=;
-        b=BWQezP2YkKw3lh9/9LHX9VO03aFIHgiop6GdJIIZGYuMO5vfIRk63fJd4GQwmT9zje
-         pBema96kHZ5nanBmxzvnbZys8rgdtSa9tIKSJwnTcK3ARqJOB0jVq4UA3RBu02+j2aBd
-         0+A7DzZ4d7X7vJRGAK4ZOxvWe1YEwHpFK4JkNSLkRgHdeP8uLmmHWeT3USggh4bwUeA8
-         WRZPPS/Qx0rxByC/2SsBnU8ooQdFb43wFBT+EyfuaHzgn3E/S8prOyj9BPdhK6yZ4lxD
-         nNbLJJjxTrSReLrxryuow+Cpy4EcQ6CZ+M1VAC4uq4bPmIOxf678HV2OkgMmnkyqSIT5
-         aaSA==
+        d=gmail.com; s=20230601; t=1744975494; x=1745580294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W//o/Ys/rBW7MLdSpGEG/ep49Nq5wGldQX5Bh4Q01DA=;
+        b=TPM05IST9GkwrNSB4SWmZZUru0S3vd4JyrfJr4sRO6IxX22sHmlu4Xn1KQRD3gM7BT
+         PCeq5+jfDRG4zszpX/a8s3g+a7CwkBA/HFUBroYTcoNOa6Qz8MI5NJiR/cw2hu4BALTA
+         6rqIxdIlbsYhkwIlmicHgiagrkqetZSVNf84LTipNTKXuIf6R4taEc9OCByV3Ul+Bocu
+         tPSgNtnFpOBAEmoaxv2vCTm+MwDbLtqcGY0RjlsIOqiHIVauPMy+GhWtLRaho37l0uhV
+         I4dqL0k0KB4Q80rSBakoscleBH7SF0Yx0mATySUPMTAwR3D0i8kxqt97K+z76pqhxKpU
+         7W0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744974591; x=1745579391;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tdUhbH0T6t5beq2qKoJ5PRG1F9USek/zSZIjlkdZiAg=;
-        b=DtNWa8KQArAvAFIbbCXnvN17FeYgy/DSivyYh1e32x1TH8nohEKUwlTBecx7x4MmWH
-         uNKDHdFaHVKeSh6MsXH5g1L2yIjILDZIQ/D0Aao6ggd5RZcd4q4no8E3XX129qkkfXz8
-         JGJT+z3bYqQIwon1xxi8J2wH1ZIul/cfCCMb+xD+b2z06zT+zgdD0r2I+gIkKAu5h/DF
-         BMq92eGtU7azDV5IK/TbRC+YGz6mElt8YNMSwidSkokrjWnftDITx1mGUbZ/uBJleNi6
-         5BQg0FUI9Mvz/cH5XsYRsuPfb8nFSAZmvwwYJccGz9qufGuuLzsAXj9hAJE5HXMplAxW
-         Fv1Q==
-X-Gm-Message-State: AOJu0YwojWzB1oNUlXcEDCEAvqQGkU9x+i0Wa76/qH4IHl7EGVav/Mjo
-	zyq3Lly0oOujdnA2/hNwgzslP/8SaDMM7WOYjAegPdZsT+sTFkJ4wCPRIEmWzGmomvG0zQpEgui
-	RzjbqK4WK6Z/LN9HNTLw30JK6xZ21j+VsARJl
-X-Gm-Gg: ASbGnctETsAuhSEcw0glB0LtbGxkeTpQnJ/Ek/TFIhsA09TW79mVlexXwJW9XZzZUFD
-	j56ca+zcGcUNoY+3PPRCVOrAX5cgsq/zMt5z6A0ANPQuYF/Cpo5bfFyL7TK3x2UZa0Crk9fVu22
-	p7RAcCbpPIckIKfQ2CKTIpUg==
-X-Google-Smtp-Source: AGHT+IGq877F73El6DrVn3eZV1jrB1hFFCQ+5823Zg8zy0hUy6Su+wkV8b6JlEIpD6do3/QsFH2M4NpI1yeK+2b/zBM=
-X-Received: by 2002:a17:90b:2b8b:b0:2ee:f440:53ed with SMTP id
- 98e67ed59e1d1-3087bcc8abcmr2824497a91.31.1744974591333; Fri, 18 Apr 2025
- 04:09:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744975494; x=1745580294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W//o/Ys/rBW7MLdSpGEG/ep49Nq5wGldQX5Bh4Q01DA=;
+        b=Og+GX70drqsdUoDk4iqg0ReGkSGRqYe/j9FYFNR2hhcue/xNu2d1y01EMz0zBnZlkE
+         JcXN0ahCxlGuDZZfYtBWT1R8WSJ5gIzs6kBvS9M3ibaMeuVsU0F0JtRsoxTuZNLOAn8m
+         f+Qh9HM73ZSwWtQU7vL7ZLnryADKKJvA2tHGUO9UZS315FLY07wMK1l3aEjArrecVf2P
+         xyqsDldx5qSiyyT46xT6vONWMg3IYNZJ+yq2eciOiriZSSKiOq9jHzp8W2rCRQ4vMylY
+         G2N/MKBCx5f83rvSXZuj26eKuLI+OAlyWfGq7geyXJbZUkE6aDp0QuTgZ+2reuF4N+Oq
+         V0FA==
+X-Forwarded-Encrypted: i=1; AJvYcCVd9E99TJS3XXmnCwyNw8U0d4h9/vJ/02FT39CGtBLViGmZAufYOBeDBrnFjFg5SpcF8nVUKdSfyQl/zgY=@vger.kernel.org, AJvYcCXDC0I9sgUR0yY2WcHHKYPLyyBpOv1AhSaoV4XHuYSDQ7Z/vHfoxyt4RQbmKOmcgMhR81tQ8MgR@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz+qjidytCW4eBsxTgVFIvxV9R444ntPzYHDNByaxhsilQ719s
+	mBAWNolpkEeUJD+lLZsuf4dZPiRgNQdpPED4kzZYiCbuF/tro8AtSx4swRwl1Ed1uQ==
+X-Gm-Gg: ASbGncuYYT9KI3prqzOVzRBkFICtMsHWay8XPQAUYYh1gUFd0EA3f3S6ecRArhZCWDZ
+	Qh/aRn2vI+HsNOa3LkGUCSj7SMXeHjr9I/KftGmcR5yH7EQvaJjQh9sJo++pmvXTIS6Yn5cAV5w
+	tZ6cEHj/nAHSbPH2JrT+bwndRkwLJgFL4ytxKfx4d/+r24WQGRDG8nfNAZxIZLNTAFLyU+g/iOE
+	y203kf2voWg31csFshKDRJg+/vUzX/uT/1pyesm/3bWLqbtgUKM2EVEknn5qHzie4bYbwZ/toGV
+	RPIq3gkRY214wWEZ/nuAXsrUbYxYy6VnrtrCxsRVQg==
+X-Google-Smtp-Source: AGHT+IG30iTqc/o70q9K2Hbdi1h5RZUfJobP4PRf5VUTOWgsiua+PVOrKWb3LlV6dsQiTSdoLK3P/g==
+X-Received: by 2002:a05:600c:c0f:b0:43d:7588:6688 with SMTP id 5b1f17b1804b1-4406ab93badmr21238555e9.12.1744975493673;
+        Fri, 18 Apr 2025 04:24:53 -0700 (PDT)
+Received: from localhost ([194.120.133.58])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4406d5a9e0esm19272115e9.5.2025.04.18.04.24.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 04:24:53 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: axienet: Fix spelling mistake "archecture" -> "architecture"
+Date: Fri, 18 Apr 2025 12:24:47 +0100
+Message-ID: <20250418112447.533746-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417184732.943057-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20250417184732.943057-1-xiyou.wangcong@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 18 Apr 2025 07:09:40 -0400
-X-Gm-Features: ATxdqUE20WdvtN6MCGFdWs0uykzdSAtjKO5pahOscCA0I55k1zn-9_b7E9z5Pwg
-Message-ID: <CAM0EoMkXW2rSTG1yr4Ni-y-Kc0BMXoEvYFf300NpM10XT6G7Eg@mail.gmail.com>
-Subject: Re: [Patch net v2 0/3] net_sched: Fix UAF vulnerability in HFSC qdisc
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, gerrard.tai@starlabs.sg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 17, 2025 at 2:47=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
->
-> This patchset contains two bug fixes and a selftest for the first one
-> which we have a reliable reproducer, please check each patch
-> description for details.
->
+There is a spelling mistake in a dev_error message. Fix it.
 
-For the patchset:
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-cheers,
-jamal
-> ---
-> v2: Add a fix for hfsc_dequeue
->
-> Cong Wang (3):
->   net_sched: hfsc: Fix a UAF vulnerability in class handling
->   net_sched: hfsc: Fix a potential UAF in hfsc_dequeue() too
->   selftests/tc-testing: Add test for HFSC queue emptying during peek
->     operation
->
->  net/sched/sch_hfsc.c                          | 23 ++++++++---
->  .../tc-testing/tc-tests/infra/qdiscs.json     | 39 +++++++++++++++++++
->  2 files changed, 56 insertions(+), 6 deletions(-)
->
-> --
-> 2.34.1
->
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 054abf283ab3..1b7a653c1f4e 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2980,7 +2980,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 			}
+ 		}
+ 		if (!IS_ENABLED(CONFIG_64BIT) && lp->features & XAE_FEATURE_DMA_64BIT) {
+-			dev_err(&pdev->dev, "64-bit addressable DMA is not compatible with 32-bit archecture\n");
++			dev_err(&pdev->dev, "64-bit addressable DMA is not compatible with 32-bit architecture\n");
+ 			ret = -EINVAL;
+ 			goto cleanup_clk;
+ 		}
+-- 
+2.49.0
+
 
