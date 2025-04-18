@@ -1,252 +1,230 @@
-Return-Path: <netdev+bounces-184198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C534EA93B22
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:40:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AFD8A93B49
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 18:50:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07B1D16DF93
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:40:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A972A19E7CC8
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF12D215781;
-	Fri, 18 Apr 2025 16:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DCC215070;
+	Fri, 18 Apr 2025 16:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GB751ZfE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrrrf0MS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0566221558;
-	Fri, 18 Apr 2025 16:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D982CCC0;
+	Fri, 18 Apr 2025 16:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744994329; cv=none; b=VhzuO1le4eu/kSYLl629vNip4yHch+ssYiFyMfvAxukrIDqeP+34Mj9IOToNEExhqJiNVwihu5LRZ27tR/nS5GDGrhHazVZfBxqo9OVzM49rtiNkwTelMQO9yvDpPEobGX+YCREXefuVoldnhjNInGKi8q2kmjg+0lyixHk/yNg=
+	t=1744995005; cv=none; b=AMebPMYyOQpvol+QKsgjI5TquNyyjO8a52Rp2jWXCrlvy3CAqmrUITMksVqmT2kPuBQ7MlBIJoTWA6pgf1rpi70+cb7igu33SMjWwadkWh9gRdMDdNqGwQXTnOgLR869cEdDkHXICNmZYhPgyn+yjxLAO9tqj7HWzgpmU56oFnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744994329; c=relaxed/simple;
-	bh=8w05lFRbfrt+PrNQMxGLKOoTXETNFwpFMMhyWpfNtP4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BkJf03I1B5FF89GS3Kn1bEBTGBHpZ3m2Pp0P25xHNrJ4wVWNpxW5mhlPM24zq3v/gZ/LxkdI9VYqCY9U3/mIXvTYcPRPTFK3i6L8PcK+lBYAuD2mf41W1z9/rnG14/ytQw2F7uVAEck2VZnm+ZPQoABngIyTgAtWDXqAOkWx+YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GB751ZfE; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744994325; x=1776530325;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8w05lFRbfrt+PrNQMxGLKOoTXETNFwpFMMhyWpfNtP4=;
-  b=GB751ZfEi9yg+0uqzAzqVyaYHpcun+O2+uZ1Ut3qioy9Kvop37DVX/4s
-   R8X6AwjP5JbnybEgnOLT3zkczgUDvzY+F6JoYYGM87qiyNFZoOINr/jGr
-   vRfUKgxIbzy+by5AHcf2Q0foz6YkiUOEUj93QlNZHlCX+ALl6rdOpJXAf
-   WmY007S59nUQa6XOss1sqW9ocBqKtBQl8Tp/g5+aV4mRD1E3vOU7l+5Fk
-   KweZE1ERkCk34clYj6NoqM7DHUGEUJAp3sTBaWDAPPji0S4iBgcEgFhXi
-   9MvuwSKbRVZObB+sC72+WG/q8oG0d33CFMmPAbNFMpVMj6U5Jv5RX5Xzm
-   Q==;
-X-CSE-ConnectionGUID: /w4AwwDsQ16D9LajcnxL2Q==
-X-CSE-MsgGUID: VErm1sDjQ++3OENDz22Apw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11407"; a="50454560"
-X-IronPort-AV: E=Sophos;i="6.15,222,1739865600"; 
-   d="scan'208";a="50454560"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 09:38:38 -0700
-X-CSE-ConnectionGUID: hqxpZk0WQ6WYqs/nUSH7rw==
-X-CSE-MsgGUID: It73fgd3Teyuxc4VUSyyog==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,222,1739865600"; 
-   d="scan'208";a="130892300"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa009.jf.intel.com with ESMTP; 18 Apr 2025 09:38:38 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	vinicius.gomes@intel.com,
-	vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
-	przemyslaw.kitszel@intel.com,
-	chwee.lin.choong@intel.com,
-	yong.liang.choong@linux.intel.com,
-	vladimir.oltean@nxp.com,
-	horms@kernel.org,
-	linux@armlinux.org.uk,
-	xiaolei.wang@windriver.com,
-	hayashi.kunihiko@socionext.com,
-	ast@kernel.org,
-	jesper.nilsson@axis.com,
-	mcoquelin.stm32@gmail.com,
-	rmk+kernel@armlinux.org.uk,
-	fancer.lancer@gmail.com,
-	kory.maincent@bootlin.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	hkelam@marvell.com,
-	alexandre.torgue@foss.st.com,
-	daniel@iogearbox.net,
-	linux-arm-kernel@lists.infradead.org,
-	hawk@kernel.org,
-	quic_jsuraj@quicinc.com,
-	gal@nvidia.com,
-	john.fastabend@gmail.com,
-	0x1207@gmail.com,
-	bpf@vger.kernel.org,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net-next 14/14] igc: add support to get frame preemption statistics via ethtool
-Date: Fri, 18 Apr 2025 09:38:20 -0700
-Message-ID: <20250418163822.3519810-15-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250418163822.3519810-1-anthony.l.nguyen@intel.com>
-References: <20250418163822.3519810-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1744995005; c=relaxed/simple;
+	bh=4SPvBV/MDlxiR5aX8tf3sSjbLn91cuUdLEqO9PVmDQk=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGR59Nl5nJCmndkJT8jLFhj0bZGIUxJFxpfEznU0gkQ4hFAapOb6tkMbQPeXovQm1k9pkNlo+CK+yW6H046uI64pBz/E6pE+ILrcm+OsehbMKtQs55yDFRc6dAmQLNlCnQMKGgHw428FZoPQPKpHANF+6ewD7ZOk5oqRVDB5/Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrrrf0MS; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c5e39d1db2so106419285a.3;
+        Fri, 18 Apr 2025 09:50:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744995002; x=1745599802; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wqsq8yPJja9MfMcD3tAjoUAZlgKfMc3FNlCDKzyz/mQ=;
+        b=lrrrf0MSCUXxj/r/YYaM1WogRuDOimZmPrWclmn8ZFQJvmeyewiIfT7eHJ9zgO7Hmq
+         ZHN28gufvNIPoESOKuvJCgb4TjFHsdOhk9MJAdNPSM2HrNCpjhEdu0KsYdDtG7Wgvrkf
+         4jOA/eE9J2D5FiTVYl6P27rJfdhYW7h0GZzsKhe5mYL8eEsULn+h0luMu61sPKUttKcO
+         tegNKf63mP80s4RRiyB1SBb56kBYC2IpmGxv8134vjRCVLVc3bNNZ3p/7eAWTMqkNQEP
+         xZ7qxaXLcEKdwXi6GruI7lTDKPG0OIQelCtA2xJoEhDk0pLmDigBVqTfGZsSBvetm5f1
+         KqRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744995002; x=1745599802;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wqsq8yPJja9MfMcD3tAjoUAZlgKfMc3FNlCDKzyz/mQ=;
+        b=K7N4+5Vt4wRCfmSPtFkoNPs63xxQY0YkS71Tdr9PhaIyEZ0OlXgLI5T9RxUk4pF4Xc
+         C07SEYuHT4x/glucZoWVswVFon80iIZatlyZupVHr1sOKWCvfoQdgIWCwVVaaWZ7HPA/
+         WOGkGX0Zhiusbfad6NIULHtyAxvqB88NES7IzRNjEiLCv+kfD2TXUQRAW5kY9YbvT4RS
+         wu/ad4b2G4eVpiccRrVqAzu86vLdFL1aIB2bLkMMxZVm7qCh25I3SYnHsBHqIa3yHa7n
+         12NAvAUnlTfLWEZ4BuBEa0So26IM1YD8YkYl1V+KuvKsHEr/L1BXG7BBpi8tCsUimJfX
+         Adkw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2og31Z+WeCdSo8wfv3D5vgJ83JOxt8cwP4kJPknMIsbD4RkZngXdD+Eje38/cU3+FCF79lj3wkJe/IF+ygjQI@vger.kernel.org, AJvYcCW3y2XAb0ivOt7Uqgmu/+fHIhm7iYd6rdUMmD7V5FCJAOKBRdGteZvgoNY42fcWhKIFj/NInU5SeY/gnEes@vger.kernel.org, AJvYcCWDJZI4EZyJLAj473r0JLjitMAr6oihTMUyqWndGMwPr22J3eRUitNgI/+IjehofMDmRfrLJnbu2mJK7y8gR7c=@vger.kernel.org, AJvYcCWLgF/OAO37VKGEyB3dQDYXLZuDbgRZVVvDtdqmsbUbZEqxL99ZEMENvWFEXBPq9sOHnLA1LQEBInWqrtei@vger.kernel.org, AJvYcCWNr1q5lbQj75hg2WkpZewcoU9fkILDCcEsDSVOZi/L8q8X8ll6pqmuiSBvcppaa8yl0gPgEM8GPfKU@vger.kernel.org, AJvYcCXOBnvcn67falgpbTxxH7KDvacVAc3L+qJcP60NodFIiBg9dwVUKg882cwgIMQt5onqmbV2POzq9Qz7df8=@vger.kernel.org, AJvYcCXQbeL0QffPNJ+Inpel/2qRIIZHpaozwD8iSprQE0NdcsS0rYz6tLEPUpQi18wHbeABKUXw31w/@vger.kernel.org, AJvYcCXRoASaZD/WPF7wEjZvDLSHhzlUBwEwkx4wNJ5T5NiSA2hjZmj1pcVfe9V0VQtD3f/B+VMjJAsIilJE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy02AA3biaQOt3ajCn3eXkdhSK1D79qeNRR61vK98Sm6ndSPea+
+	lsw968H3Y9HU1naP6VsI020AI8Ap6JVud0ekCgBtoxgN6kH9Mmne
+X-Gm-Gg: ASbGncvejsFRtG7wuaE1/WrnJswWacjnAwgXLmAIx9zf8bS726ppbk2bt9bGT59K41m
+	XTmRGGi+4t2l91gCD0/BVLB4zRLra3jyXv4o/c1Syc0sWVMV55ZOmVd02UY3sQFVOrAgDodPQ1e
+	dAGXQQUv8yVMFsUZxwYm8vZm93ISjvHtiiw5Baw9rfXh5nPmJ/IOUja2Bh9wT843nvPionC9ot4
+	oZqOMqrrIARgCCHCMUK4KKqlolaN6Q1zrFpS/KhTMnLHQalYaUOU4Tyl+oRp+fx3ZYgZE54G4bP
+	wk6E8cy9sCz+S8H7dZOUAAWiSIKQiorDwDiyy1Jtcls1Qz82dC5LeQPGYP21/2owvi2yfyZaXMS
+	mNNfgjyetk66qCq6fLedGb7t0xUBJCsAuAffSPI/jyw==
+X-Google-Smtp-Source: AGHT+IGjqTF4f9smmVkb3wgWaIXUFVJ5bhyDcAmk4QFxgPcVtKxPUq6oNVaI94PfU1W5J6bp6Dym2A==
+X-Received: by 2002:a05:620a:4112:b0:7c5:9b93:8f64 with SMTP id af79cd13be357-7c92800f4ccmr542294585a.37.1744995001792;
+        Fri, 18 Apr 2025 09:50:01 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925ac5018sm124259085a.52.2025.04.18.09.50.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Apr 2025 09:50:01 -0700 (PDT)
+Message-ID: <680282b9.050a0220.3b746a.5cf9@mx.google.com>
+X-Google-Original-Message-ID: <aAKCtQe8o73FA8db@winterfell.>
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 0E13C1200043;
+	Fri, 18 Apr 2025 12:50:00 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Fri, 18 Apr 2025 12:50:00 -0400
+X-ME-Sender: <xms:t4ICaPrgLkWEbH6GWhTGPaFLVQbWrWOHlfTfkbUonj_YAvDMD-KU1Q>
+    <xme:t4ICaJqChA3dlMw71yhy8csoqqK5Y4iLQ0Z62MWQRL5LWGE5fFQMMMJHqxl4-Vp_7
+    SP1XzVYBXxDcpDtJg>
+X-ME-Received: <xmr:t4ICaMNPGrgxWdPMVCQLF2Mu2gBYuu6YOb47AYWzWqRWmLPK1aR1dgLJ-C0K0Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvieejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegoufhushhpvggtthffohhmrghinhculdegledmnecujfgu
+    rhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhunhcuhf
+    gvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtthgv
+    rhhnpeekjefgudefhfeigffghfdtheeggfdtuddvkeejleffheeufeffteetvefgfeeuje
+    enucffohhmrghinhepghhithhhuhgsrdhiohenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrsh
+    honhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghn
+    gheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepge
+    ejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtrghmihhrugesghhmrghilhdr
+    tghomhdprhgtphhtthhopehmrghsrghhihhrohihsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghilh
+    drtghomhdprhgtphhtthhopehgrghrhiesghgrrhihghhuohdrnhgvthdprhgtphhtthho
+    pegsjhhorhhnfegpghhhsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhopegsvg
+    hnnhhordhlohhsshhinhesphhrohhtohhnrdhmvgdprhgtphhtthhopegrrdhhihhnuggs
+    ohhrgheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:t4ICaC6UhO1CZnKjR6Ik-hzIl3GtGbvNVc1I-IDE4qls3LYxm5xgUQ>
+    <xmx:t4ICaO4vQPmAJgA9EQ9e4E1UXeaGRebhXTNU3grxc_kkgAjUxFqXfg>
+    <xmx:t4ICaKjYst-8W_IjfguRa7uGthyObF8qia3gL-YVcCE_LCjZovMezA>
+    <xmx:t4ICaA7BSsupuce3_SqR3OsmGrEA4G9TNiV4jY5WZn2qvcS_4fm5JQ>
+    <xmx:uIICaNKT393DPp0R4GPwnosQuFP000EMpmjxlybcE0RtxwLUKggyEoYo>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 18 Apr 2025 12:49:59 -0400 (EDT)
+Date: Fri, 18 Apr 2025 09:49:57 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org,
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v10 2/6] rust: enable `clippy::ptr_cast_constness` lint
+References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
+ <20250418-ptr-as-ptr-v10-2-3d63d27907aa@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250418-ptr-as-ptr-v10-2-3d63d27907aa@gmail.com>
 
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+On Fri, Apr 18, 2025 at 11:37:18AM -0400, Tamir Duberstein wrote:
+> In Rust 1.72.0, Clippy introduced the `ptr_cast_constness` lint [1]:
+> 
+> > Though `as` casts between raw pointers are not terrible,
+> > `pointer::cast_mut` and `pointer::cast_const` are safer because they
+> > cannot accidentally cast the pointer to another type.
+> 
+> There are only 2 affected sites:
+> - `*mut T as *const U as *mut U` becomes `(*mut T).cast()`
+> - `&self as *const Self as *mut Self` becomes
+>   `core::ptr::from_ref(self).cast_mut()`.
+> 
+> Apply these changes and enable the lint -- no functional change
+> intended.
+> 
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#ptr_cast_constness [1]
+> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-Implemented "ethtool --include-statistics --show-mm" callback for IGC.
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 
-Tested preemption scenario to check preemption statistics:
-1) Trigger verification handshake on both boards:
-    $ sudo ethtool --set-mm enp1s0 pmac-enabled on
-    $ sudo ethtool --set-mm enp1s0 tx-enabled on
-    $ sudo ethtool --set-mm enp1s0 verify-enabled on
-2) Set preemptible or express queue in taprio for tx board:
-    $ sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-      num_tc 4 map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-      queues 1@0 1@1 1@2 1@3 base-time 0 sched-entry S F 100000 \
-      fp E E P P
-3) Send large size packets on preemptible queue
-4) Send small size packets on express queue to preempt packets in
-   preemptible queue
-5) Show preemption statistics on the receiving board:
-   $ ethtool --include-statistics --show-mm enp1s0
-     MAC Merge layer state for enp1s0:
-     pMAC enabled: on
-     TX enabled: on
-     TX active: on
-     TX minimum fragment size: 64
-     RX minimum fragment size: 60
-     Verify enabled: on
-     Verify time: 128
-     Max verify time: 128
-     Verification status: SUCCEEDED
-     Statistics:
-      MACMergeFrameAssErrorCount: 0
-      MACMergeFrameSmdErrorCount: 0
-      MACMergeFrameAssOkCount: 511
-      MACMergeFragCountRx: 764
-      MACMergeFragCountTx: 0
-      MACMergeHoldCount: 0
+Regards,
+Boqun
 
-Co-developed-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Co-developed-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 41 ++++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_regs.h    | 16 ++++++++
- 2 files changed, 57 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index fd4b4b332309..3fc1eded9605 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1819,6 +1819,46 @@ static int igc_ethtool_set_mm(struct net_device *netdev,
- 	return igc_tsn_offload_apply(adapter);
- }
- 
-+/**
-+ * igc_ethtool_get_frame_ass_error - Get the frame assembly error count.
-+ * @reg_value: Register value for IGC_PRMEXCPRCNT
-+ * Return: The count of frame assembly errors.
-+ */
-+static u64 igc_ethtool_get_frame_ass_error(u32 reg_value)
-+{
-+	/* Out of order statistics */
-+	u32 ooo_frame_cnt, ooo_frag_cnt;
-+	u32 miss_frame_frag_cnt;
-+
-+	ooo_frame_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAME_CNT, reg_value);
-+	ooo_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAG_CNT, reg_value);
-+	miss_frame_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT,
-+					reg_value);
-+
-+	return ooo_frame_cnt + ooo_frag_cnt + miss_frame_frag_cnt;
-+}
-+
-+static u64 igc_ethtool_get_frame_smd_error(u32 reg_value)
-+{
-+	return FIELD_GET(IGC_PRMEXCPRCNT_OOO_SMDC, reg_value);
-+}
-+
-+static void igc_ethtool_get_mm_stats(struct net_device *dev,
-+				     struct ethtool_mm_stats *stats)
-+{
-+	struct igc_adapter *adapter = netdev_priv(dev);
-+	struct igc_hw *hw = &adapter->hw;
-+	u32 reg_value;
-+
-+	reg_value = rd32(IGC_PRMEXCPRCNT);
-+
-+	stats->MACMergeFrameAssErrorCount = igc_ethtool_get_frame_ass_error(reg_value);
-+	stats->MACMergeFrameSmdErrorCount = igc_ethtool_get_frame_smd_error(reg_value);
-+	stats->MACMergeFrameAssOkCount = rd32(IGC_PRMPTDRCNT);
-+	stats->MACMergeFragCountRx = rd32(IGC_PRMEVNTRCNT);
-+	stats->MACMergeFragCountTx = rd32(IGC_PRMEVNTTCNT);
-+}
-+
- static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 					  struct ethtool_link_ksettings *cmd)
- {
-@@ -2115,6 +2155,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.set_link_ksettings	= igc_ethtool_set_link_ksettings,
- 	.self_test		= igc_ethtool_diag_test,
- 	.get_mm			= igc_ethtool_get_mm,
-+	.get_mm_stats		= igc_ethtool_get_mm_stats,
- 	.set_mm			= igc_ethtool_set_mm,
- };
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
-index 12ddc5793651..f343c6bfc6be 100644
---- a/drivers/net/ethernet/intel/igc/igc_regs.h
-+++ b/drivers/net/ethernet/intel/igc/igc_regs.h
-@@ -222,6 +222,22 @@
- 
- #define IGC_FTQF(_n)	(0x059E0 + (4 * (_n)))  /* 5-tuple Queue Fltr */
- 
-+/* Time sync registers - preemption statistics */
-+#define IGC_PRMPTDRCNT		0x04284	/* Good RX Preempted Packets */
-+#define IGC_PRMEVNTTCNT		0x04298	/* TX Preemption event counter */
-+#define IGC_PRMEVNTRCNT		0x0429C	/* RX Preemption event counter */
-+
-+ /* Preemption Exception Counter */
-+ #define IGC_PRMEXCPRCNT				0x42A0
-+/* Received out of order packets with SMD-C */
-+#define IGC_PRMEXCPRCNT_OOO_SMDC			0x000000FF
-+/* Received out of order packets with SMD-C and wrong Frame CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAME_CNT			0x0000FF00
-+/* Received out of order packets with SMD-C and wrong Frag CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAG_CNT			0x00FF0000
-+/* Received packets with SMD-S and wrong Frag CNT and Frame CNT */
-+#define IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT		0xFF000000
-+
- /* Transmit Scheduling Registers */
- #define IGC_TQAVCTRL		0x3570
- #define IGC_TXQCTL(_n)		(0x3344 + 0x4 * (_n))
--- 
-2.47.1
-
+> ---
+>  Makefile                        | 1 +
+>  rust/kernel/block/mq/request.rs | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 5d2931344490..7b85b2a8d371 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -481,6 +481,7 @@ export rust_common_flags := --edition=2021 \
+>  			    -Aclippy::needless_lifetimes \
+>  			    -Wclippy::no_mangle_with_rust_abi \
+>  			    -Wclippy::ptr_as_ptr \
+> +			    -Wclippy::ptr_cast_constness \
+>  			    -Wclippy::undocumented_unsafe_blocks \
+>  			    -Wclippy::unnecessary_safety_comment \
+>  			    -Wclippy::unnecessary_safety_doc \
+> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+> index 4a5b7ec914ef..af5c9ac94f36 100644
+> --- a/rust/kernel/block/mq/request.rs
+> +++ b/rust/kernel/block/mq/request.rs
+> @@ -69,7 +69,7 @@ pub(crate) unsafe fn aref_from_raw(ptr: *mut bindings::request) -> ARef<Self> {
+>          // INVARIANT: By the safety requirements of this function, invariants are upheld.
+>          // SAFETY: By the safety requirement of this function, we own a
+>          // reference count that we can pass to `ARef`.
+> -        unsafe { ARef::from_raw(NonNull::new_unchecked(ptr as *const Self as *mut Self)) }
+> +        unsafe { ARef::from_raw(NonNull::new_unchecked(ptr.cast())) }
+>      }
+>  
+>      /// Notify the block layer that a request is going to be processed now.
+> @@ -155,7 +155,7 @@ pub(crate) fn wrapper_ref(&self) -> &RequestDataWrapper {
+>          // the private data associated with this request is initialized and
+>          // valid. The existence of `&self` guarantees that the private data is
+>          // valid as a shared reference.
+> -        unsafe { Self::wrapper_ptr(self as *const Self as *mut Self).as_ref() }
+> +        unsafe { Self::wrapper_ptr(core::ptr::from_ref(self).cast_mut()).as_ref() }
+>      }
+>  }
+>  
+> 
+> -- 
+> 2.49.0
+> 
 
