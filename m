@@ -1,161 +1,158 @@
-Return-Path: <netdev+bounces-184217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6DEA93E4B
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 21:34:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C51A93E53
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 21:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F3BB1B62168
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 19:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8269461CC2
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 19:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0136E219311;
-	Fri, 18 Apr 2025 19:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238C622D7B3;
+	Fri, 18 Apr 2025 19:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbygk7qp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t+Guq4Hd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDCE5475E;
-	Fri, 18 Apr 2025 19:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E014221B9CD;
+	Fri, 18 Apr 2025 19:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745004853; cv=none; b=YDIf9WhssgTW5lV60qxi7gzeExrEdz6GChJuoGFYhCyDwWAaVujV1vwouCg+JAsGduLZVW4j7AhBRQhpvD72mr0+J/zoeAxx3pNSitLG/JdWv3Fqsg7vZXkXI6XzOE9X0by+DHBZUsJocTxVuTz0gOerdjJGK1i9pBeji60mC1Q=
+	t=1745004920; cv=none; b=NMuH8N8rJ3c4dccSE827yDvO+W3aucRPAzeXC5Ob2fXTUP4V082KKSiQduZ0SeovcuCXKLmDYTXEMrjiqBuCgrEelhVgDNhM6sY5GW1wI1A+Gp1bzqJe/LHAc6+9b+7KeND3DQn4ptBf+7IMB1qRcfBWJnwCtsUQwyMrANmG9b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745004853; c=relaxed/simple;
-	bh=D9tqP4q6k4FiJNJriVyf0FBNkmHvdMa/ZWvSnLdctjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=dqfNvQYPo+0eZZbg0JdpLJFg4Y8ehLv1aemCKM1ttb8QgwDaVezqiCEc6Ou4r5Fhqy4v1jgEVkyNDPSmwIpPFv4KbzGGsG2sNOId0IRyrWor0E2OnLhhKopxV5bRjhWCyETd/GsRgyDl25FYvMrJY73QilDMfZwgjgcsei57azs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbygk7qp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BA01C4CEE2;
-	Fri, 18 Apr 2025 19:34:13 +0000 (UTC)
+	s=arc-20240116; t=1745004920; c=relaxed/simple;
+	bh=vqFTFt0YdGYWN8vJdkEKbxx2rEmZzIS+iVRiY+3yqbA=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=X/fBnj2XObodHFV3BExMhxHC1o+1s5bzmMRJQlsaX47Y9IhyNkLhPUbzcBEpwehU9mjrAfuvezQlifddS71jI83VevXAAKQ8O+tR5dxSu+ckB/7lqBmxrtk4H68FgYEeabCdB+eJgiWMZymbA1lhR/FfME0xy4oiJTXrpUmEhik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t+Guq4Hd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3408FC4CEE2;
+	Fri, 18 Apr 2025 19:35:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745004853;
-	bh=D9tqP4q6k4FiJNJriVyf0FBNkmHvdMa/ZWvSnLdctjw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=rbygk7qpQ+aaTPAS9KmJOxGTxcbO0r8DgMEvh2mLlPNP2csSjKGHgYw1wKQaOUrrL
-	 CklfbKFdJ4LK+KINSpWWoRQqpIfaocPFNjY6WxNvNJAFP6VCN2wtmDse8YZlnL7RTE
-	 ZpVMYIwZ1gtvibrMsRmv7FVgjU3sibVOSphN1aCFuCQ+jWfX8eufRH/K+mhkJzLgkZ
-	 x2sZJyLN0kJke8uqa071bFaUyMmS9KAZ1tq5QDWxqIiqgxGC1mOXznTPaeKP/8NJ/E
-	 vhhlzhIgBLXrh7HnZVAOiKW+549ONMYdUgEZKK3mVf3kD1lPqzPcja6P6RIWzyFFFM
-	 oUDrRW795DUnQ==
-Date: Fri, 18 Apr 2025 14:34:11 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	En-Wei Wu <en-wei.wu@canonical.com>, vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
-	"Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH net 3/3] igc: return early when failing to read EECD
- register
-Message-ID: <20250418193411.GA168278@bhelgaas>
+	s=k20201202; t=1745004919;
+	bh=vqFTFt0YdGYWN8vJdkEKbxx2rEmZzIS+iVRiY+3yqbA=;
+	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
+	b=t+Guq4HdbFUo9uT75wS5MjZjkC3Sw3cOGuDQdPVem3HUypF9TPKt9aTC/HkNc6W7y
+	 7c5vdu8roXMQSijR8tG9LSDG7Eg8ubRoNLLLYodxUh8CZFtiyjNRWZrM3O7CC2Lfwb
+	 +WR7LFSy5KbsS5cQcnS5ZNmGCbEj2FsKAaxdNHCfPeCTyiviwLITVLjDqlqr5rNfO8
+	 YDqdfr2PVB1MT88gqbsH4ACSPnumDlI8xPCwTpT1oCerPSZ1hMoKZxW2PHc2CrQwH0
+	 popJOmX4YEoBS1hteJW8V5faCmjXOOJvz03JigPoQxyV7mWbtHBVXVbEr+W/6LyL6o
+	 f6Byy6CPguHgQ==
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
+Date: Fri, 18 Apr 2025 22:35:14 +0300 (EEST)
+To: Simon Horman <horms@kernel.org>
+cc: chia-yu.chang@nokia-bell-labs.com, dsahern@kernel.org, kuniyu@amazon.com, 
+    bpf@vger.kernel.org, netdev@vger.kernel.org, dave.taht@gmail.com, 
+    pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org, 
+    stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+    davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch, 
+    donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
+    shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
+    ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+    g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+    mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+    Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Subject: Re: [PATCH v4 net-next 09/15] tcp: accecn: AccECN option
+In-Reply-To: <20250418183138.GE2676982@horms.kernel.org>
+Message-ID: <8b6f580b-d682-91f7-f958-1806ee6e8bbe@kernel.org>
+References: <20250417230029.21905-1-chia-yu.chang@nokia-bell-labs.com> <20250417230029.21905-10-chia-yu.chang@nokia-bell-labs.com> <20250418183138.GE2676982@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250107190150.1758577-4-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset=US-ASCII
 
-[+cc Kalesh, Przemek, linux-pci]
+On Fri, 18 Apr 2025, Simon Horman wrote:
 
-On Tue, Jan 07, 2025 at 11:01:47AM -0800, Tony Nguyen wrote:
-> From: En-Wei Wu <en-wei.wu@canonical.com>
+> On Fri, Apr 18, 2025 at 01:00:23AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
 > 
-> When booting with a dock connected, the igc driver may get stuck for ~40
-> seconds if PCIe link is lost during initialization.
+> ...
 > 
-> This happens because the driver access device after EECD register reads
-> return all F's, indicating failed reads. Consequently, hw->hw_addr is set
-> to NULL, which impacts subsequent rd32() reads. This leads to the driver
-> hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
-> prevents retrieving the expected value.
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
 > 
-> To address this, a validation check and a corresponding return value
-> catch is added for the EECD register read result. If all F's are
-> returned, indicating PCIe link loss, the driver will return -ENXIO
-> immediately. This avoids the 40-second hang and significantly improves
-> boot time when using a dock with an igc NIC.
+> ...
 > 
-> Log before the patch:
-> [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
-> [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
-> [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_device) (uninitialized): Driver can't access device - SMBI bit is set.
-> [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error -13
-> [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> > @@ -766,6 +769,47 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+> >  		*ptr++ = htonl(opts->tsecr);
+> >  	}
+> >  
+> > +	if (OPTION_ACCECN & options) {
+> > +		const u8 ect0_idx = INET_ECN_ECT_0 - 1;
+> > +		const u8 ect1_idx = INET_ECN_ECT_1 - 1;
+> > +		const u8 ce_idx = INET_ECN_CE - 1;
+> > +		u32 e0b;
+> > +		u32 e1b;
+> > +		u32 ceb;
+> > +		u8 len;
+> > +
+> > +		e0b = opts->ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
+> > +		e1b = opts->ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
+> > +		ceb = opts->ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_OFFSET;
+> > +		len = TCPOLEN_ACCECN_BASE +
+> > +		      opts->num_accecn_fields * TCPOLEN_ACCECN_PERFIELD;
+> > +
+> > +		if (opts->num_accecn_fields == 2) {
+> > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > +				       ((e1b >> 8) & 0xffff));
+> > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
+> > +				       (ceb & 0xffffff));
+> > +		} else if (opts->num_accecn_fields == 1) {
+> > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > +				       ((e1b >> 8) & 0xffff));
+> > +			leftover_bytes = ((e1b & 0xff) << 8) |
+> > +					 TCPOPT_NOP;
+> > +			leftover_size = 1;
+> > +		} else if (opts->num_accecn_fields == 0) {
+> > +			leftover_bytes = (TCPOPT_ACCECN1 << 8) | len;
+> > +			leftover_size = 2;
+> > +		} else if (opts->num_accecn_fields == 3) {
+> > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > +				       ((e1b >> 8) & 0xffff));
+> > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
+> > +				       (ceb & 0xffffff));
+> > +			*ptr++ = htonl(((e0b & 0xffffff) << 8) |
+> > +				       TCPOPT_NOP);
+> > +		}
+> > +		if (tp)
+> > +			tp->accecn_minlen = 0;
 > 
-> Log after the patch:
-> [    1.031000] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    1.032097] igc 0000:70:00.0: PTM enabled, 4ns granularity
-> [    1.642291] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCIe link lost, device now detached
-> [    5.480490] igc 0000:70:00.0: enabling device (0000 -> 0002)
-> [    5.480516] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> Hi,
 > 
-> Fixes: ab4056126813 ("igc: Add NVM support")
-> Cc: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
-> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
-> Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc_base.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_base.c b/drivers/net/ethernet/intel/igc/igc_base.c
-> index 9fae8bdec2a7..1613b562d17c 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_base.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_base.c
-> @@ -68,6 +68,10 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
->  	u32 eecd = rd32(IGC_EECD);
->  	u16 size;
->  
-> +	/* failed to read reg and got all F's */
-> +	if (!(~eecd))
-> +		return -ENXIO;
+> I'm sorry if this is a false positive: Smatch flags that here we assume
+> that tp might be NULL, while elsewhere in this function tp is dereferenced
+> unconditionally. So my question is, can tp be NULL here?
 
-I don't understand this.  It looks like a band-aid that makes boot
-faster but doesn't solve the real problem.
+Hi Simon,
 
-In its defense, I guess that with this patch, the first igc probe
-fails, and then for some reason we attempt another a few seconds
-later, and the second igc probe works fine, so the NIC actually does
-end up working correct, right?
+Thanks for taking look!
 
-I think the PCI core has some issues with configuring ASPM L1.2, and I
-wonder if those are relevant here.  If somebody can repro the problem
-(i.e., without this patch, which looks like it appeared in v6.13 as
-bd2776e39c2a ("igc: return early when failing to read EECD
-register")), I wonder if you could try booting with "pcie_port_pm=off
-pcie_aspm.policy=performance" and see if that also avoids the problem?
+This looks a false positive. It's because tcp_options_write() is shared by 
+the handshake and established connections. A direct caller from the 
+handshake path passes NULL as tp:
 
-If so, I'd like to see the dmesg log with "pci=earlydump" and the
-"sudo lspci -vv" output when booted with and without "pcie_port_pm=off
-pcie_aspm.policy=performance".
+	tcp_options_write(th, NULL, tcp_rsk(req), &opts, &key);
 
->  	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
->  
->  	/* Added to a constant, "size" becomes the left-shift value
-> @@ -221,6 +225,8 @@ static s32 igc_get_invariants_base(struct igc_hw *hw)
->  
->  	/* NVM initialization */
->  	ret_val = igc_init_nvm_params_base(hw);
-> +	if (ret_val)
-> +		goto out;
->  	switch (hw->mac.type) {
->  	case igc_i225:
->  		ret_val = igc_init_nvm_params_i225(hw);
-> -- 
-> 2.47.1
+The thing that smatch doesn't know is that some TCP options are not going 
+to be present during handshake. Those code paths that only deal with 
+options that are for an established connection can assume full sk/tp has 
+been already instantiated so they don't need to check tp. In addition, 
+some funcs tcp_options_write() calls to make the opposite check by 
+checking tcprsk instead but it has the same effect.
+
+-- 
+ i.
+
+> > +	}
+> > +
+> >  	if (unlikely(OPTION_SACK_ADVERTISE & options)) {
+> >  		*ptr++ = htonl((leftover_bytes << 16) |
+> >  			       (TCPOPT_SACK_PERM << 8) |
+> 
+> ...
 > 
 
