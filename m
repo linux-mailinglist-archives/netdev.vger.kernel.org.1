@@ -1,184 +1,144 @@
-Return-Path: <netdev+bounces-184138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F394CA93709
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:26:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB65A9370D
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:29:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B00FB188BEA8
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:26:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603578A7422
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 12:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914D22749F2;
-	Fri, 18 Apr 2025 12:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5B3274FF8;
+	Fri, 18 Apr 2025 12:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="qL35lBxh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CnDyTiNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E392741D4;
-	Fri, 18 Apr 2025 12:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0581A3168;
+	Fri, 18 Apr 2025 12:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744979179; cv=none; b=sPlB2kipTIJmfkoT4oEQfRmBk/KZPVb3EFytiI7/+SSgdXiOaSIXS9o6Lh3SYSDz9U64GiaWSxdO6Zp/bYYqrDMi5+S6HKxr6PPxVBlC1DKqsIKATSLvIBkjxfVlT+Pqb4cIhhsqouPl/MLj/2ryc0JpPunMqux/Mx8ozF/KCJA=
+	t=1744979333; cv=none; b=NS559o9O6/0r/S6Vhys/Ytp8WrlSh0cwT3i0KegjVAu18GalSgUeaRmdC5XCOzGn3qEIFCBYd83qvK9Kf92uzLc80TfSS8bPB7e4Avl6heSYu141nGkba0U0B8P3J32aBTCvu8cv5a70/x6XvzeDZ9qtXaBUfLzNfCpayEnHd6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744979179; c=relaxed/simple;
-	bh=pLMUnkQ7i8zl1lKTBgrZZ9T1S73Ro147jf8kegIJRpk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=B13EwEamsBqq6uOj6k0/eV8gTC1PsK+E4NGKmV3jmOiwyTIeSWQ1C/iYkCm/jZXeGELFFSckW5UCBp2Z0Y6Pn5UawctSWmqtwcn7lwR9y/ZSK+cktcnZG/59500UVSUlS8yHTKxCZu+1BNtbpF6IsFueQ7brGaXcOPOAWTvZfhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=qL35lBxh; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=zgYuDIxcDeA+599F/9fuaQ38vA4OYPsLsjN7kvIiw/A=; b=qL35lBxh8HZH+xEXQjiD+NBNXE
-	wNElmDImRWWhkgSUAkTAKAvD4A2Bg1rFoFY72ssTci5CgP6FLHMs+ECg9A7qt9ivU53nw324XanVl
-	qkpsYTci/5Bna7eT0uxaPi5epE6P1BeIjQR71beALBzkYZ2aAYbp1PBiNpCwVmanuGA/7a8sBD982
-	7NUOj/9M2EWXaP9/0ICVQZiW64P8hMvBaW8vil5Fh1bh98tAuiJVjnYU0Ry0EacdiyadJFKbKp0Sm
-	xrYduuzHfoPDbx8i2FSvqP9QcBSait/nAkIxKOPnaG+iiS5vRVAOAndvnwGe0qhomfYqyGB8xpfxb
-	EepeXgKg==;
-Received: from [122.175.9.182] (port=48418 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1u5knI-000000004eF-42yZ;
-	Fri, 18 Apr 2025 17:56:09 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id E862917823F4;
-	Fri, 18 Apr 2025 17:55:57 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id BEABC1783F61;
-	Fri, 18 Apr 2025 17:55:57 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id hhW7TFWjAhWH; Fri, 18 Apr 2025 17:55:57 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 7D65F17823F4;
-	Fri, 18 Apr 2025 17:55:57 +0530 (IST)
-Date: Fri, 18 Apr 2025 17:55:57 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: horms <horms@kernel.org>
-Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
-	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
-	richardcochran <richardcochran@gmail.com>, 
-	glaroque <glaroque@baylibre.com>, schnelle <schnelle@linux.ibm.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, s hauer <s.hauer@pengutronix.de>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	basharath <basharath@couthit.com>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <2126437499.1093120.1744979157393.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250415195756.GI395307@horms.kernel.org>
-References: <20250414113458.1913823-1-parvathi@couthit.com> <20250414130237.1915448-8-parvathi@couthit.com> <20250415195756.GI395307@horms.kernel.org>
-Subject: Re: [PATCH net-next v5 07/11] net: ti: prueth: Adds support for
- network filters for traffic control supported by PRU-ICSS
+	s=arc-20240116; t=1744979333; c=relaxed/simple;
+	bh=ilxE+AXvg/NkPCparHHXLro/i6ZYsW2R0eQyBLPfXW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T5CEeWwvKpqpdyNusQoWvBNn1N8wa0AE0GqjlMbbhyZQhANqA962nPAd+nFIRSot1oG5lS2H6uprAL/BRQSo4gM5MRBWzYNsKsT2vliHqfQY3igj+Rl0Y9dMgtqWlR9rak6RGEShpWOdkTMAFpDe3wCB9fIFsHxBFm3I01wTI1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CnDyTiNl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A13CC4CEE2;
+	Fri, 18 Apr 2025 12:28:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744979333;
+	bh=ilxE+AXvg/NkPCparHHXLro/i6ZYsW2R0eQyBLPfXW4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CnDyTiNlnqdqB+YYUT48Fr1Qp0GnOVNXI3DoY3NZIXDNc8WbtLm+ZzimWGBEwldnW
+	 fI7Hs6NV6dgz9iey/D8j0ygJwboEOSavL77Nbm0tyY+cZlH5E1CplRnyDP08sePYKU
+	 GQHsmzDWam4S0tHJD2sYU7GJs9weHq/viQwuFrD3dLz/L2x9OYZdFSTTt2+IbafwfP
+	 otzZHeAV+mvQWkElFaW1d+MWar1i2D7f+9z4n7KvyzKmDjx+7F9igF1di2icH0rZPH
+	 J0AXweDYfShtEiL0tCOHd4wHg+4734MErZ8P4Nk8fYPC+J8/8SFF/JsTSZcn1pczMG
+	 Q3WBgaUiFkEow==
+Date: Fri, 18 Apr 2025 14:28:50 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: airoha: Fix an error handling path in airoha_probe()
+Message-ID: <aAJFgqrOFL_xAqtW@lore-desk>
+References: <f4a420f3a8b4a6fe72798f9774ec9aff2291522d.1744977434.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds support for network filters for traffic control supported by PRU-ICSS
-Thread-Index: N2IoJ9p4SeRG9XkM6ibtWxtAWdIZLA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Y0SBIVyEi97tYwoG"
+Content-Disposition: inline
+In-Reply-To: <f4a420f3a8b4a6fe72798f9774ec9aff2291522d.1744977434.git.christophe.jaillet@wanadoo.fr>
 
-Hi,
 
-> On Mon, Apr 14, 2025 at 06:32:33PM +0530, Parvathi Pudi wrote:
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> Driver updates to enable/disable network filters and traffic control
->> features supported by the firmware running on PRU-ICSS.
->> 
->> Control of the following features are now supported:
->> 1. Promiscuous mode
->> 2. Network Storm prevention
->> 3. Multicast filtering and
->> 4. VLAN filtering
->> 
->> Firmware running on PRU-ICSS will go through all these filter checks
->> prior to sending the rx packets to the host.
->> 
->> Ethtool or dev ioctl can be used to enable/disable these features from
->> the user space.
->> 
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Andrew F. Davis <afd@ti.com>
->> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
->> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c
->> b/drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c
-> 
-> ...
-> 
->> +static int icssm_emac_configure_clsflower(struct prueth_emac *emac,
->> +					  struct flow_cls_offload *cls)
->> +{
->> +	struct flow_rule *rule = flow_cls_offload_flow_rule(cls);
->> +	struct netlink_ext_ack *extack = cls->common.extack;
->> +	const struct flow_action_entry *act;
->> +	int i;
->> +
->> +	flow_action_for_each(i, act, &rule->action) {
->> +		switch (act->id) {
->> +		case FLOW_ACTION_POLICE:
->> +			return icssm_emac_flower_parse_policer
->> +				(emac, extack, cls,
->> +				 act->police.rate_bytes_ps);
->> +		default:
->> +			NL_SET_ERR_MSG_MOD(extack,
->> +					   "Action not supported");
->> +			return -EOPNOTSUPP;
->> +		}
->> +	}
->> +	return -EOPNOTSUPP;
-> 
-> nit: This line cannot be reached.
->     I think you can just remove it.
-> 
->     Flagged by Smatch.
-> 
+--Y0SBIVyEi97tYwoG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We will cleanup this in the next version.
+> If an error occurs after a successful airoha_hw_init() call,
+> airoha_ppe_deinit() needs to be called as already done in the remove
+> function.
+>=20
+> Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Compile tested-only
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 69e523dd4186..252b32ceb064 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -2631,6 +2631,8 @@ static int airoha_probe(struct platform_device *pde=
+v)
+>  		}
+>  	}
+>  	free_netdev(eth->napi_dev);
+> +
+> +	airoha_ppe_deinit(eth);
+>  	platform_set_drvdata(pdev, NULL);
+> =20
+>  	return err;
+> --=20
+> 2.49.0
+>=20
 
-Thanks and Regards,
-Parvathi.
+Hi Christophe,
 
+I agree we are missing a airoha_ppe_deinit() call in the probe error path,
+but we should move it above after stopping the NAPI since if airoha_hw_init=
+()
+fails we will undo the work done by airoha_ppe_init(). Something like:
+
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/etherne=
+t/airoha/airoha_eth.c
+index 16c7896f931f..37d9678798d1 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -2959,6 +2959,7 @@ static int airoha_probe(struct platform_device *pdev)
+ error_napi_stop:
+ 	for (i =3D 0; i < ARRAY_SIZE(eth->qdma); i++)
+ 		airoha_qdma_stop_napi(&eth->qdma[i]);
++	airoha_ppe_init(eth);
+ error_hw_cleanup:
+ 	for (i =3D 0; i < ARRAY_SIZE(eth->qdma); i++)
+ 		airoha_hw_cleanup(&eth->qdma[i]);
+
+
+Agree?
+
+Regards,
+Lorenzo
+
+--Y0SBIVyEi97tYwoG
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaAJFggAKCRA6cBh0uS2t
+rKOIAQCwH4/D7rA5prRIS5BaxnLlZVf6GSFzAusPqDttCUbOqAD+KQkQkPThXEuJ
+VlYdxSyCO8mR3H/2/EGw9Cw368w4iws=
+=5A8k
+-----END PGP SIGNATURE-----
+
+--Y0SBIVyEi97tYwoG--
 
