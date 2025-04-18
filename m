@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-184220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618B8A93EC4
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 22:19:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 018FDA93EDB
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 22:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 905E08A4C23
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:18:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E764A074F
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 20:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB16238C09;
-	Fri, 18 Apr 2025 20:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EBE2397B9;
+	Fri, 18 Apr 2025 20:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="C4Hwted9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eXr9MTqd"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7424F2A1C9;
-	Fri, 18 Apr 2025 20:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D4B1C2324;
+	Fri, 18 Apr 2025 20:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745007521; cv=none; b=Qt20eBUowZvegcdjvyu2Hg8qNWZNr+BGyKHbgdjI08eGkYqjwZqZtHM+m6DRQ/8QQVh/p/Tcm7kBv1CQZYCDikCy3qv07jL+o2zLFhM24RhiElPGx24RQHHrBrGG2cIzGhZr8EpOHAUalhrHrPUT6QY40GaHfDh+4KsnUi5bHvk=
+	t=1745008034; cv=none; b=UA13YIQ8+Jil3xWJA5FXnK/6cXpYEO//d1cWBQS6D+6kymY59rbbBX2MfZnojBZUpniVHqh03Ixr+62fbIKKWae27p/3G3I63nrHRrLcakCyPx+5Xmjdn1Xd1F0QhSeDH3KflYuABpMymuY4otbxXf5JlQGxjTtbi4kpuydkVqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745007521; c=relaxed/simple;
-	bh=c8nxojaQOgQcyXY1gD2OR0f7FP2pwNRSCMcMPyqrfEA=;
+	s=arc-20240116; t=1745008034; c=relaxed/simple;
+	bh=CrhsFFq5IyqJkiDJlv+lg+3v62q3lDf7I+FQDCU5DC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dLYDa6Bf4zkBDCABDSa+mEKd4Oc+0kpiDr+TLt6Q0JtjLKeXsnJd8soiv9lRozAZvXyGMn7rGxS0iAW7lLMiIME0ZIoskpBSrUSKAjniH9L/bsQkKceKYWAHol3+dValmWTM09Ic3b1TzNCBTjiZJXfDr/6ATLm7bDwm+KLBAnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=C4Hwted9; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmBIONihiZ6CnG1IwFE2SiVFirV5YITcr3KsN2TZHDmdV6IyP5EHcZrs1JvFagVcOqxt1ogQoU18aDx4R3TXIKTfym2AOkSASAul6ZIvKbXtgkpmaKaVl3hPwHeaFtPPIJiexO1vTfHf3xmAvibMuU3TDqTGlK6td6jywNPespA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eXr9MTqd; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,35 +36,37 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QwFKe2ISZRDD95Kaksh0NVFyftzgKAb4kAfOTZyXfEY=; b=C4Hwted9QqiCwBlRns8C6ZEFw/
-	tIIAU0L98GYbB6GCZr21h9IL/Qwu0SLqQSVk2ZQa8OcCU7ugu5bcerksfMNb19KVO8uHnw3ZWNkYd
-	hQIWV2G3n0bwhnJJMoreBk8hlXEd9WJV8kE5H6WAjPg063RVGpDIU5JZYkEFuBQ2gI94=;
+	bh=O79Q8up6Gy2hEMjnQITer5PbKSEwN1Pzj/8/BV+JwL4=; b=eXr9MTqdlq9ohs6A/9h4SUfc9g
+	URu7Pe6Rtniim9/50hbZjCEspUSIRrZO5c9vO9opoZKrVynLKH9QDhASi6zX8s/JuB2EXl8pSjeFd
+	4uRDz54ZFiqqTWqM6a9mWuCLl3uFlJ1Ac970YA9oSySo6C68axjiaA/PpkNPO9mijY90=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u5sAI-009w9h-4G; Fri, 18 Apr 2025 22:18:22 +0200
-Date: Fri, 18 Apr 2025 22:18:22 +0200
+	id 1u5sIZ-009wCP-5d; Fri, 18 Apr 2025 22:26:55 +0200
+Date: Fri, 18 Apr 2025 22:26:55 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 3/8] mfd: Add Microchip ZL3073x support
-Message-ID: <5a360c39-405c-4108-9800-0f71307804a0@lunn.ch>
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-4-ivecera@redhat.com>
- <8fc9856a-f2be-4e14-ac15-d2d42efa9d5d@lunn.ch>
- <CAAVpwAsw4-7n_iV=8aXp7=X82Mj7M-vGAc3f-fVbxxg0qgAQQA@mail.gmail.com>
- <894d4209-4933-49bf-ae4c-34d6a5b1c9f1@lunn.ch>
- <03afdbe9-8f55-4e87-bec4-a0e69b0e0d86@redhat.com>
- <eb4b9a30-0527-4fa0-b3eb-c886da31cc80@redhat.com>
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
+ update descriptions of RGMII modes
+Message-ID: <94075f0a-6e17-4106-879e-3aa5193f9ef2@lunn.ch>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,21 +75,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eb4b9a30-0527-4fa0-b3eb-c886da31cc80@redhat.com>
+In-Reply-To: <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
 
-> > > Anyway, look around. How many other MFD, well actually, any sort of
-> > > driver at all, have a bunch of low level helpers as inline functions
-> > > in a header? You are aiming to write a plain boring driver which looks
-> > > like every other driver in Linux....
-> > 
-> > Well, I took inline functions approach as this is safer than macro usage
-> > and each register have own very simple implementation with type and
-> > range control (in case of indexed registers).
+On Tue, Apr 15, 2025 at 12:18:01PM +0200, Matthias Schiffer wrote:
+> As discussed [1], the comments for the different rgmii(-*id) modes do not
+> accurately describe what these values mean.
+> 
+> As the Device Tree is primarily supposed to describe the hardware and not
+> its configuration, the different modes need to distinguish board designs
+> (if a delay is built into the PCB using different trace lengths); whether
+> a delay is added on the MAC or the PHY side when needed should not matter.
+> 
+> Unfortunately, implementation in MAC drivers is somewhat inconsistent
+> where a delay is fixed or configurable on the MAC side. As a first step
+> towards sorting this out, improve the documentation.
+> 
+> Link: https://lore.kernel.org/lkml/d25b1447-c28b-4998-b238-92672434dc28@lunn.ch/ [1]
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+>  .../bindings/net/ethernet-controller.yaml        | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 45819b2358002..2ddc1ce2439a6 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -74,19 +74,21 @@ properties:
+>        - rev-rmii
+>        - moca
+>  
+> -      # RX and TX delays are added by the MAC when required
+> +      # RX and TX delays are part of the board design (through PCB traces). MAC
+> +      # and PHY must not add delays.
+>        - rgmii
+>  
+> -      # RGMII with internal RX and TX delays provided by the PHY,
+> -      # the MAC should not add the RX or TX delays in this case
+> +      # RGMII with internal RX and TX delays provided by the MAC or PHY. No
+> +      # delays are included in the board design; this is the most common case
+> +      # in modern designs.
+>        - rgmii-id
+>  
+> -      # RGMII with internal RX delay provided by the PHY, the MAC
+> -      # should not add an RX delay in this case
+> +      # RGMII with internal RX delay provided by the MAC or PHY. TX delay is
+> +      # part of the board design.
+>        - rgmii-rxid
+>  
+> -      # RGMII with internal TX delay provided by the PHY, the MAC
+> -      # should not add an TX delay in this case
+> +      # RGMII with internal TX delay provided by the MAC or PHY. RX delay is
+> +      # part of the board design.
 
-Sorry, i was a bit ambiguous. Why inline? Why not just plain
-functions. Are there lots of other drivers with a large number of
-inline functions? No. inline functions are typically only used for
-stubs when code is not being built due to CONFIG_ settings.
+This looks good to me. There is nothing here which is Linux specific.
 
-	Andrew
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
