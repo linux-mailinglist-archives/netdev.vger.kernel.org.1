@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-184031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BE8A92FA7
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:04:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EED5A92FAC
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 04:04:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03A4E1B61F34
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:04:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7E3816ADA4
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6372676FC;
-	Fri, 18 Apr 2025 02:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DF8267AE9;
+	Fri, 18 Apr 2025 02:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JII0WQpz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7Avm0KI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF572676E3;
-	Fri, 18 Apr 2025 02:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46449267736;
+	Fri, 18 Apr 2025 02:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744941819; cv=none; b=s/6MiEHoQXBXCDQXPbNGbQZAJ/uP6g8OM1qfMlh/FeXr4OAa+z6/PjpPzC1fEHyzRq0aMXrFKZTIZWzE75BBMga7Z2i3tPyCIElqoAVZHJVGnWq/kdeb/wRXwM9mJZ3Zy1+o75TtnVMv30Z4gqyWMoIi1aFmtM3KgvYVBztWFsA=
+	t=1744941824; cv=none; b=YeA+TKDkDfeG9aTqrScPgZEhcP1b+XXAUKiMcGQeEEWopHfZGbmT88gW0Sz3I37Xzpw22h96iwKRDy221GfE/DF2hfVqBlwJFFpfWQZaZTB+FktOf7W+aiqLpQ0wC16ENESBMQoV7vAZTjhlX/w6CS51LWE8KUgYeeubwIHN5pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744941819; c=relaxed/simple;
-	bh=tgBKFs4mjjqy0jH1NKNLjstVRkJPGbEFPB7Uc+1VYFI=;
+	s=arc-20240116; t=1744941824; c=relaxed/simple;
+	bh=mwvwCmjbiXsu4nTgB43Qm+rnuOE7u8ttf2dzCpNyCIo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W442YQPhZANqtk5PbzfVyQq9BTa0DRazP356ur0+YeGYGyIg2+dp/SYQ3tEj03/s3YltVkq1Df8gJ6n/jl0jIOhWlLsRqfrZTD4dR8zc2gLpM0pPRzSYaRvvI4W5u1wekj1eiHtdPYy2aPu7/k6VybnI7toaFQoX9GJlCdzY2cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JII0WQpz; arc=none smtp.client-ip=209.85.222.174
+	 MIME-Version; b=KaB+nDSbNMYDWJLNTTgICDGGnKdaGkPYYKx7wIGaz5wrebicUdKOPsmXaFPowd+2hYOdz5s82JKEQPnpTsJkDgJCpz1DFknB4D9SiCBdlnfG/gPpXppBATYxAD2GhAw+i2pidcDFOFzeEYw59ErJyKVih/Pu8jyX5xg1gJ+q83w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K7Avm0KI; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5e1b40f68so148332985a.1;
-        Thu, 17 Apr 2025 19:03:37 -0700 (PDT)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c5f720c717so260882985a.0;
+        Thu, 17 Apr 2025 19:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744941817; x=1745546617; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744941820; x=1745546620; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zh63/3O8DJ0AMhBHTeTn6n+OIaLKyrEbfZMtQSeGAQ8=;
-        b=JII0WQpz2+t1A/tZ6++75xUC8kuEJ0fbqSQRyD+CiBEBHHWnFdUPN0ZmvapAz/Sweh
-         aoppKw+RrJxcfZOBcMu8DfSkmAEZuqV4ZDjiAj+NTaHz6hV2RO+rHkNlgLcEkd6SktZQ
-         3MmxNJImcOno4P2DYyyFVgPVmEtBQ/4m0B1EFbF9orimeIBsgtUEiHJXTvR74g2Um2hq
-         7ZA7XuiBCPrVulVefVOB/1OEm1fnx2MJUxDG4SYWDxvqla8HifJex3fLv4VyL73Gc1KW
-         5RXOpW0u4iu1oGVlTiv76xhZbs/QThWxEatVarAvGQ5U86MA8mehpQyb+zs6xPg/DPmL
-         SMXA==
+        bh=JDDlTSs/VGwQH9+y0CG3BqQMPXKKQfsmBI197rBvmx8=;
+        b=K7Avm0KIqs+TeZmw8CmlWoGEZptM3hmChUhLHtH+WOzzN9IBHbvNJOuMspTnY5hPrN
+         wwtKxA/fxmoKesnf5tfoQiPEjnzrmvzNA43tYZpjEz2fkfIe2HHMhqXp1gmSr2Dsv7cC
+         K37/zXcol0RokR0eBx/n8LlUVwox2Fz5PeFa81z6DK01JsL0SqlElAwaHFlVIjchzLqm
+         KRbLPa/Ot4v1Vv4ypn8+g3dVYk8KvFef6dQX5cmNYwI1NNeA6oC+1J2/C4w2IaqO+EC3
+         G+VocG5O4LHw7/P54KuWvpteKaDbZQF+oNgJSv3wkl2grn0RYORDRgT8Z31BagNV/pF3
+         66Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744941817; x=1745546617;
+        d=1e100.net; s=20230601; t=1744941820; x=1745546620;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zh63/3O8DJ0AMhBHTeTn6n+OIaLKyrEbfZMtQSeGAQ8=;
-        b=BpxQouT4FUA8hUZOXdFAvwSKEyqzuwA8AwRdVwvRgea1SjAM6ftZHvFslVXuJ7begh
-         I/sOdEYt6A/GUZCXYiH/Cl9LS4Iu331swHOaEm4GpMOO6WAXiXRSTILbLzIeErfX0Zyb
-         RaX+Z3ji1sa6R5I0PvNMVg0ZEYF+m16LnmVEpDExpVYN6YNmZmMWdr3lOZ5XDSHkmftZ
-         xb9yC4PrEL2YDWi5aM9OniA2Ng3ZvVOlB4leHeXgEz8GqVBrZM8SxuoXTBCWkkNFZsrv
-         bXSWBFv8RBS5VbxG9zxIMq/8MNoqfjuGfi46QkFcs84mLXG8yqq6A3KYtr0OOX9tRSSL
-         VgCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVrX6+bo+35Ux8xFXffwKfSquhjH06hv7bm63011aKoWESahiQqaJaLmdV/fFrkjpk/rgT131pe@vger.kernel.org, AJvYcCWezZynx9G4g1CtSa8TR0PPmGopttxa1KMiNXfW3uj9s4kcfS5tOE99+yXDUXgElynFsy+AmSVUbtlS0+1s@vger.kernel.org, AJvYcCXY2g/+jaVB8f9CWEGg2XdA68b224HfTSjp0xbuRpeHaqtyzzYXUAWQTLXYqOzH5mFMptTqO3ddPB39@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnnlCsl5IgBfPfjDhNv4On5/6STXiGGaileBehSHQkOnNUykh+
-	zdXvN+pSeywfgWZSTJ+WppELRvE1t+nzgHDuifvQYunUn0/zKmrl
-X-Gm-Gg: ASbGncv1wN9pvwz6i4hur6M4cn6pbrExNv9hRYt0BqnlWAtioSg+EtlwSIrzbK4b0FA
-	hyf5/KhymyVULZqfOFKkdEQBylg89baVTKE35D1KRifsm6ulDyZYa3CxPxQKfF7HcjZLePaXeN8
-	XL2AxE5JeUKuSjlmdLi2zBUh3sET78s03MIPD4a5InTZeP4nl5kfrji8i7P6/UrMz35G8NCwG7K
-	mX+1pDq07I4lw/oqfU1DTd19tB5i9UdY8txvR6XVFBpmL1k3sPKWZcJoM2M0gpbWdT7i1NQqe/b
-	TcIzVtL+1MEp0c0e
-X-Google-Smtp-Source: AGHT+IGt6cgriWdw1rXQhHBTfC5DxaFTz/L+44zx6+z+bVDbjk+lg9rrw0J84BJX1QCTaQhEwNnaKw==
-X-Received: by 2002:a05:620a:4415:b0:7c5:6410:3a6 with SMTP id af79cd13be357-7c927fb6a1cmr194704285a.27.1744941816794;
-        Thu, 17 Apr 2025 19:03:36 -0700 (PDT)
+        bh=JDDlTSs/VGwQH9+y0CG3BqQMPXKKQfsmBI197rBvmx8=;
+        b=mhUMoFVIPUa+zZkvRlnELxPA1sQxF5hLgYFdrrOP+64N3wecrkvjlGbwqQyvxQ7WDl
+         /qpJ/FNJf62PhT+X8E/1CY+Ff4hVXDjmlgrGKylU5J9MbMSxxLsFtFGwso/7GN3rA4bA
+         0TSEq2gxx7E2NUzWbcT/SUSXM5tK1eaFmfSF94z813MFbDABVUBJBUZ5nBffkgSbHkcx
+         FNHJj5yR0pP2EmUdywKfO86Nb4hk53E8S/M32wju0zwL4KVKzDPzIdt1Z8y6a7lGg0ml
+         5YoA9FGjUBxcCspI+QIiDAZEJD1IyOCg5bT7BaIN4Ec7/2tNo6iiPdBa6ffPH6/KrIfj
+         48wg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGlCJHiaJiDFnD6v0GsyEDpmEwe3lOD9rE5aM62xrvqTLBfwROuj1/XX0qXHOqgjU3TcxSl7JIdpyS@vger.kernel.org, AJvYcCUbMZ3TV2EksQiIDAhS/YGS/wQk4M8u70XhcilSUZu8JDz+bV3BqwMOR/pytx0XqK+aKOhV1NlAlhyfSoTm@vger.kernel.org, AJvYcCXu56I5zPNtD0worh1AYSX3o71r1+eKvV9DpvmD4/IdsDsBp/CU3euw8ISGpXrEMcMxQdSMEYQO@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6QcrThZSGjamQEcOoqWF+8tfd6e0u6zcX0ryAnPnUZ0EWqUpV
+	rxMuZ1caZRWtUK5mbRaqgPVUyqWnMLFeEwetDRcpwH0Hzp1O8SvV
+X-Gm-Gg: ASbGncuXC6Yrz4P6C3OZRIS1NRVPpjB0avoSlIFNomKTmG1/KejRAsbt+wtmgsdvxRI
+	7ncvgC3usS30duBAOVbGKd6f7IZqnQlZ7ishci4bh+4l8IDX34sJ40Rdqx/jVEBiOEualbLBpu/
+	81CIJPMijyHNmQrHYrSf7CnsiwhpJOOWo+nWdirPfaQT9Xz8wHC5ci+/0+mdNA2SF+38r+YakUT
+	9DnzDn1SIqDHMewmKjS6tMRENQXpJRokHrYne6qn0j2UFi+iv+SF3+zR0t7Fmvwn3EXlaqLcEma
+	EbLOw3lrAhiX5ryXUN2Wof58xEo=
+X-Google-Smtp-Source: AGHT+IFEjFny3a1X7qchHh6Dw4aN7uSJF2fHi9A/vFITik3oyjvzgZhup5MWE3SKXRVhwqPvt9BWGw==
+X-Received: by 2002:a05:620a:2585:b0:7c5:9566:83dc with SMTP id af79cd13be357-7c928304215mr139063485a.25.1744941820021;
+        Thu, 17 Apr 2025 19:03:40 -0700 (PDT)
 Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c925b75c8dsm55892185a.111.2025.04.17.19.03.35
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c925a8c9d9sm56741485a.27.2025.04.17.19.03.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Apr 2025 19:03:36 -0700 (PDT)
+        Thu, 17 Apr 2025 19:03:39 -0700 (PDT)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Michael Turquette <mturquette@baylibre.com>,
 	Stephen Boyd <sboyd@kernel.org>,
@@ -92,10 +92,11 @@ Cc: linux-clk@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH v5 2/5] soc: sophgo: sg2044: Add support for SG2044 TOP syscon device
-Date: Fri, 18 Apr 2025 10:03:21 +0800
-Message-ID: <20250418020325.421257-3-inochiama@gmail.com>
+	Longbin Li <looong.bin@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v5 3/5] dt-bindings: clock: sophgo: add clock controller for SG2044
+Date: Fri, 18 Apr 2025 10:03:22 +0800
+Message-ID: <20250418020325.421257-4-inochiama@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418020325.421257-1-inochiama@gmail.com>
 References: <20250418020325.421257-1-inochiama@gmail.com>
@@ -107,132 +108,286 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The SG2044 TOP device provide PLL clock function in its area.
-Add a mfd definition for it.
+The clock controller on the SG2044 provides common clock function
+for all IPs on the SoC. This device requires PLL clock to function
+normally.
+
+Add definition for the clock controller of the SG2044 SoC.
 
 Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+Reviewed-by: Chen Wang <unicorn_wang@outlook.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/soc/Kconfig                |  1 +
- drivers/soc/Makefile               |  1 +
- drivers/soc/sophgo/Kconfig         | 21 ++++++++++++++
- drivers/soc/sophgo/Makefile        |  3 ++
- drivers/soc/sophgo/sg2044-topsys.c | 45 ++++++++++++++++++++++++++++++
- 5 files changed, 71 insertions(+)
- create mode 100644 drivers/soc/sophgo/Kconfig
- create mode 100644 drivers/soc/sophgo/Makefile
- create mode 100644 drivers/soc/sophgo/sg2044-topsys.c
+ .../bindings/clock/sophgo,sg2044-clk.yaml     |  99 ++++++++++++
+ include/dt-bindings/clock/sophgo,sg2044-clk.h | 153 ++++++++++++++++++
+ 2 files changed, 252 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
+ create mode 100644 include/dt-bindings/clock/sophgo,sg2044-clk.h
 
-diff --git a/drivers/soc/Kconfig b/drivers/soc/Kconfig
-index 6a8daeb8c4b9..11e2383c0654 100644
---- a/drivers/soc/Kconfig
-+++ b/drivers/soc/Kconfig
-@@ -23,6 +23,7 @@ source "drivers/soc/qcom/Kconfig"
- source "drivers/soc/renesas/Kconfig"
- source "drivers/soc/rockchip/Kconfig"
- source "drivers/soc/samsung/Kconfig"
-+source "drivers/soc/sophgo/Kconfig"
- source "drivers/soc/sunxi/Kconfig"
- source "drivers/soc/tegra/Kconfig"
- source "drivers/soc/ti/Kconfig"
-diff --git a/drivers/soc/Makefile b/drivers/soc/Makefile
-index 2037a8695cb2..0381a0abdec8 100644
---- a/drivers/soc/Makefile
-+++ b/drivers/soc/Makefile
-@@ -29,6 +29,7 @@ obj-y				+= qcom/
- obj-y				+= renesas/
- obj-y				+= rockchip/
- obj-$(CONFIG_SOC_SAMSUNG)	+= samsung/
-+obj-y				+= sophgo/
- obj-y				+= sunxi/
- obj-$(CONFIG_ARCH_TEGRA)	+= tegra/
- obj-y				+= ti/
-diff --git a/drivers/soc/sophgo/Kconfig b/drivers/soc/sophgo/Kconfig
+diff --git a/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
 new file mode 100644
-index 000000000000..d97de4a41d5e
+index 000000000000..272e58bdb62c
 --- /dev/null
-+++ b/drivers/soc/sophgo/Kconfig
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# Sophgo SoC drivers
-+#
++++ b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
+@@ -0,0 +1,99 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/clock/sophgo,sg2044-clk.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+if ARCH_SOPHGO || COMPILE_TEST
-+menu "Sophgo SoC drivers"
++title: Sophgo SG2044 Clock Controller
 +
-+config SOPHGO_SG2044_TOPSYS
-+	tristate "Sophgo SG2044 TOP syscon driver"
-+	select MFD_CORE
-+	help
-+	  This is the core driver for the Sophgo SG2044 TOP system
-+	  controller device. This driver provide PLL clock device
-+	  for the SoC.
++maintainers:
++  - Inochi Amaoto <inochiama@gmail.com>
 +
-+	  This driver can also be built as a module.  If so, the module
-+	  will be called sg2044-topsys.
++description: |
++  The Sophgo SG2044 clock controller requires an external oscillator
++  as input clock.
 +
-+endmenu
-+endif
-diff --git a/drivers/soc/sophgo/Makefile b/drivers/soc/sophgo/Makefile
++  All available clocks are defined as preprocessor macros in
++  include/dt-bindings/clock/sophgo,sg2044-clk.h
++
++properties:
++  compatible:
++    const: sophgo,sg2044-clk
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: fpll0
++      - description: fpll1
++      - description: fpll2
++      - description: dpll0
++      - description: dpll1
++      - description: dpll2
++      - description: dpll3
++      - description: dpll4
++      - description: dpll5
++      - description: dpll6
++      - description: dpll7
++      - description: mpll0
++      - description: mpll1
++      - description: mpll2
++      - description: mpll3
++      - description: mpll4
++      - description: mpll5
++
++  clock-names:
++    items:
++      - const: fpll0
++      - const: fpll1
++      - const: fpll2
++      - const: dpll0
++      - const: dpll1
++      - const: dpll2
++      - const: dpll3
++      - const: dpll4
++      - const: dpll5
++      - const: dpll6
++      - const: dpll7
++      - const: mpll0
++      - const: mpll1
++      - const: mpll2
++      - const: mpll3
++      - const: mpll4
++      - const: mpll5
++
++  '#clock-cells':
++    const: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - '#clock-cells'
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/sophgo,sg2044-pll.h>
++
++    clock-controller@50002000 {
++      compatible = "sophgo,sg2044-clk";
++      reg = <0x50002000 0x1000>;
++      #clock-cells = <1>;
++      clocks = <&syscon CLK_FPLL0>, <&syscon CLK_FPLL1>,
++               <&syscon CLK_FPLL2>, <&syscon CLK_DPLL0>,
++               <&syscon CLK_DPLL1>, <&syscon CLK_DPLL2>,
++               <&syscon CLK_DPLL3>, <&syscon CLK_DPLL4>,
++               <&syscon CLK_DPLL5>, <&syscon CLK_DPLL6>,
++               <&syscon CLK_DPLL7>, <&syscon CLK_MPLL0>,
++               <&syscon CLK_MPLL1>, <&syscon CLK_MPLL2>,
++               <&syscon CLK_MPLL3>, <&syscon CLK_MPLL4>,
++               <&syscon CLK_MPLL5>;
++      clock-names = "fpll0", "fpll1", "fpll2", "dpll0",
++                    "dpll1", "dpll2", "dpll3", "dpll4",
++                    "dpll5", "dpll6", "dpll7", "mpll0",
++                    "mpll1", "mpll2", "mpll3", "mpll4",
++                    "mpll5";
++    };
+diff --git a/include/dt-bindings/clock/sophgo,sg2044-clk.h b/include/dt-bindings/clock/sophgo,sg2044-clk.h
 new file mode 100644
-index 000000000000..171a2922d75b
+index 000000000000..d9adca42548e
 --- /dev/null
-+++ b/drivers/soc/sophgo/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-$(CONFIG_SOPHGO_SG2044_TOPSYS)	+= sg2044-topsys.o
-diff --git a/drivers/soc/sophgo/sg2044-topsys.c b/drivers/soc/sophgo/sg2044-topsys.c
-new file mode 100644
-index 000000000000..179f2620b2a9
---- /dev/null
-+++ b/drivers/soc/sophgo/sg2044-topsys.c
-@@ -0,0 +1,45 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/include/dt-bindings/clock/sophgo,sg2044-clk.h
+@@ -0,0 +1,153 @@
++/* SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause */
 +/*
-+ * Sophgo SG2044 multi-function system controller driver
-+ *
-+ * Copyright (C) 2025 Inochi Amaoto <inochiama@gmail.com>
++ * Copyright (C) 2024 Inochi Amaoto <inochiama@gmail.com>
 + */
 +
-+#include <linux/mfd/core.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/property.h>
-+#include <linux/resource.h>
++#ifndef __DT_BINDINGS_SOPHGO_SG2044_CLK_H__
++#define __DT_BINDINGS_SOPHGO_SG2044_CLK_H__
 +
-+static const struct mfd_cell sg2044_topsys_subdev[] = {
-+	{
-+		.name = "sg2044-pll",
-+	},
-+};
++#define CLK_DIV_AP_SYS_FIXED		0
++#define CLK_DIV_AP_SYS_MAIN		1
++#define CLK_DIV_RP_SYS_FIXED		2
++#define CLK_DIV_RP_SYS_MAIN		3
++#define CLK_DIV_TPU_SYS_FIXED		4
++#define CLK_DIV_TPU_SYS_MAIN		5
++#define CLK_DIV_NOC_SYS_FIXED		6
++#define CLK_DIV_NOC_SYS_MAIN		7
++#define CLK_DIV_VC_SRC0_FIXED		8
++#define CLK_DIV_VC_SRC0_MAIN		9
++#define CLK_DIV_VC_SRC1_FIXED		10
++#define CLK_DIV_VC_SRC1_MAIN		11
++#define CLK_DIV_CXP_MAC_FIXED		12
++#define CLK_DIV_CXP_MAC_MAIN		13
++#define CLK_DIV_DDR0_FIXED		14
++#define CLK_DIV_DDR0_MAIN		15
++#define CLK_DIV_DDR1_FIXED		16
++#define CLK_DIV_DDR1_MAIN		17
++#define CLK_DIV_DDR2_FIXED		18
++#define CLK_DIV_DDR2_MAIN		19
++#define CLK_DIV_DDR3_FIXED		20
++#define CLK_DIV_DDR3_MAIN		21
++#define CLK_DIV_DDR4_FIXED		22
++#define CLK_DIV_DDR4_MAIN		23
++#define CLK_DIV_DDR5_FIXED		24
++#define CLK_DIV_DDR5_MAIN		25
++#define CLK_DIV_DDR6_FIXED		26
++#define CLK_DIV_DDR6_MAIN		27
++#define CLK_DIV_DDR7_FIXED		28
++#define CLK_DIV_DDR7_MAIN		29
++#define CLK_DIV_TOP_50M			30
++#define CLK_DIV_TOP_AXI0		31
++#define CLK_DIV_TOP_AXI_HSPERI		32
++#define CLK_DIV_TIMER0			33
++#define CLK_DIV_TIMER1			34
++#define CLK_DIV_TIMER2			35
++#define CLK_DIV_TIMER3			36
++#define CLK_DIV_TIMER4			37
++#define CLK_DIV_TIMER5			38
++#define CLK_DIV_TIMER6			39
++#define CLK_DIV_TIMER7			40
++#define CLK_DIV_CXP_TEST_PHY		41
++#define CLK_DIV_CXP_TEST_ETH_PHY	42
++#define CLK_DIV_C2C0_TEST_PHY		43
++#define CLK_DIV_C2C1_TEST_PHY		44
++#define CLK_DIV_PCIE_1G			45
++#define CLK_DIV_UART_500M		46
++#define CLK_DIV_GPIO_DB			47
++#define CLK_DIV_SD			48
++#define CLK_DIV_SD_100K			49
++#define CLK_DIV_EMMC			50
++#define CLK_DIV_EMMC_100K		51
++#define CLK_DIV_EFUSE			52
++#define CLK_DIV_TX_ETH0			53
++#define CLK_DIV_PTP_REF_I_ETH0		54
++#define CLK_DIV_REF_ETH0		55
++#define CLK_DIV_PKA			56
++#define CLK_MUX_DDR0			57
++#define CLK_MUX_DDR1			58
++#define CLK_MUX_DDR2			59
++#define CLK_MUX_DDR3			60
++#define CLK_MUX_DDR4			61
++#define CLK_MUX_DDR5			62
++#define CLK_MUX_DDR6			63
++#define CLK_MUX_DDR7			64
++#define CLK_MUX_NOC_SYS			65
++#define CLK_MUX_TPU_SYS			66
++#define CLK_MUX_RP_SYS			67
++#define CLK_MUX_AP_SYS			68
++#define CLK_MUX_VC_SRC0			69
++#define CLK_MUX_VC_SRC1			70
++#define CLK_MUX_CXP_MAC			71
++#define CLK_GATE_AP_SYS			72
++#define CLK_GATE_RP_SYS			73
++#define CLK_GATE_TPU_SYS		74
++#define CLK_GATE_NOC_SYS		75
++#define CLK_GATE_VC_SRC0		76
++#define CLK_GATE_VC_SRC1		77
++#define CLK_GATE_DDR0			78
++#define CLK_GATE_DDR1			79
++#define CLK_GATE_DDR2			80
++#define CLK_GATE_DDR3			81
++#define CLK_GATE_DDR4			82
++#define CLK_GATE_DDR5			83
++#define CLK_GATE_DDR6			84
++#define CLK_GATE_DDR7			85
++#define CLK_GATE_TOP_50M		86
++#define CLK_GATE_SC_RX			87
++#define CLK_GATE_SC_RX_X0Y1		88
++#define CLK_GATE_TOP_AXI0		89
++#define CLK_GATE_INTC0			90
++#define CLK_GATE_INTC1			91
++#define CLK_GATE_INTC2			92
++#define CLK_GATE_INTC3			93
++#define CLK_GATE_MAILBOX0		94
++#define CLK_GATE_MAILBOX1		95
++#define CLK_GATE_MAILBOX2		96
++#define CLK_GATE_MAILBOX3		97
++#define CLK_GATE_TOP_AXI_HSPERI		98
++#define CLK_GATE_APB_TIMER		99
++#define CLK_GATE_TIMER0			100
++#define CLK_GATE_TIMER1			101
++#define CLK_GATE_TIMER2			102
++#define CLK_GATE_TIMER3			103
++#define CLK_GATE_TIMER4			104
++#define CLK_GATE_TIMER5			105
++#define CLK_GATE_TIMER6			106
++#define CLK_GATE_TIMER7			107
++#define CLK_GATE_CXP_CFG		108
++#define CLK_GATE_CXP_MAC		109
++#define CLK_GATE_CXP_TEST_PHY		110
++#define CLK_GATE_CXP_TEST_ETH_PHY	111
++#define CLK_GATE_PCIE_1G		112
++#define CLK_GATE_C2C0_TEST_PHY		113
++#define CLK_GATE_C2C1_TEST_PHY		114
++#define CLK_GATE_UART_500M		115
++#define CLK_GATE_APB_UART		116
++#define CLK_GATE_APB_SPI		117
++#define CLK_GATE_AHB_SPIFMC		118
++#define CLK_GATE_APB_I2C		119
++#define CLK_GATE_AXI_DBG_I2C		120
++#define CLK_GATE_GPIO_DB		121
++#define CLK_GATE_APB_GPIO_INTR		122
++#define CLK_GATE_APB_GPIO		123
++#define CLK_GATE_SD			124
++#define CLK_GATE_AXI_SD			125
++#define CLK_GATE_SD_100K		126
++#define CLK_GATE_EMMC			127
++#define CLK_GATE_AXI_EMMC		128
++#define CLK_GATE_EMMC_100K		129
++#define CLK_GATE_EFUSE			130
++#define CLK_GATE_APB_EFUSE		131
++#define CLK_GATE_SYSDMA_AXI		132
++#define CLK_GATE_TX_ETH0		133
++#define CLK_GATE_AXI_ETH0		134
++#define CLK_GATE_PTP_REF_I_ETH0		135
++#define CLK_GATE_REF_ETH0		136
++#define CLK_GATE_APB_RTC		137
++#define CLK_GATE_APB_PWM		138
++#define CLK_GATE_APB_WDT		139
++#define CLK_GATE_AXI_SRAM		140
++#define CLK_GATE_AHB_ROM		141
++#define CLK_GATE_PKA			142
 +
-+static int sg2044_topsys_probe(struct platform_device *pdev)
-+{
-+	return devm_mfd_add_devices(&pdev->dev, PLATFORM_DEVID_AUTO,
-+				    sg2044_topsys_subdev,
-+				    ARRAY_SIZE(sg2044_topsys_subdev),
-+				    NULL, 0, NULL);
-+}
-+
-+static const struct of_device_id sg2044_topsys_of_match[] = {
-+	{ .compatible = "sophgo,sg2044-top-syscon" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, sg2044_topsys_of_match);
-+
-+static struct platform_driver sg2044_topsys_driver = {
-+	.probe = sg2044_topsys_probe,
-+	.driver = {
-+		.name = "sg2044-topsys",
-+		.of_match_table = sg2044_topsys_of_match,
-+	},
-+};
-+module_platform_driver(sg2044_topsys_driver);
-+
-+MODULE_AUTHOR("Inochi Amaoto <inochiama@gmail.com>");
-+MODULE_DESCRIPTION("Sophgo SG2044 multi-function system controller driver");
-+MODULE_LICENSE("GPL");
++#endif /* __DT_BINDINGS_SOPHGO_SG2044_CLK_H__ */
 -- 
 2.49.0
 
