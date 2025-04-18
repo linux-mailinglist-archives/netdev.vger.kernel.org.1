@@ -1,124 +1,114 @@
-Return-Path: <netdev+bounces-184156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391DEA93832
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:01:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5594A93871
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 16:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C309465FDF
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:01:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84C3B9204DA
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 14:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64587B676;
-	Fri, 18 Apr 2025 14:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C112918DF6E;
+	Fri, 18 Apr 2025 14:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="W6P7/rLf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jj1mHBhi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31B2171A1
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 14:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D602189915
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 14:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744984890; cv=none; b=qGeIcvr07IaDBuvV1UhCKxw5F3/b3OuiUXZYIl910mBi+KXqG64Q4XZ/Y54qmU6yspVJeMXoUNZ/hmsL8rpW0v8cRTAXy7VCa5Pgrjbq+AFWdR/7yQBOHuz6iaUUqkOnWlLWhR3lKoGdIOUYSeNgmG0iSWe+W96v0aKkj8dIRwQ=
+	t=1744985653; cv=none; b=N9I5gQAUPSjIA/Qby5tQGItmC+3Re60Xq4udPWI8wvf9gtXw6CU4+FS8OXUwstRmdJ9Ll9sQkp4Er6Bkwp5F/RsFkQKcVxWdqAE7g6/5z37/Hrux+k8kY8Vip1yQ7s3L+JdjT3RHCZZlWZJci8AvCggtL7NS+vJMtbjXGVZbPKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744984890; c=relaxed/simple;
-	bh=PQJhYQhsMv0MpbePzzjBsZ++F0flYM/PygLw6HSKZcw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=WlV6DCY+v2ihMW65PcLQl/TXIVkMQR29JNgucYxhctpk3RrQb1okvpYFKejSGLSeAa91HaYdx4bSkmTGwq5HwWkwDcUCiaUOM6yLVSrnP0eKXf3Eiw0E4ZF08sU8kCRfNemtLRyXUIayXW0ypWBlFgB5KbC1eKkrUrwDEFsCV38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=W6P7/rLf; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85d9a87660fso169406739f.1
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 07:01:27 -0700 (PDT)
+	s=arc-20240116; t=1744985653; c=relaxed/simple;
+	bh=+s14ujFBBxr6ZBLibix6s/f3Zmt1IGlZJv/wTUCAZj0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d6OBm2bepkLL27Mmg6wDyTWFCheMPDfrgc91LRNVzMuNuebftPuILOE+0DQD+a2siglH9EOKw8Pcw+RXZuHYFLlLDk/tF1lvkhZnguLg8rU6PD2f/ctYb7LDsFdDsRuU1x7elMB9M6U9no3tICBLJqXLPEAl+mBEYki5I8pSWvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jj1mHBhi; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b0db0b6a677so1022580a12.2
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 07:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1744984887; x=1745589687; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sC/BqjM5mkoHmF0ZEZAC3mR2mFzpKmqw2rLh58Lnr/M=;
-        b=W6P7/rLf4zuGzWdA7fyiwkikjTJpR/Qsqsc/hqa2BSxttkvLdpWkNddulz9J1eikah
-         0fwK7gOvLTDlSgFYpxJBcfFHRehzrdhDYT7q0EoeqShm5dlZ4pD3X1Jxk8OA2n5DFWLS
-         XnkID9dMdpXaKpZHQFhZ1NANqs/mKj0nVk0A3uw96WSzhHnGhX/LsmUfIHKMX3bfKmN9
-         wIwVXCkEMhps/y9S12IHXAqBjTUZbkPpciI5PC3mNonIdf5YcR2KKNp4F0cBEz0csBfe
-         ogNMAccLPBRr7MHcpxLcu+0b49mCiwBEJkjtLIYih0iWxOvAsEw7qeiT0VOgMt7kshgr
-         ENeQ==
+        d=gmail.com; s=20230601; t=1744985651; x=1745590451; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CJVqYWfvxsMwajl2MePkR1VsXo/YFcgeoMoojX0CTzo=;
+        b=jj1mHBhi7HnwV1pQQzoTHPz6ir2u6SKcskfAq7zU/vLdmN/Buc3cO/pJT/JjiGWxlS
+         mxBU0zJ3nyuTivRcxZQUm0zQqukUj8Fus+aMld35IYsSLSC0IsvLRZqaCuZm8oqP0UWY
+         N4QaXdb+W75lJ1Un70ZzXXnQn1Vk6w3A22XlkogLPDYzR9DOfp+shP9Rrf4hKr2yX9ae
+         UjGX4DZFyEhv8+LoXU9mcK8po5d+n0VyHJq2z0lNGQzDhNEBSKw58tIVplC8cPv4MSNf
+         8io14CrPfl35lP/Z1MErkzzH1L6ff4ANJM+430vSAcj4WQYvNM1bN8Vn6odMuW8DDJgr
+         sI/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744984887; x=1745589687;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sC/BqjM5mkoHmF0ZEZAC3mR2mFzpKmqw2rLh58Lnr/M=;
-        b=w+gA/zcrA/6Xzefj1+obLr4QAWC961aLKSY8RkkDAFk5ECBnSZcXgK6IHIEFlNuvvr
-         Z6v2lTzjUMagoI95Oto3GOND1yYKDr62bGCOtc1f5mamxo0OfiMqCFy5APbFJSJWFd0d
-         nGJNyYdIRJ1oV57UpxhleRjLB1tyouP3FOZa5yloi4+pNk9GRiwH70walvS78piC5CBM
-         sXrcF54+hv+VJkYtfFeXS8FvmkI3llneTp7wqAVW7LGb1TW2ad5eyVTpMVt8o4mK0L41
-         sxeWEJYqjPBOnPuRHamakWAuYDucwxfqLKZBCmojn/zc3T44vei9g7I5JSac0orFw1CJ
-         02+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUNBbXsAEfz6dGXhC9Vi89LhiJiwv7WscjzKpKLcqJOQXs0/LtfyrjT4q3LyeOzTG0If7vfD40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHxfIqDXWmA5Lfaacn8vs/Oy8IU6ZangJ+A8zxaYDJGYNMEarx
-	/UNmxDV7IO/HB2s/nuafqxh6AU4kvkFwxXpkvXiQK8DggQzw88jdokr+G9nctC8=
-X-Gm-Gg: ASbGncvIaGRU3jwaVLbGaEWrmihTKOygJNAQ4QKJsqnLWZa3xzOd9aKlKW2jrCcKR64
-	Hqp0dVByr0fZJ92mU0gBGrWBZ3/AIWVnw+RhtWImy8VOsZA0f6Jl3v5V8OhFzNEaD2+N4kGeT57
-	zLtcw3fY0yPRp1rdMB0WW3zsJ440FDPCHw1Jax9cdvaJsKfAsSVur/GzrpONZ+tWCzYbV7gaq1+
-	EhjUTnNDUzNaPsdADTPmhr7CEuqyiwf+KmwSeNqaqIhc0PObo4/Ii2rhYlKBsG1PpkTPzHWAaJg
-	e5qUoj+Gb/r2IYDJRGKJf/1G94tDo+U=
-X-Google-Smtp-Source: AGHT+IGxSs5KjMlhBU5ReFue9k/mK/MwbQI1TY+914sEhLQKUPzGe8W+IItktORYdswpMLQPVCp3Fg==
-X-Received: by 2002:a05:6602:370a:b0:85b:43a3:66ad with SMTP id ca18e2360f4ac-861dbe3b67bmr227329539f.8.1744984886849;
-        Fri, 18 Apr 2025 07:01:26 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f6a37fb41dsm463105173.38.2025.04.18.07.01.25
+        d=1e100.net; s=20230601; t=1744985651; x=1745590451;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJVqYWfvxsMwajl2MePkR1VsXo/YFcgeoMoojX0CTzo=;
+        b=n4Gm/O56m5v+Zq5Im2qBMMGWEKkkO0KG7lTHpiUl11j15JeeRXqr+Cpc5ijT+bXLAQ
+         1u3lWa+dmRQn2dXbf6Wh3pfolXBcJ2JwOg3GVkzlScaV8llAyFyL6EoFMC3+mlulx6lw
+         zVGSYA20f0Yfts8r78w5AZW+FyMRtmVPzPRM3LmXOftu4NnRK5arDImDoMH49p9QrJxx
+         LW+agUfGZcQG+63yrzYqSVcU38nVkNyAtsGpRIDRvaBStW9srWROCbqwhxD9cjnFfMhv
+         bXUhkiDokZf2GK4RyBQaJFjsmsGGXMAQBLcjctnHvUHpMy3kvn2NY+bh0Ra6X83CmnhN
+         8m5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWa6plCEtef6z/H/VSy95IBnMl1y5VKYNOBaLpjNZCwpTkY+gZBfq1POagNsxAoMqif8wg4ikI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFl5IYp2FJkHGYSYkskJbAMtMgK5rBgOuHVTo+saWX4gA7EcAl
+	7j9pho0GZSHxE2cWUxjmMfeqIFrvB7dxZXiIuuDNfqZw/MMh9y8=
+X-Gm-Gg: ASbGncvka4L7qJETCREuZ+Ya1Z580k8GkOhR4WUz2wV4qATcLMX3QOkxghmnfGDhPZS
+	i1YLRBRYVE5dH1knk8L3Mt6OOReOqGYQ/yZ6FkwzGO1RzZuc3vQ/eQP/axtYhIfmotWeWdbZPFx
+	stToBAQvmn6Ms+2uFudtHtR1yQwVdawKfjMOFXD1p6VvTju/O/o+DSQbIXWaVPMFEWWghALfJ0G
+	EDMBLWGrN7HrO3FyfcON6Zra3TT6leOhAxALOzB+6ctr5gSLxkHit52PG6oXsEugFolCbG40Cj/
+	hk2Elxa6g82kLPwGgv3Zj1Uu87EUcTF/MkhUXxfh
+X-Google-Smtp-Source: AGHT+IHJNqp1s/y/9go5qiH7g/2jUGRLtSymcEVqKPAQRWreeDuASeA4kh6gFuKJVofQG9cmGLPYdA==
+X-Received: by 2002:a17:903:1b0c:b0:224:76f:9e44 with SMTP id d9443c01a7336-22c5357a13dmr39724755ad.8.1744985651415;
+        Fri, 18 Apr 2025 07:14:11 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50fda402sm16877175ad.232.2025.04.18.07.14.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 07:01:26 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
- Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>, 
- netdev@vger.kernel.org
-In-Reply-To: <ef9b7db249b14f6e0b570a1bb77ff177389f881c.1744965853.git.asml.silence@gmail.com>
-References: <ef9b7db249b14f6e0b570a1bb77ff177389f881c.1744965853.git.asml.silence@gmail.com>
-Subject: Re: [PATCH io_uring-6.15] io_uring/zcrx: fix late dma unmap for a
- dead dev
-Message-Id: <174498488589.689807.7439507318071758979.b4-ty@kernel.dk>
-Date: Fri, 18 Apr 2025 08:01:25 -0600
+        Fri, 18 Apr 2025 07:14:10 -0700 (PDT)
+Date: Fri, 18 Apr 2025 07:14:10 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com,
+	sdf@fomichev.me, ap420073@gmail.com
+Subject: Re: [PATCH net] net: fix the missing unlock for detached devices
+Message-ID: <aAJeMtRlBIMGfdN2@mini-arch>
+References: <20250418015317.1954107-1-kuba@kernel.org>
+ <CAHS8izMnK0C0sQpK+5NoL-ETNjJ+6BUhx_Bgq9drViUaic+W1A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMnK0C0sQpK+5NoL-ETNjJ+6BUhx_Bgq9drViUaic+W1A@mail.gmail.com>
 
-
-On Fri, 18 Apr 2025 13:02:27 +0100, Pavel Begunkov wrote:
-> There is a problem with page pools not dma-unmapping immediately
-> when the device is going down, and delaying it until the page pool is
-> destroyed, which is not allowed (see links). That just got fixed for
-> normal page pools, and we need to address memory providers as well.
+On 04/18, Mina Almasry wrote:
+> On Thu, Apr 17, 2025 at 6:53 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > The combined condition was left as is when we converted
+> > from __dev_get_by_index() to netdev_get_by_index_lock().
+> > There was no need to undo anything with the former, for
+> > the latter we need an unlock.
+> >
+> > Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
-> Unmap pages in the memory provider uninstall callback, and protect it
-> with a new lock. There is also a gap between a dma mapping is created
-> and the mp is installed, so if the device is killed in between,
-> io_uring would be hodling dma mapping to a dead device with no one to
-> call ->uninstall. Move it to page pool init and rely on ->is_mapped to
-> make sure it's only done once.
-> 
-> [...]
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-Applied, thanks!
+Mina, the same (unlock netedev on !present) needs to happen for
+https://lore.kernel.org/netdev/20250417231540.2780723-5-almasrymina@google.com/
 
-[1/1] io_uring/zcrx: fix late dma unmap for a dead dev
-      commit: f12ecf5e1c5eca48b8652e893afcdb730384a6aa
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Presumably you'll do another repost at some point?
 
