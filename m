@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-183988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-183991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EA1DA92E99
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:06:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C410A92E9D
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 02:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E2AD4675E9
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA123B9AF6
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 00:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9D7372;
-	Fri, 18 Apr 2025 00:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A9546BF;
+	Fri, 18 Apr 2025 00:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YxreyFj/"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="daDwkX3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02A710E3
-	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD5F1C32
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 00:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744934775; cv=none; b=B6bny2g+3yAASSVVzMo5Zql095v3VjW4CZNDBloMb7v+WtMI+mtBWTl3V6N+KkgFqkx7pY3yemclVPH/mua04j3Y+YBu61gBJv7et7x16/kFZrryZe7ZBMVa/skgIpEwHkufJoTuie//Sd6kYDOq84DaAq4HTOzkuVQr7OEEb1k=
+	t=1744934795; cv=none; b=Tfy9w1MQebV9WJ6gDbqJNCmGacSns61vr14lP6qYz8aCLohfbp/dfzJWuetGJFPiP8OkOFZYKyf51/Jw/1J0chNErf/jkhUL25QPyBSZazPgtyFaCMsRdhg3ypznl4KO+BQ4e3b+H2b5coZQvFMACQf86jGmNRV/+wgDiAoXKHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744934775; c=relaxed/simple;
-	bh=17yaz042v70uixxtwHiT4iDao47Ci0n5dWsP3eCHUnM=;
+	s=arc-20240116; t=1744934795; c=relaxed/simple;
+	bh=dwI7xtaXTwbiE+y7Ca8Un1ic/RVZGEmvZzd46q1BDAY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ddBal4o407VEHhKOoN8WiprrrqSZRXn1x5UFGg3RsSMaurUWdX9SfOOnFnv6F0WPlYKhVGrgL+BBHYvbgJW2fH2Oz+3YlG+cXyMl7AE1yy1+ni0KAIxT4Tvcgeein+Qk/i8ludcNNNEXs7AdKkGSvEeEstgKywCUXSuS2HOpSg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YxreyFj/; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=b+lxlvzvmaagK+x7eYY7cZu0E179jRarb2zW3Ln0gBwKXtG+ZL9o5ORZaiTieEVnm/S4qMVw9Eq9hxdBjGd+QpFlPNMD7LM1Ck2VEjCB6gP9lRUUaqEQ7vwzqd113LIYDKDGjkPNJImb4mK2SvOlHqc7jlaqR8H+bLkLxZubPN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=daDwkX3d; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744934771; x=1776470771;
+  t=1744934795; x=1776470795;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=eC7aoslAjvMHTbit52MU8ZRxsQLhgKp0OyPIG4cKIYg=;
-  b=YxreyFj/cHGcarneqgHyG0nBzCsVMiyY090n/sUqNuDdOonkGmeowZJH
-   uAXEew/RRUWGrDEATAkyxbfWUfl4xf8gFmKuBAWesgwqlE+9JwRcUHid3
-   wmNRlcKK1c567f3Z9nxtaCSskQPFiNExHi+KWCtoJszT1Sr/QFW/IOlg2
-   Q=;
+  bh=vLwtUWVIpvkkYedTFKAROR42+ngFJH0Kh9G+u85bfrQ=;
+  b=daDwkX3daAfQl1eZ1FblJeUiEZG0SHkj3/FNArRX67O5LGUCVRCDOQqn
+   RAQ0P5x37DNVcLVVTKmcJSCaLpzMe0jEcT3AiJYz+SKnasoKU7jFZAJCl
+   U8TsebJhsnaxYu5OqAFZOe8+LVLiG33FYugUUA7WEqcD362ScpZHyqIHS
+   U=;
 X-IronPort-AV: E=Sophos;i="6.15,220,1739836800"; 
-   d="scan'208";a="512500936"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:06:10 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:26613]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.20:2525] with esmtp (Farcaster)
- id 84e25271-5722-4bf1-a20f-019399fedecc; Fri, 18 Apr 2025 00:06:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 84e25271-5722-4bf1-a20f-019399fedecc
+   d="scan'208";a="490407561"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2025 00:06:33 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:36211]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.240:2525] with esmtp (Farcaster)
+ id 4ee7b281-462b-4014-9959-cd4e7f4b755d; Fri, 18 Apr 2025 00:06:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 4ee7b281-462b-4014-9959-cd4e7f4b755d
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:06:07 +0000
+ Fri, 18 Apr 2025 00:06:31 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.94.49.59) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 18 Apr 2025 00:06:05 +0000
+ Fri, 18 Apr 2025 00:06:29 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 03/15] ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
-Date: Thu, 17 Apr 2025 17:03:44 -0700
-Message-ID: <20250418000443.43734-4-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 04/15] ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().
+Date: Thu, 17 Apr 2025 17:03:45 -0700
+Message-ID: <20250418000443.43734-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250418000443.43734-1-kuniyu@amazon.com>
 References: <20250418000443.43734-1-kuniyu@amazon.com>
@@ -77,135 +77,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+X-ClientProxiedBy: EX19D035UWA003.ant.amazon.com (10.13.139.86) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-ip6_route_info_create() is called from 3 functions:
+In ip6_route_multipath_add(), we call rt6_qualify_for_ecmp() for each
+entry.  If it returns false, the request fails.
 
-  * ip6_route_add()
-  * ip6_route_multipath_add()
-  * addrconf_f6i_alloc()
+rt6_qualify_for_ecmp() returns false if either of the conditions below
+is true:
 
-addrconf_f6i_alloc() does not need validation for struct fib6_config in
-ip6_route_info_create().
+  1. f6i->fib6_flags has RTF_ADDRCONF
+  2. f6i->nh is not NULL
+  3. f6i->fib6_nh->fib_nh_gw_family is AF_UNSPEC
 
-ip6_route_multipath_add() calls ip6_route_info_create() for multiple
-routes with slightly different fib6_config instances, which is copied
-from the base config passed from userspace.  So, we need not validate
-the same config repeatedly.
+1 is unnecessary because rtm_to_fib6_config() never sets RTF_ADDRCONF
+to cfg->fc_flags.
 
-Let's move such validation into rtm_to_fib6_config().
+2. is equivalent with cfg->fc_nh_id.
+
+3. can be replaced by checking RTF_GATEWAY in the base and each multipath
+entry because AF_INET6 is set to f6i->fib6_nh->fib_nh_gw_family only when
+cfg.fc_is_fdb is true or RTF_GATEWAY is set, but the former is always
+false.
+
+These checks do not require RCU and can be done earlier.
+
+Let's perform the equivalent checks in rtm_to_fib6_multipath_config().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/ipv6/route.c | 79 +++++++++++++++++++++++++-----------------------
- 1 file changed, 42 insertions(+), 37 deletions(-)
+v3: Explain the checks do not require RCU.
+---
+ net/ipv6/route.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 4de7abe5ee02..23102f37f220 100644
+index 23102f37f220..5f370c269e64 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -3739,38 +3739,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
- 	int err = -EINVAL;
- 	int addr_type;
- 
--	/* RTF_PCPU is an internal flag; can not be set by userspace */
--	if (cfg->fc_flags & RTF_PCPU) {
--		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_PCPU");
--		goto out;
--	}
--
--	/* RTF_CACHE is an internal flag; can not be set by userspace */
--	if (cfg->fc_flags & RTF_CACHE) {
--		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_CACHE");
--		goto out;
--	}
--
--	if (cfg->fc_type > RTN_MAX) {
--		NL_SET_ERR_MSG(extack, "Invalid route type");
--		goto out;
--	}
--
--	if (cfg->fc_dst_len > 128) {
--		NL_SET_ERR_MSG(extack, "Invalid prefix length");
--		goto out;
--	}
--	if (cfg->fc_src_len > 128) {
--		NL_SET_ERR_MSG(extack, "Invalid source address length");
--		goto out;
--	}
--#ifndef CONFIG_IPV6_SUBTREES
--	if (cfg->fc_src_len) {
--		NL_SET_ERR_MSG(extack,
--			       "Specifying source address requires IPV6_SUBTREES to be enabled");
--		goto out;
--	}
--#endif
- 	if (cfg->fc_nh_id) {
- 		nh = nexthop_find_by_id(net, cfg->fc_nh_id);
- 		if (!nh) {
-@@ -3835,11 +3803,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
- 	rt->fib6_src.plen = cfg->fc_src_len;
- #endif
- 	if (nh) {
--		if (rt->fib6_src.plen) {
--			NL_SET_ERR_MSG(extack, "Nexthops can not be used with source routing");
--			err = -EINVAL;
--			goto out_free;
--		}
- 		if (!nexthop_get(nh)) {
- 			NL_SET_ERR_MSG(extack, "Nexthop has been deleted");
- 			err = -ENOENT;
-@@ -5239,6 +5202,48 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
+@@ -5030,6 +5030,7 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
  	}
  
-+	if (newroute) {
-+		/* RTF_PCPU is an internal flag; can not be set by userspace */
-+		if (cfg->fc_flags & RTF_PCPU) {
-+			NL_SET_ERR_MSG(extack, "Userspace can not set RTF_PCPU");
-+			goto errout;
-+		}
+ 	do {
++		bool has_gateway = cfg->fc_flags & RTF_GATEWAY;
+ 		int attrlen = rtnh_attrlen(rtnh);
+ 
+ 		if (attrlen > 0) {
+@@ -5043,9 +5044,17 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
+ 						       "Invalid IPv6 address in RTA_GATEWAY");
+ 					return -EINVAL;
+ 				}
 +
-+		/* RTF_CACHE is an internal flag; can not be set by userspace */
-+		if (cfg->fc_flags & RTF_CACHE) {
-+			NL_SET_ERR_MSG(extack, "Userspace can not set RTF_CACHE");
-+			goto errout;
-+		}
-+
-+		if (cfg->fc_type > RTN_MAX) {
-+			NL_SET_ERR_MSG(extack, "Invalid route type");
-+			goto errout;
-+		}
-+
-+		if (cfg->fc_dst_len > 128) {
-+			NL_SET_ERR_MSG(extack, "Invalid prefix length");
-+			goto errout;
-+		}
-+
-+#ifdef CONFIG_IPV6_SUBTREES
-+		if (cfg->fc_src_len > 128) {
-+			NL_SET_ERR_MSG(extack, "Invalid source address length");
-+			goto errout;
-+		}
-+
-+		if (cfg->fc_nh_id &&  cfg->fc_src_len) {
-+			NL_SET_ERR_MSG(extack, "Nexthops can not be used with source routing");
-+			goto errout;
-+		}
-+#else
-+		if (cfg->fc_src_len) {
++				has_gateway = true;
+ 			}
+ 		}
+ 
++		if (newroute && (cfg->fc_nh_id || !has_gateway)) {
 +			NL_SET_ERR_MSG(extack,
-+				       "Specifying source address requires IPV6_SUBTREES to be enabled");
-+			goto errout;
++				       "Device only routes can not be added for IPv6 using the multipath API.");
++			return -EINVAL;
 +		}
-+#endif
-+	}
 +
- 	err = 0;
- errout:
- 	return err;
+ 		rtnh = rtnh_next(rtnh, &remaining);
+ 	} while (rtnh_ok(rtnh, remaining));
+ 
+@@ -5387,13 +5396,6 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 			rt = NULL;
+ 			goto cleanup;
+ 		}
+-		if (!rt6_qualify_for_ecmp(rt)) {
+-			err = -EINVAL;
+-			NL_SET_ERR_MSG(extack,
+-				       "Device only routes can not be added for IPv6 using the multipath API.");
+-			fib6_info_release(rt);
+-			goto cleanup;
+-		}
+ 
+ 		rt->fib6_nh->fib_nh_weight = rtnh->rtnh_hops + 1;
+ 
 -- 
 2.49.0
 
