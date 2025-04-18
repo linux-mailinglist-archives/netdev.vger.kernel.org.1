@@ -1,167 +1,122 @@
-Return-Path: <netdev+bounces-184205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34B8CA93B96
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 19:01:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D2BA93BA2
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 19:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76AB04475AF
-	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 17:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF45464428
+	for <lists+netdev@lfdr.de>; Fri, 18 Apr 2025 17:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DCC219311;
-	Fri, 18 Apr 2025 17:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5F7215782;
+	Fri, 18 Apr 2025 17:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ZTta/6gI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dan0ahEz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D112144D6;
-	Fri, 18 Apr 2025 17:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600A74CB5B
+	for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 17:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744995697; cv=none; b=J7FcOQabwu6y/b/WAduNHz8JizEp+3kCLizclOMrV4koZZFJkgFtccBbQs2OFiXyY5pIwf4xAAFL7zq+7YfQenNTqjiB6CDIX6M5Gy44y+NRgFBN1OjcRyD+B1XWDWC9g214Rdidwzv2aRuzMCj469MC13DBI9DuvlKoXXCRGo8=
+	t=1744995877; cv=none; b=jFzTLd5CwMqu2YpmIRQFQ2i8tCMvoDXg7RcSR8e20NWSFGSnEzPxwJk05zLGXQ6ajMG5E9euLB1k6D+Ngn2xtQ1Bc/WJj96ejI2vMLH+NznvOYB2GaIQAH0jjEuexTh2qY0KOAjOUi1+6NpRq2mr3SlSXRUhVTDYgpbJNYh50lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744995697; c=relaxed/simple;
-	bh=oI+EaJPKASRaj7ZktB84nugSnxLbHdpW/DC7Ynxq2b8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GqwkvH5J95h+nBQFpJL1FSLm+hHrT/tQo/5/O9VcrpSLk0vsYFn4faMjOsALNKGLGAxwAImZfDWGEiEn2LguL/nGUJ6yGq9leYIT67tLBSGmCG+WcrzRa9WJJRqHyoCYVXXUtCQ+K9hSvKCEt0FSZF/klGtqM9/TrZa9O1BKu+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ZTta/6gI; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 91FAB101BF2CB;
-	Fri, 18 Apr 2025 19:01:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1744995692; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=tBWiIVtzQkFeHoj4T9tvDBw4U0JfIJ9IFgfClrd78xY=;
-	b=ZTta/6gIatx/2uKRev0Lo3JfA6NTfSrNlGjUkaEApTJ5CPR8pAmVVlJruzwF/8ERax+qyu
-	nwmQ1jXCPb5HUcudTgnZskN5oKszxyfOI0/tT0MA5sjOGV2a0OuI7tD/QXNU/jra9Cuz8F
-	/T6w6oeBtTZFGoOsv9E2QhBTtRA+WmAaYrdvIjw3qokrhv6T0ouxsnbomlHjDkWsZsViqs
-	R1UkQiGoFPI2cZT1QVhWXjCIFy+o6U7p3EK9w6cjghuSQdIlSdejnsSIRQLpjMlHhT5Z60
-	gY1jJGXv9CkRZzZvxdHB0Yx/dCJ7HaqotiKNSkdHaCS10eSDHevHSVFciD/pXQ==
-Date: Fri, 18 Apr 2025 19:01:25 +0200
-From: Pavel Machek <pavel@denx.de>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com,
-	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	aleksander.lobakin@intel.com, kory.maincent@bootlin.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.10 13/15] net: vlan: don't propagate flags on
- open
-Message-ID: <aAKFZT6sPCZX63y6@duo.ucw.cz>
-References: <20250403191002.2678588-1-sashal@kernel.org>
- <20250403191002.2678588-13-sashal@kernel.org>
+	s=arc-20240116; t=1744995877; c=relaxed/simple;
+	bh=OTapgSwgLLdxTvhxyYt2b7x7+wuenEteyF9sDvzxssU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EiRSv7T4xnFB3Yy/QxDO66UkvbsMwOUabxtTb6EEkOpt70XQ7gkItmeLRNqVU4n0qC3I+iOzCn1hJyD3x4begxO+kcB6JiXcMYjJCqZRAWf5LxSNTsTLirnF/JRb48nvJG0D1o4QYj9H2XuQClf1lOEJ2QhGo6TcxrECShVe2AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dan0ahEz; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E84B3439EB;
+	Fri, 18 Apr 2025 17:04:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744995873;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Us5RYVBuh7gVLQ8W7Dr1/7D4Y1egBvTGmiLiLUIPuoY=;
+	b=dan0ahEzr2sSSJTbNwljFF8UC7qMLk+W3FepXqKojPKi8q16jkSpwxEh2hUrjJ8zedbtLp
+	WeSO3aYsXEMf2joqe3gTx5c9GTCSqpC1f+znyDafTNBTGMY9IEfBrL1srleP6bvOOS8Stg
+	TADzXFsUFWRMrIUF/LcSIFdIZdYInMj+5lkNgsOZfH00ctq6WhKpOm73pLft2/lObgpo86
+	TKTQeIS0vjs7PNANsmvcTLBILvafQFAwhiZ159FAfgvBqktL+uCiHxJV+dM9P9BWYMBzVr
+	/jUPQEDgN1wD1rukrov5cGtHTiyINM6LbegviuhadRp7NVYK/3PEZz3iBWL2mQ==
+Date: Fri, 18 Apr 2025 19:04:31 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, jacob.e.keller@intel.com, yuyanghuang@google.com,
+ sdf@fomichev.me, gnault@redhat.com, nicolas.dichtel@6wind.com,
+ petrm@nvidia.com
+Subject: Re: [PATCH net-next v2 12/13] tools: ynl: generate code for rt-addr
+ and add a sample
+Message-ID: <20250418190431.69c10431@kmaincent-XPS-13-7390>
+In-Reply-To: <20250410014658.782120-13-kuba@kernel.org>
+References: <20250410014658.782120-1-kuba@kernel.org>
+	<20250410014658.782120-13-kuba@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="bC8Y275hHWkIX4eN"
-Content-Disposition: inline
-In-Reply-To: <20250403191002.2678588-13-sashal@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
-
-
---bC8Y275hHWkIX4eN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvjedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgduleemkeehkeejmeejuddttdemtgefgeegmeguugeivdemuggsvdekmegrtdguugenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekheekjeemjedutddtmegtfeeggeemugguiedvmegusgdvkeemrgdtuggupdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtp
+ hhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu 2025-04-03 15:10:00, Sasha Levin wrote:
-> From: Stanislav Fomichev <sdf@fomichev.me>
+On Wed,  9 Apr 2025 18:46:57 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> YNL C can now generate code for simple classic netlink families.
+> Include rt-addr in the Makefile for generation and add a sample.
 >=20
-> [ Upstream commit 27b918007d96402aba10ed52a6af8015230f1793 ]
+>   $ ./tools/net/ynl/samples/rt-addr
+>               lo: 127.0.0.1
+>        wlp0s20f3: 192.168.1.101
+>               lo: ::
+>        wlp0s20f3: fe80::6385:be6:746e:8116
+>             vpn0: fe80::3597:d353:b5a7:66dd
 >=20
-> With the device instance lock, there is now a possibility of a deadlock:
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-"now". Does the same problem exist in 5.10?
+Hello,
 
-Best regards,
-								Pavel
+This seems to broke the check-spec:
 
-> --- a/net/8021q/vlan_dev.c
-> +++ b/net/8021q/vlan_dev.c
-> @@ -272,17 +272,6 @@ static int vlan_dev_open(struct net_device *dev)
->  			goto out;
->  	}
-> =20
-> -	if (dev->flags & IFF_ALLMULTI) {
-> -		err =3D dev_set_allmulti(real_dev, 1);
-> -		if (err < 0)
-> -			goto del_unicast;
-> -	}
-> -	if (dev->flags & IFF_PROMISC) {
-> -		err =3D dev_set_promiscuity(real_dev, 1);
-> -		if (err < 0)
-> -			goto clear_allmulti;
-> -	}
-> -
->  	ether_addr_copy(vlan->real_dev_addr, real_dev->dev_addr);
-> =20
->  	if (vlan->flags & VLAN_FLAG_GVRP)
-> @@ -296,12 +285,6 @@ static int vlan_dev_open(struct net_device *dev)
->  		netif_carrier_on(dev);
->  	return 0;
-> =20
-> -clear_allmulti:
-> -	if (dev->flags & IFF_ALLMULTI)
-> -		dev_set_allmulti(real_dev, -1);
-> -del_unicast:
-> -	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
-> -		dev_uc_del(real_dev, dev->dev_addr);
->  out:
->  	netif_carrier_off(dev);
->  	return err;
-> @@ -314,10 +297,6 @@ static int vlan_dev_stop(struct net_device *dev)
-> =20
->  	dev_mc_unsync(real_dev, dev);
->  	dev_uc_unsync(real_dev, dev);
-> -	if (dev->flags & IFF_ALLMULTI)
-> -		dev_set_allmulti(real_dev, -1);
-> -	if (dev->flags & IFF_PROMISC)
-> -		dev_set_promiscuity(real_dev, -1);
-> =20
->  	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
->  		dev_uc_del(real_dev, dev->dev_addr);
-> @@ -474,12 +453,10 @@ static void vlan_dev_change_rx_flags(struct net_dev=
-ice *dev, int change)
->  {
->  	struct net_device *real_dev =3D vlan_dev_priv(dev)->real_dev;
-> =20
-> -	if (dev->flags & IFF_UP) {
-> -		if (change & IFF_ALLMULTI)
-> -			dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
-> -		if (change & IFF_PROMISC)
-> -			dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
-> -	}
-> +	if (change & IFF_ALLMULTI)
-> +		dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
-> +	if (change & IFF_PROMISC)
-> +		dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
->  }
-> =20
->  static void vlan_dev_set_rx_mode(struct net_device *vlan_dev)
+$ make -C tools/net/ynl   =20
+...
+rt-addr-user.c:62:10: error: =E2=80=98IFA_PROTO=E2=80=99 undeclared here (n=
+ot in a function); did you mean =E2=80=98IFA_RTA=E2=80=99?
+   62 |         [IFA_PROTO] =3D { .name =3D "proto", .type =3D YNL_PT_U8, },
+      |          ^~~~~~~~~
+      |          IFA_RTA
+rt-addr-user.c:62:10: error: array index in initializer not of integer type
+rt-addr-user.c:62:10: note: (near initialization for =E2=80=98rt_addr_addr_=
+attrs_policy=E2=80=99)
+rt-addr-user.c:62:23: warning: excess elements in array initializer
+   62 |         [IFA_PROTO] =3D { .name =3D "proto", .type =3D YNL_PT_U8, },
+      |                       ^
+rt-addr-user.c:62:23: note: (near initialization for =E2=80=98rt_addr_addr_=
+attrs_policy=E2=80=99)
 
+I found it through git bisect.
+
+Regards,
 --=20
-DENX Software Engineering GmbH,        Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-
---bC8Y275hHWkIX4eN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCaAKFZQAKCRAw5/Bqldv6
-8kP0AKDB9qbJiZzzNyzkREcjPbqHR+RpRgCgmExl2z2MS8hgpfFzPz8xpNPeFPM=
-=S3W+
------END PGP SIGNATURE-----
-
---bC8Y275hHWkIX4eN--
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
