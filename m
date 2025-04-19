@@ -1,141 +1,159 @@
-Return-Path: <netdev+bounces-184274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECCFA940C2
-	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 03:13:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36B3A941F1
+	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 08:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB01B8E392C
-	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 01:13:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EAAD18970B2
+	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 06:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4DA3398A;
-	Sat, 19 Apr 2025 01:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8791218A6A7;
+	Sat, 19 Apr 2025 06:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLMa1iG2"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="pUB+Za1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2177080E
-	for <netdev@vger.kernel.org>; Sat, 19 Apr 2025 01:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C97C17B418
+	for <netdev@vger.kernel.org>; Sat, 19 Apr 2025 06:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745025225; cv=none; b=OJvYdR7+hs1yIPm0B7ACxFcnAMBxXeg3ysLY87rDe3XEEnoSIRRCODeemoVw0Db7dVhY5hr+OOx50KWG7aCz5uIpMIp6HLjFLXPPBmL9amshfdDDb+UYG2TzW+PxmKuk5slq7Cnip9H+WxWMq9x6rVg/7MXx5RSt6phVhnqj4Nc=
+	t=1745044712; cv=none; b=UR/VjXOallOzSlKuZ6Fj36otIumOpJUB5lHSy8VwQFp7wXJkI18aYpQ2+5A6+MnpDAXSnVLl8q8vwodfRXgR0zUvJkNXWMaebqtDye9WRfmVhdHRa37kSUF4vOOOEVlQX5u9XJQNVaEyGMof8D7vQgCVoeaTLe6zT2V8Q6fwLm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745025225; c=relaxed/simple;
-	bh=KW1brpm5ntpV2gdRdjTaMTa4x8lemRCZLjMPekDyZFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kaV6uICI3bSwlaR//jefXz4g4qQYfiZywfKXqoT6IRQ/YCYhE5lzGZKWwH5cfnQjhKJLzMibcvs+3JaivLT5X5N5T2PtcVlefGmRKnIuRP1r/Ab4FB0WSL2z0/TJpv9cU/or88ul3OHIFaHRhAG45+OuHr4GpVpGTYJQM0QjJqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLMa1iG2; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-72d3b48d2ffso2031269b3a.2
-        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 18:13:42 -0700 (PDT)
+	s=arc-20240116; t=1745044712; c=relaxed/simple;
+	bh=2bJApVbCqaYV1WOjfVu30MkD4jgODlLDUie7auLxSK4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N8wmzeliza9TYANDGa5aQjHGNgKSbC2E0jARbWfYgw9LAHWyjkGrjdf62K5/V5tqjvRLJe9/qVpQslMu3yy/wrIBb3ZZqgZFVckgG2cPs73w4aocxhf6QziVQ/8NUxL+7I0YNnRkdwvgFMfNPXci+AyOjXDonkFxvBWsbEhO+FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=pUB+Za1X; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5f435c9f2f9so3691352a12.1
+        for <netdev@vger.kernel.org>; Fri, 18 Apr 2025 23:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745025222; x=1745630022; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DlpnVmCZv7tgbZP1+N2vLa3YiePL66KoxRFFLaVJEz8=;
-        b=VLMa1iG29fodUWsJ/4hl/ttj8Q41bBMxWs2bntBDKBSk94uVyPp3R49V5afOLnjS8O
-         TV0QYMt99lDOPSGQ1nf8f1bM69yNGFbxd0lyZAEVBw+h738fTkM7+tzs6aejxY36MIYl
-         o86En3fCyXno27P3GirTxdKlSgmHw/YFYer+9rSTnF0O6iVcpqtl0bUxLLgafqp4IA06
-         UEVw7wCLl7MwLBOrIZW1OTtxLs69+LGrrYR783qHR2vd7H7k+uM7Yf871fdg7v2TshPC
-         yERAasXKJbGoe19+z0xlk77g9YfDADxdlF1dvi7PyLXb/mM0VAzApdTesHmO4tUGrOlM
-         B0gA==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1745044709; x=1745649509; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YQE1L+fCmAWDWTOVRBTsNUWoOyibF5s2FYSP946tumI=;
+        b=pUB+Za1XkQFRlY6UAZkMY+YOQbOnGZCz45xbDf4w5gej4jk/m/kUnvu2fREaEEkqb4
+         76mDMcC0hDEEACDo2vv6llL/WbekxbS+iFCSUJn/knJlJasB8/lGBJiyin0yrI2CVg7j
+         hmLFRYwRlCWvH+iPKibIk1nVqVSFlE1tq7wU0JPfwnKZ/qA+CVyeAW/+Kvw+nwUJFnHk
+         PuC075359AymIlFSnww/KCxcuvWc32otr98RB1X+qXD4sQRaXfavxFnsZj7lSSZDnuFM
+         hEJgY89rk3p0vLZnshYbpHUuR81pRjOWinAE988lrdbJpDwGOqiQ6wdaG00sMQF96vfP
+         3atw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745025222; x=1745630022;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DlpnVmCZv7tgbZP1+N2vLa3YiePL66KoxRFFLaVJEz8=;
-        b=Ol2x+/+Ch6kjKtfUPVKU3wZKU3kFitoU4O6y9VoOMIQvKFOA1/6WXbjNGymNKjDS4Q
-         dAD1UPEViiJRJa6c0tQHapclyY/O5gh1z8xQgEUuSeiWkNSHQylOd7A9awyAnBvm+dh1
-         S+A1ofo6Qa1SoQvKUqbFN+VMKQUMp++D2SNQQtMnREBtVpMvPKfT47M2rVwkv1fz082Y
-         XU9+0bVpKT8gOhajrWfhHnz3cOIuMjYFHqF45RMNmNZA0jHCYjz6V6UL84TZjETlFi7A
-         VZd/te5r4djVuDgwZKS9F9fYuhZu4yAPPy/ldjeIhSd7cqsKRSJlNn4ecOBYTet+qG7e
-         aAyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVMbqLwQWk2/evO98LJF5UTR4HOB/E+wBKOUzQtgO408MjuZ2axB6eMWZUp9/Pv/jhAu/uKLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCe44ZckyV5H+VGFuti6Y39MMH2U1Mp4Cpcw0b13ffmZN6FzPp
-	CrdXExOd5m4+WNMwixsM7YkTUotbdpbwDpx4Q+ni34b2xK/T3Q0=
-X-Gm-Gg: ASbGnct1+mtnkpja9KKoudcaMVLR7D3gyeOOhvzR6/Sekd8okwBeNwHekCggtjfX3H5
-	u4LQZMsJvm0f72NdrlrzicTySkgO7kzH5RnQnlRq3snbEW/+NgONCwOYfF0Cibvu2eiQJVgm0Sv
-	wYY4JVt2gVOcYEPKKkL7Fl2bhOowIBJBOceUD2yRix9byQU4rrvuu3mCS8LO5vAb0u+VHNbfwbZ
-	FLyUnxUUC9EGiKaikQJOpgwxOZL/3QvbjsfbFHAwTL2ek9a48WjZElR47cNphmJpxkMONXFJKS7
-	K+fc6yXoTqGqRKXIfJ2r9vODNNXt+8DzWvEU8yYF
-X-Google-Smtp-Source: AGHT+IFEIPhrFk9x/VmD0n+LPePCRZOQdykZY3ericZ3EhvLpqMYWYStnMsbjPyucFt7YWjbZ3pJxw==
-X-Received: by 2002:a05:6a21:b8b:b0:1fd:f4df:9a89 with SMTP id adf61e73a8af0-203cbc74c9dmr6326011637.25.1745025221763;
-        Fri, 18 Apr 2025 18:13:41 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73dbf90d930sm2243094b3a.81.2025.04.18.18.13.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Apr 2025 18:13:41 -0700 (PDT)
-Date: Fri, 18 Apr 2025 18:13:39 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>, donald.hunter@gmail.com,
-	jacob.e.keller@intel.com
-Subject: Re: [PATCH net-next] tools: ynl: add missing header deps
-Message-ID: <aAL4w0lYkMtR1d5S@mini-arch>
-References: <20250418234942.2344036-1-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1745044709; x=1745649509;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YQE1L+fCmAWDWTOVRBTsNUWoOyibF5s2FYSP946tumI=;
+        b=cFKTcwgPQp+/R6njrHPYsv/a3O0KRBed0zhtIHEqHm9ArYcFZ+XUulWdQtK1kRxaRp
+         VYKag+5oKGwaqWYrWRQh7hYYQnkWnhJyx5hQh48O4zd5JB2SeG+Q530wMgFXr+9jqf9N
+         n38oysDOmdyHBwNsyHdOKPKM95fl1XWyJC+wcGyVA81WuGbN/I74PG4AEzUNy7WwdwZq
+         D1wE8PlcJJrJyJWiNkdSQDe3H+hwkCBsbwKbk5qQ1GixbJFNOcK6j8Xml7kMzL5lbQyw
+         eSM1uI0XJ5503f5z/PuouBvYDeNwrPh3UJyxVqCIWQPVQ1v3rlWgebThwOrnKTS209m9
+         QYkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsOsc+HAS3qtNTK55L0u1O6Knxz2UggtNFAvrA/F/qOX2NsSMOYp6j6MUBWGYV0Su/GCynJsA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAsxay6Hx5bKypSvNCBCz5ttzM3PTeIH63xyA7QAun34obsrXc
+	Mn9PcOMa/jn0dc5SEgvsKWIisDsfQpsNSf766kACIzj6wwO4+zeUnuocOL9RR2o=
+X-Gm-Gg: ASbGncvdxTo8+u+8FZXfu+LxfPc2/R9nePZiUbSAUPqh6qUCD6QWfILZ501g34jhfsr
+	gOreDFZ5xZUUQUiU8X/siVAIPErniJna8mU4OFASbnG1e4GGs8KkP0Z2ppLNqQGrxvRCM5D8aU9
+	Mlgcv+1C8N+mjpDrlOuKYa+9x44YaPrME2/FFQ1tfiD1RRtbRlJ8vG/zSW3IIWONFbETo6rmIUJ
+	ONy21XfUcjbtgjlCy/EjJYDqK1oT3WksJSdrscjBwDD9g0abaRtLG/5y14cZ3ThCARQqzUQt+mf
+	EjBz2oIOBjUTxZo3Xs2seUsl4vw28MEqsoe9/HF1Jr6B1sxWRg2Up9lT3Ql7uDnp3zh2aae8
+X-Google-Smtp-Source: AGHT+IHgTwNG+uupMJ5d55AJht1W7aNdWYqhfAfoFDuNA3b330lWIRmNkFOCjZP/rpXWYCpscpJW1w==
+X-Received: by 2002:a05:6402:27cd:b0:5e6:1353:1319 with SMTP id 4fb4d7f45d1cf-5f6285296e4mr4213314a12.12.1745044708404;
+        Fri, 18 Apr 2025 23:38:28 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f62554bd3asm1844254a12.16.2025.04.18.23.38.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Apr 2025 23:38:27 -0700 (PDT)
+Message-ID: <8af190ea-5b12-4393-95ac-2bc5cf682c65@blackwall.org>
+Date: Sat, 19 Apr 2025 09:38:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250418234942.2344036-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: bridge: mcast: re-implement
+ br_multicast_{enable, disable}_port functions
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux.dev,
+ Yong Wang <yongwang@nvidia.com>, Andy Roulin <aroulin@nvidia.com>,
+ mlxsw@nvidia.com
+References: <cover.1744896433.git.petrm@nvidia.com>
+ <36976a87816f7228ca25d7481512ebe2556d892c.1744896433.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <36976a87816f7228ca25d7481512ebe2556d892c.1744896433.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 04/18, Jakub Kicinski wrote:
-> Various new families and my recent work on rtnetlink missed
-> adding dependencies on C headers. If the system headers are
-> up to date or don't include a given header at all this doesn't
-> make a difference. But if the system headers are in place but
-> stale - compilation will break.
+On 4/17/25 16:43, Petr Machata wrote:
+> From: Yong Wang <yongwang@nvidia.com>
 > 
-> Reported-by: Kory Maincent <kory.maincent@bootlin.com>
-> Fixes: 29d34a4d785b ("tools: ynl: generate code for rt-addr and add a sample")
-> Link: https://lore.kernel.org/20250418190431.69c10431@kmaincent-XPS-13-7390
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: donald.hunter@gmail.com
-> CC: jacob.e.keller@intel.com
-> ---
->  tools/net/ynl/Makefile.deps | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> When a bridge port STP state is changed from BLOCKING/DISABLED to
+> FORWARDING, the port's igmp query timer will NOT re-arm itself if the
+> bridge has been configured as per-VLAN multicast snooping.
 > 
-> diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-> index 385783489f84..8b7bf673b686 100644
-> --- a/tools/net/ynl/Makefile.deps
-> +++ b/tools/net/ynl/Makefile.deps
-> @@ -20,15 +20,18 @@ CFLAGS_ethtool:=$(call get_hdr_inc,_LINUX_ETHTOOL_H,ethtool.h) \
->  	$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h) \
->  	$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_GENERATED_H,ethtool_netlink_generated.h)
->  CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
-> +CFLAGS_lockd_netlink:=$(call get_hdr_inc,_LINUX_LOCKD_NETLINK_H,lockd_netlink.h)
->  CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
->  CFLAGS_net_shaper:=$(call get_hdr_inc,_LINUX_NET_SHAPER_H,net_shaper.h)
->  CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
->  CFLAGS_nl80211:=$(call get_hdr_inc,__LINUX_NL802121_H,nl80211.h)
->  CFLAGS_nlctrl:=$(call get_hdr_inc,__LINUX_GENERIC_NETLINK_H,genetlink.h)
->  CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
-> +CFLAGS_ovpn:=$(call get_hdr_inc,_LINUX_OVPN,ovpn.h)
->  CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
->  CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
->  CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
-> -CFLAGS_rt-addr:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
-> +CFLAGS_rt-addr:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
-> +	$(call get_hdr_inc,__LINUX_IF_ADDR_H,if_addr.h)
->  CFLAGS_rt-route:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
->  CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
+> Solve this by choosing the correct multicast context(s) to enable/disable
+> port multicast based on whether per-VLAN multicast snooping is enabled or
+> not, i.e. using per-{port, VLAN} context in case of per-VLAN multicast
+> snooping by re-implementing br_multicast_enable_port() and
+> br_multicast_disable_port() functions.
+> 
+> Before the patch, the IGMP query does not happen in the last step of the
+> following test sequence, i.e. no growth for tx counter:
+>  # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
+>  # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
+>  # ip link add name swp1 up master br1 type dummy
+>  # bridge link set dev swp1 state 0
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 1
+>  # sleep 1
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 1
+>  # bridge link set dev swp1 state 3
+>  # sleep 2
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 1
+> 
+> After the patch, the IGMP query happens in the last step of the test:
+>  # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
+>  # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
+>  # ip link add name swp1 up master br1 type dummy
+>  # bridge link set dev swp1 state 0
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 1
+>  # sleep 1
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 1
+>  # bridge link set dev swp1 state 3
+>  # sleep 2
+>  # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+> 3
+> 
+> Signed-off-by: Yong Wang <yongwang@nvidia.com>
+> Reviewed-by: Andy Roulin <aroulin@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> ---
+>  net/bridge/br_multicast.c | 77 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 69 insertions(+), 8 deletions(-)
+> 
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+I feel like I've seen a similar patch before. Are you sure this is not v2? :)
+Anyway looks good to me. Thanks!
 
-(mostly checked that XXX_H defines listed here match the ones in the
-header files)
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
