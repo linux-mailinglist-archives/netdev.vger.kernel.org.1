@@ -1,198 +1,193 @@
-Return-Path: <netdev+bounces-184293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B47A944BD
-	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 18:50:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF5C7A944FE
+	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 20:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5857B189BA3B
-	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 16:50:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F36B189CEFF
+	for <lists+netdev@lfdr.de>; Sat, 19 Apr 2025 18:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC851DE8A8;
-	Sat, 19 Apr 2025 16:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9A11DE8AB;
+	Sat, 19 Apr 2025 18:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRhLenMQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XxsuHSDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8F01465B4
-	for <netdev@vger.kernel.org>; Sat, 19 Apr 2025 16:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0728B13C3F2
+	for <netdev@vger.kernel.org>; Sat, 19 Apr 2025 18:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745081438; cv=none; b=sK1J9qe6LZWWwBeKV3F18RC7S3d6BCpDmLAM8D90ku9MSqoMFYAvdgw1GTc2y/nAAz58BqOQbQ3YLM6aIuJMFE4y1DDfSClmTJcKyOR6CNKfhylI5VfmCyrZ8Ez20mhNfOXtr5PoYVkS05XG6U5qZ5pAjESDwmyFA0nNSRpKEkI=
+	t=1745086293; cv=none; b=prUURCEQT7i3yirmCzxxeP54vKBc56b6+f0/wd4gla971TThO9R+gpuq9Sq+uiMxDNq8cidpk6lYoSR5PLdE52e2A6QMQjVnbzJ+qNEWhO0/lj+oIeGWjJYENj2GHDzFF0f/Q6HbaEp2Zo29/+YY/iksJFUvVScNOCYn+/WW2hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745081438; c=relaxed/simple;
-	bh=hgt5u4hJcnOlBKT3vj9LQnWtll2HmR1D47irc31CwZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uB0kg+Y0JrKJNm28c9PJe2sN0jYDwc7U2hYOvuLcEykwFNDC3VIUjIlRd3AAUMvqVjt+irU/GA45c0xK17XvSnKbGYkBgCp/fzVFU6TwW4odzEHXIoxXvf7yW5A9Rsg3NrgQQYrLiiN51VdxolQxjPbac6SK3l4g8NoIWarUQTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRhLenMQ; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e5bc066283so4203111a12.0
-        for <netdev@vger.kernel.org>; Sat, 19 Apr 2025 09:50:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745081435; x=1745686235; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pFmG4Yjcuj/yEtol3FRL9FCcE/zLthByUxW5LXM7RRM=;
-        b=dRhLenMQgxBiTUt7DdShPH7gjyceHP0l3RaUil9fM9Ch10uHQdOvbAreY85ZTz7ykJ
-         iLItJuw8K4+FaGTihGVClhjOLh9JLbngvsx8d7FPrg0xctnp1iGwPMiJXzMyP9k7jrcy
-         GMHMoaFpVG5DdlvQYYBc5MZmQpBz5CAFuySWWHi24EumHiuBUoDd6KaMnh1fT5ebTnvm
-         FijaFgrt1+Ha1uVi5Zplbozi6LUxQfgE86MBgsrIrYuJNjb6EnSAbblO/5YjcN+lGykA
-         U8uOIb+/WEK1V2JbbXOT8imaX903/gff03fesrSv7tlKgdpEyMMQKgbgqI5V9qrgmR9w
-         yoBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745081435; x=1745686235;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFmG4Yjcuj/yEtol3FRL9FCcE/zLthByUxW5LXM7RRM=;
-        b=G+KD3sV/vvjTUhz06+GHlx3lu5AspVpDwY4oODY5tU6hoQ1vT304VDKranpsD1IPRK
-         jzKemzYrKCJ7OchLo1GP9vHWKwDtvU7a6/L8os60PvWIEXXgfROo6Da1hxQMqySb63+2
-         SuZk7x6P49Navmi9j43nO+Y9sYYdMbcWuslnrN4NnAHrSk9injjxVlAImUUAW3g3TkXE
-         xj1tjFb5NussH7WjH2xUsRQHroc6LmjtAvpEzp/tAW5kE6uPIXiP4rsK7gzYnpgYT5VG
-         tLL4+CDsckPSklrwNkz65BRQPV1CN3P1adNQPI7PYXLbHh7oRNYg6c/+DVxmku6A7oY4
-         tntQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWmYjOfKgqt2meZmVwBH5wuiZpmZdMIE2gPNaq9X0kWydvHjjO5p4alh4o1DYwOCsc7QNZWPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxae5Qq1QPcTBt4IeACke3JW7u9My4sxFxINF8obLo2ilqQbI7U
-	RwzVlw3A+6fDINx8hNaz0bTZrjfqTwrwwRrP144aabq1eCEtEfFi
-X-Gm-Gg: ASbGncsFmUv+IhYnQzSLioAsQpUCg7GT5grafM5NaT/+gBShjAkZJ0d9ZYKBSEEv7u/
-	gvcziN7BedhU63VW+OoDDuI2QJP2KWZSl5q1mYNyn3Q7l0TvU2926g1cOwXvhCIQiM3MAnTW9pO
-	LJjDVAA5+e4khHGGyAMzUjLdaJinQGz9LVucVFp7u3DQZEQd6VwdMudDowgTGGPB13TkB6U+98s
-	vbR0Sk/Y6rgQTpFdSmObtXcGrkiIfMSsYfTqW5MQlxsFVCOr75j3dHabbdQeYtV8CtYYidhumwX
-	uf+ymH3ycJmtuo/r+P3cbf/D/sDkLr2UogVsRcXd2SM4
-X-Google-Smtp-Source: AGHT+IFmELEuuh29u+I2Sur6DELySCuHEU2N8DSY6YSTnbDaJkF5+2g+YD04/MnLLEINUHqsm1pajQ==
-X-Received: by 2002:a17:907:9414:b0:ac2:cdcb:6a85 with SMTP id a640c23a62f3a-acb74b2d3f5mr515717566b.22.1745081434584;
-        Sat, 19 Apr 2025 09:50:34 -0700 (PDT)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6eefcfb8sm286333066b.111.2025.04.19.09.50.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Apr 2025 09:50:34 -0700 (PDT)
-Message-ID: <01c17d6f-dfb4-4464-b33e-6e3ed64ecaae@gmail.com>
-Date: Sat, 19 Apr 2025 19:51:07 +0300
+	s=arc-20240116; t=1745086293; c=relaxed/simple;
+	bh=dlNRYfwVe/9NoyKITEUeul4WzsBB8O5w8tbI50YXG0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kjWM3NUlt7UdZZZJs0r8d2/r+mnOk/s8yPjIF/bSoXeqz7LmKodGnm4eWbGm8R1PVG+OCzvkdfPawUpYQavSeUwHp+use7CPq6sw13OeAWDR594PK/dZYqF/lwesipEEx6edInhN0ioYGpY1kkDdi3F0hjObkWtmn7BlJ+lk0hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XxsuHSDu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gqmVIZNz/MlKdXdpiJ94ijA/Vsi2PneqW9zsialsl4c=; b=XxsuHSDuNZ513SNoEvPOgjtJd1
+	dGhXwAakYMElPO/wvX18RVWTL4A+jWwBzINa9PXrvODckwMZuF/DvGIxsS7OS/3+XbAOMuK24wn2J
+	a5hIc4oSMZ5KlA+sQEcV1uUB0i6oPZRWZi3qthQ+OzyWr4snWsmm8K/5U7yV7UZ2uXeU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u6Cet-009zjt-Si; Sat, 19 Apr 2025 20:11:19 +0200
+Date: Sat, 19 Apr 2025 20:11:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, hkallweit1@gmail.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+Message-ID: <de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch>
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/6] net: wwan: core: split port creation and
- registration
-To: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
- <20250408233118.21452-3-ryazanov.s.a@gmail.com>
- <CAFEp6-0kBH2HMVAWK_CAoo-Hd3FU8k-54L1tzvBnqs=eS39Gkg@mail.gmail.com>
- <a43d7bce-5f70-4d69-8bad-c65976245996@gmail.com>
- <CAFEp6-1veH3N+eVw2Bc+=2ZhrQAzTcU8Lw9fHTmY2334gaDBSg@mail.gmail.com>
- <9b36d9b6-c2da-43ef-a958-167c663792e4@gmail.com>
- <CAFEp6-2n13+Q5sjatgjjgG0vFP28PSiH8PoOJBNB-u9HX04ObQ@mail.gmail.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <CAFEp6-2n13+Q5sjatgjjgG0vFP28PSiH8PoOJBNB-u9HX04ObQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
 
-On 19.04.2025 14:44, Loic Poulain wrote:
-> On Sat, Apr 19, 2025 at 1:04 AM Sergey Ryazanov <ryazanov.s.a@gmail.com> wrote:
->> ...
->> Looks like I've found another one solution to move the port resources
->> (memory) release back to the function allocating it. It is also a bit
->> hackish and I would like to hear a feedback from you.
->>
->> The port is released inside wwan_port_register_wwan() just because we
->> release it differently depending on the initialization stage, right?
->>
->> We cannot call put_device() before the device_register() call. And that
->> is why I've created that __wwan_port_destroy() routine. What if we make
->> port eligible to be released with put_device() ASAP? Internally,
->> device_register() just sequentially calls device_initialize() and then
->> device_add(). Indeed, device_initialize() makes a device struct eligible
->> to be released with put_device().
->>
->> We can avoid using device_register() and instead of it, do the
->> registration step by step. Just after the port memory allocation and
->> very basic initialization, we can call device_initialize(). And then
->> call device_add() when it is time to register the port with the kernel.
->> And if something going to go wrong, we can return just an error from
->> wwan_port_register_wwan() and release the port with put_device() in
->> wwan_create_port() where it was allocated. Something like this:
->>
->> static int wwan_port_register_wwan(struct wwan_port *port)
->> {
->>       ...
->>       if (something_wrong)
->>           return -E<ERROR_TYPE>;
->>       ...
->>       return 0;
->> }
->>
->> struct wwan_port *wwan_create_port(struct device *parent,
->>                                      enum wwan_port_type type,
->>                                      const struct wwan_port_ops *ops,
->>                                      struct wwan_port_caps *caps,
->>                                      void *drvdata)
->> {
->>       ...
->>       port = kzalloc(sizeof(*port), GFP_KERNEL);
->>       /* Do basic port init here */
->>       port->dev.type = &wwan_port_dev_type;
->>       device_initialize(&port->dev);  /* allows put_device() usage */
->>
->>       if (port->type == WWAN_PORT_NMEA)
->>           err = wwan_port_register_gnss(port);
->>       else
->>           err = wwan_port_register_wwan(port);
->>
->>       if (err) {
->>           put_device(&port->dev);
->>           goto error_wwandev_remove;
->>       }
->>
->>       return port;
->>       ...
->> }
->>
->> The only drawback I see here is that we have to use put_device() to
->> release the port memory even in case of GNSS port. We don't actually
->> register the port as device, but I believe, this can be explained with a
->> proper comment.
+On Wed, Apr 16, 2025 at 08:28:46AM -0700, Alexander Duyck wrote:
+> Address two issues found in the phylink code.
 > 
-> Yes, that's a good alternative, so you would also have to use
-> put_device in gnss_unregister, or do something like:
+> The first issue is the fact that there were unused defines that were
+> referencing deprecated macros themselves. Since they aren't used we might
+> as well drop them.
 > 
-> void wwan_remove_port(struct wwan_port *port)
-> {
-> [...]
->      if (port->type == WWAN_PORT_NMEA)
->                  wwan_port_unregister_gnss(port);
->      /* common unregistering (put_device), not necessarily in a
-> separate function */
->     wwan_port_unregister(port);
-> [...]
-> }
-> 
-> And probably have a common wwan_port_destroy function:
-> static void wwan_port_destroy(struct device *dev)
-> {
->      if (port->type != WWAN_PORT_NMEA)
->          ida_free(&minors, MINOR(dev->devt));
->      [...]
->      kfree(port);
-> }
+> The second issue which is more the main reason for this submission is the
+> fact that the BMC was losing link when we would call phylink_resume. This
+> is fixed by adding a new boolean value link_balanced which will allow us
+> to avoid doing an immediate force of the link up/down and instead defer it
+> until after we have checked the actual link state.
 
-Yep. This change also makes sense if we manage to release the port in a 
-unified way. Will try to implement it next week to see how it's going to 
-look like in as a code.
+I'm wondering if we have jumped straight into the weeds without having
+a good overall big picture of what we are trying to achieve. But maybe
+it is just me, and this is just for my edification...
 
---
-Sergey
+As i've said a few times we don't have a good story around networking
+and BMCs. Traditionally, all the details have been hidden away in the
+NIC firmware, and linux is pretty much unaware it is going on, at
+least from the Host side. fbnic is changing that, and we need
+Linux/phylink to understand this.
+
+Since this is all pretty new to me, i went and quickly read:
+
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0222_1.1.0.pdf
+
+Hopefully i now have a better big picture.
+
+Figure 2 answers a few questions for me. One was, do we actually have
+a three port switch in here? And i would say no. We have something
+similar, but not a switch. There is no back to back MAC on the host
+PCI interface. We do have back to back MAC on the NC-SI port, but it
+appears Linux has no knowledge of the NIC NC-SI MAC, and the BMC is
+controlling BMC NC-SI MAC.
+
+Not having a switch means when we are talking about the MAC, PCS, PHY
+etc, we are talking about the media side MAC, PCS, PHY. Given that
+phylink is just as often used with switches with a conduit interface
+and switch ports, that is an important point.
+
+Figure 2 also hints at there being three different life cycles all
+interacting with each other. Our normal model in phylink is that the
+Network Controller is passive, it is told what to do by
+Linux/phylink. However, in this setup, that is not true. The Network
+Controller is active, it has firmware running on it. The Network
+Controller and the Management Controller life cycle probably starts at
+about the same time, when the PSU starts generating standby power. The
+host life cycle starts later, when the BMC decides to power up the
+host.
+
+The NC-SI protocol defines messages between the Management Controller
+and the Network Controller. One of these messages is how to configure
+the media side. See section 8.4.21. It lists different networks speeds
+which can be negotiated, duplex, and pause, and if to use
+auto-neg. There is not enough details to fully specific link modes
+above 1000BaseT, all you can request for example is 40G, but you
+cannot say CR4, KR4, SR4, or LR4. There also does not appear to be a
+way to ask the network controller what it actually supports. So i
+guess you normally just ask for everything up to 100G, and you are
+happy when Get Link Status response command says the link it 10BaseT
+Half.
+
+The Network Controller needs to be smart enough to get the link up and
+running. So it basically has a phylink implementation, with a PCS
+driver, 0 or more PHY drivers, SFP cage driver, SFP driver etc.
+
+Some text from the document, which is pretty relevant to the
+discussion.
+
+  The Set Link command may be used by the Management Controller to
+  configure the external network interface associated with the channel
+  by using the provided settings. Upon receiving this command, while
+  the host NC driver is not operational, the channel shall attempt to
+  set the link to the configuration specified by the parameters. Upon
+  successful completion of this command, link settings specified in
+  the command should be used by the network controller as long as the
+  host NC driver does not overwrite the link settings.
+
+  In the absence of an operational host NC driver, the NC should
+  attempt to make the requested link state change even if it requires
+  the NC to drop the current link. The channel shall send a response
+  packet to the Management Controller within the required response
+  time. However, the requested link state changes may take an
+  unspecified amount of time to complete.
+
+  The actual link settings are controlled by the host NC driver when
+  it is operational. When the host NC driver is operational, link
+  settings specified by the MC using the Set Link command may be
+  overwritten by the host NC driver. The link settings are not
+  restored by the NC if the host NC driver becomes non
+  operational.
+
+There is a very clear indication that the host is in control, or the
+host is not in control. So one obvious question to me is, should
+phylink have ops into the MAC driver to say it is taking over control,
+and relinquishing control? The Linux model is that when the interface
+is admin down, you can use ethtool to preconfigure things, but they
+don't take affect until the link is admin up. So with admin down, we
+have a host NC driver, but it is not operational, hence the Network
+Controller is in control of the link at the Management Controllers
+bequest. It is only with admin up that phylink takes control of the
+Network Controller, and it releases it with admin down. Having these
+ops would also help with suspend/resume. Suspend does not change the
+admin up/down status, but the host clearly needs to hand over control
+of the media to the Network Controller, and take it back again on
+resume.
+
+Also, if we have these ops, we know that admin down/suspend does not
+mean media down. The presence of these ops triggers different state
+transitions in the phylink state machine so that it simply hands off
+control of the media, but otherwise leaves it alone.
+
+With this in place, i think we can avoid all the unbalanced state?
+
+What is potentially more interesting is when phylink takes control. Do
+we have enough information about the system to say its current
+configuration is the wanted configuration? Or are we forced to do a
+ground up reconfiguration, which will include a media down/up? I had a
+quick scan of the document and i did not find anything which says the
+host is not allowed/is allowed to do disruptive things, but the text
+quoted above says 'The actual link settings are controlled by the host
+NC driver when it is operational'. Controlling the link settings is a
+disruptive operation, so the management controller needs to be
+tolerant to such changes.
+
+So, can we ignore the weeds for the moment, and think about the big
+picture?
+
+	Andrew
 
