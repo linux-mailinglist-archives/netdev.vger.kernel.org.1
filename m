@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-184305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 617A9A948AD
-	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 20:05:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F230CA948AE
+	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 20:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11DE318881F1
-	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 18:06:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D798170AB8
+	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 18:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE21920C47C;
-	Sun, 20 Apr 2025 18:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A301D20CCEB;
+	Sun, 20 Apr 2025 18:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8n4df9O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgqZYg7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9DD1853
-	for <netdev@vger.kernel.org>; Sun, 20 Apr 2025 18:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29051E9904
+	for <netdev@vger.kernel.org>; Sun, 20 Apr 2025 18:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745172345; cv=none; b=rGSjOPhN6DvCgWlELhzKjXcQ5xy7kTk8vj8IQZEDpPRsImsQpjw9pNRpJFkNnQ4SZz0CbmcZW/xRU8hyaejhYa4sGQu1fb6xpd44CDz0C3KfxXfZEQNNVflexrn8vTk7+bASZf8lSCw9p5SrrnwPQtUnmD/qeuA7CfQMIejO+qo=
+	t=1745172346; cv=none; b=oMFy4AXYxFFPHBhzqd4JNpfjSVoMQiDr8sdL3+i0QR3Rw4Y6+sYpNWWUlNo/++jlgc0HK4AY4iKE2PqzWcU9kZn3DQYF7K+y3K/9LjYS3OzcUIJdBff8pGF8Fc/HXO61KItuwhXJB2bZYv5RJjGIRPYsPF8lMmwkNqKKomGau0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745172345; c=relaxed/simple;
-	bh=yRs/4KRnJWyuQQoFaKu6bc0w8h9lbnMjhVjj2mPzFrE=;
+	s=arc-20240116; t=1745172346; c=relaxed/simple;
+	bh=iUdSr4xpXDDz37A3/6kujG6bqN6D17uv2pT3j8Ztf48=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DETRXd0voTXvdYR2OxtxKt8OONJrbofU89sNMUuvIINvtpUEM3u2fH5w5dmzjv40OChcFyr75sdRZ20CjBHqqSG8emWwjFTQalIUYxx9/K6/siAgpgHTcpEBkGc3hv3MwPWTCyB7BA5DGHn9iXNaKcKi6bf4LZYI4URd/d35H08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8n4df9O; arc=none smtp.client-ip=209.85.219.52
+	 MIME-Version; b=k0a0Pt1aNmLxfdd/OptHLUhcoQh1K2XLG2VB7EFk2Zmfqqw6qXngxCecVz5nvTZWUhXipeBtLFTJJjRjysOjnLryWI0jyxKITV8wuJTOzNLn++44PM045ZMVeYTRaNktBp+1Dro8tv2lzEanPGaPr7LHkw2E7nxiML5nAThxoL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LgqZYg7f; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6ecfbf8fa76so40162606d6.0
-        for <netdev@vger.kernel.org>; Sun, 20 Apr 2025 11:05:43 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6ecfa716ec1so31658916d6.2
+        for <netdev@vger.kernel.org>; Sun, 20 Apr 2025 11:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745172343; x=1745777143; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745172344; x=1745777144; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3FNzZ56proBOBcHfkZtSoJqynYiPq0siS/n70Qcj5qw=;
-        b=W8n4df9OCfyY6nHGO8bpNXk0KuNKsk5MtJo6Uzc5tgKTkD9ngaXK9W/UoimjuAwaoF
-         9DXBf9mRpW/T/aTkUhGCsnFx+GE+EXEK5t4QULgoB/8iYl+j/m0OOr1SwB940PGkFEi8
-         wk1a7ipd1mLrhJrxA4SuzJUkY/mqr4tvYAhNjyaI8/+Qb5pNoFy3v2nxnQJf5DWVPZoe
-         mi42y01qkPaH2ezqY//02S/wFPZ3keaKOnnr2aEug9EsF5hT4FEhjarAYo5X752kUE/O
-         V2z9P/TBBrRUWNwgR4Wfk9buJMu7Y7rBqKkqBO1VtnzguLwZiXGIV0Sc33iMVQt31/By
-         s0xw==
+        bh=rq7kWK52h9IVGIo39gR+cnz3fLdJjkbpncf2bk3iQ84=;
+        b=LgqZYg7fxlntJK2IjCJn560yzLkpbfyd4FIXzHe9OMnqeaUlmSRQDU+C9m/RUyJmZk
+         Qo3df0Gf6Nps6WUcz9gYvwYs8SInqbmkQmLJ2T2IG0+EpiJcG0Nu0IbRy4rR6jJXy22e
+         sW2M/01ANlWsc8ytmw5PeRDnLocLlhjPPFaNCaABA5FDrPb/dBpX11EQRDH7pBWd00Z9
+         jvXzs65KLA8xiVdU/5RfcmdW3ASI5x8nwCFlCyzm+drZEv2GBjuiIr6AntsDB6BCJkA8
+         LiEQSb2TgcOiAqQHfkKLW+hhmL8CFbnG/hZA0vx9wNpmZnPj/WH41gytCcGGMsUew2Es
+         HQDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745172343; x=1745777143;
+        d=1e100.net; s=20230601; t=1745172344; x=1745777144;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3FNzZ56proBOBcHfkZtSoJqynYiPq0siS/n70Qcj5qw=;
-        b=XL8uUQGcGh9xtKhrStX1MgeJTnSqaexxGjCpq+qq1jgDwvFCu8oodIHUU3w3+08nBM
-         cJkXkvJp170HfCc6gwY1jB519csi15xZz6Y5Uc4fjyEuOgTUxPMjePL1hSl3FFv05O8m
-         AqfpGQEA8LWrPH1DLo1bv0aMf0Hu4mlwHizlvdOViYG0bWUeZHYS8QXcZkfQRbYBT3k7
-         MRWuG9feQaX3xIg/OnCmQ4z36UvkCmmCFwoZILwdAr8TnOhgcN1DEd8PepoxS39SwfX7
-         Por23NBC4BV0iP1v8KBq1sJs2Bq0yE2yPzhO0bfFGI+/XD4X99pIK+36vpQ+dYX4Qicf
-         lnwA==
-X-Gm-Message-State: AOJu0YxCBhAE6Wea2BM2gcZ9qdo9JTmh+kX/JKJc7HNiEaJ1ChXFuSuC
-	0QDd7u4KNfEPjo7tuqtXSeLnFFaeUV92xEt3yvKZNGLsZdXQsSlUvUKdzg==
-X-Gm-Gg: ASbGncto/yz1aCo1rRUwxtyXiUy8bm4c+t1tp8OFD2YUEVKTTCAs0XAmjGoCqkAZ1Yy
-	W0luuKybHtcosjHgMnSgWVbzV+gt4BfSBVF43N+hYbFvSRZRueq3ZIEPgxDL3LA8UEfOO5eX0M8
-	93WnhgMlAHaj2FkWmfdky66plbQ/gHyEcM7ruz8ELnfgrUD2VouoDmPOMBoTlMP4ZHkIKiei6El
-	eRYIJyDCx/5XkKBIdxZBhieCeTSjgshH3AaX+EvA2YAzQf8gUqo4v7rDcv6FSjppI1DJFF6C03V
-	Viq0OOJk3gd76oFjNae6jVSKH4Nxfh8Xika9uhvz7IvFaBL0hLrsJLezGuktF2Mbq7m6dTabPwQ
-	BhJp1fxIrcSCOQypNfF1I5IlFP+cueuGgswqgL30GfCRBLWLozxQNZw==
-X-Google-Smtp-Source: AGHT+IGrvx+aKR+4gQ+STpVGktMCyMx1q8Guw4R6zXNjAuVhDoIhF29SpVPdLlJprJzG5odHOWpylg==
-X-Received: by 2002:ad4:5d6b:0:b0:6e8:ec85:831c with SMTP id 6a1803df08f44-6f2c4650cd9mr192308366d6.35.1745172342781;
-        Sun, 20 Apr 2025 11:05:42 -0700 (PDT)
+        bh=rq7kWK52h9IVGIo39gR+cnz3fLdJjkbpncf2bk3iQ84=;
+        b=Zb2q4ElORCNuzDJrmOXIT6wiH1FsbrBpTnvRpuTBTPymTnMBzyNvtSCqwzJ7tUubE6
+         UUibW7qks42rWr8wjWAvLZG7CRk/9CtI8GJcN6ql6MFbng+6K7a10BuBkBJTXBt011Vp
+         TaVq5ArRcVUH4CCXHfT6gqSawsVFtVPSSaCE61VymHJsSP6gCE3Fzv1s9cg1otJszBRD
+         KGNNlPcAFDUPjCsMUJlAJvs84lTxmGd9c2yS5xhyDeK9Azi/ScMzp0+EkigRbwks1VJj
+         gQvupA7BmpeVuDhCafBPIgQ24RJA/gVP8Pj+L67iI9wgH/0s0pPBFT0TjTdZCnym9GMq
+         ek7A==
+X-Gm-Message-State: AOJu0Yy07cobIoWHVxr2jAEisz7yDlPznP+6mkyrEZh+tLAxKsA4FgbF
+	awceB5BlClfhKTbB+4PBq2fNK5mWJT8ZynORW0sE0L+IMbQy1LfTrBoAAw==
+X-Gm-Gg: ASbGncs95uDBM8Sz9+Ga3W0qdescWB19L8scvxK8jPDj5tayGb1TAYPBtdN6CvO6avN
+	tlaCrnryLsPVtxrNST5dcw3Aj77X0rB2O1RtnktLZFZmtBv7E9dE00yi6VvYWJ32jH8NZ/fLFzZ
+	vZMmysaY5x0oFG7QwfpDfLd2eW2GUQEn7LgBxUQgWkiak9NonLGYU8Fh+3BEs9K6DHextaFiTgA
+	MSFVcDGAlF3b5ZUEFNEZyEr7kyUFoeOiQfWtq31vumvgyu3Y95RsLVMRh1VKfJ4GneptiQPrhPN
+	7lAv3AGH6GPzIkSkZgNwlFzHI1gJtipVvTaepKFNs9w8lg0loZ3XNVLyrgEFq1NmRnJCSz+2a0y
+	n7lKeb1VvtZlWTLqWmmVwhqze7RShNWLLmB8uUhKmrcc=
+X-Google-Smtp-Source: AGHT+IGUlIbX/tvwfJNrYG+9mgNzmcX3Xlr9KrSNcw9Ysv4ChT8ErnhPO33Nx5udloxkXg2ZH9qVNw==
+X-Received: by 2002:a05:6214:f67:b0:6ed:14cd:d179 with SMTP id 6a1803df08f44-6f2c44ed56cmr166102496d6.3.1745172343692;
+        Sun, 20 Apr 2025 11:05:43 -0700 (PDT)
 Received: from willemb.c.googlers.com.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
         by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2c21cccsm34333676d6.106.2025.04.20.11.05.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Apr 2025 11:05:42 -0700 (PDT)
+        Sun, 20 Apr 2025 11:05:43 -0700 (PDT)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -83,9 +83,9 @@ Cc: davem@davemloft.net,
 	idosch@nvidia.com,
 	kuniyu@amazon.com,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 1/3] ipv4: prefer multipath nexthop that matches source address
-Date: Sun, 20 Apr 2025 14:04:29 -0400
-Message-ID: <20250420180537.2973960-2-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next 2/3] ip: load balance tcp connections to single dst addr and port
+Date: Sun, 20 Apr 2025 14:04:30 -0400
+Message-ID: <20250420180537.2973960-3-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.49.0.805.g082f7c87e0-goog
 In-Reply-To: <20250420180537.2973960-1-willemdebruijn.kernel@gmail.com>
 References: <20250420180537.2973960-1-willemdebruijn.kernel@gmail.com>
@@ -99,168 +99,155 @@ Content-Transfer-Encoding: 8bit
 
 From: Willem de Bruijn <willemb@google.com>
 
-With multipath routes, try to ensure that packets leave on the device
-that is associated with the source address.
+Load balance new TCP connections across nexthops also when they
+connect to the same service at a single remote address and port.
 
-Avoid the following tcpdump example:
+This affects only port-based multipath hashing:
+fib_multipath_hash_policy 1 or 3.
 
-    veth0 Out IP 10.1.0.2.38640 > 10.2.0.3.8000: Flags [S]
-    veth1 Out IP 10.1.0.2.38648 > 10.2.0.3.8000: Flags [S]
+Local connections must choose both a source address and port when
+connecting to a remote service, in ip_route_connect. This
+"chicken-and-egg problem" (commit 2d7192d6cbab ("ipv4: Sanitize and
+simplify ip_route_{connect,newports}()")) is resolved by first
+selecting a source address, by looking up a route using the zero
+wildcard source port and address.
 
-Which can happen easily with the most straightforward setup:
+As a result multiple connections to the same destination address and
+port have no entropy in fib_multipath_hash.
 
-    ip addr add 10.0.0.1/24 dev veth0
-    ip addr add 10.1.0.1/24 dev veth1
+This is not a problem when forwarding, as skb-based hashing has a
+4-tuple. Nor when establishing UDP connections, as autobind there
+selects a port before reaching ip_route_connect.
 
-    ip route add 10.2.0.3 nexthop via 10.0.0.2 dev veth0 \
-    			  nexthop via 10.1.0.2 dev veth1
+Load balance also TCP, by using a random port in fib_multipath_hash.
+Port assignment in inet_hash_connect is not atomic with
+ip_route_connect. Thus ports are unpredictable, effectively random.
 
-This is apparently considered WAI, based on the comment in
-ip_route_output_key_hash_rcu:
+Implementation details:
 
-    * 2. Moreover, we are allowed to send packets with saddr
-    *    of another iface. --ANK
+Do not actually pass a random fl4_sport, as that affects not only
+hashing, but routing more broadly, and can match a source port based
+policy route, which existing wildcard port 0 will not. Instead,
+define a new wildcard flowi flag that is used only for hashing.
 
-It may be ok for some uses of multipath, but not all. For instance,
-when using two ISPs, a router may drop packets with unknown source.
+Selecting a random source is equivalent to just selecting a random
+hash entirely. But for code clarity, follow the normal 4-tuple hash
+process and only update this field.
 
-The behavior occurs because tcp_v4_connect makes three route
-lookups when establishing a connection:
-
-1. ip_route_connect calls to select a source address, with saddr zero.
-2. ip_route_connect calls again now that saddr and daddr are known.
-3. ip_route_newports calls again after a source port is also chosen.
-
-With a route with multiple nexthops, each lookup may make a different
-choice depending on available entropy to fib_select_multipath. So it
-is possible for 1 to select the saddr from the first entry, but 3 to
-select the second entry. Leading to the above situation.
-
-Address this by preferring a match that matches the flowi4 saddr. This
-will make 2 and 3 make the same choice as 1. Continue to update the
-backup choice until a choice that matches saddr is found.
-
-Do this in fib_select_multipath itself, rather than passing an fl4_oif
-constraint, to avoid changing non-multipath route selection. Commit
-e6b45241c57a ("ipv4: reset flowi parameters on route connect") shows
-how that may cause regressions.
-
-Also read ipv4.sysctl_fib_multipath_use_neigh only once. No need to
-refresh in the loop.
-
-This does not happen in IPv6, which performs only one lookup.
+fib_multipath_hash can be reached with zero sport from other code
+paths, so explicitly pass this flowi flag, rather than trying to infer
+this case in the function itself.
 
 Signed-off-by: Willem de Bruijn <willemb@google.com>
-
-Side-quest: I wonder if the second route lookup in ip_route_connect
-is vestigial since the introduction of the third route lookup with
-ip_route_newports. IPv6 has neither second nor third lookup, which
-hints that perhaps both can be removed.
 ---
- include/net/ip_fib.h     |  3 ++-
- net/ipv4/fib_semantics.c | 39 +++++++++++++++++++++++++--------------
- net/ipv4/route.c         |  2 +-
- 3 files changed, 28 insertions(+), 16 deletions(-)
+ include/net/flow.h  |  1 +
+ include/net/route.h |  3 +++
+ net/ipv4/route.c    | 13 ++++++++++---
+ net/ipv6/route.c    | 13 ++++++++++---
+ net/ipv6/tcp_ipv6.c |  2 ++
+ 5 files changed, 26 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index e3864b74e92a..48bb3cf41469 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -574,7 +574,8 @@ static inline u32 fib_multipath_hash_from_keys(const struct net *net,
+diff --git a/include/net/flow.h b/include/net/flow.h
+index 2a3f0c42f092..a1839c278d87 100644
+--- a/include/net/flow.h
++++ b/include/net/flow.h
+@@ -39,6 +39,7 @@ struct flowi_common {
+ #define FLOWI_FLAG_ANYSRC		0x01
+ #define FLOWI_FLAG_KNOWN_NH		0x02
+ #define FLOWI_FLAG_L3MDEV_OIF		0x04
++#define FLOWI_FLAG_ANY_SPORT		0x08
+ 	__u32	flowic_secid;
+ 	kuid_t  flowic_uid;
+ 	__u32		flowic_multipath_hash;
+diff --git a/include/net/route.h b/include/net/route.h
+index c605fd5ec0c0..8e39aa822cf9 100644
+--- a/include/net/route.h
++++ b/include/net/route.h
+@@ -326,6 +326,9 @@ static inline void ip_route_connect_init(struct flowi4 *fl4, __be32 dst,
+ 	if (inet_test_bit(TRANSPARENT, sk))
+ 		flow_flags |= FLOWI_FLAG_ANYSRC;
  
- int fib_check_nh(struct net *net, struct fib_nh *nh, u32 table, u8 scope,
- 		 struct netlink_ext_ack *extack);
--void fib_select_multipath(struct fib_result *res, int hash);
-+void fib_select_multipath(struct fib_result *res, int hash,
-+			  const struct flowi4 *fl4);
- void fib_select_path(struct net *net, struct fib_result *res,
- 		     struct flowi4 *fl4, const struct sk_buff *skb);
- 
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index f68bb9e34c34..b5d21763dfaf 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -2168,34 +2168,45 @@ static bool fib_good_nh(const struct fib_nh *nh)
- 	return !!(state & NUD_VALID);
- }
- 
--void fib_select_multipath(struct fib_result *res, int hash)
-+void fib_select_multipath(struct fib_result *res, int hash,
-+			  const struct flowi4 *fl4)
- {
- 	struct fib_info *fi = res->fi;
- 	struct net *net = fi->fib_net;
--	bool first = false;
-+	bool found = false;
-+	bool use_neigh;
-+	__be32 saddr;
- 
- 	if (unlikely(res->fi->nh)) {
- 		nexthop_path_fib_result(res, hash);
- 		return;
- 	}
- 
-+	use_neigh = READ_ONCE(net->ipv4.sysctl_fib_multipath_use_neigh);
-+	saddr = fl4 ? fl4->saddr : 0;
++	if (IS_ENABLED(CONFIG_IP_ROUTE_MULTIPATH) && !sport)
++		flow_flags |= FLOWI_FLAG_ANY_SPORT;
 +
- 	change_nexthops(fi) {
--		if (READ_ONCE(net->ipv4.sysctl_fib_multipath_use_neigh)) {
--			if (!fib_good_nh(nexthop_nh))
--				continue;
--			if (!first) {
--				res->nh_sel = nhsel;
--				res->nhc = &nexthop_nh->nh_common;
--				first = true;
--			}
-+		if (use_neigh && !fib_good_nh(nexthop_nh))
-+			continue;
-+
-+		if (!found) {
-+			res->nh_sel = nhsel;
-+			res->nhc = &nexthop_nh->nh_common;
-+			found = !saddr || nexthop_nh->nh_saddr == saddr;
- 		}
- 
- 		if (hash > atomic_read(&nexthop_nh->fib_nh_upper_bound))
- 			continue;
- 
--		res->nh_sel = nhsel;
--		res->nhc = &nexthop_nh->nh_common;
--		return;
-+		if (!saddr || nexthop_nh->nh_saddr == saddr) {
-+			res->nh_sel = nhsel;
-+			res->nhc = &nexthop_nh->nh_common;
-+			return;
-+		}
-+
-+		if (found)
-+			return;
-+
- 	} endfor_nexthops(fi);
- }
- #endif
-@@ -2210,7 +2221,7 @@ void fib_select_path(struct net *net, struct fib_result *res,
- 	if (fib_info_num_path(res->fi) > 1) {
- 		int h = fib_multipath_hash(net, fl4, skb, NULL);
- 
--		fib_select_multipath(res, h);
-+		fib_select_multipath(res, h, fl4);
- 	}
- 	else
- #endif
+ 	flowi4_init_output(fl4, oif, READ_ONCE(sk->sk_mark), ip_sock_rt_tos(sk),
+ 			   ip_sock_rt_scope(sk), protocol, flow_flags, dst,
+ 			   src, dport, sport, sk->sk_uid);
 diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 49cffbe83802..e5e4c71be3af 100644
+index e5e4c71be3af..685e8d3b4f5d 100644
 --- a/net/ipv4/route.c
 +++ b/net/ipv4/route.c
-@@ -2154,7 +2154,7 @@ ip_mkroute_input(struct sk_buff *skb, struct fib_result *res,
- 	if (res->fi && fib_info_num_path(res->fi) > 1) {
- 		int h = fib_multipath_hash(res->fi->fib_net, NULL, skb, hkeys);
+@@ -2037,8 +2037,12 @@ static u32 fib_multipath_custom_hash_fl4(const struct net *net,
+ 		hash_keys.addrs.v4addrs.dst = fl4->daddr;
+ 	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_IP_PROTO)
+ 		hash_keys.basic.ip_proto = fl4->flowi4_proto;
+-	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_SRC_PORT)
+-		hash_keys.ports.src = fl4->fl4_sport;
++	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_SRC_PORT) {
++		if (fl4->flowi4_flags & FLOWI_FLAG_ANY_SPORT)
++			hash_keys.ports.src = get_random_u16();
++		else
++			hash_keys.ports.src = fl4->fl4_sport;
++	}
+ 	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_DST_PORT)
+ 		hash_keys.ports.dst = fl4->fl4_dport;
  
--		fib_select_multipath(res, h);
-+		fib_select_multipath(res, h, NULL);
- 		IPCB(skb)->flags |= IPSKB_MULTIPATH;
- 	}
- #endif
+@@ -2093,7 +2097,10 @@ int fib_multipath_hash(const struct net *net, const struct flowi4 *fl4,
+ 			hash_keys.control.addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
+ 			hash_keys.addrs.v4addrs.src = fl4->saddr;
+ 			hash_keys.addrs.v4addrs.dst = fl4->daddr;
+-			hash_keys.ports.src = fl4->fl4_sport;
++			if (fl4->flowi4_flags & FLOWI_FLAG_ANY_SPORT)
++				hash_keys.ports.src = get_random_u16();
++			else
++				hash_keys.ports.src = fl4->fl4_sport;
+ 			hash_keys.ports.dst = fl4->fl4_dport;
+ 			hash_keys.basic.ip_proto = fl4->flowi4_proto;
+ 		}
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 945857a8bfe3..39f07cdbbc64 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -2492,8 +2492,12 @@ static u32 rt6_multipath_custom_hash_fl6(const struct net *net,
+ 		hash_keys.basic.ip_proto = fl6->flowi6_proto;
+ 	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_FLOWLABEL)
+ 		hash_keys.tags.flow_label = (__force u32)flowi6_get_flowlabel(fl6);
+-	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_SRC_PORT)
+-		hash_keys.ports.src = fl6->fl6_sport;
++	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_SRC_PORT) {
++		if (fl6->flowi6_flags & FLOWI_FLAG_ANY_SPORT)
++			hash_keys.ports.src = get_random_u16();
++		else
++			hash_keys.ports.src = fl6->fl6_sport;
++	}
+ 	if (hash_fields & FIB_MULTIPATH_HASH_FIELD_DST_PORT)
+ 		hash_keys.ports.dst = fl6->fl6_dport;
+ 
+@@ -2547,7 +2551,10 @@ u32 rt6_multipath_hash(const struct net *net, const struct flowi6 *fl6,
+ 			hash_keys.control.addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
+ 			hash_keys.addrs.v6addrs.src = fl6->saddr;
+ 			hash_keys.addrs.v6addrs.dst = fl6->daddr;
+-			hash_keys.ports.src = fl6->fl6_sport;
++			if (fl6->flowi6_flags & FLOWI_FLAG_ANY_SPORT)
++				hash_keys.ports.src = get_random_u16();
++			else
++				hash_keys.ports.src = fl6->fl6_sport;
+ 			hash_keys.ports.dst = fl6->fl6_dport;
+ 			hash_keys.basic.ip_proto = fl6->flowi6_proto;
+ 		}
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 7dcb33f879ee..e8e68a142649 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -267,6 +267,8 @@ static int tcp_v6_connect(struct sock *sk, struct sockaddr *uaddr,
+ 	fl6.flowi6_mark = sk->sk_mark;
+ 	fl6.fl6_dport = usin->sin6_port;
+ 	fl6.fl6_sport = inet->inet_sport;
++	if (IS_ENABLED(CONFIG_IP_ROUTE_MULTIPATH) && !fl6.fl6_sport)
++		fl6.flowi6_flags = FLOWI_FLAG_ANY_SPORT;
+ 	fl6.flowi6_uid = sk->sk_uid;
+ 
+ 	opt = rcu_dereference_protected(np->opt, lockdep_sock_is_held(sk));
 -- 
 2.49.0.805.g082f7c87e0-goog
 
