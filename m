@@ -1,140 +1,110 @@
-Return-Path: <netdev+bounces-184301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3123A94777
-	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 12:53:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D105A947EB
+	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 14:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 074BA172B67
-	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 10:53:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65D9C188BC7B
+	for <lists+netdev@lfdr.de>; Sun, 20 Apr 2025 12:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE74F1E0E0D;
-	Sun, 20 Apr 2025 10:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C474F1DE2C4;
+	Sun, 20 Apr 2025 12:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1IH7Q5y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cri1YXgG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7201BF37;
-	Sun, 20 Apr 2025 10:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458D9262A6;
+	Sun, 20 Apr 2025 12:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745146395; cv=none; b=SiUv4p6f5PGd2NK/4OzGKqyWNVn15/lELP2o1Jw0YSAwMvjv2ZYSktj+qnr//S/wNTM5TMkAasKq2jwjHF9E1nb+I716JB6ml4Ic6/Khs4BRhaEKNAJqgNQ1+NqNM37TZmSscBGaV5nyXyVDYi10IdteJ4icDrqz7fQcP88CiPI=
+	t=1745153939; cv=none; b=KTbjlx/dSf6x9ylxZd4p2ydHRoFVzazgWJ/kW8+u+H6rW8AbfbJdyKow0KdQ7IVOzYRgeTfO2YlBRBj7QqgQCR2L6WZfEct+TswcGH2Oa3N2G05989GjFZvdrti8LHnfA3YUIXZYbjUNYEcXcrujpCyktX9qWxb8yFEN5ZyZcuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745146395; c=relaxed/simple;
-	bh=bXJdf1xzVKKv9/u8aO8bX8b9n3UfGPVIyIYQIFfGoVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FvHO7A9n6+rQrtsWguY9jNftPDsy5daU76GNZx+Q7+G+J2cwG1q1k//t7RdMaIkTwkXWSkT63+Iefb05qrlCrwyfAqrvjtPpR5gsbe8Z39WrABcnIyxreVSFS07P4wWzj1SiArmGv+/9APTWJJ6g5v3cC8B/9WU1bAj8ysAcIP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1IH7Q5y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 503B7C4CEE2;
-	Sun, 20 Apr 2025 10:53:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745146394;
-	bh=bXJdf1xzVKKv9/u8aO8bX8b9n3UfGPVIyIYQIFfGoVM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c1IH7Q5yZmKMr2iaSMvQmdem9ZqiUllJEl0EL9okREs+73sVALAqaYn2A6yKNPHFB
-	 orHjbSDctMxhBIDrd769PITPCe7y1ouf3hUW6jfwzqEdzyCsjtvS2860afiYYWPupp
-	 O0UzqLEIe8Tp6XlWCc4G2an6wOsUEkXOk6jNAH4By57YQHMQVyZNT4sdlyQOprX4Ey
-	 F/NTMVTq5U9F4MAk0cRdQRrUb6an90Oj6oc61DyzKl8fdrZEcTj7Q3M3qXDzpIKHS/
-	 Q/PQaDu0MRUx4v6V8elUIqn9libCYHoX/WEQSRXh8y8+YjT3hsrDPmtlNnRMGutGNk
-	 DGjyIi3RqAebA==
-Date: Sun, 20 Apr 2025 13:53:09 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>
-Cc: kotaranov@microsoft.com, pabeni@redhat.com, haiyangz@microsoft.com,
-	kys@microsoft.com, edumazet@google.com, kuba@kernel.org,
-	davem@davemloft.net, decui@microsoft.com, wei.liu@kernel.org,
-	longli@microsoft.com, jgg@ziepe.ca, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH rdma-next 4/4] net: mana: Add support for auxiliary
- device servicing events
-Message-ID: <20250420105309.GC10635@unreal>
-References: <1744655329-13601-1-git-send-email-kotaranov@linux.microsoft.com>
- <1744655329-13601-5-git-send-email-kotaranov@linux.microsoft.com>
+	s=arc-20240116; t=1745153939; c=relaxed/simple;
+	bh=UCZvDwV/3O+qNBEYL6pnnrYcLnAJfQKYsFh4ngJIuDU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uHcsmznYHB8TOGhR1+4dwh5e9hub/YRENkf3mtxktXfOA4xA2gAwSxVn5Ce63btUsTsSuLP66j7XVm09AmxMzQf90OdvyH5DS7t3pMVs4KOKquSRnNsLduNXHYbucOn/JEqhYekXUyny7ALvY2n0zbBXoQsL7XJ2zm/jWfFb4Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cri1YXgG; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-af52a624283so2695946a12.0;
+        Sun, 20 Apr 2025 05:58:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745153937; x=1745758737; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UCZvDwV/3O+qNBEYL6pnnrYcLnAJfQKYsFh4ngJIuDU=;
+        b=Cri1YXgGKBXp0eplATWBNb8mg+6BTtbG49WiFei3ZTPoTjiG5AiDsKJu/jVYgJE18W
+         o+pzEd8HD3oLiT2Up6ohQyztmYSwnXPuQeKW67aDqMMJvWKdH9EjngIwN6cOoHYvdI5D
+         1L8Dyl/nfZDsau7AgIGTOuHv4Zwh+5j+Bo9qTSurpWziPi8zWqp+iLqLIv8D6BQDEGaI
+         sCYmpMEAexFGd454kLe7lyjUL/5asW09QLPuMOtwsDfTB+vPB0v7PlmOjVZCm+J3wr89
+         7ViP9624B9N2wbEihvJcebtCLcJpg/aFmkZxBqQfuu78DHhOghuqmhgd3JyC9pewyjTA
+         Z6TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745153937; x=1745758737;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UCZvDwV/3O+qNBEYL6pnnrYcLnAJfQKYsFh4ngJIuDU=;
+        b=D1S2St7WzLpB3B0bjz6kYke1w91yCHmGYdQfK3O3+3mJxg2TD2k1ZijrWFssbAnZJl
+         JRDIJ0/kQ8+icXuf8Ut6emweKs7LCiPYOW3UuzUscubi7KuNA9hfsrvDqFxDmtY4HO29
+         mLZS9BdZI4gSgTq1o7MJLXBVc4kqwPovbSShUX42KEl5IhlzAr7HbmuwFKhAVv+0E9C+
+         hS7QdHzmuqiuz9lkOfkKQIed3RF20aWWJ3Hx/QH5wgYAnMvMIKRQXjnWCgCJDWkXhaH7
+         kT8Fc6DycNYo4I1F03ZXVQ2D1SbcX06/JjIvUsBBq7hDzKCkLyO2wRR3Vztfge04LqC6
+         0cwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWagQMhIC+VXZ5NLF1BQaZckPZknkvfKiZJI8i7vYrMXjA9no5LWe2Bngh3YHVwKNul8cWEL7dTJ/3HVk=@vger.kernel.org, AJvYcCWI5ruqcxwzDmSeeFeNA6obtxtruHieaE9Xr0e5Xy3lqmqmHwiY2NVU9BQpzzLULmoYopDK5YEJ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0iih5IiIZ+aWcqSE/xbqe8vNGzLIpqPl2bJ3G428m9Okze28w
+	tx68x9wtPHsHYTZYzk7eKR0Re5ZmYKF/+XyE6IH4a7zRd87bPojA/fNl4Kq8ux1dvzsEFgNtfQa
+	1kKOJJHyYvSq6klcyJgSoR0MEyA==
+X-Gm-Gg: ASbGncv6+jqNyrKev+dmg1lo/55V/9De53McoLS2A+JCjuaoC0whYUH5TlNK7wW6bUB
+	hzNyQubI8EOnFCbNM4+5u2BaoXAzkLvXIPyYPInvJyHW3VsURDHpx1NXZ8GI8zG5VWmL4HYJZst
+	vd49+y1//C1QFWN2UpbzMIi/fEn6ErDW3IpzRC9DbSi7jnGhUhyTzqsA0=
+X-Google-Smtp-Source: AGHT+IHtMeXmS4UKgx5A5QB88cc2HxcM6scLRIB0dHKGqExW1c0WFSB5gbD0xJtGTuW1xFeUYM9K345PPIhrpAwRSyc=
+X-Received: by 2002:a17:90b:2802:b0:2ee:5c9b:35c0 with SMTP id
+ 98e67ed59e1d1-3087c2ea0fcmr10981397a91.9.1745153937273; Sun, 20 Apr 2025
+ 05:58:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1744655329-13601-5-git-send-email-kotaranov@linux.microsoft.com>
+References: <CALkFLL+LxVk+M--+qHiP6g31rcvXxBGRJpKvp=CCFekL9OyUww@mail.gmail.com>
+ <94abe22f-ae52-4bc6-aef1-4378db38f494@broadcom.com>
+In-Reply-To: <94abe22f-ae52-4bc6-aef1-4378db38f494@broadcom.com>
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+Date: Sun, 20 Apr 2025 18:28:44 +0530
+X-Gm-Features: ATxdqUEeJUcRFWQGEjAyEzo5cG5q_EHvWSmcHW3NQF-xR1II9mKcyHOkRYwkZmw
+Message-ID: <CALkFLL+gBK0v8nG_fRTgqg44+E7caMeF=nNpiTnJLVQ2q=5Njg@mail.gmail.com>
+Subject: Re: [ethernet/broadcom/bgmac]: Implement software multicast filter clear
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 14, 2025 at 11:28:49AM -0700, Konstantin Taranov wrote:
-> From: Shiraz Saleem <shirazsaleem@microsoft.com>
-> 
-> Handle soc servcing events which require the rdma auxiliary device resources to
-> be cleaned up during a suspend, and re-initialized during a resume.
-> 
-> Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
-> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 11 +++-
->  .../net/ethernet/microsoft/mana/hw_channel.c  | 19 ++++++
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 60 +++++++++++++++++++
->  include/net/mana/gdma.h                       | 18 ++++++
->  include/net/mana/hw_channel.h                 |  9 +++
->  5 files changed, 116 insertions(+), 1 deletion(-)
+Hello!
 
-<...>
+> Given that these controllers are always interfaced with either an
+> integrated or an external Ethernet switch chip, the design was done
+> assuming that the switch will be operated in managed mode and multicast
+> filtering will be done on the switch side.
 
-> @@ -1474,6 +1481,8 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
->  	mana_hwc_destroy_channel(gc);
->  
->  	mana_gd_remove_irqs(pdev);
-> +
-> +	destroy_workqueue(gc->service_wq);
->  }
+Thanks for the info, I wasn't aware of this. I infer that this is
+relevant from your message and the codebase:
+https://docs.kernel.org/networking/dsa/dsa.html
 
-<...>
+If I understand correctly, this TODO is basically a no-op because DSA
+already implements `dsa_mc_add` / `dsa_mc_del`
+for handling multicast addresses on the switch side.
 
-> +static void mana_handle_rdma_servicing(struct work_struct *work)
-> +{
-> +	struct mana_service_work *serv_work =
-> +		container_of(work, struct mana_service_work, work);
-> +	struct gdma_dev *gd = serv_work->gdma_dev;
-> +	struct device *dev = gd->gdma_context->dev;
-> +	int ret;
-> +
-> +	switch (serv_work->event) {
-> +	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
-> +		if (!gd->adev || gd->is_suspended)
-> +			break;
-> +
-> +		remove_adev(gd);
-> +		gd->is_suspended = true;
-> +		break;
-> +
-> +	case GDMA_SERVICE_TYPE_RDMA_RESUME:
-> +		if (!gd->is_suspended)
-> +			break;
-> +
-> +		ret = add_adev(gd, "rdma");
-> +		if (ret)
-> +			dev_err(dev, "Failed to add adev on resume: %d\n", ret);
-> +		else
-> +			gd->is_suspended = false;
-> +		break;
-> +
-> +	default:
-> +		dev_warn(dev, "unknown adev service event %u\n",
-> +			 serv_work->event);
-> +		break;
-> +	}
-> +
-> +	kfree(serv_work);
+I'll hop over to `bcnxt` as I see some TODOs there, or find something
+easier to work with for starters. Thanks again.
 
-The series looks ok to me, except one question. Are you sure that it is
-safe to have not-connected and not-locked general work while add_adev/remove_adev
-can be called in parallel from different thread? For example getting event
-GDMA_SERVICE_TYPE_RDMA_SUSPEND while mana_gd_probe() fails or some other
-intervention with PCI (GDMA_SERVICE_TYPE_RDMA_SUSPEND and PCI shutdown).
-
-What type of protection do you have here?
-
-Thanks
+--- Ujwal.
 
