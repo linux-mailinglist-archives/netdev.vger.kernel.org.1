@@ -1,133 +1,113 @@
-Return-Path: <netdev+bounces-184439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FCDA957F2
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 23:28:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0A9A95865
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 23:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1A53AE39E
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:28:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61B2C18884C4
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F7321579C;
-	Mon, 21 Apr 2025 21:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADAF21ABD5;
+	Mon, 21 Apr 2025 21:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFbe4nGB"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="jukvpE8S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2AF1DF72E
-	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 21:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C641C6FE1;
+	Mon, 21 Apr 2025 21:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745270926; cv=none; b=hgoYpnwwH55efHimjczdVETRiOCwKqhmMSdLnVyuOCSLpLcyd1AP+ltf3YtBC7KryI3ywtVCDXvI5zY43yP5tEptNsAcTMs6hPw3mbw+GhWWXRom26DMDPEliKqrcvB8i12DHOn3MO0DhFXYqjsxZeounDc8mwtTUhP+Xnicgvk=
+	t=1745272285; cv=none; b=kwhnDyHM9VMOAyRdc4O3mdMjtuw3ZLBDCH5Wfk+dnVo/YmIMT1j1CkHbqP4Bb0pULdVsGlf7Ntz1T/4JxHUwyemsA2kxHhk876hAp9R2YjNoN1VqvGCJZAtmmrt17h78nyaj+4+oMcjeUhNRFWTfPotNpIxhoobVi6o9LDznZVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745270926; c=relaxed/simple;
-	bh=cj5Ks1uWmBi3jvbXo7vmiWm0xiYdo/inZP+2yuC3Fpc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YB7nuwYCk8UTrdxBQttqWV7Emvhw9Whahi5j+Iz+jjeWLKaHymzmP5B1uOG0HlAV0VDLKWNQ1hLEHzxRFTYqrAf+LhdR8TR+gn/buay/ThWbQJ3e733FRM0dKAd3RKcdl0JMSTblr17hLW8VdUVqQpzG82ysKot1o0XqHLFC2r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFbe4nGB; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-54acc04516fso4714720e87.0
-        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 14:28:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745270922; x=1745875722; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4H+pVshPZ+N3oOAe5R0RofSWaUDM4w267tTXN7y6tdQ=;
-        b=fFbe4nGBU1GLaPrplNJVlUjC8mE4YvK01Kxp/j7TkGgbc/hgN7xaRC0xGaEmRbP/Lq
-         qN8ZU4I4nuLEfzQvG2EgNfWsjLFNupxs8Pb6QlZWV9aZ8YAMFt/xCvzyIukThlLL0YoT
-         EP29vf4H8Vr5ei1HNyuEd03Po9mudz5A0oq3xS0VDwoXuaFmMaSaz/aRqh1t+1PNzIs1
-         K3aIKEuV1QX0LmgsrIDKCjLnt+xk+dsG/BQYu3a1FawqoKK3u0aQYVjVRfzE8/7wnDVL
-         gSGZ73usAm8ktqpTyLz1uedZk+04NfFmx8DakOT/wVyF+4g+WXiTQvk1qkjSclhIOqpT
-         uRiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745270922; x=1745875722;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4H+pVshPZ+N3oOAe5R0RofSWaUDM4w267tTXN7y6tdQ=;
-        b=WWVgn570fS/CbURpWx99J52L/gHzKWQlKwZaqaUGPYVOeejj9OLpbjR0AZVJygDP3f
-         8NXn9M1k/KDZQHQmGWyAc0x7E/N4WyGiZnk3s9lSRus4IsLGMtyJu5u1Bk2/3osmpkQ0
-         M3SWgVeC2snzRvDJXO0G0qjpT407OwomXhXqmgShIiKSpZhbqQB9sorxf/BpYWOMuASn
-         ljCfrrBx9a6F2oUwgzdbmzo+f+6nA4NnGa1YvMKqrvuE6RgASc0usd5hfu2/0vdh9hfL
-         2/p7zC6REWm1DCJgJurgoY4IQO6V0WF4C48E1rBBHW+gml0dBYluqs0992bYIvbpjZbS
-         1gEA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAboUqF5XQXxROwzhwsYP5sqhR8QrRFDtJjWQuQwcgoXO9mG5N6ifcVcD/dthZ9zcbED8r2Xc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPwfPn5y4X9V2mip6PGjJw1i0uwMTc4/OqQbAaOSmjsZs3lkHs
-	/7XF3Gyz0yERK1bUwrgIM39/HztfBwK3j0FJruQjZ6S+jucOcXBtAuKqlIMZaFc=
-X-Gm-Gg: ASbGnctwpbEyJHU+sTB9AobIw0GNYm1KBBL7n96GMOoz9vg2dakw6BfxNqL65ls1vCC
-	bwrQGQZWZJAeaPLPnhFHH2n78O+q78i/nQsLJZmUknmpEDg5bzbjw5Sgy6vFcArs+MDY2xrIRGd
-	AWcxLiSE2eUNFOObL2+0cBjYScAlnZbKIZZlGB+odCTyqTjvjZO8vb8LEyVJdSAICE1AVnhQkXz
-	Pal3X1znCWOpdtM6SpjCmFXNmL3hy9ODP01XNH0ghjSLLaJIoJ/xAW9Hi9xBTVC+6GdUjiirSlY
-	7QReTlT79zBzkzzUlsuDkcdfk/kLego28vSSBxNUiW2lli52Yxf3hA==
-X-Google-Smtp-Source: AGHT+IHrB5+Gs+5ymBeBdDO16MTL1evv43zT3u2uT/2TZTgDIF4MogWUfjyHq4H4fdDl1lCDD3YCTg==
-X-Received: by 2002:a05:6512:2386:b0:545:f9c:a80f with SMTP id 2adb3069b0e04-54d6e61a370mr3927345e87.1.1745270921634;
-        Mon, 21 Apr 2025 14:28:41 -0700 (PDT)
-Received: from localhost.localdomain ([185.201.30.223])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54d6e5f5177sm1032746e87.218.2025.04.21.14.28.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 14:28:41 -0700 (PDT)
-From: Dmitry Kandybka <d.kandybka@gmail.com>
-To: Aaron Conole <aconole@redhat.com>
-Cc: Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	dev@openvswitch.org,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] openvswitch: fix band bucket value computation in ovs_meter_execute()
-Date: Tue, 22 Apr 2025 00:28:34 +0300
-Message-ID: <20250421212838.1117423-1-d.kandybka@gmail.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1745272285; c=relaxed/simple;
+	bh=HyT++7V1AOZvPoNvFoFoo1SlvVznay6EHuHNjPxCZQs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AEe31WSgGP4NCeg3gB5QA5ERvUOrQKFWvdUovoNGHbQvZSD3kx2JR/zs51zVwh2PvVuelSVCkwxMgb1uyNVqOwkroxvJtvySgEi+7Oscb84goggWl7lLqEH/QbcD3Mh8cTvNhcnwjTCSmv8/yUi+9xj/23OWZVvgNmqXBMql33Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=jukvpE8S; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u6z2l-001iAh-UK; Mon, 21 Apr 2025 23:51:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=cJG1o1PAVMfo65c2jak5MnoP2Klf8L19W0RX+/R9Jmo=
+	; b=jukvpE8Sn/PdpMalM4f8Sbjno2EmwvkP2RH/PBEWtTjE1qswKf9//9whYCvfVbuDA6NLKKQfu
+	Z05GR6tVp5/dTSDoa8L7It7xpmQ4HlEN0hBOLXLXCpXX+BlploSIPWk23KD/KaHjkEWb+mP4bm2Cv
+	nC4nAClKHGs5y5LBp5ySinYjuT2hPhOWmJF+pbBlmODODuA39IG0/wiy9Xgy88+lzeCcqX8ndVeyx
+	HwtVyYgoWSAk0Q6j9vstWgq1nfQDfxDyazAXHe2g6/nslmoQJcORZGTYC7qIYisAV6E47UAo4yB0h
+	aBwZuaP+1yNiEinAd6VH4lpOZrbjfnUAZ6HROQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u6z2k-0000NU-T9; Mon, 21 Apr 2025 23:51:11 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u6z2g-0056xd-NB; Mon, 21 Apr 2025 23:51:06 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net-next v2 0/3] vsock: SOCK_LINGER rework
+Date: Mon, 21 Apr 2025 23:50:40 +0200
+Message-Id: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALC9BmgC/1WNQQrCMBBFr1Jm7cg0SWvjyntIFxqndlASSUqol
+ N7dkJ3Lx+O/v0HiKJzg3GwQOUuS4AuoQwNuvvknozwKgyLVkSaDOQX3wrcUFdGS6rmbrB16B2X
+ yiTzJWnNX8Lyg53WBsZhZ0hLit/7ktvqaNHT6T+YWCVvTDaQH1saqS7yH9egCjPu+/wA1KxxGs
+ AAAAA==
+X-Change-ID: 20250304-vsock-linger-9026e5f9986c
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-In ovs_meter_execute(), promote 'delta_ms' to 'long long int' to avoid
-possible integer overflow. It's assumed that'delta_ms' and 'band->rate'
-multiplication leads to overcomming UINT32_MAX.
-Compile tested only.
+Change vsock's lingerning to wait on close() until all data is sent, i.e.
+until workers picked all the packets for processing.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Changes in v2:
+- Comment that some transports do not implement unsent_bytes [Stefano]
+- Reduce the indentation of virtio_transport_wait_close() [Stefano] 
+- Do not linger on shutdown(), expand the commit messages [Paolo]
+- Link to v1: https://lore.kernel.org/r/20250407-vsock-linger-v1-0-1458038e3492@rbox.co
 
-Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
+Changes in v1:
+- Do not assume `unsent_bytes()` is implemented by all transports [Stefano]
+- Link to v0: https://lore.kernel.org/netdev/df2d51fd-03e7-477f-8aea-938446f47864@rbox.co/
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/openvswitch/meter.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Michal Luczaj (3):
+      vsock: Linger on unsent data
+      vsock: Reduce indentation in virtio_transport_wait_close()
+      vsock/test: Expand linger test to ensure close() does not misbehave
 
-diff --git a/net/openvswitch/meter.c b/net/openvswitch/meter.c
-index cc08e0403909..2fab53ac60a8 100644
---- a/net/openvswitch/meter.c
-+++ b/net/openvswitch/meter.c
-@@ -594,11 +594,11 @@ bool ovs_meter_execute(struct datapath *dp, struct sk_buff *skb,
- {
- 	long long int now_ms = div_u64(ktime_get_ns(), 1000 * 1000);
- 	long long int long_delta_ms;
-+	long long int delta_ms;
- 	struct dp_meter_band *band;
- 	struct dp_meter *meter;
- 	int i, band_exceeded_max = -1;
- 	u32 band_exceeded_rate = 0;
--	u32 delta_ms;
- 	u32 cost;
- 
- 	meter = lookup_meter(&dp->meter_tbl, meter_id);
-@@ -623,7 +623,7 @@ bool ovs_meter_execute(struct datapath *dp, struct sk_buff *skb,
- 	 * wrap around below.
- 	 */
- 	delta_ms = (long_delta_ms > (long long int)meter->max_delta_t)
--		   ? meter->max_delta_t : (u32)long_delta_ms;
-+		   ? meter->max_delta_t : long_delta_ms;
- 
- 	/* Update meter statistics.
- 	 */
+ net/vmw_vsock/virtio_transport_common.c | 29 +++++++++++++++++++----------
+ tools/testing/vsock/vsock_test.c        | 30 +++++++++++++++++++++++++++---
+ 2 files changed, 46 insertions(+), 13 deletions(-)
+---
+base-commit: 8066e388be48f1ad62b0449dc1d31a25489fa12a
+change-id: 20250304-vsock-linger-9026e5f9986c
+
+Best regards,
 -- 
-2.43.5
+Michal Luczaj <mhal@rbox.co>
 
 
