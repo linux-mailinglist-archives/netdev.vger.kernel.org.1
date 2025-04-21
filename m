@@ -1,55 +1,79 @@
-Return-Path: <netdev+bounces-184350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50B9A94E6E
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:10:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D0EA94E96
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0AA27A69D9
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 09:09:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 775797A6DD9
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 09:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0059213E71;
-	Mon, 21 Apr 2025 09:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FA4213E65;
+	Mon, 21 Apr 2025 09:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="SxHP2NZ0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LL0im2Bs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33196CA5E;
-	Mon, 21 Apr 2025 09:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E03844C63
+	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 09:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745226649; cv=none; b=K47cBBSEnZnKCvyiuufYgr73h1ELzoPGsf4wjPETapj9fxqJEHpN1Baiew/IoK5qHZTzZQxDww8HCq3RS/M9158ejW/gxf5j/24sXxgGUunHcP9nZH8Pk3GBcGQUKM4311oLurywdBU75IQJ+1XXezKJbnThLnG+RNmqPJI+61Y=
+	t=1745227454; cv=none; b=AwObUdEiIBdEhf064k61lEbSPNqYkFil/jodMD2caj8Y5szNDq1EUzeGDYdXdVkSiRZO9b31PvPcUIfzeGjq4x/tYzGtZUnppPCCQUbpxqvJCu72sFgrBbqbiNdM0VmgZBgFKSn36aG1S4Tg9CEeBeX0X/QndE0K+sJ51d8B+hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745226649; c=relaxed/simple;
-	bh=kHdJISTOknZRXyvwHcOZ1+E+dOr0gE3qeLIKQ5XfQTY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=C4ruh6x1wCP0MHXhkykBXACsoznEA0BfubW+ZOybqwj0mRRTYQDtX5VNapvpoCVD5h0Jlzz/y+mu8LgykwNIiHjLO04FZhodF6+VPC1gucCgOb5aafKoWbfDkuCYQeFnKOkEAuTRm2YzL4s16jgh/pKrdXFK5+vpnCoERBuHKzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=SxHP2NZ0; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1745226622; x=1745831422; i=markus.elfring@web.de;
-	bh=kHdJISTOknZRXyvwHcOZ1+E+dOr0gE3qeLIKQ5XfQTY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=SxHP2NZ0Qvrw2apTNNETWQi36hpPI6DwnjO0ssYZ751ASDkyDB5Y+NmQvkrX7VWY
-	 Tol7jUQQMpOmEmdTe12bihpvvRab8B/UAnMEsRmlaqcVZPYdpP+ao6hGUFUd6+4A8
-	 Uk7tz4zBCrBdGPbejSkQl+Fu/iNdhRyWevh4zIwAFK7/Z2GLCdmdUHwaJ/cgWSAob
-	 PeQteIzeorDREQFmmnPI35CPJA7/YSw3/vDtMPDdVo4mA72qUIPvNVpbehBCFupZ8
-	 I5aX3txjOKjIMriFBjLoOd4Z2meID5cSUKeLJxBQNgfV0VWnpdVuaqZDn4zMxVYDw
-	 d0bBeejjfUSgJSB1pA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.70.16]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M3V26-1u6Ew80W26-00E3nF; Mon, 21
- Apr 2025 11:10:22 +0200
-Message-ID: <ea9260c1-eca4-4b9a-88de-64c27f226a27@web.de>
-Date: Mon, 21 Apr 2025 11:10:10 +0200
+	s=arc-20240116; t=1745227454; c=relaxed/simple;
+	bh=o8wObpRbonj6EIE3IbxvfiI4WKVpP5CMVy5R8J73AmY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=DccB1C8O9gsHkO6m5KpY4srVX8TjuUuUFZxDcQ57j0b3DbrBD4PpFLXW3x+vitHfUgDnTu3/wI9dFLlmdGT/ayk9byJ0U9qOa7e4btBS98S8JLCAtDnxaS4kUxq0q/xLXdp+Pa5jcjGv1x9Y8RhK6Kt1ekpRO5dWh3a8EpTiUSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LL0im2Bs; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3914aba1ce4so2510044f8f.2
+        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 02:24:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745227451; x=1745832251; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qp56QcHnMddJGTXudIPcj1nEpiZkgXyGa15nkI2ieto=;
+        b=LL0im2BsOC1YHafeu1VGbRJ7zlwobhAzH2giMAmA3Fixha26PSyll9zQ3ImLX5wiI0
+         WmPml9Kp1JpLLBdTYjJOlPDQf+v/sVnkTrTQnzaq+KVQFk7IMfWzU3IJOXT6GblfqIBY
+         7Y3yUDtqIhwK6WHbiQOWUkyfRkYvBjK2JrEmMeHcfAG2pDhxC9ChYXJU97IM7S2Xlxh8
+         fbClVzM9V9sN+haglcoHWu0D5W8rbXp8tnlklxsVU4xE/mG2ywQ8rHPBgMdDhhZL26FG
+         HWtnF/qBPpTwQHOJjdfValCLQDosD6blY6rU0baAj3e8KJ1sj0NwzcQr30CFP/2uuVND
+         VeEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745227451; x=1745832251;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qp56QcHnMddJGTXudIPcj1nEpiZkgXyGa15nkI2ieto=;
+        b=PO9GgWGCfGT4lVZJTO+bt3Zobh7Zn0anltvUYxzUKqY2y8FPNf6cWxVblcQ3ZwcPfh
+         FOiZDYj+CrPI8PJpV/t1sQjoEQLYXc5CXCXgMkLGJ3Biu2hYembVQ5Drl2qJ4IGFBUgi
+         b44pKF7jMsi3K/22TUX+yVIB89Wz9iJLERtNQ/DLsUz9wn6DtYBcEYlC+KIZzJ3rqfPd
+         UcgZBCSgZ4G2RUHTqq3T9hlwkLLb54Dhnl61HiwtdDdeNUeu6R2tHt+m1ZGTsrcAFhtV
+         hdM9ysepf1u1SCJAlHCkxo7P+svr60MQ9/ZnPs1Ois/6/6594LFMWVIwteoPqxGrVtGd
+         4Ikw==
+X-Gm-Message-State: AOJu0YwD3oxBJQKLRUclX8CexryLlID0q0xlG4L7vmIXLAzcd3IvAQTG
+	1GIMPzwTEzm12UEi8X6DtLSMEqeo70FXB9uWxrPNjyCXNKWyA6dE
+X-Gm-Gg: ASbGncvoYJ1Y9eIB2AuOiDXiwUB7G+VjSGktEFwZBDtxkbaTCdG10iYgDES3H2ocQjO
+	JG+84QB98/vrA703VQ2C7OzNlEKaRYbVbtLGNzH0jQEehGNGnKwVY+urB7AGCTunm97r/m68uRD
+	LacGaRbTf+BweLcsfqtMnBVD42CpbZ3OGHkVx80/+9Tj+XqCoyZXVVSKAKmlAenzX+LNmenqos1
+	c+WQMk602ubXnSSZDKfGLFzLy2V31cg2qFyK4uMRjlyMmY2hLVuaB7XD9waVc1kaoGGXY08wyDS
+	ynYh5ynw3ATtE3CmRAULswdpXDxeJ0eqSWY3UkhXrihUulVLpoDlXz466TxdbLXgDg/sOuuUkFk
+	7aIDUWE2NznAFW18tScQ4fNmIiCBzMbGiDSou1lIo4nveCDImW2qm2ed5huNB2SGO52HXOXt+FX
+	G0c1d02FiOUhCyrV9PRVTDX9Cjnbe/sMrcG4dwzgtv
+X-Google-Smtp-Source: AGHT+IEVmGbPnv6sENZsKcAWApkEOwVHDWvEgFDGn8M2x1LZn6HfnBbCjqqsc0lRv60Vuja26py/iA==
+X-Received: by 2002:a5d:6d88:0:b0:39c:2669:d7f4 with SMTP id ffacd0b85a97d-39efbad7d40mr8167570f8f.43.1745227450691;
+        Mon, 21 Apr 2025 02:24:10 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:adc9:f500:6d8b:3370:fae:2b2e? (dynamic-2a02-3100-adc9-f500-6d8b-3370-0fae-2b2e.310.pool.telefonica.de. [2a02:3100:adc9:f500:6d8b:3370:fae:2b2e])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4406d5cf3a7sm127056555e9.32.2025.04.21.02.24.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Apr 2025 02:24:10 -0700 (PDT)
+Message-ID: <f573fdbd-ba6d-41c1-b68f-311d3c88db2c@gmail.com>
+Date: Mon, 21 Apr 2025 11:25:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,84 +81,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Henry Martin <bsdhenrymartin@gmail.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-References: <20250418023814.71789-1-bsdhenrymartin@gmail.com>
-Subject: Re: [PATCH v7 0/2] net/mlx5: Fix NULL dereference and memory leak in
- ttc_table creation
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250418023814.71789-1-bsdhenrymartin@gmail.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: use pci_prepare_to_sleep in rtl_shutdown
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:aabuASyem9RhQYBPfwP7u98LFIGEfB2c/f5zmmKC6hcqQczLfa/
- FXmuFPSf8711+CGjp2vCqjmP+RwYvnQxLYFdskB0jqeX4QuyH5tOxnn2Yn7k9h0H6FZaWyO
- AZ68Sn6CLUVYs/O4bnIsKdQv9uGoCwN5t9sYIe088cfCMSMB41SqSCH7Sc+zMvMDBYDMEVa
- m7hX2M4F4wdEgUhzxM7Mg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ZfssjIIz9/Q=;yPKt2LsJVTtDcR7iA1sAQoassrA
- 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
- kMaI=
+Content-Transfer-Encoding: 7bit
 
-> This patch series addresses two issues in =E2=80=A6
+Use pci_prepare_to_sleep() like PCI core does in pci_pm_suspend_noirq.
+This aligns setting a low-power mode during shutdown with the handling
+of the transition to system suspend. Also the transition to runtime
+suspend uses pci_target_state() instead of setting D3hot unconditionally.
 
-Did you overlook the addition of patch version descriptions once more?
-https://lore.kernel.org/all/?q=3D%22This+looks+like+a+new+version+of+a+pre=
-viously+submitted+patch%22
-https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
-e/Documentation/process/submitting-patches.rst?h=3Dv6.15-rc3#n310
+Note: pci_prepare_to_sleep() uses device_may_wakeup() to check whether
+      device may generate wakeup events. So we don't lose anything by
+      not passing tp->saved_wolopts any longer.
 
-Regards,
-Markus
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index b2c48d013..64e30408a 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5028,10 +5028,8 @@ static void rtl_shutdown(struct pci_dev *pdev)
+ 	/* Restore original MAC address */
+ 	rtl_rar_set(tp, tp->dev->perm_addr);
+ 
+-	if (system_state == SYSTEM_POWER_OFF && !tp->dash_enabled) {
+-		pci_wake_from_d3(pdev, tp->saved_wolopts);
+-		pci_set_power_state(pdev, PCI_D3hot);
+-	}
++	if (system_state == SYSTEM_POWER_OFF && !tp->dash_enabled)
++		pci_prepare_to_sleep(pdev);
+ }
+ 
+ static void rtl_remove_one(struct pci_dev *pdev)
+-- 
+2.49.0
+
+
+
 
