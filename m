@@ -1,300 +1,277 @@
-Return-Path: <netdev+bounces-184445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76239A958E0
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:04:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26072A9592B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F3763B318C
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 22:04:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B201760D3
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 22:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7418322128E;
-	Mon, 21 Apr 2025 22:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B38820FAB2;
+	Mon, 21 Apr 2025 22:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="nQJC0Fc4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rv0RpuRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99BE221289;
-	Mon, 21 Apr 2025 22:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745272976; cv=pass; b=anA/GpSs78hGhjPFem/Uzfxvl8QjaujyXTMJa7YHTR+VeyXaMfyH7j2bybGkA8bmCwFVlJIf+ItjYJDtZZjZe1M9zA1GH7fDXtb5BvwyUlThBuOtHoGq975fv1HkDpLXuG+21xUaZd8bBrR9SEHm+a0EMF6/DI7M2KiATobNa1I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745272976; c=relaxed/simple;
-	bh=TDuUmjERxzpZupEEIWrAYX9CP7zrQEa4WT8BuKPzMms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OwPgnCZIfidZynQ08gSE4VK1Dfk007eTLoVBWXchj7lm3Pjfane4w8YxLweyRZiDhlugDBYIPEa+9py0mdl47Mg4aN8EQjv9cmTcyLqVYUBhVlwh9CILbdDEHbbWqKyAwcWVaHMJRgDjQxARUUmqycFrvIdVUOSeWMx+w4ZLMXE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=nQJC0Fc4; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from monolith.lan (unknown [185.77.218.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZhK9X3wD6z49Pwm;
-	Tue, 22 Apr 2025 01:02:40 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1745272961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
-	b=nQJC0Fc4n44QBI3x22Un5+usQfsSt3V8qe/IVEyXCcLl21XU3FKkUVdNFhPRZZSZxzuUW3
-	aAb0LckRxsmqQJl6N++dXcOUP7CWxgrP87qSafzokOGUJB5LqtNKvPrM0aazV1b9iHXyq8
-	4iscCaDdmJOQMSvhG8Fw06v9tNsQtTWYe4Ca0+gRVU0uZ7Eg70hbjqCtoUZ6FA53+BABgh
-	2Yop2Bn/oliTIkrXGqAYtSA4s85mdaCbmEbz3vN7U1qswveWADPOncAC1a6rqPWun1ytPw
-	C+S9jqXeY6ugey0OX89XZDbR4iiek8i0FI7cc2CLWCKnhcR4L903sb79aHwrdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1745272961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
-	b=jP26Hq+gxt8Pbt2P8liSeG2s4pQv1Ho57MsIay49YUqOwGAlc704nMRaZI72gT9vFKjEGr
-	0bIXJzIt8N7tuNGybwPox0QRm7TcWlsuEt0DD2eqWseWRmhW54l+j+E678jGvWHWW7jYI3
-	UovI91fpEFM/iApHFYFM2aARHHeI1j4lzrnWBdrvSm+7/h+/3Mv/4PRKVX+mjINk1pW0CN
-	VsIeqxjVSM2zW4FLYBNBTCRoWX95GICIc3GqlH1m8ncVOriaBa/EaL974ZLFAU9/5GdvGY
-	9zAyVnFhdCSuMDbvUioPMhEaBQDVKpnCZtX6zaNeb8D2+vClmpgvxrGIZlAiBg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745272961; a=rsa-sha256;
-	cv=none;
-	b=dcNYe4cpxZqtI3/gVTzxGO60DVfV0tBgbI0OA149gITIOu4GanLtaikeytgfDOkzMq/zI1
-	ZYnwFRjlrpV4yCXlTUmw5OiTeqghGUK3Xgq04hZy5qd5AryOfEjZUaNruVFoZnuHwSpIZ0
-	NX0B4uFE4SZb8rtF/q+kfKDJ9YG10S7kdW7ph2/hCFWOo/tsLhdP2/7x82aca++cQvgvwv
-	gHdTVYjGYhASAw+0/ebVF3H40dMKf60sd9WeblRLjdSTj6UI+mQYuS5eidyhrv2WYgm+Pf
-	vIjwPkYNKdQ7Npp591cJgigOgPP/ohflpPLnCB33TL7ZlXCvWbOVuNy8b0mcsA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	luiz.dentz@gmail.com,
-	netdev@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	kernelxing@tencent.com
-Subject: [PATCH] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-Date: Tue, 22 Apr 2025 01:02:08 +0300
-Message-ID: <0ff3e783e36ac2a18f04cf3bc6c0d639873dd39d.1745272179.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37456BA4A;
+	Mon, 21 Apr 2025 22:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745274028; cv=none; b=mbyzPIdT42UmSg5HgGde7BzTruWG3C7mJ9xit0SnDY9WbBCuaFzAjMt6DBTujTtEAbMNs6MGThPLru+8bGh9FWnFAG18I/E3YdPM5qfCN79ixkx1/XLv6rvZHLnzy5TbHuR53pPSy7DW0iMVzT4cwM5QqmTYeTjrrL7gypQ0iyE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745274028; c=relaxed/simple;
+	bh=Dlk2kizodiJSpWj38CgCmp8e9t/53aVYjJzM1ShlIZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tQ/rWdKjfdMe4+cQapD+QxdizwDmwiii9MO7jntqq6/muD80iOl9vx+p9a8P4e6YttwBVLgPU9CwKTvjL3Q0RW65CnPNX7VVjgQH0MfXRWs6YHBcIURNde7CXJEjntHuNX/rZJOwxam3cfEwtxYqeq77byeeZAPjXFff5L68u6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rv0RpuRU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75E5DC4CEE4;
+	Mon, 21 Apr 2025 22:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745274027;
+	bh=Dlk2kizodiJSpWj38CgCmp8e9t/53aVYjJzM1ShlIZY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rv0RpuRUEeZRiX6bijYPzFedpo0g7rL8/nRQBAxmgwGkOake7QNYqwE1aBUg1tqzv
+	 dOoIF2quCoa+snIjRSHuN4R8z7ykr6UB4z8KyTCz0WbUMhoEVRDweAOk4pakQJu+aR
+	 y/ciSnGQlp2/l5JIYwliUpSKRAb2ihEaMX3ztMW7xVBtUWHx+96a8PtFVh0gbGALOM
+	 AcKey8Bbvsayca1qYI3TsrKrpmQJ7UYIQDg/9pJv2LDXWKHNzHdUgOM1ijexxOC4dL
+	 d2WBBgdUzHCdFMRtjFOATtTxHUBCnj66dzwbNuAO/5/ZyJ9wWjWu44TJ8UNu9O5mF/
+	 ee0XO3TbwfuGA==
+Date: Mon, 21 Apr 2025 17:20:25 -0500
+From: Rob Herring <robh@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 1/8] dt-bindings: dpll: Add device tree
+ bindings for DPLL device and pin
+Message-ID: <20250421222025.GA3015001-robh@kernel.org>
+References: <20250416162144.670760-1-ivecera@redhat.com>
+ <20250416162144.670760-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416162144.670760-2-ivecera@redhat.com>
 
-Bluetooth needs some way for user to get supported so_timestamping flags
-for the different socket types.
+On Wed, Apr 16, 2025 at 06:21:37PM +0200, Ivan Vecera wrote:
+> Add a common DT schema for DPLL device and associated pin.
+> The DPLL (device phase-locked loop) is a device used for precise clock
+> synchronization in networking and telecom hardware.
 
-Use SIOCETHTOOL API for this purpose. As hci_dev is not associated with
-struct net_device, the existing implementation can't be reused, so we
-add a small one here.
+In the subject, drop 'device tree binding for'. You already said that 
+with 'dt-bindings'.
 
-Add support (only) for ETHTOOL_GET_TS_INFO command. The API differs
-slightly from netdev in that the result depends also on socket proto,
-not just hardware.
+> 
+> The device itself is equipped with one or more DPLLs (channels) and
+> one or more physical input and output pins.
+> 
+> Each DPLL channel is used either to provide pulse-per-clock signal or
+> to drive ethernet equipment clock.
+> 
+> The input and output pins have a label (specifies board label),
+> type (specifies its usage depending on wiring), list of supported
+> or allowed frequencies (depending on how the pin is connected and
+> where) and can support embedded sync capability.
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
+Convince me this is something generic... Some example parts or 
+datasheets would help. For example, wouldn't these devices have 1 or 
+more power supplies or a reset line?
 
-Notes:
-    Another option could be a new socket option, not sure what would be best
-    here. Using SIOCETHTOOL may not be that great since the 'ethtool' program
-    can't query these as the net_device doesn't actually exist.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+> v1->v3:
+> * rewritten description for both device and pin
+> * dropped num-dplls property
+> * supported-frequencies property renamed to supported-frequencies-hz
+> ---
+>  .../devicetree/bindings/dpll/dpll-device.yaml | 76 +++++++++++++++++++
+>  .../devicetree/bindings/dpll/dpll-pin.yaml    | 44 +++++++++++
+>  MAINTAINERS                                   |  2 +
+>  3 files changed, 122 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>  create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/dpll/dpll-device.yaml b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> new file mode 100644
+> index 0000000000000..11a02b74e28b7
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> @@ -0,0 +1,76 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/dpll/dpll-device.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Digital Phase-Locked Loop (DPLL) Device
+> +
+> +maintainers:
+> +  - Ivan Vecera <ivecera@redhat.com>
+> +
+> +description:
+> +  Digital Phase-Locked Loop (DPLL) device is used for precise clock
+> +  synchronization in networking and telecom hardware. The device can
+> +  have one or more channels (DPLLs) and one or more physical input and
+> +  output pins. Each DPLL channel can either produce pulse-per-clock signal
+> +  or drive ethernet equipment clock. The type of each channel can be
+> +  indicated by dpll-types property.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^dpll(@.*)?$"
 
- include/net/bluetooth/bluetooth.h |  4 ++
- net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++++
- net/bluetooth/hci_conn.c          | 40 ++++++++++++++
- 3 files changed, 131 insertions(+)
+There's no 'reg' property, so you can't ever have a unit-address. I 
+suppose you can have more than 1, so you need a '-[0-9]+' suffix.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index bbefde319f95..114299bd8b98 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -29,6 +29,7 @@
- #include <linux/poll.h>
- #include <net/sock.h>
- #include <linux/seq_file.h>
-+#include <linux/ethtool.h>
- 
- #define BT_SUBSYS_VERSION	2
- #define BT_SUBSYS_REVISION	22
-@@ -448,6 +449,9 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
- 			  hci_req_complete_t *req_complete,
- 			  hci_req_complete_skb_t *req_complete_skb);
- 
-+int hci_ethtool_ts_info(unsigned int index, int sk_proto,
-+			struct kernel_ethtool_ts_info *ts_info);
-+
- #define HCI_REQ_START	BIT(0)
- #define HCI_REQ_SKB	BIT(1)
- 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 0b4d0a8bd361..6ad2f72f53f4 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -34,6 +34,9 @@
- #include <net/bluetooth/bluetooth.h>
- #include <linux/proc_fs.h>
- 
-+#include <linux/ethtool.h>
-+#include <linux/sockios.h>
-+
- #include "leds.h"
- #include "selftest.h"
- 
-@@ -563,6 +566,86 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
- }
- EXPORT_SYMBOL(bt_sock_poll);
- 
-+static int bt_ethtool_get_ts_info(struct sock *sk, unsigned int index,
-+				  void __user *useraddr)
-+{
-+	struct ethtool_ts_info info;
-+	struct kernel_ethtool_ts_info ts_info = {};
-+	int ret;
-+
-+	ret = hci_ethtool_ts_info(index, sk->sk_protocol, &ts_info);
-+	if (ret == -ENODEV)
-+		return ret;
-+	else if (ret < 0)
-+		return -EIO;
-+
-+	memset(&info, 0, sizeof(info));
-+
-+	info.cmd = ETHTOOL_GET_TS_INFO;
-+	info.so_timestamping = ts_info.so_timestamping;
-+	info.phc_index = ts_info.phc_index;
-+	info.tx_types = ts_info.tx_types;
-+	info.rx_filters = ts_info.rx_filters;
-+
-+	if (copy_to_user(useraddr, &info, sizeof(info)))
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+static int bt_ethtool(struct sock *sk, const struct ifreq *ifr,
-+		      void __user *useraddr)
-+{
-+	unsigned int index;
-+	u32 ethcmd;
-+	int n;
-+
-+	if (copy_from_user(&ethcmd, useraddr, sizeof(ethcmd)))
-+		return -EFAULT;
-+
-+	if (sscanf(ifr->ifr_name, "hci%u%n", &index, &n) != 1 ||
-+	    n != strlen(ifr->ifr_name))
-+		return -ENODEV;
-+
-+	switch (ethcmd) {
-+	case ETHTOOL_GET_TS_INFO:
-+		return bt_ethtool_get_ts_info(sk, index, useraddr);
-+	}
-+
-+	return -EOPNOTSUPP;
-+}
-+
-+static int bt_dev_ioctl(struct socket *sock, unsigned int cmd, void __user *arg)
-+{
-+	struct sock *sk = sock->sk;
-+	struct ifreq ifr = {};
-+	void __user *data;
-+	char *colon;
-+	int ret = -ENOIOCTLCMD;
-+
-+	if (get_user_ifreq(&ifr, &data, arg))
-+		return -EFAULT;
-+
-+	ifr.ifr_name[IFNAMSIZ - 1] = 0;
-+	colon = strchr(ifr.ifr_name, ':');
-+	if (colon)
-+		*colon = 0;
-+
-+	switch (cmd) {
-+	case SIOCETHTOOL:
-+		ret = bt_ethtool(sk, &ifr, data);
-+		break;
-+	}
-+
-+	if (colon)
-+		*colon = ':';
-+
-+	if (put_user_ifreq(&ifr, arg))
-+		return -EFAULT;
-+
-+	return ret;
-+}
-+
- int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- {
- 	struct sock *sk = sock->sk;
-@@ -595,6 +678,10 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 		err = put_user(amount, (int __user *)arg);
- 		break;
- 
-+	case SIOCETHTOOL:
-+		err = bt_dev_ioctl(sock, cmd, (void __user *)arg);
-+		break;
-+
- 	default:
- 		err = -ENOIOCTLCMD;
- 		break;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 95972fd4c784..55f703076e25 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -3186,3 +3186,43 @@ void hci_conn_tx_dequeue(struct hci_conn *conn)
- 
- 	kfree_skb(skb);
- }
-+
-+int hci_ethtool_ts_info(unsigned int index, int sk_proto,
-+			struct kernel_ethtool_ts_info *info)
-+{
-+	struct hci_dev *hdev;
-+
-+	hdev = hci_dev_get(index);
-+	if (!hdev)
-+		return -ENODEV;
-+
-+	info->so_timestamping =
-+		SOF_TIMESTAMPING_TX_SOFTWARE |
-+		SOF_TIMESTAMPING_SOFTWARE |
-+		SOF_TIMESTAMPING_OPT_ID |
-+		SOF_TIMESTAMPING_OPT_CMSG |
-+		SOF_TIMESTAMPING_OPT_TSONLY;
-+	info->phc_index = -1;
-+	info->tx_types = BIT(HWTSTAMP_TX_OFF);
-+	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE);
-+
-+	switch (sk_proto) {
-+	case BTPROTO_ISO:
-+		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
-+		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
-+		break;
-+	case BTPROTO_L2CAP:
-+		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
-+		break;
-+	case BTPROTO_SCO:
-+		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
-+		if (hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
-+			info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
-+		break;
-+	default:
-+		info->so_timestamping = 0;
-+	}
-+
-+	hci_dev_put(hdev);
-+	return 0;
-+}
--- 
-2.49.0
+> +
+> +  "#address-cells":
+> +    const: 0
+> +
+> +  "#size-cells":
+> +    const: 0
+> +
+> +  dpll-types:
+> +    description: List of DPLL channel types, one per DPLL instance.
+> +    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+> +    items:
+> +      enum: [pps, eec]
+> +
+> +  input-pins:
+> +    type: object
+> +    description: DPLL input pins
+> +    unevaluatedProperties: false
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +      "#size-cells":
+> +        const: 0
+> +
+> +    patternProperties:
+> +      "^pin@[0-9]+$":
 
+Unit-addresses are generally hex.
+
+> +        $ref: /schemas/dpll/dpll-pin.yaml
+> +        unevaluatedProperties: false
+> +
+> +    required:
+> +      - "#address-cells"
+> +      - "#size-cells"
+> +
+> +  output-pins:
+> +    type: object
+> +    description: DPLL output pins
+> +    unevaluatedProperties: false
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +      "#size-cells":
+> +        const: 0
+> +
+> +    patternProperties:
+> +      "^pin@[0-9]+$":
+> +        $ref: /schemas/dpll/dpll-pin.yaml
+> +        unevaluatedProperties: false
+> +
+> +    required:
+> +      - "#address-cells"
+> +      - "#size-cells"
+> +
+> +additionalProperties: true
+> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> new file mode 100644
+> index 0000000000000..44af3a4398a5f
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> @@ -0,0 +1,44 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/dpll/dpll-pin.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: DPLL Pin
+> +
+> +maintainers:
+> +  - Ivan Vecera <ivecera@redhat.com>
+> +
+> +description: |
+> +  The DPLL pin is either a physical input or output pin that is provided
+> +  by a DPLL( Digital Phase-Locked Loop) device. The pin is identified by
+> +  its physical order number that is stored in reg property and can have
+> +  an additional set of properties like supported (allowed) frequencies,
+> +  label, type and may support embedded sync.
+
+blank line here if this is a separate paragraph:
+
+> +  Note that the pin in this context has nothing to do with pinctrl.
+> +
+> +properties:
+> +  reg:
+> +    description: Hardware index of the DPLL pin.
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+
+'reg' already has a type. You need to say how many entries (i.e. 
+'maxItems: 1')
+
+> +
+> +  esync-control:
+> +    description: Indicates whether the pin supports embedded sync functionality.
+> +    type: boolean
+> +
+> +  label:
+> +    description: String exposed as the pin board label
+> +    $ref: /schemas/types.yaml#/definitions/string
+> +
+> +  supported-frequencies-hz:
+> +    description: List of supported frequencies for this pin, expressed in Hz.
+> +
+> +  type:
+
+'type' is too generic of a property name.
+
+> +    description: Type of the pin
+> +    $ref: /schemas/types.yaml#/definitions/string
+> +    enum: [ext, gnss, int, mux, synce]
+> +
+> +required:
+> +  - reg
+> +
+> +additionalProperties: false
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1248443035f43..f645ef38d2224 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -7187,6 +7187,8 @@ M:	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>  M:	Jiri Pirko <jiri@resnulli.us>
+>  L:	netdev@vger.kernel.org
+>  S:	Supported
+> +F:	Documentation/devicetree/bindings/dpll/dpll-device.yaml
+> +F:	Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+>  F:	Documentation/driver-api/dpll.rst
+>  F:	drivers/dpll/*
+>  F:	include/linux/dpll.h
+> -- 
+> 2.48.1
+> 
 
