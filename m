@@ -1,349 +1,135 @@
-Return-Path: <netdev+bounces-184411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5561A954E5
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 18:48:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B2AA954EF
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 18:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ABDE16B995
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 16:48:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49FB5171FEC
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 16:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027AC1D88D0;
-	Mon, 21 Apr 2025 16:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FEA1DF74F;
+	Mon, 21 Apr 2025 16:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="r0QPJ3xf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxa22RqP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD0A17C77
-	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 16:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A3613D53B
+	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 16:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745254094; cv=none; b=cF6LYOUpZi9qHpc73IoXtec+eOgIwnXX+z8a9lOyGia0wU/LC/EdUiNTUUPmjcn7lzyv0Jo2zXtElskUgY6+rlCieXwW7EHd7Xd/RjFFFykFXc4sEqcTPHVzX5hcrXA2XNOPoBUI6W+Ym+Wv4aC9dk4mQxGNek6K/zfGAk5RbCo=
+	t=1745254265; cv=none; b=SVnwdNGNOFL55fYHXaGsgkJxYvIljj4zLSlZtWcYbbPOKmw4pxioWXiR40IWu2jfmhpATpHbdTkWNWPC1sE791/CBOol42GnuAEekMmCJckOY23sIoBCRwrWZIvZKAL8YIFIu3fZXy8YttwkX29kE/HjfRG3J+8P1ZKF4tDWSzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745254094; c=relaxed/simple;
-	bh=jUSicrNEmTv8RzLjQt/YWviKgPDkq5/4lQCuioRKwQ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WTFACrM5PRtvsf+Ms9g+yXzkd2xT6lCb6JMFyL/083oXZna8m9cbndIIArW9yBnfZSqIXmhU1MVJAS+h7WXBj+giQhtBNpb2BnF+ZYrFJZpHetVp9svzpHa/D3q3HNrsSGQdhh7dPPqJM2jAey0lBTMidURZGq15aqNrAdnVqr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=r0QPJ3xf; arc=none smtp.client-ip=121.127.44.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
- Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
- s=fe-e1b5cab7be; t=1745254091;
- bh=tmMMVh9ut/6pECDrXwuZNSGIOc+pxyHd/3NaqPyvhi0=;
- b=r0QPJ3xfQBVJKSd9AtRAOTmoufadyhqvB+E6/jAfocaR4xX82i9+Jc1VWB+kTtDdJwOf5krs7
- 45ZrNmSv9xJO/JCc0kxAvhOvBKfGrYmmU7107eDar54sEJ+H4zqDjRTRDXT393CN79IY5RKEdH5
- VHK7vm1P4YPjvUTmxsguHC+rDIS2eW9KOU77JETCie7YSfuxJx+jshV6DeGSl+nIdH6PP2avf6P
- ff2I5DdgohDWEGYeO2yQhUHQ8c3deh+UFbgCfyQD3NJm0u/tBjZZsUX2GaPOOkAXEL4Mz4IN/oj
- 0A3+DsIvqhMcsuD/RMnpT3mTMNn7L2YyeziqDFPMBwqg==
-X-Forward-Email-ID: 680676c88a5cda485177da7b
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 121.127.44.73
-X-Forward-Email-Version: 1.0.2
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-Message-ID: <afc99921-d9ba-4f6e-b828-bc880d55955c@kwiboo.se>
-Date: Mon, 21 Apr 2025 18:48:03 +0200
+	s=arc-20240116; t=1745254265; c=relaxed/simple;
+	bh=MEZHiFpIWEUkGffrMPQkTGhIe5PCBbFCE5rAIsKNHb0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dN9zqDT+ABqGTnTBoQQ5pjLZdrp3YYTZBis26/qtDBLqn0k3CQ486xl/7TniJcRy32jcMJFhAuvHuxqJGtiQ3ndnXpmus0X152Ump6jCpHwjGz8BdMa5eyREmV8BaR+JHsuSOvaXqCVl345Z0fgf39D27ucXbx1j624BERy4dHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cxa22RqP; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so39699755e9.3
+        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 09:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745254262; x=1745859062; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jgwUpSyaGSzqG7JjROyx+1HfaaO305df0HsP5LKVGGU=;
+        b=cxa22RqPqcdTCfeIRcJWED1l946EOp19DMRKCPv5RbPLT4OxfTzz8y8hqOaKbtnox7
+         yRSu1Ecf5nATgyAcz0bvtzaExE3o4WwasGSEDHY3WHWPCPxT3vQGh7aHaktFryg/G7yB
+         Nn4ALxSCXSR6ayhP73KpLY+Kywf+rnlkZlaKRjcmQnE3J9wt0CCKWeQhLTPIF4vRvlN5
+         KkemnmHVu55odt4fQvEDsUToa0wsakUlWl4IIeqzM6iv5uNw0ve6ZOYImrOw9aW8WVHA
+         Pb8hdnd1haNYXWZuyHcjMCN9Alfk9fMmTyEjkQpp/ZReRDy5ASAevSZnEbNA34tl0Zez
+         tzEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745254262; x=1745859062;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jgwUpSyaGSzqG7JjROyx+1HfaaO305df0HsP5LKVGGU=;
+        b=h4Q5Lq8h9gqOOUxxKEOE+nTjIg44CsJBPB6WdB+8fHrlvZizzxjodZWPhwj8D84ikF
+         KGegYxOxCiEkU3LMVShFGppUqsM9nK9r0llC+TS01k0tq8Q3/EQ3FFfWGkffyDtGwaDA
+         /NjmSW6WTjO1/tsvv/xPu3DDZGN6WMZfTV9FYdmvhdSakyr2vtOgkSygcP1w5BTV5S3/
+         FYPKUSAUVec4eK8DpHRQP+IF5+WYGWN9/TTkCVBaCip0loVet3w0t4BO9S6YSSVvODbT
+         teyUvhJNilSAAO/ISkQXtwnGabNoJE+pI8yz9IlVXbbf0X1AxW6CK4elk5EyjxP1Eh+z
+         gCxw==
+X-Gm-Message-State: AOJu0Yz1JJ9onXDkMr2jfl0/9Ak/5zlSmf2FGztAJrwk/Oz8PFEJeSbS
+	wPJ5EjHbpJckB0iObg8yxJ67JvszmXN4WpxhtlB3YLy2eELVGr+JzUqIqcI+fdf1Ui6d0+X9VPm
+	Ntm5tmUYKYh6//dsvVlMw4if83F8=
+X-Gm-Gg: ASbGnctukZUSyBUnJCK4oCEj1X75++N5NDUmDfZz9589+pQ9h1OBaXsJmeUtKdzxNn9
+	9nDMArjn6uSfcfLebwfHL4vuA2RX/5TPKJQ7wpFZfZq60sQ4DAgADsbI60lQkHR7mRUAaLwZmN+
+	7DoCsdn1OPEIf6L8ISVI7Tsxp/Q5xtPm2nYfyCEogrkKsgIBqgw+e0x30=
+X-Google-Smtp-Source: AGHT+IETFFxfCntGOL7iVLoK2HnCkk4/KhOHJw4RNoUu/hEbaoExGPnqerrqnyjXE00GhncVB3k/42W8qD8ZgsMwWiI=
+X-Received: by 2002:a5d:47ad:0:b0:39e:cbe3:17c8 with SMTP id
+ ffacd0b85a97d-39efba2ad3amr9236568f8f.12.1745254261969; Mon, 21 Apr 2025
+ 09:51:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] ethernet: stmmac: dwmac-rk: Add gmac support for
- rk3562
-To: Kever Yang <kever.yang@rock-chips.com>, heiko@sntech.de
-Cc: linux-rockchip@lists.infradead.org, David Wu <david.wu@rock-chips.com>,
- linux-arm-kernel@lists.infradead.org,
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, netdev@vger.kernel.org,
- Detlev Casanova <detlev.casanova@collabora.com>,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Chen-Yu Tsai
- <wens@csie.org>, linux-stm32@st-md-mailman.stormreply.com,
- Eric Dumazet <edumazet@google.com>
-References: <20250418095114.271562-1-kever.yang@rock-chips.com>
- <20250418095114.271562-2-kever.yang@rock-chips.com>
-Content-Language: en-US
-From: Jonas Karlman <jonas@kwiboo.se>
-In-Reply-To: <20250418095114.271562-2-kever.yang@rock-chips.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+ <de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch> <CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
+ <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch> <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+In-Reply-To: <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 21 Apr 2025 09:50:25 -0700
+X-Gm-Features: ATxdqUGWn4cy7yObxomP87GHjdSyqWsIRPXIYJy6fflx54ADqEocml-EFOSeclk
+Message-ID: <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, hkallweit1@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Kever,
+On Mon, Apr 21, 2025 at 8:51=E2=80=AFAM Alexander Duyck
+<alexander.duyck@gmail.com> wrote:
+>
+> On Sun, Apr 20, 2025 at 2:58=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrot=
+e:
+> >
 
-On 2025-04-18 11:51, Kever Yang wrote:
-> From: David Wu <david.wu@rock-chips.com>
-> 
-> Add constants and callback functions for the dwmac on RK3562 soc.
-> As can be seen, the base structure is the same.
-> 
-> Signed-off-by: David Wu <david.wu@rock-chips.com>
-> Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
-> ---
-> 
-> Changes in v3:
-> - remove unreadable MACRO;
-> - use two function for rmii and rgmii speed set;
-> - don't check grf and php_grf in function call;
-> - rebase on v6.15-rc1
-> 
-> Changes in v2:
-> - Collect review tag
-> 
->  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 190 ++++++++++++++++++
->  1 file changed, 190 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 700858ff6f7c..82174054644a 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -2,6 +2,7 @@
->  /**
->   * DOC: dwmac-rk.c - Rockchip RK3288 DWMAC specific glue layer
->   *
-> + * Copyright (c) 2014 Rockchip Electronics Co., Ltd.
->   * Copyright (C) 2014 Chen-Zhi (Roger Chen)
->   *
->   * Chen-Zhi (Roger Chen)  <roger.chen@rock-chips.com>
-> @@ -1048,6 +1049,194 @@ static const struct rk_gmac_ops rk3528_ops = {
->  	},
->  };
->  
-> +/* sys_grf */
-> +#define RK3562_GRF_SYS_SOC_CON0			0X0400
-> +#define RK3562_GRF_SYS_SOC_CON1			0X0404
-> +
-> +#define RK3562_GMAC0_CLK_RMII_MODE		GRF_BIT(5)
-> +#define RK3562_GMAC0_CLK_RGMII_MODE		GRF_CLR_BIT(5)
-> +
-> +#define RK3562_GMAC0_CLK_RMII_GATE		GRF_BIT(6)
-> +#define RK3562_GMAC0_CLK_RMII_NOGATE		GRF_CLR_BIT(6)
-> +
-> +#define RK3562_GMAC0_CLK_RMII_DIV2		GRF_BIT(7)
-> +#define RK3562_GMAC0_CLK_RMII_DIV20		GRF_CLR_BIT(7)
-> +
-> +#define RK3562_GMAC0_CLK_RGMII_DIV1		\
-> +				(GRF_CLR_BIT(7) | GRF_CLR_BIT(8))
-> +#define RK3562_GMAC0_CLK_RGMII_DIV5		\
-> +				(GRF_BIT(7) | GRF_BIT(8))
-> +#define RK3562_GMAC0_CLK_RGMII_DIV50		\
-> +				(GRF_CLR_BIT(7) | GRF_BIT(8))
-> +
-> +#define RK3562_GMAC0_CLK_RMII_DIV2		GRF_BIT(7)
-> +#define RK3562_GMAC0_CLK_RMII_DIV20		GRF_CLR_BIT(7)
-> +
-> +#define RK3562_GMAC0_CLK_SELET_CRU		GRF_CLR_BIT(9)
-> +#define RK3562_GMAC0_CLK_SELET_IO		GRF_BIT(9)
+...
 
-This is probably a typo, SELET, should probably be SELECT?
+> >
+> > > 2. Expectations for our 25G+ interfaces to behave like multi-host NIC=
+s
+> > > that are sharing a link via firmware. Specifically that
+> > > loading/unloading the driver or ifconfig up/down on the host interfac=
+e
+> > > should not cause the link to bounce and/or drop packets for any other
+> > > connections, which in this case includes the BMC.
+> >
+> > For this, it would be nice to point to some standard which describes
+> > this, so we have a generic, vendor agnostic, description of how this
+> > is supposed to work.
+> >
+> >         Andrew
+>
+> The problem here is this is more-or-less a bit of a "wild west" in
+> terms of the spec setup. From what I can tell OCP 3.0 defines how to
+> set up the PCIe bifurcation but doesn't explain what the expected
+> behavior is for the shared ports. One thing we might look into would
+> be the handling for VEPA(Virtual Ethernet Port Aggregator) or VEB
+> (Virtual Ethernet Bridging) as that wouldn't be too far off from what
+> inspired most of the logic in the hardware. Essentially the only
+> difference is that instead of supporting VFs most of these NICs are
+> supporting multiple PFs.
 
-> +
-> +#define RK3562_GMAC1_CLK_RMII_GATE		GRF_BIT(12)
-> +#define RK3562_GMAC1_CLK_RMII_NOGATE		GRF_CLR_BIT(12)
-> +
-> +#define RK3562_GMAC1_CLK_RMII_DIV2		GRF_BIT(13)
-> +#define RK3562_GMAC1_CLK_RMII_DIV20		GRF_CLR_BIT(13)
-> +
-> +#define RK3562_GMAC1_RMII_SPEED100		GRF_BIT(11)
-> +#define RK3562_GMAC1_RMII_SPEED10		GRF_CLR_BIT(11)
-> +
-> +#define RK3562_GMAC1_CLK_SELET_CRU		GRF_CLR_BIT(15)
-> +#define RK3562_GMAC1_CLK_SELET_IO		GRF_BIT(15)
+So looking at 802.1Q-2022 section 40 I wonder if we don't need to
+essentially define ourselves as an edge relay as our setup is pretty
+close to what is depicted in figure 40-1. In our case an S-channel
+essentially represents 2 SerDes lanes on an QSFP cable, with the
+switch playing the role of the EVB bridge.
 
-Same here.
-
-> +
-> +/* ioc_grf */
-> +#define RK3562_GRF_IOC_GMAC_IOFUNC0_CON0	0X10400
-> +#define RK3562_GRF_IOC_GMAC_IOFUNC0_CON1	0X10404
-> +#define RK3562_GRF_IOC_GMAC_IOFUNC1_CON0	0X00400
-> +#define RK3562_GRF_IOC_GMAC_IOFUNC1_CON1	0X00404
-> +
-> +#define RK3562_GMAC_RXCLK_DLY_ENABLE		GRF_BIT(1)
-> +#define RK3562_GMAC_RXCLK_DLY_DISABLE		GRF_CLR_BIT(1)
-> +#define RK3562_GMAC_TXCLK_DLY_ENABLE		GRF_BIT(0)
-> +#define RK3562_GMAC_TXCLK_DLY_DISABLE		GRF_CLR_BIT(0)
-> +
-> +#define RK3562_GMAC_CLK_RX_DL_CFG(val)		HIWORD_UPDATE(val, 0xFF, 8)
-> +#define RK3562_GMAC_CLK_TX_DL_CFG(val)		HIWORD_UPDATE(val, 0xFF, 0)
-> +
-> +#define RK3562_GMAC0_IO_EXTCLK_SELET_CRU	GRF_CLR_BIT(2)
-> +#define RK3562_GMAC0_IO_EXTCLK_SELET_IO		GRF_BIT(2)
-
-Same here.
-
-> +
-> +#define RK3562_GMAC1_IO_EXTCLK_SELET_CRU	GRF_CLR_BIT(3)
-> +#define RK3562_GMAC1_IO_EXTCLK_SELET_IO		GRF_BIT(3)
-
-And here.
-
-> +
-> +static void rk3562_set_to_rgmii(struct rk_priv_data *bsp_priv,
-> +				int tx_delay, int rx_delay)
-> +{
-> +	regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
-> +		     RK3562_GMAC0_CLK_RGMII_MODE);
-> +
-> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON1,
-> +		     DELAY_ENABLE(RK3562, tx_delay, rx_delay));
-> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON0,
-> +		     RK3562_GMAC_CLK_RX_DL_CFG(rx_delay) |
-> +		     RK3562_GMAC_CLK_TX_DL_CFG(tx_delay));
-> +
-> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1,
-> +		     DELAY_ENABLE(RK3562, tx_delay, rx_delay));
-> +	regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON0,
-> +		     RK3562_GMAC_CLK_RX_DL_CFG(rx_delay) |
-> +		     RK3562_GMAC_CLK_TX_DL_CFG(tx_delay));
-> +}
-> +
-> +static void rk3562_set_to_rmii(struct rk_priv_data *bsp_priv)
-> +{
-> +	if (!bsp_priv->id)
-> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
-> +			     RK3562_GMAC0_CLK_RMII_MODE);
-> +}
-> +
-> +static void rk3562_set_gmac_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
-> +{
-> +	struct device *dev = &bsp_priv->pdev->dev;
-> +	unsigned int val = 0;
-> +
-> +	switch (speed) {
-> +	case 10:
-> +		val = RK3562_GMAC0_CLK_RGMII_DIV50;
-> +		break;
-> +	case 100:
-> +		val = RK3562_GMAC0_CLK_RGMII_DIV5;
-> +		break;
-> +	case 1000:
-> +		val = RK3562_GMAC0_CLK_RGMII_DIV1;
-> +		break;
-> +	default:
-> +		goto err;
-> +	}
-> +
-> +	regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0, val);
-> +	return;
-> +err:
-> +	dev_err(dev, "unknown speed value for GMAC speed=%d", speed);
-> +}
-> +
-> +static void rk3562_set_gmac_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
-> +{
-> +	struct device *dev = &bsp_priv->pdev->dev;
-> +	unsigned int val = 0, offset;
-> +
-> +	switch (speed) {
-> +	case 10:
-> +		if (bsp_priv->id == 1) {
-> +			val = RK3562_GMAC1_CLK_RMII_DIV20;
-> +			regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
-> +				     RK3562_GMAC1_RMII_SPEED10);
-> +		} else {
-> +			val = RK3562_GMAC0_CLK_RMII_DIV20;
-> +		}
-> +		break;
-> +	case 100:
-> +		if (bsp_priv->id == 1) {
-> +			val = RK3562_GMAC1_CLK_RMII_DIV2;
-> +			regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0,
-> +				     RK3562_GMAC1_RMII_SPEED100);
-> +		} else {
-> +			val = RK3562_GMAC0_CLK_RMII_DIV2;
-> +		}
-> +		break;
-> +	default:
-> +		goto err;
-> +	}
-> +
-> +	offset = (bsp_priv->id == 1) ? RK3562_GRF_SYS_SOC_CON1 :
-> +				       RK3562_GRF_SYS_SOC_CON0;
-> +	regmap_write(bsp_priv->grf, offset, val);
-> +	return;
-> +err:
-> +	dev_err(dev, "unknown speed value for GMAC speed=%d", speed);
-> +}
-> +
-> +static void rk3562_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
-> +				       bool enable)
-> +{
-> +	struct device *dev = &bsp_priv->pdev->dev;
-> +	unsigned int value;
-> +
-> +	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
-> +		dev_err(dev, "Missing rockchip,grf or rockchip,php_grf property\n");
-> +		return;
-> +	}
-
-This should not be needed after the commit 247e84f66a3d ("net: stmmac:
-dwmac-rk: Validate GRF and peripheral GRF during probe") and the use of
-php_grf_required=true below.
-
-> +
-> +	if (!bsp_priv->id) {
-> +		value = input ? RK3562_GMAC0_CLK_SELET_IO :
-> +				RK3562_GMAC0_CLK_SELET_CRU;
-> +		value |= enable ? RK3562_GMAC0_CLK_RMII_NOGATE :
-> +				  RK3562_GMAC0_CLK_RMII_GATE;
-> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON0, value);
-> +
-> +		value = input ? RK3562_GMAC0_IO_EXTCLK_SELET_IO :
-> +				RK3562_GMAC0_IO_EXTCLK_SELET_CRU;
-> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC0_CON1, value);
-> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1, value);
-> +	} else {
-> +		value = input ? RK3562_GMAC1_CLK_SELET_IO :
-> +				RK3562_GMAC1_CLK_SELET_CRU;
-> +		value |= enable ? RK3562_GMAC1_CLK_RMII_NOGATE :
-> +				 RK3562_GMAC1_CLK_RMII_GATE;
-> +		regmap_write(bsp_priv->grf, RK3562_GRF_SYS_SOC_CON1, value);
-> +
-> +		value = input ? RK3562_GMAC1_IO_EXTCLK_SELET_IO :
-> +				RK3562_GMAC1_IO_EXTCLK_SELET_CRU;
-> +		regmap_write(bsp_priv->php_grf, RK3562_GRF_IOC_GMAC_IOFUNC1_CON1, value);
-> +	}
-> +}
-> +
-> +static const struct rk_gmac_ops rk3562_ops = {
-> +	.set_to_rgmii = rk3562_set_to_rgmii,
-> +	.set_to_rmii = rk3562_set_to_rmii,
-> +	.set_rgmii_speed = rk3562_set_gmac_rgmii_speed,
-> +	.set_rmii_speed = rk3562_set_gmac_rmii_speed,
-> +	.set_clock_selection = rk3562_set_clock_selection,
-
-This is missing the recently added:
-
-	.php_grf_required = true,
-
-Regards,
-Jonas
-
-> +};
-> +
->  #define RK3568_GRF_GMAC0_CON0		0x0380
->  #define RK3568_GRF_GMAC0_CON1		0x0384
->  #define RK3568_GRF_GMAC1_CON0		0x0388
-> @@ -1996,6 +2185,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
->  	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
->  	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
->  	{ .compatible = "rockchip,rk3528-gmac", .data = &rk3528_ops },
-> +	{ .compatible = "rockchip,rk3562-gmac", .data = &rk3562_ops },
->  	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
->  	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
->  	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
-
+Anyway I think that is probably the spec we need to dig into if we are
+looking for how the link is being shared and such. I'll try to do some
+more reading myself to get caught up on all this as the last time I
+had been reading through this it was called VEB instead of EVB.. :-/
 
