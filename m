@@ -1,66 +1,90 @@
-Return-Path: <netdev+bounces-184400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42519A95383
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 17:18:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D56A9538C
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 17:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DAB63AB9F2
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 15:18:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D16B7A761E
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 15:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FB91BD9E3;
-	Mon, 21 Apr 2025 15:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9F31C84B2;
+	Mon, 21 Apr 2025 15:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nfP0PuE1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlMTsq5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06729444;
-	Mon, 21 Apr 2025 15:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F57B1494D8
+	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 15:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745248696; cv=none; b=lattf37fAUkFuDtt6ZUOSzkGHRKsd/VtiIXQbeWRfyNMKPCyhMS7PKwCxCxiSmMeNFFagaCa/t5fjhbdalzyGy+B+wYXZbZpgJpk/E24LtL3l2/O6LCPxIEpDVaiQCcpt0Is3O14zo8eXMCXk8gdIoBnYv6ujkHXJqQIhucnSEQ=
+	t=1745249099; cv=none; b=GrmrpIQ+/9NYkxkgtdcHckBA88+kNVAmlaZMGeA0vV32LKObl/6TfK81eBKJqiootYmxw9NkoJYSwUz3xg5Got0399OVbH8J/lz8ojYG6lY4Aney/tuoTJ8Z6WZnX4L7H2kJ7i4Gq6O/8j3eQc4c3t6q7XJ+UCzMiH5pmDnEha8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745248696; c=relaxed/simple;
-	bh=HTOJZsomxIroWF/4D2suaQ8hzQxUsmD875/TOV+FLaA=;
+	s=arc-20240116; t=1745249099; c=relaxed/simple;
+	bh=PSsu7s5apfrcQZpdyBiLXltkkAMOZHa/sViOI4N88rM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=prb1mgDNJIC4jjdY833sLHBgExlO4iPYfuZn3W2YGQeinK6xLfjQpEyzFxn6IGAEbLcUVBzmwpcif5Niyz/tTxO0w6m+KGyBI80Slonq6Z5Gk8pNneqW8kdSTOH/Om/R7bX5WIaj1uZVZR6HU5P68Spz2KVnLeP+o0uWbr06zcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nfP0PuE1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF327C4CEE4;
-	Mon, 21 Apr 2025 15:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745248695;
-	bh=HTOJZsomxIroWF/4D2suaQ8hzQxUsmD875/TOV+FLaA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nfP0PuE1cV0K7v1+e/VqmcmKkNHo5wMai4Z3P0FIW4fLTGbsN0LV3sO557RmgWWCe
-	 EZa7bXDXZD0cBEpanNNw/x1aNb0NRNklywL30ZRxAypVP4ygoedmiTN4jrWgy3NbRa
-	 GvKtvtLgxjsKxZeDQLEyZUzkmAZiE5GSK+e8xvKwxJDWHzw5kqx0HuYGwlimLapTrt
-	 wsZstbyhWZOGPBua0efZHJ+/2ORayWhxV2BUV6mNg+7E/UsH9TwyMhmZ3IcCmtWnf/
-	 /FK69n7qmnLRBP56yvsvg2xdNHJ6xynemHAojeRgBL7rtPczSdqU3HK8EwyAnD3L9L
-	 cTIXSI5bZkqng==
-Date: Mon, 21 Apr 2025 16:18:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Li Li <dualli@chromium.org>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
-	arve@android.com, tkjos@android.com, maco@android.com,
-	joel@joelfernandes.org, brauner@kernel.org, cmllamas@google.com,
-	surenb@google.com, omosnace@redhat.com, shuah@kernel.org,
-	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
-	tweek@google.com, paul@paul-moore.com, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
-	hridya@google.com, smoreland@google.com, ynaffit@google.com,
-	kernel-team@android.com
-Subject: Re: [PATCH RESEND v17 1/3] lsm, selinux: Add setup_report permission
- to binder
-Message-ID: <20250421151807.GQ2789685@horms.kernel.org>
-References: <20250417002005.2306284-1-dualli@chromium.org>
- <20250417002005.2306284-2-dualli@chromium.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KMgjnG6DhjNusMULA+nYMp4KGihQbafovFs70eSBycFQHmwEL7P5rPH1UuVYRUEl4c5JJGSjB6fJ9kJwj/wFaPpptUqrKfXZPu1sJi61fNGkoxzzBB17500FIBt/3kc8VU9CqZ3kMlJztXbgeH1bVQcoEKlcupiz5otAHthmIYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlMTsq5K; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22928d629faso40151655ad.3
+        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 08:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745249096; x=1745853896; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ljq3CD+gP9uIP1/pgrR81MZhOW+Yvp3oRWzgVuH+JTM=;
+        b=MlMTsq5KLQwB9S2AQNebtO5Ze2hM4VMtB5s54Pl6sf8opuZ+RRgP9cviohoaKl0qE9
+         0QbA0qsUQ6W1MO7YoWT7cPyBRPjy2YwCuCZOg0QoSsqdrMPfy/Mbc72JzmPRVXHaX1od
+         2gzAwkQH3m0g1LQrbDhNze6nzLr8CriMptTEEoVOf/aRjmyuw5ULbEx2/+AaZDbq/Ege
+         p7R6yVUVNh3uW1KZkMD50kMPrdmp7iukeNdJYncRJ7DPv8wwmPhskmWzLfn4Ezutjhw6
+         hNB8lBBuoJIKsIljDe92gvKXG9heK76+sjdJLig2zETq8Aek6RugxBGtviIdq0ToeFa1
+         eDmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745249096; x=1745853896;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ljq3CD+gP9uIP1/pgrR81MZhOW+Yvp3oRWzgVuH+JTM=;
+        b=CERTBRrW7KSxAiXy+D6FSADsgri6tcuWk22KFOEhlLpfvTzIBowAU1xd6Z5rn0/X57
+         /8T07mFgg+pUomsUl8E3rLRvNPnTdK+TqnNdGacccPNeaiYvuvu6EQaXlKEQVPP66t+0
+         6pa02rRVQb+QUllDUQM9nEgQY3O1O+2dedpli73J61x9rtqKEoAwk/OiFx4A86/S0yDC
+         G6UJk7EXr2BNKU8mRRbqPrar55QIZddmKMMcBILcrYxGgQJR0KH2bkveUbdpwA58AjOz
+         cNVc2u05PKZwviwM2RKo34w6gYumJsTH4yWEFOhHHm8tjVqthojhA91l0uJH/UXcw4QE
+         5HXw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ4VTZHFU8mnNCKvSzVDk+pU/DcPZGuD5w2Wl2tVbC0urh/q7vA2BW6Ms2hLIE0AAntx5LyRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzI+omx0s/74ItVlk83KgtA0ImWGj+KaUqR9BWSrLDuXiO8UWg7
+	mxBBr+SUH+QYSb0eI4x1OvHIo/+mZSX7X8xVK/uPFxs3wzy/vzdsjO0/
+X-Gm-Gg: ASbGnct4G2A/HL7ykE7jPBzf3mM4aMga8gditct8D8479kJpgOYZCOyvOlgMrNoZnmx
+	DhiFkIz70WKyXX4HSMM8x21hhQ31KzgyPJnlMyMerfKid5PHK5D8NQf0wWvsnRr9JOEdlS43E9T
+	v6onFWcCf32YJtTCoSlScqZD/PP7eEDVXsaa8hhn0BZo/1RaAOizxaRlnSomtuGwtPc7FQRE58v
+	F/jucBnQcC6Dvv+uj21gdsQZwmMYqXVe3NTZI/DyNJXc7IyRrNP/iFBfWA6MAInpts847RsIwBQ
+	hzob8giiHwAo/o8JoyDw70xnlaLQ19EsR4VpfFnX
+X-Google-Smtp-Source: AGHT+IHX3ak7yJt4WUvtK3JK068HhEoYCK0bu7DqYqoIWqEF/nRZHaMSm452NKxjba/998s7tSyJjA==
+X-Received: by 2002:a17:902:c944:b0:221:7e36:b13e with SMTP id d9443c01a7336-22c5357e7a5mr194035675ad.12.1745249096369;
+        Mon, 21 Apr 2025 08:24:56 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73dbfae9a4csm6721979b3a.161.2025.04.21.08.24.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Apr 2025 08:24:55 -0700 (PDT)
+Date: Mon, 21 Apr 2025 08:24:54 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com,
+	sdf@fomichev.me, ap420073@gmail.com
+Subject: Re: [PATCH net] net: fix the missing unlock for detached devices
+Message-ID: <aAZjRhnO2RBxf9Fb@mini-arch>
+References: <20250418015317.1954107-1-kuba@kernel.org>
+ <CAHS8izMnK0C0sQpK+5NoL-ETNjJ+6BUhx_Bgq9drViUaic+W1A@mail.gmail.com>
+ <aAJeMtRlBIMGfdN2@mini-arch>
+ <CAHS8izMw=Rfa+AT-xCaUspb-GYvhsE1iugPM=_c-FFD+2KBE7A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,22 +94,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250417002005.2306284-2-dualli@chromium.org>
+In-Reply-To: <CAHS8izMw=Rfa+AT-xCaUspb-GYvhsE1iugPM=_c-FFD+2KBE7A@mail.gmail.com>
 
-On Wed, Apr 16, 2025 at 05:20:02PM -0700, Li Li wrote:
-> From: Thiébaud Weksteen <tweek@google.com>
+On 04/18, Mina Almasry wrote:
+> On Fri, Apr 18, 2025 at 7:14 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 04/18, Mina Almasry wrote:
+> > > On Thu, Apr 17, 2025 at 6:53 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> > > >
+> > > > The combined condition was left as is when we converted
+> > > > from __dev_get_by_index() to netdev_get_by_index_lock().
+> > > > There was no need to undo anything with the former, for
+> > > > the latter we need an unlock.
+> > > >
+> > > > Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> > > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > >
+> > > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> >
+> > Mina, the same (unlock netedev on !present) needs to happen for
+> > https://lore.kernel.org/netdev/20250417231540.2780723-5-almasrymina@google.com/
+> >
+> > Presumably you'll do another repost at some point?
 > 
-> Introduce a new permission "setup_report" to the "binder" class.
-> This persmission controls the ability to set up the binder generic
+> Yes, and there is also a lot going on in that series outside of this
+> locking point. If the rest of the series looks good and is merged I
+> can also look into porting this fix to the tx path as a follow up, if
+> acceptable.
 
-nit: permission
-
-    Flagged by checkpatch.pl --codespell
-
-> netlink driver to report certain binder transactions.
-> 
-> Signed-off-by: Thiébaud Weksteen <tweek@google.com>
-> Signed-off-by: Li Li <dualli@google.com>
-
-...
+I'd be surprised if the maintainers gonna pull buggy code :-) Why not
+repost with a fix? It's a three lines change.
 
