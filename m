@@ -1,248 +1,195 @@
-Return-Path: <netdev+bounces-184361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DEF1A94FB8
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 13:00:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DDB5A94FBE
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 13:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5412166509
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:00:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8E947A8660
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 10:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901FF1C8610;
-	Mon, 21 Apr 2025 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F9B2627F9;
+	Mon, 21 Apr 2025 11:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCRkoA+e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPuNhvAd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D7817CA17
-	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 11:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A3717CA17;
+	Mon, 21 Apr 2025 11:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745233224; cv=none; b=AmK6QBak3+BCgT1ZHF5vTreOsjW/ksxQ54P90o89x51xj2c3fBf6zVtnhdUyKEeVMpgGVrA3ncyCUA/CJdNrgFVpPPnVrFOdUJtm/yJEabvErCJYu6QtFBARhR96WjmQ7xY97KRp3/MdK4p2q+Um1HYZwPhWtNVWO0F/JWq7IVo=
+	t=1745233229; cv=none; b=DyYaaE6NCbTX9JBBa8dTlkFYZOv1zTAfZqV4ZjvEjpyoEwRKfvrfbiYgRAoZUm9iNBX8wzS9eqEYRS8rCtV5ymyNe2668CSlV3E2mDbGQXL2s9wHC3zNLdrXPpI41jGJGSr60fBiy/yRy8FYMYLGkZQUe3wmmCTUzJqvfcj/Vlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745233224; c=relaxed/simple;
-	bh=uPpZZxMf34MjghpZtlEufZPaYCSS3j9kbC9t6YttDGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMN663pAjgsEdiGYfNAyWKUCHA8ZtG3p2TSOVcInh2pDoK3+dZ4alwF00Gs577Q3J9hhoLaRoAN0V4FxB1ZZR/riBNAlgyF+CU2QDblcpe0TpWtpedDcJ7eAcGk5w2K+UKd2l4MxQWcMYMCT+tgefVET7uUPx29FYJh2xyDeKdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DCRkoA+e; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745233221;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eVl17+DIhdQKB5hKQKjqnZV/7Ux7S0MiBzai4RYraAo=;
-	b=DCRkoA+eXMyAegYT3tcHJsUszCpWEUlgNIVhrFgXnD9zJsXGhjtZ2p47Qhgum6IN5rgMeG
-	HIYfypuiD9yZjZgdF3bx0R3RNU2lYL9PWgv/l62Chl9HAVpVGpO1eKPuxIZIDKPOxOxTez
-	ixzRVSra77htkYZGO5kHBdbSgkudpZg=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-UILQxdLSNcqGS0LgbyEISg-1; Mon, 21 Apr 2025 06:59:41 -0400
-X-MC-Unique: UILQxdLSNcqGS0LgbyEISg-1
-X-Mimecast-MFC-AGG-ID: UILQxdLSNcqGS0LgbyEISg_1745233180
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-86da7e4b5baso409849241.1
-        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 03:59:41 -0700 (PDT)
+	s=arc-20240116; t=1745233229; c=relaxed/simple;
+	bh=l5zPS8y6iowCGIfNInsmJ0YWWMW6rrpVtTzMCrgMbTo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e/VzIBHI2ImsEY3HzBdT89kGY0X6EPYnzK2/iRWDXRqxrG+xaPoQOVXT9TI2UkIz0CU3aFPBOytGU4NrNkszrDb3N7FOAGHarZQoxkxqUuAhEU6oHoanXxLAR9zEPnSXqpz93kh65sFp8vMd6AjzpGqTOcNwsAkWzf1g3Xsb68g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPuNhvAd; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-706cb438672so25527007b3.3;
+        Mon, 21 Apr 2025 04:00:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745233226; x=1745838026; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=viAID0OFSfWPdzwpqnKUlHRrEMqoxHvEgq73p5L8B4c=;
+        b=NPuNhvAdASLO5KA9eZqnSFG1fC7zuIRY+fRwraWyDboxLB1H5N5spYyk7KfOJtn0Aw
+         PsOApmgNU1agFoJPGk6QLiR5JHvYtNPAx64xtFDtnCTt5SJwx5lZXfFY2mrMM5vSZ3FD
+         tWkS83mF0ltclqlO3rbzeEuOIkbhMIItf1KIWwOGQEndmrJVgKNOsVOMIpwewFzux0Jg
+         HsNCHLO85gufY3t+cm016dhn37i9OUsajHTyk1f7iYjKiuoq428Fh2KlWf2KxQmBimHn
+         el2d0S0rMJSav0O3T+FJlil2trrQxKV68PVV+13gTe3J8MOwp+w6d/hcH/KLYrjeSoXE
+         5stA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745233180; x=1745837980;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVl17+DIhdQKB5hKQKjqnZV/7Ux7S0MiBzai4RYraAo=;
-        b=PvAesTDl3+c9fcjPTCm1tHrBLRXm22/EN97E0ZaNxmMACsNIDeuwQRoF5OU37ioLjU
-         kzB5WIWa47a69tJgalm7y9/pJ0qdTmZtYVkJ07+s9nbWjEfiUIaRVKV79A2wwNPcg8wj
-         6NUXBukzy0D17Ico4v0wRlY7pzFlQNPIVI2GldTGl9CiFY3R/L2Lyjx6aR146V7imc1M
-         tdwJZ2m40LzPnIEc/moBegDzdAbPjHvbGrO6rYwfBrw+yPZC0gB3e9nCBXLg/qKB/1FL
-         3fIs0fiP+pw/6Oenjo6pQTz6AxEW00bCtbFfzaeOPI9nqRlp7g4rL1XBIAyAvzACBqSZ
-         TOog==
-X-Forwarded-Encrypted: i=1; AJvYcCVQuFqu7hLLbztlwPlCEcusT5qB/kEHJa4hjrlMl2yWhlkEKoWDYOJMZYUTQTbehv+6ksnEu9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC8oqc9N9UklqZvucte3lO3n2PNo1MnIUmAh7YIFDFrCObzZWd
-	ysMQW4tGKg50q7fwZ3239tX0ESuMtvwq6WVgyHwoo8CyH7u/m5O+DgTcJo0CgvEfRMJZpAl+uWZ
-	tJwBB1h1j1rg8Mde3IqueZsSUcCfJG6QEuY1/sEa/RkS92msuh3SmAQ==
-X-Gm-Gg: ASbGncsOFx+ROu7rvjSCDOK/tH+66xj7l2xs/KqXx6kNd+Yf3pXPDtYZ8YcHiVTJJ/J
-	9DdyBxpZP3uTWl0yOZ0y0m45V9id0P2PyEuHENC6ABVLWkZvAMc+oOQ6pMaaowvrZuayBRaDArO
-	9N1kknnhSHGalPacy1n9GkM4Ae1LyU1DgXeRZ65BAY+V7nmDu7CAPIBO7Ktkdl8NjzzkpUajC3j
-	/9VhSwczjwOjHb7lzJR8gXKfzgLvpTY2kr+49zK/lTNxQhv93IPEyB7oPBn7QRrFZM95aBH3wbT
-	BA==
-X-Received: by 2002:a05:6122:1791:b0:526:483:95fd with SMTP id 71dfb90a1353d-529255099femr7267945e0c.10.1745233180619;
-        Mon, 21 Apr 2025 03:59:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+Ga+p67ZBPcoJxP2RVNKC3Q+2U8jBxD/W2ry20b9xTbJ0FUlhUWa12DS5U5nxkuEf6T8ikw==
-X-Received: by 2002:a05:6122:1791:b0:526:483:95fd with SMTP id 71dfb90a1353d-529255099femr7267938e0c.10.1745233180298;
-        Mon, 21 Apr 2025 03:59:40 -0700 (PDT)
-Received: from redhat.com ([45.140.184.92])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52922c3a570sm1396339e0c.28.2025.04.21.03.59.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 03:59:39 -0700 (PDT)
-Date: Mon, 21 Apr 2025 06:59:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com,
-	sgarzare@redhat.com, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v9 2/4] vhost: Reintroduce kthread mode support in vhost
-Message-ID: <20250421065847-mutt-send-email-mst@kernel.org>
-References: <20250421024457.112163-1-lulu@redhat.com>
- <20250421024457.112163-3-lulu@redhat.com>
- <CACGkMEtCxn7rZfvo9_nUwC1TwqJ+5F2XDdU89rz=iyO3U0pCEQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1745233226; x=1745838026;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=viAID0OFSfWPdzwpqnKUlHRrEMqoxHvEgq73p5L8B4c=;
+        b=CB5H+SnpnW5y6nJeMgFYjjXhmCzlwTy2XFy3seuWovjxZotiz/luCPB+Fr3gds6XAS
+         xEmrKVr+kUcNqaaYklCSL/ShyvCk4lqWtdBzFZ77zJGhFs1RA8PqzxtNflBLgN6tVR3q
+         L3Me6nylrYvGhtUuRWn+6GOlP3J40kko6H6410vsD8fD84omsnMyLtcJ7Rn5JP75NEIk
+         gfg3Rn7LcqbG6CBcsrjhbtNWTT5DDb+8Iol4WXL2K0itEojeoSe0GWQM0AuOaRCq1jhS
+         F1LZ9wBqjt1psEVYdECcTED17T9RW7VU1bWcl2OKFcCRWUryfugVI2iisJ8HtFhfSFKw
+         sslg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3QcfpJag8rq1lc1LrtZeeJEUGBrbswCh22ROLEfCQw2N5JLud/5S8w6Xb0aCqZtLm/kKN8vlH8NuOk8U=@vger.kernel.org, AJvYcCUE/dbXN6SuWxBh5z2jspE3L/ptFxC9fPznicNyQmQ1Q/p26Iqpw4tDQnbTSR+nX/HkzyPgUjwat7xU5KZN@vger.kernel.org, AJvYcCUd0FPLOqgDP5PZ2Pl+aokpOPlFEajitRZBQadWRfxrVRNFWymmd7zi3mIoj+pAIOX60juDClz07z0Y@vger.kernel.org, AJvYcCVAlnkonTaK2LUTsLkVleWIA3KLa8hIwL592384G/g7nl57UAkcNdJIgmsLTobyUm2RahWdxEUpibAu@vger.kernel.org, AJvYcCWfDkB0/VPWDveOdZBLEMnTbWaV3bl7pDlXEFJuLL51cTfqI7qPZ3ka8JmaK4HVaTkhNFsH77Ho@vger.kernel.org, AJvYcCWpb2nTtNJlxaZqXiP9+7wRoBCYD1rfBT911+kJuErP6D5HQZa1xLMRngZqj/P32a6b3WxbuOezqVuTZmOSAZs=@vger.kernel.org, AJvYcCX/fF4gF+YWwV7sXykA7797RbAMxPNVaFbLAnIVYB45LPAKWLmly9JqS89qBfAS43/1K+v5LYHosYQ=@vger.kernel.org, AJvYcCX5XvfOnxsvtfxLA5A2g1SD+x2FjMSmAn+/4VFfY59V+Q/eL0pnXlbsrsCmw3vqk8sFfijcNJcEfzG1YQ==@vger.kernel.org, AJvYcCXGkiEbh+myd8yS+gro1rnbT0ziL5b4RfAlosuxY/lNkEnql11HpH/XIeKl0LgbPK62+lps1Mb42xOe@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxuu6/hErfw3kg3JSHKH0FJEXOVJHrkcFlnqSPhi3iVtxt4iM8y
+	bhjuMHssgB6J5UbEWU3UQTahchw7Yl57COT3pJgZ5scRlniwJda5kDfpyJE0jAaKuI3cywEf/o+
+	Z65JwL2TtdrGD/VSmj62ynS33T+Q=
+X-Gm-Gg: ASbGnctWVn55G+UO++gg/trH/z4UyJ34A47DK5j77DL+uM62/utj67loFyh0Z7ISzMG
+	zADKE6xwNWKdnWrb5H/j7FZpb9a6c66kNrgApHia2cEEVcuVHkGMsJsGIbwwOUFj40KuwrPNNiq
+	jnTzuKX8SOB+5ZZtwt9OXWAwrrpYdknVtQnLXaIn/EmHkH1GApUfpChVff
+X-Google-Smtp-Source: AGHT+IG7euA4BFR+Mx5i/i0jG3mwDi1xEltiPr00AQmdaQcpf6Ouk/sCc3/HcH3nGYloVrsJS5NYz9rk2JRvmLgu4/g=
+X-Received: by 2002:a05:690c:4a09:b0:703:c3ed:1f61 with SMTP id
+ 00721157ae682-706ccd2a836mr163642197b3.20.1745233226387; Mon, 21 Apr 2025
+ 04:00:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtCxn7rZfvo9_nUwC1TwqJ+5F2XDdU89rz=iyO3U0pCEQ@mail.gmail.com>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-2-a0282524688@gmail.com> <20250307011542.GE8350@google.com>
+ <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
+ <20250320145042.GS3890718@google.com> <CAOoeyxXZmrzBSNRdRx9vK84m5Z5y8T_A+wY98vVrPUZ7f4w4iw@mail.gmail.com>
+ <20250404142115.GC278642@google.com> <CAOoeyxVVgHGkH5ajQT0NGNPv7FmVPLzuZtGjCiF7mRRto70aAg@mail.gmail.com>
+ <20250410082132.GP372032@google.com>
+In-Reply-To: <20250410082132.GP372032@google.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Mon, 21 Apr 2025 19:00:15 +0800
+X-Gm-Features: ATxdqUESxNdKH3-Yj-9uSqFAuc712zSM3LkrmRSu8wa-twvX0fsx93cPWbbNJ5U
+Message-ID: <CAOoeyxV-dzrJNJ83Y55SKc0rBqcFk2jPM1Z2T+hPF+QFGz3GRA@mail.gmail.com>
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Lee Jones <lee@kernel.org>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 21, 2025 at 11:39:14AM +0800, Jason Wang wrote:
-> On Mon, Apr 21, 2025 at 10:45 AM Cindy Lu <lulu@redhat.com> wrote:
+Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B44=E6=9C=8810=E6=97=A5 =E9=
+=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=884:21=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Mon, 07 Apr 2025, Ming Yu wrote:
+>
+> > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B44=E6=9C=884=E6=97=A5 =
+=E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=8810:21=E5=AF=AB=E9=81=93=EF=BC=9A
+> > >
+> > > > ...
+> > > > > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x1),
+> > > > > > >
+> > > > > > > IDs are usually given in base-10.
+> > > > > > >
+> > > > > >
+> > > > > > Fix it in v9.
+> > > > > >
+> > > > > > > Why are you manually adding the device IDs?
+> > > > > > >
+> > > > > > > PLATFORM_DEVID_AUTO doesn't work for you?
+> > > > > > >
+> > > > > >
+> > > > > > I need to manage these IDs to ensure that child devices can be
+> > > > > > properly utilized within their respective modules.
+> > > > >
+> > > > > How?  Please explain.
+> > > > >
+> > > > > This numbering looks sequential and arbitrary.
+> > > > >
+> > > > > What does PLATFORM_DEVID_AUTO do differently such that it is not =
+useful?
+> > > > >
+> > > >
+> > > > As far as I know, PLATFORM_DEVID_AUTO assigns dynamic IDs to device=
+s,
+> > > > but I need fixed IDs.
+> > > > For example, the GPIO driver relies on these IDs to determine the
+> > > > group, allowing the firmware to identify which GPIO group to operat=
+e
+> > > > on through the API.
+> > >
+> > > PLATFORM_DEVID_AUTO will allocate IDs 0 through 16, the same as you'v=
+e
+> > > done here.  These lines do not have any differentiating attributes, s=
+o
+> > > either way we are not allocating specific IDs to specific pieces of t=
+he
+> > > H/W.  I still do not understand why you need to allocate them manuall=
+y.
+> > >
 > >
-> > This patch reintroduces kthread mode support in vhost,
-> > It also introduces struct vhost_worker_ops to abstract
-> > worker create/stop/wakeup operations.
+> > I'm using PLATFORM_DEVID_AUTO to allocate child device IDs with
+> > MFD_CELL_NAME(), like this:
 > >
-> > * Bring back the original vhost_worker() implementation,
-> >   and renamed to vhost_run_work_kthread_list().
+> > static const struct mfd_cell nct6694_dev[] =3D {
+> >     MFD_CELL_NAME("nct6694-gpio"),
+> >     MFD_CELL_NAME("nct6694-gpio"),
+> >     ......
+> >     MFD_CELL_NAME("nct6694-gpio"),
+> >     MFD_CELL_NAME("nct6694-i2c"),
+> >     MFD_CELL_NAME("nct6694-i2c"),
+> >     ......
+> >     MFD_CELL_NAME("nct6694-i2c"),
+> >     ......
+> > };
 > >
-> > * Add cgroup support for the kthread
-> >
-> > * Introduce struct vhost_worker_ops:
-> >   - Encapsulates create / stop / wake‑up callbacks.
-> >   - vhost_worker_create() selects the proper ops according to
-> >     inherit_owner.
-> >
-> > This partially reverts or improves upon:
-> > commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads")
-> > commit 1cdaafa1b8b4 ("vhost: replace single worker pointer with xarray")
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vhost/vhost.c | 188 ++++++++++++++++++++++++++++++++++++++----
-> >  drivers/vhost/vhost.h |  12 +++
-> >  2 files changed, 182 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 250dc43f1786..be97028a8baf 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -22,6 +22,7 @@
-> >  #include <linux/slab.h>
-> >  #include <linux/vmalloc.h>
-> >  #include <linux/kthread.h>
-> > +#include <linux/cgroup.h>
-> >  #include <linux/module.h>
-> >  #include <linux/sort.h>
-> >  #include <linux/sched/mm.h>
-> > @@ -242,7 +243,7 @@ static void vhost_worker_queue(struct vhost_worker *worker,
-> >                  * test_and_set_bit() implies a memory barrier.
-> >                  */
-> >                 llist_add(&work->node, &worker->work_list);
-> > -               vhost_task_wake(worker->vtsk);
-> > +               worker->ops->wakeup(worker);
-> >         }
-> >  }
-> >
-> > @@ -388,6 +389,44 @@ static void vhost_vq_reset(struct vhost_dev *dev,
-> >         __vhost_vq_meta_reset(vq);
-> >  }
-> >
-> > +static int vhost_run_work_kthread_list(void *data)
-> > +{
-> > +       struct vhost_worker *worker = data;
-> > +       struct vhost_work *work, *work_next;
-> > +       struct vhost_dev *dev = worker->dev;
-> > +       struct llist_node *node;
-> > +
-> > +       kthread_use_mm(dev->mm);
-> > +
-> > +       for (;;) {
-> > +               /* mb paired w/ kthread_stop */
-> > +               set_current_state(TASK_INTERRUPTIBLE);
-> > +
-> > +               if (kthread_should_stop()) {
-> > +                       __set_current_state(TASK_RUNNING);
-> > +                       break;
-> > +               }
-> > +               node = llist_del_all(&worker->work_list);
-> > +               if (!node)
-> > +                       schedule();
-> > +
-> > +               node = llist_reverse_order(node);
-> > +               /* make sure flag is seen after deletion */
-> > +               smp_wmb();
-> > +               llist_for_each_entry_safe(work, work_next, node, node) {
-> > +                       clear_bit(VHOST_WORK_QUEUED, &work->flags);
-> > +                       __set_current_state(TASK_RUNNING);
-> > +                       kcov_remote_start_common(worker->kcov_handle);
-> > +                       work->fn(work);
-> > +                       kcov_remote_stop();
-> > +                       cond_resched();
-> > +               }
-> > +       }
-> > +       kthread_unuse_mm(dev->mm);
-> > +
-> > +       return 0;
-> > +}
-> > +
-> >  static bool vhost_run_work_list(void *data)
-> >  {
-> >         struct vhost_worker *worker = data;
-> > @@ -582,6 +621,46 @@ long vhost_dev_check_owner(struct vhost_dev *dev)
-> >  }
-> >  EXPORT_SYMBOL_GPL(vhost_dev_check_owner);
-> >
-> > +struct vhost_attach_cgroups_struct {
-> > +       struct vhost_work work;
-> > +       struct task_struct *owner;
-> > +       int ret;
-> > +};
-> > +
-> > +static void vhost_attach_cgroups_work(struct vhost_work *work)
-> > +{
-> > +       struct vhost_attach_cgroups_struct *s;
-> > +
-> > +       s = container_of(work, struct vhost_attach_cgroups_struct, work);
-> > +       s->ret = cgroup_attach_task_all(s->owner, current);
-> > +}
-> > +
-> > +static int vhost_attach_task_to_cgroups(struct vhost_worker *worker)
-> > +{
-> > +       struct vhost_attach_cgroups_struct attach;
-> > +       int saved_cnt;
-> > +
-> > +       attach.owner = current;
-> > +
-> > +       vhost_work_init(&attach.work, vhost_attach_cgroups_work);
-> > +       vhost_worker_queue(worker, &attach.work);
-> > +
-> > +       mutex_lock(&worker->mutex);
-> > +
-> > +       /*
-> > +        * Bypass attachment_cnt check in __vhost_worker_flush:
-> > +        * Temporarily change it to INT_MAX to bypass the check
-> > +        */
-> > +       saved_cnt = worker->attachment_cnt;
-> > +       worker->attachment_cnt = INT_MAX;
-> > +       __vhost_worker_flush(worker);
-> > +       worker->attachment_cnt = saved_cnt;
-> 
-> I wonder if it's easier to re-introduce the flush that was used before
-> vhost kthread to avoid the tricks here. We can have flush ops for
-> example.
-> 
-> Thanks
+> > For example, the device IDs retrieved in gpio-nct6694.c is 1~16, and
+> > i2c-nct6694.c is 17~22. Does this mean each driver should
+> > independently handle its dynamically assigned IDs?
+> > Additionally, I originally referred to cgbc-core.c with i2c-cgbc.c,
+> > and ab8500-core.c with pwm-ab8500.c for associating child devices. Do
+> > you think this approach is appropriate in my case?
+>
+> Yes, if you _need_ the ranges to start from 0, then you will have to
+> call mfd_add_devices() separately on those ranges.  Otherwise one range
+> will follow directly on to another range.
+>
+> But wait, you're using mfd_add_hotplug_devices(), which means you are
+> using PLATFORM_DEVID_AUTO.  So your .id values that you've added are
+> being ignored anyway.  Thus, if you have tested that this works, you
+> don't need them anyway, right?
+>
 
-Nah we do not need ops, __vhost_worker_flush is just an internal
-function. Refactor it so we can call the part without the check.
+Yes, it uses PLATFORM_DEVID_AUTO, but in my implementation, the
+sub-devices use cell->id instead of platform_device->id, so it doesn't
+affect the current behavior.
 
--- 
-MST
+However, if you think there's a better approach or that this should be
+changed for consistency or correctness, I'm happy to update it, please
+let me know your recommendation.
 
+
+Thanks,
+Ming
 
