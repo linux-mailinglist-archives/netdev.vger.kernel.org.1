@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-184354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F2BA94F0B
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:51:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D0CA94F1D
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 12:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C972E1892F63
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 09:51:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F1917A5D80
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 10:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A79C25D8EB;
-	Mon, 21 Apr 2025 09:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B353F25FA09;
+	Mon, 21 Apr 2025 10:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="poLEOiys"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Jr9bFziy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-27.smtpout.orange.fr [80.12.242.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487BA19DF99;
-	Mon, 21 Apr 2025 09:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D187DA92E;
+	Mon, 21 Apr 2025 10:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745229059; cv=none; b=GbzixC7ED08w/YfyrC9q2BFK6b2tuu7ngtdhGxjXYNbIsoYfpJUIW2WOOlN7PAY5t3IZTd/rKVruGESw8/eLOPc2DpUZiXKqiVxjS4c2PVlldNo6XbYbmD4hhQrGQ/45w/xAIAfAoq0g8fxTic7AjXnIptD6CV+9bAKb0binFFM=
+	t=1745229684; cv=none; b=ks4tFRLrdQ3XoLb04CakU4W/DR76gJWtiZQJTkTTKChu7lvBiwxxi/COfkvSBAwgQpImNYl8lrq+cLfQxIyN88LavP/Ehi3UaEXFC43DEXG3u5G9ZgRqUmk7qY8G7udwyKPJ2jqosqsPODa1NPSE38XKsgp5v+9ppN64QpgB5CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745229059; c=relaxed/simple;
-	bh=kdyTtW+aDnediSAQNm+CqqexrHdwy9hwbT0UGQq/mBQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=W5su1dQDNg6NPGXr7Fx5A+DUQJr7JGMEmyg+IPHjATzRCQtT50yheWeZKySb1uTF8s2goZ5hObzeaJ5f42Bvq7RVTP8RNjjvoubLv+Jy3C3GGl9WUwKZqO0a42dWNH6EvxqfHr/a2QVxS3D55Rvmn1AZ3kBRGE921Dw5ITSpcsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=poLEOiys; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1745229048; x=1745833848; i=markus.elfring@web.de;
-	bh=kdyTtW+aDnediSAQNm+CqqexrHdwy9hwbT0UGQq/mBQ=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=poLEOiystaKP6l4B5ifvr/g5kpozWZPt8yBSSkGM6bTI6r4bZyUzIcyZTD6BLOXd
-	 onJ2N3P/Kh+pekCzcGPCc6LgT0fSmoh8klVL0SEQrSOK+geDHCBWTKgJTrfqApwB7
-	 qnOwuIuuObHbvdki96rcWHeFGAAdy3cJcY2V4Y31HfuDK4QJeQQQ/8HuMoKwUuxe8
-	 pk1fB1cFECzjcKL4yQ78h7opJ+CkY1t4Y5ddgiXQR2MIuGEUFnI4VD/jgpdr3l4K1
-	 FYHHGUuxwx/1gROFAYHH2fmwfFUyWdxC20k76QFK5hp3OIZby5lnVwkYn3DpJ7lWI
-	 BsqPQ0IO6PFsmIYsWQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.70.16]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MUl9B-1uXZyj0TSb-00IrOI; Mon, 21
- Apr 2025 11:50:48 +0200
-Message-ID: <834fe207-523c-42ff-8a95-4468a1e08b46@web.de>
-Date: Mon, 21 Apr 2025 11:50:45 +0200
+	s=arc-20240116; t=1745229684; c=relaxed/simple;
+	bh=oGkBMnPlWAAjsXcjxrVpQDeRO42P/LgMECqNM7eHB3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CHeXyX4wqlj+Vt69D7GZeoxJV+Z6AKene6erH+tdg4E3gW8Fs8pvqOGttqyS1xUahyFqRmNQN10JBsXrDzkLUi6Vuex8LNieYxDrs7hw4m6FVA27WQIsk4ujPRN+wSl42jCi4ovwOuUU2MZ4/x7m+1KGAJfzURjO3E9KgruehYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Jr9bFziy; arc=none smtp.client-ip=80.12.242.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id 6nodu94BFBkGO6nogufHf5; Mon, 21 Apr 2025 11:52:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1745229122;
+	bh=wZeewDiYHHmFq11xB3jS4aVNbHi62o7MBMuIWgCm9oY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Jr9bFziyT71sudM8/yGIqqBbNHxEobp6eP7D3Tt69vg8+TOSGezbr9ZMQVzN2k/qX
+	 tVO5dwV5Uy5Sc1mGcmXwDBWIlBjpuWGimGW0DTu50DiC07WPP7JHhrmrWfGGpP7sKy
+	 JsEDxnUGj31jXzNcnGWSRcDYna3oGfAZOrdZUSfYuBn5Em8Fwti67VsVEL9lSHLISx
+	 qSpc/Q1KjTVco2rb5nTyaDkCvho1RU5i+/AN9VudW8PoZXsMUSUzzI0ytqCNPzvcJt
+	 3Q31TZfQUmZhpiAtCPXjG2eM0wM0NUKkcdLm5lmQBs68bAPR/59G7cQQyRzPZHwlXM
+	 gyBmAA4YiViZA==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Mon, 21 Apr 2025 11:52:02 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <f7b99e11-c331-4613-8112-4fb5387649e8@wanadoo.fr>
+Date: Mon, 21 Apr 2025 11:51:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,83 +57,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Henry Martin <bsdhenrymartin@gmail.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Mark Bloch <mbloch@nvidia.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-References: <20250418023814.71789-2-bsdhenrymartin@gmail.com>
-Subject: Re: [PATCH v7 1/2] net/mlx5: Fix null-ptr-deref in
- mlx5_create_{inner_,}ttc_table()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250418023814.71789-2-bsdhenrymartin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:1hI6MGondi0rfkI/QZ68cl7X8ZsCcgBewfSi6cWw16MOPpZRn6B
- mrR80XaR2wZDoUEZAtv8xjLbyH/fQbZzWnS1+Rgr50yGPVnEQnT6idMPCBqxHleJU59bPuA
- veexEo19cEvlMkWZrYvyPO9SMitvWKfSl+GxLBmBgn24AElmo4O+CBdr5ISq75V3pP36Bx5
- lq5tn8vkAhVr6l+StgJNg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:M/lzPykxPFg=;iM5VFp+xB8rXo5yUzWFMNzuo8dv
- mCkEkEDEd5ugni0rC5SALL74GWuE98iLYlOzRFb9Pa37Yf0DytIBzAQTfFeiiC88/g50sB6+H
- zBXx8iPBwOiEhofOPBzbc9LghZBWANIOWgm5q3y6jLUycOmi2J5rICXvyUj3Vi4oPNuMH9Boc
- jdrkBVlSE/VtSPALRmfxmD6N5SHc+q6cNLHL87aCHRkmI3khahLA/d+hVeZBjhrk86ptlnLDn
- r5JmIu55zKGtfPSei5emH9tsjsVNzRKheq6MaSVJu7/TkQ7x2HtW9A/9KfICnfcEw/GF9Mgng
- lHaif/bQyYpFBpJTm2WWKvPS63aZUkSmtJc0BfYJ5uMsg7R3azR613FFsFfDseJn03ovYLNUh
- zidSkk3DkKTJgRWGFRes2erbbuoQIZUyMU6YzP1Ubm8s5cMj0PViAoJVYVMI+xSlXAQkegmog
- 1SVDgle2KwzGo6ojLuG0fLiGZGgV7ESFxfwvb0VYETahnlypKSlPsNTe90dmKzyMOvFU9vO8i
- ICgb3j6UtQbk9z9YXlF5nHo4OCApB/hOrFYiOruYLJMsGUESkJHoWWBVSGdsr/unXk1umr/zC
- 0G0yPXZzpLtzFCNUD+LHuImJTxg5mD6G5Ay8MW287XyRLq5ujUuEiT0uE4ZE00+R1jSnUQF44
- zPOKu510vEn4YBgiS1WcEiRNuXn7PxeAwFWl+vYXxxwotPe4CRvqKTJmznX2atTcprxn5KfFp
- QrvhqPOjIYwq5QQ0CS2zzKSU1OKsoBV2aoXAtQ3yTa2u+6eTkOZ01hAEPMMurlKymYaBwGgAa
- /Eekb0UkpzaU9oUDdfuDrk/kXs/+iwEmES7hZbfXS3qloaQce+XeyMye/f5TrBU8vc+tHbJm4
- lXlkzZxja1RCaXGiGYTFHzVz/Jn5sWBgK4MG077jqCzCz8VHtOmFH+tP4XVboDkX87ANBB3OD
- Ys5X7nt7FO5ILp2sF+/iJfL4jReI+kN/LlDqdxzpD2BzDXliDhzoCkRi6KZktSpI7YSB4OsuH
- CDsmDcWDkW2mLJpLALf6ouAT7RAhCMP6uCbSkiv8z26DHQpAwJ+JGkFh7YB3GATuLKAa2bKqp
- hvAH+Y+dco/INBvqEYT8MGtios30IuHg8Cxt6VCY6f1Ead5+4zx2bhUzeWfWi340aOqXuFi0o
- hWKPHDJca1wzLRqNzMQXMc3cx2+wvR5KqF2kEb3bHlIkEfFnicN19+mm6UbRxUoBky3UBXb3D
- Xn4N/osQ++B1ldLUdCv06Lc48r28RdDzvgj8G2SAtZRO9aa9h6Hcv/RBCSfKxxtcq6lxGm3GM
- rUNq1TcXdCxJY/csfSMoTGfRfmjBRTrn3++XvHKuX5xMeSzDyfluliTim3+zDiZO3VjwX+Wlz
- Fw+0lB7m0iIJ6MiftaKxi1Yvq38UC4glDS6sma2WpihsQCt4jGLo7KCgzyj/pKF52Nhox4ECw
- qZ1EfN/6XufHaTZnc0y9LEC4DtfjGfuNANV5HrhU5PJc/Z8/ppkJ0Hi+UpArOiWcVGBjcqnmr
- y5yCSIeSVHrGOYnsbqK8+BZ4IPILAlsJd5n7YsZ1nkNCmTZ32WfZN97z0/maZ6ImgdhX7Nn0t
- Qg6IkaYpdDt2I+JnIhQwechqdakqk55eJfQ2KvzZO/VjjPpoS1DgnxuGVZwJ6bxGFB/dLVxuU
- WaEBuhquDPHGnS2Njk3dF+8KiZUMhBnKJV14JSrM69HktH6LvMn/Iq9jCir2k3Oe1IVCZfH6M
- vF2DFQMjYrCgJfkhpRKjmsw2axW4kLddBwjPNh+jbJxjR3IN9spAecwQPDtyFzE9NdSzhjFr1
- S1/ZjWBW7BAzR5NAeHHg4s7pnRR/KzML8hF4+HFs9oXERECxMdk7X7yAfGW0fOtGz0iPbU7XC
- XoPuQ0bQ2xQA+bUz9XSbQfWVhEs9q8ch9UJyCJXWrQYzZYUpUwn2VROuSodlktUYicq3jK9Yc
- UR4vI6VvVyjB/lhi+rwmcw2zfiT6+J0yo4+9PZCj88MVcoMHLNkEteD2zfnSD2prElLXRKtkv
- ODy3JO7eGkepxs7HYJkOcq2zamGpXQcVzAv3abQfCXnR9hGj0/cIrCkjb/y3+GXzcwftwkPmN
- cjk4y8Ha5Pu+ygRHsEvktGjfRL3CpXZMueloeQ3k4zJdPqhd8zM94+6rVdQliefBfLq6YMOLq
- +4WEbv4FMhV7+P0AlU+6ErXCHon57h+a2Me8mmgc59VNOYDmQO1S34ztbyN0aI4DJtNLcraBV
- dd6V98eQn0ou3smcHSElDi7EEEghm7SGCCg+DPNZb5hf6u8WLOzoyRucFcTlbdC8UV2oFiHAS
- ww5ziU4o3A/o7PRYtHc0vrQVfgrt35KJACOJglZRpk7ht3QewS7uq0tzysb2eWVWrovXTOX42
- pVrdgBwZNyGr900NVDJbZfGwNZ9LypyVOF/5t3ijDJdIhrvFibJf3bY4kU2b/oQBILGD6Kl2w
- eSh6lnkGB3Nn4tmZtdNDS8vovuWlNnYP5dGgJXbJvlIWgF160asCXxlnqGVCM/9wp4rPR6uRh
- riaBRp58LUfBQsQUzhS7nMLYeov//zg4zoKYZ9+g/iYww1SkEMmLE6VVpAxgnhB8grkWM19YM
- dxMSER23Cc78MZKEZurElF00ApjZU2lW46xBQySD2Jx9wzPvOuar2FlCs5LUMI6DI0eAUONhQ
- sCKBkoMYHyk58hdQAOsHMneccSCjEXDQyaoJdlJqekmRE52BH96/Ot5I4AzJWLEARbK6aE9IX
- JGd4C30jeawiZ1krwd0d5VcE43ymClRI5YgGC0CccNWC9cchJmjiwp0kLCxxM3Quho6nzKvZC
- 1HjRe4rE1mP/KOdGf2pb++e3dBtusLy93yB7YrlrP3T4GLVlMKfNHWWjjMm9mkAafuh32Jb//
- +xEQ/RVpi55l238Gtckyn7q/xYCEG3JQ+GELEs3QOVPIoBtg/pVlqVyQxDlVc/BLLE76i00zd
- pUS2htrq5SvtTXy9BzGiQd8/CqxGrIj64gtCMt2xB024yp7GihBUvN8Ajw2KyHS6OfpoD6FGg
- Bvh5Tg1dZXsdvfvLxvhvhUzgezx7vPMnoliVwGX+Wa8Tx1rHaXhUqymR46l0ujYgA==
+Subject: Re: [PATCH net-next v11 1/1] hinic3: module initialization and tx/rx
+ logic
+To: Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+ Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
+ Lee Trager <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>,
+ Suman Ghosh <sumang@marvell.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Joe Damato <jdamato@fastly.com>
+References: <cover.1745221384.git.gur.stavi@huawei.com>
+ <60ec4dd1d484d9df8cdb8310980676bb2f6c5559.1745221384.git.gur.stavi@huawei.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <60ec4dd1d484d9df8cdb8310980676bb2f6c5559.1745221384.git.gur.stavi@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> Add NULL check for mlx5_get_flow_namespace() returns in
-> mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() to prevent
-> NULL pointer dereference.
+Le 21/04/2025 à 09:47, Gur Stavi a écrit :
+> From: Fan Gong <gongfan1@huawei.com>
+> 
+> This is [1/3] part of hinic3 Ethernet driver initial submission.
+> With this patch hinic3 is a valid kernel module but non-functional
+> driver.
+> 
+> The driver parts contained in this patch:
+> Module initialization.
+> PCI driver registration but with empty id_table.
+> Auxiliary driver registration.
+> Net device_ops registration but open/stop are empty stubs.
+> tx/rx logic.
+> 
+> All major data structures of the driver are fully introduced with the
+> code that uses them but without their initialization code that requires
+> management interface with the hw.
+> 
+> Co-developed-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+> Co-developed-by: Gur Stavi <gur.stavi@huawei.com>
+> Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
+> ---
 
-* Can an other summary phrase variant become more desirable accordingly?
+Hi,
 
-* Please avoid duplicate source code.
+a few nitpick, should it help and in case of a v12.
 
 
-Regards,
-Markus
+> +static const struct auxiliary_device_id hinic3_nic_id_table[] = {
+> +	{
+> +		.name = HINIC3_NIC_DRV_NAME ".nic",
+> +	},
+> +	{},
+
+Unneeded trailing , after a terminator.
+
+> +};
+
+...
+
+> +int hinic3_alloc_txqs(struct net_device *netdev)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
+> +	u16 q_id, num_txqs = nic_dev->max_qps;
+> +	struct pci_dev *pdev = nic_dev->pdev;
+> +	struct hinic3_txq *txq;
+> +	u64 txq_size;
+> +
+> +	txq_size = num_txqs * sizeof(*nic_dev->txqs);
+> +	if (!txq_size) {
+
+I think that if (!num_txqs) would be enough.
+
+> +		dev_err(hwdev->dev, "Cannot allocate zero size txqs\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	nic_dev->txqs = kzalloc(txq_size, GFP_KERNEL);
+
+and kcalloc() could be used here. (even if it is trivial that it can not 
+overflow)
+
+> +	if (!nic_dev->txqs)
+> +		return -ENOMEM;
+> +
+> +	for (q_id = 0; q_id < num_txqs; q_id++) {
+> +		txq = &nic_dev->txqs[q_id];
+> +		txq->netdev = netdev;
+> +		txq->q_id = q_id;
+> +		txq->q_depth = nic_dev->q_params.sq_depth;
+> +		txq->q_mask = nic_dev->q_params.sq_depth - 1;
+> +		txq->dev = &pdev->dev;
+> +	}
+> +
+> +	return 0;
+> +}
+
+...
+
+> +netdev_tx_t hinic3_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	u16 q_id = skb_get_queue_mapping(skb);
+> +	struct hinic3_txq *txq;
+> +
+> +	if (unlikely(!netif_carrier_ok(netdev))) {
+> +		dev_kfree_skb_any(skb);
+> +		return NETDEV_TX_OK;
+
+Why not goto err_drop_pkt;?
+
+> +	}
+> +
+> +	if (unlikely(q_id >= nic_dev->q_params.num_qps)) {
+> +		txq = &nic_dev->txqs[0];
+
+Why update txd? It won't be used after the goto.
+
+> +		goto err_drop_pkt;
+> +	}
+> +	txq = &nic_dev->txqs[q_id];
+> +
+> +	return hinic3_send_one_skb(skb, netdev, txq);
+> +
+> +err_drop_pkt:
+> +	dev_kfree_skb_any(skb);
+> +	return NETDEV_TX_OK;
+> +}
+
+...
+
+CJ
 
