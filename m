@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-184467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66204A95969
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:30:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F6AEA9596C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B90BB7A9DA0
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 22:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14F2B16AE06
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 22:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691C822A80F;
-	Mon, 21 Apr 2025 22:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCD322B8A1;
+	Mon, 21 Apr 2025 22:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXAiGp7w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VGb9Ra0T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A03224251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9AE22B5B8
 	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 22:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745274526; cv=none; b=knOP4l+2C7mD9ba0aWlhBa/OCmOSv19bagZSRjbT15GtpqqSNk8arhZP2VzIrQMVL0o+tzhcRs7ZuVt78mMhoAFPvcuOM+VK31Pp5pCZh7uudoNtOc0RuSKj4DN3uOdJFG3OjMgKYXNfs+3GKRfVx2oel8pYybA2R4bTfRAxWkk=
+	t=1745274526; cv=none; b=pBI50HZ7FbZyqRCCOMHnOfLhdzqGyELjQRhPb2HH/tFWp7nZa/qpktyCIw2ogNgpZgi2xPuiCs9qnR40qFcjJCkeIUbU31o6rMiWZxGT2/U0FAUDLZbTWoSS5y7qziQl0U9txuKw/4pn69MohGFxbknPWYBfpp4o6/t78Jr12I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745274526; c=relaxed/simple;
-	bh=o4roOPXojA1fLzB3g/veVv978K0MR63bcziRVOEWthg=;
+	bh=ogmDCzWfER/npFf6rd4iKr84a/1TPMhX5bV8UDdw36E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UModm2KGe6J8LgkhnNvYIXPv74bctd5P3HsEV94Ex+UUJc+OM2qZpRIJqL+snE/ckzqnn7fAmj4IhjgufnXvkgrgRWW/1vUPjAaTOU7KIMHn/BwsbujMhgPuK7UKtpm6mIYLqA88Osk1/mIL43RbpO8/cTLlQ2msMt++E6AEoMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXAiGp7w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A93D6C4CEE4;
-	Mon, 21 Apr 2025 22:28:45 +0000 (UTC)
+	 MIME-Version; b=UstExkbDearAZKQjx9IFYkYy+xLMhO++IsbtC3N8TYMZFIeB2trS1PDef5Rprt9aeOCHVx1DxzPo9wQRR/m3k5w/AtMZSNJUb1paSZh/9gBGcUy9GeePaPdOYn4WodX7UeBBsgv3QMNGGUGo0M78fssubkeCfclLFTx6Glmi6hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VGb9Ra0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49ADDC4CEEE;
+	Mon, 21 Apr 2025 22:28:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745274526;
-	bh=o4roOPXojA1fLzB3g/veVv978K0MR63bcziRVOEWthg=;
+	bh=ogmDCzWfER/npFf6rd4iKr84a/1TPMhX5bV8UDdw36E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AXAiGp7w40vo8tvYE2ltRiCJ/qUuisRHGrDP2w155dPZ5dw+l3gm/0KRqZ5NMFDnU
-	 lCmvsJFovRB6VdkRTeR3+m5P0wk305f2q1WG04rT83/g6Uvh+oLyrHzffy6w7u6SyP
-	 waNKa2cPvJ6XdQiuxAwtEajMtmIoQsA71/xeoRtAwwzFfcFImly8W/t2buLuQ4Lsed
-	 yJCYHYr9rgbTX0F9fMKLZgji39Bs/IvaWXOoV3k9Ff/EARJalu4zHxgD71YCXeexzB
-	 umonasMFKMwAYkaiTKklC5gIHOeMj/7/djNJvyL8LOYNQgc2nOa3o69cbqLs+QkSEc
-	 3KB8I4NwZ6DdA==
+	b=VGb9Ra0TY659JofbFNGL3APNFXJFKgu6QufCN4YUOTlNU6idjY7hBe6PoypvaJMPW
+	 grk0vUvwa8Cejo4LqlboyF+8v6RjMt12/51ha8D3/K0LDkMbjST3/fx3FHy17xHjwA
+	 smp6XAXIkkYfjPE+qvF9kfWo0qDECnSkxqTIOmzgXMGN02u3tvdHziAvBpcaKTmlE8
+	 +Wi1BZVQ7LGC9Mri21E4tcxHiWbAfU4su+d0sQWxEFDnUPfSb8TSF7C518YnTLtGrA
+	 mL7iSEStK9VjXXAq/KrPRhzX/1lxhNfLTKNNDINOTWLB9uuPVeXHvwXuipsNZcmVsJ
+	 Urcwb9L+9fyLA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	dtatulea@nvidia.com,
 	michael.chan@broadcom.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC net-next 19/22] eth: bnxt: use queue op config validate
-Date: Mon, 21 Apr 2025 15:28:24 -0700
-Message-ID: <20250421222827.283737-20-kuba@kernel.org>
+Subject: [RFC net-next 20/22] eth: bnxt: support per queue configuration of rx-buf-len
+Date: Mon, 21 Apr 2025 15:28:25 -0700
+Message-ID: <20250421222827.283737-21-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250421222827.283737-1-kuba@kernel.org>
 References: <20250421222827.283737-1-kuba@kernel.org>
@@ -72,97 +72,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the rx-buf-len config validation to the queue ops.
+Now that the rx_buf_len is stored and validated per queue allow
+it being set differently for different queues. Instead of copying
+the device setting for each queue ask the core for the config
+via netdev_queue_config().
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 40 +++++++++++++++++++
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 12 ------
- 2 files changed, 40 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 43497b335329..a772ffaf3e5b 100644
+index a772ffaf3e5b..141acfed0f91 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16052,8 +16052,46 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 	return 0;
+@@ -4280,6 +4280,7 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		struct bnxt_napi *bnapi = bp->bnapi[i];
++		struct netdev_queue_config qcfg;
+ 		struct bnxt_ring_mem_info *rmem;
+ 		struct bnxt_cp_ring_info *cpr;
+ 		struct bnxt_rx_ring_info *rxr;
+@@ -4302,7 +4303,8 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 		if (!rxr)
+ 			goto skip_rx;
+ 
+-		rxr->rx_page_size = bp->rx_page_size;
++		netdev_queue_config(bp->dev, i,	&qcfg);
++		rxr->rx_page_size = qcfg.rx_buf_len;
+ 
+ 		ring = &rxr->rx_ring_struct;
+ 		rmem = &ring->ring_mem;
+@@ -15771,6 +15773,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev,
+ 	clone->rx_agg_prod = 0;
+ 	clone->rx_sw_agg_prod = 0;
+ 	clone->rx_next_cons = 0;
++	clone->rx_page_size = qcfg->rx_buf_len;
+ 	clone->need_head_pool = false;
+ 
+ 	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
+@@ -15877,6 +15880,8 @@ static void bnxt_copy_rx_ring(struct bnxt *bp,
+ 	src_ring = &src->rx_ring_struct;
+ 	src_rmem = &src_ring->ring_mem;
+ 
++	dst->rx_page_size = src->rx_page_size;
++
+ 	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
+ 	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
+ 	WARN_ON(dst_rmem->flags != src_rmem->flags);
+@@ -16088,6 +16093,7 @@ bnxt_queue_cfg_defaults(struct net_device *dev, int idx,
  }
  
-+static int
-+bnxt_queue_cfg_validate(struct net_device *dev, int idx,
-+			struct netdev_queue_config *qcfg,
-+			struct netlink_ext_ack *extack)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+
-+	/* Older chips need MSS calc so rx_buf_len is not supported,
-+	 * but we don't set queue ops for them so we should never get here.
-+	 */
-+	if (qcfg->rx_buf_len != bp->rx_page_size &&
-+	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
-+		return -EINVAL;
-+	}
-+
-+	if (!is_power_of_2(qcfg->rx_buf_len)) {
-+		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len is not power of 2");
-+		return -ERANGE;
-+	}
-+	if (qcfg->rx_buf_len < BNXT_RX_PAGE_SIZE ||
-+	    qcfg->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
-+		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range");
-+		return -ERANGE;
-+	}
-+	return 0;
-+}
-+
-+static void
-+bnxt_queue_cfg_defaults(struct net_device *dev, int idx,
-+			struct netdev_queue_config *qcfg)
-+{
-+	qcfg->rx_buf_len	= BNXT_RX_PAGE_SIZE;
-+}
-+
  static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
++	.supported_ring_params	= ETHTOOL_RING_USE_RX_BUF_LEN,
  	.ndo_queue_mem_size	= sizeof(struct bnxt_rx_ring_info),
-+
-+	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
-+	.ndo_queue_cfg_validate = bnxt_queue_cfg_validate,
- 	.ndo_queue_mem_alloc	= bnxt_queue_mem_alloc,
- 	.ndo_queue_mem_free	= bnxt_queue_mem_free,
- 	.ndo_queue_start	= bnxt_queue_start,
-@@ -16061,6 +16099,8 @@ static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
- };
  
- static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops_unsupp = {
-+	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
-+	.ndo_queue_cfg_validate = bnxt_queue_cfg_validate,
- };
- 
- static void bnxt_remove_one(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 956f51449709..8842390f687f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -867,18 +867,6 @@ static int bnxt_set_ringparam(struct net_device *dev,
- 	if (!kernel_ering->rx_buf_len)	/* Zero means restore default */
- 		kernel_ering->rx_buf_len = BNXT_RX_PAGE_SIZE;
- 
--	if (kernel_ering->rx_buf_len != bp->rx_page_size &&
--	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
--		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
--		return -EINVAL;
--	}
--	if (!is_power_of_2(kernel_ering->rx_buf_len) ||
--	    kernel_ering->rx_buf_len < BNXT_RX_PAGE_SIZE ||
--	    kernel_ering->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
--		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range, or not power of 2");
--		return -ERANGE;
--	}
--
- 	if (netif_running(dev))
- 		bnxt_close_nic(bp, false, false);
- 
+ 	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
 -- 
 2.49.0
 
