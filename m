@@ -1,81 +1,88 @@
-Return-Path: <netdev+bounces-184374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5C99A951AC
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 15:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC0EA951FA
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 15:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FDBA17288C
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 13:29:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5393B3B3448
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 13:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19962266566;
-	Mon, 21 Apr 2025 13:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9/aXBKv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E26A266581;
+	Mon, 21 Apr 2025 13:50:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF42C265CDF;
-	Mon, 21 Apr 2025 13:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4DD264A74;
+	Mon, 21 Apr 2025 13:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745242153; cv=none; b=orEbMDdhePiVAY7p5xvBLLBtwDjAsLYqBj2Spfx1fdaqUUiBjkk+BXQDySJJpICFL+b5UMJ3Tn27MI5ZLEY+a0nAixwo2B05G5KWE+OtYRgNgxvZptLCTObbIG3mTvAZ15YJ+W7IBJKzyS4N43UuzSTFCV4nfQ0EYxODqyouJhE=
+	t=1745243443; cv=none; b=AZOJwprdr7l3OGkgh03OgWq/4qaDgq08ZTYujWzUfH3cu9Foei9DfC1YrbNJWiXRVzvOU7ZSrlphTnmXgp/ax/pRa2uLYSDH1v8MWTdqN5RgvBiaqhCC5da5JHQHdH8F0Pcxh52H6Sv1RnVqhkQPjQ/llWXoJr39dtwGGVULHNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745242153; c=relaxed/simple;
-	bh=OjPb0Os4g0jA2afhKN6cIy2DeKVLhPUQwkDjg8pUgS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=at5gKxOslsPFzedQpTr6LFF9zt/lYfXqrtUsTw7pmm/nC1zYXjRixzauGRstoz9weJOt7Bj1pCv5u5E3LIqF75Qe/ZzsMSJ6hgSySUzvuIl1jb1psivTu42rcVBjwifkoEGOh9dinY38IJ4+9mWnfd3/rOf5sg4CJV1DPWZKqg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9/aXBKv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D329C4CEE4;
-	Mon, 21 Apr 2025 13:29:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745242152;
-	bh=OjPb0Os4g0jA2afhKN6cIy2DeKVLhPUQwkDjg8pUgS0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u9/aXBKvN9npDfV9FJZez4cOROYseG1kEekFKeg1iwhYLObUU/EfvpSzidlVFpI91
-	 RnKxLQ5jK1YsKzrTY6iw0x1Am/cu+4jO6xipAMzYxLSplamBBjj5I4+IU1XLpV4yB9
-	 neHBwOBNGva+5DlU/ccArocqWCyflgEsbol044vnHtFuVdESK4BJkZVrQhALJuUymO
-	 RpzFNwv5NuK1AnW8A38XwTKnyciLIDBeMcAqFrLnBOFAxyxSOjsSlB+HCb8elPY5mX
-	 vniE4FR0PUEZF3khF0ghVXZxWLvQ/tyaTUkSX2rZacg524WVTFnmzm4o3v1hVd+/HV
-	 OxZ6AMoimFb0g==
-Date: Mon, 21 Apr 2025 14:29:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net v1 1/1] net: selftests: initialize TCP header and skb
- payload with zero
-Message-ID: <20250421132908.GF2789685@horms.kernel.org>
-References: <20250416160125.2914724-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1745243443; c=relaxed/simple;
+	bh=SEMtQfQ8NsSlHutbWhTDFmQl9QLQKGw1LL1AgG36Arg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZPZvPleVfrVF7G43zM+W/30sSkrU1kKNVTYoLtuf/3n5xxx1b7nAZWh550prS5iukccpdKDLnC9je84XcSZHFRsjxLCnW4tKkxfDwqwLHdGeyRSbtkqitwSJXVv5Ui2tOSVVETGe8WjAn0C6iTLGAna/A20zjy3vCm4eVmbvGPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Zh6FW401szsShh;
+	Mon, 21 Apr 2025 21:50:23 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6900D1400DD;
+	Mon, 21 Apr 2025 21:50:38 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 21 Apr 2025 21:50:37 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <gerhard@engleder-embedded.com>,
+	<shaojijie@huawei.com>
+Subject: [PATCH RFC net-next 0/2] net: hibmcge: add support for selftest
+Date: Mon, 21 Apr 2025 21:43:56 +0800
+Message-ID: <20250421134358.1241851-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416160125.2914724-1-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Wed, Apr 16, 2025 at 06:01:25PM +0200, Oleksij Rempel wrote:
-> Zero-initialize TCP header via memset() to avoid garbage values that
-> may affect checksum or behavior during test transmission.
-> 
-> Also zero-fill allocated payload and padding regions using memset()
-> after skb_put(), ensuring deterministic content for all outgoing
-> test packets.
-> 
-> Fixes: 3e1e58d64c3d ("net: add generic selftest support")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Cc: stable@vger.kernel.org
+patch1: the net_selftest_custom() interface is added
+to support driver customized loopback tests and
+common loopback tests.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+patch2: add selftest support for hibmcge
+
+Jijie Shao (2):
+  net: selftest: add net_selftest_custom() interface
+  net: hibmcge: add support for selftest
+
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   |   2 +
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  60 +++++-
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |   6 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   1 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |   1 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c |   3 +-
+ include/net/selftests.h                       |  61 ++++++
+ net/core/selftests.c                          | 188 +++++++++++++++++-
+ 8 files changed, 310 insertions(+), 12 deletions(-)
+
+-- 
+2.33.0
 
 
