@@ -1,259 +1,671 @@
-Return-Path: <netdev+bounces-184352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26721A94EC8
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:39:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D735AA94ED0
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 11:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9851188FEE9
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 09:39:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BCDF1892986
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 09:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D4E20E708;
-	Mon, 21 Apr 2025 09:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC92580E0;
+	Mon, 21 Apr 2025 09:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="W2B8KIwg"
+	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="SoSA1nZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D5119ADA4
-	for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 09:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBAC1C2437;
+	Mon, 21 Apr 2025 09:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745228353; cv=none; b=gwLkyiZKwgne2AErLFjwd+Pg7HcXt3MBa04awP3ZDR3jhB/WsT0H0AEWqiGCHXuxKIo0i7qO/SecU5zviBteJunVctKLfM0aT+Y2WMfTDIap8arJEcOaJjEdTX0lzXL4Crzk2MW5pHB94XaC/RkF+w7XukAWATrODU2MhUvKT64=
+	t=1745228439; cv=none; b=HQMpISxBuZt3RHvC24qh5geALYbWkzn4BTMQJBIc0/plzDCDyhUJlMEpj+NIctdFsPZREjVnazehD50hlHZGrpacOj+w3wRAJVyxG5aHVk1165INwvLp8aTNnnbNiivqr6kuLWbV8sliVtbsDIsv6ftBPP+RnWPlS98UGHXtAz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745228353; c=relaxed/simple;
-	bh=cMq6OAmBxcf/lG7hdDQdjFnvXFyPqX8uaX9LXRx5UhI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jJugKBQJ0J//lO0DqQb/ACBzSdVIBYmrk4WhT0PlILqPzHFJiN1LKYLawi9itaRI8T4bUeksrEXzO477xfGpby3aZpW5I3Sojcljz6NtTekHI72h3zBac+IJbuiKLc+Sy1g2ykFOWjDVUxbz5/lvS8zI7C6KSay3nlIISLTgbCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=W2B8KIwg; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-af590aea813so4497383a12.0
-        for <netdev@vger.kernel.org>; Mon, 21 Apr 2025 02:39:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745228351; x=1745833151; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RU9lBd2/J5bzB21zQw6ghXfLHHeW5jTZf+wK1I/zlBQ=;
-        b=W2B8KIwgIA8QFLmX7COvaVsBkXWp8i6kWLi0577GZ65e1opEPF4YWUaB2bbZ/m0lOw
-         +ZqKPwqcDxgrsl49Ep1w3mojlO7zldxZBEQib/nXUv7aJHQ5cMDfQHNfVyz3umMk098j
-         K0jSmaUhNEw1IwBVA5u/X1RsvwilcyAN1QKlY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745228351; x=1745833151;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RU9lBd2/J5bzB21zQw6ghXfLHHeW5jTZf+wK1I/zlBQ=;
-        b=wCy7JT7ktIYcdekWAcP7/9Tag16NwXyh9bN+/j1seRI6+vsEcDmVPtVdvuHRY7j1Mv
-         gJgN+JkeJ/3T/JMjWCjwEzQYP3fUZrWpqOyV1fVxCIaMiqEtnNtWQg2Vjp0OASm9845R
-         fXeh8W3PG3/5XngKVFzCVBcVUQYsIoHYyA83sc15uX7NlpLi3ZB2RR+M7hL+VZZpHNxz
-         XrxYOa/QnWQsNJmo1/qZpjZjB0G8AMIfYOpJcrbwIMMaGtKDcliLOfY+v7d4x9+olPYE
-         8p+073Y5jhgdg0zMY4RP06Tr1/sjc/kG/h3LyGIj/xjK/pOycGMLcKvwWRCec0Z8aM6a
-         SGzg==
-X-Forwarded-Encrypted: i=1; AJvYcCWt+iYKVF2JV/V0STQq6cGA8Jo0QMWFl94ljqE6MaT+QfPZKXI+2lKzheHRFaHA0ICwtcdLn5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbAs0PuK0jgq4xYRaf2bWCTNIS+jBMwzOHPQLQnz0Ih3YloLCO
-	fUZeyHrJjy9YrToytMTN56mptxcLCndFbAZLVkFJe7PG2iVD0YdRBo8GbX8j82rGU0aBTtFaIDI
-	ZvUFy644V/v/Crxmt5ma2PEPUTgXSX90AfrW7
-X-Gm-Gg: ASbGncv5jTGbPaKwSwY5oR4cTFxdYXs7d/J+f+wyXZ8L07fWWLkV/LuGOx8kt4ks5qw
-	0A/Io5grNoF1/ediwWUY80Xj6NG/kQpKylpqmMeXa3onBet9TUFHHseQFrt6VOzmPa/UfNClDRB
-	vgsqodo0iA3XrczOlk6HD3wOk=
-X-Google-Smtp-Source: AGHT+IHRMAycn8F/dC0uK+L+wQr+ItXuOw9nviGxeiyo9rm6t8CzCXNy3D7/uiLvgoAnSg5LY78RBUqmBFGz7ggtXyc=
-X-Received: by 2002:a17:903:3bcc:b0:223:3eed:f680 with SMTP id
- d9443c01a7336-22c50d44a6bmr173666385ad.18.1745228351307; Mon, 21 Apr 2025
- 02:39:11 -0700 (PDT)
+	s=arc-20240116; t=1745228439; c=relaxed/simple;
+	bh=/aGJWK22tQe/Ha4UsmQkXaFakHVo7zvmcLaGu2MOQvk=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=BLIk5CLSuUOKWQE8YAuAFP0TjlOfrXDQdefrG7DPdrr2AaQaxVmuEU/k0LnTZuKLJIRJSqrF1D/J1WTF8T1OnbF9nEFVaGewXbSMFkP94xLRExyu3dV3yRttW5lNikO/vrcN5mJUxCngBhLofxUIA/BCZtDF9t7mcf9PIP1haTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=SoSA1nZA; arc=none smtp.client-ip=82.68.155.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
+Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
+	by wylie.me.uk (Postfix) with ESMTP id 77ECE120872;
+	Mon, 21 Apr 2025 10:40:20 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
+	s=mydkim006; t=1745228420;
+	bh=/aGJWK22tQe/Ha4UsmQkXaFakHVo7zvmcLaGu2MOQvk=;
+	h=Date:From:To:Subject;
+	b=SoSA1nZAr3fhMORJk/x8gXQOWQf2UMF+rbIWxnZRFNAIYLIibsfqNgFvDiP3//J7s
+	 Fm4P53y3HyVJfrGgS828VPMidUKxOZ2eTWMKLCYGLGO7tsVHl3F17hzqWknNxlC5BC
+	 s8RDawYWuvd2OH18eTeX1dSS2j8wWwHm+7ix5R8omY+5/8bAbo5/cRzCkAUeFtuOIg
+	 tgbsA7zBFA48ZU5cXpcs9lDlqqebSnWchEKZj5rbUPwEwkv2qaW9SBVPeB3E5NTX6A
+	 eixmApAYLr+N1ZVjsybrnT06jGTH9xMXBAJCtWYDFpbnjIv3bo7OFhDIrUqUmqp+Rv
+	 1atQMwD9V8y5A==
+Date: Mon, 21 Apr 2025 10:40:19 +0100
+From: "Alan J. Wylie" <alan@wylie.me.uk>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Cong
+ Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Octavian Purdila
+ <tavip@google.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>, stable@vger.kernel.org
+Subject: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417160141.4091537-1-vadfed@meta.com>
-In-Reply-To: <20250417160141.4091537-1-vadfed@meta.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Mon, 21 Apr 2025 15:08:59 +0530
-X-Gm-Features: ATxdqUFHS6fRGJ7lNDBD261kzj-m-lJTfbRnhpIJQmgQ-bSbHo5CBx2CygasV6Y
-Message-ID: <CALs4sv1sKLABmzHNj3DuMRYjJBm2_t2WZttr56DfHozpA7kqrQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] bnxt_en: improve TX timestamping FIFO configuration
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Michael Chan <michael.chan@broadcom.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Richard Cochran <richardcochran@gmail.com>, 
-	netdev@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f32e32063346a375"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
---000000000000f32e32063346a375
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+#regzbot introduced: 6.14.2..6.14.3
 
-On Thu, Apr 17, 2025 at 9:31=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> w=
-rote:
->
-> Reconfiguration of netdev may trigger close/open procedure which can
-> break FIFO status by adjusting the amount of empty slots for TX
-> timestamps. But it is not really needed because timestamps for the
-> packets sent over the wire still can be retrieved. On the other side,
-> during netdev close procedure any skbs waiting for TX timestamps can be
-> leaked because there is no cleaning procedure called. Free skbs waiting
-> for TX timestamps when closing netdev.
->
-> Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX =
-packets to 4")
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-> ---
-> v1 -> v2:
-> * move clearing of TS skbs to bnxt_free_tx_skbs
-> * remove spinlock as no TX is possible after bnxt_tx_disable()
-> * remove extra FIFO clearing in bnxt_ptp_clear()
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++--
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 28 ++++++++++++++-----
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
->  3 files changed, 25 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index c8e3468eee61..2c8e2c19d854 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -3414,6 +3414,9 @@ static void bnxt_free_tx_skbs(struct bnxt *bp)
->
->                 bnxt_free_one_tx_ring_skbs(bp, txr, i);
->         }
-> +
-> +       if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-> +               bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
->  }
->
->  static void bnxt_free_one_rx_ring(struct bnxt *bp, struct bnxt_rx_ring_i=
-nfo *rxr)
-> @@ -12797,8 +12800,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool =
-irq_re_init, bool link_re_init)
->         /* VF-reps may need to be re-opened after the PF is re-opened */
->         if (BNXT_PF(bp))
->                 bnxt_vf_reps_open(bp);
-> -       if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-> -               WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
->         bnxt_ptp_init_rtc(bp, true);
->         bnxt_ptp_cfg_tstamp_filters(bp);
->         if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_ptp.c
-> index 2d4e19b96ee7..197893220070 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -794,6 +794,27 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_in=
-fo *ptp_info)
->         return HZ;
->  }
->
-> +void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
-> +{
-> +       struct bnxt_ptp_tx_req *txts_req;
-> +       u16 cons =3D ptp->txts_cons;
-> +
-> +       /* make sure ptp aux worker finished with
-> +        * possible BNXT_STATE_OPEN set
-> +        */
-> +       ptp_cancel_worker_sync(ptp->ptp_clock);
-> +
-> +       ptp->tx_avail =3D BNXT_MAX_TX_TS;
-> +       while (cons !=3D ptp->txts_prod) {
-> +               txts_req =3D &ptp->txts_req[cons];
-> +               if (!IS_ERR_OR_NULL(txts_req->tx_skb))
-> +                       dev_kfree_skb_any(txts_req->tx_skb);
 
-For completeness, should we not set txts_req->tx_skb =3D NULL here, just
-like we did in bnxt_ptp_clear which is now gone.
+Since 6.14.3 I have been seeing random panics, all in htb_dequeue.
+6.14.2 was fine.
 
-> +               cons =3D NEXT_TXTS(cons);
-> +       }
-> +       ptp->txts_cons =3D cons;
-> +       ptp_schedule_worker(ptp->ptp_clock, 0);
-> +}
-> +
+One only happened 8 hours after the reboot, so bisecting would be
+prolonged, since I have no idea what is triggering the crash.
 
---000000000000f32e32063346a375
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+I've captured three panics with netconsole. All are very similar.
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJgMIIC
-XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIKKPqtdOSOn5MQMimVs7yEUgW3CJinVQ
-dRoRvWMi+n+6MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDQy
-MTA5MzkxMVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
-AQUABIIBAB9EQBUIK9VOQ5C8vlOeLIuEMAMqkef0V5AtPBif2B3eeKUU0Lj6Z2GMMSGrgYS5fN5i
-kUwq1Hc1FqrsWv+aD7PCPWbL8/RBIPqdtWwl69gb5s7rCTFZz2UZ/AVZ+o1AWWu68clPcjFKAsIF
-r9YWPoG6X2u/KEppnvqwhriGSPKIk5uoEumiB444Q451U9edbKQhCKpfdItSP5v/F9wUMs2hel2B
-fwGrL3qotiDKAjZcruBUDdrOHD+T5wc9wAiVHJ1RGLxTWGyWWpRZ5n1+k1dDBI5rZzf/JBqc5CPu
-8fMrFC0w/bEe4RcaM6uhQbSTqKqDUdOZYQZnWvmyDCC6bco=
---000000000000f32e32063346a375--
+I've also included the script I use to initialise tc. As well as when
+the ppp over ethernet interface comes up, I also run this every 5
+minutes as a cron job since my ADSL line can fluctuate between 22 and
+30 Mb/s. However, from the timings of the last few lines in
+/var/log/messages before the crash, it doesn't seem that this is
+directly related.
+
+Finally, I've decoded the first panic.
+
+I'm more than happy to help with debugging, if necessary.
+
+The system is running up-to-date Gentoo.
+
+Linux version 6.14.3 (alan@bilbo) (gcc (Gentoo Hardened
+14.2.1_p20241221 p7) 14.2.1 20241221, GNU ld (Gentoo 2.44 p1) 2.44.0)
+#20 SMP PREEMPT_DYNAMIC Sun Apr 20 21:18:54 BST 2025
+
+Linux bilbo 6.14.3 #20 SMP PREEMPT_DYNAMIC Sun Apr 20 21:18:54 BST 2025
+x86_64 AMD FX(tm)-4300 Quad-Core Processor AuthenticAMD GNU/Linux
+
+# equery -q list  iproute2
+sys-apps/iproute2-6.13.0
+
+
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0 
+Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G           O
+6.14.3 #20 Tainted: [O]=OOT_MODULE
+Hardware name: Gigabyte Technology Co., Ltd. To be filled by
+O.E.M./970A-DS3P, BIOS FD 02/26/2016 RIP: 0010:rb_next+0x0/0x50
+Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b
+5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f
+48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b RSP:
+0018:ffffc90000003e50 EFLAGS: 00010246 RAX: 0000000000000000 RBX:
+ffff88811a764000 RCX: ffff88811a764180 RDX: ffff88835e4c6c00 RSI:
+ffff888162c998e8 RDI: 0000000000000000 RBP: 0000000000000000 R08:
+ffff88811a7642b0 R09: 00000000a535eebc R10: 0000000000000d09 R11:
+ffffc90000003ff8 R12: ffff88835e4c6c00 R13: ffff88811a7642b8 R14:
+00001a951355b383 R15: 0000000000000000 FS:  0000000000000000(0000)
+GS:ffff88842ec00000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3: 00000001084b4000
+CR4: 00000000000406f0 Call Trace: <IRQ>
+ htb_dequeue+0x42f/0x610 [sch_htb]
+ __qdisc_run+0x253/0x480
+ ? timerqueue_del+0x2c/0x40
+ qdisc_run+0x15/0x30
+ net_tx_action+0x182/0x1b0
+ handle_softirqs+0x102/0x240
+ __irq_exit_rcu+0x3e/0xb0
+ sysvec_apic_timer_interrupt+0x5b/0x70
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20
+RIP: 0010:cpuidle_enter_state+0x126/0x220
+Code: 18 4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8
+9a 2e 98 ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc
+00 00 00 49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49 RSP:
+0018:ffffffff81e03e40 EFLAGS: 00000202 RAX: ffff88842ec00000 RBX:
+ffff8881008d9400 RCX: 0000000000000000 RDX: 00001a94d9502071 RSI:
+fffffffbb3498394 RDI: 0000000000000000 RBP: 0000000000000002 R08:
+0000000000000002 R09: 00001a94d7bd7640 R10: 0000000000000006 R11:
+0000000000000020 R12: ffffffff81f98280 R13: 0000000000000002 R14:
+00001a94d9502071 R15: 0000000000000000 cpuidle_enter+0x2a/0x40
+do_idle+0x12d/0x1a0 cpu_startup_entry+0x29/0x30
+ rest_init+0xbc/0xc0
+ start_kernel+0x630/0x630
+ x86_64_start_reservations+0x25/0x30
+ x86_64_start_kernel+0x73/0x80
+ common_startup_64+0x12c/0x138
+ </TASK>
+Modules linked in: udp_diag netconsole sch_htb cls_u32 sch_ingress
+sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT
+xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat
+xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog
+ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw
+iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state
+xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
+ip6table_filter ip6_tables iptable_filter ip_tables x_tables tun pppoe
+binfmt_misc pppox ppp_generic slhc af_packet bridge stp llc ctr ccm
+dm_crypt radeon drm_client_lib video wmi drm_exec drm_suballoc_helper
+ath9k drm_ttm_helper syscopyarea ttm sysfillrect ath9k_common sysimgblt
+ath9k_hw fb_sys_fops drm_display_helper drm_kms_helper ath mac80211
+agpgart pl2303 snd_hda_codec_realtek cfbfillrect snd_hda_codec_generic
+usbserial snd_hda_codec_hdmi snd_hda_scodec_component cfbimgblt
+snd_hda_intel fb_io_fops snd_intel_dspcfg cfbcopyarea snd_hda_codec
+i2c_algo_bit fb snd_hda_core aesni_intel cfg80211 cdc_acm snd_pcm
+crypto_simd font snd_timer cryptd snd at24 e1000 regmap_i2c
+acpi_cpufreq libarc4 soundcore k10temp fam15h_power evdev nfsd
+sch_fq_codel auth_rpcgss lockd grace drm sunrpc
+drm_panel_orientation_quirks fuse backlight configfs loop nfnetlink
+usbhid ohci_pci xhci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd
+sha512_ssse3 usbcore sha256_ssse3 sha1_ssse3 sha1_generic gf128mul
+usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus
+i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4 CR2:
+0000000000000000 ---[ end trace 0000000000000000 ]--- RIP:
+0010:rb_next+0x0/0x50 Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d
+41 5e e9 85 73 01 00 5b 5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00
+00 00 00 00 <48> 3b 3f 48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89
+d0 48 8b RSP: 0018:ffffc90000003e50 EFLAGS: 00010246 RAX:
+0000000000000000 RBX: ffff88811a764000 RCX: ffff88811a764180 RDX:
+ffff88835e4c6c00 RSI: ffff888162c998e8 RDI: 0000000000000000 RBP:
+0000000000000000 R08: ffff88811a7642b0 R09: 00000000a535eebc R10:
+0000000000000d09 R11: ffffc90000003ff8 R12: ffff88835e4c6c00 R13:
+ffff88811a7642b8 R14: 00001a951355b383 R15: 0000000000000000 FS:
+0000000000000000(0000) GS:ffff88842ec00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 CR2: 0000000000000000
+CR3: 00000001084b4000 CR4: 00000000000406f0 Kernel panic - not syncing:
+Fatal exception in interrupt Kernel Offset: disabled ---[ end Kernel
+panic - not syncing: Fatal exception in interrupt ]---
+
+
+
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 1062b1067 P4D 1062b1067 PUD 1062ae067 PMD 0 
+Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G           O
+6.14.3 #20 Tainted: [O]=OOT_MODULE
+Hardware name: Gigabyte Technology Co., Ltd. To be filled by
+O.E.M./970A-DS3P, BIOS FD 02/26/2016 RIP: 0010:rb_next+0x0/0x50
+Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b
+5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f
+48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b RSP:
+0018:ffffc9000010ce50 EFLAGS: 00010246 RAX: 0000000000000000 RBX:
+ffff88812106e000 RCX: ffff88812106e180 RDX: ffff888129726c00 RSI:
+ffff888106a052e8 RDI: 0000000000000000 RBP: 0000000000000000 R08:
+ffff88812106e2b0 R09: 0000000036705a4e R10: 0000000000000d03 R11:
+ffffc9000010cff8 R12: ffff888129726c00 R13: ffff88812106e2b8 R14:
+000000d9fd03fce6 R15: 0000000000000000 FS:  0000000000000000(0000)
+GS:ffff88842ec80000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3: 0000000112716000
+CR4: 00000000000406f0 Call Trace: <IRQ>
+ htb_dequeue+0x42f/0x610 [sch_htb]
+ __qdisc_run+0x253/0x480
+ ? timerqueue_del+0x2c/0x40
+ qdisc_run+0x15/0x30
+ net_tx_action+0x182/0x1b0
+ handle_softirqs+0x102/0x240
+ __irq_exit_rcu+0x3e/0xb0
+ sysvec_apic_timer_interrupt+0x5b/0x70
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20
+RIP: 0010:acpi_safe_halt+0x22/0x30
+Code: 0f 1f 84 00 00 00 00 00 65 48 8b 05 b8 38 71 7e 48 8b 00 a8 08 75
+14 8b 05 a3 92 bb 00 85 c0 7e 07 0f 00 2d 20 4f 15 00 fb f4 <fa> e9 18
+77 00 00 0f 1f 84 00 00 00 00 00 8a 47 08 3c 01 75 05 e9 RSP:
+0018:ffffc900000c7e80 EFLAGS: 00000246 RAX: 0000000000000000 RBX:
+0000000000000001 RCX: ffff88842ec80000 RDX: ffff888100ddd464 RSI:
+ffff888100ddd400 RDI: ffff888100ddd464 RBP: 0000000000000001 R08:
+0000000000000001 R09: 071c71c71c71c71c R10: 0000000000000006 R11:
+0000000000000020 R12: ffffffff81f98280 R13: ffffffff81f982e8 R14:
+ffffffff81f98300 R15: 0000000000000000 acpi_idle_enter+0x8f/0xa0
+cpuidle_enter_state+0xb3/0x220 cpuidle_enter+0x2a/0x40
+ do_idle+0x12d/0x1a0
+ cpu_startup_entry+0x29/0x30
+ start_secondary+0xed/0xf0
+ common_startup_64+0x12c/0x138
+ </TASK>
+Modules linked in: netconsole sch_htb cls_u32 sch_ingress sch_cake ifb
+act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp
+xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat
+xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog
+ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw
+iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state
+xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
+ip6table_filter ip6_tables iptable_filter ip_tables x_tables tun pppoe
+pppox binfmt_misc ppp_generic slhc af_packet bridge stp llc ctr ccm
+dm_crypt radeon drm_client_lib ath9k video wmi drm_exec ath9k_common
+drm_suballoc_helper ath9k_hw drm_ttm_helper syscopyarea ttm sysfillrect
+sysimgblt ath pl2303 snd_hda_codec_realtek fb_sys_fops
+snd_hda_codec_generic usbserial mac80211 drm_display_helper
+snd_hda_codec_hdmi snd_hda_scodec_component drm_kms_helper
+snd_hda_intel snd_intel_dspcfg snd_hda_codec agpgart cfbfillrect
+snd_hda_core cfbimgblt fb_io_fops aesni_intel snd_pcm cfg80211 e1000
+cfbcopyarea i2c_algo_bit cdc_acm fb crypto_simd snd_timer snd cryptd
+acpi_cpufreq at24 font fam15h_power libarc4 soundcore k10temp
+regmap_i2c evdev nfsd sch_fq_codel auth_rpcgss lockd drm grace sunrpc
+drm_panel_orientation_quirks fuse backlight configfs loop nfnetlink
+usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd usbcore
+sha512_ssse3 sha256_ssse3 sha1_ssse3 sha1_generic gf128mul usb_common
+dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev
+i2c_core it87 hwmon_vid msr dmi_sysfs autofs4 CR2: 0000000000000000
+---[ end trace 0000000000000000 ]--- RIP: 0010:rb_next+0x0/0x50 Code:
+e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b 5d 41
+5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f 48 89
+f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b RSP:
+0018:ffffc9000010ce50 EFLAGS: 00010246 RAX: 0000000000000000 RBX:
+ffff88812106e000 RCX: ffff88812106e180 RDX: ffff888129726c00 RSI:
+ffff888106a052e8 RDI: 0000000000000000 RBP: 0000000000000000 R08:
+ffff88812106e2b0 R09: 0000000036705a4e R10: 0000000000000d03 R11:
+ffffc9000010cff8 R12: ffff888129726c00 R13: ffff88812106e2b8 R14:
+000000d9fd03fce6 R15: 0000000000000000 FS:  0000000000000000(0000)
+GS:ffff88842ec80000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3: 0000000112716000
+CR4: 00000000000406f0 Kernel panic - not syncing: Fatal exception in
+interrupt Kernel Offset: disabled ---[ end Kernel panic - not syncing:
+Fatal exception in interrupt ]---
+
+
+
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0 
+Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G           O
+6.14.3 #20 Tainted: [O]=OOT_MODULE
+Hardware name: Gigabyte Technology Co., Ltd. To be filled by
+O.E.M./970A-DS3P, BIOS FD 02/26/2016 RIP: 0010:rb_next+0x0/0x50
+Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b
+5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f
+48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b RSP:
+0018:ffffc9000010ce50 EFLAGS: 00010246 RAX: 0000000000000000 RBX:
+ffff88811899d000 RCX: ffff88811899d180 RDX: ffff8881845f2800 RSI:
+ffff8881069b7ae8 RDI: 0000000000000000 RBP: 0000000000000000 R08:
+ffff88811899d2b0 R09: 000000002997d2aa R10: 0000000000003fbf R11:
+ffffc9000010cff8 R12: ffff8881845f2800 R13: ffff88811899d2b8 R14:
+000000a69ae56401 R15: 0000000000000000 FS:  0000000000000000(0000)
+GS:ffff88842ec80000(0000) knlGS:0000000000000000 CS:  0010 DS: 0000 ES:
+0000 CR0: 0000000080050033 CR2: 0000000000000000 CR3: 0000000103c80000
+CR4: 00000000000406f0 Call Trace: <IRQ>
+ htb_dequeue+0x42f/0x610 [sch_htb]
+ __qdisc_run+0x253/0x480
+ ? timerqueue_del+0x2c/0x40
+ qdisc_run+0x15/0x30
+ net_tx_action+0x182/0x1b0
+ handle_softirqs+0x102/0x240
+ __irq_exit_rcu+0x3e/0xb0
+ sysvec_apic_timer_interrupt+0x5b/0x70
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20
+RIP: 0010:cpuidle_enter_state+0x126/0x220
+Code: 18 4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8
+9a 2e 98 ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc
+00 00 00 49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49 RSP:
+0018:ffffc900000c7e98 EFLAGS: 00000202 RAX: ffff88842ec80000 RBX:
+ffff888101d7f800 RCX: 0000000000000000 RDX: 000000a6607c6802 RSI:
+fffffffc350c4254 RDI: 0000000000000000 RBP: 0000000000000002 R08:
+0000000000000002 R09: 000000e8ec11c440 R10: 0000000000000006 R11:
+0000000000000020 R12: ffffffff81f98280 R13: 0000000000000002 R14:
+000000a6607c6802 R15: 0000000000000000 ?
+cpuidle_enter_state+0x116/0x220 cpuidle_enter+0x2a/0x40
+do_idle+0x12d/0x1a0 cpu_startup_entry+0x29/0x30
+ start_secondary+0xed/0xf0
+ common_startup_64+0x12c/0x138
+ </TASK>
+Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred
+xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper
+nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE
+iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT
+nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw iptable_raw
+ip6table_mangle iptable_mangle xt_multiport xt_state xt_limit
+xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_filter
+ip6_tables iptable_filter ip_tables x_tables pppoe tun pppox
+binfmt_misc ppp_generic slhc netconsole af_packet bridge stp llc ctr
+ccm dm_crypt radeon drm_client_lib video wmi drm_exec ath9k
+drm_suballoc_helper drm_ttm_helper syscopyarea ttm ath9k_common
+ath9k_hw sysfillrect sysimgblt fb_sys_fops drm_display_helper ath
+pl2303 drm_kms_helper usbserial mac80211 snd_hda_codec_realtek
+snd_hda_codec_generic snd_hda_codec_hdmi agpgart
+snd_hda_scodec_component cfbfillrect snd_hda_intel cfbimgblt
+snd_intel_dspcfg snd_hda_codec fb_io_fops snd_hda_core cfbcopyarea
+aesni_intel i2c_algo_bit cfg80211 snd_pcm fb snd_timer e1000 snd
+crypto_simd cdc_acm cryptd at24 font acpi_cpufreq libarc4 soundcore
+fam15h_power regmap_i2c k10temp evdev nfsd sch_fq_codel auth_rpcgss
+lockd grace sunrpc drm fuse configfs drm_panel_orientation_quirks
+backlight loop nfnetlink usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd
+ehci_pci ehci_hcd sha512_ssse3 sha256_ssse3 usbcore sha1_ssse3
+sha1_generic gf128mul usb_common dm_mirror dm_region_hash dm_log cpuid
+i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs
+autofs4 CR2: 0000000000000000 ---[ end trace 0000000000000000 ]--- RIP:
+0010:rb_next+0x0/0x50 Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d
+41 5e e9 85 73 01 00 5b 5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00
+00 00 00 00 <48> 3b 3f 48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89
+d0 48 8b RSP: 0018:ffffc9000010ce50 EFLAGS: 00010246 RAX:
+0000000000000000 RBX: ffff88811899d000 RCX: ffff88811899d180 RDX:
+ffff8881845f2800 RSI: ffff8881069b7ae8 RDI: 0000000000000000 RBP:
+0000000000000000 R08: ffff88811899d2b0 R09: 000000002997d2aa R10:
+0000000000003fbf R11: ffffc9000010cff8 R12: ffff8881845f2800 R13:
+ffff88811899d2b8 R14: 000000a69ae56401 R15: 0000000000000000 FS:
+0000000000000000(0000) GS:ffff88842ec80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 CR2: 0000000000000000
+CR3: 0000000103c80000 CR4: 00000000000406f0 Kernel panic - not syncing:
+Fatal exception in interrupt Kernel Offset: disabled ---[ end Kernel
+panic - not syncing: Fatal exception in interrupt ]---
+
+
+#!/bin/bash
+
+# https://www.bufferbloat.net/projects/codel/wiki/Cake/#installing-cake-out-of-tree-on-linux
+# https://trofi.github.io/posts/217-mitigating%20bufferbloat.html
+
+#set -x
+
+set -o nounset
+set -o errexit
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+ext=ppp0
+ext_ingress=ppp0ifb0
+
+# [query ADSL modem for up and down rates]
+
+echo -e "pppd pppoe UP $UP DN $DN" | systemd-cat -t traffic-control
+
+ext_up=$((UP * 95 / 100))kbit
+ext_down=$((DN * 95 / 100))kbit
+
+# below taken from https://wiki.gentoo.org/wiki/Traffic_shaping
+
+q=1486                  # HTB Quantum = 1500bytes IP + 14 bytes ethernet.
+			# Higher bandwidths may require a higher htb quantum. MEASURE.
+			# Some ADSL devices might require a stab setting.
+
+quantum=300		# fq_codel quantum 300 gives a boost to interactive flows
+			# At higher bandwidths (50Mbit+) don't bother
+
+modprobe act_mirred
+modprobe ifb
+modprobe sch_cake
+modprobe sch_fq_codel
+
+ethtool -K "$ext" tso off gso off gro off # Also turn of gro on ALL interfaces
+                                        # e.g ethtool -K eth1 gro off if you have eth1
+					# some devices you may need to run these
+					# commands independently
+
+# Clear old queuing disciplines (qdisc) on the interfaces
+tc qdisc del dev "$ext" root		>& /dev/null || true
+tc qdisc del dev "$ext" ingress		>& /dev/null || true
+tc qdisc del dev "$ext_ingress" root	>& /dev/null || true
+tc qdisc del dev "$ext_ingress" ingress	>& /dev/null || true
+ip link del "$ext_ingress"  		>& /dev/null || true
+
+#########
+# INGRESS
+#########
+
+# Create ingress on external interface
+tc qdisc add dev "$ext" handle ffff: ingress
+
+ip link add name "$ext_ingress"  type ifb
+ip link set dev "$ext_ingress" up || true # if the interace is not up bad things happen
+
+# Forward all ingress traffic to the IFB device
+tc filter add dev "$ext" parent ffff: protocol all u32 match u32 0 0 action mirred egress redirect dev "$ext_ingress"
+
+# Create an EGRESS filter on the IFB device
+
+# Warning: sch_htb: quantum of class 10001 is big. Consider r2q change
+# https://web.archive.org/web/20030514055053/http://www.docum.org/stef.coene/qos/faq/cache/31.html
+# default r2q is 10
+# since up ADSL rate went from 24.4 Mb/s to 26.8 Mb/s, "r2q 15" started giving a "too big" error
+# up it to 20, now OK again
+tc qdisc add dev "$ext_ingress" root handle 1: htb default 11 r2q 20
+
+# Add root class HTB with rate limiting
+
+tc class add dev "$ext_ingress" parent 1: classid 1:1 htb rate $ext_down #|& grep -v "Consider r2q change" || true
+tc class add dev "$ext_ingress" parent 1:1 classid 1:11 htb rate $ext_down prio 0 quantum $q
+
+# Add FQ_CODEL qdisc with ECN support (if you want ecn)
+tc qdisc add dev "$ext_ingress" parent 1:11 fq_codel quantum $quantum ecn
+
+#########
+# EGRESS
+#########
+# Add FQ_CODEL to EGRESS on external interface
+tc qdisc add dev "$ext" root handle 1: htb default 11
+
+# Add root class HTB with rate limiting
+tc class add dev "$ext" parent 1: classid 1:1 htb rate $ext_up
+tc class add dev "$ext" parent 1:1 classid 1:11 htb rate $ext_up prio 0 quantum $q
+
+# Note: You can apply a packet limit here and on ingress if you are memory constrained - e.g
+# for low bandwidths and machines with < 64MB of ram, limit 1000 is good, otherwise no point
+
+# Add FQ_CODEL qdisc without ECN support - on egress it's generally better to just drop the packet
+# but feel free to enable it if you want.
+
+tc qdisc add dev "$ext" parent 1:11 fq_codel quantum $quantum noecn
+
+
+
+$ cat ~/1.panic | scripts/decode_stacktrace.sh vmlinux
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0
+Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G           O
+6.14.3 #20 Tainted: [O]=OOT_MODULE
+Hardware name: Gigabyte Technology Co., Ltd. To be filled by
+O.E.M./970A-DS3P, BIOS FD 02/26/2016 RIP: 0010:rb_next
+(lib/rbtree.c:496) Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41
+5e e9 85 73 01 00 5b 5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00
+00 00 00 <48> 3b 3f 48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0
+48 8b All code ======== 0:	e8 d5 fa ff ff       	call
+0xfffffffffffffada 5:	5b                   	pop    %rbx
+   6:	4c 89 e0             	mov    %r12,%rax
+   9:	5d                   	pop    %rbp
+   a:	41 5c                	pop    %r12
+   c:	41 5d                	pop    %r13
+   e:	41 5e                	pop    %r14
+  10:	e9 85 73 01 00       	jmp    0x1739a
+  15:	5b                   	pop    %rbx
+  16:	5d                   	pop    %rbp
+  17:	41 5c                	pop    %r12
+  19:	41 5d                	pop    %r13
+  1b:	41 5e                	pop    %r14
+  1d:	e9 38 76 01 00       	jmp    0x1765a
+  22:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  29:	00 
+  2a:*	48 3b 3f             	cmp    (%rdi),%rdi
+	<-- trapping instruction 2d:	48 89 f8
+	mov    %rdi,%rax 30:	74 38                	je
+0x6a 32:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+  36:	48 85 d2             	test   %rdx,%rdx
+  39:	74 11                	je     0x4c
+  3b:	48 89 d0             	mov    %rdx,%rax
+  3e:	48                   	rex.W
+  3f:	8b                   	.byte 0x8b
+
+Code starting with the faulting instruction
+===========================================
+   0:	48 3b 3f             	cmp    (%rdi),%rdi
+   3:	48 89 f8             	mov    %rdi,%rax
+   6:	74 38                	je     0x40
+   8:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+   c:	48 85 d2             	test   %rdx,%rdx
+   f:	74 11                	je     0x22
+  11:	48 89 d0             	mov    %rdx,%rax
+  14:	48                   	rex.W
+  15:	8b                   	.byte 0x8b
+RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff88811a764000 RCX: ffff88811a764180
+RDX: ffff88835e4c6c00 RSI: ffff888162c998e8 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffff88811a7642b0 R09: 00000000a535eebc
+R10: 0000000000000d09 R11: ffffc90000003ff8 R12: ffff88835e4c6c00
+R13: ffff88811a7642b8 R14: 00001a951355b383 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88842ec00000(0000)
+knlGS:0000000000000000 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000001084b4000 CR4: 00000000000406f0
+Call Trace:
+<IRQ>
+htb_dequeue (net/sched/sch_htb.c:351 (discriminator 1)
+net/sched/sch_htb.c:924 (discriminator 1) net/sched/sch_htb.c:982
+(discriminator 1)) sch_htb __qdisc_run (net/sched/sch_generic.c:294
+net/sched/sch_generic.c:398 net/sched/sch_generic.c:416) ?
+timerqueue_del (lib/timerqueue.c:58) qdisc_run
+(./include/net/pkt_sched.h:128 ./include/net/pkt_sched.h:124)
+net_tx_action (net/core/dev.c:5553) handle_softirqs
+(./arch/x86/include/asm/atomic.h:23
+./include/linux/atomic/atomic-arch-fallback.h:457
+./include/linux/jump_label.h:262 ./include/trace/events/irq.h:142
+kernel/softirq.c:562) __irq_exit_rcu (kernel/softirq.c:435
+kernel/softirq.c:662) sysvec_apic_timer_interrupt
+(arch/x86/kernel/apic/apic.c:1049 (discriminator 35)
+arch/x86/kernel/apic/apic.c:1049 (discriminator 35)) </IRQ> <TASK>
+asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:574)
+RIP: 0010:cpuidle_enter_state (drivers/cpuidle/cpuidle.c:292) Code: 18
+4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8 9a 2e 98
+ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc 00 00 00
+49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49 All code ========
+0:	18 4c 6f 00          	sbb    %cl,0x0(%rdi,%rbp,2)
+4:	85 c0                	test   %eax,%eax 6:	7e 0b
+               	jle    0x13 8:	8b 73 04
+	mov    0x4(%rbx),%esi b:	83 cf ff             	or
+    $0xffffffff,%edi e:	e8 a1 22 e5 ff       	call
+0xffffffffffe522b4 13:	31 ff                	xor
+%edi,%edi 15:	e8 9a 2e 98 ff       	call
+0xffffffffff982eb4 1a:	45 84 ff             	test
+%r15b,%r15b 1d:	74 07                	je     0x26
+1f:	31 ff                	xor    %edi,%edi 21:	e8
+0e 58 9d ff       	call   0xffffffffff9d5834 26:	fb
+            	sti 27:	45 85 ed             	test
+%r13d,%r13d 2a:*	0f 88 cc 00 00 00    	js     0xfc
+	<-- trapping instruction 30:	49 63 c5
+	movslq %r13d,%rax 33:	48 8b 3c 24          	mov
+ (%rsp),%rdi 37:	48 6b c8 68          	imul
+$0x68,%rax,%rcx 3b:	48 6b d0 30          	imul
+$0x30,%rax,%rdx 3f:	49                   	rex.WB
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f 88 cc 00 00 00    	js     0xd2
+   6:	49 63 c5             	movslq %r13d,%rax
+   9:	48 8b 3c 24          	mov    (%rsp),%rdi
+   d:	48 6b c8 68          	imul   $0x68,%rax,%rcx
+  11:	48 6b d0 30          	imul   $0x30,%rax,%rdx
+  15:	49                   	rex.WB
+RSP: 0018:ffffffff81e03e40 EFLAGS: 00000202
+RAX: ffff88842ec00000 RBX: ffff8881008d9400 RCX: 0000000000000000
+RDX: 00001a94d9502071 RSI: fffffffbb3498394 RDI: 0000000000000000
+RBP: 0000000000000002 R08: 0000000000000002 R09: 00001a94d7bd7640
+R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+R13: 0000000000000002 R14: 00001a94d9502071 R15: 0000000000000000
+cpuidle_enter (drivers/cpuidle/cpuidle.c:391 (discriminator 2)) 
+do_idle (kernel/sched/idle.c:234 kernel/sched/idle.c:325) 
+cpu_startup_entry (kernel/sched/idle.c:422) 
+rest_init (init/main.c:743) 
+start_kernel (init/main.c:1525) 
+x86_64_start_reservations (arch/x86/kernel/head64.c:513) 
+x86_64_start_kernel (??:?) 
+common_startup_64 (arch/x86/kernel/head_64.S:421) 
+</TASK>
+Modules linked in: udp_diag netconsole sch_htb cls_u32 sch_ingress
+sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT
+xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat
+xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog
+ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw
+iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state
+xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
+ip6table_filter ip6_tables iptable_filter ip_tables x_tables tun pppoe
+binfmt_misc pppox ppp_generic slhc af_packet bridge stp llc ctr ccm
+dm_crypt radeon drm_client_lib video wmi drm_exec drm_suballoc_helper
+ath9k drm_ttm_helper syscopyarea ttm sysfillrect ath9k_common sysimgblt
+ath9k_hw fb_sys_fops drm_display_helper drm_kms_helper ath mac80211
+agpgart pl2303 snd_hda_codec_realtek cfbfillrect snd_hda_codec_generic
+usbserial snd_hda_codec_hdmi snd_hda_scodec_component cfbimgblt
+snd_hda_intel fb_io_fops snd_intel_dspcfg cfbcopyarea snd_hda_codec
+i2c_algo_bit fb snd_hda_core aesni_intel cfg80211 cdc_acm snd_pcm
+crypto_simd font snd_timer cryptd snd at24 e1000 regmap_i2c
+acpi_cpufreq libarc4 soundcore k10temp fam15h_power evdev nfsd
+sch_fq_codel auth_rpcgss lockd grace drm sunrpc
+drm_panel_orientation_quirks fuse backlight configfs loop nfnetlink
+usbhid ohci_pci xhci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd
+sha512_ssse3 usbcore sha256_ssse3 sha1_ssse3 sha1_generic gf128mul
+usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus
+i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4 CR2:
+0000000000000000 ---[ end trace 0000000000000000 ]--- RIP: 0010:rb_next
+(lib/rbtree.c:496) Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41
+5e e9 85 73 01 00 5b 5d 41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00
+00 00 00 <48> 3b 3f 48 89 f8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0
+48 8b All code ======== 0:	e8 d5 fa ff ff       	call
+0xfffffffffffffada 5:	5b                   	pop    %rbx
+6:	4c 89 e0             	mov    %r12,%rax 9:	5d
+               	pop    %rbp a:	41 5c
+	pop    %r12 c:	41 5d                	pop    %r13
+e:	41 5e                	pop    %r14 10:	e9 85 73
+01 00       	jmp    0x1739a 15:	5b
+	pop    %rbx 16:	5d                   	pop    %rbp
+17:	41 5c                	pop    %r12 19:	41 5d
+            	pop    %r13 1b:	41 5e
+pop    %r14 1d:	e9 38 76 01 00       	jmp    0x1765a
+22:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+29:	00 2a:*	48 3b 3f             	cmp
+(%rdi),%rdi		<-- trapping instruction 2d:	48 89 f8
+            	mov    %rdi,%rax 30:	74 38
+	je     0x6a 32:	48 8b 57 08          	mov
+0x8(%rdi),%rdx 36:	48 85 d2             	test   %rdx,%rdx
+39:	74 11                	je     0x4c 3b:	48 89 d0
+            	mov    %rdx,%rax 3e:	48
+	rex.W 3f:	8b                   	.byte 0x8b
+
+Code starting with the faulting instruction
+===========================================
+   0:	48 3b 3f             	cmp    (%rdi),%rdi
+   3:	48 89 f8             	mov    %rdi,%rax
+   6:	74 38                	je     0x40
+   8:	48 8b 57 08          	mov    0x8(%rdi),%rdx
+   c:	48 85 d2             	test   %rdx,%rdx
+   f:	74 11                	je     0x22
+  11:	48 89 d0             	mov    %rdx,%rax
+  14:	48                   	rex.W
+  15:	8b                   	.byte 0x8b
+RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff88811a764000 RCX: ffff88811a764180
+RDX: ffff88835e4c6c00 RSI: ffff888162c998e8 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffff88811a7642b0 R09: 00000000a535eebc
+R10: 0000000000000d09 R11: ffffc90000003ff8 R12: ffff88835e4c6c00
+R13: ffff88811a7642b8 R14: 00001a951355b383 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88842ec00000(0000)
+knlGS:0000000000000000 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 00000001084b4000 CR4: 00000000000406f0
+Kernel panic - not syncing: Fatal exception in interrupt
+Kernel Offset: disabled
+---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+$ 
+
+
+-- 
+Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
+
+Dance like no-one's watching. / Encrypt like everyone is.
+Security is inversely proportional to convenience
 
