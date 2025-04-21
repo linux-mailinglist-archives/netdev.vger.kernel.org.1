@@ -1,256 +1,122 @@
-Return-Path: <netdev+bounces-184334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53FDA94BDB
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 06:20:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD026A94BE1
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 06:24:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DED6E16FA55
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 04:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A496B188A579
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 04:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17732566D7;
-	Mon, 21 Apr 2025 04:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33732255E4D;
+	Mon, 21 Apr 2025 04:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWSWFEQP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VH6k3kEU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C603C1FC7F1;
-	Mon, 21 Apr 2025 04:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C6DD531;
+	Mon, 21 Apr 2025 04:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745209229; cv=none; b=cyzAsZB+ih0H9R5gmRwQYps6jV2uD2D4j+2wR5soJx/QLT1GOv3w88DWU6BDJ4zRg8TI+oVB/dYFnL3o77vRL+H6Xt8zs09VOyxjf6z+yB2YpHUeukmRa5DN2DnhYK4t+XU/mMDfAKeoAHEZqw7dLFjulDzUFKVefC9ZfoAx8kk=
+	t=1745209454; cv=none; b=ODAcx/Dk8GGdUkQtQvl8FuDFiogIaz19OoHGD/zHuGNuhPdI3LSG+RpNYED6z8SD+LnF7okzhKrHn+YZ9xpKO6p1iN+xwSmtLjuchgWvlRh2z84PQTXCiTAFcvPmrdQdeea+cNFdwgZOJX4M7mvsPXXbwi7+mVdEKy6b/eilri0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745209229; c=relaxed/simple;
-	bh=fzz5vJbGd7pv6ViNSfPjoRWY9qisTbb7I3wGIOAq57U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q+WgRxhY8k0fPi9srTdSxCClEYbN15IUafwTdoS1fbFqiW4G6Wsod9cWpQeYZwdhZnRdTFIi65H6p1xjdHuQ9uF0VZkfDue9gsOLl6fOPPvqVvQtemtrWS2yxEnxgbU9VB7kLl0Hqgo9Jjy1xQOsiTrBGc9gtSLw+w4OhKgqmZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWSWFEQP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40689C4CEEE;
-	Mon, 21 Apr 2025 04:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745209229;
-	bh=fzz5vJbGd7pv6ViNSfPjoRWY9qisTbb7I3wGIOAq57U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=jWSWFEQPPejY8w/rkDYZ/medBuywLpbOJspqi/LqHnzp8PSV89wF/urssd3wohMlt
-	 Wnnw36x5op00Hq8uPR5KY7hDhtRKdrTz4ZIsTdkY5ed6OZzPtbToWHgkr8Cx6ylCAl
-	 TeBT68SoTgBLVaJyxzruKqlbw1U5ANXlxpusUidp7ML0jvMQ0H/VR66m9BSPDvOcm4
-	 h8sQTZozvmZWXFNNbeFeidHPpDkcc9sT+K1q+RyVDFY4hujOtpf2Jw4ITviKmlhIJy
-	 ZrJP4VKdArdmd14dcINNM0OzZt2ntPXX4ipxkosIX+XMQ6U/uYWZxiU8vkgbGSEvnK
-	 c5F4SNW48xB/A==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e61d91a087so5405556a12.0;
-        Sun, 20 Apr 2025 21:20:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV94h2gIuTExG/WQgmX9PWoyvywIDQaAcYxKuvbRvr88/eU85Qjpci/eEsjA6pC41ePkCTJ+M0o+/A4q9A=@vger.kernel.org, AJvYcCWiZTQlC7vIXVBNvfgYvNW0mUq0FkK7p4OMiNiwseqL0gkDknzG2jMPyCAHegKaG17isZc06yBg@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrRxdXdYXJtAXPWbbw3jCMF8rwLLYnw8r5UXXjnPEVKzhh65Ud
-	/mHs1/s/XBoZXzvSFbJoeP1Ev7rpVLvIRMPGjHXKfK2GFr14JWdASaKl0LeaASJ2Kguao2YoBEZ
-	u+Vg2+fhPBTZC4MMHBZ9HysvzE9A=
-X-Google-Smtp-Source: AGHT+IHZsdvuMa94t5s7Wl81xSRyFyVOkOs7YuACBk6z/PpL2AUVEIqZOYxYjZN7u4uX7F3LM3lScub97stGyXyigSo=
-X-Received: by 2002:a17:907:2da4:b0:aca:cad6:458e with SMTP id
- a640c23a62f3a-acb74dd6021mr966291966b.43.1745209227816; Sun, 20 Apr 2025
- 21:20:27 -0700 (PDT)
+	s=arc-20240116; t=1745209454; c=relaxed/simple;
+	bh=8XpL7LgHM8PMPLRHG+npcwHCbX1D8crLdJyc1SzrAtk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlzUeaUzG/lzs/Ih1/9R2IT9RMZcWHeLOBNa/eUzqb3gsjE7gFJ2r8YV79wRnUANFIonWo0k4MOGq+GWGssR9RjyqmoJM16tjezRoDiiHRYq2f53WilkRCzIVumkFS8YRtzPpVxHnNh4go0HIjtU5+7LvmBxeeaRmL+RKYCRrl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VH6k3kEU; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-224100e9a5cso41777675ad.2;
+        Sun, 20 Apr 2025 21:24:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745209452; x=1745814252; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gD1lBT2qzhBlSXZmFrSntZGpuEODCjw4D1I4gGa8lhg=;
+        b=VH6k3kEUPv5/G3ANSIfGWrfan8yQT1BK+ZvE5sZHF8GW5yqRWIq2wZ7K6QfjIj8mx2
+         /vl5mfbbtetRupsU32yB7iQTWVnijGzTfBjFvyste1spj5Zewg6XgcDSLj791ORvqkDn
+         7L7aNISkJDHadwtq+tRP9TzOPCXymlmbX9cEqe7m3Q3lir+e7LDpMIeWYL9KNFqvqh/t
+         p8/fZinUk8r3cRR82v+ub5M6qGuE4PhFjb3hdHiJOzqzq0Ideq4CoQwqzw3V75ZQRiQE
+         qsdfpMGDwx3a2T9s8rLw/DbB0+SW5IzEL3IcI6eVNpQwF9fxIJ0s/JzAuh582sw4RTVX
+         /U8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745209452; x=1745814252;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gD1lBT2qzhBlSXZmFrSntZGpuEODCjw4D1I4gGa8lhg=;
+        b=PAnTjIhVYFTp0WP+xkvp1ZpWpl4kYCSZpZA96uIb3F9Xqr5zERXznMnXVf54HpudLE
+         YCsIxdYuLuShE5uK9Hg2xlynPZzQ+yb/BDfh7rsRJzEAXJ74hYBNja13vR3HE/gy3EF1
+         /8Eabu3pcB9uogk9+suvsZPZMdc4/o6dXdLXGARuRLbPIs2oISL3gns2hUBKDTUOB7nX
+         4kmEucq5rNO0DfxJUS2bwpgyPUTkOzTfsQnGA0Kn68sLVOLAcbJlq1aha8vvuyiO1cd5
+         EVriyWGVzTgJJKHh/wKJy5U3mXdFxj8N5C+QIM+46lgnxm8xq9rLxsGNsrMZlb2Qaqgg
+         zHyg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiBXO0Jj9ARygKwTZjQQNNiWYH6xgKljeA2X5C2UnKZk5M5g5XUphaS31uW/bFuQbTqls6efOUjMLLYk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT36d4z/bRU9Z3JX8BRS5ODznC8vyyfIvUV+n+7GklAyRI56ms
+	34i4mT8nusIfDxLK70kIBDbrZDiZJZdmV6aeWwLAm8TeAO3Ohw+Py6pRF6BgEeM=
+X-Gm-Gg: ASbGncsVECru51E8rHSRB0I/E7jJ1sfWSD36NmPuzyUMlnJk+7slcSg/TDi8Xtqpdjo
+	IHQAb8k7jLuAaoTFQcutVyDzIBr8Fw0tkF3K67tjQ0GCYqyioD4k4H1T7vourYGe9vKCrWFu9WR
+	hAKBfDxx9ca2ZxMQaae1B8ba02BiHkDvprFGRLSZhZ7xajn0eQiPAymV73ui7kMcFBEstd5TtX7
+	cmfF9HuGhEQugHlfS3YoZiUzIosbSmv54f/iGmgGuvkGs0omCBbfLILKEafk8POElY2ZKauWyF+
+	olxAbFVUZqnHGX49HoxYvC8vYREsptHELO/4btlOhuZ5CQ==
+X-Google-Smtp-Source: AGHT+IHW5VHwndq5VFkPfBwdaapMexDkhjRLo/7mVQyTVfKh4gxoemeFfnR2QhdJLx4vfv6y2rFJuw==
+X-Received: by 2002:a17:902:ebc3:b0:220:e63c:5aff with SMTP id d9443c01a7336-22c5361b3e7mr145469015ad.47.1745209451866;
+        Sun, 20 Apr 2025 21:24:11 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50ecee92sm55994535ad.187.2025.04.20.21.24.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Apr 2025 21:24:11 -0700 (PDT)
+Date: Mon, 21 Apr 2025 04:24:04 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net] bonding: use permanent address for MAC swapping if
+ device address is same
+Message-ID: <aAXIZAkg4W71HQ6c@fedora>
+References: <20250401090631.8103-1-liuhangbin@gmail.com>
+ <3383533.1743802599@famine>
+ <Z_OcP36h_XOhAfjv@fedora>
+ <Z_yl7tQne6YTcU6S@fedora>
+ <4177946.1744766112@famine>
+ <Z_8bfpQb_3fqYEcn@fedora>
+ <155385.1744949793@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416144132.3857990-1-chenhuacai@loongson.cn>
- <20250416144132.3857990-3-chenhuacai@loongson.cn> <fe0a5e7a-6bb2-45ef-8172-c06684885b36@linux.dev>
-In-Reply-To: <fe0a5e7a-6bb2-45ef-8172-c06684885b36@linux.dev>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 21 Apr 2025 12:20:17 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5ELoqM8n5A-DD7LOzjb2mkRDR+pM-CAOcfGwZYcVQQ-A@mail.gmail.com>
-X-Gm-Features: ATxdqUGcc8EyLCwgp78OF_HVaGFUNUUqjJ_56kgJ9EU-Z9uo3q6DMaUSt86Aug8
-Message-ID: <CAAhV-H5ELoqM8n5A-DD7LOzjb2mkRDR+pM-CAOcfGwZYcVQQ-A@mail.gmail.com>
-Subject: Re: [PATCH net-next V2 2/3] net: stmmac: dwmac-loongson: Add new
- multi-chan IP core support
-To: Yanteng Si <si.yanteng@linux.dev>
-Cc: Huacai Chen <chenhuacai@loongson.cn>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Feiyang Chen <chris.chenfeiyang@gmail.com>, loongarch@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Lunn <andrew@lunn.ch>, Henry Chen <chenx97@aosc.io>, Biao Dong <dongbiao@loongson.cn>, 
-	Baoqi Zhang <zhangbaoqi@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <155385.1744949793@famine>
 
-Hi, Yanteng,
+Hi Jay,
 
-On Mon, Apr 21, 2025 at 10:04=E2=80=AFAM Yanteng Si <si.yanteng@linux.dev> =
-wrote:
->
->
-> =E5=9C=A8 4/16/25 10:41 PM, Huacai Chen =E5=86=99=E9=81=93:
-> > Add a new multi-chan IP core (0x12) support which is used in Loongson-
-> > 2K3000/Loongson-3B6000M. Compared with the 0x10 core, the new 0x12 core
-> > reduces channel numbers from 8 to 4, but checksum is supported for all
-> > channels.
-> >
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > Tested-by: Henry Chen <chenx97@aosc.io>
-> > Tested-by: Biao Dong <dongbiao@loongson.cn>
-> > Signed-off-by: Baoqi Zhang <zhangbaoqi@loongson.cn>
-> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-> > ---
-> >   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 62 +++++++++++-------=
--
-> >   1 file changed, 37 insertions(+), 25 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/dri=
-vers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > index 2fb7a137b312..57917f26ab4d 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > @@ -68,10 +68,11 @@
-> >
-> >   #define PCI_DEVICE_ID_LOONGSON_GMAC 0x7a03
-> >   #define PCI_DEVICE_ID_LOONGSON_GNET 0x7a13
-> > -#define DWMAC_CORE_LS_MULTICHAN      0x10    /* Loongson custom ID */
-> > -#define CHANNEL_NUM                  8
-> > +#define DWMAC_CORE_MULTICHAN_V1      0x10    /* Loongson custom ID 0x1=
-0 */
-> > +#define DWMAC_CORE_MULTICHAN_V2      0x12    /* Loongson custom ID 0x1=
-2 */
-> >
-> >   struct loongson_data {
-> > +     u32 multichan;
->
-> In order to make the logic clearer, I suggest splitting this patch.=EF=BC=
-=9A
->
->
-> 2/4  Add multichan for loongson_data
->
-> 3/4 Add new multi-chan IP core support
-I don't think the patch is unclear now, the multichan flag is really a
-combination of DWMAC_CORE_MULTICHAN_V1 and DWMAC_CORE_MULTICHAN_V2.
+On Thu, Apr 17, 2025 at 09:16:33PM -0700, Jay Vosburgh wrote:
+> 	Wouldn't it be equally effective to, when the conflicting
+> interface is added, give it a random MAC to avoid the conflict?  That
+> random MAC shouldn't end up as the bond's MAC, so it would exist only as
+> a placeholder of sorts.
+> 
+> 	I'm unsure if there are many (any?) devices in common use today
+> that actually have issues with multiple ports using the same MAC, so I
+> don't think we need an overly complicated solution.
 
->
->
-> >       u32 loongson_id;
-> >       struct device *dev;
-> >   };
-> > @@ -119,18 +120,29 @@ static void loongson_default_data(struct pci_dev =
-*pdev,
-> >       plat->dma_cfg->pbl =3D 32;
-> >       plat->dma_cfg->pblx8 =3D true;
-> >
-> > -     if (ld->loongson_id =3D=3D DWMAC_CORE_LS_MULTICHAN) {
-> > -             plat->rx_queues_to_use =3D CHANNEL_NUM;
-> > -             plat->tx_queues_to_use =3D CHANNEL_NUM;
-> > +     switch (ld->loongson_id) {
-> > +     case DWMAC_CORE_MULTICHAN_V1:
->
-> How about adding some comments? For example:
->
-> case DWMAC_CORE_MULTICHAN_V1:   /* 2K2000 */
-> case DWMAC_CORE_MULTICHAN_V2:   /* 2K3000 and 3B6000M */
-Do you know why we deprecate PRID (a.k.a SOC name) detection and
-prefer CPUCFG detection in cpu_probe()? Because SOC-types and function
-features are orthogonal, they should not be strictly bound. There will
-be other SOCs using MULTICHAN_V1 or MULTICHAN_V2, should we update the
-comments every time when a new SOC publishes? There may also be one
-SOC with different IP-cores, then how to comment on this case?
+I'm not familiar with infiniband devices. Can we use eth_random_addr()
+to set random addr for infiniband devices? And what about other device
+type? Just return error directly?
 
-> ...
->
-> > +             ld->multichan =3D 1;
-> > +             plat->rx_queues_to_use =3D 8;
-> > +             plat->tx_queues_to_use =3D 8;
-> >
-> >               /* Only channel 0 supports checksum,
-> >                * so turn off checksum to enable multiple channels.
-> >                */
-> > -             for (int i =3D 1; i < CHANNEL_NUM; i++)
-> > +             for (int i =3D 1; i < 8; i++)
-> >                       plat->tx_queues_cfg[i].coe_unsupported =3D 1;
-> > -     } else {
-> > +
-> > +             break;
-> > +     case DWMAC_CORE_MULTICHAN_V2:
-> > +             ld->multichan =3D 1;
-> > +             plat->rx_queues_to_use =3D 4;
-> > +             plat->tx_queues_to_use =3D 4;
-> > +             break;
-> > +     default:
-> > +             ld->multichan =3D 0;
-> >               plat->tx_queues_to_use =3D 1;
-> >               plat->rx_queues_to_use =3D 1;
-> > +             break;
-> >       }
-> >   }
-> >
-> > @@ -328,14 +340,14 @@ static struct mac_device_info *loongson_dwmac_set=
-up(void *apriv)
-> >               return NULL;
-> >
-> >       /* The Loongson GMAC and GNET devices are based on the DW GMAC
-> > -      * v3.50a and v3.73a IP-cores. But the HW designers have changed =
-the
-> > -      * GMAC_VERSION.SNPSVER field to the custom 0x10 value on the
-> > -      * network controllers with the multi-channels feature
-> > +      * v3.50a and v3.73a IP-cores. But the HW designers have changed
-> > +      * the GMAC_VERSION.SNPSVER field to the custom 0x10/0x12 value
-> > +      * on the network controllers with the multi-channels feature
-> >        * available to emphasize the differences: multiple DMA-channels,
-> >        * AV feature and GMAC_INT_STATUS CSR flags layout. Get back the
-> >        * original value so the correct HW-interface would be selected.
-> >        */
-> > -     if (ld->loongson_id =3D=3D DWMAC_CORE_LS_MULTICHAN) {
-> > +     if (ld->multichan) {
-> >               priv->synopsys_id =3D DWMAC_CORE_3_70;
-> >               *dma =3D dwmac1000_dma_ops;
-> >               dma->init_chan =3D loongson_dwmac_dma_init_channel;
-> > @@ -356,13 +368,13 @@ static struct mac_device_info *loongson_dwmac_set=
-up(void *apriv)
-> >       if (mac->multicast_filter_bins)
-> >               mac->mcast_bits_log2 =3D ilog2(mac->multicast_filter_bins=
-);
-> >
-> > -     /* Loongson GMAC doesn't support the flow control. LS2K2000
-> > -      * GNET doesn't support the half-duplex link mode.
-> > +     /* Loongson GMAC doesn't support the flow control. Loongson GNET
-> > +      * without multi-channel doesn't support the half-duplex link mod=
-e.
-> >        */
-> >       if (pdev->device =3D=3D PCI_DEVICE_ID_LOONGSON_GMAC) {
-> >               mac->link.caps =3D MAC_10 | MAC_100 | MAC_1000;
-> >       } else {
-> > -             if (ld->loongson_id =3D=3D DWMAC_CORE_LS_MULTICHAN)
-> > +             if (ld->multichan)
-> >                       mac->link.caps =3D MAC_ASYM_PAUSE | MAC_SYM_PAUSE=
- |
-> >                                        MAC_10 | MAC_100 | MAC_1000;
-> >               else
-> > @@ -391,9 +403,11 @@ static int loongson_dwmac_msi_config(struct pci_de=
-v *pdev,
-> >                                    struct plat_stmmacenet_data *plat,
-> >                                    struct stmmac_resources *res)
-> >   {
-> > -     int i, ret, vecs;
-> > +     int i, ch_num, ret, vecs;
-> >
-> > -     vecs =3D roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
-> > +     ch_num =3D min(plat->tx_queues_to_use, plat->rx_queues_to_use);
->
-> I'm curious. Will there still be hardware with RX not equal to TX in the
-> future?
-Currently rx queue number is equal to tx queue number, but
-min(plat->tx_queues_to_use, plat->rx_queues_to_use) is still the best
-solution. If not, which one should be used here? tx_queues_to_use or
-rx_queues_to_use?
-
-Huacai
-
->
->
-> Thanks,
->
-> Yanteng
->
->
+Thanks
+Hangbin
 
