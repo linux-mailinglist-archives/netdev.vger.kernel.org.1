@@ -1,179 +1,300 @@
-Return-Path: <netdev+bounces-184444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F6EA95877
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 23:53:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76239A958E0
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E082D16F350
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:53:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F3763B318C
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 22:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2632165E9;
-	Mon, 21 Apr 2025 21:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7418322128E;
+	Mon, 21 Apr 2025 22:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="NgDsamrU"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="nQJC0Fc4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC52F1D95A3;
-	Mon, 21 Apr 2025 21:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745272389; cv=none; b=NqduDE01Y9FIjpGVF9yAUXeepLqsECtZHt2CldRSePUPxK8tuB0wm66F2m20/8Yiz0sHxMZ5duxiIiaT0wJpKhzU4EKdm1w3Oa0Ci78x7tIVnVvdCNLAqBlG4v04CsVmCiQsNvj1hoJ0I/iU7EupooqtEjpQaYKpXasMBc77zvA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745272389; c=relaxed/simple;
-	bh=6TVrMtlu19zY/wxbixXpv8KgBzM6j+9175a7iqm9jAo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Zh8VZXt8OJsJguxz0fx1HD4RLNuWFGiWaVlZjaB5AzWFiLBpfxCuygiijmMyHf0DTx7idqPu4b1LXlcnp0bjSO2vkMIucYROjyhczFT4QnvVhcDiV3wQFfxAIpiYiUIpM07t6wnlxpZHhi+3p3wAcw/qq+sA/kE1W5lWm0PKZ1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=NgDsamrU; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1u6z4W-000PJZ-O0; Mon, 21 Apr 2025 23:53:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=M+FkH4VAKYH9xhhtQ8r3p9M8RjS2pfNv3Ius6h/Rf3c=; b=NgDsamrU276JwI7Hq5C68Fr0FW
-	pCbhcU7mGT1oVl3aaz3RpEyO8/2zirwH5K64s5NKmlUMIAWQAOds4L9bm8giYZXVwwZjax+J2oJat
-	cZruhUzWN6B4hJ+IIz1WbDD+2uFYmnBUR0hedTxHWGnKEe3Zy+H71/0w20aIYPoK7IR6sxwfIRaWI
-	lyekHxWisYpBw6BIKD4X5JKA6MtUhdggFXOUKwlBr6P+irKGWe+oThcSWFwHgljx+lguvUQU75k3G
-	MyvgkcPz4/Ymo6VcGUdb3Wd5As8JQWDulkXXy2V+LtHPT89k9GzYZaODvhZm7yH9YkP0Sc82p/xDV
-	M4qlVb6g==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1u6z4V-0008Lh-5M; Mon, 21 Apr 2025 23:52:59 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1u6z4Q-004YWS-AU; Mon, 21 Apr 2025 23:52:54 +0200
-Message-ID: <d16f61d2-df65-41b9-a042-f54466b7e764@rbox.co>
-Date: Mon, 21 Apr 2025 23:52:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99BE221289;
+	Mon, 21 Apr 2025 22:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745272976; cv=pass; b=anA/GpSs78hGhjPFem/Uzfxvl8QjaujyXTMJa7YHTR+VeyXaMfyH7j2bybGkA8bmCwFVlJIf+ItjYJDtZZjZe1M9zA1GH7fDXtb5BvwyUlThBuOtHoGq975fv1HkDpLXuG+21xUaZd8bBrR9SEHm+a0EMF6/DI7M2KiATobNa1I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745272976; c=relaxed/simple;
+	bh=TDuUmjERxzpZupEEIWrAYX9CP7zrQEa4WT8BuKPzMms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OwPgnCZIfidZynQ08gSE4VK1Dfk007eTLoVBWXchj7lm3Pjfane4w8YxLweyRZiDhlugDBYIPEa+9py0mdl47Mg4aN8EQjv9cmTcyLqVYUBhVlwh9CILbdDEHbbWqKyAwcWVaHMJRgDjQxARUUmqycFrvIdVUOSeWMx+w4ZLMXE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=nQJC0Fc4; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from monolith.lan (unknown [185.77.218.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZhK9X3wD6z49Pwm;
+	Tue, 22 Apr 2025 01:02:40 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745272961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
+	b=nQJC0Fc4n44QBI3x22Un5+usQfsSt3V8qe/IVEyXCcLl21XU3FKkUVdNFhPRZZSZxzuUW3
+	aAb0LckRxsmqQJl6N++dXcOUP7CWxgrP87qSafzokOGUJB5LqtNKvPrM0aazV1b9iHXyq8
+	4iscCaDdmJOQMSvhG8Fw06v9tNsQtTWYe4Ca0+gRVU0uZ7Eg70hbjqCtoUZ6FA53+BABgh
+	2Yop2Bn/oliTIkrXGqAYtSA4s85mdaCbmEbz3vN7U1qswveWADPOncAC1a6rqPWun1ytPw
+	C+S9jqXeY6ugey0OX89XZDbR4iiek8i0FI7cc2CLWCKnhcR4L903sb79aHwrdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745272961;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nn7shMwnID3Cbv85If5AHt3xSsWKkrff5w2tj8O7Hco=;
+	b=jP26Hq+gxt8Pbt2P8liSeG2s4pQv1Ho57MsIay49YUqOwGAlc704nMRaZI72gT9vFKjEGr
+	0bIXJzIt8N7tuNGybwPox0QRm7TcWlsuEt0DD2eqWseWRmhW54l+j+E678jGvWHWW7jYI3
+	UovI91fpEFM/iApHFYFM2aARHHeI1j4lzrnWBdrvSm+7/h+/3Mv/4PRKVX+mjINk1pW0CN
+	VsIeqxjVSM2zW4FLYBNBTCRoWX95GICIc3GqlH1m8ncVOriaBa/EaL974ZLFAU9/5GdvGY
+	9zAyVnFhdCSuMDbvUioPMhEaBQDVKpnCZtX6zaNeb8D2+vClmpgvxrGIZlAiBg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745272961; a=rsa-sha256;
+	cv=none;
+	b=dcNYe4cpxZqtI3/gVTzxGO60DVfV0tBgbI0OA149gITIOu4GanLtaikeytgfDOkzMq/zI1
+	ZYnwFRjlrpV4yCXlTUmw5OiTeqghGUK3Xgq04hZy5qd5AryOfEjZUaNruVFoZnuHwSpIZ0
+	NX0B4uFE4SZb8rtF/q+kfKDJ9YG10S7kdW7ph2/hCFWOo/tsLhdP2/7x82aca++cQvgvwv
+	gHdTVYjGYhASAw+0/ebVF3H40dMKf60sd9WeblRLjdSTj6UI+mQYuS5eidyhrv2WYgm+Pf
+	vIjwPkYNKdQ7Npp591cJgigOgPP/ohflpPLnCB33TL7ZlXCvWbOVuNy8b0mcsA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	luiz.dentz@gmail.com,
+	netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kernelxing@tencent.com
+Subject: [PATCH] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+Date: Tue, 22 Apr 2025 01:02:08 +0300
+Message-ID: <0ff3e783e36ac2a18f04cf3bc6c0d639873dd39d.1745272179.git.pav@iki.fi>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
- <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
- <p5toijsqhehc4kp7gztto3nmrqa33f62duozoxn7u5hh6d2xpe@lfzy6kdszegf>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <p5toijsqhehc4kp7gztto3nmrqa33f62duozoxn7u5hh6d2xpe@lfzy6kdszegf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/11/25 15:43, Stefano Garzarella wrote:
-> On Mon, Apr 07, 2025 at 08:41:43PM +0200, Michal Luczaj wrote:
->> Change the behaviour of a lingering close(): instead of waiting for all
->> data to be consumed, block until data is considered sent, i.e. until worker
->> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
->>
->> Do linger on shutdown() just as well.
-> 
-> I think this should go in a separate patch.
+Bluetooth needs some way for user to get supported so_timestamping flags
+for the different socket types.
 
-As discussed, dropping linger on shutdown() for now.
+Use SIOCETHTOOL API for this purpose. As hci_dev is not associated with
+struct net_device, the existing implementation can't be reused, so we
+add a small one here.
 
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..383c6644d047589035c0439c47d1440273e67ea9 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -1013,6 +1013,29 @@ static int vsock_getname(struct socket *sock,
->> 	return err;
->> }
->>
->> +void vsock_linger(struct sock *sk, long timeout)
->> +{
->> +	if (timeout) {
-> 
-> I would prefer to avoid a whole nested block and return immediately
-> in such a case. (It's pre-existing, but since we are moving this code
-> I'd fix it).
-> 
-> 	if (!timeout)
-> 		return;
+Add support (only) for ETHTOOL_GET_TS_INFO command. The API differs
+slightly from netdev in that the result depends also on socket proto,
+not just hardware.
 
-In v2 no code is moved (since no shutdown() lingering), so I'll reduce the
-indentation in a separate patch. Let me know if it's not worth the churn
-anymore.
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
->> +		DEFINE_WAIT_FUNC(wait, woken_wake_function);
->> +		ssize_t (*unsent)(struct vsock_sock *vsk);
->> +		struct vsock_sock *vsk = vsock_sk(sk);
->> +
-> 
-> transport->unsent_bytes can be NULL, this will panic with hyperv or
-> vmci transport, especially because we now call this function in
-> vsock_shutdown().
-> 
-> I'd skip that call if transports don't implement it, but please add
-> a comment on top of this function about that.
+Notes:
+    Another option could be a new socket option, not sure what would be best
+    here. Using SIOCETHTOOL may not be that great since the 'ethtool' program
+    can't query these as the net_device doesn't actually exist.
 
-I'm not sure I understand. I am calling it only conditionally, see below.
-Nevertheless, I'll add a comment.
+ include/net/bluetooth/bluetooth.h |  4 ++
+ net/bluetooth/af_bluetooth.c      | 87 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c          | 40 ++++++++++++++
+ 3 files changed, 131 insertions(+)
 
->> +		unsent = vsk->transport->unsent_bytes;
->> +		if (!unsent)
->> +			return;
->> +
->> +		add_wait_queue(sk_sleep(sk), &wait);
->> +
->> +		do {
->> +			if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
->> +				break;
->> +		} while (!signal_pending(current) && timeout);
->> +
->> +		remove_wait_queue(sk_sleep(sk), &wait);
->> +	}
->> +}
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index bbefde319f95..114299bd8b98 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -29,6 +29,7 @@
+ #include <linux/poll.h>
+ #include <net/sock.h>
+ #include <linux/seq_file.h>
++#include <linux/ethtool.h>
+ 
+ #define BT_SUBSYS_VERSION	2
+ #define BT_SUBSYS_REVISION	22
+@@ -448,6 +449,9 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 			  hci_req_complete_t *req_complete,
+ 			  hci_req_complete_skb_t *req_complete_skb);
+ 
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *ts_info);
++
+ #define HCI_REQ_START	BIT(0)
+ #define HCI_REQ_SKB	BIT(1)
+ 
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 0b4d0a8bd361..6ad2f72f53f4 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -34,6 +34,9 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <linux/proc_fs.h>
+ 
++#include <linux/ethtool.h>
++#include <linux/sockios.h>
++
+ #include "leds.h"
+ #include "selftest.h"
+ 
+@@ -563,6 +566,86 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+ }
+ EXPORT_SYMBOL(bt_sock_poll);
+ 
++static int bt_ethtool_get_ts_info(struct sock *sk, unsigned int index,
++				  void __user *useraddr)
++{
++	struct ethtool_ts_info info;
++	struct kernel_ethtool_ts_info ts_info = {};
++	int ret;
++
++	ret = hci_ethtool_ts_info(index, sk->sk_protocol, &ts_info);
++	if (ret == -ENODEV)
++		return ret;
++	else if (ret < 0)
++		return -EIO;
++
++	memset(&info, 0, sizeof(info));
++
++	info.cmd = ETHTOOL_GET_TS_INFO;
++	info.so_timestamping = ts_info.so_timestamping;
++	info.phc_index = ts_info.phc_index;
++	info.tx_types = ts_info.tx_types;
++	info.rx_filters = ts_info.rx_filters;
++
++	if (copy_to_user(useraddr, &info, sizeof(info)))
++		return -EFAULT;
++
++	return 0;
++}
++
++static int bt_ethtool(struct sock *sk, const struct ifreq *ifr,
++		      void __user *useraddr)
++{
++	unsigned int index;
++	u32 ethcmd;
++	int n;
++
++	if (copy_from_user(&ethcmd, useraddr, sizeof(ethcmd)))
++		return -EFAULT;
++
++	if (sscanf(ifr->ifr_name, "hci%u%n", &index, &n) != 1 ||
++	    n != strlen(ifr->ifr_name))
++		return -ENODEV;
++
++	switch (ethcmd) {
++	case ETHTOOL_GET_TS_INFO:
++		return bt_ethtool_get_ts_info(sk, index, useraddr);
++	}
++
++	return -EOPNOTSUPP;
++}
++
++static int bt_dev_ioctl(struct socket *sock, unsigned int cmd, void __user *arg)
++{
++	struct sock *sk = sock->sk;
++	struct ifreq ifr = {};
++	void __user *data;
++	char *colon;
++	int ret = -ENOIOCTLCMD;
++
++	if (get_user_ifreq(&ifr, &data, arg))
++		return -EFAULT;
++
++	ifr.ifr_name[IFNAMSIZ - 1] = 0;
++	colon = strchr(ifr.ifr_name, ':');
++	if (colon)
++		*colon = 0;
++
++	switch (cmd) {
++	case SIOCETHTOOL:
++		ret = bt_ethtool(sk, &ifr, data);
++		break;
++	}
++
++	if (colon)
++		*colon = ':';
++
++	if (put_user_ifreq(&ifr, arg))
++		return -EFAULT;
++
++	return ret;
++}
++
+ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -595,6 +678,10 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		err = put_user(amount, (int __user *)arg);
+ 		break;
+ 
++	case SIOCETHTOOL:
++		err = bt_dev_ioctl(sock, cmd, (void __user *)arg);
++		break;
++
+ 	default:
+ 		err = -ENOIOCTLCMD;
+ 		break;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 95972fd4c784..55f703076e25 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -3186,3 +3186,43 @@ void hci_conn_tx_dequeue(struct hci_conn *conn)
+ 
+ 	kfree_skb(skb);
+ }
++
++int hci_ethtool_ts_info(unsigned int index, int sk_proto,
++			struct kernel_ethtool_ts_info *info)
++{
++	struct hci_dev *hdev;
++
++	hdev = hci_dev_get(index);
++	if (!hdev)
++		return -ENODEV;
++
++	info->so_timestamping =
++		SOF_TIMESTAMPING_TX_SOFTWARE |
++		SOF_TIMESTAMPING_SOFTWARE |
++		SOF_TIMESTAMPING_OPT_ID |
++		SOF_TIMESTAMPING_OPT_CMSG |
++		SOF_TIMESTAMPING_OPT_TSONLY;
++	info->phc_index = -1;
++	info->tx_types = BIT(HWTSTAMP_TX_OFF);
++	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE);
++
++	switch (sk_proto) {
++	case BTPROTO_ISO:
++		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	case BTPROTO_L2CAP:
++		info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	case BTPROTO_SCO:
++		info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE;
++		if (hci_dev_test_flag(hdev, HCI_SCO_FLOWCTL))
++			info->so_timestamping |= SOF_TIMESTAMPING_TX_COMPLETION;
++		break;
++	default:
++		info->so_timestamping = 0;
++	}
++
++	hci_dev_put(hdev);
++	return 0;
++}
+-- 
+2.49.0
 
-...
-
->> -	if (sock_flag(sk, SOCK_DONE)) {
->> +	if (sock_flag(sk, SOCK_DONE))
->> 		return true;
->> -	}
-> 
-> Please avoid this unrelated changes, if you really want to fix them,
-> add another patch in the series where to fix them.
-> 
->>
->> 	sock_hold(sk);
->> -	INIT_DELAYED_WORK(&vsk->close_work,
->> -			  virtio_transport_close_timeout);
->> +	INIT_DELAYED_WORK(&vsk->close_work, virtio_transport_close_timeout);
-> 
-> Ditto.
-> 
-> These 2 could go together in a single `cleanup` patch, although I
-> usually avoid it so that `git blame` makes sense. But if we want to
-> make checkpatch happy, that's fine.
-
-All right, dropping these. I've thought, since I was touching this function
-and this wasn't a bug fix (and wouldn't be backported), it'd be okay to do
-some trivial cleanups along the way.
-
-Here's v2:
-https://lore.kernel.org/netdev/20250421-vsock-linger-v2-0-fe9febd64668@rbox.co/
-
-Thanks,
-Michal
 
