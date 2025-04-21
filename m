@@ -1,217 +1,204 @@
-Return-Path: <netdev+bounces-184430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42818A95679
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8156A9567D
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA3116CA3B
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 19:06:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1FB716D6B5
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 19:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745BE1EB5E9;
-	Mon, 21 Apr 2025 19:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8869D1E990E;
+	Mon, 21 Apr 2025 19:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="hFdxBwJn"
+	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="kER7spcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU011.outbound.protection.outlook.com (mail-japanwestazon11010061.outbound.protection.outlook.com [52.101.228.61])
+Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334A31EB1B6;
-	Mon, 21 Apr 2025 19:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.228.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745262362; cv=fail; b=ndyenErP+YkvmW7CSH7Lo7fyEVoh+vPeC8wa/hA7rqdj9OtmQKUmu/1rc2kDHRgMVofWBjxYPz9yuOpaKTEjk0rPM6A4MwjEo6d5pgFPbnqnvtTVNWPgxKg/KDe8dvACx+Q665NdqoDyRAvBDWLKWKvIZ8C5BXBVxwUCwqCVbzE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745262362; c=relaxed/simple;
-	bh=k3get5d4k93nVztRu+VNr7wxZ0fKuaIfLkhofZNNXNM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=A3UmxI7jjvx02tPfOzJD2dler6/VwN2Jt4bf2LaNhRqSJo5qKFoxbGYWxrD2DRstTCoiZaRHTB2zZHzClfdQqawcp05J7vOJI8jncA05ylkeshLrIq0NL0pyneK5j9A15IXcpW3wTAvYDX7bvH3n72c65cdRnnO1fVloY8FikkQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=hFdxBwJn; arc=fail smtp.client-ip=52.101.228.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CmN+sFIL8Kiqzsk+jEw8I0A8z57pSz+1Fy4fa+wieoLfj1nNlUdGuzCXQBDNt3N7J10pXwNt2LQAco1r0HQ90i1WOP4vnkfDVsW5x3LG6uIZBacTY5D/Dy0MM2IrjlpNjeOpUKh+NC3eTRXD2i3HkPtFP+aeQF38w79DNqSH9Wuqyb4Yrx7EbFG/EkUJD+htuDg+ye3wvpfPBbXJStu8Nz0jOCwNj6q2ssEhfTJS3GHNRJVmFgR9H4lRzi1koFaWW4vVwFnzqYYoMDiYYvlYGX0o79BvRQ4FPBa7DPkNOOko7qGHtNz/rMHReBei76X9aiib4vp0ABpgLzkB2rcH2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k3get5d4k93nVztRu+VNr7wxZ0fKuaIfLkhofZNNXNM=;
- b=cbTNyxyhAU5Uh5QKkm3FTwWOH/vgSND/EU1Dio52sttndlOG95enK52Ox/NFGhsfpmH5p5GGlnl9XEg3VRBZdOAl7PL1B0QXM2WVWcxCB9Os6CCANnl9mXQdTKBu60mymm3BQuvZt3/j073rsReUH+gEoIEpBpgPsjJP2P4BtSyLqzfoh8ey1r0OS2PHcB+saZ/r0X3qwDaRnfUH8lK68pkhorf+zjoAKwLgzqRcy0usnD5XChb+0Pd/KwqBsEv5DRqFu/BahZ15V5xpXbSzdLK+H1GfM3kAiBI+E2WANpn50qnd5rlC3msVZrDQYoXMtKyhWxh0qwmb2vo9GraNTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k3get5d4k93nVztRu+VNr7wxZ0fKuaIfLkhofZNNXNM=;
- b=hFdxBwJn/n51OM85r+hQwSMwyr3/KNmonK8Tzjap7DDxM5QGuQL1h36XeZH7LqpHHj7RNdo4tAqwnHbCjxDlKyDMPasoawc+0PKt4K+Eg6nw9ASnz/qThIK6FvLQZeC3v81chCsyHomn39Vg4xQAL2HS3vpIGDY6Tv8opyUHa78=
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
- by OS3PR01MB7093.jpnprd01.prod.outlook.com (2603:1096:604:127::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.33; Mon, 21 Apr
- 2025 19:05:52 +0000
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1%4]) with mapi id 15.20.8655.031; Mon, 21 Apr 2025
- 19:05:52 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Russell King <linux@armlinux.org.uk>
-CC: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel
-	<p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>, Giuseppe Cavallaro
-	<peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, Fabrizio Castro
-	<fabrizio.castro.jz@renesas.com>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: RE: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Thread-Topic: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Thread-Index:
- AQHbp7UXRdTsn2oCYUWD5qYhUQGHu7OjbUQAgAAVgQCAATLSgIAJgP8QgABZJYCAAAD3cA==
-Date: Mon, 21 Apr 2025 19:05:51 +0000
-Message-ID:
- <TY3PR01MB113461CDEA58CB260ADB9FB9286B82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z_0-iH91A4Sexlzj@shell.armlinux.org.uk>
- <CA+V-a8sS0TtS-TEdkQ8MB5F4JtzV9358Y9fmKe5MggGU+wP=4Q@mail.gmail.com>
- <CA+V-a8tbW2Zs6op20yRTcihSm1bcMC2dYnRXVCKRf=q4fymZyg@mail.gmail.com>
- <TY3PR01MB1134633A8CB82788BB98C6E6286B82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <aAaVrVFql3vSktrT@shell.armlinux.org.uk>
-In-Reply-To: <aAaVrVFql3vSktrT@shell.armlinux.org.uk>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|OS3PR01MB7093:EE_
-x-ms-office365-filtering-correlation-id: 3afe39a4-70e3-45ff-1e7b-08dd810788ff
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?VQ5oc5sofqd6/0pShrg9yugBqYlwt59ABbSKOvkt5Gi98kxOKp6MpftpIXV2?=
- =?us-ascii?Q?AKigIKDOgrFC3DwEStoiew+ziEdh4KWQcm7JbNIbEYQQfnwdgfp4dUvIloQl?=
- =?us-ascii?Q?kodErtTuJvvy0gD8T1LopSSOuZGfyD9o0OkCEKDM04wGIiVRlPA89Ni+zsjN?=
- =?us-ascii?Q?gMGdKti2KYfev3E/3TZVjyoLl+u1bd/DG9VVCVm1PnwvITgCb9IirbfXWLcn?=
- =?us-ascii?Q?JgB+7+S56egEPXtQAt4p2emE2sUZ3wGyHGYLo4ryv41bD3FVimp2wG8jCP+y?=
- =?us-ascii?Q?fH82zlxQjajiXC34CkfxK5Y2z4zW7A0sOORONlqOUf0MKPggWtOaXFZNzlDI?=
- =?us-ascii?Q?PIKzpVen77bWdH09kyEpPdtuLLnk2mcbUDMFbjbp3SudAD59Rd0bsgJGij5p?=
- =?us-ascii?Q?cGtijqS667sHubar9xjdMICuU5Wam7+tSM7WPfLjomfCmAnmlkWkm+E8WEm+?=
- =?us-ascii?Q?A23PgmnbMiRHGcmupnsuXRBTIbSdeRCw4Dbw3uoXBfRn4BQ9s/WbVzYF/Y5P?=
- =?us-ascii?Q?hEMZZQa+gWIEAuY3QKHpBDzJI2JMkFRq6SsnQObcwo4RyNVnDYJBbcUZ5SqS?=
- =?us-ascii?Q?eSxrjsLU3xitPf3mzPKz3SLRm5qb8J2VBFWOzClw5zlQHX7O7wsXQtB3pALL?=
- =?us-ascii?Q?+CBHkMFzexHrmBmsMh1V8ca6h31WJ6Oz5omNLTE2grse0f2fIHBzS461SWnq?=
- =?us-ascii?Q?l6iMSg472SvKljrB46RhnRz6bYcsn7krD1Kf3+8V37WHGC+T9fS2xBk72cJT?=
- =?us-ascii?Q?pwdrZm1mY+kIp1yZfUWoB4Sgwn9sM3oLH+8/pErFWCYGI7X5dDLhDqIFDKve?=
- =?us-ascii?Q?/Nabfw3CY8gYxC6hDXHwNtzdL8CgZEhQPonpGJR6Uwzule+TEz1Lq3Cj6eXy?=
- =?us-ascii?Q?4UFA79WeCF0xH7plmR3qNXgrOv2GDoRTsV6AhVZKme3gKWfnQHRZcq3Yf+ze?=
- =?us-ascii?Q?EmSzBE86J6ChvxtMg+1bplK+OEnN6rPRhwryhCu7dp92KSlV28CPvti4iPvF?=
- =?us-ascii?Q?SNrSgNWBJgevgU8I6IoPtBO9ltTJn7g85nD+CaYBx5wuvV3FE39fD+IAEL1R?=
- =?us-ascii?Q?zl/Zcv3gf5ysdJCzXyWwW3BEs10JHyR/d5F2Ap/0BIGiXteUkqplp9yd3koK?=
- =?us-ascii?Q?V+VT/YUOeL/glEBNSORIKXzItLbh4qov50jx4CxEL/1osifJf1Ty9XKtUWSf?=
- =?us-ascii?Q?RaEhf5ARy/muXYkf/oFrp7+7jlpw+Osaq5CpWO6GtBT/hwC4goFPC7CrMGLn?=
- =?us-ascii?Q?h+uiqW9L1mI7+/HtljcvX1cwOQ6Tx9OO/4Y9Rjs2WmzppWv4TUhpVldb5xbY?=
- =?us-ascii?Q?KUsaa3rA+Tv039lEu37gQWsIDsxNrU6fVQWQunVbb3PxW53s14JvzQihmijO?=
- =?us-ascii?Q?RudJ4KGYj1sEV7VxGxRhS5cAJm9S2zZg4mMkM//502qGCK4v92XwqCkUN7kQ?=
- =?us-ascii?Q?+/j6/O8/ObfL4rbEizoZnipEKdL8Af1nmOE8KUngtv425AjpumlE0iIooMdR?=
- =?us-ascii?Q?TVHBk2lZ6zvj5A4=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Vw5izmDCStzirC+aV4YQg48H8GHixwH/jtXMxxCDj1bDi4QvIni940TTlJLx?=
- =?us-ascii?Q?piJ+7LbtpF78aDZR2rJL5LOcavEiMbRzEShXZmK2DOCNFMeajsVaJcNliSsM?=
- =?us-ascii?Q?yrY20Ovqd5LIjrtnAyJUdeGt1BcGnZLKv1IJvTV31jXB25muQnoiedGrFXyb?=
- =?us-ascii?Q?OpesC2I7GgM+1zBd4XZa1FAyh3wiS3JLB02/oZ6vJe7xZXUsx05gtCqAlCCs?=
- =?us-ascii?Q?XEMtwQkBCxgO95VNVfIIccN85jggKCfbYLku0VOiAFSfX3j7sTBYfZswmVVn?=
- =?us-ascii?Q?f3ToRiRNzPCc6kwmgB5EF7rgCYINkmuqV+sT7pqi4+E+0QT+iwGEBo6rGy3C?=
- =?us-ascii?Q?ki+f8241WqGIQAhur1VLfw6lmwkTz81ykilzxVrzDrJ52/3ZkdRw6A+ra4Vc?=
- =?us-ascii?Q?70pXeB+goNZaAqW7UwvY1Q/6wY+hSPa6wbMo5fmkAVUpMmZr/GnyWixMblH7?=
- =?us-ascii?Q?6old49MqSFqmS97a7bHrVwU2g0AOFBRFpoLmXOqPnQ6sclPW2jnFWdZAvy8q?=
- =?us-ascii?Q?lFQxnbDPivyk4vKDzSW6xJ0k81qLPfYVFmSfNfYwuzUDxiyngwSNTQKGWm0h?=
- =?us-ascii?Q?XjrtrRTvOCF0sjPBp+lMj1A1UjuOh6EFoaBIsdz7I5uTHBj7Yp1j5NhR3fL3?=
- =?us-ascii?Q?dU5WkJoRAC9zgvyzkgq2jwsd5c/JiBqdGdyB5V5/uxnZyhqrlf7RhnvfjDQc?=
- =?us-ascii?Q?18w18j1rVuHs7+6UoLpvEtTcnRdV0keob3dhDp9IEBhWKtAadfRdVzTWgDNQ?=
- =?us-ascii?Q?aMF4OEBzjihAXTxjPr93wdyOQ+GDeNZ1c9xJGWFfw9cJ7k2OAA4y0PsUgbYZ?=
- =?us-ascii?Q?Or/Dr7z6jPJgYGKXqJHGMjGU6uwhIQNeggVkV4ipACrvnqC/FC675fQ1FaqY?=
- =?us-ascii?Q?qi5V9sL3OvfIOjV8iEolB9WEzYq0atJzfGonQJ5gEvKjVd0lWnEjY49QI3zO?=
- =?us-ascii?Q?jOiiY+vP/2kqzl6FINtYhwquYM0w2HXVAqIJEd3B8wKBevXlgymtsZVsEogP?=
- =?us-ascii?Q?leeITbJAqqJbynzYBdvG3SsaonhNb3RWe5+H77YkFtJYaErOvnVYj8J92Qpa?=
- =?us-ascii?Q?jwkbKTNCAXzJ+ewwBx9zQ7exuifC3T2acAsyxzzJqGBDSCXLs+fNnQ2tURho?=
- =?us-ascii?Q?SDp9vqKn9bc9GsK5lqLlCPr4sn+fX0oHXytMMJc2MsMmYFrxoaSYa+zeb69I?=
- =?us-ascii?Q?Xfvi9JC2q25ftYGc7zxjn2otXjNZVNjLR6iRnOGBjFYpKA093oPbTWjyXB/R?=
- =?us-ascii?Q?nyhvGzXj7nYq6LSmND0W6v4Tt+BJqmIcuexYErUCA5hYUItFayBz4w+Lz+Y9?=
- =?us-ascii?Q?roV1Ep57dJ+x7w/dY6VVxOk/WYd9oODmzvKe0l6R/PA+Wg6h9BaZ5tCJxN5+?=
- =?us-ascii?Q?3sH5Slv2do27hgxjROUukhUznQjH6Bo4FDrmFlFpsIWKYw3eFgGzWptDkiIM?=
- =?us-ascii?Q?ihoJh6ogOS4ohjMRxw1Sjp3H/g9/xOPMJbGuGBC0R5atrsSnjLqWEb464Ri/?=
- =?us-ascii?Q?jMEEyzzc3/laaDlXY4Hhx05EoAxVaPsoXAyL7BBndot0NO5LrgJvOBpAxf8M?=
- =?us-ascii?Q?hrtjJd7LXF1nZXIIevSi0iuK37TeTLHpq0dvq3wqwbLYl+hvjshZleK8ntN8?=
- =?us-ascii?Q?2A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BB91E8320;
+	Mon, 21 Apr 2025 19:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745262382; cv=none; b=An/cm4Jruo0kE/UuQlKjhQC64BTR3GXOG1SaVoQCg/BcgYT3ltwzxXb48193qXNpJZsEFrRiISC+3B09I5M23LtU8DQOi0ZPfYFkmlgwksJLRaC7qXDX5VqhlM3O0V5Lvyzbg0eIFq4IIErkwcVXO3FGvGni3AC7hO4hyZht7Q8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745262382; c=relaxed/simple;
+	bh=vTKRaKFRv9kn3SC+rgDREeTrII8g8FovnKvl8R6ktrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vDFPbiD7ldwmekLHyGzQEL2ciglvquoExfbQjcqYGlEZST+yfoz590TJBui5YqwsTzz549CHW+188oF0PJhDKgKKKbjFX+j8Skr6hTi+lGPWuMfOpIbXt1lMY8x1SoIFO2Ws7kdh9uVlLObavW9EkOEqRP6OhuPePSBudcsaKMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=kER7spcG; arc=none smtp.client-ip=82.68.155.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
+Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
+	by wylie.me.uk (Postfix) with ESMTP id AEEC8120872;
+	Mon, 21 Apr 2025 20:06:01 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
+	s=mydkim006; t=1745262361;
+	bh=vTKRaKFRv9kn3SC+rgDREeTrII8g8FovnKvl8R6ktrI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=kER7spcG8m1/KVwt7QtEORa89/IQs8He89mAmuggsVNgfbYTiGrGrFUm5Kf+aXDD1
+	 yIDlyMWEcjSn1P2Z2/l0Qo3J2yfpWx2An9gyplWX1UBpt9dZYt9MXmquNYHYagdz2T
+	 9ECiMMLPXw970VTiITkgmltKHjlshoM39nKBw0vZxM62cHh4OT4FTxQo1krPZds+BY
+	 g0lCe2WOttRKl3+F10oLJdCRlmFNVr3p9/kNCjohIoum2WwGsyXZSeDiDNE+eb7xYV
+	 aAunimqsXz2zlGLobDK0ZMO3ZH69wfUVed6/CQu0LEA4Cm6K91aTr6r44of3kHxAzN
+	 N/tiLL0XO6Qlg==
+Date: Mon, 21 Apr 2025 20:06:01 +0100
+From: "Alan J. Wylie" <alan@wylie.me.uk>
+To: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Cong
+ Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Octavian Purdila
+ <tavip@google.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>, stable@vger.kernel.org
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+In-Reply-To: <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+	<6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
+	<20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3afe39a4-70e3-45ff-1e7b-08dd810788ff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Apr 2025 19:05:51.9452
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SY26PIBeZeWqfVCWJiLacWgCxDsfmjLT4pJK9rr37/TdQbz8THuT5l9Kywt18JMczuTrTR31ZNDs7ho9ssBKl4RMrBxVPAuRcAD0WJwafag=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB7093
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
+On Mon, 21 Apr 2025 13:10:00 +0100
+"Alan J. Wylie" <alan@wylie.me.uk> wrote:
 
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: 21 April 2025 20:00
-> Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer fo=
-r Renesas GBETH
+> On Mon, 21 Apr 2025 13:50:52 +0200
+> Holger Hoffst=C3=A4tte <holger@applied-asynchrony.com> wrote:
+
+> > If so, try either reverting the above or adding:
+> > "sch_htb: make htb_qlen_notify() idempotent" aka
+> > https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
+commit/?id=3D5ba8b837b522d7051ef81bacf3d95383ff8edce5
+> >=20
+> > which was successfully not added to 6.14.3, along with the rest of
+> > the series:
+> > https://lore.kernel.org/all/20250403211033.166059-2-xiyou.wangcong@gmai=
+l.com/ =20
 >=20
-> On Mon, Apr 21, 2025 at 01:45:50PM +0000, Biju Das wrote:
-> > Hi All,
-> > FYI, On RZ/G3E, for STR to work with mainline, we need to reinitialize =
-the PHY.
+> "successfully not added"?
 >=20
-> Which "mainline" are you using?
+> $ git cherry-pick  5ba8b837b522d7051ef81bacf3d95383ff8edce5
+> [linux-6.14.y 2285c724bf7d] sch_htb: make htb_qlen_notify() idempotent
+>  Author: Cong Wang <xiyou.wangcong@gmail.com>
+>  Date: Thu Apr 3 14:10:23 2025 -0700
+>  1 file changed, 2 insertions(+)
 >=20
-> Reading your emails, I suspect v6.14 rather than something post-dating v6=
-.15-rc1, since your latest
-> email suggests that the PHY driver's
-> ->resume method is not being called early in stmmac's resume. However,
-> commits 367f1854d442 and ef43e5132895 made this happen, which were merged=
- during the merge window, and
-> are thus in v6.15-rc1.
+> It will take a while (perhaps days?) before I can confirm success.
 
-I am using Linux version 6.15.0-rc2-next-20250417 + renesas_defconfig with =
-CONFIG_PROVE_LOCKING enabled.
+I'm afraid that didn't help. Same panic.
 
-Cheers,
-Biju
+
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 139bfa067 P4D 139bfa067 PUD 133bf1067 PMD 0=20
+Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G           O       6.14.3-00=
+001-g2285c724bf7d #21
+Tainted: [O]=3DOOT_MODULE
+Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./970A-DS=
+3P, BIOS FD 02/26/2016
+RIP: 0010:rb_next+0x0/0x50
+Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b 5d =
+41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f 48 89 f=
+8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b
+RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8881052e9000 RCX: ffff8881052e9180
+RDX: ffff8881e5e4f400 RSI: ffff888190075ee8 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffff8881052e92b0 R09: 00000000e49ea9dc
+R10: 000000000000278a R11: 001dcd6500000000 R12: ffff8881e5e4f400
+R13: ffff8881052e92b8 R14: 00000b92b6422fbf R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88842ec00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000139952000 CR4: 00000000000406f0
+Call Trace:
+ <IRQ>
+ htb_dequeue+0x42f/0x610 [sch_htb]
+ __qdisc_run+0x253/0x480
+ ? timerqueue_del+0x2c/0x40
+ qdisc_run+0x15/0x30
+ net_tx_action+0x182/0x1b0
+ handle_softirqs+0x102/0x240
+ __irq_exit_rcu+0x3e/0xb0
+ sysvec_apic_timer_interrupt+0x5b/0x70
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x16/0x20
+RIP: 0010:cpuidle_enter_state+0x126/0x220
+Code: 18 4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8 9a =
+2e 98 ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc 00 00 0=
+0 49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49
+RSP: 0018:ffffffff81e03e40 EFLAGS: 00000202
+RAX: ffff88842ec00000 RBX: ffff8881008e7400 RCX: 0000000000000000
+RDX: 00000b927d3d4a20 RSI: fffffffc3199eb61 RDI: 0000000000000000
+RBP: 0000000000000002 R08: 0000000000000002 R09: 00000b927aa897c0
+R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+R13: 0000000000000002 R14: 00000b927d3d4a20 R15: 0000000000000000
+ cpuidle_enter+0x2a/0x40
+ do_idle+0x12d/0x1a0
+ cpu_startup_entry+0x29/0x30
+ rest_init+0xbc/0xc0
+ start_kernel+0x630/0x630
+ x86_64_start_reservations+0x25/0x30
+ x86_64_start_kernel+0x73/0x80
+ common_startup_64+0x12c/0x138
+ </TASK>
+Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred netc=
+onsole xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper =
+nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE iptable_nat =
+nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT nf_reject_ipv6 ipt_REJECT=
+ nf_reject_ipv4 ip6table_raw iptable_raw ip6table_mangle iptable_mangle xt_=
+multiport xt_state xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_def=
+rag_ipv4 ip6table_filter ip6_tables iptable_filter ip_tables x_tables pppoe=
+ tun pppox binfmt_misc ppp_generic slhc af_packet bridge stp llc ctr ccm dm=
+_crypt radeon drm_client_lib ath9k video wmi drm_exec ath9k_common drm_suba=
+lloc_helper ath9k_hw drm_ttm_helper syscopyarea ttm ath sysfillrect sysimgb=
+lt fb_sys_fops mac80211 pl2303 drm_display_helper snd_hda_codec_realtek usb=
+serial drm_kms_helper snd_hda_codec_generic snd_hda_codec_hdmi snd_hda_scod=
+ec_component snd_hda_intel agpgart snd_intel_dspcfg snd_hda_codec cfbfillre=
+ct cfbimgblt cfg80211 snd_hda_core fb_io_fops
+ cfbcopyarea i2c_algo_bit fb e1000 snd_pcm font cdc_acm snd_timer aesni_int=
+el libarc4 snd at24 acpi_cpufreq k10temp crypto_simd soundcore fam15h_power=
+ cryptd regmap_i2c evdev nfsd sch_fq_codel auth_rpcgss lockd grace sunrpc d=
+rm configfs drm_panel_orientation_quirks fuse backlight loop nfnetlink usbh=
+id xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd sha512_ssse3 sha25=
+6_ssse3 sha1_ssse3 usbcore sha1_generic gf128mul usb_common dm_mirror dm_re=
+gion_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid =
+msr dmi_sysfs autofs4
+CR2: 0000000000000000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:rb_next+0x0/0x50
+Code: e8 d5 fa ff ff 5b 4c 89 e0 5d 41 5c 41 5d 41 5e e9 85 73 01 00 5b 5d =
+41 5c 41 5d 41 5e e9 38 76 01 00 0f 1f 84 00 00 00 00 00 <48> 3b 3f 48 89 f=
+8 74 38 48 8b 57 08 48 85 d2 74 11 48 89 d0 48 8b
+RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8881052e9000 RCX: ffff8881052e9180
+RDX: ffff8881e5e4f400 RSI: ffff888190075ee8 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffff8881052e92b0 R09: 00000000e49ea9dc
+R10: 000000000000278a R11: 001dcd6500000000 R12: ffff8881e5e4f400
+R13: ffff8881052e92b8 R14: 00000b92b6422fbf R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88842ec00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000000139952000 CR4: 00000000000406f0
+Kernel panic - not syncing: Fatal exception in interrupt
+Kernel Offset: disabled
+Rebooting in 3 seconds..
+
+
+--=20
+Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
+
+Dance like no-one's watching. / Encrypt like everyone is.
+Security is inversely proportional to convenience
 
