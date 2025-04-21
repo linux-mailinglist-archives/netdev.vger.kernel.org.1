@@ -1,206 +1,148 @@
-Return-Path: <netdev+bounces-184433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9FDA9569D
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:17:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BAEFA956B0
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 21:21:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676B11892B77
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 19:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68D7F1895E36
+	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 19:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA121EF087;
-	Mon, 21 Apr 2025 19:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5291EEA5E;
+	Mon, 21 Apr 2025 19:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyWDJ/AQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JYRwM/jE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B731EBFFF;
-	Mon, 21 Apr 2025 19:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D3627463;
+	Mon, 21 Apr 2025 19:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745263030; cv=none; b=T9Pb/+bRaqbx38a0HgaQf46zvNzX3nI7nHm8Da42NWMyCa5qRadZ/s5v123Hg+kHcQ38znX5BrPeHG5++1esykT3bCaTicUF+YjyW/uuxRGrFuSHtoCGzJ/Cl9aPgEnoPumsLHPdOd5lH94IckB+LcqSnjFsB/7r/7OMEdh6wdQ=
+	t=1745263258; cv=none; b=mIv1G/zXOXcq8LUx7TTEsMz0Z2qrN+mi+HF8mX2fXgkZ1VPrsMOobWSsEfxDU39Q9u6MXbUWiAV0A1L0mYpnzfoZJHxkK/n2GFkA4EzCJQvRoVXLCHIvZDwdUWRTXDUGRToX2f4W5XphAQLdzhlAvQz3fbEcp+UjdRx6es8IHWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745263030; c=relaxed/simple;
-	bh=vNVjzy6SY6NB8V0+5kVwIcx0deQrkMhPB96hHSvdq/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J8/HPBBqk49Tw/H73tHIqDmfV7mWDFeAN4AxsuS7hWWZgsP5PvOV3u3tzD9C4fpMlTT74I4N0a6ipj11m70HM781PPQfl6A0g6SjEfFSDhezLe8AbdAJdWGO+effK9H27SmSa5y4MpcrxDCGHDPYXHnWE+FkKSHhHqHReMudPiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LyWDJ/AQ; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-aee773df955so4277903a12.1;
-        Mon, 21 Apr 2025 12:17:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745263028; x=1745867828; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F874gon9E3P4hwlV/yFSCkcXv75v2itLgs6pZvbeUpA=;
-        b=LyWDJ/AQA8bnh+J+IZwX/LunlaUpPywOP5VoyhYzmA2TL3mmxW6X0yydPPm3VMD0p5
-         eyVimzavEFXh6yFEkp+0oKCOONglIFhvFW+nDXV7oOLjS4rWhDp7cCtisVZbAOmIcNyM
-         0YqH1+GpnWOlLK+No2GDFoffAflijkMaBwn2GxkDmTk2q3Svog1/mWs8BqDfZ1wngDFB
-         m449sHL4eQP+8su+zxJzDzer24afyIpZ/cWzsxAt3CnF1YrhHv9Wy6kWqhdNORfZCfDC
-         yQDOesKXsSKoKbK2G3VPKuxREc819vKptHWmIC3k8C/I+eybQFfZEXBJv9JqEbq3cUIT
-         6GZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745263028; x=1745867828;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F874gon9E3P4hwlV/yFSCkcXv75v2itLgs6pZvbeUpA=;
-        b=V+bK7wyX83QgG3p6+Co/YZsOB0Ctnal0qu2F2Ci44wwF2EFkN3gUtktBZVrp5xWQoO
-         3BlQHdXV1TA6O90cdPaURZedZs1nXUIrzr1PNt7n2HTVZdxOVjfVKPygUD/eNZkFcxjS
-         MWEHT2MiddNPL+jDscfVVWjPm1EQ+AP72EV+D6vdwLgfCUj18fgmkQRtFmoMuAXsXTZT
-         BPNJTAot8yIJ3LSPVtRnLlq7mjfDu5D9ZscKs62uMydsfOO4mqSybQbE2RTxaXroGoCh
-         uvqKCLWUG0A3nk0eim7jWmb3S6bCHfOsV3TkU7MYR/Ek8wJonsm7QVhYE+txNJTiYSoS
-         SIDw==
-X-Forwarded-Encrypted: i=1; AJvYcCU46gXrkxnuRbwld3DmjRSezuWHNvYJs3efw3KhE/RFGdanpVukBRNTIOzpjwiGRlJKoQZwHK2BlFb86xc=@vger.kernel.org, AJvYcCUugO8bZp9rBd9QXhOe/zRCuOzLF7Qv2vkKwaofnCEKdfFZoP20O0qRmYer7DXozKjwzERKxFn1@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4SrwzWBtcQ7Vab2BGuCWfd815X8iQ1OP3UoVJFAHXuL/a8Wiz
-	GF1+uH+9Zqy46kkNPKSUpPwh3djm2RzKP3auixsNZzfZcrBEWudz
-X-Gm-Gg: ASbGncsdkSYrhwyrydN5fhH+JihASDjisTMmypmhmXalLbQ1xZexfzaUmCgzbEDATks
-	3vZESCSwRBB91pfS4SJFBXfKdod8axEhMk9MKIBppJzuCKnDIxpwS2N8IEexiITzUlLWgQcjTlG
-	L/AaVLjmZWgeSa2FhwxoPF/4n76cbWimC3i59fvk+w56RXzFbXvmBPmPb4GFiu6LwgZumglHQf7
-	y7HazKWCydP0EBU1iiuAUq8Oaz+HHD4wjkGu9GwhzIpQcpjITSvLZ1TF6VieZe6uVGTqJbiTzNj
-	G0Xu3u1y4nU0xKy1xWTBZiJnTCz+BBjWb0gD7LKNAw==
-X-Google-Smtp-Source: AGHT+IH6t+tcpp4993pIVk43Qfm1vQX+JJNqthrLys0H4E9YIC8cmt+4g1IsPuNP9Vkk7i0VPJDevA==
-X-Received: by 2002:a17:90b:51c1:b0:2ff:71d2:ee8f with SMTP id 98e67ed59e1d1-3087c361083mr19056772a91.13.1745263027604;
-        Mon, 21 Apr 2025 12:17:07 -0700 (PDT)
-Received: from mythos-cloud.. ([125.138.201.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3087df24097sm6968738a91.21.2025.04.21.12.17.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Apr 2025 12:17:07 -0700 (PDT)
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1745263258; c=relaxed/simple;
+	bh=FIgFzNnBr++vmjtDk8pCe3cYTsEPiaXPjORFzQs4bws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rhdfod3r75r42uuog+mQjOWBu4DLgSogQsLLSKWDS8eSKTEbo2+61vaRi8PEJ4N2od7jOOJZat236vaqxz5bnNICwPtxhK86cYPC2WvIB884wLQLEzrsCti+VCO81mUi4hjKn5hDO8oFeoQ6g+X1W3lBSi4rLJg//LQftsZvmBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JYRwM/jE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RBxdBp38IXRTVJ8jY24aTNAum3SlxGZFX20fKSQ3ODk=; b=JYRwM/jEdQoWgGqz6IdOEGv5e0
+	D/tDikDnrG0Zhs6L62dkRU3gpNIyQa5Sqn7jXvKICVVMX2FiKeVl8hrgfKNt3ivSdKTUjvpBpaYUp
+	oJPbnMmr3MS/8wX/kBL9F7OafQgHlIjx/ey0huY5PAOPGA41R+mS+/zf0cnLfDxdTQhWqhnW6/7TS
+	O2ei9BBeMgvKyeBHj44IIspAKGjekqp4k4aqAVcA18ljtzZbX61rFTzz0QFRpLYeDSdVHnTuqQxLc
+	9WUa3/qvqz8TLAiH3FQyEK4Jr3cX1Xeox3El7JzIOjKSa5iWn3BcuuVajsAIBnbyH8inmnyXZS2bc
+	xUq6JpPA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50644)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u6wh1-0003I5-1f;
+	Mon, 21 Apr 2025 20:20:35 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u6wgw-0006hE-0M;
+	Mon, 21 Apr 2025 20:20:30 +0100
+Date: Mon, 21 Apr 2025 20:20:29 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Moon Yeounsu <yyyynoom@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: dlink: add synchronization for stats update
-Date: Tue, 22 Apr 2025 04:16:44 +0900
-Message-ID: <20250421191645.43526-2-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
+ update descriptions of RGMII modes
+Message-ID: <aAaafd8LZ3Ks-AoT@shell.armlinux.org.uk>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-There are two paths that call `get_stats()`:
-    1. From user space via the `ip` command
-    2. From interrupt context via `rio_interrupt()`
+On Tue, Apr 15, 2025 at 12:18:01PM +0200, Matthias Schiffer wrote:
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 45819b2358002..2ddc1ce2439a6 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -74,19 +74,21 @@ properties:
+>        - rev-rmii
+>        - moca
+>  
+> -      # RX and TX delays are added by the MAC when required
+> +      # RX and TX delays are part of the board design (through PCB traces). MAC
+> +      # and PHY must not add delays.
+>        - rgmii
+>  
+> -      # RGMII with internal RX and TX delays provided by the PHY,
+> -      # the MAC should not add the RX or TX delays in this case
+> +      # RGMII with internal RX and TX delays provided by the MAC or PHY. No
+> +      # delays are included in the board design; this is the most common case
+> +      # in modern designs.
+>        - rgmii-id
+>  
+> -      # RGMII with internal RX delay provided by the PHY, the MAC
+> -      # should not add an RX delay in this case
+> +      # RGMII with internal RX delay provided by the MAC or PHY. TX delay is
+> +      # part of the board design.
+>        - rgmii-rxid
+>  
+> -      # RGMII with internal TX delay provided by the PHY, the MAC
+> -      # should not add an TX delay in this case
+> +      # RGMII with internal TX delay provided by the MAC or PHY. RX delay is
+> +      # part of the board design.
+>        - rgmii-txid
+>        - rtbi
+>        - smii
 
-Case 1 is synchronized by `rtnl_lock()`, so it is safe.
-However, the two cases above are not synchronized with each other.
-Therefore, `spin_lock` is needed to protect `get_stats()` as it can be
-preempted by an interrupt. In this context, `spin_lock_irq()` is required
-(using `spin_lock_bh()` may result in a deadlock).
+Sorry, but I don't think this wording improves the situation - in fact,
+I think it makes the whole thing way more confusing.
 
-While `spin_lock` protects `get_stats()`, it does not protect updates to
-`dev->stats.tx_errors` and `dev->stats.collisions`, which may be
-concurrently modified by the interrupt handler and user space.
-By using temporary variables in `np->tx_errors` and `np->collisions`,
-we can safely update `dev->stats` without additional locking.
+Scenario 1: I'm a network device driver author. I read the above, Okay,
+I have a RGMII interface, but I need delays to be added. I'll detect
+when RGMII-ID is used, and cause the MAC driver to add the delays, but
+still pass PHY_INTERFACE_MODE_RGMII_ID to phylib.
 
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
----
-Question:
-	This might be a bit off-topic, but I don’t fully understand why a single global
-	`rtnl_lock` is used for synchronization. While I may not be fully aware of the 
-	design rationale, it seems somewhat suboptimal. I believe it could be improved.
----
- drivers/net/ethernet/dlink/dl2k.c | 11 +++++++++--
- drivers/net/ethernet/dlink/dl2k.h |  5 +++++
- 2 files changed, 14 insertions(+), 2 deletions(-)
+Scenario 2: I'm writing a DT file for a board. Hmm, so if I specify
+rgmii because the delays are implemented in the traces, but I need to
+fine-tune them. However, the documentation says that delays must not
+be added by the MAC or the PHY so how do I adjust them. I know, I'll
+use rgmii-id because that allows delays!
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index d0ea92607870..2d929a83e101 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -865,7 +865,7 @@ tx_error (struct net_device *dev, int tx_status)
- 	frame_id = (tx_status & 0xffff0000);
- 	printk (KERN_ERR "%s: Transmit error, TxStatus %4.4x, FrameId %d.\n",
- 		dev->name, tx_status, frame_id);
--	dev->stats.tx_errors++;
-+	np->tx_errors++;
- 	/* Ttransmit Underrun */
- 	if (tx_status & 0x10) {
- 		dev->stats.tx_fifo_errors++;
-@@ -904,7 +904,7 @@ tx_error (struct net_device *dev, int tx_status)
- 	}
- 	/* Maximum Collisions */
- 	if (tx_status & 0x08)
--		dev->stats.collisions++;
-+		np->collisions++;
- 	/* Restart the Tx */
- 	dw32(MACCtrl, dr16(MACCtrl) | TxEnable);
- }
-@@ -1074,6 +1074,7 @@ get_stats (struct net_device *dev)
- #endif
- 	unsigned int stat_reg;
- 
-+	spin_lock_irq(&np->stats_lock);
- 	/* All statistics registers need to be acknowledged,
- 	   else statistic overflow could cause problems */
- 
-@@ -1085,6 +1086,7 @@ get_stats (struct net_device *dev)
- 	dev->stats.multicast = dr32(McstFramesRcvdOk);
- 	dev->stats.collisions += dr32(SingleColFrames)
- 			     +  dr32(MultiColFrames);
-+	dev->stats.collisions += np->collisions;
- 
- 	/* detailed tx errors */
- 	stat_reg = dr16(FramesAbortXSColls);
-@@ -1095,6 +1097,8 @@ get_stats (struct net_device *dev)
- 	dev->stats.tx_carrier_errors += stat_reg;
- 	dev->stats.tx_errors += stat_reg;
- 
-+	dev->stats.tx_errors += np->tx_errors;
-+
- 	/* Clear all other statistic register. */
- 	dr32(McstOctetXmtOk);
- 	dr16(BcstFramesXmtdOk);
-@@ -1123,6 +1127,9 @@ get_stats (struct net_device *dev)
- 	dr16(TCPCheckSumErrors);
- 	dr16(UDPCheckSumErrors);
- 	dr16(IPCheckSumErrors);
-+
-+	spin_unlock_irq(&np->stats_lock);
-+
- 	return &dev->stats;
- }
- 
-diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
-index 195dc6cfd895..dc8755a69b73 100644
---- a/drivers/net/ethernet/dlink/dl2k.h
-+++ b/drivers/net/ethernet/dlink/dl2k.h
-@@ -372,6 +372,8 @@ struct netdev_private {
- 	struct pci_dev *pdev;
- 	void __iomem *ioaddr;
- 	void __iomem *eeprom_addr;
-+	// To ensure synchronization when stats are updated.
-+	spinlock_t stats_lock;
- 	spinlock_t tx_lock;
- 	spinlock_t rx_lock;
- 	unsigned int rx_buf_sz;		/* Based on MTU+slack. */
-@@ -401,6 +403,9 @@ struct netdev_private {
- 	u16 negotiate;		/* Negotiated media */
- 	int phy_addr;		/* PHY addresses. */
- 	u16 led_mode;		/* LED mode read from EEPROM (IP1000A only) */
-+
-+	u64 collisions;
-+	u64 tx_errors;
- };
- 
- /* The station address location in the EEPROM. */
+I suspect neither of these two are really want you mean, but given
+this wording, that's exactly where it leads - which is more
+confusion and less proper understanding.
+
 -- 
-2.49.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
