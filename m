@@ -1,158 +1,208 @@
-Return-Path: <netdev+bounces-184507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D5C6A96088
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:07:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B76A96093
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:09:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F6183BAC64
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 08:05:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 850163ADE19
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 08:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56A023AE96;
-	Tue, 22 Apr 2025 08:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EBA233D72;
+	Tue, 22 Apr 2025 08:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="enGmkuWH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYv+/pYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8677149C7D;
-	Tue, 22 Apr 2025 08:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8453A1E7C32;
+	Tue, 22 Apr 2025 08:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745309090; cv=none; b=vBJUSWM8hs/iRXHDlP2fp5k4gv0AugQFoIOHfFwvI0n5JSlhduBvB+8ChKjTPu0kTfFyc46lNwqL3hhymUO4oG03sHi24YtuFrtqgJ9ZGiUnO3YRBvnEE55Vv7VxM7RJdYoAvva7oL2+qEP21X1Q7q7RopOod6pvyJJAJClwsxg=
+	t=1745309333; cv=none; b=LpwpxKSmg/mrOzsQRCJToKuwasVafPwuMK/5uEKdJH/p0nARbnQsbqSce8vtgP1hQx1clwYcqbpYA9kMpEm8bvZGWuaFoKdN+ZZaLF17o7G5fyiVxXF8IXm/L2OZ8rtGMerdT9IBKXtowbXJWP7v60yXc5E6CXcCg9Zv3pGGvKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745309090; c=relaxed/simple;
-	bh=dKg2iMASpZKlpSKiCHccH+FM4Cc+jvpjBNHcnykSyl4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Cq5DtR9FpytH2os2GN9aO8J0FTVUgyOHx0RSHfykiDFB8K/v4aRyNWmwq5kZ5NW3GnNCoYSUqEbEBvCHX8FMZJWNDOyW6vouszxxjbg8KtYoRZDxlp91Pl4NUWWlAfxcFPc+bOvBg4bieUKTC9ZRtU+c+CEpfq83aqjE50b3Ftw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=enGmkuWH; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=jhwxs
-	X7bT2boAjm5LCgWVLRdP11jribrR6xBUttHT2I=; b=enGmkuWHo4kn5hs42kTQo
-	RXk0rfNiJPybF1+3puHxHV6tKuyZhXVBJOFgaizbheuToAlnjR/f9e3If7KTZxnB
-	4q8aDBpZ705wabm6FBz5fKhjR864aN0lcUHkrqVxPMuYCMSayp9tYzHXOZ4cLclf
-	C7VZxQT8f94ZFDzMU0Ljck=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgAHGGuDTQdoB12hAg--.4613S2;
-	Tue, 22 Apr 2025 16:04:21 +0800 (CST)
-From: Feng Yang <yangfeng59949@163.com>
-To: alexei.starovoitov@gmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	song@kernel.org,
-	yangfeng59949@163.com,
-	yangfeng@kylinos.cn,
-	yonghong.song@linux.dev
-Subject: 
-Date: Tue, 22 Apr 2025 16:04:19 +0800
-Message-Id: <20250422080419.322136-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAADnVQLnij-d3Hif1x8ocoYD=8sZG67qACXPZhK78cpYKczwkw@mail.gmail.com>
-References: <CAADnVQLnij-d3Hif1x8ocoYD=8sZG67qACXPZhK78cpYKczwkw@mail.gmail.com>
+	s=arc-20240116; t=1745309333; c=relaxed/simple;
+	bh=cjxeTIBjmGDBo3MhtyDpWmP+BZTYc/JTlOwvci9CQTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SkCO88mc4YTNQZsguE9E3YB9Ce516Z90gbPqDpNN35pVZaVsVsmzmB9idZdQjEwpbqjiE5Sm18277ineAqZfRiHBqgTdRCNCs60ApOAYHtUVPfvUxplUhwWwt0WhAaa2rXXSGeC8J12f9r3tDYKPQrEVANIR33SkGQ8lJBqyOzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYv+/pYI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93959C4CEEA;
+	Tue, 22 Apr 2025 08:08:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745309333;
+	bh=cjxeTIBjmGDBo3MhtyDpWmP+BZTYc/JTlOwvci9CQTY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fYv+/pYIPEf1BOh4BavScuPJYtjWNwaFWhndS7H1TtiwqP/rDqM6fk00o1uZG4opD
+	 UYRwUStlpRweKSPIpdx4AqHbCfAseLNyoR7WkbKpadjdWf9Fq3j+52kwd7wgnkvYcS
+	 HFw4/P3UPCfPcx/Pf7w/nzRzuxHcJFYnadVqnRhomdAfL0uRuhsQxNwZtQC5M0AFOG
+	 A9s+qhrcdYFnCJm6DCkvdgWWtYFMVRnnIYGCuxRg2+sp9AcFq4qKMD8fJ16su56nhT
+	 dCtnULXRrkttGHNnGgrrw2ygxpaesNSTmT/AG7fgTILnL5Hl6lqO7cNXpXt8b+WP3i
+	 6IWF06kixtj2g==
+Message-ID: <14de236b-e2a7-4bde-986d-1e5ffddd01b4@kernel.org>
+Date: Tue, 22 Apr 2025 10:08:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgAHGGuDTQdoB12hAg--.4613S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCF4xurW8ZFyxAF4xZr1xuFg_yoW5tw1fpa
-	15AFy3Cr4kJF4aqwnrGr40vFW5Gw4Uu3yxCasrK34agr4qvF9rXr1UJr1S9F9Yvry2k34f
-	AayvqrZ8KrW0qa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UVKZAUUUUU=
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiTRM3eGgG8cnG3QABsd
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/13] dt-bindings: mmc: vt8500-sdmmc: Convert to YAML
+To: Alexey Charkov <alchark@gmail.com>, Rob Herring <robh@kernel.org>
+Cc: Andi Shyti <andi.shyti@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org, linux-pwm@vger.kernel.org
+References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
+ <20250416-wmt-updates-v1-3-f9af689cdfc2@gmail.com>
+ <20250416201407.GC3811555-robh@kernel.org>
+ <CABjd4YyTKquLcYC+DVg_koi3p7AhqwBNiazCiC713DQKjCaBSA@mail.gmail.com>
+ <CABjd4Yxi4SLqsAk_fb9C=1BW6XjnZ8LQ_JKYu6KZ3TtMS0fnhg@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <CABjd4Yxi4SLqsAk_fb9C=1BW6XjnZ8LQ_JKYu6KZ3TtMS0fnhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Subject: Re: [PATCH bpf-next] bpf: Remove bpf_get_smp_processor_id_proto
-
-On Mon, 21 Apr 2025 18:53:07 -0700 Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
-
-> On Thu, Apr 17, 2025 at 8:41 PM Feng Yang <yangfeng59949@163.com> wrote:
-> >
-> > From: Feng Yang <yangfeng@kylinos.cn>
-> >
-> > All BPF programs either disable CPU preemption or CPU migration,
-> > so the bpf_get_smp_processor_id_proto can be safely removed,
-> > and the bpf_get_raw_smp_processor_id_proto in bpf_base_func_proto works perfectly.
-> >
-> > Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-> > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> > ---
-> >  include/linux/bpf.h      |  1 -
-> >  kernel/bpf/core.c        |  1 -
-> >  kernel/bpf/helpers.c     | 12 ------------
-> >  kernel/trace/bpf_trace.c |  2 --
-> >  net/core/filter.c        |  6 ------
-> >  5 files changed, 22 deletions(-)
-> >
-> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > index 3f0cc89c0622..36e525141556 100644
-> > --- a/include/linux/bpf.h
-> > +++ b/include/linux/bpf.h
-> > @@ -3316,7 +3316,6 @@ extern const struct bpf_func_proto bpf_map_peek_elem_proto;
-> >  extern const struct bpf_func_proto bpf_map_lookup_percpu_elem_proto;
-> >
-> >  extern const struct bpf_func_proto bpf_get_prandom_u32_proto;
-> > -extern const struct bpf_func_proto bpf_get_smp_processor_id_proto;
-> >  extern const struct bpf_func_proto bpf_get_numa_node_id_proto;
-> >  extern const struct bpf_func_proto bpf_tail_call_proto;
-> >  extern const struct bpf_func_proto bpf_ktime_get_ns_proto;
-> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> > index ba6b6118cf50..1ad41a16b86e 100644
-> > --- a/kernel/bpf/core.c
-> > +++ b/kernel/bpf/core.c
-> > @@ -2943,7 +2943,6 @@ const struct bpf_func_proto bpf_spin_unlock_proto __weak;
-> >  const struct bpf_func_proto bpf_jiffies64_proto __weak;
-> >
-> >  const struct bpf_func_proto bpf_get_prandom_u32_proto __weak;
-> > -const struct bpf_func_proto bpf_get_smp_processor_id_proto __weak;
-> >  const struct bpf_func_proto bpf_get_numa_node_id_proto __weak;
-> >  const struct bpf_func_proto bpf_ktime_get_ns_proto __weak;
-> >  const struct bpf_func_proto bpf_ktime_get_boot_ns_proto __weak;
-> > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> > index e3a2662f4e33..2d2bfb2911f8 100644
-> > --- a/kernel/bpf/helpers.c
-> > +++ b/kernel/bpf/helpers.c
-> > @@ -149,18 +149,6 @@ const struct bpf_func_proto bpf_get_prandom_u32_proto = {
-> >         .ret_type       = RET_INTEGER,
-> >  };
-> >
-> > -BPF_CALL_0(bpf_get_smp_processor_id)
-> > -{
-> > -       return smp_processor_id();
-> > -}
-> > -
-> > -const struct bpf_func_proto bpf_get_smp_processor_id_proto = {
-> > -       .func           = bpf_get_smp_processor_id,
-> > -       .gpl_only       = false,
-> > -       .ret_type       = RET_INTEGER,
-> > -       .allow_fastcall = true,
-> > -};
-> > -
+On 18/04/2025 14:38, Alexey Charkov wrote:
+>>
+>>>> +
+>>>> +  reg:
+>>>> +    maxItems: 1
+>>>> +
+>>>> +  clocks:
+>>>> +    maxItems: 1
+>>>> +
+>>>> +  interrupts:
+>>>> +    items:
+>>>> +      - description: SDMMC controller interrupt
+>>>> +      - description: SDMMC controller DMA interrupt
+>>>> +
+>>>> +  sdon-inverted:
+>>>> +    type: boolean
+>>>> +    description: SD_ON bit is inverted on the controller
+>>>
+>>> This implies I know what the non-inverted state is. If you know, please
+>>> state that here.
+>>
+>> This is a tricky one. The only answer I have is "it's inverted in
+>> later versions vs. the first version I saw in the wild, and I'm not
+>> sure if it's board related or IP version related - nor if the original
+>> was active low or high". No docs, no schematics, no vendor left around
+>> to chase for answers.
+>>
+>> Will dig around some more and update the description if I succeed in
+>> uncovering any further clues :)
 > 
-> bpf_get_raw_smp_processor_id_proto doesn't have
-> allow_fastcall = true
+> I've found some extra clues and would like to consult on the best way forward.
 > 
-> so this breaks tests.
+> It turns out (if my understanding of the decompiled binary-only WM8505
+> vendor driver is correct) that all chips before (not including) WM8505
+> rev. A2 treated their "clock stop" bit (register offset 0x08 a.k.a.
+> SDMMC_BUSMODE, bit 0x10 a.k.a. BM_CST in vendor sources, BM_SD_OFF in
+> mainline) as "set 1 to disable SD clock", while all the later versions
+> treated it as "set 0 to disable SD clock". Which means that there are
+> WM8505 based systems that rely on either of those behaviours, while
+> any later chips need "set 0 to disable". This is not a board related
+> quirk but an on-chip SDMMC controller revision related quirk.
 > 
-> Instead of removing BPF_CALL_0(bpf_get_smp_processor_id)
-> we should probably remove BPF_CALL_0(bpf_get_raw_cpu_id)
-> and adjust SKF_AD_OFF + SKF_AD_CPU case.
-> I don't recall why raw_ version was used back in 2014.
+> I'd love to switch to a compatible-based logic and drop the
+> "sdon-inverted" flag altogether from the binding I'm writing, but here
+> are my doubts where I'd love to consult.
+> 
+> * Looks like WM8505 rev. A2 needs a separate compatible string vs.
+> prior WM8505. Can we have something like "wm,wm8505a2-sdhc" and
+> "wm,wm8505-sdhc" respectively? WM8505a2 not being an actual chip name,
+> but something discoverable by reading its hardware ID from a system
+> configuration register at runtime
+
+Then maybe it can be fully detected runtime? E.g. via soc_id driver (see
+drivers/soc/)?
+
+> * If I introduce new compatible strings for "wm,wm8650-sdhc",
+> "wm,wm8750-sdhc", "wm,wm8850-sdhc" and "wm,wm8880-sdhc" in bindings,
+> DTS and driver code, then the new driver and new DTB should work fine,
+> and the DTS should pass schema checks. New driver code won't work with
+> older DTB unless I keep the logic to parse "sdon-inverted" which
+> wouldn't be part of the binding. Old driver code would not work with
+> newer DTB except for pre-A2 versions of WM8505. Is that acceptable?
+> * Existing DTS doesn't differentiate between pre-A2 vs. post-A2
+> revisions of WM8505 and is bound to fail on the latter
+
+That's an old platform, so we should not break the ABI, thus drivers
+must fully support old DTBs.
+
+> 
+> I realize that breaking backward/forward compatibility is undesirable,
+> but frankly these systems seem to have few mainline users, and those
+> people who do run mainline on them ought to be compiling the kernel
+> and its DTB at the same time, because the firmware doesn't know
+
+There might be other users of DTS and anyway what would be exactly the
+benefit? This hardware aspect is already documented via sdon-inverted
+property.
+
+> anything about DT and any modern kernel can only be booted in
+> "appended DTB" mode. I also don't know of any non-Linux code that
+> might be using these device trees.
+> 
+> Any guidance would be much appreciated.
 > 
 
-The following two seem to explain the reason:
-https://lore.kernel.org/all/7103e2085afa29c006cd5b94a6e4a2ac83efc30d.1467106475.git.daniel@iogearbox.net/
-https://lore.kernel.org/all/02fa71ebe1c560cad489967aa29c653b48932596.1474586162.git.daniel@iogearbox.net/
 
+Best regards,
+Krzysztof
 
