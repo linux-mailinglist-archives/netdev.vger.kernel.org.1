@@ -1,145 +1,158 @@
-Return-Path: <netdev+bounces-184762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB2D5A971A0
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:51:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E65F4A971AE
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4C0400E89
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:50:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED80144187E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E634928FFC0;
-	Tue, 22 Apr 2025 15:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rt+6t44+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C65E14883F;
+	Tue, 22 Apr 2025 15:52:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE5528EA7A
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72DF290083;
+	Tue, 22 Apr 2025 15:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745337038; cv=none; b=mmpD5dbQsNu6FupKqduKnoiCcnoiZzMekMGh5ilDsJj4VZi6IBZygC69wjxnv9nriNQ9dvXcLUCyn9FNlJnxKNFJqzfL0NxMHIKcEDiadibvXCTPNGWAsA5UQUykzsPaiqlr5SE5ydl6QpiIGgkz7V7wIhYuRBquWyTB5nef0wM=
+	t=1745337124; cv=none; b=kVQkEvi7vOxCXWzImqKdDWGUacpQE2q5W9SpgakQc7tQXfrj35u4toQafTrOUyxkIZ5Y1xYe5TnaXn3w+/E/TNjkCZGWFkH+rwrPDrTrvoRnugUYAc1KtuAxThs4OZqwqwxuPoi/kq2CCqHtlffVJSr6dyMFOIkP/80hSq8mrNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745337038; c=relaxed/simple;
-	bh=b9Sc20nAJojQ+ITw9oWzmbvR3TnwSI9r8jbvfUvvH+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cRVZTTQDhx2PNiNk9NqhJkAix3DM5dejIa9JM6d0ALj/81fMnytZgqaqklAO+rl1ExTs+UbJ16SoWD+svdRh2ktM2liA3RKCta7aOJVSf8yh0oGH1VoBTcKLMK2At5OrCKXFsf4iGx8WKd4JPg/bsArgaCkG+LnvkhPc+8td6hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rt+6t44+; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-225477548e1so53656055ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 08:50:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745337036; x=1745941836; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qSDxqEHK7azXbgy5Y04gKH79BoT6pDB8N3BuaMsroj8=;
-        b=Rt+6t44+cYE9XiRWTNYSu7gKMZNWwAnFg/dJSXbSJ+gkVpG4sbmgd3+zg6jpGVALnj
-         jMJXGq6Jvk/OZjL12UFS8CbE+9i3x0Gpjj2imGU+AMGLLPzOm0rSgC/Ml22Z+U9X1vps
-         Tcw0+SsQzBA0vx7F2bcdx0Ul+dG/M9KlBL32suy1vSOHe9/dOtBFVCGPfGujINciYYD/
-         Qd6bWbCloISgUmr0YtYAM7iObC5B9saD8yU1bixMIaMwR+rroolL5ogCHXoVKQTOLlXp
-         Cnz5QMdmLm2KeqGlONEG9TWdGQC93WI8AEFfyzhfYDlnmuCqOyfCNjzyV/QuAcI1llwu
-         sAsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745337036; x=1745941836;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qSDxqEHK7azXbgy5Y04gKH79BoT6pDB8N3BuaMsroj8=;
-        b=LMUAM/qm1V1EbS/1oxOXbC875xoFjLBlu3wZ8/yVZrGNMbql0HwyyEZAa+XMcG5cHS
-         eFz/owyfcNLNz4FK/x8lzqIYjolg+P4qMOv6lhEJCTkjPqhj2FeDh6MhphW75k77UTiA
-         t3CRzErCFzlhNG/XCORuyChwyg8y6+AI0qrVaPuPcVXMNNgZl/G1+6G9kEW+XoC38UT3
-         X5mG0oWmcmVa4DmLL6SNW0ADpyzXhKzgHAE/c2xKwkMhqVkzuI/psiP+Xa/7y3kDGDsg
-         ESLYsGmeXJU8PAuRCDY+wslY6+PlHYWseUAjx5DmhgymByRNFOTnck0jqzGShcM7ZOP2
-         8qqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxjZpnLgVldn958V3jOwMcnSt+/hjgtFBXVDeBbRbkuMjCUZYKMiXf6hu1iqB5B5Tlxz+nw0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbDFd/kD7VK/r/1V/IoDyNeVVrCPXOIKQ5vcaZEEuPG1/bD+LZ
-	REecwZ2fWY4wMFFOPtZfHVDRoHDsm81bGpjResd7bjT+39/2nmolYq3R
-X-Gm-Gg: ASbGncvqs0YDpmEXiNDg/RUsMlU9JWFKs9xCSoD/+u4umc8eqdpkWr+UbgBeW3LPzOy
-	eOf+pbXsgd7/OwVtioGYJNRBTA3Vfm8xDiOTgPhgNtSC82YCOkbRzJvTY9mzQ+IXGIx0XtVV0lL
-	+DnW9FUAhvqvAh1Rb+TPA2FSZIIlCRzzqzVrVWvWU3/RAvLoNOjdhBWEidP1/lwRVA62DTmEo+F
-	N7JxDtuYoH/dLX/LtZGknYWUVnFFq084t3DUivd/sKv9diEHl+K2+oxijCWn03BviiUjQUzWCYA
-	6JoJB8jneXTbxWPkxlLSkvTwIuog2P7X+6P0OMJ1
-X-Google-Smtp-Source: AGHT+IGEga9SQHydp753REPG/BYhbD6U/eyeVM8rDQ9wKgrgFXdYzI05tenjn8fFZlcu0Zi3q5mWPg==
-X-Received: by 2002:a17:903:2410:b0:224:3c9:19ae with SMTP id d9443c01a7336-22c53601521mr268031235ad.34.1745337036545;
-        Tue, 22 Apr 2025 08:50:36 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50bdda5csm86502305ad.44.2025.04.22.08.50.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 08:50:36 -0700 (PDT)
-Date: Tue, 22 Apr 2025 08:50:35 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
-	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
-	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 14/22] eth: bnxt: always set the queue mgmt ops
-Message-ID: <aAe6y6ZSQsdk5eHF@mini-arch>
-References: <20250421222827.283737-1-kuba@kernel.org>
- <20250421222827.283737-15-kuba@kernel.org>
+	s=arc-20240116; t=1745337124; c=relaxed/simple;
+	bh=AH+Q8UtE92o5RJ5wRhCdSovwJClD9/7ON4gllAZdkcc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tdjgwkRGxKaDi7T+R3JHDain/AwcmsHem0huq5tTl8K9J5+L0ij4Ye4oqVEtRKxYa2tl0AjTwm3XChzdEZ1DY4GxcfRzc5TzKDHOZs3hBNOu34dyqibpmAm3N4V3ooQC9h9WVMdFCw1QkJvDihOY5lyjnHcHcTf8v+nhK/4q3fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZhmsQ2dpLz6L5Gs;
+	Tue, 22 Apr 2025 23:50:18 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id ECFA01401F4;
+	Tue, 22 Apr 2025 23:51:58 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 22 Apr
+ 2025 17:51:58 +0200
+Date: Tue, 22 Apr 2025 16:51:57 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
+Subject: Re: [PATCH v13 11/22] cxl: define a driver interface for HPA free
+ space enumeration
+Message-ID: <20250422165157.00006953@huawei.com>
+In-Reply-To: <eb1e5fca-7a8b-4ff1-8222-ce2eb16777dd@amd.com>
+References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
+	<20250414151336.3852990-12-alejandro.lucero-palau@amd.com>
+	<20250415145016.00003725@huawei.com>
+	<eb5f16f8-607a-4c71-8f81-5cdb4ff73a75@amd.com>
+	<20250417173650.00003ee0@huawei.com>
+	<eb1e5fca-7a8b-4ff1-8222-ce2eb16777dd@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250421222827.283737-15-kuba@kernel.org>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On 04/21, Jakub Kicinski wrote:
-> Core provides a centralized callback for validating per-queue settings
-> but the callback is part of the queue management ops. Having the ops
-> conditionally set complicates the parts of the driver which could
-> otherwise lean on the core to feel it the correct settings.
-> 
-> Always set the queue ops, but provide no restart-related callbacks if
-> queue ops are not supported by the device. This should maintain current
-> behavior, the check in netdev_rx_queue_restart() looks both at op struct
-> and individual ops.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 627132ce10df..49d66f4a5ad0 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -16039,6 +16039,9 @@ static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
->  	.ndo_queue_stop		= bnxt_queue_stop,
->  };
->  
-> +static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops_unsupp = {
-> +};
-> +
->  static void bnxt_remove_one(struct pci_dev *pdev)
->  {
->  	struct net_device *dev = pci_get_drvdata(pdev);
-> @@ -16694,7 +16697,8 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  		bp->rss_cap |= BNXT_RSS_CAP_MULTI_RSS_CTX;
->  	if (BNXT_SUPPORTS_QUEUE_API(bp))
->  		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
-> -	dev->request_ops_lock = true;
-> +	else
-> +		dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops_unsupp;
->  
->  	rc = register_netdev(dev);
->  	if (rc)
-> -- 
-> 2.49.0
-> 
+On Thu, 17 Apr 2025 22:22:19 +0100
+Alejandro Lucero Palau <alucerop@amd.com> wrote:
 
-nit: maybe reflow as follows?
+> On 4/17/25 17:36, Jonathan Cameron wrote:
+> > On Thu, 17 Apr 2025 13:11:00 +0100
+> > Alejandro Lucero Palau <alucerop@amd.com> wrote:
+> >  
+> >> On 4/15/25 14:50, Jonathan Cameron wrote:  
+> >>> On Mon, 14 Apr 2025 16:13:25 +0100
+> >>> alejandro.lucero-palau@amd.com wrote:
+> >>>     
+> >>>> From: Alejandro Lucero <alucerop@amd.com>
+> >>>>
+> >>>> CXL region creation involves allocating capacity from device DPA
+> >>>> (device-physical-address space) and assigning it to decode a given HPA
+> >>>> (host-physical-address space). Before determining how much DPA to
+> >>>> allocate the amount of available HPA must be determined. Also, not all
+> >>>> HPA is created equal, some specifically targets RAM, some target PMEM,
+> >>>> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
+> >>>> is host-only (HDM-H).
+> >>>>
+> >>>> Wrap all of those concerns into an API that retrieves a root decoder
+> >>>> (platform CXL window) that fits the specified constraints and the
+> >>>> capacity available for a new region.
+> >>>>
+> >>>> Add a complementary function for releasing the reference to such root
+> >>>> decoder.
+> >>>>
+> >>>> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> >>>>
+> >>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>  
+> >>> One trivial comment inline.
+> >>>
+> >>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> >>>     
+> >>>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> >>>> index 80caaf14d08a..0a9eab4f8e2e 100644
+> >>>> --- a/drivers/cxl/core/region.c
+> >>>> +++ b/drivers/cxl/core/region.c
+> >>>> +static int find_max_hpa(struct device *dev, void *data)
+> >>>> +{
+> >>>> +	struct cxlrd_max_context *ctx = data;
+> >>>> +	struct cxl_switch_decoder *cxlsd;
+> >>>> +	struct cxl_root_decoder *cxlrd;
+> >>>> +	struct resource *res, *prev;
+> >>>> +	struct cxl_decoder *cxld;
+> >>>> +	resource_size_t max;
+> >>>> +	int found = 0;
+> >>>> +
+> >>>> +	if (!is_root_decoder(dev))
+> >>>> +		return 0;
+> >>>> +
+> >>>> +	cxlrd = to_cxl_root_decoder(dev);
+> >>>> +	cxlsd = &cxlrd->cxlsd;
+> >>>> +	cxld = &cxlsd->cxld;
+> >>>> +
+> >>>> +	/*
+> >>>> +	 * None flags are declared as bitmaps but for the sake of better code  
+> >>> None?  
+> >>
+> >> Not sure you refer to syntax or semantics here. Assuming is the former:  
+> > Just the wording of the comment. I'm not sure what it means.  
+> 
+> 
+> Ok. I just want to make clear those flags fields used in the 
+> bitmap_subset are not declared as bitmaps, just in case someone points 
+> this out.
+> 
+> I do not think this is problematic, and a good idea you gave me, but 
+> better to comment on it before someone complains about it.
+> 
+Ah.. Ok. So something like:
 
-dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops_unsupp;
-if (BNXT_SUPPORTS_QUEUE_API(bp))
-	dev->queue_mgmt_ops = &bnxt_queue_mgmt_ops;
+Fields are not declared as bitmaps, but bitmap_subset may still be used.
+
+> 
+> >  
+> >>
+> >> No flags fields?  
+> > Not following that either.  
+> >>  
+> >>>     
+> >>>> +	 * used here as such, restricting the bitmap size to those bits used by
+> >>>> +	 * any Type2 device driver requester.
+> >>>> +	 */  
+> >>>     
+
 
