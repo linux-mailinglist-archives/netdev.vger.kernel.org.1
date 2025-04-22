@@ -1,168 +1,234 @@
-Return-Path: <netdev+bounces-184908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78A6A97AC9
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:01:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11031A97AE7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:07:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F38CC1897A18
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:01:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A4718874DB
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F11726C38A;
-	Tue, 22 Apr 2025 23:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EAA1EE7B7;
+	Tue, 22 Apr 2025 23:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vSTPJmDW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOjs3fRJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CBA9476
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2201C9476
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745362856; cv=none; b=hnwinviw25v/P/qEasuWuF91ILbLFsB30uMoMsPLvsyi+266lORJGTQKFS9moEEfDx+7JO+sTKDxZC5diNuqsJG6POpLsEQkRr6idqkZMVoEX7W06U6Lm5/do0Man5evrGXJcNAVAJDGNbr8p6AJuVRFtLrJ0HHuimCDVfmfBmo=
+	t=1745363220; cv=none; b=Lq16xGg8I5F4oN4eiWSWH6EtEzRhBTqTGKVbcuOIxSRWqhB3M5fWXqg8dB8UKvxlaW52E1/nVz2kQnl/HNhawIGJl4R1eQcPHknsrHYRMTCuu1j3IL1oU0EG1nysKLpRoSUMjR9HDA8XKelSTiS6TXIbxpg6gAW5Ua81TiedZGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745362856; c=relaxed/simple;
-	bh=vA0x1LF+TTujtzA/a9qIyOuUZvc6uTpZ8L2xS4rCm/w=;
+	s=arc-20240116; t=1745363220; c=relaxed/simple;
+	bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dkjgeABn6S0pWvCgSUYG+gI7awWL+Q8P1qlymIloN3KECAouLk4tL5bWi1mv+5rtPH4gU/sMrp4XiLPVtc5Ma3eRgtfV60AJ1ZAVj4nmfYCkgaD0IDHlcvsO89b+A8W5nNaV1c/7ggbuT0XQfZ4DIWA6wzzLDvMlOp2RMRF3nXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vSTPJmDW; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2240aad70f2so102515ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:00:54 -0700 (PDT)
+	 To:Cc:Content-Type; b=qDlAHAEjhM2I1hhGKZdpWEQGIj1Q19Q+HyBJSXXYKzb4VUMp+dZYaH4ynveO0HbbHj/q5KCQEKwEG9mcTUdXTL46FSpc07eDXzGzt7rQ8EP0b2i3J1V5zN2LsUNEuBm6dxeax52Apl+C46DIeGyZVI4WAkaUZUi9IV1gDKofCuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DOjs3fRJ; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39ac56756f6so5666799f8f.2
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:06:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745362854; x=1745967654; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745363216; x=1745968016; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X0wkS+mYcttDoYH2cbzpbLqiayCSdu0EeV0O89OnxB4=;
-        b=vSTPJmDW/0RBiNQ+pXo+/ZFUu9NXOW/mYR/LTeXX0PDtkS2kzlnEhrDftAorprnLh9
-         B/ocgO6V4ijHaBDVDYg9jL9VOb/JTTXw0+6S+4tY7MtwRoZ5UvWVUsbIXQaus6pT7WIM
-         w9JyPlBFdKdDqkaPdhGNJyHXBD3R1sPHkcrer5Y+IzcoOu9zjO12veodho3lesqRnqS/
-         ZAStMrBVqSDj4W5etdANq85mg8kvu8N2Yyfeq9+o7t2dSSKpzsDi4P2t4oGQC/1IFwHS
-         Bak+lxuGPw4pkmdTAXPNdW6jRVAwnpbPvESvT2YSRlvhPL7TLc7E1y0fQt/+j6nPSPYZ
-         Y8pw==
+        bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
+        b=DOjs3fRJISLhfkad+N3ESxL+twVRWnZfRnp0ELOp538sQWqkJDwzairKupr0uvfRXw
+         Yxv+cYWpa8Gx2IjUIybE3dJ/ba/MI8ImVAVq0qRhfoh2PQRp+j0wxg7JuWblv//63AbL
+         JHRG7+qN6i0Tn/gLs6z865K2ZR8b07aCih341wiRRt5wShHvMmVf2whQRDY9NCBFpWlw
+         /QHKXQstmBCHROVRgAFerDP3kgx6b3CgTgcFkrQkyVBM0WbzUl5U11IWHgPz36ZqWm7C
+         2iM4X26z7+C695/OV/dPR51HXTdp8TSrOd+bvwpLA3eZxxka5RqU5eKpDJ/Humtklm+w
+         t4lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745362854; x=1745967654;
+        d=1e100.net; s=20230601; t=1745363216; x=1745968016;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X0wkS+mYcttDoYH2cbzpbLqiayCSdu0EeV0O89OnxB4=;
-        b=l0gqmOBAPDd7Cq1IG5WMsaLVX68xkSRFGTJ6kS1STmKfRlfT+uvOxm2bs0JQjarzqA
-         Df7bNCUYBc/oimWOAhLBcFn+PeYBDrpbf/nm70pmjdRM7NAS6ctn93W4ytwdVBY0n31P
-         XNun5PK9VdfUre4fUiFVpYUrKnp28saTPKDUDMKon4B+LRNKL3jbzOp0gB4+AtZ1JVEU
-         Do8bscNb7+I/9MzuZAUFp4kjaH7mgku7Y1+H+EpDpxHweouS8MCRVf929hwbCSLfnf+4
-         I1g+SfijQGw6R6jmZnhCC6sR04zAEoKa2MP3nB1J7xoX6FuDbUxpiQq8nJM06ikH8vUQ
-         T61Q==
-X-Gm-Message-State: AOJu0YzarytKzV1AmruCArIDs2gENLXEAVD+ttVV6c4rPYds08ZAOKRJ
-	6b3WNeOuC3afHGdF9vKMksLYwAvffk/1QN6XRDlrrmDnSYwpgH8esFfoPoOlMI3JfWrHs12n7Zc
-	pjY6D5gvGB4U1GDW9eWxK9qGS5Xrn8SDyxI7t
-X-Gm-Gg: ASbGncv/iIXeKr2qwNJQAPBE1Y6sYE7n+P84xw1cpBE3lh/dM34wW4mdIrD0jRPmTGC
-	2pAXm2bOgVRbJThALQsrlqrBUbt7X6bdeeek6VkMzYzsqK2AoUUMNnKRVJp+ULGoiC0kf0HDjT+
-	nuEXvTd8IA//hoKL3iKHp4wdFZfHZjaEPVmuS7JrDdrZ35dqEg7zoqOPFVahk4JMQ=
-X-Google-Smtp-Source: AGHT+IFcA8eNct2OIuHlbOvxzm3T6NVzaOSOXt3ivEIqSJ8wke0kgYVfmjCEtUHN4nE+IsPWRgGhH+7fhESmeCiNRMo=
-X-Received: by 2002:a17:902:ef07:b0:215:86bf:7e46 with SMTP id
- d9443c01a7336-22da4ebcff9mr256305ad.7.1745362853731; Tue, 22 Apr 2025
- 16:00:53 -0700 (PDT)
+        bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
+        b=sjxxJ02mvKe3seC1oGXcjuzxkkeHE8JggxwTXW3MGx6jsJjSGhDSkV3Jyqs2y45AVE
+         j+nUHv2rJhlrc9BwBAdW0rv2WhziUlE4V4q63cCdMBfNW+IQKLUkndC8Afi97Wi0CvWx
+         9n+pEwsTq2RYjNyyjle9QkDTfj9x2Vn3gQMYFBFD4CuIanvmkY1Tnfg3+kQYj7jX8How
+         95+nHsO5EJhrTXAJ0OAkB6wOlYTGSnMEfcASN8r2ugNT6/cLy3IA22oQFibxj/OJ2M06
+         NcQ5tUNx66KODKWNZGVcE9FY0K2t7xuct8k0FlZXs03o2A5HnJdjElcTfmw1yh4esDsJ
+         T6pw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6gmg9IVWeFUE0whZe/dLhoR3M5rdyWQLgpBDcI/6/H/euVltaTpHZkr/e0S1oW0h6aU6i9MI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz1f+m8cRWJdEf7Uc6MJlSdGyHGZrfcdBJDmwPyOEta65LwaEE
+	ovIRjwUQ2/S44fxZUZ8ukuXEi1lE6FAXcxpBL/GaJ6lnlXMWmwGq1f4YU9TeErwmsbK2T5B+c5a
+	Z3g4/nj6jk9Hk0VxBKUozm7n9OuU=
+X-Gm-Gg: ASbGnctzDzNrn8dS6Tj3pZobmx91i2TZ+zl3/2or9lW8cf4yHcz9PrT0nAy5JY7PxHR
+	5YXNEmYCfzF0cHo5y0ZkH4Ma0e7CglGW8EFCTzNNZFO9Bpgd3pzhUGxLljlXtXSKNNOGDG5cVpI
+	T++JKA96AUWlF461h+pnmnIeWMAOOlUPHylBTTeqAis9Y3CJT0aIuarj8=
+X-Google-Smtp-Source: AGHT+IF0eTI8qJhLL0CcPl+mm0ljJmmsBF0EQc/0Ht7P/DJ5fO/fFgiicLe6BP+5jEkxLNcX9S8S0r+sQnL8O58Q39U=
+X-Received: by 2002:a5d:59a9:0:b0:391:2c67:798f with SMTP id
+ ffacd0b85a97d-39efbaded2bmr12514499f8f.41.1745363216214; Tue, 22 Apr 2025
+ 16:06:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417231540.2780723-1-almasrymina@google.com>
- <20250417231540.2780723-8-almasrymina@google.com> <CAEAWyHckGSYEMDqVDT0u7pFCpO9fmXpEDb7-YV87pu+R+ytxOw@mail.gmail.com>
- <CAHS8izNZXmG0bi15DpmX2EcococF2swM83Urk19aQBvz=z3nUQ@mail.gmail.com>
-In-Reply-To: <CAHS8izNZXmG0bi15DpmX2EcococF2swM83Urk19aQBvz=z3nUQ@mail.gmail.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Tue, 22 Apr 2025 16:00:42 -0700
-X-Gm-Features: ATxdqUGxkrayoAGMPm_qgEhKu-sQHz14vjXf4E7ZJdbEqvqiDvu9MHtNVHd91NA
-Message-ID: <CAEAWyHf7Qzi8CDBeRMB5nMvvNawrFrUCh52k4JevbSHX1Y=zcw@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 7/9] gve: add netmem TX support to GVE DQO-RDA mode
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>
+References: <de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch> <CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
+ <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch> <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+ <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
+ <20250421182143.56509949@kernel.org> <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
+ <20250422082806.6224c602@kernel.org> <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
+ <CAKgT0UfW=mHjtvxNdqy1qB6VYGxKrabWfWNgF3snR07QpNjEhQ@mail.gmail.com> <c7c7aee2-5fda-4b66-a337-afb028791f9c@lunn.ch>
+In-Reply-To: <c7c7aee2-5fda-4b66-a337-afb028791f9c@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 22 Apr 2025 16:06:19 -0700
+X-Gm-Features: ATxdqUGU8zL7ZjX3dBUB3W2_ARhCI1IACBppFJr_imRlTeB-VN4k-6X8tZPpngQ
+Message-ID: <CAKgT0UfDWP91rH1G70+pYL2HbMdjgr46h3X+uufL42xmXVi=cg@mail.gmail.com>
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux@armlinux.org.uk, 
+	hkallweit1@gmail.com, davem@davemloft.net, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 22, 2025 at 2:30=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
+On Tue, Apr 22, 2025 at 3:26=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Tue, Apr 22, 2025 at 10:43=E2=80=AFAM Harshitha Ramamurthy
-> <hramamurthy@google.com> wrote:
+> On Tue, Apr 22, 2025 at 02:29:48PM -0700, Alexander Duyck wrote:
+> > On Tue, Apr 22, 2025 at 9:50=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > > > The whole concept of a multi-host NIC is new to me. So i at least=
+ need
+> > > > > to get up to speed with it. I've no idea if Russell has come acro=
+ss it
+> > > > > before, since it is not a SoC concept.
+> > > > >
+> > > > > I don't really want to agree to anything until i do have that con=
+cept
+> > > > > understood. That is part of why i asked about a standard. It is a
+> > > > > dense document answering a lot of questions. Without a standard, =
+i
+> > > > > need to ask a lot of questions.
+> > > >
+> > > > Don't hesitate to ask the questions, your last reply contains no
+> > > > question marks :)
+> > >
+> > > O.K. Lets start with the basics. I assume the NIC has a PCIe connecto=
+r
+> > > something like a 4.0 x4? Each of the four hosts in the system
+> > > contribute one PCIe lane. So from the host side it looks like a 4.0 x=
+1
+> > > NIC?
 > >
-> > On Thu, Apr 17, 2025 at 4:15=E2=80=AFPM Mina Almasry <almasrymina@googl=
-e.com> wrote:
-> > >
-> > > Use netmem_dma_*() helpers in gve_tx_dqo.c DQO-RDA paths to
-> > > enable netmem TX support in that mode.
-> > >
-> > > Declare support for netmem TX in GVE DQO-RDA mode.
-> > >
-> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > >
-> > > ---
-> > >
-> > > v4:
-> > > - New patch
-> > > ---
-> > >  drivers/net/ethernet/google/gve/gve_main.c   | 4 ++++
-> > >  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 8 +++++---
-> > >  2 files changed, 9 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net=
-/ethernet/google/gve/gve_main.c
-> > > index 8aaac9101377..430314225d4d 100644
-> > > --- a/drivers/net/ethernet/google/gve/gve_main.c
-> > > +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> > > @@ -2665,6 +2665,10 @@ static int gve_probe(struct pci_dev *pdev, con=
-st struct pci_device_id *ent)
-> > >
-> > >         dev_info(&pdev->dev, "GVE version %s\n", gve_version_str);
-> > >         dev_info(&pdev->dev, "GVE queue format %d\n", (int)priv->queu=
-e_format);
-> > > +
-> > > +       if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
-> > > +               dev->netmem_tx =3D true;
-> > > +
-> >
-> > a nit: but it would fit in better and be more uniform if this is set
-> > earlier in the function where other features are set for the
-> > net_device.
-> >
+> > More like 5.0 x16 split in to 4 5.0 x4 NICs.
 >
-> Thanks for taking a look. I actually thought about that while trying
-> to implement this, but AFAIU (correct if wrong), gve_is_gqi and
-> gve_is_qpl need priv to be initialized, so this feature set must be
-> performed after gve_init_priv in this function. I suppose this feature
-> checking maybe can be put before register_netdev. Do you prefer that?
+> O.K. Same thing, different scale.
 
-Ah yes, you are right. Thanks for checking. That would be preferable.
-Another option is to move it inside gve_init_priv() after the mode has
-been set. Either is okay.
+Agreed.
 
-Thanks,
-Harshitha
+> > > There are not 4 host MACs connected to a 5 port switch. Rather, each
+> > > host gets its own subset of queues, DMA engines etc, for one shared
+> > > MAC. Below the MAC you have all the usual PCS, SFP cage, gpios, I2C
+> > > bus, and blinky LEDs. Plus you have the BMC connected via an RMII lik=
+e
+> > > interface.
+> >
+> > Yeah, that is the setup so far. Basically we are using one QSFP cable
+> > and slicing it up. So instead of having a 100CR4 connection we might
+> > have 2x50CR2 operating on the same cable, or 4x25CR.
 >
+> But for 2x50CR2 you have two MACs? And for 4x25CR 4 MACs?
+
+Yes. Some confusion here may be that our hardware always has 4
+MAC/PCS/PMA setups, one for each host. Depending on the NIC
+configuration we may have either 4 hosts or 2 hosts present with 2
+disabled. What they end up doing is routing 2 lanes from the QSFP to
+one host and the other two to the other. So in the case of the QSFP28
+or QSFP+ we can only support 2 hosts, and with the QSFP-DD we can
+support 4.
+
+> Or is there always 4 MACs, each MAC has its own queues, and you need
+> to place frames into the correct queue, and with a 2x50CR2 you also
+> need to load balance across those two queues?
+
+Are you familiar with the concept of QSFP breakout cables? The general
+idea is that one end of the cable is a QSFP connection and it will
+break out into 4 SFP connections on the other end. That is actually
+pretty close to the concept behind our NIC. We essentially have an
+internalized breakout where the QSFP connection comes in, but we break
+it into either 2 or 4 connections on our end. Our limit is 2 lanes per
+host.
+
+I did a quick search and came up with the following link to a Cisco
+whitepaper that sort of explains the breakout cable concept. I will
+try to see if I can find a spec somewhere that defines how to handle a
+breakout cable:
+https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transc=
+eiver-modules/whitepaper-c11-744077.html
+
+> I guess the queuing does not matter much to phylink, but how do you
+> represent multiple PCS lanes to phylink? Up until now, one netdev has
+> had one PCS lane. It now has 1, 2, or 4 lanes. None of the
+> phylink_pcs_op have a lane indicator.
+
+So the PCS isn't really much of a problem. There is only one PCS per
+host. Where things get a bit messier is that the PMA/PMD setup is per
+lane. So our PCS has vendor registers for setting up the PMA side of
+things and we have to set them for 2 devices instead of just one.
+Likewise we have to pass a lanes mask to the PMD to tell it which
+lanes are being configured for what modulation and which lanes are
+disabled.
+
+> > > NC-SI, with Linux controlling the hardware, implies you need to be
+> > > able to hand off control of the GPIOs, I2C, PCS to Linux. But with
+> > > multi-host, it makes no sense for all 4 hosts to be trying to control
+> > > the GPIOs, I2C, PCS, perform SFP firmware upgrade. So it seems more
+> > > likely to me, one host gets put in change of everything below the
+> > > queues to the MAC. The others just know there is link, nothing more.
+> >
+> > Things are a bit simpler than that. With the direct-attach we don't
+> > need to take any action on the SFP. Essentially the I2C and GPIOs are
+> > all shared. As such we can read the QSFP state, but cannot modify it
+> > directly. We aren't taking any actions to write to the I2C other than
+> > bank/page which is handled all as a part of the read call.
 >
-> --
-> Thanks,
-> Mina
+> That might work for direct-attach, but what about the general case? We
+> need to ensure whatever we add supports the general case.
+
+I agree, but at the same time I am just letting you know the
+limitations of our hardware setup. There isn't anything to really
+control on the QSFP. It is mostly just there to provide the media and
+that is about it. No PHY on it to load FW for.
+
+> The current SFP code expects a Linux I2C bus. Given how SFPs are
+> broken, it does 16 bytes reads at the most. When it needs to read more
+> than 16 bytes, i expect it will set the page once, read it back to
+> ensure the SFP actually implements the page, and then do multiple I2C
+> reads to read all the data it wants from that page. I don't see how
+> this is going to work when the I2C bus is shared.
+
+The general idea is that we have to cache the page and bank in the
+driver and pass those as arguments to the firmware when we perform a
+read. Basically it will take a lock on the I2C, set the page and bank,
+perform the read, and then release the lock. With that all 4 hosts can
+read the I2C from the QSFP without causing any side effects.
+
+> > > This actually circles back to the discussion about fixed-link. The on=
+e
+> > > host in control of all the lower hardware has the complete
+> > > picture. The other 3 maybe just need a fixed link. They don't get to
+> > > see what is going on below the MAC, and as a result there is no
+> > > ethtool support to change anything, and so no conflicting
+> > > configuration? And since they cannot control any of that, they cannot
+> > > put the link down. So 3/4 of the problem is solved.
+> >
+> > Yeah, this is why I was headed down that path for a bit. However our
+> > links are independent with the only shared bit being the PMD and the
+> > SFP module.
+>
+> Yours might be, but what is the general case?
+
+I will do some digging into the breakout cable path. That seems like
+the most likely setup that would be similar and more general.
 
