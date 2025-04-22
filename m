@@ -1,122 +1,76 @@
-Return-Path: <netdev+bounces-184790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7E1A97314
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:52:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF91BA97321
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 587E73B95B8
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:51:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71E3D7A3185
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D5429009F;
-	Tue, 22 Apr 2025 16:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6E42949EF;
+	Tue, 22 Apr 2025 16:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="m0dTY7cZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jv0b3A7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF47918D63A;
-	Tue, 22 Apr 2025 16:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A6E13C3F6;
+	Tue, 22 Apr 2025 16:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745340727; cv=none; b=sTHoWtwU9McfdLkJEsrFnHsimlLZhi4sFJDHKt2xmQGaRPb/vnZ/2d3Qs0GNvNOch0VSmBaGyjE2tjpAyvJWKG1XcwLaKCdaZbm8TQBL8EvzWXThcHyni7v7httcRKXIiYVIN9vQlkyUX/9VYQCHRE0yFJCtVrLtncfVDKiEnQs=
+	t=1745340844; cv=none; b=ZfrooLxNMw3mrjUVztJuDUEChymCfEzddM8f2f8S3w69wykKhKoSVgA+HCG3YdeC+bepKBzEogKp4/DQo5G/r6UUFoRVAg+PYf3HHJnS1gWyhsoCMDcmtnQipGegbJiSMYvhWaISy9u43l+ucHpY2vGv1+ERIhTzQ3Bbn37Y/fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745340727; c=relaxed/simple;
-	bh=T4Gei4noOURlngmAU8lLrsYIK9+KhrxsvVg1WHk+lhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s7oayU7aumGNciypbZLQutk7vxbelz90BggsiGXgBbqpHSeI0D0kpUJazZyTN4y0yOqbxLkm56sY7XPrq+ddpobdJqmgYyGRAHYcaS0ortkG5hvQcqmkMHZdTQxrbA85X/uaqw06k3dc6FX/UDGRiGceE6AWQcedMkaAGgpN7sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=m0dTY7cZ; arc=none smtp.client-ip=82.68.155.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
-Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
-	by wylie.me.uk (Postfix) with ESMTP id 7F752120801;
-	Tue, 22 Apr 2025 17:51:46 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
-	s=mydkim006; t=1745340706;
-	bh=T4Gei4noOURlngmAU8lLrsYIK9+KhrxsvVg1WHk+lhM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=m0dTY7cZIdpgs09MArNJseZM9Lw1jjQxBlMju7wpdrCdvSHzyugnQEKDEUSrYTsVl
-	 LrGsrMAhtLRUKd8t1JCOWlRl9aCQy6MQ7LWH/tlZ9M/FjP5wPyoQSpHsaHMF9lnr/E
-	 cKWdU6WBUwTCitYizkn9E2br5L3avHczeD97QMDqIOv0uER475/mh81WOw71ZvxIZO
-	 jEct0OPSGJbsIfCWItiAABrn51KCGASgG1rmUeAQejXxg0Hp8BL49wE19RM/0OV+TA
-	 tHwuaLK5zFDZbiwVILCzCX3VOHM3D4r77lFzIxLbNlE0wvdkbCUoTj21O1GnVUQVmS
-	 LUu6gOGFEkU4Q==
-Date: Tue, 22 Apr 2025 17:51:45 +0100
-From: "Alan J. Wylie" <alan@wylie.me.uk>
-To: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Cong
- Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Octavian Purdila
- <tavip@google.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@redhat.com>, stable@vger.kernel.org
-Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
- htb_dequeue
-Message-ID: <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
-In-Reply-To: <20250421210927.50d6a355@frodo.int.wylie.me.uk>
-References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
-	<6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
-	<20250421131000.6299a8e0@frodo.int.wylie.me.uk>
-	<20250421200601.5b2e28de@frodo.int.wylie.me.uk>
-	<89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
-	<20250421210927.50d6a355@frodo.int.wylie.me.uk>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
-X-Clacks-Overhead: GNU Terry Pratchett
+	s=arc-20240116; t=1745340844; c=relaxed/simple;
+	bh=P2Cwn0mIOA//S9MJQ9EVspSybWtsYxxbfjWoCZdfSP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UicUjVhr7qYzATBiOG5rDmrtfvxHDAqPe8YiSYqru3jbAcioNIJCVlyjK5obyg/kVFSKMiMdafr7iPJ0gOxcL4x1hKkC0W7lJGz5ATkfZBJkrThKphzqGoBMYoq+AN9y7yKhadviW3VnUzP3vTbuIdz5q5WSMp+auqCWIdhoycY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jv0b3A7e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22726C4CEE9;
+	Tue, 22 Apr 2025 16:54:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745340843;
+	bh=P2Cwn0mIOA//S9MJQ9EVspSybWtsYxxbfjWoCZdfSP8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jv0b3A7eixAfLOFmtbhzTtlj0A9zNqDP5eDF5XeL4ZVW0rO0sikXGgjhQYtJ0E2Rh
+	 RomgmmCSuzTp0TGIxIW4yS8z0BtYoWqx/BQ+bFRTEQAblTnFTHXrT7CpG+Cbs5aKEG
+	 VpAbxzujzisvidpetv70C/PcM3+zW/OQ/DOwnPGrAcnQT2czsllkoi31LvzpEBXWDn
+	 SuRInvTp6uLX9D7ld1F2wep/aQpdTdhu6vJaZ0S0nDjdajiNyysMTuoSOejkdZFB4P
+	 mpkiQmZRf92ROMKT3ld6LFV1J2ufylr3DYlxtN0h2kRJHOa0maR2spYiYLn0fVlamD
+	 Q4ND93qV3U7Fg==
+Date: Tue, 22 Apr 2025 17:53:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] net: dsa: rzn1_a5psw: Make the read-only array
+ offsets static const
+Message-ID: <20250422165358.GJ2843373@horms.kernel.org>
+References: <20250417161106.490122-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250417161106.490122-1-colin.i.king@gmail.com>
 
-On Mon, 21 Apr 2025 21:09:27 +0100
-"Alan J. Wylie" <alan@wylie.me.uk> wrote:
+On Thu, Apr 17, 2025 at 05:11:06PM +0100, Colin Ian King wrote:
+> Don't populate the read-only array offsets and md5_init on the stack
+> at run time, instead make it static const.
+> 
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-> On Mon, 21 Apr 2025 21:47:44 +0200
-> Holger Hoffst=C3=A4tte <holger@applied-asynchrony.com> wrote:
->=20
-> > > I'm afraid that didn't help. Same panic.   =20
-> >=20
-> > Bummer :-(
-> >=20
-> > Might be something else missing then - so for now the only other
-> > thing I'd suggest is to revert the removal of the qlen check in
-> > fq_codel. =20
->=20
-> Like this?
->=20
-> $ git diff  sch_fq_codel.c
-> diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-> index 6c9029f71e88..4fdf317b82ec 100644
-> --- a/net/sched/sch_fq_codel.c
-> +++ b/net/sched/sch_fq_codel.c
-> @@ -316,7 +316,7 @@ static struct sk_buff *fq_codel_dequeue(struct
-> Qdisc *sch) qdisc_bstats_update(sch, skb);
->         flow->deficit -=3D qdisc_pkt_len(skb);
-> =20
-> -       if (q->cstats.drop_count) {
-> +       if (q->cstats.drop_count && sch->q.qlen) {
->                 qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
->                                           q->cstats.drop_len);
->                 q->cstats.drop_count =3D 0;
-> $=20
->=20
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-It's been about 21 hours and no crash yet. I had an excellent day down
-a cave, so there's not been as much Internet traffic as usual, but
-there's a good chance the above patch as at least worked around, if not
-fixed the issue.
-
-Regards
-Alan
-
---=20
-Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
-
-Dance like no-one's watching. / Encrypt like everyone is.
-Security is inversely proportional to convenience
 
