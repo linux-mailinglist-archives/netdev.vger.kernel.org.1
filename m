@@ -1,159 +1,143 @@
-Return-Path: <netdev+bounces-184610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CF3A96604
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:33:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39070A96611
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66D001891EBD
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:33:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76EDB18994CA
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3791F0987;
-	Tue, 22 Apr 2025 10:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056EC1E5200;
+	Tue, 22 Apr 2025 10:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RU9ruP9p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7194333062;
-	Tue, 22 Apr 2025 10:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309B31DDA24
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745317979; cv=none; b=Gf8nH2BYWH8ZARLW40+6YuZ67wI0taJLZdgB0SBJPFnVucXvpI+V4W5AKLQssDOgyZykNmUjKf78BlESWXjve4SpJJCGPjWag19DrBrDWmfESueMfu42VqJLP2S9yFBQHpxnUMLboL5uYkQXu/MXXLqn4OY1lN+hmI9h1EJd8MM=
+	t=1745318220; cv=none; b=kP5pGVDjT2OZgFMdI/15w/NRy7fz1VNlJ/lRy44Nxis3WOWhkjSUHzRgY9mzQe/5Ouryo8WXozegsa5q9mfWAZO1dzAMU0qCgiDoThgF0HsFWJBwuFW0IEayip8+whApLyTEiTMNybZaEhfEQc1CSiNcYae7o8g2brKzCyplCTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745317979; c=relaxed/simple;
-	bh=c74m9nJuaHqBhP0VHLohLK106T0cVKwkPnarj1bL+14=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LTlD8nuZT05jh2VS84rtDGShihTEAa0bp2FnjmIoe1jV2XES8qmQNHOdM9kT4H/Ci3q+lPgNliDr1wa6/b2+pbimPFW/o0vejUtoQXqobu6QmPHSkbRc5JI2q7R2YPeWLYj4coJ18yVXc2bGmZaEp8zBn8DA1VstQfU4PQpeLgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso2291894e0c.3;
-        Tue, 22 Apr 2025 03:32:57 -0700 (PDT)
+	s=arc-20240116; t=1745318220; c=relaxed/simple;
+	bh=lISL3NiWw4mvoLJ62jQX5IcFRZEuxeHYsVe/7mScNZI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ngxk4P5SStRVexL+XqGPRVVUIQwe3YrpGwqxrTpiWr6h1fJAL5ZKHHCqh+z4V2I7cSHZfgfLh4e2yN4TpRgpupjqrHvoVxWAJBERSQvWH6SEGUzmCutfb74WYzfYre/fvxCdMvegEblB19PvVU/qhvvXjZVxMX18TRjp+DV3G08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RU9ruP9p; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745318217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O3XBRVopizL05RbM7mWrrbeHqC8XI4fazOIg42s2uyw=;
+	b=RU9ruP9piDrBf4nDt8v1PXr7rjmYTP98hyLJ4noV2aKRhu8VMe/NS1ikXYfqMa3nKe4UB2
+	ExAwAXS7mjkDfAs6XiVLR28yjCWZkNh4Hh6hdaL6x89a6jqAIeR/WC1snxGWcW21uQ67tq
+	zk0W52ZNAZCOLwEx7OnEf1QozNFU7FQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-W-FOc022OZC1q5ZKzof5AQ-1; Tue, 22 Apr 2025 06:36:55 -0400
+X-MC-Unique: W-FOc022OZC1q5ZKzof5AQ-1
+X-Mimecast-MFC-AGG-ID: W-FOc022OZC1q5ZKzof5AQ_1745318214
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43efa869b19so30288635e9.2
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 03:36:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745317975; x=1745922775;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7vytO4TOm8gf3AQur2lnADNQtT+Rd1ucyY5nITKDwjU=;
-        b=Tzoc77CzTP4UPUWaOiHGTTjgOX24WbVYNv4x6omF8n7WmXp9bvVRuQFZEKLqRT0YF9
-         HqX4tk/sM1hIdHLSXkvUsH3mX64I9GK16x1yMJAxDY2vc6NVERrSl2NKvh18HpJsiPaq
-         W79mWODJFJV0QQXlssenDq62wsgxDLg+nsGpNGLLum/iAISeVYqq1M+pp6JdgfSC8un3
-         k3ouL37Eglm5Ti5ZyN4WqMh3GMc8cX0jMktFIxADr10KQYe9WIYAnuDQRzMw1YfI3L9N
-         8mQ8WXcAcXpUlh3DfOZ413kwnzigtU7xtxlGzOtls3eItCwBLb1Q0mHaufVXm1r2q700
-         F2RQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOsMsXhZsu5D2cnHz+tg1uKwr9TmOjK0l/ueeHfsElQQ9upvO54gsg7uW3OafBOz9agzWfO1BgEG8J4Job@vger.kernel.org, AJvYcCVV3R6gSu2K6GCcr4IQGpZsYlNmbbXLPwCvno4mFy1lXHGH7tO1/KdMIGrg8H+mHwceF0/C+yxw@vger.kernel.org, AJvYcCXSfjx+atlzaitIhQSY+ravDyri301Z3yN86qG8qiiwJfyNC4HN3HuQ7rtJwANC2FAvbgoOMK7EONo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB4QFOMU1f2aQyItNzhOx9jX93Mqr0HttsEGj4gVaXBsRbk+Em
-	7PiZMuYjuM6JcP3bJG2wIWNpxicuA3Ge0AGJlEnubZy4Yb+0I3us5QZxOdlS
-X-Gm-Gg: ASbGncsQfED4kxvuT1T7efUOw7Ug56Ix+cgUpjx+z+6hXwhRHD+L09n9s3iU8p8zsPs
-	Z2CGBbjIiMRHCjrQiHBMvd1lO1CTD2fdw78SW5drPrKpqYmZ0EACsyHz507hJjIlpWgZm64GooO
-	UYiN0n6CuN1hA7W+aPK045obICxgwPGhI49oNtxkvr4cs3XlaQIGPWUjFuAmtHkPY30nlTEXsXn
-	m5nUXZYcLtZbykjKKlWRegpfj0OCBdYi2brFjxfRQ1yUurW48wueMn2NnBBIFHXdDSUqjHoGWRn
-	E9BHMqjdBV2K30MHfkJgxNYCfYgE8978QZHf5b+QvhLLUxqAiIP9ibuJMnqx5IlnV+OS7JJQjRQ
-	dw7Q=
-X-Google-Smtp-Source: AGHT+IE3JysLBLtZnmXPR/CJPtPBNkRh0Nc6lR8/IZOWBG4GMc7vXB5TMHWNk+pke1BmAlMSyABMBg==
-X-Received: by 2002:a05:6122:3c8c:b0:527:bc6b:35bb with SMTP id 71dfb90a1353d-529253d6bb4mr11751584e0c.3.1745317975632;
-        Tue, 22 Apr 2025 03:32:55 -0700 (PDT)
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com. [209.85.222.50])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52922c1025esm1884566e0c.13.2025.04.22.03.32.55
+        d=1e100.net; s=20230601; t=1745318214; x=1745923014;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3XBRVopizL05RbM7mWrrbeHqC8XI4fazOIg42s2uyw=;
+        b=jN3CyZeL74BnV/H59spV0jtkKgXEgG0/KnpRjUw444Ex/DI4q6NVTfYHqQa4HMj+kV
+         s4X/FzO7B/UTt2BaVpPeM/fgFxR4R34ylfooYTM4FQQ1JFCzCePW6Cj0iJ3L682rs6h8
+         M7GoH6BLCYhNFKdbzkjiOFuAOsxZPS0g8a8ruzBxFR+YMQ06UHwJxR4A+jXgeFgSZZRB
+         gQtSYM8vSMXmc9ivhWIjvnfHW8NU2BVf72+GEACfHA+lIPBPPYopdW25PXvSe5j9fMko
+         SQNbuD06Jg1T0URtED1bZLV1cb/dJ3rSfhRkKu/64tqlhpEyak/ZciXhD5OTLG9J9Ixj
+         4IPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWC1O3Tyk5yw9gXM3Md7v3bvNHhODNrKAOTPqd/WEzqRTp17ju9QcLIKIW7vIY3b6e6azxmxnQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpBZuUcJcvrujKRkVnw5cAm0OZ98KpuJAmEjdUnsOQHhC/Y/Pv
+	VmsyJgAgiFF8GradzzjbCw1a/jxfsHX5UiJbWmQTKhRUxoLYH6oxFr0BD7OWxs45kcDnM2bn2Zb
+	GglZVSZ5U1smWnGLcgY/Il/VOTJjszTj/MqNkQP6nUu+mRFi+GZy/5A==
+X-Gm-Gg: ASbGnctcmD3+GMroAyeJYSEhbeuVcPErnUpZ6aXufPrQfH6dkC1Ak8ZHkKfvw09ms6H
+	qcwFvT+l9wu0IxNXNRcUxH3bhAMYeTZsfiqBvhjMAauN39pd49YWS8S9/LoFzkNFW0KOV/20k8U
+	gw2t1QragSV/HMwsN0VsGd6T1VrfHn/CLOlwQQ6Ira+TLnOoPGdGRafptlOB7iuWGRZKGevZPST
+	s80kpPiFkNTK82VMbJLpynOhnjC8zljN/5G+U5X+kVFhAPboYtLmpaFU5WfFBE+l15i4AnctDNm
+	h95RPECge0Und9HOqA0CY7zWc4MAGtni/XcL
+X-Received: by 2002:a05:600c:a088:b0:43c:ec28:d31b with SMTP id 5b1f17b1804b1-4406ab9767bmr174966365e9.10.1745318214298;
+        Tue, 22 Apr 2025 03:36:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPrwg9VkOHDbgQPuydQXO/FAlkVS9kR0/xcjl/pevPw2FccxA7aaeSvgcnpK7uvnK2aFmoIg==
+X-Received: by 2002:a05:600c:a088:b0:43c:ec28:d31b with SMTP id 5b1f17b1804b1-4406ab9767bmr174966015e9.10.1745318213813;
+        Tue, 22 Apr 2025 03:36:53 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-86-8.dyn.eolo.it. [146.241.86.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d5ccc97sm170734155e9.25.2025.04.22.03.36.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 03:32:55 -0700 (PDT)
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-86b9d1f729eso1908865241.3;
-        Tue, 22 Apr 2025 03:32:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUIGftBiLXJ6OKSxYTlWEden5c5H/2Xt7qIJCAOJr3yzXlYNHFVgT7SLxT0SArYEHL76bxkYkzyJL4=@vger.kernel.org, AJvYcCVDjG85qZl93PBR5twTWPWzqSsaj6KINrLfCEcKYWop3XCDrcc1w1JKBzxcJk672gYgQDAzvYBE@vger.kernel.org, AJvYcCWjkmr1blAAFxnLNQJzO4E4FC4g7q4pw2yr2tASPEXYunQWZex5bWX/kNFo8hXntyTFaCRB+5t1KeD5I6/Y@vger.kernel.org
-X-Received: by 2002:a05:6102:3139:b0:4c1:c10d:cf65 with SMTP id
- ada2fe7eead31-4cb80232571mr8147349137.25.1745317975059; Tue, 22 Apr 2025
- 03:32:55 -0700 (PDT)
+        Tue, 22 Apr 2025 03:36:53 -0700 (PDT)
+Message-ID: <f5d244d2-acd4-4dfc-8221-93d2a714b97f@redhat.com>
+Date: Tue, 22 Apr 2025 12:36:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <PN3PR01MB9597382EFDE3452410A866AEB8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <PN3PR01MB9597B01823415CB7FCD3BC27B8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <CAMuHMdV9tX=TG7E_CrSF=2PY206tXf+_yYRuacG48EWEtJLo-Q@mail.gmail.com>
- <PN3PR01MB9597B3AE75E009857AA12D4DB8BB2@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <CAMuHMdWpqHLest0oqiB+hG47t=G7OScLmHz5zr2u0ZgED_+Obg@mail.gmail.com> <aAdsbgx53ZbdvB6p@smile.fi.intel.com>
-In-Reply-To: <aAdsbgx53ZbdvB6p@smile.fi.intel.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 22 Apr 2025 12:32:42 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXuM5wBoAeJXK+rTp5Ok8U87NguVGm+dng5WOWaP3O54w@mail.gmail.com>
-X-Gm-Features: ATxdqUFtFyy2GYQo3KtAmKWE1aHynw34_2Dg7VBWf7uTMs4ERXRYeYaDF1kqp6E
-Message-ID: <CAMuHMdXuM5wBoAeJXK+rTp5Ok8U87NguVGm+dng5WOWaP3O54w@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] lib/vsprintf: Add support for generic FourCCs by
- extending %p4cc
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Aditya Garg <gargaditya08@live.com>, Hector Martin <marcan@marcan.st>, alyssa@rosenzweig.io, 
-	Petr Mladek <pmladek@suse.com>, Sven Peter <sven@svenpeter.dev>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Aun-Ali Zaidi <admin@kodeit.net>, 
-	Maxime Ripard <mripard@kernel.org>, airlied@redhat.com, Simona Vetter <simona@ffwll.ch>, 
-	Steven Rostedt <rostedt@goodmis.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, apw@canonical.com, joe@perches.com, 
-	dwaipayanray1@gmail.com, lukas.bulwahn@gmail.com, Kees Cook <kees@kernel.org>, 
-	tamird@gmail.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org, 
-	Asahi Linux Mailing List <asahi@lists.linux.dev>, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH 1/2] TCP: note received valid-cookie Fast Open
+ option
+To: Jeremy Harris <jgh@exim.org>, netdev@vger.kernel.org
+Cc: edumazet@google.com, ncardwell@google.com
+References: <20250416090836.7656-1-jgh@exim.org>
+ <20250416091513.7875-1-jgh@exim.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250416091513.7875-1-jgh@exim.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Andy,
+On 4/16/25 11:15 AM, Jeremy Harris wrote:
+> Signed-off-by: Jeremy Harris <jgh@exim.org>
 
-On Tue, 22 Apr 2025 at 12:16, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
-> On Tue, Apr 22, 2025 at 10:43:59AM +0200, Geert Uytterhoeven wrote:
-> > On Tue, 22 Apr 2025 at 10:30, Aditya Garg <gargaditya08@live.com> wrote:
-> > > On 22-04-2025 01:37 pm, Geert Uytterhoeven wrote:
-> > > > On Tue, 8 Apr 2025 at 08:48, Aditya Garg <gargaditya08@live.com> wrote:
->
-> ...
->
-> > > Originally, it was %p4cr (reverse-endian), but on the request of the
-> > > maintainers, it was changed to %p4cn.
-> >
-> > Ah, I found it[1]:
-> >
-> > | so, it needs more information that this mimics htonl() / ntohl() for
-> > networking.
-> >
-> > IMHO this does not mimic htonl(), as htonl() is a no-op on big-endian.
-> > while %p4ch and %p4cl yield different results on big-endian.
-> >
-> > > So here network means reverse of host, not strictly big-endian.
-> >
-> > Please don't call it "network byte order" if that does not have the same
-> > meaning as in the network subsystem.
-> >
-> > Personally, I like "%p4r" (reverse) more...
-> > (and "%p4ch" might mean human-readable ;-)
->
-> It will confuse the reader. h/r is not very established pair. If you really
-> wont see h/n, better to drop them completely for now then. Because I'm against
-> h/r pair.
+The commit description is missing.
 
-I am not against h/n in se, but I am against bad/confusing naming.
-The big question is: should it print
-  (A) the value in network byte order, or
-  (B) the reverse of host byte order?
+> ---
+>  include/linux/tcp.h     | 3 ++-
+>  net/ipv4/tcp_fastopen.c | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 1669d95bb0f9..a96c38574bce 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -385,7 +385,8 @@ struct tcp_sock {
+>  		syn_fastopen:1,	/* SYN includes Fast Open option */
+>  		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
+>  		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
+> -		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
+> +		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
+> +		syn_fastopen_in:1; /* Received SYN includes Fast Open option */
 
-If the answer is (A), I see no real reason to have %p4n, as %p4b prints
-the exact same thing.  Moreover, it leaves us without a portable
-way to print values in reverse without the caller doing an explicit
-__swab32() (which is not compatible with the %p pass-by-pointer
-calling convention).
+Worth mentioning in the commit message that this will fill a bit hole.
+>  
+>  	u8	keepalive_probes; /* num of allowed keep alive probes	*/
+>  	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
+> diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+> index 1a6b1bc54245..004d0024cd98 100644
+> --- a/net/ipv4/tcp_fastopen.c
+> +++ b/net/ipv4/tcp_fastopen.c
+> @@ -401,6 +401,7 @@ struct sock *tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
+>  				}
+>  				NET_INC_STATS(sock_net(sk),
+>  					      LINUX_MIB_TCPFASTOPENPASSIVE);
+> +				tcp_sk(child)->syn_fastopen_in = 1;
 
-If the answer is (B), "%p4n using network byte order" is bad/confusing
-naming.
+Likely you need to reset the bit on disconnect().
 
-Gr{oetje,eeting}s,
+/P
 
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
