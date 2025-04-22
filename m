@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 444CBA963AF
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:11:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD13AA963B5
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:12:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A8DD168FFE
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:09:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DA851888421
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E542F23A995;
-	Tue, 22 Apr 2025 09:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E653253F1B;
+	Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G72da2Xe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ep8keecx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BB822A7E9;
-	Tue, 22 Apr 2025 09:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A045253947
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745312966; cv=none; b=oFBRlmBG8wtWsLGLwaZXT7RN+hw71961vW/Mx4NsI7mgNojObwBoEdwXHVaeLp59HCH8d+MCcq6asEFl5535BBpjplqPb+IF0C+KXqqiKhCsqh8Py6ZmK7iKlumHmXBFd10wlD1iNrZ3zt+dm+9aqs2K3rNVpc/MxddjTHMIutQ=
+	t=1745312968; cv=none; b=Zh8q9VTi3iFKYHnD6wiN1BosPN2fTkA1wsvOjOX4WCLGHNlrnOlrFH76ixY+a6a9DDD3kGjsgFHRjueyiniOCWxKiyRFYDIEuxuaGu2bgNs3KSBhJFmCcHjKdwB5rwDzCoGHZilrWnyukhACP6wUD7BwDDMXXesR7roXeYATaOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745312966; c=relaxed/simple;
-	bh=mFSwkrwc/woqReWcRrFiToGptgj6JqGT5qUZ8w0yzC4=;
+	s=arc-20240116; t=1745312968; c=relaxed/simple;
+	bh=sUEAWHCQA+dOg/EDk5/UP7oO24mVup92Rfh3+Pui2tg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j58kxJsbk9HroLgzEQfq6v5avm3Sz+5dzMajFpC2KWiWxeUABJ+aIVySjLc7ShXpa8Zwm4egY7N8TEoVEJXlidsxb9OrfIKybIP035QNxiwJuKbL/7rl4ze3IXdJ2WnLRTaTOExc13OX1GpBv+oqUrjGGZMLmXBlXfmWLbJFfMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G72da2Xe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 839B6C4CEE9;
-	Tue, 22 Apr 2025 09:09:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uKREwpdl2Fyh9+yavkRyejQKnvnOd+NOXUE5aezeh473gblIEqwN8HmExO+l+xadVM+oGPy0S89U03wHHa3J4g/XGD0HU5Ek/LV3Jz73F6lDHBfsGtJvKKHF3rC85dhUQAwJHkH59hwLOs2thkrY2Cw8Qzk+gBlGbg7FQEsPw4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ep8keecx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19F48C4CEE9;
+	Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745312966;
-	bh=mFSwkrwc/woqReWcRrFiToGptgj6JqGT5qUZ8w0yzC4=;
+	s=k20201202; t=1745312968;
+	bh=sUEAWHCQA+dOg/EDk5/UP7oO24mVup92Rfh3+Pui2tg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G72da2XeldJj1UW6a12w3l89rBt7tfbC0GAHsKxGXq5cDoel8/3end4ShFVgDGk7F
-	 R7tui1x9mW/eg82FVn7oCpOUm0ubFuN3zWlMjXzuAykDXexnl25q9XA2bkFX5Faxj4
-	 UOXSS2jExqUda3NcBOYo3eUs0NLboTEMu5DiRcEbP2xUSkyXvPKRBQTpIcLGzjPiW8
-	 FTlSp7RK1PT1ZWJqou2Yuo9r2L0GR98AP1h7NLEgg+JMat4+oHejT86yefa//T9LEa
-	 WzivRLcXqyMI2db7VfjL5jOzYAc7sSOIZQqpjK2ADlkmk/3LdE3GZDTKi/Hm8VgDqx
-	 Vgo59FAFX7Qbw==
+	b=ep8keecxfVCsbBwZicDUrVppig2hrDJr5eejofH7JNNn7CghFR5MK0Kvv67gRMnN8
+	 6gOLaFvkiAMGiXeBQOWdLjdC/24YHQ5PVjTzy/q4XSbq/DmjOkP027pZoot3IqSIbn
+	 Ywhut6ISS4dRKAvsd6d1EPh0mk1Kaq8OJZpl9tK4m1/LRV7pWU1fEFLbMEV2XPg/pX
+	 7fNwx/1smiHGD6W+dQo4BPpVo5pJadl316pmK/Gwd6lONfGWisk/KdU6Fa5urhMIYx
+	 8VfmOAYKZwR62/t6EDvosJN4r7xQlkVt7e2gTUtfEVeajRO9MqGx8RkQBOU8z/rVcZ
+	 vYjckoVO4u1Cg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DD739D6546;
-	Tue, 22 Apr 2025 09:10:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEBD439D6546;
+	Tue, 22 Apr 2025 09:10:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,50 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] ENETC bug fixes for bpf_xdp_adjust_head() and
- bpf_xdp_adjust_tail()
+Subject: Re: [PATCH net] net: fix the missing unlock for detached devices
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174531300475.1477965.2995189751191314193.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Apr 2025 09:10:04 +0000
-References: <20250417120005.3288549-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20250417120005.3288549-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, claudiu.manoil@nxp.com, wei.fang@nxp.com,
- xiaoning.wang@nxp.com, vlatko.markovikj@etas.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, lorenzo@kernel.org, toke@redhat.com,
- aleksander.lobakin@intel.com, imx@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+ <174531300624.1477965.9431180923272525735.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 09:10:06 +0000
+References: <20250418015317.1954107-1-kuba@kernel.org>
+In-Reply-To: <20250418015317.1954107-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jdamato@fastly.com, almasrymina@google.com, sdf@fomichev.me,
+ ap420073@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 15:00:02 +0300 you wrote:
-> It has been reported that on the ENETC driver, bpf_xdp_adjust_head()
-> and bpf_xdp_adjust_tail() are broken in combination with the XDP_PASS
-> verdict. I have constructed a series a simple XDP programs and tested
-> with various packet sizes and confirmed that this is the case.
+On Thu, 17 Apr 2025 18:53:17 -0700 you wrote:
+> The combined condition was left as is when we converted
+> from __dev_get_by_index() to netdev_get_by_index_lock().
+> There was no need to undo anything with the former, for
+> the latter we need an unlock.
 > 
-> Patch 3/3 fixes the core issue, which is that the sk_buff created on
-> XDP_PASS is created by the driver as if XDP never ran, but in fact the
-> geometry needs to be adjusted according to the delta applied by the
-> program on the original xdp_buff. It depends on commit 539c1fba1ac7
-> ("xdp: add generic xdp_build_skb_from_buff()") which is not available in
-> "stable" but perhaps should be.
+> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] net: enetc: register XDP RX queues with frag_size
-    https://git.kernel.org/netdev/net/c/2768b2e2f7d2
-  - [net,2/3] net: enetc: refactor bulk flipping of RX buffers to separate function
-    https://git.kernel.org/netdev/net/c/1d587faa5be7
-  - [net,3/3] net: enetc: fix frame corruption on bpf_xdp_adjust_head/tail() and XDP_PASS
-    https://git.kernel.org/netdev/net/c/020f0c8b3d39
+  - [net] net: fix the missing unlock for detached devices
+    https://git.kernel.org/netdev/net/c/d3153c3b4270
 
 You are awesome, thank you!
 -- 
