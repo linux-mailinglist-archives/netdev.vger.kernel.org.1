@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80EEA963CA
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE899A963D6
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 246F63AAE0C
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:11:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 812791694AF
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C009E25B697;
-	Tue, 22 Apr 2025 09:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCEE25C6FE;
+	Tue, 22 Apr 2025 09:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WF2t4odc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXMUF1bd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9941725B690;
-	Tue, 22 Apr 2025 09:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1525825C6FC;
+	Tue, 22 Apr 2025 09:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745313021; cv=none; b=IvxteeNFNWJAHJwDVLF5Q1iObGjhtlKfCNPxLUPxbfcl3eIGk+nk5y0VUrOsH9Dhlr7P79sh/vW9HDMGQmYAXrgoSmnIQMyF1tauMhNkj/+9n53ExTNB8zmLfEZ1C9TprA9ktRm0hwMEzWRDXsLcB04iUf39C7DRwqqMjYCfR5o=
+	t=1745313023; cv=none; b=I7TUvGAVZtVAhC9Sij3EfCiOC9FKyYkkQy2fEga9Y2qum40ob+2sRFqaLxv6c02v6/PeV5oH1gMHbQgJ0R09kC1NWFdSCBabPtzRKCl3LxLCz+jnc4zORBOfzO+lf4CXBvpk8dJov+RfiV0TdCHIwwaQt7STl7k0Jgy15BHgkmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745313021; c=relaxed/simple;
-	bh=rTFl97stjjs2a2UIbOlESEtFYiAc0rhT6u+bOAyltWw=;
+	s=arc-20240116; t=1745313023; c=relaxed/simple;
+	bh=mqyxRKHdVm2N5M3+F1q6B6mbV4al+YiJAAlrjXzPB/Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iGUTD1Inrt6XIkoZMTlk/6CmkpAY9osNGzNhCMu7/FzsrDUVhDSPCTxz0bj22idVWSXRsm0yfiB5ijDvPB5rff5B5OWhI2PLnv0FKdPkyeZ3Ifc49eaBBuibEw9sluzHmopjTlHM7nOH+8kovPXexFmE7BCs7uXd73OmdVklcFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WF2t4odc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FE8DC4CEEA;
-	Tue, 22 Apr 2025 09:10:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CGPbsyZMTnuPh7Uyt8TqGPJSnr65+K/8+q1Q5w5ThmyhGoizGukAuqNo43xYBKw5Ux2dApb9bMPQ5n5J0Tem2+/30zmA/UHVGnVEA5ho4xotOxiN1qM41KBfvtSwIyt6mYMLtSJEyoMyAAPFQD44GfwcqkVIMCuJ221X+Q5c+u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXMUF1bd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AC53C4CEE9;
+	Tue, 22 Apr 2025 09:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745313021;
-	bh=rTFl97stjjs2a2UIbOlESEtFYiAc0rhT6u+bOAyltWw=;
+	s=k20201202; t=1745313022;
+	bh=mqyxRKHdVm2N5M3+F1q6B6mbV4al+YiJAAlrjXzPB/Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WF2t4odcFN3TY6plSYONe3IqBqimE+ihFfPB1fJrwx790v8tCJh0z6EhC7fO2NiDZ
-	 d2sEnNPeGDEcmFLTty00SnKAac0Eg3szH6rVtxoRvMAiGOHYygI0FTLTno3mvhQMY6
-	 0MbfLzTAJD0WPIVRThzIoTx8JI0bniVR1sKtlqA1R5XwtUzzWM1lCnH0TSGpAGNJiO
-	 wJdPJio9pzxbKZqt/aLt2wdwzKEpi3uNYyFgdlWu5d3Ft4lE2rWXfxfucesKbNaNIu
-	 t12njwDz9WrYDR9zRZVWHZyafk7s5vEp5IVsKk0SYEQNFkyiFmobaPlE/wN+q7D4IM
-	 aQQ8Zk4SC8UHQ==
+	b=DXMUF1bd9mPkr+Coa2NLSftdObfmTb2NXnoUcIKYJRi7gbv84OO6gLITSI2d31Wkc
+	 +lmldsJqywqSP+2XzUsyfrTExHhuXMVvqDJuPtUN48b9nmhsIvjnbFY+UebWN4Rbob
+	 gvY24I9PvRne82pDZ55eVXJnUs6JGKMOM4CXPd83Ty4RabYhUwdDg+dwE9Dv0ed/9p
+	 1yjpOnNJfTWB1x+Qr/2MFFpKkzK9AuUlTNWNvzkPOzzdD1yQatRXlnwcPsaIt1H2LA
+	 MEey3vzIo7MgfdFPr4wSDiNnHa0NRoeQnNUWSXULt4J23lKTjN8pb5Lhu34YK4LCee
+	 A37zP/xXDHzVg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDC439D6546;
-	Tue, 22 Apr 2025 09:11:00 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3440339D6546;
+	Tue, 22 Apr 2025 09:11:02 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] s390: ism: Pass string literal as format argument
- of dev_set_name()
+Subject: Re: pull-request: bpf-next 2025-04-17
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174531305924.1477965.8234488898422063716.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Apr 2025 09:10:59 +0000
-References: <20250417-ism-str-fmt-v1-1-9818b029874d@kernel.org>
-In-Reply-To: <20250417-ism-str-fmt-v1-1-9818b029874d@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org
+ <174531306075.1477965.2610305807611704106.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 09:11:00 +0000
+References: <20250417184338.3152168-1-martin.lau@linux.dev>
+In-Reply-To: <20250417184338.3152168-1-martin.lau@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 11:28:23 +0100 you wrote:
-> GCC 14.2.0 reports that passing a non-string literal as the
-> format argument of dev_set_name() is potentially insecure.
+On Thu, 17 Apr 2025 11:43:37 -0700 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> drivers/s390/net/ism_drv.c: In function 'ism_probe':
-> drivers/s390/net/ism_drv.c:615:2: warning: format not a string literal and no format arguments [-Wformat-security]
->   615 |  dev_set_name(&ism->dev, dev_name(&pdev->dev));
->       |  ^~~~~~~~~~~~
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 12 non-merge commits during the last 9 day(s) which contain
+> a total of 18 files changed, 1748 insertions(+), 19 deletions(-).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] s390: ism: Pass string literal as format argument of dev_set_name()
-    https://git.kernel.org/netdev/net-next/c/199561a48f02
+  - pull-request: bpf-next 2025-04-17
+    https://git.kernel.org/netdev/net-next/c/07e32237ed9d
 
 You are awesome, thank you!
 -- 
