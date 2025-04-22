@@ -1,214 +1,196 @@
-Return-Path: <netdev+bounces-184697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08825A96F01
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C288A96F0A
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:37:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B84216B2BA
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:33:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA22116AFEB
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09FC25EF9C;
-	Tue, 22 Apr 2025 14:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905BA28A3E1;
+	Tue, 22 Apr 2025 14:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="jkr4Tisv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePgqBsz"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2095.outbound.protection.outlook.com [40.107.223.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF355FB95
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 14:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.95
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745332418; cv=fail; b=fXgVe9CY2u+hnuXyCcYCC0GbMLRLuERqvuPkiTYWIgsYStNMdK2godcWvefn+lI1h3g4KSoL9l3nNYhDZZZruKM2hJE5aXbtkPDvf48uvAsTP+i0huCf94PV2vjDNjbADQ0NomWEMIej5MbUpXKl/ZKltR8+G4lW/TXRBQG2cSc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745332418; c=relaxed/simple;
-	bh=0chFxYrJKcIsprUfpxwCt9HXhL9Y3fpjfm/McJ/8k2Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=VCBSIk153wyb3EA0KQNh+DMrkLk5bV1J6KzTIQMTL+/AEWrGLfUg3Mn4pPi6au2C+IPNAtFVdKfGhyeeIp6hC+fjAf8dCRcVbN1fgKOtgCVqiChj6QK3xOGDNEIc1ZqUNndMHxrpYvulDD8jL7SvMgldPsE/9xLsC8S/gWLOQQQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=jkr4Tisv; arc=fail smtp.client-ip=40.107.223.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S69/OhBujgsD5tnDg4clf3sQrw0fyKWZa7K2CwRpu+I6e4Qaiw1p50nzuhAwqZ5jADk0t0CYELhdicCvbnyHGejQQH8W0GczR36dd1Tp4Ei55f5++0GiVFyxKU2a2M5msiv2pe0g+uVV4FLypgB45Gx7PT/+Q9i8wGIYDA8BAgnywI7RXezDi8cniBD+7nECwQGmOSUbQWUe+efpOp2kwFvRBy8RuPrGuLoI8K+itni6RpadAIeTZgYTu/BtoHqpwD/HM3Zm5maU0+uykQ3drUQHMMafsgDnWnl2i5S8aUb/LiegNUMyNohra8v3o7+AMVYsmJL++MllpMkn/1FdYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=91qL6Oe4p46Ti/1XHRQK4H6kqohRdGJlYQb7x/bEcas=;
- b=GWMFQE2OtaN+J7Tumhk3odWbo5SEBI0J5F3Zez78N1w7NhIk+oytFDdrb5a3WI0OCcB1BnQ0uMOf1pn+D9Kfdstyct6g5ybmBd6N7ZC6TPt/4AKjcSBILrUhH1UlN/6Bxff2UjyiCNdEQXQSfuhwBS4aLVsEjhMRv8Rpu4kknj9fwTQKj08CfsV/vNKY99cGofrhwMnQefigsVKU/9Z0ywir1cp35I3esUo6swlQ+EZeimwXz6Fhefyk5yf7wL0i9rkSV84xlNbHU51lmHTfpCj5QZzM0XstSarAKhtUDuXAQFRNb8OPzaAtyvglOFo0OdTSiAuN7Kf/APFATGJJrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6E724C061;
+	Tue, 22 Apr 2025 14:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745332651; cv=none; b=MNy9iiVrloG9yv2BMKvrFCyHBJ2ZxzDFgOUwlHob4sa15HaagWu0+zAUNcKJCBTOisCdLNZ+RAHdyFhIoreXg3cAvVyR3CMtfq3v5ayTxiB0euBBFSw31K42s+GJ1bgt34EhK7AfFElrt1t3l7z4tttt58CAAns0QLEh7DP9L+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745332651; c=relaxed/simple;
+	bh=xmX3wFn4yklfFDUdyFQ1DZ2SHZtonDRd61YMLJM3MpY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gt1/LNSXDxAKs3QyoAslj3dmqDfw1cLN/vMKSoAxEXpz37SNiEJhoVd1WmpsYaOkjp20P4nqw9BBR7IsDP9XFktWYIlgRvcvw0IrDiQUpOQuXFI4qVr/8m70o9WIq7MPAMDORrmgrqygCFVUhnJSxzNT11yNHJA7aKhoTu0bD+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PePgqBsz; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf848528aso39299265e9.2;
+        Tue, 22 Apr 2025 07:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=91qL6Oe4p46Ti/1XHRQK4H6kqohRdGJlYQb7x/bEcas=;
- b=jkr4TisvlklQe9mtUvmC6jTBR0UNkGVErVicQUmZtZNBs1JNwDAuFqP0ECypy85TXiVc4ppqQjXkJQ0bXcgpWd0OQY72tm8slTd7lbZSQpSxbdPnqUIqMd3DGC+uLIwJjNWLoPmQ3q7ijvUKNo9kOGmgeb8xA7bTYa/G1zxd5l8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by CH0PR13MB5139.namprd13.prod.outlook.com (2603:10b6:610:f1::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.22; Tue, 22 Apr
- 2025 14:33:32 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0%4]) with mapi id 15.20.8632.030; Tue, 22 Apr 2025
- 14:33:31 +0000
-Date: Tue, 22 Apr 2025 16:33:21 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net-next v2 1/4] bnxt_en: Change FW message timeout
- warning
-Message-ID: <aAeosU3V02vWxD7Z@LouisNoVo>
-References: <20250417172448.1206107-1-michael.chan@broadcom.com>
- <20250417172448.1206107-2-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417172448.1206107-2-michael.chan@broadcom.com>
-X-ClientProxiedBy: JN3P275CA0137.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:ce::8)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+        d=gmail.com; s=20230601; t=1745332648; x=1745937448; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KVNRoD0RrSksEzR7JBfXuuef+5VZbaweuF4W6LsXFS4=;
+        b=PePgqBszsdiRkab072Hmjgb9Cx4J2FC5I1Nk7O6bxJIlkeeZmxwM3qy+MXQ9Ki4qmk
+         qrSxKTKcBhGitQTI4mAHG3dqMaQKf3xN3oXIfTOp5ucd+NrL5ICZqCpQ5LTSzSQjE1bQ
+         7Q0THaOwAlRko2U2r4aA+73xOIVqt73q+iKFDxsMoQ3JO6H3j3w6YIlhmxAThFDgLJQP
+         BLHrr18KzF/zO8alswywW2nNC60FPo4ORSxPLc5pKbaK3SkQdD9he2fAXf136eYI95fN
+         jgOCg6pht8StVlT+hvtjZH4nCARxmYpI5QWwcm3PGpuvt5f9AqySb/ye7yO1XHHycsZA
+         I/TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745332648; x=1745937448;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KVNRoD0RrSksEzR7JBfXuuef+5VZbaweuF4W6LsXFS4=;
+        b=l7uIAlwOB8nX8pIm8h8ON0shqahf2CjR0CrSZLobBZp2tljHkGlExhf0/vtu7MurwA
+         QWJMPPiJNI3m2Q6O3mtZTBj4+pUP8+ovn7CLjU1z8DoiEYuM6vIeNiZwnMOhoy9PWnnP
+         FdVQoK1f5IdEvZN3TyhM6xj1kX5z4z3X5F6G2loFOne41SUyayUnj7i3oh+19EqcNQQ5
+         I8/kzzo3OEqyx7IUgPGl5FSuSk5Kft2JWeQg0PRlRoNtUFQWApSyk0JhdX6IatP+2Fii
+         AXHDDW01yUWUfiyb6DolOK+52WSED6zMdgCmcQ1C0jZtHfoO49o2pWL/jBAd7rJffGTp
+         b9mA==
+X-Forwarded-Encrypted: i=1; AJvYcCUITHtbUQOrMdWrd1f9HJwhF2eaAiXkrfYVNBFSx8gjdvnhWzGdUEd+m5NBB6lcZmFHRcg=@vger.kernel.org, AJvYcCUN4NDsw6mzTZlzBk+hn43KjQDzYU0WV5ZHQEyArv+yiWvzzetVlmsnQh5crNA2gZOym46/Al08HN0DeqA9@vger.kernel.org, AJvYcCV4uSybK/JbuWSLkmHBiLdjA9rtctuv7oNmvkBTLbNoYqDLlI4MnchsmLTVLdZNKIEua+52OEfu@vger.kernel.org, AJvYcCVJVGA8rVK8TvsjeI5E8J9XcoBk4abWDwUauYTm2kLz3xb8G4+mxIfhQjZmSdoupURo3hY9n74tRgdi9kWcap68elAj@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyDj8teaNUiaTk+6eDCOkQ4nOE6kr2bJGrJ/gFFcbVUd2p0rUt
+	wI3IQTegNorKFI4liQ4UAJj7d47np+Ty2Do+qkFnTwBtfxlabK+vai6dyZdgm5zQtilcKcgw3RH
+	7GIajTJoDWBIlyo2KYpLjXXJcrpQ=
+X-Gm-Gg: ASbGnctfCyS5N+LjVRgt7vMQdyPPKKyp03A63oisCK2qv37brY0AmquQyAqeyrw2Zgm
+	foHL0GGPGJKYxH30rx6xLSHQAuYFDnGgHK2HXGnYzpdBDFNVXjIjnZweXquVwd2GwFpo4mbd3yK
+	gNK9b+yBBofIiq+CUiTvArE2mAwU/ufqbWjv29Ew==
+X-Google-Smtp-Source: AGHT+IG4Cy/AdgYd6cpiRO8xYSkhTRhh8bYXvxmR0r57jfYKceNU82XctCFA4+x4WBeXTAS2Qil7GfTxuYlsebAtqlo=
+X-Received: by 2002:a05:600c:1e10:b0:43d:300f:fa1d with SMTP id
+ 5b1f17b1804b1-4406ac62b75mr163192435e9.31.1745332647307; Tue, 22 Apr 2025
+ 07:37:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|CH0PR13MB5139:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a4c7102-8e96-4e84-5b98-08dd81aaa7b6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?F/zlUa1HS2tUoIBIUI5Mw8DN5fD1QB08xKZseoo02l+5vuNiFMImqOtLMvEC?=
- =?us-ascii?Q?Yp+E2kw6PMk6lzb1FLLAK5ccNqfGXuZoD9jKQV4WfFqfnrYtwzyH6eAIFhw6?=
- =?us-ascii?Q?PQdUYrUZwiPj8TK/kfFhGzX/C0PmZ/46twgneoBuo6/L42G14/0aKWXCnDse?=
- =?us-ascii?Q?blzL+HG2mbwib3emg5mrCvguw2dlDoBhLjUXfuXL1SKQHAFzBxwaES0GlLCB?=
- =?us-ascii?Q?J3q7bZ1hQ7rYcwrvTiQDFyMee9soKfkFcB/SqzMq/3Si+4ThgwjudX6pvKFZ?=
- =?us-ascii?Q?5t+3a3bpALc8tCgRtgAOtN/RT6z6uwdelIz+DTWZGyQzmmvG9M5IfxzNun6m?=
- =?us-ascii?Q?2qUEpQ0U88vx/61f6d1QOPDxK4GzMhYzlCc67DmOo2zvwwhNvRaHB7cBzsnw?=
- =?us-ascii?Q?t8y+yFXY+QFuq+2j1uzi5ehdNNipHlo1GBliIsEqgr55do6CODv4o49OEVHC?=
- =?us-ascii?Q?sjRvmjN4b6Qb9gHLxcocBgjyFLxiPJpMz6L6ReZ7jEHjRd4zaf8Sq6S5pW6b?=
- =?us-ascii?Q?ROwc6uY+iJX+I+4IFvidiZTTviyrdD6lDz6Kp8r/xuKHxYT1i9wu+F0KMS78?=
- =?us-ascii?Q?+zezlu3x0I0JHqI2Ia1G5H1rXKYSrUxQOU5WaxIw84I9wU21DCDwIMd6mNT7?=
- =?us-ascii?Q?Yr/h9pPXXXz0udVqOPKyK0RcqIdM89AMcWB7dc/q1upx4/S/31L5qZJ+Y5aa?=
- =?us-ascii?Q?iyeFNIx3H5dExghKf+BOA3EsrNtXe9CwUoIbFsIu1myulGpY5Z7MaGqSpWga?=
- =?us-ascii?Q?V2MbVorHjJ8VvtnXN+VpDLCPijImQMfmVuFaJGil0d6ftmdpBi5pmtPE5FOh?=
- =?us-ascii?Q?vJCgDA+sYJxQrVwrLLuI+wp1+UFB0rlyxSoDRbZtYB+kPYYd3mpQSlEtk9i7?=
- =?us-ascii?Q?HO9JoEYaEem5hfwGhhRNCG9ZgYRTQ+DD49fSLIU4tByN5/0xkzg+1tlaFnFo?=
- =?us-ascii?Q?N0NNTKyDOSDIoM5pM4rhf7GEFf7QKCW7TlSQH1FoSQ90QOqTtPs9DI2vEKhY?=
- =?us-ascii?Q?0TXQBHCULqge/plqFMYY+/PvvmC2Tctxobgv4KMTqI/2/Opz2a/ezEro3Niq?=
- =?us-ascii?Q?0UdzcDTqici+6a/N5x9+cxCBP5fguouR2zUYafw2WgTq3b6jwxy+cSoPikgc?=
- =?us-ascii?Q?aPlgY0qc3Ua8KDVjw/e/KmUQ8HMaDqBD9hQpsjkn5sRHFVwxs5co/7Po+uGC?=
- =?us-ascii?Q?WioofpwHKFBRdoZiYBlC0wXFqy/B2PclAhoustjhIJ0+btSWyp7245D2pyb5?=
- =?us-ascii?Q?7BeaJeDBKqUjZy9+rWp7xn9R3NQCtYuZ9LreOEKPKXmLdEAVGacq+ekqmAT7?=
- =?us-ascii?Q?9sJUv1kejK87xqN7hYrq4Sl/AILCzLPV9PVd94TQzcsaDz8/QtmkMmZ7OD0B?=
- =?us-ascii?Q?cKvLIOHhZSItkfHusyd/TtecmGQ6EoNjRn1k+65DFElaUgwsBdjBxVcwZsmE?=
- =?us-ascii?Q?fU1hQub5ESc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YhjiEkUZwYSMAxhVy83UUhQzhqaKjrrRDZWIBK4nqPaduFvo4zQXw3Sulw3F?=
- =?us-ascii?Q?ZdyZuNYHK47wXhDOFz1makvzgo/yvqXXKABRfWQapT0habM77vUuoTJZO7y2?=
- =?us-ascii?Q?DL9OW+Lg1v+GlxFo97BC+KXyQhDJZYdOOWAkrvROQJc2CumP+wy1ZXDSP9ai?=
- =?us-ascii?Q?V9gG7wGbhdhSAtbebyWqbvNK06YRYyeB8/DbmwSHnrCiunIJ66ru0tT08O8m?=
- =?us-ascii?Q?HUqTSypiZVUxzbKxTFsRbK3czwfcuS7U+GQ2YE9U4HxtlGnXa3OwrsWG/y45?=
- =?us-ascii?Q?GF7kFYxqU8m58+ulW42afDeHjW30sv3wRfQI64FBd+bIqSNXT73x4MHIVYYE?=
- =?us-ascii?Q?4Q5lqMKgQDke9/SJqengWbVTEFZePGp33X+xz8BBJNLuLCPYh5yYtbQP4G2f?=
- =?us-ascii?Q?qUp62RzXKE0F5Ko4NMGU0q3p7ZsGo1hUlT04mUk3ghzEVd/IZ57SUP4xEeQG?=
- =?us-ascii?Q?D1aonjdjm+f7Mv8oYJSHIR/dpgMcCYpreObYLCzQ/adAn+4NWXlEitsFEM7x?=
- =?us-ascii?Q?z8P0CqGWH3ZRW8K391mZO7hWaDTkOj8Bww6eeA3hL62xWdFnAX3gfcbJRRh3?=
- =?us-ascii?Q?lht1xZNGqRLUsaPKlbZjcvFcyqrUMv2tn/fmJ5b7V+pjYmlfXYVEp2WYMB45?=
- =?us-ascii?Q?CsE5UGraityWjQCRN0aPShY7JcUnpCwONXyh8R/HA5wCKDVogXp4/9TKUVQH?=
- =?us-ascii?Q?Y5IeYmOzihqk1rmSrbQKtzKB6wHtXaLsMt3MyvdCxdmOuU2R0fMT1LGWDW6r?=
- =?us-ascii?Q?g0Np+bVdhzAjN5I0ggiQLCYs1Z40qQB0i2kOiNVHGRSkhVSqi4FHC4x3zkK1?=
- =?us-ascii?Q?ZRKyd/whRuf8vHgJn0hwp/HIn+fk2je/D6/9AcVzNbDFcF72REJgi8hRyCsw?=
- =?us-ascii?Q?cx0vvgqSOYluX8Ea1k0hSDWLvkUMkMXFFBiVB6m4ypBvjdJn5X8bNn0wfMpK?=
- =?us-ascii?Q?hkDWwWXKVd3FZ5GbVrAmYRNPIlckc/1RqBOtYpfWg41qgSUHDpLpSebOaIsH?=
- =?us-ascii?Q?B37sK06RVSnu/12vu44mMFgkkYHWL6ILFeB3w/0qeZpI5gGQEln0uRM9sqP+?=
- =?us-ascii?Q?lIr8bjyTJe6/iMTSkIEnMtAGsr5DkGRbw013pmtNPq4y3MQjLLpIRFhllh76?=
- =?us-ascii?Q?ktFnnbxnwe2+FT39n+nFszniVEF4uLaU6E03Xu2g9uQ9e2z330LI55t296Ik?=
- =?us-ascii?Q?tLeRzJc8a+y5hwkf7CXkFDCDQD0G0C92jr7pdmpBUHd7i8oqCmrVxP8NNHTS?=
- =?us-ascii?Q?CDbhcnbzF+1lxP5CanIkKY9Yxt8z8BxFHsUuMLMbe2qbg582izc0liW6Autk?=
- =?us-ascii?Q?4qb9uX9zNFd7V+ceOLP9viiqgOCHEut2ScTcfY461AiTUUVn6zXDM4I49d5+?=
- =?us-ascii?Q?VFlinKflD6umPDMV+++fDL+1XVA3FirXnPoF+1yTf0Kw31U/HudFsP2ZUw8h?=
- =?us-ascii?Q?R5UZPLTn90czvHZFXSAzt8gSbl13yR+tBzrtYzds93Zd9VSSNvNN0P4RMyJv?=
- =?us-ascii?Q?0cBey1HRfbAvZvJ+E0qaKJvTgPretLtLoR1COoL2CmI9oubhUpfjMpslylPr?=
- =?us-ascii?Q?cki5xQrJaRWRk+4m7kWmi20I/OYUyONF1rCh4NmPPCoFeFAINuqN/4xzIEOc?=
- =?us-ascii?Q?Cw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a4c7102-8e96-4e84-5b98-08dd81aaa7b6
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2025 14:33:31.7149
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t01+A7LFOEz5oLUe05tB/3xWynbpMB09akVv6em2A2SZwwdDQKqAk1nMi9jmiJGFnDp3Z6QYOr6yECatufRYLsHYpv7dGSoe4Bq/jyy9lDg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5139
+References: <CAADnVQLnij-d3Hif1x8ocoYD=8sZG67qACXPZhK78cpYKczwkw@mail.gmail.com>
+ <20250422080419.322136-1-yangfeng59949@163.com>
+In-Reply-To: <20250422080419.322136-1-yangfeng59949@163.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 22 Apr 2025 07:37:15 -0700
+X-Gm-Features: ATxdqUHuUYafvzTvLuzZ_1rXZfUvY0jWnby7h9IZIWMk-HqLMT-8ZLGhVONcJnY
+Message-ID: <CAADnVQ+WYLfoR1W6AsCJF6fNKEUgfxANXP01EQCJh1=99ZpoNw@mail.gmail.com>
+Subject: Re:
+To: Feng Yang <yangfeng59949@163.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Eduard <eddyz87@gmail.com>, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Song Liu <song@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
+	Yonghong Song <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 17, 2025 at 10:24:45AM -0700, Michael Chan wrote:
-> The firmware advertises a "hwrm_cmd_max_timeout" value to the driver
-> for NVRAM and coredump related functions that can take tens of seconds
-> to complete.  The driver polls for the operation to complete under
-> mutex and may trigger hung task watchdog warning if the wait is too long.
-> To warn the user about this, the driver currently prints a warning if
-> this advertised value exceeds 40 seconds:
-> 
-> Device requests max timeout of %d seconds, may trigger hung task watchdog
-> 
-> Initially, we chose 40 seconds, well below the kernel's default
-> CONFIG_DEFAULT_HUNG_TASK_TIMEOUT (120 seconds) to avoid triggering
-> the hung task watchdog.  But 60 seconds is the timeout on most
-> production FW and cannot be reduced further.  Change the driver's warning
-> threshold to 60 seconds to avoid triggering this warning on all
-> production devices.  We also print the warning if the value exceeds
-> CONFIG_DEFAULT_HUNG_TASK_TIMEOUT which may be set to architecture
-> specific defaults as low as 10 seconds.
-> 
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> v2: Add check for CONFIG_DEFAULT_HUNG_TASK_TIMEOUT
+On Tue, Apr 22, 2025 at 1:04=E2=80=AFAM Feng Yang <yangfeng59949@163.com> w=
+rote:
+>
+> Subject: Re: [PATCH bpf-next] bpf: Remove bpf_get_smp_processor_id_proto
+>
+> On Mon, 21 Apr 2025 18:53:07 -0700 Alexei Starovoitov <alexei.starovoitov=
+@gmail.com> wrote:
+>
+> > On Thu, Apr 17, 2025 at 8:41 PM Feng Yang <yangfeng59949@163.com> wrote=
+:
+> > >
+> > > From: Feng Yang <yangfeng@kylinos.cn>
+> > >
+> > > All BPF programs either disable CPU preemption or CPU migration,
+> > > so the bpf_get_smp_processor_id_proto can be safely removed,
+> > > and the bpf_get_raw_smp_processor_id_proto in bpf_base_func_proto wor=
+ks perfectly.
+> > >
+> > > Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+> > > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+> > > ---
+> > >  include/linux/bpf.h      |  1 -
+> > >  kernel/bpf/core.c        |  1 -
+> > >  kernel/bpf/helpers.c     | 12 ------------
+> > >  kernel/trace/bpf_trace.c |  2 --
+> > >  net/core/filter.c        |  6 ------
+> > >  5 files changed, 22 deletions(-)
+> > >
+> > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > > index 3f0cc89c0622..36e525141556 100644
+> > > --- a/include/linux/bpf.h
+> > > +++ b/include/linux/bpf.h
+> > > @@ -3316,7 +3316,6 @@ extern const struct bpf_func_proto bpf_map_peek=
+_elem_proto;
+> > >  extern const struct bpf_func_proto bpf_map_lookup_percpu_elem_proto;
+> > >
+> > >  extern const struct bpf_func_proto bpf_get_prandom_u32_proto;
+> > > -extern const struct bpf_func_proto bpf_get_smp_processor_id_proto;
+> > >  extern const struct bpf_func_proto bpf_get_numa_node_id_proto;
+> > >  extern const struct bpf_func_proto bpf_tail_call_proto;
+> > >  extern const struct bpf_func_proto bpf_ktime_get_ns_proto;
+> > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > > index ba6b6118cf50..1ad41a16b86e 100644
+> > > --- a/kernel/bpf/core.c
+> > > +++ b/kernel/bpf/core.c
+> > > @@ -2943,7 +2943,6 @@ const struct bpf_func_proto bpf_spin_unlock_pro=
+to __weak;
+> > >  const struct bpf_func_proto bpf_jiffies64_proto __weak;
+> > >
+> > >  const struct bpf_func_proto bpf_get_prandom_u32_proto __weak;
+> > > -const struct bpf_func_proto bpf_get_smp_processor_id_proto __weak;
+> > >  const struct bpf_func_proto bpf_get_numa_node_id_proto __weak;
+> > >  const struct bpf_func_proto bpf_ktime_get_ns_proto __weak;
+> > >  const struct bpf_func_proto bpf_ktime_get_boot_ns_proto __weak;
+> > > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> > > index e3a2662f4e33..2d2bfb2911f8 100644
+> > > --- a/kernel/bpf/helpers.c
+> > > +++ b/kernel/bpf/helpers.c
+> > > @@ -149,18 +149,6 @@ const struct bpf_func_proto bpf_get_prandom_u32_=
+proto =3D {
+> > >         .ret_type       =3D RET_INTEGER,
+> > >  };
+> > >
+> > > -BPF_CALL_0(bpf_get_smp_processor_id)
+> > > -{
+> > > -       return smp_processor_id();
+> > > -}
+> > > -
+> > > -const struct bpf_func_proto bpf_get_smp_processor_id_proto =3D {
+> > > -       .func           =3D bpf_get_smp_processor_id,
+> > > -       .gpl_only       =3D false,
+> > > -       .ret_type       =3D RET_INTEGER,
+> > > -       .allow_fastcall =3D true,
+> > > -};
+> > > -
+> >
+> > bpf_get_raw_smp_processor_id_proto doesn't have
+> > allow_fastcall =3D true
+> >
+> > so this breaks tests.
+> >
+> > Instead of removing BPF_CALL_0(bpf_get_smp_processor_id)
+> > we should probably remove BPF_CALL_0(bpf_get_raw_cpu_id)
+> > and adjust SKF_AD_OFF + SKF_AD_CPU case.
+> > I don't recall why raw_ version was used back in 2014.
+> >
+>
+> The following two seem to explain the reason:
+> https://lore.kernel.org/all/7103e2085afa29c006cd5b94a6e4a2ac83efc30d.1467=
+106475.git.daniel@iogearbox.net/
+> https://lore.kernel.org/all/02fa71ebe1c560cad489967aa29c653b48932596.1474=
+586162.git.daniel@iogearbox.net/
+>
 
-Hi. Sorry if this is noise - but I have not seen this reported yet. I
-think this change introduced a config dependency on 'DEBUG_KERNEL'. As far as I
-track the dependency chain:
-
-    DEFAULT_HUNG_TASK_TIMEOUT -> DETECT_HUNG_TASK -> DEBUG_KERNEL.
-
-I have a 'local_defconfig' file which I'm regularly using for compiles,
-and I had to add all three these CONFIG settings to it to be able to
-compile again, otherwise I encounter this issue:
-
-drivers/net/ethernet/broadcom/bnxt/bnxt.c:10188:21: \
-error: 'CONFIG_DEFAULT_HUNG_TASK_TIMEOUT' undeclared (first use in this function)
-      max_tmo_secs > CONFIG_DEFAULT_HUNG_TASK_TIMEOUT) {
-                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Perhaps this was on purpose, but from what I can tell on a quick scan I don't
-think it was.
-
-Regards
-Louis
-> 
-> v1: https://lore.kernel.org/netdev/20250415174818.1088646-2-michael.chan@broadcom.com/
-> ---
-
-> -- 
-> 2.30.1
-> 
-> 
+Ahh. socket filters run in RCU CS. They don't disable preemption or migrati=
+on.
+Then let's keep things as-is.
+We still want debugging provided by smp_processor_id().
+If we switch everything to raw_ may miss things. Like this example with
+socket filters.
 
