@@ -1,640 +1,464 @@
-Return-Path: <netdev+bounces-184794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89F1A97349
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A68CA97353
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 941B9440C09
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54C4A3A8728
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BEF296D15;
-	Tue, 22 Apr 2025 17:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CE0293B55;
+	Tue, 22 Apr 2025 17:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="McKl4Xeu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WMp2CpEF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9A32918F0
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745341407; cv=fail; b=n85eBB6eY5Ix30mdrSJ69rbuxZMkdHQ1mFpULaH5WkawkjXd8zSjAanGvxCAb7vI6ZBkOZx3tgUj/rFjsXcZWN9Dsd7iUujkrn4uCLJ/w6sUg5eXg8iwglVJzbjfAntHghG91LnucAFCgOqa45a4WFUilI1Mf2Dj6wzbWNIXs9I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745341407; c=relaxed/simple;
-	bh=H2efSTDdrpOjKX07NdS1gQbYEkfX+RQbMdyOpRY1/q0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KDb3JNdFH5IXuYbKpDGc3WlNu5pqs83rFRzGhAVpCUpgmFAjmSIczoZFmJJj1LAnpzvXDEHLDm1NKqGWkGrbFHyYEwdHUsEfi3vpC33/2A4NY1zCQboHVsllrlLEnu55+6VPn+8KW1tfyRmq8cvUyD1RjAZUmQ8b+VhQVr1o3Ts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=McKl4Xeu; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745341405; x=1776877405;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=H2efSTDdrpOjKX07NdS1gQbYEkfX+RQbMdyOpRY1/q0=;
-  b=McKl4XeuQex1lfjyHP6nECVznSPbJIVnXDJKNEWVwZnjrc8FWD6826VZ
-   u1Hr4Dq3sSXUHFTjIBIsmtsuVb+4vmCstTVv1DCGke4ObKPcNb6aHenBg
-   6vrUTyPocNvBniGcuqEcOy955LYW8FKFAhB8sZQ9cQWqVh9g1vkI5D/u5
-   ZRnsc7tp/G58RJ7cOJwQRPRYZrInzrJi4+G1kIPyFLhOFh3T1QHqU6FTs
-   a6Y120t7r2p5c2KpFaeQZ4bfWUEXpzlco3LT5ZzuAQnYcyPZI9RVHxXMw
-   qBjGqC5ARkvxILiZnV4LFp2pCwlDy1e9/vTYlwBZqi562J/3X1cQqgbZg
-   Q==;
-X-CSE-ConnectionGUID: VOl71C9WQ/i+LXKuZx9Niw==
-X-CSE-MsgGUID: UjK6Yju0SRakHX1IdAsqHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="47039265"
-X-IronPort-AV: E=Sophos;i="6.15,231,1739865600"; 
-   d="scan'208";a="47039265"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 10:03:22 -0700
-X-CSE-ConnectionGUID: SL+xFD9BSYKxTXiSkQ4QEA==
-X-CSE-MsgGUID: 0rvtHFFXTRa0TqVAnUwfDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,231,1739865600"; 
-   d="scan'208";a="137154527"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 10:03:21 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 22 Apr 2025 10:03:21 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 22 Apr 2025 10:03:21 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.43) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 22 Apr 2025 10:03:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yG1eQX0UPiiUsH+71BLIDiQmQw6F8HuYsvicRfPvAeiUAwAhazUAhMaJC2jCcLhTjz9vPpuh60ro/hYJoQ2Ua23MP7rXso4uMx14vo+35xLv8AGUne+PBj1UYYhMqbErvBxTlHF1HMBtHNY2h+M/P48qrIYno7oXGOyWlUMnk9qVKfRd96TcPyoI0wRv9KbWfc17xEx4SdRx+zkFchD0mdEygV6bUTDRPcnY11aIaTlRj2SLU+cZSml84BnPE5iHWFtr6wcKhOezf2hT1z1H73fVfkWUHZAX1YX8C505kBCd7ClmY6ZPSuYrZeW4UY6VvDkcuP8YSTetuVNjk7Sixw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h2lcNF0/63PIBryOzP+S0gn+/jBuoOne3WBLSHYRiVs=;
- b=NouWVnaufcS199x68ZMfW6zA+n/vR7EFvhAxXXU3+VZ7gZMeITs9gDwMk4LJxggdrYkPf2KsQyKCCaS8adwyATVSWCVggCH6EnSJKfVKr9yBt/4iDnCotPRl1sW7rgFPGXozEtopU7WMbhdbPilZG2oOR1bCd1qwm8AiWnHE+DGW+dhoiFp5TxLfsS994WZzXfNF5HUlQ0P7wUfDiEF62wrVfo8WT7PQq5wJfsjnkhiJHQFNHdKIksQW1p6oPSzL5Yc+JE+begVc3HR+zf8C5a/q/JOhu/oIB2VPcU+Ft5aaFciKwjyvn5RnwzJlzwtXiTx1HLZv8Ke7KYCQW0mAtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
- by PH7PR11MB7499.namprd11.prod.outlook.com (2603:10b6:510:278::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.34; Tue, 22 Apr
- 2025 17:03:16 +0000
-Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b]) by SJ0PR11MB5866.namprd11.prod.outlook.com
- ([fe80::265f:31c0:f775:c25b%3]) with mapi id 15.20.8655.033; Tue, 22 Apr 2025
- 17:03:16 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kolacinski, Karol"
-	<karol.kolacinski@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
-	"Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v5 2/3] ice: change SMA pins to
- SDP in PTP API
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v5 2/3] ice: change SMA pins
- to SDP in PTP API
-Thread-Index: AQHbs6C6fC0aMwpX70mJs8vMBh8+ObOv6ZMQ
-Date: Tue, 22 Apr 2025 17:03:16 +0000
-Message-ID: <SJ0PR11MB58667D4EC93EE07538F4C3AEE5BB2@SJ0PR11MB5866.namprd11.prod.outlook.com>
-References: <20250422160149.1131069-1-arkadiusz.kubalewski@intel.com>
- <20250422160149.1131069-3-arkadiusz.kubalewski@intel.com>
-In-Reply-To: <20250422160149.1131069-3-arkadiusz.kubalewski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|PH7PR11MB7499:EE_
-x-ms-office365-filtering-correlation-id: b430ba8f-fca2-49cd-9adb-08dd81bf935f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?zFQUB1ttf/HVdDH1sD8r39n3o8cKAKeCQFYCPWdCUEwGb8SWTf5TzitCrtMr?=
- =?us-ascii?Q?5oJ9Y220YVJIsSfGSD+PfLMEgSPZD1XjP3FAxCM0s2cYC2Rq79joJyulFoM8?=
- =?us-ascii?Q?hqCK7UABLGA/Ij1T2jNe6CJYrf0qhVejSd13vUxxaTPd7KILNVZ4NXJrHf0C?=
- =?us-ascii?Q?+SHrzMT3WP4tQITlXhtA1CBK4zvfl9ueYS194ZZETvsbBpz9BijBq2E6ye8J?=
- =?us-ascii?Q?Znw3zuSOfh+0RWjrGuR6jDcwKniqhbGw8S8pyNU+Ib7dZQBmwv4nNMz3Ut8v?=
- =?us-ascii?Q?2qprRdFywFLgniXYO53qgvLJq0RU2o8OeeIyLk/ZuJKQjA94WXSxAV5FLYkS?=
- =?us-ascii?Q?tIYB+CPsL4g35F98eNd381MN/fl58NckwuUxD1+542toxar8rrmKmI59G3Pm?=
- =?us-ascii?Q?GZ0srK1ojjzCKMZlT1rjp5oUC01k/soN3VJ0TatRg8w0D6QhfRAb6Zski0Jc?=
- =?us-ascii?Q?Z5JkesfUEdg50Gm+Xz76SuVoCQE2rKwk/HqDWndFItF3PzihlDX7fFi/Xr3c?=
- =?us-ascii?Q?KiUmWQdx/Rgm6yCkGu1q010h1ApfPdP660Xnbpf/1yVT07gN5k3KWy/JmJy/?=
- =?us-ascii?Q?xm/NNqBzxfbXuktjzLVV+GiCvrYchsycvykKnoVWw/dEDOwQR1oNGDvttFIJ?=
- =?us-ascii?Q?WN1yPcgzF9g8Jf98Z3kyLs+Zug6wIn7earnUnXO5GfWxVZHUd4kH746I3dWU?=
- =?us-ascii?Q?IKvHTupldGzOGn1988KWFH78rLiHguZtl8DNOIveucl3INiDi79qBBcTpnKV?=
- =?us-ascii?Q?a9j6C+uLoOjzhlGFAre96jwt/wwPkrQdSCtqanJCkueYzJg0o1uH6O14+NNv?=
- =?us-ascii?Q?VOSS8yVFycPH/UgDlm/a6r32Y1he0nOgCNHZU1DxgmWOigpZbLsgULkwPosg?=
- =?us-ascii?Q?Ow6jnGm8OAvPHToR0kg6JmRLmmw9uIYf/h6FMA8HIgsFFMlXKfbhwp5rIHDk?=
- =?us-ascii?Q?hAyIKzKTFbUS6YlLhM6B54B4UONOyPLx5GymI0mCOQEqnDEkc6QtMAcNTQvQ?=
- =?us-ascii?Q?aLCWyHoNWSpx+IbRXPOwhSU3kAYTg1G3tHm2LkDIga/5Wu3ktmKT5/xb2+dM?=
- =?us-ascii?Q?ZdfZQR8bMN7CSUPXSnVGbaueqXzLNZSUxnwZJ4AzSjZYosPF0jFwMGB+HvS+?=
- =?us-ascii?Q?Oc5r0l2bOCryoEtLTM8piXy24kAmy9jXntQzePa8yGMkq+Up3n2orN4mZOmz?=
- =?us-ascii?Q?QbWukTeL/NIhVU/oXAqzJs+p5kKPzKIzFlGQI4LpT1aq3MzhwIBOch4Csa2E?=
- =?us-ascii?Q?7QD7NFeRfsSceUJpptJGXZUfjWHNSsZhyG2tI00ghkAzZ88kaqWMmO35p+eC?=
- =?us-ascii?Q?rfwR47dyUICoTJBBtBQ94gshMAnv6cUI5/cI9JKI7WhdgYKJUTIMMS6lNLHQ?=
- =?us-ascii?Q?AtT896IOkLKGKeHoHWgpzl6ELTESrWFtWLsX8ajKg6f0SArrNix63FMAbPRV?=
- =?us-ascii?Q?1//KP34cr6agTa2GY7WqAYD6rKYER5W6Prf+zdQ82V+Ht+jOdiyFOQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CZpwDIb3GU/wlaNoyWlZVIItafWIBGVbq3bEZ/6I8mKtCjKQMqSDAsqdziHN?=
- =?us-ascii?Q?OCeKIcsQ1FbRnzjNwlysNabuIfh+18/J7oWgi3yLXJEoZ/+A9K+S3WNcI6uF?=
- =?us-ascii?Q?ray1vOgyfe16vMCUvmxPIYh3Z2Fnmm2F3sAwe8oKFF2hali58+plTi7XG8FJ?=
- =?us-ascii?Q?4cjp3vFtyjx8a8gXv+ShjZIKb/K4hTvqElc5vBxms6a2tXnmbEzqSwjDhI2w?=
- =?us-ascii?Q?FLIAQZC5f8pTu7kZ8Lko1OVT2HCtP9T4rp+VTM7oWC+taUwNKhz2F1Sndg0n?=
- =?us-ascii?Q?RQjAbDP0Bz9SR6kUg4BrQ0yp1N/acTXy+WpYltGZrynT9bNi3LSfNU3/sYNq?=
- =?us-ascii?Q?9o8wwSsion4Pd8GbGH1mZdxax8gpPpSN5wp+LR+nJcBNaaj4CDZPL+qnjHc9?=
- =?us-ascii?Q?Su9qyvd59UNbEJVWtFgbpo/MRRZC7zKTbc2O5dfYLH3fmCBFnd8V52hCKQGb?=
- =?us-ascii?Q?Xin+OQwQU/T85LwBwqfLYTZ3qVOwf4zmvGmMzWF5Jz0van/H9YhY25YCY+1X?=
- =?us-ascii?Q?1k80eHugC7SCskFZT0bxbhu1T/kGrWB/Q81WqzAInaTGOJX3lcdaFvLhHYZx?=
- =?us-ascii?Q?FQKf2IsYKcSqRUZk/d+FG4KIuFBBx8XOfjfB63YIv8a0eGBFNhaDOlMWqAgc?=
- =?us-ascii?Q?off7UCIvhakbS2HDqv6jNg+aTQRBxtSp6hypH9e5xAQL8QWGN/+xmqgIl2jO?=
- =?us-ascii?Q?7JEtxmVbijbnly7Ct5Lczas1WZT7I8KWg6zVrslR3wCWIoERP5OdGZ9Xkygg?=
- =?us-ascii?Q?C4ed99uxyF3tF2vDCrd5FPPTDp4vPYyLaAjf4NxGFKb+xkY7nHD+FPphq7Wc?=
- =?us-ascii?Q?An9s6YsRqBRkPXVWARHnlllhZllOyHyQxplHj8wOZru/o8NhHScgRQUN2rxa?=
- =?us-ascii?Q?/qBwbhNjoIeVcJ43MFNQO+UKhP0EInAYPgUBHk6oJjolT4TIi/5XxfkvLQ0G?=
- =?us-ascii?Q?Lu1JJNZzGEbPCG+iLvdWtbidNKtOzj9wniTxvEqeOA2YUDshXc6XXzBG+Iyi?=
- =?us-ascii?Q?ktmmC0VSEroefboTVTSUVT6DSA0FL//hJpYj/v1hJUtJcYv7IEt7N8guhFMi?=
- =?us-ascii?Q?e0+F2j2sz2URmN6I1mWK4Zn8EbF+nSaqsjfsT7qpjqG53GVa91ZU5iXmYpl2?=
- =?us-ascii?Q?1SsNjChpw8SlOMOW5GuisTUynHHW7PgWFkAIGwOi6THly7UC/vC5vTzwumN0?=
- =?us-ascii?Q?FqKHGTZqxbaV0jYuiHpLc4SgVyuxKzLcBPBywYtj3F4Div8ScGGrKsk5B5h8?=
- =?us-ascii?Q?zllAbZE+Xi+XFwnAO8xmGX5ek1Hc3p6UgsBEcJgDUnh0NZjd8fB45/NFlYQF?=
- =?us-ascii?Q?BCKwVjjwvsxV5+oFedWwbharzyyjV+JoUmongQaJNZ+mYI8yVAB1TG7EEQh6?=
- =?us-ascii?Q?LC+9g3ZfT8OggZFvkXn/hAmpccCAWJ8W3turhJMY9EK/+zST8ofzNWBwMThl?=
- =?us-ascii?Q?ciX5fJEJnyWbZ+9OvO5vdArzXi4QdoIURfaVm4vAIwqj43+sPwg9r1c+WgFH?=
- =?us-ascii?Q?JZ5R+55kbSz+qVEgKP/h7de4qgJe6m54IFj2VwssHbMyU8Db0iV0m2WTPN9Q?=
- =?us-ascii?Q?4rSigD8Lq2JdFUqTuGrWtm6pHBZNxti2v5mRs8SWvLlmA5cA295n+FghOwhb?=
- =?us-ascii?Q?AA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C56A13C3F6
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745341612; cv=none; b=FTbF0z3ocxHhgXx9xMyfwThBL4mvxHBLiaPM08lz0y9/oZTzrvSczjNeN3hb7Lv8/lNHr1F+NMg3Dku62zNf7QfVACzQ36Cssh3iadHiDa7oKEoQBfnRoGn4h2IAxl2kykYTSS/k/74tHkeEt6n1bkKrjPxc6zz1RT5uyqbyOSE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745341612; c=relaxed/simple;
+	bh=KAox7O8ghMX45K8i9/7C9UokeJFyg3C/oMBsFgCPP+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zg+7aQsyPD+XTJpo+F/63nMLt43QR/nnE5wqHuz8bbkdE8X87vyIExabL9vWwKK4j+U2nE42RmO3uo8dpaTyAGnEy8jGPlzsL7w32VpxbNk9pDWpYXUjkB6dc2sBjZ0DCHEbFYwqZwyGmrEGtxJvR9GukIA11oQWu+8Fb8BTUDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WMp2CpEF; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b03bc416962so3939591a12.0
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745341610; x=1745946410; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LXKNwAqPyrfePqTdq+hrBNPAEy/X4TKI6ueHlNWt4gI=;
+        b=WMp2CpEFdzWeU/Hdbw1mPWhlOAe5CI8pdzJ0q4OWQqsooIFisqEB9E7PLbKpBShvZY
+         6H8nBw3OFWKcAd7gNlyvnv+CGvEldSkdgnQ4y3EVfDllgjOovU9Tx/Y6j/DKtgWuLz0i
+         K9aK72vtdXB+vSH6np4sBum7T7lTZGXgPS77usCbla/oUMWeVYUr0/sQe0ghHoEFHCmz
+         C7ZQ8uDjqsCQx88V/kprNpCeY+OxcdqbClhDoEj/Dhrn8I1z2DmKhvEwx8eh3w27qh2D
+         q1JZe8YA2bjxxRtgLuy+6OU8czdezuNLN5LlmIxTIv8oov/gTX8bI1PKqrNCgDVodfiS
+         blvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745341610; x=1745946410;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LXKNwAqPyrfePqTdq+hrBNPAEy/X4TKI6ueHlNWt4gI=;
+        b=abg9KW/nRwcAR777t4hitw7NwrcOItUbvdoSgdsZETIGsjksUCXdItop8lZh41oGkC
+         w2lzDfn33f9ux7aSFz2IKW9P1ieKNJq9K+bET15LF+dYNSh6SIJFxvNPfL8IQjFUzkQi
+         N8YHp+6mz/1FksA7eAgjSvMCqFwauN0NlbplRUcK6pKGxv0mI5LL282Cuz3U2uKhlT0H
+         BBB0HDaWGJXIXcb5xXBT+tydsp+XqEWhK4PY7DqasWxjpRQB76jRggMSdHrGOCjylRg4
+         N/ZVJ/aXufga/mORdofc4P630JolNTGpfWGHdCe4hr5jkKe6wz9KKdpnMCfhxUDeupdE
+         EJJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXAh7BB1Cv3BSNFqbljo/HTwjttXxG9CX0PfhshU4Iz6qheuEJqrTid/4JN5HghS9EGHT9hFPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd16wqGDKBfKJj3aNhPJfycxR+5froUOlfHTygvvGOHhBINvpE
+	9vPRZWuubtAafYLZOhjxDY7SypubRM4SMviCscyo0Of2QBgpCUg=
+X-Gm-Gg: ASbGncuT+rWiKmTXecEoJRbEQRb+5EqCwpPEVo3q2fTZpvpCBg84nNxUE32Wg4lfOll
+	r/rGXSUuJmNDB5vJgAoQBpHjtXQcnWPapPZbo7QlE5n3ROn8rhVg5brF2xi0Uih0oruTxouuSCH
+	q9DVJNGepf9Lg2yJtL8AG/rALxl3ff922+Aht03p8Vn8nLkO9jSTNBihQhHH6dRGMh3/5JMRqx4
+	MyBQIOtUxjXWlYn9FIT2DtBpkYAKW/nmpDKEB+GxkoVaRXjyeaMsc8Ao2k4yLciE6OnnMv2RX2A
+	6D8sn+NLsfJabLkx+34lRQ1NFF+N9RpljHz0Uc5P
+X-Google-Smtp-Source: AGHT+IGe2VeTaYYWiD3MCh5jDOKx/152+g9E/E6Ybm1lucxVA9ZDKsYQDiHCjV0NtQEzsKzsiIlIAQ==
+X-Received: by 2002:a17:90b:254d:b0:2ff:7331:18bc with SMTP id 98e67ed59e1d1-3087bbc22dbmr19362800a91.26.1745341610124;
+        Tue, 22 Apr 2025 10:06:50 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3087df0c143sm8877810a91.16.2025.04.22.10.06.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 10:06:49 -0700 (PDT)
+Date: Tue, 22 Apr 2025 10:06:48 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 22/22] selftests: drv-net: add test for rx-buf-len
+Message-ID: <aAfMqE_m6QFTph_k@mini-arch>
+References: <20250421222827.283737-1-kuba@kernel.org>
+ <20250421222827.283737-23-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b430ba8f-fca2-49cd-9adb-08dd81bf935f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2025 17:03:16.7706
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y09Xu1cHXmCqq2fEmArP82FHnh1u89SPOWpS2Sjhg6WKasThlRbiFMGAw4AIr+rvP/lMGPCr5Eyygd/eT/iiAXhG/Jg2u9qHe9XdZsBCwxI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7499
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250421222827.283737-23-kuba@kernel.org>
 
-
-
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Arkadiusz Kubalewski
-> Sent: Tuesday, April 22, 2025 6:02 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kolacinski, Karol <karol.kolacinski@intel.com=
->;
-> Olech, Milena <milena.olech@intel.com>; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v5 2/3] ice: change SMA pins t=
-o SDP
-> in PTP API
->=20
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
->=20
-> This change aligns E810 PTP pin control to all other products.
->=20
-> Currently, SMA/U.FL port expanders are controlled together with SDP pins
-> connected to 1588 clock. To align this, separate this control by exposing=
- only
-> SDP20..23 pins in PTP API on adapters with DPLL.
->=20
-> Clear error for all E810 on absent NVM pin section or other errors to all=
-ow
-> proper initialization on SMA E810 with NVM section.
->=20
-> Use ARRAY_SIZE for pin array instead of internal definition.
->=20
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+On 04/21, Jakub Kicinski wrote:
+> Add a test for rx-buf-len. Check both nic-wide and per-queue settings.
+> 
+>   # ./drivers/net/hw/rx_buf_len.py
+>   TAP version 13
+>   1..6
+>   ok 1 rx_buf_len.nic_wide
+>   ok 2 rx_buf_len.nic_wide_check_packets
+>   ok 3 rx_buf_len.per_queue
+>   ok 4 rx_buf_len.per_queue_check_packets
+>   ok 5 rx_buf_len.queue_check_ring_count
+>   ok 6 rx_buf_len.queue_check_ring_count_check_packets
+>   # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> v5:
-> - no change.
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp.c | 254 ++++-------------------
->  drivers/net/ethernet/intel/ice/ice_ptp.h |   3 -
->  2 files changed, 39 insertions(+), 218 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index b79a148ed0f2..b948a6d9226c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -40,21 +40,19 @@ static const struct ice_ptp_pin_desc
-> ice_pin_desc_e810[] =3D {
->  	{  ONE_PPS,   { -1,  5 }, { 0, 1 }},
->  };
->=20
-> -static const char ice_pin_names_nvm[][64] =3D {
-> -	"GNSS",
-> -	"SMA1",
-> -	"U.FL1",
-> -	"SMA2",
-> -	"U.FL2",
-> +static const char ice_pin_names_dpll[][64] =3D {
-> +	"SDP20",
-> +	"SDP21",
-> +	"SDP22",
-> +	"SDP23",
->  };
->=20
-> -static const struct ice_ptp_pin_desc ice_pin_desc_e810_sma[] =3D {
-> +static const struct ice_ptp_pin_desc ice_pin_desc_dpll[] =3D {
->  	/* name,   gpio,       delay */
-> -	{  GNSS, {  1, -1 }, { 0, 0 }},
-> -	{  SMA1, {  1,  0 }, { 0, 1 }},
-> -	{  UFL1, { -1,  0 }, { 0, 1 }},
-> -	{  SMA2, {  3,  2 }, { 0, 1 }},
-> -	{  UFL2, {  3, -1 }, { 0, 0 }},
-> +	{  SDP0, { -1,  0 }, { 0, 1 }},
-> +	{  SDP1, {  1, -1 }, { 0, 0 }},
-> +	{  SDP2, { -1,  2 }, { 0, 1 }},
-> +	{  SDP3, {  3, -1 }, { 0, 0 }},
->  };
->=20
->  static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf) @@ -92,101 +90,=
-6 @@
-> static int ice_ptp_find_pin_idx(struct ice_pf *pf, enum ptp_pin_function =
-func,
->  	return -1;
->  }
->=20
-> -/**
-> - * ice_ptp_update_sma_data - update SMA pins data according to pins setu=
-p
-> - * @pf: Board private structure
-> - * @sma_pins: parsed SMA pins status
-> - * @data: SMA data to update
-> - */
-> -static void ice_ptp_update_sma_data(struct ice_pf *pf, unsigned int
-> sma_pins[],
-> -				    u8 *data)
-> -{
-> -	const char *state1, *state2;
-> -
-> -	/* Set the right state based on the desired configuration.
-> -	 * When bit is set, functionality is disabled.
-> -	 */
-> -	*data &=3D ~ICE_ALL_SMA_MASK;
-> -	if (!sma_pins[UFL1 - 1]) {
-> -		if (sma_pins[SMA1 - 1] =3D=3D PTP_PF_EXTTS) {
-> -			state1 =3D "SMA1 Rx, U.FL1 disabled";
-> -			*data |=3D ICE_SMA1_TX_EN;
-> -		} else if (sma_pins[SMA1 - 1] =3D=3D PTP_PF_PEROUT) {
-> -			state1 =3D "SMA1 Tx U.FL1 disabled";
-> -			*data |=3D ICE_SMA1_DIR_EN;
-> -		} else {
-> -			state1 =3D "SMA1 disabled, U.FL1 disabled";
-> -			*data |=3D ICE_SMA1_MASK;
-> -		}
-> -	} else {
-> -		/* U.FL1 Tx will always enable SMA1 Rx */
-> -		state1 =3D "SMA1 Rx, U.FL1 Tx";
-> -	}
-> -
-> -	if (!sma_pins[UFL2 - 1]) {
-> -		if (sma_pins[SMA2 - 1] =3D=3D PTP_PF_EXTTS) {
-> -			state2 =3D "SMA2 Rx, U.FL2 disabled";
-> -			*data |=3D ICE_SMA2_TX_EN |
-> ICE_SMA2_UFL2_RX_DIS;
-> -		} else if (sma_pins[SMA2 - 1] =3D=3D PTP_PF_PEROUT) {
-> -			state2 =3D "SMA2 Tx, U.FL2 disabled";
-> -			*data |=3D ICE_SMA2_DIR_EN |
-> ICE_SMA2_UFL2_RX_DIS;
-> -		} else {
-> -			state2 =3D "SMA2 disabled, U.FL2 disabled";
-> -			*data |=3D ICE_SMA2_MASK;
-> -		}
-> -	} else {
-> -		if (!sma_pins[SMA2 - 1]) {
-> -			state2 =3D "SMA2 disabled, U.FL2 Rx";
-> -			*data |=3D ICE_SMA2_DIR_EN | ICE_SMA2_TX_EN;
-> -		} else {
-> -			state2 =3D "SMA2 Tx, U.FL2 Rx";
-> -			*data |=3D ICE_SMA2_DIR_EN;
-> -		}
-> -	}
-> -
-> -	dev_dbg(ice_pf_to_dev(pf), "%s, %s\n", state1, state2);
-> -}
-> -
-> -/**
-> - * ice_ptp_set_sma_cfg - set the configuration of the SMA control logic
-> - * @pf: Board private structure
-> - *
-> - * Return: 0 on success, negative error code otherwise
-> - */
-> -static int ice_ptp_set_sma_cfg(struct ice_pf *pf) -{
-> -	const struct ice_ptp_pin_desc *ice_pins =3D pf->ptp.ice_pin_desc;
-> -	struct ptp_pin_desc *pins =3D pf->ptp.pin_desc;
-> -	unsigned int sma_pins[ICE_SMA_PINS_NUM] =3D {};
-> -	int err;
-> -	u8 data;
-> -
-> -	/* Read initial pin state value */
-> -	err =3D ice_read_sma_ctrl(&pf->hw, &data);
-> -	if (err)
-> -		return err;
-> -
-> -	/* Get SMA/U.FL pins states */
-> -	for (int i =3D 0; i < pf->ptp.info.n_pins; i++)
-> -		if (pins[i].func) {
-> -			int name_idx =3D ice_pins[i].name_idx;
-> -
-> -			switch (name_idx) {
-> -			case SMA1:
-> -			case UFL1:
-> -			case SMA2:
-> -			case UFL2:
-> -				sma_pins[name_idx - 1] =3D pins[i].func;
-> -				break;
-> -			default:
-> -				continue;
-> -			}
-> -		}
-> -
-> -	ice_ptp_update_sma_data(pf, sma_pins, &data);
-> -	return ice_write_sma_ctrl(&pf->hw, data);
-> -}
-> -
->  /**
->   * ice_ptp_cfg_tx_interrupt - Configure Tx timestamp interrupt for the d=
-evice
->   * @pf: Board private structure
-> @@ -1878,63 +1781,6 @@ static void ice_ptp_enable_all_perout(struct
-> ice_pf *pf)
->  					   true);
->  }
->=20
-> -/**
-> - * ice_ptp_disable_shared_pin - Disable enabled pin that shares GPIO
-> - * @pf: Board private structure
-> - * @pin: Pin index
-> - * @func: Assigned function
-> - *
-> - * Return: 0 on success, negative error code otherwise
-> - */
-> -static int ice_ptp_disable_shared_pin(struct ice_pf *pf, unsigned int pi=
-n,
-> -				      enum ptp_pin_function func)
-> -{
-> -	unsigned int gpio_pin;
-> -
-> -	switch (func) {
-> -	case PTP_PF_PEROUT:
-> -		gpio_pin =3D pf->ptp.ice_pin_desc[pin].gpio[1];
-> -		break;
-> -	case PTP_PF_EXTTS:
-> -		gpio_pin =3D pf->ptp.ice_pin_desc[pin].gpio[0];
-> -		break;
-> -	default:
-> -		return -EOPNOTSUPP;
-> -	}
-> -
-> -	for (unsigned int i =3D 0; i < pf->ptp.info.n_pins; i++) {
-> -		struct ptp_pin_desc *pin_desc =3D &pf->ptp.pin_desc[i];
-> -		unsigned int chan =3D pin_desc->chan;
-> -
-> -		/* Skip pin idx from the request */
-> -		if (i =3D=3D pin)
-> -			continue;
-> -
-> -		if (pin_desc->func =3D=3D PTP_PF_PEROUT &&
-> -		    pf->ptp.ice_pin_desc[i].gpio[1] =3D=3D gpio_pin) {
-> -			pf->ptp.perout_rqs[chan].period.sec =3D 0;
-> -			pf->ptp.perout_rqs[chan].period.nsec =3D 0;
-> -			pin_desc->func =3D PTP_PF_NONE;
-> -			pin_desc->chan =3D 0;
-> -			dev_dbg(ice_pf_to_dev(pf), "Disabling pin %u with
-> shared output GPIO pin %u\n",
-> -				i, gpio_pin);
-> -			return ice_ptp_cfg_perout(pf, &pf-
-> >ptp.perout_rqs[chan],
-> -						  false);
-> -		} else if (pf->ptp.pin_desc->func =3D=3D PTP_PF_EXTTS &&
-> -			   pf->ptp.ice_pin_desc[i].gpio[0] =3D=3D gpio_pin) {
-> -			pf->ptp.extts_rqs[chan].flags &=3D
-> ~PTP_ENABLE_FEATURE;
-> -			pin_desc->func =3D PTP_PF_NONE;
-> -			pin_desc->chan =3D 0;
-> -			dev_dbg(ice_pf_to_dev(pf), "Disabling pin %u with
-> shared input GPIO pin %u\n",
-> -				i, gpio_pin);
-> -			return ice_ptp_cfg_extts(pf, &pf-
-> >ptp.extts_rqs[chan],
-> -						 false);
-> -		}
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->  /**
->   * ice_verify_pin - verify if pin supports requested pin function
->   * @info: the driver's PTP info structure @@ -1969,14 +1815,6 @@ static =
-int
-> ice_verify_pin(struct ptp_clock_info *info, unsigned int pin,
->  		return -EOPNOTSUPP;
->  	}
->=20
-> -	/* On adapters with SMA_CTRL disable other pins that share same
-> GPIO */
-> -	if (ice_is_feature_supported(pf, ICE_F_SMA_CTRL)) {
-> -		ice_ptp_disable_shared_pin(pf, pin, func);
-> -		pf->ptp.pin_desc[pin].func =3D func;
-> -		pf->ptp.pin_desc[pin].chan =3D chan;
-> -		return ice_ptp_set_sma_cfg(pf);
-> -	}
-> -
->  	return 0;
->  }
->=20
-> @@ -2499,14 +2337,14 @@ static void ice_ptp_setup_pin_cfg(struct ice_pf
-> *pf)
->  	for (unsigned int i =3D 0; i < pf->ptp.info.n_pins; i++) {
->  		const struct ice_ptp_pin_desc *desc =3D &pf-
-> >ptp.ice_pin_desc[i];
->  		struct ptp_pin_desc *pin =3D &pf->ptp.pin_desc[i];
-> -		const char *name =3D NULL;
-> +		const char *name;
->=20
->  		if (!ice_is_feature_supported(pf, ICE_F_SMA_CTRL))
->  			name =3D ice_pin_names[desc->name_idx];
-> -		else if (desc->name_idx !=3D GPIO_NA)
-> -			name =3D ice_pin_names_nvm[desc->name_idx];
-> -		if (name)
-> -			strscpy(pin->name, name, sizeof(pin->name));
-> +		else
-> +			name =3D ice_pin_names_dpll[desc->name_idx];
+>  .../testing/selftests/drivers/net/hw/Makefile |   1 +
+>  .../selftests/drivers/net/hw/rx_buf_len.py    | 299 ++++++++++++++++++
+>  2 files changed, 300 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/rx_buf_len.py
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> index 07cddb19ba35..88625c0e86c8 100644
+> --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> @@ -20,6 +20,7 @@ TEST_PROGS = \
+>  	pp_alloc_fail.py \
+>  	rss_ctx.py \
+>  	rss_input_xfrm.py \
+> +	rx_buf_len.py \
+>  	tso.py \
+>  	#
+>  
+> diff --git a/tools/testing/selftests/drivers/net/hw/rx_buf_len.py b/tools/testing/selftests/drivers/net/hw/rx_buf_len.py
+> new file mode 100755
+> index 000000000000..d8a6d07fac5e
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/rx_buf_len.py
+> @@ -0,0 +1,299 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
 > +
-> +		strscpy(pin->name, name, sizeof(pin->name));
->=20
->  		pin->index =3D i;
->  	}
-> @@ -2518,8 +2356,8 @@ static void ice_ptp_setup_pin_cfg(struct ice_pf *pf=
-)
->   * ice_ptp_disable_pins - Disable PTP pins
->   * @pf: pointer to the PF structure
->   *
-> - * Disable the OS access to the SMA pins. Called to clear out the OS
-> - * indications of pin support when we fail to setup the SMA control regi=
-ster.
-> + * Disable the OS access to the pins. Called to clear out the OS
-> + * indications of pin support when we fail to setup pin array.
->   */
->  static void ice_ptp_disable_pins(struct ice_pf *pf)  { @@ -2560,40 +2398=
-,30
-> @@ static int ice_ptp_parse_sdp_entries(struct ice_pf *pf, __le16 *entrie=
-s,
->  	for (i =3D 0; i < num_entries; i++) {
->  		u16 entry =3D le16_to_cpu(entries[i]);
->  		DECLARE_BITMAP(bitmap, GPIO_NA);
-> -		unsigned int bitmap_idx;
-> +		unsigned int idx;
->  		bool dir;
->  		u16 gpio;
->=20
->  		*bitmap =3D FIELD_GET(ICE_AQC_NVM_SDP_AC_PIN_M,
-> entry);
+> +import errno, time
+> +from typing import Tuple
+> +from lib.py import ksft_run, ksft_exit, KsftSkipEx, KsftFailEx
+> +from lib.py import ksft_eq, ksft_ge, ksft_in, ksft_not_in
+> +from lib.py import EthtoolFamily, NetdevFamily, NlError
+> +from lib.py import NetDrvEpEnv, GenerateTraffic
+> +from lib.py import cmd, defer, bpftrace, ethtool, rand_port
 > +
-> +		/* Check if entry's pin bitmap is valid. */
-> +		if (bitmap_empty(bitmap, GPIO_NA))
-> +			continue;
 > +
->  		dir =3D !!FIELD_GET(ICE_AQC_NVM_SDP_AC_DIR_M, entry);
->  		gpio =3D FIELD_GET(ICE_AQC_NVM_SDP_AC_SDP_NUM_M,
-> entry);
-> -		for_each_set_bit(bitmap_idx, bitmap, GPIO_NA + 1) {
-> -			unsigned int idx;
->=20
-> -			/* Check if entry's pin bit is valid */
-> -			if (bitmap_idx >=3D NUM_PTP_PINS_NVM &&
-> -			    bitmap_idx !=3D GPIO_NA)
-> -				continue;
-> -
-> -			/* Check if pin already exists */
-> -			for (idx =3D 0; idx < ICE_N_PINS_MAX; idx++)
-> -				if (pins[idx].name_idx =3D=3D bitmap_idx)
-> -					break;
-> -
-> -			if (idx =3D=3D ICE_N_PINS_MAX) {
-> -				/* Pin not found, setup its entry and name */
-> -				idx =3D n_pins++;
-> -				pins[idx].name_idx =3D bitmap_idx;
-> -				if (bitmap_idx =3D=3D GPIO_NA)
-> -					strscpy(pf->ptp.pin_desc[idx].name,
-> -						ice_pin_names[gpio],
-> -						sizeof(pf->ptp.pin_desc[idx]
-> -							       .name));
-> -			}
-> +		for (idx =3D 0; idx < ICE_N_PINS_MAX; idx++) {
-> +			if (pins[idx].name_idx =3D=3D gpio)
-> +				break;
-> +		}
->=20
-> -			/* Setup in/out GPIO number */
-> -			pins[idx].gpio[dir] =3D gpio;
-> +		if (idx =3D=3D ICE_N_PINS_MAX) {
-> +			/* Pin not found, setup its entry and name */
-> +			idx =3D n_pins++;
-> +			pins[idx].name_idx =3D gpio;
->  		}
-> +		pins[idx].gpio[dir] =3D gpio;
->  	}
->=20
->  	for (i =3D 0; i < n_pins; i++) {
-> @@ -2621,10 +2449,10 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf
-> *pf)
->=20
->  	if (pf->hw.mac_type =3D=3D ICE_MAC_GENERIC_3K_E825) {
->  		pf->ptp.ice_pin_desc =3D ice_pin_desc_e825c;
-> -		pf->ptp.info.n_pins =3D
-> ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e825c);
-> +		pf->ptp.info.n_pins =3D ARRAY_SIZE(ice_pin_desc_e825c);
->  	} else {
->  		pf->ptp.ice_pin_desc =3D ice_pin_desc_e82x;
-> -		pf->ptp.info.n_pins =3D
-> ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e82x);
-> +		pf->ptp.info.n_pins =3D ARRAY_SIZE(ice_pin_desc_e82x);
->  	}
->  	ice_ptp_setup_pin_cfg(pf);
->  }
-> @@ -2650,15 +2478,13 @@ static void ice_ptp_set_funcs_e810(struct ice_pf
-> *pf)
->  	if (err) {
->  		/* SDP section does not exist in NVM or is corrupted */
->  		if (ice_is_feature_supported(pf, ICE_F_SMA_CTRL)) {
-> -			ptp->ice_pin_desc =3D ice_pin_desc_e810_sma;
-> -			ptp->info.n_pins =3D
-> -
-> 	ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e810_sma);
-> +			ptp->ice_pin_desc =3D ice_pin_desc_dpll;
-> +			ptp->info.n_pins =3D ARRAY_SIZE(ice_pin_desc_dpll);
->  		} else {
->  			pf->ptp.ice_pin_desc =3D ice_pin_desc_e810;
-> -			pf->ptp.info.n_pins =3D
-> -				ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e810);
-> -			err =3D 0;
-> +			pf->ptp.info.n_pins =3D
-> ARRAY_SIZE(ice_pin_desc_e810);
->  		}
-> +		err =3D 0;
->  	} else {
->  		desc =3D devm_kcalloc(ice_pf_to_dev(pf), ICE_N_PINS_MAX,
->  				    sizeof(struct ice_ptp_pin_desc), @@ -
-> 2676,8 +2502,6 @@ static void ice_ptp_set_funcs_e810(struct ice_pf *pf)
->  	ptp->info.pin_config =3D ptp->pin_desc;
->  	ice_ptp_setup_pin_cfg(pf);
->=20
-> -	if (ice_is_feature_supported(pf, ICE_F_SMA_CTRL))
-> -		err =3D ice_ptp_set_sma_cfg(pf);
->  err:
->  	if (err) {
->  		devm_kfree(ice_pf_to_dev(pf), desc);
-> @@ -2703,7 +2527,7 @@ static void ice_ptp_set_funcs_e830(struct ice_pf
-> *pf)  #endif /* CONFIG_ICE_HWTS */
->  	/* Rest of the config is the same as base E810 */
->  	pf->ptp.ice_pin_desc =3D ice_pin_desc_e810;
-> -	pf->ptp.info.n_pins =3D ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e810);
-> +	pf->ptp.info.n_pins =3D ARRAY_SIZE(ice_pin_desc_e810);
->  	ice_ptp_setup_pin_cfg(pf);
->  }
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h
-> b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> index 3b769a0cad00..c8dac5a5bcd9 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> @@ -202,9 +202,6 @@ enum ice_ptp_pin_nvm {
->=20
->  /* Pin definitions for PTP */
->  #define ICE_N_PINS_MAX			6
-> -#define ICE_SMA_PINS_NUM		4
-> -#define ICE_PIN_DESC_ARR_LEN(_arr)	(sizeof(_arr) / \
-> -					 sizeof(struct ice_ptp_pin_desc))
->=20
->  /**
->   * struct ice_ptp_pin_desc - hardware pin description data
-> --
-> 2.38.1
+> +def _do_bpftrace(cfg, mul, base_size, tgt_queue=None):
+> +    queue_filter = ''
+> +    if tgt_queue is not None:
+> +        queue_filter = 'if ($skb->queue_mapping != %d) {return;}' % (tgt_queue + 1, )
 
+if tgt_queue: should work as well?
+
+> +
+> +    t = ('tracepoint:net:netif_receive_skb { ' +
+> +         '$skb = (struct sk_buff *)args->skbaddr; '+
+> +         '$sh = (struct skb_shared_info *)($skb->head + $skb->end); ' +
+> +         'if ($skb->dev->ifindex != ' + str(cfg.ifindex) + ') {return;} ' +
+> +         queue_filter +
+> +         '@[$skb->len - $skb->data_len] = count(); ' +
+> +         '@h[$skb->len - $skb->data_len] = count(); ' +
+> +         'if ($sh->nr_frags > 0) { @[$sh->frags[0].len] = count(); @d[$sh->frags[0].len] = count();} }'
+> +        )
+
+Why do we have @h and @d? We seem to check only the 'sizes'/@?
+
+> +    maps = bpftrace(t, json=True, timeout=2)
+> +    # We expect one-dim array with something like:
+> +    # {"type": "map", "data": {"@": {"1500": 1, "719": 1,
+> +    sizes = maps["@"]
+> +    h = maps["@h"]
+> +    d = maps["@d"]
+> +    good = 0
+> +    bad = 0
+
+[..]
+
+> +    for k, v in sizes.items():
+> +        k = int(k)
+> +        if mul == 1 and k > base_size:
+> +            bad += v
+> +        elif mul > 1 and k > base_size:
+> +            good += v
+> +        elif mul < 1 and k >= base_size:
+> +            bad += v
+
+I haven't fully processed what's going on here, but will it be
+easier if we go from mul*base_size to old_size and new_size? Or maybe
+the comments can help?
+
+if old_size == new_size and frag > old_size:
+  # unchanged buf len, unexpected large frag
+elif new_size < old_size and frag >= old_size:
+  # shrank buf len, but got old (big) frag
+elif new_size > old_size and frag > old_size:
+  # good
+
+> +    ksft_eq(bad, 0, "buffer was decreased but large buffers seen")
+> +    if mul > 1:
+> +        ksft_ge(good, 100, "buffer was increased but no large buffers seen")
+
+> +
+> +
+> +def _ethtool_create(cfg, act, opts):
+> +    output = ethtool(f"{act} {cfg.ifname} {opts}").stdout
+> +    # Output will be something like: "New RSS context is 1" or
+> +    # "Added rule with ID 7", we want the integer from the end
+> +    return int(output.split()[-1])
+> +
+> +
+> +def nic_wide(cfg, check_geometry=False) -> None:
+> +    """
+> +    Apply NIC wide rx-buf-len change. Run some traffic to make sure there
+> +    are no crashes. Test that setting 0 restores driver default.
+> +    Assume we start with the default.
+> +    """
+> +    try:
+> +        rings = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+> +    except NlError as e:
+> +        rings = {}
+> +    if "rx-buf-len" not in rings:
+> +        raise KsftSkipEx('rx-buf-len configuration not supported by device')
+> +
+> +    if rings['rx-buf-len'] * 2 <= rings['rx-buf-len-max']:
+> +        mul = 2
+> +    else:
+> +        mul = 1/2
+
+And similarly here? (and elsewhere)
+
+def pick_buf_size(rings):
+	""" pick new rx-buf-len depending on current and max settings """
+	buf_len = rings['rx-buf-len']
+	if buf_len * 2 <= <= rings['rx-buf-len-max']:
+ 	  # if can grow, try to grow
+	  return buf_len, buf_len * 2
+	else:
+	  # otherwise shrink
+	  return buf_len, buf_len / 2
+
+old_buf_len, new_buf_len = pick_buf_size(ring)
+...
+
+(or maybe its just me, idk, easier to think in old>new comparisons vs
+doing mul*base_size math)
+
+> +    cfg.ethnl.rings_set({'header': {'dev-index': cfg.ifindex},
+> +                         'rx-buf-len': rings['rx-buf-len'] * mul})
+> +
+> +    # Use zero to restore default, per uAPI, we assume we started with default
+> +    reset = defer(cfg.ethnl.rings_set, {'header': {'dev-index': cfg.ifindex},
+> +                                       'rx-buf-len': 0})
+> +
+> +    new = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+> +    ksft_eq(new['rx-buf-len'], rings['rx-buf-len'] * mul, "config after change")
+> +
+> +    # Runs some traffic thru them buffers, to make things implode if they do
+> +    traf = GenerateTraffic(cfg)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, mul, rings['rx-buf-len'])
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +
+> +    reset.exec()
+> +    new = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+> +    ksft_eq(new['rx-buf-len'], rings['rx-buf-len'], "config reset to default")
+> +
+> +
+> +def nic_wide_check_packets(cfg) -> None:
+> +    nic_wide(cfg, check_geometry=True)
+> +
+> +
+> +def _check_queues_with_config(cfg, buf_len, qset):
+> +    cnt = 0
+> +    queues = cfg.netnl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+> +    for q in queues:
+> +        if 'rx-buf-len' in q:
+> +            cnt += 1
+> +            ksft_eq(q['type'], "rx")
+> +            ksft_in(q['id'], qset)
+> +            ksft_eq(q['rx-buf-len'], buf_len, "buf size")
+> +    if cnt != len(qset):
+> +        raise KsftFailEx('queue rx-buf-len config invalid')
+> +
+> +
+> +def _per_queue_configure(cfg) -> Tuple[dict, int, defer]:
+> +    """
+> +    Prep for per queue test. Set the config on one queue and return
+> +    the original ring settings, the multiplier and reset defer.
+> +    """
+> +    # Validate / get initial settings
+> +    try:
+> +        rings = cfg.ethnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+> +    except NlError as e:
+> +        rings = {}
+> +    if "rx-buf-len" not in rings:
+> +        raise KsftSkipEx('rx-buf-len configuration not supported by device')
+> +
+> +    try:
+> +        queues = cfg.netnl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+> +    except NlError as e:
+> +        raise KsftSkipEx('queue configuration not supported by device')
+> +
+> +    if len(queues) < 2:
+> +        raise KsftSkipEx('not enough queues: ' + str(len(queues)))
+> +    for q in queues:
+> +        if 'rx-buf-len' in q:
+> +            raise KsftFailEx('queue rx-buf-len already configured')
+> +
+> +    # Apply a change, we'll target queue 1
+> +    if rings['rx-buf-len'] * 2 <= rings['rx-buf-len-max']:
+> +        mul = 2
+> +    else:
+> +        mul = 1/2
+> +    try:
+> +        cfg.netnl.queue_set({'ifindex': cfg.ifindex, "type": "rx", "id": 1,
+> +                             'rx-buf-len': rings['rx-buf-len'] * mul })
+> +    except NlError as e:
+> +        if e.error == errno.EOPNOTSUPP:
+> +            raise KsftSkipEx('per-queue rx-buf-len configuration not supported')
+> +        raise
+> +
+> +    reset = defer(cfg.netnl.queue_set, {'ifindex': cfg.ifindex,
+> +                                        "type": "rx", "id": 1,
+> +                                        'rx-buf-len': 0})
+> +    # Make sure config stuck
+> +    _check_queues_with_config(cfg, rings['rx-buf-len'] * mul, {1})
+> +
+> +    return rings, mul, reset
+> +
+> +
+> +def per_queue(cfg, check_geometry=False) -> None:
+> +    """
+> +    Similar test to nic_wide, but done a single queue (queue 1).
+> +    Flow filter is used to direct traffic to that queue.
+> +    """
+> +
+> +    rings, mul, reset = _per_queue_configure(cfg)
+> +    _check_queues_with_config(cfg, rings['rx-buf-len'] * mul, {1})
+> +
+> +    # Check with traffic, we need to direct the traffic to the expected queue
+> +    port = rand_port()
+> +    flow = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port} action 1"
+> +    nid = _ethtool_create(cfg, "-N", flow)
+> +    ntuple = defer(ethtool, f"-N {cfg.ifname} delete {nid}")
+> +
+> +    traf = GenerateTraffic(cfg, port=port)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, mul, rings['rx-buf-len'], tgt_queue=1)
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +    ntuple.exec()
+> +
+> +    # And now direct to another queue
+> +    flow = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port} action 0"
+> +    nid = _ethtool_create(cfg, "-N", flow)
+> +    ntuple = defer(ethtool, f"-N {cfg.ifname} delete {nid}")
+> +
+> +    traf = GenerateTraffic(cfg, port=port)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, 1, rings['rx-buf-len'], tgt_queue=0)
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +
+> +    # Back to default
+> +    reset.exec()
+> +    queues = cfg.netnl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+> +    for q in queues:
+> +        ksft_not_in('rx-buf-len', q)
+> +
+> +
+> +def per_queue_check_packets(cfg) -> None:
+> +    per_queue(cfg, check_geometry=True)
+> +
+> +
+> +def queue_check_ring_count(cfg, check_geometry=False) -> None:
+> +    """
+> +    Make sure the change of ring count is handled correctly.
+> +    """
+> +    rings, mul, reset = _per_queue_configure(cfg)
+> +
+> +    channels = cfg.ethnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+> +    if channels.get('combined-count', 0) < 4:
+> +        raise KsftSkipEx('need at least 4 rings, have',
+> +                         channels.get('combined-count'))
+> +
+> +    # Move the channel count up and down, should make no difference
+> +    moves = [1, 0]
+> +    if channels['combined-count'] == channels['combined-max']:
+> +        moves = [-1, 0]
+> +    for move in moves:
+> +        target = channels['combined-count'] + move
+> +        cfg.ethnl.channels_set({'header': {'dev-index': cfg.ifindex},
+> +                                'combined-count': target})
+> +
+> +    _check_queues_with_config(cfg, rings['rx-buf-len'] * mul, {1})
+> +
+> +    # Check with traffic, we need to direct the traffic to the expected queue
+> +    port1 = rand_port()
+> +    flow1 = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port1} action 1"
+> +    nid = _ethtool_create(cfg, "-N", flow1)
+> +    ntuple = defer(ethtool, f"-N {cfg.ifname} delete {nid}")
+> +
+> +    traf = GenerateTraffic(cfg, port=port1)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, mul, rings['rx-buf-len'], tgt_queue=1)
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +
+> +    # And now direct to another queue
+> +    port0 = rand_port()
+> +    flow = f"flow-type tcp{cfg.addr_ipver} dst-ip {cfg.addr} dst-port {port0} action 0"
+> +    nid = _ethtool_create(cfg, "-N", flow)
+> +    defer(ethtool, f"-N {cfg.ifname} delete {nid}")
+> +
+> +    traf = GenerateTraffic(cfg, port=port0)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, 1, rings['rx-buf-len'], tgt_queue=0)
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +
+> +    # Go to a single queue, should reset
+> +    ntuple.exec()
+> +    cfg.ethnl.channels_set({'header': {'dev-index': cfg.ifindex},
+> +                            'combined-count': 1})
+> +    cfg.ethnl.channels_set({'header': {'dev-index': cfg.ifindex},
+> +                            'combined-count': channels['combined-count']})
+> +
+> +    nid = _ethtool_create(cfg, "-N", flow1)
+> +    defer(ethtool, f"-N {cfg.ifname} delete {nid}")
+> +
+> +    queues = cfg.netnl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+> +    for q in queues:
+> +        ksft_not_in('rx-buf-len', q)
+> +
+> +    # Check with traffic that queue is now getting normal buffers
+> +    traf = GenerateTraffic(cfg, port=port1)
+> +    try:
+> +        if check_geometry:
+> +            _do_bpftrace(cfg, 1, rings['rx-buf-len'], tgt_queue=1)
+> +    finally:
+> +        traf.wait_pkts_and_stop(20000)
+> +
+> +
+> +def queue_check_ring_count_check_packets(cfg):
+> +    queue_check_ring_count(cfg, True)
+> +
+> +
+> +def main() -> None:
+> +    with NetDrvEpEnv(__file__) as cfg:
+> +        cfg.netnl = NetdevFamily()
+> +        cfg.ethnl = EthtoolFamily()
+> +
+> +        o = [nic_wide,
+> +             per_queue,
+> +             nic_wide_check_packets]
+
+o?
 
