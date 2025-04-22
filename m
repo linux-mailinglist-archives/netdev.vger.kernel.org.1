@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD13AA963B5
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:12:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5C6A963B9
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:12:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DA851888421
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:10:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C40188B798
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E653253F1B;
-	Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E95256C7C;
+	Tue, 22 Apr 2025 09:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ep8keecx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqB6HV0a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A045253947
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225F5253947;
+	Tue, 22 Apr 2025 09:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745312968; cv=none; b=Zh8q9VTi3iFKYHnD6wiN1BosPN2fTkA1wsvOjOX4WCLGHNlrnOlrFH76ixY+a6a9DDD3kGjsgFHRjueyiniOCWxKiyRFYDIEuxuaGu2bgNs3KSBhJFmCcHjKdwB5rwDzCoGHZilrWnyukhACP6wUD7BwDDMXXesR7roXeYATaOM=
+	t=1745312970; cv=none; b=Za88ygVONqf3KFCucxAkT7GsHNaj7If95p43mnXgkM/7FcaQ+26oy22VVypk9dDuBAwrV8Vhk4gUnBNI1qVyilh0fDg6PrS060x9Sn83bRsievj7AmBbU3e/fp6PuWly1RAkiw6BcmmD6lv/S617ldlBEpnFlezpGXo2nH5Nje8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745312968; c=relaxed/simple;
-	bh=sUEAWHCQA+dOg/EDk5/UP7oO24mVup92Rfh3+Pui2tg=;
+	s=arc-20240116; t=1745312970; c=relaxed/simple;
+	bh=LWLwIWIREcnGHVr9V4bXSa6VdoUXdDgUQPuZFLtN2mE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uKREwpdl2Fyh9+yavkRyejQKnvnOd+NOXUE5aezeh473gblIEqwN8HmExO+l+xadVM+oGPy0S89U03wHHa3J4g/XGD0HU5Ek/LV3Jz73F6lDHBfsGtJvKKHF3rC85dhUQAwJHkH59hwLOs2thkrY2Cw8Qzk+gBlGbg7FQEsPw4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ep8keecx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19F48C4CEE9;
-	Tue, 22 Apr 2025 09:09:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ToUW/S2DdlIKc8E6/BvSNsBMpdelbxTViDf2cDcAmkZnB4u7KtWOZHrKV0RpXcy6q6ur1fBL+CtFlwXQOEYgnEh/0D607qxz+Z3lj9qbRZiWs5ox8NKqC8HwI532UiOQhm8ZD/ywh2TFD94S0vYEy4By0BuOlKCr9hsPl2rivk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqB6HV0a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F855C4CEE9;
+	Tue, 22 Apr 2025 09:09:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745312968;
-	bh=sUEAWHCQA+dOg/EDk5/UP7oO24mVup92Rfh3+Pui2tg=;
+	s=k20201202; t=1745312969;
+	bh=LWLwIWIREcnGHVr9V4bXSa6VdoUXdDgUQPuZFLtN2mE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ep8keecxfVCsbBwZicDUrVppig2hrDJr5eejofH7JNNn7CghFR5MK0Kvv67gRMnN8
-	 6gOLaFvkiAMGiXeBQOWdLjdC/24YHQ5PVjTzy/q4XSbq/DmjOkP027pZoot3IqSIbn
-	 Ywhut6ISS4dRKAvsd6d1EPh0mk1Kaq8OJZpl9tK4m1/LRV7pWU1fEFLbMEV2XPg/pX
-	 7fNwx/1smiHGD6W+dQo4BPpVo5pJadl316pmK/Gwd6lONfGWisk/KdU6Fa5urhMIYx
-	 8VfmOAYKZwR62/t6EDvosJN4r7xQlkVt7e2gTUtfEVeajRO9MqGx8RkQBOU8z/rVcZ
-	 vYjckoVO4u1Cg==
+	b=VqB6HV0aqc+RSvcoU9WUo8DWCxt0Ccdy0uBbJENx3iH5+9Ohg6YQZYiDLIMDsvl6e
+	 0n9oykz0PgHCuJlFYF2tO4l81reaL/2HXwylK01UIRrIKu+XzvVQcQRJk7qiiCjKbS
+	 uq7tpZTFlDL6xK18yWTvNTCHIPLXrhmYhytfVVqbIxpbMOIZ/VI4Cg7sUzLEB9Fs0k
+	 S7oumbvI+udWTuOvEAYiGSES0Z+QwpKadFnYnSByZMWFtuHTKd1fR2MI4w0vMhP7MN
+	 spwfxsr7GBoYOAjPHYrmpbvJNwoRhiNeG/c65fZvbjA//uAwubZtLgdlFjOvbrS6ZM
+	 3f99er/Ufla1g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEBD439D6546;
-	Tue, 22 Apr 2025 09:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342AA39D6546;
+	Tue, 22 Apr 2025 09:10:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: fix the missing unlock for detached devices
+Subject: Re: [PATCH v7 0/2] net/mlx5: Fix NULL dereference and memory leak in
+ ttc_table creation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174531300624.1477965.9431180923272525735.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Apr 2025 09:10:06 +0000
-References: <20250418015317.1954107-1-kuba@kernel.org>
-In-Reply-To: <20250418015317.1954107-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jdamato@fastly.com, almasrymina@google.com, sdf@fomichev.me,
- ap420073@gmail.com
+ <174531300776.1477965.14714402895095610167.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 09:10:07 +0000
+References: <20250418023814.71789-1-bsdhenrymartin@gmail.com>
+In-Reply-To: <20250418023814.71789-1-bsdhenrymartin@gmail.com>
+To: henry martin <bsdhenrymartin@gmail.com>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mbloch@nvidia.com, amirtz@nvidia.com,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 18:53:17 -0700 you wrote:
-> The combined condition was left as is when we converted
-> from __dev_get_by_index() to netdev_get_by_index_lock().
-> There was no need to undo anything with the former, for
-> the latter we need an unlock.
+On Fri, 18 Apr 2025 10:38:12 +0800 you wrote:
+> This patch series addresses two issues in the
+> mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() functions:
 > 
-> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 1. A potential NULL pointer dereference if mlx5_get_flow_namespace()
+> returns NULL.
+> 
+> 2. A memory leak in the error path when ttc_type is invalid (default:
+> switch case).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: fix the missing unlock for detached devices
-    https://git.kernel.org/netdev/net/c/d3153c3b4270
+  - [v7,1/2] net/mlx5: Fix null-ptr-deref in mlx5_create_{inner_,}ttc_table()
+    https://git.kernel.org/netdev/net/c/91037037ee3d
+  - [v7,2/2] net/mlx5: Move ttc allocation after switch case to prevent leaks
+    https://git.kernel.org/netdev/net/c/fa8fd315127c
 
 You are awesome, thank you!
 -- 
