@@ -1,103 +1,150 @@
-Return-Path: <netdev+bounces-184728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A780A9709E
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:27:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA86DA970C1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5510316B369
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:27:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A2C33A830F
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773762857C9;
-	Tue, 22 Apr 2025 15:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93AC28FFD1;
+	Tue, 22 Apr 2025 15:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="YwBF+djW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMUXKyUX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24428.protonmail.ch (mail-24428.protonmail.ch [109.224.244.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B00619DFAB
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47C628FFCD
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745335625; cv=none; b=hz1Y0P1Q4K1aCYytJshg2CoQYiRh4Xrxff/JJsvhynhUygkYryLNVkYebnOG4+lAqpToaPouAUNNnJ2iLxPqFEeScVseMjWxs2PYpG10+dIq9nTAChtElIN08usX1GeyADvWoTbXS8Ooh83DnqSkHmNX1n6UnHAN8UCIgOkdc1s=
+	t=1745335688; cv=none; b=Q27HJWkmtZ/akilbe9POBjYoxAOE80KpXNQFO860qVmEMX66YXsbenlaHyRBKpXdzDeqLRRGgs8A7vuAzOgXUbzN+24ciWxxzpZH5FAVCMB++KPILqFkUCaDYRF3i4Qv9YxYy8Nj73HXEB3zx4FsNgsqkwsa2hCuUb/AEbYVL40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745335625; c=relaxed/simple;
-	bh=MEafIECKcuWc44YBAqnnnaCjr/KScTAcOKXFYO7Ool0=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NkvcgqoEQq5GPTfGNepvjMTCE9G4k6BCox9dNW+X6umvvu5QiBXg8cHRrDPEjquYdLBZ8pHIgK9+6m2Km1yiM2GCeK5azhllhNJnnW0jsTQov4x5WQXHKdy4rxnLyYS+mS0nRg+iEaqcJiL7P+s6O8iiInBaBiSXtholi1JVGvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=YwBF+djW; arc=none smtp.client-ip=109.224.244.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1745335616; x=1745594816;
-	bh=MEafIECKcuWc44YBAqnnnaCjr/KScTAcOKXFYO7Ool0=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=YwBF+djWAOWgftyuE0LjWyICoo0SfKOsMwfc39z3lm8h4uWDzJaSSiqcb0rgrtyyQ
-	 //QnH/P9zpYoSuhsQDNVz9s0oHQhItoOZdqiw4nJClPQ7+0k2Xh1JDUkixcO6qybNW
-	 fRz0YdXKr7kRPzNa/9Qh7BOhpu11l4jntfVQDb1YaS+Hfjhi0NclyG/YJaoLSDgO6T
-	 H6DcTMyKS6mIecmfQEe3qMJIxa0J+lmxVMPMAT3zuLJWd9wMxQ0f9u7SptaVl4M/GX
-	 PV44GySq81C64yAE3agG7VRgOXckxZTTGMlXkqx7euAGdvuXYyFlptfPb23Dxu3bEM
-	 5YMfhjEaV1BXg==
-Date: Tue, 22 Apr 2025 15:26:50 +0000
-To: Linux Networking <netdev@vger.kernel.org>
-From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
-Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
-Subject: Check Point Firewall R81.20 proves to be very difficult to configure
-Message-ID: <xflLA4hzBH5V24QOVFpGw5XnOE8hVEDgfyhIPavnLR0E2UfZXuwzTPlwj7Mm4jU2scwxe5l70g63gqWlYdKspSt_y-4zs5S2PykUPHRVAWE=@protonmail.com>
-Feedback-ID: 39510961:user:proton
-X-Pm-Message-ID: f6ab279869f0ec2fff4b79666db71a941e6c5b7f
+	s=arc-20240116; t=1745335688; c=relaxed/simple;
+	bh=2Vtymed43jE3eqa+iT/LjKB/xHeQMUhQNK2xCymdLMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HIP1g44l18RIj/GxXFtBp4qForaXpIG5VPp+xCpj0JzYAKzQIdGfoyTShxnDmmIr9dW5cnBC040LhZLrxnL1+1r31gsFw82al29ApfqVwJCc2PcCu5NfqEciejx8op6J2O33wJIDS7D2hCR09g6KhrzHX2y6/KNgrwNmrL9mWao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EMUXKyUX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB711C4CEE9;
+	Tue, 22 Apr 2025 15:28:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745335688;
+	bh=2Vtymed43jE3eqa+iT/LjKB/xHeQMUhQNK2xCymdLMc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EMUXKyUXeFEdHrgUgnjAXjM47i4glDYEX/suOpebTDKNaJvQBXfvU1JEmSLLhAXDD
+	 kyxAZOuyqfUQMp8pxVxN9pXzIMTLT+mt+9qBl+Uk3ziVSFQXHuf8Ex+5+TiyhLe31D
+	 +U1EanNoa7awS82uT3poWsqewREsLaSHupe6kgHyIE2//ynfNnOZF67knToDAsJ9eV
+	 eAFeDmxmmRHp3NlULFcbsDq0AlocYupTcaia/j/UAavJp2nkR4KTXUXBcqfau9UKDp
+	 o6W2nM9fvpJbyn/+V5WFoh96c4iFuJPHkHJhqfrOpiqmDDM/xsRNn10yti7/bDtDj2
+	 aaYrjLUFr1ayQ==
+Date: Tue, 22 Apr 2025 08:28:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+ linux@armlinux.org.uk, hkallweit1@gmail.com, davem@davemloft.net,
+ pabeni@redhat.com
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+Message-ID: <20250422082806.6224c602@kernel.org>
+In-Reply-To: <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+	<de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch>
+	<CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
+	<06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch>
+	<CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+	<CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
+	<20250421182143.56509949@kernel.org>
+	<e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Subject: Check Point Firewall R81.20 proves to be very difficult to configu=
-re
+On Tue, 22 Apr 2025 15:49:02 +0200 Andrew Lunn wrote:
+> > Interesting. My gut feeling is that even if we make Linux and the NIC
+> > behave nicely according to 802.1Q, we'll also need to make some changes
+> > on the BMC side. And there we may encounter pushback as the status quo
+> > works quite trivially for devices with PHY control in FW.  
+> 
+> As i see it, we have two things stacked on top of each other. We have
+> what is standardised for NC-SI, DSP0222. That gives a basis, and then
+> there is vendor stuff on top for multi-host, which is more strict.
 
-Good day from Singapore,
+The multi-host piece I'd completely ignore. Real multi-host NICs
+cannot do without firmware. One component needs to be in control
+of global resources, and it can't be a host that may get randomly
+rebooted.
 
-Check Point Firewall R81.20 is based on Red Hat Enterprise Linux (RHEL).
+> Linux should have generic support for DSP0222. I've seen vendors hack
+> around with WoL to make it work. It would be nice to replace that hack
+> with a method to tell phylink to enable support for DSP0222. A
+> standardised method, since as additional ops, or a flag. phylink can
+> then separate admin down from carrier down when needed.
 
-I have searched high and low on Google and YouTube for concise guides on co=
-nfiguring Check Point Firewall R81.20 with basic internet connectivity for =
-home use, but couldn't find any.
+I'm no DSP0222 expert but in my experience it is rather limited in
+defining its interactions with the host. It is also irrelevant what
+exact tap / agent is asking us to keep the link up. The point is
+_some_ agent is running either on the NIC or leeching off the NIC,
+and is requesting the link to stay up. It could even be a VF/VM on
+the same host.
 
-Today 22 Apr 2025 Tuesday, I asked ChatGPT to generate a concise guide for =
-configuring Check Point Firewall R81.20 with basic internet connectivity fo=
-r home use.
+FWIW in the NFP we just had a "forced" bit which told the host not
+to touch physical link status:
+https://elixir.bootlin.com/linux/v6.15-rc1/source/drivers/net/ethernet/netronome/nfp/nfp_port.h#L62
 
-However, the guide generated by ChatGPT doesn't exactly match the webUI and=
- SmartConsole interfaces of Check Point Firewall R81.20.
+A possible extension would be to have a bitmap of possible agent types,
+so that the user has more info about what agent is keeping the link up.
+But at the end of the day all the link mgmt cares about is whether such
+bitmap is empty or not.
 
-At the end of the day, I couldn't get Check Point Firewall R81.20 to work i=
-n my home and I screwed up the firewall configuration.
+> Then we have vendor stuff on top. 
+> 
+> > BTW Saeed posted a devlink param to "keep link up" recently:
+> > https://lore.kernel.org/all/20250414195959.1375031-11-saeed@kernel.org/
+> > Intel has ethtool priv flags to the same effect, in their 40G and 100G
+> > drivers, but with reverse polarity:
+> > https://docs.kernel.org/networking/device_drivers/ethernet/intel/i40e.html#setting-the-link-down-on-close-private-flag
+> > These are all for this exact use case. In the past Ido added module
+> > power policy, which is the only truly generic configurable, and one we
+> > should probably build upon:
+> > https://docs.kernel.org/networking/ethtool-netlink.html#c.ethtool_module_power_mode_policy
+> > I'm not sure if this is expected to include PCS or it's just telling
+> > the module to keep the laser on..  
+> 
+> Ideally, we want to define something vendor agnostic. And i would
+> prefer we talk about the high level concept, sharing the NIC with a
+> BMC and multiple hosts, rather than the low level, keep link up.
+> 
+> The whole concept of a multi-host NIC is new to me. So i at least need
+> to get up to speed with it. I've no idea if Russell has come across it
+> before, since it is not a SoC concept.
+> 
+> I don't really want to agree to anything until i do have that concept
+> understood. That is part of why i asked about a standard. It is a
+> dense document answering a lot of questions. Without a standard, i
+> need to ask a lot of questions.
 
-I guess I have to re-install Check Point Firewall R81.20 from the DVD ISO i=
-mage and start all over again.
+Don't hesitate to ask the questions, your last reply contains no
+question marks :)
 
-Check Point Firewall R81.20 proves to be very difficult to configure, even =
-for home use. Most of the other brands of firewalls are far easier to confi=
-gure.
+> I also think there is a lot more to it than just keeping the laser
+> on. For NC-SI, DSP0222 that probably does cover a big chunk of the
+> problem, but for multi-host, my gut is telling me there is more to it.
+> 
+> Let me do some research and thinking about multi-host.
 
-Regards,
-
-Mr. Turritopsis Dohrnii Teo En Ming
-Targeted Individuals in Singapore
-GIMP =3D Government-Induced Medical Problems
-22 Apr 2025 Tuesday
-
-
-
-
-
-
-
+The only case that could make multi-host relevant here is if each host
+had its own port but they shared some resources like clocks. Making it
+a not-really multi-host. I know there are NICs on the market which have
+similar limitations on single host. If you configure port breakout all
+sub-ports need to run at the same rate. Programming of shared resources
+is orthogonal in my mind to a subservient agent asking us not to link
+down.
 
