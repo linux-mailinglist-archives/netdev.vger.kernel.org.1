@@ -1,199 +1,174 @@
-Return-Path: <netdev+bounces-184563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E0BA9639D
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:09:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6203A963A6
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 186A41888099
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:02:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45D2F3A2243
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018FB1EFFAB;
-	Tue, 22 Apr 2025 09:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73DA31EF37A;
+	Tue, 22 Apr 2025 09:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3y1EiME"
+	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="CDiAeWH9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010049.outbound.protection.outlook.com [52.101.69.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5118B19D8B7;
-	Tue, 22 Apr 2025 09:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745312508; cv=none; b=L2OOGawpefzP0Qm0GynVdAp4r7OE57GdCJHTGJ1xcz9VSvWbuRrBmcC7OOfFXZpU1k/Usv69eLL8fbbzx2I3Mki5x9puxtYHaSJbFM8Oouc6CHbi4pbR6gHY2RSoCO+rihPDGJd9wYyDavajxoQgNbMA4h0UnbjTsfli/3Bpzv4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745312508; c=relaxed/simple;
-	bh=xwAiim+BzPpGaX7BSuXBzGYxP0hQVbNoyy/nha9lMnc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z+NqTKpPAzkpvI30tkVd27xA/IZAcQSvTlRdV2TPRw3Z8DBgBJqFCgovPhqEIok7XsYz0kAuhKISvTvSWSnTuX4xpcFXHQjt+mapB/K+ldnkZk1rjpJSkgjesj53u2oQFMhvLP3XAMWik9sjm8avtMt0Kps0SnjEgs7vDuJgsiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3y1EiME; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c5675dec99so458005385a.0;
-        Tue, 22 Apr 2025 02:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745312506; x=1745917306; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bI4tM5u6hlOmKAY3jmb6sm9muPDkxLfs7d3SJ5djx70=;
-        b=X3y1EiMEt9UYslUa1kg5GJxLXlxZpahsIz669QuQ2XdeSS4dNRHLZQ83L1nWko8U7o
-         7JI/5YdkZimREjEp6iqnAANmGoo0BAcviaA7NpTwrLkc7BOgyqE6K3VZdzQNw6gc+Q4m
-         G3uAV4aVaQd3fV6oM6CjaJGiv44Tzx4mOxjwcAHJ8mkZ7X9lraJC2+BasBmMOw42nw8R
-         LWnhLhssrJg1bcRBepDEASf4jKVpWacjs6Bv0IH0S4irfRNjf4Y1u951Y3QKMwwZuQsT
-         /v7KpGYu51cNBk7d5dvhWVKFFYGYVqdAeQGOsmkdcoajri/4Leul3Ejmpk7d0keANkzZ
-         rkMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745312506; x=1745917306;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bI4tM5u6hlOmKAY3jmb6sm9muPDkxLfs7d3SJ5djx70=;
-        b=jQ+ZNiIYr1YmNIwXmZFyYnTRmNEd+huOCV6uf3L7Jwh0x722upnRmu2LR2cFlKusvJ
-         nulnu+LUh1/J8bi5Kki2isQXzgFEIPAeaTaF6deQYq3bvwqtYwoRHw84NZKqFj+A4dy5
-         imYMlRmI7dOqDqsS5ck9Mb3SGej0eedvec2lH5sz5y4RPeL9IwCBCPhElXcVDp3Xqkjo
-         YGJww1+oJMnGpxZ9wfD1hnAZUdhBjoTpJbGk+CdTjO1W9rsvLoqIK3AAMBB4wD390Tw+
-         S17AD4gUr5mv5HeQLeZ8tGKS/51OZtEuuIqVLJQngsXG4XpEr/U61YCoQkh1Vu3AkQZ7
-         zDAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUUZfib64LKeYo/8C4gL9cBWF/i0zTtBI6GNaE6IE1CVb/9+qPDmoufvrnt6WC2EaE1b7PALO1x/B+N@vger.kernel.org, AJvYcCVIXf463i0d5xm5KvwvTnNA5RtvWDY3+XE+Xg8kSJ8zBXigDHJ1vsZMJVYXYpR2ETpeG83gpl8axfjJ@vger.kernel.org, AJvYcCW7pQJagTqNh3mjmn7isvA9qTTdoLiUTuMHlXFayuBQIe2O9t6cqn39SXi6SD7I6NO3cl/khslYxtek@vger.kernel.org, AJvYcCWgwa0UCnn1RTNUVeNhyW27K57DCJRX5ilpKAnOJdNgeovCNsHZWcsydck+RPdep5Fapm7GUt7W@vger.kernel.org, AJvYcCX5Suh7zeF+y3iMoq4xKPoyw5PWa1R2/HpsCxiWfxeqCLU5QdyQe0VDVzhezkzVGw2tIN500TQ2KqAJ@vger.kernel.org, AJvYcCXV/I+cAC3ybTHHn4h5rr7lzLIjVchDg6/i3jjOhX7pHfpRKoLj2MFu/nNEuQ23RNjFiCbu26TRXfmjPP5m@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeGm7eVLm6XUyFg2Zc3Wsi+kFcg2caP9nEkmiB3KaTOxmSx0Hr
-	zZI0n4WtO192hoR8JteG+16veYHKSo4uhmbW7wcaRY+D+qn/t+np7duE0Po9CyDCOUVy6Dn9+TQ
-	geZw4U4rnB8XaDD2TyBW7OxU83vM=
-X-Gm-Gg: ASbGncs0ARJqzrwVxfQVOA4fhvoo2W/pR1t5LgWpkKq+8bMgPBD+OdIIylN8QxAgS6K
-	1r20SvH1DZp36BDFbjyH5MPEchB2PmxX0IumiNEKrXwdI4Q2W0plpbVK9GWrZ2Eioyc9bM6/HvI
-	LUMDFNTo2PMzTfRGpArVCytCOaV32bO2lX+I1f7LvhbiCdzsAijZ82rQ==
-X-Google-Smtp-Source: AGHT+IHPgdQcr6+EJ2c2GBm62vKYoe1rNLruGx6vpyIyteGjKou1apc6OLDwP+NZ9T6S5hjDnfeJTmR8mETK+wK+bzs=
-X-Received: by 2002:a05:620a:2684:b0:7c5:5909:18e5 with SMTP id
- af79cd13be357-7c927f6f84fmr1960081385a.3.1745312506200; Tue, 22 Apr 2025
- 02:01:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08661EFFAB;
+	Tue, 22 Apr 2025 09:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745312804; cv=fail; b=VmB/Lfsgyg/m3XCbq2xtIXxbV5A1gPha9k8eJ7FnR15BlK+iiFkb/L9RvteIxo+0H8hyjSl7fvc2yzWylCj7TQEU15vYfpQA53wbzzeHVuesiUvbk/xnQesiUSZA5iVXuljWQRZcRE0GpC5IounRCcCzUlKNkHUurotwUShELgU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745312804; c=relaxed/simple;
+	bh=DoMmLt05+dVQaGSQLDhFL6olUM9fU2ScDn4mSfIdfOI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jhox0POXt9VJnByNDlS4V43MISLyrXfHaWE0uIEVORNH6VNM+T96sZZbVLwRJraYupsOhoRFt5bLYtdKVaDpcTWtfS0+fUbl21+1HVXGTSMV8+2zJc+wxNSjKFgCnrMJX/yLtP7vxOg5UuFQblR/ELIV3zbBiInFo6udfCNibBY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=CDiAeWH9; arc=fail smtp.client-ip=52.101.69.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aDCu5ZczMx2OltNrBWWif1yK0SbtkQTmiJy+eR78BTuLDLdn6dFfGVQ+BGuXD7zdY/eBXDDOKeN4fBjRt1S68BVydbIMisRxwPp0oqYH8PwBjrJtaqRoAY8mKTHC1sHFi9MahJTjut1e5nBaR6siOT/vaybkmC5qSbbTZsC24TpM4anV9NinHrF09HMIF6TdY3YBpD+OOrueUzotfVzIrVXusaLS8SxPPNsmMZdEhhVwpCLTC69gU9cIKcvVBUSFbzvTJjYjs1Q0tKp/dSYiuXHYVqubvbEf0V+L4e/OQwp/W/+eNVUuX+YEJVLk8rw3a5m/7jF8hi/bKM8HwuSUIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hrTKIOumvKP8HT8o1Xi8ttGxMYZBT78PsbScPtmIjY8=;
+ b=Zy34FzwhPp3BhGZ0mBxDRYbtJ0jf7ITF8xC9jESKV43oy+xNgJYZLVHncbt2FBru6XqR8g9WuqpU4/8IcyPAIi7/PvlmaHqa+Rk1YNL1kteSAIYW1R+iEqQ3UIaDHddHqsFXHrhzlMlFD9prhtJf9qGfecr2Qbr2UfQ/mVzGqRqQJcKQAQkPS36iyNZ+v3wajTiI6l616P4GFrCvjiHUutmay4IN4fJW6YceE7lWU74xZMMt5dLVPNYsqlKkqALczyKe73Xp8DFB0vscsCOLefzGPwZJi84HVv06jpGgK998/Y27xtj9T9SCBONFqK/HvkrqrBmK2ZBK5gq5L0bn+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=leica-geosystems.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hrTKIOumvKP8HT8o1Xi8ttGxMYZBT78PsbScPtmIjY8=;
+ b=CDiAeWH9+Ya56WdRPf1FxoBiQyPhsFkIvRGMdlrQ/zRfUm+YCXSVQO+lcSUp/hJplDjsvIgLuSp8VEZmXY9u6k6D0xmxmLYrceKM8uW9WkBbzol6GJ9MxWX9+leyQ+ZB3lgWItajWtvjbX4Hho7uLvy+n3boB9VXdhbC4u7UwKo=
+Received: from AM6PR10CA0027.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:209:89::40)
+ by AM8PR06MB7556.eurprd06.prod.outlook.com (2603:10a6:20b:354::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.22; Tue, 22 Apr
+ 2025 09:06:38 +0000
+Received: from AM4PEPF00027A62.eurprd04.prod.outlook.com
+ (2603:10a6:209:89:cafe::50) by AM6PR10CA0027.outlook.office365.com
+ (2603:10a6:209:89::40) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.35 via Frontend Transport; Tue,
+ 22 Apr 2025 09:06:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
+ smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
+Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
+ designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.8.40.94; helo=hexagon.com; pr=C
+Received: from hexagon.com (193.8.40.94) by
+ AM4PEPF00027A62.mail.protection.outlook.com (10.167.16.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.12 via Frontend Transport; Tue, 22 Apr 2025 09:06:36 +0000
+Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Tue, 22 Apr 2025 11:06:36 +0200
+From: Johannes Schneider <johannes.schneider@leica-geosystems.com>
+To: dmurphy@ti.com
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	f.fainelli@gmail.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk,
+	michael@walle.cc,
+	netdev@vger.kernel.org,
+	bsp-development.geo@leica-geosystems.com,
+	Johannes Schneider <johannes.schneider@leica-geosystems.com>
+Subject: [PATCH net v2] net: dp83822: Fix OF_MDIO config check
+Date: Tue, 22 Apr 2025 11:06:34 +0200
+Message-Id: <20250422090634.4145880-1-johannes.schneider@leica-geosystems.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416-wmt-updates-v1-0-f9af689cdfc2@gmail.com>
- <20250416-wmt-updates-v1-3-f9af689cdfc2@gmail.com> <20250416201407.GC3811555-robh@kernel.org>
- <CABjd4YyTKquLcYC+DVg_koi3p7AhqwBNiazCiC713DQKjCaBSA@mail.gmail.com>
- <CABjd4Yxi4SLqsAk_fb9C=1BW6XjnZ8LQ_JKYu6KZ3TtMS0fnhg@mail.gmail.com> <14de236b-e2a7-4bde-986d-1e5ffddd01b4@kernel.org>
-In-Reply-To: <14de236b-e2a7-4bde-986d-1e5ffddd01b4@kernel.org>
-From: Alexey Charkov <alchark@gmail.com>
-Date: Tue, 22 Apr 2025 13:01:44 +0400
-X-Gm-Features: ATxdqUGmp6GiWAgqNWbO-0WSin1O6yJxUf9gHQTl5ZTyEce7EbX-dkQTVJBozo4
-Message-ID: <CABjd4YwpKYr3q06E7H3upFxyUT6uGg-Jzt2_FiyfS8R=j0ye8w@mail.gmail.com>
-Subject: Re: [PATCH 03/13] dt-bindings: mmc: vt8500-sdmmc: Convert to YAML
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Andi Shyti <andi.shyti@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@kernel.org>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-i2c@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pwm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 22 Apr 2025 09:06:36.0207 (UTC) FILETIME=[D9A48BF0:01DBB365]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00027A62:EE_|AM8PR06MB7556:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 97c50340-b0e3-4b70-7487-08dd817cfc61
+X-SET-LOWER-SCL-SCANNER: YES
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9npoyGPo/3hjz0XcANwZpcnjvFu/XwoAtrZRiW+EPLMuj9Umb1z2U/jZvoHf?=
+ =?us-ascii?Q?jwcblg2zWQTuikQ6Spokd7xrqjRpiTZOdDobg/x80zoG24FjWBsh/Uyhgn6y?=
+ =?us-ascii?Q?XZAF5MVpAL1RvlEeY4fKQEUk1DHARxugzxATFUJkI4rlLZr8S1aIjSIl5VB1?=
+ =?us-ascii?Q?bLZyJ0fviyvB8TEjfVfMK0bmH8/ze1c7lLZSDIsnbT2SXmB4uVyNZcR8S1KI?=
+ =?us-ascii?Q?0aXiDr7BBYgD8Bgtr0bmHPbhqiyogTupHxS0/xQHdku3TzKlXorSQbGUw4It?=
+ =?us-ascii?Q?/gJw3vCSIhxowQZuvL/NaxH/g45JPhaxQ9/C1X6Ak8TNZz8tZjwFolkNXWAh?=
+ =?us-ascii?Q?8GSczUj246FbckAOtPWaVh+hxZhI9vpxYrOmW/4G/BC8JRN1exzKee5JfHhk?=
+ =?us-ascii?Q?RTAbWww4lr29KGgn2krpVodX6HddD5+wv5sj8kphBJ5BxnIgUX5xoURjCvba?=
+ =?us-ascii?Q?r8Jh7/3AG0EvG8bxF2+eQewZbdcg/LA2M8nuupx0dkK9WZA5quONG7SDES0w?=
+ =?us-ascii?Q?SkGG39R73LlsbaKbesjNl5XWekdtEtj+79ognLl4keNrlg6m5Xl+SLSJ8Taq?=
+ =?us-ascii?Q?FT2ltRuGAxMbrQDUZQZBSoj4Wf8ecZ/tzdzilNRnxiN9k7G+Ezk5G8dzadOF?=
+ =?us-ascii?Q?ZFruzEmux4vVsIL0FQ/MYrsg4CNQUmHEzrX4rwQxRovVSVhklTRLM36pmzhe?=
+ =?us-ascii?Q?zub2vbNqczauCaXe8bVPYzcpDJQxkXPnD+4SUxzeelDR9M3CScf8fH6bhuR/?=
+ =?us-ascii?Q?XZKbdzcQSZ8XdwzFbMPlJyOGQrJmRc0QXZbzZ0mTizppM5uZ02icbB+X+5W3?=
+ =?us-ascii?Q?SuFNWKJ8V3FLGNtRwea7oeeyiKsV3FUx835SUGhy4x/UUjmk/sHdzvw+LPe3?=
+ =?us-ascii?Q?c4WZXbwwSiJlMDM8cuRkCrn7ZzIC7ub1ItPOrMiRHMCFZM1L6BnLBE/MxoNk?=
+ =?us-ascii?Q?oNHAwRYxmDcTLf4AYiN+AHEV1lYTCzioCRBryOKL4OHsjIIWsQXz/Kyr5QIh?=
+ =?us-ascii?Q?Xfes/FwxxTMnTWo6ovl1+0dANGnfs44mqM00fmtmqqTpGpFqDzWQhMhX6Xi7?=
+ =?us-ascii?Q?VJHsniIS/D2P2X8fdtqOuT3R/ybR4D4ev9nC3mtDNz+th3XYSkfymKTHYmW2?=
+ =?us-ascii?Q?QIZMZsGEviw4o6dH713cCpoHi6FH8WlZFBvk/6igI2BCxXU1Z0IGtlcFDinv?=
+ =?us-ascii?Q?deCmatHLfKQMRVrYn0ECKJdvZfL2vH3CHoTeHFq4mVBtMlrro6qnBCnDTpX6?=
+ =?us-ascii?Q?x63/4KumREahw1qRsPNLUtgolXrAgSqsTC8PtU2QC0wc8s2BgzkK88d+bZJM?=
+ =?us-ascii?Q?0+Qm2ooTO5Ye2nzZxW1T5Vp+/gZBMwbmP4Dc98iJEHE9sMSO2tOmgxGgxDKv?=
+ =?us-ascii?Q?fVgwHscEc20ZQaFhJMjSbJpAfe5chE/3oebIDIu2ntibCx5VHad/Ukit01vc?=
+ =?us-ascii?Q?y1luqfnn07+q2sOLfPXGJEWgRMBs0lH0F4mcZtqKZkmqTL/V9kDKH59v1/Ik?=
+ =?us-ascii?Q?TMAlYUJjAqU60EMk9Hzv/Ghc9HJqE9JMoeA0?=
+X-Forefront-Antispam-Report:
+	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2025 09:06:36.5713
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97c50340-b0e3-4b70-7487-08dd817cfc61
+X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00027A62.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR06MB7556
 
-On Tue, Apr 22, 2025 at 12:08=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.o=
-rg> wrote:
->
-> On 18/04/2025 14:38, Alexey Charkov wrote:
-> >>
-> >>>> +
-> >>>> +  reg:
-> >>>> +    maxItems: 1
-> >>>> +
-> >>>> +  clocks:
-> >>>> +    maxItems: 1
-> >>>> +
-> >>>> +  interrupts:
-> >>>> +    items:
-> >>>> +      - description: SDMMC controller interrupt
-> >>>> +      - description: SDMMC controller DMA interrupt
-> >>>> +
-> >>>> +  sdon-inverted:
-> >>>> +    type: boolean
-> >>>> +    description: SD_ON bit is inverted on the controller
-> >>>
-> >>> This implies I know what the non-inverted state is. If you know, plea=
-se
-> >>> state that here.
-> >>
-> >> This is a tricky one. The only answer I have is "it's inverted in
-> >> later versions vs. the first version I saw in the wild, and I'm not
-> >> sure if it's board related or IP version related - nor if the original
-> >> was active low or high". No docs, no schematics, no vendor left around
-> >> to chase for answers.
-> >>
-> >> Will dig around some more and update the description if I succeed in
-> >> uncovering any further clues :)
-> >
-> > I've found some extra clues and would like to consult on the best way f=
-orward.
-> >
-> > It turns out (if my understanding of the decompiled binary-only WM8505
-> > vendor driver is correct) that all chips before (not including) WM8505
-> > rev. A2 treated their "clock stop" bit (register offset 0x08 a.k.a.
-> > SDMMC_BUSMODE, bit 0x10 a.k.a. BM_CST in vendor sources, BM_SD_OFF in
-> > mainline) as "set 1 to disable SD clock", while all the later versions
-> > treated it as "set 0 to disable SD clock". Which means that there are
-> > WM8505 based systems that rely on either of those behaviours, while
-> > any later chips need "set 0 to disable". This is not a board related
-> > quirk but an on-chip SDMMC controller revision related quirk.
-> >
-> > I'd love to switch to a compatible-based logic and drop the
-> > "sdon-inverted" flag altogether from the binding I'm writing, but here
-> > are my doubts where I'd love to consult.
-> >
-> > * Looks like WM8505 rev. A2 needs a separate compatible string vs.
-> > prior WM8505. Can we have something like "wm,wm8505a2-sdhc" and
-> > "wm,wm8505-sdhc" respectively? WM8505a2 not being an actual chip name,
-> > but something discoverable by reading its hardware ID from a system
-> > configuration register at runtime
->
-> Then maybe it can be fully detected runtime? E.g. via soc_id driver (see
-> drivers/soc/)?
+When CONFIG_OF_MDIO is set to be a module the code block is not
+compiled. Use the IS_ENABLED macro that checks for both built in as
+well as module.
 
-Thanks for pointing this out! Yes, it should work. A separate
-mini-driver to identify the SoC based on the system configuration
-register readings and a match table on soc_device_attribute inside the
-wmt-sdmmc driver to differentiate between different controller
-versions which are all identified as "wm,wm8505-sdhc" in current
-device trees.
+Fixes: 5dc39fd ("net: phy: DP83822: Add ability to advertise Fiber connection")
+Signed-off-by: Johannes Schneider <johannes.schneider@leica-geosystems.com>
+---
+ drivers/net/phy/dp83822.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > * If I introduce new compatible strings for "wm,wm8650-sdhc",
-> > "wm,wm8750-sdhc", "wm,wm8850-sdhc" and "wm,wm8880-sdhc" in bindings,
-> > DTS and driver code, then the new driver and new DTB should work fine,
-> > and the DTS should pass schema checks. New driver code won't work with
-> > older DTB unless I keep the logic to parse "sdon-inverted" which
-> > wouldn't be part of the binding. Old driver code would not work with
-> > newer DTB except for pre-A2 versions of WM8505. Is that acceptable?
-> > * Existing DTS doesn't differentiate between pre-A2 vs. post-A2
-> > revisions of WM8505 and is bound to fail on the latter
->
-> That's an old platform, so we should not break the ABI, thus drivers
-> must fully support old DTBs.
+diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+index 14f361549638..e32013eb0186 100644
+--- a/drivers/net/phy/dp83822.c
++++ b/drivers/net/phy/dp83822.c
+@@ -730,7 +730,7 @@ static int dp83822_phy_reset(struct phy_device *phydev)
+ 	return phydev->drv->config_init(phydev);
+ }
+ 
+-#ifdef CONFIG_OF_MDIO
++#if IS_ENABLED(CONFIG_OF_MDIO)
+ static const u32 tx_amplitude_100base_tx_gain[] = {
+ 	80, 82, 83, 85, 87, 88, 90, 92,
+ 	93, 95, 97, 98, 100, 102, 103, 105,
+-- 
+2.34.1
 
-Noted, thanks.
-
-> > I realize that breaking backward/forward compatibility is undesirable,
-> > but frankly these systems seem to have few mainline users, and those
-> > people who do run mainline on them ought to be compiling the kernel
-> > and its DTB at the same time, because the firmware doesn't know
->
-> There might be other users of DTS and anyway what would be exactly the
-> benefit? This hardware aspect is already documented via sdon-inverted
-> property.
-
-The benefit is rather cosmetic (to properly describe different
-versions of this controller using SoC-specific compatible strings, and
-to avoid defining bindings for random vendor-specific properties such
-as sdon-inverted).
-
-Best regards,
-Alexey
 
