@@ -1,127 +1,146 @@
-Return-Path: <netdev+bounces-184621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C53A967A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 13:36:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA29A96806
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 13:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10497189E4E7
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:36:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B12D188378B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC95D27C146;
-	Tue, 22 Apr 2025 11:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341A82777E1;
+	Tue, 22 Apr 2025 11:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWcFa+NU"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="t9CwRx3h";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="X5uTpcw5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD90927BF7E
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 11:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1BD27815B;
+	Tue, 22 Apr 2025 11:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745321675; cv=none; b=Y0fJ25OtgpKq8b9ineuCCR2mF37cQcNj7q+WyL3d8PEAiDqTLK1Q4ni28KJPwRxP/LpqPkI/4EGJqLCm4RmYd/tCp5cjgsrDBkB03HD1KuiQhc0aFvgOks81KZx+6DGLTslCBgHhPXaAoUL5pWc7qFUSP9f2yc4XBG0opLtWbF4=
+	t=1745322251; cv=none; b=lRJmLab1oDPSgVPksV56ZTRzKx91WIjex5QUI9NSk2Rv7R2m1BI7FAkGqy8YOcF5auB+Lpu/sxkxlLClrp6bJJgh7mpeqCUJlAlRk+fzUw17KX+Q3VY44vrJ6yxWwt2jE2whkB8Qq/rWrMpko4A/vsDsEPxVg0XeTNm1ULQKXys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745321675; c=relaxed/simple;
-	bh=lFumZS6tt4BMr7MTloOs1i3/oR/EXnRSIqWU3NsWGDU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hk+MJJ/J/3o2If8FGZC5pgIqmYvFdL4y3gJ/nMTfBbOpZ42HVV2kT/U7t98/e/I1NlH8lT6PABJEG2RhFNy4pMDYp+VqCEFcsmlfuOPVBiAYZsNCwtLaaDLrDP+M9D/foVXi/7h4fZkl5l48w9vGPXlqUmCik/yyTBOWbKEK4xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FWcFa+NU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745321672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U00RFHj5GcnU7nOzmkFGCrDuJoVathVhZ4H2BEj+k80=;
-	b=FWcFa+NUqAZtCg06Ob8ZTo45nmJNrhyaUJERn/T5C3KaQrL4azTD1snOagukLk+9+VShA/
-	OZGkEy7r6UYJGI7TM7+j8LgxjJ0HGD4VK1fQfFfBAzgmI3CYueAiHtzSEX5Ofbuzj+dYCi
-	QeYKcbNze4mO5D+gMzOEXhyu7L1RfDg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-xaD_QG8wMLa292Lz9RZkIA-1; Tue, 22 Apr 2025 07:34:31 -0400
-X-MC-Unique: xaD_QG8wMLa292Lz9RZkIA-1
-X-Mimecast-MFC-AGG-ID: xaD_QG8wMLa292Lz9RZkIA_1745321670
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf44b66f7so30627415e9.1
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 04:34:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745321670; x=1745926470;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U00RFHj5GcnU7nOzmkFGCrDuJoVathVhZ4H2BEj+k80=;
-        b=FR3n4PFzpt3c5y1G3zUICY9XLRD6+4eBSeDJ1KhrcfDIAgOvmN2Yc9Iq8+dbA6iFIj
-         cK72NOMUABHls/xsXUH0kLW9fg2jJSEFDX5X8qbE7QMFQmMaCabym9Hcr9wZa8CpL4Yq
-         E3e3MWypYXZBCSl5s4RI1tLrsqpwwSroDRC+VfqmYMacoSePM1Qq51j6JjZw6QdsMSK8
-         G90PrFLvLbk5rZAXv5U0A0OxqGelZo+uUONsotmUgS9lJ+Am6T9anIOHhY8vv5hi2O/o
-         KFPBXn9MNzI86Zc43tfSdTVTY6+NcfCt4/6qYscucaygJq4ds+P3N004nJ45MobRLVWJ
-         eV2w==
-X-Gm-Message-State: AOJu0YwfywEAHXzZyj4AEf6dUPL5ISLcJICpR+HEzAYJDMwBrXaBZKFW
-	l+JxKKkDsmLQh9gijEhzwzfI/KKkw5MZqP/1c9lfKwY8+fPe9yPYsnbdOkVonc7KwvOxzV9RMwv
-	nnT6b2dqOw0LsLquD/2P9Yz1xI/mNJkyJmmpjig3+weTX6df3NRkp/Q==
-X-Gm-Gg: ASbGncs4J38s9icL5AndSl7OQavVxc32WmBlJQqEmuvTDwuRwux3s3Yd2Qq3Mfftj1l
-	X8YmEiwZUQivVwA5/LNgODbMwgDpJe3iIa/HpPy5LfFiT2IAS2pbKOyef4T8HBgyq2MZedTdnlF
-	eXFzc7q2VoiwZDU2XJhkZLqDE3YSBOPA51bXI18CbKvQmIlS9d6UHxfQ4GVq+8GB41YEGYqrcoT
-	GX7i64UdVp1jvCQECDFohByvOi4RgcalSLR6gvX6pqfZTgcZdd3Rxzrr5Ay0FXgntWgrZaJcxy3
-	pdkpAxG9lZdwmT4aSY2CeJQpaaDEK+uYxIsK
-X-Received: by 2002:a05:600c:a08b:b0:43d:94:2d1e with SMTP id 5b1f17b1804b1-4406ab96950mr151278455e9.13.1745321669793;
-        Tue, 22 Apr 2025 04:34:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHxyp6dPoiSPRUX82g/CemVVsglLJ9gvL0b1VuZmHuk27xeWHrQ7nlHlBJC7WOsTXBng8kufQ==
-X-Received: by 2002:a05:600c:a08b:b0:43d:94:2d1e with SMTP id 5b1f17b1804b1-4406ab96950mr151278235e9.13.1745321669486;
-        Tue, 22 Apr 2025 04:34:29 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-86-8.dyn.eolo.it. [146.241.86.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4408d0a7802sm10151805e9.1.2025.04.22.04.34.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 04:34:29 -0700 (PDT)
-Message-ID: <831f64a3-1421-4d61-a2ff-3ac17378c2a0@redhat.com>
-Date: Tue, 22 Apr 2025 13:34:27 +0200
+	s=arc-20240116; t=1745322251; c=relaxed/simple;
+	bh=0SJZ4NFhZXBaM3WznzcAPczPKN69J8Kh0Zkk5FzAszw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=l5j5irONek+t6miSQmDzsWr3rxm4zeBg9l/sTATxtMpCYgRLKONBtyYYEoVx2tuVdhyYAbgrR/9GOvnT2xMs2x5DkeMvI4SShQqCx54TxPsVEtF76DEPvpcU67TpetACz4RrDiArlSVsIR4WB+MZEHDYuUfBSyQOf8xudeLmq2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=t9CwRx3h; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=X5uTpcw5; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 8BC646062F; Tue, 22 Apr 2025 13:44:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745322243;
+	bh=2lvC8aBIaC9vo96uZIY6di9kQoFjH1x9H9QBbtx+75c=;
+	h=Date:From:To:Cc:Subject:From;
+	b=t9CwRx3h3ZLSQoAemtcSHhCVOhFHGbshdxzvvUn5oHOWVhQAefYa00JZuYpSNnSkH
+	 NowvuxVoF0o5z4HHKwvGN02jk3iDHX1rgFW4lVUI0NOTuRpo8ZgY+wWietCqmMCavP
+	 7tVl/gXjqhJ2NtV9Vkof7ZGec3EgCQlF74V9fWOT0xTMF1lJ4Wd4sPzcIk8X2A8Orn
+	 O8PFcQ9mxOf+WmVbsqz99kO5uVz1xYg+W8Mm8PefgyCrXvbuqqGEpeB/apeNz3Ilxo
+	 3Ddj/i9GEgYbBd1x/TYcpbmTBPRUfsWVZCUkbnyA36A1LEcGNPdmJzGd8e0lX1r/um
+	 7NYaOmW5anZSQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id B3ADC6062F;
+	Tue, 22 Apr 2025 13:44:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745322241;
+	bh=2lvC8aBIaC9vo96uZIY6di9kQoFjH1x9H9QBbtx+75c=;
+	h=Date:From:To:Cc:Subject:From;
+	b=X5uTpcw5fuPhnlqEX1HN8GUzZCYCc4kBXN76FAJKidxqklxgvDabgzwTUlSJY+xW7
+	 fR5bf4duNLTFnFgcY9l0armM3JycVfk2iwJ+za51PgHN4QkjEvxoy1aZ9lpwsknZuO
+	 QKjrcOzPHVFXzGik1l3pc1aZRd1avcmR89PV9p3dCuDVMfLW5KnFjlBFbFhYe/pmDx
+	 VRGf0sog/TGSn8dVgyJ2ZLgAOIe4lbKecY97pdxmpDS7+57fVgbmoAMK1is5BP/0zQ
+	 bis5HCV1Q53611fqMdZDlM+07WMjSqJcZW/J17LoiN7kP2AXr8KDs9D4zYBK/6Pl02
+	 iMGCP90eLMJsQ==
+Date: Tue, 22 Apr 2025 13:43:59 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
+Cc: netfilter-announce@lists.netfilter.org, lwn@lwn.net,
+	netdev@vger.kernel.org
+Subject: [ANNOUNCE] nftables 1.1.3 release
+Message-ID: <aAeA_6rbRNqpIRE2@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue
- cases
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, toke@redhat.com,
- gerrard.tai@starlabs.sg, pctammela@mojatatu.com,
- Victor Nogueira <victor@mojatatu.com>
-References: <20250416102427.3219655-1-victor@mojatatu.com>
- <20250417090728.5325e724@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250417090728.5325e724@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="v0lrDgCn2ghomeXI"
+Content-Disposition: inline
 
-On 4/17/25 6:07 PM, Jakub Kicinski wrote:
-> On Wed, 16 Apr 2025 07:24:22 -0300 Victor Nogueira wrote:
->> As described in Gerrard's report [1], there are cases where netem can
->> make the qdisc enqueue callback reentrant. Some qdiscs (drr, hfsc, ets,
->> qfq) break whenever the enqueue callback has reentrant behaviour.
->> This series addresses these issues by adding extra checks that cater for
->> these reentrant corner cases. This series has passed all relevant test
->> cases in the TDC suite.
-> 
-> Sorry for asking this question a bit late, but reentrant enqueue seems
-> error prone. Is there a clear use case for netem as a child?
-> If so should we also add some sort of "capability" to avoid new qdiscs
-> falling into the same trap, without giving the problem any thought?
 
-AFAIK netem use is quite widespread, even outside testing scenarios. I
-suspect preventing netem from nesting under arbitrary root could break
-multiple ("unusual") users.
+--v0lrDgCn2ghomeXI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-Cheers,
+Hi!
 
-Paolo
+The Netfilter project proudly presents:
 
+        nftables 1.1.3
+
+This release contains a few fixes:
+
+- Incorrect bytecode for vlan pcp mangling from netdev family chains
+  such as ingress/egress:
+
+     ... vlan pcp set 6 counter
+
+- Bogus element in large concatenated set ranges, leading to:
+
+      16777216 . 00:11:22:33:44:55 . 10.1.2.3 comment "123456789012345678901234567890"
+
+  instead of:
+
+     "lo" . 00:11:22:33:44:55 . 10.1.2.3 comment "123456789012345678901234567890"
+
+- Restore set auto-merge feature with timeouts, disabled in the
+  previous v1.1.2 release.
+
+See changelog for more details (attached to this email).
+
+You can download this new release from:
+
+https://www.netfilter.org/projects/nftables/downloads.html
+https://www.netfilter.org/pub/nftables/
+
+[ NOTE: We have switched to .tar.xz files for releases. ]
+
+To build the code, libnftnl >= 1.2.9 and libmnl >= 1.0.4 are required:
+
+* https://netfilter.org/projects/libnftnl/index.html
+* https://netfilter.org/projects/libmnl/index.html
+
+Visit our wikipage for user documentation at:
+
+* https://wiki.nftables.org
+
+For the manpage reference, check man(8) nft.
+
+In case of bugs and feature requests, file them via:
+
+* https://bugzilla.netfilter.org
+
+Happy firewalling.
+
+--v0lrDgCn2ghomeXI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename="changes-nftables-1.1.3.txt"
+
+Florian Westphal (1):
+      evalute: make vlan pcp updates work
+
+Pablo Neira Ayuso (3):
+      Revert "intervals: do not merge intervals with different timeout"
+      netlink: bogus concatenated set ranges with netlink message overrun
+      build: Bump version to 1.1.3
+
+
+--v0lrDgCn2ghomeXI--
 
