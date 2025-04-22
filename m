@@ -1,67 +1,89 @@
-Return-Path: <netdev+bounces-184785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41639A9728C
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:24:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B102BA972DD
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 571AF3AB008
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:23:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB8EC173588
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ED828FFDC;
-	Tue, 22 Apr 2025 16:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50C8293B65;
+	Tue, 22 Apr 2025 16:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjLMOyso"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dJdRDl9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA6529CE8;
-	Tue, 22 Apr 2025 16:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2645F2900AB
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745339006; cv=none; b=SKRbaBxUAizLCY/GTShDX7VmB3HXPSFPTBGKA2+hkm4RVM590lg+v2R0Jl6yWCl7g1gSHUiP2pFxwr0go05OIUFIoRBkKlZ2EWuwC4YU9XEnWbaleQUZf3wIsBilBGyEZVeKKbyTO6vWLbvbQka0z+wxLXB5Qy0NfiqHwzCiVQg=
+	t=1745339790; cv=none; b=FYVz3z6LA/B3ygH4wTV+liLH99Lj0O/LIk4LWVuoh0/VLnMIFdp67VR05JO8zR1mLF9hA0D82Th7CwM6OK/rh3TVzPsz7mYwsKaEgaGJf4Z3FMCBYqkMjgNApTJv2p6VxgBdQ/2OK/SVC7c+4FWQtde6iPoz+dvm2xex2s8iGEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745339006; c=relaxed/simple;
-	bh=el03+wkT7G2QcB+cYa9PQdWkqikPRn2Ydhr4BlWOGIw=;
+	s=arc-20240116; t=1745339790; c=relaxed/simple;
+	bh=b/SOpMGjLbEOxepLw3Yx1X4fTeOX1MUXL5EOgZkj+oQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CBTw5opXXeJJ6l8/KrZG0lV0ipAPaTkp5QcHpg8Yv2sBPXqkHr6GffLVgcbEazTs66i0wCFvsRUmCb1jd/BoLSO3AyCnIc5qD3aZwJfJOSSyyL8/cFEFqafWDH5TdvOuOvVtMKut8NoQveaxrUv6gZ+ke7J6BgCluOGeNlEwLS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjLMOyso; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA4D0C4CEED;
-	Tue, 22 Apr 2025 16:23:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745339005;
-	bh=el03+wkT7G2QcB+cYa9PQdWkqikPRn2Ydhr4BlWOGIw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UjLMOysolSc4V48hMrcN7AaQ+UhnfJEZiE6TH3niXOQApWPf0Kb8URGZSy18MZ6cY
-	 /ikHU7gEI7qqrvd9+ixLIOmppJINTxmNRpHWXXN2AGlZvhN4Z189aXQaf4AbNONkog
-	 Pbx7FXMAwfyO9OTWUeh4+NJuCIvbNrkXuF9XkNKAbJVuQ6jatWnZRnyxhqkmTPXlyn
-	 sXSjUTBwjKT0Sw2e4GPoDP2YX39IwBDdFB8gyzVMt+gyJ7sMe4dancoq0EolH5lu6H
-	 TvMTTdq4ReFQ1OCEbb/ZJ/BDZOZRgUmgULQBqMgsgT3kp1fNoyLkPle3C94QXeZVvA
-	 e6AR1oH/d2LjA==
-Date: Tue, 22 Apr 2025 17:23:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ij@kernel.org>
-Cc: chia-yu.chang@nokia-bell-labs.com, dsahern@kernel.org,
-	kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	dave.taht@gmail.com, pabeni@redhat.com, jhs@mojatatu.com,
-	kuba@kernel.org, stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
-	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Subject: Re: [PATCH v4 net-next 09/15] tcp: accecn: AccECN option
-Message-ID: <20250422162318.GI2843373@horms.kernel.org>
-References: <20250417230029.21905-1-chia-yu.chang@nokia-bell-labs.com>
- <20250417230029.21905-10-chia-yu.chang@nokia-bell-labs.com>
- <20250418183138.GE2676982@horms.kernel.org>
- <8b6f580b-d682-91f7-f958-1806ee6e8bbe@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QR29rd6DO5d47e8wO8owkXWLotn1RvBWBd3XOyGYAI+Htb4MF8uYRo9kX8P7h4fVWQxsZ8jB4k0GYujEisDw62nIt4xukbni6B5WvZlnfnM+M9XsTcUVhriGDPEcVQrc1N+8qa9dHLOwSuJhC6FAktRlxauVtpqmFuYfkQDoSpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dJdRDl9i; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-736b98acaadso5134264b3a.1
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745339788; x=1745944588; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jjv19RP32slCxDiB3HUggjCBjxZ3dmJqul3pXWqIvrw=;
+        b=dJdRDl9i4Re+Q6eratRcviqlVpPqAzWeZyLXtDQdH5HE+ykhFIOcIG5FwYRt8PxYn6
+         7rmYVMxIlpiraSRzyKFByCZS9ILur9XKzakNEB675/CHm+i185U8Fqnm58dAR3OWox4H
+         Rg2rBtgxgrdxRqNrvUm2/gNdGgulSAa2iPGibiNOai+hSGyJrHAKzaQVqg+42YcYbbex
+         dlirH2QLA/+vn6FqVkHfhPVAYpeqwlWu6aj2h/HWaOzT21acwKG5z7rBfz1aAWD60rdf
+         shE8w4bwhIwsMuPvXNAy7RaBRfAccutO9TZZMymDwdHigaqKK04QhHpAEFUgSSuQJ+5l
+         Dcfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745339788; x=1745944588;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jjv19RP32slCxDiB3HUggjCBjxZ3dmJqul3pXWqIvrw=;
+        b=r7MtNZbrGZJmarn6nFaxknflRSSVsobh7WirBWk1FxT30rFAy73NOLL2MRnEW5Ys5J
+         QxKW+k7WK96ql2rhFBOVlQUkLDz4W2coB0wfX4hL83Hp5FEwe91HW0zpNMVcXcXcRB9U
+         zVGZG5Y6OJmELzPbJ3Xh3zz1kHrD48ed0fv0B+cdOCUUcq70bnxvZQikBT57uBI9fy2M
+         ARe2nh1sZ4/ZNR+pISFwZxYyhGC8ggTqG/zptP06hIkSjykHeJ7w6srNl1PT4RtObZ+w
+         7n88YN92kij6a3ZN0cgBeNl29SMOXEVevPG4iwmfl9FZf9BzQsALg+Hox5OWlxbTGO+g
+         V/dw==
+X-Forwarded-Encrypted: i=1; AJvYcCXd05L2UcCwFBebB0wR2qVr9/u9UwGCYlOS45RYlMiy75rE81EY43hMkBqQemzPxgWB6HY3Z80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoFdCxaD5brQuh1hBmOXSbFmW8JJ1Cgnpy1gJHXDeG+koy/qLW
+	wlvLcPcok/VoRnDuKisdI5MK+L43/2UPf2Hmhvd0Gz9IEOW7Mis=
+X-Gm-Gg: ASbGnctUvuJ96TKEnRI9ot6AdrX4cdCH5KdWm2ktkDDgboFVQJk49AlW/FPIub9RhS0
+	BtNZLqCos2yEabNTdqsGPn/7zHapUOG9fURHWDWlknp3D5qb94qMDpHms7iyklrLdxN1H+Ws7b9
+	EwSxIPjpRls+rL3UPriaTyYjjOvRDXSiYGuN6VlNCggOxl6H8lM96ufo8ZdMFX+LIjX2JcWzPFQ
+	FjKfNRHMFbgqaujXdwsrWiiDsX5TdYlx4DDmVqF9FW8HMGQi+eoCoFQFsLycR30kIk0XKzm/AqH
+	4bpa8YnA3FBJ4uTuroG8p6aNBsA9LyktCcqsXVC0
+X-Google-Smtp-Source: AGHT+IHavBQeaiI5gxiHHi1AOhk6Vg8smx0Hiwk/+yHxS99KzKm1EKf0+ZNjvXtHx4uwb5w2SsCbLQ==
+X-Received: by 2002:a05:6a00:8d8c:b0:730:7600:aeab with SMTP id d2e1a72fcca58-73dc14e01b3mr20551819b3a.13.1745339788220;
+        Tue, 22 Apr 2025 09:36:28 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73dbf8e13e1sm8867248b3a.46.2025.04.22.09.36.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 09:36:27 -0700 (PDT)
+Date: Tue, 22 Apr 2025 09:36:26 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 21/22] selftests: drv-net: add helper/wrapper for
+ bpftrace
+Message-ID: <aAfFilVul0zbE20U@mini-arch>
+References: <20250421222827.283737-1-kuba@kernel.org>
+ <20250421222827.283737-22-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,86 +92,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8b6f580b-d682-91f7-f958-1806ee6e8bbe@kernel.org>
+In-Reply-To: <20250421222827.283737-22-kuba@kernel.org>
 
-On Fri, Apr 18, 2025 at 10:35:14PM +0300, Ilpo Järvinen wrote:
-> On Fri, 18 Apr 2025, Simon Horman wrote:
+On 04/21, Jakub Kicinski wrote:
+> bpftrace is very useful for low level driver testing. perf or trace-cmd
+> would also do for collecting data from tracepoints, but they require
+> much more post-processing.
 > 
-> > On Fri, Apr 18, 2025 at 01:00:23AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
-> > 
-> > ...
-> > 
-> > > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > 
-> > ...
-> > 
-> > > @@ -766,6 +769,47 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> > >  		*ptr++ = htonl(opts->tsecr);
-> > >  	}
-> > >  
-> > > +	if (OPTION_ACCECN & options) {
-> > > +		const u8 ect0_idx = INET_ECN_ECT_0 - 1;
-> > > +		const u8 ect1_idx = INET_ECN_ECT_1 - 1;
-> > > +		const u8 ce_idx = INET_ECN_CE - 1;
-> > > +		u32 e0b;
-> > > +		u32 e1b;
-> > > +		u32 ceb;
-> > > +		u8 len;
-> > > +
-> > > +		e0b = opts->ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
-> > > +		e1b = opts->ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
-> > > +		ceb = opts->ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_OFFSET;
-> > > +		len = TCPOLEN_ACCECN_BASE +
-> > > +		      opts->num_accecn_fields * TCPOLEN_ACCECN_PERFIELD;
-> > > +
-> > > +		if (opts->num_accecn_fields == 2) {
-> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> > > +				       ((e1b >> 8) & 0xffff));
-> > > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
-> > > +				       (ceb & 0xffffff));
-> > > +		} else if (opts->num_accecn_fields == 1) {
-> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> > > +				       ((e1b >> 8) & 0xffff));
-> > > +			leftover_bytes = ((e1b & 0xff) << 8) |
-> > > +					 TCPOPT_NOP;
-> > > +			leftover_size = 1;
-> > > +		} else if (opts->num_accecn_fields == 0) {
-> > > +			leftover_bytes = (TCPOPT_ACCECN1 << 8) | len;
-> > > +			leftover_size = 2;
-> > > +		} else if (opts->num_accecn_fields == 3) {
-> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
-> > > +				       ((e1b >> 8) & 0xffff));
-> > > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
-> > > +				       (ceb & 0xffffff));
-> > > +			*ptr++ = htonl(((e0b & 0xffffff) << 8) |
-> > > +				       TCPOPT_NOP);
-> > > +		}
-> > > +		if (tp)
-> > > +			tp->accecn_minlen = 0;
-> > 
-> > Hi,
-> > 
-> > I'm sorry if this is a false positive: Smatch flags that here we assume
-> > that tp might be NULL, while elsewhere in this function tp is dereferenced
-> > unconditionally. So my question is, can tp be NULL here?
+> Add a wrapper for running bpftrace and sanitizing its output.
+> bpftrace has JSON output, which is great, but it prints loose objects
+> and in a slightly inconvenient format. We have to read the objects
+> line by line, and while at it return them indexed by the map name.
 > 
-> Hi Simon,
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/testing/selftests/net/lib/py/utils.py | 33 +++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 > 
-> Thanks for taking look!
-> 
-> This looks a false positive. It's because tcp_options_write() is shared by 
-> the handshake and established connections. A direct caller from the 
-> handshake path passes NULL as tp:
-> 
-> 	tcp_options_write(th, NULL, tcp_rsk(req), &opts, &key);
-> 
-> The thing that smatch doesn't know is that some TCP options are not going 
-> to be present during handshake. Those code paths that only deal with 
-> options that are for an established connection can assume full sk/tp has 
-> been already instantiated so they don't need to check tp. In addition, 
-> some funcs tcp_options_write() calls to make the opposite check by 
-> checking tcprsk instead but it has the same effect.
+> diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+> index 34470d65d871..760ccf6fcccc 100644
+> --- a/tools/testing/selftests/net/lib/py/utils.py
+> +++ b/tools/testing/selftests/net/lib/py/utils.py
+> @@ -185,6 +185,39 @@ global_defer_queue = []
+>      return tool('ethtool', args, json=json, ns=ns, host=host)
+>  
+>  
+> +def bpftrace(expr, json=None, ns=None, host=None, timeout=None):
+> +    """
+> +    Run bpftrace and return map data (if json=True).
+> +    The output of bpftrace is inconvenient, so the helper converts
+> +    to a dict indexed by map name, e.g.:
+> +     {
+> +       "@":     { ... },
+> +       "@map2": { ... },
+> +     }
+> +    """
+> +    cmd_arr = ['bpftrace']
+> +    # Throw in --quiet if json, otherwise the output has two objects
+> +    if json:
+> +        cmd_arr += ['-f', 'json', '-q']
+> +    if timeout:
+> +        expr += ' interval:s:' + str(timeout) + ' { exit(); }'
 
-Thanks for checking, I appreciate you clarifying this.
+nit: any reason not to use format string here ^^
 
