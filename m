@@ -1,145 +1,114 @@
-Return-Path: <netdev+bounces-184613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 153E9A96623
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:41:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A4E3A96635
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0CEE3A8DED
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:40:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 065CA18912CE
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C29D1F12E0;
-	Tue, 22 Apr 2025 10:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2133F1FBC8C;
+	Tue, 22 Apr 2025 10:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YdD8jiZU"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="d2gk/1TM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27F61DDA1B
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D643B1EE7BC;
+	Tue, 22 Apr 2025 10:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745318471; cv=none; b=TaQpmAN5qN2euDJlKYMcRm3bAB/HIK3H59w9wyhTKLUMw8LMvfVQLagD2PWu1utOiUPStXRqACHQ4iRt4BzhH/l9Vz8B1STkZ796WdqHkorX4xvA6cMju2iLYd6o8V3X5DfCGaKuE7dzSRDWwB63+lBZ7CYvVwMrU1ekR+59ft0=
+	t=1745318619; cv=none; b=ZnPmDM3lpDrmvk2x0inqcr5DD6TMGcTssuBdZlkeja+ICZ8ddseFTk51YKHcnp9WdRwMzYyMHXYmKjl+BPwPPHUaEMTd36cVMtfyZEAZQGrQsr1qnuFon0+PK72PzPklWFAbnPKBbLp76NZ9SWUXtinuLBRKvMBQVoUjNR1aD3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745318471; c=relaxed/simple;
-	bh=MBxL0LkvIA4vATxYe4x0tjrYUSOw3EtiQtqh4dVesjE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bb1et/k/U5px9S+kcDrmailR25ILfXwyyi67ItcMGy8QRn8W9UCxTIuuC/g3Ie7hCDedjR1dr+gpC8KkjfJZzXM5GE8AqN0RapN4wLdG4J3ZSKxkWCUBfmwMPmbHwjfq1/j7A9qvIwSj1RvbBWVGy4aheqz9uNmMIkPJAInYNbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YdD8jiZU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745318467;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HvNtL6c2VjzDh2f+3Rz55In+lMu12wbNCHwQu/1GSVI=;
-	b=YdD8jiZUtTToN3z5y4wpIqEOEs6KzC0SLkybQrRzCW8k1eNQZmI5lkyReb0Kyx8iPXGDOf
-	+dJXU8ZtM/surywIPgeCnsMeepJmNW0sO6Ike/eGSiSkKmgQGr9qI9lio4AifDnwj32eJN
-	eNhm0aQ7MGHQKbp4ZQSNyCTChhbHRS8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-USp-3rROPBeRJ65WKX2exA-1; Tue, 22 Apr 2025 06:41:06 -0400
-X-MC-Unique: USp-3rROPBeRJ65WKX2exA-1
-X-Mimecast-MFC-AGG-ID: USp-3rROPBeRJ65WKX2exA_1745318465
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39979ad285bso2221880f8f.2
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 03:41:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745318465; x=1745923265;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HvNtL6c2VjzDh2f+3Rz55In+lMu12wbNCHwQu/1GSVI=;
-        b=I1lYRHlowZFaP6MtlUD4T6AKzk4FgjfCq/n7za3TZPwnNVKvBPl1EAqy9VD30kvAdv
-         gH8C/w1hluPGS9rONwd57d0opDfQfXpqLIeW0fJYs76FLvxNc6zSMcsYjGqrUrezILbC
-         5SYnpA5NYhe8rjdMFEismEvu3886dEB3g6hcl8iVdG/H22acPq8e6CWyZFDi+4nxJC0f
-         E3U68qQ1ssZrYPmqqH64FDw9v6gbRK8xrtYDV06I6K9FYxGIg5z6xETMEydCgGSeP3In
-         So2iSMkvl+2bDQzzv97+MtLLG03x2EWqlYsPTpcJNelJ0raIS0rxMTWC27xENgCwiZSi
-         q5OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOYcVePzr3dNwd4+guv347rCI8SUeJF1YV91PqiyzlUinbDg+xPevqCmcP5YGVZbKPSDh8kiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjIDv5Wso85PYRburTgOUyvlb+H/G93iMrjv0argunzT0dwKEu
-	eT+kYkWVUbeZ1wM1wTsZdWODb5mReK2Ry9oem5UqW3o4Oyv1EHvXe2eHNfc+dpNloQDrzOssIeg
-	LJYCQrSo1/rqPJoHBqdR0wUOoC/+K/y7DJvaTVc+lOpb7gDuL91nGsQ==
-X-Gm-Gg: ASbGnctMHQhEWPeu+it+/h98a1ulMtU4Ka2e3hmjiDOPAhIKDLdB0/nn77PM435KY8/
-	PkadunCL3I67ZRdSp0vL7XD3B0y/Vu6xqw4BeTqdVWFFkK08sKTxL1HWylgPn6fEzLlzqiMxYrN
-	xP5VtvtMWDjVujRd7Ws06n5laVpHaKd/Rycf+0B40mYLAzZnPWCqzKNqQkE/+hhftGa6bLKmkh3
-	xPBzstKpnKX3v7jtWIG977vKDV91NMZ2YgVw6x+ifs4rrvAIfNfgiBYkPCzCApCJ7POB6f0XrzS
-	YzjUuPZ3nPoloOR4fpPl+vdlmqSfmMly1Dch
-X-Received: by 2002:a5d:5987:0:b0:39e:e438:8e4b with SMTP id ffacd0b85a97d-39efbaf6e96mr11661117f8f.50.1745318465085;
-        Tue, 22 Apr 2025 03:41:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHfhmdY3+2oaQKSOAlvXE2xWziVZEiI/GfbXgpJGaf3eH1zP169yxdyhIy73RUyTSQrUgpQ/A==
-X-Received: by 2002:a5d:5987:0:b0:39e:e438:8e4b with SMTP id ffacd0b85a97d-39efbaf6e96mr11661101f8f.50.1745318464726;
-        Tue, 22 Apr 2025 03:41:04 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-86-8.dyn.eolo.it. [146.241.86.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4a517dsm14622895f8f.100.2025.04.22.03.41.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 03:41:04 -0700 (PDT)
-Message-ID: <0f5578fd-9f0b-4541-aff8-f882850ee01d@redhat.com>
-Date: Tue, 22 Apr 2025 12:41:03 +0200
+	s=arc-20240116; t=1745318619; c=relaxed/simple;
+	bh=qJxguF5XzFQ70DcwywAq3gNy1HdlL2Sn/ai5szCPS4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OpgUde/N5QJorL2ak71igJPRMAbIo9//clPWWo9ZExFZWE49aX0IE1FldqkOrhxZiUsXWBYCHAnK8qzGprBGL01xwwrtfd7kZjUUc4pwXFR/BiAoWZiopDs9PgpCVMAUuhE+aYwk9YOnahbso1hXq2o63o1p9yLmf+33fJMiVls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=d2gk/1TM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF394C4CEE9;
+	Tue, 22 Apr 2025 10:43:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1745318618;
+	bh=qJxguF5XzFQ70DcwywAq3gNy1HdlL2Sn/ai5szCPS4E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d2gk/1TM7i9nWnxFI+Wd68ccqdkJoF6IPmE6Q4P03mdpoje7zctYDWGh/ZOsMhaku
+	 NC0lrB7tYkg2KQ5iJ98oUxAB82omDFBx7iuf7RXga84Bd7+YEdm+HZWo51pTnnpW+I
+	 bOLWg6TZtcs5Eff4wq+LZzyxX9xkZbHizxm1+gm8=
+Date: Tue, 22 Apr 2025 12:43:35 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Ricardo =?iso-8859-1?Q?Ca=F1uelo?= Navarro <rcn@igalia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@kernel.org>
+Subject: Re: [PATCH stable] xdp: Reset bpf_redirect_info before running a
+ xdp's BPF prog.
+Message-ID: <2025042223-departed-aids-add9@gregkh>
+References: <20250414162120.U-UFSLv8@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH 2/2] TCP: pass accepted-TFO indication through
- getsockopt
-To: Jeremy Harris <jgh@exim.org>, netdev@vger.kernel.org
-Cc: edumazet@google.com, ncardwell@google.com
-References: <20250416090836.7656-1-jgh@exim.org>
- <20250416091538.7902-1-jgh@exim.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250416091538.7902-1-jgh@exim.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250414162120.U-UFSLv8@linutronix.de>
 
-On 4/16/25 11:15 AM, Jeremy Harris wrote:
-> Signed-off-by: Jeremy Harris <jgh@exim.org>
-
-The commit message is missing.
-
-> ---
->  include/uapi/linux/tcp.h | 1 +
->  net/ipv4/tcp.c           | 2 ++
->  2 files changed, 3 insertions(+)
+On Mon, Apr 14, 2025 at 06:21:20PM +0200, Sebastian Andrzej Siewior wrote:
+> Ricardo reported a KASAN discovered use after free in v6.6-stable.
 > 
-> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-> index dc8fdc80e16b..ae8c5a8af0e5 100644
-> --- a/include/uapi/linux/tcp.h
-> +++ b/include/uapi/linux/tcp.h
-> @@ -184,6 +184,7 @@ enum tcp_fastopen_client_fail {
->  #define TCPI_OPT_ECN_SEEN	16 /* we received at least one packet with ECT */
->  #define TCPI_OPT_SYN_DATA	32 /* SYN-ACK acked data in SYN sent or rcvd */
->  #define TCPI_OPT_USEC_TS	64 /* usec timestamps */
-> +#define TCPI_OPT_TFO_SEEN	128 /* we accepted a Fast Open option on SYN */
->  
->  /*
->   * Sender's congestion state indicating normal or abnormal situations
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index e0e96f8fd47c..b45eb7cb2909 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -4164,6 +4164,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info *info)
->  		info->tcpi_options |= TCPI_OPT_SYN_DATA;
->  	if (tp->tcp_usec_ts)
->  		info->tcpi_options |= TCPI_OPT_USEC_TS;
-> +	if (tp->syn_fastopen_in)
-> +		info->tcpi_options |= TCPI_OPT_TFO_SEEN;
+> The syzbot starts a BPF program via xdp_test_run_batch() which assigns
+> ri->tgt_value via dev_hash_map_redirect() and the return code isn't
+> XDP_REDIRECT it looks like nonsense. So the output in
+> bpf_warn_invalid_xdp_action() appears once.
+> Then the TUN driver runs another BPF program (on the same CPU) which
+> returns XDP_REDIRECT without setting ri->tgt_value first. It invokes
+> bpf_trace_printk() to print four characters and obtain the required
+> return value. This is enough to get xdp_do_redirect() invoked which
+> then accesses the pointer in tgt_value which might have been already
+> deallocated.
+> 
+> This problem does not affect upstream because since commit
+> 	401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+> 
+> the per-CPU variable is referenced via task's task_struct and exists on
+> the stack during NAPI callback. Therefore it is cleared once before the
+> first invocation and remains valid within the RCU section of the NAPI
+> callback.
+> 
+> Instead of performing the huge backport of the commit (plus its fix ups)
+> here is an alternative version which only resets the variable in
+> question prior invoking the BPF program.
+> 
+> Acked-by: Toke Høiland-Jørgensen <toke@kernel.org>
+> Reported-by: Ricardo Cañuelo Navarro <rcn@igalia.com>
+> Closes: https://lore.kernel.org/all/20250226-20250204-kasan-slab-use-after-free-read-in-dev_map_enqueue__submit-v3-0-360efec441ba@igalia.com/
+> Fixes: 97f91a7cf04ff ("bpf: add bpf_redirect_map helper routine")
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+> 
+> I discussed this with Toke, thread starts at
+> 	https://lore.kernel.org/all/20250313183911.SPAmGLyw@linutronix.de/
+> 
+> The commit, which this by accident, is part of v6.11-rc1.
+> I added the commit introducing map redirects as the origin of the
+> problem which is v4.14-rc1. The code is a bit different there but it
+> seems to work similar.
+> Affected kernels would be from v4.14 to v6.10.
 
-I guess a paired iproute2 change is needed to really observe the new info.
-
-And it would be nice to leverage such thing to later add a paired
-self-test for this feature.
-
-Thanks,
-
-Paolo
+Does not apply to any tree other than 6.6.y :(
 
 
