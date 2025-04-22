@@ -1,86 +1,112 @@
-Return-Path: <netdev+bounces-184764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDBE3A971AF
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:52:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E26A971D1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:00:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8EF17ED9F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:52:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD225440BA4
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FEA28EA7C;
-	Tue, 22 Apr 2025 15:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D477E28FFF7;
+	Tue, 22 Apr 2025 15:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SR7Qd09e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9OhbOCG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08111F4CBC
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06AC28FFE7
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745337159; cv=none; b=H1uFq39yE7tjSTsmOehyTB9FafsN53DP0aywMv3jxoBEePrnsKTaeiZh606PTEZROTnfCOvnzGeAH3K2ZPaYQMYMDejoNhCXjLRtFzAAa6oJpOiZED1FFmAFBTrIYnC47apjxPH3+Fp+xm6D+EkIOhFVRRgr0KDSSFHkHex+Pc8=
+	t=1745337584; cv=none; b=JLNiCnasYQJ6/WceAotMzwjVJqVI1IY5zCnITWBDTDbunIh3aSO7R4jdF06lafkmzZZ9jt1D8dJfcB/1iD2akztJrSeEYypB4g2W5wWkE+YBElB0ZG/VTK/7VCQ1BRHAtWLSHwX9SN+0ey2nSTIyUlbTG9Qfaqp9dZzCq7+gXsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745337159; c=relaxed/simple;
-	bh=K78QEFH4vnZzDZ5+dBn1mvVeELeWIMfgOL+CDMgksWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G6hVNhpSwLKb/AYlLfT+gz+yIlfo2qxIDC0Z21H0uBBiQiaaiMPqV2+moQyxjQ/BLaQeZnx9UoldSdW9JzbrUE76ITI9NHyqRENRrwbFkoNCSuVzcMpGBGbqnrwqhYRttGBG8Spwnwpz4DqLugJHb7FCPcCQFbw3MFRevqom40c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SR7Qd09e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FEF2C4CEE9;
-	Tue, 22 Apr 2025 15:52:38 +0000 (UTC)
+	s=arc-20240116; t=1745337584; c=relaxed/simple;
+	bh=qmjXZDeehc6+VqaGfMuHTX89SmLxYMBp7YUw/6wlzic=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kkcxB0LwjRs/oyBfX96rwLOnooIqzu0pT+uKG/wUoeTs/W2zbBTjsNqucwqJBWRo0CD/cKGrH+N+U8sTc/WfKvIe2tPhvfywlol28fr0iichMmDwgktJo89I93r5diiQJ2S2dEtkq7fxDCh+6AdiGyuGHi/K+iCUHjzMUEewr1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9OhbOCG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A764CC4CEE9;
+	Tue, 22 Apr 2025 15:59:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745337159;
-	bh=K78QEFH4vnZzDZ5+dBn1mvVeELeWIMfgOL+CDMgksWw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SR7Qd09eWDPJBuNxeecOVTAUogxAaRq89Kyneo3wQepp6pWnCnnP2ZG/dRUn4HRgP
-	 mAAbRx36RYPxT9Vs8GgRyBK4oh7/nG3vEQYu85Wi7ts4P8nndh1hZg4l9V+xkb4AEm
-	 hC1UmDe9o/qkWbiqH/dgdhi4Nc3OjYWV1rwVq22+hXqz3z4sS7VhKAuXyWCZqDr1ht
-	 DhumuqgGf/mYE0KCNO6c/a5bDG3eVrxsnLN7idGNwPq0rZ5j7nASAZxwuo1Jd8f6rm
-	 ALwpjOJcZaQeoF/ETLFbRh6BoJkcq6+UqtRfLaHtxyAPSjz+BLsJyZJJ0aDPeK3DUq
-	 6qT7n81VfOIJQ==
-Date: Tue, 22 Apr 2025 08:52:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
- dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
- jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 07/22] eth: bnxt: set page pool page order based
- on rx_page_size
-Message-ID: <20250422085237.2f91f999@kernel.org>
-In-Reply-To: <aAe2jaAUi0-deSeI@mini-arch>
-References: <20250421222827.283737-1-kuba@kernel.org>
-	<20250421222827.283737-8-kuba@kernel.org>
-	<aAe2jaAUi0-deSeI@mini-arch>
+	s=k20201202; t=1745337584;
+	bh=qmjXZDeehc6+VqaGfMuHTX89SmLxYMBp7YUw/6wlzic=;
+	h=From:Date:Subject:To:Cc:From;
+	b=b9OhbOCG5ZmDmCO1zAPiAhwgT+WRh9dK7dfjUclNkMddBCThfZw1+B5pSzVjxi8s5
+	 Jtq7VpINWOncN402VRE/azZWY9Sh1BrVKXVTa56jU/VBGDzbJhY7bCavIfIQZgh1tO
+	 Ot7S7gbyt7GFFTaiJbxvbbnDV0BgI8sUvp7OMYSqIylYjw1SdDZMzKfa9vzn9RYGBr
+	 ewo6Uy7D2aOnwTb6NoK4ITav2PIQ9BbAlEbti1mPQfnYeX1urMgLoQeM9UgV3HbzIK
+	 8EvTXwEPrYimE3QjEdfWsNgxWjA0QwyWfGEhkY5ylt7d1WlB6t4hH1ZOI/IPlxjJLQ
+	 jQ8fBQLTfwo6A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 22 Apr 2025 17:59:23 +0200
+Subject: [PATCH net v3] net: airoha: Add missing filed to ppe_mbox_data
+ struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250422-airoha-en7581-fix-ppe_mbox_data-v3-1-87dd50d2956e@kernel.org>
+X-B4-Tracking: v=1; b=H4sIANq8B2gC/x2N0QqDMAwAf0XyvIBmdo79yhDJllTzYFtaEUH89
+ 5U9Hhx3JxTNpgVezQlZdysWQ4X7rYHvwmFWNKkM1JJreyJky3Fh1DC4Z4feDkxJp/UTj0l4Y3Q
+ P8R1JL34gqJWUtUr/w3u8rh+h5HTucQAAAA==
+X-Change-ID: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Tue, 22 Apr 2025 08:32:29 -0700 Stanislav Fomichev wrote:
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > index b611a5ff6d3c..a86bb2ba5adb 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > @@ -3802,6 +3802,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
-> >  	pp.pool_size = bp->rx_agg_ring_size;
-> >  	if (BNXT_RX_PAGE_MODE(bp))
-> >  		pp.pool_size += bp->rx_ring_size;
-> > +	pp.order = get_order(bp->rx_page_size);  
-> 
-> Since it's gonna be configured by the users going forward, for the
-> pps that don't have mp, we might want to check pp.order against
-> MAX_PAGE_ORDER (and/or PAGE_ALLOC_COSTLY_ORDER?) during
-> page_pool_create? 
+The official Airoha EN7581 firmware requires adding max_packet filed in
+ppe_mbox_data struct while the unofficial one used to develop the Airoha
+EN7581 flowtable support does not require this field.
+This patch does not introduce any real backwards compatible issue since
+EN7581 fw is not publicly available in linux-firmware or other
+repositories (e.g. OpenWrt) yet and the official fw version will use this
+new layout. For this reason this change needs to be backported.
 
-Hm, interesting question. Major concern being that users will shoot
-themselves in the foot? Or that syzbot will trigger a warning?
+Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v3:
+- resend targeting net tree
+- Link to v2: https://lore.kernel.org/r/20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org
+
+Changes in v2:
+- Add more details to commit log
+- Link to v1: https://lore.kernel.org/r/20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_npu.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c3611b4a154d19bc2c 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.c
++++ b/drivers/net/ethernet/airoha/airoha_npu.c
+@@ -104,6 +104,7 @@ struct ppe_mbox_data {
+ 			u8 xpon_hal_api;
+ 			u8 wan_xsi;
+ 			u8 ct_joyme4;
++			u8 max_packet;
+ 			int ppe_type;
+ 			int wan_mode;
+ 			int wan_sel;
+
+---
+base-commit: c03a49f3093a4903c8a93c8b5c9a297b5343b169
+change-id: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
