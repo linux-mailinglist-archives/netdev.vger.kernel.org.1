@@ -1,185 +1,100 @@
-Return-Path: <netdev+bounces-184636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB8B6A9694F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:28:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216CBA96A4E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA7DC3BB46E
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364CC16149B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44F527C842;
-	Tue, 22 Apr 2025 12:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D58kUsBc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B569B280CFC;
+	Tue, 22 Apr 2025 12:39:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9C71A317D
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 12:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530BB27E1AD
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 12:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745324917; cv=none; b=XYwSuBPaYJM7u0PsDT/d3XlXsdHcYirDCb5Nc2vK6ympXr38EoRIaJqO2TPPKZtPdWwpPfNV7ZCbrpFikVJNW7CGDDxAQnF3dcO+j1NLI3nYXHjSlvRQQSLnQ50bPfBp7oW6jlc5TWF0xC+fw4PRsvmEtp1QX6Ypzr0dFdO6wAo=
+	t=1745325560; cv=none; b=O3Eu/3hYmkSFSoXCat5cSE/Yynh7T2vAJAq5hFWCXOeZHlxl7+iktoUz3N2IVqmSdkr4235aV/MRTGknC5Y0FLUanoppqrNJfZENedPaPjMFY7RaUdpIm7+RpdyO178dZ4VMgw9+VQwzgcCurP673/QJ2RhaIIpF8tRQQ1zD41Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745324917; c=relaxed/simple;
-	bh=9o4Ct5oPQcRAvUtHbnEvgyXCjeAY+3bYihDGYD4aows=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOIj/d8Pmt+8rP8HujilVMgrWHPRM1ujYsYUNyVATA0K101yAD55OnqqzeKKuWgXKslQioilHJNqGkg1tWJodd466MMLuNnB+3CkWNpv4TNRLNgPeVQ4Acs6PT/fT3ENcLR86QINy7FWtJJWwkg+ff49R3CtkWgaKxLYLJAwiIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D58kUsBc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12F11C4CEE9;
-	Tue, 22 Apr 2025 12:28:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745324917;
-	bh=9o4Ct5oPQcRAvUtHbnEvgyXCjeAY+3bYihDGYD4aows=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D58kUsBcroX5/pBlshXIWywZdrDk8k/KuOlM19ll8C/6A79X6dznwni1weXUiGp6l
-	 6RJqzGGKMi7MTKrSCH4uklyMgkzqLvzLfoHVNQX77yVtBPCjlQ+nTT2T49DEwk7ODl
-	 NoqrVVFgON1dqGbApiM0eqHr+fqp8TWMhP07sYabjbeI5RoxsMrFhsKnk+utozjlll
-	 NmBpYXTHpSH1C3RB1T9NMqsqh3JgOVa3RokI6urtrP5mBjgu/BMdtkt0MMD2OYGB13
-	 mRFKLwd6ljfIzVkwA7p8YVSdf18v3+VxeDGhUnpIh+tCaUCOAf1okcwUe2bUIK4fsi
-	 lUC97apFMRs3g==
-Date: Tue, 22 Apr 2025 13:28:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tung Nguyen <tung.quang.nguyen@est.tech>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, jmaloy@redhat.com,
-	syzbot+ed60da8d686dc709164c@syzkaller.appspotmail.com,
-	Hoang Le <hoang.h.le@dektech.com.au>,
-	tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH net] tipc: fix NULL pointer dereference in
- tipc_mon_reinit_self()
-Message-ID: <20250422122832.GE2843373@horms.kernel.org>
-References: <20250417074826.578115-1-tung.quang.nguyen@est.tech>
+	s=arc-20240116; t=1745325560; c=relaxed/simple;
+	bh=BhEtMKzjeaskERsSKy6HSFs0ItPLGjxwUZ01f4eTLIA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZYsbcSe9aYBuYdeMHVph4cqvtsO8r1FdC1yB7prDtn4/um18ne1MVRW0gyW6i9ifc1LV0cyThsrKJ6GkegGuYruh6e2JZzDsXgkUFPkokg3QEZQjxx2jKvturWIEy3qNlPg5DCttHMRrwwiiujv/J1gKllIBjHhe4gInuil4kfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7Cu0-0001wH-Kp; Tue, 22 Apr 2025 14:39:04 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7Ctz-001YQi-1F;
+	Tue, 22 Apr 2025 14:39:03 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7Ctz-008TQ0-10;
+	Tue, 22 Apr 2025 14:39:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v2 0/4] net: selftest: improve test string formatting and checksum handling
+Date: Tue, 22 Apr 2025 14:38:58 +0200
+Message-Id: <20250422123902.2019685-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417074826.578115-1-tung.quang.nguyen@est.tech>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-+ Hoang Le, tipc-discussion
+This patchset addresses two issues in the current net selftest
+framework:
 
-On Thu, Apr 17, 2025 at 02:47:15PM +0700, Tung Nguyen wrote:
-> syzbot reported:
-> 
-> tipc: Node number set to 1055423674
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> CPU: 3 UID: 0 PID: 6017 Comm: kworker/3:5 Not tainted 6.15.0-rc1-syzkaller-00246-g900241a5cc15 #0 PREEMPT(full)
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> Workqueue: events tipc_net_finalize_work
-> RIP: 0010:tipc_mon_reinit_self+0x11c/0x210 net/tipc/monitor.c:719
-> ...
-> RSP: 0018:ffffc9000356fb68 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000003ee87cba
-> RDX: 0000000000000000 RSI: ffffffff8dbc56a7 RDI: ffff88804c2cc010
-> RBP: dffffc0000000000 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000007
-> R13: fffffbfff2111097 R14: ffff88804ead8000 R15: ffff88804ead9010
-> FS:  0000000000000000(0000) GS:ffff888097ab9000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000f720eb00 CR3: 000000000e182000 CR4: 0000000000352ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  tipc_net_finalize+0x10b/0x180 net/tipc/net.c:140
->  process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
->  process_scheduled_works kernel/workqueue.c:3319 [inline]
->  worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
->  kthread+0x3c2/0x780 kernel/kthread.c:464
->  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->  </TASK>
-> ...
-> RIP: 0010:tipc_mon_reinit_self+0x11c/0x210 net/tipc/monitor.c:719
-> ...
-> RSP: 0018:ffffc9000356fb68 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000003ee87cba
-> RDX: 0000000000000000 RSI: ffffffff8dbc56a7 RDI: ffff88804c2cc010
-> RBP: dffffc0000000000 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000007
-> R13: fffffbfff2111097 R14: ffff88804ead8000 R15: ffff88804ead9010
-> FS:  0000000000000000(0000) GS:ffff888097ab9000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000f720eb00 CR3: 000000000e182000 CR4: 0000000000352ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 
-> There is a racing condition between workqueue created when enabling
-> bearer and another thread created when disabling bearer right after
-> that as follow:
-> 
-> enabling_bearer                          | disabling_bearer
-> ---------------                          | ----------------
-> tipc_disc_timeout()                      |
-> {                                        | bearer_disable()
->  ...                                     | {
->  schedule_work(&tn->work);               |  tipc_mon_delete()
->  ...                                     |  {
-> }                                        |   ...
->                                          |   write_lock_bh(&mon->lock);
->                                          |   mon->self = NULL;
->                                          |   write_unlock_bh(&mon->lock);
->                                          |   ...
->                                          |  }
-> tipc_net_finalize_work()                 | }
-> {                                        |
->  ...                                     |
->  tipc_net_finalize()                     |
->  {                                       |
->   ...                                    |
->   tipc_mon_reinit_self()                 |
->   {                                      |
->    ...                                   |
->    write_lock_bh(&mon->lock);            |
->    mon->self->addr = tipc_own_addr(net); |
->    write_unlock_bh(&mon->lock);          |
->    ...                                   |
->   }                                      |
->   ...                                    |
->  }                                       |
->  ...                                     |
-> }                                        |
-> 
-> 'mon->self' is set to NULL in disabling_bearer thread and dereferenced
-> later in enabling_bearer thread.
-> 
-> This commit fixes this issue by validating 'mon->self' before assigning
-> node address to it.
-> 
-> Reported-by: syzbot+ed60da8d686dc709164c@syzkaller.appspotmail.com
-> Fixes: 46cb01eeeb86 ("tipc: update mon's self addr when node addr generated")
-> Signed-off-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+- Truncated test names: Existing test names are prefixed with an index,
+  reducing the available space within the ETH_GSTRING_LEN limit.  This
+  patch removes the index to allow more descriptive names.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+- Inconsistent checksum behavior: On DSA setups and similar
+  environments, checksum offloading is not always available or
+  appropriate. The previous selftests did not distinguish between software
+  and hardware checksum modes, leading to unreliable results. This
+  patchset introduces explicit csum_mode handling and adds separate tests
+  for both software and hardware checksum validation.
 
-> ---
->  net/tipc/monitor.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/tipc/monitor.c b/net/tipc/monitor.c
-> index e2f19627e43d..b45c5b91bc7a 100644
-> --- a/net/tipc/monitor.c
-> +++ b/net/tipc/monitor.c
-> @@ -716,7 +716,8 @@ void tipc_mon_reinit_self(struct net *net)
->  		if (!mon)
->  			continue;
->  		write_lock_bh(&mon->lock);
-> -		mon->self->addr = tipc_own_addr(net);
-> +		if (mon->self)
-> +			mon->self->addr = tipc_own_addr(net);
->  		write_unlock_bh(&mon->lock);
->  	}
->  }
-> -- 
-> 2.43.0
-> 
-> 
+Oleksij Rempel (4):
+  net: selftests: drop test index from net_selftest_get_strings()
+  net: selftests: prepare for detailed error handling in
+    net_test_get_skb()
+  net: selftests: add checksum mode support and SW checksum handling
+  net: selftests: add PHY loopback tests with HW checksum offload
+
+ net/core/selftests.c | 308 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 291 insertions(+), 17 deletions(-)
+
+--
+2.39.5
+
 
