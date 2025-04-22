@@ -1,134 +1,206 @@
-Return-Path: <netdev+bounces-184594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B483A96508
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:51:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EAC7A96517
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B6D3A292B
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:50:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7B53BA077
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8752F1F12FC;
-	Tue, 22 Apr 2025 09:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2600D202C2F;
+	Tue, 22 Apr 2025 09:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AcNF/BzP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C17oggqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73046F50F
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614281F1524;
+	Tue, 22 Apr 2025 09:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745315472; cv=none; b=GbBcDcMbbLv5Jp5AamdCrHRSKONg2KzQowSk+8Q29wfUPxzSdlDSgkvibBsAgcwMzdQT37IyfGyK7f2ACBysisIog0PgI4DkccZl9kxFW8xTRlPa/rPifEqx/Adu1kWqPYm/JQ8IDXCgPwYQepLwg7QhIT8n7BA9PrJ5KhgJ1CE=
+	t=1745315599; cv=none; b=HTljRKHcadpgs8qravi/JqNhdlNun6URUF4NhEwb0raVJO3kJWwDiguE4/VB6JLdMYrNLVjnHRLXZPvnmvayqtLARMppS3XWnQTQemvoEDoH8HFS9sTDjEi5aQDu/yw3MEX+g31jpwxUFKfVc1Itcc+lOJehiPvCRa540Q2PP9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745315472; c=relaxed/simple;
-	bh=gmni3RIntqoKE+lOK1tbNMFqIipTn3oqXbLanFJL1xo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XpHIvDsHUD06wTsWgk31SBmoPQ41x7HoW/4LxtD9DH3OToUnlo93bO0Yz6Xc8Au0PYwRrhDcfuKG8etr/0uWioo8lPdtBkbXGin5im+f6zPSIX95oJJv5fqG6upByV3Q1Ze7SrS/vvAxpWWn6R9adLkH5of/oLWaS2zqwr3oBdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AcNF/BzP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5DmO8FoHqEdikoi6rgbBajhkJBA7ZVRXfgskXmlB27I=; b=AcNF/BzPufmQcPjhNp/VEb6aiq
-	DzlboJH11N7wKgZGimEwF/9mceKi0dMoLNlM0MFFAjyXp46amKXcdWKCqxC0fTYKcARa/RzjSDlQc
-	s1+2yATNZHB3S5Z5GMQnhgRCtyrhQQ3v4ZINrFpVH16ldQ/cH3SUGs9cHStWMNDweN8gqXQ9unZnY
-	yXVInc5OgQJIIoZNC+o9WsORGfYXij6zqFnwtYR+UyvAQsMhOtKi6BTNVSIJhPt2xyEfpBD8d2SJk
-	Di4oV5NNdhcrtt2mXAyEnwkyAPatN2NmILwA+PSOpkJhWYjOPJ1jF1WGEjj80X7UaB842ZG0zQuEg
-	5NL1fZ6w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53758)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u7AHP-00049D-1e;
-	Tue, 22 Apr 2025 10:51:04 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u7AHM-0007O1-2J;
-	Tue, 22 Apr 2025 10:51:00 +0100
-Date: Tue, 22 Apr 2025 10:51:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled
- and link down
-Message-ID: <aAdmhIcBDDIskr3J@shell.armlinux.org.uk>
-References: <Z__URcfITnra19xy@shell.armlinux.org.uk>
- <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
- <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
- <aAERy1qnTyTGT-_w@shell.armlinux.org.uk>
- <aAEc3HZbSZTiWB8s@shell.armlinux.org.uk>
- <CAKgT0Uf2a48D7O_OSFV8W7j3DJjn_patFbjRbvktazt9UTKoLQ@mail.gmail.com>
- <aAE59VOdtyOwv0Rv@shell.armlinux.org.uk>
- <CAKgT0Uc_O_5wMQOG66PS2Dc2Bn3WZ_vtw2tZV8He=EU9m5LsjQ@mail.gmail.com>
+	s=arc-20240116; t=1745315599; c=relaxed/simple;
+	bh=nQfvSQTk3q5Ln1Mb1BzF5AhQYYL5+U7RCTpig9HFDe8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wri/u2Xlu1nqFF+AtNNs8NVfv9dz423lmw2XdLJZLqoF0zqXt/zlQZRNnZsvxWNbdIjifbmZWnXjptyjxgeOaSRUqZOZRON+yifM20CEnhs/JweU2diI5vbR9hU7skoTkAKm+xfwkHydJMdrxRrjpRWzmADFXI4J/6JTWHMmrWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C17oggqg; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e8fce04655so46446166d6.3;
+        Tue, 22 Apr 2025 02:53:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745315595; x=1745920395; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=yETBkW1U88nCu/gylpzqjgQQTBz7Y8uKO9OA9A9LFVE=;
+        b=C17oggqgFLQ+fFdy6yfDZlFLz3j+lMmYFGFZ14TdOEB5nWHjbdK5AWHTBmENeIdBYN
+         LU1I1pRKKQRfkhiuGHmBMzMa5+/8MW8fltu/Gig00rKE9pKDXCs5j8rHKhB+ksnQ5dLv
+         TNhpTyt5NOO6rKp82vnfvdx0v/mjdKT/NwGGPJ6htCdVZlqpH9HQIgdcaFTW9x0wJeZn
+         UD1Xd7BO+Het3UZIe41VAb0diPw+CDs6zelfzyPgwkzXIBWaCymqmAWgc6a0HmTHhN5j
+         0cb9LgeYvpv2hZeyVtR4gWDnG6/gAESXK+/6vLaayZrCXXv6axxSVTxYexbl+2Y9lddI
+         3pbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745315595; x=1745920395;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yETBkW1U88nCu/gylpzqjgQQTBz7Y8uKO9OA9A9LFVE=;
+        b=CaMqHSbgdzefVnnZNExwzYJ6BMVAI3mZElpXP8Ch/tgYxnuqT/Vu2VF2OWN9G/y55F
+         Oa9F0dkYHDkj5ymOM10j1W7L2muP/wr31CNDGB0DEvwLTaoyL7uVtKa3U37DtYcCX2jL
+         IElvFxnvAGWOaQ1fT+BJ5vU6OMy9ZwBisCuJHxkbzRGvhs/Pq7Shdi5QA4+om+0jr0yR
+         FpOPTBCl7lZaGZ6wziIT2kpi9iBQLIZTKH3S+L1H2dXd6BF/NyFMSUO7niNdVrPHF258
+         eKidCn9X0Y8bos/Det+Kdiu5GcUuuZgUmzvr3u0MLkkXRS7/n6SMBXyunIk4KkefRGbo
+         3iLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIQm/3rFEIFM23Kh2jEvvmMv6j3lfRANyp2BmfrMmp8rmP/Vk4tX+bk2CMLdZf5OEljyaUukk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3u4eHSy7d+4i59QgiRWWVT26TP2cBxN284kP8U+cSjMj2Fbnc
+	KDXTFhLCjLhRFxH3ySY7c6ymfKU/dCMqfcdGPpewlyxfArD9lKGZMC8OboRKc/eumNz13B6zyIz
+	mU4Y760B04O8z6eZYf5MQjY31wDvTa3mhYRs=
+X-Gm-Gg: ASbGncupYb1kuneh6gj4/KFtvQzvHQCMPN7ydpRDE14zGQ63RReFzHNLFhvK98VowwM
+	BxS5M5fFdRCsvohGzVLK9RB5pe82Zpx8/xi6HllgkIwvPpvPbfAGPgQ1fbP1Lqb8fFNv045zEdK
+	Hqc0bJsHJQhvYw3v95jTqrNpde
+X-Google-Smtp-Source: AGHT+IG9EHPlaIkF6blMPd0BV9rfzA8PqWZ82hTSrVfZVaEAW3ZDFSX1gMGce2uY0p5zhrx5tpnS3xIvOwd//eopcMQ=
+X-Received: by 2002:ad4:5b83:0:b0:6e6:5f28:9874 with SMTP id
+ 6a1803df08f44-6f2c45020bbmr259686826d6.2.1745315595118; Tue, 22 Apr 2025
+ 02:53:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0Uc_O_5wMQOG66PS2Dc2Bn3WZ_vtw2tZV8He=EU9m5LsjQ@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CGME20250416101926eucas1p193c52e72b20321605905f1c465c8ac06@eucas1p1.samsung.com>
+ <20250416101908.10919-1-e.kubanski@partner.samsung.com>
+In-Reply-To: <20250416101908.10919-1-e.kubanski@partner.samsung.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 22 Apr 2025 11:53:04 +0200
+X-Gm-Features: ATxdqUHbkAm8vm6z4FQF1hB3H-7aTHmuQlu_qulyA9dIL7lUpgWW_6X-1Tw_jEc
+Message-ID: <CAJ8uoz0Tap7JtQdoHFrXeE96XxUhJroZTPbCKhUeR3u3jzOWjA@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf] xsk: Fix race condition in AF_XDP generic RX path
+To: "e.kubanski" <e.kubanski@partner.samsung.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 17, 2025 at 12:49:07PM -0700, Alexander Duyck wrote:
-> What I was saying is that we could add an additional state flag that
-> we set before you write to the phylink_disable_state. You would
-> essentially set the state to true if you want to preserve the current
-> state, and if it is true you would set cur_link_statte to false in
-> phylink_resolve ignoring the actual current link state.
-> 
-> So in phylink_stop you would set it to false, and in phylink_suspend
-> you would set it to true. With that change phylink_stop could force
-> the link down, whereas phylink_suspend would keep it up,
-> phylink_suspend could deal with netif_carrier_off, and phylink_resume
-> could deal with old_link_state.
+On Wed, 16 Apr 2025 at 12:19, e.kubanski <e.kubanski@partner.samsung.com> wrote:
+>
+> Move rx_lock from xsk_socket to xsk_buff_pool.
+> Fix synchronization for shared umem mode in
+> generic RX path where multiple sockets share
+> single xsk_buff_pool.
+>
+> RX queue is exclusive to xsk_socket, while FILL
+> queue can be shared between multiple sockets.
+> This could result in race condition where two
+> CPU cores access RX path of two different sockets
+> sharing the same umem.
+>
+> Protect both queues by acquiring spinlock in shared
+> xsk_buff_pool.
+>
+> Lock contention may be minimized in the future by some
+> per-thread FQ buffering.
+>
+> It's safe and necessary to move spin_lock_bh(rx_lock)
+> after xsk_rcv_check():
+> * xs->pool and spinlock_init is synchronized by
+>   xsk_bind() -> xsk_is_bound() memory barriers.
+> * xsk_rcv_check() may return true at the moment
+>   of xsk_release() or xsk_unbind_dev(),
+>   however this will not cause any data races or
+>   race conditions. xsk_unbind_dev() removes xdp
+>   socket from all maps and waits for completion
+>   of all outstanding rx operations. Packets in
+>   RX path will either complete safely or drop.
 
-I really don't like the idea that the netif carrier state differs from
-old_link_state. These need to be the same to ensure that drivers which
-use phylink in PHYLINK_NETDEV mode (which uses netif carrier for link
-state tracking) vs PHYLINK_DEV mode (which uses old_link_state) see the
-same behaviour, becomes much harder to guarantee if we start treating
-these differently in the code depending on something other than which
-PHYLINK*DEV is in use. It's really not something I want to entertain.
+Thanks Eryk.
 
-> > So, if the link was up, and we don't call mac_link_down() then we must
-> > also *not* call phylink_mac_initial_config(). I've no idea what will
-> > break with that change.
-> 
-> Sorry, mentioning it didn't occur to me as I have been dealing with
-> the "rolling start" since the beginning. In mac_prepare I deal with
-> this. Specifically the code in mac_prepare will check to see if the
-> link state is currently up with the desired configuration already or
-> not. If it is, it sets a flag that will keep us from doing any changes
-> that would be destructive to the link. If the link is down it
-> basically clears the way for a full reinitialization.
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-I would much rather avoid any of the "setup" calls (that means
-mac_prepare(), mac_config(), mac_finish(), pcs_config() etc) and
-mac_link_up() if we're going to add support for "rolling start" to
-phylink.
-
-That basically means that the MAC needs to be fully configured to
-process packets before phylink_start() or phylink_resume() is called.
-
-This, however, makes me wonder why you'd even want to use phylink in
-this situation, as phylink will be doing virtually nothing for fbnic.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> Fixes: bf0bdd1343efb ("xdp: fix race on generic receive path")
+> ---
+>  include/net/xdp_sock.h      | 3 ---
+>  include/net/xsk_buff_pool.h | 2 ++
+>  net/xdp/xsk.c               | 6 +++---
+>  net/xdp/xsk_buff_pool.c     | 1 +
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> index bfe625b55d55..df3f5f07bc7c 100644
+> --- a/include/net/xdp_sock.h
+> +++ b/include/net/xdp_sock.h
+> @@ -71,9 +71,6 @@ struct xdp_sock {
+>          */
+>         u32 tx_budget_spent;
+>
+> -       /* Protects generic receive. */
+> -       spinlock_t rx_lock;
+> -
+>         /* Statistics */
+>         u64 rx_dropped;
+>         u64 rx_queue_full;
+> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+> index 50779406bc2d..7f0a75d6563d 100644
+> --- a/include/net/xsk_buff_pool.h
+> +++ b/include/net/xsk_buff_pool.h
+> @@ -53,6 +53,8 @@ struct xsk_buff_pool {
+>         refcount_t users;
+>         struct xdp_umem *umem;
+>         struct work_struct work;
+> +       /* Protects generic receive in shared and non-shared umem mode. */
+> +       spinlock_t rx_lock;
+>         struct list_head free_list;
+>         struct list_head xskb_list;
+>         u32 heads_cnt;
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 89d2bef96469..e2a75f3be237 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -337,13 +337,14 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp)
+>         u32 len = xdp_get_buff_len(xdp);
+>         int err;
+>
+> -       spin_lock_bh(&xs->rx_lock);
+>         err = xsk_rcv_check(xs, xdp, len);
+>         if (!err) {
+> +               spin_lock_bh(&xs->pool->rx_lock);
+>                 err = __xsk_rcv(xs, xdp, len);
+>                 xsk_flush(xs);
+> +               spin_unlock_bh(&xs->pool->rx_lock);
+>         }
+> -       spin_unlock_bh(&xs->rx_lock);
+> +
+>         return err;
+>  }
+>
+> @@ -1724,7 +1725,6 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+>         xs = xdp_sk(sk);
+>         xs->state = XSK_READY;
+>         mutex_init(&xs->mutex);
+> -       spin_lock_init(&xs->rx_lock);
+>
+>         INIT_LIST_HEAD(&xs->map_list);
+>         spin_lock_init(&xs->map_list_lock);
+> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> index 1f7975b49657..3a5f16f53178 100644
+> --- a/net/xdp/xsk_buff_pool.c
+> +++ b/net/xdp/xsk_buff_pool.c
+> @@ -87,6 +87,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+>         pool->addrs = umem->addrs;
+>         pool->tx_metadata_len = umem->tx_metadata_len;
+>         pool->tx_sw_csum = umem->flags & XDP_UMEM_TX_SW_CSUM;
+> +       spin_lock_init(&pool->rx_lock);
+>         INIT_LIST_HEAD(&pool->free_list);
+>         INIT_LIST_HEAD(&pool->xskb_list);
+>         INIT_LIST_HEAD(&pool->xsk_tx_list);
+> --
+> 2.34.1
+>
+>
 
