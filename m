@@ -1,106 +1,137 @@
-Return-Path: <netdev+bounces-184768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CAB0A971E8
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:06:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E76A971EB
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48ED044046C
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:06:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A65FD1884FC1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF05290BA6;
-	Tue, 22 Apr 2025 16:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CE228A3E2;
+	Tue, 22 Apr 2025 16:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AcOXqpIj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KG/Ti9nk"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75572290086;
-	Tue, 22 Apr 2025 16:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DE2199252
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745337985; cv=none; b=cx/H/0MyXOqroIMFp8Cha+kvnt65R6G78j6SHd7ig/cR0ajhhr11suOcmnmUuRlH3F+KByzxQ7nePVc8VMlbwS4R55MZUI9Yi6mLUMAX89l0tRHGMS+lQDARHi75Y+KsX+Va+YoHuSqBwc2gYQEqF5zCbjejD9fh99eSOldbJrQ=
+	t=1745338021; cv=none; b=Bv/3OdXrg1oOQ6TajAc/syN79cU+2ZYABImulkUjq5lLUT8S/obCnYXaONuhaigr5M+EL1avaNX9/OV+vOQs6f9HBvGE2ANmJDUaS1HfGYBe34nlaSfa9yxkQ8Nzd3m/WoSJl5oapw7RXKUxBGN4KsK5yDL9/3IMygyC0XNHtls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745337985; c=relaxed/simple;
-	bh=l/GKSbrMBp2X50Z2sa9WsYIMj+6sBSQ5RVr1V8Qo+ak=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=jsDbxlgH6mP0K83OgtavGJyFHaZgPBElJKgqkPGt1iQPHAY2RXNdYi0+zrrMIXcy4UUThMlKKk5e8I4g97mOpwPUomwbCOjzCJ0hTV5eOMEurZSfG425OeiUNDrtGRHw6YAhZyeGt1OCVLM7zyJxhsgSbBOkQGsypFimXFRoMd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AcOXqpIj; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 43304438C1;
-	Tue, 22 Apr 2025 16:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1745337980;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EYp1PH84CI/1BjGsz+Aop4wrRagREEsClZGhgLNu8YE=;
-	b=AcOXqpIj1Y5WHHcyuArtzMkdreDit/Ps1+jloEHY3T8+Dr2Exj7tcyzpHwaaA2YO+Ay+cu
-	XxAKVq4fbXpCOOl28MCp4zejQRvHlKBGqVs97g/a+TWVn0Icll1gkDR7WuHnLFVpVcRMXg
-	JV9+8FR/4BEsqO/ZYv5NtF1yZbZIsxMJ27keaFOwbWHZ8cPhxJyN8RG1u/VNYwGedA38TF
-	DBMj1aOjXK8xP75F3tyJRltTrN7+6UhCOF3JhzpFY/vbrGHq3olR4PGXK6xtp3jVOe3DVd
-	tbHXaIg96rp7ImtFUehKsx3cBRyjLoJIB0w7XvxLlY9WVLQJv9NoH7Kd4znQlQ==
+	s=arc-20240116; t=1745338021; c=relaxed/simple;
+	bh=uS+NW8Y4dc5xpJmdpcLo8BFyXBbM9TQxx4BVJ+kC3YM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eDL1emfcQz2fY8kpLRVxlOcCLHKL5dPmAXE6s5sucHOuBiY1jXUKcEYngKD9DZtZtmvH55pzROBokXTKLUquOqvnYcjvPeNtEYzZL1+H4p9KtlnZizGdtLD9iCPMcV7M/l6saxp9mjA5vnUpd8oDxUpjlP2yUUihuYbPdgnkDpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KG/Ti9nk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8491FC4CEE9;
+	Tue, 22 Apr 2025 16:07:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745338020;
+	bh=uS+NW8Y4dc5xpJmdpcLo8BFyXBbM9TQxx4BVJ+kC3YM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KG/Ti9nkF3aM1gmutyt0mvxxiLbpZh17B0TOZenhe3P5aPRGaO6SKnRhbzyDPYUhZ
+	 UJSqLmAJy2PZzVYRQgXrmJy9NDP6tk5ykFOEqyxTcmLwGzJFAMCypYIBiKdylRhAqb
+	 iAGl7lULvdPUxf7gVO5s2WGg0wtv5XtXfF07t8n+wlp80f7qQF93i+0V3YIVhwbuGY
+	 1fTzmITDCCz9XSOqifZoRDoc3LaYSt9wBuvbHc+YHayz1K36rOk1P31nGV+JuXEPTt
+	 VhsZrpkQfDiAggKBXzMkzv2l+Ma5RzvSU48wwrnd12px89Bmv0e+YwBPM8xGkPcXWG
+	 gFtRvXTrurVQQ==
+Message-ID: <649a886e-a914-433e-b6d2-152a69a0ad5d@kernel.org>
+Date: Tue, 22 Apr 2025 09:06:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] ipv4: prefer multipath nexthop that matches
+ source address
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, idosch@nvidia.com, kuniyu@amazon.com,
+ Willem de Bruijn <willemb@google.com>
+References: <20250420180537.2973960-1-willemdebruijn.kernel@gmail.com>
+ <20250420180537.2973960-2-willemdebruijn.kernel@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250420180537.2973960-2-willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 22 Apr 2025 18:06:18 +0200
-Message-Id: <D9DAOEKXJKQB.HHD75KOLKIW1@bootlin.com>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Maxime
- Coquelin" <mcoquelin.stm32@gmail.com>, "Alexandre Torgue"
- <alexandre.torgue@foss.st.com>, "Richard Cochran"
- <richardcochran@gmail.com>, "Daniel Machon" <daniel.machon@microchip.com>,
- "Maxime Chevallier" <maxime.chevallier@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 2/2] net: stmmac: fix multiplication overflow when
- reading timestamp
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250422-stmmac_ts-v1-0-b59c9f406041@bootlin.com>
- <20250422-stmmac_ts-v1-2-b59c9f406041@bootlin.com>
- <aAe2iULNthghEEEt@shell.armlinux.org.uk>
-In-Reply-To: <aAe2iULNthghEEEt@shell.armlinux.org.uk>
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeegudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkvefuhffvofhfjgesthhqredtredtjeenucfhrhhomheptehlvgigihhsucfnohhthhhorhoruceorghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeelkeehiefhfeehvefhtdegueelkeehffffffeuvdekkeekuddvueeguefgieeukeenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkv
- ghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepmhgtohhquhgvlhhinhdrshhtmhefvdesghhmrghilhdrtghomhdprhgtphhtthhopegrlhgvgigrnhgurhgvrdhtohhrghhuvgesfhhoshhsrdhsthdrtghomh
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hello Russell,
+On 4/20/25 12:04 PM, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
+> 
+> With multipath routes, try to ensure that packets leave on the device
+> that is associated with the source address.
+> 
+> Avoid the following tcpdump example:
+> 
+>     veth0 Out IP 10.1.0.2.38640 > 10.2.0.3.8000: Flags [S]
+>     veth1 Out IP 10.1.0.2.38648 > 10.2.0.3.8000: Flags [S]
+> 
+> Which can happen easily with the most straightforward setup:
+> 
+>     ip addr add 10.0.0.1/24 dev veth0
+>     ip addr add 10.1.0.1/24 dev veth1
+> 
+>     ip route add 10.2.0.3 nexthop via 10.0.0.2 dev veth0 \
+>     			  nexthop via 10.1.0.2 dev veth1
+> 
+> This is apparently considered WAI, based on the comment in
+> ip_route_output_key_hash_rcu:
+> 
+>     * 2. Moreover, we are allowed to send packets with saddr
+>     *    of another iface. --ANK
+> 
+> It may be ok for some uses of multipath, but not all. For instance,
+> when using two ISPs, a router may drop packets with unknown source.
+> 
+> The behavior occurs because tcp_v4_connect makes three route
+> lookups when establishing a connection:
+> 
+> 1. ip_route_connect calls to select a source address, with saddr zero.
+> 2. ip_route_connect calls again now that saddr and daddr are known.
+> 3. ip_route_newports calls again after a source port is also chosen.
+> 
+> With a route with multiple nexthops, each lookup may make a different
+> choice depending on available entropy to fib_select_multipath. So it
+> is possible for 1 to select the saddr from the first entry, but 3 to
+> select the second entry. Leading to the above situation.
+> 
+> Address this by preferring a match that matches the flowi4 saddr. This
+> will make 2 and 3 make the same choice as 1. Continue to update the
+> backup choice until a choice that matches saddr is found.
+> 
+> Do this in fib_select_multipath itself, rather than passing an fl4_oif
+> constraint, to avoid changing non-multipath route selection. Commit
+> e6b45241c57a ("ipv4: reset flowi parameters on route connect") shows
+> how that may cause regressions.
+> 
+> Also read ipv4.sysctl_fib_multipath_use_neigh only once. No need to
+> refresh in the loop.
+> 
+> This does not happen in IPv6, which performs only one lookup.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> 
+> Side-quest: I wonder if the second route lookup in ip_route_connect
+> is vestigial since the introduction of the third route lookup with
+> ip_route_newports. IPv6 has neither second nor third lookup, which
+> hints that perhaps both can be removed.
+> ---
+>  include/net/ip_fib.h     |  3 ++-
+>  net/ipv4/fib_semantics.c | 39 +++++++++++++++++++++++++--------------
+>  net/ipv4/route.c         |  2 +-
+>  3 files changed, 28 insertions(+), 16 deletions(-)
+> 
 
-On Tue Apr 22, 2025 at 5:32 PM CEST, Russell King (Oracle) wrote:
-> On Tue, Apr 22, 2025 at 05:07:23PM +0200, Alexis Lothor=C3=A9 wrote:
->>  	ns =3D readl(ptpaddr + GMAC_PTP_ATNR);
->> -	ns +=3D readl(ptpaddr + GMAC_PTP_ATSR) * NSEC_PER_SEC;
->> +	ns +=3D (u64)(readl(ptpaddr + GMAC_PTP_ATSR)) * NSEC_PER_SEC;
->
-> I'm not sure what the extra parens around readl() are actually trying to
-> do. Please drop them if they're not useful.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-They are indeed not specifically useful in this case, they will be dropped
-in v2.
-
-Thanks,
-
-Alexis
-
---=20
-Alexis Lothor=C3=A9, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
 
 
