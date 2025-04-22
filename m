@@ -1,205 +1,131 @@
-Return-Path: <netdev+bounces-184555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 357DAA96312
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:55:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55689A9632E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88A983BD0A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 08:50:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38885189D3B4
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 08:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBE5238C15;
-	Tue, 22 Apr 2025 08:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D6F25EF94;
+	Tue, 22 Apr 2025 08:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JoNMZ1/g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E6C190472;
-	Tue, 22 Apr 2025 08:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01E225E806;
+	Tue, 22 Apr 2025 08:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745311457; cv=none; b=f/nkNC9Pc3C3eQSigEh+Ez3iEMBOS93daA7+GJIw+7BPBHLQFFpxrJIyV2Vbaw0bua3H3Wka17ZjHJgwil6HVw9+UlGfPOdm3b3ugcO4M8KtnCPrwlk9GtMsA2dK0T7yLHPYJyzBYYfEN4cg1vHeY5TIJuuKMfOO2xUV4ydcmfo=
+	t=1745311432; cv=none; b=t/a/gMpN6s2P1GBqTs24228QdfApwU2qFU6+d/PcFidoGAsX8UM220HjWVL/4bKrwxIEAYGwNvqXPtVd3/Xk6g5vEM4eIcsMKJrmOhZ6MLm+4yOMwIPvZsxTAKlAo8wL02te1Tmu5+Dj9FXyGSF1IS017ojXhqJXNWQIKPjxk/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745311457; c=relaxed/simple;
-	bh=d3vMkZUgF1qGZvdCTBm7Bb2MO67cZCqhiB7dVZXff7A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fflLLKmhQO9p8pYD8lZBXZu540D9jYzWVRvloOr1vhKR3Q1aj7KmudF/9Ukjd5oHwtcGbgBkR+6jr0UmMZkZxSWomcJENhg5LOktjUpS2ALVenShzRuRVoaw3VQsSqFt6a6wUvPPfYHbn77npW51C2XpiXi639phepR2YE7Azi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1745311432; c=relaxed/simple;
+	bh=lqD7m89r2sQrsEOmBfAzRt8RKN827E6V2hOjWrQC4mY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lS4SUd4wqfue1F6+zrJ7DJXNYSbWCcggKJatgVlD/s8Y8R6fyPEMkNd29d+yLhIKihfNH5VBAOsYKnZ9YHN8UndOENlqCn5jJZnVuvU2Wgz3pviQiLlFpLh+C1rgOToN08sKJOkF7fSyX0wvLZtP2NZLebL2DTeFpv8c/ZUsRaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JoNMZ1/g; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-86715793b1fso1702233241.0;
-        Tue, 22 Apr 2025 01:44:14 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5e8be1bdb7bso7483682a12.0;
+        Tue, 22 Apr 2025 01:43:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745311429; x=1745916229; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=03SE0QEScorD8X63ZKpeNL8JKETFXurDVO26PPtrnKM=;
+        b=JoNMZ1/gyxMannbt9i/1J5HgS+tzX6kFPLD2sL5PYwbHo3yIPeqp5LBG6Y9YiZbNEU
+         jb1RjSnjeCI2L70B16dp2zcgF9+uifk94Q9I+a5ltkqiWr66/n6y/ygqLMzvwPOzSdzr
+         pEo8aYtmSlaHG4oTi8RGB6jXrpU5WFo5y70SJ5/0K3zt9BmHvNH3qgGWdldRbitMF72A
+         Wo4YrAVMe+I8e7uz5YBdO6kLXJQbVd0Ch3pnoDyKV0WHDVfQnEPKEgRLrxEC11uJ/Qlt
+         NiG8obCWAt5o+mhExOrKPXppbGqFwWHsm82XyJsE6w2X8wKQkpQXk/kSmVqv9GLVsIFB
+         rEvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745311454; x=1745916254;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mLaMluqDEwjyr3+Ikq130BwnO35HxC0ThAvpH6TmcJU=;
-        b=C5Qyjm6DW+n1mautQR+o9B/+7tOw3oLILI3f1NpWKjO08W/xVIfeB0plsw0CDje4vs
-         jCe4FEBMrMTLvvFd15Igy+t7h2LAi3X8Qr6omOujpf+Anad3UF/rRrxnno4fU7AM8bIn
-         r5fKjLAyV5K+rSoc6ANC8rG+eefCD2BcMVlyAWzZTNYGAIFhVK59w/buAgF9dpfrEYd0
-         Yw6W5TtAF5t+xTQbNH4l+0uRiIZ5ozaMC5tbmW/DEMRmFPWRQsZX6rYPOq7vkC12OeA/
-         zX0aZTDwJfqY+ANXlY/McwBcAtBJqMZzgLZW9O+xLoN4+GwaxvzveYDlT2stwgGjdirS
-         pYzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOXnz3Mt2nI+K+figv98dVb6Po42DcUH3cNMaxB9iGXGNa2zY7nxHTETUbuj14y67LrVp0u2I1@vger.kernel.org, AJvYcCVTSfnHHWP8cWa6ep84ei7s82fP/1TbNPGcSHR2nrzH4WQRe1TyKzk5mG7BxvcM5iZShO+zbuWJh/s=@vger.kernel.org, AJvYcCVtMNeIiG5LRsjfP5I/vFhIYpbN9eIEOCO0yNiqTp4bwa5T4KNaHvHVjqQLFA6IbrtI56zgVfoQs1d27WAu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4OGJHL8V4cCQZTY1s1EaQg86sNU04PilkVcLc7XFpBYL4Dwbv
-	Iiy7ksM97DItlLgq9iqOY19r18bNzaWPIrWRlTOa0NRZY/JKIHODttJefuaI
-X-Gm-Gg: ASbGncuFjIHIJRIEchYJqla1MhTWH0eV9e2S0OsvGULcTqAtvl2JBS8bpnt2uYPxnGl
-	Z2NlT+Z4zKFXF63Wnm3jb8qbREewPymHZ5S+Inau8RAGGEwiFXK4QG9ybVaYK9USMUJZ2+mgsg0
-	3Kh8Kum5+F65HbhwrYwBH4bjwT51wiQgDRHLQ45jLVx43XD/8yKXJRBtz4Xei/ep+kC0ZJhl9ZG
-	X0wZHMG3Fz56eDLTz6X4i32BH2T2qGMcuvlixnVsWZxZ0IXgG32p3bg7uONbaOOgOud7Z+Kwei3
-	4oEgulXeI/OepfEIQ1dXvSHQplemdR1JXMbKSjZgB6nNgBq8oJ1JhZl2LFwzIjSuuX//23B6D4G
-	5g7t9dgQ=
-X-Google-Smtp-Source: AGHT+IGHjwtajK+eESnZcNJv/Xcrc5PPMvqynRq9MQ0CFLdghjl4CA3+//ryDafi5O9y073O90WCdg==
-X-Received: by 2002:a05:6102:53ce:b0:4bb:dba6:99d4 with SMTP id ada2fe7eead31-4cb800d8a62mr7419001137.7.1745311454063;
-        Tue, 22 Apr 2025 01:44:14 -0700 (PDT)
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com. [209.85.221.179])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4cb7dd84911sm2133955137.4.2025.04.22.01.44.13
+        d=1e100.net; s=20230601; t=1745311429; x=1745916229;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=03SE0QEScorD8X63ZKpeNL8JKETFXurDVO26PPtrnKM=;
+        b=VT7arvIDRfkpfquvs5JisdzgIBGVu1yu3iii6c7T7my9RMzVYEIkGz2BMQiE6Wskon
+         vs7XBZ6h7x0d9iJVY6lxAVAiX8ZRw3XZO4jB/NTQMNCzIogoMapWYOblkwrz1mQgi0Q6
+         oyYZeeXnHb290iVzgfSoiLf+YLvNCojKS0ccHhgbcaIqaZStecVe0RNc8ykJBP1wzv0Y
+         mKAA/ridEiN7lGw+WmtxDf6SHUSpJI/JY9UulRo0On1VgUHZaHZEyUy9hgLkS/aB1zBE
+         Dfc3AWKyQAbqgQ5fnphbw/NoHO80Ky9SAJdzaK60VvSRVH8tmnDS82lW5Gpwdjk8kSlP
+         9/4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUsQccODKIh6v81KYPAo8qCQAswkDnkbzFg5oOSRaVREzbTb4OJenc0img0Y3gVz2hP68edN4Rt@vger.kernel.org, AJvYcCVGyOfJGNaKImMFHUByDvcxvvxUK88N4cDLcx34I8aS+mFcKt+Terd7cVBf0d5/UQegrMkeQ4i+B0Uz@vger.kernel.org, AJvYcCW6fuFzWHhsfK0LtXIo8V3NUkvM675eG+BneXg+sEr5PMRvxHSEeZL5NiYlYxf1zcL5lkrv4r1XEA==@vger.kernel.org, AJvYcCWFr6zCvy+X0dwcTSWOxe8nKgh6iknO8rOauaRS9PmcMU2ZW+at7gNEYGvKkPmf5qR3tkYDdCqYIh2vvCbJCJOh@vger.kernel.org, AJvYcCWuX1tIyLmm8WC8WH/EedAnhFUGckwP3h50F3/B8NPovpH2yEMO+3UeL1bv29w4h/4V4Z1n@vger.kernel.org, AJvYcCX7H4ZZcsZ1DgwCJFknaFPXVOj2wWErha/hYHvnD1CQx8yYu7IlrkVYnmPFp9nY6swymRikZfnYgBIGMQfe@vger.kernel.org
+X-Gm-Message-State: AOJu0YwChA7nRNMqYUmZ/d8UsxnwsT74ykiUv+pgWFT/dVY2jXlXzO07
+	rPuGZb97KwgDz084HOmWdNUxQAd7kCNDZDGdEATlqd5QdNucDn3B
+X-Gm-Gg: ASbGncs6fiXetxak4xhs/qqU3vDfUqmphGQikL479W1KSU5jBrdH1ePn/EyVCWtcWal
+	eIiZlWYCdEoS50ujMPAMO9rmG8yM/syKX5aTo0vjKnnKsJzneAk5AZevNkT9Jzlk7fh38M3wI1j
+	ZJPBJ2N81Fwp2VuknMbUB6DKSnYxJ/ljiDb0mBUWxDm33vzewxdwdVQG2Qr/XJnn4Pfd2IkR6N0
+	ZpRWwKxCy/n/Nq21HWCdJZmR1ASSI1uU2/JqGqU8Kh3pWCOgflvWqrqwBuEYqrTOtGdW7K9+uws
+	cWEEsBl1OMuwZSbgNGbmECLdL4SW1ayhUANaA0Y/AOWpSy/zTBT6v/37KqboHy9G
+X-Google-Smtp-Source: AGHT+IHwRLxRlfj/B+cZPJBkcYi+NC7m90ZU8vBSpXmplNdykziG156hWUX5aB76mCTOP3JqMinJQg==
+X-Received: by 2002:a17:906:ef05:b0:aca:db46:8170 with SMTP id a640c23a62f3a-acb74e79d11mr1252517166b.60.1745311429050;
+        Tue, 22 Apr 2025 01:43:49 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::158? ([2620:10d:c092:600::1:558d])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6ec42af6sm623375166b.43.2025.04.22.01.43.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 01:44:13 -0700 (PDT)
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5240b014f47so1859268e0c.1;
-        Tue, 22 Apr 2025 01:44:13 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUgsLcqOZ6qig0Nyx1yEz1ZQjjBG2RMAXT29vXcAMPOgEPFhtdJIeZqgPhoKE1r9AR6Ab+rHGNZs+jIGU1J@vger.kernel.org, AJvYcCV54AhY9zdZZtSpsQXZJgX/7vEcfCQ1EmzT7lIdR9KPY4FsKR7nRgRalQn0keIegudMBPw59DafJZY=@vger.kernel.org, AJvYcCXk7N+IiJZcFo+L9hOFe4RZCAfIyNwtdP5NgTUogaqmaa7OiGERKxy2B8bwolG11SlkVRKvdLgl@vger.kernel.org
-X-Received: by 2002:a05:6122:3c44:b0:520:61ee:c815 with SMTP id
- 71dfb90a1353d-529254ff048mr10359604e0c.10.1745311453748; Tue, 22 Apr 2025
- 01:44:13 -0700 (PDT)
+        Tue, 22 Apr 2025 01:43:48 -0700 (PDT)
+Message-ID: <484ecaad-56de-4c0d-b7fa-a3337557b0bf@gmail.com>
+Date: Tue, 22 Apr 2025 09:45:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <PN3PR01MB9597382EFDE3452410A866AEB8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <PN3PR01MB9597B01823415CB7FCD3BC27B8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <CAMuHMdV9tX=TG7E_CrSF=2PY206tXf+_yYRuacG48EWEtJLo-Q@mail.gmail.com> <PN3PR01MB9597B3AE75E009857AA12D4DB8BB2@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
-In-Reply-To: <PN3PR01MB9597B3AE75E009857AA12D4DB8BB2@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 22 Apr 2025 10:43:59 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWpqHLest0oqiB+hG47t=G7OScLmHz5zr2u0ZgED_+Obg@mail.gmail.com>
-X-Gm-Features: ATxdqUE7mMMNjQJXGhijqI3kY1zbATKtnGoK226m5ymri0gv1G5LUPASpBBxpD0
-Message-ID: <CAMuHMdWpqHLest0oqiB+hG47t=G7OScLmHz5zr2u0ZgED_+Obg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] lib/vsprintf: Add support for generic FourCCs by
- extending %p4cc
-To: Aditya Garg <gargaditya08@live.com>
-Cc: Hector Martin <marcan@marcan.st>, alyssa@rosenzweig.io, Petr Mladek <pmladek@suse.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Sven Peter <sven@svenpeter.dev>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Aun-Ali Zaidi <admin@kodeit.net>, 
-	Maxime Ripard <mripard@kernel.org>, airlied@redhat.com, Simona Vetter <simona@ffwll.ch>, 
-	Steven Rostedt <rostedt@goodmis.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, apw@canonical.com, joe@perches.com, 
-	dwaipayanray1@gmail.com, lukas.bulwahn@gmail.com, Kees Cook <kees@kernel.org>, 
-	tamird@gmail.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org, 
-	Asahi Linux Mailing List <asahi@lists.linux.dev>, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 2/9] net: add get_netmem/put_netmem support
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ io-uring@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
+ David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250417231540.2780723-1-almasrymina@google.com>
+ <20250417231540.2780723-3-almasrymina@google.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250417231540.2780723-3-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Aditya,
+On 4/18/25 00:15, Mina Almasry wrote:
+> Currently net_iovs support only pp ref counts, and do not support a
+> page ref equivalent.
 
-CC netdev
+Makes me wonder why it's needed. In theory, nobody should ever be
+taking page references without going through struct ubuf_info
+handling first, all in kernel users of these pages should always
+be paired with ubuf_info, as it's user memory, it's not stable,
+and without ubuf_info the user is allowed to overwrite it.
 
-On Tue, 22 Apr 2025 at 10:30, Aditya Garg <gargaditya08@live.com> wrote:
-> On 22-04-2025 01:37 pm, Geert Uytterhoeven wrote:
-> > On Tue, 8 Apr 2025 at 08:48, Aditya Garg <gargaditya08@live.com> wrote:
-> >> From: Hector Martin <marcan@marcan.st>
-> >>
-> >> %p4cc is designed for DRM/V4L2 FourCCs with their specific quirks, but
-> >> it's useful to be able to print generic 4-character codes formatted as
-> >> an integer. Extend it to add format specifiers for printing generic
-> >> 32-bit FourCCs with various endian semantics:
-> >>
-> >> %p4ch   Host byte order
-> >> %p4cn   Network byte order
-> >> %p4cl   Little-endian
-> >> %p4cb   Big-endian
-> >>
-> >> The endianness determines how bytes are interpreted as a u32, and the
-> >> FourCC is then always printed MSByte-first (this is the opposite of
-> >> V4L/DRM FourCCs). This covers most practical cases, e.g. %p4cn would
-> >> allow printing LSByte-first FourCCs stored in host endian order
-> >> (other than the hex form being in character order, not the integer
-> >> value).
-> >>
-> >> Acked-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> >> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> >> Reviewed-by: Petr Mladek <pmladek@suse.com>
-> >> Tested-by: Petr Mladek <pmladek@suse.com>
-> >> Signed-off-by: Hector Martin <marcan@marcan.st>
-> >> Signed-off-by: Aditya Garg <gargaditya08@live.com>
-> >
-> > Thanks for your patch, which is now commit 1938479b2720ebc0
-> > ("lib/vsprintf: Add support for generic FourCCs by extending %p4cc")
-> > in drm-misc-next/
-> >
-> >> --- a/Documentation/core-api/printk-formats.rst
-> >> +++ b/Documentation/core-api/printk-formats.rst
-> >> @@ -648,6 +648,38 @@ Examples::
-> >>         %p4cc   Y10  little-endian (0x20303159)
-> >>         %p4cc   NV12 big-endian (0xb231564e)
-> >>
-> >> +Generic FourCC code
-> >> +-------------------
-> >> +
-> >> +::
-> >> +       %p4c[hnlb]      gP00 (0x67503030)
-> >> +
-> >> +Print a generic FourCC code, as both ASCII characters and its numerical
-> >> +value as hexadecimal.
-> >> +
-> >> +The generic FourCC code is always printed in the big-endian format,
-> >> +the most significant byte first. This is the opposite of V4L/DRM FourCCs.
-> >> +
-> >> +The additional ``h``, ``n``, ``l``, and ``b`` specifiers define what
-> >> +endianness is used to load the stored bytes. The data might be interpreted
-> >> +using the host byte order, network byte order, little-endian, or big-endian.
-> >> +
-> >> +Passed by reference.
-> >> +
-> >> +Examples for a little-endian machine, given &(u32)0x67503030::
-> >> +
-> >> +       %p4ch   gP00 (0x67503030)
-> >> +       %p4cn   00Pg (0x30305067)
-> >> +       %p4cl   gP00 (0x67503030)
-> >> +       %p4cb   00Pg (0x30305067)
-> >> +
-> >> +Examples for a big-endian machine, given &(u32)0x67503030::
-> >> +
-> >> +       %p4ch   gP00 (0x67503030)
-> >> +       %p4cn   00Pg (0x30305067)
-> >
-> > This doesn't look right to me, as network byte order is big endian?
-> > Note that I didn't check the code.
->
-> Originally, it was %p4cr (reverse-endian), but on the request of the maintainers, it was changed to %p4cn.
-
-Ah, I found it[1]:
-
-| so, it needs more information that this mimics htonl() / ntohl() for
-networking.
-
-IMHO this does not mimic htonl(), as htonl() is a no-op on big-endian.
-while %p4ch and %p4cl yield different results on big-endian.
-
-> So here network means reverse of host, not strictly big-endian.
-
-Please don't call it "network byte order" if that does not have the same
-meaning as in the network subsystem.
-
-Personally, I like "%p4r" (reverse) more...
-(and "%p4ch" might mean human-readable ;-)
-
-[1] https://lore.kernel.org/all/Z8B6DwcRbV-8D8GB@smile.fi.intel.com
-
-Gr{oetje,eeting}s,
-
-                        Geert
+Maybe there are some gray area cases like packet inspection or
+tracing? However in this case, after the ubuf_info is dropped, the
+user can overwrite the memory with its secrets. Definitely iffy
+in security terms.
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Pavel Begunkov
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
