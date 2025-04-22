@@ -1,86 +1,102 @@
-Return-Path: <netdev+bounces-184816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3211A974A4
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:49:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E74FAA974A8
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7098A3BECB4
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3038B176457
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CC31D5ADE;
-	Tue, 22 Apr 2025 18:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B6A29617C;
+	Tue, 22 Apr 2025 18:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MtMK2l6Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DkDK0WpZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B6329615A
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 18:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72E228541A
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 18:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745347787; cv=none; b=XCyWNE6JoWZ964aMMhtz6RS3Qj5+g2Jw7A+if3iUyIoLNSGEwu5QTBtIYwkybOlAfpKD4tdtmPoL9Jf9qfpxBAQ5IfW8e1D9hs1q3j6tj0ktA6tkb6AoX85dvlSAdEOnxIplfdKsrgOdk9lrU6yDV4KbzCdC/sj1NnWeCPG/l+A=
+	t=1745347832; cv=none; b=fAaDOsHlOIvjGkZkJVPEV0b7W5Zmb3nOLgt9dfh7df9L5gQtWmpGPxZH4eBvaPsejPhjJ+E7SMao9w0i5/2BTm1g5pkXrbkXoP4OmjjVHbYUY1wHUtuc6MrTa+YddkYek6Vug4yNODGN8d1aLmWgTNO37RarV0I5kDoE0q5gHdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745347787; c=relaxed/simple;
-	bh=RWoWEtAf7f+7io/364/s7GfQqzo3lkhR6B0rZgvXcxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EqW8BJghaLGfrgQvddSXkc3kXMGmBO6MNjYrl7wfDO1AyOh4Joc+u9LtFW7BB2zd2nbdByhJYKxjxJWHPOMTIZZxvQ0j9VNvM5uecxz7zCaaj09j74/AfwyJfpz7UuSQfh07aQHIgkL/t4yr3D3H1qsAqU6sHbi76kNcfu5okDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MtMK2l6Q; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <35f0089e-57a6-4f40-a278-aee4bcfeafac@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745347771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EhgdkHrICyQW4O8yX6lvFSiloeTjU1LbOh9CjFLXlJs=;
-	b=MtMK2l6QIMZPloVF21C6KQJolqy0G8ntUQXZ4lS9zmRs3ehhc80XRUdfeLE9NqlKFdYzOk
-	d9lXh55ryL0zBNg4j5HVok/jLP0TuiN2ywklnaYc01st5fnLf2KpLJSppDXND/uNCKCjdT
-	VK0Sn+INywGbY6xtbx9S3uFfSsi8QCQ=
-Date: Tue, 22 Apr 2025 11:49:26 -0700
+	s=arc-20240116; t=1745347832; c=relaxed/simple;
+	bh=Tz7KWX/ahAGTd/J1CTSrrRjRv2EOpf9kdi604b3VeJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L9nqpOs9H6Z3Ylw7ol9uK8JtBl5RR4fkoyMkwjOY3mLAkxwLuFOGu9seL7EkCkUlyh8gKL3IvSxFsifG5VLtNq6bDMvZ/qnzBnpClJMnKZP+WIB0aU5B4KKte+dnM8cFqjZ9/+yuEn1/Q1hz4vINhO1dXK1oWLkYTqrlCfj9nvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DkDK0WpZ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=946FFN1l6+LGBo+OoDj3047BQNW+IvIkoCOxqblskVo=; b=DkDK0WpZY0Jq55ys8TbVlzWxDo
+	7FL4DoCFgctofbZeLPPS/XasSY/wOAdC7qAqRiIG4YqvbSmcl1a8nW6LhgFByQGjWtsXwFaZJmNp8
+	SJyXNNC/FW26A2j7EUZ1QH/vEGDxw0zmvGlt87DYaMYt+QRGemppebe5PUMmHHuRoYVRUeFfPWGxb
+	+xTVc5E4197S/KAQekc3NHpxmTZE/u9JyRQrUOmklDSZvqBvMpGVgHDULuYx4ihX9uDIWJKGQjq0x
+	bBT35uvtepoSnKeAJd2XhWeYOODkHJmY6NnH91k7CNXYp2F3/QvUZhvK/f/9NXCSDZqeHr9wuncnE
+	hIa94nVw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52366)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u7IhK-0004sA-0y;
+	Tue, 22 Apr 2025 19:50:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u7IhH-0007iL-27;
+	Tue, 22 Apr 2025 19:50:19 +0100
+Date: Tue, 22 Apr 2025 19:50:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+Message-ID: <aAfk662jTFj4iIQD@shell.armlinux.org.uk>
+References: <CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
+ <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch>
+ <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+ <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
+ <20250421182143.56509949@kernel.org>
+ <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
+ <20250422082806.6224c602@kernel.org>
+ <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
+ <aAfSMh_kNre5mxyT@shell.armlinux.org.uk>
+ <e7815c91-e047-4b3e-b3e4-371f30c9dadd@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: pull-request: bpf-next 2025-04-17
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, Amery Hung <ameryhung@gmail.com>
-References: <20250417184338.3152168-1-martin.lau@linux.dev>
- <20250421185450.6fde6f84@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250421185450.6fde6f84@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7815c91-e047-4b3e-b3e4-371f30c9dadd@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 4/21/25 6:54 PM, Jakub Kicinski wrote:
-> On Thu, 17 Apr 2025 11:43:37 -0700 Martin KaFai Lau wrote:
->> 1) bpf qdisc support, from Amery Hung.
->>     A qdisc can be implemented in bpf struct_ops programs and
->>     can be used the same as other existing qdiscs in the
->>     "tc qdisc" command.
+On Tue, Apr 22, 2025 at 08:13:43PM +0200, Andrew Lunn wrote:
+> > Should one host have control, or should the BMC have control? I don't
+> > actually know what you're talking about w.r.t. DSP0222 or whatever it
+> > was, nor NC-SI - I don't have these documents.
 > 
-> Hm, it doesn't build in allmodconfig. Is there a strong reason for it?
+> I gave a reference to it a few email back in the conversation:
+> 
+> https://www.dmtf.org/sites/default/files/standards/documents/DSP0222_1.2.0.pdf
+> 
+> Linux has an implementation of the protocol in net/nsci
 
-The bpf_qdisc.c is enforcing some correctness in the bpf 
-Qdisc_op.{init,reset,destroy}. For example, it ensures that 
-qdisc_watchdog_cancel is done in reset/destroy.
+Hmm. I don't think I have bandwidth to read that spec any time soon,
+sorry.
 
-It is done by patching the bpf .reset prog and call a kfunc to ensure the 
-cleanup work is done. Patching with mod kfunc is not supported now. We can 
-consider to directly use BPF_EMIT_CALL to support mod helper call which should 
-be simpler verifier changes.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
