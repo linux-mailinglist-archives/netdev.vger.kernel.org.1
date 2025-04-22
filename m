@@ -1,219 +1,138 @@
-Return-Path: <netdev+bounces-184870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C796A97837
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:10:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FCBA97855
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574F317536F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 21:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9411D3AC9E7
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 21:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA8D2DEB96;
-	Tue, 22 Apr 2025 21:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41EC1EFFAB;
+	Tue, 22 Apr 2025 21:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gkTb8zm2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZkjpSijL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F252DDD17
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 21:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C7D1E376C;
+	Tue, 22 Apr 2025 21:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745356223; cv=none; b=pYsr+bW2duLMBxKOrAHuaNQsLm1HDcqCHlMUjEETbORgWvVjLevYUvD8KFKTkA705VRKqMS7I8azPSfkRrZPS+huUwR/T4W/aVrzIzjN41+0l5zZNlJFsMid+emzVxNKPv5G+yln/FyBTsdQpU1i6+Z4EDqr01OE9IKP7dRFQ/8=
+	t=1745356524; cv=none; b=YlCclCNunddUX7EDcPeotWsfhNjPILLvDvo1Z/nYrJ9zbuayKJChj15VB1pEOspoC90weGNTXefcZw1sefRoXdEtdvknFCJ7t8xEzD/3PLmaBseoI6gA69pi+sbogDYe156QEvOqA5x6Nj1LJnYECNbk4WZcIw6+aLq1JPJNN3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745356223; c=relaxed/simple;
-	bh=DGei0lrNYocjpAo+fluDzi6pCQENfL0ofHkr/7MyVCc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lWCd8pd328B72uYWBqe102bMP1KLlEzzfi0IGMCzeRjcP7cwCq5Vg9xnAiyF1TNt9VlymA8EiMXO+bZujF9/LEQ/e6S9OxjYNwNj+LR6EmzMENiSZFxjB0KqScesnfpow+QBNpJKSZaFP8Ls/6vigR0ZlXsgMcL4nzVDsFhah4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gkTb8zm2; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2240aad70f2so75165ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 14:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745356221; x=1745961021; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P7kxTjGBKB0aUEv3DpjjmftGzp6kA+GSoHXFlnyGsDM=;
-        b=gkTb8zm2CyA7ntRa3aTsez52qSIVwAk3fZlk5npkOMuMl51y0eVARx8qiSvxtMEn82
-         TVg4ZYJ4reXvPRkKGdNuGaRk743KSKz1dktQR2WK7rG6eraQAAUgppCC369xSh1K63af
-         9EWLflP0rxE52O0+ZV9atxXuNaEixcDtl6KOu6qtj+ztvrLw31xKL+BW1+8F8Yz6BWt5
-         4/PTlbLiWwgERn/DgY7aeRB5v9qFVwwTg8DK7/0CKQrZ/pmLi0Rxv4pS1Aq0aBvRGyta
-         TTp1vFaYcuqn3xN0Lt9DeYtk+iK32vwyDB4/pPgKhrXnpUGHcnZAiY83sV815qp+ow0R
-         E//A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745356221; x=1745961021;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P7kxTjGBKB0aUEv3DpjjmftGzp6kA+GSoHXFlnyGsDM=;
-        b=Ya/4y5MBa8bge4V1jYftAUKRnKdR7sJPkZ1rQPcoaXNFIsgPG+QpQgPtCbI8X2o/V5
-         cBMrzTdovLmBWKQ0wlTnh9LUf3POmUKPiZstb13+LGg722rT85lxYoJy0j3I0O7NAJzS
-         UPklpVo6zexfIavAlDZWIGQ2nngAL2Y5mvTiclYp7SDGxMzK5buqFf9be13gIikSNHVz
-         uRPAPHHDK828ZQaARxh68ZuDLOPgzCwHEqKU11lcA8prB10ynU8ZIHl9aEXFd83w58uc
-         /IiOVXKy+cen78/kjh57xM8OauqHWR3EvEFKCZu1lzmHaNd5dbyol4KqtTi9iA7AyVHs
-         DxfQ==
-X-Gm-Message-State: AOJu0YzPiO6r4383az5RaVpQ/IBHtevzxB1KtrLfyBbJNPFmPbq+zd8U
-	MOac8b2vOf/rC9McXN0aUA6bsiBz7jyAn5BPMQ1MTixLJPJc+E0lai+bcIivsikYJSp0KOjheG+
-	QvuRis+NezaAw/i4KWH/l+ZH68XIqMQKy77aW
-X-Gm-Gg: ASbGncuWEUximoEGoc5hsa05vWi7bejnennjKg25pAd1PSkKOdPuZrdSFLyQ8V9QtcG
-	02gCS/7jc1hC8Qt7tPIjg7kbZ7tbVKYhzhkbvxAkbPnWCXzQ8XX7dpXaF7uq1pJ1yUhA8+42keO
-	0j1kqCNiSF5YjWdqsHiDJz8pVhcITZMXrdeVu66i/U7E/iyd3qghfo
-X-Google-Smtp-Source: AGHT+IH158SP9GigskzwrjsRVwtmkJmUMnK2yFgK5B4j6Q7h/21qQMUx52O/Zx9vaqWSN5WxUUUx40w0l4D2Gn/nHjY=
-X-Received: by 2002:a17:903:440b:b0:21f:465d:c588 with SMTP id
- d9443c01a7336-22da2b93ca8mr912615ad.14.1745356220781; Tue, 22 Apr 2025
- 14:10:20 -0700 (PDT)
+	s=arc-20240116; t=1745356524; c=relaxed/simple;
+	bh=QdTQyr37SfxusAZldiv5gHbHmQlIKPCRsCyk7lP3UWI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tH2LUUj07xS4IvtTFaqfc5MM8YKcvBORShHWAc5OiVzP60Kd8Ott+28Dnsn5NLlWKrD+yy3q+7WQiiDKR9fEScR8BoDTseFu1rksn82JiGufnf265cBMmwOzaRfJxTuBFj1Hl7g3fj4CjMwROv7L8ZKlhTvuhq5ubSZ8zcmPRYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZkjpSijL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D03DC4CEE9;
+	Tue, 22 Apr 2025 21:15:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745356524;
+	bh=QdTQyr37SfxusAZldiv5gHbHmQlIKPCRsCyk7lP3UWI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ZkjpSijLr+5OqbD7Fp7C4WWxFb43VVFxYDZrWor1VQk+KY05Qe56RFD/rOfzYVo83
+	 vloBhgbJaoGAbQEvssRhAr0l9Ls9v0gqN5Zj2ZAmHlAfE7MpZj8kaXeTdTYnJag1nd
+	 RFZFFsvE4p3ym1XgMjgGHZPSukkgbwwvW1FJKABgxaxM800orH40/GjiFloKZQq63n
+	 bSkVQPZiWPw0ecYyWcCLjBF0rbwqiBiCUblX9QTjMDq07TwXBIZywqpX1m1KNR7xxc
+	 DKzc4b/3qJxrrO98/giZaCBAaCfUoBPRplyS08zjnksNjra26rODUbs1Y16OPHCy7x
+	 bb1jrPHybu4LQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 22 Apr 2025 23:14:52 +0200
+Subject: [PATCH bpf-next] bpf: Allow XDP dev bounded program to perform
+ XDP_REDIRECT into maps
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417231540.2780723-1-almasrymina@google.com>
- <20250417231540.2780723-3-almasrymina@google.com> <484ecaad-56de-4c0d-b7fa-a3337557b0bf@gmail.com>
- <CAHS8izPw9maOMqLALTLc22eOKnutyLK9azOs4FzO1pfaY8xE6g@mail.gmail.com>
- <957b74ed-f29c-4bb8-b819-af4e1168d6c1@gmail.com> <CAHS8izM8+zG6KOhV7ysTsCj_PEty5eL+P+uUxTZhdsOSZTwmow@mail.gmail.com>
- <c0bd45f7-0325-4e4b-b0ea-ccae24a1eabd@gmail.com> <8c1c6405-1e60-4512-a675-4c00b00d400a@gmail.com>
-In-Reply-To: <8c1c6405-1e60-4512-a675-4c00b00d400a@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 22 Apr 2025 14:10:07 -0700
-X-Gm-Features: ATxdqUGGcVSR15YZdMmTAEwjNhzjDLr5MPRZuyqszCuepKJwAh2SaRe-PxHXBXc
-Message-ID: <CAHS8izPGuF1PxfdmXUC1XJHpmRqotXh=vUY_a-AEHdAgPmLQ1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 2/9] net: add get_netmem/put_netmem support
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMsGCGgC/x2MQQqAIBAAvxJ7bsHUDvWV6GC51l5UlCKQ/t7Sc
+ QZmGlQqTBXmrkGhmyunKDD0Heyniwche2HQSo/Kao2Pz5hLOnBLV/QY+MEpGBUMDcY6BxLmQqL
+ /6bK+7wfJs591ZAAAAA==
+X-Change-ID: 20250422-xdp-prog-bound-fix-9f30f3e134aa
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Tue, Apr 22, 2025 at 1:03=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 4/22/25 20:47, Pavel Begunkov wrote:
-> > On 4/22/25 19:30, Mina Almasry wrote:
-> >> On Tue, Apr 22, 2025 at 11:19=E2=80=AFAM Pavel Begunkov <asml.silence@=
-gmail.com> wrote:
-> >>>
-> >>> On 4/22/25 14:56, Mina Almasry wrote:
-> >>>> On Tue, Apr 22, 2025 at 1:43=E2=80=AFAM Pavel Begunkov <asml.silence=
-@gmail.com> wrote:
-> >>>>>
-> >>>>> On 4/18/25 00:15, Mina Almasry wrote:
-> >>>>>> Currently net_iovs support only pp ref counts, and do not support =
-a
-> >>>>>> page ref equivalent.
-> >>>>>
-> >>>>> Makes me wonder why it's needed. In theory, nobody should ever be
-> >>>>> taking page references without going through struct ubuf_info
-> >>>>> handling first, all in kernel users of these pages should always
-> >>>>> be paired with ubuf_info, as it's user memory, it's not stable,
-> >>>>> and without ubuf_info the user is allowed to overwrite it.
-> >>>>>
-> >>>>
-> >>>> The concern about the stability of the from-userspace data is alread=
-y
-> >>>> called out in the MSG_ZEROCOPY documentation that we're piggybacking
-> >>>> devmem TX onto:
-> >>>
-> >>> Sure, I didn't object that. There is no problem as long as the
-> >>> ubuf_info semantics is followed, which by extension mean that
-> >>> any ref manipulation should already be gated on ubuf_info, and
-> >>> there should be no need in changing generic paths.
-> >>>
-> >>
-> >> I'm sorry I'm not following. skb_frag_ref is how the net stack obtains
-> >> references on an skb_frag, regardless on whether the frag is a
-> >> MSG_ZEROCOPY one with ubuf info, or a regular tx frag without a
-> >> ubuf_info, or even an io_uring frag which I think have the
-> >
-> > Yep
-> >
-> >> msg->ubuf_info like we discussed previously. I don't see the net stack
-> >> in the current code special casing how it obtains refs on frags, and I
-> >> don't see the need to add special casing. Can you elaborate in more
-> >
-> > You'll be special casing it either way, it's probably unavoidable,
-> > just here it is in put/get_netmem.
-> >
-> >> detail what is the gating you expect, and why? Are you asking that I
-> >> check the skb has a ubuf_info before allowing to grab the reference on
-> >> the dmabuf binding? Or something else?
-> >
-> > get_page() already shouldn't be a valid operation for ubuf backed frags
-> > apart from few cases where frags are copied/moved together with ubuf.
+In the current implementation if the program is bounded to a specific
+device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
+or CPUMAP even if the program is not attached to the map entry. This
+seems in contrast with the explanation available in
+bpf_prog_map_compatible routine. Fix the issue taking into account
+even the attach program type and allow XDP dev bounded program to
+perform XDP_REDIRECT into maps if the attach type is not BPF_XDP_DEVMAP
+or BPF_XDP_CPUMAP.
 
-This is where I'm not following. Per the v5 changelog of this commit,
-all these skb_helpers hit skb_frag_ref (which is just get_page
-underneath):
+Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ kernel/bpf/core.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-tcp_grow_skb, __skb_zcopy_downgrade_managed, __pskb_copy_fclone,
-  pskb_expand_head, skb_zerocopy, skb_split, pksb_carve_inside_header,
-  pskb_care_inside_nonlinear, tcp_clone_payload, skb_segment, skb_shift,
-  skb_try_coalesce.
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index ba6b6118cf504041278d05417c4212d57be6fca0..a33175efffc377edbfe281397017eb467bfbcce9 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -2358,6 +2358,26 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
+ 	return 0;
+ }
+ 
++static bool bpf_prog_dev_bound_map_compatible(struct bpf_map *map,
++					      const struct bpf_prog *prog)
++{
++	if (!bpf_prog_is_dev_bound(prog->aux))
++		return true;
++
++	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY)
++		return false;
++
++	if (map->map_type == BPF_MAP_TYPE_DEVMAP &&
++	    prog->expected_attach_type != BPF_XDP_DEVMAP)
++		return true;
++
++	if (map->map_type == BPF_MAP_TYPE_CPUMAP &&
++	    prog->expected_attach_type != BPF_XDP_CPUMAP)
++		return true;
++
++	return false;
++}
++
+ bool bpf_prog_map_compatible(struct bpf_map *map,
+ 			     const struct bpf_prog *fp)
+ {
+@@ -2373,7 +2393,7 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
+ 	 * in the case of devmap and cpumap). Until device checks
+ 	 * are implemented, prohibit adding dev-bound programs to program maps.
+ 	 */
+-	if (bpf_prog_is_dev_bound(aux))
++	if (!bpf_prog_dev_bound_map_compatible(map, fp))
+ 		return false;
+ 
+ 	spin_lock(&map->owner.lock);
 
-I don't see many of them opt-out of skb_frag_ref if the skb is
-unreadable or has ubuf_info. Are you saying all/most/some of these
-callers are invalid?  I tend to assume merged code is the correct one
-unless I have ample expertise to say otherwise.
+---
+base-commit: 5709be4c35ba760b001733939e20069de033a697
+change-id: 20250422-xdp-prog-bound-fix-9f30f3e134aa
 
-> > The frags are essentially bundled with ubuf and shouldn't exist without
-> > it, because otherwise user can overwrite memory with all the following
-> > nastiness. If there are some spots violating that, I'd rather say they
-> > should be addressed.
-> >
-> > Instead of adding net_iov / devmem handling in generic paths affecting
-> > everyone, you could change those functions where it's get_page() are
-> > called legitimately. The niov/devmem part of get/put_netmem doesn't
-> > even have the same semantics as the page counterparts as it cannot
-> > prevent from reallocation. That might be fine, but it's not clear
->
-> Actually, maybe it's not that exclusive to netiov, same reallocation
-> argument is true for user pages, even though they're reffed
-> separately.
->
-> It might be fine to leave this approach, while suboptimal it should
-> be easier for you. Depends on how folks feel about the extra
-> overhead in the normal tx path.
->
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-Right, I think there is only 2 ways to handle all the code paths in
-the tcp stack that hit skb_frag_ref:
-
-1. We go over all of them and make sure they're unreachable for unreadable =
-skbs:
-
-if (!skb_frags_readable()) return; // or something
-
-2. or, we just add net_iov support in skb_frag_ref.
-
-This patch series does the latter, which IMO is much preferred.
-
-FWIW I'm surprised that adding net_iov support to skb_frag_ref/unref
-is facing uncertainty. I've added net_iov support for many skb helpers
-in commit 65249feb6b3df ("net: add support for skbs with unreadable
-frags") and commit 9f6b619edf2e8 ("net: support non paged skb frags").
-skb_frag_ref/unref is just 1 helper I "missed" because it's mostly
-(but not entirely) used by the TX path.
-
---=20
-Thanks,
-Mina
 
