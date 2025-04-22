@@ -1,162 +1,178 @@
-Return-Path: <netdev+bounces-184802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B561A973AE
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:39:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A677A973DB
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48A91165CD3
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4744D176EAD
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0673C1D5ADE;
-	Tue, 22 Apr 2025 17:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF791DFE26;
+	Tue, 22 Apr 2025 17:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCdDxSRJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z5MRyVtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C271A304A;
-	Tue, 22 Apr 2025 17:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C60E1DE3CB
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745343587; cv=none; b=CW9SvBGLz0lAHBoER+Cg5eNbWc/pSsMXY+FjjzBSYRPiuNMZuEfJbmjGKR8OXvnyRj1sFSDgIEHsvMiGQneyma6Nm9qN6lrbUHOqWKYUhMVRZodAcEoaTp16Dbat9CyBw+JUhchzeWXw03rnnqIamidn6ZYvGXuJJE/8WqX04gE=
+	t=1745343833; cv=none; b=mPYtQo34PNZUW4IyIrsEeVLYgdZzJ0KTbwQlkErljrd6fDuErDvoWNvaKh4K5tdmy7zYSgjf3v8dHCb4pPfX+Pgxfj8VRqiNhCWfaMdCtWk9vqjd7qdvokibLuwKx219XAmvtB5j8QQr1tJXmutT7zSFiQTp1ixiRjNMjNLAoiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745343587; c=relaxed/simple;
-	bh=3YZFzxOuKJTu8Q1FGxg6Bi9g2E5JnxHXdcJm8VS/K0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oL3vGEoXnFCQclDiEeZbiGgg01ULgua5kMAQHFOYM98Hr0dAEDDvOO8nCwhIZVhy1EYNoWxggz3Hd0yjRiFBZwk/vJrKma7IgqDvLRIiL9k9j1MKAF2cg2ItqYdExCZLOQNhcUCj3X0Sy74Y8uwI1Li6yzfYFkM+XieT9t8mr/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCdDxSRJ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-224019ad9edso77710115ad.1;
-        Tue, 22 Apr 2025 10:39:45 -0700 (PDT)
+	s=arc-20240116; t=1745343833; c=relaxed/simple;
+	bh=zcVb6Cfxy75Ob1kNh4bYs664zPYBcfFrxG08qGEETk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FiueNoltMrfpxSsvmiu0p1C4bPs3tZBi0dQZYMH3Ev+QEMYl/b42RuAFuZyTiJ6OEYB4NdBG7oXUpTqwEoL1JGbrjkhW+mQk1ZEyflcDh+GiYizC9xSXNwIVamPT2+4/YsBdkAEsgO1URsQnz+Poib6qxIIDMg1QFc1wVwmUcC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z5MRyVtm; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2264c9d0295so22035ad.0
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745343584; x=1745948384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=anhUaw1RW0p1uWHnHVQxnFlleHgiv10T6B9HOPoc5+k=;
-        b=RCdDxSRJSr9md71gMVp2kAFb/P4i1ikH0zRR3U7BHn3y9eID2w00J+Ic1jsRFOdseL
-         Fdodo/Jsf+Smgn4kWrBe1FfJSG0ZRydjMO6WrgxnEDrTb/eMdyUZ+1GjCfaDZ/1GBBVS
-         4emCTL8BqaY9heqak2B0teUurP4CGTNnEQ9GuNugK2yQoYNK+Y/LAD+Ri8Un+bpmQq0U
-         x8Ov/gtH9Npw8pOI01cPOh0IA7ik3aOo8nxQM/fwEjB7p9vqoYI29VkmH12C1iHQQWbv
-         hRR5cT+dTi6kAm+P9yNGs92SvlGIBlTznSkE0Wd9L9nIe8gX7tQnouBEeuY7qPmdh1Lz
-         aCjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745343584; x=1745948384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1745343829; x=1745948629; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=anhUaw1RW0p1uWHnHVQxnFlleHgiv10T6B9HOPoc5+k=;
-        b=e64JHEnTo8appmYeza7FIAbVhMNQ22ti+Rapj0Sg3PiRDtkEYr49AkjJR8MrEoCZYj
-         8CWrAx5iKUjP4NO9zKDhGfK5naoJi6YqC+BUfUrCI3hMUjtkYiANVDTOrr8inCw43kNO
-         djAGKcUYExQWzjhPhhuZR4yZxlJneBcuEwgSkTsa57+qJzpN/DI0ionrK5n+okrsYw+g
-         wBgscAA5LeODdwejdHcFb88S5+sPSANHln/pTWNdISbn8sL45mK0bktrV/DBNy7lHHdN
-         wgEMX7Qwa3VfX3ItZ1UQj/yAO8p3pFrg3C6fyoKgb8iZeUFwnFtwlGpOMsu9yK+F/WmL
-         iI/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6/DP5YLDvEgNUDzVkx/hdgCY6WhbG7pQipGQHvhjhZttR30x6524zP57pGeZjZVZa/UKnhlyiqOkTx7a+@vger.kernel.org, AJvYcCVlhh5ZZNC1X30554KXUGMASnwZHjIGd/LVX/YXwg0MDNgUX5gDRiUlr9i33Pi6hLEY2dk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYUHEDuqdwVNzLtW3wNwRUd5KjYV8TDj8FLnGOizoOxDwxFUj6
-	ggbAy3woE5CghG8yElNeeTG/NUGiJeyf6JVDn7BELi0V0a1Jus4=
-X-Gm-Gg: ASbGncuwkYWaTTwa/wd3QFHXU4DG0P0fA+VgSOlMgx/XbjK09Iqf+0QaJ9NiKOGpb2U
-	Dda/z2mkYGIMiDaPyxC7Mm6rn91ZLiNVkh7TwGSjJ/uO3UNOZJZWWxldzVOT2l5+ZDZ+usme6qM
-	pSnZo66ch1Im7soZqO6Dx/wGK4NDF3krC0rz3tpzEB/sZIJsvFcdeQS4xTTc6m4f5nNUK06m72D
-	qNNssMTm0WN4cHOSJp0gdeorXaDPc44AelbrTZJ5uHddRlwaWNQnW7kaOZ8nZ/OzphoZaiEchY4
-	BDY2wKT5BJ9MugM3JE3VYL5WNe5bClJvW46FDi0N
-X-Google-Smtp-Source: AGHT+IHvr3CHGB3eDx2bTmct/OupIJFB9ySp0TkQI8A4cDHpuOWfg/rg1k0f3jpJcDBOwp937CEu/w==
-X-Received: by 2002:a17:902:d4cd:b0:21f:35fd:1b6c with SMTP id d9443c01a7336-22c5364235fmr207110085ad.45.1745343584621;
-        Tue, 22 Apr 2025 10:39:44 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50bdb34fsm88466805ad.31.2025.04.22.10.39.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 10:39:44 -0700 (PDT)
-Date: Tue, 22 Apr 2025 10:39:43 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Joshua Washington <joshwash@google.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Mina Almasry <almasrymina@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] xdp: create locked/unlocked instances of xdp
- redirect target setters
-Message-ID: <aAfUX_jDZpe4Vx_M@mini-arch>
-References: <20250422011643.3509287-1-joshwash@google.com>
+        bh=0nQBVslpgDVVhWwmvHoRlwAkP6zwHezc78dd9O+zlzs=;
+        b=Z5MRyVtmSJelRcKJ/A0VjB5ggn4Owq7/VIWqWFmreFFhO6SVN9Bh382JLue/LLmSR3
+         q59KyHXAxCh3SKWUIGcQfaZFpVm1vGgDUqi03+19CQ+CzzU2uMr3D7mA/yu6HqTTI0To
+         ASIyWuCX79VGbHhV/t0tlswUyJfs6gxYR3t3zExOg+ZK3c9vZHKmpFKlNj0BxdVAp9eZ
+         uTZvHDBfMur2sqAmdANBq7Q4AtRWVwvXSSDmmjOzev/4Tm2+Qi7m0bKMXrXWg0n/LnJI
+         1GcweZihXZtL6+Zy/mteHZx9jZvPBxUrF9/BI/IbnRiX3IB+Eej6QBZmoUUtboCTIMJo
+         TOnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745343829; x=1745948629;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0nQBVslpgDVVhWwmvHoRlwAkP6zwHezc78dd9O+zlzs=;
+        b=TT3XOqV/uXQX6XIzxAn0F2QahBhfYaMDzbG45ZuM9fa9/iCKFI38DKckTYb68dIpVo
+         dt0mgPUgiHRlGJrHSqC04Z1dZfvnIlRVmmdH2JTwvMPo8X/eO31xD3YNgMkU1RDRH/0Z
+         IK2kbheHmma8zzRF19Wcv02kMzkwvs0OtsB6KIQw3hhTUgxvbHQfrR+PUHIuN2NZSzYe
+         DtYKArM4OPAMY5uWxsKemRJhzpqXP9DjoVMhsgebu2sp5tjIKhVXXbmG+tujwR7ci+JX
+         3LXED9PzAF84wp2ciR7JJOTRLoaTJTP1fbtXYVNu1kDH2hqpH0IhISiV9R20SQmxxowm
+         Hpww==
+X-Gm-Message-State: AOJu0YwaUsLEdvjm9CnDYUFCO+S0HjjUF0Tz5Li6h8/OKrm6kugZgHrM
+	0ayJUFv7XfAyaVsEiMtevxyw1LLNAGtuFEJ0lqtBeJpkxgh4nwUjt9DEJBh6n6L1CHfzRAokzBy
+	o4UFkbO2nUHOE3V8rjRjmt8itzISZ6cdPtPJl
+X-Gm-Gg: ASbGncvXjmFfaEK3OrSPUnBDPQE3mSzMDeR6Zzd83ZLD9XW6zSXO1l0PcMa4FmE4U0J
+	kfbW/h8yNWzNMxTzKAcpmaaSdNloakSRekDB5xkDPNmtoRkuw/JAc65HFS0JmFGA5UCl92YM/mG
+	0eBI8yV1EJ38nZJ7PdjEEAKZSh0aZ8XfCrTal4OKjcfy3HJc5ft+qm
+X-Google-Smtp-Source: AGHT+IGSKGIgLM9bohGpvqQzDuyOGN9Dox9hCzuEhi9yioRJmO0B7Hjp5oQ00AwnuEeP5W6trjfsTXRGJyVju6gMOtY=
+X-Received: by 2002:a17:903:1a4d:b0:215:42a3:e844 with SMTP id
+ d9443c01a7336-22c54562829mr9132085ad.17.1745343829160; Tue, 22 Apr 2025
+ 10:43:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250422011643.3509287-1-joshwash@google.com>
+References: <20250417231540.2780723-1-almasrymina@google.com> <20250417231540.2780723-8-almasrymina@google.com>
+In-Reply-To: <20250417231540.2780723-8-almasrymina@google.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Tue, 22 Apr 2025 10:43:38 -0700
+X-Gm-Features: ATxdqUEoZbftW3pP1LK4aYTjtkb7qLFfr67voRhIGom_RJK1JmrrX3YpsAjUeYk
+Message-ID: <CAEAWyHckGSYEMDqVDT0u7pFCpO9fmXpEDb7-YV87pu+R+ytxOw@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 7/9] gve: add netmem TX support to GVE DQO-RDA mode
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04/21, Joshua Washington wrote:
-> Commit 03df156dd3a6 ("xdp: double protect netdev->xdp_flags with
-> netdev->lock") introduces the netdev lock to xdp_set_features_flag().
-> The change includes a _locked version of the method, as it is possible
-> for a driver to have already acquired the netdev lock before calling
-> this helper. However, the same applies to
-> xdp_features_(set|clear)_redirect_flags(), which ends up calling the
-> unlocked version of xdp_set_features_flags() leading to deadlocks in
-> GVE, which grabs the netdev lock as part of its suspend, reset, and
-> shutdown processes:
-> 
-> [  833.265543] WARNING: possible recursive locking detected
-> [  833.270949] 6.15.0-rc1 #6 Tainted: G            E
-> [  833.276271] --------------------------------------------
-> [  833.281681] systemd-shutdow/1 is trying to acquire lock:
-> [  833.287090] ffff949d2b148c68 (&dev->lock){+.+.}-{4:4}, at: xdp_set_features_flag+0x29/0x90
-> [  833.295470]
-> [  833.295470] but task is already holding lock:
-> [  833.301400] ffff949d2b148c68 (&dev->lock){+.+.}-{4:4}, at: gve_shutdown+0x44/0x90 [gve]
-> [  833.309508]
-> [  833.309508] other info that might help us debug this:
-> [  833.316130]  Possible unsafe locking scenario:
-> [  833.316130]
-> [  833.322142]        CPU0
-> [  833.324681]        ----
-> [  833.327220]   lock(&dev->lock);
-> [  833.330455]   lock(&dev->lock);
-> [  833.333689]
-> [  833.333689]  *** DEADLOCK ***
-> [  833.333689]
-> [  833.339701]  May be due to missing lock nesting notation
-> [  833.339701]
-> [  833.346582] 5 locks held by systemd-shutdow/1:
-> [  833.351205]  #0: ffffffffa9c89130 (system_transition_mutex){+.+.}-{4:4}, at: __se_sys_reboot+0xe6/0x210
-> [  833.360695]  #1: ffff93b399e5c1b8 (&dev->mutex){....}-{4:4}, at: device_shutdown+0xb4/0x1f0
-> [  833.369144]  #2: ffff949d19a471b8 (&dev->mutex){....}-{4:4}, at: device_shutdown+0xc2/0x1f0
-> [  833.377603]  #3: ffffffffa9eca050 (rtnl_mutex){+.+.}-{4:4}, at: gve_shutdown+0x33/0x90 [gve]
-> [  833.386138]  #4: ffff949d2b148c68 (&dev->lock){+.+.}-{4:4}, at: gve_shutdown+0x44/0x90 [gve]
-> 
-> Introduce xdp_features_(set|clear)_redirect_target_locked() versions
-> which assume that the netdev lock has already been acquired before
-> setting the XDP feature flag and update GVE to use the locked version.
-> 
-> Cc: bpf@vger.kernel.org
-> Fixes: 03df156dd3a6 ("xdp: double protect netdev->xdp_flags with netdev->lock")
-> Tested-by: Mina Almasry <almasrymina@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Signed-off-by: Joshua Washington <joshwash@google.com>
+On Thu, Apr 17, 2025 at 4:15=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> Use netmem_dma_*() helpers in gve_tx_dqo.c DQO-RDA paths to
+> enable netmem TX support in that mode.
+>
+> Declare support for netmem TX in GVE DQO-RDA mode.
+>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>
+> ---
+>
+> v4:
+> - New patch
+> ---
+>  drivers/net/ethernet/google/gve/gve_main.c   | 4 ++++
+>  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 8 +++++---
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
+ernet/google/gve/gve_main.c
+> index 8aaac9101377..430314225d4d 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -2665,6 +2665,10 @@ static int gve_probe(struct pci_dev *pdev, const s=
+truct pci_device_id *ent)
+>
+>         dev_info(&pdev->dev, "GVE version %s\n", gve_version_str);
+>         dev_info(&pdev->dev, "GVE queue format %d\n", (int)priv->queue_fo=
+rmat);
+> +
+> +       if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
+> +               dev->netmem_tx =3D true;
+> +
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+a nit: but it would fit in better and be more uniform if this is set
+earlier in the function where other features are set for the
+net_device.
+
+>         gve_clear_probe_in_progress(priv);
+>         queue_work(priv->gve_wq, &priv->service_task);
+>         return 0;
+> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/e=
+thernet/google/gve/gve_tx_dqo.c
+> index 2eba868d8037..a27f1574a733 100644
+> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> @@ -660,7 +660,8 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_r=
+ing *tx,
+>                         goto err;
+>
+>                 dma_unmap_len_set(pkt, len[pkt->num_bufs], len);
+> -               dma_unmap_addr_set(pkt, dma[pkt->num_bufs], addr);
+> +               netmem_dma_unmap_addr_set(skb_frag_netmem(frag), pkt,
+> +                                         dma[pkt->num_bufs], addr);
+>                 ++pkt->num_bufs;
+>
+>                 gve_tx_fill_pkt_desc_dqo(tx, desc_idx, skb, len, addr,
+> @@ -1038,8 +1039,9 @@ static void gve_unmap_packet(struct device *dev,
+>         dma_unmap_single(dev, dma_unmap_addr(pkt, dma[0]),
+>                          dma_unmap_len(pkt, len[0]), DMA_TO_DEVICE);
+>         for (i =3D 1; i < pkt->num_bufs; i++) {
+> -               dma_unmap_page(dev, dma_unmap_addr(pkt, dma[i]),
+> -                              dma_unmap_len(pkt, len[i]), DMA_TO_DEVICE)=
+;
+> +               netmem_dma_unmap_page_attrs(dev, dma_unmap_addr(pkt, dma[=
+i]),
+> +                                           dma_unmap_len(pkt, len[i]),
+> +                                           DMA_TO_DEVICE, 0);
+>         }
+>         pkt->num_bufs =3D 0;
+>  }
+> --
+> 2.49.0.805.g082f7c87e0-goog
+>
 
