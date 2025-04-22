@@ -1,234 +1,380 @@
-Return-Path: <netdev+bounces-184909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11031A97AE7
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:07:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3E7A97AF2
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:15:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A4718874DB
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:07:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B85187A1644
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EAA1EE7B7;
-	Tue, 22 Apr 2025 23:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7FB8632B;
+	Tue, 22 Apr 2025 23:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOjs3fRJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="icfr9HGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2201C9476
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745363220; cv=none; b=Lq16xGg8I5F4oN4eiWSWH6EtEzRhBTqTGKVbcuOIxSRWqhB3M5fWXqg8dB8UKvxlaW52E1/nVz2kQnl/HNhawIGJl4R1eQcPHknsrHYRMTCuu1j3IL1oU0EG1nysKLpRoSUMjR9HDA8XKelSTiS6TXIbxpg6gAW5Ua81TiedZGc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745363220; c=relaxed/simple;
-	bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qDlAHAEjhM2I1hhGKZdpWEQGIj1Q19Q+HyBJSXXYKzb4VUMp+dZYaH4ynveO0HbbHj/q5KCQEKwEG9mcTUdXTL46FSpc07eDXzGzt7rQ8EP0b2i3J1V5zN2LsUNEuBm6dxeax52Apl+C46DIeGyZVI4WAkaUZUi9IV1gDKofCuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DOjs3fRJ; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39ac56756f6so5666799f8f.2
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745363216; x=1745968016; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
-        b=DOjs3fRJISLhfkad+N3ESxL+twVRWnZfRnp0ELOp538sQWqkJDwzairKupr0uvfRXw
-         Yxv+cYWpa8Gx2IjUIybE3dJ/ba/MI8ImVAVq0qRhfoh2PQRp+j0wxg7JuWblv//63AbL
-         JHRG7+qN6i0Tn/gLs6z865K2ZR8b07aCih341wiRRt5wShHvMmVf2whQRDY9NCBFpWlw
-         /QHKXQstmBCHROVRgAFerDP3kgx6b3CgTgcFkrQkyVBM0WbzUl5U11IWHgPz36ZqWm7C
-         2iM4X26z7+C695/OV/dPR51HXTdp8TSrOd+bvwpLA3eZxxka5RqU5eKpDJ/Humtklm+w
-         t4lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745363216; x=1745968016;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B84M41yhf7PaZex3hwybYtmQf9d2HEOmnqm6gKZpkc0=;
-        b=sjxxJ02mvKe3seC1oGXcjuzxkkeHE8JggxwTXW3MGx6jsJjSGhDSkV3Jyqs2y45AVE
-         j+nUHv2rJhlrc9BwBAdW0rv2WhziUlE4V4q63cCdMBfNW+IQKLUkndC8Afi97Wi0CvWx
-         9n+pEwsTq2RYjNyyjle9QkDTfj9x2Vn3gQMYFBFD4CuIanvmkY1Tnfg3+kQYj7jX8How
-         95+nHsO5EJhrTXAJ0OAkB6wOlYTGSnMEfcASN8r2ugNT6/cLy3IA22oQFibxj/OJ2M06
-         NcQ5tUNx66KODKWNZGVcE9FY0K2t7xuct8k0FlZXs03o2A5HnJdjElcTfmw1yh4esDsJ
-         T6pw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6gmg9IVWeFUE0whZe/dLhoR3M5rdyWQLgpBDcI/6/H/euVltaTpHZkr/e0S1oW0h6aU6i9MI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxz1f+m8cRWJdEf7Uc6MJlSdGyHGZrfcdBJDmwPyOEta65LwaEE
-	ovIRjwUQ2/S44fxZUZ8ukuXEi1lE6FAXcxpBL/GaJ6lnlXMWmwGq1f4YU9TeErwmsbK2T5B+c5a
-	Z3g4/nj6jk9Hk0VxBKUozm7n9OuU=
-X-Gm-Gg: ASbGnctzDzNrn8dS6Tj3pZobmx91i2TZ+zl3/2or9lW8cf4yHcz9PrT0nAy5JY7PxHR
-	5YXNEmYCfzF0cHo5y0ZkH4Ma0e7CglGW8EFCTzNNZFO9Bpgd3pzhUGxLljlXtXSKNNOGDG5cVpI
-	T++JKA96AUWlF461h+pnmnIeWMAOOlUPHylBTTeqAis9Y3CJT0aIuarj8=
-X-Google-Smtp-Source: AGHT+IF0eTI8qJhLL0CcPl+mm0ljJmmsBF0EQc/0Ht7P/DJ5fO/fFgiicLe6BP+5jEkxLNcX9S8S0r+sQnL8O58Q39U=
-X-Received: by 2002:a5d:59a9:0:b0:391:2c67:798f with SMTP id
- ffacd0b85a97d-39efbaded2bmr12514499f8f.41.1745363216214; Tue, 22 Apr 2025
- 16:06:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F666184F
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745363748; cv=fail; b=jJ4jUOkdpbo1d8Yfytz2O2yv3xNnPPGFQTSL8vxS2hmyETDazG41uzGK8dstvoNkAaGHYVXVyuI3K3ttXJMqfJ/mBLwDL6lVN3WKJv7EXvZOgtZOxbJsuWsxuJY7xodeDQoorhCzZgCSb5lpC0j11gHALPrV+xF902zbW2b1mQk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745363748; c=relaxed/simple;
+	bh=0/lHWpnO8aAygSPANa+KJ+3XW/GHHmpaHC0tcff11lY=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UIBZatIaIsWHiTaP/3BQjTFR/9lxfLCRMoJ5zViYHrtUmiQM0jagnhVXGu6WJI8tBUNp8KfjSLmitOX8kyJnF8fATgc3v+SW5Dyqs/TCTtrDEGaGEEkEcVssuEoLu9/DV9+ArRAktLXsNFngXyvOUt+FkGh8iy4TXRhuq14gGmQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=icfr9HGP; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745363746; x=1776899746;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0/lHWpnO8aAygSPANa+KJ+3XW/GHHmpaHC0tcff11lY=;
+  b=icfr9HGPFM3XVbcBLHBpYz/QHm1ai4oSKezLLbXwy+tB4ehegvomQwd1
+   +oEx7xoM6Do5zkdTr9rcx1xQFp8E6m4GQqAOKdEh886PttYsvvdnOfq4q
+   RxKFArQY3oq0RCQBTUhV4OgJedFRPayeCrZui0Zv9f5zyo4/Fk30kEfN8
+   PA4Q/zS27vCvj/6E3MI2ZJZEctZJA4lcHMU9/rfJshBKPv3dabpZyMNNx
+   Hgt0/FkzYh204WBpbC7dKcDjo73ibmXQgkvCP0NRsW26DM5we2mi3M+B0
+   fiJJ4tvcJUHJngRh6tkhWJnUgt4r3fEfqabzHnPOu70K108redrmFh1p+
+   g==;
+X-CSE-ConnectionGUID: AeKgMkk3Q5eGOM35EuWQLw==
+X-CSE-MsgGUID: K8nlZRw5SFigHQpaQ0g7lQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="46177617"
+X-IronPort-AV: E=Sophos;i="6.15,232,1739865600"; 
+   d="scan'208";a="46177617"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 16:15:43 -0700
+X-CSE-ConnectionGUID: 1upvBvqGTZC+dn7XAOy9Rw==
+X-CSE-MsgGUID: QeEjg3bwRc24fu6b2GXuSg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,232,1739865600"; 
+   d="scan'208";a="133024132"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 16:15:39 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 22 Apr 2025 16:15:38 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 22 Apr 2025 16:15:38 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 22 Apr 2025 16:15:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=diXjDLuSRphfpcedyaV573RmDkNWzr3ArZDTjf8WB3b/kfLSayNKuIDha8VYtug/NLTmeWoDKBRbtu9tNlPHsc92A6D3NQWMBirElGJCG/3ZzSdEaTWXYA2GJrbKaCEbVdsfX8fOvdtSvY2PkytHoDU0xPN925kswcU6ooOam7w5/H6qhjUVmUjC6ysy9Ana+D0mslaz3PT8LPO5P9pn7krtCApZf573hqXs954nJTTWPa3u7N2y16XzcXLxZilYSpJtLEiFZO4Y/TdOqYXZEC3VkSmH6IQBtcED+YkwdMTkLPyQynEcBMmZSZHvtlbZY0xMwLiGH+R8Heb6iEgjSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6dCzDtJ2sWOaDdHIlOED2ZK23QZBdU3N3+CStxZlMfM=;
+ b=RLw6NDeywVaAWX3tLfFhY6dmcU+lR2YChTLiOvPHG0m/JgKXs0Puk04dd+xn6qygRfcCkwu1jgcjNnqgUd9hu5m3777lMS+cxFrN8wHl1jh5kgkFTBIrnYBIdxxVLl8mZ+x7eShuJ6+Kq29NFhyrMUzT2arqvQq0Zez/0X0O/C10v/eWD/FBo3lXJmCmmeYVmMZV5LsnXLjBtbiGg/rP0MLSItZylAhPHFLVp3JTUv+WsDWYE467jkDE5yxqgNzQ7BUJb9RdOMMy6GsRupdIULhKb/4RKFHiZHeQpvgWzjKzOIs61N5/joJ90XA7CqIwGNehQqNTlLVOWskfopgkvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5042.namprd11.prod.outlook.com (2603:10b6:303:99::14)
+ by IA1PR11MB7294.namprd11.prod.outlook.com (2603:10b6:208:429::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.36; Tue, 22 Apr
+ 2025 23:15:35 +0000
+Received: from CO1PR11MB5042.namprd11.prod.outlook.com
+ ([fe80::9b:7c08:c7d5:a021]) by CO1PR11MB5042.namprd11.prod.outlook.com
+ ([fe80::9b:7c08:c7d5:a021%3]) with mapi id 15.20.8632.025; Tue, 22 Apr 2025
+ 23:15:35 +0000
+Message-ID: <8ffa3734-e3eb-4a07-ab7c-3e227c34044e@intel.com>
+Date: Tue, 22 Apr 2025 16:15:32 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/3] idpf: fix offloads support for encapsulated
+ packets
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"Dumazet, Eric" <edumazet@google.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "willemb@google.com" <willemb@google.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, Zachary Goldstein <zachmgoldstein@google.com>,
+	"Salin, Samuel" <samuel.salin@intel.com>
+References: <20250422214822.882674-1-anthony.l.nguyen@intel.com>
+ <20250422214822.882674-4-anthony.l.nguyen@intel.com>
+ <68081e80888e6_3d8ff0294f9@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: "Chittim, Madhu" <madhu.chittim@intel.com>
+In-Reply-To: <68081e80888e6_3d8ff0294f9@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P221CA0020.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:303:8b::25) To CO1PR11MB5042.namprd11.prod.outlook.com
+ (2603:10b6:303:99::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch> <CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
- <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch> <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
- <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
- <20250421182143.56509949@kernel.org> <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
- <20250422082806.6224c602@kernel.org> <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
- <CAKgT0UfW=mHjtvxNdqy1qB6VYGxKrabWfWNgF3snR07QpNjEhQ@mail.gmail.com> <c7c7aee2-5fda-4b66-a337-afb028791f9c@lunn.ch>
-In-Reply-To: <c7c7aee2-5fda-4b66-a337-afb028791f9c@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 22 Apr 2025 16:06:19 -0700
-X-Gm-Features: ATxdqUGU8zL7ZjX3dBUB3W2_ARhCI1IACBppFJr_imRlTeB-VN4k-6X8tZPpngQ
-Message-ID: <CAKgT0UfDWP91rH1G70+pYL2HbMdjgr46h3X+uufL42xmXVi=cg@mail.gmail.com>
-Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux@armlinux.org.uk, 
-	hkallweit1@gmail.com, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5042:EE_|IA1PR11MB7294:EE_
+X-MS-Office365-Filtering-Correlation-Id: 63b21ea7-7eca-438b-6610-08dd81f395b3
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bU93bWJLR3JxYnF1Mk5QVkt6bE14Z3U5QjQrbzhhOVVTVGNVd2JHckxkK0M1?=
+ =?utf-8?B?aHk2ZDVqUGtiZDd5VXhhSlRMMkhtdzBhYnVXSEpnVjZXN2dQZVJNRHltU0Qy?=
+ =?utf-8?B?N3pXUE5VVUNpUjlvdUhpaUNqWHR4TC81MGVGVk53TkZ3dndLbjFwMm5mR1Rh?=
+ =?utf-8?B?QzUzOUxHQXFKTHY4bzBuZS9nRjFEQ01BVnBjd2Q3NytRb1BKVHo5eWtJbVpm?=
+ =?utf-8?B?M3FVdHFmcGs2RkFzYzRIVTB1VGtRa0xPOU9OTjgya3ZSS3RqOHBjcnV0bkc3?=
+ =?utf-8?B?RkN5OXd5cndsOEZZS0VwN0t6VkFjL1kyeEFjRUlIY1VzS294Z3I1RFo3SHl6?=
+ =?utf-8?B?V1Nkc3JxUzZVYjZuQnBVcHdGRHZQYXhaSUh4UEo5RjRUbHNIWHkvQ0JTd2xx?=
+ =?utf-8?B?d2x6a2UvTzllcDE1dHNpMnRjRHltYm9Va0didnJuWjArUEtCR3NFRERmZTJJ?=
+ =?utf-8?B?T0lCRXp4MW4ydDBiTkhnUDlMVFU5NDlNR29WRXpibk5pOUhuRVJSS2REQnRJ?=
+ =?utf-8?B?eDdXRGlkMWNwdEJhZzJaQWtMNGlFVkJNZmNrcWxycEtwZDhJYkhsSkJOcXNX?=
+ =?utf-8?B?M1VCMmovRzZiaTF1QWJqTGpsb3Z1VUdQdTZZek56RStJQjV4Q2V4akoreG9z?=
+ =?utf-8?B?eHFIUU1OZGpvS2hCRDVzWWZ3UCs4SUFXV3VFSzhXSE01amliQldrNnVtU3dV?=
+ =?utf-8?B?YnBIdTg0MFUyZlByNGxKc0VFb3M3WE1FQ2cxeXEvS2lFY1lUYWxPZzFmQUxI?=
+ =?utf-8?B?aGVuT0VYczBITGZRNUE5OTFtVnFCcWI2Szc2d0ZxYUtDSVhtSTQ1Y3pYZWkz?=
+ =?utf-8?B?d0JSc2ZESTA0SXhPcjBZL2ozMGsxNmNBdEo1WXRzeUNTdG1RYmMxekVXSExG?=
+ =?utf-8?B?WHpUY3I3bjdkdC91WGZNb0t3STh3Wm1JajdNUUJQSVZtZHZ5UHU0UkZTMFJ1?=
+ =?utf-8?B?WTZ4dVdDcXNnWmFWZXp6bm5INjJ4OVIvek51eEpVbWNiUk1KUi94VmlhY0NL?=
+ =?utf-8?B?d1ZETDBNTVlDUEoweU1xVEk4NEtpVHBLaFN6SnNSV3pmZU5KdWNjdjBNVTdt?=
+ =?utf-8?B?d3BUK1h0VlpKUlB0TnhDdFo3VmV5THFUV3hJeDA4eVR5aC9xNFR5QUt6Tno5?=
+ =?utf-8?B?MkNRS3VYYytWWXMxWkp4aTRnU2JTUlA5b2FtYmNxck5LZzhaa1dKVThTYWNp?=
+ =?utf-8?B?WE1Bc0RmekMrNVp2aFh4UlhnQmgxbmV6VytqTzMwY1lWL1V4c25wUit2YUcx?=
+ =?utf-8?B?bGFpRnVpUmg1SkR2eHM4R0dKZUlLeXUxak5aLzhYNmg2SmRtRWM4N3N2OEE0?=
+ =?utf-8?B?dzhnRkFuYk1hVExzeHA3ODFVU1NiU3VIY0g5eGxZV1cyTU1yYlB2WlFjL2Rn?=
+ =?utf-8?B?ODF5L3BIaHJXWmlleW9XYVU0VFBDN2J1SndwUTRlWUFZSzRVVUZQNi8rZXdn?=
+ =?utf-8?B?YmJzcERtNnJhNTNWQXIwK3g3RlpWdFNxamg0ekEyNzVIL2Myc05xSmMzYnlE?=
+ =?utf-8?B?aWg4SUlOVmlmcDdNTk1HQ2EyMDhUU29yeDVSQlFGQkRiZklZNEZhWDNyS2hG?=
+ =?utf-8?B?WExxQmlIUkE5WUxpNzB0ZnI0VC9ESlFWVmM1OTFKZjJRL2JmUUFuczBZVWJM?=
+ =?utf-8?B?TVQ0T3lPWmNTWnYxazNMRFAySWoyYWcveUVXWjBJWjlLdEtqcklGa0tYN1gx?=
+ =?utf-8?B?YUh0Ull1cFFtWWpGSW1KSzE3eUdrcjg4dXFiNklwc0ZNKzdEa0ZoRVNUZlZB?=
+ =?utf-8?B?dlh2UmliM1lNNU9FaEErZzh2ZkdSTW1zc0lWTDFQZ0ZKZmtMd2tVMHYySDJC?=
+ =?utf-8?B?bVlDYXgrYStSbmI3OWxhZTM4WFF0b3VBZXgvTENGZVliZFZJTlZLUS96cE9S?=
+ =?utf-8?B?c3EyYUM3RG84YTVHRVI3dkl0SFEwWkxNSmdUNmQyYVBTUDh3OThxTWtoQkpC?=
+ =?utf-8?B?MVNvY0ZVelpGQzNIUkJOdzE5L2VlNUpZNVhZUkx3eVp3QXpzMC9iS2Vldkhq?=
+ =?utf-8?B?MGMvbXh0VElnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5042.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?akdCVDhXdU5oRnYrbDdvcC91cE85YmFTM1FzNHlXemY5WUp6dkY0V0htMEw5?=
+ =?utf-8?B?dWFUSWZlbGNLL3pwTU9LMGhOeWdJdUIzajNBemhkMXJuek9pZ2RtNlg1bmlS?=
+ =?utf-8?B?djhjazdpU2ZPNXJHSUFmMzBOcndDS2VOS1czT2wzLzlEVjNMNFF0VGpVMmhi?=
+ =?utf-8?B?WkRxQ0tCazJyYVpQNTVnWVNjakxVU0x5d2NPNVI0bEhLUzBpUFhBVHJnM0tK?=
+ =?utf-8?B?N0N1ZnpKdFVkRDlVcHMvTTliTG81b1F4YlR0aTRjVWhsSXVjbWdIZ1pWRlYv?=
+ =?utf-8?B?UEx5K1RtRXk5SmhWTGpyeCtDV05ibEo2a25aUTg4TFdjL0t1bENHR0l4S1dU?=
+ =?utf-8?B?NXRYdXY1RzVqVkNUeFZJcDdPaWlMY2ZpYXQ4Z09TcEZsRU1qMnR2Rnl3RVpR?=
+ =?utf-8?B?N0N3bXdKQndXS293dnY1U05TY09NRXVlaEhDdktQZDA5RENIbHhxT2VDZHJh?=
+ =?utf-8?B?SWlPdUg4L3ZhZDhkeHphQzdOVm84T0FTb1FFVTdydnFqdFNJZU9wSDdQODFz?=
+ =?utf-8?B?QWVGRTQyQ0ozMmd5OVJoUGRuTjJhY2xTTWJjaFVwaC8xVHV5M2RPSjd3eGdX?=
+ =?utf-8?B?UFB5S25HK1R3ZCtReUR6K3hnM002aEtLb2tsWkliWkhabVJjczJ0dzBsWUlx?=
+ =?utf-8?B?cVg0U2lMNG9TMXhIY3VGZ2ZoaW1idUNEUGJJakcxSENIRTJiYlVGaHROZlds?=
+ =?utf-8?B?SVU5M2F6R21SY29MUGdtTFZFN1F4dUMzZ2pkN3FVMVVBOWs3N05Qd2JpenNi?=
+ =?utf-8?B?UmVYK2JSdk5IUDcvMHRXWkFKRWNzcG5TcGR0VXB5ZXJVNzkwZGw4bHMrY0JI?=
+ =?utf-8?B?VHQ2c29xajN4ejF1WU9zVjZ1Y3BuZGNESVBtR09FYkYwY3VlODYxdEtWb3Ft?=
+ =?utf-8?B?VURqZXdnV0h0cjZ4YVVOYW5HUklGWFJNZDZsOWZpWGd1dkVVeng2MVhTdlBh?=
+ =?utf-8?B?NVVoSlEzeEJKcUYzYjExUkt5YmpGTUlNUXFod2JmM21oekZwbFl1cDJvRXRM?=
+ =?utf-8?B?U05HKzJGK2VFUW1vZ05XZU1HalJGYkVIQ2lOOWxGWEVXN1cwQVIyb2lFNWVN?=
+ =?utf-8?B?TDhqSG1HR3kxYWx0L24vWklxdkhqaHdQZDU1b3ZGMnBOd1VQRmZWVlM0U3NN?=
+ =?utf-8?B?L0JXSFJ6dVZWOW5LazN3Z3N4RzhvSzl4T0c0N2J1WXp2dzR2d2M1TExiTkxp?=
+ =?utf-8?B?ZTAzTXpKREhaRVl0OHlibDNrN0RlaU9hQm9WY002ajFwMFhZSll1SWM2eFd1?=
+ =?utf-8?B?eTNHR1NQdFVqLzY5dy92ekFKekdmb0ZmNU9HQjI3V2dsQnEwOEpHU0pWQlBR?=
+ =?utf-8?B?M2VMNmVkTHlCMXhLNGttc2o1OXFOcWc4cGpKSHpuQmx3NmsyeTF0OVJQcHZR?=
+ =?utf-8?B?RTRNa2JGRFpmZGQzODdPTFdRV1F3bUxJNDZieW5wek5WUmhZSktSWTJwTEpy?=
+ =?utf-8?B?dkJ2akpuc045cmloRFYzakZCUGp4ZkdBN1NjVE1mWG9oVXg0RXByRjA4ejlH?=
+ =?utf-8?B?ajhBYWdxdzU5Z2JENjN3TnpabCtIamt6SEZyZlpIbTBvWWR2QTRZb0h0ZW43?=
+ =?utf-8?B?bWxoTThONGlWbjk5RFI2NW1nR2pFZGNuRlRia29qTjRjZlNySHcyUmZQTjEr?=
+ =?utf-8?B?eEFWZkVGY2hqRWUvUkpjdS9OZXoySllsSWJ5cXAwMlhNOUhuc3lRQ0NqbGll?=
+ =?utf-8?B?VXhKQnhkMWRPaXdRd2Q3d3dkT3lyMm9mZmt0TC9oOURxcHJSVFhuTHZCcEFm?=
+ =?utf-8?B?MjBpMnpPa2dFNGkvWjE3cTd6YTR3eExZWUIyOUpwRlN3eG93QytYekxib2xJ?=
+ =?utf-8?B?QStBeWpBdm9QQVpVbjBxOVBCa3h3MzdHZVlNZWdabmFSYUhJYmE0M04xZG9k?=
+ =?utf-8?B?SVBZdW1GRHo0ellGbXRpU256YUpGaVpPT0N0Y2NYZVk0L0QzN1VPb2swL2NV?=
+ =?utf-8?B?UnlUWkNLeXowdklxcDRibTFZRnh2WjU0U1BoQUJnYVhnTi9OMTF2bVFXQWgz?=
+ =?utf-8?B?WmNXWFRJaGFTQkdsNnZiREs2cTVYcWcvekMvZHUyQm1zTGdCR3BISGNFVXhQ?=
+ =?utf-8?B?V1o2dVRKclUyUjJmNEpjMjJjS014V2E2Z3M4OUJWVytQcjVHSXdMSWRUQStF?=
+ =?utf-8?B?dU9IZkRvUzBwb1VHU1BsME9kTUQ5ZExRWFE2M3NOOE1ndG5FQmlFTm1VZ01R?=
+ =?utf-8?B?c0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63b21ea7-7eca-438b-6610-08dd81f395b3
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5042.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2025 23:15:35.1308
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qe4goCmYvDBEPLWT2KIzVZ/9qpbEJrbtBruCL4uglFzQPeo7O7XmBw6Z3Q9uxI9cR0CZopdpI/s8KAh01Jh6HA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7294
+X-OriginatorOrg: intel.com
 
-On Tue, Apr 22, 2025 at 3:26=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Tue, Apr 22, 2025 at 02:29:48PM -0700, Alexander Duyck wrote:
-> > On Tue, Apr 22, 2025 at 9:50=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > > > The whole concept of a multi-host NIC is new to me. So i at least=
- need
-> > > > > to get up to speed with it. I've no idea if Russell has come acro=
-ss it
-> > > > > before, since it is not a SoC concept.
-> > > > >
-> > > > > I don't really want to agree to anything until i do have that con=
-cept
-> > > > > understood. That is part of why i asked about a standard. It is a
-> > > > > dense document answering a lot of questions. Without a standard, =
-i
-> > > > > need to ask a lot of questions.
-> > > >
-> > > > Don't hesitate to ask the questions, your last reply contains no
-> > > > question marks :)
-> > >
-> > > O.K. Lets start with the basics. I assume the NIC has a PCIe connecto=
-r
-> > > something like a 4.0 x4? Each of the four hosts in the system
-> > > contribute one PCIe lane. So from the host side it looks like a 4.0 x=
-1
-> > > NIC?
-> >
-> > More like 5.0 x16 split in to 4 5.0 x4 NICs.
->
-> O.K. Same thing, different scale.
 
-Agreed.
 
-> > > There are not 4 host MACs connected to a 5 port switch. Rather, each
-> > > host gets its own subset of queues, DMA engines etc, for one shared
-> > > MAC. Below the MAC you have all the usual PCS, SFP cage, gpios, I2C
-> > > bus, and blinky LEDs. Plus you have the BMC connected via an RMII lik=
-e
-> > > interface.
-> >
-> > Yeah, that is the setup so far. Basically we are using one QSFP cable
-> > and slicing it up. So instead of having a 100CR4 connection we might
-> > have 2x50CR2 operating on the same cable, or 4x25CR.
->
-> But for 2x50CR2 you have two MACs? And for 4x25CR 4 MACs?
+On 4/22/2025 3:56 PM, Willem de Bruijn wrote:
+> Tony Nguyen wrote:
+>> From: Madhu Chittim <madhu.chittim@intel.com>
+>>
+>> Split offloads into csum, tso and other offloads so that tunneled
+>> packets do not by default have all the offloads enabled.
+>>
+>> Stateless offloads for encapsulated packets are not yet supported in
+>> firmware/software but in the driver we were setting the features same as
+>> non encapsulated features.
+>>
+>> Fixed naming to clarify CSUM bits are being checked for Tx.
+>>
+>> Inherit netdev features to VLAN interfaces as well.
+>>
+>> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
+>> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+>> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
+>> Tested-by: Zachary Goldstein <zachmgoldstein@google.com>
+>> Tested-by: Samuel Salin <Samuel.salin@intel.com>
+>> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/idpf/idpf.h     | 14 ++++--
+>>   drivers/net/ethernet/intel/idpf/idpf_lib.c | 57 ++++++++--------------
+>>   2 files changed, 29 insertions(+), 42 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+>> index 66544faab710..5f73a4cf5161 100644
+>> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+>> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+>> @@ -633,10 +633,18 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_UDP)
+>>   
+>> +#define IDPF_CAP_TX_CSUM_L4V4 (\
+>> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_TCP	|\
+>> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_UDP)
+>> +
+>>   #define IDPF_CAP_RX_CSUM_L4V6 (\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
+>>   
+>> +#define IDPF_CAP_TX_CSUM_L4V6 (\
+>> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_TCP	|\
+>> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_UDP)
+>> +
+>>   #define IDPF_CAP_RX_CSUM (\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L3_IPV4		|\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
+>> @@ -644,11 +652,9 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
+>>   	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
+>>   
+>> -#define IDPF_CAP_SCTP_CSUM (\
+>> +#define IDPF_CAP_TX_SCTP_CSUM (\
+>>   	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_SCTP	|\
+>> -	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP	|\
+>> -	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_SCTP	|\
+>> -	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_SCTP)
+>> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP)
+>>   
+>>   #define IDPF_CAP_TUNNEL_TX_CSUM (\
+>>   	VIRTCHNL2_CAP_TX_CSUM_L3_SINGLE_TUNNEL	|\
+>> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+>> index aa755dedb41d..730a9c7a59f2 100644
+>> --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
+>> +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+>> @@ -703,8 +703,10 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+>>   {
+>>   	struct idpf_adapter *adapter = vport->adapter;
+>>   	struct idpf_vport_config *vport_config;
+>> +	netdev_features_t other_offloads = 0;
+>> +	netdev_features_t csum_offloads = 0;
+>> +	netdev_features_t tso_offloads = 0;
+>>   	netdev_features_t dflt_features;
+>> -	netdev_features_t offloads = 0;
+>>   	struct idpf_netdev_priv *np;
+>>   	struct net_device *netdev;
+>>   	u16 idx = vport->idx;
+>> @@ -766,53 +768,32 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+>>   
+>>   	if (idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
+>>   		dflt_features |= NETIF_F_RXHASH;
+>> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V4))
+>> -		dflt_features |= NETIF_F_IP_CSUM;
+>> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V6))
+>> -		dflt_features |= NETIF_F_IPV6_CSUM;
+> 
+> IDPF_CAP_RX_CSUM_L4V4 and IDPF_CAP_RX_CSUM_L4V6 are no longer used
+> after this commit, so the definitions (above) should be removed?
 
-Yes. Some confusion here may be that our hardware always has 4
-MAC/PCS/PMA setups, one for each host. Depending on the NIC
-configuration we may have either 4 hosts or 2 hosts present with 2
-disabled. What they end up doing is routing 2 lanes from the QSFP to
-one host and the other two to the other. So in the case of the QSFP28
-or QSFP+ we can only support 2 hosts, and with the QSFP-DD we can
-support 4.
+Thank you, will fix it in next version.
 
-> Or is there always 4 MACs, each MAC has its own queues, and you need
-> to place frames into the correct queue, and with a 2x50CR2 you also
-> need to load balance across those two queues?
+>> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V4))
+>> +		csum_offloads |= NETIF_F_IP_CSUM;
+>> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V6))
+>> +		csum_offloads |= NETIF_F_IPV6_CSUM;
+>>   	if (idpf_is_cap_ena(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM))
+>> -		dflt_features |= NETIF_F_RXCSUM;
+>> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_SCTP_CSUM))
+>> -		dflt_features |= NETIF_F_SCTP_CRC;
+>> +		csum_offloads |= NETIF_F_RXCSUM;
+>> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_SCTP_CSUM))
+>> +		csum_offloads |= NETIF_F_SCTP_CRC;
+>>   
+>>   	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV4_TCP))
+>> -		dflt_features |= NETIF_F_TSO;
+>> +		tso_offloads |= NETIF_F_TSO;
+>>   	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV6_TCP))
+>> -		dflt_features |= NETIF_F_TSO6;
+>> +		tso_offloads |= NETIF_F_TSO6;
+>>   	if (idpf_is_cap_ena_all(adapter, IDPF_SEG_CAPS,
+>>   				VIRTCHNL2_CAP_SEG_IPV4_UDP |
+>>   				VIRTCHNL2_CAP_SEG_IPV6_UDP))
+>> -		dflt_features |= NETIF_F_GSO_UDP_L4;
+>> +		tso_offloads |= NETIF_F_GSO_UDP_L4;
+>>   	if (idpf_is_cap_ena_all(adapter, IDPF_RSC_CAPS, IDPF_CAP_RSC))
+>> -		offloads |= NETIF_F_GRO_HW;
+>> -	/* advertise to stack only if offloads for encapsulated packets is
+>> -	 * supported
+>> -	 */
+>> -	if (idpf_is_cap_ena(vport->adapter, IDPF_SEG_CAPS,
+>> -			    VIRTCHNL2_CAP_SEG_TX_SINGLE_TUNNEL)) {
+>> -		offloads |= NETIF_F_GSO_UDP_TUNNEL	|
+>> -			    NETIF_F_GSO_GRE		|
+>> -			    NETIF_F_GSO_GRE_CSUM	|
+>> -			    NETIF_F_GSO_PARTIAL		|
+>> -			    NETIF_F_GSO_UDP_TUNNEL_CSUM	|
+>> -			    NETIF_F_GSO_IPXIP4		|
+>> -			    NETIF_F_GSO_IPXIP6		|
+>> -			    0;
+>> -
+>> -		if (!idpf_is_cap_ena_all(vport->adapter, IDPF_CSUM_CAPS,
+>> -					 IDPF_CAP_TUNNEL_TX_CSUM))
+>> -			netdev->gso_partial_features |=
+>> -				NETIF_F_GSO_UDP_TUNNEL_CSUM;
+>> -
+>> -		netdev->gso_partial_features |= NETIF_F_GSO_GRE_CSUM;
+>> -		offloads |= NETIF_F_TSO_MANGLEID;
+>> -	}
+>> +		other_offloads |= NETIF_F_GRO_HW;
+>>   	if (idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_LOOPBACK))
+>> -		offloads |= NETIF_F_LOOPBACK;
+>> +		other_offloads |= NETIF_F_LOOPBACK;
+>>   
+>> -	netdev->features |= dflt_features;
+>> -	netdev->hw_features |= dflt_features | offloads;
+>> -	netdev->hw_enc_features |= dflt_features | offloads;
+>> +	netdev->features |= dflt_features | csum_offloads | tso_offloads;
+>> +	netdev->hw_features |=  netdev->features | other_offloads;
+>> +	netdev->vlan_features |= netdev->features | other_offloads;
+>> +	netdev->hw_enc_features |= dflt_features | other_offloads;
+>>   	idpf_set_ethtool_ops(netdev);
+>>   	netif_set_affinity_auto(netdev);
+>>   	SET_NETDEV_DEV(netdev, &adapter->pdev->dev);
+>> -- 
+>> 2.47.1
+>>
+> 
+> 
+> 
 
-Are you familiar with the concept of QSFP breakout cables? The general
-idea is that one end of the cable is a QSFP connection and it will
-break out into 4 SFP connections on the other end. That is actually
-pretty close to the concept behind our NIC. We essentially have an
-internalized breakout where the QSFP connection comes in, but we break
-it into either 2 or 4 connections on our end. Our limit is 2 lanes per
-host.
-
-I did a quick search and came up with the following link to a Cisco
-whitepaper that sort of explains the breakout cable concept. I will
-try to see if I can find a spec somewhere that defines how to handle a
-breakout cable:
-https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transc=
-eiver-modules/whitepaper-c11-744077.html
-
-> I guess the queuing does not matter much to phylink, but how do you
-> represent multiple PCS lanes to phylink? Up until now, one netdev has
-> had one PCS lane. It now has 1, 2, or 4 lanes. None of the
-> phylink_pcs_op have a lane indicator.
-
-So the PCS isn't really much of a problem. There is only one PCS per
-host. Where things get a bit messier is that the PMA/PMD setup is per
-lane. So our PCS has vendor registers for setting up the PMA side of
-things and we have to set them for 2 devices instead of just one.
-Likewise we have to pass a lanes mask to the PMD to tell it which
-lanes are being configured for what modulation and which lanes are
-disabled.
-
-> > > NC-SI, with Linux controlling the hardware, implies you need to be
-> > > able to hand off control of the GPIOs, I2C, PCS to Linux. But with
-> > > multi-host, it makes no sense for all 4 hosts to be trying to control
-> > > the GPIOs, I2C, PCS, perform SFP firmware upgrade. So it seems more
-> > > likely to me, one host gets put in change of everything below the
-> > > queues to the MAC. The others just know there is link, nothing more.
-> >
-> > Things are a bit simpler than that. With the direct-attach we don't
-> > need to take any action on the SFP. Essentially the I2C and GPIOs are
-> > all shared. As such we can read the QSFP state, but cannot modify it
-> > directly. We aren't taking any actions to write to the I2C other than
-> > bank/page which is handled all as a part of the read call.
->
-> That might work for direct-attach, but what about the general case? We
-> need to ensure whatever we add supports the general case.
-
-I agree, but at the same time I am just letting you know the
-limitations of our hardware setup. There isn't anything to really
-control on the QSFP. It is mostly just there to provide the media and
-that is about it. No PHY on it to load FW for.
-
-> The current SFP code expects a Linux I2C bus. Given how SFPs are
-> broken, it does 16 bytes reads at the most. When it needs to read more
-> than 16 bytes, i expect it will set the page once, read it back to
-> ensure the SFP actually implements the page, and then do multiple I2C
-> reads to read all the data it wants from that page. I don't see how
-> this is going to work when the I2C bus is shared.
-
-The general idea is that we have to cache the page and bank in the
-driver and pass those as arguments to the firmware when we perform a
-read. Basically it will take a lock on the I2C, set the page and bank,
-perform the read, and then release the lock. With that all 4 hosts can
-read the I2C from the QSFP without causing any side effects.
-
-> > > This actually circles back to the discussion about fixed-link. The on=
-e
-> > > host in control of all the lower hardware has the complete
-> > > picture. The other 3 maybe just need a fixed link. They don't get to
-> > > see what is going on below the MAC, and as a result there is no
-> > > ethtool support to change anything, and so no conflicting
-> > > configuration? And since they cannot control any of that, they cannot
-> > > put the link down. So 3/4 of the problem is solved.
-> >
-> > Yeah, this is why I was headed down that path for a bit. However our
-> > links are independent with the only shared bit being the PMD and the
-> > SFP module.
->
-> Yours might be, but what is the general case?
-
-I will do some digging into the breakout cable path. That seems like
-the most likely setup that would be similar and more general.
 
