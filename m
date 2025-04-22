@@ -1,131 +1,119 @@
-Return-Path: <netdev+bounces-184699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309CBA96F1B
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:40:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6609DA96F24
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:42:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F16EB3AA60F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38B033A5221
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0D128CF60;
-	Tue, 22 Apr 2025 14:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B466C2857F6;
+	Tue, 22 Apr 2025 14:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LNDMR9KG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mQbOxbPV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B728C5C5;
-	Tue, 22 Apr 2025 14:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5DA35897
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 14:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745332846; cv=none; b=VmoetwgB6NtQHn7EH/9oG08jp+TFRE2NKLewYTyfa/Z1MO7+d4I+CpEQwH3nzebgHE3QJjl59mGWBvi+YBXcKS53iPP2ryLL2AbYDFJK1mAZ4lWW9gHAFkGFjrglk8dAId/o7GygeAfJ8bn+uft7dKCLKvNNG5wiEcjcb2I+mmM=
+	t=1745332957; cv=none; b=NjA9WlZbS4aHeyd6S6RFpGPEzeNjbhtJ7r/0g3uPDs+dlTat8jl0os/RI3pHQj9IAZblvnPxnOfQLGBdOF8Qc1uTJ3iz1EI+8NCN+/OT2Kpy4ZPZL5DOT3VQd+oyRCItTMDN02ao6dpXXzmmsAQnhUfg7lUTGqP6k6pePpQVLWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745332846; c=relaxed/simple;
-	bh=M9Zr7hxLPheS12ZSZNWK5qMbOtisljKEvNuI/iEukEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nlIEiEMb9l14rdR/cwvLq9yosAgSfbmVz/9v8x4ekioyMGmh2ZznPzGPRYmybkBHrfBN9I2kPygN7ZANGjjGFz6EKJG1LbVjBzbfOIeSuEXgQh4rDJ2D3CGoQuWeo71FTLugIU0dy1VvgjdbaErz/HJEb8FoHy2yWQEP/BASIZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LNDMR9KG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=W0S8t/6FGxg47c0LEtOaE/CH+Zrp13P24zwNFo5jGGw=; b=LNDMR9KGZUOWw2nq8JndcvNeF/
-	UlrAChAS6n9brfhMKUvxfErkEiAKWZfUakTgo1Kkbz1sy/lTjGFy4FUuQ/j1f6howOfcfwKPT3E3w
-	xIqAYCKilAfznPhLUM091UBTLzpjpG4jgH+P8NwnhBhr/88g68aCbnmxfY71+QOETvkc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u7EnR-00ADBy-Ka; Tue, 22 Apr 2025 16:40:25 +0200
-Date: Tue, 22 Apr 2025 16:40:25 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <d79ed229-f0b7-441a-b075-31fd2b2f8fe6@lunn.ch>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <6be3bdbe-e87e-4e83-9847-54e52984c645@ti.com>
- <cd483b43465d6e50b75f0b11d0fae57251cdc3db.camel@ew.tq-group.com>
- <5d74d4b2-f442-4cb8-910e-cb1cc7eb2b3d@ti.com>
- <b53fba84c8435859a40288f3a12db40685b8863a.camel@ew.tq-group.com>
- <aAdZoMge_CKtqokU@shell.armlinux.org.uk>
+	s=arc-20240116; t=1745332957; c=relaxed/simple;
+	bh=tGrt3F4436LOcPHiTDoHr4XrIReYCHafMCHvGqaziRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WScLHk64wgFosyYWBcEZXqsAG89ll0ov3LgsVyUEu+7aN8v2QC5PWgY99kjtBfg+jzMu9ifrJ/xfHzmPxWIlztbjpuPTEShIoEyO/UqkVfDkGXizfw+5VleYNWpRpntXVgVDCbNyhCZXEEAPHihX5vo/OFaQJyOeBUAr6iwqDE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mQbOxbPV; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AE75A41CFD;
+	Tue, 22 Apr 2025 14:42:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1745332953;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jt9Mkr75c4uKAU1hZ+a3wXo6IhuSBSJ1I5FWD7KkaKo=;
+	b=mQbOxbPVkr5b4cEsk2QiCO7WlOWZoOOT2oQwWVn4K5DxpU27RzMBPjwNtHVpQXZ6MRWV37
+	7r/QCuZm1iooze+gyHGRrPPHg3qH9N9eM/QHV8BT3oorCPuUv7hAXz7mSa/cIfzJbcQV3Q
+	5nvO6MfJBWe8Nm7WbilLrZfs/JspuxXqYB9SgtcbKkuMZhmnvntW9cULdVIRydNZF8/y7N
+	AqO+Cxa6Ik5c1YyfNby9a13BHYfA5rO0cGviemIoPAVKy2wQeSiLfS3bpicrVK2Z8J61Ej
+	ZX15rnnmRt1SH65uFg6azI3W9YYkAD+AW9QIWjgtPa1xREx7kpYWJ6Mt3xc/lQ==
+Date: Tue, 22 Apr 2025 16:42:30 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jon Hunter
+ <jonathanh@nvidia.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net-next] net: stmmac: dwc-qos: calibrate tegra with
+ mdio bus idle
+Message-ID: <20250422164230.5ffb90d3@fedora.home>
+In-Reply-To: <E1u7EYR-001ZAS-Cr@rmk-PC.armlinux.org.uk>
+References: <E1u7EYR-001ZAS-Cr@rmk-PC.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAdZoMge_CKtqokU@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeegtddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtoheprhhmkhdokhgvrhhnvghlsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgto
+ hhmpdhrtghpthhtoheprghlvgigrghnughrvgdrthhorhhguhgvsehfohhsshdrshhtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-> I'm hoping that Andrew will read my email form yesterday and reconsider
-> because to me this is a backwards step
+Hello Russell,
 
-I will get back to that in a minute.
+On Tue, 22 Apr 2025 15:24:55 +0100
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
-> > On Linux, there currently isn't a way for the MAC driver to query from the PHY
-> > whether it could include the delays itself. My assumption is that most PHYs
-> > either don't have internal delays, or the delays are configurable.
+> Thierry states that there are prerequists for Tegra's calibration
+> that should be met before starting calibration - both the RGMII and
+> MDIO interfaces should be idle.
 > 
-> motorcomm, dp83tg720, icplus, marvell, dp 838678, adin, micrel, tja11xx,
-> vitesse, dp83822, mscc, at803x, microchip_t1, broadcom, dp83869,
-> intel-xway, realtek all do handle internal delays. I haven't checked
-> whether there are PHYs that don't - that's harder because we don't know
-> whether PHYs that don't mention RGMII in the driver actually support
-> RGMII or not.
-
-I did look through this once. There are no PHYs with Linux drivers
-which support any of the RGMII without supporting all 4 RGMII
-modes. So we should just assume all RGMII PHYs can add the delays.
-
-If i remember the history correctly, Renesas built an RDK with a PHY
-which did not support RGMII delays. So they where forced to do the
-delays in the MAC. But it seems like mainline support for that PHY
-never happened.
-
+> This commit adds the necessary MII bus locking to ensure that the MDIO
+> interface is idle during calibration.
 > 
-> > If this is
-> > the case, having the MAC add them in internal-delay modes and not adding them on
-> > the PHY side would be the best default (also for PHY-less/fixed-link setups,
-> > which should be handled like a PHY without internal delay capabilities.)
-> 
-> See my "advanced" use case above. We do have drivers doing that.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I agree with Russell here, it is the worse default, not the best
-default. It makes it different to nearly every other MAC driver. It
-needs extra work in the MAC, which most MAC drivers get wrong. They
-also tend not to call out they have done it different to every other
-MAC driver in Linux, and so it does not get the needed extra review,
-and so is broken. I also think there is some 'vendor SDK' mentality
-here. Our MAC can do this, our SDK allows it, the Linux driver must
-have it and use it. Pretty much all hardware has features which never
-get used, but vendors sometimes have issues with just leaving it
-unused.
+[...]
+	
+> -static void tegra_eqos_fix_speed(void *priv, int speed, unsigned int mode)
+> +static void tegra_eqos_fix_speed(void *bsp_priv, int speed, unsigned int mode)
+>  {
+> -	struct tegra_eqos *eqos = priv;
+> +	struct tegra_eqos *eqos = bsp_priv;
+>  	bool needs_calibration = false;
+> +	struct stmmac_priv *priv;
+>  	u32 value;
+>  	int err;
+>  
+> @@ -158,6 +159,11 @@ static void tegra_eqos_fix_speed(void *priv, int speed, unsigned int mode)
+>  	}
+>  
+>  	if (needs_calibration) {
+> +		priv = netdev_priv(dev_get_drvdata(eqos->dev));
+> +
+> +		/* Calibration should be done with the MDIO bus idle */
+> +		mutex_lock(&priv->mii->mdio_lock);
 
-	Andrew
+Can't priv->mii be NULL, if the PHY for that MAC is connected to
+another MDIO bus for instance ?
+
+Maxime
 
