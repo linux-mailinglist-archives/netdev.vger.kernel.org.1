@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-184607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05CCA965C6
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:23:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 186B8A965E1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EB587AC237
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:22:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A0C3AB12A
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC9E1F5827;
-	Tue, 22 Apr 2025 10:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C871C2116EB;
+	Tue, 22 Apr 2025 10:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KZt5KOmZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hmibpaJQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C816DF510;
-	Tue, 22 Apr 2025 10:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A164F510;
+	Tue, 22 Apr 2025 10:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745317393; cv=none; b=osllSSzbaZzBOcRiiKw9kxulunocAadKW4/5idnyPq/A12tpNHLbd3BN0WrugXSJr+H3q4xsT9BbzmL3whA1V/vpP1jrJOEcwWuYsGgw8S90YewK0Tl7omR1hQwMR1uug7DhHZnsxCL1nOl0hpqmlib5S7cHBt3QQyrIyz53og4=
+	t=1745317590; cv=none; b=Gx/Qkl6LTOhrSDgeU5C4s+3PafEpEijRbnbvo9V1nlyiXq/B3NKEfJ/EVQVcZmX+KmIc60O4eGIWGvWXyW4Ttxg0kNMwB6UGzII1G3qgMh27EIfTowLgKFbDy8CDX3uODOBEK+Dj0gCKXcomyTL9Xu1mZhUcobZQexYbzv7TUig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745317393; c=relaxed/simple;
-	bh=9U0y8AazlFYUUbq6n7jrNcFwYKUoO+Qq3tFFP4YSOg4=;
+	s=arc-20240116; t=1745317590; c=relaxed/simple;
+	bh=YqWYyAx8wFfLAqMZkhCl82gepw008Z3BzNjGaTOcJnQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mBg9wUj7j/ZVqrnS8CRircF7MqBVhi7V01tUW1oCMOhB17prOxwEpaxFWjhIT+GZOJyD6SvZWqJM2efFORZfjT6WpRwEulOvOqrluYOsj+pmWbQdEOyBgz6+A35jehI1TeP5NOQeRPqDGs7FqfN0rQrbEWqmMsu77VgUzBWeKi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KZt5KOmZ; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=s33pPmDnVdOQI7eKV4iNu1oMY7UjllG2OJQ6cYP7Iqo6xSe7n+gTSl3SktpHILQbHL2rWivPLoG3zhOcSAE/tA5r0efPiw58GhE5jDDTVJPDpKfm28UEhN7eKsrHbqD9gyxHhgrbPwf7/NPNHmlyJifjkugWH28ZFHgnOrtstgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hmibpaJQ; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,23 +37,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eWqimEvZYjJ+hHLiu/HNG+SHzYVuamy+C0IrsJuwiZc=; b=KZt5KOmZMimyaXz1jUZ3tCe+nC
-	gHyTmBIBPv2GDXRgIPXD86ceGvYoRmhJR0o+qMKCtK8dw2EQLu6ki9wnqj5auK0MR/ak30Rfjon95
-	nGbKHssWOnmxa85ge4y2nY0ar4CjdgNJeoYn9CgZ7F9f8EilHiWGiOqcw3CIDBe/eCbd4e8bGN11O
-	c3tPXs2mTzCz7XiBqLXQGeN8O+AHDQT1IK1knc6qdihGUGlvml0Mt22pyhq+JTZxrm19eXK+Svrre
-	JWbI/uHRNK3iT8ZGObSGZO5Mvb0L8RLhD9gVSWaFSbO1bEgk/8K2jS1aI5cGd7qYjtqO0YMsiajhR
-	174DMe/w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36088)
+	bh=CjTX9sSLA5APr26oD3oIvumjEEJaT08iYbGX+c3YqhQ=; b=hmibpaJQjafVjg/TfxQRzmQGmP
+	VNbw2ltDqE/oXry3qBL68JLB9s7RUpgmQ+y6A6geZM6nULubvbmvUYIrEltC5wngYJ25K/z/3Ku9T
+	XJn7ylB9dncRVw1lZjyTu2tq+MBLggbp7XoskY6PQGqczQkZgnyF5B39iDyF/HBbtmNmkjg/a58J+
+	ihQdDdgJ4TkLSoSTwlQzr7amSpH7Ae3NuLj+vza1xxZh+O4XLRTixUsr8L/f1I1vZXRQLh5UGRlGf
+	+fuNrkFCC8ZbuaHunIqY9YRL1pIvrxt96kMzooTAWiYwIzCLKpVFrlEkoXmUKULr3ZIo2fdy+hrK6
+	7I9VULUA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60956)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1u7AmP-0004C5-04;
-	Tue, 22 Apr 2025 11:23:05 +0100
+	id 1u7Apc-0004Cl-1S;
+	Tue, 22 Apr 2025 11:26:24 +0100
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u7AmM-0007PA-0g;
-	Tue, 22 Apr 2025 11:23:02 +0100
-Date: Tue, 22 Apr 2025 11:23:02 +0100
+	id 1u7Apb-0007PM-0x;
+	Tue, 22 Apr 2025 11:26:23 +0100
+Date: Tue, 22 Apr 2025 11:26:23 +0100
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
@@ -62,11 +62,11 @@ Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	thomas.petazzoni@bootlin.com, Simon Horman <horms@kernel.org>,
 	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>
-Subject: Re: [PATCH net 1/3] net: stmmac: socfpga: Enable internal GMII when
- using 1000BaseX
-Message-ID: <aAduBtZ9jc_AMmEZ@shell.armlinux.org.uk>
+Subject: Re: [PATCH net 2/3] net: stmmac: socfpga: Don't check for phy to
+ enable the SGMII adapter
+Message-ID: <aAduzwMTLvaeyQkb@shell.armlinux.org.uk>
 References: <20250422094701.49798-1-maxime.chevallier@bootlin.com>
- <20250422094701.49798-2-maxime.chevallier@bootlin.com>
+ <20250422094701.49798-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,22 +75,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422094701.49798-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <20250422094701.49798-3-maxime.chevallier@bootlin.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Apr 22, 2025 at 11:46:55AM +0200, Maxime Chevallier wrote:
-> Dwmac Socfpga may be used with an instance of a Lynx / Altera TSE PCS,
-> in which case it gains support for 1000BaseX.
+On Tue, Apr 22, 2025 at 11:46:56AM +0200, Maxime Chevallier wrote:
+> The SGMII adapter needs to be enabled for both Cisco SGMII and 1000BaseX
+> operations. It doesn't make sense to check for an attached phydev here,
+> as we simply might not have any, in particular if we're using the
+> 1000BaseX interface mode.
 > 
-> It appears that the PCS is wired to the MAC through an internal GMII
-> bus. Make sure that we enable the GMII_MII mode for the internal MAC when
-> using 1000BaseX.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> So, check only for the presence of a SGMII adapter to re-enable it after
+> a link config.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+I wonder whether:
 
-Thanks!
+	struct stmmac_priv *priv = netdev_priv(dev_get_drvdata(dwmac->dev));
+
+	if ((priv->plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
+	     priv->plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) &&
+	    sgmii_adapter_base)
+ 		writew(SGMII_ADAPTER_ENABLE,
+ 		       sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
+
+would describe the required functionality here better, making it clear
+under which interface modes we expect to set the enable bits.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
