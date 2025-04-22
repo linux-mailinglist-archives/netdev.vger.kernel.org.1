@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-184474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63638A959D7
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 01:43:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6728EA959FF
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 02:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D73F167E7F
-	for <lists+netdev@lfdr.de>; Mon, 21 Apr 2025 23:43:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 243247A2621
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D3D22CBE2;
-	Mon, 21 Apr 2025 23:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D439CA59;
+	Tue, 22 Apr 2025 00:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwerwgBN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TysWquBb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185E9219A68;
-	Mon, 21 Apr 2025 23:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84F6DF58;
+	Tue, 22 Apr 2025 00:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745278998; cv=none; b=NPUJrAjlKn1cheK8CbyX2ZkjDU++9nXckwkuGfeBdApamJYSEswn6DxLCdLiOcnFZxdCj/w2hr9Gj2T3Q+6UFjy0zTJ1HCBdjvai8Q0SFQ5OCYpVilS3i7Rg7K6JxoERF/JojHU2fByVnokVQdqLocN8PMfNgQtMTa+u0+pZfl0=
+	t=1745280231; cv=none; b=nWgUatSQFu1jyvXa7F9aIUwnsNcUQ7u13DTbjRNoUvQvNHxfz1fMZI7ZZl98QlRUsPEoUQz8tKjDFY/CLuJrbD9WNNscWBw3vyLam4MHtjvuTGu4W0SHPA8CqWFS/DStsamCtPRiLat76Z+9qbOLuM5ke4kLRfO44LFA5hbXuLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745278998; c=relaxed/simple;
-	bh=xeeOHiQmCewMvU5/2XDoaHNz2BGzcdbJPohQiaaKAgQ=;
+	s=arc-20240116; t=1745280231; c=relaxed/simple;
+	bh=ByXM9NwhLFSE7cwLmMnQdf3Y/z48xuxLc5CpTPHWd8E=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WdnQpPHOJs4T0z8FwS9kKw6f3auFwaOmCGir+wkCQgnaKNvhOB3b9/cU3uCBgOtlhRbaJOlVkz60rigiA9FWvjpmvkpIdU+bIHig/xVNO4dtQf5zFXRw/YVSBA3sb3QBbhlonzHXQetkrudJfKkYrrhpxHW7c/utw/XtXdCUxFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwerwgBN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22D67C4CEE4;
-	Mon, 21 Apr 2025 23:43:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Sj3+tgd43yPgJgg/V8tuhlvqdjQQlyhenED9zgId/Uvp7fAK95dG9t/jlMB5iedRK9nKyodYyregs6D4+Ut4ZwNQwq7Lryq9TYCT3pKh8ftqhmUi5Zwz1nwrmjt5HI8Feim+Z+FBbQ3+WqhUsoRrqh0YUK/Id36iq+pLh0Hm1gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TysWquBb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D231C4CEE4;
+	Tue, 22 Apr 2025 00:03:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745278996;
-	bh=xeeOHiQmCewMvU5/2XDoaHNz2BGzcdbJPohQiaaKAgQ=;
+	s=k20201202; t=1745280231;
+	bh=ByXM9NwhLFSE7cwLmMnQdf3Y/z48xuxLc5CpTPHWd8E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lwerwgBNrKIM3h4p8C8Oc1iW4eOmXCmgBpjmITGovIDzIP/5hOod1SE5na8L11kU4
-	 ZNSuobcDDE4PshrcRGARzTJ/ekBNhdpZCOhufVnZlDnhR9G7LgGikTFBHVKKYmssKG
-	 e+Mw7mYLrkvaj7LRzYx6hNMmh7WxosKRhzg39SYFVKqiREhqvew6hGGFJ5yXs00FAO
-	 zd+JLST472pk8jx2sG21RoafSCjEXThOoJzlOVX4mTUBi5m+I3Fw28Yq8zotQ0Y/JF
-	 jtDsJXtOAoLxcJwTZZQGV9W47/AOHRjfxMokI98jl6Ql/i12Igbpvfp3kItEeWQVC2
-	 pA55EzrncJ0Cw==
-Date: Mon, 21 Apr 2025 16:43:15 -0700
+	b=TysWquBb8nGwZpbr/arQtdRMae5KhBFd2ZpyWCcnUHoR3UrCUEoDqU9isnIgRM7h2
+	 hkncZot2SV5UDJXVU6oH1tu2LYMi5xwHGvS2fXYfuX5+AwKn+Au23FYxO28WmvQW2N
+	 NwsTdO+vJYtzk94+26Zbu5Hzjdj9DCbgso5VpuZ8xyiB6pn9C7IAr1Szgr5JgxnjcF
+	 4aDX7EHxoCdCbH2pgLd3Uq502Ill+BA0U3s65jgVcYxr+q9SkBm9L8GSKIWEHFJgla
+	 RMEd14cK5LpxzO0Jtxi9XKbJDn4d29tgLsF77ct9/zWQuLNwIt+FbH3EhYzzI/Kv9V
+	 7iS+UM/9NK5ZQ==
+Date: Mon, 21 Apr 2025 17:03:49 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
-Cc: Colin Ian King <colin.i.king@gmail.com>, "Pandey, Radhey Shyam"
- <radhey.shyam.pandey@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, "Simek, Michal" <michal.simek@amd.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "kernel-janitors@vger.kernel.org"
- <kernel-janitors@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH][next] net: axienet: Fix spelling mistake "archecture"
- -> "architecture"
-Message-ID: <20250421164315.5e09f02d@kernel.org>
-In-Reply-To: <BL3PR12MB6571DC0AA8A521078E442E48C9B82@BL3PR12MB6571.namprd12.prod.outlook.com>
-References: <20250418112447.533746-1-colin.i.king@gmail.com>
-	<BL3PR12MB6571DC0AA8A521078E442E48C9B82@BL3PR12MB6571.namprd12.prod.outlook.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, mhklinux@outlook.com,
+ pasha.tatashin@soleen.com, kent.overstreet@linux.dev,
+ brett.creeley@amd.com, schakrabarti@linux.microsoft.com,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ rosenp@gmail.com, paulros@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] net: mana: Add sched HTB offload support
+Message-ID: <20250421170349.003861f2@kernel.org>
+In-Reply-To: <1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
+References: <1745217220-11468-1-git-send-email-ernis@linux.microsoft.com>
+	<1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,8 +67,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 21 Apr 2025 05:34:01 +0000 Gupta, Suraj wrote:
-> Please add Fixes
+On Sun, 20 Apr 2025 23:33:39 -0700 Erni Sri Satya Vennela wrote:
+> This controller can offload only one HTB leaf.
 
-Fixes tags are for code bugs, FWIW, no need here
+This is not a reasonable use case for HTB.
+
+If your reason not to use the shaper API is that there is no CLI
+for it perhaps you should add one to iproute2.
 
