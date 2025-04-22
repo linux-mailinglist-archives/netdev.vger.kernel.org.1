@@ -1,133 +1,146 @@
-Return-Path: <netdev+bounces-184722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56DDA96FFE
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE5DA97009
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 205AD16BE31
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:08:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9625E16CB72
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E19C28F94A;
-	Tue, 22 Apr 2025 15:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CB528F928;
+	Tue, 22 Apr 2025 15:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IzuQtJHk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWMaq0EX"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FAC284B5B;
-	Tue, 22 Apr 2025 15:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3143028C5A1
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745334488; cv=none; b=gIHJA/gr7gE5WK34m4AqdS1Hxk5mj3CbL9I3y7pqh8OG80zkP1RkdC+VWsiPx/Fww+D8Jwx200mTwlY+JRorRmPCeUx9ewPj4BCmo6GzcA0dsK/OnrBwS8QkfLS9xPAixbKfNhbLU4u06K6dXLjaWmx0DFYHYmfJRu1OxUoU+/U=
+	t=1745334580; cv=none; b=VPIVMwbkKBT5zI6+9qMDVlKh9nDFv/nsM/JFe9GQdCkNsNxhqRK6udxiFbkgS+fnjm2D9Z6DC6TbYmi6VWhpdMNBleFxxnwFM52z06R5eq2QfM7KTpNCRwzXIUqz5v2HtldEEyCbteI6rcppDedKwMjQNEnTNdUh0lqZXbrv3P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745334488; c=relaxed/simple;
-	bh=AHZaZUsr4DPTBZ80zjQhTttqoC74cFQHMwz+oExB/4w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J6KlUq/ZJxh+A9dNf7aIK9XcuhBp2t+W3PyMFshGDf5YUC3Pz6w3rur/NJPGAm1jfl7bzuT7N6KGy1ztKYUL7a7uSfwj9oqMjFWXsAY1Z0hdOCAXYpmVNauWdiuLqZuqKO5nTzm2hrCzLutGQu4XHw+JFCkOWF7iI+VD4GP8f/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IzuQtJHk; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A7E7543A3E;
-	Tue, 22 Apr 2025 15:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1745334478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TRcZcJeqXe3bZ8BydUxdPRAg1PRktnOnWrwURyrXOHk=;
-	b=IzuQtJHkjpr/eiSJK2AczFT9xNq4AUt+9Db9jV6u/eXqZe/xJVmDCmiAQpDRjnLIbFuBzh
-	9VpX5AD5Dq51LK+mevlQazB1jH+55sv2mwwKpX12wHYWJKAP3Pq4RZkG4OM5vLpXJx7XcE
-	kquo80h+KxGnpsdyZtVq225Q53uLhqEfJpxrh6UydkMGFjcM1gRqEOSbdEvxjhPLu0+/ST
-	BlyHFXozSnRzQhDEjYh9ZO2f9uLL1QOuR5z0NTe4BAODmgoEibM3+9osK2/kUrY6+Yf9pR
-	TddWRW8hP0GItWlSq1D2jOvB90wPMYdZknqVapV+Ovps+MvsO9+1EAl6bUEFgg==
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Date: Tue, 22 Apr 2025 17:07:23 +0200
-Subject: [PATCH net 2/2] net: stmmac: fix multiplication overflow when
- reading timestamp
+	s=arc-20240116; t=1745334580; c=relaxed/simple;
+	bh=u2pTJx0Ij+runOvsJmA0q5y9Kslc+OcE1AiOs4Q52gA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DFQr0XCyyN3m14V0QjTQpb7GR7CmBoTOmJ1qMKbqQcTCgPAqqsJZpvWt8tce4n8sM+OWnjiTfjU6O6+iqXgKcWN7KgErwkb7XI6E9yHt3F7hBDIzDlXJ4A2gg6P0GU5y3su3qMIuJK1VwONOtj3uIZ3FvlU2TmRGPffzUsFNVbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWMaq0EX; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3085f5855c4so4816311a91.1
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 08:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745334576; x=1745939376; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
+        b=fWMaq0EXfAG3BHE7JfR6uLKMHALt98SwgbMx8tUXl5+HBynuzfsocxXtiedr9Nk8II
+         O2IRJqJLxz5EQQxVg4I5U0EF4K6A9UD9yItB8uDzjYWmdW7pRZE4b+C+d0eDcteWuTpT
+         qRTHOOZw+sLPzWAzpg1e59N/tkjSYjpUO7VmF2LUmUzRaj+9u/iMsNn61MV1QM+0O2cA
+         +jl56znNd4NO2Z/VFmDHQJ6sI8ulRX2TDsOE1N1Jg1pPm2TrAEcdGyJchvr1Z9ky8A4+
+         P6zW13gfUAmeZ/FippT/ZJ8EAHk2QpCPCHOmOphlhJ7oWdZ+X8ixc7Y/q7hVsdfIyuhJ
+         AxbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745334576; x=1745939376;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
+        b=q+dQ+RxeCa0AZr/bB/6T5YSRlAvd1t1ne+AgrrEYrC3k7d03OXHfy1DBeqrHLa8F2X
+         z/ehWgd6HuT3ia2aPu7qQB7D3mCIf4lew48AZHJQahJBRuUrMSNF6YbTKJLfRu2aF6Xt
+         fttRvlVCp7O5Tr3wP7oBEPVr7hiLXCSDBYdk3b+hyG87i5SwJH8rMBwMBPlHsc/IbRlg
+         z0Ls+pJZtCAcCC1zJkAL0aqJRmo60vTH5eymUDMpWTTTK0/uFZEKyRy49/7lkRdzvdcL
+         lrZEJQbpfxzchrkO7AqptqRt0qMkVhIh6useyADITlG1kHDbiVK/FE4xNXXW0mpGKVGn
+         NlLw==
+X-Forwarded-Encrypted: i=1; AJvYcCV96uWNjGBhKM0ev4NRMIzGN3i0uuwSEoVlGtTdzmJ6XvxDvcEwIbyG2YwJa5SIARFYbHhlN1s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTVSZANoywNuEzginsLmNxoyck2plCJQldxVMpw5R389EljCzF
+	481IJ87nYj2X/EagzD7EPoIrwp0rW2DOh1E4UvO6d5RIKVmkW7IDNCB/oBvoZ5t1yKOkTtXqvc6
+	pGQ==
+X-Google-Smtp-Source: AGHT+IHGR6YFubcBkAQrqhkjsdDwq21aLEhFyH8uteoXFGo84CYqI3Y4PMerNLsX7Qx/XFlRMipUTrfnrN0=
+X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:2fc:2c9c:880])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecf:b0:2ff:692b:b15
+ with SMTP id 98e67ed59e1d1-3087bbca3b0mr26039866a91.33.1745334576501; Tue, 22
+ Apr 2025 08:09:36 -0700 (PDT)
+Date: Tue, 22 Apr 2025 08:09:34 -0700
+In-Reply-To: <20250422082216.1954310-11-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250422-stmmac_ts-v1-2-b59c9f406041@bootlin.com>
-References: <20250422-stmmac_ts-v1-0-b59c9f406041@bootlin.com>
-In-Reply-To: <20250422-stmmac_ts-v1-0-b59c9f406041@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Daniel Machon <daniel.machon@microchip.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- "Russell King (Oracle)" <linux@armlinux.org.uk>, 
- =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.14.2
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeegtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomheptehlvgigihhsucfnohhthhhorhoruceorghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeghfetffeuhfehkeekleffffdvuefggfevjefftddvffduheettdeiveetteenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgdujedvrddujedrtddrudgnpdhmrghilhhfrhhomheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedujedprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkv
- ghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhsthhmfedvsehsthdqmhguqdhmrghilhhmrghnrdhsthhorhhmrhgvphhlhidrtghomhdprhgtphhtthhopegurghnihgvlhdrmhgrtghhohhnsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
-X-GND-Sasl: alexis.lothore@bootlin.com
+Mime-Version: 1.0
+References: <20250422082216.1954310-1-xin@zytor.com> <20250422082216.1954310-11-xin@zytor.com>
+Message-ID: <aAexLqjhKncFyw2V@google.com>
+Subject: Re: [RFC PATCH v2 10/34] x86/msr: Convert __rdmsr() uses to
+ native_rdmsrq() uses
+From: Sean Christopherson <seanjc@google.com>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
+	linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org, 
+	jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org, 
+	namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, 
+	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, 
+	kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com, 
+	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com, 
+	pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, 
+	boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com, 
+	decui@microsoft.com
+Content-Type: text/plain; charset="us-ascii"
 
-The current way of reading a timestamp snapshot in stmmac can lead to
-integer overflow, as the computation is done on 32 bits. The issue has
-been observed on a dwmac-socfpga platform returning chaotic timestamp
-values due to this overflow. The corresponding multiplication is done
-with a MUL instruction, which returns 32 bit values. Explicitly casting
-the value to 64 bits replaced the MUL with a UMLAL, which computes and
-returns the result on 64 bits, and so returns correctly the timestamps.
+On Tue, Apr 22, 2025, Xin Li (Intel) wrote:
+> __rdmsr() is the lowest level primitive MSR read API, and its direct
+> use is NOT preferred.
 
-Prevent this overflow by explicitly casting the intermediate value to
-u64 to make sure that the whole computation is made on u64. While at it,
-apply the same cast on the other dwmac variant (GMAC4) method for
-snapshot retrieval.
+Doesn't mean it's wrong.
 
-Fixes: 19b93bbb20eb ("net: stmmac: Introduce dwmac1000 timestamping operations")
-Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c  | 2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> Use its wrapper function native_rdmsrq() instead.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-index a8b901cdf5cbb395a0f6b4800ad6f06c6e870077..43b2b3377136f2d9c717f85cba6a452e7a178ad7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-@@ -553,7 +553,7 @@ void dwmac1000_get_ptptime(void __iomem *ptpaddr, u64 *ptp_time)
- 	u64 ns;
- 
- 	ns = readl(ptpaddr + GMAC_PTP_ATNR);
--	ns += readl(ptpaddr + GMAC_PTP_ATSR) * NSEC_PER_SEC;
-+	ns += (u64)(readl(ptpaddr + GMAC_PTP_ATSR)) * NSEC_PER_SEC;
- 
- 	*ptp_time = ns;
- }
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-index 0f59aa98260404bece530f505500f13d35884d0c..1950156f6af6f6f13ebdc1c04f01a862b664bc9b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
-@@ -222,7 +222,7 @@ static void get_ptptime(void __iomem *ptpaddr, u64 *ptp_time)
- 	u64 ns;
- 
- 	ns = readl(ptpaddr + PTP_ATNR);
--	ns += readl(ptpaddr + PTP_ATSR) * NSEC_PER_SEC;
-+	ns += (u64)(readl(ptpaddr + PTP_ATSR)) * NSEC_PER_SEC;
- 
- 	*ptp_time = ns;
- }
+...
 
--- 
-2.49.0
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 1547bfacd40f..e73c1d5ba6c4 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -380,7 +380,7 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
+>  	if (!vmx->disable_fb_clear)
+>  		return;
+>  
+> -	msr = __rdmsr(MSR_IA32_MCU_OPT_CTRL);
+> +	msr = native_rdmsrq(MSR_IA32_MCU_OPT_CTRL);
+>  	msr |= FB_CLEAR_DIS;
+>  	native_wrmsrq(MSR_IA32_MCU_OPT_CTRL, msr);
+>  	/* Cache the MSR value to avoid reading it later */
+> @@ -7307,7 +7307,7 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
+>  		return;
+>  
+>  	if (flags & VMX_RUN_SAVE_SPEC_CTRL)
+> -		vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
+> +		vmx->spec_ctrl = native_rdmsrq(MSR_IA32_SPEC_CTRL);
 
+And what guarantees that native_rdmsrq() won't have tracing?  Ugh, a later patch
+renames native_rdmsrq() => native_rdmsrq_no_trace().
+
+I really don't like this.  It makes simple and obvious code:
+
+	vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
+
+so much harder to read:
+
+	vmx->spec_ctrl = native_rdmsrq_no_trace(MSR_IA32_SPEC_CTRL);
+
+and does so in a way that is difficult to review, e.g. I have to peek ahead to
+understand that this is even ok.
+
+I strongly prefer that we find a way to not require such verbose APIs, especially
+if KVM ends up using native variants throughout.  Xen PV is supposed to be the
+odd one out, yet native code is what suffers.  Blech.
 
