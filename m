@@ -1,131 +1,162 @@
-Return-Path: <netdev+bounces-184580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC3DA963FD
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:19:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FB0A9640C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1A743A3162
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:18:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6E6B3A289F
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F631EB1A7;
-	Tue, 22 Apr 2025 09:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3651F2B90;
+	Tue, 22 Apr 2025 09:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fPmyyQpn"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aTCKesca"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1830E1F151E
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37302E56A;
+	Tue, 22 Apr 2025 09:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745313509; cv=none; b=ZmuM8k6zu/gL8DVj1u+/ANwPKJo69bTpitE4Bd573qZ6go/ea8gBg6ji2dAGOrlP2szevSwN0+CNS31WjyWCZPFIQST/Jbf0mHvja86RZ6Wqxpmz3jIqlfXJYhy2B8Dk42AZOhQ7F/h87peVDHcFmg0FGyVn/5W9GwgAfosEdTw=
+	t=1745313683; cv=none; b=Fjg7xMPJ4MijZC6lseFjvAvYB0RkvzKOyFUkz08vwT7aeod55fwEvhxXU7QxPAOpv/5OeIeCS4WIq5EP6wbuPMeQgOTxNHDMTXyJ1HP+XqK916AdbbGGLoPP7l5bu5tcdbAZkow1j0PcovUGQEbWPb0bMWqgce+rQQA1DN14F1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745313509; c=relaxed/simple;
-	bh=d7eIeT9FZFY89i5wfhwpFdeC7VPIv1U6wLdokmNZ/6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ufkOuawDxBh3R5TnelN/8/WzeAbt8Dx3WRK1pBwbcCPB8JFCdMviTTUkWkpa9zkRFV+Uk3rKF6O5V3sMWVlREHTKPNsvCxdGar+/VaFXK31wh5fIUSvsBU+w9yJUtNn+6mqy90upxE/fTR0tXN3Zpgk7sJWUYJ7AWmor1EH4TM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fPmyyQpn; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so51293395e9.1
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 02:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745313506; x=1745918306; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+RdjoJlg0hi28zGgBtHCFNDTL+4+uZWkJ4jKZNHMsrc=;
-        b=fPmyyQpnGrtxvdKbaRbo1yCvd60l59cngN8fucsl6kQA6A16yTgMLAd7lRK1koVGyb
-         1UWy8KIwubr/TcYhrZjAEAw7QdESk9msHV2izJ231M+91uZlZps0Czs8B5JS7wD6t7tQ
-         oWL+VCxLBezVYSYqE8AsVS3Hi/IeC1yeCSpe6qrJnBrnWVxx7M1m5/XYeNkg1iIWkwlt
-         abHlW1xkhg1bgjUL1DasuU5rfVksxA306ruHh1fBfe3KPOCytKDId2eAYia+VYX1M6Kk
-         hyUVStIdOA7uzv9NFx3adsndGznFjW11tTmU0OZI0fSquEpwAcXfnmJ1H6SMqsN94zly
-         EtfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745313506; x=1745918306;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+RdjoJlg0hi28zGgBtHCFNDTL+4+uZWkJ4jKZNHMsrc=;
-        b=U5U1TDt6tAd9oOxqp54dFbIcf0XPJbEXx9TECW83/C571IcfGaWSybBqu221RkII5H
-         9j45u+HBLWl4E+A6EBlU5YJ6JCTs+2OjR1WP9GRkEoB8zW6AqGrljJ8pFu7cMo7R+W6H
-         AgFCDn5sr5bNixaxhc2avdANP5eZZxEs/eWZsfuYpZ6HqhGc2sP+25S4sEHktWYb6rdM
-         AvGDLPQc66MV9sZer0BU8nKqKUOImws321nHdIrMzTZNfGb+HHIf+HpIanhZCc2DDrzl
-         JkYlt0r4PZ9agw0p8Y1mDCJAlyTrElA0dP2ptI72PRZtw/jRp679gv6KmxA4nmicsrtZ
-         yhmQ==
-X-Gm-Message-State: AOJu0YwMjaio4QlWsKuByyxHt26zCl5Xmd0e7QVvqFQP0uCTjTT92P51
-	WeotGjpY1Y9a9WSgF4bnPabFA4GD6GdOJcUTw9HI/f6Znl2m2PmQ5L0ruf3PpG4=
-X-Gm-Gg: ASbGncsnd3r8AuuvsDJIGQvpqOvQngO5NoiPLGOsMUjcryt41d7AakFGLyQDvGSmLL8
-	rb7VqxbEnuWTGXsFNcOeG313Zu67djnQ6t+hrW2rw6piFqIMoobai64BFe/ZH5PmIi7mLntxAii
-	cwLmh35VAVQsepByxZfwvVKbcRTBESM+uSKKNTqCo5hJUU8oltzbCd7yhNhTrE1a+Wj7QkX1nDF
-	ftIcmJmKDz+++ibREE8tdaMViE2jxLrqytTTYzO+rJAKYporhu6yTIKgiC/QF6R8PbS2gq1CHog
-	NcWvqT2fhGlyo4ApM2dCvoYOFerb4fvAzvzcEvsCtNyXV9UGTQaxfHqT+ZS67ABp7Jzs
-X-Google-Smtp-Source: AGHT+IFML7PZZprDrgsxIn1ZQe5x9hLLSR82MPLU/biw4v7TUsY7L+BwUA9Z+27H4yWxLIxej4k86A==
-X-Received: by 2002:a05:600c:548e:b0:440:6a5f:c31f with SMTP id 5b1f17b1804b1-4406ab93420mr127229375e9.11.1745313506271;
-        Tue, 22 Apr 2025 02:18:26 -0700 (PDT)
-Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4207afsm14723062f8f.12.2025.04.22.02.18.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 02:18:25 -0700 (PDT)
-Date: Tue, 22 Apr 2025 11:18:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, tariqt@nvidia.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	donald.hunter@gmail.com, kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v3 2/3] devlink: add function unique identifier
- to devlink dev info
-Message-ID: <5abwoi3oh3jy7y65kybk42stfeu3a7bx4smx4bc5iueivusflj@qkttnjzlqzbl>
-References: <20250416214133.10582-1-jiri@resnulli.us>
- <20250416214133.10582-3-jiri@resnulli.us>
- <20250417183822.4c72fc8e@kernel.org>
- <o47ap7uhadqrsxpo5uxwv5r2x5uk5zvqrlz36lczake4yvlsat@xx2wmz6rlohi>
- <20250418172015.7176c3c0@kernel.org>
+	s=arc-20240116; t=1745313683; c=relaxed/simple;
+	bh=IJFxtry7hhT8Yr4zEl4gtA++56+FAG+dLifspSiZ+1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ODk8QhY1E3sZBB639IWcBuCUvtaFQsssJtFBJDHnD/PZrVXYAAiI7uOB8evOXcau4Ly2w5pEckwr7f4Am5NAFKmLJtTUn5bCK2p6LCT4YQcLee/xLXS8grhKZ1uXiV3A8TPc2wcpVOJYYwScd2+q+MhrCPM3KR4heoEMhYFc8n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aTCKesca; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M9KXTP1995439
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 22 Apr 2025 02:20:33 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M9KXTP1995439
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745313638;
+	bh=cLR0wjbhwRTduGhrcmgQgQdpIXcDkWnqVuLKh1m13oQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aTCKescadr0sHc1OBNab3mt0WNOdORNOUu7rpBETQ6vGwSMvW5FXLhE2vfj1fe1w6
+	 kxqgtHLh80BykH4vNphE7UVD2umMuSaHZ0X7BB8pQmc61E8lzA//9+HuTE4ROZLaHQ
+	 dQx1WOTNwbk243SjOLe1tpFcPH9y12xx7ogDIZhREF4ji6RETc9TF7kIMeKjF5mIsX
+	 eMDXrP0TRl7JUiIRx2OTEz9i2vbZmrKeMtWUxjkY/XflI7iXlGFVwA24g71d0hbH9Y
+	 ZcmCp02WLH6iMipEkRPpY3a67hmjRhqj5K+CZV5FH7x7JFpmsNnSuIPtKmy58Xt4bk
+	 MKbcDfnoCUCnA==
+Message-ID: <7fea6158-9b7d-4bfb-b709-729266803c32@zytor.com>
+Date: Tue, 22 Apr 2025 02:20:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418172015.7176c3c0@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 22/34] x86/msr: Utilize the alternatives mechanism
+ to read MSR
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-23-xin@zytor.com>
+ <91f9217a-cc2d-4a6e-bada-290312f73d82@suse.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <91f9217a-cc2d-4a6e-bada-290312f73d82@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Sat, Apr 19, 2025 at 02:20:15AM +0200, kuba@kernel.org wrote:
->On Fri, 18 Apr 2025 12:15:01 +0200 Jiri Pirko wrote:
->> Ports does not look suitable to me. In case of a function with multiple
->> physical ports, would the same id be listed for multiple ports? What
->> about representors?
->
->You're stuck in nVidia thinking. PF port != Ethernet port.
->I said PF port.
+On 4/22/2025 1:59 AM, Jürgen Groß wrote:
+> On 22.04.25 10:22, Xin Li (Intel) wrote:
+>> To eliminate the indirect call overhead introduced by the pv_ops API,
+>> utilize the alternatives mechanism to read MSR:
+>>
+>>      1) When built with !CONFIG_XEN_PV, X86_FEATURE_XENPV becomes a
+>>         disabled feature, preventing the Xen code from being built
+>>         and ensuring the native code is executed unconditionally.
+>>
+>>      2) When built with CONFIG_XEN_PV:
+>>
+>>         2.1) If not running on the Xen hypervisor (!X86_FEATURE_XENPV),
+>>              the kernel runtime binary is patched to unconditionally
+>>              jump to the native MSR read code.
+>>
+>>         2.2) If running on the Xen hypervisor (X86_FEATURE_XENPV), the
+>>              kernel runtime binary is patched to unconditionally jump
+>>              to the Xen MSR read code.
+>>
+>> The alternatives mechanism is also used to choose the new immediate
+>> form MSR read instruction when it's available.
+>>
+>> Consequently, remove the pv_ops MSR read APIs and the Xen callbacks.
+> 
+> Same as the comment to patch 5: there is no indirect call overhead after
+> the system has come up.
+> 
 
-PF port representor represents the eswitch side of the link to the
-actual PF. The PF may or may not be on the same host.
+Please check https://lore.kernel.org/lkml/87y1h81ht4.ffs@tglx/.
 
-Ethernet port is physical port.
+And it's was also mentioned in the previous patch:
 
-Why this is nVidia thinking? How others understand it?
+https://lore.kernel.org/lkml/20250422082216.1954310-22-xin@zytor.com/
+
+Please let me know what I have missed.
+
+Thanks!
+     Xin
 
 
->
->> This is a function propertly, therefore it makes sense to me to put it
->> on devlink instance as devlink instance represents the function.
->> 
->> Another patchset that is most probably follow-up on this by one of my
->> colleagues will introduce fuid propertly on "devlink port function".
->> By that and the info exposed by this patch, you would be able to identify
->> which representor relates to which function cross-hosts. I think that
->> your question is actually aiming at this, isn't it?
->
->Maybe it's time to pay off some technical debt instead of solving all
->problems with yet another layer of new attributes :(
-
-What do you mean by this? We need a way to identify port representor
-(PF/VF/SF, does not matter which) and the other side of the wire that
-may be on a different host. How else do you imagine to do the
-identification of these 2 sides?
 
