@@ -1,146 +1,127 @@
-Return-Path: <netdev+bounces-184723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FE5DA97009
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:10:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D07DFA9703D
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9625E16CB72
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:09:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB72E189D21C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CB528F928;
-	Tue, 22 Apr 2025 15:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9422E28EA5E;
+	Tue, 22 Apr 2025 15:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWMaq0EX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1seoP+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3143028C5A1
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204B0EEBB;
+	Tue, 22 Apr 2025 15:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745334580; cv=none; b=VPIVMwbkKBT5zI6+9qMDVlKh9nDFv/nsM/JFe9GQdCkNsNxhqRK6udxiFbkgS+fnjm2D9Z6DC6TbYmi6VWhpdMNBleFxxnwFM52z06R5eq2QfM7KTpNCRwzXIUqz5v2HtldEEyCbteI6rcppDedKwMjQNEnTNdUh0lqZXbrv3P0=
+	t=1745334931; cv=none; b=OFt6RvxrgBAK1d1uH5ZuXbFMb7Pu1NRlLjSDGhtbqX82u9aRc8u4+oFCrW6oK4x5sdZI7bsjOqmaue8Rk6MdbD48UEK02BZ4ZmuBFJ9wiLUpWUl9wSUUF5Ri3IbcYwzki3c5l374K0uugZngZkqJV7ZOV6kxfQ/SIagb2UZOzbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745334580; c=relaxed/simple;
-	bh=u2pTJx0Ij+runOvsJmA0q5y9Kslc+OcE1AiOs4Q52gA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DFQr0XCyyN3m14V0QjTQpb7GR7CmBoTOmJ1qMKbqQcTCgPAqqsJZpvWt8tce4n8sM+OWnjiTfjU6O6+iqXgKcWN7KgErwkb7XI6E9yHt3F7hBDIzDlXJ4A2gg6P0GU5y3su3qMIuJK1VwONOtj3uIZ3FvlU2TmRGPffzUsFNVbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWMaq0EX; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3085f5855c4so4816311a91.1
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 08:09:36 -0700 (PDT)
+	s=arc-20240116; t=1745334931; c=relaxed/simple;
+	bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NQsLCmduvc+NTPoXud6xxbT3R6pkkO68nC2hEx3SnQz9w4JWDCgjHAtHxxf8Jzs71jbbgl5k11KiX+Xb+/Wz98N0WXbXr2Jnw0iQPqn1DrafS+kqIWm9MGXMi1vBDdimz7CFARG+2fKbzaw4POGZ2Qm+5GwKMBO7dD1WfCFN0pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1seoP+A; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-af8cb6258bcso239816a12.3;
+        Tue, 22 Apr 2025 08:15:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745334576; x=1745939376; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
-        b=fWMaq0EXfAG3BHE7JfR6uLKMHALt98SwgbMx8tUXl5+HBynuzfsocxXtiedr9Nk8II
-         O2IRJqJLxz5EQQxVg4I5U0EF4K6A9UD9yItB8uDzjYWmdW7pRZE4b+C+d0eDcteWuTpT
-         qRTHOOZw+sLPzWAzpg1e59N/tkjSYjpUO7VmF2LUmUzRaj+9u/iMsNn61MV1QM+0O2cA
-         +jl56znNd4NO2Z/VFmDHQJ6sI8ulRX2TDsOE1N1Jg1pPm2TrAEcdGyJchvr1Z9ky8A4+
-         P6zW13gfUAmeZ/FippT/ZJ8EAHk2QpCPCHOmOphlhJ7oWdZ+X8ixc7Y/q7hVsdfIyuhJ
-         AxbQ==
+        d=gmail.com; s=20230601; t=1745334929; x=1745939729; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
+        b=Z1seoP+AZVnbXBhyUfCB5LcGeR/jQwabr+dVjCbLXVgwwBtYX3fHEbWVrxb+z/VIor
+         /1KXQkom5I1Mqmzupqc7HjQr5Sg7ISLOO+YTkUboHFAatku/Li1/+XUEHh0cw4iev5I7
+         PS9yMJGIa7HF4+A8WxdaQipy/OtcpWE2HmytJSID++6qHYjDRqjX+W9nX2Dzw7e21H7v
+         3iokcj/DJ2ezKxBY2zidC+eHC20IgmAdc4Xh8hOG1VMgw15VYU6ILbHkBKt1IcMQC19r
+         tQEHi0rH8dQQ3Maa0OGycOcan6FwnNSIOqo/DJH7aS7PjMSkTdaJ5flA7THRVlM0aBx1
+         J9+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745334576; x=1745939376;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rRXArVhux4Bsw70YvwQ+lh5zlccYMqH0xPXNTi9FZ8g=;
-        b=q+dQ+RxeCa0AZr/bB/6T5YSRlAvd1t1ne+AgrrEYrC3k7d03OXHfy1DBeqrHLa8F2X
-         z/ehWgd6HuT3ia2aPu7qQB7D3mCIf4lew48AZHJQahJBRuUrMSNF6YbTKJLfRu2aF6Xt
-         fttRvlVCp7O5Tr3wP7oBEPVr7hiLXCSDBYdk3b+hyG87i5SwJH8rMBwMBPlHsc/IbRlg
-         z0Ls+pJZtCAcCC1zJkAL0aqJRmo60vTH5eymUDMpWTTTK0/uFZEKyRy49/7lkRdzvdcL
-         lrZEJQbpfxzchrkO7AqptqRt0qMkVhIh6useyADITlG1kHDbiVK/FE4xNXXW0mpGKVGn
-         NlLw==
-X-Forwarded-Encrypted: i=1; AJvYcCV96uWNjGBhKM0ev4NRMIzGN3i0uuwSEoVlGtTdzmJ6XvxDvcEwIbyG2YwJa5SIARFYbHhlN1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTVSZANoywNuEzginsLmNxoyck2plCJQldxVMpw5R389EljCzF
-	481IJ87nYj2X/EagzD7EPoIrwp0rW2DOh1E4UvO6d5RIKVmkW7IDNCB/oBvoZ5t1yKOkTtXqvc6
-	pGQ==
-X-Google-Smtp-Source: AGHT+IHGR6YFubcBkAQrqhkjsdDwq21aLEhFyH8uteoXFGo84CYqI3Y4PMerNLsX7Qx/XFlRMipUTrfnrN0=
-X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:2fc:2c9c:880])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecf:b0:2ff:692b:b15
- with SMTP id 98e67ed59e1d1-3087bbca3b0mr26039866a91.33.1745334576501; Tue, 22
- Apr 2025 08:09:36 -0700 (PDT)
-Date: Tue, 22 Apr 2025 08:09:34 -0700
-In-Reply-To: <20250422082216.1954310-11-xin@zytor.com>
+        d=1e100.net; s=20230601; t=1745334929; x=1745939729;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zZKF9nOH8sEPJErHTOsvwYFx9dUfb3L1BJmkI6VuiUo=;
+        b=r+DCZHJixW1FxhfWCpLsiremgsGnIf3NWJptAqcVdt6CktPMODu92KveFQjcc8wzjO
+         SAmRzk9bSimYGFSrcT5U/3p3dKi9I/NRy0AgQMKuFQdtk4hPM92Nv6z2dBf67YYGR9d7
+         pZvXaqEoPXM5rVUR2RRFeE446szAtvwV0KVF7Q460F3COq0oSr1bNTnl/hGjRtHw+6/I
+         l8v4BGTiRAVmBs0FE0/LGMMyZLf/yuyf6J72FpRnzC8gDkZ1lC3hxon45+t4/2+mBH2a
+         8f72ZRYP4tuktIwrqKPgHRm1JD47PR3TYXHkFytOvTkaJRxrVHF31Z6H9mYDrwKNCUcn
+         3WeA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8WoPXH7Ly5lHdsjLzD3BjhUdiLkXNiSIvRIxY/JvSpFo+kPMoDiCJXGeOSx+rCYre1tAgg4IRnBjCtrCb@vger.kernel.org, AJvYcCUbk6jUOADrQWGooGnCdGaowN/f52dCs0sm8u6u1dSIRnffBuxI+uq9YUVa3RcLtaBqgZw1IJ3xMirIZjE3CjTV@vger.kernel.org, AJvYcCUevxR7Ij5CySBz9r95QYMaQxRCQDeF5ld0jnxwO0Gb059dwTQk8Cn/E3roybov1VKMYHWFpPMDfU1A6bA=@vger.kernel.org, AJvYcCVtqx1wSdGvEaZrAQK+R1ZeaCxsQQUfli3Nm09aldhyTQ44ATI2X1In8HbC3by/CTtbc83gOvBiS/sD@vger.kernel.org, AJvYcCVymSz5SKJXWKsHsTdJlNS0fxYADwqvkKAwaFqOVw5tUrmrgekxF6XIgEouKytlrqOC+sKuBZhNvubBfBhuskA=@vger.kernel.org, AJvYcCWKgGM6Z007qiWPCPjpzMN9VDbE4tSoMbsc4msQgiWQ6uKcT9f8nosUyH2nCI9ENcJgBevrpsv1JTBz@vger.kernel.org, AJvYcCWOH0OKf/VsJ4z6o3vufLSv+qRFC2UNL8/pJJ5M+GDc6WX8caXYytMb1Ttz09eopP5Cj9BIFBmpfXHUytwM@vger.kernel.org, AJvYcCXViCqsSfu1rijaOTBgaKmZqlGH3yjGiWUFadRzCF49g1UON8ESzM/xf9yTPUlY0XlAC/6sZfuH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+lng6FjWA2ZOhYq7FnlJ1f2Wzgyb7voiCOODwmVWV8sfO/IWw
+	+U7z30+fE1/GJCEkxtIyLznKS1+hWB7534AHVH8tzP1MxwLGQHoJ5W66iJwSQB7ucIdrgAaD4I9
+	nKpNTY8NCBb26hMK3TkB8qP2ECYo=
+X-Gm-Gg: ASbGncuxu90GAftl1muSeiY+m6S59aO7p3e9MnfY78sEvaDHab+uDTTo/7OTRAApnHM
+	pOHa4/BkMN3vMVoP/x/Nhl/OVgfrbHLTjsgIKW9VvUV+I6LtuO7D4Krv1grES0TJDd3JnZ1G/2U
+	F3pgHvzQaBWQGayHsoN6prGQ==
+X-Google-Smtp-Source: AGHT+IEuT6KxYsdhSw5cCeMrUaqYdXW9YE/wChmli/G+cfCYNzLRiA7m7gmwaKew+OoBnqvuuEbFo8HJGHR2tvaOM7M=
+X-Received: by 2002:a17:90b:3501:b0:2ff:7970:d2b6 with SMTP id
+ 98e67ed59e1d1-3087bde06ddmr9204562a91.5.1745334929331; Tue, 22 Apr 2025
+ 08:15:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250422082216.1954310-1-xin@zytor.com> <20250422082216.1954310-11-xin@zytor.com>
-Message-ID: <aAexLqjhKncFyw2V@google.com>
-Subject: Re: [RFC PATCH v2 10/34] x86/msr: Convert __rdmsr() uses to
- native_rdmsrq() uses
-From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
-	linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org, 
-	jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org, 
-	namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, 
-	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, 
-	kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com, 
-	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com, 
-	pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, 
-	boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	decui@microsoft.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250416-ptr-as-ptr-v9-0-18ec29b1b1f3@gmail.com>
+ <20250416-ptr-as-ptr-v9-4-18ec29b1b1f3@gmail.com> <68014084.0c0a0220.394e75.122c@mx.google.com>
+ <CAJ-ks9muaNU9v2LZ5=cmfXV6R5AO+joNOoPP=+hs-GJN=APfKQ@mail.gmail.com>
+ <680160b8.050a0220.223d09.180f@mx.google.com> <CAJ-ks9=TXjk8W18ZMG4mx0JpYvXr4nwnUJqjCnqvW9zu2Y1xjA@mail.gmail.com>
+ <aAJrOV88S-4Qb5o0@Mac.home>
+In-Reply-To: <aAJrOV88S-4Qb5o0@Mac.home>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 22 Apr 2025 17:15:16 +0200
+X-Gm-Features: ATxdqUEzkXpfnBhiY7k29QsDY3HizJvfa3BhU5YB5Skka6eAvbENy4JVzwfqVy4
+Message-ID: <CANiq72meaJr5noasX+4p7r5BM1H4tCa33eLrsta00Vpk-cF7VQ@mail.gmail.com>
+Subject: Re: [PATCH v9 4/6] rust: enable `clippy::as_underscore` lint
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
+	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
+	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 22, 2025, Xin Li (Intel) wrote:
-> __rdmsr() is the lowest level primitive MSR read API, and its direct
-> use is NOT preferred.
+On Fri, Apr 18, 2025 at 5:09=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> w=
+rote:
+>
+> I'm leaning towards to 2 and then 3, because using `as` can sometimes
+> surprise you when you change the type. Thoughts?
 
-Doesn't mean it's wrong.
+Having explicit functions sounds good to me, and would also help
+migrating later easily to anything else (because all cases are
+explicitly tagged and easy to grep for).
 
-> Use its wrapper function native_rdmsrq() instead.
-
-...
-
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1547bfacd40f..e73c1d5ba6c4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -380,7 +380,7 @@ static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
->  	if (!vmx->disable_fb_clear)
->  		return;
->  
-> -	msr = __rdmsr(MSR_IA32_MCU_OPT_CTRL);
-> +	msr = native_rdmsrq(MSR_IA32_MCU_OPT_CTRL);
->  	msr |= FB_CLEAR_DIS;
->  	native_wrmsrq(MSR_IA32_MCU_OPT_CTRL, msr);
->  	/* Cache the MSR value to avoid reading it later */
-> @@ -7307,7 +7307,7 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
->  		return;
->  
->  	if (flags & VMX_RUN_SAVE_SPEC_CTRL)
-> -		vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
-> +		vmx->spec_ctrl = native_rdmsrq(MSR_IA32_SPEC_CTRL);
-
-And what guarantees that native_rdmsrq() won't have tracing?  Ugh, a later patch
-renames native_rdmsrq() => native_rdmsrq_no_trace().
-
-I really don't like this.  It makes simple and obvious code:
-
-	vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
-
-so much harder to read:
-
-	vmx->spec_ctrl = native_rdmsrq_no_trace(MSR_IA32_SPEC_CTRL);
-
-and does so in a way that is difficult to review, e.g. I have to peek ahead to
-understand that this is even ok.
-
-I strongly prefer that we find a way to not require such verbose APIs, especially
-if KVM ends up using native variants throughout.  Xen PV is supposed to be the
-odd one out, yet native code is what suffers.  Blech.
+Cheers,
+Miguel
 
