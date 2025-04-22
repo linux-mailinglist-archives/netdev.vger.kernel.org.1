@@ -1,206 +1,244 @@
-Return-Path: <netdev+bounces-184595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EAC7A96517
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:54:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85DFA9651B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B7B53BA077
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:54:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FCC77A6FE8
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2600D202C2F;
-	Tue, 22 Apr 2025 09:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758CE202F8B;
+	Tue, 22 Apr 2025 09:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C17oggqg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFu6p76u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614281F1524;
-	Tue, 22 Apr 2025 09:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861712036FA
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745315599; cv=none; b=HTljRKHcadpgs8qravi/JqNhdlNun6URUF4NhEwb0raVJO3kJWwDiguE4/VB6JLdMYrNLVjnHRLXZPvnmvayqtLARMppS3XWnQTQemvoEDoH8HFS9sTDjEi5aQDu/yw3MEX+g31jpwxUFKfVc1Itcc+lOJehiPvCRa540Q2PP9E=
+	t=1745315624; cv=none; b=iM9iLgrmVxGY/oVavjkIV8f+WwGOiBmcdEsWcXlk3772O3HnZCoMQAZ1Sr18nL/m5bY9/A0L/im7dRiVPGrBmUqanI2j/PZ7t7AB8a+4SDYuI0GQydl+XIEoJi3Tvuwjb/ZZncx+t9m+yoezRP/pumSujrj81rBHsvKstkHnE7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745315599; c=relaxed/simple;
-	bh=nQfvSQTk3q5Ln1Mb1BzF5AhQYYL5+U7RCTpig9HFDe8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wri/u2Xlu1nqFF+AtNNs8NVfv9dz423lmw2XdLJZLqoF0zqXt/zlQZRNnZsvxWNbdIjifbmZWnXjptyjxgeOaSRUqZOZRON+yifM20CEnhs/JweU2diI5vbR9hU7skoTkAKm+xfwkHydJMdrxRrjpRWzmADFXI4J/6JTWHMmrWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C17oggqg; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e8fce04655so46446166d6.3;
-        Tue, 22 Apr 2025 02:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745315595; x=1745920395; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yETBkW1U88nCu/gylpzqjgQQTBz7Y8uKO9OA9A9LFVE=;
-        b=C17oggqgFLQ+fFdy6yfDZlFLz3j+lMmYFGFZ14TdOEB5nWHjbdK5AWHTBmENeIdBYN
-         LU1I1pRKKQRfkhiuGHmBMzMa5+/8MW8fltu/Gig00rKE9pKDXCs5j8rHKhB+ksnQ5dLv
-         TNhpTyt5NOO6rKp82vnfvdx0v/mjdKT/NwGGPJ6htCdVZlqpH9HQIgdcaFTW9x0wJeZn
-         UD1Xd7BO+Het3UZIe41VAb0diPw+CDs6zelfzyPgwkzXIBWaCymqmAWgc6a0HmTHhN5j
-         0cb9LgeYvpv2hZeyVtR4gWDnG6/gAESXK+/6vLaayZrCXXv6axxSVTxYexbl+2Y9lddI
-         3pbg==
+	s=arc-20240116; t=1745315624; c=relaxed/simple;
+	bh=DCc3yBCsqdPNNY2uSU0prMZ58cy7dzH4+00lcq9cFhY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=kxg9mOnRQVKBkYplcLsY1WGpU0JxnoKyAIffjaF0fv7WzsLOgpZrzCwZIz5zo5oI3zL9zfS4oKNtXAhS46Q5KVSa0jLWIOq5Y5a5H/Zh8jYykj4dvgSBiKkOITrcnRZ0hMjwR4M6rnRL6tjIRNwr9pp2VtHqjLrgWb42OxoipEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BFu6p76u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745315621;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T+UqUh7siRWF1pR1SGVYCpepDRE8usjhEsgJtixBTFs=;
+	b=BFu6p76uSXYUA/NXLiJVQ3Vv/ZN7rzDPuHp2xdxWX3alHYvWGLaFIzBHf+hhY+8grpbTMU
+	fCQFNm0GdSwTlMTxfR1QxhZPEo2jj6ZkpQjgExQSxYd3qfVP8kHBO8qZ394bM4FdnMpJOb
+	RQogrDVw+zZyE8xS+N9xBLcWnYdH+ys=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-297-5NG_9w7EMrqtfI-G0uBCNA-1; Tue, 22 Apr 2025 05:53:39 -0400
+X-MC-Unique: 5NG_9w7EMrqtfI-G0uBCNA-1
+X-Mimecast-MFC-AGG-ID: 5NG_9w7EMrqtfI-G0uBCNA_1745315618
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so21350475e9.3
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 02:53:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745315595; x=1745920395;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yETBkW1U88nCu/gylpzqjgQQTBz7Y8uKO9OA9A9LFVE=;
-        b=CaMqHSbgdzefVnnZNExwzYJ6BMVAI3mZElpXP8Ch/tgYxnuqT/Vu2VF2OWN9G/y55F
-         Oa9F0dkYHDkj5ymOM10j1W7L2muP/wr31CNDGB0DEvwLTaoyL7uVtKa3U37DtYcCX2jL
-         IElvFxnvAGWOaQ1fT+BJ5vU6OMy9ZwBisCuJHxkbzRGvhs/Pq7Shdi5QA4+om+0jr0yR
-         FpOPTBCl7lZaGZ6wziIT2kpi9iBQLIZTKH3S+L1H2dXd6BF/NyFMSUO7niNdVrPHF258
-         eKidCn9X0Y8bos/Det+Kdiu5GcUuuZgUmzvr3u0MLkkXRS7/n6SMBXyunIk4KkefRGbo
-         3iLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIQm/3rFEIFM23Kh2jEvvmMv6j3lfRANyp2BmfrMmp8rmP/Vk4tX+bk2CMLdZf5OEljyaUukk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3u4eHSy7d+4i59QgiRWWVT26TP2cBxN284kP8U+cSjMj2Fbnc
-	KDXTFhLCjLhRFxH3ySY7c6ymfKU/dCMqfcdGPpewlyxfArD9lKGZMC8OboRKc/eumNz13B6zyIz
-	mU4Y760B04O8z6eZYf5MQjY31wDvTa3mhYRs=
-X-Gm-Gg: ASbGncupYb1kuneh6gj4/KFtvQzvHQCMPN7ydpRDE14zGQ63RReFzHNLFhvK98VowwM
-	BxS5M5fFdRCsvohGzVLK9RB5pe82Zpx8/xi6HllgkIwvPpvPbfAGPgQ1fbP1Lqb8fFNv045zEdK
-	Hqc0bJsHJQhvYw3v95jTqrNpde
-X-Google-Smtp-Source: AGHT+IG9EHPlaIkF6blMPd0BV9rfzA8PqWZ82hTSrVfZVaEAW3ZDFSX1gMGce2uY0p5zhrx5tpnS3xIvOwd//eopcMQ=
-X-Received: by 2002:ad4:5b83:0:b0:6e6:5f28:9874 with SMTP id
- 6a1803df08f44-6f2c45020bbmr259686826d6.2.1745315595118; Tue, 22 Apr 2025
- 02:53:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745315618; x=1745920418;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T+UqUh7siRWF1pR1SGVYCpepDRE8usjhEsgJtixBTFs=;
+        b=kCrWoPwCZSoCG6TLGaLlgDAlszFdriICJ2jZCS44FclDAf9cZkexQ4/Aq4MiRIYwNv
+         uENVJgPaw9aBvlZYEfxA6F1uGLsC51niYVKBa6lLl0jkJfFeGfsGxqqQt38XU94l8Ofx
+         koLi7gHG9GuayLlEAR+bEuBGm5WFmLI6yvBbulrZOKSgox1b3IFokymP8qZO5C7GX65b
+         QU+FdqImOitMd3YYKSaPfdr8fhuP2peTnz6mEL5u/gA3sccYeQQ64G1epb+gr3k9f/ET
+         wxljK+D/4X+M4JlJBaSTVglZkMU5cemURAaxVTddfqvFrbcieKxx+osmUThlyEOTdP8Y
+         nhyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMDNcmGqYPXeeeIXYcRkMNDEvTkRX5RWbJ1zYpR+iU01tzywmKttQSutjdbR2BijOk5uGV4xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4RaDZcqPFMLGCaKKSlghDdZ+UzUSf7cWXQD/QY03lJY5fGHUM
+	14LOJDcpDZWQa8O2RfLLajgLgR8HV2D8+qZRa6sUb6NTP0zfCTEz668MAAstBxSF7hlkXWFlJJp
+	Xc0uzbwl1JlGG4hzbcdYWCio2bCX99EtS/onNo/7m11A81wInjq5sAA==
+X-Gm-Gg: ASbGncv7JDoeN+A2R1DQN8AcAThCBvE+FH9NJBS4LNPQCHzRQZ9IMe76N45UG85DPml
+	lBke+a8dZ6Rz83vNFBYeswBhfEwsltssFQSYN71AUbtElTiCdTTLr4LpFECqbrFfbS4G0GnBIEY
+	SIdlOS5SGXVLQq0Rs8ddDKYFEBxXThWBUGqrsPAhGokIzPvGZy930N7UUk3ctnJbP0HRN9kc+n4
+	swwKNN/D36dp+tt3ZqA0mGo8au2xHy7wo+6JVWBVPmFaS/nSgyKHgGbTcVGrLHvyyA3PBYbw9dW
+	f1ottu0Y5bAuJR+q5OCOa4zk+Me+FM26zx9K
+X-Received: by 2002:a05:600c:34c1:b0:43d:fa58:81d3 with SMTP id 5b1f17b1804b1-4406ac227fbmr122446005e9.32.1745315618197;
+        Tue, 22 Apr 2025 02:53:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IELd9y2H3dCrtLmR1DIRKBH11l4OEmiZ2yNoBIf8u5QiIP6XTBXHDW0/0UXfmKoS/09wAj4Bg==
+X-Received: by 2002:a05:600c:34c1:b0:43d:fa58:81d3 with SMTP id 5b1f17b1804b1-4406ac227fbmr122445785e9.32.1745315617831;
+        Tue, 22 Apr 2025 02:53:37 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-86-8.dyn.eolo.it. [146.241.86.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43ce6bsm14756493f8f.55.2025.04.22.02.53.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Apr 2025 02:53:37 -0700 (PDT)
+Message-ID: <949655cd-4690-4513-a24e-7f1e035425b0@redhat.com>
+Date: Tue, 22 Apr 2025 11:53:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20250416101926eucas1p193c52e72b20321605905f1c465c8ac06@eucas1p1.samsung.com>
- <20250416101908.10919-1-e.kubanski@partner.samsung.com>
-In-Reply-To: <20250416101908.10919-1-e.kubanski@partner.samsung.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 22 Apr 2025 11:53:04 +0200
-X-Gm-Features: ATxdqUHbkAm8vm6z4FQF1hB3H-7aTHmuQlu_qulyA9dIL7lUpgWW_6X-1Tw_jEc
-Message-ID: <CAJ8uoz0Tap7JtQdoHFrXeE96XxUhJroZTPbCKhUeR3u3jzOWjA@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf] xsk: Fix race condition in AF_XDP generic RX path
-To: "e.kubanski" <e.kubanski@partner.samsung.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 net-next 1/5] Documentation: netlink: specs: tc: Add
+ DualPI2 specification
+To: chia-yu.chang@nokia-bell-labs.com, xandfury@gmail.com,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250415124317.11561-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250415124317.11561-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250415124317.11561-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 16 Apr 2025 at 12:19, e.kubanski <e.kubanski@partner.samsung.com> wrote:
->
-> Move rx_lock from xsk_socket to xsk_buff_pool.
-> Fix synchronization for shared umem mode in
-> generic RX path where multiple sockets share
-> single xsk_buff_pool.
->
-> RX queue is exclusive to xsk_socket, while FILL
-> queue can be shared between multiple sockets.
-> This could result in race condition where two
-> CPU cores access RX path of two different sockets
-> sharing the same umem.
->
-> Protect both queues by acquiring spinlock in shared
-> xsk_buff_pool.
->
-> Lock contention may be minimized in the future by some
-> per-thread FQ buffering.
->
-> It's safe and necessary to move spin_lock_bh(rx_lock)
-> after xsk_rcv_check():
-> * xs->pool and spinlock_init is synchronized by
->   xsk_bind() -> xsk_is_bound() memory barriers.
-> * xsk_rcv_check() may return true at the moment
->   of xsk_release() or xsk_unbind_dev(),
->   however this will not cause any data races or
->   race conditions. xsk_unbind_dev() removes xdp
->   socket from all maps and waits for completion
->   of all outstanding rx operations. Packets in
->   RX path will either complete safely or drop.
-
-Thanks Eryk.
-
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-
-> Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-> Fixes: bf0bdd1343efb ("xdp: fix race on generic receive path")
+On 4/15/25 2:43 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Introduce the specification of tc qdisc DualPI2 stats and attributes,
+> which is the reference implementation of IETF RFC9332 DualQ Coupled AQM
+> (https://datatracker.ietf.org/doc/html/rfc9332) providing two different
+> queues: low latency queue (L-queue) and classic queue (C-queue).
+> 
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > ---
->  include/net/xdp_sock.h      | 3 ---
->  include/net/xsk_buff_pool.h | 2 ++
->  net/xdp/xsk.c               | 6 +++---
->  net/xdp/xsk_buff_pool.c     | 1 +
->  4 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> index bfe625b55d55..df3f5f07bc7c 100644
-> --- a/include/net/xdp_sock.h
-> +++ b/include/net/xdp_sock.h
-> @@ -71,9 +71,6 @@ struct xdp_sock {
->          */
->         u32 tx_budget_spent;
->
-> -       /* Protects generic receive. */
-> -       spinlock_t rx_lock;
-> -
->         /* Statistics */
->         u64 rx_dropped;
->         u64 rx_queue_full;
-> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-> index 50779406bc2d..7f0a75d6563d 100644
-> --- a/include/net/xsk_buff_pool.h
-> +++ b/include/net/xsk_buff_pool.h
-> @@ -53,6 +53,8 @@ struct xsk_buff_pool {
->         refcount_t users;
->         struct xdp_umem *umem;
->         struct work_struct work;
-> +       /* Protects generic receive in shared and non-shared umem mode. */
-> +       spinlock_t rx_lock;
->         struct list_head free_list;
->         struct list_head xskb_list;
->         u32 heads_cnt;
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index 89d2bef96469..e2a75f3be237 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -337,13 +337,14 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp)
->         u32 len = xdp_get_buff_len(xdp);
->         int err;
->
-> -       spin_lock_bh(&xs->rx_lock);
->         err = xsk_rcv_check(xs, xdp, len);
->         if (!err) {
-> +               spin_lock_bh(&xs->pool->rx_lock);
->                 err = __xsk_rcv(xs, xdp, len);
->                 xsk_flush(xs);
-> +               spin_unlock_bh(&xs->pool->rx_lock);
->         }
-> -       spin_unlock_bh(&xs->rx_lock);
-> +
->         return err;
->  }
->
-> @@ -1724,7 +1725,6 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
->         xs = xdp_sk(sk);
->         xs->state = XSK_READY;
->         mutex_init(&xs->mutex);
-> -       spin_lock_init(&xs->rx_lock);
->
->         INIT_LIST_HEAD(&xs->map_list);
->         spin_lock_init(&xs->map_list_lock);
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 1f7975b49657..3a5f16f53178 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -87,6 +87,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
->         pool->addrs = umem->addrs;
->         pool->tx_metadata_len = umem->tx_metadata_len;
->         pool->tx_sw_csum = umem->flags & XDP_UMEM_TX_SW_CSUM;
-> +       spin_lock_init(&pool->rx_lock);
->         INIT_LIST_HEAD(&pool->free_list);
->         INIT_LIST_HEAD(&pool->xskb_list);
->         INIT_LIST_HEAD(&pool->xsk_tx_list);
-> --
-> 2.34.1
->
->
+>  Documentation/netlink/specs/tc.yaml | 144 ++++++++++++++++++++++++++++
+>  1 file changed, 144 insertions(+)
+> 
+> diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
+> index aacccea5dfe4..0fb971935285 100644
+> --- a/Documentation/netlink/specs/tc.yaml
+> +++ b/Documentation/netlink/specs/tc.yaml
+> @@ -816,6 +816,58 @@ definitions:
+>        -
+>          name: drop-overmemory
+>          type: u32
+> +  -
+> +    name: tc-dualpi2-xstats
+> +    type: struct
+> +    members:
+> +      -
+> +        name: prob
+> +        type: u32
+> +        doc: Current probability
+> +      -
+> +        name: delay_c
+> +        type: u32
+> +        doc: Current C-queue delay in microseconds
+> +      -
+> +        name: delay_l
+> +        type: u32
+> +        doc: Current L-queue delay in microseconds
+> +      -
+> +        name: pkts_in_c
+> +        type: u32
+> +        doc: Number of packets enqueued in the C-queue
+> +      -
+> +        name: pkts_in_l
+> +        type: u32
+> +        doc: Number of packets enqueued in the L-queue
+> +      -
+> +        name: maxq
+> +        type: u32
+> +        doc: Maximum number of packets seen by the DualPI2
+> +      -
+> +        name: ecn_mark
+> +        type: u32
+> +        doc: All packets marked with ecn
+> +      -
+> +        name: step_mark
+> +        type: u32
+> +        doc: Only packets marked with ecn due to L-queue step AQM
+> +      -
+> +        name: credit
+> +        type: s32
+> +        doc: Current credit value for WRR
+> +      -
+> +        name: memory_used
+> +        type: u32
+> +        doc: Memory used in bytes by the DualPI2
+> +      -
+> +        name: max_memory_used
+> +        type: u32
+
+Here and in other numeric fields you should probably want to use 'uint'
+type, that will allow either 32 or 64 bits integers depending on the
+actual value and will make possible overflows harder.
+
+> +        doc: Maximum memory used in bytes by the DualPI2
+> +      -
+> +        name: memory_limit
+> +        type: u32
+> +        doc: Memory limit in bytes
+>    -
+>      name: tc-fq-pie-xstats
+>      type: struct
+> @@ -2299,6 +2351,92 @@ attribute-sets:
+>        -
+>          name: quantum
+>          type: u32
+> +  -
+> +    name: tc-dualpi2-attrs
+> +    attributes:
+> +      -
+> +        name: limit
+> +        type: u32
+> +        doc: Limit of total number of packets in queue
+> +      -
+> +        name: memlimit
+> +        type: u32
+> +        doc: Memory limit of total number of packets in queue
+> +      -
+> +        name: target
+> +        type: u32
+> +        doc: Classic target delay in microseconds
+> +      -
+> +        name: tupdate
+> +        type: u32
+> +        doc: Drop probability update interval time in microseconds
+> +      -
+> +        name: alpha
+> +        type: u32
+> +        doc: Integral gain factor in Hz for PI controller
+> +      -
+> +        name: beta
+> +        type: u32
+> +        doc: Proportional gain factor in Hz for PI controller
+> +      -
+> +        name: step_thresh
+> +        type: u32
+> +        doc: L4S step marking threshold in microseconds or in packet (see step_packets)
+> +      -
+> +        name: step_packets
+> +        type: flags
+> +        doc: L4S Step marking threshold unit
+> +        entries:
+> +        - microseconds
+> +        - packets
+> +      -
+> +        name: min_qlen_step
+> +        type: u32
+> +        doc: Pacekts enqueued to the L-queue can apply the step threshold when the queue length of L-queue is larger than this value. (0 is recommended)
+
+Typo above, should likely be 'Packets'
+
+/P
+
 
