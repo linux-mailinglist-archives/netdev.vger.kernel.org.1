@@ -1,171 +1,188 @@
-Return-Path: <netdev+bounces-184828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FEAEA9763F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 21:57:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F178FA97675
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B73C16C117
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:57:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 025D81B600AE
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2240F298980;
-	Tue, 22 Apr 2025 19:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F4A298CD5;
+	Tue, 22 Apr 2025 20:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Gem/KGh/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdQudz1p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5882980A1
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 19:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A35D1D63C2;
+	Tue, 22 Apr 2025 20:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745351839; cv=none; b=Cj5YwXz1qY8mYFaoSn83wUsPuxxv23LeE/s5GIZPO4Yp3zi2U0Gq6pCqpqNPzlqVs/YA7/9gd1DzlYJ1110TtwBKd54KZPcMj593QZdZXS273OWOqOeodvr2zyG+eZsl5IVvTvepQzHEdVbGulayB8Lmu5zAQOjv+u1UYdMNQvQ=
+	t=1745352211; cv=none; b=OHFujGanj7vNY68PKaic31KMPjy7yHiqaXp34HSOQLFw8JvdYfH3kehFO8pleFlQUPXQPRcxBr1LJYJa81MgBpC8LlkGylS0OoPHK9OGHQDiq8Hx9FmuaLWg999xyBI5KuCXSje+M0IUI24o1BGpI3MebUOLDz7FmdaSiAEq1jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745351839; c=relaxed/simple;
-	bh=WJHka7iuLuH68LfF4yXHtBMkrb9iSbcghMlX8jPOgoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDaFwWqbubYds0eUBHNwsFNDqs09+kPyaNW7VtB2AeZxfh621S/B3NbeOIGAz5V5+3dPGaBZ23/mKkgxIplQj5JSSSsJ7UgyVRDo07+rBt997ndfVK9rNBK+eSheIw7ZxQftoIaLekJ0zL2P6B7ZfjQRp68ree7cP3rHrKiN/6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Gem/KGh/; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-224341bbc1dso55427805ad.3
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 12:57:15 -0700 (PDT)
+	s=arc-20240116; t=1745352211; c=relaxed/simple;
+	bh=flx1X1PjzPEns4chd4qdAsjn7Uq40UIGYu9K3jmqWtc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kAzP34Jo0+NIaZw/qfyDBlyZ34cUBC2oj6YhVGl6HdZB0VmxCdIDXziOJ3m1NPvGNn8iCjri92Ln6WPD9fALE04/w2XOT3ZUJzxRevpxYoa82LWW1eb2/jCybMRdpSDI8ShTpOzu5Ba/N/jSbwr37pw6scDhQ67Q8NbpCW45NbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdQudz1p; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a064a3e143so593275f8f.3;
+        Tue, 22 Apr 2025 13:03:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745351835; x=1745956635; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ge0GHHTU91a+LD/T9F4eD36zKBwLZ5OWIWjjLI6NmxQ=;
-        b=Gem/KGh/S+NrQs6GjEW2PDXZXO3bn0yjQV28GkByO4Ky0Aj1dZ08v3sq05Y4bj4lua
-         SDmYdv9Y8R3BM9sdbn3wQvJ2ijxOop47wNxUtPMddnAu/Eq1vPzGyGJDseLlt+EzPwbT
-         Fnk5D+8cyQv6ynwBZ1ckJNs4jfkVLq80aogFM=
+        d=gmail.com; s=20230601; t=1745352207; x=1745957007; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UKj7RHO7Q2wBMbkNPnOSKUZxAmZQvo37ML03ejRqDVw=;
+        b=kdQudz1pBFJT49QLKwT/YheepFl2ji6UOVJ2SYk974gd7rO/gOGopHTQH9EyFKdgW4
+         B/eKTRe2htUA45TzE1/KiMmgiXP1hhNdLaLqmqQS0/SkAcClTrUiY8UWoXl0l2SvxvEm
+         e+x21/409z/gLwULXYXwPhEoUGB0bFGdCQjBYqNA6+Oo91iQqPQgRgSFxtal7LZdCKjt
+         j+tfNaxs0gIbo9s+B+OmxMXMOEL34H4/bvDufQANn7uk99xwpXsOI36TKCiUT7tz0DwQ
+         qPuuV1fb2W7cyqb+8c2mOpeM4zM0xw4I7D1P0SbYKR9RxITasoAqJJlkJxXLi3h3ilLJ
+         vAsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745351835; x=1745956635;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1745352207; x=1745957007;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ge0GHHTU91a+LD/T9F4eD36zKBwLZ5OWIWjjLI6NmxQ=;
-        b=khKbFOr6E3vh8Apv0juHw/VL3IgvPbQacvIQGvRwbDzfCmWL4eo/X71EpMvgysNyQx
-         2pJ/jXHNYj4UFl09lbhyRHrT6qdBew4TezzN3/RVSnAyOLBvD+B/hIdJz5XnpqKmlkIS
-         VcTOxHwiY1GfcoLuy4eisMsRc1TJuzH1nDcwUtCPBXEdhOT6m/1GzBRQ84aM1lZLhb17
-         v/JKkK7kN45bKrLrkiGPZhszsTji4ZArWjkK5JEVe04ITGzjorKotiPdxQu/giJH+FwQ
-         OGt5ARndww7tySF1J0zDaP4WlHu7BlJ4BcGnSLyG26vREjORK3vl0Q4eOEy8wEeaEuo5
-         Mqkg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4ichjrqAWM+fgWYaqzQOeIZATokM9YDlMOtAHH9GGsOh8bLjRBAsGf6jCeOgQ9QvbZXjtsn0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAlElCeOO0dtiyg/+6R3LLAQ2UXsZOX0qjA+2qSeg92GaDZS58
-	KmIx/HcjuUPSSKua+5q0U0mAayDImlW3tIMn+OJHsPAMmDLUzm5XpeVRbitQ3JE=
-X-Gm-Gg: ASbGncsbEuxj9s9mctQx0/WsUtOqgnllzdWqidhO/4tllev37SMVbQj98e2L2A78s3u
-	zOQEsXU/dmJ/NocuTtPTeyq4+vINjXMlAg3GQxT4dTON/iNyf5fRmccp7nXMd6JSc0m2NCwryRC
-	kHPpcm1ID3MGpGXijmKd4ZUAYVIhPeVSdT0dEOY1KT7kl0qMlCdEiRru5oakKi6TTMkH9mydxOZ
-	KISEqthfLwOb6HngsrsyN1pLcxA39LWDnsdsv08gqsE4jArNaTf01T7iCHxCwTm739q3qRVxgIH
-	imrrUADR8JVobbDzUy1M+9lenS3nAGcZayjxfq/kJQtIe8FjOgPyz08vPrImD+INWT02w8aeAOd
-	v5u0n752wocMM
-X-Google-Smtp-Source: AGHT+IGsNxArdxzOP9mnPCPC+VWbU2kO/sN+4A5DBzKZ/DV66j37lHSy3/MwCvWry4OtA9kofLS9Yw==
-X-Received: by 2002:a17:902:ecc7:b0:224:1c1:4aba with SMTP id d9443c01a7336-22c53620d32mr233368065ad.50.1745351834726;
-        Tue, 22 Apr 2025 12:57:14 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50fe055fsm89414645ad.253.2025.04.22.12.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 12:57:14 -0700 (PDT)
-Date: Tue, 22 Apr 2025 12:57:11 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
-	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
-	dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 04/22] net: clarify the meaning of netdev_config
- members
-Message-ID: <aAf0lyGclY42Vux-@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
-	sdf@fomichev.me, almasrymina@google.com, dw@davidwei.uk,
-	asml.silence@gmail.com, ap420073@gmail.com, dtatulea@nvidia.com,
-	michael.chan@broadcom.com
-References: <20250421222827.283737-1-kuba@kernel.org>
- <20250421222827.283737-5-kuba@kernel.org>
+        bh=UKj7RHO7Q2wBMbkNPnOSKUZxAmZQvo37ML03ejRqDVw=;
+        b=SDGVoVJ5p1JXpv5xaCzlCpO2tZZ5M5sOgSpMsHSzva1AucxZftsliM0ghlRyanCKsZ
+         QiZwY9Bv3X2Wys+1jJkIl2jLXgAERXTjc2VVsZMLlOKtS3Yz9EnCd9jk5HjpyhQ6ZwmV
+         QRyrtqb93gtVHuBJPuY7v76TsIfkUHz6hNb+8LEbvNhS8Co/9XbYDlgnthNFQh2tUDzg
+         jPKSAavGdJhaqK/NXn1PqveJGm2DfJY+hfc5vL8jFGefsVjWypLT8sgGi65t2mD3b9OF
+         4NgZYSGMs52Ax/2FlFwYDqSxc6iPE19UHuZt6KsFaNcTlOE0IzoY/HDX9wXkuUjiV7X8
+         5LFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIRwenq5R3cxDnR7mHZIpPMMcTlA5Cov4vraYGWIvEa0lTouSzXUkBTEhjc1R/rQOUhyQDj0SkBw==@vger.kernel.org, AJvYcCVQqvkBNYERy562sFa8Q5e8fIggsl32dqUtH/SPcL9P/w6TvL/RiZ0/TfuFZFFBJ5ldcHxguLv31gs1D0c7@vger.kernel.org, AJvYcCVtAXa/m5SaF7E1K0KKN0IAlQmvs6svvw3iq1RJ8mTKrrDD9PpefE3wcSxTTPkdob7riIgA@vger.kernel.org, AJvYcCX3Aj5l1y129Rkh4HPsVcdftMErKNMKrsB5D/Db05P1UtPoszFGFXwFZ5Y1arLulHtOGXevQUQIT2Ab@vger.kernel.org, AJvYcCXNKSx/XcliFw6fXx92q0tYsC87z+wtrVVU6wjplOXl25Ax7UBfUe+4E4HpWjpOr1PTiLOG72crnDXBXCrZU7DW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzoahi49ahjIbjuNagMrEWIQDUyYbR9QYsD6cQXrwxGF3UCqXG2
+	7OJ46Eq0DVEBDZGdi8aKFvl1Vhh4nrsYyw3F5Yxf7XOxTUta/swf
+X-Gm-Gg: ASbGncvM5+FhiUe6Qda+SCrzkctI+hwTiEZdNCC/BM3tZrnjaNK/2w+4u24+aRCnzvB
+	2ChfIVrgAKAjbQg62kTjMV7FKeaYSBZKcMPATFWbtKUu5jBd8MeG0bmHe6aiK3OtDecdb9l4Vnl
+	hxRjMnn5RhpbUUsP6h7hDKRAI1LM91Q68nlYw9nFW9XB0FCMcQ80yhJiHhuLe23bYXzJELazaUg
+	h+YSsPC8XoyonsRYkhSeMn9KEB/4Rf7/Y059H+7unAOOROskQwzRdCp7Imij1ZLuV/OciqrG+oZ
+	VuLcoe1YOJcb9ImdypkdWi+LkSKra8dBrFx+V7ySodx+/CAQ
+X-Google-Smtp-Source: AGHT+IF+gc5hNP3PcfsbBN/YhSJuJTKdae8tm4WgIVh9uwA2+dAe4gQLce8qN+vp5i5Phgl0ysqOIA==
+X-Received: by 2002:a05:6000:4a11:b0:39c:dcc:f589 with SMTP id ffacd0b85a97d-39efba3d0d6mr13189843f8f.20.1745352207445;
+        Tue, 22 Apr 2025 13:03:27 -0700 (PDT)
+Received: from [192.168.8.100] ([85.255.235.90])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43319csm16518816f8f.38.2025.04.22.13.03.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Apr 2025 13:03:26 -0700 (PDT)
+Message-ID: <8c1c6405-1e60-4512-a675-4c00b00d400a@gmail.com>
+Date: Tue, 22 Apr 2025 21:04:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250421222827.283737-5-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 2/9] net: add get_netmem/put_netmem support
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
+ David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250417231540.2780723-1-almasrymina@google.com>
+ <20250417231540.2780723-3-almasrymina@google.com>
+ <484ecaad-56de-4c0d-b7fa-a3337557b0bf@gmail.com>
+ <CAHS8izPw9maOMqLALTLc22eOKnutyLK9azOs4FzO1pfaY8xE6g@mail.gmail.com>
+ <957b74ed-f29c-4bb8-b819-af4e1168d6c1@gmail.com>
+ <CAHS8izM8+zG6KOhV7ysTsCj_PEty5eL+P+uUxTZhdsOSZTwmow@mail.gmail.com>
+ <c0bd45f7-0325-4e4b-b0ea-ccae24a1eabd@gmail.com>
+Content-Language: en-US
+In-Reply-To: <c0bd45f7-0325-4e4b-b0ea-ccae24a1eabd@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 21, 2025 at 03:28:09PM -0700, Jakub Kicinski wrote:
-> hds_thresh and hds_config are both inside struct netdev_config
-> but have quite different semantics. hds_config is the user config
-> with ternary semantics (on/off/unset). hds_thresh is a straight
-> up value, populated by the driver at init and only modified by
-> user space. We don't expect the drivers to have to pick a special
-> hds_thresh value based on other configuration.
+On 4/22/25 20:47, Pavel Begunkov wrote:
+> On 4/22/25 19:30, Mina Almasry wrote:
+>> On Tue, Apr 22, 2025 at 11:19 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>>
+>>> On 4/22/25 14:56, Mina Almasry wrote:
+>>>> On Tue, Apr 22, 2025 at 1:43 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>>>>
+>>>>> On 4/18/25 00:15, Mina Almasry wrote:
+>>>>>> Currently net_iovs support only pp ref counts, and do not support a
+>>>>>> page ref equivalent.
+>>>>>
+>>>>> Makes me wonder why it's needed. In theory, nobody should ever be
+>>>>> taking page references without going through struct ubuf_info
+>>>>> handling first, all in kernel users of these pages should always
+>>>>> be paired with ubuf_info, as it's user memory, it's not stable,
+>>>>> and without ubuf_info the user is allowed to overwrite it.
+>>>>>
+>>>>
+>>>> The concern about the stability of the from-userspace data is already
+>>>> called out in the MSG_ZEROCOPY documentation that we're piggybacking
+>>>> devmem TX onto:
+>>>
+>>> Sure, I didn't object that. There is no problem as long as the
+>>> ubuf_info semantics is followed, which by extension mean that
+>>> any ref manipulation should already be gated on ubuf_info, and
+>>> there should be no need in changing generic paths.
+>>>
+>>
+>> I'm sorry I'm not following. skb_frag_ref is how the net stack obtains
+>> references on an skb_frag, regardless on whether the frag is a
+>> MSG_ZEROCOPY one with ubuf info, or a regular tx frag without a
+>> ubuf_info, or even an io_uring frag which I think have the
 > 
-> The two approaches have different advantages and downsides.
-> hds_thresh ("direct value") gives core easy access to current
-> device settings, but there's no way to express whether the value
-> comes from the user. It also requires the initialization by
-> the driver.
+> Yep
 > 
-> hds_config ("user config values") tells us what user wanted, but
-> doesn't give us the current value in the core.
+>> msg->ubuf_info like we discussed previously. I don't see the net stack
+>> in the current code special casing how it obtains refs on frags, and I
+>> don't see the need to add special casing. Can you elaborate in more
 > 
-> Try to explain this a bit in the comments, so at we make a conscious
-> choice for new values which semantics we expect.
+> You'll be special casing it either way, it's probably unavoidable,
+> just here it is in put/get_netmem.
 > 
-> Move the init inside ethtool_ringparam_get_cfg() to reflect the semantics.
-> Commit 216a61d33c07 ("net: ethtool: fix ethtool_ringparam_get_cfg()
-> returns a hds_thresh value always as 0.") added the setting for the
-> benefit of netdevsim which doesn't touch the value at all on get.
-> Again, this is just to clarify the intention, shouldn't cause any
-> functional change.
+>> detail what is the gating you expect, and why? Are you asking that I
+>> check the skb has a ubuf_info before allowing to grab the reference on
+>> the dmabuf binding? Or something else?
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  include/net/netdev_queues.h | 19 +++++++++++++++++--
->  net/ethtool/common.c        |  3 ++-
->  2 files changed, 19 insertions(+), 3 deletions(-)
+> get_page() already shouldn't be a valid operation for ubuf backed frags
+> apart from few cases where frags are copied/moved together with ubuf.
+> The frags are essentially bundled with ubuf and shouldn't exist without
+> it, because otherwise user can overwrite memory with all the following
+> nastiness. If there are some spots violating that, I'd rather say they
+> should be addressed.
 > 
-> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> index ea709b59d827..f4eab6fc64f4 100644
-> --- a/include/net/netdev_queues.h
-> +++ b/include/net/netdev_queues.h
-> @@ -6,11 +6,26 @@
->  
->  /**
->   * struct netdev_config - queue-related configuration for a netdev
-> - * @hds_thresh:		HDS Threshold value.
-> - * @hds_config:		HDS value from userspace.
->   */
->  struct netdev_config {
-> +	/* Direct value
-> +	 *
-> +	 * Driver default is expected to be fixed, and set in this struct
-> +	 * at init. From that point on user may change the value. There is
-> +	 * no explicit way to "unset" / restore driver default.
-> +	 */
-> +	/** @hds_thresh: HDS Threshold value (ETHTOOL_A_RINGS_HDS_THRESH).
-> +	 */
->  	u32	hds_thresh;
-> +
-> +	/* User config values
-> +	 *
-> +	 * Contain user configuration. If "set" driver must obey.
-> +	 * If "unset" driver is free to decide, and may change its choice
-> +	 * as other parameters change.
-> +	 */
-> +	/** @hds_config: HDS enabled (ETHTOOL_A_RINGS_TCP_DATA_SPLIT).
-> +	 */
->  	u8	hds_config;
->  };
+> Instead of adding net_iov / devmem handling in generic paths affecting
+> everyone, you could change those functions where it's get_page() are
+> called legitimately. The niov/devmem part of get/put_netmem doesn't
+> even have the same semantics as the page counterparts as it cannot
+> prevent from reallocation. That might be fine, but it's not clear
 
-Not your fault and not exactly related to this patch, but in general
-I found it a bit confusing that the two fields are different widths.
+Actually, maybe it's not that exclusive to netiov, same reallocation
+argument is true for user pages, even though they're reffed
+separately.
+
+It might be fine to leave this approach, while suboptimal it should
+be easier for you. Depends on how folks feel about the extra
+overhead in the normal tx path.
+
+-- 
+Pavel Begunkov
+
 
