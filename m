@@ -1,112 +1,102 @@
-Return-Path: <netdev+bounces-184765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E26A971D1
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:00:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61073A971D2
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD225440BA4
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:59:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5055E189FB6F
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D477E28FFF7;
-	Tue, 22 Apr 2025 15:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D664318D63A;
+	Tue, 22 Apr 2025 16:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9OhbOCG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WZ/9W/Vw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06AC28FFE7
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B602D179BD
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745337584; cv=none; b=JLNiCnasYQJ6/WceAotMzwjVJqVI1IY5zCnITWBDTDbunIh3aSO7R4jdF06lafkmzZZ9jt1D8dJfcB/1iD2akztJrSeEYypB4g2W5wWkE+YBElB0ZG/VTK/7VCQ1BRHAtWLSHwX9SN+0ey2nSTIyUlbTG9Qfaqp9dZzCq7+gXsE=
+	t=1745337622; cv=none; b=DUlbLC9oiEnWvGUDNcpPQwVx8jJmLTW0y+5sMG7WOKd+1fyR2N+a5TucGY+5XeiNlbqPgLaW6OcNcgPXyyFd+lJzNuGDrpRy5qMYR+02hOTK8Ae0ft/LWO+kZ37y4LhUsV48SeCNMQIlDMt2i6BuNyIR5AUyvRzEzsVj1i6RNqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745337584; c=relaxed/simple;
-	bh=qmjXZDeehc6+VqaGfMuHTX89SmLxYMBp7YUw/6wlzic=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kkcxB0LwjRs/oyBfX96rwLOnooIqzu0pT+uKG/wUoeTs/W2zbBTjsNqucwqJBWRo0CD/cKGrH+N+U8sTc/WfKvIe2tPhvfywlol28fr0iichMmDwgktJo89I93r5diiQJ2S2dEtkq7fxDCh+6AdiGyuGHi/K+iCUHjzMUEewr1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9OhbOCG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A764CC4CEE9;
-	Tue, 22 Apr 2025 15:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745337584;
-	bh=qmjXZDeehc6+VqaGfMuHTX89SmLxYMBp7YUw/6wlzic=;
-	h=From:Date:Subject:To:Cc:From;
-	b=b9OhbOCG5ZmDmCO1zAPiAhwgT+WRh9dK7dfjUclNkMddBCThfZw1+B5pSzVjxi8s5
-	 Jtq7VpINWOncN402VRE/azZWY9Sh1BrVKXVTa56jU/VBGDzbJhY7bCavIfIQZgh1tO
-	 Ot7S7gbyt7GFFTaiJbxvbbnDV0BgI8sUvp7OMYSqIylYjw1SdDZMzKfa9vzn9RYGBr
-	 ewo6Uy7D2aOnwTb6NoK4ITav2PIQ9BbAlEbti1mPQfnYeX1urMgLoQeM9UgV3HbzIK
-	 8EvTXwEPrYimE3QjEdfWsNgxWjA0QwyWfGEhkY5ylt7d1WlB6t4hH1ZOI/IPlxjJLQ
-	 jQ8fBQLTfwo6A==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 22 Apr 2025 17:59:23 +0200
-Subject: [PATCH net v3] net: airoha: Add missing filed to ppe_mbox_data
- struct
+	s=arc-20240116; t=1745337622; c=relaxed/simple;
+	bh=cihEAzrhQy74cbYbiQXNP4K5ybnIOndoAzao8J/JF+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVQSnx19a5LjPyqe6yWXs80MjY3xjUp/t4E5bSFFG8he7aMacrCSdhEti+I/cbHR+o3ZlAM6OTVVCmlD0mPqlQ/EbvqzglN+9VhTkWTaWbLHrqlDG4mUQ2G8EMXSFKghLTsbfJIg2J26dKMf+I8Wi6ySX7MExrT+r3hl8nFKfmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WZ/9W/Vw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=PZmCJqCHx8RPvrgcInv+cbQiftHXQ6sOW2pD0FbecrE=; b=WZ/9W/VwIklI3/NfX46Zne78Du
+	bmdjoTVCOiXJRz5DTdc4cFYwPmqWODry8uByzTzPLiuk+HI3U8TqC/6ZrJGVAAOQF3zRCbogMRhcQ
+	3f53jBywez8ovi3O/Fg7YIojioNARwXY8Va3Lx5Ew3T3eAdQW8L0MQwOiTzAAm3YJVaw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u7G2f-00AE3h-MJ; Tue, 22 Apr 2025 18:00:13 +0200
+Date: Tue, 22 Apr 2025 18:00:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled
+ and link down
+Message-ID: <156d5309-dc73-4ce0-9c26-48a3a28621dd@lunn.ch>
+References: <Z__URcfITnra19xy@shell.armlinux.org.uk>
+ <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
+ <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
+ <aAERy1qnTyTGT-_w@shell.armlinux.org.uk>
+ <aAEc3HZbSZTiWB8s@shell.armlinux.org.uk>
+ <CAKgT0Uf2a48D7O_OSFV8W7j3DJjn_patFbjRbvktazt9UTKoLQ@mail.gmail.com>
+ <aAE59VOdtyOwv0Rv@shell.armlinux.org.uk>
+ <CAKgT0Uc_O_5wMQOG66PS2Dc2Bn3WZ_vtw2tZV8He=EU9m5LsjQ@mail.gmail.com>
+ <aAdmhIcBDDIskr3J@shell.armlinux.org.uk>
+ <CAKgT0Uei=6GABwke2vv0D-dY=03uSnkVN4KnKuDR_DNfem2tWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250422-airoha-en7581-fix-ppe_mbox_data-v3-1-87dd50d2956e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIANq8B2gC/x2N0QqDMAwAf0XyvIBmdo79yhDJllTzYFtaEUH89
- 5U9Hhx3JxTNpgVezQlZdysWQ4X7rYHvwmFWNKkM1JJreyJky3Fh1DC4Z4feDkxJp/UTj0l4Y3Q
- P8R1JL34gqJWUtUr/w3u8rh+h5HTucQAAAA==
-X-Change-ID: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0Uei=6GABwke2vv0D-dY=03uSnkVN4KnKuDR_DNfem2tWg@mail.gmail.com>
 
-The official Airoha EN7581 firmware requires adding max_packet filed in
-ppe_mbox_data struct while the unofficial one used to develop the Airoha
-EN7581 flowtable support does not require this field.
-This patch does not introduce any real backwards compatible issue since
-EN7581 fw is not publicly available in linux-firmware or other
-repositories (e.g. OpenWrt) yet and the official fw version will use this
-new layout. For this reason this change needs to be backported.
+> For us to fit we are going to have to expand things quite a bit as we
+> need to add support for higher speeds, QSFP, QSFP-DD, FEC, BMC, and
+> multi-host type behavior at a minimum. I had more-or-less assumed
+> there was a desire to push the interface support up to 100G or more
+> and that was one motivation for pushing us into phylink. By pushing us
+> in it was a way to get there with us as the lead test/development
+> vehicle since we are one of the first high speed NICs to actually
+> expose most of the hardware and not hide it behind firmware.
+> 
+> That said,  I have come to see some of the advantages for us as well.
+> Things like the QSFP support seems like it should be a light lift as I
+> just have to add support for basic SFF-8636, which isn't too
+> dissimilar to SFF-8472, and the rest seems to mostly fall in place
+> with the device picking up the interface mode from the QSFP module as
+> there isn't much needed for a DA cable.
 
-Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v3:
-- resend targeting net tree
-- Link to v2: https://lore.kernel.org/r/20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org
+You should also get hwmon for the SFP for free. ethtool
+--dump-module-eeprom will need a little work in sfp.c, but less work
+than a whole MAC driver implementation. With that in place firmware
+upgrade of the SFP should be easy. And we have a good quirk
+infrastructure in place for dealing with SFPs, which all seem broken
+in some way. No need to reinvent that.
 
-Changes in v2:
-- Add more details to commit log
-- Link to v1: https://lore.kernel.org/r/20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org
----
- drivers/net/ethernet/airoha/airoha_npu.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..16201b5ce9f27866896226c3611b4a154d19bc2c 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -104,6 +104,7 @@ struct ppe_mbox_data {
- 			u8 xpon_hal_api;
- 			u8 wan_xsi;
- 			u8 ct_joyme4;
-+			u8 max_packet;
- 			int ppe_type;
- 			int wan_mode;
- 			int wan_sel;
-
----
-base-commit: c03a49f3093a4903c8a93c8b5c9a297b5343b169
-change-id: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
-
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+	Andrew
 
