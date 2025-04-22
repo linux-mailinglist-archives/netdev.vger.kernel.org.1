@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-184766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61073A971D2
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EE5A971D7
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5055E189FB6F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A193B14BD
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D664318D63A;
-	Tue, 22 Apr 2025 16:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDD527C859;
+	Tue, 22 Apr 2025 16:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WZ/9W/Vw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n7oFJI4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B602D179BD
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D24927815F
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745337622; cv=none; b=DUlbLC9oiEnWvGUDNcpPQwVx8jJmLTW0y+5sMG7WOKd+1fyR2N+a5TucGY+5XeiNlbqPgLaW6OcNcgPXyyFd+lJzNuGDrpRy5qMYR+02hOTK8Ae0ft/LWO+kZ37y4LhUsV48SeCNMQIlDMt2i6BuNyIR5AUyvRzEzsVj1i6RNqA=
+	t=1745337839; cv=none; b=HCFS5mr22YlZJF1MTMuR0KqM/UzPQ3QdrNiqNV5dZqxFSos5iuSLRX/HYTr0uZ5wv5PBcpF1G1cIT1amo+ssUDnoZD+bbNtpUYBTCOfxZGBPCoCYa8Y+8lzypaWrFxK9sNoaZ9PyHt+73/0ryL8i64dCfT8BFb/4jkiwf3/DuWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745337622; c=relaxed/simple;
-	bh=cihEAzrhQy74cbYbiQXNP4K5ybnIOndoAzao8J/JF+4=;
+	s=arc-20240116; t=1745337839; c=relaxed/simple;
+	bh=UNnhvLP7zIb5IJPg1Tnki+zvvtQrfIX980UlR7/FUfY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hVQSnx19a5LjPyqe6yWXs80MjY3xjUp/t4E5bSFFG8he7aMacrCSdhEti+I/cbHR+o3ZlAM6OTVVCmlD0mPqlQ/EbvqzglN+9VhTkWTaWbLHrqlDG4mUQ2G8EMXSFKghLTsbfJIg2J26dKMf+I8Wi6ySX7MExrT+r3hl8nFKfmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WZ/9W/Vw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PZmCJqCHx8RPvrgcInv+cbQiftHXQ6sOW2pD0FbecrE=; b=WZ/9W/VwIklI3/NfX46Zne78Du
-	bmdjoTVCOiXJRz5DTdc4cFYwPmqWODry8uByzTzPLiuk+HI3U8TqC/6ZrJGVAAOQF3zRCbogMRhcQ
-	3f53jBywez8ovi3O/Fg7YIojioNARwXY8Va3Lx5Ew3T3eAdQW8L0MQwOiTzAAm3YJVaw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u7G2f-00AE3h-MJ; Tue, 22 Apr 2025 18:00:13 +0200
-Date: Tue, 22 Apr 2025 18:00:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=fFfgNUOPkjKvZcn9XAdfGc8fAdSc1V+70BY0sNX3z+NnRb1EmPvEG4R2wZyaNuAAbw5MLHLGE+faIEcaTibA7gYeM8S0w2VVe+pVi0XD5qVrtDB4dtpeeyrkLtBI8SVy1Udx/O1YuiYxsuHJ64vAGfKUeiJu3/wa6UjxScshAr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=n7oFJI4W; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qJTeiDhJ/WU7DbPen9gCUpOHDGJpW9QAvy7lOs5acwQ=; b=n7oFJI4WqKOu9+eVmJtqHXOVB3
+	JTIVy23JI8bH8OPl6Mz309ZOVFRTYODek7sIIX9YFVW7Z+r6MHkHXPJ8mtDkGS1p0M2T0MGTti99k
+	Faa9DIsszbBqTzeRXUG/MyUS5G5FjtL9/Au3W3bjzFbeW6hEHUUM81B6a1W26v7/+BU1tyH/It2Qa
+	nHom0TZAiFC8pvGpSnGo9NrvXn5FRDAexrTT7VL4FkeizKRhyMPw9XSY5LFN+oUAY3koiZOXOAlj3
+	J6S8wOJYEioUn65n/JyR70aSXhE3HKaEB5r5xaVCUByXGWmEk0Cz90yTERtG3MCMWoyjuYoh3yjBg
+	/bDc9G1Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44004)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u7G69-0004hZ-2X;
+	Tue, 22 Apr 2025 17:03:49 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u7G66-0007bk-0A;
+	Tue, 22 Apr 2025 17:03:46 +0100
+Date: Tue, 22 Apr 2025 17:03:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mathew McBride <matt@traverse.com.au>
+Cc: Ioana Ciornei <ioana.ciornei@nxp.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled
- and link down
-Message-ID: <156d5309-dc73-4ce0-9c26-48a3a28621dd@lunn.ch>
-References: <Z__URcfITnra19xy@shell.armlinux.org.uk>
- <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
- <9910f0885c4ee48878569d3e286072228088137a.camel@gmail.com>
- <aAERy1qnTyTGT-_w@shell.armlinux.org.uk>
- <aAEc3HZbSZTiWB8s@shell.armlinux.org.uk>
- <CAKgT0Uf2a48D7O_OSFV8W7j3DJjn_patFbjRbvktazt9UTKoLQ@mail.gmail.com>
- <aAE59VOdtyOwv0Rv@shell.armlinux.org.uk>
- <CAKgT0Uc_O_5wMQOG66PS2Dc2Bn3WZ_vtw2tZV8He=EU9m5LsjQ@mail.gmail.com>
- <aAdmhIcBDDIskr3J@shell.armlinux.org.uk>
- <CAKgT0Uei=6GABwke2vv0D-dY=03uSnkVN4KnKuDR_DNfem2tWg@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, regressions@lists.linux.dev
+Subject: Re: [REGRESSION] net: pcs-lynx: 10G SFP no longer links up
+Message-ID: <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
+References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
+ <E1tJ8NM-006L5J-AH@rmk-PC.armlinux.org.uk>
+ <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,30 +75,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKgT0Uei=6GABwke2vv0D-dY=03uSnkVN4KnKuDR_DNfem2tWg@mail.gmail.com>
+In-Reply-To: <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> For us to fit we are going to have to expand things quite a bit as we
-> need to add support for higher speeds, QSFP, QSFP-DD, FEC, BMC, and
-> multi-host type behavior at a minimum. I had more-or-less assumed
-> there was a desire to push the interface support up to 100G or more
-> and that was one motivation for pushing us into phylink. By pushing us
-> in it was a way to get there with us as the lead test/development
-> vehicle since we are one of the first high speed NICs to actually
-> expose most of the hardware and not hide it behind firmware.
+On Fri, Apr 18, 2025 at 01:02:19PM +1000, Mathew McBride wrote:
+> #regzbot introduced: 6561f0e547be221f411fda5eddfcc5bd8bb058a5
 > 
-> That said,  I have come to see some of the advantages for us as well.
-> Things like the QSFP support seems like it should be a light lift as I
-> just have to add support for basic SFF-8636, which isn't too
-> dissimilar to SFF-8472, and the rest seems to mostly fall in place
-> with the device picking up the interface mode from the QSFP module as
-> there isn't much needed for a DA cable.
+> Hi Russell,
+> 
+> On Thu, Dec 5, 2024, at 8:42 PM, Russell King (Oracle) wrote:
+> > Report the PCS in-band capabilities to phylink for the Lynx PCS.
+> > 
+> 
+> The implementation of in-band capabilities has broken SFP+ (10GBase-R) mode on my LS1088 board.
+> The other ports in the system (QSGMII) work fine.
 
-You should also get hwmon for the SFP for free. ethtool
---dump-module-eeprom will need a little work in sfp.c, but less work
-than a whole MAC driver implementation. With that in place firmware
-upgrade of the SFP should be easy. And we have a good quirk
-infrastructure in place for dealing with SFPs, which all seem broken
-in some way. No need to reinvent that.
+Thanks for the report.
 
-	Andrew
+Please try the diff below:
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 1bdd5d8bb5b0..2147e2d3003a 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -3624,6 +3624,15 @@ static int phylink_sfp_config_optical(struct phylink *pl)
+ 	phylink_dbg(pl, "optical SFP: chosen %s interface\n",
+ 		    phy_modes(interface));
+ 
++	/* GBASE-R interfaces with the exception of KR do not have autoneg at
++	 * the PCS. As the PCS is media facing, disable the Autoneg bit in the
++	 * advertisement.
++	 */
++	if (interface == PHY_INTERFACE_MODE_5GBASER ||
++	    interface == PHY_INTERFACE_MODE_10GBASER ||
++	    interface == PHY_INTERFACE_MODE_25GBASER)
++		__clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, config.advertising);
++
+ 	if (!phylink_validate_pcs_inband_autoneg(pl, interface,
+ 						 config.advertising)) {
+ 		phylink_err(pl, "autoneg setting not compatible with PCS");
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
