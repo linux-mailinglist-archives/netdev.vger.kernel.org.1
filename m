@@ -1,112 +1,155 @@
-Return-Path: <netdev+bounces-184784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C46A97277
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:22:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41639A9728C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 18:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91B27188B984
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 571AF3AB008
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F18928FFDC;
-	Tue, 22 Apr 2025 16:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ED828FFDC;
+	Tue, 22 Apr 2025 16:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjLMOyso"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C458B28F527;
-	Tue, 22 Apr 2025 16:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA6529CE8;
+	Tue, 22 Apr 2025 16:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745338941; cv=none; b=C+tKkRfEMrnhcv+SSRsIETli8TvVYqNMegYeg1e5F4AWCBdwAP7o4wUygRqqe1CVGsqKFxq/HH+caUzXv8SDdhy1KH6aQJ0tRmthDyytQbyms8gE+SJ7uPFCQQrnX3s9Zc5DWVOp2Q3d3nJdUVoJx+vWavRsLlo0nreT2YhkU+c=
+	t=1745339006; cv=none; b=SKRbaBxUAizLCY/GTShDX7VmB3HXPSFPTBGKA2+hkm4RVM590lg+v2R0Jl6yWCl7g1gSHUiP2pFxwr0go05OIUFIoRBkKlZ2EWuwC4YU9XEnWbaleQUZf3wIsBilBGyEZVeKKbyTO6vWLbvbQka0z+wxLXB5Qy0NfiqHwzCiVQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745338941; c=relaxed/simple;
-	bh=6sSFpjU1Fyw2Y31zbfsq+JMfKLoYSLZv/cDvBMBaAEU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S2eEZ7KabilVZbFTPwBw1rCRNznsZVGZlK4jKv+6j6VWwwiDHnOCWe6YTzV98aNqsk7ASq4AE/wVOP/TOHtH4maBapY5GBYUgNpIUo0BjBpQw1ZoaOIQ069NMWyNZ1Hoooxk1UCKr3yM51YHqoOouPanyW+KlpX0FAuqIV0gHT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZhnT14KHFz6K9X0;
-	Wed, 23 Apr 2025 00:17:41 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 496321401F3;
-	Wed, 23 Apr 2025 00:22:13 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 22 Apr
- 2025 18:22:12 +0200
-Date: Tue, 22 Apr 2025 17:22:11 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v14 11/22] cxl: define a driver interface for HPA free
- space enumeration
-Message-ID: <20250422172211.00004d10@huawei.com>
-In-Reply-To: <20250417212926.1343268-12-alejandro.lucero-palau@amd.com>
-References: <20250417212926.1343268-1-alejandro.lucero-palau@amd.com>
-	<20250417212926.1343268-12-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1745339006; c=relaxed/simple;
+	bh=el03+wkT7G2QcB+cYa9PQdWkqikPRn2Ydhr4BlWOGIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CBTw5opXXeJJ6l8/KrZG0lV0ipAPaTkp5QcHpg8Yv2sBPXqkHr6GffLVgcbEazTs66i0wCFvsRUmCb1jd/BoLSO3AyCnIc5qD3aZwJfJOSSyyL8/cFEFqafWDH5TdvOuOvVtMKut8NoQveaxrUv6gZ+ke7J6BgCluOGeNlEwLS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjLMOyso; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA4D0C4CEED;
+	Tue, 22 Apr 2025 16:23:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745339005;
+	bh=el03+wkT7G2QcB+cYa9PQdWkqikPRn2Ydhr4BlWOGIw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UjLMOysolSc4V48hMrcN7AaQ+UhnfJEZiE6TH3niXOQApWPf0Kb8URGZSy18MZ6cY
+	 /ikHU7gEI7qqrvd9+ixLIOmppJINTxmNRpHWXXN2AGlZvhN4Z189aXQaf4AbNONkog
+	 Pbx7FXMAwfyO9OTWUeh4+NJuCIvbNrkXuF9XkNKAbJVuQ6jatWnZRnyxhqkmTPXlyn
+	 sXSjUTBwjKT0Sw2e4GPoDP2YX39IwBDdFB8gyzVMt+gyJ7sMe4dancoq0EolH5lu6H
+	 TvMTTdq4ReFQ1OCEbb/ZJ/BDZOZRgUmgULQBqMgsgT3kp1fNoyLkPle3C94QXeZVvA
+	 e6AR1oH/d2LjA==
+Date: Tue, 22 Apr 2025 17:23:18 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ij@kernel.org>
+Cc: chia-yu.chang@nokia-bell-labs.com, dsahern@kernel.org,
+	kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+	dave.taht@gmail.com, pabeni@redhat.com, jhs@mojatatu.com,
+	kuba@kernel.org, stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, ncardwell@google.com,
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com
+Subject: Re: [PATCH v4 net-next 09/15] tcp: accecn: AccECN option
+Message-ID: <20250422162318.GI2843373@horms.kernel.org>
+References: <20250417230029.21905-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250417230029.21905-10-chia-yu.chang@nokia-bell-labs.com>
+ <20250418183138.GE2676982@horms.kernel.org>
+ <8b6f580b-d682-91f7-f958-1806ee6e8bbe@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8b6f580b-d682-91f7-f958-1806ee6e8bbe@kernel.org>
 
-On Thu, 17 Apr 2025 22:29:14 +0100
-<alejandro.lucero-palau@amd.com> wrote:
-
-> From: Alejandro Lucero <alucerop@amd.com>
+On Fri, Apr 18, 2025 at 10:35:14PM +0300, Ilpo Järvinen wrote:
+> On Fri, 18 Apr 2025, Simon Horman wrote:
 > 
-> CXL region creation involves allocating capacity from device DPA
-> (device-physical-address space) and assigning it to decode a given HPA
-> (host-physical-address space). Before determining how much DPA to
-> allocate the amount of available HPA must be determined. Also, not all
-> HPA is created equal, some specifically targets RAM, some target PMEM,
-> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-> is host-only (HDM-H).
+> > On Fri, Apr 18, 2025 at 01:00:23AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
+> > 
+> > ...
+> > 
+> > > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > 
+> > ...
+> > 
+> > > @@ -766,6 +769,47 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+> > >  		*ptr++ = htonl(opts->tsecr);
+> > >  	}
+> > >  
+> > > +	if (OPTION_ACCECN & options) {
+> > > +		const u8 ect0_idx = INET_ECN_ECT_0 - 1;
+> > > +		const u8 ect1_idx = INET_ECN_ECT_1 - 1;
+> > > +		const u8 ce_idx = INET_ECN_CE - 1;
+> > > +		u32 e0b;
+> > > +		u32 e1b;
+> > > +		u32 ceb;
+> > > +		u8 len;
+> > > +
+> > > +		e0b = opts->ecn_bytes[ect0_idx] + TCP_ACCECN_E0B_INIT_OFFSET;
+> > > +		e1b = opts->ecn_bytes[ect1_idx] + TCP_ACCECN_E1B_INIT_OFFSET;
+> > > +		ceb = opts->ecn_bytes[ce_idx] + TCP_ACCECN_CEB_INIT_OFFSET;
+> > > +		len = TCPOLEN_ACCECN_BASE +
+> > > +		      opts->num_accecn_fields * TCPOLEN_ACCECN_PERFIELD;
+> > > +
+> > > +		if (opts->num_accecn_fields == 2) {
+> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > > +				       ((e1b >> 8) & 0xffff));
+> > > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
+> > > +				       (ceb & 0xffffff));
+> > > +		} else if (opts->num_accecn_fields == 1) {
+> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > > +				       ((e1b >> 8) & 0xffff));
+> > > +			leftover_bytes = ((e1b & 0xff) << 8) |
+> > > +					 TCPOPT_NOP;
+> > > +			leftover_size = 1;
+> > > +		} else if (opts->num_accecn_fields == 0) {
+> > > +			leftover_bytes = (TCPOPT_ACCECN1 << 8) | len;
+> > > +			leftover_size = 2;
+> > > +		} else if (opts->num_accecn_fields == 3) {
+> > > +			*ptr++ = htonl((TCPOPT_ACCECN1 << 24) | (len << 16) |
+> > > +				       ((e1b >> 8) & 0xffff));
+> > > +			*ptr++ = htonl(((e1b & 0xff) << 24) |
+> > > +				       (ceb & 0xffffff));
+> > > +			*ptr++ = htonl(((e0b & 0xffffff) << 8) |
+> > > +				       TCPOPT_NOP);
+> > > +		}
+> > > +		if (tp)
+> > > +			tp->accecn_minlen = 0;
+> > 
+> > Hi,
+> > 
+> > I'm sorry if this is a false positive: Smatch flags that here we assume
+> > that tp might be NULL, while elsewhere in this function tp is dereferenced
+> > unconditionally. So my question is, can tp be NULL here?
 > 
-> Wrap all of those concerns into an API that retrieves a root decoder
-> (platform CXL window) that fits the specified constraints and the
-> capacity available for a new region.
+> Hi Simon,
 > 
-> Add a complementary function for releasing the reference to such root
-> decoder.
+> Thanks for taking look!
 > 
-> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> This looks a false positive. It's because tcp_options_write() is shared by 
+> the handshake and established connections. A direct caller from the 
+> handshake path passes NULL as tp:
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> 	tcp_options_write(th, NULL, tcp_rsk(req), &opts, &key);
+> 
+> The thing that smatch doesn't know is that some TCP options are not going 
+> to be present during handshake. Those code paths that only deal with 
+> options that are for an established connection can assume full sk/tp has 
+> been already instantiated so they don't need to check tp. In addition, 
+> some funcs tcp_options_write() calls to make the opposite check by 
+> checking tcprsk instead but it has the same effect.
 
-> +	/*
-> +	 * None flags are declared as bitmaps but for the sake of better code
-> +	 * used here as such, restricting the bitmap size to those bits used by
-> +	 * any Type2 device driver requester.
-
-I'd just drop the comment as it's more confusing than helpful.
-
-If you really want something then perhaps.
-
-	* Flags are single unsigned longs. As CXL_DECODER_F_MAX is less than
-	* 32 bits the bitmap functions may be used.
-
-> +	 */
-> +	if (!bitmap_subset(&ctx->flags, &cxld->flags, CXL_DECODER_F_MAX)) {
-> +		dev_dbg(dev, "flags not matching: %08lx vs %08lx\n",
-> +			cxld->flags, ctx->flags);
-> +		return 0;
-> +	}
-
-
+Thanks for checking, I appreciate you clarifying this.
 
