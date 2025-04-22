@@ -1,144 +1,139 @@
-Return-Path: <netdev+bounces-184688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E64A96DE4
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:05:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137FBA96DE8
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37DC73A4EA0
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F257161C8E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACBE522D7B9;
-	Tue, 22 Apr 2025 14:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7286281345;
+	Tue, 22 Apr 2025 14:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="diHRM3SS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIAfQZL9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC3A2820B0
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 14:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827A6280A3A
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 14:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745330622; cv=none; b=jbRxUA+EhpgJmmx5W89GRyAbOoIhc0JW7c1LbTAsQTiUN1msfA8ylJaZTE0vwOuypxw+10i7ciC+PIRg3EwEFNmSkL5Ph537nHbA1bAYxp8i5OuVZEZApRWylkvdT2mh7m1gTRacMMIPItHrs5dw2ZYc6kr7l5s0DCwLVSaPKIQ=
+	t=1745330787; cv=none; b=PHmWXhMGny87yLI1xEZHp6C08wcBslFI4J5r2oNldoXDXYj77uVQQywitviTfRTkchxLteepFEEv2a7veoiAVjTdYK8pwE1pH5EFVGl2hEu/2HGclA/bReVsBKYrjOVyTyw/oI/G3urU6hZfIaOW0y9lANmlkTaJiqgiYhP8qpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745330622; c=relaxed/simple;
-	bh=DI5wbiqZFhNjcg4g07wsE2rRpyR+Bg6kHqEcrbHze4Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iY4cBDbujO+Nes4MsZboMvTUdbOvh9Zmds2NldWNaozShYXrDh1kkGlpfTFO1dn2JB80MoH9zOv22qbuTgIdrHhbben9l5qxMwRF6E6S6WqK7Z5EVebbN7yCNqcElgyvAm827sQ4pSB35X+VCIJJyGMyS1GKPqIQ7aDLD5ZoC2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=diHRM3SS; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2240aad70f2so182685ad.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 07:03:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745330620; x=1745935420; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxtxQ2q5f2CesvMzHl2K/43Dvf+KKs8Sp+BtzyImVRI=;
-        b=diHRM3SSYX1rhVTrFh85dMgmHNY8sO2ecyPwPFFxn5sQbKf8uyHGCTCokaasiZyg6F
-         VKxRmeoGqd8z3gNfYfdYx9nRIt0sO2m4rZspMiU89vOTce8M36DF/iBjf+yUOw63OKP3
-         hITordz6p0dyt9ILX6PjDqmdftBpNagsZ2+9Q43sianlor0YDckrxv6UHr73LrRP40nl
-         0RhaPUqvIJhdfxVTKdVpFekbtxJ6p6mBz3v5CgPtgZJFLkFtAW0VeT+gmLV9s0iEgJ0l
-         8gyzbdup2vQ5J4dKQketbtzn+Miv5FOylJYS/7yQo/70s3oaoMk8nilN940PIjwG8SKq
-         /+mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745330620; x=1745935420;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wxtxQ2q5f2CesvMzHl2K/43Dvf+KKs8Sp+BtzyImVRI=;
-        b=dQdcX0sbdBnMxwDM0G5njDLECysEjYkGOESgUIp5ss55HXDYgIm6uHvgXt8/SmQf4/
-         AHpztoSKTVWC4E6iMd5uebgx+tRX4ade1VF4X3eAsFKV8W0TP3U/q5+tnLh7WWmK/hF5
-         7D3WxYfTtMzMO8jh13sHgkZG4Qnp7vZpJnH9qaTsSYmo/+sNuQlhByJCFgDaoxgyM16J
-         e6qyHZyvZE1W5uMZMacqCA9HRA2FC/eqgKj8VR4J7ts8Gdeea90T1BrXEyJAa51jfGaV
-         qk92XgpwnMfx1dXvvoN4Me3S68oxbCMXyTmPRB2AoHwkwucXyp0ZDzo3Zn4MAc0/gJP1
-         6o0Q==
-X-Gm-Message-State: AOJu0YwMXG7EZMN4IvHGXywgAmP0w6i6fLLygJSHEPRKleasE8BaxDfC
-	eG0oZ7y8Og5OvFJSoGI/E79Xh+PZKI68bcWS+yBMcfcJ6RPhUB2981SFLjJH4PICi5bm2RUSq0V
-	AVdXkPaZm2BTNFckTREvXqgEsG/wBmfkuj4Fw
-X-Gm-Gg: ASbGnctsjK37ATtq/O9AizGQcdBKxk413/cGpIkFuwtbPEwQmWTmMtxuZQkwJuzebfF
-	hcrKROPtTNxiHB/W7iU6V+kTHyV+QbWZwWXm6bIL9tvzUmsh4iylDBRIWXYt0sPzV5V/tKpnTy+
-	3cMBrJH7cHeMMevqhmlcm8PwKHgejyAw/eng==
-X-Google-Smtp-Source: AGHT+IG0i+651pdR53K0l/n7uIQCSuRiQEGLD3Fi7ND1TmWV2npssXiwnzzo30HBpgP42jyUy2IALw8wxWFt/Kz8RzE=
-X-Received: by 2002:a17:902:ebc3:b0:22c:33b4:c2ed with SMTP id
- d9443c01a7336-22c52a93c28mr10089535ad.26.1745330619867; Tue, 22 Apr 2025
- 07:03:39 -0700 (PDT)
+	s=arc-20240116; t=1745330787; c=relaxed/simple;
+	bh=CtaCG5SyvKvnVAPK00rPM/KJJLyNDvl8auFq2J3k/uI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CW8mGZIuroAUbt0tQSNjRy3EnMEG6rO0bEtw/HjG6rIiayD2uV+erOxWj+roYtOwHnCd6yvm8hvfYP5WUULdioA92IaeDo8ESIKLS26e62Ci7uhi1rTHZEH2QdCVMnyJGRHvd5nwe6FAj3L6deXzlCSgFNkqQjVx+WfEq1vCtLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIAfQZL9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B234C4CEEA;
+	Tue, 22 Apr 2025 14:06:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745330786;
+	bh=CtaCG5SyvKvnVAPK00rPM/KJJLyNDvl8auFq2J3k/uI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IIAfQZL9fQgIfVIGb0L9ht0MjiVsLAwWs9upaZ8fPknu9hkZ/Fpw39X1DIHFrns2N
+	 ton2sut5F9fVzE0DRdGq7Ttg9SlsZvctgTjhkrYO0fYxa+16zux23IRSSWHahBRSTM
+	 jS4jnzjWixltEPMyjFfl5KWaKEP8GCN5XK/8wDUsdsTlcI9kxwofJgkkvrGC0UXezq
+	 ui2dUhoX4QuT9ZTKPb6N9p5vdOhIOaZ4/IHpLgDDuQewy6B8Lw+J90LvcAn7mFUjy7
+	 CiG6ENvTtRZK2eto871T7K3Hq7i2qVJCspWKQPaS+0fpl0QOeykexE0Ff5ohp16a/9
+	 dC0K1Kdh4ghhA==
+Date: Tue, 22 Apr 2025 16:06:24 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v2] net: airoha: Add missing filed to
+ ppe_mbox_data struct
+Message-ID: <aAeiYFIIOyTVvMhw@lore-desk>
+References: <20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org>
+ <20250421183610.7bad877c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417231540.2780723-1-almasrymina@google.com>
- <20250417231540.2780723-2-almasrymina@google.com> <f7a96367-1bb0-4ed2-8fbf-af7558fccc20@gmail.com>
-In-Reply-To: <f7a96367-1bb0-4ed2-8fbf-af7558fccc20@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 22 Apr 2025 07:03:26 -0700
-X-Gm-Features: ATxdqUHgiM0jEZwKYWOLJlVXJ7i1N-PNg4kE-n9ns-g62S6RZ7kqQTTDhmeVqPw
-Message-ID: <CAHS8izMFxDG5E07ZdqnDH_2D_g1fW8X0M7u3gGyV8efzxDNZbg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 1/9] netmem: add niov->type attribute to
- distinguish different net_iov types
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="YKyKny5ZTTWVilj9"
+Content-Disposition: inline
+In-Reply-To: <20250421183610.7bad877c@kernel.org>
+
+
+--YKyKny5ZTTWVilj9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 22, 2025 at 1:16=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 4/18/25 00:15, Mina Almasry wrote:
-> > Later patches in the series adds TX net_iovs where there is no pp
-> > associated, so we can't rely on niov->pp->mp_ops to tell what is the
-> > type of the net_iov.
->
-> That's fine, but that needs a NULL pp check in io_uring as well,
-> specifically in io_zcrx_recv_frag().
->
+> On Thu, 17 Apr 2025 11:30:47 +0200 Lorenzo Bianconi wrote:
+> > The official Airoha EN7581 firmware requires adding max_packet filed in
+> > ppe_mbox_data struct while the unofficial one used to develop the Airoha
+> > EN7581 flowtable support does not require this field.
+> > This patch does not introduce any real backwards compatible issue since
+> > EN7581 fw is not publicly available in linux-firmware or other
+> > repositories (e.g. OpenWrt) yet and the official fw version will use th=
+is
+> > new layout. For this reason this change needs to be backported.
+> >=20
+> > Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+>=20
+> I'm not sure I agree with this fixes tag. The fixes tag should point=20
+> to the earliest commit where any problem may be visible. IIUC you're
+> targeting net-next because the structure is not used in net. So the
+> Fixes tag should also point to some commit in net-next...
+> If we leave it as is after the merge window stable bot will pull this
+> commit into 6.15 for no good reason.
 
-I think you mean this update in the code:
+Hi Jakub,
 
-if (!niov->pp || niov->pp->mp_ops !=3D &io_uring_pp_zc_ops ||
-    io_pp_to_ifq(niov->pp) !=3D ifq)
-return -EFAULT;
+actually the commit below is even present in the net tree. Since this is
+required to work with the official airoha firmware, I guess I should repost
+targeting net with the same Fixes tag. Agree?
 
-Yes, thanks, will do.
+Regards,
+Lorenzo
 
-> You can also move it to struct net_iov_area and check niov->owner->type
-> instead. It's a safer choice than aliasing with struct page, there is
-> no cost as you're loading ->owner anyway (e.g. for
-> net_iov_virtual_addr()), and it's better in terms of normalisation /
-> not unnecessary duplicating it, assuming we'll never have niovs of
-> different types bound to the same struct net_iov_area.
->
+commit 23290c7bc190def4e1ca61610992d9b7c32e33f3
+Author: Lorenzo Bianconi <lorenzo@kernel.org>
+Date:   Fri Feb 28 11:54:20 2025 +0100
 
-Putting it in niov->owner->type is an alternative approach. I don't
-see a strong reason to go with one over the other. I'm thinking there
-will be fast code paths that want to know the type of the frag or skb
-and don't need the owner, so it will be good to save loading another
-cacheline. We have more space in struct net_iov than we know what to
-do with anyway.
+    net: airoha: Introduce Airoha NPU support
 
+    Packet Processor Engine (PPE) module available on EN7581 SoC populates
+    the PPE table with 5-tuples flower rules learned from traffic forwarded
+    between the GDM ports connected to the Packet Switch Engine (PSE) modul=
+e.
+    The airoha_eth driver can enable hw acceleration of learned 5-tuples
+    rules if the user configure them in netfilter flowtable (netfilter
+    flowtable support will be added with subsequent patches).
+    airoha_eth driver configures and collects data from the PPE module via a
+    Network Processor Unit (NPU) RISC-V module available on the EN7581 SoC.
+    Introduce basic support for Airoha NPU module.
+   =20
+    Tested-by: Sayantan Nandy <sayantan.nandy@airoha.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
---
-Thanks,
-Mina
+> --=20
+> pw-bot: cr
+
+--YKyKny5ZTTWVilj9
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaAeiYAAKCRA6cBh0uS2t
+rN+8AP9R7ZHRbO9irHC1fwakaSHs5lzuYIjCukAlC/qJVgOUjQD+KJmJnJP+PiRc
+SoY+YA56aAOCed+gPMr7Tp3/vOmWlA4=
+=wyH7
+-----END PGP SIGNATURE-----
+
+--YKyKny5ZTTWVilj9--
 
