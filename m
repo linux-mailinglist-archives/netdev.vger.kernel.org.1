@@ -1,85 +1,181 @@
-Return-Path: <netdev+bounces-184480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88648A95A8A
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 03:36:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFE48A95A98
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 03:44:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 478977A9D05
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 01:35:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 706C07A3120
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 01:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F1213212A;
-	Tue, 22 Apr 2025 01:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4042E18A6C1;
+	Tue, 22 Apr 2025 01:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYQau24O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FxR+++a5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055E1134BD
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 01:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F82134BD;
+	Tue, 22 Apr 2025 01:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745285772; cv=none; b=qYRmV8nQ4R0xuG1rBtmvQgEoOCKvTN834gsRK2Pt4Vm8ldhscZABlO4yYOM3SigTpcjrsW+aFmVcu67/GWdHNrsIVe6wSA72YtihyRsNefO9q5Lf7d8izagQdsD2qumX1cOWMGqEux3361T4EjLdQ90kBMT2Kgo2xTW/ATm+ygE=
+	t=1745286271; cv=none; b=GBZRxydPzeR/5Vv+LW5iYACV6zPxwyy0MlPUccHIPRnnlBPaPaznqCf2EOUd8SbOAEXIMu2GXDdztjg0DL/ZHC55ssKWpVWz4YudO2LvHKMe1xO8SjrQtXc75zddhGAZ8JYIURN5cLuNkA/q3a3GJeo1GKwg9DO4/vbJh7FbwZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745285772; c=relaxed/simple;
-	bh=jaSaaz4fD7gmy5u/L+9Ywg1JbN6BK11zXKoZ4GqzkRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DLDwn/60B49nzL21pRpUCZFj3KX1kQxNXzAMhUGX4dyl60V+x6+Ayat+OA2skSkAjrwWrfIbQFCs/MBE4yvFSZf+hIWtfg/5f1gwv3IBZX42/49lVFFB8rRLPakNuuA8buVc9RY59zE0CNlf8d48q2NdWNP0vly4kiBfnmWgPXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYQau24O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A678C4CEE4;
-	Tue, 22 Apr 2025 01:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745285771;
-	bh=jaSaaz4fD7gmy5u/L+9Ywg1JbN6BK11zXKoZ4GqzkRg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gYQau24O5eGvmuufDN0rW0XBs9GPjVVDtpPYw/mZeJsyIofS5cjPRsvIhuiwoO3R9
-	 B3k6pTHPt0XMREAyEL1xd1ZuOLIObVNsgF9vgDzFu3VzvB3WZuY50qo9blGBwBM+8+
-	 FQpN8Hy/a6+wIkf/xMN4YI0QNg/VQb12oOJLk8E/cAyhJpyqx0ZGJdGF7xJ5fgN5VS
-	 zxwWDsX7xCRIKCJocSEOYiDXm16TunVszZc6rZE2VcPkkp84Nit+meTPkrajJ42XGd
-	 j3EgOGeCn/Ufuwgq8uWWXckstGmlqVZZQQ9tmEm2n8gTuv1LAar7ei9DkWPSS4kDa/
-	 v7ZVSYrH7o9hA==
-Date: Mon, 21 Apr 2025 18:36:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net-next v2] net: airoha: Add missing filed to
- ppe_mbox_data struct
-Message-ID: <20250421183610.7bad877c@kernel.org>
-In-Reply-To: <20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org>
-References: <20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org>
+	s=arc-20240116; t=1745286271; c=relaxed/simple;
+	bh=JY1g3/MhFC5jdUryaepPudN/DdnY5dop8+gFTmOow00=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iQwSc66+Zfxpeer6KFcOywywcBk9F5cNgDoGS7lsBn1JFu5a7zgY3vmk7OT8iPvExQ5R1LVDNh9Y2W8d+rxE+3DfQQCZ5FluUL6ETxx3TvJ0s2vCG+hRmOA6K5+BzOpz2R5fUz4Y2i08AlmBiPRUMdlQs7xbTcq0RaO+LVTTmq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FxR+++a5; arc=none smtp.client-ip=209.85.208.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5f62ef3c383so5806529a12.2;
+        Mon, 21 Apr 2025 18:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745286268; x=1745891068; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4h4TbY8Znfe/dR8gB7rAZNuUR7bnGOkg0xdG1pb23lI=;
+        b=FxR+++a5AvNloflrUE+3tEaUoAreHqVRXWxxI5/IYg2RL5uP7mxQM5Ce+YtT38J7+Y
+         tM/MWULPnKvaodTEZtXkhGNqzfDK7zTO0cdROw1CFnPuNFtg8aRMHNFKGcfHlVgo16iD
+         h1md1DIaqvlVXh9An5nIL9J5r1W5ZEPczhTjktHi+U7VdTXHc2Qt9f89ROn3aaeO6/X5
+         Ci633wWEC5Cu+fOKi0YGRWG1A3qgPE0e5lKgQxt/Pl90ynKRiHuk675J7OX7mIdRiMQu
+         NPIaQbZJDZidpvBaH6kLGUJdKRhxmCHIw9/L3MjXVio60MS0XGnVIO3VF6v+SlDgekB2
+         kwJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745286268; x=1745891068;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4h4TbY8Znfe/dR8gB7rAZNuUR7bnGOkg0xdG1pb23lI=;
+        b=IF4OJ8PLJJ8tB9V/1hxxCz9H5n0+SF20SalMRwCVJbfsPhs/wtHCHB4zm3FDej0xiq
+         80pYEnixN8r8m4tGKN/olg9IgfO/QpAfzT/1bEfRM2+cpmo2evE6ccEG4FCjb9h/3vli
+         3HQ23rcpaRF9xFsCuhi3XGJ9jXgpjtnkp+l/sNut96PYDjOVChH9V9b+QyzZF1Fq88sa
+         GFCIraVD1npALCfhXAT8lGFhLMmiw4TJ1DRc+h4kfovr+wDckVpx4mkIRYEIbunuTvON
+         g/QfDvfNzmBdg1xXKjNbsU2hORjVsiaEr6ma73IGJCYQV2N2eQqEpqSOPSB7MtFzhJGM
+         uKhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqLiAPa+c2xSKTD8wMD9GnLjOeTvZKAA5/B3n/t9XGpyWcDoPa4LkvykcrJK7d9WrvcAgIC48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPh9wNEyFMmRY1k53wrdhrPcciZBuxEziByPSDSmtSsNgGm+0K
+	+39oHP5LJYZclq7RGkOPrdOmNYQU/5qPb+aW2IjX6XrXipgAjYBcLyhqnastcFZpJO2SnqeHK4e
+	Q3UnPmk7O2xune3ZoKNdHkNm4+9s=
+X-Gm-Gg: ASbGncsd4gnQqKcSHAGAWtT8bu395E5bKI+4C4X8sOvOP2wRUkTGdz1w8nLb/Vab/9t
+	tYvxpuuukMTwD+cwD5ExhRo+HZN90y/GdtQ2pbJgaBzc/7xZzkgFuaKiY+fWXkXfJcilFZ2pXH2
+	a3lP958rwwYHeK6zyadIIB3fVaZqLA1IM531Kv4GSKrMM=
+X-Google-Smtp-Source: AGHT+IH+3u+Vu4bFaUBa6pl7bA2TSfeNZz9QBKUAwcn5lqpOBVlv4nK6Ywycd4ayshCND08ePMKYBPwWIoDNl2caUew=
+X-Received: by 2002:a17:907:3da7:b0:ac3:c7bd:e436 with SMTP id
+ a640c23a62f3a-acb74dd5869mr1209055366b.51.1745286267466; Mon, 21 Apr 2025
+ 18:44:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250418224652.105998-1-martin.lau@linux.dev> <20250418224652.105998-4-martin.lau@linux.dev>
+In-Reply-To: <20250418224652.105998-4-martin.lau@linux.dev>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Tue, 22 Apr 2025 03:43:50 +0200
+X-Gm-Features: ATxdqUGMbONhDBSp6SSFH7_QFy3bmQ8EeY6eI7tGzcGiKYNTh81Zvh9qVz_pTlI
+Message-ID: <CAP01T76vnejd27gaxW1oNiEhT96Yp0j1JEs8iXb13UW6ep5XJQ@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 03/12] bpf: Add bpf_rbtree_{root,left,right} kfunc
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
+	kernel-team@meta.com, Amery Hung <ameryhung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 17 Apr 2025 11:30:47 +0200 Lorenzo Bianconi wrote:
-> The official Airoha EN7581 firmware requires adding max_packet filed in
-> ppe_mbox_data struct while the unofficial one used to develop the Airoha
-> EN7581 flowtable support does not require this field.
-> This patch does not introduce any real backwards compatible issue since
-> EN7581 fw is not publicly available in linux-firmware or other
-> repositories (e.g. OpenWrt) yet and the official fw version will use this
-> new layout. For this reason this change needs to be backported.
-> 
-> Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+On Sat, 19 Apr 2025 at 00:47, Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>
+> From: Martin KaFai Lau <martin.lau@kernel.org>
+>
+> In the kernel fq qdisc implementation, it requires to traverse a rbtree
+> stored with the networking "flows".
+>
+> In the later bpf selftests prog, the much simplified logic that uses
+> the bpf_rbtree_{root,left,right} to traverse the tree is like:
+>
+> struct fq_flow {
+>         struct bpf_rb_node      fq_node;
+>         struct bpf_rb_node      rate_node;
+>         struct bpf_refcount     refcount;
+>         unsigned long           sk_long;
+> };
+>
+> struct fq_flow_root {
+>         struct bpf_spin_lock lock;
+>         struct bpf_rb_root root __contains(fq_flow, fq_node);
+> };
+>
+> struct fq_flow *fq_classify(...)
+> {
+>         struct bpf_rb_node *tofree[FQ_GC_MAX];
+>         struct fq_flow_root *root;
+>         struct fq_flow *gc_f, *f;
+>         struct bpf_rb_node *p;
+>         int i, fcnt = 0;
+>
+>         /* ... */
+>
+>         f = NULL;
+>         bpf_spin_lock(&root->lock);
+>         p = bpf_rbtree_root(&root->root);
+>         while (can_loop) {
+>                 if (!p)
+>                         break;
+>
+>                 gc_f = bpf_rb_entry(p, struct fq_flow, fq_node);
+>                 if (gc_f->sk_long == sk_long) {
+>                         f = bpf_refcount_acquire(gc_f);
+>                         break;
+>                 }
+>
+>                 /* To be removed from the rbtree */
+>                 if (fcnt < FQ_GC_MAX && fq_gc_candidate(gc_f, jiffies_now))
+>                         tofree[fcnt++] = p;
+>
+>                 if (gc_f->sk_long > sk_long)
+>                         p = bpf_rbtree_left(&root->root, p);
+>                 else
+>                         p = bpf_rbtree_right(&root->root, p);
+>         }
+>
+>         /* remove from the rbtree */
+>         for (i = 0; i < fcnt; i++) {
+>                 p = tofree[i];
+>                 tofree[i] = bpf_rbtree_remove(&root->root, p);
+>         }
+>
+>         bpf_spin_unlock(&root->lock);
+>
+>         /* bpf_obj_drop the fq_flow(s) that have just been removed
+>          * from the rbtree.
+>          */
+>         for (i = 0; i < fcnt; i++) {
+>                 p = tofree[i];
+>                 if (p) {
+>                         gc_f = bpf_rb_entry(p, struct fq_flow, fq_node);
+>                         bpf_obj_drop(gc_f);
+>                 }
+>         }
+>
+>         return f;
+>
+> }
+>
+> The above simplified code needs to traverse the rbtree for two purposes,
+> 1) find the flow with the desired sk_long value
+> 2) while searching for the sk_long, collect flows that are
+>    the fq_gc_candidate. They will be removed from the rbtree.
+>
+> This patch adds the bpf_rbtree_{root,left,right} kfunc to enable
+> the rbtree traversal. The returned bpf_rb_node pointer will be a
+> non-owning reference which is the same as the returned pointer
+> of the exisiting bpf_rbtree_first kfunc.
+>
+> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> ---
 
-I'm not sure I agree with this fixes tag. The fixes tag should point 
-to the earliest commit where any problem may be visible. IIUC you're
-targeting net-next because the structure is not used in net. So the
-Fixes tag should also point to some commit in net-next...
-If we leave it as is after the merge window stable bot will pull this
-commit into 6.15 for no good reason.
--- 
-pw-bot: cr
+Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
 
