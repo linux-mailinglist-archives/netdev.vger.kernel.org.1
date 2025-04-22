@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-184681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1E7A96D83
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC916A96D88
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:56:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 810B2188912A
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 13:55:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ECF71892615
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 13:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20EA283CB0;
-	Tue, 22 Apr 2025 13:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB8D2857F4;
+	Tue, 22 Apr 2025 13:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ef680URI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWOCzF8S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044E9146A60;
-	Tue, 22 Apr 2025 13:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9C5281535;
+	Tue, 22 Apr 2025 13:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745330094; cv=none; b=TnvY4IZfFcVTkPdog4HOk+AxRF3MtT/TTuX9tjNBQb5Umsp7f9ZRtGbIr/fxYNUJY4uRplxt6lLt4/FuBH5IeuBbAlgzFyV/itxjxZ8NOqOtePGMQ1+vVFjcJgCB2kBuGAGc/JSQ7IzkIgxHOqlWR3sCF0eY/QjORWRdkGE+vOs=
+	t=1745330102; cv=none; b=izv+cVqZO9oCKmt7CP75EKBUVhnO4ckgcD5fmYjAs7+pBaQVZ9PJ8nkuBAlKS7+tPUaKPwkPLFJ8KSZ1PsI/uXvZc8iP+RtKa6Xp9FY8r6Vq17QK0YtwkFwmIyrnSpSBLAyq4J88D8Vhl2qhIomSoPeVxlLyre2z2WLps29WJrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745330094; c=relaxed/simple;
-	bh=kd3vW/wW1gabeQG7Fy0PVk4IKsLzJY/aNs7T6WdurXM=;
+	s=arc-20240116; t=1745330102; c=relaxed/simple;
+	bh=12o8EpFplw5vxKVaPZGoT3TplIy82zwNzBv2WcTOE8Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LIW4ESaQkpX4iwguFzm2BXGVbzF6D7fZBiLpe+hule0UO73B2BcojdsEF/ZNEcuZZzBHmbjKaHDUxTVbvwEyHBIhVKxvi83r4xEMYLjg2AZnDop/kMrvHcxHMRU/kbfZMoyRF+KHTOofvaYxYqN6M4HRHpYM/nivJ37s01t4DpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ef680URI; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=h4BPfenBCkUm/nFSMd9ohzUVR8CC5tw5RD1N40bGE+DKgJvSeb4loZlt8YbELTaX+BCoDjRVdZ8IBaflDopzS/Gmgp4WwL3Q1ffsZd2kw9GYb/kf9OIufqwkULF0qeOgfKyYzyi6O1GPpBe2bBK8iQE6PUUdcBX3btFv7kooMv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nWOCzF8S; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b13e0471a2dso181307a12.2;
-        Tue, 22 Apr 2025 06:54:52 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7396f13b750so5576286b3a.1;
+        Tue, 22 Apr 2025 06:55:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745330092; x=1745934892; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745330100; x=1745934900; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OA/MmqYliLwWhi3o92n3t+JslJEn4NlsVVnjQQ5ihp8=;
-        b=ef680URIDlzz9j1nMrL7fVQshjOvnKj7J9a83HI2yeWo3BjzgDyoSU4NaXKGx3QDlU
-         OQXBYHNSJPpPg6e5rdoEzomlNoqalIYWFPnTlLqknUKSHTvg20eiTFtvRyaINQ2fkyIl
-         2Dy6wkmmFBNuUfCTO1/M6goTLkr/7gZKGSxLN9clEg05xJ5OJIRVYn5VY5dE3nk6d122
-         3egJP1e66UC0XuN0lrz5lH4vJbmC6+ak3sFm4puFrS52jj0Vykmci4RVdvgrEfI2ZTt4
-         oy+5ZmYN9f+o7ID5VBLFpe/wkKwFWdv+oSrrKsPWDGgUVkk1KLWyvu2nVJ/WCScODhXf
-         Sn0w==
+        bh=sB3yUUfhGJKZTpW8owaV/xnUEivaCxVXrQXi/bn6tLQ=;
+        b=nWOCzF8SehbRYtsPUK93Gnuf21f2ElWXu3KdERKPIbR7yHa9jpJtRrxvM/ir6qQDiC
+         fmdarECqxZbng+e2tJK1qAJslORAvFgHKVHlzyO1zM3iMs175JFMTw1DOoRhvXC2hXcv
+         R0mArAH1i7Ei2gGAp+CGWJhVqAq1h9VtAk8AGA1ShuEdZ5MFVUWUTJ4bUHI6LyOnKLSB
+         mRE6pZdXO6QERcBPeKEe4n9JIh8L67XgaHkgCOvSHNhXgOhaargP0dqMFEzUKMpfEO3J
+         Qc0nKQZyCtLoGR/aevI9i4W0U5JBsdREL7pTQy+jcB3OtthWhit6lhW45+S6XAN+unZY
+         0s3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745330092; x=1745934892;
+        d=1e100.net; s=20230601; t=1745330100; x=1745934900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OA/MmqYliLwWhi3o92n3t+JslJEn4NlsVVnjQQ5ihp8=;
-        b=byFlJAwC2XlInMO4FbqVIBMItR3OYSgDkcnDhMtptL8M0DmUbv2B+qSHv3xB/v6X+8
-         tW+lss173g3QrQNcrKSfyGlahlvbrBqNA3FTr+91QLBQW4yvpDqTVDujS2088tXh3uTj
-         372OD5RQ6m9pLN8lEQaKpobAck4pZPSKstA77mpKL0bFxqWbcNctmpGJP4injysun2Ne
-         NFqWATYJXjEnDVR49LyU3b3dGlf4rWUhHepAM5ATpTyJY5BDoz+Ul6CRZ6PKfRbMZIcL
-         px3vIUQiXYj/naPlSiRsVBhcMdOnLmwduk2dZcd6/4Nm0TR2SPZpETwie1Ts2AXjH2LF
-         f92w==
-X-Forwarded-Encrypted: i=1; AJvYcCVDBXnUk49nEp5G20Ye/76OVu8YFIdWtICqLhyZBrZY3MQptKvGJcV0Bggwa2OKp5mU9QJ3OSPHOidMTCM=@vger.kernel.org, AJvYcCXEhyXyfqKSLqNYf1qils2yYWw5HEzyo0F8TCJqolmx2qSsbMg9F0Dfj++hvktoTgFrieiN1dpe@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiEg5eEIeCQWAdbiZazKe8FsF58cKZTnSmd6srKbaGqTn8sa9k
-	C/jv7ty8695/OfWvf8OAII2JAT3bNLxc7YAvUaorLF2YeYw5gw6HqfD0d36G
-X-Gm-Gg: ASbGnctxGovZyV/PXtx4YRlGqiTkz31p1Pi3YY+ST/eAXqLqsDwr4ypcUdvnn+FPcBa
-	fMqzmQcBDpqWlhVSzRSmV5A4kVLa61cQyJ6B/fNv/81j/06BGIlnJD3EBe83SzZcno/Sewzh3EZ
-	SjE/Z4EYPPqdlX8dfHe+324npft0lKnJqPuebEkZflgXb6WdeFioBYRJbPtPxHoZ/ELWmEs91/r
-	nMyI1eUp3HkyFs2nzxTYqFtJl/9XX4gZKGU+V6CYfFySgyyMLO25gtc1nBL5MA1LG7YoWMHgaVe
-	LIHuFz1dZAc682EfBT5p2HB4b44UTjr7E9H6wndrmBdKa4P5tBS2HxvQEWNI8IRLZweT4EOLO2z
-	3iA37J87wDVt2WKrfdw==
-X-Google-Smtp-Source: AGHT+IFQSM/A3SMEFEI+Gb0vSvgqV3Z2tMqCRbJiessfnFICSzi69NjpfPD3Qppo4NvySWvzPM3m0w==
-X-Received: by 2002:a17:902:e944:b0:220:ca08:8986 with SMTP id d9443c01a7336-22c535a177fmr292454765ad.22.1745330092025;
-        Tue, 22 Apr 2025 06:54:52 -0700 (PDT)
+        bh=sB3yUUfhGJKZTpW8owaV/xnUEivaCxVXrQXi/bn6tLQ=;
+        b=Sc2yR8k0x0mVJ7Bm0GBo4fJ0xMInaV0lVlx7OO5q9zady6Q59M8LJT+rc+cjD8YfbR
+         6848F5ukpFW7mz5DaQXn2sg/5w3dJeF/CvHyZwXUqihEFL1bQQV0pGIs1KhXWqkJBUg0
+         cYZtasik/FQaBkyIxEsXcZU6D5T9gJpsLUiFai1RQUti0YOQCqfcsh2sK2peF3CdcK5D
+         YzA1Hn2pFajZ5hWZpYsvaC9Xn4Sy9fRGStIcrf3iLGhWaA7+p3skqiPDyc5fGVGVsoxe
+         M3A747tDKG6YKJSiJ6QnztFdBLNU9AS/BXML1GDksS1D7hIx+8jQSMYdt9JVGm/2UIHC
+         38LA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKyEs1XwTvEHbHO+SRBVMQf8dnqhNjKUj2NSIGvG7sKAGi0xFRQEgPogzSjAZWhRVUa+jfZ+WThb1Bqyg=@vger.kernel.org, AJvYcCXUGF4PChWxTNocY++fculYz743ua3nrKCVg8YTNm+UGl248hRdnorABX72E5La8HW4gmV6xTzM@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHyVTb5e4sXqiaVsUTHVPav7+rRJEdEenRJIamujSfRT4ExO6m
+	QPJcuPM/DNlZ04QiNBxHPZKKmsWwQeUc+7rUGPWDJYTas9/8rv2AgYiRyz7u
+X-Gm-Gg: ASbGncsM2U/r3GwUQ6gFrCH4yAaMzaeDayQ13pTVWwErumEuq4qVNC1QS28XPYc1za2
+	RyjQtNv6kCKDYHrvYsZklNxvF9wEMN1synfY48Y0BOhDZS1IrOW+fM7Jn878eT8k7Jn3Nhq4yaN
+	gH0nnuhvoDzu2NQ1JQJUXddGt/peqLO9+dZdXD/BS4fQlL6AtK8IOD2Bygq7t9Y9XaVgaEBLgMJ
+	HjruSh0FIH84w6RdNpUqaczQY/OnjdUzVi+DleYHAJV09p3fMF6AAmxwp/62mUWcH6sF4qn6YRx
+	/a2cO5z5T4C/1jWm9boe0o0uw1vCi1Yik5kkenZfX4Myz60nqtFa6S0MY5OITyXfdZSDjn6AzXG
+	O8w3cJ5QleBI9elkj2g==
+X-Google-Smtp-Source: AGHT+IEWWLVFHgHeX0ZNZinSLQVyEdVz9dK9N1V/I9vxsqL6DoRE7khqVk3usst5VG+jmkiuGGkm7w==
+X-Received: by 2002:a05:6a00:8d93:b0:73b:71a9:a5ad with SMTP id d2e1a72fcca58-73dc15a06bamr20436799b3a.16.1745330098603;
+        Tue, 22 Apr 2025 06:54:58 -0700 (PDT)
 Received: from mew.. (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbfaaba76sm8869650b3a.143.2025.04.22.06.54.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbfaaba76sm8869650b3a.143.2025.04.22.06.54.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 06:54:51 -0700 (PDT)
+        Tue, 22 Apr 2025 06:54:58 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: rust-for-linux@vger.kernel.org
-Cc: Trevor Gross <tmgross@umich.edu>,
+Cc: Andrew Lunn <andrew@lunn.ch>,
 	Alice Ryhl <aliceryhl@google.com>,
 	Gary Guo <gary@garyguo.net>,
 	Fiona Behrens <me@kloenk.dev>,
@@ -83,8 +83,8 @@ Cc: Trevor Gross <tmgross@umich.edu>,
 	Andreas Hindborg <a.hindborg@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	andrew@lunn.ch,
 	hkallweit1@gmail.com,
+	tmgross@umich.edu,
 	ojeda@kernel.org,
 	alex.gaynor@gmail.com,
 	bjorn3_gh@protonmail.com,
@@ -107,9 +107,9 @@ Cc: Trevor Gross <tmgross@umich.edu>,
 	vschneid@redhat.com,
 	tgunders@redhat.com,
 	david.laight.linux@gmail.com
-Subject: [PATCH v14 2/6] rust: time: Add PartialEq/Eq/PartialOrd/Ord trait to Ktime
-Date: Tue, 22 Apr 2025 22:53:31 +0900
-Message-ID: <20250422135336.194579-3-fujita.tomonori@gmail.com>
+Subject: [PATCH v14 3/6] rust: time: Introduce Delta type
+Date: Tue, 22 Apr 2025 22:53:32 +0900
+Message-ID: <20250422135336.194579-4-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250422135336.194579-1-fujita.tomonori@gmail.com>
 References: <20250422135336.194579-1-fujita.tomonori@gmail.com>
@@ -121,14 +121,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add PartialEq/Eq/PartialOrd/Ord trait to Ktime so two Ktime instances
-can be compared to determine whether a timeout is met or not.
+Introduce a type representing a span of time. Define our own type
+because `core::time::Duration` is large and could panic during
+creation.
 
-Use the derive implements; we directly touch C's ktime_t rather than
-using the C's accessors because it is more efficient and we already do
-in the existing code (Ktime::sub).
+time::Ktime could be also used for time duration but timestamp and
+timedelta are different so better to use a new type.
 
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
+i64 is used instead of u64 to represent a span of time; some C drivers
+uses negative Deltas and i64 is more compatible with Ktime using i64
+too (e.g., ktime_[us|ms]_delta() APIs return i64 so we create Delta
+object without type conversion.
+
+i64 is used instead of bindings::ktime_t because when the ktime_t
+type is used as timestamp, it represents values from 0 to
+KTIME_MAX, which is different from Delta.
+
+as_millis() method isn't used in this patchset. It's planned to be
+used in Binder driver.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 Reviewed-by: Gary Guo <gary@garyguo.net>
 Reviewed-by: Fiona Behrens <me@kloenk.dev>
@@ -136,22 +148,115 @@ Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- rust/kernel/time.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ rust/kernel/time.rs | 88 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
 diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-index f509cb0eb71e..9d57e8a5552a 100644
+index 9d57e8a5552a..e00b9a853e6a 100644
 --- a/rust/kernel/time.rs
 +++ b/rust/kernel/time.rs
-@@ -29,7 +29,7 @@ pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
+@@ -10,9 +10,15 @@
  
- /// A Rust wrapper around a `ktime_t`.
- #[repr(transparent)]
--#[derive(Copy, Clone)]
-+#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
- pub struct Ktime {
-     inner: bindings::ktime_t,
+ pub mod hrtimer;
+ 
++/// The number of nanoseconds per microsecond.
++pub const NSEC_PER_USEC: i64 = bindings::NSEC_PER_USEC as i64;
++
+ /// The number of nanoseconds per millisecond.
+ pub const NSEC_PER_MSEC: i64 = bindings::NSEC_PER_MSEC as i64;
+ 
++/// The number of nanoseconds per second.
++pub const NSEC_PER_SEC: i64 = bindings::NSEC_PER_SEC as i64;
++
+ /// The time unit of Linux kernel. One jiffy equals (1/HZ) second.
+ pub type Jiffies = crate::ffi::c_ulong;
+ 
+@@ -149,3 +155,85 @@ fn into_c(self) -> bindings::clockid_t {
+         self as bindings::clockid_t
+     }
  }
++
++/// A span of time.
++///
++/// This struct represents a span of time, with its value stored as nanoseconds.
++/// The value can represent any valid i64 value, including negative, zero, and
++/// positive numbers.
++#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord, Debug)]
++pub struct Delta {
++    nanos: i64,
++}
++
++impl Delta {
++    /// A span of time equal to zero.
++    pub const ZERO: Self = Self { nanos: 0 };
++
++    /// Create a new [`Delta`] from a number of microseconds.
++    ///
++    /// The `micros` can range from -9_223_372_036_854_775 to 9_223_372_036_854_775.
++    /// If `micros` is outside this range, `i64::MIN` is used for negative values,
++    /// and `i64::MAX` is used for positive values due to saturation.
++    #[inline]
++    pub const fn from_micros(micros: i64) -> Self {
++        Self {
++            nanos: micros.saturating_mul(NSEC_PER_USEC),
++        }
++    }
++
++    /// Create a new [`Delta`] from a number of milliseconds.
++    ///
++    /// The `millis` can range from -9_223_372_036_854 to 9_223_372_036_854.
++    /// If `millis` is outside this range, `i64::MIN` is used for negative values,
++    /// and `i64::MAX` is used for positive values due to saturation.
++    #[inline]
++    pub const fn from_millis(millis: i64) -> Self {
++        Self {
++            nanos: millis.saturating_mul(NSEC_PER_MSEC),
++        }
++    }
++
++    /// Create a new [`Delta`] from a number of seconds.
++    ///
++    /// The `secs` can range from -9_223_372_036 to 9_223_372_036.
++    /// If `secs` is outside this range, `i64::MIN` is used for negative values,
++    /// and `i64::MAX` is used for positive values due to saturation.
++    #[inline]
++    pub const fn from_secs(secs: i64) -> Self {
++        Self {
++            nanos: secs.saturating_mul(NSEC_PER_SEC),
++        }
++    }
++
++    /// Return `true` if the [`Delta`] spans no time.
++    #[inline]
++    pub fn is_zero(self) -> bool {
++        self.as_nanos() == 0
++    }
++
++    /// Return `true` if the [`Delta`] spans a negative amount of time.
++    #[inline]
++    pub fn is_negative(self) -> bool {
++        self.as_nanos() < 0
++    }
++
++    /// Return the number of nanoseconds in the [`Delta`].
++    #[inline]
++    pub const fn as_nanos(self) -> i64 {
++        self.nanos
++    }
++
++    /// Return the smallest number of microseconds greater than or equal
++    /// to the value in the [`Delta`].
++    #[inline]
++    pub const fn as_micros_ceil(self) -> i64 {
++        self.as_nanos().saturating_add(NSEC_PER_USEC - 1) / NSEC_PER_USEC
++    }
++
++    /// Return the number of milliseconds in the [`Delta`].
++    #[inline]
++    pub const fn as_millis(self) -> i64 {
++        self.as_nanos() / NSEC_PER_MSEC
++    }
++}
 -- 
 2.43.0
 
