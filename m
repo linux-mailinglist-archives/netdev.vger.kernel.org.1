@@ -1,196 +1,131 @@
-Return-Path: <netdev+bounces-184698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C288A96F0A
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:37:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 309CBA96F1B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 16:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA22116AFEB
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:37:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F16EB3AA60F
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 14:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905BA28A3E1;
-	Tue, 22 Apr 2025 14:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0D128CF60;
+	Tue, 22 Apr 2025 14:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePgqBsz"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LNDMR9KG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6E724C061;
-	Tue, 22 Apr 2025 14:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B728C5C5;
+	Tue, 22 Apr 2025 14:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745332651; cv=none; b=MNy9iiVrloG9yv2BMKvrFCyHBJ2ZxzDFgOUwlHob4sa15HaagWu0+zAUNcKJCBTOisCdLNZ+RAHdyFhIoreXg3cAvVyR3CMtfq3v5ayTxiB0euBBFSw31K42s+GJ1bgt34EhK7AfFElrt1t3l7z4tttt58CAAns0QLEh7DP9L+s=
+	t=1745332846; cv=none; b=VmoetwgB6NtQHn7EH/9oG08jp+TFRE2NKLewYTyfa/Z1MO7+d4I+CpEQwH3nzebgHE3QJjl59mGWBvi+YBXcKS53iPP2ryLL2AbYDFJK1mAZ4lWW9gHAFkGFjrglk8dAId/o7GygeAfJ8bn+uft7dKCLKvNNG5wiEcjcb2I+mmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745332651; c=relaxed/simple;
-	bh=xmX3wFn4yklfFDUdyFQ1DZ2SHZtonDRd61YMLJM3MpY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gt1/LNSXDxAKs3QyoAslj3dmqDfw1cLN/vMKSoAxEXpz37SNiEJhoVd1WmpsYaOkjp20P4nqw9BBR7IsDP9XFktWYIlgRvcvw0IrDiQUpOQuXFI4qVr/8m70o9WIq7MPAMDORrmgrqygCFVUhnJSxzNT11yNHJA7aKhoTu0bD+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PePgqBsz; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf848528aso39299265e9.2;
-        Tue, 22 Apr 2025 07:37:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745332648; x=1745937448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KVNRoD0RrSksEzR7JBfXuuef+5VZbaweuF4W6LsXFS4=;
-        b=PePgqBszsdiRkab072Hmjgb9Cx4J2FC5I1Nk7O6bxJIlkeeZmxwM3qy+MXQ9Ki4qmk
-         qrSxKTKcBhGitQTI4mAHG3dqMaQKf3xN3oXIfTOp5ucd+NrL5ICZqCpQ5LTSzSQjE1bQ
-         7Q0THaOwAlRko2U2r4aA+73xOIVqt73q+iKFDxsMoQ3JO6H3j3w6YIlhmxAThFDgLJQP
-         BLHrr18KzF/zO8alswywW2nNC60FPo4ORSxPLc5pKbaK3SkQdD9he2fAXf136eYI95fN
-         jgOCg6pht8StVlT+hvtjZH4nCARxmYpI5QWwcm3PGpuvt5f9AqySb/ye7yO1XHHycsZA
-         I/TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745332648; x=1745937448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KVNRoD0RrSksEzR7JBfXuuef+5VZbaweuF4W6LsXFS4=;
-        b=l7uIAlwOB8nX8pIm8h8ON0shqahf2CjR0CrSZLobBZp2tljHkGlExhf0/vtu7MurwA
-         QWJMPPiJNI3m2Q6O3mtZTBj4+pUP8+ovn7CLjU1z8DoiEYuM6vIeNiZwnMOhoy9PWnnP
-         FdVQoK1f5IdEvZN3TyhM6xj1kX5z4z3X5F6G2loFOne41SUyayUnj7i3oh+19EqcNQQ5
-         I8/kzzo3OEqyx7IUgPGl5FSuSk5Kft2JWeQg0PRlRoNtUFQWApSyk0JhdX6IatP+2Fii
-         AXHDDW01yUWUfiyb6DolOK+52WSED6zMdgCmcQ1C0jZtHfoO49o2pWL/jBAd7rJffGTp
-         b9mA==
-X-Forwarded-Encrypted: i=1; AJvYcCUITHtbUQOrMdWrd1f9HJwhF2eaAiXkrfYVNBFSx8gjdvnhWzGdUEd+m5NBB6lcZmFHRcg=@vger.kernel.org, AJvYcCUN4NDsw6mzTZlzBk+hn43KjQDzYU0WV5ZHQEyArv+yiWvzzetVlmsnQh5crNA2gZOym46/Al08HN0DeqA9@vger.kernel.org, AJvYcCV4uSybK/JbuWSLkmHBiLdjA9rtctuv7oNmvkBTLbNoYqDLlI4MnchsmLTVLdZNKIEua+52OEfu@vger.kernel.org, AJvYcCVJVGA8rVK8TvsjeI5E8J9XcoBk4abWDwUauYTm2kLz3xb8G4+mxIfhQjZmSdoupURo3hY9n74tRgdi9kWcap68elAj@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyDj8teaNUiaTk+6eDCOkQ4nOE6kr2bJGrJ/gFFcbVUd2p0rUt
-	wI3IQTegNorKFI4liQ4UAJj7d47np+Ty2Do+qkFnTwBtfxlabK+vai6dyZdgm5zQtilcKcgw3RH
-	7GIajTJoDWBIlyo2KYpLjXXJcrpQ=
-X-Gm-Gg: ASbGnctfCyS5N+LjVRgt7vMQdyPPKKyp03A63oisCK2qv37brY0AmquQyAqeyrw2Zgm
-	foHL0GGPGJKYxH30rx6xLSHQAuYFDnGgHK2HXGnYzpdBDFNVXjIjnZweXquVwd2GwFpo4mbd3yK
-	gNK9b+yBBofIiq+CUiTvArE2mAwU/ufqbWjv29Ew==
-X-Google-Smtp-Source: AGHT+IG4Cy/AdgYd6cpiRO8xYSkhTRhh8bYXvxmR0r57jfYKceNU82XctCFA4+x4WBeXTAS2Qil7GfTxuYlsebAtqlo=
-X-Received: by 2002:a05:600c:1e10:b0:43d:300f:fa1d with SMTP id
- 5b1f17b1804b1-4406ac62b75mr163192435e9.31.1745332647307; Tue, 22 Apr 2025
- 07:37:27 -0700 (PDT)
+	s=arc-20240116; t=1745332846; c=relaxed/simple;
+	bh=M9Zr7hxLPheS12ZSZNWK5qMbOtisljKEvNuI/iEukEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nlIEiEMb9l14rdR/cwvLq9yosAgSfbmVz/9v8x4ekioyMGmh2ZznPzGPRYmybkBHrfBN9I2kPygN7ZANGjjGFz6EKJG1LbVjBzbfOIeSuEXgQh4rDJ2D3CGoQuWeo71FTLugIU0dy1VvgjdbaErz/HJEb8FoHy2yWQEP/BASIZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LNDMR9KG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=W0S8t/6FGxg47c0LEtOaE/CH+Zrp13P24zwNFo5jGGw=; b=LNDMR9KGZUOWw2nq8JndcvNeF/
+	UlrAChAS6n9brfhMKUvxfErkEiAKWZfUakTgo1Kkbz1sy/lTjGFy4FUuQ/j1f6howOfcfwKPT3E3w
+	xIqAYCKilAfznPhLUM091UBTLzpjpG4jgH+P8NwnhBhr/88g68aCbnmxfY71+QOETvkc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u7EnR-00ADBy-Ka; Tue, 22 Apr 2025 16:40:25 +0200
+Date: Tue, 22 Apr 2025 16:40:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
+ update descriptions of RGMII modes
+Message-ID: <d79ed229-f0b7-441a-b075-31fd2b2f8fe6@lunn.ch>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <6be3bdbe-e87e-4e83-9847-54e52984c645@ti.com>
+ <cd483b43465d6e50b75f0b11d0fae57251cdc3db.camel@ew.tq-group.com>
+ <5d74d4b2-f442-4cb8-910e-cb1cc7eb2b3d@ti.com>
+ <b53fba84c8435859a40288f3a12db40685b8863a.camel@ew.tq-group.com>
+ <aAdZoMge_CKtqokU@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAADnVQLnij-d3Hif1x8ocoYD=8sZG67qACXPZhK78cpYKczwkw@mail.gmail.com>
- <20250422080419.322136-1-yangfeng59949@163.com>
-In-Reply-To: <20250422080419.322136-1-yangfeng59949@163.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 22 Apr 2025 07:37:15 -0700
-X-Gm-Features: ATxdqUHuUYafvzTvLuzZ_1rXZfUvY0jWnby7h9IZIWMk-HqLMT-8ZLGhVONcJnY
-Message-ID: <CAADnVQ+WYLfoR1W6AsCJF6fNKEUgfxANXP01EQCJh1=99ZpoNw@mail.gmail.com>
-Subject: Re:
-To: Feng Yang <yangfeng59949@163.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Eduard <eddyz87@gmail.com>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Network Development <netdev@vger.kernel.org>, 
-	Song Liu <song@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
-	Yonghong Song <yonghong.song@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aAdZoMge_CKtqokU@shell.armlinux.org.uk>
 
-On Tue, Apr 22, 2025 at 1:04=E2=80=AFAM Feng Yang <yangfeng59949@163.com> w=
-rote:
->
-> Subject: Re: [PATCH bpf-next] bpf: Remove bpf_get_smp_processor_id_proto
->
-> On Mon, 21 Apr 2025 18:53:07 -0700 Alexei Starovoitov <alexei.starovoitov=
-@gmail.com> wrote:
->
-> > On Thu, Apr 17, 2025 at 8:41 PM Feng Yang <yangfeng59949@163.com> wrote=
-:
-> > >
-> > > From: Feng Yang <yangfeng@kylinos.cn>
-> > >
-> > > All BPF programs either disable CPU preemption or CPU migration,
-> > > so the bpf_get_smp_processor_id_proto can be safely removed,
-> > > and the bpf_get_raw_smp_processor_id_proto in bpf_base_func_proto wor=
-ks perfectly.
-> > >
-> > > Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-> > > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> > > ---
-> > >  include/linux/bpf.h      |  1 -
-> > >  kernel/bpf/core.c        |  1 -
-> > >  kernel/bpf/helpers.c     | 12 ------------
-> > >  kernel/trace/bpf_trace.c |  2 --
-> > >  net/core/filter.c        |  6 ------
-> > >  5 files changed, 22 deletions(-)
-> > >
-> > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > index 3f0cc89c0622..36e525141556 100644
-> > > --- a/include/linux/bpf.h
-> > > +++ b/include/linux/bpf.h
-> > > @@ -3316,7 +3316,6 @@ extern const struct bpf_func_proto bpf_map_peek=
-_elem_proto;
-> > >  extern const struct bpf_func_proto bpf_map_lookup_percpu_elem_proto;
-> > >
-> > >  extern const struct bpf_func_proto bpf_get_prandom_u32_proto;
-> > > -extern const struct bpf_func_proto bpf_get_smp_processor_id_proto;
-> > >  extern const struct bpf_func_proto bpf_get_numa_node_id_proto;
-> > >  extern const struct bpf_func_proto bpf_tail_call_proto;
-> > >  extern const struct bpf_func_proto bpf_ktime_get_ns_proto;
-> > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> > > index ba6b6118cf50..1ad41a16b86e 100644
-> > > --- a/kernel/bpf/core.c
-> > > +++ b/kernel/bpf/core.c
-> > > @@ -2943,7 +2943,6 @@ const struct bpf_func_proto bpf_spin_unlock_pro=
-to __weak;
-> > >  const struct bpf_func_proto bpf_jiffies64_proto __weak;
-> > >
-> > >  const struct bpf_func_proto bpf_get_prandom_u32_proto __weak;
-> > > -const struct bpf_func_proto bpf_get_smp_processor_id_proto __weak;
-> > >  const struct bpf_func_proto bpf_get_numa_node_id_proto __weak;
-> > >  const struct bpf_func_proto bpf_ktime_get_ns_proto __weak;
-> > >  const struct bpf_func_proto bpf_ktime_get_boot_ns_proto __weak;
-> > > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> > > index e3a2662f4e33..2d2bfb2911f8 100644
-> > > --- a/kernel/bpf/helpers.c
-> > > +++ b/kernel/bpf/helpers.c
-> > > @@ -149,18 +149,6 @@ const struct bpf_func_proto bpf_get_prandom_u32_=
-proto =3D {
-> > >         .ret_type       =3D RET_INTEGER,
-> > >  };
-> > >
-> > > -BPF_CALL_0(bpf_get_smp_processor_id)
-> > > -{
-> > > -       return smp_processor_id();
-> > > -}
-> > > -
-> > > -const struct bpf_func_proto bpf_get_smp_processor_id_proto =3D {
-> > > -       .func           =3D bpf_get_smp_processor_id,
-> > > -       .gpl_only       =3D false,
-> > > -       .ret_type       =3D RET_INTEGER,
-> > > -       .allow_fastcall =3D true,
-> > > -};
-> > > -
-> >
-> > bpf_get_raw_smp_processor_id_proto doesn't have
-> > allow_fastcall =3D true
-> >
-> > so this breaks tests.
-> >
-> > Instead of removing BPF_CALL_0(bpf_get_smp_processor_id)
-> > we should probably remove BPF_CALL_0(bpf_get_raw_cpu_id)
-> > and adjust SKF_AD_OFF + SKF_AD_CPU case.
-> > I don't recall why raw_ version was used back in 2014.
-> >
->
-> The following two seem to explain the reason:
-> https://lore.kernel.org/all/7103e2085afa29c006cd5b94a6e4a2ac83efc30d.1467=
-106475.git.daniel@iogearbox.net/
-> https://lore.kernel.org/all/02fa71ebe1c560cad489967aa29c653b48932596.1474=
-586162.git.daniel@iogearbox.net/
->
+> I'm hoping that Andrew will read my email form yesterday and reconsider
+> because to me this is a backwards step
 
-Ahh. socket filters run in RCU CS. They don't disable preemption or migrati=
-on.
-Then let's keep things as-is.
-We still want debugging provided by smp_processor_id().
-If we switch everything to raw_ may miss things. Like this example with
-socket filters.
+I will get back to that in a minute.
+
+> > On Linux, there currently isn't a way for the MAC driver to query from the PHY
+> > whether it could include the delays itself. My assumption is that most PHYs
+> > either don't have internal delays, or the delays are configurable.
+> 
+> motorcomm, dp83tg720, icplus, marvell, dp 838678, adin, micrel, tja11xx,
+> vitesse, dp83822, mscc, at803x, microchip_t1, broadcom, dp83869,
+> intel-xway, realtek all do handle internal delays. I haven't checked
+> whether there are PHYs that don't - that's harder because we don't know
+> whether PHYs that don't mention RGMII in the driver actually support
+> RGMII or not.
+
+I did look through this once. There are no PHYs with Linux drivers
+which support any of the RGMII without supporting all 4 RGMII
+modes. So we should just assume all RGMII PHYs can add the delays.
+
+If i remember the history correctly, Renesas built an RDK with a PHY
+which did not support RGMII delays. So they where forced to do the
+delays in the MAC. But it seems like mainline support for that PHY
+never happened.
+
+> 
+> > If this is
+> > the case, having the MAC add them in internal-delay modes and not adding them on
+> > the PHY side would be the best default (also for PHY-less/fixed-link setups,
+> > which should be handled like a PHY without internal delay capabilities.)
+> 
+> See my "advanced" use case above. We do have drivers doing that.
+
+I agree with Russell here, it is the worse default, not the best
+default. It makes it different to nearly every other MAC driver. It
+needs extra work in the MAC, which most MAC drivers get wrong. They
+also tend not to call out they have done it different to every other
+MAC driver in Linux, and so it does not get the needed extra review,
+and so is broken. I also think there is some 'vendor SDK' mentality
+here. Our MAC can do this, our SDK allows it, the Linux driver must
+have it and use it. Pretty much all hardware has features which never
+get used, but vendors sometimes have issues with just leaving it
+unused.
+
+	Andrew
 
