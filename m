@@ -1,295 +1,181 @@
-Return-Path: <netdev+bounces-184599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F341A96543
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:58:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C797A9659B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C161189CF4C
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:58:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E5F07A5793
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4979720B7EA;
-	Tue, 22 Apr 2025 09:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819FB214A94;
+	Tue, 22 Apr 2025 10:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cHLsoNRU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FNMvgoMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FC82036F3
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5699F214815;
+	Tue, 22 Apr 2025 10:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745315884; cv=none; b=IfgNJE9qDrKOWpu7FVzR0QkQTlkpVdezyHDtt1++BVXBUYPpM5mCmPGnjMsCfJ2J2M1PZCeI7Y5GdPzpKBI65riTa+FZgeWHGISb8DyPxXregCMYrtQ9vHMvQxFphDC6Eg2xSFek8vyu1XarpXeagd5tNYEK3amA708drknR0DY=
+	t=1745316778; cv=none; b=H6q08drlIXGiXDLO23X/ITJPIOAFPw0iMv99ibEmXkWl6MQnsbpqASrsvSJDYJaIJsWAEdhVsMl0LYRFgOQ+MGhf8y1i0ByTWKAaEy3pwUrRREkGXv93UQT4+4X3RpgMu35CVF1eefKfI8BiVLWcorVrAMIKMIWBjaIceq7duuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745315884; c=relaxed/simple;
-	bh=tO6B4uusGXWb6S1d5vB39Y8e5rVhKy79xlXkhC2hD/8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CFCTz1Qx4TXlBrEG9bN8jo3FUvkpoj2aDslCwIjSLFnzpq8MzHCxH18fgwFiIEwZ+k74qLkUQ2wOgzyG3AzLPAn0I0Q45P8rdUZe9xkAcw58jDzOXCUWotHb/+hqSmbntRWHFjkC6PbdFiyYs6uxbu25eCyrBk1j4cpgj3n3jjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=cHLsoNRU; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39c1ef4acf2so3011704f8f.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 02:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1745315880; x=1745920680; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tO6B4uusGXWb6S1d5vB39Y8e5rVhKy79xlXkhC2hD/8=;
-        b=cHLsoNRUSrRFPsnxYTqdRoHuPRcHFk4bLYqf0exWuh8lozisJ35yit1T+TKlczWFHh
-         IUNN9jxzf11zubnS2xVRGAx0DSO77MjU9MnzfBc7UR41YiW6HHg5hX0M3yX5JeStHM9P
-         L4BaimxAt66DNfxkV62hl3NPBY7RVwOXu0QQ+BTHfCKFcDX4WpkzS1xc2DfaS1ldHoGb
-         QhHvThj9s1tgeehIosM4J8oWdrbBN8RmMgVYWMWAYzvN/QZUxt0qA1T5Oayq57yLKuQ/
-         1Df4QSJ7b7P57lCoheSjkW/dOQHbE8S/XSdYIoYqoXkEV0Z11hPNEibbNgZq1V4nUkjL
-         tmRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745315880; x=1745920680;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tO6B4uusGXWb6S1d5vB39Y8e5rVhKy79xlXkhC2hD/8=;
-        b=Y0d/umVMEuUJp4ShJvMit7sHYCCTPq+HO1HFSPl2qHjFVgPqU9yB/KoZtHwQ9X2sAE
-         WpPt8LvkQLwQqwy0OuRqYRt7RjEjelTh1N3tYBynWvimdsPy9naMqFCjbP5zP8uOWneN
-         aWfB3rZ8obVoVFwcWoOOeKDvgP3i0GfV2MNIMSUGTmb5dmGoHNfSQfTJUwAXnJzV0hP/
-         xfyZOBY1F5OZp+3bKA3fUJzgAG6SOJcdfjYLyGVgZzZ39RzZcanaglq+AiWwlEoBRaQb
-         zOkqu4RfzkCoiZkoO/Lu9pEbRGKndg2AJjW2OxmTOaeatLO6WjZnppwxGyWD/795CrM4
-         t6jw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGzoo9VZAmVFl8YygH4KcINYAMNZNGeVGzmhvs6dDcXvWPNr1BnYQBV6U2i7qnRogKIVqq3d0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHpRjgnfA7kfVrLAHg1SayKNkBEwHbw0dWPM4qXn7xMuu4ZH9F
-	hvoaD10AOQEVJeD3JAPtjhnBDSSUccL8yIwpGKNv1iFsNcpWKE2cAJ0QYgm2nC4=
-X-Gm-Gg: ASbGnctkuMRycWqSqHn/DkqNsBby+ppit2j4LdxNiFv0PVWU09WWKslBehX1mXmAdT0
-	XnVBvoZ1fkR6AEzfyUQX4S7RCvf8nwwsfTwLg4YisZm26BeaCbtFka5zha7EfI9fPI2vNyShxqp
-	MzfYwiJPARDaHiKXYHmpRBd+S50NdaiIdGJfTmSTPLRCEL1NWyXsCa+WTIiYhdBfekHJEdF1NsP
-	dOyNtFktrMPjwmn6fy4Mn3x0NJ+aO2HmDGyNkG1CGoU5c87h//9nfivUnQWNRPqdoeH4zBZK6nO
-	o8wN83qjQTx1o/HqykREfvipj6vmc4lgYsJ5R7ueXSJ1n9q8xQCIlXo8S/knMP8DHpTuaBmCbyM
-	WzJq1RUQKOoWnqRJWmHOBOhaeDhMnFzD+i4V4iLXGUT22a02i0dDc1lE2DlSwndXh7Q==
-X-Google-Smtp-Source: AGHT+IGwOEvoLsyGlKbLK2I7EO3CV112zbLo9AuOo2VfG3qa8/zautum4TxS9/Et7Lbmpeas2d4LEQ==
-X-Received: by 2002:a5d:584e:0:b0:39c:2264:43ea with SMTP id ffacd0b85a97d-39efba2a69bmr12519153f8f.3.1745315879983;
-        Tue, 22 Apr 2025 02:57:59 -0700 (PDT)
-Received: from ?IPV6:2003:e5:873d:1a00:8e99:ce06:aa4a:2e7b? (p200300e5873d1a008e99ce06aa4a2e7b.dip0.t-ipconnect.de. [2003:e5:873d:1a00:8e99:ce06:aa4a:2e7b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4207afsm14838749f8f.12.2025.04.22.02.57.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 02:57:59 -0700 (PDT)
-Message-ID: <6046a6d0-bae3-41bb-9960-82c403f62476@suse.com>
-Date: Tue, 22 Apr 2025 11:57:57 +0200
+	s=arc-20240116; t=1745316778; c=relaxed/simple;
+	bh=zBdyi2R9Lkw9tHEasbCLnDpaXuNn2xb91rzlh3ywO7A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=m1dGHTBOF4OsKfYW1aH223NAGU7VVs2ZEhX6wPtciLAZnyjmWt/kpao4vgTkjHu7x6vyrbAEVYqrOn5p2svqdVaM+l/kDlPSmsXjonOnlJaJD1Yx3McRQyIBWLsONxzIT19K7Cddr+SsHYUrvxEIv1iLa6/UlX3m9ZBJdfu2+Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FNMvgoMX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AABC4CEEF;
+	Tue, 22 Apr 2025 10:12:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745316777;
+	bh=zBdyi2R9Lkw9tHEasbCLnDpaXuNn2xb91rzlh3ywO7A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=FNMvgoMXoicOi9N84cvWyw/627EaP8c/B31+dwNTir3+vDFFnUMa/ByaMeQwif1q/
+	 cpwBKO7JICYSqToP6NBIVY0+CwS7ZDPhBOH3+pfHRlJOzNIXxp3tf+qMHhGxpVnBVb
+	 uyvff7dkuRT2Lk2es+0uP+Mny5VjkTpJ6i+k19kW3NPk0+qFMR3KcyBlfBFGv3CIKb
+	 dQxvXSgDSyuhIgOF8xXlLnlIDTmHDEawIXsKujv59qPZFvzAPMUwJRZ5i1grkIpwXu
+	 3hNtz+UO6dHqEjm9FkaKSe0HCQYar8sZWoxp1J936PHU/1x17BGmj92kQ+TmHjDlCU
+	 0xniIqxVIShnA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+Cc: <boqun.feng@gmail.com>,  <rust-for-linux@vger.kernel.org>,
+  <gary@garyguo.net>,  <me@kloenk.dev>,  <daniel.almeida@collabora.com>,
+  <linux-kernel@vger.kernel.org>,  <netdev@vger.kernel.org>,
+  <andrew@lunn.ch>,  <hkallweit1@gmail.com>,  <tmgross@umich.edu>,
+  <ojeda@kernel.org>,  <alex.gaynor@gmail.com>,
+  <bjorn3_gh@protonmail.com>,  <benno.lossin@proton.me>,
+  <a.hindborg@samsung.com>,  <aliceryhl@google.com>,
+  <anna-maria@linutronix.de>,  <frederic@kernel.org>,
+  <tglx@linutronix.de>,  <arnd@arndb.de>,  <jstultz@google.com>,
+  <sboyd@kernel.org>,  <mingo@redhat.com>,  <peterz@infradead.org>,
+  <juri.lelli@redhat.com>,  <vincent.guittot@linaro.org>,
+  <dietmar.eggemann@arm.com>,  <rostedt@goodmis.org>,
+  <bsegall@google.com>,  <mgorman@suse.de>,  <vschneid@redhat.com>,
+  <tgunders@redhat.com>,  <david.laight.linux@gmail.com>
+Subject: Re: [PATCH v13 3/5] rust: time: Introduce Instant type
+In-Reply-To: <20250416.124624.303652240226377083.fujita.tomonori@gmail.com>
+	(FUJITA Tomonori's message of "Wed, 16 Apr 2025 12:46:24 +0900")
+References: <87lds3cjgx.fsf@kernel.org>
+	<20250414.205954.2258973048785103265.fujita.tomonori@gmail.com>
+	<67fe9efe.d40a0220.aa401.b05f@mx.google.com>
+	<E9nr7KtdtfgTx8OzOOMM6dg3LRl1-BqtqXj6-tGosNOz6Gi2PvOpoyiiqPGv_9nL8hfBOcnCbGP-LfBKIjlV9A==@protonmail.internalid>
+	<20250416.124624.303652240226377083.fujita.tomonori@gmail.com>
+User-Agent: mu4e 1.12.7; emacs 30.1
+Date: Tue, 22 Apr 2025 12:07:02 +0200
+Message-ID: <87cyd4bjcp.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 22/34] x86/msr: Utilize the alternatives mechanism
- to read MSR
-To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
- linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
- linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
- andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
- mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
- irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
- wei.liu@kernel.org, ajay.kaher@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
- pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
- luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
- haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-23-xin@zytor.com>
- <91f9217a-cc2d-4a6e-bada-290312f73d82@suse.com>
- <7fea6158-9b7d-4bfb-b709-729266803c32@zytor.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <7fea6158-9b7d-4bfb-b709-729266803c32@zytor.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------LRC1NKAgjBDvH3dBaZRyJS4G"
+Content-Type: text/plain
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------LRC1NKAgjBDvH3dBaZRyJS4G
-Content-Type: multipart/mixed; boundary="------------2vrbMGF8pPaZHLnA82JDRyos";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
- linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
- linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
- andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
- mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
- irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
- wei.liu@kernel.org, ajay.kaher@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
- pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
- luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
- haiyangz@microsoft.com, decui@microsoft.com
-Message-ID: <6046a6d0-bae3-41bb-9960-82c403f62476@suse.com>
-Subject: Re: [RFC PATCH v2 22/34] x86/msr: Utilize the alternatives mechanism
- to read MSR
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-23-xin@zytor.com>
- <91f9217a-cc2d-4a6e-bada-290312f73d82@suse.com>
- <7fea6158-9b7d-4bfb-b709-729266803c32@zytor.com>
-In-Reply-To: <7fea6158-9b7d-4bfb-b709-729266803c32@zytor.com>
+"FUJITA Tomonori" <fujita.tomonori@gmail.com> writes:
 
---------------2vrbMGF8pPaZHLnA82JDRyos
-Content-Type: multipart/mixed; boundary="------------0gah4xKFvsHE00D3flXrnkz1"
+> On Tue, 15 Apr 2025 11:01:30 -0700
+> Boqun Feng <boqun.feng@gmail.com> wrote:
+>
+>> On Mon, Apr 14, 2025 at 08:59:54PM +0900, FUJITA Tomonori wrote:
+>>> On Mon, 14 Apr 2025 09:04:14 +0200
+>>> Andreas Hindborg <a.hindborg@kernel.org> wrote:
+>>>
+>>> > "Boqun Feng" <boqun.feng@gmail.com> writes:
+>>> >
+>>> >> On Sun, Apr 13, 2025 at 07:43:08PM +0900, FUJITA Tomonori wrote:
+>>> >>> Introduce a type representing a specific point in time. We could use
+>>> >>> the Ktime type but C's ktime_t is used for both timestamp and
+>>> >>> timedelta. To avoid confusion, introduce a new Instant type for
+>>> >>> timestamp.
+>>> >>>
+>>> >>> Rename Ktime to Instant and modify their methods for timestamp.
+>>> >>>
+>>> >>> Implement the subtraction operator for Instant:
+>>> >>>
+>>> >>> Delta = Instant A - Instant B
+>>> >>>
+>>> >>> Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+>>> >>
+>>> >> I probably need to drop my Reviewed-by because of something below:
+>>> >>
+>>> >>> Reviewed-by: Gary Guo <gary@garyguo.net>
+>>> >>> Reviewed-by: Fiona Behrens <me@kloenk.dev>
+>>> >>> Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
+>>> >>> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
+>>> >>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>>> >>> ---
+>>> >> [...]
+>>> >>> diff --git a/rust/kernel/time/hrtimer.rs b/rust/kernel/time/hrtimer.rs
+>>> >>> index ce53f8579d18..27243eaaf8ed 100644
+>>> >>> --- a/rust/kernel/time/hrtimer.rs
+>>> >>> +++ b/rust/kernel/time/hrtimer.rs
+>>> >>> @@ -68,7 +68,7 @@
+>>> >>>  //! `start` operation.
+>>> >>>
+>>> >>>  use super::ClockId;
+>>> >>> -use crate::{prelude::*, time::Ktime, types::Opaque};
+>>> >>> +use crate::{prelude::*, time::Instant, types::Opaque};
+>>> >>>  use core::marker::PhantomData;
+>>> >>>  use pin_init::PinInit;
+>>> >>>
+>>> >>> @@ -189,7 +189,7 @@ pub trait HrTimerPointer: Sync + Sized {
+>>> >>>
+>>> >>>      /// Start the timer with expiry after `expires` time units. If the timer was
+>>> >>>      /// already running, it is restarted with the new expiry time.
+>>> >>> -    fn start(self, expires: Ktime) -> Self::TimerHandle;
+>>> >>> +    fn start(self, expires: Instant) -> Self::TimerHandle;
+>>> >>
+>>> >> We should be able to use what I suggested:
+>>> >>
+>>> >> 	https://lore.kernel.org/rust-for-linux/Z_ALZsnwN53ZPBrB@boqun-archlinux/
+>>> >>
+>>> >> to make different timer modes (rel or abs) choose different expire type.
+>>> >>
+>>> >> I don't think we can merge this patch as it is, unfortunately, because
+>>> >> it doesn't make sense for a relative timer to take an Instant as expires
+>>> >> value.
+>>> >
+>>> > I told Tomo he could use `Instant` in this location and either he or I
+>>> > would fix it up later [1].
+>>> >
+>>
+>> I saw that, however, I don't think we can put `Instant` as the parameter
+>> for HrTimerPointer::start() because we don't yet know how long would the
+>> fix-it-up-later take. And it would confuse users if they need a put an
+>> Instant for relative time.
+>>
+>>> > I don't want to block the series on this since the new API is not worse
+>>> > than the old one where Ktime is overloaded for both uses.
+>>
+>> How about we keep Ktime? That is HrTimerPointer::start() still uses
+>> Ktime, until we totally finish the refactoring as Tomo show below?
+>> `Ktime` is much better here because it at least matches C API behavior,
+>> we can remove `Ktime` once the dust is settled. Thoughts?
+>
+> Either is fine with me. I'll leave it to Andreas' judgment.
+>
+> Andreas, if you like Boqun's approach, I'll replace the third patch
+> with the following one and send v14.
+>
+> I added Ktime struct to hrtimer.rs so the well-reviewed changes to
+> time.rs remain unchanged.
 
---------------0gah4xKFvsHE00D3flXrnkz1
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+OK, Let's keep Ktime for hrtimer for now. I am OK with you putting
+`Ktime` in `hrtimer.rs` but you could also put it in time.rs. If you
+don't want to modify the patches that already has reviews, you can add
+it back in a separate patch.
 
-T24gMjIuMDQuMjUgMTE6MjAsIFhpbiBMaSB3cm90ZToNCj4gT24gNC8yMi8yMDI1IDE6NTkg
-QU0sIErDvHJnZW4gR3Jvw58gd3JvdGU6DQo+PiBPbiAyMi4wNC4yNSAxMDoyMiwgWGluIExp
-IChJbnRlbCkgd3JvdGU6DQo+Pj4gVG8gZWxpbWluYXRlIHRoZSBpbmRpcmVjdCBjYWxsIG92
-ZXJoZWFkIGludHJvZHVjZWQgYnkgdGhlIHB2X29wcyBBUEksDQo+Pj4gdXRpbGl6ZSB0aGUg
-YWx0ZXJuYXRpdmVzIG1lY2hhbmlzbSB0byByZWFkIE1TUjoNCj4+Pg0KPj4+IMKgwqDCoMKg
-IDEpIFdoZW4gYnVpbHQgd2l0aCAhQ09ORklHX1hFTl9QViwgWDg2X0ZFQVRVUkVfWEVOUFYg
-YmVjb21lcyBhDQo+Pj4gwqDCoMKgwqDCoMKgwqAgZGlzYWJsZWQgZmVhdHVyZSwgcHJldmVu
-dGluZyB0aGUgWGVuIGNvZGUgZnJvbSBiZWluZyBidWlsdA0KPj4+IMKgwqDCoMKgwqDCoMKg
-IGFuZCBlbnN1cmluZyB0aGUgbmF0aXZlIGNvZGUgaXMgZXhlY3V0ZWQgdW5jb25kaXRpb25h
-bGx5Lg0KPj4+DQo+Pj4gwqDCoMKgwqAgMikgV2hlbiBidWlsdCB3aXRoIENPTkZJR19YRU5f
-UFY6DQo+Pj4NCj4+PiDCoMKgwqDCoMKgwqDCoCAyLjEpIElmIG5vdCBydW5uaW5nIG9uIHRo
-ZSBYZW4gaHlwZXJ2aXNvciAoIVg4Nl9GRUFUVVJFX1hFTlBWKSwNCj4+PiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgdGhlIGtlcm5lbCBydW50aW1lIGJpbmFyeSBpcyBwYXRjaGVkIHRv
-IHVuY29uZGl0aW9uYWxseQ0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBqdW1wIHRv
-IHRoZSBuYXRpdmUgTVNSIHJlYWQgY29kZS4NCj4+Pg0KPj4+IMKgwqDCoMKgwqDCoMKgIDIu
-MikgSWYgcnVubmluZyBvbiB0aGUgWGVuIGh5cGVydmlzb3IgKFg4Nl9GRUFUVVJFX1hFTlBW
-KSwgdGhlDQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGtlcm5lbCBydW50aW1lIGJp
-bmFyeSBpcyBwYXRjaGVkIHRvIHVuY29uZGl0aW9uYWxseSBqdW1wDQo+Pj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHRvIHRoZSBYZW4gTVNSIHJlYWQgY29kZS4NCj4+Pg0KPj4+IFRo
-ZSBhbHRlcm5hdGl2ZXMgbWVjaGFuaXNtIGlzIGFsc28gdXNlZCB0byBjaG9vc2UgdGhlIG5l
-dyBpbW1lZGlhdGUNCj4+PiBmb3JtIE1TUiByZWFkIGluc3RydWN0aW9uIHdoZW4gaXQncyBh
-dmFpbGFibGUuDQo+Pj4NCj4+PiBDb25zZXF1ZW50bHksIHJlbW92ZSB0aGUgcHZfb3BzIE1T
-UiByZWFkIEFQSXMgYW5kIHRoZSBYZW4gY2FsbGJhY2tzLg0KPj4NCj4+IFNhbWUgYXMgdGhl
-IGNvbW1lbnQgdG8gcGF0Y2ggNTogdGhlcmUgaXMgbm8gaW5kaXJlY3QgY2FsbCBvdmVyaGVh
-ZCBhZnRlcg0KPj4gdGhlIHN5c3RlbSBoYXMgY29tZSB1cC4NCj4+DQo+IA0KPiBQbGVhc2Ug
-Y2hlY2sgaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC84N3kxaDgxaHQ0LmZmc0B0Z2x4
-Ly4NCj4gDQo+IEFuZCBpdCdzIHdhcyBhbHNvIG1lbnRpb25lZCBpbiB0aGUgcHJldmlvdXMg
-cGF0Y2g6DQo+IA0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMjUwNDIyMDgy
-MjE2LjE5NTQzMTAtMjIteGluQHp5dG9yLmNvbS8NCj4gDQo+IFBsZWFzZSBsZXQgbWUga25v
-dyB3aGF0IEkgaGF2ZSBtaXNzZWQuDQoNClBsZWFzZSBzZWUgbXkgcmVzcG9uc2UgdG8gdGhl
-IHByZXZpb3VzIHBhdGNoLg0KDQoNCkp1ZXJnZW4NCg==
---------------0gah4xKFvsHE00D3flXrnkz1
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+Either way we should add a `// NOTE: Ktime is going to be removed when
+hrtimer is converted to Instant/Duration`.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
 
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
+Best regards,
+Andreas Hindborg
 
---------------0gah4xKFvsHE00D3flXrnkz1--
 
---------------2vrbMGF8pPaZHLnA82JDRyos--
-
---------------LRC1NKAgjBDvH3dBaZRyJS4G
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgHaCYFAwAAAAAACgkQsN6d1ii/Ey88
-2gf9G2X7seedpgkuVi3Kr8ramS2kAPeIhTmk5YzYNI/baO7kJni9Bz3A8CJrjqPBQos1/m+ZHUnL
-HHqgoLhq+2kdhHVUY+nPYIPdebmYLTHvd3gC+R7swUzJf55bQGENKLO6WtuH5sksovruObmjap7C
-sbHKsWYiAx51NvcRCMZPJAmT8N/+KqAAPfqutdEhiGIfuSkyH9cA34H3Dg/y2hLs4SMppXznwBe7
-TXOOblqw8TxiQKwP05dQo56KdIc6ap06wnELQWlmjSZUSIkSyD4RvmANZE0jAxiFKQr00dtaGUxz
-eaA239uDGL6mfOq/W/cBOw0vspmUeBL6fc4RZErgyw==
-=mYH8
------END PGP SIGNATURE-----
-
---------------LRC1NKAgjBDvH3dBaZRyJS4G--
 
