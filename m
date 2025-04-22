@@ -1,176 +1,151 @@
-Return-Path: <netdev+bounces-184578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13DBA963F0
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:18:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151FFA963FA
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED74E188C967
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:14:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF90C189A76A
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB992472A1;
-	Tue, 22 Apr 2025 09:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DFD2550DC;
+	Tue, 22 Apr 2025 09:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZPeuqs2Q"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ELJ67bb9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C23B1EFFBF;
-	Tue, 22 Apr 2025 09:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11EB2550D9
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 09:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745313237; cv=none; b=sJGXbxdeKArJJgrV/yT88cXl9SmZRQ3mwOgdXiCRYgSRa0Uh5uWA4kwIaQDP6e05tIoIRdkE3VjdXkBdf2rU2u89uW4a1MSVouBk2QegyRPXZpriAQ46PZHbzTyYf6VEcCfQwM+wEzfqszGWsYplsA7umwHTRd6QvFHJzfl2AHg=
+	t=1745313284; cv=none; b=iIj2pEwfqNG4IE6eKfbLTcZ27OW6VlLshQztDn2rSnVNB+s00hIa0nIPlrSI1Nn67X2Gp+Ap5nUfn0Fk75vGxoQxpv76XhvdpQ2lwwyqYdC+G0JZc8MmHGuDYVWmgTNbSkjwLtigoHltdolaQK2zXrlFRABtQx2dpO6Y8Jojgjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745313237; c=relaxed/simple;
-	bh=8t87NXRHmH+x11mIfycM4fyvuVR/eKMQUHrwiHhPu78=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqRSsyIK2jm7yc24LVHKX8b7QMSP93cmnmSZmjGw0Jb2uyi9tIhq3VynnSgryOhP6EpNYEBScfisyxM1Hn+/7VIrIYk0R/mlV4Hr9QAGzKFxAnIurqXH1nBb3yK+TopRfuhdN9KnD7dx4xjKPg7HpLVEfaE2Fhaf3mQXjxcSQqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZPeuqs2Q; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53M9Clo71988629
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 22 Apr 2025 02:12:47 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53M9Clo71988629
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745313171;
-	bh=5MyMi1dWDpqM4+680ZRWUMemTrM7gOfrACTzG+hcvhU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZPeuqs2QxCZr+2CQbzBLOCpW3Aawds6/1cwg0KOGkN4s7Xzb3PZq6E2KiAUhdSklS
-	 6bmAZ9hG+CfiogKMARVhoVzL3oriBG5dyHPHGBto0/mSKUTbfZ4aFLYUysVlh6JFC/
-	 ZfI2lvkhOZHiUCZh+IkdkYywF31eKyF7de+lHzDs4b9fjhHs57HIRf++LaLMNtLPKY
-	 QczCdjB0+4sEGoXJlmUjHhZjwRqeUafNM/3rfcGnb2CJu8EO98o0Ia9j/fEpQcfhQG
-	 lCV0OoOhQjfirIbZQCPq86OrgvY0dVY0/wQxoL36KQ5giQ3vDEnESbBhySaQesbEM7
-	 0Bz5uP6uYbAzw==
-Message-ID: <a482b4df-f662-4d5d-8100-ade07afcdc24@zytor.com>
-Date: Tue, 22 Apr 2025 02:12:46 -0700
+	s=arc-20240116; t=1745313284; c=relaxed/simple;
+	bh=hb9nRR5K+0KKUCCIlFPq+xn+7rN/2O0ZIk1vYiWfSco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=blxLm1BL7FiBLWlkFU95Ry337a1EUBKQU7bHPNVdgqYXZ7XezQmfpa6cRa58Bwc1VZjrHB/ztWfYIBJBLqhjH9dHuYXApZSVmgZXqoXthqJvqO8PPz2zSGw+TuHZFSyiW7obiuuw1WMF7i3gpEfGo7GDM+m2HBWlptzyUHDthcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ELJ67bb9; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cf3192f3bso48686025e9.1
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 02:14:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745313280; x=1745918080; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFmmnpl4XwCXv99by51T09kPcELv8zaWE44R4O9qreU=;
+        b=ELJ67bb9x7Qox31okJNi8eV0s9coanHBJmc5rjmIOTtnodwfzqNshZ03LxjdSHV0l6
+         PiqDZJszTQ1W9pZuZVrYdq/cDSSkTl+IiJXdg/oaXorwtQDryPTh9sX1afTzBCPertqH
+         ai+qSLERnUcX4zsDg9YWs+xBOdSzfAkBV5E48X7zOWqBRgPHrwZdi4/cvoPghIKjxTMd
+         sZuC59TvDaOGin/9PaHDoGeXcIaDF9JMOxnUNePjlFgi5GOQ9kAjIadcdOEp7XWZ1sF7
+         CmLSWhmZsf23t+cJfixn6INByb0vgpIbvBjXJSCVbzhhNV6J2LIvYIMKpmcBpKCepwtI
+         iYHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745313280; x=1745918080;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KFmmnpl4XwCXv99by51T09kPcELv8zaWE44R4O9qreU=;
+        b=sceje5wHlAmpTz5uiaPprBrWQgx7ZgXIipRKq5pnyOI/qR01Q7H+sPozgjhBEjg4eP
+         BxjNUoJcn995VUJ7tmLDgp+bGzLz6WuXToA9VnHDliG7wO7lcKbpx2oHU28gk8JvxqOH
+         qPlbswJ1K3HOpQzh4XpPE2QW5ErzhincGmiD+gBg2YArdUzXl4stuYDDiPZje0asYjfb
+         1m7Dpcv65pbuc64JOxjnoRPkEMPNvqrzpiRREu3eeilWgja0Dvoo5Bdf1Jgx1zeLv9MK
+         +rFZuUzmmQYCoQtjPSBMj4ir+KekszMTHvu2Y9fvXKFRKv347JTuf4PcWocZFvmlGhSB
+         fqqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbPpBCB1R8gJcsEO/qZviUcLLQRPltbqZj8gZAGs5UfTq4YPGR2wKERQYD9fPB8J/6v+qBkDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx56+BhH2f0UJ7ucJ9lNR6PonL7wuRowVWhB+tg60swJe6Wlobt
+	K82SeDd8banCaeqxCbrL+KSWaLgkZppek+ef7J3u/hKwJP/yD0QiDDJGuIOy++OP0YBMl9MIknE
+	e
+X-Gm-Gg: ASbGnct4+wnNQY1E4xgtQmxTswwGAjlNw4T4YYO5+6pB0FM+iU6M24Nnp5jwPqgGiW5
+	drZ17S7ZAmfNTRt1HkMzNYj531UlDc49hOM6KFs+hBdCtnAbDqCHWSjJ9xtOMX+Vcv5/MGUzm/A
+	yB3hl//dFmkPwjKkguZv7YucNWMquL6eax4uJhharrZxMny3qJOeyxOuyEiQvlCgBpzSVnqwKoA
+	fKCqLn3pCukZlDABG5o6ozN4sQfkcbHlDw7sMxXtvSg3GIlGBJnchQrD3DtoDXqAcz6IVYDzuiy
+	lG26ZbseLbXH5+GXE6Zmt5jAdEl0qu0549QeX/YpfGSnP3gMpJes9Ajp63v+8ca4N/J3
+X-Google-Smtp-Source: AGHT+IFxYzUGc2lgbjAfZgS2oqJIHWXh49D/UwBkdHf3tvHrVAFdZSmGuS6nB61/piapdKu93vl6dQ==
+X-Received: by 2002:a05:600c:3b9b:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-4406aa872fdmr144472485e9.0.1745313279991;
+        Tue, 22 Apr 2025 02:14:39 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa43bf20sm14292446f8f.48.2025.04.22.02.14.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 02:14:39 -0700 (PDT)
+Date: Tue, 22 Apr 2025 11:14:36 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V2 01/14] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <v6p7dcbtka6juf2ibero7ivimuhfbxs37uf5qihjbq4un4bdm6@ofdo34scswqq>
+References: <20250414195959.1375031-1-saeed@kernel.org>
+ <20250414195959.1375031-2-saeed@kernel.org>
+ <20250416180826.6d536702@kernel.org>
+ <bctzge47tevxcbbawe7kvbzlygimyxstqiqpptfc63o67g4slc@jenow3ls7fgz>
+ <20250418170803.5afa2ddf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 06/34] x86/msr: Use the alternatives mechanism to
- read PMC
-To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-7-xin@zytor.com>
- <fbb509e8-0bd6-480f-be32-fd0895255a21@suse.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <fbb509e8-0bd6-480f-be32-fd0895255a21@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250418170803.5afa2ddf@kernel.org>
 
-On 4/22/2025 1:38 AM, Jürgen Groß wrote:
-> On 22.04.25 10:21, Xin Li (Intel) wrote:
->> To eliminate the indirect call overhead introduced by the pv_ops API,
->> use the alternatives mechanism to read PMC:
-> 
-> Which indirect call overhead? The indirect call is patched via the
-> alternative mechanism to a direct one.
-> 
+Sat, Apr 19, 2025 at 02:08:03AM +0200, kuba@kernel.org wrote:
+>On Fri, 18 Apr 2025 12:26:50 +0200 Jiri Pirko wrote:
+>> Thu, Apr 17, 2025 at 03:08:26AM +0200, kuba@kernel.org wrote:
+>> >On Mon, 14 Apr 2025 12:59:46 -0700 Saeed Mahameed wrote:  
+>> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >> 
+>> >> Devlink param and health reporter fmsg use attributes with dynamic type
+>> >> which is determined according to a different type. Currently used values
+>> >> are NLA_*. The problem is, they are not part of UAPI. They may change
+>> >> which would cause a break.
+>> >> 
+>> >> To make this future safe, introduce a enum that shadows NLA_* values in
+>> >> it and is part of UAPI.
+>> >> 
+>> >> Also, this allows to possibly carry types that are unrelated to NLA_*
+>> >> values.  
+>> >
+>> >I don't think you need to expose this in C. I had to solve this
+>> >problem for rtnl because we nested dpll attrs in link info. Please see:
+>> >
+>> >https://github.com/kuba-moo/linux/commit/6faf7a638d0a5ded688a22a1337f56470dca85a3
+>> >
+>> >and look at the change for dpll here (sorry IDK how to link to a line :S)
+>> >
+>> >https://github.com/kuba-moo/linux/commit/00c8764ebb12f925b6f1daedd5e08e6fac478bfd
+>> >
+>> >With that you can add the decode info to the YAML spec for Python et al.
+>> >but there's no need do duplicate the values. Right now this patch
+>> >generates a bunch of "missing kdoc" warnings.
+>> >
+>> >Ima start sending those changes after the net -> net-next merge,
+>> >some of the prep had to go to net :(  
+>> 
+>> I may be missing something, I don't see how your work is related to
+>> mine. The problem I'm trying to solve is that kernel sends NLA_* values
+>> to userspace, without NLA_* being part of UAPI. At any time (even unlikely),
+>> NLA_* values in kernel may change and that would break the userspace
+>> suddenly getting different values.
+>> 
+>> Therefore, I introduce an enum for this. This is how it should have been
+>> done from day 1, it's a bug in certain sense. Possibility to carry
+>> non-NLA_* type in this enum is a plus we benefit from later in this
+>> patchset.
+>
+>Ugh, I thought enum netlink_attribute_type matches the values :|
+>And user space uses MNL_ types.
+>
+>Please don't invent _DYN_ATTR at least. Why not PARAM_TYPE ?
 
-See below.
-
-
->>
->>      1) When built with !CONFIG_XEN_PV, X86_FEATURE_XENPV becomes a
->>         disabled feature, preventing the Xen PMC read code from being
->>         built and ensuring the native code is executed unconditionally.
-> 
-> Without CONFIG_XEN_PV CONFIG_PARAVIRT_XXL is not selected, resulting in
-> native code anyway.
-
-Yes, this is kept in this patch, but in a little different way.
-
-> 
->>
->>      2) When built with CONFIG_XEN_PV:
->>
->>         2.1) If not running on the Xen hypervisor (!X86_FEATURE_XENPV),
->>              the kernel runtime binary is patched to unconditionally
->>              jump to the native PMC read code.
->>
->>         2.2) If running on the Xen hypervisor (X86_FEATURE_XENPV), the
->>              kernel runtime binary is patched to unconditionally jump
->>              to the Xen PMC read code.
->>
->> Consequently, remove the pv_ops PMC read API.
-> 
-> I don't see the value of this patch.
-> 
-> It adds more #ifdef and code lines without any real gain.
-> 
-> In case the x86 maintainers think it is still worth it, I won't object.
-
-I think we want to totally bypass pv_ops in the case 2.1).
-
-Do you mean the indirect call is patched to call native code *directly*
-for 2.1?  I don't know it, can you please elaborate?
-
-AFAIK, Xen PV has been the sole user of pv_ops for nearly 20 years. This
-raises significant doubts about whether pv_ops provides Linux with the
-value of being a well-abstracted "CPU" or "Platform".  And the x86
-maintainers have said that it's a maintenance nightmare.
-
-Thanks!
-     Xin
+Because it is used for both params and health reporters (fmsg).
 
