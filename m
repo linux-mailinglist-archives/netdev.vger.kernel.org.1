@@ -1,116 +1,104 @@
-Return-Path: <netdev+bounces-184718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8910BA96FD9
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:06:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA030A96FDD
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6D0C1B66537
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12CF91B6827E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69FF27BF7D;
-	Tue, 22 Apr 2025 15:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB5228F933;
+	Tue, 22 Apr 2025 15:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRWmgWcJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I6IV+lrb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8273635949
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74A828F931
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745334161; cv=none; b=fkJdJH/MvpAc1TQYM+l9K3Jk97C5YqNbR3ttfCbl1JwUCy9cMRUnuz88xDHMY6c2vLoG34GjZmpOlUyKOtduECN0UheXMU8RRrzuR+C1yusBbG5wWfyDW/emoaPBib6RWMLVzD7RT+ZFxyVDBF96ZNBVEnFWJGvLMFpUzNUNy0s=
+	t=1745334185; cv=none; b=swGsIFZW80RGzgVfTlPizxw39Ud8Y/3YvLgZpgEbkPAQY7gmfKgxgHz1Un/44WHJ8veHYHOZRt+Fw8XyGnHDNggEdAHkF7pX9MLrak0V8AufFwy6hmbxIKjc/oB1kCbJpG3/9bqvJi4MUI7vgdG3NYeAvTEFbBgBMgv0/Vr/MFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745334161; c=relaxed/simple;
-	bh=631ooWU/IIBWbibqv5uQh9Dw6r3rFg9c6eQU86XEoJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nc3pBn4viIetU+GIwTw2gPmzVUh5iaXw7CAdr9HKqEdf1ETHDI8bneB7PpMYfOamNy+1gsYwZ0wKr20INAaMymLUhxT7zbjdSpI9kh+S3HdW2BwuJQYqX/MTJvl5rtS/vcjwRXqrMrKNDhUIsTzio1zHaadeyivNEUlDCpk+/0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRWmgWcJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF61C4CEE9;
-	Tue, 22 Apr 2025 15:02:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745334159;
-	bh=631ooWU/IIBWbibqv5uQh9Dw6r3rFg9c6eQU86XEoJU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QRWmgWcJHMTdp8zbGmuiGl+gg+O/M1MB7N7ylgotvn4++phTEYxnLtfgehAy+wi7d
-	 6U3S0Nq2/yIyCWMxjkJftIYJWGQtu7t/PDQrW03V1mecosbPDUTjU9gXIX9eBdDsSM
-	 sR3/UWBTnekOwArZxcJGB4frDvwSHo2nvfzXkP2oJx7Qv/9wSPxgkh8Ucb8HP7nzun
-	 vfgnNBcFG751PwkFZtFtYzqprHg/b8VUAu+VgCAxm1fRwXnOxXuOUJMgyEmlfy3Eva
-	 kperAaFV5tyOchhkqiXRzXk+PIpV8eabwgBBZzXoQaR+fHwdeBckWS0+7X9IxMbol1
-	 t9a3xpYTK0mCw==
-Date: Tue, 22 Apr 2025 08:02:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, tariqt@nvidia.com, andrew+netdev@lunn.ch,
- horms@kernel.org, donald.hunter@gmail.com,
- kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v3 2/3] devlink: add function unique identifier
- to devlink dev info
-Message-ID: <20250422080238.00cbc3dc@kernel.org>
-In-Reply-To: <5abwoi3oh3jy7y65kybk42stfeu3a7bx4smx4bc5iueivusflj@qkttnjzlqzbl>
-References: <20250416214133.10582-1-jiri@resnulli.us>
-	<20250416214133.10582-3-jiri@resnulli.us>
-	<20250417183822.4c72fc8e@kernel.org>
-	<o47ap7uhadqrsxpo5uxwv5r2x5uk5zvqrlz36lczake4yvlsat@xx2wmz6rlohi>
-	<20250418172015.7176c3c0@kernel.org>
-	<5abwoi3oh3jy7y65kybk42stfeu3a7bx4smx4bc5iueivusflj@qkttnjzlqzbl>
+	s=arc-20240116; t=1745334185; c=relaxed/simple;
+	bh=a9oHiuIRd+Lat23wgyOLQVKu0davNOYNyV1lqgu94Hc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aPqEeTV4eLCudbxLMvU8No/l9810Z+FXTF9QYvvfHuyA7KEoOXi9wcBGzzmzR71S/1ncBcxe9A3hq1cNrFvCF631wvRaCYxVBLSDOO7lqpvAkn8PxRnt2ucoioaiN5IWsXxcjLSqSH8aiG3wwM/yjE2imnJvaDPHz4bYf460UoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I6IV+lrb; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-306b590faaeso3883608a91.3
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 08:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745334183; x=1745938983; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZR743ev6ExzRYE8cINx+AM9cywgAmFfoIc+SqezuNJU=;
+        b=I6IV+lrbYv0t+bvIaiG0TbVyWJT40Lj0vRqcLzc3/x+0dcZml1AnFM8HQY5Ii0wkCK
+         EFI9GLLncA7Nf81PeY4qYgGpbEdk6GQtvjHUrP43uS7sYSItfs/Hp/W+equBtADhN9iR
+         H8kGG/d5XAZylKSAL++q+ioYsECrBM0IYZU7VUdqcrJGhPa3joqiDrIgBusCnfsOOjmZ
+         /a1Dr6t8bvSNSFRCHQvERf4r1hilrZRf/fX4p3Lkj5VzPiie0d1c69yQE2wP4ATTE3E/
+         J6p2quspRGpvtugOYU1sLARWmrmhAeltWiFl33W2BwncgY4q3qCNTdFwpdJXyCO/Kkkj
+         To3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745334183; x=1745938983;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZR743ev6ExzRYE8cINx+AM9cywgAmFfoIc+SqezuNJU=;
+        b=dMUoDPDvSPCyTrtyOuTCgS+rOGCQeupjj96nWbEsif4mFs3/5/uPLRvOR0LgQZIjP3
+         1rkGRjWzmTdLi0Xb0zbqWgdddKl2Zcw/ATxQ1q9VvPjSDdhhiRu0QZSxcJ4LdB4MN2p+
+         bjapXlbeJtC8WjGI23BG6hN/zaUOaWxnAKu/ioyLgPOzgWhR8vzDHtcAXtj7yQCOQvDv
+         sMCRHeTqCxWwZldzDoor7NaWpCDflk/dV6Bjy/6YKW0nJfm7yHJVSqEE1yRAF33J6YHd
+         N3ZuplmWWcHIskI94NBTVPNgUlrH9cbxqG1moa+aGC9VwbiYjU6nXOnZO3u/n26JDZFH
+         uPLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbKFuzUFPufBLqtXeV7TQErhDOX55FTxu3Jxq/kEu+H77xZ/aKvEBPIi8yYca9bNgTCP0jqA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqBWHy0wvm4Ba9Fdu3XBcp1qPNFqz373QJenzkML/3nGJcjnJm
+	EYeAIRkT6RggjwZq3ueHws08HJxJv+CapFNlO30+hVDP3AmGvHhKaaYFKTU4iKJDsBLqke89AwH
+	4qg==
+X-Google-Smtp-Source: AGHT+IEIapJZJRM9UWSGs3HX5eEFDXXhucM1QTXJfnPOK/9YTrDfsNmQubNfg9xjcSY4LHTjaYmG0pXn5/g=
+X-Received: from pjbsn11.prod.google.com ([2002:a17:90b:2e8b:b0:308:861f:fddb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a0c:b0:2ef:31a9:95c6
+ with SMTP id 98e67ed59e1d1-3087bb56439mr25794718a91.14.1745334182926; Tue, 22
+ Apr 2025 08:03:02 -0700 (PDT)
+Date: Tue, 22 Apr 2025 08:03:01 -0700
+In-Reply-To: <20250422082216.1954310-1-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250422082216.1954310-1-xin@zytor.com>
+Message-ID: <aAevpauKYWwObsB7@google.com>
+Subject: Re: [RFC PATCH v2 00/34] MSR refactor with new MSR instructions support
+From: Sean Christopherson <seanjc@google.com>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
+	linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org, 
+	jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org, 
+	namhyung@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, 
+	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com, 
+	kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com, 
+	bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com, 
+	pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, 
+	boris.ostrovsky@oracle.com, kys@microsoft.com, haiyangz@microsoft.com, 
+	decui@microsoft.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 22 Apr 2025 11:18:23 +0200 Jiri Pirko wrote:
-> Sat, Apr 19, 2025 at 02:20:15AM +0200, kuba@kernel.org wrote:
-> >On Fri, 18 Apr 2025 12:15:01 +0200 Jiri Pirko wrote:  
-> >> Ports does not look suitable to me. In case of a function with multiple
-> >> physical ports, would the same id be listed for multiple ports? What
-> >> about representors?  
-> >
-> >You're stuck in nVidia thinking. PF port != Ethernet port.
-> >I said PF port.  
-> 
-> PF port representor represents the eswitch side of the link to the
-> actual PF. The PF may or may not be on the same host.
-> 
-> Ethernet port is physical port.
-> 
-> Why this is nVidia thinking? How others understand it?
+On Tue, Apr 22, 2025, Xin Li (Intel) wrote:
+> base-commit: f30a0c0d2b08b355c01392538de8fc872387cb2b
 
-Because you don't have a PF port for local PF.
-
-The information you want to convey is which of the PF ports is "local".
-I believe we discussed this >5 years ago when I was trying to solve
-this exact problem for the NFP.
-
-The topology information belongs on the ports, not the main instance.
-
-> >> This is a function propertly, therefore it makes sense to me to put it
-> >> on devlink instance as devlink instance represents the function.
-> >> 
-> >> Another patchset that is most probably follow-up on this by one of my
-> >> colleagues will introduce fuid propertly on "devlink port function".
-> >> By that and the info exposed by this patch, you would be able to identify
-> >> which representor relates to which function cross-hosts. I think that
-> >> your question is actually aiming at this, isn't it?  
-> >
-> >Maybe it's time to pay off some technical debt instead of solving all
-> >problems with yet another layer of new attributes :(  
-> 
-> What do you mean by this? 
-
-I keep saying that the devlink instance should represent the chip /
-data processing pipeline.
-
-> We need a way to identify port representor
-> (PF/VF/SF, does not matter which) and the other side of the wire that
-> may be on a different host. How else do you imagine to do the
-> identification of these 2 sides?
+This commit doesn't exist in Linus' tree or the tip tree, and the series doesn't
+apply cleanly on any of the "obvious" choices.  Reviewing a 34 patches series
+without being able to apply it is a wee bit difficult...
 
