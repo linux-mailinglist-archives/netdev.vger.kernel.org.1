@@ -1,77 +1,122 @@
-Return-Path: <netdev+bounces-184475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6728EA959FF
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 02:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E668A95A4B
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 03:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 243247A2621
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 00:02:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D28E7A909C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 01:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D439CA59;
-	Tue, 22 Apr 2025 00:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39FE84D08;
+	Tue, 22 Apr 2025 01:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TysWquBb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kq++VrVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84F6DF58;
-	Tue, 22 Apr 2025 00:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1117D125DF;
+	Tue, 22 Apr 2025 01:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745280231; cv=none; b=nWgUatSQFu1jyvXa7F9aIUwnsNcUQ7u13DTbjRNoUvQvNHxfz1fMZI7ZZl98QlRUsPEoUQz8tKjDFY/CLuJrbD9WNNscWBw3vyLam4MHtjvuTGu4W0SHPA8CqWFS/DStsamCtPRiLat76Z+9qbOLuM5ke4kLRfO44LFA5hbXuLQ=
+	t=1745283961; cv=none; b=l03gSAdT89Bx2H43H4W+o0S33kSNBVKxCtzet/Ltz4njIlErwm2AX8hIyT9n400HMU6tltivycMOfJyKHhZZJuMun/uDVMxfXlmPGvlRFLOfbNvcJ6vpmvW1rcy1A2qwFLGpmaVv2U/E6Fe2YdQfG4MPvCCAEE6SlTiR0gQMlBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745280231; c=relaxed/simple;
-	bh=ByXM9NwhLFSE7cwLmMnQdf3Y/z48xuxLc5CpTPHWd8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sj3+tgd43yPgJgg/V8tuhlvqdjQQlyhenED9zgId/Uvp7fAK95dG9t/jlMB5iedRK9nKyodYyregs6D4+Ut4ZwNQwq7Lryq9TYCT3pKh8ftqhmUi5Zwz1nwrmjt5HI8Feim+Z+FBbQ3+WqhUsoRrqh0YUK/Id36iq+pLh0Hm1gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TysWquBb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D231C4CEE4;
-	Tue, 22 Apr 2025 00:03:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745280231;
-	bh=ByXM9NwhLFSE7cwLmMnQdf3Y/z48xuxLc5CpTPHWd8E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TysWquBb8nGwZpbr/arQtdRMae5KhBFd2ZpyWCcnUHoR3UrCUEoDqU9isnIgRM7h2
-	 hkncZot2SV5UDJXVU6oH1tu2LYMi5xwHGvS2fXYfuX5+AwKn+Au23FYxO28WmvQW2N
-	 NwsTdO+vJYtzk94+26Zbu5Hzjdj9DCbgso5VpuZ8xyiB6pn9C7IAr1Szgr5JgxnjcF
-	 4aDX7EHxoCdCbH2pgLd3Uq502Ill+BA0U3s65jgVcYxr+q9SkBm9L8GSKIWEHFJgla
-	 RMEd14cK5LpxzO0Jtxi9XKbJDn4d29tgLsF77ct9/zWQuLNwIt+FbH3EhYzzI/Kv9V
-	 7iS+UM/9NK5ZQ==
-Date: Mon, 21 Apr 2025 17:03:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org, mhklinux@outlook.com,
- pasha.tatashin@soleen.com, kent.overstreet@linux.dev,
- brett.creeley@amd.com, schakrabarti@linux.microsoft.com,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- rosenp@gmail.com, paulros@microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] net: mana: Add sched HTB offload support
-Message-ID: <20250421170349.003861f2@kernel.org>
-In-Reply-To: <1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
-References: <1745217220-11468-1-git-send-email-ernis@linux.microsoft.com>
-	<1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1745283961; c=relaxed/simple;
+	bh=pzlIxYXw3dVCJk2xnhZd2Z19X3NxTLuQqOl6007Ve48=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b2cKSvjz335jt4jfo9fsSYlkQZVjbIyq6bp/89OmczymgDmiYxZ1X8YmR9+ISiIwHPegcuvu7BHfq/vQB8Zmk1q1ujFnaMgG0Zi0G126feR44dbnS2d7sTe98wjMyegtXDrv9l0VAyVRqLu8ZlfW25U0LtGyky9+qaX9o1sT3YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kq++VrVN; arc=none smtp.client-ip=209.85.218.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-ac345bd8e13so660002766b.0;
+        Mon, 21 Apr 2025 18:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745283958; x=1745888758; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3M7sAfGBAOV8eDt/hvtRBXRPqMNgvzCNV7GeaqWBh1I=;
+        b=kq++VrVNNS5bRRBXDEA8QD8+i6F46QHSdnosBlZh0Llidh4xIvSHFLd+CLZqAGJPA7
+         oUKwnJKhjS4C5Efb/d+vVCYUv8JHfobN3cdaaLJ7Rm6h4pfM8XXszNgVhqWs/Lt5Dwqk
+         L6hlB5OyBReEVrTCZqlWc0d4OmNsvqzMIQ04A+JpDut5OSQkMoWhqNKkP8GjT9hiybUj
+         WJCSLlQzIHnOe0XntEVhFcssp7TQLr9ya2xWtOgPvoKhI3avQx0+cJd4pReOezBkCZiY
+         VYJ0fw/0GutReJ6G0JF0BFfZW0lpv4voI4gMXGuIoteCE50tjeIPXNANEUiW1lE2UlcF
+         OdLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745283958; x=1745888758;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3M7sAfGBAOV8eDt/hvtRBXRPqMNgvzCNV7GeaqWBh1I=;
+        b=BNhyh6/wUF3B9k+nc0GMAn4yVnGNvwNilHWzyKXof/C8W/THOvg0EGo59MS0BiPaMA
+         obI020GjJRY0RsFBZRkdHyqgc1qYC2BP+QVs4EQPdx/RbPKmtNsC9xo2/TPVmmzWqxYo
+         TsTBh1fva/raQ0IYeuGeVQLOVyYDovX28fPiQ2Qg8yM4vMYcmO1jTeISlaSkMTwqopvD
+         5/RQ2YGF0v8pPzo60PfwDsINmgxFZ0GRfCGPOUAgzxy/QbygHZWuBMcBtJhT47JW1x6i
+         +fs0VI9wmxDWULEaksi9rcN/y/GQp3nA8ibNZoBoHI/4Yk+jOWk8j9j+ykaXJXweNJK5
+         hY4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVu7AfSOooVkGpJDkPTkXZixPf6Q2nxhgcBJrN6XorGsk5W/lR0D1WU7kYUFklpiKn1J4MqPDE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0R0/taIk0Ze8njvvuCZw4h3VeVuuOEqZo8a+n8NYPojm3KCH2
+	D8a1bbDnynZkMnd9kGFGEmv2MTWZB2MsvoDckHhzzmo8EZWypDcKb36qk2pM+1y6KnTC96pwhi2
+	0pEl/ny0iaZIzQV16tNvKf7zTnEUSa+iC
+X-Gm-Gg: ASbGncsd9T6/i3/SsU/UcekkiO0blSWnX6AZ70G+wFL67dkSpZN4wRsNkSymt43k/+l
+	SkF8fnY5FVq141tNuohtIDIoaSXp5/ZtxwBouS8oVaSB2HnBH1SeF6/7PFHNQLBILk2W5sCQhCP
+	9jdzPVlhoJff7urVJZjbb4Fulfu7zc9jvTgVUHPpbec84=
+X-Google-Smtp-Source: AGHT+IGxaM3GFKXNBbM8RVCjc5GUyWZsUBZaKDac2ZBrwiBJJBsb3lOQ++a3MlBFdKzgnAEnJKSLfTOkTUK1jrwwM1I=
+X-Received: by 2002:a17:907:96ac:b0:ac3:8897:eb75 with SMTP id
+ a640c23a62f3a-acb74ad94b2mr1314756266b.10.1745283958296; Mon, 21 Apr 2025
+ 18:05:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250418224652.105998-1-martin.lau@linux.dev> <20250418224652.105998-2-martin.lau@linux.dev>
+In-Reply-To: <20250418224652.105998-2-martin.lau@linux.dev>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Tue, 22 Apr 2025 03:05:21 +0200
+X-Gm-Features: ATxdqUEyHSXbk6qPzmLm_Cw_KAHOUiJvtM5G1fe8_42R66jhKILMxEvFGwb3QrI
+Message-ID: <CAP01T776eigY_RD8CFTiqLNcRMvy+jdNtsAmQgTDL0YfLbhzvw@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 01/12] bpf: Check KF_bpf_rbtree_add_impl for
+ the "case KF_ARG_PTR_TO_RB_NODE"
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
+	kernel-team@meta.com, Amery Hung <ameryhung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 20 Apr 2025 23:33:39 -0700 Erni Sri Satya Vennela wrote:
-> This controller can offload only one HTB leaf.
+On Sat, 19 Apr 2025 at 00:47, Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>
+> From: Martin KaFai Lau <martin.lau@kernel.org>
+>
+> In a later patch, two new kfuncs will take the bpf_rb_node pointer arg.
+>
+> struct bpf_rb_node *bpf_rbtree_left(struct bpf_rb_root *root,
+>                                     struct bpf_rb_node *node);
+> struct bpf_rb_node *bpf_rbtree_right(struct bpf_rb_root *root,
+>                                      struct bpf_rb_node *node);
+>
+> In the check_kfunc_call, there is a "case KF_ARG_PTR_TO_RB_NODE"
+> to check if the reg->type should be an allocated pointer or should be
+> a non_owning_ref.
+>
+> The later patch will need to ensure that the bpf_rb_node pointer passing
+> to the new bpf_rbtree_{left,right} must be a non_owning_ref. This
+> should be the same requirement as the existing bpf_rbtree_remove.
+>
+> This patch swaps the current "if else" statement. Instead of checking
+> the bpf_rbtree_remove, it checks the bpf_rbtree_add. Then the new
+> bpf_rbtree_{left,right} will fall into the "else" case to make
+> the later patch simpler. bpf_rbtree_add should be the only
+> one that needs an allocated pointer.
+>
+> This should be a no-op change considering there are only two kfunc(s)
+> taking bpf_rb_node pointer arg, rbtree_add and rbtree_remove.
+>
+> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> ---
 
-This is not a reasonable use case for HTB.
-
-If your reason not to use the shaper API is that there is no CLI
-for it perhaps you should add one to iproute2.
+Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
 
