@@ -1,117 +1,165 @@
-Return-Path: <netdev+bounces-184842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02ACCA976E2
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:22:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EC6EA97741
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B9195A0508
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:21:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E5D35A0C4F
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC6C29C33B;
-	Tue, 22 Apr 2025 20:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A362C2ADC;
+	Tue, 22 Apr 2025 20:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="h2QGGRsn"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Cvh5DzyY";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="WLWG5ISL"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3CF29AAE1;
-	Tue, 22 Apr 2025 20:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425562C108E;
+	Tue, 22 Apr 2025 20:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745353267; cv=none; b=LbqmeDgOdeDtFTOihxEYWUBajuUPaE1gQWyfHpP1yW77RoRC7H9cSDovIHf5AwUZ1vRZBdPG6B8W9RrT8YVl/ZQJVaxw4h9n2uHZ/oxKU2mXtpwwGykvvEExEWI2N0iSPEEBlEnF6nsfurhbwaQ3n3y4vxNlX30OVL7d8+GpNvI=
+	t=1745353437; cv=none; b=o+Xb8z3NllAMgUMGKft7zXrNiWEkg9Z/IAFB7JgvHmYEYEQzob24USEY+mJLXsxEjJa2tYxZzE2R8HrsGD6qDtiQH7soiVfqB2hV5F9eajaDGgZ2mkdBA6dga/DFDovGl9Sm5lIE6TacRYs9VpfG18Y4lvneg6W2gDvwYNRUoJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745353267; c=relaxed/simple;
-	bh=CS7AKF/9vLtf/TyeLql6jdatBRJcEof29RHJq/23Jog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J02mU8NjMrOfFzOxbn+TVQpjPEfRF6McfVYI0kGXq0Lb0Fa+NoawFD+9XKnDA9RLL0eNrnyFL1xkQzshKoSrTMSKSz6e35lN5AJXcdO9loKV4IorSwUGmvSdl4Kl2UiV9FLEaFTGEm5qNlBCrPVYJa4q+rxxVrUIKoyf8mRdVFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=h2QGGRsn; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=T+6cHpd/27XGOPMFydca7fk610QISCEGPK2+n0P8YDM=; b=h2QGGRsnQ9gaBZ+OcdcyJxrwEJ
-	H0uZvJY1p2AAy1KxNcFffKkp1A8h0pF3M1z+0DMaNZOl5coJD7+Fn3Mneg+CI0DnPM/FKyHs+ItfZ
-	yYSqLtx7A6rjZ0xcZXjdQQ4Q2wmKGplUvjavR7/9zmtlVrzmfNF8PuyuJOIOtmGeoegOYFr7APmDr
-	/Q2JaE4tcSvHcTWESIfpFIEmcSqzO9Z6U3j9aV52cz/DdzbYrbzcAQtHAAWNMpYs5Pm7E43v3U3Ga
-	49jcfd9X9E1r1X7ChmTHicF7OEPY3RyKodXf5+rO+5SoBG7jeCuWG0t417BCtY+EgNJq1uLchbNoJ
-	19XS1GbQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58702)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u7K6w-0004yU-11;
-	Tue, 22 Apr 2025 21:20:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u7K6s-0007mx-3B;
-	Tue, 22 Apr 2025 21:20:51 +0100
-Date: Tue, 22 Apr 2025 21:20:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, rafal@milecki.pl, hkallweit1@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
-	conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	florian.fainelli@broadcom.com
-Subject: Re: [PATCH net-next 3/5] net: bcmasp: Remove support for asp-v2.0
-Message-ID: <aAf6IgSCOlWuJn_2@shell.armlinux.org.uk>
-References: <20250416224815.2863862-1-justin.chen@broadcom.com>
- <20250416224815.2863862-4-justin.chen@broadcom.com>
- <20250422183235.GN2843373@horms.kernel.org>
+	s=arc-20240116; t=1745353437; c=relaxed/simple;
+	bh=cfqlclV7rlb58wBm3clmCBE6P26650KIuUuZUS1/9IY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=QYqnYAtqRFtEsaKqg/P9JsDBoa3xsSpNW/pqOlguYGEr8wrYe+LatH9ro3fsrHtfLxynsjqNKjPiIKijN/HITPv4NnUncDUBmJDj11tZAj8dDpxIhnTZGrRAHmKUN+cejVWRcF6OmZ9Dvj2NMBF5ZIvzkv9k5EPzjLuyxN/cb0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Cvh5DzyY; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=WLWG5ISL; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 98B24609B3; Tue, 22 Apr 2025 22:23:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745353432;
+	bh=RMDD+4XAInnUNqQ2tUcnfN0YgiUr0xjTvaHXu9jLJcw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Cvh5DzyY8Q2D+WB/V7GxU03s2YCcafm/gxuyslCg/nn34f0VZK1KADIa8n5Fqskdw
+	 OSuML2+QnZIv2UhxcLyMHW4ZEvNqHpSC6UMJ6JLYk5X6u2bAzwzKFEGqdX75XCvA9o
+	 UUmubbPeKFpRxX4O8S1V/udn+AA+B3P7dIzdpnvsoaiuoqdjewjN3a7vKEtOx4IXRl
+	 bICW9pEi/CcoVuFuVkgSHQuYWhzF9scV4v5pYDiHCuT1QIaBJVWO/u7yrOy8tD4Aun
+	 5Jcj4f0D1na+qW+1+7oQJY+piWGTTkUMVuUniwW5eCFjAZYviJ6XaCG8oIYMGFs+GF
+	 sZAusTbxptKYw==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 1048B609AF;
+	Tue, 22 Apr 2025 22:23:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745353427;
+	bh=RMDD+4XAInnUNqQ2tUcnfN0YgiUr0xjTvaHXu9jLJcw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WLWG5ISLtVJPQdVYIc4wwG0q4hGxt/DMe090EdgGk3rGUp0LkfV7u4EO3QhIOGrBH
+	 CW54q2GYjN6e3hledMjb87a5FhP4PoviTk7U8W8AbkfRY0pd5/8Vo2LPgmbaSdR1bv
+	 rO22+G6wNGats/UIc4TlRtjJBu6z2cPw7ozd+KovFjKZDkwgySWV2fSvgBRQQ7S8UX
+	 lJs1Rb5bzLKCoDdiuXZL7hAZlPve+SRWw0v+G+qMPnQ3LEd/L1BmKCWUbnJfHb0cVE
+	 oh/h1GnSxK8uA6Nf962IuzdDP7tIQlBOiyGMl01goqahORDtWFEYP1j3G+/5fKVXr2
+	 moDO883ulxi9g==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net-next 0/7] Netfilter updates for net-next
+Date: Tue, 22 Apr 2025 22:23:20 +0200
+Message-Id: <20250422202327.271536-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422183235.GN2843373@horms.kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 22, 2025 at 07:32:35PM +0100, Simon Horman wrote:
-> On Wed, Apr 16, 2025 at 03:48:13PM -0700, Justin Chen wrote:
-> > The SoC that supported asp-v2.0 never saw the light of day. asp-v2.0 has
-> > quirks that makes the logic overly complicated. For example, asp-v2.0 is
-> > the only revision that has a different wake up IRQ hook up. Remove asp-v2.0
-> > support to make supporting future HW revisions cleaner.
-> > 
-> > Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-> > ---
-> >  drivers/net/ethernet/broadcom/asp2/bcmasp.c   | 98 ++-----------------
-> >  drivers/net/ethernet/broadcom/asp2/bcmasp.h   | 45 ++-------
-> >  .../ethernet/broadcom/asp2/bcmasp_ethtool.c   | 21 +---
-> >  .../net/ethernet/broadcom/asp2/bcmasp_intf.c  |  2 +-
-> >  .../ethernet/broadcom/asp2/bcmasp_intf_defs.h |  3 +-
-> >  5 files changed, 23 insertions(+), 146 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-> 
-> ...
-> 
-> >  static const struct bcmasp_plat_data v21_plat_data = {
-> > -	.init_wol = bcmasp_init_wol_shared,
-> > -	.enable_wol = bcmasp_enable_wol_shared,
-> > -	.destroy_wol = bcmasp_wol_irq_destroy_shared,
-> >  	.core_clock_select = bcmasp_core_clock_select_one,
-> > -	.hw_info = &v21_hw_info,
-> > +	.eee_fixup = NULL;
-> 
-> 	.eee_fixup = NULL,
+Hi,
 
-Even better... omit it entirely.
+The following batch contains Netfilter updates for net-next:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+1) Replace msecs_to_jiffies() by secs_to_jiffies(), from Easwar Hariharan.
+
+2) Allow to compile xt_cgroup with cgroupsv2 support only, from Michal Koutny.
+
+3) Prepare for sock_cgroup_classid() removal by wrapping it around
+   ifdef, also from Michal Koutny.
+
+4) Disable xtables legacy with PREEMPT_RT, from Sebastian Andrzej Siewior
+   and Florian Westphal.
+
+5) Remove redundant pointer fetch on conntrack template, from Xuanqiang Luo.
+
+6) Re-format one block in the tproxy documentation for consistency,
+   from Chen Linxuan.
+
+7) Expose set element count and type via netlink attributes,
+   from Florian Westphal.
+
+This is an initial batch with updates, more updates coming soon.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-04-22
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 45bd443bfd8697a7da308c16c3e75e2bb353b3d1:
+
+  net: 802: Remove unused p8022 code (2025-04-22 07:04:02 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-04-22
+
+for you to fetch changes up to 2cbe307c60463dc47bf590bc93709398c4c4b3bb:
+
+  netfilter: nf_tables: export set count and backend name to userspace (2025-04-22 22:17:07 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-04-22
+
+----------------------------------------------------------------
+Chen Linxuan (1):
+      docs: tproxy: fix formatting for nft code block
+
+Easwar Hariharan (1):
+      netfilter: xt_IDLETIMER: convert timeouts to secs_to_jiffies()
+
+Florian Westphal (1):
+      netfilter: nf_tables: export set count and backend name to userspace
+
+Michal Koutný (2):
+      netfilter: xt_cgroup: Make it independent from net_cls
+      net: cgroup: Guard users of sock_cgroup_classid()
+
+Pablo Neira Ayuso (1):
+      netfilter: Exclude LEGACY TABLES on PREEMPT_RT.
+
+Xuanqiang Luo (1):
+      netfilter: conntrack: Remove redundant NFCT_ALIGN call
+
+ Documentation/networking/tproxy.rst      |  4 ++--
+ include/uapi/linux/netfilter/nf_tables.h |  4 ++++
+ net/Kconfig                              | 10 ++++++++++
+ net/bridge/netfilter/Kconfig             |  8 ++++----
+ net/ipv4/inet_diag.c                     |  2 +-
+ net/ipv4/netfilter/Kconfig               | 15 ++++++++-------
+ net/ipv6/netfilter/Kconfig               | 13 +++++++------
+ net/netfilter/Kconfig                    |  2 +-
+ net/netfilter/nf_conntrack_core.c        |  4 +---
+ net/netfilter/nf_tables_api.c            | 26 ++++++++++++++++++++++++++
+ net/netfilter/x_tables.c                 | 16 +++++++++++-----
+ net/netfilter/xt_IDLETIMER.c             | 12 ++++++------
+ net/netfilter/xt_TCPOPTSTRIP.c           |  4 ++--
+ net/netfilter/xt_cgroup.c                | 26 ++++++++++++++++++++++++++
+ net/netfilter/xt_mark.c                  |  2 +-
+ 15 files changed, 110 insertions(+), 38 deletions(-)
 
