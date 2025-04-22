@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-184798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0223A97379
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:20:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38618A97395
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBD4F189E241
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:20:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFC517A3A5E
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC4A2973BD;
-	Tue, 22 Apr 2025 17:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EF1290BBC;
+	Tue, 22 Apr 2025 17:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQqszmw6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75D229009C;
-	Tue, 22 Apr 2025 17:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B92284B48
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745342438; cv=none; b=RmK8woXAq9Z5AeaEYkpEfptGRmkrzaCvcyZ+RzxKFY9pvrgCXL7R4td5s87dFwwk8XafInsmqNYmNn5FHsgJW6OQFrzPxcrsrF+j3+kdejID3+Ri48NH9Agbvn821LyBbtzLXnCVqz/LWpQvJsCjlfoSC84PPk+/kl8rbV/ikoQ=
+	t=1745342843; cv=none; b=obdf6Av4HR1twUSN+nq9Wo9RPX15ZE2C0DAXaTyepQlOFd2UbWBYFnyQ3rgxMl4OkNQCiTPs6AsbbdmB3tkt4v1gZ9pmdCfMlJFJNt5Kq4UlTHwu4LRCm+txX5pZ/lsnf+XRcgCFVSHt0AxijyoxtoIZVTZxhNWnU52ZOzAoMo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745342438; c=relaxed/simple;
-	bh=rE7/v/WhlI1/tb/SRLFDYrXPU3x2rQOcXmg7kgr1tIM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NYBtJeM8AhlSdZYjJJcYM+kYkwwGL8k2TbsxBx82wmeywMVzY123EBupScEi/cbsAwxzIiHlZozOBIJwlL4QPWNftsYNyRnSCjtN0jR9GeDknZX7IIqypAGL8fp+NWQmC7wKkb2zuHYn5G14gJThTT5YCEAV7dyG9VG5OkFbxVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
-Received: from tux.applied-asynchrony.com (p5b07e9b7.dip0.t-ipconnect.de [91.7.233.183])
-	by mail.itouring.de (Postfix) with ESMTPSA id 8DC351CA1;
-	Tue, 22 Apr 2025 19:20:25 +0200 (CEST)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-	by tux.applied-asynchrony.com (Postfix) with ESMTP id E516F6017547D;
-	Tue, 22 Apr 2025 19:20:24 +0200 (CEST)
-Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
- htb_dequeue
-To: "Alan J. Wylie" <alan@wylie.me.uk>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Octavian Purdila <tavip@google.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vu?=
- =?UTF-8?Q?sen?= <toke@redhat.com>, stable@vger.kernel.org,
- Greg KH <gregkh@linuxfoundation.org>
-References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
- <6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
- <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
- <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
- <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
- <20250421210927.50d6a355@frodo.int.wylie.me.uk>
- <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
-Date: Tue, 22 Apr 2025 19:20:24 +0200
+	s=arc-20240116; t=1745342843; c=relaxed/simple;
+	bh=D0QymgneXaTt/3fgHr6UcxMDJUrzIZEGs9HkruuNRY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VQ7bh2rI/Nvh4pllxHrOkKxupX3JIHkdsH595nxb/fJkM8bbzqVWZ03HemocTP3XHas1nS9KTRid2rCY7VL8t6KuTudWISCInFMh+Tu9Q782WJJ7jPkZjDU2VX6VxSUMTtDPUHxDdxWwsjuzJzK6c8AEXAOamVfzTEhE2lva13w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQqszmw6; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22c336fcdaaso60886975ad.3
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:27:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745342841; x=1745947641; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Opd+J48FPKI3ZGiGg/JuYjcZrjQj8elWYQobjTII45M=;
+        b=RQqszmw6QvuVlButjepv6pfReYSCoeDP049xvIwJpKijQkIcbAdhheQU1ndKmtvVls
+         OyJyEmVzEHhAbfY9kd/Zz0GuP6hZgHc1XIx3ZpuqDE96ob8EU+jdfnSPOTWa5nfClCHL
+         95VEO6GBWSakmijO3swkvFi4AMnflQQLF/TbeLJIVviy/Nd4fvaqMGB4oIxZIVLQ/UOz
+         85dUaM71mPL09AW+/smhBR9AUnTdrt8DIVrz4W+VqdBdIKXFm07BeDsE8Kx1myBoVQSl
+         lMMLWPEKp7lW3Rd8nFBo3lCuVuuiH8usuLacoRIxO+/qiAV9b9cNdO1oEL5avhqTw2Wh
+         W18A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745342841; x=1745947641;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Opd+J48FPKI3ZGiGg/JuYjcZrjQj8elWYQobjTII45M=;
+        b=k9g5cJtY73OdUZfpEryhUWmj+pd/+zqKYd3crSpz++HNopdQ8clCpU2MxQKUXx3iML
+         cEeC+0VD0M8d65UxgyIrjTCTla+gN7RnQKXJIg4ydoKKUSqWd0vHO+RXpwJYHyhULSlr
+         PiuPbUwPVRTMZB+GzUeDmZzVGEtnjw2nSoiAoUpKFj5zCwPLZDlOJKmfSqfnAy6b9RLc
+         nO0jwbdrn6JhocHj4CPy3vAYo5MYv33jkVls1ugKoH0nqXgzYpVsEpVabIwXYG+2CY2j
+         aci/zMjuVSivjN9K8tfcgFXpffIyxXgvVcnoGeHuDpmm1ADa5M3xHL2BmPew08lS9PYd
+         k2IA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsaIZpgsIfsvi3f5BL0AIbQqRZB+PnrZjn/MkbB6nx2rGG9KDoSXQZmAJ8bex2EqAXOqf+zhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfT3od61WCUvOUzTajb5CFMD9HiYCGWIN5vWoHQmFRMkxwxRha
+	Y3Qfb8H3iPvKqVRjmMZLMewHjPMw6bNxRVT5ML5zDkFrTQvWSwI=
+X-Gm-Gg: ASbGnctdHcsDwmujMVzSgUKqyWTYVOumP+5gqplJPY1vU7RgOl1SoZShifwZ2eVHPT2
+	ml3PN9X3xcD6GYD5aN0jN0hacvtZBk8xCuAJhGqdxeD9Fglb7N/76dniUWTXLyzHbcmP71pROqB
+	4y9J+nS4HnJ3K/9rDtdyxklroLO1Uj6e8K0QVKFXQWzy0+NHenBxSO2Y4V7SIPELxgPrB6wPrfZ
+	9N2d3ANJPFPUgp8gpVnXb5LeyfxkFLz0HfoNyeZBtIqpbTstw+5jmBeuJjlSIGtae5fBiG5GRCC
+	4qiOZnz0wo8xooOxppepjFsMMWWZGIZuuxGespju
+X-Google-Smtp-Source: AGHT+IFJxy2dFyTAGO8lGVAdWil/IemCX9zsPK2DQ+P07AzSVN4h59bZXjSdSpSViRw9Z5c5/WM0Nw==
+X-Received: by 2002:a17:902:ea07:b0:227:e6b2:d989 with SMTP id d9443c01a7336-22c5362e557mr243009235ad.44.1745342840995;
+        Tue, 22 Apr 2025 10:27:20 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50eb5318sm88172095ad.107.2025.04.22.10.27.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 10:27:20 -0700 (PDT)
+Date: Tue, 22 Apr 2025 10:27:19 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 07/22] eth: bnxt: set page pool page order based
+ on rx_page_size
+Message-ID: <aAfRd__DgRYfgubF@mini-arch>
+References: <20250421222827.283737-1-kuba@kernel.org>
+ <20250421222827.283737-8-kuba@kernel.org>
+ <aAe2jaAUi0-deSeI@mini-arch>
+ <20250422085237.2f91f999@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250422085237.2f91f999@kernel.org>
 
-(cc: Greg KH)
-
-On 2025-04-22 18:51, Alan J. Wylie wrote:
-> On Mon, 21 Apr 2025 21:09:27 +0100
-> "Alan J. Wylie" <alan@wylie.me.uk> wrote:
+On 04/22, Jakub Kicinski wrote:
+> On Tue, 22 Apr 2025 08:32:29 -0700 Stanislav Fomichev wrote:
+> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > index b611a5ff6d3c..a86bb2ba5adb 100644
+> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > @@ -3802,6 +3802,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+> > >  	pp.pool_size = bp->rx_agg_ring_size;
+> > >  	if (BNXT_RX_PAGE_MODE(bp))
+> > >  		pp.pool_size += bp->rx_ring_size;
+> > > +	pp.order = get_order(bp->rx_page_size);  
+> > 
+> > Since it's gonna be configured by the users going forward, for the
+> > pps that don't have mp, we might want to check pp.order against
+> > MAX_PAGE_ORDER (and/or PAGE_ALLOC_COSTLY_ORDER?) during
+> > page_pool_create? 
 > 
->> On Mon, 21 Apr 2025 21:47:44 +0200
->> Holger Hoffstätte <holger@applied-asynchrony.com> wrote:
->>
->>>> I'm afraid that didn't help. Same panic.
->>>
->>> Bummer :-(
->>>
->>> Might be something else missing then - so for now the only other
->>> thing I'd suggest is to revert the removal of the qlen check in
->>> fq_codel.
->>
->> Like this?
->>
->> $ git diff  sch_fq_codel.c
->> diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
->> index 6c9029f71e88..4fdf317b82ec 100644
->> --- a/net/sched/sch_fq_codel.c
->> +++ b/net/sched/sch_fq_codel.c
->> @@ -316,7 +316,7 @@ static struct sk_buff *fq_codel_dequeue(struct
->> Qdisc *sch) qdisc_bstats_update(sch, skb);
->>          flow->deficit -= qdisc_pkt_len(skb);
->>   
->> -       if (q->cstats.drop_count) {
->> +       if (q->cstats.drop_count && sch->q.qlen) {
->>                  qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
->>                                            q->cstats.drop_len);
->>                  q->cstats.drop_count = 0;
->> $
->>
-> 
-> It's been about 21 hours and no crash yet. I had an excellent day down
-> a cave, so there's not been as much Internet traffic as usual, but
-> there's a good chance the above patch as at least worked around, if not
-> fixed the issue.
+> Hm, interesting question. Major concern being that users will shoot
+> themselves in the foot? Or that syzbot will trigger a warning?
 
-Thought so .. \o/
+Yeah, both, some WARN_ON in the page allocator. I did trigger one for
+MAX_PAGE_ORDER at some point, but not sure about PAGE_ALLOC_COSTLY_ORDER.
 
-I guess now the question is what to do about it. IIUC the fix series [1]
-addressed some kind of UAF problem, but obviously was not applied
-correctly or is missing follow-ups. It's also a bit mysterious why
-adding the HTB patch didn't work.
-
-Maybe Cong Wang can advise what to do here?
-
-So unless someone else has any ideas: Greg, please revert:
-
-6.14.y/a57fe60ef4cf96bfbb6b58397ec28bdb5a5c6b31
-("codel: remove sch->q.qlen check before qdisc_tree_reduce_backlog()")
-
-and probably from 6.12 as well.
-
-cheers
-Holger
-
-[1] https://lore.kernel.org/all/20250403211033.166059-1-xiyou.wangcong@gmail.com/
+Just thinking from the overall setup point of view. I'm assuming that if we
+are gonna support >PAGE_SIZE devmem chunks we'll have to tune rx-buf-len
+_after_ we've bound dmabuf to the queue? (otherwise we are hitting those
+PAGE_ALLOC_COSTLY_ORDER if we do it before) And there is no revert back
+to reasonable rx-buf-len on unbind. Or for devmem we'll have some TBD way
+to communicate "preferred" rx-buf-len per queue (derived from the dmabuf
+binding itself) during the bind?
 
