@@ -1,154 +1,168 @@
-Return-Path: <netdev+bounces-184907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCFFA97AC4
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:58:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78A6A97AC9
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA925460BB1
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:58:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F38CC1897A18
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1DC2BCF7C;
-	Tue, 22 Apr 2025 22:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F11726C38A;
+	Tue, 22 Apr 2025 23:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Enc5uyOm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vSTPJmDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAE31EE7DD;
-	Tue, 22 Apr 2025 22:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CBA9476
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745362692; cv=none; b=mNf6vsl9l+WzX2IK3QVzjwxuu0ogtfj3JBDhC7pE6ojCLUGMplW5ftDokHbfAV/d09rZHagZAJ4wITDpm/rzuwVB2E6/z7iJFfuC1ijXefxnjxgZ07Btda7bM7QHmDP/BehVxrr/Vpx3KzTTgMY3UEYkY+Xiacaqao/kE/UoMuE=
+	t=1745362856; cv=none; b=hnwinviw25v/P/qEasuWuF91ILbLFsB30uMoMsPLvsyi+266lORJGTQKFS9moEEfDx+7JO+sTKDxZC5diNuqsJG6POpLsEQkRr6idqkZMVoEX7W06U6Lm5/do0Man5evrGXJcNAVAJDGNbr8p6AJuVRFtLrJ0HHuimCDVfmfBmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745362692; c=relaxed/simple;
-	bh=qhoCRr6iJ4JDLDgkjS7q5wQsu+zo9f5E/xP7W721KYM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S2DKYlDkhIpSIb12FtLfKef3BJB2ZM7pp0Wdy3n9HFDZj/XoZe2e/CMZ3DU2LrSEYynJ/JkWxfI34tqy27YGYH2/iYAqetBV4xxHHtTc6Cas5HkJz2J3FQKnDQQXvsUgLyPRrKBohhnDphJhX9v/Arpda1paq4keqQp9tdpz4nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Enc5uyOm; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-227c7e57da2so50486765ad.0;
-        Tue, 22 Apr 2025 15:58:10 -0700 (PDT)
+	s=arc-20240116; t=1745362856; c=relaxed/simple;
+	bh=vA0x1LF+TTujtzA/a9qIyOuUZvc6uTpZ8L2xS4rCm/w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dkjgeABn6S0pWvCgSUYG+gI7awWL+Q8P1qlymIloN3KECAouLk4tL5bWi1mv+5rtPH4gU/sMrp4XiLPVtc5Ma3eRgtfV60AJ1ZAVj4nmfYCkgaD0IDHlcvsO89b+A8W5nNaV1c/7ggbuT0XQfZ4DIWA6wzzLDvMlOp2RMRF3nXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vSTPJmDW; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2240aad70f2so102515ad.0
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 16:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745362690; x=1745967490; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4+iUhVe7p621IQ4rwytm2VMPB/Jrbhsqc2u60r7Vr8=;
-        b=Enc5uyOmJyyj6YrMRhlPm9GHn0rVAAinO1qWl7tfHs/1VYoyelSY6whgqhart3+T0y
-         iKkUvwFN5098bH4sYBTM7G5ODFeOEfvBQjfeM7L7lpu3qwt59LqY+jbSfSDDElnvh8Vs
-         PrSvSiChT9j1A3iI5Il4tW35ZKMKRnju6u7OqsKZIWwr/+mQSET6f7DOVCFhXYpJZYws
-         LCH6DktUg/AFrq75PxaoaJDoAM/11DvaHVDYIGeKH5Ui9EVmz5wCl7GC/ImwhbC+wW/b
-         jtV1uGKiCUtrzNItYjsFZYIgpn+/76YPFgttsK6/xkdABu+z9EdNdMUWBIPnLqGsIscQ
-         XMsg==
+        d=google.com; s=20230601; t=1745362854; x=1745967654; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X0wkS+mYcttDoYH2cbzpbLqiayCSdu0EeV0O89OnxB4=;
+        b=vSTPJmDW/0RBiNQ+pXo+/ZFUu9NXOW/mYR/LTeXX0PDtkS2kzlnEhrDftAorprnLh9
+         B/ocgO6V4ijHaBDVDYg9jL9VOb/JTTXw0+6S+4tY7MtwRoZ5UvWVUsbIXQaus6pT7WIM
+         w9JyPlBFdKdDqkaPdhGNJyHXBD3R1sPHkcrer5Y+IzcoOu9zjO12veodho3lesqRnqS/
+         ZAStMrBVqSDj4W5etdANq85mg8kvu8N2Yyfeq9+o7t2dSSKpzsDi4P2t4oGQC/1IFwHS
+         Bak+lxuGPw4pkmdTAXPNdW6jRVAwnpbPvESvT2YSRlvhPL7TLc7E1y0fQt/+j6nPSPYZ
+         Y8pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745362690; x=1745967490;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g4+iUhVe7p621IQ4rwytm2VMPB/Jrbhsqc2u60r7Vr8=;
-        b=syPfK4bsH8nbD/GQ/A4TZveHSadf9Jw9tsvL1ng96UewjvLlG5l84wljAnYbZqy65P
-         aZ5a1GOoJMG7hmvpIiGET6F0xFKL2dOGoBA5swxzonkCl8lf8a+zwTTTaxAWA1YACPtr
-         xPrTLlEOPxnrYNeihua5Zjq0ymD1SiRuLwkmbV6sUNvUFvcpJdH8BhAVGKOhGYiH3VrP
-         aa4xXQiMyBKKTT0QlfGgWUDCwMN+E+TbDge5ZAmSjpgAmPz4qc/eyfjglck+orJXgDzi
-         IocxGA77IizIeZQBi4nGkH5a3Z4phRLCpuvtIN82oZOq5CknDnEsc+0tuIip5du0Zh/J
-         BcxQ==
-X-Gm-Message-State: AOJu0YyDKgd7qqm/cXGFQtFKnwiXtSarGgYjG4aRiw+DUUgylTgkPts2
-	TdsISnh3X6/QQKUHOLMCKA7Y/CtVtvOTzUkUHdn1zIoZDydX7SYs7qJVEQ==
-X-Gm-Gg: ASbGncu+ihrzOVjryW4OwzG3BcJoCBcLTgOyKn2x93JHkS0UH6H4KhoGd4xRUYUhHSo
-	mpMKsAxBeeEmBTZFTJe8ZbH1PuuRC/v5ktS/crrhfFo3HIu4cg2jf+hr/P8cAri4PuuXYNcvlEP
-	mDNkFTqDf7Oa5s1c77HlYnoDAD+ChH8GzbRI8tWWyhTcuR655yUnFbiXVevHoRfPn9HmFWobCxt
-	U7uxlqF0g5Ys4jsKAYJgs4DYvjL2JB2CkUga2iM8dW7I0IIBEVUG5OV8vU9i0R6KulSvKAJzC2I
-	jhjEaItfbQjEeqDZ2BJufte/nWOz+Yqj3ZGGa9MTqA==
-X-Google-Smtp-Source: AGHT+IFwK/lAXaOceQuK5Hi0GaDdk7yxxO7EC4ESy6jL8Ksqb4no5JEI1f7zjK7yyRvDNqWW40Ia8w==
-X-Received: by 2002:a17:902:ea07:b0:223:88af:2c30 with SMTP id d9443c01a7336-22c5357f3b2mr224090895ad.16.1745362689627;
-        Tue, 22 Apr 2025 15:58:09 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:6::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bde12bsm91100035ad.40.2025.04.22.15.58.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 15:58:09 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org,
-	xiyou.wangcong@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next/net] bpf: net_sched: Fix using bpf qdisc as default qdisc
-Date: Tue, 22 Apr 2025 15:58:08 -0700
-Message-ID: <20250422225808.3900221-1-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.1
+        d=1e100.net; s=20230601; t=1745362854; x=1745967654;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X0wkS+mYcttDoYH2cbzpbLqiayCSdu0EeV0O89OnxB4=;
+        b=l0gqmOBAPDd7Cq1IG5WMsaLVX68xkSRFGTJ6kS1STmKfRlfT+uvOxm2bs0JQjarzqA
+         Df7bNCUYBc/oimWOAhLBcFn+PeYBDrpbf/nm70pmjdRM7NAS6ctn93W4ytwdVBY0n31P
+         XNun5PK9VdfUre4fUiFVpYUrKnp28saTPKDUDMKon4B+LRNKL3jbzOp0gB4+AtZ1JVEU
+         Do8bscNb7+I/9MzuZAUFp4kjaH7mgku7Y1+H+EpDpxHweouS8MCRVf929hwbCSLfnf+4
+         I1g+SfijQGw6R6jmZnhCC6sR04zAEoKa2MP3nB1J7xoX6FuDbUxpiQq8nJM06ikH8vUQ
+         T61Q==
+X-Gm-Message-State: AOJu0YzarytKzV1AmruCArIDs2gENLXEAVD+ttVV6c4rPYds08ZAOKRJ
+	6b3WNeOuC3afHGdF9vKMksLYwAvffk/1QN6XRDlrrmDnSYwpgH8esFfoPoOlMI3JfWrHs12n7Zc
+	pjY6D5gvGB4U1GDW9eWxK9qGS5Xrn8SDyxI7t
+X-Gm-Gg: ASbGncv/iIXeKr2qwNJQAPBE1Y6sYE7n+P84xw1cpBE3lh/dM34wW4mdIrD0jRPmTGC
+	2pAXm2bOgVRbJThALQsrlqrBUbt7X6bdeeek6VkMzYzsqK2AoUUMNnKRVJp+ULGoiC0kf0HDjT+
+	nuEXvTd8IA//hoKL3iKHp4wdFZfHZjaEPVmuS7JrDdrZ35dqEg7zoqOPFVahk4JMQ=
+X-Google-Smtp-Source: AGHT+IFcA8eNct2OIuHlbOvxzm3T6NVzaOSOXt3ivEIqSJ8wke0kgYVfmjCEtUHN4nE+IsPWRgGhH+7fhESmeCiNRMo=
+X-Received: by 2002:a17:902:ef07:b0:215:86bf:7e46 with SMTP id
+ d9443c01a7336-22da4ebcff9mr256305ad.7.1745362853731; Tue, 22 Apr 2025
+ 16:00:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250417231540.2780723-1-almasrymina@google.com>
+ <20250417231540.2780723-8-almasrymina@google.com> <CAEAWyHckGSYEMDqVDT0u7pFCpO9fmXpEDb7-YV87pu+R+ytxOw@mail.gmail.com>
+ <CAHS8izNZXmG0bi15DpmX2EcococF2swM83Urk19aQBvz=z3nUQ@mail.gmail.com>
+In-Reply-To: <CAHS8izNZXmG0bi15DpmX2EcococF2swM83Urk19aQBvz=z3nUQ@mail.gmail.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Tue, 22 Apr 2025 16:00:42 -0700
+X-Gm-Features: ATxdqUGxkrayoAGMPm_qgEhKu-sQHz14vjXf4E7ZJdbEqvqiDvu9MHtNVHd91NA
+Message-ID: <CAEAWyHf7Qzi8CDBeRMB5nMvvNawrFrUCh52k4JevbSHX1Y=zcw@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 7/9] gve: add netmem TX support to GVE DQO-RDA mode
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use bpf_try_module_get()/bpf_module_put() instead of try_module_get()/
-module_put() when handling default qdisc since users can assign a bpf
-qdisc to it.
+On Tue, Apr 22, 2025 at 2:30=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> On Tue, Apr 22, 2025 at 10:43=E2=80=AFAM Harshitha Ramamurthy
+> <hramamurthy@google.com> wrote:
+> >
+> > On Thu, Apr 17, 2025 at 4:15=E2=80=AFPM Mina Almasry <almasrymina@googl=
+e.com> wrote:
+> > >
+> > > Use netmem_dma_*() helpers in gve_tx_dqo.c DQO-RDA paths to
+> > > enable netmem TX support in that mode.
+> > >
+> > > Declare support for netmem TX in GVE DQO-RDA mode.
+> > >
+> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > >
+> > > ---
+> > >
+> > > v4:
+> > > - New patch
+> > > ---
+> > >  drivers/net/ethernet/google/gve/gve_main.c   | 4 ++++
+> > >  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 8 +++++---
+> > >  2 files changed, 9 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net=
+/ethernet/google/gve/gve_main.c
+> > > index 8aaac9101377..430314225d4d 100644
+> > > --- a/drivers/net/ethernet/google/gve/gve_main.c
+> > > +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> > > @@ -2665,6 +2665,10 @@ static int gve_probe(struct pci_dev *pdev, con=
+st struct pci_device_id *ent)
+> > >
+> > >         dev_info(&pdev->dev, "GVE version %s\n", gve_version_str);
+> > >         dev_info(&pdev->dev, "GVE queue format %d\n", (int)priv->queu=
+e_format);
+> > > +
+> > > +       if (!gve_is_gqi(priv) && !gve_is_qpl(priv))
+> > > +               dev->netmem_tx =3D true;
+> > > +
+> >
+> > a nit: but it would fit in better and be more uniform if this is set
+> > earlier in the function where other features are set for the
+> > net_device.
+> >
+>
+> Thanks for taking a look. I actually thought about that while trying
+> to implement this, but AFAIU (correct if wrong), gve_is_gqi and
+> gve_is_qpl need priv to be initialized, so this feature set must be
+> performed after gve_init_priv in this function. I suppose this feature
+> checking maybe can be put before register_netdev. Do you prefer that?
 
-To trigger the bug:
-$ bpftool struct_ops register bpf_qdisc_fq.bpf.o /sys/fs/bpf
-$ echo bpf_fq > /proc/sys/net/core/default_qdisc
+Ah yes, you are right. Thanks for checking. That would be preferable.
+Another option is to move it inside gve_init_priv() after the mode has
+been set. Either is okay.
 
-Fixes: c8240344956e (bpf: net_sched: Support implementation of Qdisc_ops in bpf)
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- net/sched/sch_api.c     | 4 ++--
- net/sched/sch_generic.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index db6330258dda..1cda7e7feb32 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -208,7 +208,7 @@ static struct Qdisc_ops *qdisc_lookup_default(const char *name)
- 
- 	for (q = qdisc_base; q; q = q->next) {
- 		if (!strcmp(name, q->id)) {
--			if (!try_module_get(q->owner))
-+			if (!bpf_try_module_get(q, q->owner))
- 				q = NULL;
- 			break;
- 		}
-@@ -238,7 +238,7 @@ int qdisc_set_default(const char *name)
- 
- 	if (ops) {
- 		/* Set new default */
--		module_put(default_qdisc_ops->owner);
-+		bpf_module_put(ops, default_qdisc_ops->owner);
- 		default_qdisc_ops = ops;
- 	}
- 	write_unlock(&qdisc_mod_lock);
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index e6fda9f20272..7d2836d66043 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -1002,14 +1002,14 @@ struct Qdisc *qdisc_create_dflt(struct netdev_queue *dev_queue,
- {
- 	struct Qdisc *sch;
- 
--	if (!try_module_get(ops->owner)) {
-+	if (!bpf_try_module_get(ops, ops->owner)) {
- 		NL_SET_ERR_MSG(extack, "Failed to increase module reference counter");
- 		return NULL;
- 	}
- 
- 	sch = qdisc_alloc(dev_queue, ops, extack);
- 	if (IS_ERR(sch)) {
--		module_put(ops->owner);
-+		bpf_module_put(ops, ops->owner);
- 		return NULL;
- 	}
- 	sch->parent = parentid;
--- 
-2.47.1
-
+Thanks,
+Harshitha
+>
+>
+> --
+> Thanks,
+> Mina
 
