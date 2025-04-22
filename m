@@ -1,238 +1,143 @@
-Return-Path: <netdev+bounces-184894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06431A979B4
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:48:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA972A979B6
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 23:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 853B11B63D57
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 21:49:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B40703AB352
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 21:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7822980B0;
-	Tue, 22 Apr 2025 21:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8834D27057E;
+	Tue, 22 Apr 2025 21:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kq1Jl/LT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDDlYEfK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD71227056E
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 21:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3A321FF2B;
+	Tue, 22 Apr 2025 21:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745358516; cv=none; b=qV6bT7dlxwuAaIsRAUrbfDKLUj8olfknN/qBmXE1w7i3PsLn2SLKtMB8/f6cghuHst6MnwZufwDMz3C0dWqFbE4fSYDd45kGYIAex6rH8ENn521v7Rq8D4m4w+gQ0mpmM4JXgCcXsWSwvhmyFrM4Z6ZSmmwT2CoF5KAXuCCAstY=
+	t=1745358571; cv=none; b=m08hCOZxre6kx4ad7O1MfVAJceM8Ni2Fu/1typfzKP1ajGDj1hxDtY/qor9NNvxxgjwT7DFbcOfjwVfud5Uthu8j0L0ucDs0eGMSs8qLNCtUz6ilWCwgu+AQzaEEL1tbNzrGICjGjMo0SNi1irGfCHycYaamzGArRVFKi4HMWQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745358516; c=relaxed/simple;
-	bh=yed63qB8hP2SnG+WxuvI9uycOPs4jNMKyHrSsBaFKmQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mjNcwmwks+fY4zCXqoqlZ79Gjs1ovshTBUdf/JlC+O+AFS8IKT0PwK4jKGPcM0MBg1a5rQ7oYoxupsFvhDBVIVU/c0ewNjf0HuBFo7yb3OsBIpLAMKZZsQCoAqg30Wyttzo6Y+nFg5E9lkuAkXzjhoEpnVforpApJs6hjF0kFAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kq1Jl/LT; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745358515; x=1776894515;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yed63qB8hP2SnG+WxuvI9uycOPs4jNMKyHrSsBaFKmQ=;
-  b=kq1Jl/LTBla09fwCVDF2/zgARWyNZ7/tutBt7PiCfcR6AWOxu+tWcUlw
-   +tCtMIkvJhX9jdxgQHq5v+knKDLg8HchpA0zJSUdGPg1onLj99nOjeHN6
-   OUyv4qobvItrc2Bv6OaEowtYqgVVbTI8DaJ2/NPbvcYmjlbiZsdJThUiA
-   6qCvciLgTFVERYKg8XR5MsGEh0kEn/PfAqcmCnHFLseiSKcNpcMDJnJga
-   Ycm79v9dKYF8izrTn3mgN0Pz4AYDOBLob8DoTBK/MelSM1umYlWMxMOKd
-   6oSPuPRa2jS9mOjx/sgRqLqweBWTywnfRAnBwClZcShjjjyzyDyqXa0Kg
-   Q==;
-X-CSE-ConnectionGUID: vnZnRaVcR2O2TnpKGshBlQ==
-X-CSE-MsgGUID: FFsNbrUwTgymhvJ/NqRJbw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="46949145"
-X-IronPort-AV: E=Sophos;i="6.15,232,1739865600"; 
-   d="scan'208";a="46949145"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 14:48:33 -0700
-X-CSE-ConnectionGUID: Mw35uTN9SCe15YV+vvHEgg==
-X-CSE-MsgGUID: 9Szj18IDRD+VUDhKVpvdFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,232,1739865600"; 
-   d="scan'208";a="163186557"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa001.fm.intel.com with ESMTP; 22 Apr 2025 14:48:32 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Madhu Chittim <madhu.chittim@intel.com>,
-	anthony.l.nguyen@intel.com,
-	willemb@google.com,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Zachary Goldstein <zachmgoldstein@google.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 3/3] idpf: fix offloads support for encapsulated packets
-Date: Tue, 22 Apr 2025 14:48:07 -0700
-Message-ID: <20250422214822.882674-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250422214822.882674-1-anthony.l.nguyen@intel.com>
-References: <20250422214822.882674-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1745358571; c=relaxed/simple;
+	bh=sG7YJMva/w4l3cfCNfOiczfRXXTwbAHBKnI5Bzj7KRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=otJKMPVsGpXy6h2v9IRLfgWgeJC5TYqgWsMdbU1j1Ud+8xE/IoaLJXbaPqMrJg4VrxEmSPYdcm1zyNd1J6GO6OetYR822Gm900FRGk6SsOYIGGkfd1o7G/kKkkrL3e5u6FunzFiKlssuee+fa63CfufJSsQ4q3JmU4NCYSukRqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bDDlYEfK; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b0db0b6a677so4856302a12.2;
+        Tue, 22 Apr 2025 14:49:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745358569; x=1745963369; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9dYvt2Xcrh+kbYqRYnlS/5tyT+BexXkaGSTJNxwW1ck=;
+        b=bDDlYEfKHrybz4D5fziRdAbnlktSssaGIjF7SJWhWbTXclq8u9Dv/LWcCgdrUicvi6
+         S4eTJ4+2RdT+6odU6o/DTc6229rvFfd85dqZecwoYftyGT1iemnGFFqD/5qYKODAP3u5
+         2VtYxvWCXyuZ38xmYhl8CRnGSSKiDRUHBtJLuDQR5URSrPnvTexjFquqpeG6/CwWeRf1
+         +MU7DrkbWQ3rTZ1nhI4hHBqjIIbosADE6JAHsb0lszCPlJrRTFf+2846DDHfdsjl0EkQ
+         vW8exvRcFWNEnn2RphjGK5JHHSYBhxHgud0utI3TYtsXgGbALQ8QAH7jlkFSwZLNs1hN
+         Bxtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745358569; x=1745963369;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9dYvt2Xcrh+kbYqRYnlS/5tyT+BexXkaGSTJNxwW1ck=;
+        b=dErwHoEzJVCMceAQDKc5+Rvomgd9AIWBTezjn458R9DJAZ4ngqEYkHxZcNSO1yBu2d
+         0uiM1iSrzBTSmPZwyOheAb2+e5hcf0tmqecGWpA7X1gnVZrf5Q176eD6+DpDysSo3asx
+         5yaBuYVpoIO7hG/eOVCrDxDFOkUUJbRzzJBC9TKoIhUW3HTFrBlqPV3BU1SL2j/0Qnbl
+         YEsBUhjFLSFIXbAnE8R2Agjl6gmPd5WpwS40F80QM96YnUevGzVGgmbUlUQBrYlUnUXG
+         m4HMFTnd0QKxFzQi+j+BZIxRdk6mfxKNKYtCIX1SyacLgm/OO05iBzmdDck8KmB2g+RY
+         STFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUuh3tlBLlv23s09zdZPOIshP4sf2+0jMYlZDsWiibYl2zDb8jNn4zIUiNluSAWAnoYOxD31Ahf@vger.kernel.org, AJvYcCVLOqICqgf6j6ZampLk5Jl+JXKDq0rq2CmrQlReU4nwylS530rnADKrsEWBnvX0XE0QkMSYwRZf@vger.kernel.org, AJvYcCWn86Mq6k4v80TXf+XDO7Y6EKBqR/KNQClwWoLDJY3OTPM5az2V7BZrXzKh3sgLMUqmF7RKedrbYw/k6RQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdAojUkFQE/BguChfpn9hzNQ+gFGIVWhM6r8W2X9tM/1QfVPyE
+	puZ3I34QjCbTxmXfkUU9HSicTi2Iq+mcjyc8dfSIMEDCpl58sDCO
+X-Gm-Gg: ASbGnctTqT4mPh+i5LqqL7wjLW7AEwEhcVBFpg1kFqyndf8YXpYoe0TptYzkpeTm9S2
+	jWPq+eYsfI+vBLDD3NdNkASMtgs2r/SaHVAe4tTuPYlUg/aoCxHbPi1KGsTqzmMxAQc0pKteTIy
+	0pkeu6Ja6tGGIl6dM7ubL+pbKtl3cYtAR9fxjfTptqZRMWPG4zjqoJWHkCsfDTk6dplrKWvgY43
+	W1rTocmL4hJJufgPd0li/Wunv8ShRY41wK9RlN06u9OmCuhzlEVUoYlPAzlqI1RGiqgeQIzwh4f
+	OET32/vjgMt4TxOx7zr3NdKUKPIMDFRg+odFbOV27qmAtsrncafUBsk=
+X-Google-Smtp-Source: AGHT+IEa5UJBk8pFAAEn17DT7zrqf9LgrhW1yVg3/4Nr/d7c82A8poo6UJuKjfvQ33n45llJ3lLYzw==
+X-Received: by 2002:a17:90a:f945:b0:2ea:bf1c:1e3a with SMTP id 98e67ed59e1d1-3087bb57aa9mr27886530a91.12.1745358569302;
+        Tue, 22 Apr 2025 14:49:29 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb4a46sm90649335ad.147.2025.04.22.14.49.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 14:49:28 -0700 (PDT)
+Date: Tue, 22 Apr 2025 14:49:27 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: "Alan J. Wylie" <alan@wylie.me.uk>
+Cc: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <aAgO59L0ccXl6kUs@pop-os.localdomain>
+References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+ <6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
+ <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+ <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+ <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+ <20250421210927.50d6a355@frodo.int.wylie.me.uk>
+ <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+ <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+ <aAf/K7F9TmCJIT+N@pop-os.localdomain>
+ <20250422214716.5e181523@frodo.int.wylie.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422214716.5e181523@frodo.int.wylie.me.uk>
 
-From: Madhu Chittim <madhu.chittim@intel.com>
+Hi, Alan
 
-Split offloads into csum, tso and other offloads so that tunneled
-packets do not by default have all the offloads enabled.
+Although I am still trying to understand the NULL pointer, which seems
+likely from:
 
-Stateless offloads for encapsulated packets are not yet supported in
-firmware/software but in the driver we were setting the features same as
-non encapsulated features.
+ 478                         if (p->inner.clprio[prio].ptr == cl->node + prio) {
+ 479                                 /* we are removing child which is pointed to from
+ 480                                  * parent feed - forget the pointer but remember
+ 481                                  * classid
+ 482                                  */
+ 483                                 p->inner.clprio[prio].last_ptr_id = cl->common.classid;
+ 484                                 p->inner.clprio[prio].ptr = NULL;
+ 485                         }
 
-Fixed naming to clarify CSUM bits are being checked for Tx.
+Does the following patch work? I mean not just fixing the crash, but
+also not causing any other problem.
 
-Inherit netdev features to VLAN interfaces as well.
+Please give it a try.
 
-Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-Tested-by: Zachary Goldstein <zachmgoldstein@google.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Thanks!
+
 ---
- drivers/net/ethernet/intel/idpf/idpf.h     | 14 ++++--
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 57 ++++++++--------------
- 2 files changed, 29 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 66544faab710..5f73a4cf5161 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -633,10 +633,18 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_UDP)
- 
-+#define IDPF_CAP_TX_CSUM_L4V4 (\
-+	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_TCP	|\
-+	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_UDP)
-+
- #define IDPF_CAP_RX_CSUM_L4V6 (\
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
- 
-+#define IDPF_CAP_TX_CSUM_L4V6 (\
-+	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_TCP	|\
-+	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_UDP)
-+
- #define IDPF_CAP_RX_CSUM (\
- 	VIRTCHNL2_CAP_RX_CSUM_L3_IPV4		|\
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
-@@ -644,11 +652,9 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
- 	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
- 
--#define IDPF_CAP_SCTP_CSUM (\
-+#define IDPF_CAP_TX_SCTP_CSUM (\
- 	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_SCTP	|\
--	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP	|\
--	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_SCTP	|\
--	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_SCTP)
-+	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP)
- 
- #define IDPF_CAP_TUNNEL_TX_CSUM (\
- 	VIRTCHNL2_CAP_TX_CSUM_L3_SINGLE_TUNNEL	|\
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index aa755dedb41d..730a9c7a59f2 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -703,8 +703,10 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 4b9a639b642e..0cdc778fddef 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
+  */
+ static inline void htb_next_rb_node(struct rb_node **n)
  {
- 	struct idpf_adapter *adapter = vport->adapter;
- 	struct idpf_vport_config *vport_config;
-+	netdev_features_t other_offloads = 0;
-+	netdev_features_t csum_offloads = 0;
-+	netdev_features_t tso_offloads = 0;
- 	netdev_features_t dflt_features;
--	netdev_features_t offloads = 0;
- 	struct idpf_netdev_priv *np;
- 	struct net_device *netdev;
- 	u16 idx = vport->idx;
-@@ -766,53 +768,32 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
+-	*n = rb_next(*n);
++	if (*n)
++		*n = rb_next(*n);
+ }
  
- 	if (idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
- 		dflt_features |= NETIF_F_RXHASH;
--	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V4))
--		dflt_features |= NETIF_F_IP_CSUM;
--	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V6))
--		dflt_features |= NETIF_F_IPV6_CSUM;
-+	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V4))
-+		csum_offloads |= NETIF_F_IP_CSUM;
-+	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V6))
-+		csum_offloads |= NETIF_F_IPV6_CSUM;
- 	if (idpf_is_cap_ena(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM))
--		dflt_features |= NETIF_F_RXCSUM;
--	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_SCTP_CSUM))
--		dflt_features |= NETIF_F_SCTP_CRC;
-+		csum_offloads |= NETIF_F_RXCSUM;
-+	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_SCTP_CSUM))
-+		csum_offloads |= NETIF_F_SCTP_CRC;
- 
- 	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV4_TCP))
--		dflt_features |= NETIF_F_TSO;
-+		tso_offloads |= NETIF_F_TSO;
- 	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV6_TCP))
--		dflt_features |= NETIF_F_TSO6;
-+		tso_offloads |= NETIF_F_TSO6;
- 	if (idpf_is_cap_ena_all(adapter, IDPF_SEG_CAPS,
- 				VIRTCHNL2_CAP_SEG_IPV4_UDP |
- 				VIRTCHNL2_CAP_SEG_IPV6_UDP))
--		dflt_features |= NETIF_F_GSO_UDP_L4;
-+		tso_offloads |= NETIF_F_GSO_UDP_L4;
- 	if (idpf_is_cap_ena_all(adapter, IDPF_RSC_CAPS, IDPF_CAP_RSC))
--		offloads |= NETIF_F_GRO_HW;
--	/* advertise to stack only if offloads for encapsulated packets is
--	 * supported
--	 */
--	if (idpf_is_cap_ena(vport->adapter, IDPF_SEG_CAPS,
--			    VIRTCHNL2_CAP_SEG_TX_SINGLE_TUNNEL)) {
--		offloads |= NETIF_F_GSO_UDP_TUNNEL	|
--			    NETIF_F_GSO_GRE		|
--			    NETIF_F_GSO_GRE_CSUM	|
--			    NETIF_F_GSO_PARTIAL		|
--			    NETIF_F_GSO_UDP_TUNNEL_CSUM	|
--			    NETIF_F_GSO_IPXIP4		|
--			    NETIF_F_GSO_IPXIP6		|
--			    0;
--
--		if (!idpf_is_cap_ena_all(vport->adapter, IDPF_CSUM_CAPS,
--					 IDPF_CAP_TUNNEL_TX_CSUM))
--			netdev->gso_partial_features |=
--				NETIF_F_GSO_UDP_TUNNEL_CSUM;
--
--		netdev->gso_partial_features |= NETIF_F_GSO_GRE_CSUM;
--		offloads |= NETIF_F_TSO_MANGLEID;
--	}
-+		other_offloads |= NETIF_F_GRO_HW;
- 	if (idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_LOOPBACK))
--		offloads |= NETIF_F_LOOPBACK;
-+		other_offloads |= NETIF_F_LOOPBACK;
- 
--	netdev->features |= dflt_features;
--	netdev->hw_features |= dflt_features | offloads;
--	netdev->hw_enc_features |= dflt_features | offloads;
-+	netdev->features |= dflt_features | csum_offloads | tso_offloads;
-+	netdev->hw_features |=  netdev->features | other_offloads;
-+	netdev->vlan_features |= netdev->features | other_offloads;
-+	netdev->hw_enc_features |= dflt_features | other_offloads;
- 	idpf_set_ethtool_ops(netdev);
- 	netif_set_affinity_auto(netdev);
- 	SET_NETDEV_DEV(netdev, &adapter->pdev->dev);
--- 
-2.47.1
-
+ /**
 
