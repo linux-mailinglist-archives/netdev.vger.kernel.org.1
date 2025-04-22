@@ -1,264 +1,154 @@
-Return-Path: <netdev+bounces-184906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A41A97AC1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:56:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCFFA97AC4
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 372AF5A13A5
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:55:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA925460BB1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650E825CC5E;
-	Tue, 22 Apr 2025 22:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1DC2BCF7C;
+	Tue, 22 Apr 2025 22:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iW3g5YMi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Enc5uyOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C56E242D6B
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 22:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAE31EE7DD;
+	Tue, 22 Apr 2025 22:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745362564; cv=none; b=loQrPA973RxC3ALHlUKo3CvxcO7sQnwkB8uZM/7mnYzTGPFvjuFy5CfyfxboDKeow3p+cpX5CNnOftfD4mBFi1XGfFNO6NDafOHQq4ouXUBcfuhJo8Gbzn5r9Yk6LUapVALI/3Axxr5C0ni8ow3xP3PO7flZ8A+ALycZG71FPWk=
+	t=1745362692; cv=none; b=mNf6vsl9l+WzX2IK3QVzjwxuu0ogtfj3JBDhC7pE6ojCLUGMplW5ftDokHbfAV/d09rZHagZAJ4wITDpm/rzuwVB2E6/z7iJFfuC1ijXefxnjxgZ07Btda7bM7QHmDP/BehVxrr/Vpx3KzTTgMY3UEYkY+Xiacaqao/kE/UoMuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745362564; c=relaxed/simple;
-	bh=MEhdpwTjo3YYGd/IXJ3n1Ytzk8c6AhzAnobQyGJM9m0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=QbvWp1pP6U2DUjDNYU2R8igFugWo/goMRBMj5/HYfSCnTlMKJ3BRan2LQ/GWtZa4JcIBGPceW67u7KSDNbPgdKR+5lGFPSRBAeamXWMYjfxJ/3ML0jdfxleuRUccFJPJLhhpx5R+JIOX1Tm/TobsJtpKDsSo3wKo2F8iAghuop0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iW3g5YMi; arc=none smtp.client-ip=209.85.219.49
+	s=arc-20240116; t=1745362692; c=relaxed/simple;
+	bh=qhoCRr6iJ4JDLDgkjS7q5wQsu+zo9f5E/xP7W721KYM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S2DKYlDkhIpSIb12FtLfKef3BJB2ZM7pp0Wdy3n9HFDZj/XoZe2e/CMZ3DU2LrSEYynJ/JkWxfI34tqy27YGYH2/iYAqetBV4xxHHtTc6Cas5HkJz2J3FQKnDQQXvsUgLyPRrKBohhnDphJhX9v/Arpda1paq4keqQp9tdpz4nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Enc5uyOm; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6e8f8657f29so53352916d6.3
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:56:02 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-227c7e57da2so50486765ad.0;
+        Tue, 22 Apr 2025 15:58:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745362561; x=1745967361; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PBzeT7kQC1yVqsLS4jhP2z5bW5aVJIuFV4Fc44a1TFs=;
-        b=iW3g5YMihix6iQoFq96FAikUHzGvyerbEIt0HIiYROsREuh3gzMMb4TzvjgXphkhG/
-         yZWqIdu0lRSWomXKOM2DlMlf+WUXdITI5vydeCqRF5mP9lBcIi+eJT+41f3djOBxz9uL
-         iLYtYoVDaUfz1Cqs0I1lPLudP6bcSS3bg3/b69RHsp1L2ABKwdOUdyj81DpDndjn9JJ8
-         eHex/gGfD1jucXUuxUJOzlnItgPMW34w96VcgIKDJM/Z5ods+dLQf3PF6pNBRD/3qPLk
-         skP/a0AZ0YAUvDo/Hhv8H+S6jat7aLFCx6SlNQeFHveZWW8VRghw9Vy3Q/ccnNTmyQz2
-         YlbA==
+        d=gmail.com; s=20230601; t=1745362690; x=1745967490; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g4+iUhVe7p621IQ4rwytm2VMPB/Jrbhsqc2u60r7Vr8=;
+        b=Enc5uyOmJyyj6YrMRhlPm9GHn0rVAAinO1qWl7tfHs/1VYoyelSY6whgqhart3+T0y
+         iKkUvwFN5098bH4sYBTM7G5ODFeOEfvBQjfeM7L7lpu3qwt59LqY+jbSfSDDElnvh8Vs
+         PrSvSiChT9j1A3iI5Il4tW35ZKMKRnju6u7OqsKZIWwr/+mQSET6f7DOVCFhXYpJZYws
+         LCH6DktUg/AFrq75PxaoaJDoAM/11DvaHVDYIGeKH5Ui9EVmz5wCl7GC/ImwhbC+wW/b
+         jtV1uGKiCUtrzNItYjsFZYIgpn+/76YPFgttsK6/xkdABu+z9EdNdMUWBIPnLqGsIscQ
+         XMsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745362561; x=1745967361;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PBzeT7kQC1yVqsLS4jhP2z5bW5aVJIuFV4Fc44a1TFs=;
-        b=LV5pCgzjHh6D2TSHfZTCJh5OyjQUFO0yUfjkOu/O4Jh3YjhRcmZJXZ2Egf71/dU0k/
-         uivi7qMiIefleMYuYbLO1BDi3w71E8DFoh2v0t7Dz8rwc7vN1OIkD/2JJSrWVZMgwDyh
-         NbdD0oNJECdFNvmLGqmlsxMH5VWFUQJDfcMa7HUCX+FIZ4wTXu7vvXLzBrNT/0Hokbye
-         hMWSTF7EAA9JJ75+Fyh/Pfv5uLQHlHSGsbLr64eq00s8cGlOGi7rUSTFXEcZSe79K3Zi
-         a0lNnLmW0fM0Ihl69uznvzbrJX0HhFVqiEj/E92RU2Jx7C5PE44xsAx2+AMN7/yd+eJn
-         xXPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Z5b3Ft95kmt9KiJbDNrqbmUFX1UUpwP92OcozLPEPeIF2KzsRXEpxeoKBlzDA2jNzVpBimA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN7FY5anZC2ENAnUJlMQnwFYWDJaJ9tMrKJXo3vwL+1lIDFpyZ
-	v2xf9fSpqvENjl2hkal69HUuYMhmzxWmGnWslIPgnjeowqSk/OVu
-X-Gm-Gg: ASbGncsxUB/SEckzaAsbvuI6O5gk3uQuwk3fLoCj00KRlVfjdqFdgoZ1aVkM7KLgovQ
-	rCi+yujgfZZjCU//uxcMqPmYB0LPjxKsFcZ5Xmoe57UErcMUL28Zswe3FcurJ58fZBZiYRShSu6
-	MWrRWK2D7FhzsluQyqHCXFN9dtKH3yVUfSEpDrw3nCBKIEVXj+ADHGJQImg7rxw+jlhYuy0JmBt
-	7Gr79VFsp+9hJalrMIQ+3xGZ84G5ot5pRHnpL06ci3gDMCwT7D9LUs7q8BllQtAtuzDwp62XpEc
-	iXAGkTr31KMo3+B3IIL9BJv6EsZvD85WiGzn17fiZGGprw62exkR0qekMOV7782yXcqbuYy8+mx
-	vF/vykUjo/lLVm/5iUGslUse+T5NyEBU=
-X-Google-Smtp-Source: AGHT+IFn/AZJmWR2PvBY8yFvPeLH8+9dnMjfHW5DT8jVTPtS4Y+7UXnCSkSOWgzTgBlFsD7HPgvL/g==
-X-Received: by 2002:a05:6214:2505:b0:6e8:fb94:b9bf with SMTP id 6a1803df08f44-6f2c44edd2dmr264697016d6.4.1745362561432;
-        Tue, 22 Apr 2025 15:56:01 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f2c2c21c56sm62870096d6.101.2025.04.22.15.56.00
+        d=1e100.net; s=20230601; t=1745362690; x=1745967490;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g4+iUhVe7p621IQ4rwytm2VMPB/Jrbhsqc2u60r7Vr8=;
+        b=syPfK4bsH8nbD/GQ/A4TZveHSadf9Jw9tsvL1ng96UewjvLlG5l84wljAnYbZqy65P
+         aZ5a1GOoJMG7hmvpIiGET6F0xFKL2dOGoBA5swxzonkCl8lf8a+zwTTTaxAWA1YACPtr
+         xPrTLlEOPxnrYNeihua5Zjq0ymD1SiRuLwkmbV6sUNvUFvcpJdH8BhAVGKOhGYiH3VrP
+         aa4xXQiMyBKKTT0QlfGgWUDCwMN+E+TbDge5ZAmSjpgAmPz4qc/eyfjglck+orJXgDzi
+         IocxGA77IizIeZQBi4nGkH5a3Z4phRLCpuvtIN82oZOq5CknDnEsc+0tuIip5du0Zh/J
+         BcxQ==
+X-Gm-Message-State: AOJu0YyDKgd7qqm/cXGFQtFKnwiXtSarGgYjG4aRiw+DUUgylTgkPts2
+	TdsISnh3X6/QQKUHOLMCKA7Y/CtVtvOTzUkUHdn1zIoZDydX7SYs7qJVEQ==
+X-Gm-Gg: ASbGncu+ihrzOVjryW4OwzG3BcJoCBcLTgOyKn2x93JHkS0UH6H4KhoGd4xRUYUhHSo
+	mpMKsAxBeeEmBTZFTJe8ZbH1PuuRC/v5ktS/crrhfFo3HIu4cg2jf+hr/P8cAri4PuuXYNcvlEP
+	mDNkFTqDf7Oa5s1c77HlYnoDAD+ChH8GzbRI8tWWyhTcuR655yUnFbiXVevHoRfPn9HmFWobCxt
+	U7uxlqF0g5Ys4jsKAYJgs4DYvjL2JB2CkUga2iM8dW7I0IIBEVUG5OV8vU9i0R6KulSvKAJzC2I
+	jhjEaItfbQjEeqDZ2BJufte/nWOz+Yqj3ZGGa9MTqA==
+X-Google-Smtp-Source: AGHT+IFwK/lAXaOceQuK5Hi0GaDdk7yxxO7EC4ESy6jL8Ksqb4no5JEI1f7zjK7yyRvDNqWW40Ia8w==
+X-Received: by 2002:a17:902:ea07:b0:223:88af:2c30 with SMTP id d9443c01a7336-22c5357f3b2mr224090895ad.16.1745362689627;
+        Tue, 22 Apr 2025 15:58:09 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:6::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bde12bsm91100035ad.40.2025.04.22.15.58.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 15:56:00 -0700 (PDT)
-Date: Tue, 22 Apr 2025 18:56:00 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- andrew+netdev@lunn.ch, 
- netdev@vger.kernel.org
-Cc: Madhu Chittim <madhu.chittim@intel.com>, 
- anthony.l.nguyen@intel.com, 
- willemb@google.com, 
- Sridhar Samudrala <sridhar.samudrala@intel.com>, 
- Zachary Goldstein <zachmgoldstein@google.com>, 
- Samuel Salin <Samuel.salin@intel.com>
-Message-ID: <68081e80888e6_3d8ff0294f9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250422214822.882674-4-anthony.l.nguyen@intel.com>
-References: <20250422214822.882674-1-anthony.l.nguyen@intel.com>
- <20250422214822.882674-4-anthony.l.nguyen@intel.com>
-Subject: Re: [PATCH net 3/3] idpf: fix offloads support for encapsulated
- packets
+        Tue, 22 Apr 2025 15:58:09 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@kernel.org,
+	xiyou.wangcong@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next/net] bpf: net_sched: Fix using bpf qdisc as default qdisc
+Date: Tue, 22 Apr 2025 15:58:08 -0700
+Message-ID: <20250422225808.3900221-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Tony Nguyen wrote:
-> From: Madhu Chittim <madhu.chittim@intel.com>
-> 
-> Split offloads into csum, tso and other offloads so that tunneled
-> packets do not by default have all the offloads enabled.
-> 
-> Stateless offloads for encapsulated packets are not yet supported in
-> firmware/software but in the driver we were setting the features same as
-> non encapsulated features.
-> 
-> Fixed naming to clarify CSUM bits are being checked for Tx.
-> 
-> Inherit netdev features to VLAN interfaces as well.
-> 
-> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-> Tested-by: Zachary Goldstein <zachmgoldstein@google.com>
-> Tested-by: Samuel Salin <Samuel.salin@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf.h     | 14 ++++--
->  drivers/net/ethernet/intel/idpf/idpf_lib.c | 57 ++++++++--------------
->  2 files changed, 29 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-> index 66544faab710..5f73a4cf5161 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
-> @@ -633,10 +633,18 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_UDP)
->  
-> +#define IDPF_CAP_TX_CSUM_L4V4 (\
-> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_TCP	|\
-> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_UDP)
-> +
->  #define IDPF_CAP_RX_CSUM_L4V6 (\
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
->  
-> +#define IDPF_CAP_TX_CSUM_L4V6 (\
-> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_TCP	|\
-> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_UDP)
-> +
->  #define IDPF_CAP_RX_CSUM (\
->  	VIRTCHNL2_CAP_RX_CSUM_L3_IPV4		|\
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_TCP	|\
-> @@ -644,11 +652,9 @@ bool idpf_is_capability_ena(struct idpf_adapter *adapter, bool all,
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_TCP	|\
->  	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_UDP)
->  
-> -#define IDPF_CAP_SCTP_CSUM (\
-> +#define IDPF_CAP_TX_SCTP_CSUM (\
->  	VIRTCHNL2_CAP_TX_CSUM_L4_IPV4_SCTP	|\
-> -	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP	|\
-> -	VIRTCHNL2_CAP_RX_CSUM_L4_IPV4_SCTP	|\
-> -	VIRTCHNL2_CAP_RX_CSUM_L4_IPV6_SCTP)
-> +	VIRTCHNL2_CAP_TX_CSUM_L4_IPV6_SCTP)
->  
->  #define IDPF_CAP_TUNNEL_TX_CSUM (\
->  	VIRTCHNL2_CAP_TX_CSUM_L3_SINGLE_TUNNEL	|\
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> index aa755dedb41d..730a9c7a59f2 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> @@ -703,8 +703,10 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
->  {
->  	struct idpf_adapter *adapter = vport->adapter;
->  	struct idpf_vport_config *vport_config;
-> +	netdev_features_t other_offloads = 0;
-> +	netdev_features_t csum_offloads = 0;
-> +	netdev_features_t tso_offloads = 0;
->  	netdev_features_t dflt_features;
-> -	netdev_features_t offloads = 0;
->  	struct idpf_netdev_priv *np;
->  	struct net_device *netdev;
->  	u16 idx = vport->idx;
-> @@ -766,53 +768,32 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
->  
->  	if (idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
->  		dflt_features |= NETIF_F_RXHASH;
-> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V4))
-> -		dflt_features |= NETIF_F_IP_CSUM;
-> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM_L4V6))
-> -		dflt_features |= NETIF_F_IPV6_CSUM;
+Use bpf_try_module_get()/bpf_module_put() instead of try_module_get()/
+module_put() when handling default qdisc since users can assign a bpf
+qdisc to it.
 
-IDPF_CAP_RX_CSUM_L4V4 and IDPF_CAP_RX_CSUM_L4V6 are no longer used
-after this commit, so the definitions (above) should be removed?
+To trigger the bug:
+$ bpftool struct_ops register bpf_qdisc_fq.bpf.o /sys/fs/bpf
+$ echo bpf_fq > /proc/sys/net/core/default_qdisc
 
-> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V4))
-> +		csum_offloads |= NETIF_F_IP_CSUM;
-> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_CSUM_L4V6))
-> +		csum_offloads |= NETIF_F_IPV6_CSUM;
->  	if (idpf_is_cap_ena(adapter, IDPF_CSUM_CAPS, IDPF_CAP_RX_CSUM))
-> -		dflt_features |= NETIF_F_RXCSUM;
-> -	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_SCTP_CSUM))
-> -		dflt_features |= NETIF_F_SCTP_CRC;
-> +		csum_offloads |= NETIF_F_RXCSUM;
-> +	if (idpf_is_cap_ena_all(adapter, IDPF_CSUM_CAPS, IDPF_CAP_TX_SCTP_CSUM))
-> +		csum_offloads |= NETIF_F_SCTP_CRC;
->  
->  	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV4_TCP))
-> -		dflt_features |= NETIF_F_TSO;
-> +		tso_offloads |= NETIF_F_TSO;
->  	if (idpf_is_cap_ena(adapter, IDPF_SEG_CAPS, VIRTCHNL2_CAP_SEG_IPV6_TCP))
-> -		dflt_features |= NETIF_F_TSO6;
-> +		tso_offloads |= NETIF_F_TSO6;
->  	if (idpf_is_cap_ena_all(adapter, IDPF_SEG_CAPS,
->  				VIRTCHNL2_CAP_SEG_IPV4_UDP |
->  				VIRTCHNL2_CAP_SEG_IPV6_UDP))
-> -		dflt_features |= NETIF_F_GSO_UDP_L4;
-> +		tso_offloads |= NETIF_F_GSO_UDP_L4;
->  	if (idpf_is_cap_ena_all(adapter, IDPF_RSC_CAPS, IDPF_CAP_RSC))
-> -		offloads |= NETIF_F_GRO_HW;
-> -	/* advertise to stack only if offloads for encapsulated packets is
-> -	 * supported
-> -	 */
-> -	if (idpf_is_cap_ena(vport->adapter, IDPF_SEG_CAPS,
-> -			    VIRTCHNL2_CAP_SEG_TX_SINGLE_TUNNEL)) {
-> -		offloads |= NETIF_F_GSO_UDP_TUNNEL	|
-> -			    NETIF_F_GSO_GRE		|
-> -			    NETIF_F_GSO_GRE_CSUM	|
-> -			    NETIF_F_GSO_PARTIAL		|
-> -			    NETIF_F_GSO_UDP_TUNNEL_CSUM	|
-> -			    NETIF_F_GSO_IPXIP4		|
-> -			    NETIF_F_GSO_IPXIP6		|
-> -			    0;
-> -
-> -		if (!idpf_is_cap_ena_all(vport->adapter, IDPF_CSUM_CAPS,
-> -					 IDPF_CAP_TUNNEL_TX_CSUM))
-> -			netdev->gso_partial_features |=
-> -				NETIF_F_GSO_UDP_TUNNEL_CSUM;
-> -
-> -		netdev->gso_partial_features |= NETIF_F_GSO_GRE_CSUM;
-> -		offloads |= NETIF_F_TSO_MANGLEID;
-> -	}
-> +		other_offloads |= NETIF_F_GRO_HW;
->  	if (idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_LOOPBACK))
-> -		offloads |= NETIF_F_LOOPBACK;
-> +		other_offloads |= NETIF_F_LOOPBACK;
->  
-> -	netdev->features |= dflt_features;
-> -	netdev->hw_features |= dflt_features | offloads;
-> -	netdev->hw_enc_features |= dflt_features | offloads;
-> +	netdev->features |= dflt_features | csum_offloads | tso_offloads;
-> +	netdev->hw_features |=  netdev->features | other_offloads;
-> +	netdev->vlan_features |= netdev->features | other_offloads;
-> +	netdev->hw_enc_features |= dflt_features | other_offloads;
->  	idpf_set_ethtool_ops(netdev);
->  	netif_set_affinity_auto(netdev);
->  	SET_NETDEV_DEV(netdev, &adapter->pdev->dev);
-> -- 
-> 2.47.1
-> 
+Fixes: c8240344956e (bpf: net_sched: Support implementation of Qdisc_ops in bpf)
+Signed-off-by: Amery Hung <ameryhung@gmail.com>
+---
+ net/sched/sch_api.c     | 4 ++--
+ net/sched/sch_generic.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index db6330258dda..1cda7e7feb32 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -208,7 +208,7 @@ static struct Qdisc_ops *qdisc_lookup_default(const char *name)
+ 
+ 	for (q = qdisc_base; q; q = q->next) {
+ 		if (!strcmp(name, q->id)) {
+-			if (!try_module_get(q->owner))
++			if (!bpf_try_module_get(q, q->owner))
+ 				q = NULL;
+ 			break;
+ 		}
+@@ -238,7 +238,7 @@ int qdisc_set_default(const char *name)
+ 
+ 	if (ops) {
+ 		/* Set new default */
+-		module_put(default_qdisc_ops->owner);
++		bpf_module_put(ops, default_qdisc_ops->owner);
+ 		default_qdisc_ops = ops;
+ 	}
+ 	write_unlock(&qdisc_mod_lock);
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index e6fda9f20272..7d2836d66043 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -1002,14 +1002,14 @@ struct Qdisc *qdisc_create_dflt(struct netdev_queue *dev_queue,
+ {
+ 	struct Qdisc *sch;
+ 
+-	if (!try_module_get(ops->owner)) {
++	if (!bpf_try_module_get(ops, ops->owner)) {
+ 		NL_SET_ERR_MSG(extack, "Failed to increase module reference counter");
+ 		return NULL;
+ 	}
+ 
+ 	sch = qdisc_alloc(dev_queue, ops, extack);
+ 	if (IS_ERR(sch)) {
+-		module_put(ops->owner);
++		bpf_module_put(ops, ops->owner);
+ 		return NULL;
+ 	}
+ 	sch->parent = parentid;
+-- 
+2.47.1
 
 
