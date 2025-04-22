@@ -1,111 +1,349 @@
-Return-Path: <netdev+bounces-184495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443E0A95C86
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 05:11:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D3C5A95C98
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 05:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B3133A3F2F
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 03:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F58161A16
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 03:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4E219D07B;
-	Tue, 22 Apr 2025 03:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1B317B50A;
+	Tue, 22 Apr 2025 03:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AOyTYJ++"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F5510A1F;
-	Tue, 22 Apr 2025 03:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41011A8404
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 03:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745291456; cv=none; b=YBhg/ZplWLhSe1rscMm+EcRRdjZdjosq7FDDUuQPpLSNuVEkELwL70MgyESo14/ZTqaLYqdVE+h5BVU+2ymfmrQRoxSOL3uCbkjpvgm686Rq4M7fVvOe3tsr89Zcj+DEqCPJ67GqdGihSHT01y1P5AUJI3SWTIcvGdEhc9iNZoY=
+	t=1745292834; cv=none; b=Z1eSq2R21YuOR5OkpyTFXzO16Kawf0OMehBh/hyWPyAcuG3ORCeLOUExsjSaCJxQsf5vqMdk0NHL0K8ujAaeKj5sANOew7gY4CX3juQnc2OV6X2Gi2Bm/u8zxDKGhVPTuDSDSCVEinOxzk6zB/c11WJstQT6l4OeQQ9O+cDfMPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745291456; c=relaxed/simple;
-	bh=GYsg3nDDsxCC5f/WHunIiWZ82w5GH9824GyCufi9os4=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=u7yhKz7/jLwNkVddMH++iPjR3s+od9zN5lruR/MenzCyMBzesv8nA6r9y+9vcKudTKzSg3fF/XNWfk9xD+kUr5Lq0dWNCV/jnAMYks8Y+uMskkopaykQ/a+qWsMpv3nm3WaKqNt9x2VRiNxfgNkb1pwRW+tOrRZdlG1BHhn0OJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1u73zC-000000005M0-0aoj;
-	Tue, 22 Apr 2025 03:10:28 +0000
-Date: Tue, 22 Apr 2025 04:10:20 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Neal Yen <neal.yen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: dsa: mt7530: sync driver-specific behavior of
- MT7531 variants
-Message-ID: <89ed7ec6d4fa0395ac53ad2809742bb1ce61ed12.1745290867.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1745292834; c=relaxed/simple;
+	bh=YOHinWUJrIZn0yEi+PczlhBeYrl0GIBlw9PxUC43raM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jD9YuHIVxQjHpsLLwS5Gv7t7nzDwg18O9YOhaB5FqQoliJBCjHf5xL2Zyu6+Ak2c6lnoOG8danazNf0bPQ+bT3CEKI/e7vkYlGdT4McjGLbxRe8lwo6H48/u/SbTC4y/xsCbOStqSd5IlStVbq5dndAU4kBL9Pavc4Iq50rP5a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AOyTYJ++; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e3b08fdc-8a10-4491-a7a3-c11fed6d15ae@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745292828;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aPZ1Xg/BSQsUZshzvDYT6XZ7YUU+zdwK7Xfh5sdYxo0=;
+	b=AOyTYJ++P4X3k/9Tk3laRS5/EsUp4QPfYjTQhyadLgrnLWgdveaKv/OY5CHVHfxUXWE48r
+	kmDGHjlV9Q5Ut25w6EcRGORI1iVh9YwpzCnhgtf1H0I1l7bp5YWZ4BhI67GLTgnKHSISNv
+	nNHI+iEQ2r9Ys6D0FJ3/z4SF0bQZiXs=
+Date: Mon, 21 Apr 2025 20:33:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH v4 bpf-next 2/6] bpf: udp: Make sure iter->batch always
+ contains a full bucket snapshot
+To: Jordan Rife <jordan@jrife.io>
+Cc: Aditi Ghag <aditi.ghag@isovalent.com>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20250419155804.2337261-1-jordan@jrife.io>
+ <20250419155804.2337261-3-jordan@jrife.io>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250419155804.2337261-3-jordan@jrife.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-MT7531 standalone and MMIO variants found in MT7988 and EN7581 share
-most basic properties. Despite that, assisted_learning_on_cpu_port and
-mtu_enforcement_ingress were only applied for MT7531 but not for MT7988
-or EN7581, causing the expected issues on MMIO devices.
+On 4/19/25 8:57 AM, Jordan Rife wrote:
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 0ac31dec339a..d3128261e4cb 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -3377,6 +3377,7 @@ int udp4_seq_show(struct seq_file *seq, void *v)
+>   }
+>   
+>   #ifdef CONFIG_BPF_SYSCALL
+> +#define MAX_REALLOC_ATTEMPTS 3
+>   struct bpf_iter__udp {
+>   	__bpf_md_ptr(struct bpf_iter_meta *, meta);
+>   	__bpf_md_ptr(struct udp_sock *, udp_sk);
+> @@ -3401,11 +3402,13 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>   	struct bpf_udp_iter_state *iter = seq->private;
+>   	struct udp_iter_state *state = &iter->state;
+>   	struct net *net = seq_file_net(seq);
+> +	int resizes = MAX_REALLOC_ATTEMPTS;
+>   	int resume_bucket, resume_offset;
+>   	struct udp_table *udptable;
+>   	unsigned int batch_sks = 0;
+> -	bool resized = false;
+> +	spinlock_t *lock = NULL;
+>   	struct sock *sk;
+> +	int err = 0;
+>   
+>   	resume_bucket = state->bucket;
+>   	resume_offset = iter->offset;
+> @@ -3433,10 +3436,13 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>   		struct udp_hslot *hslot2 = &udptable->hash2[state->bucket].hslot;
+>   
+>   		if (hlist_empty(&hslot2->head))
+> -			continue;
+> +			goto next_bucket;
+>   
+>   		iter->offset = 0;
+> -		spin_lock_bh(&hslot2->lock);
+> +		if (!lock) {
+> +			lock = &hslot2->lock;
+> +			spin_lock_bh(lock);
+> +		}
+>   		udp_portaddr_for_each_entry(sk, &hslot2->head) {
+>   			if (seq_sk_match(seq, sk)) {
+>   				/* Resume from the last iterated socket at the
+> @@ -3454,15 +3460,28 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>   				batch_sks++;
+>   			}
+>   		}
+> -		spin_unlock_bh(&hslot2->lock);
+>   
+>   		if (iter->end_sk)
+>   			break;
+> +next_bucket:
+> +		/* Somehow the bucket was emptied or all matching sockets were
+> +		 * removed while we held onto its lock. This should not happen.
+> +		 */
+> +		if (WARN_ON_ONCE(!resizes))
+> +			/* Best effort; reset the resize budget and move on. */
+> +			resizes = MAX_REALLOC_ATTEMPTS;
+> +		if (lock)
 
-Apply both settings equally also for MT7988 and EN7581 by moving both
-assignments form mt7531_setup() to mt7531_setup_common().
+I found the "if (lock)" changes and its related changes make the code harder
+to follow. This change is mostly to handle one special case,
+avoid releasing the lock when "resizes" reaches the limit.
 
-This fixes unwanted flooding of packets due to unknown unicast
-during DA lookup, as well as issues with heterogenous MTU settings.
+Can this one case be specifically handled in the "for(bucket)" loop?
 
-Fixes: 7f54cc9772ce ("net: dsa: mt7530: split-off common parts from mt7531_setup")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-See also https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/b4204fb062d60ac57791c90a11d05cf75269dcbd
+With this special case, it can alloc exactly the "batch_sks" size
+with GFP_ATOMIC. It does not need to put the sk or get the cookie.
+It can directly continue from the "iter->batch[iter->end_sk - 1].sock".
 
- drivers/net/dsa/mt7530.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Something like this on top of this set. I reset the "resizes" on each new bucket,
+removed the existing "done" label and avoid getting cookie in the last attempt.
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index d70399bce5b9..c5d6628d7980 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2419,6 +2419,9 @@ mt7531_setup_common(struct dsa_switch *ds)
- 	struct mt7530_priv *priv = ds->priv;
- 	int ret, i;
- 
-+	ds->assisted_learning_on_cpu_port = true;
-+	ds->mtu_enforcement_ingress = true;
-+
- 	mt753x_trap_frames(priv);
- 
- 	/* Enable and reset MIB counters */
-@@ -2571,9 +2574,6 @@ mt7531_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
- 
--	ds->assisted_learning_on_cpu_port = true;
--	ds->mtu_enforcement_ingress = true;
--
- 	return 0;
- }
- 
--- 
-2.49.0
+Untested code and likely still buggy. wdyt?
+
+#define MAX_REALLOC_ATTEMPTS 2
+
+static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+{
+	struct bpf_udp_iter_state *iter = seq->private;
+	struct udp_iter_state *state = &iter->state;
+	unsigned int find_cookie, end_cookie = 0;
+	struct net *net = seq_file_net(seq);
+	struct udp_table *udptable;
+	unsigned int batch_sks = 0;
+	int resume_bucket;
+	struct sock *sk;
+	int resizes = 0;
+	int err = 0;
+
+	resume_bucket = state->bucket;
+
+	/* The current batch is done, so advance the bucket. */
+	if (iter->st_bucket_done)
+		state->bucket++;
+
+	udptable = udp_get_table_seq(seq, net);
+
+again:
+	/* New batch for the next bucket.
+	 * Iterate over the hash table to find a bucket with sockets matching
+	 * the iterator attributes, and return the first matching socket from
+	 * the bucket. The remaining matched sockets from the bucket are batched
+	 * before releasing the bucket lock. This allows BPF programs that are
+	 * called in seq_show to acquire the bucket lock if needed.
+	 */
+	find_cookie = iter->cur_sk;
+	end_cookie = iter->end_sk;
+	iter->cur_sk = 0;
+	iter->end_sk = 0;
+	iter->st_bucket_done = false;
+	batch_sks = 0;
+
+	for (; state->bucket <= udptable->mask; state->bucket++) {
+		struct udp_hslot *hslot2 = &udptable->hash2[state->bucket].hslot;
+
+		if (hlist_empty(&hslot2->head)) {
+			resizes = 0;
+			continue;
+		}
+
+		spin_lock_bh(&hslot2->lock);
+
+		/* Initialize sk to the first socket in hslot2. */
+		sk = hlist_entry_safe(hslot2->head.first, struct sock,
+				      __sk_common.skc_portaddr_node);
+		/* Resume from the first (in iteration order) unseen socket from
+		 * the last batch that still exists in resume_bucket. Most of
+		 * the time this will just be where the last iteration left off
+		 * in resume_bucket unless that socket disappeared between
+		 * reads.
+		 *
+		 * Skip this if end_cookie isn't set; this is the first
+		 * batch, we're on bucket zero, and we want to start from the
+		 * beginning.
+		 */
+		if (state->bucket == resume_bucket && end_cookie)
+			sk = bpf_iter_udp_resume(sk,
+						 &iter->batch[find_cookie],
+						 end_cookie - find_cookie);
+last_realloc_retry:
+		udp_portaddr_for_each_entry_from(sk) {
+			if (seq_sk_match(seq, sk)) {
+				if (iter->end_sk < iter->max_sk) {
+					sock_hold(sk);
+					iter->batch[iter->end_sk++].sock = sk;
+				}
+				batch_sks++;
+			}
+		}
+
+		if (unlikely(resizes == MAX_REALLOC_ATTEMPTS)  &&
+		    iter->end_sk && iter->end_sk != batch_sks) {
+			/* last realloc attempt to batch the whole
+			 * bucket. Keep holding the lock to ensure the
+			 * bucket will not be changed.
+			 */
+			err = bpf_iter_udp_realloc_batch(iter, batch_sks, GFP_ATOMIC);
+			if (err) {
+				spin_unlock_bh(&hslot2->lock);
+				return ERR_PTR(err);
+			}
+			sk = iter->batch[iter->end_sk - 1].sock;
+			sk = hlist_entry_safe(sk->__sk_common.skc_portaddr_node.next,
+					      struct sock, __sk_common.skc_portaddr_node);
+			batch_sks = iter->end_sk;
+			goto last_realloc_retry;
+		}
+
+		spin_unlock_bh(&hslot2->lock);
+
+		if (iter->end_sk)
+			break;
+
+		/* Got an empty bucket after taking the lock */
+		resizes = 0;
+	}
+
+	/* All done: no batch made. */
+	if (!iter->end_sk)
+		return NULL;
+
+	if (iter->end_sk == batch_sks) {
+		/* Batching is done for the current bucket; return the first
+		 * socket to be iterated from the batch.
+		 */
+		iter->st_bucket_done = true;
+		return iter->batch[0].sock;
+	}
+
+	err = bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2, GFP_USER);
+	if (err)
+		return ERR_PTR(err);
+
+	resizes++;
+	goto again;
+}
+  
+static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
+				      unsigned int new_batch_sz, int flags)
+{
+	union bpf_udp_iter_batch_item *new_batch;
+
+	new_batch = kvmalloc_array(new_batch_sz, sizeof(*new_batch),
+				   flags | __GFP_NOWARN);
+	if (!new_batch)
+		return -ENOMEM;
+
+	if (flags != GFP_ATOMIC)
+		bpf_iter_udp_put_batch(iter);
+
+	/* Make sure the new batch has the cookies of the sockets we haven't
+	 * visited yet.
+	 */
+	memcpy(new_batch, iter->batch, sizeof(*iter->batch) * iter->end_sk);
+	kvfree(iter->batch);
+	iter->batch = new_batch;
+	iter->max_sk = new_batch_sz;
+
+	return 0;
+}
+
+> +			spin_unlock_bh(lock);
+> +		lock = NULL;
+>   	}
+>   
+>   	/* All done: no batch made. */
+> -	if (!iter->end_sk)
+> -		return NULL;
+> +	if (!iter->end_sk) {
+> +		sk = NULL;
+> +		goto done;
+> +	}
+> +
+> +	sk = iter->batch[0];
+>   
+>   	if (iter->end_sk == batch_sks) {
+>   		/* Batching is done for the current bucket; return the first
+> @@ -3471,16 +3490,30 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>   		iter->st_bucket_done = true;
+>   		goto done;
+>   	}
+> -	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
+> -						    GFP_USER)) {
+> -		resized = true;
+> -		/* After allocating a larger batch, retry one more time to grab
+> -		 * the whole bucket.
+> -		 */
+> -		goto again;
+> +
+> +	/* Somehow the batch size still wasn't big enough even though we held
+> +	 * a lock on the bucket. This should not happen.
+> +	 */
+> +	if (WARN_ON_ONCE(!resizes))
+> +		goto done;
+> +
+> +	resizes--;
+> +	if (resizes) {
+> +		spin_unlock_bh(lock);
+> +		lock = NULL;
+>   	}
+> +	err = bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
+> +					 resizes ? GFP_USER : GFP_ATOMIC);
+> +	if (err) {
+> +		sk = ERR_PTR(err);
+> +		goto done;
+> +	}
+> +
+> +	goto again;
+>   done:
+> -	return iter->batch[0];
+> +	if (lock)
+> +		spin_unlock_bh(lock);
+> +	return sk;
+>   }
+>   
+>   static void *bpf_iter_udp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
 
 
