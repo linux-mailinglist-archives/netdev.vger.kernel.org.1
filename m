@@ -1,143 +1,180 @@
-Return-Path: <netdev+bounces-184867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE658A977F2
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:46:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D268A977F9
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3743C1766B3
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:46:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2441188FCBC
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 20:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8391C2C2576;
-	Tue, 22 Apr 2025 20:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A765B2C257F;
+	Tue, 22 Apr 2025 20:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="maDEm0/9"
+	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="ULO8Hh2a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC1E2D92C6
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 20:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC27F223DF1;
+	Tue, 22 Apr 2025 20:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745354800; cv=none; b=OKYp7evyxs6r/oRyczjZFdNa+xOlFPlydv7qPfP+3yBCYhrhJjnWAp3HuskDTwP/QTbqAiW4EWzW6Z0RbVuxGyJOlQ3NrZKTqPIF+wyacjOJ+jAQxtH2GkWMt1d/Zj0c+LgbjKzHh7gJxswPYdtyrOpvLCPrem3d4kBx+8BpQPw=
+	t=1745354852; cv=none; b=pVse8+vrwT2RJaKtISvrEUNKsP9FfD0FxuyjXaoPTj/xyXeVxpbl7MROU61hVpMDvvd01yLy6iSOvB0Bq+qG6ZEYFvyf41xVAsZSJzE1mau3oD/v256Gkt4bLZ3kYhPa+fbn75uxJ8jD4jAbh3c5B/mApDJcf8C97uD9iB0elfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745354800; c=relaxed/simple;
-	bh=AepzvkTaXC3tf015Trnt4kidHqKonWdB6m9AqTJB5Is=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u4H4M+oBcNIhts4v7vdSZDliwPhGMdsxL4ZiXFvDHyNyfrh1nOprB41ggdnKm+8IG6uoon/EpujwegmCvGRsL5V7fGE1SQoAgSAwP9teALqgXPSZHgesAzz0ZE+qm2NpfRhjYlayDo864L1kgJ3STpP5piUdpmh4HY+VojU8ADA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=maDEm0/9; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2263428c8baso13385ad.1
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 13:46:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745354798; x=1745959598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0hbnVvENaVU3NRLrUDXLjqPtRsqZnanRvkC7zMsTFmw=;
-        b=maDEm0/9uQs9/f9YyauaANBQvRiwE/gBMcs2NalSOx2kq7A9HxYvAFgU6uBag79YDM
-         zhP8YHIrVOHPphcC182uhhXJnm1Bh4R1RaL1BmUhtTwn20leEt5B2+Yy6WZCF2jQNWYG
-         a53e6R4X7AIHFD2r2iuUkFWwwqRcWh1hcVKnIz7Yz8hwp+0KlUNbVPKoYSwyo6/C17tm
-         Xpxswaob9wTMBlgp30y03vJo+sd4/odiRz2MZVdNat1YJALG2hEN4VUnT9tF1qvhZgjr
-         FR2N2NbZHEbYtIT/PYY4CZBl4kW/A2noNHH+lBCys5kiYlM6UZqwMnhC8ou48Aw8sWgF
-         Jtlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745354798; x=1745959598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0hbnVvENaVU3NRLrUDXLjqPtRsqZnanRvkC7zMsTFmw=;
-        b=VWxyfcW8LYgt0UakPvZCRKTBHbv8LQ4GtFs1/yOH475gy0JY0jZ2M2wiIXr/K9SX5G
-         gffEDM9yO9GimONUjIVf4iqrUSf0nYJokFLXuWz38Lo6TeDOvjHdC3SHBpeb+BMRbSuM
-         c15RBaOCDfBhWzXQCvPc2q00O5lzyfCT71/gqx+RH0LpQP11DVLjLGIpQMoGQS0h82ZB
-         /sQYl3SQOU2d3YSVNSIyPgtUHpepVfIxXgpbmP3FdlHWNTDUmcjvXSCKmOQ4H7D7iW9c
-         NTGXoV7+X+zTfvjlzCSY4YOgy1ck7NT9ZeXUnQAb7lT6MY6jF2rYCJc6WA9uDxsJhtDK
-         f8fA==
-X-Gm-Message-State: AOJu0YyOKxNwgXuJg7/SVk8GV7q/KuAJolc7uto87Xme7RST3QRQS7jY
-	s7p+l6j3yYdZkNT42uhTJBjEsmLHzzRpEtbcMgcv4Cxstf1mvFUgnvuSnW29rGf07d5A+4usrgi
-	iO7Xq4IgLfGe+6nvaWh5PFl2kCwQOanNNTGG0
-X-Gm-Gg: ASbGncsWfaF3l1/mHyyLhD7Pu2pzhaDGrQTROFzRjFp9sipQrNN4t0KPmXVuVdP9TA9
-	4SPef4W5aGDhQqyCeQOtLc4WUtG2MLUv+GEeiUxq/ZjrFu5MAEF/hJYyg5nM30a0Gz86cVJArjb
-	D4K4RHexuCRxxOtS9vBBiWxP2BWjsrtrWcHmZ42oTtFQMzFV4U1F67
-X-Google-Smtp-Source: AGHT+IEri+jHg7nzBWYce/s95T8w1odDrVsc9bNQomfJRGLKE9zLufWZUYri8enjRiH0NTmCrON34chxcEP4+8+fy1g=
-X-Received: by 2002:a17:902:f78d:b0:224:1fb:7b65 with SMTP id
- d9443c01a7336-22da2c3fe23mr741975ad.22.1745354797940; Tue, 22 Apr 2025
- 13:46:37 -0700 (PDT)
+	s=arc-20240116; t=1745354852; c=relaxed/simple;
+	bh=jI6WvZRTjseleXVwj2r4KXdhlz//nry7SMVNn90CJK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lg+UVDDoVpZx9W3dY2Hlg6ef9tkA9AZcjUCZQ0OdetDTCXDiP7GqR7q9N/ogUFyjwIjhWympL/WVw9RQ1FUTtN8B//oMhVqVNdL1yIg90KWdf41HCxA5nkhKApijmm5Js93LxPNmloFUI4C02RCQjDTWb28GTffIpnj3tyI9C/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=ULO8Hh2a; arc=none smtp.client-ip=82.68.155.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
+Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
+	by wylie.me.uk (Postfix) with ESMTP id 78EA0120801;
+	Tue, 22 Apr 2025 21:47:17 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
+	s=mydkim006; t=1745354837;
+	bh=jI6WvZRTjseleXVwj2r4KXdhlz//nry7SMVNn90CJK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=ULO8Hh2aQDgzFQqB3l5JjlzWKsXf9iEEpPxZF+9BrhHF3VZMQYmQvi1M/QFP59P1r
+	 WlPgp9XcNhxA5ko/bwOTIIVEyTcqnYonfBWxHFzhDh850931xi3LFslUI7ifcEgjmV
+	 NMZ0xROAlD89vjgG0b/83F5zNWVhSTv4C2q5CjWhQp+rbtpsocWF2KGgnUcZWLihIb
+	 rYjPNns24elRXWhe5NYGx51uC+rKR4R+hmmB0WBlovtMjXf1GqNK4Lf9H66aacgTAB
+	 kJzelemb24BywXoZava1XEdVYhTfOS7Ja36O/wDDPNb7DdV+7lBHWRDV2FUJY8WdI/
+	 LWt7W6xi/gO7g==
+Date: Tue, 22 Apr 2025 21:47:16 +0100
+From: "Alan J. Wylie" <alan@wylie.me.uk>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Jiri
+ Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
+ stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <20250422214716.5e181523@frodo.int.wylie.me.uk>
+In-Reply-To: <aAf/K7F9TmCJIT+N@pop-os.localdomain>
+References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+	<6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
+	<20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+	<20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+	<89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+	<20250421210927.50d6a355@frodo.int.wylie.me.uk>
+	<20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+	<4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+	<aAf/K7F9TmCJIT+N@pop-os.localdomain>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250417231540.2780723-1-almasrymina@google.com>
- <20250417231540.2780723-2-almasrymina@google.com> <f7a96367-1bb0-4ed2-8fbf-af7558fccc20@gmail.com>
- <CAHS8izMFxDG5E07ZdqnDH_2D_g1fW8X0M7u3gGyV8efzxDNZbg@mail.gmail.com> <5d2f86ce-e2bb-406a-8d53-58a464958d2d@gmail.com>
-In-Reply-To: <5d2f86ce-e2bb-406a-8d53-58a464958d2d@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 22 Apr 2025 13:46:24 -0700
-X-Gm-Features: ATxdqUFHY8ewiDnZPwv9bGxstV-8bLqJUqf0obD0wDTOy1se33mAidQpqaIoPl0
-Message-ID: <CAHS8izMZbt=NAK0GF6VqJNBRKy+iZQGMFG+jFJEesbz=5RiLXg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 1/9] netmem: add niov->type attribute to
- distinguish different net_iov types
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 22, 2025 at 12:52=E2=80=AFPM Pavel Begunkov <asml.silence@gmail=
-.com> wrote:
->
-> On 4/22/25 15:03, Mina Almasry wrote:
-> > On Tue, Apr 22, 2025 at 1:16=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
-ail.com> wrote:
-> >>
-> >> On 4/18/25 00:15, Mina Almasry wrote:
-> >>> Later patches in the series adds TX net_iovs where there is no pp
-> >>> associated, so we can't rely on niov->pp->mp_ops to tell what is the
-> >>> type of the net_iov.
-> >>
-> >> That's fine, but that needs a NULL pp check in io_uring as well,
-> >> specifically in io_zcrx_recv_frag().
-> >>
-> >
-> > I think you mean this update in the code:
-> >
-> > if (!niov->pp || niov->pp->mp_ops !=3D &io_uring_pp_zc_ops ||
-> >      io_pp_to_ifq(niov->pp) !=3D ifq)
-> > return -EFAULT;
-> >
-> > Yes, thanks, will do.
->
-> That will work. I'm assuming that those pp-less niovs can
-> end up in the rx path. I think it was deemed not impossible,
-> right?
->
+On Tue, 22 Apr 2025 13:42:19 -0700
+Cong Wang <xiyou.wangcong@gmail.com> wrote:
 
-I'm not sure these pp-less niovs can ever end up in the RX path, but
-I'm not sure, and I guess better safe than sorry. We usually get
-yelled at for defensive checks but I don't think this one is too
-defensive. There could be a path where a TX skb somehow ends up here.
+> On Tue, Apr 22, 2025 at 07:20:24PM +0200, Holger Hoffst=C3=A4tte wrote:
+> > (cc: Greg KH)
+> >=20
+> > On 2025-04-22 18:51, Alan J. Wylie wrote: =20
+> > > On Mon, 21 Apr 2025 21:09:27 +0100
+> > > "Alan J. Wylie" <alan@wylie.me.uk> wrote:
+> > >  =20
+> > > > On Mon, 21 Apr 2025 21:47:44 +0200
+> > > > Holger Hoffst=C3=A4tte <holger@applied-asynchrony.com> wrote:
+> > > >  =20
+> > > > > > I'm afraid that didn't help. Same panic. =20
+> > > > >=20
+> > > > > Bummer :-(
+> > > > >=20
+> > > > > Might be something else missing then - so for now the only
+> > > > > other thing I'd suggest is to revert the removal of the qlen
+> > > > > check in fq_codel. =20
+> > > >=20
+> > > > Like this?
+> > > >=20
+> > > > $ git diff  sch_fq_codel.c
+> > > > diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+> > > > index 6c9029f71e88..4fdf317b82ec 100644
+> > > > --- a/net/sched/sch_fq_codel.c
+> > > > +++ b/net/sched/sch_fq_codel.c
+> > > > @@ -316,7 +316,7 @@ static struct sk_buff
+> > > > *fq_codel_dequeue(struct Qdisc *sch) qdisc_bstats_update(sch,
+> > > > skb); flow->deficit -=3D qdisc_pkt_len(skb);
+> > > > -       if (q->cstats.drop_count) {
+> > > > +       if (q->cstats.drop_count && sch->q.qlen) {
+> > > >                  qdisc_tree_reduce_backlog(sch,
+> > > > q->cstats.drop_count, q->cstats.drop_len);
+> > > >                  q->cstats.drop_count =3D 0;
+> > > > $
+> > > >  =20
+> > >=20
+> > > It's been about 21 hours and no crash yet. I had an excellent day
+> > > down a cave, so there's not been as much Internet traffic as
+> > > usual, but there's a good chance the above patch as at least
+> > > worked around, if not fixed the issue. =20
+> >=20
+> > Thought so .. \o/
+> >=20
+> > I guess now the question is what to do about it. IIUC the fix
+> > series [1] addressed some kind of UAF problem, but obviously was
+> > not applied correctly or is missing follow-ups. It's also a bit
+> > mysterious why adding the HTB patch didn't work.
+> >=20
+> > Maybe Cong Wang can advise what to do here? =20
+>=20
+> I guess my patch caused some regression, I am still decoding the
+> crashes reported here.
+>=20
+> Meanwhile, if you could provide a reliable (and ideally minimum)
+> reproducer, it would help me a lot to debug.
+>=20
+> Thanks!
 
---
-Thanks,
-Mina
+Sorry. No reproducer. The crashes seemed to be totally random.
+
+I posted the script I use to set up tc in my initial report.
+
+FYI, here's the resulting config.
+
+# tc qdisc show
+qdisc noqueue 0: dev lo root refcnt 2=20
+qdisc fq_codel 0: dev enp3s0 root refcnt 2 limit 10240p flows 1024 quantum =
+6014 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+qdisc fq_codel 0: dev enp4s0 root refcnt 2 limit 10240p flows 1024 quantum =
+1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+qdisc fq_codel 0: dev enp5s6f0 root refcnt 2 limit 10240p flows 1024 quantu=
+m 1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+qdisc noqueue 0: dev wlp5s7 root refcnt 2=20
+qdisc noqueue 0: dev brdmz root refcnt 2=20
+qdisc noqueue 0: dev heipv6 root refcnt 2=20
+qdisc fq_codel 0: dev tun0 root refcnt 2 limit 10240p flows 1024 quantum 14=
+64 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+qdisc htb 1: dev ppp0 root refcnt 2 r2q 10 default 0x11 direct_packets_stat=
+ 0 direct_qlen 3
+qdisc fq_codel 824c: dev ppp0 parent 1:11 limit 10240p flows 1024 quantum 3=
+00 target 5ms interval 100ms memory_limit 32Mb drop_batch 64=20
+qdisc ingress ffff: dev ppp0 parent ffff:fff1 ----------------=20
+qdisc fq_codel 0: dev tun1 root refcnt 2 limit 10240p flows 1024 quantum 15=
+00 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+qdisc htb 1: dev ppp0ifb0 root refcnt 2 r2q 20 default 0x11 direct_packets_=
+stat 0 direct_qlen 32
+qdisc fq_codel 824b: dev ppp0ifb0 parent 1:11 limit 10240p flows 1024 quant=
+um 300 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64=20
+#=20
+
+
+
+--=20
+Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
+
+Dance like no-one's watching. / Encrypt like everyone is.
+Security is inversely proportional to convenience
 
