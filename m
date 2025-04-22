@@ -1,143 +1,97 @@
-Return-Path: <netdev+bounces-184611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39070A96611
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:37:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375A8A96621
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 12:40:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76EDB18994CA
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E67D3A8C67
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 10:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056EC1E5200;
-	Tue, 22 Apr 2025 10:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A9A1F12E0;
+	Tue, 22 Apr 2025 10:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RU9ruP9p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBDEcvgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309B31DDA24
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC30C1EEA27;
+	Tue, 22 Apr 2025 10:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745318220; cv=none; b=kP5pGVDjT2OZgFMdI/15w/NRy7fz1VNlJ/lRy44Nxis3WOWhkjSUHzRgY9mzQe/5Ouryo8WXozegsa5q9mfWAZO1dzAMU0qCgiDoThgF0HsFWJBwuFW0IEayip8+whApLyTEiTMNybZaEhfEQc1CSiNcYae7o8g2brKzCyplCTA=
+	t=1745318401; cv=none; b=UueEy4tHiU3nYbd3fK4OP4cbsGgJ79hUR1wAqEpTkSszSR7dJ6lt5uZWQqCUAFdNaUUYWXvw+bSOjKb0VndZv9x2F3uNt3oMQN3ocb7CWWW254EwrWZoOlkI3BWc2YKbU0JrIbWd7Enp2ufwNiQOJjRzN7Z7EknBmie5z/tkNXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745318220; c=relaxed/simple;
-	bh=lISL3NiWw4mvoLJ62jQX5IcFRZEuxeHYsVe/7mScNZI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ngxk4P5SStRVexL+XqGPRVVUIQwe3YrpGwqxrTpiWr6h1fJAL5ZKHHCqh+z4V2I7cSHZfgfLh4e2yN4TpRgpupjqrHvoVxWAJBERSQvWH6SEGUzmCutfb74WYzfYre/fvxCdMvegEblB19PvVU/qhvvXjZVxMX18TRjp+DV3G08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RU9ruP9p; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745318217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O3XBRVopizL05RbM7mWrrbeHqC8XI4fazOIg42s2uyw=;
-	b=RU9ruP9piDrBf4nDt8v1PXr7rjmYTP98hyLJ4noV2aKRhu8VMe/NS1ikXYfqMa3nKe4UB2
-	ExAwAXS7mjkDfAs6XiVLR28yjCWZkNh4Hh6hdaL6x89a6jqAIeR/WC1snxGWcW21uQ67tq
-	zk0W52ZNAZCOLwEx7OnEf1QozNFU7FQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-584-W-FOc022OZC1q5ZKzof5AQ-1; Tue, 22 Apr 2025 06:36:55 -0400
-X-MC-Unique: W-FOc022OZC1q5ZKzof5AQ-1
-X-Mimecast-MFC-AGG-ID: W-FOc022OZC1q5ZKzof5AQ_1745318214
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43efa869b19so30288635e9.2
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 03:36:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745318214; x=1745923014;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3XBRVopizL05RbM7mWrrbeHqC8XI4fazOIg42s2uyw=;
-        b=jN3CyZeL74BnV/H59spV0jtkKgXEgG0/KnpRjUw444Ex/DI4q6NVTfYHqQa4HMj+kV
-         s4X/FzO7B/UTt2BaVpPeM/fgFxR4R34ylfooYTM4FQQ1JFCzCePW6Cj0iJ3L682rs6h8
-         M7GoH6BLCYhNFKdbzkjiOFuAOsxZPS0g8a8ruzBxFR+YMQ06UHwJxR4A+jXgeFgSZZRB
-         gQtSYM8vSMXmc9ivhWIjvnfHW8NU2BVf72+GEACfHA+lIPBPPYopdW25PXvSe5j9fMko
-         SQNbuD06Jg1T0URtED1bZLV1cb/dJ3rSfhRkKu/64tqlhpEyak/ZciXhD5OTLG9J9Ixj
-         4IPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWC1O3Tyk5yw9gXM3Md7v3bvNHhODNrKAOTPqd/WEzqRTp17ju9QcLIKIW7vIY3b6e6azxmxnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpBZuUcJcvrujKRkVnw5cAm0OZ98KpuJAmEjdUnsOQHhC/Y/Pv
-	VmsyJgAgiFF8GradzzjbCw1a/jxfsHX5UiJbWmQTKhRUxoLYH6oxFr0BD7OWxs45kcDnM2bn2Zb
-	GglZVSZ5U1smWnGLcgY/Il/VOTJjszTj/MqNkQP6nUu+mRFi+GZy/5A==
-X-Gm-Gg: ASbGnctcmD3+GMroAyeJYSEhbeuVcPErnUpZ6aXufPrQfH6dkC1Ak8ZHkKfvw09ms6H
-	qcwFvT+l9wu0IxNXNRcUxH3bhAMYeTZsfiqBvhjMAauN39pd49YWS8S9/LoFzkNFW0KOV/20k8U
-	gw2t1QragSV/HMwsN0VsGd6T1VrfHn/CLOlwQQ6Ira+TLnOoPGdGRafptlOB7iuWGRZKGevZPST
-	s80kpPiFkNTK82VMbJLpynOhnjC8zljN/5G+U5X+kVFhAPboYtLmpaFU5WfFBE+l15i4AnctDNm
-	h95RPECge0Und9HOqA0CY7zWc4MAGtni/XcL
-X-Received: by 2002:a05:600c:a088:b0:43c:ec28:d31b with SMTP id 5b1f17b1804b1-4406ab9767bmr174966365e9.10.1745318214298;
-        Tue, 22 Apr 2025 03:36:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPrwg9VkOHDbgQPuydQXO/FAlkVS9kR0/xcjl/pevPw2FccxA7aaeSvgcnpK7uvnK2aFmoIg==
-X-Received: by 2002:a05:600c:a088:b0:43c:ec28:d31b with SMTP id 5b1f17b1804b1-4406ab9767bmr174966015e9.10.1745318213813;
-        Tue, 22 Apr 2025 03:36:53 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-86-8.dyn.eolo.it. [146.241.86.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4406d5ccc97sm170734155e9.25.2025.04.22.03.36.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Apr 2025 03:36:53 -0700 (PDT)
-Message-ID: <f5d244d2-acd4-4dfc-8221-93d2a714b97f@redhat.com>
-Date: Tue, 22 Apr 2025 12:36:51 +0200
+	s=arc-20240116; t=1745318401; c=relaxed/simple;
+	bh=4LnIRp9D/8OmSuE1d+taUXVsOhdHN5TkiGn8ODV+s9Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DSC8yiawuf2eF5n+bz6VTX/kbZpSeugLgaPmIkuqFZOt4QWXaYa4wLokvpyZwL4jXdNgjqqzda/j4MLZDRZniQhq80FZ1ZX0xI8ks3oMKhIagbBxlIABMzZVFlX+X/upHyY/fJQgWxzHqmtUsIHknCQVcDki08o81kgsEBJYkE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBDEcvgd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 608A1C4CEE9;
+	Tue, 22 Apr 2025 10:40:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745318400;
+	bh=4LnIRp9D/8OmSuE1d+taUXVsOhdHN5TkiGn8ODV+s9Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hBDEcvgd5VXKShzvaTtYa/7AzFo40E5wesQ2yKRP5YItM+Z+vtHMqBBbQ3qUb3TJ1
+	 J+gNKOEGl6PQ5LUtpZj9tkBvePxeFySw/gPJhVGoe3EGOGC+g6YATA2BjNU9yXm4tn
+	 VxMto+PeB4e777G35kCjb8aKh5jEJazLbMKKCdpS+Tzz95UvLHZAN6jYrO7vhcJRc/
+	 n7ezwrBPzourSzPJbJIf/84pAWc/19MKzkzPBiMyOuEbsBi3o1dmY0XCjxn7Sh7AcI
+	 /YQ43YUm6JcKO5l2dehp6sOW48e39zxffFB7JID1YbJyHQvMV3UpkgzSqp9cOiFEtH
+	 KYRuteD2FNW0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC66B380CEF4;
+	Tue, 22 Apr 2025 10:40:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH 1/2] TCP: note received valid-cookie Fast Open
- option
-To: Jeremy Harris <jgh@exim.org>, netdev@vger.kernel.org
-Cc: edumazet@google.com, ncardwell@google.com
-References: <20250416090836.7656-1-jgh@exim.org>
- <20250416091513.7875-1-jgh@exim.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250416091513.7875-1-jgh@exim.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next 0/3] ionic: support QSFP CMIS
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174531843876.1515168.2615748033975707416.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 10:40:38 +0000
+References: <20250415231317.40616-1-shannon.nelson@amd.com>
+In-Reply-To: <20250415231317.40616-1-shannon.nelson@amd.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, brett.creeley@amd.com
 
-On 4/16/25 11:15 AM, Jeremy Harris wrote:
-> Signed-off-by: Jeremy Harris <jgh@exim.org>
+Hello:
 
-The commit description is missing.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> ---
->  include/linux/tcp.h     | 3 ++-
->  net/ipv4/tcp_fastopen.c | 1 +
->  2 files changed, 3 insertions(+), 1 deletion(-)
+On Tue, 15 Apr 2025 16:13:13 -0700 you wrote:
+> This patchset sets up support for additional pages and better
+> handling of the QSFP CMIS data.
 > 
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 1669d95bb0f9..a96c38574bce 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -385,7 +385,8 @@ struct tcp_sock {
->  		syn_fastopen:1,	/* SYN includes Fast Open option */
->  		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
->  		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
-> -		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
-> +		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
-> +		syn_fastopen_in:1; /* Received SYN includes Fast Open option */
+> v2:
+>  - removed unnecessary index range checks
+>  - return EOPNOTSUPP for unavailable page
+>  - removed obsolete ionic_get_module_info and ionic_get_module_eeprom
+> 
+> [...]
 
-Worth mentioning in the commit message that this will fill a bit hole.
->  
->  	u8	keepalive_probes; /* num of allowed keep alive probes	*/
->  	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
-> diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-> index 1a6b1bc54245..004d0024cd98 100644
-> --- a/net/ipv4/tcp_fastopen.c
-> +++ b/net/ipv4/tcp_fastopen.c
-> @@ -401,6 +401,7 @@ struct sock *tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
->  				}
->  				NET_INC_STATS(sock_net(sk),
->  					      LINUX_MIB_TCPFASTOPENPASSIVE);
-> +				tcp_sk(child)->syn_fastopen_in = 1;
+Here is the summary with links:
+  - [v2,net-next,1/3] ionic: extend the QSFP module sprom for more pages
+    https://git.kernel.org/netdev/net-next/c/c51ab838f532
+  - [v2,net-next,2/3] ionic: support ethtool get_module_eeprom_by_page
+    https://git.kernel.org/netdev/net-next/c/9c2e17d30b65
+  - [v2,net-next,3/3] ionic: add module eeprom channel data to ionic_if and ethtool
+    https://git.kernel.org/netdev/net-next/c/0651c83ea96c
 
-Likely you need to reset the bit on disconnect().
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-/P
 
 
