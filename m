@@ -1,129 +1,177 @@
-Return-Path: <netdev+bounces-184799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38618A97395
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:27:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA08A9739C
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 19:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFC517A3A5E
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:26:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695B7189EBF1
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EF1290BBC;
-	Tue, 22 Apr 2025 17:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F381519A6;
+	Tue, 22 Apr 2025 17:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQqszmw6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GmYtNHPJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B92284B48
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBBD28382
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 17:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745342843; cv=none; b=obdf6Av4HR1twUSN+nq9Wo9RPX15ZE2C0DAXaTyepQlOFd2UbWBYFnyQ3rgxMl4OkNQCiTPs6AsbbdmB3tkt4v1gZ9pmdCfMlJFJNt5Kq4UlTHwu4LRCm+txX5pZ/lsnf+XRcgCFVSHt0AxijyoxtoIZVTZxhNWnU52ZOzAoMo0=
+	t=1745343036; cv=none; b=f/0Bx2w+lNtq1jk7DQSLrefoBYvrVht4j+yYPMzHEQh3RAZ3lo5/mcRV9HYLQIQvLQNpIkKxrdQVr6lWRnu2wP9nBxzOW1r1pFGmMA6wioSe26wfsfed71dm4S5LWpZItsa49ORmtmgjhMbn733L3od+EMwahJIbw7n3QffZJhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745342843; c=relaxed/simple;
-	bh=D0QymgneXaTt/3fgHr6UcxMDJUrzIZEGs9HkruuNRY8=;
+	s=arc-20240116; t=1745343036; c=relaxed/simple;
+	bh=1CKUVZSXC3l7C12StwyD6xRcRr5R1P7889PykMzs4YA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQ7bh2rI/Nvh4pllxHrOkKxupX3JIHkdsH595nxb/fJkM8bbzqVWZ03HemocTP3XHas1nS9KTRid2rCY7VL8t6KuTudWISCInFMh+Tu9Q782WJJ7jPkZjDU2VX6VxSUMTtDPUHxDdxWwsjuzJzK6c8AEXAOamVfzTEhE2lva13w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQqszmw6; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22c336fcdaaso60886975ad.3
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 10:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745342841; x=1745947641; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Opd+J48FPKI3ZGiGg/JuYjcZrjQj8elWYQobjTII45M=;
-        b=RQqszmw6QvuVlButjepv6pfReYSCoeDP049xvIwJpKijQkIcbAdhheQU1ndKmtvVls
-         OyJyEmVzEHhAbfY9kd/Zz0GuP6hZgHc1XIx3ZpuqDE96ob8EU+jdfnSPOTWa5nfClCHL
-         95VEO6GBWSakmijO3swkvFi4AMnflQQLF/TbeLJIVviy/Nd4fvaqMGB4oIxZIVLQ/UOz
-         85dUaM71mPL09AW+/smhBR9AUnTdrt8DIVrz4W+VqdBdIKXFm07BeDsE8Kx1myBoVQSl
-         lMMLWPEKp7lW3Rd8nFBo3lCuVuuiH8usuLacoRIxO+/qiAV9b9cNdO1oEL5avhqTw2Wh
-         W18A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745342841; x=1745947641;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Opd+J48FPKI3ZGiGg/JuYjcZrjQj8elWYQobjTII45M=;
-        b=k9g5cJtY73OdUZfpEryhUWmj+pd/+zqKYd3crSpz++HNopdQ8clCpU2MxQKUXx3iML
-         cEeC+0VD0M8d65UxgyIrjTCTla+gN7RnQKXJIg4ydoKKUSqWd0vHO+RXpwJYHyhULSlr
-         PiuPbUwPVRTMZB+GzUeDmZzVGEtnjw2nSoiAoUpKFj5zCwPLZDlOJKmfSqfnAy6b9RLc
-         nO0jwbdrn6JhocHj4CPy3vAYo5MYv33jkVls1ugKoH0nqXgzYpVsEpVabIwXYG+2CY2j
-         aci/zMjuVSivjN9K8tfcgFXpffIyxXgvVcnoGeHuDpmm1ADa5M3xHL2BmPew08lS9PYd
-         k2IA==
-X-Forwarded-Encrypted: i=1; AJvYcCUsaIZpgsIfsvi3f5BL0AIbQqRZB+PnrZjn/MkbB6nx2rGG9KDoSXQZmAJ8bex2EqAXOqf+zhQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfT3od61WCUvOUzTajb5CFMD9HiYCGWIN5vWoHQmFRMkxwxRha
-	Y3Qfb8H3iPvKqVRjmMZLMewHjPMw6bNxRVT5ML5zDkFrTQvWSwI=
-X-Gm-Gg: ASbGnctdHcsDwmujMVzSgUKqyWTYVOumP+5gqplJPY1vU7RgOl1SoZShifwZ2eVHPT2
-	ml3PN9X3xcD6GYD5aN0jN0hacvtZBk8xCuAJhGqdxeD9Fglb7N/76dniUWTXLyzHbcmP71pROqB
-	4y9J+nS4HnJ3K/9rDtdyxklroLO1Uj6e8K0QVKFXQWzy0+NHenBxSO2Y4V7SIPELxgPrB6wPrfZ
-	9N2d3ANJPFPUgp8gpVnXb5LeyfxkFLz0HfoNyeZBtIqpbTstw+5jmBeuJjlSIGtae5fBiG5GRCC
-	4qiOZnz0wo8xooOxppepjFsMMWWZGIZuuxGespju
-X-Google-Smtp-Source: AGHT+IFJxy2dFyTAGO8lGVAdWil/IemCX9zsPK2DQ+P07AzSVN4h59bZXjSdSpSViRw9Z5c5/WM0Nw==
-X-Received: by 2002:a17:902:ea07:b0:227:e6b2:d989 with SMTP id d9443c01a7336-22c5362e557mr243009235ad.44.1745342840995;
-        Tue, 22 Apr 2025 10:27:20 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50eb5318sm88172095ad.107.2025.04.22.10.27.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 10:27:20 -0700 (PDT)
-Date: Tue, 22 Apr 2025 10:27:19 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
-	dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
-	jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 07/22] eth: bnxt: set page pool page order based
- on rx_page_size
-Message-ID: <aAfRd__DgRYfgubF@mini-arch>
-References: <20250421222827.283737-1-kuba@kernel.org>
- <20250421222827.283737-8-kuba@kernel.org>
- <aAe2jaAUi0-deSeI@mini-arch>
- <20250422085237.2f91f999@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBf5q4EP9gp+W/qObe54xfcyRJV2CqVTe7WVyYTGkL6TO63YPcOqyMH25lfqM1lzs2AIuN80Z3aSOqjYYICDkkQTAnS7ktxlf1yUgd9yXTyFpMiEdBYEgigMPYSB/fdUHVj/YYx4VZVzpnsKACTn0MxDnPtqUeN9armdg4BE98k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GmYtNHPJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/bmOUlKw6ea5zoFQo+oUHS8Le0h6+cK5sNV3EpakRIk=; b=GmYtNHPJMHivSmxYipw25U7X3q
+	tW+Mu8hJedvBR5S3LpzAxxH8iBl9fKh1lfAz607Ki6DrPefa+q5yEMoAQjDgbqKFMcsBjaWfoXHYg
+	VExmGzBCTdxbIQW5Gs1Fxb1jRWs1BgHL+6ZZFOP1adPXavKwGM1YzUIrWvJYjm62KLaNK86e19kzT
+	LTDgK8nUcIkMvWjyYuzNWCv82/C8s+yH/0MXbCc7POOKRjIaY/AwK/4we2kR8J0ESLwM/nwzLsPXh
+	D07b4pI60HxSxUbz2aF23Uu4J1XWbfiV9KrB/KL4RtPvuD6ux29vkPNuw0geu01p6r8q8KJki/MC5
+	d//UnHPA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52938)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u7HS1-0004m1-0u;
+	Tue, 22 Apr 2025 18:30:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u7HRy-0007ev-2q;
+	Tue, 22 Apr 2025 18:30:26 +0100
+Date: Tue, 22 Apr 2025 18:30:26 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
+Message-ID: <aAfSMh_kNre5mxyT@shell.armlinux.org.uk>
+References: <174481691693.986682.7535952762130777433.stgit@ahduyck-xeon-server.home.arpa>
+ <de130c97-c344-42ee-b3bc-0ca5f9dc36df@lunn.ch>
+ <CAKgT0UcXY3y3=0AnbbbRH75gh2ciBKhQj2tzQAbcHW_acKeoQw@mail.gmail.com>
+ <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch>
+ <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
+ <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
+ <20250421182143.56509949@kernel.org>
+ <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
+ <20250422082806.6224c602@kernel.org>
+ <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250422085237.2f91f999@kernel.org>
+In-Reply-To: <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 04/22, Jakub Kicinski wrote:
-> On Tue, 22 Apr 2025 08:32:29 -0700 Stanislav Fomichev wrote:
-> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > index b611a5ff6d3c..a86bb2ba5adb 100644
-> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > @@ -3802,6 +3802,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
-> > >  	pp.pool_size = bp->rx_agg_ring_size;
-> > >  	if (BNXT_RX_PAGE_MODE(bp))
-> > >  		pp.pool_size += bp->rx_ring_size;
-> > > +	pp.order = get_order(bp->rx_page_size);  
+On Tue, Apr 22, 2025 at 06:49:54PM +0200, Andrew Lunn wrote:
+> > > The whole concept of a multi-host NIC is new to me. So i at least need
+> > > to get up to speed with it. I've no idea if Russell has come across it
+> > > before, since it is not a SoC concept.
+> > > 
+> > > I don't really want to agree to anything until i do have that concept
+> > > understood. That is part of why i asked about a standard. It is a
+> > > dense document answering a lot of questions. Without a standard, i
+> > > need to ask a lot of questions.
 > > 
-> > Since it's gonna be configured by the users going forward, for the
-> > pps that don't have mp, we might want to check pp.order against
-> > MAX_PAGE_ORDER (and/or PAGE_ALLOC_COSTLY_ORDER?) during
-> > page_pool_create? 
+> > Don't hesitate to ask the questions, your last reply contains no
+> > question marks :)
 > 
-> Hm, interesting question. Major concern being that users will shoot
-> themselves in the foot? Or that syzbot will trigger a warning?
+> O.K. Lets start with the basics. I assume the NIC has a PCIe connector
+> something like a 4.0 x4? Each of the four hosts in the system
+> contribute one PCIe lane. So from the host side it looks like a 4.0 x1
+> NIC?
+> 
+> There are not 4 host MACs connected to a 5 port switch. Rather, each
+> host gets its own subset of queues, DMA engines etc, for one shared
+> MAC. Below the MAC you have all the usual PCS, SFP cage, gpios, I2C
+> bus, and blinky LEDs. Plus you have the BMC connected via an RMII like
+> interface.
+> 
+> You must have a minimum of firmware on the NIC to get the MAC into a
+> state the BMC can inject/receive frames, configure the PCS, gpios to
+> the SFP, enough I2C to figure out what the module is, what quirks are
+> needed etc.
 
-Yeah, both, some WARN_ON in the page allocator. I did trigger one for
-MAX_PAGE_ORDER at some point, but not sure about PAGE_ALLOC_COSTLY_ORDER.
+This all makes sense, but at this point, I have to ask something that
+seems to be fundamental to me:
 
-Just thinking from the overall setup point of view. I'm assuming that if we
-are gonna support >PAGE_SIZE devmem chunks we'll have to tune rx-buf-len
-_after_ we've bound dmabuf to the queue? (otherwise we are hitting those
-PAGE_ALLOC_COSTLY_ORDER if we do it before) And there is no revert back
-to reasonable rx-buf-len on unbind. Or for devmem we'll have some TBD way
-to communicate "preferred" rx-buf-len per queue (derived from the dmabuf
-binding itself) during the bind?
+  Should any of the hosts accessing the NIC through those PCIe x1
+  interfaces have any knowledge or control of anything behind "their"
+  view of the MAC?
+
+I would say no, they should not, because if they do, they can interfere
+with other hosts. Surely only the BMC should have permission to access
+the layers of hardware behind the MAC?
+
+What should a host know about the setup? Maybe the speed of their
+network connection through the MAC. I state it that way rather than
+"the speed of the media" because if there is some control over the
+traffic from each "host" then the media speed is irrelevant.
+
+> NC-SI, with Linux controlling the hardware, implies you need to be
+> able to hand off control of the GPIOs, I2C, PCS to Linux. But with
+> multi-host, it makes no sense for all 4 hosts to be trying to control
+> the GPIOs, I2C, PCS, perform SFP firmware upgrade. So it seems more
+> likely to me, one host gets put in change of everything below the
+> queues to the MAC. The others just know there is link, nothing more.
+
+Ouch. Yes - if we have four independent hosts trying to access the same
+I2C hardware as another host on the same hardware, then that sounds
+like a recipe for a trainwreck.
+
+> This actually circles back to the discussion about fixed-link. The one
+> host in control of all the lower hardware has the complete
+> picture. The other 3 maybe just need a fixed link. They don't get to
+> see what is going on below the MAC, and as a result there is no
+> ethtool support to change anything, and so no conflicting
+> configuration? And since they cannot control any of that, they cannot
+> put the link down. So 3/4 of the problem is solved.
+
+Should one host have control, or should the BMC have control? I don't
+actually know what you're talking about w.r.t. DSP0222 or whatever it
+was, nor NC-SI - I don't have these documents.
+
+> phylink is however not expecting that when phylink_start() is called,
+> it might or might not have to drive the hardware depending on if it
+> wins an election to control the hardware. And if it losses, it needs
+> to ditch all its configuration for a PCS, SPF, etc and swap to a
+> fixed-link. Do we want to teach phylink all this, or put all phylink
+> stuff into open(), rather than spread across probe() and open(). Being
+> in open(), you basically construct a different phylink configuration
+> depending on if you win the election or not.
+
+That sounds very complicated and all very new stuff.
+
+> Is one host in the position to control the complete media
+> configuration? Could you split the QSFP into four, each host gets its
+> own channel, and it gets to choose how to use that channel, different
+> FEC schemes, bit rates?
+
+Yes, each channel in a QSFPs have separate LOS status bits accessible
+over I2C. It's been a while since I looked at this, but I seem to
+remember there aren't hardware pins for LOS, TX_DISABLE etc - that's
+all over I2C.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
