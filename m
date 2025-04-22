@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1AF9A963BB
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:12:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97189A963C2
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 11:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF9F18876F1
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:10:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2107188575A
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 09:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DC6257453;
-	Tue, 22 Apr 2025 09:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8A9252913;
+	Tue, 22 Apr 2025 09:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rnlwGH72"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLVng98S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6614319D8B7;
-	Tue, 22 Apr 2025 09:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EE31EEA47;
+	Tue, 22 Apr 2025 09:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745312971; cv=none; b=FmvOs/7Ue4vuVy+q5VnkRK57at6kjOR22BoY6rmrCE21be/n8Y7SJ+sjiHVmznB1J6egs6n+r42h0r0qLQvUQ8azX0xIylEbL8kEkBLSJOMDaq1XvHmQ5HdTFpxAss5eNX1v4917P3tcv1Ov3JFBcXuLrVFVporEuh46kV1mc9w=
+	t=1745313012; cv=none; b=s4J4zQQJKHmmCxSyE5FbpMqxPDrcavamoBr7IJTbNvSR8hDkIXVTke+91RXX5wATuCq31qK8LW4y5Ec3dIUv4iR9Q9XpOMlxDKB6iUEeJnVAM/DGdT8Jg0bKlNVR9FzthLfal9Hu/+P/odsTLNkOAPf+zRcb0/Q7wLmwZN3NwzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745312971; c=relaxed/simple;
-	bh=vz2jGYSY9oKDBgzu86yZLAUblBgnnaoGNFo9xbS5InE=;
+	s=arc-20240116; t=1745313012; c=relaxed/simple;
+	bh=3IwvABZJyhasjs2DLJ2I5DQtXsBPXFe8l+Bx1IpXSno=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LdFOdBttfoBDiS1pF/ixe2Yi0647FTztCuaXlMkcxPDLdygdmbYBA1wgs9X/8nl6PySFRJPVto+oUJnFr/rLz6dSYPOWtjXbTNJheBADPtmUtt9xq4HP7ZrbdnFhiste1tJSfq/8VaBzYM77+v1bL8N/ETt6ARBWSvFazJkPipI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rnlwGH72; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAF17C4CEE9;
-	Tue, 22 Apr 2025 09:09:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=D8cA0qHEJedtRQYvVPk9HXQzcdAGMuYCWlZQKtiPAdAGWH10wXt5OMk+l2SeBu+PRqKTKn0G91p3NpmCspF4UPec5CFHQxszpk9M2qYRA58O57ljpfrf3myGOJEQAMQ3J6mXW4N2cMi87tQyXgVNTc/KruzV1A/YQSIPwkF+Ez8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLVng98S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D6E5C4CEE9;
+	Tue, 22 Apr 2025 09:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745312970;
-	bh=vz2jGYSY9oKDBgzu86yZLAUblBgnnaoGNFo9xbS5InE=;
+	s=k20201202; t=1745313012;
+	bh=3IwvABZJyhasjs2DLJ2I5DQtXsBPXFe8l+Bx1IpXSno=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rnlwGH7276RFaEUFuhe+paW6L4DhAzLSYIxKPJAtPO7J6cB3riqGMer25WHWGqL4s
-	 a7HL0WdzUr4RM9XZBE4cvS3uClE58mKzn8oRUCYKmdiEwAywN/GvrtZ+D0elGMp4l3
-	 hy74hf0NexQ7ev6chMryY0TdNBu78Je2HpqL6dY6gzjKUBIum2Dl7eLICBbJZVBowD
-	 DJN+m4hF5lz88/wiwPd9aYZCtUC0cMFZQWlDe9iWojr37qgI5yOALLAmLfsvfXuM08
-	 CvqA929Le9muTGTK11sLg47snjAZe9Th1tXiu+KYGwaq2eXCGBu47vUooV/2FJ7oTf
-	 yVm7MlTBsGqUw==
+	b=HLVng98SuIHAhxPpnaf3QeXL3HpoL69235/I+zllsQqRaM/Kc0TmDT6AqWcNyBRsW
+	 x5XEeOEe/NHnTWnbsJzQxouMvUhx4kTSiMBvU1JfCK1kKr7aPmu0cM+J+8VSyF8Jvk
+	 iYiPFrIpUKwgLM2sjxxfg24WEdqpSfVtQqo+Wj0Gbsz5vBWojJW7iqfnYZkvNhYL1J
+	 kJW4LEQVV6aN6Kq4RCGXPjGgKpVI4u6HH3ob+FtPgh4oTyso78zmykAKLJMfwo5JC2
+	 9AWTKHhmQaLhRZkISf0v7INqdzf8Kl2pGR6u2qxCsHa6Hvztae0LrzXhiHXWGLmXHB
+	 OmExn3EKM8Ubw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7107A39D6546;
-	Tue, 22 Apr 2025 09:10:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C8F39D6546;
+	Tue, 22 Apr 2025 09:10:52 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] xen-netfront: handle NULL returned by
- xdp_convert_buff_to_frame()
+Subject: Re: [PATCH net-next 0/2] net: Adopting nlmsg_payload() (final series)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174531300924.1477965.13156830298760999777.git-patchwork-notify@kernel.org>
-Date: Tue, 22 Apr 2025 09:10:09 +0000
-References: <20250417122118.1009824-1-sdl@nppct.ru>
-In-Reply-To: <20250417122118.1009824-1-sdl@nppct.ru>
-To: Alexey Nepomnyashih <sdl@nppct.ru>
-Cc: jgross@suse.com, sstabellini@kernel.org, oleksandr_tyshchenko@epam.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, xen-devel@lists.xenproject.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- lvc-project@linuxtesting.org, stable@vger.kernel.org
+ <174531305073.1477965.10840520281239562472.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 09:10:50 +0000
+References: <20250417-nlmsg_v3-v1-0-9b09d9d7e61d@debian.org>
+In-Reply-To: <20250417-nlmsg_v3-v1-0-9b09d9d7e61d@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 12:21:17 +0000 you wrote:
-> The function xdp_convert_buff_to_frame() may return NULL if it fails
-> to correctly convert the XDP buffer into an XDP frame due to memory
-> constraints, internal errors, or invalid data. Failing to check for NULL
-> may lead to a NULL pointer dereference if the result is used later in
-> processing, potentially causing crashes, data corruption, or undefined
-> behavior.
+On Thu, 17 Apr 2025 06:03:06 -0700 you wrote:
+> This patchset marks the final step in converting users to the new
+> nlmsg_payload() function. It addresses the last two files that were not
+> converted in previous series, specifically updating the following
+> functions:
+> 
+> 	neigh_valid_dump_req
+> 	rtnl_valid_dump_ifinfo_req
+> 	rtnl_valid_getlink_req
+> 	valid_fdb_get_strict
+> 	valid_bridge_getlink_req
+> 	rtnl_valid_stats_req
+> 	rtnl_mdb_valid_dump_req
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] xen-netfront: handle NULL returned by xdp_convert_buff_to_frame()
-    https://git.kernel.org/netdev/net/c/cc3628dcd851
+  - [net-next,1/2] net: Use nlmsg_payload in neighbour file
+    https://git.kernel.org/netdev/net-next/c/9929ba194299
+  - [net-next,2/2] net: Use nlmsg_payload in rtnetlink file
+    https://git.kernel.org/netdev/net-next/c/a45193018001
 
 You are awesome, thank you!
 -- 
