@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-184738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB699A97125
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:37:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59AA5A97126
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 17:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 678877A87E3
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:36:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580533A47C3
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 15:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECEB28F92E;
-	Tue, 22 Apr 2025 15:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9559C28A3E0;
+	Tue, 22 Apr 2025 15:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FaFUKfTo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h572z2N3"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0D81494A8
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9321F150B
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 15:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745336241; cv=none; b=UJ9IbW1j518hkajWLJOJfhVbIbB+1W893PM7oLdqkXxinz7/3rqSeYbE1dNEyzggtkkMaQP2+w7MSPVYC7h8A6Uxk0GXh8MuRDrmIaDhyE2wtAle9TdJZ/7obD4yjMwEqMNVbRxoJvWWU66yD86PREgb64hDfZ9PpAjdh2exhnA=
+	t=1745336249; cv=none; b=eJPaXYDWVmWkKoqm+CKYNPmCVG2V2zc1XKviadQoCgkPpEip7+aAcKhSnDGVikLTejCGGhvfvgL0a6baa5ULOvFi3Xy9eVhXLdHjW2RWtaGapARzsbOX1+RUpd3tr63EX57m/tSAht6g0IwlQg2sPLRj0ikMazHuRso9LmK1K9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745336241; c=relaxed/simple;
-	bh=+sd6+5sIEGCELoIeGMFmOAxmrhEdlGTqkd8NinE9UgM=;
+	s=arc-20240116; t=1745336249; c=relaxed/simple;
+	bh=jEuc8oG1zoj+1FvFFD0JTEeZGZF00r/3x6Ok+rnihfY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FpKye/gE9XQoHQaAxQaGWp6hStjnk2jSU014Ipcjs1KlP8jtcrikvKgZ5Uu4iTIiCafcGUK65SV37imxldar5aKF477qz2dzSS9E+sUKvqo2xwWGecUSmI+lITgR/R78OiOkcGCSRaFDAieVgZnrGWE0ugRjsYzFw5UHHSMj9Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FaFUKfTo; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=QSIN245J63/2GG96VHV0zHCvaK6Jrk+2LZvG9gw7TpAp2yVwbMiwZwJ3v3RMrQ79H01Falc/52zEdDyc/AfreuETP9oWJtT9tXNxfFI4j0Dmei/7LCUIyr+ZM+txny9MR9hZPCJ4IdmIDP17IYL24Jr5vMFrvF59P1Cdy6tZjKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h572z2N3; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745336239; x=1776872239;
+  t=1745336248; x=1776872248;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+sd6+5sIEGCELoIeGMFmOAxmrhEdlGTqkd8NinE9UgM=;
-  b=FaFUKfTokBkSNcbJ8/Z0FyRq3yUoVhsMHNIDIFjjmJT1TQDrBfYPulXT
-   NNVf/2hTDmEjpsAsdSYmPrv8gjl2+8IahNeDu8XnXTsxn41CexWktAthR
-   28Uk8AuUNHottYoodn+aKHPZUjDwL4d2c0vosEgnwiMCzjgHyL+IHCIWp
-   ia83AOTcPXNfPud7jTmEUgdfiurRfHIiy+gllROcfyfHMODL0XzJW8YBx
-   8suJsK2tiC2ZGL4nQ0po+6J0C/FesHuBzvh7upbk+H+CfAYzi45XdWuBF
-   1jOT+FodppxYs8XMlPKAgitorfeLiWoCHaktpxLrvcB9mtprnPdd0FYLi
-   w==;
-X-CSE-ConnectionGUID: 96JX4onySEmI3zNnhWQDig==
-X-CSE-MsgGUID: dhBDXs7RSaGfBHeuYq+QdA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="64312339"
+  bh=jEuc8oG1zoj+1FvFFD0JTEeZGZF00r/3x6Ok+rnihfY=;
+  b=h572z2N3tr1B8Mzfag2sf7licaxHn9BPq7vAQngGjqleAChVljm34its
+   BRq+2mmyzaQLCQfcAkGci9KTnP/GzUmA9uLekd5UN61I2wqPwLV9MwQYo
+   xs4xUNZMKliMdskYGqwMweUzHm/l+sR1XkrSlRoRKCbI9iKuVG/ma3DyI
+   6LYxVBFnGvU2bYTf9o9kdz2pldDXBlRVaOWgn9teeiHHISZD1UXwwGQtJ
+   D8d8x+h8AsxIFQGz8tmjzktePBWuOT1JZ0U90FZRveJ0qKpyAbsF+EoB5
+   45Ib3VwV7emJb3F5uRu0ouxUe+CMLh8pJNzFrvkhvYzqc8nAWSVkg8X5B
+   g==;
+X-CSE-ConnectionGUID: LsKdG7NyR6KUhpIaRGBSBw==
+X-CSE-MsgGUID: oNa+DJs0TLa/VNu7YR01iw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="64312349"
 X-IronPort-AV: E=Sophos;i="6.15,231,1739865600"; 
-   d="scan'208";a="64312339"
+   d="scan'208";a="64312349"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 08:37:19 -0700
-X-CSE-ConnectionGUID: 5aJDM3xQQ0WAThyS8SNXLw==
-X-CSE-MsgGUID: xu0UQp+/QZaRD5lmr8+6xg==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 08:37:21 -0700
+X-CSE-ConnectionGUID: k8ICJBLaQiS+uxaTrM2UkA==
+X-CSE-MsgGUID: 2yCqT0hoSsain78tEwRHWA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,231,1739865600"; 
-   d="scan'208";a="131947822"
+   d="scan'208";a="131947828"
 Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 08:37:16 -0700
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2025 08:37:18 -0700
 From: Michal Kubiak <michal.kubiak@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: maciej.fijalkowski@intel.com,
@@ -67,9 +67,9 @@ Cc: maciej.fijalkowski@intel.com,
 	jacob.e.keller@intel.com,
 	netdev@vger.kernel.org,
 	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-net 1/3] ice: fix Tx scheduler error handling in XDP callback
-Date: Tue, 22 Apr 2025 17:36:57 +0200
-Message-Id: <20250422153659.284868-2-michal.kubiak@intel.com>
+Subject: [PATCH iwl-net 2/3] ice: create new Tx scheduler nodes for new queues only
+Date: Tue, 22 Apr 2025 17:36:58 +0200
+Message-Id: <20250422153659.284868-3-michal.kubiak@intel.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20250422153659.284868-1-michal.kubiak@intel.com>
 References: <20250422153659.284868-1-michal.kubiak@intel.com>
@@ -81,170 +81,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the XDP program is loaded, the XDP callback adds new Tx queues.
-This means that the callback must update the Tx scheduler with the new
-queue number. In the event of a Tx scheduler failure, the XDP callback
-should also fail and roll back any changes previously made for XDP
-preparation.
+The current implementation of the Tx scheduler tree attempts
+to create nodes for all Tx queues, ignoring the fact that some
+queues may already exist in the tree. For example, if the VSI
+already has 128 Tx queues and the user requests for 16 new queues,
+the Tx scheduler will compute the tree for 272 queues (128 existing
+queues + 144 new queues), instead of 144 queues (128 existing queues
+and 16 new queues).
+Fix that by modifying the node count calculation algorithm to skip
+the queues that already exist in the tree.
 
-The previous implementation had a bug that not all changes made by the
-XDP callback were rolled back. This caused the crash with the following
-call trace:
-
-[  +9.549584] ice 0000:ca:00.0: Failed VSI LAN queue config for XDP, error: -5
-[  +0.382335] Oops: general protection fault, probably for non-canonical address 0x50a2250a90495525: 0000 [#1] SMP NOPTI
-[  +0.010710] CPU: 103 UID: 0 PID: 0 Comm: swapper/103 Not tainted 6.14.0-net-next-mar-31+ #14 PREEMPT(voluntary)
-[  +0.010175] Hardware name: Intel Corporation M50CYP2SBSTD/M50CYP2SBSTD, BIOS SE5C620.86B.01.01.0005.2202160810 02/16/2022
-[  +0.010946] RIP: 0010:__ice_update_sample+0x39/0xe0 [ice]
-
-[...]
-
-[  +0.002715] Call Trace:
-[  +0.002452]  <IRQ>
-[  +0.002021]  ? __die_body.cold+0x19/0x29
-[  +0.003922]  ? die_addr+0x3c/0x60
-[  +0.003319]  ? exc_general_protection+0x17c/0x400
-[  +0.004707]  ? asm_exc_general_protection+0x26/0x30
-[  +0.004879]  ? __ice_update_sample+0x39/0xe0 [ice]
-[  +0.004835]  ice_napi_poll+0x665/0x680 [ice]
-[  +0.004320]  __napi_poll+0x28/0x190
-[  +0.003500]  net_rx_action+0x198/0x360
-[  +0.003752]  ? update_rq_clock+0x39/0x220
-[  +0.004013]  handle_softirqs+0xf1/0x340
-[  +0.003840]  ? sched_clock_cpu+0xf/0x1f0
-[  +0.003925]  __irq_exit_rcu+0xc2/0xe0
-[  +0.003665]  common_interrupt+0x85/0xa0
-[  +0.003839]  </IRQ>
-[  +0.002098]  <TASK>
-[  +0.002106]  asm_common_interrupt+0x26/0x40
-[  +0.004184] RIP: 0010:cpuidle_enter_state+0xd3/0x690
-
-Fix this by performing the missing unmapping of XDP queues from
-q_vectors and setting the XDP rings pointer back to NULL after all those
-queues are released.
-Also, add an immediate exit from the XDP callback in case of ring
-preparation failure.
-
-Fixes: efc2214b6047 ("ice: Add support for XDP")
+Fixes: 5513b920a4f7 ("ice: Update Tx scheduler tree for VSI multi-Tx queue support")
 Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 47 ++++++++++++++++-------
- 1 file changed, 33 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_sched.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8119913b5f69..34df104ac567 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -2740,6 +2740,27 @@ void ice_map_xdp_rings(struct ice_vsi *vsi)
- 	}
- }
- 
-+/**
-+ * ice_unmap_xdp_rings - Unmap XDP rings from interrupt vectors
-+ * @vsi: the VSI with XDP rings being unmapped
-+ */
-+static void ice_unmap_xdp_rings(struct ice_vsi *vsi)
-+{
-+	int v_idx;
-+
-+	ice_for_each_q_vector(vsi, v_idx) {
-+		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
-+		struct ice_tx_ring *ring;
-+
-+		ice_for_each_tx_ring(ring, q_vector->tx)
-+			if (!ring->tx_buf || !ice_ring_is_xdp(ring))
-+				break;
-+
-+		/* restore the value of last node prior to XDP setup */
-+		q_vector->tx.tx_ring = ring;
-+	}
-+}
-+
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index 6ca13c5dcb14..6524875b34d3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -1604,16 +1604,16 @@ ice_sched_get_agg_node(struct ice_port_info *pi, struct ice_sched_node *tc_node,
  /**
-  * ice_prepare_xdp_rings - Allocate, configure and setup Tx rings for XDP
-  * @vsi: VSI to bring up Tx rings used by XDP
-@@ -2803,7 +2824,7 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
- 	if (status) {
- 		dev_err(dev, "Failed VSI LAN queue config for XDP, error: %d\n",
- 			status);
--		goto clear_xdp_rings;
-+		goto unmap_xdp_rings;
- 	}
- 
- 	/* assign the prog only when it's not already present on VSI;
-@@ -2819,6 +2840,8 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		ice_vsi_assign_bpf_prog(vsi, prog);
- 
- 	return 0;
-+unmap_xdp_rings:
-+	ice_unmap_xdp_rings(vsi);
- clear_xdp_rings:
- 	ice_for_each_xdp_txq(vsi, i)
- 		if (vsi->xdp_rings[i]) {
-@@ -2835,6 +2858,8 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
- 	mutex_unlock(&pf->avail_q_mutex);
- 
- 	devm_kfree(dev, vsi->xdp_rings);
-+	vsi->xdp_rings = NULL;
-+
- 	return -ENOMEM;
- }
- 
-@@ -2850,7 +2875,7 @@ int ice_destroy_xdp_rings(struct ice_vsi *vsi, enum ice_xdp_cfg cfg_type)
+  * ice_sched_calc_vsi_child_nodes - calculate number of VSI child nodes
+  * @hw: pointer to the HW struct
+- * @num_qs: number of queues
++ * @num_new_qs: number of new queues that will be added to the tree
+  * @num_nodes: num nodes array
+  *
+  * This function calculates the number of VSI child nodes based on the
+  * number of queues.
+  */
+ static void
+-ice_sched_calc_vsi_child_nodes(struct ice_hw *hw, u16 num_qs, u16 *num_nodes)
++ice_sched_calc_vsi_child_nodes(struct ice_hw *hw, u16 num_new_qs, u16 *num_nodes)
  {
- 	u16 max_txqs[ICE_MAX_TRAFFIC_CLASS] = { 0 };
- 	struct ice_pf *pf = vsi->back;
--	int i, v_idx;
-+	int i;
+-	u16 num = num_qs;
++	u16 num = num_new_qs;
+ 	u8 i, qgl, vsil;
  
- 	/* q_vectors are freed in reset path so there's no point in detaching
- 	 * rings
-@@ -2858,17 +2883,7 @@ int ice_destroy_xdp_rings(struct ice_vsi *vsi, enum ice_xdp_cfg cfg_type)
- 	if (cfg_type == ICE_XDP_CFG_PART)
- 		goto free_qmap;
- 
--	ice_for_each_q_vector(vsi, v_idx) {
--		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
--		struct ice_tx_ring *ring;
--
--		ice_for_each_tx_ring(ring, q_vector->tx)
--			if (!ring->tx_buf || !ice_ring_is_xdp(ring))
--				break;
--
--		/* restore the value of last node prior to XDP setup */
--		q_vector->tx.tx_ring = ring;
--	}
-+	ice_unmap_xdp_rings(vsi);
- 
- free_qmap:
- 	mutex_lock(&pf->avail_q_mutex);
-@@ -3013,11 +3028,14 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		xdp_ring_err = ice_vsi_determine_xdp_res(vsi);
- 		if (xdp_ring_err) {
- 			NL_SET_ERR_MSG_MOD(extack, "Not enough Tx resources for XDP");
-+			goto resume_if;
- 		} else {
- 			xdp_ring_err = ice_prepare_xdp_rings(vsi, prog,
- 							     ICE_XDP_CFG_FULL);
--			if (xdp_ring_err)
-+			if (xdp_ring_err) {
- 				NL_SET_ERR_MSG_MOD(extack, "Setting up XDP Tx resources failed");
-+				goto resume_if;
-+			}
- 		}
- 		xdp_features_set_redirect_target(vsi->netdev, true);
- 		/* reallocate Rx queues that are used for zero-copy */
-@@ -3035,6 +3053,7 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 			NL_SET_ERR_MSG_MOD(extack, "Freeing XDP Rx resources failed");
+ 	qgl = ice_sched_get_qgrp_layer(hw);
+@@ -1863,8 +1863,9 @@ ice_sched_update_vsi_child_nodes(struct ice_port_info *pi, u16 vsi_handle,
+ 			return status;
  	}
  
-+resume_if:
- 	if (if_running)
- 		ret = ice_up(vsi);
- 
+-	if (new_numqs)
+-		ice_sched_calc_vsi_child_nodes(hw, new_numqs, new_num_nodes);
++	ice_sched_calc_vsi_child_nodes(hw, new_numqs - prev_numqs,
++				       new_num_nodes);
++
+ 	/* Keep the max number of queue configuration all the time. Update the
+ 	 * tree only if number of queues > previous number of queues. This may
+ 	 * leave some extra nodes in the tree if number of queues < previous
 -- 
 2.45.2
 
