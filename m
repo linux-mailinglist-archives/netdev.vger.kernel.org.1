@@ -1,155 +1,95 @@
-Return-Path: <netdev+bounces-184903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B773A97AAA
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:50:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB2BA97AAC
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 376371B60E05
-	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:50:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 834D47A3309
+	for <lists+netdev@lfdr.de>; Tue, 22 Apr 2025 22:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2352BE0FA;
-	Tue, 22 Apr 2025 22:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BB52C2AD7;
+	Tue, 22 Apr 2025 22:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XrfShaRT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFn5y/l8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AD68634F;
-	Tue, 22 Apr 2025 22:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5495C2C2AB4
+	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 22:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745362195; cv=none; b=HFwf3iNQxnOvTmoyxAsFNeUnKUxJdEbAthUktDIXf7L9dv2MuDK6oFloJJHvSq0KcjYEq/lBGNTrAIfESoYc5x30h3+niPTTnk5mn3pAeksP0JH0Ojt+tbira5V7f+U6XFovvvmRcg5TZH+8dW7kpvCDh+2md6ebcicLGyT4lDk=
+	t=1745362196; cv=none; b=V3w2uWv85SINDaBk/akhPmfGIcUj03HaySUSO6BjAkYEhW22im9L6WMoJin2Rd8PGbedG3dH6M13rvnLgmZQGHifVisvdD2mKHGer03JjRgn9MU1j2wdqUwmMlFWMnZtnWIta+EP8BX8KnACzA5WRHvQnH4zBZX+ki4upxNPBfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745362195; c=relaxed/simple;
-	bh=NQVpfJugMzR1LkjV5816vnGHeZ7+wpVEURecExKe/tw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ys+CH+3Y97AEcqd4K+tro1yWrlZ72YfElRs+EtItC21UmuyhJMM5DkTQezmM4QY3WrYXEDIWciEXO4XkgpbBfK9R1OsaR9n3/f2OIb+1L1bTWMgSqbr7GU2pnCrLQ+yTEGNvDySEMmi+kvQort4lunLmXji0+/YfKOoz3KbvqPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XrfShaRT; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22423adf751so59022235ad.2;
-        Tue, 22 Apr 2025 15:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745362193; x=1745966993; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D3cn4adHcJd/kIJjKobK35R0hnccjB466Q4g0zrjHPU=;
-        b=XrfShaRTyKsY7M/ALrzHSlgB3q61ceudMPbOcDueO+HAyVbkkEKOI86Nb3u3AVy/Fx
-         cu04Ke2NCN0hw0WD2RZIarcJhixs4TvAfZh1sfCG42eL+inOHawHgiQOBtwjN01FLf8V
-         esuvyYO3pNd5Ri4Mh8dco45K5DZ2dULvfzdrCIb+flBo1Eg2JC2ugJ905oCAeZTVLuXx
-         GjdFxNqklnm1E7m+LJp48iIU2Ny1EQ1bRFEXx1g/jBoJrRkmDUFiAlq6dHOf9S+43NGa
-         xRXUGEPS4Qzhjmrom8URCaTef6IalPCb3O597VHWH2Lbujc9TVqSSjBM+uDpztTicjfW
-         xdRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745362193; x=1745966993;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D3cn4adHcJd/kIJjKobK35R0hnccjB466Q4g0zrjHPU=;
-        b=WxbS8E3/EZzJ4rJI5tPHMpsR4xalvCI1dlZeHirpsGE2g3wBIu5p9XY3/vWtReANeo
-         fpWo+8z9bgo4LecXn+kp2M9/vHg871P34ioPLh0kjrWWFHrhBcyhyjAlVFPyVtbTWCkx
-         bLGIN1L3HvwO6kilfHJkvE1b2BXgATWcMnGWUVbzTYShmc6yrTjyKAOpLHAtBazAc9DB
-         NMSq86/ctwythk8OYMq2mfK1haG8vkjgbl10ZEuDsjdNwa4vTo4RlKpzqmm2kc7iXKYr
-         bmp3dZ0b17grw2dMcBglWEHkP0KZsw0J8QNgut3Ezz/z+/mIqAEAPeGL8jP2ldYscwE2
-         B/BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBblF+AC6FgN3iP5IYYeVmFTLrc8YfIYE8pmE2uetN9SoRFhYSZjDkZokOScZEn+iAePE=@vger.kernel.org, AJvYcCWmcAixrMY4KjxPE6h1vWI5XRwTss2dPks21kyQG8MaatvMXYnMIAIHKlEMoBmaTh9oVsxzPGai@vger.kernel.org
-X-Gm-Message-State: AOJu0YyImjFDNHpqy4zQBMOGuCPBxaPL4YqjGjexVquxIs/iIuSH0Bg4
-	Jcx1mW8T3B46Crgo54tI11UCnGjxdsjtWJnoOVuGj78HWyi8iNI=
-X-Gm-Gg: ASbGncsE9lTXe7XAL3db1ciWU9p3nfjqMQwgssjc62GuApINypaPNv9emJ8pTjwoKQv
-	59Ms7E4g4ghjqg+XKEc1Gf98MeTlyUwXcRRwlIkLychTXT9ec4dfo8/Lc4tVEYNXZ4+4UTJVT/2
-	9ISjZoG7P0mWBda5FC/eU9PWy0SloQSCHEDTCI3P5ZZ/qB06CJmIpkAOos7zkDnTb7iQeXNVGnZ
-	M6XxQqAcsgJ51Wfst2/mu+DSQQIcPGxp1p1O6rqe+vgE6/lbV54qbn+CyvTWPwtR8k5pmSM2m8H
-	jCMmZRyDg7mKLbYjPLtiOe7VOUFsqf63yNWOAAOF
-X-Google-Smtp-Source: AGHT+IHYoc/VT/NIfCpQwnBCvJZle7AKqAnjl81ibsZtG7n4j4FPahCW7IyewqqOGI7XgO2KUItEhw==
-X-Received: by 2002:a17:903:1aa6:b0:224:2201:84da with SMTP id d9443c01a7336-22c5356de05mr220609175ad.6.1745362193412;
-        Tue, 22 Apr 2025 15:49:53 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73dbf8beaf2sm9146857b3a.5.2025.04.22.15.49.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 15:49:52 -0700 (PDT)
-Date: Tue, 22 Apr 2025 15:49:52 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next] bpf: Allow XDP dev bounded program to perform
- XDP_REDIRECT into maps
-Message-ID: <aAgdECkTiP-po7HP@mini-arch>
-References: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
+	s=arc-20240116; t=1745362196; c=relaxed/simple;
+	bh=gK02uRtbIPfT0wi8eklMvtcyFjPFLGNwxr2+qteMrnE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=X+qc6oUwB+Phv964Eoa7C/yDyOVpbPaAgvmgwMxCRpMPLt0HNJdQwNNgNSJWOqpPJ2DoYD5qzsv16B4KlL1VkD6h0wTEAciZyHIbkr8DcArIMqnswu+6540gX1nMxAZ9iL+p08yHeFSds4tXc0hW8JSYQkeJ6FQ7aj6N85GlG7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFn5y/l8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71A2C4CEEC;
+	Tue, 22 Apr 2025 22:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745362195;
+	bh=gK02uRtbIPfT0wi8eklMvtcyFjPFLGNwxr2+qteMrnE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BFn5y/l8E2U2vjMF4Ao0SOlj0cvksEMNuehxjcTYbeqNyrTcsRK72/jyCzQZJhkKB
+	 uWiFcyaRlQfGC2HiAmsz5yIzo4uw7/11RTH2HkGsrWMIk+SHj3MI3At28k+PU4jZOp
+	 Hwn7Ig1KZLcsHc3VaPvqrKGu2U9eJlpAUDdAVIPyvWtkdqda8klhgKBx/pgnIzxLRg
+	 I7L2tcSRhNd6m7EDCNCfvpNw3Ps0M8nujulMay541+00y45B1Rs71GEeZ4XAZ/W3Zu
+	 r2oLOWKTuxTgWUzRMsVpqufT1Cd3IO/2I2kXXkWyhwovqj1UXaxSudDTxRncbcs5aQ
+	 MiLLXVutc9XKw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7146E380CEF4;
+	Tue, 22 Apr 2025 22:50:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Patch v4 iproute2-next 0/2] Add mdb offload failure notification
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174536223428.2078978.18421801962462859445.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Apr 2025 22:50:34 +0000
+References: <20250415144306.908154-1-Joseph.Huang@garmin.com>
+In-Reply-To: <20250415144306.908154-1-Joseph.Huang@garmin.com>
+To: Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, razor@blackwall.org, idosch@nvidia.com,
+ bridge@lists.linux-foundation.org, joseph.huang.2024@gmail.com
 
-On 04/22, Lorenzo Bianconi wrote:
-> In the current implementation if the program is bounded to a specific
-> device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
-> or CPUMAP even if the program is not attached to the map entry. This
-> seems in contrast with the explanation available in
-> bpf_prog_map_compatible routine. Fix the issue taking into account
-> even the attach program type and allow XDP dev bounded program to
-> perform XDP_REDIRECT into maps if the attach type is not BPF_XDP_DEVMAP
-> or BPF_XDP_CPUMAP.
+Hello:
+
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Tue, 15 Apr 2025 10:43:04 -0400 you wrote:
+> Add support to handle mdb offload failure notifications.
 > 
-> Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  kernel/bpf/core.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
+> Kernel commits:
+> e846fb5e7c52 ("net: bridge: mcast: Add offload failed mdb flag")
+> 9fbe1e3e61c2 ("net: bridge: Add offload_fail_notification bopt")
 > 
-> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> index ba6b6118cf504041278d05417c4212d57be6fca0..a33175efffc377edbfe281397017eb467bfbcce9 100644
-> --- a/kernel/bpf/core.c
-> +++ b/kernel/bpf/core.c
-> @@ -2358,6 +2358,26 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
->  	return 0;
->  }
->  
-> +static bool bpf_prog_dev_bound_map_compatible(struct bpf_map *map,
-> +					      const struct bpf_prog *prog)
-> +{
-> +	if (!bpf_prog_is_dev_bound(prog->aux))
-> +		return true;
-> +
-> +	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY)
-> +		return false;
+> The link to kernel changes:
+> https://lore.kernel.org/netdev/20250411150323.1117797-1-Joseph.Huang@garmin.com/
+> 
+> [...]
 
-[..]
+Here is the summary with links:
+  - [v4,iproute2-next,1/2] bridge: mdb: Support offload failed flag
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=7e24631ccf31
+  - [v4,iproute2-next,2/2] iplink_bridge: Add mdb_offload_fail_notification
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=4f4e3bb5c3d3
 
-> +	if (map->map_type == BPF_MAP_TYPE_DEVMAP &&
-> +	    prog->expected_attach_type != BPF_XDP_DEVMAP)
-> +		return true;
-> +
-> +	if (map->map_type == BPF_MAP_TYPE_CPUMAP &&
-> +	    prog->expected_attach_type != BPF_XDP_CPUMAP)
-> +		return true;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Not sure I understand, what does it mean exactly? That it's ok to add
-a dev-bound program to the dev/cpumap if the program itself is gonna
-be attached only to the real device? Can you expand more on the specific
-use-case?
 
-The existing check makes sure that the dev-bound programs run only in the
-contexts that have hw descriptors. devmap and cpumap don't satisfy
-this constraint afaiu.
 
