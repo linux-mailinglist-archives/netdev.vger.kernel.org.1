@@ -1,90 +1,135 @@
-Return-Path: <netdev+bounces-185144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4996AA98B36
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:33:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C71A98BD9
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2C5E3A4B4A
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:33:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10BE77A773F
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02291624D2;
-	Wed, 23 Apr 2025 13:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6015C1A3165;
+	Wed, 23 Apr 2025 13:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5c9+nTy"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="khKz/QWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDB774040
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1334719F121;
+	Wed, 23 Apr 2025 13:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745415231; cv=none; b=ajgi3IRkIpJe1lD1NbZpTf+QCFuAncg2FTX3+qITJZDns9sCdHfB7frlpHBM4+mAJFzjquEmjrBlybYtn4BLnxBWl271QzSo7cMmLLqdRA5ou1RY8pV5m13wKBU6s3u8bY/MWk6nWCTeolbZcG2e28UuHxB9MBrxxmhFCQB/xwk=
+	t=1745416321; cv=none; b=N5hJX6HsaKfOC/+ihhYH590t59k6kqd9VoAATBomzRBBGZSJ/DhLcn5Ji2XnRs3c9hZM+7Bj5NDaPFzlYV9zx2dQWPvyqaG/vwxQr4K3mWDt/HxlAQ1F8NQmV/yTYyVCJdN7o0dO02rkYlBha8Ew90Fs38V2VvfWv3EBD51m9Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745415231; c=relaxed/simple;
-	bh=LAggvedjfM3/QkWgHFlxHtpbw+YmZ4PQd5zXikFl3c8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rzh1OizEc5xwFRUUcm5YHkYlwKRrnv+tSPDXLiJLtomotsrBQ/LSUlzXpyScDrfFyExpZTYXioTM74Equ9bxZTtmrKyMKc3RCrP61P6tXIXAKL4Vmr1OYPm4QdXNadWU0cakuAfUbUUHxcbwwLkAhj+ECIrKQ/plzKBmph1Plao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5c9+nTy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4CCC4CEE2;
-	Wed, 23 Apr 2025 13:33:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745415231;
-	bh=LAggvedjfM3/QkWgHFlxHtpbw+YmZ4PQd5zXikFl3c8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p5c9+nTy3DxHN57sYIMI8MDDAZ7nOGXfIZfb/CV6LRDjm8pB1taVu9G2l8/yhvNr4
-	 NLDvQAOkanbBhPlzbRQ+Y18MkDOdXT9DauD0nYwczZpTfeUKxTkTPZqAQ6VCtOO1LT
-	 +azi5ImTWG0P8DYif0/tOt3EW0vXqdDAD+6AyOrr7mn7ULAA6nzU9Fq6NEDxv1HbBq
-	 sTB+BEfqLm4zab0skb+1Yh6T5veebCcPgQyUOZIrxurWOOqhZA8d5f1T21zScgDmcB
-	 pEijtONFMuGnKCafusL2Aj7NlADVqCK99vQSYNx2G1gIIolFJlzwzvpBDoahoAO1Pj
-	 ikwlZXAziWwyA==
-Date: Wed, 23 Apr 2025 06:33:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Wojciech Drewek <wojciech.drewek@intel.com>, Kuniyuki Iwashima
- <kuniyu@amazon.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, netdev@vger.kernel.org, marcin.szycik@intel.com
-Subject: Re: [PATCH v2 net-next 2/3] pfcp: Convert pfcp_net_exit() to
- ->exit_rtnl().
-Message-ID: <20250423063350.49025e5e@kernel.org>
-In-Reply-To: <aAimsamTlQOq3/aD@mev-dev.igk.intel.com>
-References: <20250418003259.48017-1-kuniyu@amazon.com>
-	<20250418003259.48017-3-kuniyu@amazon.com>
-	<20250422194757.67ba67d6@kernel.org>
-	<aAimsamTlQOq3/aD@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1745416321; c=relaxed/simple;
+	bh=vkHUz5Y/Z51TaWRVJXs72kzGY33VaBWtYdjAEAOQWJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ExWpWQCXZl5JRVQIEHETtD/bCdOr1fdr5qRkxI5Il47LN065YnXTWe9FtXVwzg3LxOJXj98d+JlVmibZJ/vFmAchGNumvCmQNEHsO3FrwaHHjAi5xIZYbZ+zN5q4gIr9SSH99DFLC6wqpTv0fSpRvOUHgJ3I3C5IbxCapCpg+34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=khKz/QWp; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=IMCPuVA6/i+pUoALfItRP9EV1da9/5LML/7OjIzcryo=; b=khKz/QWpSt9+BEGBkdWgA9dpxk
+	oFqcuci/ch6LseibNN1DNmQYS7rztVj53+GWrU9BnUrOG85m9gLyD/lOG9TTyaGonszuCWCmgN04H
+	10Mh+RN1Og7epCKmxnYXr/LJEsQZwUBiErb2GyMdUT78leboDY8rFJfOSJHZcIaSZ3jYrinrJKHo4
+	8GTApS7C+smSbop94hZfYyk0LVTAZ1O5ksaGzcbHRirhHDL8arV1vXTz3KviX8IWln4dJsz1EhKka
+	8BEyGrcKSAoDsQocgUrp9xuOMaUiK1jMoLp/35kDOGTj/YrH4kfHfC8jHuIBYQhw0nZBE1ctWzK/1
+	Wcj8Qr+A==;
+Received: from 85-195-247-12.fiber7.init7.net ([85.195.247.12] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1u7aGe-0007fK-2p;
+	Wed, 23 Apr 2025 15:36:01 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	Andrew Sauber <andrew.sauber@isovalent.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	William Tu <witu@nvidia.com>,
+	Martin Zaharinov <micron10@gmail.com>,
+	Ronak Doshi <ronak.doshi@broadcom.com>
+Subject: [PATCH net] vmxnet3: Fix malformed packet sizing in vmxnet3_process_xdp
+Date: Wed, 23 Apr 2025 15:36:00 +0200
+Message-ID: <20250423133600.176689-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27617/Wed Apr 23 10:38:53 2025)
 
-On Wed, 23 Apr 2025 10:37:05 +0200 Michal Swiatkowski wrote:
-> On Tue, Apr 22, 2025 at 07:47:57PM -0700, Jakub Kicinski wrote:
-> > On Thu, 17 Apr 2025 17:32:33 -0700 Kuniyuki Iwashima wrote: =20
-> > >  drivers/net/pfcp.c | 23 +++++++---------------- =20
-> >=20
-> > Wojciech, Micha=C5=82, does anyone use this driver?
-> > It seems that it hooks dev_get_tstats64 as ndo_get_stats64=20
-> > but it never allocates tstats, so any ifconfig / ip link
-> > run after the device is create immediately crashes the kernel.
-> > I don't see any tstats in this driver history or UDP tunnel
-> > code so I'm moderately confused as how this worked / when
-> > it broke.
-> >=20
-> > If I'm not missing anything and indeed this driver was always
-> > broken we should just delete it ? =20
->=20
-> Uh, I remember that we used it to add tc filter. Maybe we can fix it?
+vmxnet3 driver's XDP handling is buggy for packet sizes using ring0 (that
+is, packet sizes between 128 - 3k bytes).
 
-If it really was broken for over a year and nobody noticed -
-my preference would be to delete it. I don't think you need
-an actual tunnel dev to add TC filters?
+We noticed MTU-related connectivity issues with Cilium's service load-
+balancing in case of vmxnet3 as NIC underneath. A simple curl to a HTTP
+backend service where the XDP LB was doing IPIP encap led to overly large
+packet sizes but only for *some* of the packets (e.g. HTTP GET request)
+while others (e.g. the prior TCP 3WHS) looked completely fine on the wire.
+
+In fact, the pcap recording on the backend node actually revealed that the
+node with the XDP LB was leaking uninitialized kernel data onto the wire
+for the affected packets, for example, while the packets should have been
+152 bytes their actual size was 1482 bytes, so the remainder after 152 bytes
+was padded with whatever other data was in that page at the time (e.g. we
+saw user/payload data from prior processed packets).
+
+We only noticed this through an MTU issue, e.g. when the XDP LB node and
+the backend node both had the same MTU (e.g. 1500) then the curl request
+got dropped on the backend node's NIC given the packet was too large even
+though the IPIP-encapped packet normally would never even come close to
+the MTU limit. Lowering the MTU on the XDP LB (e.g. 1480) allowed to let
+the curl request succeed (which also indicates that the kernel ignored the
+padding, and thus the issue wasn't very user-visible).
+
+Commit e127ce7699c1 ("vmxnet3: Fix missing reserved tailroom") was too eager
+to also switch xdp_prepare_buff() from rcd->len to rbi->len. It really needs
+to stick to rcd->len which is the actual packet length from the descriptor.
+The latter we also feed into vmxnet3_process_xdp_small(), by the way, and
+it indicates the correct length needed to initialize the xdp->{data,data_end}
+parts. For e127ce7699c1 ("vmxnet3: Fix missing reserved tailroom") the
+relevant part was adapting xdp_init_buff() to address the warning given the
+xdp_data_hard_end() depends on xdp->frame_sz. With that fixed, traffic on
+the wire looks good again.
+
+Fixes: e127ce7699c1 ("vmxnet3: Fix missing reserved tailroom")
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Tested-by: Andrew Sauber <andrew.sauber@isovalent.com>
+Cc: Anton Protopopov <aspsk@isovalent.com>
+Cc: William Tu <witu@nvidia.com>
+Cc: Martin Zaharinov <micron10@gmail.com>
+Cc: Ronak Doshi <ronak.doshi@broadcom.com>
+---
+ drivers/net/vmxnet3/vmxnet3_xdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/vmxnet3/vmxnet3_xdp.c b/drivers/net/vmxnet3/vmxnet3_xdp.c
+index 616ecc38d172..5f470499e600 100644
+--- a/drivers/net/vmxnet3/vmxnet3_xdp.c
++++ b/drivers/net/vmxnet3/vmxnet3_xdp.c
+@@ -397,7 +397,7 @@ vmxnet3_process_xdp(struct vmxnet3_adapter *adapter,
+ 
+ 	xdp_init_buff(&xdp, PAGE_SIZE, &rq->xdp_rxq);
+ 	xdp_prepare_buff(&xdp, page_address(page), rq->page_pool->p.offset,
+-			 rbi->len, false);
++			 rcd->len, false);
+ 	xdp_buff_clear_frags_flag(&xdp);
+ 
+ 	xdp_prog = rcu_dereference(rq->adapter->xdp_bpf_prog);
+-- 
+2.43.0
+
 
