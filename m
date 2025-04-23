@@ -1,170 +1,179 @@
-Return-Path: <netdev+bounces-185267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 127B0A998D3
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:43:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB4CA99885
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:33:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 556BA4A262D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:43:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CD723BB459
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6927A2957AA;
-	Wed, 23 Apr 2025 19:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1CD29347D;
+	Wed, 23 Apr 2025 19:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmXX85RI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6OObWSo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFF6293B5A;
-	Wed, 23 Apr 2025 19:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AFB293471;
+	Wed, 23 Apr 2025 19:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745437334; cv=none; b=BagKx8wqFch+nGd3gC3cvl4mQvtqBwk5VohDcRGsV6h781e21HcOmcOGl64dhhxpkaPf6K7ZLke4FQjSElomO+qml5jGkv8i15eN+RZyw87UPqP3uoJEEtem4M6T8JSqIDT64TguuxiGMXyRmp7wBeHjonazEXIXo51yGNm9gPA=
+	t=1745436782; cv=none; b=FENzhPQKeq2vi24i5q2V97e0pCbDA6H1lvijNpsKZeMCy/6B+OOl1MRs8Ajl+7r21F8Tqyzvdui2KlZUV53W/F4hHbW9UdUv4ZdIScfZuTTKs9/7lp5CgTuhamDcuJMC+30DqQslfXjdfiFz6jZ1fQAiAxzJu6ubSbwOyQ2kEy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745437334; c=relaxed/simple;
-	bh=4ZdUq2tzBznByojYCi0WA8cKaEHmxfVFiiY35QjqGeM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MvHGRcksUfKam3JuqqjTtScliBa0ofO8oYjam3yRe/oziVKW2UfXdIBM5/Px9HL7/tWia1HSc6/PFjiS9DqU7B8ykcy3KAryuaLX9whDsA3HSbFgoEEG28lkzEl8u1GhTcwMV/ivrvs4ITqOw8VSL8J5SLz6BFnHpVhpHT1AzUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmXX85RI; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1745436782; c=relaxed/simple;
+	bh=qeXaEOZxb709KPbgIWs4cj6m9zaoicIroOb1v3e0D38=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CthRZKd88FMoLO+UkujMd+uNO+OLS6RyNH0xGBEYxYm31KBCLegcUHPCNlV36hg8QnpQmXmkQvYKHxwZSSRfL7cT6NK4P+BYxXNIYVyr2yfFSfVJW7ALF0OombShBRGO4IKLdnwDk1G/qkgc2ekbhsS5pyrOxx2AdZ78senHeE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6OObWSo; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2ff6cf448b8so334930a91.3;
-        Wed, 23 Apr 2025 12:42:12 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22c33e4fdb8so1914005ad.2;
+        Wed, 23 Apr 2025 12:33:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745437332; x=1746042132; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iBIIB+/ZmIi8Tc2LcqXAgRSWZd60kP7sw7lnOaM4f9M=;
-        b=hmXX85RIAtMQuPggXYQd1hxa7W4Df1yKq4A2zSl+0aUoqsmuEnJHh70hlHVQ8qi501
-         os+pjuLzcg0lCZturKWWVu5kLToFYyF4dqj/yFW8OK6wY//8WbD3zOTPU+Zuqui5QagB
-         BEhMDEYcsur9lh1uIJrI+blqgoYkC4kpCh1GS8koGa//zdTNTdIuh/GQAQEwfzV2rGnD
-         y9uaOfj5W7wz6YKpaWeO+6rPP6qt48bur4dpCEpNXli+48BChkee0p5qXQBIzc9+33rz
-         xE2LpUeOvA5F51+/1E5QgRyJ7O8S0xCEOzhPsDQh8Z6EyUtNzNX9DwOGSjEObpRtpC9C
-         3cow==
+        d=gmail.com; s=20230601; t=1745436780; x=1746041580; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7TWawy/oO2koF169FCbsai+IajiXPIwWUAaxyA1lZrk=;
+        b=T6OObWSoyjLfGNeKZZI692OwBdfvG0Cr/tu+jL7l3+I4Tn7fRcs4VxzJzqbyDf1JOb
+         bZTyjlbgkatxWkRBuK9TcRU+aSFucd88RU0gLHK0HKq6QkooTjVdM176uSFQ6dG2ZIMt
+         PI9AjvnULsLvBXX18umqufxRZv5EnwesFYlUhbeD5Zg4JlNXdDucqrSVHs+0Zfi/mZSG
+         J4zGBAR221/eEPVKcKh+Wn69SyFNNXds9Lhecn09WeurRR0zlv57mrHNp8cxNAvO266y
+         jcA4T3PB3KJkgHx9Wbnkvfti3goBbEXFicA08aBHm2CDxEEaSIJmSFmmsnblVGsjTcKN
+         x/XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745437332; x=1746042132;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iBIIB+/ZmIi8Tc2LcqXAgRSWZd60kP7sw7lnOaM4f9M=;
-        b=XCKO8bGgdpe97p/GlI0kCOtIqq8fzPlA2V2hbJw9//i05XffktlXj0bVWPZZDfQk39
-         5cO43RdPHQJpg6AsYhcbttCvf+KvrYLG/zOycbb+Gszm2BuEwhy/HpqWl1T9Bp7e6bC+
-         09PCUzqgysTIOYs1SECAxQd1ZfufDXiRr8ogwBrqjPT9POpF/hxTvozmIQCp3UAjqeev
-         M5PlfwUwj5zLpaZaoxP2qf6te2gZo/rUVFgHHEWz1SisqZfhXxDnO0obykFSxjG6d99U
-         AfMJeSGpcxsSQ62grmhoOSW3F9Nol0nQi4LtWOnAb5eHGRQhBojwQ1Dt+l9jBe3cYM30
-         CSsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVshvQ7dBWi9MPjNjPEF0I0NjZGxzdyUMIuRgnmnqt5qX0i3wPUgFrmUqtskidGaM0PUAy7UvkL@vger.kernel.org, AJvYcCWImE7UveCMWk5FlSiJCfIgXmcZWwCAd2jEzxqmiZG3Cc4+8h+b7uDxo8nEhS6og3Acw2nTKAjkDRHyYgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvrgCwk8DiiDO98XscyH+ruJfXKdbyKcz8IQmeQ9d2LRLzd3lX
-	BLhjrj7BHtgJNqkjX86Ws/yaLxW9rs2Fl496yqHbvSjetYiIhgEM0wCcDp88
-X-Gm-Gg: ASbGncs0hCk80o+l6YNCvVImAl6SSurpGZvVtrOsaC7Cdz7YhqCkL1XAMts1aO7rH2J
-	VDuv8JwqfbjnOyHyAW3yGlCq50bK77BUsywBsjbarhdBtUs5DuYQE8VnjEX2KPiJIfskFw9n7Kc
-	KRWYl+dLY+/BLAqgFxQtF1a5iNTKbWWU9ku+NhKpiFJl4cVmlwDf2rEUm7DzrqXp/7IeKNKB81/
-	LNI7A2hUQ+y5NBFiBFO2wCKw8O/ExJKV+dHjOlbUdEmzu08kPoX8xNKXOqs2EvrRqknoK54H72H
-	vPGhhWt81Caf0VsXlXwV/bT9SSczBb2jnp5OWk4QTmkP248QKs1TCmrdAKyvCCjLDjZd376ppzE
-	xUKauhoUmkkEuI1fInw==
-X-Google-Smtp-Source: AGHT+IHVHb8f5emrtviZLG/qufveIt8tZsd+Ml9sZN+0I3m7amvYcQpN6eX7VVzpqWUE/VNgi2h9Nw==
-X-Received: by 2002:a17:90b:5488:b0:2ee:ee77:2263 with SMTP id 98e67ed59e1d1-309ed24bc3bmr93692a91.7.1745437331875;
-        Wed, 23 Apr 2025 12:42:11 -0700 (PDT)
-Received: from mew.. (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309df9ef918sm2056475a91.7.2025.04.23.12.42.05
+        d=1e100.net; s=20230601; t=1745436780; x=1746041580;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7TWawy/oO2koF169FCbsai+IajiXPIwWUAaxyA1lZrk=;
+        b=LOzMZRGxuufmnA0UmehSm+stTINdMZzN5z4OUXYlrAkFzk/RB5yWFWrBm+pQYGY6G3
+         sG+xJ9VgsgREl0cX521jnXtvzAuIE9tSsgciEYMoXkA0Bd22dYbwRrbf9xhbujAh6mU2
+         pbe9htcqW+Yh3ka0pTH1BtJUTt/sJZWwciuIddnRi6UQyV7J4CLuaLnmSJ35q3CWO/NB
+         GiqxBOz6SVGFeJWai/zcRGWrs5WRlIJ6P5Eh8rMHevFWRL5YvkW970RU08c8qBFCrLrd
+         4NaybmQ9bvPvlhJ99T8gIjQE1nxpY+xwtMME+m908yq1rvbJ8+lSZmORB5e6Dq5HN1Xp
+         gpxw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8JM5jJ5bsUY1aTV1eC9u1YyByOW5R0yV9nLKmcC+UWrmTpbXnzxIhgXtQWTfE2ZrYHTidPQuqssH571k=@vger.kernel.org, AJvYcCVdpQ527Q5WpGiPwYf9r1bSW9hBbLn0e4dOGb/okdlWhwZT/5xqQ4rrQTLlDyi2zhIH+Z0X6ntK@vger.kernel.org, AJvYcCXcWUvwuticsw/mRhd3TnkQB82MdV7sKxonEFIM4u7byWlVxB9uHuh/sIHt21+GDLNDj/S7CzIe@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLTibhI7Si7lMssZh2tAbu8QmhU2RTQQ+n+U9K+rOOG2GJBnhv
+	YqYzeyVEemNEs7Tp+KTnb1xzrw5+8Tx6v1141VmWOCZ9Tw1iz3nu
+X-Gm-Gg: ASbGncsfSPJzMaWM5m/BN5gmwmmvT70HqcAA+X+tnTqR9BPBcOpekqJB+JWmmD/6Uxh
+	FGqfA+PuwGu7sfAWZHR0H4pxoBc1mZz/BwL8WfguJ2N5KztXyKtJsYeZv5Q+PajpacQlV5CR7h2
+	RTW2pKuPx0t2L9bOv+JbnHhoN++5aaIT48+yfECNmMPG0oRTYt/jWESjMm+0mz7FIpEA3Wyg5Oe
+	Ayp7HreHqrfaOaY3cjrYDq4J+BLvrGeIYU1bvcRDNnVVgcZKbKrFA1xtKUe/O7jqt/b1Cox6JDY
+	mbZcMU6l3VvcaYpFynU20rZMocgQ6PqO50mZEVG0h9Sb
+X-Google-Smtp-Source: AGHT+IEWT0wZBmAOH0PSIjsDQw7UecOVeWgSLRwG+BXz/ugDANFWFinATMDNMWo+M4dyODERvpT75A==
+X-Received: by 2002:a17:902:e5cc:b0:223:3630:cd32 with SMTP id d9443c01a7336-22c5365eaefmr309410525ad.53.1745436780172;
+        Wed, 23 Apr 2025 12:33:00 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bf52cesm108249605ad.65.2025.04.23.12.32.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 12:42:11 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: rust-for-linux@vger.kernel.org
-Cc: John Stultz <jstultz@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	tmgross@umich.edu,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me,
-	a.hindborg@samsung.com,
-	aliceryhl@google.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	tglx@linutronix.de,
-	arnd@arndb.de,
-	sboyd@kernel.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	juri.lelli@redhat.com,
-	vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com,
-	rostedt@goodmis.org,
-	bsegall@google.com,
-	mgorman@suse.de,
-	vschneid@redhat.com,
-	tgunders@redhat.com,
-	me@kloenk.dev,
-	david.laight.linux@gmail.com
-Subject: [PATCH v15 6/6] MAINTAINERS: rust: Add a new section for all of the time stuff
-Date: Thu, 24 Apr 2025 04:28:56 +0900
-Message-ID: <20250423192857.199712-7-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250423192857.199712-1-fujita.tomonori@gmail.com>
-References: <20250423192857.199712-1-fujita.tomonori@gmail.com>
+        Wed, 23 Apr 2025 12:32:59 -0700 (PDT)
+Date: Wed, 23 Apr 2025 12:32:58 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: "Alan J. Wylie" <alan@wylie.me.uk>
+Cc: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <aAlAakEUu4XSEdXF@pop-os.localdomain>
+References: <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+ <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+ <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+ <20250421210927.50d6a355@frodo.int.wylie.me.uk>
+ <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+ <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+ <aAf/K7F9TmCJIT+N@pop-os.localdomain>
+ <20250422214716.5e181523@frodo.int.wylie.me.uk>
+ <aAgO59L0ccXl6kUs@pop-os.localdomain>
+ <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
 
-Add a new section for all of the time stuff to MAINTAINERS file, with
-the existing hrtimer entry fold.
+On Wed, Apr 23, 2025 at 10:51:49AM +0100, Alan J. Wylie wrote:
+> On Tue, 22 Apr 2025 14:49:27 -0700
+> Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> 
+> > Although I am still trying to understand the NULL pointer, which seems
+> > likely from:
+> > 
+> >  478                         if (p->inner.clprio[prio].ptr == cl->node + prio) {
+> >  479                                 /* we are removing child which is pointed to from
+> >  480                                  * parent feed - forget the pointer but remember
+> >  481                                  * classid
+> >  482                                  */
+> >  483                                 p->inner.clprio[prio].last_ptr_id = cl->common.classid;
+> >  484                                 p->inner.clprio[prio].ptr = NULL;
+> >  485                         }
+> > 
+> > Does the following patch work? I mean not just fixing the crash, but
+> > also not causing any other problem.
+> 
+> > ---
+> > 
+> > diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> > index 4b9a639b642e..0cdc778fddef 100644
+> > --- a/net/sched/sch_htb.c
+> > +++ b/net/sched/sch_htb.c
+> > @@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
+> >   */
+> >  static inline void htb_next_rb_node(struct rb_node **n)
+> >  {
+> > -	*n = rb_next(*n);
+> > +	if (*n)
+> > +		*n = rb_next(*n);
+> >  }
+> >  
+> >  /**
+> 
+> There's been three of these: 
+> 
+> Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+> Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+> Apr 23 10:41:36 bilbo kernel: WARNING: CPU: 1 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+> 
+> But no panic.
+> 
+> I've run scripts/decode.sh on the last one.
+> 
 
-Acked-by: John Stultz <jstultz@google.com>
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
-Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- MAINTAINERS | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Thanks a lot for testing! This helped a lot to verify how far we can go
+beyond the panic and what I still missed. To me it looks a bit
+complicated for -stable if we make everything idempotent along the path.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c59316109e3f..3072c0f8ec0e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10585,20 +10585,23 @@ F:	kernel/time/timer_list.c
- F:	kernel/time/timer_migration.*
- F:	tools/testing/selftests/timers/
+Do you mind testing the following one instead? Please revert the
+above one for htb_next_rb_node(). I think maybe this is the safest fix
+we could have for -stable.
+
+Thanks!
+
+--------->
+
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 4b9a639b642e..3786abbdc4c3 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -1487,7 +1487,8 @@ static void htb_qlen_notify(struct Qdisc *sch, unsigned long arg)
  
--HIGH-RESOLUTION TIMERS [RUST]
-+DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
- M:	Andreas Hindborg <a.hindborg@kernel.org>
- R:	Boqun Feng <boqun.feng@gmail.com>
-+R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
- R:	Frederic Weisbecker <frederic@kernel.org>
- R:	Lyude Paul <lyude@redhat.com>
- R:	Thomas Gleixner <tglx@linutronix.de>
- R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
-+R:	John Stultz <jstultz@google.com>
-+R:	Stephen Boyd <sboyd@kernel.org>
- L:	rust-for-linux@vger.kernel.org
- S:	Supported
- W:	https://rust-for-linux.com
- B:	https://github.com/Rust-for-Linux/linux/issues
--T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
--F:	rust/kernel/time/hrtimer.rs
--F:	rust/kernel/time/hrtimer/
-+T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
-+F:	rust/kernel/time.rs
-+F:	rust/kernel/time/
+ 	if (!cl->prio_activity)
+ 		return;
+-	htb_deactivate(qdisc_priv(sch), cl);
++	if (!cl->leaf.q->q.qlen)
++		htb_deactivate(qdisc_priv(sch), cl);
+ }
  
- HIGH-SPEED SCC DRIVER FOR AX.25
- L:	linux-hams@vger.kernel.org
--- 
-2.43.0
-
+ static inline int htb_parent_last_child(struct htb_class *cl)
 
