@@ -1,623 +1,175 @@
-Return-Path: <netdev+bounces-184975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2B7FA97D7D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 05:16:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B686CA97DEB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 06:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDE6E5A0CA2
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:15:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B5A17C20D
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 04:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DA526B0AD;
-	Wed, 23 Apr 2025 03:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348AF264FBA;
+	Wed, 23 Apr 2025 04:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qf0e5Tw2"
+	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="gUL3XrCX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2080.outbound.protection.outlook.com [40.107.21.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C688269CF5
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 03:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745377901; cv=none; b=NVmW7o3kSyNDCWbhpknCcGF9o+ccSiMV13/YRy/atywcP2L6XMAgztl5Nce8j0SDv49jzUN/0E6jIKJnbJ5GsOsMu0BFRqvD4KkxVcwOfBOfPAFqhM45TP5/weoiSsp8fyKaUUHK4D2R28/XaLNlWhCBD7662d36qHWdvGR4FSs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745377901; c=relaxed/simple;
-	bh=Vi33KqKhG7x3BNoFbACoZ5r+THaO0JTRUfoWql9LZaA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oY3Tm8V+J/riCrugKLsdAq8yVi3WCWraCsn28gxchYcJ5G42tKGUKGA1318JR/27nq567eSvcgFYKACfA03tj59E00xH1BOOtlPxpWvxUJ0P102OqI9PF+31kf0sd9vxuV5P4ZaYlnGVzBFFQwuXfLox4Kt8HW9Skx1bRXp8rqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qf0e5Tw2; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30828f9af10so12640728a91.3
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 20:11:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745377897; x=1745982697; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIcvVfVujYu1zkhd0Yxn6lfo1pZDNqsetggSFzEmXzs=;
-        b=qf0e5Tw28QYlKvi1uFrDPDYeey722kujA12l5XD4cR/Ic8S7s7OG5FY8B705StXGnx
-         O1CmcgAIKKqEZjkp5m+NQjrItGEKU8Ym6yvCsvNZOIOE/6Cyn8NEmWJ02i8imDZrCTIO
-         IY6uAYgRU2oiqRmbrBNiF8Up+0D6aw5eVdkoNx2ng41fNju//+ViSyWN2X1REYzP+zAZ
-         3sJiDg6OD0E5Or4YI2ne2/pjiMz6GuQ0Bvizil4HLJEH6AYbXXd7v0ysZXEJU9tigGjB
-         VBaxo18Kxepoo7Lvg9B4z6gUjhIY62/JTBalqGYflQbgQmA+PSVfMHMpre7xeILM3KWF
-         /NYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745377897; x=1745982697;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIcvVfVujYu1zkhd0Yxn6lfo1pZDNqsetggSFzEmXzs=;
-        b=kwDwA2wp26483il2QkW1mSld+WD+HBKRAeAU6caOMW6NA4Vs5IfskGMGBzcvNInOfS
-         X3u+RGX6hbp3VhQBhGNdXLEs7/L1GSLhJPADTbkRfUlBWWvL0tGg99O5odYwfFSJZyKX
-         +ISZy3gSGXWCEn3uRylR2ElrWk/3WF+3lTCOo4I5upa/QY6WNQqCnM3uX8Fp2jrQKM/V
-         5VWGtkMNG0SdkacJyHKFwCdRwJTIXEwohy6GwWMUCiJsox9FhYuHSLnoidemml8sukdB
-         trrOYBIgle1XlQ0IgMpjnw9x/3WK0fjuCVzBKh8uiqKz2ELYer/jIOYYBM8lRB1FQ+ur
-         d+Qg==
-X-Gm-Message-State: AOJu0YwTrcY+0I+pHJb/k6lFY2BOHs/v8Tvx3M4CFAzqAX0Ny71BPgL+
-	L2SNBBcgstPBUFxbwbTQZ16f318oul8Vj7lSLjOE+59KeaBpo2E57G34yszd9rKO1Kqj97+bwr0
-	snDdaVCxo9wBIYRCmS6kuaxlAneRvqmk/ja10492hK4zAIjXZjIPX7SGPm4zWlmvOOtOLrzBp3R
-	vfXePoGF8KNzK0DX29jAL2Eq4pcbGSr+V+LQWPyYMuMZdb/QZ+nWby4XG4cB4=
-X-Google-Smtp-Source: AGHT+IH6GfuVf4gPvzCAvUoyUPy8l+5s7HpKfQhW2kpYxm4os8bhmt8GPoNVhXLJb9CFcOUoMzRJmKeTxRekr735zA==
-X-Received: from pjkk11.prod.google.com ([2002:a17:90b:57eb:b0:2fa:2661:76ac])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:d443:b0:2ff:6af3:b5fa with SMTP id 98e67ed59e1d1-3087bbad9f8mr22850980a91.22.1745377896852;
- Tue, 22 Apr 2025 20:11:36 -0700 (PDT)
-Date: Wed, 23 Apr 2025 03:11:16 +0000
-In-Reply-To: <20250423031117.907681-1-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27645262FCD;
+	Wed, 23 Apr 2025 04:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745383659; cv=fail; b=RzpHc3ECekzZZUWLY1LhRrjyK+pflGgeFAdWuA6h6JhR2t/bTRx2OU/uic4cBEscvZmsrkY0s14d6Jga1JUpxMZD+oBC6QHwduo6PFURixyF8w++O5dq4++78FFjg9kqbtm6ocALjUN0qsyV2uLiQTTC2jrcsOYSNr4ytD70w5Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745383659; c=relaxed/simple;
+	bh=bGpVAdw3lTy/sdZuonzzLi5GuA2hpCeN6fLI6sewHwA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=otF8vqyDWP3ibP90VeuQ6+3UCBFeRy3RHhWo73dJFKFAFFjdR5VYNIxezhKk7N8tC/P14hRjamRQ3GJL3peRisC9t/XviQ/Rfqmzrv9LHYnr5V5kXTCX1sO9pEmMzPnGH4bpgTwlkDV9b7LvTN+HJ9m8LXBExF0TbtgoQNsM7iM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=gUL3XrCX; arc=fail smtp.client-ip=40.107.21.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NALQEyQwbM184xCLe7pYbYQqJORHeukNLPng9DNRUZ+PZa/EcemjId1lKnR8U1stJJ15ANTObRwvED28QeafSHuUztCQNQAO6c+/iIr7AKqV5/ssiC0el5ogsbkNf2csYJzB0KJWsI9b6i7BryW0Jmc18TzhTiqhAIYkGqNQumz7M5L3gnZFn15AOyA+NW9aD5PmhUgjBidVjRThqITUPNRMY4mLl0wS/m9VNkpWFr9qbpvjhDlfODOxog5qixOISG5gQmJwoAOHg+fO8vCsI5X1AU+EP1tvfyxxMXyD/Jz4v4NmA70OgZKFzbfvjNyXqgVEwghhk0bNR0RVw55vcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9fEJlMMXhFIQhsHTjm+cmLsV/PPz7J/PvTIYEFlCAqo=;
+ b=d0DRFMFx03Ypv37uduIxFw+pB9hgIMV6DyWWfaEQeGCz4dwuXrE40U3SpV6Bbzlddcl+JWLe4DfuETenNOc1uRmHynmDsmpBlvwkmvdP7eoTdJ+YfQVrDJjU6q7J3T+eMi8lXva61lbwuRhg9V6GTsjapTZ7KBnzcpx37op4NihpXEStfMbBp94lFD0UB4fg+NLCRlqDmwxz8OlovnFYwGJLsvdjmB2jy3Pg9OiCWu4pSM4sG8SS5sHmf4He1rVNiJ+DdHdloRg1R4P6pcM3YgYbWXjD68G+Uz7dih9g0wlszVQWTIFLQWEKUHcjK3UZNQWrLOh7cw4mBObJVPh7zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=leica-geosystems.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9fEJlMMXhFIQhsHTjm+cmLsV/PPz7J/PvTIYEFlCAqo=;
+ b=gUL3XrCXa7Atj1IdmFSnt1gxNsd/53n13HgoEXiGKZXYo9BsJgU7+ceW8RwPdQ6Jar2eYVRC5SOyW8VXetonTGVBZVIOwww6cjyE36Q9SSHbP23u/gN5RSbe1aQlYYPQA49RgLu8v3pFwTfsAd4xlbv2a/WivTOSRp2axD2Al2k=
+Received: from DU2P251CA0011.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:230::6) by
+ AS5PR06MB9037.eurprd06.prod.outlook.com (2603:10a6:20b:67d::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.36; Wed, 23 Apr 2025 04:47:33 +0000
+Received: from DB1PEPF000509F3.eurprd02.prod.outlook.com
+ (2603:10a6:10:230:cafe::cc) by DU2P251CA0011.outlook.office365.com
+ (2603:10a6:10:230::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.35 via Frontend Transport; Wed,
+ 23 Apr 2025 04:47:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
+ smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
+Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
+ designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.8.40.94; helo=hexagon.com; pr=C
+Received: from hexagon.com (193.8.40.94) by
+ DB1PEPF000509F3.mail.protection.outlook.com (10.167.242.149) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.12 via Frontend Transport; Wed, 23 Apr 2025 04:47:33 +0000
+Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
+	 Wed, 23 Apr 2025 06:47:33 +0200
+From: Johannes Schneider <johannes.schneider@leica-geosystems.com>
+To: dmurphy@ti.com
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	f.fainelli@gmail.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk,
+	michael@walle.cc,
+	netdev@vger.kernel.org,
+	bsp-development.geo@leica-geosystems.com,
+	Johannes Schneider <johannes.schneider@leica-geosystems.com>
+Subject: [PATCH net v3] net: dp83822: Fix OF_MDIO config check
+Date: Wed, 23 Apr 2025 06:47:24 +0200
+Message-Id: <20250423044724.1284492-1-johannes.schneider@leica-geosystems.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250423031117.907681-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.49.0.805.g082f7c87e0-goog
-Message-ID: <20250423031117.907681-10-almasrymina@google.com>
-Subject: [PATCH net-next v10 9/9] selftests: ncdevmem: Implement devmem TCP TX
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 23 Apr 2025 04:47:33.0116 (UTC) FILETIME=[D3A6D3C0:01DBB40A]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F3:EE_|AS5PR06MB9037:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: cf679758-ad2f-4247-0ca0-08dd8221f659
+X-SET-LOWER-SCL-SCANNER: YES
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?oR8ho/KIzm3SeISKgjvF+M364Ef5I1rCY6ROABvhDm1FiLiV6z6meTSsUupt?=
+ =?us-ascii?Q?XcioB/8Bfv1ggl0oUZwmvMMxEtKk4hdMrIZqdh04e6at18iyuLsVJK/RAkzJ?=
+ =?us-ascii?Q?m07/10PFJ+5hrLCjtzb3Kskop1AoF7CbDHxTl/qz0uCU+tgd2xImyP8l+gOm?=
+ =?us-ascii?Q?8CvoOBaaLWWWIMY2T+7VU2A5sEzvaNcXcjtJr/YBs+1kYyTYcd0xhjI473un?=
+ =?us-ascii?Q?gQwijsaPkE1IDfgdyDk8me15Aw9ES4XD7RVi5G06aLT4cM+U6k3c+OyN2nlL?=
+ =?us-ascii?Q?s2S5iHWW+QeEvMrrjW6OC3Fw3UpB6Ut7vzGpZ8wr1cv3H66CjVDNhEzPn5wy?=
+ =?us-ascii?Q?rI+J6V+9GZ2FL9mG7ba63Oe7Rfmrnxv0/pJ4wgUMiDS/lb1CVvOJz6B3v2z9?=
+ =?us-ascii?Q?Hh+TpOQmLXad8RPvFrlrUprHXB+EUXJa9TtbKPBnBxv7l74LmKysUJGIYtNs?=
+ =?us-ascii?Q?WcCR2nLy76jMvS267ujwjxByQCQg0eQ6sNT3QYG/loqVf+hVvTOlT3VYHqKQ?=
+ =?us-ascii?Q?4SHhwuOlHntI0kuEQJWw5TehzcXwAEmZrKrl+5EDJVJ1T/I383CY/pM/8vx5?=
+ =?us-ascii?Q?LFt4Z54x99e6UGSSVGmFQ+6D13SIa3Iu5QuF8j6WGzZ4vBIJ2w78cst5E7/0?=
+ =?us-ascii?Q?jyVw3Qlh+Gk5x6HIkyCP9kM3xvUM5gXN3pNXsbhqSlLyBA6IFH0DevCC4xU9?=
+ =?us-ascii?Q?4ZqqFE61SqkWTeHU9+HoF5RC9lKvfFYVylsgyezdmsNBvu20+I67tW5+o7nl?=
+ =?us-ascii?Q?+Y9XCtAcPvsonCSUClL9jqFjlspkYFJA3hn3HKDoei3b7NwgVKfWRY77APUl?=
+ =?us-ascii?Q?RcTX16xiK/bobxBRXImtFkB3KgjKkFeEDGK7JFMysQNuJ5Dvn+Me9ab4yhk0?=
+ =?us-ascii?Q?8ztPi1ELYavoyfFiIEPKPgF5gNEYGdcLfLiA+hPXytWsH3UoKVQQHVB09LKv?=
+ =?us-ascii?Q?zJ6lYypEwLoSaV0UM10Yg4H3WccdFWEWA4AD1Mzre1OtRc/CGk01UgAu+Hk7?=
+ =?us-ascii?Q?2QO1Lg8iuYGnRVbJt1rOl10JwS4LY7szP+ZhZnTSUDHzbwuv1NwuJaeFu3kz?=
+ =?us-ascii?Q?RLlObokGmPVDIFANsAbr84bbrP56CBlZXfs1TATu22J4p2Bix/BSRWWOQ0Hn?=
+ =?us-ascii?Q?Q2PF2ruqrINQ4OQ7Ug4s4GNGeZ59Ky0CzuBGM6cuNfyBaV4VRl9E6FoyNEZl?=
+ =?us-ascii?Q?JHcCRwwVP4d+VNGBBjjfpC+5aNspUb49Sh/7YW1J6Tv5iCCY0rz+21ge7tXc?=
+ =?us-ascii?Q?a1LV6bUtOGVt/cjXpfrwqve876yKuZr3njLqiALvt8lJSPwjTyyIobBatcvk?=
+ =?us-ascii?Q?WXSzAiB5FlgNfzmv/OUELk+18dz0sCKS2EO1PxDc6Arcy5l/22fgJN0LXHU+?=
+ =?us-ascii?Q?1wxNtwOvTZRVHg7GfsNxaPVXX27mJROg2lrKCcXLBfTnDn2Xg+Yodppk2V8e?=
+ =?us-ascii?Q?tfOUf0TQ488dX9KUebVLThFuD8HcSY2Zy7FmSskV/6Xt+BmFxmIQU5uct6gP?=
+ =?us-ascii?Q?I44ugmUN9stoBS3UfHRyM75K7OyoCUqKp2ZL?=
+X-Forefront-Antispam-Report:
+	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2025 04:47:33.3710
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf679758-ad2f-4247-0ca0-08dd8221f659
+X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509F3.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR06MB9037
 
-Add support for devmem TX in ncdevmem.
+When CONFIG_OF_MDIO is set to be a module the code block is not
+compiled. Use the IS_ENABLED macro that checks for both built in as
+well as module.
 
-This is a combination of the ncdevmem from the devmem TCP series RFCv1
-which included the TX path, and work by Stan to include the netlink API
-and refactored on top of his generic memory_provider support.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-
+Fixes: 5dc39fd5ef35 ("net: phy: DP83822: Add ability to advertise Fiber connection")
+Signed-off-by: Johannes Schneider <johannes.schneider@leica-geosystems.com>
 ---
+ drivers/net/phy/dp83822.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v5:
-- Remove unnecassyr socat bindings (Stan).
-- Add exit_wait=True (Stan)
-- Remove unnecessary -c arg to ncdevmem in check_tx.
-
-v4:
-- Add TX test to devmem.py (Paolo).
-
-v3:
-- Update ncdevmem docs to run validation with RX-only and RX-with-TX.
-- Fix build warnings (Stan).
-- Make the validation expect new lines in the pattern so we can have the
-  TX path behave like netcat (Stan).
-- Change ret to errno in error() calls (Stan).
-- Handle the case where client_ip is not provided (Stan).
-- Don't assume mid is <= 2000 (Stan).
-
-v2:
-- make errors a static variable so that we catch instances where there
-  are less than 20 errors across different buffers.
-- Fix the issue where the seed is reset to 0 instead of its starting
-  value 1.
-- Use 1000ULL instead of 1000 to guard against overflow (Willem).
-- Do not set POLLERR (Willem).
-- Update the test to use the new interface where iov_base is the
-  dmabuf_offset.
-- Update the test to send 2 iov instead of 1, so we get some test
-  coverage over sending multiple iovs at once.
-- Print the ifindex the test is using, useful for debugging issues where
-  maybe the test may fail because the ifindex of the socket is different
-  from the dmabuf binding.
-
----
- .../selftests/drivers/net/hw/devmem.py        |  26 +-
- .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
- 2 files changed, 311 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-index 3947e91571159..7fc686cf47a2d 100755
---- a/tools/testing/selftests/drivers/net/hw/devmem.py
-+++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-@@ -1,6 +1,7 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
-+from os import path
- from lib.py import ksft_run, ksft_exit
- from lib.py import ksft_eq, KsftSkipEx
- from lib.py import NetDrvEpEnv
-@@ -10,8 +11,7 @@ from lib.py import ksft_disruptive
- 
- def require_devmem(cfg):
-     if not hasattr(cfg, "_devmem_probed"):
--        port = rand_port()
--        probe_command = f"./ncdevmem -f {cfg.ifname}"
-+        probe_command = f"{cfg.bin_local} -f {cfg.ifname}"
-         cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
-         cfg._devmem_probed = True
- 
-@@ -25,7 +25,7 @@ def check_rx(cfg) -> None:
-     require_devmem(cfg)
- 
-     port = rand_port()
--    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.addr_v['6']} -p {port}"
-+    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr_v['6']} -p {port}"
- 
-     with bkg(listen_cmd) as socat:
-         wait_port_listen(port)
-@@ -34,9 +34,27 @@ def check_rx(cfg) -> None:
-     ksft_eq(socat.stdout.strip(), "hello\nworld")
- 
- 
-+@ksft_disruptive
-+def check_tx(cfg) -> None:
-+    cfg.require_ipver("6")
-+    require_devmem(cfg)
-+
-+    port = rand_port()
-+    listen_cmd = f"socat -U - TCP6-LISTEN:{port}"
-+
-+    with bkg(listen_cmd, exit_wait=True) as socat:
-+        wait_port_listen(port)
-+        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifname} -s {cfg.addr_v['6']} -p {port}", host=cfg.remote, shell=True)
-+
-+    ksft_eq(socat.stdout.strip(), "hello\nworld")
-+
-+
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run([check_rx],
-+        cfg.bin_local = path.abspath(path.dirname(__file__) + "/ncdevmem")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+        ksft_run([check_rx, check_tx],
-                  args=(cfg, ))
-     ksft_exit()
- 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 2bf14ac2b8c62..f801a1b3545f0 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -9,22 +9,31 @@
-  *     ncdevmem -s <server IP> [-c <client IP>] -f eth1 -l -p 5201
-  *
-  *     On client:
-- *     echo -n "hello\nworld" | nc -s <server IP> 5201 -p 5201
-+ *     echo -n "hello\nworld" | \
-+ *		ncdevmem -s <server IP> [-c <client IP>] -p 5201 -f eth1
-  *
-- * Test data validation:
-+ * Note this is compatible with regular netcat. i.e. the sender or receiver can
-+ * be replaced with regular netcat to test the RX or TX path in isolation.
-+ *
-+ * Test data validation (devmem TCP on RX only):
-  *
-  *     On server:
-  *     ncdevmem -s <server IP> [-c <client IP>] -f eth1 -l -p 5201 -v 7
-  *
-  *     On client:
-  *     yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | \
-- *             tr \\n \\0 | \
-- *             head -c 5G | \
-+ *             head -c 1G | \
-  *             nc <server IP> 5201 -p 5201
-  *
-+ * Test data validation (devmem TCP on RX and TX, validation happens on RX):
-  *
-- * Note this is compatible with regular netcat. i.e. the sender or receiver can
-- * be replaced with regular netcat to test the RX or TX path in isolation.
-+ *	On server:
-+ *	ncdevmem -s <server IP> [-c <client IP>] -l -p 5201 -v 8 -f eth1
-+ *
-+ *	On client:
-+ *	yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06\\x07) | \
-+ *		head -c 1M | \
-+ *		ncdevmem -s <server IP> [-c <client IP>] -p 5201 -f eth1
-  */
- #define _GNU_SOURCE
- #define __EXPORTED_HEADERS__
-@@ -40,15 +49,18 @@
- #include <fcntl.h>
- #include <malloc.h>
- #include <error.h>
-+#include <poll.h>
- 
- #include <arpa/inet.h>
- #include <sys/socket.h>
- #include <sys/mman.h>
- #include <sys/ioctl.h>
- #include <sys/syscall.h>
-+#include <sys/time.h>
- 
- #include <linux/memfd.h>
- #include <linux/dma-buf.h>
-+#include <linux/errqueue.h>
- #include <linux/udmabuf.h>
- #include <linux/types.h>
- #include <linux/netlink.h>
-@@ -79,6 +91,8 @@ static int num_queues = -1;
- static char *ifname;
- static unsigned int ifindex;
- static unsigned int dmabuf_id;
-+static uint32_t tx_dmabuf_id;
-+static int waittime_ms = 500;
- 
- struct memory_buffer {
- 	int fd;
-@@ -92,6 +106,8 @@ struct memory_buffer {
- struct memory_provider {
- 	struct memory_buffer *(*alloc)(size_t size);
- 	void (*free)(struct memory_buffer *ctx);
-+	void (*memcpy_to_device)(struct memory_buffer *dst, size_t off,
-+				 void *src, int n);
- 	void (*memcpy_from_device)(void *dst, struct memory_buffer *src,
- 				   size_t off, int n);
- };
-@@ -152,6 +168,20 @@ static void udmabuf_free(struct memory_buffer *ctx)
- 	free(ctx);
+diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+index 14f361549638..e32013eb0186 100644
+--- a/drivers/net/phy/dp83822.c
++++ b/drivers/net/phy/dp83822.c
+@@ -730,7 +730,7 @@ static int dp83822_phy_reset(struct phy_device *phydev)
+ 	return phydev->drv->config_init(phydev);
  }
  
-+static void udmabuf_memcpy_to_device(struct memory_buffer *dst, size_t off,
-+				     void *src, int n)
-+{
-+	struct dma_buf_sync sync = {};
-+
-+	sync.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_WRITE;
-+	ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-+
-+	memcpy(dst->buf_mem + off, src, n);
-+
-+	sync.flags = DMA_BUF_SYNC_END | DMA_BUF_SYNC_WRITE;
-+	ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-+}
-+
- static void udmabuf_memcpy_from_device(void *dst, struct memory_buffer *src,
- 				       size_t off, int n)
- {
-@@ -169,6 +199,7 @@ static void udmabuf_memcpy_from_device(void *dst, struct memory_buffer *src,
- static struct memory_provider udmabuf_memory_provider = {
- 	.alloc = udmabuf_alloc,
- 	.free = udmabuf_free,
-+	.memcpy_to_device = udmabuf_memcpy_to_device,
- 	.memcpy_from_device = udmabuf_memcpy_from_device,
- };
- 
-@@ -187,14 +218,16 @@ void validate_buffer(void *line, size_t size)
- {
- 	static unsigned char seed = 1;
- 	unsigned char *ptr = line;
--	int errors = 0;
-+	unsigned char expected;
-+	static int errors;
- 	size_t i;
- 
- 	for (i = 0; i < size; i++) {
--		if (ptr[i] != seed) {
-+		expected = seed ? seed : '\n';
-+		if (ptr[i] != expected) {
- 			fprintf(stderr,
- 				"Failed validation: expected=%u, actual=%u, index=%lu\n",
--				seed, ptr[i], i);
-+				expected, ptr[i], i);
- 			errors++;
- 			if (errors > 20)
- 				error(1, 0, "validation failed.");
-@@ -393,6 +426,49 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
- 	return -1;
- }
- 
-+static int bind_tx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-+			 struct ynl_sock **ys)
-+{
-+	struct netdev_bind_tx_req *req = NULL;
-+	struct netdev_bind_tx_rsp *rsp = NULL;
-+	struct ynl_error yerr;
-+
-+	*ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!*ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return -1;
-+	}
-+
-+	req = netdev_bind_tx_req_alloc();
-+	netdev_bind_tx_req_set_ifindex(req, ifindex);
-+	netdev_bind_tx_req_set_fd(req, dmabuf_fd);
-+
-+	rsp = netdev_bind_tx(*ys, req);
-+	if (!rsp) {
-+		perror("netdev_bind_tx");
-+		goto err_close;
-+	}
-+
-+	if (!rsp->_present.id) {
-+		perror("id not present");
-+		goto err_close;
-+	}
-+
-+	fprintf(stderr, "got tx dmabuf id=%d\n", rsp->id);
-+	tx_dmabuf_id = rsp->id;
-+
-+	netdev_bind_tx_req_free(req);
-+	netdev_bind_tx_rsp_free(rsp);
-+
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
-+	netdev_bind_tx_req_free(req);
-+	ynl_sock_destroy(*ys);
-+	return -1;
-+}
-+
- static void enable_reuseaddr(int fd)
- {
- 	int opt = 1;
-@@ -431,7 +507,7 @@ static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
- 	return 0;
- }
- 
--int do_server(struct memory_buffer *mem)
-+static int do_server(struct memory_buffer *mem)
- {
- 	char ctrl_data[sizeof(int) * 20000];
- 	struct netdev_queue_id *queues;
-@@ -685,6 +761,206 @@ void run_devmem_tests(void)
- 	provider->free(mem);
- }
- 
-+static uint64_t gettimeofday_ms(void)
-+{
-+	struct timeval tv;
-+
-+	gettimeofday(&tv, NULL);
-+	return (tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-+}
-+
-+static int do_poll(int fd)
-+{
-+	struct pollfd pfd;
-+	int ret;
-+
-+	pfd.revents = 0;
-+	pfd.fd = fd;
-+
-+	ret = poll(&pfd, 1, waittime_ms);
-+	if (ret == -1)
-+		error(1, errno, "poll");
-+
-+	return ret && (pfd.revents & POLLERR);
-+}
-+
-+static void wait_compl(int fd)
-+{
-+	int64_t tstop = gettimeofday_ms() + waittime_ms;
-+	char control[CMSG_SPACE(100)] = {};
-+	struct sock_extended_err *serr;
-+	struct msghdr msg = {};
-+	struct cmsghdr *cm;
-+	__u32 hi, lo;
-+	int ret;
-+
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
-+
-+	while (gettimeofday_ms() < tstop) {
-+		if (!do_poll(fd))
-+			continue;
-+
-+		ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
-+		if (ret < 0) {
-+			if (errno == EAGAIN)
-+				continue;
-+			error(1, errno, "recvmsg(MSG_ERRQUEUE)");
-+			return;
-+		}
-+		if (msg.msg_flags & MSG_CTRUNC)
-+			error(1, 0, "MSG_CTRUNC\n");
-+
-+		for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+			if (cm->cmsg_level != SOL_IP &&
-+			    cm->cmsg_level != SOL_IPV6)
-+				continue;
-+			if (cm->cmsg_level == SOL_IP &&
-+			    cm->cmsg_type != IP_RECVERR)
-+				continue;
-+			if (cm->cmsg_level == SOL_IPV6 &&
-+			    cm->cmsg_type != IPV6_RECVERR)
-+				continue;
-+
-+			serr = (void *)CMSG_DATA(cm);
-+			if (serr->ee_origin != SO_EE_ORIGIN_ZEROCOPY)
-+				error(1, 0, "wrong origin %u", serr->ee_origin);
-+			if (serr->ee_errno != 0)
-+				error(1, 0, "wrong errno %d", serr->ee_errno);
-+
-+			hi = serr->ee_data;
-+			lo = serr->ee_info;
-+
-+			fprintf(stderr, "tx complete [%d,%d]\n", lo, hi);
-+			return;
-+		}
-+	}
-+
-+	error(1, 0, "did not receive tx completion");
-+}
-+
-+static int do_client(struct memory_buffer *mem)
-+{
-+	char ctrl_data[CMSG_SPACE(sizeof(__u32))];
-+	struct sockaddr_in6 server_sin;
-+	struct sockaddr_in6 client_sin;
-+	struct ynl_sock *ys = NULL;
-+	struct msghdr msg = {};
-+	ssize_t line_size = 0;
-+	struct cmsghdr *cmsg;
-+	struct iovec iov[2];
-+	char *line = NULL;
-+	unsigned long mid;
-+	size_t len = 0;
-+	int socket_fd;
-+	__u32 ddmabuf;
-+	int opt = 1;
-+	int ret;
-+
-+	ret = parse_address(server_ip, atoi(port), &server_sin);
-+	if (ret < 0)
-+		error(1, 0, "parse server address");
-+
-+	socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
-+	if (socket_fd < 0)
-+		error(1, socket_fd, "create socket");
-+
-+	enable_reuseaddr(socket_fd);
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname,
-+			 strlen(ifname) + 1);
-+	if (ret)
-+		error(1, errno, "bindtodevice");
-+
-+	if (bind_tx_queue(ifindex, mem->fd, &ys))
-+		error(1, 0, "Failed to bind\n");
-+
-+	if (client_ip) {
-+		ret = parse_address(client_ip, atoi(port), &client_sin);
-+		if (ret < 0)
-+			error(1, 0, "parse client address");
-+
-+		ret = bind(socket_fd, &client_sin, sizeof(client_sin));
-+		if (ret)
-+			error(1, errno, "bind");
-+	}
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, sizeof(opt));
-+	if (ret)
-+		error(1, errno, "set sock opt");
-+
-+	fprintf(stderr, "Connect to %s %d (via %s)\n", server_ip,
-+		ntohs(server_sin.sin6_port), ifname);
-+
-+	ret = connect(socket_fd, &server_sin, sizeof(server_sin));
-+	if (ret)
-+		error(1, errno, "connect");
-+
-+	while (1) {
-+		free(line);
-+		line = NULL;
-+		line_size = getline(&line, &len, stdin);
-+
-+		if (line_size < 0)
-+			break;
-+
-+		mid = (line_size / 2) + 1;
-+
-+		iov[0].iov_base = (void *)1;
-+		iov[0].iov_len = mid;
-+		iov[1].iov_base = (void *)(mid + 2);
-+		iov[1].iov_len = line_size - mid;
-+
-+		provider->memcpy_to_device(mem, (size_t)iov[0].iov_base, line,
-+					   iov[0].iov_len);
-+		provider->memcpy_to_device(mem, (size_t)iov[1].iov_base,
-+					   line + iov[0].iov_len,
-+					   iov[1].iov_len);
-+
-+		fprintf(stderr,
-+			"read line_size=%ld iov[0].iov_base=%lu, iov[0].iov_len=%lu, iov[1].iov_base=%lu, iov[1].iov_len=%lu\n",
-+			line_size, (unsigned long)iov[0].iov_base,
-+			iov[0].iov_len, (unsigned long)iov[1].iov_base,
-+			iov[1].iov_len);
-+
-+		msg.msg_iov = iov;
-+		msg.msg_iovlen = 2;
-+
-+		msg.msg_control = ctrl_data;
-+		msg.msg_controllen = sizeof(ctrl_data);
-+
-+		cmsg = CMSG_FIRSTHDR(&msg);
-+		cmsg->cmsg_level = SOL_SOCKET;
-+		cmsg->cmsg_type = SCM_DEVMEM_DMABUF;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(__u32));
-+
-+		ddmabuf = tx_dmabuf_id;
-+
-+		*((__u32 *)CMSG_DATA(cmsg)) = ddmabuf;
-+
-+		ret = sendmsg(socket_fd, &msg, MSG_ZEROCOPY);
-+		if (ret < 0)
-+			error(1, errno, "Failed sendmsg");
-+
-+		fprintf(stderr, "sendmsg_ret=%d\n", ret);
-+
-+		if (ret != line_size)
-+			error(1, errno, "Did not send all bytes");
-+
-+		wait_compl(socket_fd);
-+	}
-+
-+	fprintf(stderr, "%s: tx ok\n", TEST_PREFIX);
-+
-+	free(line);
-+	close(socket_fd);
-+
-+	if (ys)
-+		ynl_sock_destroy(ys);
-+
-+	return 0;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	struct memory_buffer *mem;
-@@ -728,6 +1004,8 @@ int main(int argc, char *argv[])
- 
- 	ifindex = if_nametoindex(ifname);
- 
-+	fprintf(stderr, "using ifindex=%u\n", ifindex);
-+
- 	if (!server_ip && !client_ip) {
- 		if (start_queue < 0 && num_queues < 0) {
- 			num_queues = rxq_num(ifindex);
-@@ -778,7 +1056,7 @@ int main(int argc, char *argv[])
- 		error(1, 0, "Missing -p argument\n");
- 
- 	mem = provider->alloc(getpagesize() * NUM_PAGES);
--	ret = is_server ? do_server(mem) : 1;
-+	ret = is_server ? do_server(mem) : do_client(mem);
- 	provider->free(mem);
- 
- 	return ret;
+-#ifdef CONFIG_OF_MDIO
++#if IS_ENABLED(CONFIG_OF_MDIO)
+ static const u32 tx_amplitude_100base_tx_gain[] = {
+ 	80, 82, 83, 85, 87, 88, 90, 92,
+ 	93, 95, 97, 98, 100, 102, 103, 105,
+
+base-commit: 9d7a0577c9db35c4cc52db90bc415ea248446472
 -- 
-2.49.0.805.g082f7c87e0-goog
+2.34.1
 
 
