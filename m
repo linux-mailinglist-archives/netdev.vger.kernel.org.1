@@ -1,319 +1,204 @@
-Return-Path: <netdev+bounces-185320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33342A99C37
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:49:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E43A99C40
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:51:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F239447A97
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:49:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC8FF3ABC6A
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598B2242D63;
-	Wed, 23 Apr 2025 23:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A0E242D84;
+	Wed, 23 Apr 2025 23:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m22b7eh7"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="XdIhiWcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860C6223DC5
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 23:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED80D1FECBD
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 23:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745452186; cv=none; b=GCINRDhsZK4fO16nYkVGCeEr4Bs+MT11ya5cyaGKeKHYy5DTmsCPxEZI4zOkCQ277m/flkyjfzyE0lmo6ktQAgXjSjiRs2uMfTtI9QYAflerKm10DZ60DNcPSkK89yNruI1v7tYpw2JYeULgVRDSPJMPNZzrxlkHBhZEyFkzd4s=
+	t=1745452290; cv=none; b=I6O5oU1lybK6irtHOPpTFtOazmpysAPvpf4IBD976oLsU0mSpY/o0Taru41iPPEoeR/6oOo3B4GNLaW9DBdnelFJpbSIXxZtos5QLPJRZbnjVowvszmm8vg1VtKdoAMNlpSQ/lPJr3YQoagQVDxcWg4zFRjkI3i9aENDscOl2Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745452186; c=relaxed/simple;
-	bh=2VepqBRKfk+JUtYK6Opi6yC4PoH9lRaO6DVRy49F788=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g3Y6Rl4fFK4/YGdyfcrA8JqGnRuakbzKPKOMgnKNlgBKkJBFPXb9Rp8IX0l5KvNThPFRTxceJ69+DjFsv9vy5IDG+f2In+MVQVqff3Zdxczl7iMjsc0zoZgTHpTCEwfrBxcFk3KSWLjIgaQVYPMu1HwxIXgg+ePDcg9kDvh23JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m22b7eh7; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2240aad70f2so104655ad.0
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 16:49:44 -0700 (PDT)
+	s=arc-20240116; t=1745452290; c=relaxed/simple;
+	bh=ESq12MoDj0n1gSGYk55mPV1EuKJQEQLEGWNKf5vXWgM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZKO4pRS8DYb+TpWs+PdXUSk7qhwCoSBPb1QdUAF18oGr4ESrxae2Vvb63qlJVKMVP1dcPDgZQCfjVUnGS40lQBzmv3rY23OFPNnGbgPaMfvLzKXPJNYnJhn4Cg1WYijzCbBF3EMaDjWYDonKaMA01emR0HNDfTRzyQT8uAuzITk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=XdIhiWcS; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2240ff0bd6eso808245ad.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 16:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745452184; x=1746056984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZgkZ0Ext9iMP/JpiGlrjV0G3sg7KUzWq6I5onInGXLo=;
-        b=m22b7eh7ZBAWuwp7bnnFNPDsGXVQsJgKx+hykA/dVSbsJgYAf5w2hfu5xArKlpaCHf
-         jt+IWwYEfNrRJzlhCsLsw6WR+n+EGP7r+VoSB54JXwSHboVNzntSz3/Z6Hodfr7a/15u
-         8+k3QfiC/wMJz6eYAM+iuFiBEtLs6dzI2Rw3y1IaqESHzvdXk4jyVgAwLdrssEtEL6D6
-         3HPrHD5dd6IpQaMzXB76bNq9QUljv+CaRttURfXotriwapSQ+0U0HB0sFCfZpQEANqfA
-         +TqfHvmWI3VIMd8qdr3Qf1kohOYK4cwoxuwjmUzJA6/Pf+DokhIf64GtClz7SkLog/1d
-         VyEg==
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1745452287; x=1746057087; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/AsBOsdnsiqKNxklBct/cUcMShwyJwNdUbI1HKP1v+E=;
+        b=XdIhiWcSysoP19MFh/boBLdN4616pN/VPHBss9FoMdOtibCyvWyecXc6esACWWo5im
+         eT9STEQ67BoQhk9ZNMgEuaq187NsI7y/AqksJCApA6W85IclH1t/8Mf6I4ckevwRIXz5
+         tK/M0+AakRwwd3UITowe/hzcR/ZEWu3i0jK1PVYojjdZ2uSlfOcjegfoizXZvhM0YYhC
+         lLTNXHto3hzrZ4Ja93S//xJC9e0tuS1v6hNrDOV46YMu0hLXgd0C1I2wSVL2nOUsFWbY
+         AQVPTT6mrLdgftyNZiEryvTExQ+WLl5tax4ZpK7530fGua16vkv3WJddvxaf6xyHwO9t
+         VzFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745452184; x=1746056984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZgkZ0Ext9iMP/JpiGlrjV0G3sg7KUzWq6I5onInGXLo=;
-        b=d0nSwCqltO5AD2bVj5PItXT3zoxJ12qUq/EEaf7AVMi8nkFINKO4VlPgHsufc/jN05
-         thyMQhmzoWiT2VlIl7s04E7oP+jofQNfbqy5hGxOggoaQAjI3hPsZAYtU994XBEiqSMx
-         PpfeVRoXCbmquNJG3Dtvebdd0hBuW2qA9RTOo5fqHkeTI+UycF2Roftg2duWQQdRqAKF
-         NzDWaYUvBVwRSUv6MJe8fXkUiKXbkURp1GSO0JXN3Aok3rF0OQwQqaMGo52fxZrDWbWg
-         DA/PROb/AMstmcy+qSEGo7+WU84+TXunhwgmN1MBLau8CprgJS7hFa6ChzmVcqX1Cpav
-         gxHg==
-X-Gm-Message-State: AOJu0YwOGQ/e1ip8lfzIIxxhU6y/z9lZcLybwEyzjdDpat4G4ZvsFDCk
-	Fb9ZIVtcx88f+s2IAQYfeS0hHaov/5xcObrLZ3cYH5SEcQVsV08tw7b5rNapycodHBr6BDqy6aG
-	CHx3myz0Xp1F5+GLFsbsbu7ffQGA7xGkWQnFI
-X-Gm-Gg: ASbGncutMAVCD2T5D24OFAzSzARhiANJEjD3ipuBilrYyY0MXAyJOHZXQx6A8BKKRKz
-	OM9oGYqDRPpj5/bYRamob2BaopB9ihLED5dvqh4t50AP/lmdj6mE4ZaXQVY0C2Nt2dMUccKLg52
-	lI5F3vwgDvk8p5EsOFEflyZnzco6WQFADcf80sBvlA4Y6HpLzAT6Y3
-X-Google-Smtp-Source: AGHT+IGX7LK2aizJTPRrsUG1SCwbT2wY7Q85CyE+4DCuBGCQwpCEAfBGkW2ltJ7AcRFVxOQFDMwRmDSguzDhCxxr7Yc=
-X-Received: by 2002:a17:903:46c6:b0:21f:3c4a:136f with SMTP id
- d9443c01a7336-22db2214bfcmr1400785ad.28.1745452183416; Wed, 23 Apr 2025
- 16:49:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745452287; x=1746057087;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/AsBOsdnsiqKNxklBct/cUcMShwyJwNdUbI1HKP1v+E=;
+        b=V6AOH1qBQygmKzzcGOb3nyRq4eX56oRFFVcfDw3lIembgnUQ7rg9I5PflvfFZYufFg
+         XKJkZwVp60J+T3uTSeECcRC98rb/GkFgDiq46PnyhPWYPoNtV2aG9bR0PM950sQYK6ve
+         VHuhbMRyWI4hLb8F2UEVBmGbNnrqEDcj85PPQ9xf1WopZ9Fc9G09aEW/uReeS21i6N3i
+         6oD9zz77j/+fu6V5Zi+93lI/s9qOtanCXCgSvvM24Xwj61XkunfHUybA6Nogfr4LorXA
+         q+raGXn11f4D9+OxwD7pFIGKdHA9ntwta57tlGTD5e2D4kI79CncUO12ctxxpDwUqtIY
+         8UuQ==
+X-Gm-Message-State: AOJu0YyuOoNa3Y8nkvxlooeKvIKlA6wdHKFu1CdjBVMvcUk8LmQuvZD1
+	4uEWq9dK7dxbJW+QAI7qEFTrY3ypMVztpnkd6OMWnRIFRSyBqJBs4Ku3UXTalmFnYEHZbOMnhlC
+	dTYg=
+X-Gm-Gg: ASbGnctTt6G454rb3b5cnGrQLPOUnnI37s8MScW06WUWloq3gOfHib4v19nUzJI+MZd
+	eg389IYkizYry03HPURTiP2JCvQwJsLwaFaf54KNmcGip0kki+VgTKOKe3xqYxHRAxKfmKokDcx
+	Z8mibYJw9NLFm4w68fJpZqob0RAY3c2otnNtg4XsyHvFVSVIv9PZr+RTNA16eTT7uTKUUZsBgV4
+	JvVWH4fWJqFT02VAcH42NuhfGYOSDJSBTcoyBshPyu3TXVKa9PUWpBrqL3+N/neZKSAoTUjK6he
+	urPVsQxplMIf2g61eoX6ZgSw4Bry1xNwmIvv2HMD
+X-Google-Smtp-Source: AGHT+IH5/OcV01UlRW0unD94pA2OsRTYIKucGtgHihQP93ogW51ZdQffJ0OAzzVGwPD2y3Ffye7BTQ==
+X-Received: by 2002:a17:903:1d2:b0:224:1785:8044 with SMTP id d9443c01a7336-22db3be6885mr2418035ad.4.1745452286757;
+        Wed, 23 Apr 2025 16:51:26 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:f4b1:8a64:c239:dca3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76cfasm499175ad.47.2025.04.23.16.51.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 16:51:26 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Aditi Ghag <aditi.ghag@isovalent.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: [PATCH v5 bpf-next 0/6] bpf: udp: Exactly-once socket iteration
+Date: Wed, 23 Apr 2025 16:51:08 -0700
+Message-ID: <20250423235115.1885611-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423031117.907681-1-almasrymina@google.com>
- <20250423031117.907681-5-almasrymina@google.com> <20250423140931-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250423140931-mutt-send-email-mst@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 23 Apr 2025 16:49:30 -0700
-X-Gm-Features: ATxdqUHdLn2wP88hj2tffPEL1QlUjkAMN1_0DSb5R09qEYsDQJ9iaUC4P8x0YMU
-Message-ID: <CAHS8izNRk1MOs-R1RmWMQ5zMBOo70YpTzOdt8=OrrjrD7JQTfA@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 4/9] net: devmem: Implement TX path
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 23, 2025 at 11:24=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
->
-> some nits
->
-> On Wed, Apr 23, 2025 at 03:11:11AM +0000, Mina Almasry wrote:
-> > @@ -189,43 +200,44 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
-signed int dmabuf_fd,
-> >       }
-> >
-> >       binding->dev =3D dev;
-> > -
-> > -     err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
-,
-> > -                           binding, xa_limit_32b, &id_alloc_next,
-> > -                           GFP_KERNEL);
-> > -     if (err < 0)
-> > -             goto err_free_binding;
-> > -
-> >       xa_init_flags(&binding->bound_rxqs, XA_FLAGS_ALLOC);
-> > -
-> >       refcount_set(&binding->ref, 1);
-> > -
-> >       binding->dmabuf =3D dmabuf;
-> >
->
-> given you keep iterating, don't tweak whitespace in the same patch-
-> will make the review a tiny bit easier.
->
+Both UDP and TCP socket iterators use iter->offset to track progress
+through a bucket, which is a measure of the number of matching sockets
+from the current bucket that have been seen or processed by the
+iterator. On subsequent iterations, if the current bucket has
+unprocessed items, we skip at least iter->offset matching items in the
+bucket before adding any remaining items to the next batch. However,
+iter->offset isn't always an accurate measure of "things already seen"
+when the underlying bucket changes between reads which can lead to
+repeated or skipped sockets. Instead, this series remembers the cookies
+of the sockets we haven't seen yet in the current bucket and resumes
+from the first cookie in that list that we can find on the next
+iteration. This series focuses on UDP socket iterators, but a later
+series will apply a similar approach to TCP socket iterators.
 
-Sure.
+To be more specific, this series replaces struct sock **batch inside
+struct bpf_udp_iter_state with union bpf_udp_iter_batch_item *batch,
+where union bpf_udp_iter_batch_item can contain either a pointer to a
+socket or a socket cookie. During reads, batch contains pointers to all
+sockets in the current batch while between reads batch contains all the
+cookies of the sockets in the current bucket that have yet to be
+processed. On subsequent reads, when iteration resumes,
+bpf_iter_udp_batch finds the first saved cookie that matches a socket in
+the bucket's socket list and picks up from there to construct the next
+batch. On average, assuming it's rare that the next socket disappears
+before the next read occurs, we should only need to scan as much as we
+did with the offset-based approach to find the starting point. In the
+case that the next socket is no longer there, we keep scanning through
+the saved cookies list until we find a match. The worst case is when
+none of the sockets from last time exist anymore, but again, this should
+be rare.
 
->
-> >       binding->attachment =3D dma_buf_attach(binding->dmabuf, dev->dev.=
-parent);
-> >       if (IS_ERR(binding->attachment)) {
-> >               err =3D PTR_ERR(binding->attachment);
-> >               NL_SET_ERR_MSG(extack, "Failed to bind dmabuf to device")=
-;
-> > -             goto err_free_id;
-> > +             goto err_free_binding;
-> >       }
-> >
-> >       binding->sgt =3D dma_buf_map_attachment_unlocked(binding->attachm=
-ent,
-> > -                                                    DMA_FROM_DEVICE);
-> > +                                                    direction);
-> >       if (IS_ERR(binding->sgt)) {
-> >               err =3D PTR_ERR(binding->sgt);
-> >               NL_SET_ERR_MSG(extack, "Failed to map dmabuf attachment")=
-;
-> >               goto err_detach;
-> >       }
-> >
-> > +     if (direction =3D=3D DMA_TO_DEVICE) {
-> > +             binding->tx_vec =3D kvmalloc_array(dmabuf->size / PAGE_SI=
-ZE,
-> > +                                              sizeof(struct net_iov *)=
-,
-> > +                                              GFP_KERNEL);
-> > +             if (!binding->tx_vec) {
-> > +                     err =3D -ENOMEM;
-> > +                     goto err_unmap;
-> > +             }
-> > +     }
-> > +
-> >       /* For simplicity we expect to make PAGE_SIZE allocations, but th=
-e
-> >        * binding can be much more flexible than that. We may be able to
-> >        * allocate MTU sized chunks here. Leave that for future work...
-> >        */
-> > -     binding->chunk_pool =3D
-> > -             gen_pool_create(PAGE_SHIFT, dev_to_node(&dev->dev));
-> > +     binding->chunk_pool =3D gen_pool_create(PAGE_SHIFT,
-> > +                                           dev_to_node(&dev->dev));
-> >       if (!binding->chunk_pool) {
-> >               err =3D -ENOMEM;
-> > -             goto err_unmap;
-> > +             goto err_tx_vec;
-> >       }
-> >
-> >       virtual =3D 0;
-> > @@ -270,24 +282,34 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
-signed int dmabuf_fd,
-> >                       niov->owner =3D &owner->area;
-> >                       page_pool_set_dma_addr_netmem(net_iov_to_netmem(n=
-iov),
-> >                                                     net_devmem_get_dma_=
-addr(niov));
-> > +                     if (direction =3D=3D DMA_TO_DEVICE)
-> > +                             binding->tx_vec[owner->area.base_virtual =
-/ PAGE_SIZE + i] =3D niov;
-> >               }
-> >
-> >               virtual +=3D len;
-> >       }
-> >
-> > +     err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
-,
-> > +                           binding, xa_limit_32b, &id_alloc_next,
-> > +                           GFP_KERNEL);
-> > +     if (err < 0)
-> > +             goto err_free_id;
-> > +
-> >       return binding;
-> >
-> > +err_free_id:
-> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> >  err_free_chunks:
-> >       gen_pool_for_each_chunk(binding->chunk_pool,
-> >                               net_devmem_dmabuf_free_chunk_owner, NULL)=
-;
-> >       gen_pool_destroy(binding->chunk_pool);
-> > +err_tx_vec:
-> > +     kvfree(binding->tx_vec);
-> >  err_unmap:
-> >       dma_buf_unmap_attachment_unlocked(binding->attachment, binding->s=
-gt,
-> >                                         DMA_FROM_DEVICE);
-> >  err_detach:
-> >       dma_buf_detach(dmabuf, binding->attachment);
-> > -err_free_id:
-> > -     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
-> >  err_free_binding:
-> >       kfree(binding);
-> >  err_put_dmabuf:
-> > @@ -295,6 +317,21 @@ net_devmem_bind_dmabuf(struct net_device *dev, uns=
-igned int dmabuf_fd,
-> >       return ERR_PTR(err);
-> >  }
-> >
-> > +struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id)
-> > +{
-> > +     struct net_devmem_dmabuf_binding *binding;
-> > +
-> > +     rcu_read_lock();
-> > +     binding =3D xa_load(&net_devmem_dmabuf_bindings, id);
-> > +     if (binding) {
-> > +             if (!net_devmem_dmabuf_binding_get(binding))
-> > +                     binding =3D NULL;
-> > +     }
-> > +     rcu_read_unlock();
-> > +
-> > +     return binding;
-> > +}
-> > +
-> >  void net_devmem_get_net_iov(struct net_iov *niov)
-> >  {
-> >       net_devmem_dmabuf_binding_get(net_devmem_iov_binding(niov));
-> > @@ -305,6 +342,53 @@ void net_devmem_put_net_iov(struct net_iov *niov)
-> >       net_devmem_dmabuf_binding_put(net_devmem_iov_binding(niov));
-> >  }
-> >
-> > +struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *=
-sk,
-> > +                                                      unsigned int dma=
-buf_id)
-> > +{
-> > +     struct net_devmem_dmabuf_binding *binding;
-> > +     struct dst_entry *dst =3D __sk_dst_get(sk);
-> > +     int err =3D 0;
-> > +
-> > +     binding =3D net_devmem_lookup_dmabuf(dmabuf_id);
->
-> why not initialize binding together with the declaration?
->
+CHANGES
+=======
+v4 -> v5:
+* Rework the logic from patch two ("bpf: udp: Make sure iter->batch
+  always contains a full bucket snapshot") to move the handling of the
+  GFP_ATOMIC case inside the main loop and get rid of the extra lock
+  variable. This makes the logic clearer and makes it clearer that the
+  bucket lock is always released (Martin).
+* Introduce udp_portaddr_for_each_entry_from in patch two instead of
+  patch four ("bpf: udp: Avoid socket skips and repeats during
+  iteration"), since patch two now needs to be able to resume list
+  iteration from an arbitrary point in the GFP_ATOMIC case.
+* Similarly, introduce the memcpy inside bpf_iter_udp_realloc_batch in
+  patch two instead of patch four, since in the GFP_ATOMIC case the new
+  batch needs to remember the sockets from the old batch.
+* Use sock_gen_cookie instead of __sock_gen_cookie inside
+  bpf_iter_udp_put_batch, since it can be called from a preemptible
+  context (Martin).
 
-I find it stylistically much better to error check this right after
-it's assigned.
+v3 -> v4:
+* Explicitly assign sk = NULL on !iter->end_sk exit condition
+  (Kuniyuki).
+* Reword the commit message of patch two ("bpf: udp: Make sure
+  iter->batch always contains a full bucket snapshot") to make the
+  reasoning for GFP_ATOMIC more clear.
 
-> > +     if (!binding || !binding->tx_vec) {
-> > +             err =3D -EINVAL;
-> > +             goto out_err;
-> > +     }
-> > +
-> > +     /* The dma-addrs in this binding are only reachable to the corres=
-ponding
-> > +      * net_device.
-> > +      */
-> > +     if (!dst || !dst->dev || dst->dev->ifindex !=3D binding->dev->ifi=
-ndex) {
-> > +             err =3D -ENODEV;
-> > +             goto out_err;
-> > +     }
-> > +
-> > +     return binding;
-> > +
-> > +out_err:
-> > +     if (binding)
-> > +             net_devmem_dmabuf_binding_put(binding);
-> > +
-> > +     return ERR_PTR(err);
-> > +}
-> > +
-> > +struct net_iov *
-> > +net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding,
-> > +                    size_t virt_addr, size_t *off, size_t *size)
-> > +{
-> > +     size_t idx;
-> > +
-> > +     if (virt_addr >=3D binding->dmabuf->size)
-> > +             return NULL;
-> > +
-> > +     idx =3D virt_addr / PAGE_SIZE;
->
-> init this at where it's declared?
-> or where it's used.
->
+v2 -> v3:
+* Guarantee that iter->batch is always a full snapshot of a bucket to
+  prevent socket repeat scenarios [3]. This supercedes the patch from v2
+  that simply propagated ENOMEM up from bpf_iter_udp_batch and covers
+  the scenario where the batch size is still too small after a realloc.
+* Fix up self tests (Martin)
+  * ASSERT_EQ(nread, sizeof(out), "nread") instead of
+    ASSERT_GE(nread, 1, "nread) in read_n.
+  * Use ASSERT_OK and ASSERT_OK_FD in several places.
+  * Add missing free(counts) to do_resume_test.
+  * Move int local_port declaration to the top of do_resume_test.
+  * Remove unnecessary guards before close and free.
 
-I think probably a local variable isn't warranted. Will remove.
+v1 -> v2:
+* Drop WARN_ON_ONCE from bpf_iter_udp_realloc_batch (Kuniyuki).
+* Fixed memcpy size parameter in bpf_iter_udp_realloc_batch; before it
+  was missing sizeof(elem) * (Kuniyuki).
+* Move "bpf: udp: Propagate ENOMEM up from bpf_iter_udp_batch" to patch
+  two in the series (Kuniyuki).
 
---=20
-Thanks,
-Mina
+rfc [1] -> v1:
+* Use hlist_entry_safe directly to retrieve the first socket in the
+  current bucket's linked list instead of immediately breaking from
+  udp_portaddr_for_each_entry (Martin).
+* Cancel iteration if bpf_iter_udp_realloc_batch() can't grab enough
+  memory to contain a full snapshot of the current bucket to prevent
+  unwanted skips or repeats [2].
+
+[1]: https://lore.kernel.org/bpf/20250404220221.1665428-1-jordan@jrife.io/
+[2]: https://lore.kernel.org/bpf/CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com/
+[3]: https://lore.kernel.org/bpf/d323d417-3e8b-48af-ae94-bc28469ac0c1@linux.dev/
+
+Jordan Rife (6):
+  bpf: udp: Make mem flags configurable through
+    bpf_iter_udp_realloc_batch
+  bpf: udp: Make sure iter->batch always contains a full bucket snapshot
+  bpf: udp: Use bpf_udp_iter_batch_item for bpf_udp_iter_state batch
+    items
+  bpf: udp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Return socket cookies from sock_iter_batch progs
+  selftests/bpf: Add tests for bucket resume logic in UDP socket
+    iterators
+
+ include/linux/udp.h                           |   3 +
+ net/ipv4/udp.c                                | 151 ++++--
+ .../bpf/prog_tests/sock_iter_batch.c          | 447 +++++++++++++++++-
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/sock_iter_batch.c     |  24 +-
+ 5 files changed, 569 insertions(+), 57 deletions(-)
+
+-- 
+2.48.1
+
 
