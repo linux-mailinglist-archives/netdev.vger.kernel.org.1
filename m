@@ -1,185 +1,120 @@
-Return-Path: <netdev+bounces-185100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672B7A987E8
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:54:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBDAA98843
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143CC3AAFE5
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:54:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F063B6653
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D761926C3B0;
-	Wed, 23 Apr 2025 10:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E66F26D4CC;
+	Wed, 23 Apr 2025 11:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Up4iEUVK"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="uTTjZ0vn"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81F426C38B;
-	Wed, 23 Apr 2025 10:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B0126B099
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 11:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745405681; cv=none; b=kvEe00fFmylmJKoxvl6hEDiiI9IhmeteDj61K8rlOLPrGSxBQ0PrNLY+ZgW6U35wY3butKkfvpfjs2D9oQPLye5+ZqgMQppHXMV/zoWXDVdmn+MMolkVaB+1BokyvuOmb/8WWv1zR+DO3YXY5Gs8a8DkssjgAalf76hlTPCdk94=
+	t=1745406792; cv=none; b=MuU8XHDxzHQEXDVyjI/4gb/NfKRPeKEwyoWS0VDyje0fiY/bG3xXtluYSs2rURCmnydmSwjVX2Y99C2eN8i1Hm47Rev6tW+oIVhUHeRo3LvyR5Kg6cIQAM85Wk70mPIMGXnYfpP110fkbipOKh/h+/6bNrpTDESg/kQ2ZRzee6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745405681; c=relaxed/simple;
-	bh=PKRxF5CSeXMnjowgFobPAyzE/YcGtkyPnA1UcaUN9us=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=a+LcjmrP+aAmIEUhBFNn9Acs/1Ynlxd4CoEG48xtNiLKMafWkZqzL67qLbyaLLHlkpWek0i9/N6Z0MlbeF415BpADvvd9FI8Cr3kmWJqgfDkLPBM/C/V54P6h32PGfTfmQOiRi6dYGOfduLoen1S3LmCU7rj2+OCuXAHQuZLDeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Up4iEUVK; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53NArs5S32446350, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1745405634; bh=PKRxF5CSeXMnjowgFobPAyzE/YcGtkyPnA1UcaUN9us=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=Up4iEUVKeOna4yP778vBMZbKx3A5ugyvfwy4E59mKuVEspOFdjU5nDYImJuGg93Ta
-	 2s3nZiiqJOKmiCKWL6GRdPslfW1tmpOa/rJiQqP+Ok8izxkqZbmczfzalWl29f8xBW
-	 ykmkbtInuWV4wYGYGE091BxRluJdVutQV4RwIZNFQziPGs2P+k8Auy4vZIvBWGvOr2
-	 rwAk0Wsc88eQN5sdtpsUTDgMIIvW/Ria1cF6Lf3epwXpNT7khGrDZ1H0+rUT2/d0tw
-	 020Inc4nvp5WwwScw7UYATJeNHa0EhO6NZloDnpyiOE+sKGhgxRQtbVRPC9lIEAqrf
-	 Lq2AFD62IU/0Q==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53NArs5S32446350
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 23 Apr 2025 18:53:54 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 23 Apr 2025 18:53:54 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 23 Apr 2025 18:53:53 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Wed, 23 Apr 2025 18:53:53 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>, Andrew Lunn <andrew@lunn.ch>,
-        David Laight
-	<david.laight.linux@gmail.com>
-Subject: RE: [PATCH net v3 3/3] rtase: Fix a type error in min_t
-Thread-Topic: [PATCH net v3 3/3] rtase: Fix a type error in min_t
-Thread-Index: AQHbr3bl9x+S2lV3JkCdeosgY8bnPbOvL9aAgAHmKAA=
-Date: Wed, 23 Apr 2025 10:53:53 +0000
-Message-ID: <040b019af779423f96752f10a697195b@realtek.com>
-References: <20250417085659.5740-1-justinlai0215@realtek.com>
- <20250417085659.5740-4-justinlai0215@realtek.com>
- <20250422132831.GH2843373@horms.kernel.org>
-In-Reply-To: <20250422132831.GH2843373@horms.kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1745406792; c=relaxed/simple;
+	bh=z8RrRdhcUjbqoX2RuDxs8KBckaz1DBpRIM7v6Ptanlg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKa5SKQxDCNEBSEfcZLX4X1QDQjeOrbrwexvBocUtrzbo24vYaIH7qpT/CmLSjcHuvH5vq+kuL8Oq9Py/4c7JRhvT5UzUtZ5B7w12paKgEBPPJ2XUKUt627Gxu+KDCJQ0jjxzyHMz+JBJQU54t3NpfFHBqPNBws9oNKhSIq7kcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=uTTjZ0vn; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so57301755e9.3
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 04:13:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745406788; x=1746011588; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9GFYx8qJoY9CCSncpYAexU3+mJqhwMWqryfmBNBNc6Y=;
+        b=uTTjZ0vn7ARxZG7NJbdjLbUTyTtVgAAzfZnn583+ubWwh2O0DgprEg/JL5IWYfi4BO
+         Tbn2O2C+Ih5e0Iah5Eo0Jc6U6drBakfOf12sj0wKJw9g+ZBvCnANy0JwLM6djdqbSnbL
+         P7LTytFMxCOmk83GK/XOSwJ7BS/zObvo3IKocAIC0b8ze5r/Jwx/Huff9nrgY/sInyaZ
+         RafHKX494WeYdA0PclgTLjnYFwnqq5QGezg0YstIIi5PceG+t92KTEXH4S1ffS1kw0X5
+         jISJyobsbe4CMmKKDxVxmjDkwJLTNmPV3ufKFCZr5bndk43LYbw7JEq4sAeNEdEJIscH
+         lvAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745406788; x=1746011588;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9GFYx8qJoY9CCSncpYAexU3+mJqhwMWqryfmBNBNc6Y=;
+        b=s5FpMN4NiI2IM9hTGkUr/nqdabWr4OkCI6Mxk8lX2dZpo8vaFoqNGqB/ouGD1zp/p8
+         3eNjirfQtXlir7FjVxfARl3AOP+TZtawk/mTLtKw375u+HNh12Zl1gp8Hwre+rIHHyZr
+         HyHtNJa5SzP/Z3CIMCU9bx7/E13DAZjvQ0DiZVaRM7uvis/Kw0kD4Z7gKgPuqjM+zC1v
+         aaAwbf+PbYaLhtwQwRYhm8dvjEiKwVvVAc/KWEnmK3QOsriHAB42JJljZ0lDs470m/9L
+         RdSw/IaR+y+BbVoAz1VrG3gVNTpJTBCDA7bE9IH0RMdE/CuPndCCeou0L49o19NQRufN
+         yiPg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9NLMyk4T7TaJyT8iWrIawRK7qDP/3auSo/h87Flu5cLkZxKLW0WHOo1Cg7nxmYoPvz+t167c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHpJ6VOzwxbSYEt7f6ChcumPWkokPphKH2cKgDV+34JBNublNN
+	MsrEEkXUPVQtpVsWRq8GQUgx4FTpARggflqN0hVsD/JzvKUZy+X0udlL0V+yxkA=
+X-Gm-Gg: ASbGnctF7pXxqBeldXYntBV/OEvaQoqxJbpRPWdTJQrrAH3P+qeBfYiC4byi6rNxid+
+	CscBP6P+pezYI+ZjKiulZePt/peTvZ5rLEHyU7LN7ooHF9DDGo9f7uoEd1aKoxYDIQgYdP7PjDj
+	oj8ut7MAY6oVQlmO7in/dSEKgCzQMSUuvDDBZ8tmiWosYPDMfbcDT2Ie9PiUIaa4h0RYy+TgSr0
+	4roNIXbD8RBqKz0wa53qBQi3VE03ROdvL8cYJ5hWrOULoCOk5Y94yKilweZJwFTUJmXSwd7jZFX
+	oqbIw+kzAKCQI55UdbtmLesDY5ss/bkT81DhWh/M9eed6iQ0
+X-Google-Smtp-Source: AGHT+IFHPTkvj4iEwYE+xPPfxMeMcssmSayZZR5ZNZvZNHdFY0ipox3EK9e2j/CLTZBuJV3YFtarIA==
+X-Received: by 2002:a05:600c:54ce:b0:43d:fa59:bced with SMTP id 5b1f17b1804b1-4406d831a7dmr100998465e9.32.1745406787383;
+        Wed, 23 Apr 2025 04:13:07 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4332b2sm18736491f8f.30.2025.04.23.04.13.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 04:13:06 -0700 (PDT)
+Date: Wed, 23 Apr 2025 13:12:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V2 01/14] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <ccwchffn6gtsy7ek4dhdqaxlbch4mptjqaqmh43a3rk7uu6dxu@jfua3hr6zxvw>
+References: <20250414195959.1375031-1-saeed@kernel.org>
+ <20250414195959.1375031-2-saeed@kernel.org>
+ <20250416180826.6d536702@kernel.org>
+ <bctzge47tevxcbbawe7kvbzlygimyxstqiqpptfc63o67g4slc@jenow3ls7fgz>
+ <20250418170803.5afa2ddf@kernel.org>
+ <v6p7dcbtka6juf2ibero7ivimuhfbxs37uf5qihjbq4un4bdm6@ofdo34scswqq>
+ <20250422075524.3bef2b46@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422075524.3bef2b46@kernel.org>
 
->=20
-> + David Laight
->=20
-> On Thu, Apr 17, 2025 at 04:56:59PM +0800, Justin Lai wrote:
-> > Fix a type error in min_t.
-> >
-> > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this
-> > module")
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > ---
-> >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > index 55b8d3666153..bc856fb3d6f3 100644
-> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > @@ -1923,7 +1923,7 @@ static u16 rtase_calc_time_mitigation(u32
-> time_us)
-> >       u8 msb, time_count, time_unit;
-> >       u16 int_miti;
-> >
-> > -     time_us =3D min_t(int, time_us, RTASE_MITI_MAX_TIME);
-> > +     time_us =3D min_t(u32, time_us, RTASE_MITI_MAX_TIME);
->=20
-> Hi Justin, Andrew, David, all,
->=20
-> I may be on the wrong track here, but near the top of minmax.h I see:
->=20
-> /*
->  * min()/max()/clamp() macros must accomplish several things:
->  *
->  * - Avoid multiple evaluations of the arguments (so side-effects like
->  *   "x++" happen only once) when non-constant.
->  * - Perform signed v unsigned type-checking (to generate compile
->  *   errors instead of nasty runtime surprises).
->  * - Unsigned char/short are always promoted to signed int and can be
->  *   compared against signed or unsigned arguments.
->  * - Unsigned arguments can be compared against non-negative signed
-> constants.
->  * - Comparison of a signed argument against an unsigned constant fails
->  *   even if the constant is below __INT_MAX__ and could be cast to int.
->  */
->=20
-> So, considering the 2nd last point, I think we can simply use min() both =
-above
-> and below. Which would avoid the possibility of casting to the wrong type=
- again
-> in future.
->=20
-> Also, aside from which call is correct. Please add some colour to the com=
-mit
-> message describing why this is a bug if it is to be treated as a fix for =
-net rather
-> than a clean-up for net-next.
->=20
-> >
-> >       if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
-> >               msb =3D fls(time_us);
-> > @@ -1945,7 +1945,7 @@ static u16 rtase_calc_packet_num_mitigation(u16
-> pkt_num)
-> >       u8 msb, pkt_num_count, pkt_num_unit;
-> >       u16 int_miti;
-> >
-> > -     pkt_num =3D min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
-> > +     pkt_num =3D min_t(u16, pkt_num, RTASE_MITI_MAX_PKT_NUM);
-> >
-> >       if (pkt_num > 60) {
-> >               pkt_num_unit =3D RTASE_MITI_MAX_PKT_NUM_IDX;
-> > --
-> > 2.34.1
-> >
+Tue, Apr 22, 2025 at 04:55:24PM +0200, kuba@kernel.org wrote:
+>On Tue, 22 Apr 2025 11:14:36 +0200 Jiri Pirko wrote:
+>> >Ugh, I thought enum netlink_attribute_type matches the values :|
+>> >And user space uses MNL_ types.
+>> >
+>> >Please don't invent _DYN_ATTR at least. Why not PARAM_TYPE ?  
+>> 
+>> Because it is used for both params and health reporters (fmsg).
+>
+>I see. Still, a better name is needed. "Dynamic" sounds too positive,
+>and the construct is a dead end and a misunderstanding of netlink.
 
-Hi Simon,
+VAR_ATTR? Any other suggestion?
 
-According to a more detailed clarification, this part is actually an
-enhancement and does not cause any issues during operation, so it is
-not a real bug. Therefore, I will post this patch in net-next.
+>
+>Coincidentally - you added it to the YNL spec but didn't set it for 
+>the attrs that carry the values of the enum.
 
-Thanks,
-Justin
+True. Will drop it.
 
