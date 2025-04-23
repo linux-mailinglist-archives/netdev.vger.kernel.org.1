@@ -1,139 +1,99 @@
-Return-Path: <netdev+bounces-185135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6CEAA98A15
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:46:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 210EAA98A2A
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15D7517420E
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A73BC3AC149
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819962701B7;
-	Wed, 23 Apr 2025 12:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1936BC8EB;
+	Wed, 23 Apr 2025 12:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="VsxM9+Zq";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="nxS5gt55"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dVO0Rj96"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.wizmail.org (smtp.wizmail.org [85.158.153.28])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B38182
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 12:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFF379D2;
+	Wed, 23 Apr 2025 12:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745412382; cv=none; b=D8UaWeDJm+jLWnfmjamna+WovgHvbx7t8vJox/H1kZAzEdf6LaBrvvtxk1bUd17F7m+j77R6PBUImskq5QWxuBXks689qsRiYFSZHeQZlS7+/JUGqJNEstEyL+J6wv+DC8csexUuIxOouRi/LEN/9eT37W77wySvZDvTAwDmfbs=
+	t=1745412845; cv=none; b=pMWpdbmFLc6Tg4St4bmaHJaX726fTaOWvW+MqKDrx/Yg1BAoRwxkz6WQ2TUV/QSLxPAozr7YGaA8ZddXHxebfTyWsuW01avQQ4bq9JOuhtr/1iqMxYFp8ovUhZrlt10JuhaXSs9ZwTQgSRmTbHxnuIlkSUMGPepSWaSrzJUBDIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745412382; c=relaxed/simple;
-	bh=mLoNzO5ryL0WvKWQA8Y33R/f1dQns93JX0EW1zACqKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sclzj33504LdudaMqnzKW6ckjp8vQyvX2AamQ46DOHSQ9m+c/qG71z1axhTXY8JuAQnSyfqzdEpHSp+00BMRQMVK2W24hNIMWnbR45sRECgq2EJQA0hvrGNKP4xhDCuft7IjIjhiHS6sxQmJQE0j/C+QIyH9yjAPbACk4Nu4vN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=VsxM9+Zq; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=nxS5gt55; arc=none smtp.client-ip=85.158.153.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:MIME-Version:References
-	:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	Autocrypt; bh=r2yCm93V994tEJAy0ItMvj0QYVOnPMcgF+UexH1h3TE=; b=VsxM9+ZqIrB2VRi
-	yvkSP4aVoHWNQBp616suu679vfgL7XfYEUNSktaspBFPerRC42XkHRtlw32MLoGeYzzzvCw==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
-	; s=r202001; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	Autocrypt; bh=r2yCm93V994tEJAy0ItMvj0QYVOnPMcgF+UexH1h3TE=; b=nxS5gt55msdAU4y
-	AeCkME5uPwWoGpoU83J2FSjhTEEI7iETsBpPTPElkKVPqxfx6CuOom23NfWZEq5L9AdwSUzV6+IqC
-	5gyz66PuT2AbqqjICbFUJ++f4YuBRQJlBp3ILMhCw7itTFBqyMHbPEUERMJVyZNGbWNdwOm9ePeMr
-	HyEzLMJxfgP2GhlQKoiRG38jGxeWuncX/NmJoImz3MyBBB1DSxWrkIHdtBEkNIhQugFd/46FMC5aX
-	9fuV7Ou9mBj2IxfZpe1Q5kn+JAHvDnN+UJqi+/H2rjKDzl9flndZjd+byYBxa1mwFkf/SYDcEXH3K
-	YEddvtpPumIEHZyPIDw==;
-Authentication-Results: wizmail.org;
-	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
-	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
-Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain)
-	by www.wizmail.org (Exim 4.98.115)
-	(TLS1.3) tls TLS_AES_256_GCM_SHA384
-	with esmtpsa
-	id 1u7ZUZ-00000001iXI-0QR3
-	(return-path <jgh@exim.org>);
-	Wed, 23 Apr 2025 12:46:19 +0000
-From: Jeremy Harris <jgh@exim.org>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	Jeremy Harris <jgh@exim.org>
-Subject: [PATCH 1/1] ss: tcp: observability of fastopen child creation
-Date: Wed, 23 Apr 2025 13:46:00 +0100
-Message-ID: <20250423124600.5038-2-jgh@exim.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250423124600.5038-1-jgh@exim.org>
-References: <20250423124600.5038-1-jgh@exim.org>
+	s=arc-20240116; t=1745412845; c=relaxed/simple;
+	bh=ZKAVMogWXPx2pj2K5Hh9LlE9qAqI5Iu2j9uhvzT38OM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OzlaK1uMP7tYow8zXg+FQ9brS+Y5OL9T+lE7yHkoRGe/RsSQxE+up7hakRIRyT4KAWZpU/dx0QrGAJalI1a71sf3JELBEtmM5aBmoCgnXMykF0DKzibdYJGMmxmo3kqya36jbMQT/lrT4bhBCaiCYffyILkUoTukJY5SJYmExSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dVO0Rj96; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=b0qvYVi5EKKwE4d58vIOem1eVuvc6m9T7pA9hU6GFgM=;
+	t=1745412843; x=1746622443; b=dVO0Rj96yMJJjFjxpy/QBleZZ5HxPWK28C/le7dpDSsps+L
+	X2wYSC+N9iUguA3RTgwunXPmUx1apwxcAj/IFJYnXi4sbr2XzhM26/s9PfOsrAd7maVawqRVZwQuC
+	HRBOhO3tJ8kCBQUE17nxwDbjrSnh+zsja76n+5LoGHTyw7/AAuwhMaBXB2RaLsuJbSbdSvVAuIrfQ
+	2NZLxc4W0EHgMbVtWPm/e+x++HO+AmuN/OTpMSdKzF84rQJ4Q/jMAGmaCKUJWrFUDhQYyxAupjs0e
+	3eN3M2eSQYNQqISRaz5mQccHHyXtmVJPq9zvAdAOWyFLjcnsMLoM4fpNd1upSnQQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1u7Zbu-0000000EfWY-2Ois;
+	Wed, 23 Apr 2025 14:53:54 +0200
+Message-ID: <b30cc04676a031db8c36df243160992094b3848d.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: mac80211_hwsim: Prevent tsf from setting if
+ beacon is disabled
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Edward Adam Davis <eadavis@qq.com>, 
+	syzbot+064815c6cd721082a52a@syzkaller.appspotmail.com
+Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Date: Wed, 23 Apr 2025 14:53:53 +0200
+In-Reply-To: <tencent_096EDEEED78C81A7D006E812E4C66E898A06@qq.com>
+References: <67fac9a6.050a0220.379d84.0016.GAE@google.com>
+	 <tencent_096EDEEED78C81A7D006E812E4C66E898A06@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain) with esmtpsa
+X-malware-bazaar: not-scanned
 
-ss -oi can output "fastopen_child" attribute if the passive-open
-socket was created as a fastopen child
+On Sun, 2025-04-13 at 14:11 +0800, Edward Adam Davis wrote:
+>=20
+> --- a/drivers/net/wireless/virtual/mac80211_hwsim.c
+> +++ b/drivers/net/wireless/virtual/mac80211_hwsim.c
+> @@ -1226,6 +1226,11 @@ static void mac80211_hwsim_set_tsf(struct ieee8021=
+1_hw *hw,
+>  {
+>  	struct mac80211_hwsim_data *data =3D hw->priv;
+>  	u64 now =3D mac80211_hwsim_get_tsf(hw, vif);
+> +	struct ieee80211_bss_conf *conf =3D link_conf_dereference_protected(vif=
+,
+> +			data->link_data[0].link_id);
+> +
+> +	if (conf && !conf->enable_beacon)
+> +		return;
+>  	/* MLD not supported here */
+>  	u32 bcn_int =3D data->link_data[0].beacon_int;
+>  	u64 delta =3D abs(tsf - now);
 
-Signed-off-by: Jeremy Harris <jgh@exim.org>
----
- include/uapi/linux/tcp.h | 1 +
- misc/ss.c                | 4 ++++
- 2 files changed, 5 insertions(+)
+Please keep kernel coding style - the line break there is awful (but
+with "conf =3D ..." on a line by itself it can be just one line), and you
+shouldn't have code before variable declarations.
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index cc5253a5..85b51e4c 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -184,6 +184,7 @@ enum tcp_fastopen_client_fail {
- #define TCPI_OPT_ECN_SEEN	16 /* we received at least one packet with ECT */
- #define TCPI_OPT_SYN_DATA	32 /* SYN-ACK acked data in SYN sent or rcvd */
- #define TCPI_OPT_USEC_TS	64 /* usec timestamps */
-+#define TCPI_OPT_TFO_CHILD	128 /* child from a Fast Open option on SYN */
- 
- /*
-  * Sender's congestion state indicating normal or abnormal situations
-diff --git a/misc/ss.c b/misc/ss.c
-index 6d597650..0df88045 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -891,6 +891,7 @@ struct tcpstat {
- 	bool		    has_ecn_opt;
- 	bool		    has_ecnseen_opt;
- 	bool		    has_fastopen_opt;
-+	bool		    has_fastopen_child_opt;
- 	bool		    has_wscale_opt;
- 	bool		    app_limited;
- 	struct dctcpstat    *dctcp;
-@@ -2613,6 +2614,8 @@ static void tcp_stats_print(struct tcpstat *s)
- 		out(" ecnseen");
- 	if (s->has_fastopen_opt)
- 		out(" fastopen");
-+	if (s->has_fastopen_child_opt)
-+		out(" fastopen_child");
- 	if (s->cong_alg[0])
- 		out(" %s", s->cong_alg);
- 	if (s->has_wscale_opt)
-@@ -3099,6 +3102,7 @@ static void tcp_show_info(const struct nlmsghdr *nlh, struct inet_diag_msg *r,
- 			s.has_ecn_opt	   = TCPI_HAS_OPT(info, TCPI_OPT_ECN);
- 			s.has_ecnseen_opt  = TCPI_HAS_OPT(info, TCPI_OPT_ECN_SEEN);
- 			s.has_fastopen_opt = TCPI_HAS_OPT(info, TCPI_OPT_SYN_DATA);
-+			s.has_fastopen_child_opt = TCPI_HAS_OPT(info, TCPI_OPT_TFO_CHILD);
- 		}
- 
- 		if (tb[INET_DIAG_CONG])
--- 
-2.49.0
+The comment should probably also move because it's relevant for your new
+[0] as well.
 
+johannes
 
