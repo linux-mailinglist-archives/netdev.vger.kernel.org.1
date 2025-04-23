@@ -1,292 +1,217 @@
-Return-Path: <netdev+bounces-185172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763C6A98C9D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:18:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5D6A98D47
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8BB4443454
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:18:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFA5744554C
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9DA923D2AB;
-	Wed, 23 Apr 2025 14:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3DTNLJC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2EC27D773;
+	Wed, 23 Apr 2025 14:36:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEBC25229E
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 14:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE8B27CCD7;
+	Wed, 23 Apr 2025 14:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745417893; cv=none; b=BwMRa26SWkrhr76jM2qv4q1qVHUxJrr8wn1LxJpykOUcuVrqYzKb/P3Z0q4N4/3ugGvIXQXMjefUhffE0wl8GWZPwfP6c3t8i683bf2D+01acuO3Uw9sDcrGsZfAAh9ySJgRPh6ntwJ/X0pgr/oPjqYK+EPIbb1cKDfVY1OPCjw=
+	t=1745419002; cv=none; b=MfRf/77F2Qv4QD/6eM2F3cerNWBr7FnSYXJ23JhT6dVtwx6Ksmsj9fGHv4Aovp4mcc3bGcpTWkmNin1v4+2GvTOqQYTRagKLJp3gMgSWH2Hf3vJ+rtxybnsQmgUDMaRtqMSC5x4RvOZoWWBA/ioVGpUq0Atjmrs++vGNnl7YJxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745417893; c=relaxed/simple;
-	bh=WFW+nXVL2wGxtx5+7mdFHABj9NqZDdjXTJzav1pHL80=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=mTGeAb3wW1spVCz/jfR4h3SmdG/xBrESHnOcdsW2+jMHdFuaj0m8Myw48LUXMyOYOeoFuB7D6VYmBEl3l2hoR9Mrjt0PnX6eyVox6HrLNRdWtB7Fb6SHkt0dru+2ox6jShAZ5kh0kSr75/rzycLGo6bfURrndy1bZ/a7G+U+dK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E3DTNLJC; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4774ce422easo70110101cf.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 07:18:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745417891; x=1746022691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vi6NkGZKPqFR379t/RdwBM9n8qT18BsavZ9QsWAshKs=;
-        b=E3DTNLJC7M7USOqe6flIipG/WFrVY0pkSXeYC/E1StgmmoKNDPh0T0TusLtbZpUWIr
-         x0clo1EYBWC09LhMVXQFehMTPKCcYswPK/KMwwUqno71wszudIHbi0N0q62X9EynlEwz
-         YYul/XjwSdHUa/V0gybZsGl9jjWedGryWjyFAZvqpD17cvCfLjmNmApLxgaHtJuEF8Iv
-         NpgIC3aufrxXUOhLfx60qmwwk1OASDuU7tD2jLiJ+QbYpadrr8PopVxmZhedezcyFrmV
-         USxAFMaNCyliLuizGaS5E0UgeDEM3t9AYZCx7tD5odNegQgiLizpa3sO5OrImERuh25n
-         5ZbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745417891; x=1746022691;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vi6NkGZKPqFR379t/RdwBM9n8qT18BsavZ9QsWAshKs=;
-        b=mgnwdEHDJ8Vie1Tp9MU85BaGnyC/W8ljyi1eKDo5hmPnrIjH2mZQn98pqlGsXOXuUV
-         zdPIskOHyTYYECLabbHahZs8VE3VWSr7H4tvd5fvoyABoEFyWqfSpNp/LypdNO6anvtR
-         lpARChZM//sUha0+7GrmJqZtzDUA1A76YSR7kYueNWXHljBb4YCX5GbE7IqVnC8GLu7W
-         lIJKHafdgGWSqm8gIl7BPdnRSd4Jvr9CRh8iPiesRAHm6eqQmt3YWm4UoeKUSrEk+3v0
-         jD5s8Ey4QZwBj5kilyMEhksrzMq59lGCcshWsmeXauZObe0S3u5V0HVGu5W0pj4f9y+h
-         Nwxw==
-X-Gm-Message-State: AOJu0Yw0/oaA9pU3iSoNtcqK92bV7BKxW68IxegKHh3X1l6+eMbreXmF
-	WDDrXXzq/sf2iNNd72jpzciM2AVQkT6I3A47Wh1qN14i1RqnyWVW
-X-Gm-Gg: ASbGncsFcm3TaII4TomZ4uD4nx0tLSHTKMHjfYwM6XAd4orNls/4b6p7ODSi+kghPeP
-	KgGikxnSaTmlpkfzgEyXp5RvAtWjOyTKV99ygg5m2syAhkdBNkE4KiFbchd2EuvCqgJXDcZsC+L
-	ul7/4CPywRdZbb+3MJv9Kk8J4Nn9fQVh7T831Dt4GNN9DdLe4xgl8fB6WEC57N2TVWeYoDpQRKj
-	O1W/Fkan8G3zwftz8LvhwddUK8LZ+n4bpOi7ZGRe/ICorgLALN+yQPBpUW3PycA/eZ2jBxVImGb
-	3JsK4bkG36Z0Hfn4cQau5WcWEj9HxDuPzD62t2DjAVtrt5/XtVmtULDKzp1QIgLQhb2zN3i2oY9
-	/UuUJa+h4Cba2/5TUcTnO
-X-Google-Smtp-Source: AGHT+IGPeQynyWvwe/noz2uD05L6cYnPjIGgFl+dAtR1yfE/HjwI982UTlvkXWK8g15V49eMWuNwJA==
-X-Received: by 2002:a05:622a:203:b0:476:b33f:6694 with SMTP id d75a77b69052e-47aec41155fmr377075451cf.28.1745417890422;
-        Wed, 23 Apr 2025 07:18:10 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-47ae9c16d3csm68336271cf.11.2025.04.23.07.18.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 07:18:09 -0700 (PDT)
-Date: Wed, 23 Apr 2025 10:18:09 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ido Schimmel <idosch@idosch.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- horms@kernel.org, 
- idosch@nvidia.com, 
- kuniyu@amazon.com, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <6808f6a11ba60_20419294d4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <aAitarcdcgq9x6uL@shredder>
-References: <20250420180537.2973960-1-willemdebruijn.kernel@gmail.com>
- <20250420180537.2973960-4-willemdebruijn.kernel@gmail.com>
- <aAitarcdcgq9x6uL@shredder>
-Subject: Re: [PATCH net-next 3/3] selftests/net: test tcp connection load
- balancing
+	s=arc-20240116; t=1745419002; c=relaxed/simple;
+	bh=jXWH4gWpIEVt9GSvwo7tXrMiNKO8lNf34sBHJdv6D40=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=gwoQGPyPIEbfrDWamOsYAXX2dInhOLMUe8IbdbxK+8Kr4NFxDyOqBRfM9sPAJ0du/ugASnWFhDbcA7XZEYaNBe9JTwWqqYhib7RAEMxF5RSriOtSPnq0/iP/Kgya+9fefgDpLtidlAQn4YDYVwvj+PfIoFVJlZgEDKxAcRArLAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1u7axS-000G3T-Eh; Wed, 23 Apr 2025 16:20:14 +0200
+Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1u7axS-000BTG-1f;
+	Wed, 23 Apr 2025 16:20:14 +0200
+Message-ID: <b06ede77-541b-453f-9e7a-79f3e5591f66@hetzner-cloud.de>
+Date: Wed, 23 Apr 2025 16:20:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Michal Kubiak <michal.kubiak@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Jay Vosburgh
+ <jv@jvosburgh.net>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sdn@hetzner-cloud.de
+References: <d33f0ab4-4dc4-49cd-bbd0-055f58dd6758@hetzner-cloud.de>
+ <Z/fWHYETBYQuCno5@localhost.localdomain>
+ <ff7ca6ea-a122-4d7d-9ef2-d091cbdd96d2@hetzner-cloud.de>
+ <Z/jPgceDT4gRu9/R@localhost.localdomain> <aAEUcXIRnWolGWnA@boxer>
+Content-Language: en-US
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
+ 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
+ wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
+Subject: Re: [BUG] ixgbe: Detected Tx Unit Hang (XDP)
+In-Reply-To: <aAEUcXIRnWolGWnA@boxer>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27617/Wed Apr 23 10:38:53 2025)
 
-Ido Schimmel wrote:
-> On Sun, Apr 20, 2025 at 02:04:31PM -0400, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
-> > 
-> > Verify that TCP connections use both routes when connecting multiple
-> > times to a remote service over a two nexthop multipath route.
-> > 
-> > Use netcat to create the connections. Use tc prio + tc filter to
-> > count routes taken, counting SYN packets across the two egress
-> > devices.
-> > 
-> > To avoid flaky tests when testing inherently randomized behavior,
-> > set a low bar and pass if even a single SYN is observed on both
-> > devices.
-> > 
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > 
-> > ---
-> > 
-> > Integrated into fib_nexthops.sh as it covers multipath nexthop
-> > routing and can reuse all of its setup(), but technically the test
-> > does not use nexthop *objects* as is, so I can also move into a
-> > separate file and move common setup code to lib.sh if preferred.
+Am 17.04.25 um 16:47 schrieb Maciej Fijalkowski:
+> On Fri, Apr 11, 2025 at 10:14:57AM +0200, Michal Kubiak wrote:
+>> On Thu, Apr 10, 2025 at 04:54:35PM +0200, Marcus Wichelmann wrote:
+>>> Am 10.04.25 um 16:30 schrieb Michal Kubiak:
+>>>> On Wed, Apr 09, 2025 at 05:17:49PM +0200, Marcus Wichelmann wrote:
+>>>>> Hi,
+>>>>>
+>>>>> in a setup where I use native XDP to redirect packets to a bonding interface
+>>>>> that's backed by two ixgbe slaves, I noticed that the ixgbe driver constantly
+>>>>> resets the NIC with the following kernel output:
+>>>>>
+>>>>>   ixgbe 0000:01:00.1 ixgbe-x520-2: Detected Tx Unit Hang (XDP)
+>>>>>     Tx Queue             <4>
+>>>>>     TDH, TDT             <17e>, <17e>
+>>>>>     next_to_use          <181>
+>>>>>     next_to_clean        <17e>
+>>>>>   tx_buffer_info[next_to_clean]
+>>>>>     time_stamp           <0>
+>>>>>     jiffies              <10025c380>
+>>>>>   ixgbe 0000:01:00.1 ixgbe-x520-2: tx hang 19 detected on queue 4, resetting adapter
+>>>>>   ixgbe 0000:01:00.1 ixgbe-x520-2: initiating reset due to tx timeout
+>>>>>   ixgbe 0000:01:00.1 ixgbe-x520-2: Reset adapter
+>>>>>
+>>>>> This only occurs in combination with a bonding interface and XDP, so I don't
+>>>>> know if this is an issue with ixgbe or the bonding driver.
+>>>>> I first discovered this with Linux 6.8.0-57, but kernel 6.14.0 and 6.15.0-rc1
+>>>>> show the same issue.
+>>>>>
+>>>>>
+>>>>> I managed to reproduce this bug in a lab environment. Here are some details
+>>>>> about my setup and the steps to reproduce the bug:
+>>>>>
+>>>>> [...]
+>>>>>
+>>>>> Do you have any ideas what may be causing this issue or what I can do to
+>>>>> diagnose this further?
+>>>>>
+>>>>> Please let me know when I should provide any more information.
+>>>>>
+>>>>>
+>>>>> Thanks!
+>>>>> Marcus
+>>>>>
+>>>>
+>> [...]
+>>
+>> Hi Marcus,
+>>
+>>> thank you for looking into it. And not even 24 hours after my report, I'm
+>>> very impressed! ;)
+>>
+>> Thanks! :-)
+>>
+>>> Interesting. I just tried again but had no luck yet with reproducing it
+>>> without a bonding interface. May I ask how your setup looks like?
+>>
+>> For now, I've just grabbed the first available system with the HW
+>> controlled by the "ixgbe" driver. In my case it was:
+>>
+>>   Ethernet controller: Intel Corporation Ethernet Controller X550
+>>
+>> Also, for my first attempt, I didn't use the upstream kernel - I just tried
+>> the kernel installed on that system. It was the Fedora kernel:
+>>
+>>   6.12.8-200.fc41.x86_64
+>>
+>>
+>> I think that may be the "beauty" of timing issues - sometimes you can change
+>> just one piece in your system and get a completely different replication ratio.
+>> Anyway, the higher the repro probability, the easier it is to debug
+>> the timing problem. :-)
 > 
-> No strong preference, but fib_nexthops.sh explicitly tests nexthop
-> objects, so including here a test that doesn't use them is a bit weird.
-> Did you consider putting this in fib_tests.sh instead?
+> Hi Marcus, to break the silence could you try to apply the diff below on
+> your side?
 
-Ok, that is a more logical location.
+Hi, thank you for the patch. We've tried it and with your changes we can no
+longer trigger the error and the NIC is no longer being reset.
 
-The main reason for fib_nexthops.sh was that it can reuse all of its
-setup().
+> We see several issues around XDP queues in ixgbe, but before we
+> proceed let's this small change on your side.
 
-But I can probably use route_setup and manually add ns remote and
-veth5 and 6. Will take a look.
+How confident are you that this patch is sufficient to make things stable enough
+for production use? Was it just the Tx hang detection that was misbehaving for
+the XDP case, or is there an underlying issue with the XDP queues that is not
+solved by disabling the detection for it?
+
+With our current setup we cannot verify accurately, that we have no packet loss 
+or stuck queues. We can do additional tests to verify that. 
  
-> > ---
-> >  tools/testing/selftests/net/fib_nexthops.sh | 83 +++++++++++++++++++++
-> >  1 file changed, 83 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/net/fib_nexthops.sh b/tools/testing/selftests/net/fib_nexthops.sh
-> > index b39f748c2572..93d19e92bd5b 100755
-> > --- a/tools/testing/selftests/net/fib_nexthops.sh
-> > +++ b/tools/testing/selftests/net/fib_nexthops.sh
-> > @@ -31,6 +31,7 @@ IPV4_TESTS="
-> >  	ipv4_compat_mode
-> >  	ipv4_fdb_grp_fcnal
-> >  	ipv4_mpath_select
-> > +	ipv4_mpath_balance
-> >  	ipv4_torture
-> >  	ipv4_res_torture
-> >  "
-> > @@ -45,6 +46,7 @@ IPV6_TESTS="
-> >  	ipv6_compat_mode
-> >  	ipv6_fdb_grp_fcnal
-> >  	ipv6_mpath_select
-> > +	ipv6_mpath_balance
-> >  	ipv6_torture
-> >  	ipv6_res_torture
-> >  "
-> > @@ -2110,6 +2112,87 @@ ipv4_res_torture()
-> >  	log_test 0 0 "IPv4 resilient nexthop group torture test"
-> >  }
-> >  
-> > +# Install a prio qdisc with separate bands counting IPv4 and IPv6 SYNs
-> > +tc_add_syn_counter() {
-> > +	local -r dev=$1
-> > +
-> > +	# qdisc with band 1 for no-match, band 2 for ipv4, band 3 for ipv6
-> > +	ip netns exec $me tc qdisc add dev $dev root handle 1: prio bands 3 \
-> > +		priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-> > +	ip netns exec $me tc qdisc add dev $dev parent 1:1 handle 2: pfifo
-> > +	ip netns exec $me tc qdisc add dev $dev parent 1:2 handle 4: pfifo
-> > +	ip netns exec $me tc qdisc add dev $dev parent 1:3 handle 6: pfifo
-> > +
-> > +	# ipv4 filter on SYN flag set: band 2
-> > +	ip netns exec $me tc filter add dev $dev parent 1: protocol ip u32 \
-> > +		match ip protocol 6 0xff \
-> > +		match ip dport 8000 0xffff \
-> > +		match u8 0x02 0xff at 33 \
-> > +		flowid 1:2
-> > +
-> > +	# ipv6 filter on SYN flag set: band 3
-> > +	ip netns exec $me tc filter add dev $dev parent 1: protocol ipv6 u32 \
-> > +		match ip6 protocol 6 0xff \
-> > +		match ip6 dport 8000 0xffff \
-> > +		match u8 0x02 0xff at 53 \
-> > +		flowid 1:3
-> > +}
-> > +
-> > +tc_get_syn_counter() {
-> > +	ip netns exec $me tc -j -s qdisc show dev $1 handle $2 | jq .[0].packets
-> > +}
-> > +
-> > +ip_mpath_balance() {
-> > +	local -r ipver="-$1"
-> > +	local -r daddr=$2
-> > +	local -r handle="$1:"
-> > +	local -r num_conn=20
-> > +
-> > +	tc_add_syn_counter veth1
-> > +	tc_add_syn_counter veth3
-> > +
-> > +	for i in $(seq 1 $num_conn); do
-> > +		ip netns exec $remote nc $ipver -l -p 8000 >/dev/null &
-> > +		echo -n a | ip netns exec $me nc $ipver -q 0 $daddr 8000
-> 
-> I don't have the '-q' option in Fedora:
-> 
-> # ./fib_nexthops.sh -t ipv4_mpath_balance
-> nc: invalid option -- 'q'
-> [...]
-> Tests passed:   0
-> Tests failed:   1
-> Tests skipped:  0
-> 
-> We had multiple problems in the past with 'nc' because of different
-> distributions using different versions. See for example:
-> 
-> ba6fbd383c12dfe6833968e3555ada422720a76f
-> 5e8670610b93158ffacc3241f835454ff26a3469
-> 
-> Maybe use 'socat' instead?
+> Additional question, do you have enabled pause frames on your setup?
 
-Ack, will change.
+Pause frames were enabled, but we can also reproduce it after disabling them,
+without your patch.
 
-> > +	done
-> > +
-> > +	local -r syn0="$(tc_get_syn_counter veth1 $handle)"
-> > +	local -r syn1="$(tc_get_syn_counter veth3 $handle)"
-> > +	local -r syns=$((syn0+syn1))
-> > +
-> > +	[ "$VERBOSE" = "1" ] && echo "multipath: syns seen: ($syn0,$syn1)"
-> > +
-> > +	[[ $syns -ge $num_conn ]] && [[ $syn0 -gt 0 ]] && [[ $syn1 -gt 0 ]]
-> 
-> IIUC, this only tests that connections to the same destination address
-> and destination port are load balanced across all the paths (patch #2),
-> but it doesn't test that each connection uses the source address of the
-> egress interface (patch #1). Any reason not to test both? I'm asking
-> because I expect the current test to pass even without both patches.
-> 
-> I noticed that you are using tc-u32 for the matching, but with tc-flower
-> you can easily match on both 'src_ip' and 'tcp_flags'.
-
-Will do. Thanks!
-
-> > +}
-> > +
-> > +ipv4_mpath_balance()
-> > +{
-> > +	$IP route add 172.16.101.1 \
-> > +		nexthop via 172.16.1.2 \
-> > +		nexthop via 172.16.2.2
-> > +
-> > +	ip netns exec $me \
-> > +		sysctl -q -w net.ipv4.fib_multipath_hash_policy=1
-> > +
-> > +	ip_mpath_balance 4 172.16.101.1
-> > +
-> > +	log_test $? 0 "Multipath loadbalance"
-> > +}
-> > +
-> > +ipv6_mpath_balance()
-> > +{
-> > +	$IP route add 2001:db8:101::1\
-> > +		nexthop via 2001:db8:91::2 \
-> > +		nexthop via 2001:db8:92::2
-> > +
-> > +	ip netns exec $me \
-> > +		sysctl -q -w net.ipv6.fib_multipath_hash_policy=1
-> > +
-> > +	ip_mpath_balance 6 2001:db8:101::1
-> > +
-> > +	log_test $? 0 "Multipath loadbalance"
-> > +}
-> > +
-> >  basic()
-> >  {
-> >  	echo
-> > -- 
-> > 2.49.0.805.g082f7c87e0-goog
-> > 
-> > 
-
-
+Thanks!
+Marcus
 
