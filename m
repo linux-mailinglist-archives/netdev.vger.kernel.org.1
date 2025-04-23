@@ -1,115 +1,100 @@
-Return-Path: <netdev+bounces-185297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258DFA99B5B
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:17:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B51AA99B5E
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84DE1B83E21
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:17:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4C107AF3AA
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12C21EFF89;
-	Wed, 23 Apr 2025 22:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B238A20766E;
+	Wed, 23 Apr 2025 22:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RswZ3qZu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMEDfEBL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E263586331
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 22:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E22A205AD0
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 22:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745446641; cv=none; b=WqEdFJvVecfOPz03k3W0FmKWuQaLZgnLnqGlP2C/iwxeR95qNgz4uvDEnM55a+lWob28nJvNfT4DulyNg7cp9xN/M+DldX8TLMyeG1w2OiZ4t7+NJNBNMSwNKpcJ8QKpwOVoTkV3rgHln7LqOgAncfiEmb7piydo2w+0Iu0TpMc=
+	t=1745446666; cv=none; b=sTP1Bqo2FloLd0i4n1r2QP6MQkTEPZV4yTBxtS018Q9VTCx8/pedRHfcvIfnm9fz6m7wdLhQzG7k+NpaD1+vUtpzmkO/jfDVUt4qiLXyXpc+lXOIDdodd5+dn8eUWGyAWDhVitCu3ycTTzUqEFsLWSzXZW8FaV8wBwc5OjEWKuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745446641; c=relaxed/simple;
-	bh=vcYM3cGRIV8ga2z6h0eXe3QtkdwpdnrsYFMU/4WLeog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EFyl3WExjI5Q3jVJIj5I/UCrcY0G66x/Z0bUDyRTTq/ETQAzcNGR+HrzJNgI30KXqF1qdiRMfZw9VCkMEsL/+tv2RDzrKvLrcv9X2j6p4vNRqcBZnXneZMg2Lx3qAXEx79QgUyGuxvwcBKBYDQATHC1naSe0Ogj1y340fr++N8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RswZ3qZu; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 23 Apr 2025 15:16:56 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745446625;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r0Pugca4uCw8q3SU8l12BS7UQCUB0ByIynMRUd5StOU=;
-	b=RswZ3qZubhaGXoBHAYXa6YrNySCpNwcOXqbp5gTNYF0OU+2jqfcWS0YtXQLS0dsldUPu7A
-	7JMFUnvbgAqR1gkJK1wgITJqNxDU/z3lAyOYg/IxNcuUYL8qSWCFvi7Np82V8FL6TOrbrM
-	bR6zTCcS+EAfqwhnSYyhnbdOR3CNxRY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	Vlastimil Babka <vbabka@suse.cz>, Eric Dumazet <edumazet@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>
-Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
-Message-ID: <ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
-References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
- <20250422181022.308116c1@kernel.org>
+	s=arc-20240116; t=1745446666; c=relaxed/simple;
+	bh=SS97nWn4q2LvF/GBzO3N76WT5f/w9w88acg4fr3HcCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ISgGSrdteVnXgDd0xT4x3einVXTj+8SkjZrmtTMn5aNlvVYU9QAPFSg6Rja8leyuZtACuE+v4IrQbbz26nkA1+ge84MBPcqBCLj945WEM8whmbdrxrOyGRHCPIuyIjfBA7X6E7Dmy2BtUWDgWoDG8zUfQfdPaJtQt+1H9obr74I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMEDfEBL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B6DC4CEEB;
+	Wed, 23 Apr 2025 22:17:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745446666;
+	bh=SS97nWn4q2LvF/GBzO3N76WT5f/w9w88acg4fr3HcCg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qMEDfEBL6BQwpE73tQxS+DjY4I2le93wPYVknOkrI+rMP7gLUdVQYwZl2zqaAT+xS
+	 FcEVHxZC95oUa7SCbAX5mlDMLgZneQGJs+TSsydLNXL+pz64lIaJEoaM5TMuaJ34B7
+	 9kMmgLbIUgvV8f2evSpojo4/8aF5rIz/9LsjE6xFjrhoahoT2krshH5UhHDVpsSfqu
+	 Baw69NSmTouiuCTw6dTR76m7beIADHyd+jvqpGIuzyxblgZnpyAxjX4dXv8VEvfFdh
+	 DXE0inzT7O7P0nvMYisXVNGl0jyQBhVOcDzispVfuuA+ONdycZ/2bstnCoxeJAep2y
+	 T1en78HGrwENw==
+Date: Wed, 23 Apr 2025 15:17:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, tariqt@nvidia.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, donald.hunter@gmail.com,
+ kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [PATCH net-next v3 2/3] devlink: add function unique identifier
+ to devlink dev info
+Message-ID: <20250423151745.0b5a8e77@kernel.org>
+In-Reply-To: <25ibrzwenjiuull524o42b4ch5mg7am2mhw5y2f5gb6d6qp5gt@ghgzmi7pd2rw>
+References: <20250416214133.10582-1-jiri@resnulli.us>
+	<20250416214133.10582-3-jiri@resnulli.us>
+	<20250417183822.4c72fc8e@kernel.org>
+	<o47ap7uhadqrsxpo5uxwv5r2x5uk5zvqrlz36lczake4yvlsat@xx2wmz6rlohi>
+	<20250418172015.7176c3c0@kernel.org>
+	<5abwoi3oh3jy7y65kybk42stfeu3a7bx4smx4bc5iueivusflj@qkttnjzlqzbl>
+	<20250422080238.00cbc3dc@kernel.org>
+	<25ibrzwenjiuull524o42b4ch5mg7am2mhw5y2f5gb6d6qp5gt@ghgzmi7pd2rw>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422181022.308116c1@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Wed, 23 Apr 2025 13:23:46 +0200 Jiri Pirko wrote:
+> >Because you don't have a PF port for local PF.
+> >
+> >The information you want to convey is which of the PF ports is "local".
+> >I believe we discussed this >5 years ago when I was trying to solve
+> >this exact problem for the NFP.  
+> 
+> If you instantiate a VF devlink instance, you would also like to see
+> "local" VF port? Does not make any sense to me honestly.
+> 
+> Why PF needs to have "local" PF port, isn't it a bit like Uroboros? The
+> PF devlink instance exists, the ports are links to other entities.
+> What's the reason to have a like to itself?
 
-On Tue, Apr 22, 2025 at 06:10:22PM -0700, Jakub Kicinski wrote:
-> On Wed, 16 Apr 2025 11:02:29 -0700 Shakeel Butt wrote:
-> >  static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
-> >  {
-> >  	struct memcg_stock_pcp *stock;
-> > -	unsigned int stock_pages;
-> > +	struct mem_cgroup *cached;
-> > +	uint8_t stock_pages;
-> 
-> Is it okay to use uintX_t now?
-> 
-> >  	unsigned long flags;
-> > +	bool evict = true;
-> > +	int i;
-> >  
-> >  	VM_WARN_ON_ONCE(mem_cgroup_is_root(memcg));
-> >  
-> > -	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
-> > +	if (nr_pages > MEMCG_CHARGE_BATCH ||
-> > +	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
-> >  		/*
-> > -		 * In case of unlikely failure to lock percpu stock_lock
-> > -		 * uncharge memcg directly.
-> > +		 * In case of larger than batch refill or unlikely failure to
-> > +		 * lock the percpu stock_lock, uncharge memcg directly.
-> >  		 */
-> 
-> We're bypassing the cache for > CHARGE_BATCH because the u8 math 
-> may overflow? Could be useful to refocus the comment on the 'why'
-> 
+Neither do VF devlink instances in the first place.
 
-We actually never put more than MEMCG_CHARGE_BATCH in the cache and thus
-we can use u8 as type here. Though we may increase the batch size in
-future, so I should put a BUILD_BUG_ON somewhere here.
-
-> >  		memcg_uncharge(memcg, nr_pages);
-> >  		return;
-> >  	}
+> >The topology information belongs on the ports, not the main instance.  
 > 
-> nits notwithstanding:
+> It's not a topology information. It's an entity property. Take VF for
+> example. VF also exposes FunctionUID under devlink info, same as PF.
+> There is no port instance under VF devlink instance. Same for SF.
+> Do you want to create dummy ports here just to have the "local" link?
 > 
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> I have to be missing something, the drawing as I see it fits 100%.
 
-Thanks a lot for the review.
+Very hard to understand where you're coming from since you haven't
+explained why the user has to suddenly care about this new property
+you're adding.
 
