@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-184927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D60A97B9E
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:18:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED13BA97BB0
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:32:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9FBA3B5108
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:18:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D4A3BBD96
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614EB1EA7FD;
-	Wed, 23 Apr 2025 00:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4897F2566D9;
+	Wed, 23 Apr 2025 00:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fsH5BVhe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcBzlkSw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C631EA7DD;
-	Wed, 23 Apr 2025 00:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9C1F6679;
+	Wed, 23 Apr 2025 00:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745367529; cv=none; b=qWElFDW7OkJpbLIMu1hsNjwWTVfHB9zyTV0Gpt/fLUyB+v23J6A2gB0VUSKsI5fBPXMrpBEmun1MDxx6SIhltJzUeq4so0l3NY9zHayGCw7HC3N3j+WhZq1XpRtFAEZEyAc8X47Yrs148Qo6UwO5eQhx2kqbpgnq7RpQ89BH5mw=
+	t=1745368351; cv=none; b=oAynKeL+GdrtIvIarvAcnC62Gz8y1ut08iaZpoVtf5r5jJoZbbhlYq/Nsv6G1zuYlcGGIDnSOFAzS5EhYT1OWJOrSFigrpg34ijbNfaOW0cjxm3THzgRZExXqPrXGcTSqU+zO239/IWwSPsnynn+HjKqN6dkSX4ODBoa0t7IE30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745367529; c=relaxed/simple;
-	bh=ZNxOHaeGy5AnoXe7j6R1daES+ngPlMQqefaZFX2wrcE=;
+	s=arc-20240116; t=1745368351; c=relaxed/simple;
+	bh=lp1Re+DHc+mgySgQWvfsd6t9SXf7l9beLDcsufq2Vcg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SZFn6kthumuBLBPjYF85V5gfy4b5rx5NMv15mgLCGQFBa3WzKRHUh0eUsK8Y1MQHe0gndIxBvXPxjTI4QSWls8ljxOvK9SU5ZOKHb6VXaAX4FpNkBLZGLIrSW/RC2YK1NoUmw2l/BlM5RkoVA1o59mCj0xyeLmlrRTzfkpfT538=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fsH5BVhe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DAFDC4CEE9;
-	Wed, 23 Apr 2025 00:18:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Nf1EU9dc+bp6LuhD1wN5sB01dPKt/OzPLUBrN/psp4vWgBwZVN3d3WlL8NJvB3RTRUR48k2Y6ppILAAD2UmxwBlpf0Zu6OWs2zFwNqk9jHz3KEbo4DSanud75O3To6fsA4V5XTo/Np0ZXOCjv+xvcRrokTUspePdNY4xxsKkOVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcBzlkSw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11C4CC4CEEC;
+	Wed, 23 Apr 2025 00:32:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745367528;
-	bh=ZNxOHaeGy5AnoXe7j6R1daES+ngPlMQqefaZFX2wrcE=;
+	s=k20201202; t=1745368350;
+	bh=lp1Re+DHc+mgySgQWvfsd6t9SXf7l9beLDcsufq2Vcg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fsH5BVheu4QuBeLXL86opbP6Rz2lAnRJUPvFbZeYbhJ0JeAhXR83jNniM9gQTJIp7
-	 mOhwG/5xSgu/+9BdkJsPWn2yAEr8V1Moc6o9I0+xvd3nh/TuFRpUCJA/pv2yfD+6HF
-	 QONha8mDriVwdiZE0bnzsYB7FUb5A0zm5pergUz1ny+VLmGK4hl8nj7he1POpMq3qO
-	 WpBfc++/GPqiJAte7veyPM2PCsdCgW3DoxhtP07WYnaFGwJiMCvTvGI1VursA03N6G
-	 Ctg/gtP6Sf7IOfOgG2WK86GlbNDY8aYhI5zDFZ7UUsjjVi5naW3xWtZ/jF1bUFwrlU
-	 ANRxrdYSkMftQ==
-Date: Tue, 22 Apr 2025 17:18:46 -0700
+	b=EcBzlkSwgVXeXq0OP9SDOs2b6Jr32j/lLepVrtr2Sja/t9U7Wud84tvfCStkBSD3a
+	 jB789nR2EqmmU4fhGZPrq4f6qDZvMZpKME0Fgz0rPko8oVDUl34bGfTxCdvJ1hwOv1
+	 Eqwyucb87XHd9AQK5J1t1RkOBmfDMIkAt6J2xoNLBJqA7w7pbw0ZSOCLmRbklZhvGp
+	 2q/TPYHXUuiMtkQZBdh8xErMRdj0BsfGCdoVSJ6CQt/Nsz6u/+CCiuXQVDccuJ7h73
+	 OkZKZAOmrP4kl7+trV7jHFFEd/7+l/lgkuNJ6Jl6bEqW1I/WoxoPguOBbFwxGFjvp1
+	 p4+vyaCPH7Hhg==
+Date: Tue, 22 Apr 2025 17:32:29 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org, mhklinux@outlook.com,
- pasha.tatashin@soleen.com, kent.overstreet@linux.dev,
- brett.creeley@amd.com, schakrabarti@linux.microsoft.com,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- rosenp@gmail.com, paulros@microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] net: mana: Add sched HTB offload support
-Message-ID: <20250422171846.433d620d@kernel.org>
-In-Reply-To: <20250422194830.GA30207@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1745217220-11468-1-git-send-email-ernis@linux.microsoft.com>
-	<1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
-	<20250421170349.003861f2@kernel.org>
-	<20250422194830.GA30207@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+ <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v4] rtase: Add ndo_setup_tc support for CBS
+ offload in traffic control setup
+Message-ID: <20250422173229.6dc21ff5@kernel.org>
+In-Reply-To: <20250416115757.28156-1-justinlai0215@realtek.com>
+References: <20250416115757.28156-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,15 +62,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Apr 2025 12:48:30 -0700 Erni Sri Satya Vennela wrote:
-> On Mon, Apr 21, 2025 at 05:03:49PM -0700, Jakub Kicinski wrote:
-> > On Sun, 20 Apr 2025 23:33:39 -0700 Erni Sri Satya Vennela wrote:  
-> > > This controller can offload only one HTB leaf.  
-> >   
-> We selected tc-htb for our current use case because we plan to support
-> multiple speed classes in the future.
+On Wed, 16 Apr 2025 19:57:57 +0800 Justin Lai wrote:
+> Add support for ndo_setup_tc to enable CBS offload functionality as
+> part of traffic control configuration for network devices, where CBS
+> is applied from the CPU to the switch. More specifically, CBS is
+> applied at the GMAC in the topmost architecture diagram.
 
-Which net-shapers also support.
-
-IIRC HTB offload requires that you dynamically allocate the Tx queues.
+Applied, thanks!
 
