@@ -1,110 +1,112 @@
-Return-Path: <netdev+bounces-185281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25AE3A999D7
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:02:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3211A999DB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 887EB7AFCA5
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:01:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 461285A2DE0
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E9C1917CD;
-	Wed, 23 Apr 2025 21:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A19D26B96B;
+	Wed, 23 Apr 2025 21:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="BAd1EBng";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="S5KYAfqt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ev2iaQ8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8116DCE1;
-	Wed, 23 Apr 2025 21:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A992A2676CD
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745442128; cv=none; b=F4rhYwbyfDyjuOi1eZ1t1yxDKhCKqWl1GAJ8+/mfvbYl7VncTO6gjqmLpR+Hj6CDDxEUl4+J9vU/3R3p5QVrqppxgSfzDbvF5oCfbaYsAJPNUL7SDHqvDvaK1HERnOY2abyC54tEo4fJiiiYFXumHBD92zp0RA6YADxZUAaw9qg=
+	t=1745442308; cv=none; b=aJNG6wB+cvMnO+kMBDgNZy20A5CM6BfHaq05bI1Ed+wqkg9ZGw5hffGfoN4JkhdXCnvHRf67alHTz6/YZK/UkbfOiM7sakBReFmphAVoSqpdNFUofk4xgorjGU1s5TU7n+mdA1Gqn24clZMErniLEElf7x6EAzl5M13jZR/ymrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745442128; c=relaxed/simple;
-	bh=m0NRbO5nY7qHPSrRaqy1oF54g1J1IPbxCrbifZ3F7bc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OCt36C6r8wczThxlTXaHlT22ofM4Q8pXDDmlQaZZyikfdGOCQIERd8bcIbLo+voRrh1e40EYmyu+gOyQQZyMWRahYCAX9TCOQnTObX8JYeHvpGtrp05F9zqfNZpgkazNLjKB5QrnZ41OVrUw/XFTQ8g4R9a/XNQkWZr0kkSomCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=BAd1EBng; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=S5KYAfqt; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 786596068D; Wed, 23 Apr 2025 23:02:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1745442123;
-	bh=U6mHiAVlBrKayEMdAqUBFkPkm2rVLSbO0qLr9kMNgmM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BAd1EBngZjTFQdXKG1mf0e99IJBFfdIc7mZOQuN/oDBM/NvlycNPM6jyiBQTo26Xg
-	 wilGFglqoLQPfIiKlYY/2wj5fNIhMWPLfNnb4UX9I3xN0SlWS/Ol44wdjhnzR93r6T
-	 qnCmvasMvnn7tIgSZm5dxuQ5VHFQr0lbdrP3Fc9owxr0oyDFbl/Lv9yfgs5p5gJqgM
-	 C+ck43aK1i2+hGYXZ//Tey5OxtgedgbNsz4+dB0w6HyB6hONGB33AXQmNqOtGNvVoQ
-	 h940jpKV4sTEGPytL4dL1IfeWqg7hUUx9FoJlF/3ln0vQyvthbe9efUU2oW8jVEe/x
-	 6hPFyidGMzUeQ==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 69D8F60614;
-	Wed, 23 Apr 2025 23:02:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1745442121;
-	bh=U6mHiAVlBrKayEMdAqUBFkPkm2rVLSbO0qLr9kMNgmM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S5KYAfqtPU8EUYyvJMOUG9jp4ByyabH4zD8mBcMtXaradeIkxbtDQJrB7sw/lpPbt
-	 pkKIQexK6HfbRu8wFMuTXeCaz+bBLfjPiQB652dS57mBuTafC0s7E3Z+coG+5Lyxqi
-	 fUQZNzI5HkKhvWu0VikBbsMBME/wpKi3j2PFOw+RCn2WQ34u0SJodFTxFQmMyCvorY
-	 U37f8sAGTuDl34N43jCDwYo8CW5kom02XLsJL1tcM6LKugJB2tA9vJk5gEVk6ArCNd
-	 axKCpHvB1eRs/FkPn/nazFQO0wEsBQbuFx4zp+XDoIP2fr4lKbvqYMM0j1x43K4h3B
-	 EtoObU34J3MLQ==
-Date: Wed, 23 Apr 2025 23:01:58 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
-	edumazet@google.com, horms@kernel.org
-Subject: Re: [PATCH net-next 4/7] netfilter: Exclude LEGACY TABLES on
- PREEMPT_RT.
-Message-ID: <aAlVRq-ol-3jj1ml@calendula>
-References: <20250422202327.271536-1-pablo@netfilter.org>
- <20250422202327.271536-5-pablo@netfilter.org>
- <20250423070002.3dde704e@kernel.org>
- <20250423140654.GD7371@breakpoint.cc>
- <20250423144914.GA7214@breakpoint.cc>
+	s=arc-20240116; t=1745442308; c=relaxed/simple;
+	bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sdNpCi/zUIOHgsrlSwBZs6299aBJxXem3Dz2a8vhCvGYoO15V6msQkZXil45JGao3M/6z5tmG2eT0HEeEM+8Z1aTcQS8ztix/N4Afb/OMqiclW6t2pN3VWyyRNsZg3P/3FmtIxMDtyQ2txg40xnAplQDE0Kb4+S+YimoqfQ2ekM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ev2iaQ8o; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2264c9d0295so67365ad.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 14:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745442306; x=1746047106; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
+        b=ev2iaQ8ogdlVbifq/mNf3myZ835iVFcSY9oHQZCoB1gocISvFK3qLX3Fb7n+MRHO2/
+         n7Fj4/hJLHqw8sAfJeXom4o3m5hV5XCOHO0rP1yKrBcafDrSBNZSNlkVSqRfFTLT2LdR
+         IfDqYq3DYE7e1DGZxg0ftgGHaxd/uCg4KvlYCHdJG02/FiLLf6PYWVUNNVRtnxqp5rOA
+         F0MXX+FE/doSQhwac6iuPh4iejYSnn7vbqmj/72oXnWGOpp8WP7oAJ/vxOPtZpaED/AL
+         OK8k+Eh2l7lO/S/zFqFSLlX8vMxavV22OLBE/qEUJx1qbv3jQ94HABeuPwByi+u7xFCi
+         CPig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745442306; x=1746047106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
+        b=Uynk3xeqPYq1MssOX5PT9L2npLDuuJenb3yQYC0f+ioE3Ylo34TMa5oH8QjHhOwlIr
+         AT3D/I27lTz25H9mgmHW04/tTiO6fFlE8JKB22WppAhmUHWiFE/5nNNFtiBqo18Bwmtn
+         ZQ3u6srKIZOKTsJaLH2gdr+iGSUCNTG+Nx2WDA6TuD3I14m6rYckoa4eDsFjIJMZ1taR
+         O4UzsezAPP2V7IT2+d4V93eZYORM0oX/E73UH/ymmrrJ9yvCEoKXafB+/ABHIWBECFPb
+         wGf/dJbyfKzurSXJDxgCh13BrQWmCmyVpfl7T1gJIGWtH96OAtle4tUCawsNCuEANKV8
+         zSSg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7IwuTKcOtBsEpdRWREcw7NATXa7fJLbmi3Xo84VGBTaPYWWXyAg9uhjnnD+Ip/igxrc1s3Vg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJRZj7OsN6ULDeqY3HspgMWEkyMW2FV26ZeXWL1ejMIoCSY5M2
+	3oBiSKlVq/lS0T7mAP1hWfJbYuGHa09sw2HEXIMnmUC+TkK2Q6lQzs6tkqXyQL2NcYItem5tPj/
+	O57VULxSEPNgKjPHwSYNLfvYaPg1SbWTaHzvu
+X-Gm-Gg: ASbGncuBLTVZKUzQma27V46Nym5DMDoPLwk2RFwlUCwNHzFgmHzHFdQE0IZYATTkG8I
+	j+2hZe+ToRq9Lp/bpYV2btBPeXl71gm4L9k7SUILdNsHCdlz9SIYYkXl/SVG1K4GYim6yo8KCKx
+	Xzyh+Py+twC5fEqqs0aCwHHlKpA+0cW79FOVwY0hgb0UAtVV4xrRUGETvtAtFnvOE=
+X-Google-Smtp-Source: AGHT+IH17FUDJdpzdq5TseYsn861iLDhqtSJ4arBwM1adaGGNEcSmFuu4gJettT+LWVYzPU2tHb+KFq1OujDKzFrei4=
+X-Received: by 2002:a17:902:8345:b0:21d:dd8f:6e01 with SMTP id
+ d9443c01a7336-22db323ece3mr130305ad.5.1745442305587; Wed, 23 Apr 2025
+ 14:05:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250423144914.GA7214@breakpoint.cc>
+References: <20250421222827.283737-1-kuba@kernel.org> <20250421222827.283737-11-kuba@kernel.org>
+In-Reply-To: <20250421222827.283737-11-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 23 Apr 2025 14:04:51 -0700
+X-Gm-Features: ATxdqUEOBFGQsgU2RTNPz8b_mfidSLuKS_NFMvxoT2inFFMetFOSPsdEWvftJ-k
+Message-ID: <CAHS8izOPQ_dF0M0RunYhXnUwUQ_ac3hTRjdNjbNPhOyLU+veJw@mail.gmail.com>
+Subject: Re: [RFC net-next 10/22] net: reduce indent of struct
+ netdev_queue_mgmt_ops members
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	donald.hunter@gmail.com, sdf@fomichev.me, dw@davidwei.uk, 
+	asml.silence@gmail.com, ap420073@gmail.com, jdamato@fastly.com, 
+	dtatulea@nvidia.com, michael.chan@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Florian,
+On Mon, Apr 21, 2025 at 3:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Trivial change, reduce the indent. I think the original is copied
+> from real NDOs.
 
-On Wed, Apr 23, 2025 at 04:49:14PM +0200, Florian Westphal wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > I can have a look, likely there needs to a a patch before this one
-> > that adds a few explicit CONFIG_ entries rather than replying on
-> > implicit =y|m.
-> 
-> Pablo, whats the test suite expectation?
-> 
-> The netfilter tests pass when iptables is iptables-nft, but not
-> when iptables is iptables-legacy.
-> 
-> I can either patch them and replace iptables with iptables-nft
-> everywhere or I an update config so that iptables-legacy works too.
-> 
-> Unless you feel different, I will go with b) and add the needed
-> legacy config options.
+That's exactly what happened :D
 
-b) is fine with me.
+> It's unnecessarily deep, makes passing struct args
+> problematic.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> net tests are a different issue, they fail regardless of iptables-nft or
-> legacy, looking at that now.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-Thanks.
+--=20
+Thanks,
+Mina
 
