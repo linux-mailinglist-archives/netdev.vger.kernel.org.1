@@ -1,236 +1,224 @@
-Return-Path: <netdev+bounces-185187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3428A98ED1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:00:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1E76A98E36
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 890DA461662
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35B5447E45
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE40263C9E;
-	Wed, 23 Apr 2025 14:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163D827A12D;
+	Wed, 23 Apr 2025 14:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lwYNfYdx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2059.outbound.protection.outlook.com [40.107.236.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5835281363;
-	Wed, 23 Apr 2025 14:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420289; cv=none; b=gMO+Z59N17PJQZC79FOUSzqSlmgHrFZ+pQ5x+6RxpETQjA1WRDPanfOVa/TToZ9kIHMZdhLSp4c+E8AcjqlxMUQY1r7TG2fe/5vnhuMBNjrZUNAc9LMBLVGSeWRSZDZtGot6IsezGU6+D87AkgAAU/gTRmfgnzLaAUEaKC7sOWk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420289; c=relaxed/simple;
-	bh=jnfqlRhyk0nxJXxoUORXfipw+CR6jruRhOi93htI5a8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MWhZAT2PT9QuBGoWD4K0PU4hYbhODA6gebNk+q9tAbwC+1EYWlxw+RFouwLPmNJ3uddwUu9hJvaGtsu6tyRYqzDO56fCxK2rAqyqc8pljwmF4Kgk9k909YMKp4SvAmcnSFbzwJhoj4zY4TC/X06B/o3vicAQTlhtLp9O1R48k/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c5aecec8f3so397944485a.1;
-        Wed, 23 Apr 2025 07:58:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420284; x=1746025084;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hlyPTphf+x28unQ9fsmlIwni94vcWgQaX/dq2nBGd2c=;
-        b=uo70yKrNm5TbrHdXKvXWi8VnQESgYgOVM1K5HXlAo16VYU45OYFJe9ua/Sa2iwLV6+
-         28WHwOkgnXp9EQjg21NVCeYrNWh9xiZZhO8FP6rNkBvDgz2AiYgSDW7ZOASqyY9cmkPf
-         BTP2J/NTbYUVFOhKF3l/AT+k+rKw96giRmEFMFlD77ggnkP93jk6zAk9cpr6d4setTiq
-         H20Oj+AFMqW0rZ9nT7JYi2aq8cNWgd6iT+3TxEsSKAiX56Z61og1+GyMJq4t92Qi48kQ
-         ORC066vv1rMfoyMpKOSsNVUZNreZDGpmij5axRIJoCXb+OmTZSO23aqKXjfrKKupXZKJ
-         XQ4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVbZaWCugcFVPmvcT9h4IJu+gAbtzcXOTOhnXfHYnlEYimt1l8LRTOoA1bnt+HPPKaw1fRZiS/+@vger.kernel.org, AJvYcCWJ7+toTLi1se2nADmhVQnjsi5cju3HVfi9U5h0Xb7k4+jPTJ/mbBQEHu/lrYVp9vGdAza01ym70M8=@vger.kernel.org, AJvYcCWmAR8UNFF/kdfTltg92iPVUWvqfqBqenGXPPEBjaHCC8aNDtLcrI7APaW2OoxX2/M9FyKrwpRXP+8+Eo3N@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCAjyH46+Wi163XODQ7KI/n1/qHZAh71DulJyRjfovY0HkRSpO
-	lqhBny7gCTap7ilY9CVCm1+CaE8pBzmsJEk/a3tOAEDsozjjZ40Kv6E0JYZ3m+c=
-X-Gm-Gg: ASbGncu4LKHFcUuoVZBEuLcCiDylHBrBINwVtGYkmlWsn7d5KmMNrheIbn2OGAZXrn8
-	aUbCCror/X0gqli0zxpe1iFvDEXsSxT8t3cn+/OVHDWyWAv5EWwL5ACCyQF7EvEI/MkmM6z43rJ
-	kU7KweJiZoiStWd0zmspQp2pb2s0iUedrE9zpa0mFIGqPkpRUGr5/GO83AD7L0bR7tzvH0MUe2X
-	vajEiijipBkB18jtfaec/Wq14UPTHtjDQZYAmSF+rYEV5qTsq9U4rR58O0V1X+pcY01PPNfvjoo
-	2L5f1+jfV6VETp1ehaJXkkcUvWwKuJvnoQeE07Z7Jxed6SRZ27BYo65xAw8j4R7SQsJG6lCvl2e
-	VGGAl9E0=
-X-Google-Smtp-Source: AGHT+IGsXgE4cnpqPU+SPp8fFl9Kxl40eBT7/qjgJZoSA8IrqAUo4bACVTD1sY9dv1/pRyXoi8nFUA==
-X-Received: by 2002:a05:620a:1790:b0:7c5:4b24:468d with SMTP id af79cd13be357-7c927f594f8mr2723135285a.2.1745420284118;
-        Wed, 23 Apr 2025 07:58:04 -0700 (PDT)
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com. [209.85.222.180])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c925b4dbdbsm688524185a.68.2025.04.23.07.58.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 07:58:03 -0700 (PDT)
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c54b651310so902884985a.0;
-        Wed, 23 Apr 2025 07:58:03 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU7L5GOAoLnNdpzwNAd+rhMJM+znc5VuHw2IfNDUbsdwNDyKtk5weFJmCyk1ERe3px2DAp8mdoF8vc=@vger.kernel.org, AJvYcCX3efPKSfbUpf4hWr9NrfiVUxOZCNewxx2qjUwajaxji8siOvkKj/13zMZ5rVY+k5H9X47pWaQD@vger.kernel.org, AJvYcCXYvXlEmKLEusF2FZBenHXVXs9R9BMApYP1nTXFE+L5+pCq+GurBi2ip7Io3/TBpEd7cA6AEvR029TWxM/n@vger.kernel.org
-X-Received: by 2002:a05:6122:793:b0:526:285a:f4b3 with SMTP id
- 71dfb90a1353d-529253b90f7mr17209301e0c.2.1745419814638; Wed, 23 Apr 2025
- 07:50:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599D618DB17
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 14:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745419952; cv=fail; b=UuASXqS0sUarvg0uxjCHfgG313UALTs+xOhAXmQvGLy48vQWsYbldLgzp1AwF8NyPq3ODc00d7aJcNyA36/eWOHQHxxEqy4AV2+j1+PjTh6kwt1nPkFQvrpLeWkRPGPhcGrsqfbdsWw+jQMZl62mQnwzmbytSWDjhdWTcMHvD1Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745419952; c=relaxed/simple;
+	bh=OpPC+PJG9d+s0zxGATqk2d8A8LpWWnsdGtYWbQuc71w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Dim34J2DZ7kkWcKJO5QLskqxNZuzkYaR6AB/1WfINqUimSnxwH0NSzaJOFZb2XKCIM4RqxxiTsXxY+C1WguG07hFRTLty3ClwjFIBUwMbfHKwmSuSMHh8K0W81uLGl6BLe8C+grMwXp4le9lMZw++81mua1TAFFHjRkF+mnhE24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lwYNfYdx; arc=fail smtp.client-ip=40.107.236.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=paV+yFOb6lfzwe9oY+IUlGjD2z8SDE8PgYidHRqURlCQqz8+7+BpCOfX/2GQGdbqd+utuRpDXeKKSiJ8nHgrSbbVYLUhinA/vmhuAq1ttd440Hz9XfGiM/bTFWyT9o223uvUxaGRfwL7e2wWuq0a+HVuLvZDX+FuNV6VyeEWJqLL2kujVcZygDFNKuhteRqW1ExCiFFgS3CUzaYZMI3vZKlsuxU9p7Dps/JiqCzrt271cb5mOSby3UWBnF/jl5qGxo/oqccDEq2OdEyxtaDSOZLMzrLiaSE+TbzMe7s6inRYcCMbQOuMWThtViXkE0Z7eH/JQXzL4tZIIRkH7IVLoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Heej36mRUmSqEoZZc6pAYiqSKflMoOuNJF2kihLems4=;
+ b=d9DBUZvDCVkrjq7SXG8DwVUKWDMuX5Qz408VF3YzlfB8acpdOPk0AYizsE7cYVdgBkTm010QNl6OqesHtrCgprJ6UyA36I/sly8nJjO2vfSkUbPot+cAx+XcZsi2lVTyxJHAPSDcnBjMpWoH6haI8QCo5xz6ATaBeQdqp1+GWu8usYET4EG8kDCL/ylBo8USDb+k+FC/zJHzi/8giDCzSSssOZxaZsuoIVNm3wtpq+ydf80DVSGjzMlFyjn7R/y0qH7ILo7MFSD9+rQ20YLAsqumQdbaRI/d+rnakS+bz6XjpIz7GX1Weza+ESzK1FQmM9IykZ+KBDMjuRZZSGC9kQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Heej36mRUmSqEoZZc6pAYiqSKflMoOuNJF2kihLems4=;
+ b=lwYNfYdx1B6p9A3QVnVRiFvFUrR/xbbHgwDYhlJcLC4eiq1mOGNWwKM6erhEmnXOJezRFkfv8jkG0fOyDzqnCeOVPsfcWTsrlLM6wZXfvaD6Xz5xtkpvv4MTd2ION47h66ugS9n84PUIng6tp1/F37lNVG2UWm+61hKy5J+CxW2OgRmoXLsMK0uDgF/53opc/9DECY6pGRC2FT1yEy4LmWfMqgGDN8WmaC1ZknpoWj8oiEdr6cJuaWqcMAr1NeGEwD8+h/ReTQxheCW8Es8Ht3Sd76smv6b4b2dojZbpzK34Y3jwUvLsSueCtFye+pNd3ltMMbxFP93p3lw8gkyCrA==
+Received: from SJ0PR13CA0037.namprd13.prod.outlook.com (2603:10b6:a03:2c2::12)
+ by DM4PR12MB5769.namprd12.prod.outlook.com (2603:10b6:8:60::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.33; Wed, 23 Apr 2025 14:52:26 +0000
+Received: from SN1PEPF00036F43.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c2:cafe::13) by SJ0PR13CA0037.outlook.office365.com
+ (2603:10b6:a03:2c2::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.15 via Frontend Transport; Wed,
+ 23 Apr 2025 14:52:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF00036F43.mail.protection.outlook.com (10.167.248.27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.12 via Frontend Transport; Wed, 23 Apr 2025 14:52:26 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 23 Apr
+ 2025 07:52:11 -0700
+Received: from shredder.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 23 Apr
+ 2025 07:52:08 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <razor@blackwall.org>,
+	<petrm@nvidia.com>, <roopa@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net] vxlan: vnifilter: Fix unlocked deletion of default FDB entry
+Date: Wed, 23 Apr 2025 17:51:31 +0300
+Message-ID: <20250423145131.513029-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <PN3PR01MB9597382EFDE3452410A866AEB8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <PN3PR01MB9597B01823415CB7FCD3BC27B8B52@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <CAMuHMdV9tX=TG7E_CrSF=2PY206tXf+_yYRuacG48EWEtJLo-Q@mail.gmail.com>
- <PN3PR01MB9597B3AE75E009857AA12D4DB8BB2@PN3PR01MB9597.INDPRD01.PROD.OUTLOOK.COM>
- <CAMuHMdWpqHLest0oqiB+hG47t=G7OScLmHz5zr2u0ZgED_+Obg@mail.gmail.com> <aAjthvTuIeUIO4CT@pathway.suse.cz>
-In-Reply-To: <aAjthvTuIeUIO4CT@pathway.suse.cz>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 23 Apr 2025 16:50:02 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXuawN0eC0yO40-zrz70TH-3_Y-CFSy6=hHCCMLAPvU5w@mail.gmail.com>
-X-Gm-Features: ATxdqUEtXjwX1Xvi6EF4OaIe3skICOJiGJO6vzaZtD0WSg84WGPiul-c6IaIVeg
-Message-ID: <CAMuHMdXuawN0eC0yO40-zrz70TH-3_Y-CFSy6=hHCCMLAPvU5w@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] lib/vsprintf: Add support for generic FourCCs by
- extending %p4cc
-To: Petr Mladek <pmladek@suse.com>
-Cc: Aditya Garg <gargaditya08@live.com>, Hector Martin <marcan@marcan.st>, alyssa@rosenzweig.io, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Sven Peter <sven@svenpeter.dev>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Aun-Ali Zaidi <admin@kodeit.net>, 
-	Maxime Ripard <mripard@kernel.org>, airlied@redhat.com, Simona Vetter <simona@ffwll.ch>, 
-	Steven Rostedt <rostedt@goodmis.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, apw@canonical.com, joe@perches.com, 
-	dwaipayanray1@gmail.com, lukas.bulwahn@gmail.com, Kees Cook <kees@kernel.org>, 
-	tamird@gmail.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org, 
-	Asahi Linux Mailing List <asahi@lists.linux.dev>, netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F43:EE_|DM4PR12MB5769:EE_
+X-MS-Office365-Filtering-Correlation-Id: e71244d7-bf47-42c7-8687-08dd8276767b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Wf8ZhUScmxt43yNJ7Et2Ddh6AOFDYxC3XGetq+lZjxYyYItDelJRCFJbQjaL?=
+ =?us-ascii?Q?pjkIBwHHqbtvxXjN8hEcZL0Bkwrm+REGjbhelSOfR+C7j9SThXj48H7F20Tc?=
+ =?us-ascii?Q?m964d2SHD+s7U0G850iaruIhttjKEDQr5zBZ7VmCIWF9POi5gZUoq+Zg2NS2?=
+ =?us-ascii?Q?JK4c2emD3+qnmLn5qTOHAcXxXCh3xd4yKlwtHkITHTf0uuPkhTy0CsjTzjdO?=
+ =?us-ascii?Q?m2grHdjYxmQ0zun345kWtr8D05D4Ue6XJVK1tr8p5LsUvUF0apZRUXF1LL3m?=
+ =?us-ascii?Q?v9eonvLjZnCGl7xo5NlCwBf6Vmf61zg8nvvPZ5ZMKzW/628/t0JYNOjS0fk/?=
+ =?us-ascii?Q?+cVvGaqr2yz9EG7VpfYGVUUUdMZpPLpkZDsD8IjqvnqhE2siCEVO3qNM/kta?=
+ =?us-ascii?Q?nWHXggXpX7g15lsp2AxOPIx36tpQ2wN1AYbyAPQSibHTZt+cyjGz7i/nCVd+?=
+ =?us-ascii?Q?HVcWWFO72hp2wgbFc3U6gFx/3UAVRXDBaWCuixVlmG271lL/xydtVGWB7e66?=
+ =?us-ascii?Q?WMv66xPdYIh6iKNdFgwLBvbDDZ8C9y1cssonB3ivvL7AZFi29R0FJrQBIW9J?=
+ =?us-ascii?Q?tcoNVSrl4TCOZmd+5iAzE9C1zP7HGlHyeo8YRrx05B4fgnxgQykFRsi03Zhp?=
+ =?us-ascii?Q?k7ArTH2flsifDBnDkXuy/tMN257BCb6gTaYNiytrj5Xid9WWMFQfbH6j/mz9?=
+ =?us-ascii?Q?9CLOhppnN7rGOAVQ3KfpEgw+/92yYcEIPD+N4RNTMfFJTQM0ajXGzAx7recN?=
+ =?us-ascii?Q?VE+zSrVd5XNeQK7r5lVGhax3iFdWbLwYa1akneNBlghnLxwRzHT8q+rh5srQ?=
+ =?us-ascii?Q?0A5nA/3CXAQxEy0C0GB5RQanEROSh0wK2OxG0UeZb0MkCFHTi/foW5oTpd6m?=
+ =?us-ascii?Q?2Oqfs8qBFiuxN/fuw8qTESlHxq9YmOH2L1upa4KrPOWEmS13y+c/lPXHErJM?=
+ =?us-ascii?Q?NrFrQobTkzy4MQUGQJonq2bPlKP4vsoLTyO0o1xpeECUqyRyD4bvXlGCF2jv?=
+ =?us-ascii?Q?QK/AjDgQAWkGYBgs47iSZJvCk10b8YwdpKH1UmnOJ4jE4RWMWzRDcsvLC9SV?=
+ =?us-ascii?Q?owPPfT+zCBXAztIqSUUrTyiLpDaheL131MEtQJfzqqrtk1HeO64PkuLqYPdo?=
+ =?us-ascii?Q?AMWatLwaIo0LGd6Ws8MkQslAIXOTHxpwwl0jAS7BqbvFErI3BAe26OJiiJGW?=
+ =?us-ascii?Q?7SITxQRuNLF0Fq0v0muT9ifkgRtXLJFrewe7YMw38NertmRC/z3grC25omp1?=
+ =?us-ascii?Q?QVPPWNVCZuUJlsH3/R8IIYdv6sIfpz1pXutAZR419N3yBP/9WoLzEVx0IBFm?=
+ =?us-ascii?Q?zishpKVY7S3sSocf/aTdkdbas5QKYug/M1Drgm3NFMSaDasloIDde3SGRqz3?=
+ =?us-ascii?Q?1vg5BZFJqV1iHkT0+0B1wYZP1dXDPzOXcy+A9jvmSLWs2scduaFemuLwnA/x?=
+ =?us-ascii?Q?oZXDvkSlhmfXjUx3Ca2tTEELJDGzRw0i1v7nsavVN3+ejEYOK/DFh3mfQlZA?=
+ =?us-ascii?Q?khKGBfL2sd/THFx9w+7+c+oT0vj6pUfN5SvafBVGeA4dmkg+FYpjQwvOxg?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2025 14:52:26.0630
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e71244d7-bf47-42c7-8687-08dd8276767b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00036F43.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5769
 
-Hi Petr,
+When a VNI is deleted from a VXLAN device in 'vnifilter' mode, the FDB
+entry associated with the default remote (assuming one was configured)
+is deleted without holding the hash lock. This is wrong and will result
+in a warning [1] being generated by the lockdep annotation that was
+added by commit ebe642067455 ("vxlan: Create wrappers for FDB lookup").
 
-On Wed, 23 Apr 2025 at 15:39, Petr Mladek <pmladek@suse.com> wrote:
-> On Tue 2025-04-22 10:43:59, Geert Uytterhoeven wrote:
-> > On Tue, 22 Apr 2025 at 10:30, Aditya Garg <gargaditya08@live.com> wrote:
-> > > On 22-04-2025 01:37 pm, Geert Uytterhoeven wrote:
-> > > > On Tue, 8 Apr 2025 at 08:48, Aditya Garg <gargaditya08@live.com> wrote:
-> > > >> From: Hector Martin <marcan@marcan.st>
-> > > >>
-> > > >> %p4cc is designed for DRM/V4L2 FourCCs with their specific quirks, but
-> > > >> it's useful to be able to print generic 4-character codes formatted as
-> > > >> an integer. Extend it to add format specifiers for printing generic
-> > > >> 32-bit FourCCs with various endian semantics:
-> > > >>
-> > > >> %p4ch   Host byte order
-> > > >> %p4cn   Network byte order
-> > > >> %p4cl   Little-endian
-> > > >> %p4cb   Big-endian
-> > > >>
-> > > >> The endianness determines how bytes are interpreted as a u32, and the
-> > > >> FourCC is then always printed MSByte-first (this is the opposite of
-> > > >> V4L/DRM FourCCs). This covers most practical cases, e.g. %p4cn would
-> > > >> allow printing LSByte-first FourCCs stored in host endian order
-> > > >> (other than the hex form being in character order, not the integer
-> > > >> value).
-> > > >>
-> > > >> Acked-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-> > > >> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > > >> Reviewed-by: Petr Mladek <pmladek@suse.com>
-> > > >> Tested-by: Petr Mladek <pmladek@suse.com>
-> > > >> Signed-off-by: Hector Martin <marcan@marcan.st>
-> > > >> Signed-off-by: Aditya Garg <gargaditya08@live.com>
-> > > >
-> > > > Thanks for your patch, which is now commit 1938479b2720ebc0
-> > > > ("lib/vsprintf: Add support for generic FourCCs by extending %p4cc")
-> > > > in drm-misc-next/
-> > > >
-> > > >> --- a/Documentation/core-api/printk-formats.rst
-> > > >> +++ b/Documentation/core-api/printk-formats.rst
-> > > >> @@ -648,6 +648,38 @@ Examples::
-> > > >>         %p4cc   Y10  little-endian (0x20303159)
-> > > >>         %p4cc   NV12 big-endian (0xb231564e)
-> > > >>
-> > > >> +Generic FourCC code
-> > > >> +-------------------
-> > > >> +
-> > > >> +::
-> > > >> +       %p4c[hnlb]      gP00 (0x67503030)
-> > > >> +
-> > > >> +Print a generic FourCC code, as both ASCII characters and its numerical
-> > > >> +value as hexadecimal.
-> > > >> +
-> > > >> +The generic FourCC code is always printed in the big-endian format,
-> > > >> +the most significant byte first. This is the opposite of V4L/DRM FourCCs.
-> > > >> +
-> > > >> +The additional ``h``, ``n``, ``l``, and ``b`` specifiers define what
-> > > >> +endianness is used to load the stored bytes. The data might be interpreted
-> > > >> +using the host byte order, network byte order, little-endian, or big-endian.
-> > > >> +
-> > > >> +Passed by reference.
-> > > >> +
-> > > >> +Examples for a little-endian machine, given &(u32)0x67503030::
-> > > >> +
-> > > >> +       %p4ch   gP00 (0x67503030)
-> > > >> +       %p4cn   00Pg (0x30305067)
-> > > >> +       %p4cl   gP00 (0x67503030)
-> > > >> +       %p4cb   00Pg (0x30305067)
-> > > >> +
-> > > >> +Examples for a big-endian machine, given &(u32)0x67503030::
-> > > >> +
-> > > >> +       %p4ch   gP00 (0x67503030)
-> > > >> +       %p4cn   00Pg (0x30305067)
-> > > >
-> > > > This doesn't look right to me, as network byte order is big endian?
-> > > > Note that I didn't check the code.
-> > >
-> > > Originally, it was %p4cr (reverse-endian), but on the request of the maintainers, it was changed to %p4cn.
-> >
-> > Ah, I found it[1]:
-> >
-> > | so, it needs more information that this mimics htonl() / ntohl() for
-> > networking.
-> >
-> > IMHO this does not mimic htonl(), as htonl() is a no-op on big-endian.
-> > while %p4ch and %p4cl yield different results on big-endian.
-> >
-> > > So here network means reverse of host, not strictly big-endian.
-> >
-> > Please don't call it "network byte order" if that does not have the same
-> > meaning as in the network subsystem.
-> >
-> > Personally, I like "%p4r" (reverse) more...
-> > (and "%p4ch" might mean human-readable ;-)
-> >
-> > [1] https://lore.kernel.org/all/Z8B6DwcRbV-8D8GB@smile.fi.intel.com
->
-> I have to admit that I was always a bit confused by the meaning of the
-> new modifiers. And I did give up at some point and decided to do not
-> block the patch when it made sense to others.
->
-> But I have to agree with Geert here. The current behavior of %p4ch
-> is confusing on big endian system. I would expect that it does not
-> revert the ordering.
->
-> Well, I still think that people might find all 4 variants useful.
-> Andy does not like "r". What about "hR"? It is inspired by
-> the existing %pmR.
+Reproducer:
 
-I am not a fan of complicating the format specifier even more by adding
-more characters...  But seeing %pmR, I have to admit it does make sense.
+ # ip link add vx0 up type vxlan dstport 4789 external vnifilter local 192.0.2.1
+ # bridge vni add vni 10010 remote 198.51.100.1 dev vx0
+ # bridge vni del vni 10010 dev vx0
 
-> The problem is that the semantic is not the same. The modifiers affect
-> the output ordering of IPv4 addresses while they affect the reading order
-> in case of FourCC code.
+Fix by acquiring the hash lock before the deletion and releasing it
+afterwards. Blame the original commit that introduced the issue rather
+than the one that exposed it.
 
-Note that for IPv4 addresses we have %pI4, which BTW also takes [hnbl]
-modifiers.
+[1]
+WARNING: CPU: 3 PID: 392 at drivers/net/vxlan/vxlan_core.c:417 vxlan_find_mac+0x17f/0x1a0
+[...]
+RIP: 0010:vxlan_find_mac+0x17f/0x1a0
+[...]
+Call Trace:
+ <TASK>
+ __vxlan_fdb_delete+0xbe/0x560
+ vxlan_vni_delete_group+0x2ba/0x940
+ vxlan_vni_del.isra.0+0x15f/0x580
+ vxlan_process_vni_filter+0x38b/0x7b0
+ vxlan_vnifilter_process+0x3bb/0x510
+ rtnetlink_rcv_msg+0x2f7/0xb70
+ netlink_rcv_skb+0x131/0x360
+ netlink_unicast+0x426/0x710
+ netlink_sendmsg+0x75a/0xc20
+ __sock_sendmsg+0xc1/0x150
+ ____sys_sendmsg+0x5aa/0x7b0
+ ___sys_sendmsg+0xfc/0x180
+ __sys_sendmsg+0x121/0x1b0
+ do_syscall_64+0xbb/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
-> Avoid the confusion by replacing the "n" modifier with "hR", aka
-> reverse host ordering.
->
-> Signed-off-by: Petr Mladek <pmladek@suse.com>
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+I'm sorry, but I only noticed this issue after the recent VXLAN patches
+were applied to net-next. There will be a conflict when merging net into
+net-next, but resolution is trivial. Reference:
+https://github.com/idosch/linux/commit/ed95370ec89cccbf784d5ef5ea4b6fb6fa0daf47.patch
+---
+ drivers/net/vxlan/vxlan_vnifilter.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Thanks, LGTM!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+index 6e6e9f05509a..06d19e90eadb 100644
+--- a/drivers/net/vxlan/vxlan_vnifilter.c
++++ b/drivers/net/vxlan/vxlan_vnifilter.c
+@@ -627,7 +627,11 @@ static void vxlan_vni_delete_group(struct vxlan_dev *vxlan,
+ 	 * default dst remote_ip previously added for this vni
+ 	 */
+ 	if (!vxlan_addr_any(&vninode->remote_ip) ||
+-	    !vxlan_addr_any(&dst->remote_ip))
++	    !vxlan_addr_any(&dst->remote_ip)) {
++		u32 hash_index = fdb_head_index(vxlan, all_zeros_mac,
++						vninode->vni);
++
++		spin_lock_bh(&vxlan->hash_lock[hash_index]);
+ 		__vxlan_fdb_delete(vxlan, all_zeros_mac,
+ 				   (vxlan_addr_any(&vninode->remote_ip) ?
+ 				   dst->remote_ip : vninode->remote_ip),
+@@ -635,6 +639,8 @@ static void vxlan_vni_delete_group(struct vxlan_dev *vxlan,
+ 				   vninode->vni, vninode->vni,
+ 				   dst->remote_ifindex,
+ 				   true);
++		spin_unlock_bh(&vxlan->hash_lock[hash_index]);
++	}
+ 
+ 	if (vxlan->dev->flags & IFF_UP) {
+ 		if (vxlan_addr_multicast(&vninode->remote_ip) &&
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.49.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
