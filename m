@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-185164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A99A98C50
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:05:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A2EA98C51
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CD121893471
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:05:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEEF644559E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2BE27979F;
-	Wed, 23 Apr 2025 14:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B152798E3;
+	Wed, 23 Apr 2025 14:04:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA1E279792;
-	Wed, 23 Apr 2025 14:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132A127933B;
+	Wed, 23 Apr 2025 14:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745417058; cv=none; b=CeQfhpvams37cQ5Rpoye1rH/1i+IUKPnZUiMLX1x3GJSlVsIUHaOJIfDwWkcrDL2nN+Btk0nmiihSJwWZZgx+5liPNYajY0t/gnoXQODlNyDegPA0kMNuyaTo+JriZ06JbQeUUGcss5EsIFyAlRxghQW2nTZJ/8hgBDRZMgm7eg=
+	t=1745417066; cv=none; b=XKdakCiNuXmNtpLa5rSRHVjiH+OOkWcFVL9Hs9eE5+4qSnqnJ0qQrJs7pDF3LgbvHqiPRPyetDTP9dOWMsLsV9fk306kmgAZjDBdQ0jTMmOEdnS9oyQu1BIvtiUFD0sqzUljdVy6ZNsFvqeVwNHLpkZmAM4VJw8E4Jjh7ugQe7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745417058; c=relaxed/simple;
-	bh=lKyymF7Hpjd26M8XcjHpoVGsP92kwq3xGudaxC8q40M=;
+	s=arc-20240116; t=1745417066; c=relaxed/simple;
+	bh=0V5/pbt0VA5Hg3Oc3Eb1tgOeb9g+83cQqd7UmD2KG/0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TGUZ9aQHONWv6yY2Gf40OQ/UnPd7SUM8lA58WyOB/NG3PVrcnO6r9njKa4mJLYQVRxZO9BGMuH1Rw+w/rbjjJm93sdTFZOwsDsUptXrQWET/XmXaUOCZNWIozaVcywp2XkhD3iATjCrS/1/+bnGklmXmqfnFlDegItjRFTGLr/0=
+	 In-Reply-To:To:Cc; b=KaGUVRigPgzSltzTM+/Xz6iyVz8NhxLxrL1uATR2kWTm8HTUJKmmN2C5J22vHcFDIsZ+h78lLtqtw3DGDtGT/rLyqoYgxuCxFNp0M+I9tGmQ51lhbXvmnHfodGNegbM1W5I54utEDw1bE/8AkJ1iHOdRP1rj0NmFrrpio78eWz0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
@@ -34,11 +34,11 @@ Received: from [127.0.0.1] (unknown [116.232.18.95])
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 4D5DC3430AC;
-	Wed, 23 Apr 2025 14:04:10 +0000 (UTC)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id A642C343104;
+	Wed, 23 Apr 2025 14:04:17 +0000 (UTC)
 From: Yixun Lan <dlan@gentoo.org>
-Date: Wed, 23 Apr 2025 22:03:23 +0800
-Subject: [PATCH 2/5] dt-bindings: arm: sunxi: Add A523 EMAC0 compatible
+Date: Wed, 23 Apr 2025 22:03:24 +0800
+Subject: [PATCH 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,7 +47,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250423-01-sun55i-emac0-v1-2-46ee4c855e0a@gentoo.org>
+Message-Id: <20250423-01-sun55i-emac0-v1-3-46ee4c855e0a@gentoo.org>
 References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
 In-Reply-To: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -62,44 +62,99 @@ Cc: Andre Przywara <andre.przywara@arm.com>, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  Yixun Lan <dlan@gentoo.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=954; i=dlan@gentoo.org;
- h=from:subject:message-id; bh=lKyymF7Hpjd26M8XcjHpoVGsP92kwq3xGudaxC8q40M=;
- b=owEBzQIy/ZANAwAKATGq6kdZTbvtAcsmYgBoCPM/BF4N7i/TYB6b3RNTlrp4EIT9sg8KqYeMb
- gv6OH1IHvOJApMEAAEKAH0WIQS1urjJwxtxFWcCI9wxqupHWU277QUCaAjzP18UgAAAAAAuAChp
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2341; i=dlan@gentoo.org;
+ h=from:subject:message-id; bh=0V5/pbt0VA5Hg3Oc3Eb1tgOeb9g+83cQqd7UmD2KG/0=;
+ b=owEBzQIy/ZANAwAKATGq6kdZTbvtAcsmYgBoCPNCu+Ck+tBycFGCLRZGCONhmaFsMetB/xTFc
+ zcuVTjTtk+JApMEAAEKAH0WIQS1urjJwxtxFWcCI9wxqupHWU277QUCaAjzQl8UgAAAAAAuAChp
  c3N1ZXItZnByQG5vdGF0aW9ucy5vcGVucGdwLmZpZnRoaG9yc2VtYW4ubmV0QjVCQUI4QzlDMzF
- CNzExNTY3MDIyM0RDMzFBQUVBNDc1OTREQkJFRAAKCRAxqupHWU277XUmEACZ800KPPzNvd5qzG
- dq77Xn4pkeobCVGqmHVzjTxaG8jl6AqbrT+hPCyYVIysejlUeys+viVgGx6RvEZaUJM2BdhsmoQ
- hQ4u7z2XMeqFaUntVWbRDUsQnZNCITcWMAm9BaG68IYCfRCKteFo6xJ2+VOymprkW4HvTDOKXnV
- wZcpRU1q3q8I/OtkgcIhbZLP9xbZA1drlyOJ+CLwQ/kjXJn6UZQhDzSx4I8d8iveb6/67WmCUlC
- g9lNCSDGfrDvs9lmW4yff8cFC0twTdBx2JyvJ61nu+fEwAUgrpc9y58QAPSZN6mglDsdye8E5wH
- diV08zakE9J/fL63Sq01dzetXf2EeAVj/5qvHCkMMriTKNAg2dyKRyfBHCLAoI/2Sszo+sFoR0I
- s70uY4X8Xw9w7jpQM6Z1EwZjni5NoUisdb6U1RW282qfvTnxbYmcKIAqns3paow0Qs1ZS11Qha0
- JgNR7VkgsH4DyxPRR0mO2/SjSfT69hLdqTjtBC5YyygX5TSU1s5zMc+zDVZdKakWInM7CCvqN+r
- Nbj/WmuG+cxzTJ9EZ3Y4qeomWqagv2v35dp6PsF2Qq1jaFMVjb2r03J9Xtg1s4OKN1d3KdBSdsC
- mceosQP+8eVz4Nd8jeSMC70lknR5kQUeVEq6udQ1dP0HeefUDlqxJhFa+2Pbt6fAEaQQ==
+ CNzExNTY3MDIyM0RDMzFBQUVBNDc1OTREQkJFRAAKCRAxqupHWU277TOWD/9d0BZRe4NDQvirps
+ zi/lwslGgvwYMjLQ/3HTIRvNt7QMkf0jwCPqovWlSOyGHEP/yX19MXMUv3qqnE4k6qFZD1G7XZH
+ 9KYotrmieLbFK63woUMoH88mAWCrG7IcndR4CgAIOOCxn7wFxUCH/oYC+Z7JklA+fIZWVY2gb2D
+ VN0kipeHFaPfF3yboNeDC0EhjnF+aqEo1qjGMin9ipcm7SVuCjkuyom8uqyv01zKojpeA6RrLlX
+ HIWlbwtXxBI3mFj8k1zOtpArnHFm6P/+pSrI/3e+JMB7+T1PV++ULZSXDDCk0Oslar2zGbSWpMq
+ kdBmCiHGekqceFB+2//G3Uwx2WzqjxEyVvN/MgjaMrIerIM2PQY2JUHiKB4jhMtZxDI4+GWlJX8
+ ihcmq3pEZouT6juXeuErif6A1C8aT12zeqEg9bCuHYqwLp8mEelrssZuNLIy7RY4+1zRlIM3ezU
+ W8FEkhfdfDDrd/C3njsYCh40+9r6xuHrXIPbZfEGMmRUhqH6yONaEcIDwplJtmMGew7m7l6El2B
+ kHx3316rXA3p4rcX94AR2pyRcfW1yMyK8sn/5rpSIexzGMHohCRTHRQ/od/S+aYAeWwZGiMnsho
+ TvFeuhcFlNZ0Hoo1FKLtbYlbBxdAIgKJdKT/0RRm/R0/6juU+/582hwa16anX0ou/eiA==
 X-Developer-Key: i=dlan@gentoo.org; a=openpgp;
  fpr=50B03A1A5CBCD33576EF8CD7920C0DBCAABEFD55
 
-Allwinner A523 SoC variant (A527/T527) contains an "EMAC0" Ethernet
-MAC compatible to the A64 version.
+Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
+including the A527/T527 chips.
 
 Signed-off-by: Yixun Lan <dlan@gentoo.org>
 ---
- Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 42 ++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-index 7fe0352dff0f8d74a08f3f6aac5450ad685e6a08..7b6a2fde8175353621367c8d8f7a956e4aac7177 100644
---- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-+++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-@@ -23,6 +23,7 @@ properties:
-               - allwinner,sun20i-d1-emac
-               - allwinner,sun50i-h6-emac
-               - allwinner,sun50i-h616-emac0
-+              - allwinner,sun55i-a523-emac0
-           - const: allwinner,sun50i-a64-emac
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+index ee485899ba0af69f32727a53de20051a2e31be1d..c3ba2146c4b45f72c2a5633ec434740d681a21fb 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+@@ -126,6 +126,17 @@ pio: pinctrl@2000000 {
+ 			interrupt-controller;
+ 			#interrupt-cells = <3>;
  
-   reg:
++			emac0_pins: emac0-pins {
++				pins = "PH0", "PH1", "PH2", "PH3",
++					"PH4", "PH5", "PH6", "PH7",
++					"PH9", "PH10","PH13","PH14",
++					"PH15","PH16","PH17","PH18";
++				allwinner,pinmux = <5>;
++				function = "emac0";
++				drive-strength = <40>;
++				bias-pull-up;
++			};
++
+ 			mmc0_pins: mmc0-pins {
+ 				pins = "PF0" ,"PF1", "PF2", "PF3", "PF4", "PF5";
+ 				allwinner,pinmux = <2>;
+@@ -409,6 +420,15 @@ i2c5: i2c@2503400 {
+ 			#size-cells = <0>;
+ 		};
+ 
++		syscon: syscon@3000000 {
++			compatible = "allwinner,sun55i-a523-system-control",
++				     "allwinner,sun50i-a64-system-control";
++			reg = <0x03000000 0x1000>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			ranges;
++		};
++
+ 		gic: interrupt-controller@3400000 {
+ 			compatible = "arm,gic-v3";
+ 			#address-cells = <1>;
+@@ -521,6 +541,28 @@ ohci1: usb@4200400 {
+ 			status = "disabled";
+ 		};
+ 
++		emac0: ethernet@4500000 {
++			compatible = "allwinner,sun55i-a523-emac0",
++				     "allwinner,sun50i-a64-emac";
++			reg = <0x04500000 0x10000>;
++			clocks = <&ccu CLK_BUS_EMAC0>;
++			clock-names = "stmmaceth";
++			resets = <&ccu RST_BUS_EMAC0>;
++			reset-names = "stmmaceth";
++			interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++			pinctrl-names = "default";
++			pinctrl-0 = <&emac0_pins>;
++			syscon = <&syscon>;
++			status = "disabled";
++
++			mdio0: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
+ 		r_ccu: clock-controller@7010000 {
+ 			compatible = "allwinner,sun55i-a523-r-ccu";
+ 			reg = <0x7010000 0x250>;
 
 -- 
 2.49.0
