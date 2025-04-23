@@ -1,156 +1,487 @@
-Return-Path: <netdev+bounces-185228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6CBA99625
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:14:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86B85A9962E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8364657E7
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:14:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336E55A47ED
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:15:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD7C28B509;
-	Wed, 23 Apr 2025 17:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277A2284695;
+	Wed, 23 Apr 2025 17:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="IvWYQaPf"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="QILEW3Bk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2086.outbound.protection.outlook.com [40.107.20.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A554289367;
-	Wed, 23 Apr 2025 17:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428457; cv=none; b=MxKRslDQEtyPfFb+S9EuI7Ux6Qpsvo3CK+mj01oBLM5BXfxtm6qwRND1I50FUIm65P0gqR7arJ/dDy1IA/mUkHrSBOALyFRiTtEZ+AyPN2uR7NybBZhadBicoZLt5yxPMybg9n7r6AeAEKq0OXaWLu64WomNBu1iUvv2ff10JFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428457; c=relaxed/simple;
-	bh=q0SsHabUmjj5ZdU0sUyhSgU3OxN3W7D4JCWOS+nAJGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ogq1kDakyIirld0U5ZpyIoxMu6VLdb0zMDYf/Aknwg5vSuREa6Ya0eBaEcv4g14AXQxokz5Pc0qfYkck4zBqqSs+B5TbNfbbZvgH8vwsKiC2aEW0zDW1yffs7ZrlhTr/SfI26z1VdSX9rbrnXAlJEyeI42BEKBtbACv3qalWw5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=IvWYQaPf; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53NHCvSb3804133
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 10:12:58 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53NHCvSb3804133
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745428382;
-	bh=AIJHrckYwFl98orUcLBTt95yPEoWX9oW9903W4hlM3w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IvWYQaPfxJvqBiLff3ahLWLm3on+DUaPa1Srpyp5LZs0jmOjsi4vJcD4bjFx1mkw1
-	 kmlinO9+bgIwDEaEPFxhzeh7OV4pJBnWqMwgS7SNusPzCVCr4pLxzCg1y9KDDjfFVk
-	 DyWNlDOln4+yBgIudOkFG4lEG2Lq/WOJhKF9+SXuHgWi4l0RDrbboFRD8k6F5lKkRA
-	 14yiMRrsILUIgyeyHSqLlSqGk6PDPkVte7v13JiaABizSWVFosdv0a/zLQKXJUGorp
-	 W8BYnasPgTuqRiwJsD+umVEKtOLbT7Bc0M6cVA0p6p7RA3scb+WSFcK+vk2X+rNlyz
-	 87hDNwO5mesTw==
-Message-ID: <e01fb578-3523-4f19-8db3-e231d5daa76e@zytor.com>
-Date: Wed, 23 Apr 2025 10:12:56 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDBB13B797;
+	Wed, 23 Apr 2025 17:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745428521; cv=fail; b=pqvbvcmxg9a7guLKd6tVLzbv1AQQfzPyjWUF7F6UP8vKiTgGSnBtFiDwKCFhTfGZWzRq3ZWZKjqVWvU5ex0K+RMtjxByBdYJRwMUdhWaWJt3zvhTWv9tYvRX0tMVq64c7L0SoD99o7pIWX2/dXTLVsvAWXDnWUfavBaRd+ZRFrs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745428521; c=relaxed/simple;
+	bh=IRmVYjcK2xbkuVpFHzrlnSICtqJR71XbzCy355w51yU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CAgQBoD41A2V97lgtwvEEt7pRFZ6GBSP2ne98QMBFUqSQb5P00f6Q52pyEVybxxd0GQBVZYhUeQARUNpa9Pzi1gF380o2qIjn26F1oCu3u3OL8cJ8+lFJLi/Xq9jUt3qiDsCUS3tXP/2VDbp2+drazByQLSXSCLoX5qJBWPhpcM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=QILEW3Bk; arc=fail smtp.client-ip=40.107.20.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WhONYvbcqkmzX0eTKyZtq/pJoRzKVA/a5aKZwzse1LXXAZ7GTs9ntGfBAM3MSxdiPHNmRPxfZiFhfrT+EWZbODslJesdIXmCH8NN0sYhxlg5+X3k5U6cFFfDVvG3P+wr+PLNdq5oc4XgcGpODKq2lFwfm0IXqjQvaN4GL/LD+K7fs7Mcuu7VzUwkUjJ6ZlisoautD7ks/YE3fufVEoFjR5FpBGOYdGqQcHp4oW84olcXYEQeih48G7GQVqe32tW+/gYWlrsoUEmTfH6CaryHSKgKDFoRvLGalb2l7C6mlAIemcPK0QRocdN3Mk0uDTAnniLFkfovgGy0ZQkTJGwVHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ca6oCsiuAf5UbfTlOMoC7zOCkNAi5S+A8F2oe/f3M8k=;
+ b=cZjtKMn1ZC4J7XMOIHTJmFTgBKpTDHy7fPKG4NvE0fnx8KT6frjUSzWrENe0urVCBAB+1f0ViT8wGB8Ph6DYohLwU6Fv4PdNbyqu0WE+ly7OmS1D0FzyfchQQg5FWBHCxLHKR8aRN9YIv9af08h9o+sueP10/R8LK1PbKC7c8rk8Rql8R+rE7YG2wb4Sarv7YImdzc1SRHmrzEE3OaNXjQVR3xT4XsskXahnJatcTiiqx/htIIGfzQcAL0vkOodVflpZfEdAsUCTAyYvKPOozMjshIDQFHgrXvCGS8YpKIsWuRjLzNZziuGqQHu0ESLTAyAkzgx+r7g28Mo4hw2SuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ca6oCsiuAf5UbfTlOMoC7zOCkNAi5S+A8F2oe/f3M8k=;
+ b=QILEW3BkkDcbN9+D59+UqO+oKwFdgz4Ko3cN39lkOS8W3PNsdeb4BOpj2dGeh2fM/cFKRsLABVjzoQT3tFMz4FUDCVlY3XuB4bi3t4CDKICAXKmffbPeGqMIe66h1mNLmYf8oWRiwm8tLmsUynrlYHkrJhDQm/45XKcs3JuNxcsgR32lqMLxLw0KZ4DBl7pXiZVYUNgU010u8eUiZoAvO3e0psmrhtQd5ny7GVr+CHFAeSpHmlo9Ips7TSquYg4rAIoXMZU1ROFVuzISeYeUAXMJLDT1p1DkBcJc9ZXYvgpH2IIODdnNDEScpPP2eAFyrGm7wTY2v0iPYXTrr3XcuA==
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
+ by DU0PR07MB9361.eurprd07.prod.outlook.com (2603:10a6:10:44b::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.35; Wed, 23 Apr
+ 2025 17:15:15 +0000
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56%2]) with mapi id 15.20.8678.021; Wed, 23 Apr 2025
+ 17:15:15 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+CC: "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
+	<jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "horms@kernel.org"
+	<horms@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
+	<liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
+	<ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, g.white <g.white@cablelabs.com>,
+	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
+	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
+	"cheshire@apple.com" <cheshire@apple.com>, "rs.ietf@gmx.at" <rs.ietf@gmx.at>,
+	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>, vidhi_goel
+	<vidhi_goel@apple.com>
+Subject: RE: [PATCH v12 net-next 1/5] Documentation: netlink: specs: tc: Add
+ DualPI2 specification
+Thread-Topic: [PATCH v12 net-next 1/5] Documentation: netlink: specs: tc: Add
+ DualPI2 specification
+Thread-Index: AQHbs8NmIQkwVudS6k+2maCdGlvRfbOxKjD/gABTlwA=
+Date: Wed, 23 Apr 2025 17:15:15 +0000
+Message-ID:
+ <PAXPR07MB79840FF6B073C61136AC238CA3BA2@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250422201602.56368-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250422201602.56368-2-chia-yu.chang@nokia-bell-labs.com>
+ <m2o6wnt8to.fsf@gmail.com>
+In-Reply-To: <m2o6wnt8to.fsf@gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|DU0PR07MB9361:EE_
+x-ms-office365-filtering-correlation-id: ec425891-cc0e-40ea-08bd-08dd828a6a0b
+x-ld-processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?/21GAhyJC7uU6EkL3TgjHyuinyB6iypU/T8ObLlc2jQPz+GzvZQLofu1I/CO?=
+ =?us-ascii?Q?EJzZgop2OxOBqPhN1yTUscBUsqFs/vkGoEfHwyqc7vHllygNzJaLRjkuLZsV?=
+ =?us-ascii?Q?6eRZ1Z2xvvvHJdtmvPJqM7HO456V//6GuLzxeaDXRsw9wFtQGLs+IHvif5Vo?=
+ =?us-ascii?Q?Z5wxoHlQgh8oA4DabXRaYQ6brQWFoqHuzFvTYrOuWTpVj+2fgYwtzXZYp5OP?=
+ =?us-ascii?Q?pdD/EwdVrYtW759Rp2AAnbSJnP3GeOmkst60xigcOl5/fA53zAEJFn7OwjY3?=
+ =?us-ascii?Q?wc2H6esKhz2gx2fouro+32HkCA9zorFaCBsLUyX+gXK6ct9NGTyw0sUjj2ZL?=
+ =?us-ascii?Q?eNeox0AtF6Bs2ShrO08/I3Fym2h0KtrY/GZ04De8T3dkuJAzPhHNM23r6H8O?=
+ =?us-ascii?Q?6f3Kp7bFtRqwCtSO04WwqBZvVpqpqicrCWNmBceKGbrWX1NXqzWRew0dDmJE?=
+ =?us-ascii?Q?hYTjt1BxB4nniycm/YmSgOarhBa3YdUxhR7r18nxd+YTS6XRS5ysCqnf/p9c?=
+ =?us-ascii?Q?b1s8YAGS51/e+16kYYVvnLWax1XTNsGxjR0+RPZXe1QjAmhx381Ozk2f0lO2?=
+ =?us-ascii?Q?8NKobRbJC6eSM0VQyCzvr1t8xChXAnb1Eo/uoGP5/dbYB5VRK176rwWhDEVj?=
+ =?us-ascii?Q?4KPTOxoaF7Xpn5CPXuh+qg9sFhvXdnvQJVdVmC1CWYWw26eg6JeXRs3B51Ki?=
+ =?us-ascii?Q?O5b5S8A3k7o2/14HKa5BxMmHaC72HGZyXtp8QtMq4wEtfewi27eidJUpt+9W?=
+ =?us-ascii?Q?sTAV8XK6yp2gN0N9fLjLF0TLIJjdOB/SMwkHlzfjdxAsB4E8JUZnvzXdGvsy?=
+ =?us-ascii?Q?VD+HcZ0346GcXy6t+BaGro8W5Kj1SVyLih5AyCPLHJ9XOe/zLJFm9Wi4vCB0?=
+ =?us-ascii?Q?Br24qraNCfrpnGHHChZyr5sGhMF8gKL71ovnNbNFjoYUas2WE4NIlC4SmkEZ?=
+ =?us-ascii?Q?g2YkbI8fCXiW4WS7DGVoK0XCGGhNX3P6798W4IH/98v/OSwtXnhrxJQmg1uD?=
+ =?us-ascii?Q?hzwkJuHT8KUQZSXAbh378RTIwgLAwMg8ZL3q4sWVLSe2zyaqTFj5EQPU/300?=
+ =?us-ascii?Q?udg4U6NPJo/raicRMnVO7hQ02/FC7W5938YfUEBJdimgZ5YQCohf6gUsOoll?=
+ =?us-ascii?Q?HMjwdcYUesgioCducx18TvTtqzzL2uSLjT65RPdE0QoeovJVKSjgWgNKnYgM?=
+ =?us-ascii?Q?Ms6A3F4mZx4vfOGmyQftGwfjl8pqx4N64Ua4GMNsxYfBjMbw4jW/w3yyO0gH?=
+ =?us-ascii?Q?kSOk6sDm4EcSpWWwLw7DLK/5J83Tbo2DW6RapiWz5f/WAV36G5ov9tSVi1ET?=
+ =?us-ascii?Q?QdV3EDbZCcJwETWJNbYJSQEkBbRTZkU8t3bVNnvo0Bge+G4AyfHHONhflIfP?=
+ =?us-ascii?Q?vj+kaPybgi8wfLLJuwRki1fkBbA6/3Y5kFNx88G/qUQ3RAXDvSomvH1xCtAp?=
+ =?us-ascii?Q?ea2+zjI5EJvVKUuxvzUZRT21Vn2Y6cLTyz1GqLuhYVvq/k80OArZMf6t9h6z?=
+ =?us-ascii?Q?b9xHdSxMqyxsaGk=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?aLywnabl1lTRySRKVHHd/HriavuL6TE9AGNp5RuqNOJdxtg40wnICLMc7l7E?=
+ =?us-ascii?Q?ALsvHzeFbUhCf5Q00w5w5WixE+l+HshM435l3V2GCpMalrs+2uI5Tnyor+43?=
+ =?us-ascii?Q?BY6FRRfeNgeXjsYPtivJ8OuWoeYqUilmOheZCNwEaFMIbg79oT5ZBYQR31p+?=
+ =?us-ascii?Q?16CWpODIM4M68Llh1v7pmVefnf1oRT4F/jjHRg0zQQ+WK4PuGoBAOyS/PRgn?=
+ =?us-ascii?Q?bzbKgpuNHpmMxU8ancZo6quItXHj/zApZBC7pjR7lHQWfRlC+uCdXclOH8xY?=
+ =?us-ascii?Q?sfqGvGv1Jm5oPnbiJFcgBBMfQnPBfMaCjdTCOjnbivAcMjsixwy+Udi4LSC4?=
+ =?us-ascii?Q?HvjHnWPY4YwI3KtQyNZ66K4Nyk+T26MWk5lVm3YYXdpBn/EIU2fHPF+C053I?=
+ =?us-ascii?Q?vCFpVi6TcVfm/60DQktK22wf/wOAuvhhlpUutRppxPWR4UaF1MsEXX8xiBd0?=
+ =?us-ascii?Q?0qkZ00irllUi6J80M1XoxxxGslHdSJAZCWAD3UUQNgTlxpPSCJdOHGMLCr/u?=
+ =?us-ascii?Q?lsX5wVB9ghOD27PaorK1RLtGuJ6tUA759oTRAEJLQAFsinqVriHo6QvISgZh?=
+ =?us-ascii?Q?DBCe9It+KjVoVE6PY/NQkgqUNLjNBd9WHuRy0ttKMOJAAQbh8N0g/d1ZiOKO?=
+ =?us-ascii?Q?q3ikO3+EI0zwa75/z3+EoFiRDJ3cenYDTDq4o0AUR1VqkiYXaddtq3/yhFL3?=
+ =?us-ascii?Q?iNHy7OHxKc/AR7qvJ9G5wZto5FNlgo37yW6Y2CHsVRc9Fha5wYzJFYdk8h1l?=
+ =?us-ascii?Q?S5Msn5EYUFagOnWL/+n2k81Uti9AkmSEtdFOojjfanioxUGrDseSrLulqGKq?=
+ =?us-ascii?Q?ijZyoRtXT+ipSHhrgLmvP/3LynpXvusOLiNGPJIn8qRv4nijLzNE2p6sawhq?=
+ =?us-ascii?Q?JyKF2YHVyV0XhMVkNiK137Rwb9PLMGHqeUwp80ee80LYO+2KcA0ikyKT52Or?=
+ =?us-ascii?Q?0Lkw1RQWngp8FsW3DEu6EOaMFTOQHl3JjnDRItU11SDWsbJucbGUuuj3EAoR?=
+ =?us-ascii?Q?tKhxDOIVkXEO0fIwzuoiovSNyIAIax1aFyvpd1wV7R6kOghPu5dBqn0apu75?=
+ =?us-ascii?Q?F2b1AqDXU++GCg5Qzu8RELcjmecZ8MIcnDn6lstm4Q3flwPOdG9UqyQTiRZD?=
+ =?us-ascii?Q?/Y4cJnb7iWOcTyLxpTMuAOwMqq/fMF35e/MVC0Ueq7G/aikC8jWoL972Wbtz?=
+ =?us-ascii?Q?yw5Tt9GcZliZGcf5nSFExqlnbMpHFOTk54AeeI1tR0hPQzMHoM7DhyJ1v4JA?=
+ =?us-ascii?Q?bxRjbNKaClpxPIewoba+eZOtv1W2toeKZHfcSV1CZLl9lr1PtyggohDSb8F3?=
+ =?us-ascii?Q?sLrmFFIvKCOyYKgIV910DsymGYDRM+6KTwSTxDXpFMUpAy0Exe8EYlD9fTyK?=
+ =?us-ascii?Q?qx8THrwTKi/kcBLkRdTpBnY6upDfCaCOvUUoCH08qZAInmhmnqaDiXS8sEmN?=
+ =?us-ascii?Q?LTiGtNZT6G3cml2fO+Aw9TfvjRHpzjIY9cAt75nF+QDJoNdjkvrpUKPhIzP0?=
+ =?us-ascii?Q?jJV/qXFhN1lJHXLF4O+re03Nmm82c0NpNdznKnADUaLJ6dgYBUn4pFgEVPV7?=
+ =?us-ascii?Q?jqWOB0dAZna3Y7GsA+fTeBaJeZSQz6MAJcwXeEtU+/kCHU9eXQ9HJAQehtt2?=
+ =?us-ascii?Q?JDNpfmkTVHryOJ2iwxzVM1g=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 01/34] x86/msr: Move rdtsc{,_ordered}() to
- <asm/tsc.h>
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-2-xin@zytor.com>
- <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec425891-cc0e-40ea-08bd-08dd828a6a0b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Apr 2025 17:15:15.2609
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: z7ZN/MnG7yn3agAkPrRCti0gVxYxBHNqeUZffxiT5QRGrZDWEeAPgnxHlZakYG5BLO4OiFViet0eZu6JofAZKpivVbL8sDE5h8jPv0LEJsNkm241EqbHI55VhOJBdda/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR07MB9361
 
-On 4/23/2025 7:13 AM, Dave Hansen wrote:
-> On 4/22/25 01:21, Xin Li (Intel) wrote:
->> Relocate rdtsc{,_ordered}() from <asm/msr.h> to <asm/tsc.h>, and
->> subsequently remove the inclusion of <asm/msr.h> in <asm/tsc.h>.
->> Consequently, <asm/msr.h> must be included in several source files
->> that previously did not require it.
-> 
-> I know it's mildly obvious but could you please add a problem statement
-> to these changelogs, even if it's just one little sentence?
+> -----Original Message-----
+> From: Donald Hunter <donald.hunter@gmail.com>=20
+> Sent: Wednesday, April 23, 2025 1:29 PM
+> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+> Cc: xandfury@gmail.com; netdev@vger.kernel.org; dave.taht@gmail.com; pabe=
+ni@redhat.com; jhs@mojatatu.com; kuba@kernel.org; stephen@networkplumber.or=
+g; xiyou.wangcong@gmail.com; jiri@resnulli.us; davem@davemloft.net; edumaze=
+t@google.com; horms@kernel.org; andrew+netdev@lunn.ch; ast@fiberby.net; liu=
+hangbin@gmail.com; shuah@kernel.org; linux-kselftest@vger.kernel.org; ij@ke=
+rnel.org; ncardwell@google.com; Koen De Schepper (Nokia) <koen.de_schepper@=
+nokia-bell-labs.com>; g.white <g.white@cablelabs.com>; ingemar.s.johansson@=
+ericsson.com; mirja.kuehlewind@ericsson.com; cheshire@apple.com; rs.ietf@gm=
+x.at; Jason_Livingood@comcast.com; vidhi_goel <vidhi_goel@apple.com>
+> Subject: Re: [PATCH v12 net-next 1/5] Documentation: netlink: specs: tc: =
+Add DualPI2 specification
+>=20
+>=20
+> CAUTION: This is an external email. Please be very careful when clicking =
+links or opening attachments. See the URL nok.it/ext for additional informa=
+tion.
+>=20
+>=20
+>=20
+> chia-yu.chang@nokia-bell-labs.com writes:
+>=20
+> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> >
+> > Introduce the specification of tc qdisc DualPI2 stats and attributes,=20
+> > which is the reference implementation of IETF RFC9332 DualQ Coupled=20
+> > AQM
+> > (https://datatracker.ietf.org/doc/html/rfc9332) providing two=20
+> > different
+> > queues: low latency queue (L-queue) and classic queue (C-queue).
+> >
+> > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> > ---
+> >  Documentation/netlink/specs/tc.yaml | 144=20
+> > ++++++++++++++++++++++++++++
+> >  1 file changed, 144 insertions(+)
+>=20
+> The syntax is not valid so this doesn't pass the schema check and presuma=
+bly hasn't been tested. Please validate YNL .yaml additions e.g.
+>=20
+> ./tools/net/ynl/pyynl/cli.py \
+>     --spec Documentation/netlink/specs/tc.yaml \
+>     --list-ops
+>=20
+> ...
+> jsonschema.exceptions.ValidationError: Additional properties are not allo=
+wed ('entries' was unexpected) ...
+> On instance['attribute-sets'][30]['attributes'][14]:
+>     {'name': 'gso_split',
+>      'type': 'flags',
+>      'doc': 'Split aggregated skb or not',
+>      'entries': ['split_gso', 'no_split_gso']}
+>=20
 
-So "ALWAYS make a changelog a complete story", right?
+Hi Donald,
 
-And that would be helpful for long term maintainability.
+	Thanks for the feedback, and I will take actions for below points as well =
+as the corresponding iproute2-net fixes.
+	One more question is I see "uint" type is not valid during validation - se=
+e below (but which was suggested in v11), shall I change it back to u32/u8?
 
-> 
-> 	For some reason, there are some TSC-related functions in the
-> 	MSR header even though there is a tsc.h header.
-> 
-> 	Relocate rdtsc{,_ordered}() and	subsequently remove the
-> 	inclusion of <asm/msr.h> in <asm/tsc.h>. Consequently,
-> 	<asm/msr.h> must be included in several source files that
-> 	previously did not require it.
-> 
-> But I agree with the concept, so with this fixed:
+Failed validating 'enum' in schema['properties']['definitions']['items']['p=
+roperties']['members']['items']['properties']['type']:
+    {'description': "The netlink attribute type. Members of type 'binary' "
+                    "or 'pad'\n"
+                    "must also have the 'len' property set.\n",
+     'enum': ['u8',
+              'u16',
+              'u32',
+              'u64',
+              's8',
+              's16',
+              's32',
+              's64',
+              'string',
+              'binary',
+              'pad']}
 
-TBH, I did hesitate to touch so many files just to include msr.h.
+On instance['definitions'][42]['members'][12]['type']:
+    'uint'=09
 
-But because tsc.h doesn't reference any MSR definitions, it doesn't make 
-sense to include msr.h in tsc.h.  I still did the big changes.
-
-> 
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
-
-Thank you very much!
+Best regards,
+Chia-Yu
+=20
+> >
+> > diff --git a/Documentation/netlink/specs/tc.yaml=20
+> > b/Documentation/netlink/specs/tc.yaml
+> > index aacccea5dfe4..08255bba81c4 100644
+> > --- a/Documentation/netlink/specs/tc.yaml
+> > +++ b/Documentation/netlink/specs/tc.yaml
+> > @@ -816,6 +816,58 @@ definitions:
+> >        -
+> >          name: drop-overmemory
+> >          type: u32
+> > +  -
+> > +    name: tc-dualpi2-xstats
+> > +    type: struct
+> > +    members:
+> > +      -
+> > +        name: prob
+> > +        type: uint
+> > +        doc: Current probability
+> > +      -
+> > +        name: delay_c
+>=20
+> Please use dashes in member names, e.g. "delay-c", to follow YNL conventi=
+ons. Same for all member and attribute names below.
+>=20
+> > +        type: uint
+> > +        doc: Current C-queue delay in microseconds
+> > +      -
+> > +        name: delay_l
+> > +        type: uint
+> > +        doc: Current L-queue delay in microseconds
+> > +      -
+> > +        name: pkts_in_c
+> > +        type: uint
+> > +        doc: Number of packets enqueued in the C-queue
+> > +      -
+> > +        name: pkts_in_l
+> > +        type: uint
+> > +        doc: Number of packets enqueued in the L-queue
+> > +      -
+> > +        name: maxq
+> > +        type: uint
+> > +        doc: Maximum number of packets seen by the DualPI2
+> > +      -
+> > +        name: ecn_mark
+> > +        type: uint
+> > +        doc: All packets marked with ecn
+> > +      -
+> > +        name: step_mark
+> > +        type: uint
+> > +        doc: Only packets marked with ecn due to L-queue step AQM
+> > +      -
+> > +        name: credit
+> > +        type: int
+> > +        doc: Current credit value for WRR
+> > +      -
+> > +        name: memory_used
+> > +        type: uint
+> > +        doc: Memory used in bytes by the DualPI2
+> > +      -
+> > +        name: max_memory_used
+> > +        type: uint
+> > +        doc: Maximum memory used in bytes by the DualPI2
+> > +      -
+> > +        name: memory_limit
+> > +        type: uint
+> > +        doc: Memory limit in bytes
+> >    -
+> >      name: tc-fq-pie-xstats
+> >      type: struct
+> > @@ -2299,6 +2351,92 @@ attribute-sets:
+> >        -
+> >          name: quantum
+> >          type: u32
+> > +  -
+> > +    name: tc-dualpi2-attrs
+> > +    attributes:
+> > +      -
+> > +        name: limit
+> > +        type: uint
+> > +        doc: Limit of total number of packets in queue
+> > +      -
+> > +        name: memlimit
+> > +        type: uint
+> > +        doc: Memory limit of total number of packets in queue
+> > +      -
+> > +        name: target
+> > +        type: uint
+> > +        doc: Classic target delay in microseconds
+> > +      -
+> > +        name: tupdate
+> > +        type: uint
+> > +        doc: Drop probability update interval time in microseconds
+> > +      -
+> > +        name: alpha
+> > +        type: uint
+> > +        doc: Integral gain factor in Hz for PI controller
+> > +      -
+> > +        name: beta
+> > +        type: uint
+> > +        doc: Proportional gain factor in Hz for PI controller
+> > +      -
+> > +        name: step_thresh
+> > +        type: uint
+> > +        doc: L4S step marking threshold in microseconds or in packet (=
+see step_packets)
+> > +      -
+> > +        name: step_packets
+> > +        type: flags
+> > +        doc: L4S Step marking threshold unit
+> > +        entries:
+> > +        - microseconds
+> > +        - packets
+>=20
+> This is not valid syntax. Enumerations and sets of flags need to be defin=
+ed separately. For example, look at the definition of tc-cls-flags and its =
+usage.
+>=20
+> BUT step_packets is defined as a boolean in the implementation so could b=
+e implemented as a boolean flag in the API. If it needs to be extensible in=
+ future then it should be declared as an enum in uAPI and defined in this s=
+pec as an enum. Either way, the parsing and policy in patch 2 should be mad=
+e more robust.
+>=20
+> > +      -
+> > +        name: min_qlen_step
+> > +        type: uint
+> > +        doc: Packets enqueued to the L-queue can apply the step thresh=
+old when the queue length of L-queue is larger than this value. (0 is recom=
+mended)
+> > +      -
+> > +        name: coupling_factor
+> > +        type: uint
+> > +        doc: Probability coupling factor between Classic and L4S (2 is=
+ recommended)
+> > +      -
+> > +        name: drop_overload
+> > +        type: flags
+> > +        doc: Control the overload strategy (drop to preserve latency o=
+r let the queue overflow)
+> > +        entries:
+> > +        - drop_on_overload
+> > +        - overflow
+>=20
+> Not valid syntax. Use a boolean flag or define an enum.
+>=20
+> > +      -
+> > +        name: drop_early
+> > +        type: flags
+> > +        doc: Decide where the Classic packets are PI-based dropped or =
+marked
+> > +        entries:
+> > +        - drop_enqueue
+> > +        - drop_dequeue
+>=20
+> Not valid syntax. Use a boolean flag or define an enum.
+>=20
+> > +      -
+> > +        name: classic_protection
+> > +        type: uint
+> > +        doc: Classic WRR weight in percentage (from 0 to 100)
+> > +      -
+> > +        name: ecn_mask
+> > +        type: flags
+> > +        doc: Configure the L-queue ECN classifier
+> > +        entries:
+> > +        - l4s_ect
+> > +        - any_ect
+>=20
+> Not valid syntax. Type should probably match implementation, unless you w=
+ant to enumerate the valid values by definining an enum.
+>=20
+> > +      -
+> > +        name: gso_split
+> > +        type: flags
+> > +        doc: Split aggregated skb or not
+> > +        entries:
+> > +        - split_gso
+> > +        - no_split_gso
+>=20
+> Not valid syntax. Use a boolean flag or define an enum.
+>=20
+> > +      -
+> > +        name: max_rtt
+> > +        type: uint
+> > +        doc: The maximum expected RTT of the traffic that is controlle=
+d by DualPI2 in usec
+> > +      -
+> > +        name: typical_rtt
+> > +        type: uint
+> > +        doc: The typical base RTT of the traffic that is controlled=20
+> > + by DualPI2 in usec
+> >    -
+> >      name: tc-ematch-attrs
+> >      attributes:
+> > @@ -3679,6 +3817,9 @@ sub-messages:
+> >        -
+> >          value: drr
+> >          attribute-set: tc-drr-attrs
+> > +      -
+> > +        value: dualpi2
+> > +        attribute-set: tc-dualpi2-attrs
+> >        -
+> >          value: etf
+> >          attribute-set: tc-etf-attrs
+> > @@ -3846,6 +3987,9 @@ sub-messages:
+> >        -
+> >          value: codel
+> >          fixed-header: tc-codel-xstats
+> > +      -
+> > +        value: dualpi2
+> > +        fixed-header: tc-dualpi2-xstats
+> >        -
+> >          value: fq
+> >          fixed-header: tc-fq-qd-stats
 
