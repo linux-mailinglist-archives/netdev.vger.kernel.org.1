@@ -1,247 +1,517 @@
-Return-Path: <netdev+bounces-185055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F4C4A98678
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:52:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286B1A9867C
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 578581B65421
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:53:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09ADE189B5F5
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BC4262FF7;
-	Wed, 23 Apr 2025 09:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FD6265CAD;
+	Wed, 23 Apr 2025 09:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/4rlgCh"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F14244664;
-	Wed, 23 Apr 2025 09:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2F8262FF2
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 09:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745401957; cv=none; b=cIbdEI5RzCZSnYUcSiG/JLeI3hkcUHctTq6Yq16n8uUXls0WtDj9c7ZXgQBUIFbYvfZsd70wo3t+QxRZOHxkhr3rKdX+JB8x9D93FCbtEg4nQh+jeKw/5Z3MjsyWAft0ePGpqQSfZL53bVTXmXC2iiJrFEU2g3c0hb6QMI2pOpg=
+	t=1745401989; cv=none; b=d2P99JhJ+ZwXPg651sRXyqxnd2Z3zzmZJU+lSeAYJCvpeTkJk2OgBgwxEUrSBEUM2e4ihLPNQRFNak2UY0A5OSI2Bq8vV3TUKHTTJZ87156VYgsIauNMSunolawgUdi77zWO2Ul3uEUAUsFsb21w2jqHqiCQwV5pBxsxzbYY25k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745401957; c=relaxed/simple;
-	bh=eng0Kl1y21wM6mLTFLHDhzUYy9jCSvV0putd8xHi5Ro=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jDbKiqwulQ4ESDEHGE+W00JjKaDWi96HevHA7Kbb+6O6DYkgdVdj5cQJkQy9s7wz2b7RCDcotlbxe9JzHlPlAYTrCFWB7qzbNvnkk+T+vkXE/d5UWl/6qlBCNdlBW+EaZug/PiBx2Q7eyLoT9i5y3uj837MsNNyXvVDXixnEYAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB64B2B;
-	Wed, 23 Apr 2025 02:52:29 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.manchester.arm.com [10.32.100.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2DC8F3F59E;
-	Wed, 23 Apr 2025 02:52:32 -0700 (PDT)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Yixun Lan <dlan@gentoo.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next] net: stmmac: sun8i: drop unneeded default syscon value
-Date: Wed, 23 Apr 2025 10:52:22 +0100
-Message-Id: <20250423095222.1517507-1-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1745401989; c=relaxed/simple;
+	bh=U5yXw26sa3szgBEB4LzfURQCw32HcHb31OM/JpInzAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kmtfj1j2FNOpV+jadiWYqqn6I8SEXTWYbmsSxMBg0wHoXubCzXPWk8spb8O5OcLiuTl8Sq4ITSYiXConCSTFmDhGM2lC4kbQSgo0f3v/gz/tAJnIHs+RpvQfIX9Dw0e84h4zujkB7Pzp8Q+j1WScxoVTVhhLJgo4Mypv6CMXKzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I/4rlgCh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745401986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dj2sAoXNr+Ixy1q2pKFX2yBLtrU4B8tUlBpM53gKSfA=;
+	b=I/4rlgChzi1AbXEX6dD31bPCB20VP0UJn5FxcyTgYwXrfNe9jUkyqBpwtrvqIJ1ybQHYeK
+	moV+sHMI/lfKmsshQ30usuRznviZcD1xV2IN+IPjc4CucMVktrjea0O9GFVQpFUeuWz3do
+	FJcctMs3gHEwsNOhO541zTdJ4F/4Nto=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-65-k6zl9hWROfaDxOA_TM0oZg-1; Wed, 23 Apr 2025 05:53:05 -0400
+X-MC-Unique: k6zl9hWROfaDxOA_TM0oZg-1
+X-Mimecast-MFC-AGG-ID: k6zl9hWROfaDxOA_TM0oZg_1745401984
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6e90b13f5c3so141046056d6.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 02:53:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745401984; x=1746006784;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dj2sAoXNr+Ixy1q2pKFX2yBLtrU4B8tUlBpM53gKSfA=;
+        b=LQGMKTTcUgCEnszjCTKWocuK1dcIs0HhGjewG0LY606TrXRhgN24JqnQT2N6598PHN
+         MbUQ00qIrpS1mtQNz83QTEcJDK/TOMKlW9Hp0sRGshFyHzME9RXv5OlKNosY5QsSrQPK
+         VvnUTypm6Jd9GSUCn29IA7qxcfKu0xr7JmRBmWIMiLelyC7BA9uBNNoTSjKfDHHw0jgk
+         UkMg3JKp5LfR63VJw+QS5apc2RmcQCd20yescvILrG5hvewQpDoCnkI9JQxniJNlo/PS
+         xldtcw/A8/PpZbhWYlhW8k/tN9h8CymsH4bKaQBMzEFQAZTwnC9LlHYno9EZYo5Fno9G
+         Ej6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWNMjtt9XAEQHTtbRO02cD09PBsMJ/BHtmPK4DfSE7QtRs5Eel0f9OiSt3/RTm0nDKDH6P55Eg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEITAfKHfJH1bbXMkyhX7T4Gv4c0vsu2QVKurviVHjghlP5pYG
+	PFAj620gwgsuYgzMrhCC1j/qCBGvfs/1pVcXsxE+eyuOd35tgoeIGTg5ncglekq3GquQ/QwGv3v
+	fzWVDfuRitPcHSlsHAnU32k149cGs7fhvxiyANVvE+C6sHLY4dTC00a6C5QbS3g==
+X-Gm-Gg: ASbGncv8N7Khnt0mdzRHaJxv0Y0+wOI1BRadgzjYVsQeRaZZxQQhDuv4P/y93Lftb4F
+	Lpht5TMEBGgP0gn091sPxi+fgGexeaCEUgC6ygguSZEixS9OlVOZVP5H5NbbJZ6SCovPCMgaNOG
+	LcNbk5hrVMser5Zf9iJe5ApGIyN5ODRFYkf92Uo1Rqyzh6hJpMnOalC5vKVm8BZus1n3w9ovBZo
+	KBUjlgCkGYQer7dKatV8ls7XvhvTyJECs/ed1m9tPs85HddC8Hvi3iE+jNkU+yA+Pgnk1ggnMP5
+	Q3J6iVNYwiEqNcA/IA==
+X-Received: by 2002:a05:6214:29cd:b0:6e8:9e9c:d20f with SMTP id 6a1803df08f44-6f2c4576b1amr350122606d6.21.1745401983905;
+        Wed, 23 Apr 2025 02:53:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmgp2JwRrNMK/q74s595Od7UgPj2YU5GS4W3JOW29wbPRRb1P3CCPoBNzovYyqRKwPt+8evQ==
+X-Received: by 2002:a05:6214:29cd:b0:6e8:9e9c:d20f with SMTP id 6a1803df08f44-6f2c4576b1amr350122286d6.21.1745401983459;
+        Wed, 23 Apr 2025 02:53:03 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.217.181])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f2c2af1c27sm68897826d6.2.2025.04.23.02.53.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 02:53:02 -0700 (PDT)
+Date: Wed, 23 Apr 2025 11:52:52 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests/vsock: add initial vmtest.sh for
+ vsock
+Message-ID: <lgqapvbfvfzkbe3xzuytba4zct7zryomgqfnc4k7ejhxxzanyj@n7i5jawceipr>
+References: <20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com>
 
-For some odd reason we are very picky about the value of the EMAC clock
-register from the syscon block, insisting on a certain reset value and
-only doing read-modify-write operations on that register, even though we
-pretty much know the register layout.
-This already led to a basically redundant variant entry for the H6, which
-only differs by that value. We will have the same situation with the new
-A523 SoC, which again is compatible to the A64, but has a different syscon
-reset value.
+Hi Bobby,
+I had couple of more comments below:
 
-Drop any assumptions about that value, and set or clear the bits that we
-want to program, from scratch (starting with a value of 0). For the
-remove() implementation, we just turn on the POWERDOWN bit, and deselect
-the internal PHY, which mimics the existing code.
+On Thu, Apr 17, 2025 at 10:05:53PM -0700, Bobby Eshleman wrote:
+>This commit introduces a new vmtest.sh runner for vsock.
+>
+>It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+>H2G, and loopback. The testing tools from tools/testing/vsock/ are
+>reused. Currently, only vsock_test is used.
+>
+>VMCI and hyperv support is automatically built, though not used.
+>
+>Only tested on x86.
+>
+>To run:
+>
+>  $ tools/testing/selftests/vsock/vmtest.sh
+>
+>Future work can include vsock_diag_test.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+>---
+>Changes in v2:
+>- add kernel oops and warnings checker
+>- change testname variable to use FUNCNAME
+>- fix spacing in test_vm_server_host_client
+>- add -s skip build option to vmtest.sh
+>- add test_vm_loopback
+>- pass port to vm_wait_for_listener
+>- fix indentation in vmtest.sh
+>- add vmci and hyperv to config
+>- changed whitespace from tabs to spaces in help string
+>- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
+>---
+> MAINTAINERS                                |   1 +
+> tools/testing/selftests/vsock/.gitignore   |   1 +
+> tools/testing/selftests/vsock/config.vsock |  10 +
+> tools/testing/selftests/vsock/vmtest.sh    | 306 +++++++++++++++++++++++++++++
+> 4 files changed, 318 insertions(+)
+>
+>diff --git a/MAINTAINERS b/MAINTAINERS
+>index c3fce441672349f7850c57d788bc1a29b203fba5..f214cf7c4fb59ec67885ee6c81daa44e17c80f5f 100644
+>--- a/MAINTAINERS
+>+++ b/MAINTAINERS
+>@@ -25323,6 +25323,7 @@ F:	include/uapi/linux/vm_sockets.h
+> F:	include/uapi/linux/vm_sockets_diag.h
+> F:	include/uapi/linux/vsockmon.h
+> F:	net/vmw_vsock/
+>+F:	tools/testing/selftests/vsock/
+> F:	tools/testing/vsock/
+>
+> VMALLOC
+>diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..1950aa8ac68c0831c12c1aaa429da45bbe41e60f
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/.gitignore
+>@@ -0,0 +1 @@
+>+vsock_selftests.log
+>diff --git a/tools/testing/selftests/vsock/config.vsock b/tools/testing/selftests/vsock/config.vsock
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..9e0fb2270e6a2fc0beb5f0d9f0bc37158d0a9d23
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/config.vsock
+>@@ -0,0 +1,10 @@
+>+CONFIG_VSOCKETS=y
+>+CONFIG_VSOCKETS_DIAG=y
+>+CONFIG_VSOCKETS_LOOPBACK=y
+>+CONFIG_VMWARE_VMCI_VSOCKETS=y
+>+CONFIG_VIRTIO_VSOCKETS=y
+>+CONFIG_VIRTIO_VSOCKETS_COMMON=y
+>+CONFIG_HYPERV_VSOCKETS=y
+>+CONFIG_VMWARE_VMCI=y
+>+CONFIG_VHOST_VSOCK=y
+>+CONFIG_HYPERV=y
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>new file mode 100755
+>index 0000000000000000000000000000000000000000..61dfcc06223fa7a30cb575cb3f2d01121b3ed3ce
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -0,0 +1,306 @@
+>+#!/bin/bash
+>+# SPDX-License-Identifier: GPL-2.0
+>+#
+>+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
+>+#
+>+# Dependencies:
+>+#		* virtme-ng
+>+#		* busybox-static (used by virtme-ng)
+>+#		* qemu	(used by virtme-ng)
+>+
+>+SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+>+KERNEL_CHECKOUT=$(realpath ${SCRIPT_DIR}/../../../..)
+>+PLATFORM=${PLATFORM:-$(uname -m)}
+>+
+>+if [[ -z "${QEMU:-}" ]]; then
+>+	QEMU=$(which qemu-system-${PLATFORM})
+>+fi
+>+
+>+SKIP_BUILD=0
+>+
+>+VSOCK_TEST=${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
+>+
+>+TEST_GUEST_PORT=51000
+>+TEST_HOST_PORT=50000
+>+TEST_HOST_PORT_LISTENER=50001
+>+SSH_GUEST_PORT=22
+>+SSH_HOST_PORT=2222
+>+VSOCK_CID=1234
+>+
+>+QEMU_PIDFILE=/tmp/qemu.pid
+>+
+>+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
+>+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
+>+# adding an additional port to forward to the device created from "--ssh" and
+>+# virtme-init mistakenly sets identical IPs to the ssh device and additional
+>+# devices, we instead opt out of using --ssh, add the device manually, and also
+>+# add the kernel cmdline options that virtme-init uses to setup the interface.
+>+QEMU_OPTS=""
+>+QEMU_OPTS="${QEMU_OPTS} -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
+>+QEMU_OPTS="${QEMU_OPTS},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
+>+QEMU_OPTS="${QEMU_OPTS} -device virtio-net-pci,netdev=n0"
+>+QEMU_OPTS="${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=${VSOCK_CID}"
+>+QEMU_OPTS="${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
+>+KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
+>+
+>+LOG=${SCRIPT_DIR}/vsock_selftests.log
+>+
+>+#		Name				Description
+>+tests="
+>+	vm_server_host_client     Run vsock_test in server mode on the VM and in client mode on the host.
+>+	vm_client_host_server     Run vsock_test in client mode on the VM and in server mode on the host.
+>+	vm_loopback               Run vsock_test using the loopback transport in the VM.
+>+"
+>+
+>+usage() {
+>+	echo
+>+	echo "$0 [OPTIONS]"
+>+	echo
+>+	echo "Options"
+>+	echo "  -v: verbose output"
+>+	echo "  -s: skip build"
+>+	echo
+>+	echo "Available tests${tests}"
+>+	exit 1
+>+}
+>+
+>+die() {
+>+	echo "$*" >&2
+>+	exit 1
+>+}
+>+
+>+vm_ssh() {
+>+	ssh -q -o UserKnownHostsFile=/dev/null -p 2222 localhost $*
+>+	return $?
+>+}
+>+
+>+cleanup() {
+>+	if [[ -f "${QEMU_PIDFILE}" ]]; then
+>+		pkill -9 -F ${QEMU_PIDFILE} 2>&1 >/dev/null
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
-Hi,
+Why SIGKILL ? can we be more graceful (e.g. SIGTERM) ?
 
-if anyone can shed some light on why we had this value and its handling
-in the first place, I would be grateful. I don't really get its purpose,
-and especially the warning message about the reset value seems odd.
-I briefly tested this on A523, H3, H6, but would be glad to see more
-testing on this.
+>+	fi
+>+}
+>+
+>+build() {
+>+	log_setup "Building kernel and tests"
+>+
+>+	pushd ${KERNEL_CHECKOUT} >/dev/null
+>+	vng \
+>+		--kconfig \
+>+		--config ${KERNEL_CHECKOUT}/tools/testing/selftests/vsock/config.vsock
+>+	make -j$(nproc)
+>+	make -C ${KERNEL_CHECKOUT}/tools/testing/vsock
+>+	popd >/dev/null
+>+	echo
+>+}
+>+
+>+vm_setup() {
+>+	local VNG_OPTS=""
+>+	if [[ "${VERBOSE}" = 1 ]]; then
+>+		VNG_OPTS="--verbose"
+>+	fi
+>+	vng \
+>+		$VNG_OPTS	\
+>+		--run ~/local/linux \
+>+		--qemu /bin/qemu-system-x86_64 \
+>+		--qemu-opts="${QEMU_OPTS}" \
+>+		--user root \
+>+		--append "${KERNEL_CMDLINE}" \
+>+		--rw  2>&1 >/dev/null &
+>+}
+>+
+>+vm_wait_for_ssh() {
+>+	i=0
+>+	while [[ true ]]; do
+>+		if (( i > 20 )); then
+>+			die "Timed out waiting for guest ssh"
+>+		fi
+>+		vm_ssh -- true
+>+		if [[ $? -eq 0 ]]; then
+>+			break
+>+		fi
+>+		i=$(( i + 1 ))
+>+		sleep 5
+>+	done
+>+}
+>+
+>+wait_for_listener() {
+>+	local PORT=$1
+>+	local i=0
+>+	while ! ss -ltn | grep -q ":${PORT}"; do
+>+		if (( i > 30 )); then
+>+			die "Timed out waiting for listener on port ${PORT}"
+>+		fi
+>+		sleep 3
+>+		i=$(( i + 1 ))
+>+	done
+>+}
+>+
+>+vm_wait_for_listener() {
+>+	local port=$1
+>+	vm_ssh -- "$(declare -f wait_for_listener); wait_for_listener ${port}"
+>+}
+>+
+>+host_wait_for_listener() {
+>+	wait_for_listener ${TEST_HOST_LISTENER_PORT}
 
-Cheers,
-Andre
+Typo here: s/TEST_HOST_LISTENER_PORT/TEST_HOST_PORT_LISTENER
 
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 47 ++-----------------
- 1 file changed, 4 insertions(+), 43 deletions(-)
+>+}
+>+
+>+log() {
+>+	local prefix="$1"
+>+	shift
+>+
+>+	if [[ "$#" -eq 0 ]]; then
+>+		cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
+>+	else
+>+		echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
+>+	fi
+>+}
+>+
+>+log_setup() {
+>+	log "setup" "$@"
+>+}
+>+
+>+log_host() {
+>+	testname=$1
+>+	shift
+>+	log "test:${testname}:host" "$@"
+>+}
+>+
+>+log_guest() {
+>+	testname=$1
+>+	shift
+>+	log "test:${testname}:guest" "$@"
+>+}
+>+
+>+test_vm_server_host_client() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+
+>+	vm_ssh -- "${VSOCK_TEST}" \
+>+		--mode=server \
+>+		--control-port="${TEST_GUEST_PORT}" \
+>+		--peer-cid=2 \
+>+		2>&1 | log_guest "${testname}" &
+>+
+>+	vm_wait_for_listener ${TEST_GUEST_PORT}
+>+
+>+	${VSOCK_TEST}	\
+>+		--mode=client	\
+>+		--control-host=127.0.0.1	\
+>+		--peer-cid="${VSOCK_CID}"	\
+>+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
+>+
+>+	rc=$?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 85723a78793ab..0f8d29763a909 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -31,10 +31,6 @@
-  */
- 
- /* struct emac_variant - Describe dwmac-sun8i hardware variant
-- * @default_syscon_value:	The default value of the EMAC register in syscon
-- *				This value is used for disabling properly EMAC
-- *				and used as a good starting value in case of the
-- *				boot process(uboot) leave some stuff.
-  * @syscon_field		reg_field for the syscon's gmac register
-  * @soc_has_internal_phy:	Does the MAC embed an internal PHY
-  * @support_mii:		Does the MAC handle MII
-@@ -48,7 +44,6 @@
-  *				value of zero indicates this is not supported.
-  */
- struct emac_variant {
--	u32 default_syscon_value;
- 	const struct reg_field *syscon_field;
- 	bool soc_has_internal_phy;
- 	bool support_mii;
-@@ -94,7 +89,6 @@ static const struct reg_field sun8i_ccu_reg_field = {
- };
- 
- static const struct emac_variant emac_variant_h3 = {
--	.default_syscon_value = 0x58000,
- 	.syscon_field = &sun8i_syscon_reg_field,
- 	.soc_has_internal_phy = true,
- 	.support_mii = true,
-@@ -105,14 +99,12 @@ static const struct emac_variant emac_variant_h3 = {
- };
- 
- static const struct emac_variant emac_variant_v3s = {
--	.default_syscon_value = 0x38000,
- 	.syscon_field = &sun8i_syscon_reg_field,
- 	.soc_has_internal_phy = true,
- 	.support_mii = true
- };
- 
- static const struct emac_variant emac_variant_a83t = {
--	.default_syscon_value = 0,
- 	.syscon_field = &sun8i_syscon_reg_field,
- 	.soc_has_internal_phy = false,
- 	.support_mii = true,
-@@ -122,7 +114,6 @@ static const struct emac_variant emac_variant_a83t = {
- };
- 
- static const struct emac_variant emac_variant_r40 = {
--	.default_syscon_value = 0,
- 	.syscon_field = &sun8i_ccu_reg_field,
- 	.support_mii = true,
- 	.support_rgmii = true,
-@@ -130,7 +121,6 @@ static const struct emac_variant emac_variant_r40 = {
- };
- 
- static const struct emac_variant emac_variant_a64 = {
--	.default_syscon_value = 0,
- 	.syscon_field = &sun8i_syscon_reg_field,
- 	.soc_has_internal_phy = false,
- 	.support_mii = true,
-@@ -141,7 +131,6 @@ static const struct emac_variant emac_variant_a64 = {
- };
- 
- static const struct emac_variant emac_variant_h6 = {
--	.default_syscon_value = 0x50000,
- 	.syscon_field = &sun8i_syscon_reg_field,
- 	/* The "Internal PHY" of H6 is not on the die. It's on the
- 	 * co-packaged AC200 chip instead.
-@@ -933,25 +922,11 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 	struct sunxi_priv_data *gmac = plat->bsp_priv;
- 	struct device_node *node = dev->of_node;
- 	int ret;
--	u32 reg, val;
--
--	ret = regmap_field_read(gmac->regmap_field, &val);
--	if (ret) {
--		dev_err(dev, "Fail to read from regmap field.\n");
--		return ret;
--	}
--
--	reg = gmac->variant->default_syscon_value;
--	if (reg != val)
--		dev_warn(dev,
--			 "Current syscon value is not the default %x (expect %x)\n",
--			 val, reg);
-+	u32 reg = 0, val;
- 
- 	if (gmac->variant->soc_has_internal_phy) {
- 		if (of_property_read_bool(node, "allwinner,leds-active-low"))
- 			reg |= H3_EPHY_LED_POL;
--		else
--			reg &= ~H3_EPHY_LED_POL;
- 
- 		/* Force EPHY xtal frequency to 24MHz. */
- 		reg |= H3_EPHY_CLK_SEL;
-@@ -965,11 +940,6 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		 * address. No need to mask it again.
- 		 */
- 		reg |= 1 << H3_EPHY_ADDR_SHIFT;
--	} else {
--		/* For SoCs without internal PHY the PHY selection bit should be
--		 * set to 0 (external PHY).
--		 */
--		reg &= ~H3_EPHY_SELECT;
- 	}
- 
- 	if (!of_property_read_u32(node, "allwinner,tx-delay-ps", &val)) {
-@@ -980,8 +950,6 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		val /= 100;
- 		dev_dbg(dev, "set tx-delay to %x\n", val);
- 		if (val <= gmac->variant->tx_delay_max) {
--			reg &= ~(gmac->variant->tx_delay_max <<
--				 SYSCON_ETXDC_SHIFT);
- 			reg |= (val << SYSCON_ETXDC_SHIFT);
- 		} else {
- 			dev_err(dev, "Invalid TX clock delay: %d\n",
-@@ -998,8 +966,6 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		val /= 100;
- 		dev_dbg(dev, "set rx-delay to %x\n", val);
- 		if (val <= gmac->variant->rx_delay_max) {
--			reg &= ~(gmac->variant->rx_delay_max <<
--				 SYSCON_ERXDC_SHIFT);
- 			reg |= (val << SYSCON_ERXDC_SHIFT);
- 		} else {
- 			dev_err(dev, "Invalid RX clock delay: %d\n",
-@@ -1008,11 +974,6 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		}
- 	}
- 
--	/* Clear interface mode bits */
--	reg &= ~(SYSCON_ETCS_MASK | SYSCON_EPIT);
--	if (gmac->variant->support_rmii)
--		reg &= ~SYSCON_RMII_EN;
--
- 	switch (plat->mac_interface) {
- 	case PHY_INTERFACE_MODE_MII:
- 		/* default */
-@@ -1039,9 +1000,9 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 
- static void sun8i_dwmac_unset_syscon(struct sunxi_priv_data *gmac)
- {
--	u32 reg = gmac->variant->default_syscon_value;
--
--	regmap_field_write(gmac->regmap_field, reg);
-+	if (gmac->variant->soc_has_internal_phy)
-+		regmap_field_write(gmac->regmap_field,
-+				   (H3_EPHY_SHUTDOWN | H3_EPHY_SELECT));
- }
- 
- static void sun8i_dwmac_exit(struct platform_device *pdev, void *priv)
--- 
-2.25.1
+Why using a global variable instead of a return value?
+
+>+}
+>+
+>+test_vm_client_host_server() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+
+>+	${VSOCK_TEST}	\
+>+		--mode "server" \
+>+		--control-port "${TEST_HOST_PORT_LISTENER}" \
+>+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
+>+
+>+	host_wait_for_listener
+>+
+>+	vm_ssh -- "${VSOCK_TEST}"	\
+>+		--mode=client	\
+>+		--control-host=10.0.2.2	\
+>+		--peer-cid=2	\
+>+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
+>+
+>+	rc=$?
+>+}
+>+
+>+test_vm_loopback() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+	local port=60000 # non-forwarded local port
+>+
+>+	vm_ssh -- ${VSOCK_TEST}	\
+>+		--mode=server \
+>+		--control-port="${port}" \
+>+		--peer-cid="${VSOCK_CID}" &
+>+
+>+	vm_wait_for_listener ${port}
+>+
+>+	vm_ssh -- ${VSOCK_TEST}	\
+>+		--mode=client	\
+>+		--control-host="127.0.0.1" \
+>+		--control-port="${port}" \
+>+		--peer-cid="${VSOCK_CID}"
+>+
+>+	rc=$?
+>+}
+>+
+>+run_test() {
+>+	unset IFS
+>+	local host_oops_cnt_before=$(dmesg | grep -i 'Oops' | wc -l)
+>+	local host_warn_cnt_before=$(dmesg --level=warn | wc -l)
+>+	local vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
+>+	local vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+
+>+	name=$(echo "${1}" | awk '{ print $1 }')
+>+	eval test_"${name}"
+>+
+>+	local host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
+>+	if [[ ${host_oops_cnt_after} -gt ${host_oops_cnt_before} ]]; then
+>+		echo "${name}: kernel oops detected on host" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	local host_warn_cnt_after=$(dmesg --level=warn | wc -l)
+>+	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
+>+		echo "${name}: kernel warning detected on host" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	local vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
+>+	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
+>+		echo "${name}: kernel oops detected on vm" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	local vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
+>+		echo "${name}: kernel warning detected on vm" | log_host ${name}
+>+		rc=1
+>+	fi
+>+}
+>+
+>+while getopts :hvs o
+>+do
+>+	case $o in
+>+	v) VERBOSE=1;;
+
+Should we set VERBOSE=0 on top as default like we do for SKIP_BUILD ?
+
+>+	s) SKIP_BUILD=1;;
+>+	h|*) usage;;
+>+	esac
+>+done
+>+shift $((OPTIND-1))
+>+
+>+trap cleanup EXIT
+>+
+>+> ${LOG}
+>+if (( SKIP_BUILD != 1 )); then
+
+I recommend using the same syntax in this file to check variables
+(I mean for example when we check SKIP_BUILD and VERBOSE), I don't
+have a preference.
+
+>+	build
+>+fi
+>+log_setup "Booting up VM"
+>+vm_setup
+>+vm_wait_for_ssh
+>+log_setup "VM booted up"
+>+
+>+IFS="
+>+"
+>+cnt=0
+>+for t in ${tests}; do
+>+	rc=0
+>+	run_test "${t}"
+>+	if [[ ${rc} != 0 ]]; then
+>+		cnt=$(( cnt + 1 ))
+>+	fi
+>+done
+>+
+>+if [[ ${cnt} = 0 ]]; then
+>+	echo OK
+>+else
+>+	echo FAILED: ${cnt}
+>+fi
+>+echo "Log: ${LOG}"
+>+exit ${cnt}
+>
+>---
+>base-commit: cc04ed502457412960d215b9cd55f0d966fda255
+>change-id: 20250325-vsock-vmtest-b3a21d2102c2
+>
+>Best regards,
+>-- 
+>Bobby Eshleman <bobbyeshleman@gmail.com>
+>
 
 
