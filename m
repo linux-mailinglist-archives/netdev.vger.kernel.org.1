@@ -1,67 +1,45 @@
-Return-Path: <netdev+bounces-185227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68BAA995ED
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:59:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9BEA99671
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:22:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2157C1B6750C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:59:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902493B4ECB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AB328A1CF;
-	Wed, 23 Apr 2025 16:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HTgGcYUY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6652328C5BF;
+	Wed, 23 Apr 2025 17:21:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from caffeine.csclub.uwaterloo.ca (caffeine.csclub.uwaterloo.ca [129.97.134.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9E52820AF;
-	Wed, 23 Apr 2025 16:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1DD28A41A;
+	Wed, 23 Apr 2025 17:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.97.134.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745427566; cv=none; b=Ufh2CyzAlNinMALQdObQdGOkblnHDSYy+eLmUBMPkRVDgxy+CbsV2VhtpYY02DbyyJpdsBrC95xr4b4EXgos8MPQrhuz/fxK2eBnx3wVW9oMBgd1HiHqlUr9o5YG7H96GMA6onwjvJNaoKsyPy9AQAIyBKxkTp1PwpvHes5Lh68=
+	t=1745428896; cv=none; b=dzScx89f2OXDBey777bToJjcKwpQhRrxE31QSGtqQ06ZvPgBVLIU3dI10yySsUNkx8j6uK4gZBN3yD1lIq/mfDmpMIrHqYDv77ykwxWx3fAAKwaUtH+SLCPKMivdAvDQR8Aci7V+KBOODRjDZuec2md4fIGcrxNZ7dr8uVhD664=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745427566; c=relaxed/simple;
-	bh=sX77W58og4f7TVzBiVcSzr1pOUIuK6lzidg8w6JHimQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e5ioafuIyU/qeHkCJEFusHx4N4IfehjPcudXLttrpFNYrmDiWTlaxUgUHSa+kem3gHCoZJBEa7D6L5uzcmgPxJj3xHtVlmkWlKTVqhnbK7K0uwMMsfkrEHeu0raMxgMK7r9JXoJo1kBZT7zpftneZopQESc8XMwWWxpvuzZAKjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HTgGcYUY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9eg5/u6HzX0Cp+nICWQL7K//s1nQYj6V4b9sPm0RHqc=; b=HTgGcYUYQrh/dviTjPqiP+NehA
-	j9fzKjHgaPNTBMwNKS+qS5WEXTole8ST55pYhA+OG/elfkf+SOkH46lYaUW1+ymoVsNRt7m+PCjN3
-	fFDnjgFQ9nuHL5oKa+aHDDUnP1XDpoJg565TXYNMX0onQw2zzfYR2KVgbvQ1V4jIQsJM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u7dRI-00AMTD-Pu; Wed, 23 Apr 2025 18:59:12 +0200
-Date: Wed, 23 Apr 2025 18:59:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yixun Lan <dlan@gentoo.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 5/5] arm64: dts: allwinner: t527: add EMAC0 to Avaoto-A1
- board
-Message-ID: <de5ecf8c-2dcb-4228-8cb0-daea4767639f@lunn.ch>
-References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
- <20250423-01-sun55i-emac0-v1-5-46ee4c855e0a@gentoo.org>
+	s=arc-20240116; t=1745428896; c=relaxed/simple;
+	bh=d4Egn7mgBRaSWdNorW7Zr3c+3merAWcJknb6FQv5GeA=;
+	h=Date:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:From; b=YFYUKQr7xiuZlp2g9r1KfqWlpbgZhBrFpBMvhoqId2Au0BgLVyTOGQIG3lHbeVgZdVWA1n2KEmoh3e8xIlNFzvl7yonDydToI5X7cOcXHv0VKOOdTIJCgGqCdqpfVc+f7puexkSDEYaUyv1t4stmyR+B3ycQfuYpsWsbSRHmLbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca; spf=pass smtp.mailfrom=csclub.uwaterloo.ca; arc=none smtp.client-ip=129.97.134.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csclub.uwaterloo.ca
+Received: by caffeine.csclub.uwaterloo.ca (Postfix, from userid 20367)
+	id 97DED460E57; Wed, 23 Apr 2025 13:12:54 -0400 (EDT)
+Date: Wed, 23 Apr 2025 13:12:54 -0400
+To: intel-wired-lan@lists.osuosl.org
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Netdev <netdev@vger.kernel.org>,
+	Len Sorensen <lsorense@csclub.uwaterloo.ca>
+Subject: Fix promiscous and multicast mode on iavf after reset
+Message-ID: <aAkflkxbvC8MB8PG@csclub.uwaterloo.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,16 +48,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423-01-sun55i-emac0-v1-5-46ee4c855e0a@gentoo.org>
+From: Lennart Sorensen <lsorense@csclub.uwaterloo.ca>
 
-> +&emac0 {
-> +	phy-mode = "rgmii";
-> +	phy-handle = <&ext_rgmii_phy>;
-> +
-> +	allwinner,tx-delay-ps = <100>;
-> +	allwinner,rx-delay-ps = <300>;
+I discovered that anything that causes a reset in iavf makes breaks
+promiscous mode and multicast.  This is because the host side ice
+driver clears the VF from filters when it is reset.  iavf then correctly
+calls iavf_configure, but since the current_netdev_promisc_flags already
+match the netdev promisc settings, nothing is done, so the promisc and
+multicast settings are not sent to the ice host driver after the reset.
+As a result the iavf side shows promisc enabled but it isn't working.
+Disabling and re-enabling promisc on the iavf side fixes it of course.
+Simple test case to show this is to enable promisc, check that packets
+are being seen, then change the mtu size (which does a reset) and check
+packets received again, and promisc is no longer active.  Disabling
+promisc and enabling it again restores receiving the packets.
 
-Same issue here.
+The following seems to work for me, but I am not sure it is the correct
+place to clear the saved flags.
 
-     Andrew
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 6d7ba4d67a19..4018a08d63c1 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -3233,6 +3233,14 @@ static void iavf_reset_task(struct work_struct *work)
+ 		iavf_shutdown_adminq(hw);
+ 		iavf_init_adminq(hw);
+ 		iavf_request_reset(adapter);
++
++		/* Clear remembered promisc and multicast flags since
++		 * reset clears them on the host so they will get force
++		 * applied again through iavf_configure() down below.
++		 */
++		spin_lock_bh(&adapter->current_netdev_promisc_flags_lock);
++		adapter->current_netdev_promisc_flags &= ~(IFF_PROMISC | IFF_ALLMULTI);
++		spin_unlock_bh(&adapter->current_netdev_promisc_flags_lock);
+ 	}
+ 	adapter->flags |= IAVF_FLAG_RESET_PENDING;
+ 
+
+-- 
+Len Sorensen
 
