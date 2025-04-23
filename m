@@ -1,98 +1,172 @@
-Return-Path: <netdev+bounces-185148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CFABA98B8C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:42:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D13A98B9C
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 633931779C4
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:42:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C006163907
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58791ABED9;
-	Wed, 23 Apr 2025 13:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DC21A8F8A;
+	Wed, 23 Apr 2025 13:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqa6pac6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i45NS8VH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9FA1C3C04
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC5C195B1A
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745415627; cv=none; b=HwbgE6CKjjSMd9ByimYonIun7l4MbEpwRgvRLciNsoNWH4x3zFlAshSwx9hmkfvbxZO/NY7lZL1RADbHbLDggHgPQHOV3FY8pIsnwLbCvKPnWEX53sV0w+pvMeCcxcu8cNh3bv53sRsmUdxv6xiSl1PGaVVByf8WDA7BayKLoek=
+	t=1745415797; cv=none; b=f7Al3iMbsXDkPJhibn/IM08EDFpfg+YQ+KoAM6zx5wfRRGeohphag0d93mBbUFrLPUCnfzLTD2FmuUAHYVEzKaV5qPAR8aDCNX1qKJrZmXGSpM9RV0sh4JQVlzEo+1nnq3vTA6SMUYGeFAau46HvwtTy1yNYHdHQbR3c7a+CTuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745415627; c=relaxed/simple;
-	bh=IbI+nb/is5P0KrD1xbkdWthbjwY2pi2xE3YupUSVimc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZnX1ocMPW4V3YqfcHqyGnICrIOxZjXjcZ/sypqTLO4zlw/3fpbFYJnh7a5x33GUWRd55tUYTGixSyP1s3MFQY1epBm7+BrdoMlg1Y7jYkV4BZNqUwXDs1xZC67dYbFmsIdSkf4YEz8VzFp+396rMfypg4pQ1HHGYspsXvuN6ADE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqa6pac6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F11DFC4CEE2;
-	Wed, 23 Apr 2025 13:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745415627;
-	bh=IbI+nb/is5P0KrD1xbkdWthbjwY2pi2xE3YupUSVimc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hqa6pac6EXLAf+7vy0zNQvIt6Zg3wO9uEWXb9WtLX4n4i7ZHHxO8tPxppdjn3AF6V
-	 i0Z9JGdqpNW5lwkZiVIE0ngDFoU+wt3QjCs0SUyJ4FhKzRZTDJP1LuM0HJyEFZha3G
-	 77ndsj4/qqu9+MDTEbivdMHafEi3ytawgqJRVV2o7+it1j0u55DChkpTMekV7mVD1L
-	 UeXDHy1uXgYJiQPhR0PbkURQA4kfWbnIz1mI1fVvsG735mRBXDdVSKIdoBPgE9fcPm
-	 lfs7LPqQFdQfVRcZ4agTgmmwWWVlLMbPMu6oyRWjzQ22O8USXML+hpY3/VfaYicpwY
-	 8SSPc4qXpkifg==
-Date: Wed, 23 Apr 2025 06:40:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 2/3] pfcp: Convert pfcp_net_exit() to
- ->exit_rtnl().
-Message-ID: <20250423064026.636c822f@kernel.org>
-In-Reply-To: <20250418003259.48017-3-kuniyu@amazon.com>
-References: <20250418003259.48017-1-kuniyu@amazon.com>
-	<20250418003259.48017-3-kuniyu@amazon.com>
+	s=arc-20240116; t=1745415797; c=relaxed/simple;
+	bh=2oNxgFh7wQy3eSTXUuVVZ5YrZWKlKCIvbcZjJzlgFfk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=fmBZHf0nsVVtEXBTXd3uz1u0i2epiT2ktlVy+xVH3xOt8jmPGb75gLfnx/+KNxXCvHx9cxRfo+nJrJiKjfRFlhGMJOT4znt3qogSjm6QfyumgJV+21GUEQQ7BHLloHsqZj3HyohclVfK/F8fXj8MfU2hHltIjmJW81h07OuhK+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=i45NS8VH; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso62196805e9.2
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 06:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745415792; x=1746020592; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FfrnhMcNKf5rCGWHGoNIZp7mNgbnWoHESdB7RpEhfqo=;
+        b=i45NS8VH9j1Oz0y0h9MAM2BESfQeaGh+Dh+a6FJhpDkpc/b5nSBZi6eUChnC3FtqOB
+         h9RYFH9VVn2NY3O6feDekcZTqtzU81CFECv4chNYTcRWpXluuaXpyhvsUJrIwD3lvj0i
+         g541zgQKukKKx5+D2EpbjzeO6J/1nFSeAOSvvyYJxVgmqlHzBUegXZf2/O1wUR5QnTKL
+         etVuKR5KPf5z13JejwrvSqbRsCW4zFAUwncAbqrA9TIS7dVdUaGFDyNAeWQ/6swPf5U3
+         0bD/tIlq0iMfTnvTVLaD15P8xHbFsCCKpyh6UgibOswlmcmWqOM6njeJJ+ECcYGXv+aY
+         XnHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745415792; x=1746020592;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FfrnhMcNKf5rCGWHGoNIZp7mNgbnWoHESdB7RpEhfqo=;
+        b=Q8Se6el1dM8Wkal8jpbi2+T22uAue9T8CwJioIx8mmwmvqM9ADmRZGOKK+cqDuNqY6
+         L7iZeBjHHstZS8F6mLhwZ9SLzuenI64brZf1jOe4eoviP8kXTm/7/QNN9fP+Q4zCplDN
+         rySZbeqhirtsKuwA59xRb7RTp2je3kVA5kxBLrRz8HE6ggcTCng6llkzTX/2CJifKMgK
+         sDTmQvYjiRXMtQTUdgEhE9U9sR5vag714IZk/NDQubqAVZa7+ao4wweS4CiY1Yngs2+V
+         a+xS5n38hKY5b0VIY8hIlNb4xN+ehKUiJdNf/gk0kt5Vse8yR0ZcqNluApHOa6kYcEpF
+         ndaw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3CnFrJKI8CEA2Pu3F66im9u73m90umsJI3yiWzgrVfU5stg7Buzlq6hO5ZygMyR9mViK0Xe8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8s0kMn2n6sOxAL463/J5nFlUzyuyPBrrll3ZJ/G9m3JdJhtnd
+	bsW/S43BjUXn2Jhh4O2NsfjBDoXuqIPdgZkGdEUb6skCcsy6mPamPryKgZVF2wc=
+X-Gm-Gg: ASbGncs7Dj95UR2Xcuco00uf72IYl557SL1aMVxK978pXeDvSptzoT/P7LnDKLGqo3c
+	I5dBaPBEZrw/7XA25NGKb0aI5oMHiCGB8fqKKH0wnUXBZe0+NATvgZzpM0Op4+4tkBNEfElcnZq
+	/rrtENmTZLE204EUQo8V1Z9UpY27mh/WSH7MDKNUGw74oTXa98atR4B+5rHfkbSYlb6wQb5WjYd
+	tSM0yTKJXeCPjiq4/VXwFA+4abTobPISPPA3sVo3JjerblFGznT5VpyV7lpnbzBjRB8h/F3Q7ZW
+	inAeYKZsyF15R+SRCpdZA0or+oQdJTxg+LjdtcTcOQDXhb0AHe+QdT4cc9QShNRLGF9wIs4j5+K
+	PyEyA1d+1wMMRKDXxIw==
+X-Google-Smtp-Source: AGHT+IHnS/+w8vgB7Qer4VFmmeqW2fg9vqIPQjMtQu2PKuXwZePY3kDPFYEnC2G7XWePQ888jen21Q==
+X-Received: by 2002:a05:600c:5027:b0:43c:fa52:7d2d with SMTP id 5b1f17b1804b1-4406abfa6bcmr157183955e9.20.1745415792377;
+        Wed, 23 Apr 2025 06:43:12 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:3d9:2080:2835:c2f4:c226:77dd? ([2a01:e0a:3d9:2080:2835:c2f4:c226:77dd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-44092db2ba6sm26108245e9.31.2025.04.23.06.43.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Apr 2025 06:43:11 -0700 (PDT)
+Message-ID: <1acbe9dc-02ca-4233-a79a-901e714f5c9c@linaro.org>
+Date: Wed, 23 Apr 2025 15:43:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 32/33] dt-bindings: display: panel: samsung,ams581vf01:
+ Add google,sunfish
+To: Danila Tikhonov <danila@jiaxyga.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-hardening@vger.kernel.org, linux@mainlining.org,
+ ~postmarketos/upstreaming@lists.sr.ht
+References: <20250422213137.80366-1-danila@jiaxyga.com>
+ <20250422213137.80366-16-danila@jiaxyga.com>
+Content-Language: en-US, fr
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro
+In-Reply-To: <20250422213137.80366-16-danila@jiaxyga.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu, 17 Apr 2025 17:32:33 -0700 Kuniyuki Iwashima wrote:
-> -static void __net_exit pfcp_net_exit(struct net *net)
-> +static void __net_exit pfcp_net_exit_rtnl(struct net *net,
-> +					  struct list_head *dev_to_kill)
->  {
->  	struct pfcp_net *pn = net_generic(net, pfcp_net_id);
->  	struct pfcp_dev *pfcp, *pfcp_next;
-> -	struct net_device *dev;
-> -	LIST_HEAD(list);
-> -
-> -	rtnl_lock();
-> -	for_each_netdev(net, dev)
-> -		if (dev->rtnl_link_ops == &pfcp_link_ops)
-> -			pfcp_dellink(dev, &list);
->  
->  	list_for_each_entry_safe(pfcp, pfcp_next, &pn->pfcp_dev_list, list)
-> -		pfcp_dellink(pfcp->dev, &list);
-> -
-> -	unregister_netdevice_many(&list);
-> -	rtnl_unlock();
-> +		pfcp_dellink(pfcp->dev, dev_to_kill);
+On 22/04/2025 23:31, Danila Tikhonov wrote:
+> This panel is used in Google Pixel 4a (google,sunfish). Document the
+> corresponding string.
+> 
+> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
+> ---
+>   .../bindings/display/panel/samsung,ams581vf01.yaml        | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml b/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
+> index 70dff9c0ef2b..a3a1de32d8be 100644
+> --- a/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
+> +++ b/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
+> @@ -17,7 +17,13 @@ allOf:
+>   
+>   properties:
+>     compatible:
+> -    const: samsung,ams581vf01
+> +    oneOf:
+> +      - enum:
+> +          - samsung,ams581vf01
+> +      - items:
+> +          - enum:
+> +              - google,ams581vf01-sunfish
+> +          - const: samsung,ams581vf01
 
-Kuniyuki, I got distracted by the fact the driver is broken but I think
-this isn't right. The devices do not migrate to the local pcfp_dev_list
-when their netns is changed. They always stay on the list of original
-netns. Which I guess may make some sense as that's where their socket
-is? So we need to scan both the pcfp_dev_list _and_ the local netdevs
-that are pfcp. Am I misunderstanding something?
 
-For gtp was the problem perhaps that we were walking multiple
-netns'es? I'm my understanding is correct then 4ccacf86491 needs 
-a redo :(
+Why do you introduce a new compatible ? using samsung,ams581vf01 is prefectly fine
+if it's same panel.
+
+Neil
+
+>   
+>     reg:
+>       maxItems: 1
+
 
