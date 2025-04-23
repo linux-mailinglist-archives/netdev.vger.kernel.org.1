@@ -1,190 +1,170 @@
-Return-Path: <netdev+bounces-185081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A432A9879A
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:36:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E48D9A9879C
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9284E3ADF82
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:36:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771981B66680
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A041F26A083;
-	Wed, 23 Apr 2025 10:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEA926B0B6;
+	Wed, 23 Apr 2025 10:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="mtN9lRsz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QQNzGFZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD55B265CAD
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 10:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B854E26982A;
+	Wed, 23 Apr 2025 10:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745404466; cv=none; b=koh/OaGckuZPPQHPFCtdSugGUx8e0U3M4bh4XOlHUQKb0c4yy+e6sqKddYLsVhllvNcuU3yQZSRtq0SYfj9EJysbsntBYXJon17IP3sdQaKoah4qd0kBXsFNCYuQ8W7Vxo23NfnN6N41nNG+kBqSs49utlOst8x0frXF3crgcME=
+	t=1745404475; cv=none; b=MLp5eG2ew6Kd1k2VQpiS7EnrRIKZ60rdtbMN+aZlvXwOQpPJV8Z5tsNbUvTn0mgx57mvxJgOeSw4vh+wxdzW+ruzOZTqZKxpf1+SBTc4Dt7ETRI95XSVpIBefOPIP/j3841p5jiGochnJYljy3XTQk3FT/Vek7Z5DcbgnUoau58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745404466; c=relaxed/simple;
-	bh=N8pLXeLSKUbQv+RLdJoyPCm4XGvIk8H/cpO7vr3KiJk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZLB3Sb0OFCNTNg3dwRI0TQ0qYGOSn9+wHN2NehgfQI65rxTerpL/m9vc9ZtDiHuwnqzwxjA4PJ+z2jsy4gt9rOotNJVH9GV75shVoDypH4/+MqfCM5KKM5/fOmIT8g3FDK//N6XMAdFlwmgA5VqRoJhkoM1eXlMZp0HucdLCe38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=mtN9lRsz; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53N8JZpg027996;
-	Wed, 23 Apr 2025 03:34:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=Y1h2a5Y0VX7xJecS61
-	xQcviM422ZdZOCwBhZL6mIRqw=; b=mtN9lRszvvmfRcMQZpucot7oMUfPHt8oF7
-	nFk7D0FHQDs7VjXs5P6bgjiXrMPZvkLCb2fkX965EDZtqlsv0NeCaPuCWLJHxKQf
-	w1uLWQhk+w7D5UAxcXcWSoJf1D/mwBCPqZiegQJoj6vajXYl8tpEdY9USNhdYjnm
-	58sF62m6UOm3eSq5KU1izu8EgM7Z5CRRjbImEhgMl0tNIO44t30A8cu9QtUPbJSw
-	FsYpftGKyg0+GKshyikdBGtA1Kx2HVqW+JXc7olc9gzAd2Cd4EOHSutmlxRPUI7E
-	C5UR6XtOteWVrQM3o8A5acGrQznDeKIg2whTYdaot+nv9Ot85BHA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 466qd4jd1r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 23 Apr 2025 03:34:12 -0700 (PDT)
-Received: from devvm31871.cln0.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1748.10; Wed, 23 Apr 2025 10:34:10 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Michael Chan
-	<michael.chan@broadcom.com>,
-        Pavan Chebbi <pavan.chebbi@broadcom.com>,
-        Jakub
- Kicinski <kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v3] bnxt_en: improve TX timestamping FIFO configuration
-Date: Wed, 23 Apr 2025 03:33:51 -0700
-Message-ID: <20250423103351.868959-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1745404475; c=relaxed/simple;
+	bh=1RB7NIL91XUf2k6m8r8JVyagzIj5xdzoJ5ohhRrl3a8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H8yp2MDA3L+heDYim+5ncnnoT3IhU+Vhx3LLzm6wwbmleiPliUOoSelTZ+uXY70fMCyIBptYVoMk6+h4PHOegvuUyP2K5S4X3V1pWFvbXTVOWH0P2Alve4y6YQW6AAsZTDi1dDD5wLndtyT6/fx48lDzfQzAYtLWA8Edu2kl0YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QQNzGFZE; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745404474; x=1776940474;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1RB7NIL91XUf2k6m8r8JVyagzIj5xdzoJ5ohhRrl3a8=;
+  b=QQNzGFZEUJiX+1FoWe2Lqj539/1RN55WVxgy5V5kFfa1fVPtVZcq1+5c
+   S2Dv+KO0WN27WpVz9lCLj9j/VYkgg48zpu6D0QAJ3MYxDOpaXZF4iwMzW
+   UwYuQJOrk7yne2fys5VBwlJGNPeytAwppnXRJv3GOh+MpaQwY9v/GY3na
+   QoQ2t/a3w+Du0zVug4vF4YqF/g2ldgWLiDUd+/C23Hu9zGZ7VZlvL9E2F
+   qSr0n9CjO3FFvXwbmMBbTNI/z550IuuPhoPbP+KquhY0RW/ojfLGpmpLt
+   L0nVd+ircr8WoYJyhUvkCuyz6xeUEj1kr4jfn3HrIaTbsgi6Zht3s/KtK
+   w==;
+X-CSE-ConnectionGUID: STpmY10FSuabNHbmfCnYCA==
+X-CSE-MsgGUID: FVuFOoF8TyOIefVCUixuJQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11411"; a="57980407"
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="57980407"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 03:34:33 -0700
+X-CSE-ConnectionGUID: ChnanD1PQAiJuLHDknsfWA==
+X-CSE-MsgGUID: cWUuRIhUSYivP4+B+XZ7QQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
+   d="scan'208";a="132810669"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 03:34:30 -0700
+Date: Wed, 23 Apr 2025 12:34:08 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Vlad Dogaru <vdogaru@nvidia.com>,
+	Yevgeny Kliteynik <kliteyn@nvidia.com>
+Subject: Re: [PATCH net 1/5] net/mlx5e: Use custom tunnel header for vxlan gbp
+Message-ID: <aAjCIE/DMAlLZXGA@mev-dev.igk.intel.com>
+References: <20250423083611.324567-1-mbloch@nvidia.com>
+ <20250423083611.324567-2-mbloch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=AIvSZTdw c=1 sm=1 tr=0 ts=6808c224 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=XR8D0OoHHMoA:10 a=Q-fNiiVtAAAA:8 a=VabnemYjAAAA:8 a=VnezELSGKxGoUyyTTqgA:9 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: W3BhOPJQJ0vavVh7eRS2AmcwoCQWMV_l
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDIzMDA3MiBTYWx0ZWRfXwN/shmNIwbQq WlXiramw5/gGWidE4vAAPtzawryLbwpZC8hesLovK7qBJql/gF99GqgedY3uaTUVuA2zQ5ZNCc9 vXyLgkoUGvFVM3NAk1ua7bHS3sz6X4VcINXvHcMyZ3Jp7HIFKQCnvHBuqa92eMPazUBQyEfmIY8
- /8loVEBlTN6l3l+KCr+Elw7Zb62+cgVGSIS9uXSd+//ChV9zwMTyNyHbupF8hxmZDrfgBHKNvv5 bdYu/D8Xr3EafnhcByuLrHLwlbsvJ0uzQW7htuehikMkh5/39uP9epONay+GGU0d1nVZsM4GeQd e7HwTwAKiltX5IUFZleALa03XlENWnCnjmiydAPATSAjhnHaC65kY67mEomv++f/28iBkJuC9sr
- LPBZRsLYYZE3t58AKAKwU4Fk78cUZWxm0J6yiqRbLSJUGk13tuCG00EYoBq4RTqtngiydq7P
-X-Proofpoint-ORIG-GUID: W3BhOPJQJ0vavVh7eRS2AmcwoCQWMV_l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-23_07,2025-04-22_01,2024-11-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423083611.324567-2-mbloch@nvidia.com>
 
-Reconfiguration of netdev may trigger close/open procedure which can
-break FIFO status by adjusting the amount of empty slots for TX
-timestamps. But it is not really needed because timestamps for the
-packets sent over the wire still can be retrieved. On the other side,
-during netdev close procedure any skbs waiting for TX timestamps can be
-leaked because there is no cleaning procedure called. Free skbs waiting
-for TX timestamps when closing netdev.
+On Wed, Apr 23, 2025 at 11:36:07AM +0300, Mark Bloch wrote:
+> From: Vlad Dogaru <vdogaru@nvidia.com>
+> 
+> Symbolic (e.g. "vxlan") and custom (e.g. "tunnel_header_0") tunnels
+> cannot be combined, but the match params interface does not have fields
+> for matching on vxlan gbp. To match vxlan bgp, the tc_tun layer uses
+> tunnel_header_0.
+> 
+> Allow matching on both VNI and GBP by matching the VNI with a custom
+> tunnel header instead of the symbolic field name.
+> 
+> Matching solely on the VNI continues to use the symbolic field name.
+> 
+> Fixes: 74a778b4a63f ("net/mlx5: HWS, added definers handling")
+> Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
+> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+> ---
+>  .../mellanox/mlx5/core/en/tc_tun_vxlan.c      | 32 +++++++++++++++++--
+>  1 file changed, 29 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+> index 5c762a71818d..7a18a469961d 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+> @@ -165,9 +165,6 @@ static int mlx5e_tc_tun_parse_vxlan(struct mlx5e_priv *priv,
+>  	struct flow_match_enc_keyid enc_keyid;
+>  	void *misc_c, *misc_v;
+>  
+> -	misc_c = MLX5_ADDR_OF(fte_match_param, spec->match_criteria, misc_parameters);
+> -	misc_v = MLX5_ADDR_OF(fte_match_param, spec->match_value, misc_parameters);
+> -
+>  	if (!flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ENC_KEYID))
+>  		return 0;
+>  
+> @@ -182,6 +179,30 @@ static int mlx5e_tc_tun_parse_vxlan(struct mlx5e_priv *priv,
+>  		err = mlx5e_tc_tun_parse_vxlan_gbp_option(priv, spec, f);
+>  		if (err)
+>  			return err;
+> +
+> +		/* We can't mix custom tunnel headers with symbolic ones and we
+> +		 * don't have a symbolic field name for GBP, so we use custom
+> +		 * tunnel headers in this case. We need hardware support to
+> +		 * match on custom tunnel headers, but we already know it's
+> +		 * supported because the previous call successfully checked for
+> +		 * that.
+> +		 */
+> +		misc_c = MLX5_ADDR_OF(fte_match_param, spec->match_criteria,
+> +				      misc_parameters_5);
+> +		misc_v = MLX5_ADDR_OF(fte_match_param, spec->match_value,
+> +				      misc_parameters_5);
+> +
+> +		/* Shift by 8 to account for the reserved bits in the vxlan
+> +		 * header after the VNI.
+> +		 */
+> +		MLX5_SET(fte_match_set_misc5, misc_c, tunnel_header_1,
+> +			 be32_to_cpu(enc_keyid.mask->keyid) << 8);
+> +		MLX5_SET(fte_match_set_misc5, misc_v, tunnel_header_1,
+> +			 be32_to_cpu(enc_keyid.key->keyid) << 8);
+> +
+> +		spec->match_criteria_enable |= MLX5_MATCH_MISC_PARAMETERS_5;
+> +
+> +		return 0;
+>  	}
+>  
+>  	/* match on VNI is required */
+> @@ -195,6 +216,11 @@ static int mlx5e_tc_tun_parse_vxlan(struct mlx5e_priv *priv,
+>  		return -EOPNOTSUPP;
+>  	}
+>  
+> +	misc_c = MLX5_ADDR_OF(fte_match_param, spec->match_criteria,
+> +			      misc_parameters);
+> +	misc_v = MLX5_ADDR_OF(fte_match_param, spec->match_value,
+> +			      misc_parameters);
+> +
+>  	MLX5_SET(fte_match_set_misc, misc_c, vxlan_vni,
+>  		 be32_to_cpu(enc_keyid.mask->keyid));
+>  	MLX5_SET(fte_match_set_misc, misc_v, vxlan_vni,
 
-Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX packets to 4")
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v2 -> v3:
-* remove leftover unused variable in bnxt_ptp_clear()
-v1 -> v2:
-* move clearing of TS skbs to bnxt_free_tx_skbs
-* remove spinlock as no TX is possible after bnxt_tx_disable()
-* remove extra FIFO clearing in bnxt_ptp_clear()
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 28 ++++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
- 3 files changed, 25 insertions(+), 9 deletions(-)
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c8e3468eee61..2c8e2c19d854 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3414,6 +3414,9 @@ static void bnxt_free_tx_skbs(struct bnxt *bp)
- 
- 		bnxt_free_one_tx_ring_skbs(bp, txr, i);
- 	}
-+
-+	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-+		bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
- }
- 
- static void bnxt_free_one_rx_ring(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-@@ -12797,8 +12800,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	/* VF-reps may need to be re-opened after the PF is re-opened */
- 	if (BNXT_PF(bp))
- 		bnxt_vf_reps_open(bp);
--	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
--		WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
- 	bnxt_ptp_init_rtc(bp, true);
- 	bnxt_ptp_cfg_tstamp_filters(bp);
- 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 2d4e19b96ee7..197893220070 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -794,6 +794,27 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
- 	return HZ;
- }
- 
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
-+{
-+	struct bnxt_ptp_tx_req *txts_req;
-+	u16 cons = ptp->txts_cons;
-+
-+	/* make sure ptp aux worker finished with
-+	 * possible BNXT_STATE_OPEN set
-+	 */
-+	ptp_cancel_worker_sync(ptp->ptp_clock);
-+
-+	ptp->tx_avail = BNXT_MAX_TX_TS;
-+	while (cons != ptp->txts_prod) {
-+		txts_req = &ptp->txts_req[cons];
-+		if (!IS_ERR_OR_NULL(txts_req->tx_skb))
-+			dev_kfree_skb_any(txts_req->tx_skb);
-+		cons = NEXT_TXTS(cons);
-+	}
-+	ptp->txts_cons = cons;
-+	ptp_schedule_worker(ptp->ptp_clock, 0);
-+}
-+
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod)
- {
- 	spin_lock_bh(&ptp->ptp_tx_lock);
-@@ -1117,12 +1138,5 @@ void bnxt_ptp_clear(struct bnxt *bp)
- 	kfree(ptp->ptp_info.pin_config);
- 	ptp->ptp_info.pin_config = NULL;
- 
--	for (i = 0; i < BNXT_MAX_TX_TS; i++) {
--		if (ptp->txts_req[i].tx_skb) {
--			dev_kfree_skb_any(ptp->txts_req[i].tx_skb);
--			ptp->txts_req[i].tx_skb = NULL;
--		}
--	}
--
- 	bnxt_unmap_ptp_regs(bp);
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index a95f05e9c579..0481161d26ef 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -162,6 +162,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
- void bnxt_ptp_reapply_pps(struct bnxt *bp);
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
- int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
- void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
- int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
--- 
-2.47.1
-
+> -- 
+> 2.34.1
 
