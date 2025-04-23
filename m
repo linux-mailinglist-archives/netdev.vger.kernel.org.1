@@ -1,112 +1,121 @@
-Return-Path: <netdev+bounces-185282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3211A999DB
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:05:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA74A999E8
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 461285A2DE0
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:04:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C5C1B83DAF
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A19D26B96B;
-	Wed, 23 Apr 2025 21:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED8027933F;
+	Wed, 23 Apr 2025 21:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ev2iaQ8o"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hm3nApL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A992A2676CD
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40B628468B
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745442308; cv=none; b=aJNG6wB+cvMnO+kMBDgNZy20A5CM6BfHaq05bI1Ed+wqkg9ZGw5hffGfoN4JkhdXCnvHRf67alHTz6/YZK/UkbfOiM7sakBReFmphAVoSqpdNFUofk4xgorjGU1s5TU7n+mdA1Gqn24clZMErniLEElf7x6EAzl5M13jZR/ymrY=
+	t=1745442404; cv=none; b=uxLJqa8r9X6uRt8uSPTgnFxDxmd/DzieqjakpH9bLmHSRUTFLfjijc6z0v7FiXrd3qUcYVEw1TLT1Zeu0BE64RqYXCDnZdbbs3jnFul+/fOQo2+prlD92VjYEphJPRoCpm975IOcr/L0vJ+MYkLheHDdu5/QK65klBm/rfLDf08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745442308; c=relaxed/simple;
-	bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sdNpCi/zUIOHgsrlSwBZs6299aBJxXem3Dz2a8vhCvGYoO15V6msQkZXil45JGao3M/6z5tmG2eT0HEeEM+8Z1aTcQS8ztix/N4Afb/OMqiclW6t2pN3VWyyRNsZg3P/3FmtIxMDtyQ2txg40xnAplQDE0Kb4+S+YimoqfQ2ekM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ev2iaQ8o; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2264c9d0295so67365ad.0
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 14:05:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745442306; x=1746047106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
-        b=ev2iaQ8ogdlVbifq/mNf3myZ835iVFcSY9oHQZCoB1gocISvFK3qLX3Fb7n+MRHO2/
-         n7Fj4/hJLHqw8sAfJeXom4o3m5hV5XCOHO0rP1yKrBcafDrSBNZSNlkVSqRfFTLT2LdR
-         IfDqYq3DYE7e1DGZxg0ftgGHaxd/uCg4KvlYCHdJG02/FiLLf6PYWVUNNVRtnxqp5rOA
-         F0MXX+FE/doSQhwac6iuPh4iejYSnn7vbqmj/72oXnWGOpp8WP7oAJ/vxOPtZpaED/AL
-         OK8k+Eh2l7lO/S/zFqFSLlX8vMxavV22OLBE/qEUJx1qbv3jQ94HABeuPwByi+u7xFCi
-         CPig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745442306; x=1746047106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gVCtGrcDJPP4LFpLQiVJjtc7w5QBYtFmhIi1Hyc6q0Q=;
-        b=Uynk3xeqPYq1MssOX5PT9L2npLDuuJenb3yQYC0f+ioE3Ylo34TMa5oH8QjHhOwlIr
-         AT3D/I27lTz25H9mgmHW04/tTiO6fFlE8JKB22WppAhmUHWiFE/5nNNFtiBqo18Bwmtn
-         ZQ3u6srKIZOKTsJaLH2gdr+iGSUCNTG+Nx2WDA6TuD3I14m6rYckoa4eDsFjIJMZ1taR
-         O4UzsezAPP2V7IT2+d4V93eZYORM0oX/E73UH/ymmrrJ9yvCEoKXafB+/ABHIWBECFPb
-         wGf/dJbyfKzurSXJDxgCh13BrQWmCmyVpfl7T1gJIGWtH96OAtle4tUCawsNCuEANKV8
-         zSSg==
-X-Forwarded-Encrypted: i=1; AJvYcCV7IwuTKcOtBsEpdRWREcw7NATXa7fJLbmi3Xo84VGBTaPYWWXyAg9uhjnnD+Ip/igxrc1s3Vg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJRZj7OsN6ULDeqY3HspgMWEkyMW2FV26ZeXWL1ejMIoCSY5M2
-	3oBiSKlVq/lS0T7mAP1hWfJbYuGHa09sw2HEXIMnmUC+TkK2Q6lQzs6tkqXyQL2NcYItem5tPj/
-	O57VULxSEPNgKjPHwSYNLfvYaPg1SbWTaHzvu
-X-Gm-Gg: ASbGncuBLTVZKUzQma27V46Nym5DMDoPLwk2RFwlUCwNHzFgmHzHFdQE0IZYATTkG8I
-	j+2hZe+ToRq9Lp/bpYV2btBPeXl71gm4L9k7SUILdNsHCdlz9SIYYkXl/SVG1K4GYim6yo8KCKx
-	Xzyh+Py+twC5fEqqs0aCwHHlKpA+0cW79FOVwY0hgb0UAtVV4xrRUGETvtAtFnvOE=
-X-Google-Smtp-Source: AGHT+IH17FUDJdpzdq5TseYsn861iLDhqtSJ4arBwM1adaGGNEcSmFuu4gJettT+LWVYzPU2tHb+KFq1OujDKzFrei4=
-X-Received: by 2002:a17:902:8345:b0:21d:dd8f:6e01 with SMTP id
- d9443c01a7336-22db323ece3mr130305ad.5.1745442305587; Wed, 23 Apr 2025
- 14:05:05 -0700 (PDT)
+	s=arc-20240116; t=1745442404; c=relaxed/simple;
+	bh=qgnmbrs5R1omCctiVkoCevVxRfXdNIRKhT9uiNX8N8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bg1IdkI9r2xt/UJYSCzCYtQAhnr1W9bV4OFBsQGf7JQvVsgHSrxCvnURcT727XYg7bS6AzVWJ6905Xl1N9nF1U3YK8i0IIosGSH2sw3fIzdjGA0PLkOUcfOOuRveN9X5zQSRUCYDuzjyqZ7JN/xhLiV6bOxxk+Wg5pe8LKcKhks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hm3nApL2; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <99b52c22-c797-4291-92ad-39eaf041ae8c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745442389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=74tQ57PHLi6ZOj350BhyOhfjL3E4tvKmSozsLI7eDxo=;
+	b=Hm3nApL2VyCOk1R8A1HZ9E99C91Zy63aYzPbt7jJv3V9l3XGw97qwhTzZ7tj6eN7tshG5Z
+	zmKjm9EiOmybaMAsdLdtwnVXyFwnp5Tk17ytSPkkl+wW1hXDcliD7PYbcAO1gcfLRp7ln1
+	UTH5caPBySOO30o2LNJSQ3vaF0VMn/Y=
+Date: Wed, 23 Apr 2025 22:06:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421222827.283737-1-kuba@kernel.org> <20250421222827.283737-11-kuba@kernel.org>
-In-Reply-To: <20250421222827.283737-11-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 23 Apr 2025 14:04:51 -0700
-X-Gm-Features: ATxdqUEOBFGQsgU2RTNPz8b_mfidSLuKS_NFMvxoT2inFFMetFOSPsdEWvftJ-k
-Message-ID: <CAHS8izOPQ_dF0M0RunYhXnUwUQ_ac3hTRjdNjbNPhOyLU+veJw@mail.gmail.com>
-Subject: Re: [RFC net-next 10/22] net: reduce indent of struct
- netdev_queue_mgmt_ops members
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	donald.hunter@gmail.com, sdf@fomichev.me, dw@davidwei.uk, 
-	asml.silence@gmail.com, ap420073@gmail.com, jdamato@fastly.com, 
-	dtatulea@nvidia.com, michael.chan@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 0/6] gve: Add Rx HW timestamping support
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jeroendb@google.com, andrew+netdev@lunn.ch,
+ willemb@google.com, pkaligineedi@google.com, yyd@google.com,
+ joshwash@google.com, shailend@google.com, linux@treblig.org,
+ thostet@google.com, jfraker@google.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250418221254.112433-1-hramamurthy@google.com>
+ <d3e40052-0d23-4f9e-87b1-4b71164cfa13@linux.dev>
+ <CAG-FcCN-a_v33_d_+qLSqVy+heACB5JcXtiBXP63Q1DyZU+5vw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAG-FcCN-a_v33_d_+qLSqVy+heACB5JcXtiBXP63Q1DyZU+5vw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 21, 2025 at 3:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Trivial change, reduce the indent. I think the original is copied
-> from real NDOs.
+On 23/04/2025 21:46, Ziwei Xiao wrote:
+> On Wed, Apr 23, 2025 at 3:13 AM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 18/04/2025 23:12, Harshitha Ramamurthy wrote:
+>>> From: Ziwei Xiao <ziweixiao@google.com>
+>>>
+>>> This patch series add the support of Rx HW timestamping, which sends
+>>> adminq commands periodically to the device for clock synchronization with
+>>> the nic.
+>>
+>> It looks more like other PHC devices, but no PTP clock is exported. Do
+>> you plan to implement TX HW timestamps for this device later?
+>> Is it possible to use timecounter to provide proper PTP device on top of
+>> GVE?
+> Yes, the TX HW timestamps and PTP device work is undergoing. Those
+> would be sent out in separate patch series when they are ready.
 
-That's exactly what happened :D
+It looks like it's better to have PTP device ready firts as it
+definitely needs some worker to keep time counting. And it should be
+done with ptp::aux_work and replace the work you introduced in patch 3
+of this series.
 
-> It's unnecessarily deep, makes passing struct args
-> problematic.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>>
+>>>
+>>> John Fraker (5):
+>>>     gve: Add device option for nic clock synchronization
+>>>     gve: Add adminq command to report nic timestamp.
+>>>     gve: Add rx hardware timestamp expansion
+>>>     gve: Add support for SIOC[GS]HWTSTAMP IOCTLs
+>>>     gve: Advertise support for rx hardware timestamping
+>>>
+>>> Kevin Yang (1):
+>>>     gve: Add initial gve_clock
+>>>
+>>>    drivers/net/ethernet/google/gve/Makefile      |   2 +-
+>>>    drivers/net/ethernet/google/gve/gve.h         |  14 +++
+>>>    drivers/net/ethernet/google/gve/gve_adminq.c  |  51 ++++++++-
+>>>    drivers/net/ethernet/google/gve/gve_adminq.h  |  26 +++++
+>>>    drivers/net/ethernet/google/gve/gve_clock.c   | 103 ++++++++++++++++++
+>>>    .../net/ethernet/google/gve/gve_desc_dqo.h    |   3 +-
+>>>    drivers/net/ethernet/google/gve/gve_ethtool.c |  23 +++-
+>>>    drivers/net/ethernet/google/gve/gve_main.c    |  47 ++++++++
+>>>    drivers/net/ethernet/google/gve/gve_rx_dqo.c  |  26 +++++
+>>>    9 files changed, 290 insertions(+), 5 deletions(-)
+>>>    create mode 100644 drivers/net/ethernet/google/gve/gve_clock.c
+>>>
+>>
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-
---=20
-Thanks,
-Mina
 
