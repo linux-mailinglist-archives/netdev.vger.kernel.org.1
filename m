@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-184928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED13BA97BB0
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:32:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2B2A97BC2
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D4A3BBD96
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:32:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 692B01897DEA
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4897F2566D9;
-	Wed, 23 Apr 2025 00:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2652561A2;
+	Wed, 23 Apr 2025 00:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcBzlkSw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L42+mSNc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9C1F6679;
-	Wed, 23 Apr 2025 00:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FA51F2B88
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 00:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745368351; cv=none; b=oAynKeL+GdrtIvIarvAcnC62Gz8y1ut08iaZpoVtf5r5jJoZbbhlYq/Nsv6G1zuYlcGGIDnSOFAzS5EhYT1OWJOrSFigrpg34ijbNfaOW0cjxm3THzgRZExXqPrXGcTSqU+zO239/IWwSPsnynn+HjKqN6dkSX4ODBoa0t7IE30=
+	t=1745369048; cv=none; b=NkkZPpI4Kw5LlldnTDWO4uoBIjBTBMDoSsAPdc0m46iAASqWVzBJrlkTKlhY9Mqg4LA2lnvZFxgicd5zC++iY0AI7bDNnFZjO0Xt/XzdxZuTZM7R5kxcT4vHc6elZ7WUXS8zC0EM5sgQcTVuNKOv8BY2+0F5lxGb38MEhq3bVJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745368351; c=relaxed/simple;
-	bh=lp1Re+DHc+mgySgQWvfsd6t9SXf7l9beLDcsufq2Vcg=;
+	s=arc-20240116; t=1745369048; c=relaxed/simple;
+	bh=K0viF8YdgXAd8GjltFpc+FLwDWe+JSxlhOOo++VszXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nf1EU9dc+bp6LuhD1wN5sB01dPKt/OzPLUBrN/psp4vWgBwZVN3d3WlL8NJvB3RTRUR48k2Y6ppILAAD2UmxwBlpf0Zu6OWs2zFwNqk9jHz3KEbo4DSanud75O3To6fsA4V5XTo/Np0ZXOCjv+xvcRrokTUspePdNY4xxsKkOVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcBzlkSw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11C4CC4CEEC;
-	Wed, 23 Apr 2025 00:32:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Cp+dsgj11xOu6TKTKfoWBVd4azrhUXmVIz363hsHFvpZX1PbfUg+UcVb7ZD3Y4/ADIL6I0CDkgwVUoDq/Wbu7peYhNMKmQ6XMo9afihwLHOyQUPLFwowjQ0SCAmjRR4r5pQxVxq7GGuInEkcoLeU6cWVKD5HwwKWj16kNremeJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L42+mSNc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6794FC4CEE9;
+	Wed, 23 Apr 2025 00:44:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745368350;
-	bh=lp1Re+DHc+mgySgQWvfsd6t9SXf7l9beLDcsufq2Vcg=;
+	s=k20201202; t=1745369047;
+	bh=K0viF8YdgXAd8GjltFpc+FLwDWe+JSxlhOOo++VszXc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EcBzlkSwgVXeXq0OP9SDOs2b6Jr32j/lLepVrtr2Sja/t9U7Wud84tvfCStkBSD3a
-	 jB789nR2EqmmU4fhGZPrq4f6qDZvMZpKME0Fgz0rPko8oVDUl34bGfTxCdvJ1hwOv1
-	 Eqwyucb87XHd9AQK5J1t1RkOBmfDMIkAt6J2xoNLBJqA7w7pbw0ZSOCLmRbklZhvGp
-	 2q/TPYHXUuiMtkQZBdh8xErMRdj0BsfGCdoVSJ6CQt/Nsz6u/+CCiuXQVDccuJ7h73
-	 OkZKZAOmrP4kl7+trV7jHFFEd/7+l/lgkuNJ6Jl6bEqW1I/WoxoPguOBbFwxGFjvp1
-	 p4+vyaCPH7Hhg==
-Date: Tue, 22 Apr 2025 17:32:29 -0700
+	b=L42+mSNcJaMF9BXsjWgqX3pyrWkmka+UUPLVmgbffW5KrxzVh2Zrr+OeQDZjKC5GP
+	 WRsxcfwLjqUFxYPtojI8Se5pTBr0EtY/9ElHXisO7bETf+PIPbE6qvZTNpa5fv2rqt
+	 zur3TE60Uc+JyaGn5N7CSCHI74VXajryfqecJ4qWzgYA4VWdgWmDO6yyndLfWAN5++
+	 aiYel0OE6cCZFWnOGjji4cT1yF2hZ9Q6i2P9+Jve+XSuBOl661UsB76YF/yvaNz6OL
+	 ZkjjUlEa/9T47xnZV3XKJvj9voj6nhg5CHzzGQHbcF1xsZcoe4b0QP5wt2kpxnye/r
+	 7e4ySK+a0G8+Q==
+Date: Tue, 22 Apr 2025 17:44:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
- <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v4] rtase: Add ndo_setup_tc support for CBS
- offload in traffic control setup
-Message-ID: <20250422173229.6dc21ff5@kernel.org>
-In-Reply-To: <20250416115757.28156-1-justinlai0215@realtek.com>
-References: <20250416115757.28156-1-justinlai0215@realtek.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, toke@redhat.com, gerrard.tai@starlabs.sg,
+ pctammela@mojatatu.com
+Subject: Re: [PATCH net v2 1/5] net_sched: drr: Fix double list add in class
+ with netem as child qdisc
+Message-ID: <20250422174406.38cc5155@kernel.org>
+In-Reply-To: <20250416102427.3219655-2-victor@mojatatu.com>
+References: <20250416102427.3219655-1-victor@mojatatu.com>
+	<20250416102427.3219655-2-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +63,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 16 Apr 2025 19:57:57 +0800 Justin Lai wrote:
-> Add support for ndo_setup_tc to enable CBS offload functionality as
-> part of traffic control configuration for network devices, where CBS
-> is applied from the CPU to the switch. More specifically, CBS is
-> applied at the GMAC in the topmost architecture diagram.
+On Wed, 16 Apr 2025 07:24:23 -0300 Victor Nogueira wrote:
+> +static bool cl_is_initialised(struct drr_class *cl)
 
-Applied, thanks!
+cl_is_active() ?
+Had to look at the code to figure out what it does, but doesn't seem to
+have much to do with being "initialised". The point is that the list
+node of this class is not on the list of active classes.
+
+> +	return !list_empty(&cl->alist);
+> +}
+> +
+>  static struct drr_class *drr_find_class(struct Qdisc *sch, u32 classid)
+>  {
+>  	struct drr_sched *q = qdisc_priv(sch);
+> @@ -357,7 +362,7 @@ static int drr_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  		return err;
+>  	}
+>  
+> -	if (first) {
+> +	if (first && !cl_is_initialised(cl)) {
+
+I think we can delete the "first" check and temp variable.
+The code under the if() does not touch the packet so it doesn't matter
+whether we execute it for the initial or the nested call, right?
 
