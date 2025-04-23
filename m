@@ -1,95 +1,86 @@
-Return-Path: <netdev+bounces-184925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E44A97B75
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:59:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1851CA97B81
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B45A1B6098F
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:00:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5452D17D038
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3217D2147F5;
-	Tue, 22 Apr 2025 23:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C824D36C;
+	Wed, 23 Apr 2025 00:03:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhjACKLh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddbpABZZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6ED1D61A3
-	for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D97733DB;
+	Wed, 23 Apr 2025 00:03:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745366391; cv=none; b=KT5Sgj/a9sPY1bXUbZhlzp2bIwNWHt53ozMpwNwx1HLWhjGCaHECl0hh5abMx6f9uhth+WAAx1OlpPaLJzGvW8gbvd5/cgqfM+dYuMJupWNkqYB9qv8DMkDXah/auLhiD/IHIjv+XUkDbDh3hgtjkyqQDLOm6VW78LbEuvgxjm0=
+	t=1745366612; cv=none; b=PMmub82/vwwX+QoQatnpnUbp2ePNOs+slBdQHsktTs2OqqRlO6OgdF9H0gvaUkO6/58vvmIKdnHCuZYOCvFIsffLvAUtEtoPNR7iIFL53wTka+jisOMmhCr/ZoV3+meckbMmkYcy/8TkKP+KNXNBmZRd0L6H3XJW+Jew8gGNfYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745366391; c=relaxed/simple;
-	bh=gHASo0LA3+NHcIbbHdHyN3xgWxNUwRFJ2ZyMxMuqnKU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kkC7jJaonOntL1q4XrbkXBI3w/bolP204yGCPnAQqVkoPF95v7pl0orIEOigbHLuhzq8NKU4rwlYhfgYay1xXlT9wWAwsCRdNma1QHX0utGbi1cNwHPjxOAVbMOK5X8Cz9yLQiz7j6jqtn/VwCMALxxka5s+8gEHHXLwJePZhMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhjACKLh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75BCAC4CEE9;
-	Tue, 22 Apr 2025 23:59:50 +0000 (UTC)
+	s=arc-20240116; t=1745366612; c=relaxed/simple;
+	bh=en1R4ZF4hD6JaXdEWowCEJQiD6Q12apOn7tseGVXg44=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tAPYVwcfIyKrtsj8DVmYveFyjk50W1eZWNrjBBumjkcKmCpg3Ohow2xf9x5r856zOVqbbQbVrxdPqVQiDdY7byKr/GKl5xoZqcESbncqVOD2/qRCCrIKgP0/Hy+f1LLPSSNTzeL8zTqiao5TAxWWwbkFAKlmETPy3+ZsRYL2IRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddbpABZZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E9DC4CEE9;
+	Wed, 23 Apr 2025 00:03:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745366390;
-	bh=gHASo0LA3+NHcIbbHdHyN3xgWxNUwRFJ2ZyMxMuqnKU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uhjACKLhrKbawYyaj+bOf6zp3e9fwOjQ+O5NlgRatqaE1rjtB6avRniCxlc8UAMBS
-	 GwTlHXFkB4CDItJFKuP2mWJ6Znm08FzjqCeb+SxJ3sU5HDOiElHB8sgsp+6dqjDSq+
-	 bMIAQNZPo9d3axkI7v3K11Q55iPVWvWU1LQL8XGGrGSik5GgCKP8SM0l1wfj34CjyY
-	 zonrlMdpvGMtdDFzahYDTas855W60v1cZWwYBRO2DAD0MVa/lE26S/1FHeivzNrZaD
-	 WJpql79u76VuHGoppsJsHSnaWbecYP1KoV9AWxOZ8PcJokSm98Nxa26NCIwBMOWtjT
-	 ksurPzVtxPQkQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C78380CEF4;
-	Wed, 23 Apr 2025 00:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745366612;
+	bh=en1R4ZF4hD6JaXdEWowCEJQiD6Q12apOn7tseGVXg44=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ddbpABZZ8tQT8CUB8SnkBZ3gfqAxgTU22NsG4tAPnSU7nxi6Fsp7LaFKLPV6qvtYJ
+	 20nWbC1PHF7lzRlkdqmjDVyHOn/SIIyJmeu4QCVslwlrV1ytwX1A/k0XT1YDVLJbqf
+	 B4RNOtWMpcY+bF86k0OGuh9LTMw6THrGipTGem4/jAMNy8U1h0M9Njz8leaOAz246u
+	 EkGf3u+tyjElznWP31cbH3loRNhKFjhbDH28sxAtYCLrfCpXa71k7GmSsVx9rD9YBy
+	 pJhl3PiP8smaZs56HFOgUXHrNMYMEXKFe6IMqY8wMdpIdkBbjNWFHdNfNgph8K++Bo
+	 b/GgIjTlNYLVw==
+Date: Tue, 22 Apr 2025 17:03:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next] bpf: Allow XDP dev bounded program to perform
+ XDP_REDIRECT into maps
+Message-ID: <20250422170330.71e47a70@kernel.org>
+In-Reply-To: <aAgdECkTiP-po7HP@mini-arch>
+References: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
+	<aAgdECkTiP-po7HP@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: phylink: fix suspend/resume with WoL enabled and
- link down
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174536642901.2092468.9000223067110745952.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Apr 2025 00:00:29 +0000
-References: <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1u55Qf-0016RN-PA@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexander.duyck@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- qiangqing.zhang@nxp.com, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 16 Apr 2025 17:16:01 +0100 you wrote:
-> When WoL is enabled, we update the software state in phylink to
-> indicate that the link is down, and disable the resolver from
-> bringing the link back up.
+On Tue, 22 Apr 2025 15:49:52 -0700 Stanislav Fomichev wrote:
+> > +	if (map->map_type == BPF_MAP_TYPE_DEVMAP &&
+> > +	    prog->expected_attach_type != BPF_XDP_DEVMAP)
+> > +		return true;
+> > +
+> > +	if (map->map_type == BPF_MAP_TYPE_CPUMAP &&
+> > +	    prog->expected_attach_type != BPF_XDP_CPUMAP)
+> > +		return true;  
 > 
-> On resume, we attempt to bring the overall state into consistency
-> by calling the .mac_link_down() method, but this is wrong if the
-> link was already down, as phylink strictly orders the .mac_link_up()
-> and .mac_link_down() methods - and this would break that ordering.
-> 
-> [...]
+> Not sure I understand, what does it mean exactly? That it's ok to add
+> a dev-bound program to the dev/cpumap if the program itself is gonna
+> be attached only to the real device? Can you expand more on the specific
+> use-case?
 
-Here is the summary with links:
-  - [net] net: phylink: fix suspend/resume with WoL enabled and link down
-    https://git.kernel.org/netdev/net/c/4c8925cb9db1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+And an upstream offload which supports it..
 
