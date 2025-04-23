@@ -1,254 +1,256 @@
-Return-Path: <netdev+bounces-185193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4681A98FF2
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:15:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A47E4A99254
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26F2C7A3268
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:14:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9A01BA1BD5
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B686828BA8C;
-	Wed, 23 Apr 2025 15:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216EE293B65;
+	Wed, 23 Apr 2025 15:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WqMHKsDn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+0NWU4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0715028B4EA;
-	Wed, 23 Apr 2025 15:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4953E293B5A;
+	Wed, 23 Apr 2025 15:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745420986; cv=none; b=OhVLC7zmB6OI4AR4X/9KidhARF9/5Sx98dGQRhw9engUWapbpkxceQoWdM6nog4xPVtJE5gV2voZCdYzv+y7TiiEDTFRgg7vFWjt0nI9ASHzzAMkaClXJAsVdhcdPbqybAyPAwqI4C99mGhXx40C1idpZoy3kqtlR5DGuvNFz7E=
+	t=1745421651; cv=none; b=hfkH+/4x6csHKvfUCXKMZhWmjyMWt7kQFgIsqm0MELdjcumGuIbAp9PE8FUu4ef0POkUIRngxqn+eFdmmlzgcHx/EvzMR4QWeTYG+JgQsBuU/+XoZD5kiU3gCAMmZUwLt8VEn0Wohiiw9gF6a10TwuxzSScD2F44f9k2o4uWa9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745420986; c=relaxed/simple;
-	bh=mJ2QmQEFlcsiPq05OXibmnIZMX98xAun/0Bd8vQ8h74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s8xG9TzH44upn+Eizpj2o8RZtfD1FzN1oPaQL2fGSzjiIt6qCtlsErtNo+EpCinz8gd9N0tAkCavddQFuWRruR1e5AJ/fmwSFJShvPNqUsG9vZgAHgbWp2IWzd/UQScCXTNbeSPsZK8aegQXvibGv7ZDjhxZlT/YRIM82lAQQHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WqMHKsDn; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1745421651; c=relaxed/simple;
+	bh=VDfwmOCVRoGoEsvlBNbRNn+5O+sBsS7veCm7PZofIIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LuWSobq+eIulT1G9LQQ/XWuVnD4S3jx54LbhR3qbeuP4SUEeb1At5Ri9FW9aFygqKL16zqSDQ4N3N+4+rv3vDfimgwO/SJBZqi5EoWab5dqXq0hXokf9oxe1i1QHhVxNR2tTE4d23ehEClKbKHS9OziVCjLqBIM7DSbV3kBa4Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P+0NWU4p; arc=none smtp.client-ip=209.85.215.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-af91fc1fa90so5603365a12.0;
-        Wed, 23 Apr 2025 08:09:44 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-af28bc68846so5626391a12.1;
+        Wed, 23 Apr 2025 08:20:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745420984; x=1746025784; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o3rPa8I79belhuSJBW7U9rJoyeLMEN3HyUU1cJZksbU=;
-        b=WqMHKsDnPB6Yia8cqHkWNOwLt+Vi7z9CpFf0JEe4TFoMwAdyW+7vLOYjz+fvSbEZ01
-         2g8aD12rSKYutKn3NlUEKtab4366zga36SEtO3DSDj8dRVVeno1m+Bw5Go+40Wm1AB+A
-         3Y7Cv8HkjNUWrnUtAzrFNgk1dg4SvFxSWUVqSyyU75CsgIlqBXyPTSnvMIDi68BmuIJG
-         Pmxpn53Lksd/Vv8wNl5jOB7ibVs4LYcYm+iOz6Dc5tydI3E1031sZTFNOjcHBWzjyT7U
-         jVj2gf8joMA0mdwHHBwhO98GQkQfNYYobMI3ihBZP8hXtGVWc6M1dniX2lV5B4y6ZIh6
-         MOXw==
+        d=gmail.com; s=20230601; t=1745421648; x=1746026448; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ay1hJ+xxSveKW4SXff1bMvJ/IKV12NveP9f4RrvhN6c=;
+        b=P+0NWU4p827RUysOZ6f6emFPBXhjR+uHsAF8SZVsLTvNe0nKajbhhnlZUEL+siKpo0
+         rCQq1TPV+MNE+lR44Y7lxYyR9TiAk8I3yKs2455vIIoyjCgJUASx8P2cMkScquNSCLee
+         eKGUVaDx/difRU0xlqCHzLKm59BY4QeE37wAQ12HIcJoZUPOYj5HLRCUK2/g6PzPqGTA
+         wfl4pR6ZLz+sZZf1O/i6KLImnDkW/DpZcYP+WmvNrNVdIEM4z+zgJmBBSODTmu1fTK93
+         w++d4tJ4Wmss1eTHC7kk2UBDuy/bpsWxrfA+X+otekKhdoIAHDFqOm6pfKbYOYkXLGMh
+         5isQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745420984; x=1746025784;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o3rPa8I79belhuSJBW7U9rJoyeLMEN3HyUU1cJZksbU=;
-        b=F7P+rjabqdMLPt8fr5e6/c90KueBuiTP6DJQGN/nGEUxpZ+tMuAaUOACVwG+5GU5VI
-         kmZ2+kYEPqyLm2eWD16TiC9Qtemc8cCcEaUgfa47f/sXpSM28HusTXZZ60FBU9A/M3XR
-         AqFk+Io4jODygwHmW32IM2I6YeCTT2RYazvoY2T5YHXBr7TXTfns7+RbJwLE1TEFcWvS
-         Enw3uTAMUvfUBoT0QCOKyW+MieqxjAtrFNXeQ392j7zdAw2W9azK93EwcjmiTl3XgN5a
-         JNrWxPNWv5AFSp5giYjk2dE/QWaJBqEe00Ze8fFpo4g+xTWHCHaBGSc6Refij5GWgrLO
-         JvTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ85cB57og0wNiPBC9IvTdtTNlYc3NSsPpRH26WFFbyXexUeI2DlUJsVOHp8kmuP4f/eY=@vger.kernel.org, AJvYcCXBXqbQdDtQ0r4e+nkWaRu+U+tdNaXNPKCbPFOFm6dFclLd9y9LC6CgZWxktuSkhjsiov/XS82Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWtQB/R0dibZ8FxgE6LII/oBYAtK6LRYqyLeRBnHmqExwX+YSq
-	E4JQwrozTankebjLTxC3xYsLLKFQ2qjKL+Sjn9SeLk7LbflXeXU=
-X-Gm-Gg: ASbGncvb9np/TJy/L4EbSWAkVUKHSATgtLX2hHTpHjXbfNOhpTrk5pSsUhZqhzGhWp5
-	zi96mQIMd5kzFXMAPMnmthhShmV0lgDr+LRj0NUbgSSMz6ffeK4pESAgzStUplYI3S7Blh96AJm
-	nsQfNTGmpQnjaFzERncU9RyfLDokoACb7+ocPoV0kfWKuHzQ9PF+4mVHq3j0erA0qrvkPS+kTo8
-	PxOalJw0QxfZ3CxDoqmkuzMq4wKxRrtWW7SGVViS31DcpJczweuYqYhd0MAbROPTMwGKu8X2tf6
-	YktHH/TZZ72dx9aEISbzuxETzKcPg1SXUJMyT4yUBH7Q+tF7OF0=
-X-Google-Smtp-Source: AGHT+IGDspR2tsBX6soJVLkGe7DCaFNIoklaYxrABWOUxQL+LlWLIVvZIQPHa6SnLAOOMJoa4Oo2Hw==
-X-Received: by 2002:a17:90b:2b8c:b0:2ee:c91a:acf7 with SMTP id 98e67ed59e1d1-3087bb41235mr28667893a91.4.1745420983963;
-        Wed, 23 Apr 2025 08:09:43 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-309dfa28376sm1730423a91.25.2025.04.23.08.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 08:09:43 -0700 (PDT)
-Date: Wed, 23 Apr 2025 08:09:42 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next] bpf: Allow XDP dev bounded program to perform
- XDP_REDIRECT into maps
-Message-ID: <aAkCtq4pEi2cTKV3@mini-arch>
-References: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
- <aAgdECkTiP-po7HP@mini-arch>
- <aAi80as6PpOeuWJU@lore-desk>
- <aAj6IBZ4hsUS12f4@mini-arch>
- <aAj_ELYjc7cFDjSG@lore-desk>
+        d=1e100.net; s=20230601; t=1745421648; x=1746026448;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ay1hJ+xxSveKW4SXff1bMvJ/IKV12NveP9f4RrvhN6c=;
+        b=S+c5U7xOsvguR8rrKMyV4OrBC5K5T2tQgpakp6Kjz3advc8q4uKRDEz8oNr6QMa9U2
+         QKZdlCdaicNshhmW6JH6eSuY2x2muNV8AZclMxLPmDas+eWV9jeRAlSplbLkcj96iXHW
+         THbBzz0g2vI0M9uUHnGMHGecYVr7qjwZ8bqPgWRMAx24XP2ZQ88Jo5WkZdPOQKg+ATP2
+         78wIgS5y8nf1u8K9LF+thBqHz6fnkNFZ/Eng7Z598k+aEtdTDj9BUl1R+0+lG4dMJk9o
+         VKS26TLr2G79dDMDkLlm6v6Qgi5sPuBOTMPfQmqCg/P480lVrI3qGsn9ZuD81tBiUCQl
+         gGdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDZjf4TW7BISok2+voIgHwABx/p0fseeUa1BG90Qkyvn9Rir94yY7aYUwE5SXcTUDwX4TyoDw76Bh4E5gF@vger.kernel.org, AJvYcCUd1d2gRysVL0MfiKpfXQMmRccJVPa328qTSJ0j1MHWFSf07GbDzbTGO3Jbrj90hiGm3vQ=@vger.kernel.org, AJvYcCVT6sGdRQlPeoFG1/WFt0Prvuz8nno90AbhNKjKWMA2/QENxxPBoiwsrM8JzzsptUUWTUL4kOaE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/PUV3LmLNALL0tdgi/2Xo9DsNYrd1hKb/UrYxNmve05BF7DQL
+	QnrsVOlYYHtNNRrbvFMqIOxbSFnX3y9gFCTPxOLZdIPgUeyu5DlkREKpTm1N9BQ=
+X-Gm-Gg: ASbGncvvgOTKp+9pZbTWxhHr6cxBedliTZpDUYJJTM39qPwVBYkBzvZzeUZJK356sa6
+	yahtpp2nSLkukqtRMwbMjqk49cCwiDrLUtYV6wCViXW8zkrpC7CHJ8+2HzNbZfQ3aqPuh5MLWx3
+	lr6ZXwNtv0F+idoikEqUa/yLr1q5Jq5mRAyTyeyEFVLIDLu5+nk1hjhyQhaJB4M28f9Y8DVmnt1
+	n4bIzRW1lwsw8ok6V4I1JddG7S1ZIHKKF3m3s4z+KA+6K1PCrIxtzmixzZ7AqBvsszbCke2or3Q
+	yE4/SJa5IlnCJqfa20hIFLva4Nl++quuG4YwHhVRcFZkHbIP0zXcujP3HE20QRrF0HvJoubuL7U
+	1Gheyp6GLNhVroQ==
+X-Google-Smtp-Source: AGHT+IF0njUnwLJs73OxHmEO22W7D/ZiIYfKXmFPNk7S0195rDOuNRKX5c2xxOZE+G0FANmjiFezMw==
+X-Received: by 2002:a05:6a21:3a8d:b0:1f5:8cc8:9cc5 with SMTP id adf61e73a8af0-203cbd27edemr35835560637.34.1745421648443;
+        Wed, 23 Apr 2025 08:20:48 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:933:3ee4:f75:4ee9? ([2001:ee0:4f0e:fb30:933:3ee4:f75:4ee9])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b0db13a3396sm9277066a12.28.2025.04.23.08.20.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Apr 2025 08:20:47 -0700 (PDT)
+Message-ID: <aac402b4-d04c-4d7e-91c8-ab6c20c9a74d@gmail.com>
+Date: Wed, 23 Apr 2025 22:20:41 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aAj_ELYjc7cFDjSG@lore-desk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/4] selftests: net: add a virtio_net deadlock selftest
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250417072806.18660-1-minhquangbui99@gmail.com>
+ <20250417072806.18660-5-minhquangbui99@gmail.com>
+ <20250422184151.2fb4fffe@kernel.org>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20250422184151.2fb4fffe@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 04/23, Lorenzo Bianconi wrote:
-> > On 04/23, Lorenzo Bianconi wrote:
-> > > On Apr 22, Stanislav Fomichev wrote:
-> > > > On 04/22, Lorenzo Bianconi wrote:
-> > > > > In the current implementation if the program is bounded to a specific
-> > > > > device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
-> > > > > or CPUMAP even if the program is not attached to the map entry. This
-> > > > > seems in contrast with the explanation available in
-> > > > > bpf_prog_map_compatible routine. Fix the issue taking into account
-> > > > > even the attach program type and allow XDP dev bounded program to
-> > > > > perform XDP_REDIRECT into maps if the attach type is not BPF_XDP_DEVMAP
-> > > > > or BPF_XDP_CPUMAP.
-> > > > > 
-> > > > > Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
-> > > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > > > ---
-> > > > >  kernel/bpf/core.c | 22 +++++++++++++++++++++-
-> > > > >  1 file changed, 21 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> > > > > index ba6b6118cf504041278d05417c4212d57be6fca0..a33175efffc377edbfe281397017eb467bfbcce9 100644
-> > > > > --- a/kernel/bpf/core.c
-> > > > > +++ b/kernel/bpf/core.c
-> > > > > @@ -2358,6 +2358,26 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
-> > > > >  	return 0;
-> > > > >  }
-> > > > >  
-> > > > > +static bool bpf_prog_dev_bound_map_compatible(struct bpf_map *map,
-> > > > > +					      const struct bpf_prog *prog)
-> > > > > +{
-> > > > > +	if (!bpf_prog_is_dev_bound(prog->aux))
-> > > > > +		return true;
-> > > > > +
-> > > > > +	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY)
-> > > > > +		return false;
-> > > > 
-> > > > [..]
-> > > > 
-> > > > > +	if (map->map_type == BPF_MAP_TYPE_DEVMAP &&
-> > > > > +	    prog->expected_attach_type != BPF_XDP_DEVMAP)
-> > > > > +		return true;
-> > > > > +
-> > > > > +	if (map->map_type == BPF_MAP_TYPE_CPUMAP &&
-> > > > > +	    prog->expected_attach_type != BPF_XDP_CPUMAP)
-> > > > > +		return true;
-> > > > 
-> > > > Not sure I understand, what does it mean exactly? That it's ok to add
-> > > > a dev-bound program to the dev/cpumap if the program itself is gonna
-> > > > be attached only to the real device? Can you expand more on the specific
-> > > > use-case?
-> > > > 
-> > > > The existing check makes sure that the dev-bound programs run only in the
-> > > > contexts that have hw descriptors. devmap and cpumap don't satisfy
-> > > > this constraint afaiu.
-> > > 
-> > > My use-case is to use a hw-metadata kfunc like bpf_xdp_metadata_rx_timestamp()
-> > > to read hw timestamp from the NIC and then redirect the xdp_buff into a DEVMP
-> > > (please note there are no programs attached to any DEVMAP entries):
-> > > 
-> > > extern int bpf_xdp_metadata_rx_timestamp(const struct xdp_md *ctx,
-> > > 					 __u64 *timestamp) __ksym;
-> > > 
-> > > struct {
-> > > 	__uint(type, BPF_MAP_TYPE_DEVMAP);
-> > > 	__uint(key_size, sizeof(__u32));
-> > > 	__uint(value_size, sizeof(struct bpf_devmap_val));
-> > > 	__uint(max_entries, 1);
-> > > } dev_map SEC(".maps");
-> > > 
-> > > SEC("xdp")
-> > > int xdp_meta_redirect(struct xdp_md *ctx)
-> > > {
-> > > 	__u64 timestamp;
-> > > 
-> > > 	...
-> > > 	bpf_xdp_metadata_rx_timestamp(ctx, &timestamp);
-> > > 	...
-> > > 
-> > > 	return bpf_redirect_map(&dev_map, ctx->rx_queue_index, XDP_PASS);
-> > > }
-> > > 
-> > > According to my understanding this is feasible just if the "xdp_meta_redirect"
-> > > program is bounded to a device otherwise the program is reject with the following
-> > > error at load time:
-> > > 
-> > > libbpf: prog 'xdp_meta_redirect': BPF program load failed: -EINVAL
-> > > libbpf: prog 'xdp_meta_redirect': -- BEGIN PROG LOAD LOG --
-> > > metadata kfuncs require device-bound program
-> > > processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0
-> > > peak_states 0 mark_read 0
-> > > -- END PROG LOAD LOG --
-> > > 
-> > > in order to fix it:
-> > > 
-> > > 	...
-> > > 	index = if_nametoindex(DEV); 
-> > > 	bpf_program__set_ifindex(prog, index);
-> > > 	bpf_program__set_flags(prog, BPF_F_XDP_DEV_BOUND_ONLY);
-> > > 	...
-> > > 
-> > > Doing so the program load still fails for the check in bpf_prog_map_compatible():
-> > > 
-> > > 	bool bpf_prog_map_compatible()
-> > > 	{
-> > > 		...
-> > > 		if (bpf_prog_is_dev_bound(aux))
-> > > 			return false;
-> > > 		...
-> > 
-> > [..]
-> >  
-> > > In other words, a dev-bound XDP program can't interact with a DEVMAP (or
-> > > CPUMAP) even if it is not attached to a map entry.
-> > > I think if the XDP program is just running in the driver NAPI context
-> > > it should be doable to use a hw-metada kfunc and perform a redirect into
-> > > a DEVMAP or CPUMAP, right? Am I missing something?
-> > 
-> > Thanks for the info! Yes, that should work. I wonder if you hit
-> > bpf_prog_select_runtime->bpf_check_tail_call->bpf_prog_map_compatible
-> > path? Looks like we should not do bpf_prog_is_dev_bound in that case (the rest
-> > of the bpf_prog_map_compatible callers should).
-> 
-> yes, the issue occurs at the program load time when we run
-> bpf_prog_map_compatible() following the call path you pointed out:
-> 
-> bpf_prog_select_runtime() -> bpf_check_tail_call() -> bpf_prog_map_compatible()
-> 
-> Do you mean we should get rid of the bpf_prog_is_dev_bound() check in
-> bpf_prog_map_compatible() and move it in the bpf_prog_map_compatible() callers
-> instead? In particular:
-> 
->  - __cpu_map_load_bpf_program()
->  - __dev_map_alloc_node()
->  - prog_fd_array_get_ptr()
+On 4/23/25 08:41, Jakub Kicinski wrote:
+> On Thu, 17 Apr 2025 14:28:06 +0700 Bui Quang Minh wrote:
+>> The selftest reproduces the deadlock scenario when binding/unbinding XDP
+>> program, XDP socket, rx ring resize on virtio_net interface.
+>>
+>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>> ---
+>>   .../testing/selftests/drivers/net/hw/Makefile |  1 +
+>>   .../selftests/drivers/net/hw/virtio_net.py    | 65 +++++++++++++++++++
+>>   2 files changed, 66 insertions(+)
+>>   create mode 100755 tools/testing/selftests/drivers/net/hw/virtio_net.py
+>>
+>> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+>> index 07cddb19ba35..b5af7c1412bf 100644
+>> --- a/tools/testing/selftests/drivers/net/hw/Makefile
+>> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+>> @@ -21,6 +21,7 @@ TEST_PROGS = \
+>>   	rss_ctx.py \
+>>   	rss_input_xfrm.py \
+>>   	tso.py \
+>> +	virtio_net.py \
+> Maybe xsk_reconfig.py ? Other drivers will benefit from this test, too,
+> and that's a more descriptive name.
+>
+>>   	#
+>>   
+>>   TEST_FILES := \
+>> diff --git a/tools/testing/selftests/drivers/net/hw/virtio_net.py b/tools/testing/selftests/drivers/net/hw/virtio_net.py
+>> new file mode 100755
+>> index 000000000000..7cad7ab98635
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/drivers/net/hw/virtio_net.py
+>> @@ -0,0 +1,65 @@
+>> +#!/usr/bin/env python3
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +
+>> +# This is intended to be run on a virtio-net guest interface.
+>> +# The test binds the XDP socket to the interface without setting
+>> +# the fill ring to trigger delayed refill_work. This helps to
+>> +# make it easier to reproduce the deadlock when XDP program,
+>> +# XDP socket bind/unbind, rx ring resize race with refill_work on
+>> +# the buggy kernel.
+>> +#
+>> +# The Qemu command to setup virtio-net
+>> +# -netdev tap,id=hostnet1,vhost=on,script=no,downscript=no
+>> +# -device virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on
+>> +
+>> +from lib.py import ksft_exit, ksft_run
+>> +from lib.py import KsftSkipEx, KsftFailEx
+>> +from lib.py import NetDrvEnv
+>> +from lib.py import bkg, ip, cmd, ethtool
+>> +import re
+>> +
+>> +def _get_rx_ring_entries(cfg):
+>> +    output = ethtool(f"-g {cfg.ifname}").stdout
+>> +    values = re.findall(r'RX:\s+(\d+)', output)
+> no need for the regexps, ethtool -g supports json formatting:
+>
+> 	output = ethtool(f"-g {cfg.ifname}", json=True)[0]
+> 	return output["rx"]
+>
+> ?
+>
+>> +    return int(values[1])
+>> +
+>> +def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
+>> +    # Probe for support
+>> +    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
+>> +    if xdp.ret == 255:
+>> +        raise KsftSkipEx('AF_XDP unsupported')
+>> +    elif xdp.ret > 0:
+>> +        raise KsftFailEx('unable to create AF_XDP socket')
+>> +
+>> +    try:
+>> +        xsk_bkg = bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} ' \
+>> +                      '{xdp_queue_id} -z', ksft_wait=3)
+> This process will time out after 3 seconds but the test really
+> shouldn't leave things running after it exits. Don't worry about
+> the couple of seconds of execution time. Wrap each test in
+>
+> 	with bkg(f"... the exec info ... "):
+> 		# test code here
+>
+> The bkg() class has an __exit__() handle once the test finishes
+> and leaves the with block it will terminate.
 
-Maybe move existing bpf_prog_map_compatible parts (except is_dev_bound)
-into some new bpf_prog_map_compatible_type helper?
+I've tried to make the setup_xsk into each test. However, I've an issue 
+that the XDP socket destruct waits for an RCU grace period as I see this 
+sock's flag SOCK_RCU_FREE is set. So if we start the next test right 
+away, we can have the error when setting up XDP socket again because 
+previous XDP socket has not unbound the network interface's queue yet. I 
+can resolve the issue by putting the sleep(1) after closing the socket 
+in xdp_helper:
 
-bpf_prog_map_compatible() {
-  if (bpf_prog_is_dev_bound)
-    return false;
-  return bpf_prog_map_compatible_type(...);
-}
+diff --git a/tools/testing/selftests/net/lib/xdp_helper.c 
+b/tools/testing/selftests/net/lib/xdp_helper.c
+index f21536ab95ba..e882bb22877f 100644
+--- a/tools/testing/selftests/net/lib/xdp_helper.c
++++ b/tools/testing/selftests/net/lib/xdp_helper.c
+@@ -162,5 +162,6 @@ int main(int argc, char **argv)
+          */
 
-And make bpf_check_tail_call call new bpf_prog_map_compatible_type. Not
-sure about the naming though (as usual)..
+         close(sock_fd);
++       sleep(1);
+         return 0;
+  }
+
+Do you think it's enough or do you have a better suggestion here?
+
+Thanks,
+Quang Minh.
+
+>
+>> +        return xsk_bkg
+>> +    except:
+>> +        raise KsftSkipEx('Failed to bind XDP socket in zerocopy. ' \
+>> +                         'Please consider adding iommu_platform=on ' \
+>> +                         'when setting up virtio-net-pci')
+>> +
+>> +def check_xdp_bind(cfg):
+>> +    ip(f"link set dev %s xdp obj %s sec xdp" %
+>> +       (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
+>> +    ip(f"link set dev %s xdp off" % cfg.ifname)
+>> +
+>> +def check_rx_resize(cfg, queue_size = 128):
+>> +    rx_ring = _get_rx_ring_entries(cfg)
+>> +    ethtool(f"-G %s rx %d" % (cfg.ifname, queue_size))
+>> +    ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
+> Why guess the ring size? What if it's already 128? I usually do:
+>
+> 	rx_ring = _get_rx_ring_entries(cfg)
+> 	ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring / 2))
+> 	ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
+>
+> IOW flip between half or double and current.
+>
+>> +def main():
+>> +    with NetDrvEnv(__file__, nsim_test=False) as cfg:
+>> +        try:
+>> +            xsk_bkg = setup_xsk(cfg)
+>> +        except KsftSkipEx as e:
+>> +            print(f"WARN: xsk pool is not set up, err: {e}")
+>> +
+>> +        ksft_run([check_xdp_bind, check_rx_resize],
+>> +                 args=(cfg, ))
+>> +    ksft_exit()
+>> +
+>> +if __name__ == "__main__":
+>> +    main()
+
 
