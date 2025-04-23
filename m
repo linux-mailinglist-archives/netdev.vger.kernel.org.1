@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-184998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0110CA980E1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:30:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 018EEA980EB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17C6216AA12
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:30:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47E54188E2E9
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCFC26B098;
-	Wed, 23 Apr 2025 07:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FF426E152;
+	Wed, 23 Apr 2025 07:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="PDLXlzMH"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="E6LLzaCb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A17A26A0E0;
-	Wed, 23 Apr 2025 07:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EE126B2D7;
+	Wed, 23 Apr 2025 07:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745393392; cv=none; b=DxoBxOq5+BaOiKgp/n49Diu1zjornUerEtjhibIXl48Xo5Y+nou7u2M3SVVpi3L8KkfNcyPvlXUBhnBsKpaOLO/RlLqaww7EEnIkv3DoSpxzv0QBFsM20tM0c1o5/LeXOESJMYIR58Ttkiq/JYJ2ml42stMUWqltkrvqdl4SzJI=
+	t=1745393395; cv=none; b=SeHVW5x04ufwSyAkfGYmSti8J/E0xmkCnARrSbx6yC6EMMvlm5vKKjE/St5kW4EhQXIcrctEmuKvAoeoGYoZQqhKCScfFVqfUx551pN0RSCrfs7dZ4g6FzLebdFYumh8xnNQOZsjPXmiHnhn62h4yXI2uasQ02Si6iGwVbUjlZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745393392; c=relaxed/simple;
-	bh=I83GxZDzcFuI33mtv7+ZFbBGKbZoP+td5F4juz3ryy0=;
+	s=arc-20240116; t=1745393395; c=relaxed/simple;
+	bh=LWBXNONxBATl9kuap6o+2ezuDlAGLH9/EcsecDvp9js=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rpYOB8SkyoCiBY3HrbgybJXjXH+FTSjcw0UBTO8WEAnACYz65/H5PuaOM+jK6zviHkHhIcKgO3Syv8dixu7GCwtIKNTpn5GoJnSFAbQVuw9szCxlQ13aW+qpS5oofXJO2UnQ80Sebaxyn/Ty2uM9mNZVh+Xw6rILLxWFXJulMOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=PDLXlzMH; arc=none smtp.client-ip=89.58.32.78
+	 MIME-Version; b=U7xmOx2WG4duzUZurulMLyyvl+qJjv74RGxIupH0qvkrLykI6mvHF6CoCX6LHgJq5dP2xANX7I0APeueYARBZaDwTC3j85daFAtBlBZtNVWAvmqNJJ43nys2M7xRytIpmKKEezd+1yzxn/Zt1dCMFkOdL3yH91xXwqZbicQc5Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=E6LLzaCb; arc=none smtp.client-ip=89.58.32.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 567E6102A8CBE;
-	Wed, 23 Apr 2025 09:29:47 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C9AA102A4CB7;
+	Wed, 23 Apr 2025 09:29:48 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1745393388; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1745393390; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=bhsgfhrOV51CF8CHf8FVR4/zGx8w+Pf/0ncp6vUStt4=;
-	b=PDLXlzMHNLfIrSZfd04ox1q+jdD4QnYFne1Q8iTWLNw1LeSBasUG0lwdu1yX3j1W36WxbT
-	ygZduwCZB9OLTLigP3AXRxaG7NoaaBQSN2GhC9VBOuaC8jOdRH3S9LoJwSkoL0qg05FDzg
-	H1uCBUU0PlwqOjUlgR1pBElez8kvMnLOSjx/+Px02goBR5TDn/Qwkn+fOAmTylEwus9uGe
-	5wFkYVWwYVg+BsrrqEQfSLLmAKcPv0hhhaSrESqSmHHV3eg7lypbMOccQxgN20Lu0NOXnL
-	wOpO1k4yb4mvB3wkO5VqRSSedW9a9ODdLfE+ZECzH9MfjoDNI/rJMmcnhpfN2w==
+	bh=aB8MI0EI5Gkq7Eb45WJ1p7xyGJxC1MY+LPh/kB8JjbE=;
+	b=E6LLzaCbGJ6yfshavAZR4gvEvjwyCwp/dioyXkpa8g0h+HpLPBjMIXw5gOwtoP2sa0JLM0
+	sJWvJoFwHzx5qqTLZ3OGxWkJg70o1KzxrUVgHkUQzUCvKPMLpUKpKtRzbRqXCHCz6e2vr1
+	pcSad4JDOP6bHlch5rxz/5eZtODILM4NMGfpvRoV3BYtaMWqo8h2qQIPH6SA6LwK7ZgOW2
+	1yAGEXqBgBzDXjtg+X4X+plL/FfdRHam9GG1HUMXWrX4i+CbIu1+aQ+wljPxf+cilKRaoz
+	YtedgFVRnp2VzEKeWKfatxE+4/0wKMC0qTPkQ3SbO9xLjeWvtNEVX7kZlflGKg==
 From: Lukasz Majewski <lukma@denx.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [net-next v7 5/7] ARM: mxs_defconfig: Enable CONFIG_NFS_FSCACHE
-Date: Wed, 23 Apr 2025 09:29:09 +0200
-Message-Id: <20250423072911.3513073-6-lukma@denx.de>
+Subject: [net-next v7 6/7] ARM: mxs_defconfig: Update mxs_defconfig to 6.15-rc1
+Date: Wed, 23 Apr 2025 09:29:10 +0200
+Message-Id: <20250423072911.3513073-7-lukma@denx.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250423072911.3513073-1-lukma@denx.de>
 References: <20250423072911.3513073-1-lukma@denx.de>
@@ -79,47 +79,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-It is not possible to enable by user the CONFIG_NETFS_SUPPORT anymore and
-hence it depends on CONFIG_NFS_FSCACHE being enabled.
+This file is the updated version of mxs_defconfig for the v6.15-rc1
+linux-next.
 
-This patch fixes potential performance regression for NFS on the mxs
-devices.
+Detailed description of removed configuration entries:
+-CONFIG_MTD_M25P80=y -> it has been replaced MTD_SPI_NOR (which is enabled)
+-CONFIG_SMSC_PHY=y -> is enabled implicit by USB_NET_SMSC95XX
+-CONFIG_GPIO_SYSFS=y -> it has been deprecated by moving to EXPERT and
+                        its replacement GPIO_CDEV is enabled by default
 
 Signed-off-by: Lukasz Majewski <lukma@denx.de>
 Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
 Suggested-by: Stefan Wahren <wahrenst@gmx.net>
 
 ---
-Changes for v6:
+Changes for v5:
 - New patch
+
+Changes for v6:
+- Add detailed description on the removed configuration options
+  after update
 
 Changes for v7:
 - None
 ---
- arch/arm/configs/mxs_defconfig | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/arm/configs/mxs_defconfig | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/arch/arm/configs/mxs_defconfig b/arch/arm/configs/mxs_defconfig
-index c76d66135abb..22f7639f61fe 100644
+index 22f7639f61fe..b1a31cb914c8 100644
 --- a/arch/arm/configs/mxs_defconfig
 +++ b/arch/arm/configs/mxs_defconfig
-@@ -138,8 +138,6 @@ CONFIG_PWM_MXS=y
- CONFIG_NVMEM_MXS_OCOTP=y
- CONFIG_EXT4_FS=y
- # CONFIG_DNOTIFY is not set
--CONFIG_NETFS_SUPPORT=m
--CONFIG_FSCACHE=y
- CONFIG_FSCACHE_STATS=y
- CONFIG_CACHEFILES=m
- CONFIG_VFAT_FS=y
-@@ -155,6 +153,7 @@ CONFIG_NFS_FS=y
- CONFIG_NFS_V3_ACL=y
- CONFIG_NFS_V4=y
- CONFIG_ROOT_NFS=y
-+CONFIG_NFS_FSCACHE=y
- CONFIG_NLS_CODEPAGE_437=y
- CONFIG_NLS_CODEPAGE_850=y
- CONFIG_NLS_ISO8859_1=y
+@@ -32,9 +32,6 @@ CONFIG_INET=y
+ CONFIG_IP_PNP=y
+ CONFIG_IP_PNP_DHCP=y
+ CONFIG_SYN_COOKIES=y
+-# CONFIG_INET_XFRM_MODE_TRANSPORT is not set
+-# CONFIG_INET_XFRM_MODE_TUNNEL is not set
+-# CONFIG_INET_XFRM_MODE_BEET is not set
+ # CONFIG_INET_DIAG is not set
+ # CONFIG_IPV6 is not set
+ CONFIG_CAN=m
+@@ -45,7 +42,6 @@ CONFIG_MTD=y
+ CONFIG_MTD_CMDLINE_PARTS=y
+ CONFIG_MTD_BLOCK=y
+ CONFIG_MTD_DATAFLASH=y
+-CONFIG_MTD_M25P80=y
+ CONFIG_MTD_SST25L=y
+ CONFIG_MTD_RAW_NAND=y
+ CONFIG_MTD_NAND_GPMI_NAND=y
+@@ -60,7 +56,6 @@ CONFIG_ENC28J60=y
+ CONFIG_ICPLUS_PHY=y
+ CONFIG_MICREL_PHY=y
+ CONFIG_REALTEK_PHY=y
+-CONFIG_SMSC_PHY=y
+ CONFIG_CAN_FLEXCAN=m
+ CONFIG_USB_USBNET=y
+ CONFIG_USB_NET_SMSC95XX=y
+@@ -77,13 +72,11 @@ CONFIG_SERIAL_AMBA_PL011=y
+ CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
+ CONFIG_SERIAL_MXS_AUART=y
+ # CONFIG_HW_RANDOM is not set
+-# CONFIG_I2C_COMPAT is not set
+ CONFIG_I2C_CHARDEV=y
+ CONFIG_I2C_MXS=y
+ CONFIG_SPI=y
+ CONFIG_SPI_GPIO=m
+ CONFIG_SPI_MXS=y
+-CONFIG_GPIO_SYSFS=y
+ # CONFIG_HWMON is not set
+ CONFIG_WATCHDOG=y
+ CONFIG_STMP3XXX_RTC_WATCHDOG=y
 -- 
 2.39.5
 
