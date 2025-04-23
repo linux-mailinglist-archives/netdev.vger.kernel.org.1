@@ -1,180 +1,332 @@
-Return-Path: <netdev+bounces-185124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B36DA9896C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:15:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF19A9898E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:18:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F61F1B66B60
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:15:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 222CF7A2D67
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CF72741D3;
-	Wed, 23 Apr 2025 12:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F1021ABDD;
+	Wed, 23 Apr 2025 12:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+msE829"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Si+5gSsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BDF2741C8;
-	Wed, 23 Apr 2025 12:14:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2ECC8632B
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 12:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745410478; cv=none; b=bTouzpJwukleO1D5qT/tVEYac+YQkzKTbAFgkwCC/wK7dE1sqUFhbbTdwsAhEhD6qkN8N55kBgM4UtQZX3lMtwphF+FNaw2p1Ud7SwIp3NVPyZlRKBNJoWtRNtU4HFve4fVL4wnHspWw5MtEgzLuxvwrLM+ClZ+ZuFI51nRsJA4=
+	t=1745410702; cv=none; b=KTH2LDMN8N2Ak1pIu1C7O/Hl7Ah5VTzTlOPCpnMtBHVnADx6ut77uaLdpSdt47LHoLc93aiSKT+80K7B789TPTY+oc6enuxLkRNo6PWPN1OQUNHLMwOBO0My833Kr7Pad4GMbzqu7MV5bHAs0iAkLPoIa2WPvc95vQx7RBnwqyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745410478; c=relaxed/simple;
-	bh=iI+zOFiPdKwPbL1x/XV2O6KQJB7HnqFPdwL8xUTkTGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fKcoBWIXw9KKBb8vPQ20J6EgPdz9DtB+puccoPBrtNdUIdpNeQROTUYvJyw+y305ALW8jKdxMvOio7mHF5xZfSJDGPnUir3DuhJL0/kGTsLSVnU03lmVnTTcpKhqCeVm/7YKGeL+6SywiIRX9SfpZF79r3n/omeeSDAe76NP6oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+msE829; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2295d78b433so74063275ad.2;
-        Wed, 23 Apr 2025 05:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745410476; x=1746015276; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6G/y3HQErml1NMZQNrayd+/BsrgNwWrmomSiPVW0Nsc=;
-        b=K+msE829fzeroKjiXRKf9NS3zVzUUkKOoMMAF9p20Rq7zI3UpFWs/wjPbA1RNLVrOQ
-         vVfAdLWwA9vuVb6mCOospRpxAjWd/UZuJcED8twGKhxdCBd0yVg/D+VMs/TS14NDIvMO
-         lLRsgO6f6j7rOltvdgwFQ2a3ndNnP2+wUebwEjRiSUOMxkGc71ZPSLkhcx+26ivKpVbB
-         cv6CoJPRA8kaZI/fueIeiHRDBavWrKshCJ18Jfc0jQBpfx+RQo+iQtTraMX/MVPJupHf
-         +yJTCc4Ffcu6f1Ke19e/hxFVhMvYphTXdrrKZ+jtnNxc5cjjEd+oanDRajP0fLbMd+Dl
-         gDoQ==
+	s=arc-20240116; t=1745410702; c=relaxed/simple;
+	bh=tCHjkL1SLgoL2j2PMqkiNHKmGBzODwMfabfskxgGLgY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hc9I7L7hJ4SJA/ipHKbhgD2sfGccQMFOQtGH7LA7VvWBtRGSOIBvsNNu4w3oCiiwlMDbmPuC9xCyZPD+xloLvc5fDdTDLL4p+ZXzzIGLf3JmHs5rkQWPDtaa6bcXDceXCjJd8b4Qq9JFcB9XtOsnPjMNGU4yyljiCUmX2iy7cik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Si+5gSsH; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53NANlok014532
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 12:18:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ioGfs5MtgxexvBjcj4mXKq9ldJm50YBOXelQWnDDA+w=; b=Si+5gSsH5Sq4CR5G
+	Zobx6D0+awRftNyIeqLD7wIQskcuztJErV9gBIQp2+U6xijczIIGrGoV3uMuvabf
+	cR2Xq8lPy7e8jzNEHDBW+Og4hF5TZymj9fK/dEZzsIqvbifYODTJbgyUohcQ64+u
+	0X4uPBqGFeeHEAdZ5+1hXskww8AEFCL86Squ1tM1exBkLb5iGs0PXfZdkADjR3M6
+	xq1FhOyRQWGM1oeaQTo0L0a/yBRvylt0hKZKgfCANbK3gwS0ayoj1gl7bPDuhqPG
+	LxAOgDlMO66Wd5eF2yvBd/PwJx6SGqzIu3vcrZc2MrGFEWvmTNoGel42tBrLw6u7
+	lJVAvQ==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 466jh0j2qb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 12:18:18 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c555d4ad75so31768685a.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 05:18:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745410476; x=1746015276;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6G/y3HQErml1NMZQNrayd+/BsrgNwWrmomSiPVW0Nsc=;
-        b=nqMkNQeFPvYpqYfzKzqQSX5pRPRjcbZtNJLP1R+/NjAhORUT3jaiaJUsiX5xD1Jb0e
-         nztEZ6YqmMassfoAdfWaf7ki4TB7hAc5V42umgQbNZjoOdNCLry5geHpwmehqVY4GMhV
-         61lucRpRB5LdaNJZ5W4nYOl3TxXAVMTUKya7KUu0aQjcioWOQm+kRLDAxHo4QGbScOmY
-         29tU5X6aQHKzYlk3XkIuCukHAJOxSnhiFBxBs0NjONZJBCQCjl4QFNzGU5wH9KKEwo0z
-         Olu5Quyv0+SiGnVTRriQNHxf03P8I8esLIyI/kKqMR7PG2otKr3spLZVvb14Jj2BbdH7
-         yXaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBpbA0viVYCT5tmO/CL1M+aTLtyCOr5RepQQ0VvVFOgjYt/5CA/oK+sB9sYmIqUjOlHhMkq/+Tdds8kyw=@vger.kernel.org, AJvYcCWZvOQRiwMOvsXx9CMbAgBwAWx77WlIarNAgdSQTRx0G6RRgTax7fAD9HBGRy0wsVKojI+07+Bz@vger.kernel.org, AJvYcCX7OJgNXnk9u4GHlOkNgwPBuAwgNtGQvGzmie/HY3+LMip/bNEGdcaJWL8mFR04JTJ8FjOhes7JhLasnzzgAYdM@vger.kernel.org
-X-Gm-Message-State: AOJu0YylA7FJTMB22WvdqsUWjt+R9CIY/AVqLbnH2R9Hvo9M0X7nsWYf
-	7IoeRFgiFkGhYpwh0fArEZltD9C2wKRJc6ODmIq70kTWPAAuRkga
-X-Gm-Gg: ASbGnctFG7JQpjWXfL6Vha7WxW5jNi/G0GCz0+LQNWp5xTyF+oblHBXiDStYiBq8sqr
-	1BCCFTB2vM0k4Zsk8cq0ZAYLxvCnmej49bTgg/fHKJFH8ocmZDQR07yLzk0S5wyoJahegY+7vnO
-	UUBaQ/TjlMyXYhnn0KCS30rJ7N8rBh/+4HCOGyaIvnauPSdq1WvRt4CLvbuPgsEpHeLrarVImpg
-	9yXDS5jm//kJgaQORPBEInyLNz3DLOzOXVO+hlz0ZZ5mDVzzJ6Ekw/ouQ7p9sRIt1zWR+GOVyTb
-	9cn+QMNO/GD8dtDIae27jVd1PEsUSymkBXkZ2a4l/lI=
-X-Google-Smtp-Source: AGHT+IF+oB26vPds+B4kBrr2c9xPwwreiL7sTMFTRFvzhefCWoyDXGQln9OtTCMvRnNeQwmY27e4aw==
-X-Received: by 2002:a17:903:234e:b0:215:8d49:e2a7 with SMTP id d9443c01a7336-22c53620bb5mr256277845ad.50.1745410475779;
-        Wed, 23 Apr 2025 05:14:35 -0700 (PDT)
-Received: from ubuntu2404.. ([122.231.145.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50bf5528sm102647295ad.100.2025.04.23.05.14.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 05:14:34 -0700 (PDT)
-From: KaFai Wan <mannkafai@gmail.com>
-To: alexei.starovoitov@gmail.com,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	mykolal@fb.com,
-	shuah@kernel.org,
-	memxor@gmail.com
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	leon.hwang@linux.dev,
-	KaFai Wan <mannkafai@gmail.com>
-Subject: [PATCH bpf-next v4 2/2] selftests/bpf: Add test to access const void pointer argument in tracing program
-Date: Wed, 23 Apr 2025 20:13:29 +0800
-Message-ID: <20250423121329.3163461-3-mannkafai@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250423121329.3163461-1-mannkafai@gmail.com>
-References: <20250423121329.3163461-1-mannkafai@gmail.com>
+        d=1e100.net; s=20230601; t=1745410698; x=1746015498;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ioGfs5MtgxexvBjcj4mXKq9ldJm50YBOXelQWnDDA+w=;
+        b=AMGl7LIh/GWMQR3r07geXXqr8sDLuIG1iwexNkjQ9zuh1FFlSJJP1DgutvjPSgErEv
+         1wMAokRNSqgtSgQXIor0MhEa1tdIdOM1vZtpswZttrwshCuz/gXDdX8h7IW27APK4413
+         rjdvnBLfu75N1FT6KX/i95Pvzmz1Qtla/au9fWbRm/vOdZHIoOf6H2PYsWU8W3GzDi/X
+         Xajy+vQkAYSvkWpwqukVq6Vy0i4a3taYnWHOJTThirMlXCSnxXgu8iU7btCv4mUy0Z1A
+         aEvqQg7+OvuqEJlKOrfSyr8NUyGcz4XUBoN532epWWotJpSM9Lz7BSlPJDPN7yll2z6K
+         1Dqw==
+X-Forwarded-Encrypted: i=1; AJvYcCX39WboK+M7IqGaXqxd9DOMZjw8mwNTzQ/0294JpqWiKQvFq2OEuRES2WEbHFwt9q5YeeHiHFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVY8PZXmLPIFCz+zB9FjrcS+n6qo2/mJLlDI9eI93ZXLrsfhJb
+	Roq6LTxjvTCbL57QmsOi0f68MOOWblxSS5HMJyp6NWhrxhTmYDt/muf8srCApRW0JYxYb/Hc+Ic
+	VUBSBKspY3VcbVZQrfD8WR+3bLfgmC6lTpvO/aZTUPvBi7mAVQ8miQEk=
+X-Gm-Gg: ASbGncty4DgvtcYBYk9nbNFyTP2fYBvgLqMfn+G6qHs7g6GQIcUgkrQIE2hGuU+ZjeT
+	5YyYDWe2CLLgP7wYc73lNwC9pRl4Q6icYRWdr9QJGrQcIgsP/uzAJSSwtgo5OzKC1abgj3UGOG7
+	kOHDiMqWard0tq1ztHbhFlwSnvQAC5/Dqf0QKlIYr6B+szo4NAUgOg0UhfGZOlJIuW/wADcFtRN
+	1vRVLOznZYkyo0OD0cozjDwXjeUNSWptRHXWHeTA2JHbEW9Qzk15EVD68p6UqJZKaYQ1BKQSymD
+	s0zYLfLNPOpHNC1PyAJkwaKcKRzdljhIVA0b8KpXxBM1YDMLLBHmTqIxpJTatZkHzjA=
+X-Received: by 2002:a05:620a:2492:b0:7c0:be0e:cb09 with SMTP id af79cd13be357-7c94d266c35mr148951785a.7.1745410697590;
+        Wed, 23 Apr 2025 05:18:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEav1ZFFMWH2+h22EnPEjP1DswVCKNGIgBpCwJp2VazcB6M7t8R/W/1xgUW9/XgzClpBqzW6A==
+X-Received: by 2002:a05:620a:2492:b0:7c0:be0e:cb09 with SMTP id af79cd13be357-7c94d266c35mr148944985a.7.1745410697019;
+        Wed, 23 Apr 2025 05:18:17 -0700 (PDT)
+Received: from [192.168.65.183] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6efadd51sm817256866b.179.2025.04.23.05.18.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Apr 2025 05:18:16 -0700 (PDT)
+Message-ID: <e0a61158-6278-45bc-bc5c-fe35227bdbf1@oss.qualcomm.com>
+Date: Wed, 23 Apr 2025 14:18:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 30/33] arm64: dts: qcom: Add dtsi for Snapdragon
+ 730/730g/732g (SM7150) SoCs
+To: Danila Tikhonov <danila@jiaxyga.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck
+ <linux@roeck-us.net>,
+        Rajendra Nayak <quic_rjendra@quicinc.com>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Bjorn Andersson
+ <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wesley Cheng <quic_wcheng@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+        Kishon Vijay Abraham I <kishon@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
+        Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>,
+        Srinivas Kandagatla <srini@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Georgi Djakov <djakov@kernel.org>,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Robert Foss
+ <rfoss@kernel.org>, Andi Shyti <andi.shyti@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>, Taniya Das <quic_tdas@quicinc.com>,
+        Sibi Sankar <quic_sibis@quicinc.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+        Imran Shaik <quic_imrashai@quicinc.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Jessica Zhang <quic_jesszhan@quicinc.com>,
+        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>, Kees Cook <kees@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        David Wronek <david@mainlining.org>,
+        Jens Reidel <adrian@mainlining.org>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+        linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-hardening@vger.kernel.org, linux@mainlining.org,
+        ~postmarketos/upstreaming@lists.sr.ht
+References: <20250422213137.80366-1-danila@jiaxyga.com>
+ <20250422213137.80366-14-danila@jiaxyga.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250422213137.80366-14-danila@jiaxyga.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: JsVyPitmza7R5qL43AHhPezr5x17aZT0
+X-Authority-Analysis: v=2.4 cv=ftfcZE4f c=1 sm=1 tr=0 ts=6808da8a cx=c_pps a=qKBjSQ1v91RyAK45QCPf5w==:117 a=FpWmc02/iXfjRdCD7H54yg==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=KKAkSRfTAAAA:8 a=OuZLqq7tAAAA:8 a=7ibcVnAUAAAA:8
+ a=uu6HZSQSBnFQn7oXV_IA:9 a=QEXdDO2ut3YA:10 a=NFOGd7dJGGMPyQGDc5-O:22 a=cvBusfyB2V15izCimMoJ:22 a=AKGiAy9iJ-JzxKVHQNES:22 a=HywIFdX19-EX8Ph82vJO:22
+X-Proofpoint-GUID: JsVyPitmza7R5qL43AHhPezr5x17aZT0
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDIzMDA4NSBTYWx0ZWRfXy2bc6//zIe2y TEMhRCkKCHeiTFVviouduQOGd9bGjJlbvfXRE0YG1jWlmAMbnl+GDbW26qq8GgPgerVcea4/u+b Rx4OyXVlUjK8QoAeCeAdmXs0esVJpM8of1Cx8OWttM17DEv0hbdKlKzkbLQOvK/Nrxy8QZRp4cr
+ q2dAMGH7Fqx6SMuQii0dLZ2pSPjsf0QV61f75ao0zmXMBQfGVfzrQjt1/Lj/IDDObO9s7aNUvyL uNFh4asUVDoYkECQFHO4hExuO60rc9FarPHY8veM5nY/b8DhaxA2YgQK00sH9XMWiC6mw0Ob22S iUK94a/r71L+t9ZXbDZ9Ks/vn6eqLQT3cCdm6GFFkP8poxEpa2d4KK7FCJw7vW4OZjxdqI6n3Mt
+ OUaCz9KeZ5/IXx7w/SU8/MCwAENm5mUMmFtOGLffi0Kq88F/RJ0VrFoVP7nITK6Ik7kug4tD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
+ definitions=2025-04-23_07,2025-04-22_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=602 lowpriorityscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 adultscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2504230085
 
-Adding verifier test for accessing const void pointer argument in
-tracing programs.
+On 4/22/25 11:31 PM, Danila Tikhonov wrote:
+> Add base dtsi for SM7150-AA/SM7150-AB/SM7150-AC SoCs
+> 
+> Co-developed-by: David Wronek <david@mainlining.org>
+> Signed-off-by: David Wronek <david@mainlining.org>
+> Co-developed-by: Jens Reidel <adrian@mainlining.org>
+> Signed-off-by: Jens Reidel <adrian@mainlining.org>
+> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
+> ---
 
-The test program loads 1st argument of bpf_fentry_test10 function
-which is const void pointer and checks that verifier allows that.
+[...]
 
-Signed-off-by: KaFai Wan <mannkafai@gmail.com>
-Acked-by: Jiri Olsa <jolsa@kernel.org>
----
- net/bpf/test_run.c                                   |  8 +++++++-
- .../selftests/bpf/progs/verifier_btf_ctx_access.c    | 12 ++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+> +		cpu0: cpu@0 {
+> +			device_type = "cpu";
+> +			compatible = "qcom,kryo470";
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 7cb192cbd65f..aaf13a7d58ed 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -569,6 +569,11 @@ __bpf_kfunc u32 bpf_fentry_test9(u32 *a)
- 	return *a;
- }
- 
-+int noinline bpf_fentry_test10(const void *a)
-+{
-+	return (long)a;
-+}
-+
- void noinline bpf_fentry_test_sinfo(struct skb_shared_info *sinfo)
- {
- }
-@@ -699,7 +704,8 @@ int bpf_prog_test_run_tracing(struct bpf_prog *prog,
- 		    bpf_fentry_test6(16, (void *)17, 18, 19, (void *)20, 21) != 111 ||
- 		    bpf_fentry_test7((struct bpf_fentry_test_t *)0) != 0 ||
- 		    bpf_fentry_test8(&arg) != 0 ||
--		    bpf_fentry_test9(&retval) != 0)
-+		    bpf_fentry_test9(&retval) != 0 ||
-+		    bpf_fentry_test10((void *)0) != 0)
- 			goto out;
- 		break;
- 	case BPF_MODIFY_RETURN:
-diff --git a/tools/testing/selftests/bpf/progs/verifier_btf_ctx_access.c b/tools/testing/selftests/bpf/progs/verifier_btf_ctx_access.c
-index 28b939572cda..03942cec07e5 100644
---- a/tools/testing/selftests/bpf/progs/verifier_btf_ctx_access.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_btf_ctx_access.c
-@@ -65,4 +65,16 @@ __naked void ctx_access_u32_pointer_reject_8(void)
- "	::: __clobber_all);
- }
- 
-+SEC("fentry/bpf_fentry_test10")
-+__description("btf_ctx_access const void pointer accept")
-+__success __retval(0)
-+__naked void ctx_access_const_void_pointer_accept(void)
-+{
-+	asm volatile ("					\
-+	r2 = *(u64 *)(r1 + 0);		/* load 1st argument value (const void pointer) */\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+Please split this into Kryo 470 silver and gold, with the former being
+based on CA55 and the latter on CA76
 
+[...]
+
+> +	pmu-a55 {
+> +		compatible = "arm,cortex-a55-pmu";
+> +		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
+> +	};
+> +
+> +	pmu-a76 {
+> +		compatible = "arm,cortex-a78-pmu";
+> +		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_LOW>;
+> +	};
+
+Please update this, mimicking 
+
+2c06e0797c32 ("arm64: dts: qcom: sm8650: add PPI interrupt partitions for the ARM PMUs")
+
+> +
+> +	psci {
+> +		compatible = "arm,psci-1.0";
+> +		method = "smc";
+> +
+> +		cpu_pd0: power-domain-cpu0 {
+> +			#power-domain-cells = <0>;
+> +			power-domains = <&cluster_pd>;
+> +			domain-idle-states = <&little_cpu_sleep_0
+> +					      &little_cpu_sleep_1>;
+
+<&foo>,
+<&foo2>;
+
+because they are phandles to separate things - DTC treats them equally
+though..
+
+[...]
+
+> +				interconnects = <&aggre1_noc MASTER_QUP_0 QCOM_ICC_TAG_ALWAYS
+> +						 &config_noc SLAVE_QUP_0 QCOM_ICC_TAG_ALWAYS>,
+> +						<&gem_noc MASTER_AMPSS_M0 QCOM_ICC_TAG_ALWAYS
+> +						 &config_noc SLAVE_QUP_0 QCOM_ICC_TAG_ALWAYS>,
+
+Paths involving AMPSS_M0 (the cpu endpoint) should be ACTIVE_ONLY,
+this applies to the entire file and all paths
+
+[...]
+
+> +		remoteproc_adsp: remoteproc@62400000 {
+> +			compatible = "qcom,sm7150-adsp-pas";
+> +			reg = <0x0 0x62400000 0x0 0x100>;
+
+This region is 0x10_000 long
+
+[...]
+
+> +		adreno_smmu: iommu@5040000 {
+> +			compatible = "qcom,sm7150-smmu-v2",
+> +				     "qcom,adreno-smmu",
+> +				     "qcom,smmu-v2";
+> +			reg = <0x0 0x05040000 0x0 0x10000>;
+> +
+> +			interrupts = <GIC_SPI 229 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 231 IRQ_TYPE_LEVEL_HIGH>,
+> +				     <GIC_SPI 364 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 365 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 366 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 367 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 368 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 369 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 370 IRQ_TYPE_EDGE_RISING>,
+> +				     <GIC_SPI 371 IRQ_TYPE_EDGE_RISING>;
+> +
+> +			clocks = <&gpucc GPU_CC_AHB_CLK>,
+> +				 <&gcc GCC_GPU_MEMNOC_GFX_CLK>,
+> +				 <&gcc GCC_GPU_SNOC_DVM_GFX_CLK>;
+> +			clock-names = "ahb",
+> +				      "bus",
+> +				      "iface";
+> +
+> +			power-domains = <&gpucc CX_GDSC>;
+> +
+> +			#iommu-cells = <1>;
+> +			#global-interrupts = <2>;
+
+Add `dma-coherent` and check whether the GPU still works
+
+[...]
+
+> +		};
+> +
+> +		gmu: gmu@506a000 {
+> +			compatible = "qcom,adreno-gmu-618.0",
+> +				     "qcom,adreno-gmu";
+> +			reg = <0x0 0x0506a000 0x0 0x31000>,
+
+Make it 0x26_000 so that it doesn't leak into GPU_CC
+
+[...]
+
+> +		tsens0: thermal-sensor@c263000 {
+> +			compatible = "qcom,sm7150-tsens",
+> +				     "qcom,tsens-v2";
+> +			reg = <0x0 0x0c263000 0x0 0x1ff>, /* TM */
+> +			      <0x0 0x0c222000 0x0 0x1ff>; /* SROT */
+
+Please remove these comments
+
+[...]
+
+> +		intc: interrupt-controller@17a00000 {
+> +			compatible = "arm,gic-v3";
+> +			reg = <0x0 0x17a00000 0x0 0x10000>,  /* GICD */
+> +			      <0x0 0x17a60000 0x0 0x100000>; /* GICR * 8 */
+
+And these ones too
+
+[...]
+
+> +	thermal-zones {
+
+Please adjust this against 
+
+https://lore.kernel.org/linux-arm-msm/20250219-x1e80100-thermal-fixes-v1-0-d110e44ac3f9@linaro.org/
+
+(keep only critical trips with no sw cooling for the CPU, etc.)
+
+Konrad
 
