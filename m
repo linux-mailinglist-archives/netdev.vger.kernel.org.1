@@ -1,124 +1,139 @@
-Return-Path: <netdev+bounces-185273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36C2FA99975
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2DCA99980
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFCEF7A7219
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:27:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9C1462ADA
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3A626B941;
-	Wed, 23 Apr 2025 20:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079D72673A5;
+	Wed, 23 Apr 2025 20:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHjT7QE5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IqDCa3UN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8422026B96A;
-	Wed, 23 Apr 2025 20:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E7B86331
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 20:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745440144; cv=none; b=fwkty/9rB2SQuEcG1E60MXLHvJoCiE5adH/yYaX/BQ0wafGnf4MWxhght3VQqREC9WU4e8PxIeV68w9GFQEdd1iFk4QLonOa8btMhQxweV6lmWE+SGnyrxvZCCcOBKwjzhXgfDWFusBGdafszE2aZ0og4u45xhnmvOPdIUTfInQ=
+	t=1745440515; cv=none; b=isVgpn9E2b6xUjGklb9DsiBz6n4VG7ZotBCKvc/+IqxJMeTbpDdD6S3tphPQtaM+y+n4Wb7yIZMp5nFxuvQkCjWK5zb2rXSfl5Qj7Nkwmb3VnTuDGlsxhwIJeu1663UzKoX09rzYkvP/tXfaI4HcGEuVgwCCqh4IevvS+bIuagQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745440144; c=relaxed/simple;
-	bh=a6J0YZiJf0wIUXDHn7eG6jDQuIrcZmzDIHYFQUg5hv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gCK7/sua6HbFExtI9rJSFCIkJHbZJRPKaOAoqjfPE9owh4ZfKOtK0XjQWdxkDcndQDTAPpzKustPJvk5oWGrekl/e3ZURX12J44DyrRzajSzt3zXp86FJGhtmk6Epkjqk0/mLWgBgLnBgRGnbot0yKx4r6mLtKlBqzr3ZwBq0JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHjT7QE5; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2254e0b4b79so4387905ad.2;
-        Wed, 23 Apr 2025 13:29:03 -0700 (PDT)
+	s=arc-20240116; t=1745440515; c=relaxed/simple;
+	bh=PGaUAOiMiKZNW6eo55PaYE59RLvATWcy+aE2Rl/g00U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O/M1UexSMz7AflAqUgoKHzjkcnEYUB1IidIhkwTXjJJwuJyQdtA+bayggPqvVKersLzCF36JZL8bE/JbcRo+SAS1uxqqm0dB09GTHz39aHwIBNCA9ax97fP5JoDoClQsjEmqZ6PpfMb1Wja7C6Vt7krta+aTzERyl24RIsr3jjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IqDCa3UN; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2240aad70f2so64235ad.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:35:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745440143; x=1746044943; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyfXWteVf2Uw3jmWN9AEEs2P8ez5YpxAoieteSWvTT0=;
-        b=kHjT7QE534L6vbZRX5cmM/cEozAc1eBzFylEYjIW+RhVoMgybrQ22MJouyiq5MaNra
-         mXia+soSRdpEfU3WOKOU5r9UXoZox4fAvCovCQmRAkz/AERMAZF5T/YYgmL1a8QR65y+
-         gsJiKTo2/w4HatWhCTd1t43+LNgWYbsKVW6sLJ1GTf/vruITguDBRz95jT8dcdEpw49Q
-         Y+6V6mS8NV+wrvtseg1WJm2Sm5x5kyV3JXCo+mdkikpX11BI/Mb2kjYQLpP+zq+M0o26
-         Xu+bv/Eojnbosqm3N+5oLIVfZVVo6qtUdrHSoIQWqWygoulx1Uppji0CQh/qn2c7J2sd
-         el3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745440143; x=1746044943;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1745440514; x=1746045314; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oyfXWteVf2Uw3jmWN9AEEs2P8ez5YpxAoieteSWvTT0=;
-        b=GHy0K7ZOhgh/mHShrTuSjBu5MpPUaVE9Xsl7FPdG0Jmab/a6ovS88HJd+mzapYc2Ku
-         /azm9A3cZUIyvVQun7TnLsy8M9bw6rOc63v2EqRDjLczB5AH1x0RAKCoIc4pG7eMfJJT
-         n4u6AEwFOKdspy/z8M+/AbXghqcZLLmkrxNVzYrEugZgSPsR0+MMJQfP46pILHRJBOtO
-         Dz2mMvXUo6ITXW4ZAVDOYM6f8eCQMHjprtTthKIMf5BvwMgJUn/5yp6N5waTLELw5EHT
-         fT8uvUVsu6qdPXDYtIS4V7gClSFQA5QJwxBGvTQDXRCrqPrqQ6jaxt3zSwwtSzeeC2jm
-         9gow==
-X-Forwarded-Encrypted: i=1; AJvYcCUE7ZJxAqofe/a7k/w57BNYG29jwZ7pQESrV/iUodBP29KcI3SEjiULP01KF77wi1WXVF0=@vger.kernel.org, AJvYcCUFOZSX/e1vAGiNankkrZYvAZBVJyMD+nTySpzkIX4tHyKth32uDjKbGblDXnWkaCS68oDGTKzk@vger.kernel.org, AJvYcCUs6jqfHGEPkgVK6L4EQh4STkpf2Vg7v2ABMLcjHu/PFRVg6vhfupk/cKu/ItrszEqmEZfOcyCOcjU/QWwZ07F6@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdKXFLJn9BsNCI97gUVtS/CIt9YuT49dPF71O7kcQ9krg2wwNB
-	LNeTD3uL+M8JMXui5FvKJ1zn2NDBqHs+4SIj5z69J7jt3T61kRM=
-X-Gm-Gg: ASbGncvc/Uf3wtFcMTTQpCMS4uX2RDpLXJrnGP55Hc/teWnpk8nY6ZU5nP4LpLk8NCq
-	lkMYKKQtQybVtcLdncITxnpierl22PfJvuOAXNg5u059+V2pUO4uFOOnVJJ23NaC3LnBJfqwKsP
-	WfR+Vc11y0zOqKYpqoHnqjoSec/VWlZzQtAYfhGPTjL2UCJPzTpwiTCbq1FfplFe8T08UueXZ/k
-	X+VEFXrCvF3+fDVxStIcvcAbwsRaIOsWEgOsPvxJ0MXCEhCQIG5zgW+4dMabn5dflQgE29TupAo
-	oevHgEvrktqfHOQ7bDs9I/PZIsANwwuOptKmjfQL
-X-Google-Smtp-Source: AGHT+IG+I2gupbmugyEQpRKBsCZt2czrIlRva1wVly9xDSObaN4PrDuHgmHsG2fu7u6rVZ4ynoqgrA==
-X-Received: by 2002:a17:902:e54a:b0:223:5ace:eccf with SMTP id d9443c01a7336-22c535acd67mr324263045ad.25.1745440142742;
-        Wed, 23 Apr 2025 13:29:02 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50eb4287sm108976045ad.130.2025.04.23.13.29.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 13:29:02 -0700 (PDT)
-Date: Wed, 23 Apr 2025 13:29:01 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to perform
- XDP_REDIRECT into maps
-Message-ID: <aAlNjRGLbUuohQCN@mini-arch>
-References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
+        bh=OP6x/SvmYDWBsSwjz+wW/QLgAnSGMPtUeNJseQYliVE=;
+        b=IqDCa3UN/Lx6cw3BGvRbxeLDzAPXuMFeGgGyCq0p6JP/toYYIGUSa9TarXp7BtwKPE
+         i4hbW8QFTYzeYXVdedtQFIWcUBk44IhDpHSNEHlwog4KwlaQdI3lDYidv4wLP9+VM20e
+         VbDEwS8yJwrKPUbT0PHGxcXvXt1JYY1X3W5ctoEfDCrnhhPQWpcmoF3Mp5K+XYkmHKVS
+         wgoBynMPgo7HTxcZCYHqnUsOEFMwk7x564/ozpWT8RJE+pfhspn1OWCnO1dWx/o61YCx
+         iinkvOOd4aK1Ezo7lyk3XH6BJa78qnv9n/SDoTrNmdCPGfCNP9kkP4D0HpUBIUsaMlJB
+         cTWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745440514; x=1746045314;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OP6x/SvmYDWBsSwjz+wW/QLgAnSGMPtUeNJseQYliVE=;
+        b=qfCQbe+FpWQGbMj/1maOELAVe5NrPlp3mGhC+Zh53AVEzvh6eho2UGLnoqbbXz80J9
+         dtRqaYkdVVVTCIg6HsyTenQRbF6VQQ43cmvbrKq3e0jPdnB49aYEytLgsOGy6ztQ7eLN
+         ErOfx83TxucCO7BNNtwuPxuLE78Lw1QBYgD0OJQxBT3zT5JklJ4K/A/eMFK/rdg2firk
+         lieLvU8sAN8e/L2ljmmMNSbAggOSeXiAuDWOipdtV3kmc09N+gGIMkDJ2sk5Sp7PGWPh
+         z/FkRcQV1LwW/53yGu0JvqesowgBbuTkfJWysX67+OCjYkfE6YbIzPe8JiKM9LOevyL/
+         qj8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWSfE2bAc084l1vCVIDJw/hASIiK+8KS0Q/zAe/cgX65HkCbIXjnnHOJrJDl8IwYosKK+xLDsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkdwFUEQm4tbt9HDmrx8glIDMuBbDYkmKhC07Aps/xJpr4459d
+	TjYksrRl9mNMInuQFvq7N+v+Y2ZxwFyWnCf7e9ozIB3H3CjhigtUsIiOzJvuhifi/FZY9oD9FK6
+	TT3WB1jtn8TdKxnBKw/Qv8KANAPfdXQdWIJ3BxdSPEs3X854EGw==
+X-Gm-Gg: ASbGncv8+PBSvaxCL8/niqY+YCLnXbgjxyzOT+CsOthi1wwkv/ha0QIqFRQqfQQvY7u
+	2rbFiHwDSjKzUGJxGZ3arkfvDzv6xt7bY4KthMvuu9/cHO8NbdZ7LE0Xu6/KDT6r06zT1kS52xk
+	D7MLPF6JLQnw5/+J18DA4nX46wbuAPhuA4Q6Y9XdZDXl/sBHu/gTNA
+X-Google-Smtp-Source: AGHT+IF9aV5DlMNct8CKi/1ggi7BXHKa747cmMNGnhdvKQH10y41IEUmht3O2pI1agJ6uMYbVjWnKa2umnKyNKE2HFc=
+X-Received: by 2002:a17:903:364d:b0:215:65f3:27ef with SMTP id
+ d9443c01a7336-22db21443f8mr882685ad.12.1745440513439; Wed, 23 Apr 2025
+ 13:35:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
+References: <20250421222827.283737-1-kuba@kernel.org> <20250421222827.283737-7-kuba@kernel.org>
+In-Reply-To: <20250421222827.283737-7-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 23 Apr 2025 13:35:00 -0700
+X-Gm-Features: ATxdqUHRxDWXOEezSmyl49BciZlvxeX_d5vfrvtRcVsnl4zznyRpgT_L0moETR8
+Message-ID: <CAHS8izPze3g7qdTGJ7xd9LeipVyx5cNTKisLDaT6FOTj=X_VzQ@mail.gmail.com>
+Subject: Re: [RFC net-next 06/22] eth: bnxt: read the page size from the
+ adapter struct
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	donald.hunter@gmail.com, sdf@fomichev.me, dw@davidwei.uk, 
+	asml.silence@gmail.com, ap420073@gmail.com, jdamato@fastly.com, 
+	dtatulea@nvidia.com, michael.chan@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04/23, Lorenzo Bianconi wrote:
-> In the current implementation if the program is dev-bound to a specific
-> device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
-> or CPUMAP even if the program is running in the driver NAPI context and
-> it is not attached to any map entry. This seems in contrast with the
-> explanation available in bpf_prog_map_compatible routine.
-> Fix the issue introducing __bpf_prog_map_compatible utility routine in
-> order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_call()
-> at program load time (bpf_prog_select_runtime()).
-> Continue forbidding to attach a dev-bound program to XDP maps
-> (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
-> 
-> Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+On Mon, Apr 21, 2025 at 3:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Switch from using a constant to storing the BNXT_RX_PAGE_SIZE
+> inside struct bnxt. This will allow configuring the page size
+> at runtime in subsequent patches.
+>
+> The MSS size calculation for older chip continues to use the constant.
+> I'm intending to support the configuration only on more recent HW,
+> looks like on older chips setting this per queue won't work,
+> and that's the ultimate goal.
+>
+> This patch should not change the current behavior as value
+> read from the struct will always be BNXT_RX_PAGE_SIZE at this stage.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 27 ++++++++++---------
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  4 +--
+>  3 files changed, 17 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.h
+> index 868a2e5a5b02..158b8f96f50c 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -2358,6 +2358,7 @@ struct bnxt {
+>         u16                     max_tpa;
+>         u32                     rx_buf_size;
+>         u32                     rx_buf_use_size;        /* useable size *=
+/
+> +       u16                     rx_page_size;
+I think you want a hunk that sets:
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+ rx_page_size =3D BNXT_RX_PAGE_SIZE;
 
-Thank you!
+In this patch? I could not find it, I don't know if I missed it. I
+know in latery patches you're going to set this variable differently,
+but for bisects and what not you may want to retain the current
+behavior.
+
+--=20
+Thanks,
+Mina
 
