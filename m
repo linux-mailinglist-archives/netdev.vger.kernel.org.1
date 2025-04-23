@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-185005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E3BFA9816F
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:46:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B7A5A98172
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F26717BA02
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:46:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B63467A2DBE
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBF81DF982;
-	Wed, 23 Apr 2025 07:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDC526A1D5;
+	Wed, 23 Apr 2025 07:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Amb7a1Fi"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="X8BO+Z2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053911A2557;
-	Wed, 23 Apr 2025 07:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4894A26A09E;
+	Wed, 23 Apr 2025 07:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745394386; cv=none; b=dYtoIT8AzIREA2EhQMGsFw6KDm5kBI90l9Gp9eA2RrapLaFu+mZ/fXaNGGeiVoxNzpABWPTaOAymnBnlVa9vpdQfdFht3x6V/odeJFPHz+bL1iLzYzdtIjZvahiXYjlo8Zz0lXQYNzy8gJ4uUqBeI2ZDiDSuDvabOq5XNsuUsFQ=
+	t=1745394389; cv=none; b=uInBwN4DkTxOcPeqggmxr06gXDholYR+VfEI19V2n0S2cMl/M2vC4EZeZoE5tBsv/g1Yt4Q2vGQBkE1nN20J4JX0nnPyy9M8Y4wgc5LTROlvoMNTFZI0D0S26lCdK9VCIWZAv9oGWeNTt7FMRG8plt0DyhikMuAJSOQqQz9NgXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745394386; c=relaxed/simple;
-	bh=JnI42D8gnyQIiAq6rTseCR4+UVuJOHXMODheJ8QYLL8=;
+	s=arc-20240116; t=1745394389; c=relaxed/simple;
+	bh=rtUf7kOs0Puf2UPujlWySKy2elK/Uoh7yNJ8qWZHYmA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e1JfUNkS0v4eXKKbVMduEZXi2YZH0UhYzxV5yriKamBgw6m8g2IQLqBbKi4xHDvSXaZzVciDOx6H2yX0FYcHDSpEsl4tRRvDTZl3Ov7X7tXwsQamJY2iUWgtCGA06K+Urzbn42Db0nOW3oh2078tsoCZx7HTEcBRL8DztV+K/pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=Amb7a1Fi; arc=none smtp.client-ip=212.227.15.19
+	 MIME-Version; b=AkBNUEAnWidtWLEDgNo0qOEPUpMENyoaHRg9vek5hNZxWstg0I6PbYDavkkqVSXkIBSNsMVB4PAZ2+Ur22gojZ+Nnb9M7U1kRdso2rbVYzRkhDMnoDklZ9Ymt69eNdiqIUgCWFJdyvLfy+Hf2ckIZf/L38yTIHY7/opxImsYQCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=X8BO+Z2r; arc=none smtp.client-ip=212.227.15.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1745394379; x=1745999179; i=wahrenst@gmx.net;
-	bh=6Qnka5fdg7WyXfCC1kVmA4SZaNXQgpnVMsbi+lOFjiA=;
+	s=s31663417; t=1745394380; x=1745999180; i=wahrenst@gmx.net;
+	bh=s5jtIj5ZEfTChRlGTCSG/OOmpwscxmjvvOjSBkMie9I=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=Amb7a1FiKIv2H1GG1JSfPImbEeB9QDu/X4r7jmGSvLbmX4K/h/5QCsad8nPDcYAQ
-	 HNgfpthSXthCXXxxGfOG2HOMpCkzdjFAK5tfF5S838bAQtXsxHBZZMfcBxvBFdlW4
-	 OfdIBKdQqHJcH0FwkzW6drguYwd8quhO7zI1qjroCnrid0Q2R4rbq17j531HK0DEz
-	 GqLbVKzwwOyRB9g8UoHbNoxgPyXrNN8rmzdgsHGBR4nvNGtZfbJKFnjm2vLTVJ++0
-	 VlMHsoLMx9sh8ipt+tRx5tJHJaIpNLRhe8Y5NJfwyyMUge4MKWlza4YDvgxZ/y7ua
-	 PzUjm1IFQQcVUQCdyw==
+	b=X8BO+Z2rZ8/Ih9Z8bootvhvsz8oOqc1V79CtKdOz+yGS2cbnzHDLBQTBz0oG5NFJ
+	 BGP72RsOian98eZOVzzYxLtNS1Epvhr0kUlYKAOcaJCS+zTVkqxwqUGFHiBphz02q
+	 0oZpti4P6HKmhzuW7kFZeWDuKoUsdj/Wyhz2wetspKfI67bEqFb6KbT+uMTY2FxjL
+	 t7l359rwR46x+k3nOUyFX3bURo2pXwKqUCE7vELwrZlwpHdqfRNTqWThrNDuCXpUu
+	 rfiT4N5SPn7co4o0TgLonaImj9buQZ+p3UOfg+AwmadiQlIkjriQi9lGhso/CpWyl
+	 o7jUc1LfCS4QKNoPzA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.251.153]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MvsEn-1v09Qi1k8d-0189DZ; Wed, 23
- Apr 2025 09:46:19 +0200
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MIdeR-1uM5oU3rIT-003p8h; Wed, 23
+ Apr 2025 09:46:20 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net 3/5] net: vertexcom: mse102x: Fix LEN_MASK
-Date: Wed, 23 Apr 2025 09:45:51 +0200
-Message-Id: <20250423074553.8585-4-wahrenst@gmx.net>
+Subject: [PATCH net 4/5] net: vertexcom: mse102x: Add range check for CMD_RTS
+Date: Wed, 23 Apr 2025 09:45:52 +0200
+Message-Id: <20250423074553.8585-5-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250423074553.8585-1-wahrenst@gmx.net>
 References: <20250423074553.8585-1-wahrenst@gmx.net>
@@ -73,79 +73,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:VgVy13nL0ScqfCSFbGxaOXEncyk5S8feQdoG8bFEyZSh/zQCeVn
- NU85JCrw50vk/SpkwwIMmxKLL7XZ1y5TpqNufSqpYAtftKWliNiucHMPpTspZkofkpOXAYy
- L/iPJ4K15O7BpVu2ydDCAp+17tpH3ITqtZn6wNpK5aMVb9ry7bFnypM3R6i6HoIV1iEGqjJ
- g2XqJQaWtH2uR4/vB7xSA==
+X-Provags-ID: V03:K1:6Srhnfe+j2KUw2GmRtcbuA+DPM7yBrXBgPKR30cLR/GCQV881Ge
+ 2b0NJbSBGLr7ZzCEbyQySscEyROGpKFqHvTQv1mRU/1CCT5h+FrOXNng8rqXQp0MYA1IWEB
+ NdQzCd/bQ2O0gvkVCVYDiegLQcEDhWAaZKFPxiGKxmqF1pYDoU80aRtHB7Mk2tQySS613Ag
+ PXH7k8AE+WLncwRs2i+cA==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:C/i5ry7xYwc=;AWP5y3vXEkxikeWhb8y4Ahu0jgv
- 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
+UI-OutboundReport: notjunk:1;M01:P0:TNC4KZbSeo4=;emXHaZeBOdh5FvLfIEmiPP8KyWd
+ +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
 
-The LEN_MASK for CMD_RTS doesn't cover the whole parameter mask.
-The Bit 11 is reserved, so adjust LEN_MASK accordingly.
+Since there is no protection in the SPI protocol against electrical
+interferences, the driver shouldn't blindly trust the length payload
+of CMD_RTS. So introduce a bounds check for incoming frames.
 
 Fixes: 2f207cbf0dd4 ("net: vertexcom: Add MSE102x SPI support")
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
 et/vertexcom/mse102x.c
-index 92ebf1633159..3edf2c3753f0 100644
+index 3edf2c3753f0..2c06d1d05164 100644
 =2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
 +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -33,7 +33,7 @@
- #define CMD_CTR		(0x2 << CMD_SHIFT)
+@@ -6,6 +6,7 @@
 =20
- #define CMD_MASK	GENMASK(15, CMD_SHIFT)
--#define LEN_MASK	GENMASK(CMD_SHIFT - 1, 0)
-+#define LEN_MASK	GENMASK(CMD_SHIFT - 2, 0)
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 =20
- #define DET_CMD_LEN	4
- #define DET_SOF_LEN	2
++#include <linux/if_vlan.h>
+ #include <linux/interrupt.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+@@ -337,8 +338,9 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
+)
+ 	}
+=20
+ 	rxlen =3D cmd_resp & LEN_MASK;
+-	if (!rxlen) {
+-		net_dbg_ratelimited("%s: No frame length defined\n", __func__);
++	if (rxlen < ETH_ZLEN || rxlen > VLAN_ETH_FRAME_LEN) {
++		net_dbg_ratelimited("%s: Invalid frame length: %d\n", __func__,
++				    rxlen);
+ 		mse->stats.invalid_len++;
+ 		return;
+ 	}
 =2D-=20
 2.34.1
 
