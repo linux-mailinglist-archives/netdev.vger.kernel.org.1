@@ -1,126 +1,169 @@
-Return-Path: <netdev+bounces-185034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86397A9848D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:01:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7B5A98490
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:01:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20F618847BB
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:01:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB7F37A976B
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69761DD539;
-	Wed, 23 Apr 2025 09:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3511F2B8E;
+	Wed, 23 Apr 2025 09:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="IbWWLfS/"
+	dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b="UbWrAVwp";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="muouxeg3"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C2642A8B;
-	Wed, 23 Apr 2025 09:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745398880; cv=pass; b=sYSffnKpsuCQh4qHZvRuK6BeoHGcgyCfb+mbiTXpnJFzaTdSlahMiw3DOTKAKTtXeQ0B0rfcQP71tH01d/qC/+bdL4sM2baP+MQhXfN0COvqG209XDptHMysFQHAqARd0TqlNkJWZ6acBV8p7KyD041u4A9ygDzAhsmm2c2yLFI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745398880; c=relaxed/simple;
-	bh=WEFboc1GBdXAA9WvCS/gR1Bseal3a2X9Ch7YA1eEJ9c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LYmEiJgnuc8Kp7Uvt3kezHYNj4AdbPA8zDxw9owOzLm2f2rrDUu0V1aY4b6YHkXdlMgyQePve7hJr/RYzPNYJFlsYsXh6xLeRkMZIQ7ndSxna/dMdaqvq0YTdbwP/vWr6X9TxWw+E+h0UusDdS6cofD4D3wPJtPYq//JhDXykLk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=IbWWLfS/; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1745398840; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=lJgtMKWq6xOI2o+ZGlMrwdS+6YwQAEaoTr+OpCcs3SsgWhfkFSoYGo4WfwVmOP7yrxOzt3bzhqVzTiSvjWZEQRefHWqFyNnRek0HNZVH//8pR0I5F0dKJU8CDfFfxxyQMle4xPSdfvr2rKqiyIReDVtLg1O5gaM/9fND2U7PSr0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1745398840; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=WEFboc1GBdXAA9WvCS/gR1Bseal3a2X9Ch7YA1eEJ9c=; 
-	b=fDxNID6hxMeFZwbYw3XmYCdjCo4XiAwqJNnJMuQF0BRMfLX1PZI+/lcavXFF6SPEq0CG4B99bL4K+vkvs1m3yO3hh9uoVjrofBimXuV8t7E6pBctA7sMnVmYxYMxhOHmtkdVaq2o5OsX6oAGLeIJ/asJ74NbS+6kfabC4GBzsBU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
-	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1745398840;
-	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=WEFboc1GBdXAA9WvCS/gR1Bseal3a2X9Ch7YA1eEJ9c=;
-	b=IbWWLfS/sg+vpsYTKWwUVP7NyM1PPY3FDC8FI4iQNoi6cdadB7tvM6bL0iAxRJ10
-	2NmHHH13frKbxF9EsCc8sSbTBg+/BDwM1KtWkaVsAzIZPF7nwQ3LwWyitf1YJjrxzwV
-	0XsOMq5q1G568jkdPRLpg+w8j9k5wneSYVCjY194=
-Received: by mx.zohomail.com with SMTPS id 1745398837671692.7273249531318;
-	Wed, 23 Apr 2025 02:00:37 -0700 (PDT)
-Message-ID: <ce7a0b320ed41ebe76e9908ab3eac3780fc56764.camel@collabora.com>
-Subject: Re: [PATCH 2/2] net: ethernet: mtk-star-emac: rearm interrupts in
- rx_poll only when advised
-From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>,  Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,  Biao
- Huang <biao.huang@mediatek.com>, Yinghua Pan <ot_yinghua.pan@mediatek.com>,
- kernel@collabora.com, 	netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Date: Wed, 23 Apr 2025 11:00:31 +0200
-In-Reply-To: <20250422160716.71a16b1a@fedora.home>
-References: 
-	<20250422-mtk_star_emac-fix-spinlock-recursion-issue-v1-0-1e94ea430360@collabora.com>
-		<20250422-mtk_star_emac-fix-spinlock-recursion-issue-v1-2-1e94ea430360@collabora.com>
-	 <20250422160716.71a16b1a@fedora.home>
-Organization: Collabora Ltd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528001F4725
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 09:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745398899; cv=none; b=IpKxTCDxtTeonaGx/qMkl9L5i2RG9FWS6o5s83GQMO12qW04fp4KrGvZDi0MaMMM7w6iuNPF5s0PKpFpAcJ7BFQfBCnfj5f+A/r8glvSKmfErPvlmDIRrm1bUffMsG2TPDYITgcS3NrsIQBns5NgMx4CGUAsh41p4sJMImvVJkY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745398899; c=relaxed/simple;
+	bh=BW7t9jNayRBf1ClggMJtd3Fp6+ccv9CeKKDviPbFIvQ=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=G7xywhJ+pFq3GgZGArhTaB0/ivEzTs+Vdnj+1RiRoQENAS1DXhOzDJEzRp6f5RaaRjaNViQoLOE5SATC8+LcNZttJ+AzkDddcGKHylPgwd3qTfVq8XQ4h697pyKM39CVa3sRwsb6rjcQRx3+p7xKCFqii8BWkKLT45heNrMWJuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au; spf=pass smtp.mailfrom=traverse.com.au; dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b=UbWrAVwp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=muouxeg3; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=traverse.com.au
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 2AE2625401C2;
+	Wed, 23 Apr 2025 05:01:35 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-01.internal (MEProxy); Wed, 23 Apr 2025 05:01:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=traverse.com.au;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1745398895; x=1745485295; bh=6rYiYxza8OupvFSqvlyUYjwG0PLM/T6t
+	h/eLY3q8+V0=; b=UbWrAVwp6+3tHv4dVYXzafE8OXvFGiofevVO30MPlN+ghajb
+	UIMmumAMqG6XYMmkp326WuVsmAQ2v7nu6quxehGti1mpISbfQLxtYbDxe53W8m1Z
+	BGWZ1oREOORbbxJ+TA79XiJrtAs3A3M1cjY03MsVOSKUyRoB6nVH6/irduX8JNiK
+	P0GN+DGPu4/UAJdH+babo/MUMjSTxMii2y4rrpg+qNYt3SgPK/8Okq+sUEadQw7U
+	mBSqf+VwTZUMS8LcDgT38bvC3tndp3LeYUdNpRa3Ax1m9bCnZIp2p+GVJLQ2adkq
+	DlfWUdZz8AJJIP60PqqF2GBDFd/lH54/XTGjlQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1745398895; x=
+	1745485295; bh=6rYiYxza8OupvFSqvlyUYjwG0PLM/T6th/eLY3q8+V0=; b=m
+	uouxeg3DLwsR4JXP1l4P6eYN49rF84EzyanNxjGBC3vqxNTFdZyajKtFOJrr79rq
+	Cl/SaF8H+xCfd3JEIyvmtrHZYcOlDjFFVirjTbJlZIH9OCBSsSLnsOSXze9Sd5TS
+	b72F7ttKw1drAeN41SbY9ZkPKQTXYkrRQnamGr4/jZltyOQP/ztsRGVH+2w3Dmcm
+	xQgY2suxsvHezVei04wT8ZsOQtxjLSE8b5YsSEsZ5CqcB0rHAcajIyKl72xrEEth
+	14q21aIIkJmPo3dtAbhfA/lSo8zt/4JaurfqlcFnUjrn+fRfeYmSVf0uWOvMxvCR
+	dgwKfGbFgO6KSuQrUxMWA==
+X-ME-Sender: <xms:bqwIaOxf2wpgrNlQnv6Hwo9s0YAHXO_wTj2Z70zFgPKo3YExfKrP2Q>
+    <xme:bqwIaKT7GxWxlEnYkESW5y6N3KSBdWFf2epI6FBDW-9oX7DVUmb1Q1YKisfpSzIuK
+    AWhWv_diZUYtdTCkgU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeiudekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedfofgrthhhvgifucfotgeurhhiuggvfdcuoehmrghtthesthhrrg
+    hvvghrshgvrdgtohhmrdgruheqnecuggftrfgrthhtvghrnheptdelgfeiudelgeevgedv
+    teegvdehtddvheeigeelgeegveetleetheffgfejgfeinecuffhomhgrihhnpehtrhgrvh
+    gvrhhsvgdrtghomhdrrghupdgrrhhmlhhinhhugidrohhrghdruhhknecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrthhtsehtrhgrvhgvrh
+    hsvgdrtghomhdrrghupdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtth
+    hopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohephhhkrghllhif
+    vghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhogh
+    hlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheprhgvghhrvghsshhiohhnsheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtth
+    hopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehiohgrnhgrrdgtihhorhhn
+    vghisehngihprdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:bqwIaAXVj0tt7LWwTsWq4a27SWmSbkFfECWyM6GvCqc4rFCLXwy5lg>
+    <xmx:bqwIaEidH2FGedOytoSeIiMuwROo8byXZ9Vxwtj8YxRG4PuBjUdNQA>
+    <xmx:bqwIaABsaGxInNEqMjJroFK4HQgwO-NOk6WntKmnRbZkBBYztLk9VQ>
+    <xmx:bqwIaFKYZApBaz_KYcFncWrNDytwnAFmRUexDH2tE4B0nXgfqHU6tQ>
+    <xmx:b6wIaLV-7LNNYaJKvPprmYFG7MqLrOgMg8ng-tEDnDcfHDuCbDb-XhI9>
+Feedback-ID: i426947f3:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 70ADA78006C; Wed, 23 Apr 2025 05:01:34 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+X-ThreadId: T7d5bb7b82feda5d9
+Date: Wed, 23 Apr 2025 19:01:02 +1000
+From: "Mathew McBride" <matt@traverse.com.au>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: "Ioana Ciornei" <ioana.ciornei@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+ "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit" <hkallweit1@gmail.com>,
+ regressions@lists.linux.dev
+Message-Id: <f7eac1d6-34eb-4eba-937d-c6624f9a6826@app.fastmail.com>
+In-Reply-To: <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
+References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
+ <E1tJ8NM-006L5J-AH@rmk-PC.armlinux.org.uk>
+ <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
+ <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
+Subject: Re: [REGRESSION] net: pcs-lynx: 10G SFP no longer links up
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi Maxime,
 
-On Tue, 2025-04-22 at 16:07 +0200, Maxime Chevallier wrote:
-> Hi Louis-Alexis,
->=20
-> On Tue, 22 Apr 2025 15:03:39 +0200
-> Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com> wrote:
->=20
-> > In mtk_star_rx_poll function, on event processing completion, the
-> > mtk_star_emac driver calls napi_complete_done but ignores its
-> > return
-> > code and enable RX DMA interrupts inconditionally. This return code
-> > gives the info if a device should avoid rearming its interrupts or
-> > not,
-> > so fix this behaviour by taking it into account.
-> >=20
-> > Signed-off-by: Louis-Alexis Eyraud
-> > <louisalexis.eyraud@collabora.com>
->=20
-> Patch looks correct, however is it fixing a problematic behaviour
-> you've seen ? I'm asking because it lacks a Fixes: tag, as well as
-> targetting one of the net/net-next trees :)
->=20
-I found the issue by code reading and checking if the sequence is
-correct with my other fix.=C2=A0
-It seemed the right way to do in comparison to mtk_star_tx_poll
-function that does check napi_complete return code before rearming
-interrupts.
+On Wed, Apr 23, 2025, at 2:03 AM, Russell King (Oracle) wrote:
+> On Fri, Apr 18, 2025 at 01:02:19PM +1000, Mathew McBride wrote:
+> > #regzbot introduced: 6561f0e547be221f411fda5eddfcc5bd8bb058a5
+> > 
+> > Hi Russell,
+> > 
+> > On Thu, Dec 5, 2024, at 8:42 PM, Russell King (Oracle) wrote:
+> > > Report the PCS in-band capabilities to phylink for the Lynx PCS.
+> > > 
+> > 
+> > The implementation of in-band capabilities has broken SFP+ (10GBase-R) mode on my LS1088 board.
+> > The other ports in the system (QSGMII) work fine.
+> 
+> Thanks for the report.
 
-Regarding the Fixes tag and subject prefix, I'll also add those in the
-v2.
+Thanks Russell!
 
-> Thanks,
->=20
-> Maxime
->=20
-Regards,
+The diff below does fix the problem, 10G SFP's now link up again.
 
-Louis-Alexis
+I should note that Alex Guzman was the one who originally reported the issue to me, he has also confirmed this diff resolves the issue.
+Link: https://forum.traverse.com.au/t/sfp-ports-stop-working-with-linux-6-14-in-arch-linux/1076/4
+
+> Please try the diff below:
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 1bdd5d8bb5b0..2147e2d3003a 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -3624,6 +3624,15 @@ static int phylink_sfp_config_optical(struct phylink *pl)
+> phylink_dbg(pl, "optical SFP: chosen %s interface\n",
+>     phy_modes(interface));
+>  
+> + /* GBASE-R interfaces with the exception of KR do not have autoneg at
+> + * the PCS. As the PCS is media facing, disable the Autoneg bit in the
+> + * advertisement.
+> + */
+> + if (interface == PHY_INTERFACE_MODE_5GBASER ||
+> +     interface == PHY_INTERFACE_MODE_10GBASER ||
+> +     interface == PHY_INTERFACE_MODE_25GBASER)
+> + __clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, config.advertising);
+> +
+> if (!phylink_validate_pcs_inband_autoneg(pl, interface,
+> config.advertising)) {
+> phylink_err(pl, "autoneg setting not compatible with PCS");
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
 
