@@ -1,113 +1,90 @@
-Return-Path: <netdev+bounces-185225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06DF5A995D2
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:54:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1D2A995E9
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 492A646471D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:54:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B97D1B667BA
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAFA288CA0;
-	Wed, 23 Apr 2025 16:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36E028A1CD;
+	Wed, 23 Apr 2025 16:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDeOKQh8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n989T3S3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F59C208CA;
-	Wed, 23 Apr 2025 16:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94CF2820AF;
+	Wed, 23 Apr 2025 16:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745427293; cv=none; b=fmu7SvegSZGym2+ef9CGA5s8hh3Th3ejBO/PpQXAXjfY8DQx67fgtoeRFDgPW03TYh5HCQ+wT6cB+k6lQAGqT9E5JZtz9NdHWoF4yfdJoJ/qCtn1WTnv715On6xrpvL8gxraA7Zb4Kj0b2bt8/rJfcWaREMM7JlWHAK0VLwHXhk=
+	t=1745427554; cv=none; b=IpYBQWEZKLdiAfMu/M3OnHPPY80wA03KGpufJyS7Y8NEsJdn19vPmzeLo7B9f7xeLJn/MusXdgo5WkhWY2bGtQxH44W26dBox0d6CuBJSLLq6lvyRJi+UZkZOELHTs+gE5QozTH/oRbuRS5PEluNMj7feRcghd4SHf9F8zLXTQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745427293; c=relaxed/simple;
-	bh=z2FR24bQ3nJuX8a6oht7xaQEZUBxaQGQZuecYUe1MNM=;
+	s=arc-20240116; t=1745427554; c=relaxed/simple;
+	bh=ZBYjCWap5snCq+ls10DvvCuKnV6nwylAsutQrwPX7Gw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VIUCcLxYuVsdYC7iGczbu8+o1S6rwr1fiJuveE55cVosb82IvP2tttHgXnfMYYBM75zOZV8999EW8BCKyKcsIhTwqjixrz90SA7dN32PiPzBJd6OP+42d4Sylf/Qi5ISTuuEj4es2yjmArGBGId5rKDABhL1U2JdJ5roVmDFnso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IDeOKQh8; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7376e311086so9510492b3a.3;
-        Wed, 23 Apr 2025 09:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745427291; x=1746032091; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gCLjH+TXgL/Od2a0SjgrrHJ2SawhjffMsNcsXcKJBIo=;
-        b=IDeOKQh8t6VIe3LD6A4ujVqiq7hBgXhUZyxcM5u6G65wxXWcsBJxjl8K+VBeaNGxMg
-         6/IoGEj1H6EDgjsFwzEeYk2KCJYzAI6Xs/UeFvcdOInwd3X0f8pmnxiIstcX29Dyfjf9
-         AoATnqK33Jxp729fkehsb0a8VYVWYBvNb3oXv1zDqleESkk4YiGB7KOoH7yCMgRFrF91
-         5/YCrlj75uIf2GrbMGFiZf05UYhdjrKhIGIpx/KPXSm9COCBzw4DBjV7KtE20lDlKxSl
-         ZXZtnthM//UyXOlgxAfUGDGR14Gsl+hKXJLV/FgPY1hlYSiAKMEU61GZ0RbxRquFZyHd
-         +mhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745427291; x=1746032091;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gCLjH+TXgL/Od2a0SjgrrHJ2SawhjffMsNcsXcKJBIo=;
-        b=BgQk8sLSQcJD+TTC8vNUo8N2sbD3zq64HBT5FLHmyT6BRGt/xklwBX2dFImXHYh8wc
-         EcTM8nfIawT/45Uui5NhfZCBIyyfqO39EU6JpPvMJAuLGjnrIu2h98CDx/tt8K8jEH90
-         Aidc2zJw4u+MCMb3SDzY+zOiQngJoAz6rDGEXM6niE6IADKRRzeJgGRv/I0Ou2yhLyS3
-         7mf6/+nDSMVoUq8lzMTmLN0cq8sBeVp1T8urAA7bWS3AnxNXXQYVlNulMv1DDEbPHR87
-         ri98OySkhlwa1eesuC8sFm8Ga6XmMY8uDyI7TbX8S2R6gsnSBfmG63sM/lxMB1Xo9QRj
-         f/cA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9EhRShjTH21fvaX2uUuA4MU8gooeTCEHYIuZe7RVHQRomalv5H/k1WyDsjHttx618SLqBAO9NalJrygm7slg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykSDeZ0EAUjr5qaWvcQjjDThhF78lZcOvnf90E+ZxfHQdOPjlN
-	24sZLxAcm+OyZ8vkKkw7uWZYROuv8MCrNqGeP4TUXDn6DZsCe5o=
-X-Gm-Gg: ASbGncu2ro8jLHmCbXudGMmxlGQ5Fb0mGAn/sJt2slDr7VeoVVI7PeUCqblI3x+HZ1E
-	mnNbR7XbDSiBrYAHNvwWPl2hPubuBtpfv4qkbL3a2kYbbzP+JinrvoIQvRlefz4kHLL4kpkVtZr
-	i3Ox9BAuzFqLr4407o1E5ZROr9x9xy/coLph8I5nngKx4mTB8SWizHNUu/wh9X+CGHBJ2bpXmnE
-	6T4+sgr8nzrr9OzuR1HJDVBW5B0T7JAdi3AiimfV3V96SdrRPK8aocwpMxJ06QIXwP1xVd6+lI9
-	zaOp+rmoXd7pZDzsNEuqu7TXJWHq2TblatDA9IiS
-X-Google-Smtp-Source: AGHT+IHIKHMZwGtLd6nehggdROpn94YiXt4+KIWvqvIwvImlRLLRRa+wIfu1RbZks3G8XSaVcmy5LQ==
-X-Received: by 2002:a05:6a00:2445:b0:737:678d:fb66 with SMTP id d2e1a72fcca58-73dc144d8f0mr24216813b3a.5.1745427291370;
-        Wed, 23 Apr 2025 09:54:51 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73dbfa5828esm10814348b3a.112.2025.04.23.09.54.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 09:54:50 -0700 (PDT)
-Date: Wed, 23 Apr 2025 09:54:50 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dq2teiRiM2x2eio9dPmMI0miKgtMbW7oSXJ5xbq0sogQrD5PO4Y5IqOpR5MIIXmXXBfPk9h1JUVYDGAMSEaSGIi0xzvl6EMwU/zmX/t69vaYhMWjfN8yvyLU8zOuS256FVEQRZJqJZ8g0uJmmYQ2oO0RK533rI1gjHLPxFJdNlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n989T3S3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+pGhfX/4H3scf/HydnEYjfq1z6zKounijmYTLMLhC5E=; b=n989T3S3GDIXGm1qZvGBeYMZus
+	FFbkrtH8uTUC5JEGWWDg1gzaXJKpIm6WJL4xNXmsGG607YJy9Sp2XJvWYbYSJ+eTA6KLJDm+L9UsP
+	YP9DGWt/OIbhPtQv9sfilbwMU7bSjlKGpijJY28Qhe1jNNoKo/3GIi2LLSDCk7AQOo0M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u7dQj-00AMSb-42; Wed, 23 Apr 2025 18:58:37 +0200
+Date: Wed, 23 Apr 2025 18:58:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yixun Lan <dlan@gentoo.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Maxime Ripard <mripard@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 2/2] tests/ncdevmem: Fix double-free of queue array
-Message-ID: <aAkbWusk4Ay5uW37@mini-arch>
-References: <20250423153504.1085434-1-cratiu@nvidia.com>
- <20250423153504.1085434-2-cratiu@nvidia.com>
+	Andre Przywara <andre.przywara@arm.com>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
+ board
+Message-ID: <aa38baed-f528-4650-9e06-e7a76c25ec89@lunn.ch>
+References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
+ <20250423-01-sun55i-emac0-v1-4-46ee4c855e0a@gentoo.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423153504.1085434-2-cratiu@nvidia.com>
+In-Reply-To: <20250423-01-sun55i-emac0-v1-4-46ee4c855e0a@gentoo.org>
 
-On 04/23, Cosmin Ratiu wrote:
-> netdev_bind_rx takes ownership of the queue array passed as parameter
-> and frees it, so a queue array buffer cannot be reused across multiple
-> netdev_bind_rx calls.
-> 
-> This commit fixes that by always passing in a newly created queue array
-> to all netdev_bind_rx calls in ncdevmem.
-> 
-> Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> +&emac0 {
+> +	phy-mode = "rgmii";
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Does the PCB have extra long clock lines in order to provide the
+needed 2ns delay? I guess not, so this should be rgmii-id.
+
+> +	phy-handle = <&ext_rgmii_phy>;
+> +
+> +	allwinner,tx-delay-ps = <300>;
+> +	allwinner,rx-delay-ps = <400>;
+
+These are rather low delays, since the standard requires 2ns. Anyway,
+once you change phy-mode, you probably don't need these.
+
+     Andrew
 
