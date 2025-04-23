@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-185301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A504BA99B8C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:30:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80021A99B90
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E615744819E
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:30:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC271B6815A
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164E61EB5E1;
-	Wed, 23 Apr 2025 22:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CD81F584E;
+	Wed, 23 Apr 2025 22:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrRV4qEm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vOQN83hH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0002701B1;
-	Wed, 23 Apr 2025 22:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249E72701DC
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 22:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745447448; cv=none; b=iNJtRCA0p7AwF166lXZz7lc/uPcsupIhCrBLAwKZv7Nr5HV1kiApn5a4GbM5Kuf50aMJ2B0NXf5tFJzMLZLFWOde6UuTh/tjsESHVbUYnkYd5OtLbjlxaIRL9skcliSeFnuloj3lxyorVy43zKcfH4k+FpaD5+zW5dZRqNbHkto=
+	t=1745447595; cv=none; b=OJJKZ6zxYkY6iDuSvlVgb6DSpzpq5xQnl5RzWyoXi6zhihOEQ6KT+rLaR6Us923rG/0Hr7XLir7ROzliLdxBNigdzVzliTS+Th1JVMzLL2IkBlwQIqH6aiPLN9azqOKNgmTUvO7+dK/IUglPOnsyeikh9HkqN0Bka+Trk59K/GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745447448; c=relaxed/simple;
-	bh=v7uvC031KbxPygQ0Q81LLAIVu0y2fzp6RXRgtN9+ces=;
+	s=arc-20240116; t=1745447595; c=relaxed/simple;
+	bh=5Tl68l12QKePWTi4Fci1YuVxHp5REKn62c5v7vuWp7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=okCIwT6KX12t6ngRH3nNNOYKA9WhPnsSB+76lCO3k0S8Jo69TsrpguLuImK0VQo/pHyEx6bP8HRpysD/QdrZZa5m8DR3JfyaR0kjZJqbfzbMvZDc46Z6u5ToTHPrDs/2gAKIyv6OetBU5nm3vBEq2zL8JCZkLffxTtj/Ros4L50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrRV4qEm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E1FC4CEE2;
-	Wed, 23 Apr 2025 22:30:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=b58buYDABB60qH1947uBB7yB/hmsxP5Nd5xFVVU4hajwPgFKMgI2vAKrauL94QF2yuuEpUt0AMK1cMwOLFQ0OxOH55HiKDmcIVejkMrvWcc1Pzm3qKXu3iEeU3wG38zf7xrr4gTJuxDDj8Knoa26Q0R9mnurnJhGlJRulfunRo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vOQN83hH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C39DC4CEE2;
+	Wed, 23 Apr 2025 22:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745447447;
-	bh=v7uvC031KbxPygQ0Q81LLAIVu0y2fzp6RXRgtN9+ces=;
+	s=k20201202; t=1745447595;
+	bh=5Tl68l12QKePWTi4Fci1YuVxHp5REKn62c5v7vuWp7s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HrRV4qEm6Cum6fI3+/bCX5YNQAKLuTD927Q2pC/abmq7LAWalH9WkoEGZvSIU/kh3
-	 S7dfEp4onAh4HJ6uLpqCPOOPpEH+7/W8e1MLo50qTkHIzGz/D0fUvrf6Y8jP4WKbjl
-	 bHw3fi2RMZhStqMTCmsvuPZ2Hmx9wVT1a7goTJk2e6HyLXSIpyi3shdN7mmM4QJg8z
-	 CjCuXWcr8WZOERehn2xkctPrjdLpoKCivbf0+u34uldkimkfjPgaISQ0J/Qki/LSA0
-	 1kMQAGNrv26tHwdDS9IpulTnccD01AHMATiBSM5acU6uhDPAudunhyYoI6ivvlmqOd
-	 lM48p9wYIM5Jg==
-Date: Wed, 23 Apr 2025 15:30:46 -0700
+	b=vOQN83hHnkpkH5Jn180CTTGNnvqimZQvMuDEMYghA9HK7jxWDq/K0RZhcUaK3qVqs
+	 EV1f65eQRxFpQQFKzvAjQNP88vP9zzCrUYALv9O7+yv8+cauYhgarezcMEk3yzyKKN
+	 gbDpCTN+jzK/UDWvNPPX9bcW7nEnXk8AOTfdP+DOUytGdsUowDB8sGbFT42B7GuNP2
+	 ZRwb+T4u/OHU+6dS/RcZkvyDPL6aVHBV+KrbMEoknSC1D1hwnsjplqeFLtugzytF5h
+	 VLZWmWv+2ULwmpLxsTbs6jr9X4nq39NsO0Hs8Q+HpV2RH2GiIq8DPKjKVFeesFMKj6
+	 YH8gJU5eIckwQ==
+Date: Wed, 23 Apr 2025 15:33:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner
- <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, Roman Gushchin
- <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, Vlastimil
- Babka <vbabka@suse.cz>, Eric Dumazet <edumazet@google.com>, Soheil Hassas
- Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Meta kernel team
- <kernel-team@meta.com>
-Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
-Message-ID: <20250423153046.54d135f2@kernel.org>
-In-Reply-To: <ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
-References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
-	<20250422181022.308116c1@kernel.org>
-	<ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <horms@kernel.org>, <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+ <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next 2/3] pfcp: Convert pfcp_net_exit() to
+ ->exit_rtnl().
+Message-ID: <20250423153313.7e72c924@kernel.org>
+In-Reply-To: <20250423145736.95775-1-kuniyu@amazon.com>
+References: <20250423064026.636c822f@kernel.org>
+	<20250423145736.95775-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,28 +62,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Apr 2025 15:16:56 -0700 Shakeel Butt wrote:
-> > > -	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
-> > > +	if (nr_pages > MEMCG_CHARGE_BATCH ||
-> > > +	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
-> > >  		/*
-> > > -		 * In case of unlikely failure to lock percpu stock_lock
-> > > -		 * uncharge memcg directly.
-> > > +		 * In case of larger than batch refill or unlikely failure to
-> > > +		 * lock the percpu stock_lock, uncharge memcg directly.
-> > >  		 */  
-> > 
-> > We're bypassing the cache for > CHARGE_BATCH because the u8 math 
-> > may overflow? Could be useful to refocus the comment on the 'why'
-> 
-> We actually never put more than MEMCG_CHARGE_BATCH in the cache and thus
-> we can use u8 as type here. Though we may increase the batch size in
-> future, so I should put a BUILD_BUG_ON somewhere here.
+On Wed, 23 Apr 2025 07:12:55 -0700 Kuniyuki Iwashima wrote:
+> If the netns is queued up for cleanup_net(), the local netdevs
+> are handled later by default_device_exit_batch().
 
-No idea if this matters enough to deserve its own commit but basically
-I was wondering if that behavior change is a separate optimization.
-
-Previously we'd check if the cache was for the releasing cgroup and sum
-was over BATCH - drain its stock completely. Now we bypass looking at
-the cache if nr_pages > BATCH so the cgroup may retain some stock.
+Missed default_device_exit_batch(), I love notifiers so much!
 
