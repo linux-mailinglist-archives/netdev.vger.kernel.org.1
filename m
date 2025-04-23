@@ -1,146 +1,153 @@
-Return-Path: <netdev+bounces-185314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF2DA99BFD
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:25:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7D4A99C0B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF085A5613
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:24:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5487442F53
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97AF22F770;
-	Wed, 23 Apr 2025 23:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F02C22F773;
+	Wed, 23 Apr 2025 23:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="g52K7MMR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dcjn0YRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8838A223DC9;
-	Wed, 23 Apr 2025 23:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EACB20CCDA
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 23:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745450701; cv=none; b=hyTgH2V/vJuX9QYVG+arQSvJUxwStbr4L1uUukR+Cp+KqaDYyhYG0b2SjEAmv1VsxFzHOSot4fgNC1DkNF3YeVFOH/Cg4xlIRLkpBtfG9Zlf+1/dIfVS6hc+fpIl0YQX1Zq9N+j5JW+KsQ3ibDJcHyJS5jiqZ7Hrfx2/KLEm5Aw=
+	t=1745450981; cv=none; b=RMdOE5ZpWOBFNldHrAmY2F2hdBVADLRnpWeHodjRS4XvztmpKW8IOhGsMqo9LVNGeSPb9gP74YNd8BK76nf6nhkoZngoMUWYyG4baVUnJE7iIYhwvW/eNdCxq90D1c19O8QEjUQjX6h0DP3HDzl5/DDMb1xAAN9CHyp8sdqeBLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745450701; c=relaxed/simple;
-	bh=yskBEWSEF6FlJkJi4DwqXGby0psHuBX/9ua/oCniJP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BGfXTY3iZ9Dv287qopTGeAFuZgVIrDc8m82KQ/oiLlfn0gsv9XMT7ucLGil1u6izN/iUiE/2SQ6vB/g9lqm4G5KY2yOtKRKaCx+KvtMQP0O7tE+UqWfofsxkZJycIddgpRuvoWzC9jEjRx3jcprOutLYPcJSPvaBZYthxio3O4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=g52K7MMR; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53NNNmdO016856
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 16:23:49 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53NNNmdO016856
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745450634;
-	bh=3ZRudBcQfUXdEeUGknvRzjxdjhla7ofQa9vhRPg63Iw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=g52K7MMRbWF6yLwDhmY0YU3Om9fpRH0Ut+qyo76sxSZ4NHnyBc98XW5u2s2hVCFUK
-	 PhNe+N15jsjlumb03xkDxJWNBMQ76zGMekkVPvwrCgqXTuVJomLV1T/3YW5TFZ7jZ8
-	 1UmN3Fwk6b31yjBct2QL3ajxMU+0ZhSXqsLtn5qHYLVhfR4vWwV537HB9cU8VSqJHv
-	 6bXyJrePtilh9n0zOlm3jS0UhKtUD+8gXNtFrWLBIVXKpgaPuv0YalLYf+ij4Y2WWd
-	 yrxqlPYGWH/00BTyjqGIOa+LNPKvKGQxRb/Vrh8pulNMK2D75Bck1Sw8zFpVOmUKyD
-	 ftlR5gTTNtHcw==
-Message-ID: <88bcd897-8436-4ebb-ac03-833c8c8045f2@zytor.com>
-Date: Wed, 23 Apr 2025 16:23:47 -0700
+	s=arc-20240116; t=1745450981; c=relaxed/simple;
+	bh=0O5WtYNKdLbi+s7TD+BRlfJErmHtxMD6iqcFd67bmnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1ModMeEH/Xb1bc4ktj7dzJZcoC4jWJtMLi4XeKpq93SazWeK7A9yZj0IL5oz9Faenhxn0u3BOeqVRX8RgrfySA40vN1hw4Dc6vNooci34uKD76y+dt+8XOznITUmpZRQLNilGrO6s0IzY4H4dG2+xZs2ffRmnApG9ogmj9Fx38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dcjn0YRv; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2240b4de12bso5538505ad.2
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 16:29:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745450980; x=1746055780; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BS+4sV4qLBvU48aLRyzMNrXGFRS5Q+zvryJvXAf11I=;
+        b=dcjn0YRvl9W9fMnqSfP4cM8qVT59J6c75Ow3se/CawOcqOkaE1ENpM2fndrn27Ihu0
+         HKq5uahH9jECZd9txXS0MnTI/OuPvm34nYulMtk4szCWpZ/Zyqt1hW4D9dn9y5qPqAqM
+         jF9xhSv1JdfMuVIJJ0MxP8EudDQg88a5dzoVh4bW5gKUEXP6uAoP9Yk7s6Iidf46pw0H
+         g9n27SV3fp86xMIDU5DM4Y5Pzrt1vm9jJBKSTBVkB7NWZQlnb79svPUHmLZbvTqfKyB2
+         u45cLYitreq9H5KjFnGmSk4N/Kyy0/NgZf9hTSZavVTrI3bd+t512riAH5YifS7dOcO5
+         ANwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745450980; x=1746055780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9BS+4sV4qLBvU48aLRyzMNrXGFRS5Q+zvryJvXAf11I=;
+        b=OXYoxs8nW6duC/uOGP3Od/ahU8cofsBkQWI+3cGxkyK6Tx9/UmeIjlvYrnlFa/me+c
+         VcTJ9BBDqNKlecvNw1mHFRKCqHsj+A+lgvcTBmh42teytK0TQbBwM/83Iv2ENCU2Z3at
+         fTWIMsZUPl9h3vPx4B4LCytKNH3oUBvjX8n5Bzqg35n+jgAB8V8kXTC+EvubD4RKyNCl
+         pR89znQ0O1/ePp9bow8nb1TDbsOnfK5JzOw4Ty4lpt2Wj6/C1ZUfAgFWOXP0md6840YW
+         MrhVQ4/g9+waIjCpVLnYZkroyfJexmWOxkXd5/NoDNbPMl+zbf0TRiQqnqRKA8nJI8nl
+         nzWw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0zDyIY3cthC9M7x7a9S3HmGuXzaj+EWGrXcwySzhcbcD4sIvnnql5cC74ruApM91RWySShWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoGwBdUJ3Thrk07//5QHBnr+rwNrXcuwgHEe/J6iqZJelM+2WM
+	iaOilsggLJj6KkdfNEd68rfufrXwFPDcFKGfs0jFWngM5T5chBq6SpaOed9f
+X-Gm-Gg: ASbGncsiAJsQVNXhHsydpzmmrsmx4MNtf0Zh81l5S3kp1IDNdwUYy/iJ+i8AUf9ehkM
+	yFQtzR3Pm8Gn6uZiJz4SgdNm6Xd7R7Mme/sczQ1r4O7YeteSKsIkEBQ1BPY9Ab6QjEYmU5bGP2g
+	WM5E6L7mcN7QMwjc8+5lCrTT9KdUWS4wFXydYJW6NsO2dBjrtAIElRSmQG0qFaaYIqFtz5WDDwV
+	ebLrKoMR19uf6yfy+47z60sal/cEub5Lb59qg69TXp56AVAvmEojMRsbS85/zK9GlG3yAf2wV6v
+	d7mORZGNGkBIWE9XaXuXzTV7Df+vPGHKXIM9IZTRVgC9xHNZlLfHU5k=
+X-Google-Smtp-Source: AGHT+IEaKpXxJyZTpbuGG0ZluRsSix0kHsl4z5QSu8f3B/k+iS8JEq8coMfu2AQ14m5awUx8UDcDUA==
+X-Received: by 2002:a17:903:2f91:b0:22c:33b2:e420 with SMTP id d9443c01a7336-22db3ba5a70mr4404835ad.7.1745450979796;
+        Wed, 23 Apr 2025 16:29:39 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15fa908a40sm53148a12.47.2025.04.23.16.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 16:29:39 -0700 (PDT)
+Date: Wed, 23 Apr 2025 16:29:38 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, netdev@vger.kernel.org,
+	jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, toke@redhat.com,
+	gerrard.tai@starlabs.sg, pctammela@mojatatu.com
+Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue
+ cases
+Message-ID: <aAl34pi75s8ItSme@pop-os.localdomain>
+References: <20250416102427.3219655-1-victor@mojatatu.com>
+ <aAFVHqypw/snAOwu@pop-os.localdomain>
+ <4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com>
+ <aAlSqk9UBMNu6JnJ@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 08/34] x86/msr: Convert a native_wrmsr() use to
- native_wrmsrq()
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-9-xin@zytor.com>
- <2932db03-164a-447e-92cf-1ef6c35c15a4@intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <2932db03-164a-447e-92cf-1ef6c35c15a4@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aAlSqk9UBMNu6JnJ@pop-os.localdomain>
 
-On 4/23/2025 8:51 AM, Dave Hansen wrote:
-> On 4/22/25 01:21, Xin Li (Intel) wrote:
->>   static __always_inline void sev_es_wr_ghcb_msr(u64 val)
->>   {
->> -	u32 low, high;
->> -
->> -	low  = (u32)(val);
->> -	high = (u32)(val >> 32);
->> -
->> -	native_wrmsr(MSR_AMD64_SEV_ES_GHCB, low, high);
->> +	native_wrmsrq(MSR_AMD64_SEV_ES_GHCB, val);
->>   }
+On Wed, Apr 23, 2025 at 01:50:50PM -0700, Cong Wang wrote:
+> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> index fdd79d3ccd8c..000f8138f561 100644
+> --- a/net/sched/sch_netem.c
+> +++ b/net/sched/sch_netem.c
+> @@ -531,21 +531,6 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  		return NET_XMIT_DROP;
+>  	}
+>  
+> -	/*
+> -	 * If doing duplication then re-insert at top of the
+> -	 * qdisc tree, since parent queuer expects that only one
+> -	 * skb will be queued.
+> -	 */
+> -	if (skb2) {
+> -		struct Qdisc *rootq = qdisc_root_bh(sch);
+> -		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
+> -
+> -		q->duplicate = 0;
+> -		rootq->enqueue(skb2, rootq, to_free);
+> -		q->duplicate = dupsave;
+> -		skb2 = NULL;
+> -	}
+> -
+>  	qdisc_qstats_backlog_inc(sch, skb);
+>  
+>  	cb = netem_skb_cb(skb);
+> @@ -613,6 +598,21 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+>  		sch->qstats.requeues++;
+>  	}
+>  
+> +	/*
+> +	 * If doing duplication then re-insert at top of the
+> +	 * qdisc tree, since parent queuer expects that only one
+> +	 * skb will be queued.
+> +	 */
+> +	if (skb2) {
+> +		struct Qdisc *rootq = qdisc_root_bh(sch);
+> +		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
+> +
+> +		q->duplicate = 0;
+> +		rootq->enqueue(skb2, rootq, to_free);
+> +		q->duplicate = dupsave;
+> +		skb2 = NULL;
+> +	}
+> +
+>  finish_segs:
+>  	if (skb2)
+>  		__qdisc_drop(skb2, to_free);
 > 
-> A note on ordering: Had this been a native_wrmsr()=>__wrmsr()
-> conversion, it could be sucked into the tree easily before the big
-> __wrmsr()=>native_wrmsrq() conversion.
 
-Can't reorder the 2 patches, because __wrmsr() takes two u32 arguments
-and the split has to be done explicitly in sev_es_wr_ghcb_msr().
+Just FYI: I tested this patch, netem duplication still worked, I didn't
+see any issue.
 
-Thanks!
-     Xin
-
-
+Thanks.
 
