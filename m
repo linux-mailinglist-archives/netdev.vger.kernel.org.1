@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-184926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1851CA97B81
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:03:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D60A97B9E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5452D17D038
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:03:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9FBA3B5108
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 00:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C824D36C;
-	Wed, 23 Apr 2025 00:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614EB1EA7FD;
+	Wed, 23 Apr 2025 00:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddbpABZZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fsH5BVhe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D97733DB;
-	Wed, 23 Apr 2025 00:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C631EA7DD;
+	Wed, 23 Apr 2025 00:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745366612; cv=none; b=PMmub82/vwwX+QoQatnpnUbp2ePNOs+slBdQHsktTs2OqqRlO6OgdF9H0gvaUkO6/58vvmIKdnHCuZYOCvFIsffLvAUtEtoPNR7iIFL53wTka+jisOMmhCr/ZoV3+meckbMmkYcy/8TkKP+KNXNBmZRd0L6H3XJW+Jew8gGNfYA=
+	t=1745367529; cv=none; b=qWElFDW7OkJpbLIMu1hsNjwWTVfHB9zyTV0Gpt/fLUyB+v23J6A2gB0VUSKsI5fBPXMrpBEmun1MDxx6SIhltJzUeq4so0l3NY9zHayGCw7HC3N3j+WhZq1XpRtFAEZEyAc8X47Yrs148Qo6UwO5eQhx2kqbpgnq7RpQ89BH5mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745366612; c=relaxed/simple;
-	bh=en1R4ZF4hD6JaXdEWowCEJQiD6Q12apOn7tseGVXg44=;
+	s=arc-20240116; t=1745367529; c=relaxed/simple;
+	bh=ZNxOHaeGy5AnoXe7j6R1daES+ngPlMQqefaZFX2wrcE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tAPYVwcfIyKrtsj8DVmYveFyjk50W1eZWNrjBBumjkcKmCpg3Ohow2xf9x5r856zOVqbbQbVrxdPqVQiDdY7byKr/GKl5xoZqcESbncqVOD2/qRCCrIKgP0/Hy+f1LLPSSNTzeL8zTqiao5TAxWWwbkFAKlmETPy3+ZsRYL2IRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddbpABZZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E9DC4CEE9;
-	Wed, 23 Apr 2025 00:03:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SZFn6kthumuBLBPjYF85V5gfy4b5rx5NMv15mgLCGQFBa3WzKRHUh0eUsK8Y1MQHe0gndIxBvXPxjTI4QSWls8ljxOvK9SU5ZOKHb6VXaAX4FpNkBLZGLIrSW/RC2YK1NoUmw2l/BlM5RkoVA1o59mCj0xyeLmlrRTzfkpfT538=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fsH5BVhe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DAFDC4CEE9;
+	Wed, 23 Apr 2025 00:18:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745366612;
-	bh=en1R4ZF4hD6JaXdEWowCEJQiD6Q12apOn7tseGVXg44=;
+	s=k20201202; t=1745367528;
+	bh=ZNxOHaeGy5AnoXe7j6R1daES+ngPlMQqefaZFX2wrcE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ddbpABZZ8tQT8CUB8SnkBZ3gfqAxgTU22NsG4tAPnSU7nxi6Fsp7LaFKLPV6qvtYJ
-	 20nWbC1PHF7lzRlkdqmjDVyHOn/SIIyJmeu4QCVslwlrV1ytwX1A/k0XT1YDVLJbqf
-	 B4RNOtWMpcY+bF86k0OGuh9LTMw6THrGipTGem4/jAMNy8U1h0M9Njz8leaOAz246u
-	 EkGf3u+tyjElznWP31cbH3loRNhKFjhbDH28sxAtYCLrfCpXa71k7GmSsVx9rD9YBy
-	 pJhl3PiP8smaZs56HFOgUXHrNMYMEXKFe6IMqY8wMdpIdkBbjNWFHdNfNgph8K++Bo
-	 b/GgIjTlNYLVw==
-Date: Tue, 22 Apr 2025 17:03:30 -0700
+	b=fsH5BVheu4QuBeLXL86opbP6Rz2lAnRJUPvFbZeYbhJ0JeAhXR83jNniM9gQTJIp7
+	 mOhwG/5xSgu/+9BdkJsPWn2yAEr8V1Moc6o9I0+xvd3nh/TuFRpUCJA/pv2yfD+6HF
+	 QONha8mDriVwdiZE0bnzsYB7FUb5A0zm5pergUz1ny+VLmGK4hl8nj7he1POpMq3qO
+	 WpBfc++/GPqiJAte7veyPM2PCsdCgW3DoxhtP07WYnaFGwJiMCvTvGI1VursA03N6G
+	 Ctg/gtP6Sf7IOfOgG2WK86GlbNDY8aYhI5zDFZ7UUsjjVi5naW3xWtZ/jF1bUFwrlU
+	 ANRxrdYSkMftQ==
+Date: Tue, 22 Apr 2025 17:18:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next] bpf: Allow XDP dev bounded program to perform
- XDP_REDIRECT into maps
-Message-ID: <20250422170330.71e47a70@kernel.org>
-In-Reply-To: <aAgdECkTiP-po7HP@mini-arch>
-References: <20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org>
-	<aAgdECkTiP-po7HP@mini-arch>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, mhklinux@outlook.com,
+ pasha.tatashin@soleen.com, kent.overstreet@linux.dev,
+ brett.creeley@amd.com, schakrabarti@linux.microsoft.com,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ rosenp@gmail.com, paulros@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] net: mana: Add sched HTB offload support
+Message-ID: <20250422171846.433d620d@kernel.org>
+In-Reply-To: <20250422194830.GA30207@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1745217220-11468-1-git-send-email-ernis@linux.microsoft.com>
+	<1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
+	<20250421170349.003861f2@kernel.org>
+	<20250422194830.GA30207@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,19 +69,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Apr 2025 15:49:52 -0700 Stanislav Fomichev wrote:
-> > +	if (map->map_type == BPF_MAP_TYPE_DEVMAP &&
-> > +	    prog->expected_attach_type != BPF_XDP_DEVMAP)
-> > +		return true;
-> > +
-> > +	if (map->map_type == BPF_MAP_TYPE_CPUMAP &&
-> > +	    prog->expected_attach_type != BPF_XDP_CPUMAP)
-> > +		return true;  
-> 
-> Not sure I understand, what does it mean exactly? That it's ok to add
-> a dev-bound program to the dev/cpumap if the program itself is gonna
-> be attached only to the real device? Can you expand more on the specific
-> use-case?
+On Tue, 22 Apr 2025 12:48:30 -0700 Erni Sri Satya Vennela wrote:
+> On Mon, Apr 21, 2025 at 05:03:49PM -0700, Jakub Kicinski wrote:
+> > On Sun, 20 Apr 2025 23:33:39 -0700 Erni Sri Satya Vennela wrote:  
+> > > This controller can offload only one HTB leaf.  
+> >   
+> We selected tc-htb for our current use case because we plan to support
+> multiple speed classes in the future.
 
-And an upstream offload which supports it..
+Which net-shapers also support.
+
+IIRC HTB offload requires that you dynamically allocate the Tx queues.
 
