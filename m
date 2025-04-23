@@ -1,109 +1,79 @@
-Return-Path: <netdev+bounces-185182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349AEA98D68
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:41:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5DFA98DFB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9BAB171AC2
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:41:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B4B91B820D1
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D54280A47;
-	Wed, 23 Apr 2025 14:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZebEuXkN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA9C280CD9;
+	Wed, 23 Apr 2025 14:49:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2B327FD58;
-	Wed, 23 Apr 2025 14:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0324280A20;
+	Wed, 23 Apr 2025 14:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745419281; cv=none; b=cVprkZZS0vnuqOPfPv8FlNQl7wVGbmVEHDMGe3y9npmvAvUqHhlPGYhdLjrtbTBJOq7QHXBZAqjkh9ukjs9zM7kaSopYBFsn4MkkEqZMlCa9QqZHQkYxijrFBw8QymPGHH2zN8RJ1qphmWIl9M2k/fdO6R2FwIP+7JdXU3cKhpg=
+	t=1745419762; cv=none; b=rXJmPesVBtEOzfTEJInI7fNnCoMaVDBBel6iP9fMNYw1AQmNkjWC8ZzNb8TuQKGRf6dKF0a0SUIsLXYP1QLTzA6CxCQktJ8YCrafVEQ1cs2nPgiO4AuX0TYlzjwn92oIICsg6x84GGtO6015U7+9qz9S1NneYNDUUFicASpxfnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745419281; c=relaxed/simple;
-	bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
+	s=arc-20240116; t=1745419762; c=relaxed/simple;
+	bh=8h9Pj6FUCm22sHBnB//KVvxcGmneZCHyGzEMLBFkEv4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fMOXxwt+X1A9yjMbxTjD5VlQDGKmN9JdYOh1vU1SRDHaX/AMaIzO8cRdmECwT+TsEJ6ZZrmMdXzL5n1dNwp8d6EQW9r0I0nULWX4g1i8qehJBR7/9ld9anQ8SIOKgj0BmZEDDWgZSTrLwnQF0ulGik8CWcJ1PF2KJtpPV1Zlkeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZebEuXkN; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22d95f0dda4so37848145ad.2;
-        Wed, 23 Apr 2025 07:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745419278; x=1746024078; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
-        b=ZebEuXkN/lWivO+94JjUqIOftBuP3cT1B0YAPX9WYUL1pKk5pffECBHY4Q6zyfVnaB
-         HCPFH4bBkGmd7PWZz95rFz3plClZPXW6B3B6GT8vTYKtmvssfV6ah1g+rb/4vuPIcdpu
-         prxGK9cZhdK+hUYyavFL1ZP/ZUDJJUrADHXZZcxsERYTUGb33idLeJj+dXDJ1LgP/vdK
-         NDPgGuuad3dEdDrIOhIsWFVBqzO5UhpgL9fMXAZwOVn6YUT7ZlDNnK9lL4nXBIZhN3J5
-         wo5kornvKs7IwEj/ZWlsh7nYjsW71NW+2hoBzpWSiZcZWuKp+YplpXPOaOtmj2zYR1zh
-         D7aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745419278; x=1746024078;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
-        b=bGg1FDkWa7gAiguWGvs97JI4jbtGUEtnABH/bpi58BabV7c23hln6jOS1xDQckuxU/
-         Fl/aFcCz/cElHSdc3Q4wQSBSWXGOEbueWfUckh/q1ZhG1AjlkLTEvZ6w1xgxOsIx9/oB
-         VooOayvtnfg1Nj4O+gG6H8sbQzIyASDlPjgcdUMCPy6SAOYVpyNJBFWVoi17CMrKqGkm
-         tMvnOqVZXsamamdXYT/6GnDO5oXuIm4bCEgFe6VQW7oHm7heeMZQWq7iYeimhet4OY+p
-         HR1ueYSbq6Tqz3apN2nVPdlt0NM0VUxrpcRbpYEbmS94egyJPZV2diEn6MxOoKnKOnjb
-         ziTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIG/aebxF6MnWogT3Xk+Sa7Mw6yBYQUVMaaimhh3tOuacg13MMS2TjuAff+Z7girmspiZrIUCDwnzud9va@vger.kernel.org, AJvYcCWNCExMdGyA0EBqdoPA+ibZMcBtWUjf9MjmnyzC/4pJqeaLbAYUxVacNaiRCpKU3oFq8Jk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2ow7zPLJPoY55xBGcsvwj7EMRdxHK6uD9vfCSUf0s/+gTTpfw
-	SiMhL5HaLS3RextyM60PliWVdBKj+Xcseu3ewBtKAT5ONPtSf5w=
-X-Gm-Gg: ASbGncvgs2kansLy4+hDq6KuF+jZlYjGDtKwANkOgoSn7+kjlIl6rrUJ6XmupggGQk/
-	OFrCM5VtBnhRBjn47E3C+evzJSyfuEFQNtnXXPBqT8F8Hx11cgFztdL9pjHvvTi9bQP+E2EsUFg
-	MCU5BNNzE0utmYaEGWpaBa/YeN8jXKz3/0Mb4E/xaG9urPg6YxRyNjV42A6V+8F/w0WtgilSaAG
-	VttuKscCDDBskPPru+/c3YKBoSxxX/jtMz+zZ5Hcx8suITflbrxwlvrCteMKhglz4q+nQXQM3QW
-	3UfzYXS/2KHps2grac3mMRsaq6Mhl7T5S1HzxKLi
-X-Google-Smtp-Source: AGHT+IGDMJ7mVrs7MGpWDguaDL50Errcc6GUi2lzccVKv7XMdolZY/WHsJ2g0YXTG07aJRo3JnZyqA==
-X-Received: by 2002:a17:902:ced0:b0:224:1ec0:8a1a with SMTP id d9443c01a7336-22c536423c5mr268699125ad.51.1745419278341;
-        Wed, 23 Apr 2025 07:41:18 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50fe0859sm105266865ad.246.2025.04.23.07.41.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 07:41:17 -0700 (PDT)
-Date: Wed, 23 Apr 2025 07:41:17 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] xsk: respect the offsets when copying frags
-Message-ID: <aAj8DfHJ_XZxrDSJ@mini-arch>
-References: <20250423101047.31402-1-minhquangbui99@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EOzzHAf6fz9qEisBe7YcoXoKp9Y9lPj3JZM5gCd41IZGV93RcsnsMh562AurB6umsDwTEFQSU9XUGOTlpQbrrjGz6x5IeWPpI5Q55L8xoBUMXxFuAOv4adh+Jq7akgLT2Kjc/DJMr7dnrMT4KHEqSftTdykSIwHUaYQv5QIdkW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1u7bPW-0003Qt-KZ; Wed, 23 Apr 2025 16:49:14 +0200
+Date: Wed, 23 Apr 2025 16:49:14 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	horms@kernel.org
+Subject: Re: [PATCH net-next 4/7] netfilter: Exclude LEGACY TABLES on
+ PREEMPT_RT.
+Message-ID: <20250423144914.GA7214@breakpoint.cc>
+References: <20250422202327.271536-1-pablo@netfilter.org>
+ <20250422202327.271536-5-pablo@netfilter.org>
+ <20250423070002.3dde704e@kernel.org>
+ <20250423140654.GD7371@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250423101047.31402-1-minhquangbui99@gmail.com>
+In-Reply-To: <20250423140654.GD7371@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 04/23, Bui Quang Minh wrote:
-> Add the missing offsets when copying frags in xdp_copy_frags_from_zc().
+Florian Westphal <fw@strlen.de> wrote:
+> I can have a look, likely there needs to a a patch before this one
+> that adds a few explicit CONFIG_ entries rather than replying on
+> implicit =y|m.
 
-Can you please share more about how you've hit this problem?
-I don't see the caller of this function (xdp_build_skb_from_zc)
-being used at all.
+Pablo, whats the test suite expectation?
 
-Alexander, do you have plans to use it? Or should we remove it for now?
+The netfilter tests pass when iptables is iptables-nft, but not
+when iptables is iptables-legacy.
+
+I can either patch them and replace iptables with iptables-nft
+everywhere or I an update config so that iptables-legacy works too.
+
+Unless you feel different, I will go with b) and add the needed
+legacy config options.
+
+net tests are a different issue, they fail regardless of iptables-nft or
+legacy, looking at that now.
 
