@@ -1,84 +1,112 @@
-Return-Path: <netdev+bounces-185311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80BBDA99BE7
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F30A99BF5
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C36824635E4
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB1A2463814
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FED21FF25;
-	Wed, 23 Apr 2025 23:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F78722F768;
+	Wed, 23 Apr 2025 23:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhoYZkrh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rfy2pXGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655981FC0EA;
-	Wed, 23 Apr 2025 23:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30643185B48;
+	Wed, 23 Apr 2025 23:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745450174; cv=none; b=KfxlFxujxczrVDdLAMfoA4qcs7Ww2wymPdwYp4ywv6GVR6ZvE8R9b1OYMlg8SX8Uzba/jFbIuKnnmfLsUh673fIpwqqAYjzslW3UHmdQXcOpNLc0xnsnpYVAZvuWZIlGMplSodscixGeOD0UTS1jfKf8zr7MHStdmWpVTCunmkg=
+	t=1745450426; cv=none; b=HX8RoJ1FFJH0ROtBc8u+R1SDoEUHl0emJn7kitzPaBZbxHe/F5FosgO+1+U3VfitHJmAvqUgQfKH4nGtWnNoWSXg62FnuZk5aRAh4VRVruUuSZfNM1P10Rel9BpA0jKcIQo476L8oWtfz6G5vrc9JOe9cZrMKKcv0LRxWIbQHoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745450174; c=relaxed/simple;
-	bh=NNcdf8wyavIjq8V75Q+5WpjSVOttiC0wv70XgJLK978=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O+L0HOmwkvWCJGpUZCvPikJb6V+cgFuOqtEt1HxmjveQkH8aS7KEe25O1Q35UfJ7ITMRisuXZaY2DJiue+gJjV0NV9DPutrx/4QTfybGOOBkvwanlDcKjhZFU5etYbQ4alZ872LoixPV8wuiwh+vbM0J8Q/b3n+GV43lvz6MO6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhoYZkrh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F65C4CEE2;
-	Wed, 23 Apr 2025 23:16:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745450173;
-	bh=NNcdf8wyavIjq8V75Q+5WpjSVOttiC0wv70XgJLK978=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mhoYZkrh/6PQrecbFzIPV7nC1SCMm+/o4D6peTMth39CUvLyczBz0uynPqozhn99I
-	 ob3Rben5hiZ1KRuHsOX87s0ls0nysrZeRlpw0Jt9S2O96GZWikw5IuVhJFlhFEzs0T
-	 pUdYcwYArpjuUw5bMR0NpoIUOFIPXwKPqzowAW11wi5vvcD5QSXQ9w4+JSed5OBr+U
-	 Nt7gnqQd+R3m9eYBtCXVLDPU9dZoSawhZpYxxD7KxobzLFy2Zw0gd+xBxT1Rt8FmJu
-	 ZflJ4n3Iqg40hcnCaGxIv2PsjaZeXjIOU//6VFSkQsTRnAQaY4P+kja0s6PG3ox4uS
-	 zfMlbJOljO3Hg==
-Date: Wed, 23 Apr 2025 16:16:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, shaw.leon@gmail.com, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org (open list),
- linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
- bpf@vger.kernel.org (open list:XDP (eXpress Data
- Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: Re: [PATCH net-next v3 3/3] selftests: drv-net: Test that NAPI ID
- is non-zero
-Message-ID: <20250423161612.3dc2923e@kernel.org>
-In-Reply-To: <20250418013719.12094-4-jdamato@fastly.com>
-References: <20250418013719.12094-1-jdamato@fastly.com>
-	<20250418013719.12094-4-jdamato@fastly.com>
+	s=arc-20240116; t=1745450426; c=relaxed/simple;
+	bh=PoLdUM8YKELkgIWFMosRaUPk5GGn1/ct137NlwZgwT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DRX8zy7yIvjq3KhTc/3VoxP/A6BCmXYOGmoEdQ/qRu1GqrMjmcWMQ+4cYDM9V+fIY8UoGvxhNoxtPVagO2K7sJ+8vhehafY2UGowNCTTBZ4VE/NQ0huU7s/7Nvjv3MpGwhR7Z+Fb6NnL7eX4UAM8BxRongwZ+Gw/MzKjMV4jqQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rfy2pXGV; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22c336fcdaaso4342965ad.3;
+        Wed, 23 Apr 2025 16:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745450424; x=1746055224; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=abKOlY2sTzPQ/TusDqq4nfLYAhPWi10xulEUiXcfDms=;
+        b=Rfy2pXGVWbNXH8Uz5YRbqYELc4fFQZPcEubltlUMmlbnHqXcdN0lG1X9dcP7u6Wu38
+         1L3dNwW5kTPiZ73ks6sQYJegl/cNWvkREEM5bO8dfaeUuWUeZCgQm3zMYDEBZZv8/sQK
+         mh8JiLD1O2EJ1K8F1JbhIuytLPNNlI8+RZGQDm/r92HxhLC0mwk8uPiJyb3M9/kf0yA7
+         6sBtLF0q/Tatvjaq5gzqKC29RUig6uREfY3V1sAuxlRZDd5ZSpdCnBu0hPYNErMKEF4L
+         iwx+nxWFVr1xQt653PhcO6CwYvBGxlSu4LMxS37gTgahopQ9HUitCcgeGJesJpmaOXps
+         2efQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745450424; x=1746055224;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=abKOlY2sTzPQ/TusDqq4nfLYAhPWi10xulEUiXcfDms=;
+        b=EstKwIZhWx/slVoJPDBc6mPa3DaKWVnjJ4fxbjUSsXgXi1hc9nxXmmEse4chNJ/LHj
+         M8rC3QPdZb9TOoD3ahCUDcJpJUW6D8fGX6/2rrlOyG9rm7y2QzZlyOy2UMP/JqzLfM7M
+         KvICIe8yd9bcNUXtOgRAqmR59kz7AOrlJCpUC9qj+IKRi8WgI1mgJ4cEKBF8k1vuS22U
+         4env8ep9OS/U/pu4yJxtS5xFpoeM6MgGNa2uAwRYcNJupPAXfEobUQ8FTFxnqaoeYK+X
+         bsecVgXAn0RkIBMbf/cK7/qBhTVdqCHClTuRyIp25uvGKmIsO5TtpYRxrOkZ3NVk1t1F
+         2PwA==
+X-Forwarded-Encrypted: i=1; AJvYcCULA/gU0bk3awnjlM1IOvqjGtelLfXwgugKINO3/9CWhS+JxmlCAi5u98F+8qgOPE0zKsNAf0o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxngTO9DO9+Xz6WBg/srPC0fITBHZtrK5WVshYYU47PV5nG1GEJ
+	L/iAmipQ6cxX/Xz2I1sVLlp4KSbpflCkkKin/B6fSHuZ08+pO5hN
+X-Gm-Gg: ASbGnct/+nEE2DwyW2oNqDw+acGb1RBh0YF4hqEIhyuqCIo4043WvTmnqck+5zP0TFr
+	RHaDLLPzmszJ8PWh+uTaCRPAGws0weHIKhJAe/wU/NB1ggLVQFv5pgFhQ7MtqoXI3dpgY4sXMtS
+	LjazOLu5yQU03umTCj8vPmm3QpBMNNRyLdYfBK/LiPU26bS26o4lIxsOEJFTpmonToqUGJR5Tfj
+	cSpgEWk63zUeVi5Zo8oQFc1Nkl8n8RUH6lssSQ4L9VHUSKV8oZXaG2cnWYk6xmXR7tGqNrN67OV
+	I6v0u66Yvj4hGeiDQ1IgjJuPqECRL7u+CsNw77XSm8qI
+X-Google-Smtp-Source: AGHT+IFwr/EOTneSy/MmI0i3yAi+UxHPrsKvpXlN5lYnm/9UOJ1O9hTphUC9vPeDl7EtkGpDOhXteg==
+X-Received: by 2002:a17:902:e741:b0:220:ec62:7dc8 with SMTP id d9443c01a7336-22db3bd5c77mr5348925ad.2.1745450424348;
+        Wed, 23 Apr 2025 16:20:24 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d770d6sm246945ad.17.2025.04.23.16.20.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 16:20:23 -0700 (PDT)
+Date: Wed, 23 Apr 2025 16:20:22 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com, andrii@kernel.org,
+	daniel@iogearbox.net, martin.lau@kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH bpf-next/net] bpf: net_sched: Fix using bpf qdisc as
+ default qdisc
+Message-ID: <aAl1tm5rwB0kq1/Y@pop-os.localdomain>
+References: <20250422225808.3900221-1-ameryhung@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422225808.3900221-1-ameryhung@gmail.com>
 
-On Fri, 18 Apr 2025 01:37:05 +0000 Joe Damato wrote:
-> +    bin_remote = cfg.remote.deploy(cfg.test_dir / "napi_id_helper")
-> +    listen_cmd = f"{bin_remote} {cfg.addr_v['4']} {port}"
-> +
-> +    with bkg(listen_cmd, ksft_wait=3) as server:
+On Tue, Apr 22, 2025 at 03:58:08PM -0700, Amery Hung wrote:
+> Use bpf_try_module_get()/bpf_module_put() instead of try_module_get()/
+> module_put() when handling default qdisc since users can assign a bpf
+> qdisc to it.
+> 
+> To trigger the bug:
+> $ bpftool struct_ops register bpf_qdisc_fq.bpf.o /sys/fs/bpf
+> $ echo bpf_fq > /proc/sys/net/core/default_qdisc
+> 
 
-Sorry, not sure how I misread v2 but you are running the helper locally.
-So you don't have to deploy it to the remote machine :(
+Good to see eBPF Qdisc's can be default as well.
 
-BTW does removing the ksft_wait() from the binary work? Or does it
-cause trouble? Don't think we need to wait for anything in this case.
-With the XSK test we had to wait for the test to do the inspection
-before we unbound. Here once we get the connection we can just exit, no?
+> Fixes: c8240344956e (bpf: net_sched: Support implementation of Qdisc_ops in bpf)
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+
+Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
+
+Thanks!
 
