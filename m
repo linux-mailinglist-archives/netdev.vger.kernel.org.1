@@ -1,113 +1,84 @@
-Return-Path: <netdev+bounces-185254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A01DA99824
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:50:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EA69A99827
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40BC67ACBEB
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:49:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA8977AF0BB
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0064328A1F4;
-	Wed, 23 Apr 2025 18:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R05ie7IS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B26228D829;
+	Wed, 23 Apr 2025 18:51:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89688280CDC
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 18:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649B827FD7D;
+	Wed, 23 Apr 2025 18:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745434213; cv=none; b=K6xd9mn8x4wY5/rtup2ddL/nDEj676j33FeZddL0joc+BtW0cVR9fJuvVea0F1Cx9erkAqbDJZCCR0dtvmYRR+TMtlQb6XtxJW0/rdmZO2uY0ZbvakEvTfVstOHPy/k3XxPzQheADdt117PMCSlK/LTBbi1pQ8HWzeWrmv/E/Bg=
+	t=1745434278; cv=none; b=MvyvhllmJFwqmfXZGJeVduPrJJKXZOXdI/B4XG3EbSMP4mpvngN+MeTR0A7jlS2OjwqEISzgtcD6PcMBnkjGpBo8uOQJ0bpwy58IkLgRfgwwvt+LPDBFmhwo3yFrppMpZSZbfjL9+TSZE4RI1I1mgR5QR5lDoQzAeYDCuZMpHVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745434213; c=relaxed/simple;
-	bh=46YI0j6vLtCLaxnHlsMJBI+Z9TXQj79mXcDdZPes/Fo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DGQiLfOqK9PuU2DgFQoPP3Gjg22+2+WpxcMHKoVQP1BhQLeBoTiaKBPHtffCnozfBeh7YjMqtHzm+EsgIp3vEGF2QGtMK4JlI9U5AsowqJNOClV2fZnIX6Um+f3/52w/YVpJjxiMDd90mYvpZt0JfdI8N83xRa0TYftq+rLfN2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R05ie7IS; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2240aad70f2so41715ad.0
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 11:50:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745434212; x=1746039012; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=46YI0j6vLtCLaxnHlsMJBI+Z9TXQj79mXcDdZPes/Fo=;
-        b=R05ie7IS7KrtSMqRsawPTOIyER+HqGpT8JBOwHimX/pj4e2yKyMrYOrLnakSRMRpGe
-         CXxMvbnLo3uDd6zmWC9frilWcOlP5kSX1NpQRxP4bqdysVXAZ4Akuwvb+BnynxOZ4DGd
-         Xsqm6Z4u2QHBlf94k1nqEp/0J4zEkdvY9DtxWdA2NwLJMKEG1qBRf4ZRf5K9b/6Zpf59
-         KRTu8IxUOswNBKAPk4MqtegGzgLfcnAosqYbwX+8X2yJHDmb4UHcSR622j9z3el6TzTx
-         qCqAL79FJWXVSVzKv3Ql+ZOxdPylHDrJSB0XE5yoZRa8rW67N392oXKpZyrW2M9/pCi/
-         lTPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745434212; x=1746039012;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=46YI0j6vLtCLaxnHlsMJBI+Z9TXQj79mXcDdZPes/Fo=;
-        b=Z/cH2r2r0c34GCbJFHFshKTwq/sF/RrWx2FYLFVSuH/M1OMjtQ1K+ku3g1lPObmIRA
-         OBtkxBPhzt3LfTPjjnsadpFcl4KNMUuALr1TnAQN0Vm2m+tSOogZteyPkwjj3vUmI9v0
-         c+j7nPL1/5trhHbPPURDNI9QWwA4MBrfopxkWRKztPXHaS/c5ChsAtD2AVsj0Mz8/3/w
-         xlLn6m1l93mnf4roJj0kufCRNmevW+9l32CkYxoEpLMIshGTuH5mpAG9Byn7lWuhT4SW
-         7uKOlqmTFt05IQVPdscAI7lOdTlB7iwpt8W/+7XILb0RkXvQrbev5Og3qpoygl+tbZ3j
-         93AQ==
-X-Gm-Message-State: AOJu0YxXSjrooAoYzX4qs7CBJ0S/4vijg7GQ2ZlVbGE2I1PYHbctp1jO
-	17bumkk6IVz1I85ggQGFJN7ng+X8OeqXTn37zWkEzPrTnDG8C5/ISTAuO14zuope8+bU0MEutQh
-	/G4CIcSOq/fLb3x6XntDGCYEhknY41FEl5d3Jj5TWIYT3zGYSSQ==
-X-Gm-Gg: ASbGncsbfjijxP5fd7P3KDTG09n7bCmEvcq+TRMgrWAbtX6TzH6p3Z0iICImVddIeAN
-	JlyGT6fwGv4+lMe1vdLXoRWvXTymxDhhXEH8of/rJMp/kFn3s5wkHO/QuAvOD2l6FYjr8BRm9I3
-	6J0snlmNj/3c+0oO3og50Ujjl4JSQrSHKH6tAmy3tJ4uS0saZ/LxGS
-X-Google-Smtp-Source: AGHT+IGDdQr4gPC/57wQTS3NlPWMgh7VtzJjlRR+R1rpkZIj4VicuBwBY2NnnChIvMtHoNNYZlJ8koUe45NHhKsTg+0=
-X-Received: by 2002:a17:903:3d0b:b0:215:7152:36e4 with SMTP id
- d9443c01a7336-22db236f2a4mr299635ad.27.1745434211536; Wed, 23 Apr 2025
- 11:50:11 -0700 (PDT)
+	s=arc-20240116; t=1745434278; c=relaxed/simple;
+	bh=B3l3DrVwceHsmAJLpOH9gKyLG+5YvzEjnbWCz/zqbq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TWWOmYCnoL0cc8hu5Dz8fPPiccnTukLTMKwrJwctNYcXH+yX3EGp+fVoX0OTInOSAocx2uFF3bXdI/qJJCgdMOF7PXnazRwBOwRrfD7MAyStQVhkZz4YTB3HdQVWUxLiDBtiTnW4oJqv/Yfozi4pFSo4QLKw0W8qy8UeoSWERz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6FEC4CEE2;
+	Wed, 23 Apr 2025 18:51:15 +0000 (UTC)
+Date: Wed, 23 Apr 2025 14:53:08 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, David Ahern <dsahern@kernel.org>,
+ Juri Lelli <juri.lelli@gmail.com>, Breno Leitao <leitao@debian.org>,
+ netdev@vger.kernel.org, Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ bpf@vger.kernel.org, Gabriele Monaco <gmonaco@redhat.com>
+Subject: Re: [RFC][PATCH] tracepoint: Have tracepoints created with
+ DECLARE_TRACE() have _tp suffix
+Message-ID: <20250423145308.5f808ada@gandalf.local.home>
+In-Reply-To: <CAEf4BzZfoCV=irWiy1MCY0fkhsJWxq8UGTYCW9Y3pQQP35eBLQ@mail.gmail.com>
+References: <20250418110104.12af6883@gandalf.local.home>
+	<CAEf4BzZfoCV=irWiy1MCY0fkhsJWxq8UGTYCW9Y3pQQP35eBLQ@mail.gmail.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423153504.1085434-1-cratiu@nvidia.com> <20250423153504.1085434-2-cratiu@nvidia.com>
-In-Reply-To: <20250423153504.1085434-2-cratiu@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 23 Apr 2025 11:49:59 -0700
-X-Gm-Features: ATxdqUFRoPAxj8O5gyFHvPrpXz0zS8j_z75QAgKXLVKEmLgp6XG2WdrYdvwRpIM
-Message-ID: <CAHS8izPSH9UXZwrETq2ze8_-gZRLmJ+nsKQeDp9EXm-PVUADjw@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] tests/ncdevmem: Fix double-free of queue array
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 23, 2025 at 9:00=E2=80=AFAM Cosmin Ratiu <cratiu@nvidia.com> wr=
-ote:
->
-> netdev_bind_rx takes ownership of the queue array passed as parameter
-> and frees it, so a queue array buffer cannot be reused across multiple
-> netdev_bind_rx calls.
->
-> This commit fixes that by always passing in a newly created queue array
-> to all netdev_bind_rx calls in ncdevmem.
->
-> Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+On Wed, 23 Apr 2025 11:21:25 -0700
+Andrii Nakryiko <andrii.nakryiko@gmail.com> wrote:
 
-Thank you!
+> The part about accessing only from code within the kernel isn't true.
+> Can we please drop that? BPF program can be attached to these bare
+> tracepoints just fine without tracefs (so-called BPF raw tracepoint
+> program types).
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+Is it possible to see a list of these tracepoints from user space? If not,
+then it's only available via the kernel. Sure BPF and even trace probes can
+attach to them. Just like attaching to functions. The point is, they are
+not exposed directly to user space. User space only knows about it if the
+user has access to the kernel.
 
---=20
+Unless BPF does expose what's avaliable, does it?
+
+> 
+> But I don't have an objection to the change itself, given all of them
+> currently do have _tp suffix except a few that we have in BPF
+> selftests's module, just as Jiri mentioned.
+> 
+> Acked-by: Andrii Nakryiko <andrii@kernel.org>
+
 Thanks,
-Mina
+
+-- Steve
 
