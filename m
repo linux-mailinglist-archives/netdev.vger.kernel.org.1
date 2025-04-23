@@ -1,119 +1,166 @@
-Return-Path: <netdev+bounces-185106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30456A988AC
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE26AA988C1
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97FB75A397E
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6BB63A4033
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FEF26C3B0;
-	Wed, 23 Apr 2025 11:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D480426D4DA;
+	Wed, 23 Apr 2025 11:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFRKD46K"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NAszZ++H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FE5FC08;
-	Wed, 23 Apr 2025 11:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EB02D613
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 11:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745408249; cv=none; b=nYjFosT4XeANYXU71+rAAjS6GtA5JPvJ2GL1F5F1yE2w7ek/OiMbYagICl/gLlqCzLv8YvKJ7rgoJ4QmX+bjfZ66tuuqgvtQeUYj2dkGgoNiFJj4kRzLpLIddus6zqsiwmg/LgEXhbFmZaFjfylJe/Lxd8g41bG+wNrcD4UPhIw=
+	t=1745408530; cv=none; b=uyDY7C3w10k79ARfUgBL3SJbXlm97hd0zHhTQska4vUeO/x/r0inx8t7UQyAYTydbxMUtbbGjBZCcATqf/NISFOZlU1acTNq2UI6lNr5jof/5pgwn/P/v3ti5cVJ5//2UUZhnB6KFdMp+o/hmgQMi+NOw0yrL5JNH4eE/zo67/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745408249; c=relaxed/simple;
-	bh=ZOYMbzEXP8RLe+8yWrKjk75zGEZAVkvv3WQseXJv0cQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YUIAh0xzBT0Ib9VYPo0XyJgDp3sAIGckBla2XNkuGgoMIuCpSd/eK3rMbfAHajRw3AtNKsmUp9wTQz/HdP4T8nu0Lv9wqcIIUk/rhaGbixOY5G/+pM6H++qZJm7hQkGbFiULA22eoJhUlR29+SorKRtaykAqPW47pRqq2uu8oKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFRKD46K; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39ee57c0b8cso6121145f8f.0;
-        Wed, 23 Apr 2025 04:37:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745408246; x=1746013046; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sOaslwO/iDwgRO6fHWCqrlxeNb4sZEAWfunB5Ekm3Yw=;
-        b=CFRKD46KAxCSY0GnRw3hpSW2CTnMcs+t5+zUcvTICIm595UnYv+fNvGC1IaEWX2VGj
-         G8Yerid3y+63qAbNBjy5Z91GmvWrdZaFzsz7iXIKQo8UInPK+QIxyUX3BZN6LouKsZ6x
-         hR2/zdMHFzkhz4UMykPFcwPAFF6EOwjs3AM7YU1NVLs0shtnkNmiWaJ907yPuKrsGD41
-         bnhN0CSgvJtG25s533hJ3HfDRh87ZOZzt1EYdjgbHI//bSZn1DXHi+Cqni1sz7+R5qsD
-         2qYxxaNnRHHMID4Ppbw1f7UyUu+V85p8bILHVUxHxj+R5tdktrDpMm25oApGpF9RqMeU
-         ag3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745408246; x=1746013046;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sOaslwO/iDwgRO6fHWCqrlxeNb4sZEAWfunB5Ekm3Yw=;
-        b=ACYaAK8cWKihFAcJvUKTR2pwhutWHqm2J7YMTIoSEVs6dPScAoToHtdf2Rsy7AQnbx
-         eqrTM5s7SYlgz0zkmMOQBNK1IC+ANgw2VRPojCfISGA4qMuOgSuBFuYiSHzzW0o4c9zQ
-         +ebTMubYIGYeypQiEE+hFCAPvrJwS5gY2RJjHMC2uX1hlcsi0LM3HAnoWZ2vBGSq1IGx
-         hq815QSHqzBlBowR3BNdL7VecHPkRjcULaYHWwItSiIkWtFaHv8BRtY95FW3I2iO4hDS
-         CUVppMFi4YTNUSu6UAn083mZsAH2ciEWgn2Bvx6idIQrSkVRn6T4QkcbNCQF12aih6UE
-         UKmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ+w8ahaAOeaWCjBxujFKzv7z9xHuhBeLR1T/tF1LHngzybhGrpvizLQULxGL5YUrEK7qwB/MIBAMHbFM=@vger.kernel.org, AJvYcCVpbCVTde6MIACnQ/zLCt6aOsAKtfSVcavgfCIZ9VzHJZ5Nb0Gihg7ExleBTuw07cHjGvNN8XMr@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/3sZFMVp1LwJMFx6fiST35JO4Rtx0U1+7dQLPLU/TZYu/rUT+
-	G1aWvU6pCykERHSyJNr6QcZ5rFvVqWXK7StdMhNGAvD/1xQpP7jp
-X-Gm-Gg: ASbGncv6Gmqr9CjhmDZziqNX9kuuhBwtRCDXtOA0908q1/f7guph0yvnmbdqNKSPr2S
-	LEMJsMgWtNo/Wb4Fy93eeIjTYe/zeA/aqYTsVb2441PcHBiakezqC0OQ2F3nml63W0odOE9rYYC
-	v3mZ5eaQ84k2FjCqgTZKR/gnuXlu2u3K6sMSohh0QMh7sdthJtmXgeH5GMad8SEaha+Yaqd/NBa
-	M/U62SwxS64DnNi1bS1kvzbyztrK3+3EJ49gL2vJgMEUB/X9/7jpAWlCL1CFTsRTXq5ztH1ejcC
-	KCAq2g+oWe8FcqejddhYanuYi2MUImLGlRsRxm14aA==
-X-Google-Smtp-Source: AGHT+IHSoaSXaAgj53jWAGtI7Z7mMkdXhhLo9jTahymT0NfSoVyVjCueixP+i4S5vMsc6dh5pNJwhw==
-X-Received: by 2002:a5d:6d88:0:b0:399:737f:4e02 with SMTP id ffacd0b85a97d-39efbad2f10mr16252645f8f.39.1745408245796;
-        Wed, 23 Apr 2025 04:37:25 -0700 (PDT)
-Received: from localhost ([194.120.133.58])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39efa43d22esm18699323f8f.52.2025.04.23.04.37.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 04:37:25 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: ip_gre: Fix spelling mistake "demultiplexor" -> "demultiplexer"
-Date: Wed, 23 Apr 2025 12:37:19 +0100
-Message-ID: <20250423113719.173539-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1745408530; c=relaxed/simple;
+	bh=VUPg3bhuJzoixVUf9RA2/3LNeJxMosdnsdvYxq4lsyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bbMuY/EAg74xMkAEH02mLgnbvDgYZ0sKpXDr8s4lu/lqFMalVZMUOZ6mktl2RYRUr+aNJcVzt2gYyz9CPN/+XK7nI5VgIyvoP1K9N/aXSrsrweptpYSbXVTrrCrs7mh7VVYxVqDh73oJDT+4hc4G32tQHdeWAomCkMh7f/OVc1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NAszZ++H; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 774511140243;
+	Wed, 23 Apr 2025 07:42:07 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Wed, 23 Apr 2025 07:42:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1745408527; x=1745494927; bh=19RyRxh26IWFroPv+t2vQombPFFwkLMUiJq
+	Aa6moRYM=; b=NAszZ++Hqc7xzAcOB0HheKkAv5RXAVs6T3R7ySCrMqdUOGUgjP2
+	0NANAi8XyRo71i0hynNC/iUCAPyF9Ec6HSchiVNua2hYWh4RlHO6+koccjIO+0U0
+	2Jr3S590dX0kiQvihbmJqH+VOBZPiIicDOdkcw2voW3WUkTPUFKCbhRhR4VhG23x
+	5gxCvVOZz73NhP5xymjyjeoZ+HNdbYEaO+1E6xOzQgb8UU1WF6KoRDT8AdnznlrX
+	lqy8Ju8paQ6/MibwFYJjUgSMJPGvusD1RIfkm9+fu3FwrVpdkEStBMzj0ZNfxb0r
+	KZPnPK10Qw9WV3LkSxOByUTy/pQK1wit03g==
+X-ME-Sender: <xms:D9IIaAdO3xX9XiGYgXNX6YEmXaY-gSuCRZm1gusA16aqmfRXKGcs3g>
+    <xme:D9IIaCOfmDjoFzGbUrZ9Duen6cmj8OHgw5fHTA3BKWuiiKoZc58pwaNo9pXARw6y6
+    0Vi_c4OdS-FlrI>
+X-ME-Received: <xmr:D9IIaBiMmT3LjRC0vJoiwAy8hNWA_VbqSZMAskOr-70qu0QxAc6Nth8BJHz9>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeihedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
+    drohhrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifedu
+    ieefgfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
+    thhtohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhimhhonhhksggrsg
+    ihsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhg
+X-ME-Proxy: <xmx:D9IIaF-iQWlNNsad8EuC5_i-QwUsnFLE3_BTgXxv83cGMmwFV31q1A>
+    <xmx:D9IIaMtAqxbKaiXh_-XAj0WfF1UdfrmSZ6EAvacn11G7Ev1Mx-VKIg>
+    <xmx:D9IIaMGUK8n1RqLvs5QB__T2PdnqemRtSq9a28dylOubN3XSFNqh8g>
+    <xmx:D9IIaLNNvcGn9PBRe5hCqYiQoyP3ktFiUnBWJrj479LmEBgN39tmEw>
+    <xmx:D9IIaJNXM4fGf0-22hqnJGhIs4v2x1Ssi5EdBAXtKDWihPtF5HFKdsRB>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 23 Apr 2025 07:42:06 -0400 (EDT)
+Date: Wed, 23 Apr 2025 14:42:03 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: query on EAPOL multicast packet with linux bridge interface
+Message-ID: <aAjSCwwuRpI8GdB7@shredder>
+References: <CAEFUPH1Erfh9YUctVDHxL8TWsiVfs+Fr8aJLtrjiKECbiGTxHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEFUPH1Erfh9YUctVDHxL8TWsiVfs+Fr8aJLtrjiKECbiGTxHQ@mail.gmail.com>
 
-There is a spelling mistake in a pr_info message. Fix it.
+On Tue, Apr 22, 2025 at 06:42:58PM -0700, SIMON BABY wrote:
+> Hello,
+> 
+> I have a difficulty with making EAPOL packet forwarding with the Linux
+> bridge interface.
+> 
+>  I have configured the group_fwd_mask parameter with the below value.
+> 
+>  echo 8 > /sys/class/net/br0/bridge/group_fwd_mask
+> 
+> I still could not see the EAPOL packets being forwarded  from the
+> linux bridge interface . However I can see the EAPOL packets are
+> forwarded if I use it as a regular interface.
+> 
+> Do we have any more settings?
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- net/ipv4/gre_demux.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What do you mean by "linux bridge interface"? The bridge device itself
+or a bridge port? Also, what is "regular interface"?
 
-diff --git a/net/ipv4/gre_demux.c b/net/ipv4/gre_demux.c
-index 6701a98d9a9f..dafd68f3436a 100644
---- a/net/ipv4/gre_demux.c
-+++ b/net/ipv4/gre_demux.c
-@@ -199,7 +199,7 @@ static const struct net_protocol net_gre_protocol = {
- 
- static int __init gre_init(void)
- {
--	pr_info("GRE over IPv4 demultiplexor driver\n");
-+	pr_info("GRE over IPv4 demultiplexer driver\n");
- 
- 	if (inet_add_protocol(&net_gre_protocol, IPPROTO_GRE) < 0) {
- 		pr_err("can't add protocol\n");
--- 
-2.49.0
+The following script [1] seems to work fine for me:
 
+EAPOL packets on h2 without group_fwd_mask: 0
+EAPOL packets on h2 with group_fwd_mask: 1
+
+Can you adjust it to show the problem you are referring to?
+
+Thanks
+
+[1]
+#!/bin/bash
+
+# Setup
+#
+for ns in h1 h2 br; do
+	ip netns add $ns
+	ip -n $ns link set dev lo up
+done
+
+ip -n h1 link add name veth0 type veth peer name veth1 netns br
+ip -n h2 link add name veth2 type veth peer name veth3 netns br
+
+ip -n h1 link set dev veth0 up
+ip -n h2 link set dev veth2 up
+
+ip -n br link add name br0 up type bridge
+ip -n br link set dev veth1 up master br0
+ip -n br link set dev veth3 up master br0
+
+tc -n h2 qdisc add dev veth2 clsact
+tc -n h2 filter add dev veth2 ingress pref 1 proto all \
+	flower dst_mac 01:80:c2:00:00:03 action pass
+
+# Without group_fwd_mask
+#
+ip netns exec h1 mausezahn veth0 -a own -b 01:80:c2:00:00:03 -c 1 -q
+sleep 1
+pkt=$(tc -n h2 -s -j -p filter show dev veth2 ingress | \
+	jq ".[] | select(.options.handle == 1) | .options.actions[0].stats.packets")
+
+echo "EAPOL packets on h2 without group_fwd_mask: $pkt"
+
+# With group_fwd_mask
+#
+ip -n br link set dev br0 type bridge group_fwd_mask 0x0008
+ip netns exec h1 mausezahn veth0 -a own -b 01:80:c2:00:00:03 -c 1 -q
+sleep 1
+pkt=$(tc -n h2 -s -j -p filter show dev veth2 ingress | \
+	jq ".[] | select(.options.handle == 1) | .options.actions[0].stats.packets")
+echo "EAPOL packets on h2 with group_fwd_mask: $pkt"
+
+# Cleanup
+#
+for ns in h1 h2 br; do
+	ip netns del $ns
+done
 
