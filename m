@@ -1,89 +1,97 @@
-Return-Path: <netdev+bounces-185205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E47A993DA
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:04:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B01A99452
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 879F39A81FC
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:57:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6669A1CA0
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE642857E2;
-	Wed, 23 Apr 2025 15:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C33929A3C5;
+	Wed, 23 Apr 2025 15:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="So8kcJYK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDBB8r5o"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570CF2853E0;
-	Wed, 23 Apr 2025 15:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FB0298CCA;
+	Wed, 23 Apr 2025 15:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745423092; cv=none; b=kUPnUUBdmrAN8VFfK1w569vsexl5i3V/fSI5O89Y9VZl+qLL3jeKeODFYogDnCpuK40Lpq875wvMHRi7pFc0n+CCUkVUvxzNxP3r9Ub/nLaweKnF1Dyry9aL/MrlFmvwUwrSUs+KjsqWf3HScspWoYEBrRqwXvtJzyyvryfI8eI=
+	t=1745422451; cv=none; b=k/qFugSvpKX8TKA+/QuzSwqa12wsmC1+K09NVSgNk4BVx5TuEqGJfqaXIy9i1Q/jN7Z5riuWzENtplTwOj8L2DcZ0jAOg+Rc7XuFH085NGqmW8bbeMGvkQH6UKxovOz9RTgOVZhYo8A/fKrgP+vM3zuIqKHAU3y9W8NHoBfdvdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745423092; c=relaxed/simple;
-	bh=RvH5FgF81bFkw2pxOgwseRZAgpOXsvqHOEmUofvT3cA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Id8fY9wgc6b1RG+mKCXYbRV01itshQOWkv+ptoL1OnyBbzzyk378pM9roNrCDT7yaBWcXKjUaujXCmwMQznjtv4pg09FPYmA6uygQNTA4i1ML9YYGWwhbh8Yk9gPwVvLgzXHqJWPciZv0QhUzBDgr9LBhNZSmAyZniGQafMYnaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=So8kcJYK; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=RvH5FgF81bFkw2pxOgwseRZAgpOXsvqHOEmUofvT3cA=;
-	t=1745423091; x=1746632691; b=So8kcJYKTAbL/D1EBRPJIu5p95H6F7AL1cE/SN9LvsQ87fT
-	apYp2+oagzgYrHAKks7YB7dqaJWE6uBtA4HQ6Rnru2RQ/mJfyO0Pzdm5hv+xQLhYgOfV1ELmweBEa
-	MR1hXz5tl48BKBmkFkZ10Z3fIUEjNXn5sHmJR2bs9OlDsgr360aAlb/4ysGVAKNQc5fBkiKZDsrx7
-	u8h6Mh4nHfyVeRDpFrOG1F6KBWXMvUDbHbz15n0osFxHIH6rD2eDmw1QgAYGKjR7etR7H2wwjpfw9
-	538RJ+8uZfTcZN7FsQ8+TQySTp8KkSVd/rzbBXhIfFbJzqiugiph+GwXIXrHt6Yw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1u7cHI-0000000Ensa-0njz;
-	Wed, 23 Apr 2025 17:44:48 +0200
-Message-ID: <4a91f731c49d3449632f19dcf4a1a8f5a9eb847b.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 1/3] cfg80211: Restore initial state on failed
- device_rename() in cfg80211_switch_netns()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, linux-wireless@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, 
-	netdev@vger.kernel.org
-Date: Wed, 23 Apr 2025 17:44:45 +0200
-In-Reply-To: <20250407125345.1238818-2-i.abramov@mt-integration.ru>
-References: <20250407125345.1238818-1-i.abramov@mt-integration.ru>
-	 <20250407125345.1238818-2-i.abramov@mt-integration.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1745422451; c=relaxed/simple;
+	bh=4dZGTxOMlI6lJPyNCE7bp/S/ATLVwiABeAvtgl4Aa9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qSS8wn2YB5WsZ7cInRG7FzfGUXJBEyz9gwGSVVdfhhgIumsy5U2XtZ5sqkQx1so5aFpEgqWKSm+La7N/AZ8j0ugE8COEW7lEJgF0HyUHSjA0Tg1Iw2vb7VO7bIpuVWqLXyvRhDExzhqH9XjGOfOgi2eohetiJ9roMDgMriYHBA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDBB8r5o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEB4BC4CEE2;
+	Wed, 23 Apr 2025 15:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745422450;
+	bh=4dZGTxOMlI6lJPyNCE7bp/S/ATLVwiABeAvtgl4Aa9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bDBB8r5oF+sDb2+8MYCSJCnPScYtVX77O+SgNvUs2ZnDSlyBjCSuTzkukkrSkCuZi
+	 r7NM0ChACP0fsel2Wb2Y1ouQlTxg1UZ8sKkp8zA8irROwWV1TTW4cOEo0Mdc/TxUfV
+	 oC8l89DQGR1R5wJCqzYWjP/t2PGvgLu1b/1AaYgQvH5P7NY4/WhMMOJvjrELn4dw+f
+	 f0KdxZk0olJeky8MlIeXEaESOPvRlRB32gM5dHQy7URo1Qbm7uOpok5dR+c70C+gzK
+	 N84ZbUgLf5JW7uUfoDGqQgd/C/WlbXmdKdpHFlDk0orhqu4YZN5w8GToJXLRSeiMfT
+	 EiFx6JmSeKGaw==
+Date: Wed, 23 Apr 2025 16:34:05 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org, rafal@milecki.pl,
+	linux@armlinux.org.uk, hkallweit1@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
+	conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, andrew+netdev@lunn.ch,
+	florian.fainelli@broadcom.com
+Subject: Re: [PATCH net-next v2 5/8] dt-bindings: net: brcm,asp-v2.0: Add
+ asp-v3.0
+Message-ID: <20250423-opt-entrust-8bee59fa7a1f@spud>
+References: <20250422233645.1931036-1-justin.chen@broadcom.com>
+ <20250422233645.1931036-6-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fU6Vs7wFRNSFVO99"
+Content-Disposition: inline
+In-Reply-To: <20250422233645.1931036-6-justin.chen@broadcom.com>
 
-On Mon, 2025-04-07 at 15:53 +0300, Ivan Abramov wrote:
-> Currently, the return value of device_rename() is not acted upon.
+
+--fU6Vs7wFRNSFVO99
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 22, 2025 at 04:36:42PM -0700, Justin Chen wrote:
+> Add asp-v3.0 support. v3.0 is a major revision that reduces
+> the feature set for cost savings. We have a reduced amount of
+> channels and network filters.
 >=20
-> To avoid an inconsistent state in case of failure, roll back the changes
-> made before the device_rename() call.
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 
-This kind of seems complicated for something that ought to not happen
-...
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-And also (+netdev), what do we do in case this is called from
-cfg80211_pernet_exit() - leak the whole network namespace because we
-couldn't allocate memory for the name? That seems counterproductive.
+--fU6Vs7wFRNSFVO99
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'm really not convinced of this whole patchset.
+-----BEGIN PGP SIGNATURE-----
 
-johannes
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaAkIbQAKCRB4tDGHoIJi
+0n3DAQCsXV3h+OYNAdYj64Hv5z5YN9n3SvoK5dONNx863jk8JQD7Br0xBT9IUNfz
+NNkAp9Wxz1W6EVCNUet7lhZToExeSQE=
+=xNjz
+-----END PGP SIGNATURE-----
 
+--fU6Vs7wFRNSFVO99--
 
