@@ -1,258 +1,125 @@
-Return-Path: <netdev+bounces-185057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02B3A986A1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:00:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E747A986A5
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:01:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DDFD3B2DC4
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:00:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 590E1189BA9D
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E527620D4F6;
-	Wed, 23 Apr 2025 10:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6E422F773;
+	Wed, 23 Apr 2025 10:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mSDPzUkZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GMN43t"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3345A2701A7
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 10:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745402431; cv=fail; b=RCPxl3T04lSEJwzMEODE/M0ACLhSe57aOUBmhS8eOGLfza8bLuvNXCOq0/uaTS5lgv6etKpftsW7Ir1UsTqWLR+El0kmSw6o2logN+OHafOFsQ2GNlyz4uonl9e/8JnMC8M350Q8ixC0gQDS+Knv/QnyXGviFKiC7HHk9JJBH8s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745402431; c=relaxed/simple;
-	bh=p1Beh2jCBFURjQProu199L0IZrYIldXT/OZqado2EEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=NO9Q7zfKOcQIxeHeQBDIaVVP0BxOZX+hKvU/vTOFUrUc5dokBm8indPzs3KNmJ2kPeKFqnB8hZM9pL6zZ8xi91qe2DBC80+oRyTGSlh1MldtIEFtHUJGGiZyxAbvaa4KlHJpMDww5fc8iSol8qMLChXmFZqUS6ZMqXb49cMB3Xw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mSDPzUkZ; arc=fail smtp.client-ip=40.107.223.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Tvy3yuqlLohXIlVB9Fok9pXSSCi+0qTedlJR1ao6gz+2Lo8kokYvz2fF1lB9Xmu9myOpBSOuD8a3Oc5YZtnwaYDsNQzoKMC88IxKZB1UOeYOdBRFjtTQoNJoNvr/xOGe7i2feL6EnXg95xeLko7lqMhjpgwXe0R7LpEaqgDrZn6dGat4XtDFAiyJ/NO0zQtEWjJqlV0zavIXvwQNG5npsRH8JvomhPvsdWjBeTtrSrUM79YjJ+zr5MR2phM6x6rxrqvtcx3rjNBUJ2svGyvdeuNwZoT+oiKNlnhPJtp5iIe+fISKHU9P2G3X4ExMiNCDwKe072TAMaTgN7u4/+tIDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C2bskSi/friMDg470hm+eCNZ0Gb83EDhOlwu3SKwuTA=;
- b=QpU0ZYUuvWh6f9ZDwBxoG0KFuqXmkfS9yBhOSJsgEgccqqZYbF6ZUKfPSfr6IBR08GbBBXvcjwyx5EIRx20Ybx/rf23JR/dBrZqTviyhk6PnPXSy+DkRJu7VCJCwNjd4aaKoCg1CM+gJjqt29mdJYrQGlWmmB3lLrZ4HQ+owEMVJotP3WoOQ0Iuiuw/QPCooQT4jhTLE3IBHZsvx9sOqZohvDRRZ+jYVaSDQHZMPHpIL+vjlBx92ZlsnbCPTicTGWvN6wW6pkYJdvHOjtiHwOx5yMT28tm4jvUEvVztaIdrn5SY4ai1bsaKIOsJtz3Sq4spYAgR6fqJojXCel1/JVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C2bskSi/friMDg470hm+eCNZ0Gb83EDhOlwu3SKwuTA=;
- b=mSDPzUkZwezhgCUBXP4qH1WosxIgMd/9nMDtEBbfHiN8XHMMFclGYr/ls1UAqHMMtCHWDo9i9L6jp8RNGUlKLe3rAdrDFA8g74bwprWwFIVGEETlSKxbgr/o5IxIIm/zwJkbBVVkYg979BqFtnWypx8emJqwxIdQekDoaizIZ9o8AEfV1nmvBD/pvwP5Iy2GTYErw/+M3H5l0Lh+NiYaW/+GfKqL7iBVbrqJxy5gf/xUmdFD5R0L7FgFVASU+bvPAmTm4jDaQPsO6srovSzl95MSol7aInKWQ3lXmb8uz2tfY8IxC9TeerO0YHSSpSdHCeF+TabqD39/U6X5ohT5Kg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by DM4PR12MB6206.namprd12.prod.outlook.com (2603:10b6:8:a7::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8655.38; Wed, 23 Apr 2025 10:00:26 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%5]) with mapi id 15.20.8655.033; Wed, 23 Apr 2025
- 10:00:25 +0000
-Date: Wed, 23 Apr 2025 10:00:01 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com, sdf@fomichev.me, 
-	almasrymina@google.com, dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com, 
-	jdamato@fastly.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 19/22] eth: bnxt: use queue op config validate
-Message-ID: <a5uokb5qgp5atz2cakap2idwhepu5uxkmhj43guf5t3abhyu4n@7xaxugulyng2>
-References: <20250421222827.283737-1-kuba@kernel.org>
- <20250421222827.283737-20-kuba@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250421222827.283737-20-kuba@kernel.org>
-X-ClientProxiedBy: TL0P290CA0002.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::10) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78651EB198
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 10:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745402512; cv=none; b=mL/uDhWs8P+cMxeWtdNwmwLv71+YsKIqCrhT+0hRtthBSM9OLvK+DwTOfDAgeNnRMo/MB/au/xohlGAnbe/rT/pmlmHnemLbOioYarFOCZsk+/2q8KAt1YeuZi7+RQZ0XZiRQOhewzCxW3gRJAa7CmW37Aiv8CDceeQUDOElIl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745402512; c=relaxed/simple;
+	bh=nv8JLHYDC2xOcut+2tS9pdLAbaCM0agWONcGBv7sls4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ujlipvo+D2PXl9LIkgQ6/kywZZgxYH9A4QUCSKamkr/FDNHNzFWHEwjW3sQJZ91IZgVne9ybi+CS1MTnqhE/CvUIP3H/NuxDJvJuFM4UvWeh04MXSMyNGJdnJa9yEAJ/4GhiSGXcfw2ElNFYk4rxtAlMPbcf4aRzhJzr1sRbDjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P6GMN43t; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745402509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LEa4Jm6UzeVd+a2A5Ueja4N+wKFxUkh/wMN5U9m9PM4=;
+	b=P6GMN43tmPBfLw/PcU6yFajZKhvtVP43FjGCCEYs/G4Kpkt2cqlT/qu3QotoW6eK5IvyqW
+	fnPJOJLEtMZXcrsjpN39yZuYwxilIU4qmM61G5m3aDK2M1rbn8upsck7OXpg/aRrkW0ICk
+	JKCGlsXfaCSvdcNWWk6yTOzpbCknyJ8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-KuCNJN3lOeyf1Y25qgGD_g-1; Wed, 23 Apr 2025 06:01:48 -0400
+X-MC-Unique: KuCNJN3lOeyf1Y25qgGD_g-1
+X-Mimecast-MFC-AGG-ID: KuCNJN3lOeyf1Y25qgGD_g_1745402507
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39979ad285bso2768589f8f.2
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 03:01:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745402507; x=1746007307;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LEa4Jm6UzeVd+a2A5Ueja4N+wKFxUkh/wMN5U9m9PM4=;
+        b=Lq+eMVLz8GdmelPlU43RyUlBHf4yKzs0x9w+cPLVh4xLjyRI4EA8c+qILCXeJaczba
+         IjA/3NQCpIKtTly4zH3gEx414sO/l6mbggspx6fS89VNEmbQNNywvQJ6Iu15PlDoPBP1
+         cXul+EWEeqvtmqSvqNV+DVQFswjYFEMa7WA4B1PpcQ6Y13ddRG9GD5KhxXRdESvKSVAO
+         Gf4bKZGsjDq3uZGhpYW+il+nGREr558IRKHlsxfpPw9cpby9Cd8H9xbU4Nos99AIAwQ6
+         sJzPzaA5OCLcMOiwEGfSOwuK5WtQN2hbmnKJnn1062YQCrfEOD2m/07VAN0bz1vT5QTW
+         PV6w==
+X-Gm-Message-State: AOJu0YzA5didHJ0sDnh63ZQhwWIxv586C9aMgGgp/l1pwXB7OLeHnUeb
+	kALx7skiizYa+3UYlbuUL4awzOmf8+RWnNBY3nFNT5i4sVApUvdUtpRpOfHLm0UwfScK9gp6oUX
+	8s5E1xNzqiJQH51xenZ6OrkXDz8mNrBot8x3+Qu0OsW2shfvDUxZ7Eg==
+X-Gm-Gg: ASbGncshxgCBdat2dt8OPMhlZwHIwJ0X676YsZl9NlZdLc8JnYpsrjKQCMepjs85rKE
+	EUiLX/7HYC4L0C6AiwAclMwCzoaXyK6pH+r2Gm5lgI6fLgdy6e8H8zu2eJXymiADtuq/e3PH7pL
+	NA/jp0X9rO3mAGfMM0EQpmZJ1wb9fmGpucNbPQu7b8Kb7Jhbqi+jo5z9EdVljdjbnYFOmcvl4ms
+	57o1S2PBRAzpN8eu0BNqoeG31Bm+pjhf4jjMlsNhIqRmN67eIQTIMlrRrUKJYw8WpUzhCtTZUVa
+	kHD0Ew==
+X-Received: by 2002:a5d:5f8a:0:b0:391:2bcc:11f2 with SMTP id ffacd0b85a97d-39efba2c924mr14032493f8f.1.1745402506825;
+        Wed, 23 Apr 2025 03:01:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH4G2U9kgv92X9sS4XHICgmED1HPmyDoyHHpcKYM/4QdqRwsN2Bs7wLbrqwJzV+WWUid8F8Ig==
+X-Received: by 2002:a5d:5f8a:0:b0:391:2bcc:11f2 with SMTP id ffacd0b85a97d-39efba2c924mr14032460f8f.1.1745402506426;
+        Wed, 23 Apr 2025 03:01:46 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4235dasm17963014f8f.9.2025.04.23.03.01.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 03:01:45 -0700 (PDT)
+Date: Wed, 23 Apr 2025 06:01:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David George <dgeorgester@gmail.com>
+Cc: netdev@vger.kernel.org, jasowang@redhat.com
+Subject: Re: Supporting out of tree custom vhost target modules
+Message-ID: <20250423060040-mutt-send-email-mst@kernel.org>
+References: <CA+Lg+WFYqXdNUJ2ZQ0=TY58T+Pyay4ONT=8z3LASQXSqN3A0VA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|DM4PR12MB6206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94813ddf-5037-42a8-1ab5-08dd824dab5f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?o/ho37P6CkmoUfHAEEwFJaFrkZ8Y43qrVrsOSExvSyaOqbKxYeUGkPlZdFDf?=
- =?us-ascii?Q?TCn5wtRKCmtSjeeGe2M7ekP0R/DYIYr8TRQy+IE9ZIWDJ0dhbPl9JjivJjIL?=
- =?us-ascii?Q?PsfrSSabBAj7iHE+IXVGP3kLtrS6tOK+Q4vhWU1DdDfoiEZQrly5PHrVjW2w?=
- =?us-ascii?Q?UEgka6hB3qp6cIzc2hnME05+V4i2jdCjTYoOJ7uQRqyL/CBl6NBu507M0Wx/?=
- =?us-ascii?Q?FQcJAsuIFrMk1NKuT+7AlyOhzqg1Zime4R/1r8VTI8fQZHLI/zwlxPWlV0VF?=
- =?us-ascii?Q?Cip2IxwKPiAI4E5R1m6lxX9gjC8tOQb2Q1MraWZj904etGYST3n9/C9HAlgI?=
- =?us-ascii?Q?QlRivWYzflFBFJwcReZu4iyfGqubetM1XyCCdA5TsUnxBWIjnQ+gAZZSZ2Um?=
- =?us-ascii?Q?Dtjve99AVQVedCLbFhApDEIDDClJ3mikXR6lChnVbpsIiO4hWwijnQ8vxoSR?=
- =?us-ascii?Q?gvAJTdqRWWAJTEOeuuKAULXPLbezXqdaCv7NbyuybsV6q9xXdZfQnXueF8o8?=
- =?us-ascii?Q?4gQUi0BryTRNWxIsnBp79tkW/e9Ghjy0lFAIfaz+hZqeZx+8kwSHlubsse4b?=
- =?us-ascii?Q?NB0WoVrJ2UrTsjYtLkYBKvd3InQ7WW5QuSPHxF8Zy4CYmS0vnEEBCku5BG21?=
- =?us-ascii?Q?EflV1mMXSrjrwgkjll0/T6PnnXqwbdz+FPSzFO0duKbNG5CzzVRgrqha/Asm?=
- =?us-ascii?Q?v38xUpO/JwAp7DyintndZso5tzimgal3w4MC5kMZdDykUHPV/i6DLJASwUVV?=
- =?us-ascii?Q?8/WIjQaF5yFQoAAuaWlcgycY1E2MrZ2xub/6cTKRJ/xjjtb+AxQ93mxPIDWK?=
- =?us-ascii?Q?IGYAcrx5I/NLr2VIoTYT5tK4IMlJkezKDAroGirli14cTAUcPxY4Ugb+zcrO?=
- =?us-ascii?Q?58nyPtYAz4LeqiCDu21ZRDZiyvlXp4Myddb4kMxjOpqBf8kFWCjchBw4RWR3?=
- =?us-ascii?Q?XTnno/vgWalX4yCpOKpDOKSVsYxvX7XFiAv6EQIFdQRSIr6EVADo/RYPSKJ/?=
- =?us-ascii?Q?X0HOVQ7JZbGzpFRDWe9IFXCF493brTVUmF7CNrdGszcIS8Nc36ZZL6JXdaHM?=
- =?us-ascii?Q?s5p3RhmuB37u+6FqHrll1msQDl0jCk0shsJ+Im6TDh3EAZgKdDHmO5Fsozbr?=
- =?us-ascii?Q?myHyy1N1WOXGEqtXpnpqS+IW1RVexnKzFCqwaWPyWkm3K4Px7AqUH122kAFb?=
- =?us-ascii?Q?PdpKi1eq7Aub1Tz5V1IAlndRhZ8Z0z3/Mp3m0jQ2gEPHG2IsxeULSqJ/YuLS?=
- =?us-ascii?Q?urlaOyRqbJMYUQDemDaWD7GTyr9F3ZNExXJcS5PWGC8YdCPHGfHx3xaWgyHo?=
- =?us-ascii?Q?Ngg5RTt9PyEee1Obb++6GxUq/S7PHO1Ti9ugLAbrXxBr+cuN9t9bP9XvlYNN?=
- =?us-ascii?Q?pooxC9TMH4zTCUtB0qrMKQOQY2tuv6NvKpdmPEekC+ZYEL18tKpoGUdSZGqY?=
- =?us-ascii?Q?gzjFQkEYmWs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?g2ATbPx8McPphDAWBVZrc87VhilrxhCwqtLullKQd3yyNuLgPZ689GmhnwPh?=
- =?us-ascii?Q?E0W5wHWZsCwCUE57kKEDCMRQfZubhxxXysWFalnCEvTa/CYDe4CaS5wnI21h?=
- =?us-ascii?Q?N4qb5ncihXwwcYPgO7MaHEvvr7uS+tXdNbMEu90x6brwF+D40FBDCB09PmZl?=
- =?us-ascii?Q?cvVy5XVCQtXvDfs7lBNfrLcPTpBpdoqe0OL5OxJGwldcXnvKRvv5E5Rz0e1D?=
- =?us-ascii?Q?I8t12BzwiBC4NMM28r+QS1z3/R3nA7XkucICtoMznyI5qaRVPMoG2xM0QQoi?=
- =?us-ascii?Q?WWKzIb5y4mQ9P7UtHoqwsxM/wLNcTUJSRbbyerQV58uTykS5MzyxEzlBwHEF?=
- =?us-ascii?Q?o4FqWN7dw9ydcDj3G8OeOdIb+64PtglDktV9Soc95mJiye4FJV6Q2o2HauCZ?=
- =?us-ascii?Q?UhtmABB6cNg6rpS+ehtgKyQaEJ8D4SSxJM9hilwFW41LzHN6ZPBHKcAI4ZlU?=
- =?us-ascii?Q?Up7ysP2QaWrbXSCekJMQcAqjCI45BE9C0aUlelpV1uiXvJBGcOi7VXx/kurP?=
- =?us-ascii?Q?VHWhoyM+10GNbAH98xCMGxSk2Lw4576U2x2ppTL/i0AmCrJ+uJlxhKPvMWGk?=
- =?us-ascii?Q?0Ls6zG4IeMvLFnNTds4Ku74sDyCWhCDO9t6Rc7Zn+uphC2pYeQRqCenDtCPW?=
- =?us-ascii?Q?QT5rpJfnJJYiBH6jVbL3j8lZARNsqbDEyRVPIRLAVQrqjwc6aYgCkDplAAI6?=
- =?us-ascii?Q?dR1dt7HAeTw/C2o7bdmoJz7uxfrL4lJK4moDckC1eEZWbYqQz38N/YW9XQm5?=
- =?us-ascii?Q?gSvDKp2Lu9n1daGKweoVz28bvlPFnHJY+1LQQY/fBKG02M8w+1/tlsH8qlne?=
- =?us-ascii?Q?c0K8PZLur8RZl8485UGCrf1UP6ifLcMAGcs7/bpHlcHNRC5ngYTZalQzEwBy?=
- =?us-ascii?Q?o1Zfv3BNZUzE2eDVtD25wzUWYKUbW2vlG43Bhkq3wEmF7hcBtdagp7+NrZUD?=
- =?us-ascii?Q?p8Qg1y4Fz0FqBq/ZhE779QFPpw8PFVzwiKwYv5jimKiDbZfbpRMtGoJGx8FY?=
- =?us-ascii?Q?L/G+FcnnvJFCt+f/hq8evlVI6RLTmmvUvoYC2Dxa8/8g3EkuAG3UsMXcagXT?=
- =?us-ascii?Q?ufiJMqf78W2913II3I/3xX33mDBjJ8mRJll84OZQohVMd7nBvkhRmnI1m9MJ?=
- =?us-ascii?Q?9qK8HZCjAG6K9UhsXtWzj/YQCjMm563a1Sd9b1ZFA6EqcrSswzob2cQRrS3s?=
- =?us-ascii?Q?npG2xkKVO1eD73Ski4EaPMYwQSCz81ACtU0Y2NFMxrxEFrY6L0MT/E8Yxabw?=
- =?us-ascii?Q?PGCcfAS3H90yQBTdq8lsKm1QkopExS7NXkiYY4rv3TtKgxYac1KuqPBwx/LY?=
- =?us-ascii?Q?CQGdik+qcS/MltHpStPliRPv6m/hhv56W2yHbwZ6eikLRDa0wonwxXaei+9a?=
- =?us-ascii?Q?nIdnO1AlfOsNAMBYRnGbKq42ls49bywpRzQ4gdBs3H6jmvWE/1u9lr/qudK2?=
- =?us-ascii?Q?w4TwA9qG+ddvDN3Ce5zUSnYkAhiTVqUQrs8nGUb/hxvUpKQl2Ot0388Fa6va?=
- =?us-ascii?Q?ArzjqRWM0Jucx6yJOkp0tbG2qjiMV8visw4Wz36sihTU2nY0RoYvInPmbXJ/?=
- =?us-ascii?Q?hGd9uw147XSVKB4/VcSvPSpzxrwpWsTdBJveNBnw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94813ddf-5037-42a8-1ab5-08dd824dab5f
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2025 10:00:25.8873
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9oeVqhO5tHtMomwrNAY1YT+5PWTILZV6DCzB6ljpm0fCp+cuWOrH4KXK25EKU7lWQTCkYdeMJiayQFSHA/azwg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6206
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+Lg+WFYqXdNUJ2ZQ0=TY58T+Pyay4ONT=8z3LASQXSqN3A0VA@mail.gmail.com>
 
-On Mon, Apr 21, 2025 at 03:28:24PM -0700, Jakub Kicinski wrote:
-> Move the rx-buf-len config validation to the queue ops.
+On Wed, Apr 23, 2025 at 11:47:49AM +0200, David George wrote:
+> Hello all
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 40 +++++++++++++++++++
->  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 12 ------
->  2 files changed, 40 insertions(+), 12 deletions(-)
+> I am in the process of writing an out of tree kernel module that does a very
+> similar job to vhost_net.  The problem is that plain tap devices aren't quite
+> going to cover what I want to do (1:N device mapping and various exotic
+> offloads).
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 43497b335329..a772ffaf3e5b 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -16052,8 +16052,46 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
->  	return 0;
->  }
->  
-> +static int
-> +bnxt_queue_cfg_validate(struct net_device *dev, int idx,
-> +			struct netdev_queue_config *qcfg,
-> +			struct netlink_ext_ack *extack)
-> +{
-> +	struct bnxt *bp = netdev_priv(dev);
-> +
-> +	/* Older chips need MSS calc so rx_buf_len is not supported,
-> +	 * but we don't set queue ops for them so we should never get here.
-> +	 */
-> +	if (qcfg->rx_buf_len != bp->rx_page_size &&
-> +	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
-> +		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!is_power_of_2(qcfg->rx_buf_len)) {
-> +		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len is not power of 2");
-> +		return -ERANGE;
-> +	}
-> +	if (qcfg->rx_buf_len < BNXT_RX_PAGE_SIZE ||
-> +	    qcfg->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
-> +		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range");
-> +		return -ERANGE;
-> +	}
-> +	return 0;
-> +}
-> +
-HDS off and rx_buf_len > 4K seems to be accepted. Is this inteded?
+> The approach I am taking at the moment is to tweak vhost/net.c to suit my needs
+> and operate it as an out of tree module. The problem with this approach is the
+> "vhost.h" is not in include/ so won't be usable without the whole source tree
+> to compile against.
+> 
+> Is promoting vhost.h from drivers/vhost to include/xyz/ something that could be
+> considered?
+> 
+> Alternatively, what I want to do could perhaps be done through an API to
+> register a custom socket associated with a custom misc dev within vhost_net,
+> but that is a lot more invasive.
+> 
+> Thanks,
+> David George
 
-> +static void
-> +bnxt_queue_cfg_defaults(struct net_device *dev, int idx,
-> +			struct netdev_queue_config *qcfg)
-> +{
-> +	qcfg->rx_buf_len	= BNXT_RX_PAGE_SIZE;
-> +}
-> +
->  static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
->  	.ndo_queue_mem_size	= sizeof(struct bnxt_rx_ring_info),
-> +
-> +	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
-> +	.ndo_queue_cfg_validate = bnxt_queue_cfg_validate,
->  	.ndo_queue_mem_alloc	= bnxt_queue_mem_alloc,
->  	.ndo_queue_mem_free	= bnxt_queue_mem_free,
->  	.ndo_queue_start	= bnxt_queue_start,
-> @@ -16061,6 +16099,8 @@ static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
->  };
->  
->  static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops_unsupp = {
-> +	.ndo_queue_cfg_defaults	= bnxt_queue_cfg_defaults,
-> +	.ndo_queue_cfg_validate = bnxt_queue_cfg_validate,
->  };
->  
->  static void bnxt_remove_one(struct pci_dev *pdev)
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index 956f51449709..8842390f687f 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -867,18 +867,6 @@ static int bnxt_set_ringparam(struct net_device *dev,
->  	if (!kernel_ering->rx_buf_len)	/* Zero means restore default */
->  		kernel_ering->rx_buf_len = BNXT_RX_PAGE_SIZE;
->  
-> -	if (kernel_ering->rx_buf_len != bp->rx_page_size &&
-> -	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
-> -		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
-> -		return -EINVAL;
-> -	}
-> -	if (!is_power_of_2(kernel_ering->rx_buf_len) ||
-> -	    kernel_ering->rx_buf_len < BNXT_RX_PAGE_SIZE ||
-> -	    kernel_ering->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
-> -		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range, or not power of 2");
-> -		return -ERANGE;
-> -	}
-> -
->  	if (netif_running(dev))
->  		bnxt_close_nic(bp, false, false);
->  
-> -- 
-> 2.49.0
->
+See no good reason for that, that header is there so modules outside
+of vhost don't use it by mistake.
 
-Thanks,
-Dragos
 
