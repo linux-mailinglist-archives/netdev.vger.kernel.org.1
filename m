@@ -1,169 +1,152 @@
-Return-Path: <netdev+bounces-185035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7B5A98490
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:01:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C99A5A984C7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB7F37A976B
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:00:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BC061B66B61
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3511F2B8E;
-	Wed, 23 Apr 2025 09:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF7425CC48;
+	Wed, 23 Apr 2025 09:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b="UbWrAVwp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="muouxeg3"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="jHhglhXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528001F4725
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 09:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B79625C820;
+	Wed, 23 Apr 2025 09:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745398899; cv=none; b=IpKxTCDxtTeonaGx/qMkl9L5i2RG9FWS6o5s83GQMO12qW04fp4KrGvZDi0MaMMM7w6iuNPF5s0PKpFpAcJ7BFQfBCnfj5f+A/r8glvSKmfErPvlmDIRrm1bUffMsG2TPDYITgcS3NrsIQBns5NgMx4CGUAsh41p4sJMImvVJkY=
+	t=1745399078; cv=none; b=HwLVf3HaGt11J3PhKwCbp6j2zTmRbauxg8a7/Rtj14jg8p/v3gc8NCTErPZQ7Q7eWyMcHvpl1Vb8aKptCL4DNlvGBrFSQivwJXmGGWyFXhnvlJOeWBORNLGnWX2OJquhhqUfSG3IOtx5bPfkDsLF50B45X86F6GwtFyU37xScnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745398899; c=relaxed/simple;
-	bh=BW7t9jNayRBf1ClggMJtd3Fp6+ccv9CeKKDviPbFIvQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=G7xywhJ+pFq3GgZGArhTaB0/ivEzTs+Vdnj+1RiRoQENAS1DXhOzDJEzRp6f5RaaRjaNViQoLOE5SATC8+LcNZttJ+AzkDddcGKHylPgwd3qTfVq8XQ4h697pyKM39CVa3sRwsb6rjcQRx3+p7xKCFqii8BWkKLT45heNrMWJuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au; spf=pass smtp.mailfrom=traverse.com.au; dkim=pass (2048-bit key) header.d=traverse.com.au header.i=@traverse.com.au header.b=UbWrAVwp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=muouxeg3; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=traverse.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=traverse.com.au
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 2AE2625401C2;
-	Wed, 23 Apr 2025 05:01:35 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-01.internal (MEProxy); Wed, 23 Apr 2025 05:01:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=traverse.com.au;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1745398895; x=1745485295; bh=6rYiYxza8OupvFSqvlyUYjwG0PLM/T6t
-	h/eLY3q8+V0=; b=UbWrAVwp6+3tHv4dVYXzafE8OXvFGiofevVO30MPlN+ghajb
-	UIMmumAMqG6XYMmkp326WuVsmAQ2v7nu6quxehGti1mpISbfQLxtYbDxe53W8m1Z
-	BGWZ1oREOORbbxJ+TA79XiJrtAs3A3M1cjY03MsVOSKUyRoB6nVH6/irduX8JNiK
-	P0GN+DGPu4/UAJdH+babo/MUMjSTxMii2y4rrpg+qNYt3SgPK/8Okq+sUEadQw7U
-	mBSqf+VwTZUMS8LcDgT38bvC3tndp3LeYUdNpRa3Ax1m9bCnZIp2p+GVJLQ2adkq
-	DlfWUdZz8AJJIP60PqqF2GBDFd/lH54/XTGjlQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1745398895; x=
-	1745485295; bh=6rYiYxza8OupvFSqvlyUYjwG0PLM/T6th/eLY3q8+V0=; b=m
-	uouxeg3DLwsR4JXP1l4P6eYN49rF84EzyanNxjGBC3vqxNTFdZyajKtFOJrr79rq
-	Cl/SaF8H+xCfd3JEIyvmtrHZYcOlDjFFVirjTbJlZIH9OCBSsSLnsOSXze9Sd5TS
-	b72F7ttKw1drAeN41SbY9ZkPKQTXYkrRQnamGr4/jZltyOQP/ztsRGVH+2w3Dmcm
-	xQgY2suxsvHezVei04wT8ZsOQtxjLSE8b5YsSEsZ5CqcB0rHAcajIyKl72xrEEth
-	14q21aIIkJmPo3dtAbhfA/lSo8zt/4JaurfqlcFnUjrn+fRfeYmSVf0uWOvMxvCR
-	dgwKfGbFgO6KSuQrUxMWA==
-X-ME-Sender: <xms:bqwIaOxf2wpgrNlQnv6Hwo9s0YAHXO_wTj2Z70zFgPKo3YExfKrP2Q>
-    <xme:bqwIaKT7GxWxlEnYkESW5y6N3KSBdWFf2epI6FBDW-9oX7DVUmb1Q1YKisfpSzIuK
-    AWhWv_diZUYtdTCkgU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeiudekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
-    tddtnecuhfhrohhmpedfofgrthhhvgifucfotgeurhhiuggvfdcuoehmrghtthesthhrrg
-    hvvghrshgvrdgtohhmrdgruheqnecuggftrfgrthhtvghrnheptdelgfeiudelgeevgedv
-    teegvdehtddvheeigeelgeegveetleetheffgfejgfeinecuffhomhgrihhnpehtrhgrvh
-    gvrhhsvgdrtghomhdrrghupdgrrhhmlhhinhhugidrohhrghdruhhknecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrthhtsehtrhgrvhgvrh
-    hsvgdrtghomhdrrghupdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtth
-    hopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohephhhkrghllhif
-    vghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhogh
-    hlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheprhgvghhrvghsshhiohhnsheslhhishhtshdrlhhinhhugidruggvvhdprhgtphhtth
-    hopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehiohgrnhgrrdgtihhorhhn
-    vghisehngihprdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:bqwIaAXVj0tt7LWwTsWq4a27SWmSbkFfECWyM6GvCqc4rFCLXwy5lg>
-    <xmx:bqwIaEidH2FGedOytoSeIiMuwROo8byXZ9Vxwtj8YxRG4PuBjUdNQA>
-    <xmx:bqwIaABsaGxInNEqMjJroFK4HQgwO-NOk6WntKmnRbZkBBYztLk9VQ>
-    <xmx:bqwIaFKYZApBaz_KYcFncWrNDytwnAFmRUexDH2tE4B0nXgfqHU6tQ>
-    <xmx:b6wIaLV-7LNNYaJKvPprmYFG7MqLrOgMg8ng-tEDnDcfHDuCbDb-XhI9>
-Feedback-ID: i426947f3:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 70ADA78006C; Wed, 23 Apr 2025 05:01:34 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1745399078; c=relaxed/simple;
+	bh=Scv61BPn1S5NCIrOFvABukt5YWGju5wHJrpfJQ5MtTs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FfZwY4Hf/TUqmqdWyWilhnJU3Fr4Lx58f53PHb2zma60mG7XxgaMglMZOxxy3I4TK5fIhbfWRUNSsMQj1PAyBU/YCMbvZaHxjOnyUeGlRk0F/AeuCqWi867qajhuPu18mxwcmWBGYbk7CYw3neaA4gcTq5yjzTSytMcSYp/nGhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=jHhglhXv; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N93fQA3189218
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 23 Apr 2025 02:03:42 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N93fQA3189218
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745399025;
+	bh=u0XOm4Pe1y26VX9KraE8lCfVMIhih5CUvlEon/+N7r8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jHhglhXvhVyTJ9jbGbBEsLpKKKBonwgJfuJebJkfdM2ZVf587fR3O1LmBPaAX8A+7
+	 Y/kQ8sy1SWT03AqNGStd9X6lus78yvsubZ9m4m+1Q78rLFEGgbDfDd5TAdwoyWFOo7
+	 QE2PAqjPMr7Nf9QsR+7zMCqsy41tHPFwJQOXdldXH4Uef0v3MZmMgxjyvQfzSoLRiS
+	 nHnSLuwIeibOtU52hStVUmkHsV08RKi82jG7O+XUZkO1n+JM2syhx8Jp+OwjcGZBEa
+	 gS0TDoUjBiODs26vxsCih9QvNtT077p8SGL+iciRZQ/Xtdur9QA3BHiJOB0btfGNTu
+	 cVHFdG56BYXAQ==
+Message-ID: <7899fcd9-3492-49d3-8097-a3ddefaaeef0@zytor.com>
+Date: Wed, 23 Apr 2025 02:03:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: T7d5bb7b82feda5d9
-Date: Wed, 23 Apr 2025 19:01:02 +1000
-From: "Mathew McBride" <matt@traverse.com.au>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "Ioana Ciornei" <ioana.ciornei@nxp.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
- "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit" <hkallweit1@gmail.com>,
- regressions@lists.linux.dev
-Message-Id: <f7eac1d6-34eb-4eba-937d-c6624f9a6826@app.fastmail.com>
-In-Reply-To: <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
-References: <Z1F1b8eh8s8T627j@shell.armlinux.org.uk>
- <E1tJ8NM-006L5J-AH@rmk-PC.armlinux.org.uk>
- <025c0ebe-5537-4fa3-b05a-8b835e5ad317@app.fastmail.com>
- <aAe94Tkf-IYjswfP@shell.armlinux.org.uk>
-Subject: Re: [REGRESSION] net: pcs-lynx: 10G SFP no longer links up
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 22/34] x86/msr: Utilize the alternatives mechanism
+ to read MSR
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-23-xin@zytor.com>
+ <080351cb-6c3d-4540-953d-6205f1ff0745@suse.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <080351cb-6c3d-4540-953d-6205f1ff0745@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-On Wed, Apr 23, 2025, at 2:03 AM, Russell King (Oracle) wrote:
-> On Fri, Apr 18, 2025 at 01:02:19PM +1000, Mathew McBride wrote:
-> > #regzbot introduced: 6561f0e547be221f411fda5eddfcc5bd8bb058a5
-> > 
-> > Hi Russell,
-> > 
-> > On Thu, Dec 5, 2024, at 8:42 PM, Russell King (Oracle) wrote:
-> > > Report the PCS in-band capabilities to phylink for the Lynx PCS.
-> > > 
-> > 
-> > The implementation of in-band capabilities has broken SFP+ (10GBase-R) mode on my LS1088 board.
-> > The other ports in the system (QSGMII) work fine.
+On 4/22/2025 4:12 AM, Jürgen Groß wrote:
+>> +
+>> +static __always_inline bool __rdmsrq(u32 msr, u64 *val, int type)
+>> +{
+>> +    bool ret;
+>> +
+>> +#ifdef CONFIG_XEN_PV
+>> +    if (cpu_feature_enabled(X86_FEATURE_XENPV))
+>> +        return __xenpv_rdmsrq(msr, val, type);
 > 
-> Thanks for the report.
+> I don't think this will work for the Xen PV case.
 
-Thanks Russell!
+Well, I have been testing the code on xen-4.17 coming with Ubuntu
+24.04.2 LTS :)
 
-The diff below does fix the problem, 10G SFP's now link up again.
-
-I should note that Alex Guzman was the one who originally reported the issue to me, he has also confirmed this diff resolves the issue.
-Link: https://forum.traverse.com.au/t/sfp-ports-stop-working-with-linux-6-14-in-arch-linux/1076/4
-
-> Please try the diff below:
 > 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 1bdd5d8bb5b0..2147e2d3003a 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -3624,6 +3624,15 @@ static int phylink_sfp_config_optical(struct phylink *pl)
-> phylink_dbg(pl, "optical SFP: chosen %s interface\n",
->     phy_modes(interface));
->  
-> + /* GBASE-R interfaces with the exception of KR do not have autoneg at
-> + * the PCS. As the PCS is media facing, disable the Autoneg bit in the
-> + * advertisement.
-> + */
-> + if (interface == PHY_INTERFACE_MODE_5GBASER ||
-> +     interface == PHY_INTERFACE_MODE_10GBASER ||
-> +     interface == PHY_INTERFACE_MODE_25GBASER)
-> + __clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, config.advertising);
-> +
-> if (!phylink_validate_pcs_inband_autoneg(pl, interface,
-> config.advertising)) {
-> phylink_err(pl, "autoneg setting not compatible with PCS");
+> X86_FEATURE_XENPV is set only after the first MSR is being read.
+
+No matter whether the code works or not, good catch!
+
 > 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
+> This can be fixed by setting the feature earlier, but it shows that the
+> paravirt feature has its benefits in such cases.
+
+See my other reply to let Xen handle all the details.
+
+Plus the code actually works, I would actually argue the opposite :-P
+
+
+
 
