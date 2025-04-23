@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-185321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1915A99C3F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:51:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 127DFA99C42
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 01:51:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D863ABB50
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:51:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356CD1B808BD
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603E5242D7A;
-	Wed, 23 Apr 2025 23:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA3C244673;
+	Wed, 23 Apr 2025 23:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="rFXobRAo"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="BTMzqnDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E914521FF28
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 23:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46987238C1E
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 23:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745452290; cv=none; b=F/g+C+RTTWPIpAQBC8JuPIJJPr/IfKVFQFs6mdun/nKf3SPUtFN1//5jrVXYx66kaRSechP/a09VOOk3mZ1Vw9E4yLjmVtfj8Q7yN8FjpzyWGsPYHB9K6NkLyJbVjDNLAilQk51MVfezYyJZNzci541pqmokd7zgPz8VKsLAOFo=
+	t=1745452291; cv=none; b=f4myWLKXrRH9UZiEtBamLSc/MoP2dRnSkiaZv21ne/9fN9ZkLbzysFYC2ngb4sLqZ+sRquC3d4L6HXZBP+qOiuvprhs7B62Di7br514NtFUmqRiShhv0/Scw47aBIDuB1aMZjuV6gzkzGKPg8081ZbH5lQLoUoaEfpsQfoSsYvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745452290; c=relaxed/simple;
-	bh=FvoiZo8CsQW0GPXAIiATIYaWqN8/nCTt141sKLDXks4=;
+	s=arc-20240116; t=1745452291; c=relaxed/simple;
+	bh=FBj7LZvfNV2C2B/oOGS6wGyUDLX8RKZiFkdPqgHg2rE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nfED4Y0m4iCw9GkeEpKP8P40sZzxHai6+qq9OqFpUznAnaqjP/NcCuuxkpa+2doPwVjbDPUGwvzfM0VJq45lh2kbEJAbNJRAUWr00ypnjh7EOTr7GezYRL0oSOCyeDqovcBypbuLvmCPi2q5K28GaWquPXjYNpnQOPuw2bgyeSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=rFXobRAo; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=Zc1o9Q5eTjidhpj5Qp61MGx8iThdoidPtAFUxgdsCCMlfMWGJn2JXvUySRZtLTkeEFnCzyhhUH8k+CIN9HbztxwQqGJoXBf8fjBsfHYxBvS5gpWseP0rXHLMCxZ6EKUPBSyWOXG6Hq0hFC3jAXis5q0R5J3CpXVJOMuDMuSQoag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=BTMzqnDS; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22403c99457so770115ad.3
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 16:51:28 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2240b4de10eso723185ad.1
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 16:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1745452288; x=1746057088; darn=vger.kernel.org;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1745452289; x=1746057089; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8T6hDhDL07Ig6e5imc6Py5jYi0Q9TXugskoJKEqglC8=;
-        b=rFXobRAo9Veuz4M9cQXAlNUiDRPg8N281ifgb77de6foU7X/+NYyNwCBbHk6/8Z4sq
-         dIdfTgM/4+jgY/ov+Nr6mbHdi0zA3/z+R0xMECK1U+79hxbPGcfwJwGdlYKfO3QX89GV
-         ZNakRegm0AELqMkC4chAo9HZVTVWfgB5xEpc6Ahcx7DsZ0Hmn+CM+0Ae2XmewzwGtnco
-         W/8o6OQ7MYtrBoco+zj9sGW9FyABmNX/Q7kaqFELG/Y3NJMcTjtGa2W16IgDzb9gfc7G
-         FxMZGKe1TZwXxrtrWzyI48toWDFkA3QsTGWRKVkO0/wqf43eBc2OItPTysdnfu5P6LtL
-         Xtjw==
+        bh=Nu1ma7oh32WGDFCcqk3JijchsOGs9eeCKBsDLWEj1bM=;
+        b=BTMzqnDSmjt3obzPBBseHcyEda3j+NkY7n9FT8MAcKF5czung8C1sFgZBSWC0vnlFD
+         bmfVyMvdT0Ok8HMw1tGDFWZt/tcyPMpEquRnpqTdYlUMf+6xxkxd7TZGGafghDDDvoNr
+         kIEll6ySvqOn3ZlGWM7S8RIpW6cXwj9mOEGw8AQOESh6tQXFZUyud8H7XjEc2V815KhX
+         nLTme0I+Vf0ZvmVf9JBi+/LVZd8t6MRiklkfafgpemmwIZdP6Or0DuZBslIJSgVmz1tx
+         3kDIvc+rycn90nzHOZOWQM69snlIBlkyKtULFdaQt6CuVb9jd2TLinoMcZn+bQuWuIlI
+         QWIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745452288; x=1746057088;
+        d=1e100.net; s=20230601; t=1745452289; x=1746057089;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8T6hDhDL07Ig6e5imc6Py5jYi0Q9TXugskoJKEqglC8=;
-        b=fUt6Lm6ij/Zqvb+65cyYqXNZ7sHIeD2XcWopI4sztU0S3MJrl8OPsS59QdTY9+8xIW
-         lv3lNekJ7vefL7U13fzKbuHHeBAQaT3kQIwMNXNHpnTev/RIQbECUloRVAwKLILQ6cfu
-         8uxuiXs54iZx/tAOEy8tTMlp/G6WdZu5rMyuMrbuHzom4DMayt2oOIwloZe1OdERIaDY
-         FvoIA6PlMI11v9bJSSQ7jsM+zx+8/jdE5YFOS58tKXI0Nh89flTW1svfpZERmOq+XqHZ
-         nBRjX1ApPiDIlihRNBbY0TahUqvSCorDp3cQ2L0QqLUl/UkcrTIt844yr4PlNWXhLNaY
-         ZbfA==
-X-Gm-Message-State: AOJu0YxDu0n1PTJNyQgBBsxUnFwnSSuuwiNVye+5+pUOp/QSllFvEl19
-	YXBHgYN6SPIVgv2DNqIyp3QlPblQNw7eY4nT4r0KHnlssfiiwawRQMw49iQXYp3GmAMvfDFo1oN
-	cPHI=
-X-Gm-Gg: ASbGncsLELq6fvG2kilgRnV5veWEpoS9ixtf7zh8tcFvD/3qvH5ORcgxr62r25ggngj
-	4xw0A5qX9CH2VPOtlTyI8GqDacVvUm/c5QtjfAkOrRMIjHLplrP5172I9clrgg199JOVMdp/E6C
-	9MIATgLBJRXsAU366GCm4zOVW8I/a+xP+p1PVPrGHqMul3Ti40mCOTeFhTUbzbcCTBfuVr5CtDX
-	APU0cHnojs8B7IHqZ4O56SCYdjLO4Xq/TcMx/6Zw7s7iKzk9xRK6Ti9cwQfTVMFMpKade/qV+nF
-	oroRUpEB6ZYwVCv1hIMpjUzzdtVd8g==
-X-Google-Smtp-Source: AGHT+IEyGRyxFGq4bQ617nWX+ar/YlqkpHG2LTnFNSv2adeU33TxrPM3w/oazKd8EtAl2do0qnCXDw==
-X-Received: by 2002:a17:902:f541:b0:212:48f0:5b6f with SMTP id d9443c01a7336-22db3d72cbcmr1907505ad.9.1745452287851;
-        Wed, 23 Apr 2025 16:51:27 -0700 (PDT)
+        bh=Nu1ma7oh32WGDFCcqk3JijchsOGs9eeCKBsDLWEj1bM=;
+        b=WRpTm5gwDXh4cueFuZ5qTndUjFR++UnRTDgRlF9TbV96mbfxJow3R4pjAB6qZLg54D
+         Kr5zrowLipVqkMxFrbpmrsfq/lfukhrFieghizFSa+S5n4c8wVmEJ4PYOX0OK+AD2mJS
+         E9HFFF7RWddMykuerJbKv4ksMwMzCJJJaqO9QJAy5ldULLn0HVxM4dU0SCnlPwCWhvcQ
+         8WKnyxTPpES5qJhWIaUNCt4guRxq9k3SRgulzSe9rU/ovq/+ahlM9SAyMuRSGUYm+os0
+         VWwp1+9Y8sMo2vskhWpK1xIYnXn3gKye6mEUL6JIek9bAMhEzjIr40mqykWGAmYAy7yo
+         MZhQ==
+X-Gm-Message-State: AOJu0Yynpf/g3wIbzabnywt6HT3Q+MxF1eIPs2I58wxsqIABFo6XrzmN
+	3mm9zxohLaXOq/+6z2XDiOnZ4oXKz6YJZ7Fu9ESDKmyzEaraIInBzJdpARYjQeYNqqBDt7dtZke
+	FuhA=
+X-Gm-Gg: ASbGncsGznJlnjPQrsctVE++PjKJIw8/kZeL0/xkK/+DEYQPBFefaNf9VQlGlU/vMDs
+	hlRiGU+iK2/XmixvkKUKzDtgZNn+n+rSdo0KSbtARWdD4qh1gQJR0Uuo/0UfL2W913PAJ547gJn
+	+xcfhpuXF3gF6/NPmcLh2RFhgEEk1ZyarcuF13kV0QtRPKy9dIO8SQp0Hwyjm9oP4dkhJADe3b0
+	56086cTzjmgKosBTyRXdhkwZqCrkUqX8LYhJmljZ9nJ68uWPYwRUIrbLQjEue/+475K3eGv3Pk0
+	j9gZrKOqFGb2SDbWBHunIV/Yh45QcVsu1in5iwjO
+X-Google-Smtp-Source: AGHT+IEBr7R4hUlvqm1XZ6RC0wMA10N6hNOWvSsEtC5k7HY9kXTwQ3suKQEksBOg8YD9rvFAGxny5A==
+X-Received: by 2002:a17:902:cecc:b0:21d:cdb7:876c with SMTP id d9443c01a7336-22db3bb9e87mr2350345ad.3.1745452289274;
+        Wed, 23 Apr 2025 16:51:29 -0700 (PDT)
 Received: from t14.. ([2001:5a8:4528:b100:f4b1:8a64:c239:dca3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76cfasm499175ad.47.2025.04.23.16.51.26
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76cfasm499175ad.47.2025.04.23.16.51.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 16:51:27 -0700 (PDT)
+        Wed, 23 Apr 2025 16:51:28 -0700 (PDT)
 From: Jordan Rife <jordan@jrife.io>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org
@@ -81,9 +81,9 @@ Cc: Jordan Rife <jordan@jrife.io>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [PATCH v5 bpf-next 1/6] bpf: udp: Make mem flags configurable through bpf_iter_udp_realloc_batch
-Date: Wed, 23 Apr 2025 16:51:09 -0700
-Message-ID: <20250423235115.1885611-2-jordan@jrife.io>
+Subject: [PATCH v5 bpf-next 2/6] bpf: udp: Make sure iter->batch always contains a full bucket snapshot
+Date: Wed, 23 Apr 2025 16:51:10 -0700
+Message-ID: <20250423235115.1885611-3-jordan@jrife.io>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250423235115.1885611-1-jordan@jrife.io>
 References: <20250423235115.1885611-1-jordan@jrife.io>
@@ -95,62 +95,199 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prepare for the next patch which needs to be able to choose either
-GFP_USER or GFP_ATOMIC for calls to bpf_iter_udp_realloc_batch.
+Require that iter->batch always contains a full bucket snapshot. This
+invariant is important to avoid skipping or repeating sockets during
+iteration when combined with the next few patches. Before, there were
+two cases where a call to bpf_iter_udp_batch may only capture part of a
+bucket:
+
+1. When bpf_iter_udp_realloc_batch() returns -ENOMEM [1].
+2. When more sockets are added to the bucket while calling
+   bpf_iter_udp_realloc_batch(), making the updated batch size
+   insufficient [2].
+
+In cases where the batch size only covers part of a bucket, it is
+possible to forget which sockets were already visited, especially if we
+have to process a bucket in more than two batches. This forces us to
+choose between repeating or skipping sockets, so don't allow this:
+
+1. Stop iteration and propagate -ENOMEM up to userspace if reallocation
+   fails instead of continuing with a partial batch.
+2. Retry bpf_iter_udp_realloc_batch() two times without holding onto the
+   bucket lock (hslot2->lock) so that we can use GFP_USER and maximize
+   the chances that memory allocation succeeds. On the third attempt, if
+   we still haven't been able to capture a full bucket snapshot, hold
+   onto the bucket lock through bpf_iter_udp_realloc_batch() to
+   guarantee that the bucket size doesn't change while we allocate more
+   memory and fill the batch. On the last pass, we must use GFP_ATOMIC
+   since we hold onto the spin lock.
+
+Introduce the udp_portaddr_for_each_entry_from macro and use it instead
+of udp_portaddr_for_each_entry to make it possible to continue iteration
+from an arbitrary socket. This is required for this patch in the
+GFP_ATOMIC case to allow us to fill the rest of a batch starting from
+the middle of a bucket and the later patch which skips sockets that were
+already seen.
+
+Testing all scenarios directly is a bit difficult, but I did some manual
+testing to exercise the code paths where GFP_ATOMIC is used and where
+where ERR_PTR(err) is returned. I used the realloc test case included
+later in this series to trigger a scenario where a realloc happens
+inside bpf_iter_udp_batch and made a small code tweak to force the first
+two realloc attempts to allocate a too-small buffer, thus requiring
+another attempt until the GFP_ATOMIC case is hit. Some printks showed
+three reallocs with the tests passing:
+
+Apr 16 00:08:32 crow kernel: go again (mem_flags=GFP_USER)
+Apr 16 00:08:32 crow kernel: go again (mem_flags=GFP_USER)
+Apr 16 00:08:32 crow kernel: go again (mem_flags=GFP_ATOMIC)
+
+With this setup, I also forced bpf_iter_udp_realloc_batch to return
+-ENOMEM on one of the retries to ensure that iteration ends and that the
+read() in userspace fails and incremented batch_sks to hit the
+WARN_ON_ONCE condition.
+
+[1]: https://lore.kernel.org/bpf/CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com/
+[2]: https://lore.kernel.org/bpf/7ed28273-a716-4638-912d-f86f965e54bb@linux.dev/
 
 Signed-off-by: Jordan Rife <jordan@jrife.io>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
 ---
- net/ipv4/udp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ include/linux/udp.h |  3 +++
+ net/ipv4/udp.c      | 62 ++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 50 insertions(+), 15 deletions(-)
 
+diff --git a/include/linux/udp.h b/include/linux/udp.h
+index 0807e21cfec9..a69da9c4c1c5 100644
+--- a/include/linux/udp.h
++++ b/include/linux/udp.h
+@@ -209,6 +209,9 @@ static inline void udp_allow_gso(struct sock *sk)
+ #define udp_portaddr_for_each_entry(__sk, list) \
+ 	hlist_for_each_entry(__sk, list, __sk_common.skc_portaddr_node)
+ 
++#define udp_portaddr_for_each_entry_from(__sk) \
++	hlist_for_each_entry_from(__sk, __sk_common.skc_portaddr_node)
++
+ #define udp_portaddr_for_each_entry_rcu(__sk, list) \
+ 	hlist_for_each_entry_rcu(__sk, list, __sk_common.skc_portaddr_node)
+ 
 diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 2742cc7602bb..6a3c351aa06e 100644
+index 6a3c351aa06e..0960e42f2d2c 100644
 --- a/net/ipv4/udp.c
 +++ b/net/ipv4/udp.c
-@@ -3401,7 +3401,7 @@ struct bpf_udp_iter_state {
- };
+@@ -3383,6 +3383,7 @@ int udp4_seq_show(struct seq_file *seq, void *v)
+ }
  
- static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
--				      unsigned int new_batch_sz);
-+				      unsigned int new_batch_sz, int flags);
- static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
- {
- 	struct bpf_udp_iter_state *iter = seq->private;
-@@ -3477,7 +3477,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
- 		iter->st_bucket_done = true;
- 		goto done;
+ #ifdef CONFIG_BPF_SYSCALL
++#define MAX_REALLOC_ATTEMPTS 2
+ struct bpf_iter__udp {
+ 	__bpf_md_ptr(struct bpf_iter_meta *, meta);
+ 	__bpf_md_ptr(struct udp_sock *, udp_sk);
+@@ -3410,8 +3411,9 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+ 	int resume_bucket, resume_offset;
+ 	struct udp_table *udptable;
+ 	unsigned int batch_sks = 0;
+-	bool resized = false;
+ 	struct sock *sk;
++	int resizes = 0;
++	int err = 0;
+ 
+ 	resume_bucket = state->bucket;
+ 	resume_offset = iter->offset;
+@@ -3439,11 +3441,14 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+ 		struct udp_hslot *hslot2 = &udptable->hash2[state->bucket].hslot;
+ 
+ 		if (hlist_empty(&hslot2->head))
+-			continue;
++			goto next_bucket;
+ 
+ 		iter->offset = 0;
+ 		spin_lock_bh(&hslot2->lock);
+-		udp_portaddr_for_each_entry(sk, &hslot2->head) {
++		sk = hlist_entry_safe(hslot2->head.first, struct sock,
++				      __sk_common.skc_portaddr_node);
++fill_batch:
++		udp_portaddr_for_each_entry_from(sk) {
+ 			if (seq_sk_match(seq, sk)) {
+ 				/* Resume from the last iterated socket at the
+ 				 * offset in the bucket before iterator was stopped.
+@@ -3460,10 +3465,34 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+ 				batch_sks++;
+ 			}
+ 		}
++
++		if (unlikely(resizes == MAX_REALLOC_ATTEMPTS) && iter->end_sk &&
++		    iter->end_sk != batch_sks) {
++			/* This is the last realloc attempt, so keep holding the
++			 * lock to ensure that the bucket does not change.
++			 */
++			err = bpf_iter_udp_realloc_batch(iter, batch_sks,
++							 GFP_ATOMIC);
++			if (err) {
++				spin_unlock_bh(&hslot2->lock);
++				return ERR_PTR(err);
++			}
++
++			sk = iter->batch[iter->end_sk - 1];
++			sk = hlist_entry_safe(sk->__sk_common.skc_portaddr_node.next,
++					      struct sock,
++					      __sk_common.skc_portaddr_node);
++			batch_sks = iter->end_sk;
++			resizes++;
++			goto fill_batch;
++		}
++
+ 		spin_unlock_bh(&hslot2->lock);
+ 
+ 		if (iter->end_sk)
+ 			break;
++next_bucket:
++		resizes = 0;
  	}
--	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2)) {
-+	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
-+						    GFP_USER)) {
- 		resized = true;
- 		/* After allocating a larger batch, retry one more time to grab
- 		 * the whole bucket.
-@@ -3831,12 +3832,12 @@ DEFINE_BPF_ITER_FUNC(udp, struct bpf_iter_meta *meta,
- 		     struct udp_sock *udp_sk, uid_t uid, int bucket)
  
- static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
--				      unsigned int new_batch_sz)
-+				      unsigned int new_batch_sz, int flags)
- {
- 	struct sock **new_batch;
+ 	/* All done: no batch made. */
+@@ -3475,18 +3504,18 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+ 		 * socket to be iterated from the batch.
+ 		 */
+ 		iter->st_bucket_done = true;
+-		goto done;
++		return iter->batch[0];
+ 	}
+-	if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2,
+-						    GFP_USER)) {
+-		resized = true;
+-		/* After allocating a larger batch, retry one more time to grab
+-		 * the whole bucket.
+-		 */
+-		goto again;
+-	}
+-done:
+-	return iter->batch[0];
++
++	if (WARN_ON_ONCE(resizes >= MAX_REALLOC_ATTEMPTS))
++		return iter->batch[0];
++
++	err = bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2, GFP_USER);
++	if (err)
++		return ERR_PTR(err);
++
++	resizes++;
++	goto again;
+ }
  
- 	new_batch = kvmalloc_array(new_batch_sz, sizeof(*new_batch),
--				   GFP_USER | __GFP_NOWARN);
-+				   flags | __GFP_NOWARN);
+ static void *bpf_iter_udp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+@@ -3841,7 +3870,10 @@ static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
  	if (!new_batch)
  		return -ENOMEM;
  
-@@ -3859,7 +3860,7 @@ static int bpf_iter_init_udp(void *priv_data, struct bpf_iter_aux_info *aux)
- 	if (ret)
- 		return ret;
- 
--	ret = bpf_iter_udp_realloc_batch(iter, INIT_BATCH_SZ);
-+	ret = bpf_iter_udp_realloc_batch(iter, INIT_BATCH_SZ, GFP_USER);
- 	if (ret)
- 		bpf_iter_fini_seq_net(priv_data);
- 
+-	bpf_iter_udp_put_batch(iter);
++	if (flags != GFP_ATOMIC)
++		bpf_iter_udp_put_batch(iter);
++
++	memcpy(new_batch, iter->batch, sizeof(*iter->batch) * iter->end_sk);
+ 	kvfree(iter->batch);
+ 	iter->batch = new_batch;
+ 	iter->max_sk = new_batch_sz;
 -- 
 2.48.1
 
