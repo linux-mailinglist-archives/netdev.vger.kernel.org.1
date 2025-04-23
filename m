@@ -1,57 +1,77 @@
-Return-Path: <netdev+bounces-185288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C460AA99AC8
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:29:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6BAEA99B09
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 23:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E523A5A79DD
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:29:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FFCE4644D0
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 21:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C32F26FA5C;
-	Wed, 23 Apr 2025 21:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6031FCFE7;
+	Wed, 23 Apr 2025 21:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cpmCZKDU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ee4pCpT4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F1826E17A
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2562701D4;
+	Wed, 23 Apr 2025 21:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745443763; cv=none; b=h36AwwZZ0zWyo08sufJcxSmg9LWo2zypXUH3FSo8hEM4v8xgEJo6HRdtMUDNbbuggqdpCNUNMZRGTfy32kNgoq2Iu21oKhyGooSlTSC7Xekl7yWT7SFS9JFVSs1teL7Rx5paZQiEW8Y+6Km9ICuz/c4kWTODnEXcHOFXwXvN1vc=
+	t=1745445445; cv=none; b=tHBQ8ucj98GhjKapOsnnqQOyH0b06IKGUh/wMddEKUTj/pBq/Xj2YTyIGVfRfy8B46AmUrjF8TPVPUR21Vpfj7mA/pr3OjNLlu9b0OFkCNbSsle298vsbLpCGYibKUHMY17wgF3bJF/WQUmfU4M/Fh+ufqY9naoLOiekAYRUIjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745443763; c=relaxed/simple;
-	bh=yBh/RmRUs+K6AiGD+JaXuuHDWVr09llB6PD0qB7GPN0=;
+	s=arc-20240116; t=1745445445; c=relaxed/simple;
+	bh=LTR2hs5byCKEFUsgJ7ZJqVPMvJGrhL4/fkSVIHm6vY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xq3YPWQtEIcUHAb56frODfdKmr6+mN0hOxO+/5bE4EkgiYNhEu0pMmDHOsjFd7T3ntAaTKqG93FdIJUg6B0gyjES08x7AsujSZW6cQ44vpJy5H3u80MEPhmeQled4iG1UdIsUN5nz4GdcYmO5OabImEy2i0ALiq8P54krNhMfro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cpmCZKDU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4E0C4CEE2;
-	Wed, 23 Apr 2025 21:29:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VRWkDGGUDYXVYdvvUfB/sVM1BivetuQYANEZG5lP2FrkkQyKjun2b4YlLKdK7yGcBglTZk1vKw2FJD8zAxXWnbcbnObOunB2mqOvNwcoy4GaZeePpYBR/wtQyP0t8vEHBZwXGgu0K5peVz7J6+X8mWQ++p+bS8B18IgPurGpcEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ee4pCpT4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9781C4CEE2;
+	Wed, 23 Apr 2025 21:57:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745443762;
-	bh=yBh/RmRUs+K6AiGD+JaXuuHDWVr09llB6PD0qB7GPN0=;
+	s=k20201202; t=1745445444;
+	bh=LTR2hs5byCKEFUsgJ7ZJqVPMvJGrhL4/fkSVIHm6vY8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cpmCZKDUXNgF0AD75tAOs5jiWgHPXF8fQdFL3NlkwsAah6HVlVXqR9lsf7H5jTboZ
-	 rzO1TOTO+M8VZ2OQXD/RU0kV5gIeNjZjcb9vr0lJxKgFNNWpenKQ5bMKAMf/7mFzc+
-	 ZshSrT9HehrtFa55ox9RHanckMSxjAKExMzIQYkidLYOGWuZzSUSjfv5u7GcVkbt5S
-	 UyI9DsAYMKVP2m7l2esdPsFYO+x1tgo94oPNoWxOjHgHqX1J0Ba02lCPG2kcR5oDX1
-	 GHJvm4OSouTUqS7sX+XjqsPAshPZNjDIKyUNiAmx/8OU/F5k3TyaAPSNfpn6ZxXuli
-	 D7UtqpsyRAoqQ==
-Date: Wed, 23 Apr 2025 14:29:21 -0700
+	b=Ee4pCpT4JI6TxES3sauuCCzIWPDS+jtUV/VUeo6DUX5gr+IAFrQU0MHeA/J00Qp7W
+	 YIbhEDp8MMN/t8t/NIgvn+35BqbkG1pKEfHG9Oacz+BU5W7wj3LWUf5SrqwFH/mboh
+	 gG5ysWBFZYNfJHus3EinC5422Lq45C68v/Sfoo08zSE1QoTa6LEIQOQzOcYUrBd0eL
+	 334qA8IvSZ8CrbhGoUHFsc7jXsdh3HAUT9MVPYBSCqKagjqbD+PBAf62LSTHfkkgOW
+	 8LvAlLyYBrFb4xaS7AViTiHzLVnfOXEHtMFGLpx8DtPz1+Q3Opnp3MLnngpdK7y/S3
+	 K7o8oHgj6JCPg==
+Date: Wed, 23 Apr 2025 14:57:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
- <edumazet@google.com>, <andrew+netdev@lunn.ch>, <razor@blackwall.org>,
- <petrm@nvidia.com>, <roopa@nvidia.com>
-Subject: Re: [PATCH net] vxlan: vnifilter: Fix unlocked deletion of default
- FDB entry
-Message-ID: <20250423142921.089e58cf@kernel.org>
-In-Reply-To: <20250423145131.513029-1-idosch@nvidia.com>
-References: <20250423145131.513029-1-idosch@nvidia.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, KY Srinivasan
+ <kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Long Li
+ <longli@microsoft.com>, Konstantin Taranov <kotaranov@microsoft.com>,
+ "horms@kernel.org" <horms@kernel.org>, "mhklinux@outlook.com"
+ <mhklinux@outlook.com>, "pasha.tatashin@soleen.com"
+ <pasha.tatashin@soleen.com>, "kent.overstreet@linux.dev"
+ <kent.overstreet@linux.dev>, "brett.creeley@amd.com"
+ <brett.creeley@amd.com>, "schakrabarti@linux.microsoft.com"
+ <schakrabarti@linux.microsoft.com>, "shradhagupta@linux.microsoft.com"
+ <shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "rosenp@gmail.com" <rosenp@gmail.com>, Paul
+ Rosswurm <paulros@microsoft.com>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 2/3] net: mana: Add sched HTB offload
+ support
+Message-ID: <20250423145723.7ff12e1a@kernel.org>
+In-Reply-To: <MN0PR21MB3437359D91F059D83AF929F0CABA2@MN0PR21MB3437.namprd21.prod.outlook.com>
+References: <1745217220-11468-1-git-send-email-ernis@linux.microsoft.com>
+	<1745217220-11468-3-git-send-email-ernis@linux.microsoft.com>
+	<20250421170349.003861f2@kernel.org>
+	<20250422194830.GA30207@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20250422171846.433d620d@kernel.org>
+	<MN0PR21MB3437359D91F059D83AF929F0CABA2@MN0PR21MB3437.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,39 +81,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Apr 2025 17:51:31 +0300 Ido Schimmel wrote:
-> I'm sorry, but I only noticed this issue after the recent VXLAN patches
-> were applied to net-next. There will be a conflict when merging net into
-> net-next, but resolution is trivial. Reference:
-> https://github.com/idosch/linux/commit/ed95370ec89cccbf784d5ef5ea4b6fb6fa0daf47.patch
+On Wed, 23 Apr 2025 15:27:16 +0000 Haiyang Zhang wrote:
+> > > We selected tc-htb for our current use case because we plan to support
+> > > multiple speed classes in the future.  
+> > 
+> > Which net-shapers also support.  
+> 
+> Thanks for pointing that out...
+> But for easier usage with existing tc tool for customers, can we still
+> use tc-htb offload? Does using tc-htb offload for speed clamping break
+> any coding convention or API specs?
 
-Thanks! I guess this shouldn't happen often but FWIW for conflict-less
-build breakage a patch on top of the merge would be more convenient
-than the net-next version of the patch. Like this:
-
-diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-index 81d088c2f8dc..39b446a4bad7 100644
---- a/drivers/net/vxlan/vxlan_vnifilter.c
-+++ b/drivers/net/vxlan/vxlan_vnifilter.c
-@@ -628,7 +628,7 @@ static void vxlan_vni_delete_group(struct vxlan_dev *vxlan,
- 		u32 hash_index = fdb_head_index(vxlan, all_zeros_mac,
- 						vninode->vni);
- 
--		spin_lock_bh(&vxlan->hash_lock[hash_index]);
-+		spin_lock_bh(&vxlan->hash_lock);
- 		__vxlan_fdb_delete(vxlan, all_zeros_mac,
- 				   (vxlan_addr_any(&vninode->remote_ip) ?
- 				   dst->remote_ip : vninode->remote_ip),
-@@ -636,7 +636,7 @@ static void vxlan_vni_delete_group(struct vxlan_dev *vxlan,
- 				   vninode->vni, vninode->vni,
- 				   dst->remote_ifindex,
- 				   true);
--		spin_unlock_bh(&vxlan->hash_lock[hash_index]);
-+		spin_unlock_bh(&vxlan->hash_lock);
- 	}
- 
- 	if (vxlan->dev->flags & IFF_UP) {
--- 
-2.49.0
-
+The only spec here is that the offloaded version is supposed to look
+like the non-offloaded one. I really don't see how you can claim that
+static single class HTB is a accurate offload of HTB.
 
