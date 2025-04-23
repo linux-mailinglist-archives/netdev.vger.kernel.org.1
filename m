@@ -1,91 +1,156 @@
-Return-Path: <netdev+bounces-185231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9BEA99671
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:22:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6CBA99625
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 19:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902493B4ECB
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:22:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8364657E7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 17:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6652328C5BF;
-	Wed, 23 Apr 2025 17:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD7C28B509;
+	Wed, 23 Apr 2025 17:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="IvWYQaPf"
 X-Original-To: netdev@vger.kernel.org
-Received: from caffeine.csclub.uwaterloo.ca (caffeine.csclub.uwaterloo.ca [129.97.134.17])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1DD28A41A;
-	Wed, 23 Apr 2025 17:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.97.134.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A554289367;
+	Wed, 23 Apr 2025 17:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745428896; cv=none; b=dzScx89f2OXDBey777bToJjcKwpQhRrxE31QSGtqQ06ZvPgBVLIU3dI10yySsUNkx8j6uK4gZBN3yD1lIq/mfDmpMIrHqYDv77ykwxWx3fAAKwaUtH+SLCPKMivdAvDQR8Aci7V+KBOODRjDZuec2md4fIGcrxNZ7dr8uVhD664=
+	t=1745428457; cv=none; b=MxKRslDQEtyPfFb+S9EuI7Ux6Qpsvo3CK+mj01oBLM5BXfxtm6qwRND1I50FUIm65P0gqR7arJ/dDy1IA/mUkHrSBOALyFRiTtEZ+AyPN2uR7NybBZhadBicoZLt5yxPMybg9n7r6AeAEKq0OXaWLu64WomNBu1iUvv2ff10JFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745428896; c=relaxed/simple;
-	bh=d4Egn7mgBRaSWdNorW7Zr3c+3merAWcJknb6FQv5GeA=;
-	h=Date:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:From; b=YFYUKQr7xiuZlp2g9r1KfqWlpbgZhBrFpBMvhoqId2Au0BgLVyTOGQIG3lHbeVgZdVWA1n2KEmoh3e8xIlNFzvl7yonDydToI5X7cOcXHv0VKOOdTIJCgGqCdqpfVc+f7puexkSDEYaUyv1t4stmyR+B3ycQfuYpsWsbSRHmLbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca; spf=pass smtp.mailfrom=csclub.uwaterloo.ca; arc=none smtp.client-ip=129.97.134.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csclub.uwaterloo.ca
-Received: by caffeine.csclub.uwaterloo.ca (Postfix, from userid 20367)
-	id 97DED460E57; Wed, 23 Apr 2025 13:12:54 -0400 (EDT)
-Date: Wed, 23 Apr 2025 13:12:54 -0400
-To: intel-wired-lan@lists.osuosl.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>,
-	Len Sorensen <lsorense@csclub.uwaterloo.ca>
-Subject: Fix promiscous and multicast mode on iavf after reset
-Message-ID: <aAkflkxbvC8MB8PG@csclub.uwaterloo.ca>
+	s=arc-20240116; t=1745428457; c=relaxed/simple;
+	bh=q0SsHabUmjj5ZdU0sUyhSgU3OxN3W7D4JCWOS+nAJGU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ogq1kDakyIirld0U5ZpyIoxMu6VLdb0zMDYf/Aknwg5vSuREa6Ya0eBaEcv4g14AXQxokz5Pc0qfYkck4zBqqSs+B5TbNfbbZvgH8vwsKiC2aEW0zDW1yffs7ZrlhTr/SfI26z1VdSX9rbrnXAlJEyeI42BEKBtbACv3qalWw5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=IvWYQaPf; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53NHCvSb3804133
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 23 Apr 2025 10:12:58 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53NHCvSb3804133
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745428382;
+	bh=AIJHrckYwFl98orUcLBTt95yPEoWX9oW9903W4hlM3w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IvWYQaPfxJvqBiLff3ahLWLm3on+DUaPa1Srpyp5LZs0jmOjsi4vJcD4bjFx1mkw1
+	 kmlinO9+bgIwDEaEPFxhzeh7OV4pJBnWqMwgS7SNusPzCVCr4pLxzCg1y9KDDjfFVk
+	 DyWNlDOln4+yBgIudOkFG4lEG2Lq/WOJhKF9+SXuHgWi4l0RDrbboFRD8k6F5lKkRA
+	 14yiMRrsILUIgyeyHSqLlSqGk6PDPkVte7v13JiaABizSWVFosdv0a/zLQKXJUGorp
+	 W8BYnasPgTuqRiwJsD+umVEKtOLbT7Bc0M6cVA0p6p7RA3scb+WSFcK+vk2X+rNlyz
+	 87hDNwO5mesTw==
+Message-ID: <e01fb578-3523-4f19-8db3-e231d5daa76e@zytor.com>
+Date: Wed, 23 Apr 2025 10:12:56 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-From: Lennart Sorensen <lsorense@csclub.uwaterloo.ca>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 01/34] x86/msr: Move rdtsc{,_ordered}() to
+ <asm/tsc.h>
+To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-2-xin@zytor.com>
+ <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <4caedcaf-793a-4371-a8db-50723dcdbad4@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I discovered that anything that causes a reset in iavf makes breaks
-promiscous mode and multicast.  This is because the host side ice
-driver clears the VF from filters when it is reset.  iavf then correctly
-calls iavf_configure, but since the current_netdev_promisc_flags already
-match the netdev promisc settings, nothing is done, so the promisc and
-multicast settings are not sent to the ice host driver after the reset.
-As a result the iavf side shows promisc enabled but it isn't working.
-Disabling and re-enabling promisc on the iavf side fixes it of course.
-Simple test case to show this is to enable promisc, check that packets
-are being seen, then change the mtu size (which does a reset) and check
-packets received again, and promisc is no longer active.  Disabling
-promisc and enabling it again restores receiving the packets.
+On 4/23/2025 7:13 AM, Dave Hansen wrote:
+> On 4/22/25 01:21, Xin Li (Intel) wrote:
+>> Relocate rdtsc{,_ordered}() from <asm/msr.h> to <asm/tsc.h>, and
+>> subsequently remove the inclusion of <asm/msr.h> in <asm/tsc.h>.
+>> Consequently, <asm/msr.h> must be included in several source files
+>> that previously did not require it.
+> 
+> I know it's mildly obvious but could you please add a problem statement
+> to these changelogs, even if it's just one little sentence?
 
-The following seems to work for me, but I am not sure it is the correct
-place to clear the saved flags.
+So "ALWAYS make a changelog a complete story", right?
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6d7ba4d67a19..4018a08d63c1 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -3233,6 +3233,14 @@ static void iavf_reset_task(struct work_struct *work)
- 		iavf_shutdown_adminq(hw);
- 		iavf_init_adminq(hw);
- 		iavf_request_reset(adapter);
-+
-+		/* Clear remembered promisc and multicast flags since
-+		 * reset clears them on the host so they will get force
-+		 * applied again through iavf_configure() down below.
-+		 */
-+		spin_lock_bh(&adapter->current_netdev_promisc_flags_lock);
-+		adapter->current_netdev_promisc_flags &= ~(IFF_PROMISC | IFF_ALLMULTI);
-+		spin_unlock_bh(&adapter->current_netdev_promisc_flags_lock);
- 	}
- 	adapter->flags |= IAVF_FLAG_RESET_PENDING;
- 
+And that would be helpful for long term maintainability.
 
--- 
-Len Sorensen
+> 
+> 	For some reason, there are some TSC-related functions in the
+> 	MSR header even though there is a tsc.h header.
+> 
+> 	Relocate rdtsc{,_ordered}() and	subsequently remove the
+> 	inclusion of <asm/msr.h> in <asm/tsc.h>. Consequently,
+> 	<asm/msr.h> must be included in several source files that
+> 	previously did not require it.
+> 
+> But I agree with the concept, so with this fixed:
+
+TBH, I did hesitate to touch so many files just to include msr.h.
+
+But because tsc.h doesn't reference any MSR definitions, it doesn't make 
+sense to include msr.h in tsc.h.  I still did the big changes.
+
+> 
+> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+
+Thank you very much!
 
