@@ -1,114 +1,149 @@
-Return-Path: <netdev+bounces-185244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61290A997AB
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:17:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53B6DA997C2
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99E974A2CB6
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:17:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1BD83B9B34
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E599E28D82B;
-	Wed, 23 Apr 2025 18:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6271A28DF1C;
+	Wed, 23 Apr 2025 18:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="H3D2KdsW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cl2EDV52"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E5228CF6D;
-	Wed, 23 Apr 2025 18:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861FD28DEEA;
+	Wed, 23 Apr 2025 18:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745432249; cv=none; b=QPPzrafjCfOCEAm4tdLta/UDSQokXkwO/wsfvNrjfqw4Oyuy3EO66wdtfDI2cHfj+ws5Ma8DNXckSkryfYYzIXot2rQry4AI4A1JL8bYNFMuGg45S2iT4kfqhK5MpEHZ6c+HeTjZdv+fc+NjhWK5+xgXg0brxUnwfX/ik/5vzbQ=
+	t=1745432511; cv=none; b=NMbfTe5h07KbDWFU+pRthOj4sPnfsq8T7N6qMjWxCGrrUeqr18ZO+mO2SaBraCF6bhPdJblAoFaU3r+660T71CN2GOLxYomuSG1MCfFOdDiVfGaVXJwEoHNmjf9wtgBM5LrszKsNqSBlfBVpPb/c9PSMlB++Z8YY3yVHFN5xsH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745432249; c=relaxed/simple;
-	bh=cWViDUuxcwp4/QVdZ3TBEnvofiMGdKFWJSsT4185cWw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BARUX7S+r23m3xmP1OsUOqXEcrQtXwm5UKcpNuoBRZfNvZc7WKrV0U7eS21m3atElr8zjhTJt+ZyOFtJd2fFUI+HWMFjTGkJ0LF7jKq6KcPbM6N9GQfji40a5lIkiSsch8Hxq3ytXiqrBz6nLIodozBi/Hthn9y0aEZfSaVCZ+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=H3D2KdsW; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1745432511; c=relaxed/simple;
+	bh=n5KEgKPWGyndOy8RBM0wXCL7YL1bmrK2XR2keNckLaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jvZfUW1+2rIeLvQvIm5N//sQ8ZHQEY3F7pFxz5NVnZzByTAu8SZYws3apHmrIWguqq45Yishx3v8+xAg6z5xWxYnpJkfjdHir83wFBenn56C3S9hcdFbsHX2GErOciozQRcvYlXJlZYUO3CXjiVZ2StAIpWj2+P2mjHWgiaTIPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cl2EDV52; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5f62d3ed994so172030a12.2;
+        Wed, 23 Apr 2025 11:21:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1745432248; x=1776968248;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yqfu2rj6ntU/1h7MczMuErOve4BDb+YoGDcVuGCnHY4=;
-  b=H3D2KdsWAzESkCW3Omfcr3LkCjN1qH/Xn7KeTPmf0T28exm7Xiec09lm
-   NGLXxLUXsIupKRIr7brrym7ClWIlG0tDc1PhUTsQqizROuurxJeHffUVR
-   IOkHY+6QB3Nc0nt3ZnRRiJIafQDoJCa8R1q1nGoTlIiVxM1DlzKTaoiUv
-   k=;
-X-IronPort-AV: E=Sophos;i="6.15,233,1739836800"; 
-   d="scan'208";a="190040270"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 18:17:26 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:2327]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.240:2525] with esmtp (Farcaster)
- id 44cf353b-ca45-47b7-b2b2-94e0c0015865; Wed, 23 Apr 2025 18:17:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 44cf353b-ca45-47b7-b2b2-94e0c0015865
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 23 Apr 2025 18:17:25 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 23 Apr 2025 18:17:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <johannes@sipsolutions.net>
-CC: <i.abramov@mt-integration.ru>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] cfg80211: Restore initial state on failed device_rename() in cfg80211_switch_netns()
-Date: Wed, 23 Apr 2025 11:16:40 -0700
-Message-ID: <20250423181714.24628-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <4a91f731c49d3449632f19dcf4a1a8f5a9eb847b.camel@sipsolutions.net>
-References: <4a91f731c49d3449632f19dcf4a1a8f5a9eb847b.camel@sipsolutions.net>
+        d=gmail.com; s=20230601; t=1745432508; x=1746037308; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NhlqINkYpZZBLzVdSPqg22TCWxPQvkr1ZzGoXFf5r1M=;
+        b=cl2EDV52G7UXR88D2b+Ku+trcK8nub6TC31rjkxsal9iSKRDP1qab3CWKtXBfSIX6W
+         60K0hx1rWKhkLHoljiFmyk7dw/GVdYRVnVxLkNQ7lZb5b+GHIWec338zKDHmqEc38Re0
+         xMvAlkIyAP4EScG/TXCaZOFy0p1wHAjKneP3F4PrRWg5BIWdyRdKjBh/d4PYmqqVnJXW
+         VLrLbsZvBpkhBhuNbLvkK18gElc/wSsbYrBjpqBNMjjo88XlwrInc3x1/4hAjpIizg2M
+         d2eHLeUJ951FByiVyd8YHVzON6k7x3sgRl3UvcT1kslqapQd5nD1v+kEhHuHB5mwRJeC
+         rnBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745432508; x=1746037308;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NhlqINkYpZZBLzVdSPqg22TCWxPQvkr1ZzGoXFf5r1M=;
+        b=qC4EK7DTEeLMraOJqBcJw0BpHN172I5cyFjE4Y6lRZH44QaxlgvGcs8bQdLLKzBsTk
+         qVvsbRHZK7OW8DsGuB/ZnZn7xNfWG7VO1Jg1u0qvfIHthikEt5uIrDABGMWvSbQhZZe3
+         OcLGvbQK5Z7k18pSQHGUHH6sTdGcVrmfcuhBpkfuNw0NrY6kvtD7mXng2dRix0k6Gmlq
+         t/8lgeIzXfFzzBaZU5cOTOgOe1pxc8pinOpHm3FCr+T8TDY+C6UQpOoVZZa7tcqz7vRt
+         DuLQL+s5IsFExIjLEeThytBMZ/E8ZUt9bzb3XQpVMp55i3c55qqn7EaLWuyVNqPnNE11
+         a/Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOYKfKTZZZzdUvlXzkc1h3TAkj3N/IiTvuMjD81/Tjg7ki2X3x1gt1WjcEt8oIOgo2aIE=@vger.kernel.org, AJvYcCVrRN1dM0f/sOstAO88FMHdQfmGfPEDGoymUeKnYXfyLBsuw3SJgyDcEbrU1qJ+IdopraM92qfODv3BiqeVCe9wPkSx@vger.kernel.org, AJvYcCWTn8SUlCBeGXT8asANdWme4bEp+suOB/LwYGcuS7uqM/mkMZihhCVBLHYLq5/ojCqA2QZrFkop@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHlvyDj45bOy4ndQpGp7Wsb4q7Zbnys3mz6d/L35mpn/Lw3b9N
+	65DQSyENTbaWT6w2WzOBjf4JrqIKdekrf9EkxNbUulNoDXMz/3iTRL6YvBvPdN/CDcq4kGQm99a
+	C4MkxZQ8YfQ9nPvrieSdbsbfbm6YtmkWu
+X-Gm-Gg: ASbGncuUBlWEiDPtt3sVqswjuEtHaCNXl0tlCKgPsp+Ng1a9t8r6jhXkoNCjL6fJkCr
+	K6r//g21mgQJyekqnUIr2gCj9quhZf1Hh7TrxBTbg5iH32Heexr+jhAMh628mygUspNkS4AEDFK
+	jMrMYe/Ta7IcTAfGHXcS+T/orZD4em8ud2sCw3FQ==
+X-Google-Smtp-Source: AGHT+IH5HySMSVpWQQiLuLBm1KmGGdctAt+lPhEDR0CAkLYpQS/qWp3FPfJC0WRecO9a0ItoWqyOqKqk1/lb4NE26vI=
+X-Received: by 2002:a17:907:26c3:b0:ac1:f003:be08 with SMTP id
+ a640c23a62f3a-ace54e6c8ecmr12271066b.12.1745432507647; Wed, 23 Apr 2025
+ 11:21:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250418110104.12af6883@gandalf.local.home>
+In-Reply-To: <20250418110104.12af6883@gandalf.local.home>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 23 Apr 2025 11:21:25 -0700
+X-Gm-Features: ATxdqUHQ9RunUOfE64hoOmU3UUAYp4mJ_IcDoTqKsW5Uram8ZVu2YLxD24VGhnk
+Message-ID: <CAEf4BzZfoCV=irWiy1MCY0fkhsJWxq8UGTYCW9Y3pQQP35eBLQ@mail.gmail.com>
+Subject: Re: [RFC][PATCH] tracepoint: Have tracepoints created with
+ DECLARE_TRACE() have _tp suffix
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, David Ahern <dsahern@kernel.org>, 
+	Juri Lelli <juri.lelli@gmail.com>, Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf@vger.kernel.org, 
+	Gabriele Monaco <gmonaco@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Johannes Berg <johannes@sipsolutions.net>
-Date: Wed, 23 Apr 2025 17:44:45 +0200
-> On Mon, 2025-04-07 at 15:53 +0300, Ivan Abramov wrote:
-> > Currently, the return value of device_rename() is not acted upon.
-> > 
-> > To avoid an inconsistent state in case of failure, roll back the changes
-> > made before the device_rename() call.
-> 
-> This kind of seems complicated for something that ought to not happen
-> ...
-> 
-> And also (+netdev), what do we do in case this is called from
-> cfg80211_pernet_exit() - leak the whole network namespace because we
-> couldn't allocate memory for the name? That seems counterproductive.
+On Fri, Apr 18, 2025 at 7:59=E2=80=AFAM Steven Rostedt <rostedt@goodmis.org=
+> wrote:
+>
+> From: Steven Rostedt <rostedt@goodmis.org>
+>
+> Most tracepoints in the kernel are created with TRACE_EVENT(). The
+> TRACE_EVENT() macro (and DECLARE_EVENT_CLASS() and DEFINE_EVENT() where i=
+n
+> reality, TRACE_EVENT() is just a helper macro that calls those other two
+> macros), will create not only a tracepoint (the function trace_<event>()
+> used in the kernel), it also exposes the tracepoint to user space along
+> with defining what fields will be saved by that tracepoint.
+>
+> There are a few places that tracepoints are created in the kernel that ar=
+e
+> not exposed to userspace via tracefs. They can only be accessed from code
+> within the kernel. These tracepoints are created with DEFINE_TRACE()
 
-default_device_exit_net() does BUG() in such a case, it doens't
-assume -ENOMEM as we are freeing memory in the netns dismantle.
+The part about accessing only from code within the kernel isn't true.
+Can we please drop that? BPF program can be attached to these bare
+tracepoints just fine without tracefs (so-called BPF raw tracepoint
+program types).
 
+But I don't have an objection to the change itself, given all of them
+currently do have _tp suffix except a few that we have in BPF
+selftests's module, just as Jiri mentioned.
 
-static void __net_exit default_device_exit_net(struct net *net)
-{
-...
-	for_each_netdev_safe(net, dev, aux) {
-...
-		err = dev_change_net_namespace(dev, &init_net, fb_name);
-		if (err) {
-			pr_emerg("%s: failed to move %s to init_net: %d\n",
-				 __func__, dev->name, err);
-			BUG();
-		}
-	}
-}
+Acked-by: Andrii Nakryiko <andrii@kernel.org>
+
+>
+> Most of these tracepoints end with "_tp". This is useful as when the
+> developer sees that, they know that the tracepoint is for in-kernel only
+> and is not exposed to user space.
+>
+> Instead of making this only a process to add "_tp", enforce it by making
+> the DECLARE_TRACE() append the "_tp" suffix to the tracepoint. This
+> requires adding DECLARE_TRACE_EVENT() macros for the TRACE_EVENT() macro
+> to use that keeps the original name.
+>
+> Link: https://lore.kernel.org/all/20250418083351.20a60e64@gandalf.local.h=
+ome/
+>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> ---
+>  include/linux/tracepoint.h   | 38 ++++++++++++++++++++++++------------
+>  include/trace/bpf_probe.h    |  4 ++--
+>  include/trace/define_trace.h | 17 +++++++++++++++-
+>  include/trace/events/sched.h | 30 ++++++++++++++--------------
+>  include/trace/events/tcp.h   |  2 +-
+>  5 files changed, 60 insertions(+), 31 deletions(-)
+>
+
+[...]
 
