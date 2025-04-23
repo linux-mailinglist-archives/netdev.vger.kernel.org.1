@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-185212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF617A994B8
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:20:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461C0A99519
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFE58169C32
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2EBD5A8191
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551D820D509;
-	Wed, 23 Apr 2025 16:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FC62798E9;
+	Wed, 23 Apr 2025 16:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzl9HJgs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXjqOXtb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2988D1A5B82;
-	Wed, 23 Apr 2025 16:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94E97081C;
+	Wed, 23 Apr 2025 16:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745424870; cv=none; b=kd591qgEN5PzYPBKOXWJfzLjLq2kGu6wk5eFF7ES8MDEJHTWPq00mAH9YFk7wBiVnIKoq/6zC5c2arUx5naQTJbuTTDCrdNSOoefR86NLDYINQTEk1yNC0gJemlxrwHENL9F+Am/i5drexPmrs5grV0Z4eGdhPtRDF0PsNffN1g=
+	t=1745424973; cv=none; b=hZ2say73wx/7fYEWj88pPIrTi3645vz52A3vevsp92nS9aWxa7hSHHZwxgQEJAWMexSTE8JKT/RdrKyKnSB0R56DYhEnSkjZscJbdV9Nkw9Uy0dmnTcF3oWOuhX7Y+y9A3jMdAAIa54yO2DD5UEwIvx8p18Sd6TYkqpy+0KmZEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745424870; c=relaxed/simple;
-	bh=Z/4DmM8gueZBF5pkQ33eV/TOGnbp2ifSLowAhDlqItU=;
+	s=arc-20240116; t=1745424973; c=relaxed/simple;
+	bh=nfwTXpjDniJet8uRyJolK5Eq9zCVpA6j7omF0J8cUG8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fMhc9H+ESsqLMNJoAO35Zu9rNPiQ5J3VBREBM72fH67TxFOcHKhi6/ncLJqj4YqOMFRVh+Yit20ZHw6XXDd1x418JBEzLBdekndzOREW/TQPwpyx9geKu1ORXc3Ohd60oBLJq2cc5CobmcYkNnVExNFEF9Z8unMKuCw2y6gnF/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rzl9HJgs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3FDC4CEE2;
-	Wed, 23 Apr 2025 16:14:27 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=OR3w1jMYIoFs5fEBnkE2PHUQBpKX/XNn/ota0CPBXy5AeRUZZBfSKLcLpfoBaU48i2OaXy9D+wnzYQOsRxc5PTFWhXMcIMBnjMYEXiP617cHd0E85f4MgJK3uEvGA1An9iwJPXq+pvbCoLaIVGjg+4bZHhYBBMwQ75DEzea4B2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXjqOXtb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1ED7C4CEE2;
+	Wed, 23 Apr 2025 16:16:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745424869;
-	bh=Z/4DmM8gueZBF5pkQ33eV/TOGnbp2ifSLowAhDlqItU=;
+	s=k20201202; t=1745424973;
+	bh=nfwTXpjDniJet8uRyJolK5Eq9zCVpA6j7omF0J8cUG8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rzl9HJgsjiv6OYRiFt5O2M0ta6p8Ba77FyXKYN2G+cx5d/s5boXYxcdHFaeuOgmyt
-	 6I19ywl2bpMIKMIuH6g/GCL3Q4vlp4avUahDcq8p04KXmOYsa9LWESKzUxgswLn5eQ
-	 iwM9/QtSrE3MjM2UYlUzaau1gdcQ+2pkFhsBxN4mKvKofdnyr+MWLtkT1g7sIuQeGJ
-	 UiTSV6ZIoJ2lG9f0bGah41y6kr+oQxcbfVPLFWaw34SMT9KuHpSCDUW7raJZo0k1Ab
-	 xaMc4diV6LsDmovTDwWNifJRz7+kWEHsA4thtGUp/yf3zXdVl9AexBTHSVVfLDFZDH
-	 Q9HaurUSXyKwA==
-Date: Wed, 23 Apr 2025 17:14:25 +0100
+	b=rXjqOXtbX0/7dQRCbYS2KUqZR5ipICV1dayWh3Qy0iTw8GnBa8YiVvKvTIRyyjsCg
+	 iCayn/B4TjY44D74JfVPc4Mxoub8FBAXru6EYVDvgQReO1JwsaEZZWW3DpwRJsOUKx
+	 blEufBkOLsu4EnXwdcb1L94Ar0NWMpox6M8FzNZn8fyyU4g83URhq/Z1OWO3TEX7cW
+	 m/I1pq8BkyA9yPoAyPQmpt26l3Yo7Ex2DKEV5HDWHNzMALy5rVnZmUUmxQpBywRc3r
+	 Fnk2fruUR0ONftOfn149sWIeNoh2NNyWTS+pwbyaAzvD5RzzrX3VI8gZiFZJzenAF1
+	 GLh4a9VXxr7dw==
+Date: Wed, 23 Apr 2025 17:16:08 +0100
 From: Simon Horman <horms@kernel.org>
-To: "Ertman, David M" <david.m.ertman@intel.com>
-Cc: "Nikolova, Tatyana E" <tatyana.e.nikolova@intel.com>,
-	"jgg@nvidia.com" <jgg@nvidia.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [Intel-wired-lan] [iwl-next v5 5/5] iidc/ice/irdma: Update IDC
- to support multiple consumers
-Message-ID: <20250423161425.GA2843373@horms.kernel.org>
-References: <20250416021549.606-1-tatyana.e.nikolova@intel.com>
- <20250416021549.606-6-tatyana.e.nikolova@intel.com>
- <20250417112143.GE2430521@horms.kernel.org>
- <IA1PR11MB6194FD66BA60E12D6430DF22DDBF2@IA1PR11MB6194.namprd11.prod.outlook.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>, Andrew Lunn <andrew@lunn.ch>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: Re: [PATCH net v3 3/3] rtase: Fix a type error in min_t
+Message-ID: <20250423161608.GB2843373@horms.kernel.org>
+References: <20250417085659.5740-1-justinlai0215@realtek.com>
+ <20250417085659.5740-4-justinlai0215@realtek.com>
+ <20250422132831.GH2843373@horms.kernel.org>
+ <040b019af779423f96752f10a697195b@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,73 +68,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <IA1PR11MB6194FD66BA60E12D6430DF22DDBF2@IA1PR11MB6194.namprd11.prod.outlook.com>
+In-Reply-To: <040b019af779423f96752f10a697195b@realtek.com>
 
-On Fri, Apr 18, 2025 at 05:14:24PM +0000, Ertman, David M wrote:
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> > Simon Horman
-> > Sent: Thursday, April 17, 2025 4:22 AM
-> > To: Nikolova, Tatyana E <tatyana.e.nikolova@intel.com>
-> > Cc: jgg@nvidia.com; leon@kernel.org; intel-wired-lan@lists.osuosl.org; linux-
-> > rdma@vger.kernel.org; netdev@vger.kernel.org
-> > Subject: Re: [Intel-wired-lan] [iwl-next v5 5/5] iidc/ice/irdma: Update IDC to
-> > support multiple consumers
+On Wed, Apr 23, 2025 at 10:53:53AM +0000, Justin Lai wrote:
 > > 
-> > On Tue, Apr 15, 2025 at 09:15:49PM -0500, Tatyana Nikolova wrote:
-> > > From: Dave Ertman <david.m.ertman@intel.com>
+> > + David Laight
+> > 
+> > On Thu, Apr 17, 2025 at 04:56:59PM +0800, Justin Lai wrote:
+> > > Fix a type error in min_t.
 > > >
-> > > In preparation of supporting more than a single core PCI driver
-> > > for RDMA, move ice specific structs like qset_params, qos_info
-> > > and qos_params from iidc_rdma.h to iidc_rdma_ice.h.
+> > > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this
+> > > module")
+> > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > > ---
+> > >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
 > > >
-> > > Previously, the ice driver was just exporting its entire PF struct
-> > > to the auxiliary driver, but since each core driver will have its own
-> > > different PF struct, implement a universal struct that all core drivers
-> > > can provide to the auxiliary driver through the probe call.
+> > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > index 55b8d3666153..bc856fb3d6f3 100644
+> > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > @@ -1923,7 +1923,7 @@ static u16 rtase_calc_time_mitigation(u32
+> > time_us)
+> > >       u8 msb, time_count, time_unit;
+> > >       u16 int_miti;
 > > >
-> > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > > Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
-> > > Co-developed-by: Mustafa Ismail <mustafa.ismail@intel.com>
-> > > Signed-off-by: Mustafa Ismail <mustafa.ismail@intel.com>
-> > > Co-developed-by: Shiraz Saleem <shiraz.saleem@intel.com>
-> > > Signed-off-by: Shiraz Saleem <shiraz.saleem@intel.com>
-> > > Co-developed-by: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-> > > Signed-off-by: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+> > > -     time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
+> > > +     time_us = min_t(u32, time_us, RTASE_MITI_MAX_TIME);
 > > 
-> > ...
+> > Hi Justin, Andrew, David, all,
 > > 
-> > > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > > index fcb199efbea5..4af60e2f37df 100644
-> > > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> > > @@ -1339,8 +1339,13 @@ ice_devlink_enable_roce_get(struct devlink
-> > *devlink, u32 id,
-> > >  			    struct devlink_param_gset_ctx *ctx)
-> > >  {
-> > >  	struct ice_pf *pf = devlink_priv(devlink);
-> > > +	struct iidc_rdma_core_dev_info *cdev;
+> > I may be on the wrong track here, but near the top of minmax.h I see:
+> > 
+> > /*
+> >  * min()/max()/clamp() macros must accomplish several things:
+> >  *
+> >  * - Avoid multiple evaluations of the arguments (so side-effects like
+> >  *   "x++" happen only once) when non-constant.
+> >  * - Perform signed v unsigned type-checking (to generate compile
+> >  *   errors instead of nasty runtime surprises).
+> >  * - Unsigned char/short are always promoted to signed int and can be
+> >  *   compared against signed or unsigned arguments.
+> >  * - Unsigned arguments can be compared against non-negative signed
+> > constants.
+> >  * - Comparison of a signed argument against an unsigned constant fails
+> >  *   even if the constant is below __INT_MAX__ and could be cast to int.
+> >  */
+> > 
+> > So, considering the 2nd last point, I think we can simply use min() both above
+> > and below. Which would avoid the possibility of casting to the wrong type again
+> > in future.
+> > 
+> > Also, aside from which call is correct. Please add some colour to the commit
+> > message describing why this is a bug if it is to be treated as a fix for net rather
+> > than a clean-up for net-next.
+> > 
 > > >
-> > > -	ctx->val.vbool = pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2
-> > ? true : false;
-> > > +	cdev = pf->cdev_info;
-> > > +	if (!cdev)
-> > > +		return -ENODEV;
-> > 
-> > Is it possible for cdev to be NULL here?
-> > 
-> > Likewise for other checks for NULL arguments passed to functions
-> > elsewhere in this patch.
+> > >       if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
+> > >               msb = fls(time_us);
+> > > @@ -1945,7 +1945,7 @@ static u16 rtase_calc_packet_num_mitigation(u16
+> > pkt_num)
+> > >       u8 msb, pkt_num_count, pkt_num_unit;
+> > >       u16 int_miti;
+> > >
+> > > -     pkt_num = min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> > > +     pkt_num = min_t(u16, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> > >
+> > >       if (pkt_num > 60) {
+> > >               pkt_num_unit = RTASE_MITI_MAX_PKT_NUM_IDX;
+> > > --
+> > > 2.34.1
+> > >
 > 
 > Hi Simon,
 > 
-> In the resume path from Sx states it is possible to have a NULL pointer for
-> the cdev_info pointer.  This is due to us not wanting to fail on resuming unless
-> absolutely necessary.  I went through the rest of the patch looking for NULL checks
-> and all of them are valid from my inspection (possible to be NULL).
-> 
-> Thanks for the review!
+> According to a more detailed clarification, this part is actually an
+> enhancement and does not cause any issues during operation, so it is
+> not a real bug. Therefore, I will post this patch in net-next.
 
-Likewise, thanks for checking.
+Thanks. Please do consider using min() instead of min_t() when you post the
+patch to net-next.
 
