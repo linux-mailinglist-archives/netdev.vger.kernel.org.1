@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-184940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B291A97C1A
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:29:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA63A97C1C
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87B2B17E2A8
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:29:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A511B61591
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D438125D53E;
-	Wed, 23 Apr 2025 01:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE6525D901;
+	Wed, 23 Apr 2025 01:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNHgy3Ai"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ffX3Zme2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAABD1A23BE;
-	Wed, 23 Apr 2025 01:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF79E25D8F5
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 01:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745371791; cv=none; b=Je0rhwcyiBrqLEIqyzZr9yQstXSoRhZseN4QUw8j38TO32gdMDAhjjZDFWjR7jqLB2Hincd01NH8JL9y3PC9UDgj5bWtEzDeTuXIPNCbnwDNbG9WDstIylgPNhANcaXEcY8huhHpcDVGq5Yrd9k2KxnCD2VbbFxcJcBeiTcpP/k=
+	t=1745371793; cv=none; b=NvtH5kKMHIOHWvDMHZ9WKQAs6wvXMnMLFyFor/T/n1ZtL2vmuNQI0ktuQlNe4i1jjJFFXdTmMBhmMOA8sQGg2fKukoHjJDIPHNjzlJ1tpJkmdlv+wLnc65fegF03dMYLrjiQyM7KjgmWsG/o7LqSGIT5p46kP2mbwYdIFcWVe0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745371791; c=relaxed/simple;
-	bh=Gevgh82HxT5cgQiOLTNIo9KgIKveEH4Cs3+gRb6Ds1I=;
+	s=arc-20240116; t=1745371793; c=relaxed/simple;
+	bh=404nH2hiUbjJYrdsv6fE+yIVGshf+op5JOKelrp+aTU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R/Tz4dzvddyn9TueZ1fyVjsBdRdEsV4yF+gb1b1XigEuckXMRFyWLCRzlilbe5S1uUJyZbuTtNYoyFDx8iVpQyycu8reJ9h29YSOrPXrpfT2ArJcmPypVvKt291QaTtyE0kcTmAnx/HXI12S5zmo79WJpBGl+eADYB40baFxTEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNHgy3Ai; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED77FC4CEE9;
-	Wed, 23 Apr 2025 01:29:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AkQ23yLhcctYEm387Wc2bBrmhNY19ynYIOyJvB1E/vO563785DjNOxwjJsRS49G+lTY57TrqQFh2JUTytclDF6iU/olFY9zcxYjRmiI6PFeSlK5fcbElf/zPppGZcGArMOu1Cb/15yJatyUJZa2ZI7XrXc4xsnJz57Y38s3VG9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ffX3Zme2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B742C4CEEF;
+	Wed, 23 Apr 2025 01:29:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745371791;
-	bh=Gevgh82HxT5cgQiOLTNIo9KgIKveEH4Cs3+gRb6Ds1I=;
+	s=k20201202; t=1745371792;
+	bh=404nH2hiUbjJYrdsv6fE+yIVGshf+op5JOKelrp+aTU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nNHgy3AiKbv8wcZPEZW3KBW/5mPh8iihtY9t9bC5gBx0CzxrpCdqDkrHq1xBOw7z0
-	 tJvF8t0N9DITn+HJsXvkBRcBi887jrBfzewRxaWjrhxasBeWm6RN6ocHzEtGQSpEGr
-	 WzIhGCaV5xYq1EBZu6EJBn7bT69zHw4Sn4rgZqgIqNUu2DxezIXuIDc3tTutkMZZg4
-	 4kMpKYgMyOXCiwP/I261BeOyWkso45Y6zn2mY/qR+KWuTnWy31X/uoul8cQGFHYzkr
-	 EcT+tB20BjT1Z4m58Td0ScGM35z27uEARVHeThDTxA8uP8RF5g2JPRUwmDT3xD8y4Z
-	 pxDlOH7/Cwkig==
+	b=ffX3Zme23MKcr/zBN8dxVrhuIaHs+xwc7Bk0R7R1eicAmbWIOFsZ+87SlQ2I83QOT
+	 lnI6jbGwARCxbMhmCkR6Ho8WwIOMd2S7FIYHUP+W16lWHbdZXI4XjIfSBTjw0z2XCE
+	 sDMoxhB91jvJJOgP/llJ6kveSNJVmP99cYSZAp+Yq0/oy+WjQL4qW222/rfPz3Pgg8
+	 fKSE+nYm6co/M1NJ6jEhvZsLIDuD6xMm/Zx2BpDI0WaJC4MJi4gu4zDGH1jpwhxQ8S
+	 NfE2Hr05lmSvqeoxHMZTW7sHFbx74FT4BBzgfMIoFcsfQtbT0lTf+Nxf58dDAjSNpU
+	 Gw3Fj4ZJD+UyQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4F380CEF4;
-	Wed, 23 Apr 2025 01:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C79380CEF4;
+	Wed, 23 Apr 2025 01:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: phy: leds: fix memory leak
+Subject: Re: [PATCH net] net: phylink: mac_link_(up|down)() clarifications
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174537182950.2107432.13440582690052227566.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Apr 2025 01:30:29 +0000
-References: <20250417032557.2929427-1-dqfext@gmail.com>
-In-Reply-To: <20250417032557.2929427-1-dqfext@gmail.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mail@maciej.szmigiero.name, nathan.sullivan@ni.com, josh.cartwright@ni.com,
- zach.brown@ni.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- gch981213@gmail.com, qingfang.deng@siflower.com.cn, hao.guan@siflower.com.cn
+ <174537183074.2107432.17359160335159032493.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Apr 2025 01:30:30 +0000
+References: <E1u5Ah5-001GO1-7E@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1u5Ah5-001GO1-7E@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexander.duyck@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 11:25:56 +0800 you wrote:
-> From: Qingfang Deng <qingfang.deng@siflower.com.cn>
+On Wed, 16 Apr 2025 22:53:19 +0100 you wrote:
+> As a result of an email from the fbnic author, I reviewed the phylink
+> documentation, and I have decided to clarify the wording in the
+> mac_link_(up|down)() kernel documentation as this was written from the
+> point of view of mvneta/mvpp2 and is misleading.
 > 
-> A network restart test on a router led to an out-of-memory condition,
-> which was traced to a memory leak in the PHY LED trigger code.
-> 
-> The root cause is misuse of the devm API. The registration function
-> (phy_led_triggers_register) is called from phy_attach_direct, not
-> phy_probe, and the unregister function (phy_led_triggers_unregister)
-> is called from phy_detach, not phy_remove. This means the register and
-> unregister functions can be called multiple times for the same PHY
-> device, but devm-allocated memory is not freed until the driver is
-> unbound.
+> The documentation talks about forcing the link - indeed, this is what
+> is done in the mvneta and mvpp2 drivers but not at the physical layer
+> but the MACs idea, which has the effect of only allowing or stopping
+> packet flow at the MAC. This "link" needs to be controlled when using
+> a PHY or fixed link to start or stop packet flow at the MAC. However,
+> as the MAC and PCS are tightly integrated, if the MACs idea of the
+> link is forced down, it has the side effect that there is no way to
+> determine that the media link has come up - in this mode, the MAC must
+> be allowed to follow its built-in PCS so we can read the link state.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: phy: leds: fix memory leak
-    https://git.kernel.org/netdev/net/c/b7f0ee992adf
+  - [net] net: phylink: mac_link_(up|down)() clarifications
+    https://git.kernel.org/netdev/net/c/ce6815585d46
 
 You are awesome, thank you!
 -- 
