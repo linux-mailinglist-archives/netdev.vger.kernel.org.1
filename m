@@ -1,165 +1,119 @@
-Return-Path: <netdev+bounces-185105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 968F5A9889D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30456A988AC
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00EAC7AA681
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:31:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97FB75A397E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1315B223DD9;
-	Wed, 23 Apr 2025 11:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FEF26C3B0;
+	Wed, 23 Apr 2025 11:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="YLY04CUA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFRKD46K"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EA62701C0;
-	Wed, 23 Apr 2025 11:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FE5FC08;
+	Wed, 23 Apr 2025 11:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745407952; cv=none; b=FdjmrIKfFdeeGTxdCJLrfeOO43v7kJvCvvsaxgFEoclgGXhFWVHM4jCHXwaO4z5dCJTyS5owtXT+4Xq1WmOdpQDYi0UXFR9RJMvk7Ja9XAvMKzkXmw9mb44A0/q0WoXbJyLz51oGjfryIhSJJG9dWZv90mXks4F9kFgEekf+A4E=
+	t=1745408249; cv=none; b=nYjFosT4XeANYXU71+rAAjS6GtA5JPvJ2GL1F5F1yE2w7ek/OiMbYagICl/gLlqCzLv8YvKJ7rgoJ4QmX+bjfZ66tuuqgvtQeUYj2dkGgoNiFJj4kRzLpLIddus6zqsiwmg/LgEXhbFmZaFjfylJe/Lxd8g41bG+wNrcD4UPhIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745407952; c=relaxed/simple;
-	bh=DxaGI1hjzmUVNeyuzADxz1+yGkPl6JZZjtGe+adGZ4o=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y/V8upXT7xylVbhs+qNtLOcRjMGOGZcjayOKm9gTH5mRohfDy9lJr+hvT/TYXL6CDebV1aLfsD6sGwwm7v7KnXy2AklaYsbSTgw3WVANybqaf8zbDimcZzTWP10/7znn5XpiH5aTQcjaeD2ikE9Ke+zc+VHoFwPeKgSMiBR14ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=YLY04CUA; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53NBW2pgC2492977, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1745407922; bh=DxaGI1hjzmUVNeyuzADxz1+yGkPl6JZZjtGe+adGZ4o=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=YLY04CUAgHpN/0C1YO9mQSWWpH2I79YiYOCI+z40ntEhfj8paNzDP9bzdjkIAWpFh
-	 C9xNFoYgwJGbYLzHZF13KVZ2q90CQXl/J9c2CDfGX1SlmeaMG0NUXegGvtzJj5EFtU
-	 3GKOe81/7bMSP7fjfG+0i0JlILCAmH3dnlaQWg1uAklgW/uUY5+dbSZI7M6dc1WfEx
-	 Tf9Fv6Lovi7/YvdNjkYnjSdKY/OQbk/gpYzZILM/QMocqDJQ4g5exh2d/EKh+WkCNC
-	 hUqXEPEzJ/cJbZ5zr7xHTdZekwpn827a5oENccvFjEe0NN7enBk8JkWCYxAIM71wBe
-	 pTBTJR6lQAAkw==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53NBW2pgC2492977
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 23 Apr 2025 19:32:02 +0800
-Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 23 Apr 2025 19:32:02 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 23 Apr 2025 19:32:01 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Wed, 23 Apr 2025 19:32:01 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>,
-        kernel test robot <lkp@intel.com>
-Subject: RE: [PATCH net v3 1/3] rtase: Modify the condition used to detect overflow in rtase_calc_time_mitigation
-Thread-Topic: [PATCH net v3 1/3] rtase: Modify the condition used to detect
- overflow in rtase_calc_time_mitigation
-Thread-Index: AQHbr3bGQZBcM8+BV0aT2Y9FDkzNELOvLZGAgAHx31A=
-Date: Wed, 23 Apr 2025 11:32:01 +0000
-Message-ID: <59893ad874224d209b1b43c00c56ba00@realtek.com>
-References: <20250417085659.5740-1-justinlai0215@realtek.com>
- <20250417085659.5740-2-justinlai0215@realtek.com>
- <20250422132023.GG2843373@horms.kernel.org>
-In-Reply-To: <20250422132023.GG2843373@horms.kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1745408249; c=relaxed/simple;
+	bh=ZOYMbzEXP8RLe+8yWrKjk75zGEZAVkvv3WQseXJv0cQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YUIAh0xzBT0Ib9VYPo0XyJgDp3sAIGckBla2XNkuGgoMIuCpSd/eK3rMbfAHajRw3AtNKsmUp9wTQz/HdP4T8nu0Lv9wqcIIUk/rhaGbixOY5G/+pM6H++qZJm7hQkGbFiULA22eoJhUlR29+SorKRtaykAqPW47pRqq2uu8oKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFRKD46K; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39ee57c0b8cso6121145f8f.0;
+        Wed, 23 Apr 2025 04:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745408246; x=1746013046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sOaslwO/iDwgRO6fHWCqrlxeNb4sZEAWfunB5Ekm3Yw=;
+        b=CFRKD46KAxCSY0GnRw3hpSW2CTnMcs+t5+zUcvTICIm595UnYv+fNvGC1IaEWX2VGj
+         G8Yerid3y+63qAbNBjy5Z91GmvWrdZaFzsz7iXIKQo8UInPK+QIxyUX3BZN6LouKsZ6x
+         hR2/zdMHFzkhz4UMykPFcwPAFF6EOwjs3AM7YU1NVLs0shtnkNmiWaJ907yPuKrsGD41
+         bnhN0CSgvJtG25s533hJ3HfDRh87ZOZzt1EYdjgbHI//bSZn1DXHi+Cqni1sz7+R5qsD
+         2qYxxaNnRHHMID4Ppbw1f7UyUu+V85p8bILHVUxHxj+R5tdktrDpMm25oApGpF9RqMeU
+         ag3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745408246; x=1746013046;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sOaslwO/iDwgRO6fHWCqrlxeNb4sZEAWfunB5Ekm3Yw=;
+        b=ACYaAK8cWKihFAcJvUKTR2pwhutWHqm2J7YMTIoSEVs6dPScAoToHtdf2Rsy7AQnbx
+         eqrTM5s7SYlgz0zkmMOQBNK1IC+ANgw2VRPojCfISGA4qMuOgSuBFuYiSHzzW0o4c9zQ
+         +ebTMubYIGYeypQiEE+hFCAPvrJwS5gY2RJjHMC2uX1hlcsi0LM3HAnoWZ2vBGSq1IGx
+         hq815QSHqzBlBowR3BNdL7VecHPkRjcULaYHWwItSiIkWtFaHv8BRtY95FW3I2iO4hDS
+         CUVppMFi4YTNUSu6UAn083mZsAH2ciEWgn2Bvx6idIQrSkVRn6T4QkcbNCQF12aih6UE
+         UKmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVZ+w8ahaAOeaWCjBxujFKzv7z9xHuhBeLR1T/tF1LHngzybhGrpvizLQULxGL5YUrEK7qwB/MIBAMHbFM=@vger.kernel.org, AJvYcCVpbCVTde6MIACnQ/zLCt6aOsAKtfSVcavgfCIZ9VzHJZ5Nb0Gihg7ExleBTuw07cHjGvNN8XMr@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/3sZFMVp1LwJMFx6fiST35JO4Rtx0U1+7dQLPLU/TZYu/rUT+
+	G1aWvU6pCykERHSyJNr6QcZ5rFvVqWXK7StdMhNGAvD/1xQpP7jp
+X-Gm-Gg: ASbGncv6Gmqr9CjhmDZziqNX9kuuhBwtRCDXtOA0908q1/f7guph0yvnmbdqNKSPr2S
+	LEMJsMgWtNo/Wb4Fy93eeIjTYe/zeA/aqYTsVb2441PcHBiakezqC0OQ2F3nml63W0odOE9rYYC
+	v3mZ5eaQ84k2FjCqgTZKR/gnuXlu2u3K6sMSohh0QMh7sdthJtmXgeH5GMad8SEaha+Yaqd/NBa
+	M/U62SwxS64DnNi1bS1kvzbyztrK3+3EJ49gL2vJgMEUB/X9/7jpAWlCL1CFTsRTXq5ztH1ejcC
+	KCAq2g+oWe8FcqejddhYanuYi2MUImLGlRsRxm14aA==
+X-Google-Smtp-Source: AGHT+IHSoaSXaAgj53jWAGtI7Z7mMkdXhhLo9jTahymT0NfSoVyVjCueixP+i4S5vMsc6dh5pNJwhw==
+X-Received: by 2002:a5d:6d88:0:b0:399:737f:4e02 with SMTP id ffacd0b85a97d-39efbad2f10mr16252645f8f.39.1745408245796;
+        Wed, 23 Apr 2025 04:37:25 -0700 (PDT)
+Received: from localhost ([194.120.133.58])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39efa43d22esm18699323f8f.52.2025.04.23.04.37.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 04:37:25 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: ip_gre: Fix spelling mistake "demultiplexor" -> "demultiplexer"
+Date: Wed, 23 Apr 2025 12:37:19 +0100
+Message-ID: <20250423113719.173539-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-> On Thu, Apr 17, 2025 at 04:56:57PM +0800, Justin Lai wrote:
-> > Fix the following compile error reported by the kernel test robot by
-> > modifying the condition used to detect overflow in
-> > rtase_calc_time_mitigation.
-> >
-> > In file included from include/linux/mdio.h:10:0,
-> >                   from
-> drivers/net/ethernet/realtek/rtase/rtase_main.c:58:
-> >  In function 'u16_encode_bits',
-> >      inlined from 'rtase_calc_time_mitigation.constprop' at drivers/net=
-/
-> >      ethernet/realtek/rtase/rtase_main.c:1915:13,
-> >      inlined from 'rtase_init_software_variable.isra.41' at drivers/net=
-/
-> >      ethernet/realtek/rtase/rtase_main.c:1961:13,
-> >      inlined from 'rtase_init_one' at drivers/net/ethernet/realtek/
-> >      rtase/rtase_main.c:2111:2:
-> > >> include/linux/bitfield.h:178:3: error: call to '__field_overflow'
-> >       declared with attribute error: value doesn't fit into mask
-> >     __field_overflow();     \
-> >     ^~~~~~~~~~~~~~~~~~
-> >  include/linux/bitfield.h:198:2: note: in expansion of macro
-> > '____MAKE_OP'
-> >    ____MAKE_OP(u##size,u##size,,)
-> >    ^~~~~~~~~~~
-> >  include/linux/bitfield.h:200:1: note: in expansion of macro
-> > '__MAKE_OP'
-> >   __MAKE_OP(16)
-> >   ^~~~~~~~~
-> >
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Closes:
-> > https://lore.kernel.org/oe-kbuild-all/202503182158.nkAlbJWX-lkp@intel.
-> > com/
-> > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this
-> > module")
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
->=20
-> Hi Justin,
->=20
-> FWIIW, I note that this problem is reported by GCC 7.5.0 on sparc64 but n=
-ot by
-> GCC 14.2.0. And I think that is because in the end the values passed to
-> u16_encode_bits (line 1915 in the trace above) are the same with and with=
-out
-> this patch. That is to say, this the compiler error above is a false posi=
-tive of
-> sorts.
->=20
-> But I believe GCC 7.5.0 is a supported compiler version for sparc64.
-> And this does result in an error, without W=3D1 or any other extra KCFLAG=
-S set.
-> So I agree this is appropriate to treat as a fix for net.
->=20
-> And in any case, fix or no fix, it seems nice to limit the scope of the
-> initialisation of msb.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
+There is a spelling mistake in a pr_info message. Fix it.
 
-Hi Simon,
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ net/ipv4/gre_demux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you for your review. I will repost this patch separately in the
-net tree.
-
-Thanks,
-Justin
+diff --git a/net/ipv4/gre_demux.c b/net/ipv4/gre_demux.c
+index 6701a98d9a9f..dafd68f3436a 100644
+--- a/net/ipv4/gre_demux.c
++++ b/net/ipv4/gre_demux.c
+@@ -199,7 +199,7 @@ static const struct net_protocol net_gre_protocol = {
+ 
+ static int __init gre_init(void)
+ {
+-	pr_info("GRE over IPv4 demultiplexor driver\n");
++	pr_info("GRE over IPv4 demultiplexer driver\n");
+ 
+ 	if (inet_add_protocol(&net_gre_protocol, IPPROTO_GRE) < 0) {
+ 		pr_err("can't add protocol\n");
+-- 
+2.49.0
 
 
