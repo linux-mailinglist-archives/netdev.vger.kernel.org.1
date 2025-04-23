@@ -1,131 +1,139 @@
-Return-Path: <netdev+bounces-185004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE90A98160
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:42:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833ACA98175
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D5083AA052
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:42:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73D4A17BCA7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F96268FEB;
-	Wed, 23 Apr 2025 07:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B8226B2AC;
+	Wed, 23 Apr 2025 07:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ht8Pg4C2"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="MuAoy5Jn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961B266B40;
-	Wed, 23 Apr 2025 07:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D1426A0D1;
+	Wed, 23 Apr 2025 07:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745394142; cv=none; b=f+ydcomMXbvp5XfWQLxQfmy0Tc3TQIovWfxhWK+Maa3XbPFAbP/Cmy5+fQq4yEdtrgd19gPvo1thhWDDOxe+5LnJdzWsJblv/geDddvFz40l2ylv+T5c3bkutWE5P/uonILSXuLh6XTO4Z59AFhLenLQtdUZhasfH4X5/YrIwrA=
+	t=1745394391; cv=none; b=aPZmB7kcjHVCBFgalSf89k82xYCQqQCotUH2dfm6pJk/ek7qUjyuTb7FP5uvsmH60cT4j5vr3uk8CUExFpQAatz5dM6ttGSCWlb8HXI1nm2I3bkedlGY/6v/6989muzcXQeOvckxnlE1F3V//+qVZafZwW18oNI99fTsLlcYohE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745394142; c=relaxed/simple;
-	bh=Xg0KnLB4URmkB602Xl9ajDC10CPLIyV/X6uVweDcuCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YKoIQt4kM9SVtdMkFPcHx3Teo7vY5PdftIkNFXNJbAYMiEzNTB+uxMxm6zM9n9PTRy0eeyhJQh7sea/HfnIRQKKKujReyQc19s/P3txXSDHYXKyx7ayn+lYtcNhPRtE0ALncDQOn+FL5yT2XiKDhuWC44uUguh+IQdNBbsRsGFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ht8Pg4C2; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N7efcj3105192
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 00:41:21 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N7efcj3105192
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745394085;
-	bh=6GdmFpMZgynlN0+8/dR5L54gssO+r5xFLscuv7Zb+Vs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ht8Pg4C2x78BenMmhZHdlstOae3d80RJunxbx/Cvdsa9Ng1sweJyhq1qZe74uad8w
-	 dHIUkIaWpBwuEpEQXpNTzZstGa5HP1LuibQWsRATlidlNhOkvy0MIlrog/VWtzXAtz
-	 iLAft/hoYaZa+I3d3ZuooQk2COryT2hVxNfUJCgHWslPfgG0MkXcQL1z8/s+UH5PeL
-	 gb+2hbsIwrgPCaQZfJBxkbSwSmLHKEpQNdet6O8uEfcXydqh1elJk/5c7nEHD20WPV
-	 eqeeCqMeQgCc7w45x4no+uWwxrEjeXlIz4D82w4Q141GaNuvo9afJ+SLxKkWxA61fx
-	 KcYJYI7GY7/WQ==
-Message-ID: <9268e169-554d-43c8-a00c-f43c274f6116@zytor.com>
-Date: Wed, 23 Apr 2025 00:40:40 -0700
+	s=arc-20240116; t=1745394391; c=relaxed/simple;
+	bh=Ga2o5j3jSKoAno2xpRj2CfQ50rnP6/DQsQlw0yMjgQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z4kFkROvChjnXzihtul8EohUDqeT1xf35hoR2iAPLzG/8uOdI53++9E2N3LO0bO2AcT4RtF6q26MI20kOJwLHy8y8P0H1v4nqZZUcExTf98GOPpsEF55OfE8zgnuvyItzCirM6ne3CqC41PrJpBCJkpx3NYog3ArUszRTS2/qy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=MuAoy5Jn; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1745394378; x=1745999178; i=wahrenst@gmx.net;
+	bh=MhSlQAd0W28TE1r//syKzr2OZo839iGIpMX9nJi+1LU=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=MuAoy5JneK7zxO9zIcuzF2SmnMtcEyBuQfyKWs1nH2ZGowhxs+4jqV9/458sysvl
+	 gaPOjQYB1qdlDUX2k3lrXz9dY/oe2IwQGKroPFTu7Ekj9Kk805ArDy11IfEDneNm7
+	 7PYDb8dobYTxyCpGiYV4V87mXiVR4oa+t/6myW+IfwK5nmKNeijIyWcqmcYR4rt4V
+	 kyl1Gl0K+OlqtFk1qDetX7MuMD19MQQdevsyqE52dOChf/4BsCWEj/qkmJzoP35ju
+	 UkHWWtyzO8kU77Gf/tix+y3WxvcquIMAVcmpmQ8y5bZ7ItSgNY2Zymh82sslrukjL
+	 ejh960uPawZ0J+KfsA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.251.153]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N95e9-1vDMr70BiZ-00uxvJ; Wed, 23
+ Apr 2025 09:46:18 +0200
+From: Stefan Wahren <wahrenst@gmx.net>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH net 0/5] net: vertexcom: mse102x: Fix RX handling
+Date: Wed, 23 Apr 2025 09:45:48 +0200
+Message-Id: <20250423074553.8585-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 06/34] x86/msr: Use the alternatives mechanism to
- read PMC
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-7-xin@zytor.com>
- <fbb509e8-0bd6-480f-be32-fd0895255a21@suse.com>
- <a482b4df-f662-4d5d-8100-ade07afcdc24@zytor.com>
- <bfeba521-0a49-42d0-bf83-15d031dfc6da@suse.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <bfeba521-0a49-42d0-bf83-15d031dfc6da@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:dYqEZO5Zb96sbjeghkbjZKb08HCZCpLUDP70OPkIgjc8rCesMRl
+ 9lD80UDX+11hDF4e58hE8Bx/2ONOhRZ+XvvbRkshgVtmUlfLJP71792jP6EeFpw6kvuapdM
+ zJBAg8FJ8cuv2RFH4+YDssDSZtOcb5OdRTH8xV05pZe3P0D2ij+l8QKSKNBliZ9RMt1RZrK
+ UOnNes8ZLw6n9uqne73+Q==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:6mYsuqFexdk=;npqHsc2u80cSCTUPjKzlhOQojy4
+ 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
+ OwPha5IPWiAko+7xdjdcVL7rtl980vI=
 
-On 4/22/2025 2:28 AM, Juergen Gross wrote:
-> 
-> I have worked rather hard to make it less intrusive, especially by removing
-> the paravirt specific code patching (now all done via alternative patching)
-> and by removing 32-bit Xen PV mode.
+The series contains substantial fixes for the RX handling of
+the Vertexcom MSE102x.
 
-I looked at the optimization, and it is a nice improvement.
+Stefan Wahren (5):
+  net: vertexcom: mse102x: Fix possible stuck of SPI interrupt
+  dt-bindings: vertexcom-mse102x: Fix IRQ type in example
+  net: vertexcom: mse102x: Fix LEN_MASK
+  net: vertexcom: mse102x: Add range check for CMD_RTS
+  net: vertexcom: mse102x: Fix RX error handling
+
+ .../bindings/net/vertexcom-mse102x.yaml       |  2 +-
+ drivers/net/ethernet/vertexcom/mse102x.c      | 36 +++++++++++++++----
+ 2 files changed, 30 insertions(+), 8 deletions(-)
+
+=2D-=20
+2.34.1
+
 
