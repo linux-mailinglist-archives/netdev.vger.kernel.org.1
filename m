@@ -1,96 +1,115 @@
-Return-Path: <netdev+bounces-185296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DCFA99B4F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:14:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258DFA99B5B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:17:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43AFF5A6E99
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:14:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84DE1B83E21
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25771E1308;
-	Wed, 23 Apr 2025 22:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12C21EFF89;
+	Wed, 23 Apr 2025 22:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="riwSNAm/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RswZ3qZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E741885B4;
-	Wed, 23 Apr 2025 22:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E263586331
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 22:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745446490; cv=none; b=ZAVWcbS7CmjLMpwlRgg85l7HvecH0DhTTMwvHLr9QkX/K9/TPkC3vsIZoOp0EGaVpBv6HWmeEl1CSy9J1VNJkbp5DW6naFjzQ2BH3kyCywwqIaDuGsGN1AEw2KTkk98/Pnr/ihV19enPYoa2PVK7nKHqIr0TWMtWSeHEaFa5MNY=
+	t=1745446641; cv=none; b=WqEdFJvVecfOPz03k3W0FmKWuQaLZgnLnqGlP2C/iwxeR95qNgz4uvDEnM55a+lWob28nJvNfT4DulyNg7cp9xN/M+DldX8TLMyeG1w2OiZ4t7+NJNBNMSwNKpcJ8QKpwOVoTkV3rgHln7LqOgAncfiEmb7piydo2w+0Iu0TpMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745446490; c=relaxed/simple;
-	bh=yA5ENDOU6WR/6eoqizFm8BUxphmvVuGLV+xi0KRrHsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l2JIO8ArVv1cQLV9gVjMqGvCnGabPkSSqAoJ5hOG+S6hODicdqA1+NZuShLW46AfRqIFlxixHYTYJmP5BBzlJmoZYFdUd+0yjhRhCM1HtPhbNPdetcadwflX4zb90ijdJR2dGglhjXCEGd0nUe4fAXARZ+p8f0lOOc11Ft0XhFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=riwSNAm/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14146C4CEE2;
-	Wed, 23 Apr 2025 22:14:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745446489;
-	bh=yA5ENDOU6WR/6eoqizFm8BUxphmvVuGLV+xi0KRrHsc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=riwSNAm/IP7hpOveudhoxer5Kf/aotbjwxCXUtk3nzygYvgSsL6ONNw1BRs54fBDb
-	 Yfe6SP7JqDLkwCMjTytT1pow9SxXz9vaO2aKzm8yShqTD9bkayFdWVmdJDO6+hFV5B
-	 QGr8wGMsp+Blk+SaETw9oSmG47z9ithxfSLJI2DoieZGg0QFXF7ZMH8ocXhpyy12Jv
-	 Cq5IFsSwbaEZFInLrNCnX0bm3FrKvXlRf6uny3iL0r80RC+Gk8vqTPZKoLiczx6s9f
-	 52JzTTWyJw45ekwLLIjoIUzt2xfez0G/unjv0b3jivQQO+Dtn2oDk32xFQECWPEXKz
-	 OADngvh80wKPQ==
-Date: Wed, 23 Apr 2025 15:14:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Philipp Stanner <phasta@mailbox.org>
-Cc: phasta@kernel.org, Sunil Goutham <sgoutham@marvell.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Geetha
- sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- hariprasad <hkelam@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>,
- Taras Chornyi <taras.chornyi@plvision.eu>, Daniele Venzano
- <venza@brownhat.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Helge Deller
- <deller@gmx.de>, Ingo Molnar <mingo@kernel.org>, Simon Horman
- <horms@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Sabrina Dubroca
- <sd@queasysnail.net>, Jacob Keller <jacob.e.keller@intel.com>,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: Re: [PATCH 2/8] net: octeontx2: Use pure PCI devres API
-Message-ID: <20250423151448.15a4a13e@kernel.org>
-In-Reply-To: <00189e0a036e1bc7af8f78cc9fa934f1ad23efba.camel@mailbox.org>
-References: <20250416164407.127261-2-phasta@kernel.org>
-	<20250416164407.127261-4-phasta@kernel.org>
-	<20250422174914.43329f7f@kernel.org>
-	<5e20b320cbbe492769c87ed60b591b22d5e8e264.camel@mailbox.org>
-	<00189e0a036e1bc7af8f78cc9fa934f1ad23efba.camel@mailbox.org>
+	s=arc-20240116; t=1745446641; c=relaxed/simple;
+	bh=vcYM3cGRIV8ga2z6h0eXe3QtkdwpdnrsYFMU/4WLeog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EFyl3WExjI5Q3jVJIj5I/UCrcY0G66x/Z0bUDyRTTq/ETQAzcNGR+HrzJNgI30KXqF1qdiRMfZw9VCkMEsL/+tv2RDzrKvLrcv9X2j6p4vNRqcBZnXneZMg2Lx3qAXEx79QgUyGuxvwcBKBYDQATHC1naSe0Ogj1y340fr++N8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RswZ3qZu; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 23 Apr 2025 15:16:56 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745446625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r0Pugca4uCw8q3SU8l12BS7UQCUB0ByIynMRUd5StOU=;
+	b=RswZ3qZubhaGXoBHAYXa6YrNySCpNwcOXqbp5gTNYF0OU+2jqfcWS0YtXQLS0dsldUPu7A
+	7JMFUnvbgAqR1gkJK1wgITJqNxDU/z3lAyOYg/IxNcuUYL8qSWCFvi7Np82V8FL6TOrbrM
+	bR6zTCcS+EAfqwhnSYyhnbdOR3CNxRY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Vlastimil Babka <vbabka@suse.cz>, Eric Dumazet <edumazet@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Meta kernel team <kernel-team@meta.com>
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+Message-ID: <ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+ <20250422181022.308116c1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422181022.308116c1@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 23 Apr 2025 10:38:01 +0200 Philipp Stanner wrote:
-> > > This error path should be renamed. Could you also apply your
-> > > conversion
-> > > to drivers/net/ethernet/marvell/octeontx2/af/ ?  
-> > 
-> > Hm, those must have slipped me for some reason. Will reiterate with
-> > them and the error path.  
-> 
-> Wait, false alarm. I actually did look at them and those in af/ don't
-> seem to use the combination of pcim_enable_device() + pci_request_*
-> 
-> Only users of that combination have to be ported. Users of
-> pci_enable_device() + pcim_* functions and pcim_enable_device() +
-> pcim_* functions are fine.
-> 
-> Correct me if I missed the first mentioned combination up there.
+Hi Jakub,
 
-I think you're right, there are apparently multiple but separate
-drivers in that directory.
+On Tue, Apr 22, 2025 at 06:10:22PM -0700, Jakub Kicinski wrote:
+> On Wed, 16 Apr 2025 11:02:29 -0700 Shakeel Butt wrote:
+> >  static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+> >  {
+> >  	struct memcg_stock_pcp *stock;
+> > -	unsigned int stock_pages;
+> > +	struct mem_cgroup *cached;
+> > +	uint8_t stock_pages;
+> 
+> Is it okay to use uintX_t now?
+> 
+> >  	unsigned long flags;
+> > +	bool evict = true;
+> > +	int i;
+> >  
+> >  	VM_WARN_ON_ONCE(mem_cgroup_is_root(memcg));
+> >  
+> > -	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+> > +	if (nr_pages > MEMCG_CHARGE_BATCH ||
+> > +	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+> >  		/*
+> > -		 * In case of unlikely failure to lock percpu stock_lock
+> > -		 * uncharge memcg directly.
+> > +		 * In case of larger than batch refill or unlikely failure to
+> > +		 * lock the percpu stock_lock, uncharge memcg directly.
+> >  		 */
+> 
+> We're bypassing the cache for > CHARGE_BATCH because the u8 math 
+> may overflow? Could be useful to refocus the comment on the 'why'
+> 
+
+We actually never put more than MEMCG_CHARGE_BATCH in the cache and thus
+we can use u8 as type here. Though we may increase the batch size in
+future, so I should put a BUILD_BUG_ON somewhere here.
+
+> >  		memcg_uncharge(memcg, nr_pages);
+> >  		return;
+> >  	}
+> 
+> nits notwithstanding:
+> 
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+
+Thanks a lot for the review.
 
