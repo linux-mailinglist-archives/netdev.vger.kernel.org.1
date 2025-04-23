@@ -1,119 +1,98 @@
-Return-Path: <netdev+bounces-184954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BBF2A97C8F
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:53:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B53C5A97C9B
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 04:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3EEB7A1600
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:52:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB8121B611B6
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 02:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1BD263899;
-	Wed, 23 Apr 2025 01:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8100263F3F;
+	Wed, 23 Apr 2025 02:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="OB9tJ4Xs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxgRkm7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ECED2620D5
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 01:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F200263F28;
+	Wed, 23 Apr 2025 02:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745373198; cv=none; b=gMuwzaRbU0kEQj96BsGRebn1nIKdenBv7DnHKqblog1nMikFpbWVz/d0KpFKr5yxyZmCYBWBzK9v38MFYwwNPZ3OpTHFfWbwv9QwAXW1vphUXRmFfZZcXTjB5oF8me8++BDsvjOkqBThb4c0IkSuMHSWTXI1wo9ABTUaozYzh18=
+	t=1745374191; cv=none; b=VhCPoaZqQTrG0vwHMlwucEH230ZKlcNoDQqoostFThT5VtaoZS4yItR9qZRzw0K1z0ecYUqkH87D99F6l6d4ceToyV+A85QaNY2mYOmmFdHuTDGs5GQCfcEBygvl5g1ILOQ8E/4OuLVwcSkiFz6V0NuGxEX45GW3oMpZleqDMX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745373198; c=relaxed/simple;
-	bh=YOADREcuXzeFJ/7ogJYsiWtLPdbvIBRLVZcgwkoXONI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnZGq7qlwPDQBq3V+eZ+y16aXpMtxDIoJixMUCcRi0vHTGEbH8mWPyATj8HkaJLD4/zJD2lrovvPlJZPP3XbYI5TbavwTq5oGcmrlOhb6W29bVYe0sYGiyM4vTktoH3YWKP3GvQpQIF8I3zvaR0PoU3BtVmnmOM9krlhHbo8U5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=OB9tJ4Xs; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-736aaeed234so4899468b3a.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 18:53:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745373195; x=1745977995; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KGiT7L93EPMhEGwb6/RngvZihZULdSMhV4XtuXAOh98=;
-        b=OB9tJ4XsxdyY/okBWZ+ZgsXXDwRpzO7HaQtbRIYoocmCWVh7+vs2HPWdFWGJLqN5Az
-         gXbPkcvzHrc5J2KRgH8IFNYDAzz/N2ABGjKL142XMAWnGwBJISHMO3y0NLJz9LEBqK3O
-         QpbGV/id3TOHmTa520zLLQ7YrRtSoyPzpE7Qc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745373195; x=1745977995;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KGiT7L93EPMhEGwb6/RngvZihZULdSMhV4XtuXAOh98=;
-        b=G72OClMUvJekdPn10xLxwfs3aQIHjwHIfbLPMndTuP3UETQvQpT6efuMIzuLWkRlXH
-         LzrTqPVdW/V+J37vJ3KvacUT2WqiY7qlwY7gIHcodt0+OeV1KWUURi+MGFHaBzy8ZtFq
-         RgU6a/bCH7cBfPrIQQbGMn5kd+hAQCO0NXuic1moUUmZLAoQ/khhEaI7PlA41YAhJh0Y
-         pnu5FdQ4U+VxbaxOhfIjcD9KfwdU1q306+YxXWX2noaYnHGR6YrSYuJSAqyXZamTmkpj
-         HkrHL3NJXklBBgx+ySUkNNAuSIMsMWUNbgGdetgdBux6B5ywz82BFV/VEv/yzjWkKtnK
-         cnYg==
-X-Gm-Message-State: AOJu0YwTMAb2I+AvgA3IheF1bl7w3syJ/trteyCOFsVPsUV+eMXXWY2T
-	gDbLmlEqBTlDNjdy72oCZCmgDC4ZczEC0jSlmRtLtRXcA8UKqHYxCoU2s5vK/Fk=
-X-Gm-Gg: ASbGncsxxQuUsjaL7DmRx9tHkT4/u9bZY3YJmg3CRp4YpEjgQxbOD37CvLEH5gSobGq
-	Y8I0sKZKxlgcM/lQGpOhin5DBa6Twv+zDrPUkDJMYyR+v7pJTNoE3b37jGKg/Fb5/NPm7F42Ye1
-	irGKAI8hfJhfaoZhS73/sq+tsto8ZXA/hXpXP7zMCHLpnjnHejLwNkVuEe/RIlN8VeyHvPoPTiJ
-	ixLaidFjsc4WKcfRlX1Tqv6oWwCHF0V+ExRqu3L63nloZaTHDPIeYt3aVCyD0pXTGohSAWqlCmX
-	Hx8HXOI3PCtnOdIrdtBPx/CI/c2J53Kwe46+ZdaFOXsVl/aeCcl90dDrCMPTTd5zW0zbiBR5X1q
-	l6wU4FeU=
-X-Google-Smtp-Source: AGHT+IHB4kTggl2g+HQj4syvd8yW2jw969FjiGdBYuNYXKvY4w6+RCyzB+/uh6VxNaqouYmzneOtFw==
-X-Received: by 2002:a05:6a00:1142:b0:736:fff2:9ac with SMTP id d2e1a72fcca58-73dc15d0c1amr23847999b3a.23.1745373195665;
-        Tue, 22 Apr 2025 18:53:15 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8c0200sm9332236b3a.1.2025.04.22.18.53.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 18:53:15 -0700 (PDT)
-Date: Tue, 22 Apr 2025 18:53:12 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
-	andrew+netdev@lunn.ch, willemb@google.com, ziweixiao@google.com,
-	pkaligineedi@google.com, yyd@google.com, joshwash@google.com,
-	shailend@google.com, linux@treblig.org, thostet@google.com,
-	jfraker@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 6/6] gve: Advertise support for rx hardware
- timestamping
-Message-ID: <aAhICMrep5YHu2hO@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
-	andrew+netdev@lunn.ch, willemb@google.com, ziweixiao@google.com,
-	pkaligineedi@google.com, yyd@google.com, joshwash@google.com,
-	shailend@google.com, linux@treblig.org, thostet@google.com,
-	jfraker@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
-References: <20250418221254.112433-1-hramamurthy@google.com>
- <20250418221254.112433-7-hramamurthy@google.com>
+	s=arc-20240116; t=1745374191; c=relaxed/simple;
+	bh=9Eq6F5rNFpCaMiyqHi+sGGOWlrMFXjbKYuY+wV7w51U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AvMykOJZMnWHfeJp4BCwVyevY/j2O8Px3yIni2q611q6NVeyVz5rM3Kz2P5wZZE6HsIXaFbVSqjdT5eWs8+r4IJBvDVYHyNOak0bSVsnJ7r0DyIGRwFidU4Hh60eMAPz2Y3N/F7EP7pIZztxvy92VEj5tznWJ3yls9uZnkqUEV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxgRkm7i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 073F4C4CEEC;
+	Wed, 23 Apr 2025 02:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745374191;
+	bh=9Eq6F5rNFpCaMiyqHi+sGGOWlrMFXjbKYuY+wV7w51U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AxgRkm7iSqpy2pItlu4TMsQH/qP9CltUAWA/2h/JIakeTqGhgWgXBEJwc/zGJaNvk
+	 ZEGz6jcQIp3+0y+iX+iJ2KtQJo3MHUT57yENhZfSs8e+tA1yNBJ/NIrUPqEWU8G+Wo
+	 omx4oYNbHSpKd5Vcc1Dy2r6OMjnzpCGabMcKrd63otAeeCHX5YYdSQUP5TtZQ4IswQ
+	 Scm/0/lBcvGD99vpdnEsCYnvpznAkA3pgjLLx783lz27Zq9glqSwiDId6q2lURu8VB
+	 +xV5ZbMCyos9DVbug3tIc6+PpY3Rr2QIapcmWZarklSAMkah0zK4/89MDufe5Bx32p
+	 Er9YAkN85jcQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF33380CEF4;
+	Wed, 23 Apr 2025 02:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250418221254.112433-7-hramamurthy@google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: ethernet: mtk_eth_soc: net: revise NETSYSv3
+ hardware  configuration
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174537422950.2115098.6975575929534366973.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Apr 2025 02:10:29 +0000
+References: <b71f8fd9d4bb69c646c4d558f9331dd965068606.1744907886.git.daniel@makrotopia.org>
+In-Reply-To: <b71f8fd9d4bb69c646c4d558f9331dd965068606.1744907886.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, lorenzo@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
 
-On Fri, Apr 18, 2025 at 10:12:54PM +0000, Harshitha Ramamurthy wrote:
-> From: John Fraker <jfraker@google.com>
-> 
-> This patch expands our get_ts_info ethtool handler with the new
-> gve_get_ts_info which advertises support for rx hardware timestamping.
-> 
-> With this patch, the driver now fully supports rx hardware timestamping.
-> 
-> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: John Fraker <jfraker@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Hello:
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 17 Apr 2025 17:41:07 +0100 you wrote:
+> From: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
+> 
+> Change hardware configuration for the NETSYSv3.
+>  - Enable PSE dummy page mechanism for the GDM1/2/3
+>  - Enable PSE drop mechanism when the WDMA Rx ring full
+>  - Enable PSE no-drop mechanism for packets from the WDMA Tx
+>  - Correct PSE free drop threshold
+>  - Correct PSE CDMA high threshold
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] net: ethernet: mtk_eth_soc: net: revise NETSYSv3 hardware configuration
+    https://git.kernel.org/netdev/net/c/491ef1117c56
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
