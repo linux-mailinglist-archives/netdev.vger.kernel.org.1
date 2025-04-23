@@ -1,107 +1,114 @@
-Return-Path: <netdev+bounces-185163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0CEA98C4B
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:04:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815D6A98C49
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:04:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B4EE189304C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:05:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D20C93A8FE7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F9027B4E9;
-	Wed, 23 Apr 2025 14:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AC527935D;
+	Wed, 23 Apr 2025 14:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="NErA9wOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D8279917;
-	Wed, 23 Apr 2025 14:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80FB2797B8;
+	Wed, 23 Apr 2025 14:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745417051; cv=none; b=M1zIAft2d34YDd/Grv0vOJfqRZDW0SZ6Oc7PbM5J/nyC1GCDDBsbmPnZ8x07pmjkRqCKiG1BTrdwjZ9ukMdhOK5D2f5Fys987ghSXn4EH9iULklDfE8wcz+2T+HSO1s34GoyNr1pnoKENVvj4TVq5plN0oUKS6oRGy8IC0YiDX4=
+	t=1745417050; cv=none; b=t9iOEktozQmKnB0HoY2nvAH4QRXkr83scSkHnUmv6ritAGyG2/DMG/tIbbvCvmaOtFmhZrBDFNyDpoiXWR1/Y0weviYGMeeM1UKySQ77SMbPISpB4pBOyTQH+H8Dw9nU9de/qu4uf9Q5kC37sS2ZSobvxXMnRV99BWHBVPH5+TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745417051; c=relaxed/simple;
-	bh=fNoJRpHuKT1mrda+dXosfcR63wOlI+o2Qg/r3AfmdGQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=swZapadK0RhW0QAQ8peZ1HMpgHuXed4WDEnWSH+JNlJR+YdZTfzlRq4OW9Zlshjsqu4hNL7EouYJQVQHi67fyrWdDafkyKqkCuwxz9V17TACMlRS3fofXkuz2b09TxgymyOxiOMylxfYGRClnRmRMOP+WOvv5Y7DS22vQ9umjBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from [127.0.0.1] (unknown [116.232.18.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 5F3523430F9;
-	Wed, 23 Apr 2025 14:04:04 +0000 (UTC)
-From: Yixun Lan <dlan@gentoo.org>
-Date: Wed, 23 Apr 2025 22:03:22 +0800
-Subject: [PATCH 1/5] dt-bindings: sram: sunxi-sram: Add A523 compatible
+	s=arc-20240116; t=1745417050; c=relaxed/simple;
+	bh=IE9+QhGjstZ+dXjDylZNdtZWhXj8gUk7kwoxYglND5A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A/8P0afwX0BdJRrknzu7/5q98GAOYKkMAqab3BP16nxiF1tQFVvLqLKfx66LBmDBdq5R40aeg1qUTOlhwUsU5v9gqoVkGeGyt5QYVd85JyueafwBAW+OBy/Bg2yq15HLChySSzkyc7Cj2PPQeqIIXJuhZgk16ZP2rBIEZaqqnR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=NErA9wOa; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=oaGiHzShZ+7Se81JoQaFP8hejDedRsEVccoTeyzc4dw=;
+	t=1745417049; x=1746626649; b=NErA9wOauBzLnyJ1h7Ns/jH0B6mcuYXQnm/MjDb7+KkTK5N
+	W7YnpftsMJvRXEVwEGvZWHzdNAPx+vn2dPqDsMyqu70sTRQ7uh/HtJIuFeXwF/DZ+E8Hk6Copl7Zp
+	hjJeaZ1+koGDwAC2fPR+uqLvZZHOjw/HcdJEfXczFlhcL+2EvbsHaoFTlZJ1C3FX+5N2X17fEkrrR
+	9fUBChg7JxhKOP2IN5wRFNuEClEUDqNHWdn38isSb9AjmCnRsK5jwljR1i/PXNsNVwzYvtEQcmaE4
+	UbeshGkJ+XwjRsJQybjcWyvrH79tcpabm3PNzzE6+5Q/6LmIsT3wYc9Ak4wz/7vw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1u7ahp-0000000Ej6j-2iEm;
+	Wed, 23 Apr 2025 16:04:05 +0200
+Message-ID: <ff63580712b8f20b4be7b38a31bc3bb9d69a4820.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: mac80211_hwsim: Prevent tsf from setting if
+ beacon is disabled
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org,
+ syzbot+064815c6cd721082a52a@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Date: Wed, 23 Apr 2025 16:04:04 +0200
+In-Reply-To: <tencent_6FF36BC379E97AE3ADC450776CD77EA6C405@qq.com>
+References: 
+	<b30cc04676a031db8c36df243160992094b3848d.camel@sipsolutions.net>
+	 <tencent_6FF36BC379E97AE3ADC450776CD77EA6C405@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250423-01-sun55i-emac0-v1-1-46ee4c855e0a@gentoo.org>
-References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
-In-Reply-To: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, 
- Jernej Skrabec <jernej.skrabec@gmail.com>, 
- Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Yixun Lan <dlan@gentoo.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=987; i=dlan@gentoo.org;
- h=from:subject:message-id; bh=fNoJRpHuKT1mrda+dXosfcR63wOlI+o2Qg/r3AfmdGQ=;
- b=owEBzQIy/ZANAwAKATGq6kdZTbvtAcsmYgBoCPM8tzxyRwM5JaEizk2cNclzPvX++EJ0fWumI
- +ET5sc3sJyJApMEAAEKAH0WIQS1urjJwxtxFWcCI9wxqupHWU277QUCaAjzPF8UgAAAAAAuAChp
- c3N1ZXItZnByQG5vdGF0aW9ucy5vcGVucGdwLmZpZnRoaG9yc2VtYW4ubmV0QjVCQUI4QzlDMzF
- CNzExNTY3MDIyM0RDMzFBQUVBNDc1OTREQkJFRAAKCRAxqupHWU277SdDD/9ZZ0Hso/3o+n/pod
- 4Vcz6ad9dd0AuydxpIuJZolPthCKCSHL3oPvWZW3S7D2fVAJ5B8dCw6dAAuv5D7FCEzfEHqUiKq
- c9CPebORx/66nLiB6PZrmdTWtUX/1BXaogZwJjr9sulTEBpRrWTJVoqt842wahV2GIij/JZ6XD+
- 01GrOr2Xj+X/BK6C3RrhdqnRgJxOskoBOVhftQcnpFDfSKNSzHhvQaFXpnkwR308xiPhuZE4eLh
- Vl/KWdbEuNhZoyykq2p3x2rayeE16p0UYqz0aSNFvTOWSs/sUGdjF6Jo6fnaLPsewkye6Bi8l/t
- obiKMbLT07Bl2FlfwZuX1rhSZGPu7fCK3RPLcAXgNY2c/BGgYw+7Jj1ZeJCVr+vk7A/U3YYGOJP
- yOWuR7ywl633p5mTX1AWXag0kJWCySDR/OYeNkCtvKlV5wMCzIhILsuayDC9/mdYGo8vpZQvsTS
- qZjmgAYdNfFnkPXdueuwIHNnEvpOShtZHjjHqUANgzLN6mYtQTLfAQgnDX7PX2GVZBtc87tyKBg
- C7I6/cM/WeQCp1o5A2aK1qqYXbAy2AFB82ntCwY0sxf5JzEbEKyzWQgR3beTqVm/mDdfYZChdCm
- HG+FuA4VpsQ3iSIsKsxnBtAzFpU3KQMfyDXjRue9K/gQXz0atGdfd5mCC/JUKe4ZWTnQ==
-X-Developer-Key: i=dlan@gentoo.org; a=openpgp;
- fpr=50B03A1A5CBCD33576EF8CD7920C0DBCAABEFD55
+X-malware-bazaar: not-scanned
 
-Add new compatible for A527/T527 chips which using same die
-as the A523 SoC.
+On Wed, 2025-04-23 at 21:56 +0800, Edward Adam Davis wrote:
+> On Wed, 23 Apr 2025 14:53:53 +0200, Johannes Berg wrote:
+> > > --- a/drivers/net/wireless/virtual/mac80211_hwsim.c
+> > > +++ b/drivers/net/wireless/virtual/mac80211_hwsim.c
+> > > @@ -1226,6 +1226,11 @@ static void mac80211_hwsim_set_tsf(struct ieee=
+80211_hw *hw,
+> > >  {
+> > >  	struct mac80211_hwsim_data *data =3D hw->priv;
+> > >  	u64 now =3D mac80211_hwsim_get_tsf(hw, vif);
+> > > +	struct ieee80211_bss_conf *conf =3D link_conf_dereference_protected=
+(vif,
+> > > +			data->link_data[0].link_id);
+> > > +
+> > > +	if (conf && !conf->enable_beacon)
+> > > +		return;
+> > >  	/* MLD not supported here */
+> > >  	u32 bcn_int =3D data->link_data[0].beacon_int;
+> > >  	u64 delta =3D abs(tsf - now);
+> >=20
+> > Please keep kernel coding style - the line break there is awful (but
+> > with "conf =3D ..." on a line by itself it can be just one line), and y=
+ou
+> > shouldn't have code before variable declarations.
+> like this?
 
-Signed-off-by: Yixun Lan <dlan@gentoo.org>
----
- .../devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml     | 1 +
- 1 file changed, 1 insertion(+)
+Looks good I guess, not sure you wanted bcn_int/delta to be calculated
+before or after.
 
-diff --git a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-index a7236f7db4ec34d44c4e2268f76281ef8ed83189..e7f7cf72719ea884d48fff69620467ff2834913b 100644
---- a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-+++ b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-@@ -50,6 +50,7 @@ properties:
-           - enum:
-               - allwinner,sun50i-a100-system-control
-               - allwinner,sun50i-h6-system-control
-+              - allwinner,sun55i-a523-system-control
-           - const: allwinner,sun50i-a64-system-control
- 
-   reg:
+> > The comment should probably also move because it's relevant for your ne=
+w
+> > [0] as well.
+> I don't understand what you mean.
 
--- 
-2.49.0
+The "/* MLD not supported here */" comment refers to the [0] - it
+explains why the [0] (rather than link id) is OK. So it also applies to
+your [0], if you're going to put it before the comment then IMHO it
+makes sense to move the comment. With what you did now the comment is
+still earlier though, of course.
 
+johannes
 
