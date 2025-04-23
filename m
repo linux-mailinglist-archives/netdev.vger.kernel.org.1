@@ -1,215 +1,149 @@
-Return-Path: <netdev+bounces-185007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72353A98173
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:46:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25119A981A6
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A386917B9F1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:46:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3F6C7A250E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 07:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8CD26AABD;
-	Wed, 23 Apr 2025 07:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="dwulbudq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D5E26E16A;
+	Wed, 23 Apr 2025 07:51:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1183D1A2557;
-	Wed, 23 Apr 2025 07:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4E626B08D
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 07:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745394390; cv=none; b=XZzY1ydfN8wLKELI/8OeQsjNt5G4PTnfkuuRoMZ+Wj/70HGrZEf4FfNSDd2AUzvUlVrLVWeoZEPPMNMjjOLLlG33mA3TP1wymNRFfxzYn5h/py+LwPymd6sNmHtzkCm12GCOvyGfJllmnc92Yi98spmVGixhkqnfaLsXskKc85g=
+	t=1745394692; cv=none; b=LVq84HbQSQk3qZ1rZ+iXWeraJjyfOwHt/j4hH5QT8gnnabMSmU5/A8IYTjO1xMvvqAkaZ2JgUax8TJn2UZC94THC8PjxcTBmrv1hrrie2X7bDOUVfK4YbU/9ywCM8209C2tIkGncG3Bb1LCMXKr+JqWuWWM7elYPtB5k6GkpHH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745394390; c=relaxed/simple;
-	bh=QwEV+u9FXS9n54L9RlduPFF8NSmQ57lB3GnXU59/KQA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fgWgYtFyFm85hl6owpCn4iQw62EEGIHIQ8OuepTl9/QDVYU1EVzn7tcVQRuVuMc8XFmW11SAwEzEM7+NUGqGkW9cPEfKd5hJbR3+DoZXjk0CSDUP2sjW7k3m1eaDiYqQAHXNG6Zh1/JyxLCFGv5me6lhMzS0McptL8gVQLSWdKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=dwulbudq; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1745394380; x=1745999180; i=wahrenst@gmx.net;
-	bh=PYnlupRimACw2/kv0FtWV3dC3rRtzmfhKvztySLxGEc=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=dwulbudqUaAV97YFblv1xglJORwRJl+mxcWhA//+rMpZE7sghTt1wmuBGv5gXUV7
-	 wDM+q4hQtGf5jrtfMcUtBxvShXPUIQfpjz7iD8uFAjr8nXi2zjN82jcErCoR+1zV5
-	 8PygmO3TnAyuawQjuQGBId8loIQGe/+aX2nw9oMC+jFcC4EkXJbn5CcKuBHWByPvA
-	 PIHEeGoe0+kNcL+hbdZDaCa9mqaYZy0dhlPkVtna3YR09QWlZjxtg8uo6yt6Pi+gU
-	 M/hzX0jHUxbxpSG8lAU11+Ddp8nt3iqOB7FnFfH/jNdWqCeve3FXI/668GWmZbxBc
-	 /JIDMpJULLymgc5jVg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([37.4.251.153]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M9FjR-1uDo4Z1NRv-00D8oP; Wed, 23
- Apr 2025 09:46:20 +0200
-From: Stefan Wahren <wahrenst@gmx.net>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net 5/5] net: vertexcom: mse102x: Fix RX error handling
-Date: Wed, 23 Apr 2025 09:45:53 +0200
-Message-Id: <20250423074553.8585-6-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250423074553.8585-1-wahrenst@gmx.net>
-References: <20250423074553.8585-1-wahrenst@gmx.net>
+	s=arc-20240116; t=1745394692; c=relaxed/simple;
+	bh=JVM+D2cPD5kJCHNUnkFYFbPV/xrj7r3Yu2JBXWM/bAw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ePHIYdlTBPpdox8T9yhqJRkqojzCBwVxcyjhbYzrS7BFHTEs7NgpWyKvtxIM2tmsIdIrBM/LmngCYI5J2rNtOkfU6YrO8N3AshKQoLzjJj9XClecGcN3HLUiBUR/2pBN0LLhYAu+hePOfKaLjear6S4ZfluR+TcLLvOcbOpwsa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d90a7e86f7so86929175ab.2
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 00:51:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745394689; x=1745999489;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ndzc6o3PQmddI86XNaY5hOBgE+u1I/s9h4gsKtPCnXA=;
+        b=ogorzUITKxm4Xm7Vt/Or/PuV1JKYeYahvRdbA8TI6OhjJcMYzTvUVAE97vCu97mjmF
+         lvWlPJHoAASmfq8qOlo91sI4Ntb7GqFnfp56hV8kZwlBJM0sdynt1bJWeaIKhWSLbaY2
+         RlO2UkLEWb89hD1L2iVhocLbfuQV/uQhfJXZYqR3lZo5qXe0vmd9HR9s+4y/d4qpa+2S
+         Qy0kEnNuGOYV4ORyCK/IKyWkQ5td+/kQ9dIcERvFaOz79UpAeAgBYGN/z4/2l2g4RaF8
+         MW8hqx/jYcdvyfFyofDxPaNQoDH0GyGJTCmtY144YCFn7eBh7ZWALZ8m9mupkW1gTXrK
+         IjzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbnb2R1Fkqvvf3/HI/kVkTkVQmX3E/OuJVpNpH/9aqBIKvsjIWOWyA80QY8vDigB36YgzYysE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9ZjRVpAP81FLcNufy+bXZSD+UTchxGXnLRGNy2XekDlBsEqJp
+	oir6FMJNbdjTVscE2oAfgzo3jVbg7r5B+wRZZp+wNyOvxVbhY9Yxht2ifJm0FPUXL7aMFgGB8y/
+	QjbjckHcGf43xCmHK5ptsaJe6HVYjblPUTVJdUbJCatSNpgjWB+GCBTA=
+X-Google-Smtp-Source: AGHT+IG5YLRkPk6ll0iD2rCSjwKFuFfurI2t2jOfecpW+WGCbVLdc1PkvWWxpmLjuN7Eii/AIBDV3eP249+/8w8J/XBuHeUt6u3x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Mg5opcGbcbVJoDFt80kqBKyfhfS3MqDZF7qu6uiBHJSQ1GPrkv5
- NHGM+HSY6stA8RYrYD3W+WdFst0yMEH1mvlwVB5y8T+LRzQLr3wEig4ASQMdlCKXhtyeXVS
- adU5xFdKjiIPRXfxGtrfJyRfJOo65exfPdoopnuV/JsoxNE03FqzaiAQuEsfNlkZ6PLQ6Cy
- nySLABz4xLYT8++3YAPVA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:eTRAZuTxV/w=;miEO2RS0hwJ+7jIOja3N1mWRuZE
- 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
+X-Received: by 2002:a05:6e02:1946:b0:3d8:1d7c:e192 with SMTP id
+ e9e14a558f8ab-3d88ed8839bmr182605365ab.7.1745394689606; Wed, 23 Apr 2025
+ 00:51:29 -0700 (PDT)
+Date: Wed, 23 Apr 2025 00:51:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68089c01.050a0220.36a438.000f.GAE@google.com>
+Subject: [syzbot] [net?] KASAN: null-ptr-deref Write in dst_cache_per_cpu_get (3)
+From: syzbot <syzbot+c71bf8ad5b74c29baa2f@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-In case the CMD_RTS got corrupted by interferences, the MSE102x
-doesn't allow a retransmission of the command. Instead the Ethernet
-frame must be shifted out of the SPI FIFO. Since the actual length is
-unknown, assume the maximum possible value.
+Hello,
 
-Fixes: 2f207cbf0dd4 ("net: vertexcom: Add MSE102x SPI support")
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+syzbot found the following issue on:
 
-diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
-et/vertexcom/mse102x.c
-index 2c06d1d05164..e4d993f31374 100644
-=2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
-+++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -263,7 +263,7 @@ static int mse102x_tx_frame_spi(struct mse102x_net *ms=
-e, struct sk_buff *txp,
- }
-=20
- static int mse102x_rx_frame_spi(struct mse102x_net *mse, u8 *buff,
--				unsigned int frame_len)
-+				unsigned int frame_len, bool drop)
- {
- 	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
- 	struct spi_transfer *xfer =3D &mses->spi_xfer;
-@@ -281,6 +281,9 @@ static int mse102x_rx_frame_spi(struct mse102x_net *ms=
-e, u8 *buff,
- 		netdev_err(mse->ndev, "%s: spi_sync() failed: %d\n",
- 			   __func__, ret);
- 		mse->stats.xfer_err++;
-+	} else if (drop) {
-+		netdev_dbg(mse->ndev, "%s: Drop frame\n", __func__);
-+		ret =3D -EINVAL;
- 	} else if (*sof !=3D cpu_to_be16(DET_SOF)) {
- 		netdev_dbg(mse->ndev, "%s: SPI start of frame is invalid (0x%04x)\n",
- 			   __func__, *sof);
-@@ -308,6 +311,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
-)
- 	struct sk_buff *skb;
- 	unsigned int rxalign;
- 	unsigned int rxlen;
-+	bool drop =3D false;
- 	__be16 rx =3D 0;
- 	u16 cmd_resp;
- 	u8 *rxpkt;
-@@ -330,7 +334,8 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
-)
- 			net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
- 					    __func__, cmd_resp);
- 			mse->stats.invalid_rts++;
--			return;
-+			drop =3D true;
-+			goto drop;
- 		}
-=20
- 		net_dbg_ratelimited("%s: Unexpected response to first CMD\n",
-@@ -342,9 +347,16 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *ms=
-e)
- 		net_dbg_ratelimited("%s: Invalid frame length: %d\n", __func__,
- 				    rxlen);
- 		mse->stats.invalid_len++;
--		return;
-+		drop =3D true;
- 	}
-=20
-+	/* In case of a invalid CMD_RTS, the frame must be consumed anyway.
-+	 * So assume the maximum possible frame length.
-+	 */
-+drop:
-+	if (drop)
-+		rxlen =3D VLAN_ETH_FRAME_LEN;
-+
- 	rxalign =3D ALIGN(rxlen + DET_SOF_LEN + DET_DFT_LEN, 4);
- 	skb =3D netdev_alloc_skb_ip_align(mse->ndev, rxalign);
- 	if (!skb)
-@@ -355,7 +367,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
-)
- 	 * They are copied, but ignored.
- 	 */
- 	rxpkt =3D skb_put(skb, rxlen) - DET_SOF_LEN;
--	if (mse102x_rx_frame_spi(mse, rxpkt, rxlen)) {
-+	if (mse102x_rx_frame_spi(mse, rxpkt, rxlen, drop)) {
- 		mse->ndev->stats.rx_errors++;
- 		dev_kfree_skb(skb);
- 		return;
-=2D-=20
-2.34.1
+HEAD commit:    fc96b232f8e7 Merge tag 'pci-v6.15-fixes-2' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1049063f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=170d968a88ba5c06
+dashboard link: https://syzkaller.appspot.com/bug?extid=c71bf8ad5b74c29baa2f
+compiler:       Debian clang version 15.0.6, Debian LLD 15.0.6
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fd977d7e57de/disk-fc96b232.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ffa0a3b5b655/vmlinux-fc96b232.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/44df3bd100d2/bzImage-fc96b232.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c71bf8ad5b74c29baa2f@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: null-ptr-deref in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+BUG: KASAN: null-ptr-deref in atomic_add_negative_relaxed include/linux/atomic/atomic-instrumented.h:1475 [inline]
+BUG: KASAN: null-ptr-deref in rcuref_get include/linux/rcuref.h:67 [inline]
+BUG: KASAN: null-ptr-deref in dst_hold include/net/dst.h:238 [inline]
+BUG: KASAN: null-ptr-deref in dst_cache_per_cpu_get+0x7d/0x2b0 net/core/dst_cache.c:50
+Write of size 4 at addr 0000000000000043 by task kworker/1:0/24
+
+CPU: 1 UID: 0 PID: 24 Comm: kworker/1:0 Not tainted 6.15.0-rc2-syzkaller-00278-gfc96b232f8e7 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Workqueue: wg-crypt-wg2 wg_packet_tx_worker
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_report+0xe3/0x5b0 mm/kasan/report.c:524
+ kasan_report+0x143/0x180 mm/kasan/report.c:634
+ check_region_inline mm/kasan/generic.c:-1 [inline]
+ kasan_check_range+0x28f/0x2a0 mm/kasan/generic.c:189
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ atomic_add_negative_relaxed include/linux/atomic/atomic-instrumented.h:1475 [inline]
+ rcuref_get include/linux/rcuref.h:67 [inline]
+ dst_hold include/net/dst.h:238 [inline]
+ dst_cache_per_cpu_get+0x7d/0x2b0 net/core/dst_cache.c:50
+ dst_cache_get_ip6+0x8c/0xf0 net/core/dst_cache.c:133
+ send6+0x466/0xbf0 drivers/net/wireguard/socket.c:129
+ wg_socket_send_skb_to_peer+0x115/0x1d0 drivers/net/wireguard/socket.c:178
+ wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
+ wg_packet_tx_worker+0x1bf/0x810 drivers/net/wireguard/send.c:276
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
+ worker_thread+0x870/0xd50 kernel/workqueue.c:3400
+ kthread+0x7b7/0x940 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
