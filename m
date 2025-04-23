@@ -1,484 +1,410 @@
-Return-Path: <netdev+bounces-185053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11DF1A98625
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:44:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3465DA98675
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 11:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50A647AC545
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D60A93B9558
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 09:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F048F274FDB;
-	Wed, 23 Apr 2025 09:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2104E2673BB;
+	Wed, 23 Apr 2025 09:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QeNlUiiO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="f4kHKvcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A01D2749F6;
-	Wed, 23 Apr 2025 09:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F912638A6;
+	Wed, 23 Apr 2025 09:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745401305; cv=none; b=MvOq3I6I+txKixNnCFTAIvuktOqk9VTAHi55KMgZkMT9G088Cl5fMDRuSB5xvwUuH8uHjkVFm7QncUd1Q4kv9lkvjO1vIScJN/T4WvB16juoZ4Sx1Fuz8Hmfb4LI1mG9AL9lYS9ZpNjq+ptzPDylGKV8MqgycQjkzfjO6zYepss=
+	t=1745401931; cv=none; b=maRYMfoqz+hikmq4XuNd7kAcHNXEE7W69xFImavaIOjBbKXRVRk4FTyZSIy4U8zFz87jlB3sr/qo0jvwCCuwjtcVZE+s2Z/VA9MxDlnhCgIm2qvIYxu6n+qiQroxpvXt6Rs2iKL4TCPPQeRKpwJOoCyGv0fEzhN36boMlWA4dvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745401305; c=relaxed/simple;
-	bh=8ZWT716Kvf9Nmir1qWbHYxD7A02pPultL0YPRcp8J0I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gc33yBDNj/gk2xn/oQu+bD12yyVLBMxbvV3G44aR1XcG+1t07f1ptNR26wk7JeIuUE8OKPby3pd1hliZ1DLSA5VSPslvngQx7s7SDKNZlBRCK6cF3xHocuxr3Q/+KZU3f0TiqgH7iQ9QfdO/PNXQqX5p93Jd1NgxehYxs/jEz+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QeNlUiiO; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22c33677183so72489605ad.2;
-        Wed, 23 Apr 2025 02:41:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745401303; x=1746006103; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sog+/W6AVctfHjoxm2zZUHdfyp4KwnzETFplxHLsp8g=;
-        b=QeNlUiiO9wQGB+IJ+CkkMFsWG4cQkMOhb13OZqRbbyof/4NmznYWWEAFGL9dJfsYsJ
-         +KpiyPHEm2t0w4vdmYsm0NfZKFJX4z2eggXYnAkhTk30H4BlWcpEgPpc5+Z+880ztEkW
-         9QKX3vNfGkwPmhpw/jPsqCthzggXUeEAe7DfHZBwwFed2NDKfVVxzJtGY6nxBQtigV5T
-         swTWXgn0QN4CvuDkY/DuXPsxh+hv81QINwsWWL+cglVHefdSiURy0+UoL4sVTpMxvo+0
-         3Mz1rvX8GgCxNOu8HO2jJvwhxrfLF4xaWNMAh1QjVLAvzHvchZrZnTFD6lHI/1a4T9c3
-         eUXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745401303; x=1746006103;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sog+/W6AVctfHjoxm2zZUHdfyp4KwnzETFplxHLsp8g=;
-        b=gX53t/6MmZGOvMFXLAp7SHDhplfF7uFIX5FEFtrZ2SxAR3llowhLpQm+6iRZROGxn+
-         ptosc2vtBnPRk/86sm2XoNT68FNIEAxH/Gyrdlttx8tDUvLRlxvr6+KnRaRbg5g3uyjb
-         KWHy7idXW2fG1X/zSqMk7aRemttYwn+Zp6Ws98Zqqr+hBFfrUI3bIIV/okrwbueHKinF
-         UcVyQz+dsJQT8XIwZlNlCtZxEv35y3JNp2RobU9ztP4ulHIyCGl+qGycxN1IVDBkSlKY
-         04NKQhLxoOUOgk41AeVMick+/lb5fu+WxH3DxfJRtxj94n8+fZytnGW/2dOW45Ps2alr
-         2Cmg==
-X-Forwarded-Encrypted: i=1; AJvYcCUEuhnLiQCU9rMYC8ipRqt9hOATYFL7D/r8PnYdQasX3fupZjrPUnDgrwP+YKxHyBquduTVr9JRm0Y=@vger.kernel.org, AJvYcCUKPCsJWvstqgbGF68uMXgo03TMWF6Xj2ABNMXRDoX5lxW5K8NbpuN69XhFnKia8FKWuEV2Wa+u@vger.kernel.org, AJvYcCUddnZMviwJteFh29gBJtQf+mOzxhvD43TMY5LddzzEUHPUNR5f1lA2RC6R5qoeoKsJ+h0dZtfHgL1j/ak=@vger.kernel.org, AJvYcCWCRVZBvYcWXEsFKu6u42CUJqhlQJxEn/7tmR8bIsClSmdNzwcAHtopZrtSU30lLmjDoatCxu2vDl1gyA==@vger.kernel.org, AJvYcCWK4d/wNxEyomzDxrktSDq1d20ZaPx82Nw37veOeONyyIwfRx4/uMHtCtctBwORAu0LKO3oTmA1f/V3@vger.kernel.org, AJvYcCWucO6oo70vkd2mK5xfd1Gu07KWBrfiL4m+dv/QQwjufm/esirwq7dUofoaTO+TH3Zqk0nwkW+Ubobl@vger.kernel.org, AJvYcCXHQRGq3Uemxlx/5xRoynYsjk080hQlrWsHh1ehGAZsEn1Jj4GikGAoJEjR47vI3IXi4FkYvWmwAsJW@vger.kernel.org, AJvYcCXb9PZ0GAu3gnB5+x9BQrT9ugEzZztfxD3TT/n61ahtEqq+31x4SSKCIo+pHKNWRwoRwiDmJeFZ8oDYcZmxh/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6Fo63Anb5YC8zdPNeLWKlbeBxe5nwjQabjHtTCSeI5yJABjl4
-	7JLj+otcSt/D88BPKvVXkqpZjd6nd265zDLu9tKjHVz+sBXfI0DW
-X-Gm-Gg: ASbGnct85X6P4cvzCVHvO+WUcYs24WcT6eVAoWxP3RucMGeWhoHtULIs2BCIigTGklP
-	8gnZvvz7Y91M3J2RpKd//i5jzUEMmGOCO/u4mRproPb70WazD102FmPn41nvNCVels/tlBlJ6NX
-	z7UE7crPoFMrc6bXDW4Y4/EWYKBIIe1WlWK/HD9e7WpYvC+UJi/qIlExYPxOqy16KJJU/tpcknB
-	XHvmAqWzOMMMBO1Hn9/MkPEj+IaUnnvPPNLBdfwCCASi3jHAl6By5sUrTVdf2jNSCmBAk96XHxO
-	7xPV+V1l6rFjQ37ZvsDRfSCdIx69zNJQxwT+w3jdDbqFWHEzf8Q1Qf03V4uTs+4QulfZIYzCxV8
-	gYyA=
-X-Google-Smtp-Source: AGHT+IErZyJ7tT8dzYSmK+hrSa5NYGbKDJ5zpqYD7lrhUFQQUR6L51YgyQh6NQl+PA3JRfhf2AdxAQ==
-X-Received: by 2002:a17:903:986:b0:224:e33:889b with SMTP id d9443c01a7336-22c5359a406mr311914135ad.12.1745401303161;
-        Wed, 23 Apr 2025 02:41:43 -0700 (PDT)
-Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50eb4b8esm99972775ad.124.2025.04.23.02.41.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 02:41:42 -0700 (PDT)
-From: a0282524688@gmail.com
-X-Google-Original-From: tmyu0@nuvoton.com
-To: lee@kernel.org,
-	linus.walleij@linaro.org,
-	brgl@bgdev.pl,
-	andi.shyti@kernel.org,
-	mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wim@linux-watchdog.org,
-	linux@roeck-us.net,
-	jdelvare@suse.com,
-	alexandre.belloni@bootlin.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Ming Yu <tmyu0@nuvoton.com>
-Subject: [PATCH v10 7/7] rtc: Add Nuvoton NCT6694 RTC support
-Date: Wed, 23 Apr 2025 17:40:58 +0800
-Message-Id: <20250423094058.1656204-8-tmyu0@nuvoton.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250423094058.1656204-1-tmyu0@nuvoton.com>
-References: <20250423094058.1656204-1-tmyu0@nuvoton.com>
+	s=arc-20240116; t=1745401931; c=relaxed/simple;
+	bh=WOozxA7JmAlAWd60GMX1b1lFDDZ/x+g9tSp/vPyYotM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N6upJAC+uGS8slOgEVmKaOWCoMp3oMR85HxpzIfqewfSayAZ+QMS6wjBwZ3inrCda+0VTkAS5cvj7eba0N+rxBCaHd4toKQ9Z0SPf1O/PTLhd4+STfh76mV8tlR64qDSn3wO9LPSXpmj/VW+IMVxivwrRFt3gaBgBRC42EfHfP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=fail (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=f4kHKvcc reason="signature verification failed"; arc=none smtp.client-ip=82.68.155.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
+Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
+	by wylie.me.uk (Postfix) with ESMTP id 3027112086D;
+	Wed, 23 Apr 2025 10:51:53 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
+	s=mydkim006; t=1745401913;
+	bh=AmSzq95jWT6ouFo+UPoV+fYl7qT29nUVb7RHNWFzkDQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=f4kHKvccdkpLVTXYh2k4o23SBUCWq266M6sjYavhPBccfQGme4FyII+ZJJ0+xDyTE
+	 DBa6XcM45vo7nfWmR+uaTG4mmf9zo4ZDZchrhBmC2nFN4+4//ERv+Jla8HfhLnlI5n
+	 Ul/WDRYt9Jl2+u8cbZ+AgD11jRf+HfdUF+CJdatOxOrc/UPDumrj5Pn0Ee56rRM8jq
+	 poG6ndhAaBD19Z40k0jbMcvCftDJf5dD5hgCRcQ8nZCmv6ia8Dl0KRw4X4bqVrOJfb
+	 diNH9UO+3Xyq7CZ1/gh3wE6399j51ExQ4p8B/St8TcMHmssy9BXR7nBu7I6P80RWtQ
+	 bdNuRQKwTVLwg==
+Date: Wed, 23 Apr 2025 10:51:49 +0100
+From: "Alan J. Wylie" <alan@wylie.me.uk>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Jiri
+ Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
+ stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
+In-Reply-To: <aAgO59L0ccXl6kUs@pop-os.localdomain>
+References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+	<6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
+	<20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+	<20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+	<89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+	<20250421210927.50d6a355@frodo.int.wylie.me.uk>
+	<20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+	<4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+	<aAf/K7F9TmCJIT+N@pop-os.localdomain>
+	<20250422214716.5e181523@frodo.int.wylie.me.uk>
+	<aAgO59L0ccXl6kUs@pop-os.localdomain>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Ming Yu <tmyu0@nuvoton.com>
+On Tue, 22 Apr 2025 14:49:27 -0700
+Cong Wang <xiyou.wangcong@gmail.com> wrote:
 
-This driver supports RTC functionality for NCT6694 MFD device
-based on USB interface.
+> Although I am still trying to understand the NULL pointer, which seems
+> likely from:
+> 
+>  478                         if (p->inner.clprio[prio].ptr == cl->node + prio) {
+>  479                                 /* we are removing child which is pointed to from
+>  480                                  * parent feed - forget the pointer but remember
+>  481                                  * classid
+>  482                                  */
+>  483                                 p->inner.clprio[prio].last_ptr_id = cl->common.classid;
+>  484                                 p->inner.clprio[prio].ptr = NULL;
+>  485                         }
+> 
+> Does the following patch work? I mean not just fixing the crash, but
+> also not causing any other problem.
 
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
----
- MAINTAINERS               |   1 +
- drivers/rtc/Kconfig       |  10 ++
- drivers/rtc/Makefile      |   1 +
- drivers/rtc/rtc-nct6694.c | 298 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 310 insertions(+)
- create mode 100644 drivers/rtc/rtc-nct6694.c
+> ---
+> 
+> diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> index 4b9a639b642e..0cdc778fddef 100644
+> --- a/net/sched/sch_htb.c
+> +++ b/net/sched/sch_htb.c
+> @@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
+>   */
+>  static inline void htb_next_rb_node(struct rb_node **n)
+>  {
+> -	*n = rb_next(*n);
+> +	if (*n)
+> +		*n = rb_next(*n);
+>  }
+>  
+>  /**
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8f76bf3bdbf4..885e74f8ff5a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17366,6 +17366,7 @@ F:	drivers/hwmon/nct6694-hwmon.c
- F:	drivers/i2c/busses/i2c-nct6694.c
- F:	drivers/mfd/nct6694.c
- F:	drivers/net/can/usb/nct6694_canfd.c
-+F:	drivers/rtc/rtc-nct6694.c
- F:	drivers/watchdog/nct6694_wdt.c
- F:	include/linux/mfd/nct6694.h
- 
-diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-index 838bdc138ffe..d8662b5d1e47 100644
---- a/drivers/rtc/Kconfig
-+++ b/drivers/rtc/Kconfig
-@@ -416,6 +416,16 @@ config RTC_DRV_NCT3018Y
- 	   This driver can also be built as a module, if so, the module will be
- 	   called "rtc-nct3018y".
- 
-+config RTC_DRV_NCT6694
-+	tristate "Nuvoton NCT6694 RTC support"
-+	depends on MFD_NCT6694
-+	help
-+	  If you say yes to this option, support will be included for Nuvoton
-+	  NCT6694, a USB device to RTC.
-+
-+	  This driver can also be built as a module. If so, the module will
-+	  be called rtc-nct6694.
-+
- config RTC_DRV_RK808
- 	tristate "Rockchip RK805/RK808/RK809/RK817/RK818 RTC"
- 	depends on MFD_RK8XX
-diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
-index 31473b3276d9..da091d66e2d7 100644
---- a/drivers/rtc/Makefile
-+++ b/drivers/rtc/Makefile
-@@ -118,6 +118,7 @@ obj-$(CONFIG_RTC_DRV_MXC)	+= rtc-mxc.o
- obj-$(CONFIG_RTC_DRV_MXC_V2)	+= rtc-mxc_v2.o
- obj-$(CONFIG_RTC_DRV_GAMECUBE)	+= rtc-gamecube.o
- obj-$(CONFIG_RTC_DRV_NCT3018Y)	+= rtc-nct3018y.o
-+obj-$(CONFIG_RTC_DRV_NCT6694)	+= rtc-nct6694.o
- obj-$(CONFIG_RTC_DRV_NTXEC)	+= rtc-ntxec.o
- obj-$(CONFIG_RTC_DRV_OMAP)	+= rtc-omap.o
- obj-$(CONFIG_RTC_DRV_OPAL)	+= rtc-opal.o
-diff --git a/drivers/rtc/rtc-nct6694.c b/drivers/rtc/rtc-nct6694.c
-new file mode 100644
-index 000000000000..a6e79304d7ac
---- /dev/null
-+++ b/drivers/rtc/rtc-nct6694.c
-@@ -0,0 +1,298 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Nuvoton NCT6694 RTC driver based on USB interface.
-+ *
-+ * Copyright (C) 2024 Nuvoton Technology Corp.
-+ */
-+
-+#include <linux/bcd.h>
-+#include <linux/irqdomain.h>
-+#include <linux/kernel.h>
-+#include <linux/mfd/core.h>
-+#include <linux/mfd/nct6694.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+#include <linux/rtc.h>
-+#include <linux/slab.h>
-+
-+/*
-+ * USB command module type for NCT6694 RTC controller.
-+ * This defines the module type used for communication with the NCT6694
-+ * RTC controller over the USB interface.
-+ */
-+#define NCT6694_RTC_MOD		0x08
-+
-+/* Command 00h - RTC Time */
-+#define NCT6694_RTC_TIME	0x0000
-+#define NCT6694_RTC_TIME_SEL	0x00
-+
-+/* Command 01h - RTC Alarm */
-+#define NCT6694_RTC_ALARM	0x01
-+#define NCT6694_RTC_ALARM_SEL	0x00
-+
-+/* Command 02h - RTC Status */
-+#define NCT6694_RTC_STATUS	0x02
-+#define NCT6694_RTC_STATUS_SEL	0x00
-+
-+#define NCT6694_RTC_IRQ_INT_EN	BIT(0)	/* Transmit a USB INT-in when RTC alarm */
-+#define NCT6694_RTC_IRQ_GPO_EN	BIT(5)	/* Trigger a GPO Low Pulse when RTC alarm */
-+
-+#define NCT6694_RTC_IRQ_EN	(NCT6694_RTC_IRQ_INT_EN | NCT6694_RTC_IRQ_GPO_EN)
-+#define NCT6694_RTC_IRQ_STS	BIT(0)	/* Write 1 clear IRQ status */
-+
-+struct __packed nct6694_rtc_time {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 week;
-+	u8 day;
-+	u8 month;
-+	u8 year;
-+};
-+
-+struct __packed nct6694_rtc_alarm {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 alarm_en;
-+	u8 alarm_pend;
-+};
-+
-+struct __packed nct6694_rtc_status {
-+	u8 irq_en;
-+	u8 irq_pend;
-+};
-+
-+union __packed nct6694_rtc_msg {
-+	struct nct6694_rtc_time time;
-+	struct nct6694_rtc_alarm alarm;
-+	struct nct6694_rtc_status sts;
-+};
-+
-+struct nct6694_rtc_data {
-+	struct nct6694 *nct6694;
-+	struct rtc_device *rtc;
-+	union nct6694_rtc_msg *msg;
-+	int irq;
-+};
-+
-+static int nct6694_rtc_read_time(struct device *dev, struct rtc_time *tm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
-+	int ret;
-+
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, time);
-+	if (ret)
-+		return ret;
-+
-+	tm->tm_sec = bcd2bin(time->sec);		/* tm_sec expect 0 ~ 59 */
-+	tm->tm_min = bcd2bin(time->min);		/* tm_min expect 0 ~ 59 */
-+	tm->tm_hour = bcd2bin(time->hour);		/* tm_hour expect 0 ~ 23 */
-+	tm->tm_wday = bcd2bin(time->week) - 1;		/* tm_wday expect 0 ~ 6 */
-+	tm->tm_mday = bcd2bin(time->day);		/* tm_mday expect 1 ~ 31 */
-+	tm->tm_mon = bcd2bin(time->month) - 1;		/* tm_month expect 0 ~ 11 */
-+	tm->tm_year = bcd2bin(time->year) + 100;	/* tm_year expect since 1900 */
-+
-+	return ret;
-+}
-+
-+static int nct6694_rtc_set_time(struct device *dev, struct rtc_time *tm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
-+
-+	time->sec = bin2bcd(tm->tm_sec);
-+	time->min = bin2bcd(tm->tm_min);
-+	time->hour = bin2bcd(tm->tm_hour);
-+	time->week = bin2bcd(tm->tm_wday + 1);
-+	time->day = bin2bcd(tm->tm_mday);
-+	time->month = bin2bcd(tm->tm_mon + 1);
-+	time->year = bin2bcd(tm->tm_year - 100);
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, time);
-+}
-+
-+static int nct6694_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
-+	int ret;
-+
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, alarm);
-+	if (ret)
-+		return ret;
-+
-+	alrm->time.tm_sec = bcd2bin(alarm->sec);
-+	alrm->time.tm_min = bcd2bin(alarm->min);
-+	alrm->time.tm_hour = bcd2bin(alarm->hour);
-+	alrm->enabled = alarm->alarm_en;
-+	alrm->pending = alarm->alarm_pend;
-+
-+	return ret;
-+}
-+
-+static int nct6694_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
-+
-+	alarm->sec = bin2bcd(alrm->time.tm_sec);
-+	alarm->min = bin2bcd(alrm->time.tm_min);
-+	alarm->hour = bin2bcd(alrm->time.tm_hour);
-+	alarm->alarm_en = alrm->enabled ? NCT6694_RTC_IRQ_EN : 0;
-+	alarm->alarm_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, alarm);
-+}
-+
-+static int nct6694_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
-+
-+	if (enabled)
-+		sts->irq_en |= NCT6694_RTC_IRQ_EN;
-+	else
-+		sts->irq_en &= ~NCT6694_RTC_IRQ_EN;
-+
-+	sts->irq_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, sts);
-+}
-+
-+static const struct rtc_class_ops nct6694_rtc_ops = {
-+	.read_time = nct6694_rtc_read_time,
-+	.set_time = nct6694_rtc_set_time,
-+	.read_alarm = nct6694_rtc_read_alarm,
-+	.set_alarm = nct6694_rtc_set_alarm,
-+	.alarm_irq_enable = nct6694_rtc_alarm_irq_enable,
-+};
-+
-+static irqreturn_t nct6694_irq(int irq, void *dev_id)
-+{
-+	struct nct6694_rtc_data *data = dev_id;
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
-+	int ret;
-+
-+	rtc_lock(data->rtc);
-+
-+	sts->irq_en = NCT6694_RTC_IRQ_EN;
-+	sts->irq_pend = NCT6694_RTC_IRQ_STS;
-+	ret = nct6694_write_msg(data->nct6694, &cmd_hd, sts);
-+	if (ret) {
-+		rtc_unlock(data->rtc);
-+		return IRQ_NONE;
-+	}
-+
-+	rtc_update_irq(data->rtc, 1, RTC_IRQF | RTC_AF);
-+
-+	rtc_unlock(data->rtc);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static void nct6694_irq_dispose_mapping(void *d)
-+{
-+	struct nct6694_rtc_data *data = d;
-+
-+	irq_dispose_mapping(data->irq);
-+}
-+
-+static int nct6694_rtc_probe(struct platform_device *pdev)
-+{
-+	struct nct6694_rtc_data *data;
-+	struct nct6694 *nct6694 = dev_get_drvdata(pdev->dev.parent);
-+	int ret;
-+
-+	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
-+
-+	data->msg = devm_kzalloc(&pdev->dev, sizeof(union nct6694_rtc_msg),
-+				 GFP_KERNEL);
-+	if (!data->msg)
-+		return -ENOMEM;
-+
-+	data->irq = irq_create_mapping(nct6694->domain, NCT6694_IRQ_RTC);
-+	if (!data->irq)
-+		return -EINVAL;
-+
-+	ret = devm_add_action_or_reset(&pdev->dev, nct6694_irq_dispose_mapping,
-+				       data);
-+	if (ret)
-+		return ret;
-+
-+	ret = devm_device_init_wakeup(&pdev->dev);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to init wakeup\n");
-+
-+	data->rtc = devm_rtc_allocate_device(&pdev->dev);
-+	if (IS_ERR(data->rtc))
-+		return PTR_ERR(data->rtc);
-+
-+	data->nct6694 = nct6694;
-+	data->rtc->ops = &nct6694_rtc_ops;
-+	data->rtc->range_min = RTC_TIMESTAMP_BEGIN_2000;
-+	data->rtc->range_max = RTC_TIMESTAMP_END_2099;
-+
-+	platform_set_drvdata(pdev, data);
-+
-+	ret = devm_request_threaded_irq(&pdev->dev, data->irq, NULL,
-+					nct6694_irq, IRQF_ONESHOT,
-+					"rtc-nct6694", data);
-+	if (ret < 0)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to request irq\n");
-+
-+	return devm_rtc_register_device(data->rtc);
-+}
-+
-+static struct platform_driver nct6694_rtc_driver = {
-+	.driver = {
-+		.name	= "nct6694-rtc",
-+	},
-+	.probe		= nct6694_rtc_probe,
-+};
-+
-+module_platform_driver(nct6694_rtc_driver);
-+
-+MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
-+MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS("platform:nct6694-rtc");
+There's been three of these: 
+
+Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 10:41:36 bilbo kernel: WARNING: CPU: 1 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+
+But no panic.
+
+I've run scripts/decode.sh on the last one.
+
+Apr 23 08:08:32 bilbo kernel: ------------[ cut here ]------------
+Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_filter ip6_tables iptable_filter ip_tables x_tables pppoe pppox ppp_generic binfmt_misc tun slhc netconsole af_packet bridge stp llc ctr ccm dm_crypt radeon ath9k drm_client_lib ath9k_common video ath9k_hw wmi drm_exec drm_suballoc_helper snd_hda_codec_realtek drm_ttm_helper snd_hda_codec_generic snd_hda_codec_hdmi ath syscopyarea snd_hda_scodec_component ttm pl2303 snd_hda_intel usbserial mac80211 sysfillrect snd_intel_dspcfg sysimgblt snd_hda_codec fb_sys_fops drm_display_helper drm_kms_helper snd_hda_co
+ re agpgart snd_pcm cfbfillrect cfbimgblt snd_timer
+Apr 23 08:08:32 bilbo kernel: cfg80211 fb_io_fops cdc_acm cfbcopyarea aesni_intel i2c_algo_bit e1000 crypto_simd snd fb cryptd at24 libarc4 regmap_i2c font fam15h_power soundcore acpi_cpufreq k10temp evdev nfsd sch_fq_codel auth_rpcgss lockd drm grace sunrpc drm_panel_orientation_quirks backlight fuse loop configfs nfnetlink usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd usbcore sha512_ssse3 sha256_ssse3 sha1_ssse3 sha1_generic gf128mul usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4
+Apr 23 08:08:32 bilbo kernel: CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G           O       6.14.3-dirty #23
+Apr 23 08:08:32 bilbo kernel: Tainted: [O]=OOT_MODULE
+Apr 23 08:08:32 bilbo kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./970A-DS3P, BIOS FD 02/26/2016
+Apr 23 08:08:32 bilbo kernel: RIP: 0010:htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: Code: d4 45 21 a4 87 08 01 00 00 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c1 c5 a7 e0 90 53 83 be a8 01 00 00 00 48 89 f3 75 02 <0f> 0b 48 89 de e8 29 fe ff ff 31 c0 89 83 a8 01 00 00 5b e9 9b c5
+Apr 23 08:08:32 bilbo kernel: RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+Apr 23 08:08:32 bilbo kernel: RAX: ffff8881b7311c00 RBX: ffff8881b7312000 RCX: ffff8881b73121c8
+Apr 23 08:08:32 bilbo kernel: RDX: ffff8881b7312000 RSI: ffff8881b7312000 RDI: ffff88811c353180
+Apr 23 08:08:32 bilbo kernel: RBP: 0000000000000000 R08: ffff88811c3532b0 R09: 000000009ceae056
+Apr 23 08:08:32 bilbo kernel: R10: 0000000000005de4 R11: ffffc90000003ff8 R12: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: R13: ffff8881b7312000 R14: 00000273e71c1348 R15: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: FS:  0000000000000000(0000) GS:ffff88842ec00000(0000) knlGS:0000000000000000
+Apr 23 08:08:32 bilbo kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 23 08:08:32 bilbo kernel: CR2: 000000c00050b000 CR3: 000000018920e000 CR4: 00000000000406f0
+Apr 23 08:08:32 bilbo kernel: Call Trace:
+Apr 23 08:08:32 bilbo kernel: <IRQ>
+Apr 23 08:08:32 bilbo kernel: htb_dequeue+0x3f1/0x5a0 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: __qdisc_run+0x253/0x480
+Apr 23 08:08:32 bilbo kernel: ? timerqueue_del+0x2c/0x40
+Apr 23 08:08:32 bilbo kernel: qdisc_run+0x15/0x30
+Apr 23 08:08:32 bilbo kernel: net_tx_action+0x182/0x1b0
+Apr 23 08:08:32 bilbo kernel: handle_softirqs+0x102/0x240
+Apr 23 08:08:32 bilbo kernel: __irq_exit_rcu+0x3e/0xb0
+Apr 23 08:08:32 bilbo kernel: sysvec_apic_timer_interrupt+0x5b/0x70
+Apr 23 08:08:32 bilbo kernel: </IRQ>
+Apr 23 08:08:32 bilbo kernel: <TASK>
+Apr 23 08:08:32 bilbo kernel: asm_sysvec_apic_timer_interrupt+0x16/0x20
+Apr 23 08:08:32 bilbo kernel: RIP: 0010:cpuidle_enter_state+0x126/0x220
+Apr 23 08:08:32 bilbo kernel: Code: 18 4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8 9a 2e 98 ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc 00 00 00 49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49
+Apr 23 08:08:32 bilbo kernel: RSP: 0018:ffffffff81e03e40 EFLAGS: 00000202
+Apr 23 08:08:32 bilbo kernel: RAX: ffff88842ec00000 RBX: ffff8881008d8000 RCX: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: RDX: 00000273acf9a9e7 RSI: fffffff6533d45e7 RDI: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: RBP: 0000000000000002 R08: 0000000000000002 R09: 071c71c71c71c71c
+Apr 23 08:08:32 bilbo kernel: R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+Apr 23 08:08:32 bilbo kernel: R13: 0000000000000002 R14: 00000273acf9a9e7 R15: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: cpuidle_enter+0x2a/0x40
+Apr 23 08:08:32 bilbo kernel: do_idle+0x12d/0x1a0
+Apr 23 08:08:32 bilbo kernel: cpu_startup_entry+0x29/0x30
+Apr 23 08:08:32 bilbo kernel: rest_init+0xbc/0xc0
+Apr 23 08:08:32 bilbo kernel: start_kernel+0x630/0x630
+Apr 23 08:08:32 bilbo kernel: x86_64_start_reservations+0x25/0x30
+Apr 23 08:08:32 bilbo kernel: x86_64_start_kernel+0x73/0x80
+Apr 23 08:08:32 bilbo kernel: common_startup_64+0x12c/0x138
+Apr 23 08:08:32 bilbo kernel: </TASK>
+Apr 23 08:08:32 bilbo kernel: ---[ end trace 0000000000000000 ]---
+
+Apr 23 08:08:32 bilbo kernel: ------------[ cut here ]------------
+Apr 23 08:08:32 bilbo kernel: WARNING: CPU: 0 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_filter ip6_tables iptable_filter ip_tables x_tables pppoe pppox ppp_generic binfmt_misc tun slhc netconsole af_packet bridge stp llc ctr ccm dm_crypt radeon ath9k drm_client_lib ath9k_common video ath9k_hw wmi drm_exec drm_suballoc_helper snd_hda_codec_realtek drm_ttm_helper snd_hda_codec_generic snd_hda_codec_hdmi ath syscopyarea snd_hda_scodec_component ttm pl2303 snd_hda_intel usbserial mac80211 sysfillrect snd_intel_dspcfg sysimgblt snd_hda_codec fb_sys_fops drm_display_helper drm_kms_helper snd_hda_co
+ re agpgart snd_pcm cfbfillrect cfbimgblt snd_timer
+Apr 23 08:08:32 bilbo kernel: cfg80211 fb_io_fops cdc_acm cfbcopyarea aesni_intel i2c_algo_bit e1000 crypto_simd snd fb cryptd at24 libarc4 regmap_i2c font fam15h_power soundcore acpi_cpufreq k10temp evdev nfsd sch_fq_codel auth_rpcgss lockd drm grace sunrpc drm_panel_orientation_quirks backlight fuse loop configfs nfnetlink usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd usbcore sha512_ssse3 sha256_ssse3 sha1_ssse3 sha1_generic gf128mul usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4
+Apr 23 08:08:32 bilbo kernel: CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O       6.14.3-dirty #23
+Apr 23 08:08:32 bilbo kernel: Tainted: [W]=WARN, [O]=OOT_MODULE
+Apr 23 08:08:32 bilbo kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./970A-DS3P, BIOS FD 02/26/2016
+Apr 23 08:08:32 bilbo kernel: RIP: 0010:htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: Code: d4 45 21 a4 87 08 01 00 00 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c1 c5 a7 e0 90 53 83 be a8 01 00 00 00 48 89 f3 75 02 <0f> 0b 48 89 de e8 29 fe ff ff 31 c0 89 83 a8 01 00 00 5b e9 9b c5
+Apr 23 08:08:32 bilbo kernel: RSP: 0018:ffffc90000003e50 EFLAGS: 00010246
+Apr 23 08:08:32 bilbo kernel: RAX: ffff8881b7311c00 RBX: ffff8881b7312000 RCX: ffff8881b73121c8
+Apr 23 08:08:32 bilbo kernel: RDX: ffff8881b7312000 RSI: ffff8881b7312000 RDI: ffff88811c353180
+Apr 23 08:08:32 bilbo kernel: RBP: 0000000000000000 R08: ffff88811c3532b0 R09: 000000009cee5629
+Apr 23 08:08:32 bilbo kernel: R10: 00000000000033ab R11: 001dcd6500000000 R12: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: R13: ffff8881b7312000 R14: 00000273f4f3639c R15: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: FS:  0000000000000000(0000) GS:ffff88842ec00000(0000) knlGS:0000000000000000
+Apr 23 08:08:32 bilbo kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 23 08:08:32 bilbo kernel: CR2: 00007fc3b0cb0000 CR3: 0000000126e70000 CR4: 00000000000406f0
+Apr 23 08:08:32 bilbo kernel: Call Trace:
+Apr 23 08:08:32 bilbo kernel: <IRQ>
+Apr 23 08:08:32 bilbo kernel: htb_dequeue+0x3f1/0x5a0 [sch_htb]
+Apr 23 08:08:32 bilbo kernel: __qdisc_run+0x253/0x480
+Apr 23 08:08:32 bilbo kernel: ? timerqueue_del+0x2c/0x40
+Apr 23 08:08:32 bilbo kernel: qdisc_run+0x15/0x30
+Apr 23 08:08:32 bilbo kernel: net_tx_action+0x182/0x1b0
+Apr 23 08:08:32 bilbo kernel: handle_softirqs+0x102/0x240
+Apr 23 08:08:32 bilbo kernel: __irq_exit_rcu+0x3e/0xb0
+Apr 23 08:08:32 bilbo kernel: sysvec_apic_timer_interrupt+0x5b/0x70
+Apr 23 08:08:32 bilbo kernel: </IRQ>
+Apr 23 08:08:32 bilbo kernel: <TASK>
+Apr 23 08:08:32 bilbo kernel: asm_sysvec_apic_timer_interrupt+0x16/0x20
+Apr 23 08:08:32 bilbo kernel: RIP: 0010:cpuidle_enter_state+0x126/0x220
+Apr 23 08:08:32 bilbo kernel: Code: 18 4c 6f 00 85 c0 7e 0b 8b 73 04 83 cf ff e8 a1 22 e5 ff 31 ff e8 9a 2e 98 ff 45 84 ff 74 07 31 ff e8 0e 58 9d ff fb 45 85 ed <0f> 88 cc 00 00 00 49 63 c5 48 8b 3c 24 48 6b c8 68 48 6b d0 30 49
+Apr 23 08:08:32 bilbo kernel: RSP: 0018:ffffffff81e03e40 EFLAGS: 00000202
+Apr 23 08:08:32 bilbo kernel: RAX: ffff88842ec00000 RBX: ffff8881008d8000 RCX: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: RDX: 00000273bad0f26e RSI: fffffff6533d45e7 RDI: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: RBP: 0000000000000002 R08: 0000000000000002 R09: 000002b2b12dc100
+Apr 23 08:08:32 bilbo kernel: R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+Apr 23 08:08:32 bilbo kernel: R13: 0000000000000002 R14: 00000273bad0f26e R15: 0000000000000000
+Apr 23 08:08:32 bilbo kernel: cpuidle_enter+0x2a/0x40
+Apr 23 08:08:32 bilbo kernel: do_idle+0x12d/0x1a0
+Apr 23 08:08:32 bilbo kernel: cpu_startup_entry+0x29/0x30
+Apr 23 08:08:32 bilbo kernel: rest_init+0xbc/0xc0
+Apr 23 08:08:32 bilbo kernel: start_kernel+0x630/0x630
+Apr 23 08:08:32 bilbo kernel: x86_64_start_reservations+0x25/0x30
+Apr 23 08:08:32 bilbo kernel: x86_64_start_kernel+0x73/0x80
+Apr 23 08:08:32 bilbo kernel: common_startup_64+0x12c/0x138
+Apr 23 08:08:32 bilbo kernel: </TASK>
+Apr 23 08:08:32 bilbo kernel: ---[ end trace 0000000000000000 ]---
+Apr 23 08:08:35 bilbo kernel: AIF:UNPRIV TCP packet: IN=ppp0 OUT= MAC= SRC=23.94.171.218 DST=82.68.155.94 LEN=44 TOS=0x00 PREC=0x00 TTL=245 ID=16537 PROTO=TCP SPT=49012 DPT=25634 WINDOW=1024 RES=0x00 SYN URGP=0 
+
+
+Apr 23 10:41:36 bilbo kernel: ------------[ cut here ]------------
+Apr 23 10:41:36 bilbo kernel: WARNING: CPU: 1 PID: 0 at htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 10:41:36 bilbo kernel: Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_filter ip6_tables iptable_filter ip_tables x_tables pppoe pppox ppp_generic binfmt_misc tun slhc netconsole af_packet bridge stp llc ctr ccm dm_crypt radeon ath9k drm_client_lib ath9k_common video ath9k_hw wmi drm_exec drm_suballoc_helper snd_hda_codec_realtek drm_ttm_helper snd_hda_codec_generic snd_hda_codec_hdmi ath syscopyarea snd_hda_scodec_component ttm pl2303 snd_hda_intel usbserial mac80211 sysfillrect snd_intel_dspcfg sysimgblt snd_hda_codec fb_sys_fops drm_display_helper drm_kms_helper snd_hda_co
+ re agpgart snd_pcm cfbfillrect cfbimgblt snd_timer
+Apr 23 10:41:36 bilbo kernel: cfg80211 fb_io_fops cdc_acm cfbcopyarea aesni_intel i2c_algo_bit e1000 crypto_simd snd fb cryptd at24 libarc4 regmap_i2c font fam15h_power soundcore acpi_cpufreq k10temp evdev nfsd sch_fq_codel auth_rpcgss lockd drm grace sunrpc drm_panel_orientation_quirks backlight fuse loop configfs nfnetlink usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd usbcore sha512_ssse3 sha256_ssse3 sha1_ssse3 sha1_generic gf128mul usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4
+Apr 23 10:41:36 bilbo kernel: CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G        W  O       6.14.3-dirty #23
+Apr 23 10:41:36 bilbo kernel: Tainted: [W]=WARN, [O]=OOT_MODULE
+Apr 23 10:41:36 bilbo kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./970A-DS3P, BIOS FD 02/26/2016
+Apr 23 10:41:36 bilbo kernel: RIP: 0010:htb_deactivate+0xd/0x30 [sch_htb]
+Apr 23 10:41:36 bilbo kernel: Code: d4 45 21 a4 87 08 01 00 00 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c1 c5 a7 e0 90 53 83 be a8 01 00 00 00 48 89 f3 75 02 <0f> 0b 48 89 de e8 29 fe ff ff 31 c0 89 83 a8 01 00 00 5b e9 9b c5
+Apr 23 10:41:36 bilbo kernel: RSP: 0018:ffffc9000010ce50 EFLAGS: 00010246
+Apr 23 10:41:36 bilbo kernel: RAX: ffff8881aab77800 RBX: ffff8881b7368400 RCX: ffff8881b73685c8
+Apr 23 10:41:36 bilbo kernel: RDX: ffff8881b7368400 RSI: ffff8881b7368400 RDI: ffff88811c27a180
+Apr 23 10:41:36 bilbo kernel: RBP: 0000000000000000 R08: ffff88811c27a2b0 R09: 00000000b37f4031
+Apr 23 10:41:36 bilbo kernel: R10: 0000000000003819 R11: ffffc9000010cff8 R12: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: R13: ffff8881b7368400 R14: 00000ace389b7f34 R15: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: FS:  0000000000000000(0000) GS:ffff88842ec80000(0000) knlGS:0000000000000000
+Apr 23 10:41:36 bilbo kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 23 10:41:36 bilbo kernel: CR2: 00007f0030446000 CR3: 00000002c2cd6000 CR4: 00000000000406f0
+Apr 23 10:41:36 bilbo kernel: Call Trace:
+Apr 23 10:41:36 bilbo kernel: <IRQ>
+Apr 23 10:41:36 bilbo kernel: htb_dequeue+0x3f1/0x5a0 [sch_htb]
+Apr 23 10:41:36 bilbo kernel: __qdisc_run+0x253/0x480
+Apr 23 10:41:36 bilbo kernel: ? timerqueue_del+0x2c/0x40
+Apr 23 10:41:36 bilbo kernel: qdisc_run+0x15/0x30
+Apr 23 10:41:36 bilbo kernel: net_tx_action+0x182/0x1b0
+Apr 23 10:41:36 bilbo kernel: handle_softirqs+0x102/0x240
+Apr 23 10:41:36 bilbo kernel: __irq_exit_rcu+0x3e/0xb0
+Apr 23 10:41:36 bilbo kernel: sysvec_apic_timer_interrupt+0x5b/0x70
+Apr 23 10:41:36 bilbo kernel: </IRQ>
+Apr 23 10:41:36 bilbo kernel: <TASK>
+Apr 23 10:41:36 bilbo kernel: asm_sysvec_apic_timer_interrupt+0x16/0x20
+Apr 23 10:41:36 bilbo kernel: RIP: 0010:acpi_safe_halt+0x22/0x30
+Apr 23 10:41:36 bilbo kernel: Code: 0f 1f 84 00 00 00 00 00 65 48 8b 05 b8 38 71 7e 48 8b 00 a8 08 75 14 8b 05 a3 92 bb 00 85 c0 7e 07 0f 00 2d 20 4f 15 00 fb f4 <fa> e9 18 77 00 00 0f 1f 84 00 00 00 00 00 8a 47 08 3c 01 75 05 e9
+Apr 23 10:41:36 bilbo kernel: RSP: 0018:ffffc900000c7e80 EFLAGS: 00000246
+Apr 23 10:41:36 bilbo kernel: RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffff88842ec80000
+Apr 23 10:41:36 bilbo kernel: RDX: ffff888100ddc864 RSI: ffff888100ddc800 RDI: ffff888100ddc864
+Apr 23 10:41:36 bilbo kernel: RBP: 0000000000000001 R08: 0000000000000001 R09: 00000acdfd2a9600
+Apr 23 10:41:36 bilbo kernel: R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+Apr 23 10:41:36 bilbo kernel: R13: ffffffff81f982e8 R14: ffffffff81f98300 R15: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: acpi_idle_enter+0x8f/0xa0
+Apr 23 10:41:36 bilbo kernel: cpuidle_enter_state+0xb3/0x220
+Apr 23 10:41:36 bilbo kernel: cpuidle_enter+0x2a/0x40
+Apr 23 10:41:36 bilbo kernel: do_idle+0x12d/0x1a0
+Apr 23 10:41:36 bilbo kernel: cpu_startup_entry+0x29/0x30
+Apr 23 10:41:36 bilbo kernel: start_secondary+0xed/0xf0
+Apr 23 10:41:36 bilbo kernel: common_startup_64+0x12c/0x138
+Apr 23 10:41:36 bilbo kernel: </TASK>
+Apr 23 10:41:36 bilbo kernel: ---[ end trace 0000000000000000 ]---
+
+
+$ scripts/decode_stacktrace.sh vmlinux
+
+Apr 23 10:41:36 bilbo kernel: Modules linked in: sch_htb cls_u32 sch_ingress sch_cake ifb act_mirred xt_hl xt_nat ts_bm xt_string xt_TARPIT(O) xt_CT xt_tcpudp xt_helper nf_nat_ftp nf_conntrack_ftp ip6t_rt ip6table_nat xt_MASQUERADE iptable_nat nf_nat xt_TCPMSS xt_LOG nf_log_syslog ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 ip6table_raw iptable_raw ip6table_mangle iptable_mangle xt_multiport xt_state xt_limit xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip6table_filter ip6_tables iptable_filter ip_tables x_tables pppoe pppox ppp_generic binfmt_misc tun slhc netconsole af_packet bridge stp llc ctr ccm dm_crypt radeon ath9k drm_client_lib ath9k_common video ath9k_hw wmi drm_exec drm_suballoc_helper snd_hda_codec_realtek drm_ttm_helper snd_hda_codec_generic snd_hda_codec_hdmi ath syscopyarea snd_hda_scodec_component ttm pl2303 snd_hda_intel usbserial mac80211 sysfillrect snd_intel_dspcfg sysimgblt snd_hda_codec fb_sys_fops drm_display_helper drm_kms_helper snd_hda_co
+ re agpgart snd_pcm cfbfillrect cfbimgblt snd_timer
+Apr 23 10:41:36 bilbo kernel: cfg80211 fb_io_fops cdc_acm cfbcopyarea aesni_intel i2c_algo_bit e1000 crypto_simd snd fb cryptd at24 libarc4 regmap_i2c font fam15h_power soundcore acpi_cpufreq k10temp evdev nfsd sch_fq_codel auth_rpcgss lockd drm grace sunrpc drm_panel_orientation_quirks backlight fuse loop configfs nfnetlink usbhid xhci_pci ohci_pci xhci_hcd ohci_hcd ehci_pci ehci_hcd usbcore sha512_ssse3 sha256_ssse3 sha1_ssse3 sha1_generic gf128mul usb_common dm_mirror dm_region_hash dm_log cpuid i2c_piix4 i2c_smbus i2c_dev i2c_core it87 hwmon_vid msr dmi_sysfs autofs4
+Apr 23 10:41:36 bilbo kernel: CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G        W  O       6.14.3-dirty #23
+Apr 23 10:41:36 bilbo kernel: Tainted: [W]=WARN, [O]=OOT_MODULE
+Apr 23 10:41:36 bilbo kernel: Hardware name: Gigabyte Technology Co., Ltd. To be filled by O.E.M./970A-DS3P, BIOS FD 02/26/2016
+Apr 23 10:41:36 bilbo kernel: RIP: 0010:htb_deactivate (net/sched/sch_htb.c:613 (discriminator 1)) sch_htb 
+Apr 23 10:41:36 bilbo kernel: Code: d4 45 21 a4 87 08 01 00 00 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e 41 5f e9 c1 c5 a7 e0 90 53 83 be a8 01 00 00 00 48 89 f3 75 02 <0f> 0b 48 89 de e8 29 fe ff ff 31 c0 89 83 a8 01 00 00 5b e9 9b c5
+All code
+========
+   0:	d4                   	(bad)
+   1:	45 21 a4 87 08 01 00 	and    %r12d,0x108(%r15,%rax,4)
+   8:	00 
+   9:	48 83 c4 18          	add    $0x18,%rsp
+   d:	5b                   	pop    %rbx
+   e:	5d                   	pop    %rbp
+   f:	41 5c                	pop    %r12
+  11:	41 5d                	pop    %r13
+  13:	41 5e                	pop    %r14
+  15:	41 5f                	pop    %r15
+  17:	e9 c1 c5 a7 e0       	jmp    0xffffffffe0a7c5dd
+  1c:	90                   	nop
+  1d:	53                   	push   %rbx
+  1e:	83 be a8 01 00 00 00 	cmpl   $0x0,0x1a8(%rsi)
+  25:	48 89 f3             	mov    %rsi,%rbx
+  28:	75 02                	jne    0x2c
+  2a:*	0f 0b                	ud2		<-- trapping instruction
+  2c:	48 89 de             	mov    %rbx,%rsi
+  2f:	e8 29 fe ff ff       	call   0xfffffffffffffe5d
+  34:	31 c0                	xor    %eax,%eax
+  36:	89 83 a8 01 00 00    	mov    %eax,0x1a8(%rbx)
+  3c:	5b                   	pop    %rbx
+  3d:	e9                   	.byte 0xe9
+  3e:	9b                   	fwait
+  3f:	c5                   	.byte 0xc5
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f 0b                	ud2
+   2:	48 89 de             	mov    %rbx,%rsi
+   5:	e8 29 fe ff ff       	call   0xfffffffffffffe33
+   a:	31 c0                	xor    %eax,%eax
+   c:	89 83 a8 01 00 00    	mov    %eax,0x1a8(%rbx)
+  12:	5b                   	pop    %rbx
+  13:	e9                   	.byte 0xe9
+  14:	9b                   	fwait
+  15:	c5                   	.byte 0xc5
+Apr 23 10:41:36 bilbo kernel: RSP: 0018:ffffc9000010ce50 EFLAGS: 00010246
+Apr 23 10:41:36 bilbo kernel: RAX: ffff8881aab77800 RBX: ffff8881b7368400 RCX: ffff8881b73685c8
+Apr 23 10:41:36 bilbo kernel: RDX: ffff8881b7368400 RSI: ffff8881b7368400 RDI: ffff88811c27a180
+Apr 23 10:41:36 bilbo kernel: RBP: 0000000000000000 R08: ffff88811c27a2b0 R09: 00000000b37f4031
+Apr 23 10:41:36 bilbo kernel: R10: 0000000000003819 R11: ffffc9000010cff8 R12: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: R13: ffff8881b7368400 R14: 00000ace389b7f34 R15: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: FS:  0000000000000000(0000) GS:ffff88842ec80000(0000) knlGS:0000000000000000
+Apr 23 10:41:36 bilbo kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Apr 23 10:41:36 bilbo kernel: CR2: 00007f0030446000 CR3: 00000002c2cd6000 CR4: 00000000000406f0
+Apr 23 10:41:36 bilbo kernel: Call Trace:
+Apr 23 10:41:36 bilbo kernel: <IRQ>
+Apr 23 10:41:36 bilbo kernel: htb_dequeue (./include/net/sch_generic.h:821 (discriminator 1) net/sched/sch_htb.c:702 (discriminator 1) net/sched/sch_htb.c:933 (discriminator 1) net/sched/sch_htb.c:983 (discriminator 1)) sch_htb 
+Apr 23 10:41:36 bilbo kernel: __qdisc_run (net/sched/sch_generic.c:294 net/sched/sch_generic.c:398 net/sched/sch_generic.c:416) 
+Apr 23 10:41:36 bilbo kernel: ? timerqueue_del (lib/timerqueue.c:58) 
+Apr 23 10:41:36 bilbo kernel: qdisc_run (./include/net/pkt_sched.h:128 ./include/net/pkt_sched.h:124) 
+Apr 23 10:41:36 bilbo kernel: net_tx_action (net/core/dev.c:5553) 
+Apr 23 10:41:36 bilbo kernel: handle_softirqs (./arch/x86/include/asm/atomic.h:23 ./include/linux/atomic/atomic-arch-fallback.h:457 ./include/linux/jump_label.h:262 ./include/trace/events/irq.h:142 kernel/softirq.c:562) 
+Apr 23 10:41:36 bilbo kernel: __irq_exit_rcu (kernel/softirq.c:435 kernel/softirq.c:662) 
+Apr 23 10:41:36 bilbo kernel: sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1049 (discriminator 35) arch/x86/kernel/apic/apic.c:1049 (discriminator 35)) 
+Apr 23 10:41:36 bilbo kernel: </IRQ>
+Apr 23 10:41:36 bilbo kernel: <TASK>
+Apr 23 10:41:36 bilbo kernel: asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:574) 
+Apr 23 10:41:36 bilbo kernel: RIP: 0010:acpi_safe_halt (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:114 drivers/acpi/processor_idle.c:112) 
+Apr 23 10:41:36 bilbo kernel: Code: 0f 1f 84 00 00 00 00 00 65 48 8b 05 b8 38 71 7e 48 8b 00 a8 08 75 14 8b 05 a3 92 bb 00 85 c0 7e 07 0f 00 2d 20 4f 15 00 fb f4 <fa> e9 18 77 00 00 0f 1f 84 00 00 00 00 00 8a 47 08 3c 01 75 05 e9
+All code
+========
+   0:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+   7:	00 
+   8:	65 48 8b 05 b8 38 71 	mov    %gs:0x7e7138b8(%rip),%rax        # 0x7e7138c8
+   f:	7e 
+  10:	48 8b 00             	mov    (%rax),%rax
+  13:	a8 08                	test   $0x8,%al
+  15:	75 14                	jne    0x2b
+  17:	8b 05 a3 92 bb 00    	mov    0xbb92a3(%rip),%eax        # 0xbb92c0
+  1d:	85 c0                	test   %eax,%eax
+  1f:	7e 07                	jle    0x28
+  21:	0f 00 2d 20 4f 15 00 	verw   0x154f20(%rip)        # 0x154f48
+  28:	fb                   	sti
+  29:	f4                   	hlt
+  2a:*	fa                   	cli		<-- trapping instruction
+  2b:	e9 18 77 00 00       	jmp    0x7748
+  30:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+  37:	00 
+  38:	8a 47 08             	mov    0x8(%rdi),%al
+  3b:	3c 01                	cmp    $0x1,%al
+  3d:	75 05                	jne    0x44
+  3f:	e9                   	.byte 0xe9
+
+Code starting with the faulting instruction
+===========================================
+   0:	fa                   	cli
+   1:	e9 18 77 00 00       	jmp    0x771e
+   6:	0f 1f 84 00 00 00 00 	nopl   0x0(%rax,%rax,1)
+   d:	00 
+   e:	8a 47 08             	mov    0x8(%rdi),%al
+  11:	3c 01                	cmp    $0x1,%al
+  13:	75 05                	jne    0x1a
+  15:	e9                   	.byte 0xe9
+Apr 23 10:41:36 bilbo kernel: RSP: 0018:ffffc900000c7e80 EFLAGS: 00000246
+Apr 23 10:41:36 bilbo kernel: RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffff88842ec80000
+Apr 23 10:41:36 bilbo kernel: RDX: ffff888100ddc864 RSI: ffff888100ddc800 RDI: ffff888100ddc864
+Apr 23 10:41:36 bilbo kernel: RBP: 0000000000000001 R08: 0000000000000001 R09: 00000acdfd2a9600
+Apr 23 10:41:36 bilbo kernel: R10: 0000000000000006 R11: 0000000000000020 R12: ffffffff81f98280
+Apr 23 10:41:36 bilbo kernel: R13: ffffffff81f982e8 R14: ffffffff81f98300 R15: 0000000000000000
+Apr 23 10:41:36 bilbo kernel: acpi_idle_enter (drivers/acpi/processor_idle.c:705) 
+Apr 23 10:41:36 bilbo kernel: cpuidle_enter_state (drivers/cpuidle/cpuidle.c:268) 
+Apr 23 10:41:36 bilbo kernel: cpuidle_enter (drivers/cpuidle/cpuidle.c:391 (discriminator 2)) 
+Apr 23 10:41:36 bilbo kernel: do_idle (kernel/sched/idle.c:234 kernel/sched/idle.c:325) 
+Apr 23 10:41:36 bilbo kernel: cpu_startup_entry (kernel/sched/idle.c:422) 
+Apr 23 10:41:36 bilbo kernel: start_secondary (arch/x86/kernel/smpboot.c:315) 
+Apr 23 10:41:36 bilbo kernel: common_startup_64 (arch/x86/kernel/head_64.S:421) 
+Apr 23 10:41:36 bilbo kernel: </TASK>
+Apr 23 10:41:36 bilbo kernel: ---[ end trace 0000000000000000 ]---
+
 -- 
-2.34.1
+Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
 
+Dance like no-one's watching. / Encrypt like everyone is.
+Security is inversely proportional to convenience
 
