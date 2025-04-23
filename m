@@ -1,321 +1,226 @@
-Return-Path: <netdev+bounces-185246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56A1A997CC
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:25:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9B1A997D8
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17C737AAA5B
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:23:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4833B7061
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 18:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E007428DF1C;
-	Wed, 23 Apr 2025 18:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E89728CF7F;
+	Wed, 23 Apr 2025 18:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9rzUu3O"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="PKAKN3DT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11021078.outbound.protection.outlook.com [40.93.194.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089C2285401
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 18:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745432693; cv=none; b=FeUL7lDQ4fkb5uHV024sImWz/C1C1OP6JXsKkc1bFwIL35dcg/Pk97aMm5/b3ggf9JAi6hZKQ/kUG6TZWQ/M6xmwK5vTEs9x0E7Al20JsxKYGtOSNtlEYaGDnSHYmX3Cl5UzEtf21j+ZC2wvO5YIlZFr7UMskYXOT0pDnIyNRgA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745432693; c=relaxed/simple;
-	bh=2kFipTkI9R4lAA/fVQ77ATu/54yZGXXZ2osRGeIHD58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFZA7nvFXBncH++k+9ZwGvB8OxisvFSz1MYyJ4X3l1O45xTlOV4ZG8gzwvmutv64DCOCKbDUSARH4ax5Z7kdPebMru0CoMYwCvZKF8fDtryTYodbAi8qkhFx1v8lMUYuxx/cE575e90SkDqVsae5Q4gdrGzSvvVDWPXzq6GvWCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D9rzUu3O; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745432690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xDiBetsqPmhwr4oXU09zlLKMEaFLxeBh720CI/G1T2w=;
-	b=D9rzUu3Ow3oS0K0/QjCMaXFnZMkuqVYQ3lsDDdkf5/gyJ+iQ91I+SWR1iVnylLHGfcYD36
-	V+g45fAaJS4vv/tD+7PDGIzAmkaluR+TNsKITlYYM0KzEsJt/nXs083FrwFhIsM/O3bCGV
-	XypL9n6o4QgolhfFqlBqCedhaEGaNCw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-l-lJPxGENM213O_2e_SQFw-1; Wed, 23 Apr 2025 14:24:49 -0400
-X-MC-Unique: l-lJPxGENM213O_2e_SQFw-1
-X-Mimecast-MFC-AGG-ID: l-lJPxGENM213O_2e_SQFw_1745432688
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so581525e9.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 11:24:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745432688; x=1746037488;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xDiBetsqPmhwr4oXU09zlLKMEaFLxeBh720CI/G1T2w=;
-        b=w5kfgvdIRhDMu3Rk5EKU7/5HHcPmG124SHlzOKnhmTIES7FjgSzXODXDJNoTdnIhsB
-         QLq2Enagfl7erM43FQyx/knYroTOR48so7YR5F69AWmIR2fcBHxCIJgimHcthqvZbcOu
-         XUI7gubcNUqqCcAVyQFJzAa6oB4RLl0G0J02M0Onuripfc1iPjwrBRjLZBKIdi5z6cTm
-         6zTdM/nWtsaaPEY5bOXPiLLjDYrtQw2dmYCHU0bMf8LrNrj/tPb+xhME0UsyQG6CpOxY
-         hQA/pF6RGaJM73iZ+t205M5xhJqTZsyNytPg6O5TXLTueZ9xTLcZOjewCb7hgmslu6Yg
-         ucvw==
-X-Gm-Message-State: AOJu0Yws5YqSd0j+TmRc1+sYSIwvnVgD3HbY7CxXAnIbWArFLtSiO6zt
-	6kv9F3wszDPSzLolauHSNZrcoguyVgbPYP5VTfDEsl6a490K+iMOnxo0WFiuUGya5bdmzEDFZH7
-	uFjlZ8IKArfCseqESo1Px5ydMrzQIgSGlnMRsR2pbKvkwvPIG4jzPRg==
-X-Gm-Gg: ASbGncuU5rI8P15SIIIukGJU/wTfC8e1TlE/GWQh0dx6yx4bRQnwpC8XqmguUgsmbFC
-	6Bd/r12H+KVlzfW7gC2tMhRsAt2H6Qzvxxn4N9ilRqEHzmLMjM+lqCuzMgqgwT2rXWAx7z2kyXL
-	jJ7fny7gw4k7TCJwN60ZW2xcbutFOSIYEPn19KiO+QCTR7wVPuCyQ2EFFz0N0D4KaUMAVTdly6n
-	xEXbDDqpt/65V1GCZfLCILZTpfT0GjDENMaaYr665Zd6IhBZEsn2A84v8qa5B3V8e2yDDjYmDXt
-	Ujp6Yw==
-X-Received: by 2002:a05:600c:1d18:b0:43c:f3e4:d6f6 with SMTP id 5b1f17b1804b1-4406ac27928mr208905625e9.31.1745432688472;
-        Wed, 23 Apr 2025 11:24:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGhMUybKS0xk+duePsY3EIBDyJlRwfswDnOg4sEpKMj9IfeNCbDaS3GP/dkavlx5C/2n4m6hA==
-X-Received: by 2002:a05:600c:1d18:b0:43c:f3e4:d6f6 with SMTP id 5b1f17b1804b1-4406ac27928mr208905055e9.31.1745432687961;
-        Wed, 23 Apr 2025 11:24:47 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4931acsm19793032f8f.72.2025.04.23.11.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 11:24:47 -0700 (PDT)
-Date: Wed, 23 Apr 2025 14:24:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Mina Almasry <almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD71263F54;
+	Wed, 23 Apr 2025 18:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745432769; cv=fail; b=q6sC07ZlzdEbMAjD3KxkHJNJyrsL1YSfSWVqJ8cxOqQj72RQxwlwc6aMKWQzBwsVPMmJoQNne0galke97K4NZbFZTXx28AhBv1kE9Hkn4sOZ1gJknvEEXxmGGjWhmM/h1Ytqf5bl8g/eZqRQmfpRkY9Se1QNQOs8UCxQj9kguEs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745432769; c=relaxed/simple;
+	bh=MYy8Uu3Rvi9FL8HgU34IBlS5G71CezaQN6kSMKWUeLk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KBsiP/G1TJIPkcaHDMDBPMXK11w4HqyDcq/9D2wx1nR6Kn0BhBUfpbc0hnLVz8lT+lQDnBe+A4lLaZaHuWPHyLbxmaSyH7lTyffDpD3TsYHM65YCIO9zTbmpG8wp0Z7p2g0V05cF9VH9IpIRqqkPWtXtz95w8Pf/th5eb9N9r68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=PKAKN3DT reason="key not found in DNS"; arc=fail smtp.client-ip=40.93.194.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZPBjJtoWHr826BH+fIgFB8P5psfS7VjI0bHbu83spiI7oKEywrCvJIaf5ejGwcvnGKX1RtAY+R/jZ6twKRZvSzjrIQXUKU6V+FRHNC9vbJvhjXaETy1Pz88BG2jHExV+ngJcaodCU/ivjcYyxDavwOYfHTvcrpYO4sFYx4ioU5xVotyqF5IJbFHZQsHXur6efvH1jsINMn8IJgteY0FRhhhHL7yv59tWhZWremKYy+JrvmuzvXqJPZ2NNxQK+QrVSuEamkFhpjaZ58aLrbfEge8Ew1QydscDK2U4VSHmapaZfa/dku+l/kw27o+YffpDvFuQAhpC0ldL4lun2oFF9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cav5FalcQ8Bg4/S7XMQ62vanvufq7dIcyPJkvcjAd80=;
+ b=sI8uMCC/dETwsD4pevUfaoRh43YnUbupS3tNrHa9JfQgmsArXql3WVutayHvpTuHj3Jbn+MSW4R2ofsbh6eN+H1oFfOQpUHa5bZBECwOKsl2ghGhciZzymuN10tYjBUxemFTWpXDUi1KHbHNdZYJTSegCHYfOyrWnstaIFLMYn+sFUctBTYh+XrDb4Zoqxbe5A04c5+uDBtKS66QIwmTioYVoLB7Vkp3SmoGB1FmYrN6rYx6ZiSb+VBWhUecrvcwJN47m+GPJmwC5FR8qmUQWEBPliZQ1HG8zM7ZDstszaQuHGIsH6tgVL95GYYQz/wyamRIqLd0dHplp1fCvyJGOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cav5FalcQ8Bg4/S7XMQ62vanvufq7dIcyPJkvcjAd80=;
+ b=PKAKN3DTOm478r4WXl3cWd8EmOjL1o5DzMjPg20BwRymZgdCZJmxAHsVypsnAu00gKdJvPbjOS4bLxOp7OHfYYs+ycUkL4ZzfyLlDPy5Ne+TYrQA04l6ER3DL3oz+2T/HcvNiP9H0mceE/PkmEQiAhs4QxxUkBAMHT01UZ80F1I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
+ CH3PR01MB8715.prod.exchangelabs.com (2603:10b6:610:20c::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.36; Wed, 23 Apr 2025 18:26:02 +0000
+Received: from BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::3513:ad6e:208c:5dbd]) by BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::3513:ad6e:208c:5dbd%5]) with mapi id 15.20.8678.021; Wed, 23 Apr 2025
+ 18:26:02 +0000
+Message-ID: <b254a359-0ca8-463b-b666-e34ba357bd09@amperemail.onmicrosoft.com>
+Date: Wed, 23 Apr 2025 14:25:57 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v19 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+To: Jeremy Kerr <jk@codeconstruct.com.au>, admiyo@os.amperecomputing.com,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v10 4/9] net: devmem: Implement TX path
-Message-ID: <20250423140931-mutt-send-email-mst@kernel.org>
-References: <20250423031117.907681-1-almasrymina@google.com>
- <20250423031117.907681-5-almasrymina@google.com>
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Huisong Li <lihuisong@huawei.com>
+References: <20250418221438.368203-1-admiyo@os.amperecomputing.com>
+ <20250418221438.368203-5-admiyo@os.amperecomputing.com>
+ <7b5ed6452d077e65005010c81eaeb3124d1e9feb.camel@codeconstruct.com.au>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <7b5ed6452d077e65005010c81eaeb3124d1e9feb.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BY3PR05CA0047.namprd05.prod.outlook.com
+ (2603:10b6:a03:39b::22) To BN3PR01MB9212.prod.exchangelabs.com
+ (2603:10b6:408:2cb::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423031117.907681-5-almasrymina@google.com>
-
-some nits
-
-On Wed, Apr 23, 2025 at 03:11:11AM +0000, Mina Almasry wrote:
-> @@ -189,43 +200,44 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  	}
->  
->  	binding->dev = dev;
-> -
-> -	err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
-> -			      binding, xa_limit_32b, &id_alloc_next,
-> -			      GFP_KERNEL);
-> -	if (err < 0)
-> -		goto err_free_binding;
-> -
->  	xa_init_flags(&binding->bound_rxqs, XA_FLAGS_ALLOC);
-> -
->  	refcount_set(&binding->ref, 1);
-> -
->  	binding->dmabuf = dmabuf;
->
-
-given you keep iterating, don't tweak whitespace in the same patch-
-will make the review a tiny bit easier.
-
-  
->  	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
->  	if (IS_ERR(binding->attachment)) {
->  		err = PTR_ERR(binding->attachment);
->  		NL_SET_ERR_MSG(extack, "Failed to bind dmabuf to device");
-> -		goto err_free_id;
-> +		goto err_free_binding;
->  	}
->  
->  	binding->sgt = dma_buf_map_attachment_unlocked(binding->attachment,
-> -						       DMA_FROM_DEVICE);
-> +						       direction);
->  	if (IS_ERR(binding->sgt)) {
->  		err = PTR_ERR(binding->sgt);
->  		NL_SET_ERR_MSG(extack, "Failed to map dmabuf attachment");
->  		goto err_detach;
->  	}
->  
-> +	if (direction == DMA_TO_DEVICE) {
-> +		binding->tx_vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
-> +						 sizeof(struct net_iov *),
-> +						 GFP_KERNEL);
-> +		if (!binding->tx_vec) {
-> +			err = -ENOMEM;
-> +			goto err_unmap;
-> +		}
-> +	}
-> +
->  	/* For simplicity we expect to make PAGE_SIZE allocations, but the
->  	 * binding can be much more flexible than that. We may be able to
->  	 * allocate MTU sized chunks here. Leave that for future work...
->  	 */
-> -	binding->chunk_pool =
-> -		gen_pool_create(PAGE_SHIFT, dev_to_node(&dev->dev));
-> +	binding->chunk_pool = gen_pool_create(PAGE_SHIFT,
-> +					      dev_to_node(&dev->dev));
->  	if (!binding->chunk_pool) {
->  		err = -ENOMEM;
-> -		goto err_unmap;
-> +		goto err_tx_vec;
->  	}
->  
->  	virtual = 0;
-> @@ -270,24 +282,34 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  			niov->owner = &owner->area;
->  			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
->  						      net_devmem_get_dma_addr(niov));
-> +			if (direction == DMA_TO_DEVICE)
-> +				binding->tx_vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
->  		}
->  
->  		virtual += len;
->  	}
->  
-> +	err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
-> +			      binding, xa_limit_32b, &id_alloc_next,
-> +			      GFP_KERNEL);
-> +	if (err < 0)
-> +		goto err_free_id;
-> +
->  	return binding;
->  
-> +err_free_id:
-> +	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
->  err_free_chunks:
->  	gen_pool_for_each_chunk(binding->chunk_pool,
->  				net_devmem_dmabuf_free_chunk_owner, NULL);
->  	gen_pool_destroy(binding->chunk_pool);
-> +err_tx_vec:
-> +	kvfree(binding->tx_vec);
->  err_unmap:
->  	dma_buf_unmap_attachment_unlocked(binding->attachment, binding->sgt,
->  					  DMA_FROM_DEVICE);
->  err_detach:
->  	dma_buf_detach(dmabuf, binding->attachment);
-> -err_free_id:
-> -	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
->  err_free_binding:
->  	kfree(binding);
->  err_put_dmabuf:
-> @@ -295,6 +317,21 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
->  	return ERR_PTR(err);
->  }
->  
-> +struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id)
-> +{
-> +	struct net_devmem_dmabuf_binding *binding;
-> +
-> +	rcu_read_lock();
-> +	binding = xa_load(&net_devmem_dmabuf_bindings, id);
-> +	if (binding) {
-> +		if (!net_devmem_dmabuf_binding_get(binding))
-> +			binding = NULL;
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	return binding;
-> +}
-> +
->  void net_devmem_get_net_iov(struct net_iov *niov)
->  {
->  	net_devmem_dmabuf_binding_get(net_devmem_iov_binding(niov));
-> @@ -305,6 +342,53 @@ void net_devmem_put_net_iov(struct net_iov *niov)
->  	net_devmem_dmabuf_binding_put(net_devmem_iov_binding(niov));
->  }
->  
-> +struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
-> +							 unsigned int dmabuf_id)
-> +{
-> +	struct net_devmem_dmabuf_binding *binding;
-> +	struct dst_entry *dst = __sk_dst_get(sk);
-> +	int err = 0;
-> +
-> +	binding = net_devmem_lookup_dmabuf(dmabuf_id);
-
-why not initialize binding together with the declaration?
-
-> +	if (!binding || !binding->tx_vec) {
-> +		err = -EINVAL;
-> +		goto out_err;
-> +	}
-> +
-> +	/* The dma-addrs in this binding are only reachable to the corresponding
-> +	 * net_device.
-> +	 */
-> +	if (!dst || !dst->dev || dst->dev->ifindex != binding->dev->ifindex) {
-> +		err = -ENODEV;
-> +		goto out_err;
-> +	}
-> +
-> +	return binding;
-> +
-> +out_err:
-> +	if (binding)
-> +		net_devmem_dmabuf_binding_put(binding);
-> +
-> +	return ERR_PTR(err);
-> +}
-> +
-> +struct net_iov *
-> +net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding,
-> +		       size_t virt_addr, size_t *off, size_t *size)
-> +{
-> +	size_t idx;
-> +
-> +	if (virt_addr >= binding->dmabuf->size)
-> +		return NULL;
-> +
-> +	idx = virt_addr / PAGE_SIZE;
-
-init this at where it's declared?
-or where it's used.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|CH3PR01MB8715:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4fb3fa5a-771b-4347-b8b0-08dd82944d85
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Rk5rT1NSbHlWR2xXQlVMdXJ3ZUg4NDBRTWgwNHRYWWVVblFvZmxyKy9BUE1l?=
+ =?utf-8?B?ZENwaDBXeXk0NUtKVzdpdzUzbCtjbXhIWmVDeTJZRDEwOGV3QnE3cGlwdU91?=
+ =?utf-8?B?QTlaMTlRMThxQTc5RXBvaDArb09hY2lDMHZJMlhZa3dJV1lxNzFQL2tFUlI4?=
+ =?utf-8?B?WWRQUWo2aGMxbC9aN3RkUU5JclBUVzJOWDlzRWZ2MDJFK2pmRS80YS9JeWgv?=
+ =?utf-8?B?NU5WQ2VxazVidkdJdjNpcDJlWGhJU0htNGJ2aUFhRGVLRkZBV1BBbk5wQS9P?=
+ =?utf-8?B?RVhWazBFZVNrQzQyNEl6YytBR28zcFdLV0R2SlkxRE5LNEV0eThaMWRWeURS?=
+ =?utf-8?B?aE5KamFVZEJpK2M1L2VzbTc1MkErUDlQa1ExRnNIdXlvbXJCbFZjZVFjcEZo?=
+ =?utf-8?B?eGR5Y1cwcnFzWG5TbGF3UmVTblZxTU03ajI0dW9QbDBvTDhTVmNzNTV4WkYr?=
+ =?utf-8?B?WU9VUlNBQ3dzbDhlcWhGVmdBdFpDaFBtM3hSd3duTzJQcXdiZ2cxOEtMYlZQ?=
+ =?utf-8?B?QnJVZFNNdXFDbHJJVlJ5NHlGUVhUVjdMKzk4b0xMa01uaVdSekxFVnUxcGlP?=
+ =?utf-8?B?bk1aTzlPdkh6QVZwTEJEREszTkZmM0NLa3k3SWZkK3BYV2IrWlFSblFYQUhq?=
+ =?utf-8?B?Zjk5NG0xQ253RUtFNmUzai9aU01HLzk0T3dBNFRmM0o1SkRwTEhuNThZTHgv?=
+ =?utf-8?B?ekw2MGdYTjhZcEh6SDlFdEgzRUdhTjNhblhvNFJUMGxaQkV6UEw5YWNuSUhC?=
+ =?utf-8?B?dHdORFJOeE8yV0d5bjBwL1dYcVFpc29YR1c2OHNHRG50WUV2WDJUZFpkSmdC?=
+ =?utf-8?B?K3hkYTg1TzQzODBZSFRjaEtUWnVPSnp6K0ptNm9vZ2d2ZlNlUjl2TG5keWFo?=
+ =?utf-8?B?blVwMU8vN0F3NlQ1Y0VLNjB2My9pYVFRcENkZnFNZHNESmVrdUhWdUU0OXF5?=
+ =?utf-8?B?RG92bXh1ak05NmlJVmNxczlwTkdyTDRKSXBhMW5nVit3VXpwbm5JRzdEc3dp?=
+ =?utf-8?B?cXlEbHcwRUVZaWNFWEk2c3NsWit2Qjg3QzN2UFA2MWlWOUJMNXp0QUlpM1NK?=
+ =?utf-8?B?OGpzajROR1ZuZmV1RndpV2szaGNZa3pIbkVHMUVSc3gzdE9EZytvYWtHcytY?=
+ =?utf-8?B?YU5tZDJlRjF1NEVqZ1BlbDVURXFZdElvL0hvY0dFdno0MDFBYXNvSXRTRHVJ?=
+ =?utf-8?B?T0c2L2tMSTRCRll6TEVsYmFKeUM3YTNtQlVGV05qdmhlQVZFbnJ3OFlNTGRr?=
+ =?utf-8?B?b0pFemk1TTR6VGZnMTIvY2REOWVEWWNHRm1Bc0VPU0w1MDBRTndvLzhpcERN?=
+ =?utf-8?B?NHpBRXkrVWdNa2ZVbEdNbFhDUk95ak4vZ3ZFSitWVEFabWFGTFlmS2tnYmkw?=
+ =?utf-8?B?VG1UVkRZaTRYZEsweEIyMHQ1T2hqOCs0bmV0aHV4K1Rva004UHdudXZaOEI1?=
+ =?utf-8?B?SW02V3N3elJHSGNNcVdONjYydjFCdThKc0tCamF0UVp1K1BmYWhTOWRaVGZ3?=
+ =?utf-8?B?cDlUQ09MSVZldFFJWkJiaTdkRG04VHlVWUxpakhzcW1rL2ZENFVZaVZpVUlL?=
+ =?utf-8?B?OFkxTWViQ2pLYWZBRTdxZzR0NGNLVkthelVyWlVIdGM1QmhHNlhBRHE5RW1k?=
+ =?utf-8?B?K3FwUWFNUTRSZW1obHpsVUI0M2xycVRmZWlFWHdhSjR2ZW9yak5EaC9zZGIy?=
+ =?utf-8?B?aVlJbUR3ekVaRjNNZURNTVdzM002ZHB1N0tZL0pjUlFQS1lSNll2K0NGdVZC?=
+ =?utf-8?B?SjVKcjZ3OGEvT2t3Z09xSWdVRk1GVmVHWXZqNyt6aWpKSnhEckloTVJQWThS?=
+ =?utf-8?B?dUFSL0RMZVdtNnJmMFZKSHdSY3NLNU5nNlE2S3duS1pHZ0gxZlNyQjBXcmVx?=
+ =?utf-8?B?RzI5dkhMOExwVEx2WWJBOGtKUzJ0emVXUStLSHFyY1ZoYUZubGFvWTd5V0k3?=
+ =?utf-8?Q?kJSD0ZioznI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(10070799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S1R5MXNsT2dHek1NcGFyZTlaUU1NWDNlMWVvdjZiNk9vOE9heEpFeDA5M1ZJ?=
+ =?utf-8?B?eVpVVmdyVmdnb25wdU1oRmRnK1V0a01XQVdiWlRsaHFPN3NkNURNUnZmZVVx?=
+ =?utf-8?B?MmxoK1UyamN3OUZLbjJkd25PN2hjcWVFeXYySmR1aXc1b2F0UmhKR2g3VnVG?=
+ =?utf-8?B?MDRiTGhFdXUzUThvS09hSi9VcVZFN2FFSGdlZVhWUitTN1N1QmVpOWJ0MUxB?=
+ =?utf-8?B?VWtaV1RJVlJvT3dWNU42WVJMWkc1aVFGQnZEZjgzK0gxZVpRWHNJbU44dk5n?=
+ =?utf-8?B?blZ0T29VQUtubUR3S2xSUXlLSU00eEUzVXV2cHJVUEtod0sybE5rUzBLYVpq?=
+ =?utf-8?B?V0p2QzFpVk9ZajdOUVh4eFJ4anRVb3F1Z0NMd0R3V1lEWjB3bUpOYUhpOUN1?=
+ =?utf-8?B?aVJSVk1OSVJXYzROZ1FnN2UvNWxxYm5wa2Y2SEh2eFhORnJRRUc5YVhiMEFu?=
+ =?utf-8?B?Mzk2N3hmUjFsemNrMTM2SmFOWklySmFyT1lHaWE0a0tWUGJsL29uMmNyNS80?=
+ =?utf-8?B?d0t6cFhSQ3p2UlN6SVpDS0h4U3Z3Y3YzdXhlTUIvd1VBak0zaFFUZzBiNEtM?=
+ =?utf-8?B?aFZqNHZQT2dscldCWk13M2szdGl6MW9hSjZkd0hReHFZNjE3RDIrOGo2U2lX?=
+ =?utf-8?B?VENmZytyWVdEOUtPODZiQnFLNDZvb0xtQjZnQkNZRWRvbkN6ZDlBcThPbVhZ?=
+ =?utf-8?B?WDFhV3B2RmVtVkpheHhROEtVaTFoZDlhd2ppd3VCOGJQdm9tMG9OdGN3RGNr?=
+ =?utf-8?B?ZTFsazlLazJuNE80ZmRtTHZkNXBmN0s4eGp2L0g5c28wamw4dmxlS3pvUlND?=
+ =?utf-8?B?OTJBczVoYVFRYzBzbE03NkF6Rk0rdE9TaHM0UG0zWXRHeEs5SlFEN1RlL3cz?=
+ =?utf-8?B?SkUzdWJJV0dpNzNDMmVydTRHVzE0ZGIvazg1ZUpRQ3BTOXJBbFplb2FOV3Vr?=
+ =?utf-8?B?emZDK0pCaC9VK2wybzFYYytBaWhhSlNUSEF1YktOcDhtZGVOZ1BiVmtjTWJQ?=
+ =?utf-8?B?OEdwV1ZoeEMxUVJXandSdjRyQktIejdoSmRpc0NCVDVuTGJ6Nmh2MG8zbHV2?=
+ =?utf-8?B?S2hzenpxT2RtcjJuWFBHaS9maERUMVhKU2kvRFJzaVdoM25hQWhWditJMkpX?=
+ =?utf-8?B?cHJudDNLYlBDRDJxZFdKUWNJM1RXb2FuQlJHZjR6cmZrSDc4VnNWRnJJSW9z?=
+ =?utf-8?B?OTFWK0p2SFExTXhHWXdTUHJzdmpiU0FmVXZmTmtZOGFVcGJrRVJ1RWZRRUdt?=
+ =?utf-8?B?Y2o5bk1UeHVFang5Ty9WOVg4d2RPVTJOclI5d0Y5VTVVU1dJSWZRWitBeUdk?=
+ =?utf-8?B?a3ZSaWpGRUIvQ1FLK2lNZTVzTTNCOEM5dnA2ZjZBNkNKVVNsTGNtVW1RK2FM?=
+ =?utf-8?B?ZVFCQXorRjRDSHRvTmFyNDczSkRRcDRJVVpOTUdNVkUxQlM0bG96MXpIN240?=
+ =?utf-8?B?eGt1akNuMjU3dXdLckFSRTRqTGhzQTg0T1U1QkdWSXUvNE5kQjh2WHZOeG5T?=
+ =?utf-8?B?clMyRUlidzlEVlV3QlV1KzBxVDFyUGM5ZU1BcVR5bkhGNHp4OXVJRWdid0I2?=
+ =?utf-8?B?eFdBY1lTWHFkWHhOdEs3Y21ZSEhXd3ZUVkNuMGtJek5lREtPdkg0c09hU0lM?=
+ =?utf-8?B?R1J3VTdhY2puNXZKeFRxZnpDRnExUGFhZ2hVQ3R5REEyV0xpYWJKelRhOHdu?=
+ =?utf-8?B?QzZtdE9LNnBaL1RnTXE3ZTF3NWFKUjR3SEVBalpReUV2a3J6WCtCM3ZNcjFp?=
+ =?utf-8?B?WFpQT2xCZ0JwNmkvT3E4V3N0d1dMdklKaHBtS1lGbFdzam44ZWxQZnJaRVNJ?=
+ =?utf-8?B?djlXdHFDTUZFTmRoSkZTYjhHWjI2TW84MmlvRWc2aHA3aFJ0MFhNbE12NFNy?=
+ =?utf-8?B?OXZUMkVsOHI1aVJRRDQ5NWlOR1ZOUkdJZFpLTHFJQllDSXh0UVJqTXU2ejQx?=
+ =?utf-8?B?UjNrWEJ5NVNMUEg5enVRYjFzZ3ZXMCtGb1pKRkt0NFJvYmprd2p1Wm44czBF?=
+ =?utf-8?B?Y1drQk5XZVhVWHZpUEtkWjVkL1VoczR0RFdIbEtraU5rVi82S1puZlZCVkVX?=
+ =?utf-8?B?d0dnQ1VZWUN3a0VMNVlzV0hXZUlUNHpuMG1ZSlZJWjBXdWdmOW9PL3RxY2VF?=
+ =?utf-8?B?OEY5dzVyUVVvRmdGYWdoT1JBTHZiUmZNWitXS3BwNjBPc3VIRWlLVG9DZzBQ?=
+ =?utf-8?B?NnZSaUlXeWFUelN0cENPcXJqNkIrSnpEendBeW1oMktzSjNxczdkNGJ2V2V1?=
+ =?utf-8?Q?5jrB5xvmAv8mMpDixJl00sY0fB8ybB1MldigCNwl5Y=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb3fa5a-771b-4347-b8b0-08dd82944d85
+X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2025 18:26:02.5402
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wdxQYA7pCDaarnKu/1B+QrAkPxfnbhq7AnwGdNrYPrbLgIXoPSKD7Qvj+cKaKQ4da6U8DyZFEGRx0Mlxe1/ZiVS6XtvZjGy/RC6vTpnNVgRaAs3mP8RHDPtnsXC7MLVC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR01MB8715
 
 
-> +
-> +	*off = virt_addr % PAGE_SIZE;
-> +	*size = PAGE_SIZE - *off;
+On 4/22/25 10:15, Jeremy Kerr wrote:
+> > +       spin_lock_irqsave(&mpnd->lock, flags);
+> > +       rc = skb_cow_head(skb, sizeof(struct mctp_pcc_hdr));
+> > +       if (rc)
+> > +               return rc;
+> This will return with mpdn->lock still held.
+> And should this return the raw rc value? Or NETDEV_TX_OK?
+
+I based my code off the other drivers in the same directory:
+
+         rc = skb_cow_head(skb, sizeof(struct mctp_i2c_hdr));
+         if (rc)
+                 return rc;
+
+
+         rc = skb_cow_head(skb, sizeof(struct mctp_i3c_internal_hdr));
+         if (rc)
+                 return rc;
+
+However, I just noticed the USB one, that went in last release, does 
+this (using a goto)
+
+err_drop:
+         dev_dstats_tx_dropped(dev);
+         kfree_skb(skb);
+         return NETDEV_TX_OK;
+
+Seems strange to returning NETDEV_TX_OK for what is essentially a memory 
+allocation failure?  However, I am going to assume that this most recent 
+one represents the current wisdom, and will follow suit.
 
 
 
-> +
-> +	return binding->tx_vec[idx];
-> +}
-> +
->  /*** "Dmabuf devmem memory provider" ***/
->  
->  int mp_dmabuf_devmem_init(struct page_pool *pool)
 
 
--- 
-MST
+
+
+
 
 
