@@ -1,166 +1,185 @@
-Return-Path: <netdev+bounces-185096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530D1A987D1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:48:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 672B7A987E8
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 850C8444A1B
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:48:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143CC3AAFE5
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D5425C80C;
-	Wed, 23 Apr 2025 10:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D761926C3B0;
+	Wed, 23 Apr 2025 10:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VgvUxBX7"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Up4iEUVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90438645;
-	Wed, 23 Apr 2025 10:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81F426C38B;
+	Wed, 23 Apr 2025 10:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745405294; cv=none; b=hjBhT7cnFNcv//uaT18PFLVZG20VWFW4gUL/dRV1muOeorklZgLgeyN2mK/f02VUYM93n4+RW5RmGn5sIF3/4OOYZsgMlcxala4Q1NblgTg5ZLgE3bTlrwUDp97UfPVDRkXZs00JvyzeKRR6zdQcpaimekurLB2uOyAA6wyASv4=
+	t=1745405681; cv=none; b=kvEe00fFmylmJKoxvl6hEDiiI9IhmeteDj61K8rlOLPrGSxBQ0PrNLY+ZgW6U35wY3butKkfvpfjs2D9oQPLye5+ZqgMQppHXMV/zoWXDVdmn+MMolkVaB+1BokyvuOmb/8WWv1zR+DO3YXY5Gs8a8DkssjgAalf76hlTPCdk94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745405294; c=relaxed/simple;
-	bh=QBBn9vTmnK8rVIlRrvQjN8xkipKr+QbWyEEEv7UESDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NyeMTHGqagBtnbYr71nF424nsVeeg4lqV9H7HWRuBdg88iaTwZn2Frbluu6X5gDXbHfgG2EVBg1OyYH963k3oo/BiJQi3G6R0D/YhrmoXRc/7RzlJv9q/obDMxyFTxXamR4ATZjLGkZxnGxsvgdI1UdgBdHCwykaoKgDCMOAXvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VgvUxBX7; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac3b12e8518so1015933466b.0;
-        Wed, 23 Apr 2025 03:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745405291; x=1746010091; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yW3Ewl9XC1g0tqlHWENmHDvEOdSUdHOSXTlz2TpUlQc=;
-        b=VgvUxBX7vTM0r2bj2dFyo8yJFi+Ea5noljGABIYpREsNbCunDQj2xgK5AlOarTmyBH
-         NgamrjLxq12t1ee6ure23084joLR/c4xhdR8QRUdlfBa2T70VneQo0qb56o/8tJnjGnq
-         cKUb+E2+BECgtwAwleomTaCwBy1smXoYX8gAU+uQm5JpzBWadUTP7ElQHxnWgyjpIUNG
-         qVIYu2wroxf/PJm7SEyBDm6y4Eh8OQ6SzSvbXYqRLPTNSUk6uhZc/4nqBiY4HpQA5Hc6
-         5xzfR/yE1UokMN7zhTNnigENHECBbxAY+bG9nrtrjY1nZP2lZvFIbZpBRD30pZOrc44b
-         4yPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745405291; x=1746010091;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yW3Ewl9XC1g0tqlHWENmHDvEOdSUdHOSXTlz2TpUlQc=;
-        b=ti771MtiwXhNhj3eRikGjaZYmDiu2hO4uidPSYDZmQh0+T0VShHc0WVEId06DS9VVK
-         FDx/6dkMNdLzKy+/1VqfPblbVIVcsEczesiFrhx+ndh1v6hQu/7YIDeqjBGWnlOFXVqy
-         cezEPUBq+Ku0JmYViIZzZS4cNVVBCboecexoFJ9rtreSKrtVo78t5AtbshsF2aafknsP
-         fDmZV9FdpQampSNDrjDKoDVvIfN/8a8YuwEuUPwVrICMJPD6pfgL6x/R9LbUxqVLhUtT
-         xJD+Qu3BC49O6PoxXe3FULUM3v68KtkD2kmUuS/j/DlFQwmxc8BjKGmi0xjCtdPJYm4+
-         xCYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwXAhdrGU3mfGOGDpVFd7hEYKaWvtPyfwjCphXYcEo/ZnCxWabqsZGhnXxgZEvzG6o4k/ABx21N5CH@vger.kernel.org, AJvYcCVAEEcUi1ju5kfrqVHUYOsxnlyHzP4Tg1mPej7rX3vgZSvcSwDmFAorVND5olKOPSZ76TpZamQXSA==@vger.kernel.org, AJvYcCVYvN+tb4cuKCFUyEVbyc2ApRXWZBUsjhq+KHSRRIqdlWeZnQ8kuLncRcol5OSlr7e+BpJwRI8rgDtqXysy@vger.kernel.org, AJvYcCXjkiuFWTQlA8eu3xCBFgYiFDYBpMgMbCtklL6sRf1U6AiQ3n9FmFoilDehV5tByURQtoiGJgTGnJTpL1QVzNqn@vger.kernel.org, AJvYcCXo2yudBq+kcO17evophJZ73LPv0bc4L4axo3cbL3YRxCGQ/+hfIJJt8rSnMLHeZOcoIKf7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm5eyTPyL2uLxt5NvN9F2jYzQgWCQkl6Lb/xBZElQNZkMg5Mde
-	dB+scppkH7AJnXxRGlAh+/Sw4UijPWH2lc25aOmSI2CPaL2DLYhq
-X-Gm-Gg: ASbGncsFeoIaWwnetB6qbq2OQ2lM3K8wyEJBUm92rOK2G9Rwb133F0PCSd7Lj0P9BSA
-	RT22wSCMdguwwiGoNvV29OMJWR3IuVungpi+i1xrz4LAC2useXqh8b8jK6zaGJvoEBXwBvSqia6
-	Zc0/e+QwVeYhpV1fyb6kifUbztcuxy0pPmFOoavghYa2wzYJh5cAfF9sEVigAsT6VUYpLo8ctDF
-	eG189lqt1lOt+paGfPxPio9vmg2CMHbt/K9qyqrprVNO+HL0nDzg6GfxF9DoxWkv1vQ3kIdop4J
-	soK8Wxl7Yfh5C0o2NjV6+RznIQFQ4LqCT3tCg3BI/mxmC/8eKpI=
-X-Google-Smtp-Source: AGHT+IGSOkms0vGWAQQk5LDkY0uQOFjlrtaq8CZWRZeiflOHa+/oqFgsKRBzQiPT5EoHF60fgvH8Mw==
-X-Received: by 2002:a17:907:1c21:b0:ab7:1012:3ccb with SMTP id a640c23a62f3a-acb74b2e84cmr1451252366b.14.1745405290671;
-        Wed, 23 Apr 2025 03:48:10 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.144.224])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acb6ef9669csm780506166b.161.2025.04.23.03.48.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 03:48:09 -0700 (PDT)
-Message-ID: <97fd3326-94d0-4d85-bb33-802ed88fcbda@gmail.com>
-Date: Wed, 23 Apr 2025 11:49:23 +0100
+	s=arc-20240116; t=1745405681; c=relaxed/simple;
+	bh=PKRxF5CSeXMnjowgFobPAyzE/YcGtkyPnA1UcaUN9us=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=a+LcjmrP+aAmIEUhBFNn9Acs/1Ynlxd4CoEG48xtNiLKMafWkZqzL67qLbyaLLHlkpWek0i9/N6Z0MlbeF415BpADvvd9FI8Cr3kmWJqgfDkLPBM/C/V54P6h32PGfTfmQOiRi6dYGOfduLoen1S3LmCU7rj2+OCuXAHQuZLDeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Up4iEUVK; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53NArs5S32446350, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1745405634; bh=PKRxF5CSeXMnjowgFobPAyzE/YcGtkyPnA1UcaUN9us=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=Up4iEUVKeOna4yP778vBMZbKx3A5ugyvfwy4E59mKuVEspOFdjU5nDYImJuGg93Ta
+	 2s3nZiiqJOKmiCKWL6GRdPslfW1tmpOa/rJiQqP+Ok8izxkqZbmczfzalWl29f8xBW
+	 ykmkbtInuWV4wYGYGE091BxRluJdVutQV4RwIZNFQziPGs2P+k8Auy4vZIvBWGvOr2
+	 rwAk0Wsc88eQN5sdtpsUTDgMIIvW/Ria1cF6Lf3epwXpNT7khGrDZ1H0+rUT2/d0tw
+	 020Inc4nvp5WwwScw7UYATJeNHa0EhO6NZloDnpyiOE+sKGhgxRQtbVRPC9lIEAqrf
+	 Lq2AFD62IU/0Q==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53NArs5S32446350
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 23 Apr 2025 18:53:54 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 23 Apr 2025 18:53:54 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 23 Apr 2025 18:53:53 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Wed, 23 Apr 2025 18:53:53 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Simon Horman <horms@kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>, Andrew Lunn <andrew@lunn.ch>,
+        David Laight
+	<david.laight.linux@gmail.com>
+Subject: RE: [PATCH net v3 3/3] rtase: Fix a type error in min_t
+Thread-Topic: [PATCH net v3 3/3] rtase: Fix a type error in min_t
+Thread-Index: AQHbr3bl9x+S2lV3JkCdeosgY8bnPbOvL9aAgAHmKAA=
+Date: Wed, 23 Apr 2025 10:53:53 +0000
+Message-ID: <040b019af779423f96752f10a697195b@realtek.com>
+References: <20250417085659.5740-1-justinlai0215@realtek.com>
+ <20250417085659.5740-4-justinlai0215@realtek.com>
+ <20250422132831.GH2843373@horms.kernel.org>
+In-Reply-To: <20250422132831.GH2843373@horms.kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/9] net: add get_netmem/put_netmem support
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
- David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
- Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-References: <20250417231540.2780723-1-almasrymina@google.com>
- <20250417231540.2780723-3-almasrymina@google.com>
- <484ecaad-56de-4c0d-b7fa-a3337557b0bf@gmail.com>
- <CAHS8izPw9maOMqLALTLc22eOKnutyLK9azOs4FzO1pfaY8xE6g@mail.gmail.com>
- <957b74ed-f29c-4bb8-b819-af4e1168d6c1@gmail.com>
- <CAHS8izM8+zG6KOhV7ysTsCj_PEty5eL+P+uUxTZhdsOSZTwmow@mail.gmail.com>
- <c0bd45f7-0325-4e4b-b0ea-ccae24a1eabd@gmail.com>
- <8c1c6405-1e60-4512-a675-4c00b00d400a@gmail.com>
- <CAHS8izPGuF1PxfdmXUC1XJHpmRqotXh=vUY_a-AEHdAgPmLQ1g@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izPGuF1PxfdmXUC1XJHpmRqotXh=vUY_a-AEHdAgPmLQ1g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On 4/22/25 22:10, Mina Almasry wrote:
-...
->>> Instead of adding net_iov / devmem handling in generic paths affecting
->>> everyone, you could change those functions where it's get_page() are
->>> called legitimately. The niov/devmem part of get/put_netmem doesn't
->>> even have the same semantics as the page counterparts as it cannot
->>> prevent from reallocation. That might be fine, but it's not clear
->>
->> Actually, maybe it's not that exclusive to netiov, same reallocation
->> argument is true for user pages, even though they're reffed
->> separately.
->>
->> It might be fine to leave this approach, while suboptimal it should
->> be easier for you. Depends on how folks feel about the extra
->> overhead in the normal tx path.
->>
-> 
-> Right, I think there is only 2 ways to handle all the code paths in
-> the tcp stack that hit skb_frag_ref:
-> 
-> 1. We go over all of them and make sure they're unreachable for unreadable skbs:
-> 
-> if (!skb_frags_readable()) return; // or something
-> 
-> 2. or, we just add net_iov support in skb_frag_ref.
-> 
-> This patch series does the latter, which IMO is much preferred.
-> 
-> FWIW I'm surprised that adding net_iov support to skb_frag_ref/unref
-> is facing uncertainty. I've added net_iov support for many skb helpers
-> in commit 65249feb6b3df ("net: add support for skbs with unreadable
-> frags") and commit 9f6b619edf2e8 ("net: support non paged skb frags").
-> skb_frag_ref/unref is just 1 helper I "missed" because it's mostly
-> (but not entirely) used by the TX path.
+>=20
+> + David Laight
+>=20
+> On Thu, Apr 17, 2025 at 04:56:59PM +0800, Justin Lai wrote:
+> > Fix a type error in min_t.
+> >
+> > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this
+> > module")
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 55b8d3666153..bc856fb3d6f3 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > @@ -1923,7 +1923,7 @@ static u16 rtase_calc_time_mitigation(u32
+> time_us)
+> >       u8 msb, time_count, time_unit;
+> >       u16 int_miti;
+> >
+> > -     time_us =3D min_t(int, time_us, RTASE_MITI_MAX_TIME);
+> > +     time_us =3D min_t(u32, time_us, RTASE_MITI_MAX_TIME);
+>=20
+> Hi Justin, Andrew, David, all,
+>=20
+> I may be on the wrong track here, but near the top of minmax.h I see:
+>=20
+> /*
+>  * min()/max()/clamp() macros must accomplish several things:
+>  *
+>  * - Avoid multiple evaluations of the arguments (so side-effects like
+>  *   "x++" happen only once) when non-constant.
+>  * - Perform signed v unsigned type-checking (to generate compile
+>  *   errors instead of nasty runtime surprises).
+>  * - Unsigned char/short are always promoted to signed int and can be
+>  *   compared against signed or unsigned arguments.
+>  * - Unsigned arguments can be compared against non-negative signed
+> constants.
+>  * - Comparison of a signed argument against an unsigned constant fails
+>  *   even if the constant is below __INT_MAX__ and could be cast to int.
+>  */
+>=20
+> So, considering the 2nd last point, I think we can simply use min() both =
+above
+> and below. Which would avoid the possibility of casting to the wrong type=
+ again
+> in future.
+>=20
+> Also, aside from which call is correct. Please add some colour to the com=
+mit
+> message describing why this is a bug if it is to be treated as a fix for =
+net rather
+> than a clean-up for net-next.
+>=20
+> >
+> >       if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
+> >               msb =3D fls(time_us);
+> > @@ -1945,7 +1945,7 @@ static u16 rtase_calc_packet_num_mitigation(u16
+> pkt_num)
+> >       u8 msb, pkt_num_count, pkt_num_unit;
+> >       u16 int_miti;
+> >
+> > -     pkt_num =3D min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> > +     pkt_num =3D min_t(u16, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> >
+> >       if (pkt_num > 60) {
+> >               pkt_num_unit =3D RTASE_MITI_MAX_PKT_NUM_IDX;
+> > --
+> > 2.34.1
+> >
 
-It'd have looked completely different if you did it back then, which
-is the same semantics mismatch I mentioned. For pp rx niovs it'd
-have incremented the niovs ref pinning that specific niov down
-and preventing reallocation (by pp), and that with no devmem specific
-code sticking into generic code.
-This patch adds a 3rd way to refcount a frag (after page refs and
-pp_ref_count), which is why it attracted attention.
+Hi Simon,
 
--- 
-Pavel Begunkov
+According to a more detailed clarification, this part is actually an
+enhancement and does not cause any issues during operation, so it is
+not a real bug. Therefore, I will post this patch in net-next.
 
+Thanks,
+Justin
 
