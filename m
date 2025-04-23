@@ -1,279 +1,161 @@
-Return-Path: <netdev+bounces-185027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35207A9843C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:54:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761C7A98483
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14F6E189702D
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 08:54:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7B8016AC81
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 08:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FE81F8743;
-	Wed, 23 Apr 2025 08:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="dl3P7bXF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066F11E5018;
+	Wed, 23 Apr 2025 08:59:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5691F2BAB;
-	Wed, 23 Apr 2025 08:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6152701B2;
+	Wed, 23 Apr 2025 08:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745398406; cv=none; b=kXatubg/QDNCoEKJV2cDeimGGLnrUlkNid4qNRCsBYloxCirg3knqgaN4wj5hx/hnN6hBoz67Xtird627sAasHZl+nITvGDakxc1nh+ygtcmh2qi5u4Lv2FJ4OtAZlEouENhGUG8PpVG9VrhPU19MO0uNiIdSxffTNQSfoSpC8c=
+	t=1745398787; cv=none; b=j2TU0KcH156LY4EYY9dCnyYUepxexviGi/9oK1icQvQKYfn6BCz1fb+NzYSbmXw9a1SrIDSMwl8RPx9/0Qb2Z7E6fJ+UXQjnBpDmYzRs275edsYwXoyHEF9g46CcZuF+ls3WsMIZBfgg+f92vvpeVf3vbn9T6iuCrTqW7TtbMao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745398406; c=relaxed/simple;
-	bh=auPKMW+q1+Qqn2QTB5GXMprPrUP+dPOtU3JF8GSfRa0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ndeoyMDsTWU9n0hDDJNI5xWEd7V1cZaqD2nqn3tyEPNwJZYVZAnZPxfjAB5x6lA4DLM9w+4WJUFyvnF4XCd9Z9YEYadQ4DKMMXSFM/H/DFOp7HbiJEYY5U2p17Kf+l5UitundvEY35t/CcUlKHCpIf3WWJFs40NDqwgmGoSfa8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=dl3P7bXF; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53N8pdPU3180274
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 23 Apr 2025 01:51:39 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53N8pdPU3180274
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745398303;
-	bh=6kmN/+GrZw4rC3Ys6pLoNaD/Wf1DQKhvLOyIykqio94=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dl3P7bXFsCov3PgD20ymOIC1FG1eSAGxGe1DQbY2LG6O/NrMHMVBlGAk+JDp60Fgf
-	 +Pnv70fyGnLeBBbiUkB5NfR80TUqf9PoUmAU9iHHDMoRGzCfwBcwkKjONfEfh6RU3y
-	 Xd+yt6SiKMOPKs7smA0LIwhSCJBbmEF2pgXMq1hR7ce2lmLZxa2oozrZU5Xx64YBSy
-	 em5fezjfad3PGQcOwdbxM11bSPQVT17+MM/RZhPGMfA5z1Fo8GISFAxn0dAWTxVqKs
-	 NapT16DwTl3Gg6ZXI0V3IlW3sqxII7MOJohN3YgP4fSuVYSwWgYi1N7Og/gNcKFK4d
-	 023Wanxii0hkw==
-Message-ID: <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
-Date: Wed, 23 Apr 2025 01:51:38 -0700
+	s=arc-20240116; t=1745398787; c=relaxed/simple;
+	bh=uHWekA94BHUStyZoX5LJyDtvPegkwkDK+SHYN1zdReg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RDfbwazxNYO0iT7YSMLOKrMzzhn4uYSScu3i2dORpRH4xE5J/81NO1Y2odqhjES9Z/mAc9SKq9i+xTWt7avrnXq/yJA8hoYxqNki/Fa76FwYoeDYtAjeWnE2zwt4vHaMg3oALvI4SyLqwa4erGQW6JAtxMlFYOvV05NqKjX04Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53N7lBYB025978;
+	Wed, 23 Apr 2025 08:59:29 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 466jhj8h9w-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 23 Apr 2025 08:59:28 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Wed, 23 Apr 2025 01:59:27 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Wed, 23 Apr 2025 01:59:23 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jianqi.ren.cn@windriver.com>, <jhs@mojatatu.com>,
+        <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH 5.15.y] net/sched: act_mirred: don't override retval if we already lost the skb
+Date: Wed, 23 Apr 2025 16:59:23 +0800
+Message-ID: <20250423085923.2890055-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
- to write MSR
-To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-22-xin@zytor.com>
- <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: IEluZoRdqirOPmjxdYA4XupcAB1J8Z7l
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDIzMDA2MCBTYWx0ZWRfX1DCx4QgzP1eT V7bkHXk0uxGxAdOYczLh1Os+Z3ICuxlVea4uNIKt8uEoraFjPw0NLVxockOYz78qapziTu8svOV 1Il5u1NCjMOv2ezzm7tbzG3/KMG0HrBEGAo3NlIgf8DV8UnvmVnR8TQbVO5nA4KKmNQKYnGz2y3
+ vgfDogb2axwTt+N0JAyEYjHaE3vK3ts0i9T/3EtowoXibBOlYJrhrmUo/3caGAkF3PqOu99LQO+ KsRjky49T4tH0ufdMLsYIk53jjogwe739+PzG0gOgvmnhQTIqANE0G4GbEuGzSczo98Cz3eDuTG dCaBNqXQ4vs2XbnoeGS0a46bPeLIM1V6Xi1LxlrjE5aycDrKUDXd7/33TFwVAClchQYJ7ZtVNOj
+ ykJqaNkuPcy62VHFT4JcijhyheK3oPvTuEl6n+y0Ojf3s4zJUJMH+pNhgVm86AsHl7V511bi
+X-Authority-Analysis: v=2.4 cv=ONQn3TaB c=1 sm=1 tr=0 ts=6808abf0 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=A7XncKjpAAAA:8 a=J1Y8HTJGAAAA:8 a=t7CeM3EgAAAA:8
+ a=z6SZLS2PjRZJ6NiNSX0A:9 a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: IEluZoRdqirOPmjxdYA4XupcAB1J8Z7l
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-23_06,2025-04-22_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ mlxscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0 spamscore=0
+ malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2504230060
 
-On 4/22/2025 2:57 AM, Jürgen Groß wrote:
-> On 22.04.25 10:22, Xin Li (Intel) wrote:
->> The story started from tglx's reply in [1]:
->>
->>    For actual performance relevant code the current PV ops mechanics
->>    are a horrorshow when the op defaults to the native instruction.
->>
->>    look at wrmsrl():
->>
->>    wrmsrl(msr, val
->>     wrmsr(msr, (u32)val, (u32)val >> 32))
->>      paravirt_write_msr(msr, low, high)
->>        PVOP_VCALL3(cpu.write_msr, msr, low, high)
->>
->>    Which results in
->>
->>     mov    $msr, %edi
->>     mov    $val, %rdx
->>     mov    %edx, %esi
->>     shr    $0x20, %rdx
->>     call    native_write_msr
->>
->>    and native_write_msr() does at minimum:
->>
->>     mov    %edi,%ecx
->>     mov    %esi,%eax
->>     wrmsr
->>     ret
->>
->>    In the worst case 'ret' is going through the return thunk. Not to
->>    talk about function prologues and whatever.
->>
->>    This becomes even more silly for trivial instructions like STI/CLI
->>    or in the worst case paravirt_nop().
-> 
-> This is nonsense.
-> 
-> In the non-Xen case the initial indirect call is directly replaced with
-> STI/CLI via alternative patching, while for Xen it is replaced by a direct
-> call.
-> 
-> The paravirt_nop() case is handled in alt_replace_call() by replacing the
-> indirect call with a nop in case the target of the call was paravirt_nop()
-> (which is in fact no_func()).
-> 
->>
->>    The call makes only sense, when the native default is an actual
->>    function, but for the trivial cases it's a blatant engineering
->>    trainwreck.
-> 
-> The trivial cases are all handled as stated above: a direct replacement
-> instruction is placed at the indirect call position.
+From: Jakub Kicinski <kuba@kernel.org>
 
-The above comment was given in 2023 IIRC, and you have addressed it.
+[ Upstream commit 166c2c8a6a4dc2e4ceba9e10cfe81c3e469e3210 ]
 
-> 
->> Later a consensus was reached to utilize the alternatives mechanism to
->> eliminate the indirect call overhead introduced by the pv_ops APIs:
->>
->>      1) When built with !CONFIG_XEN_PV, X86_FEATURE_XENPV becomes a
->>         disabled feature, preventing the Xen code from being built
->>         and ensuring the native code is executed unconditionally.
-> 
-> This is the case today already. There is no need for any change to have
-> this in place.
-> 
->>
->>      2) When built with CONFIG_XEN_PV:
->>
->>         2.1) If not running on the Xen hypervisor (!X86_FEATURE_XENPV),
->>              the kernel runtime binary is patched to unconditionally
->>              jump to the native MSR write code.
->>
->>         2.2) If running on the Xen hypervisor (X86_FEATURE_XENPV), the
->>              kernel runtime binary is patched to unconditionally jump
->>              to the Xen MSR write code.
-> 
-> I can't see what is different here compared to today's state.
-> 
->>
->> The alternatives mechanism is also used to choose the new immediate
->> form MSR write instruction when it's available.
-> 
-> Yes, this needs to be added.
-> 
->> Consequently, remove the pv_ops MSR write APIs and the Xen callbacks.
-> 
-> I still don't see a major difference to today's solution.
+If we're redirecting the skb, and haven't called tcf_mirred_forward(),
+yet, we need to tell the core to drop the skb by setting the retcode
+to SHOT. If we have called tcf_mirred_forward(), however, the skb
+is out of our hands and returning SHOT will lead to UaF.
 
-The existing code generates:
+Move the retval override to the error path which actually need it.
 
-     ...
-     bf e0 06 00 00          mov    $0x6e0,%edi
-     89 d6                   mov    %edx,%esi
-     48 c1 ea 20             shr    $0x20,%rdx
-     ff 15 07 48 8c 01       call   *0x18c4807(%rip)  # <pv_ops+0xb8>
-     31 c0                   xor    %eax,%eax
-     ...
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Fixes: e5cf1baf92cb ("act_mirred: use TC_ACT_REINSERT when possible")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+[Minor conflict resolved due to code context change.]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+Verified the build test
+---
+ net/sched/act_mirred.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-And on native, the indirect call instruction is patched to a direct call
-as you mentioned:
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 97cd4b2377d6..e1c183b28306 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -258,13 +258,13 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 	dev = rcu_dereference_bh(m->tcfm_dev);
+ 	if (unlikely(!dev)) {
+ 		pr_notice_once("tc mirred: target device is gone\n");
+-		goto out;
++		goto err_cant_do;
+ 	}
+ 
+ 	if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
+ 		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
+ 				       dev->name);
+-		goto out;
++		goto err_cant_do;
+ 	}
+ 
+ 	/* we could easily avoid the clone only if called by ingress and clsact;
+@@ -278,7 +278,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 	if (!use_reinsert) {
+ 		skb2 = skb_clone(skb, GFP_ATOMIC);
+ 		if (!skb2)
+-			goto out;
++			goto err_cant_do;
+ 	}
+ 
+ 	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
+@@ -321,12 +321,16 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 	}
+ 
+ 	err = tcf_mirred_forward(want_ingress, skb2);
+-	if (err) {
+-out:
++	if (err)
+ 		tcf_action_inc_overlimit_qstats(&m->common);
+-		if (tcf_mirred_is_act_redirect(m_eaction))
+-			retval = TC_ACT_SHOT;
+-	}
++	__this_cpu_dec(mirred_nest_level);
++
++	return retval;
++
++err_cant_do:
++	if (is_redirect)
++		retval = TC_ACT_SHOT;
++	tcf_action_inc_overlimit_qstats(&m->common);
+ 	__this_cpu_dec(mirred_nest_level);
+ 
+ 	return retval;
+-- 
+2.34.1
 
-     ...
-     bf e0 06 00 00          mov    $0x6e0,%edi
-     89 d6                   mov    %edx,%esi
-     48 c1 ea 20             shr    $0x20,%rdx
-     e8 60 3e 01 00          call   <{native,xen}_write_msr> # direct
-     90                      nop
-     31 c0                   xor    %eax,%eax
-     ...
-
-
-This patch set generates assembly w/o CALL on native:
-
-     ...
-     e9 e6 22 c6 01          jmp    1f   # on native or nop on Xen
-     b9 e0 06 00 00          mov    $0x6e0,%ecx
-     e8 91 d4 fa ff          call   ffffffff8134ee80 <asm_xen_write_msr>
-     e9 a4 9f eb 00          jmp    ffffffff8225b9a0 <__x86_return_thunk>
-         ...
-1:  b9 e0 06 00 00          mov    $0x6e0,%ecx   # immediate form here
-     48 89 c2                mov    %rax,%rdx
-     48 c1 ea 20             shr    $0x20,%rdx
-     3e 0f 30                ds wrmsr
-     ...
-
-It's not a major change, but when it is patched to use the immediate 
-form MSR write instruction, it's straightforwardly streamlined.
-
-> 
-> Only the "paravirt" term has been eliminated.
-
-Yes.
-
-But a PV guest doesn't operate at the highest privilege level, which
-means MSR instructions typically result in a #GP fault.  I actually 
-think the pv_ops MSR APIs are unnecessary because of this inherent
-limitation.
-
-Looking at the Xen MSR code, except PMU and just a few MSRs, it falls
-back to executes native MSR instructions.  As MSR instructions trigger
-#GP, Xen takes control and handles them in 2 ways:
-
-   1) emulate (or ignore) a MSR operation and skip the guest instruction.
-
-   2) inject the #GP back to guest OS and let its #GP handler handle it.
-      But Linux MSR exception handler just ignores the MSR instruction
-      (MCE MSR exception will panic).
-
-So why not let Xen handle all the details which it already tries to do?
-(Linux w/ such a change may not be able to run on old Xen hypervisors.)
-
-BTW, if performance is a concern, writes to MSR_KERNEL_GS_BASE and
-MSR_GS_BASE anyway are hpyercalls into Xen.
-
-Thanks!
-     Xin
 
