@@ -1,167 +1,146 @@
-Return-Path: <netdev+bounces-184985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154E5A97F75
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 08:43:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92ACCA97FED
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 08:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 385283A8059
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 06:42:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 476433AEC07
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 06:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121FE2673AB;
-	Wed, 23 Apr 2025 06:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2CA265613;
+	Wed, 23 Apr 2025 06:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxiEBmsJ"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="rRvB7UGL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from silver.cherry.relay.mailchannels.net (silver.cherry.relay.mailchannels.net [23.83.223.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDB5266B62
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 06:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745390569; cv=none; b=lffFFfjsfBk6i4oknMa90wF5PnJLBQUQdpsct0ugtEvipYrC3f/WUrukB9F8ObEMuBohYv2dG1TwYhm6rb3GfIg0Sxj0I3w1hViT1EjoIZB77fyYFWhf0QQ4YMxGQtMNMqViijB0yyRzvvvusHqQRn/MN6g7KScp/nexPpzcRS4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745390569; c=relaxed/simple;
-	bh=1z9o8ll4AHzFt/k/hmidvON8KqNqYeHpKakhn28WR60=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=bqFEafqRhHGpF44BQ0CJu43Cu8IVz/pHhg2hrkzltZE4/6Q3IK1bZDZ7MzpQ/SFzkkryptbUU/6FIr+1axmbDqeM76cvXqdCHB3z+Ga67A90hN7150Sy1qGBHXJPuevsP4zBld+8AdXNRqFyk76D7JLFaGb1bvKu/I7Y6eN9bGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxiEBmsJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745390566;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1AE264602;
+	Wed, 23 Apr 2025 06:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745391501; cv=pass; b=l18hu/WHfafxYEQDwvA1o+NdUMjE/b/i//UzXBqWvLffu74yfjYaaDRU7tH61/AjoJBgnGpoPmmQzTZIDfGP8s6Lip+Kq+8xKiMQYYtSOoXJEZnL9AnXYMxKT7iBXuGHmQBkZ2dy5n8zDe9eufQqoxZG91pHGwY/pRaaSDqhT7w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745391501; c=relaxed/simple;
+	bh=9Pv/UqOlGAz6M6uYoscsoU17c6hsgoL6aNA1kJI82qs=;
+	h=From:To:Subject:In-Reply-To:References:Message-ID:MIME-Version:
+	 Content-Type:Date; b=pQE/Ta7rkcSJ16ciQgvaggtRHIg77T3jk5OE0+d8eg97hjcAV0rq4owQjYLjeVjeXfrQO2ThZV2GItSyZ+Il6vUGwozyJZz9qJ7sVDS6L727c4qKVUWZNxnqM1CBOC+YM/6SB2aVuIxNPYeaYrzlxmEh2lTbHgRRGi7SGwr3/70=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=rRvB7UGL; arc=pass smtp.client-ip=23.83.223.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 8F84B8439E0;
+	Wed, 23 Apr 2025 06:50:25 +0000 (UTC)
+Received: from fr-int-smtpout9.hostinger.io (trex-9.trex.outbound.svc.cluster.local [100.113.64.21])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 853AD8454F4;
+	Wed, 23 Apr 2025 06:50:22 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1745391025; a=rsa-sha256;
+	cv=none;
+	b=qb188cWjCtdZiVZpRIaoNuQW3H0UKtf7otGdFXrbvLzX9aoJPDUeTZU9aTZdydp2u7q/22
+	xGa2ZIUDQAcdI/TqYrrZmAvqHXPIpgBSgH4MZVyE+QjQsoBJ+DtOMS3KwxWymZMa3UDk/g
+	ukMnxM0q7kPB0Ibm5SLS8X7bHfgB5zLqB9shoMnOyrSkCP24iy6a6yr/I8HC/iw6ShT/Ex
+	U5+hlUxiA0CI5ojAWeC5O5hROuKHLpKs7BE/CBf96XgzJy9epJFwC3uE1ZXIqGhE2dQhRZ
+	flgctoRv7vvSxJUgvf+2c9oBb/TKSoN3hJyVIWtpEfaupoS+yO6lfXxYu0xy5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1745391025;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=A+IIFd1CyCLzYQbKkS9qdqGwkTTadepQIc+Dm7g0mP0=;
-	b=DxiEBmsJNPum/5wfbykMzpBzzCHSpM95B9wrzU5YCTk52J7e+21iF44F6XZKMRb08/3Cqs
-	JHFgVIZGE7cC5sJAoQ4Xb82yu1RMo7bj1SOVwgN7396nw6Abd7ZsYsa8dG54tZzFAbXFRQ
-	R0rlEJydtE+T5lXsRdAgu91NMmMUhPQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-388-P97pTlgMMXW5M6c9pc5x4w-1; Wed, 23 Apr 2025 02:42:44 -0400
-X-MC-Unique: P97pTlgMMXW5M6c9pc5x4w-1
-X-Mimecast-MFC-AGG-ID: P97pTlgMMXW5M6c9pc5x4w_1745390563
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39ee4b91d1cso241280f8f.0
-        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 23:42:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745390563; x=1745995363;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A+IIFd1CyCLzYQbKkS9qdqGwkTTadepQIc+Dm7g0mP0=;
-        b=vfxah9q2Szlhgviao5VMAEmih6/29d/lAHi8daEWP1c/U/Rec5HIihJw40X9ODUukq
-         Qw+f0uhGM15+ujeqeZLODJcpa43DTHa0h2gv3VxA/QPST7ajZ9GlkvhoqJOM20g0yA9t
-         9TB8g2akisQki440M2n7RB+tkEmV9zv4wBP93BWgxnxv9sdcsznM6wFf428nl0o0JgOQ
-         Jkp2+drudosUK6dLThctb4cf+iWEvjUgYjg+vyVngtAVg/yo8AqIT3ZuaC7rSiw0v+2o
-         JYS/BLW9sFtkImv27C5GtQyaweE2pC8Bem/8dyhbTZzppOWptl8UljQwyB21rKE0ghyL
-         MH0A==
-X-Forwarded-Encrypted: i=1; AJvYcCWEhXS78dP397FexpDKyyzfBTFAAzZ0C51Xf76BUUTOKml2s1u9IzIqXUXSUxAHuyEk/7Vn/4A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvfbTYlOoLy+qDIXHJkBALurWYjRx4pmOdRYVSff6SfskLrd/J
-	EufYRsbHsmGMd4KVBEfgR84gl/d5MGOh1HSwNP2z++nh9a2w2He0MMC+IZTEqtA8Myx8KdgLXo7
-	2BiCScUW8akTks0zITKMMIVAfx05ZiqukyBF+mrIZmVa3/GdquMY3ug==
-X-Gm-Gg: ASbGncsX+DDmaBuyz5DIHoT6k4IRWloMU8u/c9T2GAB1+RJP+x1AKnb5FUFddxnsAY3
-	0Kp0Qdic241TMUa7UUn6Bwzhr9NyP3B2IEsp0gRJZlBSOyCuaCfKPP1NA2mrJRyzz1Y+S7ivnLD
-	M2BPlQ/2ssrnrVTXVDeo/5M4vZa8+TCxZVkrXizODjoXh2QdE4BwjVhtpuit4KMUs1UdDH8krTp
-	7Ghq9Cjl1zV5ZO/EfmhNRRFy6L5KK/Ae/qpVzthYi2gkTLo3RPzncuTbEpMpsHR9JDjXIDBSvH5
-	pHHObA==
-X-Received: by 2002:a5d:64a4:0:b0:38d:ba8e:7327 with SMTP id ffacd0b85a97d-3a06723c38cmr1327887f8f.8.1745390562732;
-        Tue, 22 Apr 2025 23:42:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfqF3/DnXpz0jT/bVyus2YqORUpTFcY/LdcHG+U6sJT+ZpWhfo0iR0WXLgcAAw16VAtx6A4g==
-X-Received: by 2002:a5d:64a4:0:b0:38d:ba8e:7327 with SMTP id ffacd0b85a97d-3a06723c38cmr1327865f8f.8.1745390562360;
-        Tue, 22 Apr 2025 23:42:42 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39efa4930f1sm17830202f8f.61.2025.04.22.23.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Apr 2025 23:42:41 -0700 (PDT)
-Date: Wed, 23 Apr 2025 02:42:39 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	danielj@nvidia.com, dongli.zhang@oracle.com, eauger@redhat.com,
-	eric.auger@redhat.com, jasowang@redhat.com, jfalempe@redhat.com,
-	maxbr@linux.ibm.com, mst@redhat.com, pasic@linux.ibm.com,
-	quic_zhonhan@quicinc.com, sgarzare@redhat.com,
-	syzbot+efe683d57990864b8c8e@syzkaller.appspotmail.com
-Subject: [GIT PULL] virtio, vhost: fixes
-Message-ID: <20250423024239-mutt-send-email-mst@kernel.org>
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=9Pv/UqOlGAz6M6uYoscsoU17c6hsgoL6aNA1kJI82qs=;
+	b=axu470fjexr5bBgpmPZCQ2/FBnMxiy0wl7SLsnALI/P/egdVmRWUKd99dKA0WDabNZiyFx
+	r6sncISV6RL7ej5JUUv1O/vqLC1QGhX4emtL97N6ZMFeSrLtcMdLlEszq/8jjoXYpcBH+u
+	eXGflSWVo7WrbTeMcydps5giED9lvdwPlINjFU4MJvRbOVBR0vQO+ckn7hjfESpyDL7ysv
+	fRWA/ZwV4n07I5NfKZIO92egYRZkH/N7Cy/uzrYdi6wIe31BPoV5UQ4B/ug/hR13YM8eQK
+	bxBjPQtXfyRbUVyRyfdrOZKGm/g216jKAl4JmjQLIsvZhLtjXoFl5MjIfs0wBQ==
+ARC-Authentication-Results: i=1;
+	rspamd-5cfcf5665-kj6cg;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=chester.a.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Madly-Rock: 5ce5863d4316f6a1_1745391025410_3471300557
+X-MC-Loop-Signature: 1745391025409:59469947
+X-MC-Ingress-Time: 1745391025409
+Received: from fr-int-smtpout9.hostinger.io (fr-int-smtpout9.hostinger.io
+ [89.116.146.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.113.64.21 (trex/7.0.3);
+	Wed, 23 Apr 2025 06:50:25 +0000
+Received: from [127.0.0.1] (unknown [82.165.193.131])
+	(Authenticated sender: chester.a.unal@arinc9.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4Zj8qv5Zy7zH9gKF;
+	Wed, 23 Apr 2025 06:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1745391020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Pv/UqOlGAz6M6uYoscsoU17c6hsgoL6aNA1kJI82qs=;
+	b=rRvB7UGLlhnr2BbHcKSDyclrFwluPsInB4qipbV+vlBsPug9CFdnHftTOskq2E/dCz2xUp
+	AcLog4x5bbhEaidnEpJdHReYT5zNwyBRIQbAwZnC1VYkjQUSPC136hBUFskj0dKs4Us7gx
+	ozVSucH4wd/TpmTrkeu6wM0CDc9oi5P2nsNy1xxxv8VN4kz5pb83jTx5ohx1sI2tNDpvQX
+	FyRIWOa8FOKrneq42GIaa735xlx05dCACwg72o0LfCXWYtmOCYEZ+qCltD14Mvt9T3k0cq
+	P9A1Y3GxWaeFOQdQ0WU7vNeGo9Ts62fghjqPtPWJxJmR/BhPzCguHzPo31M6lQ==
+From: "Chester A. Unal" <chester.a.unal@arinc9.com>
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Neal Yen <neal.yen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net=5D_net=3A_dsa=3A_mt7530=3A_sync_dr?=
+ =?US-ASCII?Q?iver-specific_behavior_of_MT7531_variants?=
+User-Agent: Thunderbird for Android
+In-Reply-To: <89ed7ec6d4fa0395ac53ad2809742bb1ce61ed12.1745290867.git.daniel@makrotopia.org>
+References: <89ed7ec6d4fa0395ac53ad2809742bb1ce61ed12.1745290867.git.daniel@makrotopia.org>
+Message-ID: <F9390C07-3C4F-47FD-A89F-FB5A90D38A84@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Apr 2025 06:50:19 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=Vv1xAP2n c=0 sm=1 tr=0 ts=68088dac p=VT4XjZGOAAAA:8 a=TIbRxBwJK3FFcHPSi+5Ynw==:117 a=TIbRxBwJK3FFcHPSi+5Ynw==:17 a=IkcTkHD0fZMA:10 a=puQWGBksFvoA:10 a=mpaa-ttXAAAA:8
+X-CM-Envelope: MS4xfF7jBa0YSLhlk6TV6ePe0WqoEsEHXS/cCyxaL7CiN4ZJkDGyZ+GqpqGiK5D+idyg+8D8/oDxxYUsTDDfLVfPAJS+bN6nhtEqFUDRvS7JSJujUR6lyArD umz16IOW50tygTML3dnxJ/Ax9NSrfrkKHctd+ZAXuDTP6A+pbEamzCG8T7CJxcIW2QfGEdWvL9FIkMfJSkzpbHmf4W5kcxkqMr12YPKtnSnFUZrzYtrNRGK1 X8cbF+cP/MOjv0UfEDkG9c5yuU1qIJluG86fbzi9kZ6GfO0McKSWn8FSWNwgYw2ziPbaDJmzHIFf0UVaQzJ8ADXCKBk9tPCCWIFbSW+2ui6M3qfgzZrBVfDq xMoH6IQHrW5wt8uT8dakwQ7OhBTXGB8LP2DK43Fo5DKcT/IimXk16yutnIQ6Vry5FxKsU1AzNjXZWwRoEpxEsvuK6MhTVrT7l9C60DUwrbyu7qSAhaeGooQi X3w11FSs70oyJHslOoksrjK0AR2BptQDW5j+LrWsU+jg9NivyRf21mIroMbMQ+NV+VdKmHdKt+kIKbgseAYtZlsLaVm8u2KQBtsfblT74ZT+sCLXehykNvpK JceIUJKaPv0SGPjKQbsHQS7TktJrHIK22G+QOng0ZCWYiZ2hiJkuj0ho/h5vOzWt2L+fl9+UZ3RuD8e1mcLBgOdu+XnoQaLl+aehny0T/1WsKyb+OtZ1Fwor EwWeHCjocX5uSJ352MjgzzdoNkd1IOez
+X-AuthUser: chester.a.unal@arinc9.com
 
-The following changes since commit 8ffd015db85fea3e15a77027fda6c02ced4d2444:
+On 22 April 2025 06:10:20 GMT+03:00, Daniel Golle <daniel@makrotopia=2Eorg>=
+ wrote:
+>MT7531 standalone and MMIO variants found in MT7988 and EN7581 share
+>most basic properties=2E Despite that, assisted_learning_on_cpu_port and
+>mtu_enforcement_ingress were only applied for MT7531 but not for MT7988
+>or EN7581, causing the expected issues on MMIO devices=2E
+>
+>Apply both settings equally also for MT7988 and EN7581 by moving both
+>assignments form mt7531_setup() to mt7531_setup_common()=2E
+>
+>This fixes unwanted flooding of packets due to unknown unicast
+>during DA lookup, as well as issues with heterogenous MTU settings=2E
+>
+>Fixes: 7f54cc9772ce ("net: dsa: mt7530: split-off common parts from mt753=
+1_setup")
+>Signed-off-by: Daniel Golle <daniel@makrotopia=2Eorg>
+>---
+>See also https://git01=2Emediatek=2Ecom/plugins/gitiles/openwrt/feeds/mtk=
+-openwrt-feeds/+/b4204fb062d60ac57791c90a11d05cf75269dcbd
 
-  Linux 6.15-rc2 (2025-04-13 11:54:49 -0700)
+Reviewed-by: Chester A=2E Unal <chester=2Ea=2Eunal@arinc9=2Ecom>
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 58465d86071b61415e25fb054201f61e83d21465:
-
-  vhost-scsi: Fix vhost_scsi_send_status() (2025-04-18 10:08:11 -0400)
-
-----------------------------------------------------------------
-virtio, vhost: fixes
-
-A small number of fixes.
-
-virtgpu is exempt from reset shutdown fow now -
-	 a more complete fix is in the works
-spec compliance fixes in:
-	virtio-pci cap commands
-	vhost_scsi_send_bad_target
-	virtio console resize
-missing locking fix in vhost-scsi
-virtio ring - a KCSAN false positive fix
-VHOST_*_OWNER documentation fix
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Daniel Jurgens (1):
-      virtio_pci: Use self group type for cap commands
-
-Dongli Zhang (3):
-      vhost-scsi: protect vq->log_used with vq->mutex
-      vhost-scsi: Fix vhost_scsi_send_bad_target()
-      vhost-scsi: Fix vhost_scsi_send_status()
-
-Halil Pasic (1):
-      virtio_console: fix missing byte order handling for cols and rows
-
-Maximilian Immanuel Brandtner (1):
-      virtio_console: fix order of fields cols and rows
-
-Michael S. Tsirkin (1):
-      virtgpu: don't reset on shutdown
-
-Stefano Garzarella (2):
-      vhost: fix VHOST_*_OWNER documentation
-      vhost_task: fix vhost_task_create() documentation
-
-Zhongqiu Han (1):
-      virtio_ring: Fix data race by tagging event_triggered as racy for KCSAN
-
- drivers/char/virtio_console.c        |  7 ++--
- drivers/gpu/drm/virtio/virtgpu_drv.c |  9 +++++
- drivers/vhost/scsi.c                 | 74 +++++++++++++++++++++++++++---------
- drivers/virtio/virtio.c              |  6 +++
- drivers/virtio/virtio_pci_modern.c   |  4 +-
- drivers/virtio/virtio_ring.c         |  2 +-
- include/linux/virtio.h               |  3 ++
- include/uapi/linux/vhost.h           |  4 +-
- include/uapi/linux/virtio_pci.h      |  1 +
- kernel/vhost_task.c                  |  2 +-
- 10 files changed, 85 insertions(+), 27 deletions(-)
-
+Chester A=2E
 
