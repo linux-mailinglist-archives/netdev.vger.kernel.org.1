@@ -1,141 +1,137 @@
-Return-Path: <netdev+bounces-185059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C14A986C0
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:07:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4123EA986EF
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 12:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 505067AB4CA
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:05:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9219F188A70B
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 10:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B517268C70;
-	Wed, 23 Apr 2025 10:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A520269B12;
+	Wed, 23 Apr 2025 10:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXuB20eY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LDYTcBCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E03262FDC;
-	Wed, 23 Apr 2025 10:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D245D268FEB;
+	Wed, 23 Apr 2025 10:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745402813; cv=none; b=Tm6wwGR0iSga68IsGh1dKdH93AvghSjHALdtiY0j6xIQgRm5BOnVF6qAHTVYNonKjEf88a/8xSZH4a871jg7ROAxXMk+zlRt4OfSPUJudfWCscwOKz89zymctqfxISwg/91t+SYrIKICFKgQg8jniJqMJQGPeHekiol6SMar1v0=
+	t=1745403131; cv=none; b=ph9rJvHrgy6ToeKe2X+HXebebhxzUUREiQpRxahOAsiU5oji6c6fDPnZPmTFczBj5lSndGVnZmkEb4LYG91WtGzfQ17Z+RwN/QCpbB/m0ZGVzz2/laSVJ/stIxf+lQw4w8afp0MNneo8ovQnuqD1cQwjZ3SvSP9ONDBqMVCh0Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745402813; c=relaxed/simple;
-	bh=p1aeHbezR6P+B0RDIv5XMNvfkOFMi7yR6BnbDSgQIIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UpV5CSKPOA8i8IF0olkZrILDBvcVdzXtgFFCvaAqEmtNQ9iai6PVeLe0ymxKwJ97/CeaIs3xNcQ6LTsZBDDv/Qb1epD5V6JPcE7dfnCDDHBiGtZ0E8fkp2fHxRzf4iPFRZYgXJs9xnHTeqhvOQT5cKkWxeByc6kmsgg1mDYC1Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXuB20eY; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1745403131; c=relaxed/simple;
+	bh=0tPJ8mi/IaknU+odJztdVn7rnmNajNaShzpp0+/yzUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QAUar7QN/BN0ioPgV+fv7w3Ivl3zakiRETfi6I5qWEZIJ9e+AMKthoOUovCZgm/OfcH3asGOJhdsr/7SLT9DcewODcAXujWW0J3D16QE5SrjkGC1LpevgnLs4/X80gi1LNoRD/ERoWH7bIE7hOaqOGOKMX3rm39hzNxm1cRPQEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LDYTcBCs; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cf257158fso40384765e9.2;
-        Wed, 23 Apr 2025 03:06:51 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7376dd56f60so4435646b3a.3;
+        Wed, 23 Apr 2025 03:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745402810; x=1746007610; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yLF36sbTYK0KIWRbMmjLucJkeA+0T4TK0wNGl/x6x44=;
-        b=WXuB20eYcF7y7bk/FutWfqCk6ikpxra8t5KT350eCGeS79nQivTMrTZdzZqldACbcr
-         IWpahBelEfksxSKrmRx7MDUgxvS2yCNiv182NRlmwAXKSCzQq8kQLFJXG6vtdXB+hNwb
-         0tFcoxrtXTSPsSgiyPGc28zatyFU37ZnPFuqgZ7jLx/RcDkuhpc8l9MkHP5eddfoiMqO
-         J81zxyV4fdZOB8o5t4QALhexaJR4Htb+6XX7o/cqukym4Go7SiWrcxAKla51PJnU7NK0
-         JzdGg8CpK6O6E5dPPiwR6crkxaHEVcOZ2COIe1I6x6V6VTmPl47H3fgzq57guqFGXX7/
-         6NVg==
+        d=gmail.com; s=20230601; t=1745403128; x=1746007928; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+5GhlYau1vYRJo6luDQW5bI32zszXHjJmD7lMKKoHpA=;
+        b=LDYTcBCs29mewevTAtAF56zHeKUOstoRye0W+MDmrZRDiH80BXs0eNVY2cec3i5KXK
+         7u2m6+yHTTAgHQ0lAFDi/MbKgPSrWNwiABxbDgqk91QkxA7yIXpKKbZa6HaPOrRHAfFy
+         uA2j5Ojf0aOHC+H5SJTo5PJCUGXkcB4zq92ZO8JaGGZX/Zdz5TRFsyBpkzU+GHs198/Q
+         5k8Q2FCbbq0YO+OGHgqUd4KZ01udfs/uo8F37T3GGw9qq0cjlXbJiQCCtD3Mpj3LHvdW
+         Fq97m4PD2aX2sam+DWShILUqJ6ao0vrlHn6TQPa2EsBSieARV5z9lXSc/cV7OuvwYQSK
+         0kBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745402810; x=1746007610;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLF36sbTYK0KIWRbMmjLucJkeA+0T4TK0wNGl/x6x44=;
-        b=fmrpvrItW8qDgUPU1mdsyRebGvVGuArghY8JyT16bOgqnr9TyaniTPRI7d6dFh6FtG
-         Em3aN/bju05k/gBquhRvUoYcU18BduVhN/b2FU0WRYIC/MKIkmFe9Qo5thDKTAnzYoiw
-         OZVl2Zx1ccTAZoQ1+u+aobL16JmAIrsoIApgG4OxWxvmBXQqZRrYNsl7oS2HhTf7QmpS
-         gDXb2WDJhsLIcyUIvZZ1pJXAd/ewbu+CmeQ1VlbQAQDM/DMGEDlGjEH6QyLHRebQ8HZO
-         czlTuI1v0pcOy1Xl9cWbdsTw7IPP1xhOQFSSIBzJYM8/IGvQiUBTqYJfM1wWxmC/k3Ry
-         quLg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7j1bfyoBwpdpDDHoEVE5Ef/Y8loWDNYIJC87SuFW+pP/EkeorWQ5/rov8DsPtjfqwA8SMGQfx9dsDhoA=@vger.kernel.org, AJvYcCWCWLhv0CL3HMzWhSQ1dcxQWj7rz5+WEsWxXwUgqCCD4ewxwx8Vk3tmVll9HsZK2tTBK21EOwlr@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywt1VizWY8UsY5KsMzU/shZBoFvuhkUS/QGFWhOJ+iU/dnZNfsg
-	vuilGKSJ0JP0PMAJaNP4uml48mFxIrJuskHfHNRu8qXLhCzxxty1
-X-Gm-Gg: ASbGnctmpSa/zY2KYOkKzQEmc2f19b6h59i9Nwi3m/Yb/ocZHuauPYBAeiKydSmwsSp
-	PsbB9vYAISjDNgXwU5raT9s4Tski41SQ0S2RtHtQlE7QAm/tpkFDqEP5VA0bwf/2omr7WfTLz6s
-	WV3+xYEK3qNX4jJBsNPwa4UEfr7YJ3bpdBCpsZTTRtc2X4vIsLXnIUTSdU8Kae6FUGRFY9xCXXg
-	7r1wIdy3Wqfp84RQUePEOzyKQKlaa802yPsYXC/7wu9chyskZ6Izrfj7SrIhuMxkAHBx4d9QESW
-	Uk6wYzm5L0HLjkVSslJ9cfOmgOkSwdREXkCuDVHTTg==
-X-Google-Smtp-Source: AGHT+IHWK0WshXlOs5OraQgDN/FsgzhL7hkkmTvNLw7hrCUa5cxOfc9S10EHvHC0RFX+JdX2CVNVXQ==
-X-Received: by 2002:a05:600c:3c91:b0:43c:f00b:d581 with SMTP id 5b1f17b1804b1-4406ac0fc21mr156671605e9.29.1745402809826;
-        Wed, 23 Apr 2025 03:06:49 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-39efa43bef1sm17924994f8f.49.2025.04.23.03.06.48
+        d=1e100.net; s=20230601; t=1745403128; x=1746007928;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+5GhlYau1vYRJo6luDQW5bI32zszXHjJmD7lMKKoHpA=;
+        b=tVoG0jgcpdzjaLHZf5ID8oUAzFAPWRxQ4ClcnM9c6biFDp1tzKNOjt5FeknOKkZumb
+         V8M3/g8HcgijeJ8BOBMTjqpqNTJoQKzyMA9pSJkfK5phc7zYAgwHCnIITVKrAO/QWpNe
+         teCVor+yD4GExlC+mcwaycDzxkIeJ5lMG5TYDllD4aJHz1G38wnm+5OCNZTv3MOyJq6N
+         Va3IZ50c+pONZt5uY1r3jQUlPix3dfWnQSpIIoh+KCoLM64iE0i8giuv+9kCmQ55pEga
+         gqA+dUmXC4dzk29Z0tcJz2POZhWfRNf4uTsNP5hqoiVDcND/zSBI0Uv/F/W+GMSIoqFl
+         8H6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWiQSCM1nKljprRne0bwOy8FC31nPawwOnGYNDK6zhK1TkfgY398BMVDOHlZchteE+I7k8CNvrb1ARwm0UR@vger.kernel.org, AJvYcCWqZQyqIFT1A9MZ3t/Ftk8FSYdM5fNcdfNx3kzVBZ82gkyz4Cy6p4niwShkJ1f53iQWhYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzjSvQdP/bZFYfNpwqRxyxd+fRanh5SbmkILfnDpgaQsM9Mi+/
+	2rq8y371p/C9vl6oSt9E5L8IFCSCfomZd0H3VUV4cQbgVZ2QJ8/puEP6F3SV
+X-Gm-Gg: ASbGncvHYB2XVSY31cKyyENpNGoMnhs1DctzkmsrCQKiEeLcZjLtQ7Wkgx6kmA+GZYv
+	5bNsaaecGxRkkfdde8vgAa9XJ/E89VBnTywrdI52j9Ww1zm9eiJXW7loLyaclxMdkgAgdIE5L1B
+	wDk1DVfrI1rUz1P+SQGSzd2VJW22gmN4NTNovlvlydPx5KNwkk9v5sktQ+0ByyR1SCTajBYf7Ox
+	o7ZjNdjhs3vyiKOhhvzuLB/wktujfU2AgJXkS1uchls/ChN8bqFX8XfjFJMTG1WhYmoUZ/t+KGS
+	DNhAkc5mcCTY+eJInTDxHVtmvMuKY6Opb+ArGn+sEztqfkDxVnG7tA==
+X-Google-Smtp-Source: AGHT+IFYnhOBn5pS9shSq5SLZtSLmusdGP2QV0V8marPCcCYHjxdzclWwlwxEVaAinCSJFTwfmlfew==
+X-Received: by 2002:a05:6a20:9f4f:b0:1f5:520d:fb93 with SMTP id adf61e73a8af0-203cbc72b3emr26471767637.24.1745403128068;
+        Wed, 23 Apr 2025 03:12:08 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:933:3ee4:f75:4ee9])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b0db157ed7fsm8740970a12.75.2025.04.23.03.12.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 03:06:49 -0700 (PDT)
-Date: Wed, 23 Apr 2025 12:06:46 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+        Wed, 23 Apr 2025 03:12:07 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, Yixun Lan <dlan@gentoo.org>,
-	Maxime Ripard <mripard@kernel.org>, netdev@vger.kernel.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: stmmac: sun8i: drop unneeded default
- syscon value
-Message-ID: <aAi7tq-otdhJRpTy@Red>
-References: <20250423095222.1517507-1-andre.przywara@arm.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net] xsk: respect the offsets when copying frags
+Date: Wed, 23 Apr 2025 17:10:47 +0700
+Message-ID: <20250423101047.31402-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250423095222.1517507-1-andre.przywara@arm.com>
 
-Le Wed, Apr 23, 2025 at 10:52:22AM +0100, Andre Przywara a écrit :
-> For some odd reason we are very picky about the value of the EMAC clock
-> register from the syscon block, insisting on a certain reset value and
-> only doing read-modify-write operations on that register, even though we
-> pretty much know the register layout.
-> This already led to a basically redundant variant entry for the H6, which
-> only differs by that value. We will have the same situation with the new
-> A523 SoC, which again is compatible to the A64, but has a different syscon
-> reset value.
-> 
-> Drop any assumptions about that value, and set or clear the bits that we
-> want to program, from scratch (starting with a value of 0). For the
-> remove() implementation, we just turn on the POWERDOWN bit, and deselect
-> the internal PHY, which mimics the existing code.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
-> Hi,
-> 
-> if anyone can shed some light on why we had this value and its handling
-> in the first place, I would be grateful. I don't really get its purpose,
-> and especially the warning message about the reset value seems odd.
-> I briefly tested this on A523, H3, H6, but would be glad to see more
-> testing on this.
-> 
+Add the missing offsets when copying frags in xdp_copy_frags_from_zc().
 
-Hello
+Fixes: 560d958c6c68 ("xsk: add generic XSk &xdp_buff -> skb conversion")
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+ net/core/xdp.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-The origin is me, when doing initial sun8i-emac I feared to miss something and so added some strict tests on its value.
-Another goal was to detect half init from firmware/bootloader.
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index f86eedad586a..a723dc301f94 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -697,7 +697,8 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+ 	nr_frags = xinfo->nr_frags;
+ 
+ 	for (u32 i = 0; i < nr_frags; i++) {
+-		u32 len = skb_frag_size(&xinfo->frags[i]);
++		const skb_frag_t *frag = &xinfo->frags[i];
++		u32 len = skb_frag_size(frag);
+ 		u32 offset, truesize = len;
+ 		netmem_ref netmem;
+ 
+@@ -707,8 +708,8 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+ 			return false;
+ 		}
+ 
+-		memcpy(__netmem_address(netmem),
+-		       __netmem_address(xinfo->frags[i].netmem),
++		memcpy(__netmem_address(netmem) + offset,
++		       __netmem_address(frag->netmem) + skb_frag_off(frag),
+ 		       LARGEST_ALIGN(len));
+ 		__skb_fill_netmem_desc_noacc(sinfo, i, netmem, offset, len);
+ 
+-- 
+2.43.0
 
-But I agree it is now useless.
-
-I will send this patch on all my CI boards, so you will have extra test.
-
-Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
-
-Thanks
-Regards
 
