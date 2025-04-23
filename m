@@ -1,108 +1,97 @@
-Return-Path: <netdev+bounces-184950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671BAA97C7E
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:51:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B950EA97C82
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 300F21B61AAC
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:51:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A9C17EED3
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E64265632;
-	Wed, 23 Apr 2025 01:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0377C263F2B;
+	Wed, 23 Apr 2025 01:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMqDL6ga"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="f1eS3Hnh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1163263F2B;
-	Wed, 23 Apr 2025 01:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22331AB531;
+	Wed, 23 Apr 2025 01:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745372991; cv=none; b=r6tudF9CLgbi9hEw8iE+wH11D4S3hAORNUYZIPuXHJIm07yEFWsVkFd9UIqs2BDoRAD9SgzsDCz/hhtNfyIa0t5lE4evp3c2uEFAznLHVgzg8JCY7YRxHKjmQikvGVXpyd4BTpLi9XhM6QEiTIM3IM6AWQaW6lcs2kjKXa3HFF0=
+	t=1745373057; cv=none; b=rjCq0kWa4Q+fWts09BAQy1lg1n2moGxyM1u6Jc7cpn9csyRdu1fL3XQLNROGE0Qk+SrrFdr5XqACRinMprkq5iaUsWpAUFy5nY8QQ4ihewGT8XXDZaOI0sdFVFhxshmgwAhyEu8QsQ/du7+uCfIBMAuUdWpIndmkmNXI9RJfP0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745372991; c=relaxed/simple;
-	bh=QxEqK4cbT808ELsKax+8p0w2UjvmBOkBNaPB8xPHKI0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FkUmokrMd43VBYmyfgA20UdNPS+Ykyug340Aqv0awR94SxCMy0ckLOVpkA5fHFnzNodPFDvAiSCSIBeS0l9vlmtG19A8R5XlUFUgTCHqGUDYGatj0WnKaQyjV1Wg+VkF8HxVBTFZ/ZzHH/8YhOZJQb2+/UVv8gfHFvBegd2gtjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMqDL6ga; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E7AC4CEE9;
-	Wed, 23 Apr 2025 01:49:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745372990;
-	bh=QxEqK4cbT808ELsKax+8p0w2UjvmBOkBNaPB8xPHKI0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oMqDL6gaQ1PJBIb8WuncnlC8rKeAuIxBOoptE52dnZSIzFVX2NRF49ZuY2GXBir8q
-	 3G+Mnddyg6c2pzc7MB+7oXQBA1N2tPwUHVjkFFxfM5UcRri/E6DDcYxHoKwXvceLWK
-	 qDE61VAN5rPNCfA6xTBtHpg/JnD3biqsxRoLZ5uFEArHoXnTiRQvIS/Z8+q1YxbZUW
-	 6gVv2nxcoXuB9ACLmK20ieFP2ogZZhSK1oipFZr4BxCrkE1eBVtnInN5fg4nrqCm9M
-	 eY86mTyh+xOXXtWWFtKkHy7Z+N5iOWh25DwgFtCkLNWZsPj5GprJKnTgWD8dn81XqC
-	 mbOedOKZs3f7Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE67380CEF4;
-	Wed, 23 Apr 2025 01:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1745373057; c=relaxed/simple;
+	bh=6R4WwuGJQJq5HvrJ2/kuGeJvc41TbQnsdhIRQmsPQsE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GGGrUbNZF3ZbOHsV6ckT07m0Vn4JBdYOxjZjeLWouxZ9DHG3P6DZs74KTOgIvgxK/ZaISficdssxp+1n8/1v6Y9lEvq498JeHibCujRX7rIOeaPHVcd66/2WLTZuz2fabA7sjmwuvIMVkEpdwy8ocNhRGeCMLHdUlJMebc9As2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=f1eS3Hnh; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=Fy3qz1uFkZb+AL/yG6A3s9Izi4qPXtaKdWPYBlXrJwM=; b=f1eS3HnhYf/lVfjkmlw9N00TJ3
+	MoH9Q1LNu0a8MBPDdrVThATKvb9F3ej8PGzTmZwCywSuZMRnB0U0oZnaqYTesfaKYaiJIWOKfHhxB
+	NVnYyWvHqs6aPv86MLRp+scFBECxCiddJF4eMilkpzCFqX2vsfS5mRsi+ozgYfsDF20doISyi8hIJ
+	nfoKhQYJOen+SM5u9YThmSDsrdS+V1ViQqwy1HvKQOIQB0DOOYujy848qu5xILYfZpZ1PqhRwuroW
+	RkSqxoWgrpNurt6/0WBG8IYN1thHGRUo/FA/86wTlzP+zNHimU/HCO/Wq7CNzZOr6NDIb+uqVNTHo
+	Ml0BPVlQ==;
+Received: from [50.39.124.201] (helo=[192.168.254.17])
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1u7PGF-00000006ipK-2Xkf;
+	Wed, 23 Apr 2025 01:50:52 +0000
+Message-ID: <8ba27b19-6259-49d3-a77f-84bfa39aa694@infradead.org>
+Date: Tue, 22 Apr 2025 18:50:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/4] virtio-net: disable delayed refill when pausing rx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174537302875.2111809.8543884098526067319.git-patchwork-notify@kernel.org>
-Date: Wed, 23 Apr 2025 01:50:28 +0000
-References: <20250417072806.18660-1-minhquangbui99@gmail.com>
-In-Reply-To: <20250417072806.18660-1-minhquangbui99@gmail.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: virtualization@lists.linux.dev, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, andrew+netdev@lunn.ch, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, eperezma@redhat.com,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: linux-next: Tree for Apr 22
+ (drivers/net/ethernet/broadcom/bnxt/bnxt.c)
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>
+References: <20250422210315.067239d3@canb.auug.org.au>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250422210315.067239d3@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 17 Apr 2025 14:28:02 +0700 you wrote:
-> Hi everyone,
+On 4/22/25 4:03 AM, Stephen Rothwell wrote:
+> Hi all,
 > 
-> This series tries to fix a deadlock in virtio-net when binding/unbinding
-> XDP program, XDP socket or resizing the rx queue.
+> News: there will be no linux-next release this coming Friday.
 > 
-> When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
-> napi_disable() on the receive queue's napi. In delayed refill_work, it
-> also calls napi_disable() on the receive queue's napi. When
-> napi_disable() is called on an already disabled napi, it will sleep in
-> napi_disable_locked while still holding the netdev_lock. As a result,
-> later napi_enable gets stuck too as it cannot acquire the netdev_lock.
-> This leads to refill_work and the pause-then-resume tx are stuck
-> altogether.
+> Changes since 20250417:
 > 
-> [...]
 
-Here is the summary with links:
-  - [v4,1/4] virtio-net: disable delayed refill when pausing rx
-    https://git.kernel.org/netdev/net/c/4bc12818b363
-  - [v4,2/4] selftests: net: move xdp_helper to net/lib
-    (no matching commit)
-  - [v4,3/4] selftests: net: add flag to force zerocopy mode in xdp_helper
-    (no matching commit)
-  - [v4,4/4] selftests: net: add a virtio_net deadlock selftest
-    (no matching commit)
+on x86_64:
 
-You are awesome, thank you!
+when # CONFIG_DETECT_HUNG_TASK is not set
+
+so CONFIG_DEFAULT_TASK_TIMEOUT is not set/defined:
+
+../drivers/net/ethernet/broadcom/bnxt/bnxt.c: In function 'bnxt_hwrm_ver_get':
+../drivers/net/ethernet/broadcom/bnxt/bnxt.c:10188:28: error: 'CONFIG_DEFAULT_HUNG_TASK_TIMEOUT' undeclared (first use in this function)
+10188 |             max_tmo_secs > CONFIG_DEFAULT_HUNG_TASK_TIMEOUT) {
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+~Randy
 
 
