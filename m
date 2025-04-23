@@ -1,127 +1,109 @@
-Return-Path: <netdev+bounces-185181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B160A98D65
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:41:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349AEA98D68
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 16:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338B33B67D1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:41:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9BAB171AC2
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 14:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E98C27EC6C;
-	Wed, 23 Apr 2025 14:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D54280A47;
+	Wed, 23 Apr 2025 14:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0IyUc88j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZebEuXkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64876481CD
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 14:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2B327FD58;
+	Wed, 23 Apr 2025 14:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745419277; cv=none; b=d6ypTKgfY1It7cPOpGPWSgjYb2zrfuhAIdczMZWaHSdvOZsooD5Bg4QMCC8Xk140KILfmwTV6bQ9U8mLiLAzEr+X9WCjhO1O78fpGK+4xb8UK+SXfZhUEBH9bHVoEjPanxlUDrIhuOcSvLl4EIB8vJ5MRiwGB+3K0VBqKhLmYKA=
+	t=1745419281; cv=none; b=cVprkZZS0vnuqOPfPv8FlNQl7wVGbmVEHDMGe3y9npmvAvUqHhlPGYhdLjrtbTBJOq7QHXBZAqjkh9ukjs9zM7kaSopYBFsn4MkkEqZMlCa9QqZHQkYxijrFBw8QymPGHH2zN8RJ1qphmWIl9M2k/fdO6R2FwIP+7JdXU3cKhpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745419277; c=relaxed/simple;
-	bh=jYTlrDsHzO9OEikxM7Gr+ZwLK8oHhFWsMwfZyoLfQ5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NRtRbwA1Hx+u13X3Jh4ZdQLQyxtkSBn9HyuTy5MnhJ2NGPvrUKQQH2XNNVYdK1hjXiXu8dvpR8rFDZblzXpG75yoH94jeWQJdFIV3Hw89Wecf/7Hm6+TmnaOUSpdm+99Jkrq0KXAsTUxmDGhEmFNdeQPy1l9NTuHk+4GkuLjVro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=0IyUc88j; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22928d629faso62436905ad.3
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 07:41:13 -0700 (PDT)
+	s=arc-20240116; t=1745419281; c=relaxed/simple;
+	bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fMOXxwt+X1A9yjMbxTjD5VlQDGKmN9JdYOh1vU1SRDHaX/AMaIzO8cRdmECwT+TsEJ6ZZrmMdXzL5n1dNwp8d6EQW9r0I0nULWX4g1i8qehJBR7/9ld9anQ8SIOKgj0BmZEDDWgZSTrLwnQF0ulGik8CWcJ1PF2KJtpPV1Zlkeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZebEuXkN; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22d95f0dda4so37848145ad.2;
+        Wed, 23 Apr 2025 07:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1745419273; x=1746024073; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bfH82R14xJ+9dQqDHetknS/UsEjphIlXgwWxKJXhO18=;
-        b=0IyUc88jBVkD5kpMlUfIsizhHRErnMD6GRko7MgZmRDdxjEUi72gJZJwndz+X5tEqS
-         Wa7RAuMkzIfxOly35JNiQ5GGhLlWbC+IiLFStjvPolEIX+z2v0KvE91JVLWKxk2Hz058
-         p0sJ01jsoqIF1bnkIHsCKKYBx7AWO8d3advrxxCsz3Vm9yJo4BWg15ewlM4YL6GgnbI6
-         wSeifl2xriOVM7qjbMB4V+7Gjf/jeSyoFD9PWwPxVnUnsMB1Z3GoxQ23kq2hJpBMuPnU
-         FVJz1klzqPGoJ4HKHUzglistiE/0CUBv6ucukFOwubgGP6He6ZVkrFtt7V7o+ubki+9D
-         W6RA==
+        d=gmail.com; s=20230601; t=1745419278; x=1746024078; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
+        b=ZebEuXkN/lWivO+94JjUqIOftBuP3cT1B0YAPX9WYUL1pKk5pffECBHY4Q6zyfVnaB
+         HCPFH4bBkGmd7PWZz95rFz3plClZPXW6B3B6GT8vTYKtmvssfV6ah1g+rb/4vuPIcdpu
+         prxGK9cZhdK+hUYyavFL1ZP/ZUDJJUrADHXZZcxsERYTUGb33idLeJj+dXDJ1LgP/vdK
+         NDPgGuuad3dEdDrIOhIsWFVBqzO5UhpgL9fMXAZwOVn6YUT7ZlDNnK9lL4nXBIZhN3J5
+         wo5kornvKs7IwEj/ZWlsh7nYjsW71NW+2hoBzpWSiZcZWuKp+YplpXPOaOtmj2zYR1zh
+         D7aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745419273; x=1746024073;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bfH82R14xJ+9dQqDHetknS/UsEjphIlXgwWxKJXhO18=;
-        b=YC79ZG2Sit8fARbPRfqBKXAH1paDT9DEk8hAzJCVa4732VzTUCJ1/yBUESbvhXnYTM
-         CZopkP3JB5TdUHoQxDiu+VJ99mNXbybO5qeNf8prg5mHFfWLyTcj0zLytp+P63lDJrsS
-         Bx0OYY9TbxYsS+4qSZPqOgd1IulxlfV8t+CmOoSP8JRgEsJUuaPZ20ZOhfFX6+oyGNZX
-         1IoHWXflDzKuOczSE2K/4bNuByUHXcEdBviGzQS14Q/689ZtIq2lO4ff740X5Y0qw/F9
-         lokYUydcfMCnqMk5/SYc7pg9ryNihY9TH78aFH8tLr8LvhcrQEQdWxcTdb6iqXPcqS95
-         j9hg==
-X-Gm-Message-State: AOJu0Yxcfn96Us8tpE3ikPrZDwOE72/UlD5o0E46C+TPiQGD85QFLnsO
-	iSofHIVKxWjsur8DdmLPCdlnyJqS0T0TTACc7i8kRNzIhy1IVn4jQpD9q0OoTA==
-X-Gm-Gg: ASbGncuzzKBrYdwsH/YvU0E10avoeGQxYzI/fa9iBjS42hb4EI2CH9q2iAuxYJQhwO/
-	UMvnkJXCN2Q2suLWi5udJ4H4uq6PWmFTEOXmKjdmomCkS89DCIF6GgR7k4xZ+Y+Wc+QHRZCLfsm
-	TkkZfpIUCf7D6jF8/5KNK+G2fMOcZF0dW270FimnyYqJZF97IeNzZHVbRfJlqyO4/NrXM7dgJLa
-	bQWXCbbdjlafGhSjDjadAZF1QY2C0mayrEbJdCWOAEZqTNggiTyXovvA3ERXgy7zPEr/9HHavla
-	8X2qh2AZxQuytf+Rsc/kfvPTyDhf7Nb/eHmQC2pXUlsDTHCBoWVCpCXQS2MWxMs7XNXS27hbiN2
-	6f1SjBe2o
-X-Google-Smtp-Source: AGHT+IFa06Q6KaXmNp9bA2mo0NYLrxO+yE9INIq/A1BDYA7AAP7oWHE2Xt8R7xWkvo3vOJ3fwjysOA==
-X-Received: by 2002:a17:903:2285:b0:220:c4e8:3b9d with SMTP id d9443c01a7336-22c536014d1mr257744415ad.37.1745419273445;
-        Wed, 23 Apr 2025 07:41:13 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c0:73b:9a6c:c614:cc79:b1ba? ([2804:7f1:e2c0:73b:9a6c:c614:cc79:b1ba])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22c50ed1dc3sm105364805ad.205.2025.04.23.07.41.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 07:41:12 -0700 (PDT)
-Message-ID: <25909f3c-a263-4532-8d61-2bad391a1d79@mojatatu.com>
-Date: Wed, 23 Apr 2025 11:41:08 -0300
+        d=1e100.net; s=20230601; t=1745419278; x=1746024078;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LSv+72puYjw5bOpYmjZlT20L7XZXssOk3Xu53zcVZf0=;
+        b=bGg1FDkWa7gAiguWGvs97JI4jbtGUEtnABH/bpi58BabV7c23hln6jOS1xDQckuxU/
+         Fl/aFcCz/cElHSdc3Q4wQSBSWXGOEbueWfUckh/q1ZhG1AjlkLTEvZ6w1xgxOsIx9/oB
+         VooOayvtnfg1Nj4O+gG6H8sbQzIyASDlPjgcdUMCPy6SAOYVpyNJBFWVoi17CMrKqGkm
+         tMvnOqVZXsamamdXYT/6GnDO5oXuIm4bCEgFe6VQW7oHm7heeMZQWq7iYeimhet4OY+p
+         HR1ueYSbq6Tqz3apN2nVPdlt0NM0VUxrpcRbpYEbmS94egyJPZV2diEn6MxOoKnKOnjb
+         ziTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIG/aebxF6MnWogT3Xk+Sa7Mw6yBYQUVMaaimhh3tOuacg13MMS2TjuAff+Z7girmspiZrIUCDwnzud9va@vger.kernel.org, AJvYcCWNCExMdGyA0EBqdoPA+ibZMcBtWUjf9MjmnyzC/4pJqeaLbAYUxVacNaiRCpKU3oFq8Jk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2ow7zPLJPoY55xBGcsvwj7EMRdxHK6uD9vfCSUf0s/+gTTpfw
+	SiMhL5HaLS3RextyM60PliWVdBKj+Xcseu3ewBtKAT5ONPtSf5w=
+X-Gm-Gg: ASbGncvgs2kansLy4+hDq6KuF+jZlYjGDtKwANkOgoSn7+kjlIl6rrUJ6XmupggGQk/
+	OFrCM5VtBnhRBjn47E3C+evzJSyfuEFQNtnXXPBqT8F8Hx11cgFztdL9pjHvvTi9bQP+E2EsUFg
+	MCU5BNNzE0utmYaEGWpaBa/YeN8jXKz3/0Mb4E/xaG9urPg6YxRyNjV42A6V+8F/w0WtgilSaAG
+	VttuKscCDDBskPPru+/c3YKBoSxxX/jtMz+zZ5Hcx8suITflbrxwlvrCteMKhglz4q+nQXQM3QW
+	3UfzYXS/2KHps2grac3mMRsaq6Mhl7T5S1HzxKLi
+X-Google-Smtp-Source: AGHT+IGDMJ7mVrs7MGpWDguaDL50Errcc6GUi2lzccVKv7XMdolZY/WHsJ2g0YXTG07aJRo3JnZyqA==
+X-Received: by 2002:a17:902:ced0:b0:224:1ec0:8a1a with SMTP id d9443c01a7336-22c536423c5mr268699125ad.51.1745419278341;
+        Wed, 23 Apr 2025 07:41:18 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22c50fe0859sm105266865ad.246.2025.04.23.07.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 07:41:17 -0700 (PDT)
+Date: Wed, 23 Apr 2025 07:41:17 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] xsk: respect the offsets when copying frags
+Message-ID: <aAj8DfHJ_XZxrDSJ@mini-arch>
+References: <20250423101047.31402-1-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/5] net_sched: drr: Fix double list add in class
- with netem as child qdisc
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, toke@redhat.com, gerrard.tai@starlabs.sg,
- pctammela@mojatatu.com
-References: <20250416102427.3219655-1-victor@mojatatu.com>
- <20250416102427.3219655-2-victor@mojatatu.com>
- <20250422174406.38cc5155@kernel.org>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20250422174406.38cc5155@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250423101047.31402-1-minhquangbui99@gmail.com>
 
-On 4/22/25 21:44, Jakub Kicinski wrote:
-> On Wed, 16 Apr 2025 07:24:23 -0300 Victor Nogueira wrote:
->> +static bool cl_is_initialised(struct drr_class *cl)
-> cl_is_active() ?
-> Had to look at the code to figure out what it does, but doesn't seem to
-> have much to do with being "initialised". The point is that the list
-> node of this class is not on the list of active classes.
+On 04/23, Bui Quang Minh wrote:
+> Add the missing offsets when copying frags in xdp_copy_frags_from_zc().
 
-Ok, I believe cl_is_active describes it better. I'll make that change.
+Can you please share more about how you've hit this problem?
+I don't see the caller of this function (xdp_build_skb_from_zc)
+being used at all.
 
->>   static struct drr_class *drr_find_class(struct Qdisc *sch, u32 classid)
->>   {
->>   	struct drr_sched *q = qdisc_priv(sch);
->> @@ -357,7 +362,7 @@ static int drr_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->>   		return err;
->>   	}
->>   
->> -	if (first) {
->> +	if (first && !cl_is_initialised(cl)) {
-> I think we can delete the "first" check and temp variable.
-> The code under the if() does not touch the packet so it doesn't matter
-> whether we execute it for the initial or the nested call, right?
-
-I was being more conservative, but your suggestion is a good optimisation.
-
-cheers,
-Victor
+Alexander, do you have plans to use it? Or should we remove it for now?
 
