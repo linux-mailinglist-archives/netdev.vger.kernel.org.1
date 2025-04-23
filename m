@@ -1,184 +1,193 @@
-Return-Path: <netdev+bounces-185278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FDAA999B6
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:51:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856C6A999C2
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C7C01B638C8
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:51:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7575F1B852C7
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 20:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF2B27A129;
-	Wed, 23 Apr 2025 20:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634EE26B953;
+	Wed, 23 Apr 2025 20:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlMxAG0g"
+	dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b="dSDuoWP7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="E5GcZm1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008B127935A
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 20:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A072701BC;
+	Wed, 23 Apr 2025 20:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745441454; cv=none; b=nzyahGrPd6vGgwh45x02Aj2aQTmwx8TA6Oh7u6Eda7uYhdOZEoWiksldbmYEbh6kSv5piZtnmQnlnR8++GRr9dvGGSB6Z2kn0vAT3j33faFzYCrry1xsimf69FWhTu4+8accBvXwG6GBu85omBUQrkmCvY5xxGv/hYuQGR9+DNE=
+	t=1745441682; cv=none; b=PMh1/hl4kUcXMk8vdVIgihRlWiDV6egro3dJlbYxUvfLm28Ff0zsnNvN5t/2j3EGGD1l8C498piZKHen0QPiA8q7+4fb5JVs2reM59pXYohy61E2XU6nMBH8gAfTeUnpX7d+DOT6oC0i17zs9eg9ZIyFYBPfZRlxKeLMTPXAXsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745441454; c=relaxed/simple;
-	bh=EPkRvXmwlR3RU4qVGBNgoF0s+yoQC5cc73SAuhZGqlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ia8ejMqlBf+En4oFfMZJhB68rVm4L/ilsXA0YQvQZf72accbGSRm602+tliLuSa3JT/poAnIsgfPVutPKATDlx44PmoC5GmkeZkJHNTKcJ8f1SLeMjKGGzktlc90VJqU/yO4mrdF4qIkESRrdqY96S08P925YygYjjeZqDoxPwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlMxAG0g; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff6cf448b8so412953a91.3
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:50:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745441452; x=1746046252; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BUBkm1IOr6p2VHqzMvkmLagJkrXpfHVpkWga12/AYks=;
-        b=XlMxAG0gFGlDIlMOYHud4IEUes2b36MzjCfT0Btovh2RCdZ2nVtrh9+wCKjd0kj1ml
-         CVITzxJI7BXCXxT/8pWlTrE45jTs00WeSAS7TMGVZ66pp3sXAykdC0RO/QQ2Q2dnIDDl
-         YxT6ZQh3TYCJ8/mdK/Kad4qn5AABcBDJNTzLjF5x3etIcwav0QlOz3h1ykUY7BPQSLDg
-         IFLkj8TgVVPqu+xz4lMQwKSmRmhhQonF4uVir4+9qI6CcBS+4wXLZaAYZiVyCEa0Fk0u
-         k1DIl/utfidz7xY53/CHRNSRIsThd4VSLITb57KqkJs61bHVa7M//MCaMzKvFVRneTUl
-         bdFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745441452; x=1746046252;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BUBkm1IOr6p2VHqzMvkmLagJkrXpfHVpkWga12/AYks=;
-        b=Thgc54xgAU1MO7i7IDyz7Fk9Gq/azT/NZ3GoB5RMrM5YCHWFQE0mymoDD3udnGjNQF
-         PARWUzyuqHXqUh+eiXIjlvI9XkhbjdtFV8bc7+wYUnW0OFVVmKYhJG4FD8fR8m2MCW3d
-         QylBFaG2Ij/pF8co2ay1LoK5RxaUEaG2qkvqYh263YiZFFxv1Bapb95wDwh8IlXqJXI4
-         ykGelbwefrzZV+5v3oeI1Qirk/kWSHE8PB9Glqa0wzTivJiLLzRQWFwB19c6yRVvQsFb
-         1vlBiQKChabttPZT1YYWsCRz8OexhyxxVavx1Hcf9XCJi5EX8u4A3ICpdUzyWKVQ8EKU
-         IIPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUstrCsfhk8JjS9geqcfeYGpAT1YJFScRyroE/S2osRPofv0jNhxy0HD4FZp258lSnM4knAJfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEw7cWYnRo65aNIxxXB/RvW12ruHADvZYUSrsKRHoqM3pc3Nwf
-	wSZHlXlzSK+2NCyFiKJ8BOEj/+QWMQTplNaj6LEQsIhyy4jkJW747kNWAH6K
-X-Gm-Gg: ASbGncvqkYwq26IQY3xwjkeOnclXF5/ycM4SBCZLGr/jfhckYJlbGQmXGg96jhtMRsA
-	ny9AOqTn8vyfDxew4dzzzxoa2HogGWOrq+D8fPFJxJmlzmBS0RWDSLc7yR7oIzCZY4pGOe10bPy
-	nIqYttLG/E/CIbwdiLazBfIDb3T70Hfg704gDDnesJyZYtemJ4DOA/QEsyLZbSHbFJq3qUciyiZ
-	KBvtvSDHso1v7ihsdVlbLtW5KEZUKfq/wRVW3TlNpyo94WM0LnhHGc84+l67yh81ZibIkAtwZ4X
-	hTwxlGlWfZhMDDhPxOU1igyc9buOHeH8TzZznBf3skyI
-X-Google-Smtp-Source: AGHT+IHksSQWm2zN6VzQa5YMR14iHgpLwRUqaP4pqJNvZr87iSwsfv4EOaomnysSOCvxBvq9Xlt2qQ==
-X-Received: by 2002:a17:90b:2dd2:b0:305:5f33:980f with SMTP id 98e67ed59e1d1-309ed312ef0mr336408a91.27.1745441452176;
-        Wed, 23 Apr 2025 13:50:52 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309dfa5bac9sm2119334a91.33.2025.04.23.13.50.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 13:50:51 -0700 (PDT)
-Date: Wed, 23 Apr 2025 13:50:50 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Victor Nogueira <victor@mojatatu.com>, netdev@vger.kernel.org,
-	jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, toke@redhat.com,
-	gerrard.tai@starlabs.sg, pctammela@mojatatu.com
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue
- cases
-Message-ID: <aAlSqk9UBMNu6JnJ@pop-os.localdomain>
-References: <20250416102427.3219655-1-victor@mojatatu.com>
- <aAFVHqypw/snAOwu@pop-os.localdomain>
- <4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com>
+	s=arc-20240116; t=1745441682; c=relaxed/simple;
+	bh=wp/tmVkOATVLugd1D0jouBtXDou1iJLlFR51aXGWQCg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=OdBI+mBqw7jkCPfPVRpEhy4l+hEHz8zxuSmIZWikyKxq9cePElxhmMY14HtpSg6pCCWGXFGlzWKtYFSNDKVyg8GSLFBX/TERfc3NODoflWxGhDoBL9pJWjap4zxxqRwtYHCDOl6yMnD2gt/Nk7zvcFVebce3SAFZZOmP6/g45Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com; spf=pass smtp.mailfrom=arthurfabre.com; dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b=dSDuoWP7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=E5GcZm1F; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arthurfabre.com
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id DBF6125401E4;
+	Wed, 23 Apr 2025 16:54:37 -0400 (EDT)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-05.internal (MEProxy); Wed, 23 Apr 2025 16:54:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arthurfabre.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1745441677; x=1745528077; bh=g2MVnbEaHajTV+ZwVS0fqv4DkHnJ+QiQ
+	uueDHO49G3g=; b=dSDuoWP7oJGtq3cxmB6LLFAJA97FUvfszsYN0JNDZMM8v9Hw
+	1ehgJ9p4oWrRJHN2NzrvIp2dgm2lTMY0139qTugrOZxupmL8DOa6SmfRieNga6dd
+	xZHkU38Ayq1AwmfAZW0qg0/1GbFh3oMEknUaLo2wD5dHE0pwY3y6UQcPyi61pczx
+	DNYDloleMvSBURilXgKPZn0x6jj4U2NhBu7gLsR64p/ifPej4vO7PdVUGwWAK3Gn
+	BmI4PR6G3MPa/kZSNJlK5+GUkJOzfL0/A/vm7BxCNJLZkUfhgIy7i51/U6PXrDUb
+	w6NWENjAkHOKcDQC364mgh6tVTu4QQSMOHKE+w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1745441677; x=
+	1745528077; bh=g2MVnbEaHajTV+ZwVS0fqv4DkHnJ+QiQuueDHO49G3g=; b=E
+	5GcZm1FWe/wxPNQfQ+uKqkJPH/ITsLVb1NBW4k9h7sFEAn7oevGo/Kx/aTkZG7e2
+	wzxWQWa6MQOcLXpGt1heLaCPRWCYWAYCgLzzdcyuKyFzPxQM/eI9gLa0l9A2AKc0
+	psWijl2dtDeD8zqoe2241NtYE8K1oCXdduyLeVTpRRMtU7fdJYTxSBhWQ70zNBPw
+	19+T+g2BRMxlsE2s24zOvEUtpXK5Fgru/SVwjSfMez8h6668RyU+H8m3D56nZftH
+	m2xDgJ4sauR9b/ATAGwr8sn5xVQU4rtv5kVMNvCPEWhzIbrWX/+biupvJ6oIX7Il
+	gqhfSGFdZKmoR0+biRxvA==
+X-ME-Sender: <xms:jVMJaGVUulHrVbnceCWHHVS7aXcdPU8UMNcmCMCn0R5O2c6fwTSU9A>
+    <xme:jVMJaCnJOt91BN8sfveieTGNgpiAd1EGL6mitkcbCQXwzoaKH_AggQ9WbXeXXaRs6
+    Yc4CaWnaiusHQwz5ro>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeejieduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofgggfgtfffkvefuhffvofhfjgesthhqredt
+    redtjeenucfhrhhomhepfdetrhhthhhurhcuhfgrsghrvgdfuceorghrthhhuhhrsegrrh
+    hthhhurhhfrggsrhgvrdgtohhmqeenucggtffrrghtthgvrhhnpefhfeejgefhhffhveel
+    teehhfffheffvdettdelgfeltefhteelveeuffetfffgjeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhthhhurhesrghrthhhuhhrfhgr
+    sghrvgdrtghomhdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopehjrghkuhgssegtlhhouhgufhhlrghrvgdrtghomhdprhgtphhtthhopehj
+    sghrrghnuggvsghurhhgsegtlhhouhgufhhlrghrvgdrtghomhdprhgtphhtthhopeihrg
+    hnsegtlhhouhgufhhlrghrvgdrtghomhdprhgtphhtthhopehsthhfohhmihgthhgvvhes
+    ghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
+    hmpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhgrfihk
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtoheplhgsihgrnhgtohhnsehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:jVMJaKbU7tMLZm-lxp3Py8DYsYFxv0582GG0JIHMVdP3T80U_ZqUiA>
+    <xmx:jVMJaNUaqRH3gu9dTi4V8DBrtD6TjP1k4nESttebhop8nbIXsQGjkw>
+    <xmx:jVMJaAmPuyHoxHy0lGvXNo_Ld-yYINMfqHGKrE80AGPZhTpoGGnwJw>
+    <xmx:jVMJaCeZkApXLzVxNUZ95cJ5DUL1D08EG2KclOhEcazcggODQs0d1Q>
+    <xmx:jVMJaKTJx03Z6VAEW8_oDiNQ9_fyT_z-taAyzkQW0K5wZc74We8jrXhZ>
+Feedback-ID: i9179493c:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 598A01F00072; Wed, 23 Apr 2025 16:54:37 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 23 Apr 2025 22:54:36 +0200
+Message-Id: <D9EBFOPVB4WH.1MCWD4B4VGXGO@arthurfabre.com>
+Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <jakub@cloudflare.com>,
+ <hawk@kernel.org>, <yan@cloudflare.com>, <jbrandeburg@cloudflare.com>,
+ <thoiland@redhat.com>, <lbiancon@redhat.com>, <ast@kernel.org>,
+ <kuba@kernel.org>, <edumazet@google.com>
+Subject: Re: [PATCH RFC bpf-next v2 10/17] bnxt: Propagate trait presence to
+ skb
+From: "Arthur Fabre" <arthur@arthurfabre.com>
+To: "Stanislav Fomichev" <stfomichev@gmail.com>
+X-Mailer: aerc 0.17.0
+References: <20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com> <20250422-afabre-traits-010-rfc2-v2-10-92bcc6b146c9@arthurfabre.com> <aAkW--LAm5L2oNNn@mini-arch>
+In-Reply-To: <aAkW--LAm5L2oNNn@mini-arch>
 
-On Tue, Apr 22, 2025 at 01:21:22PM +0200, Paolo Abeni wrote:
-> On 4/17/25 9:23 PM, Cong Wang wrote:
-> > On Wed, Apr 16, 2025 at 07:24:22AM -0300, Victor Nogueira wrote:
-> >> As described in Gerrard's report [1], there are cases where netem can
-> >> make the qdisc enqueue callback reentrant. Some qdiscs (drr, hfsc, ets,
-> >> qfq) break whenever the enqueue callback has reentrant behaviour.
-> >> This series addresses these issues by adding extra checks that cater for
-> >> these reentrant corner cases. This series has passed all relevant test
-> >> cases in the TDC suite.
-> >>
-> >> [1] https://lore.kernel.org/netdev/CAHcdcOm+03OD2j6R0=YHKqmy=VgJ8xEOKuP6c7mSgnp-TEJJbw@mail.gmail.com/
-> >>
-> > 
-> > I am wondering why we need to enqueue the duplicate skb before enqueuing
-> > the original skb in netem? IOW, why not just swap them?
-> 
-> It's not clear to me what you are suggesting, could you please rephrase
-> and/or expand the above?
+On Wed Apr 23, 2025 at 6:36 PM CEST, Stanislav Fomichev wrote:
+> On 04/22, Arthur Fabre wrote:
+> > Call the common xdp_buff_update_skb() helper.
+> >=20
+> > Signed-off-by: Arthur Fabre <arthur@arthurfabre.com>
+> > ---
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index c8e3468eee612ad622bfbecfd7cc1ae3396061fd..0eba3e307a3edbc5fe1abf2=
+fa45e6256d98574c2 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > @@ -2297,6 +2297,10 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct b=
+nxt_cp_ring_info *cpr,
+> >  			}
+> >  		}
+> >  	}
+> > +
+> > +	if (xdp_active)
+> > +		xdp_buff_update_skb(&xdp, skb);
+>
+> For me, the preference for reusing existing metadata area was
+> because of the patches 10-16: we now need to care about two types of
+> metadata explicitly.
 
-Sure, below is the change on my mind:
+Having to update all the drivers is definitely not ideal. Motivation is:
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fdd79d3ccd8c..000f8138f561 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -531,21 +531,6 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		return NET_XMIT_DROP;
- 	}
- 
--	/*
--	 * If doing duplication then re-insert at top of the
--	 * qdisc tree, since parent queuer expects that only one
--	 * skb will be queued.
--	 */
--	if (skb2) {
--		struct Qdisc *rootq = qdisc_root_bh(sch);
--		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
--
--		q->duplicate = 0;
--		rootq->enqueue(skb2, rootq, to_free);
--		q->duplicate = dupsave;
--		skb2 = NULL;
--	}
--
- 	qdisc_qstats_backlog_inc(sch, skb);
- 
- 	cb = netem_skb_cb(skb);
-@@ -613,6 +598,21 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		sch->qstats.requeues++;
- 	}
- 
-+	/*
-+	 * If doing duplication then re-insert at top of the
-+	 * qdisc tree, since parent queuer expects that only one
-+	 * skb will be queued.
-+	 */
-+	if (skb2) {
-+		struct Qdisc *rootq = qdisc_root_bh(sch);
-+		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
-+
-+		q->duplicate = 0;
-+		rootq->enqueue(skb2, rootq, to_free);
-+		q->duplicate = dupsave;
-+		skb2 = NULL;
-+	}
-+
- finish_segs:
- 	if (skb2)
- 		__qdisc_drop(skb2, to_free);
+1. Avoid trait_set() and xdp_adjust_meta() from corrupting each other's
+   data.=20
+   But that's not a problem if we disallow trait_set() and
+   xdp_adjust_meta() to be used at the same time, so maybe not a good
+   reason anymore (except for maybe 3.)
 
-> 
-> When duplication packets, I think we will need to call root->enqueue()
-> no matter what, to ensure proper accounting, and that would cause the
-> re-entrancy issue. What I'm missing?
+2. Not have the traits at the "end" of the headroom (ie right next to
+   actual packet data).
+   If it's at the "end", we need to move all of it to make room for
+   every xdp_adjust_head() call.
+   It seems more intrusive to the current SKB API: several funcs assume
+   that there is headroom directly before the packet.
 
-The problem here is the ordering, if we enqueue the skb2 (aka the
-duplication packet) first (as what it is), the qlen is not yet increased
-at this point so the qdisc is technically still empty (as we test qlen).
+3. I'm not sure how this should be exposed with AF_XDP yet. Either:
+   * Expose raw trait storage, and having it at the "end" of the
+     headroom is nice. But userspace would need to know how to parse the
+	 header.
+   * Require the XDP program to copy the traits it wants into the XDP
+     metadata area, which is already exposed to userspace. That would
+	 need traits and XDP metadata to coexist.
 
-If we reverse that order, that is, enqueuing skb2 _after_ the original
-packet, qlen should be increased by tfifo_enqueue() _before_ skb2 is
-enqueue, so the qdisc is not empty for skb2 any more.
+>
+> If you insist on placing it into the headroom, can we at least have some
+> common helper to finish xdp->skb conversion? It can call skb_ext_from_hea=
+droom
+> and/or skb_metadata_set:
+>
+> xdp_buff_done(*xdp, *skb) {
+> 	if (have traits) {
+> 		skb_ext_from_headroom
+> 		return
+> 	}
+>
+> 	metasize =3D xdp->data - xdp->data_meta;
+> 	if (metasize)
+> 		skb_metadata_set
+> }
+>
+> And then we'll have some common rules for the drivers: call xdp_buff_done
+> when you're done with the xdp_buff to take care of metadata/traits. And
+> it might be easier to review: you're gonna (mostly) change existing
+> calls to skb_metadata_set to your new helper. Maybe we can even
+> eventually fold all xdp_update_skb_shared_info stuff into that as
+> well...
 
-This is why I think (meaning I never test it) it could solve the problem
-here and is a much simpler fix (0 line of code in delta).
+Yes! This is what I was going for with xdp_buff_update_skb() - it would be
+nice for it handle all the SKB updating, including skb_metadata_set().
 
-Thanks!
+Should I do that first, and submit it as separate series()?
 
