@@ -1,104 +1,93 @@
-Return-Path: <netdev+bounces-185300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B4BA99B8A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:30:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A504BA99B8C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 969EC5A77B7
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:29:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E615744819E
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 22:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CBB2144B7;
-	Wed, 23 Apr 2025 22:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164E61EB5E1;
+	Wed, 23 Apr 2025 22:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dhKTNHhj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrRV4qEm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316CC1EB5E1
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 22:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0002701B1;
+	Wed, 23 Apr 2025 22:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745447409; cv=none; b=A9RaNRgtDRrMWzvvh6ga0oiHy/PVdZi2JquHl4ViITEANRIsXYbnsed8SuACMc9Skt6j7QEQJZ2gInnNENLZpHdBq/WZ/MTI0+YvbiHmrO2Hy1dujOlJxbb7fgLvIVY2/gBAtq8HyduJSwIknhTjPZTDIJBEmmCipHueNYibwU8=
+	t=1745447448; cv=none; b=iNJtRCA0p7AwF166lXZz7lc/uPcsupIhCrBLAwKZv7Nr5HV1kiApn5a4GbM5Kuf50aMJ2B0NXf5tFJzMLZLFWOde6UuTh/tjsESHVbUYnkYd5OtLbjlxaIRL9skcliSeFnuloj3lxyorVy43zKcfH4k+FpaD5+zW5dZRqNbHkto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745447409; c=relaxed/simple;
-	bh=PSn2Ym+IrgVLRTNnl+RAsPv/cJDcB9cRnBpKHyLT9ss=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g3yf7+DWWsC9EnczKTQyfgc1ISSTjpmnwGhmy2wjtqfYq0GcOPE34mJ3nPXPmbqBafUQs6QzJgl0z9ZdzNuiaw4ySa8BBLU8sJJzcM3KGKUYyrrFhNQjC7krCBlYHSqSlnBLNu6XavO0yCf38yrENITOLo3KDhQTnVPLepQwMCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dhKTNHhj; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c865305d-b10b-4f67-b466-cc05a57dccfe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745447402;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BppaMnUaT5ao5D/mw/RQZpbCdeA3kIveXo6RuEuwJPY=;
-	b=dhKTNHhjOqFRp5rH5Wtxb5SOrqw6w5RohSfdq0CVRYUo8/BjCDIySx0agC7qtXvHhvIMPo
-	dSpS91ni0GUM7N7OSgq1DKcwI+ttqFLwIHBMsoiRq5YDykdheghqT8D5ADA/36k2DoHrIJ
-	mQq3i8JWf7/lTjNBrS+O6fK3KHwG6L0=
-Date: Wed, 23 Apr 2025 15:29:53 -0700
+	s=arc-20240116; t=1745447448; c=relaxed/simple;
+	bh=v7uvC031KbxPygQ0Q81LLAIVu0y2fzp6RXRgtN9+ces=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=okCIwT6KX12t6ngRH3nNNOYKA9WhPnsSB+76lCO3k0S8Jo69TsrpguLuImK0VQo/pHyEx6bP8HRpysD/QdrZZa5m8DR3JfyaR0kjZJqbfzbMvZDc46Z6u5ToTHPrDs/2gAKIyv6OetBU5nm3vBEq2zL8JCZkLffxTtj/Ros4L50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrRV4qEm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E1FC4CEE2;
+	Wed, 23 Apr 2025 22:30:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745447447;
+	bh=v7uvC031KbxPygQ0Q81LLAIVu0y2fzp6RXRgtN9+ces=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HrRV4qEm6Cum6fI3+/bCX5YNQAKLuTD927Q2pC/abmq7LAWalH9WkoEGZvSIU/kh3
+	 S7dfEp4onAh4HJ6uLpqCPOOPpEH+7/W8e1MLo50qTkHIzGz/D0fUvrf6Y8jP4WKbjl
+	 bHw3fi2RMZhStqMTCmsvuPZ2Hmx9wVT1a7goTJk2e6HyLXSIpyi3shdN7mmM4QJg8z
+	 CjCuXWcr8WZOERehn2xkctPrjdLpoKCivbf0+u34uldkimkfjPgaISQ0J/Qki/LSA0
+	 1kMQAGNrv26tHwdDS9IpulTnccD01AHMATiBSM5acU6uhDPAudunhyYoI6ivvlmqOd
+	 lM48p9wYIM5Jg==
+Date: Wed, 23 Apr 2025 15:30:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner
+ <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, Roman Gushchin
+ <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, Vlastimil
+ Babka <vbabka@suse.cz>, Eric Dumazet <edumazet@google.com>, Soheil Hassas
+ Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Meta kernel team
+ <kernel-team@meta.com>
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+Message-ID: <20250423153046.54d135f2@kernel.org>
+In-Reply-To: <ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+	<20250422181022.308116c1@kernel.org>
+	<ha4sqstdknwvvubs2g33r3itrabepz2jwlr3ksrbjdlgjnbuel@appekpf6ffud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to perform
- XDP_REDIRECT into maps
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/23/25 10:44 AM, Lorenzo Bianconi wrote:
-> In the current implementation if the program is dev-bound to a specific
-> device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
-> or CPUMAP even if the program is running in the driver NAPI context and
-> it is not attached to any map entry. This seems in contrast with the
-> explanation available in bpf_prog_map_compatible routine.
-> Fix the issue introducing __bpf_prog_map_compatible utility routine in
-> order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_call()
-> at program load time (bpf_prog_select_runtime()).
-> Continue forbidding to attach a dev-bound program to XDP maps
-> (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
+On Wed, 23 Apr 2025 15:16:56 -0700 Shakeel Butt wrote:
+> > > -	if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+> > > +	if (nr_pages > MEMCG_CHARGE_BATCH ||
+> > > +	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+> > >  		/*
+> > > -		 * In case of unlikely failure to lock percpu stock_lock
+> > > -		 * uncharge memcg directly.
+> > > +		 * In case of larger than batch refill or unlikely failure to
+> > > +		 * lock the percpu stock_lock, uncharge memcg directly.
+> > >  		 */  
+> > 
+> > We're bypassing the cache for > CHARGE_BATCH because the u8 math 
+> > may overflow? Could be useful to refocus the comment on the 'why'
 > 
-> Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
-> Changes in v2:
-> - Introduce __bpf_prog_map_compatible() utility routine in order to skip
->    bpf_prog_is_dev_bound check in bpf_check_tail_call()
-> - Extend xdp_metadata selftest
-> - Link to v1: https://lore.kernel.org/r/20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org
-> ---
->   kernel/bpf/core.c                                  | 27 +++++++++++++---------
->   .../selftests/bpf/prog_tests/xdp_metadata.c        | 22 +++++++++++++++++-
->   tools/testing/selftests/bpf/progs/xdp_metadata.c   | 13 +++++++++++
+> We actually never put more than MEMCG_CHARGE_BATCH in the cache and thus
+> we can use u8 as type here. Though we may increase the batch size in
+> future, so I should put a BUILD_BUG_ON somewhere here.
 
-The change lgtm. Please separate the selftest changes to patch 2. Thanks.
+No idea if this matters enough to deserve its own commit but basically
+I was wondering if that behavior change is a separate optimization.
 
-pw-bot: cr
-
+Previously we'd check if the cache was for the releasing cgroup and sum
+was over BATCH - drain its stock completely. Now we bypass looking at
+the cache if nr_pages > BATCH so the cgroup may retain some stock.
 
