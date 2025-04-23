@@ -1,172 +1,114 @@
-Return-Path: <netdev+bounces-185149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D13A98B9C
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:43:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACBD9A98BBE
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:47:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C006163907
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CDFA3B9CC0
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DC21A8F8A;
-	Wed, 23 Apr 2025 13:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C511A08DF;
+	Wed, 23 Apr 2025 13:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i45NS8VH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3P8AxUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC5C195B1A
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBAA1A08A6
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745415797; cv=none; b=f7Al3iMbsXDkPJhibn/IM08EDFpfg+YQ+KoAM6zx5wfRRGeohphag0d93mBbUFrLPUCnfzLTD2FmuUAHYVEzKaV5qPAR8aDCNX1qKJrZmXGSpM9RV0sh4JQVlzEo+1nnq3vTA6SMUYGeFAau46HvwtTy1yNYHdHQbR3c7a+CTuE=
+	t=1745416014; cv=none; b=W/erEfu4JWpTQxQppsppj6lWZym9jI3thfG0y9F3oa2uj9i5NJzGFWMp4cY1ua4+yug9lT0eyL0Nknxk/be6eSkaEm6nrOLqPNplbQ5O3PkOqDBn0PGTwuXJX5jj5RHTDTwgybSylAoMBArWVc2jpOJcyyLYGxX+zn+Ag+ojEXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745415797; c=relaxed/simple;
-	bh=2oNxgFh7wQy3eSTXUuVVZ5YrZWKlKCIvbcZjJzlgFfk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fmBZHf0nsVVtEXBTXd3uz1u0i2epiT2ktlVy+xVH3xOt8jmPGb75gLfnx/+KNxXCvHx9cxRfo+nJrJiKjfRFlhGMJOT4znt3qogSjm6QfyumgJV+21GUEQQ7BHLloHsqZj3HyohclVfK/F8fXj8MfU2hHltIjmJW81h07OuhK+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=i45NS8VH; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso62196805e9.2
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 06:43:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745415792; x=1746020592; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FfrnhMcNKf5rCGWHGoNIZp7mNgbnWoHESdB7RpEhfqo=;
-        b=i45NS8VH9j1Oz0y0h9MAM2BESfQeaGh+Dh+a6FJhpDkpc/b5nSBZi6eUChnC3FtqOB
-         h9RYFH9VVn2NY3O6feDekcZTqtzU81CFECv4chNYTcRWpXluuaXpyhvsUJrIwD3lvj0i
-         g541zgQKukKKx5+D2EpbjzeO6J/1nFSeAOSvvyYJxVgmqlHzBUegXZf2/O1wUR5QnTKL
-         etVuKR5KPf5z13JejwrvSqbRsCW4zFAUwncAbqrA9TIS7dVdUaGFDyNAeWQ/6swPf5U3
-         0bD/tIlq0iMfTnvTVLaD15P8xHbFsCCKpyh6UgibOswlmcmWqOM6njeJJ+ECcYGXv+aY
-         XnHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745415792; x=1746020592;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FfrnhMcNKf5rCGWHGoNIZp7mNgbnWoHESdB7RpEhfqo=;
-        b=Q8Se6el1dM8Wkal8jpbi2+T22uAue9T8CwJioIx8mmwmvqM9ADmRZGOKK+cqDuNqY6
-         L7iZeBjHHstZS8F6mLhwZ9SLzuenI64brZf1jOe4eoviP8kXTm/7/QNN9fP+Q4zCplDN
-         rySZbeqhirtsKuwA59xRb7RTp2je3kVA5kxBLrRz8HE6ggcTCng6llkzTX/2CJifKMgK
-         sDTmQvYjiRXMtQTUdgEhE9U9sR5vag714IZk/NDQubqAVZa7+ao4wweS4CiY1Yngs2+V
-         a+xS5n38hKY5b0VIY8hIlNb4xN+ehKUiJdNf/gk0kt5Vse8yR0ZcqNluApHOa6kYcEpF
-         ndaw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3CnFrJKI8CEA2Pu3F66im9u73m90umsJI3yiWzgrVfU5stg7Buzlq6hO5ZygMyR9mViK0Xe8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8s0kMn2n6sOxAL463/J5nFlUzyuyPBrrll3ZJ/G9m3JdJhtnd
-	bsW/S43BjUXn2Jhh4O2NsfjBDoXuqIPdgZkGdEUb6skCcsy6mPamPryKgZVF2wc=
-X-Gm-Gg: ASbGncs7Dj95UR2Xcuco00uf72IYl557SL1aMVxK978pXeDvSptzoT/P7LnDKLGqo3c
-	I5dBaPBEZrw/7XA25NGKb0aI5oMHiCGB8fqKKH0wnUXBZe0+NATvgZzpM0Op4+4tkBNEfElcnZq
-	/rrtENmTZLE204EUQo8V1Z9UpY27mh/WSH7MDKNUGw74oTXa98atR4B+5rHfkbSYlb6wQb5WjYd
-	tSM0yTKJXeCPjiq4/VXwFA+4abTobPISPPA3sVo3JjerblFGznT5VpyV7lpnbzBjRB8h/F3Q7ZW
-	inAeYKZsyF15R+SRCpdZA0or+oQdJTxg+LjdtcTcOQDXhb0AHe+QdT4cc9QShNRLGF9wIs4j5+K
-	PyEyA1d+1wMMRKDXxIw==
-X-Google-Smtp-Source: AGHT+IHnS/+w8vgB7Qer4VFmmeqW2fg9vqIPQjMtQu2PKuXwZePY3kDPFYEnC2G7XWePQ888jen21Q==
-X-Received: by 2002:a05:600c:5027:b0:43c:fa52:7d2d with SMTP id 5b1f17b1804b1-4406abfa6bcmr157183955e9.20.1745415792377;
-        Wed, 23 Apr 2025 06:43:12 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:3d9:2080:2835:c2f4:c226:77dd? ([2a01:e0a:3d9:2080:2835:c2f4:c226:77dd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-44092db2ba6sm26108245e9.31.2025.04.23.06.43.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Apr 2025 06:43:11 -0700 (PDT)
-Message-ID: <1acbe9dc-02ca-4233-a79a-901e714f5c9c@linaro.org>
-Date: Wed, 23 Apr 2025 15:43:08 +0200
+	s=arc-20240116; t=1745416014; c=relaxed/simple;
+	bh=yHmOW04DPppLh8IfziITDSuZp7e8mfznwZ/kZcUjsmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LpDsDkmZ9qR3r81sjmKlXTO0/h6ddRoKFuHYDAcTx3jk4viqD79hni3p6v6DrN1ZQ34rbgE1uNKd5HaOTSiSgqFbuj4/6OarXspcIJ09IMb8j1xVUiPvpXZCE5aIYaUh0cKfpWPXFADglCSpt9K5bB3Olwh8vHe6WRg5Ay/Gx5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3P8AxUy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A28C4CEEB;
+	Wed, 23 Apr 2025 13:46:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745416014;
+	bh=yHmOW04DPppLh8IfziITDSuZp7e8mfznwZ/kZcUjsmQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B3P8AxUyEwdtKNOvnAldK82ebTk1P0wOghBPErzA1uotXCjE8fC3ox5xs57jL75fh
+	 K8En2G9rHmRry7TdRWxI1A8LP4ngqfQC8oUbQKMgdPh8AKjw+JFjgcW8pF9r8BtcqR
+	 O979OYT7ai9+aJSCNzHLa4QTFtghqkWi3WJr5ATU1D0UrQ1Y4Oe8shM5YFO989IR5b
+	 CDQ+1QILQHPPqbtpuEZlh2/n3uYLKsqhs6utFrEEG5LZoXhBxZ4107wCDwYy7myPDE
+	 4IcBaJUOpDbLYipMNqpzmLEY2YiEYIjJVPtpWpkGbvVcgTzUqruONvr9R+3ghULI+O
+	 eMnWWGTuRCbnA==
+Date: Wed, 23 Apr 2025 06:46:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
+ dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
+ jdamato@fastly.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 19/22] eth: bnxt: use queue op config validate
+Message-ID: <20250423064653.6db44e9a@kernel.org>
+In-Reply-To: <a5uokb5qgp5atz2cakap2idwhepu5uxkmhj43guf5t3abhyu4n@7xaxugulyng2>
+References: <20250421222827.283737-1-kuba@kernel.org>
+	<20250421222827.283737-20-kuba@kernel.org>
+	<a5uokb5qgp5atz2cakap2idwhepu5uxkmhj43guf5t3abhyu4n@7xaxugulyng2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 32/33] dt-bindings: display: panel: samsung,ams581vf01:
- Add google,sunfish
-To: Danila Tikhonov <danila@jiaxyga.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-hardening@vger.kernel.org, linux@mainlining.org,
- ~postmarketos/upstreaming@lists.sr.ht
-References: <20250422213137.80366-1-danila@jiaxyga.com>
- <20250422213137.80366-16-danila@jiaxyga.com>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20250422213137.80366-16-danila@jiaxyga.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 22/04/2025 23:31, Danila Tikhonov wrote:
-> This panel is used in Google Pixel 4a (google,sunfish). Document the
-> corresponding string.
-> 
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
-> ---
->   .../bindings/display/panel/samsung,ams581vf01.yaml        | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml b/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
-> index 70dff9c0ef2b..a3a1de32d8be 100644
-> --- a/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
-> +++ b/Documentation/devicetree/bindings/display/panel/samsung,ams581vf01.yaml
-> @@ -17,7 +17,13 @@ allOf:
->   
->   properties:
->     compatible:
-> -    const: samsung,ams581vf01
-> +    oneOf:
-> +      - enum:
-> +          - samsung,ams581vf01
-> +      - items:
-> +          - enum:
-> +              - google,ams581vf01-sunfish
-> +          - const: samsung,ams581vf01
+On Wed, 23 Apr 2025 10:00:01 +0000 Dragos Tatulea wrote:
+> > +static int
+> > +bnxt_queue_cfg_validate(struct net_device *dev, int idx,
+> > +			struct netdev_queue_config *qcfg,
+> > +			struct netlink_ext_ack *extack)
+> > +{
+> > +	struct bnxt *bp = netdev_priv(dev);
+> > +
+> > +	/* Older chips need MSS calc so rx_buf_len is not supported,
+> > +	 * but we don't set queue ops for them so we should never get here.
+> > +	 */
+> > +	if (qcfg->rx_buf_len != bp->rx_page_size &&
+> > +	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS)) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "changing rx-buf-len not supported");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	if (!is_power_of_2(qcfg->rx_buf_len)) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len is not power of 2");
+> > +		return -ERANGE;
+> > +	}
+> > +	if (qcfg->rx_buf_len < BNXT_RX_PAGE_SIZE ||
+> > +	    qcfg->rx_buf_len > BNXT_MAX_RX_PAGE_SIZE) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "rx-buf-len out of range");
+> > +		return -ERANGE;
+> > +	}
+> > +	return 0;
+> > +}
+> > +  
+> HDS off and rx_buf_len > 4K seems to be accepted. Is this inteded?
 
+For bnxt rx_buf_len only applies to the "payload buffers".
+I should document that, and retest with XDP. 
 
-Why do you introduce a new compatible ? using samsung,ams581vf01 is prefectly fine
-if it's same panel.
+I posted a doc recently with a "design guide" for API interfaces, 
+it said:
 
-Neil
+  Visibility
+  ==========
 
->   
->     reg:
->       maxItems: 1
+  To simplify the implementations configuration parameters of disabled features
+  do not have to be hidden, or inaccessible.
 
+Which I intended to mean that configuring something that isn't enabled
+is okay. IIRC we also don't reject setting hds threshold if hds is off.
+
+Hope I understood what you're getting at.
 
