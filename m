@@ -1,194 +1,90 @@
-Return-Path: <netdev+bounces-185143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA8FA98B2A
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:32:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4996AA98B36
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 15:33:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F69E1889F10
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:31:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2C5E3A4B4A
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 13:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC0018D65F;
-	Wed, 23 Apr 2025 13:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02291624D2;
+	Wed, 23 Apr 2025 13:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aRFmbBeB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5c9+nTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6F046447
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDB774040
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745415084; cv=none; b=ubalIQVtcn8AJ6HI0eHKIMugdmhYWodpywK7E82CQx8uSa1Jd+WULxJ23Plc7N+kUeUh14fFxKlpOpqmQS47jIK3i/PtUzRPH3dBWsWeZqrWgkM3tQp7qnUWjI+0wCRiF/ZtdiwhNwoH5FH19bGUN4X+P8l1XsORDf7MZJLFDZY=
+	t=1745415231; cv=none; b=ajgi3IRkIpJe1lD1NbZpTf+QCFuAncg2FTX3+qITJZDns9sCdHfB7frlpHBM4+mAJFzjquEmjrBlybYtn4BLnxBWl271QzSo7cMmLLqdRA5ou1RY8pV5m13wKBU6s3u8bY/MWk6nWCTeolbZcG2e28UuHxB9MBrxxmhFCQB/xwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745415084; c=relaxed/simple;
-	bh=YPWbosimC3qPkFIdP63gOcohPto8jVI/bjwvfdxo1T0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VVPQ0IVWA0kw6NtqrxSDY4hqJ3ARr8WYDXDX4k57AUqBGgrEv+xqFFslr7Yj+cTxJCX5HZRuYvnm74YBdIqrvWAX/kXIFoqGbTTvX1niK4tmcTqtHH6Eu2blH6qU5R488/fZzEnYSV0WriVTMAM96UjfT99PM4nUxfipiiN0DjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aRFmbBeB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53NAU2lT014698
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:31:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=dZWmP9gM06dWmEKtYYm5mxy3
-	nQnWFD6fy7umPVrKHi0=; b=aRFmbBeByAGZvNocZKi/oi6Wq9yS71NB7meeiNC5
-	6VkTz4uk1rAlDwQDYkckfe+r/03dNhtgy7dh+2+Iin9RD7qbRHx4v3mwbz8Ow97h
-	ejZTDBqmtXWtDK+WEkkHf15QK+jfNOnAAQXhFkEjaaxpfGWCEyay7Mt/FAf72jw0
-	F3IeOZ8obV2qKlRVtyVqR5wLUIBRsGu+Q26lSN1UbKtQkAYB9rBL2DwdnrGHAgnc
-	hTIHQdArOuO3M5xjZ5odE/21yDszB7JUx3h2mWIQSALFgyWOlqgUKlB804XHgytT
-	avZVqKi6iPhVByNXlcHdavlosu/o2JgNgovILUgMNI6MHA==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 466jh0j8du-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 13:31:21 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c5d9d8890fso185873585a.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 06:31:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745415080; x=1746019880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dZWmP9gM06dWmEKtYYm5mxy3nQnWFD6fy7umPVrKHi0=;
-        b=vZ1r5F/IhlDbKo8OFG88UWuWpYWm1nR5twlKzfpCQ7mW/MjaYj7uMWk/fh7IebOf88
-         +knd8nlCPcoesRMGJF+G+KErs1eM6MxjqFqL4VVWGSW4noBpgZ5F+uooPd/6fjBc04Mf
-         BlStJrUMbFX88jPO7leEixygHN2Wob00jf3vi3Ut/L7FQARNCnK+x9S1HwHyoUR/AZmo
-         pitvImS9C1Rzq4VWoAyMep7oUA3aQ/ZCJQ8svVZb/aS1W5u32RlkezEH7b+xLsfx/rxx
-         u0No7ypTttpAsMcyPw+qMoAZCzQvWSs/UUrg7EsGSuFsm+c7MijqpIhrXxUwAFPAA0pz
-         /vgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXA9TA/FerWWEm0km1zWc+S8Kvn6HjYuzXSs1vD8BtOkNSImkjI2k9++eZRrGAxlRvURsS+MRw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbvArOiFPwIyikm83jMWksnK2vp6MMzUe6BjJbmV5FRWZkOWmI
-	I10qRS2Ko1pJdGpSkgCKd2/zJJplPiSBAukiKio2BubDZFYiPl4Oc1Cv5tnlb5IGUbF09nzkgX1
-	rLlUZOpzq11ePeKA8jN+E3Kd8eIEmjwbGoSCfiy9JVL6ioUNEEOknuCM=
-X-Gm-Gg: ASbGncs0pzqsJjchTcSVULJhpi6bk1/P3FO7TgEpwM+wjKDeVznpSUQtzLABYS+jTU8
-	ig2Sh6k0d0YjBmfnDny2jeqkEh7tb6j34S8RKHgEOEvYdzzRm3lLrEZvIM44lMvVoasZE8fY4d6
-	6BAtcrI9xEEG48c9Hk3CrUrZTJUB5exjzeF4xqzhNjZ04nX3EUcR0RdFWwcXd31/7/oFD8CQ2Ij
-	zC6o1iVsPKNkl8q1yxmpyUzOSeOOSAWpovH+9do+9M9v/R+GuNNdGHSaB/uTnNlj9wfAc/sCeFU
-	Cpr9Z1uKhCJUt56iNpCanDWUaLxRQz1eKpDpSK0+6W+5S3xbyUBnFNGytApBA7LhT8uDeXBzyZQ
-	=
-X-Received: by 2002:a05:620a:24c5:b0:7c3:dd2d:c0e2 with SMTP id af79cd13be357-7c94d83dee5mr484768785a.13.1745415080682;
-        Wed, 23 Apr 2025 06:31:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpfJbI+AgBKtKkvkNrS86sfl4ggqkejOcLK4vPJLKCGSN66njI9kIk5rDo+YJT0RY1DWgIxg==
-X-Received: by 2002:a05:620a:24c5:b0:7c3:dd2d:c0e2 with SMTP id af79cd13be357-7c94d83dee5mr484758485a.13.1745415079978;
-        Wed, 23 Apr 2025 06:31:19 -0700 (PDT)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--7a1.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::7a1])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54d6e5f61afsm1578477e87.246.2025.04.23.06.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 06:31:18 -0700 (PDT)
-Date: Wed, 23 Apr 2025 16:31:16 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Danila Tikhonov <danila@jiaxyga.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Rajendra Nayak <quic_rjendra@quicinc.com>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Wesley Cheng <quic_wcheng@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
-        Kishon Vijay Abraham I <kishon@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
-        Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>,
-        Srinivas Kandagatla <srini@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Georgi Djakov <djakov@kernel.org>,
-        Loic Poulain <loic.poulain@oss.qualcomm.com>,
-        Robert Foss <rfoss@kernel.org>, Andi Shyti <andi.shyti@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Taniya Das <quic_tdas@quicinc.com>,
-        Sibi Sankar <quic_sibis@quicinc.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-        Imran Shaik <quic_imrashai@quicinc.com>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Jessica Zhang <quic_jesszhan@quicinc.com>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>, Kees Cook <kees@kernel.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        David Wronek <david@mainlining.org>,
-        Jens Reidel <adrian@mainlining.org>, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dmaengine@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        iommu@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-hardening@vger.kernel.org,
-        linux@mainlining.org, ~postmarketos/upstreaming@lists.sr.ht
-Subject: Re: [PATCH 29/33] firmware: qcom: tzmem: disable sm7150 platform
-Message-ID: <3skwipkunn6dw4xtzyx4vdiqiwtu2qgezbel3vcu5k4cxk65yi@csi6xun5nlyj>
-References: <20250422213137.80366-1-danila@jiaxyga.com>
- <20250422213137.80366-13-danila@jiaxyga.com>
+	s=arc-20240116; t=1745415231; c=relaxed/simple;
+	bh=LAggvedjfM3/QkWgHFlxHtpbw+YmZ4PQd5zXikFl3c8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rzh1OizEc5xwFRUUcm5YHkYlwKRrnv+tSPDXLiJLtomotsrBQ/LSUlzXpyScDrfFyExpZTYXioTM74Equ9bxZTtmrKyMKc3RCrP61P6tXIXAKL4Vmr1OYPm4QdXNadWU0cakuAfUbUUHxcbwwLkAhj+ECIrKQ/plzKBmph1Plao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5c9+nTy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4CCC4CEE2;
+	Wed, 23 Apr 2025 13:33:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745415231;
+	bh=LAggvedjfM3/QkWgHFlxHtpbw+YmZ4PQd5zXikFl3c8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p5c9+nTy3DxHN57sYIMI8MDDAZ7nOGXfIZfb/CV6LRDjm8pB1taVu9G2l8/yhvNr4
+	 NLDvQAOkanbBhPlzbRQ+Y18MkDOdXT9DauD0nYwczZpTfeUKxTkTPZqAQ6VCtOO1LT
+	 +azi5ImTWG0P8DYif0/tOt3EW0vXqdDAD+6AyOrr7mn7ULAA6nzU9Fq6NEDxv1HbBq
+	 sTB+BEfqLm4zab0skb+1Yh6T5veebCcPgQyUOZIrxurWOOqhZA8d5f1T21zScgDmcB
+	 pEijtONFMuGnKCafusL2Aj7NlADVqCK99vQSYNx2G1gIIolFJlzwzvpBDoahoAO1Pj
+	 ikwlZXAziWwyA==
+Date: Wed, 23 Apr 2025 06:33:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, netdev@vger.kernel.org, marcin.szycik@intel.com
+Subject: Re: [PATCH v2 net-next 2/3] pfcp: Convert pfcp_net_exit() to
+ ->exit_rtnl().
+Message-ID: <20250423063350.49025e5e@kernel.org>
+In-Reply-To: <aAimsamTlQOq3/aD@mev-dev.igk.intel.com>
+References: <20250418003259.48017-1-kuniyu@amazon.com>
+	<20250418003259.48017-3-kuniyu@amazon.com>
+	<20250422194757.67ba67d6@kernel.org>
+	<aAimsamTlQOq3/aD@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422213137.80366-13-danila@jiaxyga.com>
-X-Proofpoint-ORIG-GUID: tHqCZ0V2BXCG_GFXsnr_tL8lpvTE7Nlf
-X-Authority-Analysis: v=2.4 cv=ftfcZE4f c=1 sm=1 tr=0 ts=6808eba9 cx=c_pps a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=7ibcVnAUAAAA:8 a=EUspDBNiAAAA:8 a=UlxMoeSB6LsTFmt9i7YA:9 a=CjuIK1q_8ugA:10
- a=PEH46H7Ffwr30OY-TuGO:22 a=HywIFdX19-EX8Ph82vJO:22
-X-Proofpoint-GUID: tHqCZ0V2BXCG_GFXsnr_tL8lpvTE7Nlf
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDIzMDA5NSBTYWx0ZWRfX0mDDz9tmVm0q e/rNoOFa65ICrOemzlP9ufXsGx9CVcDOizDmooMZB03VrUSZtgUOyzTLGq09LJaWwuBTZvOXw3Q D/YoID5fh9kTcWUla1/aTrPGo11QjbXOhulqVkhGcLDogGbKCgMzspXUSFsNLlcdobZL5maC8aH
- hIZg7SRFEsNtFCVYY6dv3h77vvHxz5YIYAgmsGEc27v5Znl1HfOZXvmDoGGY0adpR1C/6VS9hNi OMCcRMv31OQ7SoMHL8C0SFIdIPYFGIAqTJ8PWIcBKSsVAP8Z/4hfdTgjk9P76bpwrRvlNjKX9uf y18pGRkqirkzDeirDL7wKPwgKRKF3WfH0y3MK4pWYeUi9T1nJ465OYU3B2GglYFk8+AE+7w1vUK
- yCCp6RKPdYm6/zRqLXut5tAr0srz/8SNfvkIO02G3DtX488BVcwv3Fiwg1Oxw2NJtpWW3Xyl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
- definitions=2025-04-23_08,2025-04-22_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- suspectscore=0 mlxlogscore=841 lowpriorityscore=0 phishscore=0
- malwarescore=0 impostorscore=0 adultscore=0 spamscore=0 clxscore=1011
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2504230095
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 23, 2025 at 12:31:33AM +0300, Danila Tikhonov wrote:
-> The SHM bridge makes the SM7150 devices reset while probing the RMTFS
-> (in qcom_scm_assign_mem()). Blacklist the SHM Bridge on corresponding
-> platforms using SoC-level compat string.
-> 
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
-> ---
->  drivers/firmware/qcom/qcom_tzmem.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
+On Wed, 23 Apr 2025 10:37:05 +0200 Michal Swiatkowski wrote:
+> On Tue, Apr 22, 2025 at 07:47:57PM -0700, Jakub Kicinski wrote:
+> > On Thu, 17 Apr 2025 17:32:33 -0700 Kuniyuki Iwashima wrote: =20
+> > >  drivers/net/pfcp.c | 23 +++++++---------------- =20
+> >=20
+> > Wojciech, Micha=C5=82, does anyone use this driver?
+> > It seems that it hooks dev_get_tstats64 as ndo_get_stats64=20
+> > but it never allocates tstats, so any ifconfig / ip link
+> > run after the device is create immediately crashes the kernel.
+> > I don't see any tstats in this driver history or UDP tunnel
+> > code so I'm moderately confused as how this worked / when
+> > it broke.
+> >=20
+> > If I'm not missing anything and indeed this driver was always
+> > broken we should just delete it ? =20
+>=20
+> Uh, I remember that we used it to add tc filter. Maybe we can fix it?
 
-Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-
--- 
-With best wishes
-Dmitry
+If it really was broken for over a year and nobody noticed -
+my preference would be to delete it. I don't think you need
+an actual tunnel dev to add TC filters?
 
