@@ -1,91 +1,128 @@
-Return-Path: <netdev+bounces-184948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-184949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E10CA97C76
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:50:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D8FA97C7B
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 03:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BBF9169FE1
-	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:50:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66EF87ADD42
+	for <lists+netdev@lfdr.de>; Wed, 23 Apr 2025 01:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4446A263F5B;
-	Wed, 23 Apr 2025 01:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E62F26388C;
+	Wed, 23 Apr 2025 01:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gw2Xi4CO"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="FUNpT0BZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1D2566DF;
-	Wed, 23 Apr 2025 01:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B992566DF
+	for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 01:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745372896; cv=none; b=Oz1nP4S7Vb63zXNMJnZqtc65saFjYtjyr+G5veRe7yM2pv6H/V3rfVb8kv55XfP0XP/+WL1z8/0UQhA6ECh7BwIPLHKaOJZRARMxXhhYzhBqlgzHtTAPTXnspuFaDdGxl0tzB+lLIRld2m/L5eyxq0jV2Z0ItqddP8brVv5bh0k=
+	t=1745372947; cv=none; b=oTM1KPxBSGaBy75ypwsBz/mqa3n25y4lfjt13f8oqw8Usk4CtcjwUwIXAoqyCUv2DhBxJ65/OvGj156BaO4TPaHYxFR0eurzqUUJdwG4axpFqRFX9E9m2kXChFCoAonGc4gGQCvZakLLGHUiQbH5sCgAlm9ZN5wrulA7Uqumi50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745372896; c=relaxed/simple;
-	bh=b2Ty2Y4IHTlG+wCuGIQJJ+LjqBQxitk5tYKjHEox70M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+TM2wiHM2KLyb+3zmhZqX4b4GHWp2wz5Q5+VeT3CFrtlf/Zt5Eb2m35p0Kv3AWGUwj7IVkrDj2lc16IbRY3WcS2AvCityKLuJ4nmh7TOx9Im32X6LkBrC7x2Wc9VbDYINtctaoPKUIst3Bs0VdjZOOpFjh/o9tZ6YpkDY7EJrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gw2Xi4CO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6879DC4CEE9;
-	Wed, 23 Apr 2025 01:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745372895;
-	bh=b2Ty2Y4IHTlG+wCuGIQJJ+LjqBQxitk5tYKjHEox70M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gw2Xi4CODtGpUsSD2n7vzegKZNAZrX7v7cP5MoWILH/deNzm1Mc6zYYPZyjAgzEUP
-	 b5RHT7XkZw9rcxU1kAdZouBfsUPF/Ea6MAS1C68foXvQn9KlVl1IUKD/p+MG0GKTiM
-	 e7OhHfTpWbI2gj2556A0HiCdv0k1eWyDTlWcfRaeLCq1PCYJo5Qt8Npe4cXlvMXjQI
-	 VGQ2xKKQRHKx628jjrIuDHLjjb4OtLDEEonf3W43a6W0ZNI6itZhkhcbkxzEAMvFtR
-	 +xBrfrLCLoDih5+yyQ3T9OaZ0DOQcb76WYojV5Dr/7OoVmG/CXNhQCNblxrZvQCD9f
-	 syV4wS6dwAtzw==
-Date: Tue, 22 Apr 2025 18:48:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, "Russell
- King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro
- <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, Biju Das
- <biju.das.jz@bp.renesas.com>, Fabrizio Castro
- <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v8 4/4] MAINTAINERS: Add entry for Renesas
- RZ/V2H(P) DWMAC GBETH glue layer driver
-Message-ID: <20250422184813.02b21095@kernel.org>
-In-Reply-To: <20250417084015.74154-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250417084015.74154-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-	<20250417084015.74154-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1745372947; c=relaxed/simple;
+	bh=ckkWUT/xderljp85srBq8CewP/4u2qXDhejWjPahdMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPr+jWOlksrKojBu8qFkbLOTU7m6lvzuTLRFZk8HwmakeWGck7qcqjtw92fRXB8WECKP9BC84Jto+TVeHvX7ONeqE1hNGe0e5FZTvvehEdDcJucZWTlLPyWyIiOdzeT8JzN+QiwByG+2lFdkSjYhJ3Hfm1as2MXvuFdOy7JyFGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=FUNpT0BZ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7370a2d1981so4790627b3a.2
+        for <netdev@vger.kernel.org>; Tue, 22 Apr 2025 18:49:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1745372945; x=1745977745; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aratRX3GRbQd0qysev0iEy+ZcM4r/zDaLLFPtb+pO10=;
+        b=FUNpT0BZ0z2QT9NPVQGHbyOqrtJtjgHdcCbg7jWHMsq20tWyFGEiCmCgSGIyPZfYpo
+         IDIEbzii6Oby4XjOWq67mEqg/2BfzwgEzpqWg0F/1kAQgSmR3DttBiqEJbqNepLsbgwY
+         7OMBMrAfY2uYvrQukxZ0RTzg8Yb/pXnS+BSsc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745372945; x=1745977745;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aratRX3GRbQd0qysev0iEy+ZcM4r/zDaLLFPtb+pO10=;
+        b=Ey6kwPT9ZOtVE519y9iOBBavD1nYiXukNMpRh6md0hK+UiF6AxEp07aE7YmIR6xoMX
+         ajJmevIvtuxmZfZCnuNZVwZeRKEdtBCks6X5msafGDJjkYC/4sQwiXsgSB1JP794tlFs
+         V8mTgdeuBX21A1FSr75Aux/BbGbZlIIqXuNHb4lcVzi15usWVUHlcdr7lY8+AhbQb9PR
+         7pZzy8Qnd6HPtsq8vmKBKgryiJRKeQ+b1/QpSnUbD0E7inIxjCspAjjTLUYmiwU51vbD
+         Z3qLhMwnWsXMxXc0GBU1Y2LbkbBruMlJQrz1plUKSZrBSb13Aua9457aw0DxzYsEMaS7
+         6lFA==
+X-Gm-Message-State: AOJu0Yw9IDEiosWmGk20GeLfXg/UKlLtcswZsJsswPJUQACXPrQrGRa8
+	KAGnWULDe72sMRMaAK2829ODAkXw6FYUO1GXHmXAGtKcwKL9ANxqkIgJLKSS5us=
+X-Gm-Gg: ASbGncvAkb1YKrHR8/YCubD+qb6Q8XftYbVthoORVWP0dg13GAaGar0hXvUVVDVItMa
+	HvTRv3Ao+03qwTb+9+lSpqCkMu8AVq1U1quL4Ud0Lb5KtCAlhCxBd6YxjvoepBEMjjWiEncc1DF
+	n4LRFztG3640axNeXcll3/UtMdADJkFfb7A+493NhlH/H7yeAloZPw8Q00aUZlkvTyHU3Ch9A+E
+	SulSYoCL9UraScwVHbvEGstf2dJHVVhKgMvPoZuo+FUgQl06JCkiOOZMmNQ98243Q6Ihv3gEfK6
+	oRHX+rxG6CKmy+uBJnxZmwbZ2l2ui4eR6GISfJSCfjt0JGzez0nzu1MTiIcs7fcLDH3BVMomQrO
+	U0a2aaBI=
+X-Google-Smtp-Source: AGHT+IG1V6w8PoW8HpIHJlOW/cURA2YNsA3KkFsPZNzMXgLxdjhLsNpC/+YYH9kU0qfn3ptgft9YrQ==
+X-Received: by 2002:a05:6a20:9f9b:b0:1f5:59e5:8adb with SMTP id adf61e73a8af0-203cba9836emr25980226637.0.1745372944856;
+        Tue, 22 Apr 2025 18:49:04 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73dbf8e3631sm9749625b3a.51.2025.04.22.18.49.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Apr 2025 18:49:04 -0700 (PDT)
+Date: Tue, 22 Apr 2025 18:49:01 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
+	andrew+netdev@lunn.ch, willemb@google.com, ziweixiao@google.com,
+	pkaligineedi@google.com, yyd@google.com, joshwash@google.com,
+	shailend@google.com, linux@treblig.org, thostet@google.com,
+	jfraker@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/6] gve: Add initial gve_clock
+Message-ID: <aAhHDTWQ9k6_Eid5@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
+	andrew+netdev@lunn.ch, willemb@google.com, ziweixiao@google.com,
+	pkaligineedi@google.com, yyd@google.com, joshwash@google.com,
+	shailend@google.com, linux@treblig.org, thostet@google.com,
+	jfraker@google.com, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <20250418221254.112433-1-hramamurthy@google.com>
+ <20250418221254.112433-4-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250418221254.112433-4-hramamurthy@google.com>
 
-On Thu, 17 Apr 2025 09:40:15 +0100 Prabhakar wrote:
-> +RENESAS RZ/V2H(P) DWMAC GBETH GLUE LAYER DRIVER
-> +M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +S:	Supported
+On Fri, Apr 18, 2025 at 10:12:51PM +0000, Harshitha Ramamurthy wrote:
+> From: Kevin Yang <yyd@google.com>
+> 
+> This initial version of the gve clock only performs one major function,
+> managing querying the nic clock and storing the results.
+> 
+> The timestamp delivered in descriptors has a wraparound time of ~4
+> seconds so 250ms is chosen as the sync cadence to provide a balance
+> between performance, and drift potential when we do start associating
+> host time and nic time.
+> 
+> A dedicated ordered workqueue has been setup to ensure a consistent
+> cadence for querying the nic clock.
+> 
+> Co-developed-by: John Fraker <jfraker@google.com>
+> Signed-off-by: John Fraker <jfraker@google.com>
+> Co-developed-by: Ziwei Xiao <ziweixiao@google.com>
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Co-developed-by: Tim Hostetler <thostet@google.com>
+> Signed-off-by: Tim Hostetler <thostet@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kevin Yang <yyd@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-I'm going to make this Maintained when applying, please see:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#supported-status-for-drivers
-
-> +F:	Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> +F:	drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
