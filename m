@@ -1,106 +1,135 @@
-Return-Path: <netdev+bounces-185698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFC5A9B69A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:41:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 148E2A9B677
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D03913BF898
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:41:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37E2C5A500D
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D141828FFED;
-	Thu, 24 Apr 2025 18:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6E728EA4A;
+	Thu, 24 Apr 2025 18:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="GcZBwvFW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEkR48Nm"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward202d.mail.yandex.net (forward202d.mail.yandex.net [178.154.239.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9D31624E5;
-	Thu, 24 Apr 2025 18:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2C228BAA1
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745520106; cv=none; b=ceK/ruuPsQWv5/L2PPxG6UDh9o7mkCpTjH9lw/DdAC6MF7VfByQmDdXofzJXWU8HxyR8M/5P5r76mao4rHGlv+4AkCcEKrTxd7YlSAMnGONVt/TS7JyEyt6Mkh5+msu0X8FC1pM1TKrzTsp3+UWwZWcab9f91cYFiyEb1OMogGk=
+	t=1745519842; cv=none; b=LI4VooP0cMBbQ/yyScjKV0qF8BdM1jHPc9znC0GZ0Rm69mb+OZRXBQjbH4jvFdBXZDRwUYRb79vr2KsKRh8d0qZgWghP3R6nLE1TRXdjIuFGSWHqZTeN9k6g3Fy2a312ypOC9cwMJB3s0u7CxE3firpVSNaEfyr3eSbnNLHYZiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745520106; c=relaxed/simple;
-	bh=UY7mwzK6h3h/JHCIa8gPjepYiPqxs1+ZGL7ML4m7Lc0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I+eE2LlGME2Fbiy2qN5yFcF9Ai9nwnKakJKaJktI5vTsGBbvDfO1dY+MvFcg7jidenhyUXtBrUPf1CxMVK9VJEehQpPCUU6XKiJkj/3zYCtBcu/4tDI4nrJ7d2B7s9TrFL5Mhu774qTQjD1WNHb0wRZ206rB34IbxwnOQi7NjmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=GcZBwvFW; arc=none smtp.client-ip=178.154.239.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
-Received: from forward100d.mail.yandex.net (forward100d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d100])
-	by forward202d.mail.yandex.net (Yandex) with ESMTPS id 2DC43689D4;
-	Thu, 24 Apr 2025 21:33:56 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:3bcd:0:640:dc38:0])
-	by forward100d.mail.yandex.net (Yandex) with ESMTPS id 075F160027;
-	Thu, 24 Apr 2025 21:33:48 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id kXVCAB2LZmI0-s6An8AkH;
-	Thu, 24 Apr 2025 21:33:47 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
-	t=1745519627; bh=9699AcloeCDb7D22U3eJAvZmA6C/RcO8yloHAzmxeEk=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=GcZBwvFWGhzYWKa9NQMASVuJBRpvlkYld+BsaOPqKfl13YUPViF8gaZJ3zpsyBMdb
-	 KDLpkzrEiV8s0HNRIWdiY2w+lhHpUbJAc7sp9iNHRXI22CYeEJVLFWUXVfyurU0ZIJ
-	 fjQCzYrIsxvJq1gI0U0TKhe8rIpXDy1K/E54Xurc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-77.klg.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
-From: Alexei Safin <a.safin@rosa.ru>
-To: Stanislaw Gruszka <stf_xl@wp.pl>
-Cc: Alexei Safin <a.safin@rosa.ru>,
-	Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] iwlegacy: 4965: fix possible out-of-bounds access in il4965_tx_cmd_build_rate()
-Date: Thu, 24 Apr 2025 21:33:38 +0300
-Message-Id: <20250424183338.3277-1-a.safin@rosa.ru>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1745519842; c=relaxed/simple;
+	bh=+ObrAILT9MkV5shE5b54uVUAUE30hCzzXTVkWGYXhw8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cmsfQZgqAWE6Llyh4XESMeybefctD6EQD5VRZEISGYQK7FyS/9JM83mbx/iMMtGSNzHJaYFKwyw4TS+JX/BDF5wYvXpZsmvvNzLM00Cu2NXENSiA+lFo9hf0gl6gXTrOfNLrjGbXnT6PO7tLjz+sXLMp+WJTRPkEBajSRTykYy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEkR48Nm; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43ef83a6bfaso5355e9.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745519839; x=1746124639; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yNqctYL3THrGPUgjPioxVFaahQ/pztGGq3mgBrGdeIA=;
+        b=KEkR48Nmw3ARC98RUya/+7ej53CBzhGZXZN0R9eQHTvrufmKK2/FzYklC//bw3JciR
+         yK9nYiEKti2OfipZrKXr5p7sDtaNfWYGKisfDTTUCdiaSg+Fjr7JC+Mxbs3WrsVdETJn
+         CuekIjCAkY6kpM1bkcZHlralAJJ4mhl4F0kTpv52gOAUi7FmnXT7LwG3yvtde7IVv004
+         qju9AU+8x2Xcc0XZ3tzlm3GlxmBYHsc1CzAe9ydNcNciqhlyMELZ5OdibRNnqAjo72DA
+         rIQtFovm1ZhjEwjIoCp6tCFIcZnXmZiftsLuULeHe1LJ2L4uQ5BP+MApJ3EDROSEB/HB
+         ySkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745519839; x=1746124639;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yNqctYL3THrGPUgjPioxVFaahQ/pztGGq3mgBrGdeIA=;
+        b=wBDxS48UcreR/wtUreZyEWZ72xbkR5jrbAbBCrs0pNZ2gnsL2jlPVi8N4nvsWbp22q
+         1Z+RbVTpGfI+U8FhfCXJthl0Dy2+7bL9yvvUgUxjCw1ZD9+MR3fj+48d6nKRfWTL3a3h
+         Yy/DvBy/4NHh01re3etDLU2BTpub2utzSrl4R8Gz/pp/DXRenD5zjRRYS0oeyIYjBp3O
+         lUJKG4/C0Xh+tRQvws7nQCT8ZHIaqRmmMdKyYm3rCNqCH6lXF3FEj2qbFPgM9yO4fnEW
+         V44Ptq0D4ULkzVMC/zSEM4VbdRCe5toJy1k+KQ5z9OTbhvBSwblyhDo8Bgb8w0xjrQP6
+         6Xiw==
+X-Forwarded-Encrypted: i=1; AJvYcCWovR1j+OnSwA7x3Gg5t2POe+iIsyOnN7y6UNWvU0rqqbfAyrTOBRyuchmqRDI7t2i0mGHNL70=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPY+w5T2dMzwuZ0VinyRZ+XkbXhJurbg/a6j+OxDFoellIlp7I
+	BfqmRbT4koyg6X6ZqgBS4Pig/5lAid9yNHcgGYWcI2Auqk1zgeP+LKdh8R2OcGKk17xU/cc7jcB
+	yaG95PmBuHLO1h62mL2uV5tAU1eDH7HgRQN43
+X-Gm-Gg: ASbGncu7G28LV0+Gg+pn9/6Jc9ri1+g8eqCNZPYYvZWEPmb2Fp4p2U04SWQc+c3MeGQ
+	CrQdXnxG19XyrCrk90DgYSOrxD2iBC5TD1Wf+qgPR64dxdggFKYdVBg0yXG0NAGsGRAIVHaTPK7
+	x7ITCH4v0ODIwAzJHd4pMlqH+9F0dT27bczsmHR8nhOrms/mau1pAr
+X-Google-Smtp-Source: AGHT+IEHp5xBpPTtWdZMCzH+i0q9BEJGwYBYE7/dAlz0v4nOND8LIunN0ki4CNECu8NBZl9yPLxj0Z18YNBl1Z62spA=
+X-Received: by 2002:a7b:ce10:0:b0:43b:bf3f:9664 with SMTP id
+ 5b1f17b1804b1-440a44c1c39mr72835e9.5.1745519838948; Thu, 24 Apr 2025 11:37:18
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250417204323.3902669-1-hramamurthy@google.com> <20250423171431.2cd8ca21@kernel.org>
+In-Reply-To: <20250423171431.2cd8ca21@kernel.org>
+From: Ziwei Xiao <ziweixiao@google.com>
+Date: Thu, 24 Apr 2025 11:37:07 -0700
+X-Gm-Features: ATxdqUHZZkXp_HEGK61LJUBhezgIo7ojwCvAQNi8CpuLohtbOPKgVVzGIJimasw
+Message-ID: <CAG-FcCPexBHubfzRcVUsBXRYkY0v-ricG-yqLd5q1j051cbEoQ@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Add adminq lock for creating and destroying
+ multiple queues
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, jeroendb@google.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, pkaligineedi@google.com, willemb@google.com, 
+	shailend@google.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
-rate_idx values greater than or equal to RATE_COUNT_LEGACY.
+On Wed, Apr 23, 2025 at 5:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 17 Apr 2025 20:43:23 +0000 Harshitha Ramamurthy wrote:
+> > Also this patch cleans up the error handling code of
+> > gve_adminq_destroy_tx_queue.
+>
+> >  static int gve_adminq_destroy_tx_queue(struct gve_priv *priv, u32 queu=
+e_index)
+> >  {
+> >       union gve_adminq_command cmd;
+> > -     int err;
+> >
+> >       memset(&cmd, 0, sizeof(cmd));
+> >       cmd.opcode =3D cpu_to_be32(GVE_ADMINQ_DESTROY_TX_QUEUE);
+> > @@ -808,11 +820,7 @@ static int gve_adminq_destroy_tx_queue(struct gve_=
+priv *priv, u32 queue_index)
+> >               .queue_id =3D cpu_to_be32(queue_index),
+> >       };
+> >
+> > -     err =3D gve_adminq_issue_cmd(priv, &cmd);
+> > -     if (err)
+> > -             return err;
+> > -
+> > -     return 0;
+> > +     return gve_adminq_issue_cmd(priv, &cmd);
+> >  }
+>
+> You mean this cleanup? That's not appropriate for a stable fix...
+>
+> Could you also explain which callers of this core are not already
+> under rtnl_lock and/pr the netdev instance lock?
+I discovered this and thought that this applied more widely, but upon
+rereading it turns out it only applies to upcoming timestamping
+patches and a previous flow steering code attempt that was scuttled.
+Current callers are under rtnl_lock or netdev_lock. Should not have
+been sent to the net. So will send as part of the timestamping series.
+Thanks.
 
-Use a correct bounds check to avoid accessing il_rates[] with
-an invalid index. The previous comparison allowed rate_idx to become
-equal to RATE_COUNT_LEGACY, which exceeds the array limit.
 
-Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
-'rate_idx >= RATE_COUNT_LEGACY' to ensure memory safety.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
-Signed-off-by: Alexei Safin <a.safin@rosa.ru>
----
- drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-index 78dee8ccfebf..f60d9b9798c1 100644
---- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-+++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-@@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
- 	 */
- 	rate_idx = info->control.rates[0].idx;
- 	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
--	    || rate_idx > RATE_COUNT_LEGACY)
-+	    || rate_idx >= RATE_COUNT_LEGACY)
- 		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
- 	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
- 	if (info->band == NL80211_BAND_5GHZ)
--- 
-2.39.5 (Apple Git-154)
-
+> --
+> pw-bot: cr
 
