@@ -1,126 +1,108 @@
-Return-Path: <netdev+bounces-185685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305CAA9B5C2
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:51:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D69CA9B5F5
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0B64C196E
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:51:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12B61BA04AF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC1928E61A;
-	Thu, 24 Apr 2025 17:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A849D1FC0EA;
+	Thu, 24 Apr 2025 18:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="BVFv6Rd/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GNApvPhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E64C28A1F9;
-	Thu, 24 Apr 2025 17:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8FD28BA85
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745517098; cv=none; b=rE5kcYSuRgDaoD8DKO+VCUQe9UG3iZL0GEuQFg7/lTwnScFVtgH5jJfjJtnVzXdiIldhHirVZN1VmE8+pCfS2jDuXhv/QJEngX2bTY+JZwxHbqI2SE9ZQ/pCsImsBKubZr4OPCtFn+Y+nsd0MfZ11McjFHhF5BWvdntNga9QuxY=
+	t=1745518025; cv=none; b=JYIdjgaH/S29Jct+xZO4jmV305/3L5RzFLKHuHvx6Xf+0rby+jhyhd058biQTYeYOKZQY28nxly2sRVfXgxmv/GYSoVh7Cku2RyXlsQe4Ao26ObjPXYi5u7QIhphIkuNcIIYqop+6vlCgAeettafd6St49Mdz5z/HnMOTAtFTs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745517098; c=relaxed/simple;
-	bh=vRUzZpZGFJolMKWVih6pSIskaMZx/C9W0RbkMI/WUL4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LKlpA4b/4oDwkQ8qJSMnIiazcrirqlLRcfTpbrAt9Ekx3oePVrKE53pHbCdcp9WAP2qC5w+e7k2Yad4ygOUjQc3hU2WharHFDxjNp2SI7O9516ni97Q0iJbdw67JV72FuQsc6hWFV3VIESrpK00nP5xQnyfVKW73bx8DYl+mr6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=BVFv6Rd/; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53OHooUY1383060
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 24 Apr 2025 10:50:51 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53OHooUY1383060
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745517053;
-	bh=vRUzZpZGFJolMKWVih6pSIskaMZx/C9W0RbkMI/WUL4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BVFv6Rd/IQ4J/PYHV3nN9oqAwGme4iFBImZRL6GTcMhgw7NYKI28t7uuoVpBh6PKp
-	 Qy2xaOL92iZPXBKZt18DClDdHu3Cu26OIl4X3wCxR6sP5IvdC0f2A7gL/3A2OrpX9K
-	 vBDJPG7XgmIA8lWPglrxwu2BGk3JKhEvcr6RSlKe2FpGUDSIGQIrDKIZmZn49EaoYL
-	 ADBESCC4Zsb4bWa7wGLDCdPOl+K3TeEVWdgeOHMFTdiA2wKrluDoC86oJ/ps6iqrBb
-	 f6WH3cQT18xQO9Bmnlmpr31eZorHV057tP0mCCdH9T/XCtwTZdzP0kYWRlcnS5Uvqb
-	 Rvudk3Z8FPKfA==
-Message-ID: <b90ead3b-75fd-464f-aa93-5afdc7ee0f02@zytor.com>
-Date: Thu, 24 Apr 2025 10:50:50 -0700
+	s=arc-20240116; t=1745518025; c=relaxed/simple;
+	bh=ta5uwZDYWisxxM12KjjF1QgxHL63HaMu0WevHhYe1ZQ=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=kxwsPZLiGxo/lY/IZz9kYtpXtrZmETqu7XsMI9+OxVp8w5IzzAi9Md+4l4NoGdFDc8/ljOveH/59+ekfG9gn2/m1WrI8AezYLVDblHgJE2KK65Eloe14RFgOuE0n+cCH8FR8MxUo7wmANj4RPxBozq95YFcv3QfFIFm+Ha/4Atk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GNApvPhf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745518022;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=5+vSqsQhIhaN4+ReXmp4a/18RE4upAKYHd+YtcarN9I=;
+	b=GNApvPhfPL2w+c54bxephNJq/gDm98Sg/qT4h8RiaXAJFMalOEAr+e82/aKSdK1Ib4Hg2F
+	H0UGacwhl4fAD0s7GlaIqkEreeXqck1ibT84se0KTI2dck4WadOH+hwPO/x0V3EzCI7UAa
+	/Ubuumu4uFO6CXs3pHr2tC6DzLRF9YQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-547-8IGoqjXZN3CLvNUkuKphkQ-1; Thu,
+ 24 Apr 2025 14:07:00 -0400
+X-MC-Unique: 8IGoqjXZN3CLvNUkuKphkQ-1
+X-Mimecast-MFC-AGG-ID: 8IGoqjXZN3CLvNUkuKphkQ_1745518019
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBB3F19560A1;
+	Thu, 24 Apr 2025 18:06:59 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A675180045C;
+	Thu, 24 Apr 2025 18:06:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+cc: dhowells@redhat.com, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+    Tony Nguyen <anthony.l.nguyen@intel.com>,
+    Paulo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Is it possible to undo the ixgbe device name change?
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 13/34] x86/xen/msr: Remove the error pointer
- argument from set_reg()
-To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
-        namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-14-xin@zytor.com>
- <7c7de4be-e8d0-45b9-9212-186d79e95512@suse.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <7c7de4be-e8d0-45b9-9212-186d79e95512@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3452223.1745518016.1@warthog.procyon.org.uk>
+Date: Thu, 24 Apr 2025 19:06:56 +0100
+Message-ID: <3452224.1745518016@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 4/24/2025 3:11 AM, Jürgen Groß wrote:
-> set_seg(), please (further up, too).
+[resent with mailing list addresses fixes]
 
-Good catch, thanks a lot!
+Hi,
+
+With commit:
+
+	a0285236ab93fdfdd1008afaa04561d142d6c276
+	ixgbe: add initial devlink support
+
+the name of the device that I see on my 10G ethernet card changes from enp1s0
+to enp1s0np0.
+
+This is a bit of a problem for my test box because I have Network Manager set
+up static configuration for that enp1s0... which no longer exists when that
+commit is applied.  I could change to enp1s0np0, but then this would no longer
+exist if I want to test a kernel that doesn't have that commit applied.
+
+If the name doesn't exist, booting pauses for about a minute while NM tries to
+find it (probably a NM bug), so adding both names isn't an option either :-/
+
+(I don't use DHCP for this adapter as it's directly wired to another test box)
+
+Alternatively, as a compromise, might it be possible to omit the "np0" bit if
+the adapter only has one port?
+
+Thanks,
+David
+
 
