@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-185381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6391AA99F8A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 05:25:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C23D9A99F95
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 05:28:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C32123B869F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 03:25:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13E8F447B07
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 03:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A561A3BC0;
-	Thu, 24 Apr 2025 03:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E194C1A9B4C;
+	Thu, 24 Apr 2025 03:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267A542A82;
-	Thu, 24 Apr 2025 03:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C9519ADA2;
+	Thu, 24 Apr 2025 03:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745465111; cv=none; b=U5RB7/iJvPUDQ92GUe5QiUbFySu14UI4b/I8FrNvCZCbe1f9zHF+TRdTogrdwit1hdXlUbea7N8B7eq+OSWWAhZ8lSqCgj7ZK40d5GhAYMUIeeCvT32Nxpw9WL4BkLz9CCzYcbwF4Zqqz5A0C38yBMd88M0mvMwoynzZ+TJPAic=
+	t=1745465322; cv=none; b=GxnBZnz5+xxgrhK512hoqlNLHbhF8X/GpQBTLremSOketNnylOLM3rhL/rGOJz6nRabIc0ibnHoy4d1iJy1OX7jwJQHmtDUkyI2nRpAY62iHJvGCCogKHdlEe7o2u63ky4ldgmfefhDmZWCWLw+a4c/EkmV5hpQ8oopHplLKVlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745465111; c=relaxed/simple;
-	bh=fmK306GqM09TGZOU24Fy14i1C+SkYrZmUh5ZU5CZGW0=;
+	s=arc-20240116; t=1745465322; c=relaxed/simple;
+	bh=I7bN184Qa6b68f8r0qfbTkBDm69Fk0wjcaJ3BS1XiGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/Adyky9w9zU9m+Eo6xtYMvrsjOb1RqpeMWEC0AqJR1gJLcgHLqWzLT14C+Ya7O6Gv+W9LVfoh1y3xGVO9m9pno8e/IASAEsL4MQgxUKeF3rQHSYCbwGXQMPsDP0kNpsrVslzGhujnbE0eILPtp/9gjo9oSsV8skQ+xvAXyzwFc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=JXR6lnzI/Y4HMpXtfpKnC5GZoPVm7RzxDtZicyiLXy8K58rJMn4ZrKM1gtE3o10Jz3JbIRpgIYm413xIKzKHQjE7hlu3Zi1oHaJaw91dRc2iQzIa+wFxAiDJghDbcwgd3OlknERS1vzPZdB/PNFkOzirFC/awJDojZTIdyWSJJ4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
@@ -34,9 +34,9 @@ Received: from localhost (unknown [116.232.18.95])
 	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id 4ED3333BE00;
-	Thu, 24 Apr 2025 03:25:09 +0000 (UTC)
-Date: Thu, 24 Apr 2025 03:25:05 +0000
+	by smtp.gentoo.org (Postfix) with ESMTPSA id 55D0D342FED;
+	Thu, 24 Apr 2025 03:28:40 +0000 (UTC)
+Date: Thu, 24 Apr 2025 03:28:36 +0000
 From: Yixun Lan <dlan@gentoo.org>
 To: Andre Przywara <andre.przywara@arm.com>
 Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -51,12 +51,11 @@ Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH 5/5] arm64: dts: allwinner: t527: add EMAC0 to Avaoto-A1
- board
-Message-ID: <20250424032505-GYB47799@gentoo>
+Subject: Re: [PATCH 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC
+Message-ID: <20250424032836-GYC47799@gentoo>
 References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
- <20250423-01-sun55i-emac0-v1-5-46ee4c855e0a@gentoo.org>
- <20250424021706.22eaab66@minigeek.lan>
+ <20250423-01-sun55i-emac0-v1-3-46ee4c855e0a@gentoo.org>
+ <20250424014314.146e088f@minigeek.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,74 +64,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250424021706.22eaab66@minigeek.lan>
+In-Reply-To: <20250424014314.146e088f@minigeek.lan>
 
-hi Andre,
+Hi Andre,
 
-On 02:17 Thu 24 Apr     , Andre Przywara wrote:
-> On Wed, 23 Apr 2025 22:03:26 +0800
+On 01:43 Thu 24 Apr     , Andre Przywara wrote:
+> On Wed, 23 Apr 2025 22:03:24 +0800
 > Yixun Lan <dlan@gentoo.org> wrote:
 > 
-> Hi,
+> Hi Yixun,
 > 
-> > On Avaoto A1 board, the EMAC0 connect to an external RTL8211F-CG PHY,
+> thanks for sending those patches!
 > 
-> The name would be "Avaota" A1 board.
+> > Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
+> > including the A527/T527 chips.
 > 
-> > which features a 25MHz crystal, and using PH8 pin as PHY reset.
-> > 
+> maybe add here that MAC0 is compatible to the A64, and requires an
+> external PHY. And that we only add the RGMII pins for now.
+> 
+ok
+
 > > Signed-off-by: Yixun Lan <dlan@gentoo.org>
 > > ---
-> > I don't own this board, only compose this patch according to the
-> > schematics. Let me know if it works.
-> > ---
-> >  arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
+> >  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 42 ++++++++++++++++++++++++++
+> >  1 file changed, 42 insertions(+)
 > > 
-> > diff --git a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-> > index 85a546aecdbe149d6bad10327fca1fb7dafff6ad..23ab89c742c679fb274babbb0205f119eb2c9baa 100644
-> > --- a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-> > +++ b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-> > @@ -64,6 +64,23 @@ &ehci1 {
-> >  	status = "okay";
-> >  };
-> 
-> As for the Radxa board, we need an alias for ethernet0.
-> 
+> > diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> > index ee485899ba0af69f32727a53de20051a2e31be1d..c3ba2146c4b45f72c2a5633ec434740d681a21fb 100644
+> > --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> > +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> > @@ -126,6 +126,17 @@ pio: pinctrl@2000000 {
+> >  			interrupt-controller;
+> >  			#interrupt-cells = <3>;
 > >  
-> > +&emac0 {
-> > +	phy-mode = "rgmii";
+> > +			emac0_pins: emac0-pins {
 > 
-> As Andrew mentioned, this should probably be "rgmii-id".
+> Both the alias and the node name should contain rgmii instead of emac0,
+> as the other SoCs do, I think:
+> 			rgmii0_pins: rgmii0-pins {
 > 
-> > +	phy-handle = <&ext_rgmii_phy>;
+ok
+> > +				pins = "PH0", "PH1", "PH2", "PH3",
+> > +					"PH4", "PH5", "PH6", "PH7",
+> > +					"PH9", "PH10","PH13","PH14",
+> > +					"PH15","PH16","PH17","PH18";
 > 
-> Can you please add the phy-supply here, it's reg_dcdc4.
+> I think there should be a space behind each comma, and the
+> first quotation marks in each line should align.
 > 
-> Cheers,
-> Andre
-> 
-> > +
-> > +	allwinner,tx-delay-ps = <100>;
-> > +	allwinner,rx-delay-ps = <300>;
-> > +
-> > +	status = "okay";
-> > +};
-> > +
-> > +&mdio0 {
-> > +	ext_rgmii_phy: ethernet-phy@1 {
-> > +		compatible = "ethernet-phy-ieee802.3-c22";
-> > +		reg = <1>;
-> > +	};
-> > +};
-> > +
-> >  &mmc0 {
-> >  	vmmc-supply = <&reg_cldo3>;
-> >  	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_DOWN)>; /* PF6 */
-> > 
-> 
+will do
 
-all above comments make sense, will address in next version
+> PH13 is EPHY-25M, that's the (optional) 25 MHz output clock pin, for
+> PHYs without a crystal. That's not controlled by the MAC, so I would
+> leave it out of this list, as also both the Avaota and the Radxa don't
+> need it. If there will be a user, they can add this separately.
+> 
+make sense
+
+> > +				allwinner,pinmux = <5>;
+> > +				function = "emac0";
+> > +				drive-strength = <40>;
+> > +				bias-pull-up;
+> 
+> Shouldn't this be push-pull, so no pull-up?
+> 
+will drop
+
+> The rest looks correct, when compared to the A523 manual.
+> 
+thanks for review
+
 -- 
 Yixun Lan (dlan)
 
