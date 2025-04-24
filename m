@@ -1,162 +1,96 @@
-Return-Path: <netdev+bounces-185656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294EFA9B3D3
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 829CDA9B3FE
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5613B98EA
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:22:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80EB59280A7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E581C27B4F8;
-	Thu, 24 Apr 2025 16:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F922820AF;
+	Thu, 24 Apr 2025 16:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDfwp4+f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4qjxZvR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315B65BAF0;
-	Thu, 24 Apr 2025 16:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58AB72820AA;
+	Thu, 24 Apr 2025 16:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745511768; cv=none; b=s35JWcWRCJPnE4pDH4uKmOZxMw9xItpuNe7TT9pKi3CLOqbkgKUkPoeQZMaZsO2JiGfL0oJ+XhSLxQFrJitxHCdU/KRUavu+rohoazZ+VEyfhpR+ZR+TYmL1fJXQtpBAWFYugmCrEPTi0kUwejJOMrQZrDvecj1GNfpyopL2rvc=
+	t=1745511889; cv=none; b=UrJ4sN8LvMisjULZ10x1QmNOOKQuuyGkQyJpVKsfwK0DCP56iVYjYLd1Ykx9ca/XhN9cuw3plSHzWv60R2Ydb+5MpQfn0GKLNTEEL+4zTxT6o3/xT+CMcW6PA69H2c2iaTWwpumV7CrmDxkrpr36RsZloVKbopfYdJ80QckmH8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745511768; c=relaxed/simple;
-	bh=3+XlnP4ZIi0Boi78IxKkmV6330u4OI8yZ6DyTgI7uHA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=txoMiwLFewHiRa7GRHdQuCd/Q2DHvOumG/VKnZ8No1mmwAAL503ZhJSsXSr9YozJ6VGtBXznXQTn3BaRZ7kfAf2B69WaO7fwM3xdu74z58ZYpuac4O1K6mFy1ClNCRw3L0uS9VY01DaXe5rQB4nY78zW+1RFam8HdIur8G2LSsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FDfwp4+f; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-39c1ef4acf2so1016193f8f.0;
-        Thu, 24 Apr 2025 09:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745511765; x=1746116565; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8PbFB/8kHDMc/YDyWse6m4570g+LrAowPtrzkDrTWHs=;
-        b=FDfwp4+fs54lCARsgn1a4FDwZiHHVPgOn3C5vi0xyxIH2AAWGI9pKBt5PneafLe53U
-         x1lMmThOi/gxbPZ1lQOPXBQz//95mUB31DPDGh17X4e1sHMqsDrTF0Eqh4BbF7aczCSf
-         FwpcMXkdpcFHNXbJe0HXuqRrD1zmvd2LIEAUlRtLyP3UqNBSq3wIGn6oQFnPC8iuXMzj
-         l8JA+tzreT2oGan4m98bBS3HT81M79IInUrsTi5oWTR0ajEtOeFvbr1E3TEIn6fXfK4g
-         ccuw/n2vlVElCyAtTrUs3pjrK4soEV9VortdQ53UHut8bxiFRQfJu9Jc73OkqTWQCgDL
-         E6gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745511765; x=1746116565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8PbFB/8kHDMc/YDyWse6m4570g+LrAowPtrzkDrTWHs=;
-        b=aiUr2atSCo8EA4eWGUxx8I9i1MOgoUAYElZcVDoY4i7GRRtDeZQK46Na/6W36Ic+FE
-         fVIW4P8bZ/IaqfKhn2FeB7tKWBTiLEaMMv63062F9KcEseILsISnsazsJ6fjXsRA/owz
-         DifOsuhGKJ8Pv7+O6eZNutDKzLVC6SONKXRVd8BbxT2AbcjRXzgFeRaUyHBg/NFcOFTl
-         dvQyCdDSvrQbcVz33UfhG+XQqp8f5OHbDti5Jop+joi+B0WdaUU6VSg7b5q+86nUxojw
-         g/HtUiaJAvjyO15aI3/18AWYmCWTW4Oj5gqpj0zubNm4qZ2LV9ABhPrO9dyxnOmyYGFO
-         TjYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWm3Whk3LTpagf73kg7VaUhgcu2iDvU85luPB75qFY/G7Ldp7uC7frTCid6EJFq7q5aWwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzxs2pbhvZWRuurkGr/10CqwgHLH3K0bWpNVVhZL/wmPoTmAfZE
-	W37/S2zf359z/L1dwZIkOFQ19cM/4EMtAJLxzcPgpLY7QtlpnTCBJaJ1Kr1BqZTJb22tsO4BrW6
-	kzgO8hUFqhbItiqObmn0RM7aGBicmhc08
-X-Gm-Gg: ASbGncucw9uoeGHY9SEBRTO7bF/qLcEf9Ix4cezB4OfUPdvidQbdP2yJepYyK4gIoIH
-	ISmwttvgZJQMsbxMvSJd1Nq+V6O0sbKtoWgSzjJcyIkBTOkni4iOA8a3nO6IyJdAAoPvyNiu44H
-	bA+1hDUO96+hX7QTqk6+ujYdjK5H12fsOQKg1t
-X-Google-Smtp-Source: AGHT+IEr1mhHZBCot2ejOcsZr6AkUBB/HZj2xFv0yZmzfkUOd7Atd/lALT3z/e/21t+W+XVjt0ylOtRKVInNH9+d2Ko=
-X-Received: by 2002:a05:6000:40dd:b0:391:2306:5131 with SMTP id
- ffacd0b85a97d-3a06cfabc65mr2991636f8f.45.1745511765231; Thu, 24 Apr 2025
- 09:22:45 -0700 (PDT)
+	s=arc-20240116; t=1745511889; c=relaxed/simple;
+	bh=ehthhJRsT67ePCHd7tekdu+92oqaTFfVHKePVSJFtCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EejDKRAzWFYiLznfyj32IXLB6F86Ys/D9T/bg3+WvoP6rfuChCOUbucZOzujSxcuzp4M4JP3WjTF9hS1QVcDKSiPXJxNN2BLE9K8ksDjfM9ltzDs+gnH40xDiaNd0L0yUl206sOj3glnkK0bncp0n1Q1Wibpnrmv/8NUs4OjyqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4qjxZvR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B101C4CEE3;
+	Thu, 24 Apr 2025 16:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745511889;
+	bh=ehthhJRsT67ePCHd7tekdu+92oqaTFfVHKePVSJFtCA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q4qjxZvR6FaqZL4R+VVLTh009Rpx+NCL7vIjuEb3ilJm/CfGsr2sP411UqEsJFwZ+
+	 Py/Uo/xbi8SxuQ/rkxVjQ+hZulcPX8hjFyqk3YlO6rUw/Spq20yz4sBCYua/PQb02C
+	 V3erMw/pp/3x0K9ybnA/g/IvKSuDpnF7u8aqYCVH9L8u0VC6lmPVwf7tpiYgkr/MuA
+	 vCO2zwMKfeq7/YhEv0S0edvlZkF7sPV5FbCUicNwsyV8G7c/IcbQI1X9mC4xKBYdT9
+	 RXCtJ0PLSX7PhG8oehjhjroD+/n/9RsldsOhLmzEX55LVt8J0BNbTXsV2yhlOcZybG
+	 H+PH/FeUioUPQ==
+Date: Thu, 24 Apr 2025 17:24:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacek Kowalski <jacek@jacekk.info>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] e1000e: disregard NVM checksum on tgp when valid
+ checksum mask is not set
+Message-ID: <20250424162444.GH3042781@horms.kernel.org>
+References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com>
- <20250422-afabre-traits-010-rfc2-v2-1-92bcc6b146c9@arthurfabre.com>
-In-Reply-To: <20250422-afabre-traits-010-rfc2-v2-1-92bcc6b146c9@arthurfabre.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 24 Apr 2025 09:22:34 -0700
-X-Gm-Features: ATxdqUGXdA4oEz7RfZMlL5RnjRHgxfi2G7Ns2b9ewWC096LVtjY6w-vRRdwCjxg
-Message-ID: <CAADnVQJeCC5j4_ss2+G2zjMbAcn=G3JLeAJCBZRC8uzfsVAjMA@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next v2 01/17] trait: limited KV store for packet metadata
-To: Arthur Fabre <arthur@arthurfabre.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Jakub Sitnicki <jakub@cloudflare.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Yan Zhai <yan@cloudflare.com>, 
-	jbrandeburg@cloudflare.com, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <thoiland@redhat.com>, 
-	lbiancon@redhat.com, Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
 
-On Tue, Apr 22, 2025 at 6:23=E2=80=AFAM Arthur Fabre <arthur@arthurfabre.co=
-m> wrote:
->
-> +/**
-> + * trait_set() - Set a trait key.
-> + * @traits: Start of trait store area.
-> + * @hard_end: Hard limit the trait store can currently grow up against.
-> + * @key: The key to set.
-> + * @val: The value to set.
-> + * @len: The length of the value.
-> + * @flags: Unused for now. Should be 0.
-> + *
-> + * Return:
-> + * * %0       - Success.
-> + * * %-EINVAL - Key or length invalid.
-> + * * %-EBUSY  - Key previously set with different length.
-> + * * %-ENOSPC - Not enough room left to store value.
-> + */
-> +static __always_inline
-> +int trait_set(void *traits, void *hard_end, u64 key, const void *val, u6=
-4 len, u64 flags)
-> +{
-> +       if (!__trait_valid_key(key) || !__trait_valid_len(len))
-> +               return -EINVAL;
-> +
-> +       struct __trait_hdr *h =3D (struct __trait_hdr *)traits;
-> +
-> +       /* Offset of value of this key. */
-> +       int off =3D __trait_offset(*h, key);
-> +
-> +       if ((h->high & (1ull << key)) || (h->low & (1ull << key))) {
-> +               /* Key is already set, but with a different length */
-> +               if (__trait_total_length(__trait_and(*h, (1ull << key))) =
-!=3D len)
-> +                       return -EBUSY;
-> +       } else {
-> +               /* Figure out if we have enough room left: total length o=
-f everything now. */
-> +               if (traits + sizeof(struct __trait_hdr) + __trait_total_l=
-ength(*h) + len > hard_end)
-> +                       return -ENOSPC;
+On Tue, Apr 22, 2025 at 09:43:01AM +0200, Jacek Kowalski wrote:
+> Some Dell Tiger Lake systems have incorrect NVM checksum. These also
+> have a bitmask that indicates correct checksum set to "invalid".
+> 
+> Because it is impossible to determine whether the NVM write would finish
+> correctly or hang (see https://bugzilla.kernel.org/show_bug.cgi?id=213667)
+> it makes sense to skip the validation completely under these conditions.
+> 
+> Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
+> Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM checksum")
 
-I'm still not excited about having two metadata-s
-in front of the packet.
-Why cannot traits use the same metadata space ?
+I think that while the commit cited above relates to this problem,
+this bug actually dates back to the patch I'm citing immediately below.
+And I think we should cite that commit here. IOW, I'm suggesting:
 
-For trait_set() you already pass hard_end and have to check it
-at run-time.
-If you add the same hard_end to trait_get/del the kfuncs will deal
-with possible corruption of metadata by the program.
-Transition from xdp to skb will be automatic. The code won't care that trai=
-ts
-are there. It will just copy all metadata from xdp to skb. Corrupted or not=
-.
-bpf progs in xdp and skb might even use the same kfuncs
-(or two different sets if the verifier is not smart enough right now).
+Fixes: fb776f5d57ee ("e1000e: Add support for Tiger Lake")
 
-Ideally we add hweight64 as new bpf instructions then maybe
-we won't need any kernel changes at all.
-bpf side will do:
-bpf_xdp_adjust_meta(xdp, -max_offset_for_largest_key);
-and then
-trait_set(xdp->data_meta /* pointer to trait header */, xdp->data /*
-hard end */, ...);
-can be implemented as bpf prog.
+> Cc: stable@vger.kernel.org
 
-Same thing for skb progs.
-netfilter/iptable can use another bpf prog to make decisions.
+That not withstanding, based on the commit message,
+and the use of e1000_pch_tgp in another Tiger Lake fix [1],
+I think this patch looks good.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+[1] commit ffd24fa2fcc7 ("e1000e: Correct NVM checksum verification flow")
+
 
