@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-185753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68445A9BA69
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:06:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD739A9BA6C
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A40189273F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:06:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAD6C1B60929
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD2121C160;
-	Thu, 24 Apr 2025 22:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215B72820C4;
+	Thu, 24 Apr 2025 22:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSy+o7lE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CiSoiycE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0742A19F471
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 22:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E599628136E;
+	Thu, 24 Apr 2025 22:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745532391; cv=none; b=Cp4Wfo4rRHBuZQ4FiYrvy0dKdeYg1nBB4d/HA9zeksdX/p3m8VPvDXKx4RxX+PUQXXr0+w8W876oQNBwnJkpK2KAArO5blGIZOnqlmw0PFD+nSE5pnN0XDf9jztvzo/5mKoHb5m2q6ApOl9P5qj4bkPAX4vip+rCsYqcqi6JxDA=
+	t=1745532434; cv=none; b=mlcvQQuaNam7UpfYx8OJbMv4k+gD46H2A7A4EPiKsB0z4JeOxTLMMjepEqsERHm2r1T+lNBle/yKkrwsGg9RCw9Bel2CBzblXJZcUxHPmuRl7PXFeZQrgYDxCW9+UIXx0JAv7MLUfqUI/12r4L0BvSuBMTXgn5nXqQ4xnOZKXgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745532391; c=relaxed/simple;
-	bh=TnuUr1ED+BYMeYw1qYEj/B7iPXWy3qS5JD4ftIhr2MY=;
+	s=arc-20240116; t=1745532434; c=relaxed/simple;
+	bh=OvaJnaxhDspEpD+7HCoFKAG+qPMA3h/TjqBh8rM8svA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c9XVZbaj9qRDTboXtHC/vfQQXd691818VHpgY6j4JT6uJyx3FaS4nARtvzClqIj8HJyONmRk8RqV4hve5BvJDMs03vOQK5nbnMPAAdmgtqaG2TOEze9zS8Nzs+N9VhWPRXFUUHWHSMnJcqi1NfG7JDRbLFQj9wvVw9YlEhVBw0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSy+o7lE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05F87C4CEE3;
-	Thu, 24 Apr 2025 22:06:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Nh29cTtlX28wwTmZU18MQx0muDmM24OXMQaGVrw2+NQ+JaF5kAEHzbGnNPsJArmzRfeU53tKf46q5qxt0DkTt/9cKMwGW2uSxgIK3KWaIuQ0OrUzVL9KjVzSdQeYIEVXFH5n0PKrzKCQKsn4F2LGCYGH65I4UR+9Wg2636F5pmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CiSoiycE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0B82C4CEE3;
+	Thu, 24 Apr 2025 22:07:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745532390;
-	bh=TnuUr1ED+BYMeYw1qYEj/B7iPXWy3qS5JD4ftIhr2MY=;
+	s=k20201202; t=1745532433;
+	bh=OvaJnaxhDspEpD+7HCoFKAG+qPMA3h/TjqBh8rM8svA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NSy+o7lEdRZH88rnaP/Bzq9+t7AswB7MG+ryLBG5e3bffYXKfN2howYgaGjItzL1h
-	 h6O68Pgj7TndYfqJ0xHRHgeNEOZdMDV7i5BEeysFCFVwIfLWLXmE3nkfCsu9Aws4dc
-	 E70BBTwTe8cXTPc4U99UTun3Z1Mtutsu3D3fTQlX8VPAhbu5vPM2KaimkxFHCS4mP8
-	 fMAsCzjV+0uk0eGWaQ3EdgKOP+RMzaNrDFBC9M/d/z0H+zY7KTYUts8iMTfSpJ7jpX
-	 9fhodIEN0gzslwP5Z8OGjKLt9HhOxFCdO4k9JvT2PyWwsaNlNBTf+FjtUWaTXtdBv+
-	 6i6mBoT7g+tnw==
-Date: Thu, 24 Apr 2025 15:06:29 -0700
+	b=CiSoiycEuquOYrsTDQSc0NBrVPmbGFqbi63SEuefY1Dz49mij2jCBU6iFF7g0achz
+	 +o0rU+VpVQD5ZgUSMGjzfcp7djasMC5QDdBnqrOvxrTEF6RlCz8eLrG8maj+RDNERf
+	 jSwqiF+ettBrVg+q0nrbJmTjNVH09LKsn5B/s3KXi4w7y+bSWjmecYR5mN6zXj34+a
+	 wEdJEYtS4FIJdep3BSwsF5VGq529lL+d8FEej2rH5Q2CNJg8NNuU21tZSNZCjzSiGG
+	 G59Gr1l9nvKoMb8TbClCB3j5m5Addd6SUcn8PwZhWTFr2SYb/Fft4jLQNSh+W03Azq
+	 i7l0Cq7rA6vGQ==
+Date: Thu, 24 Apr 2025 15:07:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, tariqt@nvidia.com, andrew+netdev@lunn.ch,
- horms@kernel.org, donald.hunter@gmail.com,
- kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v3 2/3] devlink: add function unique identifier
- to devlink dev info
-Message-ID: <20250424150629.7fbf2d3b@kernel.org>
-In-Reply-To: <3kjuqbqtgfvklja3hmz55uh3pmlzruynih3lfainmnwzsog4hz@x7x74s2c36vx>
-References: <20250416214133.10582-1-jiri@resnulli.us>
-	<20250416214133.10582-3-jiri@resnulli.us>
-	<20250417183822.4c72fc8e@kernel.org>
-	<o47ap7uhadqrsxpo5uxwv5r2x5uk5zvqrlz36lczake4yvlsat@xx2wmz6rlohi>
-	<20250418172015.7176c3c0@kernel.org>
-	<5abwoi3oh3jy7y65kybk42stfeu3a7bx4smx4bc5iueivusflj@qkttnjzlqzbl>
-	<20250422080238.00cbc3dc@kernel.org>
-	<25ibrzwenjiuull524o42b4ch5mg7am2mhw5y2f5gb6d6qp5gt@ghgzmi7pd2rw>
-	<20250423151745.0b5a8e77@kernel.org>
-	<3kjuqbqtgfvklja3hmz55uh3pmlzruynih3lfainmnwzsog4hz@x7x74s2c36vx>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v4 4/4] selftests: net: add a virtio_net deadlock
+ selftest
+Message-ID: <20250424150711.7a255935@kernel.org>
+In-Reply-To: <619bc46d-4acf-4c54-bd47-6b482fb76878@gmail.com>
+References: <20250417072806.18660-1-minhquangbui99@gmail.com>
+	<20250417072806.18660-5-minhquangbui99@gmail.com>
+	<20250422184151.2fb4fffe@kernel.org>
+	<aac402b4-d04c-4d7e-91c8-ab6c20c9a74d@gmail.com>
+	<20250423152333.68117196@kernel.org>
+	<619bc46d-4acf-4c54-bd47-6b482fb76878@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,20 +72,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 24 Apr 2025 11:42:09 +0200 Jiri Pirko wrote:
-> This you see on the PF that is managing the eswitch. This devlink port
-> is a representor of another PF, let's call it PFx. PFx may or may not be
-> on a different host. It's a link from PF managed eswitch to PFx.
-> 
-> So you have 2 PFs that are in hierarchy (one is on downlink of another),
-> each on different host.
-> 
-> To find out how these 2 are connected together, you need to know some
-> identification, on both sides. On PF side, that is port.function.uid the
-> patchset mentioned above introduces. On PFx, the same value is listed
-> under devlink info, which is what my patch we are discussing here is
-> adding.
+On Thu, 24 Apr 2025 17:33:49 +0700 Bui Quang Minh wrote:
+> Yes, the kernel returns EBUSY. Loop and retry sounds good to me but it's 
+> not easy to get the return code when using bkg(). So for simplicity, 
+> I'll retry with sleep(1) 3 times when the xdp_helper fails.
 
-Still not clear, sorry, can you show a diagram?
-"Downsteam" makes me think the NIC device itself is a PCIe switch?
+I meant retry _inside_ the xdp_helper :)
+That should be pretty easy?
 
