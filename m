@@ -1,194 +1,144 @@
-Return-Path: <netdev+bounces-185581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4326FA9AFF4
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:59:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8382CA9AFFD
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39FB71B625A3
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 13:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E871D1B61AE8
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289A4189916;
-	Thu, 24 Apr 2025 13:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBTDBoPs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F8754F81;
+	Thu, 24 Apr 2025 14:00:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157981922E7;
-	Thu, 24 Apr 2025 13:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471531F5E6;
+	Thu, 24 Apr 2025 14:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745503145; cv=none; b=rlglJT4zbSeV6I7q1hel8+t3ykXojud1tuXt3JdkPWJgiSPlNaJxPlXwPIBkrewjr+b/BMRjJ9xUUzVku+5agJZJSDuPMXW2gfVczxkQhM3RVUu5N8BDznfNs5JaMf+PDrB2VULD8XSoT6ti76Jog30OjKvN5mkaKSv2FZ0EEG4=
+	t=1745503244; cv=none; b=bSO11JMR2ULdGiTkV4qDJurS/w11LKFzBw85jY8//kf5gASLTkekd55OXJDWDov7UY6ftcQbISX8hErK3RWeRojGdXXIlT1bwHOXeAAMTlXwZ/RBuWObdDlrJaDvjEpnZ/4tSwguBzdC9ASGUdVKugypQ2fQ4olmRgl6ZhVeJsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745503145; c=relaxed/simple;
-	bh=/wS2qyfeKJ1g5QmVsC2qtA6t6KVTFxjhV6QUtMMGuSY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a+vqshbuAA+B6s2ZitplPg7PcSSJgu+W7rhS/7Ic/iBLeOkvTSDgv0ngPM/F/3AqMunjl7hODQQTYpLk/Ia8DT04UwRCB2YHadMChfv1aLvMRgCyeSV53beVyK5r9wLnYOQq2H0E/57ZdB0q4aeqk7a5TPzZb/GfWh0G9xDdPV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBTDBoPs; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7082e46880eso10981857b3.1;
-        Thu, 24 Apr 2025 06:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745503142; x=1746107942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZO12YFKzi4KoiVvc7xW76x/LCsQTlzuhTcAROt1KEG0=;
-        b=IBTDBoPsjOyGWcTlLp5U+fbqnYKLxTQNNnjRE0eBxjjgTGnNgGBPInJWjUKUbe+dZa
-         R1c1E/VI+hbz/RMo/H6wEasgoEl/qay4B6hZpgu1Npt/qoA7T1gp6MrHNNklOBy5cgmx
-         1L3nebbg+Hl49vFNIuW9Rr7W3KL+ojSy0TminPp+238hXB9qFYM2JoXlCFlu8jTObVh/
-         o+1mKm9ds9ESs4GIeo3ifBIY51LQwfWnF+2yo5Zyhy8jN5VfKzSsu81Xd1rFFYj0d217
-         mNwoZcyrC6Vo7ZHq4YspDM7AGykoXNOt46o+rfAvmsswcbnApiP58OZm3/ilgp5dPBZ7
-         zgSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745503142; x=1746107942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZO12YFKzi4KoiVvc7xW76x/LCsQTlzuhTcAROt1KEG0=;
-        b=eb8mu0LFSdMkjQ1/95YQmVa/HgmaZCeUvTk9Tte/TVHGlOIEfoWuBDOmdaJT++eTeG
-         HKEdp+fNf/1BVfAdSNw4UnFEhubZnlW9pOzNTdh2v+I6gwjIFz3fIVZ604nGMaub38Nu
-         8EqanctzDJS81UrWFinUVxNUiwnja+Dd1F9VhSh1JdFuiVXTok2L73ie8O+JtYJ07MTi
-         YPr/NXWZI6reNRXCLalr2MZHQOmEivw+dBQQ+hXCBQXxZE6VRtupP40U2itJKUI3NXza
-         nCqkyGg2Etq3uRfhEWdH+pSsfR4RvCH6RhrYhZCIqnqIrpVTXUBQhHqsONUcfFdeVkOm
-         10Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/nwF/cEXFUcb6sU5kVf0ksCnhPa+U5sW8d6FZd3YISE2ckFMQwjRZjwv+bh3BVoW9jwX14TuL+MafwxI=@vger.kernel.org, AJvYcCXLB3bD20csF79Eb/a4tTP8RIVWwxp26kpAz+9blbdwL1hklMnHFSpig71BtK19nBZtKuZGe1uw@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt0KOwDcD4aun1k7a9miBUnEQ+ns/eMmFrGVNcYCAiJXtj8xxv
-	OaAHK+U5/JQTrcGEx5QLSZoL0rbpcpNhmCnd481UT1jLflIV4twoqz66c++iTHoAlXWtr7z6DtC
-	BlsomRObofQFhSqN8MT2E62+dx6g=
-X-Gm-Gg: ASbGnctRUwc7JJk5N4ZVgoPB852gAdWjj8p6ouNgTUDM6rd2rGZYkMtt8rLkNjLM+XS
-	FEiLQaFSlXA6HiCnWd87CJ7SWGns85Mw4hZ+WuPliGBM7K+iniKHqi5ztRVQqYgjNTWc02fzVaV
-	hx8LWJCeLhnOaWE8+IQmE=
-X-Google-Smtp-Source: AGHT+IHwqpgOt9Q26PQFQWtRKmrYV8P1gwnc5VvyJ5FcB0TIN01J8+K9ePxG06lYnAm+fqtwRLaYCH3Rpl74fZ4E9Sw=
-X-Received: by 2002:a05:690c:488a:b0:705:750d:c359 with SMTP id
- 00721157ae682-7083eda4894mr44030517b3.32.1745503141818; Thu, 24 Apr 2025
- 06:59:01 -0700 (PDT)
+	s=arc-20240116; t=1745503244; c=relaxed/simple;
+	bh=VXBgvoZTtrA5JYDFoyhknIVGp8ZSKhzEYnqrJP640i8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YHFdg9VH4MVpcjDq5aqtyhE3pM4yLNiLZUmTEANpbHblp9o5XZF9y6MhsCE5mypQGrAeRC11UHwfaX5Q0BaE4mMaZpsEz01TjxkFYb7NX5q3nkknqbkOk0qC0DXwlQ39ArRWkUIQvt1QixbSud+R1fazinOEfQaBSiHrvC3yL8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8FFAC1063;
+	Thu, 24 Apr 2025 07:00:37 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C995C3F66E;
+	Thu, 24 Apr 2025 07:00:39 -0700 (PDT)
+Date: Thu, 24 Apr 2025 15:00:37 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chen-Yu
+ Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
+ Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
+ board
+Message-ID: <20250424150037.0f09a867@donnerap.manchester.arm.com>
+In-Reply-To: <4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
+References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
+	<20250423-01-sun55i-emac0-v1-4-46ee4c855e0a@gentoo.org>
+	<aa38baed-f528-4650-9e06-e7a76c25ec89@lunn.ch>
+	<20250424014120.0d66bd85@minigeek.lan>
+	<835b58a3-82a0-489e-a80f-dcbdb70f6f8d@lunn.ch>
+	<20250424134104.18031a70@donnerap.manchester.arm.com>
+	<4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422184913.20155-1-jonas.gorski@gmail.com>
- <20250424102509.65u5zmxhbjsd5vun@skbuf> <04ac4aec-e6cd-4432-a31d-73088e762565@gmail.com>
-In-Reply-To: <04ac4aec-e6cd-4432-a31d-73088e762565@gmail.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Thu, 24 Apr 2025 15:58:50 +0200
-X-Gm-Features: ATxdqUGxE8RDK8LuHitstkRn3GpB3QidAJNNw7_xvXz_vuRnG-LEtKIfyuVz_5Y
-Message-ID: <CAOiHx==5p2O6wVa42YtR-d=Sufbb2Ljy64mFSHavX2bguVXPWg@mail.gmail.com>
-Subject: Re: [PATCH net] net: dsa: fix VLAN 0 filter imbalance when toggling filtering
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 2:34=E2=80=AFPM Florian Fainelli <f.fainelli@gmail.=
-com> wrote:
->
->
->
-> On 4/24/2025 12:25 PM, Vladimir Oltean wrote:
-> > On Tue, Apr 22, 2025 at 08:49:13PM +0200, Jonas Gorski wrote:
-> >> When a net device has NETIF_F_HW_VLAN_CTAG_FILTER set, the 8021q code
-> >> will add VLAN 0 when enabling the device, and remove it on disabling i=
-t
-> >> again.
-> >>
-> >> But since we are changing NETIF_F_HW_VLAN_CTAG_FILTER during runtime i=
-n
-> >> dsa_user_manage_vlan_filtering(), user ports that are already enabled
-> >> may end up with no VLAN 0 configured, or VLAN 0 left configured.
-> >>
-> >> E.g.the following sequence would leave sw1p1 without VLAN 0 configured=
-:
-> >>
-> >> $ ip link add br0 type bridge vlan_filtering 1
-> >> $ ip link set br0 up
-> >> $ ip link set sw1p1 up (filtering is 0, so no HW filter added)
-> >> $ ip link set sw1p1 master br0 (filtering gets set to 1, but already u=
-p)
-> >>
-> >> while the following sequence would work:
-> >>
-> >> $ ip link add br0 type bridge vlan_filtering 1
-> >> $ ip link set br0 up
-> >> $ ip link set sw1p1 master br0 (filtering gets set to 1)
-> >> $ ip link set sw1p1 up (filtering is 1, HW filter is added)
-> >>
-> >> Likewise, the following sequence would leave sw1p2 with a VLAN 0 filte=
-r
-> >> enabled on a vlan_filtering_is_global dsa switch:
-> >>
-> >> $ ip link add br0 type bridge vlan_filtering 1
-> >> $ ip link set br0 up
-> >> $ ip link set sw1p1 master br0 (filtering set to 1 for all devices)
-> >> $ ip link set sw1p2 up (filtering is 1, so VLAN 0 filter is added)
-> >> $ ip link set sw1p1 nomaster (filtering is reset to 0 again)
-> >> $ ip link set sw1p2 down (VLAN 0 filter is left configured)
-> >>
-> >> This even causes untagged traffic to break on b53 after undoing the
-> >> bridge (though this is partially caused by b53's own doing).
-> >>
-> >> Fix this by emulating 8021q's vlan_device_event() behavior when changi=
-ng
-> >> the NETIF_F_HW_VLAN_CTAG_FILTER flag, including the printk, so that th=
-e
-> >> absence of it doesn't become a red herring.
-> >>
-> >> While vlan_vid_add() has a return value, vlan_device_event() does not
-> >> check its return value, so let us do the same.
-> >>
-> >> Fixes: 06cfb2df7eb0 ("net: dsa: don't advertise 'rx-vlan-filter' when =
-not needed")
-> >> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> >> ---
-> >
-> > Why does the b53 driver depend on VID 0? CONFIG_VLAN_8021Q can be
-> > disabled or be an unloaded module, how does it work in that case?
->
-> This is explained in this commit:
->
-> https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
-mmit/?id=3D64a81b24487f0d2fba0f033029eec2abc7d82cee
->
-> however the case of starting up with CONFIG_VLAN_8021Q and then loading
-> the 8021q module was not thought about, arguably I am not sure what sort
-> of notification or event we can hook onto in order to react properly to
-> that module being loaded. Do you know?
+On Thu, 24 Apr 2025 14:57:27 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-config BRIDGE_VLAN_FILTERING
-        bool "VLAN filtering"
-        depends on BRIDGE
-        depends on VLAN_8021Q
+Hi Andrew,
 
-without 8021Q there is no vlan filtering bridge, so filtering can
-never be 1, so NETIF_F_HW_VLAN_CTAG_FILTER is never set, so HW filters
-for VLAN 0 are never installed or removed, therefore the issue can
-never happen.
+> > > Just to be clear, you tried it with "rgmii-id" and the same <300> and
+> > > <400> values?  
+> > 
+> > Yes, sorry, I wasn't clear: I used rgmii-id, then experimented with those
+> > values.  
+> 
+> O.K, great.
+> 
+> I do suspect the delays are not actually in pico seconds. But without
+> a data sheet, it is hard to know.
+> 
+>        if (!of_property_read_u32(node, "allwinner,rx-delay-ps", &val)) {
+>                 if (val % 100) {
+>                         dev_err(dev, "rx-delay must be a multiple of 100\n");
+>                         return -EINVAL;
+>                 }
+>                 val /= 100;
+>                 dev_dbg(dev, "set rx-delay to %x\n", val);
+>                 if (val <= gmac->variant->rx_delay_max) {
+>                         reg &= ~(gmac->variant->rx_delay_max <<
+>                                  SYSCON_ERXDC_SHIFT);
+>                         reg |= (val << SYSCON_ERXDC_SHIFT);
+> 
+> So the code divides by 100 and writes it to a register. But:
+> 
+> static const struct emac_variant emac_variant_h3 = {
+>         .rx_delay_max = 31,
+> 
+> 
+> static const struct emac_variant emac_variant_r40 = {
+>         .rx_delay_max = 7,
+> };
+> 
+> With the change from 7 to 31, did the range get extended by a factor
+> of 4, or did the step go down by a factor of 4, and the / 100 should
+> be / 25? I suppose the git history might have the answer in the commit
+> message, but i'm too lazy to go look.
 
-The issue is only if a vlan filtering bridge was there, and now isn't
-anymore, and a previously VLAN 0 HW filter is left intact. This causes
-an incomplete vlan entry left programmed in the vlan table of the chip
-with just this port as a member, which breaks forwarding for that
-VLAN, which is incidentally also the VLAN used for untagged traffic in
-the non filtering case.
+IIRC this picosecond mapping was somewhat made up, to match common DT
+properties. The manual just says:
+====================
+12:10  R/W  default: 0x0 ETXDC: Configure EMAC Transmit Clock Delay Chain.
+====================
 
-There are a several issues currently in how b53 handles VLANs,
-especially on non filtering bridges. E.g. switchdev.rst says all vlan
-configuration should be ignored, but currently it isn't, as b53
-dutifully configures any vlans to the hardware passed on from DSA. I
-will attempt to fix at a later time, but first I wanted to make sure
-that switchdev/dsa/vlan/etc subsystems are working correctly.
+So the unit is really unknown, but is probably some kind of internal cycle count.
+The change from 7 to 31 is purely because the bitfield grew from 3 to 5
+bits. We don't know if the underlying unit changed on the way.
+Those values are just copied from whatever the board vendor came up with,
+we then multiply them by 100 and put them in the mainline DT. Welcome to
+the world of Allwinner ;-)
 
-Best regards,
-Jonas
+And git history doesn't help, it's all already in the first commit for this
+driver. I remember some discussions on the mailing list, almost 10 years
+ago, but this requires even more digging ...
+
+Cheers,
+Andre
+
+
+
+> 
+> I briefly tried "rgmii", and I couldn't get a lease, so I quite
+> > confident it's rgmii-id, as you said. The vendor DTs just use "rgmii", but
+> > they might hack the delay up another way (and I cannot be asked to look at
+> > that awful code).
+> > 
+> > Cheers,
+> > Andre  
+
 
