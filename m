@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-185429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A15A9A554
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:09:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF78A9A556
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82791B82C07
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:09:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10DEE3B4E08
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60571FCCF7;
-	Thu, 24 Apr 2025 08:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C72213E8B;
+	Thu, 24 Apr 2025 08:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I+QKQGUw";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Z2sHzrU8"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j9XI366b";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="OzhEfmrq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D4D1F6667;
-	Thu, 24 Apr 2025 08:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9491920298A;
+	Thu, 24 Apr 2025 08:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482139; cv=fail; b=ANYbwFIs8THiV/LsSHT2Si/noqlaJZYm7gza0YzgMOhJPxNv0C7RfdJG8swkbFhcCHsnRYbVm7adjtnvVBObC2GizxHmJuEF0DXC3HsSM3sZk35kh5NyCbkkBNkbZicYEY1Tfiv06Wra4nA8LJE7/hjiZjKGcOnaHxP3VocCE9A=
+	t=1745482144; cv=fail; b=k+ueojyNVNyhU6A5bkoGxirsqOp8ZfN3akx6VLc+kAqvugzATxrGqbKO16/edwqeXWxd8r+G0B0xbiytmHwPNvJuoFdYko4QVLN5zRuBjaewqE1j3nYA38+jcaZ+GbjDkF8f8IPfdI9HFP34GXFMhpNsfI8XwoWyCPsNj3bbI58=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482139; c=relaxed/simple;
-	bh=lRGgiGyJ4vam8UCkGj+SfF6y2mEQVN0+yPhRUHgIFkA=;
+	s=arc-20240116; t=1745482144; c=relaxed/simple;
+	bh=Ax9QYXaawaCc99DWWOkCL+XMmVOMz0GJArci0LK4vag=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MioVw5SB4oTVB7WxA7ufzVzqfuL1U0QWAxtdNvQMuewdIqUp9Q0sfA7qMSymShG4Pu83j3HS7rZFcHq3JKJQgJhkpmalAtJ/vS626kVZSAZtSHygg7ExbpzttAVPgnmmAYjqFACdTj4Z7ee0FqlG5nqtTVaHPiSqALaUMRsm2jI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=I+QKQGUw; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Z2sHzrU8; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=rP/roo09C996c025RjrmmbJ7tGzSUcwrm4nOWGbwp20FdDs3c7FN3gsNHEOTd60sGm5SVVo1c3Tch3o1Wek7KPo55x8r5F/nFq0ZEnmw50POxH5k4NsTUUvHX0jHhdAXXyH6ab3x4UZanOsqr/0HKPkGUUokG+RHIG14lrDD+nI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=j9XI366b; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=OzhEfmrq; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O84swB003302;
-	Thu, 24 Apr 2025 08:08:40 GMT
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6tvo5013966;
+	Thu, 24 Apr 2025 08:08:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=; b=
-	I+QKQGUwfbRL8szae7SkcSmHOGB6hPumojq4QA9OhQ7jEbOlIoF2V2mUvrrz5qTf
-	uIFPk5x/dB8AWvhQsMpDiRsQOSn2LLeJKkoyBrgF+YjfyB4tVinoPs+/evMUAJ4t
-	GyjaPon6MHzQ42FIGC0UU6D9dUpnF7U0vkoovXOfxud8YHyajSm5O0cfUNStLyUD
-	50jrYp22DT1YcNw4HoQf3KkMvZquzlYrM5mEbZbongbcfan7f2p6s7XVKEhTW73N
-	vHK3bKmamYoQNBhwlYnKpjuSwG09DtfF4ePIlhwbfQeRfXOETnkZjTSIioASHSmM
-	CYJ9lVpE7SRCWWJQ7dYjkA==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467hfm006v-1
+	corp-2023-11-20; bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=; b=
+	j9XI366b3UoFf3+PwVmQRzE4l4pquixAffPgzoWyLdhdqsKpcZruraXCDyh95dwy
+	Ymzm5qHUlO6WtU/FH0e9neFKp+XslaJBWRKL9M+jLAg58a49XUtkuXSTquF8oMYL
+	4lk4r55dRM6P/RLBYhG+Gw4kum5TNPM870wwMS7M6+AEPbsUl0OoEmkBbRLrKN6P
+	lSO14yyV0IXYbStsHBN7UDkCH8NlF+02vMXIycIc9h/Nhjj5tXc1Lc+hb8VOTB83
+	tT08e9CP2WsM5U2cWcEV9Hmn/IiFWdQJ70JjR33X+LN/QnA26eVINYWx6RCwjJZD
+	VCJqtlQZ9jiY2Fu6Dqc9pg==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467eghr8tx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:40 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6ufhP031694;
-	Thu, 24 Apr 2025 08:08:39 GMT
-Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazlp17011028.outbound.protection.outlook.com [40.93.13.28])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 467gfr25em-1
+	Thu, 24 Apr 2025 08:08:43 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O7806D025207;
+	Thu, 24 Apr 2025 08:08:42 GMT
+Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazlp17012014.outbound.protection.outlook.com [40.93.14.14])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 466jbrqxv5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:39 +0000
+	Thu, 24 Apr 2025 08:08:42 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HB/tyrT5/XVjY9Wv9YIf+m64fVyK31KfoHHujGRd5gThLQ2KohFD39UdVDhYcKwJYzhKNMCR17lDgiWz2D6XYPZaXq6A1sK1ihFJr4dmboH8+0NPAB8HG8FNGwWn6SD7EL/fK3eRdavXlnE9B2EhbuHn+g+Fsu17nJBULnWuyDPUUChHQhONxTLZ0hOyOTM4ohjsBzBykZT/kcX5lBv+0BxTp5y4EG5arn9PgA+uwhSlnZIoIBbhJw/TaOu9Bv94whkQLI3iuylLE632maKuSnEvYJrlPpMfJzSY52mJsSGg3ObA9JjJ4anW26IIYV6Yhx5jZ+A336GAv34hzM2moQ==
+ b=R+ZCO/SHmGhHWZjfV0SlB4U1okpr3zVQXrF5/un6ayqR4NegHcHSmZ1IruPDpzPLj1DSjcPP+SrlLWIzgdiDvnGML3fGo7t2HQT6qf5Xv3Ozq/KNqnBOEyEP25H7BfQO3loC2R2pS2KG9rxLZ/8WIV/ln5ExWRvpIEoN+91WsoIvJruDY/qeDCwmivj+gRi+0dLfuByLy7oekgcI+StH3ef8RGxmRqKhhlNmUznUBdINctC73ZJJy1fP0LFQUNsYCK+jLtyCeu6AqEDLNduypvlZUvz24WSLoiEGuVQn0bSl6gM3tGrwOYKHVlqHlgvKMf6Zd7Ql/0cYdmty+wXArw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=;
- b=iP1NdM516KUei+0O91Fmr65Kb49P0tfkD9R56CijARBwgL6ZzeabBLlS/sLtojZ/w3c3ZXAhzifyQBBRP4JNsH2nUYpSVWit1k6oBLfg3/BXCoQNYL2ufoIiegfo7Gvmp69UpLw8PXEnBhTws8jecR+t40RFpVU419lGlPvMDJhxGRTItmtFBkXjDu10WTrHBioSYYo4UHMNZ7Hgy9Dkrqo/FFaivUOBnS9l2EVoG+JGPwBiOs5ULDMN6XGeQjwDUoGT7FMgC/Q9xyjYCAk5bo5VBSrL4YUz+GkJGIvmC8T/aZlNPLUghZX6K7A1AUx1eVfBdlgdP7lpYhpZUtAVuQ==
+ bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=;
+ b=E0KUqfbRuiA66WLrqL25R0jSZgq8LUh8u/PGE2ANO4wHheutRXcmQ0z7RSRtlFfCiTJzv0umg+B2aHKVZmM3m5b9JUFyKm3XOHUJw3FjwBYS7U22//51/WWu5JEu6EBx7cEwsCVYvQFjTnvLkOsA4pEWa8PNKniF4viLB+YGrXkoUeedkkWDnc0qDGReB9B+NHmfW88hE1hgCdADi2nMrUFFPMnJ2LFwXlp6ERAT2J71er1+qR59hEFu0uq4JezZc8KUje3LwboVGSsP9MrcicFUozMCUNqvM5Q5Kak78W7Cm2k64G6wh0DEo+qa1VHGoYkNSeyauvyiVv8k8zEnqw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=;
- b=Z2sHzrU8GUATNFIzPjbCjjSVRKOJcFyHgaWzB87VG6xWdWP7QI7eygn97Qse2nr/qDmfR6y25PsmCQOKfm3gpE9IJpJB+yNZYRGo3A30wRxIF8Uy6mJ6O4c9xXVWemX/iRxsCy3OFXQ7VnzIJR7Q+USefQ8MnA30z5VOJhw4U4s=
+ bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=;
+ b=OzhEfmrqJ6FQ7e8uH5KWEZRtVG5lke4lK31dEing8w1Olr+bRcsIYQAtjndy4Cl+46QQgfKXIEORe9WIK54D5oh/YP4QF86kaWGKrrqJ4Io6Oq4N6dy7tCVd9cr6beNf27yRDuHngfFXvf5kU5nEta+a+/gkUVxPofi09e2QjOw=
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
  by LV3PR10MB8156.namprd10.prod.outlook.com (2603:10b6:408:285::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Thu, 24 Apr
- 2025 08:08:33 +0000
+ 2025 08:08:40 +0000
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23%7]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:08:33 +0000
+ 08:08:40 +0000
 From: Harry Yoo <harry.yoo@oracle.com>
 To: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
         David Rientjes <rientjes@google.com>,
@@ -92,16 +92,16 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
         Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Harry Yoo <harry.yoo@oracle.com>
-Subject: [RFC PATCH 5/7] mm/percpu: allow (un)charging objects without alloc/free
-Date: Thu, 24 Apr 2025 17:07:53 +0900
-Message-ID: <20250424080755.272925-6-harry.yoo@oracle.com>
+Subject: [RFC PATCH 6/7] lib/percpu_counter: allow (un)charging percpu counters without alloc/free
+Date: Thu, 24 Apr 2025 17:07:54 +0900
+Message-ID: <20250424080755.272925-7-harry.yoo@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250424080755.272925-1-harry.yoo@oracle.com>
 References: <20250424080755.272925-1-harry.yoo@oracle.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SE2P216CA0005.KORP216.PROD.OUTLOOK.COM
- (2603:1096:101:117::16) To CH3PR10MB7329.namprd10.prod.outlook.com
+X-ClientProxiedBy: SE2P216CA0126.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:101:2c7::10) To CH3PR10MB7329.namprd10.prod.outlook.com
  (2603:10b6:610:12c::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -111,237 +111,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|LV3PR10MB8156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ee4fbdb-c64d-4d9b-0b05-08dd830734a6
+X-MS-Office365-Filtering-Correlation-Id: 62e3d334-9c42-4eb7-d3b7-08dd83073915
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OwNs6JJ06qIWEjRvl7QUsjGHln/I+xO8RZ5KPzSO3Mrx1XQUTfkH0eFZcpb0?=
- =?us-ascii?Q?fj7SKe1t2x2uGHzgCX/fvs91MjEhowHD/5BVJcwWQqroOXwjX7O59I3zwllO?=
- =?us-ascii?Q?J0dYgHKhnsGFNs7DLpDZyL4CsGsfkWYVDX1iZXZ3srozLTypdff1K3gbLB8j?=
- =?us-ascii?Q?TIJueRfEC9dY7tVoJevybykhLQDo1HGih9RMyNeQ7Aj86IILF5vyAyqmIRWK?=
- =?us-ascii?Q?tx3Ou/mISMrrOSvi09yfAXZCP5nH3I28UxrL4KJrWl71cka+veMg3zwgb7GX?=
- =?us-ascii?Q?+U3wVAM3lcqExjS5XIxWjg7blIcT6ilEdUasNdEwSC4mL8C/zAuvmhrmxscX?=
- =?us-ascii?Q?3uWN75Et+yAQCVUr1sruj6kIntE9WpzHyN8v8uP3/SNIGZlpqotQRKkIA65A?=
- =?us-ascii?Q?h5rBdcREY+Y2gcFvfTByCTxJbpujKdAPgGHK+KxkTGANXF2HIasPZSO8Ptis?=
- =?us-ascii?Q?OoQw6rErWSo+JFANB6Y6tZRXTZJ3AX+m0b+lMrMZsGpEzS3zvN+3Rb+0OHAj?=
- =?us-ascii?Q?eUEZVvbqOhyqV9apYeFhgAvVDA+Y/sS4pSi0SqML+NIqRYzNYKQqSec0tA8S?=
- =?us-ascii?Q?ewZIG6Jamuq+PBTajB9edLjsaXvFQ6BDdRdVqSO/qlq5UBXN5zib6rJRmknA?=
- =?us-ascii?Q?24klFJImbYdHLB8iFMYWWnerdvCOffoGknm9+by/0fKzEuyfeII2qOCko1hN?=
- =?us-ascii?Q?ji+Ql6W/IIkV1znBitCgQPeYsi+KbN1a+m3clDkVZkhgCsWMglOjxCs5/YHo?=
- =?us-ascii?Q?L8egIMp0oEZYwAvRVZz/K3hi+cVMtMDelQAVdhFq3dj04sVbG8XmCaaRVhZU?=
- =?us-ascii?Q?UPxyiYs94Vo+NS+wwxltzT9ndC4qbZYrNjr3cqtxqeMvMQdYjUTq71gIrhrS?=
- =?us-ascii?Q?e5SKQB6pVZxcqYNcAFDxCR08k0BfrBxfs1TrbwFryBI1lf+CEghVUrSs3ker?=
- =?us-ascii?Q?fXBZsI2JM0dQdXIyFg/Tg4JJXzMFuz5Vxr5BVGeMO4nCY8REEk2UGxp0+tUJ?=
- =?us-ascii?Q?4h+2do4InwC6jYczWPIcuZRiS2iua6JheK5cF4X0hf9Q/Eb4jPKTB0x+19kl?=
- =?us-ascii?Q?itMcemEW1/eSz3thj47N7vGRRXvlhBQB5hLLx8TrM9ypJdXEPukBMaBO00Aa?=
- =?us-ascii?Q?PiClkMcDHmbbmaAB/R5SldLNhoFESRwIEcOJwt79T51t4Dw3kMaD2K/c3O8e?=
- =?us-ascii?Q?bbJf4MvsI97HBsnmuUPNgU5Bpw18pyky49gjjNozL+kmZTHgwr3WJ4oq7CSN?=
- =?us-ascii?Q?oRWGwWu31v9UOXSzXVZ+s60y6nvl7JZhGUkkWFvC2Zplj015yIHZVLLG5hwt?=
- =?us-ascii?Q?FPVYcFecyrczUFxy4mDzBh8I9ru/3ZIgDxgL9+fhUvyhPuqsdHGsIyfco1hv?=
- =?us-ascii?Q?bQvQwvFVGyTSW+3XiWGAf5DKEeonnqfB/1TH8UxL0G2Ymi+KJA=3D=3D?=
+	=?utf-8?B?SzlydnpMeGpaRVloVU9BRC9VcmRuak8xSTQ3SzFNU0tGdjFPOGtEQy9pd0Fv?=
+ =?utf-8?B?NVQwQU5HOEJqbk5Ha2daYmh2ZzU2bW04bzdtYm9lVlNGSUdoSWV1K0Z1Zm9s?=
+ =?utf-8?B?U2g4Y1g2NERiY01mWVYwSXlHazhtZDc5MnA5QklDMXFqdENlV25JdEtEWTRY?=
+ =?utf-8?B?NDZvaGdUd1pnK2NEQ3VBb1F1KzFXT1g5TmVSWnNDMktFRmdJcHBSTFZva1VL?=
+ =?utf-8?B?bFU5aGNURDljRXZBTGNRd1dBS2xJSzFVck8xWFV6OE5kQ3BYcnoydU9DREYy?=
+ =?utf-8?B?cHpvSTJvZkdmajZzUXJCUkNVT3ZrTkRIS1hSN2xHM1FUMWpZN2JRT2xEeWlY?=
+ =?utf-8?B?VVIvZG52VHd0eE9NQ1ZyU0RXVTZHb1pRNGlwczhCSFdad3Q3MGR5WUNzUGJ6?=
+ =?utf-8?B?M3Q5MW8zaitaYXV4VVcvek40clQ3QjFDMTdYTnVRV2kyY3M1QjdMNEphVHAx?=
+ =?utf-8?B?RlBMTjlSZzZDbktQSDJ6VnJkeDdBTTkxTHNUQ1pRNEMwTUxiZEhoUUQ5UytK?=
+ =?utf-8?B?dzdDT0VlZitrd2xWSDhXSHRFTHExaW5vcE9SSHdNb3BhQUVLM0ZYYkU4cWRH?=
+ =?utf-8?B?T2pRNjVyV05zeURrSUF0ZE16NXFtb0ZhcUpZalllTDJlOUM4L0hTQkw1RURS?=
+ =?utf-8?B?eWlPeXhxdVB1WExiWDlVdnJ1cGViU29nZUxWUGxSd08velVmWWFaWDlzR3FJ?=
+ =?utf-8?B?WStLMFFLNU02V3pzSjd5VGZ3aWJRbXRFZmRYTHpMUkVCWmNkRUNYanhYbFRz?=
+ =?utf-8?B?VFNPaEE3bXY0SXFKbVdGMVhQcXFOT3VKajRNa1lnSU9ZbkMwRW5YSXVLRHhK?=
+ =?utf-8?B?eWJKNVZhenJUWDZTSEw0QjR6NGo0eGF1cDRSY2ovQlByWlM3N0l0aXIrRjRy?=
+ =?utf-8?B?aTg5RFlNaFY1OEtFUm56MTZoaUVaZWNtV3BCeWZhSUVWQjUwSW9RS003OWps?=
+ =?utf-8?B?Y3NLdXdKMUhoWjliOUlHa1EreXVDU3NuNUFhdThrU2NQcCsySVM3WENtZGJH?=
+ =?utf-8?B?VjFyL0VrbnZhZFVUcnNwcHBZWXZwZGJBdXBNYS9xbThGTXpvWWxVQUJUN2ht?=
+ =?utf-8?B?aG9BT2tjRGFLUU1MRjhxOUMwR0NyZEg3cFprSHNKMi9ET2wxOW80WklVV3Bp?=
+ =?utf-8?B?T1Q0UCsrNlVtV0hYdG9vYzB0YTdLZzlBclhzSzdoUktkUGt2VDF3aWZNai9G?=
+ =?utf-8?B?UWR3dGhqU2dGRG03WnlEcm8rOCtPZkhTWHprNkl5ZTJ1M29oWXFwM2VsMjRk?=
+ =?utf-8?B?VmpDNFVOVGt0MmF3SWt3SHBYbHBrYlFtZS9ZbGtRbkFhQ3p1UmpFd3l0QXYr?=
+ =?utf-8?B?UXZHZjJZLzc2RlE5WTFxVGNkRmg2Um1YU01PUU9Uc01kbHkyMWpwdHo0VHNI?=
+ =?utf-8?B?QkpzQTl6YThJbnRld2NGTWRtWjc5aXhicXpjZW1mVHp3bmVZRTEvNllYTHdL?=
+ =?utf-8?B?TXIxbjM5K3dKd21UOFFpR2NxME9nYTg4SkxncU5lUFYweGo2R3RSYTYzWDlK?=
+ =?utf-8?B?bldiSlJLSmxiVERVZXNuKy9KWWpwc2VtUm13dmxidEFVRXBteHk4Mjl0NUVQ?=
+ =?utf-8?B?OXRtbXUydmNycUNaRGQwRzduTGVOb2o3SXNjdHlHeFUrNE4ycnJGbi9mejlS?=
+ =?utf-8?B?YmpjL3prcUtsLzg1d3UwVFFtNDFDM2NMblZjZnhKZkJrQXphS1VCajZtM2NU?=
+ =?utf-8?B?eUdsMmpOSTV5UmlCQW1EKzVJYjFGOE9nQzZzaHgvd1UxckhkelBYSEdwbkM2?=
+ =?utf-8?B?M09RT3h6eHJDRGpDamFuZGw4V3dqeExuU3loTVpZWDJTT3RCNE5McEVpajY4?=
+ =?utf-8?B?SjZSU1VJMkZGMHhXWnRWZlFNdG9XVXpvQVBvUkJzM2FNRy9uZXZIWXExVDNx?=
+ =?utf-8?B?eGpaOU5TVHg4R0REUFJ0M3BMdThVTTk0SEVVbUQ0SmVCeE5teXU1R0NEdmhk?=
+ =?utf-8?Q?wEBpajyjw5U=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?tULQbJoQsiJmAYealKPif2pd+Of6+BEFYN/6pdWPd50e94012LRLEBO20kqi?=
- =?us-ascii?Q?EC70dwR3ClK8SpgFJg88aU3zvKuX+aqvId9XhSoRb5bwF/b6W+z4CUacpodM?=
- =?us-ascii?Q?2faIIJrcjf0JsX9GHUI/dXyHvuBvMQbjxdR2JIU0gb5WrbZyx0mHgVoG7OFF?=
- =?us-ascii?Q?wNt2mwgsvs9+UwZ0Wm0QnSmjzjbpahkvpr9xvSt2QISXXiAVJfMxstXFTt3s?=
- =?us-ascii?Q?4yKTmO8frdNXJB3qtNfrgTz3jG+eqMEiVMKJUCZ+xwvEwwg6ZIPnZ4Kmd3jd?=
- =?us-ascii?Q?aN0yFEd3kWwj0GtXRZ2JZz4YBdXq6EnFTdBvdjzbheB1qLLlLyNVzgc/hszH?=
- =?us-ascii?Q?RlEmssizmv5BwreZLwmYdU98yuM11BuoYNZc73i8+D+yWyPN8VE2R/KnJsvU?=
- =?us-ascii?Q?vhr2uH6TohKz5g1Eim9od57kdXLNEAx52LkhDB+u9DHABbrX613l9H9SOJmZ?=
- =?us-ascii?Q?vikzkBRI57QegoF1d2IpD/gVShBNsgE4S0bjAj2Hpk6+2m3aGO8bt3KfKcx8?=
- =?us-ascii?Q?BPGlX+l4Y4DTzxpM25J9C8v2xJuNlyGEvlMTCiDY5aHMviUBpjjc1dF65Qev?=
- =?us-ascii?Q?uMG++cdkx4xluypkLt/UmMq0f5S1j94i2kba3YY4CbgPH1A4P3Q9mNxkMtXL?=
- =?us-ascii?Q?V42fM3ckvbbQqWVioE8OtuPBVt3PwW3QuRxvytFACcVg09/xQFTTa4/F0NHY?=
- =?us-ascii?Q?C3FO4aywwG/T3CFG8atvgmuYG2UGnuGcXEZYfNRbkjzAw23S6GyQqHlVTQ57?=
- =?us-ascii?Q?9avgbllhcH/t/XQcBt97fp8fNXMwIHrYk3UrBxXcV2JR9qMrS8VT65+44dyp?=
- =?us-ascii?Q?C+1vOMgSFOUVWvXhR5mPdEisVNkuQYTK6T5M5WD7a/PtDnYYPt8Xm3Pr3DF2?=
- =?us-ascii?Q?9hgbhmrzm0qambHhtm4A5GEzAg9j7QWqLW74qZLCf6OO0SEpkTMxTNH6GIgC?=
- =?us-ascii?Q?2RbeC+DhQPRBB+E9eTMcVT1rqadydqZn+yMnNBoYltfsOYOca3C/zEbRtidX?=
- =?us-ascii?Q?GKrKTODxMIXr0as6OHg5+Ju0zptTYI+I1x4VvzL/hVQohAqmXmB5Didtnwe8?=
- =?us-ascii?Q?fudlgjDLzTC4ogBcFCLkfssCkUAmT95EUR8E1HpygZJA1JR8zysnFLSwuHt/?=
- =?us-ascii?Q?UIYinwS2J7LlsnvxBhjArAlwIoWYBhpiDxQncN9eDe13O4l4CEeS51KyIbnQ?=
- =?us-ascii?Q?sPaDapbYoyXB5urisbdD5ZvpP8p8UrHJhC2eyIpEwkqjhGeZzfaryOsIsVkO?=
- =?us-ascii?Q?vPE4rNRoT7mYPqM7HDmyKxg/mDi/+IvqQi83XlnEISQn5RlnPENjuNT9d1R+?=
- =?us-ascii?Q?7+epk+4jcpPTtKzW4G0EOkN4WBYZ0Xl/eK8uGLpfxeo0ufI000lT3+k2XjOU?=
- =?us-ascii?Q?tE/iTlQapoH3nd0N9Oc48h5JnoDYLLyghjRydjkhRz7VYEokUFWY9tRvOn9J?=
- =?us-ascii?Q?OOul4WHPEROf2mBifonajShcmEnpCZLAdRnotyYug7uX1W42Vef/9mc6TdMX?=
- =?us-ascii?Q?9l3G/WgYu8Y11mEDq0U6I9qwRihWvFJJP76GYKhBAow5O+tGRpewkpyuJ7xU?=
- =?us-ascii?Q?pX7sZELD/Mr7/n6oBdZMP+R2TvT2epq/js171CQj?=
+	=?utf-8?B?WmhVYUw1VUZKSTljWkVWY28zWUI0L3VPM0ZtaVpEc05VT25YOHZLdTYvTnVr?=
+ =?utf-8?B?OVU1VGd5MTJUZVg1Wk5tWlAzVjhtT3lXeWtFeUNQRWQ3OU12RVpQTTJQWGJ5?=
+ =?utf-8?B?NlNFRUdFZlhSL2p1cVVHUE1DUE1ORm1PZW9NSkE5TmNpbFcvQVdBY1l3YlRL?=
+ =?utf-8?B?MjVrRGE1R0RyZHFqSjBzaE5HQ21hZ1BVZ1JwZytPSVhDczNlM21mSmtFcmRw?=
+ =?utf-8?B?N2JUVjc2L09CR3RDUzFaU3dJZGFVK1pITXhoTXVEY3YzMXpTK3R0R3dIS3dM?=
+ =?utf-8?B?ZWtoZzYrZVNidENBMHF3QVNjYUlwb2tzUDJUZzBWcTdnTTN0TU56eVNmTmdz?=
+ =?utf-8?B?dm41V0V2RVFsMHRZN2pWUS9KWUhNQTRtY090UGNDUUluSmlMd0Fkemh1anpn?=
+ =?utf-8?B?b2xINExLdmNWNGs0ZTdib1MxWEdodnBoOVE4cFIvdk4ydzhLY1pYV0g2QWJT?=
+ =?utf-8?B?c0hWMGdzUzZUemhPZkpwL3QvbjNmR0hKYkxidnlhcnE0QkE5cm9QVm1ublR6?=
+ =?utf-8?B?NjJZb2NtMWRVOHgySEhTbnZtTGQ4WHdmaXpNTGFGYjg0eU1oMlBKb2NOMWl1?=
+ =?utf-8?B?VmQ1S0JDbXRFam1YTElDdnFrM09hTksxbDFMb1BXR09EM2ZyUjdGQ2x5MXIz?=
+ =?utf-8?B?RmdOajYrdWRRbVc4Q2RJMHZ0QS84REc2NVJUZkpLTWpZZlBHb1k4dlhvY0lH?=
+ =?utf-8?B?QkhkVVJkaHBjYnQ1dEd5QjRsWHZmdXhLZDA2SVRpUmFockFhQWtXSUc4SDRP?=
+ =?utf-8?B?RWlkOGRTODNXcEtta0MyQUQzMWo2U09jdDVWOXlJTmJuVjdYbzBvWGtQN3lQ?=
+ =?utf-8?B?dTNrYUhtVC9sM1FESVNzVlRDMElrVVNJa2F2N2ZJU2ZOdVduYTRiMGxSQUc4?=
+ =?utf-8?B?NE1mSzNGMzJJL1ZUQmxoMDRLT294U3h1OENQZVQ2UUFtc0FwL1BxcVF5b3hT?=
+ =?utf-8?B?RFJPWnNZa3dJZm9PUUlmYXYzWjVORTlpSGFpakZvanZ5R1FsbVliWnVraTc2?=
+ =?utf-8?B?S3Q4MmFMN25zNXdBMSsxWlVEZTRQa1hJTWFQa0F4NTl1VkFrVlYrM0tKM0pt?=
+ =?utf-8?B?U3RoS0JMNXhNNkMzZnFZR1FOWTdXY25EVlFmTTMyMFNud3RsY2FLMVZkb2hp?=
+ =?utf-8?B?cXFLV1NERC9mai9zc3dxWXZQSnBRakVKNzhJbVljbHRpOHBPQnFXcEVOV2hI?=
+ =?utf-8?B?QWVXMTVXU0hQMGhyeDNxa1o1aW9rQzZDR2NYWXBtV0RhM3JRYldTV01rQ2tO?=
+ =?utf-8?B?Zld1cDJHZHAxSnZRL0M0OGVxZ2R4SzF6ZTdGbkM0QmNiWGdXd1JnOEJIenRn?=
+ =?utf-8?B?MXpmUGtWcENaZXFpbEhJQjA4NG5pbXI4WW5SVE9BSW8zUWZ6K09WQlNLUWpo?=
+ =?utf-8?B?UnRYQ2d2WVBZcWJPek0rQURIQlI1SHhJcm4zOFN1YzgzdEsydks2STBDVC9i?=
+ =?utf-8?B?QUsrVFJBRlhJbXRDNVZhc2dqVEdqRjg3N2t2S3dpRDllRFd6S3d3OHdSeXBw?=
+ =?utf-8?B?akljaWlNcDk0ZnZubTdKOWM3ajdQSDRDNzFXdTRKb3NueUU0bDFybnlIaHQy?=
+ =?utf-8?B?NmxnVzM3aUNGciswUzlRZVcvbXlCTHVXZUZtblBoZWdNZmp6bVBSOUwxazZ1?=
+ =?utf-8?B?ZW40RUZmKzcxamZPRFNaYjhBREY0U0U3TEhhSzY4NzJqQ2ZGbFJJcEVsY1Nr?=
+ =?utf-8?B?RGo3dWl4OGFIcVprTExLcHlYSE4rZ05Uc0ZkQlFkaEVST2JISlVYY3lPaEdz?=
+ =?utf-8?B?SXV1dm93M3J5VGU3ZjRHMTBucU9pWjhndzhGRld2alR2aVprb0lMVkZndTVK?=
+ =?utf-8?B?TTRTVU1LM1lGOEgzSjVlV0xnblI3b2pDUkJXNW95UVVPU3RSeU1KR3B5NjI4?=
+ =?utf-8?B?eWpCVHJmdG1SdHlKanM2ZDFsUU5wRGF1SE9Vd1hrVEtMd1hlbDY3QTY0UkJp?=
+ =?utf-8?B?RWVZOXF4WjdlQ2hFSm11bzVaYUlRZFhFVDVtZzVXcktvK2NXcWJyaHA0YW8x?=
+ =?utf-8?B?TDRwSXY2SXBvRGFhMS8wMmRxd2c5aHpnTkt6ZWU1aUZrMUIwakVTRklWeFdN?=
+ =?utf-8?B?dTZhTU04OElOUnhYMUhUVVZ4ZFp2eTBZOWNST3JZNDFMaUpxN0E2bTRRYUo0?=
+ =?utf-8?Q?mYcesARIGk0hUYEuVhZLGl27N?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	HwvwQixPXvMjrB6whv0vqHiMgBOIXOXMiVPuBjwabYkPY7BxY+1jZo4HGJl/Qj+1kF4u5E34aXI4YCIEoQ1AfakoE2ZlfAcli652vyBugziaOaqIeygd03XJYUgc/Pw2tt2xGwjj/b8QgCwPFyHAtbEcZXUihqxQFyqKuaVa/MDxAmX4Wf1vTr8yjldd1GKkRhxUr3S7on0wxRSNAvpvz84yzaRFnsQQA2kylnAQmayWmStxObCf/9jVy+kUWA6SL6pomFx/il7c7Mc+ladSRrwAtc77PyqroWjlGb8hd9rLjtX77dEkFYTwAtwx/E2QHo0xIIS+fxsghag1+GmkyEnRVZVVGJJ7wmaEXJga0vGXqV20hvNwnbN73lKzxXWuTpmz7f8wfSKz03v66M199nX9PmcdW4JgTfV+7GSFEvF890agN4yxwSZvko2QCwSwxghunU7mefhkc5izw4BOe+L452m7eS7PxBZIRQC0MGvijy2ORM7L/91Sri90V+cFF5lq8O6izmWKz/KXHYykPny9vwfRV+SFRToNMC8skFYQKs8HBjmvXafoztRQlUC3xJYtFbKCGoy2EvwKA1GFxykiBhgaDRtqjFjQhiRAxVo=
+	EFx/pPF2XEfYrL+uCrGPjTwlr7PAZzBf7Qb0xqhL8fEAMxSiusfNBFmOLScJrU9mow+DHBxg3voxpbO10AZeYLe4nlyL2O8eVqIMcREqWXzLqFkuIpQD/5MJQWoCfpGS61oXbwo8pMGbsKWXsvE1BrKk524VFV4S01tkVN/yPZpbjl5iR+DznYUcV1EZ7TSHORguKL0ONQr/iFVtoDyG++UY2fwhC7Xmri44zCHaYulF8TzUCIYOO9SbLHHD9FkrtV1b5CUQpxCYKPfZ3AwEHzZD5tvE77CkzgZorAo7nixlntSsDBYMozFPu7NvEuBWGbzRBCpuH5zqjoPZiQTOFdmNCadTqxpFGt1D8UZRIWXeMTpnb77CwbsazE4iKizw/ZhrITSJ43L/PxI2XQTNcbNwH3lIR2t7+dhpcN60XnGCEiXgvzi0MP3gqpKPGQodRTzk0qLPSD4fR/LRu9VKERARgPPJj7T7pWK0emm7T2iNI1St7WbyQcoO0CqIFKuZvTHlaGqoLp4KPiligGHPeLo882WCi22Lz8mEXW/8jm2XyRtfO2ntusE3ETtIXwoOiuiB2OUugw4yRa7eDfmns36e6j3rrA3a6Lpu9MDv7bo=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ee4fbdb-c64d-4d9b-0b05-08dd830734a6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62e3d334-9c42-4eb7-d3b7-08dd83073915
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:33.0827
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:40.3431
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +hCO/fq8qB/MuUTQzXPRUYK4YyuWpDDak6EDidM6Z2cOjVy6rSRCgjCGyxgvgt0q/mGAkO3G8M8d/filZSsbYQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ANTpOCDP0W95J5amKB9oh9gxolyd37BlTw4I4MQZCDM4wSCBrp0of5P2VrvwEsZvggfIWJ7UfxTToFpjsfTjSA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB8156
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
  definitions=2025-04-24_04,2025-04-22_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2504070000 definitions=main-2504240053
-X-Proofpoint-GUID: --QRqZqRwSQrzYl9AdvUh0J3AExGv7Nd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfX3xFEBXD+2Z2T nlzsdMt3XI1fbNzIIEaykfy0RnG4wauJi7T1BXn7fNLq1/H/cs/Pq/8Nth5l8Wua7AiyvayIuYW q/Ce8tvaAZaDFlD2ptzL5AgpUkuKXwsAEXLrc5DQw2xoS0cAN2GJ0Y609mpcBaW5SkS/2Niped3
- zoIsz96UtLgDJnStHeIuANWOqHq6XfliiR8mUAMpEmiR6bQKwEB5ftKRIJsqI2YX1qxPeIHrY4R Z+CWTm7eW17l952CDWlZTJsb9MxhITl/e7PThc5KiR1XGgiE5FYy5hB8iiQXgzpjG45tB9FZFmG 9cqtQ4tbTZ8sWsGI72+MsMc2VbQG+N0qbbV5aANcU8atFVgWW9msjnQ4PfLDivf01gTBoof5xCl Zc2dXHpE
-X-Proofpoint-ORIG-GUID: --QRqZqRwSQrzYl9AdvUh0J3AExGv7Nd
+X-Proofpoint-GUID: buUtswGaxlDXrVhHq-wViwpgRJTz4I63
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfXxUeO4H1y6Jou JPNhagubbFnTGxRqYb45GgnXeCK7Yj/iiqnbbFTkS364g0mrGsz0KE9wvj6sKOnA6o3INekDP4y alAoTcyjn1JRKg9JStn1k9TlhJGSLJnyJNIuDGZ+T43Ipt35fHQIAEchNi6EvNFSRxIAUO8ByZH
+ K3BNBbW5qHxqZUJ+JYPBGu2nwAdfcXTiYt1OA2Hu7uk4IREGJHkpEbTRY+YbG9mVJD2B+q6axj/ 0xZ7m1x5gJOfGOWVeBKqnQc8X9K3DtVuwp2rDvrsVSayeGciRYEi8gRGdLyCfYP8aB9/oQjpXre OLAo2x3juyzntlzdM9f68Tbr3znKgHnXOgQEpILNVVvCS3BPxT/jvGqlqQh1podOWNQpX9yUteX fb9olRrk
+X-Proofpoint-ORIG-GUID: buUtswGaxlDXrVhHq-wViwpgRJTz4I63
 
-With a slab ctor/dtor pair, slab objects can retain a pointer to percpu
-memory that remains allocated until the slab destructor frees it.
+Introduce percpu_counter_{charge,uncharge}_many() to allow explicit
+charging and uncharging of percpu memory used by percpu_counter, without
+requiring allocation and deallocation of the counters just to
+(un)charge.
 
-In such cases, the charging and uncharging of percpu memory should be
-invoked when slab objects are allocated and freed. Allow explicit
-(un)charging of percpu memory to ensure accurate memory accounting
-for the slab destructor users.
-
-Note that these APIs only (un)charge memory only for memory cgroups.
-They do not affect memory allocation profiling. Memory allocation
-profiling records percpu memory only when it is actually allocated or
-freed.
+This is useful in cases where percpu counters preallocated and reused
+multiple times—for example, when a slab constructor allocates percpu
+counters that are (un)charged multiple times over their lifetime,
+until they are finally freed by the destructor.
 
 Signed-off-by: Harry Yoo <harry.yoo@oracle.com>
 ---
- include/linux/percpu.h | 10 ++++++
- mm/percpu.c            | 79 +++++++++++++++++++++++++++++-------------
- 2 files changed, 64 insertions(+), 25 deletions(-)
+ include/linux/percpu_counter.h |  2 ++
+ lib/percpu_counter.c           | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/include/linux/percpu.h b/include/linux/percpu.h
-index 52b5ea663b9f..2d13ef0885d6 100644
---- a/include/linux/percpu.h
-+++ b/include/linux/percpu.h
-@@ -140,6 +140,16 @@ extern void __init setup_per_cpu_areas(void);
- extern void __percpu *pcpu_alloc_noprof(size_t size, size_t align, bool reserved,
- 				   gfp_t gfp) __alloc_size(1);
+diff --git a/include/linux/percpu_counter.h b/include/linux/percpu_counter.h
+index 3a44dd1e33d2..6e6b0752b1e4 100644
+--- a/include/linux/percpu_counter.h
++++ b/include/linux/percpu_counter.h
+@@ -46,6 +46,8 @@ int __percpu_counter_init_many(struct percpu_counter *fbc, s64 amount,
+ #define percpu_counter_init(fbc, value, gfp)				\
+ 	percpu_counter_init_many(fbc, value, gfp, 1)
  
-+#ifdef CONFIG_MEMCG
-+extern bool pcpu_charge(void __percpu *__pdata, size_t size, gfp_t gfp);
-+extern void pcpu_uncharge(void __percpu *__pdata, size_t size);
-+#else
-+static inline bool pcpu_charge(void __percpu *__pdata, size_t size, gfp_t gfp)
-+{
-+	return true;
-+}
-+static inline void pcpu_uncharge(void __percpu *__pdata, size_t size) { }
-+#endif
- #define __alloc_percpu_gfp(_size, _align, _gfp)				\
- 	alloc_hooks(pcpu_alloc_noprof(_size, _align, false, _gfp))
- #define __alloc_percpu(_size, _align)					\
-diff --git a/mm/percpu.c b/mm/percpu.c
-index b35494c8ede2..069d8e593164 100644
---- a/mm/percpu.c
-+++ b/mm/percpu.c
-@@ -1606,6 +1606,32 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
- 	return pcpu_get_page_chunk(pcpu_addr_to_page(addr));
++bool percpu_counter_charge_many(struct percpu_counter *fbc, gfp_t gfp, u32 nr_counters);
++void percpu_counter_uncharge_many(struct percpu_counter *fbc, u32 nr_counters);
+ void percpu_counter_destroy_many(struct percpu_counter *fbc, u32 nr_counters);
+ static inline void percpu_counter_destroy(struct percpu_counter *fbc)
+ {
+diff --git a/lib/percpu_counter.c b/lib/percpu_counter.c
+index 2891f94a11c6..a9fe96787725 100644
+--- a/lib/percpu_counter.c
++++ b/lib/percpu_counter.c
+@@ -224,6 +224,31 @@ int __percpu_counter_init_many(struct percpu_counter *fbc, s64 amount,
  }
+ EXPORT_SYMBOL(__percpu_counter_init_many);
  
-+#ifdef CONFIG_MEM_ALLOC_PROFILING
-+static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
-+				      size_t size)
++bool percpu_counter_charge_many(struct percpu_counter *fbc, gfp_t gfp, u32 nr_counters)
 +{
-+	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts)) {
-+		alloc_tag_add(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag,
-+			      current->alloc_tag, size);
-+	}
++	s32 __percpu *counters;
++	size_t counter_size;
++	size_t charge_size;
++
++	counter_size = ALIGN(sizeof(*counters), __alignof__(*counters));
++	counters = fbc->counters;
++	charge_size = nr_counters * counter_size;
++
++	return pcpu_charge(counters, charge_size, gfp);
 +}
 +
-+static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
++void percpu_counter_uncharge_many(struct percpu_counter *fbc, u32 nr_counters)
 +{
-+	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts))
-+		alloc_tag_sub(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag, size);
-+}
-+#else
-+static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
-+				      size_t size)
-+{
-+}
++	s32 __percpu *counters;
++	size_t counter_size;
++	size_t uncharge_size;
 +
-+static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
-+{
-+}
-+#endif
-+
- #ifdef CONFIG_MEMCG
- static bool pcpu_memcg_pre_alloc_hook(size_t size, gfp_t gfp,
- 				      struct obj_cgroup **objcgp)
-@@ -1667,7 +1693,35 @@ static void pcpu_memcg_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
- 
- 	obj_cgroup_put(objcg);
- }
-+bool pcpu_charge(void *ptr, size_t size, gfp_t gfp)
-+{
-+	struct obj_cgroup *objcg = NULL;
-+	void *addr;
-+	struct pcpu_chunk *chunk;
-+	int off;
-+
-+	addr = __pcpu_ptr_to_addr(ptr);
-+	chunk = pcpu_chunk_addr_search(addr);
-+	off = addr - chunk->base_addr;
-+
-+	if (!pcpu_memcg_pre_alloc_hook(size, gfp, &objcg))
-+		return false;
-+	pcpu_memcg_post_alloc_hook(objcg, chunk, off, size);
-+	return true;
++	counter_size = ALIGN(sizeof(*counters), __alignof__(*counters));
++	counters = fbc->counters;
++	uncharge_size = nr_counters * counter_size;
++	pcpu_uncharge(counters, uncharge_size);
 +}
 +
-+void pcpu_uncharge(void *ptr, size_t size)
-+{
-+	void *addr;
-+	struct pcpu_chunk *chunk;
-+	int off;
-+
-+	addr = __pcpu_ptr_to_addr(ptr);
-+	chunk = pcpu_chunk_addr_search(addr);
-+	off = addr - chunk->base_addr;
- 
-+	pcpu_memcg_free_hook(chunk, off, size);
-+}
- #else /* CONFIG_MEMCG */
- static bool
- pcpu_memcg_pre_alloc_hook(size_t size, gfp_t gfp, struct obj_cgroup **objcgp)
-@@ -1686,31 +1740,6 @@ static void pcpu_memcg_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
- }
- #endif /* CONFIG_MEMCG */
- 
--#ifdef CONFIG_MEM_ALLOC_PROFILING
--static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
--				      size_t size)
--{
--	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts)) {
--		alloc_tag_add(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag,
--			      current->alloc_tag, size);
--	}
--}
--
--static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
--{
--	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts))
--		alloc_tag_sub(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag, size);
--}
--#else
--static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
--				      size_t size)
--{
--}
--
--static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
--{
--}
--#endif
- 
- /**
-  * pcpu_alloc - the percpu allocator
+ void percpu_counter_destroy_many(struct percpu_counter *fbc, u32 nr_counters)
+ {
+ 	unsigned long flags __maybe_unused;
 -- 
 2.43.0
 
