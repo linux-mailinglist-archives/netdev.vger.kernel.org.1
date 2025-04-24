@@ -1,96 +1,173 @@
-Return-Path: <netdev+bounces-185590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5FBCA9B0DC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:30:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31510A9B109
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FDC54A316C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:29:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 670274A6970
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3377327CB04;
-	Thu, 24 Apr 2025 14:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48635146D53;
+	Thu, 24 Apr 2025 14:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ML+zf286"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Mo0zD16k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-67.smtpout.orange.fr [193.252.22.67])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5D41B4248;
-	Thu, 24 Apr 2025 14:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F432701DA;
+	Thu, 24 Apr 2025 14:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745504635; cv=none; b=MoUeymJ780HnaWndGwCkb9VfnWzIUxvRId6CkxC8Ib+D4Zt4KbNiJfUuLNXB4yAc4KnpxHahurXx3Z8YerkPVeUglVBHWMoTcHsg2kM8RQKx2Vd50wxZKd7BiQYV47oNdk5fw0VWJfzVuREg3/hceBJel1p6VK49XmdMmFKxsVc=
+	t=1745505218; cv=none; b=lHVe5pPKQRFtTBmIKRTudG8Tnw0seou2gHfEM0RwDQVtPTRfZOIC+lq/JGb81Kn/BAvx+AGgiAzRxMTI6R+MXBvG0COkA/Csz2aEiTVnixhH8cOw9ostp2Lpv2aHwqCYifC9zYtqJGT7MuQdh9pjoNwtV6GKhlD9otCOWiWFIvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745504635; c=relaxed/simple;
-	bh=/VhUo42gnBZ25sYuPllLt17/9RBLjW6u+T/K4IZR0hw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O0NZBEt0pYvYmg/CqP80DiHnPigITYcGq3l3I8xJyGOZrhTNJtLK8JZDg05kAD0Jc1JLGJHvTNFEivt5iT4BjbU0d7RJHU8wql643zuFbkDSiVnm1RzxoQO6finRwISZk+MxU5jObkKT0B8dMWv83iKX9275G5cZ42s2HKctLMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ML+zf286; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3D3C4CEE3;
-	Thu, 24 Apr 2025 14:23:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745504634;
-	bh=/VhUo42gnBZ25sYuPllLt17/9RBLjW6u+T/K4IZR0hw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ML+zf286/DaEHVgCXjhaP2vpTTURYvyX9EfSn3scYmNQN67IPAGDDbKVzY/KQARYM
-	 AlO+zh4Oq4R1UqQSoahOOaZeAMKuoQGeLp45Vc+gdM08MVllJiK4sJ4Scpl23FUXql
-	 DUjsW2EzawZTIDNF7WnWV3W8r7b3mpy3sIHVR0+KRg4F40tGSCzJBj40MSoi3LXclH
-	 y8zdP5Z9vsil8Y96FmmGVBpxVTIF5Diiz2kB8Ogw92Z1ZwoI5QseAxZ0v9yFbm2TYs
-	 ryJP79l0cR5RDttUySz0zcX244MDdsqFFpTmfWEro5yj7RnUYnWDph7Is0mUBg56NZ
-	 5EBCf9aOY9zxg==
-Date: Thu, 24 Apr 2025 07:23:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, tom@herbertland.com, Eric
- Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNl?=
- =?UTF-8?B?bg==?= <toke@toke.dk>, dsahern@kernel.org,
- makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
-Subject: Re: [PATCH net-next V6 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-Message-ID: <20250424072352.18aa0df1@kernel.org>
-In-Reply-To: <174549940981.608169.4363875844729313831.stgit@firesoul>
-References: <174549933665.608169.392044991754158047.stgit@firesoul>
-	<174549940981.608169.4363875844729313831.stgit@firesoul>
+	s=arc-20240116; t=1745505218; c=relaxed/simple;
+	bh=bdu4AdfU3rVBoxI7dS381WsNGFKefFYdMLFb+5Z2TMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hsnzu3FBpHIr5xsURRaJQ6eywc2fNo2KkcU11NxlcI8Nfw7fGkIRJKBiEIs+vqRRGP27b/OFoclMDt4kaD7rgR31GD8r/vopt5VXZo4VSIEOednu6y6arW1z1MJtoz4HZmXhKHw8but1sQGe7LMXKO3aeK1iFyN5AtHz6LyZBGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Mo0zD16k; arc=none smtp.client-ip=193.252.22.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id 7xUeu3cnoukJt7xUiuRXfG; Thu, 24 Apr 2025 16:24:09 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1745504649;
+	bh=K9cTD87TavWzyJKYV4zrWDK5k7WI86kJqfUPCYnBnpY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Mo0zD16kfhROPb+1Ho5AGTv/skh9UvI9T+ybmvv0ZaPxLZk/mRql/25aIiG8QyLCe
+	 tvxfUJsuopjzSih0MEig6qCnAog+5SP+EMQwFehpp9jWfjQH3UbRHUiZEDxvxAXfad
+	 RNooe3PS1rVFnrCa6LKgdWKDncDCdIIdFz4n0db4lkkILWSELqJPYRLnDm3RYA43Bn
+	 oM5uxlXMQYjE6e9suw2j9QZkzwlBfcEstuxJDkMkuzkds4s1w/nhnBWYe8qP4GDtVl
+	 vuklKInx8Tvyi5Cahx1qUsKW6AE+SmJJfgm5+Lt52iwK2XwMrjobv6E2ulGXl00phY
+	 /rpMczZfmaSPA==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 24 Apr 2025 16:24:09 +0200
+X-ME-IP: 124.33.176.97
+Message-ID: <6c1980f7-9cdb-4443-830d-1d76dc8e2dd6@wanadoo.fr>
+Date: Thu, 24 Apr 2025 23:23:59 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] selftests: can: Import tst-filter from can-tests
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ dcaratti@redhat.com, fstornio@redhat.com
+References: <cover.1745323279.git.fmaurer@redhat.com>
+ <a4468403cc51ea6c0e8495d7d095befb37aa5aaf.1745323279.git.fmaurer@redhat.com>
+ <CAMZ6RqKfdNRBKoH16=7JDC2QKB+XO68mahg2X7zKDcUAM+8bzw@mail.gmail.com>
+ <96bd9677-c257-480b-be3c-7c4b9b79b238@redhat.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <96bd9677-c257-480b-be3c-7c4b9b79b238@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 24 Apr 2025 14:56:49 +0200 Jesper Dangaard Brouer wrote:
-> +	case NETDEV_TX_BUSY:
-> +		/* If a qdisc is attached to our virtual device, returning
-> +		 * NETDEV_TX_BUSY is allowed.
-> +		 */
-> +		txq = netdev_get_tx_queue(dev, rxq);
-> +
-> +		if (qdisc_txq_has_no_queue(txq)) {
-> +			dev_kfree_skb_any(skb);
-> +			goto drop;
-> +		}
-> +		netif_tx_stop_queue(txq);
-> +		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
-> +		__skb_push(skb, ETH_HLEN);
-> +		/* Depend on prior success packets started NAPI consumer via
-> +		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
-> +		 * paired with empty check in veth_poll().
-> +		 */
-> +		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
-> +			netif_tx_wake_queue(txq);
+On 24/04/2025 at 23:02, Felix Maurer wrote:
+> On 24.04.25 09:42, Vincent Mailhol wrote:
+>> On Tue. 22 Apr. 2025 at 21:08, Felix Maurer <fmaurer@redhat.com> wrote:
+> [...]
+>>> +ALL_TESTS="
+>>> +       test_raw_filter
+>>> +"
+>>> +
+>>> +net_dir=$(dirname $0)/..
+>>> +source $net_dir/lib.sh
+>>> +
+>>> +VCANIF="vcan0"
+>>
+>> Here, you are making the VCANIF variable configuration, but then, in
+>> your test_raw_filter.c I see:
+>>
+>>   #define VCANIF "vcan0"
+>>
+>> This means that in order to modify the interface, one would have to
+>> both modify the .sh script and the .c source. Wouldn't it be possible
+>> to centralize this? For example by reading the environment variable in
+>> the C file?
+>>
+>> Or maybe there is a smarter way to pass values in the kernel selftests
+>> framework which I am not aware of?
+> 
+> Good point, I'll try to come up with something to avoid the duplication
+> (either from the selftest framework or just for the CAN tests). I'd
+> prefer an argument to the program though, as I find this the more usual
+> way to pass info if one ever wants to run the test directly.
 
-Looks like I wrote a reply to v5 but didn't hit send. But I may have
-set v5 to Changes Requested because of it :S Here is my comment:
+Passing an argument would be the best. I am not sure how to do this with the
+selftests (but I did not investigate either).
 
- I think this is missing a memory barrier. When drivers do this dance
- there's usually a barrier between stop and recheck, to make sure the
- stop is visible before we check. And vice versa veth_xdp_rcv() needs
- to make sure other side sees the "empty" indication before it checks 
- if the queue is stopped.
+>>> +setup()
+>>> +{
+>>> +       ip link add name $VCANIF type vcan || exit $ksft_skip
+>>> +       ip link set dev $VCANIF up
+>>> +       pwd
+>>> +}
+
+Speaking of which, if you allow the user to modify the interface, then you will
+one additional check here to see whether it is a virtual can interface or not
+(the ip link commands are not the same for the vcan and the physical can).
+
+Something like:
+
+  CANIF="${CANIF:-vcan}"
+  BITRATE="${BITRATE:-500000}"
+
+  setup()
+  {
+  	if [ $CANIF == vcan* ]; then
+  		ip link add name $CANIF type vcan || exit $ksft_skip
+  	else
+  		ip link set dev $CANIF type can $BITRATE 500000
+  	fi
+  	ip link set dev $VCANIF up
+  	pwd
+  }
+
+>>> +cleanup()
+>>> +{
+>>> +       ip link delete $VCANIF
+>>> +}
+>>
+>> I guess that this setup() and this cleanup() is something that you
+>> will also need in the other can tests. Would it make sense to declare
+>> these in a common.sh file and just do a
+>>
+>>   source common.sh
+>>
+>> here?
+> 
+> I usually try to avoid making changes in anticipation of the future. I'm
+> not sure if all the tests need a similar environment and would prefer to
+> split this when we encounter that they do. Are you okay with that?
+
+Yes, this works. Keep this idea in back of your mind and if there is a need to
+reuse those in the future, then it will be a good timing to do the factorize the
+code.
+
+
+Yours sincerely,
+Vincent Mailhol
+
 
