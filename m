@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-185727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7979A9B8FD
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:20:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9404A9B8FF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A6404C52A1
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:20:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E24114C4029
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48E8223DDD;
-	Thu, 24 Apr 2025 20:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8BA1FECBD;
+	Thu, 24 Apr 2025 20:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cwsfoOPF"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FzSTFY9f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1280221D00A
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6421FECD3
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745525940; cv=none; b=hGt8pB2tycts/QyXzzKMGUVYOdaAZjKRRln/z2TkdoudMmKK98EvjzP/toSOsnMnpaxUv7H1dxTTZG0p8aKhgOd1Gq5U00BTTyasPEfZFRucwzakYBSgVsozoKRlQL4kynlcETaCrkRfklL/ajNmhzxEFmcJLQ3BtUQ1rJjXedU=
+	t=1745525948; cv=none; b=uvKTHUGrAnmmQbfml55h6nyVTA4fwHDNsdBXVaEyHYevPEXbqFjE1S4PaG/iVHnai0Y6qS7uh+z80VWtRR/tHJ+siNyeD4YUjvwYkH+n0cNv9SP4/bl9qPl39Q+OrVNLoJRx5tAYSF5AXQczUNbrhrEkhEQ5xRliqOGhe8MRDfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745525940; c=relaxed/simple;
-	bh=rxZKhx8TsXmgZB6THrS8ri601D6uZVXOdGQzwg1laDU=;
+	s=arc-20240116; t=1745525948; c=relaxed/simple;
+	bh=wXtt3O6QR0SBtm6JBBM/8SyfsD/cxOGQ/lU0OsnQlXc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iM540DNwK8q/iqtFvvTDcnKUN63NhEnTprW4ZqKCaiCF6csZ6evEsI6kDckc6q2Mg3hUjNcbhx1Azl/YV3HGVP8mJRkzwKhTbIr6IWHEUAPxKhkz/2vrEPG+vq+i4dajRzq5mkmAY2uCJGnfxrNazOBzdOkDw2lNuQzDldNwMJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cwsfoOPF; arc=none smtp.client-ip=209.85.210.54
+	 In-Reply-To:Content-Type; b=EOHWIs8bJix0LnIyvZ9fMKzp4odOtpjo/7N1ZJiDY7t++RPWKQ7SPO8j3RxmpM2sAXIhAbgr9KP/l2tyceSmOb063sUvqjjoDp976JOMgIgxQI1z7qkNk2VfxVMATxDYPwk5HAlhc4wUN0IvN3g18Ll6FX94vOb9fdWHVblzK4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FzSTFY9f; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-72bc3987a05so875185a34.1
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:18:58 -0700 (PDT)
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72c173211feso463379a34.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745525938; x=1746130738; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1745525946; x=1746130746; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fsBPmi5pPaqSKfCinwouG2FkRpkKC2fumVCLBW64feI=;
-        b=cwsfoOPF9mUTSXa3VA6S577xoiM038oJcCEXSvja0HRCaPt8Bd+UznP4KD2VpnJ6WE
-         Yr2xKXVa8/Ug7VEB7kfpIsgznoEVYLfkyrBLQlluJNUvV2hrCJPufcIVZqfbBvtmY0IC
-         2HtAV0Q/JfSm7MkdcULZtt1G1FLq16Qsl6xko=
+        bh=fqpCmm/9ps6ojnKQ5WNeOaRI3x7j1foxwoVLfKtNdk0=;
+        b=FzSTFY9fG5hY3YHZQtsfEwjUpuxHQPsoEIEyMFZ4wQrDbRYURtHEuUIG7KsWewiz5E
+         shrNvIeTJN8WtzHFxwctPsg6BMECAzlV0GEsrVy0za+78FZr79Wq2Gr9PFKxc8ba+MD/
+         IlTzE/QL0ze3Xy2bm2KH4pHdmhZhKuh2Bh5mQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745525938; x=1746130738;
+        d=1e100.net; s=20230601; t=1745525946; x=1746130746;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fsBPmi5pPaqSKfCinwouG2FkRpkKC2fumVCLBW64feI=;
-        b=bsedvDePw6BLRxBbHRJIt10+dxCesyIxB4aoL7Q/YZA+TzHWxWboNjq/gcqWUEMOGs
-         BdoSxjOcXiQt+Q1qPg2eVcKoNp8AaRsc0GvgGoUZfqvHAJV0aX3uoe9Gxnn1rd1WbuS7
-         3/DEQK/l2MQK+rNnqSXewbiA+NWz4mBbU5kJ4Xune9t+GGEHNV8+kSFCbgQ/nwxgtNR1
-         suGCeLTQrW+jUXDVB/FgMNf79WoZgAQ2RaNPVKRAX8N+BUlG9LcqhfKRaMYg5XFU/yNZ
-         zHw+q4oOn14WnfiUEnru18T/D29dJDcx9On0j0SYb04dp+6NqpgaYsqmR7wKAgcDJCpZ
-         u/DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwIud5H9D6BIvd5NitsaFONHDDo4hD+rkrWfeA5EkcgHmZtdQsCnE8TSw7YCRmNwvsfJnpLZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzsyjkq+9T5RojYDiBUI+1V4ex7wDn7m663QHWu7ePHRS++nl1+
-	HxemQm0WwHjXPLLqt42bEf2aUspMDMnjMoMfG5mkbF9xzIWdyd5CadjxZBgISg==
-X-Gm-Gg: ASbGncst2tCjcJMXne9D1jgTJJt8eGb0f8fs9kJt0HTK88pCc1KIy3KRaKde0mzvQx1
-	A+1tXa043PY6DkotW15r0nqAoXuNNu5vZNOkHMiYv7cJcEyjQ2bi4lH23hjKvzoOUUKyiI/rand
-	PUUmshefWra6cntt2nkBEq473gH3CxPLp39Ny8zi5nWDXdtj1jLFdKLQ4sXsLru0FLQHd6UbOBi
-	40oct5ybpNGf1bKrEAFHo1lXT5pJE6Fx4X1/aJ7hyMxI9BoqWXunUhUw4cIt3ax3nBo19gj+Ks0
-	UtI9blI1GURSGaHGjyfd2ad+u3dZFhOV0/+fMJ4jhUq29MEbspiELK9F24tEFORi7UjGz0Sqc9z
-	pFxQQbWSCmjp2ZsWYbhEJp0I=
-X-Google-Smtp-Source: AGHT+IHsOJvCEZ9FewargAde1R1OYTru0OLROwfvLZfytCWHUhUeMnGRx6mIMHGS3NPRwbyTR33g1w==
-X-Received: by 2002:a05:6830:4109:b0:72b:9140:f6d9 with SMTP id 46e09a7af769-7304fa8546emr2259303a34.4.1745525937944;
-        Thu, 24 Apr 2025 13:18:57 -0700 (PDT)
+        bh=fqpCmm/9ps6ojnKQ5WNeOaRI3x7j1foxwoVLfKtNdk0=;
+        b=a7r3kSaBXHce6CHuZI+qDbQ5AD3rl67U1uauKF0qzfUUA+IrmdJMjcsocABTona7an
+         ++V9jCoKLpdbLyGNV2Rm888HdX64+06+1t7pLKUdfoKw377qsaDwo/CSf86Qdn/cCQ7O
+         sJfTJ1PULqnuyyHVpFbt8F7T0eB2La4cJ9pjhbCTnhO0vTCXTGgTn7qjbdJbQAPRKK66
+         01lfnrb2wGArwNsdwsZWbRxFz8EOyVMD8HtbqkSmcCiNGBaXxIqPNPCwdWwb7zx0jBh4
+         cwDHpQQXggioIzNsILjC8P8mnhLtMaZjsVOXJu/k9J1mAdWc/B+kUS0gKfCngCC/AQcY
+         ecOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPb1oIl7JGBb8I6GTtKsA7iUySSizYesyIwAbIG6GAM2CKzasPjdc1ilp20dUr5I58mAHVyZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKuzNZVuaKiwnGv4oFH8hE3WeYo0drEeAyvA/UW0iKY6Jm+4BJ
+	BSzfxEQpXNUkPL5CXM5pCzpEX484oxLnAIs2MGHHSSaQgXGXHanqjWPMgURxVw==
+X-Gm-Gg: ASbGncsCKVntneOvj6YibaUWpV87UTmIftOcZhma9/OrnL5AbnI7fYr6tLc4w5rTrZq
+	5+0hFSDI7zYitkzywh7c8dRX/pSwplyWmohRDcLMSU6SfcZ1CQTT41on38koEW31Ekz+8QiqbX9
+	U12EA+T5JRd4q6BrLOr64xqQlxTiC71UrUT2ZQDoXt2wbqX1xEyu2kgzIcv1u5Qe7LCnE8Fau7X
+	JwZPuuwCbgPKUxzE7tbGijCbtUj37Auh4jb12XIqV2RZsict5ytjhcFBdO1vEHdLzKslKTwzreL
+	02Vg6PFz6UfF0m5jml1UE9ecEftQNeRjd37Z4vLd9ekXRhiREg4GKs358jZzEkoYJ2tkXWmIMax
+	BShb66jZ2/QVBE3Sw2on5wRpBbrv3YRB3qQ==
+X-Google-Smtp-Source: AGHT+IG6Zmz2sFvChlWMDoH7pTDFaR1Uux4d3RWMHcXZbIqfP6Es8O8XHkxJz+V9Fp3SVlkL6sqntQ==
+X-Received: by 2002:a05:6830:2a8f:b0:72c:320c:d960 with SMTP id 46e09a7af769-73059c6b3efmr842016a34.15.1745525946160;
+        Thu, 24 Apr 2025 13:19:06 -0700 (PDT)
 Received: from [192.168.1.105] (88-187-52-200.subs.proxad.net. [88.187.52.200])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7304f2ac2besm363165a34.30.2025.04.24.13.18.53
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7304f2ac2besm363165a34.30.2025.04.24.13.19.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 13:18:57 -0700 (PDT)
-Message-ID: <00277504-2fd9-4bde-afbe-0bbdb038c74e@broadcom.com>
-Date: Thu, 24 Apr 2025 22:18:52 +0200
+        Thu, 24 Apr 2025 13:19:05 -0700 (PDT)
+Message-ID: <9f2ebcc4-69b6-454d-a5cc-72e51d5fdff2@broadcom.com>
+Date: Thu, 24 Apr 2025 22:19:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,7 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/8] net: bcmasp: Remove support for asp-v2.0
+Subject: Re: [PATCH net-next v2 4/8] net: phy: mdio-bcm-unimac: Remove
+ asp-v2.0
 To: Justin Chen <justin.chen@broadcom.com>, devicetree@vger.kernel.org,
  netdev@vger.kernel.org
 Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
@@ -89,7 +90,7 @@ Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
  kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
  andrew+netdev@lunn.ch
 References: <20250422233645.1931036-1-justin.chen@broadcom.com>
- <20250422233645.1931036-4-justin.chen@broadcom.com>
+ <20250422233645.1931036-5-justin.chen@broadcom.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -124,17 +125,14 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250422233645.1931036-4-justin.chen@broadcom.com>
+In-Reply-To: <20250422233645.1931036-5-justin.chen@broadcom.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 4/23/2025 1:36 AM, Justin Chen wrote:
-> The SoC that supported asp-v2.0 never saw the light of day. asp-v2.0 has
-> quirks that makes the logic overly complicated. For example, asp-v2.0 is
-> the only revision that has a different wake up IRQ hook up. Remove asp-v2.0
-> support to make supporting future HW revisions cleaner.
+> Remove asp-v2.0 which will no longer be supported.
 > 
 > Signed-off-by: Justin Chen <justin.chen@broadcom.com>
 
