@@ -1,131 +1,228 @@
-Return-Path: <netdev+bounces-185734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D767A9B946
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:34:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E348FA9B960
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2341B60326
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:35:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D573BE8D6
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D982192FD;
-	Thu, 24 Apr 2025 20:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAE620F08E;
+	Thu, 24 Apr 2025 20:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c7beM3Dz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfPkinW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF8C4414
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1C414E2E2;
+	Thu, 24 Apr 2025 20:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745526895; cv=none; b=ptIxw/Q5SeZJIJejH9uB2h9bjgEyhCWam31dH0iiruczGlX2C59qABnItEsdCgKyqn1nojWZ+KqlbvIRhgMct1dXUrADQDj3kZCcLydAL8D4oWtUM48AgC3hdBHjYFW8p1YtS79w2qpZqzYNHttqUHaAu2j2+FahdF7lbhBcYIs=
+	t=1745527639; cv=none; b=OP97G4ARxLbQDXUjZXRF8qL4pSxJIgl6Pj0EdZvcVE/FcpaHcKHJMBuxyh63wfVaKq7ZlWUvLLzUkGzTq7GoiuJIdEaHBy9V0iU/Zi7f0B06e4ekHi8WWTV7FlGEYl7xKigR/h9T9YYlJFBgTKFdaPlWdO1qvXhkIY9IdInYLXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745526895; c=relaxed/simple;
-	bh=V8URR3g958yg3vP5Z35iK1YO2szV8GmuvvA8Lhelwkw=;
+	s=arc-20240116; t=1745527639; c=relaxed/simple;
+	bh=aRR9U42dKiAFdfeSisi+NbgIuTAkls5smAOfmnflsaI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IQpv9sFxFOFX3xRvjkC1wod+vECrVMa6uotP5vUR0W7D2NI1xgjup7ah5SqcZsj2LknbpmRcnY5147AEyoOJ0Qmapr5r6GhhsJa2bjN+qeHN9RDR/EpsqiGCRGIQOFRHRZAfGXyoLH/Q8nxS2qwwAXSQPdEe55rH1OfIDbQJPnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c7beM3Dz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=std+j5Qaz87SwbkZsVsKpwrzLyZzLrkia9SzU8BDXqc=; b=c7beM3DzrUheImButF4mcXE6vN
-	gtE9qGQjIU1v9P/0KIcfONdRWbSQ13kJ0Z/09J3D3D6VMz/lD0aR+Re+xEwzExMjpY8HMDXrRZw8Q
-	X9Iw//pTmTQcSWIRrfYb2X1EscKa7hteUJsVKxIJD37Wu+bP5OqI8xYmaYzLnXetNWjI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u83HW-00AVme-PA; Thu, 24 Apr 2025 22:34:50 +0200
-Date: Thu, 24 Apr 2025 22:34:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, hkallweit1@gmail.com, davem@davemloft.net,
-	pabeni@redhat.com
-Subject: Re: [net-next PATCH 0/2] net: phylink: Fix issue w/ BMC link flap
-Message-ID: <3e37228e-c0a9-4198-98d3-a35cc77dbd94@lunn.ch>
-References: <06490a1a-427c-4e35-b9c3-154a0c88ed60@lunn.ch>
- <CAKgT0UfeH4orZq5AnHvgeTL3i05fPu-GNmBwTnnrGFWOdU+6Cg@mail.gmail.com>
- <CAKgT0Udw-XQmRan1qBaBEkCOqNd2FRNgPd8E8Au+Wmih7QVsWA@mail.gmail.com>
- <20250421182143.56509949@kernel.org>
- <e3305a73-6a18-409b-a782-a89702e43a80@lunn.ch>
- <20250422082806.6224c602@kernel.org>
- <08b79b2c-8078-4180-9b74-7cd03b2b06f7@lunn.ch>
- <CAKgT0UfW=mHjtvxNdqy1qB6VYGxKrabWfWNgF3snR07QpNjEhQ@mail.gmail.com>
- <c7c7aee2-5fda-4b66-a337-afb028791f9c@lunn.ch>
- <CAKgT0UfDWP91rH1G70+pYL2HbMdjgr46h3X+uufL42xmXVi=cg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=URvvOmFI/STcn9hPXM9ZA8Mt1S0WDRiGDav3F7yf/2yY6naZVctr5Ma5bzQzi1OuEOG01HjHkt0SksLEFo17MEC/obWIy3Pss+l2ebZ9WllAAWwdLI2w9/ZfIzqSVHjjtEzFK8TJFiQKa/iOsaVUAoHZhBOUozbDBIGJO1ps+Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfPkinW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F9AC4CEE3;
+	Thu, 24 Apr 2025 20:47:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745527636;
+	bh=aRR9U42dKiAFdfeSisi+NbgIuTAkls5smAOfmnflsaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AfPkinW/6MqeKFXAIw5YqEChgB2LX5EkjxeAvWGVHXpWJjXQKHoonSldphap6JNlY
+	 sOfn3PptKh219lLorekxIdhc+lGBEqtr9hSd+nSZv/3igMc9rbsba1wAlqzF5ACjjG
+	 kThJvK+QoMLHO1N6wN6VpZrD7o9LcXyBhKdrNx0CbF8h93zdnJZsyXWKNINXrI8D9S
+	 Hr5xu6k4uF06r8oLp4bTkJurxQLqJe2QaePenx7dUzsW0aIU3iz6kq8LfFDckvJ8HL
+	 1ILwntxb8QM56oZFYFsgQkbA53N6MgFxRra32pwFICBMTK1G2yuR96Tz26M028nsBX
+	 ggVP9uatgmM1Q==
+Date: Thu, 24 Apr 2025 22:47:11 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to perform
+ XDP_REDIRECT into maps
+Message-ID: <aAqjTz7O4HpuVspL@lore-rh-laptop>
+References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
+ <87wmb97uyt.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2v2QP9mMY9ArTXMu"
+Content-Disposition: inline
+In-Reply-To: <87wmb97uyt.fsf@toke.dk>
+
+
+--2v2QP9mMY9ArTXMu
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKgT0UfDWP91rH1G70+pYL2HbMdjgr46h3X+uufL42xmXVi=cg@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-Sorry for the delay, busy with $DAY_JOB
-
-> > > > There are not 4 host MACs connected to a 5 port switch. Rather, each
-> > > > host gets its own subset of queues, DMA engines etc, for one shared
-> > > > MAC. Below the MAC you have all the usual PCS, SFP cage, gpios, I2C
-> > > > bus, and blinky LEDs. Plus you have the BMC connected via an RMII like
-> > > > interface.
-> > >
-> > > Yeah, that is the setup so far. Basically we are using one QSFP cable
-> > > and slicing it up. So instead of having a 100CR4 connection we might
-> > > have 2x50CR2 operating on the same cable, or 4x25CR.
+> Lorenzo Bianconi <lorenzo@kernel.org> writes:
+>=20
+> > In the current implementation if the program is dev-bound to a specific
+> > device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
+> > or CPUMAP even if the program is running in the driver NAPI context and
+> > it is not attached to any map entry. This seems in contrast with the
+> > explanation available in bpf_prog_map_compatible routine.
+> > Fix the issue introducing __bpf_prog_map_compatible utility routine in
+> > order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_cal=
+l()
+> > at program load time (bpf_prog_select_runtime()).
+> > Continue forbidding to attach a dev-bound program to XDP maps
+> > (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
 > >
-> > But for 2x50CR2 you have two MACs? And for 4x25CR 4 MACs?
-> 
-> Yes. Some confusion here may be that our hardware always has 4
-> MAC/PCS/PMA setups, one for each host. Depending on the NIC
-> configuration we may have either 4 hosts or 2 hosts present with 2
-> disabled.
+> > Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> > Changes in v2:
+> > - Introduce __bpf_prog_map_compatible() utility routine in order to skip
+> >   bpf_prog_is_dev_bound check in bpf_check_tail_call()
+> > - Extend xdp_metadata selftest
+> > - Link to v1: https://lore.kernel.org/r/20250422-xdp-prog-bound-fix-v1-=
+1-0b581fa186fe@kernel.org
+> > ---
+> >  kernel/bpf/core.c                                  | 27 +++++++++++++-=
+--------
+> >  .../selftests/bpf/prog_tests/xdp_metadata.c        | 22 ++++++++++++++=
++++-
+> >  tools/testing/selftests/bpf/progs/xdp_metadata.c   | 13 +++++++++++
+> >  3 files changed, 50 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > index ba6b6118cf504041278d05417c4212d57be6fca0..a3e571688421196c3ceaed6=
+2b3b59b62a0258a8c 100644
+> > --- a/kernel/bpf/core.c
+> > +++ b/kernel/bpf/core.c
+> > @@ -2358,8 +2358,8 @@ static unsigned int __bpf_prog_ret0_warn(const vo=
+id *ctx,
+> >  	return 0;
+> >  }
+> > =20
+> > -bool bpf_prog_map_compatible(struct bpf_map *map,
+> > -			     const struct bpf_prog *fp)
+> > +static bool __bpf_prog_map_compatible(struct bpf_map *map,
+> > +				      const struct bpf_prog *fp)
+> >  {
+> >  	enum bpf_prog_type prog_type =3D resolve_prog_type(fp);
+> >  	bool ret;
+> > @@ -2368,14 +2368,6 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
+> >  	if (fp->kprobe_override)
+> >  		return false;
+> > =20
+> > -	/* XDP programs inserted into maps are not guaranteed to run on
+> > -	 * a particular netdev (and can run outside driver context entirely
+> > -	 * in the case of devmap and cpumap). Until device checks
+> > -	 * are implemented, prohibit adding dev-bound programs to program map=
+s.
+> > -	 */
+> > -	if (bpf_prog_is_dev_bound(aux))
+> > -		return false;
+> > -
+> >  	spin_lock(&map->owner.lock);
+> >  	if (!map->owner.type) {
+> >  		/* There's no owner yet where we could check for
+> > @@ -2409,6 +2401,19 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
+> >  	return ret;
+> >  }
+> > =20
+> > +bool bpf_prog_map_compatible(struct bpf_map *map, const struct bpf_pro=
+g *fp)
+> > +{
+> > +	/* XDP programs inserted into maps are not guaranteed to run on
+> > +	 * a particular netdev (and can run outside driver context entirely
+> > +	 * in the case of devmap and cpumap). Until device checks
+> > +	 * are implemented, prohibit adding dev-bound programs to program map=
+s.
+> > +	 */
+> > +	if (bpf_prog_is_dev_bound(fp->aux))
+> > +		return false;
+> > +
+> > +	return __bpf_prog_map_compatible(map, fp);
+> > +}
+> > +
+> >  static int bpf_check_tail_call(const struct bpf_prog *fp)
+> >  {
+> >  	struct bpf_prog_aux *aux =3D fp->aux;
+> > @@ -2421,7 +2426,7 @@ static int bpf_check_tail_call(const struct bpf_p=
+rog *fp)
+> >  		if (!map_type_contains_progs(map))
+> >  			continue;
+> > =20
+> > -		if (!bpf_prog_map_compatible(map, fp)) {
+> > +		if (!__bpf_prog_map_compatible(map, fp)) {
+>=20
+> Hmm, so this allows devbound programs in tail call maps, right? But
+> there's no guarantee that a tail call map will always be used for a
+> particular device, is there? For instance, it could be shared between
+> multiple XDP programs, bound to different devices, thus getting the
+> wrong kfunc.
 
-So with 2 hosts, each host has two netdevs? If you were to dedicate
-the whole card to one host, you would have 4 netdevs? It is upto
-whatever is above to perform load balancing over those?
+According to my understanding the following path will be executed just for
+dev-bound program that performs XDP_REDIRECT into a BPF_MAP_TYPE_PROG_ARRAY:
 
-If you always have 4 MAC/PCS, then the PCS is only ever used with a
-single lane? The MAC does not support 100000baseKR4 for example, but
-250000baseKR1?
+bpf_prog_select_runtime() -> bpf_check_tail_call() -> __bpf_prog_map_compat=
+ible()
 
-> The general idea is that we have to cache the page and bank in the
-> driver and pass those as arguments to the firmware when we perform a
-> read. Basically it will take a lock on the I2C, set the page and bank,
-> perform the read, and then release the lock. With that all 4 hosts can
-> read the I2C from the QSFP without causing any side effects.
+while for XDP program inserted into BPF_MAP_TYPE_PROG_ARRAY we will continue
+running bpf_prog_map_compatible() so we will forbid inserting ev-bound prog=
+rams.
+This is even tested into xdp_metadata selftest:
 
-I assume your hardware team have not actually implemented I2C, they
-have licensed it. Hence there is probably already a driver for it in
-drivers/i2c/busses, maybe one of the i2c-designware-? However, you are
-not going to use it, you are going to reinvent the wheel so you can
-parse the transactions going over it, look for reads and writes to
-address 127? Humm, i suppose you could have a virtual I2C driver doing
-this stacked on top of the real I2C driver. Is this something other
-network drivers are going to need? Should it be somewhere in
-drivers/net/phy? The hard bit is how you do the mutex in an agnostic
-way. But it looks like hardware spinlocks would work:
-https://docs.kernel.org/locking/hwspinlock.html
+https://github.com/torvalds/linux/blob/master/tools/testing/selftests/bpf/p=
+rog_tests/xdp_metadata.c#L416
 
-And actually, it is more complex than caching the page.
+It seems to me v2 is not more relaxed than v1. Am I missing something?
 
-  This specification defines functions in Pages 00h-02h. Pages 03-7Fh
-  are reserved for future use. Writing the value of a non-supported
-  Page shall not be accepted by the transceiver. The Page Select byte
-  shall revert to 0 and read / write operations shall be to the
-  unpaged A2h memory map.
+Regards,
+Lorenzo
 
-So i expect the SFP driver to do a write followed by a read to know if
-it needs to return EOPNOTSUPP to user space because the SFP does not
-implement the page.
+>=20
+> Or you could even have dev-bound programs tail-called from non-dev-bound
+> programs with this change AFAICT?
+>=20
+> In other words, I think this is too relaxed, your change in v1 that only
+> relaxed cpumap and devmap checks here was better.
+>=20
+> In fact, I don't really see why bpf_check_tail_call() needs to look at
+> devmap/cpumap at all, so maybe just changing the
+> map_type_contains_progs() call to only match tail call maps is better?
+>=20
+> -Toke
 
-	Andrew
+--2v2QP9mMY9ArTXMu
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaAqjTAAKCRA6cBh0uS2t
+rBSJAQCb5y1spcF6J0yANxRkAUZQAtSZVpd/X8FgWQ75OBWcOwEAlYBg0yHxDwhJ
+qoZmCDGBeVGi3Fg1/EbKegw0UsZxNwA=
+=ODrw
+-----END PGP SIGNATURE-----
+
+--2v2QP9mMY9ArTXMu--
 
