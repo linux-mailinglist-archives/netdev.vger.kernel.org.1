@@ -1,115 +1,153 @@
-Return-Path: <netdev+bounces-185419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E76A9A492
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:46:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74149A9A4F1
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3146189846C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:46:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E262923D82
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86CF20298D;
-	Thu, 24 Apr 2025 07:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3A41F6667;
+	Thu, 24 Apr 2025 07:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OB/Wu0p/"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="bYoQbH1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-72.smtpout.orange.fr [193.252.22.72])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5C61F4CAB;
-	Thu, 24 Apr 2025 07:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0385E1F4188;
+	Thu, 24 Apr 2025 07:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745480659; cv=none; b=CfmnSF0m8H64Spn8fwovLxdoCnvMukHyLJ0syxbzi/mL9+JUguDESYt5K0DW7QNOFUJM1bgdqyQpY1n+fmaQ3qEBfEGciUkkfvic42UFjKxlAFXtseuE2+5hFoZvLmsUH0Mu9WOnEsY99YSiRqHQEzAKpPyLG01J0yvZKlKUUn4=
+	t=1745481229; cv=none; b=qzfLx15Lnmasy3k/7JmfpoLNnEoli6dT/9HgsWPrhd99VJn1Zu09fkAm6L3YwV74XoDrf9kALy8jKDxo/o2SmPlseQvejAeWAEFBl9BUkjMBSBfA9MKLTgMVgmqDMZc+4GPs2LRB50iEZ2/0dNrb5dCJZBV82sM8tptoWt9SKSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745480659; c=relaxed/simple;
-	bh=VnZ0ZKETltelPggcEVrc3mWHY8TQu/tmfh9OEL4vmMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f4v7pq4kj8tHjD7sAlBD5E1TTmVIX7xMQcgW4PbFk2MYHbivdi70e645VoH5KxKhK3KWhrNvv/W2iHGuXSVsNgb6Bpq4RJ/spjmDIdwfoJxEFwnCztrahwR/QA1KyB8MFBapot2HePmbRy7qoHz99xRZFVVhBeW1xnzExEx2Puc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OB/Wu0p/; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745480658; x=1777016658;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VnZ0ZKETltelPggcEVrc3mWHY8TQu/tmfh9OEL4vmMI=;
-  b=OB/Wu0p/r8d15aebZjNEJntfPO9eWB3D/pZUnPOZv9YQNClfiBNNVzqW
-   KsM/uCZOF5AiVokmGN7VWM41rOCaTzTd3ExwHBFrt8bixmAw7EojDGD8h
-   1YowSpfcLieySl6POEIYeClPzKs0txBlHWnfI6SokzyewlKKrpBnd+Jlz
-   yigZlZQbLsGoEvQzjyhXtdblXT26G0TbuiE+VG/AK1VHAHXLwesW+UNQI
-   yv8e/EA8vCnwjihXWRM6cyqap28mofCr+lCvKXP/JdrIUahwPH9gFzwgV
-   91pB5dh5vqsYiOR43QX3ORlBONnA1qtmS5ivaf9dAduyuVt8m8DYm7oDm
-   g==;
-X-CSE-ConnectionGUID: V2WGM4HkS+aVeKFQFLBK6Q==
-X-CSE-MsgGUID: wxBLYM9lRMGvXLXlRBz0Vw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="57741542"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="57741542"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 00:44:16 -0700
-X-CSE-ConnectionGUID: MELztBFPQQ2RK/E68kIfoA==
-X-CSE-MsgGUID: h1WZ0YKEQFuFYSt/MxBHnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="132274496"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 00:43:59 -0700
-Message-ID: <02689dad-a10a-41a8-ad7e-e92d0a8d7e76@linux.intel.com>
-Date: Thu, 24 Apr 2025 15:43:56 +0800
+	s=arc-20240116; t=1745481229; c=relaxed/simple;
+	bh=3xWxJedTmecmXbJvqY9BfQusNhg8/ufg2pc+yGepvCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s66bm01bWk8gyESoGZdSse0IwMOPEPvknrWJiLN2f0fOLqfu3DILvmJBiEuZCi790Yxp80Xor3jnF2ie4wytp7Wv4046/VA2Bvv/7Hw8zbMpKUpu5BqCRnz1w85i8+aNzUitG6ckq0ieQceNnlBbV5I6rqr3lpmdCmLAyrueP60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=bYoQbH1l; arc=none smtp.client-ip=193.252.22.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ej1-f42.google.com ([209.85.218.42])
+	by smtp.orange.fr with ESMTPSA
+	id 7rG9up98WOaHY7rGCuhwO0; Thu, 24 Apr 2025 09:44:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1745480680;
+	bh=ZGyUrHEN80lsUNEPYdnlrD7iPYpeUH4sQ5suvUCtFks=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=bYoQbH1lsJKO8JaosIB/QJFyDdralpaL8TALHPD67wNOaIb03ljiYgWWSLhAwilaf
+	 S1Si5pZtBbOTdcKy4vqps+1Ac1uKH4JovPXsNETHw8h0B3y9VqCa7nsrxXM/+KLDVM
+	 G4nS413RHZCLBDwegRNPxx4fX8dJ3pZu1NQYIvnIb+895fnNnbEln5dle8ufcuGSXS
+	 S6gM3zebAWIM4h0PrpYignG6up03NeLBwYXdy9VOLDT15cxQBH6mfTMCzv23ydw9EH
+	 0BRvCfH29+gVO803k9nIX3xcKXNxG6IloS/FTGVV/2p7J1Tf7A3gbYqWyIOGHrSA80
+	 5k2valhi0bDjg==
+X-ME-Helo: mail-ej1-f42.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 24 Apr 2025 09:44:40 +0200
+X-ME-IP: 209.85.218.42
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac25520a289so113479066b.3;
+        Thu, 24 Apr 2025 00:44:40 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUJkQHuUhVnQyEDdjkLgluXe+D7saNLB0iDYyGlmvgDodNnO0oiChpEuDRgKI1TVaGwR0cdJdeT@vger.kernel.org, AJvYcCVe+fd2ksRw2jRJYMqRPBLk7CU+mWXoVXQPE3d+2sRgBhaQF8rwFSJwPEuOYLBhBhf6B6qOmIzjuo4=@vger.kernel.org, AJvYcCW4GHJdlNH66FNZrAZU621smg7+gU1xYngsCcghzfNBR7q9cBlzTNWnmLu3n+MHJVAvdttCOwTzRNoI7jnWULmK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz7p209Qi5XtoKj6lW/jUNuBUchOhXouz13cwMXDuUMqqKCf59
+	qvOilpM8pijQW9aWjiypMLIhOyaxbZ6N16EWPgkbJtUMmU8dgMq3YJaNkXjQBZ0ZHQIeZE8oOKB
+	vJC5sidIYDEMuVpIt/SicIv3ZoGA=
+X-Google-Smtp-Source: AGHT+IFtRW8AnCxj7ZZK96VH/HRW8rO4PqPmk6v0jzecLO3+wyPYoU7HhLMDl8EA85G9T+iwoNWRRiSYcavReo6MpOY=
+X-Received: by 2002:a17:907:6d20:b0:acb:4e0c:23ed with SMTP id
+ a640c23a62f3a-ace5731a270mr146829066b.14.1745480677387; Thu, 24 Apr 2025
+ 00:44:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
-To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
- linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
- linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
- jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org,
- namhyung@kernel.org, mark.rutland@arm.com,
- alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
- adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org,
- ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
- seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
- kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-13-xin@zytor.com>
- <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
- <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1745323279.git.fmaurer@redhat.com> <710557cef8fb8472628862d9b65edcf7aeb32bb5.1745323279.git.fmaurer@redhat.com>
+In-Reply-To: <710557cef8fb8472628862d9b65edcf7aeb32bb5.1745323279.git.fmaurer@redhat.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Thu, 24 Apr 2025 16:44:26 +0900
+X-Gmail-Original-Message-ID: <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
+X-Gm-Features: ATxdqUEQeMsUFmU2qWO3ZYD-o6q2DSQEzgq_DnwA1JNVZbTdO6MT72QyyX0ZLSc
+Message-ID: <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] selftests: can: Document test_raw_filter test cases
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, dcaratti@redhat.com, fstornio@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-
-On 4/24/2025 3:21 PM, Xin Li wrote:
-> On 4/23/2025 11:33 PM, Mi, Dapeng wrote:
->> Could we merge this patch and previous patch into a single patch? It's
->> unnecessary to just modify the pmu_msr_read()/pmu_msr_write() in previous
->> patch and delete them immediately. It just wastes the effort.
-> No, it's not wasting effort, it's for easier review.
+On Tue. 22 Apr. 2025 at 21:03, Felix Maurer <fmaurer@redhat.com> wrote:
+> The expected results did not explain very well what was really tested. Make
+> the expectations more clear by writing out the flags that should be set in
+> the received frames and add a short explanation for each test case. Also,
+> document the overall test design.
 >
-> Look at this patch, you can easily tell that pmu_msr_read() and
-> pmu_msr_write() are nothing more than pmu_msr_chk_emulated(), and
-> then removing them makes a lot of sense.
+> Signed-off-by: Felix Maurer <fmaurer@redhat.com>
+> ---
+>  .../selftests/net/can/test_raw_filter.c       | 65 ++++++++++++++-----
+>  1 file changed, 49 insertions(+), 16 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/can/test_raw_filter.c b/tools/testing/selftests/net/can/test_raw_filter.c
+> index 7fe11e020a1c..8d43053824d2 100644
+> --- a/tools/testing/selftests/net/can/test_raw_filter.c
+> +++ b/tools/testing/selftests/net/can/test_raw_filter.c
+> @@ -101,94 +101,113 @@ FIXTURE_VARIANT(can_filters) {
+>         int exp_num_rx;
+>         int exp_rxbits;
+>  };
+> +#define T_EFF (CAN_EFF_FLAG >> 28)
+> +#define T_RTR (CAN_RTR_FLAG >> 28)
 
-These 2 patches are not complicated, it won't be difficult to review if
-merging them into one as long as the commit message mentions it clearly.
-Anyway I'm fine if you hope to keep them into two patches.
+I do not like this
 
+  >> 28
 
+shift. I understand that it is part of the original design, but for
+me, this is just obfuscation.
+
+Why just not using CAN_EFF_FLAG and CAN_RTR_FLAG as-is for the
+expected values? What benefit does this shift add?
+
+> +/* Receive all frames when filtering for the ID in standard frame format */
+>  FIXTURE_VARIANT_ADD(can_filters, base) {
+>         .testcase = 1,
+>         .id = ID,
+>         .mask = CAN_SFF_MASK,
+>         .exp_num_rx = 4,
+> -       .exp_rxbits = 4369,
+> +       .exp_rxbits = (1 | 1 << (T_EFF) | 1 << (T_RTR) | 1 << (T_EFF | T_RTR)),
+                        ^                                                      ^
+Nitpick: those outermost parentheses are not needed.
+
+This took me time to process. Isn't your expression redundant? What about
+
+  .exp_rxbits = 1 | 1 << (T_EFF | T_RTR),
+
+?
+
+This gives me the same result:
+
+  https://godbolt.org/z/cr3q5vjMr
+
+>  };
+> +/* Ignore EFF flag in filter ID if not covered by filter mask */
+>  FIXTURE_VARIANT_ADD(can_filters, base_eff) {
+>         .testcase = 2,
+>         .id = ID | CAN_EFF_FLAG,
+>         .mask = CAN_SFF_MASK,
+>         .exp_num_rx = 4,
+> -       .exp_rxbits = 4369,
+> +       .exp_rxbits = (1 | 1 << (T_EFF) | 1 << (T_RTR) | 1 << (T_EFF | T_RTR)),
+                         ^
+What is the meaning of this 1?
+
+>  };
+
+(...)
+
+Yours sincerely,
+Vincent Mailhol
 
