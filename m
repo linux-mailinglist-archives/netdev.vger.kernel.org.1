@@ -1,132 +1,104 @@
-Return-Path: <netdev+bounces-185393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1EFA99FFF
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 06:07:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34DCDA9A002
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 06:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1CF5188EE03
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:07:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E941D7A28F6
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C853819D884;
-	Thu, 24 Apr 2025 04:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="JroYeDdf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76481B4241;
+	Thu, 24 Apr 2025 04:08:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307E619CC3D;
-	Thu, 24 Apr 2025 04:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AB581741
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 04:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745467529; cv=none; b=UJT7HvkzfY+zB8bI1CPDhC9QFSUzBtAe978SHaEl28bE7nBlZMzqsOk5n8oh3Oti2ddHFe45npekqiOhv/1a895VoZ23XBlha/zp2cus9Skt/N/giHG1qPJHSuiT/4Fgn9priSn4Rg9qpB+MTb99SmjxPDliqhJGRS4zEOD3MgA=
+	t=1745467700; cv=none; b=VhZ+yG1mKfpHo51HVQ6UdTWkPgSBldnkn8kAeYmmOf4hKDUCwnp78/WCm5lUS8q1JHl0IHKr248CIJQ3wRw8C36TYepTDr/c0WWvD2K1G3B++z4dm3wfpMycemyzLgWND+TXUl1HgxvZwUEH8uhP9dmgHQvMAazDz68O9JUDVng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745467529; c=relaxed/simple;
-	bh=C0fT7nTb4i7lur/awzNdei1Byl5mpGyS71sQxaNBIuE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UKhX4t6jVkH4ugJ+n+ZLhIeBgmDUoHYc3do/mhQNfkrkOjunLhqT86lHRqGSF5206kBatke3SSri94KSXYd33+uiNQrWqf8pqAbvJzcFkZFPMPVXO5jKEyINXdy5gpb/fwH1R+wDkOxPckR1dj8J0ryxr80f6RDOEQVtdZkkBWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=JroYeDdf; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53O44qYpA4054997, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1745467492; bh=C0fT7nTb4i7lur/awzNdei1Byl5mpGyS71sQxaNBIuE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=JroYeDdfNUY387WH9CRYxi8U0q9lXCevPzBzWyHiBzeJIKmbD/z2d4zB/yutieFy8
-	 mEx4zO49PcXUMcgiRfNI+9VR6y2G/3YDeQNn5jkZYGAJSWxO+kBjVM/Ba5u/FIsuNh
-	 tOSQHJQUSs2FECTci71pcJxwKLDa0fWoK60FWj/+XpvN4u27+bLTRg8NfgjfXUH9WU
-	 cLC7bnwjsGsmW+Kg9b5PosvySqrGx2hoEtH71z2YcHcUofVlX58ckF3qFNqIRH09GY
-	 K84HwBHvHPFrmZuWj2qlkxAIooreeLrdomzB262Pavs4GmVSLr6n1vOJChET5q6e5e
-	 JJpvzu6B5fI5A==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53O44qYpA4054997
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 12:04:52 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 24 Apr 2025 12:04:52 +0800
-Received: from RTDOMAIN (172.21.210.124) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 24 Apr
- 2025 12:04:51 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>,
-        "kernel
- test robot" <lkp@intel.com>
-Subject: [PATCH net] rtase: Modify the condition used to detect overflow in rtase_calc_time_mitigation
-Date: Thu, 24 Apr 2025 12:04:44 +0800
-Message-ID: <20250424040444.5530-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1745467700; c=relaxed/simple;
+	bh=ci7+hmwkiyewObamN4NDCFkAKiCyOM8pn1d+250B7kY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rAJ4mdaU4GUXltqZmQfKLEUU/kzVsZavCBEpzbxsjLn26gSTSWAhit94JbzMDBNESAPljEPdwM3c2wX7BaCzsaw0uzpgw4uMPjuhanibbKt7MnHQTI8Y2YO/13qxO3wgsXkSTKckwVHGSliDGAs4tI6Bg+I3sjJEskkUEzapdDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7nsS-00061c-Ge; Thu, 24 Apr 2025 06:07:56 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7nsQ-001p3q-2j;
+	Thu, 24 Apr 2025 06:07:54 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7nsQ-001DBB-2G;
+	Thu, 24 Apr 2025 06:07:54 +0200
+Date: Thu, 24 Apr 2025 06:07:54 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 0/4] net: selftest: improve test string
+ formatting and checksum handling
+Message-ID: <aAm5Ggfn126EBFae@pengutronix.de>
+References: <20250422123902.2019685-1-o.rempel@pengutronix.de>
+ <20250423184400.31425ecd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250423184400.31425ecd@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Fix the following compile error reported by the kernel test
-robot by modifying the condition used to detect overflow in
-rtase_calc_time_mitigation.
+On Wed, Apr 23, 2025 at 06:44:00PM -0700, Jakub Kicinski wrote:
+> On Tue, 22 Apr 2025 14:38:58 +0200 Oleksij Rempel wrote:
+> > This patchset addresses two issues in the current net selftest
+> > framework:
+> > 
+> > - Truncated test names: Existing test names are prefixed with an index,
+> >   reducing the available space within the ETH_GSTRING_LEN limit.  This
+> >   patch removes the index to allow more descriptive names.
+> > 
+> > - Inconsistent checksum behavior: On DSA setups and similar
+> >   environments, checksum offloading is not always available or
+> >   appropriate. The previous selftests did not distinguish between software
+> >   and hardware checksum modes, leading to unreliable results. This
+> >   patchset introduces explicit csum_mode handling and adds separate tests
+> >   for both software and hardware checksum validation.
+> 
+> Doesn't apply, presumably because of the fix that's sitting in net?
 
-In file included from include/linux/mdio.h:10:0,
-                  from drivers/net/ethernet/realtek/rtase/rtase_main.c:58:
- In function 'u16_encode_bits',
-     inlined from 'rtase_calc_time_mitigation.constprop' at drivers/net/
-     ethernet/realtek/rtase/rtase_main.c:1915:13,
-     inlined from 'rtase_init_software_variable.isra.41' at drivers/net/
-     ethernet/realtek/rtase/rtase_main.c:1961:13,
-     inlined from 'rtase_init_one' at drivers/net/ethernet/realtek/
-     rtase/rtase_main.c:2111:2:
->> include/linux/bitfield.h:178:3: error: call to '__field_overflow'
-      declared with attribute error: value doesn't fit into mask
-    __field_overflow();     \
-    ^~~~~~~~~~~~~~~~~~
- include/linux/bitfield.h:198:2: note: in expansion of macro
- '____MAKE_OP'
-   ____MAKE_OP(u##size,u##size,,)
-   ^~~~~~~~~~~
- include/linux/bitfield.h:200:1: note: in expansion of macro
- '__MAKE_OP'
-  __MAKE_OP(16)
-  ^~~~~~~~~
+Yes, your right. I tried to decouple it, but seems in the last version
+made to many changes. Sorry
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202503182158.nkAlbJWX-lkp@intel.com/
-Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 2aacc1996796..55b8d3666153 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1925,8 +1925,8 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
- 
- 	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
- 
--	msb = fls(time_us);
--	if (msb >= RTASE_MITI_COUNT_BIT_NUM) {
-+	if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
-+		msb = fls(time_us);
- 		time_unit = msb - RTASE_MITI_COUNT_BIT_NUM;
- 		time_count = time_us >> (msb - RTASE_MITI_COUNT_BIT_NUM);
- 	} else {
 -- 
-2.34.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
