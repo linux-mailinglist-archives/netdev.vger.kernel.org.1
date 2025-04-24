@@ -1,121 +1,183 @@
-Return-Path: <netdev+bounces-185423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4620FA9A4C4
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:51:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1C4A9A4EE
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6D23B6748
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:49:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD5121B8265A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C531E5219;
-	Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6421FF1AD;
+	Thu, 24 Apr 2025 07:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KAeJDrlg"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="U31FCzkO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A7D8C11
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435271F3BAB
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 07:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745481009; cv=none; b=i73YL42Q1D+QHfKMLDz8UyWSSuXCECnkAksMXrbbMDuHItyLRuXNIChSbIPmVfQwPB2P3HaUT98x2D4C1msPqwOQBVGC0QmW4V1LodR7+JfuQT8Y05Y3wXYwxsK4J13NUdkx4RMeDnRqSJLJCR51AzUarAKO48mitUTGKUQ9jkU=
+	t=1745481200; cv=none; b=K6ftBx2gvk9LyqYKHQ8GyUQThDN91yW45kjXmdkFYhR4UWJIRHHhzgwVLnbrvwuXmIDou3sNjOObYE8IPOd5DNXXVqH0pChUIy0C85EN6zZ3niKVDX711uuaopYoBRjQfhNyULNApp1lQdZUE2JarKBFuFeF9axLcKGz21OtI0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745481009; c=relaxed/simple;
-	bh=rOpxxm+9KW6szQxQ0KqgxfWTa6IVtYN+ONDUkutwY0M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FVvyDH6hbvEmrxjRLU2fW5zwgsk+XrKXbtEJ71TMzcwwhKoc6c2A/KyzAJRu/HQdPwL/PGvJvPuAAQDi0eihQUEyad92lTWPTR9yYJ3WRIuONFiinTTn64Gb2sEJfvzRjhgrwNre21v/pkML1FauaVo8CBiEXbC9zkA7FHomHs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KAeJDrlg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2793EC4CEE3;
-	Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745481009;
-	bh=rOpxxm+9KW6szQxQ0KqgxfWTa6IVtYN+ONDUkutwY0M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KAeJDrlgSjjrczJnJf/Mq/b6tZpirZUSxduzwbFqEX33y6G4psEp+5BbruR3priMX
-	 BLnSbJ/NCoJVcgQeQwakSZJ7zlNm2DK19ivzx4xGY4Mi08vwyYnhG8/t69pgb/EGJG
-	 0ExDYCfFTR2f5DW4tgFLx0Su/uhpKX5pQpyfDBCalwY1ZLbGqqoPEHeZVbVgbtAcLQ
-	 RoIbQ+Iov/sI1YvKjxvmWG+ENTD+qev/+kNLc1el372E0o7aoYg0ifvJAxqov3rZXg
-	 WW0Hz8HqubDdYCfsxfBLcBQR37jzcEYVfwtD9rc7hAY6hT9ps3Dq8bTyGfIjxO0OJe
-	 dQHUWWNCq+sZg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE42380CFD9;
-	Thu, 24 Apr 2025 07:50:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1745481200; c=relaxed/simple;
+	bh=9mFMZroc5oBoDKj6d/82lLiLqDCPw7MT5bI7GBzcQ1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n0nKzJ9izBpnQUxdiSi1Gbkbb5pytZH6tylKw6un+bKKktADa8WD7Q8HE0kQbUvM9QNGXA2up4mYC32InSEPyIp9pQAUi1SZWD/0YzFF21NHmbxRLf+t7LqIfRrIZtOP9KP8qR99CEhgXliT9uHcEn6jh5Ms6fSAnFVbHVpjb80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=U31FCzkO; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u7rOJ-008q7v-6c; Thu, 24 Apr 2025 09:53:03 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=uw9+BDHjFakD/ccZx/zIKGbt3jtgtXmvzKA3XvGg8XI=; b=U31FCzkOUcP1pVuVaU04HwXs5+
+	ttE1C+krUyX634t/HHNvoucwfnhBA4nn2snaGxqVL0YqpGX967IdJsLL8OJkhmgEQIZoqjKohEDwd
+	0NijhGSwt0NzDeHAz4drrSdwH1aTs9VqQeTSVRJiIm6iIHKN8wsaPrRm2s9S/GlefJtLMxWxvdYe7
+	e6Cdth6Fu7MAnIB/lYuUb1X5E2ztOSS/dvOxLBp8/gQhv5TZkPk5/HnZTWee3AWiR3N+qvqoZUZmI
+	fV4+Q8ElnTYy4h621zV7V30JDD+8FPhQgu2Bs2gu+dpCQFePScyyAqIvJw/BuiOI+hF+lFov7BmpK
+	E2wVqguA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u7rOI-0004x6-4b; Thu, 24 Apr 2025 09:53:02 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u7rO4-002vfC-SB; Thu, 24 Apr 2025 09:52:48 +0200
+Message-ID: <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
+Date: Thu, 24 Apr 2025 09:52:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 00/15] ipv6: No RTNL for IPv6 routing table.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174548104775.3247136.12623057523963360588.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Apr 2025 07:50:47 +0000
-References: <20250418000443.43734-1-kuniyu@amazon.com>
-In-Reply-To: <20250418000443.43734-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Luigi Leonardi <leonardi@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
+ <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co>
+ <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
+ <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
+ <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co>
+ <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 17 Apr 2025 17:03:41 -0700 you wrote:
-> IPv6 routing tables are protected by each table's lock and work in
-> the interrupt context, which means we basically don't need RTNL to
-> modify an IPv6 routing table itself.
+On 4/24/25 09:28, Stefano Garzarella wrote:
+> On Wed, Apr 23, 2025 at 11:06:33PM +0200, Michal Luczaj wrote:
+>> On 4/23/25 18:34, Stefano Garzarella wrote:
+>>> On Wed, Apr 23, 2025 at 05:53:12PM +0200, Luigi Leonardi wrote:
+>>>> Hi Michal,
+>>>>
+>>>> On Mon, Apr 21, 2025 at 11:50:41PM +0200, Michal Luczaj wrote:
+>>>>> Currently vsock's lingering effectively boils down to waiting (or timing
+>>>>> out) until packets are consumed or dropped by the peer; be it by receiving
+>>>>> the data, closing or shutting down the connection.
+>>>>>
+>>>>> To align with the semantics described in the SO_LINGER section of man
+>>>>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
+>>>>> of a lingering close(): instead of waiting for all data to be handled,
+>>>>> block until data is considered sent from the vsock's transport point of
+>>>>> view. That is until worker picks the packets for processing and decrements
+>>>>> virtio_vsock_sock::bytes_unsent down to 0.
+>>>>>
+>>>>> Note that such lingering is limited to transports that actually implement
+>>>>> vsock_transport::unsent_bytes() callback. This excludes Hyper-V and VMCI,
+>>>>> under which no lingering would be observed.
+>>>>>
+>>>>> The implementation does not adhere strictly to man page's interpretation of
+>>>>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
+>>>>>
+>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>>>> ---
+>>>>> net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++--
+>>>>> 1 file changed, 11 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..aeb7f3794f7cfc251dde878cb44fdcc54814c89c 100644
+>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>> @@ -1196,12 +1196,21 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
+>>>>> {
+>>>>> 	if (timeout) {
+>>>>> 		DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>>>>> +		ssize_t (*unsent)(struct vsock_sock *vsk);
+>>>>> +		struct vsock_sock *vsk = vsock_sk(sk);
+>>>>> +
+>>>>> +		/* Some transports (Hyper-V, VMCI) do not implement
+>>>>> +		 * unsent_bytes. For those, no lingering on close().
+>>>>> +		 */
+>>>>> +		unsent = vsk->transport->unsent_bytes;
+>>>>> +		if (!unsent)
+>>>>> +			return;
+>>>>
+>>>> IIUC if `unsent_bytes` is not implemented, virtio_transport_wait_close
+>>>> basically does nothing. My concern is that we are breaking the
+>>>> userspace due to a change in the behavior: Before this patch, with a
+>>>> vmci/hyper-v transport, this function would wait for SOCK_DONE to be
+>>>> set, but not anymore.
+>>>
+>>> Wait, we are in virtio_transport_common.c, why we are talking about
+>>> Hyper-V and VMCI?
+>>>
+>>> I asked to check `vsk->transport->unsent_bytes` in the v1, because this
+>>> code was part of af_vsock.c, but now we are back to virtio code, so I'm
+>>> confused...
+>>
+>> Might your confusion be because of similar names?
 > 
-> Currently, the control paths require RTNL because we may need to
-> perform device and nexthop lookups; we must prevent dev/nexthop from
-> going away from the netns.
+> In v1 this code IIRC was in af_vsock.c, now you pushed back on virtio 
+> common code, so I still don't understand how 
+> virtio_transport_wait_close() can be called with vmci or hyper-v 
+> transports.
 > 
-> [...]
+> Can you provide an example?
 
-Here is the summary with links:
-  - [v3,net-next,01/15] ipv6: Validate RTA_GATEWAY of RTA_MULTIPATH in rtm_to_fib6_config().
-    https://git.kernel.org/netdev/net-next/c/4cb4861d8c3b
-  - [v3,net-next,02/15] ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.
-    https://git.kernel.org/netdev/net-next/c/bd11ff421d36
-  - [v3,net-next,03/15] ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
-    https://git.kernel.org/netdev/net-next/c/fa76c1674f2e
-  - [v3,net-next,04/15] ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().
-    https://git.kernel.org/netdev/net-next/c/e6f497955fb6
-  - [v3,net-next,05/15] ipv6: Move nexthop_find_by_id() after fib6_info_alloc().
-    https://git.kernel.org/netdev/net-next/c/c9cabe05e450
-  - [v3,net-next,06/15] ipv6: Split ip6_route_info_create().
-    https://git.kernel.org/netdev/net-next/c/c4837b9853e5
-  - [v3,net-next,07/15] ipv6: Preallocate rt->fib6_nh->rt6i_pcpu in ip6_route_info_create().
-    https://git.kernel.org/netdev/net-next/c/5720a328c3e9
-  - [v3,net-next,08/15] ipv6: Preallocate nhc_pcpu_rth_output in ip6_route_info_create().
-    https://git.kernel.org/netdev/net-next/c/d27b9c40dbd6
-  - [v3,net-next,09/15] ipv6: Don't pass net to ip6_route_info_append().
-    https://git.kernel.org/netdev/net-next/c/87d5d921eaf2
-  - [v3,net-next,10/15] ipv6: Rename rt6_nh.next to rt6_nh.list.
-    https://git.kernel.org/netdev/net-next/c/5a1ccff5c65a
-  - [v3,net-next,11/15] ipv6: Factorise ip6_route_multipath_add().
-    https://git.kernel.org/netdev/net-next/c/71c0efb6d12f
-  - [v3,net-next,12/15] ipv6: Protect fib6_link_table() with spinlock.
-    https://git.kernel.org/netdev/net-next/c/834d97843e3b
-  - [v3,net-next,13/15] ipv6: Defer fib6_purge_rt() in fib6_add_rt2node() to fib6_add().
-    https://git.kernel.org/netdev/net-next/c/accb46b56bc3
-  - [v3,net-next,14/15] ipv6: Protect nh->f6i_list with spinlock and flag.
-    https://git.kernel.org/netdev/net-next/c/081efd18326e
-  - [v3,net-next,15/15] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
-    https://git.kernel.org/netdev/net-next/c/169fd62799e8
+You're right, it was me who was confused. VMCI and Hyper-V have their own
+vsock_transport::release callbacks that do not call
+virtio_transport_wait_close().
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+So VMCI and Hyper-V never lingered anyway?
 
+>> vsock_transport::unsent_bytes != virtio_vsock_sock::bytes_unsent
+>>
+>> I agree with Luigi, it is a breaking change for userspace depending on a
+>> non-standard behaviour. What's the protocol here; do it anyway, then see if
+>> anyone complains?
+>>
+>> As for Hyper-V and VMCI losing the "lingering", do we care? And if we do,
+>> take Hyper-V, is it possible to test any changes without access to
+>> proprietary host/hypervisor?
+>>
+> 
+> Again, how this code can be called when using vmci or hyper-v 
+> transports?
 
+It cannot, you're right.
+
+> If we go back on v1 implementation, I can understand it, but with this 
+> version I really don't understand the scenario.
+> 
+> Stefano
+> 
 
