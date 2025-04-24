@@ -1,125 +1,151 @@
-Return-Path: <netdev+bounces-185665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2672CA9B46C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:46:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258AEA9B46F
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 747D47B2663
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:45:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57FA71B81D11
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB8E1A23BE;
-	Thu, 24 Apr 2025 16:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE2628A1CA;
+	Thu, 24 Apr 2025 16:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="CLolI0gI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HsvqyVCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489AD28B4E5
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E2C1A23BE
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513210; cv=none; b=mFI5QaG6pNjY2C6UyQzvkzBvRtxevSNPiuVkZE8fiqbxwob5co/PC6/+XdfmX8ggwIwP4Eq6S7ubqwG/a+YwyZJIWZ4k/Ki5GFXLJldh3BloV7ak2kIFiW8YOpS1MYQaswVzlWuuSo/lk6GtsSQWbqIFdZWXv6szsL/lYacKMVM=
+	t=1745513238; cv=none; b=ZDBeGv3ylUt1XAyCgXrb+H3/N5cGXpJD5TzdoL2F1HewqRtlgNM0rQO/z+Xk7o4rsOHtNfDMefvIVfx3cKicCBov/aWCBgiTV05HV0heOfAwbIcy7O6UZT39cvMYdDQArYzTb3E80SYEml/2vtJP5ipqEN/ERw6xNs1M/bF2HEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513210; c=relaxed/simple;
-	bh=4V0OJvZhwo9CryL3WO0sn+dGrmqATcnugSsQq/wzqHI=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=KmtQ9QDvKbyKBCFlt9OMXx0lc+79tMJyKpWhIS6IvhmlmHN60/hFi2hC59ss3gO2/VCmbKeelCj++4lXX/dTO9352+i/JY741/KrN615Bs4omMoxEf54DdzNGfmgkfwQ+2nejQ/VoTTYLwHpeYR34ZB3bCySm+CdekbqsLyF09I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=CLolI0gI; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e61d91a087so2024895a12.0
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:46:47 -0700 (PDT)
+	s=arc-20240116; t=1745513238; c=relaxed/simple;
+	bh=0f8o8ggcrr8CNxbIrOe4CpkhYVZSBWqA5HmCOdwcb/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pk34//8alVeLeGCF+NzRwwfP+edh+bpONJN2bIFHyksx7OQd4QX2qqkLCsft9H1ZUH9p4yGYuhFVKIaUGLoFxC+1VAC/ZS+aBcy4dfumrnh7T40T8JbcQAC9hFwYETVERsUSGkKt4vkKvOomD6J7xKU6Kd8PgPtN0a3cKh/KAAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HsvqyVCK; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47690a4ec97so14511051cf.2
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1745513206; x=1746118006; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WhDyBzYENMDRP2Qu4icH/WALzGg0heRjnQ9LBasVOtE=;
-        b=CLolI0gIEadwLL1pK4YC7/sGG28KZj6rHmLsTTSgXzfaavBGuJf9SoI6pncIkU0okN
-         CfSCsQfOxVaE74s8fU+xbgokpLQRzv2c/hkRCURtU55dLp1BQt2tBHBOhIMcPlpm5w4i
-         NWScyYCBp4XjumDzFVK71/kvR0p0kX1K4JLwBXkB1FzMnPx2xXNhQsQVru5iv+xklCuV
-         v1Tv1aE7g9WUrH5TUA1hBXX3ILWZod9bSGjZW7Q2m/ojXYoDPgUapT63zCeRpIQGoRHG
-         0VVc9InRIBrXH05Xzcf3Mjj+3zc6CeFxLlw3+Tp9vcHA8+EMMxfhfmYKHBnWClXaESv+
-         352w==
+        d=google.com; s=20230601; t=1745513235; x=1746118035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JrHAIXfmfIQ8jGFOWzV+7yMp1lmDdXbraFupzxGgZtc=;
+        b=HsvqyVCK+aZ8xbXCnl+S9K+sROfMFodjQNeruhKFZ4uAvuezL+lav9MpKpHIgOEGhV
+         WJGRUZgsv4JYAjAFI+LD+bb551OWRnVVZtsR+omuyk+s6PZ1xTe1BCEu+z61xZvqTRy5
+         157bDzN80XFkvHZmms84mRKj1mDILQOVjRKTIs5WOgjOGFL+gyX4oCIFOB0W2cpczwrf
+         CvDrcbufgliWaLz48tAZmseKx6VuYLRK9KDqH/6AzF+rXkJXFuGNkizocSp2gofRspRO
+         ZU9vxMo/ASace20J0nDAxITea/DDxJig4zXNXsXb3ZiI6hTtGXW++WgK8nme9kTkdJlr
+         cDfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745513206; x=1746118006;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WhDyBzYENMDRP2Qu4icH/WALzGg0heRjnQ9LBasVOtE=;
-        b=lLOcT2GwdwLG7DvvjD26+6Cf4Lwzi66q97I/Q5YIWnVUDuJEJyywqwRSQnIKFBIBGB
-         /dGK1/UDhCWfsTz+sqy5w3s27y3A8jCMaNF5vhcZG+Y799MtPPQrc3jYyGcdO0JgPSta
-         ZVOlx70aqVkwh5Hlpj0jxK4sIOfen2PYst+c2akINRAyIv97D1CDb+/VPn70BtQOiUPP
-         4MsrUnAPID4j3ELtoEH5oiaLKKmKp7yBC3KmT9rUMYmp1LlV5/e+haGR92ogDbgk3Q2f
-         2lACYjjKPC5jQZtnH/Q6BAi6FDxDIEBEALHFoh592zd8s40OL+gMUt+DfclGXNc7yBGd
-         D4sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKNd4kRyQ/c+4ddjh+USdB2pNZDgorX6RPQ4mHREdeR0BPVOf5g4WQA89hxVVVh8ENC6bhzGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEzW55oqXiobf34+Y/G4VEzgOiLpzorqpjF6Xljq1b0UR4YX94
-	HUoyhJgmX0s7lCI6Zk91XUW1xcTIorQBsuIc7SjmYQx5g96YDHLmiOhZfQgoug==
-X-Gm-Gg: ASbGnctfbQ0XjihbGwFSyheRZp8Uk/cwGKcevPbg4R2JpFNQsPlqWBfrRyS/UagLPxd
-	IA9LWMR72P84Xck4pmOrLTQXFhaP4qwL5vUiFaWT2ACnn6K0wMvKxxQGtSR86zi8BJwAXP+sVHY
-	jcr6ECHP3KZ6eFhEgGOtHieRA5XJoXTByEzrW6Tw+7L/8bw79u46GoQrDS1/1jXyoZkinLgRIxV
-	7Cjr8AeGemXPC0CcYr0CmU/cI7UwdvYBJEEJWJfAjA/o0r+PxiFoTC1Gk+CpzFyy37b71U35Fjt
-	Jv7e6eBDmhkMtc1gXWnNp/0eF6r5Re4havBmnQvx/6Kc2WD3qQ==
-X-Google-Smtp-Source: AGHT+IHTYRGYL0LPgs+SLCq7Lwnmm7pESM7YoTIQRAUYPS5PaefisCf4m3nGAns1jOX8rlFzOE1U5w==
-X-Received: by 2002:a05:6402:40d1:b0:5f6:20c4:3b0e with SMTP id 4fb4d7f45d1cf-5f6fabcda66mr75949a12.8.1745513206448;
-        Thu, 24 Apr 2025 09:46:46 -0700 (PDT)
-Received: from [10.2.1.132] ([194.53.194.238])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f6ed416c66sm1370042a12.60.2025.04.24.09.46.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 09:46:46 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <dc357533-f7e3-49fc-9a27-4554eb46fd43@jacekk.info>
-Date: Thu, 24 Apr 2025 18:46:45 +0200
+        d=1e100.net; s=20230601; t=1745513235; x=1746118035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JrHAIXfmfIQ8jGFOWzV+7yMp1lmDdXbraFupzxGgZtc=;
+        b=wqYUbg69NjldN5riZKfZc2Z2mPk55nEVcq5TR6GJZ+W/9EB1f9pXjEhnPFnhDI7YiB
+         li1rLPqYFunNp7egqAQmXzPRA2Q30BGH2gFytiv5R/u2/UyH4HCxGDYaDCvCy7sJwVlq
+         ESAt06Wd/A77WhwuoVkZO7G1DmO9Ea3+ShQqnXy3OQg/MpC1kFvUB7/74150SUmA903c
+         XY+KdDm8V5WHRMEiQlxxFV8t4jA5J7Hw8SdCtdNEO+l39md//87M4M9nAfHlOje0M1hI
+         4jwhPwEGGAhKUrymQeMqaxfUbQFLGHijR8Ko9kmmZt+4AapCHqdY5NtfEd9xNNuxCxex
+         a93w==
+X-Gm-Message-State: AOJu0Yw1UfYfmK16cj1Q/1BofVkAldqwPptW756iq/x/wBdqpJj+0ZXZ
+	ZJESkFdEzh9sGZrkukoTawcslP1BkX8ZjXATj6qG1dnbrOUo5nuf6ORoMuK+vm98mjV6r7lAdEE
+	l5M5U3BQeLBa3uhXdmFrbcDkqlU/ZTGtQkHRaK1rNvQaZlCTGjA==
+X-Gm-Gg: ASbGncuWmKPQLrDaQEO3HyD5oVCRVhLUHnWnf37RCSYsY3VTfLGNBpiR1WcmWRu9fBw
+	JwDlJxIl8h1WeWdw36XEWTDrUEO0yMxpOvgd+srZu5QAbeUk5GATPDLdOKdwl+/asJMr22i3d24
+	NIPPi34TK113+QUQj5gcoP8yUS9T0+JFdKn/nGNjmqbMlYu4keBAo=
+X-Google-Smtp-Source: AGHT+IH4HoxZgNqSBX1HcSaFcO3nDfhb5BoNyiCS7uKICma3hFepFqyQkq6E4rUmKF2oBT4biGVh9Fjvak1CfwXYACU=
+X-Received: by 2002:a05:622a:e:b0:476:6d30:8aed with SMTP id
+ d75a77b69052e-47eb51bd076mr51610691cf.49.1745513234982; Thu, 24 Apr 2025
+ 09:47:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] e1000e: disregard NVM checksum on tgp when valid checksum
- mask is not set
-To: Simon Horman <horms@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
- <20250424162444.GH3042781@horms.kernel.org>
-Content-Language: en-US
-In-Reply-To: <20250424162444.GH3042781@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250424143549.669426-1-willemdebruijn.kernel@gmail.com> <20250424143549.669426-2-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250424143549.669426-2-willemdebruijn.kernel@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 24 Apr 2025 09:47:03 -0700
+X-Gm-Features: ATxdqUFLJ_1crxXMqmRz7R1ykowq3tFs3Flm3laMONpWcm_5UzBg5-vVZYAcLsc
+Message-ID: <CANn89i+ve7zU1+BceKCH4Sp2ycMcRsO=_i7Vn1oo9PGFWUg1Mw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] ipv4: prefer multipath nexthop that
+ matches source address
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, idosch@nvidia.com, 
+	kuniyu@amazon.com, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->> Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM
->> checksum")
-> 
-> I think that while the commit cited above relates to this problem, 
-> this bug actually dates back to the patch I'm citing immediately 
-> below. And I think we should cite that commit here. IOW, I'm 
-> suggesting:
-> 
-> Fixes: fb776f5d57ee ("e1000e: Add support for Tiger Lake")
+On Thu, Apr 24, 2025 at 7:35=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> With multipath routes, try to ensure that packets leave on the device
+> that is associated with the source address.
+>
+> Avoid the following tcpdump example:
+>
+>     veth0 Out IP 10.1.0.2.38640 > 10.2.0.3.8000: Flags [S]
+>     veth1 Out IP 10.1.0.2.38648 > 10.2.0.3.8000: Flags [S]
+>
+> Which can happen easily with the most straightforward setup:
+>
+>     ip addr add 10.0.0.1/24 dev veth0
+>     ip addr add 10.1.0.1/24 dev veth1
+>
+>     ip route add 10.2.0.3 nexthop via 10.0.0.2 dev veth0 \
+>                           nexthop via 10.1.0.2 dev veth1
+>
+> This is apparently considered WAI, based on the comment in
+> ip_route_output_key_hash_rcu:
+>
+>     * 2. Moreover, we are allowed to send packets with saddr
+>     *    of another iface. --ANK
+>
+> It may be ok for some uses of multipath, but not all. For instance,
+> when using two ISPs, a router may drop packets with unknown source.
+>
+> The behavior occurs because tcp_v4_connect makes three route
+> lookups when establishing a connection:
+>
+> 1. ip_route_connect calls to select a source address, with saddr zero.
+> 2. ip_route_connect calls again now that saddr and daddr are known.
+> 3. ip_route_newports calls again after a source port is also chosen.
+>
+> With a route with multiple nexthops, each lookup may make a different
+> choice depending on available entropy to fib_select_multipath. So it
+> is possible for 1 to select the saddr from the first entry, but 3 to
+> select the second entry. Leading to the above situation.
+>
+> Address this by preferring a match that matches the flowi4 saddr. This
+> will make 2 and 3 make the same choice as 1. Continue to update the
+> backup choice until a choice that matches saddr is found.
+>
+> Do this in fib_select_multipath itself, rather than passing an fl4_oif
+> constraint, to avoid changing non-multipath route selection. Commit
+> e6b45241c57a ("ipv4: reset flowi parameters on route connect") shows
+> how that may cause regressions.
+>
+> Also read ipv4.sysctl_fib_multipath_use_neigh only once. No need to
+> refresh in the loop.
+>
+> This does not happen in IPv6, which performs only one lookup.
+>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
 
-I had my doubts when choosing a commit for the "Fixes" tag, but since
-my setup would most likely work up until 4051f68318ca9, I selected it
-specifically.
-
-On my laptop NVM write attempt does (temporarily) fix a checksum
-and makes driver loading possible. Only after 4051f68318ca9, which
-disabled this code path (because it broke someone else's setup), I'd
-be unable to use my network adapter anymore.
-
--- 
-Best regards,
-   Jacek Kowalski
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
