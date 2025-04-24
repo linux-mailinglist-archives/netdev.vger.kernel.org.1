@@ -1,94 +1,91 @@
-Return-Path: <netdev+bounces-185340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0F8A99CF5
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:28:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7130EA99CF8
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54A14460FCE
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:28:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBFFB5A102E
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D221E51D;
-	Thu, 24 Apr 2025 00:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036F278F2D;
+	Thu, 24 Apr 2025 00:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Irk3iess"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="xQgtT0G3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C501A29A
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE2B8C1F
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745454495; cv=none; b=LHzY8/YOF8gd2r5MrEnbjO19Be7SzlBq6DSezEpT5ezrjaLrUeLZDxG1N2ZOmUTIcAus2145CXuIG4IxTMK9EyOZVfHokve9odFfI3w9R5AB/8eCOfAvcUx96pAMotR/5PbNRwNKvpI98tSL+BRWVltlcaqBaKByDOq/rg1z2MM=
+	t=1745454497; cv=none; b=HIt7QVImpjO83SeYyailHIkEKnZur2u78GkXc2SwmBKdlRBnzPey/NxBge78HewTw9ntYYwfPxls8fPUx56jKumfhol8qOPPcGLNmU7L/LicIFiSWsMcH4BfxNIRPK6hSu0VZAsgk1w/8er4CGmOMKTfKRZFJI9MrWYbDQN3fGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745454495; c=relaxed/simple;
-	bh=h8wAY7qtIy5UrHIDhwmDC5fKfwUd64U5Lep9H+J6vLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eIDwFVJi3mu4+/7/wZA2GOiJQ98+/9PY/wvsvUhC28ZrX8a99n1K0XTL8j+4fXbx5lcCoSIXAdaDVyPR33VeOe8S7Ph9rOcioh0HyziEe9X8y9/jhHSWyTuHFPI/Mata4OZvczQkWq5gYBeW39lKUeGz+A/VjvTk7+ixbqbCvgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Irk3iess; arc=none smtp.client-ip=209.85.216.45
+	s=arc-20240116; t=1745454497; c=relaxed/simple;
+	bh=peXZjv91qcnXAES8N8mnCKfga6OZjhML/WpesH4NfKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m9lQgji3CYd8zh/4Mw6dZAa1C//bNi1mcbNi9xEiT4RiNEFHtgpfSifN6Lu1TjGBh8UJ3S7vVfxkSilbLmb1SUinnF7VXlxi/5847mkj3wHguXyE9M+6KN1yMghudLFDNKYspZSZAUcqKIo69mY7n4ucqxhuiiLeHD77xOxH+e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=xQgtT0G3; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-301a4d5156aso508602a91.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:28:13 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-af52a624283so424364a12.0
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745454493; x=1746059293; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KIHmcKmXhg69DmaElnA5LLW3gaVd1eMpD/hTU28A/HE=;
-        b=Irk3iess1ZWp76vpIqY5KPFENe546uefn8gu0FUv4zFwws9WeEWpYwLJhVFzmtGIJ/
-         9NymRvz3kZ2/UGxkxTyOq7NsHOel9Bexar/PuFA6mjIMCKul9TJzb8r7CaSm5jS0HWOl
-         sa8u4cOsXO8vdoSuPh/cq2Izhdy+ZBT2rXb+o=
+        d=fastly.com; s=google; t=1745454494; x=1746059294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h6JaAma8wr++LnPs79mPGowXaCOiBb9Nd8NFNngwV7o=;
+        b=xQgtT0G3NgMoiY22v5qnfKORQEPyZFI0xQvj1+Yb0/4GrQeC8E6hWf9J6Uy7ItYp+B
+         RIf3ooMxiJd5DxsBQjexhd+nNJBCbYD0olRn4PRQKPizkzTe68G8YgTVIrxEVa2TuPZK
+         wANm0tfGrxEFZGCi/9SoVDZcaN+pGJA4GBs2M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745454493; x=1746059293;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KIHmcKmXhg69DmaElnA5LLW3gaVd1eMpD/hTU28A/HE=;
-        b=qqyt9Pvdpbk5Yb3HTD+xlcb6OCau+38q8uvi9x16ATHqM2pYnQwc1GphC7iib17nn2
-         SLxdKRBIXumiv/AiJtwlNZe95TGgkq1BR8WBauPkxWqwM83TVySEMvI522jY3QibaqXV
-         lgDCoWgzVwHte5CarsG/nWcKVMEQIqxGDTvdtVMSLWJM+DnMSorJvvcvfpODx4J/aSJ8
-         Pi0GSMQ/wsLnB7MjGaFZnyiEhFv+pyQzNxFDIqX8ALuurk3OdLzzAaoWt7r3WZmC/2El
-         PjcYTjF+E2fzxqQsU0K5CDzd6mxGCy6Wf01BUWzlQTBgu7gjsP8Ygya2CkFhuzdk8IlL
-         Oc1Q==
-X-Gm-Message-State: AOJu0YyLEOAnN40dIzG7Abg0+zEYdbFbvy/csJLDLGb48ggbPtQNg1lr
-	pdBIt65xjW1RJqkvCOYMQtytIxZmVT7PxxPB0Kro0tzL+IfzHSG+945lmEbF4Q0GzOAK8bHhtE8
-	WftJiHCN1B0lrGvug9UrB4GzxHOmsDz6oatWM/KCLtxgH+ie6pKXqcAZ18Oi0nlD5whakGTvGMp
-	mh8TlM+o6H2qbTvABdQbUFSNEhm+PLRs5ArNw=
-X-Gm-Gg: ASbGncuPgEgCSv9VHMWM+VaXEflU5qsGgWm3Z+pujBRrJB0dho38BS5jgWjofofNLhf
-	0jki/Z5+KxG5ptS9RdHrXL6rvVDb0MBfi1WZLrxtN2BGW0n3ywu515Qwg8/vI5L2E7LSUjBrGjG
-	Qm7xzqEFZidO6zezfTzTZwg4gsXSlhpxU5LZobH/VW0VvoG+CA3XbwWPI2VIBpQG+JUtfCfhgeE
-	5KJTrIUkvol4kxmH8u63Obsyrjqau9mn6ZgPqjpd0mNqFxUB8lzWUv9s04Tl4s6hj0RASQdSqy/
-	uFmImpiGx15utLg9ph+eDLSZliWuNbsdj9uGKhw2xFdNEZBJ
-X-Google-Smtp-Source: AGHT+IETblWxuoSuSV8+WUwaLohHsvmGk7SHFO08yaKEGr+w9ecMqwtPnCysdbaJTuia4bAV484exQ==
-X-Received: by 2002:a17:90b:584c:b0:2ff:53ad:a0ec with SMTP id 98e67ed59e1d1-309ed2821damr1082565a91.21.1745454492678;
-        Wed, 23 Apr 2025 17:28:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745454494; x=1746059294;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h6JaAma8wr++LnPs79mPGowXaCOiBb9Nd8NFNngwV7o=;
+        b=cR0xbYKHuHYUgSbRzhl17J1fzmjH7k/a0Ca06xaScfr6q74UnGhu2n2+p6zmsfy79G
+         5lnqUlPwmC9d6xVKrHM7hLyHseN4llGxJj08PgPTjr6Vc8Fs00h66WKlR6HAXYzYuCnb
+         eG8I6aHSgdY4+kNX4EN6Td7fdOe4ksX+0HIvU4qoSqyZc94gElxiMZLNpodCvtVtCjkx
+         pXaHhyMO7Xk5Wcf3L/bWqBa6aXG1NTLchfRobbZFQl7CkdnMsSUrKNsum+iwJ5ddBBnj
+         KzhvyZQ/lwqYca0FsUmLjWlyhPHHjkQu0mqvau3TL5SNu5E+XzbkWJVynSj6LwGxwIUb
+         ocKw==
+X-Gm-Message-State: AOJu0YxgPYJsE6Y0x68SOktIDnKm9BvQy7lbxouMdkAKZKASw6yxctnv
+	sM2umRbLEFhcfuRLsLp6/xcrUfcRabaH/g1uz2AYdIms3Hy18EcGFDTDVRQPydCrwZf/B/4TbgE
+	8mBI4UAOQUHzDOUVuPs9wv6o6Y+1gaqZJjBFigFTLX6tEHUYxoaZoZUSxfAXzh2uo5aMdGutLKs
+	eLQpxbY+uhQKPV9yuA36SV7hg+Y3IqkRU48w0=
+X-Gm-Gg: ASbGncvwH75O6cU8eD0HOYk36ZsDuJG1X6jDzRNJI57MgpADTycQodFYzqSnkWq/WTM
+	W95sQH7ahp9kEM+8ZBtAs9O3GrcHkDsEJa9snv+wtnxThPtvpiHa3Vk7mkqDfz48rdVbOykbsec
+	kGWMAuoDnU3vUI7MHTFTK9T6yVasY1Tqb17TpjmycSq7ufR9WiN6T4nS+5Ylxa6Z+9+K93sT6Qr
+	RUWyn8D8RN44tMfDQ3Ew4Gkr3zFnRF3Tzo/MONFsI6u1Irw5v16ph7F1xWocrZ0VeUYwIIjGBP6
+	tk8ZyeY/VAj4Kshuvm7Ebs3hwWP/mVmrf772v0Yn1oXu3smt
+X-Google-Smtp-Source: AGHT+IFKCZWDrLDyEBVkIjzd2enJ/SHv5mfApzf31oQfNyqhNgFukwVTxCJOUx6z4xW3g53RKeEzNQ==
+X-Received: by 2002:a17:90a:d603:b0:2fb:fe21:4841 with SMTP id 98e67ed59e1d1-309ee37cae3mr551102a91.8.1745454494054;
+        Wed, 23 Apr 2025 17:28:14 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ee7c4054sm83013a91.23.2025.04.23.17.28.11
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ee7c4054sm83013a91.23.2025.04.23.17.28.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 17:28:12 -0700 (PDT)
+        Wed, 23 Apr 2025 17:28:13 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
 	shaw.leon@gmail.com,
 	pabeni@redhat.com,
 	Joe Damato <jdamato@fastly.com>,
-	Alexei Starovoitov <ast@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_)),
-	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net-next v4 0/3] Fix netdevim to correctly mark NAPI IDs
-Date: Thu, 24 Apr 2025 00:27:30 +0000
-Message-ID: <20250424002746.16891-1-jdamato@fastly.com>
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v4 1/3] netdevsim: Mark NAPI ID on skb in nsim_rcv
+Date: Thu, 24 Apr 2025 00:27:31 +0000
+Message-ID: <20250424002746.16891-2-jdamato@fastly.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250424002746.16891-1-jdamato@fastly.com>
+References: <20250424002746.16891-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,62 +94,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Greetings:
+Previously, nsim_rcv was not marking the NAPI ID on the skb, leading to
+applications seeing a napi ID of 0 when using SO_INCOMING_NAPI_ID.
 
-Welcome to v4.
+To add to the userland confusion, netlink appears to correctly report
+the NAPI IDs for netdevsim queues but the resulting file descriptor from
+a call to accept() was reporting a NAPI ID of 0.
 
-This series fixes netdevsim to correctly set the NAPI ID on the skb.
-This is helpful for writing tests around features that use
-SO_INCOMING_NAPI_ID.
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ drivers/net/netdevsim/netdev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-In addition to the netdevsim fix in patch 1, patches 2 & 3 do some self
-test refactoring and add a test for NAPI IDs. The test itself (patch 3)
-introduces a C helper because apparently python doesn't have
-socket.SO_INCOMING_NAPI_ID.
-
-Thanks,
-Joe
-
-v4:
-  - Updated the macro guard in patch 2
-  - Removed the remote deploy from patch 3
-
-v3: https://lore.kernel.org/netdev/20250418013719.12094-1-jdamato@fastly.com/
-  - Dropped patch 3 from v2 as it is no longer necessary.
-  - Patch 3 from this series (which was patch 4 in the v2)
-    - Sorted .gitignore alphabetically
-    - added cfg.remote_deploy so the test supports real remote machines
-    - Dropped the NetNSEnter as it is unnecessary
-    - Fixed a string interpolation issue that Paolo hit with his Python
-      version
-
-v2: https://lore.kernel.org/netdev/20250417013301.39228-1-jdamato@fastly.com/
-  - No longer an RFC
-  - Minor whitespace change in patch 1 (no functional change).
-  - Patches 2-4 new in v2
-
-rfcv1: https://lore.kernel.org/netdev/20250329000030.39543-1-jdamato@fastly.com/
-
-
-Joe Damato (3):
-  netdevsim: Mark NAPI ID on skb in nsim_rcv
-  selftests: drv-net: Factor out ksft C helpers
-  selftests: drv-net: Test that NAPI ID is non-zero
-
- drivers/net/netdevsim/netdev.c                |  2 +
- .../testing/selftests/drivers/net/.gitignore  |  1 +
- tools/testing/selftests/drivers/net/Makefile  |  6 +-
- tools/testing/selftests/drivers/net/ksft.h    | 56 +++++++++++++
- .../testing/selftests/drivers/net/napi_id.py  | 23 +++++
- .../selftests/drivers/net/napi_id_helper.c    | 83 +++++++++++++++++++
- .../selftests/drivers/net/xdp_helper.c        | 49 +----------
- 7 files changed, 172 insertions(+), 48 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/ksft.h
- create mode 100755 tools/testing/selftests/drivers/net/napi_id.py
- create mode 100644 tools/testing/selftests/drivers/net/napi_id_helper.c
-
-
-base-commit: cd7276ecac9c64c80433fbcff2e35aceaea6f477
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index 0e0321a7ddd7..2aa999345fe1 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -29,6 +29,7 @@
+ #include <net/pkt_cls.h>
+ #include <net/rtnetlink.h>
+ #include <net/udp_tunnel.h>
++#include <net/busy_poll.h>
+ 
+ #include "netdevsim.h"
+ 
+@@ -357,6 +358,7 @@ static int nsim_rcv(struct nsim_rq *rq, int budget)
+ 			break;
+ 
+ 		skb = skb_dequeue(&rq->skb_queue);
++		skb_mark_napi_id(skb, &rq->napi);
+ 		netif_receive_skb(skb);
+ 	}
+ 
 -- 
 2.43.0
 
