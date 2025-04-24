@@ -1,95 +1,71 @@
-Return-Path: <netdev+bounces-185530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73956A9ACFC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:14:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC33A9AD07
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:16:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E405D7B5A8E
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:11:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2246A7B2D7B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E2E230999;
-	Thu, 24 Apr 2025 12:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F9A223DEB;
+	Thu, 24 Apr 2025 12:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGtOZZ4p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oe51ROCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F4F22E403
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D441FE45D;
+	Thu, 24 Apr 2025 12:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745496674; cv=none; b=bhahihlmCBRi5uIjYsCg02Wd8CNlML+dv/BsyUPsOhF69KrO9S8DgMsdWnVHO999NF14lZ4nzI3zrlyVR5xc2S7DS9fWYMu/kNYpq/P8cHD/D1WEhoJHOyO8FO3MvQh5MT9Z+++oJ09JsKspTP587hoFnUwxZNJYCvqYVUuOwh8=
+	t=1745496971; cv=none; b=TfReNEkIGneKSjfDPg/eoD4TN1aRMqIz6CcmbbDUCAPnAXpxKC603YONgJjBxOQgDPZYYbPuxrl5Ymo50xvsPe8AEHroF/S0YufCWad8As9C8u/ZYsCmjIMiGkfOxUKOuWVx+jWQ239/X/zlKzlvIsvj21iN1/7W66XDTa++IQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745496674; c=relaxed/simple;
-	bh=bz4+/X497RFI15mRxsIqRhNBIwSZjCmNalMcue3pcXU=;
+	s=arc-20240116; t=1745496971; c=relaxed/simple;
+	bh=Sf0ybRK9DYsCxZ5Je/2MG9IakhbW6jd2lRTZlZQzniw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WYFegglGxn5HBPS4doK3Dul2vBFq3ClMbyAGHC3YEdIKdGLpEjTY8aYjADdQE6qugdfYgK+hRin1d88fesXR8zOjIKLySicL6DS+CjM6qmEnUmVj/brKY8rurxE6kuqeeEorlwnsaIMy8wIeOTD6xl+AWEeSBg5ENZi3i7KV7EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OGtOZZ4p; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745496670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J+iBi7KEPHVPdl78TuinUFRyNTsFrvN4I3oDOUPKzwc=;
-	b=OGtOZZ4pELLlpsDfRSPosBgIxy9Yo/hTbR/mPEJbTM8qtqlkiJRQ37c6WdlwPSc6VDHoRL
-	jhymIOCo0UXhIyppfSzMa1XJGOT21M1GjmfXwE7gNhvKGxu8cj4GQ/gGJIsgDLXSDM9itg
-	H87XgQXbrkKmHo1nCOmKtYvt/01hrUk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-101-0MMo2mzPMaiAJOs5r1oxvg-1; Thu, 24 Apr 2025 08:11:09 -0400
-X-MC-Unique: 0MMo2mzPMaiAJOs5r1oxvg-1
-X-Mimecast-MFC-AGG-ID: 0MMo2mzPMaiAJOs5r1oxvg_1745496668
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so4730125e9.3
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 05:11:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745496668; x=1746101468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J+iBi7KEPHVPdl78TuinUFRyNTsFrvN4I3oDOUPKzwc=;
-        b=uYmacRIMhGdXx2sHfcloRum0EHohJJBWjoumfoakkN4JjBXy8ZOXCZVV2/a2jqWKkz
-         wOtPUrJbQMQVqWOfQPETbpvasqNyU0f3iUGrsVtR6LnlfrUg6D9C9jmkeMWH4QR/7hc0
-         mYQLecwN7xsn8yStMhcF22cWPuG70sknR2AX9AKQY/rKV4f3zIkNr1EnTd2+5qbxTpG/
-         whrTk3bZHatbEOBFwdUfYU1Cb6qkgmP+aoCEeAX9CKN1b7EvbL97+rvzSHFnffcxEXsi
-         PvopNr51/c4UPPYWwMkp9gfPQdX6SZlVpKQYi34vwt6iOXQa8CI/kWtIwRm0R5Xhzlh6
-         25fg==
-X-Forwarded-Encrypted: i=1; AJvYcCX1QQplq7xBb55Fbtav2UP1ghWiJLuLTrSEZgWJ34yGNqPRM2KqoH7Rq7K4o23PdnT6DY0M7oE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuIACTITt36dERNJ0DTItcBNMJ/iz8/2qDfKsd3+7ZBYe9ZRcO
-	Jdp9w3PbGkZy2zos7dPsubhdf/5zXHhNhtrCt357vdstiy2qTOXqBUe/ls47sONus+3tFOGk8eS
-	XVh1OBqOrQcfA5bm+gT7qNEYVdQk22ujo39YFP4kQK8UXlxvoaK3zgw==
-X-Gm-Gg: ASbGncvsqQHUm1mumWFoR+QU9CjaI2RRMtsOb4FbRXNmXMpCd+KUsPpReccuDtOw+O1
-	PAMNpkw9mQHatpoAD6q1gWWzEG+JpUoxbJBbuRXZ2ecDMiV1jZhIBirgxbWVunuSKXD7S1YoidQ
-	vciCkhF1tyK/+DsNptM3G3xIVdXIlzE+e8CckGEe576cL4vqnJ9VYSkBtCaSbhK5YdeJi0uhsLr
-	bE/l6/AxvoAe5mKVTORQ+JAUwUs3USjQPlLc7sbTOU28Q/9UQq1kwsn9UG+44WJf1Unr15sreZt
-	y8UD2Q==
-X-Received: by 2002:a05:600c:1395:b0:43c:f616:f08 with SMTP id 5b1f17b1804b1-4409bd17dfdmr21734065e9.8.1745496668280;
-        Thu, 24 Apr 2025 05:11:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9n0roJbpJf5HRR05saKucJsNpfjrLxCLOXtUJbPRGicV0Zxwyv2cOdsaG6FPN2tpgup02FQ==
-X-Received: by 2002:a05:600c:1395:b0:43c:f616:f08 with SMTP id 5b1f17b1804b1-4409bd17dfdmr21733875e9.8.1745496667950;
-        Thu, 24 Apr 2025 05:11:07 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2b77f9sm18718025e9.25.2025.04.24.05.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 05:11:07 -0700 (PDT)
-Date: Thu, 24 Apr 2025 08:11:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
- after sendmsg
-Message-ID: <20250424080749-mutt-send-email-mst@kernel.org>
-References: <20250420010518.2842335-1-jon@nutanix.com>
- <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UH3+VHwl9wQajvllfPMiPg9hFUQG3F1oGV/XVJXOAUhThqEMVH+AxXD5wuCvGhlyvIHx9EwO/UyWzlPTA0jA6nmwHbzOBp2rG8dvkm880WIJqYk27tmPf1XXOhhcbbMg9WMGTPmXtHldvMcRlXYFr92OymK5ValdCfdy1pCBAGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oe51ROCq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AC87C4CEE3;
+	Thu, 24 Apr 2025 12:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745496971;
+	bh=Sf0ybRK9DYsCxZ5Je/2MG9IakhbW6jd2lRTZlZQzniw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Oe51ROCqK35W//I58nfZjw9T19a9u3WVnBJB0SkIp3x39DQ7ql8iB0byUcTix9qCE
+	 kZcy0a7XB+8uEXdqyJEA5ZXVFElPivKUlHovhEnK6Xrq4cXaAY0AQg5s4mQoaYJlDK
+	 Pz8JmgYFrFGRSuf04xqzh3mZr2pcmqaNxzxK/Thnrcf3UQ4v8XT/0JUcy+C3UBTUzS
+	 sfZTv9+jSh9WJTAKEVMPUsKU8AvLRMaAdxVo3n8DxEduUqvdHw6Z3G2zHhUK0UHqCh
+	 OBrRynyn5GyXNZbV/uEfFTIvdekG9eVkwHEIW7xSRx0WchZ089/QSS/LQuqiDYN23P
+	 zjAwyzQoD4VYA==
+Date: Thu, 24 Apr 2025 13:16:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Boon Khai Ng <boon.khai.ng@altera.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Tien Sung Ang <tien.sung.ang@altera.com>,
+	Mun Yew Tham <mun.yew.tham@altera.com>,
+	G Thomas Rohan <rohan.g.thomas@altera.com>
+Subject: Re: [PATCH net-next v4 1/2] net: stmmac: Refactor VLAN implementation
+Message-ID: <20250424121604.GE3042781@horms.kernel.org>
+References: <20250421162930.10237-1-boon.khai.ng@altera.com>
+ <20250421162930.10237-2-boon.khai.ng@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,75 +74,184 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+In-Reply-To: <20250421162930.10237-2-boon.khai.ng@altera.com>
 
-On Thu, Apr 24, 2025 at 01:48:53PM +0200, Paolo Abeni wrote:
-> On 4/20/25 3:05 AM, Jon Kohler wrote:
-> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > index b9b9e9d40951..9b04025eea66 100644
-> > --- a/drivers/vhost/net.c
-> > +++ b/drivers/vhost/net.c
-> > @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >  			break;
-> >  		/* Nothing new?  Wait for eventfd to tell us they refilled. */
-> >  		if (head == vq->num) {
-> > +			/* If interrupted while doing busy polling, requeue
-> > +			 * the handler to be fair handle_rx as well as other
-> > +			 * tasks waiting on cpu
-> > +			 */
-> >  			if (unlikely(busyloop_intr)) {
-> >  				vhost_poll_queue(&vq->poll);
-> > -			} else if (unlikely(vhost_enable_notify(&net->dev,
-> > -								vq))) {
-> > -				vhost_disable_notify(&net->dev, vq);
-> > -				continue;
-> >  			}
-> > +			/* Kicks are disabled at this point, break loop and
-> > +			 * process any remaining batched packets. Queue will
-> > +			 * be re-enabled afterwards.
-> > +			 */
-> >  			break;
-> >  		}
+On Tue, Apr 22, 2025 at 12:29:29AM +0800, Boon Khai Ng wrote:
+> Refactor VLAN implementation by moving common code for DWMAC4 and
+> DWXGMAC IPs into a separate VLAN module. VLAN implementation for
+> DWMAC4 and DWXGMAC differs only for CSR base address, the descriptor
+> for the VLAN ID and VLAN VALID bit field.
 > 
-> It's not clear to me why the zerocopy path does not need a similar change.
-
-It can have one, it's just that Jon has a separate patch to drop
-it completely. A commit log comment mentioning this would be a good
-idea, yes.
-
-> > @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> >  		++nvq->done_idx;
-> >  	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
-> >  
-> > +	/* Kicks are still disabled, dispatch any remaining batched msgs. */
-> >  	vhost_tx_batch(net, nvq, sock, &msg);
-> > +
-> > +	/* All of our work has been completed; however, before leaving the
-> > +	 * TX handler, do one last check for work, and requeue handler if
-> > +	 * necessary. If there is no work, queue will be reenabled.
-> > +	 */
-> > +	vhost_net_busy_poll_try_queue(net, vq);
+> The descriptor format for VLAN is not moved to the common code due
+> to hardware-specific differences between DWMAC4 and DWXGMAC.
 > 
-> This will call vhost_poll_queue() regardless of the 'busyloop_intr' flag
-> value, while AFAICS prior to this patch vhost_poll_queue() is only
-> performed with busyloop_intr == true. Why don't we need to take care of
-> such flag here?
-
-Hmm I agree this is worth trying, a free if possibly small performance
-gain, why not. Jon want to try?
-
-
-> @Michael: I assume you prefer that this patch will go through the
-> net-next tree, right?
+> For the DWMAC4 IP, the Receive Normal Descriptor 0 (RDES0) is
+> formatted as follows:
+>     31                                                0
+>       ------------------------ -----------------------
+> RDES0| Inner VLAN TAG [31:16] | Outer VLAN TAG [15:0] |
+>       ------------------------ -----------------------
 > 
-> Thanks,
+> For the DWXGMAC IP, the RDES0 format varies based on the
+> Tunneled Frame bit (TNP):
 > 
-> Paolo
+> a) For Non-Tunneled Frame (TNP=0)
+> 
+>     31                                                0
+>       ------------------------ -----------------------
+> RDES0| Inner VLAN TAG [31:16] | Outer VLAN TAG [15:0] |
+>       ------------------------ -----------------------
+> 
+> b) For Tunneled Frame (TNP=1)
+> 
+>      31                   8 7                3 2      0
+>       --------------------- ------------------ -------
+> RDES0| VNID/VSID           | Reserved         | OL2L3 |
+>       --------------------- ------------------ ------
+> 
+> The logic for handling tunneled frames is not yet implemented
+> in the dwxgmac2_wrback_get_rx_vlan_tci() function. Therefore,
+> it is prudent to maintain separate functions within their
+> respective descriptor driver files
+> (dwxgmac2_descs.c and dwmac4_descs.c).
+> 
+> Signed-off-by: Boon Khai Ng <boon.khai.ng@altera.com>
+> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
 
-I don't mind and this seems to be what Jon wants.
-I could queue it too, but extra review  it gets in the net tree is good.
+...
 
--- 
-MST
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> index a6d395c6bacd..d9f41c047e5e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> @@ -614,76 +614,6 @@ static int dwxgmac2_rss_configure(struct mac_device_info *hw,
+>  	return 0;
+>  }
+>  
+> -static void dwxgmac2_update_vlan_hash(struct mac_device_info *hw, u32 hash,
+> -				      u16 perfect_match, bool is_double)
+> -{
+> -	void __iomem *ioaddr = hw->pcsr;
+> -
+> -	writel(hash, ioaddr + XGMAC_VLAN_HASH_TABLE);
+> -
+> -	if (hash) {
+> -		u32 value = readl(ioaddr + XGMAC_PACKET_FILTER);
+> -
+> -		value |= XGMAC_FILTER_VTFE;
+> -
+> -		writel(value, ioaddr + XGMAC_PACKET_FILTER);
 
+Here the XGMAC_FILTER_VTFE bit of XGMAC_PACKET_FILTER is set.
+However, this logic does not appear in vlan_update_hash()
+
+> -
+> -		value = readl(ioaddr + XGMAC_VLAN_TAG);
+> -
+> -		value |= XGMAC_VLAN_VTHM | XGMAC_VLAN_ETV;
+> -		if (is_double) {
+> -			value |= XGMAC_VLAN_EDVLP;
+> -			value |= XGMAC_VLAN_ESVL;
+> -			value |= XGMAC_VLAN_DOVLTC;
+> -		} else {
+> -			value &= ~XGMAC_VLAN_EDVLP;
+> -			value &= ~XGMAC_VLAN_ESVL;
+> -			value &= ~XGMAC_VLAN_DOVLTC;
+> -		}
+
+And likewise, here value is based on reading from XGMAC_VLAN_TAG.
+Whereas in vlan_update_hash is constructed without reading from
+XGMAC_VLAN_TAG.
+
+Can I clarify that this is intentional and that vlan_update_hash(),
+which is based on the DWMAC4 implementation, will also work for DWXGMAC IP?
+
+> -
+> -		value &= ~XGMAC_VLAN_VID;
+> -		writel(value, ioaddr + XGMAC_VLAN_TAG);
+> -	} else if (perfect_match) {
+> -		u32 value = readl(ioaddr + XGMAC_PACKET_FILTER);
+> -
+> -		value |= XGMAC_FILTER_VTFE;
+> -
+> -		writel(value, ioaddr + XGMAC_PACKET_FILTER);
+> -
+> -		value = readl(ioaddr + XGMAC_VLAN_TAG);
+> -
+> -		value &= ~XGMAC_VLAN_VTHM;
+> -		value |= XGMAC_VLAN_ETV;
+> -		if (is_double) {
+> -			value |= XGMAC_VLAN_EDVLP;
+> -			value |= XGMAC_VLAN_ESVL;
+> -			value |= XGMAC_VLAN_DOVLTC;
+> -		} else {
+> -			value &= ~XGMAC_VLAN_EDVLP;
+> -			value &= ~XGMAC_VLAN_ESVL;
+> -			value &= ~XGMAC_VLAN_DOVLTC;
+> -		}
+> -
+> -		value &= ~XGMAC_VLAN_VID;
+> -		writel(value | perfect_match, ioaddr + XGMAC_VLAN_TAG);
+> -	} else {
+> -		u32 value = readl(ioaddr + XGMAC_PACKET_FILTER);
+> -
+> -		value &= ~XGMAC_FILTER_VTFE;
+> -
+> -		writel(value, ioaddr + XGMAC_PACKET_FILTER);
+> -
+> -		value = readl(ioaddr + XGMAC_VLAN_TAG);
+> -
+> -		value &= ~(XGMAC_VLAN_VTHM | XGMAC_VLAN_ETV);
+> -		value &= ~(XGMAC_VLAN_EDVLP | XGMAC_VLAN_ESVL);
+> -		value &= ~XGMAC_VLAN_DOVLTC;
+> -		value &= ~XGMAC_VLAN_VID;
+> -
+> -		writel(value, ioaddr + XGMAC_VLAN_TAG);
+> -	}
+> -}
+
+...
+
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
+
+...
+
+> +static int vlan_write_filter(struct net_device *dev,
+> +			     struct mac_device_info *hw,
+> +			     u8 index, u32 data)
+> +{
+> +	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+> +	int i, timeout = 10;
+> +	u32 val;
+> +
+> +	if (index >= hw->num_vlan)
+> +		return -EINVAL;
+> +
+> +	writel(data, ioaddr + VLAN_TAG_DATA);
+> +
+> +	val = readl(ioaddr + VLAN_TAG);
+> +	val &= ~(VLAN_TAG_CTRL_OFS_MASK |
+> +		VLAN_TAG_CTRL_CT |
+> +		VLAN_TAG_CTRL_OB);
+> +	val |= (index << VLAN_TAG_CTRL_OFS_SHIFT) | VLAN_TAG_CTRL_OB;
+> +
+> +	writel(val, ioaddr + VLAN_TAG);
+> +
+> +	for (i = 0; i < timeout; i++) {
+> +		val = readl(ioaddr + VLAN_TAG);
+> +		if (!(val & VLAN_TAG_CTRL_OB))
+> +			return 0;
+> +		udelay(1);
+> +	}
+
+I am curious to know why readl_poll_timeout() isn't used here
+as was the case in dwmac4_write_vlan_filter().
+
+> +
+> +	netdev_err(dev, "Timeout accessing MAC_VLAN_Tag_Filter\n");
+> +
+> +	return -EBUSY;
+> +}
+
+...
 
