@@ -1,93 +1,152 @@
-Return-Path: <netdev+bounces-185592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5992A9B10E
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:35:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D11A9B110
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBEF53AA706
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:32:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D54C18977F7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B971AA1F4;
-	Thu, 24 Apr 2025 14:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146E343AA1;
+	Thu, 24 Apr 2025 14:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rGwUIeZk"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="fcyInJHC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="J1cOdWPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE7D15C15F;
-	Thu, 24 Apr 2025 14:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6DD27456;
+	Thu, 24 Apr 2025 14:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745505052; cv=none; b=jD36Ycwr3gkQK6asoYrvxbCxlgx6IcrTjwPbo8F67nhkWgY9qqp4MI2GPAklei5ue/7tjhs+mS/8DijMdO14AoaaPpd8pjCf7Fn995QckXyxV9cPwmk7odcM02wE2Wc+aWxNHiKq5ojlnZITQba3Gutt3AT/LiO7t0Roe1l6ZBA=
+	t=1745505270; cv=none; b=CRmvvYTgbOAcD0gme15Fsf+5MM2kpruCE61XJgagZho2x5qbtoo9no5gQ6c73wJGJvIrSl4B8uqvpYN17MOEchosP7p+QqSlyiDYqgjQSLHOt4akcfN7hOMC+b2czRoWjxhS6gmAL8bSG+PRuZ4u90qANDVZSJhl3qb6r0Z6amQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745505052; c=relaxed/simple;
-	bh=ZFc4orxBfXaOKJwAgG5MmhnmivFZu74kaL+MgA9Ew0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P+H/vLK5eTZeJFsMjrk8JCpR/pE+RmIyrTgWk0N/IpBtcD/V+bpQBs5v/wl0D90oVzeIAAj26vmpTyOxnqf0OpvUwOk0FzEQ1vNfQHLfNdr9HNBti64U7oFGIxoTtI2I7PaEgO9d6mGBs9wQbMtX+kfGqdZyPt8ew5L7/grc0D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rGwUIeZk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=owGFFqZxx5YPM9OVVa3CXcYpxABz6/DpdMCwx9oKsR8=; b=rGwUIeZko9Zpb2DLhEAxXKIy6L
-	gs3XBlK13qYez6Du8tw5y8i0dFxb6spPl+Ak7NkzrOXq2GMgI3FigXs/9XI8SQp3FsV/QkSb29lJ0
-	26xxeDxcxh6asjozvSqObmgQ5h1kabG2SwXC0PA6EwaFyu9W8Z80DQuel0mQBe6v/evA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u7xb6-00ATNY-GD; Thu, 24 Apr 2025 16:30:40 +0200
-Date: Thu, 24 Apr 2025 16:30:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v1 3/4] net: phy: Don't report advertised EEE
- modes if EEE is disabled
-Message-ID: <07bd8b38-c49c-481b-b08b-fff78b9ffe98@lunn.ch>
-References: <20250424130222.3959457-1-o.rempel@pengutronix.de>
- <20250424130222.3959457-4-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1745505270; c=relaxed/simple;
+	bh=lBY632yHFONY6RYE7IZBlTMj+ZH0jJ67pll7LbVsi50=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=QwfYOm5JOT6Gnh0P4FYgMFMQbYN/HlK8VJEDv8gteDWwz4Piz2qiTmRiOF2r16YWXEV49vsU//Z8Gy4vpbMBXdoq+6a67sZwNrufIwwBRssiQuOF+TKcY3jqxM5lFkAUsXwhHk0LeO/0mRrECJB7PfewCopmeNlQDvjK+av6828=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=fcyInJHC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=J1cOdWPH; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id E4EAC1140230;
+	Thu, 24 Apr 2025 10:34:25 -0400 (EDT)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-05.internal (MEProxy); Thu, 24 Apr 2025 10:34:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1745505265;
+	 x=1745591665; bh=zTkvCEnROr1A65wAUwD/pBdGL1QA1EttebQzh1cAxms=; b=
+	fcyInJHC855hzAWTZ2h3AVxngjSc+fFcc6loF5MtVM9qaOJ8prCdjio44QD9CK9Z
+	zMo6bJmPFq12CjR1VuSXrd9eKceErfiaxlG6nx9Z7ae4o7FBSAupTULqA4oaTzBi
+	VHseiiHlUY3DYaU9iEeeiFN0sUD//cd46MTtY0QsHBQRIQoL1SU58lLjwrVzsE4A
+	0naxzbGQQ+THgQA6O8wCmaTaQs6j1l5B9duv7w3CEhDfE4YWon6WVJ7kCg6hDP7C
+	eTovsz+eXTyq6p1ex5NUN7QUvL83hA19JJ4ygoXSxvI9UYxU+GV3q4xQUHHkcAXQ
+	n74I3uYZO/bsuUkm0O4aYg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1745505265; x=
+	1745591665; bh=zTkvCEnROr1A65wAUwD/pBdGL1QA1EttebQzh1cAxms=; b=J
+	1cOdWPHspr4C/scac8IbOUvSOQvD7e9hdQwop/kh5GV3ew7KZ9gna1X5H4LDUafk
+	bMF07kCGYjRO6/eVREigZDQmrZAa/8YYA9RipNYfDARrAMMTzl5sNVl4YXwq0cF8
+	yMQ2fMouIDZDqpIf2vMwqpwX5vmGgZ0MB5luG2puRjIeadnYxzhsrUK+uIB2G+cE
+	NH5bgY2PzEDF1NUyVxjqH1DP22r1E2sHXZiqjjanV2hdDL3e79rgr8ec3VzSSLxO
+	f8J/xt5hufP1MwdiDV6GunboWKjvSbd3JiG/Gn1pu04tvK+O9fBSZe/Kim1qKwUf
+	OaK3PxMkaKdOC9gbawmEw==
+X-ME-Sender: <xms:8EsKaJNuqCDjxjPu2DaEr7dsZ_7l5s-hCob_4zL0GrheSqjJGNUtxw>
+    <xme:8EsKaL9CiezppF3Q0XmZ1flUGkn9nl3Co3i0yHskhUc9UC2_3bFu86TBe9Z6NblJm
+    tqHA6SWF7UOn-TIsi0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeljedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
+    gsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeet
+    fefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohep
+    vdejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepphgrvhgvlhesuggvnhigrdguvgdprhgtphhtthho
+    pehfrdhfrghinhgvlhhlihesghhmrghilhdrtghomhdprhgtphhtthhopehsuhguihhpmh
+    drmhhukhhhvghrjhgvvgesghhmrghilhdrtghomhdprhgtphhtthhopehrfigrrhhsohif
+    sehgmhigrdguvgdprhgtphhtthhopegsrhhoohhnihgvsehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopegtohhnohhrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgrthhhrghnsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:8EsKaIRd3Sl6rsoO-64VW8JMHzPSHZHnQEFXsQgChAQ5zl4caKg0Xw>
+    <xmx:8EsKaFvV2KflmPXyAtdb-mxtNoD6jzwtux6j6qlRaEZk9tQXOdCcTg>
+    <xmx:8EsKaBdeKh2DeonmkhAqgy2IqsLyOLIKpI9ahv7V0oMJFbIKmdqcIQ>
+    <xmx:8EsKaB1WrauUdokUwXNaVmdICfNCsKJYwzgs3ppl8MxOgLlLbqsEcA>
+    <xmx:8UsKaLtlJLq9XUVq_FgwPc-FdeQNxlAG4nvOIao8z4kjl0lxY1b-AarP>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id CA59F2220075; Thu, 24 Apr 2025 10:34:24 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424130222.3959457-4-o.rempel@pengutronix.de>
+X-ThreadId: T573a13c25518dc45
+Date: Thu, 24 Apr 2025 16:34:04 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Naresh Kamboju" <naresh.kamboju@linaro.org>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ "Linus Torvalds" <torvalds@linux-foundation.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Guenter Roeck" <linux@roeck-us.net>, shuah <shuah@kernel.org>,
+ patches@kernelci.org, lkft-triage@lists.linaro.org,
+ "Pavel Machek" <pavel@denx.de>, "Jon Hunter" <jonathanh@nvidia.com>,
+ "Florian Fainelli" <f.fainelli@gmail.com>,
+ "Sudip Mukherjee" <sudipm.mukherjee@gmail.com>,
+ "Slade Watkins" <srw@sladewatkins.net>, rwarsow@gmx.de,
+ "Conor Dooley" <conor@kernel.org>, hargar@microsoft.com,
+ "Mark Brown" <broonie@kernel.org>, Netdev <netdev@vger.kernel.org>,
+ clang-built-linux <llvm@lists.linux.dev>,
+ "Anders Roxell" <anders.roxell@linaro.org>,
+ "Dan Carpenter" <dan.carpenter@linaro.org>,
+ "Nathan Chancellor" <nathan@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>
+Message-Id: <e77b24ce-e91b-4c90-82d6-0fa91fcce163@app.fastmail.com>
+In-Reply-To: <2025042443-ibuprofen-scavenger-c4df@gregkh>
+References: <20250423142624.409452181@linuxfoundation.org>
+ <CA+G9fYu+FEZ-3ye30Hk2sk1+LFsw7iO5AHueUa9H1Ub=JO-k2g@mail.gmail.com>
+ <2025042443-ibuprofen-scavenger-c4df@gregkh>
+Subject: Re: [PATCH 6.1 000/291] 6.1.135-rc1 review
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 03:02:21PM +0200, Oleksij Rempel wrote:
-> Currently, `ethtool --show-eee` reports "Advertised EEE link modes" even when
-> EEE is disabled, which can be misleading. For example:
-> 
->   EEE settings for lan1:
->           EEE status: disabled
->           Tx LPI: disabled
->           Supported EEE link modes:  100baseT/Full
->                                      1000baseT/Full
->           Advertised EEE link modes:  100baseT/Full
->                                       1000baseT/Full
->           Link partner advertised EEE link modes:  Not reported
+On Thu, Apr 24, 2025, at 15:41, Greg Kroah-Hartman wrote:
+> On Thu, Apr 24, 2025 at 07:01:02PM +0530, Naresh Kamboju wrote:
+>> 
+>> ## Build error:
+>> net/sched/act_mirred.c:265:6: error: variable 'is_redirect' is used
+>> uninitialized whenever 'if' condition is true
+>> [-Werror,-Wsometimes-uninitialized]
+>>   265 |         if (unlikely(!(dev->flags & IFF_UP)) ||
+>> !netif_carrier_ok(dev)) {
+>>       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Odd this isn't showing up in newer releases, as this is an old commit
+> and nothing has changed in this file since then (it showed up in 6.8.)
+>
+> Is there some follow-up commit somewhere that I'm missing that resolved
+> this issue?
 
-What is the behaviour for normal link mode advertisement? If i turn
-autoneg off, do the advertised link modes disappear? Do they reappear
-when i turn autoneg back on again?
+I think the difference is commit 16085e48cb48 ("net/sched: act_mirred:
+Create function tcf_mirred_to_dev and improve readability") from 
+v6.8, which adds the initialization that 166c2c8a6a4d ("net/sched:
+act_mirred: don't override retval if we already lost the skb")
+relies on.
 
-I would expect EEE to follow what the normal link modes do. Assuming
-the Read/modify/write does not break this.
-
-	Andrew
+      Arnd
 
