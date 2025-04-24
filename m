@@ -1,129 +1,122 @@
-Return-Path: <netdev+bounces-185555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A8F3A9AE19
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B9A2A9AE4B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2EC14A0FD1
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:57:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5685D16F850
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 13:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E9127BF9E;
-	Thu, 24 Apr 2025 12:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pquxH5Tc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B2327FD70;
+	Thu, 24 Apr 2025 13:02:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2877027BF6F;
-	Thu, 24 Apr 2025 12:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C7527FD54
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499465; cv=none; b=DzRVcIt+5X2W9PdJjwBhBqMIBGQB0V7H3Mt359d4yhYS7zxBqoXqd7TSetrZr5J/hb7Ka1njcJDeGpY89TVR018gk4FpdI67/3ZNm2LyX72eh70H6fenzRGJoNceH8Ajgq28H4ttqLoI8Ey5MlsOmkjWp4UX4qKlF4mpgJcOjPs=
+	t=1745499766; cv=none; b=mc1Z1cY++efscO0qA4Pbvp+GHXVxRIaCu84nt4sqsP/uBdXyC/E14w2LRv6OD1pOxbHj2vkzVlTpGsc8sOqXQkSQ2hpnOrVEgagqHoZMTspdFiRo4iPyE5kwfRp1sSF1V8pM5NXhOyDF8EhzcA/GPhhKyHdgWt+EaRkba87V6Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499465; c=relaxed/simple;
-	bh=J0lIE4vzLnRiJOxdYUmeZR6BncyTaoVNVM9VyFhACGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WxB2etga0oLbhqXPQsPq+Mi793bkIV2vFoJYDm2ixnq5/Mqs8WsdfTVrrGb2ww3PH8+VvmZJnxbybTupWNMjgO4KgaSpggvJVJKwp1JF//0M2HHPWXCPmhmeN85+L1N+HdOFRIm1wHhZ932zQeyO2cUUqigE0L8DNY5/7bAowzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pquxH5Tc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ei9FNw6IjtxDnJGtZ0ljQWti041QWdVAFekLHXRFiv8=; b=pquxH5TcA9L1wdWXApkcJYJYcv
-	UuJ3wPBl6Qmnm2H3WE6PKIU8sdYhYUPw9ic8jzEr/CfC4/gHksuQ73zK1kAnNeZiQSY6Ul2QErFw2
-	D9Fq3/+6GVrOYvNUnytuZRe1jtUZXE60Apy3/Yd/3HF3SongBjPChdvdNGR9KEAHSfBM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u7w8t-00ASoP-Lw; Thu, 24 Apr 2025 14:57:27 +0200
-Date: Thu, 24 Apr 2025 14:57:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1745499766; c=relaxed/simple;
+	bh=VkBMTFzQQcwgUPsyNIWIjWTCwANchLCXkLSY2etY9w4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OwEKPKWvgvlTtzqg2X+JYs35Vg3wSJVvuzqaCvpn/K6UhLL8q3Fk8Z5VYn9Z6zQoQRYpK5+v2RieBsB/A2HRu6j8rLaofwO+9NEKdU89UshWba62d1QJMmyONKilAOWZjcpDmeFGzm2mWJzr0K8CH/r/UcezGQMxfA67jwp9KWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7wDh-0002ZT-3v; Thu, 24 Apr 2025 15:02:25 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7wDf-001swF-1o;
+	Thu, 24 Apr 2025 15:02:23 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u7wDf-00Gc4L-1Y;
+	Thu, 24 Apr 2025 15:02:23 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
- board
-Message-ID: <4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
-References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
- <20250423-01-sun55i-emac0-v1-4-46ee4c855e0a@gentoo.org>
- <aa38baed-f528-4650-9e06-e7a76c25ec89@lunn.ch>
- <20250424014120.0d66bd85@minigeek.lan>
- <835b58a3-82a0-489e-a80f-dcbdb70f6f8d@lunn.ch>
- <20250424134104.18031a70@donnerap.manchester.arm.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v1 0/4]  Improve EEE control for KSZ switches and clarify ethtool output
+Date: Thu, 24 Apr 2025 15:02:18 +0200
+Message-Id: <20250424130222.3959457-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424134104.18031a70@donnerap.manchester.arm.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> > Just to be clear, you tried it with "rgmii-id" and the same <300> and
-> > <400> values?
-> 
-> Yes, sorry, I wasn't clear: I used rgmii-id, then experimented with those
-> values.
+This patch series addresses two areas related to Energy Efficient
+Ethernet (EEE) handling, focusing on better integration of Microchip KSZ
+switches with the DSA framework and improving the clarity of ethtool
+--show-eee output.
 
-O.K, great.
+Part 1: Previously, I added a filter to the set_mac_eee() implementation
+in the Microchip KSZ driver to reject unsupported configurations -
+specifically, attempts to disable LPI while keeping EEE enabled, or to
+change the Tx LPI timer. This was intended as a safeguard to clarify
+what the driver does not support, since EEE is handled internally by the
+KSZ hardware through PHY advertisement.
 
-I do suspect the delays are not actually in pico seconds. But without
-a data sheet, it is hard to know.
+However, after many changes in the EEE framework, this filter has become
+outdated and problematic. It now blocks users from disabling EEE
+altogether. Since there is no MAC-level configuration required for KSZ
+switches, and the driver already implements support_eee(), the cleanest
+path forward is to remove the set_mac_eee() implementation entirely.
 
-       if (!of_property_read_u32(node, "allwinner,rx-delay-ps", &val)) {
-                if (val % 100) {
-                        dev_err(dev, "rx-delay must be a multiple of 100\n");
-                        return -EINVAL;
-                }
-                val /= 100;
-                dev_dbg(dev, "set rx-delay to %x\n", val);
-                if (val <= gmac->variant->rx_delay_max) {
-                        reg &= ~(gmac->variant->rx_delay_max <<
-                                 SYSCON_ERXDC_SHIFT);
-                        reg |= (val << SYSCON_ERXDC_SHIFT);
+Part 2: Clarify ethtool output related to EEE
+The ethtool --show-eee command could produce misleading output:
+- It displayed "Advertised EEE link modes" even when EEE was disabled
+- It omitted the link partner's EEE advertisement unless local EEE was
+  enabled
 
-So the code divides by 100 and writes it to a register. But:
+The remaining patches focus on improving the usability and correctness
+of the ethtool --show-eee output, particularly in cases where EEE is
+disabled.
 
-static const struct emac_variant emac_variant_h3 = {
-        .rx_delay_max = 31,
+Tested with Microchip KSZ series hardware.
 
+Oleksij Rempel (4):
+  net: dsa: user: Skip set_mac_eee() if support_eee() is implemented
+  net: dsa: microchip: Remove set_mac_eee() callback from KSZ driver
+  net: phy: Don't report advertised EEE modes if EEE is disabled
+  net: phy: Always read EEE LPA in genphy_c45_ethtool_get_eee()
 
-static const struct emac_variant emac_variant_r40 = {
-        .rx_delay_max = 7,
-};
+ drivers/net/dsa/microchip/ksz_common.c | 19 -------------------
+ drivers/net/phy/phy-c45.c              |  7 ++++---
+ net/dsa/user.c                         |  6 ++----
+ 3 files changed, 6 insertions(+), 26 deletions(-)
 
-With the change from 7 to 31, did the range get extended by a factor
-of 4, or did the step go down by a factor of 4, and the / 100 should
-be / 25? I suppose the git history might have the answer in the commit
-message, but i'm too lazy to go look.
+--
+2.39.5
 
-	Andrew
-
-
-
-I briefly tried "rgmii", and I couldn't get a lease, so I quite
-> confident it's rgmii-id, as you said. The vendor DTs just use "rgmii", but
-> they might hack the delay up another way (and I cannot be asked to look at
-> that awful code).
-> 
-> Cheers,
-> Andre
 
