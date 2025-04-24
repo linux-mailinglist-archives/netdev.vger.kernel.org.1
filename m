@@ -1,418 +1,334 @@
-Return-Path: <netdev+bounces-185471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D0BA9A919
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:55:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FE4A9A93A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 113923A9510
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:54:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAF92188B92F
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F61B1D516F;
-	Thu, 24 Apr 2025 09:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GPU2vGO7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0310F1D516F;
+	Thu, 24 Apr 2025 09:58:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E545819CC3D;
-	Thu, 24 Apr 2025 09:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C2FD528;
+	Thu, 24 Apr 2025 09:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745488453; cv=none; b=GZfPvQ4SwVThLL3ECRv3anqwRiSk3eaqZQrX20bopI/QGX8iLqlTp+MOraHp5+0gHC+bJ7x1tOKrrnRM3F8jwjqvHNBL6orByPoSA/PztsTqqFJvok2SlJasAiwq/ImD32TsYCF6mx+QSaZbqt5FAjVnHQwLFzEMti1QyhCNVRs=
+	t=1745488680; cv=none; b=OZ1Rny5m4tf4RtXMZr0PcNQbj+yxxeKAsDMsBrO7XS6rekNo0dQbOcLFMDBzGb1B36CQbhDU3Wi5CVc67zV4hYlWcAUFRTJCyCLJfVuO7PXavvOD9a66Uw1I3iUAlYLdPDgcIeb5xj7UqQGttbUsXCVmyGcxRvRSrX4zXtUA4b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745488453; c=relaxed/simple;
-	bh=ZV2EU0lS5UbkQEDKIMlLp8H7/VASWeIN55PoSggIycY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l9sYHlfJNE/4HwPR2JMICff88e7LnNAeyLCXqOELpxQK1m2jPk8xYqDRZyCBuRRTrYL4oJunKtT8g/ae6UNf25qdfeL+DHMC2DlP70wLAsdZiC+AtizEaNjxw63P088ZR7u0xAY8+REZcfXVjXqA35FpfkhnyoRLoU9cYxuCWc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=GPU2vGO7; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53O9rLn61823416
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 04:53:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1745488401;
-	bh=Z6vAvY6wUi4QuG5rrF2KhxpeZXkQGT1PaOJZ62tuOIQ=;
-	h=From:To:CC:Subject:Date;
-	b=GPU2vGO7CtlJfPhBIk7463bycm1+DXX+RJKzHTpIIy5M8eZGqaaK/xzfrMoubZ7mp
-	 /okyAUW84DTvUhyocTjTKfoXd2POG1fJ+/WYQeT6m/wbjKVWGidogOT9SdGHKP//C9
-	 mE1nlb05S07LGShl9r5DynJb5sm+coDaZO5Vb59A=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53O9rLas068950
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 24 Apr 2025 04:53:21 -0500
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 24
- Apr 2025 04:53:20 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 24 Apr 2025 04:53:20 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53O9rKQx014724;
-	Thu, 24 Apr 2025 04:53:20 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 53O9rJRI020685;
-	Thu, 24 Apr 2025 04:53:20 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>,
-        Meghana Malladi
-	<m-malladi@ti.com>, Lee Trager <lee@trager.us>,
-        Madhavan Srinivasan
-	<maddy@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>, Michael Ellerman
-	<mpe@ellerman.id.au>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Roger Quadros
-	<rogerq@kernel.org>,
-        MD Danish Anwar <danishanwar@ti.com>,
-        Jonathan Corbet
-	<corbet@lwn.net>, Simon Horman <horms@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>
-Subject: [PATCH net-next v3] net: ti: icssg-prueth: Add ICSSG FW Stats
-Date: Thu, 24 Apr 2025 15:23:16 +0530
-Message-ID: <20250424095316.2643573-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1745488680; c=relaxed/simple;
+	bh=X8NiDrNs8HDQF1N5ISic7R5uPwBw+A62TPPaXMb50fw=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dY085wn1wbwUbAZFZ+iVGuX5dTTN5Lzo4d+UmcwbHdBNXVfvw/8ZUrc1gQorYw+LJc2HzQNpg0gP5InW8V26ZYEqKNOe+lJUOZHJVGCC2EkqXzcKu2ey1h/2/1z3wTQeDXDD0s4IuruA7KC0EMuRE9IxZEkgTXSLia/KfhYVBbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Zjrvr3ztTz6L5Gb;
+	Thu, 24 Apr 2025 17:56:08 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8EE7E140519;
+	Thu, 24 Apr 2025 17:57:54 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 24 Apr
+ 2025 11:57:53 +0200
+Date: Thu, 24 Apr 2025 10:57:52 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <admiyo@os.amperecomputing.com>
+CC: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
+	<matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sudeep Holla
+	<sudeep.holla@arm.com>, Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v20 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <20250424105752.00007396@huawei.com>
+In-Reply-To: <20250423220142.635223-2-admiyo@os.amperecomputing.com>
+References: <20250423220142.635223-1-admiyo@os.amperecomputing.com>
+	<20250423220142.635223-2-admiyo@os.amperecomputing.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-The ICSSG firmware maintains set of stats called PA_STATS.
-Currently the driver only dumps 4 stats. Add support for dumping more
-stats.
+On Wed, 23 Apr 2025 18:01:42 -0400
+admiyo@os.amperecomputing.com wrote:
 
-The offset for different stats are defined as MACROs in icssg_switch_map.h
-file. All the offsets are for Slice0. Slice1 offsets are slice0 + 4.
-The offset calculation is taken care while reading the stats in
-emac_update_hardware_stats().
+> From: Adam Young <admiyo@os.amperecomputing.com>
+> 
+> Implementation of network driver for
+> Management Control Transport Protocol(MCTP)
+> over Platform Communication Channel(PCC)
+> 
+> DMTF DSP:0292
+> https://www.dmtf.org/sites/default/files/standards/documents/\
+> DSP0292_1.0.0WIP50.pdf
+> 
+> MCTP devices are specified via ACPI by entries
+> in DSDT/SDST and reference channels specified
+> in the PCCT.
+> 
+> Communication with other devices use the PCC based
+> doorbell mechanism.
+> 
+> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
+Hi Adam,
 
-The statistics are documented in
-Documentation/networking/device_drivers/icssg_prueth.rst
+Sorry it's been a while since I last looked at this.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
-v2 - v3:
-*) Included different firmware maintained error counters in the aggregate
-rx_errors / rx_dropped / tx_errors / tx_dropped statistics as suggested by
-Jakub Kicinski <kuba@kernel.org>
-*) Rebased on the latest net-next
+Anyhow, some fairly general feedback inline.  All minor stuff.
+With that tidied up.
 
-v1 - v2:
-*) Created icssg_prueth.rst and added Documentation of firmware statistics
-as suggested by Jakub Kicinski <kuba@kernel.org>
-*) Removed unimplemented preemption statistics.
-*) Collected RB tag from Simon Horman <horms@kernel.org>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-v1 - https://lore.kernel.org/all/20250227093712.2130561-1-danishanwar@ti.com/
-v2 - https://lore.kernel.org/all/20250305111608.520042-1-danishanwar@ti.com/
 
- .../device_drivers/ethernet/index.rst         |  1 +
- .../ethernet/ti/icssg_prueth.rst              | 56 ++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icssg_common.c  | 24 +++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  2 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.c   |  8 +--
- drivers/net/ethernet/ti/icssg/icssg_stats.h   | 58 ++++++++++++-------
- .../net/ethernet/ti/icssg/icssg_switch_map.h  | 33 +++++++++++
- 7 files changed, 151 insertions(+), 31 deletions(-)
- create mode 100644 Documentation/networking/device_drivers/ethernet/ti/icssg_prueth.rst
+> ---
+>  MAINTAINERS                 |   5 +
+>  drivers/net/mctp/Kconfig    |  13 ++
+>  drivers/net/mctp/Makefile   |   1 +
+>  drivers/net/mctp/mctp-pcc.c | 317 ++++++++++++++++++++++++++++++++++++
+>  4 files changed, 336 insertions(+)
+>  create mode 100644 drivers/net/mctp/mctp-pcc.c
 
-diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-index 05d822b904b4..f9ed93c1da35 100644
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@ -55,6 +55,7 @@ Contents:
-    ti/cpsw_switchdev
-    ti/am65_nuss_cpsw_switchdev
-    ti/tlan
-+   ti/icssg_prueth
-    wangxun/txgbe
-    wangxun/ngbe
- 
-diff --git a/Documentation/networking/device_drivers/ethernet/ti/icssg_prueth.rst b/Documentation/networking/device_drivers/ethernet/ti/icssg_prueth.rst
-new file mode 100644
-index 000000000000..da21ddf431bb
---- /dev/null
-+++ b/Documentation/networking/device_drivers/ethernet/ti/icssg_prueth.rst
-@@ -0,0 +1,56 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==============================================
-+Texas Instruments ICSSG PRUETH ethernet driver
-+==============================================
-+
-+:Version: 1.0
-+
-+ICSSG Firmware
-+==============
-+
-+Every ICSSG core has two Programmable Real-Time Unit(PRUs), two auxiliary
-+Real-Time Transfer Unit (RTUs), and two Transmit Real-Time Transfer Units
-+(TX_PRUs). Each one of these runs its own firmware. The firmwares combnined are
-+referred as ICSSG Firmware.
-+
-+Firmware Statistics
-+===================
-+
-+The ICSSG firmware maintains certain statistics which are dumped by the driver
-+via ``ethtool -S <interface>``
-+
-+These statistics are as follows,
-+
-+ - ``FW_RTU_PKT_DROP``: Diagnostic error counter which increments when RTU drops a locally injected packet due to port being disabled or rule violation.
-+ - ``FW_Q0_OVERFLOW``: TX overflow counter for queue0
-+ - ``FW_Q1_OVERFLOW``: TX overflow counter for queue1
-+ - ``FW_Q2_OVERFLOW``: TX overflow counter for queue2
-+ - ``FW_Q3_OVERFLOW``: TX overflow counter for queue3
-+ - ``FW_Q4_OVERFLOW``: TX overflow counter for queue4
-+ - ``FW_Q5_OVERFLOW``: TX overflow counter for queue5
-+ - ``FW_Q6_OVERFLOW``: TX overflow counter for queue6
-+ - ``FW_Q7_OVERFLOW``: TX overflow counter for queue7
-+ - ``FW_DROPPED_PKT``: This counter is incremented when a packet is dropped at PRU because of rule violation.
-+ - ``FW_RX_ERROR``: Incremented if there was a CRC error or Min/Max frame error at PRU
-+ - ``FW_RX_DS_INVALID``: Incremented when RTU detects Data Status invalid condition
-+ - ``FW_TX_DROPPED_PACKET``: Counter for packets dropped via TX Port
-+ - ``FW_TX_TS_DROPPED_PACKET``: Counter for packets with TS flag dropped via TX Port
-+ - ``FW_INF_PORT_DISABLED``: Incremented when RX frame is dropped due to port being disabled
-+ - ``FW_INF_SAV``: Incremented when RX frame is dropped due to Source Address violation
-+ - ``FW_INF_SA_DL``: Incremented when RX frame is dropped due to Source Address being in the denylist
-+ - ``FW_INF_PORT_BLOCKED``: Incremented when RX frame is dropped due to port being blocked and frame being a special frame
-+ - ``FW_INF_DROP_TAGGED`` : Incremented when RX frame is dropped for being tagged
-+ - ``FW_INF_DROP_PRIOTAGGED``: Incremented when RX frame is dropped for being priority tagged
-+ - ``FW_INF_DROP_NOTAG``: Incremented when RX frame is dropped for being untagged
-+ - ``FW_INF_DROP_NOTMEMBER``: Incremented when RX frame is dropped for port not being member of VLAN
-+ - ``FW_RX_EOF_SHORT_FRMERR``: Incremented if End Of Frame (EOF) task is scheduled without seeing RX_B1
-+ - ``FW_RX_B0_DROP_EARLY_EOF``: Incremented when frame is dropped due to Early EOF
-+ - ``FW_TX_JUMBO_FRM_CUTOFF``: Incremented when frame is cut off to prevent packet size > 2000 Bytes
-+ - ``FW_RX_EXP_FRAG_Q_DROP``: Incremented when express frame is received in the same queue as the previous fragment
-+ - ``FW_RX_FIFO_OVERRUN``: RX fifo overrun counter
-+ - ``FW_CUT_THR_PKT``: Incremented when a packet is forwarded using Cut-Through forwarding method
-+ - ``FW_HOST_RX_PKT_CNT``: Number of valid packets sent by Rx PRU to Host on PSI
-+ - ``FW_HOST_TX_PKT_CNT``: Number of valid packets copied by RTU0 to Tx queues
-+ - ``FW_HOST_EGRESS_Q_PRE_OVERFLOW``: Host Egress Q (Pre-emptible) Overflow Counter
-+ - ``FW_HOST_EGRESS_Q_EXP_OVERFLOW``: Host Egress Q (Pre-emptible) Overflow Counter
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index b4be76e13a2f..79f2d86acf21 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -1318,10 +1318,28 @@ void icssg_ndo_get_stats64(struct net_device *ndev,
- 	stats->rx_over_errors = emac_get_stat_by_name(emac, "rx_over_errors");
- 	stats->multicast      = emac_get_stat_by_name(emac, "rx_multicast_frames");
- 
--	stats->rx_errors  = ndev->stats.rx_errors;
--	stats->rx_dropped = ndev->stats.rx_dropped;
-+	stats->rx_errors  = ndev->stats.rx_errors +
-+			    emac_get_stat_by_name(emac, "FW_RX_ERROR") +
-+			    emac_get_stat_by_name(emac, "FW_RX_EOF_SHORT_FRMERR") +
-+			    emac_get_stat_by_name(emac, "FW_RX_B0_DROP_EARLY_EOF") +
-+			    emac_get_stat_by_name(emac, "FW_RX_EXP_FRAG_Q_DROP") +
-+			    emac_get_stat_by_name(emac, "FW_RX_FIFO_OVERRUN");
-+	stats->rx_dropped = ndev->stats.rx_dropped +
-+			    emac_get_stat_by_name(emac, "FW_DROPPED_PKT") +
-+			    emac_get_stat_by_name(emac, "FW_INF_PORT_DISABLED") +
-+			    emac_get_stat_by_name(emac, "FW_INF_SAV") +
-+			    emac_get_stat_by_name(emac, "FW_INF_SA_DL") +
-+			    emac_get_stat_by_name(emac, "FW_INF_PORT_BLOCKED") +
-+			    emac_get_stat_by_name(emac, "FW_INF_DROP_TAGGED") +
-+			    emac_get_stat_by_name(emac, "FW_INF_DROP_PRIOTAGGED") +
-+			    emac_get_stat_by_name(emac, "FW_INF_DROP_NOTAG") +
-+			    emac_get_stat_by_name(emac, "FW_INF_DROP_NOTMEMBER");
- 	stats->tx_errors  = ndev->stats.tx_errors;
--	stats->tx_dropped = ndev->stats.tx_dropped;
-+	stats->tx_dropped = ndev->stats.tx_dropped +
-+			    emac_get_stat_by_name(emac, "FW_RTU_PKT_DROP") +
-+			    emac_get_stat_by_name(emac, "FW_TX_DROPPED_PACKET") +
-+			    emac_get_stat_by_name(emac, "FW_TX_TS_DROPPED_PACKET") +
-+			    emac_get_stat_by_name(emac, "FW_TX_JUMBO_FRM_CUTOFF");
- }
- EXPORT_SYMBOL_GPL(icssg_ndo_get_stats64);
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index b6be4aa57a61..23c465f1ce7f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -54,7 +54,7 @@
- 
- #define ICSSG_MAX_RFLOWS	8	/* per slice */
- 
--#define ICSSG_NUM_PA_STATS	4
-+#define ICSSG_NUM_PA_STATS	32
- #define ICSSG_NUM_MIIG_STATS	60
- /* Number of ICSSG related stats */
- #define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 6f0edae38ea2..e8241e998aa9 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -11,7 +11,6 @@
- 
- #define ICSSG_TX_PACKET_OFFSET	0xA0
- #define ICSSG_TX_BYTE_OFFSET	0xEC
--#define ICSSG_FW_STATS_BASE	0x0248
- 
- static u32 stats_base[] = {	0x54c,	/* Slice 0 stats start */
- 				0xb18,	/* Slice 1 stats start */
-@@ -46,9 +45,8 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 
- 	if (prueth->pa_stats) {
- 		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
--			reg = ICSSG_FW_STATS_BASE +
--			      icssg_all_pa_stats[i].offset *
--			      PRUETH_NUM_MACS + slice * sizeof(u32);
-+			reg = icssg_all_pa_stats[i].offset +
-+			      slice * sizeof(u32);
- 			regmap_read(prueth->pa_stats, reg, &val);
- 			emac->pa_stats[i] += val;
- 		}
-@@ -80,7 +78,7 @@ int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
- 	if (emac->prueth->pa_stats) {
- 		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
- 			if (!strcmp(icssg_all_pa_stats[i].name, stat_name))
--				return emac->pa_stats[icssg_all_pa_stats[i].offset / sizeof(u32)];
-+				return emac->pa_stats[i];
- 		}
- 	}
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-index e88b919f532c..5ec0b38e0c67 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-@@ -155,24 +155,10 @@ static const struct icssg_miig_stats icssg_all_miig_stats[] = {
- 	ICSSG_MIIG_STATS(tx_bytes, true),
- };
- 
--/**
-- * struct pa_stats_regs - ICSSG Firmware maintained PA Stats register
-- * @fw_rx_cnt: Number of valid packets sent by Rx PRU to Host on PSI
-- * @fw_tx_cnt: Number of valid packets copied by RTU0 to Tx queues
-- * @fw_tx_pre_overflow: Host Egress Q (Pre-emptible) Overflow Counter
-- * @fw_tx_exp_overflow: Host Egress Q (Express) Overflow Counter
-- */
--struct pa_stats_regs {
--	u32 fw_rx_cnt;
--	u32 fw_tx_cnt;
--	u32 fw_tx_pre_overflow;
--	u32 fw_tx_exp_overflow;
--};
--
--#define ICSSG_PA_STATS(field)			\
--{						\
--	#field,					\
--	offsetof(struct pa_stats_regs, field),	\
-+#define ICSSG_PA_STATS(field)	\
-+{				\
-+	#field,			\
-+	field,			\
- }
- 
- struct icssg_pa_stats {
-@@ -181,10 +167,38 @@ struct icssg_pa_stats {
- };
- 
- static const struct icssg_pa_stats icssg_all_pa_stats[] = {
--	ICSSG_PA_STATS(fw_rx_cnt),
--	ICSSG_PA_STATS(fw_tx_cnt),
--	ICSSG_PA_STATS(fw_tx_pre_overflow),
--	ICSSG_PA_STATS(fw_tx_exp_overflow),
-+	ICSSG_PA_STATS(FW_RTU_PKT_DROP),
-+	ICSSG_PA_STATS(FW_Q0_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q1_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q2_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q3_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q4_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q5_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q6_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q7_OVERFLOW),
-+	ICSSG_PA_STATS(FW_DROPPED_PKT),
-+	ICSSG_PA_STATS(FW_RX_ERROR),
-+	ICSSG_PA_STATS(FW_RX_DS_INVALID),
-+	ICSSG_PA_STATS(FW_TX_DROPPED_PACKET),
-+	ICSSG_PA_STATS(FW_TX_TS_DROPPED_PACKET),
-+	ICSSG_PA_STATS(FW_INF_PORT_DISABLED),
-+	ICSSG_PA_STATS(FW_INF_SAV),
-+	ICSSG_PA_STATS(FW_INF_SA_DL),
-+	ICSSG_PA_STATS(FW_INF_PORT_BLOCKED),
-+	ICSSG_PA_STATS(FW_INF_DROP_TAGGED),
-+	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
-+	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
-+	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
-+	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
-+	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
-+	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
-+	ICSSG_PA_STATS(FW_RX_EXP_FRAG_Q_DROP),
-+	ICSSG_PA_STATS(FW_RX_FIFO_OVERRUN),
-+	ICSSG_PA_STATS(FW_CUT_THR_PKT),
-+	ICSSG_PA_STATS(FW_HOST_RX_PKT_CNT),
-+	ICSSG_PA_STATS(FW_HOST_TX_PKT_CNT),
-+	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_PRE_OVERFLOW),
-+	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_EXP_OVERFLOW),
- };
- 
- #endif /* __NET_TI_ICSSG_STATS_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-index 424a7e945ea8..490a9cc06fb0 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-@@ -231,4 +231,37 @@
- /* Start of 32 bits PA_STAT counters */
- #define PA_STAT_32b_START_OFFSET                           0x0080
- 
-+#define FW_RTU_PKT_DROP			0x0088
-+#define FW_Q0_OVERFLOW			0x0090
-+#define FW_Q1_OVERFLOW			0x0098
-+#define FW_Q2_OVERFLOW			0x00A0
-+#define FW_Q3_OVERFLOW			0x00A8
-+#define FW_Q4_OVERFLOW			0x00B0
-+#define FW_Q5_OVERFLOW			0x00B8
-+#define FW_Q6_OVERFLOW			0x00C0
-+#define FW_Q7_OVERFLOW			0x00C8
-+#define FW_DROPPED_PKT			0x00F8
-+#define FW_RX_ERROR			0x0100
-+#define FW_RX_DS_INVALID		0x0108
-+#define FW_TX_DROPPED_PACKET		0x0110
-+#define FW_TX_TS_DROPPED_PACKET		0x0118
-+#define FW_INF_PORT_DISABLED		0x0120
-+#define FW_INF_SAV			0x0128
-+#define FW_INF_SA_DL			0x0130
-+#define FW_INF_PORT_BLOCKED		0x0138
-+#define FW_INF_DROP_TAGGED		0x0140
-+#define FW_INF_DROP_PRIOTAGGED		0x0148
-+#define FW_INF_DROP_NOTAG		0x0150
-+#define FW_INF_DROP_NOTMEMBER		0x0158
-+#define FW_RX_EOF_SHORT_FRMERR		0x0188
-+#define FW_RX_B0_DROP_EARLY_EOF		0x0190
-+#define FW_TX_JUMBO_FRM_CUTOFF		0x0198
-+#define FW_RX_EXP_FRAG_Q_DROP		0x01A0
-+#define FW_RX_FIFO_OVERRUN		0x01A8
-+#define FW_CUT_THR_PKT			0x01B0
-+#define FW_HOST_RX_PKT_CNT		0x0248
-+#define FW_HOST_TX_PKT_CNT		0x0250
-+#define FW_HOST_EGRESS_Q_PRE_OVERFLOW	0x0258
-+#define FW_HOST_EGRESS_Q_EXP_OVERFLOW	0x0260
-+
- #endif /* __NET_TI_ICSSG_SWITCH_MAP_H  */
+> new file mode 100644
+> index 000000000000..589ba4387ce6
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-pcc.c
+> @@ -0,0 +1,317 @@
 
-base-commit: 07e32237ed9d3f5815fb900dee9458b5f115a678
--- 
-2.34.1
+> +
+> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+> +{
+> +	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
+> +	struct mctp_pcc_hdr *mctp_pcc_header;
+> +	void __iomem *buffer;
+> +	unsigned long flags;
+> +	int len = skb->len;
+> +	int rc;
+> +
+> +	rc = skb_cow_head(skb, sizeof(struct mctp_pcc_hdr));
+> +	if (rc)
+> +		goto err_drop;
+> +
+> +	mctp_pcc_header = skb_push(skb, sizeof(struct mctp_pcc_hdr));
+
+I'd use sizeof(*mctp_pcc_header) for these to avoid the reader needing to check
+types. There are a bunch of these you could do the same with to slightly
+improve readability.
+
+> +	mctp_pcc_header->signature = cpu_to_le32(PCC_MAGIC | mpnd->outbox.index);
+> +	mctp_pcc_header->flags = cpu_to_le32(PCC_HEADER_FLAGS);
+> +	memcpy(mctp_pcc_header->mctp_signature, MCTP_SIGNATURE,
+> +	       MCTP_SIGNATURE_LENGTH);
+> +	mctp_pcc_header->length = cpu_to_le32(len + MCTP_SIGNATURE_LENGTH);
+> +
+> +	spin_lock_irqsave(&mpnd->lock, flags);
+> +	buffer = mpnd->outbox.chan->shmem;
+> +	memcpy_toio(buffer, skb->data, skb->len);
+> +	mpnd->outbox.chan->mchan->mbox->ops->send_data(mpnd->outbox.chan->mchan,
+> +							NULL);
+
+Slightly odd alignment.  One extra space?
+
+> +	spin_unlock_irqrestore(&mpnd->lock, flags);
+> +
+> +	dev_dstats_tx_add(ndev, len);
+> +	dev_consume_skb_any(skb);
+> +	return NETDEV_TX_OK;
+> +err_drop:
+> +	dev_dstats_tx_dropped(ndev);
+> +	kfree_skb(skb);
+> +	return NETDEV_TX_OK;
+> +}
+
+> +static acpi_status lookup_pcct_indices(struct acpi_resource *ares,
+> +				       void *context)
+> +{
+> +	struct mctp_pcc_lookup_context *luc = context;
+> +	struct acpi_resource_address32 *addr;
+> +
+> +	switch (ares->type) {
+> +	case PCC_DWORD_TYPE:
+If unlikely we will ever care about other types could simpilfy to
+	if (ares->type != PCC_DWORD_TYPE)
+		return AE_OK;
+
+	etc
+
+> +		break;
+> +	default:
+> +		return AE_OK;
+> +	}
+> +
+> +	addr = ACPI_CAST_PTR(struct acpi_resource_address32, &ares->data);
+> +	switch (luc->index) {
+> +	case 0:
+> +		luc->outbox_index = addr[0].address.minimum;
+> +		break;
+> +	case 1:
+> +		luc->inbox_index = addr[0].address.minimum;
+> +		break;
+> +	}
+> +	luc->index++;
+> +	return AE_OK;
+> +}
+
+
+> +static int mctp_pcc_initialize_mailbox(struct device *dev,
+> +				       struct mctp_pcc_mailbox *box, u32 index)
+> +{
+> +	int ret;
+> +
+> +	box->index = index;
+> +	box->chan = pcc_mbox_request_channel(&box->client, index);
+as below
+	box->client.dev = dev;
+
+> +	if (IS_ERR(box->chan))
+> +		return PTR_ERR(box->chan);
+I'd put a blank line here...
+> +	ret = devm_add_action_or_reset(dev, mctp_cleanup_channel, box->chan);
+> +	if (ret)
+> +		return -EINVAL;
+And here.
+
+Why eat ret?  Which incidentally is normally -ENOMEM for these.
+Why not the simpler
+	return devm_add_action_or_reset(dev, mctp_cleanup_channel, box->chan);
+
+
+> +	return 0;
+> +}
+> +
+> +static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
+> +{
+> +	struct mctp_pcc_lookup_context context = {0, 0, 0};
+
+I'd be tempted to use simply {} or { 0 } so that if we have
+extra context in future we aren't somehow implying it should not be
+intialized to zero (as it will happen anyway).
+
+> +	struct mctp_pcc_ndev *mctp_pcc_ndev;
+> +	struct device *dev = &acpi_dev->dev;
+> +	struct net_device *ndev;
+> +	acpi_handle dev_handle;
+> +	acpi_status status;
+> +	int mctp_pcc_mtu;
+> +	char name[32];
+> +	int rc;
+> +
+> +	dev_dbg(dev, "Adding mctp_pcc device for HID %s\n",
+> +		acpi_device_hid(acpi_dev));
+> +	dev_handle = acpi_device_handle(acpi_dev);
+> +	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
+> +				     &context);
+> +	if (!ACPI_SUCCESS(status)) {
+> +		dev_err(dev, "FAILURE to lookup PCC indexes from CRS\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* inbox initialization */
+> +	snprintf(name, sizeof(name), "mctpipcc%d", context.inbox_index);
+> +	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_PREDICTABLE,
+> +			    mctp_pcc_setup);
+
+I'd use sizeof(*mctp_pcc_ndev) so we don't have to bother checking types...
+
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	mctp_pcc_ndev = netdev_priv(ndev);
+> +	spin_lock_init(&mctp_pcc_ndev->lock);
+> +
+> +	rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->inbox,
+> +					 context.inbox_index);
+
+I think this should be responsible for all the setup of inbox. So that
+includes setting inbox.client.dev as set below.
+
+> +	if (rc)
+> +		goto free_netdev;
+> +	mctp_pcc_ndev->inbox.client.rx_callback = mctp_pcc_client_rx_callback;
+> +
+> +	/* outbox initialization */
+> +	rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->outbox,
+> +					 context.outbox_index);
+
+Same as for inbox.
+
+> +	if (rc)
+> +		goto free_netdev;
+> +
+> +	mctp_pcc_ndev->acpi_device = acpi_dev;
+> +	mctp_pcc_ndev->inbox.client.dev = dev;
+> +	mctp_pcc_ndev->outbox.client.dev = dev;
+
+As above. I think these should be part of the initialize_mailbox calls
+given they are part of the mailboxes and we are passing in dev anyway.
+
+> +	mctp_pcc_ndev->mdev.dev = ndev;
+> +	acpi_dev->driver_data = mctp_pcc_ndev;
+> +
+> +	/* There is no clean way to pass the MTU to the callback function
+> +	 * used for registration, so set the values ahead of time.
+> +	 */
+> +	mctp_pcc_mtu = mctp_pcc_ndev->outbox.chan->shmem_size -
+> +		sizeof(struct mctp_pcc_hdr);
+> +	ndev->mtu = MCTP_MIN_MTU;
+> +	ndev->max_mtu = mctp_pcc_mtu;
+> +	ndev->min_mtu = MCTP_MIN_MTU;
+> +
+> +	/* ndev needs to be freed before the iomemory (mapped above) gets
+> +	 * unmapped,  devm resources get freed in reverse to the order they
+> +	 * are added.
+> +	 */
+> +	rc = mctp_register_netdev(ndev, &mctp_netdev_ops, MCTP_PHYS_BINDING_PCC);
+> +	if (rc)
+> +		goto free_netdev;
+> +	return devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
+> +free_netdev:
+> +	free_netdev(ndev);
+> +	return rc;
+> +}
+> +
+> +static const struct acpi_device_id mctp_pcc_device_ids[] = {
+> +	{ "DMT0001"},
+
+Bracket before } for consistency of spacing.
+
+> +	{}
+> +};
+> +
+> +static struct acpi_driver mctp_pcc_driver = {
+> +	.name = "mctp_pcc",
+> +	.class = "Unknown",
+> +	.ids = mctp_pcc_device_ids,
+> +	.ops = {
+> +		.add = mctp_pcc_driver_add,
+> +	},
+> +};
+> +
+> +module_acpi_driver(mctp_pcc_driver);
+> +
+> +MODULE_DEVICE_TABLE(acpi, mctp_pcc_device_ids);
+> +
+> +MODULE_DESCRIPTION("MCTP PCC ACPI device");
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Adam Young <admiyo@os.amperecomputing.com>");
 
 
