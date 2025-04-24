@@ -1,132 +1,108 @@
-Return-Path: <netdev+bounces-185410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B29FA9A405
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:33:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E06AA9A3EB
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B351B62362
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:33:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CFF97B1E19
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C727D1FECBD;
-	Thu, 24 Apr 2025 07:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="EzvxVtK1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4DA201035;
+	Thu, 24 Apr 2025 07:22:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1831F153C;
-	Thu, 24 Apr 2025 07:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCFB1FF1BF;
+	Thu, 24 Apr 2025 07:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745479345; cv=none; b=icMPohdLPIwAt2pSctN8Fx+Gg0PVaoRPWsaa1l4fV60zNwQJT19cLD9Zy1uVGrHnEDZzdIA7e4R4N+Z2PVrequ2Qp/Zb4qsX9MhTUM5ArRPK65BFK28IX6gd0ETxOhe78o28L4k03iVmwjrV5dOCvvFHMEi9luoBe45ECn/TN7o=
+	t=1745479355; cv=none; b=u6Lg6fv4gW2CcZ+0hgmShtgCTBmzqtLaov00zJHqME0bcb0KJB0ylw8lqjto/qcBc4MEogn1DUCYbdf5+wgi1SK43hVENglce6WekJ8lNi6TXSx8erU91PvhnGCeIObuOJU785YyoJDrpccgxq3kT1kSZy86XdNeedMAmDTdE9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745479345; c=relaxed/simple;
-	bh=O9DVYPK4RZY6YYB7/ewtc8a7TzxiyHmBlNZob9ULLMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CBVWjKKVZsiZB4JXbNeP67ry5IgaYl/MkrRiVmJLnRnycpl5+NDSJP+DnRut5i7ZVugmnDdu6PiVFlVgzrxn3mPUMgplUVlq55xyjzhdiGfcEjipqH6saDirb3WsXOz6h9USPvTNTWt+vCbBFm5xmkJhd87dc/hFM+9cw96r8o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=EzvxVtK1; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53O7LZ5g680960
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 24 Apr 2025 00:21:35 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53O7LZ5g680960
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745479299;
-	bh=O9DVYPK4RZY6YYB7/ewtc8a7TzxiyHmBlNZob9ULLMA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EzvxVtK1RQzG5pBpbz5wweMmUbLdbX/ewshxBSEyzwL/iSqjs/faWzfoVSom8e2bU
-	 rmtjJO6WWsw5MRs+zFMZdhntary9psA+7pGR0qJdm5RToXkkDchyg/7J6wq+MXnydS
-	 UyLEA/gHD031cZVbQISWf2vqYtuDBOavy4tsFM7jHVW35I0N3LU2ji43dZuWviNu+n
-	 FFLmIt3g5crz4RF3ksAJwKElGMES6WqszkBNO0xqtkqsXJyqbnXEZbMYTHwHd3awyK
-	 c6+7Hh3YMNGJO193usGiO/3RsTuBx8nz3JVH/XdAf95WQAP9Kvgb0r/sHpAcHBWEwG
-	 PsB6OXwrQJnjg==
-Message-ID: <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
-Date: Thu, 24 Apr 2025 00:21:34 -0700
+	s=arc-20240116; t=1745479355; c=relaxed/simple;
+	bh=yQBJ5xXAQ4dkP66O25e33ARP2AY88qxSlGWVHfRRAIY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HTdMuUr2pJnAL42sq41mKjj2zb5qTho0SJrEwkM69AB2rIuNFZuPzcz13YIUpHDrDFCvYggnb8Pf1pWnwRZs4ueNhtMRJWfeoWaoPRJjExQVD8wUYIZ07EDhqAX8SjxYjJvqdXBH0QMarPR1biyT+kFdIPAbISyBoxONVJO+jR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.238])
+	by gateway (Coremail) with SMTP id _____8AxTWuy5glotCXFAA--.63767S3;
+	Thu, 24 Apr 2025 15:22:26 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.68.238])
+	by front1 (Coremail) with SMTP id qMiowMDxfRur5glo5CaTAA--.5456S2;
+	Thu, 24 Apr 2025 15:22:22 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yanteng Si <si.yanteng@linux.dev>,
+	Feiyang Chen <chris.chenfeiyang@gmail.com>,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Huacai Chen <chenhuacai@loongson.cn>,
+	Biao Dong <dongbiao@loongson.cn>,
+	Baoqi Zhang <zhangbaoqi@loongson.cn>
+Subject: [PATCH net-next V3 0/3] net: stmmac: dwmac-loongson: Add Loongson-2K3000 support
+Date: Thu, 24 Apr 2025 15:22:06 +0800
+Message-ID: <20250424072209.3134762-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-13-xin@zytor.com>
- <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- xsDNBGUPz1cBDACS/9yOJGojBFPxFt0OfTWuMl0uSgpwk37uRrFPTTLw4BaxhlFL0bjs6q+0
- 2OfG34R+a0ZCuj5c9vggUMoOLdDyA7yPVAJU0OX6lqpg6z/kyQg3t4jvajG6aCgwSDx5Kzg5
- Rj3AXl8k2wb0jdqRB4RvaOPFiHNGgXCs5Pkux/qr0laeFIpzMKMootGa4kfURgPhRzUaM1vy
- bsMsL8vpJtGUmitrSqe5dVNBH00whLtPFM7IbzKURPUOkRRiusFAsw0a1ztCgoFczq6VfAVu
- raTye0L/VXwZd+aGi401V2tLsAHxxckRi9p3mc0jExPc60joK+aZPy6amwSCy5kAJ/AboYtY
- VmKIGKx1yx8POy6m+1lZ8C0q9b8eJ8kWPAR78PgT37FQWKYS1uAroG2wLdK7FiIEpPhCD+zH
- wlslo2ETbdKjrLIPNehQCOWrT32k8vFNEMLP5G/mmjfNj5sEf3IOKgMTMVl9AFjsINLHcxEQ
- 6T8nGbX/n3msP6A36FDfdSEAEQEAAc0WWGluIExpIDx4aW5Aenl0b3IuY29tPsLBDQQTAQgA
- NxYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89XBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
- AQAACgkQa70OVx2uN1HUpgv/cM2fsFCQodLArMTX5nt9yqAWgA5t1srri6EgS8W3F+3Kitge
- tYTBKu6j5BXuXaX3vyfCm+zajDJN77JHuYnpcKKr13VcZi1Swv6Jx1u0II8DOmoDYLb1Q2ZW
- v83W55fOWJ2g72x/UjVJBQ0sVjAngazU3ckc0TeNQlkcpSVGa/qBIHLfZraWtdrNAQT4A1fa
- sWGuJrChBFhtKbYXbUCu9AoYmmbQnsx2EWoJy3h7OjtfFapJbPZql+no5AJ3Mk9eE5oWyLH+
- QWqtOeJM7kKvn/dBudokFSNhDUw06e7EoVPSJyUIMbYtUO7g2+Atu44G/EPP0yV0J4lRO6EA
- wYRXff7+I1jIWEHpj5EFVYO6SmBg7zF2illHEW31JAPtdDLDHYcZDfS41caEKOQIPsdzQkaQ
- oW2hchcjcMPAfyhhRzUpVHLPxLCetP8vrVhTvnaZUo0xaVYb3+wjP+D5j/3+hwblu2agPsaE
- vgVbZ8Fx3TUxUPCAdr/p73DGg57oHjgezsDNBGUPz1gBDAD4Mg7hMFRQqlzotcNSxatlAQNL
- MadLfUTFz8wUUa21LPLrHBkUwm8RujehJrzcVbPYwPXIO0uyL/F///CogMNx7Iwo6by43KOy
- g89wVFhyy237EY76j1lVfLzcMYmjBoTH95fJC/lVb5Whxil6KjSN/R/y3jfG1dPXfwAuZ/4N
- cMoOslWkfZKJeEut5aZTRepKKF54T5r49H9F7OFLyxrC/uI9UDttWqMxcWyCkHh0v1Di8176
- jjYRNTrGEfYfGxSp+3jYL3PoNceIMkqM9haXjjGl0W1B4BidK1LVYBNov0rTEzyr0a1riUrp
- Qk+6z/LHxCM9lFFXnqH7KWeToTOPQebD2B/Ah5CZlft41i8L6LOF/LCuDBuYlu/fI2nuCc8d
- m4wwtkou1Y/kIwbEsE/6RQwRXUZhzO6llfoN96Fczr/RwvPIK5SVMixqWq4QGFAyK0m/1ap4
- bhIRrdCLVQcgU4glo17vqfEaRcTW5SgX+pGs4KIPPBE5J/ABD6pBnUUAEQEAAcLA/AQYAQgA
- JhYhBIUq/WFSDTiOvUIqv2u9DlcdrjdRBQJlD89ZBQkFo5qAAhsMAAoJEGu9DlcdrjdR4C0L
- /RcjolEjoZW8VsyxWtXazQPnaRvzZ4vhmGOsCPr2BPtMlSwDzTlri8BBG1/3t/DNK4JLuwEj
- OAIE3fkkm+UG4Kjud6aNeraDI52DRVCSx6xff3bjmJsJJMb12mWglN6LjdF6K+PE+OTJUh2F
- dOhslN5C2kgl0dvUuevwMgQF3IljLmi/6APKYJHjkJpu1E6luZec/lRbetHuNFtbh3xgFIJx
- 2RpgVDP4xB3f8r0I+y6ua+p7fgOjDLyoFjubRGed0Be45JJQEn7A3CSb6Xu7NYobnxfkwAGZ
- Q81a2XtvNS7Aj6NWVoOQB5KbM4yosO5+Me1V1SkX2jlnn26JPEvbV3KRFcwV5RnDxm4OQTSk
- PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
- gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
- l75w1xInsg==
-In-Reply-To: <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxfRur5glo5CaTAA--.5456S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7GFy3uw15XFWDtryxWw4Dtrc_yoWfuFX_ua
+	4Sva4rXrs5JF1Iq343Xr4rXr13uw4qqw1Y9Fnrtrn5Zwnrtr98XF1UCrWDWF13urWYvr9x
+	X34kGry8Cr1xtosvyTuYvTs0mTUanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbf8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0
+	oVCq3wAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa02
+	0Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1l
+	Yx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrw
+	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
+	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
+	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
+	67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2
+	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
+	Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-On 4/23/2025 11:33 PM, Mi, Dapeng wrote:
-> Could we merge this patch and previous patch into a single patch? It's
-> unnecessary to just modify the pmu_msr_read()/pmu_msr_write() in previous
-> patch and delete them immediately. It just wastes the effort.
+This series add stmmac driver support for Loongson-2K3000/Loongson-3B6000M,
+which introduces a new CORE ID (0x12) and a new PCI device ID (0x7a23). The
+new core reduces channel numbers from 8 to 4, but checksum is supported for
+all channels. 
 
-No, it's not wasting effort, it's for easier review.
+V1 -> V2:
+1. Use correct coding style.
+2. Add Tested-by and Reviewed-by.
 
-Look at this patch, you can easily tell that pmu_msr_read() and
-pmu_msr_write() are nothing more than pmu_msr_chk_emulated(), and
-then removing them makes a lot of sense.
+V2 -> V3:
+1. Update commit message.
+2. Add Yanteng's Reviewed-by.
+
+Huacai Chen (3):
+  net: stmmac: dwmac-loongson: Move queue number init to common function 
+  net: stmmac: dwmac-loongson: Add new multi-chan IP core support
+  net: stmmac: dwmac-loongson: Add new GMAC's PCI device ID support
+
+Tested-by: Biao Dong <dongbiao@loongson.cn>
+Signed-off-by: Baoqi Zhang <zhangbaoqi@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+ .../net/ethernet/stmicro/stmmac/dwmac-loongson.c   | 105 ++++++++++-----------
+ 1 file changed, 49 insertions(+), 56 deletions(-)
+---
+2.27.0
 
 
