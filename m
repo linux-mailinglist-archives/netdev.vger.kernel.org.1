@@ -1,117 +1,150 @@
-Return-Path: <netdev+bounces-185667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C35A9B470
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:47:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A27FA9B479
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328D43AE967
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:47:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711FF7AB376
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE5B1AA795;
-	Thu, 24 Apr 2025 16:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF50428B4E3;
+	Thu, 24 Apr 2025 16:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gjV6eh7Q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGADD76O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69AE27FD53
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225B718B495
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513246; cv=none; b=CKWQ3/5dNRad4VSLyPJnC07T2bQ5nUsFJ8OJY3kIQ1h/vZKggPJFith0hGL2+OJQ6G6fn5s1CTKVAiwDKcxwiE9xIAoj3M/tx7/2yjo+sew7pDEeNLRyWORrvJtdWf9rqzhalfjpfz4TvjxgWQ2s+s1P2nvg4e6vRrmZ3NG7m3k=
+	t=1745513386; cv=none; b=PNtOqK85jub/Z6/Cn/pGdHK7cm+dhbfa2jTzPukSvZ4Q57MQs4YRTe4HjbUI444kRd2bRl6oEjrja+i36zEM46TWp1K/4gj8hug9mgMTT/zw1DuMJUNA+/1KJ9tjuIffjYtLxa5Vt5OXQtgQDKQZHl3r9n8YJ2+yS6vkFJg3Zu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513246; c=relaxed/simple;
-	bh=wkz9kqw3OdWBo2L2FFerXuhl3CRtugInlBjq5qBFlrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OiO47XGJk0ACiG4qFXfF6t7EIYdRCQK/ZiFSc5KDZMhbnbPUyReP2ELyy5qmW8q2IA6sC+cQnNBjNeg1C9emPbdjQU49Jy5iJr0bJCuh6muy50Av+K9MPJFKPQVPTs4DGe5CuO4PNGebzk77xjE5nc4rGmt7cYj7nCOk6Fmmn24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gjV6eh7Q; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2295d78b45cso20304665ad.0
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745513244; x=1746118044; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6+sEAf6H032WeHPc4GTl93oHCucndppdcfnevkFmfko=;
-        b=gjV6eh7Qv5YFNyn3248x7ohNwlXrXpiDGT6nKw4wZuZIhjmkDD0iEvhy3EVQXP7l/U
-         rJoiYxumW8ttyC5OkcuOh9ijdchgKeLp9DHzyfuDzXkLhgrPuWxGAM55WMXFxUIPYWWd
-         c18YzZiFbDH6x+QT95s5M+aDleq/I6ajZBMEg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745513244; x=1746118044;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+sEAf6H032WeHPc4GTl93oHCucndppdcfnevkFmfko=;
-        b=nVlB/8mretBsj1Agt77cf/Ozqljm7EJKNxpx+oI+EWuIE4LUpMYVrZB1KoC2VhR73r
-         XKyB5a7DA0nEkG+bg2Y7IrtKEHLKW9+d9Wx8aQk7UiqFsqTWoiIg7OwOZ3dyXVtYtvVE
-         oI0jJqYtSjiU1/pltgTZMMRqtwexbceVbS1Z36YcG4C34/aONqCW28LGa/tF2SSNYYzc
-         THMgiFYwwIovdNEpdHMlb7zy9GLFSwRvfCRdB331/iXUjesS/qJ3NaXb9CXA9JHD0jMA
-         Fxx24rh+GisfZhPQbwggRQ97TQFJh3voMiPvBbpGQnsPku7JOWu4paxKB4+WENyGfyOC
-         JpMg==
-X-Forwarded-Encrypted: i=1; AJvYcCXRvkb2fSmf7gz8LdRhKcH7wCSgmD5bliOInfl/TUKEDiHEZ669jKmj3IW048sJbJJxQigM0Co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAVgo4O1WrKseRL17Tr3Gk7+RQzK+e7c9adLEYPOb5588N4D2c
-	DWWO4fGK3DYEQMLzebBH7tB9DM8O9tSJXUpyhNn6i+FhJ/rM1cJmz/3Bzc6KijQ=
-X-Gm-Gg: ASbGnctaSZKXP27cGAsYnzKaviyzeoGjQLOTKIflRV1aR9PmUjie2xCsbqnmcT//0tr
-	xNZreIwvVFdMXpD1K96b84tsCY9dRlNNvRV5v259Lj0cT8ym4Z77IceD28oxZm2QYeKiYBHF7qD
-	Pod2XMbAiDBWaXZAqq5PtNrwJtba4cbXjuGdqnrRv90QwMfxVNvFrniWcF5tjsUd/5LQpZXJ0Qk
-	kvnxG8ptTj6V4Mi54jDMsJt2Ly+hba9iUp8yU6zaT6tPM0rSYUyG6MXTpqAuZMevxFb9dkghH0H
-	wQi5VgWq9Wr3jFYAAQAdeZsX4ZOxOr9OkL6OeXQJH0ecs/vYsMsjC10/IUX7D8rcSZt3C+K7oZr
-	he3I4rwWNUI/F
-X-Google-Smtp-Source: AGHT+IFojv1WAE1hdZFJ+LTllz61r91BmMZVgxKfeiezKuM16wrkO1DD9dc7ub6TP8KZVud0efvpaQ==
-X-Received: by 2002:a17:903:1946:b0:220:e1e6:4472 with SMTP id d9443c01a7336-22dbd418b9dmr2391505ad.13.1745513243884;
-        Thu, 24 Apr 2025 09:47:23 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76dffsm15860955ad.30.2025.04.24.09.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 09:47:23 -0700 (PDT)
-Date: Thu, 24 Apr 2025 09:47:20 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Thorsten Leemhuis <linux@leemhuis.info>, donald.hunter@gmail.com,
-	jacob.e.keller@intel.com, danieller@nvidia.com, sdf@fomichev.me
-Subject: Re: [PATCH net-next] tools: ynl: fix the header guard name for OVPN
-Message-ID: <aAprGMeUQLj177kr@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org,
-	Thorsten Leemhuis <linux@leemhuis.info>, donald.hunter@gmail.com,
-	jacob.e.keller@intel.com, danieller@nvidia.com, sdf@fomichev.me
-References: <20250423220231.1035931-1-kuba@kernel.org>
+	s=arc-20240116; t=1745513386; c=relaxed/simple;
+	bh=yaFz9KVuXbQ3WoPpBhphcE4kDzD4jDZLdKjUo00JrCg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qud868YqxqzXbGIsl3Rq90/QxSxs5Nou6q8C6WDRBy4+9Ckp2UjlKv0CYXaqQhflrjpILp2LWIe+K4xHN26hB1PsoWnJYR3W8ZfmJsD06zZzw7dBFBmFukrVvFndh407Kn4hdGdAt3VRMZLkKDMtYi5a6DsS5wSXJEuv9AIxXjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fGADD76O; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745513384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hJKWPsrSIdki3Sut593ts9jKeKHpTjZdnwCIv+v7d1Q=;
+	b=fGADD76Os0c6N6QQlhuH9PDcc0TTIIOs21QNDktIn08kc42SYV3j6mnWWzhH+KiXMJI9Yg
+	TJe6T0SKgENc+Wo0P11FcpLN6T+IrU9ffBz+lU9m+Omo0UeEja/wRZ4YY6KOLzhd2p40dD
+	HDxR3jQTKeXKmxKOIC7IjUZOzs6pJcc=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-3aBPdaY6NSOa_mg84J2AZw-1; Thu,
+ 24 Apr 2025 12:49:39 -0400
+X-MC-Unique: 3aBPdaY6NSOa_mg84J2AZw-1
+X-Mimecast-MFC-AGG-ID: 3aBPdaY6NSOa_mg84J2AZw_1745513376
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A54D1955DCD;
+	Thu, 24 Apr 2025 16:49:35 +0000 (UTC)
+Received: from [10.44.32.28] (unknown [10.44.32.28])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 08B2619560A3;
+	Thu, 24 Apr 2025 16:49:29 +0000 (UTC)
+Message-ID: <c67a65c2-e0c2-438e-a71b-3325e8e2bc3f@redhat.com>
+Date: Thu, 24 Apr 2025 18:49:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423220231.1035931-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/8] mfd: Add Microchip ZL3073x support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20250424154722.534284-1-ivecera@redhat.com>
+ <20250424154722.534284-4-ivecera@redhat.com>
+ <4fae1a96-ac19-46b8-8eff-2a38d28414fc@lunn.ch>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <4fae1a96-ac19-46b8-8eff-2a38d28414fc@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Wed, Apr 23, 2025 at 03:02:31PM -0700, Jakub Kicinski wrote:
-> Thorsten reports that after upgrading system headers from linux-next
-> the YNL build breaks. I typo'ed the header guard, _H is missing.
+
+
+On 24. 04. 25 6:34 odp., Andrew Lunn wrote:
+>> +++ b/drivers/mfd/zl3073x-regs.h
+>> @@ -0,0 +1,74 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +
+>> +#ifndef __ZL3073X_REGS_H
+>> +#define __ZL3073X_REGS_H
+>> +
+>> +#include <linux/bitfield.h>
+>> +#include <linux/bits.h>
+>> +
+>> +/*
+>> + * Register address structure:
+>> + * ===========================
+>> + *  25        19 18   16 15     7 6           0
+>> + * +-------------------------------------------+
+>> + * | max_offset | width |  page  | page_offset |
+>> + * +-------------------------------------------+
+>> + *
+>> + * page_offset ... <0x00..0x7F>
+>> + * page .......... HW page number
+>> + * size .......... register byte size (1, 2, 4 or 6)
+>> + * max_offset .... maximal offset for indexed registers
+>> + *                 (for non-indexed regs max_offset == page_offset)
+>> + */
 > 
-> Reported-by: Thorsten Leemhuis <linux@leemhuis.info>
-> Link: https://lore.kernel.org/59ba7a94-17b9-485f-aa6d-14e4f01a7a39@leemhuis.info
-> Fixes: 12b196568a3a ("tools: ynl: add missing header deps")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: donald.hunter@gmail.com
-> CC: jacob.e.keller@intel.com
-> CC: danieller@nvidia.com
-> CC: sdf@fomichev.me
-> ---
->  tools/net/ynl/Makefile.deps | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Something i missed earlier. This does not really describe
+> hardware. The upper half is meta data about the register, which you
+> encode into the register number.
+> 
+> How many other Linux drivers do you know about which does this?
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+This was proposed by Andy S.
+
+Cite:
+V4L2 (or media subsystem) solve the problem by providing a common
+helpers for reading and writing tons of different registers in cameras.
+See the commit 613cbb91e9ce ("media: Add MIPI CCI register access helper
+functions").
+
+They encode register address and size in register value. I have just
+extend this approach to cover indexed registers. The max_offset is for
+sanity during access to such registers, potential access out of
+bounds is detected and error returned.
+
+One can use just two simple functions for both register types:
+zl3073x_read_reg(zldev, ZL_REG_NONIDX1, &value);
+zl3073x_read_reg(zldev, ZL_REG_IDX1(idx), &value);
+
+> 
+> Also width vs size.
+
+I'm sorry, just a typo during reworking.
+
+
+Ivan
+
 
