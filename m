@@ -1,203 +1,219 @@
-Return-Path: <netdev+bounces-185654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81AB1A9B364
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:07:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74BCAA9B392
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B6343BD387
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:06:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D3841BA46C7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E32027FD4B;
-	Thu, 24 Apr 2025 16:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ECC42857CD;
+	Thu, 24 Apr 2025 16:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmIzhue3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMdhBgTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE7127F741;
-	Thu, 24 Apr 2025 16:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4819E284B5C;
+	Thu, 24 Apr 2025 16:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745510830; cv=none; b=FIR5SGQyXyVKTXqksS+MhtPgdzjKNqF/cGoffnpYJvgKjUNpKBqPDy8nOpkwogt/xE9W7g87bKLKmqmgAduaZpOBNCCr1ZGC+016vRL0oTMniAJKXzqCwbcWUhFlTL2L2TAzoAgtTxCcsiOGnbFDhTG/Y6T8y1afpWnfhuxUUOQ=
+	t=1745511108; cv=none; b=Q7VGXUxFHBo65Ofd5E5yEeqipShlPT4TLP6w9mPO8qvmkpFgoK8dwPuq7zUJaypRpMWzu0hy3iVXMTf1pa7srltKeEdGtisF2bgs7rPI7Xqymx08ELieB+80d+o5CSQspefg35E1pZoq5sWsHQXLpmK8abSymAfCL+3kz7UHhPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745510830; c=relaxed/simple;
-	bh=Dvocved7LoWD4r5DAQ7IXH0mS+GeN7+ssaae+GrmBP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h2DgysERbMiXafXkavey953GqdZ6FIyWuuAOHbb55PTbRCWoM41aphQBxX11RORciOfx4C/uXbjhVOLwQBhxB6iU0HaSBm4hBW56/Ndc6LrvJfBUUHRUJgED0Q8BVZqWFjcXSUx1QIzpLMfhACFE+fVJpAwW1QMc7lM4LY6694o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmIzhue3; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1745511108; c=relaxed/simple;
+	bh=rBnYkBYfCKwOov8i1SK1rfC4Dy3fPUMul+NfsgVA7Bo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RV0Cv17+Tly/P5oI7BwAnZw7AR4AG3aT+pYcL+qmWE75pdQs3cavhuW9COxoWLihtyy9drJNG+N8ClFbsY8Q9a3hHIM3x1n/fpuHrhXKho3EdMiKkc7KbHgUB8Q5tvCvfG1WLGMYWxS2SYnaTKZQ3vv3iGFRtApqJYcEPYbc3xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMdhBgTb; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-224341bbc1dso15917475ad.3;
-        Thu, 24 Apr 2025 09:07:08 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5edc07c777eso1575234a12.3;
+        Thu, 24 Apr 2025 09:11:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745510828; x=1746115628; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=b6Hg2Hn61cEifSZ7Yz6FWUl6aS6FdXU7iBAnedM8l0w=;
-        b=KmIzhue3VhoSAkp3Ha4P7G7OMDnBdLxdBzN3ki/VD/I5fJ4zfMxNdaFZfnWhm7UyCa
-         EbMGH8QgMmovq2bVrIuQjDPHyz+QD+qgeHfmK6OFu6VIrGdNbvuB4YDOTVUO0gWyMzs9
-         8zaSIhmBjwhCjeSUdqaPRKLmA4ECqztd8oAN3U04Gdj+bBaXiZzvvTCS7x6jkhkVdrE5
-         yeLa3qSVf9RDAvWJhj/PftkdbbAUiwMIEWrn6H+3AdlesygjczVGKJaOYhSCmUG/6bYJ
-         qH8/L55FI0MFLrFA7QMo7BrBaogbG6M6jh9veTGtctfBsuM2viQZjUKfNo81KoAbV8Fv
-         Ht3A==
+        d=gmail.com; s=20230601; t=1745511104; x=1746115904; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rBnYkBYfCKwOov8i1SK1rfC4Dy3fPUMul+NfsgVA7Bo=;
+        b=HMdhBgTbSf43eOxojg8bnuYR9qSeWP79LcLSaDXpEEwywnOffGmFsFcjyuqbXA6/gz
+         8k7tw7YGCWlaVCt2tcW+Gj95SD1rDeCv9Ob5SLwFgYeNqGsrFzC1oYeaatzMK1EJdqkF
+         QNHOpLQSrearmjOHN2YxSpzIsAVg91Of9UDE4OJ/YSmYstvTdm6TZX32nhKXolcsn0PC
+         85si1zwvFzAcL/mBMfThJfO6zRGdRyhCtuio8Ojm8VsqZ29kmRa7rfdee3g7xE/RNSlN
+         Hmg9KTSj+OhTyuGdGVmM3dWElS9tMHtbQOXW57zy5vkAW+1kyomwwipQfXj+sUGRxxgB
+         1C0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745510828; x=1746115628;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b6Hg2Hn61cEifSZ7Yz6FWUl6aS6FdXU7iBAnedM8l0w=;
-        b=urdcHFo9i+iJXmv5X4/hc7av3kKiJAVgxnVYaOu5IRAGxdRVcJkL17ik5y247Orxte
-         sOKMgd0L3WmI6RjktD+f+aFs6tN8xsPnWd25DHEQqZh9NUal6Vq4z7sQic96xmPc4Sot
-         X6QGGqNK19BAas57veXUya0FKadFGfsQTv6rXhgvu/lSFYub4Ew2NLoTZGwRzijiX8Sh
-         +B6N/6N6hpoghDLnpQC3rL830PHMYGS+AHF5S9z9OmeinjsOpC1V36llTkuIitTXAcdk
-         6WM0O9exj5HUGR+h5jqtmn7JJRPZ7VDT3vP1G0E1wTNSj3FNEfHDmqK9q0p+t4lTiH/d
-         JQTw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6acE59Xtv7FN+aZ+gL+LImLv7RkJT3Qy5J3wuOmHTbEC87DSFRluZ4Bt/D1vnSpd1UQk=@vger.kernel.org, AJvYcCXYENR+5SrVYNDhBGR9hjert7wVDBUce5n7rKzJOKJZpw2YEdHTm49MyNWP8UUzZhDFjX4stQEXcDZWIwFTut7d@vger.kernel.org, AJvYcCXy01f6mImwxzD9Uzgih+0LxXtJ8LPP6mHIG4ezOlC8/y2K0w9IPFsqSDrAYSWwpqMp2BoYJ8vV@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQFkrZy9vwlMtAFZbAJO54vEiqiLSt6WNX+wKeT6OrpqAK4Lyy
-	K6u8lgASqaZsdwhq+x4nof0mxaz81hA9esS+fpD0pRYA2DaY/Lvg/K/6
-X-Gm-Gg: ASbGncuHTn8pNF5MlB8fz+hVdHpsNizehoSSvRHuwYRay0B6ytEHnAkfZAmg3o4mbzL
-	2YHEUXtavBjzBOSOCAJE4RfaXeocO5xte8XAD6fYbS8nXT/A649y78iJU3f1NBasN8hHA5zfe8n
-	H6HKrSLtbazgraLeiY6vvgmCQ5j9G/hddvnX7xHw94jyPRDovkDo9wuyHR2cyfCluhA1SvuS+xV
-	kDk8X4ops+YPP3bve9VGFPsoqTwQazqZVYEX5S49A4EPxqCFns4qvbpgrgJuDtdLbBF1SSRSpfK
-	Ny9SgAYBTFE73wRgApTW+Kh9STIwkRhKDwLltl4z+zmRYvOXR/Y=
-X-Google-Smtp-Source: AGHT+IHzlejxmjoKnsnH13VbhFKwz7loLzzPczs4uJtSS2scb3BFipVtzCMBUVeGn0S+lmzKDTPAQA==
-X-Received: by 2002:a17:903:228f:b0:224:c46:d167 with SMTP id d9443c01a7336-22db3bdf7b9mr46689145ad.16.1745510827944;
-        Thu, 24 Apr 2025 09:07:07 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22db4dbe5a2sm15287145ad.86.2025.04.24.09.07.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 09:07:07 -0700 (PDT)
-Date: Thu, 24 Apr 2025 09:07:06 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to perform
- XDP_REDIRECT into maps
-Message-ID: <aAphqn-Lm0nn4FH0@mini-arch>
-References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
- <87wmb97uyt.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1745511104; x=1746115904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rBnYkBYfCKwOov8i1SK1rfC4Dy3fPUMul+NfsgVA7Bo=;
+        b=Uptiha63YJ8CmSu3sNqKt1eyTVIoiFrwqnbTi/Su2BZsp7n1NWL3xFaigq47LvNZmG
+         L5RLCzgUrKr5r/uKSPoCEkQ9fVMj6xyjfDA5LbojXhAy4qWk4s7qsIC/ZgfhSNymfSpB
+         ZJYPbXDWmTUPytWS9aIE+CUM1YjDHDNStx0G3aqtjoUqpeDcfP0iFlC5JWHZ/ikTdb1E
+         GLvgA+uwC9v5VTycGFvQ7LFnIzV+woBLd0SxLINCfD6IumMYIBd0InZ+fOSbPlT4lV6P
+         tlV2uQWxMm1NoiVSVBLd8ZHCn/UOzYwr/Wplpief80YDCDtitCOhbKPpTrequ8nRSY0A
+         ywCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+uk5kOVMA6g3AA5L2+k2HnyFpS6wlGPHN9X1BzOF/iPs/r7FnbhfdYHcGBg07rfnpgBa7BfM1@vger.kernel.org, AJvYcCX65Xc/JlII8/Wt36zFGqw5R1Dr7CMkCsPiP9SVHtzYmjeKAB40z9o3yGJ4TjEwU2JoaDVtLhjwH4sfm3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4r7LfkbkRZWD6eGITfdcS9QAa7F85p12Ajl9ia2UNt02KlOJi
+	stAtY18nbQtqrAaPHIiq5AJs1S+WABbQC27MJ95hpEN+OgvAdtEkdtyeet0WZy+gl8/IpyN2dr8
+	P/ddATlj8/v6TvaGxLt6H9JAo5kw=
+X-Gm-Gg: ASbGncuZqWh4A4t9Hid6z+RpbDHJXugR2isNbrvnTubtD56SbXuGRJKqpDkBeSNtI57
+	UUhbYw0pPS/wGRzjAaWo5ZE38xD+vrJA/MQr84ywj6Q/VRfC+4lGZhU+N7WDy2QLrjlGluqEpaW
+	qUwd7/JZ4qINFvgoC48Gvq
+X-Google-Smtp-Source: AGHT+IGby31M7pE/UqIvfEJsZQ9NUU69Wi1+xEDECqgWhfFYhid9VUDiXC1EruOMr6Bf2ISZOq6Rqz7wkWd+oIsEGDc=
+X-Received: by 2002:a05:6402:35c5:b0:5de:c9d0:6742 with SMTP id
+ 4fb4d7f45d1cf-5f6de2bb65dmr2876390a12.9.1745511104137; Thu, 24 Apr 2025
+ 09:11:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87wmb97uyt.fsf@toke.dk>
+References: <20250424080755.272925-1-harry.yoo@oracle.com> <lr2nridih62djx5ccdijiyacdz2hrubsh52tj6bivr6yfgajsj@mgziscqwlmtp>
+ <CAGudoHF8-tpc3nJeJ3gF2_GZZGp_raMBu4GXC_5omWMc7LhN1w@mail.gmail.com>
+In-Reply-To: <CAGudoHF8-tpc3nJeJ3gF2_GZZGp_raMBu4GXC_5omWMc7LhN1w@mail.gmail.com>
+From: Mateusz Guzik <mjguzik@gmail.com>
+Date: Thu, 24 Apr 2025 18:11:31 +0200
+X-Gm-Features: ATxdqUGX-yYDU2lrQULg7WTQlr93U3bgOGgrBEp1CMvLz6ftZCTsRcY_hk0ktIw
+Message-ID: <CAGudoHE3CgoeoCjW=qpvv0+AzsSGJQpRCMLObjnOO-uALa2xiQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] Reviving the slab destructor to tackle the percpu
+ allocator scalability problem
+To: Pedro Falcato <pfalcato@suse.de>
+Cc: Harry Yoo <harry.yoo@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Vlad Buslov <vladbu@nvidia.com>, 
+	Yevgeny Kliteynik <kliteyn@nvidia.com>, Jan Kara <jack@suse.cz>, Byungchul Park <byungchul@sk.com>, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04/24, Toke Høiland-Jørgensen wrote:
-> Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> 
-> > In the current implementation if the program is dev-bound to a specific
-> > device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
-> > or CPUMAP even if the program is running in the driver NAPI context and
-> > it is not attached to any map entry. This seems in contrast with the
-> > explanation available in bpf_prog_map_compatible routine.
-> > Fix the issue introducing __bpf_prog_map_compatible utility routine in
-> > order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_call()
-> > at program load time (bpf_prog_select_runtime()).
-> > Continue forbidding to attach a dev-bound program to XDP maps
-> > (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
+On Thu, Apr 24, 2025 at 5:20=E2=80=AFPM Mateusz Guzik <mjguzik@gmail.com> w=
+rote:
+>
+> On Thu, Apr 24, 2025 at 1:28=E2=80=AFPM Pedro Falcato <pfalcato@suse.de> =
+wrote:
+> > > How to do this with slab constructors and destructors: the constructo=
+r
+> > > allocates percpu memory, and the destructor frees it when the slab pa=
+ges
+> > > are reclaimed; this slightly alters the constructor=E2=80=99s semanti=
+cs,
+> > > as it can now fail.
+> > >
 > >
-> > Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> > Changes in v2:
-> > - Introduce __bpf_prog_map_compatible() utility routine in order to skip
-> >   bpf_prog_is_dev_bound check in bpf_check_tail_call()
-> > - Extend xdp_metadata selftest
-> > - Link to v1: https://lore.kernel.org/r/20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org
-> > ---
-> >  kernel/bpf/core.c                                  | 27 +++++++++++++---------
-> >  .../selftests/bpf/prog_tests/xdp_metadata.c        | 22 +++++++++++++++++-
-> >  tools/testing/selftests/bpf/progs/xdp_metadata.c   | 13 +++++++++++
-> >  3 files changed, 50 insertions(+), 12 deletions(-)
+> > I really really really really don't like this. We're opening a pandora'=
+s box
+> > of locking issues for slab deadlocks and other subtle issues. IMO the b=
+est
+> > solution there would be, what, failing dtors? which says a lot about th=
+e whole
+> > situation...
 > >
-> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> > index ba6b6118cf504041278d05417c4212d57be6fca0..a3e571688421196c3ceaed62b3b59b62a0258a8c 100644
-> > --- a/kernel/bpf/core.c
-> > +++ b/kernel/bpf/core.c
-> > @@ -2358,8 +2358,8 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
-> >  	return 0;
-> >  }
-> >  
-> > -bool bpf_prog_map_compatible(struct bpf_map *map,
-> > -			     const struct bpf_prog *fp)
-> > +static bool __bpf_prog_map_compatible(struct bpf_map *map,
-> > +				      const struct bpf_prog *fp)
-> >  {
-> >  	enum bpf_prog_type prog_type = resolve_prog_type(fp);
-> >  	bool ret;
-> > @@ -2368,14 +2368,6 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
-> >  	if (fp->kprobe_override)
-> >  		return false;
-> >  
-> > -	/* XDP programs inserted into maps are not guaranteed to run on
-> > -	 * a particular netdev (and can run outside driver context entirely
-> > -	 * in the case of devmap and cpumap). Until device checks
-> > -	 * are implemented, prohibit adding dev-bound programs to program maps.
-> > -	 */
-> > -	if (bpf_prog_is_dev_bound(aux))
-> > -		return false;
-> > -
-> >  	spin_lock(&map->owner.lock);
-> >  	if (!map->owner.type) {
-> >  		/* There's no owner yet where we could check for
-> > @@ -2409,6 +2401,19 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
-> >  	return ret;
-> >  }
-> >  
-> > +bool bpf_prog_map_compatible(struct bpf_map *map, const struct bpf_prog *fp)
-> > +{
-> > +	/* XDP programs inserted into maps are not guaranteed to run on
-> > +	 * a particular netdev (and can run outside driver context entirely
-> > +	 * in the case of devmap and cpumap). Until device checks
-> > +	 * are implemented, prohibit adding dev-bound programs to program maps.
-> > +	 */
-> > +	if (bpf_prog_is_dev_bound(fp->aux))
-> > +		return false;
-> > +
-> > +	return __bpf_prog_map_compatible(map, fp);
-> > +}
-> > +
-> >  static int bpf_check_tail_call(const struct bpf_prog *fp)
-> >  {
-> >  	struct bpf_prog_aux *aux = fp->aux;
-> > @@ -2421,7 +2426,7 @@ static int bpf_check_tail_call(const struct bpf_prog *fp)
-> >  		if (!map_type_contains_progs(map))
-> >  			continue;
-> >  
-> > -		if (!bpf_prog_map_compatible(map, fp)) {
-> > +		if (!__bpf_prog_map_compatible(map, fp)) {
-> 
-> Hmm, so this allows devbound programs in tail call maps, right? But
-> there's no guarantee that a tail call map will always be used for a
-> particular device, is there? For instance, it could be shared between
-> multiple XDP programs, bound to different devices, thus getting the
-> wrong kfunc.
+>
+> I noted the need to use leaf spin locks in my IRC conversations with
+> Harry and later in this very thread, it is a bummer this bit did not
+> make into the cover letter -- hopefully it would have avoided this
+> exchange.
+>
+> I'm going to summarize this again here:
+>
+> By API contract the dtor can only take a leaf spinlock, in this case one =
+which:
+> 1. disables irqs
+> 2. is the last lock in the dependency chain, as in no locks are taken
+> while holding it
+>
+> That way there is no possibility of a deadlock.
+>
+> This poses a question on how to enforce it and this bit is easy: for
+> example one can add leaf-spinlock notion to lockdep. Then a misuse on
+> allocation side is going to complain immediately even without
+> triggering reclaim. Further, if one would feel so inclined, a test
+> module can walk the list of all slab caches and do a populate/reclaim
+> cycle on those with the ctor/dtor pair.
+>
+> Then there is the matter of particular consumers being ready to do
+> what they need to on the dtor side only with the spinlock. Does not
+> sound like a fundamental problem.
+>
+> > Case in point:
+> > What happens if you allocate a slab and start ->ctor()-ing objects, and=
+ then
+> > one of the ctors fails? We need to free the ctor, but not without ->dto=
+r()-ing
+> > everything back (AIUI this is not handled in this series, yet). Besides=
+ this
+> > complication, if failing dtors were added into the mix, we'd be left wi=
+th a
+> > half-initialized slab(!!) in the middle of the cache waiting to get fre=
+ed,
+> > without being able to.
+> >
+>
+> Per my previous paragraph failing dtors would be a self-induced problem.
+>
+> I can agree one has to roll things back if ctors don't work out, but I
+> don't think this poses a significant problem.
+>
+> > Then there are obviously other problems like: whatever you're calling m=
+ust
+> > not ever require the slab allocator (directly or indirectly) and must n=
+ot
+> > do direct reclaim (ever!), at the risk of a deadlock. The pcpu allocato=
+r
+> > is a no-go (AIUI!) already because of such issues.
+> >
+>
+> I don't see how that's true.
+>
+> > Then there's the separate (but adjacent, particularly as we're consider=
+ing
+> > this series due to performance improvements) issue that the ctor() and
+> > dtor() interfaces are terrible, in the sense that they do not let you b=
+atch
+> > in any way shape or form (requiring us to lock/unlock many times, alloc=
+ate
+> > many times, etc). If this is done for performance improvements, I would=
+ prefer
+> > a superior ctor/dtor interface that takes something like a slab iterato=
+r and
+> > lets you do these things.
+> >
+>
+> Batching this is also something I mentioned and indeed is a "nice to
+> have" change. Note however that the work you are suggesting to batch
+> now also on every alloc/free cycle, so doing it once per creation of a
+> given object instead is already a win.
+>
 
-Won't this (devbound progs in tail call maps) be still prohibited
-by a bpf_prog_map_compatible check in prog_fd_array_get_ptr?
+Whether the ctor/dtor thing lands or not, I would like to point out
+the current state is quite nasty and something(tm) needs to be done.
+
+The mm object is allocated from a per-cpu cache, only to have the
+mandatory initialization globally serialize *several* times, including
+twice on the same lock. This is so bad that performance would be
+better if someone created a globally-locked cache with mms still
+holding onto per-cpu memory et al.
+
+Or to put it differently, existence of a per-cpu cache of mm objs is
+defeated by the global locking endured for each alloc/free cycle (and
+this goes beyond percpu memory allocs for counters).
+
+So another idea would be to instead create a cache with *some*
+granularity (say 4 or 8 cpu threads per instance). Note this should
+reduce the total number of mms allocated (but unused) in the system.
+If mms hanging out there would still be populated like in this
+patchset, perhaps the reduction in objs which are "wasted" would be
+sufficient to ignore direct reclaim? Instead if need be this would be
+reclaimable from a dedicated thread (whatever it is in Linux).
+
+--=20
+Mateusz Guzik <mjguzik gmail.com>
 
