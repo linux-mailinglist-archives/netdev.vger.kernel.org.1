@@ -1,217 +1,144 @@
-Return-Path: <netdev+bounces-185724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FA4A9B8BB
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:02:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CACFA9B8F4
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C321B687B4
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:03:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9380A1BA86FC
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0601FCCF8;
-	Thu, 24 Apr 2025 20:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD81217733;
+	Thu, 24 Apr 2025 20:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EPPb8PV/"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Pgv/Ug1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE6B1F91C7
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E5F1FF5F3
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745524951; cv=none; b=Fa0Suqmyz7LyFGj/EZ7jP1TSlvfS2brG+QdfpatCpmS4CEN8XEK5lPiwSVu0+cKhz7g04p6HAKg7kG5BpSAXozSb/Ko9jU4I7tIMT+hiNWmrDE+cHRCuS+NP4vjrCZMAsQ5A+RX20emzDlqesAL9mJRLRftIUfa0i2jbLvkXJyQ=
+	t=1745525823; cv=none; b=SQI+ssH+jA3X4PjvQZ1v+EgSg+Ex1tFLlRZ29EmZ45HKyhfx+PzrMJR/Onu/c8EGCAfmo3W+aJ48tLmN9tEBgT+fqncx1dFxmaFVC9sCXFTBCF2RYr9Ea4cprRR33RMUM0BUcsXZBgD4gXzrZbJbVD07ogXTG2Yug244Ex023/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745524951; c=relaxed/simple;
-	bh=5INTacSeeD5pHwWRgLHBam/AsBOEkRynbd7THYTuXdA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=adbnKCfZcNYLfGirtKMSXEq6vMB5mP/0R36rddQWFvYPy8oLzzxiREemsCp2GRb2BoPnHfnaHerDb0IliSr6Ds7oTsYcaXBKhg/FDIQzFNN1hzr3HZCyeng6/DpzxVVNjMM1LCdoH8gCGRc+f+6rcfrPfWkv91H1L59Zx8Rbg+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EPPb8PV/; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7377139d8b1so1259454b3a.0
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:02:29 -0700 (PDT)
+	s=arc-20240116; t=1745525823; c=relaxed/simple;
+	bh=q7+AggGY2P8x6d61VyBgTJBxqn89Btlr+wPSFtNEJlE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eVaaM8p1Iduimz57bR0uEUDvLIykSKWqhp0KQlCivuAmtCRMz4wDg+++fCABU5jOOTIH9ZEDlM/zvpRDEmjAj5m10w+R3QARJtzWcw3q/P+Yq37Wa3KQm6okqFgnPGOJcKD1E6AJs/e/24cf47uWmS2aHkQpYPsTAquZMO1vQ2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Pgv/Ug1x; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-72b7a53ceb6so936797a34.0
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745524949; x=1746129749; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyFAHo410p6RsaGtDevMPb2lxgUtdoffu9P3maZ2om0=;
-        b=EPPb8PV/8i79pFd+bGwpyI9AJKV1Ha0fTTbmUd8famo17JnLGPi5K5crBFyh4YUqXy
-         KMgWCvpLuayTQ3uw+mJTS2SUiQRdHcQfJYLyLkgrQV8Pwg46ZmBdFg6Uk8l12bgOwAbD
-         dBkBIIv6DxLpSqDkC+Vf4RQP3hEQgblTl1v/X7l95hY/+8mcX6G5dmebh4brR9+Wk8q9
-         Q4/dWQugaTsugxNT37v0Hj6Wd7iSJNOqaNX0B1UigwFJ9O2pmIBtix/Ik58G/pWDrV0i
-         nMEYjf2NufZ7hY2To4olB1YbKJsair7pW6D35QHSBwQaKFvbzjZYcqZ97EO2fZ+FyJXZ
-         gbuQ==
+        d=broadcom.com; s=google; t=1745525820; x=1746130620; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Z/L+CJR5eqDHbla1VgY3g/G5fHe3MIqzD/ToDfzZ6c=;
+        b=Pgv/Ug1xRTXG5cD06t4mqS/fTtFx1CmdqmDtTtInYaS4CcEAQDdtfR3Q+Q39EBnx5H
+         c+oUF+cSr1sHdOVUgMjfInewQH6FJuDLdT0wCNTM5IIPv0dkYuARnrHQ76QgG0QJd6zs
+         uNR4807AnZxBOyiOefe/hcl9SKSRNmXnqPjQs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745524949; x=1746129749;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyFAHo410p6RsaGtDevMPb2lxgUtdoffu9P3maZ2om0=;
-        b=uwq4KTQKIia+62k/Ss+iMhIaeMJ63yGpWoWCX5mG3nWZvD1zRDf7NjGB0qU6YV5+HV
-         mgrwgFFoVYMDVJpXdrF/om9cD3Rs1N8ygFqoKSbtI3aJQ1d8AIlJIQBLQnzj9ICgQ48K
-         X0xnT34c1ANmnOkrx3ic/rCXbvxmEVirxvZu+zkeQ2E+GJAKMudbeOwuEe41ZrmydsBy
-         aCVUB0eqDSFmcMsut7yq8qjTomVG9c+eYnA8jUBnWtqwvL+bfZjk+vr1Ilu0HDOfagTE
-         +GU4NzIuAbFk8YWOrHYMZNDIYc3INU40OGfQr+tsSwEfLXgjmLYvNOZT25633f4l1kAA
-         7zWA==
-X-Gm-Message-State: AOJu0YxMsaBKQk/7XLl/kU6JLZTCr+0u6oAS4fonysI7OS33W6bjzfEI
-	QPWyuzmIwdFvMAawie6SpHUqVlK8JFdi4m8RYE/olknKdA3FpnfZ4Mcrq12fFF1+6khoZWAkYJl
-	ZLqCa2tgtLQ==
-X-Google-Smtp-Source: AGHT+IGrdl6qRTIYViiHaj7FoI5cG9CogIw3wxLUBjWYdYTA+5u35SJaY1bLS1wJE+9xAKbIvs2/USdvG4JstA==
-X-Received: from pfoh23.prod.google.com ([2002:aa7:86d7:0:b0:739:8c87:ed18])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:44cb:b0:736:b9f5:47c6 with SMTP id d2e1a72fcca58-73e33094288mr1280045b3a.16.1745524949331;
- Thu, 24 Apr 2025 13:02:29 -0700 (PDT)
-Date: Thu, 24 Apr 2025 20:02:22 +0000
-In-Reply-To: <20250424200222.2602990-1-skhawaja@google.com>
+        d=1e100.net; s=20230601; t=1745525820; x=1746130620;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Z/L+CJR5eqDHbla1VgY3g/G5fHe3MIqzD/ToDfzZ6c=;
+        b=LgFBkFcHIWpN8RgMKn2sh6DJV8yx5KQKTIb2toaXEySd/NLOViDKsSbZ/Y/+GyHgtN
+         qb+xw9RB4EiHswwiL6vp/ImSVZ7/6rXqhxshevpmGER5/k59/zGzXFcVwZ9b60gAtT2E
+         JORl7lnsPr8G77V2zXJtaAQqvFGeC1OwDKra6kJvs2g2XC2f8dZh1TL98o4W2865StGj
+         BpLYh2PMMS7cKn9SsPzIdsqx9Ki8KG940riDCXEpSTolHQuSA74AOANrLbNSGonX4/17
+         bHHGT5bGFKZXoYm4BtyXa3TlF+Mx2STmeLYqYw4BIlHJJB6iqtOKt1EBZjw1YwgGZjMF
+         Ib7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUwERahnhspkgrotiDM4odF+hjg8LWimIZSrf+HPTH7sItKpC2lkWXs/t5BJN06+Xpu8Q+Ctoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDY8hl4vVx5ldVNvdl85n+iTvuqkFHIzXtt6iEzuPA+0Yn/r7n
+	Ril9wgm9uVhfV8VCyu7y5+KtD0stgPddFI5+BFBdHh7aefPchPWVevbOqGJBbw==
+X-Gm-Gg: ASbGncuvR+dWkfYlLKzk4Y/CPNd0fcRiSFFDuc0nnNqVU4D/aUEZqt2GGKZv9zbnodt
+	4VpgDhzEnQ9qUgc0UlkHGsdEbY6lkYsgH5bgOd8yv3PM0G/BNV4oaIrOlzZURt1+DrvkZAfOmQM
+	dhbUxMO5GxehtgR1IOxuZRYx+7ozgO/njzAMCfbZwc/dVjm5qyOk84jF0ePYaOz4ftNufMXqvUT
+	QzK58bLcU5b6m1c2GdKpgk7OLTvl9xcJbTRE292UjUaifkPL02N3LEtGN055RyX3HZNg3Z2VxRC
+	TU6Gd8Qn3UVmsYXp0DDiZN0qRHa4M5tAovfrfiBJ4xAeI82vOzxurDoVgtEbNEPXh80wzc/l4//
+	hxFNH08WBexhV9STrIBaWw4j0vn0misHF4Q==
+X-Google-Smtp-Source: AGHT+IHZMjAwrsNEjpm7nL05Jbbd6lnVZP+y10KBvmSKSVE/LtD5DIqqjB2QcCK/bT6x8RZHKOCVKg==
+X-Received: by 2002:a05:6830:90f:b0:72a:2b8f:b111 with SMTP id 46e09a7af769-7304fa68718mr2007515a34.1.1745525820350;
+        Thu, 24 Apr 2025 13:17:00 -0700 (PDT)
+Received: from [192.168.1.105] (88-187-52-200.subs.proxad.net. [88.187.52.200])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7304f187fa9sm361427a34.11.2025.04.24.13.16.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 13:16:55 -0700 (PDT)
+Message-ID: <35f16f28-5682-4097-b459-4960f404eba0@broadcom.com>
+Date: Thu, 24 Apr 2025 22:16:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250424200222.2602990-1-skhawaja@google.com>
-X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
-Message-ID: <20250424200222.2602990-5-skhawaja@google.com>
-Subject: [PATCH net-next v5 4/4] selftests: Add napi threaded busy poll test
- in `busy_poller`
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, jdamato@fastly.com, mkarsten@uwaterloo.ca
-Cc: netdev@vger.kernel.org, skhawaja@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/8] dt-bindings: net: brcm,asp-v2.0: Remove
+ asp-v2.0
+To: Justin Chen <justin.chen@broadcom.com>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: rafal@milecki.pl, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, opendmb@gmail.com,
+ conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch
+References: <20250422233645.1931036-1-justin.chen@broadcom.com>
+ <20250422233645.1931036-2-justin.chen@broadcom.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250422233645.1931036-2-justin.chen@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add testcase to run busy poll test with threaded napi busy poll enabled.
 
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
----
- tools/testing/selftests/net/busy_poll_test.sh | 25 ++++++++++++++++++-
- tools/testing/selftests/net/busy_poller.c     | 14 ++++++++---
- 2 files changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/busy_poll_test.sh b/tools/testing/selftests/net/busy_poll_test.sh
-index 7db292ec4884..aeca610dc989 100755
---- a/tools/testing/selftests/net/busy_poll_test.sh
-+++ b/tools/testing/selftests/net/busy_poll_test.sh
-@@ -27,6 +27,9 @@ NAPI_DEFER_HARD_IRQS=100
- GRO_FLUSH_TIMEOUT=50000
- SUSPEND_TIMEOUT=20000000
- 
-+# NAPI threaded busy poll config
-+NAPI_THREADED_POLL=2
-+
- setup_ns()
- {
- 	set -e
-@@ -62,6 +65,9 @@ cleanup_ns()
- test_busypoll()
- {
- 	suspend_value=${1:-0}
-+	napi_threaded_value=${2:-0}
-+	prefer_busy_poll_value=${3:-$PREFER_BUSY_POLL}
-+
- 	tmp_file=$(mktemp)
- 	out_file=$(mktemp)
- 
-@@ -73,10 +79,11 @@ test_busypoll()
- 					     -b${SERVER_IP}        \
- 					     -m${MAX_EVENTS}       \
- 					     -u${BUSY_POLL_USECS}  \
--					     -P${PREFER_BUSY_POLL} \
-+					     -P${prefer_busy_poll_value} \
- 					     -g${BUSY_POLL_BUDGET} \
- 					     -i${NSIM_SV_IFIDX}    \
- 					     -s${suspend_value}    \
-+					     -t${napi_threaded_value} \
- 					     -o${out_file}&
- 
- 	wait_local_port_listen nssv ${SERVER_PORT} tcp
-@@ -109,6 +116,15 @@ test_busypoll_with_suspend()
- 	return $?
- }
- 
-+test_busypoll_with_napi_threaded()
-+{
-+	# Only enable napi threaded poll. Set suspend timeout and prefer busy
-+	# poll to 0.
-+	test_busypoll 0 ${NAPI_THREADED_POLL} 0
-+
-+	return $?
-+}
-+
- ###
- ### Code start
- ###
-@@ -154,6 +170,13 @@ if [ $? -ne 0 ]; then
- 	exit 1
- fi
- 
-+test_busypoll_with_napi_threaded
-+if [ $? -ne 0 ]; then
-+	echo "test_busypoll_with_napi_threaded failed"
-+	cleanup_ns
-+	exit 1
-+fi
-+
- echo "$NSIM_SV_FD:$NSIM_SV_IFIDX" > $NSIM_DEV_SYS_UNLINK
- 
- echo $NSIM_CL_ID > $NSIM_DEV_SYS_DEL
-diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
-index 04c7ff577bb8..f7407f09f635 100644
---- a/tools/testing/selftests/net/busy_poller.c
-+++ b/tools/testing/selftests/net/busy_poller.c
-@@ -65,15 +65,16 @@ static uint32_t cfg_busy_poll_usecs;
- static uint16_t cfg_busy_poll_budget;
- static uint8_t cfg_prefer_busy_poll;
- 
--/* IRQ params */
-+/* NAPI params */
- static uint32_t cfg_defer_hard_irqs;
- static uint64_t cfg_gro_flush_timeout;
- static uint64_t cfg_irq_suspend_timeout;
-+static enum netdev_napi_threaded cfg_napi_threaded_poll = NETDEV_NAPI_THREADED_DISABLE;
- 
- static void usage(const char *filepath)
- {
- 	error(1, 0,
--	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -i<ifindex>",
-+	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -t<napi_threaded_poll> -i<ifindex>",
- 	      filepath);
- }
- 
-@@ -86,7 +87,7 @@ static void parse_opts(int argc, char **argv)
- 	if (argc <= 1)
- 		usage(argv[0]);
- 
--	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
-+	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:t:")) != -1) {
- 		/* most options take integer values, except o and b, so reduce
- 		 * code duplication a bit for the common case by calling
- 		 * strtoull here and leave bounds checking and casting per
-@@ -168,6 +169,12 @@ static void parse_opts(int argc, char **argv)
- 
- 			cfg_ifindex = (int)tmp;
- 			break;
-+		case 't':
-+			if (tmp == ULLONG_MAX || tmp > 2)
-+				error(1, ERANGE, "napi threaded poll value must be 0-2");
-+
-+			cfg_napi_threaded_poll = (enum netdev_napi_threaded)tmp;
-+			break;
- 		}
- 	}
- 
-@@ -246,6 +253,7 @@ static void setup_queue(void)
- 						  cfg_gro_flush_timeout);
- 	netdev_napi_set_req_set_irq_suspend_timeout(set_req,
- 						    cfg_irq_suspend_timeout);
-+	netdev_napi_set_req_set_threaded(set_req, cfg_napi_threaded_poll);
- 
- 	if (netdev_napi_set(ys, set_req))
- 		error(1, 0, "can't set NAPI params: %s\n", yerr.msg);
+On 4/23/2025 1:36 AM, Justin Chen wrote:
+> Remove asp-v2.0 which was only supported on one SoC that never
+> saw the light of day.
+> 
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.49.0.850.g28803427d3-goog
+Florian
 
 
