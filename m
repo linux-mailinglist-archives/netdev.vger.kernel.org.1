@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-185430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF78A9A556
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:10:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B46A9A55A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10DEE3B4E08
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:09:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5350B46091B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C72213E8B;
-	Thu, 24 Apr 2025 08:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D30207A2A;
+	Thu, 24 Apr 2025 08:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j9XI366b";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="OzhEfmrq"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G9arMVap";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="zuHrtalb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9491920298A;
-	Thu, 24 Apr 2025 08:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20015E552;
+	Thu, 24 Apr 2025 08:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482144; cv=fail; b=k+ueojyNVNyhU6A5bkoGxirsqOp8ZfN3akx6VLc+kAqvugzATxrGqbKO16/edwqeXWxd8r+G0B0xbiytmHwPNvJuoFdYko4QVLN5zRuBjaewqE1j3nYA38+jcaZ+GbjDkF8f8IPfdI9HFP34GXFMhpNsfI8XwoWyCPsNj3bbI58=
+	t=1745482155; cv=fail; b=gOJKMfQaKw512C68qAp7vOe8RfzlbnQjsRPLnEn7OAZwYYaEFHH1RcSnWOuPHYou7OZfRxVZbWi4Pp6Xnf5tx900uIBDpZ1STcIO2w+kLHMp+xkeO8U5gSM0ARbVMh22KCJv3ZHmwTV6EgJqzk45uTFJsm6pV4TvuiwsdbGtgcI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482144; c=relaxed/simple;
-	bh=Ax9QYXaawaCc99DWWOkCL+XMmVOMz0GJArci0LK4vag=;
+	s=arc-20240116; t=1745482155; c=relaxed/simple;
+	bh=dBAwtnAdflK0IWe6lp8h0TS3oHrP+Mk9jpYwENp1RXU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rP/roo09C996c025RjrmmbJ7tGzSUcwrm4nOWGbwp20FdDs3c7FN3gsNHEOTd60sGm5SVVo1c3Tch3o1Wek7KPo55x8r5F/nFq0ZEnmw50POxH5k4NsTUUvHX0jHhdAXXyH6ab3x4UZanOsqr/0HKPkGUUokG+RHIG14lrDD+nI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=j9XI366b; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=OzhEfmrq; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=FRcm7Qhan6I8fMUTsQfjnzKdJtk+hSZOOjHtMlPRuKrinzVxPTfsZYFBw14xFH+R6bw/naQYi+BFP2JgeOmUooWinVVZUmrkLsMHtmzExXQTZkScOuQ8gfABtbPqr3+lEvXRzeLTnVzZi1q+PNygT9cdtJTEkH0fUBydeMzWLYA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=G9arMVap; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=zuHrtalb; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6tvo5013966;
-	Thu, 24 Apr 2025 08:08:43 GMT
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6twkk013986;
+	Thu, 24 Apr 2025 08:08:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=; b=
-	j9XI366b3UoFf3+PwVmQRzE4l4pquixAffPgzoWyLdhdqsKpcZruraXCDyh95dwy
-	Ymzm5qHUlO6WtU/FH0e9neFKp+XslaJBWRKL9M+jLAg58a49XUtkuXSTquF8oMYL
-	4lk4r55dRM6P/RLBYhG+Gw4kum5TNPM870wwMS7M6+AEPbsUl0OoEmkBbRLrKN6P
-	lSO14yyV0IXYbStsHBN7UDkCH8NlF+02vMXIycIc9h/Nhjj5tXc1Lc+hb8VOTB83
-	tT08e9CP2WsM5U2cWcEV9Hmn/IiFWdQJ70JjR33X+LN/QnA26eVINYWx6RCwjJZD
-	VCJqtlQZ9jiY2Fu6Dqc9pg==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467eghr8tx-1
+	corp-2023-11-20; bh=umMv2cMz5y5y2+1ty2nqRMvnWPK7cWwZf91YYkODtsM=; b=
+	G9arMVapbpLnx+Jc37ccC6vxqheYmATg4xuPJmqelXU7EWnjEmeZE26PqfiXCjcJ
+	Ghy2pUs+nM1OFdTJfwDNGA1A5tSZ7IuWJXAhoQhDFKVxpKHtsz1Vc30pz6mxavKP
+	WR3HjeXQ9EWPcrOHHMFyWi1vRjPMgVJaeBxfiYo+258wRPXgSxlGJZfmpKSa0EkK
+	6OykL7xp4rLIrLLX2GXCI9YAC67oyBRZ/2bpgadSKatf6hQq749Ll8POFCUwmv4L
+	nvB3bofwXOZ9K6VmjUShYIWu0zUscfuslp4vOs9DpIaxEG0crXGxSuUntJM+qSCN
+	hd6LYWPtGRPuJYp4K9RCOA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467eghr8ud-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:43 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O7806D025207;
-	Thu, 24 Apr 2025 08:08:42 GMT
-Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazlp17012014.outbound.protection.outlook.com [40.93.14.14])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 466jbrqxv5-1
+	Thu, 24 Apr 2025 08:08:55 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O60Aiv028507;
+	Thu, 24 Apr 2025 08:08:54 GMT
+Received: from ch4pr04cu002.outbound.protection.outlook.com (mail-northcentralusazlp17013058.outbound.protection.outlook.com [40.93.20.58])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 466jx76xaf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:42 +0000
+	Thu, 24 Apr 2025 08:08:53 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R+ZCO/SHmGhHWZjfV0SlB4U1okpr3zVQXrF5/un6ayqR4NegHcHSmZ1IruPDpzPLj1DSjcPP+SrlLWIzgdiDvnGML3fGo7t2HQT6qf5Xv3Ozq/KNqnBOEyEP25H7BfQO3loC2R2pS2KG9rxLZ/8WIV/ln5ExWRvpIEoN+91WsoIvJruDY/qeDCwmivj+gRi+0dLfuByLy7oekgcI+StH3ef8RGxmRqKhhlNmUznUBdINctC73ZJJy1fP0LFQUNsYCK+jLtyCeu6AqEDLNduypvlZUvz24WSLoiEGuVQn0bSl6gM3tGrwOYKHVlqHlgvKMf6Zd7Ql/0cYdmty+wXArw==
+ b=HhydKng0h8F80lQN0sXVShcJJZil3gTN25Tor4FGWkOaiQ2jywuo7c4EOg9SadCkxfVrxwY7svQSvHCuzMyD+2h/Fe8RjeYhM7fDBDvH6h3t++QOcJrhSztBGNWt7tfR3CSwzrm2g7Z41HH+N1hTDJ3EI2JBk/Lvia3haj2/WTuQO24nxciHF231fKBgFPK5OYmEjcPyXnSRcGGw47aK3SxEocUStudasg7DKs0rgs22Kqgv90UQnMwAzBYvx46VttdKFoUQCnGTblnlyZSFwSSfgKvM8WUilQxKKVN+wLVtmTeSDLjH6uhCSwuRcMdINvmBmfIXo+mxdrImITDetA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=;
- b=E0KUqfbRuiA66WLrqL25R0jSZgq8LUh8u/PGE2ANO4wHheutRXcmQ0z7RSRtlFfCiTJzv0umg+B2aHKVZmM3m5b9JUFyKm3XOHUJw3FjwBYS7U22//51/WWu5JEu6EBx7cEwsCVYvQFjTnvLkOsA4pEWa8PNKniF4viLB+YGrXkoUeedkkWDnc0qDGReB9B+NHmfW88hE1hgCdADi2nMrUFFPMnJ2LFwXlp6ERAT2J71er1+qR59hEFu0uq4JezZc8KUje3LwboVGSsP9MrcicFUozMCUNqvM5Q5Kak78W7Cm2k64G6wh0DEo+qa1VHGoYkNSeyauvyiVv8k8zEnqw==
+ bh=umMv2cMz5y5y2+1ty2nqRMvnWPK7cWwZf91YYkODtsM=;
+ b=YHDAbJDYgjiLraH23QpXRJ3jkCh1GezFLzZ6VO9NiwxDX/j/MP9lMiCdHAsMXGb52X5fFtkO0q4XPf380FayNcPXx7lvKz7gtI36nXBhyCjkvn6RVeC0o3z1jljXcWKO0YlH86RPPayqbMhfd56/j1QkFXKOdauT5yveHRKbpq33kJoF690DHD/aiQZSkk8D3aRHNWBojzFKum3nKpPGWS8U632u/eExNw6XulpGKPKgmQ5YdaV1SRyljFOuHV96LysdlWjxRvBEr9p2EJArq4fsN+rdPhNYnf30Zxq6vj7OSC8lsCux4EZVOwNDW/rbYJpjwX1Ps4edhZ+O6eOKpQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1dMUuYCwRnXUShlrqrBY53jr8XsAGAoUAqEqwagrNSk=;
- b=OzhEfmrqJ6FQ7e8uH5KWEZRtVG5lke4lK31dEing8w1Olr+bRcsIYQAtjndy4Cl+46QQgfKXIEORe9WIK54D5oh/YP4QF86kaWGKrrqJ4Io6Oq4N6dy7tCVd9cr6beNf27yRDuHngfFXvf5kU5nEta+a+/gkUVxPofi09e2QjOw=
+ bh=umMv2cMz5y5y2+1ty2nqRMvnWPK7cWwZf91YYkODtsM=;
+ b=zuHrtalbdwfPgwTgkSqSyIwJ9tjKtOq5MS7D4IV8yzdAveY81pZRBwAnfxQYXa5o6Nu/8yRoYwvli3g5QS9Zm5f7npn82SV4mJvpYSqbed4Ujbxgx6Xf07qZ4/niaAqNouEt8F1lfy2Ivn4YtudNvUB8BMwoKBdLBoe5y/L8fxg=
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
- by LV3PR10MB8156.namprd10.prod.outlook.com (2603:10b6:408:285::9) with
+ by CH0PR10MB4905.namprd10.prod.outlook.com (2603:10b6:610:ca::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Thu, 24 Apr
- 2025 08:08:40 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.35; Thu, 24 Apr
+ 2025 08:08:45 +0000
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23%7]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:08:40 +0000
+ 08:08:45 +0000
 From: Harry Yoo <harry.yoo@oracle.com>
 To: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
         David Rientjes <rientjes@google.com>,
@@ -92,16 +92,16 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
         Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Harry Yoo <harry.yoo@oracle.com>
-Subject: [RFC PATCH 6/7] lib/percpu_counter: allow (un)charging percpu counters without alloc/free
-Date: Thu, 24 Apr 2025 17:07:54 +0900
-Message-ID: <20250424080755.272925-7-harry.yoo@oracle.com>
+Subject: [RFC PATCH 7/7] kernel/fork: improve exec() throughput with slab ctor/dtor pair
+Date: Thu, 24 Apr 2025 17:07:55 +0900
+Message-ID: <20250424080755.272925-8-harry.yoo@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250424080755.272925-1-harry.yoo@oracle.com>
 References: <20250424080755.272925-1-harry.yoo@oracle.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SE2P216CA0126.KORP216.PROD.OUTLOOK.COM
- (2603:1096:101:2c7::10) To CH3PR10MB7329.namprd10.prod.outlook.com
+Content-Type: text/plain
+X-ClientProxiedBy: SEWP216CA0005.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:101:2b4::11) To CH3PR10MB7329.namprd10.prod.outlook.com
  (2603:10b6:610:12c::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -110,176 +110,353 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|LV3PR10MB8156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 62e3d334-9c42-4eb7-d3b7-08dd83073915
+X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|CH0PR10MB4905:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03bcedd3-ecc0-4395-576a-08dd83073c1a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SzlydnpMeGpaRVloVU9BRC9VcmRuak8xSTQ3SzFNU0tGdjFPOGtEQy9pd0Fv?=
- =?utf-8?B?NVQwQU5HOEJqbk5Ha2daYmh2ZzU2bW04bzdtYm9lVlNGSUdoSWV1K0Z1Zm9s?=
- =?utf-8?B?U2g4Y1g2NERiY01mWVYwSXlHazhtZDc5MnA5QklDMXFqdENlV25JdEtEWTRY?=
- =?utf-8?B?NDZvaGdUd1pnK2NEQ3VBb1F1KzFXT1g5TmVSWnNDMktFRmdJcHBSTFZva1VL?=
- =?utf-8?B?bFU5aGNURDljRXZBTGNRd1dBS2xJSzFVck8xWFV6OE5kQ3BYcnoydU9DREYy?=
- =?utf-8?B?cHpvSTJvZkdmajZzUXJCUkNVT3ZrTkRIS1hSN2xHM1FUMWpZN2JRT2xEeWlY?=
- =?utf-8?B?VVIvZG52VHd0eE9NQ1ZyU0RXVTZHb1pRNGlwczhCSFdad3Q3MGR5WUNzUGJ6?=
- =?utf-8?B?M3Q5MW8zaitaYXV4VVcvek40clQ3QjFDMTdYTnVRV2kyY3M1QjdMNEphVHAx?=
- =?utf-8?B?RlBMTjlSZzZDbktQSDJ6VnJkeDdBTTkxTHNUQ1pRNEMwTUxiZEhoUUQ5UytK?=
- =?utf-8?B?dzdDT0VlZitrd2xWSDhXSHRFTHExaW5vcE9SSHdNb3BhQUVLM0ZYYkU4cWRH?=
- =?utf-8?B?T2pRNjVyV05zeURrSUF0ZE16NXFtb0ZhcUpZalllTDJlOUM4L0hTQkw1RURS?=
- =?utf-8?B?eWlPeXhxdVB1WExiWDlVdnJ1cGViU29nZUxWUGxSd08velVmWWFaWDlzR3FJ?=
- =?utf-8?B?WStLMFFLNU02V3pzSjd5VGZ3aWJRbXRFZmRYTHpMUkVCWmNkRUNYanhYbFRz?=
- =?utf-8?B?VFNPaEE3bXY0SXFKbVdGMVhQcXFOT3VKajRNa1lnSU9ZbkMwRW5YSXVLRHhK?=
- =?utf-8?B?eWJKNVZhenJUWDZTSEw0QjR6NGo0eGF1cDRSY2ovQlByWlM3N0l0aXIrRjRy?=
- =?utf-8?B?aTg5RFlNaFY1OEtFUm56MTZoaUVaZWNtV3BCeWZhSUVWQjUwSW9RS003OWps?=
- =?utf-8?B?Y3NLdXdKMUhoWjliOUlHa1EreXVDU3NuNUFhdThrU2NQcCsySVM3WENtZGJH?=
- =?utf-8?B?VjFyL0VrbnZhZFVUcnNwcHBZWXZwZGJBdXBNYS9xbThGTXpvWWxVQUJUN2ht?=
- =?utf-8?B?aG9BT2tjRGFLUU1MRjhxOUMwR0NyZEg3cFprSHNKMi9ET2wxOW80WklVV3Bp?=
- =?utf-8?B?T1Q0UCsrNlVtV0hYdG9vYzB0YTdLZzlBclhzSzdoUktkUGt2VDF3aWZNai9G?=
- =?utf-8?B?UWR3dGhqU2dGRG03WnlEcm8rOCtPZkhTWHprNkl5ZTJ1M29oWXFwM2VsMjRk?=
- =?utf-8?B?VmpDNFVOVGt0MmF3SWt3SHBYbHBrYlFtZS9ZbGtRbkFhQ3p1UmpFd3l0QXYr?=
- =?utf-8?B?UXZHZjJZLzc2RlE5WTFxVGNkRmg2Um1YU01PUU9Uc01kbHkyMWpwdHo0VHNI?=
- =?utf-8?B?QkpzQTl6YThJbnRld2NGTWRtWjc5aXhicXpjZW1mVHp3bmVZRTEvNllYTHdL?=
- =?utf-8?B?TXIxbjM5K3dKd21UOFFpR2NxME9nYTg4SkxncU5lUFYweGo2R3RSYTYzWDlK?=
- =?utf-8?B?bldiSlJLSmxiVERVZXNuKy9KWWpwc2VtUm13dmxidEFVRXBteHk4Mjl0NUVQ?=
- =?utf-8?B?OXRtbXUydmNycUNaRGQwRzduTGVOb2o3SXNjdHlHeFUrNE4ycnJGbi9mejlS?=
- =?utf-8?B?YmpjL3prcUtsLzg1d3UwVFFtNDFDM2NMblZjZnhKZkJrQXphS1VCajZtM2NU?=
- =?utf-8?B?eUdsMmpOSTV5UmlCQW1EKzVJYjFGOE9nQzZzaHgvd1UxckhkelBYSEdwbkM2?=
- =?utf-8?B?M09RT3h6eHJDRGpDamFuZGw4V3dqeExuU3loTVpZWDJTT3RCNE5McEVpajY4?=
- =?utf-8?B?SjZSU1VJMkZGMHhXWnRWZlFNdG9XVXpvQVBvUkJzM2FNRy9uZXZIWXExVDNx?=
- =?utf-8?B?eGpaOU5TVHg4R0REUFJ0M3BMdThVTTk0SEVVbUQ0SmVCeE5teXU1R0NEdmhk?=
- =?utf-8?Q?wEBpajyjw5U=3D?=
+	=?us-ascii?Q?3G96c8pHpCTXVXXoJIklQxwiYJHQ5YGiSndK6AkFmSHgjgG2R38ObFp59RzX?=
+ =?us-ascii?Q?uSkAUNxbvzKrFUZpzCNgshh8ddyKnx4+DwHSrEkl9JtHJ2qVHG5gSRSggrfK?=
+ =?us-ascii?Q?Uvwi5oGvmKoYVznECLB4s+9+v/M0O5YNxSEgJRDcUe8m+ZGszBrStZwXeQ3x?=
+ =?us-ascii?Q?lS8XqzDJJx9B07zHDLdsSw8+E/Yc8Et8S6ntg+9vm0fPkjb1PiF/JaJRJM0c?=
+ =?us-ascii?Q?vUYfyFSKc3ZuQcHkzRBFqOFyIovXjeQDMAh7Q/tS1et8U324NsKzru3Pe865?=
+ =?us-ascii?Q?H1qikVezk+YUh1FYFp3UjYHWumvJZlShChPfH57NLlZ9e97BQ4Ogh/eABTwf?=
+ =?us-ascii?Q?r0nbgo1jzJflY60VnUUsztqdc+leY6vHwXDfnPgDTSDPdG4sBHkpEjOslU5C?=
+ =?us-ascii?Q?ojJicQQDQSTmne+HMFveJi7MkbGJanJueo37MKl8nqwfHBmFBE2T8HD/YcCm?=
+ =?us-ascii?Q?WigB5ebCNdnZapWCrINBd+svECszBEZx28BExpyO5EWmG7LceMHKGDF/Yrzd?=
+ =?us-ascii?Q?1ltUYcgnrJ3A2plGPcbnn4Pbw+u/w37l0an4pxxmrAswDTlsX8XNoUCFqi+8?=
+ =?us-ascii?Q?Hf+Dgy2qSJF09Y15bHBD7K46GF8osx2RnvZNe67YecLYAH+HoZ30IuRO95aO?=
+ =?us-ascii?Q?oICxDkbn7cmHrhZdv9Dok2Z5TvTj6m3e7n0vo3OKNFhHl8zQOnv5BFx8iEV2?=
+ =?us-ascii?Q?Jruv3z5LXfh+hV/lWGjJLUtZgGKsLetSQC3uirCvCGo3LC1Bi2vDhqjgar7f?=
+ =?us-ascii?Q?XZjO+UmUYYSk1CKl0HZLGfuNzyU9+t8iuwJIYaJAj847xLTO6a5qbqNQ8KFB?=
+ =?us-ascii?Q?dN8Y3ClpQ7+jThk38utEiJlVzXMEgHRnzzOiS/PYOlm/21CCYwNThQxk1QjO?=
+ =?us-ascii?Q?RjKixH8vPmujgcyKZOlxBv9q+ek7HM1/qBrwegD23MFVTUuhpk70wVFg26iB?=
+ =?us-ascii?Q?+vd6sNxujwftHfDfz26INupPftZ6m+ziIj/vz7W0iUo3ggadSQj2imxODe+L?=
+ =?us-ascii?Q?naVGzuB5rS/oSbnm1VaaznmGHcQnbIY4melKxBwcinHb7DyPTGRqWFqpxU/o?=
+ =?us-ascii?Q?DeFnDM+FcgBtexu0j/9hw8ICsMwfCe34aENM6FSkLbR1poQ6kvoO2OKXcmCU?=
+ =?us-ascii?Q?sjLwUIuKyPGe+IZt6OH3njTpxBENUW9eWhAiJOx5fJZDzNwFmTV8sozVPX5K?=
+ =?us-ascii?Q?AsXTjD3kIV39FrvdeVkBIGvnc8/e+5TBrWRd/3JPTUz5kF+VeKqY6WFf80MK?=
+ =?us-ascii?Q?NBDG2uIkaZURx7V8L2fkY5laGRxfNyN/9Z4PyWeEis24Ah6CnYPwAmHDYKzZ?=
+ =?us-ascii?Q?nrR/1KktA58mwWCl50+1zEsGD0zCjl5Xk2Z3iPdm73k3zvZTf+QNDIBY36F/?=
+ =?us-ascii?Q?aV3F61E=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WmhVYUw1VUZKSTljWkVWY28zWUI0L3VPM0ZtaVpEc05VT25YOHZLdTYvTnVr?=
- =?utf-8?B?OVU1VGd5MTJUZVg1Wk5tWlAzVjhtT3lXeWtFeUNQRWQ3OU12RVpQTTJQWGJ5?=
- =?utf-8?B?NlNFRUdFZlhSL2p1cVVHUE1DUE1ORm1PZW9NSkE5TmNpbFcvQVdBY1l3YlRL?=
- =?utf-8?B?MjVrRGE1R0RyZHFqSjBzaE5HQ21hZ1BVZ1JwZytPSVhDczNlM21mSmtFcmRw?=
- =?utf-8?B?N2JUVjc2L09CR3RDUzFaU3dJZGFVK1pITXhoTXVEY3YzMXpTK3R0R3dIS3dM?=
- =?utf-8?B?ZWtoZzYrZVNidENBMHF3QVNjYUlwb2tzUDJUZzBWcTdnTTN0TU56eVNmTmdz?=
- =?utf-8?B?dm41V0V2RVFsMHRZN2pWUS9KWUhNQTRtY090UGNDUUluSmlMd0Fkemh1anpn?=
- =?utf-8?B?b2xINExLdmNWNGs0ZTdib1MxWEdodnBoOVE4cFIvdk4ydzhLY1pYV0g2QWJT?=
- =?utf-8?B?c0hWMGdzUzZUemhPZkpwL3QvbjNmR0hKYkxidnlhcnE0QkE5cm9QVm1ublR6?=
- =?utf-8?B?NjJZb2NtMWRVOHgySEhTbnZtTGQ4WHdmaXpNTGFGYjg0eU1oMlBKb2NOMWl1?=
- =?utf-8?B?VmQ1S0JDbXRFam1YTElDdnFrM09hTksxbDFMb1BXR09EM2ZyUjdGQ2x5MXIz?=
- =?utf-8?B?RmdOajYrdWRRbVc4Q2RJMHZ0QS84REc2NVJUZkpLTWpZZlBHb1k4dlhvY0lH?=
- =?utf-8?B?QkhkVVJkaHBjYnQ1dEd5QjRsWHZmdXhLZDA2SVRpUmFockFhQWtXSUc4SDRP?=
- =?utf-8?B?RWlkOGRTODNXcEtta0MyQUQzMWo2U09jdDVWOXlJTmJuVjdYbzBvWGtQN3lQ?=
- =?utf-8?B?dTNrYUhtVC9sM1FESVNzVlRDMElrVVNJa2F2N2ZJU2ZOdVduYTRiMGxSQUc4?=
- =?utf-8?B?NE1mSzNGMzJJL1ZUQmxoMDRLT294U3h1OENQZVQ2UUFtc0FwL1BxcVF5b3hT?=
- =?utf-8?B?RFJPWnNZa3dJZm9PUUlmYXYzWjVORTlpSGFpakZvanZ5R1FsbVliWnVraTc2?=
- =?utf-8?B?S3Q4MmFMN25zNXdBMSsxWlVEZTRQa1hJTWFQa0F4NTl1VkFrVlYrM0tKM0pt?=
- =?utf-8?B?U3RoS0JMNXhNNkMzZnFZR1FOWTdXY25EVlFmTTMyMFNud3RsY2FLMVZkb2hp?=
- =?utf-8?B?cXFLV1NERC9mai9zc3dxWXZQSnBRakVKNzhJbVljbHRpOHBPQnFXcEVOV2hI?=
- =?utf-8?B?QWVXMTVXU0hQMGhyeDNxa1o1aW9rQzZDR2NYWXBtV0RhM3JRYldTV01rQ2tO?=
- =?utf-8?B?Zld1cDJHZHAxSnZRL0M0OGVxZ2R4SzF6ZTdGbkM0QmNiWGdXd1JnOEJIenRn?=
- =?utf-8?B?MXpmUGtWcENaZXFpbEhJQjA4NG5pbXI4WW5SVE9BSW8zUWZ6K09WQlNLUWpo?=
- =?utf-8?B?UnRYQ2d2WVBZcWJPek0rQURIQlI1SHhJcm4zOFN1YzgzdEsydks2STBDVC9i?=
- =?utf-8?B?QUsrVFJBRlhJbXRDNVZhc2dqVEdqRjg3N2t2S3dpRDllRFd6S3d3OHdSeXBw?=
- =?utf-8?B?akljaWlNcDk0ZnZubTdKOWM3ajdQSDRDNzFXdTRKb3NueUU0bDFybnlIaHQy?=
- =?utf-8?B?NmxnVzM3aUNGciswUzlRZVcvbXlCTHVXZUZtblBoZWdNZmp6bVBSOUwxazZ1?=
- =?utf-8?B?ZW40RUZmKzcxamZPRFNaYjhBREY0U0U3TEhhSzY4NzJqQ2ZGbFJJcEVsY1Nr?=
- =?utf-8?B?RGo3dWl4OGFIcVprTExLcHlYSE4rZ05Uc0ZkQlFkaEVST2JISlVYY3lPaEdz?=
- =?utf-8?B?SXV1dm93M3J5VGU3ZjRHMTBucU9pWjhndzhGRld2alR2aVprb0lMVkZndTVK?=
- =?utf-8?B?TTRTVU1LM1lGOEgzSjVlV0xnblI3b2pDUkJXNW95UVVPU3RSeU1KR3B5NjI4?=
- =?utf-8?B?eWpCVHJmdG1SdHlKanM2ZDFsUU5wRGF1SE9Vd1hrVEtMd1hlbDY3QTY0UkJp?=
- =?utf-8?B?RWVZOXF4WjdlQ2hFSm11bzVaYUlRZFhFVDVtZzVXcktvK2NXcWJyaHA0YW8x?=
- =?utf-8?B?TDRwSXY2SXBvRGFhMS8wMmRxd2c5aHpnTkt6ZWU1aUZrMUIwakVTRklWeFdN?=
- =?utf-8?B?dTZhTU04OElOUnhYMUhUVVZ4ZFp2eTBZOWNST3JZNDFMaUpxN0E2bTRRYUo0?=
- =?utf-8?Q?mYcesARIGk0hUYEuVhZLGl27N?=
+	=?us-ascii?Q?43UBPa+lueESDSdVgECp11SH17Ci94RNEuAHDNJAW+H5KPd331+IHpYUWcoE?=
+ =?us-ascii?Q?QEBaPsKNKXpsnS0qTJxSVOQV16tlwNO8Lu5pc3+fcygm5WaSILeo5mNwbisC?=
+ =?us-ascii?Q?WW7JBjOvujj/F2TdPlsHe7a51BOma9zf4V6zNOuek8ZNdi6XL+jl7gveevG2?=
+ =?us-ascii?Q?bp6lP3frEKIyQBDKjgO9NO+VMDZDHCO9n5LpKnI1bCkrKX38q/E4a0I5O9Fn?=
+ =?us-ascii?Q?2Aqvy5GCPst365uIYWBBdzzVzpukOAnSLfvPdylaESIdiFqEfFiog6MyCfsL?=
+ =?us-ascii?Q?bC3VRZiGZf3MUCoTY+R0Eavko/MxmAvSA7N/6ZQL3ubvjdloENxk5TJ/rbaN?=
+ =?us-ascii?Q?STJ3uzbff4+5XlFMFq2tOfEMAukpWq8yyrpfq1GjMT64kgNWbG49CG/3Vm89?=
+ =?us-ascii?Q?YTm8pbtEbxHTezGackJveTeIt0h7OmvMCbkHrjAVvfcVIKTbJw/PXCiyW4Xq?=
+ =?us-ascii?Q?Tq9ozT9nmbdzfGpM83Mt2RO+tkZAH59fapeEvvr802kHdqDbT4Hc6N3lkUE8?=
+ =?us-ascii?Q?X0z/xybj8imyeWJ2amKkE70lZCyTZ5sgYeYP+QZrYt1hN3PXTR/TshO6+Rep?=
+ =?us-ascii?Q?jseM8aj0Z/LeUd2NVWg9x70dDQSt9wTxEjDNXZQmGhzSVTRkGUr5fdqvtfCi?=
+ =?us-ascii?Q?DbVHxHVUecIBtSvImSa05EsuY7PxIBbZzCN9yZWjuF8C44gKeaGBagoabzEX?=
+ =?us-ascii?Q?GoAmZSZJ2o/LPBAuhzQ2B3G34xZtx0Lf+NCDOVmjsvdkiG3fpVYBGANito/5?=
+ =?us-ascii?Q?+aDJ/UV1Wi7c1NzR2aE/iZ/5bSLfuL5YQidCD7nOnOX22MAW1nF/Incnzbar?=
+ =?us-ascii?Q?Z0Rr7YCNCBJRipRopMWhLH02mAoZmuSvJLsT+FflxPlCNtqiEX/hkUcxsHJU?=
+ =?us-ascii?Q?4BjOEbCoQ0wDm9Pq9UTTBpLln8dZ+C7H0y7JMDsAibsOGxwKQ80pgG5DxSMU?=
+ =?us-ascii?Q?55GawHdu7J+s9Mdakiv+UBcKMbWkkKm61j12NoK3a3wEb1CN8WHSpfKmyMyN?=
+ =?us-ascii?Q?BKQHhissLqFH30VsLCdLEdL72EOzfkh1Ob6hbjIqr8f/4SeN/6l2vVCIokPj?=
+ =?us-ascii?Q?hnoJ+byuPg3e7mOmjyyybib7QLOuHKIhn4ghcfCR+NSJrY3oOxh+nK1+0KKH?=
+ =?us-ascii?Q?GZ0DZ2XQj7Cmsem5jTdZXCc0KjCtYxmdFaOH8Ja+M8WWEc/IzYUY+wp6KeJs?=
+ =?us-ascii?Q?NYnl7//CJWHe4Wxr9YPuVSABDhMMPsLT6YzWqz5v/88d8eC+k6OiMv4R52t5?=
+ =?us-ascii?Q?UyKjvUYf/JQ3N1elqL4sXkqiFSXMQKZCIxkCKkPcSTIElsGbsd07m/MmkVuV?=
+ =?us-ascii?Q?3FRWpvYyqJ+EVrPm5dHqAVILf2xfPA2tji4Sjm7K5j87+5dPAL4vzXid+39H?=
+ =?us-ascii?Q?CCGhCbiGXh/0EtM11Iu1kuzu85wPb5VxasqurRYlsM5cz6uwCsTM6RNPhylE?=
+ =?us-ascii?Q?a9nh70MVc1eNMqpTL+goVdvglD4ReSfF08+7cHzF3/NdBb+b0PDlxAvbqg0w?=
+ =?us-ascii?Q?m+qHLNGsjjzUFrWyuJBukcSPHkoAwgpLe9U4o5FBbipXCfi3WLI4oIwl9OgX?=
+ =?us-ascii?Q?hp3saiB8C/BDDlomAoCXEjG1smaM+8AiHekBVzW0?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	EFx/pPF2XEfYrL+uCrGPjTwlr7PAZzBf7Qb0xqhL8fEAMxSiusfNBFmOLScJrU9mow+DHBxg3voxpbO10AZeYLe4nlyL2O8eVqIMcREqWXzLqFkuIpQD/5MJQWoCfpGS61oXbwo8pMGbsKWXsvE1BrKk524VFV4S01tkVN/yPZpbjl5iR+DznYUcV1EZ7TSHORguKL0ONQr/iFVtoDyG++UY2fwhC7Xmri44zCHaYulF8TzUCIYOO9SbLHHD9FkrtV1b5CUQpxCYKPfZ3AwEHzZD5tvE77CkzgZorAo7nixlntSsDBYMozFPu7NvEuBWGbzRBCpuH5zqjoPZiQTOFdmNCadTqxpFGt1D8UZRIWXeMTpnb77CwbsazE4iKizw/ZhrITSJ43L/PxI2XQTNcbNwH3lIR2t7+dhpcN60XnGCEiXgvzi0MP3gqpKPGQodRTzk0qLPSD4fR/LRu9VKERARgPPJj7T7pWK0emm7T2iNI1St7WbyQcoO0CqIFKuZvTHlaGqoLp4KPiligGHPeLo882WCi22Lz8mEXW/8jm2XyRtfO2ntusE3ETtIXwoOiuiB2OUugw4yRa7eDfmns36e6j3rrA3a6Lpu9MDv7bo=
+	AwMvr9tbnK2w2wtdCAFhRQ519u8/zRZh/X4H2Mrhb7Dxa7Z9SGW7h9nGNNFTPD1pKoroKrk7RsA7pQLXPO0qUd51e21SGgGn8rGr9xxpK7Ub8qEsNZzZrCiKjeQuh1j+bphvXcWyb8VbH+RS23Rd9ZJle3tZ8HThbNReg/Uwqe2s8SN2fivX5YuoBpLkgHD24TkIHBhUznVHXjplyJWwZDt4OQAVH2MKazJtmtvxAjGU0Pr+TNW2iR6WbF8YQr5bQ+XwsCryxRHBbJ2lYkkjcjvxqL1J4nIu7dBy+vf+wA1xtEBYluaIPto8qNbfuXLaCN2cKV58sEHsGLYk7Cggy8QJtpbhWwItHw0f0Htv/+eXrLMIOiafIV2Phpvu1CYlbjOvixMEOUZC/ngmM+/vTujBf+kQkMLHbxdh1VIQqU6AWBCrJX5qre6E2IyhlrIlm43C7HM+gax1PZKfYeIP/Hm54EYypfo0zdUvmDuq4a3YSmWW81ZE8b0hMsWtLKz70cA3EGMhX+nNZSND1ZBWlKASMme7bhOWQOGEtJjwj+ZWFbquADsY5dQsfV4yslGe7GvMIG5M9FePiOWiaAs/IEUlFZJ7cQvJB463dgo8xuY=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62e3d334-9c42-4eb7-d3b7-08dd83073915
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03bcedd3-ecc0-4395-576a-08dd83073c1a
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:40.3431
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:45.4257
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ANTpOCDP0W95J5amKB9oh9gxolyd37BlTw4I4MQZCDM4wSCBrp0of5P2VrvwEsZvggfIWJ7UfxTToFpjsfTjSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB8156
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2FGewwUUJFX70P3RGHG7febemAHooAv6+lGnoR3Eiey8mjoGXjWUSK0XSWM6m1rKR32ZL6cfRKvSTp4aF+T7Wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB4905
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
  definitions=2025-04-24_04,2025-04-22_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2504070000 definitions=main-2504240053
-X-Proofpoint-GUID: buUtswGaxlDXrVhHq-wViwpgRJTz4I63
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfXxUeO4H1y6Jou JPNhagubbFnTGxRqYb45GgnXeCK7Yj/iiqnbbFTkS364g0mrGsz0KE9wvj6sKOnA6o3INekDP4y alAoTcyjn1JRKg9JStn1k9TlhJGSLJnyJNIuDGZ+T43Ipt35fHQIAEchNi6EvNFSRxIAUO8ByZH
- K3BNBbW5qHxqZUJ+JYPBGu2nwAdfcXTiYt1OA2Hu7uk4IREGJHkpEbTRY+YbG9mVJD2B+q6axj/ 0xZ7m1x5gJOfGOWVeBKqnQc8X9K3DtVuwp2rDvrsVSayeGciRYEi8gRGdLyCfYP8aB9/oQjpXre OLAo2x3juyzntlzdM9f68Tbr3znKgHnXOgQEpILNVVvCS3BPxT/jvGqlqQh1podOWNQpX9yUteX fb9olRrk
-X-Proofpoint-ORIG-GUID: buUtswGaxlDXrVhHq-wViwpgRJTz4I63
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 phishscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
+ definitions=main-2504240053
+X-Proofpoint-GUID: Hn3Zr6g6TBTcvKJzhUWOXGm53UDAuChD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfXwf69TNGJ1ImM puS++nViVxfoyGD7zKj0dI5SA6nrPd61LDDLVMfh/zMuEtZRsLo57RoP3BS2p8KuCogQ8ONzEZv ZwsixvlWsWUFvV+QF0fAnZ3x28KrppwRvyivboyGNPm8oR1E4G4A9w4yyh4lNKeJ2SKCJHrj2eO
+ UaKbNUw4zTftF3gpci3EbUYUAB2TtFmyIxlAew4xm8leAjBD+joTcSmHvX1X1ZC6Yj/Y6zqNUci 2wuzglzz4fr8Hs50/w0qmpqm7K2uJvUElJVbI1MMj/SOoPZm4D/JFvR7rDQmb6/Bur17EVVZ7GN gCbLbltwrbOKRn9unAI+I2uI7Zrrgld8jHETZGRICOVAV1Lx4nv2xNBJ4cwRXu43y5EQi0VxD49 I3uVKZmZ
+X-Proofpoint-ORIG-GUID: Hn3Zr6g6TBTcvKJzhUWOXGm53UDAuChD
 
-Introduce percpu_counter_{charge,uncharge}_many() to allow explicit
-charging and uncharging of percpu memory used by percpu_counter, without
-requiring allocation and deallocation of the counters just to
-(un)charge.
+When initializing newly allocated mm_struct, mm_init() allocate
+two chunks of percpu memory (pcpu_cid and rss_stat). Because percpu
+memory allocator uses a global mutex (pcpu_alloc_mutex), it becomes
+a global serialization point for exec().
 
-This is useful in cases where percpu counters preallocated and reused
-multiple times—for example, when a slab constructor allocates percpu
-counters that are (un)charged multiple times over their lifetime,
-until they are finally freed by the destructor.
+Use slab ctor/dtor pair to allocate and free percpu memory (pcpu_cid,
+rss_stat) for mm_struct. mm_init_cid() is moved to mm_init(), and rss_stat
+percpu counter is charged in mm_init() and uncharged in __mmdrop().
 
+As rss_stat and pcpu_cid fields should not be overwritten during
+memset() by mm_init() and memcy() by dup_mm(), move those fields to the
+end of mm_struct. Any field defined after 'ctor_fields_offset' won't be
+overwritten by these helpers.
+
+On the other hand, while cpu_bitmap[] is not initialized by
+the constructor, it should always be at the end of mm_struct.
+However, as cpu_bitmap[] is always initialized by mm_init(),
+not calling memset() and memcpy() for this field does not affect its
+current behavior.
+
+Note that check_mm() validates whether any rss counter is nonzero
+and reports an error if any nonzero value is found. In other words,
+under normal conditions, the counters should always be zero when
+an mm_struct is freed. Therefore is not necessary to reset the counters
+in mm_init() once they have been initialized by the constructor.
+
+To measure the performance impact, I ran the exec() benchmark [1], which
+launches one process per CPU and each proess repeatedly invokes exec().
+
+On a desktop with 12 cores (24 hardware threads), it raises
+exec() throughput by an average of 4.56%. Even in a single-threaded run
+I see roughly a 4% gain, showing that the cost of acquiring and releasing
+pcpu_alloc_mutex is significant even when it is uncontended.
+
+On a dual-socket server with 192 cores the mutex becomes a contention
+hotpot; mitigating that contention boosts exec() throughput by 33%.
+
+Link: http://apollo.backplane.com/DFlyMisc/doexec.c [1]
+Link: https://lore.kernel.org/linux-mm/CAGudoHFc+Km-3usiy4Wdm1JkM+YjCgD9A8dDKQ06pZP070f1ig@mail.gmail.com
+Suggested-by: Mateusz Guzik <mjguzik@gmail.com>
 Signed-off-by: Harry Yoo <harry.yoo@oracle.com>
 ---
- include/linux/percpu_counter.h |  2 ++
- lib/percpu_counter.c           | 25 +++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ include/linux/mm_types.h | 40 +++++++++++++++++---------
+ kernel/fork.c            | 62 +++++++++++++++++++++++++++-------------
+ 2 files changed, 69 insertions(+), 33 deletions(-)
 
-diff --git a/include/linux/percpu_counter.h b/include/linux/percpu_counter.h
-index 3a44dd1e33d2..6e6b0752b1e4 100644
---- a/include/linux/percpu_counter.h
-+++ b/include/linux/percpu_counter.h
-@@ -46,6 +46,8 @@ int __percpu_counter_init_many(struct percpu_counter *fbc, s64 amount,
- #define percpu_counter_init(fbc, value, gfp)				\
- 	percpu_counter_init_many(fbc, value, gfp, 1)
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index 56d07edd01f9..3000ca47b8ba 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -946,14 +946,6 @@ struct mm_struct {
+ 		atomic_t mm_users;
  
-+bool percpu_counter_charge_many(struct percpu_counter *fbc, gfp_t gfp, u32 nr_counters);
-+void percpu_counter_uncharge_many(struct percpu_counter *fbc, u32 nr_counters);
- void percpu_counter_destroy_many(struct percpu_counter *fbc, u32 nr_counters);
- static inline void percpu_counter_destroy(struct percpu_counter *fbc)
- {
-diff --git a/lib/percpu_counter.c b/lib/percpu_counter.c
-index 2891f94a11c6..a9fe96787725 100644
---- a/lib/percpu_counter.c
-+++ b/lib/percpu_counter.c
-@@ -224,6 +224,31 @@ int __percpu_counter_init_many(struct percpu_counter *fbc, s64 amount,
+ #ifdef CONFIG_SCHED_MM_CID
+-		/**
+-		 * @pcpu_cid: Per-cpu current cid.
+-		 *
+-		 * Keep track of the currently allocated mm_cid for each cpu.
+-		 * The per-cpu mm_cid values are serialized by their respective
+-		 * runqueue locks.
+-		 */
+-		struct mm_cid __percpu *pcpu_cid;
+ 		/*
+ 		 * @mm_cid_next_scan: Next mm_cid scan (in jiffies).
+ 		 *
+@@ -982,6 +974,7 @@ struct mm_struct {
+ 		 * mm nr_cpus_allowed updates.
+ 		 */
+ 		raw_spinlock_t cpus_allowed_lock;
++		unsigned long _padding; /* for optimal offset of mmap_lock */
+ #endif
+ #ifdef CONFIG_MMU
+ 		atomic_long_t pgtables_bytes;	/* size of all page tables */
+@@ -1059,8 +1052,6 @@ struct mm_struct {
+ 
+ 		unsigned long saved_auxv[AT_VECTOR_SIZE]; /* for /proc/PID/auxv */
+ 
+-		struct percpu_counter rss_stat[NR_MM_COUNTERS];
+-
+ 		struct linux_binfmt *binfmt;
+ 
+ 		/* Architecture-specific MM context */
+@@ -1169,6 +1160,30 @@ struct mm_struct {
+ #endif /* CONFIG_MM_ID */
+ 	} __randomize_layout;
+ 
++	/*
++	 * The fields below are not initialized by memset() or copied
++	 * by memcpy(), in order to avoid overwriting values that are
++	 * initialized by the slab constructor.
++	 *
++	 * The last field, cpu_bitmap, is an exception. This field is not
++	 * initialized by the constructor and is always initialized by
++	 * the mm_init() function.
++	 */
++	union {
++		unsigned long ctor_fields_offset;
++		struct percpu_counter rss_stat[NR_MM_COUNTERS];
++	};
++#ifdef CONFIG_SCHED_MM_CID
++	/**
++	 * @pcpu_cid: Per-cpu current cid.
++	 *
++	 * Keep track of the currently allocated mm_cid for each cpu.
++	 * The per-cpu mm_cid values are serialized by their respective
++	 * runqueue locks.
++	 */
++	struct mm_cid __percpu *pcpu_cid;
++#endif
++
+ 	/*
+ 	 * The mm_cpumask needs to be at the end of mm_struct, because it
+ 	 * is dynamically sized based on nr_cpu_ids.
+@@ -1348,12 +1363,11 @@ static inline void mm_init_cid(struct mm_struct *mm, struct task_struct *p)
+ 	cpumask_clear(mm_cidmask(mm));
  }
- EXPORT_SYMBOL(__percpu_counter_init_many);
  
-+bool percpu_counter_charge_many(struct percpu_counter *fbc, gfp_t gfp, u32 nr_counters)
-+{
-+	s32 __percpu *counters;
-+	size_t counter_size;
-+	size_t charge_size;
-+
-+	counter_size = ALIGN(sizeof(*counters), __alignof__(*counters));
-+	counters = fbc->counters;
-+	charge_size = nr_counters * counter_size;
-+
-+	return pcpu_charge(counters, charge_size, gfp);
-+}
-+
-+void percpu_counter_uncharge_many(struct percpu_counter *fbc, u32 nr_counters)
-+{
-+	s32 __percpu *counters;
-+	size_t counter_size;
-+	size_t uncharge_size;
-+
-+	counter_size = ALIGN(sizeof(*counters), __alignof__(*counters));
-+	counters = fbc->counters;
-+	uncharge_size = nr_counters * counter_size;
-+	pcpu_uncharge(counters, uncharge_size);
-+}
-+
- void percpu_counter_destroy_many(struct percpu_counter *fbc, u32 nr_counters)
+-static inline int mm_alloc_cid_noprof(struct mm_struct *mm, struct task_struct *p)
++static inline int mm_alloc_cid_noprof(struct mm_struct *mm)
  {
- 	unsigned long flags __maybe_unused;
+ 	mm->pcpu_cid = alloc_percpu_noprof(struct mm_cid);
+ 	if (!mm->pcpu_cid)
+ 		return -ENOMEM;
+-	mm_init_cid(mm, p);
+ 	return 0;
+ }
+ #define mm_alloc_cid(...)	alloc_hooks(mm_alloc_cid_noprof(__VA_ARGS__))
+@@ -1383,7 +1397,7 @@ static inline void mm_set_cpus_allowed(struct mm_struct *mm, const struct cpumas
+ }
+ #else /* CONFIG_SCHED_MM_CID */
+ static inline void mm_init_cid(struct mm_struct *mm, struct task_struct *p) { }
+-static inline int mm_alloc_cid(struct mm_struct *mm, struct task_struct *p) { return 0; }
++static inline int mm_alloc_cid(struct mm_struct *mm) { return 0; }
+ static inline void mm_destroy_cid(struct mm_struct *mm) { }
+ 
+ static inline unsigned int mm_cid_size(void)
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 7966b0876dc3..5940cf37379c 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -943,8 +943,7 @@ void __mmdrop(struct mm_struct *mm)
+ 	check_mm(mm);
+ 	put_user_ns(mm->user_ns);
+ 	mm_pasid_drop(mm);
+-	mm_destroy_cid(mm);
+-	percpu_counter_destroy_many(mm->rss_stat, NR_MM_COUNTERS);
++	percpu_counter_uncharge_many(mm->rss_stat, NR_MM_COUNTERS);
+ 
+ 	free_mm(mm);
+ }
+@@ -1295,7 +1294,6 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p,
+ 	mm->map_count = 0;
+ 	mm->locked_vm = 0;
+ 	atomic64_set(&mm->pinned_vm, 0);
+-	memset(&mm->rss_stat, 0, sizeof(mm->rss_stat));
+ 	spin_lock_init(&mm->page_table_lock);
+ 	spin_lock_init(&mm->arg_lock);
+ 	mm_init_cpumask(mm);
+@@ -1328,21 +1326,17 @@ static struct mm_struct *mm_init(struct mm_struct *mm, struct task_struct *p,
+ 	if (init_new_context(p, mm))
+ 		goto fail_nocontext;
+ 
+-	if (mm_alloc_cid(mm, p))
+-		goto fail_cid;
+-
+-	if (percpu_counter_init_many(mm->rss_stat, 0, GFP_KERNEL_ACCOUNT,
+-				     NR_MM_COUNTERS))
+-		goto fail_pcpu;
++	if (!percpu_counter_charge_many(mm->rss_stat, GFP_KERNEL_ACCOUNT,
++					NR_MM_COUNTERS))
++		goto failed_charge;
+ 
++	mm_init_cid(mm, p);
+ 	mm->user_ns = get_user_ns(user_ns);
+ 	lru_gen_init_mm(mm);
+ 	return mm;
+ 
+-fail_pcpu:
++failed_charge:
+ 	mm_destroy_cid(mm);
+-fail_cid:
+-	destroy_context(mm);
+ fail_nocontext:
+ 	mm_free_id(mm);
+ fail_noid:
+@@ -1363,7 +1357,7 @@ struct mm_struct *mm_alloc(void)
+ 	if (!mm)
+ 		return NULL;
+ 
+-	memset(mm, 0, sizeof(*mm));
++	memset(mm, 0, offsetof(struct mm_struct, ctor_fields_offset));
+ 	return mm_init(mm, current, current_user_ns());
+ }
+ EXPORT_SYMBOL_IF_KUNIT(mm_alloc);
+@@ -1725,7 +1719,7 @@ static struct mm_struct *dup_mm(struct task_struct *tsk,
+ 	if (!mm)
+ 		goto fail_nomem;
+ 
+-	memcpy(mm, oldmm, sizeof(*mm));
++	memcpy(mm, oldmm, offsetof(struct mm_struct, ctor_fields_offset));
+ 
+ 	if (!mm_init(mm, tsk, mm->user_ns))
+ 		goto fail_nomem;
+@@ -3193,9 +3187,40 @@ static int sighand_ctor(void *data)
+ 	return 0;
+ }
+ 
++static int mm_struct_ctor(void *object)
++{
++	struct mm_struct *mm = object;
++
++	if (mm_alloc_cid(mm))
++		return -ENOMEM;
++
++	if (percpu_counter_init_many(mm->rss_stat, 0, GFP_KERNEL,
++				     NR_MM_COUNTERS)) {
++		mm_destroy_cid(mm);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static void mm_struct_dtor(void *object)
++{
++	struct mm_struct *mm = object;
++
++	mm_destroy_cid(mm);
++	percpu_counter_destroy_many(mm->rss_stat, NR_MM_COUNTERS);
++}
++
+ void __init mm_cache_init(void)
+ {
+ 	unsigned int mm_size;
++	struct kmem_cache_args kmem_args = {
++		.align = ARCH_MIN_MMSTRUCT_ALIGN,
++		.useroffset = offsetof(struct mm_struct, saved_auxv),
++		.usersize = sizeof_field(struct mm_struct, saved_auxv),
++		.ctor = mm_struct_ctor,
++		.dtor = mm_struct_dtor,
++	};
+ 
+ 	/*
+ 	 * The mm_cpumask is located at the end of mm_struct, and is
+@@ -3204,12 +3229,9 @@ void __init mm_cache_init(void)
+ 	 */
+ 	mm_size = sizeof(struct mm_struct) + cpumask_size() + mm_cid_size();
+ 
+-	mm_cachep = kmem_cache_create_usercopy("mm_struct",
+-			mm_size, ARCH_MIN_MMSTRUCT_ALIGN,
+-			SLAB_HWCACHE_ALIGN|SLAB_PANIC|SLAB_ACCOUNT,
+-			offsetof(struct mm_struct, saved_auxv),
+-			sizeof_field(struct mm_struct, saved_auxv),
+-			NULL);
++	mm_cachep = kmem_cache_create("mm_struct", mm_size, &kmem_args,
++				      SLAB_HWCACHE_ALIGN|SLAB_PANIC|
++				      SLAB_ACCOUNT);
+ }
+ 
+ void __init proc_caches_init(void)
 -- 
 2.43.0
 
