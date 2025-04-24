@@ -1,95 +1,95 @@
-Return-Path: <netdev+bounces-185670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174AEA9B4B3
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:55:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB194A9B4B4
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70DC29A783A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:55:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2932E9A72E0
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B75828A1CE;
-	Thu, 24 Apr 2025 16:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C67284683;
+	Thu, 24 Apr 2025 16:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Edhor5B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XQDxohou"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8144928BAAF
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30941281529
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513576; cv=none; b=QBy04v50jxYoTvulE3B0OKE/QyWmUI2JO2v+TVxShH8TMVfgZKBKKDYxqguzQ7zNPIJVsoq2D4r2WIYCcVcTpbRgTcsoB6Ceu+9+5WgcHg+0ikwhBcyJQ2ZUDQlaITRYvHpCVbfhttwgQSRriG37TrBvzLEjWUvPus0yQlwzD6A=
+	t=1745513600; cv=none; b=NMq73Gnp6+0WVMiPGpEuefgWNk8MYa/OWliKqcls5depHkZCk6VBvZdcnh5bKeABcuiJvG9HLY9x7JAcEDZ6HQUOdgMO0fz+qdp2aCGK73LseVrmOiJrxN39C8QIsaLyvxBuOaCcDs+koJs1y/Gaej11xFd+Ud0C5niKBH1HZ9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513576; c=relaxed/simple;
-	bh=gLPdqmdR15dvvugXKFWgaDMmlP55hysaDHBLMsTxmUw=;
+	s=arc-20240116; t=1745513600; c=relaxed/simple;
+	bh=BtDZ/uOAPNgdKD05LE8UeBHthyMo5FZqHgOyzg4/5/s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AbZMv/GYVfVh6e2s8ybx/0XyvkcuUt+LPiPxjoeDp8udyLC4TpetGPQtVBP48TPqtq0+dkytR4XCwC7vRH+QpLJJkE1dlvwIVRdnNxYmc8o3rULX3UpePQzQR1FMPgJAFmNFrt80/sBrz0d+OWXfKtdegV3xK/Nb2N8IaGPWjj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Edhor5B; arc=none smtp.client-ip=209.85.222.174
+	 To:Cc:Content-Type; b=Sr6H6LcC7y+FrYWmyaWSe75vDOoaP4fz66EIjDGARTnj/dXS+B7WJ8hLSSpI8kN96krft4nuyeUSJSwnBNbbP9z8DaCeWR2g1PEELBxeL9h0emVLfw0muLEobt5xaGTiHwq1ja6kWaUrDtGZAxPsEeimRWTPyzqvQKQQFbogJvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XQDxohou; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c08fc20194so276090685a.2
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:52:54 -0700 (PDT)
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-476977848c4so15791941cf.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:53:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745513573; x=1746118373; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745513598; x=1746118398; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gLPdqmdR15dvvugXKFWgaDMmlP55hysaDHBLMsTxmUw=;
-        b=1Edhor5BjcZXCDPDTD0wvTJUFNacGH34H4XoF2XOF9kUxI3PVRp6fvt9DUYjwJmwEB
-         pp5uLLnF0C5DduJC0Zo7NORQUGoEluIUiyc4i4k1uIqGKb0SZBewSkmbNJPMBLliZnt8
-         9YqiSf3vSmnN25WGVWhDZrmSEWbWKnZJdrSikw8b7ULVQRy8tvxBDc+XAv3m/8/E1hg4
-         Cyr8bWJfzH/nMABk+bxXZJ8J9mxpFpGKR11jHwTi3URNmjeffBO1p+2UKF0D2vkqc76S
-         J6o4pRxnMu9k6vW7p0fEUE3cvDWXpanIuEmeyRiDbQT1OgJOtOpbBKLb3JcuKKaRBa+G
-         qLEw==
+        bh=BtDZ/uOAPNgdKD05LE8UeBHthyMo5FZqHgOyzg4/5/s=;
+        b=XQDxohoutJK7XdioKx7FtWeUxk+ZsRZ5UCXMIAWywktiaKFyDeFK2eALtBFXF8CV4G
+         XwKhFddxAZRfeWHmWWkhVfS16XkbmYXwVoIKID9EzAgmBjtAM0jQ7ZyAoBT2WlbYAG6H
+         PQNObWIKkATGfjlCTO4HvE5xfy5D/27plIKQC7kWcYYV6vTedRjz2wlzC8S3aSt8ln/r
+         f1wM+XyYftUOJD57X0t80epuzT/UUQFdxxfQT4K40Q5vb+9cxxsm1Fz5cOuZG+2xa5qa
+         8/8NNV8nfDSLIULhPBqiRFbEOTGO97a+ZXvkeorver+0mppUx6MGzaidKjI1BYMmp+QM
+         JMUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745513573; x=1746118373;
+        d=1e100.net; s=20230601; t=1745513598; x=1746118398;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gLPdqmdR15dvvugXKFWgaDMmlP55hysaDHBLMsTxmUw=;
-        b=CSYcdsfXe9/zlAqo9e6UB5tuTSrflwZgNSMlg4PXS40E6oaeQW58SqHDYzAJIScTyW
-         1RL2Jf+xTpYR68MfXywopJv1zpXtNNrsBdcbe3//tIApiMJLiZOZbo/i0tvOc9KYvcHG
-         6RUl9idUGx02hhwMN8/9ttj9EGfqIALhQlcKQSzbkdQuhcVp0dftSDt2K+N9bc011zUa
-         Mb640/p3oj08SHyI6MNI7S1XqazIdclUg9bMbm+ktwWtIpcjr0NcQ0ugjVHQUjD2EwSk
-         01tX9oxJc8AjmPU46cYqhDTpHq7lsrhIGdt+2G5EecYOTbz4wx4ye9jQ4mWKUTf4MQyM
-         N0hA==
-X-Gm-Message-State: AOJu0YxTuA9anZyxlYIMW0C4+lKYbEBFLUgPl1A7Q4ghblSBsxaSMBLM
-	pLBchy3cgwPlueQwX+VdEMMrQGZN92Iqn6tyy9NVWrJdlMYNZLbsI4GsCVKsHnAo6bMPWSfsLIy
-	N2IdbOtL/rf0EDADm5xY2u+KzOwrS6REmGZq0TFcVxTFgLrEUwm4i
-X-Gm-Gg: ASbGnctispjqCKnc7j4YzDRjCEutq/SpMBL0HtAClX06QZtyyU68lgJxv7Hn4HIBvHo
-	B/rX32fuTD1a4C23KH39pXYd9ZpxujkEueqn8aaerEN3q26iXTAGYI12ul7iYk/ZX/qkMgbORKF
-	Ife+X/ixXj2H4bIP30U/fOAjXD6SLLDhjZEP2R9LOBQjh884dc12E=
-X-Google-Smtp-Source: AGHT+IH8A4Tz/ZWhvnH5N7SsRgB/5THNjno92rB5MQuE1IXHWPuMdA8htyrgADGW4xm5M1o69eSmQaNg+/wJ/DTjyHE=
-X-Received: by 2002:a05:620a:248d:b0:7c5:592c:c26 with SMTP id
- af79cd13be357-7c95ef0248amr18923185a.19.1745513572951; Thu, 24 Apr 2025
- 09:52:52 -0700 (PDT)
+        bh=BtDZ/uOAPNgdKD05LE8UeBHthyMo5FZqHgOyzg4/5/s=;
+        b=RqBJulbvmoDwdoGsPHbr6WoI543PcnONriZ1nITtPR7bnHk0rtOLGj2bOSxtEQDrmz
+         i8NhTxfkxaEMcG11BMT1MIQbq6Kgrx5qkj9RwT7CfbjsLSBQwfItQrax4re/Xfo3iKM6
+         pVC7pg6Whny05q5qmLdUAvOvdjLRcgRnVdJwyulEmSXbHrkvI0pCLe8BlMxAaZsAszBi
+         Dkd1uCkeXZ1eVYBwNCIL1JfKsxPCL1j3I6UWsCOD8W22TBM9zfo5xF7Jb7jYyZOiDSy+
+         DaRYfTUDH4bUCSgDmor0Mq84aWwsbiYZB961B1gUQFWD/BAsgk8u3M8M0JDr7L7ohear
+         g4KA==
+X-Gm-Message-State: AOJu0YxlPpffnRqd2/1uqCGhM4tHsHVO54RNFgF+BObLmPa++QC/nuiC
+	CHEqsHv48oW6faDXu+VPwWtKa0h4LLPh39aXaW9Bb8mbrSuI9PSq9S593xh7U0jkD4yQvoSC5eN
+	RaE0Cvb5B6KB6+T+IuyeL71yuMjuINUYy5jTp
+X-Gm-Gg: ASbGncs+ku4WMAxLAVNVnVieQOX9G6002RYAR77BZ2lUxwWzCpguBCMETHLHn+5pAaM
+	Rp+Jfs2UsqeHj2j/n+Kz1VzNPcFHfqVciIOS05sQq+uY/QBgOm8WwpE30LuYDK5jBPGhF3fGKEm
+	SA+vhbE3GIxAPThwpYf+U1DgrEoiJT6SdakeMeFsmVzE9WaKmJAQI=
+X-Google-Smtp-Source: AGHT+IG0l41A626LjXWPw2bv29zJO4YzEm9zskSprdsGPA8voum0ytqo5LTa/JAneLe2b3Nu5YciEb5XckhRns3Deyc=
+X-Received: by 2002:a05:622a:1a92:b0:476:8825:99ba with SMTP id
+ d75a77b69052e-47fb9bd6d12mr5462331cf.12.1745513597777; Thu, 24 Apr 2025
+ 09:53:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423124334.4916-1-jgh@exim.org> <20250423124334.4916-2-jgh@exim.org>
-In-Reply-To: <20250423124334.4916-2-jgh@exim.org>
+References: <20250423124334.4916-1-jgh@exim.org> <20250423124334.4916-3-jgh@exim.org>
+In-Reply-To: <20250423124334.4916-3-jgh@exim.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 24 Apr 2025 09:52:40 -0700
-X-Gm-Features: ATxdqUETivVbemdZGQPoJC_MxXJWhMksVTto24tbgUP8-g9QPtn-NKq7sUcwJoE
-Message-ID: <CANn89iJa3iRUAY4MM-uqf5aBz_z9Gz5iUg=4b4-0pq3ZY3YYJw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] tcp: fastopen: note that a child socket was created
+Date: Thu, 24 Apr 2025 09:53:07 -0700
+X-Gm-Features: ATxdqUEKRXNtaj5prXssaz2nuXK1JCOI89dxT0q3IKQbXxmHJaCgSoAxoBJYsqs
+Message-ID: <CANn89iKCwxJrF4y7M34=mva_Z1-+UA2YwgD56MBi+3_YkGxzZg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] tcp: fastopen: pass TFO child indication through getsockopt
 To: Jeremy Harris <jgh@exim.org>
 Cc: netdev@vger.kernel.org, ncardwell@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 23, 2025 at 5:43=E2=80=AFAM Jeremy Harris <jgh@exim.org> wrote:
+On Wed, Apr 23, 2025 at 5:44=E2=80=AFAM Jeremy Harris <jgh@exim.org> wrote:
 >
-> tcp: fastopen: note that a child socket was created
+> tcp: fastopen: pass TFO child indication through getsockopt
 >
-> This uses up the last bit in a field of tcp_sock.
+> Note that this uses up the last bit of a field in struct tcp_info
 >
 > Signed-off-by: Jeremy Harris <jgh@exim.org>
 
