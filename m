@@ -1,151 +1,117 @@
-Return-Path: <netdev+bounces-185457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCBBA9A740
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:00:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00DF0A9A781
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:15:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1861B3A480D
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:00:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40C537A8E9C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E8A20FA81;
-	Thu, 24 Apr 2025 09:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9D52147F5;
+	Thu, 24 Apr 2025 09:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jcypkW7F"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jvPWtqIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352601B040B;
-	Thu, 24 Apr 2025 09:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1834D214A82
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745485226; cv=none; b=DGG4r3b0iO4/mqSPU3z0AFdDBef/SIZmiJ71InAwhUchJ/L5JzjH/OwHAtOve3a8itnwmgfTSv55awixFnyfKaOcYzYeHMJu34eqzo0Gk+ll24f8pRN8X9Vg+FXHdg+zO19oRjZhePm7GkAezlXyIWqOSuQQFajXBbhoPImQz1c=
+	t=1745486107; cv=none; b=a+CKbT2f4jrpRuZEq4MWBoXFib6aPyx3XkaBZdALoBLzcpUrWz/Qjqnt++lCA468qbQMbNajyplLdYJOsQuECPHja1zGVYw+syBgZ9uxuqLyMWl/VCy2q7PHNsJsOc10L2WvSvfGoFXI2lERbJPnBSv0KvwtRkViuEtjYmr2w54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745485226; c=relaxed/simple;
-	bh=6XlOeIX5DFdyUH7bU5Ran0PxpsOaq5kec09H/AqAeao=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDgORbB5BsAwjv/mQ85b/1/Vcjt3d8CsBYqbHB1BW+FICpBhgdidQlmNgXC6Ur1YuUbKjIz0k4pn6rOQLO4nEhevAgsGIbJKAGfhTVGRAjeA2iIoeZhot4+tbP8F0BGb4lq2bEqGhc9pwvmZUnygC66+N0VAjw0zVEhZ178xiK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jcypkW7F; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C5751FD49;
-	Thu, 24 Apr 2025 09:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1745485221;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pooxYcLlso5X9PgctTi94ch/h3HZMgeI7AqpszR64TU=;
-	b=jcypkW7Fjm85xp6+6OFzcDVNgyKuzZAYFyUrl0btlCMo+PfwciKY0nAzzvdFLIGlLuQI2L
-	/NXaCsvzjk9AyLgPB8ebEuQhxMGQeMgDpO81Dvf+WNwK79jKxx3h6LrNZ0fYbx3uiDSXA3
-	Abk/vJ70RfIvAI6Bs4n9gSFyFumszcRtuS5nxdfXh1Ep4qgtkvQx5OOYizFh/ICHjYKIm9
-	0eii9J9TtWLI5+ysC8IB0bLVbFUdDSSAnnxGpW4uiZDLJuIAaFTmCCWTR2Vka2kdW7l6w2
-	3o5LYvUVN59Mv/50tSq5jcby14C2gj6Q0bAP2/fWC+0F1h/DGCU7o/9FJMR21Q==
-Date: Thu, 24 Apr 2025 11:00:16 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Biao
- Huang <biao.huang@mediatek.com>, Yinghua Pan <ot_yinghua.pan@mediatek.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>, kernel@collabora.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2 1/2] net: ethernet: mtk-star-emac: fix spinlock
- recursion issues on rx/tx poll
-Message-ID: <20250424110016.009acccf@device-40.home>
-In-Reply-To: <20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-1-f3fde2e529d8@collabora.com>
-References: <20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-0-f3fde2e529d8@collabora.com>
-	<20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-1-f3fde2e529d8@collabora.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1745486107; c=relaxed/simple;
+	bh=in/2y0YoZ2yZl4c/CdwB/cwwywlW21ZOpJuMU1dwn4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q88z5KJ3LQEp7FrO5jtSio/FhQ3WS5i/jU2pWF0cxlWNhYXZ0IRf54RcxEnFfOgPLg3yqH3g6M8z/YgBmOHGdFn3Gj3P4eIwOdAf/275iFUpV1N+km7JOouti7uAOGC5OQ+kamnpKevQV+HLsbhLPSjFUAeLFIn/VysOTxIgV+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jvPWtqIf; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-39ee5ac4321so835373f8f.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:15:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745486103; x=1746090903; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FiDsSnC1Jo5moXRMw1WQLWKEZeoWVNhukmu1XrjYXeY=;
+        b=jvPWtqIfdVjnSX28jiUUf1CSUCgNEtlAtBpLVw8uqfBW+AJmKN6ApudLvhZ2aEwGz3
+         kh9pzFeKToNQCYIfr0gIcylpRyYvSEr45Wf7AO0+nJgz+MI/MgrzKizlIJoG+xu+xtpu
+         +Z9ohwv4XvXZGKg7PdtagyUHPgAGmxkfOzWodWFAsMkPQpUE5Ex19DgRNKvzNmKlxvKA
+         mVxCssF1btpuo4FHCgdXPHtUzlnUGmhp7vhS3ZeEMIBfGFbgB+/G7mXsmR4ppcqRk/mH
+         0TriowjfPNsHG7DeGFUmhIkw6l4tsc7PS1I4EKeapQRaK0DHLfGDBhnb0ALTANb9UJYR
+         RnAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745486103; x=1746090903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FiDsSnC1Jo5moXRMw1WQLWKEZeoWVNhukmu1XrjYXeY=;
+        b=EwPlcJ48EJ8UL17gi3XlxGGuwDdCn9QuHjCpE6Tz+vLMh/036Wohg9pl8TG7XQcO+l
+         +6JlAyPOwqX/Sw17+8x1EvQqvBvM2dGowcJuHtEsHO2BQpQJqCT1K3L/TWUPX2M3pmjr
+         6CgBsMFlAdvUbwO6jqgQQCOgETAW9tvkkg3cXmBgnyUMVgHyQzeVSBf3soT6bnYpy2on
+         l8n1tlmcfgNrKqmRGSA6c9vukoKAVUuBK65weZJQpAC0dgF56Tas5DI1jG5e5evsos+W
+         2b3NL7rEeOkOs00/KQyZrhOpSB9ZUb2ZaqpCXTRN+KPLkwcAaNYoSumZTS+JeC2sdztb
+         hLww==
+X-Forwarded-Encrypted: i=1; AJvYcCWJFWM9xVcRSFLYwEIEThygsdmkgAXeU46s2u7fDuWHgeygM2FvA74e0sMKnusm+lcrOlRu1go=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrzV+K763EPqy3RaR1ss1VBwV6KxCPjN1h6mWv1XZEkJQawiIC
+	6/YG5vYuRYhEeBm8JKb2uIky/uNdm8bn0W6a6PUCQ2ykU5WZYOPf7wIYMS9Qjgo=
+X-Gm-Gg: ASbGncv+BBnUQOIkjt2Lq7PhArLi04y41V+vM/6ZqrVK7lZPb3gnKjU7HDZPSZgcE6D
+	rVbXEifiVZ652txi3h13cVdl9SQTUlY/Phor12JaGopDMUv4P6lZvrGQd+0JouDZFdgnpMEGbWg
+	nlz97SnAU01ntEUu8TkjOpQrR9quKjL/4A4jjaM1KdVV/2FQXzquObX5cvoq/W8PODkKiLGIzkR
+	mvV5QMs9FVM+Jk7tW74g75GKvznlfM4/L/k8vsySjahw5bPS4KSw+CJ8wtLd/vq4vIWjwvkb+6l
+	cpxUX+ebkucH7eMfm7S4f230acvmBWKFmU69bk+dE8Xn3V6VkpLx+A==
+X-Google-Smtp-Source: AGHT+IH4I/sbwt8HJrCkcK469I5qqmyCDqdV1L4VN/TndZ6j/MVQ4zf96BLAR38phUwb523qaIQTTw==
+X-Received: by 2002:a05:6000:186c:b0:39a:ca05:54a9 with SMTP id ffacd0b85a97d-3a06cf61cefmr1132529f8f.29.1745486103059;
+        Thu, 24 Apr 2025 02:15:03 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d532aa9sm1439089f8f.68.2025.04.24.02.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 02:15:02 -0700 (PDT)
+Date: Thu, 24 Apr 2025 11:14:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V2 01/14] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <djjwnxpqfcngooptb67pvelhdb4n53elnfgvq6wqjql2ss4egr@osfsq5ccs2tt>
+References: <20250414195959.1375031-1-saeed@kernel.org>
+ <20250414195959.1375031-2-saeed@kernel.org>
+ <20250416180826.6d536702@kernel.org>
+ <bctzge47tevxcbbawe7kvbzlygimyxstqiqpptfc63o67g4slc@jenow3ls7fgz>
+ <20250418170803.5afa2ddf@kernel.org>
+ <v6p7dcbtka6juf2ibero7ivimuhfbxs37uf5qihjbq4un4bdm6@ofdo34scswqq>
+ <20250422075524.3bef2b46@kernel.org>
+ <ccwchffn6gtsy7ek4dhdqaxlbch4mptjqaqmh43a3rk7uu6dxu@jfua3hr6zxvw>
+ <20250423150735.566b6a52@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeeltdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopeguvghvihgtvgdqgedtrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehlohhuihhsrghlvgigihhsrdgvhihrrghuugestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopehnsggusehnsggurdhnrghmvgdprhgtphhtthhopehsvggrnhdrfigrnhhgsehmv
- gguihgrthgvkhdrtghomhdprhgtphhtthhopehlohhrvghniihosehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423150735.566b6a52@kernel.org>
 
-On Thu, 24 Apr 2025 10:38:48 +0200
-Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com> wrote:
+Thu, Apr 24, 2025 at 12:07:35AM +0200, kuba@kernel.org wrote:
+>On Wed, 23 Apr 2025 13:12:56 +0200 Jiri Pirko wrote:
+>> >Coincidentally - you added it to the YNL spec but didn't set it for 
+>> >the attrs that carry the values of the enum.  
+>> 
+>> True. Will drop it.
+>
+>Hm, drop it.. in? I mean you should set:
+>
+>	enum: your-enum-name
+>
+>on the param-type and .. fmsg-obj-value-type, I'm guessing?
 
-> Use spin_lock_irqsave and spin_unlock_irqrestore instead of spin_lock
-> and spin_unlock in mtk_star_emac driver to avoid spinlock recursion
-> occurrence that can happen when enabling the DMA interrupts again in
-> rx/tx poll.
-> 
-> ```
-> BUG: spinlock recursion on CPU#0, swapper/0/0
->  lock: 0xffff00000db9cf20, .magic: dead4ead, .owner: swapper/0/0,
->     .owner_cpu: 0
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted
->     6.15.0-rc2-next-20250417-00001-gf6a27738686c-dirty #28 PREEMPT
-> Hardware name: MediaTek MT8365 Open Platform EVK (DT)
-> Call trace:
->  show_stack+0x18/0x24 (C)
->  dump_stack_lvl+0x60/0x80
->  dump_stack+0x18/0x24
->  spin_dump+0x78/0x88
->  do_raw_spin_lock+0x11c/0x120
->  _raw_spin_lock+0x20/0x2c
->  mtk_star_handle_irq+0xc0/0x22c [mtk_star_emac]
->  __handle_irq_event_percpu+0x48/0x140
->  handle_irq_event+0x4c/0xb0
->  handle_fasteoi_irq+0xa0/0x1bc
->  handle_irq_desc+0x34/0x58
->  generic_handle_domain_irq+0x1c/0x28
->  gic_handle_irq+0x4c/0x120
->  do_interrupt_handler+0x50/0x84
->  el1_interrupt+0x34/0x68
->  el1h_64_irq_handler+0x18/0x24
->  el1h_64_irq+0x6c/0x70
->  regmap_mmio_read32le+0xc/0x20 (P)
->  _regmap_bus_reg_read+0x6c/0xac
->  _regmap_read+0x60/0xdc
->  regmap_read+0x4c/0x80
->  mtk_star_rx_poll+0x2f4/0x39c [mtk_star_emac]
->  __napi_poll+0x38/0x188
->  net_rx_action+0x164/0x2c0
->  handle_softirqs+0x100/0x244
->  __do_softirq+0x14/0x20
->  ____do_softirq+0x10/0x20
->  call_on_irq_stack+0x24/0x64
->  do_softirq_own_stack+0x1c/0x40
->  __irq_exit_rcu+0xd4/0x10c
->  irq_exit_rcu+0x10/0x1c
->  el1_interrupt+0x38/0x68
->  el1h_64_irq_handler+0x18/0x24
->  el1h_64_irq+0x6c/0x70
->  cpuidle_enter_state+0xac/0x320 (P)
->  cpuidle_enter+0x38/0x50
->  do_idle+0x1e4/0x260
->  cpu_startup_entry+0x34/0x3c
->  rest_init+0xdc/0xe0
->  console_on_rootfs+0x0/0x6c
->  __primary_switched+0x88/0x90
-> ```
-> 
-> Fixes: 0a8bd81fd6aa ("net: ethernet: mtk-star-emac: separate tx/rx handling with two NAPIs")
-> Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-> ---
-
-This looks correct to me,
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
+Okay. Makes sense. Sorry for me being a bit slow here :)
 
