@@ -1,100 +1,105 @@
-Return-Path: <netdev+bounces-185703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C230BA9B6BF
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:52:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DBEA9B6D1
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E04EA927579
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:51:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AD217AE04C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1952820D0;
-	Thu, 24 Apr 2025 18:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621E3291159;
+	Thu, 24 Apr 2025 18:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qiottNsh"
+	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="NQaIx+3H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [178.154.239.213])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656D1155342;
-	Thu, 24 Apr 2025 18:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52C7290BC0;
+	Thu, 24 Apr 2025 18:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745520715; cv=none; b=YFT061CCTpLuBc69c2XD+bGx3VBYobgyKxIPxfPKFvH56HshemHsHrxRDgJJtiqLGBJN5ylMV8OEKQSVpOUbi+xx0D+kfrIoqvyb1iSrf1LCrY45HfGQL6AFdXxV9+MuK+bqY/uBO1udyxQB7XLlHODLmZaxAxI8o8hhVKK4L8I=
+	t=1745520781; cv=none; b=f43VPU0lXBRD7g5Xh2e92j4rNJQwnN0yJyyV5rrakFBLI75ZFZRQriCMulQ+YFdRHriS9w8Yhkz5BatdWzCrlwQldx27/2Z+Bpqp1EcG9b+iFQL4bEeIYHhnpi+qclLoVqwZu6Qs7Zpjju99EJbGZ+vSPnVCJB8Lp4vVhH6BHdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745520715; c=relaxed/simple;
-	bh=v+0hjcLc+iKWUqMJmXjTqbssY3oDq1sDVgbQL6UbPqs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ro05mX0RsTCFS5Ye4Ip39U0u7Fbz0yoU2y3A5iKXE14wk7k/9bhepUooAUiAWXQ1lu3FmWwirYqzbN8F/ptCeCvjk7I5b6CbJk1hs8hp0BkfixZOwamNWorM/Yi88qkrk38uixR7uXcUYHRh4CK3JU5CxsiOnTWJ5TfgdS4nThU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qiottNsh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B92DAC4CEE3;
-	Thu, 24 Apr 2025 18:51:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745520714;
-	bh=v+0hjcLc+iKWUqMJmXjTqbssY3oDq1sDVgbQL6UbPqs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qiottNsh571nFLJULZWcKjrVK3UAryulXSZb7xkhJGDxbt0cvlo5EMuuP2RGsSaTF
-	 g9ytTykWxqAyb1MQNKJAdsaBAlA921HpgqDupGBXu5GHAUVuhPqeSDKiDIMg8uG0n9
-	 SZIxWKGJTu20l8QYdT0DtOVppbEt0LYIM9Uz7780=
-Date: Thu, 24 Apr 2025 14:51:51 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH 0/3] selftests/bpf: Fix a few issues in arena_spin_lock
-Message-ID: <20250424-imported-beautiful-orangutan-bb09e0@meerkat>
-References: <20250424165525.154403-1-iii@linux.ibm.com>
- <174551961000.3446286.10420854203925676664.git-patchwork-notify@kernel.org>
- <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
+	s=arc-20240116; t=1745520781; c=relaxed/simple;
+	bh=OygmFMPByzJxZQZ/STA64KpZbimdRAppuLQsI9S0AGM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=izdCf0/eDERdiZPv/A5YrFEIo+CAfeKnNvQb4x85nK643ZpSTPkry6HHy3GZ4AC0hiYyKo8pVLGVcsNF+8wMD8ANpPzzpSZq6kggBPjwpgc7kVwAzcwfzb4wIqVKHeoy6LM89n8F3V/l+8xWYO+YRhaaja6rM02+Q/57q1we2aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=NQaIx+3H; arc=none smtp.client-ip=178.154.239.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
+Received: from mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:bca8:0:640:45be:0])
+	by forward102d.mail.yandex.net (Yandex) with ESMTPS id E49B860983;
+	Thu, 24 Apr 2025 21:52:48 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id kqV2ll1LoCg0-foSXLjIP;
+	Thu, 24 Apr 2025 21:52:48 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
+	t=1745520768; bh=eUvSEcjM3P32iq/WojbrYA0IxejTJGbUaeImRlzSclk=;
+	h=Message-Id:Date:Cc:Subject:To:From;
+	b=NQaIx+3H/okY2atnyMu/dUv32bXBU42WHY0TqPoEtI0QKqKM7F3Odw+FQWp5HAGP6
+	 ZBAvJn6f8+pj2lYidSh1sQvnQfLx+lIlahix+d3S1hqxecKxU2QdhvbrLawUMkm1uH
+	 iP7xJkGEjh2ox33wGR52SZk9Q6JftyrFHnOSesUA=
+Authentication-Results: mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
+From: Alexei Safin <a.safin@rosa.ru>
+To: Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: Alexei Safin <a.safin@rosa.ru>,
+	Kalle Valo <kvalo@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in il4965_tx_cmd_build_rate()
+Date: Thu, 24 Apr 2025 21:52:44 +0300
+Message-Id: <20250424185244.3562-1-a.safin@rosa.ru>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
 
-On Thu, Apr 24, 2025 at 11:41:16AM -0700, Alexei Starovoitov wrote:
-> On Thu, Apr 24, 2025 at 11:32 AM <patchwork-bot+netdevbpf@kernel.org> wrote:
-> >
-> > Hello:
-> >
-> > This series was applied to netdev/net-next.git (main)
-> > by Jakub Kicinski <kuba@kernel.org>:
-> >
-> > On Thu, 24 Apr 2025 18:41:24 +0200 you wrote:
-> > > Hi,
-> > >
-> > > I tried running the arena_spin_lock test on s390x and ran into the
-> > > following issues:
-> > >
-> > > * Changing the header file does not lead to rebuilding the test.
-> > > * The checked for number of CPUs and the actually required number of
-> > >   CPUs are different.
-> > > * Endianness issue in spinlock definition.
-> > >
-> > > [...]
-> >
-> > Here is the summary with links:
-> >   - [1/3] selftests/bpf: Fix arena_spin_lock.c build dependency
-> >     https://git.kernel.org/netdev/net-next/c/4fe09ff1a54a
-> >   - [2/3] selftests/bpf: Fix arena_spin_lock on systems with less than 16 CPUs
-> >     (no matching commit)
-> >   - [3/3] selftests/bpf: Fix endianness issue in __qspinlock declaration
-> >     (no matching commit)
-> 
-> Hmm. Looks like pw-bot had too much influence from AI bots
-> and started hallucinating itself :)
+Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
+rate_idx values greater than or equal to RATE_COUNT_LEGACY.
 
-I'll look into what happened here.
+Use a correct bounds check to avoid accessing il_rates[] with
+an invalid index. The previous comparison allowed rate_idx to become
+equal to RATE_COUNT_LEGACY, which exceeds the array limit.
 
--K
+Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
+'rate_idx >= RATE_COUNT_LEGACY' to ensure memory safety.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
+Signed-off-by: Alexei Safin <a.safin@rosa.ru>
+---
+v2: change reciepent
+ drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+index 78dee8ccfebf..f60d9b9798c1 100644
+--- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
++++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+@@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
+ 	 */
+ 	rate_idx = info->control.rates[0].idx;
+ 	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
+-	    || rate_idx > RATE_COUNT_LEGACY)
++	    || rate_idx >= RATE_COUNT_LEGACY)
+ 		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
+ 	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
+ 	if (info->band == NL80211_BAND_5GHZ)
+-- 
+2.39.5 (Apple Git-154)
+
 
