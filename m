@@ -1,110 +1,166 @@
-Return-Path: <netdev+bounces-185535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7BEBA9AD34
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:23:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 782DFA9AD77
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7F3B19452ED
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:23:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AA897B67CA
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A55F22B595;
-	Thu, 24 Apr 2025 12:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BF3230BF8;
+	Thu, 24 Apr 2025 12:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmqWHxIN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QD23BqKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAC9157A67
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190E8230BC0;
+	Thu, 24 Apr 2025 12:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745497385; cv=none; b=XSqzwjyKyOKN9hULWK9uyXOW93AU4JJc2rk7Y92gvxwziz8pSZ3bFsWPcgftFVaK5/a22DhrCdy2jsVlAmVMXrOTB1QVnZUSc+RE9n5PaV7htuNY4dam4PXZaO5I4W0I8OPWym+lkISKOVxlOId3UAFC6IC1gFQWbZB3QrLePoI=
+	t=1745497514; cv=none; b=RxEm1Q4e2xNslnNv6LEq/iik7aJgf8Sb369SfQFt5OOBSRX8MmlwNXaiDeYbeVtjFZtjt/9iHvX7cNWCvrR2kgmEWzHYdT6VD3W228CDCJ9hGlbEB+IqQ53izn6Cvq0UllwJS1pu1IuG8nkq8wXxeH8y1MUwVd4PGgEnSxK+rdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745497385; c=relaxed/simple;
-	bh=e6TIk1k6gaYrJri9pmd1FONaT03IBpI7iPR3MjIaPbc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=M+nkB8gEmSTg6bV/8pPO1qGPGfr1HyOI1CaAYKWZnCYI4VskAhoNyVPmqv+4xuMyIbPQ5Vmxt/wd0GhacFnHTB6F7jiw8C5HSJXat/m7pIe/a8opM85/goyJMBjzv7+ZrsrQipvdD4CfFULNt9UXKSzrQJvcEMMAe4sPQ9J/vu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SmqWHxIN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745497382;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y7Ap0RPtUmDAb/aCd6HFvT2KxgtdQAWYYK6uDU1o8uU=;
-	b=SmqWHxINchybyE9J+aLRN8TnLysJw0nDO4XDebNN+eFmC4ArW+hbG8TiZ31Kyz1AoWBKup
-	bT7wDEkxnntg5w9MNGZv49ZkboHUOaZ3Jv3QCMI62Dhqo/QZMk2DQdYCjz25eLGiQJPW/2
-	tsh/0FMN8Jlla+LSKJnQkQ8IF1tNNxw=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-151-6UyWrLWYO1--sLyphaECkg-1; Thu,
- 24 Apr 2025 08:23:01 -0400
-X-MC-Unique: 6UyWrLWYO1--sLyphaECkg-1
-X-Mimecast-MFC-AGG-ID: 6UyWrLWYO1--sLyphaECkg_1745497379
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 552AE1800360;
-	Thu, 24 Apr 2025 12:22:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0E097180047F;
-	Thu, 24 Apr 2025 12:22:54 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250422235147.146460-1-linux@treblig.org>
-References: <20250422235147.146460-1-linux@treblig.org>
-To: linux@treblig.org
-Cc: dhowells@redhat.com, horms@kernel.org, marc.dionne@auristor.com,
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-    pabeni@redhat.com, corbet@lwn.net, linux-afs@lists.infradead.org,
-    netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] rxrpc: Remove deadcode
+	s=arc-20240116; t=1745497514; c=relaxed/simple;
+	bh=H85T7UL7vYG9a6vaHAoCybvewWCdAIkCbhDvrv1eS+M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GRjwWRcNGe/vNXlPwbQBTX+eoCZuLo73aDxKonfdP3TwizA7pvVTN1ldwM/jw5F4QgBd2mskIa7EXhIUmyy+SWzS8+CYpwI5FaD64T2IZZlklHC4gLppEUrWniNxXS6082GUbConSe9eokwF8Ur6NMQLQuLg7rwThXoY/bp93W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QD23BqKg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF7E5C4CEE3;
+	Thu, 24 Apr 2025 12:25:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745497513;
+	bh=H85T7UL7vYG9a6vaHAoCybvewWCdAIkCbhDvrv1eS+M=;
+	h=From:Subject:Date:To:Cc:From;
+	b=QD23BqKgWk9drOUY4Y9QR6+T7l+8feIj5Yp/3k4t3zx5lbKVAMUrZsUDw6r6p/fQ9
+	 vyXFHapMSfJRVJPRVK/mmEKDxiHOMf4aPS2idnAcmBPaRGb3wa3UuRZ6MvAbYxU6gl
+	 ewoahy5JF31WAzBaYZ3Tpr+B6v2QYgvdH/gLqguFqt64pxQw1xgIKVHAyQO5widdgE
+	 6JNjBJRJ/X90jzfW251uhsGK8zRJX2mJXvn6pSJ8pZp5a0Kgvf1F+K7x6lsTHaaSaj
+	 d3PyyBIn6BEPa3HMKH8Vo9Bl3YNpjQzP4mNHibTcXgN0jp6gQ9cEL9yOZTFxXeTWvn
+	 xm3bq1mBNh79A==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH RFC 0/4] net, pidfs: enable handing out pidfds for reaped
+ sk->sk_peer_pid
+Date: Thu, 24 Apr 2025 14:24:33 +0200
+Message-Id: <20250424-work-pidfs-net-v1-0-0dc97227d854@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3098547.1745497373.1@warthog.procyon.org.uk>
-Date: Thu, 24 Apr 2025 13:22:53 +0100
-Message-ID: <3098548.1745497373@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIEtCmgC/x2MywrCMBAAf6Xs2S15aCheBT/Aa/GQx9YuQlo2U
+ gul/27scQZmNigkTAWuzQZCCxeecgV9aiCOPr8IOVUGo8xFnY3F7yRvnDkNBTN9MESlO22cTba
+ DGs1CA6/HsIfH/QbPKoMvhEF8juP/tdTWtdq1xwb2/QfFUJTwhgAAAA==
+X-Change-ID: 20250423-work-pidfs-net-bc0181263d38
+To: Oleg Nesterov <oleg@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+ netdev@vger.kernel.org, David Rheinsberg <david@readahead.eu>, 
+ Jan Kara <jack@suse.cz>, Alexander Mikhalitsyn <alexander@mihalicyn.com>, 
+ Luca Boccassi <bluca@debian.org>, 
+ Lennart Poettering <lennart@poettering.net>, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>, Mike Yuan <me@yhndnzj.com>, 
+ Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4056; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=H85T7UL7vYG9a6vaHAoCybvewWCdAIkCbhDvrv1eS+M=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRw6S7N0bq2fM3X7qRi7csRtho/shLD52q9uKqj8vli4
+ 6Tpa/dxdJSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAExktgjDf1eb1gvWkqv0Q50z
+ Ex/E3PwpxyEY33g+bqf7ywPHvpyI3czI8PGa6KHpUSd/5rKf4jddbqVzs9au+YjdItU4s16Vohf
+ r2QE=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-linux@treblig.org wrote:
+SO_PEERPIDFD currently doesn't support handing out pidfds if the
+sk->sk_peer_pid thread-group leader has already been reaped. In this
+case it currently returns EINVAL. Userspace still wants to get a pidfd
+for a reaped process to have a stable handle it can pass on.
+This is especially useful now that it is possible to retrieve exit
+information through a pidfd via the PIDFD_GET_INFO ioctl()'s
+PIDFD_INFO_EXIT flag.
 
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> Remove three functions that are no longer used.
-> 
-> rxrpc_get_txbuf() last use was removed by 2020's
-> commit 5e6ef4f1017c ("rxrpc: Make the I/O thread take over the call and
-> local processor work")
-> 
-> rxrpc_kernel_get_epoch() last use was removed by 2020's
-> commit 44746355ccb1 ("afs: Don't get epoch from a server because it may be
-> ambiguous")
-> 
-> rxrpc_kernel_set_max_life() last use was removed by 2023's
-> commit db099c625b13 ("rxrpc: Fix timeout of a call that hasn't yet been
-> granted a channel")
-> 
-> Both of the rxrpc_kernel_* functions were documented.  Remove that
-> documentation as well as the code.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Another summary has been provided by David in [1]:
 
-Acked-by: David Howells <dhowells@redhat.com>
+> A pidfd can outlive the task it refers to, and thus user-space must
+> already be prepared that the task underlying a pidfd is gone at the time
+> they get their hands on the pidfd. For instance, resolving the pidfd to
+> a PID via the fdinfo must be prepared to read `-1`.
+>
+> Despite user-space knowing that a pidfd might be stale, several kernel
+> APIs currently add another layer that checks for this. In particular,
+> SO_PEERPIDFD returns `EINVAL` if the peer-task was already reaped,
+> but returns a stale pidfd if the task is reaped immediately after the
+> respective alive-check.
+>
+> This has the unfortunate effect that user-space now has two ways to
+> check for the exact same scenario: A syscall might return
+> EINVAL/ESRCH/... *or* the pidfd might be stale, even though there is no
+> particular reason to distinguish both cases. This also propagates
+> through user-space APIs, which pass on pidfds. They must be prepared to
+> pass on `-1` *or* the pidfd, because there is no guaranteed way to get a
+> stale pidfd from the kernel.
+> Userspace must already deal with a pidfd referring to a reaped task as
+> the task may exit and get reaped at any time will there are still many
+> pidfds referring to it.
+
+In order to allow handing out reaped pidfd SO_PEERPIDFD needs to ensure
+that PIDFD_INFO_EXIT information is available whenever a pidfd for a
+reaped task is created by PIDFD_INFO_EXIT. The uapi promises that reaped
+pidfds are only handed out if it is guaranteed that the caller sees the
+exit information:
+
+TEST_F(pidfd_info, success_reaped)
+{
+        struct pidfd_info info = {
+                .mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT,
+        };
+
+        /*
+         * Process has already been reaped and PIDFD_INFO_EXIT been set.
+         * Verify that we can retrieve the exit status of the process.
+         */
+        ASSERT_EQ(ioctl(self->child_pidfd4, PIDFD_GET_INFO, &info), 0);
+        ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
+        ASSERT_TRUE(!!(info.mask & PIDFD_INFO_EXIT));
+        ASSERT_TRUE(WIFEXITED(info.exit_code));
+        ASSERT_EQ(WEXITSTATUS(info.exit_code), 0);
+}
+
+To hand out pidfds for reaped processes we thus allocate a pidfs entry
+for the relevant sk->sk_peer_pid at the time the sk->sk_peer_pid is
+stashed and drop it when the socket is destroyed. This guarantees that
+exit information will always be recorded for the sk->sk_peer_pid task
+and we can hand out pidfds for reaped processes.
+
+Note, I'm marking this as RFC mostly because I'm open to other
+approaches to solving the pidfs registration. The functionality in
+general we should really provide either way.
+
+Link: https://lore.kernel.org/lkml/20230807085203.819772-1-david@readahead.eu [1]
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+Christian Brauner (4):
+      pidfs: register pid in pidfs
+      net, pidfs: prepare for handing out pidfds for reaped sk->sk_peer_pid
+      pidfs: get rid of __pidfd_prepare()
+      net, pidfs: enable handing out pidfds for reaped sk->sk_peer_pid
+
+ fs/pidfs.c                 | 70 ++++++++++++++++++++++++++++++++----
+ include/linux/pidfs.h      |  3 ++
+ include/uapi/linux/pidfd.h |  2 +-
+ kernel/fork.c              | 78 +++++++++++++---------------------------
+ net/core/sock.c            |  4 ++-
+ net/unix/af_unix.c         | 90 ++++++++++++++++++++++++++++++++++++++++------
+ 6 files changed, 174 insertions(+), 73 deletions(-)
+---
+base-commit: b590c928cca7bdc7fd580d52e42bfdc3ac5eeacb
+change-id: 20250423-work-pidfs-net-bc0181263d38
 
 
