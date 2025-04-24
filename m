@@ -1,137 +1,113 @@
-Return-Path: <netdev+bounces-185464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D565A9A845
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:38:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F4057A9A8A7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:45:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AD2C1B8406F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:38:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4716B4629E5
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48412522A3;
-	Thu, 24 Apr 2025 09:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A1523D2B3;
+	Thu, 24 Apr 2025 09:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="uIKvko3R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mbl2UA5Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B025228B
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF0D23D29D;
+	Thu, 24 Apr 2025 09:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745487099; cv=none; b=foiX7VGDLMt/B2sfzIedqnuQyFINwJblQCFaEcV8n44dsezW8+iEc0t5veHhTco+leodSC9X7q2OofRalzq4dnTHZQBot3LTl7TQiTUfAatn91nZ7u6iECbISlBHjPUFjXlvd54BjYWoe2sUJPjVkzE6qEtyp3+jr7NV0/U9R4E=
+	t=1745487503; cv=none; b=aB/GreKzkXBvZBZPhzKMKCU0RrBqb5YaHc1K9+VftJN8TvhJ1hI9pi91A/Uio8AkYUg0cnSZ9BD6uAEnoO1ntsSY7XN68mbbsNDU2Y0gszMMl41jNYrT+515EayPydyS5Z2oowgUByb8fcfHkU+Nrtru4YfpWOI5ndtOAZxONGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745487099; c=relaxed/simple;
-	bh=66p9WhAjN8+qM6y4SLl6Y2ic3zePpmalXggNHuX8Ipo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MrnFm40aX4l6Z5QMIXoTTE22AfzRPQS40N7W7EuuKHcpIaEOByvruL/VFNi17ZScDb9T4E3xNpBhdaveLMKvfXAOXmlj5isYhBRZuxsxHCA/PDc0M3dSDf3qvW1AhFPV1ySplAcdkpq7RSMCFIKwp91fBzUdeVdlYcmhr455bA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=uIKvko3R; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54e816aeca6so27336e87.2
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1745487096; x=1746091896; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uVONgDkywsv0iUs1Rs/iF4ZeRFnwYCs7FWkvBJg2vb4=;
-        b=uIKvko3RW395roNqfFh04m3Pug1dXrRLK+GPiqVlWpXjQcmijTVmsE6FEthi2wEoVR
-         376ajPZpKjipFScRc3hPqpGNezCZShW5zZJmx6wSalo2idIQ2VoIaeyRZp2ZAe3Fu5Qs
-         y7T648Y2t+Bo5sKrd/ni7dNlsKzU9fjOrv3e5OIp3oVOz6WpCoNURJl3dbMqObB5Q5ya
-         lhwfDztU6ONTwHFRNQ3N0o29YPI4nZznK3GCY21hDHVJmzGyWzTquR+slxOoRKJr6rk/
-         d9zHkzE0y6rv/evqWFIzGZj8rzJ2n3IOoAvgfr8+QIfFvU0dd0IGsTq2Hqb0WM4I30rb
-         UHHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745487096; x=1746091896;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uVONgDkywsv0iUs1Rs/iF4ZeRFnwYCs7FWkvBJg2vb4=;
-        b=iIp7BXLyETD1xNjyl6AiM4g6A0ClK6hsYzs4CXhxRiEBurbtPXaaDf4PZT9oWIbQpY
-         7Po2Kag8z6JZf7083OlbKRwvrrY7AsqAofodaQaV7ti50IDn3qzDlqAfvrD+EKP4/wqD
-         d3i2OHrpCa27SEmDCxFS/PkFFrpK4KmOl0sWkbu74rTb0KYOnGn/EkHO6vD8EGJNVcq/
-         p5BRyNXRLqp5tev/EKsdmirXh5gaFgmhXsyEQ5XprSa6D2KTaJtTul/+iPc1u2bJMDIb
-         Sgt29Wy7l/l8SdrL50hv6Ws7DEz28ArJRtMAWXQOQaMKs252p7mj0DaeWmPXmj0Ft//t
-         cjSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUl1uSZCX2T0Qr8mKb+CtUYdXWoMRB+iCBhCbudO0m7as+noYB9Qcy+sfZmF3DNiJHjJez+XWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGKpZ0wWsD0GiHEI28RRqJIOPI4K/CTc/DpVsS7MSJSTnToX2s
-	LShIYUCpVUM6nmPyft9p1ug8knK6mWzs14dI/lvkTMhwB9soJ2MUt34cAEdTT/QiIvpTrEgoz3u
-	dBNtZ1Jd2BFHUNVVKpYQ8e7Y3JZueF7qqlGOxzQ==
-X-Gm-Gg: ASbGnctm8pujxbJM6JVqO/YF9P8nCFTxH5aYVwA//ZQZ733UAU/QrNMea7o8H2WdGeX
-	IcxLxLXXtv2UIK0AgHnTwIDZzhHHUtfsSfFLLjxRxoBDl5FKXfgskxH7UVKRqMzvcakFpP56xgk
-	VjL8gR3gYRfgFOh6XHCF+szYF/emG5DI8TePuo5M+mvP6qN9O7M/SkNg==
-X-Google-Smtp-Source: AGHT+IHGzfqVm5DiI57G06hdv0RbA4ie/G2gk+CyiEFdlczu0797VWCMAj3KLEFzAK3ogReXfsixBadmL2wpmlPxhpM=
-X-Received: by 2002:a05:6512:e84:b0:545:3032:bc50 with SMTP id
- 2adb3069b0e04-54e7c42255fmr500642e87.19.1745487095942; Thu, 24 Apr 2025
- 02:31:35 -0700 (PDT)
+	s=arc-20240116; t=1745487503; c=relaxed/simple;
+	bh=JID61eSxQsJgBmkqNJZMZpjUO6Kl5+UYlI+ISdEz/PQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kfKaAJmZfK2nGqEyIQj1D+rQfBnPNNebFhaq++/awhruXoi7FbOzT6KUcVUvfcF1jM5o3YyYAj4tVQECs0l5MpShDksMlvuBp24J8It4/l+mHs81CK8XBg1bJFI2ovsr28mXTE/gnGbET7TWRrWFxpmGlfen+vPam0J4rRBAqEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mbl2UA5Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80DC1C4CEEB;
+	Thu, 24 Apr 2025 09:38:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745487502;
+	bh=JID61eSxQsJgBmkqNJZMZpjUO6Kl5+UYlI+ISdEz/PQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Mbl2UA5Zy8sM2dQjwd3BZF/dMugS44M8jxov0KzeVUi167r5mEMqwQZ+soCWkbhhZ
+	 ulfJtzY9d59Tymo6ay43VtiSdKIy1kBhDVTW3SfMWPfab7B3D0rUlnzgOpxUvBNYoC
+	 h9Z0TpGherjzv9luL5nF79Ra6VU2aiJLY0TsiuUZSVNL2iXnQhYCmLSV3r9eRGlsFr
+	 RxU1KJxDb9T2yy23KT1R8vpOh0aiL2Llf6XSy5mNZy80SGn/ADcjlUnyQ/TvJNDDxB
+	 VkyEwWWMn/RAGbkJcF+/GZCwS2TXTRj7suXByiJv8ya8/GMpyH8O7M0LS2aqBv1+4r
+	 xEQBY8zpB7jgA==
+Date: Thu, 24 Apr 2025 10:38:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, longli@microsoft.com, kotaranov@microsoft.com,
+	kent.overstreet@linux.dev, brett.creeley@amd.com,
+	schakrabarti@linux.microsoft.com, shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com, rosenp@gmail.com,
+	paulros@microsoft.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: mana: Add sched HTB offload support
+Message-ID: <20250424093816.GD3042781@horms.kernel.org>
+References: <1744876630-26918-1-git-send-email-ernis@linux.microsoft.com>
+ <1744876630-26918-3-git-send-email-ernis@linux.microsoft.com>
+ <20250417081053.5b563a92@hermes.local>
+ <20250417194727.GB10777@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20250417170052.76e52039@kernel.org>
+ <20250418165324.GA29127@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-0-f3fde2e529d8@collabora.com>
- <20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-2-f3fde2e529d8@collabora.com>
-In-Reply-To: <20250424-mtk_star_emac-fix-spinlock-recursion-issue-v2-2-f3fde2e529d8@collabora.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 24 Apr 2025 11:31:24 +0200
-X-Gm-Features: ATxdqUHuYt0fFmQbTufFKrTTQ50DPP7STko6I100ngQ7wHqRNewsR7rV0zZ35ts
-Message-ID: <CAMRc=Me20ZLb-vb6jJyy9pvWbwWsxVrxREbQOrmVyBY-S046gQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 2/2] net: ethernet: mtk-star-emac: rearm interrupts
- in rx_poll only when advised
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Biao Huang <biao.huang@mediatek.com>, Yinghua Pan <ot_yinghua.pan@mediatek.com>, 
-	kernel@collabora.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250418165324.GA29127@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Thu, Apr 24, 2025 at 10:40=E2=80=AFAM Louis-Alexis Eyraud
-<louisalexis.eyraud@collabora.com> wrote:
->
-> In mtk_star_rx_poll function, on event processing completion, the
-> mtk_star_emac driver calls napi_complete_done but ignores its return
-> code and enable RX DMA interrupts inconditionally. This return code
-> gives the info if a device should avoid rearming its interrupts or not,
-> so fix this behaviour by taking it into account.
->
-> Fixes: 8c7bd5a454ff ("net: ethernet: mtk-star-emac: new driver")
-> Signed-off-by: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-> ---
->  drivers/net/ethernet/mediatek/mtk_star_emac.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mediatek/mtk_star_emac.c b/drivers/net/=
-ethernet/mediatek/mtk_star_emac.c
-> index 23115881d8e892a622b34b593cf38e2c8bed4082..b175119a6a7da517f20267fde=
-7b2005d6c0bbadd 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_star_emac.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_star_emac.c
-> @@ -1348,8 +1348,7 @@ static int mtk_star_rx_poll(struct napi_struct *nap=
-i, int budget)
->         priv =3D container_of(napi, struct mtk_star_priv, rx_napi);
->
->         work_done =3D mtk_star_rx(priv, budget);
-> -       if (work_done < budget) {
-> -               napi_complete_done(napi, work_done);
-> +       if (work_done < budget && napi_complete_done(napi, work_done)) {
->                 spin_lock_irqsave(&priv->lock, flags);
->                 mtk_star_enable_dma_irq(priv, true, false);
->                 spin_unlock_irqrestore(&priv->lock, flags);
->
-> --
-> 2.49.0
->
+On Fri, Apr 18, 2025 at 09:53:24AM -0700, Erni Sri Satya Vennela wrote:
+> On Thu, Apr 17, 2025 at 05:00:52PM -0700, Jakub Kicinski wrote:
+> > On Thu, 17 Apr 2025 12:47:27 -0700 Erni Sri Satya Vennela wrote:
+> > > > A single leaf is just Token Bucket Filter (TBF).
+> > > > Are you just trying to support some vendor config?  
+> > > TBF does not support hardware offloading.
+> > 
+> > Did you take a look at net_shapers? Will it not let you set a global
+> > config the way you intend?
+> Yes, Jakub. I have reviewed net-shapers and noted that it is not
+> integrated into the kernel like tc. I mean there isn't a standard,
+> general-purpose command for net-shaper in Linux. It is used by other
+> tools or potentially device-specific drivers that want to leverage the
+> NIC's hardware shaping capabilities.
+> 
+> To configure shaping with net-shapers, users would need to execute a
+> command similar to:
+> 
+> ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml
+> --do set --json '{"ifindex":'$IFINDEX', 
+> 		  "shaper": {"handle": 
+> 			    {"scope": "node", "id":'$NODEID' },
+> 		  "bw-max": 2000000}}'
+> 
+> Ref: https://lore.kernel.org/all/cover.1722357745.git.pabeni@redhat.com/
+> 
+> Given the simplicity of code implementation and ease of use for users in
+> writing commands, I opted for tc-htb.
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Hi Erni,
+
+As someone who was involved with the design of net-shapers, I think it is
+reasonable to instead use the Kernel API which appears to have been
+designed specifically for this purpose: to control HW TX rate limiting.
+
+If tooling isn't intuitive or otherwise doesn't meet user's needs
+then that is something that can be addressed. But it's not a Kernel issue.
 
