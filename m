@@ -1,150 +1,138 @@
-Return-Path: <netdev+bounces-185668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A27FA9B479
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:49:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6BBA9B4B2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711FF7AB376
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:48:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 607431BA6D91
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF50428B4E3;
-	Thu, 24 Apr 2025 16:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26D528D85F;
+	Thu, 24 Apr 2025 16:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGADD76O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YjIrTM8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225B718B495
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2683E28DEE1
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513386; cv=none; b=PNtOqK85jub/Z6/Cn/pGdHK7cm+dhbfa2jTzPukSvZ4Q57MQs4YRTe4HjbUI444kRd2bRl6oEjrja+i36zEM46TWp1K/4gj8hug9mgMTT/zw1DuMJUNA+/1KJ9tjuIffjYtLxa5Vt5OXQtgQDKQZHl3r9n8YJ2+yS6vkFJg3Zu0=
+	t=1745513489; cv=none; b=bfqa4VdpywDkwJn6r4h1RTVHqdFCiziqsNX4BRBsECpvUBa5u/ONPtQicEH/RdbXDP9aBG9nRTDYKE/FEw72v+CxJPw2aJsrsip8O1EEmIx7JOZ+oGJ4e6KFyVxW5zQUjY8lDvqKMwTL3GhoJ+yUQbdKcmEul2aqc08OdtJQEZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513386; c=relaxed/simple;
-	bh=yaFz9KVuXbQ3WoPpBhphcE4kDzD4jDZLdKjUo00JrCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qud868YqxqzXbGIsl3Rq90/QxSxs5Nou6q8C6WDRBy4+9Ckp2UjlKv0CYXaqQhflrjpILp2LWIe+K4xHN26hB1PsoWnJYR3W8ZfmJsD06zZzw7dBFBmFukrVvFndh407Kn4hdGdAt3VRMZLkKDMtYi5a6DsS5wSXJEuv9AIxXjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fGADD76O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745513384;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hJKWPsrSIdki3Sut593ts9jKeKHpTjZdnwCIv+v7d1Q=;
-	b=fGADD76Os0c6N6QQlhuH9PDcc0TTIIOs21QNDktIn08kc42SYV3j6mnWWzhH+KiXMJI9Yg
-	TJe6T0SKgENc+Wo0P11FcpLN6T+IrU9ffBz+lU9m+Omo0UeEja/wRZ4YY6KOLzhd2p40dD
-	HDxR3jQTKeXKmxKOIC7IjUZOzs6pJcc=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-250-3aBPdaY6NSOa_mg84J2AZw-1; Thu,
- 24 Apr 2025 12:49:39 -0400
-X-MC-Unique: 3aBPdaY6NSOa_mg84J2AZw-1
-X-Mimecast-MFC-AGG-ID: 3aBPdaY6NSOa_mg84J2AZw_1745513376
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A54D1955DCD;
-	Thu, 24 Apr 2025 16:49:35 +0000 (UTC)
-Received: from [10.44.32.28] (unknown [10.44.32.28])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 08B2619560A3;
-	Thu, 24 Apr 2025 16:49:29 +0000 (UTC)
-Message-ID: <c67a65c2-e0c2-438e-a71b-3325e8e2bc3f@redhat.com>
-Date: Thu, 24 Apr 2025 18:49:28 +0200
+	s=arc-20240116; t=1745513489; c=relaxed/simple;
+	bh=mI+7gRwVIUctLO/aLVIx9D4jjs1loesDXw5i8kmk2dI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kgB7gasT/og7VxC6oQ8KP6Hb9McHu116IwY/8R3AsyS8rjUkhBUOX3JFOKgRSsoQaEDb7kZVkXE11IPKYMbUlBaGCMXfBLqQDQSQHM2WauIrHf572LVOB7+tnw9iEzcbDlYqUSZXQ18AVd00/IycqG/DoyBFPSPyNczl6qVpWvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YjIrTM8G; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4772f48f516so26296941cf.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:51:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745513487; x=1746118287; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mI+7gRwVIUctLO/aLVIx9D4jjs1loesDXw5i8kmk2dI=;
+        b=YjIrTM8G3U4qneCLTu2cVavwLDkMufuVXrI0Xk9YVZaxv56zYMGn4sIhaQf0iO2DhB
+         puHp+so69EaUWLogLHakFl+REG11ySb2ROSFBsSM7kI9PFMT53LrLpFW/nzmj4MsMhCB
+         dHFKGj/fgvI+z9L4W8p5wd0vNauCaCNouggL+lIR2+beDzDgcN64zTpIA1zCAseFqkpc
+         tVH7QxWJK9ZtccJkybSrE4VnPEf/Ak1MEJS/ufwG6WsJPbScdOBYiIsb15FXpfkqCr+W
+         nqfT9gfwYf9p9iOhyeF7nENB1vVlg+Z09IpcAKzCnT7cZaUP1y8gzNRpVDGq/MrbToN+
+         EIbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745513487; x=1746118287;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mI+7gRwVIUctLO/aLVIx9D4jjs1loesDXw5i8kmk2dI=;
+        b=MaJCuusUsoZJnWdGfanb1a7rHVBXfMEmsQ5OpvHHkjZDnqVfBmUja+Rdsm0EmRymna
+         Ekh0t3K7XMmQyVkQURDszaItpl/YO/KQjbap+PrAHcjog/Hc8M+oGEpWSpKq+3twi5BH
+         mlROzEJVlNSx0KqIIHsLM34RAFHWxbEs+1oRXzsz/s3F6UiLfclk/wdbe0W9vsk+vysx
+         IZhIEm6yqjWIhOj1K5mRrbRVlJfF3gxqTkJFwYP1689fS6bpdgVYMW6+dWLRXSDoD5R6
+         OTD1V46Kgx8kEjz3aljQknoyHX1i/s1pxqkx4lvnA+GioPJLctkzVLo599ft2bhfgRBY
+         r6YA==
+X-Gm-Message-State: AOJu0YwTALLOAZwItCX/Cm/0WiCyBTHB+3kKViS+rz0gaJlRwuLcUXLm
+	6+LgyaKD/FzUSlGjIFfrDRb9PKCTBNrMTe7BuwESrfsrmiIcKlp49Lv8x+D6m3WEuPCdYdcEU+f
+	TIOvwgPMe1MCQZ9RU8oaHD4Aujf5SZlxzXIGfp9BkWOQU8AqDcg==
+X-Gm-Gg: ASbGncu6N2D7IMh/8plWBAl3TLh+3BrXCKEVUrCE1aqMN+CUmZdYzFBivqOmcPtA1b+
+	dmzRt/kN8mg7OaKJLTHv3TR3pPG4NafphcKCDcLBNhWcY6AqGjbkvd/i3umVfrL3tSyPopvc/Iz
+	RZpMBQ1Xm5B4c4WnG1aeAUPPrUgCYC8ln83GE5Zrt3i6LXRYuDiGILRoKzKARSkQ==
+X-Google-Smtp-Source: AGHT+IGLh/RPe5h2B0ePd8DECq1+5uvOC6qlxo9fJEdcEqcCTWNVzxg+nI97qV6gboRDHKxOI+RNR8LRhgk9ZoW0+0o=
+X-Received: by 2002:ac8:5a13:0:b0:47a:fb28:8ee4 with SMTP id
+ d75a77b69052e-47ec3365b1amr53242741cf.22.1745513486672; Thu, 24 Apr 2025
+ 09:51:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/8] mfd: Add Microchip ZL3073x support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250424154722.534284-1-ivecera@redhat.com>
- <20250424154722.534284-4-ivecera@redhat.com>
- <4fae1a96-ac19-46b8-8eff-2a38d28414fc@lunn.ch>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <4fae1a96-ac19-46b8-8eff-2a38d28414fc@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20250424143549.669426-1-willemdebruijn.kernel@gmail.com> <20250424143549.669426-3-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250424143549.669426-3-willemdebruijn.kernel@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 24 Apr 2025 09:51:15 -0700
+X-Gm-Features: ATxdqUFgndvq5W6lahVq4dVoSiHA2OWQLzzHCECxww-riRN_30TIP-ZCuaZHCSM
+Message-ID: <CANn89iLD0bGKdFzSJDiiFhT=Np3LKHM86WE8daFO1zdEzWA+fg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] ip: load balance tcp connections to
+ single dst addr and port
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, idosch@nvidia.com, 
+	kuniyu@amazon.com, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 24, 2025 at 7:35=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> Load balance new TCP connections across nexthops also when they
+> connect to the same service at a single remote address and port.
+>
+> This affects only port-based multipath hashing:
+> fib_multipath_hash_policy 1 or 3.
+>
+> Local connections must choose both a source address and port when
+> connecting to a remote service, in ip_route_connect. This
+> "chicken-and-egg problem" (commit 2d7192d6cbab ("ipv4: Sanitize and
+> simplify ip_route_{connect,newports}()")) is resolved by first
+> selecting a source address, by looking up a route using the zero
+> wildcard source port and address.
+>
+> As a result multiple connections to the same destination address and
+> port have no entropy in fib_multipath_hash.
+>
+> This is not a problem when forwarding, as skb-based hashing has a
+> 4-tuple. Nor when establishing UDP connections, as autobind there
+> selects a port before reaching ip_route_connect.
+>
+> Load balance also TCP, by using a random port in fib_multipath_hash.
+> Port assignment in inet_hash_connect is not atomic with
+> ip_route_connect. Thus ports are unpredictable, effectively random.
+>
+> Implementation details:
+>
+> Do not actually pass a random fl4_sport, as that affects not only
+> hashing, but routing more broadly, and can match a source port based
+> policy route, which existing wildcard port 0 will not. Instead,
+> define a new wildcard flowi flag that is used only for hashing.
+>
+> Selecting a random source is equivalent to just selecting a random
+> hash entirely. But for code clarity, follow the normal 4-tuple hash
+> process and only update this field.
+>
+> fib_multipath_hash can be reached with zero sport from other code
+> paths, so explicitly pass this flowi flag, rather than trying to infer
+> this case in the function itself.
+>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-
-On 24. 04. 25 6:34 odp., Andrew Lunn wrote:
->> +++ b/drivers/mfd/zl3073x-regs.h
->> @@ -0,0 +1,74 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +
->> +#ifndef __ZL3073X_REGS_H
->> +#define __ZL3073X_REGS_H
->> +
->> +#include <linux/bitfield.h>
->> +#include <linux/bits.h>
->> +
->> +/*
->> + * Register address structure:
->> + * ===========================
->> + *  25        19 18   16 15     7 6           0
->> + * +-------------------------------------------+
->> + * | max_offset | width |  page  | page_offset |
->> + * +-------------------------------------------+
->> + *
->> + * page_offset ... <0x00..0x7F>
->> + * page .......... HW page number
->> + * size .......... register byte size (1, 2, 4 or 6)
->> + * max_offset .... maximal offset for indexed registers
->> + *                 (for non-indexed regs max_offset == page_offset)
->> + */
-> 
-> Something i missed earlier. This does not really describe
-> hardware. The upper half is meta data about the register, which you
-> encode into the register number.
-> 
-> How many other Linux drivers do you know about which does this?
-
-This was proposed by Andy S.
-
-Cite:
-V4L2 (or media subsystem) solve the problem by providing a common
-helpers for reading and writing tons of different registers in cameras.
-See the commit 613cbb91e9ce ("media: Add MIPI CCI register access helper
-functions").
-
-They encode register address and size in register value. I have just
-extend this approach to cover indexed registers. The max_offset is for
-sanity during access to such registers, potential access out of
-bounds is detected and error returned.
-
-One can use just two simple functions for both register types:
-zl3073x_read_reg(zldev, ZL_REG_NONIDX1, &value);
-zl3073x_read_reg(zldev, ZL_REG_IDX1(idx), &value);
-
-> 
-> Also width vs size.
-
-I'm sorry, just a typo during reworking.
-
-
-Ivan
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
