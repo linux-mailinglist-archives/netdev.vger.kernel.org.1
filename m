@@ -1,174 +1,153 @@
-Return-Path: <netdev+bounces-185331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F7A2A99C79
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:05:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 557EAA99C7C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:06:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6232460C05
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:05:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C2719401FF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F16383;
-	Thu, 24 Apr 2025 00:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0641717D2;
+	Thu, 24 Apr 2025 00:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHlO2W0d"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Csvn8Oix"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F644163;
-	Thu, 24 Apr 2025 00:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456AF383
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745453101; cv=none; b=FwZtBiGliU0pbtNZc2REDLG19m+yF+rGMoRq6SNpZuyo1KctHbdunsHAPX7JHa8FrNKToQrcPV505uNVrggd+luQNdzs4O3YiR95okxIfWOru9N921hYsWStt4DOqXSJQBsZHoSk1nRPlKVgkyxlXQODjzGHZoYt/YJJYw+bkmg=
+	t=1745453170; cv=none; b=DRrg/MTE8tzqlYpEqmhBZCPmqoVZPZFpgm+PRORR3MWTV52f1eZJZghbUMdYCnKJbc40O33NH1xoOsFTNCAN9k5IoY0xj/geIjSDpDH3JwGgpmjM5xEUbIAPjbiT9+F2CyzDSuyv9AhZ7jQBzFiuhsVpOO4dgrS1x9AEvUWO0GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745453101; c=relaxed/simple;
-	bh=stV5VZDxOqoxVa1pfuVLCU8s3wWiCvzhss9IUXy52zA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NE4nMAzIIwTxwwHmj8Hn/lmIYZ+jaQ7/yDDZ8PV9pIHVrhQGfVmRe1XVju4J8uQRqDAXz/gRjX3QV5jjlpxeLHOWgHSqiMFT8pD2IkKqGf6cuBQnSeXQivkgEwABCwWkPF+VGJqHBQ8rcP58d/4BgojjS25zWHD8sckok3Qk7dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHlO2W0d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF622C4CEE2;
-	Thu, 24 Apr 2025 00:04:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745453101;
-	bh=stV5VZDxOqoxVa1pfuVLCU8s3wWiCvzhss9IUXy52zA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=eHlO2W0da7SqT4kwprUaGEz83W4aX8nx+Op8lMsynjHD/qWF8vsUUG5nbRAFsr8DU
-	 pZmxQPOZo9kVFfS0ZymLRBZ1FjzawIKNysqI3n4nee2U3fhe6GSslcXZIVdA8e4EMb
-	 cs1Jl57Zc445rVcdhKa7js9+4zydZVT7580NwHAx4XSYXpCIMd0VKe/NdRq0eCyS02
-	 hQjHvlPPSdqVl800zvVrpQLzGxbEC8GGrVgpb0vsSVNUuxpD40EfR5DQfrqR9H/aVf
-	 RpCwgGd48ZsvsqP+wdrIStrYluefCBVrutdlzSdq7/M9aW2a9zBnQaDgEEoLhAMVmW
-	 AcbrdqwvsxLtg==
-Message-ID: <a07cd1c64b16b074d8e1ec2e8c06d31f4f27d5e5.camel@kernel.org>
-Subject: Re: [PATCH v4 7/7] net: register debugfs file for net_device refcnt
- tracker
-From: Jeff Layton <jlayton@kernel.org>
+	s=arc-20240116; t=1745453170; c=relaxed/simple;
+	bh=mVT9IY0iZtItMWBqylUMmJqk8EaUvrBNBHLL55g1PgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aC/Q7H8koNDCu0rmQpqjg7wj7rsbFYL3poa4NKK7W115fiPAWIQCo79jE5Lg5LxOSUUQEeD2Yw2Yoisferfl1rLDKQ8uX1KqxrMBnMG3u5HaktMqkVIVSQyqCoYsFro/7/nmc4LfIYOqwyWr4jCgwBv1fW7ZaEOSXAyDhl1qGFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Csvn8Oix; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22409077c06so6582755ad.1
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:06:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1745453168; x=1746057968; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A13DmWW4IFyC+2QEpgeShC0monFDWua+5RM+sHVw7DQ=;
+        b=Csvn8Oix9SuglDdRamLqqkrPAT+UpkUjKCnbm69tqfbx7QwYZzm9w8ZUH2Wm2lWWrb
+         orCaK6Jwi0OIr9NZ/JuPflnM+NsYryiEGrPp8/d3qe801VRlMIZr861Pt3uRsNJBd+RX
+         UprO46LrB3CFIrao2EaZrKqJNOSTntikxpZUs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745453168; x=1746057968;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A13DmWW4IFyC+2QEpgeShC0monFDWua+5RM+sHVw7DQ=;
+        b=g0xR6XqtWb1Ey3xLi3h5Jm2oApisIYWi2mcjiUZV6Y+scO2YXqfFyFBCqMzLQ9bNaT
+         uimXf56BLrsYOapMAFarQplwBc7I2MEYkVSbBmR/mv1UyG8MbqvVf31awtcN5bUhRy2S
+         o4MOYmmI4bKYNDeHh0qcJ73Jlg2C98D/zoGFGlstcnNyHxIZl9b4mWi5BHGovMnHAa3O
+         Ddkvlc80rXs8OgvWwbl8J1Z8MkDl+zFtQpZbuSYlsVkYSRwyMj2GSSNp10uQbm5tSpZE
+         YO7F4wYxaiIImzvgWqiwMaCCoEJGLFlvmwhWCcbFUa78+tSSwvcXY8aQ1y3wA5fFcOzV
+         ktaA==
+X-Gm-Message-State: AOJu0YwhLTemQe5Xh8ypIJequnI7iZEQnQeR7i+xLnIus/jB92HU15K8
+	iRV2wPmFPUaA+2cbw1D/WjJa2W2g5333MMyZ9QxXkW8q9JdJABU25+lPDjR2Iug=
+X-Gm-Gg: ASbGnctXU91fNGwKxXYk9QJ94wB/TsU4rNDOkmKgsbediPao45Z+U5gHA23Xc9rlz5l
+	6eaHywMb490FE0B+7ThxnKQqlwWO3WsUeptr/4OTCp8EQWkROHHcvTvFVYnzPR6C0cfG63TU3So
+	DCFBXCNVN5v2Q1+cEf2BhVKrDESEZizTi5G5XfK9mq/PTjiM+3nY6CcEpX+081y3p4MfK7DEy2A
+	K2VWqgroDa0+/cjzPEAh5NdZKbt2Up0S12aokXrQQwGgby9EPIWrzTLsKlYPM5EUF7KCfOPiNIZ
+	9fuQYBZTrmI8oOWiw0H9ATsCsIspY88nGRHptcTHMSzs8IKPCT00F1N7bplvtqeQKUCqmiUHnSO
+	wdxAp6ShKC06M
+X-Google-Smtp-Source: AGHT+IFQXaLcPiac68cSLV4WsHdVRb67rogM0b27Rpkqgk1ad4c1qTHP8Vc1O703UVRXxD05dGwmzg==
+X-Received: by 2002:a17:903:1a28:b0:224:13a4:d61e with SMTP id d9443c01a7336-22db3dfbcb8mr6113335ad.51.1745453168527;
+        Wed, 23 Apr 2025 17:06:08 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50e7a1dsm534375ad.140.2025.04.23.17.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Apr 2025 17:06:08 -0700 (PDT)
+Date: Wed, 23 Apr 2025 17:06:05 -0700
+From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni	
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima	
- <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor	
- <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, 	netdev@vger.kernel.org
-Date: Wed, 23 Apr 2025 20:04:58 -0400
-In-Reply-To: <20250423165323.270642e3@kernel.org>
-References: <20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org>
-		<20250418-reftrack-dbgfs-v4-7-5ca5c7899544@kernel.org>
-	 <20250423165323.270642e3@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, shaw.leon@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] selftests: drv-net: Test that NAPI ID is
+ non-zero
+Message-ID: <aAmAbcbLMl6IBwpd@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	pabeni@redhat.com, shaw.leon@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+References: <20250418013719.12094-1-jdamato@fastly.com>
+ <20250418013719.12094-4-jdamato@fastly.com>
+ <20250423161612.3dc2923e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423161612.3dc2923e@kernel.org>
 
-On Wed, 2025-04-23 at 16:53 -0700, Jakub Kicinski wrote:
-> On Fri, 18 Apr 2025 10:24:31 -0400 Jeff Layton wrote:
-> > +	/* Register debugfs file for the refcount tracker */
-> > +	if (snprintf(name, sizeof(name), "netdev-%s@%p", dev->name, dev) < si=
-zeof(name))
-> > +		ref_tracker_dir_debugfs(&dev->refcnt_tracker, name);
->=20
-> Names are not unique and IIUC debugfs is not namespaced.
-> How much naming the objects in a "user readable" fashion actually
-> matter? It'd be less churn to create some kind of "object class"
-> with a directory level named after what's already passed to
-> ref_tracker_dir_init() and then id the objects by the pointer value=20
-> as sub-dirs of that?
+On Wed, Apr 23, 2025 at 04:16:12PM -0700, Jakub Kicinski wrote:
+> On Fri, 18 Apr 2025 01:37:05 +0000 Joe Damato wrote:
+> > +    bin_remote = cfg.remote.deploy(cfg.test_dir / "napi_id_helper")
+> > +    listen_cmd = f"{bin_remote} {cfg.addr_v['4']} {port}"
+> > +
+> > +    with bkg(listen_cmd, ksft_wait=3) as server:
+> 
+> Sorry, not sure how I misread v2 but you are running the helper locally.
+> So you don't have to deploy it to the remote machine :(
 
-That sounds closer to what I had done originally. Andrew L. suggested
-the flat directory that this version represents. I'm fine with whatever
-hierarchy, but let's decide that before I respin again.
+OK I can remove that and fix the macro guard for the v4.
 
-When I was tracking down net namespace leaks recently, it was very nice
-to have the inode number of the leaked netns's in the filenames. I
-would have probably had to grovel around with drgn to figure out the
-address if that weren't embedded in the name. I think we probably ought
-to leave it up to each subsystem how it names its files. The
-discriminators between different types of objects can vary wildly.
+> BTW does removing the ksft_wait() from the binary work? Or does it
+> cause trouble? Don't think we need to wait for anything in this case.
+> With the XSK test we had to wait for the test to do the inspection
+> before we unbound. Here once we get the connection we can just exit, no?
 
-One thing that might be simpler is to make ref_tracker_dir_debugfs() a
-varargs function and allow passing in a format string and set of
-arguments for it. That might make things simpler for the callers.
---=20
-Jeff Layton <jlayton@kernel.org>
+I agree that we can just exit, but removing the wait breaks ksft
+utils:
+
+# Exception| Traceback (most recent call last):
+# Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/ksft.py", line 223, in ksft_run
+# Exception|     case(*args)
+# Exception|   File "/home/jdamato/code/net-next/./tools/testing/selftests/drivers/net/napi_id.py", line 13, in test_napi_id
+# Exception|     with bkg(listen_cmd, ksft_wait=3) as server:
+# Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/utils.py", line 130, in __exit__
+# Exception|     return self.process(terminate=self.terminate, fail=self.check_fail)
+# Exception|            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/utils.py", line 78, in process
+# Exception|     os.write(self.ksft_term_fd, b"1")
+# Exception| BrokenPipeError: [Errno 32] Broken pipe
+
+LMK how you'd like me to proceed ?
+
+I'm thinking:
+  - Leave ksft_wait()
+  - macro guard
+  - don't deploy helper to remote machine
 
