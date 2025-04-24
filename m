@@ -1,130 +1,88 @@
-Return-Path: <netdev+bounces-185681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA19A9B536
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:29:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E526A9B57A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2110C926D0A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:29:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFE7D3A485B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ACA288CA5;
-	Thu, 24 Apr 2025 17:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B86628E607;
+	Thu, 24 Apr 2025 17:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="sl8qK1og"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2gIiRDg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700DD284681
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 17:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E072A28B50F;
+	Thu, 24 Apr 2025 17:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745515773; cv=none; b=d0i52oha9HDKLmCLjosA63fY18L11dGxTZ2+kKT/EYP4PECA1Xlilot8hcsjo9Hs7HPsbDzz29X2/csJS8k6tedFbowN/74bKFuH3Ryme823YnAOQarHkZc4HgSxj1lTgNTXnwOLgcBudouegKzK7rTZybhyJPq0vDC31xsbVYs=
+	t=1745516173; cv=none; b=ZNkJJ0JKoh5eI8388j+HNv+LMfkjx9/9XhwQs+ZuM/MZaoxFrDu/FWj5/7tPj5tBPNri/NTowTA9MEphVzD72F4yEN9mrgMFZWMWbxH0h6tCHRo3jbk5vid5u3rVm7qKS8mOB6aw3MRa0JFYRL8kku1DUshur9SYBXHJ5P94PyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745515773; c=relaxed/simple;
-	bh=zDw7BMwmQ7Zzhu3em6h7WuB+uJk8Ll8pW5o+G0j0JPw=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YG3NsooDe9LPESiHnbfXs+0f2OrgGR/hJeQv0/KN32GL/ceo9DFp66kPVTxXJX/ZAMFLyfWqK44lAdiPjoc7l4ki7ilHfsr6JHT7hEn27RR7TdBWioO0QtmXstqWA/bcYfTtuyqP/Z4Y3VlnpdjX8te8cZ/8Oa6aMLGwG0jT7PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=sl8qK1og; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e5e34f4e89so2404147a12.1
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 10:29:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1745515770; x=1746120570; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JLHhBvGwHoD14XYoD4WUPVU9+Bb1BKcDzuKit79fgsI=;
-        b=sl8qK1ogUFiW0mh44xZ/byXLtlKD8jF7YnW6TxN9yYdK+oIVfj8CMBGuv1c6S/kv2J
-         E7ahCstLKU4EhFw2AuSSRofJ9PwLCOcz0X82W7loZTXSr8BPFvCOdafiR8n+a3OXEgTM
-         HxqTSoamY8Z8Pb8h/toZh9V7Pbk4yKgNxYSdycN1fkbT2cxHEwUY9UHdUuEofwylNjZ+
-         czVHmpS8o7qjpbyExSqKVNV1MFXuSDKllNwdmsxPym1tCn/O75aqsTG4vcnOdhUtMivH
-         TThXNbDb7j9pUUEKtvuX5qiaBQM+FAVKHFTJugLaP0YStsoOYvjfXUfMbeSNKDjWeg0j
-         98aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745515770; x=1746120570;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLHhBvGwHoD14XYoD4WUPVU9+Bb1BKcDzuKit79fgsI=;
-        b=R9RlmD3B2SO/sydCBNtWNrBtz9MyuaFQkGaXeKsyXKwUrup1OVdeAW42g0m6iem1yK
-         KL0IDWOHVNd6uYBwC1xWj2ckJoT0HXrhST5PJJcnuit01rOAJmm+Gae49PWU6YD+3pme
-         +Ssl1cbbzGFQuAH/g36cANqhl/Hk6EyOy+qqvLqAV1CF4IbOOSRkd4y/2zOc+b9JQYWm
-         O0UQ5FQNaoJlGcWGF06Hm9gLNyoHZ/fz6Wr9l3bpT5MxQDJAmt8zSi/Bn9LgUGT6Ef+h
-         PPKAJxdOFeDxAAEGjgSEGN5PlregLoV2CmxkA+LvVj7as++1/w+4Akri4gPHihL01GrQ
-         v5Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUphZyXRq8wkWMdva+FMs3WHyNNK8+HPlEGJ0nuK1EvN0klBFN3PRzTg+2wG83cmhIoV1yE00=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4lxKIdbtfWjyraM2XKdawyzL+R3zOHwg8UD2A6x3UNcE3KXdR
-	w8MCSL882WF8BjKw/Rmmj1nidWnl68PbMrbxwWQfzUX51SgH8ziH+YSUIM67aQ==
-X-Gm-Gg: ASbGncsC4JU8v5bxovcbtKHKQ3pDon8N1EHWXcHxodkUxfjsMPEkH1hwjgtJiraHRId
-	p7RgO6mhnlwvVmm5Ksc7lSxH0icgYcIBN2VZWza+dFoF+SmdogFBsSQK6m7Mz7OCWiQE6qlRNE0
-	WAL961nwNQBeVlgHm6JnD5umVFqM2P1mZCldKC2KmzG51ssfB+YCC3MKGWTmarzhnWCVgwXPssh
-	2bHj7hr+tSxGnsGUGlZSfR/odi3wDqvoSIFgMo3lC4PF3Dmnf2LbQdars1f4HsJFC6cR29tGMOa
-	W00keBtm2p9y3eYOVAZNupZilbCqgEJPFgDiH5Y=
-X-Google-Smtp-Source: AGHT+IE2ovPWtaSR1CwyZflNLkJWQlZGCejIdOULuu/FjYId4ZaicaBupsaFG9P4tzlR01R9OMB2kQ==
-X-Received: by 2002:a05:6402:845:b0:5f3:4194:187 with SMTP id 4fb4d7f45d1cf-5f6de6980d6mr3197899a12.18.1745515769548;
-        Thu, 24 Apr 2025 10:29:29 -0700 (PDT)
-Received: from [10.2.1.132] ([194.53.194.238])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f6eb32368bsm1383533a12.10.2025.04.24.10.29.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 10:29:29 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
-Date: Thu, 24 Apr 2025 19:29:28 +0200
+	s=arc-20240116; t=1745516173; c=relaxed/simple;
+	bh=LXwnnz906d1xYC1VPscfzjQaP1ILzKuqIOE7J7H2BE4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ebLK0Z/kgch6LKbuUVg0kyoaCoO9P5vPgUr0ZgREkvh/fMbiofmPBI+NHwo87cRa+N8Yf9eAC1U90VgzYWOqoM1zVGyr0vzggGWTD8DC2LU2ffdPf+NlyHnu5IWfwzIM8x+CuvoxaQx1jCAhUyEoBZQBNHaS5RED3CVZQ026hBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E2gIiRDg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2A5C4CEE3;
+	Thu, 24 Apr 2025 17:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745516172;
+	bh=LXwnnz906d1xYC1VPscfzjQaP1ILzKuqIOE7J7H2BE4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E2gIiRDg2CldVcrOjV9LGHtDUQ3be3aAfogJdjMryL4Z+kbzUckehRTBiw6cez4K1
+	 rK+VIPAxBsND7yVR9FGxRq4nCa2Xkm6NzvGLumQM/OR4hYKU+XaElpliX+NOUgPjuP
+	 CKUSh71eLXfrgUrEgPHt75u0a47t/vdP3w5td/v5oKqNLn23ZtEROMo917Gf4r47B+
+	 pEh1dmoV787l6TyYLOcshL8VX62Vf946AjFMnwsXzc3mqX3iizeXREpZRayvSlQfXB
+	 LrqA0rgcZlITPr4GREkLjv//LY4z9yBdR19rRtx+633DQIdKaE64Hyh5kxmAXP2AiR
+	 j3+w5OKgE06CQ==
+Date: Thu, 24 Apr 2025 18:36:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, ij@kernel.org,
+	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Subject: Re: [PATCH v5 net-next 00/15] AccECN protocol patch series
+Message-ID: <20250424173605.GL3042781@horms.kernel.org>
+References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
- when valid checksum mask is not set
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
- Simon Horman <horms@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
- <20250424162444.GH3042781@horms.kernel.org>
- <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
-Content-Language: en-US
-In-Reply-To: <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
 
-Hi,
+On Tue, Apr 22, 2025 at 05:35:47PM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Hello,
+> 
+> Plese find the v5:
+> 
+> v5 (22-Apr-2025)
+> - Further fix for 32-bit ARM alignment in tcp.c (Simon Horman <horms@kernel.org>)
+> 
+> v4 (18-Apr-2025)
+> - Fix 32-bit ARM assertion for alignment requirement (Simon Horman <horms@kernel.org>)
 
->>> Because it is impossible to determine whether the NVM write would finish
->>> correctly or hang (see https://bugzilla.kernel.org/show_bug.cgi?id=213667)
->>> it makes sense to skip the validation completely under these conditions.
+Thanks, I confirm that v6 appears to be clear wrt these
+build checks for 32-bit ARM assertion for alignment requirements.
 
-> It is not completely accurate. All the NVMs starting from Tiger Lake are locked for writes, so NVM writes will always result in a failure.
-
-Check my message in a thread of an earlier patch:
-
-Message-ID: <1c4b00b6-f6e3-4b04-a129-24452df60903@jacekk.info>
-https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20250407/047551.html
-
-On my laptop NVM write operation *does not fail* (nor hangs), driver loads and ethtool shows corrected checksum.
-
-This lasts only until module reload (rmmod/insmod) or reboot.
-
-I guess only shadow RAM is updated (or something like that) and not the non-volatile memory, but the operation itself does not error out.
-
-It might also be because I've disabled Secure Boot...
-
--- 
-Best regards,
-   Jacek Kowalski
-
+...
 
