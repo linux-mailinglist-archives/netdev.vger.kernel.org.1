@@ -1,140 +1,150 @@
-Return-Path: <netdev+bounces-185610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B89FFA9B21A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:23:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F796A9B229
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAA59A349B
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:22:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A36F27B002C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5723422156E;
-	Thu, 24 Apr 2025 15:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FF01C6FF5;
+	Thu, 24 Apr 2025 15:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rqbpViVz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reNKNlsx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBFC1B4248
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 15:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBB8178372;
+	Thu, 24 Apr 2025 15:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745508174; cv=none; b=iOwi0W95JFhtV5QonDrhcQ7Zmmylquauio/spaNWXuciI3zE+BnMHMjAE5bdCgOEKO2IX4xIfyOxk0ewPSbzeQGJypT/u5P9/ZJ1pQKbE6btMCCBy3Sq5PiKKsQbMYerCzyrVldKKhpoMfKprcZqFBKaxsNpkCKFem9QOpywtlo=
+	t=1745508297; cv=none; b=s6Cy5PMjcsSRauIh4rkx9Ev8Qa4dlVPRIfKm3F9n42ctJ3JoD474UmSMyYJirDpG9mX8tjPs3XMCe7oYtmJc4Y8h5cCMDP5whSgR6L7mSle5trLqeZJrbolxnHKoZAIvFTmFaC0GMqwQHdkSCKB6tPyXHjRElVDboIHVwuY6P0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745508174; c=relaxed/simple;
-	bh=P9Ra9EBsuHe57phVU2HbSxsMHXG4p3mA6LrK5RQN/0A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G+8iJSdYgvGNDlClRWOQ6VL9Z+8R++5jHfW2pJPIp16ajMBD/mkerurF/zo30WvetNKnws2onjoSic4X+0/ZGppXArxgwwZQiNyom9eNGWLhAhdwZXq9ScniVV9KStZoC4opaQ2wymfk2HHI8hkb2LLc8PzB3KU1+sbpil/r8ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=rqbpViVz; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-af52a624283so1127210a12.0
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 08:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1745508172; x=1746112972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hA7Ba26JGhfQR9p9e92P+E28XsBHiTPtB8nzPxji11A=;
-        b=rqbpViVzSZbt2wLY5uNsRliMXRpBFkBU2B4Yurc2DhExXKrqfTyU2EJPacZOqCfD4z
-         k7GyuWhhggikOILoZjpmdwRTIVQrAOl347e76YIYfJvZpHXQhp7DOqMhhpyHdICezrEl
-         r2kuXsLioXAK6IYUyRbCljYrr3QM4xmGy/ijB72Yf019tfnJXgRHl2FjNfu1MwzRekle
-         P0belweU1Bp6JOHxDZNfbDVaMTA4LyFv7S9opNwLlPzCeEOBRs/n97nnHO+Ia6NCDzDZ
-         6lJhk3ICzVlmfgrSZA/vH4h9isJbz1Cff4qndjf4Y9TzKaQ9dXGkAxDjFpYkP9OfLMlL
-         HfRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745508172; x=1746112972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hA7Ba26JGhfQR9p9e92P+E28XsBHiTPtB8nzPxji11A=;
-        b=ZC3ufnLVwDUFINznhR88saIeUor2g6Fp7p7yKHaI8pW3VnQ7iTgyoVxpce9f6tfDkM
-         FzjYpP1oPTrCy1e7YWkSV/1KQMQbzi/cI82fhbV1YrQzzlhNqWVvJPH+2W2gb0SoMfvp
-         EmcTio/T1yL8YF6nbMNqf+fn/zPVrF4tvupemBGkvBO74wlJyT5PuT3g6NrfdPscQQTr
-         RumBKFlqVzM7zkvcI28IkioDXsZjrAgJaYFTxMzZbfWAkBGvs4QCEKcVo7pCaX8p4uDi
-         3QflMgyr4rG/zvT3NIQRnZVxtZbUgNlHtScmIPTCiQC8jfAF7KIksazf/bOzLSPXAe3I
-         /wMg==
-X-Forwarded-Encrypted: i=1; AJvYcCVETIVPpORp3WfH/pLdN8T36qozYey4DnOjIfZY8h1fAL9UlEn1EZI5nrrlAPjF8E89ojpnS5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/c4QW3UhczbIYiQ4NMC8nA7Zsc9K/WSa/Lj1GdyDt4xj4UtCw
-	9xP/uKComQB+w85uXH3x04nSCQud4SXziBnoiu+T7NdBNKG+ZWY7BAmQgH1ceS938u1SQsCz1oF
-	jybS2uqIDGLVu3/UGXVZw7o3pIkmqE6WSbzCp
-X-Gm-Gg: ASbGncuJ2JSsfI75lPd+fqROgaNmPqyZupE3e2UIKIXYzZ+e6z60jJ2UmzHXGpXZva3
-	kIenC4q5J+Gc0vtetarRo2qbdHxVLNR+tlwgXQi/VuAF+aNbHJClIYI/ousJZUlMW/S1EaB0RFp
-	Tc1o9ujciYXPWYQIL7friXIg==
-X-Google-Smtp-Source: AGHT+IG5HfEL/z0REAwTeryaLmO6NfaYs4y1TsRfmRdtE7Z6X9OWTg7C7P9OE6KHDVTDsCdahLpFslE7lpGcD9TUyyY=
-X-Received: by 2002:a05:6a21:204:b0:1f3:1ba1:266a with SMTP id
- adf61e73a8af0-20445af2509mr2893535637.0.1745508171865; Thu, 24 Apr 2025
- 08:22:51 -0700 (PDT)
+	s=arc-20240116; t=1745508297; c=relaxed/simple;
+	bh=URvaLzPn0UgorosBEO+hlH9J1rvnPsi51D0Q0sZ8bxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f0M7zoI1TZNTPDQFnX0ETX15IRPUUo3F7hlPxmvbxD58BkInhy+MQp6l43YgEYupH56mIuPz7FwI8XSOR29wixue3xQ0cMi82dDyeJSiGfs4/QvAYSckyMcpCnKgFyWpXC/OKf4GO78gkIbE1kFJAPkIuRaPduKiGLBKM/nFHHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reNKNlsx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2635C4CEE3;
+	Thu, 24 Apr 2025 15:24:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745508297;
+	bh=URvaLzPn0UgorosBEO+hlH9J1rvnPsi51D0Q0sZ8bxE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=reNKNlsx5n4C3hJ+F2hsK6Q+GtSRH/072Nazxy8SH+9cDwTNnQQkVwlMcQUNCAZGO
+	 7Wv1dJvighsyodjzC4wOwWvQwmTZupEo5AkvLIx5p1RQFH53dRWairyP8xFGiak2bD
+	 K8t+aER0axClWjuJtq7qOZSayVySxM4kdBeWq6P+14GKEYqAQXvxOCFoThxSsxj8I7
+	 DQe77i+6N1xnRFrBDkIHvm9kmXz1t/yjCl5NVl8rANurWFypkPP7GWZFWMhIpOAA4e
+	 LdehEm2AnUdoR4K2+CybqHfBpzblEB3G6zqkhLQPMOPQ6meXceVw+WpD/HPN8U4b3e
+	 FRXTdpUGJRHyg==
+Message-ID: <c6abaa9f-cd3e-4259-bed6-5e795ff58ecd@kernel.org>
+Date: Thu, 24 Apr 2025 17:24:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250416102427.3219655-1-victor@mojatatu.com> <aAFVHqypw/snAOwu@pop-os.localdomain>
- <4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com> <aAlSqk9UBMNu6JnJ@pop-os.localdomain>
- <aAl34pi75s8ItSme@pop-os.localdomain> <20250423172416.4ee6378d@kernel.org>
-In-Reply-To: <20250423172416.4ee6378d@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 24 Apr 2025 11:22:40 -0400
-X-Gm-Features: ATxdqUGCnFqiTk74fmm4pr3DZdxYO9--y-VuPiXyIZihMTDtLglBEi4wXWTlOsI
-Message-ID: <CAM0EoMki518j_geesnGwh2jk51Z5BGRGootTGQq3HcP79y2ygQ@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue cases
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V6 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Victor Nogueira <victor@mojatatu.com>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Gerrard Tai <gerrard.tai@starlabs.sg>, Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc
+References: <174549933665.608169.392044991754158047.stgit@firesoul>
+ <174549940981.608169.4363875844729313831.stgit@firesoul>
+ <20250424072352.18aa0df1@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250424072352.18aa0df1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 23, 2025 at 8:24=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 23 Apr 2025 16:29:38 -0700 Cong Wang wrote:
-> > > +   /*
-> > > +    * If doing duplication then re-insert at top of the
-> > > +    * qdisc tree, since parent queuer expects that only one
-> > > +    * skb will be queued.
-> > > +    */
-> > > +   if (skb2) {
-> > > +           struct Qdisc *rootq =3D qdisc_root_bh(sch);
-> > > +           u32 dupsave =3D q->duplicate; /* prevent duplicating a du=
-p... */
-> > > +
-> > > +           q->duplicate =3D 0;
-> > > +           rootq->enqueue(skb2, rootq, to_free);
-> > > +           q->duplicate =3D dupsave;
-> > > +           skb2 =3D NULL;
-> > > +   }
-> > > +
-> > >  finish_segs:
-> > >     if (skb2)
-> > >             __qdisc_drop(skb2, to_free);
-> > >
-> >
-> > Just FYI: I tested this patch, netem duplication still worked, I didn't
-> > see any issue.
->
-> Does it still work if you have another layer of qdiscs in the middle?
-> It works if say DRR is looking at the netem directly as its child when
-> it does:
->
->         first =3D cl->qdisc->q.qlen
->
-> but there may be another layer, the cl->qdisc may be something that
-> hasn't incremented its qlen, and something that has netem as its child.
 
-Very strong feeling it wont work in that scenario. We can double check.
-Regardless - even if it did - what Victor sent is still a fix. Seems
-DRR had that bug originally. And then in the true tradition of
-TheLinuxWay(tm) was cutnpasted into HFSC and then the others followed.
 
-cheers,
-jamal
+On 24/04/2025 16.23, Jakub Kicinski wrote:
+> On Thu, 24 Apr 2025 14:56:49 +0200 Jesper Dangaard Brouer wrote:
+>> +	case NETDEV_TX_BUSY:
+>> +		/* If a qdisc is attached to our virtual device, returning
+>> +		 * NETDEV_TX_BUSY is allowed.
+>> +		 */
+>> +		txq = netdev_get_tx_queue(dev, rxq);
+>> +
+>> +		if (qdisc_txq_has_no_queue(txq)) {
+>> +			dev_kfree_skb_any(skb);
+>> +			goto drop;
+>> +		}
+>> +		netif_tx_stop_queue(txq);
+>> +		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
+>> +		__skb_push(skb, ETH_HLEN);
+>> +		/* Depend on prior success packets started NAPI consumer via
+>> +		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
+>> +		 * paired with empty check in veth_poll().
+>> +		 */
+>> +		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
+>> +			netif_tx_wake_queue(txq);
+> 
+> Looks like I wrote a reply to v5 but didn't hit send. But I may have
+> set v5 to Changes Requested because of it :S Here is my comment:
+> 
+>   I think this is missing a memory barrier. When drivers do this dance
+>   there's usually a barrier between stop and recheck, to make sure the
+>   stop is visible before we check. And vice versa veth_xdp_rcv() needs
+>   to make sure other side sees the "empty" indication before it checks
+>   if the queue is stopped.
+
+The call netif_tx_stop_queue(txq); already contains a memory barrier
+smp_mb__before_atomic() plus an atomic set_bit operation.  That should
+be sufficient.
+
+And the other side veth_poll(), have a smp_store_mb() before reading
+ptr_ring.
+
+--Jesper
+
+p.s.
+I actually had an alternative implementation of this, that only calls
+stop when it is needed.  See below, it kind of looks prettier, but it
+adds an extra memory barrier in the likely path. (And I'm not sure if 
+read memory barrier is strong enough).
+
+
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 6ef24e261574..5ab352ccee38 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -390,15 +390,16 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, 
+struct net_device *dev)
+                         dev_kfree_skb_any(skb);
+                         goto drop;
+                 }
+-               netif_tx_stop_queue(txq);
+                 /* Restore Eth hdr pulled by 
+dev_forward_skb/eth_type_trans */
+                 __skb_push(skb, ETH_HLEN);
+                 /* Depend on prior success packets started NAPI 
+consumer via
+-                * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
+-                * paired with empty check in veth_poll().
++                * __veth_xdp_flush().  Make sure consumer is still 
+running and
++                * didn't completely queue, before stopping TXQ. Paired with
++                * queue check in veth_poll().
+                  */
+-               if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
+-                       netif_tx_wake_queue(txq);
++               smp_rmb();
++               if (likely(!__ptr_ring_empty(&rq->xdp_ring)))
++                       netif_tx_stop_queue(txq);
+                 break;
+         case NET_RX_DROP: /* same as NET_XMIT_DROP */
+
 
