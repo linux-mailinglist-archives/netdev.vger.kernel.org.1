@@ -1,86 +1,48 @@
-Return-Path: <netdev+bounces-185438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22719A9A5A4
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:19:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBDF1A9A5AD
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBC5E7A58A2
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:18:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18A51B83B2A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E4F205AB8;
-	Thu, 24 Apr 2025 08:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6015B20C02A;
+	Thu, 24 Apr 2025 08:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PWHuAb9Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ivxr6Ei9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB497433B1
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 08:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0E719CCEA;
+	Thu, 24 Apr 2025 08:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482765; cv=none; b=kiRDOkVfG3zgEhSBi81JbGkIYSGLFAzJHyA8zuGXKVyDSwf1njLsTWOthLKK4GedtAsD0aiINgiaMgUqDxDh6zBOO/7v4cYUafct+vFMPr56RATBrn66+MBmG7hZ7l5CRksMdt+02EHOykxkQfK3D/kYKQSyjbwdNiXJsBpzCpE=
+	t=1745482812; cv=none; b=Usz7kjBN8zLiYIo9WUJkAfuPW0xQASzmmev/s3zKzlTn9bRId1pSl26MQ9WoIzwW3LInW3ebKl0fVIMGy/R/gOSSEpgKMYrtoh5lOcUTCfSRZcSrRworD3ySDO1wkL/VTQU1Lthsme4G2gtfqGvmxEYgOxbVeLr+6UB17LdaD0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482765; c=relaxed/simple;
-	bh=T1P9KHALcew+oOqvMsQQkORuKuaJPN7vZ+RkUBItKjc=;
+	s=arc-20240116; t=1745482812; c=relaxed/simple;
+	bh=Y84glWeiDu7rTXdTs8IzcHYOPg+tGzDb6oe0gwQp6NM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ybh+pK04eznOngEIggbmKjY9SHp1loA6TcVPwp2QgutfjJyqoDUUfS4JEZZPEhBAeCn46vWIvHeXYs9tluJBnfFwogj1fg/oLUT4mh82ws8Bv8rpMzSsoPoDy1dRaFiVCX6D4IbEYbv7ZZMHqbrgxu+noBzjhU9Rz8fuLjWrSWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PWHuAb9Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745482762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J86L4XEnzWVJkJPwDZWkHeRr4Qb0DDaXdtDrfn90t4U=;
-	b=PWHuAb9QUCEkPLtqVBN+VX/AmTi+HoR4+OcuR0g3flJGsuuMRmfV7FHuQEG+hiHLU0oEVf
-	kfCLISBSzp1F7gacB9nu5bjOXRIakxg63sQBfaX5Darvo6gPQtWhP+UPa/ahV2B4awp3h/
-	dSofudBEiX34i4lq+9WLdPz+KnSGx28=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-73-m90Sl7bsMbqvHWwICsI_eg-1; Thu, 24 Apr 2025 04:19:20 -0400
-X-MC-Unique: m90Sl7bsMbqvHWwICsI_eg-1
-X-Mimecast-MFC-AGG-ID: m90Sl7bsMbqvHWwICsI_eg_1745482759
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43f251dc364so3753135e9.2
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 01:19:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745482759; x=1746087559;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J86L4XEnzWVJkJPwDZWkHeRr4Qb0DDaXdtDrfn90t4U=;
-        b=OS1tFPzAgvLnWtIPRftl4e4NpNFSQA2pa2hx0Tm3jvdtsZjgqSao0pVbyn+sMH27L+
-         AAsd4vM8BFkoV5tntnsK0qPROHEoqOPP2Kzwneycvbr5VQw8sFC2PKU9oY5zkK3blDT5
-         BwbBecgzRE/X++hSvdaQX0miT+Gwic6G7qAp60TAZSdzi38lPpQnJ7zY+A7EYBUvE4gb
-         lpGfvo7OD9h/jFo4phxIutted7mQ7lUOe2XH9ftrKVEp7MiPMQIRzHaLYr/JUPwtqc1W
-         81Fd3GXPzgeAm7al9NRbDhFkwoodH6XdJg4gtPCnFkmKW65LmLUTe8MjA4wOvCC/YrLd
-         9jBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVK0cV70W1ieUGyFAlp8FGXBGGhPFyJXgU6roND5sE69ya57q6z1Rpo8LWMkNCDJveceU2Cf/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxdtzrw9tn5LKxrhWzEwhH2Y+lA8WDbq4QGrdRaqdOOp5xwwVRW
-	dp40DtmNNZvs+0SDlJkImoevMCO5p/8EtSBjeMYW57OM/Ac+kCj2pauI85Qe0mh3J65xgf65h9m
-	SgYBJClc3OULMZcZ64oBw6WEcJyDFmq02ppag9qJSQcbTuawudyjrvg==
-X-Gm-Gg: ASbGncuNPZgfsKqh0+rdZu51XG5ru01JBJt3oy1vBdolFdqzlg4LXtL3FoSoU1zGEXr
-	Twd+jV5mIEgLRGIPy8eeCYIMRuRt3SlMiJ9PkF8jHCAYtyRV16EiTjJkd2BED4bxV8RNLG2bIBO
-	0YL6gqME2sGVvoG1lEjnxYyMmbVnqlhHeEuH1+tKKFH0XxZA86HP1SAgyKeuHNMNIOxNY5d8yBe
-	YTfguHj3SGbkEI/JO6+/ZDALXqvsxqB2aF8DGW47MRjHwIGFdYB3eRk6aJHtWK6keQuJ2k8FIFp
-	GEoR2p+r9OhmV4mTqxe20WHs+WK4pqiv7g7/6xQ=
-X-Received: by 2002:a05:600c:a47:b0:43d:4e9:27fe with SMTP id 5b1f17b1804b1-4409bd10250mr12185465e9.8.1745482759175;
-        Thu, 24 Apr 2025 01:19:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEx8gELt+RPS2i7N/C3QjHHPWA6nc1Yuy7RRy+sscqwT+pL9+ZUnq0XzkC4Utjo/QQbfCpMQw==
-X-Received: by 2002:a05:600c:a47:b0:43d:4e9:27fe with SMTP id 5b1f17b1804b1-4409bd10250mr12185235e9.8.1745482758799;
-        Thu, 24 Apr 2025 01:19:18 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-7-183.dyn.eolo.it. [146.241.7.183])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4c30e2sm1234755f8f.48.2025.04.24.01.19.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 01:19:18 -0700 (PDT)
-Message-ID: <bc67444d-3311-43b0-8f68-131e1ef490c7@redhat.com>
-Date: Thu, 24 Apr 2025 10:19:17 +0200
+	 In-Reply-To:Content-Type; b=hfl43YcO80iPfnDk2DHyD5yIyU6io9N/eqg3IKMS8i2WN1DJaUBR7Mp+15389Fpa2r32AvY+S7+1mjvtJT7FTW6WNLlCT4jp4sGtCvc8uYbGcax6mi3lLSBQSzxE1+tkwzC9X60r5dKqs/BGvX4ZBgNKqmGwfnDpyborxog9o/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ivxr6Ei9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 953DCC4CEE3;
+	Thu, 24 Apr 2025 08:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745482811;
+	bh=Y84glWeiDu7rTXdTs8IzcHYOPg+tGzDb6oe0gwQp6NM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ivxr6Ei9i6wLRQZJL69+vj/KT3hFV9pHN1HPs+Es7HVNeNSt6B4jABS5bAdbGo9xO
+	 2uSRNNHY5PB2j54DJhhxVftGa36dRQvEhdMVBCUs1VyqtUYBsq8Qxu4Ve09rh9Rtzo
+	 T98SCaCR1xDV4Zpp/7/JP/wPHmA3+PtklF71JEhZF+FEEAQKaOzDxJ/PwksIPTojsf
+	 joHOh4Bn+pugmKTKmzL9P9TZTuuMOYhIYeY1uMnLDKeUKWL8pPJFyRQbbsvK54O4EI
+	 DSGNd3/vkJdOiUdgkYxHYdBfiOIIc1AAlzeScpXs+D+j8x488ijY07bkH/y0ON97Uo
+	 igmdIw5021o9g==
+Message-ID: <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org>
+Date: Thu, 24 Apr 2025 10:20:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,72 +50,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 6/7] neighbour: Convert RTM_GETNEIGHTBL to
- RCU.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+Subject: Re: [PATCH v5 3/5] dt-bindings: wireless: bcm4329-fmac: Use
+ wireless-controller.yaml schema
+To: david@ixit.cz, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250418012727.57033-1-kuniyu@amazon.com>
- <20250418012727.57033-7-kuniyu@amazon.com>
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>,
+ =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>,
+ Mailing List <devicetree-spec@vger.kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
+ <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250418012727.57033-7-kuniyu@amazon.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/18/25 3:26 AM, Kuniyuki Iwashima wrote:
-> neightbl_dump_info() calls neightbl_fill_info() and
-
-AFAICS neightbl_fill_info() is only invoked from neightbl_dump_info()
-and acquires/releases the RCU internally. Such lock pair should be dropped.
-
-> neightbl_fill_param_info() for each neigh_tables[] entry.
+On 24/03/2025 18:41, David Heidelberg via B4 Relay wrote:
+> From: Janne Grunau <j@jannau.net>
 > 
-> Both functions rely on the table lock (read_lock_bh(&tbl->lock)),
-> so RTNL is not needed.
+> The wireless-controller schema specifies local-mac-address as
+> used in the bcm4329-fmac device nodes of Apple silicon devices
+> (arch/arm64/boot/dts/apple).
 > 
-> Let's fetch the table under RCU and convert RTM_GETNEIGHTBL to RCU.
+> Fixes `make dtbs_check` for those devices.
 > 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/core/neighbour.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> index ccfef86bb044..38732d8f0ed7 100644
-> --- a/net/core/neighbour.c
-> +++ b/net/core/neighbour.c
-> @@ -2467,10 +2467,12 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
->  
->  	family = ((struct rtgenmsg *)nlmsg_data(nlh))->rtgen_family;
->  
-> +	rcu_read_lock();
-> +
->  	for (tidx = 0; tidx < NEIGH_NR_TABLES; tidx++) {
->  		struct neigh_parms *p;
->  
-> -		tbl = rcu_dereference_rtnl(neigh_tables[tidx]);
-> +		tbl = rcu_dereference(neigh_tables[tidx]);
->  		if (!tbl)
->  			continue;
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Signed-off-by: Janne Grunau <j@jannau.net>
+> Signed-off-by: David Heidelberg <david@ixit.cz>
 
-Later statements:
+This introduced several new dtbs_check warnings. Including on platforms
+which were warnings free. It is nice to fix these warnings when you make
+such changes.
 
-		p = list_next_entry(&tbl->parms, list);
-		list_for_each_entry_from(p, &tbl->parms_list, list) {
 
-are now without any protection, and AFAICS parms_list is write protected
-by tbl->lock. I think it's necessary to move the
-read_lock_bh(&tbl->lock) from neightbl_fill_param_info() to
-neightbl_dump_info() ?!?
-
-Side note: I guess it would be to follow-up replacing R/W lock with
-plain spinlock/rcu?!?
-
-Thanks!
-
-Paolo
-
+Best regards,
+Krzysztof
 
