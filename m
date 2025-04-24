@@ -1,129 +1,121 @@
-Return-Path: <netdev+bounces-185424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8501A9A4D3
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:51:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4620FA9A4C4
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC6E173541
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:51:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6D23B6748
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C481F3B97;
-	Thu, 24 Apr 2025 07:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C531E5219;
+	Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="HHQVgllf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KAeJDrlg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684F61AB530;
-	Thu, 24 Apr 2025 07:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A7D8C11
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745481106; cv=none; b=GSz7O1+szhcIe5+QioJuZLwjZu3t+BAcxwfjbA8xDoOPz0Yi3QoQj96FgT7rrXBU8EcQxA6p9DCzXeQQjmdkGtKaMmjZvnJiuvk00n0hx2W/fgQKGazt6RmpEPpYRmAA2SXiGpj9HHkpUo+8gc560gKwSkOHjHYPpichl6uUBM4=
+	t=1745481009; cv=none; b=i73YL42Q1D+QHfKMLDz8UyWSSuXCECnkAksMXrbbMDuHItyLRuXNIChSbIPmVfQwPB2P3HaUT98x2D4C1msPqwOQBVGC0QmW4V1LodR7+JfuQT8Y05Y3wXYwxsK4J13NUdkx4RMeDnRqSJLJCR51AzUarAKO48mitUTGKUQ9jkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745481106; c=relaxed/simple;
-	bh=7hQKfoI8brTvc968M0/2fCuMOAxvohLcq5efGDsVPv8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nDDBomEtmGefpC6iZO7fU4gOsuKrmmD5lOcTntMfi0PnrciIZs2n4p860NRI36XbZf2lyWaL3R54Xqa+FyioVy5zRh1GimJfkCE96SfhAX4kF+4ozTlgGjECgAZpPoPGR4IWw40hMechji5reNyXyPbgT2YtT8g0zPzV0WHgYXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=HHQVgllf; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53O7ol73715410
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 24 Apr 2025 00:50:48 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53O7ol73715410
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745481052;
-	bh=7hQKfoI8brTvc968M0/2fCuMOAxvohLcq5efGDsVPv8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HHQVgllfbBgTU8HpLd8YZoVvIwcgL/kOSRt4qdiUm5wj/uJtOGXaMBcpMCnwKbEF9
-	 rG2estbhWXCsJa81wxO7BDezD81YoepsQLWPz0FadakNwpvwpNH3bAN/wIw2h1kwT1
-	 XOreUorDjfaGzeHD4n8vPeiL9yC6tVs91R1ZiwGY2Fzo7dgNYxzGAp5Lhj+plOPcwS
-	 JyWCZfR55+mA5Di7zo/a1t+g+QvX6CHHkVSiWEXyL06p66bw2FbQf379OEyv/e0oeD
-	 S4rpgqUTn5Yxq97NCc2Ns/61Xf5EyFy7FXTRn6rJLWh/sWLE2NM1er+SCkbgBAJWqH
-	 5gggmVYYw0CGA==
-Message-ID: <f207c797-567f-426c-9fa5-27792d3478a8@zytor.com>
-Date: Thu, 24 Apr 2025 00:50:46 -0700
+	s=arc-20240116; t=1745481009; c=relaxed/simple;
+	bh=rOpxxm+9KW6szQxQ0KqgxfWTa6IVtYN+ONDUkutwY0M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FVvyDH6hbvEmrxjRLU2fW5zwgsk+XrKXbtEJ71TMzcwwhKoc6c2A/KyzAJRu/HQdPwL/PGvJvPuAAQDi0eihQUEyad92lTWPTR9yYJ3WRIuONFiinTTn64Gb2sEJfvzRjhgrwNre21v/pkML1FauaVo8CBiEXbC9zkA7FHomHs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KAeJDrlg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2793EC4CEE3;
+	Thu, 24 Apr 2025 07:50:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745481009;
+	bh=rOpxxm+9KW6szQxQ0KqgxfWTa6IVtYN+ONDUkutwY0M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KAeJDrlgSjjrczJnJf/Mq/b6tZpirZUSxduzwbFqEX33y6G4psEp+5BbruR3priMX
+	 BLnSbJ/NCoJVcgQeQwakSZJ7zlNm2DK19ivzx4xGY4Mi08vwyYnhG8/t69pgb/EGJG
+	 0ExDYCfFTR2f5DW4tgFLx0Su/uhpKX5pQpyfDBCalwY1ZLbGqqoPEHeZVbVgbtAcLQ
+	 RoIbQ+Iov/sI1YvKjxvmWG+ENTD+qev/+kNLc1el372E0o7aoYg0ifvJAxqov3rZXg
+	 WW0Hz8HqubDdYCfsxfBLcBQR37jzcEYVfwtD9rc7hAY6hT9ps3Dq8bTyGfIjxO0OJe
+	 dQHUWWNCq+sZg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE42380CFD9;
+	Thu, 24 Apr 2025 07:50:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-13-xin@zytor.com>
- <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
- <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
- <02689dad-a10a-41a8-ad7e-e92d0a8d7e76@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <02689dad-a10a-41a8-ad7e-e92d0a8d7e76@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net-next 00/15] ipv6: No RTNL for IPv6 routing table.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174548104775.3247136.12623057523963360588.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Apr 2025 07:50:47 +0000
+References: <20250418000443.43734-1-kuniyu@amazon.com>
+In-Reply-To: <20250418000443.43734-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org
 
-On 4/24/2025 12:43 AM, Mi, Dapeng wrote:
-> These 2 patches are not complicated, it won't be difficult to review if
-> merging them into one as long as the commit message mentions it clearly.
-> Anyway I'm fine if you hope to keep them into two patches.
+Hello:
 
-Simple Small Steps...
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 17 Apr 2025 17:03:41 -0700 you wrote:
+> IPv6 routing tables are protected by each table's lock and work in
+> the interrupt context, which means we basically don't need RTNL to
+> modify an IPv6 routing table itself.
+> 
+> Currently, the control paths require RTNL because we may need to
+> perform device and nexthop lookups; we must prevent dev/nexthop from
+> going away from the netns.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3,net-next,01/15] ipv6: Validate RTA_GATEWAY of RTA_MULTIPATH in rtm_to_fib6_config().
+    https://git.kernel.org/netdev/net-next/c/4cb4861d8c3b
+  - [v3,net-next,02/15] ipv6: Get rid of RTNL for SIOCDELRT and RTM_DELROUTE.
+    https://git.kernel.org/netdev/net-next/c/bd11ff421d36
+  - [v3,net-next,03/15] ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
+    https://git.kernel.org/netdev/net-next/c/fa76c1674f2e
+  - [v3,net-next,04/15] ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().
+    https://git.kernel.org/netdev/net-next/c/e6f497955fb6
+  - [v3,net-next,05/15] ipv6: Move nexthop_find_by_id() after fib6_info_alloc().
+    https://git.kernel.org/netdev/net-next/c/c9cabe05e450
+  - [v3,net-next,06/15] ipv6: Split ip6_route_info_create().
+    https://git.kernel.org/netdev/net-next/c/c4837b9853e5
+  - [v3,net-next,07/15] ipv6: Preallocate rt->fib6_nh->rt6i_pcpu in ip6_route_info_create().
+    https://git.kernel.org/netdev/net-next/c/5720a328c3e9
+  - [v3,net-next,08/15] ipv6: Preallocate nhc_pcpu_rth_output in ip6_route_info_create().
+    https://git.kernel.org/netdev/net-next/c/d27b9c40dbd6
+  - [v3,net-next,09/15] ipv6: Don't pass net to ip6_route_info_append().
+    https://git.kernel.org/netdev/net-next/c/87d5d921eaf2
+  - [v3,net-next,10/15] ipv6: Rename rt6_nh.next to rt6_nh.list.
+    https://git.kernel.org/netdev/net-next/c/5a1ccff5c65a
+  - [v3,net-next,11/15] ipv6: Factorise ip6_route_multipath_add().
+    https://git.kernel.org/netdev/net-next/c/71c0efb6d12f
+  - [v3,net-next,12/15] ipv6: Protect fib6_link_table() with spinlock.
+    https://git.kernel.org/netdev/net-next/c/834d97843e3b
+  - [v3,net-next,13/15] ipv6: Defer fib6_purge_rt() in fib6_add_rt2node() to fib6_add().
+    https://git.kernel.org/netdev/net-next/c/accb46b56bc3
+  - [v3,net-next,14/15] ipv6: Protect nh->f6i_list with spinlock and flag.
+    https://git.kernel.org/netdev/net-next/c/081efd18326e
+  - [v3,net-next,15/15] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
+    https://git.kernel.org/netdev/net-next/c/169fd62799e8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
