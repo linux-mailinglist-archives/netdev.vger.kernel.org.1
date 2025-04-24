@@ -1,193 +1,118 @@
-Return-Path: <netdev+bounces-185369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19485A99EAC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:12:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D57A99EB2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:13:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E094A446511
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:12:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48D147A563E
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3241AC458;
-	Thu, 24 Apr 2025 02:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EgrBDzLp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B944197A76;
+	Thu, 24 Apr 2025 02:12:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from spam.asrmicro.com (asrmicro.com [210.13.118.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EA51A8F97
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9D92701BA
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.13.118.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745460739; cv=none; b=qkWQiGJclmOFrEh7e5+JB34jX6jB4xvH+qYwjQG94APAgfJvUfvjx9lb/49EaBnIs2u1OkEJz/0Xkz+1peij1O0H0TSr6oYVZ+E09zvyq6EJMaGfMSsg4Aeq2J1uqn33T/sMIEJIY3b727iWiM2o2WghiC/pqpeAlCc+szBMhcs=
+	t=1745460758; cv=none; b=K/edn0Y7CIkr6k4hZFCoUh+cHGHlsAwSLmhfRXiqogL0NVPCD8zonbgxFKDVRyeDM9rfAmB634gGit/9kCbHoj4105Hzcufx6tnFesWf7a4KJ7+enA62MqS6hMPRbdDxp9pMzxjJmx44+VAUv9KCWfM+M2Lobp2avBkd1EGL7m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745460739; c=relaxed/simple;
-	bh=2M6AGVO0ShVrHCeP/aOEooSXYdimqKUNl6b9yFk0tjY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BilfgtYClCxNrYFarihDKvPLUSygezjvfeQ0dEXSSl+kWsA5bWRl4yheezpf09zqqYxnhAv0FyZS8hteURtVVXcIx4VIE0s+LeGRiiFPaEJFcbwtLN2a6SFCG7DS0yklXtUeRyQNfvXwDtKAdMQxRthrN9eNcHl/eNONDmCEPfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EgrBDzLp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A4BC4CEE2;
-	Thu, 24 Apr 2025 02:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745460739;
-	bh=2M6AGVO0ShVrHCeP/aOEooSXYdimqKUNl6b9yFk0tjY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EgrBDzLpaFMrgmy5aiLZ/Mg8kG0y5wfrS8ARGxkZlyWEXM1dw+fO8i6VPpgWRb8Rs
-	 O7ofXtLKFaRRKdKsgRntImZ+N3shz6kYNEhtUPB3IfSUWXpqhNn33GBICo4hJwg8NC
-	 gUpsfl5xZZMRxrc+UqkzU9QpHX+Ig7QlwPyWrBEGX+Z04iOZX8pkfZr1ON2Sft9OWy
-	 fNUC0ac1Z1I2miFBoRxKnmSnJaNYzFAABJSwqP4zGDlz4s9I928QbMOR2x0oDmdKWu
-	 qrat3DapiZC6qOQ1JFgEvYjMEjiyCykbcphudYt0oDF+j+7kn3BQupJhistslZQaaT
-	 gcCNsly02oGaQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	jacob.e.keller@intel.com,
-	sdf@fomichev.me,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 07/12] tools: ynl-gen: multi-attr: type gen for string
-Date: Wed, 23 Apr 2025 19:12:02 -0700
-Message-ID: <20250424021207.1167791-8-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250424021207.1167791-1-kuba@kernel.org>
-References: <20250424021207.1167791-1-kuba@kernel.org>
+	s=arc-20240116; t=1745460758; c=relaxed/simple;
+	bh=ngAvRTONXmOFNq0kaBBb2o8T/nNOkmpZwfprdyr1saE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=aFpStC2OH0uqraertuASS6LieTN4em+V9hztmir5iVLB2sWY5Qo3FzGw0vJv8IhHOQ3eIaz25wNPNZ3HnU8tVTyh6kPNVyuI59LFm8RHLulrpTLzcdEIu9HAZZkLUIYuvOsZiM2qwFwPaWYRsv3J8TydG2QW2NCzeQIAo8CNFhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com; spf=pass smtp.mailfrom=asrmicro.com; arc=none smtp.client-ip=210.13.118.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asrmicro.com
+Received: from exch01.asrmicro.com (exch01.asrmicro.com [10.1.24.121])
+	by spam.asrmicro.com with ESMTPS id 53O2C1WR086872
+	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=FAIL);
+	Thu, 24 Apr 2025 10:12:01 +0800 (GMT-8)
+	(envelope-from huajianyang@asrmicro.com)
+Received: from exch03.asrmicro.com (10.1.24.118) by exch01.asrmicro.com
+ (10.1.24.121) with Microsoft SMTP Server (TLS) id 15.0.847.32; Thu, 24 Apr
+ 2025 10:12:02 +0800
+Received: from exch03.asrmicro.com ([::1]) by exch03.asrmicro.com ([::1]) with
+ mapi id 15.00.0847.030; Thu, 24 Apr 2025 10:12:02 +0800
+From: =?gb2312?B?WWFuZyBIdWFqaWFuo6jR7ruqvaGjqQ==?= <huajianyang@asrmicro.com>
+To: "pablo@netfilter.org" <pablo@netfilter.org>
+CC: Florian Westphal <fw@strlen.de>,
+        "kadlec@netfilter.org"
+	<kadlec@netfilter.org>,
+        "razor@blackwall.org" <razor@blackwall.org>,
+        "idosch@nvidia.com" <idosch@nvidia.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "dsahern@kernel.org" <dsahern@kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "netfilter-devel@vger.kernel.org"
+	<netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org"
+	<coreteam@netfilter.org>,
+        "bridge@lists.linux.dev" <bridge@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBw?=
+ =?gb2312?Q?acket_to_slow=5Fpath_instead_of_dropping_it?=
+Thread-Topic: [PATCH] net: Move specific fragmented packet to slow_path
+ instead of dropping it
+Thread-Index: AQHbr3tKZ+wvjkSVukOYgchKk3XfyLOnYFuAgAq8iFA=
+Date: Thu, 24 Apr 2025 02:12:02 +0000
+Message-ID: <313bbfd54e6540e58e60dfcd9f0e8b2e@exch03.asrmicro.com>
+References: <20250417092953.8275-1-huajianyang@asrmicro.com>
+ <aAEMPbbOGZDRygwr@strlen.de>
+In-Reply-To: <aAEMPbbOGZDRygwr@strlen.de>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-DNSRBL: 
+X-SPAM-SOURCE-CHECK: pass
+X-MAIL:spam.asrmicro.com 53O2C1WR086872
 
-Add support for multi attr strings (needed for link alt_names).
-We record the length individual strings in a len member, to do
-the same for multi-attr create a struct ynl_string in ynl.h
-and use it as a layer holding both the string and its length.
-Since strings may be arbitrary length dynamically allocate each
-individual one.
-
-Adjust arg_member and struct member to avoid spacing the double
-pointers to get "type **name;" rather than "type * *name;"
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/net/ynl/lib/ynl.h          | 13 +++++++++++++
- tools/net/ynl/pyynl/ynl_gen_c.py | 29 +++++++++++++++++++++++++----
- 2 files changed, 38 insertions(+), 4 deletions(-)
-
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index 59256e258130..0b4acc0d288a 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -85,6 +85,19 @@ struct ynl_sock {
- 	unsigned char raw_buf[];
- };
- 
-+/**
-+ * struct ynl_string - parsed individual string
-+ * @len: length of the string (excluding terminating character)
-+ * @str: valud of the string
-+ *
-+ * Parsed and nul-terminated string. This struct is only used for arrays of
-+ * strings. Non-array string members are placed directly in respective types.
-+ */
-+struct ynl_string {
-+	unsigned int len;
-+	char str[];
-+};
-+
- struct ynl_sock *
- ynl_sock_create(const struct ynl_family *yf, struct ynl_error *e);
- void ynl_sock_destroy(struct ynl_sock *ys);
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 6e697d800875..de3e807c4a2c 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -175,7 +175,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-     def arg_member(self, ri):
-         member = self._complex_member_type(ri)
-         if member:
--            arg = [member + ' *' + self.c_name]
-+            spc = ' ' if member[-1] != '*' else ''
-+            arg = [member + spc + '*' + self.c_name]
-             if self.presence_type() == 'count':
-                 arg += ['unsigned int n_' + self.c_name]
-             return arg
-@@ -189,7 +190,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             ptr = '*' if self.is_multi_val() else ''
-             if self.is_recursive_for_op(ri):
-                 ptr = '*'
--            ri.cw.p(f"{member} {ptr}{self.c_name};")
-+            spc = ' ' if member[-1] != '*' else ''
-+            ri.cw.p(f"{member}{spc}{ptr}{self.c_name};")
-             return
-         members = self.arg_member(ri)
-         for one in members:
-@@ -638,6 +640,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-     def _complex_member_type(self, ri):
-         if 'type' not in self.attr or self.attr['type'] == 'nest':
-             return self.nested_struct_type
-+        elif self.attr['type'] == 'string':
-+            return 'struct ynl_string *'
-         elif self.attr['type'] in scalars:
-             scalar_pfx = '__' if ri.ku_space == 'user' else ''
-             return scalar_pfx + self.attr['type']
-@@ -645,12 +649,18 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             raise Exception(f"Sub-type {self.attr['type']} not supported yet")
- 
-     def free_needs_iter(self):
--        return 'type' not in self.attr or self.attr['type'] == 'nest'
-+        return self.attr['type'] in {'nest', 'string'}
- 
-     def _free_lines(self, ri, var, ref):
-         lines = []
-         if self.attr['type'] in scalars:
-             lines += [f"free({var}->{ref}{self.c_name});"]
-+        elif self.attr['type'] == 'string':
-+            lines += [
-+                f"for (i = 0; i < {var}->{ref}n_{self.c_name}; i++)",
-+                f"free({var}->{ref}{self.c_name}[i]);",
-+                f"free({var}->{ref}{self.c_name});",
-+            ]
-         elif 'type' not in self.attr or self.attr['type'] == 'nest':
-             lines += [
-                 f"for (i = 0; i < {var}->{ref}n_{self.c_name}; i++)",
-@@ -675,6 +685,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             put_type = self.type
-             ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-             ri.cw.p(f"ynl_attr_put_{put_type}(nlh, {self.enum_name}, {var}->{self.c_name}[i]);")
-+        elif self.attr['type'] == 'string':
-+            ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-+            ri.cw.p(f"ynl_attr_put_str(nlh, {self.enum_name}, {var}->{self.c_name}[i]->str);")
-         elif 'type' not in self.attr or self.attr['type'] == 'nest':
-             ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-             self._attr_put_line(ri, var, f"{self.nested_render_name}_put(nlh, " +
-@@ -1836,8 +1849,16 @@ _C_KW = {
-             ri.cw.p('return YNL_PARSE_CB_ERROR;')
-         elif aspec.type in scalars:
-             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.type}(attr);")
-+        elif aspec.type == 'string':
-+            ri.cw.p('unsigned int len;')
-+            ri.cw.nl()
-+            ri.cw.p('len = strnlen(ynl_attr_get_str(attr), ynl_attr_data_len(attr));')
-+            ri.cw.p(f'dst->{aspec.c_name}[i] = malloc(sizeof(struct ynl_string) + len + 1);')
-+            ri.cw.p(f"dst->{aspec.c_name}[i]->len = len;")
-+            ri.cw.p(f"memcpy(dst->{aspec.c_name}[i]->str, ynl_attr_get_str(attr), len);")
-+            ri.cw.p(f"dst->{aspec.c_name}[i]->str[len] = 0;")
-         else:
--            raise Exception('Nest parsing type not supported yet')
-+            raise Exception(f'Nest parsing of type {aspec.type} not supported yet')
-         ri.cw.p('i++;')
-         ri.cw.block_end()
-         ri.cw.block_end()
--- 
-2.49.0
-
+SGkgUGFibG8sDQoNCkNhbiB5b3UgZ2l2ZSBzb21lIGFkdmljZT8NCg0KVGhhbmtzLg0KDQpCZXN0
+IFJlZ2FyZHMsDQpIdWFqaWFuDQoNCi0tLS0t08q8/tStvP4tLS0tLQ0Kt6K8/sjLOiBGbG9yaWFu
+IFdlc3RwaGFsIFttYWlsdG86ZndAc3RybGVuLmRlXSANCreiy83KsbzkOiAyMDI1xOo01MIxN8jV
+IDIyOjEyDQrK1bz+yMs6IFlhbmcgSHVhamlhbqOo0e67qr2ho6kgPGh1YWppYW55YW5nQGFzcm1p
+Y3JvLmNvbT4NCrOty806IHBhYmxvQG5ldGZpbHRlci5vcmc7IGthZGxlY0BuZXRmaWx0ZXIub3Jn
+OyByYXpvckBibGFja3dhbGwub3JnOyBpZG9zY2hAbnZpZGlhLmNvbTsgZGF2ZW1AZGF2ZW1sb2Z0
+Lm5ldDsgZHNhaGVybkBrZXJuZWwub3JnOyBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5l
+bC5vcmc7IHBhYmVuaUByZWRoYXQuY29tOyBob3Jtc0BrZXJuZWwub3JnOyBuZXRmaWx0ZXItZGV2
+ZWxAdmdlci5rZXJuZWwub3JnOyBjb3JldGVhbUBuZXRmaWx0ZXIub3JnOyBicmlkZ2VAbGlzdHMu
+bGludXguZGV2OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJu
+ZWwub3JnDQrW98ziOiBSZTogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBw
+YWNrZXQgdG8gc2xvd19wYXRoIGluc3RlYWQgb2YgZHJvcHBpbmcgaXQNCg0KSHVhamlhbiBZYW5n
+IDxodWFqaWFueWFuZ0Bhc3JtaWNyby5jb20+IHdyb3RlOg0KPiBUaGUgY29uZmlnIE5GX0NPTk5U
+UkFDS19CUklER0Ugd2lsbCBjaGFuZ2UgdGhlIGJyaWRnZSBmb3J3YXJkaW5nIGZvciANCj4gZnJh
+Z21lbnRlZCBwYWNrZXRzLg0KPiANCj4gVGhlIG9yaWdpbmFsIGJyaWRnZSBkb2VzIG5vdCBrbm93
+IHRoYXQgaXQgaXMgYSBmcmFnbWVudGVkIHBhY2tldCBhbmQgDQo+IGZvcndhcmRzIGl0IGRpcmVj
+dGx5LCBhZnRlciBORl9DT05OVFJBQ0tfQlJJREdFIGlzIGVuYWJsZWQsIGZ1bmN0aW9uIA0KPiBu
+Zl9icl9pcF9mcmFnbWVudCBhbmQgYnJfaXA2X2ZyYWdtZW50IHdpbGwgY2hlY2sgdGhlIGhlYWRy
+b29tLg0KPiANCj4gSW4gb3JpZ2luYWwgYnJfZm9yd2FyZCwgaW5zdWZmaWNpZW50IGhlYWRyb29t
+IG9mIHNrYiBtYXkgaW5kZWVkIGV4aXN0LCANCj4gYnV0IHRoZXJlJ3Mgc3RpbGwgYSB3YXkgdG8g
+c2F2ZSB0aGUgc2tiIGluIHRoZSBkZXZpY2UgZHJpdmVyIGFmdGVyIA0KPiBkZXZfcXVldWVfeG1p
+dC5TbyBkcm9waW5nIHRoZSBza2Igd2lsbCBjaGFuZ2UgdGhlIG9yaWdpbmFsIGJyaWRnZSANCj4g
+Zm9yd2FyZGluZyBpbiBzb21lIGNhc2VzLg0KDQpGaXhlczogM2MxNzFmNDk2ZWY1ICgibmV0Zmls
+dGVyOiBicmlkZ2U6IGFkZCBjb25uZWN0aW9uIHRyYWNraW5nIHN5c3RlbSIpDQpSZXZpZXdlZC1i
+eTogRmxvcmlhbiBXZXN0cGhhbCA8ZndAc3RybGVuLmRlPg0KDQpUaGlzIHNob3VsZCBwcm9iYWJs
+eSBiZSByb3V0ZWQgdmlhIFBhYmxvLg0KDQpQYWJsbywgZmVlbCBmcmVlIHRvIHJvdXRlIHRoaXMg
+dmlhIG5mLW5leHQgaWYgeW91IHRoaW5rIGl0cyBub3QgYW4gdXJnZW50IGZpeCwgaXRzIGJlZW4g
+bGlrZSB0aGlzIHNpbmNlIGJyaWRnZSBjb25udHJhY2sgd2FzIGFkZGVkLg0K
 
