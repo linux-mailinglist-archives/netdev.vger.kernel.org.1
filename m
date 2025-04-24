@@ -1,207 +1,207 @@
-Return-Path: <netdev+bounces-185498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1964A9AAFE
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:50:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C31FA9AAF2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D122C4A19C0
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DAF3188897C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA4E221FBC;
-	Thu, 24 Apr 2025 10:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0551FFC74;
+	Thu, 24 Apr 2025 10:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kROr0HKm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BH0J527G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3791214813;
-	Thu, 24 Apr 2025 10:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20B6F510;
+	Thu, 24 Apr 2025 10:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745491809; cv=none; b=fepRGVYK/30iOUxC42bOdo6hwkWW7l1EkFIWbmff4fYGfWlnG2uPZoD1HL+l5vlkUCcLckdA/7rp+4z3JuOqKS3PCDrXcZscp0xO2D/Ysyvh8JiQVxt6vkFDKSHNX3swfteWuD9wXAG6nlOQBCTMQEziJNqJBmHW2zaZttd5+OM=
+	t=1745491759; cv=none; b=n/4w2S6/HjKOhAJDIdQubB2SMQpya/qW0h43PXLkKBDkl4nfCt2Dm9NwFDYn8c/AuxpXsvasXSE5YJq3MXYv7ISVx+pwxZTOBCOXNIYFtx+5Qg19Ie94ilMcCqGX4ptmamFc+1W68DuU77seAMhFFsDk0/iJHqxbxhGV9YaM4lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745491809; c=relaxed/simple;
-	bh=MnqykwymzwHERo6nKnawUDD2AsCMTGXbvqod8pxseEc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X3uqwtXTP7FzQzCYGZgPW+CBK/OepfQDF8fik5EfGlV4wyewEWy8CNaLlQK7J9sUjfxjzeJRlWBhC+zI3DpIWUJwtstrwEogFUcH+Qrt77aQe978NmnX2smWcWT+3S27Dm70EBrQjD0PBPO18YkUnrjTFzPUbn0x3gXP1GW+Zqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kROr0HKm; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-736a72220edso853007b3a.3;
-        Thu, 24 Apr 2025 03:50:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745491807; x=1746096607; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=otKFGdVb+uXNzYPZbaE8wgcboqR2b2qzgL6mIMQa4V8=;
-        b=kROr0HKmWLVVs7sEVTEB9374U+w5XFy0aNb27OXwo28n+O2VMfdVbxuHI2xG8ueDqF
-         nmH/yOvGfY6PaCAIhkphAMwZDJAqxUQ/3vDtheJlPERVk+N1xBl/vhi0co3Q5qOn29uj
-         1sWJUSkEf7WHkQKo6uhJzHe1z1P8lNRXVI5IFSOFCb7cA5oRG832f5Tfi71xnDQaFmup
-         9mE3kSIpZQUod78ZzBXj3quYhNfP/6ZioPDS5pK7fwddE3OHiNuvxx5KPr3leL+BlCkA
-         WaLaT1sO/05Y6t1feglH8h94qQIxqmq0How7eYN1DCIFvhuvwFUHgD0tWt82A16y9BJf
-         Ov4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745491807; x=1746096607;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=otKFGdVb+uXNzYPZbaE8wgcboqR2b2qzgL6mIMQa4V8=;
-        b=oNX5KgLQWS3u+rUW4pB1EtKGoYDZXzaWOaB064S3bJl4jEi4hKr3Il3/wFNEdhr0Ay
-         Ljq3VfD1/jhCegxtrKxRnY2TeXF26tXAuAFP3E9xIKbmuwrLGc3zJ9w3qdIzKStM95Dl
-         o4vVHvKmhvSvoQ02A65+zrdjUENRf8Zb97QW5ljwRqZS124O3SLjMUHbwXEIYa9CcWzx
-         y73smhJEFlEyqee7MtXhjI9SKOraBUsfft1FoHo5feNtzbff3sK/4bgNnR8FUrPa9327
-         R3cyRASiU16ANb89Rd6Yo+iaUuPT4WNJcKXx5x8lZ+ccuES/UbuezbxHdYEvAI+BPWtZ
-         /4eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUE2ZoRex5Nj7KBFR2ycK3EIhuBaaZn0PF0Oinfwz8k6SFLn155Rs3r2ibPLvgopN4muPA=@vger.kernel.org, AJvYcCVPjIYih1a1qqmuNukYVBMYmKnY8HM42GZ0xvdCk2P4S2N4OZLvG/eEhx4eEnXcyClezteXwjvhummC9K0R@vger.kernel.org, AJvYcCWiGuUa2NH16fraoZ1N3CRFuFxfwzXD0unxrBqg+Z1oJzAMqxfObElX+5w2lkMXxKHTO4XHJSkM@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7a/KpVGdpw7XT26R7I58n8gjnlXer7CzOfJg88fMrtatOtC2J
-	+DYwyTJZ0fxf6+2oP3ZXAoyFuWbUGBOjsR16KEgy7HBa1QaT1y2H
-X-Gm-Gg: ASbGnctCBUfLNAG2cLExsroer/UtoXpo2oxAIgEy1j9SkoqJBw++z/bKPbyJydtchCY
-	JOC/hURwAKUvPthXfynBxRyNnTIyKaL/dgAOA6dJAhdDXddW7T78Pldur3ojL5myIghvfrrPQEt
-	AGSVFhMEI2FgzbIJlHTtZVEec0R+lPaQCooGoOTZa73nEdvBSUHhzK0AMgqqX6F6cuDIy783wts
-	ZvCzFka7y15nZGoS2HufcwCbKO3sULkFpT5IhijoYuCfs74uK1sKDZXujQJ+guvCi+ZNyI9WeRU
-	SdaFwbJ7EEVO+pbkSEzK8VKopAAyClCucAXjQI1XHEiByF60AbsPRBXp
-X-Google-Smtp-Source: AGHT+IGgeHDm6WkVamJnp/W1II7ZDrehvPmtPJEYMjp/1PGWmVR9+feWN1Ivt1NcPJM+kVc7pr6mIQ==
-X-Received: by 2002:a05:6a00:2410:b0:73e:1e21:b653 with SMTP id d2e1a72fcca58-73e243c6011mr2778211b3a.5.1745491807205;
-        Thu, 24 Apr 2025 03:50:07 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:f632:6238:46f4:702e])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-73e25941bbbsm1120138b3a.65.2025.04.24.03.50.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 03:50:06 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: virtualization@lists.linux.dev
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH v5 3/3] selftests: net: add a virtio_net deadlock selftest
-Date: Thu, 24 Apr 2025 17:47:16 +0700
-Message-ID: <20250424104716.40453-4-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250424104716.40453-1-minhquangbui99@gmail.com>
-References: <20250424104716.40453-1-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1745491759; c=relaxed/simple;
+	bh=mqWPrwTyWntUN2VetXvoc4/yqzcGd25/TQDIPFZscK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZvV9Tf4qI+px1JoD+M9zXsNakHhlrLPY1nlfJBMdoQKvW00JWaI6iUYUjLFdRiZqq0UOzNYFC+qxnr0xyM0ONfsb5CqJ1HYDiIK/4zKXxwMyX7CqNkvgbRknTSasPE9loDfF6tei8b8P/XkQ4ATFZJQFwkfAs8FlRxDjkkED7Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BH0J527G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73357C4CEE4;
+	Thu, 24 Apr 2025 10:49:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745491758;
+	bh=mqWPrwTyWntUN2VetXvoc4/yqzcGd25/TQDIPFZscK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BH0J527GnzV00glYPFQKqBPecciMw4nWolX9ixxuZw+IXKKIh6WaRWECI84/KmVGt
+	 cwcpEUhwekxaCDH8MztWHBXkG7nwdbI8lVoeZHm3+db4lHZqYzdzTRPpJLq2zLDToP
+	 2woe3GLnozM2yL9CS8fTHHI/tnG01Xr09hKOOxB8Kk81mkXim96TDTrpjwOjISBUd4
+	 rucKmQ9loaYWfhdrI4voitdtzW2ug4kh++koWa53+fK0y1PrjbXxu4BdSzd1wc1oRQ
+	 FefFhGTwtM5yOKoRH+0hAqk6rcgV3QTdYZta4iD2radSkuhMIpElszYZAW86tP8bk2
+	 fX002j0O8dXuQ==
+Date: Thu, 24 Apr 2025 13:49:12 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Shiraz Saleem <shirazsaleem@microsoft.com>
+Cc: Konstantin Taranov <kotaranov@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Long Li <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH rdma-next 4/4] net: mana: Add support for auxiliary
+ device servicing events
+Message-ID: <20250424104912.GR48485@unreal>
+References: <1744655329-13601-1-git-send-email-kotaranov@linux.microsoft.com>
+ <1744655329-13601-5-git-send-email-kotaranov@linux.microsoft.com>
+ <20250420105309.GC10635@unreal>
+ <BL1PR21MB3089EF4639B5CC2AD5E70B96C9852@BL1PR21MB3089.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL1PR21MB3089EF4639B5CC2AD5E70B96C9852@BL1PR21MB3089.namprd21.prod.outlook.com>
 
-The selftest reproduces the deadlock scenario when binding/unbinding XDP
-program, XDP socket, rx ring resize on virtio_net interface.
+On Thu, Apr 24, 2025 at 02:33:24AM +0000, Shiraz Saleem wrote:
+> > Subject: [EXTERNAL] Re: [PATCH rdma-next 4/4] net: mana: Add support for
+> > auxiliary device servicing events
+> > 
+> > On Mon, Apr 14, 2025 at 11:28:49AM -0700, Konstantin Taranov wrote:
+> > > From: Shiraz Saleem <shirazsaleem@microsoft.com>
+> > >
+> > > Handle soc servcing events which require the rdma auxiliary device
+> > > resources to be cleaned up during a suspend, and re-initialized during a
+> > resume.
+> > >
+> > > Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
+> > > Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+> > > ---
+> > >  .../net/ethernet/microsoft/mana/gdma_main.c   | 11 +++-
+> > >  .../net/ethernet/microsoft/mana/hw_channel.c  | 19 ++++++
+> > > drivers/net/ethernet/microsoft/mana/mana_en.c | 60
+> > +++++++++++++++++++
+> > >  include/net/mana/gdma.h                       | 18 ++++++
+> > >  include/net/mana/hw_channel.h                 |  9 +++
+> > >  5 files changed, 116 insertions(+), 1 deletion(-)
+> > 
+> > <...>
+> > 
+> > > @@ -1474,6 +1481,8 @@ static void mana_gd_cleanup(struct pci_dev
+> > *pdev)
+> > >  	mana_hwc_destroy_channel(gc);
+> > >
+> > >  	mana_gd_remove_irqs(pdev);
+> > > +
+> > > +	destroy_workqueue(gc->service_wq);
+> > >  }
+> > 
+> > <...>
+> > 
+> > > +static void mana_handle_rdma_servicing(struct work_struct *work) {
+> > > +	struct mana_service_work *serv_work =
+> > > +		container_of(work, struct mana_service_work, work);
+> > > +	struct gdma_dev *gd = serv_work->gdma_dev;
+> > > +	struct device *dev = gd->gdma_context->dev;
+> > > +	int ret;
+> > > +
+> > > +	switch (serv_work->event) {
+> > > +	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
+> > > +		if (!gd->adev || gd->is_suspended)
+> > > +			break;
+> > > +
+> > > +		remove_adev(gd);
+> > > +		gd->is_suspended = true;
+> > > +		break;
+> > > +
+> > > +	case GDMA_SERVICE_TYPE_RDMA_RESUME:
+> > > +		if (!gd->is_suspended)
+> > > +			break;
+> > > +
+> > > +		ret = add_adev(gd, "rdma");
+> > > +		if (ret)
+> > > +			dev_err(dev, "Failed to add adev on resume: %d\n",
+> > ret);
+> > > +		else
+> > > +			gd->is_suspended = false;
+> > > +		break;
+> > > +
+> > > +	default:
+> > > +		dev_warn(dev, "unknown adev service event %u\n",
+> > > +			 serv_work->event);
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	kfree(serv_work);
+> > 
+> > The series looks ok to me, except one question. Are you sure that it is safe to
+> > have not-connected and not-locked general work while
+> > add_adev/remove_adev can be called in parallel from different thread? For
+> > example getting event GDMA_SERVICE_TYPE_RDMA_SUSPEND while
+> > mana_gd_probe() fails or some other intervention with PCI
+> > (GDMA_SERVICE_TYPE_RDMA_SUSPEND and PCI shutdown).
+> > 
+> > What type of protection do you have here?
+> > 
+> Hi Leon,
+> 
+> Thanks for spotting this.
+> 
+> There are two cases.
+> 
+> -Probe / Resume
+> add_adev() stores gd->adev only after auxiliary_device_add() succeeds.
+> While gd->adev is still NULL the worker drops any GDMA_SERVICE_TYPE_RDMA_SUSPEND event, so an early suspend that arrives during probe is harmless and cannot race with the later add_adev().
+> 
+> -Remove / Suspend / Shutdown
+> During teardown the worker may still be inside add_adev()/remove_adev() while the PCI thread starts its own remove_adev(). 
+> 
+> In v2 I ll serialize them with flag + flush pattern.
+> 
+> void mana_rdma_remove(struct gdma_dev *gd)
+> {
+> [....]
+>         WRITE_ONCE(gd->rdma_teardown, true);   /* block new events      */
+>         flush_workqueue(gc->service_wq);       /* wait running worker   */
+> 
+>         if (gd->adev)
+>                 remove_adev(gd);
+> 
+> [....]
+> }
+> i.e. during teardown, we stop the producer and drain the queue
+> 
+> and,
+> 
+> static void mana_handle_rdma_servicing(struct work_struct *work)
+> {
+> [....]
+> 	if (READ_ONCE(gd->rdma_teardown))
+> 		goto out;
+> [.....]
+> }
+> The flag blocks any new work, and flush_workqueue() waits for anything already running. This serialises the two paths and removes
+> the race you pointed out.
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- .../testing/selftests/drivers/net/hw/Makefile |  1 +
- .../selftests/drivers/net/hw/xsk_reconfig.py  | 68 +++++++++++++++++++
- 2 files changed, 69 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
+Yes, I also think that it solves, so let's post v2 please.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 07cddb19ba35..5447785c286e 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -21,6 +21,7 @@ TEST_PROGS = \
- 	rss_ctx.py \
- 	rss_input_xfrm.py \
- 	tso.py \
-+	xsk_reconfig.py \
- 	#
- 
- TEST_FILES := \
-diff --git a/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py b/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
-new file mode 100755
-index 000000000000..031de97a974d
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
-@@ -0,0 +1,68 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This is intended to be run on a virtio-net guest interface.
-+# The test binds the XDP socket to the interface without setting
-+# the fill ring to trigger delayed refill_work. This helps to
-+# make it easier to reproduce the deadlock when XDP program,
-+# XDP socket bind/unbind, rx ring resize race with refill_work on
-+# the buggy kernel.
-+#
-+# The Qemu command to setup virtio-net
-+# -netdev tap,id=hostnet1,vhost=on,script=no,downscript=no
-+# -device virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on
-+
-+from lib.py import ksft_exit, ksft_run
-+from lib.py import KsftSkipEx, KsftFailEx
-+from lib.py import NetDrvEnv
-+from lib.py import bkg, ip, cmd, ethtool
-+import time
-+
-+def _get_rx_ring_entries(cfg):
-+    output = ethtool(f"-g {cfg.ifname}", json=True)
-+    return output[0]["rx"]
-+
-+def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
-+    # Probe for support
-+    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
-+    if xdp.ret == 255:
-+        raise KsftSkipEx('AF_XDP unsupported')
-+    elif xdp.ret > 0:
-+        raise KsftFailEx('unable to create AF_XDP socket')
-+
-+    # Retry xsk setup 3 times
-+    i = 0
-+    while True:
-+        try:
-+            return bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} ' \
-+                       '{xdp_queue_id} -z', ksft_wait=3)
-+        except:
-+            if i == 3:
-+                raise KsftSkipEx('Failed to bind XDP socket in zerocopy.\n' \
-+                                 'Please consider adding iommu_platform=on ' \
-+                                 'when setting up virtio-net-pci')
-+            else:
-+                i += 1
-+                time.sleep(1)
-+                continue
-+
-+def check_xdp_bind(cfg):
-+    with setup_xsk(cfg):
-+        ip(f"link set dev %s xdp obj %s sec xdp" %
-+           (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
-+        ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+def check_rx_resize(cfg):
-+    with setup_xsk(cfg):
-+        rx_ring = _get_rx_ring_entries(cfg)
-+        ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring // 2))
-+        ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
-+
-+def main():
-+    with NetDrvEnv(__file__, nsim_test=False) as cfg:
-+        ksft_run([check_xdp_bind, check_rx_resize],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.0
+Just remember that WRITE_ONCE/READ_ONCE is not a replacement for locks.
 
+Thanks
+
+> 
+> Shiraz
+> 
 
