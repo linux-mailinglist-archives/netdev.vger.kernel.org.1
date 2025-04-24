@@ -1,98 +1,115 @@
-Return-Path: <netdev+bounces-185706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E69A9B7E7
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:07:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C83A9B7EA
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFD214C3E48
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:07:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADB614C3E80
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A190221FF35;
-	Thu, 24 Apr 2025 19:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AE62900A6;
+	Thu, 24 Apr 2025 19:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2RCrh/zN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtuyTswE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA0C1E231E;
-	Thu, 24 Apr 2025 19:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D6D28FFD5;
+	Thu, 24 Apr 2025 19:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745521394; cv=none; b=jgvy6whBGZGXuDnmWdiXfGXK8LrOO+TFXb1v26WRY8d+j6iw+oX68aPFaoWpzysBE/Ws4ziisCah9mRA4fLyIbAT45VgcK1coZOu997h5VvPEnzgCbwnZo127jrBcJ2QA1xndwQZ9HojfObUYg7+G4/oihKFaWijrw0SNsLfYrY=
+	t=1745521511; cv=none; b=crZdeoBd7+CZuasM/4nUyFicmmlWFWUp0zUQnKhOoMtAKCLQkRm+O/9fT9X0KDMelBOHXvvEMXfnoKIxltZD3JlgHtuHKYJ9JHL252asBOoIWukhteghNtjvC97nqPw/WxiBXHM5DzpwUOrY78gz4f/SVwmbc1cb0wd8aXR/0t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745521394; c=relaxed/simple;
-	bh=HKz2v/Dk24xsj/fbF/BXdQp5dBDuDBSlFnA/gFKOpRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mTKonnuQEeNPwuJUAa8m4s0vvoAlj8eiii6plAS40H1lAnCtrjXHyOP4wxuuC0Ek5JZ2RrT+Idb2PxInKxrDVcvxdEgzbRbkj8yyoXp8tP67JP/upjObP4FPcZtRXtaf8IEnI/6eZc0A3by5wUxbunI4/VkWJiYFy/GTMG8TjVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2RCrh/zN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bgHAVRSAtGS2mucHqdulufmpGRpZTS9/L7tc07qePPc=; b=2RCrh/zN/3ZFHAA0cZnrwsSn/r
-	7jiQ2NoKx+p2nXFoiPH81MDw/eOCr9IxIj/VbzE6U//36F+XhAZo2M3AA3n8txwu2IjAKfNnFXAo5
-	XFmmzS08oyl2Uq7rB9EUQ807RpD/QVRoh5HoTIqNZQfycVkGUke3QQAhjqS/vWYgHA0M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u81qF-00AVAd-F9; Thu, 24 Apr 2025 21:02:35 +0200
-Date: Thu, 24 Apr 2025 21:02:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jernej =?utf-8?Q?=C5=A0krabec?= <jernej.skrabec@gmail.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, Yixun Lan <dlan@gentoo.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, clabbe.montjoie@gmail.com
-Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
- board
-Message-ID: <7fcedce7-5cfe-48a4-9769-e6e7e82dc786@lunn.ch>
-References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
- <4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
- <20250424150037.0f09a867@donnerap.manchester.arm.com>
- <4643958.LvFx2qVVIh@jernej-laptop>
+	s=arc-20240116; t=1745521511; c=relaxed/simple;
+	bh=Sm3N+EFDuoJzdqd1YhzgxLoS15KUYF+jl7ejRzSDu/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cb4jGitkMp8TNgwWRqA4W02Siq3zeqcrdXY11RFZS29Rb+XgKYMG3TzL2R1GwR7iMdpj9jsRms/FU/7gSC+o59/jTC8ZdjayZ4VfNz8R4l15KHM73AbKHxLS5yfz1QFuxGOas+Gaa/NRUz8XVwZg9EOHptZHhLM3eM6+BUxzUn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtuyTswE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0688AC4CEE3;
+	Thu, 24 Apr 2025 19:05:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745521511;
+	bh=Sm3N+EFDuoJzdqd1YhzgxLoS15KUYF+jl7ejRzSDu/M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=KtuyTswEq/d9ogf6clbFjqLdijhnwWgmrCSHLZDwopx250NPh93izNpnCpJAPKINI
+	 TnHcBzoZDFzKmCWZCh4EtBlYvj1Iul6E9I6RiUgEqgpfU1bAe73+9l++Oxn+9+w0Jt
+	 26JG1mXLhp+XWqEJBujYNeW2AiktpTT4hMaH2mP9mC2pgmX+WNAO3CzQfdYz5RXkxz
+	 3WCkJoSaqqVJ5XhjKIaVHRAxJGbQ1m84advQUHWjGTKDPE2BdFMkajlqV6iQ/VmiSf
+	 xA/jIPzG7jgR3rFyoYu9P/MIjLZGOZuIkv2wcO82aAzcU9PQzVHy/lRj7ecMtMwd6K
+	 iipVWf06+4aIQ==
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5f62ef3c383so2734124a12.2;
+        Thu, 24 Apr 2025 12:05:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVZ3Xuy4Oc45vU8ojl7vUPEHbVJhF1iKA2HFtMjUkXfSXc/LmIxYkfTG4lrmaeyFLiB7+TuGpw/s8fLODw/Ww==@vger.kernel.org, AJvYcCW6gK8wOa8Ham8AjBsgvwbDWO9KD62DJ+ne42fgnbeA66oDXS8tGoicHPRQ4Ppoe+YstymcPv3sWsQ8Cg==@vger.kernel.org, AJvYcCWW279uWhfkQNf0JnlMapIMue/lK0BZkiXihhnu9B0ledgIp0kxXr5AG1HCWMU0zRAmPvWbFUAfosFxnKm9QXM=@vger.kernel.org, AJvYcCWobk4qWOLhU9uX3198LbkdS6M8rl8a7i6xwJD9IHqKephSApK23WYTssLnIrbw3DJ/OihQeeJM@vger.kernel.org, AJvYcCWynJTG/3x9kx9Mih+bYFhFTFOa/i+hQ028P2Tlv5pTII4NyM4B/RzfPQfYqOx9aMZtcxPrBqtFPpiwYvg1@vger.kernel.org, AJvYcCX0v1mWV75PTjnNsclUkCYhTOb0zjl1wYjaKM8OpAzQwRoNAKo/Bb/ByZWs9iktkcPF3ZxWRAXKvVvt+ZJ4JgA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzH1y2Ezz/4UIqT5H13xMhbYs22qY2bdG8oSiulx0G/8RZA1wvf
+	E20ntuaic+rk2aiK2VIn2nisQBIlhFiiQGcAGcQHECQFBiYuBw4KmzeoFkN4dH1Wa2Vth3zdPS5
+	v1u8IBGed7ewENsnaOD4vf6i5Ow==
+X-Google-Smtp-Source: AGHT+IGm7lm+b5Mr+cnYEdSkB8OI56BIVMt5nL9APzOm0qOr/4ImpeRmdhZ5NAUq0UWQDbHi8kbmShTWjc6+am4lBiQ=
+X-Received: by 2002:a05:6402:2686:b0:5e5:b572:a6d6 with SMTP id
+ 4fb4d7f45d1cf-5f6fabcda3dmr535218a12.10.1745521509605; Thu, 24 Apr 2025
+ 12:05:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4643958.LvFx2qVVIh@jernej-laptop>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
+ <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
+ <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org> <57701e2e-0005-4a8a-a3f5-ba098c97b480@kernel.org>
+ <4b040936baa8fa8669b34e36fe9dff6e08aeede9.camel@sipsolutions.net>
+ <f0e56cb2-17a6-44d4-ae71-8639966d565a@kernel.org> <8d8b7c3ad6a67a683abbb4fc6049898747300a16.camel@sipsolutions.net>
+ <CAL_JsqKGmoiW=yDD7G4Qznsa7S2wQ7x4Mh0i4puAyFsvcnHz1A@mail.gmail.com> <4e5d875c3f666be8d1c72fa19f6237f21b24f7ec.camel@sipsolutions.net>
+In-Reply-To: <4e5d875c3f666be8d1c72fa19f6237f21b24f7ec.camel@sipsolutions.net>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 24 Apr 2025 14:04:57 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJHdw5XOz5PLUvTZLVA0mUQTyGuqnXT0WTLTqNh27VWAw@mail.gmail.com>
+X-Gm-Features: ATxdqUHcl-CocjTcGXsOgyTDuLgwr5CqEc9QLMguz9q9ZTXAuu1QgWqCyAOM0fo
+Message-ID: <CAL_JsqJHdw5XOz5PLUvTZLVA0mUQTyGuqnXT0WTLTqNh27VWAw@mail.gmail.com>
+Subject: Re: [PATCH v5 3/5] dt-bindings: wireless: bcm4329-fmac: Use
+ wireless-controller.yaml schema
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, david@ixit.cz, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
+	=?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Andy Gross <agross@kernel.org>, Mailing List <devicetree-spec@vger.kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> In my experience, vendor DT has proper delays specified, just 7 instead of
-> 700, for example. What they get wrong, or better said, don't care, is phy
-> mode. It's always set to rgmii because phy driver most of the time ignores
-> this value and phy IC just uses mode set using resistors. Proper way here
-> would be to check schematic and set phy mode according to that. This method
-> always works, except for one board, which had resistors set wrong and
-> phy mode configured over phy driver was actually fix for it.
+On Thu, Apr 24, 2025 at 1:39=E2=80=AFPM Johannes Berg <johannes@sipsolution=
+s.net> wrote:
+>
+> On Thu, 2025-04-24 at 13:26 -0500, Rob Herring wrote:
+> > While it seems the reviews of the series caused more warnings for
+> > Apple, in general, schemas creating warnings is not breaking things.
+> > In a way, the whole point is to create warnings because if the .dts
+> > files were perfect already we wouldn't need schemas. The main
+> > requirement for schemas is only that they don't create warnings for
+> > the examples. There's still too many for .dts files to worry about it
+> > (and there's intermittent warnings from things getting merged via
+> > different trees).
+> >
+>
+> Oh, sure, but now if you want to apply the fixes you probably have to
+> wait for the broken patches in my tree to percolate all the way through
+> to Linus, then back to your tree, and then you can apply the fixes?
 
-What PHY driver is this? If it is ignoring the mode, it is broken.
+No, I never take .dts changes. They all go via the individual platform
+trees. It's a bit weird if Krzysztof refers to the commit that's not
+in the linear history, but that shouldn't hold things up. The issues
+exist with or without the schema change. They might even be backported
+to stable while the schema change won't be.
 
-We have had problems in the past in this respect. A PHY driver which
-ignored the RGMII modes, and strapping was used. That 'worked' until
-somebody built a board with broken strapping and added code to respect
-the RGMII mode, overriding the strapping. It made that board work, but
-broke lots of others which had the wrong RGMII mode....
-
-If we have this again, i would like to know so we can try to get in
-front of the problem, before we have lots of broken boards...
-
-	Andrew
+Rob
 
