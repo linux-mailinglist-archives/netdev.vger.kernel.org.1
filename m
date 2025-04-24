@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-185360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FBEA99E8C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 03:59:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464FBA99E8F
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:00:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 160FC445A3D
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 524DF1943FE7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FC11E1E1C;
-	Thu, 24 Apr 2025 01:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAC61F2C3B;
+	Thu, 24 Apr 2025 02:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qbj6izcx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p00vge3+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3212701C3;
-	Thu, 24 Apr 2025 01:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEC71E1E1C;
+	Thu, 24 Apr 2025 02:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745459994; cv=none; b=FDbfiHKk/5JqGyVu/935FRsg/W8CtjNkkOnTjX+w2iPzyXDuTVATsNl4EL485kTOB6RbnQmanAwBOxy3iKIS4oryAQ7BELEJsmcpBRwjucopXUyZmWQO1mNnhwDo+IQFJ1TJ9FCqQ3AmYDH/1K/S694NtpULrHj1ZQ7IwPv0w0c=
+	t=1745460001; cv=none; b=PuA9o9OnOAZFHIGAHEU4xIprmlTh4ANH5oQx2Wxiia05Bd3r8w5a8vaElS38VKKXcMLerLTKMgzXJUEbtx7Vy5w+dBgtykPn/o8rU2J/wsqAI7FDyhOm4Jk7esQGyCprQZujpjnx5jp3z+Vx+qITQ+876B71zuc4r95ZjdAgyAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745459994; c=relaxed/simple;
-	bh=1W1Jj2+d2pbm+Myl9tfHiRl0IkewTco9yYLRqmZx87g=;
+	s=arc-20240116; t=1745460001; c=relaxed/simple;
+	bh=7/55K0+vpUW12+5r1ow/V8WILVzRW6B3foMUi3Psn0c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XC7lKprmEw+KobUT2f1jWHNshnXoerJ3KcChVIjDAWQFYI8OgFSnXspUh0p4oJmB2Xherf4mkBBeuYRiXv2vGJDgtiN9VKnWM7bSoxQEcKnNVow5kbC6JTUWrOfXxKJ9NvR+Uws6L3YUjyf7dbGnnur/VdUPMPdxvykIUf2+vTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qbj6izcx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E25D5C4CEE3;
-	Thu, 24 Apr 2025 01:59:53 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LFm3FL+byi2u6UHEsB4WzwOpzur6zeF/nBZPQ+RvRLfKkYPZwQZlqUUqe7Sbru0CNqlSr70LxLvM7Ukc1fOjBpN2xBB9TzLE/gXorZEx8vBiImFtbBRJCSwrXgd9+VcK8G8V8mpI2BvxfXRnT5x2LKsH/7yWY3ChojOgSdUXi3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p00vge3+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A575C4CEE2;
+	Thu, 24 Apr 2025 02:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745459993;
-	bh=1W1Jj2+d2pbm+Myl9tfHiRl0IkewTco9yYLRqmZx87g=;
+	s=k20201202; t=1745460001;
+	bh=7/55K0+vpUW12+5r1ow/V8WILVzRW6B3foMUi3Psn0c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qbj6izcxEl3JIEU0CbFijWO+HVq+8WNdLpWHh/FkuTCwdFtODR4MppjWzgrMzAa14
-	 N7PMLWERTaaOmYXgmpK83aoNfOscZ3CWVc9VjPl14YMCwa1kOvY9X/6lStpW1CVoed
-	 neHOTddLSWzGuxl5elC/F8tU9c02oovHpNN+g/cX5wMn3jeLdWtfIB97wPxV6ZB/El
-	 yvQfHH9pYzTE5Nx+4J9mptBUjS4FUSWyHtndkL9sblMzZCoWHZCSIU6b3aMIQDYWRa
-	 egwFF5tiw8X/MqRG2od8q2gCEG0LL0EXgzU7Z37+nz/oZH89n9XbMMN9p7Z/HtxrUL
-	 qO0on91h5UEUg==
+	b=p00vge3+zeKFnNSchG3Yi9mkePdZCi0cTffF3MhOX0oamDjEBDcW29FqSMzHCUoQZ
+	 iDi4E39aKC9SzL85UAM0KtXYGk6fAUFNMh5e3I5vcJZxc4b5Mi/OD4gBTbWLE7ONDZ
+	 qXPqMbIaQMep8PhWcIJklLPRRxZf9JKV5jaxmlYsB9JSs9WYP5cdXXJRYB3FIdwMon
+	 9ooKNBh4iGfSC8d7h8ejKFf91qrG6hc13z/9tITZgsHbbBr1kqA9hjCuelWc42BKWO
+	 oSbdCd+dNSsv+iQTMqbkddiPyM3hAH+Hb7WCj+9HPvZJPcsSu3M/lGevRsWq8sI6xf
+	 nCyExc43zzP2A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD21380CED9;
-	Thu, 24 Apr 2025 02:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF9B380CED9;
+	Thu, 24 Apr 2025 02:00:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net 0/4] pds_core: updates and fixes
+Subject: Re: [PATCH net-next 0/3] net/mlx5: HWS, Improve IP version handling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174546003250.2831734.13519422006158210514.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Apr 2025 02:00:32 +0000
-References: <20250421174606.3892-1-shannon.nelson@amd.com>
-In-Reply-To: <20250421174606.3892-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: andrew+netdev@lunn.ch, brett.creeley@amd.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- michal.swiatkowski@linux.intel.com, horms@kernel.org,
- jacob.e.keller@intel.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+ <174546003948.2831734.1789243432503891447.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Apr 2025 02:00:39 +0000
+References: <20250422092540.182091-1-mbloch@nvidia.com>
+In-Reply-To: <20250422092540.182091-1-mbloch@nvidia.com>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 21 Apr 2025 10:46:02 -0700 you wrote:
-> This patchset has fixes for issues seen in recent internal testing
-> of error conditions and stress handling.
+On Tue, 22 Apr 2025 12:25:37 +0300 you wrote:
+> This small series hardens our checks against a single matcher containing
+> rules that match on IPv4 and IPv6. This scenario is not supported by
+> hardware steering and the implementation now signals this instead of
+> failing silently.
 > 
-> Note that the first patch in this series is a leftover from an
-> earlier patchset that was abandoned:
-> Link: https://lore.kernel.org/netdev/20250129004337.36898-2-shannon.nelson@amd.com/
+> Patches:
+> * Patch 1 forbids a single definer to match on mixed IP versions for
+>   source and destination address.
+> * Patch 2 reproduces a couple of firmware checks: it forbids creating
+>   a definer that matches on IP address without matching on IP version,
+>   and also disallows matching on IPv6 addresses and the IPv4 IHL fields
+>   in the same definer.
+> * Patch 3 forbids mixing rules that match on IPv4 and IPv6 addresses in
+>   the same matcher. The underlying definer mechanism does not support
+>   that.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,net,1/4] pds_core: Prevent possible adminq overflow/stuck condition
-    https://git.kernel.org/netdev/net/c/d9e2f070d8af
-  - [v4,net,2/4] pds_core: handle unsupported PDS_CORE_CMD_FW_CONTROL result
-    https://git.kernel.org/netdev/net/c/2567daad69cd
-  - [v4,net,3/4] pds_core: Remove unnecessary check in pds_client_adminq_cmd()
-    https://git.kernel.org/netdev/net/c/f9559d818205
-  - [v4,net,4/4] pds_core: make wait_context part of q_info
-    https://git.kernel.org/netdev/net/c/3f77c3dfffc7
+  - [net-next,1/3] net/mlx5: HWS, Fix IP version decision
+    https://git.kernel.org/netdev/net-next/c/5f2f8d8b6800
+  - [net-next,2/3] net/mlx5: HWS, Harden IP version definer checks
+    https://git.kernel.org/netdev/net-next/c/6991a975e416
+  - [net-next,3/3] net/mlx5: HWS, Disallow matcher IP version mixing
+    https://git.kernel.org/netdev/net-next/c/f41f3edf0b15
 
 You are awesome, thank you!
 -- 
