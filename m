@@ -1,105 +1,146 @@
-Return-Path: <netdev+bounces-185704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01DBEA9B6D1
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:54:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416D9A9B6E6
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AD217AE04C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:52:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B0B920348
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621E3291159;
-	Thu, 24 Apr 2025 18:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866DC290BBA;
+	Thu, 24 Apr 2025 18:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="NQaIx+3H"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eEcj8RSz"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [178.154.239.213])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52C7290BC0;
-	Thu, 24 Apr 2025 18:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.213
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A3B28A1D5
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745520781; cv=none; b=f43VPU0lXBRD7g5Xh2e92j4rNJQwnN0yJyyV5rrakFBLI75ZFZRQriCMulQ+YFdRHriS9w8Yhkz5BatdWzCrlwQldx27/2Z+Bpqp1EcG9b+iFQL4bEeIYHhnpi+qclLoVqwZu6Qs7Zpjju99EJbGZ+vSPnVCJB8Lp4vVhH6BHdI=
+	t=1745521149; cv=none; b=W2QGDWE+Mvq6PGV3ygKj0lv1q1v+00Qfj7Y22yyH3Eilw79fRkbhhVTIYikba7HVoeoGyE9F6tDoWnTf1jHlJlJHG+J05OhPstcCJcSc91PO4VVdFufCij4QRklFXgH2sK6qCyFrWiEG5zAMMbDHYhyHmEN/5NnvPic+VKusvWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745520781; c=relaxed/simple;
-	bh=OygmFMPByzJxZQZ/STA64KpZbimdRAppuLQsI9S0AGM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=izdCf0/eDERdiZPv/A5YrFEIo+CAfeKnNvQb4x85nK643ZpSTPkry6HHy3GZ4AC0hiYyKo8pVLGVcsNF+8wMD8ANpPzzpSZq6kggBPjwpgc7kVwAzcwfzb4wIqVKHeoy6LM89n8F3V/l+8xWYO+YRhaaja6rM02+Q/57q1we2aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=NQaIx+3H; arc=none smtp.client-ip=178.154.239.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
-Received: from mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:bca8:0:640:45be:0])
-	by forward102d.mail.yandex.net (Yandex) with ESMTPS id E49B860983;
-	Thu, 24 Apr 2025 21:52:48 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id kqV2ll1LoCg0-foSXLjIP;
-	Thu, 24 Apr 2025 21:52:48 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
-	t=1745520768; bh=eUvSEcjM3P32iq/WojbrYA0IxejTJGbUaeImRlzSclk=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=NQaIx+3H/okY2atnyMu/dUv32bXBU42WHY0TqPoEtI0QKqKM7F3Odw+FQWp5HAGP6
-	 ZBAvJn6f8+pj2lYidSh1sQvnQfLx+lIlahix+d3S1hqxecKxU2QdhvbrLawUMkm1uH
-	 iP7xJkGEjh2ox33wGR52SZk9Q6JftyrFHnOSesUA=
-Authentication-Results: mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
-From: Alexei Safin <a.safin@rosa.ru>
-To: Stanislaw Gruszka <stf_xl@wp.pl>
-Cc: Alexei Safin <a.safin@rosa.ru>,
-	Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in il4965_tx_cmd_build_rate()
-Date: Thu, 24 Apr 2025 21:52:44 +0300
-Message-Id: <20250424185244.3562-1-a.safin@rosa.ru>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1745521149; c=relaxed/simple;
+	bh=RZja+27Dkbmbix3QZDuohuCssm2ow08ngePhEHO3fD0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=URymB1V8fnQfdI8Nn5d6Yf64GQQFINHCHv8onEnvl7w2ogzx4H0F15qMrG/9QBOFmETUIy983x1FDUaWqitTAYsl3uKk2jnsp5GEEWDZuixIxbQXzPHc4W+kxGu+6QHSq1cZlhHKsERv/leTAG9EB0ZgrGWBnTE+KFalD3g22P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eEcj8RSz; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac7bd86f637so497882366b.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:59:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1745521143; x=1746125943; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RZja+27Dkbmbix3QZDuohuCssm2ow08ngePhEHO3fD0=;
+        b=eEcj8RSzy/N/ftU8FV8WUpbEg23lf0GKlw8FpdcGADRGIojt7dVQ4UdWydyAYlc/xO
+         7kTubFJIG/iEo1KOI0zZPWcg9/3TiWaVVJVgMXR3XDK6s8KYG1CIiUCcrdUWhIqAGWyU
+         TjQ/BCm7UVb+Yy4mH/Vl7uKbsu8A6D+Q1RD8c+e+POFDG/Rie+azx3WZSb/H5XDjfXZq
+         7Ng2OTJzggopUc17E/Xg/VDVHnf8cMEjh43H2lFI5F9c0C24EJJxd9MINFw4/c/t4uFl
+         ZEig2Nb9szj6SPokEZMx+CGTyiqg5BzN/6pDJwx3rxnzC3IL7WKPuaH/W5dt5IQvNnHG
+         oxtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745521143; x=1746125943;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RZja+27Dkbmbix3QZDuohuCssm2ow08ngePhEHO3fD0=;
+        b=Z2gjK6or4ZZTl+pR3wyKhAwODiUccpk/C7SQOprhX2KzhxZtjJuB/vWQ15IGOalDQj
+         UgdFl93vRtYkOeuEelA5ydII3n+gSRzFxDXiU/Aj50OTkh9nGoC4fwTDBctnkZg9NEWG
+         mLALBdF0StetxOTaX8LNsYPg+mcu1eVGhXrfs2v1MVN2+UFIvQiRczxT3Bb9XLxD3WZk
+         cZbxIjaOEC9CYcLI3OVXQKYnfbdZrsG5q/mnXoarU32OzcN2p507gTWViEWch0aVlOk2
+         p10GOi4QmcPlQtQlmDGBsGqaorb+FeKGl5hNi58rXFzm40SmnIu4Kc57zC6EFBAR75Gt
+         aEvA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8X6JdIhlSiaCi6T3EIokqMeAApA7eXJEzyr/XwfnwmTlsZLu6u4Dt6EdGTwerEfxhnTqUCCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHkbgCiM38n4q4oQ/T4Kd23DHRjElLfQR2E1+tc2ZOSnk11PrA
+	PSMRqtMyJfLH22F/fl0PmhCuxBV0eHSz4RVbyEthUi8r8lwmjlFroZgiz53qpys=
+X-Gm-Gg: ASbGncs+ZIA1ImOTi7snk5RzcbKxcenPHBY94DMaGQGZMYS5QoXVQmY9HKzwZ/YLZZf
+	YJbkBkdIPvemR3E+J4kLbttaR/lknhy3/GyRB3c0O+GgVa+EswG/hCd8LuEQRq440rBA/iN/jgy
+	HyvK6qusoja+WgfCE6IOIJdd1mf5m7lIZlSAb4Pk8gwokmR92Sktn4+KpisOS1sJsWFgw62olYN
+	8lLvQL+5QdAdnyk8tUCb2kMLhteSrFVRT2o2hUa/t2njvN3gy7ufJhGpKB/iv+6VFC5GOw0nW0k
+	vfaKjd1DJKP7s89iEvMysnywNj6M+TBrNA==
+X-Google-Smtp-Source: AGHT+IE1WfJB2yNHVG6dN5YP24a45RQi+2yyfaZDzZalpZ3qP62lfwp2ZK6hXPfRQCwsO6Nbp9kfIw==
+X-Received: by 2002:a17:907:60ca:b0:ac6:e29b:8503 with SMTP id a640c23a62f3a-ace5a124436mr310160866b.1.1745521143004;
+        Thu, 24 Apr 2025 11:59:03 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:506b:2387::38a:30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e4e7a25sm7201166b.52.2025.04.24.11.59.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 11:59:02 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,  Arthur
+ Fabre
+ <arthur@arthurfabre.com>,  netdev@vger.kernel.org,  bpf@vger.kernel.org,
+  hawk@kernel.org,  yan@cloudflare.com,  jbrandeburg@cloudflare.com,
+  lbiancon@redhat.com,  ast@kernel.org,  kuba@kernel.org,
+  edumazet@google.com, kernel-team@cloudflare.com
+Subject: Re: [PATCH RFC bpf-next v2 10/17] bnxt: Propagate trait presence to
+ skb
+In-Reply-To: <aApbI4utFB3riv4i@mini-arch> (Stanislav Fomichev's message of
+	"Thu, 24 Apr 2025 08:39:15 -0700")
+References: <20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com>
+	<20250422-afabre-traits-010-rfc2-v2-10-92bcc6b146c9@arthurfabre.com>
+	<aAkW--LAm5L2oNNn@mini-arch>
+	<D9EBFOPVB4WH.1MCWD4B4VGXGO@arthurfabre.com>
+	<aAl7lz88_8QohyxK@mini-arch> <87tt6d7utp.fsf@toke.dk>
+	<aApbI4utFB3riv4i@mini-arch>
+Date: Thu, 24 Apr 2025 20:59:01 +0200
+Message-ID: <87msc5e68a.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
-rate_idx values greater than or equal to RATE_COUNT_LEGACY.
+On Thu, Apr 24, 2025 at 08:39 AM -07, Stanislav Fomichev wrote:
+> On 04/24, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
 
-Use a correct bounds check to avoid accessing il_rates[] with
-an invalid index. The previous comparison allowed rate_idx to become
-equal to RATE_COUNT_LEGACY, which exceeds the array limit.
+[...]
 
-Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
-'rate_idx >= RATE_COUNT_LEGACY' to ensure memory safety.
+>> Being able to change the placement (and format) of the data store is the
+>> reason why we should absolutely *not* expose the internal trait storage
+>> to AF_XDP. Once we do that, we effectively make the whole thing UAPI.
+>> The trait get/set API very deliberately does not expose any details
+>> about the underlying storage for exactly this reason :)
+>
+> I was under the impression that we want to eventually expose trait
+> blobs to the userspace via getsockopt (or some other similar means),
+> is it not the case? How is userspace supposed to consume it?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Yes, we definitely want to consume and produce traits from userspace.
 
-Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
-Signed-off-by: Alexei Safin <a.safin@rosa.ru>
----
-v2: change reciepent
- drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Before last Netdev [1], our plan was for the socket glue layer to
+convert between the in-kernel format and a TLV-based stable format for
+uAPI.
 
-diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-index 78dee8ccfebf..f60d9b9798c1 100644
---- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-+++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-@@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
- 	 */
- 	rate_idx = info->control.rates[0].idx;
- 	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
--	    || rate_idx > RATE_COUNT_LEGACY)
-+	    || rate_idx >= RATE_COUNT_LEGACY)
- 		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
- 	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
- 	if (info->band == NL80211_BAND_5GHZ)
--- 
-2.39.5 (Apple Git-154)
+But then Alexei suggested something that did not occur to us. The traits
+format can be something that BPF and userspace agree on. The kernel just
+passes it back and forth without needing to understand the content. This
+naturally simplifies changes in the socket glue layer.
 
+As Eric pointed out, this is similar to exposing raw TCP SYN headers via
+getsockopt(TCP_SAVED_SYN). BPF can set a custom TCP option, and
+userspace can consume it.
+
+The trade-off is that then the traits can only be used in parts of the
+network stack where a BPF hook exist.
+
+Is that an acceptable limitation? That's what we're hoping to hear your
+thoughts on.
+
+One concern that comes to mind, since the network stack is unaware of
+traits contents, we will be limited to simple merge strategies (like
+"drop all" or "keep first") in the GRO layer.
+
+[1] https://www.netdevconf.info/0x19/sessions/talk/traits-rich-packet-metad=
+ata.html
 
