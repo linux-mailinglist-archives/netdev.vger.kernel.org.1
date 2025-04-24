@@ -1,115 +1,94 @@
-Return-Path: <netdev+bounces-185712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A92A9B826
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 555C1A9B82A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7FCC7A8644
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:16:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E03C7A7D89
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CCF291169;
-	Thu, 24 Apr 2025 19:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A06E28BAA0;
+	Thu, 24 Apr 2025 19:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8puR/KZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZpkTmzFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41513290BDF;
-	Thu, 24 Apr 2025 19:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C27F1A5BB6;
+	Thu, 24 Apr 2025 19:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745522255; cv=none; b=TrxhC7rmS9jfbTH79JM3V1qbNLwA4VAi/WGlog5EBGWYNB156Zp63bZKh5tqmOy4rFk4CtL5QSKCx4hbGePCPK33d0OGvchrVR5kd41YajXAZ5nMPDSJmj91osT4E/NKbiVCSvryL08K35oD1PBbaRqFYkxU/l8hvr1o5DWXPWY=
+	t=1745522327; cv=none; b=up2VzLJO4ikuijr28ApLvHqT1oUCk0UlfFVGN0Qi0AS7I+rYotpZqKfhr6vsu5g+NidUX4gbG1Okbr1Ek6QGXZlQIQGjWfvI0Aoxk1FXrGBK1Ora9ffcrDo/k/a/ckpE2lO/3scizF5Ip9n/T9nwq9zn6ffzKDYHyIgm6uh0YRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745522255; c=relaxed/simple;
-	bh=4FAg9dOCib/NxKAtEqDq/2c3ne9EVt+MCqwoJUr75Ps=;
+	s=arc-20240116; t=1745522327; c=relaxed/simple;
+	bh=5legdItJ0q6EqH5Fk5QJFNo2Mp5z6Cfpb77dkDQyYd4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cWhycHY4vPmFTLJKiHtQ+vm3Xax6eWYxA3AQGmBe/CJsYKtP6DlbWbcFNzI4TM2jWfPznnkXkW4b7qYgjtxRY9UiBb4n/8olKyGvvxcOxv+wSwPCwmrqLHZOOBVrREWCVV6OVPwG2eY0ooOYLTG9wpGImCbiKBkbSsR+QygUuKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i8puR/KZ; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso10267845e9.3;
-        Thu, 24 Apr 2025 12:17:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745522252; x=1746127052; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hKtiIR8/1ANFiI3jvmxK88n9ocUCdqWIViGNXRe9MXE=;
-        b=i8puR/KZraNY7E0qX2Lipx+TzaQoWu5SgxCdwcgzsou7gIzzRvVU+8qXyv23NL1wRi
-         hxBR6NEKeQ7l80ciHmcKlXWrjOaJ1c5m2RTDQzwx5nQDVgOxkFzWCxnarkII6Ta81dAT
-         BSZ+t4VkAA/IY2XpmNlb3+QVTnJQO8xvH30nW7pN1w7pIiN+HWBjB3UDod4rMtNs4DwT
-         51o1GFkptr1UvQc88cZFq73+1yNsIzo56K5Zmpkkv+x4T2X2dH7X49Y/79rn10kI8c74
-         ViGyT1vxDd1iz0j4I8CMi8RagrBEVFcb/6tfhH7EfE7JXk8EXAo6rWIS3QoUVMuZ+Bk/
-         sIYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745522252; x=1746127052;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hKtiIR8/1ANFiI3jvmxK88n9ocUCdqWIViGNXRe9MXE=;
-        b=b2xZhqX/8nxqH1OfpIEGzKvOUbSbSl5TX7TG4RdE2Yf/o1meJ/1WjVr1avD8MEhEiV
-         lGsNDxEV1xL74abB/9X64H/tZ64Yw8NMEvhH7DPkZVoeZgxZI4eH0WF148aHFyoD5ULk
-         JJJsFig/DzsE0DG6D19Ru6dT2SM1uOF7F5SFk2/OKA6MZjYgda+VWHMjT63veotsiGzc
-         Tw2Tkzkgopugia5tn1OUq655MtUgq0vxQD1mBR/45rcg8KFryP1gPMl0Rm5SlwAdQLBb
-         x4lyY9bs3BK+CaNr3GBWEIUrQdExFZKsJEDfWuA/4sJdzF+2xO7uch2HOZ+DxCf4yamy
-         45wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwMgtnKKMlAIJFqc873MqnzVyQxkAZ3lu2OW+dGR7PtKlkpl8qYWXknB4chkjlTXiMEng0YuaFhdst@vger.kernel.org, AJvYcCX+/ErKojFXATSNVK04c956VjD7hpSKTYxe+5S8gLnaYs2VYTDXOmhS3HTj0BU8pKFJD6B50ZpMq0Sgq3p9@vger.kernel.org, AJvYcCXw7oBDBUV8CF5IAXVZJqzn80zhP1s8TgVrqpZ+aA3R2HhnwIKQstx5KS1vLW1l91aFZlVrresa@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6drSsnDeExorps0VFBaln4pdAhXgD/MW7H8XijHSBZdkmdpF0
-	Wg2s/WdUMkmWCU4N6I86ElPQ7cME1lOphDOEheHaYQccc6r035pO
-X-Gm-Gg: ASbGncveTDSBHSqvSaWAWcaR/qW7TyeKvkmh4z+FNlSlhCZUCGrs4P4T+93yEgcRf9d
-	tzzccBne+f+MNUdmLssJmpxxvVbp7gjetcGoW0jRKZW9ILus5+tQkCuNAjqQpLzX4OZJHz5NwO/
-	bw9SZBUp2hjgnLO7EhTcmtNSTTZSvolyrPt8bg1C53UBvf4+sR8L6CXfShdp5H1fGQllI7gNEbi
-	63e8QsA4Nlm1al5UGJ8FOPK5gUS4jo91LZgZewSq3OzNiThLkQvu2RaWsrsIBQ3JUN6I9GHCrEe
-	3auushU80CCtBJ7qbKs19MwF9Khwq3LBwSifij0k
-X-Google-Smtp-Source: AGHT+IGHUagr5uQkmxlICqpS4xt1BsRnNl8Y/nS1PqKVhK6DbPifS1o99SIUo9WiHCLLy1FyDQtZ4g==
-X-Received: by 2002:a5d:64ef:0:b0:38d:dd52:1b5d with SMTP id ffacd0b85a97d-3a072a4636dmr351698f8f.4.1745522252237;
-        Thu, 24 Apr 2025 12:17:32 -0700 (PDT)
-Received: from Red ([2a01:cb1d:898:ab00:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a073cbedc4sm156237f8f.47.2025.04.24.12.17.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 12:17:31 -0700 (PDT)
-Date: Thu, 24 Apr 2025 21:17:29 +0200
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Yixun Lan <dlan@gentoo.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet
- MAC
-Message-ID: <aAqOSRQCKNuezyUK@Red>
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
- <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=svfzedzHj36dK9ZWSTIpq2osUjvig9jEJvd1+Yj064e080xlf6A5GXQQE19KDK51IdFy4BXOpRJm8+le45CWY7zrpgG2UI18+lRL/yX/akvc7StR+/Jj4p2YDygHmLbmYHX2g2cR53BgsP324U05hgvPRgFaDz/Bb6vgM9R4l7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZpkTmzFb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8m9rwFWK2GB+1BAEonxrPntgARL+u2AKlrZ41aTOYIY=; b=ZpkTmzFbhoJFbm6pny0uunJg/x
+	TyJkle2WGU+QBJ55+h4L63yWqqgQtDqLW333EkUm1hS8FW7R9Gb2lSYBo8wmKKuZgNs/sciMhKWQ/
+	qDt8k1vOdu/ROX2vDQqQOjkhq7mxDPhIhBdVeWKM8YxBb2RIDP6A8blwl8c9ZBS42zPM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u825h-00AVJi-7R; Thu, 24 Apr 2025 21:18:33 +0200
+Date: Thu, 24 Apr 2025 21:18:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+	Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/8] mfd: zl3073x: Add functions to work with
+ register mailboxes
+Message-ID: <8082254c-01a6-4aca-84de-76083fdcbb3b@lunn.ch>
+References: <20250424154722.534284-1-ivecera@redhat.com>
+ <20250424154722.534284-6-ivecera@redhat.com>
+ <5094e051-5504-48a5-b411-ed1a0d949eeb@lunn.ch>
+ <bd645425-b9cb-454d-8971-646501704697@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
+In-Reply-To: <bd645425-b9cb-454d-8971-646501704697@redhat.com>
 
-Le Thu, Apr 24, 2025 at 06:08:41PM +0800, Yixun Lan a écrit :
-> Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
-> including the A527/T527 chips. MAC0 is compatible to the A64 chip which
-> requires an external PHY. This patch only add RGMII pins for now.
-> 
+> During taking 613cbb91e9ce ("media: Add MIPI CCI register access helper
+> functions") approach I found they are using for these functions u64
+> regardless of register size... Just to accommodate the biggest
+> possible value. I know about weakness of 'void *' usage but u64 is not
+> also ideal as the caller is forced to pass always 8 bytes for reading
+> and forced to reserve 8 bytes for each read value on stack.
 
-Tested-by: Corentin LABBE <clabbe.montjoie@gmail.com>
+In this device, how are the u48s used? Are they actually u48s, or are
+they just u8[6], for example a MAC address? The network stack has lots
+of functions like:
 
-Thanks
+eth_hw_addr_set(struct net_device *dev, const u8 *addr)
+
+and it is assumed that *addr is ETH_ALEN bytes in length. There is no
+direct typing checking for this by the compiler, but the compiler is
+getting smarter at checking for buffer overruns over function calls.
+
+	Andrew
 
