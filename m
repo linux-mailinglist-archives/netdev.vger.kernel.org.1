@@ -1,109 +1,101 @@
-Return-Path: <netdev+bounces-185748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2894AA9B9DB
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:26:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A923A9B9EE
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 524A91BA430F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD78D3ACB0C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 21:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF1228150B;
-	Thu, 24 Apr 2025 21:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFA11B040B;
+	Thu, 24 Apr 2025 21:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="IlFdIO4d";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gEBZPTRC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JvLMt4bI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8E0202C5C;
-	Thu, 24 Apr 2025 21:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF672701AC;
+	Thu, 24 Apr 2025 21:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745529961; cv=none; b=NCfli+U71f0iEvWRJ21i5NEL5kAtHw8IFASWlssq1bjQURH1Ie1D1qSqIq/aOMcK9IQWK2lK6M0kTXYMB5hc3WfvwP2qYIaciQcpR1jkvfEuhEe0JEXXpfYwbQcLgvV1/vnEzJKX2eMpccIH6lLMAiM3M9RlW8tJNpBUdu8DHbs=
+	t=1745530344; cv=none; b=C8HEvwhrMPrACzd0ta3A7IU2RM9Tj9uvaX+Qo5eicli/HIGkXhAkZzstiEzX+fNsTEjnOdw/tmWKqpHZI1CufKPy5FK9giOS8p75eS8Myr1HA29Mgwi2V9LuKjZgZ5oyUV3r8mfUKKvubxF27Brh3ARqtuCkDVGiCiaOpWIBHwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745529961; c=relaxed/simple;
-	bh=b/0+yurGv1ACW+6C36BhVgC/X61hgTJAj/RwtvOObx4=;
+	s=arc-20240116; t=1745530344; c=relaxed/simple;
+	bh=F9Jv4GJ3j0VXb2ogXxDFAGRTm9u7zm0uKbOes1xYM2w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCAoNiyDUhim1GG8mXvaQH2PXEd+P5lHOhpBTi7CMHSt9dQ7SAURWe8MdqdY0Fk1rGbQdeG3xiT6klg7K+GR/lpMpKvT3Kh7+XlLrFvtHTxGSNYLFfm/pmpD150ubA1jFgEnzFAZ7nUioKMVKojVVEhUJePSKFFKHDCI4JNFIag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=IlFdIO4d; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gEBZPTRC; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 69ADF60686; Thu, 24 Apr 2025 23:25:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1745529958;
-	bh=3AKJ0o15XjVsSUO1ySJBAwGn/VtjV0+jASv1w9bnHUI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IlFdIO4dR/AEDiINjv5It3oI8AtkIeN9HYWcuArDJogkMy/PbiCKWCScC8htR8XtA
-	 o5/FYub7TkcKIMEkMh33gh2HohDcRbzN7OvtL8jLnitBoJvprn7c9jjIwNbgg2d9NO
-	 yaCohm4lXbRrEKwAgHiPumYC5AJbnqXKUuXmeaLu6CM+WCM0+9p5N4WC9d/Z2LRr+Y
-	 MeV0XIfgg2Q+QhVKzMKyGauuy16ycIVL5L/+bVVroNHpDDevw+uPQAplQrJNw+3NYH
-	 T0jZxgD4mC8Z4CEp16Uev18ua5hKA0LiShaf7xwB+3qewbe1BYzo2cDmKo4Jg2KfEJ
-	 oyxpka0olKtbQ==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id C06AE60581;
-	Thu, 24 Apr 2025 23:25:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1745529954;
-	bh=3AKJ0o15XjVsSUO1ySJBAwGn/VtjV0+jASv1w9bnHUI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gEBZPTRCX50VNlbMKODscp4KGeLWCZOcEzk6ZljEDACdCT/Rr5W1t+53eO7WMLPpx
-	 020I2H9/hzYcLTtS23bFAZj0LMtD2X/zIdtWE+Emv1nWFhxuX5INAJDQaluZw9YpYl
-	 VZVki8gklpabUg7C7Su9/XNE8tftNvT0YV54RNUKbjipdc/OeX8NsbcCcnvREFkUnT
-	 9188YTV4DfL4yiJXu9jZSDddrLAWkTOshdTRXuxi1pTYl3WToCWHlR0iqIfeNdjPOh
-	 TTDPd/bmv7Ymv1Vk0SLTFY9fcYlMtAuiaou2ncHIT4h5HeHa0qMYgPo9GCCC4JuNLf
-	 XYPSjEHxDaHEA==
-Date: Thu, 24 Apr 2025 23:25:52 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Huajian Yang <huajianyang@asrmicro.com>, kadlec@netfilter.org,
-	razor@blackwall.org, idosch@nvidia.com, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kh/mo+dk/pm+98sRzKMIiKY6VH4TLHyuHDrQYz+JKAlASUGT2kcKm/HQoKH6MGShXStanNK57oTtVp8BqEw6dm3nkUtxz+3b5z7PCQSTEld8HW0QHvhtHNTyAbA9gdwVZMsS8jPuf5039IcidZfpv1QVL9diAFMRxa3FtPTFRnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JvLMt4bI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BBDzFFL9rZVzREy0qETSrAqtD3sLRPAv+48jROirht8=; b=JvLMt4bIVJ61LUC5hRtAm852o9
+	Tm5EsPu7k/wZYWiVIlTgT1EfbijSRBoVLFGfyZGot23N/OSmQGnLn7z4HKCTV82FeL1iJB0t3OlO/
+	276TZae6ABbZxB6Uh70LdMzl85PZMGzeR5KxF2IWfJ5Ah8MJqh0GtLGC1o6Fe1UmpSY0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u84B2-00AW1O-32; Thu, 24 Apr 2025 23:32:12 +0200
+Date: Thu, 24 Apr 2025 23:32:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: David Howells <dhowells@redhat.com>
+Cc: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Paulo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: Move specific fragmented packet to slow_path
- instead of dropping it
-Message-ID: <aAqsYBIlbhdtnblW@calendula>
-References: <20250417092953.8275-1-huajianyang@asrmicro.com>
- <aAEMPbbOGZDRygwr@strlen.de>
+Subject: Re: Is it possible to undo the ixgbe device name change?
+Message-ID: <7b468f16-f648-4432-aa59-927d37a411a7@lunn.ch>
+References: <3452224.1745518016@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAEMPbbOGZDRygwr@strlen.de>
+In-Reply-To: <3452224.1745518016@warthog.procyon.org.uk>
 
-On Thu, Apr 17, 2025 at 04:12:13PM +0200, Florian Westphal wrote:
-> Huajian Yang <huajianyang@asrmicro.com> wrote:
-> > The config NF_CONNTRACK_BRIDGE will change the bridge forwarding for
-> > fragmented packets.
-> > 
-> > The original bridge does not know that it is a fragmented packet and
-> > forwards it directly, after NF_CONNTRACK_BRIDGE is enabled, function
-> > nf_br_ip_fragment and br_ip6_fragment will check the headroom.
-> > 
-> > In original br_forward, insufficient headroom of skb may indeed exist,
-> > but there's still a way to save the skb in the device driver after
-> > dev_queue_xmit.So droping the skb will change the original bridge
-> > forwarding in some cases.
+On Thu, Apr 24, 2025 at 07:06:56PM +0100, David Howells wrote:
+> [resent with mailing list addresses fixes]
 > 
-> Fixes: 3c171f496ef5 ("netfilter: bridge: add connection tracking system")
-> Reviewed-by: Florian Westphal <fw@strlen.de>
+> Hi,
 > 
-> This should probably be routed via Pablo.
+> With commit:
 > 
-> Pablo, feel free to route this via nf-next if you think its not an
-> urgent fix, its been like this since bridge conntrack was added.
+> 	a0285236ab93fdfdd1008afaa04561d142d6c276
+> 	ixgbe: add initial devlink support
+> 
+> the name of the device that I see on my 10G ethernet card changes from enp1s0
+> to enp1s0np0.
 
-Thanks, I will include this in the nf-next batch.
+Are you sure this patch is directly responsible? Looking at the patch
+i see:
+
+@@ -11617,6 +11626,11 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+        }
+        strcpy(netdev->name, "eth%d");
+        pci_set_drvdata(pdev, adapter);
++
++       devl_lock(adapter->devlink);
++       ixgbe_devlink_register_port(adapter);
++       SET_NETDEV_DEVLINK_PORT(adapter->netdev, &adapter->devlink_port);
++
+
+Notice the context, not the change. The interface is being called
+eth%d, which is normal. The kernel will replace the %d with a unique
+number. So the kernel will call it eth42 or something. You should see
+this in dmesg.
+
+It is systemd which later renames it to enp1s0 or enp1s0np0. If you
+ask me, you are talking to the wrong people.
+
+	Andrew
 
