@@ -1,151 +1,130 @@
-Return-Path: <netdev+bounces-185680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69130A9B52B
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:26:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DA19A9B536
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD16189D7F6
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:27:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2110C926D0A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5242628467A;
-	Thu, 24 Apr 2025 17:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ACA288CA5;
+	Thu, 24 Apr 2025 17:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHZcHJye"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="sl8qK1og"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914C4502BE;
-	Thu, 24 Apr 2025 17:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700DD284681
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 17:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745515613; cv=none; b=UJQKnlzO+L7EcgFBDclKUZyqDYA1P8DPnrAzGZUzDwomI5qSVoOH7tn0nG7sJXM6n/gSsVc8b6QtEHRKHSBI7J4s5CUo5iHLSKCLHingXh4I1+ZHV58I+g7RcrZ8aVXtcWE24MtXPjsO7C9EtT3iM7UFHj7ljjma/2ILa/CvoQw=
+	t=1745515773; cv=none; b=d0i52oha9HDKLmCLjosA63fY18L11dGxTZ2+kKT/EYP4PECA1Xlilot8hcsjo9Hs7HPsbDzz29X2/csJS8k6tedFbowN/74bKFuH3Ryme823YnAOQarHkZc4HgSxj1lTgNTXnwOLgcBudouegKzK7rTZybhyJPq0vDC31xsbVYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745515613; c=relaxed/simple;
-	bh=wIiZhFy3LxuX7Gvw4Izh6ggx4TutWUOG1hKDXZ1mM30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kMvVCc0UoGKfNIqwOEG3Pyvt9m7Yb5tJelf6cG0KW+PXWsw2cQA/0bm8/5repnLL7ZDNKyqvHsgWq54jk5uQA0NYmItS7G/7GC0AYN9n9LZme98yLbt6LFerwnY50AkaRSl46HxAnVCv7UZUL9SVrYZEZUG1uvTUda1lXn8DBK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHZcHJye; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e61d91a087so2100936a12.0;
-        Thu, 24 Apr 2025 10:26:51 -0700 (PDT)
+	s=arc-20240116; t=1745515773; c=relaxed/simple;
+	bh=zDw7BMwmQ7Zzhu3em6h7WuB+uJk8Ll8pW5o+G0j0JPw=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=YG3NsooDe9LPESiHnbfXs+0f2OrgGR/hJeQv0/KN32GL/ceo9DFp66kPVTxXJX/ZAMFLyfWqK44lAdiPjoc7l4ki7ilHfsr6JHT7hEn27RR7TdBWioO0QtmXstqWA/bcYfTtuyqP/Z4Y3VlnpdjX8te8cZ/8Oa6aMLGwG0jT7PQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=sl8qK1og; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e5e34f4e89so2404147a12.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 10:29:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745515610; x=1746120410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wIiZhFy3LxuX7Gvw4Izh6ggx4TutWUOG1hKDXZ1mM30=;
-        b=NHZcHJyeqniorBZlit2SQACoEV8Ir1pbqUaFQdLL/35PPKuW10RyJR0wMv4LRScSux
-         kC7DoYoxaeGuCzY3DryV11xNDfBdLXxlmVxPEIx8kur2zOSXP0J0OW2fKOQkEiodbh02
-         1YdivbQFzGLN7phvDa75ngT6IKWMGyCIw6dL7nCOayUuPYeXbD65DG9ZVItnnFJsj2u9
-         pKiebW4XrhcLfy+oSmT8EZea/YP/xx5K32n6GkIuDi9T8O+lTaMYxjD+pgpmLdh73Xn5
-         X8q36tnIDQey5actCIEfsqkjrMZguvEZK0eYElm7Q5CZBzN27pg7xkkXQCZIzH35E4in
-         ggJw==
+        d=jacekk.info; s=g2024; t=1745515770; x=1746120570; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JLHhBvGwHoD14XYoD4WUPVU9+Bb1BKcDzuKit79fgsI=;
+        b=sl8qK1ogUFiW0mh44xZ/byXLtlKD8jF7YnW6TxN9yYdK+oIVfj8CMBGuv1c6S/kv2J
+         E7ahCstLKU4EhFw2AuSSRofJ9PwLCOcz0X82W7loZTXSr8BPFvCOdafiR8n+a3OXEgTM
+         HxqTSoamY8Z8Pb8h/toZh9V7Pbk4yKgNxYSdycN1fkbT2cxHEwUY9UHdUuEofwylNjZ+
+         czVHmpS8o7qjpbyExSqKVNV1MFXuSDKllNwdmsxPym1tCn/O75aqsTG4vcnOdhUtMivH
+         TThXNbDb7j9pUUEKtvuX5qiaBQM+FAVKHFTJugLaP0YStsoOYvjfXUfMbeSNKDjWeg0j
+         98aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745515610; x=1746120410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wIiZhFy3LxuX7Gvw4Izh6ggx4TutWUOG1hKDXZ1mM30=;
-        b=bEEI7EGJKXNKAcal3ANFrXfrpKQPFDpk72FVjoyIatLvYmf6XTqItsFPxcesLjX2ua
-         FIYr3bVsXgE5AU6ZYVXpi4Gxs5wyXMT591B1niXFkjOs72h7DHrVER8OIaczXw0XWL8H
-         JVp4sFkfZk5UkmwAnCZeV9ce64NkYELCDfF9lS5QvrfwhIbNWRdy2ucdPvnqwqA3pR7v
-         lxIbxdkQvHhTIh9RzLHzcIIrIiuH8QLfGXflJtVArg/z+MGftVMR/J3174K3iZVsUTtS
-         73Ga6p4E4IMLymSi0YNKvFrJMQP+Pmy2MF22aoUfV68uLh1Kt0LzFQw2LRlgxbDuPqY4
-         yb+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWct6hSpHlud7f/rgGQH6BxGUQmwPEJ2NfCGjnlNwAF3Z36BIPgCuynUsJbhrYJisJnetEv0Uve@vger.kernel.org, AJvYcCXQdT7q3AFUsuG6D1yQjwlByaHnoUAJZ3Mr7qmjKuoKrBlkYtYjr0AE1R8jyLelv9Yn99oBnt/QTeqIdm0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0eD3UOq3B0c2HkOlSY9S7GFMBsoTtWb3ncOgJ4O/EW1jUOlRA
-	IcLv4AewcdrgThzb+HD4KCmnOqfDkh9Fs9TNSwqJx6Nrz9VVCYy/IQv6kaJjQTQg8czEAQ6/+h2
-	JpBAmYV28nYn1768SaQQaqGhJM6A=
-X-Gm-Gg: ASbGncsmynenVOKdmH0CQwqhG5sSveOUtfExOZE5+90wXI4slDmj+RVos6dqjktQJdN
-	nlvzlFYernkRTYU+vRj0d5us+h+dp6QGNGCVbkXqFrW+RZg+eAFCGddv5vLWSxGUgl6LB3LOGUQ
-	GImSeTp5i41OnYkTZm/uK9
-X-Google-Smtp-Source: AGHT+IEGOMR+vkqbrr1aAnKdjcsgbPhgb/w0LxGlhNTkXPi4SgqxARsBt3AVG3NQTKJE+6WeiTKNkw4pRe9SmtykSJM=
-X-Received: by 2002:a05:6402:3481:b0:5ec:939e:a60e with SMTP id
- 4fb4d7f45d1cf-5f6fab0aa66mr249451a12.0.1745515609608; Thu, 24 Apr 2025
- 10:26:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745515770; x=1746120570;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JLHhBvGwHoD14XYoD4WUPVU9+Bb1BKcDzuKit79fgsI=;
+        b=R9RlmD3B2SO/sydCBNtWNrBtz9MyuaFQkGaXeKsyXKwUrup1OVdeAW42g0m6iem1yK
+         KL0IDWOHVNd6uYBwC1xWj2ckJoT0HXrhST5PJJcnuit01rOAJmm+Gae49PWU6YD+3pme
+         +Ssl1cbbzGFQuAH/g36cANqhl/Hk6EyOy+qqvLqAV1CF4IbOOSRkd4y/2zOc+b9JQYWm
+         O0UQ5FQNaoJlGcWGF06Hm9gLNyoHZ/fz6Wr9l3bpT5MxQDJAmt8zSi/Bn9LgUGT6Ef+h
+         PPKAJxdOFeDxAAEGjgSEGN5PlregLoV2CmxkA+LvVj7as++1/w+4Akri4gPHihL01GrQ
+         v5Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUphZyXRq8wkWMdva+FMs3WHyNNK8+HPlEGJ0nuK1EvN0klBFN3PRzTg+2wG83cmhIoV1yE00=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4lxKIdbtfWjyraM2XKdawyzL+R3zOHwg8UD2A6x3UNcE3KXdR
+	w8MCSL882WF8BjKw/Rmmj1nidWnl68PbMrbxwWQfzUX51SgH8ziH+YSUIM67aQ==
+X-Gm-Gg: ASbGncsC4JU8v5bxovcbtKHKQ3pDon8N1EHWXcHxodkUxfjsMPEkH1hwjgtJiraHRId
+	p7RgO6mhnlwvVmm5Ksc7lSxH0icgYcIBN2VZWza+dFoF+SmdogFBsSQK6m7Mz7OCWiQE6qlRNE0
+	WAL961nwNQBeVlgHm6JnD5umVFqM2P1mZCldKC2KmzG51ssfB+YCC3MKGWTmarzhnWCVgwXPssh
+	2bHj7hr+tSxGnsGUGlZSfR/odi3wDqvoSIFgMo3lC4PF3Dmnf2LbQdars1f4HsJFC6cR29tGMOa
+	W00keBtm2p9y3eYOVAZNupZilbCqgEJPFgDiH5Y=
+X-Google-Smtp-Source: AGHT+IE2ovPWtaSR1CwyZflNLkJWQlZGCejIdOULuu/FjYId4ZaicaBupsaFG9P4tzlR01R9OMB2kQ==
+X-Received: by 2002:a05:6402:845:b0:5f3:4194:187 with SMTP id 4fb4d7f45d1cf-5f6de6980d6mr3197899a12.18.1745515769548;
+        Thu, 24 Apr 2025 10:29:29 -0700 (PDT)
+Received: from [10.2.1.132] ([194.53.194.238])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f6eb32368bsm1383533a12.10.2025.04.24.10.29.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 10:29:29 -0700 (PDT)
+From: Jacek Kowalski <jacek@jacekk.info>
+X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
+Message-ID: <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
+Date: Thu, 24 Apr 2025 19:29:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424080755.272925-1-harry.yoo@oracle.com> <80208a6c-ec42-6260-5f6f-b3c5c2788fcd@gentwo.org>
- <CAGudoHEwfYpmahzg1NsurZWe5Of-kwX3JJaWvm=LA4_rC-CdKQ@mail.gmail.com> <cd7de95e-96b6-b957-2889-bf53d0a019e2@gentwo.org>
-In-Reply-To: <cd7de95e-96b6-b957-2889-bf53d0a019e2@gentwo.org>
-From: Mateusz Guzik <mjguzik@gmail.com>
-Date: Thu, 24 Apr 2025 19:26:35 +0200
-X-Gm-Features: ATxdqUFYWN-cd_DMErkV7CJkSwlUQKtICdN_JoevuiBqeeRvsQR6ZYn-MTzoDb0
-Message-ID: <CAGudoHHbSKLxHgXfFYFdz5nXFBOQPh5EkCX8C7770vfMH-SLeA@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] Reviving the slab destructor to tackle the percpu
- allocator scalability problem
-To: "Christoph Lameter (Ampere)" <cl@gentwo.org>
-Cc: Harry Yoo <harry.yoo@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Vlad Buslov <vladbu@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>, Jan Kara <jack@suse.cz>, 
-	Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
+ when valid checksum mask is not set
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
+ <20250424162444.GH3042781@horms.kernel.org>
+ <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
+Content-Language: en-US
+In-Reply-To: <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 6:39=E2=80=AFPM Christoph Lameter (Ampere)
-<cl@gentwo.org> wrote:
->
-> On Thu, 24 Apr 2025, Mateusz Guzik wrote:
->
-> > > You could allocate larger percpu areas for a batch of them and
-> > > then assign as needed.
-> >
-> > I was considering a mechanism like that earlier, but the changes
-> > needed to make it happen would result in worse state for the
-> > alloc/free path.
-> >
-> > RSS counters are embedded into mm with only the per-cpu areas being a
-> > pointer. The machinery maintains a global list of all of their
-> > instances, i.e. the pointers to internal to mm_struct. That is to say
-> > even if you deserialized allocation of percpu memory itself, you would
-> > still globally serialize on adding/removing the counters to the global
-> > list.
-> >
-> > But suppose this got reworked somehow and this bit ceases to be a probl=
-em.
-> >
-> > Another spot where mm alloc/free globally serializes (at least on
-> > x86_64) is pgd_alloc/free on the global pgd_lock.
-> >
-> > Suppose you managed to decompose the lock into a finer granularity, to
-> > the point where it does not pose a problem from contention standpoint.
-> > Even then that's work which does not have to happen there.
-> >
-> > General theme is there is a lot of expensive work happening when
-> > dealing with mm lifecycle (*both* from single- and multi-threaded
-> > standpoint) and preferably it would only be dealt with once per
-> > object's existence.
->
-> Maybe change the lifecyle? Allocate a batch nr of entries initially from
-> the slab allocator and use them for multiple mm_structs as the need
-> arises.
->
-> Do not free them to the slab allocator until you
-> have too many that do nothing around?
->
-> You may also want to avoid counter updates with this scheme if you only
-> count the batchees useed. It will become a bit fuzzy but you improve scal=
-ability.
->
+Hi,
 
-If I get this right this proposal boils down to caching all the state,
-but hiding the objects from reclaim?
+>>> Because it is impossible to determine whether the NVM write would finish
+>>> correctly or hang (see https://bugzilla.kernel.org/show_bug.cgi?id=213667)
+>>> it makes sense to skip the validation completely under these conditions.
 
-If going this kind of route, perhaps it would be simpler to prevent
-direct reclaim on mm objs and instead if there is memory shortage, let
-a different thread take care of them?
---=20
-Mateusz Guzik <mjguzik gmail.com>
+> It is not completely accurate. All the NVMs starting from Tiger Lake are locked for writes, so NVM writes will always result in a failure.
+
+Check my message in a thread of an earlier patch:
+
+Message-ID: <1c4b00b6-f6e3-4b04-a129-24452df60903@jacekk.info>
+https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20250407/047551.html
+
+On my laptop NVM write operation *does not fail* (nor hangs), driver loads and ethtool shows corrected checksum.
+
+This lasts only until module reload (rmmod/insmod) or reboot.
+
+I guess only shadow RAM is updated (or something like that) and not the non-volatile memory, but the operation itself does not error out.
+
+It might also be because I've disabled Secure Boot...
+
+-- 
+Best regards,
+   Jacek Kowalski
+
 
