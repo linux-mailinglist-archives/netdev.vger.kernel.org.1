@@ -1,93 +1,153 @@
-Return-Path: <netdev+bounces-185774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7806DA9BB28
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:18:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED77EA9BB29
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 052185A8630
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:17:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F5434A271F
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67E819F471;
-	Thu, 24 Apr 2025 23:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="U7eUBaAl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8AA22170B;
+	Thu, 24 Apr 2025 23:20:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76CBA93D
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 23:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5A1A93D;
+	Thu, 24 Apr 2025 23:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745536689; cv=none; b=BDifn3euojmms3AtTSvD5uup5eusBdTDwe4rs/j6D1kI+GsrjHOMKA7ZVc7I0osJyg4Oxa5doffaE3PXXjoDxAJspBE2bX2HFEpii6GzyT76wuIIzc5x6D1j0QVLUGoB3UHs+DEC9f2qaVxWAN/PE6EJFjeqoQYEbO7lyeS3lcQ=
+	t=1745536852; cv=none; b=WtCKPsv4E1gS4KYHgACvVOBN66Q3A4zUF0GqocqtIQJ5eukPPyIt/FQRBztI+0emwKE0sYzzzcLvwWjouxLco4jokaq7YuONCTqdQtVVGdMqNwl3hJYV9AXaVj2s0ygH7H5ag8OAZsmN+Ha3OtVxBXA81y9dTBaMUf8w3fcj51Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745536689; c=relaxed/simple;
-	bh=tmcda9vC81UtQRnQA5lfd+X5HHflviesw2IqNzYnfTo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X9R6ty1AaC9oS+zL6fIp2g3sNLHoBfbh3fqT01tUC0BqCgRBrsgg8PTBNzOxEE5IAAcVb8T+tVsUlWd8vhgNDgUSITwmLeEyJS4J8GTdP1GCqjZ3UXsCjTpsS/J67suB8sxJ0e9LzRNnA2RGvFwgUlLZQafzMDD/nzBaKby2/7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=U7eUBaAl; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1745536688; x=1777072688;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=y7ta/nXFDp9UXPR6M/JInf5lbTNvGS6f3CMoq7qIsIw=;
-  b=U7eUBaAlmSlM7MfSDctnJuB22uaCTEDlYoMomxi1dajxPUj1Pn0hivUu
-   y3w7Fvv2gm3Fn4bQvJlbQFXr3GUNsD7iMfpWL8Ub9I6IbHIai2xpoOQYS
-   0ACFlPQVWhQ9XlASciArvkPYxoAvCmyLiScLam5sFanSZVgUlN4ULt6SX
-   k=;
-X-IronPort-AV: E=Sophos;i="6.15,237,1739836800"; 
-   d="scan'208";a="818889871"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:18:02 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:39192]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.20:2525] with esmtp (Farcaster)
- id b5e0478f-98c1-40c8-b8dd-5f817d1ad260; Thu, 24 Apr 2025 23:18:01 +0000 (UTC)
-X-Farcaster-Flow-ID: b5e0478f-98c1-40c8-b8dd-5f817d1ad260
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 24 Apr 2025 23:18:00 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 24 Apr 2025 23:17:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 5/7] neighbour: Convert RTM_GETNEIGH to RCU.
-Date: Thu, 24 Apr 2025 16:17:09 -0700
-Message-ID: <20250424231750.71572-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <c06f9032-4b9f-483b-8d72-0c70f39a398c@redhat.com>
-References: <c06f9032-4b9f-483b-8d72-0c70f39a398c@redhat.com>
+	s=arc-20240116; t=1745536852; c=relaxed/simple;
+	bh=N4jW3VnF6lQU+lm5lYfa5xJbQYoyDpUDVIHaXmX3tL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=POmSnxhr7Gi5LzyWz4B+Kzul7R0V3uMBTBlwlv+ZKA1Hd4ErDW/dtmAh9+pn4wtCpuMCo/YcIcOtUrkcGSptsq1YDNzKNSdd50XXscN48niDfsvTn1QgwzyNI6Gti1LTHwuUOx8I0tonqsAstHpastB5CSPM0Y5CCdmNou4hf80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E2C472F;
+	Thu, 24 Apr 2025 16:20:43 -0700 (PDT)
+Received: from minigeek.lan (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB6653F59E;
+	Thu, 24 Apr 2025 16:20:46 -0700 (PDT)
+Date: Fri, 25 Apr 2025 00:19:45 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Yixun Lan <dlan@gentoo.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej
+ Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
+ Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Corentin Labbe <clabbe.montjoie@gmail.com>,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet
+ MAC
+Message-ID: <20250425001945.48473374@minigeek.lan>
+In-Reply-To: <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
+References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
+	<20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.31; x86_64-slackware-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Thu, 24 Apr 2025 10:31:44 +0200
-> On 4/18/25 3:26 AM, Kuniyuki Iwashima wrote:
-> > Only __dev_get_by_index() is the RTNL dependant in neigh_get().
+On Thu, 24 Apr 2025 18:08:41 +0800
+Yixun Lan <dlan@gentoo.org> wrote:
+
+> Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
+> including the A527/T527 chips. MAC0 is compatible to the A64 chip which
+> requires an external PHY. This patch only add RGMII pins for now.
 > 
-> Very minor nit catched by checkpatch and only noted because I think the
-> series needs a new revision for other reasons. Typo above: 'dependent'
+> Signed-off-by: Yixun Lan <dlan@gentoo.org>
 
-Rather I thought dependant was the correct spell, and after noticing
-the checkpatch warning and googling, it turned out to be one of
-flavo"u"r, so I'll post a patch for checkpatch :)
+Thanks, looks good now!
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
+> ---
+>  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 40 ++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> index ee485899ba0af69f32727a53de20051a2e31be1d..c9a9b9dd479af05ba22fe9d783e32f6d61a74ef7 100644
+> --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> @@ -126,6 +126,15 @@ pio: pinctrl@2000000 {
+>  			interrupt-controller;
+>  			#interrupt-cells = <3>;
+>  
+> +			rgmii0_pins: rgmii0-pins {
+> +				pins = "PH0", "PH1", "PH2", "PH3", "PH4",
+> +				       "PH5", "PH6", "PH7", "PH9", "PH10",
+> +				       "PH14", "PH15", "PH16", "PH17", "PH18";
+> +				allwinner,pinmux = <5>;
+> +				function = "emac0";
+> +				drive-strength = <40>;
+> +			};
+> +
+>  			mmc0_pins: mmc0-pins {
+>  				pins = "PF0" ,"PF1", "PF2", "PF3", "PF4", "PF5";
+>  				allwinner,pinmux = <2>;
+> @@ -409,6 +418,15 @@ i2c5: i2c@2503400 {
+>  			#size-cells = <0>;
+>  		};
+>  
+> +		syscon: syscon@3000000 {
+> +			compatible = "allwinner,sun55i-a523-system-control",
+> +				     "allwinner,sun50i-a64-system-control";
+> +			reg = <0x03000000 0x1000>;
+> +			#address-cells = <1>;
+> +			#size-cells = <1>;
+> +			ranges;
+> +		};
+> +
+>  		gic: interrupt-controller@3400000 {
+>  			compatible = "arm,gic-v3";
+>  			#address-cells = <1>;
+> @@ -521,6 +539,28 @@ ohci1: usb@4200400 {
+>  			status = "disabled";
+>  		};
+>  
+> +		emac0: ethernet@4500000 {
+> +			compatible = "allwinner,sun55i-a523-emac0",
+> +				     "allwinner,sun50i-a64-emac";
+> +			reg = <0x04500000 0x10000>;
+> +			clocks = <&ccu CLK_BUS_EMAC0>;
+> +			clock-names = "stmmaceth";
+> +			resets = <&ccu RST_BUS_EMAC0>;
+> +			reset-names = "stmmaceth";
+> +			interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
+> +			interrupt-names = "macirq";
+> +			pinctrl-names = "default";
+> +			pinctrl-0 = <&rgmii0_pins>;
+> +			syscon = <&syscon>;
+> +			status = "disabled";
+> +
+> +			mdio0: mdio {
+> +				compatible = "snps,dwmac-mdio";
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +			};
+> +		};
+> +
+>  		r_ccu: clock-controller@7010000 {
+>  			compatible = "allwinner,sun55i-a523-r-ccu";
+>  			reg = <0x7010000 0x250>;
+> 
+
 
