@@ -1,155 +1,132 @@
-Return-Path: <netdev+bounces-185500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60766A9AB57
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 13:03:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32127A9AB5B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 13:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF304A3425
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD2B83B0EC2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 11:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A31A227574;
-	Thu, 24 Apr 2025 11:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB1B205ABB;
+	Thu, 24 Apr 2025 11:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqUlq72/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZDGJhD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AECB224AFB
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F068634F
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745492598; cv=none; b=oT0+daF0Bov357rRkrE1iQbtJ9Ar+hEs6poYbHnlCMcKwApGFY5bJGdGc7C9d92jf3eFmcjgOh40vqNuw5Y/dX9mEIaI5FIu1r5ogr614t3SdswXctrjfc7pXYJePCxPbTsCkULvd5xZ1h0G70hHotq3V683jc9TBWqws2vU5yo=
+	t=1745492669; cv=none; b=YFVbOedvJVTFToy6Serj/sHkdi+TSpcfXTAHU9qZc5OFd1oxJb5aPDe2MRSjJwQDqMunDI+eFe/lm3aX2PX4KcQ3CZ7Ko8gZktbs1jnD7ZzjCQxJ5+6ye5qmrzM6s6UYFHNBWKcXlLpp74M6PxRULUMlBlZKVtvKB8qhzV2epWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745492598; c=relaxed/simple;
-	bh=OnEK4+ktkuTBVd4LCgvO2/u1sSZlYN0t7X50RZpIPls=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sl9GpEVhEltPjxiBeVBijWnhFilIA5o4qVvR33EWPtHQo0uwf3zplwDudPxZjjXNHFiJc7jMHyHLpoNi33kN7A8BpR5K8VbJNVNIAtczjHbpQ53/i+bh7mnlR+0SKrMQWeDoDGT57qOvQ+IaPNhrkAVxbyULqKgbtp3IJay7QY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OqUlq72/; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1745492669; c=relaxed/simple;
+	bh=2U/DZ98nyb43Zevabrjr+i1gak+2K8H1G+KpXSGgK/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=SbXYSQ3DVc0pWbxp2nXs1pJPDxyQo8qFNe3TgSi6UibVYWEucP98EAW/Haat0XyyMWFcWRmo18MHnupL+QZkgffH/sGdoX1STqUmNFxDZjlZLvBp1BDkeWHv1nbsCpLasZLz8yVB1FUxml50vZepmGndtDmXm78m4lWNWv88Jmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aZDGJhD4; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745492594;
+	s=mimecast20190719; t=1745492666;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OB+hDp/hkN/T5Zk53qLd2kwTdWBUeriKnar6WFmgAY8=;
-	b=OqUlq72/cnUazuGjA5/AyJxgUHDrGr7gB8aizfTto6uoUVylNRokKp8es3Le0AJGBYOyak
-	veQOMSDCLwSZuMeUzY3DkdGrIN05bxBT4XymdK7tz84Qyx5dbiKRCuVU4zGX/w9rQbvDyY
-	tqMHzr/0ocDOkA50xovEqJZAiOhHHbg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Lyu9hNwObLGr+KhrEDmYPVh+6IL5Ud0sbGGYl34RVrU=;
+	b=aZDGJhD4KS797PojGlOJkuvFgocIG5jA5LHTwhkhuz/hHtrkN1MZVm6pKQJn327XHsN0BN
+	cF9TvhRY1I6QaFXWfSgmUmAwJDd1bM52QdTrcb/oXcip7G6G3gpUdNg0yXbo+GJd1cO5RA
+	5VdfQPpJhrTqfPxqwxDsHZL3BoyF+cY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-8-9bOGZUPeWtpZCJuXtZJw-1; Thu, 24 Apr 2025 07:03:10 -0400
-X-MC-Unique: 8-9bOGZUPeWtpZCJuXtZJw-1
-X-Mimecast-MFC-AGG-ID: 8-9bOGZUPeWtpZCJuXtZJw_1745492589
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cf44b66f7so5423135e9.1
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 04:03:10 -0700 (PDT)
+ us-mta-538-YzPxQ9q9Omaibo9HFBFiEA-1; Thu, 24 Apr 2025 07:04:25 -0400
+X-MC-Unique: YzPxQ9q9Omaibo9HFBFiEA-1
+X-Mimecast-MFC-AGG-ID: YzPxQ9q9Omaibo9HFBFiEA_1745492664
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912b54611dso431202f8f.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 04:04:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745492589; x=1746097389;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OB+hDp/hkN/T5Zk53qLd2kwTdWBUeriKnar6WFmgAY8=;
-        b=Z9qdX2Fea6AV+UW7cTizpPg130bXn/28fwkhJqoSt5sFbaxsBMco9+ZFblBnCTyH63
-         PC1VMttq3jw0jmhsQaNyhOVqStEE3MUHcnFKUAsUeupFt4WO37EpaVBG6fubAtuIvWc4
-         yk1L23FrAFuwq+Qao9GikJ08Vwk7Kgy0/BoI/EvfwvnPvrglHMnBbZzSn28m2BqYnCTa
-         gujERNBaZV6W6FNgmpgr/5PIFfAiqdcUfOP+QGCgSquAveHORtQ8RtTR/7hKhKLSY4GY
-         IyO2UiQCTW8Fgg8GXJQDa45BncgYrhLzrjwSXJYYXa1TmqalFUidtMstrYXCYlxMSbEW
-         1r1w==
-X-Forwarded-Encrypted: i=1; AJvYcCXrCuSANq9znqQwu1Ag7ZQDwVZersIhshQqeFbXMJMcEk4Vc1DYqgFYH2OlvT7legSlmZa0bew=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+FE3O0qKbNdQsIH8wC1BixVab514Y121RlVYClHByyTUYdMRh
-	RusHEEvHyAL7dXgTZYaAQw4C7/RRqCt1lTWrtxTocfMwlYvXMajurAvb4B3A6n3Q8Gp61bNHBCk
-	2N/JLXwgzaSOSDR0aspfg65OVp87vsUx+16aVIeA29zRnqwvz3i6PxQ==
-X-Gm-Gg: ASbGncsFAvynOg+L0QbOsGXh0CYD3Vi6jAzt+TqvecQDHXMMZdWR68UhFOUzaBIOOYV
-	nd8hqPHBAO6Cf84L58ff30lio++K9K+/3lPQzhhKdLfggTw9KbVajAVV04zVwdH8cQwDy467Ee+
-	aihd5j6T1rh060kKPBbwcZWyg7NrhBAanXBRji7IfU1P4ZnlfngP4yn0nXemphnCVpR/YdgLJFQ
-	42Hx9FMxaX8/V6Y/2NxxbIsKezuITxTcN1x85mXUfJMHGOdT50pcIgSosOf6Yg71o+jujK5h2YR
-	ayDISA==
-X-Received: by 2002:a05:600c:3516:b0:43d:1840:a13f with SMTP id 5b1f17b1804b1-4409bda6055mr16048805e9.25.1745492589460;
-        Thu, 24 Apr 2025 04:03:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtu0yCr7M7AP7EC3ZZSx9xsMrsn304Zj6V6BYFUjfak8chlhsmlR6+Poqw3gaQbMFvkrartg==
-X-Received: by 2002:a05:600c:3516:b0:43d:1840:a13f with SMTP id 5b1f17b1804b1-4409bda6055mr16048345e9.25.1745492588928;
-        Thu, 24 Apr 2025 04:03:08 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4408d839711sm57806515e9.0.2025.04.24.04.03.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 04:03:08 -0700 (PDT)
-Date: Thu, 24 Apr 2025 07:03:05 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v5 0/3] virtio-net: disable delayed refill when pausing rx
-Message-ID: <20250424070300-mutt-send-email-mst@kernel.org>
-References: <20250424104716.40453-1-minhquangbui99@gmail.com>
+        d=1e100.net; s=20230601; t=1745492664; x=1746097464;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lyu9hNwObLGr+KhrEDmYPVh+6IL5Ud0sbGGYl34RVrU=;
+        b=LuLC2btLRt4PV/2lFOoOJpsWbf9veJZbvtzalEoXsNzgRzUij0i1fkAhjpk/DbHAtN
+         M5GFLYtl3U8aQjPxlsy/SoXEdvBK8s9zZpKYidQJHptUfN3g0JwOCPqqQQywFkSVGs11
+         LAse+CLv2aDXbBlveN0q+l1ANJxA3DBnoN0OJuK9e0Cxkfh8v/p2CYB5eS2y36qBD/U6
+         IcovzG/4OPEFkA0cwazRWzsV3llgeRjCUUrzzeVzbwancO4meMxH0r+yRFpVLOE0DDV8
+         AFsA6zO0IRZzuuhFU31k0UVbLp7E7aTu847WgWFqZAszdujtRHLL64EkIz2jlKSg35hY
+         2Y5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWDjQ7Is2c1FI/30gOPOefwg8+riOhX0yvUResTFZ2xl/MyAusxXUu+Z8ttxmX3JNOGTbpc+Dc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZFb5bPfBngJoOTK7OM9N/BGZ3adJwg1bU22QqWvHofy4g3O7s
+	fcarFx25Y3f95AS/Ell2Qh0CDieRlY5odZnuL6KDO6kq5AgTBuGwV85akQoepf+xrET3sp5UKZL
+	YtTfxu0mgIXSqh/4OmbGwCAkP6215/5QKVAt96DbMncdmvom6ssnzbZZuzepo1w==
+X-Gm-Gg: ASbGncsmxQlLMTCuzBhVcHTz/4+Tc4wAl4Fg1h+gm9mF9BS924ymmdk9sPVLEhResj1
+	RXOnm7ds+q4Yf+/OOdVJCvNixKn+HI9esywZ8F8OwHV7BXaJYjthu1Wy3Y28GI284sZwQ40MwsS
+	83XPAw7yQEsau1RwUDBLP0TBewbYN51p47yIN/R6+GqepvN1KIK18+hkH0JDQo1jtjJdQHe8BDF
+	fe58LvtS05Dg8VEDi1pgILFDu1oXL82MguWy7Q6liUomFHJy9kWHO1KDWxkdXauiRAIsqpurrYS
+	/wRb/8iKu00bV2Aw1jQ9Ve44SbFtD/iMeZ0QTMI=
+X-Received: by 2002:a5d:47ab:0:b0:39e:faf8:feef with SMTP id ffacd0b85a97d-3a06cfab965mr1636782f8f.56.1745492663903;
+        Thu, 24 Apr 2025 04:04:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHolj4jAkXWZgjgiY9g67zZ4iSrWcvdEryaUkNLkRqtxvRgz/PM71yD5V2etIdvFtP43ygB4A==
+X-Received: by 2002:a5d:47ab:0:b0:39e:faf8:feef with SMTP id ffacd0b85a97d-3a06cfab965mr1636744f8f.56.1745492663418;
+        Thu, 24 Apr 2025 04:04:23 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-7-183.dyn.eolo.it. [146.241.7.183])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4ae0b8sm1735217f8f.32.2025.04.24.04.04.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 04:04:23 -0700 (PDT)
+Message-ID: <4e7227ef-a1d6-409f-a21b-5b1f26cf52b7@redhat.com>
+Date: Thu, 24 Apr 2025 13:04:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424104716.40453-1-minhquangbui99@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] net: fully namespace net.core.{r,w}mem_{default,max}
+ sysctls
+To: Danny Lin <danny@orbstack.dev>, Matteo Croce <teknoraver@meta.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250418070037.33971-1-danny@orbstack.dev>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250418070037.33971-1-danny@orbstack.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 05:47:13PM +0700, Bui Quang Minh wrote:
-> Hi everyone,
+On 4/18/25 9:00 AM, Danny Lin wrote:
+> This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{default,max} namespaced")
+> by adding support for writing the sysctls from within net namespaces,
+> rather than only reading the values that were set in init_net. These are
+> relatively commonly-used sysctls, so programs may try to set them without
+> knowing that they're in a container. It can be surprising for such attempts
+> to fail with EACCES.
 > 
-> This only includes the selftest for virtio-net deadlock bug. The fix
-> commit has been applied already.
+> Unlike other net sysctls that were converted to namespaced ones, many
+> systems have a sysctl.conf (or other configs) that globally write to
+> net.core.rmem_default on boot and expect the value to propagate to
+> containers, and programs running in containers may depend on the increased
+> buffer sizes in order to work properly. This means that namespacing the
+> sysctls and using the kernel default values in each new netns would break
+> existing workloads.
 > 
-> Link: https://lore.kernel.org/virtualization/174537302875.2111809.8543884098526067319.git-patchwork-notify@kernel.org/T/
+> As a compromise, inherit the initial net.core.*mem_* values from the
+> current process' netns when creating a new netns. This is not standard
+> behavior for most netns sysctls, but it avoids breaking existing workloads.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+AFAICS leveraging the above and any protocol without memory accounting
+(e.g. UDP for tx) child netns could use an "unlimited" amount of kernel
+memory. I'm wondering if it would be safer to limit, for child netns,
+the maximum value to the corresponding initns one.
 
-> Version 5 changes:
-> - Refactor the selftest
-> 
-> Version 4 changes:
-> - Add force zerocopy mode to xdp_helper
-> - Make virtio_net selftest use force zerocopy mode
-> - Move virtio_net selftest to drivers/net/hw
-> 
-> Version 3 changes:
-> - Patch 1: refactor to avoid code duplication
-> 
-> Version 2 changes:
-> - Add selftest for deadlock scenario
-> 
-> Thanks,
-> Quang Minh.
-> 
-> Bui Quang Minh (3):
->   selftests: net: move xdp_helper to net/lib
->   selftests: net: add flag to force zerocopy mode in xdp_helper
->   selftests: net: add a virtio_net deadlock selftest
-> 
->  tools/testing/selftests/drivers/net/Makefile  |  2 -
->  .../testing/selftests/drivers/net/hw/Makefile |  1 +
->  .../selftests/drivers/net/hw/xsk_reconfig.py  | 68 +++++++++++++++++++
->  tools/testing/selftests/drivers/net/queues.py |  4 +-
->  tools/testing/selftests/net/lib/.gitignore    |  1 +
->  tools/testing/selftests/net/lib/Makefile      |  1 +
->  .../{drivers/net => net/lib}/xdp_helper.c     | 19 +++++-
->  7 files changed, 90 insertions(+), 6 deletions(-)
->  create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
->  rename tools/testing/selftests/{drivers/net => net/lib}/xdp_helper.c (90%)
-> 
-> -- 
-> 2.43.0
+/P
 
 
