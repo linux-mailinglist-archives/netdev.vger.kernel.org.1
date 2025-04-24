@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-185688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E37EBA9B631
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7DEA9B637
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8495A4A8570
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:21:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875124A85DB
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FC22918DA;
-	Thu, 24 Apr 2025 18:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC84F29291A;
+	Thu, 24 Apr 2025 18:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FphviHRq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MW6Qbl8Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CFF2918D5;
-	Thu, 24 Apr 2025 18:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69212918D5
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745518801; cv=none; b=WAdGumuusoKBfu84IpT6A+hl/BGjctxFkN2xO7iwvj9SwJx0g/q6JV5iwufdCCgflFr2cKIe3osQRnH2dTJpMQjaQ/hSqRL/rlEl00vEIvXBGXOw9JX8zKvsV0R2yTgBpwDJWAcOlYOIxb3m/jZOfqkVukrksKSHiI25+PNsODk=
+	t=1745518802; cv=none; b=BJ6utogwCZsUGALSrcNszOnmxCu50HIr129cUd5br+L4GCj8Zouk1R2ONDcGcoCEOJBM3U02Qt541fahVxOfv+OSTv60MiH9WwVVrIyVjxniJTyPeL5WnYyc8XPockSEkBj4yXZ8OgrfXI3X+ROILntv+S48g8SSaZDzzaQnBYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745518801; c=relaxed/simple;
-	bh=A1MPRpwZUKWu83PMxe2/nf2hv/u+MNTQCN1PJOhMKaE=;
+	s=arc-20240116; t=1745518802; c=relaxed/simple;
+	bh=F0g9GkC45SNM6fRGftx4Szqpqh3klFm32E3CDDeUPOc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IRehSfqsXi3+QZpPmotS75NRe1axDT56t0OzcFP4dRztbC1mcfXTAv3xv+CpIS8OE3odzt+hr+TgJVH04jPRlOHwCwh8juwAauDwpohdDo7UIGQEFdHkrx4YKMrCve0mz8Ebf9irxR2X+dI3HUQTFRSgwc969Kdy65HsoAKuVS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FphviHRq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4970C4CEE3;
-	Thu, 24 Apr 2025 18:20:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=EESDv9UR4TV5vYDUFR0Gid6Zgw+9PKGnJ9+A+5bXKYSrLesxfu6eyz+ujmOSbm+93jUskdzyPalp3pKchMMfJr2BPhD8S45akOy4OxsAxhvmkliNzQdrxuZ89Li/CTcBqyosoe/O8IUPwdF2FZv2/vncN6AVGmaUL3cFyD6WRaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MW6Qbl8Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C659C4CEED;
+	Thu, 24 Apr 2025 18:20:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745518800;
-	bh=A1MPRpwZUKWu83PMxe2/nf2hv/u+MNTQCN1PJOhMKaE=;
+	s=k20201202; t=1745518802;
+	bh=F0g9GkC45SNM6fRGftx4Szqpqh3klFm32E3CDDeUPOc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FphviHRqpawxr/+Y+N7BvwwUc+Q6KnfvnpEeQC2QVYMcKnAMF4qYAx2MYmlD01Qpw
-	 gU5Plf5Yqj25HPij9+DKVGlUzgSm12Ru/joudps+JdDAWFZsyWE5qXAluH9i5sELmy
-	 SoxpB/OE4Nz3uGg+AQ96rhSlQ1Jufio5vUNW/zhh9hFt7UflJJKJrqzMwjKUrt8ohd
-	 cVZayo21Dc3HAaEI6vgYDrbsxdryvjn7jIzjM7gVJqSRzJ5L/TNZ6UZ1cTeY/BrEEm
-	 fVbNwgDwZHL7ERpins+tKlUIAVGIqx6ndpYHbCJtV3kPzUHyRTzfbpJ8whFEyCekNG
-	 FaOajmazMQmhw==
+	b=MW6Qbl8YgoCP72KCeIi5Cv/httYQLyx+OtFHwbPi8MWF+saIOrhApV+8XaIckvIct
+	 aY9wb50Lp7Le4f7aic0Ry1dv4VmZhzTqt8qsKvyihAa0STRNEZZYjxuYAXFGzf/X3a
+	 bfSeYps3Oya9/v7UcyTYy1S7i2jouicfP6XsCmpHgSPrFreUbDRTKOXKdnubi7iDYl
+	 q6OKLGYWHmR+Qytity18moRt4KgnjHEo2bvIvXj0MDE3WOloMtjS++N6sabAvbUIA4
+	 BWvmnBwxjV+pktnYMVhfjsJdxAILzwkUte41VJ2y16GqYoDIPEgAY4r1F86Fg6oAlb
+	 cMliu+UvkIBrQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC85380CFD9;
-	Thu, 24 Apr 2025 18:20:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE0E380CFD9;
+	Thu, 24 Apr 2025 18:20:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-2025-04-24
+Subject: Re: [PATCH net] vxlan: vnifilter: Fix unlocked deletion of default FDB
+ entry
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174551883928.3443031.14767697128423802990.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Apr 2025 18:20:39 +0000
-References: <20250424120535.56499-3-johannes@sipsolutions.net>
-In-Reply-To: <20250424120535.56499-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <174551884074.3443031.2705222387841498439.git-patchwork-notify@kernel.org>
+Date: Thu, 24 Apr 2025 18:20:40 +0000
+References: <20250423145131.513029-1-idosch@nvidia.com>
+In-Reply-To: <20250423145131.513029-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+ razor@blackwall.org, petrm@nvidia.com, roopa@nvidia.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 24 Apr 2025 14:04:57 +0200 you wrote:
-> Hi,
+On Wed, 23 Apr 2025 17:51:31 +0300 you wrote:
+> When a VNI is deleted from a VXLAN device in 'vnifilter' mode, the FDB
+> entry associated with the default remote (assuming one was configured)
+> is deleted without holding the hash lock. This is wrong and will result
+> in a warning [1] being generated by the lockdep annotation that was
+> added by commit ebe642067455 ("vxlan: Create wrappers for FDB lookup").
 > 
-> Got a bit late due to holidays/vacations, but here are
-> a couple of fixes, including somewhat high profile
-> regressions for some devices in iwlwifi.
-> 
-> Please pull and let us know if there's any problem.
+> Reproducer:
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] wireless-2025-04-24
-    https://git.kernel.org/netdev/net/c/30763f1adf69
+  - [net] vxlan: vnifilter: Fix unlocked deletion of default FDB entry
+    https://git.kernel.org/netdev/net/c/087a9eb9e597
 
 You are awesome, thank you!
 -- 
