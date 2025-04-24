@@ -1,137 +1,157 @@
-Return-Path: <netdev+bounces-185618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B60AEA9B287
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:37:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450E4A9B28C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:37:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D97533BBFF1
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:35:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59EF77A86B6
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E2F1D5CC4;
-	Thu, 24 Apr 2025 15:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0FA1DF994;
+	Thu, 24 Apr 2025 15:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKgOv7ek"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tI5NMHEN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81F1187FE4;
-	Thu, 24 Apr 2025 15:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026DD19D892;
+	Thu, 24 Apr 2025 15:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745508971; cv=none; b=OYFqQcSD3jx7ScRBNi2x7PRYXc7uoiF0to1xSOSEDYk9s/2BdNv1t87eZpSCB/TPsi720o9jIUlsYkih8H72aPeUuEjn4YSaSa1tT5r+43+XKrCojb1w/vD0RhgOtnr2OtgQPYCVm/ohV7JFqOH610fmmoqdGftE5fqyGHEDLWY=
+	t=1745509067; cv=none; b=Oe49eHzLJQfEMf5+iQVJIs8019pv5KC26WvXA4ZZI+K876U6Pn/2KRc76zolDlL/mpw//KVbZyDc2w/qw4YBwCazi/5GJqUpTLAhkCD80zqlBm77OJLY4LUhhf1xH1hGAZgB27gweT8RkfMq31kpm0FlFPz+ZxjKMnQmWMbiXDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745508971; c=relaxed/simple;
-	bh=mdGLiwc9GSUiQbyFTA/wJHANHSo9NTlFVbMloSFkBRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nnHAutT+V40DFlsCih5Jk4TDoL4fmR0PAFoCKUwBwl92yi7uqh4zSWrs60OFyLnlh0DIf5i4fTMnzRWGkdmYTMi4r08CLl8Bvogotmh+JWQg9PjzoLl+4kL8nSb8SvCApDTojUSJxAdwOpE3wBQcQQz3xVjYGUJqFKf/1I1YgcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKgOv7ek; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A3FCC4CEE3;
-	Thu, 24 Apr 2025 15:36:07 +0000 (UTC)
+	s=arc-20240116; t=1745509067; c=relaxed/simple;
+	bh=C7+vYPcbiwRfNDavEy+O1fs+WxZhZ/OG71iTVux0X3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=unfjllK2zc9QIdpqRd8D37gEgjSA3jAX1CdOQH3kz0anV8mG1K3AhLUHq/3s7xNuEXrbBV+0lfnKz+cg9rxguLLiCpD6Gwp865Y7umKgLqFNDtE8f8a3TG24dJmjM8k3rwsqM2q2KdQ1BzLCwdYxng7KiyZEXxqkjnRA6LRITYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tI5NMHEN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16366C4CEE3;
+	Thu, 24 Apr 2025 15:37:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745508970;
-	bh=mdGLiwc9GSUiQbyFTA/wJHANHSo9NTlFVbMloSFkBRI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uKgOv7ekM8lvqZ5HcVQUvmHod5gAmStmB/a41M+OxXnrcogNdAQJh1PQ7awvtl798
-	 Lz3GED8jXAjCOGIncdq+hxlxcdjMCOpszDvx3xWasY6OBHwQ4cgCFsnQR3S9X1qWCv
-	 VjUsE5oYJXJVV8yA5FDGZv9bYqYxcF2Xyxhfir+60UgzGxsigJD1x6x1tm8e23mE89
-	 agd1XufLEhQyhh1vdF0/YIIWWASCepGRAykF+Q2ewe9pAscYiRF1EskHJ9h/pfaDXb
-	 dfPozjNKMdDVZLwFiOPV+fL9cqGP+St5H4IGucFCXdaGIhC6k/2ZYEcZNSUtlCih7E
-	 Yq1LGFjWKeJ8g==
-Date: Thu, 24 Apr 2025 16:36:04 +0100
-From: Lee Jones <lee@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3 net-next 8/8] mfd: zl3073x: Register DPLL sub-device
- during init
-Message-ID: <20250424153604.GG8734@google.com>
-References: <20250416162144.670760-1-ivecera@redhat.com>
- <20250416162144.670760-9-ivecera@redhat.com>
- <20250417162044.GG372032@google.com>
- <335003db-49e5-4501-94e5-4e9c6994be7d@redhat.com>
- <20250424153434.GF8734@google.com>
+	s=k20201202; t=1745509066;
+	bh=C7+vYPcbiwRfNDavEy+O1fs+WxZhZ/OG71iTVux0X3M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tI5NMHENTsZjqXHc1xYYJBHLvzPXc4ZmXfQLXBvaiyyJg+JrszBReEq2qlXOxW81r
+	 2dcNsrs1lAidea7EG1HNLIgdfh7hYY4Lcl8VnzChvkQ1Suc8gXafpBhZOJkleCL31u
+	 cqC4AdcLbQq/h8X/pWmWHVPPw0Hi+cwn7wpbEoPw3fr9goNfEanDZM+kzFeVRbM9AG
+	 CFIB5XwtpoNrGHl/YZBnO9V1DlkbFfrUlIlKw3HTiCPqd33aPsmlMZeRXG9U4HdSmu
+	 rGnT/D18CfEnck7vfMT/7fIdBGaORiWwlrl3lI3jRX352ZCW0fE4sn4MqQqXnqBsRy
+	 MdRGliFuoVPZA==
+Message-ID: <f0e56cb2-17a6-44d4-ae71-8639966d565a@kernel.org>
+Date: Thu, 24 Apr 2025 17:37:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250424153434.GF8734@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/5] dt-bindings: wireless: bcm4329-fmac: Use
+ wireless-controller.yaml schema
+To: Johannes Berg <johannes@sipsolutions.net>, david@ixit.cz,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>,
+ =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>,
+ Mailing List <devicetree-spec@vger.kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
+ <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
+ <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org>
+ <57701e2e-0005-4a8a-a3f5-ba098c97b480@kernel.org>
+ <4b040936baa8fa8669b34e36fe9dff6e08aeede9.camel@sipsolutions.net>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <4b040936baa8fa8669b34e36fe9dff6e08aeede9.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 24 Apr 2025, Lee Jones wrote:
-
-> On Thu, 17 Apr 2025, Ivan Vecera wrote:
+On 24/04/2025 14:09, Johannes Berg wrote:
+> On Thu, 2025-04-24 at 10:28 +0200, Krzysztof Kozlowski wrote:
+>> On 24/04/2025 10:20, Krzysztof Kozlowski wrote:
+>>> On 24/03/2025 18:41, David Heidelberg via B4 Relay wrote:
+>>>> From: Janne Grunau <j@jannau.net>
+>>>>
+>>>> The wireless-controller schema specifies local-mac-address as
+>>>> used in the bcm4329-fmac device nodes of Apple silicon devices
+>>>> (arch/arm64/boot/dts/apple).
+>>>>
+>>>> Fixes `make dtbs_check` for those devices.
+>>>>
+>>>> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+>>>> Signed-off-by: Janne Grunau <j@jannau.net>
+>>>> Signed-off-by: David Heidelberg <david@ixit.cz>
+>>>
+>>> This introduced several new dtbs_check warnings. Including on platforms
+>>> which were warnings free. It is nice to fix these warnings when you make
+>>> such changes.
 > 
-> > 
-> > 
-> > On 17. 04. 25 6:20 odp., Lee Jones wrote:
-> > > On Wed, 16 Apr 2025, Ivan Vecera wrote:
-> > > 
-> > > > Register DPLL sub-devices to expose this functionality provided
-> > > > by ZL3073x chip family. Each sub-device represents one of the provided
-> > > > DPLL channels.
-> > > > 
-> > > > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> > > > ---
-> > > >   drivers/mfd/zl3073x-core.c | 15 +++++++++++++++
-> > > >   1 file changed, 15 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
-> > > > index 0bd31591245a2..fda77724a8452 100644
-> > > > --- a/drivers/mfd/zl3073x-core.c
-> > > > +++ b/drivers/mfd/zl3073x-core.c
-> > > > @@ -6,6 +6,7 @@
-> > > >   #include <linux/device.h>
-> > > >   #include <linux/export.h>
-> > > >   #include <linux/math64.h>
-> > > > +#include <linux/mfd/core.h>
-> > > >   #include <linux/mfd/zl3073x.h>
-> > > >   #include <linux/mfd/zl3073x_regs.h>
-> > > >   #include <linux/module.h>
-> > > > @@ -774,6 +775,20 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
-> > > >   	if (rc)
-> > > >   		return rc;
-> > > > +	/* Add DPLL sub-device cell for each DPLL channel */
-> > > > +	for (i = 0; i < chip_info->num_channels; i++) {
-> > > > +		struct mfd_cell dpll_dev = MFD_CELL_BASIC("zl3073x-dpll", NULL,
-> > > > +							  NULL, 0, i);
-> > > 
-> > > Create a static one of these with the maximum amount of channels.
-> > 
-> > Like this?
-> > 
-> > static const struct mfd_cell dpll_cells[] = {
-> > 	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 1),
-> > 	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2),
-> > 	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 3),
-> > 	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 4),
-> > 	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 5),
-> > };
-> > 
-> > rc = devm_mfd_add_devices(zldev->dev, PLATFORM_DEVID_AUTO, dpll_cells,
-> >                           chip_info->num_channels, NULL, 0, NULL);
+> Heh, especially since it said it should _fix_ things there.
 > 
-> Yes, looks better, thank you.
+>> I will send the patches for them, except for Apple SoCs.
+> 
+> Thanks, I guess I'll hold the pull request for that. And I guess the
+> Apple ones are on David then.
+I think you can go ahead. I already referenced that commit from next in
+my patches, so I hope that SHA will not change (don't rebase your tree):
 
-Sorry, just a thought.  Since this is non-standard, please make it easy
-on the reader by providing a comment to say that this call will register
-a variable number of devices depending on the value of num_channels.
+https://lore.kernel.org/linux-devicetree/?q=f%3Akrzysztof+%22Align+wifi+node+name+with+bindings%22
 
--- 
-Lee Jones [李琼斯]
+Best regards,
+Krzysztof
 
