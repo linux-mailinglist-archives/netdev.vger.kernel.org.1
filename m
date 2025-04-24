@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-185370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A66E2A99EAE
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:13:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598A2A99EAF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CEE44465E1
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:12:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19D8D7AFFB0
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FF31C6FFA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CBB1D61A3;
 	Thu, 24 Apr 2025 02:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Of+py2q+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cts5ACg9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA021B4242
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810C11D5AB5
 	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745460740; cv=none; b=s7LEvXhdRPCp7zjoO23EtZFGXhxdkpdqSPWhbNj6F6fd4Ep+CM7VB4P7+DVY/fN81+80kCxj6NMdGHlPlo/rA1i1PiWqb9ai4+EEG+xRzU9H3Fs4sSG1MgXtO+vkVRCaulmkJQ7Uxir5Wu1wBV0pyC1JQYKudK38v6qA19CIXw0=
+	t=1745460740; cv=none; b=t6xQGNMcboJw6SdUNvZIU3m8GsvZJCD7AZoOhY0JbXShsH0mAiv8FsCazOTuNtSL837tyHa1jWxIupg+6ouQJZOpFxcBpSmkKozGS9NLf6lE+rP1Le0SlZjiAzUlXMGLJrnZKBNk02rIjTxFqAddMqy/s2ZfN3ohTr4bWmxrjeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745460740; c=relaxed/simple;
-	bh=qI40/4apYhyWAYvxRoQxWDZlUlb7jfxIG/Yluph1qXQ=;
+	bh=Eou7yW+47EGIcIcDf6lnrJ7OnbHl94rFq83d43zm8I0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qrbDUVajM7clDNrszgDBv7mtbLWlZaQ5VGZEIOOZEiq/UmHwf7HnSDCnFeirIN5AfY9ewhOWTmHUyqXJzwR+kJS30V27B903usVUAqydfns/UiToSKn7afnYWnykcmvMdDnSgbxXp6qAghE+L+WsX18rz3sWPjTm3qFKsb1MUnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Of+py2q+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99FF3C4CEEE;
-	Thu, 24 Apr 2025 02:12:19 +0000 (UTC)
+	 MIME-Version; b=OspB2uIVQWMk5suAMm0CWJMp1UNhdNK0DOcJufm41h+umknOrO+90vIDUeVO8+kipXoUbAbAPS1MIka8zHrsHYAQKEC5T0VngXJRUny/0KEI3rvymYWvkeX8Nx03jRaSexCsNuGFGNaxskpXIG0vTlU53vsIA6ibczdPnWA1MxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cts5ACg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14246C4CEE3;
+	Thu, 24 Apr 2025 02:12:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745460739;
-	bh=qI40/4apYhyWAYvxRoQxWDZlUlb7jfxIG/Yluph1qXQ=;
+	s=k20201202; t=1745460740;
+	bh=Eou7yW+47EGIcIcDf6lnrJ7OnbHl94rFq83d43zm8I0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Of+py2q+DPj7T8uAUsOMm4wIYaFUnnidG1Ba8Hsqq1qJpH1oSsbqoJbJA3mRRCfUs
-	 rqe0EYvuT+QfqWmu7QMq6QdBdlPwAj/FdLGSuQ864XymEEmiKtdVG3NPDkSj459SKM
-	 0loATnmdd+3mBZLhacDU4YNe6LOFzvj3BcjkC1KQQVgrWKYchUr9QolGUB3OgrL7z3
-	 WOIXFygzKFAx7KxXu8AyGVxkdoQnRHJqPV67QCoBmFkfnWNjRmxejNaMkOjIf0W1l+
-	 yatMZqoaGHCvNRewKooicT8kNYewoyzL7mlMtiGYXe+tLuifjNokhk+gj+kp6NhoN8
-	 rrrdWEzrL7AKQ==
+	b=cts5ACg9iOAewLEAJyiI9ANliTplUB2r2nHpC4Rvil7vHawgOlaZz6tU/QhxJMr/N
+	 +leMKYDWiE6uhCiTKbca1AY4LVBQVzqz89wYodw+TkS5hoJJe6aiqa49nWsPxQBzbk
+	 quyLmprjrZdJktxwpXiZSShkoYHpn2gdyV/VJ8FfGR1FjeNrhaPWHnxqM7/Qd+yxn2
+	 MWFbm4wpAThc/YF+CrvPUelDCmvW+Juf56NnuxVCMwi0TeD7VGJKcDlvMJE2t9QITO
+	 yX4OklYRWezJOc+HamKfk3dIMkka2FQBPfbDB2QsB6PKx2IetkctpdgFFKg4As/HLT
+	 DqPYOhIkpOVYQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	jacob.e.keller@intel.com,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 09/12] tools: ynl-gen: array-nest: support put for scalar
-Date: Wed, 23 Apr 2025 19:12:04 -0700
-Message-ID: <20250424021207.1167791-10-kuba@kernel.org>
+Subject: [PATCH net-next 10/12] tools: ynl-gen: array-nest: support binary array with exact-len
+Date: Wed, 23 Apr 2025 19:12:05 -0700
+Message-ID: <20250424021207.1167791-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250424021207.1167791-1-kuba@kernel.org>
 References: <20250424021207.1167791-1-kuba@kernel.org>
@@ -66,62 +66,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-C codegen supports ArrayNest AKA indexed-array carrying scalars,
-but only for the netlink -> struct parsing. Support rendering
-from struct to netlink.
+IPv6 addresses are expressed as binary arrays since we don't have u128.
+Since they are not variable length, however, they are relatively
+easy to represent as an array of known size.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 14179b84d8ee..46d99b871d5c 100755
+index 46d99b871d5c..97fe9938c233 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -747,6 +747,23 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-                      '}']
-         return get_lines, None, local_vars
+@@ -183,10 +183,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         raise Exception(f"Struct member not implemented for class type {self.type}")
  
-+    def attr_put(self, ri, var):
-+        ri.cw.p(f'array = ynl_attr_nest_start(nlh, {self.enum_name});')
-+        if self.sub_type in scalars:
-+            put_type = self.sub_type
-+            ri.cw.block_start(line=f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
-+            ri.cw.p(f"ynl_attr_put_{put_type}(nlh, i, {var}->{self.c_name}[i]);")
-+            ri.cw.block_end()
-+        else:
-+            raise Exception(f"Put for ArrayNest sub-type {self.attr['sub-type']} not supported, yet")
-+        ri.cw.p('ynl_attr_nest_end(nlh, array);')
+     def struct_member(self, ri):
+-        if self.is_multi_val():
+-            ri.cw.p(f"unsigned int n_{self.c_name};")
+         member = self._complex_member_type(ri)
+         if member:
++            if self.is_multi_val():
++                ri.cw.p(f"unsigned int n_{self.c_name};")
+             ptr = '*' if self.is_multi_val() else ''
+             if self.is_recursive_for_op(ri):
+                 ptr = '*'
+@@ -728,12 +728,22 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         elif self.attr['sub-type'] in scalars:
+             scalar_pfx = '__' if ri.ku_space == 'user' else ''
+             return scalar_pfx + self.attr['sub-type']
++        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
++            return None  # use arg_member()
+         else:
+             raise Exception(f"Sub-type {self.attr['sub-type']} not supported yet")
+ 
++    def arg_member(self, ri):
++        if self.sub_type == 'binary' and 'exact-len' in self.checks:
++            return [f'unsigned char (*{self.c_name})[{self.checks["exact-len"]}]',
++                    f'unsigned int n_{self.c_name}']
++        return super().arg_member(ri)
 +
-+    def _setter_lines(self, ri, member, presence):
-+        # For multi-attr we have a count, not presence, hack up the presence
-+        presence = presence[:-(len('_present.') + len(self.c_name))] + "n_" + self.c_name
-+        return [f"{member} = {self.c_name};",
-+                f"{presence} = n_{self.c_name};"]
-+
+     def _attr_typol(self):
+         if self.attr['sub-type'] in scalars:
+             return f'.type = YNL_PT_U{c_upper(self.sub_type[1:])}, '
++        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
++            return f'.type = YNL_PT_BINARY, .len = {self.checks["exact-len"]}, '
+         else:
+             return f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
  
- class TypeNestTypeValue(Type):
-     def _complex_member_type(self, ri):
-@@ -1730,10 +1747,15 @@ _C_KW = {
-     local_vars.append('struct nlattr *nest;')
-     init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
- 
-+    has_anest = False
-+    has_count = False
-     for _, arg in struct.member_list():
--        if arg.presence_type() == 'count':
--            local_vars.append('unsigned int i;')
--            break
-+        has_anest |= arg.type == 'indexed-array'
-+        has_count |= arg.presence_type() == 'count'
-+    if has_anest:
-+        local_vars.append('struct nlattr *array;')
-+    if has_count:
-+        local_vars.append('unsigned int i;')
- 
-     put_req_nested_prototype(ri, struct, suffix='')
-     ri.cw.block_start()
+@@ -754,6 +764,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+             ri.cw.block_start(line=f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
+             ri.cw.p(f"ynl_attr_put_{put_type}(nlh, i, {var}->{self.c_name}[i]);")
+             ri.cw.block_end()
++        elif self.sub_type == 'binary' and 'exact-len' in self.checks:
++            ri.cw.p(f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
++            ri.cw.p(f"ynl_attr_put(nlh, i, {var}->{self.c_name}[i], {self.checks['exact-len']});")
+         else:
+             raise Exception(f"Put for ArrayNest sub-type {self.attr['sub-type']} not supported, yet")
+         ri.cw.p('ynl_attr_nest_end(nlh, array);')
+@@ -964,7 +977,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         elif elem['type'] == 'nest':
+             t = TypeNest(self.family, self, elem, value)
+         elif elem['type'] == 'indexed-array' and 'sub-type' in elem:
+-            if elem["sub-type"] in ['nest', 'u32']:
++            if elem["sub-type"] in ['binary', 'nest', 'u32']:
+                 t = TypeArrayNest(self.family, self, elem, value)
+             else:
+                 raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
+@@ -1788,7 +1801,7 @@ _C_KW = {
+     needs_parg = False
+     for arg, aspec in struct.member_list():
+         if aspec['type'] == 'indexed-array' and 'sub-type' in aspec:
+-            if aspec["sub-type"] == 'nest':
++            if aspec["sub-type"] in {'binary', 'nest'}:
+                 local_vars.append(f'const struct nlattr *attr_{aspec.c_name};')
+                 array_nests.add(arg)
+             elif aspec['sub-type'] in scalars:
+@@ -1861,6 +1874,9 @@ _C_KW = {
+             ri.cw.p('return YNL_PARSE_CB_ERROR;')
+         elif aspec.sub_type in scalars:
+             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.sub_type}(attr);")
++        elif aspec.sub_type == 'binary' and 'exact-len' in aspec.checks:
++            # Length is validated by typol
++            ri.cw.p(f'memcpy(dst->{aspec.c_name}[i], ynl_attr_data(attr), {aspec.checks["exact-len"]});')
+         else:
+             raise Exception(f"Nest parsing type not supported in {aspec['name']}")
+         ri.cw.p('i++;')
 -- 
 2.49.0
 
