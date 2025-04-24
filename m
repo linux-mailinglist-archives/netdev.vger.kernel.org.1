@@ -1,238 +1,115 @@
-Return-Path: <netdev+bounces-185421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD41A9A4A4
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:47:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E76A9A492
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 09:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 846017AC8B9
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:45:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3146189846C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 07:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7557E1F5823;
-	Thu, 24 Apr 2025 07:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86CF20298D;
+	Thu, 24 Apr 2025 07:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ZDX3ay/v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OB/Wu0p/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-15.smtpout.orange.fr [193.252.22.15])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EDB1CDFD5;
-	Thu, 24 Apr 2025 07:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5C61F4CAB;
+	Thu, 24 Apr 2025 07:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745480692; cv=none; b=DR3OZnvw9gk7jB7xtfh8xCwAg4tP3LvI9Y///w9nL/HCpg0A5JacB0Jv2FVKVhlbRAEeOCOocWpJMrgiCAvQrRseYVLk7dK0MLwZ0lMb9rpgSSD43oyEtj09w8AYrcNHBYNVwuAVYWKNFcOWheND5gsDXoJr5t5uW4i6Bh+SGfc=
+	t=1745480659; cv=none; b=CfmnSF0m8H64Spn8fwovLxdoCnvMukHyLJ0syxbzi/mL9+JUguDESYt5K0DW7QNOFUJM1bgdqyQpY1n+fmaQ3qEBfEGciUkkfvic42UFjKxlAFXtseuE2+5hFoZvLmsUH0Mu9WOnEsY99YSiRqHQEzAKpPyLG01J0yvZKlKUUn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745480692; c=relaxed/simple;
-	bh=WfVlC2CE0mhoeMmOOND8zbdoC10kmqgVlOqSOsgjkAI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tXkO709x3QdeGOunPEYyIKLpoEJaAbPwiI4OZRQgey+/Byz/Oj10OkYbg3GSgoAvITMahRLrk6CSlP/MhorU4jmoxooQHmNQGFUxDcIccfSqgEIBEnvwlL0dCrCZh3lE2w17LRuubDHEmHdmw3nK/Z/dGJ77248oqHr4ZjtyzyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ZDX3ay/v; arc=none smtp.client-ip=193.252.22.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from mail-ej1-f43.google.com ([209.85.218.43])
-	by smtp.orange.fr with ESMTPSA
-	id 7rFAuQtYPaoZo7rFDuYqr4; Thu, 24 Apr 2025 09:43:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1745480619;
-	bh=zLfUsOVmwCeRnswWcWOa9E7kofesQSaSiABhPgK0EcE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=ZDX3ay/v1+9pkdNXO3wL9/zeLr2xdSbro9ZKt0Zec5Qo4jcvMGeSq1gejOyg7G8HK
-	 lMUBWJUkMV0+VKEJ6+yefeTZ79jrPl4QZoKYj0bs7Mul4Ri3w+nF8p2hZZ89DCm9sP
-	 9WoueU9iA4+OGuV/e31kr5De3kccOFWG7dVjoVeFWM/eo137CgEXaVVa0esGQsY06T
-	 6VUSNc/AiLQfx2Soi9eYfjfbR/hHWRBky7dCGnY/svQbyLs8978FgGIdS9v/EK0Ai/
-	 LOMGA0fKFVWc+UohGN03SBdj8dTIawd+pA8DUgmQh5h32Qf3ZtCfcqSMkPjPmIRn2B
-	 t6Gv1AKUJDDSA==
-X-ME-Helo: mail-ej1-f43.google.com
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 24 Apr 2025 09:43:39 +0200
-X-ME-IP: 209.85.218.43
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac6ed4ab410so113377066b.1;
-        Thu, 24 Apr 2025 00:43:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUTj1wYVNdfYwhOGCtA0/YsSqOp7eaJaG/NxfMwaBDcwYJvkbnEMCY7bOdp5M4NAPgjl7FKW8oEuZ4=@vger.kernel.org, AJvYcCV1ot+xT2nqBSdb9MxwMc2QdPMv8Mq6xbAzEj3Szlea7pTb9u00FL0Al7RkRDDVaBKIlACSMEpL@vger.kernel.org, AJvYcCVGsqxoXID5f2z4mx0LrOTUnxiVZyklZ9B9xGeIX5XvQ2/Ct/cEHUFZhYDLsNNGVCxunHO6+Or889WEsnMOeGSC@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK+6JvxhDIAFdvGHidjBzeK3Kz6bS51a6oxsyDHPZqW35Da+Ra
-	HL7BFND/7+dj7GP3eBHKwKJMKpWKI0Z7uUt+PhsSwh9P6Pkd8ba4Eakydaqw1XbZERrZ3hAAjFb
-	yk7/N49cVsX4UE8RJwttIVthRjiE=
-X-Google-Smtp-Source: AGHT+IGjRdePXLP2s9z96dUL3Ys7/hsDE5MhsnO4hyCg7a4HajHQRk5VfYuSRjMBQvIO+1XA0xHKH1TDhNuwktmoggE=
-X-Received: by 2002:a17:907:1c1b:b0:ac3:3f11:b49d with SMTP id
- a640c23a62f3a-ace56e3aa7bmr153482566b.0.1745480616336; Thu, 24 Apr 2025
- 00:43:36 -0700 (PDT)
+	s=arc-20240116; t=1745480659; c=relaxed/simple;
+	bh=VnZ0ZKETltelPggcEVrc3mWHY8TQu/tmfh9OEL4vmMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f4v7pq4kj8tHjD7sAlBD5E1TTmVIX7xMQcgW4PbFk2MYHbivdi70e645VoH5KxKhK3KWhrNvv/W2iHGuXSVsNgb6Bpq4RJ/spjmDIdwfoJxEFwnCztrahwR/QA1KyB8MFBapot2HePmbRy7qoHz99xRZFVVhBeW1xnzExEx2Puc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OB/Wu0p/; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745480658; x=1777016658;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VnZ0ZKETltelPggcEVrc3mWHY8TQu/tmfh9OEL4vmMI=;
+  b=OB/Wu0p/r8d15aebZjNEJntfPO9eWB3D/pZUnPOZv9YQNClfiBNNVzqW
+   KsM/uCZOF5AiVokmGN7VWM41rOCaTzTd3ExwHBFrt8bixmAw7EojDGD8h
+   1YowSpfcLieySl6POEIYeClPzKs0txBlHWnfI6SokzyewlKKrpBnd+Jlz
+   yigZlZQbLsGoEvQzjyhXtdblXT26G0TbuiE+VG/AK1VHAHXLwesW+UNQI
+   yv8e/EA8vCnwjihXWRM6cyqap28mofCr+lCvKXP/JdrIUahwPH9gFzwgV
+   91pB5dh5vqsYiOR43QX3ORlBONnA1qtmS5ivaf9dAduyuVt8m8DYm7oDm
+   g==;
+X-CSE-ConnectionGUID: V2WGM4HkS+aVeKFQFLBK6Q==
+X-CSE-MsgGUID: wxBLYM9lRMGvXLXlRBz0Vw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="57741542"
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="57741542"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 00:44:16 -0700
+X-CSE-ConnectionGUID: MELztBFPQQ2RK/E68kIfoA==
+X-CSE-MsgGUID: h1WZ0YKEQFuFYSt/MxBHnQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
+   d="scan'208";a="132274496"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 00:43:59 -0700
+Message-ID: <02689dad-a10a-41a8-ad7e-e92d0a8d7e76@linux.intel.com>
+Date: Thu, 24 Apr 2025 15:43:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1745323279.git.fmaurer@redhat.com> <8b0e7642b63dfe9de85e3fe65f806843b42d3754.1745323279.git.fmaurer@redhat.com>
-In-Reply-To: <8b0e7642b63dfe9de85e3fe65f806843b42d3754.1745323279.git.fmaurer@redhat.com>
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Date: Thu, 24 Apr 2025 16:43:25 +0900
-X-Gmail-Original-Message-ID: <CAMZ6Rq+BbLX-FCLUQ+TZuCMs-3FK5EnO_QKcAD+KeLcTEYmB3A@mail.gmail.com>
-X-Gm-Features: ATxdqUG5sCLPRfRrVk7qaN-RNk_vmpQ44Moo6dzc3xLKzjU12bdlD8MoDx71EKo
-Message-ID: <CAMZ6Rq+BbLX-FCLUQ+TZuCMs-3FK5EnO_QKcAD+KeLcTEYmB3A@mail.gmail.com>
-Subject: Re: [PATCH 3/4] selftests: can: Use fixtures in test_raw_filter
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, dcaratti@redhat.com, fstornio@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 12/34] x86/msr: Remove pmu_msr_{read,write}()
+To: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, acme@kernel.org,
+ jgross@suse.com, andrew.cooper3@citrix.com, peterz@infradead.org,
+ namhyung@kernel.org, mark.rutland@arm.com,
+ alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
+ adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org,
+ ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+ seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+ kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-13-xin@zytor.com>
+ <7c44da88-72bb-4d1f-9f38-bf0e7e79b7a0@linux.intel.com>
+ <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <45f95d01-4b98-457c-8272-c396a52b3844@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue. 22 Apr. 2025 at 21:04, Felix Maurer <fmaurer@redhat.com> wrote:
-> Use fixtures in test_raw_filter instead of generating the test inputs
-> during execution. This should make tests easier to follow and extend.
+
+On 4/24/2025 3:21 PM, Xin Li wrote:
+> On 4/23/2025 11:33 PM, Mi, Dapeng wrote:
+>> Could we merge this patch and previous patch into a single patch? It's
+>> unnecessary to just modify the pmu_msr_read()/pmu_msr_write() in previous
+>> patch and delete them immediately. It just wastes the effort.
+> No, it's not wasting effort, it's for easier review.
 >
-> Signed-off-by: Felix Maurer <fmaurer@redhat.com>
-> ---
->  .../selftests/net/can/test_raw_filter.c       | 311 ++++++++++++------
->  1 file changed, 211 insertions(+), 100 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/can/test_raw_filter.c b/tools/testing/selftests/net/can/test_raw_filter.c
-> index 7414b9aef823..7fe11e020a1c 100644
-> --- a/tools/testing/selftests/net/can/test_raw_filter.c
-> +++ b/tools/testing/selftests/net/can/test_raw_filter.c
-> @@ -18,43 +18,13 @@
+> Look at this patch, you can easily tell that pmu_msr_read() and
+> pmu_msr_write() are nothing more than pmu_msr_chk_emulated(), and
+> then removing them makes a lot of sense.
 
-(...)
+These 2 patches are not complicated, it won't be difficult to review if
+merging them into one as long as the commit message mentions it clearly.
+Anyway I'm fine if you hope to keep them into two patches.
 
-> +TEST_F(can_filters, test_filter)
-> +{
-> +       fd_set rdfs;
-> +       struct timeval tv;
-> +       struct can_filter rfilter;
-> +       struct can_frame frame;
-> +       int have_rx;
-> +       int rx;
-> +       int rxbits, rxbitval;
-> +       int ret;
 
-Can you reduce the scope of the variables? More precisely, can you
-move those declarations
-
-  fd_set rdfs;
-  struct timeval tv;
-
-to the do {} while(); loop and move those declarations
-
-  struct can_frame frame;
-  int rxbitval;
-
-to the if (FD_ISSET(self->sock, &rdfs)) block?
-
-> -               TH_LOG("testcase %2d filters : can_id = 0x%08X can_mask = 0x%08X",
-> -                      testcase, rfilter.can_id, rfilter.can_mask);
-> +       rfilter.can_id = variant->id;
-> +       rfilter.can_mask = variant->mask;
-> +       setsockopt(self->sock, SOL_CAN_RAW, CAN_RAW_FILTER,
-> +                  &rfilter, sizeof(rfilter));
->
-> -               TH_LOG("testcase %2d sending patterns...", testcase);
-> +       TH_LOG("filters: can_id = 0x%08X can_mask = 0x%08X",
-> +               rfilter.can_id, rfilter.can_mask);
->
-> -               ret = send_can_frames(s, testcase);
-> -               ASSERT_EQ(0, ret)
-> -                       TH_LOG("failed to send CAN frames");
-> +       ret = send_can_frames(self->sock, variant->testcase);
-> +       ASSERT_EQ(0, ret)
-> +               TH_LOG("failed to send CAN frames");
->
-> -               have_rx = 1;
-> -               rx = 0;
-> -               rxbits = 0;
-> +       rx = 0;
-> +       rxbits = 0;
->
-> -               while (have_rx) {
-> +       do {
-> +               have_rx = 0;
-> +               FD_ZERO(&rdfs);
-> +               FD_SET(self->sock, &rdfs);
-> +               tv.tv_sec = 0;
-> +               tv.tv_usec = 50000; /* 50ms timeout */
->
-> -                       have_rx = 0;
-> -                       FD_ZERO(&rdfs);
-> -                       FD_SET(s, &rdfs);
-> -                       tv.tv_sec = 0;
-> -                       tv.tv_usec = 50000; /* 50ms timeout */
-> +               ret = select(self->sock + 1, &rdfs, NULL, NULL, &tv);
-> +               ASSERT_LE(0, ret)
-> +                       TH_LOG("failed select for frame %d (%d)", rx, errno);
->
-> -                       ret = select(s+1, &rdfs, NULL, NULL, &tv);
-> +               if (FD_ISSET(self->sock, &rdfs)) {
-> +                       have_rx = 1;
-> +                       ret = read(self->sock, &frame, sizeof(struct can_frame));
->                         ASSERT_LE(0, ret)
-> -                               TH_LOG("failed select for frame %d (%d)", rx, errno);
-> -
-> -                       if (FD_ISSET(s, &rdfs)) {
-> -                               have_rx = 1;
-> -                               ret = read(s, &frame, sizeof(struct can_frame));
-                                                                ^^^^^^^^^^^^^^^^
-sizeof(frame)
-
-> -                               ASSERT_LE(0, ret)
-> -                                       TH_LOG("failed to read frame %d (%d)", rx, errno);
-> -
-> -                               ASSERT_EQ(ID, frame.can_id & CAN_SFF_MASK)
-> -                                       TH_LOG("received wrong can_id");
-> -                               ASSERT_EQ(testcase, frame.data[0])
-> -                                       TH_LOG("received wrong test case");
-> -
-> -                               /* test & calc rxbits */
-> -                               rxbitval = 1 << ((frame.can_id & (CAN_EFF_FLAG|CAN_RTR_FLAG|CAN_ERR_FLAG)) >> 28);
-> -
-> -                               /* only receive a rxbitval once */
-> -                               ASSERT_NE(rxbitval, rxbits & rxbitval)
-> -                                       TH_LOG("received rxbitval %d twice", rxbitval);
-> -                               rxbits |= rxbitval;
-> -                               rx++;
-> -
-> -                               TH_LOG("testcase %2d rx : can_id = 0x%08X rx = %d rxbits = %d",
-> -                                      testcase, frame.can_id, rx, rxbits);
-> -                       }
-> +                               TH_LOG("failed to read frame %d (%d)", rx, errno);
-> +
-> +                       ASSERT_EQ(ID, frame.can_id & CAN_SFF_MASK)
-> +                               TH_LOG("received wrong can_id");
-> +                       ASSERT_EQ(variant->testcase, frame.data[0])
-> +                               TH_LOG("received wrong test case");
-> +
-> +                       /* test & calc rxbits */
-> +                       rxbitval = 1 << ((frame.can_id & (CAN_EFF_FLAG|CAN_RTR_FLAG|CAN_ERR_FLAG)) >> 28);
-> +
-> +                       /* only receive a rxbitval once */
-> +                       ASSERT_NE(rxbitval, rxbits & rxbitval)
-> +                               TH_LOG("received rxbitval %d twice", rxbitval);
-> +                       rxbits |= rxbitval;
-> +                       rx++;
-> +
-> +                       TH_LOG("rx: can_id = 0x%08X rx = %d rxbits = %d",
-> +                              frame.can_id, rx, rxbits);
->                 }
-> -               /* rx timed out -> check the received results */
-> -               ASSERT_EQ(rx_res[testcase], rx)
-> -                       TH_LOG("wrong number of received frames %d", testcase);
-> -               ASSERT_EQ(rxbits_res[testcase], rxbits)
-> -                       TH_LOG("wrong rxbits value in testcase %d", testcase);
-> -
-> -               TH_LOG("testcase %2d ok", testcase);
-> -               TH_LOG("---");
-> -       }
-> +       } while (have_rx);
->
-> -       close(s);
-> -       return;
-> +       /* rx timed out -> check the received results */
-> +       ASSERT_EQ(variant->exp_num_rx, rx)
-> +               TH_LOG("wrong number of received frames");
-> +       ASSERT_EQ(variant->exp_rxbits, rxbits)
-> +               TH_LOG("wrong rxbits value");
->  }
-
-Yours sincerely,
-Vincent Mailhol
 
