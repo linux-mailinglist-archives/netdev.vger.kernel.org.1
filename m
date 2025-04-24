@@ -1,50 +1,60 @@
-Return-Path: <netdev+bounces-185361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464FBA99E8F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:00:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15A71A99EA6
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 524DF1943FE7
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE10446516
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAC61F2C3B;
-	Thu, 24 Apr 2025 02:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D3517A318;
+	Thu, 24 Apr 2025 02:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p00vge3+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GfA1NiYH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEC71E1E1C;
-	Thu, 24 Apr 2025 02:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D3F2701BA
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 02:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745460001; cv=none; b=PuA9o9OnOAZFHIGAHEU4xIprmlTh4ANH5oQx2Wxiia05Bd3r8w5a8vaElS38VKKXcMLerLTKMgzXJUEbtx7Vy5w+dBgtykPn/o8rU2J/wsqAI7FDyhOm4Jk7esQGyCprQZujpjnx5jp3z+Vx+qITQ+876B71zuc4r95ZjdAgyAc=
+	t=1745460736; cv=none; b=HSzFvDTEVzGVjspMM8Js64dXSq4tf2+MtouGaIxErq4/c09r2/xwSmxYMIGHIbesvryqAWiG2HO+U/1DxAZEB115dgNQHgsc91GfgH938oL/A1eMW4fQdkKkaCMOyyORo7zzO1UbyONzygoXDGNObeQ/Q8Pew91TaTzTObmsn6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745460001; c=relaxed/simple;
-	bh=7/55K0+vpUW12+5r1ow/V8WILVzRW6B3foMUi3Psn0c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LFm3FL+byi2u6UHEsB4WzwOpzur6zeF/nBZPQ+RvRLfKkYPZwQZlqUUqe7Sbru0CNqlSr70LxLvM7Ukc1fOjBpN2xBB9TzLE/gXorZEx8vBiImFtbBRJCSwrXgd9+VcK8G8V8mpI2BvxfXRnT5x2LKsH/7yWY3ChojOgSdUXi3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p00vge3+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A575C4CEE2;
-	Thu, 24 Apr 2025 02:00:01 +0000 (UTC)
+	s=arc-20240116; t=1745460736; c=relaxed/simple;
+	bh=cmTG6M7cbBN54FrMUG8iFDHEDNYiW4rO3er5F1lSPCk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ih6zVtGHFRH0/to4s08CwuPl28IbR0EJcK9xxruZjZ+iC7oLFal8lvlBjJzCqTsbQQK6dBHjFAJ4MRZ/dDqGpIT236qY0EMA6iMBUj64CUUIPQ7WtCI/WTsF9JNpirff6IAqup+UEqU0vuN5Qvta3MNesjo+7aLZZeiH9BZxUYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GfA1NiYH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D02FC4CEE2;
+	Thu, 24 Apr 2025 02:12:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745460001;
-	bh=7/55K0+vpUW12+5r1ow/V8WILVzRW6B3foMUi3Psn0c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p00vge3+zeKFnNSchG3Yi9mkePdZCi0cTffF3MhOX0oamDjEBDcW29FqSMzHCUoQZ
-	 iDi4E39aKC9SzL85UAM0KtXYGk6fAUFNMh5e3I5vcJZxc4b5Mi/OD4gBTbWLE7ONDZ
-	 qXPqMbIaQMep8PhWcIJklLPRRxZf9JKV5jaxmlYsB9JSs9WYP5cdXXJRYB3FIdwMon
-	 9ooKNBh4iGfSC8d7h8ejKFf91qrG6hc13z/9tITZgsHbbBr1kqA9hjCuelWc42BKWO
-	 oSbdCd+dNSsv+iQTMqbkddiPyM3hAH+Hb7WCj+9HPvZJPcsSu3M/lGevRsWq8sI6xf
-	 nCyExc43zzP2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF9B380CED9;
-	Thu, 24 Apr 2025 02:00:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745460735;
+	bh=cmTG6M7cbBN54FrMUG8iFDHEDNYiW4rO3er5F1lSPCk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GfA1NiYHBP+BTFiH8zlYcTdKxYPOW11/yb9SPZqHlyoPK686ycSIf9ZEN4Gz33fTP
+	 Fk+RHnOMoF38bou3DOVGBCOMDC1ZyzK0X1rP0AM/of0vRljj8DbtQWE4+KrWs2AYEE
+	 Jr/DD7LVEUQWgSnS96LK+8p74Q0LUQi/Ij9zkicQDp6/zsHBa/+rA3C8VBLfJs5zmk
+	 Xi3HdLhj9G5k2GL5b4utabSFHiApZ8AlrxCrx/FodwMtvi44cCj8gA3kCj9Ebk1xwD
+	 64ZCIoXy5hbBTPfdiJWlw8shkbaO28g9XxGTRv8iSd1ukq4b+W6Qbx2QwEijiNC6Pu
+	 AsNkdKbwtevqw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	jacob.e.keller@intel.com,
+	sdf@fomichev.me,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 00/12] tools: ynl-gen: additional C types and classic netlink handling
+Date: Wed, 23 Apr 2025 19:11:55 -0700
+Message-ID: <20250424021207.1167791-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,55 +62,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] net/mlx5: HWS, Improve IP version handling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174546003948.2831734.1789243432503891447.git-patchwork-notify@kernel.org>
-Date: Thu, 24 Apr 2025 02:00:39 +0000
-References: <20250422092540.182091-1-mbloch@nvidia.com>
-In-Reply-To: <20250422092540.182091-1-mbloch@nvidia.com>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
- tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+This series is a bit of a random grab bag adding things we need
+to generate code for rt-link.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+First two patches are pretty random code cleanups.
 
-On Tue, 22 Apr 2025 12:25:37 +0300 you wrote:
-> This small series hardens our checks against a single matcher containing
-> rules that match on IPv4 and IPv6. This scenario is not supported by
-> hardware steering and the implementation now signals this instead of
-> failing silently.
-> 
-> Patches:
-> * Patch 1 forbids a single definer to match on mixed IP versions for
->   source and destination address.
-> * Patch 2 reproduces a couple of firmware checks: it forbids creating
->   a definer that matches on IP address without matching on IP version,
->   and also disallows matching on IPv6 addresses and the IPv4 IHL fields
->   in the same definer.
-> * Patch 3 forbids mixing rules that match on IPv4 and IPv6 addresses in
->   the same matcher. The underlying definer mechanism does not support
->   that.
-> 
-> [...]
+Patch 3 adds default values if the spec is missing them.
 
-Here is the summary with links:
-  - [net-next,1/3] net/mlx5: HWS, Fix IP version decision
-    https://git.kernel.org/netdev/net-next/c/5f2f8d8b6800
-  - [net-next,2/3] net/mlx5: HWS, Harden IP version definer checks
-    https://git.kernel.org/netdev/net-next/c/6991a975e416
-  - [net-next,3/3] net/mlx5: HWS, Disallow matcher IP version mixing
-    https://git.kernel.org/netdev/net-next/c/f41f3edf0b15
+Patch 4 adds support for setting Netlink request flags
+(NLM_F_CREATE, NLM_F_REPLACE etc.). Classic netlink uses those
+quite a bit.
 
-You are awesome, thank you!
+Patches 5 and 6 extend the notification handling for variations
+used in classic netlink. Patch 6 adds support for when notification
+ID is the same as the ID of the response message to GET.
+
+Next 4 patches add support for handling a couple of complex types.
+These are supported by the schema and Python but C code gen wasn't
+there.
+
+Patch 11 is a bit of a hack, it skips code related to kernel
+policy generation, since we don't need it for classic netlink.
+
+Patch 12 adds support for having different fixed headers per op.
+Something we could avoid in previous rtnetlink specs but some
+specs do mix.
+
+Jakub Kicinski (12):
+  tools: ynl-gen: fix comment about nested struct dict
+  tools: ynl-gen: factor out free_needs_iter for a struct
+  tools: ynl-gen: fill in missing empty attr lists
+  tools: ynl: let classic netlink requests specify extra nlflags
+  tools: ynl-gen: support using dump types for ntf
+  tools: ynl-gen: support CRUD-like notifications for classic Netlink
+  tools: ynl-gen: multi-attr: type gen for string
+  tools: ynl-gen: mutli-attr: support binary types with struct
+  tools: ynl-gen: array-nest: support put for scalar
+  tools: ynl-gen: array-nest: support binary array with exact-len
+  tools: ynl-gen: don't init enum checks for classic netlink
+  tools: ynl: allow fixed-header to be specified per op
+
+ tools/net/ynl/lib/ynl-priv.h     |   2 +-
+ tools/net/ynl/lib/ynl.h          |  14 ++
+ tools/net/ynl/lib/ynl.c          |  12 +-
+ tools/net/ynl/pyynl/ynl_gen_c.py | 218 +++++++++++++++++++++++++------
+ 4 files changed, 198 insertions(+), 48 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
 
