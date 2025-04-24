@@ -1,58 +1,62 @@
-Return-Path: <netdev+bounces-185337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114DCA99C9B
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:14:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6743BA99CE7
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CF491940809
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:14:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA42E5A5B37
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AA2383;
-	Thu, 24 Apr 2025 00:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCB717F7;
+	Thu, 24 Apr 2025 00:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcm4O7yd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFiCSBBs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDF03FC2;
-	Thu, 24 Apr 2025 00:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4747518EB0
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745453673; cv=none; b=r6NCrQS2xturA6yhg3zEglMkTr75HfOstHA7SKZ1krNL/a6Zx02FdLxqp3BwHfs8wNPdSIu0SoZ6o4eBeFG8DFKNefpqg/o9BKCPLeyAjZCDInv0gbpGfj193MEKQZEAxQ4SJk6bAQbt18SjbTaFIIgzhMl9GbAwTr4ub+psGPQ=
+	t=1745454258; cv=none; b=saVlrvg1vEowm4lWM0b3/xoTZ12GD5wZa2/9eBiXgpZ3F+sScCFr1qMwIFpPHRwz+VI/WVdetFgVnsitcdizM46J3oBTg4u69MgLfl1qF/3iiH4u9IV+fjskZdnuqrZIbepFwaTE6s8iKChc2nGHNB2+uBOU2a1CNSrrUgprRLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745453673; c=relaxed/simple;
-	bh=n0TSJLKak1tuBbaz0EWuvr3Cm4M4taXFEVBdU8emlyc=;
+	s=arc-20240116; t=1745454258; c=relaxed/simple;
+	bh=0adNhVNAvzGwmhhhADHeeaPsZ17QbMi3WE20NHqbDaM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kfT9dhHt0FeO5rTBpWhXuwiBHH+1sauLGu7MfdjmGl+mBa5IJ0qnWUK3l4KtOXfnNdkT75XhkmTV5VJjoi3KKVBDnBnEWPXSV/uGYJ04gsxlS61+ynLvxoN3Pey23ijfHxERfoo+dqevbjX5cWqFegb9PHwz7bONHHQNe2o3fqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcm4O7yd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2EEFC4CEE2;
-	Thu, 24 Apr 2025 00:14:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=aUsiAwvYA0ek/0J6ImRegfbb6QVxRWVTNLLQk7S+YqTJhXB6+eQGPA7ggwH4bxOkNQYWjfqD/AnUJW9BX1hxPfdE0bIXamaYiR4YKd1Z4olJewpGOWNGfXKESeYSQ2Nt21LZBzwTPbNQwU/IK4yTmGYG36NgKBwMV+yAtcn8mYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFiCSBBs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EBCEC4CEE2;
+	Thu, 24 Apr 2025 00:24:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745453673;
-	bh=n0TSJLKak1tuBbaz0EWuvr3Cm4M4taXFEVBdU8emlyc=;
+	s=k20201202; t=1745454257;
+	bh=0adNhVNAvzGwmhhhADHeeaPsZ17QbMi3WE20NHqbDaM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rcm4O7ydQT4lc96jG+a4lIofuzg6LA5ARUz8yLVSWh1DgytbaWGmbD2lfndX/Yzz1
-	 +o8o4LmNud0AN+34Qujb6fIIhsO+I9km0YmXThIPxDwYL3bh07Am7UUWhG0QPwxBqn
-	 NYeOjeAByZbv9QwA9073SfP+uP1lAvQU+2fAssqJ7rYyC6T+anWn941YNYLWm2Vyrt
-	 M5r1zG/1uORp6m+wnCWMuinlXwOqwYC4NLOL8kaSJchy5crHl9rOt0cF75KLL7DEFN
-	 BeCCECYc4M4laPRGILZ+3ok7EqArrJreKCM8oCnspwrABvub4HWlPz7oqal2hjbbxi
-	 DUZXSsF8iN0LA==
-Date: Wed, 23 Apr 2025 17:14:31 -0700
+	b=ZFiCSBBsdwkXpH/QgD7Taj83EsURH5TWqb5d9Ivl/Sn0fkkLdDxLtcDrpe1cbpxY0
+	 E2Rl4IH5/3hMMDA8bj95sLj0BYLRmbFVMD+i2Kga+RKofwmH9IfzskUE2om18v/DbP
+	 yzYTHnVYgRkEPLf9wIcA/36p9bipH30hszTIfmBC5L/8203MXiW0QjeRQ+ximGdYlb
+	 9WHhk466h3z7mGHhldk0tzTeyzNhXHTBIXeIYCxcrcHFpo8QTWg/v24rz7/xoEKmu1
+	 uhQXGfpZ42ELXPwzLLVMglCQmCCPt7Z9KOEdXw928B/3HZngA2cgdmgTPrpM0M4VlR
+	 wdgXG8NphI9qg==
+Date: Wed, 23 Apr 2025 17:24:16 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- pkaligineedi@google.com, willemb@google.com, ziweixiao@google.com,
- shailend@google.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] gve: Add adminq lock for creating and destroying
- multiple queues
-Message-ID: <20250423171431.2cd8ca21@kernel.org>
-In-Reply-To: <20250417204323.3902669-1-hramamurthy@google.com>
-References: <20250417204323.3902669-1-hramamurthy@google.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>,
+ netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, toke@redhat.com,
+ gerrard.tai@starlabs.sg, pctammela@mojatatu.com
+Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant
+ enqueue cases
+Message-ID: <20250423172416.4ee6378d@kernel.org>
+In-Reply-To: <aAl34pi75s8ItSme@pop-os.localdomain>
+References: <20250416102427.3219655-1-victor@mojatatu.com>
+	<aAFVHqypw/snAOwu@pop-os.localdomain>
+	<4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com>
+	<aAlSqk9UBMNu6JnJ@pop-os.localdomain>
+	<aAl34pi75s8ItSme@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,33 +66,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 17 Apr 2025 20:43:23 +0000 Harshitha Ramamurthy wrote:
-> Also this patch cleans up the error handling code of
-> gve_adminq_destroy_tx_queue.
+On Wed, 23 Apr 2025 16:29:38 -0700 Cong Wang wrote:
+> > +	/*
+> > +	 * If doing duplication then re-insert at top of the
+> > +	 * qdisc tree, since parent queuer expects that only one
+> > +	 * skb will be queued.
+> > +	 */
+> > +	if (skb2) {
+> > +		struct Qdisc *rootq = qdisc_root_bh(sch);
+> > +		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
+> > +
+> > +		q->duplicate = 0;
+> > +		rootq->enqueue(skb2, rootq, to_free);
+> > +		q->duplicate = dupsave;
+> > +		skb2 = NULL;
+> > +	}
+> > +
+> >  finish_segs:
+> >  	if (skb2)
+> >  		__qdisc_drop(skb2, to_free);
+> >   
+> 
+> Just FYI: I tested this patch, netem duplication still worked, I didn't
+> see any issue.
 
->  static int gve_adminq_destroy_tx_queue(struct gve_priv *priv, u32 queue_index)
->  {
->  	union gve_adminq_command cmd;
-> -	int err;
->  
->  	memset(&cmd, 0, sizeof(cmd));
->  	cmd.opcode = cpu_to_be32(GVE_ADMINQ_DESTROY_TX_QUEUE);
-> @@ -808,11 +820,7 @@ static int gve_adminq_destroy_tx_queue(struct gve_priv *priv, u32 queue_index)
->  		.queue_id = cpu_to_be32(queue_index),
->  	};
->  
-> -	err = gve_adminq_issue_cmd(priv, &cmd);
-> -	if (err)
-> -		return err;
-> -
-> -	return 0;
-> +	return gve_adminq_issue_cmd(priv, &cmd);
->  }
+Does it still work if you have another layer of qdiscs in the middle?
+It works if say DRR is looking at the netem directly as its child when
+it does:
 
-You mean this cleanup? That's not appropriate for a stable fix...
+	first = cl->qdisc->q.qlen
 
-Could you also explain which callers of this core are not already
-under rtnl_lock and/pr the netdev instance lock?
--- 
-pw-bot: cr
+but there may be another layer, the cl->qdisc may be something that
+hasn't incremented its qlen, and something that has netem as its child.
 
