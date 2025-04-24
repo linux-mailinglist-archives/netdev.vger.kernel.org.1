@@ -1,110 +1,145 @@
-Return-Path: <netdev+bounces-185442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61986A9A5C2
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:23:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6141A9A5D5
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A878A4636BC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:23:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB05B46382A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37972080C1;
-	Thu, 24 Apr 2025 08:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1321020AF62;
+	Thu, 24 Apr 2025 08:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="MgB8nMK5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/IuBGXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-16.smtpout.orange.fr [193.252.22.16])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2357B207A2B;
-	Thu, 24 Apr 2025 08:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8001F2BB5;
+	Thu, 24 Apr 2025 08:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482990; cv=none; b=eHsNgWzoWTeQyL8ceR3qD0sTMDzdWK8fEx3FtGpU1g+HZdsyRgkX/2lyW858ZIIfxG3bTl6zPwg2UKPCyo0tdisZGtqimjgH9iLls2kyenChEY4syD/ejwOCdVF3USRzeVMaCLMF0M7acvdT0RmQYDL2v0pEJU0nK4zzu519rng=
+	t=1745483307; cv=none; b=YrnrrRvCIJOWBWrNje8XM1eQQ0wkWLA4qKAj35azfdP2E8aejcglbtse9ydZOvsrWyZ7pD66pE8x7QdfJYMx286v5xo5qnjyjJJE7V4z7BsHdi1BSppAxoruwYb6UI8Ou+Gain+nkvU6JQHOJeErPbrckg7JTfJne7T6wzE7gv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482990; c=relaxed/simple;
-	bh=qnRPE/OjqDULD2P8NhZ9G/++7eMxpWckPTuemPzYeDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M6rZuP4G0qV1kUWgaQbvC6lSxujCGOp6+HQw2DFWY6HRQZ8dqNe1DunXNkvEHZMzyXRIKIBgP4hXXrsiIxYFZpwviBmZb9iNQ4ym5rPAtOInmZR5v9l+MnechzRvaIV2KXxbS0IPSHiZ6oNGN0eQLur/gahD1xF7bINnO3KUbag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=MgB8nMK5; arc=none smtp.client-ip=193.252.22.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from mail-ej1-f48.google.com ([209.85.218.48])
-	by smtp.orange.fr with ESMTPSA
-	id 7rqCubwxvvSg77rqGuXwwe; Thu, 24 Apr 2025 10:21:56 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1745482916;
-	bh=Qi0itqsQpWay2GuVwalqq2IwjGZETj75/Z4w2YScqHQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=MgB8nMK55fXzCwcRiTZXUIwuKktqYavs7OO9YYaFUXjMNI24e/31L0w1Cgo04pNBA
-	 IDGapSnOXlncr7xLJpT6SxulStwd0ojaHI08aq9PL3hJ7IzPh0hU9+PJfnAHyrDPIm
-	 HwKJsXht//lrVmScoYYA+vmtbxEyo5HpH5JK1BGADxkZ4VnAUqr5p5bdoClkDw7OuY
-	 BNwW6R3Wl+NVuGmzCDKsxRC2lX7K8GEqghThuEHAPHj0R/0WSADFxkOPC7589fv8Ok
-	 87V6iC7QJT5Pur/NUL7uMSglJlRsnUpOgrAvt5vd3QRJbc2qRWL83eqOi7hBY6yPyz
-	 21HrCicXXSACg==
-X-ME-Helo: mail-ej1-f48.google.com
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 24 Apr 2025 10:21:56 +0200
-X-ME-IP: 209.85.218.48
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ace333d5f7bso133525866b.3;
-        Thu, 24 Apr 2025 01:21:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU+c75tGkvUtBZpza9i8iLAudf1qnLj0CRiHnX9v+WFQARzWkDEFrPMkZ26e08k26Xc0wkQDWehucM2QSIf+mb7@vger.kernel.org, AJvYcCX7GD8Xk5Mtu9NqnA9IWNV51a54ULwJLDfMjj3TrzkhFKnJPfDE8VDIOuYYhPum4IPPSzee5DlHbWs=@vger.kernel.org, AJvYcCXsq8IZD402gINaC39S7yFy9wnXqxYyvpAcqWgoVYy6xy8FSrKJmNggjN7GPzC8FqGTGQepvUVp@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHk3C03MKO+emjwB85D1RKvdFS/KpwrO4ZF71Osd8v/VExbXKj
-	n6/GamuY5NhLb+FGnjhb91TLnLd4In1eD1YbgG2R4GwZzsbQS72ZkerSp3bfz3qTu8HDXs42gA5
-	/d2hMZISXTv+i2npoeIWHFMA8Hd8=
-X-Google-Smtp-Source: AGHT+IG0UHw7cStUnc5g3aVjgS9EvHS8GbZ/STZwvgx1+CuvS1aIGReEO/sw76SXPLW5pLvsQpjnpMm6tc6W9FpRgho=
-X-Received: by 2002:a17:907:6eab:b0:ac7:9712:d11a with SMTP id
- a640c23a62f3a-ace572bd80bmr177134266b.32.1745482912754; Thu, 24 Apr 2025
- 01:21:52 -0700 (PDT)
+	s=arc-20240116; t=1745483307; c=relaxed/simple;
+	bh=ShwC8obxmb4CNtiPkaiML3y0noOhyOD0NrJ6HWSDH74=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=uw/sfFDHiwCl2F1+arr0CAyJek8sbunuzHF24uWH5QHwmHFYgvYifsHu3uhSeGgGtCO7P9lENslK/2NtgwFB3VYrudp5b2DO8kZaIbBic9Y8IVgd0GqVswwpIgJ6n8fl+ojYUAHwoWo1/TrrwWgeP6qD0W4OuNql5ZcWr7ZwsJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/IuBGXw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207BAC4CEEC;
+	Thu, 24 Apr 2025 08:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745483306;
+	bh=ShwC8obxmb4CNtiPkaiML3y0noOhyOD0NrJ6HWSDH74=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=A/IuBGXwFx60b3FI8hbt/SKfrDZDZn6pcwRAPQtx2zb03JBzQVpzpTqRzgndkR9MV
+	 5xCMImIEVzUQinjv0BUwhOwNjFqIrFLs8syv0a5fPbUu/9H7bPBbQ6UFTzfoSUyf2i
+	 4W1+kyuCj+3QgGOksk9w7ph/p4dDisYltEUfYnAutQQU8r/vYwnq8tpYvxQ6/gPEBg
+	 b0o4g3gBS4dXxbQXSnVjsFwbkRUMf0hFgIXGxeAEkBdlCo5GjMSwYleWjGtGb4khr0
+	 BwN0w0+DRtOnjMeSzHgn/0cofW7sSkPuszeoKmdj2TpNUlQJGRb0BakD6cZLZcNfxC
+	 H+xD4pREvYDAA==
+Message-ID: <57701e2e-0005-4a8a-a3f5-ba098c97b480@kernel.org>
+Date: Thu, 24 Apr 2025 10:28:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1745323279.git.fmaurer@redhat.com> <710557cef8fb8472628862d9b65edcf7aeb32bb5.1745323279.git.fmaurer@redhat.com>
- <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
-In-Reply-To: <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Date: Thu, 24 Apr 2025 17:21:41 +0900
-X-Gmail-Original-Message-ID: <CAMZ6RqKJd_qMEy3ohoLAXMgCq2s=AntD0VKCpVwxT1DWjd7KrQ@mail.gmail.com>
-X-Gm-Features: ATxdqUFf81mWoiqNoCRhJ3HhKjTcNKKwIUAnAO_jBJPEy0HAn8kmfieQNcpj2yc
-Message-ID: <CAMZ6RqKJd_qMEy3ohoLAXMgCq2s=AntD0VKCpVwxT1DWjd7KrQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] selftests: can: Document test_raw_filter test cases
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, dcaratti@redhat.com, fstornio@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/5] dt-bindings: wireless: bcm4329-fmac: Use
+ wireless-controller.yaml schema
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: david@ixit.cz, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>,
+ =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>,
+ Mailing List <devicetree-spec@vger.kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
+ <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
+ <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu. 24 Apr. 2025 at 16:44, Vincent Mailhol
-<mailhol.vincent@wanadoo.fr> wrote:
-> On Tue. 22 Apr. 2025 at 21:03, Felix Maurer <fmaurer@redhat.com> wrote:
+On 24/04/2025 10:20, Krzysztof Kozlowski wrote:
+> On 24/03/2025 18:41, David Heidelberg via B4 Relay wrote:
+>> From: Janne Grunau <j@jannau.net>
+>>
+>> The wireless-controller schema specifies local-mac-address as
+>> used in the bcm4329-fmac device nodes of Apple silicon devices
+>> (arch/arm64/boot/dts/apple).
+>>
+>> Fixes `make dtbs_check` for those devices.
+>>
+>> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+>> Signed-off-by: Janne Grunau <j@jannau.net>
+>> Signed-off-by: David Heidelberg <david@ixit.cz>
+> 
+> This introduced several new dtbs_check warnings. Including on platforms
+> which were warnings free. It is nice to fix these warnings when you make
+> such changes.
 
-(...)
 
-> > +       .exp_rxbits = (1 | 1 << (T_EFF) | 1 << (T_RTR) | 1 << (T_EFF | T_RTR)),
->                         ^                                                      ^
-> Nitpick: those outermost parentheses are not needed.
->
-> This took me time to process. Isn't your expression redundant? What about
->
->   .exp_rxbits = 1 | 1 << (T_EFF | T_RTR),
->
-> ?
->
-> This gives me the same result:
->
->   https://godbolt.org/z/cr3q5vjMr
+I will send the patches for them, except for Apple SoCs.
 
-Never mind. This was a silly comment. I messed up the operator
-precedence in the above example, these are obviously different.
-
-Please disregard my comment and sorry for the noise.
-
-Yours sincerely,
-Vincent Mailhol
+Best regards,
+Krzysztof
 
