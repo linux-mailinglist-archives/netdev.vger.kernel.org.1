@@ -1,126 +1,110 @@
-Return-Path: <netdev+bounces-185441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FE8A9A5B9
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:21:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61986A9A5C2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3A13A6F81
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:21:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A878A4636BC
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC01207DF4;
-	Thu, 24 Apr 2025 08:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37972080C1;
+	Thu, 24 Apr 2025 08:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bfq6RVfV"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="MgB8nMK5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-16.smtpout.orange.fr [193.252.22.16])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CD7433B1
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 08:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2357B207A2B;
+	Thu, 24 Apr 2025 08:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482911; cv=none; b=XbyoA78y1Y4p016tfPYTEpUone6Vm3VBfGxrFT2VYugVUBCvMmWAKC4KiaFiIwPs8AMYEnTxboABPSiC7D/HqhwenHqfhv5TBqqokTgbInq4KAE1ttT6fZAeGoX0EtNowddwyx7OpK/CpXu/TrN4c7zVRO4Lmsfgmh72Pq3LvDM=
+	t=1745482990; cv=none; b=eHsNgWzoWTeQyL8ceR3qD0sTMDzdWK8fEx3FtGpU1g+HZdsyRgkX/2lyW858ZIIfxG3bTl6zPwg2UKPCyo0tdisZGtqimjgH9iLls2kyenChEY4syD/ejwOCdVF3USRzeVMaCLMF0M7acvdT0RmQYDL2v0pEJU0nK4zzu519rng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482911; c=relaxed/simple;
-	bh=OoRz6+XMxP7avmpWQ8rrAGV7dkXnoxI+asYjYstk7xE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hz6La+s5cSbIB6FGSJ3YzsssUVDx550/xQ+7C4wx39gfX+bj/it1eQsXrKwHpWhu3DNp9w2x7UXxZIu5GeSJgnY2hyKYxf1qzmVT2YCixc99hHLj4q/x/M/7HUUP+w/M+NkHpN6aQgwmVhbPa8LoZI3ThOaNeqV6Bn689V1AyQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bfq6RVfV; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745482909; x=1777018909;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OoRz6+XMxP7avmpWQ8rrAGV7dkXnoxI+asYjYstk7xE=;
-  b=bfq6RVfVlPWp8qxOX0FX6cUC74aTLT7KqUbXQxvrfL7Nv6ttuRsx8U7K
-   6zXfZjnaeX5MpQMXPuH1AUlgkSJoI/UxGACjgCTe5MaqElsJWDjRLJVG0
-   qX30KNguIJXfRLAP5kGjf4FWyJsXGy8tRNjebEo45ugL6FWxFm9AaoQkH
-   b09AurRpGGnZzKNvc4Zu1oJ/hqSNglL4NaKuHzu8NYhSI8pUK1Cuh9siC
-   4yTpKE3XBH3OFwM4m2Y686nEypAvKCAObXz9EWeulkweCOWGNs/Wbb9zS
-   zkObOd1Cy3GDuCLTBUUi/0RCI+dDJ6whVnytrEFggOAJcwuNcRhV1SaK3
-   g==;
-X-CSE-ConnectionGUID: pkX/jwO2TNCfVzZmizm7vQ==
-X-CSE-MsgGUID: U7/pycs3Q9+gtCh/HWk76Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="50925930"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="50925930"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 01:21:48 -0700
-X-CSE-ConnectionGUID: paPdllX6RPC0crGe4+bHOQ==
-X-CSE-MsgGUID: xKPshazXSOqFCwOwJiMWsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="155778203"
-Received: from lkp-server01.sh.intel.com (HELO 050dd05385d1) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 24 Apr 2025 01:21:47 -0700
-Received: from kbuild by 050dd05385d1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u7rq4-0003yZ-0a;
-	Thu, 24 Apr 2025 08:21:44 +0000
-Date: Thu, 24 Apr 2025 16:21:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net v3] bnxt_en: improve TX timestamping FIFO
- configuration
-Message-ID: <202504241656.J2g5XHHz-lkp@intel.com>
-References: <20250423103351.868959-1-vadfed@meta.com>
+	s=arc-20240116; t=1745482990; c=relaxed/simple;
+	bh=qnRPE/OjqDULD2P8NhZ9G/++7eMxpWckPTuemPzYeDE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M6rZuP4G0qV1kUWgaQbvC6lSxujCGOp6+HQw2DFWY6HRQZ8dqNe1DunXNkvEHZMzyXRIKIBgP4hXXrsiIxYFZpwviBmZb9iNQ4ym5rPAtOInmZR5v9l+MnechzRvaIV2KXxbS0IPSHiZ6oNGN0eQLur/gahD1xF7bINnO3KUbag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=MgB8nMK5; arc=none smtp.client-ip=193.252.22.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ej1-f48.google.com ([209.85.218.48])
+	by smtp.orange.fr with ESMTPSA
+	id 7rqCubwxvvSg77rqGuXwwe; Thu, 24 Apr 2025 10:21:56 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1745482916;
+	bh=Qi0itqsQpWay2GuVwalqq2IwjGZETj75/Z4w2YScqHQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=MgB8nMK55fXzCwcRiTZXUIwuKktqYavs7OO9YYaFUXjMNI24e/31L0w1Cgo04pNBA
+	 IDGapSnOXlncr7xLJpT6SxulStwd0ojaHI08aq9PL3hJ7IzPh0hU9+PJfnAHyrDPIm
+	 HwKJsXht//lrVmScoYYA+vmtbxEyo5HpH5JK1BGADxkZ4VnAUqr5p5bdoClkDw7OuY
+	 BNwW6R3Wl+NVuGmzCDKsxRC2lX7K8GEqghThuEHAPHj0R/0WSADFxkOPC7589fv8Ok
+	 87V6iC7QJT5Pur/NUL7uMSglJlRsnUpOgrAvt5vd3QRJbc2qRWL83eqOi7hBY6yPyz
+	 21HrCicXXSACg==
+X-ME-Helo: mail-ej1-f48.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 24 Apr 2025 10:21:56 +0200
+X-ME-IP: 209.85.218.48
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ace333d5f7bso133525866b.3;
+        Thu, 24 Apr 2025 01:21:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU+c75tGkvUtBZpza9i8iLAudf1qnLj0CRiHnX9v+WFQARzWkDEFrPMkZ26e08k26Xc0wkQDWehucM2QSIf+mb7@vger.kernel.org, AJvYcCX7GD8Xk5Mtu9NqnA9IWNV51a54ULwJLDfMjj3TrzkhFKnJPfDE8VDIOuYYhPum4IPPSzee5DlHbWs=@vger.kernel.org, AJvYcCXsq8IZD402gINaC39S7yFy9wnXqxYyvpAcqWgoVYy6xy8FSrKJmNggjN7GPzC8FqGTGQepvUVp@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHk3C03MKO+emjwB85D1RKvdFS/KpwrO4ZF71Osd8v/VExbXKj
+	n6/GamuY5NhLb+FGnjhb91TLnLd4In1eD1YbgG2R4GwZzsbQS72ZkerSp3bfz3qTu8HDXs42gA5
+	/d2hMZISXTv+i2npoeIWHFMA8Hd8=
+X-Google-Smtp-Source: AGHT+IG0UHw7cStUnc5g3aVjgS9EvHS8GbZ/STZwvgx1+CuvS1aIGReEO/sw76SXPLW5pLvsQpjnpMm6tc6W9FpRgho=
+X-Received: by 2002:a17:907:6eab:b0:ac7:9712:d11a with SMTP id
+ a640c23a62f3a-ace572bd80bmr177134266b.32.1745482912754; Thu, 24 Apr 2025
+ 01:21:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250423103351.868959-1-vadfed@meta.com>
+References: <cover.1745323279.git.fmaurer@redhat.com> <710557cef8fb8472628862d9b65edcf7aeb32bb5.1745323279.git.fmaurer@redhat.com>
+ <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
+In-Reply-To: <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Thu, 24 Apr 2025 17:21:41 +0900
+X-Gmail-Original-Message-ID: <CAMZ6RqKJd_qMEy3ohoLAXMgCq2s=AntD0VKCpVwxT1DWjd7KrQ@mail.gmail.com>
+X-Gm-Features: ATxdqUFf81mWoiqNoCRhJ3HhKjTcNKKwIUAnAO_jBJPEy0HAn8kmfieQNcpj2yc
+Message-ID: <CAMZ6RqKJd_qMEy3ohoLAXMgCq2s=AntD0VKCpVwxT1DWjd7KrQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] selftests: can: Document test_raw_filter test cases
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, dcaratti@redhat.com, fstornio@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Vadim,
+On Thu. 24 Apr. 2025 at 16:44, Vincent Mailhol
+<mailhol.vincent@wanadoo.fr> wrote:
+> On Tue. 22 Apr. 2025 at 21:03, Felix Maurer <fmaurer@redhat.com> wrote:
 
-kernel test robot noticed the following build warnings:
+(...)
 
-[auto build test WARNING on net/main]
+> > +       .exp_rxbits = (1 | 1 << (T_EFF) | 1 << (T_RTR) | 1 << (T_EFF | T_RTR)),
+>                         ^                                                      ^
+> Nitpick: those outermost parentheses are not needed.
+>
+> This took me time to process. Isn't your expression redundant? What about
+>
+>   .exp_rxbits = 1 | 1 << (T_EFF | T_RTR),
+>
+> ?
+>
+> This gives me the same result:
+>
+>   https://godbolt.org/z/cr3q5vjMr
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bnxt_en-improve-TX-timestamping-FIFO-configuration/20250423-185028
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250423103351.868959-1-vadfed%40meta.com
-patch subject: [PATCH net v3] bnxt_en: improve TX timestamping FIFO configuration
-config: i386-buildonly-randconfig-004-20250424 (https://download.01.org/0day-ci/archive/20250424/202504241656.J2g5XHHz-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250424/202504241656.J2g5XHHz-lkp@intel.com/reproduce)
+Never mind. This was a silly comment. I messed up the operator
+precedence in the above example, these are obviously different.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504241656.J2g5XHHz-lkp@intel.com/
+Please disregard my comment and sorry for the noise.
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1129:6: warning: unused variable 'i' [-Wunused-variable]
-    1129 |         int i;
-         |             ^
-   1 warning generated.
-
-
-vim +/i +1129 drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-
-118612d519d83b Michael Chan 2021-06-27  1125  
-118612d519d83b Michael Chan 2021-06-27  1126  void bnxt_ptp_clear(struct bnxt *bp)
-118612d519d83b Michael Chan 2021-06-27  1127  {
-118612d519d83b Michael Chan 2021-06-27  1128  	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-8aa2a79e9b95ea Pavan Chebbi 2024-06-28 @1129  	int i;
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yours sincerely,
+Vincent Mailhol
 
