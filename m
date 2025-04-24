@@ -1,197 +1,353 @@
-Return-Path: <netdev+bounces-185383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D9CA99FB6
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 05:47:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71DC0A99FC9
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 06:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44ED19448BE
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 03:47:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6534819463C5
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679DE79D0;
-	Thu, 24 Apr 2025 03:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DEC1AF0C7;
+	Thu, 24 Apr 2025 04:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="E0vnLSPB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6dMpZRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C1C19A
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 03:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F687198E75
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 04:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745466421; cv=none; b=P+BpebzbmFciAPq55c6o7oael+85y2QR/yweSB7Sl2u5Y6IDhgH4ihsh2y0lfF/MmeWX3/iwWb5jQ7cSeYIcdlWoyt4c354qyPwvLU22dAUxucI+JtW9FbWfqLNvUUCC6PM7HzuSHAP1hIWk++2QiNgH02NzdhlAt0kqxGNHPNg=
+	t=1745467385; cv=none; b=T516qCZ9XwVXFZMlJh/sqzw8vR6aYDcm5q2ulOIsKW/wAOqzwO8S/hERsiTM8icL/HJCvkJO5NmamaNm1m/jITF+HwScMzsIsvZZK/Gg5bqLD4fxH6OVMeNzXtO6IRbQrdqW7uAMKAQT6SZzwEod+AAOLVPE1A/w2GdSejATcsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745466421; c=relaxed/simple;
-	bh=fIxiKgaLJuO/l4yOut4fjiMoX7YeCb+4kuGPMAHQF/o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Byj/lYDCYB1jf6cdFZUnZsIQecNBZcczqNvEE4ClciigEdz8sFM7JxKZnhV74PSTNn7zD3ef4lGscPOCV8Pf5xvhk3jkwf5QdcCKXGMR6BHTnUGcSo/cKmUsuCIDtN5gLWz2eOem2tH99QLTFHb9oEwquaC84wOPViVxp6nDNWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=E0vnLSPB; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7398d65476eso434158b3a.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 20:46:56 -0700 (PDT)
+	s=arc-20240116; t=1745467385; c=relaxed/simple;
+	bh=zt6yYBvh0d8AfeUCUhVJzGOK4AHq2m+OxMp5MyPKv78=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mPNlGTCCGYW59uGdvs7MKuBiDCOlV1OZqb3pdqcfPeVeUDtRf1TS7sD+Y5MSuxJ7nzZznF5d4aD+SibSm5uLsh0XR/LxEYV4L+UHsotgz87fHgqFhGyPDNgqmI9As4ZvQVxpUW+wgUc8kp8F+CY/D19aaS1O2mFEJtORzK1gELQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6dMpZRk; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73c205898aaso400913b3a.2
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:03:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745466416; x=1746071216; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fIxiKgaLJuO/l4yOut4fjiMoX7YeCb+4kuGPMAHQF/o=;
-        b=E0vnLSPBnpSccPTUGeLaJHNvX2lGHhrmyoYU5mkRfOPqZL1Q7NjzObzMilrMXENz5Y
-         B+vQQgLA/FI6eI+QODXoD8ETYxuHIubC8Osv4gkZT5NAiXVJ6qSrfmYTkYZUPKcqNyWy
-         mKhGfsMmAFGO9wEHzlArwnEqNJIhYqmkQdzfM=
+        d=google.com; s=20230601; t=1745467383; x=1746072183; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D09PgC93ZS3ZLjn25gSS3hEDnTkEIUuDkcd6alRURFw=;
+        b=i6dMpZRkkDo2wKUbCEIwWpz7I099pcApFod+bCfDnDcc5R1swKN1/NRGq0NCj8JQRc
+         l/YqGihTrI8k0MUKOFcdOS0R1IgY2y/IUbUrLRymiBkVNPuuUkm11J6l2c0t2UDtFTRn
+         WeKyoMaAQx2X2jD4gdJlb71dWoN8KCqa01P3Q9BKA3qtOK7RVIB6Nsx2iu/KcuO8jYBY
+         huoK91iSI2TMSXuRgaunxFQET5+PHSKodzAPOwJ7OG+HVHxSu1DBLZ1aog6TxbX2vh1I
+         Ha+ORSVCZ6+XZFPqKoC4HP7/s3NUdcfYsTsbQaEF13UeRYxXnZ7Xnr/uX4y6sujhd1Vv
+         KgCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745466416; x=1746071216;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fIxiKgaLJuO/l4yOut4fjiMoX7YeCb+4kuGPMAHQF/o=;
-        b=C58eKSJ2VTGi9j2Eesm0HHc5kST4/j7/rNfy1NqildvGCkzEQwlfvBgC5xnIXtMrbG
-         zU2opH1eyPTAt3BMnQL905/81DeShP0rJRR7gMvBoSHTiLTwk1n4VHJMxzoNi4tl8MRN
-         psmNLeHPvXW8UC7d52aXMyjeJDsbfUITrMpLWMkr+LyRgQgByof73WhZBl29EpmgVeCe
-         mN+WqtRoz+o/6cqTpltlLeEDp4TIBXfuuJrkuhtpq7V3fmfKoL4YJGdn7dbtiR8bC6Ka
-         f8ujSUrALHkeMz6+ehkV50aEH7JdW2ey3hpA4098Ki/ntNQ/oLmsH/OXLHXTj3HiKIiM
-         iTkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEOYGGENy9GDvHYWltNvoCNCuImRi7mTKSJhLPvymiT4PxhV4fTP0c8qGYUpN2XOMC7NLiZUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1QKMHYr8KAhjtDNZReqxVl6ierLWlp/N0HVYP3drnSBc53nBa
-	g9zY7f40DnAcP+n+xVlOdnLT8aPDzaTr0P6cvG7v4cRQfCuJsvJaKLmjd58xUTSY9ku8MyG2PBW
-	QsRPHwnGKHEsL5SfSsgVl8GHYTt/SHzsn+kw2wUscdpXJqFp7Bw==
-X-Gm-Gg: ASbGncvRwLt3Z8c9HksIaEGWwzJqlwF3xsgnKdRc8BQlWY4EMmA54I0DcmUyq60MMyC
-	adFLs/rJ9A5jv+Dj1NmUsHvPIU306Ng8UGOAgtlG+oln6aLagJD7Nf05wMzR5cB7gcDKL4wqhSB
-	sAUHPjx2aUuy7awy6PwK2EuKE=
-X-Google-Smtp-Source: AGHT+IHhhZRYbATd9ePtC7lHYwSzYUylfI6T7+8xfqpMtP+AxcnaY3z0Vy0NbjZGfvqQZvbhEGQhZZQcRIexF9MqQ1Y=
-X-Received: by 2002:a05:6a00:3e2a:b0:73e:1e1d:1713 with SMTP id
- d2e1a72fcca58-73e267c2c98mr1119545b3a.1.1745466416095; Wed, 23 Apr 2025
- 20:46:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745467383; x=1746072183;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D09PgC93ZS3ZLjn25gSS3hEDnTkEIUuDkcd6alRURFw=;
+        b=SVILiZ/scg3kh9jwpRa1e4o7+AznTXlO7B1v7CQtcVbAHN61W0XQbUreoAOGNeTsYy
+         ybib1m7iuxTp4j+Ak7uPwrpklNYcglHsEGmuJzdzTdxKW0nRRQ5J9Qcgy4qqMya2G9Rk
+         j0GnTtkkZP4iPouU4NPr1ekL89ISSCYmyIIJpC3GD8U1UzGP/VEbCibcF8U4cODs5BC9
+         W7lHIJG7RsPIXonqZ8OBJF3GdfCKQ3RDcA91HyJfZnpiJyz5AoxGyRULCf9iRXfCge/6
+         D5KaYC+yQ2A3MBnJ2NsrzBfznxiCbs/AJx1Ks2a2dYS8qNH2oYHsYUEegPL4y+B0+uEJ
+         mAjg==
+X-Gm-Message-State: AOJu0YwV6K4/Hu7+fi1sP4NljdrTYyOAjNzYrJgQ5xr5hnJe+lLMwd0i
+	8qjRoem1/PZLIjzYvcNGE+Kcz4jwqYUBFvQM+sAMomNIvnjUtqlz9QmLxS5VZGBIlvLN4JeL6oV
+	hIuV4/xnjhmrZynjavojFbCL4brblH0G3/UMmgZy1qwYZyt3sKftfpkBb/e+LldLeVqhtXvwN97
+	uHJv2I1cEVAgTklTXk0xPox9Cd/l08QU9W3B9QsH3gepP8+7v2+I2IrLHhNGE=
+X-Google-Smtp-Source: AGHT+IHoYiJAViOyibsmWNa7O71nPYflx8ZwtWAOGvKQYrLpeEes5pAjno8XPyEp9J+g4sJP6zp56GC4j/ih4PdS9g==
+X-Received: from pfblc5.prod.google.com ([2002:a05:6a00:4f45:b0:73e:1cf2:cd5c])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:ac86:b0:73c:3060:d53 with SMTP id d2e1a72fcca58-73e24ac977amr1627489b3a.18.1745467382895;
+ Wed, 23 Apr 2025 21:03:02 -0700 (PDT)
+Date: Thu, 24 Apr 2025 04:02:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250423103351.868959-1-vadfed@meta.com>
-In-Reply-To: <20250423103351.868959-1-vadfed@meta.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Thu, 24 Apr 2025 09:16:45 +0530
-X-Gm-Features: ATxdqUHcQfu77fxaDinI-jTUdYAL9POEPB0g1qVvnIWXLZMNpn27aVLBGYQv_HY
-Message-ID: <CALs4sv1j_-i0pcQioPa9_ELa773SBpOn58pvk8s3HHcaHKR+8A@mail.gmail.com>
-Subject: Re: [PATCH net v3] bnxt_en: improve TX timestamping FIFO configuration
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b83c8406337e118e"
-
---000000000000b83c8406337e118e
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.805.g082f7c87e0-goog
+Message-ID: <20250424040301.2480876-1-almasrymina@google.com>
+Subject: [PATCH net-next v11 0/8] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, sdf@fomichev.me, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 23, 2025 at 4:04=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> w=
-rote:
->
-> Reconfiguration of netdev may trigger close/open procedure which can
-> break FIFO status by adjusting the amount of empty slots for TX
-> timestamps. But it is not really needed because timestamps for the
-> packets sent over the wire still can be retrieved. On the other side,
-> during netdev close procedure any skbs waiting for TX timestamps can be
-> leaked because there is no cleaning procedure called. Free skbs waiting
-> for TX timestamps when closing netdev.
->
-> Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX =
-packets to 4")
-> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-> ---
-> v2 -> v3:
-> * remove leftover unused variable in bnxt_ptp_clear()
-> v1 -> v2:
-> * move clearing of TS skbs to bnxt_free_tx_skbs
-> * remove spinlock as no TX is possible after bnxt_tx_disable()
-> * remove extra FIFO clearing in bnxt_ptp_clear()
-> ---
+v11: https://lore.kernel.org/netdev/20250423031117.907681-1-almasrymina@google.com/
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Addressed a couple of nits and collected Acked-by from Harshitha
+(thanks!)
 
---000000000000b83c8406337e118e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+v10: https://lore.kernel.org/netdev/20250417231540.2780723-1-almasrymina@google.com/
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJgMIIC
-XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIPArGpl49APz4Qz1KuQ6x3rW7LoaBfxw
-dme4qB9fQq9NMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDQy
-NDAzNDY1NlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
-AQUABIIBAF9KF2EpOCO9E85hXWzIUzOV9HOyLlRDfg5THjjmOVp96vgjobZRcauQUrGs+U+mNqyq
-cR7OLEfvwgsiFlRMhYwx4YxqN6FvyaODKGbzpyUbJ1LA5GTSRH7E6a3Kqq50QWBvOl0ObdyjMNur
-/YNfCqsOuIAiuntkLkIc9JquPz/gFqOoMGGv6arKb8IPMr1Ma7Vv77g+MMHwJATcuK5pGFTzD3RM
-KmZn+K0fz980K9LOaquMkUicOAK5e4wqXnzKWhTYqoqIbjwstUp45ECoV/pDwYVHZVZD4nJYLxLd
-oCGofLr6AIHieJLAkKSEmK1DeyQpvj5KFw6S+WKtr8vLhDg=
---000000000000b83c8406337e118e--
+Addressed comments following conversations with Pavel, Stan, and
+Harshitha. Thank you guys for the reviews again. Overall minor changes:
+
+Changelog:
+- Check for !niov->pp in io_zcrx_recv_frag, just in case we end up with
+  a TX niov in that path (Pavel).
+- Fix locking case in !netif_device_present (Jakub/Stan).
+
+v9: https://lore.kernel.org/netdev/20250415224756.152002-1-almasrymina@google.com/
+
+Changelog:
+- Use priv->bindings list instead of sock_bindings_list. This was missed
+  during the rebase as the bindings have been updated to use
+  priv->bindings recently (thanks Stan!)
+
+v8: https://lore.kernel.org/netdev/20250308214045.1160445-1-almasrymina@google.com/
+
+Only address minor comments on V7
+
+Changelog:
+- Use netdev locking instead of rtnl_locking to match rx path.
+- Now that iouring zcrx is in net-next, use NET_IOV_IOURING instead of
+  NET_IOV_UNSPECIFIED.
+- Post send binding to net_devmem_dmabuf_bindings after it's been fully
+  initialized (Stan).
+
+v7: https://lore.kernel.org/netdev/20250227041209.2031104-1-almasrymina@google.com/
+===
+
+Changelog:
+- Check the dmabuf net_iov binding belongs to the device the TX is going
+  out on. (Jakub)
+- Provide detailed inspection of callsites of
+  __skb_frag_ref/skb_page_unref in patch 2's changelog (Jakub)
+
+v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@google.com/
+===
+
+v6 has no major changes. Addressed a few issues from Paolo and David,
+and collected Acks from Stan. Thank you everyone for the review!
+
+Changes:
+- retain behavior to process MSG_FASTOPEN even if the provided cmsg is
+  invalid (Paolo).
+- Rework the freeing of tx_vec slightly (it now has its own err label).
+  (Paolo).
+- Squash the commit that makes dmabuf unbinding scheduled work into the
+  same one which implements the TX path so we don't run into future
+  errors on bisecting (Paolo).
+- Fix/add comments to explain how dmabuf binding refcounting works
+  (David).
+
+v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@google.com/
+===
+
+v5 has no major changes; it clears up the relatively minor issues
+pointed out to in v4, and rebases the series on top of net-next to
+resolve the conflict with a patch that raced to the tree. It also
+collects the review tags from v4.
+
+Changes:
+- Rebase to net-next
+- Fix issues in selftest (Stan).
+- Address comments in the devmem and netmem driver docs (Stan and Bagas)
+- Fix zerocopy_fill_skb_from_devmem return error code (Stan).
+
+v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@google.com/
+===
+
+v4 mainly addresses the critical driver support issue surfaced in v3 by
+Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+may come from dma-bufs.
+
+Additionally other feedback from v3 is addressed.
+
+Major changes:
+- Add helpers to handle netmem dma-addrs. Add GVE support for
+  netmem_tx.
+- Fix binding->tx_vec not being freed on error paths during the
+  tx binding.
+- Add a minimal devmem_tx test to devmem.py.
+- Clean up everything obsolete from the cover letter (Paolo).
+
+v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
+===
+
+Address minor comments from RFCv2 and fix a few build warnings and
+ynl-regen issues. No major changes.
+
+RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
+=======
+
+RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+something close to this as net-next  reopens, sending it slightly early
+to get feedback if any.
+
+Major changes:
+--------------
+
+- much improved UAPI as suggested by Stan. We now interpret the iov_base
+  of the passed in iov from userspace as the offset into the dmabuf to
+  send from. This removes the need to set iov.iov_base = NULL which may
+  be confusing to users, and enables us to send multiple iovs in the
+  same sendmsg() call. ncdevmem and the docs show a sample use of that.
+
+- Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+  this is good improvment as it was confusing to keep track of
+  2 iterators for the same sendmsg, and mistracking both iterators
+  caused a couple of bugs reported in the last iteration that are now
+  resolved with this streamlining.
+
+- Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+  and sending multiple iovs in the same sendmsg() is tested.
+
+- Fixed issue where dmabuf unmapping was happening in invalid context
+  (Stan).
+
+====================================================================
+
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
+
+Full outline on usage of the TX path is detailed in the documentation
+included with this series.
+
+Test example is available via the kselftest included in the series as well.
+
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
+
+Patch Overview:
+---------------
+
+1. Documentation & tests to give high level overview of the feature
+   being added.
+
+1. Add netmem refcounting needed for the TX path.
+
+2. Devmem TX netlink API.
+
+3. Devmem TX net stack implementation.
+
+4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+   freed from contexts where we can't sleep.
+
+5. Add devmem TX documentation.
+
+6. Add scaffolding enabling driver support for netmem_tx. Add helpers, driver
+feature flag, and docs to enable drivers to declare netmem_tx support.
+
+7. Guard netmem_tx against being enabled against drivers that don't
+   support it.
+
+8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+   devmem.py.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+Mina Almasry (7):
+  netmem: add niov->type attribute to distinguish different net_iov
+    types
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+  net: add devmem TCP TX documentation
+  net: enable driver support for netmem TX
+  gve: add netmem TX support to GVE DQO-RDA mode
+  net: check for driver support in netmem TX
+
+Stanislav Fomichev (1):
+  net: devmem: TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 ++
+ Documentation/networking/devmem.rst           | 150 +++++++++++++++++-
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ Documentation/networking/netdev-features.rst  |   5 +
+ Documentation/networking/netmem.rst           |  23 ++-
+ drivers/net/ethernet/google/gve/gve_main.c    |   3 +
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  17 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |  34 +++-
+ include/net/sock.h                            |   1 +
+ include/uapi/linux/netdev.h                   |   1 +
+ io_uring/zcrx.c                               |   3 +-
+ net/core/datagram.c                           |  48 +++++-
+ net/core/dev.c                                |  34 +++-
+ net/core/devmem.c                             | 133 +++++++++++++---
+ net/core/devmem.h                             |  83 ++++++++--
+ net/core/netdev-genl-gen.c                    |  13 ++
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  80 +++++++++-
+ net/core/skbuff.c                             |  48 +++++-
+ net/core/sock.c                               |   6 +
+ net/ipv4/ip_output.c                          |   3 +-
+ net/ipv4/tcp.c                                |  50 ++++--
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/vmw_vsock/virtio_transport_common.c       |   5 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ 28 files changed, 699 insertions(+), 73 deletions(-)
+
+
+base-commit: abcec3ed92fca92cd81d743bb8a5409da73b7560
+-- 
+2.49.0.805.g082f7c87e0-goog
+
 
