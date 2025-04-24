@@ -1,117 +1,95 @@
-Return-Path: <netdev+bounces-185776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D061A9BB2C
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:22:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A1EA9BB38
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684B71BA3C1D
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:22:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C2611716B8
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 23:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5925D1FAC42;
-	Thu, 24 Apr 2025 23:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F2E42253EE;
+	Thu, 24 Apr 2025 23:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qagfri0E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7VTZGLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC604A93D
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 23:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77814A93D
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 23:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745536919; cv=none; b=bSB/nhXeMdNcsGrIE2YnH1aKCymqS7lERlitFqREwgIUi5rmJ2akDsKp52bUFryMn3hXDYmEqmNDZ9di9fy9v5ZvCnVGyY8lvTf+9Y35Ukmp9yZV08jSkcdlQ3Ei52DF+v6M189/bNooIqG88QIsWoNcI3O3Po6WQoiHYG4OJhc=
+	t=1745537067; cv=none; b=JSkGDeYnAqYGBC+k+3+AoVRv6D9siiRfZeJCg8EQ8Uoenpf2aLz4DCrcMQlXHW1lslXX0HO5SYP0suBWxfplQhE68dB33noYWdGAeO0Ujr/gXEKSUZktTKht2R4Cp/RcNEpvNgn5lE8sSo6WZ5EZIBvrgEPcRX8qe3Ydv8AM+A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745536919; c=relaxed/simple;
-	bh=leP1MMCvTfw2WniCmxA6TjTr8mxlmUXSG09y7229cGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sb1fNo/RzJNZR7gEwTyjnBjawshEtSJjXBUCSJd2x7LunDwRjTJlaZG2hOYPF4H6MixEqdfCezVol78NOw1aXEWHGQS4UTUb0NQZbQGNjxkt+O0fJio9bK0SHMtJOmWqyj8za/Ta9jwbeg/y4is6QMJCy9bDSP/vwfwvEND7pxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qagfri0E; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-301c4850194so1245658a91.2
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745536917; x=1746141717; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SPm+ZchIX4coFmmYlxiyIumxW8XQ8NkfWSG26kLwuwA=;
-        b=qagfri0EoKqTxh1sAxj+WpI8A3JXbZYB7MY7kgoVJfADcZ0Kdy4d/xtNVC0nc9xJX8
-         MiEAZVAz5vEk/jsSjbCJ8hrmtXazhG+a5FPAYX5iNHGlX86KLNFsX8GeZTo7+qEp1Gan
-         jFr9pi98SSiUuyeiyAk469F5tgQk/95Myq8x4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745536917; x=1746141717;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SPm+ZchIX4coFmmYlxiyIumxW8XQ8NkfWSG26kLwuwA=;
-        b=RtMjplRVal0c02Jg58tOrBh1cKbm1DQWbCL1C4TEHI7V/iauuoqlfgMNoZRW+bzHQE
-         SpwI3ne28Bqt7ECUDpFbfoix7n78HfM18NjURp6RAxI2S9ugg/dI5dt9NsydeYQ5k8qr
-         hFR8lFQTWMUdVISdltc9tGXfuKnGrQMxbtbptWivBRzy8gjhPQwwwRVeG9Sh26u+WKP/
-         B3L8unyLCW5tA0XKs96Arf0nDlRQsEWf1cLar+tyIszMtrVK4RexPqFDHgJx/vQ6VArg
-         TqM9WoGCOdwecYG46N5pf8w7ovK2mOGR6QGWVAVpPirzgEtewERIm3NxXrARm7ASXQ0b
-         cKqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfM7PT7Uj+HReL/I+wSDxAxwDDUfCi4flU0KMZT/aCkzqbf0TVZkDkxOwddoJiBkD1ZHV/ayU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1SI9RReRgFWoGwPkCeEkKpuqUyrpMF0qPHYinqa2/tWrorNtB
-	Db9f0aKl24lq7c+ckDCI5WbxS9fkiiOoH3jxXopKS5tLlTowMYkPYV3eWZJu3eI=
-X-Gm-Gg: ASbGncvOsMGR9rhTpGu2QRJSrPTQyiKCiApRGuBZyGWNhWWctJ9FLjujoJ/fowFwxnH
-	Vd/0zz3RQNzMZo8dnnPy6PO3TTHUBZGX98ZchFWm6PPw5hAlctQDVJJoVutCpcHATH8t7izAmt8
-	MybdS6L2cFdePMHD/gU+m/YEIgTUMkcgOmLbzuOippufyWB0N26S1B/r79vxEF2SHVfhw17JsEv
-	3bwBlQ4b9+moavqPRYQa1DPAkn24YEfLyJtn9EhYoIu0FOO/XtnPC0F1tku8LbAR3PDr7Db7Zao
-	27E1NK9GvtcvIfBXssKpFbhxcQhoR4jMaTkB616QMebcFM3buZHXeetHBJh6CDbLF+z/OxKFnyX
-	ueM7M2lk=
-X-Google-Smtp-Source: AGHT+IG9U7wDjilGvJBmj5VDZ/tkV58FQnCaIfGJyL1yx6idSDGdc51cezUP/ZnnBH55jBxy5CfISg==
-X-Received: by 2002:a17:90b:56c8:b0:2ff:5e4e:864 with SMTP id 98e67ed59e1d1-309f7e8ce0dmr457526a91.25.1745536917080;
-        Thu, 24 Apr 2025 16:21:57 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ef0619c2sm2040926a91.12.2025.04.24.16.21.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 16:21:56 -0700 (PDT)
-Date: Thu, 24 Apr 2025 16:21:54 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 1/4] net: Create separate gro_flush helper
- function
-Message-ID: <aArHkrU6V5nhgg6a@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-References: <20250424200222.2602990-1-skhawaja@google.com>
- <20250424200222.2602990-2-skhawaja@google.com>
+	s=arc-20240116; t=1745537067; c=relaxed/simple;
+	bh=pK0wLhP8ZyLfNW4FV/7ualfAvEz8cXn1jh58QTIgfPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LHLeCbvo+2myBw9bTRgtumzQv2NzM6qBrZTvqZCSVOOXivD9uYzj3cg2YHWBjuJ8aCPzy4sa+40gkDHWo5djY8TTXLC3qyVYDeNtkXOgh7r9DFmRzVdUWq747mnZv8ZHVVWP3OqDO/zl0IQAvoGrNgAUhyfCcCBCXfol6jzwjXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7VTZGLT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4913AC4CEEA;
+	Thu, 24 Apr 2025 23:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745537066;
+	bh=pK0wLhP8ZyLfNW4FV/7ualfAvEz8cXn1jh58QTIgfPQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n7VTZGLTV3cpbEprg2Crqgis7qm38x+HQOeZPhZhPMmjC09i1YUUvdHyeyqNzbPrF
+	 Wh3yP7PXtby8a7WHoPJH4hfklgIpYGOKUmLXhOt5teba+aIV31LP3S0o0rWrbIswnV
+	 72sF0UfTxu8m8VRmZGRbMINN2UUzE0NCLUDCklnN1F6wkGQxPJOhSPNLX7fBfYWio0
+	 kmrPgALgJxz/jdUsUANX3Eid2y+9rCG98ufC6ud3SV4lbWeScxR1O5f/SU4Si3+j+X
+	 f6ndJNTdGsQLkye2RV1YebSS2WxlMYoLec+TdKtvb9NH91AVPrHlTyIaO8FykaLUIW
+	 Q9sc8cz74xPYQ==
+Date: Thu, 24 Apr 2025 16:24:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Moshe Shemesh <moshe@nvidia.com>
+Cc: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri
+ Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leonro@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>
+Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink
+ port function
+Message-ID: <20250424162425.1c0b46d1@kernel.org>
+In-Reply-To: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
+References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424200222.2602990-2-skhawaja@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 08:02:19PM +0000, Samiullah Khawaja wrote:
-> Move multiple copies of same code snippet doing `gro_flush` and
-> `gro_normal_list` into separate helper functions.
+On Wed, 23 Apr 2025 16:50:37 +0300 Moshe Shemesh wrote:
+> A function unique identifier (UID) is a vendor defined string of
+> arbitrary length that universally identifies a function. The function
+> UID can be reported by device drivers via devlink dev info command.
 > 
-> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> ---
->  net/core/dev.c | 16 ++++++++++------
+> This patch set adds UID attribute to devlink port function that reports
+> the UID of the function that pertains to the devlink port. Code is also
+> added to mlx5 as the first user to implement this attribute.
+> 
+> The main purpose of adding this attribute is to allow users to
+> unambiguously map between a function and the devlink port that manages
+> it, which might be on another host.
+> 
+> For example, one can retrieve the UID of a function using the "devlink
+> dev info" command and then search for the same UID in the output of
+> "devlink port show" command.
+> 
+> The "devlink dev info" support for UID of a function is added by a
+> separate patchset [1]. This patchset is submitted as an RFC to
+> illustrate the other side of the solution.
+> 
+> Other existing identifiers such as serial_number or board.serial_number
+> are not good enough as they don't guarantee uniqueness per function. For
+> example, in a multi-host NIC all PFs report the same value.
 
-Looks like there's an instance in kernel/bpf/cpumap.c that can be
-replaced as well?
-
-Maybe the code proposed should be moved to a helper in net/gro.h and
-then it can be used in net/core and kernel/bpf ?
+Makes sense, tho, could you please use UUID?
+Let's use industry standards when possible, not "arbitrary strings".
 
