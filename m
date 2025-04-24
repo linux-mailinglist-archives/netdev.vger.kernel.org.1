@@ -1,202 +1,177 @@
-Return-Path: <netdev+bounces-185553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20B71A9AE14
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 393F1A9AE0B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:56:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E027B1B65E8A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:57:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55E981B65580
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C137427B51E;
-	Thu, 24 Apr 2025 12:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A618E27B516;
+	Thu, 24 Apr 2025 12:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="KNYgM9v0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QaWCtypJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A4127BF9B
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C41223DEB
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499417; cv=none; b=irFnjgwRF367vIEP5SxGZl3+yyUJu/WwoAedJTRuYumYzAu4gq2a5rGJxJmE3zPVC+qnrKnQB433qILK4zcgQpPs+FNiup/1cOzS0AaSsoRBIbm5OjWNd4Q9lkoSkt37HjVIAghhKqfE/T/eo2Dyjx32w7JC/hcRKzOGutbTST8=
+	t=1745499368; cv=none; b=Zo8P3lRCQzT2ZRG+AoeGjdtSQmJVcnZXa3huGFTuHl4WL22sWPHMpeuymgjLtEe04gAT5qccjkx8e8z8iSCZJmmb7DNTVfI0bcMoRcBGIpOgaJhuk88N21E0vLgeFslUGFa0zIFYHjnIBsp66/IVHU3jXkV5cyYRrnwr1NGZOck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499417; c=relaxed/simple;
-	bh=5BTfy8Idhyh2VjCRIiZGY+O8FpzzYRJBlt2Qx7yYD3Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ms4gfLwVSgfLS/SakbX36VJh5FZ141+MD6QALbkwg5e1Co7xhTa8HVxx6/UO6y+IWdY2m8TboS72IdrNlgghfbloN5iUCaKLjCR4ZdKHMcMyizBysZKRZtaMAVCpgp7OsIEuvxFQ1zM9bztVOKFbI44On+NRZxvCnN4aJolhaf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=KNYgM9v0; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 53OCujqv028013;
-	Thu, 24 Apr 2025 05:56:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=HlQ+EQjhFs6QLbsrbZ
-	mQO2SieqI0k7nwEw12f1VBDt0=; b=KNYgM9v0vcVkH4QGj1WNY1NYusXzoKQbry
-	ghFZJIkLE/Sj+99ajtN5vbeZWf+daFbb9IV3cCEs8ViM34ftnqBIFIX5ap5AFSF4
-	x1YHJE51Z52BTsw97a7Xund3wh3jd9oj76uEJ9BzMASfLJVtqfEkj4o4TkxboPkY
-	KfW4rQBNebTiSZW8qZBs8/KsRQlzoE/2zfhoFeQzty9gSOgUj3UEeJyzqb9RluXz
-	zD1ZcxjPGT7q6Y7XE582xKeetJZAJiIYYPlOSRZdw8SRhBb1hGD+v48GaCrSsRun
-	h+pFwzP071ybyblPuldsuYc28668wAET5QLUokKMbccKJfAcYWlA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 467k9mgyej-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 24 Apr 2025 05:56:48 -0700 (PDT)
-Received: from devvm31871.cln0.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1748.10; Thu, 24 Apr 2025 12:56:01 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Michael Chan
-	<michael.chan@broadcom.com>,
-        Pavan Chebbi <pavan.chebbi@broadcom.com>,
-        Jakub
- Kicinski <kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v4] bnxt_en: improve TX timestamping FIFO configuration
-Date: Thu, 24 Apr 2025 05:55:47 -0700
-Message-ID: <20250424125547.460632-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1745499368; c=relaxed/simple;
+	bh=wytmH7a5yV+mTmP/mf2zLdZqlGHahZ/qQLdzJIcj0B4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o44YpDq0IEVYZv6HyiSXJlTa55Dv7OX576iF8aADINhINz5QC4aOBeSUBqlRq2V+RCzs1k5erQZDZTmLItp/fNrnhbDXJFWXSQ46HaeyCOBLWpos2Vq+49IFdK01YZCzT4SE7NIp9UvHveTIntsjgI7s0MQ4yP5lUJELOlz0c8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QaWCtypJ; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-af590aea813so2085255a12.0
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 05:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745499366; x=1746104166; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CSWRON5bs+6mlhVmC4A6isWLNPJweUWm5K3Tnj4Gihg=;
+        b=QaWCtypJNt40OogFeX7bt5jB4BnkdpS7ylHUH/e0bxt7WLzFBeFBDvefYasKFJCLEq
+         h6MhqtHe/WplgYuSt1xBDhe3K4j03Z44F2P/jLT3uj+pw47ACcZgpc5WvekYrbnnsat8
+         aNWyPkes7aYAxVmqCfrrjHpRcY2Ax10sJ2Ixjc09E1FQwYTEWaLx3keLd4lq7G/7gir+
+         AFawJjCFdeMWXWfsg61VLxCtPldMQ7b4uT7CrumVxxsvbWCnx/ufcqg5ggYgze6+F+hK
+         jxhJqIiscL5djMOudvJqUKWEH5CfYqzIFAaZPmjWCTLW+qBbvd9bsUG3mRtjF97sjslJ
+         xRSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745499366; x=1746104166;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CSWRON5bs+6mlhVmC4A6isWLNPJweUWm5K3Tnj4Gihg=;
+        b=sNxarRq/SVKs2ZfDIO1khmw/uVZlZ6/nADQFFeqpzSUmqDg/6cqOIAAJ5FwTP70UDm
+         wccZBFT94nhK2IvwFscIU6SDdr2v7VnbKEYiyLJ+EKtWBOQ8oAk7IYIO/tI/PFwCdSJs
+         ncTsvL5cz+muajq24r8LaGX9TNeHAY7T+DufCfTToR2JP6u324i8S4QL4VGFXFF/6Wqf
+         pQf7Kwg6S7G94FaA1eWPjLd5lO1F+GPaB94/LK79j0qiCds9AJMGcjMzXv4OCn4vO07f
+         E89mUDVKVWl2HhDF+36hH2falUaNfGKnPlIYWFctwEkfr7p6i4wKv7L+bwJV4cthUu+c
+         8GSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaqRpw8S0RIZcQn9o+uelhZOINyf7VvI2/qg7ZV1aoecu4txsZp53MIrj5Dwvga/lUCPlule8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4uXxxgh34Fepd9PK8BoIeThvj4XdCItBcobOlk6paigab1BbC
+	ACoPakN+FdRG+Kw7zvsQ3e3LexSXu4StCDMHxTz8UGSbp/o9lQzepXRAwV38UsoobG3XuHuC73J
+	DYp/oaxQw+XKvSK3bxcm0wSQMoUe/GbMz8QXy
+X-Gm-Gg: ASbGncta9sq/XgHEjfwnN58mbVH9ISNOiZU9q3hSzf2M1QYPycZQXufxmDhtx43J1nc
+	Yo6mjUCvM9sVp5kr8x3Ztea9ca2uBR+iIOj9JfeKKwmCmIoOjtlPhbdP7vj9owQX3DcQJDRwkZD
+	SZAUjl+HqrPA7eAgUy2izLfBdfJscGYtKpS/sC6x69O2ZfbrYwtiJ+
+X-Google-Smtp-Source: AGHT+IHbBDJRszZSled4CmWTPaftUgkcEDj8QcHI1jzPj+1jSYfi6PL9BwWaDk5Y1ey2LeNyPUAjVgmzfuh3lQXFxjg=
+X-Received: by 2002:a17:90a:8a87:b0:309:f46e:a67c with SMTP id
+ 98e67ed59e1d1-309f46ea6a6mr170830a91.11.1745499365881; Thu, 24 Apr 2025
+ 05:56:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=cKPgskeN c=1 sm=1 tr=0 ts=680a3510 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=XR8D0OoHHMoA:10 a=Q-fNiiVtAAAA:8 a=VabnemYjAAAA:8 a=VnezELSGKxGoUyyTTqgA:9 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-ORIG-GUID: lxKmby8uKhGwaRupVIqLZu3iT3ZdKyct
-X-Proofpoint-GUID: lxKmby8uKhGwaRupVIqLZu3iT3ZdKyct
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA4NyBTYWx0ZWRfX7q5rC1bgdRPc L2CflvSPQ9y3sCErVmWepjN3dhPDaWJ/Nk+FL/3jKN5vXo/ux8NewLURxOa4c0qRhLZ9i3CC1HG 4UwFGmEWg2cuYH9JIxe7Z3xPafU12pH8uvFMEmfNbMNhEHFn9428w9QxedXLPNX7NGfyxK0CnMY
- 5n2hz8E/NCDINx/6DxIgm6T00nV1cCDp2DRG/CxPjsA20zj0cB8UdHxjLHILnMmqdp+nVD4t0Kb Xon8ccNfcuv+g3QG3oXEiKPkGPqjcsY+L/LzM6TsgK/L2LbxoVoYL84nCMZVkJMLPM+qtPEYnvb 427VE/qFlj2BS0JnhDDk7DEPPI62Tpk5XefL7+a/vZdth+88gqzoyTQNskCilmk8/KCPqPOQL63
- BobZffWJfveBkndJqPHsx7uOQdmPsi/aKP0QJBiSjXBtAair8UERyZG+KwRzM5Cn0RFl4Jh1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
- definitions=2025-04-24_06,2025-04-22_01,2025-02-21_01
+References: <680a33d5.050a0220.10d98e.0006.GAE@google.com>
+In-Reply-To: <680a33d5.050a0220.10d98e.0006.GAE@google.com>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Thu, 24 Apr 2025 14:55:54 +0200
+X-Gm-Features: ATxdqUGpo0kP3QfW2IPGszt9sTV6h7B_wArhkeQAE2UapEW8Hp8tyjMIS3Ixh-8
+Message-ID: <CANp29Y4Zve8dohEhZ=12-w2SPOmOKbtt6U4MTvaK37CRrTQtMw@mail.gmail.com>
+Subject: Re: [syzbot] [kernel?] net test error: UBSAN: negation-overflow in corrupted
+To: syzbot <syzbot+76fd07ed2518fb9303f9@syzkaller.appspotmail.com>, 
+	Kees Cook <keescook@google.com>
+Cc: akpm@linux-foundation.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reconfiguration of netdev may trigger close/open procedure which can
-break FIFO status by adjusting the amount of empty slots for TX
-timestamps. But it is not really needed because timestamps for the
-packets sent over the wire still can be retrieved. On the other side,
-during netdev close procedure any skbs waiting for TX timestamps can be
-leaked because there is no cleaning procedure called. Free skbs waiting
-for TX timestamps when closing netdev.
++ Kees Cook
 
-Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX packets to 4")
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v3 -> v4:
-* actually remove leftover unused variable in bnxt_ptp_clear()
-(v3 was not committed before preparing unfortunately)
-v2 -> v3:
-* remove leftover unused variable in bnxt_ptp_clear()
-v1 -> v2:
-* move clearing of TS skbs to bnxt_free_tx_skbs
-* remove spinlock as no TX is possible after bnxt_tx_disable()
-* remove extra FIFO clearing in bnxt_ptp_clear()
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 29 ++++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
- 3 files changed, 25 insertions(+), 10 deletions(-)
+Hi Kees,
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c8e3468eee61..2c8e2c19d854 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3414,6 +3414,9 @@ static void bnxt_free_tx_skbs(struct bnxt *bp)
- 
- 		bnxt_free_one_tx_ring_skbs(bp, txr, i);
- 	}
-+
-+	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-+		bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
- }
- 
- static void bnxt_free_one_rx_ring(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-@@ -12797,8 +12800,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	/* VF-reps may need to be re-opened after the PF is re-opened */
- 	if (BNXT_PF(bp))
- 		bnxt_vf_reps_open(bp);
--	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
--		WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
- 	bnxt_ptp_init_rtc(bp, true);
- 	bnxt_ptp_cfg_tstamp_filters(bp);
- 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 2d4e19b96ee7..0669d43472f5 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -794,6 +794,27 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
- 	return HZ;
- }
- 
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
-+{
-+	struct bnxt_ptp_tx_req *txts_req;
-+	u16 cons = ptp->txts_cons;
-+
-+	/* make sure ptp aux worker finished with
-+	 * possible BNXT_STATE_OPEN set
-+	 */
-+	ptp_cancel_worker_sync(ptp->ptp_clock);
-+
-+	ptp->tx_avail = BNXT_MAX_TX_TS;
-+	while (cons != ptp->txts_prod) {
-+		txts_req = &ptp->txts_req[cons];
-+		if (!IS_ERR_OR_NULL(txts_req->tx_skb))
-+			dev_kfree_skb_any(txts_req->tx_skb);
-+		cons = NEXT_TXTS(cons);
-+	}
-+	ptp->txts_cons = cons;
-+	ptp_schedule_worker(ptp->ptp_clock, 0);
-+}
-+
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod)
- {
- 	spin_lock_bh(&ptp->ptp_tx_lock);
-@@ -1105,7 +1126,6 @@ int bnxt_ptp_init(struct bnxt *bp)
- void bnxt_ptp_clear(struct bnxt *bp)
- {
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
--	int i;
- 
- 	if (!ptp)
- 		return;
-@@ -1117,12 +1137,5 @@ void bnxt_ptp_clear(struct bnxt *bp)
- 	kfree(ptp->ptp_info.pin_config);
- 	ptp->ptp_info.pin_config = NULL;
- 
--	for (i = 0; i < BNXT_MAX_TX_TS; i++) {
--		if (ptp->txts_req[i].tx_skb) {
--			dev_kfree_skb_any(ptp->txts_req[i].tx_skb);
--			ptp->txts_req[i].tx_skb = NULL;
--		}
--	}
--
- 	bnxt_unmap_ptp_regs(bp);
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index a95f05e9c579..0481161d26ef 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -162,6 +162,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
- void bnxt_ptp_reapply_pps(struct bnxt *bp);
- int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
- int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
-+void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
- int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
- void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
- int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
--- 
-2.47.1
+This boot time error appears on v6.15-rc* when the kernel is built
+with clang-20. It's apparently related to
 
+commit ed2b548f1017586c44f50654ef9febb42d491f31
+Author: Kees Cook <kees@kernel.org>
+Date:   Thu Mar 6 20:19:09 2025 -0800
+    ubsan/overflow: Rework integer overflow sanitizer option to turn
+on everything
+
+Could you please have a look whether it's a legit issue?
+
+On Thu, Apr 24, 2025 at 2:51=E2=80=AFPM syzbot
+<syzbot+76fd07ed2518fb9303f9@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    cc0dec3f659d Merge branch 'net-stmmac-fix-timestamp-snaps=
+h..
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D131c21b398000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dac0f76cd0f8e0=
+93a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D76fd07ed2518fb9=
+303f9
+> compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd=
+6-1~exp1~20250402004600.97), Debian LLD 20.1.2
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/1d6f321414b4/dis=
+k-cc0dec3f.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/072c28c931b0/vmlinu=
+x-cc0dec3f.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/bcb44ff40c55/b=
+zImage-cc0dec3f.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+76fd07ed2518fb9303f9@syzkaller.appspotmail.com
+>
+> virtio-scsi blksize=3D512 sectors=3D4194304 =3D 2048 MiB
+> drive 0x000f27f0: PCHS=3D0/0/0 translation=3Dlba LCHS=3D520/128/63 s=3D41=
+94304
+> Sending Seabios boot VM event.
+> Booting from Hard Disk 0...
+> [    0serialport: Connected to syzkaller.us-central1-c.ci-upstream-net-th=
+is-kasan-gce-test-1 port 1 (session ID: e72bd3249fa5f4b40b974e21e6d99e16e83=
+84254f2e85c0fe39918dcc479fa4d, active connections: 1).
+> .000000][    T0] UBSAN: negation-overflow in lib/sort.c:199:36
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion visit https://groups.google.com/d/msgid/syzkaller=
+-bugs/680a33d5.050a0220.10d98e.0006.GAE%40google.com.
 
