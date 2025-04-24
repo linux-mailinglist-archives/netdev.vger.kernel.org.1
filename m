@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-185342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E28B6A99CFC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2CEA99CFF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FC2E463360
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:29:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D604637DC
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1A013D539;
-	Thu, 24 Apr 2025 00:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FCC14B086;
+	Thu, 24 Apr 2025 00:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gi9Jco+a"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CZVwc8F1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D4B128819
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC0D14830A
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745454500; cv=none; b=Beu5SxOUAdzu3uA7wAEsC8L8YtO6uWCM5aRfYxC74toilc31VrIG8bdrtKKcV9ZuP9mh6RULmckwHoDz0JQhByvrTA+DKuetICor7THikP56F4jdAj2d0IyDRci6I6yB3vMuA+X5IeMp2Iu+3x18bvhC4XuJJRuKnfzw8OEUGX4=
+	t=1745454503; cv=none; b=q5bO7PvOrsLTwNsGQp2EaFI79PMMFtzTLHO1pgprg75iOkYE7QQ/byzzrfk7B/lpUZwckIx66Vc9GhggEIpfqfpW9ck0CORckUxArgoG9ZLA99NuO0pJPl/xhsillvtKzu4wzKXXToqzv8Et7DmeFQ2Ut1aKdWYX4VnNRPGYKlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745454500; c=relaxed/simple;
-	bh=CC5P9PlTFOFYmpGkh+AgeMpeAfxK9NmmEpB4vEaUjMk=;
+	s=arc-20240116; t=1745454503; c=relaxed/simple;
+	bh=XfejFVfUeNjlcemQvV2FfBGjQHl1uJWERTzwSMmvtPw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K8aIvkQfXI5+P9jJCsPyTqjJkr3gKBWW7slY6DHvVmP4nWhjO841WbWAtmy7qgbG1ryMezNtpSF1b1lVom+SgbKndNK02D3C6p7Qut0CcP2iBYlIZs9ZP7/SK3d8PdeqZl9LFSmXsS34D8w4xOzc4hfdweAyMhgyyb8cp4pEZOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gi9Jco+a; arc=none smtp.client-ip=209.85.215.173
+	 MIME-Version; b=U3/YuHfrf9KAbrQL+sdEtzi9jMjZuwzuuCPqfM2oAK7grhqEt/Ci73A2OMoLyMJRxfGwsZ235B1ZCoOgreVZ46t/C0A57ox6tCJcsr9fBNncK0cefYq1tUIKiMeXy9BRbgt4tJ32wlYGuhSL08EulCugc341h97iAGsTQJ8Qxh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CZVwc8F1; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b0b2ce7cc81so359410a12.3
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:28:18 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-306bf444ba2so442684a91.1
+        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745454497; x=1746059297; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1745454500; x=1746059300; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K0pZyEyvgBt8oFD4ZrZQFJhXNyLvOB+O0xQ+Wcll9kk=;
-        b=gi9Jco+aEqNtbuyDmscJmg9o5IK/DK1zy6puezcbPjsbBSPJKI+Meuy8cuotwPLx5Y
-         UIPLcYZuj5PdAU25UiZdjQ1pKX6lzWIHfjAbLI6W8esUbXsxGM6o32Mh1dH9yWRhSZmZ
-         aQZSpBl49lHIJz+HRB3PB3KFttNvWiZCkfEpw=
+        bh=fONRRd0VBHmSB/DlTOXXKEWrq2Lhm3txVCS1ybmwFg0=;
+        b=CZVwc8F11k7fY5c1ugrngaTYmJym5j4Dcu5OdVucrMo2750HaMBRAzJlzaahoxeF24
+         qObiytR+EFDvHzQ/mQn4YBNW1HiPo8u7X12p786Mk9RDWGUriQroOaViSmEGQVAL6itK
+         WMNcX5ycXz4pS2dZ+crZncqfLudYrE8R5n55A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745454497; x=1746059297;
+        d=1e100.net; s=20230601; t=1745454500; x=1746059300;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K0pZyEyvgBt8oFD4ZrZQFJhXNyLvOB+O0xQ+Wcll9kk=;
-        b=i+NEO+bUkxiMpg4JC3mOdcSKEajWlA8TJT7qL05hPK+Nvcxf714igN7qZdI392jmzU
-         vHjsoOJ0MlKTIKJv1sRqRLAYgSu2hL3TRTHlwy9OiKkFf6ucGhUIPfxHDHcoR8q6+mCg
-         i52/oTADdCMDwuzYUNp26Wa2KANiMGKCzHxtV43wi3ze8fNgQYqn/3u50hIASc81ZWK6
-         kuDWwoqZ+G2PbfKafMMsuvLMQwDfLWeWwVW/zSzwJDgdjBCi9HYjUzvQeVoRy8pTV6ds
-         WFxKjhpJyYEGyLYXZlOaO4cnbpZHX9qtIWTogM6ZMp/ivh59G2Ju+FpW99QgI5zYXpmf
-         R8/w==
-X-Gm-Message-State: AOJu0Yx9NFTXC6G/izAJnGm3yTQbIcOtEYKy4BB3EPjJyJNqXIK0LCme
-	MOOm0bYUXqt4SAbDjl8BEwaOg9Dlc+njk0r1TN/fsUfPtajB8W7u7cEuDIGePrP8jvCC42xPJbf
-	8tU9O8DcGq1UsQTSccH1gU+DrKek6wiMX3BZQtzcWBYwrIqgRkzvCj7NRwSTPJrHg26qllCx8kV
-	xpvek++2WducpIR+qaOYWRTHSlb0S3s2ow7NY=
-X-Gm-Gg: ASbGncsSSKTpAP3mb5cT00jVLHDMqyEZlgbNrT1O70DUweeN/SKuZgOrMC2JXMUNkPh
-	ASWLXqDJn8qTNjYTSF7y/lBuk8Ikzu8jci22rde+DDwVHSH7tdvmrZ9yAl4VAeJxiRUKu+QvHV0
-	AypUfB2y93UV2cFKNz3w6ziRTgtlocs4RlKRPii58aZhpGxeXXQZ7jVep1KqSNe5JCTBp0lzqxt
-	dBv4I8RINicz49wFMzHzV1xD1YsMpXX3jJNd+GUDj15wf7sr9N4rNceMDf+rUlVMXuJaA76KiTT
-	w5a6fxxIL+cUGBDWGq9Fd974w2BTPv9P1HDmWuqGLRhha2HN
-X-Google-Smtp-Source: AGHT+IEAmg0XR+f+4dbbuaII7I/1Nj1o8g+oD7f7K+/8qFPWxrVWr1FeBq7fThzkgJQPYmfowLY1oQ==
-X-Received: by 2002:a17:90a:f945:b0:2f6:be57:49d2 with SMTP id 98e67ed59e1d1-309ed29c8d8mr1097904a91.17.1745454497172;
-        Wed, 23 Apr 2025 17:28:17 -0700 (PDT)
+        bh=fONRRd0VBHmSB/DlTOXXKEWrq2Lhm3txVCS1ybmwFg0=;
+        b=ucZlj8fExS4y8eHWfDk1jILNApAx+pcrpfSB3eKPcpnLhKYmjqjuJQtpDuONXjWs7q
+         MhpU2IdslBiKo0l0Nl79xQnsF2eSq8BhYXtbZJU9cxJMyaeQjA0IgdG/OZ+BhTOpZRAD
+         af4PPrOeuatVTFG8bqTygeAx2FFThbXIkejGu8gGgedVUas+qPFFR+S837LyARvCP/A9
+         uKziMt6BfprhLGJi0hsR3JWyHp1a5ehtQ5qGrM8A7MU8j0R7pSLNsNdvuOk9/gYWDXGc
+         jZWRDZx8peNbDLTmc88TLvya+3Fe+Kbg6TizPFQxCzOxl+0rX4EzBFXM22SM5EfN+uoy
+         aNvw==
+X-Gm-Message-State: AOJu0YyyS8KDyK2h96ABDQi1Qd7l8DcSpU39ocYpMVlVlU60C9CO914D
+	oufqJykLdccFhYaGg6JKPWczCLyp0rA7xvQt6p0VBZCPsI55hMvHowfJbNbLMM4kY7QHIJWV7al
+	DMRgZyM3plyk0wUKQqMoFzn8POuJSFk/v1pNvECeFb0iEJTVWqxj7aMjvU9ajZojNUmbDmqQriw
+	fpzPLgH7E0S59L8zw1gqbZdnV1rBu5Hm8uu04=
+X-Gm-Gg: ASbGncscTteVM1U9tRJqTKvgWCekUQty+sN0druXJM2DJ0u1LSHAGOQWmJwH3L6OIHU
+	63Kli7qUNAJ4lu8g8wUQI7trEj+BwRYc/ciD3bYC0UhzzGK6Ld7zAUy3qzqW+b7lJ9etuR21JDA
+	SBTeYq2vg7vpypva9ZLbdGHZVQSkIB6kAkboU0x4sfo0OQM9TyIie4pmWTF8UStG+tAx/r33UZG
+	s1IKhIxB+xV6sQq7rPwtXpGs7J9vgOk7pabA8nFY1IHJaz1AIMlzRilMfpemuPHOqZKYTIi+itr
+	vzG32NywOVrcC90ekond02eNidZKDqifHfFXLDuJ/bOc0oZ/
+X-Google-Smtp-Source: AGHT+IHQIolOk+n262eCIIoMGQ54RpktEuMS5r9p2G6tZQeOFE8Ai42mQoK9PW7YbvD0WD0iY5WqEA==
+X-Received: by 2002:a17:90b:2752:b0:305:2d9d:81c9 with SMTP id 98e67ed59e1d1-309ed2805d0mr1116420a91.16.1745454500436;
+        Wed, 23 Apr 2025 17:28:20 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ee7c4054sm83013a91.23.2025.04.23.17.28.15
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ee7c4054sm83013a91.23.2025.04.23.17.28.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 17:28:16 -0700 (PDT)
+        Wed, 23 Apr 2025 17:28:20 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -87,9 +87,9 @@ Cc: kuba@kernel.org,
 	linux-kernel@vger.kernel.org (open list),
 	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
 	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: [PATCH net-next v4 2/3] selftests: drv-net: Factor out ksft C helpers
-Date: Thu, 24 Apr 2025 00:27:32 +0000
-Message-ID: <20250424002746.16891-3-jdamato@fastly.com>
+Subject: [PATCH net-next v4 3/3] selftests: drv-net: Test that NAPI ID is non-zero
+Date: Thu, 24 Apr 2025 00:27:33 +0000
+Message-ID: <20250424002746.16891-4-jdamato@fastly.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250424002746.16891-1-jdamato@fastly.com>
 References: <20250424002746.16891-1-jdamato@fastly.com>
@@ -101,141 +101,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Factor ksft C helpers to a header so they can be used by other C-based
-tests.
+Test that the SO_INCOMING_NAPI_ID of a network file descriptor is
+non-zero. This ensures that either the core networking stack or, in some
+cases like netdevsim, the driver correctly sets the NAPI ID.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
- tools/testing/selftests/drivers/net/ksft.h    | 56 +++++++++++++++++++
- .../selftests/drivers/net/xdp_helper.c        | 49 +---------------
- 2 files changed, 58 insertions(+), 47 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/ksft.h
+ .../testing/selftests/drivers/net/.gitignore  |  1 +
+ tools/testing/selftests/drivers/net/Makefile  |  6 +-
+ .../testing/selftests/drivers/net/napi_id.py  | 23 +++++
+ .../selftests/drivers/net/napi_id_helper.c    | 83 +++++++++++++++++++
+ 4 files changed, 112 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/napi_id.py
+ create mode 100644 tools/testing/selftests/drivers/net/napi_id_helper.c
 
-diff --git a/tools/testing/selftests/drivers/net/ksft.h b/tools/testing/selftests/drivers/net/ksft.h
-new file mode 100644
-index 000000000000..c30a02da903f
+diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
+index ec746f374e85..72d2124fd513 100644
+--- a/tools/testing/selftests/drivers/net/.gitignore
++++ b/tools/testing/selftests/drivers/net/.gitignore
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++napi_id_helper
+ xdp_helper
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 0c95bd944d56..47247c2ef948 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -6,9 +6,13 @@ TEST_INCLUDES := $(wildcard lib/py/*.py) \
+ 		 ../../net/net_helper.sh \
+ 		 ../../net/lib.sh \
+ 
+-TEST_GEN_FILES := xdp_helper
++TEST_GEN_FILES := \
++	napi_id_helper \
++	xdp_helper \
++# end of TEST_GEN_FILES
+ 
+ TEST_PROGS := \
++	napi_id.py \
+ 	netcons_basic.sh \
+ 	netcons_fragmented_msg.sh \
+ 	netcons_overflow.sh \
+diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
+new file mode 100755
+index 000000000000..356bac46ba04
 --- /dev/null
-+++ b/tools/testing/selftests/drivers/net/ksft.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#if !defined(__NET_KSFT_H__)
-+#define __NET_KSFT_H__
++++ b/tools/testing/selftests/drivers/net/napi_id.py
+@@ -0,0 +1,23 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
++from lib.py import ksft_run, ksft_exit
++from lib.py import ksft_eq, NetDrvEpEnv
++from lib.py import bkg, cmd, rand_port, NetNSEnter
++
++def test_napi_id(cfg) -> None:
++    port = rand_port()
++    listen_cmd = f"{cfg.test_dir}/napi_id_helper {cfg.addr_v['4']} {port}"
++
++    with bkg(listen_cmd, ksft_wait=3) as server:
++        cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
++
++    ksft_eq(0, server.ret)
++
++def main() -> None:
++    with NetDrvEpEnv(__file__) as cfg:
++        ksft_run([test_napi_id], args=(cfg,))
++    ksft_exit()
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
+new file mode 100644
+index 000000000000..7e8e7d373b61
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <errno.h>
 +#include <stdio.h>
 +#include <stdlib.h>
++#include <string.h>
 +#include <unistd.h>
++#include <arpa/inet.h>
++#include <sys/socket.h>
 +
-+static void ksft_ready(void)
-+{
-+	const char msg[7] = "ready\n";
-+	char *env_str;
-+	int fd;
-+
-+	env_str = getenv("KSFT_READY_FD");
-+	if (env_str) {
-+		fd = atoi(env_str);
-+		if (!fd) {
-+			fprintf(stderr, "invalid KSFT_READY_FD = '%s'\n",
-+				env_str);
-+			return;
-+		}
-+	} else {
-+		fd = STDOUT_FILENO;
-+	}
-+
-+	write(fd, msg, sizeof(msg));
-+	if (fd != STDOUT_FILENO)
-+		close(fd);
-+}
-+
-+static void ksft_wait(void)
-+{
-+	char *env_str;
-+	char byte;
-+	int fd;
-+
-+	env_str = getenv("KSFT_WAIT_FD");
-+	if (env_str) {
-+		fd = atoi(env_str);
-+		if (!fd) {
-+			fprintf(stderr, "invalid KSFT_WAIT_FD = '%s'\n",
-+				env_str);
-+			return;
-+		}
-+	} else {
-+		/* Not running in KSFT env, wait for input from STDIN instead */
-+		fd = STDIN_FILENO;
-+	}
-+
-+	read(fd, &byte, sizeof(byte));
-+	if (fd != STDIN_FILENO)
-+		close(fd);
-+}
-+
-+#endif
-diff --git a/tools/testing/selftests/drivers/net/xdp_helper.c b/tools/testing/selftests/drivers/net/xdp_helper.c
-index aeed25914104..d5bb8ac33efa 100644
---- a/tools/testing/selftests/drivers/net/xdp_helper.c
-+++ b/tools/testing/selftests/drivers/net/xdp_helper.c
-@@ -11,56 +11,11 @@
- #include <net/if.h>
- #include <inttypes.h>
- 
 +#include "ksft.h"
 +
- #define UMEM_SZ (1U << 16)
- #define NUM_DESC (UMEM_SZ / 2048)
- 
--/* Move this to a common header when reused! */
--static void ksft_ready(void)
--{
--	const char msg[7] = "ready\n";
--	char *env_str;
--	int fd;
--
--	env_str = getenv("KSFT_READY_FD");
--	if (env_str) {
--		fd = atoi(env_str);
--		if (!fd) {
--			fprintf(stderr, "invalid KSFT_READY_FD = '%s'\n",
--				env_str);
--			return;
--		}
--	} else {
--		fd = STDOUT_FILENO;
--	}
--
--	write(fd, msg, sizeof(msg));
--	if (fd != STDOUT_FILENO)
--		close(fd);
--}
--
--static void ksft_wait(void)
--{
--	char *env_str;
--	char byte;
--	int fd;
--
--	env_str = getenv("KSFT_WAIT_FD");
--	if (env_str) {
--		fd = atoi(env_str);
--		if (!fd) {
--			fprintf(stderr, "invalid KSFT_WAIT_FD = '%s'\n",
--				env_str);
--			return;
--		}
--	} else {
--		/* Not running in KSFT env, wait for input from STDIN instead */
--		fd = STDIN_FILENO;
--	}
--
--	read(fd, &byte, sizeof(byte));
--	if (fd != STDIN_FILENO)
--		close(fd);
--}
- 
- /* this is a simple helper program that creates an XDP socket and does the
-  * minimum necessary to get bind() to succeed.
++int main(int argc, char *argv[])
++{
++	struct sockaddr_in address;
++	unsigned int napi_id;
++	unsigned int port;
++	socklen_t optlen;
++	char buf[1024];
++	int opt = 1;
++	int server;
++	int client;
++	int ret;
++
++	server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
++	if (server < 0) {
++		perror("socket creation failed");
++		if (errno == EAFNOSUPPORT)
++			return -1;
++		return 1;
++	}
++
++	port = atoi(argv[2]);
++
++	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
++		perror("setsockopt");
++		return 1;
++	}
++
++	address.sin_family = AF_INET;
++	inet_pton(AF_INET, argv[1], &address.sin_addr);
++	address.sin_port = htons(port);
++
++	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
++		perror("bind failed");
++		return 1;
++	}
++
++	if (listen(server, 1) < 0) {
++		perror("listen");
++		return 1;
++	}
++
++	ksft_ready();
++
++	client = accept(server, NULL, 0);
++	if (client < 0) {
++		perror("accept");
++		return 1;
++	}
++
++	optlen = sizeof(napi_id);
++	ret = getsockopt(client, SOL_SOCKET, SO_INCOMING_NAPI_ID, &napi_id,
++			 &optlen);
++	if (ret != 0) {
++		perror("getsockopt");
++		return 1;
++	}
++
++	read(client, buf, 1024);
++
++	ksft_wait();
++
++	if (napi_id == 0) {
++		fprintf(stderr, "napi ID is 0\n");
++		return 1;
++	}
++
++	close(client);
++	close(server);
++
++	return 0;
++}
 -- 
 2.43.0
 
