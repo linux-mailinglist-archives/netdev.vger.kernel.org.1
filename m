@@ -1,266 +1,98 @@
-Return-Path: <netdev+bounces-185343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2CEA99CFF
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:29:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECA7A99D0A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D604637DC
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:29:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E82C5A594E
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FCC14B086;
-	Thu, 24 Apr 2025 00:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AA510F9;
+	Thu, 24 Apr 2025 00:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CZVwc8F1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayaEoUD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC0D14830A
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6ED634;
+	Thu, 24 Apr 2025 00:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745454503; cv=none; b=q5bO7PvOrsLTwNsGQp2EaFI79PMMFtzTLHO1pgprg75iOkYE7QQ/byzzrfk7B/lpUZwckIx66Vc9GhggEIpfqfpW9ck0CORckUxArgoG9ZLA99NuO0pJPl/xhsillvtKzu4wzKXXToqzv8Et7DmeFQ2Ut1aKdWYX4VnNRPGYKlo=
+	t=1745454753; cv=none; b=K6YrLRPrDYAiQn1Z2QieQ2g98JUgYZDE4ReNn4PPEGX/6fguANC2dZMgBOLu4JtXXOR/NTXpfrIrkynH5X0FPIfmgNRtbzBNYO6YsIAyUauvq5PdpbqBE5xCAD15Keh0ccjyK/XNilkooecVjqw2mNoMj/3KmZcsN35A5o4fuAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745454503; c=relaxed/simple;
-	bh=XfejFVfUeNjlcemQvV2FfBGjQHl1uJWERTzwSMmvtPw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U3/YuHfrf9KAbrQL+sdEtzi9jMjZuwzuuCPqfM2oAK7grhqEt/Ci73A2OMoLyMJRxfGwsZ235B1ZCoOgreVZ46t/C0A57ox6tCJcsr9fBNncK0cefYq1tUIKiMeXy9BRbgt4tJ32wlYGuhSL08EulCugc341h97iAGsTQJ8Qxh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CZVwc8F1; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-306bf444ba2so442684a91.1
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 17:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1745454500; x=1746059300; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fONRRd0VBHmSB/DlTOXXKEWrq2Lhm3txVCS1ybmwFg0=;
-        b=CZVwc8F11k7fY5c1ugrngaTYmJym5j4Dcu5OdVucrMo2750HaMBRAzJlzaahoxeF24
-         qObiytR+EFDvHzQ/mQn4YBNW1HiPo8u7X12p786Mk9RDWGUriQroOaViSmEGQVAL6itK
-         WMNcX5ycXz4pS2dZ+crZncqfLudYrE8R5n55A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745454500; x=1746059300;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fONRRd0VBHmSB/DlTOXXKEWrq2Lhm3txVCS1ybmwFg0=;
-        b=ucZlj8fExS4y8eHWfDk1jILNApAx+pcrpfSB3eKPcpnLhKYmjqjuJQtpDuONXjWs7q
-         MhpU2IdslBiKo0l0Nl79xQnsF2eSq8BhYXtbZJU9cxJMyaeQjA0IgdG/OZ+BhTOpZRAD
-         af4PPrOeuatVTFG8bqTygeAx2FFThbXIkejGu8gGgedVUas+qPFFR+S837LyARvCP/A9
-         uKziMt6BfprhLGJi0hsR3JWyHp1a5ehtQ5qGrM8A7MU8j0R7pSLNsNdvuOk9/gYWDXGc
-         jZWRDZx8peNbDLTmc88TLvya+3Fe+Kbg6TizPFQxCzOxl+0rX4EzBFXM22SM5EfN+uoy
-         aNvw==
-X-Gm-Message-State: AOJu0YyyS8KDyK2h96ABDQi1Qd7l8DcSpU39ocYpMVlVlU60C9CO914D
-	oufqJykLdccFhYaGg6JKPWczCLyp0rA7xvQt6p0VBZCPsI55hMvHowfJbNbLMM4kY7QHIJWV7al
-	DMRgZyM3plyk0wUKQqMoFzn8POuJSFk/v1pNvECeFb0iEJTVWqxj7aMjvU9ajZojNUmbDmqQriw
-	fpzPLgH7E0S59L8zw1gqbZdnV1rBu5Hm8uu04=
-X-Gm-Gg: ASbGncscTteVM1U9tRJqTKvgWCekUQty+sN0druXJM2DJ0u1LSHAGOQWmJwH3L6OIHU
-	63Kli7qUNAJ4lu8g8wUQI7trEj+BwRYc/ciD3bYC0UhzzGK6Ld7zAUy3qzqW+b7lJ9etuR21JDA
-	SBTeYq2vg7vpypva9ZLbdGHZVQSkIB6kAkboU0x4sfo0OQM9TyIie4pmWTF8UStG+tAx/r33UZG
-	s1IKhIxB+xV6sQq7rPwtXpGs7J9vgOk7pabA8nFY1IHJaz1AIMlzRilMfpemuPHOqZKYTIi+itr
-	vzG32NywOVrcC90ekond02eNidZKDqifHfFXLDuJ/bOc0oZ/
-X-Google-Smtp-Source: AGHT+IHQIolOk+n262eCIIoMGQ54RpktEuMS5r9p2G6tZQeOFE8Ai42mQoK9PW7YbvD0WD0iY5WqEA==
-X-Received: by 2002:a17:90b:2752:b0:305:2d9d:81c9 with SMTP id 98e67ed59e1d1-309ed2805d0mr1116420a91.16.1745454500436;
-        Wed, 23 Apr 2025 17:28:20 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309ee7c4054sm83013a91.23.2025.04.23.17.28.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Apr 2025 17:28:20 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	shaw.leon@gmail.com,
-	pabeni@redhat.com,
-	Joe Damato <jdamato@fastly.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: [PATCH net-next v4 3/3] selftests: drv-net: Test that NAPI ID is non-zero
-Date: Thu, 24 Apr 2025 00:27:33 +0000
-Message-ID: <20250424002746.16891-4-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250424002746.16891-1-jdamato@fastly.com>
-References: <20250424002746.16891-1-jdamato@fastly.com>
+	s=arc-20240116; t=1745454753; c=relaxed/simple;
+	bh=cR3TCvLS3jMlfbS0rKdZV7/VIl42dYXU2s5/UI/x3QI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=br2gWyj9aq1TtIKruD4El/lbc+Caq/XFCB70U/r5syqJDmdeitxoTeO0rCGteI/ItUjQqA0r0TIZHKjYcWUwojrsbzVMcp+6ozY3S2nEIaa41T9bKxP2y0tx05VHRf5jvwfXpUP5MixxwDa34F65KMEf6n8v7PGb0eNF2/6c730=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayaEoUD5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C23C2C4CEE2;
+	Thu, 24 Apr 2025 00:32:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745454752;
+	bh=cR3TCvLS3jMlfbS0rKdZV7/VIl42dYXU2s5/UI/x3QI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ayaEoUD5+uornete260/fxlWq3b/tvUsHFY7rXlMSrgK993/YFetwx91JlQcUeYo/
+	 7+aMLEkO1ELL5s4VvZ6GQZ4krrj4Cjqk5y8DU4d3YoqSGMvJTDr2nQZUPbbUfb2Bv0
+	 96dDUdhNNsiYnDAIi0PX6zc/5O0eCQa3E3LnezZgDJzkhQMeD7zs0QUldHx4jwGsRt
+	 d7UamGYYHvzEpOx1h53iSzX+BH1m3cdnY6Kmf2oehN9NEvEnw4KmANVbCkBc4lz6YJ
+	 Y6QTISSkIjHdHgXsSTRv0kUSSuYiUTAGz0uDg6jmZG1QGcfqtR/7MRRBZ54RnvszMw
+	 uYljnw2l50JKg==
+Date: Wed, 23 Apr 2025 17:32:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni	
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima	
+ <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor	
+ <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 7/7] net: register debugfs file for net_device refcnt
+ tracker
+Message-ID: <20250423173231.5c61af5b@kernel.org>
+In-Reply-To: <a07cd1c64b16b074d8e1ec2e8c06d31f4f27d5e5.camel@kernel.org>
+References: <20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org>
+	<20250418-reftrack-dbgfs-v4-7-5ca5c7899544@kernel.org>
+	<20250423165323.270642e3@kernel.org>
+	<a07cd1c64b16b074d8e1ec2e8c06d31f4f27d5e5.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Test that the SO_INCOMING_NAPI_ID of a network file descriptor is
-non-zero. This ensures that either the core networking stack or, in some
-cases like netdevsim, the driver correctly sets the NAPI ID.
+On Wed, 23 Apr 2025 20:04:58 -0400 Jeff Layton wrote:
+> On Wed, 2025-04-23 at 16:53 -0700, Jakub Kicinski wrote:
+> > Names are not unique and IIUC debugfs is not namespaced.
+> > How much naming the objects in a "user readable" fashion actually
+> > matter? It'd be less churn to create some kind of "object class"
+> > with a directory level named after what's already passed to
+> > ref_tracker_dir_init() and then id the objects by the pointer value 
+> > as sub-dirs of that?  
+> 
+> That sounds closer to what I had done originally. Andrew L. suggested
+> the flat directory that this version represents. I'm fine with whatever
+> hierarchy, but let's decide that before I respin again.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- .../testing/selftests/drivers/net/.gitignore  |  1 +
- tools/testing/selftests/drivers/net/Makefile  |  6 +-
- .../testing/selftests/drivers/net/napi_id.py  | 23 +++++
- .../selftests/drivers/net/napi_id_helper.c    | 83 +++++++++++++++++++
- 4 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/drivers/net/napi_id.py
- create mode 100644 tools/testing/selftests/drivers/net/napi_id_helper.c
+Sorry about that :(
 
-diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
-index ec746f374e85..72d2124fd513 100644
---- a/tools/testing/selftests/drivers/net/.gitignore
-+++ b/tools/testing/selftests/drivers/net/.gitignore
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+napi_id_helper
- xdp_helper
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 0c95bd944d56..47247c2ef948 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -6,9 +6,13 @@ TEST_INCLUDES := $(wildcard lib/py/*.py) \
- 		 ../../net/net_helper.sh \
- 		 ../../net/lib.sh \
- 
--TEST_GEN_FILES := xdp_helper
-+TEST_GEN_FILES := \
-+	napi_id_helper \
-+	xdp_helper \
-+# end of TEST_GEN_FILES
- 
- TEST_PROGS := \
-+	napi_id.py \
- 	netcons_basic.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
-diff --git a/tools/testing/selftests/drivers/net/napi_id.py b/tools/testing/selftests/drivers/net/napi_id.py
-new file mode 100755
-index 000000000000..356bac46ba04
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/napi_id.py
-@@ -0,0 +1,23 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_eq, NetDrvEpEnv
-+from lib.py import bkg, cmd, rand_port, NetNSEnter
-+
-+def test_napi_id(cfg) -> None:
-+    port = rand_port()
-+    listen_cmd = f"{cfg.test_dir}/napi_id_helper {cfg.addr_v['4']} {port}"
-+
-+    with bkg(listen_cmd, ksft_wait=3) as server:
-+        cmd(f"echo a | socat - TCP:{cfg.addr_v['4']}:{port}", host=cfg.remote, shell=True)
-+
-+    ksft_eq(0, server.ret)
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([test_napi_id], args=(cfg,))
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
-new file mode 100644
-index 000000000000..7e8e7d373b61
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
-@@ -0,0 +1,83 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <arpa/inet.h>
-+#include <sys/socket.h>
-+
-+#include "ksft.h"
-+
-+int main(int argc, char *argv[])
-+{
-+	struct sockaddr_in address;
-+	unsigned int napi_id;
-+	unsigned int port;
-+	socklen_t optlen;
-+	char buf[1024];
-+	int opt = 1;
-+	int server;
-+	int client;
-+	int ret;
-+
-+	server = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-+	if (server < 0) {
-+		perror("socket creation failed");
-+		if (errno == EAFNOSUPPORT)
-+			return -1;
-+		return 1;
-+	}
-+
-+	port = atoi(argv[2]);
-+
-+	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-+		perror("setsockopt");
-+		return 1;
-+	}
-+
-+	address.sin_family = AF_INET;
-+	inet_pton(AF_INET, argv[1], &address.sin_addr);
-+	address.sin_port = htons(port);
-+
-+	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
-+		perror("bind failed");
-+		return 1;
-+	}
-+
-+	if (listen(server, 1) < 0) {
-+		perror("listen");
-+		return 1;
-+	}
-+
-+	ksft_ready();
-+
-+	client = accept(server, NULL, 0);
-+	if (client < 0) {
-+		perror("accept");
-+		return 1;
-+	}
-+
-+	optlen = sizeof(napi_id);
-+	ret = getsockopt(client, SOL_SOCKET, SO_INCOMING_NAPI_ID, &napi_id,
-+			 &optlen);
-+	if (ret != 0) {
-+		perror("getsockopt");
-+		return 1;
-+	}
-+
-+	read(client, buf, 1024);
-+
-+	ksft_wait();
-+
-+	if (napi_id == 0) {
-+		fprintf(stderr, "napi ID is 0\n");
-+		return 1;
-+	}
-+
-+	close(client);
-+	close(server);
-+
-+	return 0;
-+}
--- 
-2.43.0
+> When I was tracking down net namespace leaks recently, it was very nice
+> to have the inode number of the leaked netns's in the filenames. I
+> would have probably had to grovel around with drgn to figure out the
+> address if that weren't embedded in the name. I think we probably ought
+> to leave it up to each subsystem how it names its files. The
+> discriminators between different types of objects can vary wildly.
+> 
+> One thing that might be simpler is to make ref_tracker_dir_debugfs() a
+> varargs function and allow passing in a format string and set of
+> arguments for it. That might make things simpler for the callers.
 
+Yes, cutting out the formatting in the callers would definitely 
+be a win. Maybe that'd make the whole thing sufficiently palatable :)
 
