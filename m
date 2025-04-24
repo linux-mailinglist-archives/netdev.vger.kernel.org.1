@@ -1,303 +1,150 @@
-Return-Path: <netdev+bounces-185377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1151A99ED3
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:33:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD26AA99ED9
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BD99447C02
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895085A2665
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAE52D052;
-	Thu, 24 Apr 2025 02:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C93B199230;
+	Thu, 24 Apr 2025 02:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="O8RCMOJa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AbmL8+/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020103.outbound.protection.outlook.com [52.101.46.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1BF4C62;
-	Thu, 24 Apr 2025 02:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.103
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745462009; cv=fail; b=tARV2btZAc+0evs76aoZezZ7nSjLB18z1MLqzvronCkkkVYKxMHjJcMCKnpO9J405zNBxm81ieik2725RJ/zmKslg8Z1VQhiv8FzKEiY0qNaYNXYI9Kgipq6h5Z09zpNhazzgLFMAiKhUn/y5Vs6r9sXNl1wNpzSrRZrY4J1nUY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745462009; c=relaxed/simple;
-	bh=qOaIa4nwG4kyvtZWoHpRhi+efaj1i5sDGuU87rWITnA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IzUx3WrMfb38wfPJGWSRLMKr+TbXa09h+PXhW1TaS8YdDJqirA/qe2Nu6hRfkYxXCwbXDD77sRdtFjrtXR5NArbaBYdbRRyxERRQ3YptluNFwyvOic1dzAboP2Spfn5GaMGwKeFFZrcGRms1+h+L7wuOYG7fAmJHRB62nfbSQLg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=O8RCMOJa; arc=fail smtp.client-ip=52.101.46.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iYvLgbugNn/qjM6n4iV0Qf0oVFCD37rH7xxxhd0RxcNII5+BpTfSAdePc5xmV8FNoc30eFzkkgRVWarWniQOyjqwQGMn7oeB2Q7ptxl8k2eJ34lWTM15eXCR0IwNMwbszSHEdDxtlDGC709gJDR4/ChuA/ImlWFSLKFVkk+A9byxWig39srVtvvnTovMwfatFwg7PdmisXNllhtRZcHm0Ku++qVTwRZ8iyNTMVxF7wCobLFgu/TEMKw/IcoLnlEyJHTfN/QVzNsmuO9lq6qZcVSq3NEvzuvS2er1o6cK3KDiHbZrUxAxnP08ejj4H1wndaiOab7KrX5QmXvIqMyoDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3TrI84zhc0EVbSJiPh02Qc5qv6Ziawl4vg5I6LZJIYY=;
- b=ceekOtOEjep/8rjiJ+hv98Ocs2x9n3LG2oK8uyHsEntwjg1cB1xhx93S4hGs9+A1kDmt3PPHyJjCwhzf9UB9flzgz4eZlCnUSuFFND1A2L2UUWoftLT0yn1khUSdHW/BqAmFws2uUPM2Fybyn7J/YtG7gu5f63wJdsW8exe6OCsXb8pXjlDaUMqp78daEQ8TNNPtc/nITtd50VgWMOOT/gkjOdmMtwlKUBV8jG52RrJpsN90cnW/eli9DMLFccRC8srGrTxlK7yHo3PvV2AjU1Rs3DOvsasj25O6HlctfAZZSbKdtR/Osugcdp0eWiWFxmtQAHWYzP0hsvYwIGh3kQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3TrI84zhc0EVbSJiPh02Qc5qv6Ziawl4vg5I6LZJIYY=;
- b=O8RCMOJanSSyBOFn+IgYIxbBlr+cQovoglD9wGh+gjeqto7iOiOloSdRB7rdZLU3O6GneJhvZlFe12YWCfFgFACCSsuMTHmdQ7M7JWyUmmZAhah88mWt+PfA9HP16s5lTch0o1GUd/ERGbjwS9OQYVP7hj5uEaKYHdE6DOA15uA=
-Received: from BL1PR21MB3089.namprd21.prod.outlook.com (2603:10b6:208:391::12)
- by BL4PR21MB4107.namprd21.prod.outlook.com (2603:10b6:208:4e5::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.19; Thu, 24 Apr
- 2025 02:33:24 +0000
-Received: from BL1PR21MB3089.namprd21.prod.outlook.com
- ([fe80::f6b2:5f93:61a6:a868]) by BL1PR21MB3089.namprd21.prod.outlook.com
- ([fe80::f6b2:5f93:61a6:a868%4]) with mapi id 15.20.8678.012; Thu, 24 Apr 2025
- 02:33:24 +0000
-From: Shiraz Saleem <shirazsaleem@microsoft.com>
-To: Leon Romanovsky <leon@kernel.org>, Konstantin Taranov
-	<kotaranov@linux.microsoft.com>
-CC: Konstantin Taranov <kotaranov@microsoft.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, Haiyang Zhang <haiyangz@microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, Dexuan Cui <decui@microsoft.com>, "wei.liu@kernel.org"
-	<wei.liu@kernel.org>, Long Li <longli@microsoft.com>, "jgg@ziepe.ca"
-	<jgg@ziepe.ca>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH rdma-next 4/4] net: mana: Add support for auxiliary device
- servicing events
-Thread-Topic: [PATCH rdma-next 4/4] net: mana: Add support for auxiliary
- device servicing events
-Thread-Index: AQHbtMFAQiaPHyciUUOE/xYtlfRnjA==
-Date: Thu, 24 Apr 2025 02:33:24 +0000
-Message-ID:
- <BL1PR21MB3089EF4639B5CC2AD5E70B96C9852@BL1PR21MB3089.namprd21.prod.outlook.com>
-References: <1744655329-13601-1-git-send-email-kotaranov@linux.microsoft.com>
- <1744655329-13601-5-git-send-email-kotaranov@linux.microsoft.com>
- <20250420105309.GC10635@unreal>
-In-Reply-To: <20250420105309.GC10635@unreal>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=6c20e972-4ef2-4c33-9203-cd5340149c12;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-04-23T20:15:17Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR21MB3089:EE_|BL4PR21MB4107:EE_
-x-ms-office365-filtering-correlation-id: bc637cbd-dff1-4520-b174-08dd82d86310
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|10070799003|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?baSUtdHtFSC5PWSUnlBJs/Sgi3m9jaVEtoetYqnpWPB/pWAHTgnfQtMsQ0fW?=
- =?us-ascii?Q?8u9lLmvicMIdIrnKInVeBOHLFIrJESLIn52mV6CGuapXrc5UFdsWMUDS8BL1?=
- =?us-ascii?Q?sysZjV4LG2J3Tuz8sbwlPx4d1Z1iDMZtspAjCTs+7DKXYdDOj73qhDROymN4?=
- =?us-ascii?Q?VFF57GRKwOjUZ6Q639ZgqvfNZDwLzR3Kl+p6FalDkf+wNGUUR7zvgxu87PH6?=
- =?us-ascii?Q?/pXa+3ltNKtYNIgMY8DKPk+aKSRqvAZR1VbReMiXWeD1NcAL7NEdpqJX7Vhb?=
- =?us-ascii?Q?h4PWVCajj+Ej4diFFZsMKXsuDrroAaxgRcQb7p1Cfv4tkJkzJjCCyNpSlvVK?=
- =?us-ascii?Q?i3KM9gtghQ7XGb5lss0I8TQytjqPcn+ieqvYactZHRdd/6hBgeLI7+6mplbu?=
- =?us-ascii?Q?U/r3FQvb2Sc4epX02MdYmr3/1zgIoX2nqdRHgU3K4NLDxwpM11VYwyTgocYz?=
- =?us-ascii?Q?KcXvtFDIZDtJRe5TNkWt753kRIRrgdRf0iOkkv+wHUbaC/MTItDmnBGtif3Q?=
- =?us-ascii?Q?RhceVe5ft5rL9F1KASLJO8S4uGpzXI5ncYjVKQqHybIiG7tFZ2xcINw199wc?=
- =?us-ascii?Q?GW/dJZMTfILGGR5gJVlXMgCeKjAYOR4G93UYJD92galDglnP/ZwoqL9mGQcr?=
- =?us-ascii?Q?PczoxeLBmCtAZcV78foI4moJcWDZIZ5AHFGy085WDS9a7f+E9A3TQmi8Uazm?=
- =?us-ascii?Q?N8dadabtQgZDkJmXju1h690Hf2hJh6ISbUkwl00DVr32qzvqyCznz1wsHgj4?=
- =?us-ascii?Q?5v+wTrytDpLoTZxEG52mBghFV0jm2btA2hDsPgKKeQqme4nHpADSgARCwP6+?=
- =?us-ascii?Q?AtZnxeX1qFQSE0GCbY5aLIv6lYgCRk3pwbzvLch8AUmyuZweoXTf0K+lu53z?=
- =?us-ascii?Q?E9D7iamK7uGvTSWfxxwLYMHwLYqRUeAAqXoAGaOsw8n70xPrmP0GsroJhovn?=
- =?us-ascii?Q?WQMmKMaSi8ZNqSQX0a/b4yevFjZZj1ckyk17cHT/v/enpmb8BMdRP/K+ltv/?=
- =?us-ascii?Q?sFU+ekCAPJUZ1Pk17jIoaRfjH29lRhbd8eXzpmEaq17RSJSpluDf6lzDfAbq?=
- =?us-ascii?Q?vrLuX+94ud49a2YZ5KtJcNVbA3ch+yP5/A+BEM8JQl6PmgVl9RprErYH0m5+?=
- =?us-ascii?Q?aGxE+NW64Y1Locz8xKRYt/813J1BT3YfLqJFzSzCN4Vo5F631PpzbmdtRs44?=
- =?us-ascii?Q?8D8XrA6EforjcXuZjOxPHb8VEazEDqXgdFqE/FVqO02ZAj5XiP8kDdK/lZTw?=
- =?us-ascii?Q?5bNcDfMGlwudvqJJtYFJ/2rdqHalsEXTMl64SkwhIm96NrT2Ky53DeMbCx3I?=
- =?us-ascii?Q?M8gq3taus4cS4RJ5P4C7O3+Pg5imEllYJaFE/VBOPaLdzNcUWrqaToWVOuIo?=
- =?us-ascii?Q?I1G6Lb49gdMdC4SQxPu802DgQ9TsmpV8ENmngL/pvW4BLN5/nMtujywUvSHc?=
- =?us-ascii?Q?WeqUNXvtawVSvvKpgThYWoz5Y9hVm0035hdJGQ9Usy9hM9bYnpftueHlhqTS?=
- =?us-ascii?Q?I1ZWHvnuLVInp7A=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR21MB3089.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?IEbGDHY2uo7Y2sgKc635oGOOJolfR/8W+TorIbgkXpAMMTjkSuCJtSAalVkU?=
- =?us-ascii?Q?/wIO/yJkSh+0a14GstdICuggRfwdzK6m6vEk/CnO0eGKSoD/LQEhgBqhMyHq?=
- =?us-ascii?Q?rCMl2CF0jktdlQzr8aniIw30mBdiEHMVzTYOFhiza/8PNjc8EmLhQvaQBBqL?=
- =?us-ascii?Q?3RabTggBjYGzi9bTvnOjA9JF+BqdFNPvo4Nm6/voNg4hTQA6mrOU4D8jB4nt?=
- =?us-ascii?Q?/sAIK3B2/8Xll59Bm6pBzFjHCNEqS9dEpfY6V9mVuX4JO7JPFilzeMEV7DRc?=
- =?us-ascii?Q?gPp6Y2JEplYaPhzZv9sQ+zqRE5Fpk94112b8TV2BNbamw3Cyw4CDvXZIjBul?=
- =?us-ascii?Q?nDwrDu/sIc55SXEqvn9OkVWd/Hv1kQMkK7sQIq/J/r5c8KeW1O6DbkWrXDxV?=
- =?us-ascii?Q?r12GaDR4YyrSQOdXr0rwxA9rU1xWMmccbPhqv9cE1Kmvw7bf5FQCXZFJHALc?=
- =?us-ascii?Q?J15T8KcVocxuW8pVZv7wzk+DPZezoFfdpHidE8trh/D5lz0XhX4Z4EEaQOAv?=
- =?us-ascii?Q?4SOfg292CBCuymrChhit3x1nzJbKidf+wh3aspVGwHSbAXIIo7TLZftQyy8S?=
- =?us-ascii?Q?QYeAei1Ezor9uoU8DaRXQsjxql0THZPnDSk7Epf7CEQ77bmsOo7JfS09PINH?=
- =?us-ascii?Q?00MUsMIesCE+uP3XC4Oiffb2pnILhhXo1Kqzy5S5qSA43PoV6YNEvE0qvrbB?=
- =?us-ascii?Q?70sI5ZkRzEGkLABOYZ8h4z5ZyjWiqgtkDrPiKT/X8KxCk2LIrUXE29WssCZe?=
- =?us-ascii?Q?8eyS6g2WrtkSrSrH2R3aE6D+kKwnkNRPWRmLbX4sMcMfY+uDBaODNYu2fWQj?=
- =?us-ascii?Q?De/axoLt6RQWZPOuYYzY3mUeFQQmH22MdHaGciWuvMwHLF8/XE4lgDvaTJsD?=
- =?us-ascii?Q?ryV5vzUTaAIWqV1MqxuNXP6j/tyutpH3mKYIlbpIMbvMByAUt5AtdEgGdzhd?=
- =?us-ascii?Q?fxmwgnp2aFPIV78D924rAjOo2aPRsrjvFYs2MJRfSjGa6eOs98kFbHr+YGtQ?=
- =?us-ascii?Q?Sql9vnc4v4f576PK2p+vzUx/7V21zGUXNRuZxh+RcGOwmqHnRAROQg0apQS9?=
- =?us-ascii?Q?bQJ+ivntaPrPT3A4Df0yJz/I0HkDUjBL94WlNFbadVI2Hr7CXkWddJmx3ANv?=
- =?us-ascii?Q?FwgltSzzMEvEkn8IHsgcsJIk/SDAGRZVvbm+WUiGHlzh5t1tomQ+ttitYY56?=
- =?us-ascii?Q?vk/S4M7ZVMn7zte6hYq2BVm14z4HXBldaR/SbiuP1jD1gFfEwddlzXLkGJTZ?=
- =?us-ascii?Q?T3y5WK3CyDLmno1u0jyoQrCrsUMl0oVhLb46jYcKjZjUgXtCVCp+CTxACOWp?=
- =?us-ascii?Q?9l6JsQF7yjiML0wE02XDv+QCAoZ7Ut+dWByB47hKRaqqHq3TQGML1KXUEuU9?=
- =?us-ascii?Q?k6bzt/lM9hoZuVoCvXCvak7qlOb+STWxMHThUj///vApfz8bL4xFpxxn/FM8?=
- =?us-ascii?Q?vWbYjY7bybqmP91Riz+kGKTQOukSSdfE27gVhrHxPaW4TKX63QGl0r4sZJoX?=
- =?us-ascii?Q?3t/hYEqLM+pvLcezpBv8axsHOIEqkcNfn4G8BW7wZM6LF0mJ3bdeO2lKY6cV?=
- =?us-ascii?Q?+FuOO6lsfQGZlogsJQ/Qs5F6SjKe00odet5dGka7?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DD02FB6;
+	Thu, 24 Apr 2025 02:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745462047; cv=none; b=OlBM3F3FwdbZXCfgsFlo38QAHFfctPEMtMdjbNkFzIPGROx1zxf6TqEvCxrZe0aSha5IOEOuraZWJpfmj42ffKZCa7DZW8+ZE1j2GUWwLfcMQ6g0athNFQCOO2/e+1O7n4/9JhuxI3RI4GChUu7wgGlyxK4fgo52M4HmOFlgkpw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745462047; c=relaxed/simple;
+	bh=pxteP8c9nih6FWtnz3T9WLQSW/Z3uyVlypeiNd3IH00=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lzn1v13nN+OXsY+rOZkKLCnCJ8gHwnFFUhczMh7AaY+5aZNJWWZ77oKBmxVuP1U7N5cR6Ltq8Pqq7evmCGtkR6LW6qokIotgf20S7N+B6/YPZ83fJZrEFjBpr8uPJKytxpmfJu1WVS3P7BY4uL/xG9rJNBjBqZCHkh4X8BOjzQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AbmL8+/Q; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-440685d6afcso4738405e9.0;
+        Wed, 23 Apr 2025 19:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745462043; x=1746066843; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xFTaVhD7rf7VbkXiFfyg/2sZb+zmUP6BdApymTTnxnc=;
+        b=AbmL8+/Q8lxCQF9hBaYzgMZZUBypu5MJNSGPOhe/MhyVcBX3IZviCyZZKySr5ICMA6
+         E7qDQeKxLtSlXELzpW6ZVqmqg37MCJP30NSO/8Bwr90zk6uUtfi7VohhzY1Qbx/sG91+
+         yWuxmMne9Mr9UZG0/OUH0flbqjM4QcmxAiYIzuy+BkgnO0NsyFsZ/Tqoswnvb99f2hzI
+         0/bh7xy56auQYTNnv5G0x9XecvolxfF+SkZTZFdHW+ddy2LwZNXJxrxB3NGQMxebE0y4
+         KvWhV4bJzQfXiDsr6PruUaf7qyMskGgruMo6FGNFd6OeGy2xWNfWf1CFK+43yQOQg3gY
+         jyig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745462043; x=1746066843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xFTaVhD7rf7VbkXiFfyg/2sZb+zmUP6BdApymTTnxnc=;
+        b=Y2j7ZpBh/uTFTNoPI5oNcUCeSf+QkZwgyygKOVm2wKeZ2WDcjaC9XFnmLu8uiPUBCE
+         EPcn7+IyACAd4Dq/HwS6lB01HrhtutNC+B9luzBPqek3R683krt4DvAA+DIEP7YVfvXP
+         c6Ruu8WVXtw310zhZDSmY/+h3NhEbEadW2dUgUXoD3N+Dj+In9somMfhp7VTZh8uB/7C
+         dYogj7IMunUzIO1+eRwSN34t3lA7RS/D/pfDdRRZBuOsfb4VzqvILEjrrvXWBVxf3mYn
+         45lBEaPI+XeRlKP/Pt5beQn9LlB7q3nUv1SaDsokqKA2yE0lWp+O09AX7PuwqD+izMTL
+         6Q1w==
+X-Forwarded-Encrypted: i=1; AJvYcCVP3mrArYzj0CJr3hqGIKmhv44ZRRO1SVxxvDvE4GDaQQa3SvfSTLzX7kRkm27WjvsrFJo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1Mt8u8XrgJ06L5/ebXnfgE4OtiDi37TkFSK2NcF8++nRsZIjR
+	WgINs3kkBttZzUoayFNUYTGzkqqkBv0jLC6a/JsnrIAJX7BsDZ4kglxLcoE5g8JMfCnKPo6h75/
+	3mIlMC8s6geQ6Tce0jm9KvYWRYM4=
+X-Gm-Gg: ASbGncvqt9J78QiHrmEDrglWVmpRImynauELLtHvzqjNga3N1HBHnEkdn1bTZli5RFU
+	JsGDrM6mkjGQeQLjr1yHhbNuaPu9ahXW3Kkcz2LtnfxrjC4lDO97OZekckLZeIh8FSF0c+i0s34
+	sQ2psBNw/0pXkaJ/judiYPQEZ3mQS/dkNhQr4XUQ==
+X-Google-Smtp-Source: AGHT+IF8TvFmJ33FpLgpqCFNu87qzE8ifA3YVnDAq7z6lp8KPe5Zd3izxQWlagoPBTJpy3OrEPLlBptvSq4OeyKd63w=
+X-Received: by 2002:a5d:6d8a:0:b0:391:2c0c:1247 with SMTP id
+ ffacd0b85a97d-3a06cf4b81cmr438595f8f.1.1745462043263; Wed, 23 Apr 2025
+ 19:34:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR21MB3089.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc637cbd-dff1-4520-b174-08dd82d86310
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Apr 2025 02:33:24.2806
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8bHMkOMeOJBvyOErJLsWqzjHX5tU+XHcDMA31a/vTUVrKvWcBkUY/rP5xS2MlQFoBoYMfTefAVPkLi/D/O/ppO+U9mjmI3hzSOt4goEeVb0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR21MB4107
+References: <20250423235115.1885611-1-jordan@jrife.io> <20250423235115.1885611-3-jordan@jrife.io>
+In-Reply-To: <20250423235115.1885611-3-jordan@jrife.io>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 23 Apr 2025 19:33:52 -0700
+X-Gm-Features: ATxdqUHBYB6MUtTMz5OmejU3qdoInVgdbtNZc6mKe7JQ4mHwoKVMZEjlewA0Vxc
+Message-ID: <CAADnVQLTJt5zxuuuF9WZBd9Ui8r0ixvo37ohySX8X9U4kk9XbA@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf-next 2/6] bpf: udp: Make sure iter->batch always
+ contains a full bucket snapshot
+To: Jordan Rife <jordan@jrife.io>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Aditi Ghag <aditi.ghag@isovalent.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Subject: [EXTERNAL] Re: [PATCH rdma-next 4/4] net: mana: Add support for
-> auxiliary device servicing events
->=20
-> On Mon, Apr 14, 2025 at 11:28:49AM -0700, Konstantin Taranov wrote:
-> > From: Shiraz Saleem <shirazsaleem@microsoft.com>
-> >
-> > Handle soc servcing events which require the rdma auxiliary device
-> > resources to be cleaned up during a suspend, and re-initialized during =
-a
-> resume.
-> >
-> > Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
-> > Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-> > ---
-> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 11 +++-
-> >  .../net/ethernet/microsoft/mana/hw_channel.c  | 19 ++++++
-> > drivers/net/ethernet/microsoft/mana/mana_en.c | 60
-> +++++++++++++++++++
-> >  include/net/mana/gdma.h                       | 18 ++++++
-> >  include/net/mana/hw_channel.h                 |  9 +++
-> >  5 files changed, 116 insertions(+), 1 deletion(-)
->=20
-> <...>
->=20
-> > @@ -1474,6 +1481,8 @@ static void mana_gd_cleanup(struct pci_dev
-> *pdev)
-> >  	mana_hwc_destroy_channel(gc);
-> >
-> >  	mana_gd_remove_irqs(pdev);
-> > +
-> > +	destroy_workqueue(gc->service_wq);
-> >  }
->=20
-> <...>
->=20
-> > +static void mana_handle_rdma_servicing(struct work_struct *work) {
-> > +	struct mana_service_work *serv_work =3D
-> > +		container_of(work, struct mana_service_work, work);
-> > +	struct gdma_dev *gd =3D serv_work->gdma_dev;
-> > +	struct device *dev =3D gd->gdma_context->dev;
-> > +	int ret;
-> > +
-> > +	switch (serv_work->event) {
-> > +	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
-> > +		if (!gd->adev || gd->is_suspended)
-> > +			break;
-> > +
-> > +		remove_adev(gd);
-> > +		gd->is_suspended =3D true;
-> > +		break;
-> > +
-> > +	case GDMA_SERVICE_TYPE_RDMA_RESUME:
-> > +		if (!gd->is_suspended)
-> > +			break;
-> > +
-> > +		ret =3D add_adev(gd, "rdma");
-> > +		if (ret)
-> > +			dev_err(dev, "Failed to add adev on resume: %d\n",
-> ret);
-> > +		else
-> > +			gd->is_suspended =3D false;
-> > +		break;
-> > +
-> > +	default:
-> > +		dev_warn(dev, "unknown adev service event %u\n",
-> > +			 serv_work->event);
-> > +		break;
-> > +	}
-> > +
-> > +	kfree(serv_work);
->=20
-> The series looks ok to me, except one question. Are you sure that it is s=
-afe to
-> have not-connected and not-locked general work while
-> add_adev/remove_adev can be called in parallel from different thread? For
-> example getting event GDMA_SERVICE_TYPE_RDMA_SUSPEND while
-> mana_gd_probe() fails or some other intervention with PCI
-> (GDMA_SERVICE_TYPE_RDMA_SUSPEND and PCI shutdown).
->=20
-> What type of protection do you have here?
->=20
-Hi Leon,
+On Wed, Apr 23, 2025 at 4:51=E2=80=AFPM Jordan Rife <jordan@jrife.io> wrote=
+:
+>
+> Require that iter->batch always contains a full bucket snapshot. This
+> invariant is important to avoid skipping or repeating sockets during
+> iteration when combined with the next few patches. Before, there were
+> two cases where a call to bpf_iter_udp_batch may only capture part of a
+> bucket:
+>
+> 1. When bpf_iter_udp_realloc_batch() returns -ENOMEM [1].
+> 2. When more sockets are added to the bucket while calling
+>    bpf_iter_udp_realloc_batch(), making the updated batch size
+>    insufficient [2].
+>
+> In cases where the batch size only covers part of a bucket, it is
+> possible to forget which sockets were already visited, especially if we
+> have to process a bucket in more than two batches. This forces us to
+> choose between repeating or skipping sockets, so don't allow this:
+>
+> 1. Stop iteration and propagate -ENOMEM up to userspace if reallocation
+>    fails instead of continuing with a partial batch.
+> 2. Retry bpf_iter_udp_realloc_batch() two times without holding onto the
+>    bucket lock (hslot2->lock) so that we can use GFP_USER and maximize
+>    the chances that memory allocation succeeds. On the third attempt, if
+>    we still haven't been able to capture a full bucket snapshot, hold
+>    onto the bucket lock through bpf_iter_udp_realloc_batch() to
+>    guarantee that the bucket size doesn't change while we allocate more
+>    memory and fill the batch. On the last pass, we must use GFP_ATOMIC
+>    since we hold onto the spin lock.
+>
+> Introduce the udp_portaddr_for_each_entry_from macro and use it instead
+> of udp_portaddr_for_each_entry to make it possible to continue iteration
+> from an arbitrary socket. This is required for this patch in the
+> GFP_ATOMIC case to allow us to fill the rest of a batch starting from
+> the middle of a bucket and the later patch which skips sockets that were
+> already seen.
+>
+> Testing all scenarios directly is a bit difficult, but I did some manual
+> testing to exercise the code paths where GFP_ATOMIC is used and where
+> where ERR_PTR(err) is returned. I used the realloc test case included
+> later in this series to trigger a scenario where a realloc happens
+> inside bpf_iter_udp_batch and made a small code tweak to force the first
+> two realloc attempts to allocate a too-small buffer, thus requiring
+> another attempt until the GFP_ATOMIC case is hit. Some printks showed
+> three reallocs with the tests passing:
+>
+> Apr 16 00:08:32 crow kernel: go again (mem_flags=3DGFP_USER)
+> Apr 16 00:08:32 crow kernel: go again (mem_flags=3DGFP_USER)
+> Apr 16 00:08:32 crow kernel: go again (mem_flags=3DGFP_ATOMIC)
 
-Thanks for spotting this.
+It looks like overdesign.
+I think it would be much simpler to do GFP_USER once,
+grab the lock and follow with GFP_NOWAIT|__GFP_NOWARN.
+GFP_ATOMIC will deplete memory reserves.
+bpf iterator is certainly not a critical operation, so use GFP_NOWAIT.
 
-There are two cases.
-
--Probe / Resume
-add_adev() stores gd->adev only after auxiliary_device_add() succeeds.
-While gd->adev is still NULL the worker drops any GDMA_SERVICE_TYPE_RDMA_SU=
-SPEND event, so an early suspend that arrives during probe is harmless and =
-cannot race with the later add_adev().
-
--Remove / Suspend / Shutdown
-During teardown the worker may still be inside add_adev()/remove_adev() whi=
-le the PCI thread starts its own remove_adev().=20
-
-In v2 I ll serialize them with flag + flush pattern.
-
-void mana_rdma_remove(struct gdma_dev *gd)
-{
-[....]
-        WRITE_ONCE(gd->rdma_teardown, true);   /* block new events      */
-        flush_workqueue(gc->service_wq);       /* wait running worker   */
-
-        if (gd->adev)
-                remove_adev(gd);
-
-[....]
-}
-i.e. during teardown, we stop the producer and drain the queue
-
-and,
-
-static void mana_handle_rdma_servicing(struct work_struct *work)
-{
-[....]
-	if (READ_ONCE(gd->rdma_teardown))
-		goto out;
-[.....]
-}
-The flag blocks any new work, and flush_workqueue() waits for anything alre=
-ady running. This serialises the two paths and removes
-the race you pointed out.
-
-Shiraz
-
+pw-bot: cr
 
