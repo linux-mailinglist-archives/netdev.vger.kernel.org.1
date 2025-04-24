@@ -1,80 +1,91 @@
-Return-Path: <netdev+bounces-185672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F016A9B4CA
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:58:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A31A9B4DF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 19:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D1A74A41FA
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:58:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CC4317C6FF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87AC28DF03;
-	Thu, 24 Apr 2025 16:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FAA2857F7;
+	Thu, 24 Apr 2025 16:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUw/iDT+"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="hFLHoD2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9290D28DEE0;
-	Thu, 24 Apr 2025 16:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E67927F728
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 16:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745513873; cv=none; b=QrwAKvC0dfGLOx7BQw/xlMUcLKn0hfl8Gdcw+wUF2Rrp+/A0snFM6LTWo8GRh8zA9LXhzm6cgot+YMzzjrVfNkCepIWm+C5fEzevTt8dsevCZd35GhNNJ4m6deD3R0UVZUOrvRddg7YJKOY+Yz/iue+Dbv2FPCL1awoUq/sdt9U=
+	t=1745513917; cv=none; b=JCOnv3AY0TnKXkf4JKhPJy6TzVhPP32p4ItVl/TzMeGD1xiDqldE/U4mG7ASVVRTHH5QP24bBk94r1taSLsdfrCQ0wIPZlgWacjkyxslC1RBVlTEWOWa++Pz87yfomsy+MP5MXXZF8Al8Q+RYE+etVLkEJihUk4Ao/up4d7mtX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745513873; c=relaxed/simple;
-	bh=d79kcU9GfFoXHHLFwRO0mS3MDxIZKtB6Ybwg07CqBHM=;
+	s=arc-20240116; t=1745513917; c=relaxed/simple;
+	bh=LikPWzHKXlZ0AYHql8L8oY6SV6BxDqyvwmWhGZMgt30=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UkQJnMYMbXQ0n5ivz0p+55HNvAtaiV9lgdiSUdQuSEQdg4GDhORN7HVN1U5pj5pOtL1j02j1ZLe7ALCOLxCNFHM5LRdqlhsbSIDw88zlwQou6Dz3J01nU0DKv1hQjWRGMMToNAYEBiEH0yPjbd9DbkRIbDEF+OTc5UkpjMTIvPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUw/iDT+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDA94C4CEE8;
-	Thu, 24 Apr 2025 16:57:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745513872;
-	bh=d79kcU9GfFoXHHLFwRO0mS3MDxIZKtB6Ybwg07CqBHM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nUw/iDT+6gw5mOAM5j6Vw9sQKNjGnCcO2p1tds/nPvQxhm5QqiPeva6vHDs9PQ9h4
-	 QXE/+JHx5hp33jrRTeNto+yvVZlOdnwBVexbS0ps9/BcZu6UB2BURU7jWrCktVt3Yx
-	 vWe5TrzysIRNgwm+Zq9fP1WcPAu4YCQJSuiY5lpjOGRBMXds2/kxSK0dg9TJOgUreR
-	 H95fBBiMKtPoQ7U/Uhv2WpPXHLgqH5eydc9N4p0cpWZm/YIssotgOIeG/9vUMq0f0T
-	 /JOaV1ftzzrlpbq9qJkcazC7BQW7c8AwUEgTxyCdNBx/w0mGJWM9fQGq8FVtdTULzF
-	 MqmPC9KUeSl1Q==
-Date: Thu, 24 Apr 2025 17:57:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Shivamurthy Shastri <shivamurthy.shastri@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH 2/2] net: mana: Allow MANA driver to allocate PCI vector
- dynamically
-Message-ID: <20250424165743.GJ3042781@horms.kernel.org>
-References: <1744817747-2920-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1744817781-3243-1-git-send-email-shradhagupta@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQsfqYBgOoO7Me6MjekXLm6n+5CwZ9/nma9xX2wQVKbg7TgUyWN8Csrfywhj8Zpa3usfaaoaTF571khILUtj8g8HFQERxCzByaSxMAcS6NDC06fiygihZmY7iLF3yRLA24JjBd5m6VcUF/2Li6RUmIB5tNN8wNxkdijgDcUsGh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=hFLHoD2d; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-223fb0f619dso15528475ad.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 09:58:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1745513914; x=1746118714; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3CRbLMNDhQNMb/odIgtWlV1wOeeHs/lBu8IWLIInXCM=;
+        b=hFLHoD2dDxbEuqS4SMJ7Ad6I4sudpcVJli4ahff432zd6E5dmhkOOK68DzgT4mN//i
+         tZSNPZaXSFvuoIor9RBAWpTB7S1AL4RxWsGyvEf4pssN4xR/KvEbdqcqKFBHccm5tr1b
+         VGg+nY1qauYF6KVKgYsWeaLFmEDr6gdym/YDI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745513914; x=1746118714;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3CRbLMNDhQNMb/odIgtWlV1wOeeHs/lBu8IWLIInXCM=;
+        b=sW9SKKfh6YvnILBYPFwicc5+y+tbpHGFkX9CxC9YbWB8TAYZ0fAQCPRfWzJ2NykyK4
+         Ntp25iuV2qAxZAocEWJZNMvVHYk4BF6fM/v/RTAze0RH4a7R01QyLaIAqKPPfSiiAPo8
+         +HUGkjH93gs0vQOJToJa8iQ0pve0PmBbZhFO3p5QGnM3SnAXCcN9/Ct+E2eDQW11j6OX
+         qoRZng0Oeu8jrFmHNAsqgRWKT5tMhtLLdGnUCo8QIxUtbPtgErbj6JbNvkakteVkvHaQ
+         Pt1SSECL7rzsCBVkcK8v3qdQGOXOADuAfO/ldsVy6JE6XX6cDOdyB4UlHrO1QjLdSlf3
+         6ePQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQLc8mWNGFub5NgUjtgcBBRhnPvH9D9O+s8hEN5IH3SgQvcpDbLieClxgMmf8RjIYg+zjoowc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3mWJhrbMNLaxkULFoUDDNggvrmZsDeXQ95T3lzndUmCuimFpy
+	a9JL8mLCOHzoZO0xcIlmEMqSaJdP2HnvMw1wMHdH2Q13G+wd7l8LftjIfwn4pzw=
+X-Gm-Gg: ASbGncu7O0EDgSRyCZMzk9PaPX1Fk7HRklcVwZ5R3VVS5JdoZDFAhn7ldJvEgU8Ld42
+	4emOn1MUWxxSIOZX9lWYusRi/dS4sgU9HSFyuLZK6hFYesRcODZVLFxQVSevKd6K1p4wolScvFq
+	hiplipvEbMChCEh5I2rJ0YyVMfCOS3lL+jxa77ygZW6YOVAr/QHOF1X3FSR/5I9opsjgj4PLd8O
+	BPlPF51cfB5LT0tA2DLg0lhST4MCg0cJivOiPVMLr6cM8ZrbQSX55NhxgMJmUCy/MIyg5CEOGP2
+	RJ31fe95Bp/tXNZg0hGkEAGHvW1C+HqdJd7GjyyAsxi2m4INysUvilfHx3Nh4H3xHSW2/+6AUSv
+	7R2dWBHFyAsHx
+X-Google-Smtp-Source: AGHT+IE71FOArPf4fbjAK6Tz9mz5XvykXh05FzQ9Ed4nGtj0H+VIVi4oA8obRPXBo9ZdgRuJ/X8wkg==
+X-Received: by 2002:a17:902:d589:b0:223:fb3a:8631 with SMTP id d9443c01a7336-22db3c33a03mr55527375ad.24.1745513914369;
+        Thu, 24 Apr 2025 09:58:34 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4dbbf8dsm16031545ad.65.2025.04.24.09.58.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 09:58:33 -0700 (PDT)
+Date: Thu, 24 Apr 2025 09:58:31 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next] rtase: Use min() instead of min_t()
+Message-ID: <aApttwNRkiMP6xMJ@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, horms@kernel.org, pkshih@realtek.com,
+	larry.chiu@realtek.com
+References: <20250424062145.9185-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,162 +94,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1744817781-3243-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <20250424062145.9185-1-justinlai0215@realtek.com>
 
-On Wed, Apr 16, 2025 at 08:36:21AM -0700, Shradha Gupta wrote:
-> Currently, the MANA driver allocates pci vector statically based on
-> MANA_MAX_NUM_QUEUES and num_online_cpus() values and in some cases ends
-> up allocating more vectors than it needs.
-> This is because, by this time we do not have a HW channel and do not know
-> how many IRQs should be allocated.
-> To avoid this, we allocate 1 IRQ vector during the creation of HWC and
-> after getting the value supported by hardware, dynamically add the
-> remaining vectors.
+On Thu, Apr 24, 2025 at 02:21:45PM +0800, Justin Lai wrote:
+> Use min() instead of min_t() to avoid the possibility of casting to the
+> wrong type.
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-
-Hi Shradha,
-
-Some minor nits from my side.
-
-...
-
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-
-...
-
-> @@ -465,9 +475,10 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
->  	struct gdma_irq_context *gic;
->  	struct gdma_context *gc;
->  	unsigned int msi_index;
-> -	unsigned long flags;
-> +	struct list_head *pos;
-> +	unsigned long flags, flag_irq;
->  	struct device *dev;
-> -	int err = 0;
-> +	int err = 0, count;
-
-As this is Networking code, please preserve the arrangement of local
-variables in reverse xmas tree order - longest line to shortest.
-
-Edward Cree's tool can be useful in this area:
-https://github.com/ecree-solarflare/xmastree
-
+> Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> ---
+>  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> index 6251548d50ff..8c902eaeb5ec 100644
+> --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> @@ -1983,7 +1983,7 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
+>  	u8 msb, time_count, time_unit;
+>  	u16 int_miti;
 >  
->  	gc = gd->gdma_context;
->  	dev = gc->dev;
-> @@ -482,7 +493,22 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
->  	}
+> -	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
+> +	time_us = min(time_us, RTASE_MITI_MAX_TIME);
 >  
->  	queue->eq.msix_index = msi_index;
-> -	gic = &gc->irq_contexts[msi_index];
-> +
-> +	/* get the msi_index value from the list*/
-> +	count = 0;
-> +	spin_lock_irqsave(&gc->irq_ctxs_lock, flag_irq);
-> +	list_for_each(pos, &gc->irq_contexts) {
-> +		if (count == msi_index) {
-> +			gic = list_entry(pos, struct gdma_irq_context, gic_list);
-
-Please consider line wrapping to 80 columns or less, as is still preferred
-in Networking code.
-
-Likewise elsewhere in this patch.
-
-checkpatch.pl --max-line-length=80
-can be helpful here.
-
-> +			break;
-> +		}
-> +
-> +		count++;
-> +	}
-> +	spin_unlock_irqrestore(&gc->irq_ctxs_lock, flag_irq);
-> +
-> +	if (!gic)
-> +		return -1;
+>  	msb = fls(time_us);
+>  	if (msb >= RTASE_MITI_COUNT_BIT_NUM) {
+> @@ -2005,7 +2005,7 @@ static u16 rtase_calc_packet_num_mitigation(u16 pkt_num)
+>  	u8 msb, pkt_num_count, pkt_num_unit;
+>  	u16 int_miti;
 >  
->  	spin_lock_irqsave(&gic->lock, flags);
->  	list_add_rcu(&queue->entry, &gic->eq_list);
-> @@ -497,8 +523,10 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
->  	struct gdma_irq_context *gic;
->  	struct gdma_context *gc;
->  	unsigned int msix_index;
-> -	unsigned long flags;
-> +	struct list_head *pos;
-> +	unsigned long flags, flag_irq;
->  	struct gdma_queue *eq;
-> +	int count;
-
-Reverse xmas tree here too.
-
+> -	pkt_num = min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> +	pkt_num = min(pkt_num, RTASE_MITI_MAX_PKT_NUM);
 >  
->  	gc = gd->gdma_context;
->  
-> @@ -507,7 +535,22 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
->  	if (WARN_ON(msix_index >= gc->num_msix_usable))
->  		return;
->  
-> -	gic = &gc->irq_contexts[msix_index];
-> +	/* get the msi_index value from the list*/
-> +	count = 0;
-> +	spin_lock_irqsave(&gc->irq_ctxs_lock, flag_irq);
-> +	list_for_each(pos, &gc->irq_contexts) {
-> +		if (count == msix_index) {
-> +			gic = list_entry(pos, struct gdma_irq_context, gic_list);
-> +			break;
-> +		}
-> +
-> +		count++;
-> +	}
-> +	spin_unlock_irqrestore(&gc->irq_ctxs_lock, flag_irq);
-> +
+>  	if (pkt_num > 60) {
+>  		pkt_num_unit = RTASE_MITI_MAX_PKT_NUM_IDX;
 
-Does gic need to be initialised to NULL before the list_for_each loop
-to ensure that it is always initialised here?
+This looks fine to me and the patch is against net-next according to
+the subject line (I think?).
 
-Flagged by Clang 20.1.2 KCFLAGS=-Wsometimes-uninitialized builds, and Smatch
+I suppose there might be the question of whether this should go
+against net (because it has a fixes), but my vote is that this is
+cleanup and should go in net-next as titled.
 
-> +	if (!gic)
-> +		return;
-> +
->  	spin_lock_irqsave(&gic->lock, flags);
->  	list_for_each_entry_rcu(eq, &gic->eq_list, entry) {
->  		if (queue == eq) {
+Unless you've seen a bug around this and it should be against net
+instead?
 
-...
+I don't know, but I think it is unlikely there would be a bug in the
+wild because:
+  - RTASE_MITI_DEFAULT_TIME (128)
+  - RTASE_MITI_DEFAULT_PKT_NUM (64) 
+  - RTASE_MITI_MAX_TIME (491520)
+  - RTASE_MITI_MAX_PKT_NUM (240) 
 
-> @@ -1317,29 +1372,92 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node)
->  	return 0;
->  }
->  
-> -static int mana_gd_setup_irqs(struct pci_dev *pdev)
-> +static int mana_gd_setup_dyn_irqs(struct pci_dev *pdev, int nvec)
->  {
->  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> -	unsigned int max_queues_per_port;
->  	struct gdma_irq_context *gic;
-> -	unsigned int max_irqs, cpu;
-> -	int start_irq_index = 1;
-> -	int nvec, *irqs, irq;
-> +	int *irqs, irq, skip_first_cpu = 0;
-> +	unsigned long flags;
->  	int err, i = 0, j;
+all seem to fit in an int, so I think this change is probably more
+of a cleanup than a fixes ?
 
-Reverse xmas tree here too.
+All that said:
 
->  
->  	cpus_read_lock();
-> -	max_queues_per_port = num_online_cpus();
-> -	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
-> -		max_queues_per_port = MANA_MAX_NUM_QUEUES;
-> +	spin_lock_irqsave(&gc->irq_ctxs_lock, flags);
-> +	irqs = kmalloc_array(nvec, sizeof(int), GFP_KERNEL);
-> +	if (!irqs) {
-> +		err = -ENOMEM;
-> +		goto free_irq_vector;
-> +	}
-
-...
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
