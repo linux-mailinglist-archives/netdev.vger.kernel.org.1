@@ -1,190 +1,140 @@
-Return-Path: <netdev+bounces-185609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A06A9B200
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:21:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89FFA9B21A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 17:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41B524A16D9
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:21:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAA59A349B
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 15:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEA11A315E;
-	Thu, 24 Apr 2025 15:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5723422156E;
+	Thu, 24 Apr 2025 15:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6+W+JBW"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rqbpViVz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6341A3161;
-	Thu, 24 Apr 2025 15:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBFC1B4248
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 15:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745508075; cv=none; b=BRaY9BKA6iclsXLNqY+MJPvW0KTUbnntQeKVvNUpcMHiqKss61lIh9LjeWrdfPvAVVWgcotJoB2tlce4UjJs01np76yIgRGupiMZIowwhuupaF4co2AvQrsxeuTOqjK3PEBHNVGvkPZOJVu14tHmTblQXqK+8dCmLHT713NsjHw=
+	t=1745508174; cv=none; b=iOwi0W95JFhtV5QonDrhcQ7Zmmylquauio/spaNWXuciI3zE+BnMHMjAE5bdCgOEKO2IX4xIfyOxk0ewPSbzeQGJypT/u5P9/ZJ1pQKbE6btMCCBy3Sq5PiKKsQbMYerCzyrVldKKhpoMfKprcZqFBKaxsNpkCKFem9QOpywtlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745508075; c=relaxed/simple;
-	bh=GC+PtHDYmmef0IxCV4hv6duPBITreI/6ZNwMatH+Tgg=;
+	s=arc-20240116; t=1745508174; c=relaxed/simple;
+	bh=P9Ra9EBsuHe57phVU2HbSxsMHXG4p3mA6LrK5RQN/0A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yi6GN8ijGvk8rv0FvV/asxVkiumab1U/cS8k0K6Z0sgLmzVQXx9pniosjNiNtrfHZj7SRnvTGhJK4rZ6taV9V7Fgr2nKQiHr1t0eQx5478tcZ2v1aargjMZArjLeHOr/V7v0NJdeOjQAhDllBJ8qoSjJuq9ENb2sQJ9jr15G3aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j6+W+JBW; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5f624291db6so2008819a12.3;
-        Thu, 24 Apr 2025 08:21:13 -0700 (PDT)
+	 To:Cc:Content-Type; b=G+8iJSdYgvGNDlClRWOQ6VL9Z+8R++5jHfW2pJPIp16ajMBD/mkerurF/zo30WvetNKnws2onjoSic4X+0/ZGppXArxgwwZQiNyom9eNGWLhAhdwZXq9ScniVV9KStZoC4opaQ2wymfk2HHI8hkb2LLc8PzB3KU1+sbpil/r8ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=rqbpViVz; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-af52a624283so1127210a12.0
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 08:22:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745508072; x=1746112872; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1745508172; x=1746112972; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GC+PtHDYmmef0IxCV4hv6duPBITreI/6ZNwMatH+Tgg=;
-        b=j6+W+JBWwIJ/e0FM7zETCz2a1iVNb2Ti7laK4HeHOe6RtVTzPEhsCmwUyHNoib0CH3
-         5y4yQrak0774cLYVv2ahVR4HZ30XZXrN6QkczlK1ikymiwHJ6kotpRi3HmRnjSKWDU/r
-         EpajwdkkyW3hqXw6XnX4KCkVC/DresB4/467ZTzthbBWylduQpNltNtCEzgPlZCOtwg7
-         3K70kKf5YaJ2OhyJqOjT2twVnYBLjhI094WETg07xCh/STt2vUCn7e1O+dqbRqfJ7UDA
-         LrPgY3RWqfhQCeZFJTlSRy3c6gGPuBFqt3lWAKZF5mkrjrVFq8h24ZWyibGAsv89UqRU
-         FGZg==
+        bh=hA7Ba26JGhfQR9p9e92P+E28XsBHiTPtB8nzPxji11A=;
+        b=rqbpViVzSZbt2wLY5uNsRliMXRpBFkBU2B4Yurc2DhExXKrqfTyU2EJPacZOqCfD4z
+         k7GyuWhhggikOILoZjpmdwRTIVQrAOl347e76YIYfJvZpHXQhp7DOqMhhpyHdICezrEl
+         r2kuXsLioXAK6IYUyRbCljYrr3QM4xmGy/ijB72Yf019tfnJXgRHl2FjNfu1MwzRekle
+         P0belweU1Bp6JOHxDZNfbDVaMTA4LyFv7S9opNwLlPzCeEOBRs/n97nnHO+Ia6NCDzDZ
+         6lJhk3ICzVlmfgrSZA/vH4h9isJbz1Cff4qndjf4Y9TzKaQ9dXGkAxDjFpYkP9OfLMlL
+         HfRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745508072; x=1746112872;
+        d=1e100.net; s=20230601; t=1745508172; x=1746112972;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GC+PtHDYmmef0IxCV4hv6duPBITreI/6ZNwMatH+Tgg=;
-        b=bgcBzxJXjmFCQ+yFvyuxgTFh9ejYPozuV8gFE3zjDM/iTQ8kAPpha85MA8nZ/YpC6r
-         86LHn/Zo2WLGO2n0TCNnU/OySJvDstVxRRuQoPqi6zWsO7REdlYuhrhbbV3OZwhVReM9
-         iJCQt0JvFhGYnpZyVOVEoJUD9htjh5zmO71cyjDtUBxaW/tAodextXd0E2LaJGiIRV5h
-         Bdm2CtSIQtRjYk6+T0jm1N8A0UmWlfLuJQsYEzKPFhisuTr5JbHiMyRJErTnshNyCOnU
-         dugJC8X6/akxOmfKnIOX7Rw48LfX5VWzLHxwkoPvV2oKVWgiLe4u4qwyUNuYqhu/yHoa
-         1a/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXuzrVe9zE+Ee+gDRLTWwvQgG7mKRpgxCSh5lYsJDfQV5NVoU6VUxLgp1ZdHcWKq/ZFYLMl6syD5gA4Yx8=@vger.kernel.org, AJvYcCXzt0i9qvOMvmxaXFKpMQqyupO8XM7dCnvtLYOhj9fGZaQVHkRSo3fOFs6uD+VsXKSHUXICSt4u@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJzd8icc/Lybd9s4jS4SxoSBT3pMcNhIpxdJV68tIf0z4xtBre
-	ToU4UO1IJRfNeITYkkVgm0X69O2+BxbzCe5soJFNARjSCvqsOQeQNs8CyknF/xipydmTtVIWdPl
-	kAaydx3LcKkdd5qQMUbFPK14PYSg=
-X-Gm-Gg: ASbGncuaI4sDVl9jzCaMi1OS5ThNZ7kset2CMwLsTnvI91SU8H5mHDZuYaMAamKlky5
-	QeI/O2Jt05negp60qcTHF7D/csIHy7DjmDg6AxcEFKekJtXfXdqtQF04a7sL/xHSGtNNvCf2RlD
-	CsurkleX/EDF9TkZWcRH9K
-X-Google-Smtp-Source: AGHT+IEdImTuRc3xMVstIZacqrqR7ovVhW5g7sBs2ZSRtcs3RwZU5YX4VlNzD8HzVelGQLKyFVRllpCEcLEgDxw0YVs=
-X-Received: by 2002:a05:6402:34d1:b0:5ec:96a6:e1cd with SMTP id
- 4fb4d7f45d1cf-5f6ddb0ae59mr2804678a12.2.1745508071566; Thu, 24 Apr 2025
- 08:21:11 -0700 (PDT)
+        bh=hA7Ba26JGhfQR9p9e92P+E28XsBHiTPtB8nzPxji11A=;
+        b=ZC3ufnLVwDUFINznhR88saIeUor2g6Fp7p7yKHaI8pW3VnQ7iTgyoVxpce9f6tfDkM
+         FzjYpP1oPTrCy1e7YWkSV/1KQMQbzi/cI82fhbV1YrQzzlhNqWVvJPH+2W2gb0SoMfvp
+         EmcTio/T1yL8YF6nbMNqf+fn/zPVrF4tvupemBGkvBO74wlJyT5PuT3g6NrfdPscQQTr
+         RumBKFlqVzM7zkvcI28IkioDXsZjrAgJaYFTxMzZbfWAkBGvs4QCEKcVo7pCaX8p4uDi
+         3QflMgyr4rG/zvT3NIQRnZVxtZbUgNlHtScmIPTCiQC8jfAF7KIksazf/bOzLSPXAe3I
+         /wMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVETIVPpORp3WfH/pLdN8T36qozYey4DnOjIfZY8h1fAL9UlEn1EZI5nrrlAPjF8E89ojpnS5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/c4QW3UhczbIYiQ4NMC8nA7Zsc9K/WSa/Lj1GdyDt4xj4UtCw
+	9xP/uKComQB+w85uXH3x04nSCQud4SXziBnoiu+T7NdBNKG+ZWY7BAmQgH1ceS938u1SQsCz1oF
+	jybS2uqIDGLVu3/UGXVZw7o3pIkmqE6WSbzCp
+X-Gm-Gg: ASbGncuJ2JSsfI75lPd+fqROgaNmPqyZupE3e2UIKIXYzZ+e6z60jJ2UmzHXGpXZva3
+	kIenC4q5J+Gc0vtetarRo2qbdHxVLNR+tlwgXQi/VuAF+aNbHJClIYI/ousJZUlMW/S1EaB0RFp
+	Tc1o9ujciYXPWYQIL7friXIg==
+X-Google-Smtp-Source: AGHT+IG5HfEL/z0REAwTeryaLmO6NfaYs4y1TsRfmRdtE7Z6X9OWTg7C7P9OE6KHDVTDsCdahLpFslE7lpGcD9TUyyY=
+X-Received: by 2002:a05:6a21:204:b0:1f3:1ba1:266a with SMTP id
+ adf61e73a8af0-20445af2509mr2893535637.0.1745508171865; Thu, 24 Apr 2025
+ 08:22:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424080755.272925-1-harry.yoo@oracle.com> <lr2nridih62djx5ccdijiyacdz2hrubsh52tj6bivr6yfgajsj@mgziscqwlmtp>
-In-Reply-To: <lr2nridih62djx5ccdijiyacdz2hrubsh52tj6bivr6yfgajsj@mgziscqwlmtp>
-From: Mateusz Guzik <mjguzik@gmail.com>
-Date: Thu, 24 Apr 2025 17:20:59 +0200
-X-Gm-Features: ATxdqUGZG_Q9xpHZ3X2jOpTAzlBs2c9IIdsj6KruiU8Xt92FFEuIAKEa75sHT38
-Message-ID: <CAGudoHF8-tpc3nJeJ3gF2_GZZGp_raMBu4GXC_5omWMc7LhN1w@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/7] Reviving the slab destructor to tackle the percpu
- allocator scalability problem
-To: Pedro Falcato <pfalcato@suse.de>
-Cc: Harry Yoo <harry.yoo@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Vlad Buslov <vladbu@nvidia.com>, 
-	Yevgeny Kliteynik <kliteyn@nvidia.com>, Jan Kara <jack@suse.cz>, Byungchul Park <byungchul@sk.com>, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250416102427.3219655-1-victor@mojatatu.com> <aAFVHqypw/snAOwu@pop-os.localdomain>
+ <4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com> <aAlSqk9UBMNu6JnJ@pop-os.localdomain>
+ <aAl34pi75s8ItSme@pop-os.localdomain> <20250423172416.4ee6378d@kernel.org>
+In-Reply-To: <20250423172416.4ee6378d@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 24 Apr 2025 11:22:40 -0400
+X-Gm-Features: ATxdqUGCnFqiTk74fmm4pr3DZdxYO9--y-VuPiXyIZihMTDtLglBEi4wXWTlOsI
+Message-ID: <CAM0EoMki518j_geesnGwh2jk51Z5BGRGootTGQq3HcP79y2ygQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant enqueue cases
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Gerrard Tai <gerrard.tai@starlabs.sg>, Pedro Tammela <pctammela@mojatatu.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 24, 2025 at 1:28=E2=80=AFPM Pedro Falcato <pfalcato@suse.de> wr=
+On Wed, Apr 23, 2025 at 8:24=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
-> > How to do this with slab constructors and destructors: the constructor
-> > allocates percpu memory, and the destructor frees it when the slab page=
-s
-> > are reclaimed; this slightly alters the constructor=E2=80=99s semantics=
-,
-> > as it can now fail.
+>
+> On Wed, 23 Apr 2025 16:29:38 -0700 Cong Wang wrote:
+> > > +   /*
+> > > +    * If doing duplication then re-insert at top of the
+> > > +    * qdisc tree, since parent queuer expects that only one
+> > > +    * skb will be queued.
+> > > +    */
+> > > +   if (skb2) {
+> > > +           struct Qdisc *rootq =3D qdisc_root_bh(sch);
+> > > +           u32 dupsave =3D q->duplicate; /* prevent duplicating a du=
+p... */
+> > > +
+> > > +           q->duplicate =3D 0;
+> > > +           rootq->enqueue(skb2, rootq, to_free);
+> > > +           q->duplicate =3D dupsave;
+> > > +           skb2 =3D NULL;
+> > > +   }
+> > > +
+> > >  finish_segs:
+> > >     if (skb2)
+> > >             __qdisc_drop(skb2, to_free);
+> > >
 > >
+> > Just FYI: I tested this patch, netem duplication still worked, I didn't
+> > see any issue.
 >
-> I really really really really don't like this. We're opening a pandora's =
-box
-> of locking issues for slab deadlocks and other subtle issues. IMO the bes=
-t
-> solution there would be, what, failing dtors? which says a lot about the =
-whole
-> situation...
+> Does it still work if you have another layer of qdiscs in the middle?
+> It works if say DRR is looking at the netem directly as its child when
+> it does:
 >
-
-I noted the need to use leaf spin locks in my IRC conversations with
-Harry and later in this very thread, it is a bummer this bit did not
-make into the cover letter -- hopefully it would have avoided this
-exchange.
-
-I'm going to summarize this again here:
-
-By API contract the dtor can only take a leaf spinlock, in this case one wh=
-ich:
-1. disables irqs
-2. is the last lock in the dependency chain, as in no locks are taken
-while holding it
-
-That way there is no possibility of a deadlock.
-
-This poses a question on how to enforce it and this bit is easy: for
-example one can add leaf-spinlock notion to lockdep. Then a misuse on
-allocation side is going to complain immediately even without
-triggering reclaim. Further, if one would feel so inclined, a test
-module can walk the list of all slab caches and do a populate/reclaim
-cycle on those with the ctor/dtor pair.
-
-Then there is the matter of particular consumers being ready to do
-what they need to on the dtor side only with the spinlock. Does not
-sound like a fundamental problem.
-
-> Case in point:
-> What happens if you allocate a slab and start ->ctor()-ing objects, and t=
-hen
-> one of the ctors fails? We need to free the ctor, but not without ->dtor(=
-)-ing
-> everything back (AIUI this is not handled in this series, yet). Besides t=
-his
-> complication, if failing dtors were added into the mix, we'd be left with=
- a
-> half-initialized slab(!!) in the middle of the cache waiting to get freed=
-,
-> without being able to.
+>         first =3D cl->qdisc->q.qlen
 >
+> but there may be another layer, the cl->qdisc may be something that
+> hasn't incremented its qlen, and something that has netem as its child.
 
-Per my previous paragraph failing dtors would be a self-induced problem.
+Very strong feeling it wont work in that scenario. We can double check.
+Regardless - even if it did - what Victor sent is still a fix. Seems
+DRR had that bug originally. And then in the true tradition of
+TheLinuxWay(tm) was cutnpasted into HFSC and then the others followed.
 
-I can agree one has to roll things back if ctors don't work out, but I
-don't think this poses a significant problem.
-
-> Then there are obviously other problems like: whatever you're calling mus=
-t
-> not ever require the slab allocator (directly or indirectly) and must not
-> do direct reclaim (ever!), at the risk of a deadlock. The pcpu allocator
-> is a no-go (AIUI!) already because of such issues.
->
-
-I don't see how that's true.
-
-> Then there's the separate (but adjacent, particularly as we're considerin=
-g
-> this series due to performance improvements) issue that the ctor() and
-> dtor() interfaces are terrible, in the sense that they do not let you bat=
-ch
-> in any way shape or form (requiring us to lock/unlock many times, allocat=
-e
-> many times, etc). If this is done for performance improvements, I would p=
-refer
-> a superior ctor/dtor interface that takes something like a slab iterator =
-and
-> lets you do these things.
->
-
-Batching this is also something I mentioned and indeed is a "nice to
-have" change. Note however that the work you are suggesting to batch
-now also on every alloc/free cycle, so doing it once per creation of a
-given object instead is already a win.
-
---=20
-Mateusz Guzik <mjguzik gmail.com>
+cheers,
+jamal
 
