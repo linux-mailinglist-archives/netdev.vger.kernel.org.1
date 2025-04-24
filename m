@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-185434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F57A9A59A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:18:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A15A9A554
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA4577AC967
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:16:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A82791B82C07
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77337207DFE;
-	Thu, 24 Apr 2025 08:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60571FCCF7;
+	Thu, 24 Apr 2025 08:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eHgsFupC";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Kk31Kqwk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I+QKQGUw";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Z2sHzrU8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC6A1F4622;
-	Thu, 24 Apr 2025 08:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D4D1F6667;
+	Thu, 24 Apr 2025 08:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482670; cv=fail; b=SSoi7Sv78zy6L6UCNlcGjB3Tf96z/5o3rdsz3r7VKFGl+UDTvQIe6PFWxSnaII1G2LV2ZY774aopCm9aJPBu+MorGnQyUIfk810rZd9WEVsqrvtMru+RNW2Md+jBZE7t6kB8HZIjd3p5GogHQOZ/mtrMq7fsBlwpHJYmtuGRkqY=
+	t=1745482139; cv=fail; b=ANYbwFIs8THiV/LsSHT2Si/noqlaJZYm7gza0YzgMOhJPxNv0C7RfdJG8swkbFhcCHsnRYbVm7adjtnvVBObC2GizxHmJuEF0DXC3HsSM3sZk35kh5NyCbkkBNkbZicYEY1Tfiv06Wra4nA8LJE7/hjiZjKGcOnaHxP3VocCE9A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482670; c=relaxed/simple;
-	bh=z6uJNGzYJDb9vV37HfPCCuFkbkOoi6AuCaMlMQ5jdGM=;
+	s=arc-20240116; t=1745482139; c=relaxed/simple;
+	bh=lRGgiGyJ4vam8UCkGj+SfF6y2mEQVN0+yPhRUHgIFkA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ksQnE8wjlnQLd+0L1D2u9+iVXujYGL2hwNfUEx2gwhVg5SFzNGzys3KrmfHU/RfmEdNF1Y7dJgrYshqP8jhZlTxcljvmNf/U9YZoIzvqaAJxye2uNYxeufru01lOREcxzM+vJb21x32qrmQVqS5cEY/rL5EZku500J2ZSlQpQ/g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eHgsFupC; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Kk31Kqwk; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=MioVw5SB4oTVB7WxA7ufzVzqfuL1U0QWAxtdNvQMuewdIqUp9Q0sfA7qMSymShG4Pu83j3HS7rZFcHq3JKJQgJhkpmalAtJ/vS626kVZSAZtSHygg7ExbpzttAVPgnmmAYjqFACdTj4Z7ee0FqlG5nqtTVaHPiSqALaUMRsm2jI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=I+QKQGUw; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Z2sHzrU8; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6ttQX005503;
-	Thu, 24 Apr 2025 08:17:31 GMT
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O84swB003302;
+	Thu, 24 Apr 2025 08:08:40 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=; b=
-	eHgsFupCGkZeusebKgmm6bplK7btRdr6WXrZnCxhmUzlTLDZHk/mAsKywoLR+kPI
-	N9NWi74oqBkZuzBa3FU0/y9Qh3WxeGUkCps9jcXhdCePxdjhOq5FDXbcdV6Hlhdn
-	YSZNhSHDR25bsbz4yOYFJN+4NxugH4BrPlUgnKe+pBVGSGkSil+W9h5MN1xaHAUa
-	cvxBD/yxPRV/UQWI7Fb3ob3JbRKyovl3szmxU4Rw82CwJql/Cl+CXi/NtSyS7hXt
-	/HragOLoovGBUEpwYJyvMY8WTDJm9ZPuUVI7WOS9afExTGxtd4hbUjWlAliZZDgN
-	LMvYkgq0m0nOtk/uJ02hJA==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467fmk86pj-14
+	corp-2023-11-20; bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=; b=
+	I+QKQGUwfbRL8szae7SkcSmHOGB6hPumojq4QA9OhQ7jEbOlIoF2V2mUvrrz5qTf
+	uIFPk5x/dB8AWvhQsMpDiRsQOSn2LLeJKkoyBrgF+YjfyB4tVinoPs+/evMUAJ4t
+	GyjaPon6MHzQ42FIGC0UU6D9dUpnF7U0vkoovXOfxud8YHyajSm5O0cfUNStLyUD
+	50jrYp22DT1YcNw4HoQf3KkMvZquzlYrM5mEbZbongbcfan7f2p6s7XVKEhTW73N
+	vHK3bKmamYoQNBhwlYnKpjuSwG09DtfF4ePIlhwbfQeRfXOETnkZjTSIioASHSmM
+	CYJ9lVpE7SRCWWJQ7dYjkA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467hfm006v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:17:30 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O8832h030957;
-	Thu, 24 Apr 2025 08:08:38 GMT
-Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazlp17012050.outbound.protection.outlook.com [40.93.20.50])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 466k06xrde-4
+	Thu, 24 Apr 2025 08:08:40 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6ufhP031694;
+	Thu, 24 Apr 2025 08:08:39 GMT
+Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazlp17011028.outbound.protection.outlook.com [40.93.13.28])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 467gfr25em-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:37 +0000
+	Thu, 24 Apr 2025 08:08:39 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vOI80bKt3sYlb3Rc/ps9eNpvC9Q0gCmM82mCaSf9Uc2tPbfxVA2d1i4jWCdm/Y9y1XX4lyNXGkxzckU0XBHeaP7H01Bzuoi8OtupNJqKVUVsXn12Ipr5u4OHoY3x62poTJf+Df0a1e82YxSdv2D0xxBDOD/yF75AHzyHcvKF9g9vi6V13PS5uIKp+8nT/gor8JvkPczerePAx3SL1WbgZq24sMuYbPDCSOwK7QYgEoyfxdl9CTW3Rf79cDmwaMkNd6sb5upmJ+lUEFaUZp8/ORBH99UcnFBQnWewFp08kcJqbPuexTOMWQXm7PDoLzlwOqo2B1Nm5qrrVAtiQcyztA==
+ b=HB/tyrT5/XVjY9Wv9YIf+m64fVyK31KfoHHujGRd5gThLQ2KohFD39UdVDhYcKwJYzhKNMCR17lDgiWz2D6XYPZaXq6A1sK1ihFJr4dmboH8+0NPAB8HG8FNGwWn6SD7EL/fK3eRdavXlnE9B2EhbuHn+g+Fsu17nJBULnWuyDPUUChHQhONxTLZ0hOyOTM4ohjsBzBykZT/kcX5lBv+0BxTp5y4EG5arn9PgA+uwhSlnZIoIBbhJw/TaOu9Bv94whkQLI3iuylLE632maKuSnEvYJrlPpMfJzSY52mJsSGg3ObA9JjJ4anW26IIYV6Yhx5jZ+A336GAv34hzM2moQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=;
- b=VgZBxC0DMd3J5FYbUtkUUqQL85dNv1Fw5NkzTxZxeI3Q9K1Z/5UxysUzV4DLTI2D91xUrcv7QgBsrtYe7CfCfc7Rl6bXA3nLWw5y7+dKGh53Q69NRuXNPlSduM6n8K2HlOaJ0AaCRgIhCcrrRf0CY3B68qCpJPLvJj6q18OQmmmCch7WlvlMphCMLiu3bvQ84yTm9pXg1Gfxc7R0Z4zdnjTdig/txIzIGQsjb2f12TPAuAUz58ugAWpiqbcBkgHWtCTt/xRfl/+MM54PzwFT/QA4/2Py1pAejK9xqF/MQMzANm5PBVMZ5URpj+PjXzrS7Qv6WEII1ibrZoCLMXEVxQ==
+ bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=;
+ b=iP1NdM516KUei+0O91Fmr65Kb49P0tfkD9R56CijARBwgL6ZzeabBLlS/sLtojZ/w3c3ZXAhzifyQBBRP4JNsH2nUYpSVWit1k6oBLfg3/BXCoQNYL2ufoIiegfo7Gvmp69UpLw8PXEnBhTws8jecR+t40RFpVU419lGlPvMDJhxGRTItmtFBkXjDu10WTrHBioSYYo4UHMNZ7Hgy9Dkrqo/FFaivUOBnS9l2EVoG+JGPwBiOs5ULDMN6XGeQjwDUoGT7FMgC/Q9xyjYCAk5bo5VBSrL4YUz+GkJGIvmC8T/aZlNPLUghZX6K7A1AUx1eVfBdlgdP7lpYhpZUtAVuQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=;
- b=Kk31KqwktAhrujmIqm6x+Vq5C+Xof+1SFMTqPJabnVaSC03b68TjXe9ibgqCeHSw6bqtPhYfNGhm4jafvEh4KzVVtCSgyTGJ6Svz8+Iz4naf8JwNdEODuxT7ZErxs2ZrQ+oQzYZQRE1knSJVCXmlRHTXDqR4B7Vz6tYnG7zpOYI=
+ bh=YUgNxv4cL/9Dxkiza7/asrzAre485Wsa4U55tpifUuU=;
+ b=Z2sHzrU8GUATNFIzPjbCjjSVRKOJcFyHgaWzB87VG6xWdWP7QI7eygn97Qse2nr/qDmfR6y25PsmCQOKfm3gpE9IJpJB+yNZYRGo3A30wRxIF8Uy6mJ6O4c9xXVWemX/iRxsCy3OFXQ7VnzIJR7Q+USefQ8MnA30z5VOJhw4U4s=
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
  by LV3PR10MB8156.namprd10.prod.outlook.com (2603:10b6:408:285::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Thu, 24 Apr
- 2025 08:08:28 +0000
+ 2025 08:08:33 +0000
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23%7]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:08:28 +0000
+ 08:08:33 +0000
 From: Harry Yoo <harry.yoo@oracle.com>
 To: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
         David Rientjes <rientjes@google.com>,
@@ -92,16 +92,16 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
         Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Harry Yoo <harry.yoo@oracle.com>
-Subject: [RFC PATCH 4/7] net/sched/act_api: use slab ctor/dtor to reduce contention on pcpu alloc
-Date: Thu, 24 Apr 2025 17:07:52 +0900
-Message-ID: <20250424080755.272925-5-harry.yoo@oracle.com>
+Subject: [RFC PATCH 5/7] mm/percpu: allow (un)charging objects without alloc/free
+Date: Thu, 24 Apr 2025 17:07:53 +0900
+Message-ID: <20250424080755.272925-6-harry.yoo@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250424080755.272925-1-harry.yoo@oracle.com>
 References: <20250424080755.272925-1-harry.yoo@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SE2P216CA0177.KORP216.PROD.OUTLOOK.COM
- (2603:1096:101:2ca::6) To CH3PR10MB7329.namprd10.prod.outlook.com
+X-ClientProxiedBy: SE2P216CA0005.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:101:117::16) To CH3PR10MB7329.namprd10.prod.outlook.com
  (2603:10b6:610:12c::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -111,276 +111,237 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|LV3PR10MB8156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6eb647c8-0ecf-4fa4-ed69-08dd830731b1
+X-MS-Office365-Filtering-Correlation-Id: 5ee4fbdb-c64d-4d9b-0b05-08dd830734a6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?JHtVAr2dMi1xjAyBhlert4eli+pdw0gki3Clu9g9A4ka2euzm7yCED5B+GjD?=
- =?us-ascii?Q?nG2KR2YDrexQWzofdRVVY6cg3EWCaxmIU/Zw/JFQrS61KzG/iVB4Otlhyvg8?=
- =?us-ascii?Q?F7lOFTooXLfskDB8i85cgamVjJXP1o1dLAreI64S6GQ7bjG4CcXV5lNoRCFB?=
- =?us-ascii?Q?Um8pa4g4aqa6L/RnE1u9bPLDRZeERa4/0GCmcwVcdIDguFD43s2B7SnumOsU?=
- =?us-ascii?Q?2hLjF+zTNu0v8I8RkhiXEQAnuCWvcecIVFlbjgIKcHl497o6wz4yDHVNBmis?=
- =?us-ascii?Q?SiPoYA7KPu2QAc3aNdO3H8px4rQ4EkUmQ/dyCxwIxFsbUO+tGvKzCL1XpyUJ?=
- =?us-ascii?Q?DjboY9K9+UJKl5UzaCO5NveeEqn34EWHaGgQ8sUEk5iCy7dycMSxprUrNwFG?=
- =?us-ascii?Q?LyHvs9lkpiQcWTP50ViIE1BaS2aVtYPGPSe4eTkPyKcT4xWlpqKpMl7vr03r?=
- =?us-ascii?Q?HEHU1Cyy/GFTYgerUh/2kKUN1+u/U0v/bNgImGskJN3b87XkYE8NQVLP7B9e?=
- =?us-ascii?Q?m/QLHdgLW07bZ9pE4JdYD1aCEeGLLh5yY+XYnr3RqcnxQHPyHr5PRwtJLY17?=
- =?us-ascii?Q?JQhvj0zijuFpz14CzkNI8dyLFEQ1/W+Bw6aL6vEcH/gGV5TYwirMU+tl1fgB?=
- =?us-ascii?Q?tPFWXD41YqnlZebfXWnRxV8Zy5P7YTFmu8mYG4KhKggFNMAYoY4yfdiINzNx?=
- =?us-ascii?Q?PSzITfgPexfXQlq89BPzjnxMTMXVF/3Ionst6R90kmVrQctcC8z2BxsnDRVc?=
- =?us-ascii?Q?RtMoytxQiPGA5eB60oV332e9fLv7q8XCHAxNz/AoMVkCZLltLAFEufMtTJqH?=
- =?us-ascii?Q?cL0jRC9DQctI0B7geizBCR0EHrEZ55T8LXDtFarSgHnTR9lu6OlT3lFU/Hq2?=
- =?us-ascii?Q?xEqlfPNaL6M+ALzAGL0LqRsPoVOEkMKIN/FlxxOVN6hB9G1eA/rITE8pZexc?=
- =?us-ascii?Q?q8RaAGo/CXGjLVN9n8UcytV9M5QkcabRc5U4ZONIcelraJepW4aBym5/AkSh?=
- =?us-ascii?Q?qs3o79XI8r5nOuTI6y984VryXYbjudmBFBVw8sWSgLJspyLyaq23QatMwcIp?=
- =?us-ascii?Q?fnpVE0ZNXgmnOe5OZHBxtbegpSa+NTuOkwGFcoNzVq+gg9hws1Z0hHvwfiJ5?=
- =?us-ascii?Q?0PQCKw3j9Zs6PwhZ0aA+iOcw7YZsOujBMxp4NHhd7ybkpz++VCCk8mkPX7EJ?=
- =?us-ascii?Q?loX2MSkfF2nAtQlUVl3SnbHi+VAtTLaFxOMv5ftxq4Gdu8W3U8VrNsxlzCww?=
- =?us-ascii?Q?le0x0/ZfnDszWBsI5jaTov9wWNp2s/7Viey4IwKmFcwFuctLszYb57mfNaJM?=
- =?us-ascii?Q?mWt52VwbtO2YwHNLDDskfxv1Zr69jbZZvr8cpRAcp+h1GYv9NuHRomsExuBI?=
- =?us-ascii?Q?lEvlAIqC6nYj/og4hI/smJFIdwlR1PSxaYHV8KmGX/jnjQJfhJ9JgahzrQlL?=
- =?us-ascii?Q?olXbX7kk2PU=3D?=
+	=?us-ascii?Q?OwNs6JJ06qIWEjRvl7QUsjGHln/I+xO8RZ5KPzSO3Mrx1XQUTfkH0eFZcpb0?=
+ =?us-ascii?Q?fj7SKe1t2x2uGHzgCX/fvs91MjEhowHD/5BVJcwWQqroOXwjX7O59I3zwllO?=
+ =?us-ascii?Q?J0dYgHKhnsGFNs7DLpDZyL4CsGsfkWYVDX1iZXZ3srozLTypdff1K3gbLB8j?=
+ =?us-ascii?Q?TIJueRfEC9dY7tVoJevybykhLQDo1HGih9RMyNeQ7Aj86IILF5vyAyqmIRWK?=
+ =?us-ascii?Q?tx3Ou/mISMrrOSvi09yfAXZCP5nH3I28UxrL4KJrWl71cka+veMg3zwgb7GX?=
+ =?us-ascii?Q?+U3wVAM3lcqExjS5XIxWjg7blIcT6ilEdUasNdEwSC4mL8C/zAuvmhrmxscX?=
+ =?us-ascii?Q?3uWN75Et+yAQCVUr1sruj6kIntE9WpzHyN8v8uP3/SNIGZlpqotQRKkIA65A?=
+ =?us-ascii?Q?h5rBdcREY+Y2gcFvfTByCTxJbpujKdAPgGHK+KxkTGANXF2HIasPZSO8Ptis?=
+ =?us-ascii?Q?OoQw6rErWSo+JFANB6Y6tZRXTZJ3AX+m0b+lMrMZsGpEzS3zvN+3Rb+0OHAj?=
+ =?us-ascii?Q?eUEZVvbqOhyqV9apYeFhgAvVDA+Y/sS4pSi0SqML+NIqRYzNYKQqSec0tA8S?=
+ =?us-ascii?Q?ewZIG6Jamuq+PBTajB9edLjsaXvFQ6BDdRdVqSO/qlq5UBXN5zib6rJRmknA?=
+ =?us-ascii?Q?24klFJImbYdHLB8iFMYWWnerdvCOffoGknm9+by/0fKzEuyfeII2qOCko1hN?=
+ =?us-ascii?Q?ji+Ql6W/IIkV1znBitCgQPeYsi+KbN1a+m3clDkVZkhgCsWMglOjxCs5/YHo?=
+ =?us-ascii?Q?L8egIMp0oEZYwAvRVZz/K3hi+cVMtMDelQAVdhFq3dj04sVbG8XmCaaRVhZU?=
+ =?us-ascii?Q?UPxyiYs94Vo+NS+wwxltzT9ndC4qbZYrNjr3cqtxqeMvMQdYjUTq71gIrhrS?=
+ =?us-ascii?Q?e5SKQB6pVZxcqYNcAFDxCR08k0BfrBxfs1TrbwFryBI1lf+CEghVUrSs3ker?=
+ =?us-ascii?Q?fXBZsI2JM0dQdXIyFg/Tg4JJXzMFuz5Vxr5BVGeMO4nCY8REEk2UGxp0+tUJ?=
+ =?us-ascii?Q?4h+2do4InwC6jYczWPIcuZRiS2iua6JheK5cF4X0hf9Q/Eb4jPKTB0x+19kl?=
+ =?us-ascii?Q?itMcemEW1/eSz3thj47N7vGRRXvlhBQB5hLLx8TrM9ypJdXEPukBMaBO00Aa?=
+ =?us-ascii?Q?PiClkMcDHmbbmaAB/R5SldLNhoFESRwIEcOJwt79T51t4Dw3kMaD2K/c3O8e?=
+ =?us-ascii?Q?bbJf4MvsI97HBsnmuUPNgU5Bpw18pyky49gjjNozL+kmZTHgwr3WJ4oq7CSN?=
+ =?us-ascii?Q?oRWGwWu31v9UOXSzXVZ+s60y6nvl7JZhGUkkWFvC2Zplj015yIHZVLLG5hwt?=
+ =?us-ascii?Q?FPVYcFecyrczUFxy4mDzBh8I9ru/3ZIgDxgL9+fhUvyhPuqsdHGsIyfco1hv?=
+ =?us-ascii?Q?bQvQwvFVGyTSW+3XiWGAf5DKEeonnqfB/1TH8UxL0G2Ymi+KJA=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?P+MNZxspAmm6g986bH/g9ByUZLDTtMQuAFMsY7kF8sQ5v1FlYJ8RS0ciKsZR?=
- =?us-ascii?Q?eQXJjdhQkcqDze7Ffk0pgqYhs7FlmuzbEhRRUJ60u3dnlOA/Q2vQ38UfbU4M?=
- =?us-ascii?Q?vO0EDrXbq5Ok+J0XN0mjz5qlOfAV0GOqS2QXv2Yet0bsdRqp30/vMD+CyLnL?=
- =?us-ascii?Q?yTIQ5O0cNSLp15DAgbjnmi6Y1ME3V7Qm/ISDeF1tOQS8/D7gZw55FkGALEWm?=
- =?us-ascii?Q?swJ+sEgx3ps8Jpe14SQCkI9/69Y9+O0p8usn/fJCeoTzCISIPdouYS8U67RJ?=
- =?us-ascii?Q?bmBQZCFESjbfDmgSty4+DUOvTpMucaHEB1vRIfpdg/AJhtFv+UEvD7lM7APZ?=
- =?us-ascii?Q?5F2knUeRRZtuNtGAsqm1NfNZmPRmreiR5L/8igkNQ0DSETAXUxLiAvBXFgjV?=
- =?us-ascii?Q?5ujXVpvrqCaqsQZ+QfYVzP8IW0WAfgOXJM8C2LWw96jG+I3z/dkl7U4Qif0b?=
- =?us-ascii?Q?6loEwplIBtBlur3izppkySdh3hZZbmBxIggc5F8G0b0dfz7zSz/mDGLqh6bQ?=
- =?us-ascii?Q?YmmqQ+4Uj06FhQ25ry2SaLsomfFIAUydqc7rpeAtcLUGs4JDx10PPVcdprfn?=
- =?us-ascii?Q?rE7M8dmTsUsoWNr1hgzWfquvsCjuJUAEDUPJWRd65ED34BV4TRhkFaXEuLRK?=
- =?us-ascii?Q?kxnJXMD+Y/lUmHqu0bhIcZnybGrsyzQ7omyP5eVsEZxb/cU75/dAjcNO/COf?=
- =?us-ascii?Q?ERrLm/g/d/f+ImsgE5ZqAKItADdk3btYrXpS+1uknsatNp+cT9Qv24EDi2PW?=
- =?us-ascii?Q?2qtOLygfAn8WWqstXUNXTfl6sJBPQCpfJ5oqrf6hWJ6eQgJtAZqz2Lr0LRiZ?=
- =?us-ascii?Q?jd6QJt92Z/fwbHKCxd2ccDC78FnGpKMJiWY7wsqxZH5NXQw7Xni60Dcge0Sv?=
- =?us-ascii?Q?HoCdEMB7E1AgfPJYE3wV6utAbPozj48I5vEMujaDxZW11t2RbQqpJs9XyNDc?=
- =?us-ascii?Q?R/NieU/c24YKMlbGyfr6df9uExsTsKgnvB81lh4BIIpQ7ElTeZe8+AjTt0q2?=
- =?us-ascii?Q?GpkAHMPNavrtIT9nQ27On3TEh+42E3nbTgxcUjLqKZA7mdwM2g7JQIJPuFrd?=
- =?us-ascii?Q?RYldPvnDYXELeZ8mvOvzYFxcu1vXc3kvrMMH+2uDUQQI2VjOh8JRhJjYpxEW?=
- =?us-ascii?Q?/oc/32yUsT87vHm5FddMpjlq4yJwtqJkCuhXmcTLipXgj8U5uYSeK2sIopbh?=
- =?us-ascii?Q?yGObKOvdONtHqN1gqgKWuayQmcWvwLk39RncLvDWVDaGPwvnKzzAPozHRApD?=
- =?us-ascii?Q?TP0XML4PvNaTLfXm55CyubwgZPEVlD8EzpQMZgj43bZ0+jj63qVv9seiwC3i?=
- =?us-ascii?Q?tl7FHu23A6+aNs5M27HC+dlypfAZMt4j2umwLv9enGUtlkWG+Mr3CJ52PFQK?=
- =?us-ascii?Q?D8ttXIkVqrVPta2kTDQPi7Khcv08pubdx3cmaoffq2FFS/NeoCtl+Il5YOPZ?=
- =?us-ascii?Q?9q5lhOfGdBi9LKnyiNEGG+QSbUU1n61EeEGLbdYMf586MBlIblFlry0KCGDi?=
- =?us-ascii?Q?lK+ubl0wQ1z2JpY1ujVBXWSY1UN5vnAoujuTuFgc+W9HOsci8xpsv6YTeaoQ?=
- =?us-ascii?Q?93p99ALGzUYpWATn36h2wUQhEy+l6mk8QbA/TiGT?=
+	=?us-ascii?Q?tULQbJoQsiJmAYealKPif2pd+Of6+BEFYN/6pdWPd50e94012LRLEBO20kqi?=
+ =?us-ascii?Q?EC70dwR3ClK8SpgFJg88aU3zvKuX+aqvId9XhSoRb5bwF/b6W+z4CUacpodM?=
+ =?us-ascii?Q?2faIIJrcjf0JsX9GHUI/dXyHvuBvMQbjxdR2JIU0gb5WrbZyx0mHgVoG7OFF?=
+ =?us-ascii?Q?wNt2mwgsvs9+UwZ0Wm0QnSmjzjbpahkvpr9xvSt2QISXXiAVJfMxstXFTt3s?=
+ =?us-ascii?Q?4yKTmO8frdNXJB3qtNfrgTz3jG+eqMEiVMKJUCZ+xwvEwwg6ZIPnZ4Kmd3jd?=
+ =?us-ascii?Q?aN0yFEd3kWwj0GtXRZ2JZz4YBdXq6EnFTdBvdjzbheB1qLLlLyNVzgc/hszH?=
+ =?us-ascii?Q?RlEmssizmv5BwreZLwmYdU98yuM11BuoYNZc73i8+D+yWyPN8VE2R/KnJsvU?=
+ =?us-ascii?Q?vhr2uH6TohKz5g1Eim9od57kdXLNEAx52LkhDB+u9DHABbrX613l9H9SOJmZ?=
+ =?us-ascii?Q?vikzkBRI57QegoF1d2IpD/gVShBNsgE4S0bjAj2Hpk6+2m3aGO8bt3KfKcx8?=
+ =?us-ascii?Q?BPGlX+l4Y4DTzxpM25J9C8v2xJuNlyGEvlMTCiDY5aHMviUBpjjc1dF65Qev?=
+ =?us-ascii?Q?uMG++cdkx4xluypkLt/UmMq0f5S1j94i2kba3YY4CbgPH1A4P3Q9mNxkMtXL?=
+ =?us-ascii?Q?V42fM3ckvbbQqWVioE8OtuPBVt3PwW3QuRxvytFACcVg09/xQFTTa4/F0NHY?=
+ =?us-ascii?Q?C3FO4aywwG/T3CFG8atvgmuYG2UGnuGcXEZYfNRbkjzAw23S6GyQqHlVTQ57?=
+ =?us-ascii?Q?9avgbllhcH/t/XQcBt97fp8fNXMwIHrYk3UrBxXcV2JR9qMrS8VT65+44dyp?=
+ =?us-ascii?Q?C+1vOMgSFOUVWvXhR5mPdEisVNkuQYTK6T5M5WD7a/PtDnYYPt8Xm3Pr3DF2?=
+ =?us-ascii?Q?9hgbhmrzm0qambHhtm4A5GEzAg9j7QWqLW74qZLCf6OO0SEpkTMxTNH6GIgC?=
+ =?us-ascii?Q?2RbeC+DhQPRBB+E9eTMcVT1rqadydqZn+yMnNBoYltfsOYOca3C/zEbRtidX?=
+ =?us-ascii?Q?GKrKTODxMIXr0as6OHg5+Ju0zptTYI+I1x4VvzL/hVQohAqmXmB5Didtnwe8?=
+ =?us-ascii?Q?fudlgjDLzTC4ogBcFCLkfssCkUAmT95EUR8E1HpygZJA1JR8zysnFLSwuHt/?=
+ =?us-ascii?Q?UIYinwS2J7LlsnvxBhjArAlwIoWYBhpiDxQncN9eDe13O4l4CEeS51KyIbnQ?=
+ =?us-ascii?Q?sPaDapbYoyXB5urisbdD5ZvpP8p8UrHJhC2eyIpEwkqjhGeZzfaryOsIsVkO?=
+ =?us-ascii?Q?vPE4rNRoT7mYPqM7HDmyKxg/mDi/+IvqQi83XlnEISQn5RlnPENjuNT9d1R+?=
+ =?us-ascii?Q?7+epk+4jcpPTtKzW4G0EOkN4WBYZ0Xl/eK8uGLpfxeo0ufI000lT3+k2XjOU?=
+ =?us-ascii?Q?tE/iTlQapoH3nd0N9Oc48h5JnoDYLLyghjRydjkhRz7VYEokUFWY9tRvOn9J?=
+ =?us-ascii?Q?OOul4WHPEROf2mBifonajShcmEnpCZLAdRnotyYug7uX1W42Vef/9mc6TdMX?=
+ =?us-ascii?Q?9l3G/WgYu8Y11mEDq0U6I9qwRihWvFJJP76GYKhBAow5O+tGRpewkpyuJ7xU?=
+ =?us-ascii?Q?pX7sZELD/Mr7/n6oBdZMP+R2TvT2epq/js171CQj?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	kF4hGBiK5zV5ao+8OsHZVIk86/ovTh+8BOx1PDvMycneprz8G8LHrdlz+iqX2jLnWatYVkNZifdI1HdhyhUz9OVYYJBI8b6+O01istBuNN5X6hCFXlhAqKQcsO3uKJSvjJuSa1tfnFSD9qjIjIPRFSeVa2gykbmHEpq8nIZS6ALxeSaXCwQyIxUjzh2GIvI8vC1TWHDhvNzUcXl9WoR6+FbAYBT20mvGjF1TmAHdUWkHtLjFvm1NDNuPfLBujo5vW7UcshmX/+muAchbJMxVbp98qhOl96wn6XC6RrvNcHxG+nQzSL2sL0yChaY2P+LZILF7r9s6Ll8udOGRD1IGnBTOh5i+Jl0wXFREC6TTiJhtx+agiK+b8/4WF2hjxZu0ZCvOd1zFaQtFbNyglQxAz5MyTS5iuvRGFHqoAyCXiLN+BX00urW6f/i5rb6NO1p3oqvasYHm+x7cYZg2eFcmfitx/oUKZTSwfyyh+AMnBGAdCh0NSf1otqRj7wabAbaFcBdymQkksX7sj3q/dQh2tI6GVtdlLbw0XjXhF0KhP++uTJ3ylnt+aCOvy7NLi+1I33A9P1sQjegZKvwaWpzZ7/XAJ15fcdp2ak0wHDRkKfs=
+	HwvwQixPXvMjrB6whv0vqHiMgBOIXOXMiVPuBjwabYkPY7BxY+1jZo4HGJl/Qj+1kF4u5E34aXI4YCIEoQ1AfakoE2ZlfAcli652vyBugziaOaqIeygd03XJYUgc/Pw2tt2xGwjj/b8QgCwPFyHAtbEcZXUihqxQFyqKuaVa/MDxAmX4Wf1vTr8yjldd1GKkRhxUr3S7on0wxRSNAvpvz84yzaRFnsQQA2kylnAQmayWmStxObCf/9jVy+kUWA6SL6pomFx/il7c7Mc+ladSRrwAtc77PyqroWjlGb8hd9rLjtX77dEkFYTwAtwx/E2QHo0xIIS+fxsghag1+GmkyEnRVZVVGJJ7wmaEXJga0vGXqV20hvNwnbN73lKzxXWuTpmz7f8wfSKz03v66M199nX9PmcdW4JgTfV+7GSFEvF890agN4yxwSZvko2QCwSwxghunU7mefhkc5izw4BOe+L452m7eS7PxBZIRQC0MGvijy2ORM7L/91Sri90V+cFF5lq8O6izmWKz/KXHYykPny9vwfRV+SFRToNMC8skFYQKs8HBjmvXafoztRQlUC3xJYtFbKCGoy2EvwKA1GFxykiBhgaDRtqjFjQhiRAxVo=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6eb647c8-0ecf-4fa4-ed69-08dd830731b1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ee4fbdb-c64d-4d9b-0b05-08dd830734a6
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:28.1415
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:33.0827
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: krdnLpQqIlLAPATYGOQeuqqDW9JlCRRq+Y6aqo7lN3e02I9dUv+wLLhhCWWmGByvjzApdBkQo82Fp+5Og+Vgrg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: +hCO/fq8qB/MuUTQzXPRUYK4YyuWpDDak6EDidM6Z2cOjVy6rSRCgjCGyxgvgt0q/mGAkO3G8M8d/filZSsbYQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB8156
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
  definitions=2025-04-24_04,2025-04-22_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
- spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
- definitions=main-2504240053
-X-Proofpoint-GUID: UtXUFSJ4Jl60hY1YNT5uPOBa5aCIleKw
-X-Proofpoint-ORIG-GUID: UtXUFSJ4Jl60hY1YNT5uPOBa5aCIleKw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfX+iqNPwB+QO2U m8v99tiFZVVeBhUNSqrZOs9qiEblWFgPMou5iMUSxNXxRibaZROpVCW8PDPypddzv21ScCmTDOf LAXAdt9CFjbS92zqxLoidHsj28bLTj7lV2CuWNHmiVHJHCHxWFs85G4P2tPfXhPQ1MHx6zFp/yC
- 8NlMA+qbvGCf7ZRolOCrDbTMhQHpBpz6zezij5yg3ZVAHL2rYdAIxQfTiKSumX0tHOTovxgf16q 8AagxwgQy7Lv+imjlx9JnGWK6UnXA0+DxDcDDKwqFlG5jIhSNLrfamwIr2u3gibSm6zzosRL4hk 7RYfaMT99d2gdagBc4rGlm+OE/axJJNlxDms70W61FGL50iGzA0/cphNUeMZfmRvEi30Kewxv/8 suPKEpnE
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2504070000 definitions=main-2504240053
+X-Proofpoint-GUID: --QRqZqRwSQrzYl9AdvUh0J3AExGv7Nd
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfX3xFEBXD+2Z2T nlzsdMt3XI1fbNzIIEaykfy0RnG4wauJi7T1BXn7fNLq1/H/cs/Pq/8Nth5l8Wua7AiyvayIuYW q/Ce8tvaAZaDFlD2ptzL5AgpUkuKXwsAEXLrc5DQw2xoS0cAN2GJ0Y609mpcBaW5SkS/2Niped3
+ zoIsz96UtLgDJnStHeIuANWOqHq6XfliiR8mUAMpEmiR6bQKwEB5ftKRIJsqI2YX1qxPeIHrY4R Z+CWTm7eW17l952CDWlZTJsb9MxhITl/e7PThc5KiR1XGgiE5FYy5hB8iiQXgzpjG45tB9FZFmG 9cqtQ4tbTZ8sWsGI72+MsMc2VbQG+N0qbbV5aANcU8atFVgWW9msjnQ4PfLDivf01gTBoof5xCl Zc2dXHpE
+X-Proofpoint-ORIG-GUID: --QRqZqRwSQrzYl9AdvUh0J3AExGv7Nd
 
-A tc_action object allocates three percpu memory regions and stores their
-pointers within the object. For each object's lifetime, this requires
-acquiring and releasing the globak lock, pcpu_alloc_mutex three times.
+With a slab ctor/dtor pair, slab objects can retain a pointer to percpu
+memory that remains allocated until the slab destructor frees it.
 
-In workloads that frequently create and destroy TC filters, this leads
-to severe lock contention due to the globl lock.
+In such cases, the charging and uncharging of percpu memory should be
+invoked when slab objects are allocated and freed. Allow explicit
+(un)charging of percpu memory to ensure accurate memory accounting
+for the slab destructor users.
 
-By using the slab constructor/destructor pair, the contention on
-pcpu_alloc_mutex is shifted to the creation and destruction of slabs
-(which contains multiple objects), which occur far less frequently than
-allocating and freeing individual tc_action objects.
-
-When tested with the following command, a 26% reduction in system time
-was observed.
-
-$ cd tools/testing/selftests/tc-testing
-$ sudo python3 tdc.py -f ./tc-tests/filters/flower.json -d <NIC name>
-
-Lock contention as measured with `perf lock record/report`:
-
-Before:
-                Name   acquired  contended     avg wait   total wait     max wait     min wait
-
-                       15042346   15042346      3.82 us     57.40 s       4.00 ms       316 ns
-    pcpu_alloc_mutex   10959650   10959650      7.10 us      1.30 m       3.76 ms       313 ns
-
-After:
-                Name   acquired  contended     avg wait   total wait     max wait     min wait
-
-                       15488031   15488031      5.16 us      1.33 m  5124095.50 h        316 ns
-    pcpu_alloc_mutex    7695276    7695276      3.39 us     26.07 s       4.03 ms       284 ns
-
-The contention has moved from pcpu_alloc_mutex to other locks (which are not
-symbolized and appear as blank in the output above).
+Note that these APIs only (un)charge memory only for memory cgroups.
+They do not affect memory allocation profiling. Memory allocation
+profiling records percpu memory only when it is actually allocated or
+freed.
 
 Signed-off-by: Harry Yoo <harry.yoo@oracle.com>
 ---
- net/sched/act_api.c | 82 +++++++++++++++++++++++++++++++--------------
- 1 file changed, 56 insertions(+), 26 deletions(-)
+ include/linux/percpu.h | 10 ++++++
+ mm/percpu.c            | 79 +++++++++++++++++++++++++++++-------------
+ 2 files changed, 64 insertions(+), 25 deletions(-)
 
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 839790043256..60cde766135a 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -112,6 +112,8 @@ struct tcf_chain *tcf_action_set_ctrlact(struct tc_action *a, int action,
- }
- EXPORT_SYMBOL(tcf_action_set_ctrlact);
+diff --git a/include/linux/percpu.h b/include/linux/percpu.h
+index 52b5ea663b9f..2d13ef0885d6 100644
+--- a/include/linux/percpu.h
++++ b/include/linux/percpu.h
+@@ -140,6 +140,16 @@ extern void __init setup_per_cpu_areas(void);
+ extern void __percpu *pcpu_alloc_noprof(size_t size, size_t align, bool reserved,
+ 				   gfp_t gfp) __alloc_size(1);
  
-+static struct kmem_cache *tc_action_cache;
-+
- /* XXX: For standalone actions, we don't need a RCU grace period either, because
-  * actions are always connected to filters and filters are already destroyed in
-  * RCU callbacks, so after a RCU grace period actions are already disconnected
-@@ -121,15 +123,15 @@ static void free_tcf(struct tc_action *p)
- {
- 	struct tcf_chain *chain = rcu_dereference_protected(p->goto_chain, 1);
- 
--	free_percpu(p->cpu_bstats);
--	free_percpu(p->cpu_bstats_hw);
--	free_percpu(p->cpu_qstats);
- 
- 	tcf_set_action_cookie(&p->user_cookie, NULL);
- 	if (chain)
- 		tcf_chain_put_by_act(chain);
- 
--	kfree(p);
-+	if (p->cpu_bstats)
-+		kmem_cache_free(tc_action_cache, p);
-+	else
-+		kfree(p);
++#ifdef CONFIG_MEMCG
++extern bool pcpu_charge(void __percpu *__pdata, size_t size, gfp_t gfp);
++extern void pcpu_uncharge(void __percpu *__pdata, size_t size);
++#else
++static inline bool pcpu_charge(void __percpu *__pdata, size_t size, gfp_t gfp)
++{
++	return true;
++}
++static inline void pcpu_uncharge(void __percpu *__pdata, size_t size) { }
++#endif
+ #define __alloc_percpu_gfp(_size, _align, _gfp)				\
+ 	alloc_hooks(pcpu_alloc_noprof(_size, _align, false, _gfp))
+ #define __alloc_percpu(_size, _align)					\
+diff --git a/mm/percpu.c b/mm/percpu.c
+index b35494c8ede2..069d8e593164 100644
+--- a/mm/percpu.c
++++ b/mm/percpu.c
+@@ -1606,6 +1606,32 @@ static struct pcpu_chunk *pcpu_chunk_addr_search(void *addr)
+ 	return pcpu_get_page_chunk(pcpu_addr_to_page(addr));
  }
  
- static void offload_action_hw_count_set(struct tc_action *act,
-@@ -778,27 +780,20 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
- 		   struct tc_action **a, const struct tc_action_ops *ops,
- 		   int bind, bool cpustats, u32 flags)
- {
--	struct tc_action *p = kzalloc(ops->size, GFP_KERNEL);
-+	struct tc_action *p;
- 	struct tcf_idrinfo *idrinfo = tn->idrinfo;
- 	int err = -ENOMEM;
- 
-+	if (cpustats)
-+		p = kmem_cache_alloc(tc_action_cache, GFP_KERNEL);
-+	else
-+		p = kzalloc(ops->size, GFP_KERNEL);
++#ifdef CONFIG_MEM_ALLOC_PROFILING
++static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
++				      size_t size)
++{
++	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts)) {
++		alloc_tag_add(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag,
++			      current->alloc_tag, size);
++	}
++}
 +
- 	if (unlikely(!p))
- 		return -ENOMEM;
- 	refcount_set(&p->tcfa_refcnt, 1);
- 	if (bind)
- 		atomic_set(&p->tcfa_bindcnt, 1);
--
--	if (cpustats) {
--		p->cpu_bstats = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
--		if (!p->cpu_bstats)
--			goto err1;
--		p->cpu_bstats_hw = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
--		if (!p->cpu_bstats_hw)
--			goto err2;
--		p->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
--		if (!p->cpu_qstats)
--			goto err3;
++static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
++{
++	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts))
++		alloc_tag_sub(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag, size);
++}
++#else
++static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
++				      size_t size)
++{
++}
++
++static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
++{
++}
++#endif
++
+ #ifdef CONFIG_MEMCG
+ static bool pcpu_memcg_pre_alloc_hook(size_t size, gfp_t gfp,
+ 				      struct obj_cgroup **objcgp)
+@@ -1667,7 +1693,35 @@ static void pcpu_memcg_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
+ 
+ 	obj_cgroup_put(objcg);
+ }
++bool pcpu_charge(void *ptr, size_t size, gfp_t gfp)
++{
++	struct obj_cgroup *objcg = NULL;
++	void *addr;
++	struct pcpu_chunk *chunk;
++	int off;
++
++	addr = __pcpu_ptr_to_addr(ptr);
++	chunk = pcpu_chunk_addr_search(addr);
++	off = addr - chunk->base_addr;
++
++	if (!pcpu_memcg_pre_alloc_hook(size, gfp, &objcg))
++		return false;
++	pcpu_memcg_post_alloc_hook(objcg, chunk, off, size);
++	return true;
++}
++
++void pcpu_uncharge(void *ptr, size_t size)
++{
++	void *addr;
++	struct pcpu_chunk *chunk;
++	int off;
++
++	addr = __pcpu_ptr_to_addr(ptr);
++	chunk = pcpu_chunk_addr_search(addr);
++	off = addr - chunk->base_addr;
+ 
++	pcpu_memcg_free_hook(chunk, off, size);
++}
+ #else /* CONFIG_MEMCG */
+ static bool
+ pcpu_memcg_pre_alloc_hook(size_t size, gfp_t gfp, struct obj_cgroup **objcgp)
+@@ -1686,31 +1740,6 @@ static void pcpu_memcg_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
+ }
+ #endif /* CONFIG_MEMCG */
+ 
+-#ifdef CONFIG_MEM_ALLOC_PROFILING
+-static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
+-				      size_t size)
+-{
+-	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts)) {
+-		alloc_tag_add(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag,
+-			      current->alloc_tag, size);
 -	}
- 	gnet_stats_basic_sync_init(&p->tcfa_bstats);
- 	gnet_stats_basic_sync_init(&p->tcfa_bstats_hw);
- 	spin_lock_init(&p->tcfa_lock);
-@@ -812,7 +807,7 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
- 					&p->tcfa_rate_est,
- 					&p->tcfa_lock, false, est);
- 		if (err)
--			goto err4;
-+			goto err;
- 	}
+-}
+-
+-static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
+-{
+-	if (mem_alloc_profiling_enabled() && likely(chunk->obj_exts))
+-		alloc_tag_sub(&chunk->obj_exts[off >> PCPU_MIN_ALLOC_SHIFT].tag, size);
+-}
+-#else
+-static void pcpu_alloc_tag_alloc_hook(struct pcpu_chunk *chunk, int off,
+-				      size_t size)
+-{
+-}
+-
+-static void pcpu_alloc_tag_free_hook(struct pcpu_chunk *chunk, int off, size_t size)
+-{
+-}
+-#endif
  
- 	p->idrinfo = idrinfo;
-@@ -820,14 +815,11 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
- 	p->ops = ops;
- 	*a = p;
- 	return 0;
--err4:
--	free_percpu(p->cpu_qstats);
--err3:
--	free_percpu(p->cpu_bstats_hw);
--err2:
--	free_percpu(p->cpu_bstats);
--err1:
--	kfree(p);
-+err:
-+	if (cpustats)
-+		kmem_cache_free(tc_action_cache, p);
-+	else
-+		kfree(p);
- 	return err;
- }
- EXPORT_SYMBOL(tcf_idr_create);
-@@ -2270,8 +2262,46 @@ static const struct rtnl_msg_handler tc_action_rtnl_msg_handlers[] __initconst =
- 	 .dumpit = tc_dump_action},
- };
- 
-+static int tcf_action_ctor(void *object) {
-+	struct tc_action *p = object;
-+
-+	p->cpu_bstats = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
-+	if (!p->cpu_bstats)
-+		goto err1;
-+	p->cpu_bstats_hw = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
-+	if (!p->cpu_bstats_hw)
-+		goto err2;
-+	p->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
-+	if (!p->cpu_qstats)
-+		goto err3;
-+	return 0;
-+
-+err3:
-+	free_percpu(p->cpu_bstats_hw);
-+err2:
-+	free_percpu(p->cpu_bstats);
-+err1:
-+	return -ENOMEM;
-+}
-+
-+static void tcf_action_dtor(void *object) {
-+	struct tc_action *p = object;
-+
-+	free_percpu(p->cpu_bstats);
-+	free_percpu(p->cpu_bstats_hw);
-+	free_percpu(p->cpu_qstats);
-+}
-+
- static int __init tc_action_init(void)
- {
-+	struct kmem_cache_args kmem_args = {
-+		.ctor = tcf_action_ctor,
-+		.dtor = tcf_action_dtor,
-+	};
-+
-+	tc_action_cache = kmem_cache_create("tc_action",
-+					    sizeof(struct tc_action),
-+					    &kmem_args, SLAB_PANIC);
- 	rtnl_register_many(tc_action_rtnl_msg_handlers);
- 	return 0;
- }
+ /**
+  * pcpu_alloc - the percpu allocator
 -- 
 2.43.0
 
