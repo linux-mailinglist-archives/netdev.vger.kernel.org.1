@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-185736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1874DA9B96C
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:50:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE18A9B972
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9801D3A6218
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D7FB5A5700
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47AF223DDD;
-	Thu, 24 Apr 2025 20:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B206E26A0FF;
+	Thu, 24 Apr 2025 20:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PKxRPcgm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vu36O2/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE781ACECD
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDDB214A70
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 20:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745527851; cv=none; b=oAxSxwj4XQbSgBNFuaUb6ejSdAltNpZvyVo4DbrpVhZvUcAAGpLXiOOKwFKyHG4gWhQ0bcH+Gb3nVSeTvylSubAwc/vDlXhz5FhK9R17RBMEzmXKjs9OM0FiiQXT8aYxlGN2jamrBP/XKu32w3Uh5JiOYOlqnGb3AA33apsM2Pk=
+	t=1745528257; cv=none; b=FkQBFl+URJs6x3bHPocyySy2ArEPx+q8MXQQ+XSIUwfiVb6D678C6mUvLyZiTbr0iwdsIS8Rp2SrSZ60WfAmM1aTwj7pI2I6WyuBJTFoR9rvpWe9f5dZr2bO3WjY47vNozlxft5UveodHpnoPahIpaJp/VGy8iCQPWqppIpvx58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745527851; c=relaxed/simple;
-	bh=LB7qNGAAaMWemnkoRO++0VBgqYQ61MEhQaUz3r90ctU=;
+	s=arc-20240116; t=1745528257; c=relaxed/simple;
+	bh=69Zl1Q9Y/ulDN1OiSHLjO7STbweGZk6xpTGDwtmmH6k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cfI2nGapEQ24v5mqOhCJaAx9QdimeM7njAn3yGA6kTrgj8wmip/tzC/MyqxRhDyhu2AwbBAfetFyDU70eQPV4DMa9BJInpxUALvsCZYYvJQW4K9zvBLo0wa+1fIb0Zm0TwTxT2DUP89WzG4mPIYnKBqjE1YCBz3AIqYeB1IXv40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PKxRPcgm; arc=none smtp.client-ip=209.85.214.175
+	 To:Cc:Content-Type; b=ZMViNhLBaOqjRreIpyOKlsMUlTOAc+FaycsZPEBvxzPZD9WJgjek7Nl/edoeiuqgQDBqWLrDoakoUNs7qI5gST/h0k9H/l5BVMVnQKW4yNw8niobgeg70hVhSRU7q0rDRtLhN+HRa6zwLEMOKp/LlO8ND0HEOY7+1GLChA4Kt24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vu36O2/T; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2242ac37caeso7665ad.1
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:50:49 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2264c9d0295so46965ad.0
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 13:57:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745527849; x=1746132649; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745528255; x=1746133055; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T/802qi6eb0E7qPDB0B7VDX02ruc5oRmaUhnY+sV4z8=;
-        b=PKxRPcgmvvmGgUsuCZuNazBXlXS5LRq7rTe6ykFo6xTG0CvN8tSHriN1aAtkCDO8Pa
-         fU3iAruwQCNJUBjmaispXbk1hR00EiD/c+rjnfe7nLvvbtho+RrMCAeyvXkZWkWWd6I3
-         VOrndO/k+iEzhZ0hN91jvGvKt+rUIYxg3RGTUmmbOuy8ho1goFOGflGVlc2HOFrq39Pu
-         wICsaTBSn7j8Iat3d8HaowVc6H5MAfS3Mu4WyP6KBhtjRe9HUs3qG/j0bfATmN49tnzk
-         TrbukAC4w+ys6v/V8nRKuIvD8Hxsl/4NjdUSeNNkWDugi7Z95KKJ2cLsiObtsB6fseiq
-         vy/Q==
+        bh=tVnR30CoW6pRa2/4n0Y/Q1aA7ucltJSZ6Z66DHuDv5I=;
+        b=vu36O2/Tm6cQndQdHG8/fra8V61KLyqXQThvdJqdqrJpZGqdRiFDbAA2BPeg2ETc4/
+         +8QURryzQtO+l7fcar4YzeivkEdrT9A87GXw1+p564IMlxCO+sd8/SgrSK1WYBnuY/5m
+         b9pnkASZNIEz3cIKdWfIw+gIrLKyn0PaZnWUhHpQNkGAB0Vy+E3S3cmDPHSUwc1+dK2q
+         XHndbmFxQ4bOabDCWIovYknoPAzm1qy9HzyX82nNF4SSVYNT5ArDCi95EJkUkqGzh9TQ
+         qRfYqtYK9UwwQxfj58yMgjggWonva5n3tLtPk3tmAnUlyiJjgqCAy367bEDyjS8mBDBU
+         E6kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745527849; x=1746132649;
+        d=1e100.net; s=20230601; t=1745528255; x=1746133055;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T/802qi6eb0E7qPDB0B7VDX02ruc5oRmaUhnY+sV4z8=;
-        b=D621uyyvTcniR1dfZTDWySA+rIwngas9voIR4MVJXB3qBq5gOMkEEuHs+5kiqgwHxr
-         HUhyiP4vbZfTeLaHSiRGNdr9UC05ruzocL6C2Ucto1gcVSFypvnmjSfvQkoa3fEWnFfy
-         FY8H9jLiKXGmparqWyu/IbELr0xykOETFI19IWGqZ5KozT4cUUHv/b+W2/bv3liNyfy7
-         1es+K2+PtKZaEn1w3LJkqISsUoXah+VDLRXBMoZAJRpcPGfzWxVgULjz30jDtN74DmOf
-         1wfHEOlncO4BrCw5je++EQd0ayVBlqFQJeds0kr+ycrhE7Buc5ZJGrBtrobJiygde7KY
-         E1cg==
-X-Forwarded-Encrypted: i=1; AJvYcCXICPx5urQ4kuIwJcxzABcN2IlEsBeTw+2m5AiCmmlHIolIwE/u1AM/U5aXUppkVcRNB+CtOcs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyP6p+TWVRSfAAN7/F/oc3f1fFnd0iGkD3O3Qi6KU7Kfn2uS2SF
-	A6AYSBzZFsEV84QmjyvH+aIavnpgU1SeShqd09aJ+R+twcX8dME4P67fb0iclW5tFSVtCw5gcgq
-	MCVqYrwtmwv6GIIv0Pcpkd5yxRsr9c7bOEUlh
-X-Gm-Gg: ASbGncs1P4cvbE3t4TqVGN+P5WUmYJo8DiIpiRuzvSkH3DC34YmKWqJ78WMP4Ic/tIT
-	br7c+9PQdhVWzxUgw3pFc2vqW9p4hIMEojqrNjN1A5Ch0Tf1vQloA/SREayxyebOv8maHy4jZg+
-	iTgvtGpDL4DXxn+GBbazUdYXljwCZXKhYal8RMiB8+oZMONWF9sLQu
-X-Google-Smtp-Source: AGHT+IFNkXE9PRC3ayxXx+fRCxr+F26rln5fZ6roq2TrIdXM/8T4kEtsQjIS9/nx2ZAmTrEyasN1ZxNuuHVbrrmck8g=
-X-Received: by 2002:a17:902:d508:b0:223:3b76:4e25 with SMTP id
- d9443c01a7336-22dbe47ad14mr87555ad.17.1745527848933; Thu, 24 Apr 2025
- 13:50:48 -0700 (PDT)
+        bh=tVnR30CoW6pRa2/4n0Y/Q1aA7ucltJSZ6Z66DHuDv5I=;
+        b=pt+TSCoWm27c/EZeL9w4mIasyffiLdY0oHYFkvgO9mQAaN1URgvGMMCxHJ7W+PyBha
+         xYDoNzOJYvphPhi2c+Nuif2LBNZ06Hc8+3ZzraalP9J4zfFh+HOOHjHhbiS/gIt43qzT
+         Zvl+jthPdwKYAbZKIU0zBbU6+5xEXnpZoO1IKtqiasN+hstDp7wvdoPfIFxegPmnOwPM
+         pV/I189rpMwcuxpd+50oQQzznRT1ozGrHNc/iZgDdmtb4OcN7sTwRpy2uU4mse2XOmDk
+         bdRyvl2ZN5jiYG5xM72rewsQiJIcNPRirzQSC7gdeH0ImMESAspG7tfh900PQdtdK1UP
+         sykw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdZfEzGoVEKCq9xpFH1gyqSAxRSMna0jDiKBWfHNV7i8g8y6hl5x9NMmdQoQAt2krmvYNZ1b4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQxXA6KDhUbu56WQynW8y2V0WeFwxfi5yPmnTiAJM/5Jz3C1Ht
+	m/ftuiGQTTbJdDajmERcEoEC4ipwAg944c5vfm6FptPzELeCZsHK9yYOkDqXm5rWwAw+iDQEfGW
+	YzgNiUOtLWAqIsJagteIyVHNYvVdk+yVFj4yB
+X-Gm-Gg: ASbGncvTEnSuwNieX+K9qGDXhGVkLFsLXBdZv4ROoWVpXc0jU/SHiSSjpDzC1MtBvCx
+	SkXtVjb61pA1uavzq0Y80BzGWeAfTLNaQ9Ym9f/5Z9O0EtuuKp0Udp5zIxfVqJWMbeihTvpKSxg
+	uTu9Po1CzxMEsNdWi2MTLdsF84JfuHvbql7VlKw43O7jdeQ+vpECPe
+X-Google-Smtp-Source: AGHT+IHvwGTnXWEouc+aQrROZ+mNQ/bMS9Tbe3AjHlQ32xBvI3gUczDHvV09gYKEVvcLaka+I4ldvUmYIY4Aeaq6HYY=
+X-Received: by 2002:a17:903:3c47:b0:21f:3e29:9cd4 with SMTP id
+ d9443c01a7336-22dbda861cdmr686195ad.20.1745528255070; Thu, 24 Apr 2025
+ 13:57:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,40 +75,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250423153504.1085434-1-cratiu@nvidia.com> <CAHS8izPxT_SB6+fc7dPcojv3mui3BjDZB5xmz3u6oYuA2805FA@mail.gmail.com>
- <9322c3c4826ed1072ddc9a2103cc641060665864.camel@nvidia.com>
-In-Reply-To: <9322c3c4826ed1072ddc9a2103cc641060665864.camel@nvidia.com>
+ <aAlKaELj0xIbJ45c@mini-arch>
+In-Reply-To: <aAlKaELj0xIbJ45c@mini-arch>
 From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 24 Apr 2025 13:50:35 -0700
-X-Gm-Features: ATxdqUEuhLKTWnDuUFNISQQgLta9fpzCmB9Lk5mhqVRYucx9SnaE5w5d2Jx1MXc
-Message-ID: <CAHS8izMnpEoXzuu2Eg-3ewSj7Chq2mC5k0tFosOLT6SU3+ennQ@mail.gmail.com>
+Date: Thu, 24 Apr 2025 13:57:22 -0700
+X-Gm-Features: ATxdqUFpuA1oI86A_55BG3HYyIRY20mi4m88DNRxjvSDThCfzcctNktY6unjCfg
+Message-ID: <CAHS8izOm4QbHECZDB+imV2eVXs=KXRKzJsDw2gKGp_gx0ja7Ng@mail.gmail.com>
 Subject: Re: [PATCH net 1/2] net/devmem: Reject insufficiently large dmabuf pools
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, 
-	"davem@davemloft.net" <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>, 
-	"kuba@kernel.org" <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org, 
+	Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 24, 2025 at 1:47=E2=80=AFAM Cosmin Ratiu <cratiu@nvidia.com> wr=
-ote:
+On Wed, Apr 23, 2025 at 1:15=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> On Wed, 2025-04-23 at 10:30 -0700, Mina Almasry wrote:
+> On 04/23, Mina Almasry wrote:
 > > On Wed, Apr 23, 2025 at 9:03=E2=80=AFAM Cosmin Ratiu <cratiu@nvidia.com=
->
-> > wrote:
+> wrote:
 > > >
-> > > Drivers that are told to allocate RX buffers from pools of DMA
-> > > memory
-> > > should have enough memory in the pool to satisfy projected
-> > > allocation
-> > > requests (a function of ring size, MTU & other parameters). If
-> > > there's
-> > > not enough memory, RX ring refill might fail later at inconvenient
-> > > times
+> > > Drivers that are told to allocate RX buffers from pools of DMA memory
+> > > should have enough memory in the pool to satisfy projected allocation
+> > > requests (a function of ring size, MTU & other parameters). If there'=
+s
+> > > not enough memory, RX ring refill might fail later at inconvenient ti=
+mes
 > > > (e.g. during NAPI poll).
 > > >
 > >
@@ -117,28 +113,7 @@ ote:
 > > other buffers. So it will run with a degraded performance but nothing
 > > overly bad should happen. This should be the same behavior if the
 > > machine is under memory pressure.
->
-> What motivated this change was a failure in how mlx5 refills rings
-> today. For efficiency, ring refill triggered by NAPI polling only
-> releases old buffers just before allocating new ones so effectively has
-> a built-in assumption that the ring can be filled. Commit 4c2a13236807
-> ("net/mlx5e: RX, Defer page release in striding rq for better
-> recycling") is an interesting read here.
->
-> For more details, see the do{ }while loop in mlx5e_post_rx_mpwqes,
-> where mlx5e_free_rx_mpwqe then mlx5e_alloc_rx_mpwqe are called to free
-> the old buffer and reallocate a new one at the same position. This has
-> excellent cache-locality and the pages returned to the pool will be
-> reused by the new descriptor.
->
-
-Thanks for the detailed explanation. These seem like a clever optimization.
-
-> The bug in mlx5 is that with a large MTU & ring size, the ring cannot
-> be fully populated with rx descriptors because the pool doesn't have
-> enough memory, but there's no memory released back to the pool for new
-> ones. Eventually, rx descriptors are exhausted and traffic stops.
->
+> >
 > > In general I don't know about this change. If the user wants to use
 > > very small dmabufs, they should be able to, without going through
 > > hoops reducing the number of rx ring slots the driver has (if it
@@ -147,90 +122,99 @@ Thanks for the detailed explanation. These seem like a clever optimization.
 > > I think maybe printing an error or warning that the dmabuf is too
 > > small for the pool_size may be fine. But outright failing this
 > > configuration? I don't think so.
->
-> For regular memory-backed page pools, there's no hard limit of how big
-> they can become (except available physical memory), so this issue was
-> not seen before.
->
-> I didn't look at other drivers yet, but is it expected that drivers
-> operate with incompletely filled rings? I assumed that since the user
-> configured a specified ring size, it expects drivers to be able to use
-> that size and not silently operate in degraded mode, with a smaller
-> ring size.
->
-> If you think drivers should work in degraded mode, we can look at
-> improving the ring population code to work better in this scenario.
->
-
-You're probably a bigger expert to me on what drivers should do in
-general, but yes, this seems like an mlx5 limitation, not a general
-limitation to all drivers. GVE for example, I think, has a host of
-optimization for memory pressure scenarios that makes it resilient to
-this. I ran this test:
-
-mina-3 /home/almasrymina_google_com # ethtool -g eth0
-Ring parameters for eth0:
-...
-Current hardware settings:
-...
-RX:             1024
-
-Then hacked ncdevmem to only provide a 64 page udmabuf:
-
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 1f9fb0b1cb811..6de64f7680241 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -76,7 +76,7 @@
-
- #define PAGE_SHIFT 12
- #define TEST_PREFIX "ncdevmem"
--#define NUM_PAGES 16000
-+#define NUM_PAGES 64
-
- #ifndef MSG_SOCK_DEVMEM
- #define MSG_SOCK_DEVMEM 0x2000000
-
-To my surprise, the test passed just fine. Seems the limitation at
-least doesn't apply to GVE. I don't know what the rest of the drivers
-do, but so far this seems like driver specific behavior. I think
-putting limitations in the core stack for mlx5 issues doesn't seem
-great.
-
+> >
+> > > This commit adds a check at dmabuf pool init time that compares the
+> > > amount of memory in the underlying chunk pool (configured by the user
+> > > space application providing dmabuf memory) with the desired pool size
+> > > (previously set by the driver) and fails with an error message if chu=
+nk
+> > > memory isn't enough.
+> > >
+> > > Fixes: 0f9214046893 ("memory-provider: dmabuf devmem memory provider"=
+)
+> > > Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > > ---
+> > >  net/core/devmem.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >
+> > > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > > index 6e27a47d0493..651cd55ebb28 100644
+> > > --- a/net/core/devmem.c
+> > > +++ b/net/core/devmem.c
+> > > @@ -299,6 +299,7 @@ net_devmem_bind_dmabuf(struct net_device *dev, un=
+signed int dmabuf_fd,
+> > >  int mp_dmabuf_devmem_init(struct page_pool *pool)
+> > >  {
+> > >         struct net_devmem_dmabuf_binding *binding =3D pool->mp_priv;
+> > > +       size_t size;
+> > >
+> > >         if (!binding)
+> > >                 return -EINVAL;
+> > > @@ -312,6 +313,16 @@ int mp_dmabuf_devmem_init(struct page_pool *pool=
+)
+> > >         if (pool->p.order !=3D 0)
+> > >                 return -E2BIG;
+> > >
+> > > +       /* Validate that the underlying dmabuf has enough memory to s=
+atisfy
+> > > +        * requested pool size.
+> > > +        */
+> > > +       size =3D gen_pool_size(binding->chunk_pool) >> PAGE_SHIFT;
+> > > +       if (size < pool->p.pool_size) {
+> >
 > > pool_size seems to be the number of ptr_ring slots in the page_pool,
 > > not some upper or lower bound on the amount of memory the page_pool
 > > can provide. So this check seems useless? The page_pool can still not
-> > provide this amount of memory with dmabuf (if the netmems aren't
-> > being
+> > provide this amount of memory with dmabuf (if the netmems aren't being
 > > recycled fast enough) or with normal memory (under memory pressure).
 >
-> I think pool_size is usually set by drivers based on their params, and
-> it's the max size of pool->ring. The opportunistic check I added
-> compares this demand with the supply (available chunk memory) and fails
-> this config based on the assumption that there should be enough memory
-> in the pool to satisfy driver needs.
+> I read this check more as "is there enough chunks in the binding to
+> fully fill in the page pool". User controls the size of rx ring
+
+Only on drivers that support ethtool -G, and where it will let you
+configure -G to what you want.
+
+> which
+> controls the size of the page pool which somewhat dictates the minimal
+> size of the binding (maybe).
+
+See the test I ran in the other thread. Seems at least GVE is fine
+with dmabuf size < ring size. I don't know what other drivers do, but
+generally speaking I think specific driver limitations should not
+limit what others can do with their drivers. Sure for the GPU mem
+applications you're probably looking at the dmabufs are huge and
+supporting small dmabufs is not a concern, but someone somewhere may
+want to run with 1 MB dmabuf for some use case and if their driver is
+fine with it, core should not prevent it, I think.
+
+> So it's more of a sanity check.
 >
-> Please let me know your thoughts and how to proceed.
+> Maybe having better defaults in ncdevmem would've been a better option? I=
+t
+> allocates (16000*4096) bytes (slightly less than 64MB, why? to fit into
+> default /sys/module/udmabuf/parameters/size_limit_mb?) and on my setup
+> PP wants to get 64MB at least..
 
-I think there are better options here:
+Yeah, udmabuf has a limitation that it only supports 64MB max size
+last I looked.
 
-1. In the page_pool, warn if the dmabuf is too small for the ring
-size, but don't outright prevent the configuration. If the user is
-running on a driver that doesn't have a dmabuf size limitation, let
-them ignore the warning and run it.
+I added devmem TCP support with udmabuf selftests to demonstrate that
+the feature is non-proprietary, not to advertise that devmem tcp +
+udmabuf is a great combination. udmabuf is actually terrible for
+devmem TCP. The 64MB limit is way too small for anyone to do anything
+performant on it and by dmaing into host memory you lose many of the
+benefits of devmem TCP (lower mem bw + pcie bw utilization).
 
-2. In mlx5 code, somehow find out how big the dmabuf size is (it may
-need a new pp api), and then in mlx5 code prevent this configuration
-to workaround your (I think) driver-specific limitation.
+If you're running real experiments with devmem TCP I suggest moving to
+real dmabufs as soon as possible, or at least hack udmabuf to give you
+large sizes. We've open sourced our production devmem TCP userspace:
 
-3. Maybe address the general limitation in mlx5, and make it work even
-if it can't refill its rings? It would help this case and other memory
-pressure scenarios as well.
+https://github.com/google/tcpgpudmarxd
+https://github.com/google/nccl-plugin-gpudirecttcpx
 
-
-
-
+Porting it to upstream APIs + your dmabuf provider will have you run
+much more interesting tests than anything you do with udmabuf I think,
+unless you hack the udmabuf size.
 
 --=20
 Thanks,
