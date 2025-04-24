@@ -1,108 +1,116 @@
-Return-Path: <netdev+bounces-185686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D69CA9B5F5
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:07:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA1CA9B5FD
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12B61BA04AF
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:07:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302514C10B4
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A849D1FC0EA;
-	Thu, 24 Apr 2025 18:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2A128F503;
+	Thu, 24 Apr 2025 18:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GNApvPhf"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="bKZu2i/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8FD28BA85
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFD728E60C
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745518025; cv=none; b=JYIdjgaH/S29Jct+xZO4jmV305/3L5RzFLKHuHvx6Xf+0rby+jhyhd058biQTYeYOKZQY28nxly2sRVfXgxmv/GYSoVh7Cku2RyXlsQe4Ao26ObjPXYi5u7QIhphIkuNcIIYqop+6vlCgAeettafd6St49Mdz5z/HnMOTAtFTs0=
+	t=1745518206; cv=none; b=gk2N31BWPrk22CcSJWMzjZNZTpIKRXybFp/Hou5/X5iCl7CBJ4zuH3h50klD+SyUQHX/aEkKADi5ZNHMULp1ZbBXX3B/Z8PRmmI3Xi9nbWBYfi7u+UyjNVgHcBYCUN+OURU6lZE3mvfNMDHezu3pXy8uKhuLMQpJRJvV4iS3ucU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745518025; c=relaxed/simple;
-	bh=ta5uwZDYWisxxM12KjjF1QgxHL63HaMu0WevHhYe1ZQ=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=kxwsPZLiGxo/lY/IZz9kYtpXtrZmETqu7XsMI9+OxVp8w5IzzAi9Md+4l4NoGdFDc8/ljOveH/59+ekfG9gn2/m1WrI8AezYLVDblHgJE2KK65Eloe14RFgOuE0n+cCH8FR8MxUo7wmANj4RPxBozq95YFcv3QfFIFm+Ha/4Atk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GNApvPhf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745518022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=5+vSqsQhIhaN4+ReXmp4a/18RE4upAKYHd+YtcarN9I=;
-	b=GNApvPhfPL2w+c54bxephNJq/gDm98Sg/qT4h8RiaXAJFMalOEAr+e82/aKSdK1Ib4Hg2F
-	H0UGacwhl4fAD0s7GlaIqkEreeXqck1ibT84se0KTI2dck4WadOH+hwPO/x0V3EzCI7UAa
-	/Ubuumu4uFO6CXs3pHr2tC6DzLRF9YQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-547-8IGoqjXZN3CLvNUkuKphkQ-1; Thu,
- 24 Apr 2025 14:07:00 -0400
-X-MC-Unique: 8IGoqjXZN3CLvNUkuKphkQ-1
-X-Mimecast-MFC-AGG-ID: 8IGoqjXZN3CLvNUkuKphkQ_1745518019
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBB3F19560A1;
-	Thu, 24 Apr 2025 18:06:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A675180045C;
-	Thu, 24 Apr 2025 18:06:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-cc: dhowells@redhat.com, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-    Tony Nguyen <anthony.l.nguyen@intel.com>,
-    Paulo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Is it possible to undo the ixgbe device name change?
+	s=arc-20240116; t=1745518206; c=relaxed/simple;
+	bh=Wr8Howp6YUBHFQ5IXcbrHAh69nUeNbi1WwiX/cJv9UA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bOT/0APN3FLUpc2IuILiOIWxXKZqb+ONCCmQjhk/MIUyvxSiO1Py+g9OstWEDpgDaJgp1qY/E7R6mRj7lUPL3lYdbsxQcyB6kW4AlOUs3w5vgddm2m9MrV5AIS0oubjxaFiQ+pf3g6mbyaYQwcUjZ5PZ/lw5grRAoiQ/pUy/XtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=bKZu2i/+; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2241053582dso21074425ad.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:10:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1745518203; x=1746123003; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+UKNt0lCLDr2VLT9kOvLTb2AuOQOpzIZeg4tCrvuwj0=;
+        b=bKZu2i/+MrIu2KWaD9cKAvnwOtvxeCXthuKHF+RSMnLrA28adNRkceF7FVKDQdVdOb
+         Nvq6c/Jj8r4Z19qC5Pwd3i793T8SUDrsgwkz5e/def9SNCHPVg8SYZ/nlELW5/MxEspu
+         3fkd6+cWdFheKMYW0CgmG5pGFUhTOq8OacB+G/Fubs4yQGoQoLNEiYqTUzGTeokFEQd5
+         o/G3Qe0xBpy2OFfQtwTjMjZfVpJgERu7ftw5jiMl+1hFlOiK+BFkFdUYxKr+kHfXTMN9
+         aP9osERILIZ6wsDW+OtIUr30RDevAJkzjjvHS0+p9M9XRYNWLF4ncQkUdhN2Pc/3Bius
+         9adQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745518203; x=1746123003;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+UKNt0lCLDr2VLT9kOvLTb2AuOQOpzIZeg4tCrvuwj0=;
+        b=oSJa9lFKtFL+b8x2ow4IVx/k6eLBIbcMGfqcbOHRJ4XT3v8ESGokYBka4hrFqiD9OO
+         xw9MZn46QiY1xV0fhN1uCGeF6HsC5p+ktON/0ffi1QK5FQpEm7mtB0RYPrFJeNlMXDMD
+         uSKCzz79xdHryh/nY4oezvDrm7+D62w/g3ZAMCeDh9auNA1xM6PKXxu6LBwi/FxDyO67
+         HJBhnmMvhnOPnaEm1AdIXnfzCbs+u3/oxZes9YlOIe9Sv5cs0i780c5sW9z9xy3JN0zx
+         OQI3s+zY2WtTkOxPUIjTSonaPX+kXQ+XbNLPxVdZzlScueLgZY0Wu3MzhBuSe2ZXVTQu
+         CB0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXxo1nrE5QqE0p8FSVGlgrrlhKy6ttSZvUBGnwQnzGqb722Ei54VH/rpvM+tw6QDE+w5FPZK80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyzHvsPyT3MhL6HrsvrnZBGlGQsE7EqHEXhUmyrI7+VaO9Lis4
+	Z4wqWVVR+dKL4R1Zau9AgJsbk2uWYLCtszIh8QQYOvCmgSjrREKOKMttOlD6Zh0=
+X-Gm-Gg: ASbGncvJ89upnPB/ns0QARTW9jL0pdPomoo6qLOAWKAkQLndi2S45Cmqtx93m7LekD3
+	l/q3r7oBMnIyzyym/yhkk1GZmwTkVNnkuHNEBUTdXZlBcgLmXcYUzNcqA6wGf0Uloyzgi4857YN
+	LOTuax/u82oG2U61ucArv7UcnSByagKaByKEGNdwZ/XGtFNAmNH19TtS2lE7R8kfalhzFo7zll9
+	hp1rFlKjelsjPfQyYzhlItG84mEj07s9V9axOS01+PAa5GFWH6gc6sWYpreG0993DaHKi5QErnV
+	A6Y1oqhxDwsoJkd4X8RJT7Gk7fFF9LjMtlu1b7EsHDMAMEgchZsJdVUcoe3MtLxiDn9uSpwoh98
+	OzfvZMM7xII+YzqqKXnQ=
+X-Google-Smtp-Source: AGHT+IHnCaTt/PjXgficrL39pGhcE2L6yyJvkQieKK32vsywiH1L2LBk23RuW6NeWGc4L/G8Ur3ipA==
+X-Received: by 2002:a17:902:d50e:b0:22c:33b2:e420 with SMTP id d9443c01a7336-22dbd401ed7mr5490555ad.7.1745518202886;
+        Thu, 24 Apr 2025 11:10:02 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:1cf1:8569:9916:d71f? ([2620:10d:c090:500::6:c802])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50e751dsm16782485ad.142.2025.04.24.11.10.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Apr 2025 11:10:02 -0700 (PDT)
+Message-ID: <6d9d6ad1-71cc-47f2-b7a8-d61f5ecdfa55@davidwei.uk>
+Date: Thu, 24 Apr 2025 11:09:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3452223.1745518016.1@warthog.procyon.org.uk>
-Date: Thu, 24 Apr 2025 19:06:56 +0100
-Message-ID: <3452224.1745518016@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] selftests: iou-zcrx: Get the page size at runtime
+To: Simon Horman <horms@kernel.org>, Haiyue Wang <haiyuewa@163.com>
+Cc: io-uring@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20250419141044.10304-1-haiyuewa@163.com>
+ <20250424135559.GG3042781@horms.kernel.org>
+Content-Language: en-GB
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250424135559.GG3042781@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-[resent with mailing list addresses fixes]
+On 2025-04-24 06:55, Simon Horman wrote:
+> On Sat, Apr 19, 2025 at 10:10:15PM +0800, Haiyue Wang wrote:
+>> Use the API `sysconf()` to query page size at runtime, instead of using
+>> hard code number 4096.
+>>
+>> And use `posix_memalign` to allocate the page size aligned momory.
+>>
+>> Signed-off-by: Haiyue Wang <haiyuewa@163.com>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
 
-Hi,
-
-With commit:
-
-	a0285236ab93fdfdd1008afaa04561d142d6c276
-	ixgbe: add initial devlink support
-
-the name of the device that I see on my 10G ethernet card changes from enp1s0
-to enp1s0np0.
-
-This is a bit of a problem for my test box because I have Network Manager set
-up static configuration for that enp1s0... which no longer exists when that
-commit is applied.  I could change to enp1s0np0, but then this would no longer
-exist if I want to test a kernel that doesn't have that commit applied.
-
-If the name doesn't exist, booting pauses for about a minute while NM tries to
-find it (probably a NM bug), so adding both names isn't an option either :-/
-
-(I don't use DHCP for this adapter as it's directly wired to another test box)
-
-Alternatively, as a compromise, might it be possible to omit the "np0" bit if
-the adapter only has one port?
-
-Thanks,
-David
-
+Thanks Simon. I'll apply the patch and run the selftest to make sure it
+still works.
 
