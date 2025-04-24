@@ -1,173 +1,202 @@
-Return-Path: <netdev+bounces-185548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69750A9AE08
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:54:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B71A9AE14
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689FA3B8863
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:53:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E027B1B65E8A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9EA27B513;
-	Thu, 24 Apr 2025 12:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C137427B51E;
+	Thu, 24 Apr 2025 12:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="sgkcfejB"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="KNYgM9v0"
 X-Original-To: netdev@vger.kernel.org
-Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E16F223DEB;
-	Thu, 24 Apr 2025 12:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A4127BF9B
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499226; cv=none; b=jyDDhj6o1ziQFK/yB8hvoPgfy037OuPTHRiOhu1qhOW8SpedWAKnbtu29gPUD9y1OCwL8jMdBTyPtJZP4suntRJ/+SAMscKIBvatIOnDtWLsqKD9QciWj1hEZ4A9FUYMHFIoVGR26KEZTC+ZxoTnq5vRj+xxYcpmDy/jh+CcjoE=
+	t=1745499417; cv=none; b=irFnjgwRF367vIEP5SxGZl3+yyUJu/WwoAedJTRuYumYzAu4gq2a5rGJxJmE3zPVC+qnrKnQB433qILK4zcgQpPs+FNiup/1cOzS0AaSsoRBIbm5OjWNd4Q9lkoSkt37HjVIAghhKqfE/T/eo2Dyjx32w7JC/hcRKzOGutbTST8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499226; c=relaxed/simple;
-	bh=P86oE7d+/laopXXLm4l/4blWBmnOYmZlRzNXI5Cbk/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bw8LBBuQy6z/GnZUUpF5XfjV0Y5O/COQUTqigTS2BGY8uN2LXevN/iZPstIp0kCSVcj7x0t+YuQrwdtizhCoe5LZv5SxKclkW4wDhTgkOZhZks70k1BzV7k8CA6jpexXGAVKJ2UuUNylH6XifnUsO76Ib+nzYwyRKXmI5IU+/p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=sgkcfejB; arc=none smtp.client-ip=82.68.155.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
-Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
-	by wylie.me.uk (Postfix) with ESMTP id D6145120897;
-	Thu, 24 Apr 2025 13:53:31 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
-	s=mydkim006; t=1745499211;
-	bh=P86oE7d+/laopXXLm4l/4blWBmnOYmZlRzNXI5Cbk/4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=sgkcfejB+MzMEtjvZcAhWSxSOL+ajLWRHA4hn14nvgR1mNN1EoN6YWcRYRXibv7Pz
-	 cVu8aqIgBsE8zplzKI56Q43zb22vMEwjpUXsVbb/+UN1PZfHXlZvkv8lDzAXwXomwc
-	 7qLiJ05u47pWLFVx48PIq+4JtNijO7VWmAitAQkNfKLUlfJWkAlRIxHYdFZQXky0a2
-	 wTcfK3LdKIV+fTRHI8uXgQvAgLa1Gk//MkfPPrEczyQwTyRHfyPuv5rqhajb8tPvU7
-	 jao/H58KOS2ZrM4dxEdOagEZXy3MtvnKPtEHN0EzDqQlWpNFUsm/8wrF/QLm85veaA
-	 jpdqmfh6RBLRQ==
-Date: Thu, 24 Apr 2025 13:53:31 +0100
-From: "Alan J. Wylie" <alan@wylie.me.uk>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Jiri
- Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>, Toke
- =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
- stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
- htb_dequeue
-Message-ID: <20250424135331.02511131@frodo.int.wylie.me.uk>
-In-Reply-To: <aAlAakEUu4XSEdXF@pop-os.localdomain>
-References: <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
- <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
- <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
- <20250421210927.50d6a355@frodo.int.wylie.me.uk>
- <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
- <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
- <aAf/K7F9TmCJIT+N@pop-os.localdomain>
- <20250422214716.5e181523@frodo.int.wylie.me.uk>
- <aAgO59L0ccXl6kUs@pop-os.localdomain>
- <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
- <aAlAakEUu4XSEdXF@pop-os.localdomain>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
-X-Clacks-Overhead: GNU Terry Pratchett
+	s=arc-20240116; t=1745499417; c=relaxed/simple;
+	bh=5BTfy8Idhyh2VjCRIiZGY+O8FpzzYRJBlt2Qx7yYD3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ms4gfLwVSgfLS/SakbX36VJh5FZ141+MD6QALbkwg5e1Co7xhTa8HVxx6/UO6y+IWdY2m8TboS72IdrNlgghfbloN5iUCaKLjCR4ZdKHMcMyizBysZKRZtaMAVCpgp7OsIEuvxFQ1zM9bztVOKFbI44On+NRZxvCnN4aJolhaf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=KNYgM9v0; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 53OCujqv028013;
+	Thu, 24 Apr 2025 05:56:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=HlQ+EQjhFs6QLbsrbZ
+	mQO2SieqI0k7nwEw12f1VBDt0=; b=KNYgM9v0vcVkH4QGj1WNY1NYusXzoKQbry
+	ghFZJIkLE/Sj+99ajtN5vbeZWf+daFbb9IV3cCEs8ViM34ftnqBIFIX5ap5AFSF4
+	x1YHJE51Z52BTsw97a7Xund3wh3jd9oj76uEJ9BzMASfLJVtqfEkj4o4TkxboPkY
+	KfW4rQBNebTiSZW8qZBs8/KsRQlzoE/2zfhoFeQzty9gSOgUj3UEeJyzqb9RluXz
+	zD1ZcxjPGT7q6Y7XE582xKeetJZAJiIYYPlOSRZdw8SRhBb1hGD+v48GaCrSsRun
+	h+pFwzP071ybyblPuldsuYc28668wAET5QLUokKMbccKJfAcYWlA==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 467k9mgyej-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 24 Apr 2025 05:56:48 -0700 (PDT)
+Received: from devvm31871.cln0.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1748.10; Thu, 24 Apr 2025 12:56:01 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Michael Chan
+	<michael.chan@broadcom.com>,
+        Pavan Chebbi <pavan.chebbi@broadcom.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>
+CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH net v4] bnxt_en: improve TX timestamping FIFO configuration
+Date: Thu, 24 Apr 2025 05:55:47 -0700
+Message-ID: <20250424125547.460632-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=cKPgskeN c=1 sm=1 tr=0 ts=680a3510 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=XR8D0OoHHMoA:10 a=Q-fNiiVtAAAA:8 a=VabnemYjAAAA:8 a=VnezELSGKxGoUyyTTqgA:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-ORIG-GUID: lxKmby8uKhGwaRupVIqLZu3iT3ZdKyct
+X-Proofpoint-GUID: lxKmby8uKhGwaRupVIqLZu3iT3ZdKyct
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA4NyBTYWx0ZWRfX7q5rC1bgdRPc L2CflvSPQ9y3sCErVmWepjN3dhPDaWJ/Nk+FL/3jKN5vXo/ux8NewLURxOa4c0qRhLZ9i3CC1HG 4UwFGmEWg2cuYH9JIxe7Z3xPafU12pH8uvFMEmfNbMNhEHFn9428w9QxedXLPNX7NGfyxK0CnMY
+ 5n2hz8E/NCDINx/6DxIgm6T00nV1cCDp2DRG/CxPjsA20zj0cB8UdHxjLHILnMmqdp+nVD4t0Kb Xon8ccNfcuv+g3QG3oXEiKPkGPqjcsY+L/LzM6TsgK/L2LbxoVoYL84nCMZVkJMLPM+qtPEYnvb 427VE/qFlj2BS0JnhDDk7DEPPI62Tpk5XefL7+a/vZdth+88gqzoyTQNskCilmk8/KCPqPOQL63
+ BobZffWJfveBkndJqPHsx7uOQdmPsi/aKP0QJBiSjXBtAair8UERyZG+KwRzM5Cn0RFl4Jh1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
+ definitions=2025-04-24_06,2025-04-22_01,2025-02-21_01
 
-> On Tue, Apr 22, 2025 at 07:20:24PM +0200, Holger Hoffst=C3=A4tte wrote:
+Reconfiguration of netdev may trigger close/open procedure which can
+break FIFO status by adjusting the amount of empty slots for TX
+timestamps. But it is not really needed because timestamps for the
+packets sent over the wire still can be retrieved. On the other side,
+during netdev close procedure any skbs waiting for TX timestamps can be
+leaked because there is no cleaning procedure called. Free skbs waiting
+for TX timestamps when closing netdev.
 
-> Meanwhile, if you could provide a reliable (and ideally minimum)
-> reproducer, it would help me a lot to debug.
+Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX packets to 4")
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+v3 -> v4:
+* actually remove leftover unused variable in bnxt_ptp_clear()
+(v3 was not committed before preparing unfortunately)
+v2 -> v3:
+* remove leftover unused variable in bnxt_ptp_clear()
+v1 -> v2:
+* move clearing of TS skbs to bnxt_free_tx_skbs
+* remove spinlock as no TX is possible after bnxt_tx_disable()
+* remove extra FIFO clearing in bnxt_ptp_clear()
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 29 ++++++++++++++-----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
+ 3 files changed, 25 insertions(+), 10 deletions(-)
 
-I've found a reproducer. Below is a stripped down version of the shell scri=
-pt
-that I posted in my initial report.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index c8e3468eee61..2c8e2c19d854 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3414,6 +3414,9 @@ static void bnxt_free_tx_skbs(struct bnxt *bp)
+ 
+ 		bnxt_free_one_tx_ring_skbs(bp, txr, i);
+ 	}
++
++	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
++		bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
+ }
+ 
+ static void bnxt_free_one_rx_ring(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
+@@ -12797,8 +12800,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 	/* VF-reps may need to be re-opened after the PF is re-opened */
+ 	if (BNXT_PF(bp))
+ 		bnxt_vf_reps_open(bp);
+-	if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
+-		WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
+ 	bnxt_ptp_init_rtc(bp, true);
+ 	bnxt_ptp_cfg_tstamp_filters(bp);
+ 	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index 2d4e19b96ee7..0669d43472f5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -794,6 +794,27 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_info *ptp_info)
+ 	return HZ;
+ }
+ 
++void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
++{
++	struct bnxt_ptp_tx_req *txts_req;
++	u16 cons = ptp->txts_cons;
++
++	/* make sure ptp aux worker finished with
++	 * possible BNXT_STATE_OPEN set
++	 */
++	ptp_cancel_worker_sync(ptp->ptp_clock);
++
++	ptp->tx_avail = BNXT_MAX_TX_TS;
++	while (cons != ptp->txts_prod) {
++		txts_req = &ptp->txts_req[cons];
++		if (!IS_ERR_OR_NULL(txts_req->tx_skb))
++			dev_kfree_skb_any(txts_req->tx_skb);
++		cons = NEXT_TXTS(cons);
++	}
++	ptp->txts_cons = cons;
++	ptp_schedule_worker(ptp->ptp_clock, 0);
++}
++
+ int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod)
+ {
+ 	spin_lock_bh(&ptp->ptp_tx_lock);
+@@ -1105,7 +1126,6 @@ int bnxt_ptp_init(struct bnxt *bp)
+ void bnxt_ptp_clear(struct bnxt *bp)
+ {
+ 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+-	int i;
+ 
+ 	if (!ptp)
+ 		return;
+@@ -1117,12 +1137,5 @@ void bnxt_ptp_clear(struct bnxt *bp)
+ 	kfree(ptp->ptp_info.pin_config);
+ 	ptp->ptp_info.pin_config = NULL;
+ 
+-	for (i = 0; i < BNXT_MAX_TX_TS; i++) {
+-		if (ptp->txts_req[i].tx_skb) {
+-			dev_kfree_skb_any(ptp->txts_req[i].tx_skb);
+-			ptp->txts_req[i].tx_skb = NULL;
+-		}
+-	}
+-
+ 	bnxt_unmap_ptp_regs(bp);
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index a95f05e9c579..0481161d26ef 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -162,6 +162,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
+ void bnxt_ptp_reapply_pps(struct bnxt *bp);
+ int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
+ int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
++void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
+ int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
+ void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
+ int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
+-- 
+2.47.1
 
-Running this in a 1 second loop is enough to cause the panic very quickly.
-
-It seems a bit of network traffic is needed, too.
-
-
-# while true; do ./tc.sh; sleep 1; done
-13:33:43 7196kbit 29296kbit
-13:33:44 7196kbit 29296kbit
-...
-13:35:38 7196kbit 29296kbit
-13:35:39 7196kbit 29296kbit
-[panic]
-
-# while true; do ./tc.sh; sleep 1; done
-13:44:31 7196kbit 29296kbit
-13:44:32 7196kbit 29296kbit
-...
-13:44:52 7196kbit 29296kbit
-13:44:53 7196kbit 29296kbit
-[panic]
-
-The same place as usual
- htb_dequeue+0x42f/0x610 [sch_htb]
-
---------8<--------8<--------8<--------8<--------8<--------8<--------8<-----=
----8<--------8<
-#!/usr/bin/bash
-
-set -o nounset
-set -o errexit
-
-export PATH=3D/usr/bin
-
-ext=3Dppp0
-ext_ingress=3Dppp0ifb0
-
-ext_up=3D7196kbit
-ext_down=3D29296kbit
-
-printf "%(%T)T $ext_up $ext_down\n"
-
-q=3D1486
-quantum=3D300
-
-modprobe act_mirred
-modprobe ifb
-modprobe sch_cake
-modprobe sch_fq_codel
-
-ethtool -K "$ext" tso off gso off gro off=20
-
-tc qdisc del dev "$ext" root		>& /dev/null || true
-tc qdisc del dev "$ext" ingress		>& /dev/null || true
-tc qdisc del dev "$ext_ingress" root	>& /dev/null || true
-tc qdisc del dev "$ext_ingress" ingress	>& /dev/null || true
-ip link del "$ext_ingress"  		>& /dev/null || true
-
-tc qdisc add dev "$ext" handle ffff: ingress
-
-ip link add name "$ext_ingress"  type ifb
-ip link set dev "$ext_ingress" up || true=20
-
-tc filter add dev "$ext" parent ffff: protocol all u32 match u32 0 0 action=
- mirred egress redirect dev "$ext_ingress"
-tc qdisc add dev "$ext_ingress" root handle 1: htb default 11 r2q 20
-tc class add dev "$ext_ingress" parent 1: classid 1:1 htb rate $ext_down=20
-tc class add dev "$ext_ingress" parent 1:1 classid 1:11 htb rate $ext_down =
-prio 0 quantum $q
-tc qdisc add dev "$ext_ingress" parent 1:11 fq_codel quantum $quantum ecn
-tc qdisc add dev "$ext" root handle 1: htb default 11
-tc class add dev "$ext" parent 1: classid 1:1 htb rate $ext_up
-tc class add dev "$ext" parent 1:1 classid 1:11 htb rate $ext_up prio 0 qua=
-ntum $q
-tc qdisc add dev "$ext" parent 1:11 fq_codel quantum $quantum noecn
---------8<--------8<--------8<--------8<--------8<--------8<--------8<-----=
----8<--------8<
-
---=20
-Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
-
-Dance like no-one's watching. / Encrypt like everyone is.
-Security is inversely proportional to convenience
 
