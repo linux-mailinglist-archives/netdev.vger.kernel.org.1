@@ -1,214 +1,132 @@
-Return-Path: <netdev+bounces-185392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE59A99FF9
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 06:06:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B1EFA99FFF
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 06:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE3721946700
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1CF5188EE03
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 04:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14E31F4CB5;
-	Thu, 24 Apr 2025 04:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C853819D884;
+	Thu, 24 Apr 2025 04:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jZ1c4KMv"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="JroYeDdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31911F3D5D
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 04:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307E619CC3D;
+	Thu, 24 Apr 2025 04:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745467401; cv=none; b=K67sRA8MwoD04ttvcGWbfQTT+pMIWH2NkoG+Na8PxhPKfL8jATDwbRWbLlBVpPMGpD9tbXKkRN/86ORwjHKKF6M6CDSYCKLvCLITJpcyGFgOdaMiusyKYWB15xBzPFwx0Ag9ePXtWmFB/KuveKH+w22U89Lmo2NZQAJSJ6C75Lw=
+	t=1745467529; cv=none; b=UJT7HvkzfY+zB8bI1CPDhC9QFSUzBtAe978SHaEl28bE7nBlZMzqsOk5n8oh3Oti2ddHFe45npekqiOhv/1a895VoZ23XBlha/zp2cus9Skt/N/giHG1qPJHSuiT/4Fgn9priSn4Rg9qpB+MTb99SmjxPDliqhJGRS4zEOD3MgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745467401; c=relaxed/simple;
-	bh=7NgBY2/M7RX3ZWIExGTnoM9nMea+0yUh7UHHWuhJ4Bk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c8twfxipHUiItLkWNsRQXSNuJKxpogGbMDlzcTOZvds+geM2wREHS5UBRZyjalVbfYaapLLV6qRoVbitTDnbns7d3gycnN7687ElX3m/RmY6IpdrF1rM1177GF0NTd1iA0sQXVuE92XqmcNFDUr070APkX28ELAcOzTQThvyZs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jZ1c4KMv; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73c205898aaso401073b3a.2
-        for <netdev@vger.kernel.org>; Wed, 23 Apr 2025 21:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745467399; x=1746072199; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dm+KUe9Ww/e6Vyl6aeeJ+DObwsjW8ys4qGoTcP5xOok=;
-        b=jZ1c4KMvnZuK3XFchcG5cPV675VfERwiiWWxLd19118Uwd0SbJFwp9AwAuV/hLOXh+
-         bz+tHL5BcMMDgQ5Q1rNeVobOLq+dUmTgNJXow+jPCYJIzlGoGtIJngvXusdIMQI7k/hp
-         4EnZHsWQJ21hZ7IDc8ZmV+apDzoZG+gRDXhJO9U3taJRoYc9VQ7hnzNxaJ0bfiyppOhA
-         i66ukbAHnMrUXEIsPxGOrMMRlveNhK5k1R0LKRUKY5nZXDvUKQirVe6WWYUzpN8pXGtK
-         r7J2DrNB1e6wIuXtQI74OeFkLIH7ANM/R8Hwa8odp86xeqr8rCe9OZcP8K/Uwf0eA57+
-         hn3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745467399; x=1746072199;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dm+KUe9Ww/e6Vyl6aeeJ+DObwsjW8ys4qGoTcP5xOok=;
-        b=pSfLtxiC0yDJjBaRBuAXHCbJFZe6g0k8qCefskpxcE1M3RBqgpTf90RL4H1s9qRzMM
-         EliOlmwmVnhsDTMyt83hZhRgoP2DqyWdH0+9PCTrOg8LH65pjrpHf63hW6SlduM2ZNKi
-         H1PVimASutNdkf3L9uSD0j4md85bpn2he63uHEEaGnG4EV1tYACZTisVMYf3C38qSeRX
-         IpThmMIAo3MkIg4h5ufJ99n3sPWwnr9dY1tfwZ6RalgtZUSK86xh5YsU3sGhPTYtoQNv
-         AYFiaIW51VOsforcU4LiiQ7ds+fw0idtgTTFjqFPI74FLxgMbBVN/DjAM6jNJxoMR78U
-         jYDA==
-X-Gm-Message-State: AOJu0YzVN2PwX4Zww4tu9KHTzJLv4vFRghXLAxHpKV36I2MHKEtDG6U/
-	QRff5T3edOAu4a2UUupMwclrR2+JgPLIG4luTBkc1DhEP8cQ3tzeKby3QaiH781G2xbH8/AGaen
-	jhSwSDs7LzQNCUY3X5PRoKstqCPX7dcMUbVFHxgem2p+SR67VkekBPxocJq2wBokVNknG3F7dlk
-	IYIweV1nphjLvB8KNqGiJGfcwE3we7wUovKuT6Lr4IafTJVS7xA9ILVjuF3M0=
-X-Google-Smtp-Source: AGHT+IFLPIU2yWmxJxJgjQYe70sSW4SkHs7h5xwWXVAjgbGENSUaZlxA7iNR4GkvJCd9MTDUDy3y/0RyI7kIx5Ea4g==
-X-Received: from pfx55.prod.google.com ([2002:a05:6a00:a477:b0:736:4ad6:1803])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:2d04:b0:1f5:619a:7f4c with SMTP id adf61e73a8af0-20444f2d5a0mr1681293637.29.1745467398744;
- Wed, 23 Apr 2025 21:03:18 -0700 (PDT)
-Date: Thu, 24 Apr 2025 04:03:00 +0000
-In-Reply-To: <20250424040301.2480876-1-almasrymina@google.com>
+	s=arc-20240116; t=1745467529; c=relaxed/simple;
+	bh=C0fT7nTb4i7lur/awzNdei1Byl5mpGyS71sQxaNBIuE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UKhX4t6jVkH4ugJ+n+ZLhIeBgmDUoHYc3do/mhQNfkrkOjunLhqT86lHRqGSF5206kBatke3SSri94KSXYd33+uiNQrWqf8pqAbvJzcFkZFPMPVXO5jKEyINXdy5gpb/fwH1R+wDkOxPckR1dj8J0ryxr80f6RDOEQVtdZkkBWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=JroYeDdf; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53O44qYpA4054997, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1745467492; bh=C0fT7nTb4i7lur/awzNdei1Byl5mpGyS71sQxaNBIuE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=JroYeDdfNUY387WH9CRYxi8U0q9lXCevPzBzWyHiBzeJIKmbD/z2d4zB/yutieFy8
+	 mEx4zO49PcXUMcgiRfNI+9VR6y2G/3YDeQNn5jkZYGAJSWxO+kBjVM/Ba5u/FIsuNh
+	 tOSQHJQUSs2FECTci71pcJxwKLDa0fWoK60FWj/+XpvN4u27+bLTRg8NfgjfXUH9WU
+	 cLC7bnwjsGsmW+Kg9b5PosvySqrGx2hoEtH71z2YcHcUofVlX58ckF3qFNqIRH09GY
+	 K84HwBHvHPFrmZuWj2qlkxAIooreeLrdomzB262Pavs4GmVSLr6n1vOJChET5q6e5e
+	 JJpvzu6B5fI5A==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53O44qYpA4054997
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 24 Apr 2025 12:04:52 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 24 Apr 2025 12:04:52 +0800
+Received: from RTDOMAIN (172.21.210.124) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 24 Apr
+ 2025 12:04:51 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>,
+        "kernel
+ test robot" <lkp@intel.com>
+Subject: [PATCH net] rtase: Modify the condition used to detect overflow in rtase_calc_time_mitigation
+Date: Thu, 24 Apr 2025 12:04:44 +0800
+Message-ID: <20250424040444.5530-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250424040301.2480876-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.49.0.805.g082f7c87e0-goog
-Message-ID: <20250424040301.2480876-9-almasrymina@google.com>
-Subject: [PATCH net-next v11 8/8] net: check for driver support in netmem TX
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, sdf@fomichev.me, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-We should not enable netmem TX for drivers that don't declare support.
+Fix the following compile error reported by the kernel test
+robot by modifying the condition used to detect overflow in
+rtase_calc_time_mitigation.
 
-Check for driver netmem TX support during devmem TX binding and fail if
-the driver does not have the functionality.
+In file included from include/linux/mdio.h:10:0,
+                  from drivers/net/ethernet/realtek/rtase/rtase_main.c:58:
+ In function 'u16_encode_bits',
+     inlined from 'rtase_calc_time_mitigation.constprop' at drivers/net/
+     ethernet/realtek/rtase/rtase_main.c:1915:13,
+     inlined from 'rtase_init_software_variable.isra.41' at drivers/net/
+     ethernet/realtek/rtase/rtase_main.c:1961:13,
+     inlined from 'rtase_init_one' at drivers/net/ethernet/realtek/
+     rtase/rtase_main.c:2111:2:
+>> include/linux/bitfield.h:178:3: error: call to '__field_overflow'
+      declared with attribute error: value doesn't fit into mask
+    __field_overflow();     \
+    ^~~~~~~~~~~~~~~~~~
+ include/linux/bitfield.h:198:2: note: in expansion of macro
+ '____MAKE_OP'
+   ____MAKE_OP(u##size,u##size,,)
+   ^~~~~~~~~~~
+ include/linux/bitfield.h:200:1: note: in expansion of macro
+ '__MAKE_OP'
+  __MAKE_OP(16)
+  ^~~~~~~~~
 
-Check for driver support in validate_xmit_skb as well.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202503182158.nkAlbJWX-lkp@intel.com/
+Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v8:
-- Rebase on latest net-next and resolve conflict.
-- Remove likely (Paolo)
-
-v5: https://lore.kernel.org/netdev/20250227041209.2031104-8-almasrymina@google.com/
-- Check that the dmabuf mappings belongs to the specific device the TX
-  is being sent from (Jakub)
-
-v4:
-- New patch
-
----
- net/core/dev.c         | 34 ++++++++++++++++++++++++++++++++--
- net/core/devmem.h      |  6 ++++++
- net/core/netdev-genl.c |  7 +++++++
- 3 files changed, 45 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d1a8cad0c99c4..66f0c122de80e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3896,12 +3896,42 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
- }
- EXPORT_SYMBOL(skb_csum_hwoffload_help);
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 2aacc1996796..55b8d3666153 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1925,8 +1925,8 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
  
-+static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
-+						    struct net_device *dev)
-+{
-+	struct skb_shared_info *shinfo;
-+	struct net_iov *niov;
-+
-+	if (likely(skb_frags_readable(skb)))
-+		goto out;
-+
-+	if (!dev->netmem_tx)
-+		goto out_free;
-+
-+	shinfo = skb_shinfo(skb);
-+
-+	if (shinfo->nr_frags > 0) {
-+		niov = netmem_to_net_iov(skb_frag_netmem(&shinfo->frags[0]));
-+		if (net_is_devmem_iov(niov) &&
-+		    net_devmem_iov_binding(niov)->dev != dev)
-+			goto out_free;
-+	}
-+
-+out:
-+	return skb;
-+
-+out_free:
-+	kfree_skb(skb);
-+	return NULL;
-+}
-+
- static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device *dev, bool *again)
- {
- 	netdev_features_t features;
+ 	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
  
--	if (!skb_frags_readable(skb))
--		goto out_kfree_skb;
-+	skb = validate_xmit_unreadable_skb(skb, dev);
-+	if (unlikely(!skb))
-+		goto out_null;
- 
- 	features = netif_skb_features(skb);
- 	skb = validate_xmit_vlan(skb, features);
-diff --git a/net/core/devmem.h b/net/core/devmem.h
-index 67168aae5e5b3..919e6ed28fdcd 100644
---- a/net/core/devmem.h
-+++ b/net/core/devmem.h
-@@ -229,6 +229,12 @@ net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding, size_t addr,
- {
- 	return NULL;
- }
-+
-+static inline struct net_devmem_dmabuf_binding *
-+net_devmem_iov_binding(const struct net_iov *niov)
-+{
-+	return NULL;
-+}
- #endif
- 
- #endif /* _NET_DEVMEM_H */
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 292606df834de..84c033574eb16 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -979,6 +979,13 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
- 		goto err_unlock_netdev;
- 	}
- 
-+	if (!netdev->netmem_tx) {
-+		err = -EOPNOTSUPP;
-+		NL_SET_ERR_MSG(info->extack,
-+			       "Driver does not support netmem TX");
-+		goto err_unlock_netdev;
-+	}
-+
- 	binding = net_devmem_bind_dmabuf(netdev, DMA_TO_DEVICE, dmabuf_fd,
- 					 info->extack);
- 	if (IS_ERR(binding)) {
+-	msb = fls(time_us);
+-	if (msb >= RTASE_MITI_COUNT_BIT_NUM) {
++	if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
++		msb = fls(time_us);
+ 		time_unit = msb - RTASE_MITI_COUNT_BIT_NUM;
+ 		time_count = time_us >> (msb - RTASE_MITI_COUNT_BIT_NUM);
+ 	} else {
 -- 
-2.49.0.805.g082f7c87e0-goog
+2.34.1
 
 
