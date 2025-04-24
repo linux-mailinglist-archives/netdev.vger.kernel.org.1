@@ -1,75 +1,96 @@
-Return-Path: <netdev+bounces-185588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDEF5A9B041
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:11:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FBCA9B0DC
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 481D93ACDA2
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:11:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FDC54A316C
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0321991CA;
-	Thu, 24 Apr 2025 14:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3377327CB04;
+	Thu, 24 Apr 2025 14:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ML+zf286"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822A212CDA5;
-	Thu, 24 Apr 2025 14:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5D41B4248;
+	Thu, 24 Apr 2025 14:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745503904; cv=none; b=CFy+FTueztc8EdbieOxrTdzlrf/hdyvVhKOhmuCGkcRHQKok4P7xwBToMRd1Lp2I/dhgBT2CAmwYFVpwFyaiqT6KxYbVtP/pxeff9eGgNhWk2gZzQKIyNJnIkYffzBjf2MYp7wRTpp/A6fQk7/p13i8hAbny6RxU1yBXO4BkVsA=
+	t=1745504635; cv=none; b=MoUeymJ780HnaWndGwCkb9VfnWzIUxvRId6CkxC8Ib+D4Zt4KbNiJfUuLNXB4yAc4KnpxHahurXx3Z8YerkPVeUglVBHWMoTcHsg2kM8RQKx2Vd50wxZKd7BiQYV47oNdk5fw0VWJfzVuREg3/hceBJel1p6VK49XmdMmFKxsVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745503904; c=relaxed/simple;
-	bh=j9MhJlmrBgxTw9usy7mwcj8IIcG2mA7HsiyHb4W6AN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TtzX+LLbwjCuxJPgYdVag7GlD+FeZE1zgWdhylm8I4v8U6WUgA6cug/dtrsGjoPNcAQeYJv3IIdQXXJLtvX2CR5VITNFChgVIvLcN+Wz2QNFeUc44MXxiJNkQO4YjKyMlZdvmb9XbVA/yk+ZvnwOKAhu5mEgIODQJ9Jx6i10k7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83376C4CEE3;
-	Thu, 24 Apr 2025 14:11:43 +0000 (UTC)
-Date: Thu, 24 Apr 2025 16:11:41 +0200
-From: Greg KH <greg@kroah.com>
-To: Christian Heusel <christian@heusel.eu>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Lubomir Rintel <lkundrak@v3.sk>
-Subject: Re: [PATCH] Revert "rndis_host: Flag RNDIS modems as WWAN devices"
-Message-ID: <2025042434-timid-fencing-cfe0@gregkh>
-References: <20250424-usb-tethering-fix-v1-1-b65cf97c740e@heusel.eu>
+	s=arc-20240116; t=1745504635; c=relaxed/simple;
+	bh=/VhUo42gnBZ25sYuPllLt17/9RBLjW6u+T/K4IZR0hw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O0NZBEt0pYvYmg/CqP80DiHnPigITYcGq3l3I8xJyGOZrhTNJtLK8JZDg05kAD0Jc1JLGJHvTNFEivt5iT4BjbU0d7RJHU8wql643zuFbkDSiVnm1RzxoQO6finRwISZk+MxU5jObkKT0B8dMWv83iKX9275G5cZ42s2HKctLMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ML+zf286; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3D3C4CEE3;
+	Thu, 24 Apr 2025 14:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745504634;
+	bh=/VhUo42gnBZ25sYuPllLt17/9RBLjW6u+T/K4IZR0hw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ML+zf286/DaEHVgCXjhaP2vpTTURYvyX9EfSn3scYmNQN67IPAGDDbKVzY/KQARYM
+	 AlO+zh4Oq4R1UqQSoahOOaZeAMKuoQGeLp45Vc+gdM08MVllJiK4sJ4Scpl23FUXql
+	 DUjsW2EzawZTIDNF7WnWV3W8r7b3mpy3sIHVR0+KRg4F40tGSCzJBj40MSoi3LXclH
+	 y8zdP5Z9vsil8Y96FmmGVBpxVTIF5Diiz2kB8Ogw92Z1ZwoI5QseAxZ0v9yFbm2TYs
+	 ryJP79l0cR5RDttUySz0zcX244MDdsqFFpTmfWEro5yj7RnUYnWDph7Is0mUBg56NZ
+	 5EBCf9aOY9zxg==
+Date: Thu, 24 Apr 2025 07:23:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, tom@herbertland.com, Eric
+ Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNl?=
+ =?UTF-8?B?bg==?= <toke@toke.dk>, dsahern@kernel.org,
+ makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
+Subject: Re: [PATCH net-next V6 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+Message-ID: <20250424072352.18aa0df1@kernel.org>
+In-Reply-To: <174549940981.608169.4363875844729313831.stgit@firesoul>
+References: <174549933665.608169.392044991754158047.stgit@firesoul>
+	<174549940981.608169.4363875844729313831.stgit@firesoul>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424-usb-tethering-fix-v1-1-b65cf97c740e@heusel.eu>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 04:00:28PM +0200, Christian Heusel wrote:
-> This reverts commit 67d1a8956d2d62fe6b4c13ebabb57806098511d8. Since this
-> commit has been proven to be problematic for the setup of USB-tethered
-> ethernet connections and the related breakage is very noticeable for
-> users it should be reverted until a fixed version of the change can be
-> rolled out.
-> 
-> Closes: https://lore.kernel.org/all/e0df2d85-1296-4317-b717-bd757e3ab928@heusel.eu/
-> Link: https://chaos.social/@gromit/114377862699921553
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=220002
-> Link: https://bugs.gentoo.org/953555
-> Link: https://bbs.archlinux.org/viewtopic.php?id=304892
-> Cc: stable@vger.kernel.org
-> Acked-by: Lubomir Rintel <lkundrak@v3.sk>
-> Signed-off-by: Christian Heusel <christian@heusel.eu>
-> ---
->  drivers/net/usb/rndis_host.c | 16 ++--------------
->  1 file changed, 2 insertions(+), 14 deletions(-)
+On Thu, 24 Apr 2025 14:56:49 +0200 Jesper Dangaard Brouer wrote:
+> +	case NETDEV_TX_BUSY:
+> +		/* If a qdisc is attached to our virtual device, returning
+> +		 * NETDEV_TX_BUSY is allowed.
+> +		 */
+> +		txq = netdev_get_tx_queue(dev, rxq);
+> +
+> +		if (qdisc_txq_has_no_queue(txq)) {
+> +			dev_kfree_skb_any(skb);
+> +			goto drop;
+> +		}
+> +		netif_tx_stop_queue(txq);
+> +		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
+> +		__skb_push(skb, ETH_HLEN);
+> +		/* Depend on prior success packets started NAPI consumer via
+> +		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
+> +		 * paired with empty check in veth_poll().
+> +		 */
+> +		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
+> +			netif_tx_wake_queue(txq);
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Looks like I wrote a reply to v5 but didn't hit send. But I may have
+set v5 to Changes Requested because of it :S Here is my comment:
+
+ I think this is missing a memory barrier. When drivers do this dance
+ there's usually a barrier between stop and recheck, to make sure the
+ stop is visible before we check. And vice versa veth_xdp_rcv() needs
+ to make sure other side sees the "empty" indication before it checks 
+ if the queue is stopped.
 
