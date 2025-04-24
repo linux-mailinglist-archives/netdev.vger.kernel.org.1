@@ -1,99 +1,126 @@
-Return-Path: <netdev+bounces-185701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5CAEA9B6AB
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:47:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78883A9B6B2
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 20:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A8414A3C8A
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:47:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A921BA0AF1
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 18:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE05D1E1C1A;
-	Thu, 24 Apr 2025 18:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A0028F50B;
+	Thu, 24 Apr 2025 18:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MFkInMrC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ylzR3I28"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9633A155342;
-	Thu, 24 Apr 2025 18:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549591F3BBE
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 18:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745520427; cv=none; b=mVZr7+qiuD2AB++vYb1PIy1WGX6qeZxVv/2SsOV7lqIsQLUZgYAMSHQ4MkP3je6E6ToF+taozaS6VmPb4jiUGFtwE7QD64COh6h5mDqg2WPBHky+1ItpkbC+JgWO/uNCtfA7tEv0nx/0CG1xxJaclCgsp+CcNuqtPhd9ykV2cVw=
+	t=1745520571; cv=none; b=XQ/bdKgae4sRK7qU5qcU33VZXlI/Sj2Q5o7U3x/mxRZmipIi7Zm+mmBcHtStnal6dwV+3S9u44Hllka6KNLTykW94GE99vSK7CbiCcuR6/e7ZaztKJ0xQ9J/135B7yr+rnPlA++8t6kSImKVwQ1cQTlum/E05niRFvCUagdFRu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745520427; c=relaxed/simple;
-	bh=63B8SOezIjHF6IjNgkPDhala00PxbRTVS/sNnyV2qkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lD1wvLtMBGRaVDjyGkjrZzI6zGmNBoiKbQ8mXShYL0rdS6PuXcoohW+A4pncvcyp+9Nr+hQP0Ab188XdP+LiFVnK04d5kYl8sJAkvQ2DpInB9xfb/gYEaraEcIGazLDi5grVYxZAcaIqNa2JpayF/OStRdgFHylG8PYLhPQB74Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MFkInMrC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A39C4CEE3;
-	Thu, 24 Apr 2025 18:47:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745520427;
-	bh=63B8SOezIjHF6IjNgkPDhala00PxbRTVS/sNnyV2qkA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MFkInMrCO5J8iV/bB+T5cQR/lWofnjsGp9pDGEQWS0+81n3snP5Ijg/Jzni5NyqWE
-	 bL9nG5a2dQXEVaIviUZd62Clu7xK+rrOC42TCEbHp6KudOiK0vnD6H5Ro6tNa4khia
-	 FA0o0nYN53RVzARWd6Vc5Ndiehh4pxY7myVX05xhVEvrY7VwlNOR7NXCdpx1r0Xhty
-	 hDsRG70+dZhnKvCQyvhLU4agi4SEjB7dK7r/RfOdRBGh56oV90iNaEfMnBmV8xELA2
-	 4Ll1s6QcC295oO/zrY5exdGJW1WvIKXqmCtN7TeVeQKP1B7sHoet+vrBGAVLTg2MyT
-	 7LFKLShA+9KLA==
-Date: Thu, 24 Apr 2025 08:47:05 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Harry Yoo <harry.yoo@oracle.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dennis Zhou <dennis@kernel.org>, Mateusz Guzik <mjguzik@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Vlad Buslov <vladbu@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>, Jan Kara <jack@suse.cz>,
-	Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/7] Reviving the slab destructor to tackle the
- percpu allocator scalability problem
-Message-ID: <aAqHKWU2xFk2X2ZD@slm.duckdns.org>
-References: <20250424080755.272925-1-harry.yoo@oracle.com>
+	s=arc-20240116; t=1745520571; c=relaxed/simple;
+	bh=YJThV8OU+yLTh48RfiUdm+OTToDHsoL5U/oCrdFEqDQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hBOaEcWCAhZd+9osiz235Da4BwYzd3FAeLCthz1HfOqzpcVY+HJbGobo57hKxE+nCXhwru7MmP1h2pD7rSN4kiHft5CICfSaPnCOFYic5MI7QmV8BBdE8GmU3hHE8MPIkueAqaVWddXpXB+9vRFCRQIMBcqcVKWD9vhu4J4ZlCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ylzR3I28; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2242ac37caeso17385ad.1
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 11:49:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745520569; x=1746125369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YJThV8OU+yLTh48RfiUdm+OTToDHsoL5U/oCrdFEqDQ=;
+        b=ylzR3I28/yHFuETRVx8TQjGviT85wGYNO9xhZfMuqph6DIlhaSNwaWlvkbtPK+qs6B
+         ElMVBnjACjOFiHTrBVLwYd0Ca2Bvc55SIR11MRMKQdqC8pWDQ02LcBDNfeiyTRnZ5NNU
+         VMrctS6S7a6mrVAt0zxIvDmckXP/ME542w8bOGeXP/yi/f+pdH6jDv3F/FZqfds1HJIy
+         CmMS680r1gfHpGVYwT3Dpz2TINkurECqb7m/VPrDGvlHQ8N/F80q96LKwbu+ATbjBkLf
+         pAIcJXHi1I9IhYCmVJiTMIOvpxgVkg4KgEzzvZCM1nspYuccVgdk/hS2G9SO+thvSb9j
+         Wi/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745520569; x=1746125369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YJThV8OU+yLTh48RfiUdm+OTToDHsoL5U/oCrdFEqDQ=;
+        b=FKK9aoe7903xbj/Kbcyrx6seCjNagrQBO+vj2IBsapi5UZ61XcX0EVENvhKFSlrJbF
+         VQ9IiMEpnzMaH26FOR7kq61zuE5fhoKZJTLUocT5HgTghJig6zhXLvAdOtqZK7R1P2y/
+         xyQ13KuggcW3g4jIU0F1mDfIFfEw/7uYwiC+0Zil0AVN5L9diFuK7NUJ8zQ/alLKYq9Y
+         Mya7nU4lWIF4Iuqd9+slzYq/Ei59/aLZP9DHPq6B3eSIEQzT9qMeCb8UTJbDzxwMjwcE
+         Wu0TKAd8RXf399QdH1D7YRUfeFTASuBfRXw2uyyqV/1orUbiM/VHQFywOgvbXmk2CCaz
+         qfBg==
+X-Gm-Message-State: AOJu0YwdDuorWG65QWLSs+7prTvnCw2rbPA4Vu1MOHKbUGC1aFpZ8949
+	hEIMuhq47WGp0msZNPDaJ+0688RdJ05WCZMq7AATacaB9LD3PWBmIxWh81xOV/RaMla3rwtuEdr
+	iwWnQ6EuAM+x2Nk1SD7x8DNSR3/IauEWKtnVdmkcXng31aDssebFx
+X-Gm-Gg: ASbGnct4jyM557nZVgO7hxLWU2H043WA0akDqnjtF/zqvSQvzrwVj6L7UIfNmgGAVyJ
+	a1/rnDmwMi52qQXdTeGxRmX4JQiVLKg/nH1RfFrbbX89lySr2WmAOtEx8/VJFyXhhywIrj3Oa9z
+	NvC61VrffnGSumCrUiMhnnvq2a4zPbzwhsk632KNBAA3J+kHxF3rmf
+X-Google-Smtp-Source: AGHT+IG7TvFiypkSdm6cFL8QXv7Geze56CiuyUqiMCDjIy5B3tjxrLsMvkElYIkhtHnXIN1qIRY0zGBcPAIono1A5h0=
+X-Received: by 2002:a17:903:2053:b0:220:ce33:6385 with SMTP id
+ d9443c01a7336-22dbdb49fd4mr181535ad.9.1745520568724; Thu, 24 Apr 2025
+ 11:49:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250424080755.272925-1-harry.yoo@oracle.com>
+References: <20250424040301.2480876-1-almasrymina@google.com>
+In-Reply-To: <20250424040301.2480876-1-almasrymina@google.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 24 Apr 2025 11:49:16 -0700
+X-Gm-Features: ATxdqUGSuXy2A5TP0CkyPakNQ5S2ontOlQJJboyrRu9J3Ao5kJdPZ2OrP3y4P5Q
+Message-ID: <CAHS8izOT38_nGbPnvxaqxV-y-dUcUkqEEjfSAutd0oqsYrB4RQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v11 0/8] Device memory TCP TX
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 24, 2025 at 05:07:48PM +0900, Harry Yoo wrote:
-...
-> Eighteen years later, Mateusz Guzik proposed [1] re-introducing a slab
-> constructor/destructor pair to mitigate the global serialization point
-> (pcpu_alloc_mutex) that occurs when each slab object allocates and frees
-> percpu memory during its lifetime.
-> 
-> Consider mm_struct: it allocates two percpu regions (mm_cid and rss_stat),
-> so each allocate–free cycle requires two expensive acquire/release on
-> that mutex.
+On Wed, Apr 23, 2025 at 9:03=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> v11: https://lore.kernel.org/netdev/20250423031117.907681-1-almasrymina@g=
+oogle.com/
+>
+> Addressed a couple of nits and collected Acked-by from Harshitha
+> (thanks!)
+>
 
-When percpu allocator was first introduced, the use cases were a lot more
-limited, so the single mutex and expensive alloc/free paths weren't a
-problem. We keep using percpu memory for more and more things, and I always
-thought we'd eventually need a more sophisticated allocator something with
-object caching. I don't exactly know what that should look like but maybe a
-simplified version of sl*b serving power of two sizes should do or maybe it
-needs to be smaller and more adaptive. We'd need to collect some data to
-decide which way to go.
+Hello,
 
-Improving percpu allocator in general is obviously a heavier lift but that
-may be a better long-term direction.
+I made a slight mistake sending this iteration and accidentally
+dropped patch 9, which contains the selftest. There is nothing wrong
+with the selftest in this iteration, I just accidentally cropped the
+series 1 patch too early.
 
-Thanks.
+I'll repost after the cooldown, and if this happens to get merged I'll
+just send the selftest as a follow up patch, it's an independent
+change anyway.
 
--- 
-tejun
+--=20
+Thanks,
+Mina
 
