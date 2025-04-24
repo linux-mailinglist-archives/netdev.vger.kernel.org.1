@@ -1,173 +1,231 @@
-Return-Path: <netdev+bounces-185593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31510A9B109
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:34:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2711A9B0E1
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 16:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 670274A6970
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:33:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F041B84A8E
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48635146D53;
-	Thu, 24 Apr 2025 14:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661FB27F756;
+	Thu, 24 Apr 2025 14:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Mo0zD16k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYAV3m/t"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-67.smtpout.orange.fr [193.252.22.67])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F432701DA;
-	Thu, 24 Apr 2025 14:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6B727F750
+	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 14:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745505218; cv=none; b=lHVe5pPKQRFtTBmIKRTudG8Tnw0seou2gHfEM0RwDQVtPTRfZOIC+lq/JGb81Kn/BAvx+AGgiAzRxMTI6R+MXBvG0COkA/Csz2aEiTVnixhH8cOw9ostp2Lpv2aHwqCYifC9zYtqJGT7MuQdh9pjoNwtV6GKhlD9otCOWiWFIvU=
+	t=1745504687; cv=none; b=ESiXgIkTKRZY3j+RLYLKaJ1ITp+eGMbUsfCjJmOqTYRvGxTmDk6V8Y0UJ4rFmBr3RBDeUTI0veIE1ub3FEA9Yq41kDeayoi85os+vPUzrPno3PKREMp4FzSnmaQdgtf3lIIaoH1wyAtZzP61ZyB/KCyaYw3VeCOwtyIh2Ar3wGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745505218; c=relaxed/simple;
-	bh=bdu4AdfU3rVBoxI7dS381WsNGFKefFYdMLFb+5Z2TMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hsnzu3FBpHIr5xsURRaJQ6eywc2fNo2KkcU11NxlcI8Nfw7fGkIRJKBiEIs+vqRRGP27b/OFoclMDt4kaD7rgR31GD8r/vopt5VXZo4VSIEOednu6y6arW1z1MJtoz4HZmXhKHw8but1sQGe7LMXKO3aeK1iFyN5AtHz6LyZBGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Mo0zD16k; arc=none smtp.client-ip=193.252.22.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id 7xUeu3cnoukJt7xUiuRXfG; Thu, 24 Apr 2025 16:24:09 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1745504649;
-	bh=K9cTD87TavWzyJKYV4zrWDK5k7WI86kJqfUPCYnBnpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Mo0zD16kfhROPb+1Ho5AGTv/skh9UvI9T+ybmvv0ZaPxLZk/mRql/25aIiG8QyLCe
-	 tvxfUJsuopjzSih0MEig6qCnAog+5SP+EMQwFehpp9jWfjQH3UbRHUiZEDxvxAXfad
-	 RNooe3PS1rVFnrCa6LKgdWKDncDCdIIdFz4n0db4lkkILWSELqJPYRLnDm3RYA43Bn
-	 oM5uxlXMQYjE6e9suw2j9QZkzwlBfcEstuxJDkMkuzkds4s1w/nhnBWYe8qP4GDtVl
-	 vuklKInx8Tvyi5Cahx1qUsKW6AE+SmJJfgm5+Lt52iwK2XwMrjobv6E2ulGXl00phY
-	 /rpMczZfmaSPA==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 24 Apr 2025 16:24:09 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <6c1980f7-9cdb-4443-830d-1d76dc8e2dd6@wanadoo.fr>
-Date: Thu, 24 Apr 2025 23:23:59 +0900
+	s=arc-20240116; t=1745504687; c=relaxed/simple;
+	bh=ITEJU5E+U8k3jYhXGW3lQ1NkLPi5MlRGY624NYpem6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MymuWxWuAxnLCEB8BldfT8yXyKGoj0cbNdqCmREV8DbtxMPJr8UM+Yc6VACinJOLOTSpOrrrXZFHS81SlUwb5WlQ0ArJ6iyPKptdS8r75QM00xrU+4ABi33mJgyO+csPtAoLBRGxJFPU9BvMVa8WYjfpW9T/u0NFzFtO+2TqNV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hYAV3m/t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745504683;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nV8jVW/8nt8ZwTGGNIL9yTSPGZZ29xDmvRWgbdJwWX4=;
+	b=hYAV3m/tTTF4hSkMk7HJveaFSX2IExNylsv0ymZn+HnLT1t1vPwaT+L9iSvxV0RkH/yJCc
+	+FJLfMHVAXno2OXXmyMEpqThBRTFOJKzr9E5jLk/WDFyhD4VYNHVyxdGlQuX3p1hxzUyTd
+	vQVt2xAtTdnwjFvkdy5Xs46IM02HVK8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-17-DNIBepIvNE2ur6RXjt6c-Q-1; Thu, 24 Apr 2025 10:24:42 -0400
+X-MC-Unique: DNIBepIvNE2ur6RXjt6c-Q-1
+X-Mimecast-MFC-AGG-ID: DNIBepIvNE2ur6RXjt6c-Q_1745504681
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39131851046so380458f8f.0
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 07:24:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745504681; x=1746109481;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nV8jVW/8nt8ZwTGGNIL9yTSPGZZ29xDmvRWgbdJwWX4=;
+        b=vR5HP3uqfL1lYJOPeYCji5bsAF3980g8UQ6g+2KzqktVmoZxu949kSBROoPHBWKii9
+         hbaBdYZXWohQqU9t5uFY2v4lbVfhtDWsKHkqyJtE7i9PALwP8uaBIZTx5choc1jnDrlb
+         HYBiul8YNsyUwNSojkJhWU+oPI9yRxEcZ2pXiIdDPwzXHE8rgvNHOctq/oKIap8zexxF
+         vYknwL70Nt0svDN2pheJKHmToOskcpqx5dVeZUwvxYZP/Ene7HUtxLltAK2g3Y/cp/5S
+         FqtNnXnZbrzgtdfaAXIgylCo8dj0oipzOp6HzmLRGBosPt8FR19gOOKnXLVqj/DEdINm
+         c5Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTEdYf7xpbVDAoTvSopkk2FV1anTUiP9htBxpMzkdNQ08Ure/C+M7ZYn08EjN3DdsWSnQpJTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDYmVPkCMPcrcmo8VaYLkPpo5bGiS0y0oxHQH8mu1d+Thaw0fh
+	Gg1QwXJes2KCn41mHzRK6QDEA7X1c7cC/IBeOnaRS0fES9V9+2bTmWeTXjFCkUuVIgFWEaUdqxe
+	SjbVy8uOLq711efU205+1xXKpWmWKUKTPjuYf/iaMIPyD6XsiuGFXfA==
+X-Gm-Gg: ASbGnctoJqp2utucNjJbo4u648IJtekc+MpdRBxv4T7s02KqctsisITO5TtDckFOoNu
+	uE0X35U+wlAyHE9IupB5K5CveUk8iOTGURaP+lxukfeKQM5dCDS//FfA3ZSxVqY2+ZoLvVZHusv
+	LnEOWyUTotV2RuFBy7kH7gO89M0WtLa0wA5jS3LmDngdvqIJY39V0xODHy+rVR6rF/Gg0Yku9Us
+	plrTTEcyJDH2S0oqDMi604kS8R6Y/ykuRPGHCjhMe8ZW7jGKqghPrrFU8h9OsjTn/AxzvLMqHWk
+	QkLAVQ==
+X-Received: by 2002:a05:6000:240a:b0:39a:ca0b:e7c7 with SMTP id ffacd0b85a97d-3a06cfaba23mr2493041f8f.36.1745504681018;
+        Thu, 24 Apr 2025 07:24:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEwBzD5hh+2Z62EditO+ortaghgO8pvR6NguSzN5/Fukq1qShODNoWcevMtBiQSBYPeBcmOdg==
+X-Received: by 2002:a05:6000:240a:b0:39a:ca0b:e7c7 with SMTP id ffacd0b85a97d-3a06cfaba23mr2493006f8f.36.1745504680461;
+        Thu, 24 Apr 2025 07:24:40 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d4a7ff8sm2347237f8f.13.2025.04.24.07.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Apr 2025 07:24:39 -0700 (PDT)
+Date: Thu, 24 Apr 2025 10:24:37 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
+ after sendmsg
+Message-ID: <20250424102351-mutt-send-email-mst@kernel.org>
+References: <20250420010518.2842335-1-jon@nutanix.com>
+ <a0894275-6b23-4cff-9e36-a635f776c403@redhat.com>
+ <20250424080749-mutt-send-email-mst@kernel.org>
+ <1CE89B73-B236-464A-8781-13E083AFB924@nutanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] selftests: can: Import tst-filter from can-tests
-To: Felix Maurer <fmaurer@redhat.com>
-Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- dcaratti@redhat.com, fstornio@redhat.com
-References: <cover.1745323279.git.fmaurer@redhat.com>
- <a4468403cc51ea6c0e8495d7d095befb37aa5aaf.1745323279.git.fmaurer@redhat.com>
- <CAMZ6RqKfdNRBKoH16=7JDC2QKB+XO68mahg2X7zKDcUAM+8bzw@mail.gmail.com>
- <96bd9677-c257-480b-be3c-7c4b9b79b238@redhat.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <96bd9677-c257-480b-be3c-7c4b9b79b238@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1CE89B73-B236-464A-8781-13E083AFB924@nutanix.com>
 
-On 24/04/2025 at 23:02, Felix Maurer wrote:
-> On 24.04.25 09:42, Vincent Mailhol wrote:
->> On Tue. 22 Apr. 2025 at 21:08, Felix Maurer <fmaurer@redhat.com> wrote:
-> [...]
->>> +ALL_TESTS="
->>> +       test_raw_filter
->>> +"
->>> +
->>> +net_dir=$(dirname $0)/..
->>> +source $net_dir/lib.sh
->>> +
->>> +VCANIF="vcan0"
->>
->> Here, you are making the VCANIF variable configuration, but then, in
->> your test_raw_filter.c I see:
->>
->>   #define VCANIF "vcan0"
->>
->> This means that in order to modify the interface, one would have to
->> both modify the .sh script and the .c source. Wouldn't it be possible
->> to centralize this? For example by reading the environment variable in
->> the C file?
->>
->> Or maybe there is a smarter way to pass values in the kernel selftests
->> framework which I am not aware of?
+On Thu, Apr 24, 2025 at 01:53:34PM +0000, Jon Kohler wrote:
 > 
-> Good point, I'll try to come up with something to avoid the duplication
-> (either from the selftest framework or just for the CAN tests). I'd
-> prefer an argument to the program though, as I find this the more usual
-> way to pass info if one ever wants to run the test directly.
-
-Passing an argument would be the best. I am not sure how to do this with the
-selftests (but I did not investigate either).
-
->>> +setup()
->>> +{
->>> +       ip link add name $VCANIF type vcan || exit $ksft_skip
->>> +       ip link set dev $VCANIF up
->>> +       pwd
->>> +}
-
-Speaking of which, if you allow the user to modify the interface, then you will
-one additional check here to see whether it is a virtual can interface or not
-(the ip link commands are not the same for the vcan and the physical can).
-
-Something like:
-
-  CANIF="${CANIF:-vcan}"
-  BITRATE="${BITRATE:-500000}"
-
-  setup()
-  {
-  	if [ $CANIF == vcan* ]; then
-  		ip link add name $CANIF type vcan || exit $ksft_skip
-  	else
-  		ip link set dev $CANIF type can $BITRATE 500000
-  	fi
-  	ip link set dev $VCANIF up
-  	pwd
-  }
-
->>> +cleanup()
->>> +{
->>> +       ip link delete $VCANIF
->>> +}
->>
->> I guess that this setup() and this cleanup() is something that you
->> will also need in the other can tests. Would it make sense to declare
->> these in a common.sh file and just do a
->>
->>   source common.sh
->>
->> here?
 > 
-> I usually try to avoid making changes in anticipation of the future. I'm
-> not sure if all the tests need a similar environment and would prefer to
-> split this when we encounter that they do. Are you okay with that?
+> > On Apr 24, 2025, at 8:11 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > 
+> > !-------------------------------------------------------------------|
+> >  CAUTION: External Email
+> > 
+> > |-------------------------------------------------------------------!
+> > 
+> > On Thu, Apr 24, 2025 at 01:48:53PM +0200, Paolo Abeni wrote:
+> >> On 4/20/25 3:05 AM, Jon Kohler wrote:
+> >>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> >>> index b9b9e9d40951..9b04025eea66 100644
+> >>> --- a/drivers/vhost/net.c
+> >>> +++ b/drivers/vhost/net.c
+> >>> @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> >>> break;
+> >>> /* Nothing new?  Wait for eventfd to tell us they refilled. */
+> >>> if (head == vq->num) {
+> >>> + /* If interrupted while doing busy polling, requeue
+> >>> + * the handler to be fair handle_rx as well as other
+> >>> + * tasks waiting on cpu
+> >>> + */
+> >>> if (unlikely(busyloop_intr)) {
+> >>> vhost_poll_queue(&vq->poll);
+> >>> - } else if (unlikely(vhost_enable_notify(&net->dev,
+> >>> - vq))) {
+> >>> - vhost_disable_notify(&net->dev, vq);
+> >>> - continue;
+> >>> }
+> >>> + /* Kicks are disabled at this point, break loop and
+> >>> + * process any remaining batched packets. Queue will
+> >>> + * be re-enabled afterwards.
+> >>> + */
+> >>> break;
+> >>> }
+> >> 
+> >> It's not clear to me why the zerocopy path does not need a similar change.
+> > 
+> > It can have one, it's just that Jon has a separate patch to drop
+> > it completely. A commit log comment mentioning this would be a good
+> > idea, yes.
+> 
+> Yea, the utility of the ZC side is a head scratcher for me, I can’t get it to work
+> well to save my life. I’ve got a separate thread I need to respond to Eugenio
+> on, will try to circle back on that next week.
+> 
+> The reason this one works so well is that the last batch in the copy path can
+> take a non-trivial amount of time, so it opens up the guest to a real saw tooth
+> pattern. Getting rid of that, and all that comes with it (exits, stalls, etc), just
+> pays off.
+> 
+> > 
+> >>> @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+> >>> ++nvq->done_idx;
+> >>> } while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
+> >>> 
+> >>> + /* Kicks are still disabled, dispatch any remaining batched msgs. */
+> >>> vhost_tx_batch(net, nvq, sock, &msg);
+> >>> +
+> >>> + /* All of our work has been completed; however, before leaving the
+> >>> + * TX handler, do one last check for work, and requeue handler if
+> >>> + * necessary. If there is no work, queue will be reenabled.
+> >>> + */
+> >>> + vhost_net_busy_poll_try_queue(net, vq);
+> >> 
+> >> This will call vhost_poll_queue() regardless of the 'busyloop_intr' flag
+> >> value, while AFAICS prior to this patch vhost_poll_queue() is only
+> >> performed with busyloop_intr == true. Why don't we need to take care of
+> >> such flag here?
+> > 
+> > Hmm I agree this is worth trying, a free if possibly small performance
+> > gain, why not. Jon want to try?
+> 
+> I mentioned in the commit msg that the reason we’re doing this is to be
+> fair to handle_rx. If my read of vhost_net_busy_poll_try_queue is correct,
+> we would only call vhost_poll_queue iff:
+> 1. The TX ring is not empty, in which case we want to run handle_tx again
+> 2. When we go to reenable kicks, it returns non-zero, which means we
+> should run handle_tx again anyhow
+> 
+> In the ring is truly empty, and we can re-enable kicks with no drama, we
+> would not run vhost_poll_queue.
+> 
+> That said, I think what you’re saying here is, we should check the busy
+> flag and *not* try vhost_net_busy_poll_try_queue, right?
 
-Yes, this works. Keep this idea in back of your mind and if there is a need to
-reuse those in the future, then it will be a good timing to do the factorize the
-code.
+yes
 
+> If so, great, I did
+> that in an internal version of this patch; however, it adds another conditional
+> which for the vast majority of users is not going to add any value (I think)
+> 
+> Happy to dig deeper, either on this change series, or a follow up?
 
-Yours sincerely,
-Vincent Mailhol
+it just seems like a more conservate thing to do, given we already did
+this in the past.
+
+> > 
+> > 
+> >> @Michael: I assume you prefer that this patch will go through the
+> >> net-next tree, right?
+> >> 
+> >> Thanks,
+> >> 
+> >> Paolo
+> > 
+> > I don't mind and this seems to be what Jon wants.
+> > I could queue it too, but extra review  it gets in the net tree is good.
+> 
+> My apologies, I thought all non-bug fixes had to go thru net-next,
+> which is why I sent the v2 to net-next; however if you want to queue
+> right away, I’m good with either. Its a fairly well contained patch with
+> a huge upside :) 
+> 
+> > 
+> > -- 
+> > MST
+> > 
+> 
 
 
