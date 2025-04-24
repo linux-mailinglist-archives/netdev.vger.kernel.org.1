@@ -1,166 +1,201 @@
-Return-Path: <netdev+bounces-185763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7190EA9BAF3
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:52:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E33CEA9BAFD
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1D044678FD
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:52:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D33347A962A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 22:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBCF21E087;
-	Thu, 24 Apr 2025 22:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYasCJ+P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0D3285401;
+	Thu, 24 Apr 2025 22:58:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DA319DF7D;
-	Thu, 24 Apr 2025 22:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66F0221712;
+	Thu, 24 Apr 2025 22:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745535162; cv=none; b=GL+3cXaquWM5Y0LB1v0mgINgzF4cCjjGgDoeWqNk0HJ7c1y3R1YF6cJR9v9PWco4Nk8w/H3dDgmqt7iuQ9qnf7ZngzjBfQp4lM1L8KVqGIKeI8L65WvR4JNNjfsaga898vFIcaoRFXHzN463XWa+WsQ/dLI9i32KFXIRZN0aXpE=
+	t=1745535486; cv=none; b=CRUretaoMiCA5kp78krv9e/eZayb3KaQ+A8kFhCK/FdUn9zPCWNA6H2fRlPcaPIUNsx+ppVGZMJcmsxExybqsfdt5m5rCtx4TO82hCP2T0JzjMQCK9Vo2wv1EDoZFj6JLdrrRgubjIhjkdQxiBhJxyq7dMIwRraqIuZKsNGWdtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745535162; c=relaxed/simple;
-	bh=vPcIZ8pDaO2fxwVC5G00kxdWjIdGTsiuQwohPKn5T0Q=;
+	s=arc-20240116; t=1745535486; c=relaxed/simple;
+	bh=731nWIyt9OFN6kxXt/6KA+nv44zep6jyOw5FxNS1B/Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KVsZQV6bMbtvJ+IXTHIju4PHCCdsfDbyRr94wsj7DFppxRyXiuJNpeJt2bErV1NYemvz5uLHw7Gof43I5iTmutfZQ4iTXX2S41iuSjdsN8hAR8+AMVqqYf7v+hpPuQ+EMvArzyQ809RyKBB0qJkhwgLdU1q2u/1GKTCK2rGW3a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYasCJ+P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5211C4CEE3;
-	Thu, 24 Apr 2025 22:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745535160;
-	bh=vPcIZ8pDaO2fxwVC5G00kxdWjIdGTsiuQwohPKn5T0Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EYasCJ+PCKWsJfy6QKCS+dED2eee1eSGBrM6XFnNE259pPlh18AJDP8PmN1suzJQQ
-	 cH/grB+hHocnc8k+6xVMygiJ+X27thXwsQ25O+O9YSsSDOUpCj1QXmQFORXYlAcZt+
-	 KcByJOBeC3WcI8zrYfr+IGT1+tjjWEXc1uteTduLxmiG40HnS17N046oN3r2/ltS+7
-	 FL/k75eqNsXpmOhGT8IOdM8AzQAK7SmVbHWfHsycpJmKk9j+TXCQeONjrE3JmYzY/L
-	 h0t8O9Mc1LIPwprxr8tA7o6dVSp6g+jdCQTENRnKq2RUZyU7D3udtg33XZXgthg0U7
-	 2xxPaLfNpOp+A==
-Date: Thu, 24 Apr 2025 15:52:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jeff Layton <jlayton@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim
- Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 7/7] net: register debugfs file for net_device refcnt
- tracker
-Message-ID: <20250424155238.7d0d2a29@kernel.org>
-In-Reply-To: <4118dbd6-2b4b-42c3-9d1e-2b533fc92a66@lunn.ch>
-References: <20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org>
-	<20250418-reftrack-dbgfs-v4-7-5ca5c7899544@kernel.org>
-	<20250423165323.270642e3@kernel.org>
-	<a07cd1c64b16b074d8e1ec2e8c06d31f4f27d5e5.camel@kernel.org>
-	<20250423173231.5c61af5b@kernel.org>
-	<cdfc5c6f260ee1f81b8bb0402488bb97dd4351bb.camel@kernel.org>
-	<4118dbd6-2b4b-42c3-9d1e-2b533fc92a66@lunn.ch>
+	 MIME-Version:Content-Type; b=TaoAnS3WFc+4zZiRVBdXlvkUEmzCRM2nac8x7NPrRYjfvlQq8aoT0SezSZjAk0FhqKIIIgmX2cdna2kxtG0EvSOmyQPCbc6x8FAog6F9kgTOng+uupu21in0PQYMZ2iYLUHcMrw37qSev92jf9MVdViqz4uYEEEhApW4s4U41Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E369D2F;
+	Thu, 24 Apr 2025 15:57:57 -0700 (PDT)
+Received: from minigeek.lan (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A76533F59E;
+	Thu, 24 Apr 2025 15:58:00 -0700 (PDT)
+Date: Thu, 24 Apr 2025 23:56:58 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Yixun Lan <dlan@gentoo.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Samuel Holland
+ <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ clabbe.montjoie@gmail.com
+Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
+ board
+Message-ID: <20250424235658.0c662e67@minigeek.lan>
+In-Reply-To: <4643958.LvFx2qVVIh@jernej-laptop>
+References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
+	<4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
+	<20250424150037.0f09a867@donnerap.manchester.arm.com>
+	<4643958.LvFx2qVVIh@jernej-laptop>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.31; x86_64-slackware-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 24 Apr 2025 14:10:03 +0200 Andrew Lunn wrote:
-> > > > > How much naming the objects in a "user readable" fashion actually
-> > > > > matter? It'd be less churn to create some kind of "object class"
-> > > > > with a directory level named after what's already passed to
-> > > > > ref_tracker_dir_init() and then id the objects by the pointer value 
-> > > > > as sub-dirs of that?    
-> > > > 
-> > > > That sounds closer to what I had done originally. Andrew L. suggested
-> > > > the flat directory that this version represents. I'm fine with whatever
-> > > > hierarchy, but let's decide that before I respin again.  
-> > > 
-> > > Sorry about that :(
-> > >   
-> > 
-> > No worries...but we do need to decide what this directory hierarchy
-> > should look like.
-> > 
-> > Andrew's point earlier was that this is just debugfs, so a flat
-> > "ref_tracker" directory full of files is fine. I tend to agree with
-> > him; NAME_MAX is 255, so we have plenty of room to make uniquely-named
-> > files.
-> > 
-> > We could build a dir hierarchy though. Something like:
-> > 
-> > - ref_tracker
-> >     + netdev
-> >     + netns  
-> 
-> How do you make that generic? How due the GPU users of reftracker fit
-> in? And whatever the next users are? A flat directory keeps it
-> simple. Anybody capable of actually using this has to have a level of
-> intelligence sufficient for glob(3).
-> 
-> However, a varargs format function does make sense, since looking at
-> the current users, many of them will need it.
+On Thu, 24 Apr 2025 20:38:34 +0200
+Jernej =C5=A0krabec <jernej.skrabec@gmail.com> wrote:
 
-No preference on my side about the hierarchy TBH. I just defaulted to
-thinking about it in terms of a hierarchy class/id rather than class-id
-but shouldn't matter.
+> cc: Corentin LABBE
+>=20
+> Dne =C4=8Detrtek, 24. april 2025 ob 16:00:37 Srednjeevropski poletni =C4=
+=8Das je Andre Przywara napisal(a):
+> > On Thu, 24 Apr 2025 14:57:27 +0200
+> > Andrew Lunn <andrew@lunn.ch> wrote:
+> >=20
+> > Hi Andrew,
+> >  =20
+> > > > > Just to be clear, you tried it with "rgmii-id" and the same <300>=
+ and
+> > > > > <400> values?   =20
+> > > >=20
+> > > > Yes, sorry, I wasn't clear: I used rgmii-id, then experimented with=
+ those
+> > > > values.   =20
+> > >=20
+> > > O.K, great.
+> > >=20
+> > > I do suspect the delays are not actually in pico seconds. But without
+> > > a data sheet, it is hard to know.
+> > >=20
+> > >        if (!of_property_read_u32(node, "allwinner,rx-delay-ps", &val)=
+) {
+> > >                 if (val % 100) {
+> > >                         dev_err(dev, "rx-delay must be a multiple of =
+100\n");
+> > >                         return -EINVAL;
+> > >                 }
+> > >                 val /=3D 100;
+> > >                 dev_dbg(dev, "set rx-delay to %x\n", val);
+> > >                 if (val <=3D gmac->variant->rx_delay_max) {
+> > >                         reg &=3D ~(gmac->variant->rx_delay_max <<
+> > >                                  SYSCON_ERXDC_SHIFT);
+> > >                         reg |=3D (val << SYSCON_ERXDC_SHIFT);
+> > >=20
+> > > So the code divides by 100 and writes it to a register. But:
+> > >=20
+> > > static const struct emac_variant emac_variant_h3 =3D {
+> > >         .rx_delay_max =3D 31,
+> > >=20
+> > >=20
+> > > static const struct emac_variant emac_variant_r40 =3D {
+> > >         .rx_delay_max =3D 7,
+> > > };
+> > >=20
+> > > With the change from 7 to 31, did the range get extended by a factor
+> > > of 4, or did the step go down by a factor of 4, and the / 100 should
+> > > be / 25? I suppose the git history might have the answer in the commit
+> > > message, but i'm too lazy to go look. =20
+> >=20
+> > IIRC this picosecond mapping was somewhat made up, to match common DT
+> > properties. The manual just says:
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > 12:10  R/W  default: 0x0 ETXDC: Configure EMAC Transmit Clock Delay Cha=
+in.
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >=20
+> > So the unit is really unknown, but is probably some kind of internal cy=
+cle count.
+> > The change from 7 to 31 is purely because the bitfield grew from 3 to 5
+> > bits. We don't know if the underlying unit changed on the way.
+> > Those values are just copied from whatever the board vendor came up wit=
+h,
+> > we then multiply them by 100 and put them in the mainline DT. Welcome to
+> > the world of Allwinner ;-) =20
+>=20
+> IIRC Corentin asked Allwinner about units and their response was in 100 p=
+s.
+>=20
+> In my experience, vendor DT has proper delays specified, just 7 instead of
+> 700, for example. What they get wrong, or better said, don't care, is phy
+> mode. It's always set to rgmii because phy driver most of the time ignores
+> this value and phy IC just uses mode set using resistors.
 
-The main point I was trying to make was about using a synthetic ID -
-like the pointer value. For the netdevs this patchset waits until 
-the very end of the registration process to add the debugfs dir
-because (I'm guessing) the name isn't assigned when we alloc 
-the device (and therefore when we call ref_tracker_dir_init()).
+Ah, right, I dimly remembered there was some hardware setting, but your
+mentioning of those strap resistors now tickled my memory!
 
-Using synthetic ID lets us register the debugfs from
-ref_tracker_dir_init().
+So according to the Radxa board schematic, RGMII0-RXD0/RXDLY is pulled
+up to VCCIO via 4.7K, while RGMII0-RXD1/TXDLY is pulled to GND (also via
+4K7). According to the Motorcom YT8531 datasheet this means that RX
+delay is enabled, but TX delay is not.
+The Avaota board uses the same setup, albeit with an RTL8211F-CG PHY,
+but its datasheet confirms it uses the same logic.
 
-In fact using "registered name" can be misleading. In modern setups
-where devices are renamed based on the system topology, after
-registration.
+So does this mean we should say rgmii-rxid, so that the MAC adds the TX
+delay? Does the stmmac driver actually support this? I couldn't find
+this part by quickly checking the code.
 
-The Ethernet interface on my laptop is called enp0s13f0u1u1,
-not eth0. It is renamed by systemd right _after_ registration.
+Cheers,
+Andre
 
-[45224.911324] r8152 2-1.1:1.0 eth0: v1.12.13
-[45225.220032] r8152 2-1.1:1.0 enp0s13f0u1u1: renamed from eth0
+> Proper way here
+> would be to check schematic and set phy mode according to that. This meth=
+od
+> always works, except for one board, which had resistors set wrong and
+> phy mode configured over phy driver was actually fix for it.
+>=20
+> Best regards,
+> Jernej
+>=20
+> >=20
+> > And git history doesn't help, it's all already in the first commit for =
+this
+> > driver. I remember some discussions on the mailing list, almost 10 years
+> > ago, but this requires even more digging ...
+> >=20
+> > Cheers,
+> > Andre
+> >=20
+> >=20
+> >  =20
+> > >=20
+> > > I briefly tried "rgmii", and I couldn't get a lease, so I quite =20
+> > > > confident it's rgmii-id, as you said. The vendor DTs just use "rgmi=
+i", but
+> > > > they might hack the delay up another way (and I cannot be asked to =
+look at
+> > > > that awful code).
+> > > >=20
+> > > > Cheers,
+> > > > Andre   =20
+> >=20
+> >  =20
+>=20
+>=20
+>=20
+>=20
+>=20
 
-so in (most?) modern systems the name we carefully printed
-into the debugfs name will in fact not match the current device name.
-What more we don't try to keep the IDs monotonically increasing. 
-If I plug in another Ethernet card it will also be called eth0 when
-it's registered, again. You can experiment by adding dummy devices:
-
-# ip link add type dummy
-# ip link
-...
-2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:51:ee:5b:4b:83 brd ff:ff:ff:ff:ff:ff
-
-# ip link set dev dummy0 name other-name
-[  206.747381][  T670] other-name: renamed from dummy0
-# ip link
-...
-2: other-name: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:51:ee:5b:4b:83 brd ff:ff:ff:ff:ff:ff
-
-# ip link add type dummy
-# ip link
-...
-2: other-name: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:51:ee:5b:4b:83 brd ff:ff:ff:ff:ff:ff
-3: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether b2:51:ee:5b:4b:83 brd ff:ff:ff:ff:ff:ff
-
-
-The second device is called dummy0, again, because that name was
-"free". So with the current code we delay the registration of debugfs
-just to provide a name which is in fact misleading :S
-
-But with all that said, I guess you still want the "meaningful" ID for
-the netns, and that one is in fact stable :S
 
