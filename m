@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-185440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76622A9A5B6
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:21:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F57A9A59A
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 10:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5972A3B41E9
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:20:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA4577AC967
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 08:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10944207A2A;
-	Thu, 24 Apr 2025 08:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77337207DFE;
+	Thu, 24 Apr 2025 08:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JC1Tguwe";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="aZ6wJCED"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eHgsFupC";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Kk31Kqwk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0692C20A5E1;
-	Thu, 24 Apr 2025 08:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC6A1F4622;
+	Thu, 24 Apr 2025 08:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745482854; cv=fail; b=WO1/dopd4VIItTS6e/RrcbndiZSlN18h3tta3Y9PQbN8hW25/rbhEpDT3ctreN37Uf2D1CGwSnErZrgJJLhnOJYCTVeGuZFJuvEvZKqpoRpclFH8b3qaQDfuUNO3FgPnb9iGQ0Pj9JdFyugx1iiX0KKw8lQEr+dRgYrv1ommG4M=
+	t=1745482670; cv=fail; b=SSoi7Sv78zy6L6UCNlcGjB3Tf96z/5o3rdsz3r7VKFGl+UDTvQIe6PFWxSnaII1G2LV2ZY774aopCm9aJPBu+MorGnQyUIfk810rZd9WEVsqrvtMru+RNW2Md+jBZE7t6kB8HZIjd3p5GogHQOZ/mtrMq7fsBlwpHJYmtuGRkqY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745482854; c=relaxed/simple;
-	bh=LrIVc7bfPdLmgfDoQdveyTvE54xhKRw7KWUbO/3EASg=;
+	s=arc-20240116; t=1745482670; c=relaxed/simple;
+	bh=z6uJNGzYJDb9vV37HfPCCuFkbkOoi6AuCaMlMQ5jdGM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ESR4izMKmiSu5iusPBCzNBqZfLxsILNjnnYfZi3eoA9xe/GstiovBz6nsA+lWu736+cj4yYa2qT9pwbKSphIcvZhKopdniDpMfPD83Hcji39H5FIhI3AIISrgGxbHlz2ZDHq/Ote4Vl8Va63sAzEDEDO3+JAOeaQ5Fy9zU8MSgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=JC1Tguwe; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=aZ6wJCED; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=ksQnE8wjlnQLd+0L1D2u9+iVXujYGL2hwNfUEx2gwhVg5SFzNGzys3KrmfHU/RfmEdNF1Y7dJgrYshqP8jhZlTxcljvmNf/U9YZoIzvqaAJxye2uNYxeufru01lOREcxzM+vJb21x32qrmQVqS5cEY/rL5EZku500J2ZSlQpQ/g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eHgsFupC; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Kk31Kqwk; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6ttR4005503;
-	Thu, 24 Apr 2025 08:20:33 GMT
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53O6ttQX005503;
+	Thu, 24 Apr 2025 08:17:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=aog4JoMrhgq7+h5K2ucK6aO98+XcuAAgabvG8owueYA=; b=
-	JC1Tguwef7cUYpy/BG4D/IN+Lnw3DDMNIkp7pd6LOXKBEvqtZ/Q0ow0trUTqKIaZ
-	vVixCaaHrJAQlytiAw3IMGDSLi+ygrKUfr0ICq1AWgLFHsTMo4EJeAhEhBvz8ESR
-	tvk70RHxpAAwerne0M+Vf2fUGRKGJdRSnneJX+VK+j2kK2jdDevqluJakUWol/aj
-	loabtboDlMz5jedzGkBXEqoe2JczAbyMaSaUG4WGARGl6p/OZ6iMlTckz7zG1Ike
-	PQhF1XtRL0qW2aK7R9n74YrnbaQrpGMTMyxDitP4NjSLNneLOi7ybtObNI4ZAUJQ
-	u5NYJ0Xu0oJrrUY+c7dnFQ==
+	corp-2023-11-20; bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=; b=
+	eHgsFupCGkZeusebKgmm6bplK7btRdr6WXrZnCxhmUzlTLDZHk/mAsKywoLR+kPI
+	N9NWi74oqBkZuzBa3FU0/y9Qh3WxeGUkCps9jcXhdCePxdjhOq5FDXbcdV6Hlhdn
+	YSZNhSHDR25bsbz4yOYFJN+4NxugH4BrPlUgnKe+pBVGSGkSil+W9h5MN1xaHAUa
+	cvxBD/yxPRV/UQWI7Fb3ob3JbRKyovl3szmxU4Rw82CwJql/Cl+CXi/NtSyS7hXt
+	/HragOLoovGBUEpwYJyvMY8WTDJm9ZPuUVI7WOS9afExTGxtd4hbUjWlAliZZDgN
+	LMvYkgq0m0nOtk/uJ02hJA==
 Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467fmk86sf-10
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 467fmk86pj-14
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:20:32 +0000 (GMT)
+	Thu, 24 Apr 2025 08:17:30 +0000 (GMT)
 Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O8832f030957;
-	Thu, 24 Apr 2025 08:08:36 GMT
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 53O8832h030957;
+	Thu, 24 Apr 2025 08:08:38 GMT
 Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazlp17012050.outbound.protection.outlook.com [40.93.20.50])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 466k06xrde-3
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 466k06xrde-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Apr 2025 08:08:36 +0000
+	Thu, 24 Apr 2025 08:08:37 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dbAIuWoEk5+7SoqYkJvGpJ7mPNJhYt/OnoU7V8RNeiTMEL9E85FhBwqlVzIqXdLF2V/BDmDRcuex4ThO3CEtQdiwG0GZPcjJ8EcGFwiFe6nKu7mgt10YqpgABOmE06TcQOJldsAI+LmeehS5yTBRMD+lf5Wgc++3osBU8M9TXARscPi12OBd8EWlifxoy07Mj4mJjagtqORG14K//u9Ml7J4Vw6TI9HjnWI/EhvDVkPJRB+9IJZzNFNZ8PNd82sNZnbk5BR+grswwTJN3xd5TfW9sT91OvJckTRVGG39Vfj+4b0ZLM9blgC5jaIJeZR4UlWsxPvI+YyHyZn8E6YZKg==
+ b=vOI80bKt3sYlb3Rc/ps9eNpvC9Q0gCmM82mCaSf9Uc2tPbfxVA2d1i4jWCdm/Y9y1XX4lyNXGkxzckU0XBHeaP7H01Bzuoi8OtupNJqKVUVsXn12Ipr5u4OHoY3x62poTJf+Df0a1e82YxSdv2D0xxBDOD/yF75AHzyHcvKF9g9vi6V13PS5uIKp+8nT/gor8JvkPczerePAx3SL1WbgZq24sMuYbPDCSOwK7QYgEoyfxdl9CTW3Rf79cDmwaMkNd6sb5upmJ+lUEFaUZp8/ORBH99UcnFBQnWewFp08kcJqbPuexTOMWQXm7PDoLzlwOqo2B1Nm5qrrVAtiQcyztA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aog4JoMrhgq7+h5K2ucK6aO98+XcuAAgabvG8owueYA=;
- b=DrYvIAGXAM+KwQ6Ssog4R5mEEUTb9weIt6V1KF6VjxDn1bqK01p9tzPyobrLckcO+6L3SqtjL8aJEk/cy1fjad6odDglS+xZUOsyAawPoh+vG9l2gsFjkzO23RDup4kRiKpb6fpJYajqWXd2L/4aC1yNo3dVZtzkag9Fw5Xy/SOXHAbyn8fNp3hpILIEUAxwBvUbHDrn1rtQBDib7Ehoo/bDmfBGYvd2X+Q7xKsGyeK4nUGwm00Z2q2fUO3YK3zvfS70viXCsAXxx78HMESYaeWiUx6Axi67DUaZxojH8G38SHYl36IN0JB4wv/C3Ig0w9YvEccj2E1G9Q+snFUt/w==
+ bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=;
+ b=VgZBxC0DMd3J5FYbUtkUUqQL85dNv1Fw5NkzTxZxeI3Q9K1Z/5UxysUzV4DLTI2D91xUrcv7QgBsrtYe7CfCfc7Rl6bXA3nLWw5y7+dKGh53Q69NRuXNPlSduM6n8K2HlOaJ0AaCRgIhCcrrRf0CY3B68qCpJPLvJj6q18OQmmmCch7WlvlMphCMLiu3bvQ84yTm9pXg1Gfxc7R0Z4zdnjTdig/txIzIGQsjb2f12TPAuAUz58ugAWpiqbcBkgHWtCTt/xRfl/+MM54PzwFT/QA4/2Py1pAejK9xqF/MQMzANm5PBVMZ5URpj+PjXzrS7Qv6WEII1ibrZoCLMXEVxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aog4JoMrhgq7+h5K2ucK6aO98+XcuAAgabvG8owueYA=;
- b=aZ6wJCEDRefC2NYrLp7k5H4LldOnHuAb/WBXutrFEuq5uDREF3+UWT/v8YqwLuG8FqY9crpNb6vf/M2llivomRDH1AtM0973l4w8yvDqS090OWFvU8Iz3XmBPIQ4fjwE23tpw+cESHENQaGuKX2MEtZaO6rUQXILuiQ8vPE8FQc=
+ bh=Bc2L65wxnUxBeI3n4mrAHo69R4uH/SWMKuyIpMBn6fE=;
+ b=Kk31KqwktAhrujmIqm6x+Vq5C+Xof+1SFMTqPJabnVaSC03b68TjXe9ibgqCeHSw6bqtPhYfNGhm4jafvEh4KzVVtCSgyTGJ6Svz8+Iz4naf8JwNdEODuxT7ZErxs2ZrQ+oQzYZQRE1knSJVCXmlRHTXDqR4B7Vz6tYnG7zpOYI=
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com (2603:10b6:610:12c::16)
  by LV3PR10MB8156.namprd10.prod.outlook.com (2603:10b6:408:285::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Thu, 24 Apr
- 2025 08:08:20 +0000
+ 2025 08:08:28 +0000
 Received: from CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23]) by CH3PR10MB7329.namprd10.prod.outlook.com
  ([fe80::f238:6143:104c:da23%7]) with mapi id 15.20.8678.021; Thu, 24 Apr 2025
- 08:08:20 +0000
+ 08:08:28 +0000
 From: Harry Yoo <harry.yoo@oracle.com>
 To: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
         David Rientjes <rientjes@google.com>,
@@ -92,16 +92,16 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
         Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Harry Yoo <harry.yoo@oracle.com>
-Subject: [RFC PATCH 3/7] mm/slab: revive the destructor feature in slab allocator
-Date: Thu, 24 Apr 2025 17:07:51 +0900
-Message-ID: <20250424080755.272925-4-harry.yoo@oracle.com>
+Subject: [RFC PATCH 4/7] net/sched/act_api: use slab ctor/dtor to reduce contention on pcpu alloc
+Date: Thu, 24 Apr 2025 17:07:52 +0900
+Message-ID: <20250424080755.272925-5-harry.yoo@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250424080755.272925-1-harry.yoo@oracle.com>
 References: <20250424080755.272925-1-harry.yoo@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SL2PR03CA0006.apcprd03.prod.outlook.com
- (2603:1096:100:55::18) To CH3PR10MB7329.namprd10.prod.outlook.com
+X-ClientProxiedBy: SE2P216CA0177.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:101:2ca::6) To CH3PR10MB7329.namprd10.prod.outlook.com
  (2603:10b6:610:12c::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -111,80 +111,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR10MB7329:EE_|LV3PR10MB8156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ea955fb-4da6-4949-1bde-08dd83072d32
+X-MS-Office365-Filtering-Correlation-Id: 6eb647c8-0ecf-4fa4-ed69-08dd830731b1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?EyRiB0O6IHR2jArXDG46wI7V+LYfklYOfnA5/oQuX99ay/bMRcnCC+QDBP83?=
- =?us-ascii?Q?1rcJOHTfaPfbkeCboIKz3d1KIeA9OAOy6mokZgNN484+YT0iGYjwleyoBirS?=
- =?us-ascii?Q?xolzxZNayZzTLB6HjULHZ+5dWh0bO+0qaQ92Ha5eniPLgd2MWB0q+9erMutE?=
- =?us-ascii?Q?msVxp4/vkEyGE91Gp2nRYT13lnvjbdo76IrAY5gCdugzMBvQSx2gut6AZ+SJ?=
- =?us-ascii?Q?ENBCGcPCspQuWoYNNudNV3Iq/aNi/zmO445dpdnN/Hy/eVPGoU1pBGbnv+9n?=
- =?us-ascii?Q?4ahrjpxuiMrH22EB5YXuyKZakYdB+utxW9h4aNYA62CXtV1Fhd/krfxzoaCw?=
- =?us-ascii?Q?VrbV8SuphVUrEf+qPCcBvR2NgyGG9FmDx71tdCQt3QGYgl30jxSb33RfemgP?=
- =?us-ascii?Q?XBa1UOU/ABArsZb5fVsYGBwJ1Xrji5ctQzjb7UvK8S0jhl8W2q7rR5HGTnUb?=
- =?us-ascii?Q?zL0Ve3V+mu2FsVAtbYIIBmFvzxqj2QZ43WqwcK2gl77U1DEJhCDrBSss4pOR?=
- =?us-ascii?Q?fwFWmu8PX8E1IZVmuSHVU++7pUs0++JfOGZ1xV3J8iQU+CRfF8pzmsm6Ok67?=
- =?us-ascii?Q?Xv03I5m+4CXz9AoyGm3Nq03RaBeWEKwosop5kkFnG9tm20TxZU81zdNzM7un?=
- =?us-ascii?Q?MUZU4L9GqH/yqCAcHRSDeKq+QyQ1ibPFvZA356cs3hbce67Sz9St1tE+SCN8?=
- =?us-ascii?Q?tn2IGu4le1kWNs8nWDnnki6yPW6A6SXi2KR9m00pNL3AS4oVGrVeVcnNDW0o?=
- =?us-ascii?Q?TsTbLtvPM9flJmJ3hmH5hXXoSrh5CYeeUASrAHOxqcgxb+T3Hg6qu8X9zHGb?=
- =?us-ascii?Q?oEk4RXOqaDnLVI2wy4k9gUGvRb5g7BVDlhejqCCY2+tSFCv5dqtXzj1IUouJ?=
- =?us-ascii?Q?1mH0+juE/zGcynTbmx+a0USc+tOgSebB52VfyUI96LfOC6dmgc+LFS49Wrvt?=
- =?us-ascii?Q?K21siLP3ENYfPM72RVDsc/Gpw69snYfTKNSrtNOEwjX/GIRHX6QaH5wn62eL?=
- =?us-ascii?Q?f9WsItN5qhtDmMj2jZLn4HHnUyV3xy/T/zN70hmU47oVvvGitv7+7G+uFwtA?=
- =?us-ascii?Q?fjwrZD6ECCSNqxaH3vdVhMWShkcSbScXLrfOtx2rmPySa+OLhoQhiRQGcwGM?=
- =?us-ascii?Q?8jm/tLfT5qEp6jb05NQPd6uiv7Ok/GABF6Udp4wsYQqnZizTPZTIWaEYDhIX?=
- =?us-ascii?Q?KtwuRzWVLCcxfDMnhboTj9y1UlZ1mX4BksdV0gVhE0/SETUwT8B3oAnfkXHD?=
- =?us-ascii?Q?Av1xKs0j2hQ2TsSnWav70IOOggC7L3l+3HSebpfXr3Z401avg/qsuwOorDSy?=
- =?us-ascii?Q?6SKJ7kvfTSUlAn00IcDCVeUve2VR1kYTQ5Le7IX3jBLhGjr8sdd5gP5EdayX?=
- =?us-ascii?Q?HDKeir9aZP15uVeD9kUY/BY5riB4+C6yh3Vfvfy/JO2skssUPeDZ7dyc776N?=
- =?us-ascii?Q?AsuXgqh6ems=3D?=
+	=?us-ascii?Q?JHtVAr2dMi1xjAyBhlert4eli+pdw0gki3Clu9g9A4ka2euzm7yCED5B+GjD?=
+ =?us-ascii?Q?nG2KR2YDrexQWzofdRVVY6cg3EWCaxmIU/Zw/JFQrS61KzG/iVB4Otlhyvg8?=
+ =?us-ascii?Q?F7lOFTooXLfskDB8i85cgamVjJXP1o1dLAreI64S6GQ7bjG4CcXV5lNoRCFB?=
+ =?us-ascii?Q?Um8pa4g4aqa6L/RnE1u9bPLDRZeERa4/0GCmcwVcdIDguFD43s2B7SnumOsU?=
+ =?us-ascii?Q?2hLjF+zTNu0v8I8RkhiXEQAnuCWvcecIVFlbjgIKcHl497o6wz4yDHVNBmis?=
+ =?us-ascii?Q?SiPoYA7KPu2QAc3aNdO3H8px4rQ4EkUmQ/dyCxwIxFsbUO+tGvKzCL1XpyUJ?=
+ =?us-ascii?Q?DjboY9K9+UJKl5UzaCO5NveeEqn34EWHaGgQ8sUEk5iCy7dycMSxprUrNwFG?=
+ =?us-ascii?Q?LyHvs9lkpiQcWTP50ViIE1BaS2aVtYPGPSe4eTkPyKcT4xWlpqKpMl7vr03r?=
+ =?us-ascii?Q?HEHU1Cyy/GFTYgerUh/2kKUN1+u/U0v/bNgImGskJN3b87XkYE8NQVLP7B9e?=
+ =?us-ascii?Q?m/QLHdgLW07bZ9pE4JdYD1aCEeGLLh5yY+XYnr3RqcnxQHPyHr5PRwtJLY17?=
+ =?us-ascii?Q?JQhvj0zijuFpz14CzkNI8dyLFEQ1/W+Bw6aL6vEcH/gGV5TYwirMU+tl1fgB?=
+ =?us-ascii?Q?tPFWXD41YqnlZebfXWnRxV8Zy5P7YTFmu8mYG4KhKggFNMAYoY4yfdiINzNx?=
+ =?us-ascii?Q?PSzITfgPexfXQlq89BPzjnxMTMXVF/3Ionst6R90kmVrQctcC8z2BxsnDRVc?=
+ =?us-ascii?Q?RtMoytxQiPGA5eB60oV332e9fLv7q8XCHAxNz/AoMVkCZLltLAFEufMtTJqH?=
+ =?us-ascii?Q?cL0jRC9DQctI0B7geizBCR0EHrEZ55T8LXDtFarSgHnTR9lu6OlT3lFU/Hq2?=
+ =?us-ascii?Q?xEqlfPNaL6M+ALzAGL0LqRsPoVOEkMKIN/FlxxOVN6hB9G1eA/rITE8pZexc?=
+ =?us-ascii?Q?q8RaAGo/CXGjLVN9n8UcytV9M5QkcabRc5U4ZONIcelraJepW4aBym5/AkSh?=
+ =?us-ascii?Q?qs3o79XI8r5nOuTI6y984VryXYbjudmBFBVw8sWSgLJspyLyaq23QatMwcIp?=
+ =?us-ascii?Q?fnpVE0ZNXgmnOe5OZHBxtbegpSa+NTuOkwGFcoNzVq+gg9hws1Z0hHvwfiJ5?=
+ =?us-ascii?Q?0PQCKw3j9Zs6PwhZ0aA+iOcw7YZsOujBMxp4NHhd7ybkpz++VCCk8mkPX7EJ?=
+ =?us-ascii?Q?loX2MSkfF2nAtQlUVl3SnbHi+VAtTLaFxOMv5ftxq4Gdu8W3U8VrNsxlzCww?=
+ =?us-ascii?Q?le0x0/ZfnDszWBsI5jaTov9wWNp2s/7Viey4IwKmFcwFuctLszYb57mfNaJM?=
+ =?us-ascii?Q?mWt52VwbtO2YwHNLDDskfxv1Zr69jbZZvr8cpRAcp+h1GYv9NuHRomsExuBI?=
+ =?us-ascii?Q?lEvlAIqC6nYj/og4hI/smJFIdwlR1PSxaYHV8KmGX/jnjQJfhJ9JgahzrQlL?=
+ =?us-ascii?Q?olXbX7kk2PU=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB7329.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?CG+PMCbKLvt5YpOcPcUeeRYJlbc5xhgWsoSUAA+/Np16JXZSxv3JIgDRTy/j?=
- =?us-ascii?Q?pv8iPaHtbYVMscLy3ZPMum5DkZoTusMM2KBArwPpHrhZ4pTW/mzPX3+HdxEy?=
- =?us-ascii?Q?1MFLakLxJg8KSYmGbcqt65y744pbJqXRsh7ahFao8HgQ8THR0Rn30Qbb2m8y?=
- =?us-ascii?Q?427jgfWuPLsVZHzSzFl60F45SnloyHAMZLAI5Brk6GRx55BbqOiqHVHDgWXR?=
- =?us-ascii?Q?nVq2+yBFMzaAn+hphIxXQSmZaFl7pE9OdLlFgx3mgJcFHqua2/hhgQGLTvgZ?=
- =?us-ascii?Q?GEcPoEFDuaFU+0J+HlCBCNRfZ5UIswQr9Wb2qO6oLfULIGUMcw9t8tIcl0A8?=
- =?us-ascii?Q?eSt+c98UifjC2j/RcUfv/28KE/qaWdxhyv/F/BIv9F5jhLeJLRNJtt0ypkKa?=
- =?us-ascii?Q?lMvOpQoG8eYD0qEEc5P0J0vJLcyAJofZ6V9j30lCazYgqPgVO+7iK2ZE42GR?=
- =?us-ascii?Q?BHbzsjCIQ9kayWfxariEs3zl4Q30d4aNkkM9OsVGFoeUsKJ5M1nEjYHtBWOU?=
- =?us-ascii?Q?xTeHMvEnUUys6TuxfDBckiOlj4hpKrBjac4wBK6n7wr42XIyJXNjHfCpinWP?=
- =?us-ascii?Q?qlLcPz3JfwGen4d5sfRZGivwRR8caLZwAIw3iq1UGgDJxpj9lqwUUWDJYSRu?=
- =?us-ascii?Q?TTMXZSgrMDsHD5o5EsDvjG4UbSwh7yCnF8Nxwig/LQ7Gnen+kTJZBBJdOo0O?=
- =?us-ascii?Q?3qlYiboIhC69dRunncg+oSTzKcm8Nj56q8/3zl5qPYByRKUGZSsR0MO7SJkU?=
- =?us-ascii?Q?98oLbWdq8N72dj+ZNhnl+BeTqVQdneclJLc0kyktUK1H/eqmhaGgjhUbyCH1?=
- =?us-ascii?Q?IVi71ZMKUU1MO+t61GmGWEcFxmmY9tjPfQyN0hvh4+eOzNW2q+OZ/82c+psp?=
- =?us-ascii?Q?JjpACgVdTubiuClfKIApxaonmcnJMZX4p+aUJbjrrTVMuCeCn+6qTBNqJ3rO?=
- =?us-ascii?Q?p2CPLxTzmVJJInZ4hYuJmXT3dd3Ei2APnmn3GgemDyxuSBRjH4N2HAV7Ab5C?=
- =?us-ascii?Q?HSZGFhIF7uwS19ICjerjiyrcBZ0fVikxsQfB6NM6KxogvgvhyHJgZCsVT6DW?=
- =?us-ascii?Q?TQesGIr/fpPXRbCDZgsw1brbyEdlSfSxv877iiIWE61aH67UYng9nXCt+dBp?=
- =?us-ascii?Q?tVfsGg6o9EpbbysqxfRl0/o+39Y5Qmmalh26Zy9YJsXTff/Z1TZhVKmT5AaD?=
- =?us-ascii?Q?zxwGPimnB0j6cohUaUOjDM43gvkbjodX6zYgIQz++UiDTwZHxRDTKeVSD4Ok?=
- =?us-ascii?Q?iRGVQ11PaNmkcfkRPnrn3FVCBV/ef1tlpWqz/Q8knoXsLQi/xkjwTbSG5vdF?=
- =?us-ascii?Q?qf1HDm2ctVvDVVmrXd9fRkY/HoobytBgHU/raohilOZd4Enoq5StK0nxDw4p?=
- =?us-ascii?Q?3W95aKbnNYpo84srQOEp1/hXkNcgkZtYCM9bI9xuwDxp+VCbqfsKRz4nG9rS?=
- =?us-ascii?Q?0I7QbiWcYzX8Ob3QZjUDrlce+lQ9x1IHeqtGDxGC/uN7hhVmXLw1NlfCxCwh?=
- =?us-ascii?Q?T///fsP/tCcEtuNCGhZ9jpZl0vOLdCHOBZFQNOqAjGThnSmDsGGd8YgwNFBv?=
- =?us-ascii?Q?YKKEmdZxlWDQ5bwCgwceJ3FB+ebG1/lgnajNyzNE?=
+	=?us-ascii?Q?P+MNZxspAmm6g986bH/g9ByUZLDTtMQuAFMsY7kF8sQ5v1FlYJ8RS0ciKsZR?=
+ =?us-ascii?Q?eQXJjdhQkcqDze7Ffk0pgqYhs7FlmuzbEhRRUJ60u3dnlOA/Q2vQ38UfbU4M?=
+ =?us-ascii?Q?vO0EDrXbq5Ok+J0XN0mjz5qlOfAV0GOqS2QXv2Yet0bsdRqp30/vMD+CyLnL?=
+ =?us-ascii?Q?yTIQ5O0cNSLp15DAgbjnmi6Y1ME3V7Qm/ISDeF1tOQS8/D7gZw55FkGALEWm?=
+ =?us-ascii?Q?swJ+sEgx3ps8Jpe14SQCkI9/69Y9+O0p8usn/fJCeoTzCISIPdouYS8U67RJ?=
+ =?us-ascii?Q?bmBQZCFESjbfDmgSty4+DUOvTpMucaHEB1vRIfpdg/AJhtFv+UEvD7lM7APZ?=
+ =?us-ascii?Q?5F2knUeRRZtuNtGAsqm1NfNZmPRmreiR5L/8igkNQ0DSETAXUxLiAvBXFgjV?=
+ =?us-ascii?Q?5ujXVpvrqCaqsQZ+QfYVzP8IW0WAfgOXJM8C2LWw96jG+I3z/dkl7U4Qif0b?=
+ =?us-ascii?Q?6loEwplIBtBlur3izppkySdh3hZZbmBxIggc5F8G0b0dfz7zSz/mDGLqh6bQ?=
+ =?us-ascii?Q?YmmqQ+4Uj06FhQ25ry2SaLsomfFIAUydqc7rpeAtcLUGs4JDx10PPVcdprfn?=
+ =?us-ascii?Q?rE7M8dmTsUsoWNr1hgzWfquvsCjuJUAEDUPJWRd65ED34BV4TRhkFaXEuLRK?=
+ =?us-ascii?Q?kxnJXMD+Y/lUmHqu0bhIcZnybGrsyzQ7omyP5eVsEZxb/cU75/dAjcNO/COf?=
+ =?us-ascii?Q?ERrLm/g/d/f+ImsgE5ZqAKItADdk3btYrXpS+1uknsatNp+cT9Qv24EDi2PW?=
+ =?us-ascii?Q?2qtOLygfAn8WWqstXUNXTfl6sJBPQCpfJ5oqrf6hWJ6eQgJtAZqz2Lr0LRiZ?=
+ =?us-ascii?Q?jd6QJt92Z/fwbHKCxd2ccDC78FnGpKMJiWY7wsqxZH5NXQw7Xni60Dcge0Sv?=
+ =?us-ascii?Q?HoCdEMB7E1AgfPJYE3wV6utAbPozj48I5vEMujaDxZW11t2RbQqpJs9XyNDc?=
+ =?us-ascii?Q?R/NieU/c24YKMlbGyfr6df9uExsTsKgnvB81lh4BIIpQ7ElTeZe8+AjTt0q2?=
+ =?us-ascii?Q?GpkAHMPNavrtIT9nQ27On3TEh+42E3nbTgxcUjLqKZA7mdwM2g7JQIJPuFrd?=
+ =?us-ascii?Q?RYldPvnDYXELeZ8mvOvzYFxcu1vXc3kvrMMH+2uDUQQI2VjOh8JRhJjYpxEW?=
+ =?us-ascii?Q?/oc/32yUsT87vHm5FddMpjlq4yJwtqJkCuhXmcTLipXgj8U5uYSeK2sIopbh?=
+ =?us-ascii?Q?yGObKOvdONtHqN1gqgKWuayQmcWvwLk39RncLvDWVDaGPwvnKzzAPozHRApD?=
+ =?us-ascii?Q?TP0XML4PvNaTLfXm55CyubwgZPEVlD8EzpQMZgj43bZ0+jj63qVv9seiwC3i?=
+ =?us-ascii?Q?tl7FHu23A6+aNs5M27HC+dlypfAZMt4j2umwLv9enGUtlkWG+Mr3CJ52PFQK?=
+ =?us-ascii?Q?D8ttXIkVqrVPta2kTDQPi7Khcv08pubdx3cmaoffq2FFS/NeoCtl+Il5YOPZ?=
+ =?us-ascii?Q?9q5lhOfGdBi9LKnyiNEGG+QSbUU1n61EeEGLbdYMf586MBlIblFlry0KCGDi?=
+ =?us-ascii?Q?lK+ubl0wQ1z2JpY1ujVBXWSY1UN5vnAoujuTuFgc+W9HOsci8xpsv6YTeaoQ?=
+ =?us-ascii?Q?93p99ALGzUYpWATn36h2wUQhEy+l6mk8QbA/TiGT?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Yt/gTetmstNudtAOjGqRgkevsxcjUiDpt48nk88vTWF0dOka8WFeQ05o5HUZQpVnGAMerUAoU8H/5cAFgSFxaVFK3xcX6Q+Fvdii9Np+cLEM+89ZiePpvZlrRNB8oPvzxp8g95cJpJZMsAF2okUzqcpCnnycn60oBnvfNifaHaKl97fRFoCdm9vrIBE7+nM9QKOXoWQgAMYbx2aZL7G8w6u/CtCQUkXPiYmnwtrHPegXel+iYSmPIhCDlUaDMv/uRCtMXus6+ksmYOhmteotuAPlkOHrsM9OKK7pyBtKC61sgQO0Szhfz9D/30BL9cMR8k12Vl3fw82NRu2PVvaG61E+OeemugiR0AogXJGlabiLlDwMvTjznfk9elwfpc4HVYcYZBymqOyvyI0WNJrGuSYXwfAySleyHjeMA0YuS5x34HLXlerIcx3qMAcHkq3urtf4hIWla04vexa9YeAxj+0BCbYq3gjcBTM++ERfMx7EyFYnO1mXQ3MfIJP4U3tKmcjBo2tkGt2sX80lWdl31+EYxWl9aL+XfYtWtvsN/4uu/x4mnFN9voBRJKrL5/9/yJwF3Ixp8s/vwivvDBv1YT4T2m0bSJCd9FG7cwmUlz0=
+	kF4hGBiK5zV5ao+8OsHZVIk86/ovTh+8BOx1PDvMycneprz8G8LHrdlz+iqX2jLnWatYVkNZifdI1HdhyhUz9OVYYJBI8b6+O01istBuNN5X6hCFXlhAqKQcsO3uKJSvjJuSa1tfnFSD9qjIjIPRFSeVa2gykbmHEpq8nIZS6ALxeSaXCwQyIxUjzh2GIvI8vC1TWHDhvNzUcXl9WoR6+FbAYBT20mvGjF1TmAHdUWkHtLjFvm1NDNuPfLBujo5vW7UcshmX/+muAchbJMxVbp98qhOl96wn6XC6RrvNcHxG+nQzSL2sL0yChaY2P+LZILF7r9s6Ll8udOGRD1IGnBTOh5i+Jl0wXFREC6TTiJhtx+agiK+b8/4WF2hjxZu0ZCvOd1zFaQtFbNyglQxAz5MyTS5iuvRGFHqoAyCXiLN+BX00urW6f/i5rb6NO1p3oqvasYHm+x7cYZg2eFcmfitx/oUKZTSwfyyh+AMnBGAdCh0NSf1otqRj7wabAbaFcBdymQkksX7sj3q/dQh2tI6GVtdlLbw0XjXhF0KhP++uTJ3ylnt+aCOvy7NLi+1I33A9P1sQjegZKvwaWpzZ7/XAJ15fcdp2ak0wHDRkKfs=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ea955fb-4da6-4949-1bde-08dd83072d32
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6eb647c8-0ecf-4fa4-ed69-08dd830731b1
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB7329.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:20.4172
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2025 08:08:28.1415
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k0x24tZhiSF5/Q1sPEg4PyLt4AjdngpmlryWdU7pN1D1JoCidA3Ef8IAgrhn96TAlzh8ZYehoagGzTBaTkvLCQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: krdnLpQqIlLAPATYGOQeuqqDW9JlCRRq+Y6aqo7lN3e02I9dUv+wLLhhCWWmGByvjzApdBkQo82Fp+5Og+Vgrg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB8156
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.680,FMLib:17.12.80.40
@@ -193,277 +193,194 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulk
  spamscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
  definitions=main-2504240053
-X-Proofpoint-GUID: opq1G5kMpRkB9bMtpFthF1kXDRbuXE3r
-X-Proofpoint-ORIG-GUID: opq1G5kMpRkB9bMtpFthF1kXDRbuXE3r
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfXynVW9g7MjHg0 rvxKbH/9h8q3gsTDOkr1GJ1zzKr94/FSJxDf06BoSWUvOF3KQlxFM3zeIHpySHj7oopa1ivComv 9e3uDq5sRVnKG8VjQcniy6imGHGlMlhXDtrGZ+DdxjjQQrklz7lL6SpMuSaRUkkORfdFeGYrExr
- JTDiDDX/bTrnqvxKeU4PbfU1wn5Nouw+RU8yFBXh+eZ8sdig1CH3nr8Ksz/YN4hePXdZFPl4+BZ cau33f2A5Awsqy+Byt7w42MTSh+rn8SpruaqdH8dqeg0Z1bvHr56jOZ2XXDapFMK5uiyYT69J+Y CM9AYvxYbS3hTdcDC31zV7ouLSQ3/rXfxHgWwpJVDxTDph/5vRzQd0rUgLtcXeNjtS+eGTRUdIU rVEh/7O3
+X-Proofpoint-GUID: UtXUFSJ4Jl60hY1YNT5uPOBa5aCIleKw
+X-Proofpoint-ORIG-GUID: UtXUFSJ4Jl60hY1YNT5uPOBa5aCIleKw
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI0MDA1MyBTYWx0ZWRfX+iqNPwB+QO2U m8v99tiFZVVeBhUNSqrZOs9qiEblWFgPMou5iMUSxNXxRibaZROpVCW8PDPypddzv21ScCmTDOf LAXAdt9CFjbS92zqxLoidHsj28bLTj7lV2CuWNHmiVHJHCHxWFs85G4P2tPfXhPQ1MHx6zFp/yC
+ 8NlMA+qbvGCf7ZRolOCrDbTMhQHpBpz6zezij5yg3ZVAHL2rYdAIxQfTiKSumX0tHOTovxgf16q 8AagxwgQy7Lv+imjlx9JnGWK6UnXA0+DxDcDDKwqFlG5jIhSNLrfamwIr2u3gibSm6zzosRL4hk 7RYfaMT99d2gdagBc4rGlm+OE/axJJNlxDms70W61FGL50iGzA0/cphNUeMZfmRvEi30Kewxv/8 suPKEpnE
 
-Commit c59def9f222d ("Slab allocators: Drop support for destructors")
-removed support for destructors, based on the belief that the feature had
-few users and its usefulness was questionable.
+A tc_action object allocates three percpu memory regions and stores their
+pointers within the object. For each object's lifetime, this requires
+acquiring and releasing the globak lock, pcpu_alloc_mutex three times.
 
-Mateusz Guzik suggests [1] that using a constructor-destructor pair
-can be beneficial when object initialization and de-initialization
-require global serialization. For example, mm_struct allocates per-CPU
-variables that rely on a global lock for serialization.
+In workloads that frequently create and destroy TC filters, this leads
+to severe lock contention due to the globl lock.
 
-With the constructor-destructor pair, the serialization occurs only when
-a slab is allocated or freed, rather than each time an individual object
-is allocated or freed.
+By using the slab constructor/destructor pair, the contention on
+pcpu_alloc_mutex is shifted to the creation and destruction of slabs
+(which contains multiple objects), which occur far less frequently than
+allocating and freeing individual tc_action objects.
 
-Introduce the destructor feature. A user can enable it by specifying
-the 'dtor' field in kmem_cache_args. When a cache uses a destructor,
-cache merging is disabled and the destructor is called before freeing a slab.
-In case of SLAB_TYPESAFE_BY_RCU, it's invoked after RCU grace period.
-Unlike the constructor, the destructor does not fail and it mustn't.
+When tested with the following command, a 26% reduction in system time
+was observed.
 
-init_on_alloc, init_on_free, placing free pointer within the object,
-slab merging, __GFP_ZERO, object poisoning do not work for caches with
-destructor, for the same reason as constructor.
+$ cd tools/testing/selftests/tc-testing
+$ sudo python3 tdc.py -f ./tc-tests/filters/flower.json -d <NIC name>
 
-Meanwhile, refactor __kmem_cache_alias() to remove the check for the the
-mergeability of the cache. Instead, these checks are performed before
-calling __kmem_cache_alias().
+Lock contention as measured with `perf lock record/report`:
 
-[1] https://lore.kernel.org/linux-mm/CAGudoHFc+Km-3usiy4Wdm1JkM+YjCgD9A8dDKQ06pZP070f1ig@mail.gmail.com
+Before:
+                Name   acquired  contended     avg wait   total wait     max wait     min wait
 
-Suggested-by: Mateusz Guzik <mjguzik@gmail.com>
+                       15042346   15042346      3.82 us     57.40 s       4.00 ms       316 ns
+    pcpu_alloc_mutex   10959650   10959650      7.10 us      1.30 m       3.76 ms       313 ns
+
+After:
+                Name   acquired  contended     avg wait   total wait     max wait     min wait
+
+                       15488031   15488031      5.16 us      1.33 m  5124095.50 h        316 ns
+    pcpu_alloc_mutex    7695276    7695276      3.39 us     26.07 s       4.03 ms       284 ns
+
+The contention has moved from pcpu_alloc_mutex to other locks (which are not
+symbolized and appear as blank in the output above).
+
 Signed-off-by: Harry Yoo <harry.yoo@oracle.com>
 ---
- include/linux/slab.h | 10 ++++++++++
- mm/slab.h            |  9 +++++----
- mm/slab_common.c     | 41 +++++++++++++++++++++++++++--------------
- mm/slub.c            | 29 ++++++++++++++++++++++++-----
- 4 files changed, 66 insertions(+), 23 deletions(-)
+ net/sched/act_api.c | 82 +++++++++++++++++++++++++++++++--------------
+ 1 file changed, 56 insertions(+), 26 deletions(-)
 
-diff --git a/include/linux/slab.h b/include/linux/slab.h
-index 1ef6d5384f0b..12a8a6b07050 100644
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@ -336,6 +336,16 @@ struct kmem_cache_args {
- 	 * %NULL means no constructor.
- 	 */
- 	int (*ctor)(void *);
-+	/**
-+	 * @dtor: A destructor for the objects.
-+	 *
-+	 * The destructor is invoked for each object when a slab page is freed.
-+	 * In case of &SLAB_TYPESAFE_BY_RCU caches, dtor is called after RCU
-+	 * grace period.
-+	 *
-+	 * %NULL means no destructor.
-+	 */
-+	void (*dtor)(void *);
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 839790043256..60cde766135a 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -112,6 +112,8 @@ struct tcf_chain *tcf_action_set_ctrlact(struct tc_action *a, int action,
+ }
+ EXPORT_SYMBOL(tcf_action_set_ctrlact);
+ 
++static struct kmem_cache *tc_action_cache;
++
+ /* XXX: For standalone actions, we don't need a RCU grace period either, because
+  * actions are always connected to filters and filters are already destroyed in
+  * RCU callbacks, so after a RCU grace period actions are already disconnected
+@@ -121,15 +123,15 @@ static void free_tcf(struct tc_action *p)
+ {
+ 	struct tcf_chain *chain = rcu_dereference_protected(p->goto_chain, 1);
+ 
+-	free_percpu(p->cpu_bstats);
+-	free_percpu(p->cpu_bstats_hw);
+-	free_percpu(p->cpu_qstats);
+ 
+ 	tcf_set_action_cookie(&p->user_cookie, NULL);
+ 	if (chain)
+ 		tcf_chain_put_by_act(chain);
+ 
+-	kfree(p);
++	if (p->cpu_bstats)
++		kmem_cache_free(tc_action_cache, p);
++	else
++		kfree(p);
+ }
+ 
+ static void offload_action_hw_count_set(struct tc_action *act,
+@@ -778,27 +780,20 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
+ 		   struct tc_action **a, const struct tc_action_ops *ops,
+ 		   int bind, bool cpustats, u32 flags)
+ {
+-	struct tc_action *p = kzalloc(ops->size, GFP_KERNEL);
++	struct tc_action *p;
+ 	struct tcf_idrinfo *idrinfo = tn->idrinfo;
+ 	int err = -ENOMEM;
+ 
++	if (cpustats)
++		p = kmem_cache_alloc(tc_action_cache, GFP_KERNEL);
++	else
++		p = kzalloc(ops->size, GFP_KERNEL);
++
+ 	if (unlikely(!p))
+ 		return -ENOMEM;
+ 	refcount_set(&p->tcfa_refcnt, 1);
+ 	if (bind)
+ 		atomic_set(&p->tcfa_bindcnt, 1);
+-
+-	if (cpustats) {
+-		p->cpu_bstats = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
+-		if (!p->cpu_bstats)
+-			goto err1;
+-		p->cpu_bstats_hw = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
+-		if (!p->cpu_bstats_hw)
+-			goto err2;
+-		p->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
+-		if (!p->cpu_qstats)
+-			goto err3;
+-	}
+ 	gnet_stats_basic_sync_init(&p->tcfa_bstats);
+ 	gnet_stats_basic_sync_init(&p->tcfa_bstats_hw);
+ 	spin_lock_init(&p->tcfa_lock);
+@@ -812,7 +807,7 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
+ 					&p->tcfa_rate_est,
+ 					&p->tcfa_lock, false, est);
+ 		if (err)
+-			goto err4;
++			goto err;
+ 	}
+ 
+ 	p->idrinfo = idrinfo;
+@@ -820,14 +815,11 @@ int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
+ 	p->ops = ops;
+ 	*a = p;
+ 	return 0;
+-err4:
+-	free_percpu(p->cpu_qstats);
+-err3:
+-	free_percpu(p->cpu_bstats_hw);
+-err2:
+-	free_percpu(p->cpu_bstats);
+-err1:
+-	kfree(p);
++err:
++	if (cpustats)
++		kmem_cache_free(tc_action_cache, p);
++	else
++		kfree(p);
+ 	return err;
+ }
+ EXPORT_SYMBOL(tcf_idr_create);
+@@ -2270,8 +2262,46 @@ static const struct rtnl_msg_handler tc_action_rtnl_msg_handlers[] __initconst =
+ 	 .dumpit = tc_dump_action},
  };
  
- struct kmem_cache *__kmem_cache_create_args(const char *name,
-diff --git a/mm/slab.h b/mm/slab.h
-index 30603907d936..cffe960f2611 100644
---- a/mm/slab.h
-+++ b/mm/slab.h
-@@ -279,6 +279,7 @@ struct kmem_cache {
- 	gfp_t allocflags;		/* gfp flags to use on each alloc */
- 	int refcount;			/* Refcount for slab cache destroy */
- 	int (*ctor)(void *object);	/* Object constructor */
-+	void (*dtor)(void *object);	/* Object destructor */
- 	unsigned int inuse;		/* Offset to metadata */
- 	unsigned int align;		/* Alignment */
- 	unsigned int red_left_pad;	/* Left redzone padding size */
-@@ -438,10 +439,10 @@ extern void create_boot_cache(struct kmem_cache *, const char *name,
- 
- int slab_unmergeable(struct kmem_cache *s);
- struct kmem_cache *find_mergeable(unsigned size, unsigned align,
--		slab_flags_t flags, const char *name, int (*ctor)(void *));
-+		slab_flags_t flags, const char *name);
- struct kmem_cache *
- __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
--		   slab_flags_t flags, int (*ctor)(void *));
-+		   slab_flags_t flags);
- 
- slab_flags_t kmem_cache_flags(slab_flags_t flags, const char *name);
- 
-@@ -638,7 +639,7 @@ static inline bool slab_want_init_on_alloc(gfp_t flags, struct kmem_cache *c)
++static int tcf_action_ctor(void *object) {
++	struct tc_action *p = object;
++
++	p->cpu_bstats = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
++	if (!p->cpu_bstats)
++		goto err1;
++	p->cpu_bstats_hw = netdev_alloc_pcpu_stats(struct gnet_stats_basic_sync);
++	if (!p->cpu_bstats_hw)
++		goto err2;
++	p->cpu_qstats = alloc_percpu(struct gnet_stats_queue);
++	if (!p->cpu_qstats)
++		goto err3;
++	return 0;
++
++err3:
++	free_percpu(p->cpu_bstats_hw);
++err2:
++	free_percpu(p->cpu_bstats);
++err1:
++	return -ENOMEM;
++}
++
++static void tcf_action_dtor(void *object) {
++	struct tc_action *p = object;
++
++	free_percpu(p->cpu_bstats);
++	free_percpu(p->cpu_bstats_hw);
++	free_percpu(p->cpu_qstats);
++}
++
+ static int __init tc_action_init(void)
  {
- 	if (static_branch_maybe(CONFIG_INIT_ON_ALLOC_DEFAULT_ON,
- 				&init_on_alloc)) {
--		if (c->ctor)
-+		if (c->ctor || c->dtor)
- 			return false;
- 		if (c->flags & (SLAB_TYPESAFE_BY_RCU | SLAB_POISON))
- 			return flags & __GFP_ZERO;
-@@ -651,7 +652,7 @@ static inline bool slab_want_init_on_free(struct kmem_cache *c)
- {
- 	if (static_branch_maybe(CONFIG_INIT_ON_FREE_DEFAULT_ON,
- 				&init_on_free))
--		return !(c->ctor ||
-+		return !(c->ctor || c->dtor ||
- 			 (c->flags & (SLAB_TYPESAFE_BY_RCU | SLAB_POISON)));
- 	return false;
- }
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 59938e44a8c2..f2f1f7bb7170 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -155,7 +155,7 @@ int slab_unmergeable(struct kmem_cache *s)
- 	if (slab_nomerge || (s->flags & SLAB_NEVER_MERGE))
- 		return 1;
- 
--	if (s->ctor)
-+	if (s->ctor || s->dtor)
- 		return 1;
- 
- #ifdef CONFIG_HARDENED_USERCOPY
-@@ -172,22 +172,36 @@ int slab_unmergeable(struct kmem_cache *s)
++	struct kmem_cache_args kmem_args = {
++		.ctor = tcf_action_ctor,
++		.dtor = tcf_action_dtor,
++	};
++
++	tc_action_cache = kmem_cache_create("tc_action",
++					    sizeof(struct tc_action),
++					    &kmem_args, SLAB_PANIC);
+ 	rtnl_register_many(tc_action_rtnl_msg_handlers);
  	return 0;
  }
- 
--struct kmem_cache *find_mergeable(unsigned int size, unsigned int align,
--		slab_flags_t flags, const char *name, int (*ctor)(void *))
-+/**
-+ * Can this cache that's going to be created merged with others?
-+ * We can't use struct kmem_cache here because it is not created yet.
-+ */
-+static bool is_mergeable(const char *name, slab_flags_t flags,
-+			 struct kmem_cache_args *args)
- {
--	struct kmem_cache *s;
--
- 	if (slab_nomerge)
--		return NULL;
--
--	if (ctor)
--		return NULL;
-+		return false;
- 
- 	flags = kmem_cache_flags(flags, name);
--
- 	if (flags & SLAB_NEVER_MERGE)
--		return NULL;
-+		return false;
- 
-+	if (args->ctor || args->dtor)
-+		return false;
-+
-+#ifdef CONFIG_HARDENED_USERCOPY
-+	if (args->usersize)
-+		return false;
-+#endif
-+	return true;
-+}
-+
-+struct kmem_cache *find_mergeable(unsigned int size, unsigned int align,
-+		slab_flags_t flags, const char *name)
-+{
-+	struct kmem_cache *s;
-+
-+	flags = kmem_cache_flags(flags, name);
- 	size = ALIGN(size, sizeof(void *));
- 	align = calculate_alignment(flags, align, size);
- 	size = ALIGN(size, align);
-@@ -321,9 +335,8 @@ struct kmem_cache *__kmem_cache_create_args(const char *name,
- 		    object_size - args->usersize < args->useroffset))
- 		args->usersize = args->useroffset = 0;
- 
--	if (!args->usersize)
--		s = __kmem_cache_alias(name, object_size, args->align, flags,
--				       args->ctor);
-+	if (is_mergeable(name, flags, args))
-+		s = __kmem_cache_alias(name, object_size, args->align, flags);
- 	if (s)
- 		goto out_unlock;
- 
-diff --git a/mm/slub.c b/mm/slub.c
-index 10b9c87792b7..b7e158da7ed3 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -2626,6 +2626,15 @@ static void __free_slab(struct kmem_cache *s, struct slab *slab)
- 	struct folio *folio = slab_folio(slab);
- 	int order = folio_order(folio);
- 	int pages = 1 << order;
-+	void *p;
-+
-+	if (unlikely(s->dtor)) {
-+		p = slab->freelist;
-+		while (p != NULL) {
-+			s->dtor(p);
-+			p = get_freepointer(s, p);
-+		}
-+	}
- 
- 	__slab_clear_pfmemalloc(slab);
- 	folio->mapping = NULL;
-@@ -2717,7 +2726,7 @@ static struct slab *new_slab(struct kmem_cache *s, gfp_t flags, int node)
- 	if (unlikely(flags & GFP_SLAB_BUG_MASK))
- 		flags = kmalloc_fix_flags(flags);
- 
--	WARN_ON_ONCE(s->ctor && (flags & __GFP_ZERO));
-+	WARN_ON_ONCE((s->ctor || s->dtor) && (flags & __GFP_ZERO));
- 
- 	return allocate_slab(s,
- 		flags & (GFP_RECLAIM_MASK | GFP_CONSTRAINT_MASK), node);
-@@ -5735,7 +5744,7 @@ static int calculate_sizes(struct kmem_cache_args *args, struct kmem_cache *s)
- 	 * then we should never poison the object itself.
- 	 */
- 	if ((flags & SLAB_POISON) && !(flags & SLAB_TYPESAFE_BY_RCU) &&
--			!s->ctor)
-+			!s->ctor && !s->dtor)
- 		s->flags |= __OBJECT_POISON;
- 	else
- 		s->flags &= ~__OBJECT_POISON;
-@@ -5757,7 +5766,7 @@ static int calculate_sizes(struct kmem_cache_args *args, struct kmem_cache *s)
- 	s->inuse = size;
- 
- 	if (((flags & SLAB_TYPESAFE_BY_RCU) && !args->use_freeptr_offset) ||
--	    (flags & SLAB_POISON) || s->ctor ||
-+	    (flags & SLAB_POISON) || s->ctor || s->dtor ||
- 	    ((flags & SLAB_RED_ZONE) &&
- 	     (s->object_size < sizeof(void *) || slub_debug_orig_size(s)))) {
- 		/*
-@@ -6405,11 +6414,11 @@ void __init kmem_cache_init_late(void)
- 
- struct kmem_cache *
- __kmem_cache_alias(const char *name, unsigned int size, unsigned int align,
--		   slab_flags_t flags, int (*ctor)(void *))
-+		   slab_flags_t flags)
- {
- 	struct kmem_cache *s;
- 
--	s = find_mergeable(size, align, flags, name, ctor);
-+	s = find_mergeable(size, align, flags, name);
- 	if (s) {
- 		if (sysfs_slab_alias(s, name))
- 			pr_err("SLUB: Unable to add cache alias %s to sysfs\n",
-@@ -6443,6 +6452,7 @@ int do_kmem_cache_create(struct kmem_cache *s, const char *name,
- #endif
- 	s->align = args->align;
- 	s->ctor = args->ctor;
-+	s->dtor = args->dtor;
- #ifdef CONFIG_HARDENED_USERCOPY
- 	s->useroffset = args->useroffset;
- 	s->usersize = args->usersize;
-@@ -7003,6 +7013,14 @@ static ssize_t ctor_show(struct kmem_cache *s, char *buf)
- }
- SLAB_ATTR_RO(ctor);
- 
-+static ssize_t dtor_show(struct kmem_cache *s, char *buf)
-+{
-+	if (!s->dtor)
-+		return 0;
-+	return sysfs_emit(buf, "%pS\n", s->dtor);
-+}
-+SLAB_ATTR_RO(dtor);
-+
- static ssize_t aliases_show(struct kmem_cache *s, char *buf)
- {
- 	return sysfs_emit(buf, "%d\n", s->refcount < 0 ? 0 : s->refcount - 1);
-@@ -7356,6 +7374,7 @@ static struct attribute *slab_attrs[] = {
- 	&partial_attr.attr,
- 	&cpu_slabs_attr.attr,
- 	&ctor_attr.attr,
-+	&dtor_attr.attr,
- 	&aliases_attr.attr,
- 	&align_attr.attr,
- 	&hwcache_align_attr.attr,
 -- 
 2.43.0
 
