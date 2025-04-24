@@ -1,116 +1,173 @@
-Return-Path: <netdev+bounces-185547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE779A9ADF6
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:51:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69750A9AE08
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C634A0700
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:51:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689FA3B8863
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC86027B519;
-	Thu, 24 Apr 2025 12:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9EA27B513;
+	Thu, 24 Apr 2025 12:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b="sgkcfejB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wylie.me.uk (wylie.me.uk [82.68.155.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDE527BF92
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 12:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E16F223DEB;
+	Thu, 24 Apr 2025 12:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.68.155.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745499095; cv=none; b=dLXsWfUBaqIwj00VEyklDwIQ/BBj/baielJU7jH5T2YrqVyXz56cZiUbOU00GMRRYCe6XrGygNu9aIqiaPCfWWrwz2ljWTGoClboEEM9i12CMYXZfs4yXTc4gQ8k7IFR0h1bFEoCxA5GhAVndeNEfdOoNqoIOXYmDRxz0g8JLps=
+	t=1745499226; cv=none; b=jyDDhj6o1ziQFK/yB8hvoPgfy037OuPTHRiOhu1qhOW8SpedWAKnbtu29gPUD9y1OCwL8jMdBTyPtJZP4suntRJ/+SAMscKIBvatIOnDtWLsqKD9QciWj1hEZ4A9FUYMHFIoVGR26KEZTC+ZxoTnq5vRj+xxYcpmDy/jh+CcjoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745499095; c=relaxed/simple;
-	bh=5D5/0LzL83w5CwpzVO/3IUS4QnFdqrpA9CPTI/PQNsk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=F9Y0JFHiF5F9EkvfGGBy7iDxTL0+XYVuOezV78V8MaA9wPb8Tbtp0yLILM4UkPTi7TmgODXPy4NRVNfsA4ojdrQq0LJzn1absHSTcEfR9aSLgFtxkbGenoa5tmp8YSUGPtX3dogMDVCHpf4GHq2sMePD8Shs8244NsTj1r/JOFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d81bc8ebc8so10718215ab.2
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 05:51:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745499093; x=1746103893;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TXeQR3Sx467CreFuYozB+CwcPPf8At1T2RKk614NSIM=;
-        b=CDftumIhx1orka3PyfFdDAzc8c9PlbyhF/LHNvFIin2TIUBUe8ZJZpa1oG8MzBcT6u
-         st0+V+k5aTnPKpY4ob5f2jvSYtMqd4u/GLINtQ0CkT6HzQg1Q6iuHRqA3DcPCnA8XbeT
-         AQ3pHs3Vin5XbygGaAcxykOzn710YNTBr+VDds0YODUcIahnoEXCHDjRU+KLzvSmRvDB
-         LPvQaXkJAhod6YiZIs4/eTl7yWmaGCleIbGGcmZrZTmOhYfhLqMk37aKEVhSdVMXJ5BJ
-         J/5aHwRroBdOOb1iTdqVPfICTg41rW07aC6thEhM/GJqWmcOxTVd3ABpWjI/Fp0dG002
-         4NOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSrVYQGbs7CutFZpd+BuIErU4RlWStHRwAig7FicapfLB81Z3ZuxHzJP60jZdzNhp/bGqCJa0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx8UR49+dAxHgmd1BL7XlQprwuIiV1yjTTZGoPBf4Bb9QzVxUx
-	khQKkUrOytRKx2s5tgxeL9aSayy6lc/H1EE3k4eL34JqGoifGJTDXsu6xuZ4XoNIEqiD3k52SHW
-	Jw+aMGNMZlucZuu86cHn5ZsUzECuf+oOfwEYFovpzxcNdr5/CoyfTwdE=
-X-Google-Smtp-Source: AGHT+IFbFt3HSXR88BYSQzj51++/VfgmJ/IPefkHR6Ckckpg9vTik2GiXujwkU8Gg++jibwHOKkP3ofhpGNJ8IpzpN82gk8IP0VZ
+	s=arc-20240116; t=1745499226; c=relaxed/simple;
+	bh=P86oE7d+/laopXXLm4l/4blWBmnOYmZlRzNXI5Cbk/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bw8LBBuQy6z/GnZUUpF5XfjV0Y5O/COQUTqigTS2BGY8uN2LXevN/iZPstIp0kCSVcj7x0t+YuQrwdtizhCoe5LZv5SxKclkW4wDhTgkOZhZks70k1BzV7k8CA6jpexXGAVKJ2UuUNylH6XifnUsO76Ib+nzYwyRKXmI5IU+/p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk; spf=pass smtp.mailfrom=wylie.me.uk; dkim=pass (2048-bit key) header.d=wylie.me.uk header.i=@wylie.me.uk header.b=sgkcfejB; arc=none smtp.client-ip=82.68.155.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wylie.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wylie.me.uk
+Received: from frodo.int.wylie.me.uk (frodo.int.wylie.me.uk [192.168.21.2])
+	by wylie.me.uk (Postfix) with ESMTP id D6145120897;
+	Thu, 24 Apr 2025 13:53:31 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=wylie.me.uk;
+	s=mydkim006; t=1745499211;
+	bh=P86oE7d+/laopXXLm4l/4blWBmnOYmZlRzNXI5Cbk/4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=sgkcfejB+MzMEtjvZcAhWSxSOL+ajLWRHA4hn14nvgR1mNN1EoN6YWcRYRXibv7Pz
+	 cVu8aqIgBsE8zplzKI56Q43zb22vMEwjpUXsVbb/+UN1PZfHXlZvkv8lDzAXwXomwc
+	 7qLiJ05u47pWLFVx48PIq+4JtNijO7VWmAitAQkNfKLUlfJWkAlRIxHYdFZQXky0a2
+	 wTcfK3LdKIV+fTRHI8uXgQvAgLa1Gk//MkfPPrEczyQwTyRHfyPuv5rqhajb8tPvU7
+	 jao/H58KOS2ZrM4dxEdOagEZXy3MtvnKPtEHN0EzDqQlWpNFUsm/8wrF/QLm85veaA
+	 jpdqmfh6RBLRQ==
+Date: Thu, 24 Apr 2025 13:53:31 +0100
+From: "Alan J. Wylie" <alan@wylie.me.uk>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Holger =?UTF-8?B?SG9mZnN0w6R0dGU=?= <holger@applied-asynchrony.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev, Jiri
+ Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>,
+ stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <20250424135331.02511131@frodo.int.wylie.me.uk>
+In-Reply-To: <aAlAakEUu4XSEdXF@pop-os.localdomain>
+References: <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+ <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+ <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+ <20250421210927.50d6a355@frodo.int.wylie.me.uk>
+ <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+ <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+ <aAf/K7F9TmCJIT+N@pop-os.localdomain>
+ <20250422214716.5e181523@frodo.int.wylie.me.uk>
+ <aAgO59L0ccXl6kUs@pop-os.localdomain>
+ <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
+ <aAlAakEUu4XSEdXF@pop-os.localdomain>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+X-Clacks-Overhead: GNU Terry Pratchett
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:216a:b0:3d8:1d2d:60ab with SMTP id
- e9e14a558f8ab-3d930388dc0mr27240175ab.3.1745499093220; Thu, 24 Apr 2025
- 05:51:33 -0700 (PDT)
-Date: Thu, 24 Apr 2025 05:51:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <680a33d5.050a0220.10d98e.0006.GAE@google.com>
-Subject: [syzbot] [kernel?] net test error: UBSAN: negation-overflow in corrupted
-From: syzbot <syzbot+76fd07ed2518fb9303f9@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, davem@davemloft.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+> On Tue, Apr 22, 2025 at 07:20:24PM +0200, Holger Hoffst=C3=A4tte wrote:
 
-syzbot found the following issue on:
+> Meanwhile, if you could provide a reliable (and ideally minimum)
+> reproducer, it would help me a lot to debug.
 
-HEAD commit:    cc0dec3f659d Merge branch 'net-stmmac-fix-timestamp-snapsh..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=131c21b3980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ac0f76cd0f8e093a
-dashboard link: https://syzkaller.appspot.com/bug?extid=76fd07ed2518fb9303f9
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
+I've found a reproducer. Below is a stripped down version of the shell scri=
+pt
+that I posted in my initial report.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1d6f321414b4/disk-cc0dec3f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/072c28c931b0/vmlinux-cc0dec3f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bcb44ff40c55/bzImage-cc0dec3f.xz
+Running this in a 1 second loop is enough to cause the panic very quickly.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+76fd07ed2518fb9303f9@syzkaller.appspotmail.com
-
-virtio-scsi blksize=512 sectors=4194304 = 2048 MiB
-drive 0x000f27f0: PCHS=0/0/0 translation=lba LCHS=520/128/63 s=4194304
-Sending Seabios boot VM event.
-Booting from Hard Disk 0...
-[    0serialport: Connected to syzkaller.us-central1-c.ci-upstream-net-this-kasan-gce-test-1 port 1 (session ID: e72bd3249fa5f4b40b974e21e6d99e16e8384254f2e85c0fe39918dcc479fa4d, active connections: 1).
-.000000][    T0] UBSAN: negation-overflow in lib/sort.c:199:36
+It seems a bit of network traffic is needed, too.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+# while true; do ./tc.sh; sleep 1; done
+13:33:43 7196kbit 29296kbit
+13:33:44 7196kbit 29296kbit
+...
+13:35:38 7196kbit 29296kbit
+13:35:39 7196kbit 29296kbit
+[panic]
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+# while true; do ./tc.sh; sleep 1; done
+13:44:31 7196kbit 29296kbit
+13:44:32 7196kbit 29296kbit
+...
+13:44:52 7196kbit 29296kbit
+13:44:53 7196kbit 29296kbit
+[panic]
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+The same place as usual
+ htb_dequeue+0x42f/0x610 [sch_htb]
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+--------8<--------8<--------8<--------8<--------8<--------8<--------8<-----=
+---8<--------8<
+#!/usr/bin/bash
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+set -o nounset
+set -o errexit
 
-If you want to undo deduplication, reply with:
-#syz undup
+export PATH=3D/usr/bin
+
+ext=3Dppp0
+ext_ingress=3Dppp0ifb0
+
+ext_up=3D7196kbit
+ext_down=3D29296kbit
+
+printf "%(%T)T $ext_up $ext_down\n"
+
+q=3D1486
+quantum=3D300
+
+modprobe act_mirred
+modprobe ifb
+modprobe sch_cake
+modprobe sch_fq_codel
+
+ethtool -K "$ext" tso off gso off gro off=20
+
+tc qdisc del dev "$ext" root		>& /dev/null || true
+tc qdisc del dev "$ext" ingress		>& /dev/null || true
+tc qdisc del dev "$ext_ingress" root	>& /dev/null || true
+tc qdisc del dev "$ext_ingress" ingress	>& /dev/null || true
+ip link del "$ext_ingress"  		>& /dev/null || true
+
+tc qdisc add dev "$ext" handle ffff: ingress
+
+ip link add name "$ext_ingress"  type ifb
+ip link set dev "$ext_ingress" up || true=20
+
+tc filter add dev "$ext" parent ffff: protocol all u32 match u32 0 0 action=
+ mirred egress redirect dev "$ext_ingress"
+tc qdisc add dev "$ext_ingress" root handle 1: htb default 11 r2q 20
+tc class add dev "$ext_ingress" parent 1: classid 1:1 htb rate $ext_down=20
+tc class add dev "$ext_ingress" parent 1:1 classid 1:11 htb rate $ext_down =
+prio 0 quantum $q
+tc qdisc add dev "$ext_ingress" parent 1:11 fq_codel quantum $quantum ecn
+tc qdisc add dev "$ext" root handle 1: htb default 11
+tc class add dev "$ext" parent 1: classid 1:1 htb rate $ext_up
+tc class add dev "$ext" parent 1:1 classid 1:11 htb rate $ext_up prio 0 qua=
+ntum $q
+tc qdisc add dev "$ext" parent 1:11 fq_codel quantum $quantum noecn
+--------8<--------8<--------8<--------8<--------8<--------8<--------8<-----=
+---8<--------8<
+
+--=20
+Alan J. Wylie     https://www.wylie.me.uk/     mailto:<alan@wylie.me.uk>
+
+Dance like no-one's watching. / Encrypt like everyone is.
+Security is inversely proportional to convenience
 
