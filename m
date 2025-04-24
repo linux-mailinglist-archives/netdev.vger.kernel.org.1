@@ -1,122 +1,114 @@
-Return-Path: <netdev+bounces-185526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8143FA9ACCE
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:05:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D7DA9ACE1
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 14:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18BDE3AC45F
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:05:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B9F43B40F0
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 12:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00352227E99;
-	Thu, 24 Apr 2025 12:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078A022AE48;
+	Thu, 24 Apr 2025 12:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="bQLeMiOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382C91FAC46;
-	Thu, 24 Apr 2025 12:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229D6214226;
+	Thu, 24 Apr 2025 12:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745496331; cv=none; b=q5Y7zK2VN8TPE+3wqH+cGcejgebjJO6c6TfvInSLdzw1fq2NGzbR4GfFdMMyEwPK1YVvku719lftTJVagZPutL9g2W02ge3V/zYSDpe5ZzaEdnVrT8N8Gs6rxLv+XJ1//G/C2BmTJDcVlB7QDaKBH+fY9pjKBPhLAT5OVNblc/k=
+	t=1745496570; cv=none; b=MeN9LJg0J0hHjsNB/59qZW89duB1oEZj9PuEugZQZFy/ZgN24hyABtlqLq4ZAxyVAKIu96okbzj7dTe56WyZY8dVO/djfvgnh0jp5gPIy5En+f2bfvEJdxB+H3IzIKFpQuS3nn55sVGYfPNj24Tn45vqxv+1IBI5NokqMzj6eeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745496331; c=relaxed/simple;
-	bh=s1lwQ6KQJegruKsJwhoAbmV6Zxh4FSZt6yJYj9j9ISg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bp9d3nZFwZSInPIcU6SV51/famccQoFlIkfTcXCenAkT7OeXRcF9AGpnrmT056pLbms5DNBWWA1niRgaHXYUYjpkR/1Xb4u8mdJ2otjzedTfUTy/1cyOtZPIXy3Hmkpa7s47wPviZVmcQoie/clOGOzrbSkboRNq5jDFw1LaTqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83B231063;
-	Thu, 24 Apr 2025 05:05:24 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B57FC3F59E;
-	Thu, 24 Apr 2025 05:05:26 -0700 (PDT)
-Date: Thu, 24 Apr 2025 13:05:23 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Yixun Lan <dlan@gentoo.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chen-Yu
- Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
- Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, <devicetree@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
- board
-Message-ID: <20250424130523.6ceecca3@donnerap.manchester.arm.com>
-In-Reply-To: <20250424100514-GYA48784@gentoo>
-References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
-	<20250423-01-sun55i-emac0-v1-4-46ee4c855e0a@gentoo.org>
-	<aa38baed-f528-4650-9e06-e7a76c25ec89@lunn.ch>
-	<20250424014120.0d66bd85@minigeek.lan>
-	<20250424100514-GYA48784@gentoo>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1745496570; c=relaxed/simple;
+	bh=mhvQAy4PwAusFJNPxPQDFwPrFvhTyyBHabTJwdC0aUU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jamtRNGm9V6aISTpMH+Fu6ajn9nb5EZNLy53STVn/To+rq2a4bgGUgk0YfOykXmhjqnL+jGoy53XPUNXTRSYS8g40VlS9oT+4x5EyYEIlWmNFSl7jlXoEv2br1jeKK4b5t+0LwKoJWbHfucaRo8RDAh5nBpICGlvRKHg8GHNyEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=bQLeMiOT; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=mhvQAy4PwAusFJNPxPQDFwPrFvhTyyBHabTJwdC0aUU=;
+	t=1745496569; x=1746706169; b=bQLeMiOTL/CLn6kVXjUmypjR6zOeND/9JQJU+Mrlbe30Tei
+	hlO6P2tM5Em2SBXGNkFROFXie/L1SSd9hyzF2LiJ8aA0DtIf1MQ/ul5ja05UAOUiCWcG3+MMr/U2I
+	cW1gEs+swyKT2uK1uXIYYvI3aODHrARtUL1u/4XJtO1aFuKdwaDtT9v69g5ADIoh4ADgkAeVviBNP
+	2V1iv4PJexVTwRsP8bTzJr+SgONslwJpcyByKqsKQ4CSYHmXlW5Ugdoh8zy2FqDHcsXLQ8b/ksIto
+	dn6wcfkn9OZXluWbEgcQcCpmWTXLJB3sDCfkSRQSe0JjNaLpTSfiWQX+I102x67Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1u7vOJ-0000000H4Oc-2vQj;
+	Thu, 24 Apr 2025 14:09:20 +0200
+Message-ID: <4b040936baa8fa8669b34e36fe9dff6e08aeede9.camel@sipsolutions.net>
+Subject: Re: [PATCH v5 3/5] dt-bindings: wireless: bcm4329-fmac: Use
+ wireless-controller.yaml schema
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>, david@ixit.cz, Andrew Lunn	
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet	 <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni	 <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski	 <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Mailing List	 <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Lorenzo Bianconi	 <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
+ =?ISO-8859-1?Q?J=E9r=F4me?= Pouiller	 <jerome.pouiller@silabs.com>, Bjorn
+ Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>,
+ Andy Gross <agross@kernel.org>, Mailing List	
+ <devicetree-spec@vger.kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
+Date: Thu, 24 Apr 2025 14:09:18 +0200
+In-Reply-To: <57701e2e-0005-4a8a-a3f5-ba098c97b480@kernel.org>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
+	 <20250324-dt-bindings-network-class-v5-3-f5c3fe00e8f0@ixit.cz>
+	 <d8619ab4-3a91-467f-a3d4-f23b4e0383a4@kernel.org>
+	 <57701e2e-0005-4a8a-a3f5-ba098c97b480@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-On Thu, 24 Apr 2025 10:05:14 +0000
-Yixun Lan <dlan@gentoo.org> wrote:
+On Thu, 2025-04-24 at 10:28 +0200, Krzysztof Kozlowski wrote:
+> On 24/04/2025 10:20, Krzysztof Kozlowski wrote:
+> > On 24/03/2025 18:41, David Heidelberg via B4 Relay wrote:
+> > > From: Janne Grunau <j@jannau.net>
+> > >=20
+> > > The wireless-controller schema specifies local-mac-address as
+> > > used in the bcm4329-fmac device nodes of Apple silicon devices
+> > > (arch/arm64/boot/dts/apple).
+> > >=20
+> > > Fixes `make dtbs_check` for those devices.
+> > >=20
+> > > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> > > Signed-off-by: Janne Grunau <j@jannau.net>
+> > > Signed-off-by: David Heidelberg <david@ixit.cz>
+> >=20
+> > This introduced several new dtbs_check warnings. Including on platforms
+> > which were warnings free. It is nice to fix these warnings when you mak=
+e
+> > such changes.
 
-Hi,
+Heh, especially since it said it should _fix_ things there.
 
-> Hi Andrew, Andre,
-> 
-> On 01:42 Thu 24 Apr     , Andre Przywara wrote:
-> > On Wed, 23 Apr 2025 18:58:37 +0200
-> > Andrew Lunn <andrew@lunn.ch> wrote:
-> > 
-> > Hi,
-> >   
-> > > > +&emac0 {
-> > > > +	phy-mode = "rgmii";    
-> > > 
-> > > Does the PCB have extra long clock lines in order to provide the
-> > > needed 2ns delay? I guess not, so this should be rgmii-id.  
-> > 
-> > That's a good point, and it probably true.
-> >   
-> > >   
-> > > > +	phy-handle = <&ext_rgmii_phy>;
-> > > > +
-> > > > +	allwinner,tx-delay-ps = <300>;
-> > > > +	allwinner,rx-delay-ps = <400>;    
-> > > 
-> > > These are rather low delays, since the standard requires 2ns. Anyway,
-> > > once you change phy-mode, you probably don't need these.  
-> >   
-> As I tested, drop these two properties making ethernet unable to work,
-> there might be some space to improve, but currently I'd leave it for now
+> I will send the patches for them, except for Apple SoCs.
 
-Yes, I think we need those delays to be programmed into the syscon clock
-register, and have been doing so for years.
+Thanks, I guess I'll hold the pull request for that. And I guess the
+Apple ones are on David then.
 
-> > Those go on top of the main 2ns delay, I guess to accommodate some skew
-> > between the RX and TX lines, or to account for extra some PCB delay
-> > between clock and data? The vendor BSP kernels/DTs program those board
-> > specific values, so we have been following suit for a while, for the
-> > previous SoCs as well.
-> > I just tried, it also works with some variations of those values, but
-> > setting tx-delay to 0 stops communication.
-> >   
-> I'd not bother to try other combinations, and just stick to vendor's settings
+Knew it was a mistake for me to ever do anything with DT stuff ;-)
 
-I learned to not rely too much on Allwinner BSP settings ;-)
-
-And it's quite easy to experiment, actually: you can write directly to
-0x3000030, for instance using devmem or peekpoke, at Linux runtime. Run
-some tests or benchmarks, then try a new setting, without rebooting.
-
-Cheers,
-Andre.
+johannes
 
