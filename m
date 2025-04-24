@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-185338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6743BA99CE7
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:25:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F71A99CEB
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 02:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA42E5A5B37
-	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:24:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE2F24605B0
+	for <lists+netdev@lfdr.de>; Thu, 24 Apr 2025 00:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCB717F7;
-	Thu, 24 Apr 2025 00:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C902701CE;
+	Thu, 24 Apr 2025 00:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFiCSBBs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGkRZzXT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4747518EB0
-	for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 00:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3436A17F7;
+	Thu, 24 Apr 2025 00:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745454258; cv=none; b=saVlrvg1vEowm4lWM0b3/xoTZ12GD5wZa2/9eBiXgpZ3F+sScCFr1qMwIFpPHRwz+VI/WVdetFgVnsitcdizM46J3oBTg4u69MgLfl1qF/3iiH4u9IV+fjskZdnuqrZIbepFwaTE6s8iKChc2nGHNB2+uBOU2a1CNSrrUgprRLw=
+	t=1745454348; cv=none; b=N1TVnD8nmhjpC3Z/xIzp3pwocqZIH9YhbLLzO/1GMMjpNz0fKKcwajXzuBwDfUDHfdnJ//wFYPpRCMo9zj7QhdRXV4HeaWxkkN1Kze6T1k+64wyIxMBDO8TmOO6bJNTSfara9bAAEGAfPSf6MLVovJIf3zqb3fsWBWueNcoauyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745454258; c=relaxed/simple;
-	bh=0adNhVNAvzGwmhhhADHeeaPsZ17QbMi3WE20NHqbDaM=;
+	s=arc-20240116; t=1745454348; c=relaxed/simple;
+	bh=nqx9oEZK27AYuefLV5zlfdxshKo+A8vLCpMYfJ5Zc60=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aUsiAwvYA0ek/0J6ImRegfbb6QVxRWVTNLLQk7S+YqTJhXB6+eQGPA7ggwH4bxOkNQYWjfqD/AnUJW9BX1hxPfdE0bIXamaYiR4YKd1Z4olJewpGOWNGfXKESeYSQ2Nt21LZBzwTPbNQwU/IK4yTmGYG36NgKBwMV+yAtcn8mYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFiCSBBs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EBCEC4CEE2;
-	Thu, 24 Apr 2025 00:24:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hVmvMIVJdF0M9Ys6IwhNftCzplk6fHWMuAu6PsIN04jut6DepJHUIKfEfsQtqrehPMaHYvErJhDgiwp7gRACd1pjgQYS3dqvw5jvA/vsssIN9+CBHmVcJBymi8DMg/6mI/J3xiBAmwpqWydsFU0gT6IGavRvgpZNNO7UPUws30w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGkRZzXT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341F8C4CEE2;
+	Thu, 24 Apr 2025 00:25:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745454257;
-	bh=0adNhVNAvzGwmhhhADHeeaPsZ17QbMi3WE20NHqbDaM=;
+	s=k20201202; t=1745454347;
+	bh=nqx9oEZK27AYuefLV5zlfdxshKo+A8vLCpMYfJ5Zc60=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZFiCSBBsdwkXpH/QgD7Taj83EsURH5TWqb5d9Ivl/Sn0fkkLdDxLtcDrpe1cbpxY0
-	 E2Rl4IH5/3hMMDA8bj95sLj0BYLRmbFVMD+i2Kga+RKofwmH9IfzskUE2om18v/DbP
-	 yzYTHnVYgRkEPLf9wIcA/36p9bipH30hszTIfmBC5L/8203MXiW0QjeRQ+ximGdYlb
-	 9WHhk466h3z7mGHhldk0tzTeyzNhXHTBIXeIYCxcrcHFpo8QTWg/v24rz7/xoEKmu1
-	 uhQXGfpZ42ELXPwzLLVMglCQmCCPt7Z9KOEdXw928B/3HZngA2cgdmgTPrpM0M4VlR
-	 wdgXG8NphI9qg==
-Date: Wed, 23 Apr 2025 17:24:16 -0700
+	b=eGkRZzXTbODmiVhaKrWca5k/M9UOuCrumIQridy4Bl86b52FR4bOLKE6q0k5KIwde
+	 jb9KcPBbpCLCcgtxHWsK/cNtcmTjPJPQZHcELFFsQSfUeuuFjCWgxlfHQINmqs2ni4
+	 +xIwSV870IpGyvxQwueTRqZnLHSa+8loOJ8buZOMheW8j5vkX7MdcExCP5KqfoPcvo
+	 hAmLDQD8uW+Yxyq7nTXscur8h6ulBplo3/ZBijKji6uBByiAUkBJCoICBiQsVmm9av
+	 nIa8HKbHj36YnuLJn5hFOOU5KzuFOQEiK8apJNlGUHDDlqRvJVWoc+I9EcG9zDDSNa
+	 3tybLROGUAZow==
+Date: Wed, 23 Apr 2025 17:25:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>,
- netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, toke@redhat.com,
- gerrard.tai@starlabs.sg, pctammela@mojatatu.com
-Subject: Re: [PATCH net v2 0/5] net_sched: Adapt qdiscs for reentrant
- enqueue cases
-Message-ID: <20250423172416.4ee6378d@kernel.org>
-In-Reply-To: <aAl34pi75s8ItSme@pop-os.localdomain>
-References: <20250416102427.3219655-1-victor@mojatatu.com>
-	<aAFVHqypw/snAOwu@pop-os.localdomain>
-	<4295ec79-035c-4858-9ec4-eb639767d12b@redhat.com>
-	<aAlSqk9UBMNu6JnJ@pop-os.localdomain>
-	<aAl34pi75s8ItSme@pop-os.localdomain>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, shaw.leon@gmail.com, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, open list <linux-kernel@vger.kernel.org>, "open
+ list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, "open
+ list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)"
+ <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] selftests: drv-net: Test that NAPI ID
+ is non-zero
+Message-ID: <20250423172546.32d2da09@kernel.org>
+In-Reply-To: <aAmAbcbLMl6IBwpd@LQ3V64L9R2>
+References: <20250418013719.12094-1-jdamato@fastly.com>
+	<20250418013719.12094-4-jdamato@fastly.com>
+	<20250423161612.3dc2923e@kernel.org>
+	<aAmAbcbLMl6IBwpd@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,36 +70,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Apr 2025 16:29:38 -0700 Cong Wang wrote:
-> > +	/*
-> > +	 * If doing duplication then re-insert at top of the
-> > +	 * qdisc tree, since parent queuer expects that only one
-> > +	 * skb will be queued.
-> > +	 */
-> > +	if (skb2) {
-> > +		struct Qdisc *rootq = qdisc_root_bh(sch);
-> > +		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
-> > +
-> > +		q->duplicate = 0;
-> > +		rootq->enqueue(skb2, rootq, to_free);
-> > +		q->duplicate = dupsave;
-> > +		skb2 = NULL;
-> > +	}
-> > +
-> >  finish_segs:
-> >  	if (skb2)
-> >  		__qdisc_drop(skb2, to_free);
-> >   
+On Wed, 23 Apr 2025 17:06:05 -0700 Joe Damato wrote:
+> # Exception| Traceback (most recent call last):
+> # Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/ksft.py", line 223, in ksft_run
+> # Exception|     case(*args)
+> # Exception|   File "/home/jdamato/code/net-next/./tools/testing/selftests/drivers/net/napi_id.py", line 13, in test_napi_id
+> # Exception|     with bkg(listen_cmd, ksft_wait=3) as server:
+> # Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/utils.py", line 130, in __exit__
+> # Exception|     return self.process(terminate=self.terminate, fail=self.check_fail)
+> # Exception|            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> # Exception|   File "/home/jdamato/code/net-next/tools/testing/selftests/net/lib/py/utils.py", line 78, in process
+> # Exception|     os.write(self.ksft_term_fd, b"1")
+> # Exception| BrokenPipeError: [Errno 32] Broken pipe
+
+Thanks for testing! Makes sense, I don't think it's worth complicating
+the Python side to handle the "ready but no wait" case if it doesnt
+work as is.
+
+> LMK how you'd like me to proceed ?
 > 
-> Just FYI: I tested this patch, netem duplication still worked, I didn't
-> see any issue.
+> I'm thinking:
+>   - Leave ksft_wait()
+>   - macro guard
+>   - don't deploy helper to remote machine
 
-Does it still work if you have another layer of qdiscs in the middle?
-It works if say DRR is looking at the netem directly as its child when
-it does:
-
-	first = cl->qdisc->q.qlen
-
-but there may be another layer, the cl->qdisc may be something that
-hasn't incremented its qlen, and something that has netem as its child.
+SG!
 
