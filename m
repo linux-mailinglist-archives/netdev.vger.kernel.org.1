@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-185832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF657A9BD03
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:44:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93E7A9BD01
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0FD4464C0C
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:44:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 617C41BA088E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52F6196C7C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52AA195811;
 	Fri, 25 Apr 2025 02:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQWJPcpV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+zv6QT/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FD31957FC
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 02:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F7B194C86
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 02:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745549010; cv=none; b=SngbKk1dUsy829nyLmsK5ktszVYOnkY8NVIrZE1sLBXGzzZuyp98GJ0z5iH6lkVWdBhEwXaWuHdiIGLt2eILpE31ODByFVsHSHJYaLYop1N4G1S7/Cl45Dvi9tTBjuj5FUifs5pIbIGzQ7FljO6Kf94xwulklODCzXceya9dYJI=
+	t=1745549010; cv=none; b=QbrrJT9JCjEfiqlzTuO7W7mVdqWs69mfWTVUb7+p+7Gb3QNgrerIWkHD0wgCdaY8aAM3imnHhJ/ir19qXArsXsjZhDy63oJ1ndEcBIoS8KdyTOiZcIZu0iAb1XBhK1xwPHyiKvDz5Fi3DQnI+C1Yt1TqyiDieFbqTk7JyUfKVJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745549010; c=relaxed/simple;
-	bh=Gfgk4lsRTfT/rBbtinzRaINrNAm3a4d0Co65js88dS0=;
+	bh=RG2eseKyXPRLSHvEJklXi9zGP7lm8PV/yhWYAgjOhYU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uv0OR1li9+aRi2Wv6XAXlUhSYVoRx9aSQUdHkSmhn4HtHtidALjVRXaBhVMPEpGYk9//jDzh1kRy828p2Gskx1p1/X3o6Smu1enaDEr9XXxf59noK95yCCardWzYIEf7pwP+pVmuv5/Hfqn/32Yx+wSO6HR0YOgSMWDzqQMfuzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dQWJPcpV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2CA5C4CEEE;
-	Fri, 25 Apr 2025 02:43:28 +0000 (UTC)
+	 MIME-Version; b=CmbG3khZ1leRWiJkYTNNRWqbOTyosnqdh6EjxW1Q2VwHXQjaHnYseOp3bLVigrpgg3G/0pYFYBBqy50lNNOmZOE1B+w2Qc1ysBM2aB9OctExvz42BKtlM0LCfQG140XVmvDkFDdexhlu6I3fXoXulNkJ++GOsSaU615omy3QXgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+zv6QT/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C731C4CEEB;
+	Fri, 25 Apr 2025 02:43:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745549009;
-	bh=Gfgk4lsRTfT/rBbtinzRaINrNAm3a4d0Co65js88dS0=;
+	bh=RG2eseKyXPRLSHvEJklXi9zGP7lm8PV/yhWYAgjOhYU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dQWJPcpVJTsiAY5nyBYxd33qBRC4HREdhiGEfg/zbxiKEMsXwH6h4Q/louVR38wG3
-	 EPbB105S+dDqgYFvgaMQ46SkGg2ACMHzZmiSGT/yFFfF4UsJ1Bv1SHt4MshzA0ynlf
-	 JnU3zIqxOKA3/8K09pk9m9Aq6/LkMgG4Q8lgb1sjHntZv0Y9r/IeDPqt+cm0LVlus2
-	 ABEoqFVKx3mJGCEwNtS3/Ft15YZIv/tSJz+03X7MRa4E1Ekp5MxHUZSprbRe9zcHBG
-	 e+2etluerRb0ASHxrgqPA6guTSveMPcwB6+4pITQrHBdlf+1wjbfD7oL458saAo/Vw
-	 rVM2eo+M3foVA==
+	b=h+zv6QT/iJxJk/cFv2Tj629Ua2xtHL6XKAUEBX5dm6+qb6V/4EfLoLYE1ZUYpBLHJ
+	 sL32+zQzlMCdkMFZPUKdDxPJ9JhVbGIuWuAVRm5zEvnvWMntVA7yuOQxIrwwnRFhXd
+	 tz6woghH9HjzzZ2jGgw3XIiaMHmIka0OvaTpWwhqx9eDP0Jdta5n4m8OkZ/I03MQw+
+	 GYOIMkQz+vtLdYb42KBBhd+gVII2kF4eOHQ2FW0/T/gvnKNeSgKAETpG2MxhOip/r8
+	 SZs7lwma+bU8JqC2BoeE9OK2L1hPkFT1jnqCyzl4ESsRhnn33XikjvJrJWjqmrnkZs
+	 yWNXogp5/Bmpg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	sdf@fomichev.me,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 10/12] tools: ynl-gen: array-nest: support binary array with exact-len
-Date: Thu, 24 Apr 2025 19:43:09 -0700
-Message-ID: <20250425024311.1589323-11-kuba@kernel.org>
+Subject: [PATCH net-next v2 11/12] tools: ynl-gen: don't init enum checks for classic netlink
+Date: Thu, 24 Apr 2025 19:43:10 -0700
+Message-ID: <20250425024311.1589323-12-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250425024311.1589323-1-kuba@kernel.org>
 References: <20250425024311.1589323-1-kuba@kernel.org>
@@ -67,94 +67,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-IPv6 addresses are expressed as binary arrays since we don't have u128.
-Since they are not variable length, however, they are relatively
-easy to represent as an array of known size.
+rt-link has a vlan-protocols enum with:
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+   name: 8021q     value: 33024
+   name: 8021ad    value: 34984
+
+It's nice to have, since it converts the values to strings in Python.
+For C, however, the codegen is trying to use enums to generate strict
+policy checks. Parsing such sparse enums is not possible via policies.
+
+Since for classic netlink we don't support kernel codegen and policy
+generation - skip the auto-generation of checks from enums.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+v2:
+ - move the comment about the skip before the if
+v1: https://lore.kernel.org/4b8339b7-9dc6-4231-a60f-0c9f6296358a@intel.com
+---
+ tools/net/ynl/pyynl/ynl_gen_c.py | 46 ++++++++++++++++++--------------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index a4e65da19696..2d185c7ea16c 100755
+index 2d185c7ea16c..eda9109243e2 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -183,10 +183,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         raise Exception(f"Struct member not implemented for class type {self.type}")
+@@ -357,26 +357,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         if 'byte-order' in attr:
+             self.byte_order_comment = f" /* {attr['byte-order']} */"
  
-     def struct_member(self, ri):
--        if self.is_multi_val():
--            ri.cw.p(f"unsigned int n_{self.c_name};")
-         member = self._complex_member_type(ri)
-         if member:
-+            if self.is_multi_val():
-+                ri.cw.p(f"unsigned int n_{self.c_name};")
-             ptr = '*' if self.is_multi_val() else ''
-             if self.is_recursive_for_op(ri):
-                 ptr = '*'
-@@ -728,12 +728,22 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         elif self.attr['sub-type'] in scalars:
-             scalar_pfx = '__' if ri.ku_space == 'user' else ''
-             return scalar_pfx + self.attr['sub-type']
-+        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-+            return None  # use arg_member()
+-        if 'enum' in self.attr:
+-            enum = self.family.consts[self.attr['enum']]
+-            low, high = enum.value_range()
+-            if 'min' not in self.checks:
+-                if low != 0 or self.type[0] == 's':
+-                    self.checks['min'] = low
+-            if 'max' not in self.checks:
+-                self.checks['max'] = high
+-
+-        if 'min' in self.checks and 'max' in self.checks:
+-            if self.get_limit('min') > self.get_limit('max'):
+-                raise Exception(f'Invalid limit for "{self.name}" min: {self.get_limit("min")} max: {self.get_limit("max")}')
+-            self.checks['range'] = True
+-
+-        low = min(self.get_limit('min', 0), self.get_limit('max', 0))
+-        high = max(self.get_limit('min', 0), self.get_limit('max', 0))
+-        if low < 0 and self.type[0] == 'u':
+-            raise Exception(f'Invalid limit for "{self.name}" negative limit for unsigned type')
+-        if low < -32768 or high > 32767:
+-            self.checks['full-range'] = True
++        # Classic families have some funny enums, don't bother
++        # computing checks we only need them for policy
++        if not family.is_classic():
++            self._init_checks()
+ 
+         # Added by resolve():
+         self.is_bitfield = None
+@@ -401,6 +385,28 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
          else:
-             raise Exception(f"Sub-type {self.attr['sub-type']} not supported yet")
+             self.type_name = '__' + self.type
  
-+    def arg_member(self, ri):
-+        if self.sub_type == 'binary' and 'exact-len' in self.checks:
-+            return [f'unsigned char (*{self.c_name})[{self.checks["exact-len"]}]',
-+                    f'unsigned int n_{self.c_name}']
-+        return super().arg_member(ri)
++    def _init_checks(self):
++        if 'enum' in self.attr:
++            enum = self.family.consts[self.attr['enum']]
++            low, high = enum.value_range()
++            if 'min' not in self.checks:
++                if low != 0 or self.type[0] == 's':
++                    self.checks['min'] = low
++            if 'max' not in self.checks:
++                self.checks['max'] = high
 +
-     def _attr_typol(self):
-         if self.attr['sub-type'] in scalars:
-             return f'.type = YNL_PT_U{c_upper(self.sub_type[1:])}, '
-+        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-+            return f'.type = YNL_PT_BINARY, .len = {self.checks["exact-len"]}, '
-         else:
-             return f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
- 
-@@ -754,6 +764,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             ri.cw.block_start(line=f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
-             ri.cw.p(f"ynl_attr_put_{put_type}(nlh, i, {var}->{self.c_name}[i]);")
-             ri.cw.block_end()
-+        elif self.sub_type == 'binary' and 'exact-len' in self.checks:
-+            ri.cw.p(f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
-+            ri.cw.p(f"ynl_attr_put(nlh, i, {var}->{self.c_name}[i], {self.checks['exact-len']});")
-         else:
-             raise Exception(f"Put for ArrayNest sub-type {self.attr['sub-type']} not supported, yet")
-         ri.cw.p('ynl_attr_nest_end(nlh, array);')
-@@ -964,7 +977,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         elif elem['type'] == 'nest':
-             t = TypeNest(self.family, self, elem, value)
-         elif elem['type'] == 'indexed-array' and 'sub-type' in elem:
--            if elem["sub-type"] in ['nest', 'u32']:
-+            if elem["sub-type"] in ['binary', 'nest', 'u32']:
-                 t = TypeArrayNest(self.family, self, elem, value)
-             else:
-                 raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
-@@ -1786,7 +1799,7 @@ _C_KW = {
-     needs_parg = False
-     for arg, aspec in struct.member_list():
-         if aspec['type'] == 'indexed-array' and 'sub-type' in aspec:
--            if aspec["sub-type"] == 'nest':
-+            if aspec["sub-type"] in {'binary', 'nest'}:
-                 local_vars.append(f'const struct nlattr *attr_{aspec.c_name};')
-                 array_nests.add(arg)
-             elif aspec['sub-type'] in scalars:
-@@ -1859,6 +1872,9 @@ _C_KW = {
-             ri.cw.p('return YNL_PARSE_CB_ERROR;')
-         elif aspec.sub_type in scalars:
-             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.sub_type}(attr);")
-+        elif aspec.sub_type == 'binary' and 'exact-len' in aspec.checks:
-+            # Length is validated by typol
-+            ri.cw.p(f'memcpy(dst->{aspec.c_name}[i], ynl_attr_data(attr), {aspec.checks["exact-len"]});')
-         else:
-             raise Exception(f"Nest parsing type not supported in {aspec['name']}")
-         ri.cw.p('i++;')
++        if 'min' in self.checks and 'max' in self.checks:
++            if self.get_limit('min') > self.get_limit('max'):
++                raise Exception(f'Invalid limit for "{self.name}" min: {self.get_limit("min")} max: {self.get_limit("max")}')
++            self.checks['range'] = True
++
++        low = min(self.get_limit('min', 0), self.get_limit('max', 0))
++        high = max(self.get_limit('min', 0), self.get_limit('max', 0))
++        if low < 0 and self.type[0] == 'u':
++            raise Exception(f'Invalid limit for "{self.name}" negative limit for unsigned type')
++        if low < -32768 or high > 32767:
++            self.checks['full-range'] = True
++
+     def _attr_policy(self, policy):
+         if 'flags-mask' in self.checks or self.is_bitfield:
+             if self.is_bitfield:
 -- 
 2.49.0
 
