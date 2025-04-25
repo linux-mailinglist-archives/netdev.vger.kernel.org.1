@@ -1,190 +1,147 @@
-Return-Path: <netdev+bounces-185906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B302A9C0FE
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:30:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82BADA9C10D
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACFC31BA6E9F
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:30:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D3DD46542E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBC72367A0;
-	Fri, 25 Apr 2025 08:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E424023535C;
+	Fri, 25 Apr 2025 08:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lavabit.com header.i=@lavabit.com header.b="KnzDn7gW"
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="t27exWrh"
 X-Original-To: netdev@vger.kernel.org
-Received: from lavabit.com (lavabit.com [46.23.82.244])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838FF23536E
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.23.82.244
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E4515C0
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745569753; cv=none; b=JW2OkaF13Zmc+hbtb8E/X3ZV6GBZ4IFp4Ta3JK8nuPoFhXmTwPCDB7bEw1/aATKGX8UPI4w8RPhc9sOYhg2lhBck7xthV1z1ynrEU/0pyAs77ZR3jPQB42CLwTZSxY2S4sS2LUNypx1yHCGfktIt82oYuYe33lqZTrwZHLcNMdY=
+	t=1745570086; cv=none; b=KflK35KwwXXVfN0C0i4B8XVkh/R3KjDuaFvRGs615g6gfVDvvGq2sJlSrXbssKx8d9ocyZmEag9FO68TXZnD9cW708y1nzFxg0PLY3A1dUW7srEuybBCfF/bh3dFCZQa0NHh09jjEVE2dro8rOSH5pYv9CCYwJqmmHMD63jUuPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745569753; c=relaxed/simple;
-	bh=Qiaj2w9sK7c0XmfDKv0ILFJEONjLlw9OO/iJSrsLo0A=;
-	h=Date:From:Subject:To:Message-Id:MIME-Version:Content-Type; b=Nce4mi5UFAnAiw+Iinhk9NNdUgGmymnjT5+I7IeRIqJLZ740STlU438WHccUl8kjqRBRZrpOAqCLG3CH983kaJq7x795+HNmu9sQxp3l5rM8QfdjfJY/rh3xFuqxtT6x+OwN0UFovzqTBVJA/TEm7+lPl1PPpM6kFUlYBHIsO2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=lavabit.com; spf=pass smtp.mailfrom=lavabit.com; dkim=pass (2048-bit key) header.d=lavabit.com header.i=@lavabit.com header.b=KnzDn7gW; arc=none smtp.client-ip=46.23.82.244
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=lavabit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lavabit.com
-Received: from lavabit.com (localhost [127.0.0.1])
-	by lavabit.com (Postfix) with ESMTP id C3ECD407AA61
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:23:35 +0000 (UTC)
-Received: from 192.168.1.6 (10-213-91-213-static.btc-net.bg [213.91.213.10])
-	by lavabit.com with ESMTP id 24OJYU6BGDA5
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:23:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lavabit.com; s=bazinga;
-	t=1745569415; bh=Qiaj2w9sK7c0XmfDKv0ILFJEONjLlw9OO/iJSrsLo0A=;
-	h=Date:From:Subject:To:Message-Id:X-Mailer:MIME-Version:
-	 Content-Type;
-	b=KnzDn7gWKRAxiISdOkLxuQeRMDMaggYA8NpTRUgCO8PiFbzc9GlAFKaM026cSftrY
-	 mUWfGLiOQlTphiXE4h8v/0r5TJjmNCBETiXJeqGm30sJBdrwHIrIS5eEAUlsik5GCI
-	 YZT/ytB5KBYyzm/aw+EpFyXe7Rj5yYkEEJYm0RIs1M8ih8ajnneJF7ynOBhJwN0PRB
-	 67qw5gP5H/VIFtlDJhh4G147s2msrcxdo4RkUYcPUFTcJ55zkCM0966QmQyazIfSce
-	 5f1HKpfoZJctcI1EVbc+YFyrEcX80A/brtXwhZCSxN5T6uCzSP2UIEclzbaDSa2SnP
-	 NJQ41lgIZntQQ==
-Date: Fri, 25 Apr 2025 11:23:28 +0300
-From: =?iso-8859-5?b?stDb1eDYILLb0NTV0g==?= <vdev@lavabit.com>
-Subject: trie
-To: netdev@vger.kernel.org
-Message-Id: <4ZL9VS.N0OI63U2KKTU@lavabit.com>
-X-Mailer: geary/43.0
+	s=arc-20240116; t=1745570086; c=relaxed/simple;
+	bh=zqsD8xYMTJiUyTNPJ2v23CAoV/EGj6ZV4YLILcwsABc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kwecRXcQMTmCRP3K6p6Xi1vLTD7cTqUX3WFOGGpUSgwxLiTv+PO84j9X1AITtrM4Unl3t73dKUKI5kP4QSbb5Ev4WfIu8Jx91ETs61GJUu7cVCQ9i/W/9zNutqRg7b5lQdFseixj/dE0EnVgwcXNdFTBjXBGhyhk9VC8sEnu+bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=t27exWrh; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: 38cf2ff0-21b0-11f0-bc2a-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.40])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 38cf2ff0-21b0-11f0-bc2a-005056ab378f;
+	Fri, 25 Apr 2025 10:35:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:from:to:subject:mime-version:date:message-id;
+	bh=8/yvxp3z86rFOheLRFHFBHKY1EtIc/D5T7iQnuCrnGI=;
+	b=t27exWrhxfrd/PunXsL+ZON/teXOUj69jJjeYPGfTZDsKbU2UhY6QxA5jZzSC2UfHti+CtC2R3YA1
+	 2IsXKPGHqZyDmXCGVG1ocuiCaZbdz/PbJO+RwQmHPFtqnuQ379ia7IoJ56FXvxR5uyp2HBSvGXU/w1
+	 Z9p2CK+pULqCDhKP67uLZYhiaC3ymBvqV6fhQnTdg/GgMTgy6FvqbFqWiDPwTcQdqha3eAeMvwKqNV
+	 DS29lnDXjD4Qlvsq3awtRnnspWtKmCgoyMZW57lFwVfG6J+bJgoYIoDt5Ndg4YcB2cWAJUJqAqQOPS
+	 /PK7PcEKKutczhZAsCdqyck4dGTG43w==
+X-KPN-MID: 33|RIBl8qxlgmujX1FKwnzX9VyDT0ZAKCskxgm1P0W9jXQ8nZR5BAM8OCvJo8UWjik
+ QYKCL9im91mYQLHEnPxtOf00QLEo2aniGRp+aXvEOCRo=
+X-KPN-VerifiedSender: Yes
+X-CMASSUN: 33|kGQgDhys4HLyRALAx1+V9H0952u3JpG31JHo29NpY2zKbQx4XFVTCuo4pjiOlhB
+ VdHI+mBwEKxtWXkx1o1G1Nw==
+Received: from [192.168.1.10] (80-60-128-215.fixed.kpn.net [80.60.128.215])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 0336f9f5-21b0-11f0-855b-005056ab7584;
+	Fri, 25 Apr 2025 10:34:36 +0200 (CEST)
+Message-ID: <a00591dd-0698-4cd1-9715-446f973b877b@xs4all.nl>
+Date: Fri, 25 Apr 2025 10:33:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-M2iEtzz0SXswas6XOl1/"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/13] media: media/test_drivers: Replace open-coded
+ parity calculation with parity_odd()
+To: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
+ andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, simona@ffwll.ch, dmitry.torokhov@gmail.com,
+ mchehab@kernel.org, awalls@md.metrocast.net, hverkuil@xs4all.nl,
+ miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+ louis.peens@corigine.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, parthiban.veerasooran@microchip.com,
+ arend.vanspriel@broadcom.com, johannes@sipsolutions.net,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, yury.norov@gmail.com,
+ akpm@linux-foundation.org, jdelvare@suse.com, linux@roeck-us.net,
+ alexandre.belloni@bootlin.com, pgaj@cadence.com
+Cc: hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk,
+ Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+ jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+ linux-input@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+ Frank.Li@nxp.com, linux-hwmon@vger.kernel.org,
+ linux-i3c@lists.infradead.org, david.laight.linux@gmail.com,
+ andrew.cooper3@citrix.com, Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250409154356.423512-1-visitorckw@gmail.com>
+ <20250409154356.423512-3-visitorckw@gmail.com>
+Content-Language: en-US, nl
+From: Hans Verkuil <hverkuil@xs4all.nl>
+In-Reply-To: <20250409154356.423512-3-visitorckw@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---=-M2iEtzz0SXswas6XOl1/
-Content-Type: multipart/alternative; boundary="=-QikyYcuC7hGo2iYfYumO"
+On 09/04/2025 17:43, Kuan-Wei Chiu wrote:
+> Refactor parity calculations to use the standard parity_odd() helper.
+> This change eliminates redundant implementations.
+> 
+> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
 
---=-QikyYcuC7hGo2iYfYumO
-Content-Type: text/plain; charset=iso-8859-5; format=flowed
-Content-Transfer-Encoding: base64
+Reviewed-by: Hans Verkuil <hverkuil@xs4all.nl>
 
-uNTV7+LQINze1tUg1NAg0tgg5dDg1eHQLg0KDQo=
+Regards,
 
---=-QikyYcuC7hGo2iYfYumO
-Content-Type: text/html; charset=iso-8859-5
-Content-Transfer-Encoding: base64
+	Hans
 
-PGRpdiBpZD0iZ2VhcnktYm9keSIgZGlyPSJhdXRvIj48ZGl2PrjU1e/i0CDc3tbVINTQINLYIOXQ
-4NXh0C48L2Rpdj48L2Rpdj4=
-
---=-QikyYcuC7hGo2iYfYumO--
-
---=-M2iEtzz0SXswas6XOl1/
-Content-Type: text/plain
-Content-Disposition: attachment; filename=trie.txt
-Content-Transfer-Encoding: base64
-
-LyoKICogQ29weXJpZ2h0IChDKSAyMDI1INCS0LDQu9C10YDQuCDQktC70LDQtNC10LIgPHZkZXZA
-bGF2YWJpdC5jb20+CiAqCiAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2Fu
-IHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IKICogbW9kaWZ5IGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0
-aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UKICogYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVl
-IFNvZnR3YXJlIEZvdW5kYXRpb247IHZlcnNpb24gMgogKiBvZiB0aGUgTGljZW5zZS4KICoKICog
-VGhpcyBwcm9ncmFtIGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQgaXQgd2lsbCBiZSB1
-c2VmdWwsCiAqIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBs
-aWVkIHdhcnJhbnR5IG9mCiAqIE1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJ
-Q1VMQVIgUFVSUE9TRS4gIFNlZSB0aGUKICogR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9y
-IG1vcmUgZGV0YWlscy4KICoKICogWW91IHNob3VsZCBoYXZlIHJlY2VpdmVkIGEgY29weSBvZiB0
-aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UKICogYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07
-IGlmIG5vdCwgd3JpdGUgdG8gdGhlIEZyZWUgU29mdHdhcmUKICogRm91bmRhdGlvbiwgSW5jLiwg
-NTEgRnJhbmtsaW4gU3RyZWV0LCBGaWZ0aCBGbG9vciwgQm9zdG9uLCBNQSAgMDIxMTAtMTMwMSwg
-VVNBLgogKi8KCi8qKgogKiBMaW5lYXIgVHJpZSBpbXBsZW1lbnRhdGlvbiBmb3IgZGlyZWN0ZWQg
-Z3JhcGhzLCBkaWN0aW9uYXJpZXMsIG9yIG90aGVyIHNlcXVlbmNlLWJhc2VkIGRhdGEuCiAqIFN1
-cHBvcnRzIGluc2VydGlvbiBhbmQgc2VhcmNoIG9mIHBhdGhzIChlLmcuLCBncmFwaCByb3V0ZXMg
-WzAsMSwyXSBvciB3b3JkcyAiY2F0IikuCiAqIFVzZXMgYml0IG1hbmlwdWxhdGlvbiBmb3IgY29t
-cGFjdCBzdG9yYWdlIGFuZCBlZmZpY2llbnQgbG9va3VwLgogKgogKiBLZXkgZmVhdHVyZXM6CiAq
-IC0gbGV0dGVyc190YWJsZTogQml0bWFzayBmb3IgYXZhaWxhYmxlIGVsZW1lbnRzIChub2RlcyBv
-ciBsZXR0ZXJzKS4KICogLSBjb3VudF91cGVyX2JpdHM6IENvbXByZXNzZXMgc2hhcmVkIHByZWZp
-eGVzIGZvciBtZW1vcnkgZWZmaWNpZW5jeS4KICogLSB3ZWlnaHQ6IFN0b3JlcyBtZXRhZGF0YSAo
-ZS5nLiwgbGF0ZW5jeSBmb3Igcm91dGVzLCBmcmVxdWVuY3kgZm9yIHdvcmRzKS4KICoKICogUG90
-ZW50aWFsIGV4dGVuc2lvbnM6CiAqIC0gQWRkIGRlbGV0ZV90cmllKCkgZm9yIHJlbW92aW5nIHBh
-dGhzLgogKiAtIEltcGxlbWVudCBhdXRvY29tcGxldGUgZm9yIHByZWZpeGVzIChlLmcuLCBhbGwg
-d29yZHMgc3RhcnRpbmcgd2l0aCAiY2EiKS4KICogLSBTdXBwb3J0IGN5Y2xlcyBpbiBncmFwaHMg
-YnkgbW9kaWZ5aW5nIHBhdGggdmFsaWRhdGlvbi4KICogLSBPcHRpbWl6ZSBmb3IgbGFyZ2UgYWxw
-aGFiZXRzIChMTEEgPiA2NCkgd2l0aCBsYXJnZXIgYml0bWFza3MuCiAqLwoKI2luY2x1ZGUgPHN0
-ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPHN0ZGludC5oPgoKI2RlZmluZSBM
-TEEgMTAwIC8vIE1heGltdW0gbnVtYmVyIG9mIGVsZW1lbnRzIChub2RlcyBpbiBncmFwaCBvciBs
-ZXR0ZXJzIGluIGFscGhhYmV0KQojZGVmaW5lIEJJVF9FTkQgKExMQSkgLy8gUG9zaXRpb24gZm9y
-IEJJVF9FTkQgbWFya2VyCgpzdHJ1Y3Qgbm9kZSB7CiAgICB1aW50NjRfdCBsZXR0ZXJzX3RhYmxl
-OyAvLyBCaXRtYXNrIGZvciBhdmFpbGFibGUgZWxlbWVudHMKICAgIHN0cnVjdCBub2RlKiBuZXh0
-OyAgICAgIC8vIFBvaW50ZXIgdG8gbmV4dCBub2RlIGluIHRoZSBsaXN0CiAgICB1aW50MzJfdCB3
-ZWlnaHQ7ICAgICAgICAvLyBXZWlnaHQgZm9yIEJJVF9FTkQgbm9kZXMgKGUuZy4sIGxhdGVuY3ks
-IGZyZXF1ZW5jeSkKfTsKCi8qKgogKiBDb3VudHMgYml0cyBzZXQgaW4gbGV0dGVyc190YWJsZSBm
-cm9tIHBvcysxIHRvIExMQS0xLgogKiBVc2VkIGZvciBwcmVmaXggY29tcHJlc3Npb24gYW5kIHNr
-aXBwaW5nIG5vZGVzLgogKi8KaW50IGNvdW50X3VwZXJfYml0cyhzdHJ1Y3Qgbm9kZSogaSwgaW50
-IHBvcykgewogICAgaW50IGNvdW50ID0gMDsKICAgIGZvciAoaW50IGogPSBwb3MgKyAxOyBqIDwg
-TExBOyBqKyspIHsKICAgICAgICBpZiAoaS0+bGV0dGVyc190YWJsZSAmICgxVUxMIDw8IGopKSB7
-CiAgICAgICAgICAgIGNvdW50Kys7CiAgICAgICAgfQogICAgfQogICAgcmV0dXJuIGNvdW50Owp9
-CgovKioKICogSW5zZXJ0cyBhIHBhdGggKHNlcXVlbmNlIG9mIGVsZW1lbnRzKSBpbnRvIHRoZSBU
-cmllLgogKiBAcGFyYW0gcm9vdCBQb2ludGVyIHRvIHRoZSByb290IG5vZGUuCiAqIEBwYXJhbSBw
-YXRoIEFycmF5IG9mIGVsZW1lbnQgSURzIChlLmcuLCBbMCwxLDJdIGZvciBncmFwaCwgWzIsMCwx
-OV0gZm9yICJjYXQiKS4KICogQHBhcmFtIHBhdGhfbGVuIExlbmd0aCBvZiB0aGUgcGF0aC4KICog
-QHBhcmFtIHdlaWdodCBXZWlnaHQgZm9yIHRoZSBwYXRoIChlLmcuLCBsYXRlbmN5LCBmcmVxdWVu
-Y3kpLgogKi8Kdm9pZCBpbnNlcnRfdHJpZShzdHJ1Y3Qgbm9kZSogcm9vdCwgaW50KiBwYXRoLCBp
-bnQgcGF0aF9sZW4sIGludCB3ZWlnaHQpIHsKICAgIHN0cnVjdCBub2RlKiBpID0gcm9vdDsKICAg
-IGZvciAoaW50IGsgPSAwOyBrIDwgcGF0aF9sZW47IGsrKykgewogICAgICAgIGludCBwb3MgPSBw
-YXRoW2tdOwogICAgICAgIGktPmxldHRlcnNfdGFibGUgfD0gKDFVTEwgPDwgcG9zKTsgLy8gU2V0
-IGJpdCBmb3IgY3VycmVudCBlbGVtZW50CiAgICAgICAgaW50IG4gPSBjb3VudF91cGVyX2JpdHMo
-aSwgcG9zKTsKICAgICAgICBpZiAobiA+IDApIHsKICAgICAgICAgICAgLy8gU2tpcCBuIG5vZGVz
-IGZvciBleGlzdGluZyBlbGVtZW50cwogICAgICAgICAgICBmb3IgKGludCBqID0gbjsgaiA+IDA7
-IGotLSkgewogICAgICAgICAgICAgICAgaSA9IGktPm5leHQ7CiAgICAgICAgICAgIH0KICAgICAg
-ICB9IGVsc2UgewogICAgICAgICAgICAvLyBDcmVhdGUgbmV3IG5vZGUgYW5kIG1haW50YWluIGxp
-c3QgaW50ZWdyaXR5CiAgICAgICAgICAgIHN0cnVjdCBub2RlKiBuZXdfbm9kZSA9IGNhbGxvYygx
-LCBzaXplb2Yoc3RydWN0IG5vZGUpKTsKICAgICAgICAgICAgaWYgKCFuZXdfbm9kZSkgewogICAg
-ICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJNZW1vcnkgYWxsb2NhdGlvbiBmYWlsZWRcbiIp
-OwogICAgICAgICAgICAgICAgZXhpdCgxKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBzdHJ1
-Y3Qgbm9kZSogdGVtcCA9IGktPm5leHQ7IC8vIFByZXNlcnZlIGN1cnJlbnQgbmV4dAogICAgICAg
-ICAgICBpLT5uZXh0ID0gbmV3X25vZGU7ICAgICAgICAgIC8vIExpbmsgbmV3IG5vZGUKICAgICAg
-ICAgICAgaSA9IGktPm5leHQ7ICAgICAgICAgICAgICAgICAvLyBNb3ZlIHRvIG5ldyBub2RlCiAg
-ICAgICAgICAgIGktPm5leHQgPSB0ZW1wOyAgICAgICAgICAgICAgLy8gUmVzdG9yZSBsaW5rIHRv
-IG9sZCBuZXh0CiAgICAgICAgfQogICAgfQogICAgLy8gTWFyayBlbmQgb2YgcGF0aCBhbmQgc2V0
-IHdlaWdodAogICAgaS0+bGV0dGVyc190YWJsZSB8PSAoMVVMTCA8PCBCSVRfRU5EKTsKICAgIGkt
-PndlaWdodCA9IHdlaWdodDsKfQoKLyoqCiAqIFNlYXJjaGVzIGZvciBhIHBhdGggaW4gdGhlIFRy
-aWUuCiAqIEBwYXJhbSByb290IFBvaW50ZXIgdG8gdGhlIHJvb3Qgbm9kZS4KICogQHBhcmFtIHBh
-dGggQXJyYXkgb2YgZWxlbWVudCBJRHMuCiAqIEBwYXJhbSBwYXRoX2xlbiBMZW5ndGggb2YgdGhl
-IHBhdGguCiAqIEBwYXJhbSB3ZWlnaHQgUG9pbnRlciB0byBzdG9yZSB0aGUgd2VpZ2h0IChpZiBm
-b3VuZCkuCiAqIEByZXR1cm4gMSBpZiBwYXRoIGV4aXN0cywgMCBvdGhlcndpc2UuCiAqLwppbnQg
-c2VhcmNoX3RyaWUoc3RydWN0IG5vZGUqIHJvb3QsIGludCogcGF0aCwgaW50IHBhdGhfbGVuLCB1
-aW50MzJfdCogd2VpZ2h0KSB7CiAgICBzdHJ1Y3Qgbm9kZSogaSA9IHJvb3Q7CiAgICBmb3IgKGlu
-dCBrID0gMDsgayA8IHBhdGhfbGVuOyBrKyspIHsKICAgICAgICBpbnQgcG9zID0gcGF0aFtrXTsK
-ICAgICAgICBpZiAoIShpLT5sZXR0ZXJzX3RhYmxlICYgKDFVTEwgPDwgcG9zKSkpIHsKICAgICAg
-ICAgICAgcmV0dXJuIDA7IC8vIEVsZW1lbnQgbm90IGZvdW5kCiAgICAgICAgfQogICAgICAgIGlu
-dCBuID0gY291bnRfdXBlcl9iaXRzKGksIHBvcyk7CiAgICAgICAgZm9yIChpbnQgaiA9IG47IGog
-PiAwOyBqLS0pIHsKICAgICAgICAgICAgaWYgKCFpLT5uZXh0KSByZXR1cm4gMDsKICAgICAgICAg
-ICAgaSA9IGktPm5leHQ7CiAgICAgICAgfQogICAgfQogICAgaWYgKGktPmxldHRlcnNfdGFibGUg
-JiAoMVVMTCA8PCBCSVRfRU5EKSkgewogICAgICAgICp3ZWlnaHQgPSBpLT53ZWlnaHQ7CiAgICAg
-ICAgcmV0dXJuIDE7IC8vIFBhdGggZm91bmQKICAgIH0KICAgIHJldHVybiAwOyAvLyBQYXRoIG5v
-dCBmb3VuZAp9CgovKioKICogRnJlZXMgdGhlIFRyaWUgbWVtb3J5LgogKiBAcGFyYW0gcm9vdCBQ
-b2ludGVyIHRvIHRoZSByb290IG5vZGUuCiAqLwp2b2lkIGZyZWVfdHJpZShzdHJ1Y3Qgbm9kZSog
-cm9vdCkgewogICAgaWYgKCFyb290KSByZXR1cm47CiAgICBmcmVlX3RyaWUocm9vdC0+bmV4dCk7
-CiAgICBmcmVlKHJvb3QpOwp9CgovKioKICogRXhhbXBsZSB1c2FnZSAoY2FuIGJlIHJlbW92ZWQg
-b3IgZXh0ZW5kZWQgYnkgY29tbXVuaXR5KS4KICovCmludCBtYWluKCkgewogICAgc3RydWN0IG5v
-ZGUqIHJvb3QgPSBjYWxsb2MoMSwgc2l6ZW9mKHN0cnVjdCBub2RlKSk7CiAgICBpZiAoIXJvb3Qp
-IHsKICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIk1lbW9yeSBhbGxvY2F0aW9uIGZhaWxlZFxuIik7
-CiAgICAgICAgcmV0dXJuIDE7CiAgICB9CgogICAgLy8gRXhhbXBsZTogSW5zZXJ0IGdyYXBoIHBh
-dGhzCiAgICBpbnQgcGF0aDFbXSA9IHswLCAxfTsgICAgIC8vIFBhdGggMC0+MQogICAgaW50IHBh
-dGgyW10gPSB7MSwgMn07ICAgICAvLyBQYXRoIDEtPjIKICAgIGludCBwYXRoM1tdID0gezAsIDEs
-IDJ9OyAgLy8gUGF0aCAwLT4xLT4yCiAgICBpbnNlcnRfdHJpZShyb290LCBwYXRoMSwgMiwgMTAp
-OyAgLy8gV2VpZ2h0OiAxMAogICAgaW5zZXJ0X3RyaWUocm9vdCwgcGF0aDIsIDIsIDE1KTsgIC8v
-IFdlaWdodDogMTUKICAgIGluc2VydF90cmllKHJvb3QsIHBhdGgzLCAzLCAyNSk7ICAvLyBXZWln
-aHQ6IDI1CgogICAgLy8gRXhhbXBsZTogU2VhcmNoIHBhdGhzCiAgICB1aW50MzJfdCB3ZWlnaHQ7
-CiAgICBpZiAoc2VhcmNoX3RyaWUocm9vdCwgcGF0aDEsIDIsICZ3ZWlnaHQpKSB7CiAgICAgICAg
-cHJpbnRmKCJQYXRoIFswLDFdIGZvdW5kLCB3ZWlnaHQ6ICV1XG4iLCB3ZWlnaHQpOwogICAgfSBl
-bHNlIHsKICAgICAgICBwcmludGYoIlBhdGggWzAsMV0gbm90IGZvdW5kXG4iKTsKICAgIH0KICAg
-IGludCBwYXRoNFtdID0gezAsIDJ9OwogICAgaWYgKHNlYXJjaF90cmllKHJvb3QsIHBhdGg0LCAy
-LCAmd2VpZ2h0KSkgewogICAgICAgIHByaW50ZigiUGF0aCBbMCwyXSBmb3VuZCwgd2VpZ2h0OiAl
-dVxuIiwgd2VpZ2h0KTsKICAgIH0gZWxzZSB7CiAgICAgICAgcHJpbnRmKCJQYXRoIFswLDJdIG5v
-dCBmb3VuZFxuIik7CiAgICB9CgogICAgZnJlZV90cmllKHJvb3QpOwogICAgcmV0dXJuIDA7Cn0K
-
---=-M2iEtzz0SXswas6XOl1/--
-
+> ---
+>  drivers/media/test-drivers/vivid/vivid-vbi-gen.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/media/test-drivers/vivid/vivid-vbi-gen.c b/drivers/media/test-drivers/vivid/vivid-vbi-gen.c
+> index 70a4024d461e..5e1b7b1742e4 100644
+> --- a/drivers/media/test-drivers/vivid/vivid-vbi-gen.c
+> +++ b/drivers/media/test-drivers/vivid/vivid-vbi-gen.c
+> @@ -5,6 +5,7 @@
+>   * Copyright 2014 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
+>   */
+>  
+> +#include <linux/bitops.h>
+>  #include <linux/errno.h>
+>  #include <linux/kernel.h>
+>  #include <linux/ktime.h>
+> @@ -165,12 +166,7 @@ static const u8 vivid_cc_sequence2[30] = {
+>  
+>  static u8 calc_parity(u8 val)
+>  {
+> -	unsigned i;
+> -	unsigned tot = 0;
+> -
+> -	for (i = 0; i < 7; i++)
+> -		tot += (val & (1 << i)) ? 1 : 0;
+> -	return val | ((tot & 1) ? 0 : 0x80);
+> +	return val | (parity_odd(val) ? 0 : 0x80);
+>  }
+>  
+>  static void vivid_vbi_gen_set_time_of_day(u8 *packet)
 
 
