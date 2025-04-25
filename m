@@ -1,119 +1,106 @@
-Return-Path: <netdev+bounces-185947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822A4A9C402
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:42:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B4AA9C419
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDFE7B8312
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9B0467E6A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582EA230BC2;
-	Fri, 25 Apr 2025 09:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137912367A7;
+	Fri, 25 Apr 2025 09:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Spy4YpiG"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134F6221540;
-	Fri, 25 Apr 2025 09:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D938233721
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 09:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745574099; cv=none; b=nU0O0cPJxkQ+tj8+Bwq+LwhcS93FSgAsetL0ydX2bxO8w+lYoVNDewxOgaoNVsiv0ir36V7Gkz0sSD+GK42HgVNnpWsxWxaH4BatcF+ALQlwZd32Q9d4u/hc3XtEVUEQiJfQ0Sw+p6KAguvW+kqqgbiyNYFswmUtlLJQ9cfDS/w=
+	t=1745574415; cv=none; b=i9me9zf//hY8Wh784E0TUn5819exdHoqsSkSK4IVCPIybKRF7nJV50jG6vruGOub30BbYScTPBTFFIT1zuGD3MzHouOpPZ+8CxMBdFNgSi/YYGFSpRTmrv7OTx8T40W3/ApQN/P8TJ8DNXdXNTUocyXKalPNJoqezd3Z8US9JuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745574099; c=relaxed/simple;
-	bh=nmlAACPdyi1o/ejLELZQWZEK1WfkrRpmg/mY+BUQcfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AF3fPpulRF39of7lEaDDbcJ9Ek7U3QegvMmRPbGz4QtC+ITpNvqquwwoeloBNoxd7/lk5jBAKgO6aHWdn5gHp+UoJuQ4O7hJnWGT2PzXR59KTcMT4SeaXERddK8bfKF2Z3tpS0bR34JRyypH+ZYKUcouYW8U1NlC7+BPIe1lDvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4A941BCA;
-	Fri, 25 Apr 2025 02:41:29 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4511E3F59E;
-	Fri, 25 Apr 2025 02:41:32 -0700 (PDT)
-Date: Fri, 25 Apr 2025 10:41:28 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Chen-Yu Tsai <wens@csie.org>
-Cc: Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Jernej
- Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
- Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Corentin Labbe <clabbe.montjoie@gmail.com>,
- <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-sunxi@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet
- MAC
-Message-ID: <20250425104128.14f953f3@donnerap.manchester.arm.com>
-In-Reply-To: <CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
-	<20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
-	<CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1745574415; c=relaxed/simple;
+	bh=+v7I5BfsAnpI3Ghl6PqO0VR1yzMNwIO2yDsIR04w+N4=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=SodmwpRahazFDSNUBgnS1LEGDam03JVnH7NHC7zmQGGfN8OP6P9rK2e/m43ctg/GHPFV3SgAwvP20W5TOXlL0dGa/CiT8oMHdzOohoC5Lb1stXsi0y+wmh5V2ZPa+rLeBlnS8oK9VLCxLz0sX8WV9VTrbYHrgoHh2ifqNdFv3H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Spy4YpiG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745574411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1sOZGGLjYzY6quFmu6RJ8chWL/8DejjBW+kNPKkZQ5w=;
+	b=Spy4YpiGuqLMmmb6n8vL/1WoVLsCj4MwTavp8xZX8qD1qppZBO8bpAlcCWtdpestcfgv+X
+	iMDiJKKNjeSn0MBIQkGsP1bAptC5EtH+PvbqTB7eyIKCLmJJ+AQQ2LcCZlB5g+4UnI4KTA
+	yqrNr6Ni0HHvlCstC6TRtDwagdn2wG4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649--7fs-_SNPk-MxCB5TQKlmQ-1; Fri,
+ 25 Apr 2025 05:46:48 -0400
+X-MC-Unique: -7fs-_SNPk-MxCB5TQKlmQ-1
+X-Mimecast-MFC-AGG-ID: -7fs-_SNPk-MxCB5TQKlmQ_1745574407
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 22B94195608C;
+	Fri, 25 Apr 2025 09:46:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B56C318001EF;
+	Fri, 25 Apr 2025 09:46:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <7b468f16-f648-4432-aa59-927d37a411a7@lunn.ch>
+References: <7b468f16-f648-4432-aa59-927d37a411a7@lunn.ch> <3452224.1745518016@warthog.procyon.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+    Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+    Tony Nguyen <anthony.l.nguyen@intel.com>,
+    Paulo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: Is it possible to undo the ixgbe device name change?
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3616571.1745574403.1@warthog.procyon.org.uk>
+Date: Fri, 25 Apr 2025 10:46:43 +0100
+Message-ID: <3616572.1745574403@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, 25 Apr 2025 13:26:25 +0800
-Chen-Yu Tsai <wens@csie.org> wrote:
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Hi Chen-Yu,
+> It is systemd which later renames it to enp1s0 or enp1s0np0. If you
+> ask me, you are talking to the wrong people.
 
-> On Thu, Apr 24, 2025 at 6:09=E2=80=AFPM Yixun Lan <dlan@gentoo.org> wrote:
-> >
-> > Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
-> > including the A527/T527 chips. MAC0 is compatible to the A64 chip which
-> > requires an external PHY. This patch only add RGMII pins for now.
-> >
-> > Signed-off-by: Yixun Lan <dlan@gentoo.org>
-> > ---
-> >  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 40 ++++++++++++++++++=
-++++++++
-> >  1 file changed, 40 insertions(+)
-> >
-> > diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm6=
-4/boot/dts/allwinner/sun55i-a523.dtsi
-> > index ee485899ba0af69f32727a53de20051a2e31be1d..c9a9b9dd479af05ba22fe9d=
-783e32f6d61a74ef7 100644
-> > --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> > +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> > @@ -126,6 +126,15 @@ pio: pinctrl@2000000 {
-> >                         interrupt-controller;
-> >                         #interrupt-cells =3D <3>;
-> >
-> > +                       rgmii0_pins: rgmii0-pins {
-> > +                               pins =3D "PH0", "PH1", "PH2", "PH3", "P=
-H4",
-> > +                                      "PH5", "PH6", "PH7", "PH9", "PH1=
-0",
-> > +                                      "PH14", "PH15", "PH16", "PH17", =
-"PH18";
-> > +                               allwinner,pinmux =3D <5>;
-> > +                               function =3D "emac0";
-> > +                               drive-strength =3D <40>; =20
->=20
-> We should probably add
->=20
->                                   bias-disable;
->=20
-> to explicitly turn off pull-up and pull-down.
+Aha!  It can be configured with systemd-udev.
 
-Should we? I don't see this anywhere else for sunxi, probably because it is
-the (reset) default (0b00).
-I wonder if we have a hidden assumption about this? As in: if no bias is
-specified, we assume bias-disable? Then we should maybe enforce this is in
-the driver?
+See https://systemd.io/PREDICTABLE_INTERFACE_NAMES/
 
-Cheers,
-Andre
+And also "man systemd.link".
+
+# cat /etc/systemd/network/10-testnet.link
+[Match]
+MACAddress=00:11:22:33:44:55  <--- your MAC address here
+[Link]
+Description=Test Network
+Name=enp1s0  <--- the name you want here
+
+
+David
+
 
