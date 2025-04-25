@@ -1,128 +1,143 @@
-Return-Path: <netdev+bounces-185835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0321CA9BD44
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:37:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827C2A9BD50
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BFE92189F
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 03:37:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96AC13BE2CE
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 03:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D11183CA6;
-	Fri, 25 Apr 2025 03:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FD11B4132;
+	Fri, 25 Apr 2025 03:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EQuh1lqB"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="h6tkGPZf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A2C25771;
-	Fri, 25 Apr 2025 03:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36E5144304;
+	Fri, 25 Apr 2025 03:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745552255; cv=none; b=i8VCyx0Q7QfcoZEOr16M1e2L1O98Et33JCWT/dQ+qpL6ZGIWFCVwYteyY5oyq4OuTUT4ZEQw/1j3jGRdb0PwWblb0UKFewAsZvoy/abIJw+zW1ZaZPEuvXbVgTfbeedMOgCL7qtAWHoRywFV0Eb5jOvBhdhbllFVV2IAPnSInYE=
+	t=1745552725; cv=none; b=cC+8pVzYVlqcpY/3qUgJucQPZlyZQGBRyQP059KQx2ToW79uqM8dlWCWn1PDeawgna+jUbhmvOhG/got1PnG2JZQK1dEt8ZzLkLF5VikoEkeACmGxR2S/X83XPq5ObOcxvex7/nyIqf7CX4HCWuziebQOFZUfqWzrM8+CstF+0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745552255; c=relaxed/simple;
-	bh=tX+IWUlIERPsv8gkrnAvi8wVokUQZ8j2rGKLLycOZNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iAHAPSXNl4vZx6dfFCe+5GzonpxenDVWdo4UUk9RYfY1HQTErpaNBzIVyYl4mO5cV4BuljCRdYcrppxKmtV3DrZu7NV8jCEe9hni7WsAynWH4NQo5b3RnqD46Jey48YkLZKHT3xw9fdvOF10raW9BTXxVUSgGMxocQDdfl0L9r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EQuh1lqB; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745552253; x=1777088253;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tX+IWUlIERPsv8gkrnAvi8wVokUQZ8j2rGKLLycOZNk=;
-  b=EQuh1lqBZEtrrEtIJvMaH70biiZGtA0WG4JMdiLU/7Ag2JyzNb3OTn+E
-   uCT3Yed4Crgbw4kWgyyR+2nVSTjDitie7nXqfYdRhNTc0mG0MEtEGIxva
-   ZjRT+SD9I4D64fg/LssfgHYW3dLxxwqADPl2q53vYbl+d+hEA1Gi/UeEo
-   aSwRef0eyWdnxWfihxD89n/Ds52xRKp7ph9AKtJzA9huWgVR3tG0pagZY
-   dVsvAFycn2oURHc22enltU8byYf25/DMlO1Q5Sr1Ew/O+0+sp2e6Wplb+
-   3nZdteOm5gJlttEhtmzUl0afndUOpfs+nMqwdV4mSq4Yn6YleGieX9MAe
-   Q==;
-X-CSE-ConnectionGUID: IdPxhVSYTwiw3ISpAN2n2A==
-X-CSE-MsgGUID: lYlvfu3+RCKPfKyxC0EnVg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="64737033"
-X-IronPort-AV: E=Sophos;i="6.15,237,1739865600"; 
-   d="scan'208";a="64737033"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 20:37:32 -0700
-X-CSE-ConnectionGUID: rDFmjDsNSUGs6S7/iVhGpg==
-X-CSE-MsgGUID: y+1FxILsRhSp5KCZ5SYLLA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,237,1739865600"; 
-   d="scan'208";a="133105324"
-Received: from lkp-server01.sh.intel.com (HELO 050dd05385d1) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 24 Apr 2025 20:37:28 -0700
-Received: from kbuild by 050dd05385d1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u89sU-0004oV-03;
-	Fri, 25 Apr 2025 03:37:26 +0000
-Date: Fri, 25 Apr 2025 11:36:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/8] mfd: Add Microchip ZL3073x support
-Message-ID: <202504251112.NvSTD02Y-lkp@intel.com>
-References: <20250424154722.534284-4-ivecera@redhat.com>
+	s=arc-20240116; t=1745552725; c=relaxed/simple;
+	bh=GCsuJBHrLb8OOsw0Nrc363phMun5O+wCt6+3FMpkJQo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=lJx8m28YeK2c0ANh1LGU6keZyNdiIQ+pOZdvLVRgMX9wMY5xmv0GocMlPNBml9t8GJbqQA9jwODQ1eFx91Db5Vko+RlZUjqVjZZEy2k0vmErs0NlQ6jmSAF0dkHuQyB75fc5hOotHivgORAcw3HUGtShWvxyeJyhv50CnaPDW2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=h6tkGPZf; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [IPV6:2601:646:8081:1f93:ace:6989:11eb:d5d3] ([IPv6:2601:646:8081:1f93:ace:6989:11eb:d5d3])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53P3iRFQ2047105
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 24 Apr 2025 20:44:27 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53P3iRFQ2047105
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745552672;
+	bh=b2EU0c9r4+7Z91N6+uKj1oR80E0vF0IHEbyiUhJnLQA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=h6tkGPZf95yQ3bAcYVi/++g5apF9dA+xDaGqiCLYRc9VcHVlrJdGQsg4l29MEZ7CJ
+	 aLVdgM7ERZdGZm+YeYHxkaRoWYmC139k7kZqYZoAzT/znx6Kx6O2GtZpDA/JUfvlJ1
+	 CcsBsfRHddjbpCzdM4zIuzpA7epwqsOqTiZB4ua/CkyilKNABnOQlavSOZxha0+wfj
+	 cX6ckW2WvvNyLFS1B2A5lWVYkYGzgGJhfmVN53iSVa6vyOu/NY5xsXrNsSQKXTH85b
+	 +dwG+fJzWTGalgBqhI1nG1clXUnlMv9jRJvaiZN9wKeE5vSAPLzqIsZZs/a531ezoe
+	 HihwH9Nv3ITtg==
+Message-ID: <72516271-5b28-434a-838b-d8532e1b4fc1@zytor.com>
+Date: Thu, 24 Apr 2025 20:44:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424154722.534284-4-ivecera@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        Xin Li
+ <xin@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
+        andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+ <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+ <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
+Content-Language: en-US
+In-Reply-To: <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Ivan,
+On 4/24/25 18:15, H. Peter Anvin wrote:
+> On 4/24/25 01:14, Jürgen Groß wrote:
+>>>
+>>> Actually, that is how we get this patch with the existing alternatives
+>>> infrastructure.  And we took a step further to also remove the pv_ops
+>>> MSR APIs...
+>>
+>> And this is what I'm questioning. IMHO this approach is adding more
+>> code by removing the pv_ops MSR_APIs just because "pv_ops is bad". And
+>> I believe most refusal of pv_ops is based on no longer valid reasoning.
+>>
+> 
+> pvops are a headache because it is effectively a secondary alternatives 
+> infrastructure that is incompatible with the alternatives one...
+> 
+>>> It looks to me that you want to add a new facility to the alternatives
+>>> infrastructure first?
+>>
+>> Why would we need a new facility in the alternatives infrastructure?
+> 
+> I'm not sure what Xin means with "facility", but a key motivation for 
+> this is to:
+> 
+> a. Avoid using the pvops for MSRs when on the only remaining user 
+> thereof (Xen) is only using it for a very small subset of MSRs and for 
+> the rest it is just overhead, even for Xen;
+> 
+> b. Being able to do wrmsrns immediate/wrmsrns/wrmsr and rdmsr immediate/ 
+> rdmsr alternatives.
+> 
+> Of these, (b) is by far the biggest motivation. The architectural 
+> direction for supervisor states is to avoid ad hoc and XSAVES ISA and 
+> instead use MSRs. The immediate forms are expected to be significantly 
+> faster, because they make the MSR index available at the very beginning 
+> of the pipeline instead of at a relatively late stage.
+> 
 
-kernel test robot noticed the following build warnings:
+Note that to support the immediate forms, we *must* do these inline, or 
+the const-ness of the MSR index -- which applies to by far the vast 
+majority of MSR references -- gets lost. pvops does exactly that.
 
-[auto build test WARNING on net-next/main]
+Furthermore, the MSR immediate instructions take a 64-bit number in a 
+single register; as these instructions are by necessity relatively long, 
+it makes sense for the alternative sequence to accept a 64-bit input 
+register and do the %eax/%edx shuffle in the legacy fallback code... we 
+did a bunch of experiments to see what made most sense.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-Add-DPLL-device-and-pin/20250424-235141
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250424154722.534284-4-ivecera%40redhat.com
-patch subject: [PATCH net-next v4 3/8] mfd: Add Microchip ZL3073x support
-reproduce: (https://download.01.org/0day-ci/archive/20250425/202504251112.NvSTD02Y-lkp@intel.com/reproduce)
+	-hpa
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504251112.NvSTD02Y-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   Warning: Documentation/translations/ja_JP/process/submit-checklist.rst references a file that doesn't exist: Documentation/translations/ja_JP/SubmitChecklist
-   Warning: Documentation/translations/zh_CN/admin-guide/README.rst references a file that doesn't exist: Documentation/dev-tools/kgdb.rst
-   Warning: Documentation/translations/zh_CN/dev-tools/gdb-kernel-debugging.rst references a file that doesn't exist: Documentation/dev-tools/gdb-kernel-debugging.rst
-   Warning: Documentation/translations/zh_TW/admin-guide/README.rst references a file that doesn't exist: Documentation/dev-tools/kgdb.rst
-   Warning: Documentation/translations/zh_TW/dev-tools/gdb-kernel-debugging.rst references a file that doesn't exist: Documentation/dev-tools/gdb-kernel-debugging.rst
->> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/dpll/microchip,zl3073x*.yaml
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/leds/backlight/ti,lp8864.yaml
-   Can't build as 1 mandatory dependency is missing at ./scripts/sphinx-pre-install line 984.
-   make[2]: *** [Documentation/Makefile:121: htmldocs] Error 255
-   make[1]: *** [Makefile:1804: htmldocs] Error 2
-   make: *** [Makefile:248: __sub-make] Error 2
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
