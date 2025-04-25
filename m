@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-185855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9A0A9BE74
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:09:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4077A9BE75
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:09:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A90F316A105
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:08:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3D35178ADA
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D7E22C34A;
-	Fri, 25 Apr 2025 06:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E512F22B8C2;
+	Fri, 25 Apr 2025 06:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YLGHdf2S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="icIexWG0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC7722C35D
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 06:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9AF22CBC9
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 06:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745561314; cv=none; b=dQdAKbySWgkjS1Fj9oTwBONmIQdI0/V3vrSqxSN/xkJEhx+FBzn/9U/+yKksBBqjwNd3mtXcvys2f2WLPqXSvArjlVpnHVpvvuxLFupkckfSJ76roJl8BitCJ5N+Y7xMcdQIcKLRDVzXCCwUyQG106V1W0ZbEYJ5fyTc9yDqUZE=
+	t=1745561316; cv=none; b=Jb9GAcwoLh+SZ8vaE2jQou/9z9m5qAS3Iy9z5YFc17jPIle5t0LwagTrZfE90014xDdC2MSEglNapuXDOQDU5FJF/4HaEDliNnx9UnZ27oIvb5lsSHWQcT5fbRwWW19iaeZiBar5o7iqyP5b87H9ItsF3IgRMW9xplY2SDbzL88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745561314; c=relaxed/simple;
-	bh=adepmYRErabGIQ3OCWTZ1yvk6/mgZTTVl6bOWhosxxo=;
+	s=arc-20240116; t=1745561316; c=relaxed/simple;
+	bh=jAg/40in19GYDbgk6D3oK2wpbqw+hw8XtWQ4vs/PfYY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mr27iXhn9kgP5BhGghmLBZb8zbRk1mYhHR53Rlbex4ek6ZLgr3W5B1pIt5DWk7m1ApGGablgpaG7+0uf5/KyU0No/tplG9Pt0DHFMwJL060JZRkPfBBXEllTRPx7X8MkPGhzTUYpW9+QkgDMsnSrutVl62Gd2gP9xgh3/GBVzSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YLGHdf2S; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=B0u+077j1rnPrmxCvtBlLD7/FX5TNTDlC0X6KPktnWLfjIhO2ZVkpwXr9KTu0roM28YUb8UVvON5tsxJk7PnTHABzvMlEbAybLICmBlo9J/TBHuzX4kI+Lz7hVwH+AcBgac7er/+jqO1DvrGrsa55m+0h9BCfq5ZvvgaAjNu3+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=icIexWG0; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745561311; x=1777097311;
+  t=1745561313; x=1777097313;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=adepmYRErabGIQ3OCWTZ1yvk6/mgZTTVl6bOWhosxxo=;
-  b=YLGHdf2SMTgs/63j3UBI678Uc9Ds2RnecXPAJy75s7l7Gk5yDAWQ0J/0
-   yQscM8vC4fTgK0Nmb7jdYc83Oi88dMiFSEBIMpsXNd2251nr+ocpkDqrj
-   eXCZvHPYOyrvyPnxGpdNP+WRnE9nXyITZOfHy5UNQomrCANjFIEfERmyC
-   jKn0zur/qn+5Xs6OCtVSLLDAVyAjMJXOJ8IGu5GycNpC46BXlJnNZTBVv
-   jT+wWeVjjhZ/2Vf/kwYqhQ1JeA3DIRKwVJe4anPCNrtIretDvmmg3a1ZG
-   67haWHfaV+AtYibpLTD7CGjP+a1SEZXiA2c4E69pyWnaz9ChbfwDVdzaX
-   Q==;
-X-CSE-ConnectionGUID: vrKCxakARvy8MVn98CgatQ==
-X-CSE-MsgGUID: BxSwi1icQkKea9SgYx5sGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="58578920"
+  bh=jAg/40in19GYDbgk6D3oK2wpbqw+hw8XtWQ4vs/PfYY=;
+  b=icIexWG0sIP51dGri5AU7iVLAejyKjm9SEhspHuZ+/xIjCKX8is4+jDG
+   unv2qJpEbNQKBzZMgoN7IFFbLtfB+jRAY7bap7imFme6jUzpQxBKZAxS0
+   qog4qv94PKc+2eTt3xxOcD9vs2tYnL1qJxkqZs2K8vfVlWQl08VyhbjdC
+   nG+Uw47RRpGMsbcNRIGh7QGF8KYW5Tr679/JK9uTTsGMN3W9JoFjjt0Ir
+   H2XnEBQGORfL6eHJD5fw6JSSozpkokWdxRTo58Ar1IqHjdHYyCwbW6tcS
+   wCDc/sbmPiUH4c5gmcC4OFl2cXgQz00CMzHKKUgPpk+Y90DFTXKyBCQwU
+   g==;
+X-CSE-ConnectionGUID: ktR3j/biT+qHYtVkNpdJUQ==
+X-CSE-MsgGUID: +/W8F3z0QheNYxdKWgx3aA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="58578922"
 X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="58578920"
+   d="scan'208";a="58578922"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:08:31 -0700
-X-CSE-ConnectionGUID: WZzXGxD2ReeHYYfNTiPc9A==
-X-CSE-MsgGUID: ftH3LtfsRl2ZmIKtClzZPQ==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:08:33 -0700
+X-CSE-ConnectionGUID: q+le1ZscQB2VnjX5udZorA==
+X-CSE-MsgGUID: wf10QZaMSzKgAotToTXrfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="132703200"
+   d="scan'208";a="132703211"
 Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by orviesa010.jf.intel.com with ESMTP; 24 Apr 2025 23:08:29 -0700
+  by orviesa010.jf.intel.com with ESMTP; 24 Apr 2025 23:08:32 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -68,9 +68,9 @@ Cc: netdev@vger.kernel.org,
 	jedrzej.jagielski@intel.com,
 	larysa.zaremba@intel.com,
 	anthony.l.nguyen@intel.com
-Subject: [iwl-next v3 6/8] ice: use libie_aq_str
-Date: Fri, 25 Apr 2025 08:08:07 +0200
-Message-ID: <20250425060809.3966772-7-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v3 7/8] iavf: use libie_aq_str
+Date: Fri, 25 Apr 2025 08:08:08 +0200
+Message-ID: <20250425060809.3966772-8-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20250425060809.3966772-1-michal.swiatkowski@linux.intel.com>
 References: <20250425060809.3966772-1-michal.swiatkowski@linux.intel.com>
@@ -82,651 +82,156 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simple:
-s/ice_aq_str/libie_aq_str
+There is no need to store the err string in hw->err_str. Simplify it and
+use common helper. hw->err_str is still used for other purpouse.
 
-Add libie_aminq module in ice Kconfig.
+It should be marked that previously for unknown error the numeric value
+was passed as a string. Now the "LIBIE_AQ_RC_UNKNOWN" is used for such
+cases.
+
+Add libie_aminq module in iavf Kconfig.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
  drivers/net/ethernet/intel/Kconfig            |  1 +
- drivers/net/ethernet/intel/ice/ice.h          |  1 -
- .../net/ethernet/intel/ice/devlink/devlink.c  | 10 +--
- .../net/ethernet/intel/ice/devlink/health.c   |  2 +-
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 20 +++---
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 12 ++--
- .../net/ethernet/intel/ice/ice_fw_update.c    | 20 +++---
- drivers/net/ethernet/intel/ice/ice_lib.c      |  4 +-
- drivers/net/ethernet/intel/ice/ice_main.c     | 69 +++----------------
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  4 +-
- .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 24 +++----
- 11 files changed, 59 insertions(+), 108 deletions(-)
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |  1 -
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 52 -------------------
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  5 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  2 +-
+ 5 files changed, 5 insertions(+), 56 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 5a331c1c76cb..d5de9bc8b1b6 100644
+index d5de9bc8b1b6..29c03a9ce145 100644
 --- a/drivers/net/ethernet/intel/Kconfig
 +++ b/drivers/net/ethernet/intel/Kconfig
-@@ -294,6 +294,7 @@ config ICE
- 	select AUXILIARY_BUS
- 	select DIMLIB
+@@ -260,6 +260,7 @@ config I40E_DCB
+ config IAVF
+ 	tristate
  	select LIBIE
 +	select LIBIE_ADMINQ
- 	select NET_DEVLINK
- 	select PACKING
- 	select PLDMFW
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index a1d9cc8ddad5..0693707ceabf 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -971,7 +971,6 @@ int ice_plug_aux_dev(struct ice_pf *pf);
- void ice_unplug_aux_dev(struct ice_pf *pf);
- int ice_init_rdma(struct ice_pf *pf);
- void ice_deinit_rdma(struct ice_pf *pf);
--const char *ice_aq_str(enum libie_aq_err aq_err);
- bool ice_is_wol_supported(struct ice_hw *hw);
- void ice_fdir_del_all_fltrs(struct ice_vsi *vsi);
- int
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index fcb199efbea5..ca24714c8131 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -293,7 +293,7 @@ static int ice_devlink_info_get(struct devlink *devlink,
- 	err = ice_discover_dev_caps(hw, &ctx->dev_caps);
- 	if (err) {
- 		dev_dbg(dev, "Failed to discover device capabilities, status %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Unable to discover device capabilities");
- 		goto out_free_ctx;
- 	}
-@@ -302,7 +302,7 @@ static int ice_devlink_info_get(struct devlink *devlink,
- 		err = ice_get_inactive_orom_ver(hw, &ctx->pending_orom);
- 		if (err) {
- 			dev_dbg(dev, "Unable to read inactive Option ROM version data, status %d aq_err %s\n",
--				err, ice_aq_str(hw->adminq.sq_last_status));
-+				err, libie_aq_str(hw->adminq.sq_last_status));
+ 	select NET_SHAPER
  
- 			/* disable display of pending Option ROM */
- 			ctx->dev_caps.common_cap.nvm_update_pending_orom = false;
-@@ -313,7 +313,7 @@ static int ice_devlink_info_get(struct devlink *devlink,
- 		err = ice_get_inactive_nvm_ver(hw, &ctx->pending_nvm);
- 		if (err) {
- 			dev_dbg(dev, "Unable to read inactive NVM version data, status %d aq_err %s\n",
--				err, ice_aq_str(hw->adminq.sq_last_status));
-+				err, libie_aq_str(hw->adminq.sq_last_status));
+ config I40EVF
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_prototype.h b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+index 34b5ed87a9aa..7f9f9dbf959a 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_prototype.h
++++ b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+@@ -34,7 +34,6 @@ void iavf_debug_aq(struct iavf_hw *hw, enum iavf_debug_mask mask,
  
- 			/* disable display of pending Option ROM */
- 			ctx->dev_caps.common_cap.nvm_update_pending_nvm = false;
-@@ -324,7 +324,7 @@ static int ice_devlink_info_get(struct devlink *devlink,
- 		err = ice_get_inactive_netlist_ver(hw, &ctx->pending_netlist);
- 		if (err) {
- 			dev_dbg(dev, "Unable to read inactive Netlist version data, status %d aq_err %s\n",
--				err, ice_aq_str(hw->adminq.sq_last_status));
-+				err, libie_aq_str(hw->adminq.sq_last_status));
+ bool iavf_check_asq_alive(struct iavf_hw *hw);
+ enum iavf_status iavf_aq_queue_shutdown(struct iavf_hw *hw, bool unloading);
+-const char *iavf_aq_str(struct iavf_hw *hw, enum libie_aq_err aq_err);
+ const char *iavf_stat_str(struct iavf_hw *hw, enum iavf_status stat_err);
  
- 			/* disable display of pending Option ROM */
- 			ctx->dev_caps.common_cap.nvm_update_pending_netlist = false;
-@@ -440,7 +440,7 @@ ice_devlink_reload_empr_start(struct ice_pf *pf,
- 	err = ice_aq_nvm_update_empr(hw);
- 	if (err) {
- 		dev_err(dev, "Failed to trigger EMP device reset to reload firmware, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to trigger EMP device reset to reload firmware");
- 		return err;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index b149b8185449..ab519c0f28bf 100644
---- a/drivers/net/ethernet/intel/ice/devlink/health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -204,7 +204,7 @@ static void ice_config_health_events(struct ice_pf *pf, bool enable)
- 	if (ret)
- 		dev_err(ice_pf_to_dev(pf), "Failed to %s firmware health events, err %d aq_err %s\n",
- 			str_enable_disable(enable), ret,
--			ice_aq_str(pf->hw.adminq.sq_last_status));
-+			libie_aq_str(pf->hw.adminq.sq_last_status));
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 9fc50bb3f35a..2683ccb0230f 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -155,7 +155,7 @@ ice_dpll_pin_freq_set(struct ice_pf *pf, struct ice_dpll_pin *pin,
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to set pin freq:%u on pin:%u",
- 				   ret,
--				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   libie_aq_str(pf->hw.adminq.sq_last_status),
- 				   freq, pin->idx);
- 		return ret;
- 	}
-@@ -462,7 +462,7 @@ ice_dpll_pin_enable(struct ice_hw *hw, struct ice_dpll_pin *pin,
- 	if (ret)
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to enable %s pin:%u",
--				   ret, ice_aq_str(hw->adminq.sq_last_status),
-+				   ret, libie_aq_str(hw->adminq.sq_last_status),
- 				   pin_type_name[pin_type], pin->idx);
- 
- 	return ret;
-@@ -507,7 +507,7 @@ ice_dpll_pin_disable(struct ice_hw *hw, struct ice_dpll_pin *pin,
- 	if (ret)
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to disable %s pin:%u",
--				   ret, ice_aq_str(hw->adminq.sq_last_status),
-+				   ret, libie_aq_str(hw->adminq.sq_last_status),
- 				   pin_type_name[pin_type], pin->idx);
- 
- 	return ret;
-@@ -686,13 +686,13 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to update %s pin:%u",
- 				   ret,
--				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   libie_aq_str(pf->hw.adminq.sq_last_status),
- 				   pin_type_name[pin_type], pin->idx);
- 	else
- 		dev_err_ratelimited(ice_pf_to_dev(pf),
- 				    "err:%d %s failed to update %s pin:%u\n",
- 				    ret,
--				    ice_aq_str(pf->hw.adminq.sq_last_status),
-+				    libie_aq_str(pf->hw.adminq.sq_last_status),
- 				    pin_type_name[pin_type], pin->idx);
- 	return ret;
- }
-@@ -725,7 +725,7 @@ ice_dpll_hw_input_prio_set(struct ice_pf *pf, struct ice_dpll *dpll,
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to set pin prio:%u on pin:%u",
- 				   ret,
--				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   libie_aq_str(pf->hw.adminq.sq_last_status),
- 				   prio, pin->idx);
- 	else
- 		dpll->input_prio[pin->idx] = prio;
-@@ -1586,7 +1586,7 @@ ice_dpll_pin_phase_adjust_set(const struct dpll_pin *pin, void *pin_priv,
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to set pin phase_adjust:%d for pin:%u on dpll:%u",
- 				   ret,
--				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   libie_aq_str(pf->hw.adminq.sq_last_status),
- 				   phase_adjust, p->idx, d->dpll_idx);
- 
- 	return ret;
-@@ -2092,7 +2092,7 @@ ice_dpll_rclk_state_on_pin_set(const struct dpll_pin *pin, void *pin_priv,
- 		NL_SET_ERR_MSG_FMT(extack,
- 				   "err:%d %s failed to set pin state:%u for pin:%u on parent:%u",
- 				   ret,
--				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   libie_aq_str(pf->hw.adminq.sq_last_status),
- 				   state, p->idx, parent->idx);
- unlock:
- 	mutex_unlock(&pf->dplls.lock);
-@@ -2291,7 +2291,7 @@ ice_dpll_update_state(struct ice_pf *pf, struct ice_dpll *d, bool init)
- 		dev_err(ice_pf_to_dev(pf),
- 			"update dpll=%d state failed, ret=%d %s\n",
- 			d->dpll_idx, ret,
--			ice_aq_str(pf->hw.adminq.sq_last_status));
-+			libie_aq_str(pf->hw.adminq.sq_last_status));
- 		return ret;
- 	}
- 	if (init) {
-@@ -3205,7 +3205,7 @@ static int ice_dpll_init_info(struct ice_pf *pf, bool cgu)
- 	if (ret) {
- 		dev_err(ice_pf_to_dev(pf),
- 			"err:%d %s failed to read cgu abilities\n",
--			ret, ice_aq_str(hw->adminq.sq_last_status));
-+			ret, libie_aq_str(hw->adminq.sq_last_status));
- 		return ret;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 38f66439ea6e..c1e83aa83336 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -878,7 +878,7 @@ ice_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
- 	ret = ice_acquire_nvm(hw, ICE_RES_READ);
- 	if (ret) {
- 		dev_err(dev, "ice_acquire_nvm failed, err %d aq_err %s\n",
--			ret, ice_aq_str(hw->adminq.sq_last_status));
-+			ret, libie_aq_str(hw->adminq.sq_last_status));
- 		goto out;
- 	}
- 
-@@ -886,7 +886,7 @@ ice_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
- 				false);
- 	if (ret) {
- 		dev_err(dev, "ice_read_flat_nvm failed, err %d aq_err %s\n",
--			ret, ice_aq_str(hw->adminq.sq_last_status));
-+			ret, libie_aq_str(hw->adminq.sq_last_status));
- 		goto release;
- 	}
- 
-@@ -3613,15 +3613,15 @@ ice_set_pauseparam(struct net_device *netdev, struct ethtool_pauseparam *pause)
- 
- 	if (aq_failures & ICE_SET_FC_AQ_FAIL_GET) {
- 		netdev_info(netdev, "Set fc failed on the get_phy_capabilities call with err %d aq_err %s\n",
--			    err, ice_aq_str(hw->adminq.sq_last_status));
-+			    err, libie_aq_str(hw->adminq.sq_last_status));
- 		err = -EAGAIN;
- 	} else if (aq_failures & ICE_SET_FC_AQ_FAIL_SET) {
- 		netdev_info(netdev, "Set fc failed on the set_phy_config call with err %d aq_err %s\n",
--			    err, ice_aq_str(hw->adminq.sq_last_status));
-+			    err, libie_aq_str(hw->adminq.sq_last_status));
- 		err = -EAGAIN;
- 	} else if (aq_failures & ICE_SET_FC_AQ_FAIL_UPDATE) {
- 		netdev_info(netdev, "Set fc failed on the get_link_info call with err %d aq_err %s\n",
--			    err, ice_aq_str(hw->adminq.sq_last_status));
-+			    err, libie_aq_str(hw->adminq.sq_last_status));
- 		err = -EAGAIN;
- 	}
- 
-@@ -3952,7 +3952,7 @@ static int ice_vsi_set_dflt_rss_lut(struct ice_vsi *vsi, int req_rss_size)
- 	err = ice_set_rss_lut(vsi, lut, vsi->rss_table_size);
- 	if (err)
- 		dev_err(dev, "Cannot set RSS lut, err %d aq_err %s\n", err,
--			ice_aq_str(hw->adminq.sq_last_status));
-+			libie_aq_str(hw->adminq.sq_last_status));
- 
- 	kfree(lut);
- 	return err;
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index 4d9ad92a44fe..d86db081579f 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -68,7 +68,7 @@ ice_send_package_data(struct pldmfw *context, const u8 *data, u16 length)
- 
- 	if (status) {
- 		dev_err(dev, "Failed to send record package data to firmware, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to record package data to firmware");
- 		return -EIO;
- 	}
-@@ -257,7 +257,7 @@ ice_send_component_table(struct pldmfw *context, struct pldmfw_component *compon
- 
- 	if (status) {
- 		dev_err(dev, "Failed to transfer component table to firmware, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to transfer component table to firmware");
- 		return -EIO;
- 	}
-@@ -314,7 +314,7 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	if (err) {
- 		dev_err(dev, "Failed to flash module 0x%02x with block of size %u at offset %u, err %d aq_err %s\n",
- 			module, block_size, offset, err,
--			ice_aq_str(hw->adminq.sq_last_status));
-+			libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to program flash module");
- 		return -EIO;
- 	}
-@@ -358,7 +358,7 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to flash module 0x%02x with block of size %u at offset %u, err %s\n",
- 			module, block_size, offset,
--			ice_aq_str((enum libie_aq_err)completion_retval));
-+			libie_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to program flash module");
- 		return -EIO;
- 	}
-@@ -506,7 +506,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	if (err) {
- 		dev_err(dev, "Failed to erase %s (module 0x%02x), err %d aq_err %s\n",
- 			component, module, err,
--			ice_aq_str(hw->adminq.sq_last_status));
-+			libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to erase flash module");
- 		err = -EIO;
- 		goto out_notify_devlink;
-@@ -536,7 +536,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to erase %s (module 0x02%x), aq_err %s\n",
- 			component, module,
--			ice_aq_str((enum libie_aq_err)completion_retval));
-+			libie_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to erase flash");
- 		err = -EIO;
- 		goto out_notify_devlink;
-@@ -583,7 +583,7 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 	err = ice_nvm_write_activate(hw, activate_flags, &response_flags);
- 	if (err) {
- 		dev_err(dev, "Failed to switch active flash banks, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to switch active flash banks");
- 		return -EIO;
- 	}
-@@ -615,7 +615,7 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 	completion_retval = le16_to_cpu(task.event.desc.retval);
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to switch active flash banks aq_err %s\n",
--			ice_aq_str((enum libie_aq_err)completion_retval));
-+			libie_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to switch active flash banks");
- 		return -EIO;
- 	}
-@@ -953,7 +953,7 @@ ice_cancel_pending_update(struct ice_pf *pf, const char *component,
- 	err = ice_acquire_nvm(hw, ICE_RES_WRITE);
- 	if (err) {
- 		dev_err(dev, "Failed to acquire device flash lock, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to acquire device flash lock");
- 		return err;
- 	}
-@@ -1046,7 +1046,7 @@ int ice_devlink_flash_update(struct devlink *devlink,
- 	err = ice_acquire_nvm(hw, ICE_RES_WRITE);
- 	if (err) {
- 		dev_err(dev, "Failed to acquire device flash lock, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		NL_SET_ERR_MSG_MOD(extack, "Failed to acquire device flash lock");
- 		return err;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 78be8e9d4151..961c2b7106c8 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3787,11 +3787,11 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
- 		if (hw->adminq.sq_last_status == LIBIE_AQ_RC_EMODE)
- 			dev_dbg(dev, "can't set link to %s, err %d aq_err %s. not fatal, continuing\n",
- 				(ena ? "ON" : "OFF"), status,
--				ice_aq_str(hw->adminq.sq_last_status));
-+				libie_aq_str(hw->adminq.sq_last_status));
- 	} else if (status) {
- 		dev_err(dev, "can't set link to %s, err %d aq_err %s\n",
- 			(ena ? "ON" : "OFF"), status,
--			ice_aq_str(hw->adminq.sq_last_status));
-+			libie_aq_str(hw->adminq.sq_last_status));
- 		return status;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 7f30a923ed9e..c4264984cfcb 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -38,6 +38,7 @@ static const char ice_copyright[] = "Copyright (c) 2018, Intel Corporation.";
- 
- MODULE_DESCRIPTION(DRV_SUMMARY);
- MODULE_IMPORT_NS("LIBIE");
-+MODULE_IMPORT_NS("LIBIE_ADMINQ");
- MODULE_LICENSE("GPL v2");
- MODULE_FIRMWARE(ICE_DDP_PKG_FILE);
- 
-@@ -1119,7 +1120,7 @@ ice_link_event(struct ice_pf *pf, struct ice_port_info *pi, bool link_up,
- 	if (status)
- 		dev_dbg(dev, "Failed to update link status on port %d, err %d aq_err %s\n",
- 			pi->lport, status,
--			ice_aq_str(pi->hw->adminq.sq_last_status));
-+			libie_aq_str(pi->hw->adminq.sq_last_status));
- 
- 	ice_check_link_cfg_err(pf, pi->phy.link_info.link_cfg_err);
- 
-@@ -4224,7 +4225,7 @@ static void ice_set_safe_mode_vlan_cfg(struct ice_pf *pf)
- 	status = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (status) {
- 		dev_err(ice_pf_to_dev(vsi->back), "Failed to update VSI for safe mode VLANs, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 	} else {
- 		vsi->info.sec_flags = ctxt->info.sec_flags;
- 		vsi->info.sw_flags2 = ctxt->info.sw_flags2;
-@@ -5439,7 +5440,7 @@ static void ice_setup_mc_magic_wake(struct ice_pf *pf)
- 	status = ice_aq_manage_mac_write(hw, mac_addr, flags, NULL);
- 	if (status)
- 		dev_err(dev, "Failed to enable Multicast Magic Packet wake, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- }
- 
- /**
-@@ -7953,56 +7954,6 @@ static int ice_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
- 	}
- }
+ enum iavf_status iavf_aq_set_rss_lut(struct iavf_hw *hw, u16 seid,
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_common.c b/drivers/net/ethernet/intel/iavf/iavf_common.c
+index cc71e48b5689..614a886bca99 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_common.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_common.c
+@@ -7,58 +7,6 @@
+ #include "iavf_adminq.h"
+ #include "iavf_prototype.h"
  
 -/**
-- * ice_aq_str - convert AQ err code to a string
+- * iavf_aq_str - convert AQ err code to a string
+- * @hw: pointer to the HW structure
 - * @aq_err: the AQ error code to convert
-- */
--const char *ice_aq_str(enum libie_aq_err aq_err)
+- **/
+-const char *iavf_aq_str(struct iavf_hw *hw, enum libie_aq_err aq_err)
 -{
 -	switch (aq_err) {
 -	case LIBIE_AQ_RC_OK:
 -		return "OK";
 -	case LIBIE_AQ_RC_EPERM:
--		return "ICE_AQ_RC_EPERM";
+-		return "LIBIE_AQ_RC_EPERM";
 -	case LIBIE_AQ_RC_ENOENT:
--		return "ICE_AQ_RC_ENOENT";
--	case LIBIE_AQ_RC_ENOMEM:
--		return "ICE_AQ_RC_ENOMEM";
--	case LIBIE_AQ_RC_EBUSY:
--		return "ICE_AQ_RC_EBUSY";
--	case LIBIE_AQ_RC_EEXIST:
--		return "ICE_AQ_RC_EEXIST";
--	case LIBIE_AQ_RC_EINVAL:
--		return "ICE_AQ_RC_EINVAL";
--	case LIBIE_AQ_RC_ENOSPC:
--		return "ICE_AQ_RC_ENOSPC";
--	case LIBIE_AQ_RC_ENOSYS:
--		return "ICE_AQ_RC_ENOSYS";
--	case LIBIE_AQ_RC_EMODE:
--		return "ICE_AQ_RC_EMODE";
--	case LIBIE_AQ_RC_ENOSEC:
--		return "ICE_AQ_RC_ENOSEC";
--	case LIBIE_AQ_RC_EBADSIG:
--		return "ICE_AQ_RC_EBADSIG";
--	case LIBIE_AQ_RC_ESVN:
--		return "ICE_AQ_RC_ESVN";
--	case LIBIE_AQ_RC_EBADMAN:
--		return "ICE_AQ_RC_EBADMAN";
--	case LIBIE_AQ_RC_EBADBUF:
--		return "ICE_AQ_RC_EBADBUF";
+-		return "LIBIE_AQ_RC_ENOENT";
 -	case LIBIE_AQ_RC_ESRCH:
--		return "ICE_AQ_RC_ESRCH";
+-		return "LIBIE_AQ_RC_ESRCH";
 -	case LIBIE_AQ_RC_EIO:
--		return "ICE_AQ_RC_EIO";
+-		return "LIBIE_AQ_RC_EIO";
 -	case LIBIE_AQ_RC_EAGAIN:
--		return "ICE_AQ_RC_EAGAIN";
+-		return "LIBIE_AQ_RC_EAGAIN";
+-	case LIBIE_AQ_RC_ENOMEM:
+-		return "LIBIE_AQ_RC_ENOMEM";
 -	case LIBIE_AQ_RC_EACCES:
--		return "ICE_AQ_RC_EACCES";
+-		return "LIBIE_AQ_RC_EACCES";
+-	case LIBIE_AQ_RC_EBUSY:
+-		return "LIBIE_AQ_RC_EBUSY";
+-	case LIBIE_AQ_RC_EEXIST:
+-		return "LIBIE_AQ_RC_EEXIST";
+-	case LIBIE_AQ_RC_EINVAL:
+-		return "LIBIE_AQ_RC_EINVAL";
+-	case LIBIE_AQ_RC_ENOSPC:
+-		return "LIBIE_AQ_RC_ENOSPC";
+-	case LIBIE_AQ_RC_ENOSYS:
+-		return "LIBIE_AQ_RC_ENOSYS";
+-	case LIBIE_AQ_RC_EMODE:
+-		return "LIBIE_AQ_RC_EMODE";
+-	case LIBIE_AQ_RC_ENOSEC:
+-		return "LIBIE_AQ_RC_ENOSEC";
+-	case LIBIE_AQ_RC_EBADSIG:
+-		return "LIBIE_AQ_RC_EBADSIG";
+-	case LIBIE_AQ_RC_ESVN:
+-		return "LIBIE_AQ_RC_ESVN";
+-	case LIBIE_AQ_RC_EBADMAN:
+-		return "LIBIE_AQ_RC_EBADMAN";
+-	case LIBIE_AQ_RC_EBADBUF:
+-		return "LIBIE_AQ_RC_EBADBUF";
 -	}
 -
--	return "ICE_AQ_RC_UNKNOWN";
+-	snprintf(hw->err_str, sizeof(hw->err_str), "%d", aq_err);
+-	return hw->err_str;
 -}
 -
  /**
-  * ice_set_rss_lut - Set RSS LUT
-  * @vsi: Pointer to VSI structure
-@@ -8028,7 +7979,7 @@ int ice_set_rss_lut(struct ice_vsi *vsi, u8 *lut, u16 lut_size)
- 	status = ice_aq_set_rss_lut(hw, &params);
- 	if (status)
- 		dev_err(ice_pf_to_dev(vsi->back), "Cannot set RSS lut, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
+  * iavf_stat_str - convert status err code to a string
+  * @hw: pointer to the HW structure
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 2c0bb41809a4..1b4a9a921d6c 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -50,6 +50,7 @@ MODULE_ALIAS("i40evf");
+ MODULE_DESCRIPTION("Intel(R) Ethernet Adaptive Virtual Function Network Driver");
+ MODULE_IMPORT_NS("LIBETH");
+ MODULE_IMPORT_NS("LIBIE");
++MODULE_IMPORT_NS("LIBIE_ADMINQ");
+ MODULE_LICENSE("GPL v2");
  
- 	return status;
- }
-@@ -8051,7 +8002,7 @@ int ice_set_rss_key(struct ice_vsi *vsi, u8 *seed)
- 	status = ice_aq_set_rss_key(hw, vsi->idx, (struct ice_aqc_get_set_rss_keys *)seed);
- 	if (status)
- 		dev_err(ice_pf_to_dev(vsi->back), "Cannot set RSS key, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 
- 	return status;
- }
-@@ -8081,7 +8032,7 @@ int ice_get_rss_lut(struct ice_vsi *vsi, u8 *lut, u16 lut_size)
- 	status = ice_aq_get_rss_lut(hw, &params);
- 	if (status)
- 		dev_err(ice_pf_to_dev(vsi->back), "Cannot get RSS lut, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 
- 	return status;
- }
-@@ -8104,7 +8055,7 @@ int ice_get_rss_key(struct ice_vsi *vsi, u8 *seed)
- 	status = ice_aq_get_rss_key(hw, vsi->idx, (struct ice_aqc_get_set_rss_keys *)seed);
- 	if (status)
- 		dev_err(ice_pf_to_dev(vsi->back), "Cannot get RSS key, err %d aq_err %s\n",
--			status, ice_aq_str(hw->adminq.sq_last_status));
-+			status, libie_aq_str(hw->adminq.sq_last_status));
- 
- 	return status;
- }
-@@ -8221,7 +8172,7 @@ static int ice_vsi_update_bridge_mode(struct ice_vsi *vsi, u16 bmode)
- 	ret = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (ret) {
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for bridge mode failed, bmode = %d err %d aq_err %s\n",
--			bmode, ret, ice_aq_str(hw->adminq.sq_last_status));
-+			bmode, ret, libie_aq_str(hw->adminq.sq_last_status));
- 		goto out;
- 	}
- 	/* Update sw flags for book keeping */
-@@ -8289,7 +8240,7 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
- 		if (err) {
- 			netdev_err(dev, "switch rule update failed, mode = %d err %d aq_err %s\n",
- 				   mode, err,
--				   ice_aq_str(hw->adminq.sq_last_status));
-+				   libie_aq_str(hw->adminq.sq_last_status));
- 			/* revert hw->evb_veb */
- 			hw->evb_veb = (pf_sw->bridge_mode == BRIDGE_MODE_VEB);
- 			return err;
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index fb7ef8fcf3d2..ac3016b5f955 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -307,7 +307,7 @@ ice_vc_send_msg_to_vf(struct ice_vf *vf, u32 v_opcode,
- 	if (aq_ret && pf->hw.mailboxq.sq_last_status != LIBIE_AQ_RC_ENOSYS) {
- 		dev_info(dev, "Unable to send the message to VF %d ret %d aq_err %s\n",
- 			 vf->vf_id, aq_ret,
--			 ice_aq_str(pf->hw.mailboxq.sq_last_status));
-+			 libie_aq_str(pf->hw.mailboxq.sq_last_status));
- 		return -EIO;
- 	}
- 
-@@ -852,7 +852,7 @@ static int ice_vc_handle_rss_cfg(struct ice_vf *vf, u8 *msg, bool add)
- 		status = ice_update_vsi(hw, vsi->idx, ctx, NULL);
- 		if (status) {
- 			dev_err(dev, "update VSI for RSS failed, err %d aq_err %s\n",
--				status, ice_aq_str(hw->adminq.sq_last_status));
-+				status, libie_aq_str(hw->adminq.sq_last_status));
- 			v_ret = VIRTCHNL_STATUS_ERR_PARAM;
- 		} else {
- 			vsi->info.q_opt_rss = ctx->info.q_opt_rss;
-diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-index 5291f2888ef8..ada78f83b3ac 100644
---- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-@@ -113,7 +113,7 @@ static int ice_vsi_manage_vlan_insertion(struct ice_vsi *vsi)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for VLAN insert failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 		goto out;
- 	}
- 
-@@ -169,7 +169,7 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for VLAN strip failed, ena = %d err %d aq_err %s\n",
--			ena, err, ice_aq_str(hw->adminq.sq_last_status));
-+			ena, err, libie_aq_str(hw->adminq.sq_last_status));
- 		goto out;
- 	}
- 
-@@ -258,7 +258,7 @@ static int __ice_vsi_set_inner_port_vlan(struct ice_vsi *vsi, u16 pvid_info)
- 	ret = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (ret) {
- 		dev_info(ice_hw_to_dev(hw), "update VSI for port VLAN failed, err %d aq_err %s\n",
--			 ret, ice_aq_str(hw->adminq.sq_last_status));
-+			 ret, libie_aq_str(hw->adminq.sq_last_status));
- 		goto out;
- 	}
- 
-@@ -306,7 +306,7 @@ int ice_vsi_clear_inner_port_vlan(struct ice_vsi *vsi)
- 	ret = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (ret)
- 		dev_err(ice_hw_to_dev(hw), "update VSI for port VLAN failed, err %d aq_err %s\n",
--			ret, ice_aq_str(hw->adminq.sq_last_status));
-+			ret, libie_aq_str(hw->adminq.sq_last_status));
- 
- 	kfree(ctxt);
- 	return ret;
-@@ -353,7 +353,7 @@ static int ice_cfg_vlan_pruning(struct ice_vsi *vsi, bool ena)
+ static const struct net_device_ops iavf_netdev_ops;
+@@ -1734,7 +1735,7 @@ static int iavf_config_rss_aq(struct iavf_adapter *adapter)
  	if (status) {
- 		netdev_err(vsi->netdev, "%sabling VLAN pruning on VSI handle: %d, VSI HW ID: %d failed, err = %d, aq_err = %s\n",
- 			   ena ? "En" : "Dis", vsi->idx, vsi->vsi_num, status,
--			   ice_aq_str(pf->hw.adminq.sq_last_status));
-+			   libie_aq_str(pf->hw.adminq.sq_last_status));
- 		goto err_out;
+ 		dev_err(&adapter->pdev->dev, "Cannot set RSS key, err %s aq_err %s\n",
+ 			iavf_stat_str(hw, status),
+-			iavf_aq_str(hw, hw->aq.asq_last_status));
++			libie_aq_str(hw->aq.asq_last_status));
+ 		return iavf_status_to_errno(status);
+ 
+ 	}
+@@ -1744,7 +1745,7 @@ static int iavf_config_rss_aq(struct iavf_adapter *adapter)
+ 	if (status) {
+ 		dev_err(&adapter->pdev->dev, "Cannot set RSS lut, err %s aq_err %s\n",
+ 			iavf_stat_str(hw, status),
+-			iavf_aq_str(hw, hw->aq.asq_last_status));
++			libie_aq_str(hw->aq.asq_last_status));
+ 		return iavf_status_to_errno(status);
  	}
  
-@@ -497,7 +497,7 @@ int ice_vsi_ena_outer_stripping(struct ice_vsi *vsi, u16 tpid)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err)
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for enabling outer VLAN stripping failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	else
- 		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index a6f0e5990be2..65340ba0b152 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -29,7 +29,7 @@ static int iavf_send_pf_msg(struct iavf_adapter *adapter,
+ 	if (status)
+ 		dev_dbg(&adapter->pdev->dev, "Unable to send opcode %d to PF, status %s, aq_err %s\n",
+ 			op, iavf_stat_str(hw, status),
+-			iavf_aq_str(hw, hw->aq.asq_last_status));
++			libie_aq_str(hw->aq.asq_last_status));
+ 	return iavf_status_to_errno(status);
+ }
  
-@@ -544,7 +544,7 @@ int ice_vsi_dis_outer_stripping(struct ice_vsi *vsi)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err)
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for disabling outer VLAN stripping failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	else
- 		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
- 
-@@ -604,7 +604,7 @@ int ice_vsi_ena_outer_insertion(struct ice_vsi *vsi, u16 tpid)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err)
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for enabling outer VLAN insertion failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	else
- 		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
- 
-@@ -654,7 +654,7 @@ int ice_vsi_dis_outer_insertion(struct ice_vsi *vsi)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err)
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for disabling outer VLAN insertion failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	else
- 		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
- 
-@@ -720,7 +720,7 @@ __ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, u16 vlan_info, u16 tpid)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for setting outer port based VLAN failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	} else {
- 		vsi->info.port_based_outer_vlan = ctxt->info.port_based_outer_vlan;
- 		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
-@@ -782,7 +782,7 @@ int ice_vsi_clear_outer_port_vlan(struct ice_vsi *vsi)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err)
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for clearing outer port based VLAN failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 
- 	kfree(ctxt);
- 	return err;
-@@ -830,7 +830,7 @@ int ice_vsi_clear_port_vlan(struct ice_vsi *vsi)
- 	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(vsi->back), "update VSI for clearing port based VLAN failed, err %d aq_err %s\n",
--			err, ice_aq_str(hw->adminq.sq_last_status));
-+			err, libie_aq_str(hw->adminq.sq_last_status));
- 	} else {
- 		vsi->info.port_based_outer_vlan =
- 			ctxt->info.port_based_outer_vlan;
 -- 
 2.42.0
 
