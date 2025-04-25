@@ -1,116 +1,147 @@
-Return-Path: <netdev+bounces-185937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2888A9C2A5
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:02:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42483A9C32A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73D131BC0025
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:02:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B336D927527
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEFE242D9C;
-	Fri, 25 Apr 2025 08:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889A42343AF;
+	Fri, 25 Apr 2025 09:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EjuSTlmI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcMWUsOY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD9822E3E1
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D287230BC2;
+	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745571527; cv=none; b=buD3VNPj5BZwRWlGqDLVU8qtGbNFsUo+kvCwHWkjFfvIg2YzimnIzuGvK/YRcXr3Jgkn8RMoh1yxF/SK9UbCcYLF5Y2tzVfnfZTKb5m2xOuSMk3JyIadczvRBtIcVSDmIQy5n1vsjPe1O+KVWMMPsinV+7GUGQtHV6Tle9WQDHE=
+	t=1745572798; cv=none; b=phuRWLVIo8E71iHvekB9gnZuUWBCQ3fJATqwP0rx0AHqD701XMCDbsoEJL9aiLWUJz+6f1iMm4xRmNpUsLNXtzAVLRYzULLW92vuzce0z78QgCt+qFGqJwgviI5EwSf4sjyl5fP2M1hgG/k4/i3UkXtaLXgMuB0qzUg+3T12ufo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745571527; c=relaxed/simple;
-	bh=rA0FgN8pKr6Y+NMKb7Up7vf6L8C8r8fkDH4Qrelpoao=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=DdHJ7Ox9fff/2qfSQgvfj7cPpGZkWcXwVLD0HSSgODcyI0D7aVdGQcfN32x9tgElzvl9994n+U8FNYmLDc0hU1oluKV/DC9XtLabi136F8zkKwocA9hOa9AsiiocyX7xSBkwB2GATbt1QCuZaZJtxAy0HWTYgzDuCPKotaDcEPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EjuSTlmI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745571523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kZ2kjqGAthECdwPjzkMV1yv0jKsDaNgqhNAIusvfh0s=;
-	b=EjuSTlmIrXoA65uryUdGJDA8NLREqOTpS4BW/ar1LLhb9kY1omPligxKvuxP6z9/JLdKMB
-	GH2cfJxfJUOuwIv/3B9U2Kiy7WadOUK2DBpCyvSNWBppnLZS657un4W/6C/kSiGsnb+D/e
-	GXD1cBv2Go3xk91hc6bgXP/SYcssO/w=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-98-TIg2eD5LMlCc0rc8n9kbZw-1; Fri,
- 25 Apr 2025 04:58:40 -0400
-X-MC-Unique: TIg2eD5LMlCc0rc8n9kbZw-1
-X-Mimecast-MFC-AGG-ID: TIg2eD5LMlCc0rc8n9kbZw_1745571519
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9C4219560A0;
-	Fri, 25 Apr 2025 08:58:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CB24818001DA;
-	Fri, 25 Apr 2025 08:58:36 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <7b468f16-f648-4432-aa59-927d37a411a7@lunn.ch>
-References: <7b468f16-f648-4432-aa59-927d37a411a7@lunn.ch> <3452224.1745518016@warthog.procyon.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: dhowells@redhat.com, Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-    Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-    Tony Nguyen <anthony.l.nguyen@intel.com>,
-    Paulo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: Is it possible to undo the ixgbe device name change?
+	s=arc-20240116; t=1745572798; c=relaxed/simple;
+	bh=s+UM6pisdmKw4N9/rscRvpbQV5hWX+gCZWCLZQIJwcQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Pl3IRGVVdSNhgOZ8ELNYl5omwwuzqbPEu+1BGx2OFmd5yJ4ryi6+IcRrmLydCik3SsiUoRLIXfBos05batimMq80mU1UZGfyFTW2wfArlI0fMtsZD5qH24LoDiT0+HEoV9FyhatV3kzfptdBFv4y4b4vOXz5SUPveU3NnKlySpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QcMWUsOY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C4C27C4CEE4;
+	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745572797;
+	bh=s+UM6pisdmKw4N9/rscRvpbQV5hWX+gCZWCLZQIJwcQ=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=QcMWUsOY+tfg+yMSUeRa0AJAjh2uSxwqe6c3JH4/d60hO20ZOglqn5AS28oQRnNyH
+	 OpXkDSpy9HrsN9SWaT1QhlhNPRnz0KnMOHifrGtw1idvHzjzpeGZFq2y+uk2tCdZRL
+	 heWBumAI+X+oJ8/G/RiAIQc1WEpDA/0aKOFB6oTh8IbBHt7ZfdtGlJ4cIIzDJ32Pwm
+	 42Mjcr02GaAtQc6AM1V7bLSOK6dgXZbDYEhvNaRPrLDAA/SJ3OjEzVjAsQ8aKUQOSp
+	 5mHbu7lZCuZJcdqgrecpfXTrdPDtokYJ4oJmZDlZ4QtZjF9xb6Ysq/t9JIr762QvWk
+	 QCSjJHnAXX5LA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA72C369D1;
+	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Date: Fri, 25 Apr 2025 13:19:28 +0400
+Subject: [PATCH v2] net: dsa: qca8k: fix led devicename when using external
+ mdio bus
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3531592.1745571515.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Apr 2025 09:58:35 +0100
-Message-ID: <3531595.1745571515@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250425-qca8k-leds-v2-1-b638fd3885ca@outlook.com>
+X-B4-Tracking: v=1; b=H4sIAJ9TC2gC/22MQQ7CIBBFr9LMWkwHpLGuvIfpAmFqJ61FoRJNw
+ 93Frl38xfvJeytECkwRTtUKgRJH9nMBuavADma+kWBXGGQtdX2QWjytOY5iIheF0qTw2hqFbQ9
+ FeATq+b3FLl3hgePiw2drJ/y9fzMJBYpGYWOcKpPy7F/L5P24t/4OXc75C4PqVLmmAAAA
+X-Change-ID: 20250425-qca8k-leds-35e31b9a319f
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ George Moussalem <george.moussalem@outlook.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1745572796; l=3435;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=ydGK36Kl5X3P/v+3CwPypXc8oDZyqDCNEcnQKXNutFA=;
+ b=M4+pevfUAbWEi3MH1shAmBryPB6xZcVeewXJQthY8K/LnKGCjAm5MZD+k9aHotIPA/Rb6PEPN
+ SGaAHTo0uWVBjuck36b1/Fa4nk6RbYnvbqZwaXZnuR45en4ILAEFpS3
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-Andrew Lunn <andrew@lunn.ch> wrote:
+From: George Moussalem <george.moussalem@outlook.com>
 
-> Are you sure this patch is directly responsible? Looking at the patch
+The qca8k dsa switch can use either an external or internal mdio bus.
+This depends on whether the mdio node is defined under the switch node
+itself and, as such, the internal_mdio_mask is populated with its
+internal phys. Upon registering the internal mdio bus, the slave_mii_bus
+of the dsa switch is assigned to this bus. When an external mdio bus is
+used, it is left unassigned, though its id is used to create the device
+names of the leds.
+This leads to the leds being named '(efault):00:green:lan' and so on as
+the slave_mii_bus is null. So let's fix this by adding a null check and
+use the devicename of the external bus instead when an external bus is
+configured.
 
-I bisected it to that commit.  Userspace didn't change.
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+---
+Fix the led device names when an external mdio is configured.
+The current codepath for registering led device names 'assumes' that the
+internal mdio bus is used. Therefore, add a check and fallback to the
+device name of the external mdio bus while creating the led device
+names.
 
-> Notice the context, not the change. The interface is being called
-> eth%d, which is normal. The kernel will replace the %d with a unique
-> number. So the kernel will call it eth42 or something. You should see
-> this in dmesg.
+Wrong device names:
+root@OpenWrt:~# ls -l /sys/class/leds                                           
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):00:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):01:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):02:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
 
-Something like this?
+Correct device names:
+root@OpenWrt:~# ls -l /sys/class/leds                                                                                                                      
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:00:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:01:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
+lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:02:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
+---
+Changes in v2:
+- Fixed c/p error from older kernel version: slave_mii_bus was renamed
+  to internal_mdio_bus
+- Link to v1: https://lore.kernel.org/r/20250425-qca8k-leds-v1-1-6316ad36ad22@outlook.com
+---
+ drivers/net/dsa/qca/qca8k-leds.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-... systemd-udevd[2215]: link_config: autonegotiation is unset or enabled,=
- the speed and duplex are not writable.
-... kernel: ixgbe 0000:01:00.0 enp1s0: renamed from eth0
+diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
+index 43ac68052baf9f9926aaf4a9d8d09640f9022fcd..ef496e345a4e7dd5b9fb805b8e0ff3cce56e2986 100644
+--- a/drivers/net/dsa/qca/qca8k-leds.c
++++ b/drivers/net/dsa/qca/qca8k-leds.c
+@@ -429,7 +429,8 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
+ 		init_data.fwnode = led;
+ 		init_data.devname_mandatory = true;
+ 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d",
+-						 priv->internal_mdio_bus->id,
++						 priv->internal_mdio_bus ?
++						 priv->internal_mdio_bus->id : priv->bus->id,
+ 						 port_num);
+ 		if (!init_data.devicename) {
+ 			fwnode_handle_put(led);
 
-or:
+---
+base-commit: 02ddfb981de88a2c15621115dd7be2431252c568
+change-id: 20250425-qca8k-leds-35e31b9a319f
 
-... systemd-udevd[2568]: link_config: autonegotiation is unset or enabled,=
- the speed and duplex are not writable.
-... kernel: ixgbe 0000:01:00.0 enp1s0np0: renamed from eth0
+Best regards,
+-- 
+George Moussalem <george.moussalem@outlook.com>
 
-I presume the kernel message saying that the renaming happened is triggere=
-d by
-systemd-udevd?
-
-David
 
 
