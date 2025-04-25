@@ -1,95 +1,130 @@
-Return-Path: <netdev+bounces-185797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BA7A9BC22
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 03:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF50A9BC38
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 03:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308A14C0DE0
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:11:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBAD34A4C0A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CCA1CAB3;
-	Fri, 25 Apr 2025 01:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916502CCA5;
+	Fri, 25 Apr 2025 01:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ItoprWEX"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="bwKC9WDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E4735958;
-	Fri, 25 Apr 2025 01:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850F18494;
+	Fri, 25 Apr 2025 01:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745543472; cv=none; b=GG9vzJj6v3hcaZxaW5cJ9uCmTPYgmL9Ytvrr+6qg47DWtvCMLuxtXWjf1BULUpeBERjqiwEdAtWiFu62UtQD61yLxeD0APtW+1orOmJFedhEewC9SOD86r2qAgj5KO7ImysBRnp7FjjD1Z4wYv5HCzUT6txRLKgReHE1I5Shw2g=
+	t=1745543807; cv=none; b=DDo69dry3g0Yv/a8JP9bukBaSIFoicshrr+Sv3JgrO1LlTGkPxYmUEBbdFX5Zzm2n/Zq8ri1uhGwy5PgWc5+DQlth1gp4Im7acDhTs5nTO8fYL1YVbd5+pYch8OauidNEBILSwMFtc+nwiKDeZKkwUeQVE8xiXzzhR7buuAK9Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745543472; c=relaxed/simple;
-	bh=nLGs66opo0N3EZCpUzbatYQwr3fTWpeVoulS6yXDICc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MOK6fVJ/AM+ua2SK0MogBBEilo1BGFV1cBPi6XCqrUpitScLoXZiujM8u4qCp+8zuMy6d78ws82Ek1SMXpVLkn4ybBb586bxA9XGng4BcSv5VufaIn4MayD/fi0BUDT5iMK6ITAzcz9nEkHzZK7RsZhZACbURVf03BFWR1ZcIKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ItoprWEX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51D6DC4CEE3;
-	Fri, 25 Apr 2025 01:11:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745543472;
-	bh=nLGs66opo0N3EZCpUzbatYQwr3fTWpeVoulS6yXDICc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ItoprWEXhQVfmXnGYnnfQd/7KVz/3MGTTbymR1IqOuAw4RL9yWdeVvtkFhFNI1+2S
-	 M1D9SjbUawnI3/VFmowyD1LgJfJSMbX/7Yw/DsYU4ztcH1JQ0DH6aUJSaK2fcnlyAA
-	 QttW+qiXmxC8OeSqh5t5Ugd5RFlerUXGET2VWuftPxM0VjPETrGsiRMtCnU/eDKrDk
-	 4olu3wpqRVELbzbDHAHZuSP45Yr8eK6oxlsCI+vFrOrDFZFddqijuX7JYZQr1O6iwl
-	 97PA+TEVD02Wl8HNeLe9EI2AdrV22TBzw5LV/LSCeYlZzbH5G3k4eu4RykrUg4gQqP
-	 vCN2D/8n+qJOg==
-Date: Thu, 24 Apr 2025 18:11:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v7 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250424181110.2734cd0b@kernel.org>
-In-Reply-To: <20250423072911.3513073-5-lukma@denx.de>
-References: <20250423072911.3513073-1-lukma@denx.de>
-	<20250423072911.3513073-5-lukma@denx.de>
+	s=arc-20240116; t=1745543807; c=relaxed/simple;
+	bh=22cnopTo/mxALU1RwyL3KcFLtT6PURNTg9wJD5O4AvE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tHQMDKOyKeJn8JDRQ8pAWdV4Ql7Jl0dDXmnJUQpg9MFZCMlcF0xs3usI8n36qNhNUicXUbOR4A+AIPot7Vdl/ftvqBdLYY3rI5yOPn13duPjVaUMfDd5iawECm4WJGKb5KE7/VT/BYOX9OqekviFJ0u8/KH6nU3awt02dFbljHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=bwKC9WDG; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [172.27.3.244] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53P1FaK51878943
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 24 Apr 2025 18:15:37 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53P1FaK51878943
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745543740;
+	bh=Eqcm/Hif/MkDs4mjYz2tKFyoVP1HuqqqBruNWCY5tSI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bwKC9WDGeH6PKjPk6PbPnscfTUG7uO0p90T8jZtRz/H1uV5R0u0jHyKPLpz4Lzuza
+	 jaan86VUYCLDqr62mFWyqSXvvBjaf+ve6G5ZtKNwudj3pQxiq/p0DQHubDAWAL4iVK
+	 Num9qesxZzs6c+gaFJIpcjhHqgTrRqcXI4bwh1tGXr1pf3tvinHjceiUPk+LlVYVAf
+	 mYaL7M4P9z3kr6aQ69HDJ4GJ4kjHFXVFi/8OoAlHsRrCGt5QgNwZK3Agfp39Cx1S5g
+	 BERlMv7+KxMZFAhG9+QYjnrsyKHBCBRF3w4ALl9e3WkwPa1KT4qcT1tq3RLd9c/O5Z
+	 dx3hBdqeJAyRA==
+Message-ID: <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
+Date: Thu, 24 Apr 2025 18:15:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        Xin Li
+ <xin@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
+        andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+ <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+Content-Language: en-US
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 23 Apr 2025 09:29:08 +0200 Lukasz Majewski wrote:
-> This patch series provides support for More Than IP L2 switch embedded
-> in the imx287 SoC.
+On 4/24/25 01:14, Jürgen Groß wrote:
+>>
+>> Actually, that is how we get this patch with the existing alternatives
+>> infrastructure.  And we took a step further to also remove the pv_ops
+>> MSR APIs...
 > 
-> This is a two port switch (placed between uDMA[01] and MAC-NET[01]),
-> which can be used for offloading the network traffic.
+> And this is what I'm questioning. IMHO this approach is adding more
+> code by removing the pv_ops MSR_APIs just because "pv_ops is bad". And
+> I believe most refusal of pv_ops is based on no longer valid reasoning.
 > 
-> It can be used interchangeably with current FEC driver - to be more
-> specific: one can use either of it, depending on the requirements.
+
+pvops are a headache because it is effectively a secondary alternatives 
+infrastructure that is incompatible with the alternatives one...
+
+>> It looks to me that you want to add a new facility to the alternatives
+>> infrastructure first?
 > 
-> The biggest difference is the usage of DMA - when FEC is used, separate
-> DMAs are available for each ENET-MAC block.
-> However, with switch enabled - only the DMA0 is used to send/receive data
-> to/form switch (and then switch sends them to respecitive ports).
+> Why would we need a new facility in the alternatives infrastructure?
 
-Lots of sparse warnings and build issues here, at least on x86.
+I'm not sure what Xin means with "facility", but a key motivation for 
+this is to:
 
-Could you make sure it's clean with an allmodconfig config, 
-something like:
+a. Avoid using the pvops for MSRs when on the only remaining user 
+thereof (Xen) is only using it for a very small subset of MSRs and for 
+the rest it is just overhead, even for Xen;
 
-make C=1 W=1 drivers/net/ethernet/freescale/mtipsw/ 
--- 
-pw-bot: cr
+b. Being able to do wrmsrns immediate/wrmsrns/wrmsr and rdmsr 
+immediate/rdmsr alternatives.
+
+Of these, (b) is by far the biggest motivation. The architectural 
+direction for supervisor states is to avoid ad hoc and XSAVES ISA and 
+instead use MSRs. The immediate forms are expected to be significantly 
+faster, because they make the MSR index available at the very beginning 
+of the pipeline instead of at a relatively late stage.
+
+	-hpa
+
 
