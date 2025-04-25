@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-186070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA618A9CF5E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:17:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC2BA9CF61
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:18:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0E097B6BBA
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:16:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F5FF1BA020F
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA054191F8C;
-	Fri, 25 Apr 2025 17:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E9319E7FA;
+	Fri, 25 Apr 2025 17:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYDAMx7j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uonfJQgG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58B0134CF
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 17:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A9A191F8C
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 17:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745601470; cv=none; b=A72KLdpQ3yVuAHwOpjHAY9YMm7fbEktxriZTk3aEz9xSnrdiMN63F/Hauo+T0dadr0mvFz8kijqRJ0cc0XuLIMrxeSsAmB1rS7MjE+Sog34QBfiMVOjOVX69fM6ScbSE1qy0dn/M8XF+hDp2HSrXivUFw4BaQNXS/pkY3haed3M=
+	t=1745601486; cv=none; b=Mte6qKyu2z81biYS7Z+gJ8Zob9NGrVZStFtkpzqn2UpY05dErvJGR6QWB+HMQC4xjmimXN49yKSRUJTAG0cpX1JOCxoMr2gZOuSiagfS3lR3ALpFzg9olmtfTyys6IzaN8itC4Z3VXUlRClWoyJZOrawABs5EhTpQoEIIrQ6pqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745601470; c=relaxed/simple;
-	bh=R52I6WUQCQs45ctJowrJR75VTjTfZSijCSTrcbzlAmM=;
+	s=arc-20240116; t=1745601486; c=relaxed/simple;
+	bh=Dw2ozB0vM3/AU5yhl6y9gwhEkFP0Rm7la2gkIQvVwY0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4AzFHtVUWqn9oKn7j7Na4W0b3NJmZz2fVBuVmDS9FhZD3dscEDkAbuf49OfzAc5dPmcRu9np9lreeeUev+2hf0Hykf0Rn+8l8pQZhFRN64qcPDDtiLg3wIcIUi6QzMyToDvljBPfClx0RY8vRt82Kb8PqkReKBSMJINMV+PIlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYDAMx7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9AC5C4CEE8;
-	Fri, 25 Apr 2025 17:17:48 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=S5m2Zk6Uqeypf7osUjhyhfTxNK3joEwhmi9/CMsSJIGcSuUjJbaJSWhlh8cXepepzueYHelwIRkIFanQWD3UUzrGJ6l2gpdNfzK1pvXlyUdvo4jti8F75o6Bm2O2AmeTQw+LeilzT1RhKHVLsmZbJNo/GEiIQISMaS8XjcY/O6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uonfJQgG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B53DC4CEE4;
+	Fri, 25 Apr 2025 17:18:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745601470;
-	bh=R52I6WUQCQs45ctJowrJR75VTjTfZSijCSTrcbzlAmM=;
+	s=k20201202; t=1745601486;
+	bh=Dw2ozB0vM3/AU5yhl6y9gwhEkFP0Rm7la2gkIQvVwY0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QYDAMx7j71t0WtC/3fJAY8yr2Zl2kSJxnmbLCPYSKrXsf7LwxmNUu23gys6C0giaE
-	 ABdAXKPSJ14gf+soUke6TuLgSG/LS/cFIo3aCpHP5WISPDoTp3xBPurXI9DAwPFevE
-	 7E9/yenOe72MrtBwbwYwbOgTblH9tR1FVXoiZF3O+SSUnVe0lb6dhIseSbi/kvc5K5
-	 aHpU300JhWaA8am5yyw4zd6B54Z+ztnVLP4zu8DEx7rNumy3DMjJ7Vslln0FI8EwoY
-	 Jzs5gr5aqNA6EmO844mClez2L2HykB2uZWIfH+hB8eVKwFdirGBKsjcp4wf+kxJ+wg
-	 89S7w7vnOCzCQ==
-Date: Fri, 25 Apr 2025 18:17:46 +0100
+	b=uonfJQgGg1Os6qZVHlB1TGTK0WDwZoqgi1KkiO4DoCPSPHpLT76t6qclYHnXY8t2i
+	 YObtVIWw/RtqYE0X7p00VVCJpoutFBfiOvN6gSuephBzjpqOrUVEwY0FkKJIdwA2UM
+	 c7eaa51jOYZpupkEzRxWqaOlFAcxFr672nY6bVGHspiKDiItBSr1ve+kYwUZM59ROT
+	 0kPQsU+2ZlJbSiEZQrN+jA/kWTC4olpzrJLUy+JYT9IGGAw07fVS6v6PbdrjcbT5wL
+	 7DlxFoRnT5h5aBNrVGOkARzNiKefxnsnJr7PqsRxIO52yW/IwHNqmC0H2xhy04qA8y
+	 +JgzOaaTk3adg==
+Date: Fri, 25 Apr 2025 18:18:02 +0100
 From: Simon Horman <horms@kernel.org>
 To: David Wei <dw@davidwei.uk>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/3] io_uring/zcrx: selftests: switch to
- using defer() for cleanup
-Message-ID: <20250425171746.GQ3042781@horms.kernel.org>
+Subject: Re: [PATCH net-next v1 2/3] io_uring/zcrx: selftests: set hds_thresh
+ to 0
+Message-ID: <20250425171802.GR3042781@horms.kernel.org>
 References: <20250425022049.3474590-1-dw@davidwei.uk>
- <20250425022049.3474590-2-dw@davidwei.uk>
+ <20250425022049.3474590-3-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +61,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250425022049.3474590-2-dw@davidwei.uk>
+In-Reply-To: <20250425022049.3474590-3-dw@davidwei.uk>
 
-On Thu, Apr 24, 2025 at 07:20:47PM -0700, David Wei wrote:
-> Switch to using defer() for putting the NIC back to the original state
-> prior to running the selftest.
+On Thu, Apr 24, 2025 at 07:20:48PM -0700, David Wei wrote:
+> Setting hds_thresh to 0 is required for queue reset.
 > 
 > Signed-off-by: David Wei <dw@davidwei.uk>
 
