@@ -1,162 +1,134 @@
-Return-Path: <netdev+bounces-186183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83B7A9D63C
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:29:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80878A9D652
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2266E1BA0768
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:29:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E65423B7142
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D831A2973D7;
-	Fri, 25 Apr 2025 23:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B99A296D04;
+	Fri, 25 Apr 2025 23:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tia0CaSa"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="yQ82hEwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A66257AF8
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 23:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B382D1F4E4F
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 23:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745623738; cv=none; b=NVdpcUM2wF2kps53c1Zf1qePecBS1P19J+WSWuLDUSl9JSi3l/07/dLQ4xvSfytu5jGppH5LuQNMP23EpY6nV2Ut53w6DWfCiVqGsAmBxploch/J0UkwFTN13qc7IXY90ZPsUgrxR0yqlpg5ExEEWa/y/yj+l1RwHfAZnIezp6I=
+	t=1745624249; cv=none; b=Y7wdPmCE/hNvVq2KkytfIfbuHNp0S6lDn1X9bfm/swTybUaLT0knXHKLrXknKMAoSCiZKpDUmiftQ2ViV0Z45JNcPJA+LIL2xVRNjEezefibprM/j/hKLQ4daRtWPErErrEoVGeeZruvpyjePI94PhdMo7azf5rn06QfP9NZRWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745623738; c=relaxed/simple;
-	bh=/WdqUTHtFTLFoyqocHCShulzLEkSOeBVkLFH7+ygCQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y3FdhvzaKepS6I05htqrUGEqC2dHpyS4hHqFUgJDoTHP0kjeoCCM8AQy2UvTRzqCGD0Brjv09NTysAmUV2nkrHl9Yns3Rw/x1wXNZBTgt2YECoceym5iNA+NU5pfOCJmPXzpkQMTfJnRbK1W3mmeRoLbLBp7gFl1KCQAnmTbBkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tia0CaSa; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dc0bb19e-31cc-4fa1-9057-a188403dd422@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745623723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gmKHadEdNb/DrpvRvNIIV8K1zswPTziNfpafUqor58g=;
-	b=tia0CaSaOu+vXhEwvI/am249jByBNMUVPU85tBefVHZPSL4RXjQ/GosFXgBoNvRsny5GJJ
-	qyIoM81wrDEKbBGpqK1Di+Bv64mjHg7jGi8W1yTFhaTqCnWjeS7Ft1b4jyOGeuhsRcQWMq
-	xEecBi6jvVnyh4QH1UK9klb0GTM9nGA=
-Date: Fri, 25 Apr 2025 16:28:38 -0700
+	s=arc-20240116; t=1745624249; c=relaxed/simple;
+	bh=PhEoIhJT5S4K1Cb4u5Z3mcJQhjTh0YNTtJOMZdpjKX0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=kf5jNDmxVMDf3iXC5CROm3Q3tuaWmj9CCJ05rznsDwzdDGZGHOLxG/ewdVbPQJ+qtvyeHtsnxnInYJJIPebTBCL5KWNlly3VcamT7jymvql53V8srqjGo/7y54SMNupyaAQDNPwivrU9RBAhawQ5b3nW2w1tU9gArIfZfISDdaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=yQ82hEwx; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-227d6b530d8so32814055ad.3
+        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 16:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1745624247; x=1746229047; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WPFOFIWGGWUoGgYBlEsPjtgwQ0Np9RQ+NgR7+W3sGv4=;
+        b=yQ82hEwxflxO6yZhQcHLEsBCHpOSD3eePeVrOQvJvhcm/BD69SRGxZMiuidKCBnK/Y
+         iTnUMDSpC3KbdPzgKSvTj8fRim8CwDeB2wolFdIglIMJTs/VjsydpU1PwMRlWAaIHnAs
+         vSGcXhsopIZuqx2l2IRBGaG5X/S6q2HZKq+/xmossjn54uCoeIVGlSe2jcosj8f64TpE
+         Z6PmG5EL29e2I2qP10cqHl5hvYSwDETqFGb53LzmwUH6Rlnp9BSUydp00cc1pm5iyJke
+         NOb+hjkhSDU4DNwgLZm65Zy22mbrf51a7evPWHOSYBnY4N/Mwl0Me3WzWy58fbgUzbNs
+         Bq6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745624247; x=1746229047;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WPFOFIWGGWUoGgYBlEsPjtgwQ0Np9RQ+NgR7+W3sGv4=;
+        b=HhaW7ioGVNsGwBC9WmkSGM/t/tJ2ooCy4wf3pLnd701fiCV0ae8vytp2x//9VyfKHg
+         qkkd+Yg60WllZS52rHnSjtpHam2AsiLtEii1cHeFqs6A78ultooNDwQs5koLzi3a4j/s
+         MEPR+9K/wO3kEOCCFwsB7jeweD33yzbF/0mvOapBJO08umXUPe9PXOBtoyM/5FCeub2j
+         Y9exJParnOaEhleu5VVBRQgJ2F/Di/yrbA7RFZM1nNEYTXucKUqE/upNYQmyZ03ikHUT
+         b5MHe2pE7jWWEqZShhHwfGH5lWuaPLTpHb5VUNNcxTnF56YWc3jY1+XQH+ulAjZaVQSX
+         ksmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNG6iRA7bEHDitSYNG+HyKytsY2DEW1xWUrV1EbDKCYfHCeoLSlbxMVh9dF/TapR6/xET3ehs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzkRN4mhD05B8a2PWr3qPB6GraTvPM4px30zW8UQdDIGNUiHLg
+	ajPjFwxv3v2IamBb2ckkdrAWpdG/PRt7IhOOrS6BQ8TDZSWHAZ9YPjI2D6WqONk=
+X-Gm-Gg: ASbGnctHbVrxil1EH4a8ywB/40dfEBFcRjGVEc1uLi3jkggYbMUxBCjpLtOYhQgWOYA
+	x3TVXv5Zk58vMsHEHhy7AM1+o84yli5AhxwjOolC1hOTDvCujX/+ytk42iygW0RDaySF51PqPZ6
+	G9XuXi3pYyouRBHxVO0ZNZUMf5FOTEzpOaS117fStuGmIPwqnSKA7bzOibhq+NDCzyZdW2laTnR
+	rAeKOUfa0qKLl/edNMAWi5I8rgXdUjcaoG/lEb/5/6kbzyl17R5tavCkCxpBiq4XfLHAAD6audQ
+	1IkBhzZycfoIKWg5n/D9fN/zdbeixg3oT1CBCnx8lkfPYuo=
+X-Google-Smtp-Source: AGHT+IHvD4Q4MbPHTV1JH82YwnrVleuHJ/CcRrKi853P7E85yFvtWNgzrwLY6YwW+FHeHIUNxB4kNw==
+X-Received: by 2002:a17:903:3d08:b0:224:910:23f6 with SMTP id d9443c01a7336-22dbf743518mr65075535ad.45.1745624246990;
+        Fri, 25 Apr 2025 16:37:26 -0700 (PDT)
+Received: from [192.168.1.12] ([97.126.136.10])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22dc8463eebsm2779705ad.189.2025.04.25.16.37.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Apr 2025 16:37:26 -0700 (PDT)
+Message-ID: <e668fa44-15be-4734-9b3f-a7b922c27c00@davidwei.uk>
+Date: Fri, 25 Apr 2025 16:37:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next 10/12] selftests/bpf: Add test for
- bpf_list_{front,back}
-To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- netdev@vger.kernel.org, kernel-team@meta.com,
- Amery Hung <ameryhung@gmail.com>
-References: <20250418224652.105998-1-martin.lau@linux.dev>
- <20250418224652.105998-11-martin.lau@linux.dev>
- <CAP01T76heQ9rV1sNdssBQ_mSeDk_yxwP-Binh_j-AfTtXFVPdw@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAP01T76heQ9rV1sNdssBQ_mSeDk_yxwP-Binh_j-AfTtXFVPdw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/3] io_uring/zcrx: selftests: set hds_thresh
+ to 0
+Content-Language: en-GB
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20250425022049.3474590-1-dw@davidwei.uk>
+ <20250425022049.3474590-3-dw@davidwei.uk> <aAwRqSj8F--3Dg2O@LQ3V64L9R2>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <aAwRqSj8F--3Dg2O@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/21/25 8:08 PM, Kumar Kartikeya Dwivedi wrote:
-> On Sat, 19 Apr 2025 at 00:48, Martin KaFai Lau <martin.lau@linux.dev> wrote:
+On 2025-04-25 15:50, Joe Damato wrote:
+> On Thu, Apr 24, 2025 at 07:20:48PM -0700, David Wei wrote:
+>> Setting hds_thresh to 0 is required for queue reset.
 >>
->> From: Martin KaFai Lau <martin.lau@kernel.org>
->>
->> This patch adds a test for the new bpf_list_{front,back} kfunc.
->>
->> It also adds a test to ensure the non-owning node pointer cannot
->> be used after unlock.
->>
->> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
 >> ---
->>   .../selftests/bpf/prog_tests/linked_list.c    |   2 +
->>   .../selftests/bpf/progs/linked_list_peek.c    | 104 ++++++++++++++++++
->>   2 files changed, 106 insertions(+)
->>   create mode 100644 tools/testing/selftests/bpf/progs/linked_list_peek.c
+>>  .../testing/selftests/drivers/net/hw/iou-zcrx.py | 16 ++++++++++------
+>>  1 file changed, 10 insertions(+), 6 deletions(-)
 >>
->> diff --git a/tools/testing/selftests/bpf/prog_tests/linked_list.c b/tools/testing/selftests/bpf/prog_tests/linked_list.c
->> index 77d07e0a4a55..559f45239a83 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/linked_list.c
->> +++ b/tools/testing/selftests/bpf/prog_tests/linked_list.c
->> @@ -7,6 +7,7 @@
->>
->>   #include "linked_list.skel.h"
->>   #include "linked_list_fail.skel.h"
->> +#include "linked_list_peek.skel.h"
->>
->>   static char log_buf[1024 * 1024];
->>
->> @@ -804,4 +805,5 @@ void test_linked_list(void)
->>          test_linked_list_success(LIST_IN_LIST, false);
->>          test_linked_list_success(LIST_IN_LIST, true);
->>          test_linked_list_success(TEST_ALL, false);
->> +       RUN_TESTS(linked_list_peek);
->>   }
->> diff --git a/tools/testing/selftests/bpf/progs/linked_list_peek.c b/tools/testing/selftests/bpf/progs/linked_list_peek.c
->> new file mode 100644
->> index 000000000000..26c978091e5b
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/progs/linked_list_peek.c
->> @@ -0,0 +1,104 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
->> +
->> +#include <vmlinux.h>
->> +#include <bpf/bpf_helpers.h>
->> +#include "bpf_misc.h"
->> +#include "bpf_experimental.h"
->> +
->> +struct node_data {
->> +       struct bpf_list_node l;
->> +       int key;
->> +};
->> +
->> +#define private(name) SEC(".data." #name) __hidden __attribute__((aligned(8)))
->> +private(A) struct bpf_spin_lock glock;
->> +private(A) struct bpf_list_head ghead __contains(node_data, l);
->> +
->> +#define list_entry(ptr, type, member) container_of(ptr, type, member)
->> +#define NR_NODES 32
->> +
->> +int zero = 0;
->> +
->> +SEC("syscall")
->> +__failure __msg("invalid mem access 'scalar'")
->> +long list_peek_unlock_scalar_node(void *ctx)
->> +{
->> +       struct bpf_list_node *l_n;
->> +       struct node_data *n;
->> +
->> +       bpf_spin_lock(&glock);
->> +       l_n = bpf_list_front(&ghead);
->> +       bpf_spin_unlock(&glock);
->> +
->> +       if (l_n) {
->> +               n = list_entry(l_n, struct node_data, l);
->> +               if (n->key == 0)
->> +                       return __LINE__;
->> +       }
->> +
->> +       return 0;
->> +}
+>> diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+>> index 698f29cfd7eb..0b0b6a261159 100755
+>> --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+>> +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+>> @@ -8,10 +8,11 @@ from lib.py import NetDrvEpEnv
+>>  from lib.py import bkg, cmd, defer, ethtool, wait_port_listen
+>>  
+>>  
+>> -def _get_rx_ring_entries(cfg):
+>> +def _get_current_settings(cfg):
+>>      output = ethtool(f"-g {cfg.ifname}", host=cfg.remote).stdout
+>> -    values = re.findall(r'RX:\s+(\d+)', output)
+>> -    return int(values[1])
+>> +    rx_ring = re.findall(r'RX:\s+(\d+)', output)
+>> +    hds_thresh = re.findall(r'HDS thresh:\s+(\d+)', output)
+>> +    return (int(rx_ring[1]), int(hds_thresh[1]))
 > 
-> Would be good to have tests explicitly asserting the type is
-> non-owning ref (even though we indirectly do that by touching it after
-> unlock, relying on invalidation logic.).
+> Makes me wonder if both of these values can be parsed from ethtool
+> JSON output instead of regexing the "regular" output. No reason in
+> particular; just vaguely feels like parsing JSON is safer somehow.
 
-I will try to address the test suggestions in patch 6 and 10.
+Yeah I agree. JSON output isn't available for these ethtool commands as
+support for that is quite patchy. If/once there is JSON output I'd be up
+for switching to that.
 
-Thanks for the review!
-
-
+> 
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
 
