@@ -1,147 +1,122 @@
-Return-Path: <netdev+bounces-185938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42483A9C32A
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:20:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4146DA9C339
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B336D927527
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:19:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82D19280E3
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889A42343AF;
-	Fri, 25 Apr 2025 09:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcMWUsOY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA09221FC9;
+	Fri, 25 Apr 2025 09:22:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D287230BC2;
-	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25FA4C6E
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 09:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745572798; cv=none; b=phuRWLVIo8E71iHvekB9gnZuUWBCQ3fJATqwP0rx0AHqD701XMCDbsoEJL9aiLWUJz+6f1iMm4xRmNpUsLNXtzAVLRYzULLW92vuzce0z78QgCt+qFGqJwgviI5EwSf4sjyl5fP2M1hgG/k4/i3UkXtaLXgMuB0qzUg+3T12ufo=
+	t=1745572954; cv=none; b=tj12xU12IZRY7kwp17RQIC33UNKCnauzWMi36SbQsJhmHyHWhNb9N7cpLbGWQyDqwRnGaPPcw2bvO1R+UuBNuxFm1J3icB6JohcpXkyEAFqLr7gedr5Cd+W4gBd8gZsRcydCdIcChn3neDqpal989WZFX9tdwTDrmPkXFUnCkkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745572798; c=relaxed/simple;
-	bh=s+UM6pisdmKw4N9/rscRvpbQV5hWX+gCZWCLZQIJwcQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Pl3IRGVVdSNhgOZ8ELNYl5omwwuzqbPEu+1BGx2OFmd5yJ4ryi6+IcRrmLydCik3SsiUoRLIXfBos05batimMq80mU1UZGfyFTW2wfArlI0fMtsZD5qH24LoDiT0+HEoV9FyhatV3kzfptdBFv4y4b4vOXz5SUPveU3NnKlySpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QcMWUsOY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4C27C4CEE4;
-	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745572797;
-	bh=s+UM6pisdmKw4N9/rscRvpbQV5hWX+gCZWCLZQIJwcQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=QcMWUsOY+tfg+yMSUeRa0AJAjh2uSxwqe6c3JH4/d60hO20ZOglqn5AS28oQRnNyH
-	 OpXkDSpy9HrsN9SWaT1QhlhNPRnz0KnMOHifrGtw1idvHzjzpeGZFq2y+uk2tCdZRL
-	 heWBumAI+X+oJ8/G/RiAIQc1WEpDA/0aKOFB6oTh8IbBHt7ZfdtGlJ4cIIzDJ32Pwm
-	 42Mjcr02GaAtQc6AM1V7bLSOK6dgXZbDYEhvNaRPrLDAA/SJ3OjEzVjAsQ8aKUQOSp
-	 5mHbu7lZCuZJcdqgrecpfXTrdPDtokYJ4oJmZDlZ4QtZjF9xb6Ysq/t9JIr762QvWk
-	 QCSjJHnAXX5LA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA72C369D1;
-	Fri, 25 Apr 2025 09:19:57 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Fri, 25 Apr 2025 13:19:28 +0400
-Subject: [PATCH v2] net: dsa: qca8k: fix led devicename when using external
- mdio bus
+	s=arc-20240116; t=1745572954; c=relaxed/simple;
+	bh=Y1YHoiRnwmzGqHoxlpRxrubBVFZcVY+7ZxeCzF5GFj4=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=R7sJqZe2Hx/pZyq/F5AbRS7H1ADixruav068ifhJpiGzw8PFqG+TwaqV6GFlwUsuJVZSmRzgmj71bFbaLQx9MQR5k7lwLVnAWCOpiNKL/YBlyZzFXtGuIO7Ng2mW3IxnTXhF5BcwKpkXfUt1CP9YGI/5dVnmRVKAH66LfNKYOXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas5t1745572854t895t13832
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.188.93])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 6676197562459129134
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
+Cc: <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>,
+	<kuba@kernel.org>,
+	<edumazet@google.com>,
+	<davem@davemloft.net>,
+	<andrew+netdev@lunn.ch>,
+	<mengyuanlou@net-swift.com>
+References: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com> <aAs79UDnd0sAyVAp@shell.armlinux.org.uk>
+In-Reply-To: <aAs79UDnd0sAyVAp@shell.armlinux.org.uk>
+Subject: RE: [PATCH net] net: libwx: fix to set pause param
+Date: Fri, 25 Apr 2025 17:20:53 +0800
+Message-ID: <046701dbb5c3$58335190$0899f4b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250425-qca8k-leds-v2-1-b638fd3885ca@outlook.com>
-X-B4-Tracking: v=1; b=H4sIAJ9TC2gC/22MQQ7CIBBFr9LMWkwHpLGuvIfpAmFqJ61FoRJNw
- 93Frl38xfvJeytECkwRTtUKgRJH9nMBuavADma+kWBXGGQtdX2QWjytOY5iIheF0qTw2hqFbQ9
- FeATq+b3FLl3hgePiw2drJ/y9fzMJBYpGYWOcKpPy7F/L5P24t/4OXc75C4PqVLmmAAAA
-X-Change-ID: 20250425-qca8k-leds-35e31b9a319f
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- George Moussalem <george.moussalem@outlook.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1745572796; l=3435;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=ydGK36Kl5X3P/v+3CwPypXc8oDZyqDCNEcnQKXNutFA=;
- b=M4+pevfUAbWEi3MH1shAmBryPB6xZcVeewXJQthY8K/LnKGCjAm5MZD+k9aHotIPA/Rb6PEPN
- SGaAHTo0uWVBjuck36b1/Fa4nk6RbYnvbqZwaXZnuR45en4ILAEFpS3
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQGrOoFUwnc6DDI8c12ntTx1ZV8pAAKAlWBrtAEL2XA=
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Mc/7Da/97eYXJHrUjNgznHa34wB2pi0nPakF/Eig2F19ey5qiyD6sbRc
+	Ox7V8I9aKkQB2Syi8dpd7zKRROaZVONuQUud7fWZyc/ztns5f27rT8PFvPq/4ekbREobV3y
+	c3wV14O9tVqPtzwKh9ZMzll/JwhbPSRaPPXktU5G0II/g4pvD0nCV3DW+0ypOAIQNhpwOz1
+	lhVOuc0FhFCvr2KozEQvdcIi82SXnadYKx5LuUyUH5FA+aS8cRk2ig6sTzsGs6P234TqOcN
+	YHEM8Y6eyP2NS52Kk58C6yO3VOR8ONOXnnwK5fcKN4c9of1Bo62qnClBdYA0SaYcsg3Uqey
+	ZxLrbc+i9dQ5uM8JOxnnFFjawZT3oKlDN+axX3fRYvThcGK1dIt2LdSoPfy5gJZQ2ZzLkQJ
+	hKUZSkpjyGkZP5lt8hSMURkj0RQOYw4uN9oR9V+5H877g8Sm7Wtxx/RyWMsaoOX15ZsLajy
+	+wTd3aJQ2u7+WisV7IJfUYQvnxblmcuznfc3zHvl3eVOE7gheMdSXlyjAYiL6gW88HCnKrU
+	r/SQzDmBrIgs9MYJbYLrEqwPE38EXST2x00DLyiYq0MkqbPSctVQRj/Kn+jQtXyJ0p79wsV
+	TQ7K+yPDezceB5WUbZxt+u9DnCTYT834j/2HnL3d5HIHPDTRG1VUobY2Eb4g0bdhHM1/BBo
+	xzTWsOnYqsPKRsbNfv0u9W52vCUK1PLNQINbVE1AKWc5MT/+v2bKxldEhd3Sr+Y6S+GPDAi
+	Bkv16pj0L1/ZgCaw9r7J7Bd6IHOiM725vNOYOJfoMd5Wt3fKUogvPQjvS5aY2610gziliXR
+	77kkx3fGLFLmbpb+w5fC0vIB6xbm44mny60Ct0CTkkYUSp5mYe6GugFzaFbVmMBa09B5Hmo
+	nVnv2xL085+mFkMstSLewLXWLA/gG7vOTICtvTTyAfywXQk64GhbxaHfDJYupfnmJhy7INA
+	uU4xthu7Jlgt8WAJti13jluv0FFWWT9jDvwa12TO5U6c6jX29uo59kHB0kVszc+v9h8yaSD
+	ArqN285BjPmXCR4MwZJpR7CwJT5xc=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-From: George Moussalem <george.moussalem@outlook.com>
+On Fri, Apr 25, 2025 3:38 PM, Russell King (Oracle) wrote:
+> On Fri, Apr 25, 2025 at 03:09:42PM +0800, Jiawen Wu wrote:
+> > @@ -266,11 +266,20 @@ int wx_set_pauseparam(struct net_device *netdev,
+> >  		      struct ethtool_pauseparam *pause)
+> >  {
+> >  	struct wx *wx = netdev_priv(netdev);
+> > +	int err;
+> >
+> >  	if (wx->mac.type == wx_mac_aml)
+> >  		return -EOPNOTSUPP;
+> >
+> > -	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
+> > +	err = phylink_ethtool_set_pauseparam(wx->phylink, pause);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	if (wx->fc.rx_pause != pause->rx_pause ||
+> > +	    wx->fc.tx_pause != pause->tx_pause)
+> > +		return wx_fc_enable(wx, pause->tx_pause, pause->rx_pause);
+> 
+> Why? phylink_ethtool_set_pauseparam() will cause mac_link_down() +
+> mac_link_up() to be called with the new parameters.
+> 
+> One of the points of phylink is to stop drivers implementing stuff
+> buggily - which is exactly what the above is.
+> 
+> ->rx_pause and ->tx_pause do not set the pause enables unconditionally.
+> Please read the documentation in include/uapi/linux/ethtool.h which
+> states how these two flags are interpreted, specifically the last
+> paragraph of the struct's documentation.
+> 
+> I'm guessing your change comes from a misunderstanding how the
+> interface is supposed to work and you believe that phylink isn't
+> implementing it correctly.
 
-The qca8k dsa switch can use either an external or internal mdio bus.
-This depends on whether the mdio node is defined under the switch node
-itself and, as such, the internal_mdio_mask is populated with its
-internal phys. Upon registering the internal mdio bus, the slave_mii_bus
-of the dsa switch is assigned to this bus. When an external mdio bus is
-used, it is left unassigned, though its id is used to create the device
-names of the leds.
-This leads to the leds being named '(efault):00:green:lan' and so on as
-the slave_mii_bus is null. So let's fix this by adding a null check and
-use the devicename of the external bus instead when an external bus is
-configured.
-
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
----
-Fix the led device names when an external mdio is configured.
-The current codepath for registering led device names 'assumes' that the
-internal mdio bus is used. Therefore, add a check and fallback to the
-device name of the external mdio bus while creating the led device
-names.
-
-Wrong device names:
-root@OpenWrt:~# ls -l /sys/class/leds                                           
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):00:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):01:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 (efault):02:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
-
-Correct device names:
-root@OpenWrt:~# ls -l /sys/class/leds                                                                                                                      
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:00:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:01:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
-lrwxrwxrwx    1 root     root             0 Jan  1  1970 90000.mdio-1:02:green:lan -> ../../devices/platform/soc@0/90000.mdio/mdio_bus/90000.mdio-1/90000.n
----
-Changes in v2:
-- Fixed c/p error from older kernel version: slave_mii_bus was renamed
-  to internal_mdio_bus
-- Link to v1: https://lore.kernel.org/r/20250425-qca8k-leds-v1-1-6316ad36ad22@outlook.com
----
- drivers/net/dsa/qca/qca8k-leds.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
-index 43ac68052baf9f9926aaf4a9d8d09640f9022fcd..ef496e345a4e7dd5b9fb805b8e0ff3cce56e2986 100644
---- a/drivers/net/dsa/qca/qca8k-leds.c
-+++ b/drivers/net/dsa/qca/qca8k-leds.c
-@@ -429,7 +429,8 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
- 		init_data.fwnode = led;
- 		init_data.devname_mandatory = true;
- 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d",
--						 priv->internal_mdio_bus->id,
-+						 priv->internal_mdio_bus ?
-+						 priv->internal_mdio_bus->id : priv->bus->id,
- 						 port_num);
- 		if (!init_data.devicename) {
- 			fwnode_handle_put(led);
-
----
-base-commit: 02ddfb981de88a2c15621115dd7be2431252c568
-change-id: 20250425-qca8k-leds-35e31b9a319f
-
-Best regards,
--- 
-George Moussalem <george.moussalem@outlook.com>
+You are right.
+I should set autoneg off first, although there has no autoneg bit in this link mode.
 
 
 
