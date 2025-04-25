@@ -1,129 +1,127 @@
-Return-Path: <netdev+bounces-186039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF108A9CDCD
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:08:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B5B2A9CDEE
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11CA61B89432
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:08:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 272B43BE2F9
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D5E148830;
-	Fri, 25 Apr 2025 16:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E61192D87;
+	Fri, 25 Apr 2025 16:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7fyJsID"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbko/nMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E889618D649;
-	Fri, 25 Apr 2025 16:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E0019341F;
+	Fri, 25 Apr 2025 16:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745597314; cv=none; b=DfiP/c6qewc6weVBil6pcVGj1kdgWtS3KoBw3zRLezg1CXlQT6b3QjQjvX2HZwv6gQRDCDF+CgUICkCz9UnqQM1scIKPoNTuIXRo1ez2+NukUDSY8IDM7r/czNIoTSF53ktoi6iizWCx0ozew5G+c8o8NNHCD1uputeOKQVCSG0=
+	t=1745597937; cv=none; b=QCXzU3+y/NvZWAkblM20lmRRxen1xD88LH0D5v2bJeedIdFVBzZJYxMaqImFkIyEOL+NJvBrYIu74Bs3/L3s/yRnab6+mNU8oLP3dU9QvFYIEA7Hse/0XxiQf7PuWfdYb+NW91WK0StJCWVBvLndQVXKwgDYpa6uDeo6/gFadGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745597314; c=relaxed/simple;
-	bh=L2GzxIA56nfM+cDgMgMMSOWe5dN+/yidKvdmYvhSKfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QU/DvNZJmGfkwMDG1mxQN753pNH0TWia6/ldFdgOwFoujIVf4eVZMKTpu0xbfB41mKACc89ZTPRQELdHUF0/ePIW8yYoQDdsyyMV4qDgP/Dk8oqVZwdJavVslLP9Yp42VNVdX3G7j7ryRJ8zd0QTI63YhH3oEmY8W6GB0paCPN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7fyJsID; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22da3b26532so24062545ad.0;
-        Fri, 25 Apr 2025 09:08:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745597312; x=1746202112; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i5pNyASVzOvo7de5opodmAAp0f24p09fWkyNMVBg/4c=;
-        b=R7fyJsIDs1QPKdRZvJ3njPzf5SV+F50V9xH8x1hWbOecp0acNV7sSvwr+XKRmIkG7R
-         w6OPApiBYiidHzBxUTIpl7EwZvO1hXD1BnRAVXjPwSdOLMbDJ08LhwyhthR7xhLn9l9i
-         hgQPPnrtNXCZ7na2W4dZG5Pes8TWyJNCiA4r405/dcdJqrXJBKSwfbH4HXEPOKDRKMbd
-         zr/DvRSUx9LvuLMCJNI7fEmnEF5e589I/v0QFPPvoc+tGIvPmnjbnNfsUrAdXwtQPWwK
-         kkHYyGT6H4a8Fg685ZC1gjlli2kiX+cMbTqkzguZJnlI3x/jxYOCsjxhdIZyov3/h2mT
-         IosQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745597312; x=1746202112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i5pNyASVzOvo7de5opodmAAp0f24p09fWkyNMVBg/4c=;
-        b=sSMH1VaarqqpPec28ikcjewuw+zf/WtjzZUUyqizPGFbozHHi9l0Y+1nDFiEwoeDN1
-         yb9bFEqY0LGcG+VyQU+ELNN8yPfgSMq+lDIKO5Uk/cSiT+Runyt+Tk+tJRiJUxhzc2+7
-         WzqjUbsVnAG+EJbap1f/ROgIVECcJ9Ze1z9Qzw8JqYwStszoPHRt+bt6/EYJxN69YUHa
-         qJ64H4k57boZesMC3p449NSc7Zx1zPlBezeVajZKAumWQ7JcpvODdWaXIcdBmSwNaX2g
-         icft3kCURgF6GZdm1gW6hl1ozWYizwzoz7Hb0z9i0S6iyioxRpASiRZ6T8OWTZYtJJij
-         893Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV29vZEM49wiBFSXP55wwQVCBwzmYUTe6REp1gHJlZUG4Cw5KtCBzWEOpt3WLL3PWzGUFhg+RnE@vger.kernel.org, AJvYcCVn6Q+dkqaZSJXdGOEMvmOlNBvqCTDGHsCYEciGFgfYd9KcOqJjlzLHroMp52QiFGBdpfsVOOXFQ5CoDA0=@vger.kernel.org, AJvYcCWKeCyRZ/3PuwbI9QR8gsLjXO5qQuwkxWBT+sfJ8lOG0+DRmZ84CATJ3yF5M1hVuptQSPupLcLm@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu2ljge6V0PGL6au7Ok/BfVMbQf+/rZWUFPcL+pq+g7jBD3kYx
-	/dxIQ8or6GzwUi72R7xrIJcYO9CRPFtwTCt6DNrFq/EyvrFNzINA
-X-Gm-Gg: ASbGncujxH7nJ5H4wOqzu/AV007pX0JP/GMJcgi40YMZYA2jzvCJfvY9LjCkfem70rY
-	XL60uveyIWrOypgV2AUwl9IOXvp/tEqdMcYg95VwaCi+X8m5YrmOCTU5G5S2nJj3cw/yr0X3o6Y
-	pz7gOf00e44rfU/v1hHcTm3UNotbKcB8NCjXf+0dYtHjJm9zQCfdATdvk9g4tqivikJkxFL4hSe
-	h9J8eIOpGuY3goFs1dCKeXjZq+XVEi1ChlVI5DdF0vlWdZsP8yptEQjKMzCnCotsezYleyVbMVK
-	VjjFxusyvBrqjWqaBUGBEBaY0PhT+q8qmJAgVlJnBb2mmJ8=
-X-Google-Smtp-Source: AGHT+IEDnCojjqBFupUvzzEwiunkDr1ppd44q2OkPVWtrj2YUpLPC11441r/ohtaDxUPakVfJZSnow==
-X-Received: by 2002:a17:902:f683:b0:223:62f5:fd44 with SMTP id d9443c01a7336-22dbf62c38emr46955105ad.40.1745597311720;
-        Fri, 25 Apr 2025 09:08:31 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:e00f:8820:97a7:c371])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50e7b08sm34009365ad.114.2025.04.25.09.08.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 09:08:30 -0700 (PDT)
-Date: Fri, 25 Apr 2025 09:08:29 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: "Alan J. Wylie" <alan@wylie.me.uk>
-Cc: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
- htb_dequeue
-Message-ID: <aAuzfQe08tFJclNJ@pop-os.localdomain>
-References: <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
- <20250421210927.50d6a355@frodo.int.wylie.me.uk>
- <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
- <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
- <aAf/K7F9TmCJIT+N@pop-os.localdomain>
- <20250422214716.5e181523@frodo.int.wylie.me.uk>
- <aAgO59L0ccXl6kUs@pop-os.localdomain>
- <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
- <aAlAakEUu4XSEdXF@pop-os.localdomain>
- <20250424135331.02511131@frodo.int.wylie.me.uk>
+	s=arc-20240116; t=1745597937; c=relaxed/simple;
+	bh=NsLNzfkxX6Y7DEZfVl7qnYNxiIiLTtz5SgYM8hN0cdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FykDS0bIiLJx4Lilq2pXSkGkNO6lu4OsrrwfWcfdWlp0Kvm8k4GryArL5SMg0XUivuI4zTog/ZX0MKQ7qvyBCOUmbVqyonQNu0S1IbC2LTO3cjJ3UxsJLw/EKIhiLcOAQh3Xl6RrFP3Pe3OXJoS7B/tRQei0KIW6wKnADI49NnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbko/nMk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4DEEC4CEE4;
+	Fri, 25 Apr 2025 16:18:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745597935;
+	bh=NsLNzfkxX6Y7DEZfVl7qnYNxiIiLTtz5SgYM8hN0cdk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lbko/nMkJPT+o8Nmo8PQjNWKW1SIcZJMiheOu+00SJjCgfnvOGM6QOhbf2GNtMGSu
+	 3CLkxDwQP978hJM7B8IgF9fbAlDr6FtCqbmoRsYIzQOsVW/ug0vP9cCr79OohVrABZ
+	 wX2Kn6JaFfxZQxdKJu17W02hSoCfsqLRa0e9wCVNg084B1taVmzOnSu1enyDUkR4sw
+	 QTT5QRlkZa+QmBvMzRmG9Xd+MYbmc3A8PzfNeyaBSRkki6Sf+KolZ9kJLIfQzTutYh
+	 f4sZH6Qex3UDg4WmztfeVCC+35eRHMa8PEM1uupQEqmW1jyvNdwhbusSPOzDjSWf8r
+	 u+P2AhXO7QW9A==
+Date: Fri, 25 Apr 2025 09:18:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, fw@strlen.de
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ horms@kernel.org
+Subject: Re: [PATCH net-next,v2 0/7] Netfilter updates for net-next
+Message-ID: <20250425091854.4b5964fd@kernel.org>
+In-Reply-To: <20250424211455.242482-1-pablo@netfilter.org>
+References: <20250424211455.242482-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250424135331.02511131@frodo.int.wylie.me.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 01:53:31PM +0100, Alan J. Wylie wrote:
-> > On Tue, Apr 22, 2025 at 07:20:24PM +0200, Holger Hoffstätte wrote:
-> 
-> > Meanwhile, if you could provide a reliable (and ideally minimum)
-> > reproducer, it would help me a lot to debug.
-> 
-> I've found a reproducer. Below is a stripped down version of the shell script
-> that I posted in my initial report.
-> 
-> Running this in a 1 second loop is enough to cause the panic very quickly.
-> 
-> It seems a bit of network traffic is needed, too.
+On Thu, 24 Apr 2025 23:14:48 +0200 Pablo Neira Ayuso wrote:
+> v2: including fixes from Florian to address selftest issues
+>     and a fix for set element count and type.
 
-Excellent! Now I can try it on my side instead of bothering you. :)
+Thanks, appreciated! All our networking tests now pass, but there
+seems to still be some breakage on the BPF side, so
+tools/testing/selftests/bpf/config needs touching up.
 
-I will check if applying all patches here could make crash and warning
-go away. And of course, I need to really understand why the crash still
-happened even after the qlen check adding to htb_qlen_notify(), which is
-unexpected to me.
+I suppose while addressing the RT problem you're trying to move
+straggles off from the legacy stuff to nft? Which I'm entirely
+sympathetic to. But I'm worried that not everybody will be, and 
+there's plenty of defconfigs which include iptables:
 
-Thanks a lot!
+$ git grep CONFIG_IP_NF_IPTABLES= | wc -l
+54
+
+At the end of the day it's up to you, but maybe sleep on it? :)
+And the BPF side needs fixing for sure, they will notice..
+
+Error: #25 bpf_nf
+Error: #25/1 bpf_nf/xdp-ct
+  Error: #25/1 bpf_nf/xdp-ct
+  test_bpf_nf_ct:PASS:test_bpf_nf__open_and_load 0 nsec
+  test_bpf_nf_ct:FAIL:iptables-legacy -t raw -A PREROUTING -j CONNMARK --set-mark 42/0 unexpected error: 768 (errno 0)
+Error: #25/2 bpf_nf/tc-bpf-ct
+  Error: #25/2 bpf_nf/tc-bpf-ct
+  test_bpf_nf_ct:PASS:test_bpf_nf__open_and_load 0 nsec
+  test_bpf_nf_ct:FAIL:iptables-legacy -t raw -A PREROUTING -j CONNMARK --set-mark 42/0 unexpected error: 768 (errno 0)
+Error: #621 xdp_synproxy
+Error: #621/1 xdp_synproxy/xdp
+  Error: #621/1 xdp_synproxy/xdp
+  test_synproxy:PASS:ip netns add synproxy 0 nsec
+  test_synproxy:PASS:ip link add tmp0 type veth peer name tmp1 0 nsec
+  test_synproxy:PASS:ip link set tmp1 netns synproxy 0 nsec
+  test_synproxy:PASS:ip link set tmp0 up 0 nsec
+  test_synproxy:PASS:ip addr replace 198.18.0.1/24 dev tmp0 0 nsec
+  test_synproxy:PASS:ethtool -K tmp0 tx off 0 nsec
+  test_synproxy:PASS:ip link set tmp0 xdp object xdp_dummy.bpf.o section xdp 2> /dev/null 0 nsec
+  test_synproxy:PASS:setns 0 nsec
+  test_synproxy:PASS:ip link set lo up 0 nsec
+  test_synproxy:PASS:ip link set tmp1 up 0 nsec
+  test_synproxy:PASS:ip addr replace 198.18.0.2/24 dev tmp1 0 nsec
+  test_synproxy:PASS:sysctl -w net.ipv4.tcp_syncookies=2 0 nsec
+  test_synproxy:PASS:sysctl -w net.ipv4.tcp_timestamps=1 0 nsec
+  test_synproxy:PASS:sysctl -w net.netfilter.nf_conntrack_tcp_loose=0 0 nsec
+  test_synproxy:FAIL:iptables-legacy -t raw -I PREROUTING 	    -i tmp1 -p tcp -m tcp --syn --dport 8080 -j CT --notrack unexpected error: 768 (errno 95)
+Error: #621/2 xdp_synproxy/tc
+  Error: #621/2 xdp_synproxy/tc
+  test_synproxy:PASS:ip netns add synproxy 0 nsec
+  test_synproxy:PASS:ip link add tmp0 type veth peer name tmp1 0 nsec
+  test_synproxy:PASS:ip link set tmp1 netns synproxy 0 nsec
+  test_synproxy:PASS:ip link set tmp0 up 0 nsec
+  test_synproxy:PASS:ip addr replace 198.18.0.1/24 dev tmp0 0 nsec
+  test_synproxy:PASS:ethtool -K tmp0 tx off 0 nsec
+  test_synproxy:PASS:setns 0 nsec
+  test_synproxy:PASS:ip link set lo up 0 nsec
+  test_synproxy:PASS:ip link set tmp1 up 0 nsec
+  test_synproxy:PASS:ip addr replace 198.18.0.2/24 dev tmp1 0 nsec
+  test_synproxy:PASS:sysctl -w net.ipv4.tcp_syncookies=2 0 nsec
+  test_synproxy:PASS:sysctl -w net.ipv4.tcp_timestamps=1 0 nsec
+  test_synproxy:PASS:sysctl -w net.netfilter.nf_conntrack_tcp_loose=0 0 nsec
+  test_synproxy:FAIL:iptables-legacy -t raw -I PREROUTING 	    -i tmp1 -p tcp -m tcp --syn --dport 8080 -j CT --notrack unexpected error: 768 (errno 95)
+
+https://github.com/kernel-patches/bpf/actions/runs/14667575264/job/41166480606
 
