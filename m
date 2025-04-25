@@ -1,142 +1,144 @@
-Return-Path: <netdev+bounces-185844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4778CA9BE41
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:00:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01ECFA9BE44
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:01:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF98D3B952A
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:00:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 091E97ACD88
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0382D22A801;
-	Fri, 25 Apr 2025 06:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE3022B590;
+	Fri, 25 Apr 2025 06:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="eZVvTQJH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ny8/XG3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B776C19C540;
-	Fri, 25 Apr 2025 06:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EA522ACF2
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 06:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745560829; cv=none; b=VklU2ao8e9WMMVhq5b3Qfi+TwYIeuo2BUL6svpknWjZDgJrrMka1d9t6qWoMpj5ZXTD6O6sBDkSmvyipW54VJezFSkGbt9WkmDumVKJoFtucvsLhiC4RrPXckUf7xysGmqFehgSY5FKfpuivy5Rf9YmUoJ0gJLu0NSHH9CIUzh0=
+	t=1745560858; cv=none; b=GNlBLYOm/s1JvxCAKA7nqnkJzZHSZsiJ6UW1G1hum7vvmtI8l2yAg+Uo3heu/8lwjiLeKCZcxPdQkwS4kAPlAIy9JeTlcSyPTDtDufHsgzrYnJLMFk9DOk5MRdo4A6y7bKWf0MB/4wAVgfRcOeAuEUST51pwkvewaVj9gjArAGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745560829; c=relaxed/simple;
-	bh=KklZdxaMaK2t+GzkmjlvOLyn33H5lbCp9kBUG3gbsdM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EyIyRzq4Baivw+K/t3ONX5elCn2opgFyy781u3u2XjYix2vm4HoX6Eeqg5RagWrVlDS/aO8X2Fijh8Bz58g8sLNgsfmjGvZR2QyTWEL8qUU8rqwLTWPQra/Y0SzcvXPGSDTGS+TjW1h/t+2DRXZijummccln3NLhMBaN/KyRa1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=eZVvTQJH; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53P5xSXT12329904, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1745560768; bh=KklZdxaMaK2t+GzkmjlvOLyn33H5lbCp9kBUG3gbsdM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=eZVvTQJH18XWIc9zJZV++hpfHPkkhKIXhyoQvgH2bw1hSPl+RU538nOgplb/o72QC
-	 fYsbjKev5JncnLserer4z9FOoASMiLn+DTAYtaG4ByXa7FXdjAcNuucnmJPFLjkA0z
-	 IISAze91FAPNvEtTHfUSNc+znEoCNl/S8IpgeR20GLbY5Jl0EuTW05/PRsWlfqJ+4U
-	 kNQXZ+ZuH8bY3OQuoQl+QwfL4i1QJOUdA/TEGWihrjYJ3pfW96opDFA6ChqyoDd1GR
-	 dHw0aFI1CGgEyIDzWVtmWaebgFyg3AXyrF0Mye4F7Y4oTnrgCynPqFsbaSyo6CMjp/
-	 rsHShbTH/eHdQ==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53P5xSXT12329904
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Apr 2025 13:59:28 +0800
-Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 25 Apr 2025 13:59:28 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 25 Apr 2025 13:59:28 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Fri, 25 Apr 2025 13:59:28 +0800
-From: Ping-Ke Shih <pkshih@realtek.com>
-To: Alexei Safin <a.safin@rosa.ru>, Stanislaw Gruszka <stf_xl@wp.pl>
-CC: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>,
-        "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "lvc-project@linuxtesting.org"
-	<lvc-project@linuxtesting.org>
-Subject: RE: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in il4965_tx_cmd_build_rate()
-Thread-Topic: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in
- il4965_tx_cmd_build_rate()
-Thread-Index: AQHbtUoyW+CeES1JwUC8udH5dJNFFbOz4pRg
-Date: Fri, 25 Apr 2025 05:59:27 +0000
-Message-ID: <ea0ce54e06104682b9a5d24b9bb75a91@realtek.com>
-References: <20250424185244.3562-1-a.safin@rosa.ru>
-In-Reply-To: <20250424185244.3562-1-a.safin@rosa.ru>
-Accept-Language: en-US, zh-TW
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1745560858; c=relaxed/simple;
+	bh=jmofsGFzLjmgZ8ZBCzLdrMPiUlRLdu+MBWlrZwAXVeg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jrfWw2ufgWp/63tCU0GnAviOFfKkOiErjTn338gV5u2Sl0LVWggwvbZ9+GwPjQO8lEkrwVmooJxtuLNCcfQBgeqm+R9Ez6JMYXPwH4AOllnbvaPGeZtNCi7BK/tEYXaZblPXqu/SLN1hvRqucstv6a4rLYyCdcAlQU5sKC1Gfso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ny8/XG3w; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745560854;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=728Q82xIBCh00I19CJB2+kqGL8qnI1hZCn1gPW8uhgQ=;
+	b=Ny8/XG3weuD2QLv7a96dCx27f+T9mKGu+xSN0+phkLpgGAWB6LL/BX7Y5osUbgmU+veCc8
+	wQJ1Aa49YNzkrafeX+eNyZ14rI9kadjw4HM14o18tlasdtgnx1Vj5BnaKaypyupOMD+NqH
+	Nr38j+reLw3dc7boGfSOet5+JFwuYrk=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: mrpre@163.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v1 0/2] ktls, sockmap: Fix missing uncharge operation and add selfttest
+Date: Fri, 25 Apr 2025 13:59:56 +0800
+Message-ID: <20250425060015.6968-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Alexei Safin <a.safin@rosa.ru> wrote:
->=20
-> Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
-> rate_idx values greater than or equal to RATE_COUNT_LEGACY.
->=20
-> Use a correct bounds check to avoid accessing il_rates[] with
-> an invalid index. The previous comparison allowed rate_idx to become
-> equal to RATE_COUNT_LEGACY, which exceeds the array limit.
->=20
-> Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
-> 'rate_idx >=3D RATE_COUNT_LEGACY' to ensure memory safety.
->=20
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->=20
-> Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
+Cong reported a warning when running ./test_sockmp:
+https://lore.kernel.org/bpf/aAmIi0vlycHtbXeb@pop-os.localdomain/T/#t
 
-The Fixes is obviously wrong. It just moved the code.=20
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 40 at net/ipv4/af_inet.c inet_sock_destruct+0x173/0x1d5
+Tainted: [W]=WARN
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+Workqueue: events sk_psock_destroy
+RIP: 0010:inet_sock_destruct+0x173/0x1d5
+RSP: 0018:ffff8880085cfc18 EFLAGS: 00010202
+RAX: 1ffff11003dbfc00 RBX: ffff88801edfe3e8 RCX: ffffffff822f5af4
+RDX: 0000000000000007 RSI: dffffc0000000000 RDI: ffff88801edfe16c
+RBP: ffff88801edfe184 R08: ffffed1003dbfc31 R09: 0000000000000000
+R10: ffffffff822f5ab7 R11: ffff88801edfe187 R12: ffff88801edfdec0
+R13: ffff888020376ac0 R14: ffff888020376ac0 R15: ffff888020376a60
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000556365155830 CR3: 000000001d6aa000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ __sk_destruct+0x46/0x222
+ sk_psock_destroy+0x22f/0x242
+ process_one_work+0x504/0x8a8
+ ? process_one_work+0x39d/0x8a8
+ ? __pfx_process_one_work+0x10/0x10
+ ? worker_thread+0x44/0x2ae
+ ? __list_add_valid_or_report+0x83/0xea
+ ? srso_return_thunk+0x5/0x5f
+ ? __list_add+0x45/0x52
+ process_scheduled_works+0x73/0x82
+ worker_thread+0x1ce/0x2ae
 
-> Signed-off-by: Alexei Safin <a.safin@rosa.ru>
-> ---
-> v2: change reciepent
->  drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> index 78dee8ccfebf..f60d9b9798c1 100644
-> --- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> +++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> @@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
->          */
->         rate_idx =3D info->control.rates[0].idx;
->         if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_=
-idx < 0
-> -           || rate_idx > RATE_COUNT_LEGACY)
-> +           || rate_idx >=3D RATE_COUNT_LEGACY)
->                 rate_idx =3D rate_lowest_index(&il->bands[info->band], st=
-a);
->         /* For 5 GHZ band, remap mac80211 rate indices into driver indice=
-s */
->         if (info->band =3D=3D NL80211_BAND_5GHZ)
-> --
-> 2.39.5 (Apple Git-154)
->=20
+
+When we specify apply_bytes, we divide the msg into multiple segments,
+each with a length of 'send', and every time we send this part of the data
+using tcp_bpf_sendmsg_redir(), we use sk_msg_return_zero() to uncharge the
+memory of the specified 'send' size.
+
+However, if the first segment of data fails to send, for example, the
+peer's buffer is full, we need to release all of the msg. When releasing
+the msg, we haven't uncharged the memory of the subsequent segments.
+
+This modification does not make significant logical changes, but only
+fills in the missing uncharge places.
+
+This issue has existed all along, until it was exposed after we added the
+apply test in test_sockmap:
+
+commit 3448ad23b34e ("selftests/bpf: Add apply_bytes test to test_txmsg_redir_wait_sndmem in test_sockmap")
+
+
+Jiayuan Chen (2):
+  ktls, sockmap: Fix missing uncharge operation
+  selftests/bpf: Add test to cover sockmap with ktls
+
+ net/tls/tls_sw.c                              |  7 ++
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 76 +++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_ktls.c   | 10 +++
+ 3 files changed, 93 insertions(+)
+
+-- 
+2.47.1
 
 
