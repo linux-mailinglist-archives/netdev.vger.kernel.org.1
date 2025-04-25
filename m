@@ -1,151 +1,144 @@
-Return-Path: <netdev+bounces-186034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC998A9CD78
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:46:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BE5A9CD85
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DDF63A2DFC
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 15:45:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D81F4C6E97
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 15:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD5E28DF1C;
-	Fri, 25 Apr 2025 15:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960EF28F50A;
+	Fri, 25 Apr 2025 15:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dRNB0hzB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWI7xSIm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2CE13633F;
-	Fri, 25 Apr 2025 15:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EE51401B;
+	Fri, 25 Apr 2025 15:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745595937; cv=none; b=G7x8Ax74kaDgySNTz5Jlsoih9DAeesVDV66WKndj0XUSO+RllSNntMUVYDSLa5i68Tbb4T8uuyDJoHabqy8efQq5m4AeMzLe+mc3Dl+hLeb15HsD4Um3tI0O5/FlygD8jPpITqN8RsR+EUCtw3dVl0Oh16WLh9W21VH+Elda+Eg=
+	t=1745596004; cv=none; b=pqwjbMh45fxJmTY5p9EV2p8ok0ZIrbNVbD9eUFd2Ar8q0j/L2vGaQoWAZj0YRgpPNZA4WinpB+QqnAfnTX1TpISPio/6T2ST4J3bG7PTdfNrCbTLcS5Lz9rLryUipWRiM6D6znVpiUhjXszlFX3fIuUVaijdLmfzWzrPQJfyCwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745595937; c=relaxed/simple;
-	bh=NDEMzXyKMQaX/1P4v8LWPCUwLdyUYFm0Z5j9i1NuUNc=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=oURIrzB+ARE3FVQLxz8dnOYU14uCYJjSvVX3nqn4tRxl4sqIg0d9GcdrQHWP+8ijFC1LA/zQonMzi39gEDovU/vlRJprrAMSpCqMIjZbdqwKMDMh4/q7CcalYhhgFQ/04fC+JnOFHmm7ZJ6T/QR933JkOJ7LdY0XGkJrf978+fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dRNB0hzB; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745595936; x=1777131936;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=NDEMzXyKMQaX/1P4v8LWPCUwLdyUYFm0Z5j9i1NuUNc=;
-  b=dRNB0hzB9VSEVZTN6uSQdKcHqikDg35+hrmD9RswM0sJg7VLq7vXflvN
-   L1reVIaspl2ar5jsCDPfpN7akAbFhLGghWw+pCn19pxVTEbDg12AsoN6N
-   O6iyX/zUQKQvZtktFX2jk7eJYafaN86bT+ROFbbafcHQha1t0OhXLKs5p
-   W4k/Hcovc41OunM9OT7Hr9Q1XDHwhBS6NIRM9c6ZZzzY4mdcLEvIudGeo
-   UYRwmAL+8O3spijxoiIPhcZNqx2AO5dl0pJegz89Q+YcbAn4diomQZ1Jc
-   hAlzIA8q1wKOcSE2RV7O6gnp0NSBmt5HQG7wN/HZr61mIeUmmbAlXpmwn
-   w==;
-X-CSE-ConnectionGUID: 7bCgJpPqRiefXyfn2jXtMQ==
-X-CSE-MsgGUID: bMKMOgZ8RAGO3vxuOpGwsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11414"; a="50928849"
-X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="50928849"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2025 08:45:35 -0700
-X-CSE-ConnectionGUID: zVyTiGS+Tp27oRIuRu3o/Q==
-X-CSE-MsgGUID: FTR+bshYRAKz5gvHmp9NIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="133870388"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.154])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2025 08:45:22 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 25 Apr 2025 18:45:18 +0300 (EEST)
-To: "Xin Li (Intel)" <xin@zytor.com>
-cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-    virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
-    linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
-    linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
-    tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-    dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-    acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com, 
-    peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com, 
-    alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
-    adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org, 
-    ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-    tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com, 
-    seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com, 
-    kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
-    dapeng1.mi@linux.intel.com
-Subject: Re: [PATCH v3 01/14] x86/msr: Move rdtsc{,_ordered}() to
- <asm/tsc.h>
-In-Reply-To: <20250425083442.2390017-2-xin@zytor.com>
-Message-ID: <42dc90e1-df2a-2324-d28c-d75fb525e4a2@linux.intel.com>
-References: <20250425083442.2390017-1-xin@zytor.com> <20250425083442.2390017-2-xin@zytor.com>
+	s=arc-20240116; t=1745596004; c=relaxed/simple;
+	bh=jhP8pFJFcwBKmqgVvkl1aJ2stKtsos/RlAxiW6YqGoo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f+SqZ1DsSssg2FCFlCIAMSULg0OUnirEz29zo17MhRpj7pAsGuH1bjC+S7Kx9z/kfDQoBRoYE8QsDD0tgCS6+bwSMW9MmTcgddf8Wj/MRqPhi2LBfyASfBHXaWPS9MCezwK8/0YQF/p7yKlo7spwP7w92gHp/mDiF8LU5xL9g2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWI7xSIm; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-736bfa487c3so2027504b3a.1;
+        Fri, 25 Apr 2025 08:46:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745596001; x=1746200801; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O0oyziaAOyLAcOk9gAqKZJBNWc6/cPKz3UDQ0hjmN14=;
+        b=PWI7xSImnUPzYSWqXYOkQZaZXBBLisPDepkhFWxU/xS2MH/eyCzYN8tQqd1D0LvNJa
+         2WeCe+KeTXtnzBbQPUV09PUqP/CA2ac6OFjDEfoJZ36Zh/YK+N6KjePr/kTzretqmm+w
+         Da4h0zbb7g2Fdrr+8PaytOPkkmqyuNSnxxd7Gn9eaOJ4PrC+yRC/SE78VR2w6cjUD5h8
+         prvya+Kc5sXhFF6Ghq9N8cSX/PytG+Qi6vhns41alOJXkZgH1m4bSoTAaksB42HxWudt
+         N2i6IPgQwaNa+klRUTubUl6QWh8kd0+2eN/y1h0MJ1Gyb2agFD5fK+eWoU8xqn5F+VV2
+         wR4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745596001; x=1746200801;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O0oyziaAOyLAcOk9gAqKZJBNWc6/cPKz3UDQ0hjmN14=;
+        b=ciClwsJcWIRGfP7eKtMOvtcTPFaP0RWzRvciALXx+7eFmGtH7VtsSUdn4HDkOCSrX8
+         QLcPca1NK50ge3U+4WcXz1gN+Y3FB14FSrC+6IsuvCRaZ0/Is6SeMmVORBoqfjz9p9sx
+         LAQvf/WpMtxOTMK9dIgE5Ukr2cl9CSE250jqFGH59C/2vlSkerjt30fwoytP8DDHSfy4
+         6suRI6dFYiRdafCA0G+UICfLlSHbKMaPLWFcWyHomkfGTOJRlwz+JvUCA6C6m9Hy3PsB
+         VSo2z9pZHK4Wwn3VL7K0M7QyV96e/RYcZMkmr8s42ADQlyhvgJrvSN0ub5dx6oJeb3h3
+         LwnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXC/xCDgH+u8BQY3Rejfwua2UW/IaVjSbMcL5AhfOTLo8wijtrfQCkG85HbSspRWdO8QXY/aseg3Dk7pNNy@vger.kernel.org, AJvYcCXip1/78hX+X0DqphPybbHVJ7YuzyO3/A8p1IUnyGrVxZYmY3E223kXWqyjyL34s2n3tFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywxRVLFdm/V6CLBddL0fRsHdFakSQrJfYa2FMMMnuCmnT2DpLQ
+	JnCeLv8AfpcXpejuXa4AvlJlhkgxroH72ttGzugu5RUppIlWYamxClraZqWi
+X-Gm-Gg: ASbGnctvLap//qTQEzEKXAlM7SXcfWQd6VCKigtsEZwxOWD6b+0CjTQLRFkYiy3MQzy
+	vESN3xJ+S9betWMlOFznng2BQSuSqp3MeMOgapq2JYcLcAs/hif0cNp6TXScTHuxIPPC47An8vp
+	C8v3R11Ms0+x6u2FVuP97N0kXVQADGAgxHM1oSmSkZfKBmK9VPvZMWDKqC01Zk2gYmO55JJxNp5
+	r41IIJxL1bDvtO/v3YzhPTMN3BGZ9kaNElDxuXg0zcLXQDDoE/AhkWRX/g9xElzRD5fQcGqqVVf
+	9f0nr9SRwh+vbtK12nK6rnm8Q6mTdGZyhSxlxDtJFxTFpeDhluJGR86JVgmjzHtcMCOoLq28c7I
+	BFiHbE0p+sj/cGGqrMUU=
+X-Google-Smtp-Source: AGHT+IG9TW8cW87auP5BlEdU5WIaXA04pqBbguxPDnyixb+I1bwF2Ef/mftKrl1hMR+zWJlnM+W2CQ==
+X-Received: by 2002:a05:6a00:2311:b0:736:62a8:e52d with SMTP id d2e1a72fcca58-73fd74be6ffmr3279577b3a.12.1745596001228;
+        Fri, 25 Apr 2025 08:46:41 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:8bc6:71ac:67d1:e6ee? ([2001:ee0:4f0e:fb30:8bc6:71ac:67d1:e6ee])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25a9a993sm3430521b3a.144.2025.04.25.08.46.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Apr 2025 08:46:40 -0700 (PDT)
+Message-ID: <7a6f896f-fade-47ed-b101-72be264dcf2b@gmail.com>
+Date: Fri, 25 Apr 2025 22:46:35 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xsk: respect the offsets when copying frags
+To: netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250423101047.31402-1-minhquangbui99@gmail.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20250423101047.31402-1-minhquangbui99@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 25 Apr 2025, Xin Li (Intel) wrote:
-
-> For some reason, there are some TSC-related functions in the MSR
-> header even though there is a tsc.h header.
-> 
-> Relocate rdtsc{,_ordered}() from <asm/msr.h> to <asm/tsc.h>, and
-> subsequently remove the inclusion of <asm/msr.h> in <asm/tsc.h>.
-> Consequently, <asm/msr.h> must be included in several source files
-> that previously did not require it.
+On 4/23/25 17:10, Bui Quang Minh wrote:
+> Add the missing offsets when copying frags in xdp_copy_frags_from_zc().
 >
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Fixes: 560d958c6c68 ("xsk: add generic XSk &xdp_buff -> skb conversion")
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 > ---
-> 
-> Change in v3:
-> * Add a problem statement to the changelog (Dave Hansen).
-> ---
+>   net/core/xdp.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index f86eedad586a..a723dc301f94 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -697,7 +697,8 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+>   	nr_frags = xinfo->nr_frags;
+>   
+>   	for (u32 i = 0; i < nr_frags; i++) {
+> -		u32 len = skb_frag_size(&xinfo->frags[i]);
+> +		const skb_frag_t *frag = &xinfo->frags[i];
+> +		u32 len = skb_frag_size(frag);
+>   		u32 offset, truesize = len;
+>   		netmem_ref netmem;
+>   
+> @@ -707,8 +708,8 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+>   			return false;
+>   		}
+>   
+> -		memcpy(__netmem_address(netmem),
+> -		       __netmem_address(xinfo->frags[i].netmem),
+> +		memcpy(__netmem_address(netmem) + offset,
+> +		       __netmem_address(frag->netmem) + skb_frag_off(frag),
+>   		       LARGEST_ALIGN(len));
+>   		__skb_fill_netmem_desc_noacc(sinfo, i, netmem, offset, len);
+>   
 
->  drivers/platform/x86/intel/pmc/cnp.c          |  1 +
->  .../intel/speed_select_if/isst_if_common.c    |  1 +
->  drivers/platform/x86/intel/turbo_max_3.c      |  1 +
-
-Hi,
-
-To me this looks really a random set of source files, maybe it helped some 
-build success but it's hard for me to review this because there are still 
-cases that depend on indirect include chains.
-
-Could you just look into solving all missing msr.h includes instead 
-as clearly some are still missing after 3 pre-existing ones and you adding 
-it into 3 files:
-
-$ git grep -e rdmsr -e wrmsr -l drivers/platform/x86/
-drivers/platform/x86/intel/ifs/core.c
-drivers/platform/x86/intel/ifs/load.c
-drivers/platform/x86/intel/ifs/runtest.c
-drivers/platform/x86/intel/pmc/cnp.c
-drivers/platform/x86/intel/pmc/core.c
-drivers/platform/x86/intel/speed_select_if/isst_if_common.c
-drivers/platform/x86/intel/speed_select_if/isst_if_mbox_msr.c
-drivers/platform/x86/intel/speed_select_if/isst_tpmi_core.c
-drivers/platform/x86/intel/tpmi_power_domains.c
-drivers/platform/x86/intel/turbo_max_3.c
-drivers/platform/x86/intel/uncore-frequency/uncore-frequency.c
-drivers/platform/x86/intel_ips.c
-
-$ git grep -e 'msr.h' -l drivers/platform/x86/
-drivers/platform/x86/intel/pmc/core.c
-drivers/platform/x86/intel/tpmi_power_domains.c
-drivers/platform/x86/intel_ips.c
-
-I'd also prefer the patch(es) adding missing includes be in a different 
-patch.
-
--- 
- i.
-
+I know it's very unlikely but do we need to 
+kmap_local_page(skb_frag_page(frag) before using 
+__netmem_address(frag->netmem) to make sure the frag's page is mapped? 
+Or it is impossible that the frag's page to be highmem and unmapped? Thanks,
+Quang Minh.
 
