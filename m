@@ -1,100 +1,90 @@
-Return-Path: <netdev+bounces-186090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11686A9D0FF
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:02:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A466A9D112
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:04:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E671B188C259
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:02:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D25D7AD963
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D817021D5BE;
-	Fri, 25 Apr 2025 19:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486CF21A427;
+	Fri, 25 Apr 2025 19:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3/z+2s+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asHGJjoU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A819E219A8B;
-	Fri, 25 Apr 2025 19:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E744217647;
+	Fri, 25 Apr 2025 19:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745607670; cv=none; b=GmDMFJP3zP+nqx8iWOYtNatvm7kUhANdqeGHNIKiOA82AdTo4VpBq6r/iSpdu54V1pzs8aiv2XGYHTHQg2fN9tBAiWQcvhsX+4FDdXn0NbOmWG9eKVGLt3Yk6YDwBTdHG25Tp/+zJctHYqBg40uEm4NEVbiLaBH3oSa96WUkwhU=
+	t=1745607832; cv=none; b=AOs8wJm5Nht4FQNKc3ZIWKvdQwOVyFpG0+tnPatLvTuvR6490t1jPFWIQ3cdFo4e+vwkRjRVsv5j/fLEMLmCC7f2aPFAaEoSTh/acC3qwbOF+tpuOYmtqwveoPv1OHSOwE7NUTnnCm6d6/fcMJ7C26Y+Jq0R1y6Uk0jwYi88rxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745607670; c=relaxed/simple;
-	bh=zEJkmpbvZvMfw1LHSSnEfJBbh/CNo4aDg7dQ8Kbg9bU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aD9l/lf/C4QeU30iAtbt16S2HwCLlcaib54t42K0VDGGxmoi6bELsiyH1jZI10WVWRmN2rEEOB1RGNpAxxiZA0IcBzl5pX9pkk6Eh5y2lyxd4w0aDGpSwget6JMB5VDZt78BhqGuXqplQypMb/KrO/o++nnC0qx9fRBZRKh4Urc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3/z+2s+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10689C4CEE4;
-	Fri, 25 Apr 2025 19:01:10 +0000 (UTC)
+	s=arc-20240116; t=1745607832; c=relaxed/simple;
+	bh=8b1jSipE8vvTKtYxEIerxYV+fQ6mJiSmPoltSWnlsY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fhMrNIePr36IJScs2oCBpxjChiUmQZhBJcpbtC1UgqkNKjDyWBxCcN8zVfwR2tTVqnQISExkVrwIbib0mpRePEcIzIv5o9j2FL6rI9kXBUkfM5e25iLYz9gzPB/zMyhDR2QohsT0GgIvwOBoooxEI2b3xiD3Fgtn4QCj7y0MfZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asHGJjoU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE1CC4CEE4;
+	Fri, 25 Apr 2025 19:03:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745607670;
-	bh=zEJkmpbvZvMfw1LHSSnEfJBbh/CNo4aDg7dQ8Kbg9bU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W3/z+2s+DsnwvwKSoAA3jYv86RyOPW+V+U6SEvW7rQ8xCrLAuoIx+EegtAPkIiI/Z
-	 1R0CEogz6waoRAGIgxP7c5/ineU7ceejZtntxrZzgLsAYPchHrQKTUc85arujY2rai
-	 12Lk0UCSJX4fAgpnRaLmYv0aPrO2A2krLt/OLG5/MZ8+iquRYGB/UCJCLTLCISBMtD
-	 3mlC5G6gzqv1MzhNI5N9r1eiPegcfoH5CRLV+243zG1PmQJjTnHgKez7CHoBYriYqB
-	 qLxzUAo6P8yGvxGgdj89DEuUYUInTTBzBF3d7I4LdbSho9VbOdC1JUDcp+gP1Ho7a0
-	 8OvOLgXQzDy/Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB085380CFD7;
-	Fri, 25 Apr 2025 19:01:49 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745607831;
+	bh=8b1jSipE8vvTKtYxEIerxYV+fQ6mJiSmPoltSWnlsY8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=asHGJjoUtY3RrySnOFcQZSI/W0Kma/L3xi8Pq2sVUQ7Pho6sR15Hc3VCCplaLPz2l
+	 SQtHBKauAs6Ern4DTfsAfSUB6L4esqCR4DHL2ILGKodHKyy5L5Z92xKM4lwhuYL6dk
+	 5xZsj4agG3s/us9uLHRPGKCaYALUY6ymNGslA7vSI1HUCTsJIXHdsvQxx2361oPaCR
+	 0gZw/rm2TTBfq1kkj6xRdaFNGUhHtHa8vUDScJKcSYiT6ee3vM3si2InsECmjMmiNW
+	 P70X3oUmAQou4jsDl/VIPqcmiEg7XR/3VYS+dBmuEeKaxbaya5Ih3NKlO8TFFgWfAM
+	 EJ3qJzwiB5Z9A==
+Date: Fri, 25 Apr 2025 09:03:50 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Harry Yoo <harry.yoo@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Dennis Zhou <dennis@kernel.org>, Mateusz Guzik <mjguzik@gmail.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Vlad Buslov <vladbu@nvidia.com>,
+	Yevgeny Kliteynik <kliteyn@nvidia.com>, Jan Kara <jack@suse.cz>,
+	Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/7] Reviving the slab destructor to tackle the
+ percpu allocator scalability problem
+Message-ID: <aAvcltpVFqRmcfM5@slm.duckdns.org>
+References: <20250424080755.272925-1-harry.yoo@oracle.com>
+ <aAqHKWU2xFk2X2ZD@slm.duckdns.org>
+ <aAtfe1-ncE_oxt9H@harry>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] Fix netdevim to correctly mark NAPI IDs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174560770848.3803904.9642940432562935459.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Apr 2025 19:01:48 +0000
-References: <20250424002746.16891-1-jdamato@fastly.com>
-In-Reply-To: <20250424002746.16891-1-jdamato@fastly.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, shaw.leon@gmail.com,
- pabeni@redhat.com, ast@kernel.org, andrew+netdev@lunn.ch,
- bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- edumazet@google.com, hawk@kernel.org, john.fastabend@gmail.com,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- shuah@kernel.org
+In-Reply-To: <aAtfe1-ncE_oxt9H@harry>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 24 Apr 2025 00:27:30 +0000 you wrote:
-> Greetings:
+On Fri, Apr 25, 2025 at 07:10:03PM +0900, Harry Yoo wrote:
+> > I don't exactly know what that should look like but maybe a
+> > simplified version of sl*b serving power of two sizes should do or maybe it
+> > needs to be smaller and more adaptive. We'd need to collect some data to
+> > decide which way to go.
 > 
-> Welcome to v4.
-> 
-> This series fixes netdevsim to correctly set the NAPI ID on the skb.
-> This is helpful for writing tests around features that use
-> SO_INCOMING_NAPI_ID.
-> 
-> [...]
+> I'm not sure what kind of data we need — maybe allocation size distributions,
+> or more profiling data on workloads that contend on percpu allocator's locks?
 
-Here is the summary with links:
-  - [net-next,v4,1/3] netdevsim: Mark NAPI ID on skb in nsim_rcv
-    https://git.kernel.org/netdev/net-next/c/f71c549b26a3
-  - [net-next,v4,2/3] selftests: drv-net: Factor out ksft C helpers
-    (no matching commit)
-  - [net-next,v4,3/3] selftests: drv-net: Test that NAPI ID is non-zero
-    https://git.kernel.org/netdev/net-next/c/2593a0a1446a
+Oh yeah, mostly distributions of memory allocation sizes across different
+systems and workloads.
 
-You are awesome, thank you!
+Thanks.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+tejun
 
