@@ -1,183 +1,125 @@
-Return-Path: <netdev+bounces-185893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF478A9C019
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:50:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C363AA9C01E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0BB1B860BE
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:50:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46C1B5A24A5
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB41230BF5;
-	Fri, 25 Apr 2025 07:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AACE230D0F;
+	Fri, 25 Apr 2025 07:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCbRrNTi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALvqB4Yn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A941DED49;
-	Fri, 25 Apr 2025 07:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD6417A314;
+	Fri, 25 Apr 2025 07:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745567403; cv=none; b=jq6d1AUGT0Ks3FPhT6V2DKc0ncg9fRQyyFrpzKUew32+aBS/3pV19dW5t3AY4l4NLqOiHTRcv9aaOMHh0k/M2ERbbkGNlNKTNkavuSEGMkotG9icmOvbIXuFYKDcOX1UAzPh6/Td732hS2lA2MLXHpxWSIq4RS6pzNfaIF3+eLM=
+	t=1745567516; cv=none; b=IcGQBs/zoN8WGvT1ySCGd7asgLGDS9AQV/PUlvMObfUPRS8nhNQwpwoKadCWh483eFLooLnGxDBWlOLKGFutAGpvE7CbX1xsI+/d++q1sj/b8yGPgdxYsRvP3H01MO5MLYGdM9OI+gu/On9+zLb9DJrTrC3Byq84T2jmdiB+7YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745567403; c=relaxed/simple;
-	bh=QHkZ2w2krqWg8kpw96Vq3sOxWvbIiIYjOXmgILg98Bg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MK0Wl1zonAzrDsbbm8F5Asex4t+x6zHc5jeXrDVjTZVpEygOaeaFGZEtozGBKFoT7ZOpwz13OaRCxUp/elGkmm+5CjyqCH2mYjuN7KyB2fr9t8Ih0QszSY72E/EPXlit0TH4y2IvjEnyRDRul4W0oBht5xaRBOpNh16KsjFe5Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCbRrNTi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C0BC4CEE4;
-	Fri, 25 Apr 2025 07:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745567402;
-	bh=QHkZ2w2krqWg8kpw96Vq3sOxWvbIiIYjOXmgILg98Bg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=DCbRrNTihtuIYKfP2GPR2CxzfZPocrxdsrAV+3YYKmMmsPv7dU1D4wIrtbglsE8gp
-	 yrMsQCYkeJyYlDvBcH9fBhfucUmh3DxAr7Ifz29YuYTBSLQEy/IcccKdwtEKgCI6Oh
-	 1OuDTFcyg7emDLu3AeswxJ/aGGJwjbmWseyOO/YRDAy4YdAIPuAEd8RHn2uLcAhu16
-	 gjhAH7Ro852nke1poQ7MMF987WecfIXg0cSRN6xWJVrUye8C2F8agOrpk/hTw/6Z9M
-	 s4e2BwZ5Vp123iloCXrGvbhOw5YuKzpIWfQjYbJ3Y6gF2UXaOsRKqr059KixcHyFGH
-	 EALlvzHYVvmIg==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8E83D1A037D4; Fri, 25 Apr 2025 09:49:49 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to
- perform XDP_REDIRECT into maps
-In-Reply-To: <aAqjTz7O4HpuVspL@lore-rh-laptop>
-References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
- <87wmb97uyt.fsf@toke.dk> <aAqjTz7O4HpuVspL@lore-rh-laptop>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 25 Apr 2025 09:49:49 +0200
-Message-ID: <87frhw7k9u.fsf@toke.dk>
+	s=arc-20240116; t=1745567516; c=relaxed/simple;
+	bh=qoHFf+yoko4A/+XUPmCuZNCG1ChQkHApaZjK13JSRtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SyXQQGjZUmDFEb+6w7iV4dbIKwfx8Gp0v0MWT6bz0njlM10HAe3PPfec67P8BM+37xQ4cuW2F5MCPH1BOBwrdyyPbHtuwBR1DeNMK1tzK6niAkzcF7LZy5coLKlpbIe8zPkWuXKDSkJAASLcTqkJ0JOM1cDm4IkcQ4diPILaxuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ALvqB4Yn; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5ebf57360b6so283072a12.3;
+        Fri, 25 Apr 2025 00:51:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745567513; x=1746172313; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EtlwdttWcrSq5WLrAii4yqH6SPDuiUx6pIip08AE1cY=;
+        b=ALvqB4YnNrEASGqcj5UasutBn3oGfcqBoA1CUP+SVaqBI3tA/rL+uyyypWSIyRFPTw
+         xV+SaR9SqRGbu9b8NmRO4vvuXSbl7Zo6h9JJTCieZyo6apBnfHe5wjv0YM+h5MqnYpBz
+         sl/dVXRCbJeTiVHqudM/gil8S2mJoC22RDWzUwNuBdjHTppI57jQRXRQ6HopIlD3SrBF
+         VGTAVoh/QK2sginE3tAbHWquzhMjUxlrwttctgS1fNKTVbtYTExn3pX7K14upzHrjaDm
+         WoCiJbclQaaa951jERhScEb3w9Xbk11YLMLpMRiY+6fzpbUJms0uwqF7/HZf7YsN5Gpn
+         vQEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745567513; x=1746172313;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EtlwdttWcrSq5WLrAii4yqH6SPDuiUx6pIip08AE1cY=;
+        b=OQaH4o76hGfenKGiZqe49g9hFgzdsfulwzR34GAfeBZH1zR1UaFcEfCFYqZuvvj1aP
+         OfutvHaf9hh69KzUV3KqCfxHbp31lfPs679DqUdW7+Vn8SUnqgkSnoh9EkMgQuYjr7JW
+         u4+sNgqD4ZxZmr87rh1kDf81XFcfiLnP7MEH7QHBG/k9Qf/E5HwHYse0nx43+jvzQYjf
+         sZOEiEHUvefxC7KO48H30hs1hIaQXaWeolSZyakJ4wv9I633fbdcrhuu6I1e9+d0CF58
+         Zg+JUQCLrFhVeMilNAlPXpu9xKdSVr12D9pfAFMXWbCbH/TQIg/DbmpQ3DiXfTKvaBSg
+         14yA==
+X-Forwarded-Encrypted: i=1; AJvYcCVslP6DiqB/o1D6EmAS07CEpakLqjxO9ZKVhAlBK8/Jyl3PcxfDk+WIq7/IE+p8/61jMbr29vwB@vger.kernel.org, AJvYcCXJxPZHa4N6pFPoiMIDZNkOmxEZDxw6xyFmXt+dka2sThlpvkSMXibBJvC6w5PD3DKAVdQedVBtcu+bsrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxucfp+Kaxgaj1g320lnC8121KKSaDwGWMNx5tcl0n5NKV1wVTO
+	yNeXbuoVKLoZTDuy/M9NkOhXVNBW4Okc0PTfdz60Lozds2igm2k1
+X-Gm-Gg: ASbGncsU/+wiPgViU0hU9/NglP5EdGe92Xad/CB5jPwVTEvIQkGW2DOUKtcBtWB0rCA
+	+a5Ma8Gli9p4jBQM3T1RltmgTIi76B0HetYsblJT68GDcu+Pjz3cGZzClhHRVh6PTWEwjpKbjNt
+	YjkbvAyELIzEQHNJxRDhthm5aJoy7clURthrri+VqFxvClC98eQ1lIOErYhG+viXB9KCRcTY9u0
+	l0jFWjai93VCxm32BCIqFEZoW4YAuYgEnntWBGN9UjEjK4ibDLWh4ZtsbtK4f7zv5OeerlO5jCX
+	5R1TMbBnMkj7qgHXkbBb7U9Uklqp
+X-Google-Smtp-Source: AGHT+IGdpjO2l9Q4ZwWk0hvrRHSKx5oJXCfJGpUsINUsLgfhohWEplcz2aVOrR/qYMxGR0E4RONLHw==
+X-Received: by 2002:a17:906:4fca:b0:ac7:25c9:5142 with SMTP id a640c23a62f3a-ace7110713cmr36300866b.7.1745567512466;
+        Fri, 25 Apr 2025 00:51:52 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41c40bsm93774566b.20.2025.04.25.00.51.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 00:51:51 -0700 (PDT)
+Date: Fri, 25 Apr 2025 10:51:49 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: fix VLAN 0 filter imbalance when toggling
+ filtering
+Message-ID: <20250425075149.esoyz3upzxlnbygw@skbuf>
+References: <20250422184913.20155-1-jonas.gorski@gmail.com>
+ <cf0d5622-9b35-4a33-8680-2501d61f3cdf@redhat.com>
+ <CAOiHx=mkuvuJOBFjmDRMAeSFByW=AZ=RTTOG6poEu53XGkWHbw@mail.gmail.com>
+ <CAOiHx=m6Dqo4r9eaSSHDy5Zo8RxBY4DpE-qNeZXTjQRDAZMmaA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOiHx=m6Dqo4r9eaSSHDy5Zo8RxBY4DpE-qNeZXTjQRDAZMmaA@mail.gmail.com>
 
-Lorenzo Bianconi <lorenzo@kernel.org> writes:
+On Fri, Apr 25, 2025 at 09:30:17AM +0200, Jonas Gorski wrote:
+> After looking into it a bit more, netdev_update_features() does not
+> relay any success or failure, so there is no way for DSA to know if it
+> succeded or not. And there are places where we temporarily want to
+> undo all configured vlans, which makes it hard to do via
+> netdev_update_features().
+> 
+> Not sure anymore if this is a good way forward, especially if it is
+> just meant to fix a corner case. @Vladimir, what do you think?
+> 
+> I'd probably rather go forward with the current fix (+ apply it as
+> well for the vlan core code), and do the conversion to
+> netdev_update_features() at later time, since I see potential for
+> unexpected breakage.
+> 
+> Best regards,
+> Jonas
 
->> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->> 
->> > In the current implementation if the program is dev-bound to a specific
->> > device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
->> > or CPUMAP even if the program is running in the driver NAPI context and
->> > it is not attached to any map entry. This seems in contrast with the
->> > explanation available in bpf_prog_map_compatible routine.
->> > Fix the issue introducing __bpf_prog_map_compatible utility routine in
->> > order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_call()
->> > at program load time (bpf_prog_select_runtime()).
->> > Continue forbidding to attach a dev-bound program to XDP maps
->> > (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
->> >
->> > Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
->> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->> > ---
->> > Changes in v2:
->> > - Introduce __bpf_prog_map_compatible() utility routine in order to skip
->> >   bpf_prog_is_dev_bound check in bpf_check_tail_call()
->> > - Extend xdp_metadata selftest
->> > - Link to v1: https://lore.kernel.org/r/20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org
->> > ---
->> >  kernel/bpf/core.c                                  | 27 +++++++++++++---------
->> >  .../selftests/bpf/prog_tests/xdp_metadata.c        | 22 +++++++++++++++++-
->> >  tools/testing/selftests/bpf/progs/xdp_metadata.c   | 13 +++++++++++
->> >  3 files changed, 50 insertions(+), 12 deletions(-)
->> >
->> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
->> > index ba6b6118cf504041278d05417c4212d57be6fca0..a3e571688421196c3ceaed62b3b59b62a0258a8c 100644
->> > --- a/kernel/bpf/core.c
->> > +++ b/kernel/bpf/core.c
->> > @@ -2358,8 +2358,8 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
->> >  	return 0;
->> >  }
->> >  
->> > -bool bpf_prog_map_compatible(struct bpf_map *map,
->> > -			     const struct bpf_prog *fp)
->> > +static bool __bpf_prog_map_compatible(struct bpf_map *map,
->> > +				      const struct bpf_prog *fp)
->> >  {
->> >  	enum bpf_prog_type prog_type = resolve_prog_type(fp);
->> >  	bool ret;
->> > @@ -2368,14 +2368,6 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
->> >  	if (fp->kprobe_override)
->> >  		return false;
->> >  
->> > -	/* XDP programs inserted into maps are not guaranteed to run on
->> > -	 * a particular netdev (and can run outside driver context entirely
->> > -	 * in the case of devmap and cpumap). Until device checks
->> > -	 * are implemented, prohibit adding dev-bound programs to program maps.
->> > -	 */
->> > -	if (bpf_prog_is_dev_bound(aux))
->> > -		return false;
->> > -
->> >  	spin_lock(&map->owner.lock);
->> >  	if (!map->owner.type) {
->> >  		/* There's no owner yet where we could check for
->> > @@ -2409,6 +2401,19 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
->> >  	return ret;
->> >  }
->> >  
->> > +bool bpf_prog_map_compatible(struct bpf_map *map, const struct bpf_prog *fp)
->> > +{
->> > +	/* XDP programs inserted into maps are not guaranteed to run on
->> > +	 * a particular netdev (and can run outside driver context entirely
->> > +	 * in the case of devmap and cpumap). Until device checks
->> > +	 * are implemented, prohibit adding dev-bound programs to program maps.
->> > +	 */
->> > +	if (bpf_prog_is_dev_bound(fp->aux))
->> > +		return false;
->> > +
->> > +	return __bpf_prog_map_compatible(map, fp);
->> > +}
->> > +
->> >  static int bpf_check_tail_call(const struct bpf_prog *fp)
->> >  {
->> >  	struct bpf_prog_aux *aux = fp->aux;
->> > @@ -2421,7 +2426,7 @@ static int bpf_check_tail_call(const struct bpf_prog *fp)
->> >  		if (!map_type_contains_progs(map))
->> >  			continue;
->> >  
->> > -		if (!bpf_prog_map_compatible(map, fp)) {
->> > +		if (!__bpf_prog_map_compatible(map, fp)) {
->> 
->> Hmm, so this allows devbound programs in tail call maps, right? But
->> there's no guarantee that a tail call map will always be used for a
->> particular device, is there? For instance, it could be shared between
->> multiple XDP programs, bound to different devices, thus getting the
->> wrong kfunc.
->
-> According to my understanding the following path will be executed just for
-> dev-bound program that performs XDP_REDIRECT into a BPF_MAP_TYPE_PROG_ARRAY:
->
-> bpf_prog_select_runtime() -> bpf_check_tail_call() -> __bpf_prog_map_compatible()
->
-> while for XDP program inserted into BPF_MAP_TYPE_PROG_ARRAY we will continue
-> running bpf_prog_map_compatible() so we will forbid inserting ev-bound programs.
-> This is even tested into xdp_metadata selftest:
->
-> https://github.com/torvalds/linux/blob/master/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c#L416
->
-> It seems to me v2 is not more relaxed than v1. Am I missing something?
-
-No, you're right; see my reply to Stanislav - I misremembered the logic :)
-
--Toke
+I see the inconsistency you're trying to fix, but I'm still wondering
+whether it is the fix that b53 requires, given the fact that it doesn't
+seem to otherwise depend on 8021q to set up or modify VID 0. I would say
+I don't yet have a fully developed opinion and I am waiting for you to
+provide the result of the modified bridge_vlan_aware selftest,
+specifically drop_untagged().
 
