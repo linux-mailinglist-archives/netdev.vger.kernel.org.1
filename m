@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-186128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9915BA9D46F
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:48:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71DEDA9D470
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:48:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0312F9A39ED
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:48:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CDD17A3725
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D77D1FBEB9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3CB21D3C5;
 	Fri, 25 Apr 2025 21:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDiunYc5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+IE+beV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395D81F153C
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CDD215F6E
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745617700; cv=none; b=DfQ1hM4P61MgpJeCOHKb9EQJHAaXZSK0TaJDP75VsKA35Jp3sSDcEmmKtEiFbEm/X6oI8l1tN4hpSVsYOp/gHZWVr78z9dco2wkTgp5+ZhDK0O6BCuVWQ8+9tTGOvn5MHkyBQZc3Ik/HYC3XpgPnWn8Nf8BZgWcbNYD5IBChSHI=
+	t=1745617700; cv=none; b=VHGmh98pozdvDPkY469rZB3jKK8qDXJwKBUuD9oFSuDpD344NgpG1h71Hjl73yc3WJbu9WsFbasclSpaZjpHIsCyb1R4sm5qy6RUZkUaT9AWlYtxeC2KhiZ0aGAwvp2sJZ16ty6f1Ay9KbIN/Px2XVyZxCt3Dvg5jFrFZY4eq4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745617700; c=relaxed/simple;
-	bh=dCuH7z1lhKSsqhH7AVongX2pLnufwj2NfG1lAFpkeWw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I1CsWYooObMHPt75ESGMawk5EcJquJeikenIeflh6wFD9vbExPf24fOELm6DnmUQfDbAtvfnE5w0xqOaWgnqtjAZe1KfOrWp3pzCZ0e4DEB/GT07p+yktd0AzEsjrswss96/Q0PIoq9A22EkJ5giWyGrJ5k/p8Ej4vfO+M/DVHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDiunYc5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E5FC4CEE4;
-	Fri, 25 Apr 2025 21:48:19 +0000 (UTC)
+	bh=YvdbH0wltp+9JHwrAJCQbIMLHBVucB1FSZQYOCGy+Es=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=StxxsoLX/MDXJJX8Nmh4ydAYDQ1xMNaNEL1MYkOe2hbuHrjYUT3ia7CRgKfb40HxgSWjssYiykdBjGwL0zsfeo5WAxt1uASQDnjdWRzoyHNCiH3wg93q1PR4f9J6acuHEer9sp8JHCWaMhw2pKC5949T7Ar9BTPq1BYb+1rVYLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+IE+beV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FD0FC4CEE4;
+	Fri, 25 Apr 2025 21:48:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745617699;
-	bh=dCuH7z1lhKSsqhH7AVongX2pLnufwj2NfG1lAFpkeWw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rDiunYc5aRAi9t2/ekjc2bYknxqL5Y+b8Hvrio4ClCtW38yrfGJZX9tm3uQuVcO+l
-	 916kPsve0RQSFvuqgeM+cTVqPv0QpS5KA1Fm1oQe5bqB7XWphg6wR6kH/wbpKpMvRT
-	 pxeTqwbIir7jZTpbwYdJvK+cOpzuUQfewtXM0DzZ1XDa5XA8PSn76MmW0iF3zNF7HF
-	 w+NvVDSvbBK2ebYfTWCODy787OpOpxpxkpXFwjaKEvzZLevSHg9vEXMml3r5bG4xi1
-	 VjTZVYRAig/F/WzL7XN1R/t1LKn8o+/w+Ha8VnFimyURcBehDhh84E7lB9MLYGvm0o
-	 dG02jYGzn4GkQ==
+	s=k20201202; t=1745617700;
+	bh=YvdbH0wltp+9JHwrAJCQbIMLHBVucB1FSZQYOCGy+Es=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=K+IE+beV5zmk7+gWUO3hctCEdbgFVsc6grjXPqRmTY9t5MMj8xC2S8Y1bIJtbzJTW
+	 1QVfAr+uPnpevWzFG0UXG7l+gVYuHS8VY2YBgSBhF5Lq88NadQRGAxsBFYp8c5rKqQ
+	 IDHkgk3zEYzMKCRvHTN+Uaez5rxcEkDkMshUSMJW0/8o9Tdb0568i1Yi67Qy8kdnI7
+	 Kcl0hjqtbbfDPq4SRII9kd1b2tTP8/SXBThPS5agLQBRAdIGGS/UQ/drnXfTI+44xT
+	 IYE8/f24b/shvpgnNiYHqboWnDj2i5g0tKKKh2s/LbTcoABWgRIq03ozdZtqZCsr7D
+	 AOkWE7BqHnlBQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,11 +50,14 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net-next V3 00/15] devlink, mlx5: Add new parameters for link management and SRIOV/eSwitch configurations
-Date: Fri, 25 Apr 2025 14:47:53 -0700
-Message-ID: <20250425214808.507732-1-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next V3 01/15] tools: ynl-gen: allow noncontiguous enums
+Date: Fri, 25 Apr 2025 14:47:54 -0700
+Message-ID: <20250425214808.507732-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250425214808.507732-1-saeed@kernel.org>
+References: <20250425214808.507732-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,119 +66,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Jiri Pirko <jiri@nvidia.com>
 
-This patch series introduces several devlink parameters improving device
-configuration capabilities, link management, and SRIOV/eSwitch, by adding
-NV config boot time parameters.
+In case the enum has holes, instead of hard stop, avoid the policy value
+checking and it to the code.
 
-Userspace: https://patchwork.kernel.org/project/netdevbpf/cover/20250228021837.880041-1-saeed@kernel.org/
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ tools/net/ynl/pyynl/ynl_gen_c.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-v2->v3:
- - ynl-gen: allow noncontiguous enums, Jakub
- - devlink.yaml: var-attr-type enum, Jakub
-
-v1->v2:
- - Fix ynl-regen issue reported by Simon.
- - Fix smatch "could be null" warning reported by Dan Carpenter
- - Fix double include reported by Kernel test robot
- - Only allow per PF sriov setting - by Jiri
- - Add Reviewd-by Jiri and Tested-by Kamal.
-
-Below is a summary of the key changes:
-
-1) Enable support for devlink port parameters
-
-2) Implement multi attribute devlink param value data, for u32 array
-   type parameters
-
-3) Implement the following parameters:
-
-   3.a) total_vfs Parameter:
-   -------------------------
-
-Adds support for managing the number of VFs (total_vfs) and enabling
-SR-IOV (enable_sriov for mlx5) through devlink. These additions enhance
-user control over virtualization features directly from standard kernel
-interfaces without relying on additional external tools. total_vfs
-functionality is critical for environments that require flexible num VF
-configuration.
-
-   3.b) devlink keep_link_up Parameter:
-   ------------------------------------
-
-Introduces a new devlink parameter 'keep_link_up', allowing devices to
-keep the link active even when the driver is not loaded. This
-functionality is especially useful for maintaining link stability during
-driver upgrades or reboots without dropping connectivity.
-
-   3.c) eSwitch Hairpin per Priority Buffers:
-   ------------------------------------------
-
-Implements new devlink parameters to configure eSwitch hairpin per
-priority buffers. These parameters provide granular control over how
-packets are buffered for IEEE802.1p priorities, offering improved traffic
-management and efficiency for specific priority levels.
-
-   3.d) CQE Compression Type:
-   --------------------------
-
-Introduces a new devlink parameter, cqe_compress_type, to configure the
-rate of CQE compression based on PCIe bus conditions. This setting
-provides a balance between compression efficiency and overall NIC
-performance under different traffic loads.
-
-Detailed examples of usage for each parameter have been included in the
-respective commits.
-
-Thanks,
-Saeed
-
-
-Jiri Pirko (3):
-  tools: ynl-gen: allow noncontiguous enums
-  devlink: define enum for attr types of dynamic attributes
-  devlink: pass struct devlink_port * as arg to devlink_nl_param_fill()
-
-Saeed Mahameed (9):
-  net/mlx5: Implement cqe_compress_type via devlink params
-  devlink: Implement port params registration
-  devlink: Implement get/dump netlink commands for port params
-  devlink: Implement set netlink command for port params
-  devlink: Add 'keep_link_up' generic devlink device param
-  net/mlx5: Implement devlink keep_link_up port parameter
-  devlink: Throw extack messages on param value validation error
-  devlink: Implement devlink param multi attribute nested data values
-  net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
-
-Vlad Dumitrescu (3):
-  devlink: Add 'total_vfs' generic device param
-  net/mlx5: Implement devlink enable_sriov parameter
-  net/mlx5: Implement devlink total_vfs parameter
-
- Documentation/netlink/specs/devlink.yaml      |  46 +-
- .../networking/devlink/devlink-params.rst     |   7 +
- Documentation/networking/devlink/mlx5.rst     |  65 +-
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
- .../net/ethernet/mellanox/mlx5/core/devlink.c |   8 +
- .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +
- .../ethernet/mellanox/mlx5/core/en/devlink.c  |  16 +-
- .../ethernet/mellanox/mlx5/core/en/devlink.h  |   3 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   4 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 956 ++++++++++++++++++
- .../mellanox/mlx5/core/lib/nv_param.h         |  16 +
- include/linux/mlx5/driver.h                   |   1 +
- include/net/devlink.h                         |  30 +
- include/uapi/linux/devlink.h                  |  18 +
- net/devlink/health.c                          |  17 +-
- net/devlink/netlink_gen.c                     |  23 +-
- net/devlink/param.c                           | 444 ++++++--
- net/devlink/port.c                            |   3 +
- tools/net/ynl/pyynl/ynl_gen_c.py              |   6 +-
- 19 files changed, 1558 insertions(+), 110 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
-
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index 0d930c17f963..56d6aa162773 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -358,10 +358,10 @@ class TypeScalar(Type):
+         if 'enum' in self.attr:
+             enum = self.family.consts[self.attr['enum']]
+             low, high = enum.value_range()
+-            if 'min' not in self.checks:
++            if low and 'min' not in self.checks:
+                 if low != 0 or self.type[0] == 's':
+                     self.checks['min'] = low
+-            if 'max' not in self.checks:
++            if high and 'max' not in self.checks:
+                 self.checks['max'] = high
+ 
+         if 'min' in self.checks and 'max' in self.checks:
+@@ -862,7 +862,7 @@ class EnumSet(SpecEnumSet):
+         high = max([x.value for x in self.entries.values()])
+ 
+         if high - low + 1 != len(self.entries):
+-            raise Exception("Can't get value range for a noncontiguous enum")
++            return None, None
+ 
+         return low, high
+ 
 -- 
 2.49.0
 
