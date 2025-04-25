@@ -1,164 +1,230 @@
-Return-Path: <netdev+bounces-185921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE418A9C1C4
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:44:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77035A9C1D4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E4C3B7220
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:41:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A0E45A711E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F8825394C;
-	Fri, 25 Apr 2025 08:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B062376F7;
+	Fri, 25 Apr 2025 08:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="islUnSNc"
+	dkim=pass (2048-bit key) header.d=readahead.eu header.i=@readahead.eu header.b="ElLrvg4w";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HnXq2HQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79402253945
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994F1230BD8;
+	Fri, 25 Apr 2025 08:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745570158; cv=none; b=uPNuekOnoVzQ8bOjWW3z6HTaNWmZJI5URU8+j+rEuAspJiaqY9JEk5LesdhxKOEAWLxHA4FkGImU/BU5SIMnjPxOVWlPG8o7BAelJAByeRQn8X2MNQhn0eg+bT391+QOOz/82TlWb8DxqYmp8Xhhiu9BMLLp4PG6BREdcy+oB4I=
+	t=1745570352; cv=none; b=Pvh3/UFo+FG2VdpipEgC8lDFxQ9VEQ1M1rUPyPYgFbldkgiTE2AWzi+YyO71uZ0Bq/JFQME5OYItY0AVN4QZHdxokVPJkEa+wx79QQ+UNBMS0ffNEzkhKgRTui7yBxRzg451pOjxN9d3TFS7D3CGdGgdIkBSIeJ3kfqfu4/zuoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745570158; c=relaxed/simple;
-	bh=W0OGvNpepYMtQUI2P000WddWaGAaKqDLXnohX671FZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mSP1ApYQcEtHDVzBTz6RyAmAa0sQAf7vjwNQsCkJSXRoaNcWveltV0hSkdJUojgN/EvdSPIylaeykZnQM5SaXGuZ1cJsiDrVb+tQ+kPZMFeK5nWvYvG/0M4W2X2GqTXSHfDJtqw+xYRT5OPgsB4KdcDqrYGMBLFFnKTXIWzyfjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=islUnSNc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745570155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VIpzb0kJnabV+/Rbk1AeDaWRoPqgDoiA6nLSqcAP3Qs=;
-	b=islUnSNcmoHVw1oYCIr7DD1r5DIOY0N12VIVvTP6wxn0Umm+snMczVx2tSZytw3G8VrLle
-	aj1hplCxbH8ma5y+pvLvB+iiS2FFc5xBBDUX5+HfaYPD0AoKhqYp7G3RSmkt2YPgk324KL
-	5C15Z7D8U1r7O7wH2j+jsuwnZQgneBs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-241-ircMp0uYNaCgaFhVMAUJOA-1; Fri, 25 Apr 2025 04:35:53 -0400
-X-MC-Unique: ircMp0uYNaCgaFhVMAUJOA-1
-X-Mimecast-MFC-AGG-ID: ircMp0uYNaCgaFhVMAUJOA_1745570152
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so8644955e9.1
-        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 01:35:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745570152; x=1746174952;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VIpzb0kJnabV+/Rbk1AeDaWRoPqgDoiA6nLSqcAP3Qs=;
-        b=rttZ1x5pnVRRcx3TlaELhs5pHDJefs2H76LdrhEx25c7OhstkXpSZZ0n/BINH4J0g+
-         kt1fFWg4VMIc+fEqLekp5y14yxj2cHi18+qSZy1aA2syrvJGlxg4paZxu1xD3tSShWgY
-         lYOeo1lQjwpLz3OCsxWxtS/caZi3aDs83z4uyBpuM31CAXfJpy+HWnUNZ/F6+H/nTDPI
-         joY1IoG5Sf5z7VZeCQBxE+4epsKOJg/ZptnnxYxrFoJjBe15r6Ka8xsGXJVvIul/nhIT
-         gi/KVgd+Z/cLH/qLSJBux6WlvgBe2q0rrILjOZrEUCBxDhoCzcbB3dbSPtI/GpBvZRwI
-         3Ohg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8g5qQp/PhM3HJpiTbomkw2RlPGfw3cQaSA5/hckX3WKvnmBJK8TVWntWLIBOfhQjduKn/Zrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHRlabTmbuoOIXxUmW3WxYYRuM+O1AI26VCMjSS7SfUx0OB+FE
-	g6upRCxOFtiH8KWSo4ysd+0HFYwAkfAJMj4GmQZcQafwssoRLMRwpZ2FHEsBB/5230967mOo+DT
-	aDYbsLKYQBPu61alylvKnu2iGQEITBEuwMKjKt69UZKm0WlQVcbgdyw==
-X-Gm-Gg: ASbGncuGPMrLUKlZfbyNHN52BNvp2ys763UDfvPMoE4M0SlSc9CMxmwg9N01fC4ppmU
-	kqrNXcYMiXFoFeKiXEmH8Hsxn7exRpkHew7TUk9/u2BCPaLhG06C1uk4kwQEGWop+cQNeM0IglK
-	YHuZZRk1aGirBO+CuAn7a7y45mJi0w3fyHo7RT/hMCKan50npv10Ocw2JGWrN0P4+sdok/nzhiB
-	lrWPKNqQQiNkZNIrYMeh+FPnQyrSBqxqwCy7pL7fyvcjTvQ+gtdLvWr4ZKg9x72sCNzfCYSP7bh
-	gFhygw==
-X-Received: by 2002:a05:600d:19:b0:43c:fabf:9146 with SMTP id 5b1f17b1804b1-440a66d9ba5mr12028295e9.17.1745570152504;
-        Fri, 25 Apr 2025 01:35:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVwMxFD5f3mySi27LmA61xgw9SkI2YEf5bOWu+NSzAJvOJz2O8GeJpN1BaqSOng5t4z7wJTg==
-X-Received: by 2002:a05:600d:19:b0:43c:fabf:9146 with SMTP id 5b1f17b1804b1-440a66d9ba5mr12027935e9.17.1745570152192;
-        Fri, 25 Apr 2025 01:35:52 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-440a5310a8fsm17114375e9.22.2025.04.25.01.35.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 01:35:51 -0700 (PDT)
-Date: Fri, 25 Apr 2025 04:35:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v6 0/4] virtio-net: disable delayed refill when pausing rx
-Message-ID: <20250425043542-mutt-send-email-mst@kernel.org>
-References: <20250425071018.36078-1-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1745570352; c=relaxed/simple;
+	bh=/yXX9pgvUOeDvQBrbXVUN8W1QFyPQNhdnV+dJfUxJ/4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=N/u/bp0153zeH+P9XyHV1tiA6XQ6XOEZ9YAK+HfYCqR2qHxpH5V5dI5drGiApeGQdeiEru74gtNfQl3dQ54MOLRuVvBKBOCA+J8cBVChXC1zeDSrQauQTd1ssRfyhLP0qeZo9udzG5vV2cOy+TkS5XeQe6UzsfG0yLCTfYt+g9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readahead.eu; spf=pass smtp.mailfrom=readahead.eu; dkim=pass (2048-bit key) header.d=readahead.eu header.i=@readahead.eu header.b=ElLrvg4w; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HnXq2HQk; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=readahead.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=readahead.eu
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8AA911140218;
+	Fri, 25 Apr 2025 04:39:06 -0400 (EDT)
+Received: from phl-imap-08 ([10.202.2.84])
+  by phl-compute-02.internal (MEProxy); Fri, 25 Apr 2025 04:39:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=readahead.eu; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1745570346;
+	 x=1745656746; bh=XnvyM4plL/VWjKsIduuUMp0AGlTQ6ZHweSxORhSaPAI=; b=
+	ElLrvg4w9Et7djySJSaqsYYSTHeWOyllNLyST+gW14VDygocISieLR9UdjIZ+KmC
+	juSTvFM/pE++E/8BEkxj19/z8YPByQGEKkwsP4gY8MP1g1QcljoPcC3SL60vTLst
+	ZeRZ3CG2YeHpap7ua+IeQJh8gx42N4ozi+6DUo/ulK7BK7OktIRMnB0qxgaPse7o
+	tGaYaCEETlf1Hqk0u75ojP8cwNaF6Fln5ZvOkkhh0jYy+cUaqMcsV3qaZvI5qfam
+	9/aHmF1O/uJLqmqo67zcZIsHgrilNcfCOqbdcRm3hzrg3003yqqof6FuP1WaGuO5
+	w50E/SV2UAatd+/Uuh5aUA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1745570346; x=
+	1745656746; bh=XnvyM4plL/VWjKsIduuUMp0AGlTQ6ZHweSxORhSaPAI=; b=H
+	nXq2HQkrvQn3KCcT5xydJEpqiiQl7MVuZNAG49oq2mBpX/3aChiXeVfYqZZXNBsb
+	Azzivimrjd2yLv6PsweCIQIlcHvgG5V1Ipc3LbqRm0hPsjYaZSFp/54QMaxaF1FG
+	c0LXGyD3db04E6y6HCbhW1ygXPp4N3U5rlo9f8LKDExT/d+PwPdYQE8dTJBhuxeo
+	dZo85rBk31QDlRR0oXkkY5z2h1Sf81/cogAl78PhY+5X3I2iMoO6meenkI8xYPyb
+	t+ZeOgDwY/gMuEaq7p7x2hWUt3quX2yCkDU36aCq+xMcKbtm2YA8ihKCO21JZ9IY
+	91V+EwTnt6ORg9hUVl3lw==
+X-ME-Sender: <xms:KUoLaD6BrvEtZ243u7bFoc8e9rwbadWeZIvtNJDTmD4PSD2k6BJdzg>
+    <xme:KUoLaI7XiODhi5OEFyHIwV_a9U6_ZUHmr70_8HnPzBOXcTFZXD6E5IbvsWhepshRt
+    pzkDQtkdyXHnImMWso>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvhedukeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedfffgrvhhiugcutfhhvghinhhssggvrhhgfdcuoegurghvihguse
+    hrvggruggrhhgvrggurdgvuheqnecuggftrfgrthhtvghrnhepueekteduueejkeehheel
+    vdefleeivdeugfekvdfffefgkeefuedvtdfftddvveeknecuffhomhgrihhnpehkvghrnh
+    gvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
+    ohhmpegurghvihgusehrvggruggrhhgvrggurdgvuhdpnhgspghrtghpthhtohepudejpd
+    hmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhhnihihuhesrghmrgiiohhnrdgt
+    ohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtth
+    hopegslhhutggrseguvggsihgrnhdrohhrghdprhgtphhtthhopegurggrnhdrjhdruggv
+    mhgvhigvrhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhooh
+    hglhgvrdgtohhmpdhrtghpthhtohepsghrrghunhgvrheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrse
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgigrnhguvghrsehmihhhrghlihgt
+    hihnrdgtohhm
+X-ME-Proxy: <xmx:KUoLaKezNV5TdX96i0hcAXZKW3tm6pFEMxn8sTIOZDrBuk57bcaD2g>
+    <xmx:KUoLaEL0HBEybq4fRAGMpvl_p3k_Gv17OTAfwTitj1SgF2xPUZlleQ>
+    <xmx:KUoLaHIQ4_Famr47P1XAtLg60JsEtUkoVugx3jiRQ_-WFWkEs6PxCQ>
+    <xmx:KUoLaNwIc4QoBzJj044NWxyyLX0M298_kQkkjvHyZtpnwF_FybuOoQ>
+    <xmx:KkoLaJ6jLFtsEBhotZ1JZwTKqfiy1M1m9ZDxDzQ24RlSdI1h-jobmHpy>
+Feedback-ID: id2994666:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 8536F18A006B; Fri, 25 Apr 2025 04:39:05 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250425071018.36078-1-minhquangbui99@gmail.com>
+X-ThreadId: Tbcbd793788c73c94
+Date: Fri, 25 Apr 2025 10:38:45 +0200
+From: "David Rheinsberg" <david@readahead.eu>
+To: "Christian Brauner" <brauner@kernel.org>,
+ "Oleg Nesterov" <oleg@redhat.com>, "Kuniyuki Iwashima" <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, "Jan Kara" <jack@suse.cz>,
+ "Alexander Mikhalitsyn" <alexander@mihalicyn.com>,
+ "Luca Boccassi" <bluca@debian.org>,
+ "Lennart Poettering" <lennart@poettering.net>,
+ "Daan De Meyer" <daan.j.demeyer@gmail.com>, "Mike Yuan" <me@yhndnzj.com>
+Message-Id: <4950895a-9b99-4ec3-981c-a392a20ce74c@app.fastmail.com>
+In-Reply-To: <20250425-work-pidfs-net-v2-0-450a19461e75@kernel.org>
+References: <20250425-work-pidfs-net-v2-0-450a19461e75@kernel.org>
+Subject: Re: [PATCH v2 0/4] net, pidfs: enable handing out pidfds for reaped
+ sk->sk_peer_pid
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 02:10:14PM +0700, Bui Quang Minh wrote:
-> Hi everyone,
-> 
-> This only includes the selftest for virtio-net deadlock bug. The fix
-> commit has been applied already.
-> 
-> Link: https://lore.kernel.org/virtualization/174537302875.2111809.8543884098526067319.git-patchwork-notify@kernel.org/T/
+Hi
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Fri, Apr 25, 2025, at 10:11 AM, Christian Brauner wrote:
+> SO_PEERPIDFD currently doesn't support handing out pidfds if the
+> sk->sk_peer_pid thread-group leader has already been reaped. In this
+> case it currently returns EINVAL. Userspace still wants to get a pidfd
+> for a reaped process to have a stable handle it can pass on.
+> This is especially useful now that it is possible to retrieve exit
+> information through a pidfd via the PIDFD_GET_INFO ioctl()'s
+> PIDFD_INFO_EXIT flag.
+>
+> Another summary has been provided by David in [1]:
+>
+>> A pidfd can outlive the task it refers to, and thus user-space must
+>> already be prepared that the task underlying a pidfd is gone at the time
+>> they get their hands on the pidfd. For instance, resolving the pidfd to
+>> a PID via the fdinfo must be prepared to read `-1`.
+>>
+>> Despite user-space knowing that a pidfd might be stale, several kernel
+>> APIs currently add another layer that checks for this. In particular,
+>> SO_PEERPIDFD returns `EINVAL` if the peer-task was already reaped,
+>> but returns a stale pidfd if the task is reaped immediately after the
+>> respective alive-check.
+>>
+>> This has the unfortunate effect that user-space now has two ways to
+>> check for the exact same scenario: A syscall might return
+>> EINVAL/ESRCH/... *or* the pidfd might be stale, even though there is no
+>> particular reason to distinguish both cases. This also propagates
+>> through user-space APIs, which pass on pidfds. They must be prepared to
+>> pass on `-1` *or* the pidfd, because there is no guaranteed way to get a
+>> stale pidfd from the kernel.
+>> Userspace must already deal with a pidfd referring to a reaped task as
+>> the task may exit and get reaped at any time will there are still many
+>> pidfds referring to it.
+>
+> In order to allow handing out reaped pidfd SO_PEERPIDFD needs to ensure
+> that PIDFD_INFO_EXIT information is available whenever a pidfd for a
+> reaped task is created by PIDFD_INFO_EXIT. The uapi promises that reaped
+> pidfds are only handed out if it is guaranteed that the caller sees the
+> exit information:
+>
+> TEST_F(pidfd_info, success_reaped)
+> {
+>         struct pidfd_info info = {
+>                 .mask = PIDFD_INFO_CGROUPID | PIDFD_INFO_EXIT,
+>         };
+>
+>         /*
+>          * Process has already been reaped and PIDFD_INFO_EXIT been set.
+>          * Verify that we can retrieve the exit status of the process.
+>          */
+>         ASSERT_EQ(ioctl(self->child_pidfd4, PIDFD_GET_INFO, &info), 0);
+>         ASSERT_FALSE(!!(info.mask & PIDFD_INFO_CREDS));
+>         ASSERT_TRUE(!!(info.mask & PIDFD_INFO_EXIT));
+>         ASSERT_TRUE(WIFEXITED(info.exit_code));
+>         ASSERT_EQ(WEXITSTATUS(info.exit_code), 0);
+> }
+>
+> To hand out pidfds for reaped processes we thus allocate a pidfs entry
+> for the relevant sk->sk_peer_pid at the time the sk->sk_peer_pid is
+> stashed and drop it when the socket is destroyed. This guarantees that
+> exit information will always be recorded for the sk->sk_peer_pid task
+> and we can hand out pidfds for reaped processes.
+>
+> Note, I'm marking this as RFC mostly because I'm open to other
+> approaches to solving the pidfs registration. The functionality in
+> general we should really provide either way.
+>
+> Link: 
+> https://lore.kernel.org/lkml/20230807085203.819772-1-david@readahead.eu 
+> [1]
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+> Changes in v2:
+> - Fix typo in pidfs_register_pid() kernel documentation.
+> - Remove SOCK_RCU_FREE check as it's already and better covered by 
+> might_sleep().
+> - Add comment to pidfd_prepare() about PIDFD_STALE only being valid if
+>   the caller knows PIDFD_INFO_EXIT information is guaranteed to be
+>   available.
+> - Fix naming of variables and adhere to net declaration ordering.
+> - Link to v1: 
+> https://lore.kernel.org/20250424-work-pidfs-net-v1-0-0dc97227d854@kernel.org
+>
+> ---
+> Christian Brauner (4):
+>       pidfs: register pid in pidfs
+>       net, pidfs: prepare for handing out pidfds for reaped sk->sk_peer_pid
+>       pidfs: get rid of __pidfd_prepare()
+>       net, pidfs: enable handing out pidfds for reaped sk->sk_peer_pid
+>
+>  fs/pidfs.c                 | 80 ++++++++++++++++++++++++++++++++++++++-----
+>  include/linux/pid.h        |  2 +-
+>  include/linux/pidfs.h      |  3 ++
+>  include/uapi/linux/pidfd.h |  2 +-
+>  kernel/fork.c              | 83 ++++++++++++++++----------------------------
+>  net/core/sock.c            | 14 +++-----
+>  net/unix/af_unix.c         | 85 ++++++++++++++++++++++++++++++++++++++++------
+>  7 files changed, 183 insertions(+), 86 deletions(-)
+> ---
+> base-commit: b590c928cca7bdc7fd580d52e42bfdc3ac5eeacb
+> change-id: 20250423-work-pidfs-net-bc0181263d38
 
-> Version 6 changes:
-> - Rebase on net-next and resolve conflicts
-> - Move the retry logic to xdp_helper
-> 
-> Version 5 changes:
-> - Refactor the selftest
-> 
-> Version 4 changes:
-> - Add force zerocopy mode to xdp_helper
-> - Make virtio_net selftest use force zerocopy mode
-> - Move virtio_net selftest to drivers/net/hw
-> 
-> Version 3 changes:
-> - Patch 1: refactor to avoid code duplication
-> 
-> Version 2 changes:
-> - Add selftest for deadlock scenario
-> 
-> Thanks,
-> Quang Minh.
-> 
-> Bui Quang Minh (4):
->   selftests: net: move xdp_helper to net/lib
->   selftests: net: add flag to force zerocopy mode in xdp_helper
->   selftests: net: retry when bind returns EBUSY in xdp_helper
->   selftests: net: add a virtio_net deadlock selftest
-> 
->  .../testing/selftests/drivers/net/.gitignore  |  1 -
->  tools/testing/selftests/drivers/net/Makefile  |  1 -
->  .../testing/selftests/drivers/net/hw/Makefile |  1 +
->  .../selftests/drivers/net/hw/xsk_reconfig.py  | 60 +++++++++++++++++++
->  .../selftests/drivers/net/napi_id_helper.c    |  2 +-
->  tools/testing/selftests/drivers/net/queues.py |  4 +-
->  tools/testing/selftests/net/lib/.gitignore    |  1 +
->  tools/testing/selftests/net/lib/Makefile      |  1 +
->  .../selftests/{drivers/net => net/lib}/ksft.h |  0
->  .../{drivers/net => net/lib}/xdp_helper.c     | 39 +++++++++---
->  10 files changed, 98 insertions(+), 12 deletions(-)
->  create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
->  rename tools/testing/selftests/{drivers/net => net/lib}/ksft.h (100%)
->  rename tools/testing/selftests/{drivers/net => net/lib}/xdp_helper.c (78%)
-> 
-> -- 
-> 2.43.0
+Thank you very much! Looks good to me!
 
+Reviewed-by: David Rheinsberg <david@readahead.eu>
+
+Thanks
+David
 
