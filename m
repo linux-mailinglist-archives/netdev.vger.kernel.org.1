@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-186186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7BDA9D655
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:41:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E8FA9D656
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB1523B6701
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:41:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5881A4C60C7
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361872973B8;
-	Fri, 25 Apr 2025 23:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D032973BE;
+	Fri, 25 Apr 2025 23:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gltM073e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7PZ1Cht"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110AE13B7A3
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 23:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED5813B7A3
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 23:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745624498; cv=none; b=XbKaCLUBkyJh7GpgFq1AbjgDdJGGbEd2PdBWaiKA6i7yIsk+6BCGDXxp9s4YJmQA442HHxcVRSJ9AAgTOHN3FOdDZU4kaG6PB2xknRAuJ3Mk1f3t1y+srvXea/SbMBJtz9KmUuF9031yhYU8YxTDKCb4OKYa+FgnomeFMleE06g=
+	t=1745624532; cv=none; b=YCamDm2pp01lPa3DxRdjhBwVjyIzR5XxcjGZhZykOZNKb9pQneTcLA++pb7P4cnE+izX+shru82xS9eFIu7W3e2Ej71F8euuNxBE+Qxa/fcc/zeWIuYAwfOpLfDJKFxhImfgYnzC9yV6V3gOAO+mcO1WsiZWPdPTn+8HZJa2oRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745624498; c=relaxed/simple;
-	bh=6RqWBC4UUyiSgS0KV2XDiFI+066+bkNWD6ZxUVMZ4og=;
+	s=arc-20240116; t=1745624532; c=relaxed/simple;
+	bh=/ZxqSzwzmp9kZiARDUNtrnzTNDNvi+EMSLavfAKXvUk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TL8tvUbyLAQADHyLc/pnvQsG/P36cFT5kiTRuTOJzok8CHljvXfLHm+I6v3ZpdfBZKqtP/idF3MvDjeQi70ecZJ+pJ3X6hd5vd4qbmPWa9calhDdq2fnz8Q3pdyxzXBGhXn4UZdhtY4vaYMODLfq61vTBu7gSRBzMW3FT8xnxRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gltM073e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03870C4CEE4;
-	Fri, 25 Apr 2025 23:41:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lx4zG57A0V+/DI4e8AHPzR3SQcocfz5J4STTAE8VE1dOoB4Pk4drncwWU6w8p6gUGlkjX8rpNMiVMaM5dgTRAWIjfsPosvdJcdW0g1ma24h9yUHHb+iWaMbF+oj+b26gqBSwTJKwyjNAc9lLAN0kXheN/8FyvIQCei/pdgERmtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7PZ1Cht; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2164AC4CEE4;
+	Fri, 25 Apr 2025 23:42:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745624497;
-	bh=6RqWBC4UUyiSgS0KV2XDiFI+066+bkNWD6ZxUVMZ4og=;
+	s=k20201202; t=1745624531;
+	bh=/ZxqSzwzmp9kZiARDUNtrnzTNDNvi+EMSLavfAKXvUk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gltM073ebVXjcInc1CrlaXmZwyEb+UXsmrnzNpAWhoc94v9xaK/2IdAb+vOOwkC7n
-	 NKg+Dfu9F5tDIL8zjOzKZLzEUE+cxJn81W1ng2dOPL7saqaMTPztdDnsDlnwomIVYx
-	 l10a1GQxzdnIvNQznQ1x/dp4E5K8haJTw66PI5+FSUBqJ2TiG+wn1K7rZ0qmmWNGGX
-	 1JYAnTep3i9Jjg0GDI69Q2tMuMNEoDeMmBEcSIC4gzoAxMkqlI2IRCX5YK/ejRx/BY
-	 gHnxSktEFbknP2qoXnKqXUnh4vg2fDBoNQSEAFjQQre19QXTg5mGyhfaSEuUCrR/ti
-	 omRPQcb7Xf3wQ==
-Date: Fri, 25 Apr 2025 16:41:36 -0700
+	b=J7PZ1ChtO6737xtc1CwJzKMWEqsZ0QNX42GFT3Rv1jHXVMew7y16+bdQi4/twdF9b
+	 l9S+MzKuCIeKOHktCdL/M9jpBEyJtppUSk6snRrAxwpKLL2wav8NdjHCF++NsY6Qa1
+	 ofQlerFdABZNs1Or78Oc+UrbbqSSvugjZ2xHlOblYwNYuIRvhlqBRBvV0sZjEGXDm4
+	 NJWZX/W6mc0j4USUN0pdLiqPsZhKQn9LEbuXh6gw07s2Chcocu9EnjNHbTWK6+eRQV
+	 BmJp0Lnb+MxHmgdqRCYZhRqXl/XtUwPTOtCiKzXwm9BDzHbxNMRAAU9QvYLRN51CFO
+	 7/R0OWgDehsDQ==
+Date: Fri, 25 Apr 2025 16:42:10 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Stanislav Fomichev <stfomichev@gmail.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
@@ -49,13 +49,12 @@ Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  donald.hunter@gmail.com, sdf@fomichev.me, almasrymina@google.com,
  dw@davidwei.uk, asml.silence@gmail.com, ap420073@gmail.com,
  jdamato@fastly.com, dtatulea@nvidia.com, michael.chan@broadcom.com
-Subject: Re: [RFC net-next 17/22] netdev: add support for setting rx-buf-len
- per queue
-Message-ID: <20250425164136.03b38e7c@kernel.org>
-In-Reply-To: <aAfAvxX707BGyLOZ@mini-arch>
+Subject: Re: [RFC net-next 18/22] net: wipe the setting of deactived queues
+Message-ID: <20250425164210.240a3449@kernel.org>
+In-Reply-To: <aAfCIq6ktXXCOp-9@mini-arch>
 References: <20250421222827.283737-1-kuba@kernel.org>
-	<20250421222827.283737-18-kuba@kernel.org>
-	<aAfAvxX707BGyLOZ@mini-arch>
+	<20250421222827.283737-19-kuba@kernel.org>
+	<aAfCIq6ktXXCOp-9@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,23 +64,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Apr 2025 09:15:59 -0700 Stanislav Fomichev wrote:
-> > +    -
-> > +      name: queue-set
-> > +      doc: Set per-queue configurable options.
-> > +      attribute-set: queue
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - ifindex
-> > +            - type
-> > +            - id
-> > +            - rx-buf-len  
+On Tue, 22 Apr 2025 09:21:54 -0700 Stanislav Fomichev wrote:
+> > +void netdev_queue_config_update_cnt(struct net_device *dev, unsigned int txq,
+> > +				    unsigned int rxq)
+> > +{  
 > 
-> Do we want some guidance going forward on what belongs to queue-set
-> vs napi-set? (mostly) HW settings for the queue-set and (mostly) SW
-> settings for (serving the queues) in napi-set?
+> Presumably txq argument is here for some potential future use cases?
 
-One NAPI can have multiple queues hanging off, so all HW settings
-with the exception of IRQ coalescing should probably be on the queue?
+Yes, wanted to make sure we handle it all here, instead of adding
+another call.
 
