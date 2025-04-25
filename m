@@ -1,133 +1,150 @@
-Return-Path: <netdev+bounces-185973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A13A9C791
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 13:28:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54BA4A9C79D
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 13:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36FDC1B8158C
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBB36462066
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A90253951;
-	Fri, 25 Apr 2025 11:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103BF2459D2;
+	Fri, 25 Apr 2025 11:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UXjUD6ju"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RxglTFqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27335253949
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 11:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3031242D7A;
+	Fri, 25 Apr 2025 11:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745580378; cv=none; b=FFThtvPMAulB2TnS/Bal4gacdHzffzR8wDmfi5wondlKHe5LusgoqBo1gKusYxYG3R5WlhGrVXmWd9JSesFIu/L3Zghi9ireQ2enxwJRoWC2AqPMClVUQraMmsZPUWVEspYgMSjV8DSVIlyTl/p9g5P9uO7RRfPPQYCc25LP9Qc=
+	t=1745580506; cv=none; b=MCHd+qT9MpMEHKSzx/EiqqDh2T5v2p0bXvxByQtIfTuOJInCXETvJO1E2DOdymsJValeu8f15yjMKJSBqWa/mU+HLuT1QzpC2SCy5sY4OJQy2xR2jsj6RAhdQLFTFLos15LaNq6jQoFyfQJkpuFwogTns2VxLOZarBBzw9lt8z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745580378; c=relaxed/simple;
-	bh=TbOi3l6eQ1ZjiJNkRpjWBtJRww8/p5ZYN6oETyfDeR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZTcS1HObth3iSHXvtlDhNn4m3ixPyQ8G1e3Wu56TogJJQbDDrMchQW/V0QVv/Kxx8wUjPxFi2rP8AnaMpbtg+RkGKNFHy5ioijpzA8+iZfPaQMxeCPR9Oy4oBOFoeN4MTgSAi+qdp8C05aXViQCcQ0tjuFd82Bp6g2a8EsO3no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=UXjUD6ju; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43ce70f9afbso17305415e9.0
-        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 04:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745580373; x=1746185173; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RSss1QzBq0N72AWJKw63wc2GhbDCTVccqMU/TWHvlQY=;
-        b=UXjUD6juyJpKZB0dJB/FaT+DKMNa5abQ0o3BYRjWYg7x6HAq/KPMEgIaXu4SdwKQJY
-         A8K/3Cxk5GXn1KfnqZDWcTUWLF5srfI/ZZxXhXph07u76qgZ/pZnJuB+HcN0QMzTjecG
-         TSa8eR1f0NL4a1iTOcOPE+4XATDb93mE20e0FSV8rXPJFPphK1/QtlfC7XPjqTX51TQS
-         1BzHrJIOZIhPqhdxuybBTL/9anbSRY9QoapKfJTKZxhINZEqIVGqvghBMge7E3h2fR8p
-         I7OL6ATfX1OvQhuqbjPGEo8XZBivRTSmI1ZTgRVx+R5e3WWkqp/TFrEl3pL/tR/l3F1+
-         L6fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745580373; x=1746185173;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RSss1QzBq0N72AWJKw63wc2GhbDCTVccqMU/TWHvlQY=;
-        b=jQdsPpHF1wTJ5bJMKlFM2Cv4xeLbdaOu07z5HNuJ0K8416NPFLXMQqvZoNwhZYO50v
-         i0xJtZD3ZdC1g76zDZhM/ZfMG7MgduiwHjy7KJthC6NJad39vrbKCk3lyHjmjEhrpLqa
-         eEaZIjXjwmwslzeAehh+FtFiKNr7NuvLDe5J16cGrCyZ/JHwXHOgmK/1Gd1wpOZFy6Lc
-         PhUNtnDG7f1ROY8a9eyrd/X2omsJbfFfX+5lGdTwphUxYBWxrkW7tA44j1IvJH89nlvf
-         7Qm2ns17m6PkN2xfpS0smcP1w+ayRQgQ1lvT2idl3/eg1j3ZuQuyCTKogKWdrAry7GyG
-         Xq0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX8FcMNiJZVGSNeveNXypEE1IniKlv248rE/3AKnp+xkS4tQkcrkGCWejbjgbHCvhojfzUNuuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC6QfnGNtctgUGRXTdsls8ZAecM7LepU7MESaljcBWVB2ZNsBY
-	quXD+O7s3YP42P2IoJTOPuAVJ5rvqmcO6PEEUkljilV7uoI/DtW4OzEhCNURxg8=
-X-Gm-Gg: ASbGncsWToA8U/tM3LYWmjEk/VC6R1GZtZorwBzQ0L1gIgTKKQikZZUf07yXJRG0BdI
-	f6VKapED0jJK1Ue2ciIK32dctyDsl+y0ezEan67HTLiDWUn7fDQNe9pBa/OTVDID7H6crZitBZJ
-	4Zio+Z/UDVYqZEjuNENY1mCyAigmPD7Vi6FjkMzQc8ri4kfvpmOKfDIVEnrDNzzKs8cwmXlyFRA
-	xOgIeex0tZqjK8zhbLyZwmwFOdf+0WeJ1qbA9LcbF+bVnRYpfC9++Q5Wsvj2WcTz2BspVN9ooWR
-	UAD0fNvFx2vRS3aPUjwF5qsBfiU7AZaDybGzOLNUQl2S70LU
-X-Google-Smtp-Source: AGHT+IEI3xJBemslTKCGQtGigxkywC+RTy/gVwTIEFxKTl75RCKKLvh8q88N/8Q39oAosB6LSkqf8g==
-X-Received: by 2002:a5d:64a5:0:b0:391:45e9:face with SMTP id ffacd0b85a97d-3a074fae1c4mr1444471f8f.54.1745580372733;
-        Fri, 25 Apr 2025 04:26:12 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073bbeb5esm2138502f8f.0.2025.04.25.04.26.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 04:26:12 -0700 (PDT)
-Date: Fri, 25 Apr 2025 13:26:01 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Moshe Shemesh <moshe@nvidia.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink
- port function
-Message-ID: <l5sll5gx4vw4ykf65vukex3huj677ar5l47iheh4l63e3xtf42@72g3vl5whmek>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
- <20250424162425.1c0b46d1@kernel.org>
+	s=arc-20240116; t=1745580506; c=relaxed/simple;
+	bh=6RKZHJ2xfl2GxBt4YCR3zNnMFM/bzC0VR8WplMhPrjE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k0N5vDdsyc1cDJQHrxQywTn24rYy8g7suloNdJouOLXUaOPZY69lN9OFt+slvl1LIUKVqUR3gm5yl8KSr0wlrLzL247rccgc4k5w4TqLD+ZOkV1WU/V/lUAUkJqwCuYAl/dazJWEBbzr9iqn3eNLn+ebPDvvZuWIMj5/njTzmyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RxglTFqB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 164C9C4CEE4;
+	Fri, 25 Apr 2025 11:28:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745580505;
+	bh=6RKZHJ2xfl2GxBt4YCR3zNnMFM/bzC0VR8WplMhPrjE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RxglTFqBu4UflYEES/M/QAIq7zVthHRrcvTr/wW8pGeDR8xsLoks77syGVBnLvn9b
+	 66RxOdNEnmK1Eht/sfDMwFVmWH3PAMmoWoaYhl0nGVtyAuoEDdoVRdP9G4FE6nG8xV
+	 ns2kaM6K7HMNUF61KGesiFECenAGomxGl+gVjOIBZYupBW9upfHDmtaD9r7jlCanIY
+	 +erEFR2w5XWLGL2uUtte0sbXFrhN1TT3DjgbOXBdlvF1BNld0GhLeMHSujGyX5w36U
+	 sZAdPKW4VGa8RLvaTJoOHRaJkLWXWL1wU/+1midtNeWKBtv7SME0EI341A0AvhsTV7
+	 HOxiM84A0MP4Q==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Li <Frank.Li@nxp.com>,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] mdio: fix CONFIG_MDIO_DEVRES selects
+Date: Fri, 25 Apr 2025 13:27:56 +0200
+Message-Id: <20250425112819.1645342-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424162425.1c0b46d1@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Fri, Apr 25, 2025 at 01:24:25AM +0200, kuba@kernel.org wrote:
->On Wed, 23 Apr 2025 16:50:37 +0300 Moshe Shemesh wrote:
->> A function unique identifier (UID) is a vendor defined string of
->> arbitrary length that universally identifies a function. The function
->> UID can be reported by device drivers via devlink dev info command.
->> 
->> This patch set adds UID attribute to devlink port function that reports
->> the UID of the function that pertains to the devlink port. Code is also
->> added to mlx5 as the first user to implement this attribute.
->> 
->> The main purpose of adding this attribute is to allow users to
->> unambiguously map between a function and the devlink port that manages
->> it, which might be on another host.
->> 
->> For example, one can retrieve the UID of a function using the "devlink
->> dev info" command and then search for the same UID in the output of
->> "devlink port show" command.
->> 
->> The "devlink dev info" support for UID of a function is added by a
->> separate patchset [1]. This patchset is submitted as an RFC to
->> illustrate the other side of the solution.
->> 
->> Other existing identifiers such as serial_number or board.serial_number
->> are not good enough as they don't guarantee uniqueness per function. For
->> example, in a multi-host NIC all PFs report the same value.
->
->Makes sense, tho, could you please use UUID?
->Let's use industry standards when possible, not "arbitrary strings".
+From: Arnd Bergmann <arnd@arndb.de>
 
-Well, you could make the same request for serial number of asic and board.
-Could be uuids too, but they aren't. I mean, it makes sense to have all
-uids as uuid, but since the fw already exposes couple of uids as
-arbitrary strings, why this one should be treated differently all of the
-sudden?
+The newly added rtl9300 driver needs MDIO_DEVRES:
+
+x86_64-linux-ld: drivers/net/mdio/mdio-realtek-rtl9300.o: in function `rtl9300_mdiobus_probe':
+mdio-realtek-rtl9300.c:(.text+0x941): undefined reference to `devm_mdiobus_alloc_size'
+x86_64-linux-ld: mdio-realtek-rtl9300.c:(.text+0x9e2): undefined reference to `__devm_mdiobus_register'
+Since this is a hidden symbol, it needs to be selected by each user,
+rather than the usual 'depends on'. I see that there are a few other
+drivers that accidentally use 'depends on', so fix these as well for
+consistency and to avoid dependency loops.
+
+Fixes: 37f9b2a6c086 ("net: ethernet: Add missing depends on MDIO_DEVRES")
+Fixes: 24e31e474769 ("net: mdio: Add RTL9300 MDIO driver")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/ethernet/freescale/enetc/Kconfig | 3 ++-
+ drivers/net/mdio/Kconfig                     | 7 ++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
+index 6c2779047dcd..5367e8af1e1a 100644
+--- a/drivers/net/ethernet/freescale/enetc/Kconfig
++++ b/drivers/net/ethernet/freescale/enetc/Kconfig
+@@ -73,7 +73,8 @@ config FSL_ENETC_IERB
+ 
+ config FSL_ENETC_MDIO
+ 	tristate "ENETC MDIO driver"
+-	depends on PCI && MDIO_DEVRES && MDIO_BUS
++	depends on PCI && MDIO_BUS
++	select MDIO_DEVRES
+ 	help
+ 	  This driver supports NXP ENETC Central MDIO controller as a PCIe
+ 	  physical function (PF) device.
+diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
+index 38a4901da32f..f680ed676797 100644
+--- a/drivers/net/mdio/Kconfig
++++ b/drivers/net/mdio/Kconfig
+@@ -66,7 +66,7 @@ config MDIO_ASPEED
+ 	tristate "ASPEED MDIO bus controller"
+ 	depends on ARCH_ASPEED || COMPILE_TEST
+ 	depends on OF_MDIO && HAS_IOMEM
+-	depends on MDIO_DEVRES
++	select MDIO_DEVRES
+ 	help
+ 	  This module provides a driver for the independent MDIO bus
+ 	  controllers found in the ASPEED AST2600 SoC. This is a driver for the
+@@ -172,7 +172,7 @@ config MDIO_IPQ4019
+ 	tristate "Qualcomm IPQ4019 MDIO interface support"
+ 	depends on HAS_IOMEM && OF_MDIO
+ 	depends on COMMON_CLK
+-	depends on MDIO_DEVRES
++	select MDIO_DEVRES
+ 	help
+ 	  This driver supports the MDIO interface found in Qualcomm
+ 	  IPQ40xx, IPQ60xx, IPQ807x and IPQ50xx series Soc-s.
+@@ -181,7 +181,7 @@ config MDIO_IPQ8064
+ 	tristate "Qualcomm IPQ8064 MDIO interface support"
+ 	depends on HAS_IOMEM && OF_MDIO
+ 	depends on MFD_SYSCON
+-	depends on MDIO_DEVRES
++	select MDIO_DEVRES
+ 	help
+ 	  This driver supports the MDIO interface found in the network
+ 	  interface units of the IPQ8064 SoC
+@@ -189,6 +189,7 @@ config MDIO_IPQ8064
+ config MDIO_REALTEK_RTL9300
+ 	tristate "Realtek RTL9300 MDIO interface support"
+ 	depends on MACH_REALTEK_RTL || COMPILE_TEST
++	select MDIO_DEVRES
+ 	help
+ 	  This driver supports the MDIO interface found in the Realtek
+ 	  RTL9300 family of Ethernet switches with integrated SoC.
+-- 
+2.39.5
+
 
