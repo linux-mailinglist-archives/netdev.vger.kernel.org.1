@@ -1,94 +1,86 @@
-Return-Path: <netdev+bounces-186048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67AAFA9CE65
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:41:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B88EA9CE73
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5DD917721E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F14A3AB2CE
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3231A3152;
-	Fri, 25 Apr 2025 16:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E69E1B423E;
+	Fri, 25 Apr 2025 16:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kLEeiQJI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4Rp+tDL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AA21A315C
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 16:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749441AA1FE;
+	Fri, 25 Apr 2025 16:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745599265; cv=none; b=GX6I68H131cwyQrSLKxohV7Qj9ideodADI/3MP0GYL6QpEIJf22Iqaaj4eVPve948KCUhQz60EIHWKgyjXdJXuiz+9xJXm9eJ4xjg25O5Vzgw2YLvTtxjw1JuQZwnbDBVA3+QLtYSAPcif+Jk99nZwC1ws63vQKA0FdQagK8W84=
+	t=1745599517; cv=none; b=HlaJtZugXJP/MAmZTSiG+UNrOQvn3106IxITBVxEGtBq1y2ZyWRTdKYyN3K4NLdpZYshAC/ZXVf7Irenpw3NtR5FjTdA0s98b3qI+lJn9oHzGfIQ0vc54GVU4+jDUqPQ1Xjkh4BPR01dmZZxtz4uGRreK0MgkX7xf0RAvo3dJQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745599265; c=relaxed/simple;
-	bh=vethVVunbe1Q5SQCylYzutdqWco+Ngv8Xi7v6r+iMZ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XEz830B9idBgFmmvf/tpDj+aWkpx9K6zsi8ZZ8ZADX8AZQBr2n8AIGVoBv+i5rJ5s8X94lMfTM9Fn83RqLfsfmjdf4v8BfNaZx8qWtm/idUhAeGxjWEanyLqMfsYPwu1qUM9FZ7f0zYvxjFZKq4t5IfHBA/geF5QCnU+/i4Qf/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kLEeiQJI; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <81fc481c-5421-42ad-a13a-b9e9c6ededb6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745599258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LHSrpe12Y1pxiw8ELGseS+nSJC0BYehyKGWYkJrVVkU=;
-	b=kLEeiQJI+lSVpNE+MujsvDmdOvFr+GTsmzeNP/ArvocV6l9t6cL8/aSF2dIfE2+q+ou+Cs
-	x9TRK1jwO9Iouhdtqu4fUk+7tfOU5SJ7DWlS2Qj39um3BiI7NEow+q4+KhM106ur7WHTdc
-	zDCqpaWIIDBxHfq3Dn+4NyvM2+5YDQ4=
-Date: Fri, 25 Apr 2025 09:40:53 -0700
+	s=arc-20240116; t=1745599517; c=relaxed/simple;
+	bh=Wow6JQPfakyrFETVMOiqJ/ZVDU/bPHWIfEcPRk1RCTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLP0KMJwg+tcmN1s+9RxUlydPf17nNp5wUm3mjW9ktoSQ+fqV8BpG8mxXBHHnvybqeG8kFR1AT4Fw5m+gnflyr0/z0vQ0VN5asIlWrAjZq/sB3VUIoFkvwbFn4IxZPAki1qGEZ4TSs7FjxX1jqny+fjFVuMQ/O7XrvEnjgvdyVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4Rp+tDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37E6C4CEE4;
+	Fri, 25 Apr 2025 16:45:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745599514;
+	bh=Wow6JQPfakyrFETVMOiqJ/ZVDU/bPHWIfEcPRk1RCTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T4Rp+tDLxBpVeOUQg9/LnPyijQ+57i3HXJfngMCferBEuKAmb2TebW7oYqpB2AmGz
+	 gcyxEijR4YBZhU6+2qiV8GawHaRZuVWqqlHHxmfu4PPwH7EQ70L7Ntwv/en0vgWDdq
+	 qafvcAf14Kt8Mz70/rZeLjOhjbsv1UGeU4Nb/kS6abjrcx+LM0ao2hyyck/DdS4HwY
+	 A1DTL8D6zwr1PxN2AtTIS7pFNP9rfwzfVgUjc5CZJB6FwlbNKhmGgVXBkc1vEXgRQs
+	 iCzKGSClsUct73ydEWohviqpQvzjhMcjd9TiUnsvVrJSZnGWmV7jwIxomS9eh4ivE7
+	 yFGEAOsj8I1nA==
+Date: Fri, 25 Apr 2025 17:45:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacek Kowalski <jacek@jacekk.info>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] e1000e: disregard NVM checksum on tgp when valid
+ checksum mask is not set
+Message-ID: <20250425164510.GP3042781@horms.kernel.org>
+References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
+ <20250424162444.GH3042781@horms.kernel.org>
+ <dc357533-f7e3-49fc-9a27-4554eb46fd43@jacekk.info>
+ <20250424171856.GK3042781@horms.kernel.org>
+ <2a80cde6-27d4-46f2-8ad0-b7feefd4764c@jacekk.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5 bpf-next 2/6] bpf: udp: Make sure iter->batch always
- contains a full bucket snapshot
-To: Jordan Rife <jordan@jrife.io>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- Aditi Ghag <aditi.ghag@isovalent.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>
-References: <20250423235115.1885611-1-jordan@jrife.io>
- <20250423235115.1885611-3-jordan@jrife.io>
- <CAADnVQLTJt5zxuuuF9WZBd9Ui8r0ixvo37ohySX8X9U4kk9XbA@mail.gmail.com>
- <kjcasjtjil6br6qton7uz52ql25udddmzbraaw6qmjadbqj5xm@3o5c2rgdt5bt>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <kjcasjtjil6br6qton7uz52ql25udddmzbraaw6qmjadbqj5xm@3o5c2rgdt5bt>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a80cde6-27d4-46f2-8ad0-b7feefd4764c@jacekk.info>
 
-On 4/24/25 8:39 AM, Jordan Rife wrote:
->> It looks like overdesign.
->> I think it would be much simpler to do GFP_USER once,
+On Thu, Apr 24, 2025 at 07:37:26PM +0200, Jacek Kowalski wrote:
+> > Although I do wonder if commit 4051f68318ca9 is backported,
+> > will this patch (once accepted) end up being backported far enough?
 > 
-> Martin expressed a preference for retrying GFP_USER, so I'll let him
-> chime in here, but I'm fine the simpler approach. There were some
-> concerns about maximizing the chances that allocation succeeds, but
-> this situation should be be rare anyway, so yeah retries are probably
-> overkill.
+> Stable 5.10 (and newer) already has 4051f68318ca9 and ffd24fa2fcc7:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/net/ethernet/intel/e1000e/ich8lan.c?h=linux-5.10.y#n4139
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/drivers/net/ethernet/intel/e1000e/ich8lan.c?h=linux-5.10.y&id=8f1e3ad9456935f538c4ba06d2c04f2581ec385f
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/drivers/net/ethernet/intel/e1000e/ich8lan.c?h=linux-5.10.y&id=eb5e444fe37d467e54d2945c1293f311ce782f67
+> 
+> In my opinion my patch should be backported as well.
 
-No strong opinion on how many retries on GFP_USER, so no objection on trying 
-GFP_USER only once and then retry one last time with GFP_NOWAIT|__GFP_NOWARN.
-
-> 
->> grab the lock and follow with GFP_NOWAIT|__GFP_NOWARN.
->> GFP_ATOMIC will deplete memory reserves.
->> bpf iterator is certainly not a critical operation, so use GFP_NOWAIT.
-> 
-> Yeah, GFP_NOWAIT makes sense. Will do.
-> 
-> Jordan
-
+Yes, I agree.
 
