@@ -1,123 +1,149 @@
-Return-Path: <netdev+bounces-185838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66AF2A9BD8E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:28:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B2EFA9BD9C
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D406A3A7019
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:28:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B937B1BA3537
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DC8140E30;
-	Fri, 25 Apr 2025 04:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16ACD19DF98;
+	Fri, 25 Apr 2025 04:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YVBozJmW"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="FO53vZrz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093B026AC3
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 04:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA78134CF;
+	Fri, 25 Apr 2025 04:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745555331; cv=none; b=eLSM+dX5NTor0Gq7cAd4X8FWHnQP70Pb6MzKf1CkHVqoiwN6G2X2Ns4ARwy76/2LU5u/sO0f7tDh2SyAZIW2aTUc0OFT+SL70pBbStEnoM9oQ8NEbYquyBAddYrDIejlhB/VncEbeaOeNiDJQvNRTUNa0Im27xi5NnY2zDXGqFs=
+	t=1745555554; cv=none; b=Z1w2cr4VppNmNgRXQyBmD47V1S9rL+AWYYbA/AfeufIaXOSJFgvoPZK2HIynkwLN0IpI9fCw7VfIHee0Th009mw75bExHBRbTq12AHNhHue0W1j/9lHueCDQGRa5b1ox2h/Q50amTw92MJYfUdtEVLOfZ/XK134oXdQ3Do6ZjsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745555331; c=relaxed/simple;
-	bh=mUwKmpSiftDQFWb84758vCTbsmaHpPDT/l2BtxaPHOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JZgsdOKkKYtjGpB8NxXWnGOz57RlirA3gXgcMIt/fE6fFJhWQHXnvlQVayVdcC7XV/Cm5aXusA1spGnja0fgqAbXcIyNVTFGAM0Wek4NurW4zz2t9Usx+DfPWq7yNDRw8gbSeyRjWfh6JtscqqWtNOUnIVhoaTU6DRyIS5GNc5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YVBozJmW; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1745555554; c=relaxed/simple;
+	bh=zjF9JaePE0iVCghtEj4B1rUwWxnrzjj6eVYVCPmvMNs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CM+q8YZxcqAUvGNzapLm8rrT4Yab42oYIT0QthXhJuqOSPgNyz99rZMvi34pbMAkW2L0Tp5ozwT2qQvlVYVAM2RkjRsX8anr1s08GLav4D+f8DZmkTl4oC1D73OqcskACXDjUUR8WlklOOJCixdZh3NiJOJGo2XPw4ka324WYQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=FO53vZrz; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745555330; x=1777091330;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mUwKmpSiftDQFWb84758vCTbsmaHpPDT/l2BtxaPHOg=;
-  b=YVBozJmWSdJCo+OQpYAX5qai9zSp+wz6Xur7DWSsxmU6zlpmTItg2DeX
-   jNX+PBlFohesfr48NlTciSdsmQaC2QJKRm5tBE/xT0ZnGpNj3UvHZUZk0
-   Q0HrxFiPkr2NKek6+Flcxd5I6W0uwZ1m8IjQLrG2z6yMGovRHWkVL/vk7
-   12sJIg1hexvv8drzLzMcEZ/OfMkcqA24qzTsO6n44O3DibgTjyuKKoZ1J
-   ndXOJ1eYaQueQLuTN3y/yFrP15DhzeKZgWzE6r6z+b6e6B/l6V0DrgQgz
-   eTto3zUfEUwglThXWveEJwyZhtYpQ776EN442R4ANkAGnK7YzMRuDIVKF
-   A==;
-X-CSE-ConnectionGUID: VSfJIh2rSm2wrwKAt8d7ig==
-X-CSE-MsgGUID: k6X37O0DRU2aHVjpkB8ObQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="47082752"
-X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="47082752"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 21:28:49 -0700
-X-CSE-ConnectionGUID: dslbe/EER86DCVEyRxP2tA==
-X-CSE-MsgGUID: RAwXs4lSTYm05Q/7sOH+Qw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
-   d="scan'208";a="137799898"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 21:28:46 -0700
-Date: Fri, 25 Apr 2025 06:28:26 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	marcin.szycik@intel.com
-Subject: Re: [PATCH v2 net-next 2/3] pfcp: Convert pfcp_net_exit() to
- ->exit_rtnl().
-Message-ID: <aAsPamW5qmCp+O3e@mev-dev.igk.intel.com>
-References: <20250418003259.48017-1-kuniyu@amazon.com>
- <20250418003259.48017-3-kuniyu@amazon.com>
- <20250422194757.67ba67d6@kernel.org>
- <aAimsamTlQOq3/aD@mev-dev.igk.intel.com>
- <20250423063350.49025e5e@kernel.org>
- <aAnAxEXgyyhfgHWw@mev-dev.igk.intel.com>
- <20250424152638.5915c020@kernel.org>
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1745555553; x=1777091553;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zjF9JaePE0iVCghtEj4B1rUwWxnrzjj6eVYVCPmvMNs=;
+  b=FO53vZrz0AydtgHmCxVqKXHJLtYZTJwvCSGHXKh1iZ546qXZ0ySApM0u
+   fWbnvZLuwQlCANK5JoyvYPxl47OQlelvocWAkKnLaNdWxzlOTHTG4nvQ0
+   a+8usQUO6f/O1jTLQtDRp6rlgWHsj6rUVCmNuDkAWrcXVRZKMHuCqQ3zz
+   CUJr+0bcSrVIwVuYuCkNi+K0ejfx/S6IWllXl5UbEEGT1VwlX/SjroLRh
+   xUJU0f1pE/QQi9rv6lIl69E48xIuMNM9Q0g3xcKU6Ja+BjycOkelm9G0u
+   FPzdEJOYzjOnI2UmRu2cKXASdo2rLqncYVWaAvS8cTS3hAgjxNTt6i92B
+   w==;
+X-CSE-ConnectionGUID: Q9SVwF29Twemz3224Z21Zw==
+X-CSE-MsgGUID: Z2WZZaR1RDiB+f+XT4/lZA==
+X-IronPort-AV: E=Sophos;i="6.15,238,1739862000"; 
+   d="scan'208";a="40884322"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Apr 2025 21:32:32 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 24 Apr 2025 21:32:11 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Thu, 24 Apr 2025 21:32:08 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v1 net] net: lan743x: Fix memory leak when GSO enabled
+Date: Fri, 25 Apr 2025 09:58:53 +0530
+Message-ID: <20250425042853.21653-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424152638.5915c020@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Thu, Apr 24, 2025 at 03:26:38PM -0700, Jakub Kicinski wrote:
-> On Thu, 24 Apr 2025 06:40:36 +0200 Michal Swiatkowski wrote:
-> > > > Uh, I remember that we used it to add tc filter. Maybe we can fix it?  
-> > > 
-> > > If it really was broken for over a year and nobody noticed -
-> > > my preference would be to delete it. I don't think you need
-> > > an actual tunnel dev to add TC filters?  
-> > 
-> > Our approach was to follow scheme from exsisting ones.
-> > For example, vxlan filter:
-> > tc filter add dev vxlan ingress protocol ip ...
-> > PFCP filter:
-> > tc filter add dev pfcp ingress protocol ip ...
-> > 
-> > so in this case we need sth to point and pass the information that this
-> > tunnel is PFCP. If you have an idea how to do it without actual tunnel
-> > we are willing to implement it. AFAIR simple matching on specific port
-> > number isn't good solution as tunnel specific fields can't be passed in
-> > such scenario.
-> 
-> You're right, not sure what I was thinking.. probably about 
-> the offloaded flow.
-> 
-> Could you please fix this and provide a selftests for offloaded 
-> and non-offloaded operation? To make sure this code is exercised?
+The current implementation tracks the `skb` by linking it to the
+LS descriptor when the  number of fragments is greater than zero,
+and to the EXT descriptor when the number of fragments is zero
+with GSO enabled. However, when the `skb` is mapped to the EXT
+descriptor, it is not freed resulting in a memory leak. The
+implementation has been modified to always map the `skb` to the
+last descriptor and always be properly freed.
 
-Sure, I will do that. I am going for a two week vacation from today, so it
-can take some time for v1.
+Fixes: 23f0703c125b ("lan743x: Add main source files for new lan743x driver")
+Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 8 ++++++--
+ drivers/net/ethernet/microchip/lan743x_main.h | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-Thanks
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 8b6b9b6efe18..73dfc85fa67e 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -1815,6 +1815,7 @@ static void lan743x_tx_frame_add_lso(struct lan743x_tx *tx,
+ 	if (nr_frags <= 0) {
+ 		tx->frame_data0 |= TX_DESC_DATA0_LS_;
+ 		tx->frame_data0 |= TX_DESC_DATA0_IOC_;
++		tx->frame_last = tx->frame_first;
+ 	}
+ 	tx_descriptor = &tx->ring_cpu_ptr[tx->frame_tail];
+ 	tx_descriptor->data0 = cpu_to_le32(tx->frame_data0);
+@@ -1884,6 +1885,7 @@ static int lan743x_tx_frame_add_fragment(struct lan743x_tx *tx,
+ 		tx->frame_first = 0;
+ 		tx->frame_data0 = 0;
+ 		tx->frame_tail = 0;
++		tx->frame_last = 0;
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -1924,16 +1926,18 @@ static void lan743x_tx_frame_end(struct lan743x_tx *tx,
+ 	    TX_DESC_DATA0_DTYPE_DATA_) {
+ 		tx->frame_data0 |= TX_DESC_DATA0_LS_;
+ 		tx->frame_data0 |= TX_DESC_DATA0_IOC_;
++		tx->frame_last = tx->frame_tail;
+ 	}
+ 
+-	tx_descriptor = &tx->ring_cpu_ptr[tx->frame_tail];
+-	buffer_info = &tx->buffer_info[tx->frame_tail];
++	tx_descriptor = &tx->ring_cpu_ptr[tx->frame_last];
++	buffer_info = &tx->buffer_info[tx->frame_last];
+ 	buffer_info->skb = skb;
+ 	if (time_stamp)
+ 		buffer_info->flags |= TX_BUFFER_INFO_FLAG_TIMESTAMP_REQUESTED;
+ 	if (ignore_sync)
+ 		buffer_info->flags |= TX_BUFFER_INFO_FLAG_IGNORE_SYNC;
+ 
++	tx_descriptor = &tx->ring_cpu_ptr[tx->frame_tail];
+ 	tx_descriptor->data0 = cpu_to_le32(tx->frame_data0);
+ 	tx->frame_tail = lan743x_tx_next_index(tx, tx->frame_tail);
+ 	tx->last_tail = tx->frame_tail;
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+index 7f73d66854be..db5fc73e41cc 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.h
++++ b/drivers/net/ethernet/microchip/lan743x_main.h
+@@ -980,6 +980,7 @@ struct lan743x_tx {
+ 	u32		frame_first;
+ 	u32		frame_data0;
+ 	u32		frame_tail;
++	u32		frame_last;
+ 
+ 	struct lan743x_tx_buffer_info *buffer_info;
+ 
+-- 
+2.25.1
+
 
