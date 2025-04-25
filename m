@@ -1,145 +1,142 @@
-Return-Path: <netdev+bounces-185843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61274A9BDE4
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:33:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4778CA9BE41
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90590189AB28
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF98D3B952A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB00229B2B;
-	Fri, 25 Apr 2025 05:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0382D22A801;
+	Fri, 25 Apr 2025 06:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRXDkC/e"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="eZVvTQJH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C1D227E93;
-	Fri, 25 Apr 2025 05:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B776C19C540;
+	Fri, 25 Apr 2025 06:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745559205; cv=none; b=of5eg0Cb3Y+Wpsf1CU15f32v2RauwBCyADf8cO5rloMcUJEemeSyLzEaLj6ip6vkhXNKSaQ5P35wDLyCpLAdyI19aZ0c6kkvG/kyhbO6GsSNgDsxE5f6Lx3m4jcrytjpdO2qVVk+lpB9Y5hT7uVuSillRGM9GUMdDjawTpJ6MY8=
+	t=1745560829; cv=none; b=VklU2ao8e9WMMVhq5b3Qfi+TwYIeuo2BUL6svpknWjZDgJrrMka1d9t6qWoMpj5ZXTD6O6sBDkSmvyipW54VJezFSkGbt9WkmDumVKJoFtucvsLhiC4RrPXckUf7xysGmqFehgSY5FKfpuivy5Rf9YmUoJ0gJLu0NSHH9CIUzh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745559205; c=relaxed/simple;
-	bh=yaZ/xOw+yV7pDnZ4omfyKfpAGH6Pr1XtYBYLDUHsxpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IglWlAi6kwD0pWxSBNLcit86t85mLsnMeiatVsFYKLpBrd8Ll/Kvk65n5m9rF74N1LyTOPW8nbB2zfhumRDweRvLwJS7uHP+89s51gsWIMD61L/dLJoNrY1x/1epsiWkjSCsJFAxxMVhkMELjdtuXhgIXGm6IbVc+pcDU8N3OpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRXDkC/e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B92ECC4CEE4;
-	Fri, 25 Apr 2025 05:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745559204;
-	bh=yaZ/xOw+yV7pDnZ4omfyKfpAGH6Pr1XtYBYLDUHsxpU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mRXDkC/eFQrFfTAR3fbh0KpZCOeTtnv4cACQ2xNdDBa+FqnFssheLF5Vkep1apZjz
-	 o0bKS8Ainq6orEc5feo5R1vAa0ATuGGdGTYCMqiB+8oiNNzL14LGzOr3RPFoG9nkrE
-	 M1jcPbckn/v2S4JoPiVJ/aAS3ySZDbG4A4rs0Cq6y+kwONplUlh2GG6QKvSUhkLIMQ
-	 9a3SJjaa6+uPBMQRXICVI7IkWntN3CWPXDQ6q//fU2/l7wCbm4LMn80A/p4Y+nEEWw
-	 q6CzbpMwslcBm2d1/iJgIXf+Ti9cxhB3jFI5rAOzTo3ux6XO4YFi1fjD5Gk43e5TQ1
-	 EGk1l72F4x/PQ==
-Message-ID: <0bf77ef6-d884-44d2-8ecc-a530fee215d1@kernel.org>
-Date: Fri, 25 Apr 2025 07:33:17 +0200
+	s=arc-20240116; t=1745560829; c=relaxed/simple;
+	bh=KklZdxaMaK2t+GzkmjlvOLyn33H5lbCp9kBUG3gbsdM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EyIyRzq4Baivw+K/t3ONX5elCn2opgFyy781u3u2XjYix2vm4HoX6Eeqg5RagWrVlDS/aO8X2Fijh8Bz58g8sLNgsfmjGvZR2QyTWEL8qUU8rqwLTWPQra/Y0SzcvXPGSDTGS+TjW1h/t+2DRXZijummccln3NLhMBaN/KyRa1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=eZVvTQJH; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53P5xSXT12329904, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1745560768; bh=KklZdxaMaK2t+GzkmjlvOLyn33H5lbCp9kBUG3gbsdM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=eZVvTQJH18XWIc9zJZV++hpfHPkkhKIXhyoQvgH2bw1hSPl+RU538nOgplb/o72QC
+	 fYsbjKev5JncnLserer4z9FOoASMiLn+DTAYtaG4ByXa7FXdjAcNuucnmJPFLjkA0z
+	 IISAze91FAPNvEtTHfUSNc+znEoCNl/S8IpgeR20GLbY5Jl0EuTW05/PRsWlfqJ+4U
+	 kNQXZ+ZuH8bY3OQuoQl+QwfL4i1QJOUdA/TEGWihrjYJ3pfW96opDFA6ChqyoDd1GR
+	 dHw0aFI1CGgEyIDzWVtmWaebgFyg3AXyrF0Mye4F7Y4oTnrgCynPqFsbaSyo6CMjp/
+	 rsHShbTH/eHdQ==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53P5xSXT12329904
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Apr 2025 13:59:28 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 25 Apr 2025 13:59:28 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 25 Apr 2025 13:59:28 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Fri, 25 Apr 2025 13:59:28 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Alexei Safin <a.safin@rosa.ru>, Stanislaw Gruszka <stf_xl@wp.pl>
+CC: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Paolo
+ Abeni" <pabeni@redhat.com>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>
+Subject: RE: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in il4965_tx_cmd_build_rate()
+Thread-Topic: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in
+ il4965_tx_cmd_build_rate()
+Thread-Index: AQHbtUoyW+CeES1JwUC8udH5dJNFFbOz4pRg
+Date: Fri, 25 Apr 2025 05:59:27 +0000
+Message-ID: <ea0ce54e06104682b9a5d24b9bb75a91@realtek.com>
+References: <20250424185244.3562-1-a.safin@rosa.ru>
+In-Reply-To: <20250424185244.3562-1-a.safin@rosa.ru>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v7 4/7] net: mtip: The L2 switch driver for imx287
-To: Jakub Kicinski <kuba@kernel.org>, Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
-References: <20250423072911.3513073-1-lukma@denx.de>
- <20250423072911.3513073-5-lukma@denx.de> <20250424181110.2734cd0b@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250424181110.2734cd0b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On 25/04/2025 03:11, Jakub Kicinski wrote:
-> On Wed, 23 Apr 2025 09:29:08 +0200 Lukasz Majewski wrote:
->> This patch series provides support for More Than IP L2 switch embedded
->> in the imx287 SoC.
->>
->> This is a two port switch (placed between uDMA[01] and MAC-NET[01]),
->> which can be used for offloading the network traffic.
->>
->> It can be used interchangeably with current FEC driver - to be more
->> specific: one can use either of it, depending on the requirements.
->>
->> The biggest difference is the usage of DMA - when FEC is used, separate
->> DMAs are available for each ENET-MAC block.
->> However, with switch enabled - only the DMA0 is used to send/receive data
->> to/form switch (and then switch sends them to respecitive ports).
-> 
-> Lots of sparse warnings and build issues here, at least on x86.
-> 
-> Could you make sure it's clean with an allmodconfig config, 
-> something like:
-> 
-> make C=1 W=1 drivers/net/ethernet/freescale/mtipsw/ 
+Alexei Safin <a.safin@rosa.ru> wrote:
+>=20
+> Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
+> rate_idx values greater than or equal to RATE_COUNT_LEGACY.
+>=20
+> Use a correct bounds check to avoid accessing il_rates[] with
+> an invalid index. The previous comparison allowed rate_idx to become
+> equal to RATE_COUNT_LEGACY, which exceeds the array limit.
+>=20
+> Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
+> 'rate_idx >=3D RATE_COUNT_LEGACY' to ensure memory safety.
+>=20
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>=20
+> Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
 
-... and W=1 with clang as well.
+The Fixes is obviously wrong. It just moved the code.=20
 
-Best regards,
-Krzysztof
+> Signed-off-by: Alexei Safin <a.safin@rosa.ru>
+> ---
+> v2: change reciepent
+>  drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> index 78dee8ccfebf..f60d9b9798c1 100644
+> --- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> +++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> @@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
+>          */
+>         rate_idx =3D info->control.rates[0].idx;
+>         if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_=
+idx < 0
+> -           || rate_idx > RATE_COUNT_LEGACY)
+> +           || rate_idx >=3D RATE_COUNT_LEGACY)
+>                 rate_idx =3D rate_lowest_index(&il->bands[info->band], st=
+a);
+>         /* For 5 GHZ band, remap mac80211 rate indices into driver indice=
+s */
+>         if (info->band =3D=3D NL80211_BAND_5GHZ)
+> --
+> 2.39.5 (Apple Git-154)
+>=20
+
 
