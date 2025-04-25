@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-186136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98CF7A9D47A
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:49:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF61A9D47C
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E6417BE63
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:49:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7216E7A8923
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A992D22A7EA;
-	Fri, 25 Apr 2025 21:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C9E22B5AA;
+	Fri, 25 Apr 2025 21:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpfJevb4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ui1y+5HN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8546B228CB2
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3ADF22AE7B
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745617706; cv=none; b=TIRDlhsYx4bmaDMxNEHN+Lccneo3XqcHFOpcSF/rq6KwbZQ2Dzn40UkD6hdf8HW1xUzd+kILLaIdlWCEWc4Qo8iiNxg0au9yX5qQa6KZZGifAYTgyusGeFrJZBiOkmoKP0BuW/Z1S7bIZiIm/Ceq2VS53fJHoimc4GikjfQ/q7I=
+	t=1745617707; cv=none; b=qdCv15HekdeudydxK2XdcBTRd6xQrVjwIFXNp3rSkDt7uvqzlCplMdN5Biv6QZD3mtlIRCrHhi6j13k5YMWJcalzwrSipVe9curnPUMLXioQTbrlvnCzIrsLYr8PWtI4zJsddd8yFGsuFZtAjkBj66f/hvnu8sI4Ozz7Q7O8UXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745617706; c=relaxed/simple;
-	bh=PvBZsWOMlzpueV/Ut7P3Qhz+WSSr5v2TXp/xHDniBaE=;
+	s=arc-20240116; t=1745617707; c=relaxed/simple;
+	bh=TgkuYSief6x3FG7LR8sQ3fHGUGvd3d+d2ilQgOWAxFI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cS5SCe+R+3d70DDJin1tEncgBUyPK1moYWTwND7DHFfEyb6xH4arTReKzMjDLslOrlIPHDfQAEhhFxydwBwxtkVNHBhm7A6i7IhDuPGy5r5uLe4UglJ+/dbIk0TeHCbVi8K08JUZnxbHEQ0auY5isBsYeO2xAI/6yGtChn5KOG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpfJevb4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5921FC4CEE4;
-	Fri, 25 Apr 2025 21:48:26 +0000 (UTC)
+	 MIME-Version; b=LMSDxDMxifL15SufCIYq+5qHOxm/PkLsslNbGxQE9ZSJZhjmAq3iP/55XTNQvcGDWq7cUobWyFGB7HqcPi7bK1g9/DRtqd5HXdJAnE3Moq+vBaPtoxjRSIrux+jIlnsEkIQL8VEDCgLm/FM5MIHv6EvtixCiIcC//n2bNClJyMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ui1y+5HN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D40C4CEE4;
+	Fri, 25 Apr 2025 21:48:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745617706;
-	bh=PvBZsWOMlzpueV/Ut7P3Qhz+WSSr5v2TXp/xHDniBaE=;
+	s=k20201202; t=1745617707;
+	bh=TgkuYSief6x3FG7LR8sQ3fHGUGvd3d+d2ilQgOWAxFI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TpfJevb4XCdt5fq54Ut6q9jRGV/JKGRMFgzQHr8Gz9KO3/KAdGZSMxSsyzsu8Pkqn
-	 vUY3CagV4KGrQYXw6l3Ai8yxrk5RkPs2Y2+zrrno0P4BG/CLhf3DEI9at9tljI/75e
-	 KqOQTG5d8JBBJ6dnNn6x7nrLw5WLCMaNuP9zjRnKyLYLIBoGWRgPFrQK+O8kCalKGw
-	 NY7alKCMJEDq6kaDxEkARXYGZwc9xsqjYWppixt757rLrMdE//HpAhFimdCgwc+RED
-	 Rs4iK/jfWvxIbLv2nnRQVFCgl8E5joeKgC5+ecFRGoeAJVKceT6e+2XkJuhAQrNZRv
-	 qGWXpvmqatcQg==
+	b=Ui1y+5HNAOLCK9Z3e52jospklo5q6taBuuIbhUTXFOgde1ruCR/8J7Oi6Tr5i4XDj
+	 c8B8Rt+1LVZUHTBpPvy/UyIgXjuzRekX64d7IjiAIH9o/EcRvH8ovt2h3NomXw/tQ4
+	 EnD8s8Dz0MZLw3zM2X/w3C0NSTCDQUMs+ndLwjhqcW2dUS21lBPksQorlHYAF437RA
+	 VCOjMyntRfXMGfJ9QUn7dK8+anemTyxAA0mElACTCoSpw8+mzvZtevFuMACvHRHxAX
+	 kzrvCkiyOAyeWkRteizPdcIif7T5GvGAf3PjGR05biYWAlANKBBlL+K+4YWgQhri1n
+	 LL75ICdAIIPBw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,9 +52,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next V3 08/15] devlink: Implement port params registration
-Date: Fri, 25 Apr 2025 14:48:01 -0700
-Message-ID: <20250425214808.507732-9-saeed@kernel.org>
+Subject: [PATCH net-next V3 09/15] devlink: Implement get/dump netlink commands for port params
+Date: Fri, 25 Apr 2025 14:48:02 -0700
+Message-ID: <20250425214808.507732-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250425214808.507732-1-saeed@kernel.org>
 References: <20250425214808.507732-1-saeed@kernel.org>
@@ -68,308 +68,261 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Port params infrastructure is incomplete and needs a bit of plumbing to
-support port params commands from netlink.
+Add missing port-params netlink attributes and policies to devlink's
+spec, reuse existing get_doit/dump_doit of the devlink params for port
+params and implement the dump command for all devlink ports params.
 
-Introduce port params registration API, very similar to current devlink
-params API, add the params xarray to devlink_port structure and
-decouple devlink params registration routines from the devlink
-structure.
+This implements:
+1)  devlink port param show
+2)  devlink port param show <device>/<port>
+3)  devlink port param show <device>/<port> name <param_name>
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- include/net/devlink.h |  14 ++++
- net/devlink/param.c   | 150 ++++++++++++++++++++++++++++++++++--------
- net/devlink/port.c    |   3 +
- 3 files changed, 140 insertions(+), 27 deletions(-)
+ Documentation/netlink/specs/devlink.yaml | 13 ++--
+ include/net/devlink.h                    |  1 +
+ net/devlink/netlink_gen.c                | 16 ++++-
+ net/devlink/param.c                      | 88 ++++++++++++++++++++----
+ 4 files changed, 99 insertions(+), 19 deletions(-)
 
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 05fee1b7fe19..f48fd83567c6 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -1852,12 +1852,17 @@ operations:
+         pre: devlink-nl-pre-doit-port
+         post: devlink-nl-post-doit
+         request:
+-          attributes: *port-id-attrs
+-        reply:
+-          attributes: *port-id-attrs
++          attributes: &port-param-id-attrs
++            - bus-name
++            - dev-name
++            - port-index
++            - param-name
++        reply: &port-param-get-reply
++          attributes: *port-param-id-attrs
+       dump:
+-        reply:
++        request:
+           attributes: *port-id-attrs
++        reply: *port-param-get-reply
+ 
+     -
+       name: port-param-set
 diff --git a/include/net/devlink.h b/include/net/devlink.h
-index eed1e4507d17..11f98e3a750b 100644
+index 11f98e3a750b..b409ccbcfd12 100644
 --- a/include/net/devlink.h
 +++ b/include/net/devlink.h
-@@ -125,6 +125,7 @@ struct devlink_port {
- 	struct list_head region_list;
- 	struct devlink *devlink;
- 	const struct devlink_port_ops *ops;
-+	struct xarray params;
- 	unsigned int index;
- 	spinlock_t type_lock; /* Protects type and type_eth/ib
- 			       * structures consistency.
-@@ -1823,6 +1824,19 @@ void devl_params_unregister(struct devlink *devlink,
- void devlink_params_unregister(struct devlink *devlink,
- 			       const struct devlink_param *params,
- 			       size_t params_count);
-+int devl_port_params_register(struct devlink_port *devlink_port,
-+			      const struct devlink_param *params,
-+			      size_t params_count);
-+int devlink_port_params_register(struct devlink_port *devlink_port,
-+				 const struct devlink_param *params,
-+				 size_t params_count);
-+void devl_port_params_unregister(struct devlink_port *devlink_port,
-+				 const struct devlink_param *params,
-+				 size_t params_count);
-+void devlink_port_params_unregister(struct devlink_port *devlink_port,
-+				    const struct devlink_param *params,
-+				    size_t params_count);
+@@ -439,6 +439,7 @@ union devlink_param_value {
+ struct devlink_param_gset_ctx {
+ 	union devlink_param_value val;
+ 	enum devlink_param_cmode cmode;
++	struct devlink_port *devlink_port;
+ };
+ 
+ /**
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index f9786d51f68f..d4876cf0f049 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -322,7 +322,15 @@ static const struct nla_policy devlink_region_read_nl_policy[DEVLINK_ATTR_REGION
+ };
+ 
+ /* DEVLINK_CMD_PORT_PARAM_GET - do */
+-static const struct nla_policy devlink_port_param_get_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
++static const struct nla_policy devlink_port_param_get_do_nl_policy[DEVLINK_ATTR_PARAM_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
++	[DEVLINK_ATTR_PARAM_NAME] = { .type = NLA_NUL_STRING, },
++};
 +
- int devl_param_driverinit_value_get(struct devlink *devlink, u32 param_id,
- 				    union devlink_param_value *val);
- void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
++/* DEVLINK_CMD_PORT_PARAM_GET - dump */
++static const struct nla_policy devlink_port_param_get_dump_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
+ 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+ 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+ 	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
+@@ -938,14 +946,16 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+ 		.pre_doit	= devlink_nl_pre_doit_port,
+ 		.doit		= devlink_nl_port_param_get_doit,
+ 		.post_doit	= devlink_nl_post_doit,
+-		.policy		= devlink_port_param_get_nl_policy,
+-		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
++		.policy		= devlink_port_param_get_do_nl_policy,
++		.maxattr	= DEVLINK_ATTR_PARAM_NAME,
+ 		.flags		= GENL_CMD_CAP_DO,
+ 	},
+ 	{
+ 		.cmd		= DEVLINK_CMD_PORT_PARAM_GET,
+ 		.validate	= GENL_DONT_VALIDATE_DUMP_STRICT,
+ 		.dumpit		= devlink_nl_port_param_get_dumpit,
++		.policy		= devlink_port_param_get_dump_nl_policy,
++		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
+ 		.flags		= GENL_CMD_CAP_DUMP,
+ 	},
+ 	{
 diff --git a/net/devlink/param.c b/net/devlink/param.c
-index 66a4121015a2..4656d16cd51a 100644
+index 4656d16cd51a..918ee1abd4b4 100644
 --- a/net/devlink/param.c
 +++ b/net/devlink/param.c
-@@ -627,13 +627,16 @@ static int devlink_param_verify(const struct devlink_param *param)
+@@ -153,11 +153,14 @@ devlink_param_cmode_is_supported(const struct devlink_param *param,
  }
  
- static int devlink_param_register(struct devlink *devlink,
-+				  struct devlink_port *devlink_port,
-+				  struct xarray *params_arr,
- 				  const struct devlink_param *param)
+ static int devlink_param_get(struct devlink *devlink,
++			     struct devlink_port *devlink_port,
+ 			     const struct devlink_param *param,
+ 			     struct devlink_param_gset_ctx *ctx)
  {
+ 	if (!param->get)
+ 		return -EOPNOTSUPP;
++
++	ctx->devlink_port = devlink_port;
+ 	return param->get(devlink, param->id, ctx);
+ }
+ 
+@@ -249,7 +252,7 @@ static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+ 	union devlink_param_value param_value[DEVLINK_PARAM_CMODE_MAX + 1];
+ 	bool param_value_set[DEVLINK_PARAM_CMODE_MAX + 1] = {};
+ 	const struct devlink_param *param = param_item->param;
+-	struct devlink_param_gset_ctx ctx;
++	struct devlink_param_gset_ctx ctx = {};
+ 	struct nlattr *param_values_list;
+ 	struct nlattr *param_attr;
+ 	int var_attr_type;
+@@ -270,7 +273,7 @@ static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+ 				return -EOPNOTSUPP;
+ 		} else {
+ 			ctx.cmode = i;
+-			err = devlink_param_get(devlink, param, &ctx);
++			err = devlink_param_get(devlink, devlink_port, param, &ctx);
+ 			if (err)
+ 				return err;
+ 			param_value[i] = ctx.val;
+@@ -505,15 +508,17 @@ devlink_param_get_from_info(struct xarray *params, struct genl_info *info)
+ 	return devlink_param_find_by_name(params, param_name);
+ }
+ 
+-int devlink_nl_param_get_doit(struct sk_buff *skb,
+-			      struct genl_info *info)
++static int __devlink_nl_param_get_doit(struct devlink *devlink,
++				       struct devlink_port *devlink_port,
++				       struct xarray *params,
++				       struct genl_info *info,
++				       enum devlink_command cmd)
+ {
+-	struct devlink *devlink = info->user_ptr[0];
  	struct devlink_param_item *param_item;
-+	enum devlink_command cmd;
+ 	struct sk_buff *msg;
  	int err;
  
- 	WARN_ON(devlink_param_verify(param));
--	WARN_ON(devlink_param_find_by_name(&devlink->params, param->name));
-+	WARN_ON(devlink_param_find_by_name(params_arr, param->name));
+-	param_item = devlink_param_get_from_info(&devlink->params, info);
++	param_item = devlink_param_get_from_info(params, info);
+ 	if (!param_item)
+ 		return -EINVAL;
  
- 	if (param->supported_cmodes == BIT(DEVLINK_PARAM_CMODE_DRIVERINIT))
- 		WARN_ON(param->get || param->set);
-@@ -646,11 +649,13 @@ static int devlink_param_register(struct devlink *devlink,
+@@ -521,8 +526,7 @@ int devlink_nl_param_get_doit(struct sk_buff *skb,
+ 	if (!msg)
+ 		return -ENOMEM;
  
- 	param_item->param = param;
- 
--	err = xa_insert(&devlink->params, param->id, param_item, GFP_KERNEL);
-+	err = xa_insert(params_arr, param->id, param_item, GFP_KERNEL);
- 	if (err)
- 		goto err_xa_insert;
- 
--	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_NEW);
-+	cmd = devlink_port ? DEVLINK_CMD_PORT_PARAM_NEW : DEVLINK_CMD_PARAM_NEW;
-+	devlink_param_notify(devlink, devlink_port, param_item, cmd);
-+
- 	return 0;
- 
- err_xa_insert:
-@@ -659,30 +664,28 @@ static int devlink_param_register(struct devlink *devlink,
+-	err = devlink_nl_param_fill(msg, devlink, NULL, param_item,
+-				    DEVLINK_CMD_PARAM_GET,
++	err = devlink_nl_param_fill(msg, devlink, devlink_port, param_item, cmd,
+ 				    info->snd_portid, info->snd_seq, 0);
+ 	if (err) {
+ 		nlmsg_free(msg);
+@@ -532,6 +536,14 @@ int devlink_nl_param_get_doit(struct sk_buff *skb,
+ 	return genlmsg_reply(msg, info);
  }
  
- static void devlink_param_unregister(struct devlink *devlink,
-+				     struct devlink_port *devlink_port,
-+				     struct xarray *params_arr,
- 				     const struct devlink_param *param)
- {
- 	struct devlink_param_item *param_item;
-+	enum devlink_command cmd;
- 
--	param_item = devlink_param_find_by_id(&devlink->params, param->id);
-+	param_item = devlink_param_find_by_id(params_arr, param->id);
- 	if (WARN_ON(!param_item))
- 		return;
--	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_DEL);
--	xa_erase(&devlink->params, param->id);
-+
-+	cmd = devlink_port ? DEVLINK_CMD_PORT_PARAM_DEL : DEVLINK_CMD_PARAM_DEL;
-+	devlink_param_notify(devlink, devlink_port, param_item, cmd);
-+	xa_erase(params_arr, param->id);
- 	kfree(param_item);
- }
- 
--/**
-- *	devl_params_register - register configuration parameters
-- *
-- *	@devlink: devlink
-- *	@params: configuration parameters array
-- *	@params_count: number of parameters provided
-- *
-- *	Register the configuration parameters supported by the driver.
-- */
--int devl_params_register(struct devlink *devlink,
--			 const struct devlink_param *params,
--			 size_t params_count)
-+static int __devlink_params_register(struct devlink *devlink,
-+				     struct devlink_port *devlink_port,
-+				     struct xarray *params_arr,
-+				     const struct devlink_param *params,
-+				     size_t params_count)
- {
- 	const struct devlink_param *param = params;
- 	int i, err;
-@@ -690,10 +693,12 @@ int devl_params_register(struct devlink *devlink,
- 	lockdep_assert_held(&devlink->lock);
- 
- 	for (i = 0; i < params_count; i++, param++) {
--		err = devlink_param_register(devlink, param);
-+		err = devlink_param_register(devlink, devlink_port, params_arr,
-+					     param);
- 		if (err)
- 			goto rollback;
- 	}
-+
- 	return 0;
- 
- rollback:
-@@ -701,9 +706,28 @@ int devl_params_register(struct devlink *devlink,
- 		return err;
- 
- 	for (param--; i > 0; i--, param--)
--		devlink_param_unregister(devlink, param);
-+		devlink_param_unregister(devlink, devlink_port, params_arr,
-+					 param);
-+
- 	return err;
- }
-+
-+/**
-+ *	devl_params_register - register configuration parameters
-+ *
-+ *	@devlink: devlink
-+ *	@params: configuration parameters array
-+ *	@params_count: number of parameters provided
-+ *
-+ *	Register the configuration parameters supported by the driver.
-+ */
-+int devl_params_register(struct devlink *devlink,
-+			 const struct devlink_param *params,
-+			 size_t params_count)
++int devlink_nl_param_get_doit(struct sk_buff *skb, struct genl_info *info)
 +{
-+	return __devlink_params_register(devlink, NULL, &devlink->params,
-+					 params, params_count);
-+}
- EXPORT_SYMBOL_GPL(devl_params_register);
- 
- int devlink_params_register(struct devlink *devlink,
-@@ -719,6 +743,22 @@ int devlink_params_register(struct devlink *devlink,
- }
- EXPORT_SYMBOL_GPL(devlink_params_register);
- 
-+static void __devlink_params_unregister(struct devlink *devlink,
-+					struct devlink_port *devlink_port,
-+					struct xarray *params_arr,
-+					const struct devlink_param *params,
-+					size_t params_count)
-+{
-+	const struct devlink_param *param = params;
-+	int i;
++	struct devlink *devlink = info->user_ptr[0];
 +
-+	lockdep_assert_held(&devlink->lock);
-+
-+	for (i = 0; i < params_count; i++, param++)
-+		devlink_param_unregister(devlink, devlink_port, params_arr,
-+					 param);
++	return __devlink_nl_param_get_doit(devlink, NULL, &devlink->params,
++					   info, DEVLINK_CMD_PARAM_GET);
 +}
 +
- /**
-  *	devl_params_unregister - unregister configuration parameters
-  *	@devlink: devlink
-@@ -729,13 +769,8 @@ void devl_params_unregister(struct devlink *devlink,
- 			    const struct devlink_param *params,
- 			    size_t params_count)
- {
--	const struct devlink_param *param = params;
--	int i;
--
--	lockdep_assert_held(&devlink->lock);
--
--	for (i = 0; i < params_count; i++, param++)
--		devlink_param_unregister(devlink, param);
-+	__devlink_params_unregister(devlink, NULL, &devlink->params,
-+				    params, params_count);
+ static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
+ 					   struct devlink_port *devlink_port,
+ 					   struct xarray *params,
+@@ -595,18 +607,70 @@ int devlink_nl_param_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 					       info, DEVLINK_CMD_PARAM_NEW);
  }
- EXPORT_SYMBOL_GPL(devl_params_unregister);
  
-@@ -749,6 +784,67 @@ void devlink_params_unregister(struct devlink *devlink,
- }
- EXPORT_SYMBOL_GPL(devlink_params_unregister);
- 
-+/**
-+ *	devl_port_params_register - register configuration parameters for port
-+ *
-+ *	@devlink_port: devlink port
-+ *	@params: configuration parameters array
-+ *	@params_count: number of parameters provided
-+ *
-+ *	Register the configuration parameters supported by the driver for the
-+ *	specific port.
-+ */
-+int devl_port_params_register(struct devlink_port *devlink_port,
-+			      const struct devlink_param *params,
-+			      size_t params_count)
++static int
++devlink_nl_port_param_get_dump_one(struct sk_buff *msg,
++				   struct devlink *devlink,
++				   struct netlink_callback *cb,
++				   int flags)
 +{
-+	return __devlink_params_register(devlink_port->devlink,
-+					 devlink_port,
-+					 &devlink_port->params,
-+					 params, params_count);
-+}
-+EXPORT_SYMBOL_GPL(devl_port_params_register);
++	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
++	const struct genl_info *info = genl_info_dump(cb);
++	unsigned long port_index_end = ULONG_MAX;
++	struct devlink_param_item *param_item;
++	struct nlattr **attrs = info->attrs;
++	unsigned long port_index_start = 0;
++	struct devlink_port *devlink_port;
++	unsigned long port_index;
++	unsigned long param_id;
++	int idx = 0;
++	int err = 0;
 +
-+/**
-+ *	devl_port_params_unregister - unregister configuration parameters for port
-+ *
-+ *	@devlink_port: devlink port
-+ *	@params: configuration parameters to unregister
-+ *	@params_count: number of parameters provided
-+ */
-+void devl_port_params_unregister(struct devlink_port *devlink_port,
-+				 const struct devlink_param *params,
-+				 size_t params_count)
-+{
-+	__devlink_params_unregister(devlink_port->devlink, devlink_port,
-+				    &devlink_port->params,
-+				    params, params_count);
-+}
-+EXPORT_SYMBOL_GPL(devl_port_params_unregister);
++	if (attrs && attrs[DEVLINK_ATTR_PORT_INDEX]) {
++		port_index_start = nla_get_u32(attrs[DEVLINK_ATTR_PORT_INDEX]);
++		port_index_end = port_index_start;
++		flags |= NLM_F_DUMP_FILTERED;
++	}
 +
-+int devlink_port_params_register(struct devlink_port *devlink_port,
-+				 const struct devlink_param *params,
-+				 size_t params_count)
-+{
-+	int err;
++	xa_for_each_range(&devlink->ports, port_index, devlink_port,
++			  port_index_start, port_index_end) {
++		xa_for_each_start(&devlink_port->params, param_id, param_item,
++				  state->idx) {
++			if (idx < state->idx) {
++				idx++;
++				continue;
++			}
++			err = devlink_nl_param_fill(msg, devlink, devlink_port,
++						    param_item,
++						    DEVLINK_CMD_PORT_PARAM_GET,
++						    NETLINK_CB(cb->skb).portid,
++						    cb->nlh->nlmsg_seq, flags);
++			if (err == -EOPNOTSUPP) {
++				err = 0;
++			} else if (err) {
++				state->idx = param_id;
++				break;
++			}
++		}
++	}
 +
-+	devl_lock(devlink_port->devlink);
-+	err = devl_port_params_register(devlink_port, params, params_count);
-+	devl_unlock(devlink_port->devlink);
 +	return err;
 +}
-+EXPORT_SYMBOL_GPL(devlink_port_params_register);
 +
-+void devlink_port_params_unregister(struct devlink_port *devlink_port,
-+				    const struct devlink_param *params,
-+				    size_t params_count)
-+{
-+	devl_lock(devlink_port->devlink);
-+	devl_port_params_unregister(devlink_port, params, params_count);
-+	devl_unlock(devlink_port->devlink);
-+}
-+EXPORT_SYMBOL_GPL(devlink_port_params_unregister);
-+
- /**
-  *	devl_param_driverinit_value_get - get configuration parameter
-  *					  value for driver initializing
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 939081a0e615..39bba3f7a1f9 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -1075,6 +1075,8 @@ int devl_port_register_with_ops(struct devlink *devlink,
- 	devlink_port->registered = true;
- 	devlink_port->index = port_index;
- 	devlink_port->ops = ops ? ops : &devlink_port_dummy_ops;
-+	xa_init_flags(&devlink_port->params, XA_FLAGS_ALLOC);
-+
- 	spin_lock_init(&devlink_port->type_lock);
- 	INIT_LIST_HEAD(&devlink_port->reporter_list);
- 	err = xa_insert(&devlink->ports, port_index, devlink_port, GFP_KERNEL);
-@@ -1134,6 +1136,7 @@ void devl_port_unregister(struct devlink_port *devlink_port)
- 	devlink_port_type_warn_cancel(devlink_port);
- 	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_DEL);
- 	xa_erase(&devlink_port->devlink->ports, devlink_port->index);
-+	xa_destroy(&devlink_port->params);
- 	WARN_ON(!list_empty(&devlink_port->reporter_list));
- 	devlink_port->registered = false;
+ int devlink_nl_port_param_get_dumpit(struct sk_buff *msg,
+ 				     struct netlink_callback *cb)
+ {
+-	NL_SET_ERR_MSG(cb->extack, "Port params are not supported");
+-	return msg->len;
++	return devlink_nl_dumpit(msg, cb, devlink_nl_port_param_get_dump_one);
  }
+ 
+ int devlink_nl_port_param_get_doit(struct sk_buff *skb,
+ 				   struct genl_info *info)
+ {
+-	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
+-	return -EINVAL;
++	struct devlink_port *devlink_port = info->user_ptr[1];
++	struct devlink *devlink = info->user_ptr[0];
++
++	return __devlink_nl_param_get_doit(devlink, devlink_port,
++					   &devlink_port->params,
++					   info, DEVLINK_CMD_PORT_PARAM_GET);
+ }
+ 
+ int devlink_nl_port_param_set_doit(struct sk_buff *skb,
 -- 
 2.49.0
 
