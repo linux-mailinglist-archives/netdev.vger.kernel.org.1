@@ -1,199 +1,137 @@
-Return-Path: <netdev+bounces-185877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F55CA9BF77
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:15:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFB9A9BF7E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6579A4BCA
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:13:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CA053BD05B
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E81A23536B;
-	Fri, 25 Apr 2025 07:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE39A235C01;
+	Fri, 25 Apr 2025 07:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fqsb79me"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Qw+6HPRA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F1323534D;
-	Fri, 25 Apr 2025 07:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9362356D9;
+	Fri, 25 Apr 2025 07:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745565131; cv=none; b=dXj2+wYmtrmMIDDlaPdccxJWwWqPCNbDxqcfA4gHhv1ppfgo8421HEWeZGZQ1hJW9Mt1Xi+HM8QzwS1z06HQLkhONtxNJdG2edAGqfzLn8A3MHbwbtOPnA74Jfv3Nwmad58xadN5GJDkWNV6F5HWry2o37p3bfXhcrM4RkX6Z0Q=
+	t=1745565141; cv=none; b=rdEf51y4XLVbSjws7iS//a1rs3UsVytgwaKSdxksWsCMNsl2ehcE8oXdq9JsoZDqaOXPWC1+Z6S7IFwJ6fZTMAwtiXZbHhtFtG0Xgy5lKFy2j/53JcXjZNM7yS4V6mQEYgKBMPdyWaGwRoy2JIcfUQo65iVQBOkcQ1nASDGKCgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745565131; c=relaxed/simple;
-	bh=2QfJQ7dcrhKuX+Tq551J8RtKTlD3rjHY/Eo0FkW4GEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RA8JZsrkUnCWJXs9FBXcTD2LZ7sPZRZP/RkHGchkI4iUzAbcPQfXX5eDqdy2pOSCnr+hhyN0DuSjcmdDY0ngb3El03flLDYyMAF5xra6luqqfTbl/aGSHlhq6KH6Q4MaaLNgL3+hQCT0kT2fWrteAbHmBDUS8ER+Ie/nBFeoM2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fqsb79me; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2243803b776so32741125ad.0;
-        Fri, 25 Apr 2025 00:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745565129; x=1746169929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5KTzXr+eJ6VOU6pnmjI7NKvMZ52qKy79/3M/WgxOiNU=;
-        b=Fqsb79meejnPo0TFhO3QPfTLdROsANcGHNXMTExSIEFSoECLjchcJN5JLRjekZHEcK
-         50m4p2GhRqUaScycOL6PV6XCnRl0R72dYFIGAvzUVDNSdU7coiia1fMwJmBqrGdMfvaP
-         PMxG3EnaVC0NqElkcDg9tHrbiYkHHxeQC1S+TQOwKbRUy88FE08GarCe53oHm+EFaeSc
-         HIwMsRgh+0KLEXbu8Z4YgF2Ml40iy3boduyOiPkyCP0pFwZCwDiFB5Cpts13t1qBLWFp
-         n4HRTXc/hQVJC2AmtdCZo1Ia6dEeLj8ZKfvxwBJW/xY9a2NMvm7vyZl/InsIoPvFQVcn
-         +mMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745565129; x=1746169929;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5KTzXr+eJ6VOU6pnmjI7NKvMZ52qKy79/3M/WgxOiNU=;
-        b=myiESHk9gCf5A+KfyAqG4EU2/gg4B9ZG7xIEdPJ9BwrxD4mw73sVvlb8TAKabF0tEM
-         j7rqEPOgsFPiX8kt26iRXtYoAobzYX7mD34dJJhVHqhizwNfee7lR8w2kR+QgWcvVaNx
-         VnYJnbktsELXL5eEDOxJ3Zxwu0FahuBBx0AEhsrlma7zkkjray93+u9XrzpmWy7Qt5dN
-         qxDPvk+umh+oA+lC2H8fnPVUjxN+q6sdBpgMBgw4QcJdgu6PYqgjkTY37Or2+o1FH51o
-         2bZoTGOmRt1cD/ZBJat8uHGy4gmjfWyPVJoX/i+Yj215m9bKClC9swVGA1TzbRYCMGKS
-         DZzA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6lkdgfMiwhARV0N/ktNl27LddVB8Rt9mgNzJc99l/8dyrvcwJJr4ODUVS2chA3ZrGoac=@vger.kernel.org, AJvYcCXYbEj/WyQdPn9O80gjXFaxheA6t6YBVIbc1w7fwboVq/Im6gplvOE4YncesJ16GGcAKnVO3ggu@vger.kernel.org, AJvYcCXohx6xmf/PYWwlvLmXn3/AB+QJVkJFTtIgpMVI4yirKaPSXDK/r6F/oY8X3desFWOBCgfELozgOj/wd+Lj@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTq5U6zrXON4vh12YrCNJyfEsSVlmTsT50cg++Z+U6S6NZqjBu
-	Lbe6mLViKSyEyaQRmDXXu+cfahPYVdEfD6laJ/xXEE6GvjdWUlZq
-X-Gm-Gg: ASbGncttQa9Hv6/hzgW1178kPIPs8F/Yeudy3l1ZYoMrYYlJO5LpG5njgmsokxdNHh4
-	CA20Cf0Mx9NkZ8HHHDoibLcYnmNG47/s4fmH/nwi81+sJ9VKnSzhFvy6Yqiwhw8r2ztH8hJ8XQN
-	wCWGWKYvz5w7z5Xqfz3Pys8cGbQ/LZ1/3ssOmfkyvJOQrWe3r4nqrfa51xjOXqjBuOuht1lOx03
-	8bIG16R/8e63xLhjyZUuDln7820hSLxdxm4qhjZPqj+lsqGgsdM2tAfn0FqLAknqVcfhgiyDsZP
-	mYjKdt3Y1UGXosBCPYxWPW7KMZBG3oNzwD7oYwZVYIZ97MkE1WvppOtr
-X-Google-Smtp-Source: AGHT+IHbdQaaI+TlUD8wQDF+D7xEsxbXV0AtWO6xb3b+HZ9IeIZ1AgtMWePNiAGk/CXJX9Q3ks1G9w==
-X-Received: by 2002:a17:903:94c:b0:223:5ca8:5ecb with SMTP id d9443c01a7336-22dbf62335emr20904505ad.42.1745565129029;
-        Fri, 25 Apr 2025 00:12:09 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:1c5b:42af:3362:3840])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-22db51028basm25322425ad.196.2025.04.25.00.12.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 00:12:08 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: virtualization@lists.linux.dev
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH v6 4/4] selftests: net: add a virtio_net deadlock selftest
-Date: Fri, 25 Apr 2025 14:10:18 +0700
-Message-ID: <20250425071018.36078-5-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250425071018.36078-1-minhquangbui99@gmail.com>
-References: <20250425071018.36078-1-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1745565141; c=relaxed/simple;
+	bh=OWCgD4c53AWzLHmGkJc92XOEsxdbIrlrlIzldWXKc9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eMEJ03S67yG/8dxLqUPgWwAK44aMYEAu+MiKPOV4SJrRD0yFA4Km8F/oNk6s1QuZoBKlfrOK3nqTAYJIv9ahzCCz2QsD2pWOzRWLBVhaBiXYjvJ/DdO8aKHMZDYQJEUqTfg+SEIj0dmm4VW5GUEhdaaUjMvpIjBMMhH8EzLj0mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Qw+6HPRA; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/gz49BzCJiWld7uM47beLEzscI0nDdN8PKFhZbH8k1o=; b=Qw+6HPRAw2GLZXmgq20QS8wt0C
+	txn/mVTO91ykn5tuFL/uuYfAuUYz48Q+lrxxQKWB2g9D74CKa+ah99c2oA9gm4GaeNVuoBaXtLVTE
+	EIQdRwY5DRRXVVw52ts12pvJLUE9HqBbfk09qveKUwveCLkKx6mpx/Pt92hCzjodDWEFS+AyI99lE
+	XynTiM71ri22QAuhPkA1dOyMyrvoIpydTtDNIbY90QgKhPVFKkLiMxiJwtrCmY2XuUv18oexVkyGa
+	K2Yz5b9lN+AeV19kdukXXE8nn2xl4BF0X2TDbsW+JRVY+YdM++E1hfKHpu8kf3a1t1S5TXUufej/G
+	ZpKgJFCw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u8DE6-0000000BzpF-0oO3;
+	Fri, 25 Apr 2025 07:11:58 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 9C8B63003C4; Fri, 25 Apr 2025 09:11:57 +0200 (CEST)
+Date: Fri, 25 Apr 2025 09:11:57 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: =?iso-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>
+Cc: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, acme@kernel.org,
+	andrew.cooper3@citrix.com, namhyung@kernel.org,
+	mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+	kan.liang@linux.intel.com, wei.liu@kernel.org,
+	ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+	seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+Message-ID: <20250425071157.GI18306@noisy.programming.kicks-ass.net>
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xy1v71s9LdcW622N"
+Content-Disposition: inline
+In-Reply-To: <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
 
-The selftest reproduces the deadlock scenario when binding/unbinding XDP
-program, XDP socket, rx ring resize on virtio_net interface.
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- .../testing/selftests/drivers/net/hw/Makefile |  1 +
- .../selftests/drivers/net/hw/xsk_reconfig.py  | 60 +++++++++++++++++++
- 2 files changed, 61 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
+--xy1v71s9LdcW622N
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 07cddb19ba35..5447785c286e 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -21,6 +21,7 @@ TEST_PROGS = \
- 	rss_ctx.py \
- 	rss_input_xfrm.py \
- 	tso.py \
-+	xsk_reconfig.py \
- 	#
- 
- TEST_FILES := \
-diff --git a/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py b/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
-new file mode 100755
-index 000000000000..d19d1d518208
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
-@@ -0,0 +1,60 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This is intended to be run on a virtio-net guest interface.
-+# The test binds the XDP socket to the interface without setting
-+# the fill ring to trigger delayed refill_work. This helps to
-+# make it easier to reproduce the deadlock when XDP program,
-+# XDP socket bind/unbind, rx ring resize race with refill_work on
-+# the buggy kernel.
-+#
-+# The Qemu command to setup virtio-net
-+# -netdev tap,id=hostnet1,vhost=on,script=no,downscript=no
-+# -device virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on
-+
-+from lib.py import ksft_exit, ksft_run
-+from lib.py import KsftSkipEx, KsftFailEx
-+from lib.py import NetDrvEnv
-+from lib.py import bkg, ip, cmd, ethtool
-+import time
-+
-+def _get_rx_ring_entries(cfg):
-+    output = ethtool(f"-g {cfg.ifname}", json=True)
-+    return output[0]["rx"]
-+
-+def setup_xsk(cfg, xdp_queue_id = 0) -> bkg:
-+    # Probe for support
-+    xdp = cmd(f'{cfg.net_lib_dir / "xdp_helper"} - -', fail=False)
-+    if xdp.ret == 255:
-+        raise KsftSkipEx('AF_XDP unsupported')
-+    elif xdp.ret > 0:
-+        raise KsftFailEx('unable to create AF_XDP socket')
-+
-+    try:
-+        return bkg(f'{cfg.net_lib_dir / "xdp_helper"} {cfg.ifindex} ' \
-+                   '{xdp_queue_id} -z', ksft_wait=3)
-+    except:
-+        raise KsftSkipEx('Failed to bind XDP socket in zerocopy.\n' \
-+                         'Please consider adding iommu_platform=on ' \
-+                         'when setting up virtio-net-pci')
-+
-+def check_xdp_bind(cfg):
-+    with setup_xsk(cfg):
-+        ip(f"link set dev %s xdp obj %s sec xdp" %
-+           (cfg.ifname, cfg.net_lib_dir / "xdp_dummy.bpf.o"))
-+        ip(f"link set dev %s xdp off" % cfg.ifname)
-+
-+def check_rx_resize(cfg):
-+    with setup_xsk(cfg):
-+        rx_ring = _get_rx_ring_entries(cfg)
-+        ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring // 2))
-+        ethtool(f"-G %s rx %d" % (cfg.ifname, rx_ring))
-+
-+def main():
-+    with NetDrvEnv(__file__, nsim_test=False) as cfg:
-+        ksft_run([check_xdp_bind, check_rx_resize],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.0
+On Tue, Apr 22, 2025 at 11:57:01AM +0200, J=FCrgen Gro=DF wrote:
+> On 22.04.25 10:22, Xin Li (Intel) wrote:
 
+> >    This becomes even more silly for trivial instructions like STI/CLI
+> >    or in the worst case paravirt_nop().
+>=20
+> This is nonsense.
+
+What Jurgen says. Someone hasn't done their homework.
+
+static __always_inline void arch_local_irq_disable(void)
+{
+        PVOP_ALT_VCALLEE0(irq.irq_disable, "cli;", ALT_NOT_XEN);
+}
+
+static __always_inline void arch_local_irq_enable(void)
+{
+        PVOP_ALT_VCALLEE0(irq.irq_enable, "sti;", ALT_NOT_XEN);
+}
+
+That very much patches in STI/CLI directly when not Xen.
+
+
+--xy1v71s9LdcW622N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEv3OU3/byMaA0LqWJdkfhpEvA5LoFAmgLNbQACgkQdkfhpEvA
+5LoeWg/8D6ZI5w51DgwY+CTaX5PthgVGKgELCKDw5kBtAe3UxeF/H12T6L6a4XhK
+iSGZ9nZg17P5b2kv9cfXnslz/BqlOUjFfT+cuY64cIDvGXPqjbEcWxhHp/O7e34u
+L1wOXvlh5ZnWkVUPbeIFgLxCqPqOnGBpsq0LrQwaCxbEzkB5wKqS57h2ooqsrloQ
+V4WBwabMJ/lp704zpEgcqzWhM8zWydjPgfGuCZUTbVlvc4pgAGAwktnRd7ot+D4x
+n9UbVvBHSzW53t3RpsrzcQkVDGirtlcIipDUbPeIyTs+ArR+xfBiEl7QvXz1liAg
+GiJ7aNB/6PybXktHZBkEoRd/3sPBavWiOc1TMriCjWit/pNE+GJjUUozds3kRe/v
+pwMTYEbXlPYsgYv121YZpFaaz1ihVlIpnDj/6aqMTe+KQhAziId4CtU8pfSHYZi3
+EgC+1PUUySs0LV4TkieDsk1zmfG1lDvWNe5UKyuFYKQ/A99Kg3BacBJHc+PrZDMq
+X7MfWZLRG++yhbcBPfHasl6Vg++GagMpoJLKp5zC9QaTUjRdvYm36SR0NvOC+BAt
+NPIq3H7qbBLYR0JBaJrgNSqe+1rPgJooo5PYg1Ozmv4q50Umlai3coKqls3pnTIe
+zwUVnBTjAszAW1zI3BcSrm5Ol912qJXA7AzxV+FRiKDC+kIRaU4=
+=t7cf
+-----END PGP SIGNATURE-----
+
+--xy1v71s9LdcW622N--
 
