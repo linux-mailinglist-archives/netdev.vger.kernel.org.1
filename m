@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-186707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF2BAA073A
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:30:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A02AA0745
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1100162747
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:29:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 502B01B65D05
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10322C178A;
-	Tue, 29 Apr 2025 09:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8582C1799;
+	Tue, 29 Apr 2025 09:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWge+nkg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="heh3MmGu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8602C10B8
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 09:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584362C178C
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 09:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745918856; cv=none; b=fW7MGqHGsSdOywaWWsi9pn1ZGdBLf5k/lhnWr/8owQRCKRhfT9KP2N7C0JY4JLrZwMHwSvsNQCEykdWP2DyRJKnVjrpK3Ngt0mpaNj0pYUzZBpLxUXpPzILAkdNhs+bRvfPbA7v9hHb7qAlJiffqgyqTjYmJNFxwmuvqy79qmEc=
+	t=1745918858; cv=none; b=BgXaY6olAGOrs9N0scoiqYhVvv6UtIq3eN/HgYLVLBTwSaxHPVToWD9A2Q4LuQDfcsJcF3qZrOkkYXlQSi3tug2sJZJNtimbzsnWR40hCvrMyZpe3fXbj3DIFlMQ9qzggzUm53oLzvucogucWB7ZkuV2zEIb3rQlKQZ3sOPMUU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745918856; c=relaxed/simple;
-	bh=zhcUwB/H1Zn82PRA/kFf5APz8tWoAKyo3JSDuFxUvAg=;
+	s=arc-20240116; t=1745918858; c=relaxed/simple;
+	bh=WWf7g2m4b1gRuw3i9AVGlA3TVd4LYTzDJPwC1zK00Zs=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=MolH1mztSYezfJjpyn1euxw0jCa+RDw82qdNCdhzPe3hC8Od/CJ/yg65KJyxLT8Sm8xy7R7qPws3oq7v8l3u/eEcUNVMjugyjY9IFgyKcMQgyotPTCAah1AVeLMEaY3LTRCBHOof1xSg3TeGLMNJhHAYvF1OKTeG++f3r7xGrZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWge+nkg; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version:Content-Type; b=MqAF1X8xtJFBnCUy2N8Q3HRqLggbEJx1wPbr63kXWlR5H/JDjQs+R+qZk8mjX4/YXeIH3U6rbKEv3SR9rxVRgigTX2JtCO94Gb54j6crTxGINRvRA+J2Vr3Z/GcnHlNAv3KOY3Vx7oCWV8vYbUUY5uI5by/Hwi0MT1s4K+GSktY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=heh3MmGu; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso56036805e9.1
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 02:27:34 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-441ab63a415so11692725e9.3
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 02:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745918853; x=1746523653; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745918854; x=1746523654; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dmHIxCsT4bl1krFbpSUOp8sN3dLy2svTzTckaHaC//Y=;
-        b=QWge+nkgQEfZuE0z8SGc/S6ceryGY75iA+WNZWtEUWPYJFBnp1IsviMs29q2y89Qls
-         QKFgTD+eVMIktLGIN2pUVCoiWqH9du9rlW0iL7ZgtZpDiscjI3JQLexwzoQclEaSpJNB
-         p3Vrn4OgQIxr9SW2jQTn4s5aD8etGix7iY63Y/nfwxp+Z0ZlGpyLAiaPhbCFEd7w5iU6
-         Z6hJxZtq7lijSp8BNsQYfIr41yYI4hMSMFqGGBEpU2YAE2lm3/IpAkGkuXwZpdPthaqr
-         /0b0Poic1OA19vPGGKRyYE/tOThVOW4l9tJXjYOvUNedhSDKYib4rJHFY47nURWgHII0
-         ND3g==
+        bh=WWf7g2m4b1gRuw3i9AVGlA3TVd4LYTzDJPwC1zK00Zs=;
+        b=heh3MmGuU2IKs/5Jx3AdFwTmLm0w5BFLGbodJk4N/kuwKxeY2X1W0ADqYQAR4m3VPh
+         uaYcDtUODHeUzaN+DIZaiTUlV3tDQ1kAKqpwuZc3fQj3OIyNLhf9A/5D76EZZDSe/LFR
+         TiEMbS44Jsh6oqcglr+rzp2MvU1N5j52kB7MTnMco26NuGMCQSJ9V7H9+xDJYJmJ/QM4
+         5YytwIUEimM4VJjk/I4VCPSDJa40a4qmqk3mSO4LCv2qp/AUhG/YqpWHQgMM1lF/Ibmp
+         w1/4tmOKvUBIgmwT5KnBmT9FikdGeRrLKjazVnJA2z24PN6JkjCQXPXSHBdVImL6nUAR
+         ApBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745918853; x=1746523653;
+        d=1e100.net; s=20230601; t=1745918854; x=1746523654;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dmHIxCsT4bl1krFbpSUOp8sN3dLy2svTzTckaHaC//Y=;
-        b=kP6MMEBuovQpjhENauQ4K0cvuLBd3TvUGhNbwFDjHvVsMYmqJc5VPDzmoZ7WkT9BA9
-         zf6RZ4blvkJcD/J6WqKPRhEP/GLakU9hOBSkL9tZ9jpIciblDSsfbHlUHWx6B3jxhRW5
-         tBKrbxsX6ZKiT1z2NHuz5thRumf2ae9f1axZYJOy0EeTGLUzre/21lzbQGjikZNvsULP
-         SVsmFBIY8PK4pSpbZkJ98VIuyk94kVkIaznnbijNlZzr4nPEtEdAvIND36Ba3A7qArYY
-         CRYrM8M3rK6BMZBZm+KmEx7WCQYxvPUUPXxZ+b4MG/8EBUewUOn81Wdlkaylc8lZ8PMm
-         kSAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlhmSZ0umwL3G7ii0E6HRkcoZ/qiMUl2TNYdX5lfl5KVFmCi7MvVfGPC5yRZp5J+JoMtXTy6A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTWTd1DLqCb+AT1B2fRqQknuj9ORCMIFkodku5ccXj2zgFxx5z
-	DSCBtlfpJbl5ZDUUuNa1VBLXWiSSw55c+JfVuq0WbDVePA9Vbku+
-X-Gm-Gg: ASbGncu9Ehn2wyP0A9wVUpymEyFWqLyCkiQah5fdNcIoEuDaUWc3ysq6PmOdzxQ/31R
-	+LAwsov6q+pbJxqFuFYiRPDBW0GkZUyNR6pq/owdLGXjVanTQBrDj7altUxMesaM0bmKpgrTXq3
-	Ib381kw6MUFnUGJKDCqVZE1ySAL+YGksdK+ICynAtl9PblLJSoUcVi0Hiu9XJshquGmvFs6qnfH
-	kkQsOF3jn6zGMttIcqvPdGxVp5NK3J1ubAoZ0zSprfk+KWR5NTaYdfQd2g02cfWrB70MAln3Fq5
-	DlMRhRWVLxW/VT+crwHP9Pjz4VcsM/FG3O0SxA6ldhtp3Qa8JLsNfg==
-X-Google-Smtp-Source: AGHT+IFQV7HbwZUzbld68TkoLFiK2CzcN4Z0hiVeqsZ8jBpViHyysPyfXqGwpZSHdSzgE3p5nIX1JQ==
-X-Received: by 2002:a05:6000:1a88:b0:39c:1257:cc25 with SMTP id ffacd0b85a97d-3a07ab8a568mr10092739f8f.56.1745918853082;
-        Tue, 29 Apr 2025 02:27:33 -0700 (PDT)
+        bh=WWf7g2m4b1gRuw3i9AVGlA3TVd4LYTzDJPwC1zK00Zs=;
+        b=ni8WnQVYdFBDN1lOu00IRoH6y39eyQfCS6L1lMZZRM8cl6L02oIEy4+HwWNGeSyqRz
+         ooPrlP3rcUzYAhwzHPxTG/i24Fdb1/FrtIeiZYBNP4W4n1tHxg/eS+zreycWrUo2p7Kw
+         chwS5GHTHJjcrbR9+gdbetZTaWZaVmpXkSJt1/tDC5VMW+cGFEA2n0w0He0fyFA5kmbo
+         BqygSjQ4vJnKllK60p1QcsWEaLN0fIMQo2xA4EaX36qYVA0URyuyRSZolJZxR2P52tLo
+         fxHIXp9tG/GboyDHZGWfmfaqExPRW5cFU/sfNEYZIQwBA0bzfRTJbhDFbjjbb6+4aYIh
+         VvQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVXvz18USZbPIU8DaKjz6iOFUiG5cFlEbC9ooUk134S6hG2se3ctH9qjDRzrU7lVNk5/kSvCGg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW4RKMEA9wsQJS9jgzSo8bOYybfLpVWPKwfJS63vL7pLfDL0Mv
+	XsYHAclFCSh6/9b/ap6z2I48X1FN+Cte16ht7TjoRdtOWH8PZ1VK
+X-Gm-Gg: ASbGncteIF78/Q5DwcGy65oWoZpA8qmuKhoMJ96sni9VnyL1SqdbNz7Y6vt7vLD1grz
+	R4KYjEpPr373rVPQ4BhRKMUpr9lJwXwFZsUtmt6PdSOE0Nz1V4pklKe8GlOeYnBVvADOxNYB4tJ
+	MJnLHoTl5ewoKVkENbegA9XFJQbl3cioH5g9y7BNPtVbSwUUtFK541C3KPw6qvVTDs/3JFFxLxt
+	xOht65w17n0GaHKjNqYONUbWObHbxWaEazkgXFP1ICL9Tb7T24W62iei9vnNqv37k5xMWJewSI8
+	QlTEUZGdcXVQNJznNh0nhjlsPFR0VxQLuwg4tx3m4zfp2TgDdnDUJg==
+X-Google-Smtp-Source: AGHT+IEIUDVbdXfv8a9Ho0ROi5PNr0Fw9VSfUtV6fFz4iHl8UW2eqMhvs5OZ97BNLKLkIukrzy5qjg==
+X-Received: by 2002:a05:600c:4743:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-441ad4fee15mr15063925e9.27.1745918854533;
+        Tue, 29 Apr 2025 02:27:34 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:251e:25a2:6a2b:eaaa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e460b2sm13579764f8f.70.2025.04.29.02.27.32
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441ae3fb8fesm9299265e9.1.2025.04.29.02.27.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 02:27:32 -0700 (PDT)
+        Tue, 29 Apr 2025 02:27:34 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
   pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
   jacob.e.keller@intel.com,  sdf@fomichev.me,  jdamato@fastly.com
-Subject: Re: [PATCH net-next v2 11/12] tools: ynl-gen: don't init enum
- checks for classic netlink
-In-Reply-To: <20250425024311.1589323-12-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 24 Apr 2025 19:43:10 -0700")
-Date: Fri, 25 Apr 2025 11:04:47 +0100
-Message-ID: <m24iycr1z4.fsf@gmail.com>
+Subject: Re: [PATCH net-next v2 12/12] tools: ynl: allow fixed-header to be
+ specified per op
+In-Reply-To: <20250425024311.1589323-13-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 24 Apr 2025 19:43:11 -0700")
+Date: Fri, 25 Apr 2025 11:08:12 +0100
+Message-ID: <m2zfg4pn8z.fsf@gmail.com>
 References: <20250425024311.1589323-1-kuba@kernel.org>
-	<20250425024311.1589323-12-kuba@kernel.org>
+	<20250425024311.1589323-13-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,59 +95,14 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> rt-link has a vlan-protocols enum with:
+> rtnetlink has variety of ops with different fixed headers.
+> Detect that op fixed header is not the same as family one,
+> and use sizeof() directly. For reverse parsing we need to
+> pass the fixed header len along the policy (in the socket
+> state).
 >
->    name: 8021q     value: 33024
->    name: 8021ad    value: 34984
->
-> It's nice to have, since it converts the values to strings in Python.
-> For C, however, the codegen is trying to use enums to generate strict
-> policy checks. Parsing such sparse enums is not possible via policies.
->
-> Since for classic netlink we don't support kernel codegen and policy
-> generation - skip the auto-generation of checks from enums.
->
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - move the comment about the skip before the if
-> v1: https://lore.kernel.org/4b8339b7-9dc6-4231-a60f-0c9f6296358a@intel.com
-> ---
->  tools/net/ynl/pyynl/ynl_gen_c.py | 46 ++++++++++++++++++--------------
->  1 file changed, 26 insertions(+), 20 deletions(-)
->
-> diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-> index 2d185c7ea16c..eda9109243e2 100755
-> --- a/tools/net/ynl/pyynl/ynl_gen_c.py
-> +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-> @@ -357,26 +357,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
->          if 'byte-order' in attr:
->              self.byte_order_comment = f" /* {attr['byte-order']} */"
->  
-> -        if 'enum' in self.attr:
-> -            enum = self.family.consts[self.attr['enum']]
-> -            low, high = enum.value_range()
-> -            if 'min' not in self.checks:
-> -                if low != 0 or self.type[0] == 's':
-> -                    self.checks['min'] = low
-> -            if 'max' not in self.checks:
-> -                self.checks['max'] = high
-> -
-> -        if 'min' in self.checks and 'max' in self.checks:
-> -            if self.get_limit('min') > self.get_limit('max'):
-> -                raise Exception(f'Invalid limit for "{self.name}" min: {self.get_limit("min")} max: {self.get_limit("max")}')
-> -            self.checks['range'] = True
-> -
-> -        low = min(self.get_limit('min', 0), self.get_limit('max', 0))
-> -        high = max(self.get_limit('min', 0), self.get_limit('max', 0))
-> -        if low < 0 and self.type[0] == 'u':
-> -            raise Exception(f'Invalid limit for "{self.name}" negative limit for unsigned type')
-> -        if low < -32768 or high > 32767:
-> -            self.checks['full-range'] = True
-> +        # Classic families have some funny enums, don't bother
-> +        # computing checks we only need them for policy
-
-grammar nit: computing checks, since we only need ...
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
