@@ -1,139 +1,122 @@
-Return-Path: <netdev+bounces-186173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D6DA9D5E9
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:51:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCDAA9D5EE
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4A61BC631F
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 22:52:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A639A22D4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 22:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1A52957D1;
-	Fri, 25 Apr 2025 22:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D6E2957D4;
+	Fri, 25 Apr 2025 22:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWBJbnrC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nqPjhoXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB23224AE1;
-	Fri, 25 Apr 2025 22:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF3F224AE1
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 22:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745621514; cv=none; b=TwtXeqYptP+1ld2pdoRuMY8E2qNmN4N5lxjH6IQNX7Gqexx+hAjpJ6QNXdZEbW7I2sCMm+g8pW1FUqONRAA9Etaa+2VYZ4ogB9DaKD9F6KIt5/ch5gqRyfFxlF+80bQOHZ1Z9CFYwwWsfSMHc+q88Dm8qjRj12NlrSagS6MwDq8=
+	t=1745621521; cv=none; b=V2NXFSJmP+cwjl/oojsJGqYhPkFiqD1B4GxtrgAzajiXFmVMe9GN0ZsGKxfm1pN1JACR8nmNcTTbEe1oZowWGh4PEZ4umLMp+I/WLnVQa3rvkou3isQ/bVaa7iQsH+I0oeiTKMlIILhut1HM/31vt9i/8Gun+emwwyG46bNOUPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745621514; c=relaxed/simple;
-	bh=zNbdVDsWfFoqJaRDGsTJAkSBJEdBMH8ebC4YyJqLcaI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h2WYlZE+fQOUhD6MpiVHEe9/EAZTCMy7qxLYpL8eScsSlBLpDrlY0nGQaNwZhLvXsU0yVq28VmO7jE9o/xn0N2gBAaOQLq7t81wINDzp0R8P6yeeFROVLdgOKPwENM0vssk7z9Q0kGI+T/YhaFUMXfvcDwnpXwgODxX6WpYazds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SWBJbnrC; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6ff1e375a47so32165967b3.1;
-        Fri, 25 Apr 2025 15:51:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745621512; x=1746226312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NAdDz9du01ShWOGUuze7WbsCqL878Y5hXPeTjWvtcUc=;
-        b=SWBJbnrC/gbPGvcMhKhYGbWZNIOM0dP0kSe5uGy8rvtnw5xWh/9ecm97Xz54KxAaVL
-         9B1kzowp0HBK3S7EKDVChg3g5L7/NV2V6U5owYsQRcVPDVbkUFeBfYhCEgS1o1LwTd3g
-         1eeBcgzYv2jpk/l49x/6bcN275skpzqbq494iP5TTPq0/2NMRRjQqQrAb/jX6okl5x7b
-         tgBW+v31ejl+EDDKiScy/bKdQttvd4StIinuOMUCt8v7YscX2I5cCWR0fb1kL9x+Y9d4
-         9Oo/4H6MsLS4TBsg3WHt2sH3TSGTVGUZ5iOFJgAbH1LMatrGNit/Mqkjofds3dmG4Z8N
-         z8tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745621512; x=1746226312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NAdDz9du01ShWOGUuze7WbsCqL878Y5hXPeTjWvtcUc=;
-        b=ve1sjexyjDZ8g5H5zLkf1S9urvzeuHJdvHMGd4LYJFXYKtx5HIDmoyTirM3CVthiez
-         WtMky4tYmGaA9i2xrllDd37e4cU0QM+HaVpqs5Ho7eVAApHkTRQjDyFIaX2sD6Z0KpPt
-         qJbeHCLYw1UkMkZWBq1XsZXodmJdIHo+WLIWsbRl8cYBU5GpLoVaYSdP23Mvy+S1oCNT
-         6gZQlBoAB7UdICAzUUKanRd1vNjkbukWN+U2a5VEn1xNcaTqdPlrqb6inVWGvJbrL1WL
-         WaE2ZU0bYNnqKRBrtvZ8b6t7QU9d+jQIzrLm/1nr5in2cgTN9M6Y2OWDykbMbaz3v03z
-         sZBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKhONhI7HvQoWDwNZZVafBs+SpOWOFSWiuGDNBWbTlJeQ6WeErZy/epEy3TM03YxbzCbcNIPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZxXKwnTyry8RdN0R0zs0RlFYpSBgjpt3xLG63lLhu1U/n94rJ
-	fO5MarsXSzQccoKyxQuO+gHOHQTxHSuMvDojbk7eZUNogyb4BNLTU7W9+ceH0unRF76SVtmOu1B
-	tJ7rzkN1QdIDtRFkWu9hbxzqEBVI=
-X-Gm-Gg: ASbGncvDpwAyIShOsxzwGefmfJ0fHe1tvxTSvv6kYiNCcaBFTnP1HpWwutkKgO3s+M3
-	mtrnDvvva9Ge/RYyFc/ZkLq8cGThrceRp4plpF5BCkMZcBAQ0gmAO1OrtTcBTbKp9kbANNThrOX
-	PjlbtRZmrr9V4stsZp65VRw/ZfgVYPGM9k
-X-Google-Smtp-Source: AGHT+IFb6I3oavfH8W4C56IT9mNhcdJn42p9aE8Rfs4y4LEOY3oGR6LCE8CLwcCnr8BIYbE6f60uFcmXnCSJuKwERNM=
-X-Received: by 2002:a05:690c:3703:b0:6f7:5a46:fe5f with SMTP id
- 00721157ae682-7085f0633c0mr20507937b3.1.1745621511622; Fri, 25 Apr 2025
- 15:51:51 -0700 (PDT)
+	s=arc-20240116; t=1745621521; c=relaxed/simple;
+	bh=nlKafP0UVqrrO5vkg1rxZpzzysLcNruXsNLBcs9xvm4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zcy7SvPS5jXu1hRePUCgWlct8Ix7YoAaXwFCGh1jaFgqnzaRHQPZ9AKFGZx+cajNSE4xpY8EyfvB5IFS3eLfPrjB5k/FYNAIZmJEXmlwRy6e1xijfJwbbH6w6IVPSQh5Gbo9BuPU4LjZy6bwetJbnM4fpX05NTvP3LFaAx/a0lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nqPjhoXr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E6AC4CEE4;
+	Fri, 25 Apr 2025 22:52:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745621521;
+	bh=nlKafP0UVqrrO5vkg1rxZpzzysLcNruXsNLBcs9xvm4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nqPjhoXr4vvJqy4ua1fVyO2edmf5ecbrB9Lj+T6wkUpOcWcJLn4MWU37t16CP2uMp
+	 5NdDzTVXAxEHp8AD/3wMS2hjRtRIrZ1hnwvvvob00ZYZRE2DJxHVlIhHh8L7c8TUUQ
+	 tFlFii7cF4iA/Hs3hLBMbDfKvNAel+uvOqG8Sh52mihheon2gP2YqrAnufGWami4PY
+	 XOdVvGJ52Hg5q8X6yB7UwwKy7NLMZPZGB4y7DQ66jRKtl/EymZTgZt0wmYiwI+x0gj
+	 xIJJko36CPCf80b1aMN3bv3ucNm/TRCEl7dP0uagZ0Dlqzq5DaqqxmOpLYAyXpSuB2
+	 NFG1RxeUaxDdA==
+Date: Fri, 25 Apr 2025 15:51:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, sdf@fomichev.me, dw@davidwei.uk,
+ asml.silence@gmail.com, ap420073@gmail.com, jdamato@fastly.com,
+ dtatulea@nvidia.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 06/22] eth: bnxt: read the page size from the
+ adapter struct
+Message-ID: <20250425155159.1c82f280@kernel.org>
+In-Reply-To: <CAHS8izPze3g7qdTGJ7xd9LeipVyx5cNTKisLDaT6FOTj=X_VzQ@mail.gmail.com>
+References: <20250421222827.283737-1-kuba@kernel.org>
+	<20250421222827.283737-7-kuba@kernel.org>
+	<CAHS8izPze3g7qdTGJ7xd9LeipVyx5cNTKisLDaT6FOTj=X_VzQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250425214039.2919818-1-ameryhung@gmail.com> <20250425214039.2919818-3-ameryhung@gmail.com>
- <aAwI3k4FeJHmHFKv@slm.duckdns.org>
-In-Reply-To: <aAwI3k4FeJHmHFKv@slm.duckdns.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 25 Apr 2025 15:51:40 -0700
-X-Gm-Features: ATxdqUE9gXV19zrCeOTnVWkTIxtpFHG3KZZzpVe1cO513exJOqHJhroJUPMAGDI
-Message-ID: <CAMB2axMQsFLO-85q2tRNE==s8t_Y3A2iPaGTm0=NkjJ4wz0X=g@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 2/2] selftests/bpf: Test basic workflow of task
- local data
-To: Tejun Heo <tj@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 25, 2025 at 3:12=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
->
-> Hello,
->
-> On Fri, Apr 25, 2025 at 02:40:34PM -0700, Amery Hung wrote:
-> ...
-> > +bpf_tld_key_type_var("test_basic_value3", int, value3);
-> > +bpf_tld_key_type_var("test_basic_value4", struct test_struct, value4);
->
-> I think it'd be fine to always require key string.
->
-> > diff --git a/tools/testing/selftests/bpf/progs/test_task_local_data_bas=
-ic.c b/tools/testing/selftests/bpf/progs/test_task_local_data_basic.c
-> > new file mode 100644
-> > index 000000000000..345d7c6e37de
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/progs/test_task_local_data_basic.c
-> ...
-> > +     bpf_tld_init_var(&tld, test_basic_value3);
-> > +     bpf_tld_init_var(&tld, test_basic_value4);
->
-> Would it make more sense to make the second parameter to be a string? The
-> key names may contain tokens that are special to C and it becomes odd to
-> escape naked strings.
->
+On Wed, 23 Apr 2025 13:35:00 -0700 Mina Almasry wrote:
+> On Mon, Apr 21, 2025 at 3:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > Switch from using a constant to storing the BNXT_RX_PAGE_SIZE
+> > inside struct bnxt. This will allow configuring the page size
+> > at runtime in subsequent patches.
+> >
+> > The MSS size calculation for older chip continues to use the constant.
+> > I'm intending to support the configuration only on more recent HW,
+> > looks like on older chips setting this per queue won't work,
+> > and that's the ultimate goal.
+> >
+> > This patch should not change the current behavior as value
+> > read from the struct will always be BNXT_RX_PAGE_SIZE at this stage.
+> >
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > ---
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 27 ++++++++++---------
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  4 +--
+> >  3 files changed, 17 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.h
+> > index 868a2e5a5b02..158b8f96f50c 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > @@ -2358,6 +2358,7 @@ struct bnxt {
+> >         u16                     max_tpa;
+> >         u32                     rx_buf_size;
+> >         u32                     rx_buf_use_size;        /* useable size=
+ */
+> > +       u16                     rx_page_size; =20
+> I think you want a hunk that sets:
+>=20
+>  rx_page_size =3D BNXT_RX_PAGE_SIZE;
+>=20
+> In this patch? I could not find it, I don't know if I missed it. I
+> know in latery patches you're going to set this variable differently,
+> but for bisects and what not you may want to retain the current
+> behavior.
 
-Totally makes sense. I will only keep bpf_tld_key_type_var() that
-requires a key string in the declaration.
+Hm, it's here, last chunk for drivers/net/ethernet/broadcom/bnxt/bnxt.c:
 
-I will also add the key string as the third argument to
-bpf_tld_init_var() and rename it to bpf_tld_fetch_key(). I don't think
-the symbol type argument that refers to one of the members of struct
-task_local_data_offsets can be removed.
-
-So it becomes:
-
-bpf_tld_fetch_key(&tld, test_basic_value3, "something.test_basic_value3");
-
-Later, bpf programs still do:
-
-bpf_tld_lookup(&tls, test_basic_value3);
-
-> Thanks.
->
-> --
-> tejun
+@@ -16486,6 +16486,7 @@ static int bnxt_init_one(struct pci_dev *pdev, cons=
+t struct pci_device_id *ent)
+ 	bp =3D netdev_priv(dev);
+ 	bp->board_idx =3D ent->driver_data;
+ 	bp->msg_enable =3D BNXT_DEF_MSG_ENABLE;
++	bp->rx_page_size =3D BNXT_RX_PAGE_SIZE;
+ 	bnxt_set_max_func_irqs(bp, max_irqs);
+=20
+ 	if (bnxt_vf_pciid(bp->board_idx))
 
