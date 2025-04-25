@@ -1,125 +1,106 @@
-Return-Path: <netdev+bounces-185808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B3BCA9BC91
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 03:59:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02D93A9BC97
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF4624A1FCD
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 01:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 323FA1BA3276
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CE9130A73;
-	Fri, 25 Apr 2025 01:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D253FBA7;
+	Fri, 25 Apr 2025 02:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Nu5gNgBC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mrpwuK5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422984C7C;
-	Fri, 25 Apr 2025 01:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E564F4C7C;
+	Fri, 25 Apr 2025 02:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745546372; cv=none; b=l2epPFp4aGE4UxYZg586zVtvK1Soa+QL82Gbiv8Tjg7OlrfrQdaICosTIw+YQYRC8xNuZRrVng5+CiOkDm8M/7mYIEp4NXW9+tp5fY3fh08HpAgY9rdL1hyS8v4kgdctkB0n88ZFAPWN9hfX7kd4x+fHqZ+gNo3ABQ8+TVw+tFI=
+	t=1745546516; cv=none; b=IN74NdB6qnN6Ys+7QtXL2DHAmbdEDjFQOSOy+EJNGB3T1tTnKl3r54S10/lZE4IZrhVZ9kowZONvLomzKoLTkBGREeyaVD35xqU8363gbKEADns/TufiY8PcYgQ5+5GhKdQhbEiABI16VZy+VwicXZ0JQEVNbZIulZ4udPl1I8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745546372; c=relaxed/simple;
-	bh=+raNOYS8WXaA8C1oJIjsKu8SNSfgIJF4Td6CTRpGzto=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ocam8vx18/kRX46fEvhlNFMVBeGJFAouRd+UXJEIlPjxYaAd4WeVXtPFntkJZx2e62czaIqtneaxBS/QPCZy2LkraB1MbIxtRV4SG5E8np9fxqawVDnYNibneuim7ozs++7tvn6cjtMTYgCAGhrYLxyAgmiBx3kRi7mJiDnp2vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Nu5gNgBC; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1745546371; x=1777082371;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/UvTrfENQSso9dk5x/xbtN23kE4a23kj6ZgvvmCpbBY=;
-  b=Nu5gNgBC9cCMS1iM1RZEgFC8zUNwreP44z04MiUoT6qewdpPLuSrZB0F
-   M4Q5v+l2ftqUyWJhUpgppjUuMSw18e0t2qrGPIvlJI4NPug+z/Whg8byx
-   Ofqz7cs5uLJVgxM9xCchH6NLgwPYZvJmVA9G0Cr2PSzUV+qg7ah1xWgrU
-   8=;
-X-IronPort-AV: E=Sophos;i="6.15,237,1739836800"; 
-   d="scan'208";a="483544296"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2025 01:59:26 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:40601]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.145:2525] with esmtp (Farcaster)
- id 4a79e7f5-eeb9-447e-a037-2d34145183d0; Fri, 25 Apr 2025 01:59:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 4a79e7f5-eeb9-447e-a037-2d34145183d0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 25 Apr 2025 01:59:24 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 25 Apr 2025 01:59:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <brauner@kernel.org>
-CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <daan.j.demeyer@gmail.com>,
-	<davem@davemloft.net>, <david@readahead.eu>, <edumazet@google.com>,
-	<horms@kernel.org>, <jack@suse.cz>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <me@yhndnzj.com>, <netdev@vger.kernel.org>,
-	<oleg@redhat.com>, <pabeni@redhat.com>
-Subject: Re: [PATCH RFC 2/4] net, pidfs: prepare for handing out pidfds for reaped sk->sk_peer_pid
-Date: Thu, 24 Apr 2025 18:57:19 -0700
-Message-ID: <20250425015911.93197-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250424-work-pidfs-net-v1-2-0dc97227d854@kernel.org>
-References: <20250424-work-pidfs-net-v1-2-0dc97227d854@kernel.org>
+	s=arc-20240116; t=1745546516; c=relaxed/simple;
+	bh=pme5iQz5eKFu7fHxQXgGPqQvVq1us5JDlFMnADx3js0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WQjlY/aGcNZoWCP6vduXa7u1uyMvMDVXm5YW2vyTkpNnfk9G+UuUXaIXeG+s8bp+0XhzD7dXksmo0BpLFgBFVPgrJy5/486dVAkdgkene9wHNX2B3GhyRyWt8NJy29Ud/bGY7jGYbT4bmT92n7zua8Wp+HwjbI2QD7yDNZwwKbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mrpwuK5B; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ICF52ZSrljFNaTIWgavSI5WbnW464jwCjST74huipR8=; b=mrpwuK5B/JJe+wE22m8iiXPB5s
+	KVemoUn5f883G+1qcgAZoJTkUhHQSmUNJP9siqokmXeAGKiU0+o2W3+efjBkzS/bKemfKa0rg7lIj
+	tciOhSvPBB1NSm4/KOaLSPYukDt3NswXnwJvpQlk3ditdHmGBPSjBlhvJS3Okb5HvaA8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u88Ne-00AWyd-Cl; Fri, 25 Apr 2025 04:01:30 +0200
+Date: Fri, 25 Apr 2025 04:01:30 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Jernej =?utf-8?Q?=C5=A0krabec?= <jernej.skrabec@gmail.com>,
+	Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Samuel Holland <samuel@sholland.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, clabbe.montjoie@gmail.com
+Subject: Re: [PATCH 4/5] arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E
+ board
+Message-ID: <3681181a-0fbb-4979-9a7e-b8fe5c1b7c3c@lunn.ch>
+References: <20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org>
+ <4ba3e7b8-e680-40fa-b159-5146a16a9415@lunn.ch>
+ <20250424150037.0f09a867@donnerap.manchester.arm.com>
+ <4643958.LvFx2qVVIh@jernej-laptop>
+ <20250424235658.0c662e67@minigeek.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250424235658.0c662e67@minigeek.lan>
 
-From: Christian Brauner <brauner@kernel.org>
-Date: Thu, 24 Apr 2025 14:24:35 +0200
-> @@ -734,13 +743,48 @@ static void unix_release_sock(struct sock *sk, int embrion)
->  		unix_gc();		/* Garbage collect fds */
->  }
->  
-> -static void init_peercred(struct sock *sk)
-> +struct af_unix_peercred {
+> Ah, right, I dimly remembered there was some hardware setting, but your
+> mentioning of those strap resistors now tickled my memory!
+> 
+> So according to the Radxa board schematic, RGMII0-RXD0/RXDLY is pulled
+> up to VCCIO via 4.7K, while RGMII0-RXD1/TXDLY is pulled to GND (also via
+> 4K7). According to the Motorcom YT8531 datasheet this means that RX
+> delay is enabled, but TX delay is not.
+> The Avaota board uses the same setup, albeit with an RTL8211F-CG PHY,
+> but its datasheet confirms it uses the same logic.
+> 
+> So does this mean we should say rgmii-rxid, so that the MAC adds the TX
+> delay? Does the stmmac driver actually support this? I couldn't find
+> this part by quickly checking the code.
 
-nit: conventional naming for AF_UNIX is without af_, all structs
-(and most functions) start with unix_.
+No. It is what the PCB provides which matters. A very small number of
+PCB have extra long clock lines to add the 2ns delay. Those boards
+should use 'rgmii'. All other boards should use rgmii-id, meaning the
+delays need to be provided somewhere else. Typically it is the PHY
+which adds the delays.
 
+The strapping should not matter, the PHY driver will override that. So
+'rgmii-id' should result in the PHY doing the basis 2ns in both
+directions. The MAC DT properties then add additional delays, which i
+consider fine tuning. Most systems don't actually need fine tuning,
+but the YT8531 is funky, it often does need it for some reason.
 
-> +	struct pid *peer_pid;
-> +	const struct cred *peer_cred;
-> +};
-> +
-> +static inline int prepare_peercred(struct af_unix_peercred *peercred)
-> +{
-> +	struct pid *pid;
-> +	int err;
-> +
-> +	pid = task_tgid(current);
-> +	err = pidfs_register_pid(pid);
-> +	if (likely(!err)) {
-> +		peercred->peer_pid = get_pid(pid);
-> +		peercred->peer_cred = get_current_cred();
-> +	}
-> +	return err;
-> +}
-> +
-> +static void drop_peercred(struct af_unix_peercred *peercred)
-> +{
-> +	struct pid *pid = NULL;
-> +	const struct cred *cred = NULL;
-
-another nit: please keep variables in reverse xmas tree order.
-https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
-
-Otherwise looks good to me.
+	Andrew
 
