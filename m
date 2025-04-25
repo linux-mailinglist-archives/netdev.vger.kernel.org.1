@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-185817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122DEA9BCC2
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:21:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BDCEA9BCC5
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47D071BA5A0E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:21:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 959C817CE30
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2984C155342;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B741607AC;
 	Fri, 25 Apr 2025 02:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="cnBUwAUz"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uo2AR+pa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5031482E7
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 02:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6341415278E
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 02:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745547655; cv=none; b=Uu8C1CoXdY5daaNPty+wXmIsjqG/vPZFjV6YONle2IBU6NTXN0U4xHS9ubOXx0A+uoUjv02/rGIAXK1wt47/d0TWt0W40+vzsn9sn1FxXnDDuMh5z+JhRDTjiFl4I0L8vm14bazDbuJNW1szxF9b9kJAIQQ5AvPG9M8ndwNS1fQ=
+	t=1745547655; cv=none; b=ki7YrivLKDPx2sr/Sd0lGRl+uTdbVETGawHsBgOzMgGRUGzSnZSDF7gIvVSVlxNq9W4HV2+Oa13RrMl0Jipk9uyPFmUIScN5qFkumMmeoK6bfqkZ+2xGQH0SA9wgr/2AiTDSzcbq77+FEgXM/hqW+Ai4luISdRKGIIeNixkLMzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745547655; c=relaxed/simple;
-	bh=XUOzoXQ/Juh1wPXYRtBYu10MzV6wWdRGmL8YlhgCS2I=;
+	bh=ssKFSwXRK89XSDZ0ERguyz74WyG0R5XwvHuMIz7TidU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UTRirTBhT+V2Lcs5Zwsc7L8nYdm0cL1UnqRQYvKBOB1NR/r6pBTPs/x+SAw7I0ipD2VauMN1GTo+3WZLgMjTLy1PP2HqS3MFCHqCnH1Gf6B8OyW/Jy+g+VCl+i6qtJ0N7+BdPWGa1ylqXRwGjviMBaiuBKUBpHkiWW0a7/xuONY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=cnBUwAUz; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=DJZUA05vwmqi/UObTZnbsDzYoaJvOAN2yKAIlGjr0rq+sVS5woDA1AQhWOOpG135mP9fYKpMrVfgbSSWo9bc/1rwQY+vZhZ1ki3QtinUDWgpheIU9JjJx9+0ThO/B1qh3InmixMvRgIMNNNIbhfDQgbSPM7UrSby+i5Qai3MDSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uo2AR+pa; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-223fd89d036so22140565ad.1
-        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 19:20:53 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-224171d6826so27344735ad.3
+        for <netdev@vger.kernel.org>; Thu, 24 Apr 2025 19:20:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1745547653; x=1746152453; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1745547654; x=1746152454; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vDwAHMbfvpZyfmoa3ErGmEnc1IDh6zA+iMngd5kbowo=;
-        b=cnBUwAUzIqIptPG3zsAZOojAPHaWpKgE9AEtVeCJaCNCoBfYQDwzCZXeUHS8rACnRH
-         qv92PHkQGA4U8X+DunYU+ljKe1UtrsfMK5x8FUgcWpTI8EnWm6wv+kZx4QG2MithbKc7
-         rM4MPyPh3TOEHs+8PFVOKHfDLRfmTNeAUtO+/FKeZ309jqMscmxCnD6xA4UgG9Cf2tO9
-         IhTsAb71xDoVbhgCe0pTAUgd/JgRPdhQ9a+Tb7NxjYZtWRY3mNWLXqwdyDxsTcTtHaTI
-         DKdirSXDbUc00kq/E8BxzcsatuaJJXldEz5yp9mChxXd+Kt9FUCrrCzlb9bBfQuA2Icz
-         5HIw==
+        bh=8Z2jlM5e39jGIpwIqeo/VcG2il6Ox8bCBjNtFCFByOM=;
+        b=uo2AR+patnAX6A3nCnLwJjMw1yNr/YzEHc8hd9uGemS0wtxc9zGw9FW29DpuMsS7HH
+         McGkyEshFT0u5Y1n4g8FIUJ63kq/aleUJdQLkTPaY3zBrrPNXJelGomwfMHkNVLXvIys
+         Wt526CyHN9kDDK3aFV+9sSP3gqd2TflxoAVegPkFsMT+s19HtHVRZgyhz5E1DXBcrXcU
+         +5FBmBh8hQ/lxwvFPvSyr71lnxlMIvc6kAgKQg51JwUNRTJLKf+BnjY+RIoThQFZgMpv
+         u0pZRyCma00DdTJczNLTzAD77Ls5teavkAphDBnWaCK+JIFChOYmoHv5hksxEphRbgeT
+         F9Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745547653; x=1746152453;
+        d=1e100.net; s=20230601; t=1745547654; x=1746152454;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vDwAHMbfvpZyfmoa3ErGmEnc1IDh6zA+iMngd5kbowo=;
-        b=Ap6fq9ITYOqzLTVSxK6bE3wCV8mFcMulWZz2eZo2LR4R9Qnr+yhl5qwfhpqDyClC4a
-         oEog9xBh6U3vwi0WG120JI55PmcbeEb2J282kj681gXt6U9vCQkKTtNT2HhW8mOSpZdv
-         /NZ+Hwo4bZqWUUp/PfMAZrUE0PzJJFE9TDHVmSCV/4V4xPBY7/oEMYYKR5PSdVlP2cLz
-         4TvszMhHIBBX4VH5g7EqdhCClYv57z1Hqb0T3SeAfH4suDO/R++abN5AwUFFa0ad4bj6
-         jH0J+a297g91b+uFIer7gn45SWfoUrmaW36B7ALXrIqktA4SSoZFxbTaJynUx9McxVeH
-         br+Q==
-X-Gm-Message-State: AOJu0YxTwekZb4Sdu3XVhhbgVkFwkCO75I/FeoUE6xBkwOnacJjQZcWa
-	0rtvfPlkLP2SZ8z+WU52MLvdHzCU2bADce9K5BI/H23Br/pFpY9PqdkRsOE2K0u6912k9Bx25WH
-	l
-X-Gm-Gg: ASbGncvBabf7sqaPjYuekKPI9ORyNcol/OY8ELmsqCovWX+3zZ6ObTyB5mnw3MfKxB4
-	PtNY7f/8JM/hVMQFN6IJBnzahaW7HHQcJ/v+VhZlle7zXiV2PB+Eam6bY2a89NTLT4d7idmpWrU
-	33t9+/EvOgp4aL+GSeJvsvXtU3+Uhu60jarbrTWTRpcsgcTuv13DQ1zUwdzt6zpqnESARKHHKGK
-	Gn/BUA0QwQ2XNcAlsZuJrUdWJ7x9MIpxn2crGdkHQhIKHMTj+b2zV4Dwfae4Rc0gt05hv4E/bFu
-	HKodX7Nrtqz4Xo0zA5SRpSoKYQ==
-X-Google-Smtp-Source: AGHT+IH6rz38r33SGwkuBWAEWWmR+5+Sq1QZr3KZ4pnPfPgmYfglNiKfjHqCABJLCzfGLbYBi7Xcvg==
-X-Received: by 2002:a17:902:cf05:b0:227:eb61:34b8 with SMTP id d9443c01a7336-22dbf5f3302mr8729135ad.25.1745547652868;
-        Thu, 24 Apr 2025 19:20:52 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:4::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76ff7sm21114715ad.10.2025.04.24.19.20.52
+        bh=8Z2jlM5e39jGIpwIqeo/VcG2il6Ox8bCBjNtFCFByOM=;
+        b=XXaLOVq8Mo8tvFkt9lxpcdCLfEz1KPgvFIcTHvqZ7OpGwlij5Rw2RBCljPhCIyGOxW
+         BwkozgRIRcyQOVSxnkf35YyPpTRl+HwBlrl3McyNC7e73BOd5jT32bkOk3pIN1tvnWyD
+         Nm4gLyXo9ocG6tVexb5Z7duxcUKOtf1xGixb1Q/PB4gECZHV0h7FcYTkSQ9caAGeLdI0
+         0HOqDBxJ2pM1HuerDih91HPXnu/8jI+T5a+XplKCGgXOstJ7gtGfzP9nvEzjRZrbhuOk
+         wcyd8WjTa7bRqk85IKlJQMvusbdA//5XT7i0ouLwMCioyLu4bY1KT9g94OHxHBjj5coG
+         bPqQ==
+X-Gm-Message-State: AOJu0YzNqVnN63jBySeWvG84I3Px3e/ALlx0OWwyst3GSyGpUMh0WzpX
+	B5A/5RtrSYL0gryT2wUkHkyVH87oqyYaKI362ftTzgWDzFAfhZdhd0i+yLMbD4MQYjKpZx9pqSp
+	7
+X-Gm-Gg: ASbGncux26DQbnGSkNpe1Vp3pq2xJiKBEH2zeiajBIy03YNlaASabm77jN0H2qdACWK
+	LrD8H27oGrUrNcRdkQFs7EO3Yc9ab45DuEA4I9tpss6XGlmXsy/bZGvRD/0erJUBob2FjZp2bma
+	sBdaWSkpiFs9jFZN98/DtzjtpUxZOBl/JGChFiZ90nDTIx9jtjR/R8te3BxyYqCOtGdgs5+lq1+
+	H5paQcycn5MjvfRv63jAxFsa7nN4jcRYmkr2VUORXap5eRtOEk9InkB60yJJFkdR17zdfsXxyq1
+	7pKGJ5M7+4mLrORjWLwC/bG3XMk16ylr4GSF
+X-Google-Smtp-Source: AGHT+IHxE0pFM4miAILMdDw6mZ6NT2mZ+j4p1bGQlkHFKcXnkOJj2z1x9SRH4foYICYZG35740Yd6A==
+X-Received: by 2002:a17:902:da88:b0:224:c46:d166 with SMTP id d9443c01a7336-22dbf62c7b2mr9349385ad.40.1745547653727;
+        Thu, 24 Apr 2025 19:20:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:6::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db5216c02sm20982005ad.211.2025.04.24.19.20.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Apr 2025 19:20:52 -0700 (PDT)
+        Thu, 24 Apr 2025 19:20:53 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -79,9 +79,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v1 2/3] io_uring/zcrx: selftests: set hds_thresh to 0
-Date: Thu, 24 Apr 2025 19:20:48 -0700
-Message-ID: <20250425022049.3474590-3-dw@davidwei.uk>
+Subject: [PATCH net-next v1 3/3] io_uring/zcrx: selftests: add test case for rss ctx
+Date: Thu, 24 Apr 2025 19:20:49 -0700
+Message-ID: <20250425022049.3474590-4-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250425022049.3474590-1-dw@davidwei.uk>
 References: <20250425022049.3474590-1-dw@davidwei.uk>
@@ -93,61 +93,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Setting hds_thresh to 0 is required for queue reset.
+RSS contexts are used to shard work across multiple queues for an
+application using io_uring zero copy receive. Add a test case checking
+that steering flows into an RSS context works.
+
+Until I add multi-thread support to the selftest binary, this test case
+only has 1 queue in the RSS context.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- .../testing/selftests/drivers/net/hw/iou-zcrx.py | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ .../selftests/drivers/net/hw/iou-zcrx.py      | 41 +++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 698f29cfd7eb..0b0b6a261159 100755
+index 0b0b6a261159..48b3d27cf472 100755
 --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
 +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -8,10 +8,11 @@ from lib.py import NetDrvEpEnv
- from lib.py import bkg, cmd, defer, ethtool, wait_port_listen
+@@ -21,12 +21,25 @@ def _get_combined_channels(cfg):
+     return int(values[1])
  
  
--def _get_rx_ring_entries(cfg):
-+def _get_current_settings(cfg):
-     output = ethtool(f"-g {cfg.ifname}", host=cfg.remote).stdout
--    values = re.findall(r'RX:\s+(\d+)', output)
--    return int(values[1])
-+    rx_ring = re.findall(r'RX:\s+(\d+)', output)
-+    hds_thresh = re.findall(r'HDS thresh:\s+(\d+)', output)
-+    return (int(rx_ring[1]), int(hds_thresh[1]))
++def _create_rss_ctx(cfg, chans):
++    output = ethtool(f"-X {cfg.ifname} context new start {chans - 1} equal 1", host=cfg.remote).stdout
++    values = re.search(r'New RSS context is (\d+)', output).group(1)
++    ctx_id = int(values)
++    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}", host=cfg.remote))
++
++
+ def _set_flow_rule(cfg, chan):
+     output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port 9999 action {chan}", host=cfg.remote).stdout
+     values = re.search(r'ID (\d+)', output).group(1)
+     return int(values)
  
  
- def _get_combined_channels(cfg):
-@@ -32,11 +33,12 @@ def test_zcrx(cfg) -> None:
-     combined_chans = _get_combined_channels(cfg)
-     if combined_chans < 2:
-         raise KsftSkipEx('at least 2 combined channels required')
--    rx_ring = _get_rx_ring_entries(cfg)
--
++def _set_flow_rule_rss(cfg, chan):
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port 9999 action {chan}", host=cfg.remote).stdout
++    values = re.search(r'ID (\d+)', output).group(1)
++    return int(values)
++
++
+ def test_zcrx(cfg) -> None:
+     cfg.require_ipver('6')
+ 
+@@ -79,6 +92,34 @@ def test_zcrx_oneshot(cfg) -> None:
+         cmd(tx_cmd)
+ 
+ 
++def test_zcrx_rss(cfg) -> None:
++    cfg.require_ipver('6')
++
++    combined_chans = _get_combined_channels(cfg)
++    if combined_chans < 2:
++        raise KsftSkipEx('at least 2 combined channels required')
 +    (rx_ring, hds_thresh) = _get_current_settings(cfg)
- 
-     ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
-     defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
++
++    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
++    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
 +    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
 +    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
-     ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
-     defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-     ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
-@@ -57,10 +59,12 @@ def test_zcrx_oneshot(cfg) -> None:
-     combined_chans = _get_combined_channels(cfg)
-     if combined_chans < 2:
-         raise KsftSkipEx('at least 2 combined channels required')
--    rx_ring = _get_rx_ring_entries(cfg)
-+    (rx_ring, hds_thresh) = _get_current_settings(cfg)
- 
-     ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
-     defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
-     ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
-     defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-     ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
++    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
++    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
++    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
++
++    (ctx_id, delete_ctx) = _create_rss_ctx(cfg, combined_chans)
++    flow_rule_id = _set_flow_rule_rss(cfg, ctx_id)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
++
++    rx_cmd = f"{cfg.bin_remote} -s -p 9999 -i {cfg.ifname} -q {combined_chans - 1}"
++    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p 9999 -l 12840"
++    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
++        wait_port_listen(9999, proto="tcp", host=cfg.remote)
++        cmd(tx_cmd)
++
++
+ def main() -> None:
+     with NetDrvEpEnv(__file__) as cfg:
+         cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
 -- 
 2.47.1
 
