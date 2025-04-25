@@ -1,183 +1,151 @@
-Return-Path: <netdev+bounces-186180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB882A9D619
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:15:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25C33A9D629
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07CC178A67
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:15:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 819013A837A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0DD2973CA;
-	Fri, 25 Apr 2025 23:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46AF2957B7;
+	Fri, 25 Apr 2025 23:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yym5k9DV"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="wz3AvF/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE0621ABD6;
-	Fri, 25 Apr 2025 23:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071CB1B87F0
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 23:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745622927; cv=none; b=aL24s0fGhAzJqSjtaVgEunFheLqmHWvqaiETzDEV35iQRZgH35ljZLYJpwzltS3WLKn0w00lC6eEBzALR0vInAItVkTZr8yOt6GtN4MpcQyZLcjRSmGwyt//vVbCNahsllO8nsZB/ZyGitLhAHuni6mLodUvBJaAl7bJa+S4mO8=
+	t=1745623234; cv=none; b=RkTy5eEkEfM4pufa/ENGTyNxs2qqB9b8aU4lDQNoa/rvXlSmfgZzSPAdA5bx7S79Gd04l2bFukOtkv/He96vw0cMMssOidRiMcZnWBZXs8TtvfteFN5QBsyGgT/EEggGItjX0AOF4etCS9PkP2b/M5pefJXdjhnMCWMZiR6Twx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745622927; c=relaxed/simple;
-	bh=vsFKpSpZnGhZifAM23UK3UzlMYS9tXWLxNc3v4lm3Ro=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pR1OHXbVJMkIfuGmc8AsdoWOm/tVPwRlxzfNyzTjkkdtoEawbpLydaYzMZJH34kiUK2rcf3CD0YAfUOxkWoPXbP5fNcRotYEHglT3wSd9Ar5rYjmrUMbsHn83y+h+Ojl4V6QUdnznbpe8GsJNi1JzGgsFYRU9GfIHX2P0s5K0j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yym5k9DV; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-224019ad9edso41653735ad.1;
-        Fri, 25 Apr 2025 16:15:25 -0700 (PDT)
+	s=arc-20240116; t=1745623234; c=relaxed/simple;
+	bh=iVDgmbjAnvB3AqJz1JtnA+4x1Fh0/lGPQT3GV/3GH/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OpmDbZf7w+xBJL/qkU8HwESGTAVilyUMtVid81ahaqbHM+1QI5MA6xqaqFIQ1SY/6VP0hMfEi9wjEpEmKsTq0NmXBXXn2lNE58h7n3RnXu/K2U+HZv6Fi4w+klVUFPPHOnfloWlx4p5/GwNK3gGKN6ZQFjOwm5+lkY10nsclMKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=wz3AvF/b; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223fb0f619dso32543755ad.1
+        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 16:20:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745622925; x=1746227725; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ad7ab9Hi/U7rnoziyztPIwqTOAC6c1GvW0nqsLo6SJI=;
-        b=Yym5k9DVAqR2pbIuMA7lkg6vuVnUmOAyJ/cxpwIvaW/s8J3tOWYkw/s0c9QWyfsq+y
-         5zYXdN8HaKue3lYNlwNOPORohE7gkfIGQVFCxlqmHLVQmfaDwVFHDlJo6obCBP1EuraV
-         sWFC7Ung7QajJFFXyJczCicCUBGLYUdGwolc+ihW7Na/H3rGtlkMYoxX9GWq7+YcA63K
-         VRVoBeJN+3uO4Wyjk+W/ubE4wvW3Uc5633Md7i8rJWxbmapjnCZTUeyVJevXC2jeo7xW
-         yGoIvea5xoOhEXsouuFjs+pKcPOX3xel8/jZ4HhjAQQx2G92WZF/8N2YZdzeA5lc1gkM
-         jv5Q==
+        d=fastly.com; s=google; t=1745623232; x=1746228032; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5jquDGFiiiZhpTAIdmfIoy2mJCi05q4uBNwr7LqWx/E=;
+        b=wz3AvF/bPoP1HYQuFtNZl5JfLB3n3yQefm/DVP7HV8RMW59GWlls+hFA+OoDNqvfVl
+         Kp40b178+3/V7eeKcMgFtDfA9+wTGUZg2fDCGdpiqYM0W8esEntqufhfFDGI89R0Gknu
+         U6rf95KwH5xEzRCElwxTNd5RsYX5hHdY0BYiw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745622925; x=1746227725;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1745623232; x=1746228032;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ad7ab9Hi/U7rnoziyztPIwqTOAC6c1GvW0nqsLo6SJI=;
-        b=aSzc/fYhuc0Wtr5VD6MVv13zhdnGXAitc5HEqROMMnueKd/juCqlZ36cynUIAzkjU2
-         92j0bJPKwizXJpzJYlwBDal/w4CPZF6ETdtUmNqrk73V+Cn4uqOncZHV1welEKvNSgqv
-         QSez4AxiepW6Q/uOAfCvDk2rXMCTmQJnENfpmCsAs+oLzIkeAOu+UtOornlEAWt3YrZE
-         glHweVUlSWnJmM5owwASeeWbgcljTsuNLJBBf/JOeLbKQvJm827IqPTmJZMkl0rdbFjk
-         nlHEHKaGOW7alP8R6DDyRDjW+EPWUnJsEiUjF6FUZIFsBMNtwxRGJmr3lnPHaK62OPoS
-         ISEA==
-X-Forwarded-Encrypted: i=1; AJvYcCU82bBUNs9DbUTme6TH9Fa5YzAaLLvodPKITn/RBN6gB2PzEIR7CXEUzeEiDaUWsudKEBG3Av4x@vger.kernel.org, AJvYcCU9oQXyyoq41YT410RRA7W5dnTnzg40CfuxlOB4pfFgAFv6U6KQSyFV/X0kRJ9f7zel+ZlaUQTSo9R4Lds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEZ9YvM+uiauLSwNnFoPIyXEawTA7q/AG4BmQeOG25uIO2bow5
-	dhgt+grQrft+XWleg/4lUN5iGcb1C+V0BE/nEcxOWgleWSm+S1l1
-X-Gm-Gg: ASbGncuD5GNgAy+feQPzH/6JqKfy2bt0Wt//Cr1H9/Ey9pC8in1u14nhTjJeQhlkxYY
-	fe1gvMp4fspn/xNGbtbRuIo7gv1ifY/n8gQV6BsMFRwptsq6dQNsyN94INGGmdjw1dJnKi9hvX6
-	6DAaMPuuBF88xrrFjmCrAjb7Z98OotsQJXcQ02VXCiZujFaCDJGlWQVO51Cm1V1oZ7b2YFSm3Yc
-	NCp0+YmENGmzA4zoT6Sa7r/39Ao4eCBKwy7/EmDhlBYwHf+RQVWfPHjKIwj3iBxk3vBLkURiUb0
-	RZHeJjdaaaEe0jTnyGuEcOARzcqPjqboduP1j29HOQ==
-X-Google-Smtp-Source: AGHT+IFrQfGBydx8cnsUqT3XFwz17wFaHW9pKFR5UQ9X+kB2b1/bZey7ss18z7TOgQ7RHqhwP6HkvQ==
-X-Received: by 2002:a17:902:d2c8:b0:224:10a2:cad5 with SMTP id d9443c01a7336-22dbf4c8508mr64194745ad.10.1745622925235;
-        Fri, 25 Apr 2025 16:15:25 -0700 (PDT)
-Received: from mythos-cloud.. ([125.138.201.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15fa906da6sm3462952a12.62.2025.04.25.16.15.22
+        bh=5jquDGFiiiZhpTAIdmfIoy2mJCi05q4uBNwr7LqWx/E=;
+        b=kEN2AvyyVoQSwBS71y3OdVA97hRLcjotLkCFIiXEep5D+JMizTHKFRfAO7gme/8rZk
+         dB9VpyBG2h/YXZr0c8a69IPHFxJp9GahDx4VZ7cGk/+3hg62Mh5che9pCeCxXPew3JZt
+         zrTZ2Ll/tPn+19qz4+SSRd+sOCE2cSsXQRyt986iFOqdB7gcXcSvSdoqH3Um0DmkPous
+         S7G13hiwVsqHtm4PPxZScRBLCW8qiWSsgoT66zznYACNcbirrHeWKU4oqacQ4rpP/bvX
+         2Fy6F1ynPZ5C8tlJVD9DbRyPfvjw+/3FtZux805WAzOlLwwYh/+luXd74yKN/HarcIhC
+         elyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXu+uvt5Df4OWXMRAhAoZQn2VP11oC5A4f87WUPA2s2pCsdc43jg6G+e0H1wfnzBESPGFlit+0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoD6nuef9xx48jF5nmjqxhtO9og7IIhukxw+lFOy2G0+OBHvne
+	nV23UoeEmtJvqUiYcX735CIrtLBi/J6z1A826oaU0xA5krlW2jsZNtEUI979IH4=
+X-Gm-Gg: ASbGnctaHpWX5LxS4JartLw1YaSDumGfgnPT0CzgljjQ6M/iCzLpIuarWCHCRltOp4R
+	C57Mfk6tT4CVtMy5WhKCe4KT6bjrzelw6vn4s6BUyxoiV80SmgEecbg/CeHkst66MuqsBqcPOz5
+	JJ93jla+qhizYVRmhzWqwm9Fy85gN6ljTl8vYXuIaYW5TfcHwASAZbf4C6pE0pJYtRP2HtjOhS3
+	A/p1xUuFYzsIt/bRPwXPM9oD/fWVONR+p6L3Vi3CpgVsBaSxNcQ8DWfiR5SEIu+22FeLn4JVUoX
+	02sFZ9Au4Skgy3NrMb2ypM2A2BuHQAXCJQGgga6dYYYEwT/eLhPtegzSwXkMrznK0/HXcckF2en
+	44nfH9u8gGkOg7WrrpV7mp/g=
+X-Google-Smtp-Source: AGHT+IGUDCW+xjlqEVRCrJ7oP+WM6CTLKVce7156Oljwp7AI1/8uUgPJKtLDGJbYV/VLofrqi6iumQ==
+X-Received: by 2002:a17:903:410c:b0:224:1c41:a4cd with SMTP id d9443c01a7336-22dbf5d9f29mr46361775ad.3.1745623232228;
+        Fri, 25 Apr 2025 16:20:32 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76db1sm38487585ad.13.2025.04.25.16.20.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 16:15:24 -0700 (PDT)
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+        Fri, 25 Apr 2025 16:20:31 -0700 (PDT)
+Date: Fri, 25 Apr 2025 16:20:28 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
+	sdf@fomichev.me, dw@davidwei.uk, asml.silence@gmail.com,
+	ap420073@gmail.com, dtatulea@nvidia.com, michael.chan@broadcom.com
+Subject: Re: [RFC net-next 01/22] docs: ethtool: document that rx_buf_len
+ must control payload lengths
+Message-ID: <aAwYvE_H68kZ4L85@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Moon Yeounsu <yyyynoom@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: dlink: add synchronization for stats update
-Date: Sat, 26 Apr 2025 08:13:52 +0900
-Message-ID: <20250425231352.102535-2-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	Mina Almasry <almasrymina@google.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
+	sdf@fomichev.me, dw@davidwei.uk, asml.silence@gmail.com,
+	ap420073@gmail.com, dtatulea@nvidia.com, michael.chan@broadcom.com
+References: <20250421222827.283737-1-kuba@kernel.org>
+ <20250421222827.283737-2-kuba@kernel.org>
+ <CAHS8izODBjzaXObT8+i195_Kev_N80hJ_cg4jbfzrAoADW17oQ@mail.gmail.com>
+ <20250425155034.096b7d55@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250425155034.096b7d55@kernel.org>
 
-There are two paths that call `get_stats()`:
-    1. From user space via the `ip` command
-    2. From interrupt context via `rio_interrupt()`
+On Fri, Apr 25, 2025 at 03:50:34PM -0700, Jakub Kicinski wrote:
+> On Wed, 23 Apr 2025 13:08:33 -0700 Mina Almasry wrote:
+> > On Mon, Apr 21, 2025 at 3:28 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> > > @@ -971,6 +970,11 @@ completion queue size can be adjusted in the driver if CQE size is modified.
+> > >  header / data split feature. If a received packet size is larger than this
+> > >  threshold value, header and data will be split.
+> > >
+> > > +``ETHTOOL_A_RINGS_RX_BUF_LEN`` controls the size of the buffer chunks driver
+> > > +uses to receive packets. If the device uses different memory polls for headers
+> > > +and payload this setting may control the size of the header buffers but must
+> > > +control the size of the payload buffers.
+> > 
+> > FWIW I don't like the ambiguity that the setting may or may not apply
+> > to header buffers. AFAIU header buffers are supposed to be in the
+> > order of tens/hundreds of bytes while the payload buffers are 1-2
+> > orders of magnitude larger. Why would a driver even want this setting
+> > to apply for both? I would prefer this setting to apply to only
+> > payload buffers.
+> 
+> Okay, I have no strong reason to leave the ambiguity.
+> 
+> Converging the thread with Joe:
+> 
+> >> Document the semantics of the rx_buf_len ethtool ring param.
+> >> Clarify its meaning in case of HDS, where driver may have
+> >> two separate buffer pools.  
+> >
+> > FWIW the docs added below don't explicitly mention HDS, but I
+> > suppose that is implied from the multiple memory pools? Not sure if
+> > it's worth elucidating that.
+> 
+> Maybe not sufficiently. Some NICs just have buffer pools for different
+> sized packets, but than the buffer size should be implied by the size
+> range?
+> 
+> 
+> How about:
+> 
+>  ``ETHTOOL_A_RINGS_RX_BUF_LEN`` controls the size of the buffers driver
+>  uses to receive packets. If the device uses different buffer pools for
+>  headers and payload (due to HDS, HW-GRO etc.) this setting must
+>  control the size of the payload buffers.
 
-Case 1 is synchronized by `rtnl_lock()`, so it is safe.
-However, the two cases above are not synchronized with each other.
-Therefore, `spin_lock` is needed to protect `get_stats()` as it can be
-preempted by an interrupt. In this context, `spin_lock_irq()` is required
-(using `spin_lock_bh()` may result in a deadlock).
-
-`dev->stats.tx_errors` and `dev->stats.collisions` may be
-concurrently modified by the interrupt handler and user space, so
-they are also protected by `spin_lock`.
-
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
----
-Changelog:
-v1: https://lore.kernel.org/netdev/20250421191645.43526-2-yyyynoom@gmail.com/
-v2:
-- fix incorrect method of updating `dev->stats.tx_errors` and
-  `dev->stats.collisions`
----
- drivers/net/ethernet/dlink/dl2k.c | 11 ++++++++++-
- drivers/net/ethernet/dlink/dl2k.h |  2 ++
- 2 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index d88fbecdab4b..0a3ac9ba3729 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -865,7 +865,6 @@ tx_error (struct net_device *dev, int tx_status)
- 	frame_id = (tx_status & 0xffff0000);
- 	printk (KERN_ERR "%s: Transmit error, TxStatus %4.4x, FrameId %d.\n",
- 		dev->name, tx_status, frame_id);
--	dev->stats.tx_errors++;
- 	/* Ttransmit Underrun */
- 	if (tx_status & 0x10) {
- 		dev->stats.tx_fifo_errors++;
-@@ -902,9 +901,15 @@ tx_error (struct net_device *dev, int tx_status)
- 		rio_set_led_mode(dev);
- 		/* Let TxStartThresh stay default value */
- 	}
-+
-+	spin_lock_irq(&np->stats_lock);
- 	/* Maximum Collisions */
- 	if (tx_status & 0x08)
- 		dev->stats.collisions++;
-+
-+	dev->stats.tx_errors++;
-+	spin_unlock_irq(&np->stats_lock);
-+
- 	/* Restart the Tx */
- 	dw32(MACCtrl, dr16(MACCtrl) | TxEnable);
- }
-@@ -1074,6 +1079,7 @@ get_stats (struct net_device *dev)
- #endif
- 	unsigned int stat_reg;
- 
-+	spin_lock_irq(&np->stats_lock);
- 	/* All statistics registers need to be acknowledged,
- 	   else statistic overflow could cause problems */
- 
-@@ -1123,6 +1129,9 @@ get_stats (struct net_device *dev)
- 	dr16(TCPCheckSumErrors);
- 	dr16(UDPCheckSumErrors);
- 	dr16(IPCheckSumErrors);
-+
-+	spin_unlock_irq(&np->stats_lock);
-+
- 	return &dev->stats;
- }
- 
-diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
-index 195dc6cfd895..c24823e909ef 100644
---- a/drivers/net/ethernet/dlink/dl2k.h
-+++ b/drivers/net/ethernet/dlink/dl2k.h
-@@ -372,6 +372,8 @@ struct netdev_private {
- 	struct pci_dev *pdev;
- 	void __iomem *ioaddr;
- 	void __iomem *eeprom_addr;
-+	// To ensure synchronization when stats are updated.
-+	spinlock_t stats_lock;
- 	spinlock_t tx_lock;
- 	spinlock_t rx_lock;
- 	unsigned int rx_buf_sz;		/* Based on MTU+slack. */
--- 
-2.49.0
-
+SGTM
 
