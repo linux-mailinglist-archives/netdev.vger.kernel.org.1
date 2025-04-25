@@ -1,225 +1,165 @@
-Return-Path: <netdev+bounces-185925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67B7A9C1F7
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:50:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7805EA9C20A
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 10:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFCC6172C65
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:50:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5D47172F77
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16C121D3DB;
-	Fri, 25 Apr 2025 08:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F5821FF4D;
+	Fri, 25 Apr 2025 08:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="C05ahXwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A171F91F6
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E31F1936
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 08:51:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745571010; cv=none; b=CdjF75k01syY1LwpmH7vBPyItRtysCZThOinLvO0PPxWjANeUeGWBVu2lWdwG7Q0pmg3UrOg1nleeUZv7Jsl3AaZyw/UxVevnSSBwFdQrfgh/nKUGQX8ODDNauZ2k8Msfthawz5ycH9jQ9RNSGxcMJ1ZnOzO0eDN33fCQ4dOsGc=
+	t=1745571073; cv=none; b=fAkEEevG48NvMbt7XjNv0OJRTIN6KRoBk1ybGqofFeICA0BCFzewmbZ5spyrouxFsEHzINrwEEAtnNbTjzxNXCCje9mXyTOq/GlgO5tEQxofhfLtoJTcN66IIZ+xhApwWCejMfVkj0OysWimwWFqBeTR1I7qYXdvZWVcrGY6D2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745571010; c=relaxed/simple;
-	bh=JAMws/vtOTxHeLm3gccrM03foPW5z5Ne+1T0subrk1g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AnW9KScz2yw/VIw1vZGTltNYXIex8bZ1BNYsX5EqY2Hh3narEnJ96WvtVLwTsRVErrh989RbE/astqE8rwOUr9qHI/Wt9v0MMYhEe1u9ydUL7k1GMvBXuDGsxyg64vR7slYiJg7SXbtELDIj1Ug5de3c6MfPI1/+r8wsQirgbLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8Ekm-0004ed-2U; Fri, 25 Apr 2025 10:49:48 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8Ekh-00218p-1o;
-	Fri, 25 Apr 2025 10:49:43 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8Ekh-00144S-1W;
-	Fri, 25 Apr 2025 10:49:43 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v1 1/1] Documentation: networking: expand and clarify EEE_GET/EEE_SET documentation
-Date: Fri, 25 Apr 2025 10:49:41 +0200
-Message-Id: <20250425084941.253961-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1745571073; c=relaxed/simple;
+	bh=QKM81Z5OKSv3auXVAY478OddXt6QHpbIxR9wosP5Auo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ewxd9+Y6wuh4OMeQ1WR70gJpo+1eBsXN9wmUhawSQulnvAPECLQXelohSZiAbpPKrII6zYaaQQgQGWt9H7HJYonMqGCknFb3gtdnTdIkWU7KUMjjDNd0UzdJDKixHm3euLFAqSjDW8v5Uc1ujA2VOpHFFK05N2mwL/syeLO7ohw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=C05ahXwG; arc=none smtp.client-ip=195.121.94.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: 93f16712-21b2-11f0-b9a0-005056abbe64
+Received: from smtp.kpnmail.nl (unknown [10.31.155.38])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 93f16712-21b2-11f0-b9a0-005056abbe64;
+	Fri, 25 Apr 2025 10:52:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:from:to:subject:mime-version:date:message-id;
+	bh=ZUUJHctHfNsWNu1EuQFACb2hrUYidSMtniMgESDbRMU=;
+	b=C05ahXwGA4fFgl5pI9IJHaOIC76m8R/+Es89bI5CvWoa6HqeHuMK1mldeMHIPdQDi2kLlgzYGuFDe
+	 D6MuwZeTwD9wDa1XBMVKPiXUdLXcq+GTqnyBHWJmMljRXk48AhzZTUw4w3JcILCX9BZqxzGIjcGt45
+	 rVpMjojPveoEKJh8q2SHsNUin5NrH2hHy2UM/ToU41fRmD9iRhfZFZVHgj6RTwNoFsLryLF3BsJztF
+	 gaTSBezUZK3uueMs3FZ29rF3MDkksrwOCGH4rjzRi2+4egWucO06G46ulnDHCSBicLhtJMzaffZPP7
+	 sV5V8wKP1no2OVYkOrkoy9/F8HuD5EA==
+X-KPN-MID: 33|AF0t4UVO0ldgi6YmnFhYJXqAPxHkuBjosJGcKGQA7S6P7Abi1YftYhe8yCepFKM
+ Um9AVCIhpwBzaPi+MzlrzvCTD1SHpo9+IS4F4rFr5JFU=
+X-KPN-VerifiedSender: Yes
+X-CMASSUN: 33|nqQMCrwmB3CHOeiz1JE1vwIQX38ApX4EwzMJX9cEX5ZmT/5GDgIxRdtlrbvDrcJ
+ 3U9+ukECS2iUUeZHN8Kv+nQ==
+Received: from [192.168.1.10] (80-60-128-215.fixed.kpn.net [80.60.128.215])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 6c670738-21b2-11f0-95a4-005056abf0db;
+	Fri, 25 Apr 2025 10:51:06 +0200 (CEST)
+Message-ID: <7d0096ad-a290-4fbc-8c06-dba49e8db8af@xs4all.nl>
+Date: Fri, 25 Apr 2025 10:51:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded
+ parity calculation with parity_odd()
+To: Kuan-Wei Chiu <visitorckw@gmail.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
+ eajames@linux.ibm.com, andrzej.hajda@intel.com, neil.armstrong@linaro.org,
+ rfoss@kernel.org, maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+ tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+ dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
+ hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
+ vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ parthiban.veerasooran@microchip.com, johannes@sipsolutions.net,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, yury.norov@gmail.com,
+ akpm@linux-foundation.org, jdelvare@suse.com, linux@roeck-us.net,
+ alexandre.belloni@bootlin.com, pgaj@cadence.com, hpa@zytor.com,
+ alistair@popple.id.au, linux@rasmusvillemoes.dk,
+ Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+ jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+ linux-input@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+ Frank.Li@nxp.com, linux-hwmon@vger.kernel.org,
+ linux-i3c@lists.infradead.org, david.laight.linux@gmail.com,
+ andrew.cooper3@citrix.com, Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250409154356.423512-1-visitorckw@gmail.com>
+ <20250409154356.423512-4-visitorckw@gmail.com>
+ <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
+ <Z/bDnLzcajzIxey3@visitorckw-System-Product-Name>
+Content-Language: en-US, nl
+From: Hans Verkuil <hverkuil@xs4all.nl>
+In-Reply-To: <Z/bDnLzcajzIxey3@visitorckw-System-Product-Name>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Improve the documentation for ETHTOOL_MSG_EEE_GET and ETHTOOL_MSG_EEE_SET
-to provide accurate descriptions of all netlink attributes involved.
+On 09/04/2025 20:59, Kuan-Wei Chiu wrote:
+> On Wed, Apr 09, 2025 at 08:43:09PM +0200, Arend van Spriel wrote:
+>> On 4/9/2025 5:43 PM, Kuan-Wei Chiu wrote:
+>>> Refactor parity calculations to use the standard parity_odd() helper.
+>>> This change eliminates redundant implementations.
+>>>
+>>> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+>>> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+>>> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+>>> ---
+>>>   drivers/media/pci/cx18/cx18-av-vbi.c | 12 ++----------
+>>>   1 file changed, 2 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/drivers/media/pci/cx18/cx18-av-vbi.c b/drivers/media/pci/cx18/cx18-av-vbi.c
+>>> index 65281d40c681..15b515b95956 100644
+>>> --- a/drivers/media/pci/cx18/cx18-av-vbi.c
+>>> +++ b/drivers/media/pci/cx18/cx18-av-vbi.c
+>>
+>> [...]
+>>
+>>> @@ -278,7 +270,7 @@ int cx18_av_decode_vbi_line(struct v4l2_subdev *sd,
+>>>   		break;
+>>>   	case 6:
+>>>   		sdid = V4L2_SLICED_CAPTION_525;
+>>> -		err = !odd_parity(p[0]) || !odd_parity(p[1]);
+>>> +		err = !parity_odd(p[0]) || !parity_odd(p[1]);
+>>
+>> No need to call parity_odd() twice here. Instead you could do:
+>>
+>> 		err = !parity_odd(p[0] ^ p[1]);
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- Documentation/networking/ethtool-netlink.rst | 103 ++++++++++++++++---
- 1 file changed, 90 insertions(+), 13 deletions(-)
+I prefer the original approach, it is easier to understand. Performance
+is not an issue here, clarity of the code is more important.
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index b6e9af4d0f1b..dfbdd99a7228 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1215,20 +1215,65 @@ Kernel response contents:
- 
-   =====================================  ======  ==========================
-   ``ETHTOOL_A_EEE_HEADER``               nested  request header
--  ``ETHTOOL_A_EEE_MODES_OURS``           bool    supported/advertised modes
--  ``ETHTOOL_A_EEE_MODES_PEER``           bool    peer advertised link modes
-+  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  supported/advertised modes
-+  ``ETHTOOL_A_EEE_MODES_PEER``           bitset  peer advertised link modes
-   ``ETHTOOL_A_EEE_ACTIVE``               bool    EEE is actively used
-   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
-   ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
-   ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
-   =====================================  ======  ==========================
- 
--In ``ETHTOOL_A_EEE_MODES_OURS``, mask consists of link modes for which EEE is
--enabled, value of link modes for which EEE is advertised. Link modes for which
--peer advertises EEE are listed in ``ETHTOOL_A_EEE_MODES_PEER`` (no mask). The
--netlink interface allows reporting EEE status for all link modes but only
--first 32 are provided by the ``ethtool_ops`` callback.
-+Detailed behavior:
- 
-+``ETHTOOL_A_EEE_MODES_OURS`` is a bitset consisting of:
-+
-+ - Value: link modes that the driver intends to advertise for EEE.
-+ - Mask: subset of link modes supported for EEE by the interface.
-+
-+The `advertised` value is stored in software and remains even if EEE is
-+disabled. It can be modified independently and is preserved across toggles of
-+EEE enable/disable. If ``ETHTOOL_A_EEE_ENABLED`` is false, PHY does not
-+advertise EEE, but the configured value is reported.
-+
-+``ETHTOOL_A_EEE_MODES_PEER`` shows the peer's EEE capabilities. It is a bitset
-+consisting of:
-+
-+ - Value: link modes that the link partner advertises for EEE.
-+ - Mask: empty
-+
-+This value is typically reported by the hardware and may represent only a
-+subset of the actual capabilities supported and advertised by the link partner.
-+The local hardware may not be able to detect or represent all EEE-capable modes
-+of the peer. As a result, the true EEE support on the peer side may exceed what
-+is reported.
-+
-+``ETHTOOL_A_EEE_ACTIVE`` indicates whether EEE is currently active on the link.
-+This is determined by the kernel as a combination of the currently active link
-+mode, locally advertised EEE modes, and peer-advertised EEE modes:
-+
-+    active = (current_link_mode & advertised & link_partner)
-+
-+In practice, the evaluation may also depend on whether the MAC supports EEE for
-+the given mode. There is mostly no hardware status bit that directly indicates
-+an active EEE state. Furthermore, even if ``ETHTOOL_A_EEE_ACTIVE`` is true,
-+other settings such as ``ETHTOOL_A_EEE_TX_LPI_ENABLED`` or an excessively high
-+``ETHTOOL_A_EEE_TX_LPI_TIMER`` may prevent the MAC from actually entering the
-+LPI state. Thus, the "active" status should be interpreted as a potential
-+capability, not as a guaranteed indication of LPI activity. The only strict
-+rule is that if ``ETHTOOL_A_EEE_ENABLED`` is false, then
-+``ETHTOOL_A_EEE_ACTIVE`` must also be false.
-+
-+``ETHTOOL_A_EEE_ENABLED`` is a software-only switch that controls if the
-+advertisement is programmed into hardware.
-+
-+``ETHTOOL_A_EEE_TX_LPI_TIMER`` defines the delay in microseconds after the last
-+transmitted frame before the MAC enters the Low Power Idle (LPI) state. This
-+value applies globally to all link modes, though in practice, optimal values
-+may differ between modes.
-+
-+The netlink interface can represent link modes up to
-+``__ETHTOOL_LINK_MODE_MASK_NBITS``, but traditional ioctls only support the
-+first 32.
- 
- EEE_SET
- =======
-@@ -1239,18 +1284,50 @@ Request contents:
- 
-   =====================================  ======  ==========================
-   ``ETHTOOL_A_EEE_HEADER``               nested  request header
--  ``ETHTOOL_A_EEE_MODES_OURS``           bool    advertised modes
-+  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  advertised modes
-   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
-   ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
-   ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
-   =====================================  ======  ==========================
- 
--``ETHTOOL_A_EEE_MODES_OURS`` is used to either list link modes to advertise
--EEE for (if there is no mask) or specify changes to the list (if there is
--a mask). The netlink interface allows reporting EEE status for all link modes
--but only first 32 can be set at the moment as that is what the ``ethtool_ops``
--callback supports.
-+Detailed behavior:
-+
-+``ETHTOOL_A_EEE_MODES_OURS`` can specify the list of advertised link modes.
-+
-+``ETHTOOL_A_EEE_ENABLED`` is a software flag that tells the kernel to prepare
-+EEE functionality. If autonegotiation is enabled, this means writing the EEE
-+advertisement register so that the PHY includes the EEE-capable modes in the
-+autonegotiation pages it transmits. The actual advertisement set is a subset
-+derived from PHY-supported modes, MAC capabilities, and possible blacklists.
-+This subset can be further restricted by ``ETHTOOL_A_EEE_MODES_OURS``. If
-+autonegotiation is disabled, EEE advertisement is not transmitted and EEE will
-+not be negotiated or used.
-+
-+``ETHTOOL_A_EEE_TX_LPI_ENABLED`` controls whether the system should enter the
-+Low Power Idle (LPI) state. In this state, the MAC typically notifies the PHY,
-+which then transitions the medium (e.g., twisted pair) side into LPI. The exact
-+behavior depends on the active link mode:
-+
-+ - In **100BaseT/Full**, an asymmetric LPI configuration (local off, peer on)
-+   leads to asymmetric behavior: the local TX line remains active, while the RX
-+   line may enter LPI.
-+ - In **1000BaseT/Full**, there are no separate TX/RX lines; the wire is silent
-+   only if both sides enter the LPI state.
-+
-+- ``ETHTOOL_A_EEE_TX_LPI_TIMER`` configures the delay after the last
-+  transmitted frame before the MAC enters the LPI state. This single timer
-+  value applies to all link modes, although using the same value for all modes
-+  may not be optimal in practice. A value that is too high may effectively
-+  prevent entry into the LPI state.
-+
-+.. note::
-+   For EEE advertisement to take effect, PHY autonegotiation must be enabled.
-+
-+Limitations:
- 
-+The netlink interface allows configuring all link modes up to
-+``__ETHTOOL_LINK_MODE_MASK_NBITS``, but if drivers depend on legacy
-+``ethtool_ops``, only the first 32 link modes are supported.
- 
- TSINFO_GET
- ==========
--- 
-2.39.5
+So for this patch (i.e. this v4 version):
+
+Reviewed-by: Hans Verkuil <hverkuil@xs4all.nl>
+
+>>
+>> This is orthogonal to the change to parity_odd() though. More specific to
+>> the new parity_odd() you can now do following as parity_odd() argument is
+>> u64:
+>>
+>> 		err = !parity_odd(*(u16 *)p);
+>>
+>>
+> Thanks for the feedback!
+> Would you prefer this change to be part of the parity() conversion
+> patch, or in a separate one?
+
+Just leave it as-is, as mentioned above.
+
+Regards,
+
+	Hans
+
+> 
+> Regards,
+> Kuan-Wei
 
 
