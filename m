@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-185810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA22A9BCA1
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:10:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B30EA9BCA4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 04:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B87A7B3F5E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:09:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D038E3AEB6E
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C788213C3C2;
-	Fri, 25 Apr 2025 02:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56756145FE8;
+	Fri, 25 Apr 2025 02:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+R+F4NF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8xHJ3QH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953B043AA8;
-	Fri, 25 Apr 2025 02:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AF51AAC4;
+	Fri, 25 Apr 2025 02:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745547048; cv=none; b=olJdM3pTBefoWaMluytXNkJG/SEb3tatoQiLsu3XrzlQtTlLwQLPr4umWN0ahNz0CRFC5UxRREjSsRDBSetlS9bQT0DyNKY/Qs3OrFdUtaZUtkWUkhETpAE+6woMrMCZiAHbxb2KSJ+Ov1cmEfSZggKGvqPgvJ2xRHZx5jZmx/0=
+	t=1745547235; cv=none; b=oZ92Ae/VcLIMaP9KW+R+VvdXV8rwpz3OttF8zVuCgm40tJ5MMD9M/t65rOvHs3EniASQ6X9cKgEp2UAIbtBtiDR8p0ZXi/LdJjNtJrHSJe9ytpmgRsLt5VSrVar0dvnIRa49c408+VRi4IqiyORc1G18RwhN82/UZaKThOiehqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745547048; c=relaxed/simple;
-	bh=QRw/DYAEbDloOCSEsv2ywKTtmu3aHUR7BaB6HZib6wM=;
+	s=arc-20240116; t=1745547235; c=relaxed/simple;
+	bh=zhKRqLVd26FfGbO14mufcGFlylQAXcG1racRs/okgag=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R0weXIgBgDqjzBxzFv3oyomVtRUl+cCC+rJcfWFRvAyA5SS092NDYd9ZgpxCBCg3mA2QbTDuTbs0D9uVgOIFIxsLsyKXuciOsEIlkhsinX43E0wL8QECltzSWEbwOCAomYnP5cBzjfpzhJA1RNM2kpr52Y2ZzbiEE6G2CEcXzYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+R+F4NF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0421EC4CEE3;
-	Fri, 25 Apr 2025 02:10:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Fo9ojmJLNaRaTvObYttOa3wU6NbQbCMMulPVRyO3lXq/1bmqQxsm58JWBoiZkfwhG5LYCBeg/TOlOEahwjBWk2fo0EPkIy3RipoXAJNFe98TH03H5co+MpksRrgy+OF0zaddwnhScx2K6WtCRWW8rCLm4tjOvpWHsVhorf3bICI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8xHJ3QH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDCE4C4CEE3;
+	Fri, 25 Apr 2025 02:13:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745547048;
-	bh=QRw/DYAEbDloOCSEsv2ywKTtmu3aHUR7BaB6HZib6wM=;
+	s=k20201202; t=1745547233;
+	bh=zhKRqLVd26FfGbO14mufcGFlylQAXcG1racRs/okgag=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s+R+F4NFC237tjSlVacoyM9H1w6BD1NCkul7bNNG/I9DDPY06EL/ptwxpcRoEFbur
-	 FVJdEsCRgmI7RlusgdOey1F4mgLu6n9ZazFryUnkndZqphStmCG3enRz4NzizaR72n
-	 qDmcuHKr2ycYw4YPg+XYnEUUCVBp9E/yUpAffhiKJYIbbBmO/U26JLkAOdjzRk2XPK
-	 OZWHGUMXw/5BzGlOf3ATwPC3U3lSaxBe47OcL5zealmO0gvcAamn81t0eoPxGOhlaR
-	 3ob7ZAcI7alRC/l10h71D/PJY/KHz9ypGrynGG8ftUlqz5YdXa585FGehQ8QIFL90l
-	 De5yUUqg/0avw==
-Date: Thu, 24 Apr 2025 19:10:46 -0700
+	b=H8xHJ3QHyW32cpizyk44/SZZ7fLssnULuTJhyh73dm6ah7nOv+8lQkBFycU3KCBQb
+	 gjtKPXLpOLt2qIOu5gy+XDnYUYQpXo3IPhkXuCPr5JhYb2E/zRHT5iPtEiCrTbA8vk
+	 0AtJeKfurLux9WVFiolGd6zSbmHF8wlHaDhwftUxAHifydoa4sIC1MSNia9uuKtfNs
+	 x0zkRhpUpZDzLXR0ubHxp+qINQrvRLFOKckCEjDzbJVQ1guaZSlY9kZFDQdW3DAvCX
+	 /DYOYrQans7jn++GyA6TCj3zsMcytNJQCpANb+tW9D/Q1gAObp27PuYKF1u3xeM+VM
+	 R9ahJvStFzGDA==
+Date: Thu, 24 Apr 2025 19:13:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
- Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
- <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
- <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Lee Trager
- <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh
- <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
- Damato <jdamato@fastly.com>, Christophe JAILLET
- <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v12 1/1] hinic3: module initialization and
- tx/rx logic
-Message-ID: <20250424191046.523383fd@kernel.org>
-In-Reply-To: <cc01acb5ebc96c4edc7f85955379fb50ce27484b.1745411775.git.gur.stavi@huawei.com>
-References: <cover.1745411775.git.gur.stavi@huawei.com>
-	<cc01acb5ebc96c4edc7f85955379fb50ce27484b.1745411775.git.gur.stavi@huawei.com>
+To: Parvathi Pudi <parvathi@couthit.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, nm@ti.com,
+ ssantosh@kernel.org, tony@atomide.com, richardcochran@gmail.com,
+ glaroque@baylibre.com, schnelle@linux.ibm.com, m-karicheri2@ti.com,
+ s.hauer@pengutronix.de, rdunlap@infradead.org, diogo.ivo@siemens.com,
+ basharath@couthit.com, horms@kernel.org, jacob.e.keller@intel.com,
+ m-malladi@ti.com, javier.carrasco.cruz@gmail.com, afd@ti.com,
+ s-anna@ti.com, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
+ vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+ krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+Subject: Re: [PATCH net-next v6 04/11] net: ti: prueth: Adds link detection,
+ RX and TX support.
+Message-ID: <20250424191350.7bf69fdb@kernel.org>
+In-Reply-To: <20250423072356.146726-5-parvathi@couthit.com>
+References: <20250423060707.145166-1-parvathi@couthit.com>
+	<20250423072356.146726-5-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,29 +72,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Apr 2025 15:41:53 +0300 Gur Stavi wrote:
-> +	/* flip page offset to other buffer */
-> +	rx_info->page_offset ^= rxq->buf_len;
-> +	get_page(page);
+On Wed, 23 Apr 2025 12:53:49 +0530 Parvathi Pudi wrote:
+> +static inline void icssm_prueth_write_reg(struct prueth *prueth,
+> +					  enum prueth_mem region,
+> +					  unsigned int reg, u32 val)
+> +{
+> +	writel_relaxed(val, prueth->mem[region].va + reg);
+> +}
 
-Please don't implement local page recycling. Use page_pool instead,
-it's been around for almost a decade and because its explicitly
-managed by the networking stack its much more effective.
-
-I pointed the same thing out during Yunsilicon XSC driver review,
-which is ongoing in parallel. You should really read the mailing list
-if you want to make progress with work within the community.
-
-> +reuse_rx_page:
-> +	hinic3_reuse_rx_page(rxq, rx_info);
-> +	return;
-> +
-> +unmap_page:
-> +	/* we are not reusing the buffer so unmap it */
-> +	dma_unmap_page(rxq->dev, rx_info->buf_dma_addr, rxq->dma_rx_buff_size, DMA_FROM_DEVICE);
-
-nit: please wrap the lines at 80 chars, unless it hurts readability.
-You can use --max-line-length=80 with checkpatch
--- 
-pw-bot: cr
+Please don't use "inline" unnecessarily.
+The compiler will inline a single-line static function.
 
