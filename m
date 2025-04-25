@@ -1,140 +1,119 @@
-Return-Path: <netdev+bounces-185946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411F3A9C3FD
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:42:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 822A4A9C402
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE5851BC18FA
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:41:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDFE7B8312
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127D023D29B;
-	Fri, 25 Apr 2025 09:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZuiHaRb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582EA230BC2;
+	Fri, 25 Apr 2025 09:41:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4672367A7;
-	Fri, 25 Apr 2025 09:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134F6221540;
+	Fri, 25 Apr 2025 09:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745574009; cv=none; b=rQT5eOMKrhXqTZNDDwVNMWJAOQwQ4ou/0+3Gs80x4+jgi3oAQaU/2mSjsnVBny1ht0Ni9H+yICNmqMGD4vqVUQobJk5tHBTr0mL313LPtB8rTmgvMvXC84DQf1OyBoTsE5toiluDj1DLVl7oGHz8k/vGWoIQJADRC3sx4RCbDm8=
+	t=1745574099; cv=none; b=nU0O0cPJxkQ+tj8+Bwq+LwhcS93FSgAsetL0ydX2bxO8w+lYoVNDewxOgaoNVsiv0ir36V7Gkz0sSD+GK42HgVNnpWsxWxaH4BatcF+ALQlwZd32Q9d4u/hc3XtEVUEQiJfQ0Sw+p6KAguvW+kqqgbiyNYFswmUtlLJQ9cfDS/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745574009; c=relaxed/simple;
-	bh=bRt7XPKW9i4BWzArQjxLQ2RfDMPwgG+tmEWHd6D3ajI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TRO5Cp3ntuTKVWy4+/3C95YChSTFCzhvpWjo/Ge+6YdynIt58LUznEtqH02hk83eh4RgNUOq76BYUKBz3+KO1M4AHhjzZNKbEgC53HhplHLr9MGJxypJ5Ua/8Axe01aCxXE+c9z9T2DiamcJHYJaFdyE7WCDqezBiB6FLdrw1nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZuiHaRb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837FBC4CEE4;
-	Fri, 25 Apr 2025 09:40:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745574008;
-	bh=bRt7XPKW9i4BWzArQjxLQ2RfDMPwgG+tmEWHd6D3ajI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nZuiHaRbDlUTqyFAqPsUzi1F8HUScC4uS7RvpJF2RFS/xE4CWj9pYCv22a/5YVyLV
-	 Jz/5NAXlZ85976ozWoGeK6ridZlApAsxQR9+GqiC5BTt83aqV6jp1yYLowI8Zu5oOH
-	 xM2SKBHXt814tltu5rh6snvCLNLoOND6ZsVozYUAh6kxL+lH6atLhWnGPlRit6FiTH
-	 847GejqMvEu3UO3xw5t36G20WAml+GqQf/i9f+gVpkbrXkQWBBmCBsvOEnO64sULa2
-	 8vv2VatrwWSWAk792g6dYMz3KL2M9UxZ1L/MwpMTeeHe8P0OJDWefbwVx9a8xddAgh
-	 klbcv6dEdC6Dw==
-Message-ID: <f2f156e0-5321-4d6c-ae00-9ec5d148e3bb@kernel.org>
-Date: Fri, 25 Apr 2025 11:40:02 +0200
+	s=arc-20240116; t=1745574099; c=relaxed/simple;
+	bh=nmlAACPdyi1o/ejLELZQWZEK1WfkrRpmg/mY+BUQcfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AF3fPpulRF39of7lEaDDbcJ9Ek7U3QegvMmRPbGz4QtC+ITpNvqquwwoeloBNoxd7/lk5jBAKgO6aHWdn5gHp+UoJuQ4O7hJnWGT2PzXR59KTcMT4SeaXERddK8bfKF2Z3tpS0bR34JRyypH+ZYKUcouYW8U1NlC7+BPIe1lDvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4A941BCA;
+	Fri, 25 Apr 2025 02:41:29 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4511E3F59E;
+	Fri, 25 Apr 2025 02:41:32 -0700 (PDT)
+Date: Fri, 25 Apr 2025 10:41:28 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Chen-Yu Tsai <wens@csie.org>
+Cc: Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Jernej
+ Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
+ Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Corentin Labbe <clabbe.montjoie@gmail.com>,
+ <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-sunxi@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet
+ MAC
+Message-ID: <20250425104128.14f953f3@donnerap.manchester.arm.com>
+In-Reply-To: <CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
+References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
+	<20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
+	<CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/8] dt-bindings: dpll: Add DPLL device and
- pin
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250424154722.534284-1-ivecera@redhat.com>
- <20250424154722.534284-2-ivecera@redhat.com>
- <20250425-manul-of-undeniable-refinement-dc6cdc@kuoka>
- <bc28ca3e-6ccd-4d43-8a51-eb4563a6ed06@redhat.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <bc28ca3e-6ccd-4d43-8a51-eb4563a6ed06@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 25/04/2025 11:36, Ivan Vecera wrote:
->>> +    const: 0
->>> +
->>> +  dpll-types:
->>> +    description: List of DPLL channel types, one per DPLL instance.
->>> +    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
->>> +    items:
->>> +      enum: [pps, eec]
->>
->> Do channels have other properties as well in general?
-> 
-> No, other characteristics should be deducible either from compatible or
-> in runtime.
-> 
-OK, with fixes in commit msg:
+On Fri, 25 Apr 2025 13:26:25 +0800
+Chen-Yu Tsai <wens@csie.org> wrote:
 
+Hi Chen-Yu,
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> On Thu, Apr 24, 2025 at 6:09=E2=80=AFPM Yixun Lan <dlan@gentoo.org> wrote:
+> >
+> > Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
+> > including the A527/T527 chips. MAC0 is compatible to the A64 chip which
+> > requires an external PHY. This patch only add RGMII pins for now.
+> >
+> > Signed-off-by: Yixun Lan <dlan@gentoo.org>
+> > ---
+> >  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 40 ++++++++++++++++++=
+++++++++
+> >  1 file changed, 40 insertions(+)
+> >
+> > diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm6=
+4/boot/dts/allwinner/sun55i-a523.dtsi
+> > index ee485899ba0af69f32727a53de20051a2e31be1d..c9a9b9dd479af05ba22fe9d=
+783e32f6d61a74ef7 100644
+> > --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> > +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+> > @@ -126,6 +126,15 @@ pio: pinctrl@2000000 {
+> >                         interrupt-controller;
+> >                         #interrupt-cells =3D <3>;
+> >
+> > +                       rgmii0_pins: rgmii0-pins {
+> > +                               pins =3D "PH0", "PH1", "PH2", "PH3", "P=
+H4",
+> > +                                      "PH5", "PH6", "PH7", "PH9", "PH1=
+0",
+> > +                                      "PH14", "PH15", "PH16", "PH17", =
+"PH18";
+> > +                               allwinner,pinmux =3D <5>;
+> > +                               function =3D "emac0";
+> > +                               drive-strength =3D <40>; =20
+>=20
+> We should probably add
+>=20
+>                                   bias-disable;
+>=20
+> to explicitly turn off pull-up and pull-down.
 
-Best regards,
-Krzysztof
+Should we? I don't see this anywhere else for sunxi, probably because it is
+the (reset) default (0b00).
+I wonder if we have a hidden assumption about this? As in: if no bias is
+specified, we assume bias-disable? Then we should maybe enforce this is in
+the driver?
+
+Cheers,
+Andre
 
