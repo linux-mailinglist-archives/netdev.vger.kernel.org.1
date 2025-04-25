@@ -1,127 +1,81 @@
-Return-Path: <netdev+bounces-186041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D04CA9CDFA
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0283FA9CE17
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:27:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D491E1BC8093
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:23:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A56051896172
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA30198E9B;
-	Fri, 25 Apr 2025 16:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F3719D88B;
+	Fri, 25 Apr 2025 16:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKK0amiM"
 X-Original-To: netdev@vger.kernel.org
-Received: from caffeine.csclub.uwaterloo.ca (caffeine.csclub.uwaterloo.ca [129.97.134.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85F514F9EB;
-	Fri, 25 Apr 2025 16:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.97.134.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF7618C008;
+	Fri, 25 Apr 2025 16:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745598169; cv=none; b=DAd8YK4Zcan6x+psg9ByCOMa451Bvjs9ZiXhbAtv6o6GjbdKL3llSzrnLYH4QW+Mkf/e09e4Z/x2Z/Z2i+dZ78EGUwrbLD2P5B/KdHl6rk+y/PTTpAvCF1iAVuCmdHOf3a6Wzky7mpO5wbgMIUg+eB5Xadp88AXkGvOdur+nK30=
+	t=1745598353; cv=none; b=MwPiYwXynkzgDRyyaaiVJwL4Tsh/OiCCvrRYWgPBk2qoQhru8LHgzENw6SQr3f+cHWj8/fACdqEDaEAgyW+zEbXV85LiwkloHySqvA0xTcbUFkpfRmZyjNqXOFIMUJdlzHv1Ecv8ksxjysN/rc6avDaGqvlDiGqp6U0qrEfT8rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745598169; c=relaxed/simple;
-	bh=IBGf9HERTYTA0SschADqKfc+VU/xdv9jMJ6ICrEjo1o=;
-	h=Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To:From; b=GhGjLu/k8P9tuILTylNGBl/hLOdkTGm4n6oQe7le/kHNoemuYJDxKPN4uGXEqrz14g+H6abLnh1uFOjsNFhlM/uOlPgC7Vgxgy2EolJpPS1O2DI8LD5tswmp6hEImsDyWoiuUFrG8ah+HRpvHq7Z0SNFDAHSoDLkP3AQ5cccE8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca; spf=pass smtp.mailfrom=csclub.uwaterloo.ca; arc=none smtp.client-ip=129.97.134.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=csclub.uwaterloo.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csclub.uwaterloo.ca
-Received: by caffeine.csclub.uwaterloo.ca (Postfix, from userid 20367)
-	id 34A7C460021; Fri, 25 Apr 2025 12:22:38 -0400 (EDT)
-Date: Fri, 25 Apr 2025 12:22:38 -0400
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>
-Subject: Re: Fix promiscous and multicast mode on iavf after reset
-Message-ID: <aAu2zoNIuRk-nwWt@csclub.uwaterloo.ca>
-References: <aAkflkxbvC8MB8PG@csclub.uwaterloo.ca>
- <8236bef5-d1e3-42ab-ba1f-b1d89f305d0a@intel.com>
+	s=arc-20240116; t=1745598353; c=relaxed/simple;
+	bh=+MHpsA31/1SvOXWGOB0ffKLDsT1w+DA4iOk/aNaBbbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cBFlItN6yQDKSYWXkcP17LnDm928d3lEwOcK640mzkSMT8x2CqT05b4TGA7JWuv1PY5ZsICIfDfN81CscKy0OPT5OvNjbeZRLPfG3l8Waj82M2iypHduZy9EwwOpykcJ5bOds1w/eyDehxT4Zc7M7sZB4GvV4hqUrhH50/HusmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKK0amiM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD55C4CEE4;
+	Fri, 25 Apr 2025 16:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745598352;
+	bh=+MHpsA31/1SvOXWGOB0ffKLDsT1w+DA4iOk/aNaBbbw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TKK0amiMFc7AlVXkKZkdfL1qP70rb9ItU3i6bxLQESV/o+rYBu5Bku/wuzNfsJ+fN
+	 yJNiu5KYpJOrmPpatTttewPgzZIYsZlI1DefxfivhLkuoxCLhUvzAXnTr28GLW2ujb
+	 BUIS6LwJ+YNODuE69XMzST/gfbHK75TENi0KXNkRL3mE5ndS/1PFTBNHoL1I0urWjJ
+	 vYhgMJB6t9vVKgMvqevVrTXVyRPZ4g6Yb/RuY1hU22KAY7O4CC3NJfsRFxwtBfClmK
+	 KPI/yfcoNI4rJ0ZGoqhX9GvArz3AFiQZ7/O7Wnje5cYXUXUC9LAwgiqCpPUEgdqUKQ
+	 10JccavhvMyIw==
+Date: Fri, 25 Apr 2025 09:25:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>, Christopher Hoy
+ Poy <choypoy@linuxfoundation.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ patchwork-bot+netdevbpf@kernel.org, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf
+ <bpf@vger.kernel.org>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, Network
+ Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH 0/3] selftests/bpf: Fix a few issues in arena_spin_lock
+Message-ID: <20250425092551.2891651d@kernel.org>
+In-Reply-To: <20250424-imported-beautiful-orangutan-bb09e0@meerkat>
+References: <20250424165525.154403-1-iii@linux.ibm.com>
+	<174551961000.3446286.10420854203925676664.git-patchwork-notify@kernel.org>
+	<CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
+	<20250424-imported-beautiful-orangutan-bb09e0@meerkat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8236bef5-d1e3-42ab-ba1f-b1d89f305d0a@intel.com>
-From: Lennart Sorensen <lsorense@csclub.uwaterloo.ca>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 02:59:38PM -0700, Jacob Keller wrote:
+On Thu, 24 Apr 2025 14:51:51 -0400 Konstantin Ryabitsev wrote:
+> > Hmm. Looks like pw-bot had too much influence from AI bots
+> > and started hallucinating itself :)  
 > 
-> 
-> On 4/23/2025 10:12 AM, Lennart Sorensen wrote:
-> > I discovered that anything that causes a reset in iavf makes breaks
-> > promiscous mode and multicast.  This is because the host side ice
-> > driver clears the VF from filters when it is reset.  iavf then correctly
-> > calls iavf_configure, but since the current_netdev_promisc_flags already
-> > match the netdev promisc settings, nothing is done, so the promisc and
-> > multicast settings are not sent to the ice host driver after the reset.
-> > As a result the iavf side shows promisc enabled but it isn't working.
-> > Disabling and re-enabling promisc on the iavf side fixes it of course.
-> > Simple test case to show this is to enable promisc, check that packets
-> > are being seen, then change the mtu size (which does a reset) and check
-> > packets received again, and promisc is no longer active.  Disabling
-> > promisc and enabling it again restores receiving the packets.
-> > 
-> > The following seems to work for me, but I am not sure it is the correct
-> > place to clear the saved flags.
-> > 
-> > diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> > index 6d7ba4d67a19..4018a08d63c1 100644
-> > --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> > +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> > @@ -3233,6 +3233,14 @@ static void iavf_reset_task(struct work_struct *work)
-> >  		iavf_shutdown_adminq(hw);
-> >  		iavf_init_adminq(hw);
-> >  		iavf_request_reset(adapter);
-> > +
-> > +		/* Clear remembered promisc and multicast flags since
-> > +		 * reset clears them on the host so they will get force
-> > +		 * applied again through iavf_configure() down below.
-> > +		 */
-> > +		spin_lock_bh(&adapter->current_netdev_promisc_flags_lock);
-> > +		adapter->current_netdev_promisc_flags &= ~(IFF_PROMISC | IFF_ALLMULTI);
-> > +		spin_unlock_bh(&adapter->current_netdev_promisc_flags_lock);
-> >  	}
-> >  	adapter->flags |= IAVF_FLAG_RESET_PENDING;
-> >  
-> > 
-> 
-> We probably need to do something similar in the flow where we get an
-> unexpected reset (such as if PF resets us by changing trusted flag or
-> other state).
-> 
-> I don't think there's a better solution. Arguably the PF shouldn't be
-> losing data, but I think its a bit late to go that route at this point..
-> Its pretty baked into the virtchnl API :(
+> I'll look into what happened here.
 
-Yeah I can see arguments that calling reset should put everything in a
-known state so the VF driver can configure things as it wants, but since
-reset is also used when tx hang happens or mtu changes and various other
-things, it is definitely inconvinient.  Changing behaviour with an API
-version change seems ugly too and you would still have to support the
-old API anyhow.  I suppose having a reset fully to defaults and a soft
-reset to change settings but keep other values could have been nice,
-but a bit late now.  Some VF drivers may even be depending on the reset
-putting everything to defaults.
-
-If someone that knows the driver better can make a complete fix that
-would be great.  So far this small change appears to be working but I
-could certainly have missed some cases.  It took quite a bit of debugging
-to discover why promiscous mode on the VF side was so unreliable and
-unpredicable.  Due to the somewhat asynchrounous message handling,
-sometimes the reset would not happen until after the promisc setting
-had been applied, and then it was silently lost, while other times it
-would do the reset quicker and then the promisc setting would work.
-Very confusing to debug.
-
--- 
-Len Sorensen
+Alexei mentioned that the bot was stopped, I presume to avoid further
+mistakes. I'm 100% sure I've seen the bot be confused by merge commits
+before. It happens occasionally, IMHO there is no need to take the bot
+offline. Is there an ETA on it coming back?
 
