@@ -1,113 +1,143 @@
-Return-Path: <netdev+bounces-185886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F98AA9BFE1
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:38:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DA5A9BFE7
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2F604A7EE2
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:38:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4C74189C907
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3625222F147;
-	Fri, 25 Apr 2025 07:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3F022F169;
+	Fri, 25 Apr 2025 07:39:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Q/JwLOu4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIqPnwAB"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FD922F14C
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 07:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77BAA29;
+	Fri, 25 Apr 2025 07:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745566721; cv=none; b=PQ59FKoc3FADGMuHlbrWF6wyK51oQqtXqivBCn7wsTUTmaLcAAzHIYZCur9+IOA+aqZB4pq+kOMiUxDqn/qlGeKjzz/fUejt4D++H4IXX6QJcPmJDz0BU4MyZoiwoQq5ebYmA0ekqm61p6hBo/ZXVct1+cxhSuhNFcBVzetRhc4=
+	t=1745566759; cv=none; b=g2u5ibeMR/iCTeLSvtd89ds5p3/HCnyB2j9gp3DIYvPDA/fgwiWyJzLjmZHAcw9/6y9QcEsfg4PKCXyRxowNYTRmtP72UofmhkD7GOZGhRLJ/l3gP8AQaPBMuX2RdJ2lOfqXsO9f3q8oz83ihjbx78aGcNn/46XoXrXDJmfkxgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745566721; c=relaxed/simple;
-	bh=yA0sJhCwU1Fo3Rydf9UbrESbZdQixsOIUV4z9O2yYnc=;
+	s=arc-20240116; t=1745566759; c=relaxed/simple;
+	bh=365b8kbH3MeVvxk2IpLZYYDk1QJJ8xBLvr9s5A7tcMs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C8YOWSn0x3IO6H3a31zVg6WoeujgeGoNOzgaBs1oPuKD5fM5sFPoULhJjrFycbmm1+5UluQRz97JqmOe6mgn3RCKHO15y+/1U0F+mhlsE2wDi0PYwLTn3wIOkEWWTYzu95zV48qCKBCDrK9D0Pw4tx7cerx+wo7P0oM//syBS6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Q/JwLOu4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=96HrW++5XZF+Xjd00m6CIyxaVsJKpJPNoWDLaZ5v6Js=; b=Q/JwLOu4OLcaWwuyXaJkQ/li/I
-	Gp6Zhbtv3q5FZ0iqPlokbRpHcTBAMKR1bREbJtb60cQ1VrOs0HgkfIUatsB0VyF3dolkFTxU+tImT
-	fFhZVJlykV9hJGjtz7vo4qT8uwf4nd6Gx0gy93bNSQmfNgTyJGPc5/hznBlCfO3B8GBvQEN2veb8R
-	eEUWy/SmzihPhKogWBIurCGxRqhONIB+xp0t7cG4tPBbWLzRmg4CqL5/mzD7KLxXjjLTOTv0tWvAe
-	408pakIFSp3oXzuvgIxF0cqRsDtPqepdFqtzQtuL1sz3hEAdR32PPPDIm8PW5fB/GVya6b5a5kbUw
-	ANc/rjVA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33358)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u8Ddo-0008Q7-32;
-	Fri, 25 Apr 2025 08:38:33 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u8Ddl-0001wu-2W;
-	Fri, 25 Apr 2025 08:38:29 +0100
-Date: Fri, 25 Apr 2025 08:38:29 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net] net: libwx: fix to set pause param
-Message-ID: <aAs79UDnd0sAyVAp@shell.armlinux.org.uk>
-References: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZaJKd2coskRkf+8cA9LTxiKQm3uaaWeRmmcKKepQiIGm15Nv5zEgoVqcpARszH0PHVUp7LuPFpt+AS4bNZgjYdpVGY0E1EvttcvCwGkWIcm4Z692QpZo95Ilpj2m8tXkVVRzFnPNq5CA47ObvdA8eqFLQZeVdfuC41Fb6w6+Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIqPnwAB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899E6C4CEE4;
+	Fri, 25 Apr 2025 07:39:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745566759;
+	bh=365b8kbH3MeVvxk2IpLZYYDk1QJJ8xBLvr9s5A7tcMs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aIqPnwAB27l0ZmSsBK2JErBzaZS637ACmaawT7PMVMH6S9cayH0pxZvQuScRqS5wi
+	 wfUikJCJ2UoLQsebs9nQTVZqdsiEJMsuZV5TAr+fHFL82+P9v8ac0yU9Z7+VrCQRLG
+	 DJ60WgspGx8UFZo3Usdp1sKuaycrfb+d9MX2NrpBqeAyGFdLaKLq5YdwoMFtmLyBg6
+	 scfz8g8aZAGYfrUqiIO9b7rF/wJCEUUQ8YZPTvtQPM9AfC9vhPcCOmpACCav20azes
+	 huMXUllbjkbEtEvgI++CdTidCgUCwpQjpms8OhSK3SUNBcgD0v+WnUZd2zZYlOM4ow
+	 DoAh/qyvil7Gw==
+Date: Fri, 25 Apr 2025 09:39:16 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>, 
+	Andy Shevchenko <andy@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v4 1/8] dt-bindings: dpll: Add DPLL device and
+ pin
+Message-ID: <20250425-manul-of-undeniable-refinement-dc6cdc@kuoka>
+References: <20250424154722.534284-1-ivecera@redhat.com>
+ <20250424154722.534284-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250424154722.534284-2-ivecera@redhat.com>
 
-On Fri, Apr 25, 2025 at 03:09:42PM +0800, Jiawen Wu wrote:
-> @@ -266,11 +266,20 @@ int wx_set_pauseparam(struct net_device *netdev,
->  		      struct ethtool_pauseparam *pause)
->  {
->  	struct wx *wx = netdev_priv(netdev);
-> +	int err;
->  
->  	if (wx->mac.type == wx_mac_aml)
->  		return -EOPNOTSUPP;
->  
-> -	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
-> +	err = phylink_ethtool_set_pauseparam(wx->phylink, pause);
-> +	if (err)
-> +		return err;
+On Thu, Apr 24, 2025 at 05:47:15PM GMT, Ivan Vecera wrote:
+> Add a common DT schema for DPLL device and its associated pins.
+> The DPLL (device phase-locked loop) is a device used for precise clock
+> synchronization in networking and telecom hardware.
+> 
+> The device includes one or more DPLLs (channels) and one or more
+> physical input/output pins.
+> 
+> Each DPLL channel is used either to provide a pulse-per-clock signal or
+> to drive an Ethernet equipment clock.
+> 
+> The input and output pins have the following properties:
+> * label: specifies board label
+> * connection type: specifies its usage depending on wiring
+> * list of supported or allowed frequencies: depending on how the pin
+>   is connected and where)
+> * embedded sync capability: indicates whether the pin supports this
+> 
+> Check:
+
+This does not belong to commit msg. You do not add compile commands of C
+files, do you?
+
+Whatever you want to inform and is not relevant in the Git history
+should be in changelog part.
+
+
+> $ make dt_binding_check DT_SCHEMA_FILES=/dpll/
+>   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+> /home/cera/devel/kernel/linux-2.6/Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
+>   CHKDT   ./Documentation/devicetree/bindings
+>   LINT    ./Documentation/devicetree/bindings
+>   DTEX    Documentation/devicetree/bindings/dpll/dpll-pin.example.dts
+>   DTC [C] Documentation/devicetree/bindings/dpll/dpll-pin.example.dtb
+>   DTEX    Documentation/devicetree/bindings/dpll/dpll-device.example.dts
+>   DTC [C] Documentation/devicetree/bindings/dpll/dpll-device.example.dtb
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+> v3->v4:
+> * dropped $Ref from dpll-pin reg property
+> * added maxItems to dpll-pin reg property
+> * fixed paragraph in dpll-pin desc
+
+...
+
 > +
-> +	if (wx->fc.rx_pause != pause->rx_pause ||
-> +	    wx->fc.tx_pause != pause->tx_pause)
-> +		return wx_fc_enable(wx, pause->tx_pause, pause->rx_pause);
+> +properties:
+> +  $nodename:
+> +    pattern: "^dpll(@.*)?$"
+> +
+> +  "#address-cells":
+> +    const: 0
+> +
+> +  "#size-cells":
+> +    const: 0
+> +
+> +  dpll-types:
+> +    description: List of DPLL channel types, one per DPLL instance.
+> +    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+> +    items:
+> +      enum: [pps, eec]
 
-Why? phylink_ethtool_set_pauseparam() will cause mac_link_down() +
-mac_link_up() to be called with the new parameters.
+Do channels have other properties as well in general?
 
-One of the points of phylink is to stop drivers implementing stuff
-buggily - which is exactly what the above is.
+> +
+> +  input-pins:
+> +    type: object
+> +    description: DPLL input pins
+> +    unevaluatedProperties: false
 
-->rx_pause and ->tx_pause do not set the pause enables unconditionally.
-Please read the documentation in include/uapi/linux/ethtool.h which
-states how these two flags are interpreted, specifically the last
-paragraph of the struct's documentation.
+Best regards,
+Krzysztof
 
-I'm guessing your change comes from a misunderstanding how the
-interface is supposed to work and you believe that phylink isn't
-implementing it correctly.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
