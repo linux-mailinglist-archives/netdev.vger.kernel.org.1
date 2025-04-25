@@ -1,56 +1,98 @@
-Return-Path: <netdev+bounces-185872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5787CA9BF60
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:13:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D802A9BF61
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BAA09A3C5A
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0683C9A3E9B
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B9F22DFAC;
-	Fri, 25 Apr 2025 07:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B53B22F75A;
+	Fri, 25 Apr 2025 07:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnbQwrdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B19E22A4E3
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 07:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A2E22D78E;
+	Fri, 25 Apr 2025 07:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745565107; cv=none; b=TVFOoXmoEgZzOzPAjDQJ6xpb+JXTXmg5B8/Aeh089ffZdvwcE19AIHB2ovebLF15SssM/dIRG0QLt/bjOIrySsTu2Z/d0Go6BHqhncy7QHiBkKF81nCshy5qDtw9s2pLCyPItARHWkiLVIDDHVSiAvStdyPrTpEt6DVdQKC+DTc=
+	t=1745565108; cv=none; b=qn9i95OBka/hzJC08sOEIXwXzHbK2gfLxDDkdRqSWhqJ5nMmMH4KgxE9K8A1M6u8SLhcPMtrGwUtf5lc4f29+qkgbr627/KIpHLGFOEibMvYWYYuwiCkee9B7fXCCDURCRwNU4hDY0hj4ZS8ruRCW9bFKJm67G2uTXNpR41cwfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745565107; c=relaxed/simple;
-	bh=/VgUpElTEeiMK3Ipm1SRCKDAY2vrmfOJRPBvkhluAbQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qjLAOQ1Y6hTnlYxpC2u0ZUbXPreDPERa4j5iCZY8CqcEyiJnfrOLr3v5lmfvEa1TrK1nP7lpU/fpOQ1WjYeozH4za1eFbR/45LiJ+hXCpjqHs+Es5X6r7YI+WW7fo4HCTsz6lVyAO3zNKGEuXHSQym+0LgjDzN9nUFQ/nVhTAQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz3t1745565000t2dcf1c2c
-X-QQ-Originating-IP: FTT8rHwW0iN6pfzbYBaRZ9DrTN8AwJNK8lkUymn+tQs=
-Received: from w-MS-7E16.trustnetic.com ( [36.24.188.93])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 25 Apr 2025 15:09:49 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 9025048391018927750
-EX-QQ-RecipientCnt: 9
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	linux@armlinux.org.uk,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net] net: libwx: fix to set pause param
-Date: Fri, 25 Apr 2025 15:09:42 +0800
-Message-ID: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1745565108; c=relaxed/simple;
+	bh=0Ze69pOVYWCyP97tOm2XndYB5S6jNW2pRESISwXWI0k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l/AikElsumgN1jWUQ4aqh5s5+QOo/uIBSPMkHsc/GWR8eeKA8NCplBd61JxPDGo75uj5a4wJOxx7lezouK4PBp+hnhjsjv73cu2iIN7kJ4wHrsnynLGUlRgicmVN36mWlfXGZS72i3PmGROnEPl0NayXg+5Q5aY1bIVaDzGk89A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnbQwrdA; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22435603572so22393445ad.1;
+        Fri, 25 Apr 2025 00:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745565106; x=1746169906; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GtMjqZ/Ns16pRT8iEFKMxWMmeC23SEmlGerRJL9o71w=;
+        b=MnbQwrdA+Moir3XKQS4N44NIcn9AZCusm7SVxLQoQUZe03ftdgNgssR0OTlOKhTDqd
+         8k5ySkWyAOLOmKRlFc0+9gE2nE3Lk+VBr287C+5bULn3fFE/X5kC4u52sJ1sYo1DMCgO
+         06rLUEVX1chG8kOPA363CkTPJm7GLFXT1c+3PD18/UX4WlZFIeeEGOVzP9dWP4swsvjD
+         o0lSP5A9MwwXZKPjNLTQcdLS/3p6tx2os6f0RMwicuqcs0tf54D2gq93/Rz50Qk8GQ72
+         31alYF9rWemhLtOtEMSQAS5jxdwAszUoDLaadXU6ySLUo9ynnq4N2gHO4eLqTR3yBG74
+         aJEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745565106; x=1746169906;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GtMjqZ/Ns16pRT8iEFKMxWMmeC23SEmlGerRJL9o71w=;
+        b=ayOmzZxZAizXGRnHCRNyxNwd8KD5vh0ao9G6h72kbOl/WHR8/hoj33lvFnK2AuXaSM
+         TgJXnJkwYrcgiSSTCTBbNKmSGtBt07VyRiZoUdN9KJAD9iMHOrPhA3quTxC6t/2ZQRi6
+         i51ZAqDynh8FLfNuSJZNNB3HBX8fj0SAa3CorhUKZRN5Fm+CIZBM/sqozaTwwp3VXoOy
+         03xGALQwJ2qF8XvGiayVlrbUu1tvyyyp0qcq8wyDDhGjyZVG6TZvLskQGZqFnkszu9hz
+         0egu04WkfKE/5GbTPb93g8hHU+WjArp/tM7NZwVwDoWUT9EzDEM9e3lHY5zpzPhIHLBp
+         PaoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUjwJ/vy/5MclavzLY1Iv90vP1zcifY02jy7PB48moyOYHsjym+U/Gp87mcrWP88lYuYktEre1Q@vger.kernel.org, AJvYcCVoa3rAEXVzHRF5TKwZsMyYJdMgoQcwriaf7abb4/duPAWpTNlX8FwLOWpvodiXum+147VEvyx0I36rlHcG@vger.kernel.org, AJvYcCWMnR+xfRssR6dxvyZ3yGRkwTYJljBEgAO6jtoCAuIFkb4qSIOQwJtMUMt1WUUlh5euJ3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV6MMpUqTwcb25mez7CIZk+Y4GB+UronUgDoEtMPdC1lmKwTT8
+	TCaTLEeVskEtYa7tXQZ3PSqOtU68x9ehtI0AwTJ7BcSnQhRR1ur5Pa0eJDpgvog=
+X-Gm-Gg: ASbGncvxpSt6fup6mg560Z+UL5Vdvl8K3ZSFYN+iQoRdGRkU0Xw2oveqOOctUMIj7i+
+	RQTaVa9+0A/VnJsqy5UMjLWXiEsx7z0Mf1BnuhMhXgq7C1H7DDzYW8nT7otxaPYjeE94SeKG7d6
+	eOgrFbhOfj5Xeu0Ms5trl3VZRWK+gzu8skHdm7Dl3NfhFgzJinbEHZIuwLSCXXQQWqguxe1RVsq
+	5PvbpHjCmptNb7ih55Gdxbux7/C6J4r1TID4ex3WOd03BZ9jHnX0Jr6CBoQ5Oge9eQl+5ZBakA7
+	Ahnt9xhi+pNvPPEGXpULKRihAiCyvl/2sEnAampHby71lezvpsestmuk
+X-Google-Smtp-Source: AGHT+IHQBCORaP5MawLRFbQfek2IOmsMsFyZUNMLFw+FlPP4B+F/1Z2uUqZZUzD+g/PLxtZRDST5rQ==
+X-Received: by 2002:a17:902:fc50:b0:224:1781:a950 with SMTP id d9443c01a7336-22dbf5ebe7amr20344645ad.14.1745565105709;
+        Fri, 25 Apr 2025 00:11:45 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:1c5b:42af:3362:3840])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-22db51028basm25322425ad.196.2025.04.25.00.11.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 00:11:45 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: virtualization@lists.linux.dev
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH v6 0/4] virtio-net: disable delayed refill when pausing rx
+Date: Fri, 25 Apr 2025 14:10:14 +0700
+Message-ID: <20250425071018.36078-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,93 +100,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NhdiEwnVOUqEj+JixI75sdGEMN6TCsLgBe0dQAjlY0vYG55CjLooSNK9
-	XMeOzimqOKbiU+R3cs7O7O+aQvKI0IeGqqKHJun1WCXPHa1KY7EIBOxKj1HG9jRyVvaSquG
-	XUIhwostVEPSxDB4ks0ghWEuZteqdqirJhacPUanEvWzuK49t+bzJE6Uv1XcSwENu9JJDXX
-	IrCAKmnucKAm0zdfGcb2R2QuPZfxvA+03vLjITkiEwPDeCy/dY/wzQHPIrbyiUcQvRjREAG
-	HV6608blEV1LN9BLmLyz7WQrAgcGk3kEaN7kY3zwHReEgVpB8Jzyu8FKRTFMkc2L7PQYsAz
-	lz4zLHy0ZPKqbXBemwuPN8iihBq3y10sfv9qcEBA2P9JJ1sH0yef6eGYXJQWWFJo6RH7lsp
-	5zdkRKPtkVsyEGl941xoLvlHcU2vti2Xekk+s12ogkilsVWuRNlcPO5nhNbsITKj85FWcl7
-	DgmI+m2vaX/JzyEjJUht8NqsTiALMopuM5McxZ6xlxnpExWFZpCndJN7DTUP92CvkIc0KXr
-	Rh1jtmwTIrI0By07hzw+qOdzx+1GKSS8kU7qoMRdoosG65SayLe1rPerzHLHYt/F9SfQYQd
-	XvECzZS2IslEKdCSmN1Cy6bX9WEgrJDclljlUI9PXxC1Alq8C2PXYBGTbhzXgKGeJFzLQO7
-	gA81Ilz4F3RuXIjxTOcgZAauj5sF4ssXAITZ1RtiuwWbMmi5mGHlO5rC4yQxvZihjfrsDOZ
-	vMr193PLvdHRxKdNtb4Ti8RQzUKsgr+xqJDlrG8fbC6zb+3JG7pY+V9IrWwxPhbLuJY7mNZ
-	l8D+RRQmbVFGIWVZjnxoNDiTUoTJILfWayl0xdNFepFg8z8sKBpilv/5mAib+run0h34rIm
-	dNJtsSNr2elPqCn138eufJT3RMIa1yOCbCVT7YFNMOIzZeb3m2f4Wpk/86ldCNJqiLiyPSL
-	oYBZgU+KVZzvIdXOSw+mDolJhI3fP9WckpFzNPhcKpw/s9x8UCJms0pzHo2xtDWeOyZ5JEG
-	+LoBczL05uEPl+bcGs
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
 
-For some interfaces like PHY_INTERFACE_MODE_10GBASER, no link events
-occur when the manual pause modes are changed. So add extra judgment to
-configure the MAC.
+Hi everyone,
 
-Fixes: 2fe2ca09da95 ("net: wangxun: add flow control support")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c | 11 ++++++++++-
- drivers/net/ethernet/wangxun/libwx/wx_hw.c      |  3 +++
- drivers/net/ethernet/wangxun/libwx/wx_type.h    |  2 ++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+This only includes the selftest for virtio-net deadlock bug. The fix
+commit has been applied already.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 43019ec9329c..1b4f97ecee4a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -266,11 +266,20 @@ int wx_set_pauseparam(struct net_device *netdev,
- 		      struct ethtool_pauseparam *pause)
- {
- 	struct wx *wx = netdev_priv(netdev);
-+	int err;
- 
- 	if (wx->mac.type == wx_mac_aml)
- 		return -EOPNOTSUPP;
- 
--	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
-+	err = phylink_ethtool_set_pauseparam(wx->phylink, pause);
-+	if (err)
-+		return err;
-+
-+	if (wx->fc.rx_pause != pause->rx_pause ||
-+	    wx->fc.tx_pause != pause->tx_pause)
-+		return wx_fc_enable(wx, pause->tx_pause, pause->rx_pause);
-+
-+	return 0;
- }
- EXPORT_SYMBOL(wx_set_pauseparam);
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index aed45abafb1b..2a56c9fdb3e8 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -2450,6 +2450,9 @@ int wx_fc_enable(struct wx *wx, bool tx_pause, bool rx_pause)
- 			wx_disable_rx_drop(wx, wx->rx_ring[i]);
- 	}
- 
-+	wx->fc.rx_pause = rx_pause;
-+	wx->fc.tx_pause = tx_pause;
-+
- 	return 0;
- }
- EXPORT_SYMBOL(wx_fc_enable);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 4c545b2aa997..b1c6483c485a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1067,6 +1067,8 @@ enum wx_isb_idx {
- struct wx_fc_info {
- 	u32 high_water; /* Flow Ctrl High-water */
- 	u32 low_water; /* Flow Ctrl Low-water */
-+	bool rx_pause;
-+	bool tx_pause;
- };
- 
- /* Statistics counters collected by the MAC */
+Link: https://lore.kernel.org/virtualization/174537302875.2111809.8543884098526067319.git-patchwork-notify@kernel.org/T/
+
+Version 6 changes:
+- Rebase on net-next and resolve conflicts
+- Move the retry logic to xdp_helper
+
+Version 5 changes:
+- Refactor the selftest
+
+Version 4 changes:
+- Add force zerocopy mode to xdp_helper
+- Make virtio_net selftest use force zerocopy mode
+- Move virtio_net selftest to drivers/net/hw
+
+Version 3 changes:
+- Patch 1: refactor to avoid code duplication
+
+Version 2 changes:
+- Add selftest for deadlock scenario
+
+Thanks,
+Quang Minh.
+
+Bui Quang Minh (4):
+  selftests: net: move xdp_helper to net/lib
+  selftests: net: add flag to force zerocopy mode in xdp_helper
+  selftests: net: retry when bind returns EBUSY in xdp_helper
+  selftests: net: add a virtio_net deadlock selftest
+
+ .../testing/selftests/drivers/net/.gitignore  |  1 -
+ tools/testing/selftests/drivers/net/Makefile  |  1 -
+ .../testing/selftests/drivers/net/hw/Makefile |  1 +
+ .../selftests/drivers/net/hw/xsk_reconfig.py  | 60 +++++++++++++++++++
+ .../selftests/drivers/net/napi_id_helper.c    |  2 +-
+ tools/testing/selftests/drivers/net/queues.py |  4 +-
+ tools/testing/selftests/net/lib/.gitignore    |  1 +
+ tools/testing/selftests/net/lib/Makefile      |  1 +
+ .../selftests/{drivers/net => net/lib}/ksft.h |  0
+ .../{drivers/net => net/lib}/xdp_helper.c     | 39 +++++++++---
+ 10 files changed, 98 insertions(+), 12 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_reconfig.py
+ rename tools/testing/selftests/{drivers/net => net/lib}/ksft.h (100%)
+ rename tools/testing/selftests/{drivers/net => net/lib}/xdp_helper.c (78%)
+
 -- 
-2.48.1
+2.43.0
 
 
