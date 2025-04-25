@@ -1,159 +1,140 @@
-Return-Path: <netdev+bounces-185945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FDC3A9C3F3
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:41:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411F3A9C3FD
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01554C0A58
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:40:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE5851BC18FA
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C58023816A;
-	Fri, 25 Apr 2025 09:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127D023D29B;
+	Fri, 25 Apr 2025 09:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ohb2vKZW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZuiHaRb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A23A234963
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 09:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4672367A7;
+	Fri, 25 Apr 2025 09:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745573972; cv=none; b=OQWIPgesg8fCZ8+5XvfuncV4mXBmE+yw1zv8ygTdTtGTvUTB7BfOCCeOjioV1Fj9I8xiDGeIz52vn7Qoxs/INZrc+j6dKjNlIMDYnFvMunWeTipT8xMy9NksVtfH+rq5Qq51yWA+CmpQov+yPbhFjYJuwlvfWTN/Rc6UrKvtQqs=
+	t=1745574009; cv=none; b=rQT5eOMKrhXqTZNDDwVNMWJAOQwQ4ou/0+3Gs80x4+jgi3oAQaU/2mSjsnVBny1ht0Ni9H+yICNmqMGD4vqVUQobJk5tHBTr0mL313LPtB8rTmgvMvXC84DQf1OyBoTsE5toiluDj1DLVl7oGHz8k/vGWoIQJADRC3sx4RCbDm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745573972; c=relaxed/simple;
-	bh=x00ZgavTUTd8JDWTuQ3OYrQ8FYmxZ/6+MWDuRtYc4Yg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUgv3wv9c9gWKnr19zEfrOYJiXszQudfe3+kfemHhFquEse6GDx/qJGZeoOEfukMi8vFe8ehCMOjedU8CgMe0bWnf1CyMgXaZqgN/F7u5Wm/wYBVbMShWjIsytselEGOiMXZDxOJGh6M9sUdyGQ5Ku2beVOdiCwtSoynnsUxDdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ohb2vKZW; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cMLaFvXcWXuTBR4NwXGmCaGGLldk3zZ3VujAXnG9fJg=; b=ohb2vKZW8aTeYrgqVQClwJoS3U
-	8gzNnA5Kfv5mbW7f5HCeOycPQr2POY/tRp6K2en4wAnDUI8JbSAckOKrpI1bQfZzctP2zPE61a+YF
-	CrC5McPe0mADrfQ3ll2pVb9IsuGRSx7ixGw658TTEQBdUSJV4ash5kegRRZm2G1w+r+6khjtrNI9Y
-	6qXE9B/od96t/iTDVVYV+MYqvQJKeGLcCzu4OejVyf6rOPe0pPcbPker0q1tWSElyRbrHhIPws7Un
-	IW38zhlWpvZeYBbNmj4fd5l00N6Yo7/iNxPc2R7kLCTFepbKZ+1GI1x/Wj1OFO7f+b6xVN7ni1FpF
-	+nRV0sdw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50656)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u8FWo-000076-2s;
-	Fri, 25 Apr 2025 10:39:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u8FWm-00022D-2Y;
-	Fri, 25 Apr 2025 10:39:24 +0100
-Date: Fri, 25 Apr 2025 10:39:24 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net] net: libwx: fix to set pause param
-Message-ID: <aAtYTPuCI6Ur-9ye@shell.armlinux.org.uk>
-References: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com>
- <aAs79UDnd0sAyVAp@shell.armlinux.org.uk>
- <046701dbb5c3$58335190$0899f4b0$@trustnetic.com>
+	s=arc-20240116; t=1745574009; c=relaxed/simple;
+	bh=bRt7XPKW9i4BWzArQjxLQ2RfDMPwgG+tmEWHd6D3ajI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TRO5Cp3ntuTKVWy4+/3C95YChSTFCzhvpWjo/Ge+6YdynIt58LUznEtqH02hk83eh4RgNUOq76BYUKBz3+KO1M4AHhjzZNKbEgC53HhplHLr9MGJxypJ5Ua/8Axe01aCxXE+c9z9T2DiamcJHYJaFdyE7WCDqezBiB6FLdrw1nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZuiHaRb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837FBC4CEE4;
+	Fri, 25 Apr 2025 09:40:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745574008;
+	bh=bRt7XPKW9i4BWzArQjxLQ2RfDMPwgG+tmEWHd6D3ajI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nZuiHaRbDlUTqyFAqPsUzi1F8HUScC4uS7RvpJF2RFS/xE4CWj9pYCv22a/5YVyLV
+	 Jz/5NAXlZ85976ozWoGeK6ridZlApAsxQR9+GqiC5BTt83aqV6jp1yYLowI8Zu5oOH
+	 xM2SKBHXt814tltu5rh6snvCLNLoOND6ZsVozYUAh6kxL+lH6atLhWnGPlRit6FiTH
+	 847GejqMvEu3UO3xw5t36G20WAml+GqQf/i9f+gVpkbrXkQWBBmCBsvOEnO64sULa2
+	 8vv2VatrwWSWAk792g6dYMz3KL2M9UxZ1L/MwpMTeeHe8P0OJDWefbwVx9a8xddAgh
+	 klbcv6dEdC6Dw==
+Message-ID: <f2f156e0-5321-4d6c-ae00-9ec5d148e3bb@kernel.org>
+Date: Fri, 25 Apr 2025 11:40:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <046701dbb5c3$58335190$0899f4b0$@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/8] dt-bindings: dpll: Add DPLL device and
+ pin
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20250424154722.534284-1-ivecera@redhat.com>
+ <20250424154722.534284-2-ivecera@redhat.com>
+ <20250425-manul-of-undeniable-refinement-dc6cdc@kuoka>
+ <bc28ca3e-6ccd-4d43-8a51-eb4563a6ed06@redhat.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <bc28ca3e-6ccd-4d43-8a51-eb4563a6ed06@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 05:20:53PM +0800, Jiawen Wu wrote:
-> On Fri, Apr 25, 2025 3:38 PM, Russell King (Oracle) wrote:
-> > On Fri, Apr 25, 2025 at 03:09:42PM +0800, Jiawen Wu wrote:
-> > > @@ -266,11 +266,20 @@ int wx_set_pauseparam(struct net_device *netdev,
-> > >  		      struct ethtool_pauseparam *pause)
-> > >  {
-> > >  	struct wx *wx = netdev_priv(netdev);
-> > > +	int err;
-> > >
-> > >  	if (wx->mac.type == wx_mac_aml)
-> > >  		return -EOPNOTSUPP;
-> > >
-> > > -	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
-> > > +	err = phylink_ethtool_set_pauseparam(wx->phylink, pause);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	if (wx->fc.rx_pause != pause->rx_pause ||
-> > > +	    wx->fc.tx_pause != pause->tx_pause)
-> > > +		return wx_fc_enable(wx, pause->tx_pause, pause->rx_pause);
-> > 
-> > Why? phylink_ethtool_set_pauseparam() will cause mac_link_down() +
-> > mac_link_up() to be called with the new parameters.
-> > 
-> > One of the points of phylink is to stop drivers implementing stuff
-> > buggily - which is exactly what the above is.
-> > 
-> > ->rx_pause and ->tx_pause do not set the pause enables unconditionally.
-> > Please read the documentation in include/uapi/linux/ethtool.h which
-> > states how these two flags are interpreted, specifically the last
-> > paragraph of the struct's documentation.
-> > 
-> > I'm guessing your change comes from a misunderstanding how the
-> > interface is supposed to work and you believe that phylink isn't
-> > implementing it correctly.
+On 25/04/2025 11:36, Ivan Vecera wrote:
+>>> +    const: 0
+>>> +
+>>> +  dpll-types:
+>>> +    description: List of DPLL channel types, one per DPLL instance.
+>>> +    $ref: /schemas/types.yaml#/definitions/non-unique-string-array
+>>> +    items:
+>>> +      enum: [pps, eec]
+>>
+>> Do channels have other properties as well in general?
 > 
-> You are right.
-> I should set autoneg off first, although there has no autoneg bit in this link mode.
+> No, other characteristics should be deducible either from compatible or
+> in runtime.
+> 
+OK, with fixes in commit msg:
 
-Yes, "autoneg" in the pause API selects between using the result of
-autonegotiation if enabled, or using the values from tx/rx in the
-pause API.
 
-If autonegotiation (as in the control in SLINKSETTINGS) is disabled
-or autonegotiation is unsupported, then "autoneg" set in the pause
-parameters results in no pause. The same is incidentally true of EEE
-settings as well.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-So, "autoneg" in SLINKSETTINGS is like the big switch allowing or
-preventing all autonegotiation over the link. The other "autoneg"s
-control whether the result of autonegotiation is used.
-
-There is one thing in the ethtool_pauseparam documentation that should
-be removed:
-
- * Drivers should reject a non-zero setting of @autoneg when
- * autoneogotiation is disabled (or not supported) for the link.
-
-Let's think about what that means.
-
-- I have a 100baseT/FD link for example, and it used autoneg, and has
-  pause enabled.
-- I decide to disable autoneg, instead selecting fixed-link mode
-  through SLINKSETTINGS.
-- Reading the pause parameter settings returns the original state of
-  "autoneg" which is set.
-- Writing that back results in "rejection" if the above statement is
-  followed - which is non-sensical. Let's say it's forced to zero.
-- I later re-enable autoneg via SLINKSETTINGS
-- I now have to remember to modify the pause mode parameters to
-  re-enable pause autoneg.
-
-Things get worse if instead of the above, disabling SLINKSETTINGS
-autoneg results in the pause param autoneg being immediately disabled
-without API changes - we then end up with one API making magic changes
-to settings in another API, and I don't think that is what anyone
-would reasonably expect to happen.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Best regards,
+Krzysztof
 
