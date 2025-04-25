@@ -1,135 +1,123 @@
-Return-Path: <netdev+bounces-186021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4085A9CBE5
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:44:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E5E5A9CC21
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8C2F7A7210
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 14:43:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE2724C70EB
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 14:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CDC2580EA;
-	Fri, 25 Apr 2025 14:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBAF259C89;
+	Fri, 25 Apr 2025 14:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AYDw7rIy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPuuKYEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1A32472A6;
-	Fri, 25 Apr 2025 14:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F102594B7;
+	Fri, 25 Apr 2025 14:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745592246; cv=none; b=ttmX7ZEFp1x/fkpR4LOqsdCSIz03yR9hcTHVCv0EhPeLzuoheibrU5zhescxZAqSgjWC26Rc4Lui/acg5L3Qh1ha59PZ45Q/uuWpdXwJdE5xyNChlFB23TidoBlhdUWZGWrG6/li4yTVFvO++ItWpX9MfMHarSFNTOdBOWOsFjM=
+	t=1745592931; cv=none; b=qMn7kyESrU7yvg1XkJfa6vqWKKlA4+I6J0XE+ZmZPm//1wsl/sFkC/s+q1KXd5/SXfNwU7GP49N8fyeN+lruWJjQRXKlI6wZRZF35B9nFn25HEsr2/KMtWe2JyqBLAWBEL4jRFQG6tZk2mopnn/V6w9UGbauNnpkBe55eHTIqcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745592246; c=relaxed/simple;
-	bh=jVJBf/R/dc6ahgsECfA9a4xV6tsV8GYocrn8WOFAkRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ojK6qOwcB8r1G5iKV9+ZksKaI/iAOROnuCK6ZlD2D4Di7XemL5yeC/73MnQEZIvJ9bLkzUouDzHS6ObhGTBR+VsugrSVtCb78HgE/qovqoeAxhdZ3B4YNrxGGK0OUncT/ZijeselAIDc+1sc7AWJ9fvWtt4UfUS5Tj9oNUqqQZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AYDw7rIy; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1ssB4Rfy0T4ksx0Lnlz+elFfLJ0yGIeQrZznCe7Aq24=; b=AYDw7rIyOl/D9Wy4/pJKLOcuGO
-	mIcV+bNNNkyfM6ri86MKGLJeaBtwsJI94WTwBVzt8Gr0a5UFwNSErB6GS1x/T2KVv6UOktWihA9sE
-	cUsoq1/71O2tGVMMaZWQkBpcGzcNk+4tVB2p1GcLPy+NWuQEefWS7RwCOkikK/tSJMZKC7ITJDj7W
-	o1Tzip8br8GRK9FuQHs46K2PEkgZbxgWOazM7GJbGq3taU9GIP7l3tu747vWijHtTAw/hEQAOc3Vd
-	g6ZOJu0oWh81kbq3D4Wf9egAK3TqJlv6KAjExbCInofNxDb/icxvrlC+tJZe9t0VS5MwNcnUX374/
-	NuooLP3A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47354)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u8KHR-0000Xy-2w;
-	Fri, 25 Apr 2025 15:43:53 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u8KHP-0002Cr-0T;
-	Fri, 25 Apr 2025 15:43:51 +0100
-Date: Fri, 25 Apr 2025 15:43:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Remove ineffective
- checks from ksz_set_mac_eee()
-Message-ID: <aAufpsLhs8GLMm_b@shell.armlinux.org.uk>
-References: <20250425110845.482652-1-o.rempel@pengutronix.de>
- <aAuRAadDStfwfS1U@shell.armlinux.org.uk>
- <aAubnUSDpwtfuCrm@pengutronix.de>
+	s=arc-20240116; t=1745592931; c=relaxed/simple;
+	bh=Lr5mCcsmL9kbOt7KXF2Z8uSBQg+PFUBZ+HPfspBmrv8=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=TvFSw3Xb9ISRcsA+S8pOELBu+E6quD63IDATRI/4WLYLL1+1WE9FFW9U1mcMn/kGNYP1OeSd6bmJL3DIXqN5yrTCiliY4Zn9DJGbUk2GvHp1aPoYVuGJSXf1SCtUx3uUJObK0V8WM4l5WLLjXWbRa9S4G0yNWYxyjd0gFpj8ZpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPuuKYEV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7E7C4CEE8;
+	Fri, 25 Apr 2025 14:55:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745592930;
+	bh=Lr5mCcsmL9kbOt7KXF2Z8uSBQg+PFUBZ+HPfspBmrv8=;
+	h=Subject:From:To:Cc:Date:From;
+	b=gPuuKYEVR1MIqwG1ScCS9cyY53MFvchClw9fq+G7LR7By/9gMWoNoFPwGyT+kEAc/
+	 OqJ3n56GDsuxidpYkNV10HpKh2DH1NzzWcSZHiWR4Fj0GvioENjlCPwrBVH/Lu/cnR
+	 KeEDFFZA7RcBL4LDsNL7f5LdtXL/BHzQ8aWl2PvAgl3dBZ1XPH+ugDueVWGMVERQBm
+	 ftx2XRQaEKIqggS9d3v9KZAQ/6juSfOvI7J0Nf0rJbV9WYe9oNUIXNo52WH8T1SoN4
+	 BaOL6Kxj2N51NQ94d2ZdruF7dZsKRLkHQqpx7Lwj1YHOutnabcvCrqaJlFgi7vqE/m
+	 EmAFk0ILJG6Gg==
+Subject: [PATCH net-next V7 0/2] veth: qdisc backpressure and qdisc check
+ refactor
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ tom@herbertland.com, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc
+Date: Fri, 25 Apr 2025 16:55:25 +0200
+Message-ID: <174559288731.827981.8748257839971869213.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aAubnUSDpwtfuCrm@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 25, 2025 at 04:26:37PM +0200, Oleksij Rempel wrote:
-> On Fri, Apr 25, 2025 at 02:41:21PM +0100, Russell King (Oracle) wrote:
-> > On Fri, Apr 25, 2025 at 01:08:45PM +0200, Oleksij Rempel wrote:
-> > > KSZ switches handle EEE internally via PHY advertisement and do not
-> > > support MAC-level configuration. The ksz_set_mac_eee() handler previously
-> > > rejected Tx LPI disable and timer changes, but provided no real control.
-> > 
-> > Err what?
-> > 
-> > ksz does not set phylink_config->eee_enabled_default, so the default
-> > state in phylink is eee_enabled = false, tx_lpi_enabled = false. It
-> > doesn't set the default LPI timer, so tx_lpi_timer = 0.
-> > 
-> > As the driver does not implement the ability to change the LPI timer
-> > enable nor the timer value, this seemed reasonable as the values are
-> > not reported (being reported as zeros) and thus prevents modification
-> > thereof.
-> > 
-> > Why do you want to allow people to change parameters that have no
-> > effect?
-> 
-> The original ksz_get_mac_eee() used to report tx_lpi_enabled = true,
-> which correctly reflected the internal EEE/LPI activity of the hardware.
+This patch series addresses TX drops seen on veth devices under load,
+particularly when using threaded NAPI, which is our setup in production.
 
-Are you sure it did _actually_ did return that?
+The root cause is that the NAPI consumer often runs on a different CPU
+than the producer. Combined with scheduling delays or simply slower
+consumption, this increases the chance that the ptr_ring fills up before
+packets are drained, resulting in drops from veth_xmit() (ndo_start_xmit()).
 
-Yes, ksz_get_mac_eee() set e->tx_lpi_enabled = true, but if you read the
-commit 0945a7b44220 message, you will see that DSA calls
-phylink_ethtool_get_eee() after this function, which then calls into
-phy_ethtool_get_eee(), and phy_ethtool_get_eee() overwrites *all*
-members of struct ethtool_keee.
+To make this easier to reproduce, we’ve created a script that sets up a
+test scenario using network namespaces. The script inserts 1000 iptables
+rules in the consumer namespace to slow down packet processing and
+amplify the issue. Reproducer script:
 
-Thus, userspace doesn't see tx_lpi_enabled set.
+https://github.com/xdp-project/xdp-project/blob/main/areas/core/veth_setup01_NAPI_TX_drops.sh
 
-Please wind back to before commit 0945a7b44220 to confirm this - I
-think you'll find that this bug was introduced in commit
-fe0d4fd9285e "net: phy: Keep track of EEE configuration".
+This series first introduces a helper to detect no-queue qdiscs and then
+uses it in the veth driver to conditionally apply qdisc-level
+backpressure when a real qdisc is attached. The behavior is off by
+default and opt-in, ensuring minimal impact and easy activation.
 
-> After commit [0945a7b44220 ("net: dsa: ksz: remove setting of tx_lpi
-> parameters")], ksz_get_mac_eee() was removed, and now tx_lpi_enabled defaults
-> to false via the phylink fallback.
+---
+V7:
+ - Adjust race handling with smp_mb__after_atomic() for other archs than x86
+ - Link to V6: https://lore.kernel.org/all/174549933665.608169.392044991754158047.stgit@firesoul/
+V6:
+ - Remove __veth_xdp_flush() and handle race via __ptr_ring_empty instead
+ - Link to V5: https://lore.kernel.org/all/174489803410.355490.13216831426556849084.stgit@firesoul/
+V5:
+ - use rcu_dereference_check to signal that NAPI is a RCU section
+ - whitespace fixes reported by checkpatch.pl
+ - handle unlikely race
+ - Link to V4 https://lore.kernel.org/all/174472463778.274639.12670590457453196991.stgit@firesoul/
+V4:
+ - Check against no-queue instead of no-op qdisc
+ - Link to V3: https://lore.kernel.org/all/174464549885.20396.6987653753122223942.stgit@firesoul/
+V3:
+ - Reorder patches, generalize check for no-op qdisc as first patch
+   - RFC: As testing show this is incorrect
+ - rcu_dereference(priv->peer) in veth_xdp_rcv as this runs in NAPI
+   context rcu_read_lock() is implicit.
+ - Link to V2: https://lore.kernel.org/all/174412623473.3702169.4235683143719614624.stgit@firesoul/
+V2:
+ - Generalize check for no-op qdisc
+ - Link to RFC-V1: https://lore.kernel.org/all/174377814192.3376479.16481605648460889310.stgit@firesoul/
+---
 
-As stated above, I think this driver has had a problem for over a year
-now, caused ultimately by the incomplete submission of Andrew's patch
-set. I think you'll find that if you try the comparing the ksz behaviour
-of commit fe0d4fd9285e^ with commit fe0d4fd9285e, you'll find that's
-where this behaviour changed.
+Jesper Dangaard Brouer (2):
+      net: sched: generalize check for no-queue qdisc on TX queue
+      veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+ drivers/net/veth.c        | 57 ++++++++++++++++++++++++++++++++-------
+ drivers/net/vrf.c         |  4 +--
+ include/net/sch_generic.h |  8 ++++++
+ 3 files changed, 56 insertions(+), 13 deletions(-)
+
+--
+
 
