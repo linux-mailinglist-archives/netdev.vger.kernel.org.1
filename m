@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-185861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1783A9BEBA
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:36:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C210AA9BEC8
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19EDE4A1DD4
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12ACB1BA0491
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4209722ACDC;
-	Fri, 25 Apr 2025 06:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6653F22D780;
+	Fri, 25 Apr 2025 06:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="e4QzR/2y"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="fi2yxVXy"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B980197A76;
-	Fri, 25 Apr 2025 06:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAB322D4EF;
+	Fri, 25 Apr 2025 06:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745562984; cv=none; b=TSFcjQPqr352juK12SuZWnK1wlAgOii0Idu6deNXNGMhFrwmLZH2bZCu8+jDrincHgg4hOQG7T9YMdl+yq6TEAJ9g5e88CYs28hxquUWe50733b7N6tbuBJK4RfrE9nGGfjmbAtXT0zDjbyJ72hImeoUcaNjdyBD8zsg0U+5dqo=
+	t=1745563289; cv=none; b=TL2qAfD3nFoe448N9Wnh1tA7J/Uy3L5rV7yoeYiqFh8jWDwoQ7kq5nhTXxvAlAVj6E3xyRRRQNeiriLG5p6YvHefH0rHyoGJhHXLifRbko4grwD8exqDnDgyC+hVPVhrSkoIcKMs9RMVJzx5EHsyMNzemc+FaQhukEl6V4Eu3Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745562984; c=relaxed/simple;
-	bh=KwyTNtiZvo/Ja9Uvj/tLMwjGchEpTO819iVwCPQUPzk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QT1A5dmoVDoDxmnChlheohho0NZPzjdkrZwB4nf2YT7tP4SSOdlD8K73ydbM0h3hogu+ZoMauaE34AOVL8w/7VWMw1YPJd+6xJH0H/sCmDDmVUSeb+muQlZEMJkX8B9uni3KL+jPLv679wgGbrHyow5rXZYvV/dvJmgqmf5LwiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=e4QzR/2y; arc=none smtp.client-ip=211.75.126.72
+	s=arc-20240116; t=1745563289; c=relaxed/simple;
+	bh=O3p8axfLSNJ2gLotHYzkCpD+1PoLs7XYhd8gjjBQpFo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g+F2IwCApuDxwh4ba/TEU1qwW6hw5ZKPFDJN72hZtxCOnN2mYlYKOT6mkVUiwexU0Imjg6zrDWcb4fAoSkFlO51A7iYF99BUQ5qdTdaPjjLuBUgPwXC66JKHOMo/Cu/SRqzv+8bTgujfbpkhh19CeRRBMmDyN1d/zmchIbJ6wqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=fi2yxVXy; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53P6YbYsA2526006, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53P6f8HO12530571, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1745562877; bh=KwyTNtiZvo/Ja9Uvj/tLMwjGchEpTO819iVwCPQUPzk=;
+	t=1745563268; bh=O3p8axfLSNJ2gLotHYzkCpD+1PoLs7XYhd8gjjBQpFo=;
 	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
 	 Content-Transfer-Encoding:Content-Type;
-	b=e4QzR/2y3k1FbMi44dDAbvqc2tyAaiuAXiIb84QxIuqBKQ30PLplUEWyKrQjF9x1/
-	 6IUSMgP9YK8XL7vFQylW9KgzKzPke5cx0xnT0jO+I1wmEFmpNPdiGfA7sJ0mibYVd2
-	 fIBrGrp1dNaucTQ8Qw/pFIpx+XEjwNLR7cjgI6NLrkcWXsMikLBcI38Pns8ydUZk1N
-	 +/2Zmbb+HFf7smVCLSbPBW0VV9mrt3WOsIgpjKoTUiVcVXN6vsIGDEQ6hoILtYe+GI
-	 /qLzo2OPlIHMnopptZeP7zQKrWE71ZCIS+igzSQsSghD6a8uc1rJh+Jf9OOI/1CBL+
-	 uNJi8Vz6hmTWA==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53P6YbYsA2526006
+	b=fi2yxVXyTqOmBsFd+QlWYztZc4e3Y9qB44e2n1x7Yp2jhFjMIgbUKqclkErLvpzye
+	 4OEn763QZcSenBjv/JBnOjXCW+5soG9+IwvnI7mirQHuW98rDLcvliJP57jPC3Lddx
+	 RD3EgTw5T+iGKwkqDt1JDV6rsOGl7XTh2FBcZWzP243j+aJdIIX91QqJw5RnPjIl0E
+	 uzwvP4fn1oHudvtL06oCEmr4RuoFeW4vgu+dcMG36wQpSsyBU621rlMtlPUItyFn0M
+	 xSv9JpUjc4/KJs3JhKAUkUVQQVntbQyPKyVnkLnT3/3n3NEsnxyfGRta1k0K5Sqjrp
+	 Bp79SRp0xC+Jw==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53P6f8HO12530571
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 25 Apr 2025 14:34:37 +0800
+	Fri, 25 Apr 2025 14:41:08 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 25 Apr 2025 14:34:37 +0800
+ 15.1.2507.39; Fri, 25 Apr 2025 14:41:09 +0800
 Received: from RTDOMAIN (172.21.210.124) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 25 Apr
- 2025 14:34:37 +0800
+ 2025 14:41:06 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -61,9 +61,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>,
         Joe Damato
 	<jdamato@fastly.com>
-Subject: [PATCH net-next v2] rtase: Use min() instead of min_t()
-Date: Fri, 25 Apr 2025 14:34:29 +0800
-Message-ID: <20250425063429.29742-1-justinlai0215@realtek.com>
+Subject: [PATCH net-next v2] rtase: Modify the format specifier in snprintf to %u
+Date: Fri, 25 Apr 2025 14:40:57 +0800
+Message-ID: <20250425064057.30035-1-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,11 +73,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
  RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Use min() instead of min_t() to avoid the possibility of casting to the
-wrong type.
+Modify the format specifier in snprintf to %u.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 Reviewed-by: Joe Damato <jdamato@fastly.com>
@@ -85,31 +84,22 @@ Reviewed-by: Joe Damato <jdamato@fastly.com>
 v1 -> v2:
 - Remove the Fixes tag.
 ---
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 6251548d50ff..8c902eaeb5ec 100644
+index 8c902eaeb5ec..5996b13572c9 100644
 --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
 +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1983,7 +1983,7 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
- 	u8 msb, time_count, time_unit;
- 	u16 int_miti;
- 
--	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
-+	time_us = min(time_us, RTASE_MITI_MAX_TIME);
- 
- 	msb = fls(time_us);
- 	if (msb >= RTASE_MITI_COUNT_BIT_NUM) {
-@@ -2005,7 +2005,7 @@ static u16 rtase_calc_packet_num_mitigation(u16 pkt_num)
- 	u8 msb, pkt_num_count, pkt_num_unit;
- 	u16 int_miti;
- 
--	pkt_num = min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
-+	pkt_num = min(pkt_num, RTASE_MITI_MAX_PKT_NUM);
- 
- 	if (pkt_num > 60) {
- 		pkt_num_unit = RTASE_MITI_MAX_PKT_NUM_IDX;
+@@ -1114,7 +1114,7 @@ static int rtase_open(struct net_device *dev)
+ 		/* request other interrupts to handle multiqueue */
+ 		for (i = 1; i < tp->int_nums; i++) {
+ 			ivec = &tp->int_vector[i];
+-			snprintf(ivec->name, sizeof(ivec->name), "%s_int%i",
++			snprintf(ivec->name, sizeof(ivec->name), "%s_int%u",
+ 				 tp->dev->name, i);
+ 			ret = request_irq(ivec->irq, rtase_q_interrupt, 0,
+ 					  ivec->name, ivec);
 -- 
 2.34.1
 
