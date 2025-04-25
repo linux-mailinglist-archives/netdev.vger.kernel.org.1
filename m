@@ -1,115 +1,139 @@
-Return-Path: <netdev+bounces-186172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CA90A9D5E3
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:50:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D6DA9D5E9
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDDCF4A62C8
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 22:50:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4A61BC631F
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 22:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301B52957D1;
-	Fri, 25 Apr 2025 22:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1A52957D1;
+	Fri, 25 Apr 2025 22:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pao66x6V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SWBJbnrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1992957D0
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 22:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB23224AE1;
+	Fri, 25 Apr 2025 22:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745621436; cv=none; b=Dbp8gr5iSGBp8sL4bFB8dzeyNjNFcMSuia7FGmm6lYpBrliV1Al4TO3ryml7cAiap0GW26ULRJ7zyTfbTm0DkxgcSvleU0yOxdvEzMvVrXA2qkQ7NyA5fOvXA104cncK02/R73THzgQt9lud24NZV+5YDaElZKRwgm8dFAtfM4s=
+	t=1745621514; cv=none; b=TwtXeqYptP+1ld2pdoRuMY8E2qNmN4N5lxjH6IQNX7Gqexx+hAjpJ6QNXdZEbW7I2sCMm+g8pW1FUqONRAA9Etaa+2VYZ4ogB9DaKD9F6KIt5/ch5gqRyfFxlF+80bQOHZ1Z9CFYwwWsfSMHc+q88Dm8qjRj12NlrSagS6MwDq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745621436; c=relaxed/simple;
-	bh=RorfabHcL+7/vyTMF4tZlnTL10uXHP2IZMhK0py71UU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XY/v2oPoW9n4WNpimGhk2sICvj1mYoDqal25AJq7ML+flQwaSaAh+F/kGp3m9ch7RxI4Z0/BtFrVi6PzoT+fOsc1b3NnZdkjsjQJgbJhmLw1/whDnHMSHToqqXpj9/OfB4F8G29xYdBoZV6AJtv51Dfts5n3A3gB2OYFZuNbnZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pao66x6V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0123CC4CEE4;
-	Fri, 25 Apr 2025 22:50:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745621435;
-	bh=RorfabHcL+7/vyTMF4tZlnTL10uXHP2IZMhK0py71UU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Pao66x6VfdVeo+U03sOA1m4xHQ5z+XmvIRI0b5VLEz4Z9f6iEJZzpWQh9r996w3dp
-	 4qLUJOJgscA6Hop1ujjmEcfPQmodNaauqIWIDzwnM4Iuwhby06WfF4KFZldJHz+lG6
-	 3jnIZUKxNlbF+BIeFe7XOo5n5kWh3t7UqUZ9pupFNF+yO0Vzw9xcd/EypkLdkHsRXi
-	 3NMQ//Z1ZrhynoXmWLH/QJdN2t9PUfHcKWrP4UYHx6n4VmWY16YPGRIpm8m7c58SvQ
-	 C/7q4mJNxXx6CDHI4FhmPQVIsf69XPxcPGVVrZT4PJ9lt79vZgtAOylPbZJt210F9R
-	 VhSQIUu6L394g==
-Date: Fri, 25 Apr 2025 15:50:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>, Joe Damato <jdamato@fastly.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, sdf@fomichev.me, dw@davidwei.uk,
- asml.silence@gmail.com, ap420073@gmail.com, dtatulea@nvidia.com,
- michael.chan@broadcom.com
-Subject: Re: [RFC net-next 01/22] docs: ethtool: document that rx_buf_len
- must control payload lengths
-Message-ID: <20250425155034.096b7d55@kernel.org>
-In-Reply-To: <CAHS8izODBjzaXObT8+i195_Kev_N80hJ_cg4jbfzrAoADW17oQ@mail.gmail.com>
-References: <20250421222827.283737-1-kuba@kernel.org>
-	<20250421222827.283737-2-kuba@kernel.org>
-	<CAHS8izODBjzaXObT8+i195_Kev_N80hJ_cg4jbfzrAoADW17oQ@mail.gmail.com>
+	s=arc-20240116; t=1745621514; c=relaxed/simple;
+	bh=zNbdVDsWfFoqJaRDGsTJAkSBJEdBMH8ebC4YyJqLcaI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h2WYlZE+fQOUhD6MpiVHEe9/EAZTCMy7qxLYpL8eScsSlBLpDrlY0nGQaNwZhLvXsU0yVq28VmO7jE9o/xn0N2gBAaOQLq7t81wINDzp0R8P6yeeFROVLdgOKPwENM0vssk7z9Q0kGI+T/YhaFUMXfvcDwnpXwgODxX6WpYazds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SWBJbnrC; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6ff1e375a47so32165967b3.1;
+        Fri, 25 Apr 2025 15:51:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745621512; x=1746226312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NAdDz9du01ShWOGUuze7WbsCqL878Y5hXPeTjWvtcUc=;
+        b=SWBJbnrC/gbPGvcMhKhYGbWZNIOM0dP0kSe5uGy8rvtnw5xWh/9ecm97Xz54KxAaVL
+         9B1kzowp0HBK3S7EKDVChg3g5L7/NV2V6U5owYsQRcVPDVbkUFeBfYhCEgS1o1LwTd3g
+         1eeBcgzYv2jpk/l49x/6bcN275skpzqbq494iP5TTPq0/2NMRRjQqQrAb/jX6okl5x7b
+         tgBW+v31ejl+EDDKiScy/bKdQttvd4StIinuOMUCt8v7YscX2I5cCWR0fb1kL9x+Y9d4
+         9Oo/4H6MsLS4TBsg3WHt2sH3TSGTVGUZ5iOFJgAbH1LMatrGNit/Mqkjofds3dmG4Z8N
+         z8tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745621512; x=1746226312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NAdDz9du01ShWOGUuze7WbsCqL878Y5hXPeTjWvtcUc=;
+        b=ve1sjexyjDZ8g5H5zLkf1S9urvzeuHJdvHMGd4LYJFXYKtx5HIDmoyTirM3CVthiez
+         WtMky4tYmGaA9i2xrllDd37e4cU0QM+HaVpqs5Ho7eVAApHkTRQjDyFIaX2sD6Z0KpPt
+         qJbeHCLYw1UkMkZWBq1XsZXodmJdIHo+WLIWsbRl8cYBU5GpLoVaYSdP23Mvy+S1oCNT
+         6gZQlBoAB7UdICAzUUKanRd1vNjkbukWN+U2a5VEn1xNcaTqdPlrqb6inVWGvJbrL1WL
+         WaE2ZU0bYNnqKRBrtvZ8b6t7QU9d+jQIzrLm/1nr5in2cgTN9M6Y2OWDykbMbaz3v03z
+         sZBA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKhONhI7HvQoWDwNZZVafBs+SpOWOFSWiuGDNBWbTlJeQ6WeErZy/epEy3TM03YxbzCbcNIPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZxXKwnTyry8RdN0R0zs0RlFYpSBgjpt3xLG63lLhu1U/n94rJ
+	fO5MarsXSzQccoKyxQuO+gHOHQTxHSuMvDojbk7eZUNogyb4BNLTU7W9+ceH0unRF76SVtmOu1B
+	tJ7rzkN1QdIDtRFkWu9hbxzqEBVI=
+X-Gm-Gg: ASbGncvDpwAyIShOsxzwGefmfJ0fHe1tvxTSvv6kYiNCcaBFTnP1HpWwutkKgO3s+M3
+	mtrnDvvva9Ge/RYyFc/ZkLq8cGThrceRp4plpF5BCkMZcBAQ0gmAO1OrtTcBTbKp9kbANNThrOX
+	PjlbtRZmrr9V4stsZp65VRw/ZfgVYPGM9k
+X-Google-Smtp-Source: AGHT+IFb6I3oavfH8W4C56IT9mNhcdJn42p9aE8Rfs4y4LEOY3oGR6LCE8CLwcCnr8BIYbE6f60uFcmXnCSJuKwERNM=
+X-Received: by 2002:a05:690c:3703:b0:6f7:5a46:fe5f with SMTP id
+ 00721157ae682-7085f0633c0mr20507937b3.1.1745621511622; Fri, 25 Apr 2025
+ 15:51:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20250425214039.2919818-1-ameryhung@gmail.com> <20250425214039.2919818-3-ameryhung@gmail.com>
+ <aAwI3k4FeJHmHFKv@slm.duckdns.org>
+In-Reply-To: <aAwI3k4FeJHmHFKv@slm.duckdns.org>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 25 Apr 2025 15:51:40 -0700
+X-Gm-Features: ATxdqUE9gXV19zrCeOTnVWkTIxtpFHG3KZZzpVe1cO513exJOqHJhroJUPMAGDI
+Message-ID: <CAMB2axMQsFLO-85q2tRNE==s8t_Y3A2iPaGTm0=NkjJ4wz0X=g@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 2/2] selftests/bpf: Test basic workflow of task
+ local data
+To: Tejun Heo <tj@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Apr 2025 13:08:33 -0700 Mina Almasry wrote:
-> On Mon, Apr 21, 2025 at 3:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> > @@ -971,6 +970,11 @@ completion queue size can be adjusted in the drive=
-r if CQE size is modified.
-> >  header / data split feature. If a received packet size is larger than =
-this
-> >  threshold value, header and data will be split.
-> >
-> > +``ETHTOOL_A_RINGS_RX_BUF_LEN`` controls the size of the buffer chunks =
-driver
-> > +uses to receive packets. If the device uses different memory polls for=
- headers
-> > +and payload this setting may control the size of the header buffers bu=
-t must
-> > +control the size of the payload buffers.
->=20
-> FWIW I don't like the ambiguity that the setting may or may not apply
-> to header buffers. AFAIU header buffers are supposed to be in the
-> order of tens/hundreds of bytes while the payload buffers are 1-2
-> orders of magnitude larger. Why would a driver even want this setting
-> to apply for both? I would prefer this setting to apply to only
-> payload buffers.
-
-Okay, I have no strong reason to leave the ambiguity.
-
-Converging the thread with Joe:
-
->> Document the semantics of the rx_buf_len ethtool ring param.
->> Clarify its meaning in case of HDS, where driver may have
->> two separate buffer pools. =20
+On Fri, Apr 25, 2025 at 3:12=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote:
 >
-> FWIW the docs added below don't explicitly mention HDS, but I
-> suppose that is implied from the multiple memory pools? Not sure if
-> it's worth elucidating that.
+> Hello,
+>
+> On Fri, Apr 25, 2025 at 02:40:34PM -0700, Amery Hung wrote:
+> ...
+> > +bpf_tld_key_type_var("test_basic_value3", int, value3);
+> > +bpf_tld_key_type_var("test_basic_value4", struct test_struct, value4);
+>
+> I think it'd be fine to always require key string.
+>
+> > diff --git a/tools/testing/selftests/bpf/progs/test_task_local_data_bas=
+ic.c b/tools/testing/selftests/bpf/progs/test_task_local_data_basic.c
+> > new file mode 100644
+> > index 000000000000..345d7c6e37de
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/test_task_local_data_basic.c
+> ...
+> > +     bpf_tld_init_var(&tld, test_basic_value3);
+> > +     bpf_tld_init_var(&tld, test_basic_value4);
+>
+> Would it make more sense to make the second parameter to be a string? The
+> key names may contain tokens that are special to C and it becomes odd to
+> escape naked strings.
+>
 
-Maybe not sufficiently. Some NICs just have buffer pools for different
-sized packets, but than the buffer size should be implied by the size
-range?
+Totally makes sense. I will only keep bpf_tld_key_type_var() that
+requires a key string in the declaration.
 
+I will also add the key string as the third argument to
+bpf_tld_init_var() and rename it to bpf_tld_fetch_key(). I don't think
+the symbol type argument that refers to one of the members of struct
+task_local_data_offsets can be removed.
 
-How about:
+So it becomes:
 
- ``ETHTOOL_A_RINGS_RX_BUF_LEN`` controls the size of the buffers driver
- uses to receive packets. If the device uses different buffer pools for
- headers and payload (due to HDS, HW-GRO etc.) this setting must
- control the size of the payload buffers.
+bpf_tld_fetch_key(&tld, test_basic_value3, "something.test_basic_value3");
+
+Later, bpf programs still do:
+
+bpf_tld_lookup(&tls, test_basic_value3);
+
+> Thanks.
+>
+> --
+> tejun
 
