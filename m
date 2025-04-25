@@ -1,183 +1,180 @@
-Return-Path: <netdev+bounces-185983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C368A9C8FE
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 14:34:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87DF7A9C8F0
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 14:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8B99A1B93
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 12:33:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DB1318823B6
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 12:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11112248878;
-	Fri, 25 Apr 2025 12:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A92242D60;
+	Fri, 25 Apr 2025 12:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="n8NIp3Rt"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="C4KGDrKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E6C242D60
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 12:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660E75695;
+	Fri, 25 Apr 2025 12:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745584429; cv=none; b=qBAloD3b7NiWGJ1lGX8RTS+IrRqMUZi/zhtd/V73n16uLHC8cTq16lhb2ePpgvPd+DQo+lHLSTt6uQaiKGWU7IDS3HyM8CB12fCE2P2Jz86f+hTsMMAGn1b5WVnBO+x0ZTfKW4M7oeXWrz48K6Ueq4/sCrI1geFMkbHtypAM7ds=
+	t=1745584286; cv=none; b=oEnB4kRELxHxQc1i35dYPxocLRc0hZ32tlbU203Bl1zPdkeZ3dpbkRng9BHeQx1T2GMgc7foAvuWUpbfVXThP1kQU02Bb2VyaBFcHpeO5mjJzxytoSdbhXjRSXUUVZjOkeE1Vch9RpxUmt1XGLBeze04f3D8JOkfbUwaosVmt74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745584429; c=relaxed/simple;
-	bh=tQiTl86FEuO5UgYuomByyvi5w9Hmntw7EaR1CWYauKg=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=YD8CMzKD/CZr6ZgTyDfY3x5oh5g6hCMF1NxwnwbvY8YPtdrCNF/pEZwfwc9NFoTa/kaEik0e1vcsoJquJC7RKxec98zUN9Gn1o3Og+YBCqvumm6aA68tm3iEjLoWGDKiq4QNIyyhw6GxfjGJKWM4XQBdX8sKss7xNQ/jYRKhvPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=n8NIp3Rt; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-39c30d9085aso1608899f8f.1
-        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 05:33:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1745584425; x=1746189225; darn=vger.kernel.org;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yntU4EniIC3f4h3SJqk8e0Y5d89MUpTfrJEc3h0DwPg=;
-        b=n8NIp3RtaxRSPhznbjqt3okMg5XBZYxPOPDthnGlHDUgb6WHvQhdPL1U4fNGcfwIxM
-         ZFC8r1F3Dqi5xuh1fTjWg5mH5MtBBPNjlSNy5Eyf+v22636urX8qSpu5inyhHRYCei4G
-         aW4uu7myOaZD5cPjmeq5UNkvTnRooUpS01suyscA3CShtcf1FgXwQMl4H+/CZX0/Z6i7
-         UfyyWCMwKpc2JMUGDwi5j5Bj1XwaO9ysWj/zP1NgAGSqzK7J+oOAegG1RJwspJSqlOHT
-         M1pYkdBUufp5WQZrn6qda7C+Sge8awSWpoc1ox10lXub0gUKGyCGWXtFXahqMPc+bJIZ
-         1JWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745584425; x=1746189225;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yntU4EniIC3f4h3SJqk8e0Y5d89MUpTfrJEc3h0DwPg=;
-        b=j6AzhqlMWvV+ulr6Sq58tchojZyOiXJRCBzbbas9rupfV6AcyN6TK6dNcaMnpo9Kxg
-         6I2whbQNpX795a2qQh6rQD59YAqU7+6KLFnwPYGuilACoO9MPV/ziyOt6StQ/5Y17ovg
-         VXwyUdt7yFcGsTjj3vdJ/tUQtYDyTl6UArDaWC1L3AA1A30mPHKwFgV9p7lpXyljFCcb
-         QHhWiT05ZetVAB+i0ehfZziDMN2iZVQjkhmYB2pbvd+wX+mAo0WhgDLc16/kQ4BJKRDK
-         B1j7z88ZLW1g4kgqKGj9Quk2I//I1JNMKYXHI56TiaCKy8M1yce8mmHjJgcXiQvg8+8/
-         DczQ==
-X-Gm-Message-State: AOJu0YxhB0xrJ06go0h9+wucPJGvJs8mfyP5J/qLnYBzOG0vQ1kfj5Gm
-	lefM71aP5jFjlzNFji0DhzDlh55qBe7UIQxWSh7sDMlGXQj3gnbLfJ6Qba2ZJfo3912mZO2R84Y
-	9GiM=
-X-Gm-Gg: ASbGncsopIPBknNc0bNwu3QynCXlOTN60qNMg5NvgA1tt5oyzKq+7xmWLdns+bFjqyy
-	uqkuLOPTp98Qe8Xo4xWvTGy5wBi0H7CYd7eQ0+XWgyAEzudLVvb0ziqykAwrNblP3EmUhsa/Q5V
-	t3S4dp0QfgGnhqAzcNlLiZN0jWTwrIdxIAut9JSrgc+oK84w4GHYyBplZKeipMKdNoGa/wb2EB7
-	SPyXB39NCcFGzRQBT8xp0P3jWUgxuonkJCV72X2D0AUwk5CAqHHc/A5N5SJ9LU+HNJws26m26Tz
-	Go1p1J3S645e0mQueiriTHxuGEHCMtAgR6OUiICELDIA5Q0bvYiRW10RB5fEsCGz0wZZrA==
-X-Google-Smtp-Source: AGHT+IE8ax6S19eZtBWnOqc/2avNz/0bVbmMzwBWPw2GA5x/PwSj+C2zecdCnOz8WETDsB+ttPzEPg==
-X-Received: by 2002:a5d:59ae:0:b0:39a:ca05:5232 with SMTP id ffacd0b85a97d-3a074e0ef10mr1729900f8f.5.1745584424611;
-        Fri, 25 Apr 2025 05:33:44 -0700 (PDT)
-Received: from smtpclient.apple ([2a02:14a:105:a03:f827:4b18:cd52:f8b4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e5e345sm2244398f8f.94.2025.04.25.05.33.43
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Apr 2025 05:33:44 -0700 (PDT)
-From: Kamil Zaripov <zaripov-kamil@avride.ai>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1745584286; c=relaxed/simple;
+	bh=mXLsFPPFsBURdJfhP1NKqrNjYJ5DFZkpY6MJs2kdvkQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LyIGMMsOxOFLN3MsOg24OVo4da9935aiJtuN89tGpjynQgS6HeLwBiwYDaPqVo09K+pwevfDh+oGSylQb0XJnsb+inzZfySDrxk278sQJYpOcdeNqt0ZzMHlagLf7RWgk+/0PSJbTsPhYPbRAQlly/mBxp4qGJiug+7tx0O0ccs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=C4KGDrKS; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 2a9111a821d111f0980a8d1746092496-20250425
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=LpBRKr0cZRLIHevWTWQoGj/eG6iewYGfCh3UgiIk+eI=;
+	b=C4KGDrKS4flHPBO+C4QXwXugUsg206q+m0BOmMLAQ2fjYM3qnnUfLaZTqwKy8x+RTuRm9Tgy1gQSZYU1UFAd6u627xNLCueQo5vX5pSSAWjUhk4PLSFZw6U/a8+S2eUkaNCOVnLPhwGMNOSagnkBuA8eNXSKF0bj3KwsWfJElqg=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:8af11324-b437-4099-9298-e2c2df9d859a,IP:0,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-25
+X-CID-META: VersionHash:0ef645f,CLOUDID:4f689ef0-ff26-40e8-a637-f0e9524b171a,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 2a9111a821d111f0980a8d1746092496-20250425
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1819063952; Fri, 25 Apr 2025 20:31:09 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Fri, 25 Apr 2025 20:31:08 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Fri, 25 Apr 2025 20:31:07 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <edumazet@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<matthias.bgg@gmail.com>, <angelogioacchino.delregno@collabora.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: <shiming.cheng@mediatek.com>, Jibin Zhang <jibin.zhang@mediatek.com>
+Subject: [PATCH v2] net: use inet_twsk_put() when sk_state is TCP_TIME_WAIT
+Date: Fri, 25 Apr 2025 20:33:48 +0800
+Message-ID: <20250425123354.29254-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: bnxt_en: Invalid data read from SFP EEPROM
-Message-Id: <ED8A7112-D31F-4C4F-94AB-0F0D0DD5DDE6@avride.ai>
-Date: Fri, 25 Apr 2025 15:33:33 +0300
-To: Linux Netdev List <netdev@vger.kernel.org>
-X-Mailer: Apple Mail (2.3774.600.62)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-Hi all,
+From: Jibin Zhang <jibin.zhang@mediatek.com>
 
-I=E2=80=99m seeing corrupted EEPROM data when reading an Intel =
-E10GSFPSRX SFP module plugged into a Broadcom BCM57502 NIC (bnxt_en =
-driver). The same module gives correct EEPROM content when connected to =
-Intel E810 (ice driver) or connected directly to the CPU through I2C =
-controller. So probably the issue is specific to BCM57502 + bnxt_en + =
-firmware combination.
+It is possible for a pointer of type struct inet_timewait_sock to be
+returned from the functions __inet_lookup_established() and
+__inet6_lookup_established(). This can cause a crash when the
+returned pointer is of type struct inet_timewait_sock and
+sock_put() is called on it. The following is a crash call stack that
+shows sk->sk_wmem_alloc being accessed in sk_free() during the call to
+sock_put() on a struct inet_timewait_sock pointer. To avoid this issue,
+use inet_twsk_put() instead of sock_put() when sk->sk_state
+is TCP_TIME_WAIT.
 
-Output below shows corrupted dump vs correct dump:
+mrdump.ko        ipanic() + 120
+vmlinux          notifier_call_chain(nr_to_call=-1, nr_calls=0) + 132
+vmlinux          atomic_notifier_call_chain(val=0) + 56
+vmlinux          panic() + 344
+vmlinux          add_taint() + 164
+vmlinux          end_report() + 136
+vmlinux          kasan_report(size=0) + 236
+vmlinux          report_tag_fault() + 16
+vmlinux          do_tag_recovery() + 16
+vmlinux          __do_kernel_fault() + 88
+vmlinux          do_bad_area() + 28
+vmlinux          do_tag_check_fault() + 60
+vmlinux          do_mem_abort() + 80
+vmlinux          el1_abort() + 56
+vmlinux          el1h_64_sync_handler() + 124
+vmlinux        > 0xFFFFFFC080011294()
+vmlinux          __lse_atomic_fetch_add_release(v=0xF2FFFF82A896087C)
+vmlinux          __lse_atomic_fetch_sub_release(v=0xF2FFFF82A896087C)
+vmlinux          arch_atomic_fetch_sub_release(i=1, v=0xF2FFFF82A896087C)
++ 8
+vmlinux          raw_atomic_fetch_sub_release(i=1, v=0xF2FFFF82A896087C)
++ 8
+vmlinux          atomic_fetch_sub_release(i=1, v=0xF2FFFF82A896087C) + 8
+vmlinux          __refcount_sub_and_test(i=1, r=0xF2FFFF82A896087C,
+oldp=0) + 8
+vmlinux          __refcount_dec_and_test(r=0xF2FFFF82A896087C, oldp=0) + 8
+vmlinux          refcount_dec_and_test(r=0xF2FFFF82A896087C) + 8
+vmlinux          sk_free(sk=0xF2FFFF82A8960700) + 28
+vmlinux          sock_put() + 48
+vmlinux          tcp6_check_fraglist_gro() + 236
+vmlinux          tcp6_gro_receive() + 624
+vmlinux          ipv6_gro_receive() + 912
+vmlinux          dev_gro_receive() + 1116
+vmlinux          napi_gro_receive() + 196
+ccmni.ko         ccmni_rx_callback() + 208
+ccmni.ko         ccmni_queue_recv_skb() + 388
+ccci_dpmaif.ko   dpmaif_rxq_push_thread() + 1088
+vmlinux          kthread() + 268
+vmlinux          0xFFFFFFC08001F30C()
 
-# BCM57502 + bnxt_en (corrupted)
-$ sudo ethtool -m enP2s1f1np1 hex on
-Offset		Values
-------		------
-0x0000:		03 00 f3 00 58 00 f8 00 90 88 71 48 8c a0 75 30
-0x0010:		19 64 07 d0 18 6a 09 c4 27 10 09 d0 1f 07 0c 5a
-0x0020:		27 10 00 64 1f 07 00 9e 00 00 00 00 00 00 00 00
-0x0030:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0040:		00 00 00 00 3f 80 00 00 00 00 00 00 01 00 00 00
-0x0050:		01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 a3
-0x0060:		1f 94 83 f9 0b d5 16 81 00 15 00 00 00 00 32 00
-0x0070:		00 40 00 00 00 40 00 00 ff ff ff ff ff ff ff 01
-0x0080:		5d 01 01 01 01 01 03 04 07 10 00 00 00 00 00 00
-0x0090:		00 06 67 00 00 00 08 03 00 1e 46 49 4e 49 53 41
-0x00a0:		52 20 43 4f 52 50 2e 20 20 20 00 00 90 65 46 54
-0x00b0:		4c 58 38 35 37 31 44 33 42 43 4c 20 20 20 41 20
-0x00c0:		00 20 03 52 00 48 00 1a 00 00 41 50 4b 31 45 48
-0x00d0:		30 20 20 20 20 20 20 20 20 20 31 33 30 35 31 34
-0x00e0:		20 20 68 f0 03 cd 00 00 00 00 00 00 00 00 00 00
-0x00f0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Signed-off-by: Jibin Zhang <jibin.zhang@mediatek.com>
+---
+ net/ipv4/tcp_offload.c   | 8 ++++++--
+ net/ipv6/tcpv6_offload.c | 8 ++++++--
+ 2 files changed, 12 insertions(+), 4 deletions(-)
 
-# E810 + ice (correct)
-$ sudo ethtool -m ens102f0np0 hex on
-Offset		Values
-------		------
-0x0000:		03 04 07 10 00 00 00 00 00 00 00 06 67 00 00 00
-0x0010:		08 03 00 1e 49 6e 74 65 6c 20 43 6f 72 70 20 20
-0x0020:		20 20 20 20 00 00 1b 21 46 54 4c 58 38 35 37 34
-0x0030:		44 33 42 4e 4c 2d 49 54 41 20 20 20 03 52 00 89
-0x0040:		00 1a 00 00 41 34 31 41 53 59 4b 20 20 20 20 20
-0x0050:		20 20 20 20 32 30 30 37 30 36 20 20 68 f0 05 e4
-0x0060:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0070:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0080:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0090:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00a0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00b0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00c0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00d0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00e0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x00f0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0100:		5d 00 f3 00 58 00 f8 00 90 88 71 48 8c a0 75 30
-0x0110:		19 64 07 d0 18 6a 09 c4 27 10 09 d0 1f 07 0c 5a
-0x0120:		27 10 00 64 1f 07 00 9e 00 00 00 00 00 00 00 00
-0x0130:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0140:		00 00 00 00 3f 80 00 00 00 00 00 00 01 00 00 00
-0x0150:		01 00 00 00 01 00 00 00 01 00 00 00 00 00 00 a3
-0x0160:		23 56 85 e0 10 f8 16 94 00 15 00 00 00 00 32 00
-0x0170:		00 40 00 00 00 40 01 00 ff ff ff ff ff ff ff 01
-0x0180:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x0190:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01a0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01b0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01c0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01d0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01e0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-0x01f0:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
-Problems with the BCM57502 + bnxt_en output:
-- Bytes 0x14-0x23 should contain [49 6e 74 65 6c 20 43 6f 72 70 20 20 20 =
-20 20 20] (ASCII string =E2=80=9CIntel Corp       =E2=80=9C), but =
-instead contains [18 6a 09 c4 27 10 09 d0 1f 07 0c 5a 27 10 00 64] which =
-is not valid ASCII string.
-- Diagnostic part (0x0100-x01f0) is missing, probably because 0x5c byte =
-in first part is 0x00.
-- Bytes 0x001-0x05f in BCM57502 + bnxt_en output is the same as bytes =
-0x101-0x15f from Intel E810 + ice output.
-- Other bytes look like garbage, but this garbage persists between =
-request, different SFP modules and different ports where modules =
-inserted.
-
-Given all that facts probably there is an issue between bnxt_en driver =
-and BCM57502 firmware in I2C commands propagation interface.
-
-Is there someone who can help me to find out where is the issue? The =
-only bug that I find in code is that bnxt_read_sfp_module_eeprom_info do =
-not fill bank_number field of the struct hwrm_port_phy_i2c_read_input, =
-but it is not relevant for my case.
-
-Kamil.
-
-
+diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+index 2308665b51c5..95d7cbf6a2b5 100644
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -431,8 +431,12 @@ static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
+ 				       iph->daddr, ntohs(th->dest),
+ 				       iif, sdif);
+ 	NAPI_GRO_CB(skb)->is_flist = !sk;
+-	if (sk)
+-		sock_put(sk);
++	if (sk) {
++		if (sk->sk_state == TCP_TIME_WAIT)
++			inet_twsk_put(inet_twsk(sk));
++		else
++			sock_put(sk);
++	}
+ }
+ 
+ INDIRECT_CALLABLE_SCOPE
+diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
+index a45bf17cb2a1..5fcfa45b6f46 100644
+--- a/net/ipv6/tcpv6_offload.c
++++ b/net/ipv6/tcpv6_offload.c
+@@ -41,8 +41,12 @@ static void tcp6_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
+ 					&hdr->daddr, ntohs(th->dest),
+ 					iif, sdif);
+ 	NAPI_GRO_CB(skb)->is_flist = !sk;
+-	if (sk)
+-		sock_put(sk);
++	if (sk) {
++		if (sk->sk_state == TCP_TIME_WAIT)
++			inet_twsk_put(inet_twsk(sk));
++		else
++			sock_put(sk);
++	}
+ #endif /* IS_ENABLED(CONFIG_IPV6) */
+ }
+ 
+-- 
+2.45.2
 
 
