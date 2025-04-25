@@ -1,197 +1,119 @@
-Return-Path: <netdev+bounces-186050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB0BA9CEA7
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:49:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D335FA9CEDC
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85B76A01374
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:48:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D44F47BA4B5
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3D01C84B8;
-	Fri, 25 Apr 2025 16:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD2020E6F3;
+	Fri, 25 Apr 2025 16:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dhovad+E";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5cIHjDj/";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Dhovad+E";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="5cIHjDj/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0KB45/Cl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68161B4156
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 16:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BB820E323;
+	Fri, 25 Apr 2025 16:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745599595; cv=none; b=oQ28XoXT5n8mz3nKqZ4lx4TyM7X3DBvlXMGhWmh1mTfl0Ct2KvF1qZp4Yeby3rb2adnQH295iq4lpOn3E88U8cWR/d2AipAUgUZ/uvJ3yt2MpQFTdsrtyhsnhm9vl9W5y4hxUTnZf6YmaVLxB6jbgin1BHWyhyA2HQGMB+5/z9Y=
+	t=1745599727; cv=none; b=CsVcGzSa44nIQBheWj0tIaD9nMH+hQgrbyq9EIgCt8txjtHh7jLbjrAh17iaPYdOISHZhSZxdOYn0edmhYF+9juUMD0O3crzOee2hBymaxGisdrdnfOtaV2U/zkg/OHDWVi8VoDFyWHF3RZ9Bi4gsmn8CS+hd6eA4fbyZaorfw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745599595; c=relaxed/simple;
-	bh=HOrf+jmb4ws1bkU6N7LsjOZgRuMfhlAlBXbmWvZfsXU=;
+	s=arc-20240116; t=1745599727; c=relaxed/simple;
+	bh=VVJ/We/Lly+0+S2CLvE4/58LVy6SII/cRyTQmokO6BA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fr1tZUDtVERy0kvAEAKO/lW4lV6gFE6FgcIubxHh49+hwhLOwbcsu2OPwvDe9jkC3XH1Tpk4ypN1w7heoUvx6QFR2kd2PUdtS3vK96TyUeYv1GVIPERYcMEEtr+KPvRTy2Dr0+446wJ+Ozw+fzF358P0+m+hVRYa8VKAO7hUDoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dhovad+E; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5cIHjDj/; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Dhovad+E; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=5cIHjDj/; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8BF9821170;
-	Fri, 25 Apr 2025 16:46:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1745599591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2TsJoaUKg82MLLjLxK0pL7tlpbVY2aOP6RplXCGf28A=;
-	b=Dhovad+EjMCf9ri/QW61ZvWa52vqSXO9tLsyMP5gVAMZup7wnoTY1iL36hG7F6O4+CJH1W
-	Rk0VBwKanaqKCXSp5ayWAgOdfajhG8z4/vk/VbCGOxA16SSZp12PgBPqx5Nh+GQJks6c/Y
-	coURK6elCiX2c6QUhYgOe0L5eLJEL+o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1745599591;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2TsJoaUKg82MLLjLxK0pL7tlpbVY2aOP6RplXCGf28A=;
-	b=5cIHjDj/eUHKbMXElk641h6VBIkBJZG3qGU2w4ryC0sIpNOwNaziOzEOTtOBGAyZD+d/jL
-	diZGatnLuuQY93Dw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1745599591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2TsJoaUKg82MLLjLxK0pL7tlpbVY2aOP6RplXCGf28A=;
-	b=Dhovad+EjMCf9ri/QW61ZvWa52vqSXO9tLsyMP5gVAMZup7wnoTY1iL36hG7F6O4+CJH1W
-	Rk0VBwKanaqKCXSp5ayWAgOdfajhG8z4/vk/VbCGOxA16SSZp12PgBPqx5Nh+GQJks6c/Y
-	coURK6elCiX2c6QUhYgOe0L5eLJEL+o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1745599591;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2TsJoaUKg82MLLjLxK0pL7tlpbVY2aOP6RplXCGf28A=;
-	b=5cIHjDj/eUHKbMXElk641h6VBIkBJZG3qGU2w4ryC0sIpNOwNaziOzEOTtOBGAyZD+d/jL
-	diZGatnLuuQY93Dw==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 7984A20057; Fri, 25 Apr 2025 18:46:31 +0200 (CEST)
-Date: Fri, 25 Apr 2025 18:46:31 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Salvatore Bonaccorso <carnil@debian.org>
-Cc: Petter Reinholdtsen <pere@debian.org>, netdev@vger.kernel.org, 
-	Robert Scheck <fedora@robert-scheck.de>, AsciiWolf <mail@asciiwolf.com>
-Subject: Re: [mail@asciiwolf.com: Re: ethtool: Incorrect component type in
- AppStream metainfo causes issues and possible breakages]
-Message-ID: <i6bv6u7bepyqueeagzcpkzonicgupqk47wijpynz24mylvumzq@td444peudd2u>
-References: <p3e5khlw5gcofvjnx7whj7y64bwmjy2t7ogu3xnbhlzw7scbl4@3rceiook7pwu>
- <CAB-mu-QjxGvBHGzaVmwBpq-0UXALzdSpzcvVQPvyXjFAnxZkqA@mail.gmail.com>
- <CAB-mu-TgZ5ewRzn45Q5LrGtEKWGhrafP39enmV0DAYvTkU5mwQ@mail.gmail.com>
- <CAB-mu-QE0v=eUdvu_23gq4ncUpXu20NErH3wkAz9=hAL+rh0zQ@mail.gmail.com>
- <aAo8q1X882NYUHmk@eldamar.lan>
+	 Content-Type:Content-Disposition:In-Reply-To; b=c8415WiUelo2xiPZK16b0Ow/XeoqwWhzkR1siOoUs1rXGxKQvm2LG42FnUEBtTqPwhDBPQb/zdIhJr9Ki7AicT5o1TGF1fekypvHpRE9ZEgHyx4pzqFLaZSAscE0AustB9+vixzEcRMlCh/ivg8wNki1ReJoBy6MhaEzXczerr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0KB45/Cl; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ATk4v7NoBbgEunymz2bPZNqMG9U+8M7uzCmg6xrMY44=; b=0KB45/ClHbma9nV8LFMrAFqIcZ
+	uMCK2HFTVDTLlb0emgjJJ9qW7jckH+Xu7sX14t2sMI/SYFzdp3dg9Gb3gvozBPh4LGhOm+bjYOImo
+	STD7pSRVApFE+l7PToHHgNZ0R4rX46h0R5VU/5SPjoFp61Q0KY+8O7CXgHjwJ1aUh6oudMeQBBGmc
+	3KRlqDrkvg7kHdTcg3EVJ5+WC8tFLvTZ3eZ92WW3xv4uNXqnKGu7HP3ZaXJrMr/Oow4J9k84p3D13
+	KyU3ZzjYzvvaoSEHYuWLcTtvpJTtKgugYQyn7PsjhfiZDQ7rDX5cKQrd2BoTt3jRdbWWFHgMoMvCX
+	BCjvee0w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55842)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u8ME5-0000iH-0U;
+	Fri, 25 Apr 2025 17:48:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u8ME1-0002H8-0J;
+	Fri, 25 Apr 2025 17:48:29 +0100
+Date: Fri, 25 Apr 2025 17:48:28 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Remove ineffective
+ checks from ksz_set_mac_eee()
+Message-ID: <aAu83HGXOxQ6H8on@shell.armlinux.org.uk>
+References: <20250425110845.482652-1-o.rempel@pengutronix.de>
+ <aAuRAadDStfwfS1U@shell.armlinux.org.uk>
+ <aAubnUSDpwtfuCrm@pengutronix.de>
+ <aAufpsLhs8GLMm_b@shell.armlinux.org.uk>
+ <aAu41tjRIir8oMK7@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lzydqdswpg7citn6"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAo8q1X882NYUHmk@eldamar.lan>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Spam-Score: -5.90
-X-Spam-Flag: NO
+In-Reply-To: <aAu41tjRIir8oMK7@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Fri, Apr 25, 2025 at 06:31:18PM +0200, Oleksij Rempel wrote:
+> Additionally, it seems that setting eee_enabled automatically based on
+> advertisement in phy_probe() is no longer appropriate.
+> If you agree, I would propose a patch to remove this initialization.
 
---lzydqdswpg7citn6
-Content-Type: text/plain; charset=iso-8859-2
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Remember how eee_enabled is implemented. It controls whether we program
+the EEE advertisement with the contents of the software advertisement
+state, or clear it.
 
-On Thu, Apr 24, 2025 at 03:29:15PM +0200, Salvatore Bonaccorso wrote:
-> Hi Michal,
->=20
-> On Fri, Apr 11, 2025 at 10:48:44PM +0200, AsciiWolf wrote:
-> > Please note that as pointed out in my previous emails, the binary
-> > provides seems to be required for console-application component type.
-> >=20
-> > Daniel
-> >=20
-> > p=E1 11. 4. 2025 v 22:18 odes=EDlatel AsciiWolf <mail@asciiwolf.com> na=
-psal:
-> >=20
-> > >
-> > > Here is the proposed fix. It is validated using appstreamcli validate
-> > > and should work without issues.
-> > >
-> > > --- org.kernel.software.network.ethtool.metainfo.xml_orig
-> > > 2025-03-31 00:46:03.000000000 +0200
-> > > +++ org.kernel.software.network.ethtool.metainfo.xml    2025-04-11
-> > > 22:14:11.634355310 +0200
-> > > @@ -1,5 +1,5 @@
-> > >  <?xml version=3D"1.0" encoding=3D"UTF-8"?>
-> > > -<component type=3D"desktop">
-> > > +<component type=3D"console-application">
-> > >    <id>org.kernel.software.network.ethtool</id>
-> > >    <metadata_license>MIT</metadata_license>
-> > >    <name>ethtool</name>
-> > > @@ -11,6 +11,7 @@
-> > >    </description>
-> > >    <url type=3D"homepage">https://www.kernel.org/pub/software/network=
-/ethtool/</url>
-> > >    <provides>
-> > > +    <binary>ethtool</binary>
-> > >      <modalias>pci:v*d*sv*sd*bc02sc80i*</modalias>
-> > >    </provides>
-> > >  </component>
-> > >
-> > > Regards,
-> > > Daniel Rusek
->=20
-> Is there anything else you need from us here? Or are you waiting for
-> us for a git am'able patch? If Daniel Rusek prefers to not submit one,
-> I can re-iterate with the required changes my proposal=20
-> https://lore.kernel.org/netdev/20250411141023.14356-2-carnil@debian.org/
-> with the needed changes.
+So, if the hardware has a non-zero advertisement, then it is completely
+correct that we read the advertisement and set eee_enabled to be true.
+The alternative is, we set eee_enabled false and clear the
+advertisement.
 
-Yes, please. I'll need a formally submitted patch.
+We can't leave the advertisement and set eee_enabled to be false. That
+is inconsistent with the way we handle any attempt to set the
+eee_enabled state.
 
-Michal
+I think the correct approach in this case is to set
+config->eee_enabled_default to be true in ksz_phylink_get_caps(),
+thereby correcting the bug introduced in March 2024. That has the
+effect of setting phy->eee_cfg.tx_lpi_enabled, which means we should
+report tx_lpi_enabled as true when reading the EEE state.
 
---lzydqdswpg7citn6
-Content-Type: application/pgp-signature; name="signature.asc"
+For the stable kernels between March 2024 and the integration of
+phylink EEE support, a similar approach will be necessary to restore
+the pre-March 2024 behaviour, but that will be much harder to correct
+as the DSA driver doesn't have an appropriate hook to set that field
+at the appropriate time.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmgLvGIACgkQ538sG/LR
-dpV55Qf9G3xUdIfR8Ch4XKmIflscxYhVafL9nRBVIJahowpFeq3j74fn7oWGt9RK
-RrK8OoOs9en5wsGqmrLk7sabQ9zPGJo3fXhoEircP7awl2X3g8BU0AcKEZ1bFThc
-EHu4M9s2ZPvRMwigz6Zj8gUgZhBNGoJe6NT7YxqAGpxGdrXGdhi/3+enAi4b6fGJ
-lvodZMbwi6I5o/SKphDu83lvHXpmibwhyTVSfRdWaKzxOiEon0qVL0AWa4hEYp2s
-y2jIx9Lkd+BaSRyT58iDiQVd5UgoMmBAhGhuceDoMuGozW04JtndO9q94uCBRn77
-6pz1ysKvxo15Lg8kQ7aUosVTzFSXLw==
-=XS8G
------END PGP SIGNATURE-----
-
---lzydqdswpg7citn6--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
