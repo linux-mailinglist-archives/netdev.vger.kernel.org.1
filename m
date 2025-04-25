@@ -1,113 +1,163 @@
-Return-Path: <netdev+bounces-186098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 227F9A9D2C0
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 22:14:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDA0A9D3F5
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 647E07A5347
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 20:13:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A0473ADBF8
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDBA221D86;
-	Fri, 25 Apr 2025 20:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFD7224AFC;
+	Fri, 25 Apr 2025 21:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LoudM2O5"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="EIqyTlxX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx06lb.world4you.com (mx06lb.world4you.com [81.19.149.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF7018DB02;
-	Fri, 25 Apr 2025 20:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28D5224AE6;
+	Fri, 25 Apr 2025 21:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745612044; cv=none; b=sp91BArNqj6Phs9RWqq1MVLvwgfgUHUJ4KqFkOmKpLEUbAkITnWByLNJz6YiCTxjKGE6I4buakGEE1x8oO6XJPBHsI4wk6rE/QETq/FCSmm1Q7SUHYpkr45s6xS2nvM0Kv81p/v0i0NfL8yLNeVqeBUVx92rAgrwNj6eKEJmii0=
+	t=1745615405; cv=none; b=BNyHMBQcN5wQWspbP05WEU371LZwzy3waP5IayAJ3iAeYpD95wlB2u3KPqzB2Ag+qST8DJxgrcR78OM3c/JhFQxCGnxziGuuDBlxpIsiAQonxZuMbmqly0+Fne9RDdXb15I4Jv3Ussti1uBah0ZLm/tpSYZmw0KA0NXrS4CR3J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745612044; c=relaxed/simple;
-	bh=Pgn/TZ1ujuuwbnzguLrmQLLDyPec5k7g882M+f0Gsi8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=M9+r+P3gfZZetmZPbQhgWB/kwEhQGCGOHh6DMLbBvuv28JJuzmumxl9PNeMdB0spGiXuGhjl55np4YEU91C1+fiudletsi2dNvqfI4/I0LQHK7DAkDRM+XiIbBUTghzGQUMTt+PIEkszl1ft79YZ0NKgeLvpx8STCVscfwmNI/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LoudM2O5; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53PKCYWU3252234
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 25 Apr 2025 13:12:35 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53PKCYWU3252234
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745611957;
-	bh=Pgn/TZ1ujuuwbnzguLrmQLLDyPec5k7g882M+f0Gsi8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=LoudM2O5Ggb8UKAE6BloQQgcPc3DDE93Uie4tiM2kEIfkYTDiUipcf8Neu/KvASRD
-	 bE9VD4R7oFqzmvtHTCFXcREprEax191bGlgx7zIbx5omdo51jLm5RkfhQX4yDbIVRa
-	 GVL5VijALlpGtEZskIkKxZJvEBt7FnMylbJIzjd/5nwjnzxaNo83Yy1fNK7XF6PF8t
-	 DnRu+iOKDqlUdSjj+DZ7GCvEpBZIZH9XdMoGw1VbkegsrdCwgEQlt1Pl2oarHuisPj
-	 gl4+pko/7dDkS+MuVeY76Vou/tfvTznub+Ylyb0SFF25MRCp2uGdpU5pdOUWL4jNE7
-	 1qvVj2z6FqDTA==
-Date: Fri, 25 Apr 2025 13:12:33 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
-        andrew.cooper3@citrix.com, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-Subject: =?US-ASCII?Q?Re=3A_=5BRFC_PATCH_v2_21/34=5D_x86/msr=3A_Utiliz?=
- =?US-ASCII?Q?e_the_alternatives_mechanism_to_write_MSR?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
-References: <20250422082216.1954310-1-xin@zytor.com> <20250422082216.1954310-22-xin@zytor.com> <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com> <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com> <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com> <20250425123317.GB22125@noisy.programming.kicks-ass.net> <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
-Message-ID: <D4ADDBA5-D9B8-4DD5-8D83-8CD482700E71@zytor.com>
+	s=arc-20240116; t=1745615405; c=relaxed/simple;
+	bh=i7IbPiakB7vpTLjK9gupk8hrsHLDntK7oG/06/Usdak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ylj2Zho7EK4CkKNzUYBoIcRKi/a/FOHSVQ6rWbdgrTF74cF0tToK1g09Iwq+/QGTsQ+rMUq8t3sm6rxUyQNjIGcsZzQ/sDvipfIEvuWZ8fevmWHMAF+sqi1nrcE1a9oFMrB6leVWSa1gcaciEAJ/vPNsSb3pavH4pODM0EHOg7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=EIqyTlxX; arc=none smtp.client-ip=81.19.149.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=U2PlbSYJoDqGmlBnxEFPhzu2SoY19RbUjb4TC95q0os=; b=EIqyTlxX3Nc8I3nDrfhAQrxBF1
+	iFoESpbBgtB7fFarOuSBVC4vSpLvEjSUfpTT0/pBGvYSUqp+t/dIOHxHjcaPOuDDLBCz/qqyAc5a7
+	/UupZVwcTgYGbu8Dd6WRyA9kXC/JAaJWqa/hh864eVu3hPa56NRo0Tq60+5umqBr2cE8=;
+Received: from [188.22.4.210] (helo=[10.0.0.160])
+	by mx06lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1u8PSV-000000006I9-2m9q;
+	Fri, 25 Apr 2025 22:15:39 +0200
+Message-ID: <31a7c481-0b0c-4a46-9eb9-983f88ca137e@engleder-embedded.com>
+Date: Fri, 25 Apr 2025 22:15:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 1/2] net: selftest: add net_selftest_custom()
+ interface
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+ chenhao418@huawei.com, jonathan.cameron@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250421134358.1241851-1-shaojijie@huawei.com>
+ <20250421134358.1241851-2-shaojijie@huawei.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250421134358.1241851-2-shaojijie@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On April 25, 2025 5:51:27 AM PDT, "J=C3=BCrgen Gro=C3=9F" <jgross@suse=2Eco=
-m> wrote:
->On 25=2E04=2E25 14:33, Peter Zijlstra wrote:
->> On Wed, Apr 23, 2025 at 06:05:19PM +0200, J=C3=BCrgen Gro=C3=9F wrote:
->>=20
->>>> It's not a major change, but when it is patched to use the immediate
->>>> form MSR write instruction, it's straightforwardly streamlined=2E
->>>=20
->>> It should be rather easy to switch the current wrmsr/rdmsr paravirt pa=
-tching
->>> locations to use the rdmsr/wrmsr instructions instead of doing a call =
-to
->>> native_*msr()=2E
->>=20
->> Right, just make the Xen functions asm stubs that expect the instructio=
-n
->> registers instead of C-abi and ALT_NOT_XEN the thing=2E
->>=20
->> Shouldn't be hard at all=2E
->
->Correct=2E And for the new immediate form we can use ALTERNATIVE_3()=2E
->
->
->Juergen
+On 21.04.25 15:43, Jijie Shao wrote:
+> In net/core/selftests.c,
+> net_selftest() supports loopback tests.
+> However, the loopback content of this interface is a fixed common test
+> and cannot be expanded to add the driver's own test.
+> 
+> In this patch, the net_selftest_custom() interface is added
+> to support driver customized loopback tests and
+> extra common loopback tests.
+> 
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>   include/net/selftests.h |  61 +++++++++++++
+>   net/core/selftests.c    | 188 +++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 245 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/selftests.h b/include/net/selftests.h
+> index e65e8d230d33..a36e6ee0a41f 100644
+> --- a/include/net/selftests.h
+> +++ b/include/net/selftests.h
+> @@ -4,6 +4,48 @@
+>   
+>   #include <linux/ethtool.h>
+>   
+> +#define NET_TEST_NETIF_CARRIER		BIT(0)
+> +#define NET_TEST_FULL_DUPLEX		BIT(1)
+> +#define NET_TEST_TCP			BIT(2)
+> +#define NET_TEST_UDP			BIT(3)
+> +#define NET_TEST_UDP_MAX_MTU		BIT(4)
+> +
+> +#define NET_EXTRA_CARRIER_TEST		BIT(0)
+> +#define NET_EXTRA_FULL_DUPLEX_TEST	BIT(1)
+> +#define NET_EXTRA_PHY_TEST		BIT(2)
 
-Yes; in the ultimate case there are *four* alternatives, but the concept i=
-s the same and again we have it implemented already=2E
+What is the difference between NET_TEST_NETIF_CARRIER and
+NET_EXTRA_CARRIER_TEST? Aren't these the same tests?
+
+> +struct net_test_entry {
+> +	char name[ETH_GSTRING_LEN];
+> +
+> +	/* can set to NULL */
+> +	int (*enable)(struct net_device *ndev, bool enable);
+> +
+> +	/* can set to NULL */
+> +	int (*fn)(struct net_device *ndev);
+> +
+> +	/* if flag is set, fn() will be ignored,
+> +	 * and will do test according to the flag,
+> +	 * such as NET_TEST_UDP...
+> +	 */
+> +	unsigned long flags;
+
+Looks limited, this interface does not scale as the bits in flags are
+limited.
+
+> +};
+> +
+> +#define NET_TEST_E(_name, _enable, _flags) { \
+> +	.name = _name, \
+> +	.enable = _enable, \
+> +	.fn = NULL, \
+> +	.flags = _flags }
+> +
+> +#define NET_TEST_ENTRY_MAX_COUNT	10
+
+I expect that you have to eliminate this limitation too.
+
+> +struct net_test {
+> +	/* extra tests will be added based on this flag */
+> +	unsigned long extra_flags;
+
+Why this extra_flags to trigger tests? AFAIU the same tests can be
+triggered with entries.
+
+> +
+> +	struct net_test_entry entries[NET_TEST_ENTRY_MAX_COUNT];
+> +	/* the count of entries, must <= NET_TEST_ENTRY_MAX_COUNT */
+> +	u32 count;
+> +};
+
+You try to make net selftests more usable for drivers. I also tried
+that, but Andrew Lunn argumented for controlling the selftests some
+user space interface is expected. IMO the situation has not changed.
+
+https://lore.kernel.org/netdev/20250227203138.60420-3-gerhard@engleder-embedded.com/T/#md5e4ac1ca41adbdb43755d3c189aa8b8228bf8c9
+
+Gerhard
 
