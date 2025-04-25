@@ -1,78 +1,82 @@
-Return-Path: <netdev+bounces-186072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2881FA9CF62
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:18:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3585CA9CF64
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62D871BA011B
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:18:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C906A7A634B
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 17:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D884D1F3BAC;
-	Fri, 25 Apr 2025 17:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A221E9B32;
+	Fri, 25 Apr 2025 17:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oIRhYNBf"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="tMs8P2PL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4535191F8C
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 17:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87D7134CF;
+	Fri, 25 Apr 2025 17:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745601500; cv=none; b=Puwp2qEJaIBW7f9ZMbwuhgyvA0tlrVsbPBITLSDlhIP35JPrsaybozQe2bKwdVzJhJt9NLysXDzVDQm9PAyjx0WPrDtwYrYJEGrrY8WSPx3m8Atl4WmcfvL95zD0tl3jAm5PVj0lK+0c+jeTFhpcG1hUNj0bGh/kztiCktA+PQw=
+	t=1745601526; cv=none; b=up0Hk/+ZMCpvgRv5GxK4NFtudNfXgwrXXkLSml7t+XlLtvd77bWeyMld3tDUMPcDlz2CBe5nxagIO6As2oXPX2+/vU+SAJYrxcv+pMyONqVtbi4KHFGdyX6qfzFEieN0RGpuV04uo+WEtTBGwl7LeRpeYN5LHWm8Rieo5jSd6zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745601500; c=relaxed/simple;
-	bh=Iz/DsBxzrjvLjAutt7NUQvez1xoEgkZ6nLimuv7dnnI=;
+	s=arc-20240116; t=1745601526; c=relaxed/simple;
+	bh=yMlIIWP69R2LmDFUlaAQd5j5I9BJBFAMsgi+9DqlMI4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dueb5MfrBBBc2RVp/6AsLzpTxdx0T6QxvrQbRjgeZKweOCVS/gHED6Hgc2Bshv428E/uBwR8FAs22AG5eW1sfdAtMWNkc7JhAR6KALLDlacgh5/McqFXlQqb0o39IKGo+GZ/CM2aY5azH8l2+ScKpei6hN343x3Llvq8HNwSIFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oIRhYNBf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4544C4CEE4;
-	Fri, 25 Apr 2025 17:18:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745601500;
-	bh=Iz/DsBxzrjvLjAutt7NUQvez1xoEgkZ6nLimuv7dnnI=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=k/voUwadeuh1j59D+p9uk1fl31DLK1iqyldENvd+7RSF398L7aGPjCawbQ0wkENC+eS1Lw7q+VYlg7LQKHuGjg9vUn995DXDM9iCR2MW1yDGC2XkxIOrPzfCqXGFkpQLmbAKgfl2TO9z0UiXwFtyfQaajhWyTAok0vsM2qL/1mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=tMs8P2PL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B5BDC4CEE4;
+	Fri, 25 Apr 2025 17:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1745601525;
+	bh=yMlIIWP69R2LmDFUlaAQd5j5I9BJBFAMsgi+9DqlMI4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oIRhYNBfNIwngkyd7raqmWRWxgjLNp2c8V8hdUkz//SsFSC/i6dZwJIFmD5xCOlk0
-	 1wSjSgmYyb0SNr0pCzzZOJEKq0vtS6VBppsMtu6l+2dalzI7RuQZIRFva2YUCL1Mcl
-	 E3SrEnM3dl+fQ6g6HZ0awU5Hr7/r1o7fRBGefntJc/0vJ//vMZI21phcI+Ed+jJfit
-	 EzlSDw83g7Izv3grpZ0GgcLZw8UORhdsPKosoIWA6lPKYS8U9UfLWg/4i5ItXRR/Y4
-	 tzPM6XvNyi1Q8zjHg8DnBTqeGErUYpQkueNzbuGg3Co+ooFU3Whc/Z0BOqqZf7eX5y
-	 pMmv0lOINzQ8A==
-Date: Fri, 25 Apr 2025 18:18:16 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 3/3] io_uring/zcrx: selftests: add test case
- for rss ctx
-Message-ID: <20250425171816.GS3042781@horms.kernel.org>
-References: <20250425022049.3474590-1-dw@davidwei.uk>
- <20250425022049.3474590-4-dw@davidwei.uk>
+	b=tMs8P2PLhXOBbIybhWvBosl6Tc71+3SXPrxqmWH6brQ9SWT5tU3K/zDlpanVZo30d
+	 6S73yPSNJSzKy3cyvYIkJbx+k2bpINNHzqfn8ftSeknc1GBYw7hDNsVdyxBTYsATFF
+	 L3PR6RHhnIVvd7fEw2zhHurgaBTKUNAmOrkorT6o=
+Date: Fri, 25 Apr 2025 13:18:41 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christopher Hoy Poy <choypoy@linuxfoundation.org>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, patchwork-bot+netdevbpf@kernel.org, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH 0/3] selftests/bpf: Fix a few issues in arena_spin_lock
+Message-ID: <20250425-mottled-ruby-leech-d48a91@lemur>
+References: <20250424165525.154403-1-iii@linux.ibm.com>
+ <174551961000.3446286.10420854203925676664.git-patchwork-notify@kernel.org>
+ <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
+ <20250424-imported-beautiful-orangutan-bb09e0@meerkat>
+ <20250425092551.2891651d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250425022049.3474590-4-dw@davidwei.uk>
+In-Reply-To: <20250425092551.2891651d@kernel.org>
 
-On Thu, Apr 24, 2025 at 07:20:49PM -0700, David Wei wrote:
-> RSS contexts are used to shard work across multiple queues for an
-> application using io_uring zero copy receive. Add a test case checking
-> that steering flows into an RSS context works.
+On Fri, Apr 25, 2025 at 09:25:51AM -0700, Jakub Kicinski wrote:
+> On Thu, 24 Apr 2025 14:51:51 -0400 Konstantin Ryabitsev wrote:
+> > > Hmm. Looks like pw-bot had too much influence from AI bots
+> > > and started hallucinating itself :)  
+> > 
+> > I'll look into what happened here.
 > 
-> Until I add multi-thread support to the selftest binary, this test case
-> only has 1 queue in the RSS context.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> Alexei mentioned that the bot was stopped, I presume to avoid further
+> mistakes. I'm 100% sure I've seen the bot be confused by merge commits
+> before. It happens occasionally, IMHO there is no need to take the bot
+> offline. Is there an ETA on it coming back?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Yes, I'm poking at it right now and I'm hoping to bring it back up soon.
 
+-K
 
