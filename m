@@ -1,136 +1,145 @@
-Return-Path: <netdev+bounces-185842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239BCA9BDDB
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:26:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61274A9BDE4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5470E1897DA1
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:27:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90590189AB28
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 05:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C29821660D;
-	Fri, 25 Apr 2025 05:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB00229B2B;
+	Fri, 25 Apr 2025 05:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRXDkC/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361D520B808;
-	Fri, 25 Apr 2025 05:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C1D227E93;
+	Fri, 25 Apr 2025 05:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745558808; cv=none; b=hJIsU2/LE53M5nrZcvyhpym/R6IaznPLXViAWovHYac9Np0kg/4N/Xw2n0M2ovURkMr7RrxZRmSTnsVRQVaH00mjqtznLUaLtvYqgUqxoT7S8Wlb7aKaIS54vozr6q0Vc8NDLAJd/CycYukiC9BtGsd13ZpV/R+Z7e0AklkWZ7w=
+	t=1745559205; cv=none; b=of5eg0Cb3Y+Wpsf1CU15f32v2RauwBCyADf8cO5rloMcUJEemeSyLzEaLj6ip6vkhXNKSaQ5P35wDLyCpLAdyI19aZ0c6kkvG/kyhbO6GsSNgDsxE5f6Lx3m4jcrytjpdO2qVVk+lpB9Y5hT7uVuSillRGM9GUMdDjawTpJ6MY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745558808; c=relaxed/simple;
-	bh=DHu40UIhkKdjXoKlsrsSoVrYHeDWq3E3jCkx2mydxzA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rZVCxM7ushhqhlN3k+aiX/N1WEmamny7ozuDydAA6h4spQ182x3Gupni+FguEJeetKEGUEoGRUedrOUv03XQvTls0A0bzgZ88hw2Bv6h1VANFJgqkVgIxmeP0JVFzZ8aw6axBc+d2bgy41sRVkSbeq4H2chTSpOrHIDiD3JK1+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5499d2134e8so2004217e87.0;
-        Thu, 24 Apr 2025 22:26:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745558799; x=1746163599;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vorWjyWoS+/pe1rTuodzRNXMvlPaeZ3qAjeUiTyfr/Y=;
-        b=eWnIGdzuFl/0qIndoSQ7FzEStEi/6Tt9IELqyN+Qqdrt3vFFuEpWI0GFOD8DbC04fn
-         lihiv+NOPcLpLG8UD+YtEXYhF6QgK3Z+TCQdIGfvKHwGFn6J62TP7v7WSxr6ELcoHkOP
-         p3s3vqCvK4szxXGwg/l4Re28/TAlUsvyxu4sYQ3ihaochAdCGhUPCWQi05fFg49iFqO7
-         c2U9yiLPjxC96jzM8Fc8B4UZYzk6fT+ml2K4Ot0BkoRZJrThmme4PtiJI8U1krdVqLf9
-         HoE28562QDtVh5IkHrkVS3E4kPkyvHsVSbftjuGBANusvo4oI+rwjs2hcPiMj9ovaIZt
-         ckMw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0b84bct5RaBFtjpJoZZT+SubwLHVFSG2tYpnSkXE9WmWUAnmpvR8zFnpe4qTG5/ulrf+hQtva@vger.kernel.org, AJvYcCXDDlp9wCgXBqYMnjFTGiAFykAcQGIf5dk1s6Z9yXra3O1NRvKYuaN1WS3jECaVDuIwYMs/ojTMppnT@vger.kernel.org, AJvYcCXiFQrGvteXvlOt8DMdMaietkAagEawhcieTz+Hly0NFKPadNA4G07zTa6CsoIVv2V1KBawmf6VRtqwYxyR@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzQSfG4jqCe2ohGH562GBGiaPCDT+dyCXonPG0C1rJGWC3FDXl
-	VnnKAqUSzD81q/nyMI6ltab+GROJfwIZAGt/PbmXuf4cKgfKjmxGL+AyED+bL+w=
-X-Gm-Gg: ASbGncsFgYTXz1WfIeOQeDaamJCkw5+AnH7/5zrlJt5OsYnoJjRiJb3wnK37Io3OFnW
-	IajZ1FLpMcVwf229YiFElmRkMwffXZ/ymnE7qKeXE15vEOjlZdPuTxoLOeCQwiI2W2v3q40Ud+i
-	Upo1YvlvXVcoxV7bVmBpZ5fz0rdEkLQ/JUnHRMG1lCnGZSmGMaPPUYjd9Q5dUs5fuXAJ1G6CoDA
-	J40+X4PH4EspQVMwWx9DmTILbOhfam9TzRFs1HHKzlMrVAKbA0HVYANkLfEabhN0uXJrBU0ptt2
-	x5piXe+xccyfZVYGbzbvdAOgPVNpxqSVC2Gznob10t7EpJ2ORv9aFrMDCH4AYFmiRfyp4SGcnIG
-	jSwiAlQxH
-X-Google-Smtp-Source: AGHT+IGpAmQmKYbxZZU2G9HtLZqcwF1g7fwu85alo+iml0RAysfNFhv2BeEXvi8MpguC8jPhjQGqkg==
-X-Received: by 2002:a05:6512:3da9:b0:549:b0f3:439f with SMTP id 2adb3069b0e04-54e8cbdf78amr239531e87.25.1745558799052;
-        Thu, 24 Apr 2025 22:26:39 -0700 (PDT)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54e7cb26211sm482158e87.44.2025.04.24.22.26.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 22:26:38 -0700 (PDT)
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-3105ef2a06cso18112051fa.2;
-        Thu, 24 Apr 2025 22:26:38 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUbB9Z6T6TXKT7yfZrynYcgZsJCQj2bZjhX7cPdXZYwrAPmgFDKAEQPFXPsUzGCQaxEgTttYkZ+xWp2@vger.kernel.org, AJvYcCVCs+FaHBpIyjeH6rpyzUQ5XwiwZsNURa5EUwlLklbrcfsS7RVIEAiDEwtvKFIvQx7rCssTJbMx@vger.kernel.org, AJvYcCVwJDl9eSrvFWYLHKOK9SUemAQ6+73wDNOGGYHHjKulIAI0hkgkUp1/Jw6dsBxuYwUjueT/9DOWi/nAZ2te@vger.kernel.org
-X-Received: by 2002:a05:651c:542:b0:30b:efa5:69c3 with SMTP id
- 38308e7fff4ca-31906e314a0mr2145241fa.22.1745558797847; Thu, 24 Apr 2025
- 22:26:37 -0700 (PDT)
+	s=arc-20240116; t=1745559205; c=relaxed/simple;
+	bh=yaZ/xOw+yV7pDnZ4omfyKfpAGH6Pr1XtYBYLDUHsxpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IglWlAi6kwD0pWxSBNLcit86t85mLsnMeiatVsFYKLpBrd8Ll/Kvk65n5m9rF74N1LyTOPW8nbB2zfhumRDweRvLwJS7uHP+89s51gsWIMD61L/dLJoNrY1x/1epsiWkjSCsJFAxxMVhkMELjdtuXhgIXGm6IbVc+pcDU8N3OpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRXDkC/e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B92ECC4CEE4;
+	Fri, 25 Apr 2025 05:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745559204;
+	bh=yaZ/xOw+yV7pDnZ4omfyKfpAGH6Pr1XtYBYLDUHsxpU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mRXDkC/eFQrFfTAR3fbh0KpZCOeTtnv4cACQ2xNdDBa+FqnFssheLF5Vkep1apZjz
+	 o0bKS8Ainq6orEc5feo5R1vAa0ATuGGdGTYCMqiB+8oiNNzL14LGzOr3RPFoG9nkrE
+	 M1jcPbckn/v2S4JoPiVJ/aAS3ySZDbG4A4rs0Cq6y+kwONplUlh2GG6QKvSUhkLIMQ
+	 9a3SJjaa6+uPBMQRXICVI7IkWntN3CWPXDQ6q//fU2/l7wCbm4LMn80A/p4Y+nEEWw
+	 q6CzbpMwslcBm2d1/iJgIXf+Ti9cxhB3jFI5rAOzTo3ux6XO4YFi1fjD5Gk43e5TQ1
+	 EGk1l72F4x/PQ==
+Message-ID: <0bf77ef6-d884-44d2-8ecc-a530fee215d1@kernel.org>
+Date: Fri, 25 Apr 2025 07:33:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org> <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
-In-Reply-To: <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org>
-Reply-To: wens@csie.org
-From: Chen-Yu Tsai <wens@csie.org>
-Date: Fri, 25 Apr 2025 13:26:25 +0800
-X-Gmail-Original-Message-ID: <CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
-X-Gm-Features: ATxdqUFQB3DitZ7r67Jb5Ui1og31mJLNpJsBnkQBmfhJ0SUAid0UCHRMYJY-5Nc
-Message-ID: <CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC
-To: Yixun Lan <dlan@gentoo.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andre Przywara <andre.przywara@arm.com>, Corentin Labbe <clabbe.montjoie@gmail.com>, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v7 4/7] net: mtip: The L2 switch driver for imx287
+To: Jakub Kicinski <kuba@kernel.org>, Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20250423072911.3513073-1-lukma@denx.de>
+ <20250423072911.3513073-5-lukma@denx.de> <20250424181110.2734cd0b@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250424181110.2734cd0b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 24, 2025 at 6:09=E2=80=AFPM Yixun Lan <dlan@gentoo.org> wrote:
->
-> Add EMAC0 ethernet MAC support which found on A523 variant SoCs,
-> including the A527/T527 chips. MAC0 is compatible to the A64 chip which
-> requires an external PHY. This patch only add RGMII pins for now.
->
-> Signed-off-by: Yixun Lan <dlan@gentoo.org>
-> ---
->  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi | 40 ++++++++++++++++++++=
-++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/=
-boot/dts/allwinner/sun55i-a523.dtsi
-> index ee485899ba0af69f32727a53de20051a2e31be1d..c9a9b9dd479af05ba22fe9d78=
-3e32f6d61a74ef7 100644
-> --- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> +++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
-> @@ -126,6 +126,15 @@ pio: pinctrl@2000000 {
->                         interrupt-controller;
->                         #interrupt-cells =3D <3>;
->
-> +                       rgmii0_pins: rgmii0-pins {
-> +                               pins =3D "PH0", "PH1", "PH2", "PH3", "PH4=
-",
-> +                                      "PH5", "PH6", "PH7", "PH9", "PH10"=
-,
-> +                                      "PH14", "PH15", "PH16", "PH17", "P=
-H18";
-> +                               allwinner,pinmux =3D <5>;
-> +                               function =3D "emac0";
-> +                               drive-strength =3D <40>;
+On 25/04/2025 03:11, Jakub Kicinski wrote:
+> On Wed, 23 Apr 2025 09:29:08 +0200 Lukasz Majewski wrote:
+>> This patch series provides support for More Than IP L2 switch embedded
+>> in the imx287 SoC.
+>>
+>> This is a two port switch (placed between uDMA[01] and MAC-NET[01]),
+>> which can be used for offloading the network traffic.
+>>
+>> It can be used interchangeably with current FEC driver - to be more
+>> specific: one can use either of it, depending on the requirements.
+>>
+>> The biggest difference is the usage of DMA - when FEC is used, separate
+>> DMAs are available for each ENET-MAC block.
+>> However, with switch enabled - only the DMA0 is used to send/receive data
+>> to/form switch (and then switch sends them to respecitive ports).
+> 
+> Lots of sparse warnings and build issues here, at least on x86.
+> 
+> Could you make sure it's clean with an allmodconfig config, 
+> something like:
+> 
+> make C=1 W=1 drivers/net/ethernet/freescale/mtipsw/ 
 
-We should probably add
+... and W=1 with clang as well.
 
-                                  bias-disable;
-
-to explicitly turn off pull-up and pull-down.
-
-ChenYu
+Best regards,
+Krzysztof
 
