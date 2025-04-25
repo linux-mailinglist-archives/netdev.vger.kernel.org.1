@@ -1,148 +1,186 @@
-Return-Path: <netdev+bounces-185848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2C4A9BE5C
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E6EA9BE65
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCAE54651C1
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:06:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 761144651F0
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 06:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DEB22B8B2;
-	Fri, 25 Apr 2025 06:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E1E22B8A5;
+	Fri, 25 Apr 2025 06:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Hw/Oj/IO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cm1hnjLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016AF22B595;
-	Fri, 25 Apr 2025 06:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B202701D7
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 06:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745561181; cv=none; b=LAt4q1ecx+kYB2/CQbngScoio8c71I/VXc07qIlAARndoJIoMm7l8uAryock3zG8O6sKe9fXj4yBBT8WTmtidRHRr72IXY47iuZAqXYGnKk9APAek19HATGmW92SyA/5MeJx/VUTjxv9GXMubO7WDwoXxqbv1RKZt218KTR0AxA=
+	t=1745561295; cv=none; b=DpILqbySZKsxhs64G8oJPirK3two29eL2++t+lVvnPxtQ8Nq3nsX8ORVO3GyZ5u6gGIJJxOt9osRFLaM/OJWcSdA8cdFLHZW+exyzMGeMQAuIpmYbwYydwwgthOLVbtE0zPJMMhIqDITojhSv+DlIS0nDkRqnit6sPl4XIgr9nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745561181; c=relaxed/simple;
-	bh=VtArZyvh3OJVlev1TuT+mhv7J+r5VPbKR7V2yD85l78=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gg5i2UAmLpvUY2lTOCx3fmiooSJVfwy/C//MLXY6waPtJLsLuEo8qNMBebU2AAewxx7j8TXeehreFk4Im9ne//DvbfGHt+s/o7pyq/oU90NVZOzTg/LyTgE4ULq2GpT8Qw6CGEQAZUvSOqwEvR3RRk8QhdO5eskzTJxB8rk35o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Hw/Oj/IO; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 26943102E13D0;
-	Fri, 25 Apr 2025 08:06:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1745561170; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=ef+EBezQpcy3FcBFm+eU7MkGtMSmPuuasBxJN60QVdI=;
-	b=Hw/Oj/IO4Av7kOb3s35NwLPns3+xpbMuJVuqH+xEDaSFwjxveKEzr7E6GkEmGAbQ6i35dM
-	xfOtt+ma5ftYQe0YIuzr79f1lSRMvhwmHrJ1MKL1Op+VIQRjqdCRHl+OHvEnjjOZFJ+2Wa
-	LtflvHzHZfua9V3s/vsxEA9p/kxptvSAfc7b76Z9sg6Ev2gHQTqPZMgpYWon2RLzLaBCt2
-	4eoUgjaLQqtWm1M1X9UOXtMvYvlshLvuIQD/NRGIjBf/RLx1pizmf2RUTYAxUobIlbDqLt
-	ch/aX+sPqLBv6lvEWY1nDorOB4GpeiZ3MwqBpoZ7xZCUbBWY95Mbz5LJzCAHiQ==
-Date: Fri, 25 Apr 2025 08:05:56 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v7 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250425080556.138922a8@wsk>
-In-Reply-To: <0bf77ef6-d884-44d2-8ecc-a530fee215d1@kernel.org>
-References: <20250423072911.3513073-1-lukma@denx.de>
-	<20250423072911.3513073-5-lukma@denx.de>
-	<20250424181110.2734cd0b@kernel.org>
-	<0bf77ef6-d884-44d2-8ecc-a530fee215d1@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1745561295; c=relaxed/simple;
+	bh=qKaOs39ZG47vDsyLQKKsbRRjRgLvoPVTnHvNqIUg26Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=igTFtzxL5NOuUKNlSiCuPloJxsHFMkzavNt337VjOMFrFA1vQaNDjkKE7f2RmD7/JLLgtD1Rc8nIkeQy0cuFvIF9sZfNHDSodDWWWj53HHtqr5zS6jvNbg012+LhlDUIQ9E3cQk1uIflllkvq+mIEKdOAoiwug+NNrzkjMoxths=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cm1hnjLh; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745561292; x=1777097292;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qKaOs39ZG47vDsyLQKKsbRRjRgLvoPVTnHvNqIUg26Y=;
+  b=Cm1hnjLhzFFg2XhroRmNoAeBqWWjVbICwf0yLHn1a+O7KsaGQC7MSGXy
+   FVBNMkNG4hZNSbZd4E6cuxb8m4c75Vfndhy9v0x/7cBgo/kD3K9n1RQoY
+   PsXvkQ4upXFQ1CwnVlIw+kFZsVCAqBImKdXk+We3AafspLqKtsv63/qfE
+   sF0gMHdQc5GCMEnoNWV6ryxXyOSdTB0BbUO0Rs7nEaAI2kmrBzTrOfK4F
+   7nVczyXpqdjYL0x5cP8yCrZyj9wfbNuEDwvGIc0e/1GFEIzcVd6+MAk9e
+   YqeDyh4nUiIQcUk2xO1dISog1vNrZ40w8nv72JYS1Jhx+mDAd/BzffB8k
+   Q==;
+X-CSE-ConnectionGUID: sUK8SC8yTYisDKBchQy/9w==
+X-CSE-MsgGUID: 7f0VWodLQ0ybYtKtjhWb3Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="58578890"
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="58578890"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:08:11 -0700
+X-CSE-ConnectionGUID: BYCgyGlET1SqefRpIhqyfg==
+X-CSE-MsgGUID: 1cv+0rWTRbWjitA1HdOf/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="132703133"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by orviesa010.jf.intel.com with ESMTP; 24 Apr 2025 23:08:10 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	aleksander.lobakin@intel.com,
+	przemyslaw.kitszel@intel.com,
+	piotr.kwapulinski@intel.com,
+	aleksandr.loktionov@intel.com,
+	jedrzej.jagielski@intel.com,
+	larysa.zaremba@intel.com,
+	anthony.l.nguyen@intel.com
+Subject: [iwl-next v3 0/8] libie: commonize adminq structure
+Date: Fri, 25 Apr 2025 08:08:01 +0200
+Message-ID: <20250425060809.3966772-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8.TKQ2DIg4Q.iOHILDMF3JC";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
---Sig_/8.TKQ2DIg4Q.iOHILDMF3JC
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi Krzysztof, Jakub,
+It is a prework to allow reusing some specific Intel code (eq. fwlog).
 
-> On 25/04/2025 03:11, Jakub Kicinski wrote:
-> > On Wed, 23 Apr 2025 09:29:08 +0200 Lukasz Majewski wrote: =20
-> >> This patch series provides support for More Than IP L2 switch
-> >> embedded in the imx287 SoC.
-> >>
-> >> This is a two port switch (placed between uDMA[01] and
-> >> MAC-NET[01]), which can be used for offloading the network traffic.
-> >>
-> >> It can be used interchangeably with current FEC driver - to be more
-> >> specific: one can use either of it, depending on the requirements.
-> >>
-> >> The biggest difference is the usage of DMA - when FEC is used,
-> >> separate DMAs are available for each ENET-MAC block.
-> >> However, with switch enabled - only the DMA0 is used to
-> >> send/receive data to/form switch (and then switch sends them to
-> >> respecitive ports). =20
-> >=20
-> > Lots of sparse warnings and build issues here, at least on x86.
-> >=20
-> > Could you make sure it's clean with an allmodconfig config,=20
-> > something like:
-> >=20
-> > make C=3D1 W=3D1 drivers/net/ethernet/freescale/mtipsw/  =20
->=20
-> ... and W=3D1 with clang as well.
->=20
+Move common *_aq_desc structure to libie header and changing
+it in ice, ixgbe, i40e and iavf.
 
-The sparse warnings are because of struct switch_t casting and register
-access with this paradigm (as it is done with other drivers).
+Only generic adminq commands can be easily moved to common header, as
+rest is slightly different. Format remains the same. It will be better
+to correctly move it when it will be needed to commonize other part of
+the code.
 
-What is the advise here from the community?
+Move *_aq_str() to new libie module (libie_adminq) and use it across
+drivers. The functions are exactly the same in each driver. Some more
+adminq helpers/functions can be moved to libie_adminq when needed.
 
-> Best regards,
-> Krzysztof
+v2 --> v3: [2]
+ * rebase
+ * fix kdoc (patch 1 and 5)
+ * remove space before tab (patch 1)
 
+v1 --> v2: [1]
+ * add short descriptions in kdoc (patch 1, 5)
+ * handle all error types in switch to allow clean build (patch 3)
 
+[1] https://lore.kernel.org/netdev/20250312062426.2544608-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20250410100121.2353754-1-michal.swiatkowski@linux.intel.com/
 
+Michal Swiatkowski (8):
+  ice, libie: move generic adminq descriptors to lib
+  ixgbe: use libie adminq descriptors
+  i40e: use libie adminq descriptors
+  iavf: use libie adminq descriptors
+  libie: add adminq helper for converting err to str
+  ice: use libie_aq_str
+  iavf: use libie_aq_str
+  i40e: use libie_aq_str
 
-Best regards,
+ drivers/net/ethernet/intel/Kconfig            |   3 +
+ drivers/net/ethernet/intel/libie/Kconfig      |   6 +
+ drivers/net/ethernet/intel/libie/Makefile     |   4 +
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h |  12 +-
+ .../net/ethernet/intel/i40e/i40e_adminq_cmd.h | 155 +---
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |  15 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |   6 +-
+ drivers/net/ethernet/intel/iavf/iavf_adminq.h |  12 +-
+ .../net/ethernet/intel/iavf/iavf_adminq_cmd.h |  83 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf_type.h   |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   1 -
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 270 +------
+ drivers/net/ethernet/intel/ice/ice_common.h   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_controlq.h |   8 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  12 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 226 +-----
+ include/linux/net/intel/libie/adminq.h        | 309 ++++++++
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c |  68 +-
+ drivers/net/ethernet/intel/i40e/i40e_client.c |   7 +-
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 730 ++++++++----------
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  10 +-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |   8 +-
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  46 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  36 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 240 +++---
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  18 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  27 +-
+ drivers/net/ethernet/intel/iavf/iavf_adminq.c |  62 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 110 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |   5 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   2 +-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  10 +-
+ .../net/ethernet/intel/ice/devlink/health.c   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   | 390 +++++-----
+ drivers/net/ethernet/intel/ice/ice_controlq.c |  53 +-
+ drivers/net/ethernet/intel/ice/ice_dcb.c      |  36 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  47 +-
+ drivers/net/ethernet/intel/ice/ice_dpll.c     |  20 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  12 +-
+ .../net/ethernet/intel/ice/ice_fw_update.c    |  38 +-
+ drivers/net/ethernet/intel/ice/ice_fwlog.c    |  16 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  10 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  63 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |  38 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  20 +-
+ drivers/net/ethernet/intel/ice/ice_sched.c    |  18 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  55 +-
+ drivers/net/ethernet/intel/ice/ice_vf_mbx.c   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   6 +-
+ .../net/ethernet/intel/ice/ice_vlan_mode.c    |   6 +-
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c |  24 +-
+ .../net/ethernet/intel/ixgbe/devlink/region.c |   4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 272 +++----
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.c    |   4 +-
+ drivers/net/ethernet/intel/libie/adminq.c     |  52 ++
+ 59 files changed, 1578 insertions(+), 2140 deletions(-)
+ create mode 100644 include/linux/net/intel/libie/adminq.h
+ create mode 100644 drivers/net/ethernet/intel/libie/adminq.c
 
-Lukasz Majewski
+-- 
+2.42.0
 
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/8.TKQ2DIg4Q.iOHILDMF3JC
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmgLJkQACgkQAR8vZIA0
-zr03Fgf+KfcqvqXrwV6oo9XJVMdSNQIoB0p4NlpvVAe5aBxAydJI1xm3RrEZXNPB
-TrcywFHW7nVupYx2HApaLOvpgBFWEK0WbXSfc2EbwtFXWaaUQ+HGbpV4jAmvHbul
-RWNftPG+5U26bQE9B6hrXU7Ceve1/wAscafs+U677XofK1RyE33ZOZYsuUsKbVgo
-duYePABd2Vo4o97byc0pHVPqCmjhfPA0ID+Arzs+7aGx2ym7JqZUjRjmbADnmKg3
-7dRtO0/LmgzGdP9i4B7AvcYeHox7iUjmmqp9yXfbqyagRKcsOKqguUVviqtSjwmP
-AlDFyZxoEjM8RW9Jw2Lyzwycn6MhzA==
-=ESLF
------END PGP SIGNATURE-----
-
---Sig_/8.TKQ2DIg4Q.iOHILDMF3JC--
 
