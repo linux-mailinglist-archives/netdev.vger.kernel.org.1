@@ -1,327 +1,304 @@
-Return-Path: <netdev+bounces-185866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E543A9BF14
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:01:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3782A9BF1B
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3DC47B3159
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:00:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77B659A1A99
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFF222DFE3;
-	Fri, 25 Apr 2025 07:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB23D22D79A;
+	Fri, 25 Apr 2025 07:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="LKgco7Jl"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mhhDXbkj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5775B22A4E3
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 07:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E067052F88;
+	Fri, 25 Apr 2025 07:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745564495; cv=none; b=mwiKbVJ7r6EcPm0SeGpgNPzAWxT8DoHAyx9JG4L8v5ZJdAyrxkRmb3l2ZvewjL5H49/ktlmO5Q+3E/kZwoagB82RuP/uDU7jd1qg8Pyq1hhyDzEG4VGxBk3lW098zan9tjXa46dTKLTRLLRN2HGRx/AdHoSvbwpRvWnuREBWbts=
+	t=1745564521; cv=none; b=EFnpjTMTSEVON3yDwbAF1UJOMHgOtF2M1jxhLWCRvc/xe0I5lpaAyd6h8+xsG67JjedM1U7dnbt67OIlyrEPmS00jGWhzpGkrWXdyx6GDFrnjIV7MwesjDSoriFUPEFvyKMeatS9mqlbX7NJTUwb8/7v/gjMkD/goTaeGFndFgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745564495; c=relaxed/simple;
-	bh=+z35d4FnwaxKfrAKqUcE083ocCvqkf07d+2qYyUy+9c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nCntj5JvusI4/l+lGrWhMOl+V3xNVIqEmEDLc4IeLzObxBYWpEyM877iZgUG02VPev4hNhMyBlqMvpq5XKTD5TcOf3Y2SlsP/05l1MmhN4HfBbw6DmJFWxQ9UJzJaS2R9wJQkjoufQDDhtU8vsU3TUI3kryQVKLWossOmwT3RQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=LKgco7Jl; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cf680d351so17728145e9.0
-        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 00:01:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1745564492; x=1746169292; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+z35d4FnwaxKfrAKqUcE083ocCvqkf07d+2qYyUy+9c=;
-        b=LKgco7Jliup6rSBD0hQ8P5WUxhuQjAt7rJ1EXGnJ0d0KLsAnWovsVlzVmKNEX6VSYW
-         bmWoauIsfZb5gJtCLRgc29UPJFWK7+KBqQIJLzh9DymnYGGALOtr7AtsI0/7NWTYwldx
-         eDZNiOPPLRF4o1FBPlXVqat60AFGawe2PAZ6eTLmJLYSD1RL8nyx3EO9frTCJaKhIFC2
-         eSwg1YikmJdbdE/QxONwMuq3j+PIXvL3mWqYCXKjH1KwLd7Y3J2tjON8zawK0m8ldaAR
-         P4wR1OVurddhyW+x0p3QAgqz3I59Y7FHCRbkpiZUcFe71Ig0tcC+vFuGoUta9lIUNisD
-         uoew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745564492; x=1746169292;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+z35d4FnwaxKfrAKqUcE083ocCvqkf07d+2qYyUy+9c=;
-        b=khxqoiXF+6oNq1hV4VzoM/sXxrMrnYfpBbBNch8MSrwHtl066cqUjqQ8jgMET0e7JH
-         BXKLLB4snrjrm5A66KuNUEvAgo05MeaH4PV+JzBCq61HQs1U7M5IPh27TWgX3whudzSz
-         2QA9xeFwvXpj84DgSxU4ezi0vBQfVsKmMickD+nwKIIvrAGJ4070dBuswXuv1A/XvdTb
-         j0mPhTbYbRBpAfYV6ONT95mJ2vC8rixV0lEAIhmf2GrGBLqYLXfxKUMyJDWsslIfCz+w
-         FzsVdRJobNU63l+UDpMgUzkx7n2Cn0cOQdGp8B1RCuIM7/NHA/xOPU9NVV+OUIw65FDO
-         HGZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzxs71pwwFKfBTVP53t4iulWzk/SGnr5SEIKdwlneYjjy2srjqGTj+ZOoAjpFkcCzspI4mrpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjQPXX16bo3m5qY+QLZFj/BnB0fRDVJZ5tHXi2n2NVEJcD3VPG
-	U3yIlZIuGrREPOM4YAJpy9J6v9zzPlHezOoxhhWN7vW7+9F2QHItv9RfTybwfok=
-X-Gm-Gg: ASbGnctU1Bpv4bOtiW4FkWgtvXSTT7fmgOU3KddTSEdt5jXGA5vVtjf+Ir+TUDDDo4L
-	V0Kem4naBae49U18A6AYy2qBjBsvI+073s8DlRodnwNejAU7edpcgY3Z/PrBqnz9dxWG9MVDILy
-	jpCrX8rZHCRvCW3GU7/C6CyIM6JZzqLQw/VgbEF/9g+ZKK2lWI/p0VNPHVA88Zybm3U3hQ6sjjK
-	P96UJqQTJotUkAYVRjPSLoqHfRtm7+e201yNEz0nR9EOJWdtsaLOXxHg1iYKWESfqZU/sBeUXwK
-	JHLItv7WEelKZkm1MMxLhp+thzTAUASwHtMr9it3TkWuBfBS7gmK1oQVSlxXikrSkWwFDGaYi/i
-	G39CxijnAtYL17x9dLEBHJHtd5GjGVXE1lYeMTSFgismysB0GSzOs59GXHpF5aGWqEQ==
-X-Google-Smtp-Source: AGHT+IGufufLyZ6Eu5vID2+YO2Cr3jWI7A87kyc7N9C1LqbP68Kf/K1914Qn5HAlZea3Ybx+tzciEw==
-X-Received: by 2002:a5d:47cc:0:b0:39f:bf3:6f21 with SMTP id ffacd0b85a97d-3a06d64cab2mr4129155f8f.11.1745564491511;
-        Fri, 25 Apr 2025 00:01:31 -0700 (PDT)
-Received: from ?IPV6:2003:e5:870f:e000:6c64:75fd:2c51:3fef? (p200300e5870fe0006c6475fd2c513fef.dip0.t-ipconnect.de. [2003:e5:870f:e000:6c64:75fd:2c51:3fef])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e47307sm1410893f8f.65.2025.04.25.00.01.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Apr 2025 00:01:31 -0700 (PDT)
-Message-ID: <6ef898f7-c8a3-4326-96ab-42aa90c48e1c@suse.com>
-Date: Fri, 25 Apr 2025 09:01:29 +0200
+	s=arc-20240116; t=1745564521; c=relaxed/simple;
+	bh=ZxHAjcIptuiqodjyy8B/o+4RY/OFbTHLDblP4vNxbLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qkrp8ssVx55W6PL6Lwa8bVen+0bl4Les1Oq8cvImccXfF/I+GBY4fTqGGZgRtXDG7oa2FLID6d7FjWJfNyPXjIomqoRY2tH5OqBdSdluIvKTOR9N6oLXye35jK5S1Puw1MwRzjonRbcY3TsOXXJOt5F7GsJT3+o3YzjqT9Qzkdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mhhDXbkj; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8F7AD442B9;
+	Fri, 25 Apr 2025 07:01:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1745564516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+8qxLu4pTTuuBfBCz9xyv1AK49aNK9oYl6N1G7UkeHY=;
+	b=mhhDXbkjLaNuJHigLSjn9Ecd970zYFuxzfyD1OIpBVQlvBWlK6O12+o9vPjjmru9iB+UCH
+	MkWk3laSu1OpiUYAI6f6vvpUTo/52RoL9yR5cvpyqe/ToXoJtiI3hQ8GkEV1wz5G0gE59N
+	28kGFv1+m/E8m+L3dticfChUx9X3MMu6J8Hw60EcQTUBe6PnecAePoQCgSFc2bRkdF9JER
+	re2f32Hl7QQHa0HtqqO/bsnGJrb4yJKBxFMIlfGV/jmsrK8uirYHrobpexhoH9LwHryjtZ
+	e+ZPVife/cvYdLThvPPwZfmk+SLggGZ/VyXEekBKVoFzqDMmJwi+YV9r5wOA4A==
+Date: Fri, 25 Apr 2025 09:01:53 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net-next v7 1/3] net: ethtool: Introduce per-PHY DUMP
+ operations
+Message-ID: <20250425090153.170f11bd@device-40.home>
+In-Reply-To: <20250424180333.035ff7d3@kernel.org>
+References: <20250422161717.164440-1-maxime.chevallier@bootlin.com>
+	<20250422161717.164440-2-maxime.chevallier@bootlin.com>
+	<20250424180333.035ff7d3@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
- to write MSR
-To: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
- virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
- linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
- netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
- andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
- mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
- irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
- wei.liu@kernel.org, ajay.kaher@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
- pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
- luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
- haiyangz@microsoft.com, decui@microsoft.com
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-22-xin@zytor.com>
- <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
- <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
- <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
- <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
- <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
- <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
- <72516271-5b28-434a-838b-d8532e1b4fc1@zytor.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <72516271-5b28-434a-838b-d8532e1b4fc1@zytor.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------70AsB5RmvESA2s8FjOW8qybs"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvheduieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopeguvghvihgtvgdqgedtrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhop
+ egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------70AsB5RmvESA2s8FjOW8qybs
-Content-Type: multipart/mixed; boundary="------------GJ9OF40vHIucWp0hwDufMOKu";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
- virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
- linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
- netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
- andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
- mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
- irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
- wei.liu@kernel.org, ajay.kaher@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
- pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
- luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
- haiyangz@microsoft.com, decui@microsoft.com
-Message-ID: <6ef898f7-c8a3-4326-96ab-42aa90c48e1c@suse.com>
-Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
- to write MSR
-References: <20250422082216.1954310-1-xin@zytor.com>
- <20250422082216.1954310-22-xin@zytor.com>
- <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
- <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
- <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
- <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
- <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
- <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
- <72516271-5b28-434a-838b-d8532e1b4fc1@zytor.com>
-In-Reply-To: <72516271-5b28-434a-838b-d8532e1b4fc1@zytor.com>
+Hi Jakub,
 
---------------GJ9OF40vHIucWp0hwDufMOKu
-Content-Type: multipart/mixed; boundary="------------OqD5G79twKp4xp6ASPK6yqSb"
+On Thu, 24 Apr 2025 18:03:33 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
---------------OqD5G79twKp4xp6ASPK6yqSb
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+> On Tue, 22 Apr 2025 18:17:14 +0200 Maxime Chevallier wrote:
+> > +/* perphy ->start() handler for GET requests */  
+> 
+> Just because I think there are real bugs, I will allow myself an
+> uber-nit of asking to spell the perphy as per-PHY or such in the
+> comment? :)
 
-T24gMjUuMDQuMjUgMDU6NDQsIEguIFBldGVyIEFudmluIHdyb3RlOg0KPiBPbiA0LzI0LzI1
-IDE4OjE1LCBILiBQZXRlciBBbnZpbiB3cm90ZToNCj4+IE9uIDQvMjQvMjUgMDE6MTQsIErD
-vHJnZW4gR3Jvw58gd3JvdGU6DQo+Pj4+DQo+Pj4+IEFjdHVhbGx5LCB0aGF0IGlzIGhvdyB3
-ZSBnZXQgdGhpcyBwYXRjaCB3aXRoIHRoZSBleGlzdGluZyBhbHRlcm5hdGl2ZXMNCj4+Pj4g
-aW5mcmFzdHJ1Y3R1cmUuwqAgQW5kIHdlIHRvb2sgYSBzdGVwIGZ1cnRoZXIgdG8gYWxzbyBy
-ZW1vdmUgdGhlIHB2X29wcw0KPj4+PiBNU1IgQVBJcy4uLg0KPj4+DQo+Pj4gQW5kIHRoaXMg
-aXMgd2hhdCBJJ20gcXVlc3Rpb25pbmcuIElNSE8gdGhpcyBhcHByb2FjaCBpcyBhZGRpbmcg
-bW9yZQ0KPj4+IGNvZGUgYnkgcmVtb3ZpbmcgdGhlIHB2X29wcyBNU1JfQVBJcyBqdXN0IGJl
-Y2F1c2UgInB2X29wcyBpcyBiYWQiLiBBbmQNCj4+PiBJIGJlbGlldmUgbW9zdCByZWZ1c2Fs
-IG9mIHB2X29wcyBpcyBiYXNlZCBvbiBubyBsb25nZXIgdmFsaWQgcmVhc29uaW5nLg0KPj4+
-DQo+Pg0KPj4gcHZvcHMgYXJlIGEgaGVhZGFjaGUgYmVjYXVzZSBpdCBpcyBlZmZlY3RpdmVs
-eSBhIHNlY29uZGFyeSBhbHRlcm5hdGl2ZXMgDQo+PiBpbmZyYXN0cnVjdHVyZSB0aGF0IGlz
-IGluY29tcGF0aWJsZSB3aXRoIHRoZSBhbHRlcm5hdGl2ZXMgb25lLi4uDQo+Pg0KPj4+PiBJ
-dCBsb29rcyB0byBtZSB0aGF0IHlvdSB3YW50IHRvIGFkZCBhIG5ldyBmYWNpbGl0eSB0byB0
-aGUgYWx0ZXJuYXRpdmVzDQo+Pj4+IGluZnJhc3RydWN0dXJlIGZpcnN0Pw0KPj4+DQo+Pj4g
-V2h5IHdvdWxkIHdlIG5lZWQgYSBuZXcgZmFjaWxpdHkgaW4gdGhlIGFsdGVybmF0aXZlcyBp
-bmZyYXN0cnVjdHVyZT8NCj4+DQo+PiBJJ20gbm90IHN1cmUgd2hhdCBYaW4gbWVhbnMgd2l0
-aCAiZmFjaWxpdHkiLCBidXQgYSBrZXkgbW90aXZhdGlvbiBmb3IgdGhpcyBpcyB0bzoNCj4+
-DQo+PiBhLiBBdm9pZCB1c2luZyB0aGUgcHZvcHMgZm9yIE1TUnMgd2hlbiBvbiB0aGUgb25s
-eSByZW1haW5pbmcgdXNlciB0aGVyZW9mIA0KPj4gKFhlbikgaXMgb25seSB1c2luZyBpdCBm
-b3IgYSB2ZXJ5IHNtYWxsIHN1YnNldCBvZiBNU1JzIGFuZCBmb3IgdGhlIHJlc3QgaXQgaXMg
-DQo+PiBqdXN0IG92ZXJoZWFkLCBldmVuIGZvciBYZW47DQo+Pg0KPj4gYi4gQmVpbmcgYWJs
-ZSB0byBkbyB3cm1zcm5zIGltbWVkaWF0ZS93cm1zcm5zL3dybXNyIGFuZCByZG1zciBpbW1l
-ZGlhdGUvIHJkbXNyIA0KPj4gYWx0ZXJuYXRpdmVzLg0KPj4NCj4+IE9mIHRoZXNlLCAoYikg
-aXMgYnkgZmFyIHRoZSBiaWdnZXN0IG1vdGl2YXRpb24uIFRoZSBhcmNoaXRlY3R1cmFsIGRp
-cmVjdGlvbiANCj4+IGZvciBzdXBlcnZpc29yIHN0YXRlcyBpcyB0byBhdm9pZCBhZCBob2Mg
-YW5kIFhTQVZFUyBJU0EgYW5kIGluc3RlYWQgdXNlIE1TUnMuIA0KPj4gVGhlIGltbWVkaWF0
-ZSBmb3JtcyBhcmUgZXhwZWN0ZWQgdG8gYmUgc2lnbmlmaWNhbnRseSBmYXN0ZXIsIGJlY2F1
-c2UgdGhleSBtYWtlIA0KPj4gdGhlIE1TUiBpbmRleCBhdmFpbGFibGUgYXQgdGhlIHZlcnkg
-YmVnaW5uaW5nIG9mIHRoZSBwaXBlbGluZSBpbnN0ZWFkIG9mIGF0IGEgDQo+PiByZWxhdGl2
-ZWx5IGxhdGUgc3RhZ2UuDQo+Pg0KPiANCj4gTm90ZSB0aGF0IHRvIHN1cHBvcnQgdGhlIGlt
-bWVkaWF0ZSBmb3Jtcywgd2UgKm11c3QqIGRvIHRoZXNlIGlubGluZSwgb3IgdGhlIA0KPiBj
-b25zdC1uZXNzIG9mIHRoZSBNU1IgaW5kZXggLS0gd2hpY2ggYXBwbGllcyB0byBieSBmYXIg
-dGhlIHZhc3QgbWFqb3JpdHkgb2YgTVNSIA0KPiByZWZlcmVuY2VzIC0tIGdldHMgbG9zdC4g
-cHZvcHMgZG9lcyBleGFjdGx5IHRoYXQuDQo+IA0KPiBGdXJ0aGVybW9yZSwgdGhlIE1TUiBp
-bW1lZGlhdGUgaW5zdHJ1Y3Rpb25zIHRha2UgYSA2NC1iaXQgbnVtYmVyIGluIGEgc2luZ2xl
-IA0KPiByZWdpc3RlcjsgYXMgdGhlc2UgaW5zdHJ1Y3Rpb25zIGFyZSBieSBuZWNlc3NpdHkg
-cmVsYXRpdmVseSBsb25nLCBpdCBtYWtlcyBzZW5zZSANCj4gZm9yIHRoZSBhbHRlcm5hdGl2
-ZSBzZXF1ZW5jZSB0byBhY2NlcHQgYSA2NC1iaXQgaW5wdXQgcmVnaXN0ZXIgYW5kIGRvIHRo
-ZSAlZWF4LyANCj4gJWVkeCBzaHVmZmxlIGluIHRoZSBsZWdhY3kgZmFsbGJhY2sgY29kZS4u
-LiB3ZSBkaWQgYSBidW5jaCBvZiBleHBlcmltZW50cyB0byBzZWUgDQo+IHdoYXQgbWFkZSBt
-b3N0IHNlbnNlLg0KDQpZZXMsIEkgdW5kZXJzdGFuZCB0aGF0Lg0KDQpBbmQgSSdtIHRvdGFs
-bHkgaW4gZmF2b3Igb2YgWGluJ3MgcmV3b3JrIG9mIHRoZSBNU1IgbG93IGxldmVsIGZ1bmN0
-aW9ucy4NCg0KSW5saW5pbmcgdGhlIE1TUiBhY2Nlc3MgaW5zdHJ1Y3Rpb25zIHdpdGggcHZf
-b3BzIHNob3VsZCBub3QgYmUgdmVyeQ0KY29tcGxpY2F0ZWQuIFdlIGRvIHRoYXQgd2l0aCBv
-dGhlciBpbnN0cnVjdGlvbnMgKFNUSS9DTEksIFBURSBhY2Nlc3NlcykNCnRvZGF5LCBzbyB0
-aGlzIGlzIG5vIG5ldyBraW5kIG9mIGZ1bmN0aW9uYWxpdHkuDQoNCkkgY291bGQgaGF2ZSBh
-IHRyeSB3cml0aW5nIGEgcGF0Y2ggYWNoaWV2aW5nIHRoYXQsIGJ1dCBJIHdvdWxkIG9ubHkg
-c3RhcnQNCnRoYXQgd29yayBpbiBjYXNlIHlvdSBtaWdodCBjb25zaWRlciB0YWtpbmcgaXQg
-aW5zdGVhZCBvZiBYaW4ncyBwYXRjaA0KcmVtb3ZpbmcgdGhlIHB2X29wcyB1c2FnZSBmb3Ig
-cmRtc3Ivd3Jtc3IuIEluIGNhc2UgaXQgdHVybnMgb3V0IHRoYXQgbXkNCnZlcnNpb24gcmVz
-dWx0cyBpbiBtb3JlIGNvZGUgY2hhbmdlcyB0aGFuIFhpbidzIHBhdGNoLCBJJ2QgYmUgZmlu
-ZSB0byBkcm9wDQpteSBwYXRjaCwgb2YgY291cnNlLg0KDQoNCkp1ZXJnZW4NCg==
---------------OqD5G79twKp4xp6ASPK6yqSb
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+No problem :) Thanks a lot for the review
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+> > +static int ethnl_perphy_start(struct netlink_callback *cb)
+> > +{
+> > +	struct ethnl_perphy_dump_ctx *phy_ctx = ethnl_perphy_dump_context(cb);
+> > +	const struct genl_dumpit_info *info = genl_dumpit_info(cb);
+> > +	struct ethnl_dump_ctx *ctx = &phy_ctx->ethnl_ctx;
+> > +	struct ethnl_reply_data *reply_data;
+> > +	const struct ethnl_request_ops *ops;
+> > +	struct ethnl_req_info *req_info;
+> > +	struct genlmsghdr *ghdr;
+> > +	int ret;
+> > +
+> > +	BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
+> > +
+> > +	ghdr = nlmsg_data(cb->nlh);
+> > +	ops = ethnl_default_requests[ghdr->cmd];
+> > +	if (WARN_ONCE(!ops, "cmd %u has no ethnl_request_ops\n", ghdr->cmd))
+> > +		return -EOPNOTSUPP;
+> > +	req_info = kzalloc(ops->req_info_size, GFP_KERNEL);
+> > +	if (!req_info)
+> > +		return -ENOMEM;
+> > +	reply_data = kmalloc(ops->reply_data_size, GFP_KERNEL);
+> > +	if (!reply_data) {
+> > +		ret = -ENOMEM;
+> > +		goto free_req_info;
+> > +	}
+> > +
+> > +	/* Don't ignore the dev even for DUMP requests */  
+> 
+> another nit, this comment wasn't super clear without looking at the dump
+> for non-per-phy case. Maybe:
+> 
+> 	/* Unlike per-dev dump, don't ignore dev. The dump handler
+> 	 * will notice it and dump PHYs from given dev.
+> 	 */
+> ?
 
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
+That's better indeed :)
 
---------------OqD5G79twKp4xp6ASPK6yqSb--
+> > +	ret = ethnl_default_parse(req_info, &info->info, ops, false);
+> > +	if (ret < 0)
+> > +		goto free_reply_data;
+> > +
+> > +	ctx->ops = ops;
+> > +	ctx->req_info = req_info;
+> > +	ctx->reply_data = reply_data;
+> > +	ctx->pos_ifindex = 0;
+> > +
+> > +	return 0;
+> > +
+> > +free_reply_data:
+> > +	kfree(reply_data);
+> > +free_req_info:
+> > +	kfree(req_info);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static int ethnl_perphy_dump_one_dev(struct sk_buff *skb,
+> > +				     struct net_device *dev,
+> > +				     struct ethnl_perphy_dump_ctx *ctx,
+> > +				     const struct genl_info *info)
+> > +{
+> > +	struct ethnl_dump_ctx *ethnl_ctx = &ctx->ethnl_ctx;
+> > +	struct phy_device_node *pdn;
+> > +	int ret = 0;
+> > +
+> > +	if (!dev->link_topo)
+> > +		return 0;  
+> 
+> Now for the bugs..
+> 
+> > +	xa_for_each_start(&dev->link_topo->phys, ctx->pos_phyindex, pdn,
+> > +			  ctx->pos_phyindex) {
+> > +		ethnl_ctx->req_info->phy_index = ctx->pos_phyindex;
+> > +
+> > +		/* We can re-use the original dump_one as ->prepare_data in
+> > +		 * commands use ethnl_req_get_phydev(), which gets the PHY from
+> > +		 * the req_info->phy_index
+> > +		 */
+> > +		ret = ethnl_default_dump_one(skb, dev, ethnl_ctx, info);
+> > +		if (ret)
+> > +			break;  
+> 
+> 		return ret;
+> 
+> > +	}  
+> 
+> 	ctx->pos_phyindex = 0;
+> 
+> 	return 0;
+> 
+> IOW I don't see you resetting the pos_phyindex, so I think you'd only
+> dump correctly the first device? The next device will try to dump its
+> PHYs starting from the last index of the previous dev's PHY? [1]
 
---------------GJ9OF40vHIucWp0hwDufMOKu--
+That is true... My mistake was to test on a system with one PHY only on
+the first interface and a lot on the second, I'll adjust my tests and
+fix that, thanks a lot for spotting !
 
---------------70AsB5RmvESA2s8FjOW8qybs
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+> 
+> > +	return ret;
+> > +}
+> > +
+> > +static int ethnl_perphy_dump_all_dev(struct sk_buff *skb,
+> > +				     struct ethnl_perphy_dump_ctx *ctx,
+> > +				     const struct genl_info *info)
+> > +{
+> > +	struct ethnl_dump_ctx *ethnl_ctx = &ctx->ethnl_ctx;
+> > +	struct net *net = sock_net(skb->sk);
+> > +	netdevice_tracker dev_tracker;
+> > +	struct net_device *dev;
+> > +	int ret = 0;
+> > +
+> > +	rcu_read_lock();
+> > +	for_each_netdev_dump(net, dev, ethnl_ctx->pos_ifindex) {
+> > +		netdev_hold(dev, &dev_tracker, GFP_ATOMIC);
+> > +		rcu_read_unlock();
+> > +
+> > +		/* per-PHY commands use ethnl_req_get_phydev(), which needs the
+> > +		 * net_device in the req_info
+> > +		 */
+> > +		ethnl_ctx->req_info->dev = dev;
+> > +		ret = ethnl_perphy_dump_one_dev(skb, dev, ctx, info);
+> > +
+> > +		rcu_read_lock();
+> > +		netdev_put(dev, &dev_tracker);  
+> 
+> missing
+> 
+> 		ethnl_ctx->req_info->dev = NULL;
+> 
+> right? Otherwise if we need to send multiple skbs the "continuation"
+> one will think we're doing a filtered dump.
+> 
+> Looking at commits 7c93a88785dae6 and c0111878d45e may be helpful,
+> but I doubt you can test it on a real system, filling even 4kB
+> may be hard for small messages :(
 
------BEGIN PGP SIGNATURE-----
+Ah damn, yes. I got that right I think in net/ethtool/phy.c but not
+here.
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgLM0kFAwAAAAAACgkQsN6d1ii/Ey9J
-ewgAleneoGof9FfwPyKjEeafKKF9GL+4Sam+p2GRBaUaEVHL9jEK/zI63WD1/raK2NasxlmJYHVZ
-s2qZ+J/M8gr4P/UNqf467Np0nZ79OmtqtPh0Q77SUOsMP4psy2YPuJA7divtrxd2PMOmXFcYdbya
-id9OTcpk5o0wCYzeKaWD9FzxVnBQW3lPfGk0AYEVvYxfolzuygFQ+vjCEjLjzTy71lVX9kj5oa0B
-Xo5fqnC9Tih5mo68HAKsbmyT2b6K6RE0iWTqgXAx7T8BHgQBHHKgC6yiAj+0r5tvaOYT3nupCvZF
-v1+aoIdfjelYRqb6tHKba9qJzgzzn0kei4XfjMQ87A==
-=uKZw
------END PGP SIGNATURE-----
+As for testing, I do have a local patch to add PHY support to
+netdevsim, allowing me to add an arbitrary number of PHYs to any nsim
+devices. I'll make sure to test this case. I still plan to upstream the
+netdevsim part at some point, but that still needs a bit of polishing...
 
---------------70AsB5RmvESA2s8FjOW8qybs--
+> > +		if (ret < 0 && ret != -EOPNOTSUPP) {
+> > +			if (likely(skb->len))
+> > +				ret = skb->len;
+> > +			break;
+> > +		}
+> > +		ret = 0;  
+> 
+> [1] or you can clear the pos_index here
+> 
+> > +	}
+> > +	rcu_read_unlock();
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +/* perphy ->dumpit() handler for GET requests. */
+> > +static int ethnl_perphy_dumpit(struct sk_buff *skb,
+> > +			       struct netlink_callback *cb)
+> > +{
+> > +	struct ethnl_perphy_dump_ctx *ctx = ethnl_perphy_dump_context(cb);
+> > +	struct ethnl_dump_ctx *ethnl_ctx = &ctx->ethnl_ctx;
+> > +	int ret = 0;
+> > +
+> > +	if (ethnl_ctx->req_info->dev) {
+> > +		ret = ethnl_perphy_dump_one_dev(skb, ethnl_ctx->req_info->dev,
+> > +						ctx, genl_info_dump(cb));
+> > +		if (ret < 0 && ret != -EOPNOTSUPP && likely(skb->len))
+> > +			ret = skb->len;
+> > +
+> > +		netdev_put(ethnl_ctx->req_info->dev,
+> > +			   &ethnl_ctx->req_info->dev_tracker);  
+> 
+> You have to release this in .done
+> dumpit gets called multiple times until we run out of objects to dump.
+> OTOH user may close the socket without finishing the dump operation.
+> So all .dumpit implementations must be "balanced". The only state we
+> should touch in them is the dump context to know where to pick up from
+> next time.
+
+Thanks for poiting it out.
+
+Now that you say that, I guess that I should also move the reftracker
+I'm using for the netdev_hold in ethnl_perphy_dump_one_dev() call to
+struct ethnl_perphy_dump_ctx ? That way we make sure the netdev doesn't
+go away in-between the multiple .dumpit() calls then...
+
+Is that correct ?
+
+> > +	} else {
+> > +		ret = ethnl_perphy_dump_all_dev(skb, ctx, genl_info_dump(cb));
+> > +	}
+> > +
+> > +	return ret;
+> > +}  
+
+Thanks a lot for the review, that's most helpful.
+
+Maxime
 
