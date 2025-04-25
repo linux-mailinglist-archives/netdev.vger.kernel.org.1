@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-185793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD377A9BBBB
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:20:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97ADDA9BBDD
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 02:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 827891BA2919
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:20:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD4037A4822
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 00:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC8F45C18;
-	Fri, 25 Apr 2025 00:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F60E10FD;
+	Fri, 25 Apr 2025 00:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDybcthE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvNLdt9F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3BC23A6;
-	Fri, 25 Apr 2025 00:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43C31D555;
+	Fri, 25 Apr 2025 00:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745540399; cv=none; b=PwPfeUC8+4zy3FrrvhQRxMc+nTtOFVoeaywb4QjRbLEPZq0HuyNT/H6J8RfeJNLlSKHRil+OEJsqftlT8nwQoNHiLlZgTYx6wMIMGVbp28LGrkiVyNhAkTm8jkCsC2lu08or5gaGH7Y4AorFtoXM48eQjI2OBjsRhpz8/n2OyFM=
+	t=1745540948; cv=none; b=tlXc3yj0Y4lu9uxr4YzFgAGgJvLpfYI15klDWfkYZJvQ59dCWVHscc8A/5gY5GqM1Zq75N9AjEf+OHpZt0lLfx6C/ty+yC63Imjg0eNANxtwY08ebCnk9MQiJmO/BlCrgiB3NwU2zQ/sw7uyySnmsvz1P8G5lZ8miltz6eJ0m+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745540399; c=relaxed/simple;
-	bh=cldQ+FwghzdzQNqNosTRJex6UF73Wv+Mm7TPcxAbJ1U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Lt4r84i6WiwXF8khhGz2J0B++cu/RMzh817OTgPqLBTh6A0ZeO6SjoRy7RJoYIKEu8cSO6Gbduqq2WHR25bI3o3PJt4OuYWdGC7/b+vTIbsO7Eg53Mjb+CG6DUmom0W5gieT5LeJtxVG6jTncbdVCAPkyv5SKqBSJlVBG5gMKt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDybcthE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6051C4CEE8;
-	Fri, 25 Apr 2025 00:19:58 +0000 (UTC)
+	s=arc-20240116; t=1745540948; c=relaxed/simple;
+	bh=ugYHviq2GMOQ1AcvdkeyhC+Q2tttWJ+KSq0ZZKyk5hs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N9cksErsYXxIIAbKEh0SrGFNT32lvExi7LjA51TbZNS2TzQ5qPGKe8Rr0uv//AuZbWtQq2gzcDkXy03E6wqh6j12gfIQJ/h3oL9i/7G57syOI8HOyzlRC6+PnNRJBSHv6/Ch3RV3qlN4YJ2agnuitVTsV09f48wf5dbelxhhV2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvNLdt9F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEA6FC4CEE3;
+	Fri, 25 Apr 2025 00:29:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745540398;
-	bh=cldQ+FwghzdzQNqNosTRJex6UF73Wv+Mm7TPcxAbJ1U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YDybcthE6AQzsxvUp5Wf+Mi8S5XJOE9pbnPwMXULBQImhwRC/po1XDzJJHAFYtmYs
-	 jKA5R7Tm0O40vDsH76JV5Q2Cw/8pIUUu+jLY70ayCjOwC/zavRP1eSMpGEYqc2MOqg
-	 MvDBxMJ4iDCa2B53Upw6wEfka1+Y1DISUdK0z6oUiY0cZeY7D7voDY26urEXqu2YmU
-	 O5JQPAMMPqATEWBmMgvPK0F4l8hlo2hMFHURfKqP3uzDBWxdW6nz0ZfDY1bJAFsrv5
-	 NvljDmnqYHbIdVDeHj13MmsVjVnbqQk8J01Q5y3P+QAoaGNq1TCvzXYreeAeqFxDmp
-	 Jw72MrrT0ymrA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCBA380CFD9;
-	Fri, 25 Apr 2025 00:20:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745540947;
+	bh=ugYHviq2GMOQ1AcvdkeyhC+Q2tttWJ+KSq0ZZKyk5hs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EvNLdt9FcbkwjBGBrOGYEbC/UDjCPMFoc6dEsDriUFcZy1TIcyRIO8mj4G513z5DU
+	 JVgztTDJtRJAC7PQ5Tu2mtz0cGeWFzLnoJ9/rHjT0NzpdTUdmEDvL/YJpYXPkQ0RGL
+	 5lt9js14mDKCN+7q26in1fMXVUwUf59dgFyjZuwfelKMXfMokKfW1jqaU+liL5M7Lv
+	 4h6t0A6LLNi0yTHgQRNhH+wor7VkkN5e65zA5rc/Gs/qxily3xvOXKVZLWB+ThHyEe
+	 rxfK27D/N5LWub0fZFAkmphfamx5PTnGnQQv5efXi6YlFemKDPGWEfSi0cY/EUYA75
+	 xYUiD1oWTeqzA==
+Date: Thu, 24 Apr 2025 17:29:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] xsk: respect the offsets when copying frags
+Message-ID: <20250424172905.181af8be@kernel.org>
+In-Reply-To: <20250423101047.31402-1-minhquangbui99@gmail.com>
+References: <20250423101047.31402-1-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] rxrpc: Remove deadcode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174554043732.3528880.15151083727009143758.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Apr 2025 00:20:37 +0000
-References: <20250422235147.146460-1-linux@treblig.org>
-In-Reply-To: <20250422235147.146460-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: horms@kernel.org, dhowells@redhat.com, marc.dionne@auristor.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- corbet@lwn.net, linux-afs@lists.infradead.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 23 Apr 2025 00:51:47 +0100 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Wed, 23 Apr 2025 17:10:47 +0700 Bui Quang Minh wrote:
+> Add the missing offsets when copying frags in xdp_copy_frags_from_zc().
 > 
-> Remove three functions that are no longer used.
-> 
-> rxrpc_get_txbuf() last use was removed by 2020's
-> commit 5e6ef4f1017c ("rxrpc: Make the I/O thread take over the call and
-> local processor work")
-> 
-> [...]
+> Fixes: 560d958c6c68 ("xsk: add generic XSk &xdp_buff -> skb conversion")
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 
-Here is the summary with links:
-  - [net-next,v2] rxrpc: Remove deadcode
-    https://git.kernel.org/netdev/net-next/c/39144062ea33
+I think the fix is right but I dislike the use of netmem here :(
+Could we switch back to page_pool_dev_alloc() ?
+Allocating a netmem to immediately call __netmem_address() is strange.
+At least to me. Because netmem is supposed to be potentially unreadable.
+And using normal page allocation will avoid the confusion and bug we're
+dealing with now.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+As Stanislav pointed out this function is not used anywhere today,
+so let's target the rewrite to net-next and explain in the commit 
+message where the bug comes from and why it doesn't need to be
+backported (and drop the Fixes tag)?
 
