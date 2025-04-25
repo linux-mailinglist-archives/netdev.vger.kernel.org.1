@@ -1,149 +1,159 @@
-Return-Path: <netdev+bounces-185944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7141FA9C3FB
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:41:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FDC3A9C3F3
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:41:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9FF9C206F
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:40:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01554C0A58
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D7F23AE84;
-	Fri, 25 Apr 2025 09:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C58023816A;
+	Fri, 25 Apr 2025 09:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXemKJyx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ohb2vKZW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111BA23A9A0
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 09:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A23A234963
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 09:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745573933; cv=none; b=Kd5hmg3IvvCjPfgY647WbWsW6D0ollklT6ihDlVpIOWYwhTsnOzwzbf9yGVSj9A2SXb52NFoaBvTBGZH8xMsqdKrT6YMaaSG+ATD7CZzhhnltB1/7APm0lz2fvLsvWq1AZx+jn3exUmwfjhCIZQq1OsB0S19dn8Cu2hz1ElXQTk=
+	t=1745573972; cv=none; b=OQWIPgesg8fCZ8+5XvfuncV4mXBmE+yw1zv8ygTdTtGTvUTB7BfOCCeOjioV1Fj9I8xiDGeIz52vn7Qoxs/INZrc+j6dKjNlIMDYnFvMunWeTipT8xMy9NksVtfH+rq5Qq51yWA+CmpQov+yPbhFjYJuwlvfWTN/Rc6UrKvtQqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745573933; c=relaxed/simple;
-	bh=6/MSYSEzUT2rOHj+kI9Bo+sA+NM6tn1iylQKFbt8kwQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oVpKkrm23Zh3C5kIC55dDmHRJD3B09qhpYcW419vqFYacjgESXssN6J0JmzyFe7k0u0osod0pP3oJ/U7bFESE1YClaoxsyOC007YiLdk0yYI+4loXgf48LTw7TeSvjtC8ykVEEt6elzzqZOc7IzHWuVi7qyLbpDrYyWfN0X28CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NXemKJyx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745573931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yeTi2beNeT6GEnAy7Gy8MR4veB063ayGsd3BpNX5h+0=;
-	b=NXemKJyx8SnD7h7xLjWO+RtuqcJVVB75kvDD5owSYFZn0E2p0Y1+l2FfoVoZhQXpi0QRaF
-	+OMdgLd1dXB544gN/tuBlTPR163+oKv0U2O4w6YStECMRHGeFXX3TCwmXJS2PS45cX4bOo
-	tqTWWueaCiF2czWMblEwpZ9/ZR7mI/c=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-428-ZEycNmyVMfqWBHWwWZlrxg-1; Fri,
- 25 Apr 2025 05:38:48 -0400
-X-MC-Unique: ZEycNmyVMfqWBHWwWZlrxg-1
-X-Mimecast-MFC-AGG-ID: ZEycNmyVMfqWBHWwWZlrxg_1745573926
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D620F1800873;
-	Fri, 25 Apr 2025 09:38:45 +0000 (UTC)
-Received: from [10.44.33.33] (unknown [10.44.33.33])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5659819560A3;
-	Fri, 25 Apr 2025 09:38:40 +0000 (UTC)
-Message-ID: <7d203d86-86b9-451c-9c49-5dd1c0e6626b@redhat.com>
-Date: Fri, 25 Apr 2025 11:38:38 +0200
+	s=arc-20240116; t=1745573972; c=relaxed/simple;
+	bh=x00ZgavTUTd8JDWTuQ3OYrQ8FYmxZ/6+MWDuRtYc4Yg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SUgv3wv9c9gWKnr19zEfrOYJiXszQudfe3+kfemHhFquEse6GDx/qJGZeoOEfukMi8vFe8ehCMOjedU8CgMe0bWnf1CyMgXaZqgN/F7u5Wm/wYBVbMShWjIsytselEGOiMXZDxOJGh6M9sUdyGQ5Ku2beVOdiCwtSoynnsUxDdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ohb2vKZW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cMLaFvXcWXuTBR4NwXGmCaGGLldk3zZ3VujAXnG9fJg=; b=ohb2vKZW8aTeYrgqVQClwJoS3U
+	8gzNnA5Kfv5mbW7f5HCeOycPQr2POY/tRp6K2en4wAnDUI8JbSAckOKrpI1bQfZzctP2zPE61a+YF
+	CrC5McPe0mADrfQ3ll2pVb9IsuGRSx7ixGw658TTEQBdUSJV4ash5kegRRZm2G1w+r+6khjtrNI9Y
+	6qXE9B/od96t/iTDVVYV+MYqvQJKeGLcCzu4OejVyf6rOPe0pPcbPker0q1tWSElyRbrHhIPws7Un
+	IW38zhlWpvZeYBbNmj4fd5l00N6Yo7/iNxPc2R7kLCTFepbKZ+1GI1x/Wj1OFO7f+b6xVN7ni1FpF
+	+nRV0sdw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50656)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u8FWo-000076-2s;
+	Fri, 25 Apr 2025 10:39:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u8FWm-00022D-2Y;
+	Fri, 25 Apr 2025 10:39:24 +0100
+Date: Fri, 25 Apr 2025 10:39:24 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	mengyuanlou@net-swift.com
+Subject: Re: [PATCH net] net: libwx: fix to set pause param
+Message-ID: <aAtYTPuCI6Ur-9ye@shell.armlinux.org.uk>
+References: <6A2C0EF528DE9E00+20250425070942.4505-1-jiawenwu@trustnetic.com>
+ <aAs79UDnd0sAyVAp@shell.armlinux.org.uk>
+ <046701dbb5c3$58335190$0899f4b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/8] dt-bindings: dpll: Add support for
- Microchip Azurite chip family
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250424154722.534284-1-ivecera@redhat.com>
- <20250424154722.534284-3-ivecera@redhat.com>
- <20250425-hopeful-dexterous-ibex-b9adce@kuoka>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20250425-hopeful-dexterous-ibex-b9adce@kuoka>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <046701dbb5c3$58335190$0899f4b0$@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Fri, Apr 25, 2025 at 05:20:53PM +0800, Jiawen Wu wrote:
+> On Fri, Apr 25, 2025 3:38 PM, Russell King (Oracle) wrote:
+> > On Fri, Apr 25, 2025 at 03:09:42PM +0800, Jiawen Wu wrote:
+> > > @@ -266,11 +266,20 @@ int wx_set_pauseparam(struct net_device *netdev,
+> > >  		      struct ethtool_pauseparam *pause)
+> > >  {
+> > >  	struct wx *wx = netdev_priv(netdev);
+> > > +	int err;
+> > >
+> > >  	if (wx->mac.type == wx_mac_aml)
+> > >  		return -EOPNOTSUPP;
+> > >
+> > > -	return phylink_ethtool_set_pauseparam(wx->phylink, pause);
+> > > +	err = phylink_ethtool_set_pauseparam(wx->phylink, pause);
+> > > +	if (err)
+> > > +		return err;
+> > > +
+> > > +	if (wx->fc.rx_pause != pause->rx_pause ||
+> > > +	    wx->fc.tx_pause != pause->tx_pause)
+> > > +		return wx_fc_enable(wx, pause->tx_pause, pause->rx_pause);
+> > 
+> > Why? phylink_ethtool_set_pauseparam() will cause mac_link_down() +
+> > mac_link_up() to be called with the new parameters.
+> > 
+> > One of the points of phylink is to stop drivers implementing stuff
+> > buggily - which is exactly what the above is.
+> > 
+> > ->rx_pause and ->tx_pause do not set the pause enables unconditionally.
+> > Please read the documentation in include/uapi/linux/ethtool.h which
+> > states how these two flags are interpreted, specifically the last
+> > paragraph of the struct's documentation.
+> > 
+> > I'm guessing your change comes from a misunderstanding how the
+> > interface is supposed to work and you believe that phylink isn't
+> > implementing it correctly.
+> 
+> You are right.
+> I should set autoneg off first, although there has no autoneg bit in this link mode.
 
+Yes, "autoneg" in the pause API selects between using the result of
+autonegotiation if enabled, or using the values from tx/rx in the
+pause API.
 
-On 25. 04. 25 9:41 dop., Krzysztof Kozlowski wrote:
-> On Thu, Apr 24, 2025 at 05:47:16PM GMT, Ivan Vecera wrote:
->> Add DT bindings for Microchip Azurite DPLL chip family. These chips
->> provide up to 5 independent DPLL channels, 10 differential or
->> single-ended inputs and 10 differential or 20 single-ended outputs.
->> They can be connected via I2C or SPI busses.
->>
->> Check:
->> $ make dt_binding_check DT_SCHEMA_FILES=/dpll/
-> 
-> None of these commands belong to the commit msg. Look at all other
-> commits: do you see it anywhere?
+If autonegotiation (as in the control in SLINKSETTINGS) is disabled
+or autonegotiation is unsupported, then "autoneg" set in the pause
+parameters results in no pause. The same is incidentally true of EEE
+settings as well.
 
-+1
+So, "autoneg" in SLINKSETTINGS is like the big switch allowing or
+preventing all autonegotiation over the link. The other "autoneg"s
+control whether the result of autonegotiation is used.
 
->>    SCHEMA  Documentation/devicetree/bindings/processed-schema.json
->> /home/cera/devel/kernel/linux-2.6/Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
->>    CHKDT   ./Documentation/devicetree/bindings
->>    LINT    ./Documentation/devicetree/bindings
->>    DTC [C] Documentation/devicetree/bindings/dpll/dpll-pin.example.dtb
->>    DTEX    Documentation/devicetree/bindings/dpll/microchip,zl30731.example.dts
->>    DTC [C] Documentation/devicetree/bindings/dpll/microchip,zl30731.example.dtb
->>    DTC [C] Documentation/devicetree/bindings/dpll/dpll-device.example.dtb
->>
-> 
-> With above fixed:
-> 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+There is one thing in the ethtool_pauseparam documentation that should
+be removed:
 
-Thank you.
+ * Drivers should reject a non-zero setting of @autoneg when
+ * autoneogotiation is disabled (or not supported) for the link.
 
-I.
-> ---
-> 
-> <form letter>
-> This is an automated instruction, just in case, because many review tags
-> are being ignored. If you know the process, you can skip it (please do
-> not feel offended by me posting it here - no bad intentions intended).
-> If you do not know the process, here is a short explanation:
-> 
-> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
-> versions of patchset, under or above your Signed-off-by tag, unless
-> patch changed significantly (e.g. new properties added to the DT
-> bindings). Tag is "received", when provided in a message replied to you
-> on the mailing list. Tools like b4 can help here. However, there's no
-> need to repost patches *only* to add the tags. The upstream maintainer
-> will do that for tags received on the version they apply.
-> 
-> https://elixir.bootlin.com/linux/v6.12-rc3/source/Documentation/process/submitting-patches.rst#L577
-> </form letter>
-> 
-> Best regards,
-> Krzysztof
-> 
+Let's think about what that means.
 
+- I have a 100baseT/FD link for example, and it used autoneg, and has
+  pause enabled.
+- I decide to disable autoneg, instead selecting fixed-link mode
+  through SLINKSETTINGS.
+- Reading the pause parameter settings returns the original state of
+  "autoneg" which is set.
+- Writing that back results in "rejection" if the above statement is
+  followed - which is non-sensical. Let's say it's forced to zero.
+- I later re-enable autoneg via SLINKSETTINGS
+- I now have to remember to modify the pause mode parameters to
+  re-enable pause autoneg.
+
+Things get worse if instead of the above, disabling SLINKSETTINGS
+autoneg results in the pause param autoneg being immediately disabled
+without API changes - we then end up with one API making magic changes
+to settings in another API, and I don't think that is what anyone
+would reasonably expect to happen.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
