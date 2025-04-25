@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-185933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316F5A9C299
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:00:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50E7BA9C2B0
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6564D1BA7215
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:00:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33A107B79CC
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725E823BCF1;
-	Fri, 25 Apr 2025 08:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AB5241668;
+	Fri, 25 Apr 2025 08:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYUZQrCs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m/IbDZMY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4466A23AE9A;
-	Fri, 25 Apr 2025 08:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD00239581;
+	Fri, 25 Apr 2025 08:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745571507; cv=none; b=rbaY8q2FOIPfDABWzFU7gaFOIYV7X3UvIjbhgSRBhM197RvXK6f+LrO/rsp3OwWDlkz/Tl4YnhrXhmNaxYBcV3e1yDJgHQzyfrQrxXktxDs/dsye3vyZW4wJj4rahNIzxs3weHnNMMhaN6jWvGOi5L5+lwGlqgt2lLIriIQx9Us=
+	t=1745571514; cv=none; b=Viwjn1WUS6PcQCsUc9k/efzTv6rBK/6r4sw+2YzWxbAGErrMhUr4cZk6RkwJ40eN3uevwO9S4nhFXEVm0jcYggf6toFRbQLZYkVzQn827caR90dCWS2X4zhC83cr9b9Yr4uNNfc2aRgpo8s+MF/B3MewT6m13Q0vdI9XW5/EOwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745571507; c=relaxed/simple;
-	bh=ReLh28MMXe+RCC+isNK/dhc8sJPi0We7tbuIOvBGcMQ=;
+	s=arc-20240116; t=1745571514; c=relaxed/simple;
+	bh=JwQgJ9CbA/kRE+Ux8ehyLiYx0Jiy2Yv7pNe812gJer0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lcSFhu+430llhAPSVs/dLirKAeoy0JOzG8/5DX4fIBlJ4Yuv05ahXFdugSGebTvyyfYnE2PGRtycEY1oXxohR8l07ZFly7Vc86CvaIznriSVedY8Yng1yJIYjHiEP/cd71eBuZiGyo6Hvld7gk3rzoUd8l3RelqPz4stl26OVjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYUZQrCs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56035C4CEEA;
-	Fri, 25 Apr 2025 08:58:20 +0000 (UTC)
+	 MIME-Version; b=IOzVRMNDznxLRXUvnpfvDRJCtwjatYjmdgyP3NQWBEEXJK0R4mdahwze/rfmRQgbMEhYghbguY4Hnttg4OlGSc1/vonWFUEMIzyoRW62Hc9hC/nZKCRJlFWyNU6Uz3xL+X+1KA83dPCZh0iUc6LpCtENtjf12+AF1MtPyJAqZ8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/IbDZMY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D782C4CEE4;
+	Fri, 25 Apr 2025 08:58:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745571506;
-	bh=ReLh28MMXe+RCC+isNK/dhc8sJPi0We7tbuIOvBGcMQ=;
+	s=k20201202; t=1745571513;
+	bh=JwQgJ9CbA/kRE+Ux8ehyLiYx0Jiy2Yv7pNe812gJer0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QYUZQrCso3T23LALKw0C7Xd397quUlqZYpWiKk/VQfZ9Ut/+uMgj4EkwVQeor3alh
-	 NItGOYyddkAC+RODzbwkyubLdDUXr0qIgf5ln/ndPKYL2+DjJyg2pTavXrlY97Mfqm
-	 gXkDzipiyPOaB66oPZ45HGkjedVytgq1whLTfr1wy19bfn5DH/BwHuyhK9W9gzX+nD
-	 kT2FYv7rR6fysxtZ/wpIUEbShtnTqOeyLiryXitRzDaYdyY2jAHBcESzqQpeWGr+iR
-	 DQVQhnfsa+67LbQpP1vuUCjI3qRNT13MqRbz3bgwYu6FYWWiN4FS8VKJ17VsvjC8AR
-	 3yD1Oovvs9ezw==
+	b=m/IbDZMYVFFXSrcufpLhIzufuUvYqMslGiwePnXGDVIEK41y8v48e8eEYaS2Cqo+g
+	 C/NMce59ezEwNMvldNt1t/Bt2bc9v13er4AJgamAxSExVbOwX1HGnPj3YA6ixJ8oPM
+	 mgiKN5dsu3g/h38hc/5Qs6dNOvCv9tc0QthrCXJEn4bfBRSrvmfkvya8Zu7Ayosb2J
+	 Iw1A1dvG/fatcvCI9oGCZD42NGaicAdECTTQlAoxcBRRFJkP97bzfr06852N2Yyj19
+	 L550ongKlfHvDzpzp6bPYCAb3Gi7MdZm0LXv0DnxZ+XV0S669mdFkpe3TJCPcv+NOb
+	 7rKzHpJjBxitg==
 From: Philipp Stanner <phasta@kernel.org>
 To: Sunil Goutham <sgoutham@marvell.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -69,9 +69,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-parisc@vger.kernel.org
-Subject: [PATCH v2 5/8] net: ethernet: sis900: Use pure PCI devres API
-Date: Fri, 25 Apr 2025 10:57:38 +0200
-Message-ID: <20250425085740.65304-7-phasta@kernel.org>
+Subject: [PATCH v2 6/8] net: mdio: thunder: Use pure PCI devres API
+Date: Fri, 25 Apr 2025 10:57:39 +0200
+Message-ID: <20250425085740.65304-8-phasta@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250425085740.65304-2-phasta@kernel.org>
 References: <20250425085740.65304-2-phasta@kernel.org>
@@ -91,26 +91,60 @@ pci_enable_device() or pcim_enable_device() has been called before).
 The PCI subsystem wants to remove this behavior and, therefore, needs to
 port all users to functions that don't have this problem.
 
+Furthermore, the PCI function being managed implies that it's not
+necessary to call pci_release_regions() manually.
+
+Remove the calls to pci_release_regions().
+
 Replace pci_request_regions() with pcim_request_all_regions().
 
 Signed-off-by: Philipp Stanner <phasta@kernel.org>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/sis/sis900.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/mdio/mdio-thunder.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/sis/sis900.c b/drivers/net/ethernet/sis/sis900.c
-index 332cbd725900..df869f82cae8 100644
---- a/drivers/net/ethernet/sis/sis900.c
-+++ b/drivers/net/ethernet/sis/sis900.c
-@@ -468,7 +468,7 @@ static int sis900_probe(struct pci_dev *pci_dev,
- 	SET_NETDEV_DEV(net_dev, &pci_dev->dev);
+diff --git a/drivers/net/mdio/mdio-thunder.c b/drivers/net/mdio/mdio-thunder.c
+index 1e1aa72b1eff..a3047f7258a7 100644
+--- a/drivers/net/mdio/mdio-thunder.c
++++ b/drivers/net/mdio/mdio-thunder.c
+@@ -40,16 +40,16 @@ static int thunder_mdiobus_pci_probe(struct pci_dev *pdev,
+ 		return err;
+ 	}
  
- 	/* We do a request_region() to register /proc/ioports info. */
--	ret = pci_request_regions(pci_dev, "sis900");
-+	ret = pcim_request_all_regions(pci_dev, "sis900");
- 	if (ret)
- 		goto err_out;
+-	err = pci_request_regions(pdev, KBUILD_MODNAME);
++	err = pcim_request_all_regions(pdev, KBUILD_MODNAME);
+ 	if (err) {
+-		dev_err(&pdev->dev, "pci_request_regions failed\n");
++		dev_err(&pdev->dev, "pcim_request_all_regions failed\n");
+ 		goto err_disable_device;
+ 	}
+ 
+ 	nexus->bar0 = pcim_iomap(pdev, 0, pci_resource_len(pdev, 0));
+ 	if (!nexus->bar0) {
+ 		err = -ENOMEM;
+-		goto err_release_regions;
++		goto err_disable_device;
+ 	}
+ 
+ 	i = 0;
+@@ -107,9 +107,6 @@ static int thunder_mdiobus_pci_probe(struct pci_dev *pdev,
+ 	}
+ 	return 0;
+ 
+-err_release_regions:
+-	pci_release_regions(pdev);
+-
+ err_disable_device:
+ 	pci_set_drvdata(pdev, NULL);
+ 	return err;
+@@ -129,7 +126,6 @@ static void thunder_mdiobus_pci_remove(struct pci_dev *pdev)
+ 		mdiobus_unregister(bus->mii_bus);
+ 		oct_mdio_writeq(0, bus->register_base + SMI_EN);
+ 	}
+-	pci_release_regions(pdev);
+ 	pci_set_drvdata(pdev, NULL);
+ }
  
 -- 
 2.48.1
