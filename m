@@ -1,112 +1,103 @@
-Return-Path: <netdev+bounces-186084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC096A9D0ED
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 20:58:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9DEA9D0F4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27DCE4E3A97
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:58:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 504F21BC3A89
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EFF2185BD;
-	Fri, 25 Apr 2025 18:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F04721772D;
+	Fri, 25 Apr 2025 19:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j+Jiiqlo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2B8hbDQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6F31AA1C4;
-	Fri, 25 Apr 2025 18:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E103216399;
+	Fri, 25 Apr 2025 19:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745607516; cv=none; b=Prt26F6xRHZ9aF/X7lc/nVtIgAEU9T6brPki0yUYWVH/htgnNxsJfPhduBcfeEgzg729YEWJ/0w2QAbLd72i4LVIIy9r3TMQInVrFJ7FovVHhcxkXnafPVaw9Ks3xH4tucQE5XOoxWdGzB5mqbI06c5q/XftRxs5nVL4STls9BE=
+	t=1745607651; cv=none; b=KC7qF8RRNTM1vCMlmR5BoVPXg9swI9wqPTRxhtbzbMOsWWkwISTmPvUdwRWgXN8b7VsVvTgP7Yr0BWkrRoiWKzxPgQYCvgNEfvPTFEEtVpodd5grPeaEzHqu247AX05vm6s7P5tT6rz3TpkvQkdYhjAjVVwN1flWLcZyvLNNGFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745607516; c=relaxed/simple;
-	bh=Lsmrp9NKV92pd90erCa0bNkQyc6Oy+Y9ltxfyRGkeD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMWgd/WcHSQZ5Sjl3fx4JYushLNa+HeQTMbPe5e//1s7YnvjgHHVKk2NanHdu0ED6KG1PCcwJXNqixou4ct/FRrdK+I5InNoNJ4osa5M2Vp08iSFqButG0xxa1dpgWDYj/aGfWghFfvZpDiobZucbpA1Xs2TzA7iMYhl4eAxi0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j+Jiiqlo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C308AC4CEE4;
-	Fri, 25 Apr 2025 18:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1745607515;
-	bh=Lsmrp9NKV92pd90erCa0bNkQyc6Oy+Y9ltxfyRGkeD8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j+JiiqlocYgHar31q8KKX1xVyWVDUWmQtYm4Ae6wbdqb3DdQP0Lt3PZ9LTQ9ZLyaI
-	 moGQb8qDR/0nQxC44DRBesbPAI3UtgIJsU51mX2SAEp3AXQYD9GGTrtAjCJ+NMAWw2
-	 iAjPMZyUDoo8Rbx5zHLz4IzinUO5WHc0T47/KcjU=
-Date: Fri, 25 Apr 2025 14:58:32 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH 0/3] selftests/bpf: Fix a few issues in arena_spin_lock
-Message-ID: <20250425-artichoke-dove-of-reward-6e3ca2@lemur>
-References: <20250424165525.154403-1-iii@linux.ibm.com>
- <174551961000.3446286.10420854203925676664.git-patchwork-notify@kernel.org>
- <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
+	s=arc-20240116; t=1745607651; c=relaxed/simple;
+	bh=rcgUGGoTaQtiVKvvrkVXx2VJUfGZzIH2P/07pyV2u5o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eds2UwAXTDj20wVKMJd76o0ufH4l6QmWvlinPzR5vu+VjHUtuB/3sU7x8n7/lkqXlDSlChi/aipdKOXxwpTlE8DVl/2nm75lvmDDO812iou+QjtzyE058AVlXsgjPHS2DebhbREogl9sN+pTfTcSOuNjCYiTEpM+pHtpNb2GngY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2B8hbDQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC02CC4CEE4;
+	Fri, 25 Apr 2025 19:00:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745607650;
+	bh=rcgUGGoTaQtiVKvvrkVXx2VJUfGZzIH2P/07pyV2u5o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=j2B8hbDQ0Q/D75S2UudrcasVh/x5d6ug5uJv3EvojNwzde8OHSrnnYfEDegQu05oB
+	 rxj9W0sV4JsERitPanOWrK5OEdTF4Qouk4uqVRrK5+uJIhwv0kQtT3m15PAtqEC91V
+	 89kxxJcEuute3WVM9baRc78loK5dg08tgWampY844AToInc9hsRLkYnS9xLCK1feK6
+	 VbuEaFskcBOrYgOxkfrpN3UA4r+pfqHzikUpWy56t4AKt2n4BGWBH3NrBnCzUsJ2Fi
+	 TVixzXwYhhahGOtM9UWI/1eUDE6PJ5J133K6KdAFdff3GnR0tiOKmvNyakM5qWuJSE
+	 pe8lI6xOwdVJQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0E380CFD7;
+	Fri, 25 Apr 2025 19:01:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] mlx5 misc fixes 2025-04-23
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174560768948.3803904.7560030217169177753.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Apr 2025 19:01:29 +0000
+References: <20250423083611.324567-1-mbloch@nvidia.com>
+In-Reply-To: <20250423083611.324567-1-mbloch@nvidia.com>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Apr 24, 2025 at 11:41:16AM -0700, Alexei Starovoitov wrote:
-> > On Thu, 24 Apr 2025 18:41:24 +0200 you wrote:
-> > > Hi,
-> > >
-> > > I tried running the arena_spin_lock test on s390x and ran into the
-> > > following issues:
-> > >
-> > > * Changing the header file does not lead to rebuilding the test.
-> > > * The checked for number of CPUs and the actually required number of
-> > >   CPUs are different.
-> > > * Endianness issue in spinlock definition.
-> > >
-> > > [...]
-> >
-> > Here is the summary with links:
-> >   - [1/3] selftests/bpf: Fix arena_spin_lock.c build dependency
-> >     https://git.kernel.org/netdev/net-next/c/4fe09ff1a54a
-> >   - [2/3] selftests/bpf: Fix arena_spin_lock on systems with less than 16 CPUs
-> >     (no matching commit)
-> >   - [3/3] selftests/bpf: Fix endianness issue in __qspinlock declaration
-> >     (no matching commit)
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 23 Apr 2025 11:36:06 +0300 you wrote:
+> This patchset includes misc fixes from the team for the mlx5 core
+> and Ethernet drivers.
 > 
-> Hmm. Looks like pw-bot had too much influence from AI bots
-> and started hallucinating itself :)
+> Thanks,
+> Mark
+> 
+> Chris Mi (1):
+>   net/mlx5: E-switch, Fix error handling for enabling roce
+> 
+> [...]
 
-Looks like it's a mix of bad assumptions and the usual difficulty of
-recognizing fast-forward merges that came in through a different tree.
+Here is the summary with links:
+  - [net,1/5] net/mlx5e: Use custom tunnel header for vxlan gbp
+    https://git.kernel.org/netdev/net/c/eacc77a73275
+  - [net,2/5] net/mlx5: E-Switch, Initialize MAC Address for Default GID
+    https://git.kernel.org/netdev/net/c/5d1a04f347e6
+  - [net,3/5] net/mlx5e: TC, Continue the attr process even if encap entry is invalid
+    https://git.kernel.org/netdev/net/c/172c034264c8
+  - [net,4/5] net/mlx5e: Fix lock order in mlx5e_tx_reporter_ptpsq_unhealthy_recover
+    https://git.kernel.org/netdev/net/c/1c2940ec0ddf
+  - [net,5/5] net/mlx5: E-switch, Fix error handling for enabling roce
+    https://git.kernel.org/netdev/net/c/90538d23278a
 
-If you look at the commit mentioned above, it has:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-| Note that the first patch in this series is a leftover from an
-| earlier patchset that was abandoned:
-| Link: https://lore.kernel.org/netdev/20250129004337.36898-2-shannon.nelson@amd.com/
 
-This confuses the bot into thinking that the linked message is the source of
-the patch (which is why we started using patch.msgid.link to disambiguate
-links aimed at cross-referencing and links aimed at indicating commit
-provenance -- but we aren't relying on this disambiguation in the bot itself
-yet).
-
-The other replies are the usual mess when fast-forward tree updates confuse
-things. It's a long-standing hard bug to fix.
-
-I am going to re-enable the bot for now -- in general it's not any more wrong
-than usual. I'm scheduling some time next week to try to tackle the
-fast-forwards problem.
-
--K
 
