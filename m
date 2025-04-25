@@ -1,170 +1,89 @@
-Return-Path: <netdev+bounces-186044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F02A9CE30
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:31:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373C8A9CE40
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 18:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 489297B0C72
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494D11899B22
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 16:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446491A00ED;
-	Fri, 25 Apr 2025 16:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94B31B424D;
+	Fri, 25 Apr 2025 16:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfMLaA9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38517198823
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 16:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2D41A9B53;
+	Fri, 25 Apr 2025 16:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745598693; cv=none; b=VDzVu7+ArhIeQakEdJdfKMXgfdDeC1wuYboBh9SfZBenkkG+gKsLxI/Yr6q/R8r64jlhk3tuapAeLUUPl4ujLkyuSM694DLtzf9sAMuo719tjmAE5Y2bNy9qvxtYStQrhtHlCOC1U95QlrPzkR4PJjLqQWtH9vAUbmvGYTNbkiE=
+	t=1745598958; cv=none; b=g93fkORlKr4MQIVghWJFbC2CV+PTPLW15h5/J9ScNMEVFKlTh3NDuq7E9mjldm2LujrJPWWFmWls0NUNSMA6cbz8iYJtR28C4mTp9OUSwFa19PgwzY2lWF7gqlIimnbSCUKjbSOkIAJ/u1RvCTwsooFCNudv4KYL4VPF4aLRQBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745598693; c=relaxed/simple;
-	bh=umv34Omx9kG30FPHmNxsuOEzQrw097DD64u5IOzgDpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BotLIFyM70+8WbLBltp6AaqeJ2ppFA0jy741whZAocS5xaqCLBNoDkzzon4tau5JNituKlfyVhxjqyAGvNgjbFXRYKHJ3Dl/a1VxbILZKbD2sPQc46fCfpKwLYgITfFulXt9Y4sub3GMTJOMxFX7ehTcP5jxskrmFbcPH2nelRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8LxP-00018y-Lt; Fri, 25 Apr 2025 18:31:19 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8LxO-0024b5-0u;
-	Fri, 25 Apr 2025 18:31:18 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8LxO-003Kor-0S;
-	Fri, 25 Apr 2025 18:31:18 +0200
-Date: Fri, 25 Apr 2025 18:31:18 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Remove ineffective
- checks from ksz_set_mac_eee()
-Message-ID: <aAu41tjRIir8oMK7@pengutronix.de>
-References: <20250425110845.482652-1-o.rempel@pengutronix.de>
- <aAuRAadDStfwfS1U@shell.armlinux.org.uk>
- <aAubnUSDpwtfuCrm@pengutronix.de>
- <aAufpsLhs8GLMm_b@shell.armlinux.org.uk>
+	s=arc-20240116; t=1745598958; c=relaxed/simple;
+	bh=FsR4f8RipLNPNkpkDoIHdHQnHxmjYdk4APWukvEffD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qQNf5yveGqTYwVry1havz4+TP9W1yj/T+guuf7IAW5u0r2beBMbN95vdBtHUZmHZxqp85TWWTbj82QmXHSsLjGS8yIsDxucoz9KXV5R2Bji2OvF+GZPI9g/48crOav1gfPRfshS2RToC1dO8lFnz1lgg7OPlpKP0LmS8OaEyFOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfMLaA9S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D0BC4CEE4;
+	Fri, 25 Apr 2025 16:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745598958;
+	bh=FsR4f8RipLNPNkpkDoIHdHQnHxmjYdk4APWukvEffD4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RfMLaA9SCMn4O8Dq+CtX3lf7Nc63kO8LsATyxdnS8mFHA1v3NsH01veC5keY6dSlY
+	 OXb8/P3EgnNVNJyHzdUm32fZMqhPSPFGNiAzBLNkIxl95k1pXuot+Xg43iV6AuPcV1
+	 /5pEsEs9agtKxVq+jTtx01tfc+zjCkYA6cnu0KXhr6tntRZUEwvDZdve5sqKFO8Cq5
+	 X9fL7UBMFLaHJoZ3kdY5dprxAfAQInGL4S9fB17varuwuwSyYuqknykqYdrtOd3nmI
+	 x3B9V02oOypHvO49Nt3Tmwev0BWSndmvEKtaXa+fm+nwlVScJ85vzcwCFD+M5KZEWB
+	 rOeXBX7TXxvyw==
+Date: Fri, 25 Apr 2025 09:35:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>, Yury Norov
+ <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron
+ <Jonathan.Cameron@huwei.com>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, Long Li
+ <longli@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas
+ <bhelgaas@google.com>, Rob Herring <robh@kernel.org>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?=
+ <kw@linux.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Haiyang Zhang
+ <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
+ Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Leon
+ Romanovsky <leon@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Erni
+ Sri Satya Vennela <ernis@linux.microsoft.com>, Peter Zijlstra
+ <peterz@infradead.org>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Paul Rosswurm <paulros@microsoft.com>, Shradha Gupta
+ <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v2 3/3] net: mana: Allocate MSI-X vectors dynamically as
+ required
+Message-ID: <20250425093556.30104eda@kernel.org>
+In-Reply-To: <1745578478-15195-1-git-send-email-shradhagupta@linux.microsoft.com>
+References: <1745578407-14689-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<1745578478-15195-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aAufpsLhs8GLMm_b@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 03:43:50PM +0100, Russell King (Oracle) wrote:
-> On Fri, Apr 25, 2025 at 04:26:37PM +0200, Oleksij Rempel wrote:
-> > On Fri, Apr 25, 2025 at 02:41:21PM +0100, Russell King (Oracle) wrote:
-> > > On Fri, Apr 25, 2025 at 01:08:45PM +0200, Oleksij Rempel wrote:
-> > > > KSZ switches handle EEE internally via PHY advertisement and do not
-> > > > support MAC-level configuration. The ksz_set_mac_eee() handler previously
-> > > > rejected Tx LPI disable and timer changes, but provided no real control.
-> > > 
-> > > Err what?
-> > > 
-> > > ksz does not set phylink_config->eee_enabled_default, so the default
-> > > state in phylink is eee_enabled = false, tx_lpi_enabled = false. It
-> > > doesn't set the default LPI timer, so tx_lpi_timer = 0.
-> > > 
-> > > As the driver does not implement the ability to change the LPI timer
-i > > enable nor the timer value, this seemed reasonable as the values are
-> > > not reported (being reported as zeros) and thus prevents modification
-> > > thereof.
-> > > 
-> > > Why do you want to allow people to change parameters that have no
-> > > effect?
-> > 
-> > The original ksz_get_mac_eee() used to report tx_lpi_enabled = true,
-> > which correctly reflected the internal EEE/LPI activity of the hardware.
-> 
-> Are you sure it did _actually_ did return that?
-> 
-> Yes, ksz_get_mac_eee() set e->tx_lpi_enabled = true, but if you read the
-> commit 0945a7b44220 message, you will see that DSA calls
-> phylink_ethtool_get_eee() after this function, which then calls into
-> phy_ethtool_get_eee(), and phy_ethtool_get_eee() overwrites *all*
-> members of struct ethtool_keee.
-> 
-> Thus, userspace doesn't see tx_lpi_enabled set.
-> 
-> Please wind back to before commit 0945a7b44220 to confirm this - I
-> think you'll find that this bug was introduced in commit
-> fe0d4fd9285e "net: phy: Keep track of EEE configuration".
-> 
-> > After commit [0945a7b44220 ("net: dsa: ksz: remove setting of tx_lpi
-> > parameters")], ksz_get_mac_eee() was removed, and now tx_lpi_enabled defaults
-> > to false via the phylink fallback.
-> 
-> As stated above, I think this driver has had a problem for over a year
-> now, caused ultimately by the incomplete submission of Andrew's patch
-> set. I think you'll find that if you try the comparing the ksz behaviour
-> of commit fe0d4fd9285e^ with commit fe0d4fd9285e, you'll find that's
-> where this behaviour changed.
+On Fri, 25 Apr 2025 03:54:38 -0700 Shradha Gupta wrote:
+> +	spin_lock_irqsave(&gc->irq_ctxs_lock, flags);
+> +	irqs = kmalloc_array(nvec, sizeof(int), GFP_KERNEL);
 
-thank you again for your detailed explanations.
-
-After carefully analyzing the situation, I fully agree with your
-assessment.
-
-The key point is that the change in behavior was introduced already by
-commit [fe0d4fd9285e ("net: phy: Keep track of EEE configuration")],
-where phy_ethtool_get_eee() started overwriting the complete
-ethtool_keee structure based on phydev->eee_cfg.
-
-Since the KSZ DSA driver and the DSA framework do not request the
-PHYlink framework to enable EEE by default, tx_lpi_enabled correctly
-remains false.  However, because of how phy_probe() initializes
-eee_enabled based on PHY advertisement, userspace will observe that EEE
-is enabled, but Tx LPI is disabled, leading to an inconsistent state.
-
-Thus, the current driver behavior is consistent with the framework
-expectations.
-My initial concern was based on the assumption that we still reported
-EEE active by MAC default, which is no longer the case.
-Therefore, there is no need to adjust ksz_set_mac_eee(), and I will
-withdraw the patch.
-
-Additionally, it seems that setting eee_enabled automatically based on
-advertisement in phy_probe() is no longer appropriate.
-If you agree, I would propose a patch to remove this initialization.
-
-Thank you again for your patience and for helping to clarify this
-situation.
-
-Best regards,
-Oleksij
-
+Could you please test your submissions on a kernel with debug options
+enabled? Thank you!
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+pw-bot: cr
 
