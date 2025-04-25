@@ -1,229 +1,183 @@
-Return-Path: <netdev+bounces-185892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F055A9C017
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:49:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF478A9C019
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 09:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDF249231DB
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:49:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0BB1B860BE
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 07:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE58230BDF;
-	Fri, 25 Apr 2025 07:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB41230BF5;
+	Fri, 25 Apr 2025 07:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="W5mzngPW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCbRrNTi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9D25A79B;
-	Fri, 25 Apr 2025 07:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A941DED49;
+	Fri, 25 Apr 2025 07:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745567357; cv=none; b=UJdI1gicxYojLMs5gM2A+/PV7mTKSPIE+cZwDriCJPza4JOKV6sF5s+Hf/lN8TedAP9Klaz/7NJY1+4Ycre46t1ZRa3Wwiz608rzkOVNH9GCzuloIq195eV9OrOfWkGKNRoqXEJK1KJL13G1SvAsowCWBDuxrNf/m9mX6gENrGA=
+	t=1745567403; cv=none; b=jq6d1AUGT0Ks3FPhT6V2DKc0ncg9fRQyyFrpzKUew32+aBS/3pV19dW5t3AY4l4NLqOiHTRcv9aaOMHh0k/M2ERbbkGNlNKTNkavuSEGMkotG9icmOvbIXuFYKDcOX1UAzPh6/Td732hS2lA2MLXHpxWSIq4RS6pzNfaIF3+eLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745567357; c=relaxed/simple;
-	bh=FZiAbyedh3Hu4XRwOaYu0OJ85o9hgbMKwtwyNH+c43U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OroELYuNJV2BVc0NP3aO1PWSEt3Dgosn5HophvPk8AHK8yjTqM9xacqwhD6kB/gMvtfRtq1Dw+rIw/oSXF81EhpdyIg1t99/yN9y0NkNw5R1wIgikSpkSV/O95Od7/0g/uyScKak5F/xxLUa71QN/AXlpndtqr7wFrktlSDnrAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=W5mzngPW; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2F99710275AFE;
-	Fri, 25 Apr 2025 09:49:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1745567352; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=/dXNASC/WIWqaw/KcaFHN25jpUIQ4813arUoFsnAA/w=;
-	b=W5mzngPWSoevp/RkCHlrm6bIeICmfBGApQFzJ0GYblGaR6HMtVLH2FxtRBPpnBDPDuTvMu
-	gGj/huEmIcEK+7lQIm6QDNgYvojSeuwBJC+IW/9AAz/26JOzVxaGchp3mN8rT0+4k+PHDg
-	JA5+9KOV1Yn5cRq20sNAN9dUYRhzx1o4oa0J7Qr4i8mKibnDACG2XvcftijG+JK6neBKuz
-	5nUduG0llbzLBYuz1oPnEez9otGn0mt2TSb1opiKqJGW/MPGR2gD+z71p0fsdAk902HIh7
-	NtbcYJyrJ8+CKVCJYWlKOEF9QrmO7GO5KDspKWxPSrnkHe1KT000/vGRU+eC/A==
-Date: Fri, 25 Apr 2025 09:49:07 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v7 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250425094907.27740d07@wsk>
-In-Reply-To: <a5f54d46-6829-4d60-b453-9ee92e6b568c@kernel.org>
-References: <20250423072911.3513073-1-lukma@denx.de>
-	<20250423072911.3513073-5-lukma@denx.de>
-	<20250424181110.2734cd0b@kernel.org>
-	<0bf77ef6-d884-44d2-8ecc-a530fee215d1@kernel.org>
-	<20250425080556.138922a8@wsk>
-	<a5f54d46-6829-4d60-b453-9ee92e6b568c@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1745567403; c=relaxed/simple;
+	bh=QHkZ2w2krqWg8kpw96Vq3sOxWvbIiIYjOXmgILg98Bg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MK0Wl1zonAzrDsbbm8F5Asex4t+x6zHc5jeXrDVjTZVpEygOaeaFGZEtozGBKFoT7ZOpwz13OaRCxUp/elGkmm+5CjyqCH2mYjuN7KyB2fr9t8Ih0QszSY72E/EPXlit0TH4y2IvjEnyRDRul4W0oBht5xaRBOpNh16KsjFe5Hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCbRrNTi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C0BC4CEE4;
+	Fri, 25 Apr 2025 07:50:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745567402;
+	bh=QHkZ2w2krqWg8kpw96Vq3sOxWvbIiIYjOXmgILg98Bg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=DCbRrNTihtuIYKfP2GPR2CxzfZPocrxdsrAV+3YYKmMmsPv7dU1D4wIrtbglsE8gp
+	 yrMsQCYkeJyYlDvBcH9fBhfucUmh3DxAr7Ifz29YuYTBSLQEy/IcccKdwtEKgCI6Oh
+	 1OuDTFcyg7emDLu3AeswxJ/aGGJwjbmWseyOO/YRDAy4YdAIPuAEd8RHn2uLcAhu16
+	 gjhAH7Ro852nke1poQ7MMF987WecfIXg0cSRN6xWJVrUye8C2F8agOrpk/hTw/6Z9M
+	 s4e2BwZ5Vp123iloCXrGvbhOw5YuKzpIWfQjYbJ3Y6gF2UXaOsRKqr059KixcHyFGH
+	 EALlvzHYVvmIg==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 8E83D1A037D4; Fri, 25 Apr 2025 09:49:49 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
+ Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] bpf: Allow XDP dev-bound programs to
+ perform XDP_REDIRECT into maps
+In-Reply-To: <aAqjTz7O4HpuVspL@lore-rh-laptop>
+References: <20250423-xdp-prog-bound-fix-v2-1-51742a5dfbce@kernel.org>
+ <87wmb97uyt.fsf@toke.dk> <aAqjTz7O4HpuVspL@lore-rh-laptop>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 25 Apr 2025 09:49:49 +0200
+Message-ID: <87frhw7k9u.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/aD7bD6eqbseU9NHDSHb+3ZT";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
 
---Sig_/aD7bD6eqbseU9NHDSHb+3ZT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Lorenzo Bianconi <lorenzo@kernel.org> writes:
 
-Hi Krzysztof, Jakub
+>> Lorenzo Bianconi <lorenzo@kernel.org> writes:
+>> 
+>> > In the current implementation if the program is dev-bound to a specific
+>> > device, it will not be possible to perform XDP_REDIRECT into a DEVMAP
+>> > or CPUMAP even if the program is running in the driver NAPI context and
+>> > it is not attached to any map entry. This seems in contrast with the
+>> > explanation available in bpf_prog_map_compatible routine.
+>> > Fix the issue introducing __bpf_prog_map_compatible utility routine in
+>> > order to avoid bpf_prog_is_dev_bound() check running bpf_check_tail_call()
+>> > at program load time (bpf_prog_select_runtime()).
+>> > Continue forbidding to attach a dev-bound program to XDP maps
+>> > (BPF_MAP_TYPE_PROG_ARRAY, BPF_MAP_TYPE_DEVMAP and BPF_MAP_TYPE_CPUMAP).
+>> >
+>> > Fixes: 3d76a4d3d4e59 ("bpf: XDP metadata RX kfuncs")
+>> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>> > ---
+>> > Changes in v2:
+>> > - Introduce __bpf_prog_map_compatible() utility routine in order to skip
+>> >   bpf_prog_is_dev_bound check in bpf_check_tail_call()
+>> > - Extend xdp_metadata selftest
+>> > - Link to v1: https://lore.kernel.org/r/20250422-xdp-prog-bound-fix-v1-1-0b581fa186fe@kernel.org
+>> > ---
+>> >  kernel/bpf/core.c                                  | 27 +++++++++++++---------
+>> >  .../selftests/bpf/prog_tests/xdp_metadata.c        | 22 +++++++++++++++++-
+>> >  tools/testing/selftests/bpf/progs/xdp_metadata.c   | 13 +++++++++++
+>> >  3 files changed, 50 insertions(+), 12 deletions(-)
+>> >
+>> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+>> > index ba6b6118cf504041278d05417c4212d57be6fca0..a3e571688421196c3ceaed62b3b59b62a0258a8c 100644
+>> > --- a/kernel/bpf/core.c
+>> > +++ b/kernel/bpf/core.c
+>> > @@ -2358,8 +2358,8 @@ static unsigned int __bpf_prog_ret0_warn(const void *ctx,
+>> >  	return 0;
+>> >  }
+>> >  
+>> > -bool bpf_prog_map_compatible(struct bpf_map *map,
+>> > -			     const struct bpf_prog *fp)
+>> > +static bool __bpf_prog_map_compatible(struct bpf_map *map,
+>> > +				      const struct bpf_prog *fp)
+>> >  {
+>> >  	enum bpf_prog_type prog_type = resolve_prog_type(fp);
+>> >  	bool ret;
+>> > @@ -2368,14 +2368,6 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
+>> >  	if (fp->kprobe_override)
+>> >  		return false;
+>> >  
+>> > -	/* XDP programs inserted into maps are not guaranteed to run on
+>> > -	 * a particular netdev (and can run outside driver context entirely
+>> > -	 * in the case of devmap and cpumap). Until device checks
+>> > -	 * are implemented, prohibit adding dev-bound programs to program maps.
+>> > -	 */
+>> > -	if (bpf_prog_is_dev_bound(aux))
+>> > -		return false;
+>> > -
+>> >  	spin_lock(&map->owner.lock);
+>> >  	if (!map->owner.type) {
+>> >  		/* There's no owner yet where we could check for
+>> > @@ -2409,6 +2401,19 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
+>> >  	return ret;
+>> >  }
+>> >  
+>> > +bool bpf_prog_map_compatible(struct bpf_map *map, const struct bpf_prog *fp)
+>> > +{
+>> > +	/* XDP programs inserted into maps are not guaranteed to run on
+>> > +	 * a particular netdev (and can run outside driver context entirely
+>> > +	 * in the case of devmap and cpumap). Until device checks
+>> > +	 * are implemented, prohibit adding dev-bound programs to program maps.
+>> > +	 */
+>> > +	if (bpf_prog_is_dev_bound(fp->aux))
+>> > +		return false;
+>> > +
+>> > +	return __bpf_prog_map_compatible(map, fp);
+>> > +}
+>> > +
+>> >  static int bpf_check_tail_call(const struct bpf_prog *fp)
+>> >  {
+>> >  	struct bpf_prog_aux *aux = fp->aux;
+>> > @@ -2421,7 +2426,7 @@ static int bpf_check_tail_call(const struct bpf_prog *fp)
+>> >  		if (!map_type_contains_progs(map))
+>> >  			continue;
+>> >  
+>> > -		if (!bpf_prog_map_compatible(map, fp)) {
+>> > +		if (!__bpf_prog_map_compatible(map, fp)) {
+>> 
+>> Hmm, so this allows devbound programs in tail call maps, right? But
+>> there's no guarantee that a tail call map will always be used for a
+>> particular device, is there? For instance, it could be shared between
+>> multiple XDP programs, bound to different devices, thus getting the
+>> wrong kfunc.
+>
+> According to my understanding the following path will be executed just for
+> dev-bound program that performs XDP_REDIRECT into a BPF_MAP_TYPE_PROG_ARRAY:
+>
+> bpf_prog_select_runtime() -> bpf_check_tail_call() -> __bpf_prog_map_compatible()
+>
+> while for XDP program inserted into BPF_MAP_TYPE_PROG_ARRAY we will continue
+> running bpf_prog_map_compatible() so we will forbid inserting ev-bound programs.
+> This is even tested into xdp_metadata selftest:
+>
+> https://github.com/torvalds/linux/blob/master/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c#L416
+>
+> It seems to me v2 is not more relaxed than v1. Am I missing something?
 
-> On 25/04/2025 08:05, Lukasz Majewski wrote:
-> > Hi Krzysztof, Jakub,
-> >  =20
-> >> On 25/04/2025 03:11, Jakub Kicinski wrote: =20
-> >>> On Wed, 23 Apr 2025 09:29:08 +0200 Lukasz Majewski wrote:   =20
-> >>>> This patch series provides support for More Than IP L2 switch
-> >>>> embedded in the imx287 SoC.
-> >>>>
-> >>>> This is a two port switch (placed between uDMA[01] and
-> >>>> MAC-NET[01]), which can be used for offloading the network
-> >>>> traffic.
-> >>>>
-> >>>> It can be used interchangeably with current FEC driver - to be
-> >>>> more specific: one can use either of it, depending on the
-> >>>> requirements.
-> >>>>
-> >>>> The biggest difference is the usage of DMA - when FEC is used,
-> >>>> separate DMAs are available for each ENET-MAC block.
-> >>>> However, with switch enabled - only the DMA0 is used to
-> >>>> send/receive data to/form switch (and then switch sends them to
-> >>>> respecitive ports).   =20
-> >>>
-> >>> Lots of sparse warnings and build issues here, at least on x86.
-> >>>
-> >>> Could you make sure it's clean with an allmodconfig config,=20
-> >>> something like:
-> >>>
-> >>> make C=3D1 W=3D1 drivers/net/ethernet/freescale/mtipsw/    =20
-> >>
-> >> ... and W=3D1 with clang as well.
-> >> =20
-> >=20
-> > The sparse warnings are because of struct switch_t casting and
-> > register =20
->=20
-> clang W=3D1 fails on errors, so it is not only sparse:
->=20
-> error: cast to smaller integer type 'uint' (aka 'unsigned int') from
-> 'struct cbd_t *' [-Werror,-Wpointer-to-int-cast]
->=20
-> You probably wanted there kenel_ulong_t.
+No, you're right; see my reply to Stanislav - I misremembered the logic :)
 
-This I did not catch earlier (probably because of my testing on
-imx287). Thanks for spotting it.
-
->=20
-> > access with this paradigm (as it is done with other drivers). =20
->=20
-> I don't understand. I see code like:
->=20
-> 	struct switch_t *fecp =3D fep->hwp;
->=20
-> But this is not a cast - the same types.
-
-For example:
-
-The warning:
-
-mtipl2sw.c:208:30: warning: incorrect type in argument 1 (different
-address spaces) mtipl2sw.c:208:30:    expected void const volatile
-[noderef] __iomem *addr mtipl2sw.c:208:30:    got unsigned int *
-
-corresponds to:
- info->maclo =3D readl(&fecp->ESW_LREC0);   [*]
-
-where:
-
-struct switch_t {
-        u32 ESW_REVISION;
-        u32 ESW_SCRATCH;
-	...
-        /*from 0x420-0x4FC*/
-        u32 esw_reserved9[57];
-        /*0xFC0DC500---0xFC0DC508*/
-        u32 ESW_LREC0;
-        u32 ESW_LREC1;
-        u32 ESW_LSR;
-};
-
-
-The 'u32' type seems to be valid here as this register is 32 bit wide.
-
-To fix the sparse warnings - I think that I will replace [*] with:
-
-info->maclo =3D readl((u32 __iomem *)&fecp->ESW_LREC0);
-
-as such solution is used in a wide way in the mainline kernel.
-
-Is this the acceptable solution?
-
-> >=20
-> > What is the advise here from the community?
-> >  =20
-> >> Best regards,
-> >> Krzysztof =20
-> >=20
-> >=20
-> >=20
-> >=20
-> > Best regards,
-> >=20
-> > Lukasz Majewski
-> >=20
-> > --
-> >=20
-> > DENX Software Engineering GmbH,      Managing Director: Erika Unter
-> > HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell,
-> > Germany Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
-> > lukma@denx.de =20
->=20
->=20
-> Best regards,
-> Krzysztof
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/aD7bD6eqbseU9NHDSHb+3ZT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmgLPnMACgkQAR8vZIA0
-zr2n/Af+LVw/038n6xkuDzEVw1Ws29jNVFmBbGwSS1Om+WVKtZVnR0MEJigZTpNh
-Xw3M68InMX0jlbko1jdRMbhfzovDicEY9KYmg3pKQCZcWiFS93x+PIGFNY+ekeov
-jXyoiQY1zaC1/FT3PWtOwK6Ls+yGL83vJm9O86c2dCa6/wnARvbWULW/uQPh0AlX
-yTDzLR3RuRQqow6k+M+Rv3ruF0lx7cis6RCVOb3YkCwwBMrjUFQ/T05K5ZilZMr5
-9N257fwmaKEtAqk9Sc7fXi/kGf2IvPtobVyWOxWpyIJVeyjjp3s6G4linPN8U46P
-s2b/DM39xFJsCGTqF8rG0CJFUNM1FA==
-=Id9L
------END PGP SIGNATURE-----
-
---Sig_/aD7bD6eqbseU9NHDSHb+3ZT--
+-Toke
 
