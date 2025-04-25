@@ -1,116 +1,86 @@
-Return-Path: <netdev+bounces-185971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6583A9C6B7
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 13:09:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEFC7A9C6D5
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 13:14:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6499A4A95
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:08:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9066C16B1C4
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E410242D94;
-	Fri, 25 Apr 2025 11:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DB3242D74;
+	Fri, 25 Apr 2025 11:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzfPp44h"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5E723BCEF
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 11:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E21183CC3;
+	Fri, 25 Apr 2025 11:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745579340; cv=none; b=BrvWKt5ozCZJGq6pUAV+tL0UtUoYOx8hJ+ylp/ds2095Dce/Y6ZHiBS67sD9jdsesgRzhKtObV8r7rtBn/MpB7b7ztDwivWNv8xYviEbRO7tNlsEqg+5X55eWXE45pZgGwRO/qRLxVqk5V5ozudMrsJuv8qce9Qih4EnyNnxeYk=
+	t=1745579634; cv=none; b=P/xzN8flQ+1xwYUZxOvHfnRzrQyJKWMdpWo7ALqvWoDeL+XnJExRC9Q2vgxTW/kIoz0Dth3srfQMCgcAb346ocYBVYAaZH6K/AmW67lDPrq64AKGuZiRfVpzkPxOpifDtuHYnxcLkcxq2WvcQe8ZxzWYtQ7Z9qlh4+dos7ViqyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745579340; c=relaxed/simple;
-	bh=A28LYoc3RVB8w/haAgNOvS5MfiYECdJ08AJKkRK2+AI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rZ8g1EsrQq+mFsUOT2b8qavsdWp9NljiWHqLNWBwLul8DsnUwx7imBhvqZsickmrwG2bcIRk/lJg1k4SQ+xZHctLTGkTJxCo30EK5Z4h8pAJTciwzNNMQdRd9uXuLEMQGFXw3R2dMVztWeq0Gam7DZjttYggsjjKFF66vT4Qr5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8GvI-0003Ek-PT; Fri, 25 Apr 2025 13:08:48 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8GvH-0022JL-0j;
-	Fri, 25 Apr 2025 13:08:47 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u8GvH-0021Z1-0V;
-	Fri, 25 Apr 2025 13:08:47 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v2 1/1] net: dsa: microchip: Remove ineffective checks from ksz_set_mac_eee()
-Date: Fri, 25 Apr 2025 13:08:45 +0200
-Message-Id: <20250425110845.482652-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1745579634; c=relaxed/simple;
+	bh=Ezqd4VS2tdUP8uwDrS78FIFfjyaT1c46Eo4Ie3SLLAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jmXDvssfrCBJ67GUorV7XR5WaVsWEz7S/TH462lxmwgR9OaRPfiU6QhnHBfCUuMw133nsiof9McIggVcw7tp5i2rgA5YKPQwWLCr/t8l4+jrLFjf7DSs5z6ihONZlxaGD1SUrupdsZQlMtoD5JqdjuIjWISq+PIbrEaDO5TB3Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nzfPp44h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF51C4CEE4;
+	Fri, 25 Apr 2025 11:13:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745579634;
+	bh=Ezqd4VS2tdUP8uwDrS78FIFfjyaT1c46Eo4Ie3SLLAw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nzfPp44hY80vim38LVUi0AJaVzHubxBfSYQh9zqjDYTgTQ+pEa7LzF82G6mkiZ0Wk
+	 gHP6U4AFnQML6cW+mEhJ5YqqMn0Ql+q158Onv6pmYnXPJyufAHAnCMj+AQ4Iz7ZihQ
+	 7HJSN9CKwHety5cLGSX4G5gxDwFP4BKNoBjPziAJDnUS4gstYvpoNjsXt+duZYlSnD
+	 QUWk2MAcn5wdWKjkbA4o+a7mkCSAcc+ZokZs6XaWQmth9mMMSKmeD6CysTl2obgbEN
+	 hSVcFqsPomfniiuL5nctH2FuCDX/zr7L7rxp8I9zhrcWMRkt9EvCnCb2uiI5oeUeS9
+	 0jkh3Aoavf8Yw==
+Date: Fri, 25 Apr 2025 13:13:49 +0200
+From: Andi Shyti <andi.shyti@kernel.org>
+To: a0282524688@gmail.com
+Cc: lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org, Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v10 3/7] i2c: Add Nuvoton NCT6694 I2C support
+Message-ID: <qalofwnbulbpzl7542l7756radnx5ks7pt6wsbsblyqayxcycl@rl4ety27l27t>
+References: <20250423094058.1656204-1-tmyu0@nuvoton.com>
+ <20250423094058.1656204-4-tmyu0@nuvoton.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250423094058.1656204-4-tmyu0@nuvoton.com>
 
-KSZ switches handle EEE internally via PHY advertisement and do not
-support MAC-level configuration. The ksz_set_mac_eee() handler previously
-rejected Tx LPI disable and timer changes, but provided no real control.
+Hi,
 
-These checks now interfere with userspace attempts to disable EEE and no
-longer reflect the actual hardware behavior. Replace the logic with a
-no-op.
+On Wed, Apr 23, 2025 at 05:40:54PM +0800, a0282524688@gmail.com wrote:
+> From: Ming Yu <tmyu0@nuvoton.com>
+> 
+> This driver supports I2C adapter functionality for NCT6694 MFD
+> device based on USB interface.
+> 
+> Each I2C controller uses the default baudrate of 100kHz, which
+> can be overridden via module parameters.
+> 
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz_common.c | 12 ------------
- 1 file changed, 12 deletions(-)
+Acked-by: Andi Shyti <andi.shyti@kernel.org>
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index b45052497f8a..b4a8f2c6346f 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -3492,18 +3492,6 @@ static bool ksz_support_eee(struct dsa_switch *ds, int port)
- static int ksz_set_mac_eee(struct dsa_switch *ds, int port,
- 			   struct ethtool_keee *e)
- {
--	struct ksz_device *dev = ds->priv;
--
--	if (!e->tx_lpi_enabled) {
--		dev_err(dev->dev, "Disabling EEE Tx LPI is not supported\n");
--		return -EINVAL;
--	}
--
--	if (e->tx_lpi_timer) {
--		dev_err(dev->dev, "Setting EEE Tx LPI timer is not supported\n");
--		return -EINVAL;
--	}
--
- 	return 0;
- }
-
---
-2.39.5
-
+Thanks,
+Andi
 
