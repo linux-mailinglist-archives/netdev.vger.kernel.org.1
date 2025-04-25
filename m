@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-186134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF2FEA9D475
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:48:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F1DA9D476
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 23:48:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41F0C161365
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:48:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C8491BC8166
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD8E229B18;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6B2229B32;
 	Fri, 25 Apr 2025 21:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7D24cFl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEBeaFFG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA71228CB2
-	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9906229B26
+	for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 21:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745617704; cv=none; b=faLuOrwK1J0qdequrB6AJRtVerqLwvjEGFOuy30WwGU2mbM6tm1kkyFXye7ZEdazH9msVYb3CNx7eY/UCpZl7Uc2QV/E2QiOQ7Wxk5OAyzwy5Rxolq4v+hAn8suxzkLSpP9QhNzqb0ZHYBl+KUQeTfUzZpNN+QBgOZFR88VJXl8=
+	t=1745617705; cv=none; b=OmftF6s6oLtbb0IvSTICDWD/qPMvx0CLGlErvdZamgSKOd/G5R9jAM+f4PZRY3UfaFmQaoyQiGMDaJsjVfDvbBPZJuR+KG0hPU+4WwVUsWjtgfAkOXoKgX182mAuYDojhd3Ad+SpWVnrDaiK+NQiuAOf/qUPaWCGPfAzY6/5YJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745617704; c=relaxed/simple;
-	bh=rZQANBovBNwe4pLFNHCFmUat4CzHnjwM+AIu5DpCy5E=;
+	s=arc-20240116; t=1745617705; c=relaxed/simple;
+	bh=KtQI+lUaJtaS4IooeYFyuwaTqpWfhWn9ZPng8kXwYJI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sIOXFU3gIOk9vo/cQ9h7lCqdknod8DYhRjawaDRUjl+lnQqKYtdcQR+lpIw6GoUEuPnOM4X6w2RcqwcFu4Om6MPbyoZeJfH8QAu3/4ah9KoMkjNeL7IHmRf/rLFwZ4kNIV46vKqBwzn0hD5yBfwvG2dN4KCaA0Qwi/DKFcMWSak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O7D24cFl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB502C4CEE4;
-	Fri, 25 Apr 2025 21:48:24 +0000 (UTC)
+	 MIME-Version; b=Ql5QeFy2EokGWo2tlDsDWYZNwKIBATQWEOWh+E2tr7KI3kf5iVMqZgob/OL4hi/h2wZ+F4fZ7BsAq4XppE3qDR+NiVojk2Sz0ePeSvcD68yB6lIgjoDT+XvctsV9jveISqA4dE0Djz+aBu07gae6tKjoXIvanMM3wpMacOYZ3t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEBeaFFG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC94C4CEE4;
+	Fri, 25 Apr 2025 21:48:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745617704;
-	bh=rZQANBovBNwe4pLFNHCFmUat4CzHnjwM+AIu5DpCy5E=;
+	s=k20201202; t=1745617705;
+	bh=KtQI+lUaJtaS4IooeYFyuwaTqpWfhWn9ZPng8kXwYJI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O7D24cFlnQT8MEwEpkhZNZe5VCUFF+uzYJ0XCC0J/7euSFJICO38QZPeEzCK130+6
-	 mj+Xeas7QnRBi6dgqdOCKzQFha1eHswwU6bhy4IiobE5XYBdpKICHIRLhDxOrrpjm5
-	 KYJqH4P/AqEijYA6PgDICtFJTtbyTcWSar1V+1HRfQpYu2HxVnny14a/ApOw8Ttj/w
-	 8DXWiiFCFs/PZhNMRQxpNrswTNn9BQ2sy7gyy8D02B4YSPbyTf13zKTcESJhi38M+K
-	 utdVeMRZNOqeYfv0HF1b1j6LADzxKlDCmu4Zls2DPb8lgECcKfrbDNPRccUYqIjafh
-	 ulzXudfy2c8jw==
+	b=HEBeaFFG6swJ/3y77IEonzCTAU0t1udcg9d6IA0PWAlpjeBVaXR5o797JEnWCpr2E
+	 /c0G0xRZ1QMtLysCA9d7+ofkIo9c2tsu4pZX10CyovvcZ42tIPi3qGapJiko7vzcsx
+	 0ys8cvIA2VxF+Lg47fmic2FPQHlbZncdz5OIO/gugJymp6AvGOyg4DGxhN6TvXym+v
+	 myx6keecHluz90itQkeW8Db1QRnMjKULVRFdUCgOYb44Wehr12+wkTKzGbfcFFBvPC
+	 rqBHcwbSB7V12Loks+YTlz2hObMFQt+6nEAh9fJ/ef3HKHVpjAcNhL/3fy5Sqc3uVP
+	 x+uYAxTMH0KFw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,12 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Kamal Heib <kheib@redhat.com>
-Subject: [PATCH net-next V3 06/15] net/mlx5: Implement devlink total_vfs parameter
-Date: Fri, 25 Apr 2025 14:47:59 -0700
-Message-ID: <20250425214808.507732-7-saeed@kernel.org>
+	Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next V3 07/15] devlink: pass struct devlink_port * as arg to devlink_nl_param_fill()
+Date: Fri, 25 Apr 2025 14:48:00 -0700
+Message-ID: <20250425214808.507732-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250425214808.507732-1-saeed@kernel.org>
 References: <20250425214808.507732-1-saeed@kernel.org>
@@ -68,206 +66,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+From: Jiri Pirko <jiri@nvidia.com>
 
-Some devices support both symmetric (same value for all PFs) and
-asymmetric, while others only support symmetric configuration. This
-implementation prefers asymmetric, since it is closer to the devlink
-model (per function settings), but falls back to symmetric when needed.
+As the follow-up patch will need to get struct devlink_port *, avoid
+unnecessary lookup and instead of port_index pass the struct
+devlink_port * directly.
 
-Example usage:
-  devlink dev param set pci/0000:01:00.0 name total_vfs value <u16> cmode permanent
-  devlink dev reload pci/0000:01:00.0 action fw_activate
-  echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
-  echo 1 >/sys/bus/pci/rescan
-  cat /sys/bus/pci/devices/0000:01:00.0/sriov_totalvfs
-
-Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Tested-by: Kamal Heib <kheib@redhat.com>
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- Documentation/networking/devlink/mlx5.rst     |  22 +++
- .../mellanox/mlx5/core/lib/nv_param.c         | 129 ++++++++++++++++++
- 2 files changed, 151 insertions(+)
+ net/devlink/param.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 587e0200c1cd..00a43324dec2 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -40,6 +40,28 @@ Parameters
-      - Boolean
-      - Applies to each physical function (PF) independently, if the device
-        supports it. Otherwise, it applies symmetrically to all PFs.
-+   * - ``total_vfs``
-+     - permanent
-+     - The range is between 1 and a device-specific max.
-+     - Applies to each physical function (PF) independently, if the device
-+       supports it. Otherwise, it applies symmetrically to all PFs.
-+
-+Note: permanent parameters such as ``enable_sriov`` and ``total_vfs`` require FW reset to take effect
-+
-+.. code-block:: bash
-+
-+   # setup parameters
-+   devlink dev param set pci/0000:01:00.0 name enable_sriov value true cmode permanent
-+   devlink dev param set pci/0000:01:00.0 name total_vfs value 8 cmode permanent
-+
-+   # Fw reset
-+   devlink dev reload pci/0000:01:00.0 action fw_activate
-+
-+   # for PCI related config such as sriov PCI reset/rescan is required:
-+   echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
-+   echo 1 >/sys/bus/pci/rescan
-+   grep ^ /sys/bus/pci/devices/0000:01:00.0/sriov_*
-+
- 
- The ``mlx5`` driver also implements the following driver-specific
- parameters.
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-index 7eb2becca871..8cdef0a47a4a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -395,10 +395,139 @@ static int mlx5_devlink_enable_sriov_set(struct devlink *devlink, u32 id,
- 	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
+diff --git a/net/devlink/param.c b/net/devlink/param.c
+index f1f453ce0073..66a4121015a2 100644
+--- a/net/devlink/param.c
++++ b/net/devlink/param.c
+@@ -241,7 +241,7 @@ devlink_nl_param_value_fill_one(struct sk_buff *msg,
  }
  
-+static int mlx5_devlink_total_vfs_get(struct devlink *devlink, u32 id,
-+				      struct devlink_param_gset_ctx *ctx)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	if (!MLX5_GET(nv_global_pci_cap, data, sriov_support)) {
-+		ctx->val.vu32 = 0;
-+		return 0;
-+	}
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	if (!MLX5_GET(nv_global_pci_conf, data, per_pf_total_vf)) {
-+		ctx->val.vu32 = MLX5_GET(nv_global_pci_conf, data, total_vfs);
-+		return 0;
-+	}
-+
-+	/* SRIOV is per PF */
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	ctx->val.vu32 = MLX5_GET(nv_pf_pci_conf, data, total_vf);
-+
-+	return 0;
-+}
-+
-+static int mlx5_devlink_total_vfs_set(struct devlink *devlink, u32 id,
-+				      struct devlink_param_gset_ctx *ctx,
-+				      struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)];
-+	bool per_pf_support;
-+	void *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read global pci cap");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	if (!MLX5_GET(nv_global_pci_cap, data, sriov_support)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Not configurable on this device");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	per_pf_support = MLX5_GET(nv_global_pci_cap, data, per_pf_total_vf_supported);
-+	if (!per_pf_support) {
-+		/* We don't allow global SRIOV setting on per PF devlink */
-+		NL_SET_ERR_MSG_MOD(extack, "SRIOV is not per PF on this device");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	MLX5_SET(nv_global_pci_conf, data, sriov_valid, 1);
-+	MLX5_SET(nv_global_pci_conf, data, per_pf_total_vf, per_pf_support);
-+
-+	if (!per_pf_support) {
-+		MLX5_SET(nv_global_pci_conf, data, total_vfs, ctx->val.vu32);
-+		return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	}
-+
-+	/* SRIOV is per PF */
-+	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	MLX5_SET(nv_pf_pci_conf, data, total_vf, ctx->val.vu32);
-+	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+}
-+
-+static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
-+					   union devlink_param_value val,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 cap[MLX5_ST_SZ_DW(mnvda_reg)];
-+	void *data;
-+	u16 max;
-+	int err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, cap, configuration_item_data);
-+
-+	err = mlx5_nv_param_read_global_pci_cap(dev, cap, sizeof(cap));
-+	if (err)
-+		return err;
-+
-+	if (!MLX5_GET(nv_global_pci_cap, data, max_vfs_per_pf_valid))
-+		return 0; /* optimistic, but set might fail later */
-+
-+	max = MLX5_GET(nv_global_pci_cap, data, max_vfs_per_pf);
-+	if (val.vu16 > max) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max allowed by device is %u", max);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
- 			      mlx5_devlink_enable_sriov_get,
- 			      mlx5_devlink_enable_sriov_set, NULL),
-+	DEVLINK_PARAM_GENERIC(TOTAL_VFS, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			      mlx5_devlink_total_vfs_get, mlx5_devlink_total_vfs_set,
-+			      mlx5_devlink_total_vfs_validate),
- 	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
- 			     "cqe_compress_type", DEVLINK_PARAM_TYPE_STRING,
- 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+ static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+-				 unsigned int port_index,
++				 struct devlink_port *devlink_port,
+ 				 struct devlink_param_item *param_item,
+ 				 enum devlink_command cmd,
+ 				 u32 portid, u32 seq, int flags)
+@@ -288,7 +288,8 @@ static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+ 	if (cmd == DEVLINK_CMD_PORT_PARAM_GET ||
+ 	    cmd == DEVLINK_CMD_PORT_PARAM_NEW ||
+ 	    cmd == DEVLINK_CMD_PORT_PARAM_DEL)
+-		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX, port_index))
++		if (nla_put_u32(msg, DEVLINK_ATTR_PORT_INDEX,
++				devlink_port->index))
+ 			goto genlmsg_cancel;
+ 
+ 	param_attr = nla_nest_start_noflag(msg, DEVLINK_ATTR_PARAM);
+@@ -334,7 +335,7 @@ static int devlink_nl_param_fill(struct sk_buff *msg, struct devlink *devlink,
+ }
+ 
+ static void devlink_param_notify(struct devlink *devlink,
+-				 unsigned int port_index,
++				 struct devlink_port *devlink_port,
+ 				 struct devlink_param_item *param_item,
+ 				 enum devlink_command cmd)
+ {
+@@ -355,7 +356,7 @@ static void devlink_param_notify(struct devlink *devlink,
+ 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!msg)
+ 		return;
+-	err = devlink_nl_param_fill(msg, devlink, port_index, param_item, cmd,
++	err = devlink_nl_param_fill(msg, devlink, devlink_port, param_item, cmd,
+ 				    0, 0, 0);
+ 	if (err) {
+ 		nlmsg_free(msg);
+@@ -372,7 +373,7 @@ static void devlink_params_notify(struct devlink *devlink,
+ 	unsigned long param_id;
+ 
+ 	xa_for_each(&devlink->params, param_id, param_item)
+-		devlink_param_notify(devlink, 0, param_item, cmd);
++		devlink_param_notify(devlink, NULL, param_item, cmd);
+ }
+ 
+ void devlink_params_notify_register(struct devlink *devlink)
+@@ -396,7 +397,7 @@ static int devlink_nl_param_get_dump_one(struct sk_buff *msg,
+ 	int err = 0;
+ 
+ 	xa_for_each_start(&devlink->params, param_id, param_item, state->idx) {
+-		err = devlink_nl_param_fill(msg, devlink, 0, param_item,
++		err = devlink_nl_param_fill(msg, devlink, NULL, param_item,
+ 					    DEVLINK_CMD_PARAM_GET,
+ 					    NETLINK_CB(cb->skb).portid,
+ 					    cb->nlh->nlmsg_seq, flags);
+@@ -520,7 +521,7 @@ int devlink_nl_param_get_doit(struct sk_buff *skb,
+ 	if (!msg)
+ 		return -ENOMEM;
+ 
+-	err = devlink_nl_param_fill(msg, devlink, 0, param_item,
++	err = devlink_nl_param_fill(msg, devlink, NULL, param_item,
+ 				    DEVLINK_CMD_PARAM_GET,
+ 				    info->snd_portid, info->snd_seq, 0);
+ 	if (err) {
+@@ -532,7 +533,7 @@ int devlink_nl_param_get_doit(struct sk_buff *skb,
+ }
+ 
+ static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
+-					   unsigned int port_index,
++					   struct devlink_port *devlink_port,
+ 					   struct xarray *params,
+ 					   struct genl_info *info,
+ 					   enum devlink_command cmd)
+@@ -582,7 +583,7 @@ static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
+ 			return err;
+ 	}
+ 
+-	devlink_param_notify(devlink, port_index, param_item, cmd);
++	devlink_param_notify(devlink, devlink_port, param_item, cmd);
+ 	return 0;
+ }
+ 
+@@ -590,7 +591,7 @@ int devlink_nl_param_set_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct devlink *devlink = info->user_ptr[0];
+ 
+-	return __devlink_nl_cmd_param_set_doit(devlink, 0, &devlink->params,
++	return __devlink_nl_cmd_param_set_doit(devlink, NULL, &devlink->params,
+ 					       info, DEVLINK_CMD_PARAM_NEW);
+ }
+ 
+@@ -649,7 +650,7 @@ static int devlink_param_register(struct devlink *devlink,
+ 	if (err)
+ 		goto err_xa_insert;
+ 
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
++	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_NEW);
+ 	return 0;
+ 
+ err_xa_insert:
+@@ -665,7 +666,7 @@ static void devlink_param_unregister(struct devlink *devlink,
+ 	param_item = devlink_param_find_by_id(&devlink->params, param->id);
+ 	if (WARN_ON(!param_item))
+ 		return;
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_DEL);
++	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_DEL);
+ 	xa_erase(&devlink->params, param->id);
+ 	kfree(param_item);
+ }
+@@ -826,7 +827,7 @@ void devl_param_driverinit_value_set(struct devlink *devlink, u32 param_id,
+ 	param_item->driverinit_value = init_val;
+ 	param_item->driverinit_value_valid = true;
+ 
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
++	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_NEW);
+ }
+ EXPORT_SYMBOL_GPL(devl_param_driverinit_value_set);
+ 
+@@ -865,6 +866,6 @@ void devl_param_value_changed(struct devlink *devlink, u32 param_id)
+ 	param_item = devlink_param_find_by_id(&devlink->params, param_id);
+ 	WARN_ON(!param_item);
+ 
+-	devlink_param_notify(devlink, 0, param_item, DEVLINK_CMD_PARAM_NEW);
++	devlink_param_notify(devlink, NULL, param_item, DEVLINK_CMD_PARAM_NEW);
+ }
+ EXPORT_SYMBOL_GPL(devl_param_value_changed);
 -- 
 2.49.0
 
