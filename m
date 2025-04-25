@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-186085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9DEA9D0F4
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:00:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F01A9D0F9
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 21:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 504F21BC3A89
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:01:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 710733B0AAC
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 19:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F04721772D;
-	Fri, 25 Apr 2025 19:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E95921882B;
+	Fri, 25 Apr 2025 19:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2B8hbDQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D4qDrxHw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E103216399;
-	Fri, 25 Apr 2025 19:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F561E32D9;
+	Fri, 25 Apr 2025 19:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745607651; cv=none; b=KC7qF8RRNTM1vCMlmR5BoVPXg9swI9wqPTRxhtbzbMOsWWkwISTmPvUdwRWgXN8b7VsVvTgP7Yr0BWkrRoiWKzxPgQYCvgNEfvPTFEEtVpodd5grPeaEzHqu247AX05vm6s7P5tT6rz3TpkvQkdYhjAjVVwN1flWLcZyvLNNGFE=
+	t=1745607665; cv=none; b=rE5GfKHQQoIW0obl5it5euIFbGWx9mtbvwvHp/A3yRB1qtmZch5VrR4ix2w+9BBzHoZL2KzRvqmZsSpSQE7wQy0ohag7BzgtRH+UUNvsvMAxU4t5V/Wc+tLSHt4N1u4CceVm3IXl3OylwCMNeSB6BEjL17cRveKAGESkroYj7Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745607651; c=relaxed/simple;
-	bh=rcgUGGoTaQtiVKvvrkVXx2VJUfGZzIH2P/07pyV2u5o=;
+	s=arc-20240116; t=1745607665; c=relaxed/simple;
+	bh=+iGt+V5GHA1DlYPq1zz9QWmrWBPR93txyq3DdH2JeKU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eds2UwAXTDj20wVKMJd76o0ufH4l6QmWvlinPzR5vu+VjHUtuB/3sU7x8n7/lkqXlDSlChi/aipdKOXxwpTlE8DVl/2nm75lvmDDO812iou+QjtzyE058AVlXsgjPHS2DebhbREogl9sN+pTfTcSOuNjCYiTEpM+pHtpNb2GngY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2B8hbDQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC02CC4CEE4;
-	Fri, 25 Apr 2025 19:00:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=A+BPRHCwRoqJlZJwKsW+yTo9x+zixGkfjhg5TIX0KMmb3FdnOQ4Rnh4PZzU5UJyG1dcZQTwkSKhsAsLBeQSDnmGanLZB2PRQXfDDBxldXzHkC+mRwg24KW1yC9heILEWSYpv+8jYaLPVljol/nQe+x7LLFSrhJtZih5sYj8n56A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D4qDrxHw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C5B0C4CEE4;
+	Fri, 25 Apr 2025 19:01:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745607650;
-	bh=rcgUGGoTaQtiVKvvrkVXx2VJUfGZzIH2P/07pyV2u5o=;
+	s=k20201202; t=1745607664;
+	bh=+iGt+V5GHA1DlYPq1zz9QWmrWBPR93txyq3DdH2JeKU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j2B8hbDQ0Q/D75S2UudrcasVh/x5d6ug5uJv3EvojNwzde8OHSrnnYfEDegQu05oB
-	 rxj9W0sV4JsERitPanOWrK5OEdTF4Qouk4uqVRrK5+uJIhwv0kQtT3m15PAtqEC91V
-	 89kxxJcEuute3WVM9baRc78loK5dg08tgWampY844AToInc9hsRLkYnS9xLCK1feK6
-	 VbuEaFskcBOrYgOxkfrpN3UA4r+pfqHzikUpWy56t4AKt2n4BGWBH3NrBnCzUsJ2Fi
-	 TVixzXwYhhahGOtM9UWI/1eUDE6PJ5J133K6KdAFdff3GnR0tiOKmvNyakM5qWuJSE
-	 pe8lI6xOwdVJQ==
+	b=D4qDrxHwwT38UNKako63oG3V69TXGgDM0Qh6TgqyG5eR10bT9zL0Ho7lCSAy+0A7m
+	 B73Ct/cIzDnRkpzfteFRna5iGTCwGGtctET6+ZrhYTJYYUBz0QIF0yswWTPvn3PCKi
+	 seB4QgHAfgFrsUrbWbzawEdrTx6HXUS1BuukkTjB5A5drgnAo1SiiMxmPoILG49UVo
+	 jHQr0PoWPzmXBxkNITM03Eg2X68B2ajNyDcIttq+bww733r7L5g3NRuBpa2lipd5No
+	 AjqzM0IOuJpAcTkzodIFDFgXMJo0dzs3eIeDncYB90umf5iYT9utLHRIP5EPy+Tey0
+	 G/KKN5HqHt1pQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0E380CFD7;
-	Fri, 25 Apr 2025 19:01:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E68380CFD7;
+	Fri, 25 Apr 2025 19:01:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] mlx5 misc fixes 2025-04-23
+Subject: Re: [PATCH net-next] net: ethernet: mtk_wed: annotate RCU release in
+ attach()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174560768948.3803904.7560030217169177753.git-patchwork-notify@kernel.org>
-Date: Fri, 25 Apr 2025 19:01:29 +0000
-References: <20250423083611.324567-1-mbloch@nvidia.com>
-In-Reply-To: <20250423083611.324567-1-mbloch@nvidia.com>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
- tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+ <174560770274.3803904.14574335432566097628.git-patchwork-notify@kernel.org>
+Date: Fri, 25 Apr 2025 19:01:42 +0000
+References: <20250423150811.456205-2-johannes@sipsolutions.net>
+In-Reply-To: <20250423150811.456205-2-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ johannes.berg@intel.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 23 Apr 2025 11:36:06 +0300 you wrote:
-> This patchset includes misc fixes from the team for the mlx5 core
-> and Ethernet drivers.
+On Wed, 23 Apr 2025 17:08:08 +0200 you wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
 > 
-> Thanks,
-> Mark
-> 
-> Chris Mi (1):
->   net/mlx5: E-switch, Fix error handling for enabling roce
+> There are some sparse warnings in wifi, and it seems that
+> it's actually possible to annotate a function pointer with
+> __releases(), making the sparse warnings go away. In a way
+> that also serves as documentation that rcu_read_unlock()
+> must be called in the attach method, so add that annotation.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] net/mlx5e: Use custom tunnel header for vxlan gbp
-    https://git.kernel.org/netdev/net/c/eacc77a73275
-  - [net,2/5] net/mlx5: E-Switch, Initialize MAC Address for Default GID
-    https://git.kernel.org/netdev/net/c/5d1a04f347e6
-  - [net,3/5] net/mlx5e: TC, Continue the attr process even if encap entry is invalid
-    https://git.kernel.org/netdev/net/c/172c034264c8
-  - [net,4/5] net/mlx5e: Fix lock order in mlx5e_tx_reporter_ptpsq_unhealthy_recover
-    https://git.kernel.org/netdev/net/c/1c2940ec0ddf
-  - [net,5/5] net/mlx5: E-switch, Fix error handling for enabling roce
-    https://git.kernel.org/netdev/net/c/90538d23278a
+  - [net-next] net: ethernet: mtk_wed: annotate RCU release in attach()
+    https://git.kernel.org/netdev/net-next/c/d57ee99831e3
 
 You are awesome, thank you!
 -- 
