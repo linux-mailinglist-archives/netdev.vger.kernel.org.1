@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-185930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-185931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419BCA9C296
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F947A9C298
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 11:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66FAC3ABA6E
-	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:59:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6393A660D
+	for <lists+netdev@lfdr.de>; Fri, 25 Apr 2025 08:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A13C23875D;
-	Fri, 25 Apr 2025 08:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B277923A984;
+	Fri, 25 Apr 2025 08:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fy5NNKAd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZrO9gEe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBCE2367D5;
-	Fri, 25 Apr 2025 08:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A241EB1B9;
+	Fri, 25 Apr 2025 08:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745571487; cv=none; b=SfTvYsZmutzztTcmDZ/NYkKHPXdcT9Hq3YANsqgQ63SoQOvweKM17Ruxb//m+ItaOTCRfKvMYAEhMRVR66uF2Z58Tlns03BeUCCMFNi4bYw6GzU5BW2DV4WTkngjlMFxdrzq6Ly5r8Y5yJ40p00oUVgGYYcebtZmYTtY2Kz1piU=
+	t=1745571493; cv=none; b=oRrsqEbhpU908F6+U0ygZKBLCbO1FOQTYwsUJAqqjU1sT29E2muUw9XP9MYPeZ5H0t+TRmNE9LnrlNDd25EEpY5xbHnAO781Fp0mmuMvXAGWaiioNLr898uvZegJPhzlub07bLGn6yaWwqdZEavfQgqeqyt1rddS+o4SctdAS4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745571487; c=relaxed/simple;
-	bh=Yvoue+F0edeKn+VVijS0ELNZWKE39hZnWZ8xXcZpPKc=;
+	s=arc-20240116; t=1745571493; c=relaxed/simple;
+	bh=m+Vi1J2g9X6f8XLQfZWFFa2VyVsNzxMlpbDST6gpme8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bDYrL5eAOJnhdeSETNj0HwRzejKvzosvE8jwgy3soVRr9MUnICUoYAocC6GqJpTOo/Gmn/tOIOEPczskQ49neHoxfIp4OrFyVHj1wY99ees0pnhJWJHjdEqEqFvNFotIiVrHVTbowraoLB17qdx/YJijhA+GXe1UvQhbp3JKH+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fy5NNKAd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D8EEC4CEE4;
-	Fri, 25 Apr 2025 08:58:00 +0000 (UTC)
+	 MIME-Version; b=jFUxaoG68cCifT1Do5vySKwUzxDTvb2X6MjMg0wom0P5s0+gYJqzWm/Vhu9Jlc5JlIwQqErcc+CsFWO6fc24UCZ/CVPqK78Ld0LVSZe8tfCQI+3QhyU0yFGRjbKJ6uxPRIgjfsYmEMfZwkpCAuPECMJJ6fFl5t2w5Mp8yjS05ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZrO9gEe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E40C4CEEB;
+	Fri, 25 Apr 2025 08:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745571486;
-	bh=Yvoue+F0edeKn+VVijS0ELNZWKE39hZnWZ8xXcZpPKc=;
+	s=k20201202; t=1745571493;
+	bh=m+Vi1J2g9X6f8XLQfZWFFa2VyVsNzxMlpbDST6gpme8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fy5NNKAdc+O9dq8VB8U2ZCFdvYGQHFATOAYQ9d5sWnMFUIIjRvY61cNk2+K43bwOi
-	 13EoiuUH88j1mrbF9W0J+1y90tgisJVeZQVZ97cQIhwazkNMrHr1ui4/EWDFQ8hmTZ
-	 VVAq0aK+7oVTDl2vy1XVzrA4unS//OyLRZsKyEyiF3g5GcBUTwvMhjg+w6UItwAfNV
-	 3041sc3geLGJBDnAsd0ZTil9esn9aYlfCmz6D8pRdQlHqNRCXUREtbMcWZxBaoNfpy
-	 dufhDbq1x7MZGeHt+AIYvAzMBhtuPNSV5hpqZAZGKNO7Qf+LCsFhGMUbWRNE+tPCpz
-	 oVqfIooMixUIA==
+	b=rZrO9gEeE+tVfuQHltwGYKi6PyXbaHgIHTGo3zYBdKuknJVc4pYQyrvxYaW/quK/p
+	 XVpoCi7xYLfak/z98WjxUqsqr4J7KcOeflv5dPAgiGnQ3q5vGz5iG1xqrrNPUVBnHk
+	 NiHbBIPqNflJ6S4v0F/1dM4yDmZaXV/zjdzd9JX0MK1n8a1+DpaPUZOLZUgSxPfj/x
+	 iKxaqgfLLdwq+Kw4I2uAhMUG3FhEupoGxt05KXz+ZP5nRa8K/CITUBEA4fvnUchgp5
+	 0sj7IxsrtduNvon79eUafdIC7hSX4L8AlzXeR7SX7cIILhBRj3bF2T37RRc3FRuLS+
+	 QExag8BAQtuZw==
 From: Philipp Stanner <phasta@kernel.org>
 To: Sunil Goutham <sgoutham@marvell.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -69,9 +69,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-parisc@vger.kernel.org
-Subject: [PATCH v2 2/8] net: octeontx2: Use pure PCI devres API
-Date: Fri, 25 Apr 2025 10:57:35 +0200
-Message-ID: <20250425085740.65304-4-phasta@kernel.org>
+Subject: [PATCH v2 3/8] net: tulip: Use pure PCI devres API
+Date: Fri, 25 Apr 2025 10:57:36 +0200
+Message-ID: <20250425085740.65304-5-phasta@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250425085740.65304-2-phasta@kernel.org>
 References: <20250425085740.65304-2-phasta@kernel.org>
@@ -91,185 +91,41 @@ pci_enable_device() or pcim_enable_device() has been called before).
 The PCI subsystem wants to remove this behavior and, therefore, needs to
 port all users to functions that don't have this problem.
 
-Furthermore, the PCI function being managed implies that it's not
-necessary to call pci_release_regions() manually.
-
-Remove the calls to pci_release_regions().
-
 Replace pci_request_regions() with pcim_request_all_regions().
 
 Signed-off-by: Philipp Stanner <phasta@kernel.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   | 14 ++++----------
- .../net/ethernet/marvell/octeontx2/nic/otx2_vf.c   | 14 ++++----------
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c   | 12 +++++-------
- 3 files changed, 13 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/dec/tulip/tulip_core.c  | 2 +-
+ drivers/net/ethernet/dec/tulip/winbond-840.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index cfed9ec5b157..0aee8e3861f3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3048,7 +3048,7 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return err;
- 	}
+diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
+index c8c53121557f..bec76e7bf5dd 100644
+--- a/drivers/net/ethernet/dec/tulip/tulip_core.c
++++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
+@@ -1411,7 +1411,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
  
--	err = pci_request_regions(pdev, DRV_NAME);
-+	err = pcim_request_all_regions(pdev, DRV_NAME);
- 	if (err) {
- 		dev_err(dev, "PCI request regions failed 0x%x\n", err);
- 		return err;
-@@ -3057,7 +3057,7 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (err) {
- 		dev_err(dev, "DMA mask config failed, abort\n");
--		goto err_release_regions;
-+		return err;
- 	}
+ 	/* grab all resources from both PIO and MMIO regions, as we
+ 	 * don't want anyone else messing around with our hardware */
+-	if (pci_request_regions(pdev, DRV_NAME))
++	if (pcim_request_all_regions(pdev, DRV_NAME))
+ 		return -ENODEV;
  
- 	pci_set_master(pdev);
-@@ -3067,10 +3067,8 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	qos_txqs = min_t(int, qcount, OTX2_QOS_MAX_LEAF_NODES);
+ 	ioaddr = pcim_iomap(pdev, TULIP_BAR, tulip_tbl[chip_idx].io_size);
+diff --git a/drivers/net/ethernet/dec/tulip/winbond-840.c b/drivers/net/ethernet/dec/tulip/winbond-840.c
+index 5930cdec6f2f..e593273b2867 100644
+--- a/drivers/net/ethernet/dec/tulip/winbond-840.c
++++ b/drivers/net/ethernet/dec/tulip/winbond-840.c
+@@ -375,7 +375,7 @@ static int w840_probe1(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		return -ENOMEM;
+ 	SET_NETDEV_DEV(dev, &pdev->dev);
  
- 	netdev = alloc_etherdev_mqs(sizeof(*pf), qcount + qos_txqs, qcount);
--	if (!netdev) {
--		err = -ENOMEM;
--		goto err_release_regions;
--	}
-+	if (!netdev)
-+		return -ENOMEM;
+-	if (pci_request_regions(pdev, DRV_NAME))
++	if (pcim_request_all_regions(pdev, DRV_NAME))
+ 		goto err_out_netdev;
  
- 	pci_set_drvdata(pdev, netdev);
- 	SET_NETDEV_DEV(netdev, &pdev->dev);
-@@ -3246,8 +3244,6 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- err_free_netdev:
- 	pci_set_drvdata(pdev, NULL);
- 	free_netdev(netdev);
--err_release_regions:
--	pci_release_regions(pdev);
- 	return err;
- }
- 
-@@ -3447,8 +3443,6 @@ static void otx2_remove(struct pci_dev *pdev)
- 	pci_free_irq_vectors(pf->pdev);
- 	pci_set_drvdata(pdev, NULL);
- 	free_netdev(netdev);
--
--	pci_release_regions(pdev);
- }
- 
- static struct pci_driver otx2_pf_driver = {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 7ef3ba477d49..fb4da816d218 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -548,7 +548,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return err;
- 	}
- 
--	err = pci_request_regions(pdev, DRV_NAME);
-+	err = pcim_request_all_regions(pdev, DRV_NAME);
- 	if (err) {
- 		dev_err(dev, "PCI request regions failed 0x%x\n", err);
- 		return err;
-@@ -557,7 +557,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (err) {
- 		dev_err(dev, "DMA mask config failed, abort\n");
--		goto err_release_regions;
-+		return err;
- 	}
- 
- 	pci_set_master(pdev);
-@@ -565,10 +565,8 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	qcount = num_online_cpus();
- 	qos_txqs = min_t(int, qcount, OTX2_QOS_MAX_LEAF_NODES);
- 	netdev = alloc_etherdev_mqs(sizeof(*vf), qcount + qos_txqs, qcount);
--	if (!netdev) {
--		err = -ENOMEM;
--		goto err_release_regions;
--	}
-+	if (!netdev)
-+		return -ENOMEM;
- 
- 	pci_set_drvdata(pdev, netdev);
- 	SET_NETDEV_DEV(netdev, &pdev->dev);
-@@ -765,8 +763,6 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- err_free_netdev:
- 	pci_set_drvdata(pdev, NULL);
- 	free_netdev(netdev);
--err_release_regions:
--	pci_release_regions(pdev);
- 	return err;
- }
- 
-@@ -815,8 +811,6 @@ static void otx2vf_remove(struct pci_dev *pdev)
- 	pci_free_irq_vectors(vf->pdev);
- 	pci_set_drvdata(pdev, NULL);
- 	free_netdev(netdev);
--
--	pci_release_regions(pdev);
- }
- 
- static struct pci_driver otx2vf_driver = {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index 04e08e06f30f..0bb8a971c4ff 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -763,7 +763,7 @@ static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		return err;
- 	}
- 
--	err = pci_request_regions(pdev, DRV_NAME);
-+	err = pcim_request_all_regions(pdev, DRV_NAME);
- 	if (err) {
- 		dev_err(dev, "PCI request regions failed 0x%x\n", err);
- 		return err;
-@@ -772,7 +772,7 @@ static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (err) {
- 		dev_err(dev, "DMA mask config failed, abort\n");
--		goto err_release_regions;
-+		goto err_set_drv_data;
- 	}
- 
- 	pci_set_master(pdev);
-@@ -780,7 +780,7 @@ static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv) {
- 		err = -ENOMEM;
--		goto err_release_regions;
-+		goto err_set_drv_data;
- 	}
- 
- 	pci_set_drvdata(pdev, priv);
-@@ -797,7 +797,7 @@ static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	err = otx2_init_rsrc(pdev, priv);
- 	if (err)
--		goto err_release_regions;
-+		goto err_set_drv_data;
- 
- 	priv->iommu_domain = iommu_get_domain_for_dev(dev);
- 
-@@ -820,9 +820,8 @@ static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	otx2_disable_mbox_intr(priv);
- 	otx2_pfaf_mbox_destroy(priv);
- 	pci_free_irq_vectors(pdev);
--err_release_regions:
-+err_set_drv_data:
- 	pci_set_drvdata(pdev, NULL);
--	pci_release_regions(pdev);
- 	return err;
- }
- 
-@@ -842,7 +841,6 @@ static void rvu_rep_remove(struct pci_dev *pdev)
- 	otx2_pfaf_mbox_destroy(priv);
- 	pci_free_irq_vectors(priv->pdev);
- 	pci_set_drvdata(pdev, NULL);
--	pci_release_regions(pdev);
- }
- 
- static struct pci_driver rvu_rep_driver = {
+ 	ioaddr = pci_iomap(pdev, TULIP_BAR, netdev_res_size);
 -- 
 2.48.1
 
