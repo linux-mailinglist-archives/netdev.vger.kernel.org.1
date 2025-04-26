@@ -1,216 +1,176 @@
-Return-Path: <netdev+bounces-186243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9300CA9DB40
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 15:45:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C41D3A9DB7C
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 16:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6D2617F936
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 13:45:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AD6D17E77E
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 14:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6470D1DE881;
-	Sat, 26 Apr 2025 13:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF6E253F24;
+	Sat, 26 Apr 2025 14:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FL73MtPT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyJde0sy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3714223C9;
-	Sat, 26 Apr 2025 13:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C757A31
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 14:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745675146; cv=none; b=SCKtN3FU1DTzlZSmN0aTJKqG3/Usn6prS6t4s5oy5Xq76UmhKx52aTNzDzHm1Pd5hzmAFNInSCARSSS69dge7tYx7Mc/Vqy6daDXv7MULv91H5rUBol82nSd0Jw8/HLyVYtjbICvyWtPqh5TxJQazeGOFK6iWWbkfCwXxO2O10U=
+	t=1745678475; cv=none; b=LMJcAupVhXNThL9hXK8nHH5lX+Zwd4bvSQvuxcYdUGqCKl5bY7CQdWPxIzogBIIbJZEwPyZOz5BTwjYaVbQiBMDypCe0nnFHT2PXExVlSNOdq5odlTkyzrS2H+ll+k47mEATBMsLh8r+D6QvEOvQMW4Stb3YZwJbkP/gWcT3yjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745675146; c=relaxed/simple;
-	bh=I4nsA4r/Iu57UddEcOKuVuHTuSSaO7yRpZoDOY/Qp2U=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=f6jE//5dGP+yujZDygBhxI12zfBvjAiiIrmsxv8F+/qVvJWSwkEDnJXcMj8isOy+aqgiKuXi7bsGIRTqJzOSGW+jKWbYdrDP8oBUy6IWpAoMJFHcvXaaL+IrJKMNeZxoixKhKLAFnoyhqFAUNNjURaGIpUGUw/+2LWdOinTXh80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FL73MtPT; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745675144; x=1777211144;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=I4nsA4r/Iu57UddEcOKuVuHTuSSaO7yRpZoDOY/Qp2U=;
-  b=FL73MtPTIblP+GDB0e3HutmxvspsnScb1Q8MgkOg+0FgCJk83LlQX37D
-   D6O2VEiAd3ZnGAPuMeiC1p+lOxC0BUoWn/yv9KlVf4JTDVYVqfnzXA+OR
-   DutgC9PHVari3dsAVurAxj8alSC47O3w3xRUAYEaHX8vKl6xSDeiXOV5u
-   8+fXOtcF1Mufp5d7nAAGzqNA6s/EWO5tUHxoKF/tApwjc8U0b5Odl1lhr
-   5XkdHiDtLbON22C2c1d62RcP6zLnpMSStEIY8p39MDCuaMuh/sz5NYt7M
-   stq1CpRZD+QdAxMzxnx04nXmArVvLbd97t0xzFj351KRhqDSXG/JM5O9T
-   A==;
-X-CSE-ConnectionGUID: rluqqy2OT+ujeyTWTOU9Mg==
-X-CSE-MsgGUID: +oYvne6NRzqCTuyzNKfqzw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11415"; a="47229772"
-X-IronPort-AV: E=Sophos;i="6.15,241,1739865600"; 
-   d="scan'208";a="47229772"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2025 06:45:43 -0700
-X-CSE-ConnectionGUID: WMbNce1ORpCDbJZHWjGjpw==
-X-CSE-MsgGUID: UaIR2HdjTjK095toUEDbGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,241,1739865600"; 
-   d="scan'208";a="138223278"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.235])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2025 06:45:29 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Sat, 26 Apr 2025 16:45:26 +0300 (EEST)
-To: Xin Li <xin@zytor.com>
-cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-    virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
-    linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
-    linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
-    tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-    dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-    acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com, 
-    peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com, 
-    alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
-    adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org, 
-    ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-    tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com, 
-    seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com, 
-    kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
-    dapeng1.mi@linux.intel.com
-Subject: Re: [PATCH v3 01/14] x86/msr: Move rdtsc{,_ordered}() to
- <asm/tsc.h>
-In-Reply-To: <e62b81f3-1952-43e6-85fd-18c6f37d531d@zytor.com>
-Message-ID: <f8a5b080-b2a8-06f0-3d2d-d232ef0887a4@linux.intel.com>
-References: <20250425083442.2390017-1-xin@zytor.com> <20250425083442.2390017-2-xin@zytor.com> <42dc90e1-df2a-2324-d28c-d75fb525e4a2@linux.intel.com> <e62b81f3-1952-43e6-85fd-18c6f37d531d@zytor.com>
+	s=arc-20240116; t=1745678475; c=relaxed/simple;
+	bh=3MChHGIAxr2wCLjOEGjVktjQkHTwOLlF05+KbxFU138=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VTcuepWlIHpAMNDZ2dNuFMwDyPPUYL/Qq2G6IOxhNf7fPPkBjHYEwnbqaQ1acBnJPCLpYpEfp3OCLy2orf0ON4h1phTng+X6+SG3BlJ9/NDQ8RuP0+MrE+aWX5KbVC06TrtkMndSfZe7Frl8cnOPKPwewUmdgqwJVIPrINISsy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IyJde0sy; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47690a4ec97so38929711cf.2
+        for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 07:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745678472; x=1746283272; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FPGLmeChCi55yYwofeq9TWGMEgD3TCkdRzlZw8FAJwY=;
+        b=IyJde0syrwZKmR/bX6xzgIKET3GKmUMiLWztmjcvl0IDJNa32HiB73Gegq/b+wgBKN
+         ez5WVBN94dhXHWjBFxzIu3FFpjPogV9Rp1lzAsFPfGguSjQ7Cfb0IIpfseudZinRTLos
+         QTPfthBPEStDgJ3eFovwztvwiignMsl5YviT6jAvazcGo0mIFeoqfNAUZDW94bb7zNx0
+         lz1xXmJwK9rNzPi5/m93khYQzPa8Lo/1qOV7F5ZgWxOErNfgMmCDIQecgxpqGFLMOxhU
+         u61F8IRdJ44DsF+0DxvJd53mhOOgWyWbU3/2V5Je2vLqZ2uPnn6neUKke/QvdLU96z+G
+         +4hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745678472; x=1746283272;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FPGLmeChCi55yYwofeq9TWGMEgD3TCkdRzlZw8FAJwY=;
+        b=cZEQBoXCqW/m6MliShaHm1ObkSBWPKQtnUadD8443gAAnCBSMKw6evioBamabomtgL
+         L1GntewewNi4bjh6kw6HUtSSlJGrhAJzHWPtNI7V0dEX1Psw6T8FqoUmUG8/Nxm8IhpF
+         m8iMY1jdNiTfSQGpgPRE6UPMYhHtzRPu7x4QUJMjIqyT973lXGBqftPgqOwXHY1Nz3s8
+         vbXBTRAMyY/DAfanMPkamy6VoQtvFh642tMzaDdvSHx6FoAH1OkTGbqj6fbj1C34EfML
+         12eMIe35I/qpqTpDJVOLgvrIT9GzPdBvY/0NnNXy6FbYejHeASXeUsQMVpSwYDO1IZHl
+         Rwlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVouF6vW67Zzeb6SV+0xaZZsvDRNvUXzTE9Uk1j6h1Z0it7gO7PxpMnc+WQfryOwPwEokTk5+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVGEdHrYo6ExLn/zpCMOfU59Wb8sqtQ0DW7kTtpgnwQqvvxrq2
+	ayKgL3PFh0bfl6EzEqmRwgizZUOje6gDC0F/OLxbzSXOihDnhqkd3QLasg==
+X-Gm-Gg: ASbGncup61GTNrbpGnyadNrsPKIXhlW2qPJ15Ce9C+D3XaIyoVtSZTF+/WKM9fooeCo
+	H4xk80CQQ3rSiZVxortAJRpL3eD8xsB3SqtuEnoP6eIQe+Gb8hD1i+NfHbOkkBRUqKReh9PMJ93
+	q3hBfHhjJeSXnA++0z06+tfBVoyGg3xit8onta8PsUP8szF5XEusFQiQiGnF8yXKgURteVPmRns
+	sH6upUW9Ou70A4ogjFexnJ2ymhtK1cWBXfIZ/IVN58Z4QmiwDcPTkomWt1Lqnv808GSFZf6NqL0
+	DxGQufBQhsVbCSFBXnCSlYfmSd9mWSDhYERnf9NLKYtiHzVCjiTGP3RH8IgdZntPIIHJcCAOCFZ
+	BhlnuGdDhnj0hbUzugBYx
+X-Google-Smtp-Source: AGHT+IHhW7jcgU9hx5LwLhK1Yyr5bl/qI1KK8nMxsEiWyb6eWDuc1eNStbd+uYMTpLoB5GqZ4D4pxA==
+X-Received: by 2002:a05:622a:1a21:b0:477:1e66:7442 with SMTP id d75a77b69052e-48022b3c111mr111669541cf.5.1745678472033;
+        Sat, 26 Apr 2025 07:41:12 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-47ea1693378sm39676171cf.64.2025.04.26.07.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Apr 2025 07:41:11 -0700 (PDT)
+Date: Sat, 26 Apr 2025 10:41:10 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Samiullah Khawaja <skhawaja@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ almasrymina@google.com, 
+ willemb@google.com, 
+ mkarsten@uwaterloo.ca, 
+ netdev@vger.kernel.org
+Message-ID: <680cf086aec78_193a062946c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <aAxFmKo2cmLUmqAJ@LQ3V64L9R2>
+References: <20250423201413.1564527-1-skhawaja@google.com>
+ <20250425174251.59d7a45d@kernel.org>
+ <aAxFmKo2cmLUmqAJ@LQ3V64L9R2>
+Subject: Re: [PATCH net-next v5] Add support to set napi threaded for
+ individual napi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-589040720-1745675126=:944"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Joe Damato wrote:
+> On Fri, Apr 25, 2025 at 05:42:51PM -0700, Jakub Kicinski wrote:
+> > On Wed, 23 Apr 2025 20:14:13 +0000 Samiullah Khawaja wrote:
+> > > A net device has a threaded sysctl that can be used to enable threaded
+> > > napi polling on all of the NAPI contexts under that device. Allow
+> > > enabling threaded napi polling at individual napi level using netlink.
+> > > 
+> > > Extend the netlink operation `napi-set` and allow setting the threaded
+> > > attribute of a NAPI. This will enable the threaded polling on a napi
+> > > context.
+> > 
+> > I think I haven't replied to you on the config recommendation about
+> > how global vs per-object config should behave. I implemented the
+> > suggested scheme for rx-buf-len to make sure its not a crazy ask:
+> > https://lore.kernel.org/all/20250421222827.283737-1-kuba@kernel.org/
+> > and I do like it more.
+> > 
+> > Joe, Stanislav and Mina all read that series and are CCed here.
+> > What do y'all think? Should we make the threaded config work like
+> > the rx-buf-len, if user sets it on a NAPI it takes precedence
+> > over global config? Or stick to the simplistic thing of last
+> > write wins?
+> 
+> For the per-NAPI defer-hard-irqs (for example):
+>   - writing to the NIC-wide sysfs path overwrites all of the
+>     individual NAPI settings to be the global setting written
+>   - writing to an individual NAPI, though, the setting takes
+>     precedence over the global
+> 
+> So, if you wrote 100 to the global path, then 5 to a specific NAPI,
+> then 200 again to the global path, IIRC the NAPI would go through:
+>   - being set to 100 (from the global path write)
+>   - being set to 5 (for its NAPI specific write)
+>   - being set to 200 (from the final global path write)
+> 
+> The individual NAPI setting takes precedence over the global
+> setting; but the individual setting is re-written when the global
+> value is adjusted.
+> 
+> Can't tell if that's clear or if I just made it worse ;)
 
---8323328-589040720-1745675126=:944
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+That does not sound like precedence to me ;)
 
-On Sat, 26 Apr 2025, Xin Li wrote:
+I interpret precedence as a value being sticky. The NAPI would stay
+at 5 even after the global write of 200.
 
-> On 4/25/2025 8:45 AM, Ilpo J=C3=A4rvinen wrote:
-> > To me this looks really a random set of source files, maybe it helped s=
-ome
-> > build success but it's hard for me to review this because there are sti=
-ll
-> > cases that depend on indirect include chains.
-> >=20
-> > Could you just look into solving all missing msr.h includes instead
-> > as clearly some are still missing after 3 pre-existing ones and you add=
-ing
-> > it into 3 files:
-> >=20
-> > $ git grep -e rdmsr -e wrmsr -l drivers/platform/x86/
-> > drivers/platform/x86/intel/ifs/core.c
-> > drivers/platform/x86/intel/ifs/load.c
-> > drivers/platform/x86/intel/ifs/runtest.c
-> > drivers/platform/x86/intel/pmc/cnp.c
-> > drivers/platform/x86/intel/pmc/core.c
-> > drivers/platform/x86/intel/speed_select_if/isst_if_common.c
-> > drivers/platform/x86/intel/speed_select_if/isst_if_mbox_msr.c
-> > drivers/platform/x86/intel/speed_select_if/isst_tpmi_core.c
-> > drivers/platform/x86/intel/tpmi_power_domains.c
-> > drivers/platform/x86/intel/turbo_max_3.c
-> > drivers/platform/x86/intel/uncore-frequency/uncore-frequency.c
-> > drivers/platform/x86/intel_ips.c
-> >=20
-> > $ git grep -e 'msr.h' -l drivers/platform/x86/
-> > drivers/platform/x86/intel/pmc/core.c
-> > drivers/platform/x86/intel/tpmi_power_domains.c
-> > drivers/platform/x86/intel_ips.c
->=20
-> I think you want me to add all necessary direct inclusions, right?
+> Anyway: I have a preference for consistency
 
-For asm/msr.h yes, as it seems you're altering the inclusion paths and all=
-=20
-non-direct includes have a chance of breaking so it seems prudent to just=
-=20
-convert them into direct includes.
++1
 
-> This is the right thing to do, and I did try it but gave up later.
->=20
-> I will do it in the next iteration as you asked.  But I want to make my
-> points:
->=20
-> 1) It's not just two patterns {rd,wr}msr, there are a lot of definitions
->    in <asm/msr.h> and we need to cover all of them:
+I don't think either solution is vastly better than the other, as
+long as it is the path of least surprise. Different behavior for
+different options breaks that rule.
 
-I know and I don't expect you to get it 100% perfect, but taking a major=20
-step into the right direction would be way better than build testing one=20
-configuration and see what blows up and fix only those.
+This also reminds me of /proc/sys/net/ipv4/conf/{all, default, .. }
+API. Which confuses me to this day.
 
-In this particular case, the amount of includes seemed really subpar with=
-=20
-many users lacking the include.
+From the PoV of path of least surprise, minor preference for Joe's
+example of having no sticky state, but just last write wins.
 
->       struct msr_info
->       struct msr_regs_info
->       struct saved_msr
->       struct saved_msrs
+> when possible, so IMHO,
+> it would be nice if:
+>   - Writing to NIC-wide threaded set all NAPIs to the value written
+>     to the NIC-wide setting
+>   - Individual NAPIs can have threaded enabled/disabled, which takes
+>     precedence over global
+> 
+> But IDK if that's realistic/desirable/or even what everyone else
+> prefers :)
 
-Could be shortened to -e 'struct msr' -e 'struct saved_msr'.
 
->       {read,write}_msr
->       rdpmc
->       .*msr.*_on_cpu
-
-Well, my pattern already caught rdmsr.*on_cpu and wrmsr.*on_cpu.
-
-For the other patterns, I don't see those at all under=20
-drivers/platform/x86/ but I think when one typically implies the=20
-others tend appear as well so this might not be as hard as it seems.
-
-> 2) Once all necessary direct inclusions are in place, it's easy to
->    overlook adding a header inclusion in practice, especially if the
->    build passes.  Besides we often forget to remove a header when a
->    definition is removed.  In other words, direct inclusion is hard to
->    maintain.
-
-This is true as well but we should still try to move towards the right=20
-state affairs even if we will not get it near 100% until there's a real=20
-tool that relentlessly keeps exposing such human oversight.
-
-And do I try to check also includes whenever I remember while reviewing=20
-patches (which requires some effort as they are not visible in the code=20
-context and might not appear in a patch at all).
-
-> 3) Some random kernel configuration combinations can cause the current
->    kernel build to fail.  I hit one in x86 UML.
-
-Yes, which why direct including is much better than relying on fragile=20
-indirects.
-
-> We all know Ingo is the best person to discuss this with :).  While my
-> understanding of the header inclusion issue may be inaccurate or
-> outdated.
->=20
-> So for me, using "make allyesconfig" is a practical method for a quick
-> local build check, plus I always send my patches to Intel LKP.
-
-Even with LKP, randconfig builds may still require many tests to find=20
-issues.
-
-> There probably wants a script that identifies all files that reference a
-> definition in a header thus need to include it explicitly.  And indirect
-> includes should be zapped.
-
-Sadly, the clang based include-what-you-use tool is not yet there for=20
-the kernel AFAIK.
-
---=20
- i.
-
---8323328-589040720-1745675126=:944--
 
