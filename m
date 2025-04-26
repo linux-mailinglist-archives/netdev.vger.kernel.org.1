@@ -1,147 +1,110 @@
-Return-Path: <netdev+bounces-186220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B00BA9D76E
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 05:53:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7386A9D76F
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 05:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F1DE1BA46B1
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:53:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B37AF4A3188
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8141C1F12;
-	Sat, 26 Apr 2025 03:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E774C1DD529;
+	Sat, 26 Apr 2025 03:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJhqMsep"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AX3tzoUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D5984A35
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 03:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706F814D283
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 03:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745639609; cv=none; b=V3nyD8PgDv3Euz6z4n6lr5fr6pz/KKuQ7RkICL1gl+cw5EIMYjxczvf6W3o0bFzgSHpRjZAMDLbRy46kEO32QFvofryE9x9AjeMJUKuDjIJooL11CQAHw4Ci0CYccPWZ0g+Ilyp6LICBNZEiQeLlYjVIpHiuV/+f2joU6vZZvJA=
+	t=1745639661; cv=none; b=F4Rn6RexzIQOwc+y+kJ9tVGkYbnqJZgZDY33be5AN1O/mi2WOXIMIZqdaWZ+shIq4Fd2GGNhKzSw2B3CEhb6bqBSTLLfHt+U8gaC9L9w6fi56s6jb7grECnVT7ZOw8Vika8O6eXDnb+apDGzA9OUjAeT2AjgqoTvG6DC1l4zCUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745639609; c=relaxed/simple;
-	bh=e1frOWqQBqSr4la6jMb5N/BAJnnMixdSvnU9l2lgH/4=;
+	s=arc-20240116; t=1745639661; c=relaxed/simple;
+	bh=/5fMlbRdTTF9fOcaspDg0mn+neqEvxenHd+TJwKzEYo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tEANA7YQPFwcTTWneZ1YYK9n36Oq2h6wvYakYYnQwwkSogNB/K+yErwzQc4VGKpwlAlLreBcsP4E8L5Bm1k4reZV1zUCmTv5u1cFKfGHAiKpmedsxN4mmp/473eR4bCIU66gOKaXckYYcBISrx2a7v5BOhNpIBQwVBT2NP1WADE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mJhqMsep; arc=none smtp.client-ip=209.85.214.181
+	 To:Cc:Content-Type; b=ZbRumGSvMCKb72wsun6MBUutc3Fi474b/7FZlD/vVbP81pII71L5DCd2wbdP6EUufAhshiyDra5tZGXm2Ae9i/yaqcLb/hj5LJ6U0ye1Q212OO8HJLLN/0idng4VdT27LLtxDI74Ctgzk7s79noxg/nwbd0ITO1XX7vIN4rtQK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AX3tzoUI; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2240aad70f2so94225ad.0
-        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 20:53:27 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2240aad70f2so94315ad.0
+        for <netdev@vger.kernel.org>; Fri, 25 Apr 2025 20:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745639607; x=1746244407; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745639659; x=1746244459; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FHJQMCfQnCTUldZPJaQ4kHEgRJ+XJYExi6HhUb5fO14=;
-        b=mJhqMsepaoHI7ewI/fHYArNZujJCO5QQM+lGtZcBuodBdj8OnoDNp8BLlNctOgr/Xx
-         Z5yX62rNzQgmTNsl/wsAIbJ9gqaUvfWCUqA+CNCj5vnrODUFig3r47dcMY53UBH5TKxy
-         vdzCCsDnTG5or2BrnqMD5koA/3FKMIYC6tqe5N9FEkctsWhCRf5aO5dihYdWkKbtaio/
-         1VxSrSz8TONOzR0f72Yy/QdPgSIzbXslWs/DynXkyQiUy/DhLG5xCP9crQgKmaANme1G
-         UGfT62PCW0Wkt1CormK3YNb+I4eN/w08NOdqBBkpI5EATl15fq+TSmYBCBQfLzqLqxaj
-         PBDw==
+        bh=Rv0nQqFQxIQwbiEoCwEBS/lXrGN47dpus6ZKn17Kc8E=;
+        b=AX3tzoUIwHyb0jW0okkv2ZlzBWlO0c3gwB/RHTMyk1H6aWi+cQJeinRmkzCy/+r2Nz
+         k8F7cRATFdZPHoltNW0ibl++m2sTgWQANV6w0lqCy55fJjLml47hftMEJ6iYtHV1shlP
+         JQBk7DXwqqrRVSLBfvMD3IwSB4WMhN+bXKnbKk5sJb/7ZtCPaLnyVuuJU2HntfXTbh1k
+         5Nw3quImmlzjtB5vxwbI2lRaHi5C+Y3h4n1yRpGh4APHO4YM5XN3rHPHWpHUp0lwNWAA
+         RulBqNTd7+YqCNBB1e+w56OpIU9P3j5qQE6ISnv4dsnBv6xHo+0pn13rv3jKklsGIPZ3
+         iSlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745639607; x=1746244407;
+        d=1e100.net; s=20230601; t=1745639659; x=1746244459;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FHJQMCfQnCTUldZPJaQ4kHEgRJ+XJYExi6HhUb5fO14=;
-        b=YtEV1Whdcm+vxhzT5o63j3cvvNx3VuXkABbiqAKbwtbFq1Snaw067OGVdAqZ1LA6vV
-         rrxPK+SKxe5bSv2V7v9Zkd37XfDJPT4F33Mm6x8AObO06IizsvLaPd7cWCxNQRDixk63
-         2D4FUks75ixnKp4Pm/LWE5OuhXbPWEHKIMDbvghWINZW0rWnUWqrXBdGPOW/JbC4eMl8
-         NxG8NmmAMsRy2yCn5QUB17Pwaai+LOr34BVl4PEIPRq0k36x/ytPtdMEXR8Uuxa0eXx8
-         ye/F2gUs0/5DvzjAmxdvYA21cSLWvi47+MGynRHwtgGX51rZRX4srA62SDrvktYcej98
-         bPRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWwzFHo0E2mgGuGHW224MwAq4N/lhrCfXT4IGewLR9EZ4BpKAWjtinD1U8GfwjwL2r8ODqY7kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjlmHs7ma60MOpe0hbyenr+JFECS8xDfpFSnHzyBawyLFF21i/
-	FZiFSybDYN6jXDDFzfNSWwO5G4ySAaNWS2g/NToQRhu/7kHQj+AjPBFGOwB28ptNn9FhIulRYIW
-	yXdHqljZq+oOJjiBRbnRNwiWZbHz3XEAUbjN1
-X-Gm-Gg: ASbGnctp6hHA6bQCXOmyfD+64mPB8GgnsCIGK5hdZABUNYbckVCLPpXKJJR8x6WtewJ
-	et2VFxqZGs3z+EepVagTycxUVLUyC22fmRkffFfPZHKG7YosDZyDCXhFTBYJ9ohpmeSsOUMIYIP
-	1FLaTHATjOU6T/D/NcY5F1ywqjdxm01Bb001lWSyBmFdRgwlJt565xtM8=
-X-Google-Smtp-Source: AGHT+IFI98UaAu2e0f23jhXgY6ahs42wCGXoLX3gPBmbHEdbls2VD4/Dd+j/PRhFQKbXZG/28DQs43wsAgfv5CUiCOY=
-X-Received: by 2002:a17:902:ea12:b0:22c:33b4:c2ed with SMTP id
- d9443c01a7336-22dc75fc751mr1104145ad.26.1745639606895; Fri, 25 Apr 2025
- 20:53:26 -0700 (PDT)
+        bh=Rv0nQqFQxIQwbiEoCwEBS/lXrGN47dpus6ZKn17Kc8E=;
+        b=bCbu5R5Y8GfjJJyWSK8ZYqikRDVQrQvnLLG5w8EeefN249Dn4hI5a3tL+X0H1zCa1v
+         IVDl66F+TOH7vnIO+HXfYXsEAy5oR5R24hDp4hSEm3iz2FaCSafJZCrfrOnx189EH67p
+         vJnbS+I9f0kzBiRGxueAep7953sdrjFU0NmA52mbw7/szNPsSzG5pY1w6vNEdBwQSJeP
+         HhLSd1No9BlVVwkTOgpmEgwUE1QD28rvg6jUH0QPNzJF50W6JBzHN+gfu8IzkH4/ItkO
+         xanH16HcJTtU6oUD9S1OwOjPziV8fMoQ5Rh7ZVxprxUiP1hKbOvKTbj7yOny87Xa0v2q
+         Ac7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUdbCZ4NsTHA8CXP5rsmp+lKmNN6Eg5p/pOagzU4UL1mXYe4FHmJqSmTDQ/UIYBf2W2lPZbQ4Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnvUeTDpcXNFe3bc7xRBXh/azAhj7eDCP8lR2FLRzBbMbibMDl
+	zVipv9G5YhNbGhglUu89PyjoBBgwgBhyNY6KWtlXOj/8v3xueJVIfwNbLtBxcslU3/yHd91kL1o
+	yfkW12dVytQpsOXyIcmGngGT3PoiBXus9ISpC
+X-Gm-Gg: ASbGncuOHWLz/0RYWh7yK+qlMdX4lmtREhGaDDOQXF0lCLtFPubq7ADFV0KmJmF6s1P
+	KXuVbbB+Q9o0ho7g5tYwtxDON7ulGA8YpV4JMWNr4UnicPYq+HJ3nreXSmfQC+QIZVtYYijT0bH
+	D1f8uFTfNl4yk+5C/kfOufsj955v5ihIaemgewK4nX/HjL61V1WJVbbqU=
+X-Google-Smtp-Source: AGHT+IFiEtlpi7QqkkrAxeav1ityOslcRgnpy55ggx4p5rqUJayG5AltDKZn+6dYJsFvUol0sUIzNrD4X9NWroLw8IM=
+X-Received: by 2002:a17:903:2ecc:b0:220:ce33:6385 with SMTP id
+ d9443c01a7336-22dc9086876mr907525ad.9.1745639659209; Fri, 25 Apr 2025
+ 20:54:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423201413.1564527-1-skhawaja@google.com> <aArFm-TS3Ac0FOic@LQ3V64L9R2>
- <CAAywjhQhH5ctp_PSgDuw4aTQNKY8V5vbzk9pYd1UBXtDV4LFMA@mail.gmail.com>
- <aAwLq-G6qng7L2XX@LQ3V64L9R2> <CAAywjhTjBzU+6XqHWx=JjA89KxmaxPSuoQj7CrxQRTNGwE1vug@mail.gmail.com>
- <20250425173743.04effd75@kernel.org> <aAxGTE2hRF-oMUGD@LQ3V64L9R2>
- <20250425194742.735890ac@kernel.org> <20250425201220.58bf25d7@kernel.org>
-In-Reply-To: <20250425201220.58bf25d7@kernel.org>
+References: <20250424200222.2602990-1-skhawaja@google.com> <20250424200222.2602990-3-skhawaja@google.com>
+ <20250425183612.19068f23@kernel.org>
+In-Reply-To: <20250425183612.19068f23@kernel.org>
 From: Samiullah Khawaja <skhawaja@google.com>
-Date: Fri, 25 Apr 2025 20:53:14 -0700
-X-Gm-Features: ATxdqUFyKh1VTmNXCA-Vu6_5Qnzs9xb6qRlxCTzBUjS0n5YY1jTLb7T6euy8yoE
-Message-ID: <CAAywjhTsPXtKGQejc_vOWzgF18u9XG74LzjZeP9i3TQGxUi6NA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] Add support to set napi threaded for
- individual napi
+Date: Fri, 25 Apr 2025 20:54:06 -0700
+X-Gm-Features: ATxdqUFao4LUOIQPTr54I9J8UxdWhCrwk8-CdJqctwSGXLQZgm7DuUCtLJv1ghM
+Message-ID: <CAAywjhRMSsMhKzQQsi++upcoOvc8CQ=Q6=J35vnxywhhLrk9AA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/4] net: define an enum for the napi threaded state
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Damato <jdamato@fastly.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, mkarsten@uwaterloo.ca, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com, 
+	jdamato@fastly.com, mkarsten@uwaterloo.ca, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 25, 2025 at 8:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+On Fri, Apr 25, 2025 at 6:36=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
 >
-> On Fri, 25 Apr 2025 19:47:42 -0700 Jakub Kicinski wrote:
-> > > > I haven't looked at the code, but I think it may be something more
-> > > > trivial, namely that napi_enable() return void, so it can't fail.
-> > > > Also it may be called under a spin lock.
-> > >
-> > > If you don't mind me asking: what do you think at a higher level
-> > > on the discussion about threaded NAPI being disabled?
-> > >
-> > > It seems like the current behavior is:
-> > >   - If you write 1 to the threaded NAPI sysfs path, kthreads are
-> > >     kicked off and start running.
-> > >
-> > >   - If you write 0, the threads are not killed but don't do any
-> > >     processing and their pids are still exported in netlink.
-> > >
-> > > I was arguing in favor of disabling threading means the thread is
-> > > killed and the pid is no longer exported (as a side effect) because
-> > > it seemed weird to me that the netlink output would say:
-> > >
-> > >    pid: 1234
-> > >    threaded: 0
-> > >
-> > > In the current implementation.
-> >
-> > We should check the discussions we had when threaded NAPI was added.
-> > I feel nothing was exposed in terms of observability so leaving the
-> > thread running didn't seem all that bad back then. Stopping the NAPI
-> > polling safely is not entirely trivial, we'd need to somehow grab
-> > the SCHED bit like busy polling does, and then re-schedule.
-> > Or have the thread figure out that it's done and exit.
+> On Thu, 24 Apr 2025 20:02:20 +0000 Samiullah Khawaja wrote:
+> > -                     dev_set_threaded(ndev, true);
+> > +                     dev_set_threaded(ndev, NETDEV_NAPI_THREADED_ENABL=
+E);
 >
-> Actually, we ended up adding the explicit ownership bits so it may not
-> be all that hard any more.. Worth trying.
-Agreed. NAPI kthread lets go of the ownership by unsetting the
-SCHED_THREADED flag at napi_complete_done. This makes sure that the
-next SCHED is scheduled when new IRQ arrives and no packets are
-missed. We just have to make sure that it does that if it sees the
-kthread_should_stop. Do you think we should handle this maybe as a
-separate series/patch orthogonal to this?
-
-Also some clarification, we can remove the kthread when disabling napi
-threaded state using device level or napi level setting using netlink.
-But do you think we should also stop the thread when disabling a NAPI?
-That would mean the NAPI would lose any configurations done on this
-kthread by the user and those configurations won't be restored when
-this NAPI is enabled again. Some drivers use enable/disable as a
-mechanism to do soft reset, so a simple softreset to change queue
-length etc might revert these configurations.
+> The drivers having to specify the type of threading is too much.
+> The drivers are just indicating to the core that they are too
+> IRQ-constrained to reasonably handle load..
+>
+> Please add a wrapper, something like dev_set_threaded_hint(netdev).
+> All the drivers pass true now, the second argument is already
+> pointless. For extra points you can export just the
+> dev_set_threaded_hint and make dev_set_threaded() be a core-only function=
+.
+Agree. Will do this
 
