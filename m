@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-186250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18973A9DB98
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 16:56:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3861A9DBA0
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 17:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B42B169C60
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 14:56:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B3D07AB585
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 15:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7136322FE08;
-	Sat, 26 Apr 2025 14:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8716221FC1;
+	Sat, 26 Apr 2025 15:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScWREbdp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q4xS9gTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D316B17BA3
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 14:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEB417548
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 15:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745679357; cv=none; b=W0CLlFDEFEQKSKkkPba90UL7p/j4c1shFHbMA4cPJ72YlTZ9Dj0HwLXjUXI1AIk4S8vXEMwUUcXpyPZCWfJeqzkNs/ZAbQFPiqh9yE3WAtG0CXLvgJo5dG+YH3y0YgQtvqCZqZjtKU8K5HKl1s6iRUMy23IEmTSLghP1DCZdD88=
+	t=1745679695; cv=none; b=cAE9jnxHFwhh+LO0eXXL2aG0EmQ6y/kZaRMV3FKqfFMmF0HjGN8odsfGK6h4uUxD7/Vcwi2npE7fjQFX7oeTB19B+t/dPpGGWQBsUaEQtvDSXEXOyc1tPHgOeagTFr9dbmuQ32O802M0lA4TqBZSMeAO6aGoDryJ55KCl2jDnig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745679357; c=relaxed/simple;
-	bh=l4mzeRfiP6cOTO8MD508kntSdMpRed4FBzEfS0y2Bl0=;
+	s=arc-20240116; t=1745679695; c=relaxed/simple;
+	bh=5jKqo9MvB5attn0SH7vPni0sbydsCwbldl/yOcxjNkI=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ihFDUTDNxl0+5L1B9tQIzgAUWjbyG+x/YdkKoz4nXMwHleC+hI26sbLqA53+YWV2eLl3lCiyn5cqJxcvSbKSYUcbkIH1ZAnqHhlw/ZZyUhBWJ+S7MKC71rDGgn+DZprs2VdGtpG54Iv1wtJRP91zuf2hwN9cHn4kZey7EdS+KAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ScWREbdp; arc=none smtp.client-ip=209.85.222.176
+	 Mime-Version:Content-Type; b=rJnyXPP9TdMLZRM8Uyyx9ey5r0Xxo1ZFOIoaPach2FUgWi7+tLFCEwlyjHoFyCqzagUHKo9fUsIRHtZz6FV5OPjzqd9WA2XbE8DoIOK+rtvpqLkav0OUcqsScAfu75PUB120G0xwZz2N512W5OxxV2DkF1zFaGESyguVurKiRX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q4xS9gTG; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c560c55bc1so405358185a.1
-        for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 07:55:54 -0700 (PDT)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47691d82bfbso75771711cf.0
+        for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 08:01:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745679353; x=1746284153; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745679693; x=1746284493; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jsnFymaoLKnZMAYwNG5A0g1kJ/WbaFn7e//oy5xaBoo=;
-        b=ScWREbdpM6/xKlA/GQLzAI2sMNyAEAWenhhjPqOqUYa2nfhgjkrPRbZAu3ALHRIyB1
-         gEuIwuXlTeeFD1vAoo99zt/B4ZvphytzG5QdGOTyvweZh2v9P9v0shnpefRBattFnvjN
-         sGmsowU5MErh+h8726Z/SAph7iSmQb3nVhyKvs8Y94kdAg1DrOOcwW3awVOGJqkQewlO
-         CTru/G4lK3jQ7DxwoY6+yR4Un/bRj7GCWLMdAGetjMAGkT7DUrZxK9MSJsxH8lloFHmb
-         WijkM6D5GIjcDp1DFWG9LEtvAHrm/mLhqTY10pBuhFQHPgQi1PrSDiWgxy1QY+joL2HY
-         GkyA==
+        bh=WK5wjKz7tMVtzmHgtWAPfCxZ51HqL0/S9lOuMiMOq7w=;
+        b=Q4xS9gTGPGkT0lksaedLWqFdtVYoWlQkQe8h+8sC9gAtqJ5QFP2V9UML16PkDSLlEi
+         1tJik7nKV5DCAYPm9rrYfR5ImdKq+ihnUJyG2vKK6IVddonY8V6ml2PLzQN5l0pX+3xe
+         9jqLM2MC4klCwi5pDCS0dzV3F+/s6shgLbTmVy1egFrWgRzk4Fm4dWg/qLHTWouQAT/C
+         q+txNbAMohevNkC4EMhzhgm6PEHRke7RohIYNWoUItMrDGuQN5XaJQRB342UAn4M+W1O
+         UownCXzhsb1+23V/Bl+5WJTUwe76ctEL7z3bTMNrUPLzk73AzYFAiaughW3CKtrUrISK
+         WfBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745679354; x=1746284154;
+        d=1e100.net; s=20230601; t=1745679693; x=1746284493;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=jsnFymaoLKnZMAYwNG5A0g1kJ/WbaFn7e//oy5xaBoo=;
-        b=tzuJCMntDAn3ek9os3yyOAVWhZ2aaGAhKklqL3oX9T4FQKAWSfdZ+GVeY6kjyCNw4+
-         rmeEifzpOmWReqeR8ZCsgviiID6FMc6wJZJpOBaOyOqtoQ7GKF2jxc5lP8YaUNVtvlgZ
-         RUTIMrF7C3sMZ4hhZXpUiWolKeAImTKv6rvAilKS7ldSNN23POlkZQyzVwnoBnZd7rh+
-         HinwxKIswz2w3jHxmXLiBQbaTcpVbnS1ZVoXEZVS++/mGtcDDTMlK6RBUPNzDttSA5eF
-         QFklTTEb6j32Bg8C1/nyhQmv3LFLeMA9eeOuAF1zew2VUOKAsLZQSGLNa8byw3Ns7Kri
-         zd/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXpliJPM5NNuQL03RZgFk9uYBE262LJuSZlUDtmAHSp3oj10UzbFjn/0IxEhhBYrGEY0m1ZTq4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHsqfd1wJfDu7jvtPtQWMfk5sIh/avxn8U7P+UNiM7AsMgjkFJ
-	NlqkrsyeoZOvSjvA5n8bwiZOs/a2PwpZgudOC1KxftopxNaWPNCS
-X-Gm-Gg: ASbGncu/GGGQg9wbC+1AFZ2fYfr42LIV2+nxyOAF936gMHDCzOAfd0hqFhv8I42dW2M
-	hdd/TzXz1+yqJ/wH+DafDFZf4GD7EmgMb4hhwN9PYaw6tSKq5tx8TsYDmXWQent6qLGbl5/zjCN
-	a5aQmK4hnWnwdQJWkivVl0jRdkFLJXTqZTrSfZc1eUa9fAhm5itGxA2kT2HCAixB2UPmupAkPQK
-	R6BOsglwZNvZ54Ae82JtyVcdVHcDRGiw2aUCpqUDDwS3wlU8dl07AQmvpb7Oj6pz2n/U7hfInsK
-	MHMr5paxclqerPiQZQ2dRoVSZVG1UcvbXLu3Ci2jZeR7c69GvoIcRrccp1vheKKluQM5CMXVZ6U
-	dh/Up/3RRuIWOcxgQcBqW4LVB+h7rFj4=
-X-Google-Smtp-Source: AGHT+IGRpwt7uQ17rSd4z0Yc1/utLPtVZ7i6pW6gVKbRZIpAtRipPkhFS6hlQKY0NPaAyByrtfQcHA==
-X-Received: by 2002:a05:620a:1984:b0:7c0:c332:1cdb with SMTP id af79cd13be357-7c9619e853fmr948053785a.38.1745679353604;
-        Sat, 26 Apr 2025 07:55:53 -0700 (PDT)
+        bh=WK5wjKz7tMVtzmHgtWAPfCxZ51HqL0/S9lOuMiMOq7w=;
+        b=h/yr9QDp3oGXmJMVwAW9RyZOQX8vlL4xihx1BZQ/aF7mTL/5dLyJOwNzfABu8oZN5r
+         r11rlvFlZxayMC7ps2M5xxTKsPX319u+r1VEu/8IQMIUZ7p+2AZx0x7NzIEscy4eiaj9
+         YoEtrhwecz12GKJDkSbt6cak/UunXtHGskgN2hAxbIo5OxMwNlr9PmSgFdLjmXIC+sRM
+         EuBxZQ/kzrxvao7RUjQZlcsTHmjUWUHGjB+bdNr8RMiIw7hGuCO/pqZuKT3e6NFmxpE/
+         zCCaMdpHIuyu5cFtVd5AAEvL+iS+Et/aRfwfq3NrmDBLUym3mU3a/gPS6AdsC/NiKKhg
+         Gq7g==
+X-Gm-Message-State: AOJu0YwSTQeIYsHsJU+cag61lYHBvGl3Nedz6U6TP1ktaJV2S1zytV3S
+	737skydVZA8Ots3TS627bb3HFWNEhhLe+bKA0S1AAi4U8+O9wQLK
+X-Gm-Gg: ASbGncuoiqtPyBXBa+1c3roG6/ODDhztQU4ecX9E8hG4FKx0GqsZPbbi1nrveHJikkZ
+	iZrSH1kXUy4iP0GI18TPuWkYo3mZVO+NKxtBeO32Ans8auW8ZEB1whv/qXeWaYiSKQ/ccxno+I9
+	cVlTpJ2XlLRxr+AhFiCCHwCgVjepwYudnOdMg8qYsqCgFV8jsOFiVRHhLpNHHGYsxC1TVGJkQ7d
+	MvkGoInYbzRFVpLuw0VSkMhW9rewZem+mUjKAmFPjvC27m6CWvxQUfVZ+NivqdrHDDMtZgnJibt
+	MOrsZJX81/OGyHTuZCJ1fo48hLUsKG+0/dw/oIGJ8QlahMYCH80/GHE5/ufJy237VoS4/hqafFX
+	03Jxv2kc02h7LMGnkamnN
+X-Google-Smtp-Source: AGHT+IGmVzgmMzs7Y3RcUQKt8wWDOd7c3HcRqblUoNJiyT5mDa3Rtr5hjKcD0STKFctqZD8dDrKktg==
+X-Received: by 2002:a05:620a:4609:b0:7c5:6a66:5c1e with SMTP id af79cd13be357-7c9668cdc37mr545148485a.58.1745679692919;
+        Sat, 26 Apr 2025 08:01:32 -0700 (PDT)
 Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f4c0aaf910sm35369986d6.107.2025.04.26.07.55.52
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c965750a69sm149548385a.1.2025.04.26.08.01.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 07:55:52 -0700 (PDT)
-Date: Sat, 26 Apr 2025 10:55:52 -0400
+        Sat, 26 Apr 2025 08:01:32 -0700 (PDT)
+Date: Sat, 26 Apr 2025 11:01:31 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+To: Ido Schimmel <idosch@nvidia.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
  davem@davemloft.net, 
  kuba@kernel.org, 
- pabeni@redhat.com, 
  edumazet@google.com, 
- andrew+netdev@lunn.ch, 
- netdev@vger.kernel.org
-Cc: Madhu Chittim <madhu.chittim@intel.com>, 
- anthony.l.nguyen@intel.com, 
- willemb@google.com, 
- Sridhar Samudrala <sridhar.samudrala@intel.com>, 
- Zachary Goldstein <zachmgoldstein@google.com>, 
- Samuel Salin <Samuel.salin@intel.com>
-Message-ID: <680cf3f899896_193a062945f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250425222636.3188441-4-anthony.l.nguyen@intel.com>
-References: <20250425222636.3188441-1-anthony.l.nguyen@intel.com>
- <20250425222636.3188441-4-anthony.l.nguyen@intel.com>
-Subject: Re: [PATCH net v2 3/3] idpf: fix offloads support for encapsulated
- packets
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ horms@kernel.org, 
+ kuniyu@amazon.com, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <680cf54b983d5_193a06294ab@willemb.c.googlers.com.notmuch>
+In-Reply-To: <aAujZJXqlG8VZpJF@shredder>
+References: <20250424143549.669426-1-willemdebruijn.kernel@gmail.com>
+ <20250424143549.669426-2-willemdebruijn.kernel@gmail.com>
+ <aAujZJXqlG8VZpJF@shredder>
+Subject: Re: [PATCH net-next v2 1/3] ipv4: prefer multipath nexthop that
+ matches source address
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,33 +102,165 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Tony Nguyen wrote:
-> From: Madhu Chittim <madhu.chittim@intel.com>
+Ido Schimmel wrote:
+> On Thu, Apr 24, 2025 at 10:35:18AM -0400, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > With multipath routes, try to ensure that packets leave on the device
+> > that is associated with the source address.
+> > 
+> > Avoid the following tcpdump example:
+> > 
+> >     veth0 Out IP 10.1.0.2.38640 > 10.2.0.3.8000: Flags [S]
+> >     veth1 Out IP 10.1.0.2.38648 > 10.2.0.3.8000: Flags [S]
+> > 
+> > Which can happen easily with the most straightforward setup:
+> > 
+> >     ip addr add 10.0.0.1/24 dev veth0
+> >     ip addr add 10.1.0.1/24 dev veth1
+> > 
+> >     ip route add 10.2.0.3 nexthop via 10.0.0.2 dev veth0 \
+> >     			  nexthop via 10.1.0.2 dev veth1
+> > 
+> > This is apparently considered WAI, based on the comment in
+> > ip_route_output_key_hash_rcu:
+> > 
+> >     * 2. Moreover, we are allowed to send packets with saddr
+> >     *    of another iface. --ANK
+> > 
+> > It may be ok for some uses of multipath, but not all. For instance,
+> > when using two ISPs, a router may drop packets with unknown source.
+> > 
+> > The behavior occurs because tcp_v4_connect makes three route
+> > lookups when establishing a connection:
+> > 
+> > 1. ip_route_connect calls to select a source address, with saddr zero.
+> > 2. ip_route_connect calls again now that saddr and daddr are known.
+> > 3. ip_route_newports calls again after a source port is also chosen.
+> > 
+> > With a route with multiple nexthops, each lookup may make a different
+> > choice depending on available entropy to fib_select_multipath. So it
+> > is possible for 1 to select the saddr from the first entry, but 3 to
+> > select the second entry. Leading to the above situation.
+> > 
+> > Address this by preferring a match that matches the flowi4 saddr. This
+> > will make 2 and 3 make the same choice as 1. Continue to update the
+> > backup choice until a choice that matches saddr is found.
+> > 
+> > Do this in fib_select_multipath itself, rather than passing an fl4_oif
+> > constraint, to avoid changing non-multipath route selection. Commit
+> > e6b45241c57a ("ipv4: reset flowi parameters on route connect") shows
+> > how that may cause regressions.
+> > 
+> > Also read ipv4.sysctl_fib_multipath_use_neigh only once. No need to
+> > refresh in the loop.
+> > 
+> > This does not happen in IPv6, which performs only one lookup.
+> > 
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > Reviewed-by: David Ahern <dsahern@kernel.org>
 > 
-> Split offloads into csum, tso and other offloads so that tunneled
-> packets do not by default have all the offloads enabled.
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 > 
-> Stateless offloads for encapsulated packets are not yet supported in
-> firmware/software but in the driver we were setting the features same as
-> non encapsulated features.
+> One note below
 > 
-> Fixed naming to clarify CSUM bits are being checked for Tx.
+> [...]
 > 
-> Inherit netdev features to VLAN interfaces as well.
+> > -void fib_select_multipath(struct fib_result *res, int hash)
+> > +void fib_select_multipath(struct fib_result *res, int hash,
+> > +			  const struct flowi4 *fl4)
+> >  {
+> >  	struct fib_info *fi = res->fi;
+> >  	struct net *net = fi->fib_net;
+> > -	bool first = false;
+> > +	bool found = false;
+> > +	bool use_neigh;
+> > +	__be32 saddr;
+> >  
+> >  	if (unlikely(res->fi->nh)) {
+> >  		nexthop_path_fib_result(res, hash);
+> >  		return;
+> >  	}
+> >  
+> > +	use_neigh = READ_ONCE(net->ipv4.sysctl_fib_multipath_use_neigh);
+> > +	saddr = fl4 ? fl4->saddr : 0;
+> > +
+> >  	change_nexthops(fi) {
+> > -		if (READ_ONCE(net->ipv4.sysctl_fib_multipath_use_neigh)) {
+> > -			if (!fib_good_nh(nexthop_nh))
+> > -				continue;
+> > -			if (!first) {
+> > -				res->nh_sel = nhsel;
+> > -				res->nhc = &nexthop_nh->nh_common;
+> > -				first = true;
+> > -			}
+> > +		if (use_neigh && !fib_good_nh(nexthop_nh))
+> > +			continue;
+> > +
+> > +		if (!found) {
+> > +			res->nh_sel = nhsel;
+> > +			res->nhc = &nexthop_nh->nh_common;
+> > +			found = !saddr || nexthop_nh->nh_saddr == saddr;
+> >  		}
+> >  
+> >  		if (hash > atomic_read(&nexthop_nh->fib_nh_upper_bound))
+> >  			continue;
 > 
-> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Madhu Chittim <madhu.chittim@intel.com>
-> Tested-by: Zachary Goldstein <zachmgoldstein@google.com>
-> Tested-by: Samuel Salin <Samuel.salin@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Note that because 'res' is set before comparing the hash with the hash
+> threshold, it's possible to choose a nexthop that does not have a
+> carrier (they are assigned a hash threshold of -1), whereas this did
+> not happen before. Tested with [1].
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+This is different from the previous pre-threshold choice if !first,
+because that choice was always tested with fib_good_nh(), while now
+that is optional?
 
-The issue resolved was that checksum offload support was advertised
-for tunneled packets, but not implemented in (some) firmware.
+> I guess it's not a problem in practice because the initial route lookup
+> for the source address wouldn't have chosen the linkdown nexthop to
+> begin with.
 
-Support for tunnel encap without checksum offload (e.g., plain GRE)
-and even GSO_PARTIAL may still work. Not sure. If so, that can be
-reenabled at a later date.
+Agreed. Thanks for the thorough review.
+ 
+> >  
+> > -		res->nh_sel = nhsel;
+> > -		res->nhc = &nexthop_nh->nh_common;
+> > -		return;
+> > +		if (!saddr || nexthop_nh->nh_saddr == saddr) {
+> > +			res->nh_sel = nhsel;
+> > +			res->nhc = &nexthop_nh->nh_common;
+> > +			return;
+> > +		}
+> > +
+> > +		if (found)
+> > +			return;
+> > +
+> >  	} endfor_nexthops(fi);
+> >  }
+> 
+> [1]
+> #!/bin/bash
+> 
+> ip link del dev dummy1 &> /dev/null
+> ip link del dev dummy2 &> /dev/null
+> 
+> ip link add name dummy1 up type dummy
+> ip link add name dummy2 up type dummy
+> ip address add 192.0.2.1/28 dev dummy1
+> ip address add 192.0.2.17/28 dev dummy2
+> ip route add 192.0.2.32/28 \
+> 	nexthop via 192.0.2.2 dev dummy1 \
+> 	nexthop via 192.0.2.18 dev dummy2
+> 
+> ip link set dev dummy2 carrier off
+> sysctl -wq net.ipv4.fib_multipath_hash_policy=1
+> sysctl -wq net.ipv4.conf.all.ignore_routes_with_linkdown=1
+> 
+> sleep 1
+> 
+> ip route show 192.0.2.32/28
+> for i in {1..100}; do
+> 	ip route get to 192.0.2.33 from 192.0.2.17 ipproto tcp sport $i dport $i | grep dummy2
+> done
+
+
 
