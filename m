@@ -1,156 +1,151 @@
-Return-Path: <netdev+bounces-186255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5ABA9DBF8
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 17:48:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31C9AA9DC00
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 18:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D90D1B657E9
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 15:48:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBA5923CED
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 16:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95587254844;
-	Sat, 26 Apr 2025 15:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14281F7580;
+	Sat, 26 Apr 2025 16:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lI59ce3a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsVvjLcp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FC012E7F;
-	Sat, 26 Apr 2025 15:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CFE8488;
+	Sat, 26 Apr 2025 16:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745682519; cv=none; b=MIPui0zELmzhiTZpWhkwQbeGDqD8/a+FY+HFcsHbJe2bG46M7X/ufoZWemFjusBAZ0+ISS64ESa5ZPmCmW4aNGkwbEe4aEMfDNiAQBBVDXywZNqvEJd5xZ7VawpZNsptCzsmdNDcpADiIY8MEU1nixrt8hE83giDJyfnBIQ5yTE=
+	t=1745683243; cv=none; b=kJAWN7IgX8haunInpDzJu53Us35ugvt6TsY3PUydlhUaCWNhkKo5YQpQFgAYhombefB44PsoXw8+9BKmyEJ+HgXkFkjLxpk8XxBTb193oDMaC/F5bJW3uNwuz7oEw+h4MxuXpD/h4XrbTDW/4EZHw0lxbq+r8Y/Rb7q7kdXDMag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745682519; c=relaxed/simple;
-	bh=D7+BsCvwekffDanMZF2T90+GFeaexdP5au9UarnNoDI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4HGvFMS7FeiD5oI0qon6ygYjIBV0V8ZZOOl/+ahDLHHBoj/4MzppOqjSIhMPQN6DulKiK396rYIl1pon47xgNS9cX0T9jWqHlsqhXLSf4qXINun5RtPwwWVFs8nAe4ipFFeKtbGPU2b9WBNdqhCKWSvgzNDxNFp89LICAi+Q1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lI59ce3a; arc=none smtp.client-ip=209.85.128.182
+	s=arc-20240116; t=1745683243; c=relaxed/simple;
+	bh=wGwWAknTOCMxz0RPq8zv6IjjubENWlU5qOlxtfmR5t0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bw1e9dvfXaYxWDgUHk15J1Fk+q/mXNTrg+Veu0MUqwIti8ogsvhvbCF3fW5k5qxWoe64k7snOyn/1camGMMWhGZwbUSOx/KqQSIeKdDPC4CZYLka0ZZKQCpPcRohfDyVGU3GVL8J8awTBsdM2Rh1EzVDSaVYNWzUvQebncyha1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsVvjLcp; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6fece18b3c8so28277537b3.3;
-        Sat, 26 Apr 2025 08:48:37 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7396f13b750so3723612b3a.1;
+        Sat, 26 Apr 2025 09:00:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745682517; x=1746287317; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GNLsvAARwG2p4RnCwduiH3vXwFOFjsZWcE7ga0IQyik=;
-        b=lI59ce3aB0oOMFjC5CI0YsrZbCKbUBS9l/rmOKTF/BFF4a46kvkcp4W721CEX9zKog
-         Ih3Ph3kMiSAl5YGG0b4j6KigsZr7vB0uP/exUbbB3+wuwZAqjpKxCQaZ3u50LRDmjhZ6
-         QjYk1Yb7ZLJMp6MwbKd8UsqJWKH40BkGr/2g/iZvDxi9Pr3eEAQ8kfjRMyDmiiV1MhgE
-         9ZSQFPbGN3zLca9relTdvACEWQ9U6j4dbMpj2CQCdAcwiT1ibrT9VTDGItOp4nNqISbM
-         3r68IwvfmFmWHh/2l7pKZYcSSWBE3AFNZhiXyGWL/dm8AqwgNJXkMHCjoLYVd0uDzXcr
-         j3UQ==
+        d=gmail.com; s=20230601; t=1745683241; x=1746288041; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=znOdau2L+/dcZkQ6O6k0/5CeHr55iQYi/h0B2Jyxhy8=;
+        b=QsVvjLcpUWuSmXDhdUa5Cg3pBT0j7m1Be3Ay0GK0Ry4rST89vNLbHjj0ix7WOSIx4B
+         opqQT3A/o5UzNK74vpfnC+g54Motqm+E24ZXmZVpf066Nel9s5a0KvxSQYc24QfJaXFk
+         ewaHWEs4leWsPCRew5PqozsWSjg6TMx9LM+GqHRVlhuZ3bMA8eZjvJahXUUJAmvseeiz
+         TX0dlOZ2CYlJDL4Xyl33jc3AwbaDYh7/x1Q19mLXWY2STy4nJwyPFsO3NMsPSQ/cKKVa
+         E/foO0auvQYkb5oUQS3TCGipkWCv/7C+aG4/aCSnt5Iw9Wz7U8y7iuKAjO8Y99Lh60Fk
+         gH7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745682517; x=1746287317;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GNLsvAARwG2p4RnCwduiH3vXwFOFjsZWcE7ga0IQyik=;
-        b=Ws/f9iW1nWek6/GIrjnYChDNNwOn15tBJHnFUhpdR0W93c0cgpDu9aSCtzyztGOoUo
-         j5eVRDyA47TjdgaSDClj6D0/bzLI3cd7GtHNrgHc7Aj1+o3EHvQXlqYh4CFzH7ZCbWeX
-         GgEaglgW37iyGVBxOf8ZX3n/pVJGAWr20UvEsyMIKMwToiCD43UMV4vfJrEcoaias2R8
-         y9HO3sBX7xznVMLNrKzzfhcDKbEN//FkKASBHOz5/i7hLA4p2IbaOwoR7O5IacTPI/Ws
-         yjWdQ/8+3PFpqMYjgp9TwBKKD9kwp6ltZhnHVzqgpiw0FeRy6Nq3sxoN9eRrwAMtw+jH
-         VLNw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdGmU2T0+1wnzge2ZU1LeYLn4YOyAYZN43ehfMFZOtKzrT0kat5ysUr81EiXGwQG88SRnNyIqN@vger.kernel.org, AJvYcCXwJmp5lJMfc+0C9Tef/6U2rnH9ktepxpuKNo3b8eG1c7u1gXktHiq+VRT7tW9MHFMvDSAYTr4sHGave4E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywkarl+/eIm+OBayRCtqU0+UvcdBNynyMARPoyTb6H8CJ0KUqRW
-	XCVNCBBEtfTrqh4s7jJt21igIp/scXK5sUOhcPbjZ8FvIgeJ967cBVVQsnSxKexzNvW/9r4tFcq
-	pzkMlFXkix0YX8N5QcJBl5rbX2VY=
-X-Gm-Gg: ASbGnctgrBI1OPuYApR61fGrL4p6hxx9sQ4lw59aEoaKpKr2DnW0BhUy/8x3LaRp6l9
-	PtCOezBoAzlo874wDvGoY1K4jWe4tnwDoC1HjNXKCEgwzWLKp4bAZke72c1h5uVEq/VlplSZBZ8
-	OREiauuauamaDPevlVQSY=
-X-Google-Smtp-Source: AGHT+IF9i1s//HyT5y2Lq2s5PQXDtgcR4yGyJ0+kGIxgLmhW/Q77TjeNFAQxxZk8r+VTfGANT/c/600+dYAwpfq7gec=
-X-Received: by 2002:a05:690c:9b06:b0:6fe:abff:cb17 with SMTP id
- 00721157ae682-708541c1140mr82741867b3.26.1745682517018; Sat, 26 Apr 2025
- 08:48:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745683241; x=1746288041;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=znOdau2L+/dcZkQ6O6k0/5CeHr55iQYi/h0B2Jyxhy8=;
+        b=gRBbPx5PPyryQdRnqf8022gycSIjU4KvdG0CVJHAnM7hRA7hBcP0jSckgDEEJ3C8Y+
+         1ZRXsv81w55KwtEH2Z3V3jN4U2nHFzoBSdrfzxPFCC4Ge2KZ0/UHhmhFnFZdjnZ1TFgT
+         7OyVmpRE3L24Xq7h7BMOD3+wSoruWkyj82WinWiI+pDHw+lFMj16b/osVfbI61ONlfVM
+         inadJ5ZUbrnvrJgzGkpyrjg2XXOXcYxzhOkwdhy8Qidx/Td4WFeAbdtooUGJBVDXXM8W
+         NDOx6xNY9lTUxDu7AVogE6uhuz9WRDDS0XwkPo9UKJrD2l9PLCX2RG5GN8v4jUuYuRY5
+         worA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1HigWYTBiSl2IsbjPMKlGm9KnKmiBaszJlwRkM/iKmBgt3ptokDCpnX+85b4K0l1O774=@vger.kernel.org, AJvYcCV9BP6HuAt8ToBI2+b8ENl5McLD0OhSA9mGdIhQQOGX29lu8y7FKmEQE8s4RWlB28QOzpUE6Aqv@vger.kernel.org, AJvYcCVrFMH4bMmoJ2CdFEx32xWNz4Paqktpk1OwB4CxsaWB4g5Dyg27MINW3QgPczaiJjCu4sUVB9tj64+CTSX5pQLQ@vger.kernel.org, AJvYcCX/+/IU54gc+EPU61Ljd9NzgSkN6Du9SmlBgP68BWbURITPvSWmAPgDSjG6kJ4MniUnq/jHeB2dqtKUdXd3NQkkVtLM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr5A0I3gS5xEAGV6GAUi1t3Em3FkNbkwuHrjLCVMDIxd6gtWot
+	xH/8I/kqPCBy93XFex5+92mJ6UR9qy28p2YDw4h8Tgjp3Q+tp7uo
+X-Gm-Gg: ASbGncvFIxs/k6CiZddY2f75cuL/0oLnSjUGYYUxq0ecypkpoOmzuPz8oEJiqXmNeaT
+	8BIgWFW6qd/GFFSgCqPeFU6VPZJiuabEaNX2/GgMbYf6uOE/8tcL3HL5go20blZwXpFmVEUEfrP
+	aMcU398Bkkx2ESsGv41xpnzy1DbzcukvnwbPS6UFNY5jnosVYa8d/cdFW9GLzF21MRLKlTXV0Ju
+	1VcDIFgPZ4TZL3tpi0Zrr9+qIPcF+GydA+sAEB+Ey7fVHzIjM+7SD7/8xwDn5CDcXndWZHgSenQ
+	RPP+DPFiucsIlWfX7CT2JJGWie00/nK1wpppDuYv6fI=
+X-Google-Smtp-Source: AGHT+IGcovqBau2DivQ0yh8b8PJpIgtx+uIrmZAQJE5XOKpzVaC3xkNekpOyApo9s2Jjcrh6mQst/g==
+X-Received: by 2002:a05:6a00:1742:b0:736:5822:74b4 with SMTP id d2e1a72fcca58-73fd8f4e0c7mr8710527b3a.21.1745683241340;
+        Sat, 26 Apr 2025 09:00:41 -0700 (PDT)
+Received: from ubuntu2404.. ([122.231.145.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25941cc1sm5174760b3a.60.2025.04.26.09.00.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Apr 2025 09:00:40 -0700 (PDT)
+From: KaFai Wan <mannkafai@gmail.com>
+To: song@kernel.org,
+	jolsa@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	mattbobrowski@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	mykolal@fb.com,
+	shuah@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	leon.hwang@linux.dev,
+	mannkafai@gmail.com
+Subject: [PATCH bpf-next 0/4] bpf: Allow get_func_[arg|arg_cnt] helpers in raw tracepoint programs
+Date: Sun, 27 Apr 2025 00:00:23 +0800
+Message-ID: <20250426160027.177173-1-mannkafai@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422184913.20155-1-jonas.gorski@gmail.com>
- <cf0d5622-9b35-4a33-8680-2501d61f3cdf@redhat.com> <CAOiHx=mkuvuJOBFjmDRMAeSFByW=AZ=RTTOG6poEu53XGkWHbw@mail.gmail.com>
- <CAOiHx=m6Dqo4r9eaSSHDy5Zo8RxBY4DpE-qNeZXTjQRDAZMmaA@mail.gmail.com> <20250425075149.esoyz3upzxlnbygw@skbuf>
-In-Reply-To: <20250425075149.esoyz3upzxlnbygw@skbuf>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sat, 26 Apr 2025 17:48:26 +0200
-X-Gm-Features: ATxdqUGQmznP4hBMLQWmQXNnfaB1hJGHCxLwVyLrfmPsgeb0mkyIx7gwQ7tt0vw
-Message-ID: <CAOiHx=keOAWqF4Atzqx4VZW+xAccO=WtWCOoVoEPR9iFrDf_zw@mail.gmail.com>
-Subject: Re: [PATCH net] net: dsa: fix VLAN 0 filter imbalance when toggling filtering
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 25, 2025 at 9:51=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Fri, Apr 25, 2025 at 09:30:17AM +0200, Jonas Gorski wrote:
-> > After looking into it a bit more, netdev_update_features() does not
-> > relay any success or failure, so there is no way for DSA to know if it
-> > succeded or not. And there are places where we temporarily want to
-> > undo all configured vlans, which makes it hard to do via
-> > netdev_update_features().
-> >
-> > Not sure anymore if this is a good way forward, especially if it is
-> > just meant to fix a corner case. @Vladimir, what do you think?
-> >
-> > I'd probably rather go forward with the current fix (+ apply it as
-> > well for the vlan core code), and do the conversion to
-> > netdev_update_features() at later time, since I see potential for
-> > unexpected breakage.
-> >
-> > Best regards,
-> > Jonas
->
-> I see the inconsistency you're trying to fix, but I'm still wondering
-> whether it is the fix that b53 requires, given the fact that it doesn't
-> seem to otherwise depend on 8021q to set up or modify VID 0. I would say
-> I don't yet have a fully developed opinion and I am waiting for you to
-> provide the result of the modified bridge_vlan_aware selftest,
-> specifically drop_untagged().
+hi, 
 
-It does need a lot more fixes on top of that. With this patch applied:
+We can use get_func_[arg|arg_cnt] helpers in fentry/fexit/fmod_ret programs
+currently[1]. But they can't be used in raw_tp/tp_btf programs.
 
-TEST: Reception of 802.1p-tagged traffic                            [ OK ]
-TEST: Dropping of untagged and 802.1p-tagged traffic with no PVID   [FAIL]
-        802.1p-tagged reception succeeded, but should have failed
+Adding support to use get_func_[arg|arg_cnt] helpers in raw_tp/tp_btf
+programs.
+Adding BPF_PROG_TEST_RUN for tp_btf.
+Add selftests to check them.
 
-The latter is no surprise, since b53 does not handle non filtering
-bridges correctly, or toggling filtering at runtime.
+Thanks,
+KaFai
 
-I fixed most issues I found in b53 and it now succeeds in WIP code I
-have (and most other tests from there).
+[1] https://lore.kernel.org/bpf/20211208193245.172141-1-jolsa@kernel.org/
+---
+KaFai Wan (4):
+  bpf: Allow get_func_[arg|arg_cnt] helpers in raw tracepoint programs
+  bpf: Enable BPF_PROG_TEST_RUN for tp_btf
+  selftests/bpf: Add raw_tp_test_run for tp_btf
+  selftests/bpf: Add tests for get_func_[arg|arg_cnt] helpers in raw
+    tracepoint programs
 
-One thing I struggled a bit is that the second test tests four
-different scenarios, but only has one generic failure message, so a
-failure does not tell which of the four setups failed.
+ kernel/trace/bpf_trace.c                      | 17 +++++--
+ net/bpf/test_run.c                            | 16 +++----
+ .../bpf/prog_tests/raw_tp_get_func_args.c     | 48 +++++++++++++++++++
+ .../bpf/prog_tests/raw_tp_test_run.c          | 18 ++++++-
+ .../bpf/progs/test_raw_tp_get_func_args.c     | 47 ++++++++++++++++++
+ .../bpf/progs/test_raw_tp_test_run.c          | 16 +++++--
+ 6 files changed, 146 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/raw_tp_get_func_args.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_raw_tp_get_func_args.c
 
-The issues I fixed so far locally:
+-- 
+2.43.0
 
-1. b53 programs the vlan table based on bridge vlans regardless if
-filtering is on or not
-2. b53 allows vlan 0 to be modified from
-dsa_switch_ops::port_vlan_{add,remove} for bridged ports
-3. b53 adds vlan 0 to a port when it leaves a bridge, but does not
-remove it on join
-4. b53 does not handle switching a vlan from pvid to non-pvid
-5. stp (and other reserved multicast) requires a PVID vlan.
-
-This makes especially non-filtering bridges not work as expected, or
-the switch in any way after adding and then removing a filtering
-bridge.
-
-Best regards,
-Jonas
 
