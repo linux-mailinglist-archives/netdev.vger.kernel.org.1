@@ -1,219 +1,162 @@
-Return-Path: <netdev+bounces-186253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FC5A9DBC5
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 17:15:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C97A9DBFA
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 17:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480F21BA2744
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 15:15:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0B271892E22
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 15:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1F9191493;
-	Sat, 26 Apr 2025 15:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F7225179C;
+	Sat, 26 Apr 2025 15:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3vlyA/X"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="muZMyENy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CA4A31;
-	Sat, 26 Apr 2025 15:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAC919CC0A;
+	Sat, 26 Apr 2025 15:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745680538; cv=none; b=ZDuWKBNFNMAuGttWeIvk11VopBgJF9t4vvn2CJcAfHNdg/U0ImYOCDvwod5gFQ5diLPizo7OQIVhXkn0J2D36v3HrbpgRzp6ijj7QDJyD68FZ1Kw6tOxgW4oG2oGtUiEIsHZCqlE5vbIpsxkA5/kM2MhYVsSazOrhtMfgvqyfW8=
+	t=1745682776; cv=none; b=DIpVi9y4BF4+VzIJO4SSDabNJlSM1TfxOeI6i4Q1GpPi5Ml+Kayx+J2V0nWOdXj/gxdYbV40pnb4aOX2s8erGpCwNEkomox2hHogR8wOKgMCKMO9o4opeL5o4sfNhRWpuSqu5BS/uyI8Pw68hKnsCQJqlrU32KNtUDQyxMev5B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745680538; c=relaxed/simple;
-	bh=1X7hzm4K83uSdhmHjqtjE/ay1lY32gCYd5tZNihSHxs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=q8geAyazMB1wfy8rIaGxQ5LlkyKhPhlJ43i45NvImKXbQH2nKAQuzZrPYMUWrkZxJZ44AdaKwnYhogQq4AaWiijzfALO1MO8B8DQ36WXmm3RTrEcuMSp9XymWIDW88ONNGuPn5UFMTccoMXgWu0Kf6DlG2iZwHbmocgE6rXTPX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3vlyA/X; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6f2c45ecaffso35921986d6.2;
-        Sat, 26 Apr 2025 08:15:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745680535; x=1746285335; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Og1iE/90Bmt2hCkw8qaULnn0aSlkQYRPJno2tCvI7ZE=;
-        b=b3vlyA/XINjmGxxPJ4bfwfNIWlZWULdT/6vdxzVqO+LiKjR+uTDoBiSYZ5x2e80P/j
-         LSuKxOnlDSGCVFN+/8xc6E6ymUI42DUU4DlvhU5gVaBGrO/BmS+sq+Lz+iSyAIuqjeG4
-         wLazJt6aNq50OYhEdGUzwmAi2ejOxyA2Zia7fjTYkuYNk6Q6+A7sXxVLV5C9+0KblXlV
-         DavCnGRrUn0QhVIA9jOM5/h5J6DQfmLU1Pav9VkOuK6vr0Zc31koW4aFwFf9i5Pyulnv
-         JnQbTfnNPZkkwrSNSWaDWIfh7q5IX5q/3hfMDJKP+RLUmVDzz6HqdnNzR6diGAU8Fnwy
-         hyBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745680535; x=1746285335;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Og1iE/90Bmt2hCkw8qaULnn0aSlkQYRPJno2tCvI7ZE=;
-        b=oSpOy881+Knw03iNYNDhj6SxEFISBu6c2NSCext16R+YpRryEr7F0Z4wH2A4VOlqaN
-         uPihSJUn7VOXUPdsEWW1QzMQ3gcr49H/SMG3O3V4HpRu7I0ftvRvDNy8ZjafeAS1VLS5
-         g0BG2QooAw8Br0H3I6sOgPX42dC+BLt9sogZo3+AeB6dGZ136IybJtz7Ne0ZflQzpSK8
-         pXEXD3ztxI1VzztScZEV2cysil1EyRVlUDq0KQ9DPSid1FFcGGzJ2vBKrMxnBpWWysNH
-         m2zXRwAkyGmqRSqkX+EqmKu8PGp5rY2Vby+CZUrv5gEcZFQ133n6+a9p7V4vR9hWqER6
-         twGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVsTtrhUholeEu5J/v8TpPuwH3Jdxy1Z5u6YnGVLonnD/z4eBCEi6EyX//JGWgDXqeiyKtronwPQ8m1hCG97rA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSKO2FSWB4mLEFVOx1dm632xGZn38fMpzdu8ZaQeU0DPsWGdU2
-	8DbLrIOyMuSaSnAj4p+Gjpc8vJZ4dGLc6Pjvx8jE7DGqMWH6pwRm
-X-Gm-Gg: ASbGncsft4cYq3prF1Wh/UirHjK5DHfCdzV78KknpbehXlH30kM7TkZe+q53tc4pzcH
-	f779HEamM6Kk6nFI04N+rtkwQYs1jNbsCMP9ocwjtFByex0pv1k8ANZcdeEhN/twMkHyTDN9baU
-	PCkohewNGZ9EeEl7bN1HB8aagm9541yWqMxVdyZ9Bb0Emrm3LFLLGN7KIjVPGkIgHxjRV0qiCLn
-	Xbyor0wxaNrnaQhprHmLVQTeuaeFvyTuWmQn7GSyX/Ih6Vw+PHp0ghvvpGIM82B8xd1tCSpJTAq
-	sAHPJxOZPlrowre6ikpHCG9MfEA0tDUk9sHVftpAb+jpQlCWolBp6CdfmDMMAhvBXxB1jLtT28H
-	bmGBrIGVb+pbmyvAlYN5R
-X-Google-Smtp-Source: AGHT+IEHzBf1ELtLwhB+iurfe7MRCTefGSOl4RLwBrag1Ax3fG2pNQMv7FU/rK2NslyIWnGHlvsj3A==
-X-Received: by 2002:a05:6214:483:b0:6e6:602f:ef68 with SMTP id 6a1803df08f44-6f4cb9cfc28mr111554176d6.10.1745680535059;
-        Sat, 26 Apr 2025 08:15:35 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f4c09341edsm35525956d6.30.2025.04.26.08.15.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 08:15:34 -0700 (PDT)
-Date: Sat, 26 Apr 2025 11:15:34 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- petrm@nvidia.com, 
- willemb@google.com, 
- sdf@fomichev.me, 
- linux-kselftest@vger.kernel.org
-Message-ID: <680cf896280c4_193a06294a6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250425151757.1652517-1-kuba@kernel.org>
-References: <20250425151757.1652517-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: exit cleanly on SIGTERM /
- timeout
+	s=arc-20240116; t=1745682776; c=relaxed/simple;
+	bh=uINH35vO359kuO4RKCBqhNMqf7rry0dhDnoFY7BQ++0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t63su/rO6MRrs2jFsWNzGn7rBtSkNzXMcOuE/FvDYCF1ytNwOgIDlTPzlukQs3QCj/arUehaRyKCoqTokUiG/h2rqlR7CmUw6viG3gFDuDy3DSRBJoiddMdTxDhhvEPYVQa7WpDCtewFZJQS0bGd6yFca1zmE+2vVywOuH5LG3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=muZMyENy; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=luF1/ZSWAFeNSfH7gBHAFSQcCO8MBfOBlBzZ4kCjuvc=; b=muZMyENyxj8U9rbvrUED25L643
+	YAQNXfz/9PjxlkZ7cjSY0OeE/QvsO+Zg9uzXG6YxNVapqruZjujWkta1Jt/nq/yXX9IFUpoHrAgk+
+	CNeE49k+Xt6Ly923c/AdZcFoqceafh+37/HscczGatb/4648EUFUHnG7nyOQugaszFfk=;
+Received: from p5b206c93.dip0.t-ipconnect.de ([91.32.108.147] helo=Maecks.lan)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1u8hVn-00FfwR-0F;
+	Sat, 26 Apr 2025 17:32:15 +0200
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Willem de Bruijn <willemb@google.com>
+Cc: linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: ipv6: fix UDPv6 GSO segmentation with NAT
+Date: Sat, 26 Apr 2025 17:32:09 +0200
+Message-ID: <20250426153210.14044-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> ksft runner sends 2 SIGTERMs in a row if a test runs out of time.
-> Handle this in a similar way we handle SIGINT - cleanup and stop
-> running further tests.
-> 
-> Because we get 2 signals we need a bit of logic to ignore
-> the subsequent one, they come immediately one after the other
-> (due to commit 9616cb34b08e ("kselftest/runner.sh: Propagate SIGTERM
-> to runner child")).
-> 
-> This change makes sure we run cleanup (scheduled defer()s)
-> and also print a stack trace on SIGTERM, which doesn't happen
-> by default. Tests occasionally hang in NIPA and it's impossible
-> to tell what they are waiting from or doing.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: petrm@nvidia.com
-> CC: willemb@google.com
-> CC: sdf@fomichev.me
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/lib/py/ksft.py | 27 +++++++++++++++++++++-
->  1 file changed, 26 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-> index 3cfad0fd4570..73710634d457 100644
-> --- a/tools/testing/selftests/net/lib/py/ksft.py
-> +++ b/tools/testing/selftests/net/lib/py/ksft.py
-> @@ -3,6 +3,7 @@
->  import builtins
->  import functools
->  import inspect
-> +import signal
->  import sys
->  import time
->  import traceback
-> @@ -26,6 +27,10 @@ KSFT_DISRUPTIVE = True
->      pass
->  
->  
-> +class KsftTerminate(KeyboardInterrupt):
-> +    pass
-> +
-> +
->  def ksft_pr(*objs, **kwargs):
->      print("#", *objs, **kwargs)
->  
-> @@ -193,6 +198,19 @@ KSFT_DISRUPTIVE = True
->      return env
->  
->  
-> +term_cnt = 0
-> +
+If any address or port is changed, update it in all packets and recalculate
+checksum.
 
-A bit ugly to initialize this here. Also, it already is initialized
-below.
+Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ net/ipv4/udp_offload.c | 61 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 1 deletion(-)
 
-> +def _ksft_intr(signum, frame):
-> +    # ksft runner.sh sends 2 SIGTERMs in a row on a timeout
-> +    # if we don't ignore the second one it will stop us from handling cleanup
-> +    global term_cnt
-> +    term_cnt += 1
-> +    if term_cnt == 1:
-> +        raise KsftTerminate()
-> +    else:
-> +        ksft_pr(f"Ignoring SIGTERM (cnt: {term_cnt}), already exiting...")
-> +
-> +
->  def ksft_run(cases=None, globs=None, case_pfx=None, args=()):
->      cases = cases or []
->  
-> @@ -205,6 +223,10 @@ KSFT_DISRUPTIVE = True
->                      cases.append(value)
->                      break
->  
-> +    global term_cnt
-> +    term_cnt = 0
-> +    prev_sigterm = signal.signal(signal.SIGTERM, _ksft_intr)
-> +
->      totals = {"pass": 0, "fail": 0, "skip": 0, "xfail": 0}
->  
->      print("TAP version 13")
-> @@ -229,11 +251,12 @@ KSFT_DISRUPTIVE = True
->              cnt_key = 'xfail'
->          except BaseException as e:
->              stop |= isinstance(e, KeyboardInterrupt)
-> +            stop |= isinstance(e, KsftTerminate)
->              tb = traceback.format_exc()
->              for line in tb.strip().split('\n'):
->                  ksft_pr("Exception|", line)
->              if stop:
-> -                ksft_pr("Stopping tests due to KeyboardInterrupt.")
-> +                ksft_pr(f"Stopping tests due to {type(e).__name__}.")
->              KSFT_RESULT = False
->              cnt_key = 'fail'
->  
-> @@ -248,6 +271,8 @@ KSFT_DISRUPTIVE = True
->          if stop:
->              break
->  
-> +    signal.signal(signal.SIGTERM, prev_sigterm)
-> +
-
-Why is prev_sigterm saved and reassigned as handler here?
-
->      print(
->          f"# Totals: pass:{totals['pass']} fail:{totals['fail']} xfail:{totals['xfail']} xpass:0 skip:{totals['skip']} error:0"
->      )
-> -- 
-> 2.49.0
-> 
-
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 2c0725583be3..9a8142ccbabe 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -247,6 +247,62 @@ static struct sk_buff *__udpv4_gso_segment_list_csum(struct sk_buff *segs)
+ 	return segs;
+ }
+ 
++static void __udpv6_gso_segment_csum(struct sk_buff *seg,
++				     struct in6_addr *oldip,
++				     const struct in6_addr *newip,
++				     __be16 *oldport, __be16 newport)
++{
++	struct udphdr *uh = udp_hdr(seg);
++
++	if (ipv6_addr_equal(oldip, newip) && *oldport == newport)
++		return;
++
++	if (uh->check) {
++		inet_proto_csum_replace16(&uh->check, seg, oldip->s6_addr32,
++					  newip->s6_addr32, true);
++
++		inet_proto_csum_replace2(&uh->check, seg, *oldport, newport,
++					 false);
++		if (!uh->check)
++			uh->check = CSUM_MANGLED_0;
++	}
++
++	*oldip = *newip;
++	*oldport = newport;
++}
++
++static struct sk_buff *__udpv6_gso_segment_list_csum(struct sk_buff *segs)
++{
++	const struct ipv6hdr *iph;
++	const struct udphdr *uh;
++	struct ipv6hdr *iph2;
++	struct sk_buff *seg;
++	struct udphdr *uh2;
++
++	seg = segs;
++	uh = udp_hdr(seg);
++	iph = ipv6_hdr(seg);
++	uh2 = udp_hdr(seg->next);
++	iph2 = ipv6_hdr(seg->next);
++
++	if (!(*(const u32 *)&uh->source ^ *(const u32 *)&uh2->source) &&
++	    ipv6_addr_equal(&iph->saddr, &iph2->saddr) &&
++	    ipv6_addr_equal(&iph->daddr, &iph2->daddr))
++		return segs;
++
++	while ((seg = seg->next)) {
++		uh2 = udp_hdr(seg);
++		iph2 = ipv6_hdr(seg);
++
++		__udpv6_gso_segment_csum(seg, &iph2->saddr, &iph->saddr,
++					 &uh2->source, uh->source);
++		__udpv6_gso_segment_csum(seg, &iph2->daddr, &iph->daddr,
++					 &uh2->dest, uh->dest);
++	}
++
++	return segs;
++}
++
+ static struct sk_buff *__udp_gso_segment_list(struct sk_buff *skb,
+ 					      netdev_features_t features,
+ 					      bool is_ipv6)
+@@ -259,7 +315,10 @@ static struct sk_buff *__udp_gso_segment_list(struct sk_buff *skb,
+ 
+ 	udp_hdr(skb)->len = htons(sizeof(struct udphdr) + mss);
+ 
+-	return is_ipv6 ? skb : __udpv4_gso_segment_list_csum(skb);
++	if (is_ipv6)
++		return __udpv6_gso_segment_list_csum(skb);
++	else
++		return __udpv4_gso_segment_list_csum(skb);
+ }
+ 
+ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+-- 
+2.49.0
 
 
