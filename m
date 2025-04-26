@@ -1,79 +1,162 @@
-Return-Path: <netdev+bounces-186195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 481E4A9D6AE
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 02:30:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B55FA9D6B3
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 02:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BE7A168DCC
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:30:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7AFA9C0994
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3307189902;
-	Sat, 26 Apr 2025 00:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8751DF97D;
+	Sat, 26 Apr 2025 00:32:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPRqPDDW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IROMo4Un"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BE15A79B;
-	Sat, 26 Apr 2025 00:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07D5189902;
+	Sat, 26 Apr 2025 00:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745627450; cv=none; b=r1pz+2JHJpDFlj7G8SM5YYvMWorFxuxvSXd4nxO6zhQ7cMKWEcDsCY+KFiE0XuNFdWNwGbK53fjXwbPtlS7WbSDL9a1bJCTD7aQ+P8mbZr/IUL7uJ7YYfUc8IF40XpjLuOByeDHlD0MKRyzGaIY1yam4Wh9ymhJ2HdPXPqm58Ps=
+	t=1745627572; cv=none; b=bpc85WjCym66dML8/0y/zkrh3Ctu3jc/5aEEot+SnbdW4gMeIq9jRbkKAWa3G/K3nX3nYd88eSWJjuv2BVMVRWB/2kiiMZIX8F4dtEf4p3FREq5qh5rQX7szfGw90wRoDDoHnoJOEaLUHG/5LZ8cBLfpWD3vzibeU3lKvABQHvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745627450; c=relaxed/simple;
-	bh=SryPCpR4EGSjB4aF38Gv+X+JmpIOrr7QDRaMCvge2A8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sdvsf20Inf0h83Jc1mUKB6ANAxkQITwztcNalIg7NJk9+wSSeJX2hnI84Wes1rQajJ9BNw+ynjkJBF79MyyAfxNW7Z0QFVo/eaf1z4g4ycDADqeMP2gdEDCYc4S413/wcpF4e21YLhZxRkdxIjgq6og8yzVduqhseMH0MyCf2YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LPRqPDDW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8DBDC4CEE4;
-	Sat, 26 Apr 2025 00:30:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745627450;
-	bh=SryPCpR4EGSjB4aF38Gv+X+JmpIOrr7QDRaMCvge2A8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LPRqPDDWCj0amvSCM6UmxgZd6W7L2JSNdZgzQOsFzvoSZbHC+G6KN9eHFE9iShY/o
-	 mDjZO3JetIshyq8ZlCNvn/oFaeKl4ru0vtY1x9p6RpCJiDWxTk7AIIINNGI4hlB8MC
-	 zWcuvkMmDQ5cVJBoXH49YbCGlgVdqCJhiiPhxXT3gcOnl/hvOJ1Hc1Gcv3IY9yoXx7
-	 52Eru26pTSgjp4eMrHil3cRQNEl0FGOPg8roP2OjxrBX2pXOxH3bWm/MFhpCMDYl58
-	 VOZuEjtQGYjxd+Y19oBO6/itASm6EqYhm5/1bocqmT/VvUC/ZHoN+y0kyIGyFkPInw
-	 IPLpCH6a6PizQ==
-Date: Fri, 25 Apr 2025 17:30:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net 2/5] dt-bindings: vertexcom-mse102x: Fix IRQ type in
- example
-Message-ID: <20250425173048.36dfa282@kernel.org>
-In-Reply-To: <20250423074553.8585-3-wahrenst@gmx.net>
-References: <20250423074553.8585-1-wahrenst@gmx.net>
-	<20250423074553.8585-3-wahrenst@gmx.net>
+	s=arc-20240116; t=1745627572; c=relaxed/simple;
+	bh=jxFM2/MdYLgqKQn325343jF0av7/eQ9QvB7wBi232P4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=leZPRxd8lYc9E9hhmB/bT+sooqIwVRHIrS3LX5IJPWl8w9moR/Z7XbYPiHSHT0C2aqKsphcjMStBnubwlvC3yv4elxoUCxN5SLAMfWzRpQEU7V+Hemd5Pwp6cZ/SuQna74nqqeagGUG0vjqwh5pl/oMODtdckly4CEdzAtn1q94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IROMo4Un; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso1828425f8f.0;
+        Fri, 25 Apr 2025 17:32:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745627569; x=1746232369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mChKlW8gPH2BaMRaNQEH7MVPD51hIovVMJniZVEmEuU=;
+        b=IROMo4UnEVtVyJyOWlGes0AvVYcI8bhmMh7tL3dJTjip4cf7fN/FlTA8JOBuMGS8Nv
+         kxd+3J2bDLL59/DNQSziFL+zoSQQKpmGYBMYCC6NNZxnjbdQ7vWkHVbER++xr8QDrvYL
+         N84pgvsSSbk3cbFNXNFG46UwNmC/3Vuka4Zi10Lfxb4a1DiSUxWCOZzmb2Z2cHbtbVSK
+         eCGPOuimkL1mhXf98iLs1pMPy5UEkRwgMlGM2oLFozCHKanKHM53+3ICgglTNJHUBngE
+         qBdAr8B7rw/OZXJddHEgST9XTgm0DtfDXTNnwYYHNR9Ush4SeoOvfk57hEP+6F25Z4vI
+         /XYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745627569; x=1746232369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mChKlW8gPH2BaMRaNQEH7MVPD51hIovVMJniZVEmEuU=;
+        b=Y1cDaRiFg1EKCAJ7kxgZgGF6LbfseUfH5qYs+OOqmwat8pxSuAmcaJBrSfBqxJAH4t
+         13rSbO2JVgFhz15bqh6rIuPpFPeotBnVcRm8atSa54JE2zAdleS8pL/99CsUAQu/n5VF
+         xyob4JU5VSdTl12tpShKcMtEu7YzhddqBwu+n1mr1IlnRCBKBHimTSyV48ygta5nC6pP
+         Cl5vh4pwbw3UMAmrQbyNR8UuN7XRsZPFHpm7JHvP0XPUkm0ttAlb/s1Rnt8FMEdaAQas
+         sRFFmKVdE82nZTJydltqKrMTHsu889gWn69XO0+yt53IH90ZIMrV7dWwFEwg37m68M+g
+         GQ0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXH566F++JOdP6VMghAZfx3WEc8VclJ25Wfj8HGtXXG/O0f1CjmzkDXCYLexCu28Jg1ugo=@vger.kernel.org, AJvYcCXxC2/++Lo2AVopG4BiUW9DhK4+muPQ6w7aINo+oZZ/FbJsl3/0Jn1Lqhk3tRSsNfqTl94mGUWK@vger.kernel.org
+X-Gm-Message-State: AOJu0YynIgfSoQAkhkJ/mRs8emqz+rLE+KEaxeTa8LApMUZF8deUnSR7
+	tFggBsAB4frOcm9g3WJvq2YjGbHWr4W/7fkOR+U0rQbNOCeR8+m7qm1vB1ukGy4W64g1kRbUKg2
+	425uzaIN8l63gyz8iiIb2VjdPQFQ=
+X-Gm-Gg: ASbGncvhaho0izPtYEHWrSaudAFV6D1faBP7qBwy80YeEELjzUyairnNlnOKIDM6Q3B
+	qZHtvY0vBZJsTqHGlImQ+4ck/M9aTcPn7wU3PtZ4k9sKSQ+H+eV5C/FWPe71UfN1b+ag66MrvcP
+	Z4xAZ2Zoqs9NGfXDx+sX6BIah1bQlhUyMxpt15kMDFb/+r/ogQ
+X-Google-Smtp-Source: AGHT+IFVMzGpnK3lEhfZ0UfTv0+bsPojvQakKf3hxfZxdtXJSRWyvPF9LEo5PskUoqv/mBNTYxBgLXO03TI+mmiqmDQ=
+X-Received: by 2002:a05:6000:118a:b0:391:2b11:657 with SMTP id
+ ffacd0b85a97d-3a07ab9bd84mr637240f8f.38.1745627568859; Fri, 25 Apr 2025
+ 17:32:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250424165525.154403-1-iii@linux.ibm.com> <174551961000.3446286.10420854203925676664.git-patchwork-notify@kernel.org>
+ <CAADnVQL2YzG1TX4UkTOwhfeExCPV5Sj3dd-2c8Wn98PMsUQWCA@mail.gmail.com> <20250425-artichoke-dove-of-reward-6e3ca2@lemur>
+In-Reply-To: <20250425-artichoke-dove-of-reward-6e3ca2@lemur>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 25 Apr 2025 17:32:37 -0700
+X-Gm-Features: ATxdqUFCMFWDjyytxkh42zUHYgRBEDi-WKI9CJ-Qy0vAnncpQsTlcm1zfKI5flg
+Message-ID: <CAADnVQ++W2vQTZgzQk4Ruj7E68DcA4WS=q=GV-dF4kTvcJd83g@mail.gmail.com>
+Subject: Re: [PATCH 0/3] selftests/bpf: Fix a few issues in arena_spin_lock
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 23 Apr 2025 09:45:50 +0200 Stefan Wahren wrote:
-> According to the MSE102x documentation the trigger type is a
-> high level.
-> 
-> Fixes: 2717566f6661 ("dt-bindings: net: add Vertexcom MSE102x support")
-> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+On Fri, Apr 25, 2025 at 11:58=E2=80=AFAM Konstantin Ryabitsev
+<konstantin@linuxfoundation.org> wrote:
+>
+> On Thu, Apr 24, 2025 at 11:41:16AM -0700, Alexei Starovoitov wrote:
+> > > On Thu, 24 Apr 2025 18:41:24 +0200 you wrote:
+> > > > Hi,
+> > > >
+> > > > I tried running the arena_spin_lock test on s390x and ran into the
+> > > > following issues:
+> > > >
+> > > > * Changing the header file does not lead to rebuilding the test.
+> > > > * The checked for number of CPUs and the actually required number o=
+f
+> > > >   CPUs are different.
+> > > > * Endianness issue in spinlock definition.
+> > > >
+> > > > [...]
+> > >
+> > > Here is the summary with links:
+> > >   - [1/3] selftests/bpf: Fix arena_spin_lock.c build dependency
+> > >     https://git.kernel.org/netdev/net-next/c/4fe09ff1a54a
+> > >   - [2/3] selftests/bpf: Fix arena_spin_lock on systems with less tha=
+n 16 CPUs
+> > >     (no matching commit)
+> > >   - [3/3] selftests/bpf: Fix endianness issue in __qspinlock declarat=
+ion
+> > >     (no matching commit)
+> >
+> > Hmm. Looks like pw-bot had too much influence from AI bots
+> > and started hallucinating itself :)
+>
+> Looks like it's a mix of bad assumptions and the usual difficulty of
+> recognizing fast-forward merges that came in through a different tree.
+>
+> If you look at the commit mentioned above, it has:
+>
+> | Note that the first patch in this series is a leftover from an
+> | earlier patchset that was abandoned:
+> | Link: https://lore.kernel.org/netdev/20250129004337.36898-2-shannon.nel=
+son@amd.com/
+>
+> This confuses the bot into thinking that the linked message is the source=
+ of
+> the patch (which is why we started using patch.msgid.link to disambiguate
+> links aimed at cross-referencing and links aimed at indicating commit
+> provenance -- but we aren't relying on this disambiguation in the bot its=
+elf
+> yet).
 
-I noticed after sending previous reply that the patchset already 
-got marked as changes requested. Let me use that as an excuse to
-ask to drop this patch (and resend to net-next). Happy to oblige
-if DT maintainers disagree but I'm not sure we should be treating
-changes to an example as a fix.
+Thanks for investigating. The above part is clear,
+but I still don't understand what was so special about Ilya's
+patch that only his first patch in the series became a victim.
+msgid-s are completely different.
+
+> The other replies are the usual mess when fast-forward tree updates confu=
+se
+> things. It's a long-standing hard bug to fix.
+>
+> I am going to re-enable the bot for now -- in general it's not any more w=
+rong
+> than usual.
+
+Makes sense. Better to have it flaky than none at all.
+
+> I'm scheduling some time next week to try to tackle the
+> fast-forwards problem.
+
+Thanks. That would be great.
 
