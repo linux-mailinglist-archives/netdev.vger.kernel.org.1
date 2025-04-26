@@ -1,110 +1,78 @@
-Return-Path: <netdev+bounces-186200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8050A9D703
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:25:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E8A9D709
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E30F4C76E5
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:25:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C3E3AF5B3
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F42019CC0A;
-	Sat, 26 Apr 2025 01:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2C918DB2F;
+	Sat, 26 Apr 2025 01:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RJjIXDWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6B6191F95;
-	Sat, 26 Apr 2025 01:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666CB1898FB
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 01:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745630751; cv=none; b=apq/u8iD2uN1YHxnMimUXF+KMF9AokVgG2QaInHH1X/fdBKb8hvxpNd5XQF5yOPtmtj+NWC0QkEdgkf5CaWlBAdK08Bk+rvx8phXchyFVyltDwrgYrlQ/JoN2MXrFbBRuIpTWD0aIkt3wbwSFBty9L2nhP4njc6jimIKmFag3l0=
+	t=1745631374; cv=none; b=MxWABGziROju6J22t4faLd/9OWpVJUjSwfUEy5Vr8lPsEwbc2nfGbf+zqZ2bqXeP1O/3Qc3JoEoHAjHzC/XLXa2pI7agA4veh4ihQyMGrmNe45PQqCqcQZAcPn4SMIbIhMvKz1eJZuFTuUu4+qhAfI2vtveAVk6Y9HNv7MFdWQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745630751; c=relaxed/simple;
-	bh=Uh7YOaFa/GauQw+D1Y5cRdQi24/8GwgNBQ94AKUSAVY=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZOt3nmilsnKmzv4WmUh2AFCFEKLz71nICkzLnGRSk/e7mnLO+Ze5AyDKctbQH6NBuITyM9fZjb9V7EJC//ww+n+AU1g4umZ3xdYa6PQIUxalomohR5E6bLopymvCOdP333DtOltdWEcVdQnMdcg6o8ktkmFYA2/kBiGNUkJbOHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1u8UCc-000000007gz-3myq;
-	Sat, 26 Apr 2025 01:25:30 +0000
-Date: Sat, 26 Apr 2025 02:25:23 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Chad Monroe <chad@monroe.io>, Felix Fietkau <nbd@nbd.name>,
-	Bc-Bocun Chen <bc-bocun.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net] net: ethernet: mtk_eth_soc: fix SER panic with 4GB+ RAM
-Message-ID: <995df78417d6f117062d1d7ef63228426b97a26e.1745630570.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1745631374; c=relaxed/simple;
+	bh=8QcIsCC/+Ogfw6fmDp0vZf/u08Zx2acifAX6KRQTSjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YZUzRoFWRfHousoN5w/zWjhoLegA3a1A13etYlXPzJgNC1EWOMo08EhL2gWqbcb8EK2EO6TzqwnTNjmFt4slcpWcckDL8aWsJEgBSxEUeLKpAmTrpvArcs48OQeQFy9H3AwknIxRe6mMan2Ljbx5LZ6ND99oJqrUtOeiIs2x5PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJjIXDWe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D78AC4CEEA;
+	Sat, 26 Apr 2025 01:36:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745631373;
+	bh=8QcIsCC/+Ogfw6fmDp0vZf/u08Zx2acifAX6KRQTSjQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RJjIXDWe2keVIcXyDxkmsOvGdYM4t5amMsqhfNJWzjN7csPUBL5RNMWC5Lri+6Ns6
+	 JKWhttSZ8rJ9KTDauZ/BR1tmab04HQruoepoq2MGyFEp8uRWLCdGsxGwn+9T4MKgN6
+	 laXcOp0Xco/J12XuitneBkj2Omk2Rgty1kyArkUKfQVaBfAGnoFEthzfwjy3CsyGQr
+	 aAlvwNTh/aLQt69B5CgJfapcVtT/2L037Bl+97Um4wek5Vz3OEv9F7foNAr+aRvqcU
+	 mbI+zi9u7IESH2ivNhP0c58rboHQ0oyxvJqxK1QhQkWV08BoAcanGAOnCtTHLfkArH
+	 Ts4utsoN3vYGQ==
+Date: Fri, 25 Apr 2025 18:36:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: "David S . Miller " <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
+ mkarsten@uwaterloo.ca, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/4] net: define an enum for the napi
+ threaded state
+Message-ID: <20250425183612.19068f23@kernel.org>
+In-Reply-To: <20250424200222.2602990-3-skhawaja@google.com>
+References: <20250424200222.2602990-1-skhawaja@google.com>
+	<20250424200222.2602990-3-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Chad Monroe <chad@monroe.io>
+On Thu, 24 Apr 2025 20:02:20 +0000 Samiullah Khawaja wrote:
+> -			dev_set_threaded(ndev, true);
+> +			dev_set_threaded(ndev, NETDEV_NAPI_THREADED_ENABLE);
 
-If the mtk_poll_rx() function detects the MTK_RESETTING flag, it will
-jump to release_desc and refill the high word of the SDP on the 4GB RFB.
-Subsequently, mtk_rx_clean will process an incorrect SDP, leading to a
-panic.
+The drivers having to specify the type of threading is too much.
+The drivers are just indicating to the core that they are too
+IRQ-constrained to reasonably handle load..
 
-Add patch from Mediatek SDK to resolve this.
-
-Fixes: 2d75891ebc09 ("net: ethernet: mtk_eth_soc: support 36-bit DMA addressing on MT7988")
-Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/11857ce2f90bf065b5e53211d182622d999a4542
-Signed-off-by: Chad Monroe <chad@monroe.io>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 47807b202310..7bac5ccfb79c 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2252,14 +2252,17 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 		ring->data[idx] = new_data;
- 		rxd->rxd1 = (unsigned int)dma_addr;
- release_desc:
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
-+			if (unlikely(dma_addr == DMA_MAPPING_ERROR))
-+				addr64 = FIELD_GET(RX_DMA_ADDR64_MASK, rxd->rxd2);
-+			else
-+				addr64 = RX_DMA_PREP_ADDR64(dma_addr);
-+		}
-+
- 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
- 			rxd->rxd2 = RX_DMA_LSO;
- 		else
--			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size);
--
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA) &&
--		    likely(dma_addr != DMA_MAPPING_ERROR))
--			rxd->rxd2 |= RX_DMA_PREP_ADDR64(dma_addr);
-+			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size) | addr64;
- 
- 		ring->calc_idx = idx;
- 		done++;
--- 
-2.49.0
-
+Please add a wrapper, something like dev_set_threaded_hint(netdev).
+All the drivers pass true now, the second argument is already
+pointless. For extra points you can export just the
+dev_set_threaded_hint and make dev_set_threaded() be a core-only function.
 
