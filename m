@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-186224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB27DA9D81B
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 08:07:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F562A9D81D
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 08:08:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F23AD1BC4464
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 06:07:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC2141BC528A
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 06:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D6B17A317;
-	Sat, 26 Apr 2025 06:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49BC1917F1;
+	Sat, 26 Apr 2025 06:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcQqzjUN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UIlbAqfG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8451C86334;
-	Sat, 26 Apr 2025 06:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7202C481B6;
+	Sat, 26 Apr 2025 06:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745647638; cv=none; b=Va26GNf5LF3/C97AW3xbhD1RL69NkSi9hFzG9ttLb/j08BXmR7vasurc/DO8/9F7CdgOrN1npmEuC728uJF6xgPAT02+Z+WLxt9eXoZaNq15XNfZSjhJgNWGxdBLnjylvFeefZp6lG7f3jEzJA96Asq3gL7JpkRMSEaPvA1mOc0=
+	t=1745647682; cv=none; b=iGCswgw/eYhkV/ERVbMvqjMlM2XAZOn2OSrn2R0GwuBidJZSPkpJuHUa3uyKCzFofPapcp4XCaZv0OBxstvSsKfjU1ov4SShJ8OeihgGeLWEjCV9zik6sBgajRQTA5w+29JofN9MbBWGXWKrl1dcFPN93M7LdpBRro6Exx35r6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745647638; c=relaxed/simple;
-	bh=QwtSF+WjGaPQF7JvSMBlPqQ0wIJ63A/hKVWs7QDW9SA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HfBn1Jw5P1/k+jnXSWcHZngnzqmA+m5PEEd9SNk8Vy4G1HPtMh2wJoxRl+NaSmhEFaAeNvZsUJNhYXrrX2vqzf8uBODK8J2c7W6KiMKp6VHn+CqUhXVKJG4Z7rBVMvQ3ulYEcYFe1j5haVeq/Lp/bXIGQxvjmtFmwQXBuOHV7hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcQqzjUN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1318C4CEE2;
-	Sat, 26 Apr 2025 06:07:17 +0000 (UTC)
+	s=arc-20240116; t=1745647682; c=relaxed/simple;
+	bh=os9zCEaCkCpN9yXXWUgkC0GWbB1/AbE3Rvj9+ZNhXGI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BlbDlW2gUgIfzmwfz0iiTXqhPNes7EwOvD+Dwb693IGCPZnuo+BZnIRCktNI4LtELCVgW15i6NI9aBy37qZQra9B0PykZAmaI3aB/kq3olg4td1/KjM4FWM2X9K2h0u3jgBG1ltGgRdB9d51GnA7mGfEIlAMTC2Y2uBm7RxE34g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UIlbAqfG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CE53C4CEE2;
+	Sat, 26 Apr 2025 06:08:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745647637;
-	bh=QwtSF+WjGaPQF7JvSMBlPqQ0wIJ63A/hKVWs7QDW9SA=;
+	s=k20201202; t=1745647682;
+	bh=os9zCEaCkCpN9yXXWUgkC0GWbB1/AbE3Rvj9+ZNhXGI=;
 	h=From:To:Cc:Subject:Date:From;
-	b=rcQqzjUN9Xn2T41c/JoWACAV8n9xQIRWN44/6CG3WeWYyPoGCCjTGt2+ooAlDnbkp
-	 IP1IJRXdCmKCd4bu95wn8W8V6NzUcwdAYqvGCPf0Zfr7HKTei0Yb5/fZWLcUKm3ib2
-	 Q35IXUxF22yDvYOSv11eFdmjUk4yFtlbk/nbHTbaJNng58UlBCjuFUF5IXIOpY8X5n
-	 YjtaFSQcQgi1Mtf8MgHaGSoc0f8jmFW8cvqsbpAtQWTk0ScM+q3FtwOf6nOBwL6U6y
-	 HS5/eB68zOzsf+eoqUq+RpY4YWXCxxt0JVKo5iArSvUAA1i+dBRN2hg6XVcytLNQCj
-	 GgUYsQGGLH5ww==
+	b=UIlbAqfG2NuOCQ/4keS3DbgJERxOBXmliKxntsJBaPF/5eNTsofy3oW5+7NXJjb+4
+	 0laX6LRwC3uecmAy8ciMSQK31GKJYoK+pAwyEwHXx3TlS1sx/trJiQGiyi4Of2n6jX
+	 KjvGAWz7LdKQ32Y2jHAwyRa4dSvYQBuLqnL4d6z3woAOSlHPMD64c1Kc9fyH4xc8u3
+	 B6wBxyR89o8gGyYCdi/VUp1TdQ61s0GJqZWqO1IjE3WMY50Y0ZsQb2ZnldTJUL4Xzo
+	 FqXv/uGXKJa3IWQBS1y4JIXP8GfsdurNi/zuVq+G5vugSTIT0dvDvxAf0DDut9UVBi
+	 PMjzcn1jrtZrA==
 From: Kees Cook <kees@kernel.org>
-To: Shannon Nelson <shannon.nelson@amd.com>
+To: Tariq Toukan <tariqt@nvidia.com>
 Cc: Kees Cook <kees@kernel.org>,
-	Brett Creeley <brett.creeley@amd.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH] pds_core: Allocate pdsc_viftype_defaults copy with ARRAY_SIZE()
-Date: Fri, 25 Apr 2025 23:07:13 -0700
-Message-Id: <20250426060712.work.575-kees@kernel.org>
+Subject: [PATCH] net/mlx4_core: Adjust allocation type for buddy->bits
+Date: Fri, 25 Apr 2025 23:07:58 -0700
+Message-Id: <20250426060757.work.865-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,7 +62,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1642; i=kees@kernel.org; h=from:subject:message-id; bh=QwtSF+WjGaPQF7JvSMBlPqQ0wIJ63A/hKVWs7QDW9SA=; b=owGbwMvMwCVmps19z/KJym7G02pJDBk8FYKmzBfOyTj/PKAvwej7YTO7WDLDv4fatwxfzPK3l /YVV6nvKGVhEONikBVTZAmyc49z8XjbHu4+VxFmDisTyBAGLk4BmAjLI4b/pZmiibvv57xUrBW/ L3b1iFdlzZbPzKz2G8plFDSSk92mMPwz3c+w1pff/mRVdTBr1B/LhmvnMh9/n/alc8oElXXqPBc 4AQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1623; i=kees@kernel.org; h=from:subject:message-id; bh=os9zCEaCkCpN9yXXWUgkC0GWbB1/AbE3Rvj9+ZNhXGI=; b=owGbwMvMwCVmps19z/KJym7G02pJDBk8FXadu/kd/v0yzbedkP1WVK3iclrQxfZHV4xVjhk21 z9fO21PRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwERsVjAybO//pap2s1fl05Ej cucnKXAavS95XxkztYDB6a7sJY8FbQz/TJyzY//L9Cp3buKUniWosm7JpmMOV5cpPfE/pCa9R7q NGwA=
 X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
@@ -71,39 +71,37 @@ we need to make sure that the returned type from the allocation matches
 the type of the variable being assigned. (Before, the allocator would
 always return "void *", which can be implicitly cast to any pointer type.)
 
-This is allocating a copy of pdsc_viftype_defaults, which is an array of
-struct pdsc_viftype. To correctly return "struct pdsc_viftype *" in the
-future, adjust the allocation to allocating ARRAY_SIZE-many entries. The
-resulting allocation size is the same.
+The assigned type is "unsigned long **", but the returned type will be
+"long **". These are the same size allocation (pointer size) but the
+types do not match. Adjust the allocation type to match the assignment.
 
 Signed-off-by: Kees Cook <kees@kernel.org>
 ---
-Cc: Shannon Nelson <shannon.nelson@amd.com>
-Cc: Brett Creeley <brett.creeley@amd.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: <netdev@vger.kernel.org>
+Cc: <linux-rdma@vger.kernel.org>
 ---
- drivers/net/ethernet/amd/pds_core/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx4/mr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index 1eb0d92786f7..451b005d48d0 100644
---- a/drivers/net/ethernet/amd/pds_core/core.c
-+++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -415,7 +415,8 @@ static int pdsc_viftypes_init(struct pdsc *pdsc)
- {
- 	enum pds_core_vif_types vt;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/mr.c b/drivers/net/ethernet/mellanox/mlx4/mr.c
+index d7444782bfdd..698a5d1f0d7e 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/mr.c
++++ b/drivers/net/ethernet/mellanox/mlx4/mr.c
+@@ -106,7 +106,7 @@ static int mlx4_buddy_init(struct mlx4_buddy *buddy, int max_order)
+ 	buddy->max_order = max_order;
+ 	spin_lock_init(&buddy->lock);
  
--	pdsc->viftype_status = kzalloc(sizeof(pdsc_viftype_defaults),
-+	pdsc->viftype_status = kcalloc(ARRAY_SIZE(pdsc_viftype_defaults),
-+				       sizeof(*pdsc->viftype_status),
- 				       GFP_KERNEL);
- 	if (!pdsc->viftype_status)
- 		return -ENOMEM;
+-	buddy->bits = kcalloc(buddy->max_order + 1, sizeof(long *),
++	buddy->bits = kcalloc(buddy->max_order + 1, sizeof(*buddy->bits),
+ 			      GFP_KERNEL);
+ 	buddy->num_free = kcalloc(buddy->max_order + 1, sizeof(*buddy->num_free),
+ 				  GFP_KERNEL);
 -- 
 2.34.1
 
