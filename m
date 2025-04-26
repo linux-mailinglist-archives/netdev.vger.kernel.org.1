@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-186277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AD62A9DCF8
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 21:55:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6D2A9DDB5
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 00:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 554A3465A89
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 19:55:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCE5A3B5797
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 22:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024721F1908;
-	Sat, 26 Apr 2025 19:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5868619DF8B;
+	Sat, 26 Apr 2025 22:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="E8MfXg+3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMZtMQfn"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989B11EB9EB
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 19:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06971F19A
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 22:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745697333; cv=none; b=fmkbBWGmF0nsdpvb3Btrk+tn2mbavqrrdzEptfUhtjN4yhvX3Dcx5KCbJTaZPNP1Tr8x1M5todpBnk0AZufvPi6ABfiIMJacxK2c2RyEDCpbxmb8sa4hTMlRnchSOqph/vTEWQeTEhRggIez9T/Gd8Q8x74CQsOmMwsbKk54MjU=
+	t=1745708189; cv=none; b=s9Pp6kuyEM48bdliTQMACAPTTcq05gfvWWjrXoce3ApvJMV3a/SFIi9049UjFGT5d1qb7DyebS2GWVSlIuMUP+lLEDp2L7lclvMc9nVPC3+AYvqtFgMhR/EUgT2gs6sKxtvbju8Puuf3bSQaUTlVtRJYHsjnsy0FYCRK9gBKeTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745697333; c=relaxed/simple;
-	bh=zOxdGQ050cSN2HRN5uDln592bBavgK2vLhm0TLQJdlI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fg7GjF1uFLRAtcFMd+YApLCwAuOXuUkHRqFNgBsu+nJuY2wOLUG2KLTAIME2mDtOpy5KSlLDSbvUejaaNL74+svX7PJVmnzXL6EN4sCArjzhb5zFlZ/40/A/jkziWGQLvM3pjZig52okv76PQUY1K9ymQmez4tWwi/T0GQeZwjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=E8MfXg+3; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso3405746b3a.2
-        for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 12:55:32 -0700 (PDT)
+	s=arc-20240116; t=1745708189; c=relaxed/simple;
+	bh=mVFdUo6QgWVPWp+kXo87zHfMmgGdAiWN1Y70JHdavPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CHB6vy667e+bKErPUyHQUVZjV/yF+fAp/VCsSpY1UeCqkRatoPfdwyFCkX3aCWL69D4p4LVAFBdyjpnoOhpcyVnZikdNXD7UGPBHk/KbmHI864jk/nV82wJZuz6oMLtDvUkJUO12b8m9qiw5J4oC17UFjWksGG3AXNg/yOokf98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMZtMQfn; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-736c277331eso4393263b3a.1
+        for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 15:56:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1745697332; x=1746302132; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WWM6EJJLIlxoxRTqtmcySDyqnCyGfypQjXufSKl0PmY=;
-        b=E8MfXg+3av/nSN8yQiXcV/JmoTX+BED7gaUUGuVxauWZQDNhYJzlott8Or6qrY2Dgy
-         fexCzLooi/UOQcBfpQQ2Mrzd4UXPnRETvm22ZoTnGG1WVClIMo8ARJ3KvW07JDpreYMU
-         wx1l9jy+AgLe6HKR+Z4dPQ0B1MGqTNF7QFz0/zYi9wn8y4L4rbYSqJGCne2AjBfsaDw2
-         9goEvoCAyX5lLNc4NaZ+XVjk5SqXCGEo6+vB1t6cpJTXBq1w8IxhyzADUpTpLgE1Uf18
-         NzdyE8g/lQmprCUq1+YzRuBpekxFBbZYZEupj5JOGQY77lafRaAShNwi6+0gwZVQUj0D
-         J3IA==
+        d=gmail.com; s=20230601; t=1745708187; x=1746312987; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s2D2A7P18pCfuq11w3xmiiCk/imi016eB1p6DBZjJM4=;
+        b=ZMZtMQfnI61Zs7wcRemz2oHqPstAFOlX6Z2xgI9XD7gMVYHSJo+Z4WQOLsi0jZ5Uia
+         a7ZSCc39P3PSi9q+lJDcGhfXGpIbjMzr0DbEtF6xdS0Atwe9EFROYNBrqL0tPYcki7gr
+         aGCc3YIty7vgQXFDl725ncubP4E9ouCZML3BKtZyC+VJSeLd+JGK2e3mO9JDKtkCMrRu
+         C0Epu+95ejnhEpHVLIp51LNL0lyqmdFa2/RxPDDoKFKr5ivsH9qD4+DBpKdNvDE2sYp8
+         exVxRS5uIHG2MoHna3ciUzOYPG53iVAS36k1DZpgQTCPGAVYmcSpUUEBmweoDcP+CQ8f
+         ojbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745697332; x=1746302132;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WWM6EJJLIlxoxRTqtmcySDyqnCyGfypQjXufSKl0PmY=;
-        b=EIplCac2FXDWaW7dhplM08Cw4Av2ZnXhNaV1bP73nu2KLMxwt3DPLOPM+qLKzMdrUz
-         9VLk9xx87n6RPvAJpU3oAykrCNojKgCBfHRnFskU1pYNwCCtuGVO5qE8MX8lyKhUYQgK
-         CH3U3it3QnUjCMOT1rQl3UmFlp4Yf+twXahiNzWx8hxd8yylax+3s+TzkLP2kKiw6DFR
-         a+ZjjNG260KajH1hnvgbUbYNx9pAez5QL32We62aSvzzEIhbCiP9uaT1JUFAe8noK+4t
-         KZkGZL6ygiCGrZBeIOGOlv3DYUbNYKuga5Ev9H8wPiKNC280i3OL1R8spaNvDxnNI6kk
-         l9aQ==
-X-Gm-Message-State: AOJu0Yz84cYIHfeAENChdr5t7j1gjApG4M0aQS3wycD1HwWFbPLbcc06
-	kkjrmC7PiDOAlRAh/w8nCSkZ62332xfcEV1XVypVlenyraVHgx4sFxcVtKfAzcRlCVzPB+bwswy
-	L
-X-Gm-Gg: ASbGncvHgTXrk7TL7Q9UoEGt7+sPcOZggB5Sl9xEQvet3HhU75XQlvVBjFY5HZm43H5
-	oeZaq7DsXiIlwZ1H+uP5Y2lDfHUFTjkb+TGs8Yfd9K82cu7nF1gsJXGABH0qTyJPbPfKiFMmJ4f
-	XytP9TX9or9gfB3a9SweM6fV84qT0v3v8UsvR9glAKR/SpCItYlLLzXKtjEHfcbObzAXd38RB9E
-	OfLOhZo/N127jYvF+r8jKwuk9LgQkAGWRj+61VjnJP9y43jMgGmQXarCEPsMBy9Bvt3igJqzk76
-	ROTzM4rRRIzSlABa65qMJclnMg==
-X-Google-Smtp-Source: AGHT+IHJAnF0Tl0p+01bf0/7XMCxKeW6pc9sFwBfXBaSX9ml9vop9CD8MUiL2VCU+hLogKb6rftdzw==
-X-Received: by 2002:a05:6a00:811:b0:736:5725:59b9 with SMTP id d2e1a72fcca58-73fd6bec08cmr8414195b3a.2.1745697332044;
-        Sat, 26 Apr 2025 12:55:32 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:9::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25a9db7asm5360389b3a.145.2025.04.26.12.55.31
+        d=1e100.net; s=20230601; t=1745708187; x=1746312987;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s2D2A7P18pCfuq11w3xmiiCk/imi016eB1p6DBZjJM4=;
+        b=vCYXbHWOSbsTbllZ/L7TdfWIv/oKfJcS/sOTlHSzXBHqsgRJd/8UKQWKoBP5rTi77k
+         GkKE5Ko+V8ha8j0ZCYY+3xLKET4y8i3tTVBuZmkiB/PxQbhcVtLbPVSRzY07FcHDMnns
+         SRqXBW7grrAyao1Q1jCCYvouoBUJ4M5y5F+c6T2Ww4uIEQmmEtfqgwODAItvUsJozodl
+         pBhNiBKnb/gT0URlZEud1K1uH+z3kW9lOv58wlCqZ6am1yk/rr91JsgzKAj2CHE93m/r
+         5pFuk1aZEf2bUqoO4pyjwFPfCRqy8KWFXJCv/x/Pc8zoacFb6IJAjrkYIHuk8eTSEIOL
+         9MPQ==
+X-Gm-Message-State: AOJu0Yz8Z9nkBGEXhgJ8BAkoKumY69wFTs5v4lYCHG+1y9Wy5Cy5ESLS
+	VPNsEUKAdXTJAfZ1+UeobcZbNSAj3ZdecaqM5tRcNXRXna7NEhjj
+X-Gm-Gg: ASbGncshkc+EW9DqUFykuEdX+0drDtW/pJLFYtcL2RHxbo8QQtKBhIRRNN00lkmNIZV
+	N2nyUQ31f1iNB/kB4wNmPgSff2VI4KcMD9aSyS2/LEQS2mOVxnfoeiIJs9LU4Hc030BxAqan4Et
+	mpXqSt5/S2UOjL8T/TogWrqEqE+p99L6a9S+DoFyID8Qy2mORJGV9hBov/MyzLXNsWZ/JrVjfla
+	492WR9FAJF95hAoacXz4yoWdJS2T3QVhMtmioqFWLMDlXKTgNQhB5YkuRFJUtQm+YK9J7AJXfE+
+	wrO3kB6F7lLtOoVw+UgPIoey0WNrQ7f+QU/ijQ20AstHxs/Nhy86BXNDtw==
+X-Google-Smtp-Source: AGHT+IHL4Rafna41weaT/pzz1VQHQeYfwrFvuJU5nTp49xcS7190axeh3fqJqKCb4vOTPIlWz5cWgg==
+X-Received: by 2002:a05:6a20:3d24:b0:1f3:26ae:7792 with SMTP id adf61e73a8af0-2045b5f6042mr7969800637.18.1745708186951;
+        Sat, 26 Apr 2025 15:56:26 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:c2d7:f552:ec41:7761])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15fa80fbaasm4865209a12.49.2025.04.26.15.56.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 12:55:31 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v1 2/2] io_uring/zcrx: selftests: parse json from ethtool -g
-Date: Sat, 26 Apr 2025 12:55:25 -0700
-Message-ID: <20250426195525.1906774-3-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250426195525.1906774-1-dw@davidwei.uk>
-References: <20250426195525.1906774-1-dw@davidwei.uk>
+        Sat, 26 Apr 2025 15:56:26 -0700 (PDT)
+Date: Sat, 26 Apr 2025 15:56:25 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Will <willsroot@protonmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Savy <savy@syst3mfailure.io>, jhs@mojatatu.com, jiri@resnulli.us
+Subject: Re: [BUG] net/sched: Race Condition and Null Dereference in
+ codel_change, pie_change, fq_pie_change, fq_codel_change, hhf_change
+Message-ID: <aA1kmZ/Hs0a33l5j@pop-os.localdomain>
+References: <UTd8zf-_MMCqMv9R15RSDZybxtCeV9czSvpeaslK7984UCPTX8pbSFVyWhzqiaA6HYFZtHIldd7guvr7_8xVfkk9xSUHnY3e8dSWi7pdVsE=@protonmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <UTd8zf-_MMCqMv9R15RSDZybxtCeV9czSvpeaslK7984UCPTX8pbSFVyWhzqiaA6HYFZtHIldd7guvr7_8xVfkk9xSUHnY3e8dSWi7pdVsE=@protonmail.com>
 
-Parse JSON from ethtool -g instead of parsing text output.
+Hi Will,
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/testing/selftests/drivers/net/hw/iou-zcrx.py | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+On Fri, Apr 25, 2025 at 02:14:07PM +0000, Will wrote:
+> Hi all,
+> 
+> We've encountered and triaged the following race condition that occurs across 5 different qdiscs: codel, pie, fq_pie, fq_codel, and hhf. It came up on a modified version of Syzkaller we're working on for a research project. It works on upstream (02ddfb981de88a2c15621115dd7be2431252c568), the 6.6 LTS branch, and the 6.1 LTS branch and has existed since at least 2016 (and earlier too for some of the other listed qdiscs): https://github.com/torvalds/linux/commit/2ccccf5fb43ff62b2b9.
+> 
+> We will take codel_change as the main example here, as the other vulnerable qdiscs change functions follow the same pattern. When the limit changes, the qdisc attempts to shrink the queue size back under the limit: https://elixir.bootlin.com/linux/v6.15-rc3/source/net/sched/sch_codel.c#L146. However, this is racy against a qdisc's dequeue function. This limit check could pass and the qdisc will attempt to dequeue the head, but the actual qdisc's dequeue function (codel_qdisc_dequeue in this case) could run. This would lead to the dequeued skb being null in the change function when only one packet remains in the queue, so when the function calls qdisc_pkt_len(skb), a null dereference exception would occur.
+> 
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 3962bf002ab6..5b2770cacd39 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -9,10 +9,8 @@ from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
- 
- 
- def _get_current_settings(cfg):
--    output = ethtool(f"-g {cfg.ifname}", host=cfg.remote).stdout
--    rx_ring = re.findall(r'RX:\s+(\d+)', output)
--    hds_thresh = re.findall(r'HDS thresh:\s+(\d+)', output)
--    return (int(rx_ring[1]), int(hds_thresh[1]))
-+    output = ethtool(f"-g {cfg.ifname}", json=True, host=cfg.remote)[0]
-+    return (output['rx'], output['hds-thresh'])
- 
- 
- def _get_combined_channels(cfg):
--- 
-2.47.1
+Thanks for your detailed report, reproducer and patch!
 
+I have two questions here:
+
+1. Why do you say it is racy? We have sch_tree_lock() held when flushing
+the packets in the backlog, it should be sufficient to prevent
+concurrent ->dequeue().
+
+2. I don't see immediately from your report why we could get a NULL from
+__qdisc_dequeue_head(), because unless sch->q.qlen is wrong, we should
+always have packets in the queue until we reach 0 (you specifically used
+0 as the limit here).
+
+The reason why I am asking is that if we had any of them wrong here, we
+would have a biger trouble than just missing a NULL check.
+
+
+Best regards,
+Cong Wang
 
