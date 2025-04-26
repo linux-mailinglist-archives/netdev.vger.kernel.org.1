@@ -1,96 +1,90 @@
-Return-Path: <netdev+bounces-186205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 882E1A9D712
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:50:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BA1A9D715
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7DF21BC7385
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 929C53B3BC6
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417D71F55E0;
-	Sat, 26 Apr 2025 01:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4349C1F7580;
+	Sat, 26 Apr 2025 01:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNuCnzGj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Mum0JnWk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF13199924
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 01:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0C81DED7C
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 01:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745632196; cv=none; b=cQjn7xkeQAd2Jlngvzz37GUcvrAIJcUOZAOo4qqzwWdMjddMpekhNJoIXp9+7ZjDm+x6nRy7hfGnVsE4Vf6iLxzN6vQmatKzvxV6qfa8bBdHu/bZkANd2eKmv8DEsWYFCPthsKfGODXrxKUQfq8ngubNQbRxyUW02reWhb6xAAk=
+	t=1745632429; cv=none; b=B27dXXKguFXdyTMv7Nz5Fh+zHnBTH+jEAjolcPTakm+UG2+LGf5A68I1giIR6nfPsFlQHObeHX9QCXH26xzhLvAooDhGAe4dy+n4855kXNX7ABW+ze63kuJLQ0lQfZ4oEuBCqoIiQHvoAk0DWEw/JUYv0KSvacPWWKt6iCOg44g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745632196; c=relaxed/simple;
-	bh=cnBo5tXu8U/HH5T1ctrvE9cw1YYsO1gD5TLvmUPluvs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AJ9hz8KCnFQNnFftUIZIY0Vtk+aVKT+EMWYQf1v0Bp4omNWhyTRY5UyMNfGf6oylXBEk3J6xrNeqr4ISNK/AzAKQWx06skSzA9j+SL8yvjYwcrpjqkECoV3GkJL4HDbHaQDkdDIEjeAr9DdAl6pW2b5qqAk9wU2GrYSQhECk92E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNuCnzGj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 828E1C4CEE4;
-	Sat, 26 Apr 2025 01:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745632195;
-	bh=cnBo5tXu8U/HH5T1ctrvE9cw1YYsO1gD5TLvmUPluvs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bNuCnzGj5qiBac8rehGce09u0HS2sp5nQ0ecQ6+WXRNbx0LOKSoCYat7s0xCrxCOn
-	 I0e1sHHwI83Kbnc8MnBDHi+1eTm2sUG/63ed6HWrQbpParl90W55vd3bweQKarASTn
-	 VGogfDQbfcucyyCa7x0hvAvPq51rQ/FKW8EnhWN3SDhXonXcnloPT2MvnfvRUZXTtl
-	 RtC54XuKUCtp6TYjOckdyu0SEVL8+4JG0xLyRm2Q+Sh/wdcZWX2YizfUSoNr5T+wCc
-	 af3iZvQoJ4SuedA9oxUJZpsjPhtOymUwasi/FNRGqKXw3/AFxmpn0h4XI/Gyl12Jqv
-	 DYHVTWvsxMLCg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DE1380CFDC;
-	Sat, 26 Apr 2025 01:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1745632429; c=relaxed/simple;
+	bh=itus3HSgeaZKnzLs7A+PzZwyHfYvLZV6v7RSspLGn6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sGQM4rwOVfRPhwRGZUsYIgeZYvb64scq2Gu3hJfYu2M1MzFYXQaoxReSR35AnpXk5poL7Zymh2zPnO4wWcABI0VRgadpkRGyHMRMQjQgCQVnGQMraXt3yTCL+sUjEmAOVUp5tJoqjxzdOkcoEFYVvs1rvJrv6IO+6vLXSaj8DFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Mum0JnWk; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=mZ92s0mFC6iER0dQtVSEMXa85A2tE+alJQjbTpVolss=; b=Mum0JnWk+L/eJ8oFNtdB77dzsf
+	1Ks9cYGvcuVTYmL4xU7FamAj4pZb44H/0p0AumZJsTk9m/PLGAJYYwmOv7Rl11G0DBsJia4ea0vzu
+	Z/dHIyGZgShIMOHmVKpQ8VeoZPmzEXJiOyALuVs7FiquCwG8z+FHOG0nYmI+iE7EC5el+CL6e1JCH
+	9tenncRCLK76Sl2UkYTWsBPHghBlOHT2hAzsmKIvxKC+ya8kTYcmavrbFttqMQVPNsSLT5T0Es/lW
+	KabdanYomeZYfj3zpD/K9P++fXXlP4jd1qwwVL2od7AEZnNuOuvjhR0iU9kAh9XwlAq4zWUwhUU0r
+	3ygdrdgQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u8Ujb-0018bi-0k;
+	Sat, 26 Apr 2025 09:53:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Apr 2025 09:53:39 +0800
+Date: Sat, 26 Apr 2025 09:53:39 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH ipsec] xfrm: ipcomp: fix truesize computation on receive
+Message-ID: <aAw8o89W6F9uLuDo@gondor.apana.org.au>
+References: <f507d25958589ed4e6f62cdc4b8df64865865818.1745591479.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 0/3] io_uring/zcrx: fix selftests and add new test
- for rss ctx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174563223325.3898507.17577181713539439456.git-patchwork-notify@kernel.org>
-Date: Sat, 26 Apr 2025 01:50:33 +0000
-References: <20250425022049.3474590-1-dw@davidwei.uk>
-In-Reply-To: <20250425022049.3474590-1-dw@davidwei.uk>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f507d25958589ed4e6f62cdc4b8df64865865818.1745591479.git.sd@queasysnail.net>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 24 Apr 2025 19:20:46 -0700 you wrote:
-> Update io_uring zero copy receive selftest. Patch 1 does a requested
-> cleanup to use defer() for undoing ethtool actions during the test and
-> restoring the NIC under test back to its original state.
+On Fri, Apr 25, 2025 at 04:32:55PM +0200, Sabrina Dubroca wrote:
+> ipcomp_post_acomp currently drops all frags (via pskb_trim_unique(skb,
+> 0)), and then subtracts the old skb->data_len from truesize. This
+> adjustment has already be done during trimming (in skb_condense), so
+> we don't need to do it again.
 > 
-> Patch 2 adds a required call to set hds_thresh to 0. This is needed for
-> the queue API.
+> This shows up for example when running fragmented traffic over ipcomp,
+> we end up hitting the WARN_ON_ONCE in skb_try_coalesce.
 > 
-> [...]
+> Fixes: eb2953d26971 ("xfrm: ipcomp: Use crypto_acomp interface")
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/xfrm/xfrm_ipcomp.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-Here is the summary with links:
-  - [net-next,v1,1/3] io_uring/zcrx: selftests: switch to using defer() for cleanup
-    https://git.kernel.org/netdev/net-next/c/43fd0054f356
-  - [net-next,v1,2/3] io_uring/zcrx: selftests: set hds_thresh to 0
-    https://git.kernel.org/netdev/net-next/c/4ce3ade36f25
-  - [net-next,v1,3/3] io_uring/zcrx: selftests: add test case for rss ctx
-    https://git.kernel.org/netdev/net-next/c/5c3524b031be
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-You are awesome, thank you!
+Thanks,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
