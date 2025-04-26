@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-186198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1300CA9D6C1
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 02:37:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252D7A9D6C6
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 02:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B3409C23F0
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:37:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D77A7B49C2
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 00:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F331E1DE8;
-	Sat, 26 Apr 2025 00:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861F51E3DD7;
+	Sat, 26 Apr 2025 00:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxkcx1un"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tT0t54mt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA186F53E
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 00:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAFC6F53E
+	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 00:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745627864; cv=none; b=tlwiKjz+AckwREFQ0Giq4IsNoOEZLmtSK4VlYr30Um554RTEzNQeP2VuBX4kDwpx/UUqK5y7Z+mjjJeG3S7yjXj7XSf6YNBYTjLalbiGwK0FRgTUpGU2leGdDTEQgOlC0NS89gK9uuUax49v4bnb5rxAK6f7u06O2vKrWctag7k=
+	t=1745628173; cv=none; b=IsgrudzHlmYEageCjLDNzsFN/paj5H1XFFi7nH8OX2B2DDutF3Rk1jnJJlN5pR+XWZSIVOxzwC1bOnm1+p8KzHzbEH3O1CRaPfUNEr0X3/woHLuu7FxTgv5YGeDYVZdGEqPlmyq0t8YMtLTZsgfKYEsMAYWIsiBVHAWc/fNPu9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745627864; c=relaxed/simple;
-	bh=nzXacSjoAu3gCt9df95sW62lEQxpWnLYojCFUFIE30s=;
+	s=arc-20240116; t=1745628173; c=relaxed/simple;
+	bh=z+jlaHeemS6e93Y4MMSsAKTdJd2Qa2V9sn+CCVxxRJM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cBr4ZmCsfCCQqWOxvAHV5TL8tDTvShf3VOjBRNanCI+v2vVEo9RhVY/6o5CYDsKYL8A8S86lMVfxdPeNuATtZruf6lXEQPyufv7VOmLErp1IJuM0uUsWrAvRpNzF2oyTjr0TRTxo1nof8TJI5tyQepBLQwmPD4MM3K4VH9tsY1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxkcx1un; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF4F3C4CEE4;
-	Sat, 26 Apr 2025 00:37:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=IW6nTVIo++5aLflJGAmqONGvvvL+YiIb1kblvx7DRQdVqrFdwX1Ep7tjyO8p3q565tHp/PJjdMni9qSOMCQ2jUnDd8T0jqnz9mrgSo2grip5pkgaZsN3rztCpOuZGSYnuJ5WNyRdO7aLOfOCP1NugQp9bq1NnRkUpeI9b6Gf50E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tT0t54mt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85EEBC4CEE4;
+	Sat, 26 Apr 2025 00:42:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745627864;
-	bh=nzXacSjoAu3gCt9df95sW62lEQxpWnLYojCFUFIE30s=;
+	s=k20201202; t=1745628172;
+	bh=z+jlaHeemS6e93Y4MMSsAKTdJd2Qa2V9sn+CCVxxRJM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hxkcx1unFnJtLiSnnSoggq54UzuFbCD66pDc7DHXAmm927jXdMqaUYmAp+KsOD6sU
-	 TGrFEpSVQ7WSX0b643YCsznKAQunckQZ5pTj10RIxbTvV4ss0yALbvhwCZQXEPH/C5
-	 UE4kC3eMf3ZCVOvj6TZPxelv4l+YCq7UpGSDaZDT8G/wWQWxSqq6/ATUfQMRoT1ugn
-	 bqhva2FqAF3yR8dFJ8cWyLhxZpIO565LfJI2Q9zMBWaMwxly+A5t4BIPfemCh1ka/s
-	 g2iCfEdw9R3tXl7irEnCZiXrjvFvxJ05tiUu6Uk7EwjU5OBeugQrcbCVVfxTyz48KU
-	 9raTwMbGdIsAg==
-Date: Fri, 25 Apr 2025 17:37:43 -0700
+	b=tT0t54mtbYa1r1yfqxkuAozesDizGWLCgo32AAp7uM7s4vR5ItnwsWYBu5EIGi5I/
+	 jMfpph+hpSGcr/FIMDX/CU9BpVW1EjQYyeXXdhcJ6fpnrCNgHr9pEefYTM2SBfeF1o
+	 jo4JQomlISTugcwfu3C8Q/ffu0/lv35qZHE6xcjhvQMyIYVN/+18QXign2uvkEL4b4
+	 QJnNBkuByK/YuA3EvPnVWPZrMRCdmbMflFiNOKKbuehzbAiycPyC33t5OzwSFt1j6z
+	 Im8gIxMohOlJSC+iYN5o4bv4xRh9OGusD06jY6kTYTYeccv2K/r53ic2ZfoN/680wl
+	 QDmOq3RsTt+ew==
+Date: Fri, 25 Apr 2025 17:42:51 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Joe Damato <jdamato@fastly.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com,
+Cc: "David S . Miller " <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
  mkarsten@uwaterloo.ca, netdev@vger.kernel.org
 Subject: Re: [PATCH net-next v5] Add support to set napi threaded for
  individual napi
-Message-ID: <20250425173743.04effd75@kernel.org>
-In-Reply-To: <CAAywjhTjBzU+6XqHWx=JjA89KxmaxPSuoQj7CrxQRTNGwE1vug@mail.gmail.com>
+Message-ID: <20250425174251.59d7a45d@kernel.org>
+In-Reply-To: <20250423201413.1564527-1-skhawaja@google.com>
 References: <20250423201413.1564527-1-skhawaja@google.com>
-	<aArFm-TS3Ac0FOic@LQ3V64L9R2>
-	<CAAywjhQhH5ctp_PSgDuw4aTQNKY8V5vbzk9pYd1UBXtDV4LFMA@mail.gmail.com>
-	<aAwLq-G6qng7L2XX@LQ3V64L9R2>
-	<CAAywjhTjBzU+6XqHWx=JjA89KxmaxPSuoQj7CrxQRTNGwE1vug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,18 +62,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 25 Apr 2025 15:52:30 -0700 Samiullah Khawaja wrote:
-> > Probably need a maintainer to weigh-in on what the preferred
-> > behavior is. Maybe there's a reason the thread isn't killed.  
-> +1
+On Wed, 23 Apr 2025 20:14:13 +0000 Samiullah Khawaja wrote:
+> A net device has a threaded sysctl that can be used to enable threaded
+> napi polling on all of the NAPI contexts under that device. Allow
+> enabling threaded napi polling at individual napi level using netlink.
 > 
-> I think the reason behind it not being killed is because the user
-> might have already done some configuration using the PID and if the
-> kthread was removed, the user would have to do that configuration
-> again after enable/disable. But I am just speculating. I will let the
-> maintainers weigh-in as you suggested.
+> Extend the netlink operation `napi-set` and allow setting the threaded
+> attribute of a NAPI. This will enable the threaded polling on a napi
+> context.
 
-I haven't looked at the code, but I think it may be something more
-trivial, namely that napi_enable() return void, so it can't fail.
-Also it may be called under a spin lock.
+I think I haven't replied to you on the config recommendation about
+how global vs per-object config should behave. I implemented the
+suggested scheme for rx-buf-len to make sure its not a crazy ask:
+https://lore.kernel.org/all/20250421222827.283737-1-kuba@kernel.org/
+and I do like it more.
+
+Joe, Stanislav and Mina all read that series and are CCed here.
+What do y'all think? Should we make the threaded config work like
+the rx-buf-len, if user sets it on a NAPI it takes precedence
+over global config? Or stick to the simplistic thing of last
+write wins?
 
