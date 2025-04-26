@@ -1,78 +1,119 @@
-Return-Path: <netdev+bounces-186201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1E8A9D709
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:36:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 148A3A9D70A
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 03:36:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C3E3AF5B3
-	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 757963BAD21
+	for <lists+netdev@lfdr.de>; Sat, 26 Apr 2025 01:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2C918DB2F;
-	Sat, 26 Apr 2025 01:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RJjIXDWe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F981DF723;
+	Sat, 26 Apr 2025 01:36:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666CB1898FB
-	for <netdev@vger.kernel.org>; Sat, 26 Apr 2025 01:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0957218DB2F;
+	Sat, 26 Apr 2025 01:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745631374; cv=none; b=MxWABGziROju6J22t4faLd/9OWpVJUjSwfUEy5Vr8lPsEwbc2nfGbf+zqZ2bqXeP1O/3Qc3JoEoHAjHzC/XLXa2pI7agA4veh4ihQyMGrmNe45PQqCqcQZAcPn4SMIbIhMvKz1eJZuFTuUu4+qhAfI2vtveAVk6Y9HNv7MFdWQU=
+	t=1745631395; cv=none; b=O0iu534cIO6KTidChmqgSnQbquKY8l402SCOzzaw/fo271gYd0SrUAsgZsudxoe920iALCd8XweYGAw3cnb7S9ShJAvG+sLOnRWGaPCz784z3V8V1HrERR0S0tvdEYIrIPm6ihOvU2p0KvdyXAVDdl8UWCBUbZV59Uy96LctS0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745631374; c=relaxed/simple;
-	bh=8QcIsCC/+Ogfw6fmDp0vZf/u08Zx2acifAX6KRQTSjQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YZUzRoFWRfHousoN5w/zWjhoLegA3a1A13etYlXPzJgNC1EWOMo08EhL2gWqbcb8EK2EO6TzqwnTNjmFt4slcpWcckDL8aWsJEgBSxEUeLKpAmTrpvArcs48OQeQFy9H3AwknIxRe6mMan2Ljbx5LZ6ND99oJqrUtOeiIs2x5PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJjIXDWe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D78AC4CEEA;
-	Sat, 26 Apr 2025 01:36:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745631373;
-	bh=8QcIsCC/+Ogfw6fmDp0vZf/u08Zx2acifAX6KRQTSjQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RJjIXDWe2keVIcXyDxkmsOvGdYM4t5amMsqhfNJWzjN7csPUBL5RNMWC5Lri+6Ns6
-	 JKWhttSZ8rJ9KTDauZ/BR1tmab04HQruoepoq2MGyFEp8uRWLCdGsxGwn+9T4MKgN6
-	 laXcOp0Xco/J12XuitneBkj2Omk2Rgty1kyArkUKfQVaBfAGnoFEthzfwjy3CsyGQr
-	 aAlvwNTh/aLQt69B5CgJfapcVtT/2L037Bl+97Um4wek5Vz3OEv9F7foNAr+aRvqcU
-	 mbI+zi9u7IESH2ivNhP0c58rboHQ0oyxvJqxK1QhQkWV08BoAcanGAOnCtTHLfkArH
-	 Ts4utsoN3vYGQ==
-Date: Fri, 25 Apr 2025 18:36:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: "David S . Miller " <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
- mkarsten@uwaterloo.ca, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/4] net: define an enum for the napi
- threaded state
-Message-ID: <20250425183612.19068f23@kernel.org>
-In-Reply-To: <20250424200222.2602990-3-skhawaja@google.com>
-References: <20250424200222.2602990-1-skhawaja@google.com>
-	<20250424200222.2602990-3-skhawaja@google.com>
+	s=arc-20240116; t=1745631395; c=relaxed/simple;
+	bh=SMSNuUX7ZHc+q5C14GZZDuTM/OgTxpbj1zQTohnASTQ=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QW0BHJn4Ws2JfVYMosnLr7Y1UGdDAIWeTymfn/YE04F8UGcAsHpjPwHIQksQVcj9w1TAPy39nYRbugqvStslNY1IO1ntn++Omn8Z1FmWnuDGBBexQbYeka48ixjeWReKnAeGYsnyXCye2aayQrCPIsBj0f6UT6+GOmNL4HmRWIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1u8UNB-000000007iz-3kmJ;
+	Sat, 26 Apr 2025 01:36:25 +0000
+Date: Sat, 26 Apr 2025 02:36:22 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Chad Monroe <chad@monroe.io>, Felix Fietkau <nbd@nbd.name>,
+	Bc-Bocun Chen <bc-bocun.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: fix SER panic with 4GB+
+ RAM
+Message-ID: <aAw4lsGc_5HwBeiK@makrotopia.org>
+References: <995df78417d6f117062d1d7ef63228426b97a26e.1745630570.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <995df78417d6f117062d1d7ef63228426b97a26e.1745630570.git.daniel@makrotopia.org>
 
-On Thu, 24 Apr 2025 20:02:20 +0000 Samiullah Khawaja wrote:
-> -			dev_set_threaded(ndev, true);
-> +			dev_set_threaded(ndev, NETDEV_NAPI_THREADED_ENABLE);
+On Sat, Apr 26, 2025 at 02:25:23AM +0100, Daniel Golle wrote:
+> From: Chad Monroe <chad@monroe.io>
+> 
+> If the mtk_poll_rx() function detects the MTK_RESETTING flag, it will
+> jump to release_desc and refill the high word of the SDP on the 4GB RFB.
+> Subsequently, mtk_rx_clean will process an incorrect SDP, leading to a
+> panic.
+> 
+> Add patch from Mediatek SDK to resolve this.
+> 
+> Fixes: 2d75891ebc09 ("net: ethernet: mtk_eth_soc: support 36-bit DMA addressing on MT7988")
+> Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/11857ce2f90bf065b5e53211d182622d999a4542
 
-The drivers having to specify the type of threading is too much.
-The drivers are just indicating to the core that they are too
-IRQ-constrained to reasonably handle load..
+The above link has to be replaced by
+Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/71f47ea785699c6aa3b922d66c2bdc1a43da25b1
 
-Please add a wrapper, something like dev_set_threaded_hint(netdev).
-All the drivers pass true now, the second argument is already
-pointless. For extra points you can export just the
-dev_set_threaded_hint and make dev_set_threaded() be a core-only function.
+> Signed-off-by: Chad Monroe <chad@monroe.io>
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> index 47807b202310..7bac5ccfb79c 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -2252,14 +2252,17 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
+>  		ring->data[idx] = new_data;
+>  		rxd->rxd1 = (unsigned int)dma_addr;
+>  release_desc:
+> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
+> +			if (unlikely(dma_addr == DMA_MAPPING_ERROR))
+> +				addr64 = FIELD_GET(RX_DMA_ADDR64_MASK, rxd->rxd2);
+> +			else
+> +				addr64 = RX_DMA_PREP_ADDR64(dma_addr);
+> +		}
+> +
+>  		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
+>  			rxd->rxd2 = RX_DMA_LSO;
+>  		else
+> -			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size);
+> -
+> -		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA) &&
+> -		    likely(dma_addr != DMA_MAPPING_ERROR))
+> -			rxd->rxd2 |= RX_DMA_PREP_ADDR64(dma_addr);
+> +			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size) | addr64;
+>  
+>  		ring->calc_idx = idx;
+>  		done++;
+> -- 
+> 2.49.0
+> 
+> 
 
