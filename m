@@ -1,419 +1,259 @@
-Return-Path: <netdev+bounces-186312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1905AA9E30E
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 14:46:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE99A9E34B
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 15:27:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FCF13B01D4
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 12:46:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2851899E74
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 13:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4C37081F;
-	Sun, 27 Apr 2025 12:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38BF13C816;
+	Sun, 27 Apr 2025 13:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Nuw/uvOX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FyiZkKXn"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34621C32;
-	Sun, 27 Apr 2025 12:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745757996; cv=none; b=W4FrTdhA2ZZaK1WtdbzuQTZX3wETBM7Eh4R2OFqOedQAUjYK1t6q2R9llUlAggy2qHr8/7OfEiWB9FovXm4Q8Cv1jqWWgJRAbaWluwkpg+BpqM21j3FluTE4QksEi99wnMFV67LdAY0HO7HshDUl2cRYnmha4RvSDIpvVX0INrY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745757996; c=relaxed/simple;
-	bh=G8b32uuUGzfnW3vj+6HJ5DgvtQ72/C0qy/6PKNy3Kb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MVVHjCLuggf64kFF8nxJpRsT6Fp1nJA/KyGlwOEBPB6F9caEDz2sKUgglo0VjK61dcpbjlxaX0P9fTt8eNaK4LeHvWSiGZvxp+YkLUdVhvbkN8CswgGA/jKte1dYZMnpW64PkBPaeDTZWl3+9sdvtxigl2nrv55HwYF2xbLDjKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Nuw/uvOX; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E628B43B07;
-	Sun, 27 Apr 2025 12:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1745757984;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wb324TLeJdrXcRc7cOaMOfVIalE3CeNEfnEYzPkyUOc=;
-	b=Nuw/uvOXpBU7Q36G2r6/Wx1WG6zk5H+2UzIMv6EmrSAGp+0NYqOwM9qbRECcr93AAuqEd0
-	WF7aXamDU2raNVNXM7dsxarN9HC3fpSLhnxP/LdIHj7vlJIw4LtVsMI/UPPHfAsedEq6KF
-	le3uyBRVaT1vAGc350gWM46Dpl6uENz5mQYCQuShkQXhlrpkWRuWmRsibx/btCOzQgTcBM
-	qoikWk2oL+TTPbKcVxivw3tOF0D3mefj9lQKHYGlDUKBFMmjdyxRlyhk/ln+AL0RFfO5d+
-	E15OKdvTv2X1HzCUZR+mVkZsmBlLiH6XcrmcNxS8O+4r3GmshdL6ZJKE63RhzQ==
-Date: Sun, 27 Apr 2025 14:46:21 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Donald
- Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Xing <kernelxing@tencent.com>,
- Richard Cochran <richardcochran@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next] net: Add support for providing the PTP
- hardware source in tsinfo
-Message-ID: <20250427144621.7265e219@kmaincent-XPS-13-7390>
-In-Reply-To: <CAL+tcoAziAJD5b+AMingR4QpTmHLYJCVMCeEsGUeC0TEuRjTHg@mail.gmail.com>
-References: <20250425-feature_ptp_source-v1-1-c2dfe7b2b8b4@bootlin.com>
-	<CAL+tcoAziAJD5b+AMingR4QpTmHLYJCVMCeEsGUeC0TEuRjTHg@mail.gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF96C4C80;
+	Sun, 27 Apr 2025 13:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745760416; cv=fail; b=o1HpotDIrbv7A1PtC84GgBdbZsbE5wMtDFY4Pg9SIii7NHUTHsUXz50Scute84JLsyIky/GGYOsqTsJgH9wDo73HKIBBN992hOzXGVdZ+N4Mf2GUrxRkqV4C4NnqFyVVdg8iPE5ZysexFj3nNGyfq289f4SFtGBYJwqd6gpuZkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745760416; c=relaxed/simple;
+	bh=nsX8ldjwbkttPJwCvgm3WuS25FbCX8h88YWXnWMJ5jc=;
+	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=sILBHtuxOHiF6efj0GJx8wHV1y6AdzheskH2VpbGGS5I+tFXHLH/yXQNYwXBsLkx/ZAVDNaGyHDwq9jDmAyhqYMf/ra0LnXI86ICy4mV8m+liEnUHk/Zsi/XrxH7fpo4O9Ikrc5qm18FW8KiTUzkfSsFsIiITxO6OybeRQlp0cI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FyiZkKXn; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745760414; x=1777296414;
+  h=subject:to:cc:references:from:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nsX8ldjwbkttPJwCvgm3WuS25FbCX8h88YWXnWMJ5jc=;
+  b=FyiZkKXnqvisac135VJNgdFxbeb5H/GwFiC2/yPGsuVLsWVi4RrLDsx4
+   0mDy6y4hmM8W4pfdzlwLLYKZwiSJxy2pEXSVQdZyb54ZCOeaWvo/UcMP7
+   4waGghGoN57UAa6YTn2aqbJt4QgxQNx9j/lgCAH/GThxodNZxoniZ9uUz
+   Fzlnw2tmqXQBr0c+pvkBNoORqHFNgI0LR2v+zJlXFq/Y6U9iS/WA0ndVZ
+   Xo6/lau5hTqpFnZME0TuJSbcXKmCoTdwerzV6Uu1sin99OaKUKzNyBNyw
+   pT9rdClr8+8cS+5vZiA0MNv1eLXBpI9wxXXX2EH02KItwMr6CeiJ87nBu
+   A==;
+X-CSE-ConnectionGUID: ZmuiECHcTVSGOgg9C4lSoQ==
+X-CSE-MsgGUID: hhRSzoEoQdijfmntU2Ej2w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="58003614"
+X-IronPort-AV: E=Sophos;i="6.15,244,1739865600"; 
+   d="scan'208";a="58003614"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 06:26:54 -0700
+X-CSE-ConnectionGUID: RKruw989SuaaOQWYk2sMCQ==
+X-CSE-MsgGUID: z6F6WU2cTla+x13R4P+Tlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,244,1739865600"; 
+   d="scan'208";a="156526469"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 06:26:53 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 27 Apr 2025 06:26:52 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Sun, 27 Apr 2025 06:26:52 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sun, 27 Apr 2025 06:26:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SV8j5QIvmBL4+y3XRgw4N1Jk/TiwbOlm5NXi4jWt5uAXcyixgMltT7Kijkc4gttb/MABpQwfPkkxGr9cgHGBmlKi7ZxDj3f6tG7sh4gIo78Q2NH/0zDlTrCY7mwkb1UqntpWMlAG082FAexFtaD5nMSHd37ikUddr1JVoq/ulxFqVSHE0IdtpUobUFIFhf99DtWiA38P0wVIjSKRpNH5tCg8lX9JDStT1A5TFtQSQ3RZgG4MxMx25aCuefrCIy5lP8SRvz+DBGSWhe7dRwYCjGaFHT5frwuH1lvvyEOBpjy2DOJYv21s9pyZvJ4NCLsFqQ2WRzooOMZZZVXOW5W62w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jP+N2wZjGGjwUpK4/E8Yeim9BfVDCOGjuHSqOZ0XO7s=;
+ b=zJR1cVVSvPakgq7qvgUZK3SIzLtPH+zLwVfUy6g+zoHrSk7PqD2yz3fzihdaTUOHJAnyXZpHqybpAKh6tE3YAnWQVJvuQx0zwrJPBd0BDkrGZNToSmbwLhVOOVIoBTR4TanYImAtb7sPSNlOsJKVKA4HDXkqXOfopYB0sMauZZHTQMxhyIHFK85CRfQpQh1BWmju2H4FX3uc9jNlp1GFaAXdwEak/B1fp/VQ7gr0n8vbclXN97JlolOyIxrNdfibfjwtEwhby3yTsTTGx70PZfLAX0l9orVTLo6QtcK8kCULehDaBsLLRUdNmBbwl7rNHz/+XLrtSjXUzUbsRXyYdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5934.namprd11.prod.outlook.com (2603:10b6:303:189::7)
+ by CY8PR11MB7797.namprd11.prod.outlook.com (2603:10b6:930:76::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Sun, 27 Apr
+ 2025 13:26:49 +0000
+Received: from MW4PR11MB5934.namprd11.prod.outlook.com
+ ([fe80::96ae:ce0:2a38:7408]) by MW4PR11MB5934.namprd11.prod.outlook.com
+ ([fe80::96ae:ce0:2a38:7408%5]) with mapi id 15.20.8678.028; Sun, 27 Apr 2025
+ 13:26:49 +0000
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
+ when valid checksum mask is not set
+To: Jacek Kowalski <jacek@jacekk.info>, Simon Horman <horms@kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
+ <20250424162444.GH3042781@horms.kernel.org>
+ <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
+ <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Message-ID: <0530ea8e-eb81-74cd-5056-4ee6db8feb9e@intel.com>
+Date: Sun, 27 Apr 2025 16:26:42 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL0P290CA0012.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::12) To MW4PR11MB5934.namprd11.prod.outlook.com
+ (2603:10b6:303:189::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvheekudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudelmeekheekjeemjedutddtmegtkedtfeemvggstddtmeegugdtgeemvgejfhelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkeehkeejmeejuddttdemtgektdefmegvsgdttdemgegutdegmegvjehfledphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepkhgvrhhnvghljhgrshhonhigihhnghesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehku
- hgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: kory.maincent@bootlin.com
-
-On Sun, 27 Apr 2025 08:26:45 +0800
-Jason Xing <kerneljasonxing@gmail.com> wrote:
-
-> Hi Kory,
->=20
-> On Sat, Apr 26, 2025 at 1:45=E2=80=AFAM Kory Maincent <kory.maincent@boot=
-lin.com>
-> wrote:
-> >
-> > Multi-PTP source support within a network topology has been merged,
-> > but the hardware timestamp source is not yet exposed to users.
-> > Currently, users only see the PTP index, which does not indicate
-> > whether the timestamp comes from a PHY or a MAC. =20
->=20
-> Sorry, may I ask what the use case of distinguishing them is?  When we
-> get the hw timestamp source, I wonder what the next move could be?
-
-Then you can switch between the PTP sources of a network topology, knowing =
-which
-PTP index match which PTP source:
-$ ethtool --set-hwtimestamp-cfg eth0 index N qualifier precise
-
-Regards,
-
->=20
-> Thanks,
-> Jason
->=20
-> >
-> > Add support for reporting the hwtstamp source using a
-> > hwtstamp-source field, alongside hwtstamp-phyindex, to describe
-> > the origin of the hardware timestamp.
-> >
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > ---
-> > Not sure moving the hwtstamp_source enum to uapi/linux/net_tstamp.h and
-> > adding this header to ynl/Makefile.deps is the best choice. Maybe it is
-> > better to move the enum directly to ethtool.h header.
-> > ---
-> >  Documentation/netlink/specs/ethtool.yaml       | 16 ++++++++++++++++
-> >  include/linux/ethtool.h                        |  4 ++++
-> >  include/linux/net_tstamp.h                     |  6 ------
-> >  include/uapi/linux/ethtool_netlink_generated.h |  2 ++
-> >  include/uapi/linux/net_tstamp.h                | 13 +++++++++++++
-> >  net/ethtool/common.c                           | 22 +++++++++++++++++-=
-----
-> >  net/ethtool/tsinfo.c                           | 20 ++++++++++++++++++=
-++
-> >  tools/net/ynl/Makefile.deps                    |  3 ++-
-> >  8 files changed, 74 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/Documentation/netlink/specs/ethtool.yaml
-> > b/Documentation/netlink/specs/ethtool.yaml index
-> > c650cd3dcb80bc93c5039dc8ba2c5c18793ff987..4bb44c93e80a83b9520ea297c08a9=
-4616f7266aa
-> > 100644 --- a/Documentation/netlink/specs/ethtool.yaml +++
-> > b/Documentation/netlink/specs/ethtool.yaml @@ -98,6 +98,13 @@ definitio=
-ns:
-> >      name: tcp-data-split
-> >      type: enum
-> >      entries: [ unknown, disabled, enabled ]
-> > +  -
-> > +    name: ts-hwtstamp-source
-> > +    enum-name: hwtstamp-source
-> > +    header: linux/net_tstamp.h
-> > +    type: enum
-> > +    name-prefix: hwtstamp-source
-> > +    entries: [ unspec, netdev, phylib ]
-> >
-> >  attribute-sets:
-> >    -
-> > @@ -896,6 +903,13 @@ attribute-sets:
-> >          name: hwtstamp-provider
-> >          type: nest
-> >          nested-attributes: ts-hwtstamp-provider
-> > +      -
-> > +        name: hwtstamp-source
-> > +        type: u32
-> > +        enum: ts-hwtstamp-source
-> > +      -
-> > +        name: hwtstamp-phyindex
-> > +        type: u32
-> >    -
-> >      name: cable-result
-> >      attr-cnt-name: __ethtool-a-cable-result-cnt
-> > @@ -1981,6 +1995,8 @@ operations:
-> >              - phc-index
-> >              - stats
-> >              - hwtstamp-provider
-> > +            - hwtstamp-source
-> > +            - hwtstamp-phyindex
-> >        dump: *tsinfo-get-op
-> >      -
-> >        name: cable-test-act
-> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> > index
-> > 117718c2481439d09f60cd596012dfa0feef3ca8..f18fc8269f7066eadd6fa823e0d43=
-b4ae50b8c46
-> > 100644 --- a/include/linux/ethtool.h +++ b/include/linux/ethtool.h
-> > @@ -830,6 +830,8 @@ struct ethtool_rxfh_param {
-> >   * @so_timestamping: bit mask of the sum of the supported SO_TIMESTAMP=
-ING
-> > flags
-> >   * @phc_index: device index of the associated PHC, or -1 if there is n=
-one
-> >   * @phc_qualifier: qualifier of the associated PHC
-> > + * @phc_source: source device of the associated PHC
-> > + * @phc_phyindex: index of PHY device source of the associated PHC
-> >   * @tx_types: bit mask of the supported hwtstamp_tx_types enumeration
-> > values
-> >   * @rx_filters: bit mask of the supported hwtstamp_rx_filters enumerat=
-ion
-> > values */
-> > @@ -838,6 +840,8 @@ struct kernel_ethtool_ts_info {
-> >         u32 so_timestamping;
-> >         int phc_index;
-> >         enum hwtstamp_provider_qualifier phc_qualifier;
-> > +       enum hwtstamp_source phc_source;
-> > +       int phc_phyindex;
-> >         enum hwtstamp_tx_types tx_types;
-> >         enum hwtstamp_rx_filters rx_filters;
-> >  };
-> > diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-> > index
-> > ff0758e88ea1008efe533cde003b12719bf4fcd3..1414aed0b6adeae15b56e7a99a7d9=
-eeb43ba0b6c
-> > 100644 --- a/include/linux/net_tstamp.h +++ b/include/linux/net_tstamp.h
-> > @@ -13,12 +13,6 @@
-> >                                          SOF_TIMESTAMPING_TX_HARDWARE |=
- \
-> >                                          SOF_TIMESTAMPING_RAW_HARDWARE)
-> >
-> > -enum hwtstamp_source {
-> > -       HWTSTAMP_SOURCE_UNSPEC,
-> > -       HWTSTAMP_SOURCE_NETDEV,
-> > -       HWTSTAMP_SOURCE_PHYLIB,
-> > -};
-> > -
-> >  /**
-> >   * struct hwtstamp_provider_desc - hwtstamp provider description
-> >   *
-> > diff --git a/include/uapi/linux/ethtool_netlink_generated.h
-> > b/include/uapi/linux/ethtool_netlink_generated.h index
-> > 30c8dad6214e9a882f1707e4835e9efc73c3f92e..7cbcf44d0a3284490006961d3513c=
-58ccda98038
-> > 100644 --- a/include/uapi/linux/ethtool_netlink_generated.h +++
-> > b/include/uapi/linux/ethtool_netlink_generated.h @@ -401,6 +401,8 @@ en=
-um {
-> >         ETHTOOL_A_TSINFO_PHC_INDEX,
-> >         ETHTOOL_A_TSINFO_STATS,
-> >         ETHTOOL_A_TSINFO_HWTSTAMP_PROVIDER,
-> > +       ETHTOOL_A_TSINFO_HWTSTAMP_SOURCE,
-> > +       ETHTOOL_A_TSINFO_HWTSTAMP_PHYINDEX,
-> >
-> >         __ETHTOOL_A_TSINFO_CNT,
-> >         ETHTOOL_A_TSINFO_MAX =3D (__ETHTOOL_A_TSINFO_CNT - 1)
-> > diff --git a/include/uapi/linux/net_tstamp.h
-> > b/include/uapi/linux/net_tstamp.h index
-> > a93e6ea37fb3a69f331b1c90851d4e68cb659a83..bf5fb9f7acf5c03aaa121e0cda3c0=
-b1d83e49f71
-> > 100644 --- a/include/uapi/linux/net_tstamp.h +++
-> > b/include/uapi/linux/net_tstamp.h @@ -13,6 +13,19 @@
-> >  #include <linux/types.h>
-> >  #include <linux/socket.h>   /* for SO_TIMESTAMPING */
-> >
-> > +/**
-> > + * enum hwtstamp_source - Source of the hardware timestamp
-> > + * @HWTSTAMP_SOURCE_UNSPEC: Source not specified or unknown
-> > + * @HWTSTAMP_SOURCE_NETDEV: Hardware timestamp comes from the net devi=
-ce
-> > + * @HWTSTAMP_SOURCE_PHYLIB: Hardware timestamp comes from one of the P=
-HY
-> > + *                         devices of the network topology
-> > + */
-> > +enum hwtstamp_source {
-> > +       HWTSTAMP_SOURCE_UNSPEC,
-> > +       HWTSTAMP_SOURCE_NETDEV,
-> > +       HWTSTAMP_SOURCE_PHYLIB,
-> > +};
-> > +
-> >  /*
-> >   * Possible type of hwtstamp provider. Mainly "precise" the default one
-> >   * is for IEEE 1588 quality and "approx" is for NICs DMA point.
-> > diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> > index
-> > 49bea6b45bd5c1951ff1a52a9f30791040044d10..43e62885b46b5c0abc484d2661f7c=
-df8a3e23169
-> > 100644 --- a/net/ethtool/common.c +++ b/net/ethtool/common.c
-> > @@ -920,12 +920,20 @@ int ethtool_get_ts_info_by_phc(struct net_device =
-*dev,
-> >                 struct phy_device *phy;
-> >
-> >                 phy =3D ethtool_phy_get_ts_info_by_phc(dev, info,
-> > hwprov_desc);
-> > -               if (IS_ERR(phy))
-> > +               if (IS_ERR(phy)) {
-> >                         err =3D PTR_ERR(phy);
-> > -               else
-> > -                       err =3D 0;
-> > +                       goto out;
-> > +               }
-> > +
-> > +               info->phc_source =3D HWTSTAMP_SOURCE_PHYLIB;
-> > +               info->phc_phyindex =3D phy->phyindex;
-> > +               err =3D 0;
-> > +               goto out;
-> > +       } else {
-> > +               info->phc_source =3D HWTSTAMP_SOURCE_NETDEV;
-> >         }
-> >
-> > +out:
-> >         info->so_timestamping |=3D SOF_TIMESTAMPING_RX_SOFTWARE |
-> >                                  SOF_TIMESTAMPING_SOFTWARE;
-> >
-> > @@ -947,10 +955,14 @@ int __ethtool_get_ts_info(struct net_device *dev,
-> >
-> >                 ethtool_init_tsinfo(info);
-> >                 if (phy_is_default_hwtstamp(phydev) &&
-> > -                   phy_has_tsinfo(phydev))
-> > +                   phy_has_tsinfo(phydev)) {
-> >                         err =3D phy_ts_info(phydev, info);
-> > -               else if (ops->get_ts_info)
-> > +                       info->phc_source =3D HWTSTAMP_SOURCE_PHYLIB;
-> > +                       info->phc_phyindex =3D phydev->phyindex;
-> > +               } else if (ops->get_ts_info) {
-> >                         err =3D ops->get_ts_info(dev, info);
-> > +                       info->phc_source =3D HWTSTAMP_SOURCE_NETDEV;
-> > +               }
-> >
-> >                 info->so_timestamping |=3D SOF_TIMESTAMPING_RX_SOFTWARE=
- |
-> >                                          SOF_TIMESTAMPING_SOFTWARE;
-> > diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-> > index
-> > 8130b406ef107f7311cba15c5aafba3ba82bb5a3..62e82f43dba998abd840ea1550508=
-4e3127b4520
-> > 100644 --- a/net/ethtool/tsinfo.c +++ b/net/ethtool/tsinfo.c
-> > @@ -160,6 +160,12 @@ static int tsinfo_reply_size(const struct
-> > ethnl_req_info *req_base, /* _TSINFO_HWTSTAMP_PROVIDER */
-> >                 len +=3D nla_total_size(0) + 2 * nla_total_size(sizeof(=
-u32));
-> >         }
-> > +       if (ts_info->phc_source) {
-> > +               len +=3D nla_total_size(sizeof(u32));     /*
-> > _TSINFO_HWTSTAMP_SOURCE */
-> > +               if (ts_info->phc_phyindex)
-> > +                       /* _TSINFO_HWTSTAMP_PHYINDEX */
-> > +                       len +=3D nla_total_size(sizeof(u32));
-> > +       }
-> >         if (req_base->flags & ETHTOOL_FLAG_STATS)
-> >                 len +=3D nla_total_size(0) + /* _TSINFO_STATS */
-> >                        nla_total_size_64bit(sizeof(u64)) *
-> > ETHTOOL_TS_STAT_CNT; @@ -259,6 +265,16 @@ static int
-> > tsinfo_fill_reply(struct sk_buff *skb,
-> >
-> >                 nla_nest_end(skb, nest);
-> >         }
-> > +       if (ts_info->phc_source) {
-> > +               if (nla_put_u32(skb, ETHTOOL_A_TSINFO_HWTSTAMP_SOURCE,
-> > +                               ts_info->phc_source))
-> > +                       return -EMSGSIZE;
-> > +
-> > +               if (ts_info->phc_phyindex &&
-> > +                   nla_put_u32(skb, ETHTOOL_A_TSINFO_HWTSTAMP_PHYINDEX,
-> > +                               ts_info->phc_phyindex))
-> > +                       return -EMSGSIZE;
-> > +       }
-> >         if (req_base->flags & ETHTOOL_FLAG_STATS &&
-> >             tsinfo_put_stats(skb, &data->stats))
-> >                 return -EMSGSIZE;
-> > @@ -346,6 +362,9 @@ static int ethnl_tsinfo_dump_one_phydev(struct sk_b=
-uff
-> > *skb, if (ret < 0)
-> >                 goto err;
-> >
-> > +       reply_data->ts_info.phc_source =3D HWTSTAMP_SOURCE_PHYLIB;
-> > +       reply_data->ts_info.phc_phyindex =3D phydev->phyindex;
-> > +
-> >         ret =3D ethnl_tsinfo_end_dump(skb, dev, req_info, reply_data, e=
-hdr);
-> >         if (ret < 0)
-> >                 goto err;
-> > @@ -389,6 +408,7 @@ static int ethnl_tsinfo_dump_one_netdev(struct sk_b=
-uff
-> > *skb, if (ret < 0)
-> >                         goto err;
-> >
-> > +               reply_data->ts_info.phc_source =3D HWTSTAMP_SOURCE_NETD=
-EV;
-> >                 ret =3D ethnl_tsinfo_end_dump(skb, dev, req_info, reply=
-_data,
-> >                                             ehdr);
-> >                 if (ret < 0)
-> > diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-> > index
-> > 8b7bf673b686f17db06a3798d23d2350f7cf76c1..6c03b477f672eab80e2c71452c982=
-b9561cb7c4a
-> > 100644 --- a/tools/net/ynl/Makefile.deps +++ b/tools/net/ynl/Makefile.d=
-eps
-> > @@ -18,7 +18,8 @@ CFLAGS_devlink:=3D$(call
-> > get_hdr_inc,_LINUX_DEVLINK_H_,devlink.h) CFLAGS_dpll:=3D$(call
-> > get_hdr_inc,_LINUX_DPLL_H,dpll.h) CFLAGS_ethtool:=3D$(call
-> > get_hdr_inc,_LINUX_ETHTOOL_H,ethtool.h) \ $(call
-> > get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h) \
-> > -       $(call
-> > get_hdr_inc,_LINUX_ETHTOOL_NETLINK_GENERATED_H,ethtool_netlink_generate=
-d.h)
-> > +       $(call
-> > get_hdr_inc,_LINUX_ETHTOOL_NETLINK_GENERATED_H,ethtool_netlink_generate=
-d.h)
-> > \
-> > +       $(call get_hdr_inc,_NET_TIMESTAMPING_H,net_tstamp.h)
-> >  CFLAGS_handshake:=3D$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
-> >  CFLAGS_lockd_netlink:=3D$(call
-> > get_hdr_inc,_LINUX_LOCKD_NETLINK_H,lockd_netlink.h) CFLAGS_mptcp_pm:=3D=
-$(call
-> > get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
-> >
-> > ---
-> > base-commit: 3a726f8feac35d9b9ee11cf9737d62fe2410d539
-> > change-id: 20250418-feature_ptp_source-df4a98c94139
-> >
-> > Best regards,
-> > --
-> > K=C3=B6ry Maincent, Bootlin
-> > Embedded Linux and kernel engineering
-> > https://bootlin.com
-> >
-> > =20
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5934:EE_|CY8PR11MB7797:EE_
+X-MS-Office365-Filtering-Correlation-Id: d5d3eead-508e-4db6-e274-08dd858f2a18
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RHBlMzRQU1c5WmRreUp5clFJMkh2KzQyd1k0NXVmY3BXbmdka1BqbGhvVytl?=
+ =?utf-8?B?UG02TUgxSXNnbkYwTnRnK2Jkc2JYMVN0bHc0c09zUWJxR2sxSUlxRC96QjlK?=
+ =?utf-8?B?U3RKMC9JNE9sS1l0bmRxUXdadVR2SVYrT3ovWWk2ajRaU3BvV21iM2dUNFN1?=
+ =?utf-8?B?RzRYTXQvQjgvWU1OVXhwYllOODdta0hCNUVwU0tvdnM3MWN3ZFc1dHRYMWRH?=
+ =?utf-8?B?S3lGWUFhWkFZQU14ejNQTExBR25obGd4c2tvTjZZdWIyU3lPQlRjbks0RnV3?=
+ =?utf-8?B?dFpQUzNCYngwMmZyMEk5bWErcUdLdWw2WXNnYXhNZTkrc1BCaUpVRlZnY1kx?=
+ =?utf-8?B?S0pSb1V3dG5nbFF4T0pxSzhmcnd3eFlFcDRQUkh4ZlZuRkNyY3Y3RkQ2UnFX?=
+ =?utf-8?B?SkVnMHJ6anNEMjhiUnhYZzhQV3NnOXRaaW1jMm02WkViL0UzT3hxN2FaT0ZI?=
+ =?utf-8?B?OHBlbWFJcjR2YVBkSGxEM3IvUXhtckk0VFpTNElqQ1NHaFdYWUxDendTMnhz?=
+ =?utf-8?B?em5qOHd5SjQzVWdSZW9PTjE1emJTaG9HVnRwbXZCQ1FXODJ2RWdnVW8yNE1i?=
+ =?utf-8?B?cTRzRjFicGltODdJQVZaNkVDbk9oWWZwd1ljbDhrekxCdFFhem9EOE50bWJP?=
+ =?utf-8?B?cXF4dFRyKzUxOFRJbzZjdmZFNnlXRmw1NFZjQVEycUdPZ2NPc1Q2Wjgyd3d4?=
+ =?utf-8?B?TDhTRVMyNlZSTStXMFArY1BoM01Vb1BPMzViWEdJTFhLSC9OZVRHdnRLMFpo?=
+ =?utf-8?B?TGY4TlBteGVtYzN4QVdKMGJpM2NBbVhJbm52MThjd0RQTEF4NFQ1SktDbzhk?=
+ =?utf-8?B?YlJzTk5idzBPV0g5WVdYNEJvWGxTaFptZXM3UUl0NUVCb3hEQTAyWFBZMTFv?=
+ =?utf-8?B?QThIdmZZLzd6d0J0bFR2U2E0TStRaWJvTExJL3NnaUVuQjVQUzFoVkV0RGQ1?=
+ =?utf-8?B?NVdqdXRlUjM0SXMxMkJPZjJ0dS9tUTFibnBYK01qY0dHdi82dlRQRW10dzNo?=
+ =?utf-8?B?YmxmNEtFL3hrQU0xaWFaVk5RR3RnaVE3VCtJeHdibUVJL3puNzRueCt4cSt2?=
+ =?utf-8?B?dXRwYzZxcUloWFZNMlRORHkwYkpCSEdVNXpOcWZ2WDlENjJVMTdCdDJEcElR?=
+ =?utf-8?B?YU1YWm1MaHA4RW9aV3RzTjdCRVpEbmtqcVRON0RNc2k3bStnME1kbFdEUFAz?=
+ =?utf-8?B?QUJKOTJmaVJWdE5Bd1FsaVNnUVllaG51QWszMVVWL3Y5WlpYQVQrYUxRQ3NL?=
+ =?utf-8?B?SFVzaTJraEFRQlJqNUtBcmplLytId0w5WnNrWjFWc3pqVUNDODlLdlNmMDkz?=
+ =?utf-8?B?aW94aFE3UHQvT2FaNnhTYkRMRUlBK3A3ZVNqZEJrMWNWZ1hrQVg3cksyQWZL?=
+ =?utf-8?B?MG9rd3FVeXBqVTFFZFN3aEdzNmNUU0VxM01BVi9hdVZNWFhzN0pKak1XVWp3?=
+ =?utf-8?B?UFhkdGVVdjNmY1JOZWM2ejZTTUhKRERRVkdTb291ZjVNY2RlSElQQnJNSXVh?=
+ =?utf-8?B?dWdLYlJSbWN3QXVQeUFwNDlWZ2hkSTJZcUxONkt4aTFBcEI1TFUyVGR3WUZm?=
+ =?utf-8?B?TFFSbEQ2YjhyMzdPSmpkdVlZMXdidWVucUc4UWwyWE9GTElrN3hnNUZ0UzBy?=
+ =?utf-8?B?MzNMRzZ3b0o1Y0lMM0JLdjVMeHZpc0dVZVhsVGZoQ05UcEdmaWtvNXNoMlFq?=
+ =?utf-8?B?Y0k5c1RxSWZzOEhFZDZyNDRoYWlESk43SFRFSUJiUDJIenZHLzB4RFVTY1hm?=
+ =?utf-8?B?T1pTRHo3Q0ViUXJaWERZSU1lM3hwSjRzeFpEMndSdSt3NUlOL3V5MjB2L3Nx?=
+ =?utf-8?B?T3c3L1NPRURtWnpkWUdtTWkrcVRCUjA1NUdreml5ZU5ONGwrUlkzeHh2ZENu?=
+ =?utf-8?Q?3/ziIecG9BJRk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5934.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3lkckpsbnBKT2h0K2ZYRjkvTWNkTm52d0h2WDhuWWhqSXhmQTdEOHM5ZmR6?=
+ =?utf-8?B?cFN4WXVnS1BjdHBxZURQT05yM1NBL1J0bHp3ZFZNYkNNTTdWVittUGN4MEFU?=
+ =?utf-8?B?MUgvU2dMOFo2WlhyTlFOa2dKZThtTEdNcVViWkJPSDN5d3NoLzhCaklPZ04y?=
+ =?utf-8?B?L0tNZjdWWENuWXFpQXhKR1lHWVpieFMzSWRBSFVVZlF4NzBWbUxQczZSTkls?=
+ =?utf-8?B?aE1lK25Cbmdnd1NjdjcwNGRONWI5OHNNN2xTUVRWOW10LzFxMFB1T2RnbUJM?=
+ =?utf-8?B?ZHZKN3gzdmpjTnV5azFVMXZpdmFlTlhYU2svOWdGeW5FN2VhMHFjUlNzeXds?=
+ =?utf-8?B?ekh1YnVPMElLNjdTbXlHZVZoWEhwZzRGS29NdG81bTNQQlU5cGtIQUhpaEpY?=
+ =?utf-8?B?MDRlZFJUUVZOS244YU9IdDA3bVd2bGpyKzNHeHJaZUxtUVVlTkJnOG9JWWNw?=
+ =?utf-8?B?TzM3dmRzNkRZZGwwYzZ0Y1BvWlhEa0dUMFA3UWFKMU41dktNNStGc0pnbndi?=
+ =?utf-8?B?b1hSSEJnQ1Z6S1Q5MzJSTzhDdXNobUZmTE1ocWxNa2ovU1ViaEpWUjZmNEcx?=
+ =?utf-8?B?M1ViY2x3YzFBVE5iWS9JcEJsRlFSWWMzZ1AzbFhrTXQ4Vmo3TzRmZ2dwWnVV?=
+ =?utf-8?B?cnZoZUp6SXd3dVZpeTJUNFhpcHRzY2hiQ3Q1bHNibDRqTUg5T2J2VE54RlN1?=
+ =?utf-8?B?eWJPc2hOL2xjQ2xncUszenp3SVB0dzdRUy9hdG9JOVdJbVZycURMeVo4Q3pI?=
+ =?utf-8?B?S3BjcWlPTUJKQjB6SGpXTnhqc0tkbUtRKzhSVVZDMm9haVFWYUdJSllrTTQv?=
+ =?utf-8?B?b3J1bGtCOWlQZVJkRFRNcENkTmh2YWZiaXZSK3RrUW9Dc29zVThnS2ExOFEw?=
+ =?utf-8?B?NEY5ZkRuZU45K2RRR1pTSW41dHZHOUJTNWwxL0Q1ZXloRHArV3dTRG0rWnZn?=
+ =?utf-8?B?KzdQbGhMZlBodDhvZVpCbG92OHJxbFd6MDM3UTZFOTBRdTRZd2RFQVBqZnk5?=
+ =?utf-8?B?NmpWbldwSVNtM1NFVGNmbDcrQ1ROMlp1OExiNXl5ZVJZTGF5ZFFTZVNDbHBM?=
+ =?utf-8?B?VnpuUFZiVTgzVGNTNnp4Q3RxUHJFeEhMZUNNUGIxaXlyWURFcHFHdU9WQ01o?=
+ =?utf-8?B?U1FuMDBCMS83MlQxcmZhbXkrV2JqM0U1dnVxY2doK1hJVkFGTkgrNk1hcXpl?=
+ =?utf-8?B?UzJyTjJWVys0MzhHc0lUZzI5Yzc5TDFSREkwNXczbThFRWZBNU1pQTczRmlp?=
+ =?utf-8?B?ZmNkdzl5Vms0UytxbVdpUXNtQmVCUVlzRXNSOXozalZkdE9FeGxzaXphYW1q?=
+ =?utf-8?B?dFArclBFMEdlb2dMU2RIMXZEVE0zM3RtSS91cGF6ZTU4amtUVUZueVBPWW5z?=
+ =?utf-8?B?Mm9RbUJ5Z3BJZFlXbEc3Uk1aN092RnBNTnZKdHZyTXRCc28xRVRnT1M5Sytz?=
+ =?utf-8?B?RGovVlRYRU5CVVY4WU0rNE1yM09YUFVDaGUxUmZSeHh2aFpwSzNnbURYUjFN?=
+ =?utf-8?B?a0xiRnNBQUNaT0phWHJTT1dKSUZaWjM3SXgxUkVPaDI4TVZmQ3ZlRHN6N25v?=
+ =?utf-8?B?bkZsd0VpWWptMGRVVVYzUWxkODM4U0JyMEhKT3A3T1Y1K2gyRjdZT1Z0SnZ3?=
+ =?utf-8?B?bmI1blQ1VE5yVm1xemxzRnhQeDBZTWtqWnBGNGM3SzVKQ1FBa2pqM0dXZ2tH?=
+ =?utf-8?B?cVg0WGx2SG5rRE5YSVNaU1doc05xQ3FuTUl3bUV3b0VMcFRpYzlZMVBsMmVn?=
+ =?utf-8?B?RDZvQnlvcDRXR2FBNlZjK3JybkErdUh4cDB0ZUlnSHI3c1owWnBDTzJQZUVx?=
+ =?utf-8?B?NmhIdUNxRHB0K1dqYW9sUExUUXhmenRZamJLTER2UEc1bGg2Yk1JbGFDUlNR?=
+ =?utf-8?B?ekswdTBPZUlEL2Jwc3FFaVNXVFhPNmVNUm5pV3lWeFVTRjVlcEgwcFlUVm9S?=
+ =?utf-8?B?dktRSElnZjlqVjNHa01mRlBpSk1pZDNtTjFKazV4OVlXVXZOWnBPNmVOWlV4?=
+ =?utf-8?B?RUFpYzIxb2FOUzJyZDY4bGZla0VFT2h3bTFSckpFMEZ6bmppVmluN210T0Zs?=
+ =?utf-8?B?dHVwdkRzeE8wQkpJNGZDcFVzV3RSZldBWC91RDkrWUVpVEFFVXVZZjlSdjlY?=
+ =?utf-8?B?WXA4Mm5xMDdQMTNEY3EwL05rdnAwM0ZzRHRubi9vSVdPckloMGNhU3NnVmVX?=
+ =?utf-8?B?N0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5d3eead-508e-4db6-e274-08dd858f2a18
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5934.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2025 13:26:49.0677
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 20j0d1dN7xhHy6/wzsHjTOjeCrXnkAI1+o3A9bqYaCdoamS0CQfOtj1BbWiNZz5uqEpyVmgRy5psQBsPId8l5fbEMoNFlyWgGqYmV+jN5YQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7797
+X-OriginatorOrg: intel.com
 
 
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+On 4/24/2025 8:29 PM, Jacek Kowalski wrote:
+> Hi,
+> 
+>>>> Because it is impossible to determine whether the NVM write would 
+>>>> finish
+>>>> correctly or hang (see 
+>>>> https://bugzilla.kernel.org/show_bug.cgi?id=213667)
+>>>> it makes sense to skip the validation completely under these 
+>>>> conditions.
+> 
+>> It is not completely accurate. All the NVMs starting from Tiger Lake 
+>> are locked for writes, so NVM writes will always result in a failure.
+> 
+> Check my message in a thread of an earlier patch:
+> 
+> Message-ID: <1c4b00b6-f6e3-4b04-a129-24452df60903@jacekk.info>
+> https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20250407/047551.html 
+> 
+> 
+> On my laptop NVM write operation *does not fail* (nor hangs), driver 
+> loads and ethtool shows corrected checksum.
+> 
+> This lasts only until module reload (rmmod/insmod) or reboot.
+> 
+> I guess only shadow RAM is updated (or something like that) and not the 
+> non-volatile memory, but the operation itself does not error out.
+
+Yeah, probably this is what happens.
+
+> 
+> It might also be because I've disabled Secure Boot...
+> 
+
+Anyway, I think that the commit message should be precise.
+How about this?
+
+Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the 
+driver cannot perform checksum validation and correction. This means 
+that all NVM images must leave the factory with correct checksum and 
+checksum valid bit set. Since Tiger Lake devices were the first to have 
+this lock, some systems in the field did not meet this requirement. 
+Therefore, for these transitional devices we skip checksum update and 
+verification, if the valid bit is not set.
 
