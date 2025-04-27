@@ -1,321 +1,133 @@
-Return-Path: <netdev+bounces-186287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3E6A9DFF7
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 08:39:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE47A9E042
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 09:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53B355A307C
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 06:39:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC6FC1897B37
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 07:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DC423F41A;
-	Sun, 27 Apr 2025 06:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4B5245022;
+	Sun, 27 Apr 2025 07:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="WYyjQOhZ"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="ie5YftHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5773719F43A;
-	Sun, 27 Apr 2025 06:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EB922D7A3
+	for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 07:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745735973; cv=none; b=tLGXSfdMAMzbszQETOJfARs+gwI/T2N8uRA1hj2a3GDgiBM7VZIwZNoRi1R5p7MZI/EM1L+JndESBVjfuYrMzR2MKZGbetY9nCN9uWFxtGuYB2vN8hUDuwgI+5nUdobJ9lfFsZtbcHOMmlVBVkXcgaRomZr6KgxAYg+nSIVdy/k=
+	t=1745737546; cv=none; b=PX29vKNdsK3aNbBVHhzW7I9ZKH89ad0u7XVIvXskFx7Rxn/ILPci5m0MAKYIcsR3C3YoxmOIIX2Q+r7ofGlpn/VrW/RdS79KT0fMhQQxk5uNn8PQ4oUubm+aJryBgV7DFk4A208q7zc0pIOGWnSVSwPWew7p9urdnI+Z+JslLBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745735973; c=relaxed/simple;
-	bh=1KUTe4VJP1xNF2VNHwy4i7kAovjH09ZQfopHkdFD8bI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=P9AM7YOI9pIU1DLuvcT3jU5FxuSfTG/p8dD6o+KAaHwk/GiZmkgSvdvthwYGFgNb4HRUqGTPAvD7Gb1qRuDw9TYA9fz0AoSV3/Ggp4zYVzdQ0FxTf0fqj5C/piSxk+0WIBBnYozPffqCQJ8M5bmPZvBn1zqaqP+2Bi+bD63WpKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=WYyjQOhZ; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=LnP2a
-	VLj/uA1xUaM2LTPsV7mUmvBriC6e38+xa5mYGA=; b=WYyjQOhZ+M41ksbyED8XK
-	zBHsJ6UFKT52oHrUtCCDjmAJIhL1qa54to/PPVkMMRYrIRniq9FM1Ni+Jjke0hi3
-	AP86h0IvDl4kt0B194RttAiikeBnLCDf7ScLdSkwjx5/99kZi7UsJsO3Zd3RCUTt
-	SNy+XZ77wyPfnDhypUNI1g=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wAnH_Ld0A1oUVz9Cw--.8800S2;
-	Sun, 27 Apr 2025 14:38:23 +0800 (CST)
-From: Feng Yang <yangfeng59949@163.com>
-To: martin.lau@linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mattbobrowski@google.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	davem@davemloft.net
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 bpf-next] bpf: Allow some trace helpers for all prog types
-Date: Sun, 27 Apr 2025 14:38:21 +0800
-Message-Id: <20250427063821.207263-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1745737546; c=relaxed/simple;
+	bh=cP6/XJCXVqldEshjXYoc8yE5Oq3R5dY8qFB9/WC3g1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifVasdEPVAp0tLekGue6xDlHRg/HvS0Nc6myj41gVznR/brSFwpY4NvJOxNzqp28W/sAbI7pUSJ3D5ZhI0KpVBwab9Ag5sSl8V3me04muGS181Zmc0YSwdmYdCMMvVNJUE6eu/GdkmznkF7/RrJEIS3car7RTpBdBf4clUW/R7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=ie5YftHH; arc=none smtp.client-ip=212.77.101.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 17292 invoked from network); 27 Apr 2025 08:39:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1745735941; bh=o3uXY+03fHMqEVm7xfc1m3HwM3CT7TcojXJU2tbxrfA=;
+          h=From:To:Cc:Subject;
+          b=ie5YftHHgYaGWXxljKQT+IURdnwlKkaXBpvqN124lcpaqyFuTYF3rQUBUZJPdS/Ip
+           LT9lXqsla0AerdAd6slIu4XlXtkjJl1TYiloi99J77+2syjmq42Fe0vp+BzgVlkZhN
+           inNgKhQmag6+Jx75X0Rqn5VxQ6sArK8ZzsivRzHTLRktD97WGW2Kz9m1AvuIp5C6JB
+           er77cb2I8R5vjeXyRljAfqYV4WYnYgvkwhlWC4r4AIgFziyo6I7JqkqruMryXkLW4I
+           wQ65e0K0CgkzOXYvugtgrdXlTZSiJPX636d3LBopgqC8s0GKBiNruJ+0Q0Dv8jZRpS
+           04RjbOA5UK7XA==
+Received: from 89-64-9-175.dynamic.chello.pl (HELO localhost) (stf_xl@wp.pl@[89.64.9.175])
+          (envelope-sender <stf_xl@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <a.safin@rosa.ru>; 27 Apr 2025 08:39:01 +0200
+Date: Sun, 27 Apr 2025 08:39:00 +0200
+From: Stanislaw Gruszka <stf_xl@wp.pl>
+To: Alexei Safin <a.safin@rosa.ru>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH v2] iwlegacy: 4965: fix possible out-of-bounds access in
+ il4965_tx_cmd_build_rate()
+Message-ID: <20250427063900.GA48509@wp.pl>
+References: <20250424185244.3562-1-a.safin@rosa.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAnH_Ld0A1oUVz9Cw--.8800S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3trW7tF1UtFy5tF1rGF43Awb_yoWDWry5pF
-	nrAr9xCr4kt3yaqr17Jwn7Z34Fy34DX3yUGayDGw1xur42vry7tF1UKF42gF1rAr9rW347
-	Z3yqvFZ0kw1Iga7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07ja4E_UUUUU=
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiTgA6eGgLtSPFxQABs4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250424185244.3562-1-a.safin@rosa.ru>
+X-WP-MailID: 3dfcb9b3360eb4c1b73ce68492ffa8f3
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000001 [gSIx]                               
 
-From: Feng Yang <yangfeng@kylinos.cn>
+Hi
 
-if it works under NMI and doesn't use any context-dependent things,
-should be fine for any program type. The detailed discussion is in [1].
+On Thu, Apr 24, 2025 at 09:52:44PM +0300, Alexei Safin wrote:
+> Prevent out-of-bounds access in il4965_tx_cmd_build_rate() by rejecting
+> rate_idx values greater than or equal to RATE_COUNT_LEGACY.
+> 
+> Use a correct bounds check to avoid accessing il_rates[] with
+> an invalid index. The previous comparison allowed rate_idx to become
+> equal to RATE_COUNT_LEGACY, which exceeds the array limit.
 
-[1] https://lore.kernel.org/all/CAEf4Bza6gK3dsrTosk6k3oZgtHesNDSrDd8sdeQ-GiS6oJixQg@mail.gmail.com/
+Thanks for the patch, however I think it's not correct.
 
-Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
----
-Changes in v2:
-- not expose compat probe read APIs to more program types.
-- Remove the prog->sleepable check added for copy_from_user,
-- or the summarization_freplace/might_sleep_with_might_sleep test will fail with the error "program of this type cannot use helper bpf_copy_from_user"
-- Link to v1: https://lore.kernel.org/all/20250425080032.327477-1-yangfeng59949@163.com/
----
- kernel/bpf/cgroup.c      |  6 ------
- kernel/bpf/helpers.c     | 38 +++++++++++++++++++++++++++++++++++++
- kernel/trace/bpf_trace.c | 41 ++++------------------------------------
- net/core/filter.c        |  2 --
- 4 files changed, 42 insertions(+), 45 deletions(-)
+The definitions are:
 
-diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
-index 84f58f3d028a..dbdad5f42761 100644
---- a/kernel/bpf/cgroup.c
-+++ b/kernel/bpf/cgroup.c
-@@ -2607,16 +2607,10 @@ const struct bpf_func_proto *
- cgroup_current_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- {
- 	switch (func_id) {
--	case BPF_FUNC_get_current_uid_gid:
--		return &bpf_get_current_uid_gid_proto;
--	case BPF_FUNC_get_current_comm:
--		return &bpf_get_current_comm_proto;
- #ifdef CONFIG_CGROUP_NET_CLASSID
- 	case BPF_FUNC_get_cgroup_classid:
- 		return &bpf_get_cgroup_classid_curr_proto;
- #endif
--	case BPF_FUNC_current_task_under_cgroup:
--		return &bpf_current_task_under_cgroup_proto;
- 	default:
- 		return NULL;
- 	}
-diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-index e3a2662f4e33..a01a2e55e17d 100644
---- a/kernel/bpf/helpers.c
-+++ b/kernel/bpf/helpers.c
-@@ -23,6 +23,7 @@
- #include <linux/btf_ids.h>
- #include <linux/bpf_mem_alloc.h>
- #include <linux/kasan.h>
-+#include <linux/bpf_verifier.h>
- 
- #include "../../lib/kstrtox.h"
- 
-@@ -1912,6 +1913,12 @@ const struct bpf_func_proto bpf_probe_read_user_str_proto __weak;
- const struct bpf_func_proto bpf_probe_read_kernel_proto __weak;
- const struct bpf_func_proto bpf_probe_read_kernel_str_proto __weak;
- const struct bpf_func_proto bpf_task_pt_regs_proto __weak;
-+const struct bpf_func_proto bpf_perf_event_read_proto __weak;
-+const struct bpf_func_proto bpf_send_signal_proto __weak;
-+const struct bpf_func_proto bpf_send_signal_thread_proto __weak;
-+const struct bpf_func_proto bpf_get_task_stack_sleepable_proto __weak;
-+const struct bpf_func_proto bpf_get_task_stack_proto __weak;
-+const struct bpf_func_proto bpf_get_branch_snapshot_proto __weak;
- 
- const struct bpf_func_proto *
- bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
-@@ -1965,6 +1972,8 @@ bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return &bpf_get_current_pid_tgid_proto;
- 	case BPF_FUNC_get_ns_current_pid_tgid:
- 		return &bpf_get_ns_current_pid_tgid_proto;
-+	case BPF_FUNC_get_current_uid_gid:
-+		return &bpf_get_current_uid_gid_proto;
- 	default:
- 		break;
- 	}
-@@ -2022,6 +2031,8 @@ bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return &bpf_get_current_cgroup_id_proto;
- 	case BPF_FUNC_get_current_ancestor_cgroup_id:
- 		return &bpf_get_current_ancestor_cgroup_id_proto;
-+	case BPF_FUNC_current_task_under_cgroup:
-+		return &bpf_current_task_under_cgroup_proto;
- #endif
- 	default:
- 		break;
-@@ -2037,6 +2048,8 @@ bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return &bpf_get_current_task_proto;
- 	case BPF_FUNC_get_current_task_btf:
- 		return &bpf_get_current_task_btf_proto;
-+	case BPF_FUNC_get_current_comm:
-+		return &bpf_get_current_comm_proto;
- 	case BPF_FUNC_probe_read_user:
- 		return &bpf_probe_read_user_proto;
- 	case BPF_FUNC_probe_read_kernel:
-@@ -2047,6 +2060,10 @@ bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 	case BPF_FUNC_probe_read_kernel_str:
- 		return security_locked_down(LOCKDOWN_BPF_READ_KERNEL) < 0 ?
- 		       NULL : &bpf_probe_read_kernel_str_proto;
-+	case BPF_FUNC_copy_from_user:
-+		return &bpf_copy_from_user_proto;
-+	case BPF_FUNC_copy_from_user_task:
-+		return &bpf_copy_from_user_task_proto;
- 	case BPF_FUNC_snprintf_btf:
- 		return &bpf_snprintf_btf_proto;
- 	case BPF_FUNC_snprintf:
-@@ -2057,6 +2074,27 @@ bpf_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return bpf_get_trace_vprintk_proto();
- 	case BPF_FUNC_perf_event_read_value:
- 		return bpf_get_perf_event_read_value_proto();
-+	case BPF_FUNC_perf_event_read:
-+		return &bpf_perf_event_read_proto;
-+	case BPF_FUNC_send_signal:
-+		return &bpf_send_signal_proto;
-+	case BPF_FUNC_send_signal_thread:
-+		return &bpf_send_signal_thread_proto;
-+	case BPF_FUNC_get_task_stack:
-+		return prog->sleepable ? &bpf_get_task_stack_sleepable_proto
-+				       : &bpf_get_task_stack_proto;
-+	case BPF_FUNC_task_storage_get:
-+		if (bpf_prog_check_recur(prog))
-+			return &bpf_task_storage_get_recur_proto;
-+		return &bpf_task_storage_get_proto;
-+	case BPF_FUNC_task_storage_delete:
-+		if (bpf_prog_check_recur(prog))
-+			return &bpf_task_storage_delete_recur_proto;
-+		return &bpf_task_storage_delete_proto;
-+	case BPF_FUNC_get_branch_snapshot:
-+		return &bpf_get_branch_snapshot_proto;
-+	case BPF_FUNC_find_vma:
-+		return &bpf_find_vma_proto;
- 	default:
- 		return NULL;
- 	}
-diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-index 52c432a44aeb..868920994517 100644
---- a/kernel/trace/bpf_trace.c
-+++ b/kernel/trace/bpf_trace.c
-@@ -572,7 +572,7 @@ BPF_CALL_2(bpf_perf_event_read, struct bpf_map *, map, u64, flags)
- 	return value;
- }
- 
--static const struct bpf_func_proto bpf_perf_event_read_proto = {
-+const struct bpf_func_proto bpf_perf_event_read_proto = {
- 	.func		= bpf_perf_event_read,
- 	.gpl_only	= true,
- 	.ret_type	= RET_INTEGER,
-@@ -882,7 +882,7 @@ BPF_CALL_1(bpf_send_signal, u32, sig)
- 	return bpf_send_signal_common(sig, PIDTYPE_TGID, NULL, 0);
- }
- 
--static const struct bpf_func_proto bpf_send_signal_proto = {
-+const struct bpf_func_proto bpf_send_signal_proto = {
- 	.func		= bpf_send_signal,
- 	.gpl_only	= false,
- 	.ret_type	= RET_INTEGER,
-@@ -894,7 +894,7 @@ BPF_CALL_1(bpf_send_signal_thread, u32, sig)
- 	return bpf_send_signal_common(sig, PIDTYPE_PID, NULL, 0);
- }
- 
--static const struct bpf_func_proto bpf_send_signal_thread_proto = {
-+const struct bpf_func_proto bpf_send_signal_thread_proto = {
- 	.func		= bpf_send_signal_thread,
- 	.gpl_only	= false,
- 	.ret_type	= RET_INTEGER,
-@@ -1185,7 +1185,7 @@ BPF_CALL_3(bpf_get_branch_snapshot, void *, buf, u32, size, u64, flags)
- 	return entry_cnt * br_entry_size;
- }
- 
--static const struct bpf_func_proto bpf_get_branch_snapshot_proto = {
-+const struct bpf_func_proto bpf_get_branch_snapshot_proto = {
- 	.func		= bpf_get_branch_snapshot,
- 	.gpl_only	= true,
- 	.ret_type	= RET_INTEGER,
-@@ -1430,14 +1430,8 @@ bpf_tracing_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 	const struct bpf_func_proto *func_proto;
- 
- 	switch (func_id) {
--	case BPF_FUNC_get_current_uid_gid:
--		return &bpf_get_current_uid_gid_proto;
--	case BPF_FUNC_get_current_comm:
--		return &bpf_get_current_comm_proto;
- 	case BPF_FUNC_get_smp_processor_id:
- 		return &bpf_get_smp_processor_id_proto;
--	case BPF_FUNC_perf_event_read:
--		return &bpf_perf_event_read_proto;
- #ifdef CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
- 	case BPF_FUNC_probe_read:
- 		return security_locked_down(LOCKDOWN_BPF_READ_KERNEL) < 0 ?
-@@ -1446,35 +1440,8 @@ bpf_tracing_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return security_locked_down(LOCKDOWN_BPF_READ_KERNEL) < 0 ?
- 		       NULL : &bpf_probe_read_compat_str_proto;
- #endif
--#ifdef CONFIG_CGROUPS
--	case BPF_FUNC_current_task_under_cgroup:
--		return &bpf_current_task_under_cgroup_proto;
--#endif
--	case BPF_FUNC_send_signal:
--		return &bpf_send_signal_proto;
--	case BPF_FUNC_send_signal_thread:
--		return &bpf_send_signal_thread_proto;
--	case BPF_FUNC_get_task_stack:
--		return prog->sleepable ? &bpf_get_task_stack_sleepable_proto
--				       : &bpf_get_task_stack_proto;
--	case BPF_FUNC_copy_from_user:
--		return &bpf_copy_from_user_proto;
--	case BPF_FUNC_copy_from_user_task:
--		return &bpf_copy_from_user_task_proto;
--	case BPF_FUNC_task_storage_get:
--		if (bpf_prog_check_recur(prog))
--			return &bpf_task_storage_get_recur_proto;
--		return &bpf_task_storage_get_proto;
--	case BPF_FUNC_task_storage_delete:
--		if (bpf_prog_check_recur(prog))
--			return &bpf_task_storage_delete_recur_proto;
--		return &bpf_task_storage_delete_proto;
- 	case BPF_FUNC_get_func_ip:
- 		return &bpf_get_func_ip_proto_tracing;
--	case BPF_FUNC_get_branch_snapshot:
--		return &bpf_get_branch_snapshot_proto;
--	case BPF_FUNC_find_vma:
--		return &bpf_find_vma_proto;
- 	default:
- 		break;
- 	}
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 79cab4d78dc3..53bf560354f7 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -8488,8 +8488,6 @@ sk_msg_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 		return &bpf_msg_pop_data_proto;
- 	case BPF_FUNC_perf_event_output:
- 		return &bpf_event_output_data_proto;
--	case BPF_FUNC_get_current_uid_gid:
--		return &bpf_get_current_uid_gid_proto;
- 	case BPF_FUNC_sk_storage_get:
- 		return &bpf_sk_storage_get_proto;
- 	case BPF_FUNC_sk_storage_delete:
--- 
-2.43.0
+enum {
+        RATE_1M_IDX = 0,
+	...
+	RATE_54M_INDEX,
+	RATE_60M_INDEX,
+	RATE_COUNT
+        RATE_COUNT_LEGACY = RATE_COUNT - 1,     /* Excluding 60M */
+}
 
+extern const struct il_rate_info il_rates[RATE_COUNT];
+
+> Replace the check 'rate_idx > RATE_COUNT_LEGACY' with
+> 'rate_idx >= RATE_COUNT_LEGACY' to ensure memory safety.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+> Fixes: 7ac9a364c172 ("iwlegacy: move under intel directory")
+> Signed-off-by: Alexei Safin <a.safin@rosa.ru>
+> ---
+> v2: change reciepent
+>  drivers/net/wireless/intel/iwlegacy/4965-mac.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> index 78dee8ccfebf..f60d9b9798c1 100644
+> --- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> +++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> @@ -1572,7 +1572,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
+>  	 */
+>  	rate_idx = info->control.rates[0].idx;
+>  	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
+> -	    || rate_idx > RATE_COUNT_LEGACY)
+> +	    || rate_idx >= RATE_COUNT_LEGACY)
+>  		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
+
+.. so looks the check is fine already and changing it will induce a bug
+for RATE_54M_INDEX.
+
+Regards
+Stanislaw
+
+>  	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
+>  	if (info->band == NL80211_BAND_5GHZ)
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
 
