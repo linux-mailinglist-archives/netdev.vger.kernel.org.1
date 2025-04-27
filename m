@@ -1,174 +1,137 @@
-Return-Path: <netdev+bounces-186284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 115F8A9DEC8
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 05:07:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7FFDA9DF32
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 07:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6665C463B13
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 03:07:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D3D5A6F96
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 05:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CD81DE3A8;
-	Sun, 27 Apr 2025 03:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6EF227EB6;
+	Sun, 27 Apr 2025 05:43:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB937A930;
-	Sun, 27 Apr 2025 03:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BF9226CE5;
+	Sun, 27 Apr 2025 05:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745723222; cv=none; b=dAcViOB9ywefzHKjIs05HqTX6vN3pPN0dYz3I6MKxwMJ8aSmLFNs3Is1sruDX0SCevc46TrehddNL3GpilVZlxPjjMQnY5vjIzNEqQuMQw5LQtRb2DyIVL9+1O2hR7OELVIB63ZNAYqB0pVje/aN4vFjYmfuwXTot3jf4e6G7Po=
+	t=1745732606; cv=none; b=octWBoWVLtK/4MEiVDwIiI9uj/XeiGSqMYNvtNsor8ZZyYN8Qx4NJo0gnRnmHqqEU1ZMpikFADsOaG5UecvjCkhb/eLkYZrH4mCqzjPpBGrsb4x92YB3Z2OqnXp9CDkaTJAJ9rnIeVzRpw+hN7ytBQqryhX7gWn6X55n4+X/eNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745723222; c=relaxed/simple;
-	bh=rEICvCV1FekVGkUaonF/ktjdSyKg+00nNCVgOU7bKG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hW5ctdc/WgmoUDGF6dKLCN4A1Ww0VQGjUOUT3R7hm+TjpFEFOoLLwU4G4u3DJ8OUE3hMFcYWhHCTsecd3oTKtPEGNJig/mhJblErpGyduFOXt6kFGUf7exNQnGAuqFiCNRLD4yLo6f5Z6aqBn8vuKmKLcAJBDRxQrAJI/jgLM2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZlWc43QQ9z8xCc;
-	Sun, 27 Apr 2025 11:03:16 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 41ED41800B2;
-	Sun, 27 Apr 2025 11:06:41 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sun, 27 Apr 2025 11:06:40 +0800
-Message-ID: <11fb538b-0007-4fe7-96b2-6ddb255b496e@huawei.com>
-Date: Sun, 27 Apr 2025 11:06:32 +0800
+	s=arc-20240116; t=1745732606; c=relaxed/simple;
+	bh=fGptivm7HpFQnBALM9ABS0OE4T0+36zBT/L71NS477Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tcrdFnFpObbiUNO1zGvJZBZvJXsqS8IPASld1l2/DZADhUApQ2Ona3Pvo8XjWmxJ/uOp1eWaxntUc3AyujnV9yWHQiDt5nkgaaXoczGEVDJ8kQNeTj1wUadParQeJHGR7pvq/O3Wiq4/VNS2Eh98F72+PnnkDcF7QEGG6Lcsr1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d8e9f26b96so31895895ab.1;
+        Sat, 26 Apr 2025 22:43:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745732601; x=1746337401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oy4M4hL9SuSSgN6ArJgNtJBu7fkhmoEiZXyOUTNGzv8=;
+        b=tt40fIlinBzUgnxDBQUUi9Jqz3Z6ew/XHzCisYcEq9ETTIF4lQ3CKrsMBWJp5lbFob
+         2EnCRGjy+J3TXojBrwMZAywnvbfutGUua91y0fc18XHicVFjxEUXQ+JTXZeLEKlFGzM+
+         VfntOve0i+IQbyZbODrOvuLSgatUWdC2PTrNTXP7DVrAiHyiiT+9eknIiUV2fE0gRg6V
+         1RmjtvSmSgwYH9Cg5ww55ATkh2g4akyfVbmxBA2HR6cgaId5U8kUUWUc+txV9w2qKxyx
+         N8d+NLsC2sk/WQg829bsa6gp39PBPUGTxiWyUDN6ZEPxhvJbzIqYCQ6spC0e+OmTeGSi
+         QffA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaA+js85aEVLs48d7uIIeUHCY0c/ROd/q7OAkccrJBADLzdOAc8AUbTT4BuLHWraJ5rOocaglz@vger.kernel.org, AJvYcCWp7lfGyaXacgW4tiGkuYdZdSN66zheghCmklOGKhA1tJCyYM+LjWBcHDWVrT+L1buz2bOrX1sipYuN@vger.kernel.org, AJvYcCXuI46egPlWg+N2uU8E+BjWjj6JMy4A2E9n9Iqtnr9yHlYt95mfl4d50BnJWyfwhEU3pqYYpYUoEZyno+4D@vger.kernel.org
+X-Gm-Message-State: AOJu0YzofOwxO+M9JVVSohy0RwmDngplMVepYii42kSytYh8vo+3QJCn
+	VnvMx59UwqME2UfnpFC73VPyeqkSnlnyMbyukQ/oP/qCX5QUwI5qixxPpLurNe0=
+X-Gm-Gg: ASbGnctgGXH2FzbkvgdeDE0aKEFoLZp+XG6XSoRh4fOL59YTXDe4bjvY3KIG3JdaBX+
+	AtVqdU8ZC79XqIt7k953PUIftjTBcgzU3BAdwyqxaLk+65KU3/6ZJNvK04+E36vkpsHpCDSQVzr
+	xy2pLl6fO3O/w98YfWEIu5Huckko+SnhhGSl3Z7QN5WDpZkWwU61LdLNDPGjFelU/bQOXdfDUrN
+	SdmiciYqeT9ti0iR+G4ZTYbF2gCd8Phkvss03hXi9LopsCo0N5NnWIhLipk7ZNaHptEa630/l+U
+	fVXHP8fCIuj9Thuo+JQb6I6jtV+mBTX+o+IqkHEFFSudWF+ZtILzkWGU6SRW1Cz5gwo3KQoQ3CQ
+	Pz70feL6K
+X-Google-Smtp-Source: AGHT+IEOemKhKGhg4a4tg8ITb1dquc69hh1KYuf5vsdw87ScX1yRti50XS5o1E8t+CiITwRmsLaS+w==
+X-Received: by 2002:a05:6e02:318a:b0:3d6:d147:81c9 with SMTP id e9e14a558f8ab-3d93b46e94fmr97825505ab.12.1745732601683;
+        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com. [209.85.166.174])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a42153sm1610801173.56.2025.04.26.22.43.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d8e9f26b96so31895555ab.1;
+        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUDw9ZPPBno6JfuX6flLfwbObWdv7VTwvh+ObJc75bsUegOQNgGp1tnhC8iBdp32bCR5mg+0qT8irkH@vger.kernel.org, AJvYcCWV28s41ojcs/HxNWTXGfbBGGsq3n76H7eYSyHwpB10yCpMmDfRA8/8OFwsxGS9Oto7qwGUJf/+MbpeQgTB@vger.kernel.org, AJvYcCXGmNaHZpDaD5EuR6Qk3tY0ukg23/5rVL47P/OrCMLho8ePdas2F+P7QpQ8WcYJk2EQs0IAEPmH@vger.kernel.org
+X-Received: by 2002:a92:ca48:0:b0:3d8:1d34:4edf with SMTP id
+ e9e14a558f8ab-3d93b5cd78fmr81686365ab.15.1745732601011; Sat, 26 Apr 2025
+ 22:43:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] bonding: hold ops lock around get_link
-To: Stanislav Fomichev <sdf@fomichev.me>, <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jv@jvosburgh.net>, <andrew+netdev@lunn.ch>,
-	<linux-kernel@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
-	<syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com>
-References: <20250410161117.3519250-1-sdf@fomichev.me>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <20250410161117.3519250-1-sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org> <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
+In-Reply-To: <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Sun, 27 Apr 2025 13:43:06 +0800
+X-Gmail-Original-Message-ID: <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
+X-Gm-Features: ATxdqUH2fWJgqqz2HBql7fBmhdeRPMb6pK4jyUd7a8JS30hjhTPhRmRmPYt9c6Q
+Message-ID: <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] dt-bindings: arm: sunxi: Add A523 EMAC0 compatible
+To: Yixun Lan <dlan@gentoo.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andre Przywara <andre.przywara@arm.com>, Corentin Labbe <clabbe.montjoie@gmail.com>, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Apr 24, 2025 at 6:09=E2=80=AFPM Yixun Lan <dlan@gentoo.org> wrote:
+>
+> Allwinner A523 SoC variant (A527/T527) contains an "EMAC0" Ethernet
+> MAC compatible to the A64 version.
+
+The patch subject prefix should be "dt-bindings: net: sun8i-emac: ".
+
+And this needs an Ack from the DT binding maintainers.
+
+ChenYu
 
 
-在 2025/4/11 0:11, Stanislav Fomichev 写道:
-> syzbot reports a case of ethtool_ops->get_link being called without
-> ops lock:
->
->   ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:63
->   bond_check_dev_link+0x1fb/0x4b0 drivers/net/bonding/bond_main.c:864
->   bond_miimon_inspect drivers/net/bonding/bond_main.c:2734 [inline]
->   bond_mii_monitor+0x49d/0x3170 drivers/net/bonding/bond_main.c:2956
->   process_one_work kernel/workqueue.c:3238 [inline]
->   process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
->   worker_thread+0x870/0xd50 kernel/workqueue.c:3400
->   kthread+0x7b7/0x940 kernel/kthread.c:464
->   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->
-> Commit 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
-> changed to lockless __linkwatch_sync_dev in ethtool_op_get_link.
-> All paths except bonding are coming via locked ioctl. Add necessary
-> locking to bonding.
->
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-> Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
-> Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Yixun Lan <dlan@gentoo.org>
 > ---
-> v2:
-> - move 'BMSR_LSTATUS : 0' part out (Jakub)
-> ---
->   drivers/net/bonding/bond_main.c | 13 +++++++++----
->   1 file changed, 9 insertions(+), 4 deletions(-)
+>  Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml | 1=
+ +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 950d8e4d86f8..8ea183da8d53 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -850,8 +850,9 @@ static int bond_check_dev_link(struct bonding *bond,
->   			       struct net_device *slave_dev, int reporting)
->   {
->   	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
-> -	struct ifreq ifr;
->   	struct mii_ioctl_data *mii;
-> +	struct ifreq ifr;
-> +	int ret;
->   
->   	if (!reporting && !netif_running(slave_dev))
->   		return 0;
-> @@ -860,9 +861,13 @@ static int bond_check_dev_link(struct bonding *bond,
->   		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
->   
->   	/* Try to get link status using Ethtool first. */
-> -	if (slave_dev->ethtool_ops->get_link)
-> -		return slave_dev->ethtool_ops->get_link(slave_dev) ?
-> -			BMSR_LSTATUS : 0;
-> +	if (slave_dev->ethtool_ops->get_link) {
-> +		netdev_lock_ops(slave_dev);
-> +		ret = slave_dev->ethtool_ops->get_link(slave_dev);
-> +		netdev_unlock_ops(slave_dev);
-> +
-> +		return ret ? BMSR_LSTATUS : 0;
-> +	}
->   
->   	/* Ethtool can't be used, fallback to MII ioctls. */
->   	if (slave_ops->ndo_eth_ioctl) {
-
-
-Hello, I find that a WARNING still exists:
-
-   RTNL: assertion failed at ./include/net/netdev_lock.h (56)
-   WARNING: CPU: 1 PID: 3020 at ./include/net/netdev_lock.h:56 
-netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
-   WARNING: CPU: 1 PID: 3020 at ./include/net/netdev_lock.h:56 
-__linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
-   Modules linked in:
-   CPU: 1 UID: 0 PID: 3020 Comm: kworker/u8:10 Not tainted 
-6.15.0-rc2-syzkaller-00257-gb5c6891b2c5b #0 PREEMPT(full)
-   Hardware name: Google Compute Engine, BIOS Google 02/12/2025
-   Workqueue: bond0 bond_mii_monitor
-   RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
-
-It is report by syzbot (link: 
-https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086).
-
-Because ASSERT_RTNL() failed in netdev_ops_assert_locked().
-
-I wonder if should add rtnl lock in bond_check_dev_link()?
-
-Like this:
-
-   +++ b/drivers/net/bonding/bond_main.c
-   @@ -862,10 +862,12 @@  static int bond_check_dev_link(struct bonding 
-*bond,
-
-        /* Try to get link status using Ethtool first. */
-        if (slave_dev->ethtool_ops->get_link) {
-   -        netdev_lock_ops(slave_dev);
-   -        ret = slave_dev->ethtool_ops->get_link(slave_dev);
-   -        netdev_unlock_ops(slave_dev);
-   -
-   +        if (rtnl_trylock()) {
-   +            netdev_lock_ops(slave_dev);
-   +            ret = slave_dev->ethtool_ops->get_link(slave_dev);
-   +            netdev_unlock_ops(slave_dev);
-   +            rtnl_unlock();
-   +        }
-            return ret ? BMSR_LSTATUS : 0;
-        }
-
+> diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-e=
+mac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.=
+yaml
+> index 7fe0352dff0f8d74a08f3f6aac5450ad685e6a08..7b6a2fde8175353621367c8d8=
+f7a956e4aac7177 100644
+> --- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yam=
+l
+> +++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yam=
+l
+> @@ -23,6 +23,7 @@ properties:
+>                - allwinner,sun20i-d1-emac
+>                - allwinner,sun50i-h6-emac
+>                - allwinner,sun50i-h616-emac0
+> +              - allwinner,sun55i-a523-emac0
+>            - const: allwinner,sun50i-a64-emac
+>
+>    reg:
+>
+> --
+> 2.49.0
+>
+>
 
