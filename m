@@ -1,129 +1,192 @@
-Return-Path: <netdev+bounces-186308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B93B4A9E21F
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 11:33:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D5FDA9E250
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 11:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3FC3168E05
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 09:29:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4170D7ABCD0
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 09:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A470253322;
-	Sun, 27 Apr 2025 09:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B1B2512E2;
+	Sun, 27 Apr 2025 09:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="M//ALZ9S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bo6VpUfT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B99622D4FF;
-	Sun, 27 Apr 2025 09:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE297204090;
+	Sun, 27 Apr 2025 09:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745746027; cv=none; b=us3Dlcy84H2RbkuKvJ5n2DT/yVm0nTnkzhtNHs8NbbHuHeZm2SG4Rga7MXyG5m/Tj7IJkhMPtSGR8ofSFdp1Z04X/lXtbXgMeEJ+OIjH+YEOzfTR9S6kB7ZfQCEglyawTyvlULqb53F8fs4FMQG4uOuiwusC4WhHAYnxJnr7wrc=
+	t=1745747879; cv=none; b=FOcmWhOuW3QhtK4ZIPMYIqhT07+Ke+B+/gJ7bmuf4Qdu8JyohtzeIWsI+MDRBB9PvsIGFSBVn0CV5ErzTiZ4yv8XLtgrZGaJbqklO1X2It8xH3/fuRZlxRp4kDWVNh8rGxkV+aR8xH2H5P49AoTMN4CNyQe00QKc2en/zzTiIBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745746027; c=relaxed/simple;
-	bh=MIEw6Uk+Yy3hODU6rwhHvIU2GjFINvMLe/ajDksnc7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TIuVWn0tMG8l0AhF0zED3/GcYcaapiBhYth42B7oI8vwV1j3sNGQhGbiLCctcb6kCfwqbg+7a8RmZzuaOC1a2o4HfKYkuDx9mU0eRH4z+YUgsp4QYJCNxoPO2Pm0CTkEeAROWz5SPkrm/jHaPUdNIHRln5QgIAx9D3OwWgj9qiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=M//ALZ9S; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53R9QJ7P1607230
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 27 Apr 2025 02:26:19 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53R9QJ7P1607230
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745745982;
-	bh=MIEw6Uk+Yy3hODU6rwhHvIU2GjFINvMLe/ajDksnc7g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=M//ALZ9Sj+luXQrDMRpV2wKmumbHvDVNiTfeqhmsOqEn27FbweEdRBGxeQudcHytg
-	 mjZ0mzPUGKx3F/LVuWSdCk4ViQohkiMVOe6rMp1EIjc/BK+o1SZ+H9XVTS5+G+kSeO
-	 zQ3NHolfCn7sahiOBdM1OBsESpcIUtcW9qo6sKNY60Vfxfvch+08cpnvAyLmXFnYsQ
-	 93Y7Wskrdj3G6wb4UcX3Mz6aoc2egCpy0NZxMDGruB37nyn5jhzeGyVdMqPgshwSiv
-	 6FXv61KqgGYM/rKMdEXcU26QtoBhaWUY+LA1ZxkaC+aC++GFPJfxtH4TbeC8zG4BPw
-	 6m/0oO6Lz9THg==
-Message-ID: <5a953dcc-96c1-4312-a8b5-25ca7ee4d0f7@zytor.com>
-Date: Sun, 27 Apr 2025 02:26:18 -0700
+	s=arc-20240116; t=1745747879; c=relaxed/simple;
+	bh=l5Tb27Y5vyg3wY4lvkOBbo+U4H8Yv7JXSiafDA/SyBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NrMMo9DmHw7YvhCH19LgYm18vDoivkFDI58UDmCO0DLyZQmGaOMbkr0yNQg3HO/ok7qf0cd8XyfY/phwuvLnEd01Rn23H9muj24iNE4AxdMhsB8lqkwL7aqVi50ERlAcjrzzrVRWvO11mkodLQvvOChJZp0ukpKOjGj+Ipu8esQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bo6VpUfT; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3995ff6b066so1873409f8f.3;
+        Sun, 27 Apr 2025 02:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745747876; x=1746352676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zi8y+KhY8MsuzyCXspyB4bbIiSJsbGXeifwHJP4F24E=;
+        b=bo6VpUfT4yINkNVRQ9l+Bl7T3ImZtre+HLFMMvtNzcojeokOtGmBFxOlPPUEhFrhT6
+         MIhu2KP6G5IrHFBKx/C9WUCXw82B2fCRax1g3YJJ5EOHVxq6bdJY1Nwvv1LabAr8JaoF
+         8IhI4qpE7vNw4GRmFEYOSQY+ZB8bWATqKYqi7YUO1QJvTXNstEKYkR93BdXr2Ctig4wM
+         ja2RlzXiH1mB5FT87FPnbqlMwAjJmE10w7YXo+1tpiaTYRCXbxU6Jj3xQJQqFBNHgWsF
+         BYffI+kYsPe4Sgte25VUEFsWosALwAxu0E+hHiunqP4EU5ThlIqdQHx3A4CszeE5JU01
+         Xv5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745747876; x=1746352676;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zi8y+KhY8MsuzyCXspyB4bbIiSJsbGXeifwHJP4F24E=;
+        b=RcrforHJksy3f7CsdABkmuZdjT49fMU1/z6yCOcVPUCn4DbF4twUmx9BwDlxdhTqlA
+         Y2MQBbb9YfPYzVYQT3JpJfjhvZ7j8ispZ6v8L2wjPCOW6fXKUHUvFPKpMYlPf3R37P9H
+         nYx13BhxcC3Bnz+YoJDiREEQ941NPe/vtlik0kNotlHZ9kMCK1EsiZP8UdhRZwyUSGyU
+         3iFVse68DxZYXaTRVVd40VV+dtBlY9Snu/NjFaHNkhTJsF4NB4oo3/bvx+of+dRAqGT4
+         XinT0kjPWosEkuT+ECSC63hodOx8kxy6ycJi/TFFdJ6XR2+60WCkP5gKaXTLM92Of6Nr
+         w9HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCIcqYIE+2Kl8Kt0ZRLwy6wHwUyrAZl9LcZqvBRUtxN+zopwL9UQYxhRDFjNoJW6+mBK1X3fP9PufDZSs=@vger.kernel.org, AJvYcCWNSJhTNQ2B+FREo8hnEkPFUGyjvMIeIfnCcGN/bUVekxbu5u7FP+KcVnAOU/YcIR7VoiPjFf1z@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS7MKEkI6aCgmYL+5u/nKGrWZFFC9Ebjw1+9GhSVhUzXpZ67Ml
+	Ui9+/wsdBaN4GxS518XwczwtDvL9/2Sm+fv73oK7GZParTZgMx8c
+X-Gm-Gg: ASbGnctOkIKDe3uyeqwgm5Q2jPUfTOxXpfRxsuBHZdqKyg4HXWMifTH6JOrI3OAgty2
+	yZk2MQVfkVgcjyoyibBHNm3mOmYw7m1lGPm6doHzt+FWLXyayfTKZk7KTtzvRZSlbiIxJb7oI7y
+	cqfJmRZlsaEipGnLai0lBsy0kPKDl3mVWIqfpDRyxSx2PlBTHLDBlXggpTYBe+M/H2MiUrnW1/m
+	5Q5m5cX+6ZV2djlZiFJG01i73xo/dWGTehOXHhIuRH2JGkKvcreaH4RnhVquaMKRdeS7xYMzTPK
+	l9qKOFnYDTkDs1JFKcZao+LblIOBUGYdkKO2J7oMHvL54ovQjzxwW7LzXTozPbZqqPlytRJEFfB
+	5AZW02j0U7fPTPg==
+X-Google-Smtp-Source: AGHT+IHuYyVGFk9WjYZYs2dMxl6iVkS/EC6ijwaWExOoiJPt+HXv1feQNnbFXAK9zx4qKDIFzeetVQ==
+X-Received: by 2002:a05:6000:2283:b0:39f:6e9:8701 with SMTP id ffacd0b85a97d-3a07aa5ad4dmr3931241f8f.7.1745747875550;
+        Sun, 27 Apr 2025 02:57:55 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e46454sm7987033f8f.78.2025.04.27.02.57.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Apr 2025 02:57:55 -0700 (PDT)
+Date: Sun, 27 Apr 2025 10:57:50 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pkshih@realtek.com, larry.chiu@realtek.com, Andrew
+ Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net v3 3/3] rtase: Fix a type error in min_t
+Message-ID: <20250427105750.2f8efb02@pumpkin>
+In-Reply-To: <20250422132831.GH2843373@horms.kernel.org>
+References: <20250417085659.5740-1-justinlai0215@realtek.com>
+	<20250417085659.5740-4-justinlai0215@realtek.com>
+	<20250422132831.GH2843373@horms.kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/14] x86/xen/msr: Remove calling
- native_{read,write}_msr{,_safe}() in pmu_msr_{read,write}()
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
-        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-References: <20250425083442.2390017-1-xin@zytor.com>
- <20250425083442.2390017-10-xin@zytor.com>
- <d2bdd61d-cab6-401f-9b6a-17b28f3cd19c@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <d2bdd61d-cab6-401f-9b6a-17b28f3cd19c@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 4/27/2025 2:21 AM, Mi, Dapeng wrote:
-> Reviewed-by: Dapeng Mi<dapeng1.mi@linux.intel.com>
+On Tue, 22 Apr 2025 14:28:31 +0100
+Simon Horman <horms@kernel.org> wrote:
 
-Thanks!
+> + David Laight
+> 
+> On Thu, Apr 17, 2025 at 04:56:59PM +0800, Justin Lai wrote:
+> > Fix a type error in min_t.
+> > 
+> > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > ---
+> >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 55b8d3666153..bc856fb3d6f3 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > @@ -1923,7 +1923,7 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
+> >  	u8 msb, time_count, time_unit;
+> >  	u16 int_miti;
+> >  
+> > -	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
+> > +	time_us = min_t(u32, time_us, RTASE_MITI_MAX_TIME);  
+> 
+> Hi Justin, Andrew, David, all,
+> 
+> I may be on the wrong track here, but near the top of minmax.h I see:
+> 
+> /*
+>  * min()/max()/clamp() macros must accomplish several things:
+>  *
+>  * - Avoid multiple evaluations of the arguments (so side-effects like
+>  *   "x++" happen only once) when non-constant.
+>  * - Perform signed v unsigned type-checking (to generate compile
+>  *   errors instead of nasty runtime surprises).
+>  * - Unsigned char/short are always promoted to signed int and can be
+>  *   compared against signed or unsigned arguments.
+>  * - Unsigned arguments can be compared against non-negative signed constants.
+>  * - Comparison of a signed argument against an unsigned constant fails
+>  *   even if the constant is below __INT_MAX__ and could be cast to int.
+>  */
+> 
+> So, considering the 2nd last point, I think we can simply use min()
+> both above and below. Which would avoid the possibility of
+> casting to the wrong type again in future.
+> 
+> Also, aside from which call is correct. Please add some colour
+> to the commit message describing why this is a bug if it is
+> to be treated as a fix for net rather than a clean-up for net-next.
 
-I just sent out v4, so unless a v5 is needed, leave it to our x86
-maintainers.
+Indeed.
+Using min_t(u16,...) is entirely an 'accident waiting to happen'.
+If you are going to cast all the arguments to a function you really
+better ensure the type is big enough for all the arguments.
+The fact that one is 'u16' in no way indicates that casting the
+other(s) won't discard high significant bits.
+(and if you want a u16 result it is entirely wrong.)
+
+In this case i don't understand the code at all.
+The function is static and is only called once with a compile-time
+constant value.
+So, AFIACT, should reduce to a compile time constant.
+
+There is also the entire 'issue' of using u16 variables at all.
+You might want u16 structure members (to save space or map hardware)
+but for local variables they are only likely to increase code size.
+
+	David
+
+
+> 
+> >  
+> >  	if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
+> >  		msb = fls(time_us);
+> > @@ -1945,7 +1945,7 @@ static u16 rtase_calc_packet_num_mitigation(u16 pkt_num)
+> >  	u8 msb, pkt_num_count, pkt_num_unit;
+> >  	u16 int_miti;
+> >  
+> > -	pkt_num = min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> > +	pkt_num = min_t(u16, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+
+So a definite NAK on that change.
+
+> >  
+> >  	if (pkt_num > 60) {
+> >  		pkt_num_unit = RTASE_MITI_MAX_PKT_NUM_IDX;
+> > -- 
+> > 2.34.1
+> >   
+
 
