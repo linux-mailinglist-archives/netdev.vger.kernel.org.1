@@ -1,137 +1,217 @@
-Return-Path: <netdev+bounces-186285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FFDA9DF32
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 07:43:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6145A9DF53
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 08:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D3D5A6F96
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 05:43:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C50F71892769
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 06:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6EF227EB6;
-	Sun, 27 Apr 2025 05:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761331FDE02;
+	Sun, 27 Apr 2025 06:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=aliyun.com header.i=@aliyun.com header.b="QnrpRDGZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-87.freemail.mail.aliyun.com (out30-87.freemail.mail.aliyun.com [115.124.30.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BF9226CE5;
-	Sun, 27 Apr 2025 05:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4783BB48;
+	Sun, 27 Apr 2025 06:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745732606; cv=none; b=octWBoWVLtK/4MEiVDwIiI9uj/XeiGSqMYNvtNsor8ZZyYN8Qx4NJo0gnRnmHqqEU1ZMpikFADsOaG5UecvjCkhb/eLkYZrH4mCqzjPpBGrsb4x92YB3Z2OqnXp9CDkaTJAJ9rnIeVzRpw+hN7ytBQqryhX7gWn6X55n4+X/eNc=
+	t=1745734635; cv=none; b=glqK/NYo+g3MvJsGnMOaa9gTVzIkPo2Lb8D2wkNNvkxP/20Qs7RhKNV3cOMmOmu8HKmvivVt2jZraknlhoIjxlmzcjgYoZd9tfbDQ23/uJxWiz+HR2F1KSBnoPEpdOyEPSuTqzrDh92hKft/FU+WwePyuBMUz1WCU5td/2y6qOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745732606; c=relaxed/simple;
-	bh=fGptivm7HpFQnBALM9ABS0OE4T0+36zBT/L71NS477Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tcrdFnFpObbiUNO1zGvJZBZvJXsqS8IPASld1l2/DZADhUApQ2Ona3Pvo8XjWmxJ/uOp1eWaxntUc3AyujnV9yWHQiDt5nkgaaXoczGEVDJ8kQNeTj1wUadParQeJHGR7pvq/O3Wiq4/VNS2Eh98F72+PnnkDcF7QEGG6Lcsr1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3d8e9f26b96so31895895ab.1;
-        Sat, 26 Apr 2025 22:43:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745732601; x=1746337401;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oy4M4hL9SuSSgN6ArJgNtJBu7fkhmoEiZXyOUTNGzv8=;
-        b=tt40fIlinBzUgnxDBQUUi9Jqz3Z6ew/XHzCisYcEq9ETTIF4lQ3CKrsMBWJp5lbFob
-         2EnCRGjy+J3TXojBrwMZAywnvbfutGUua91y0fc18XHicVFjxEUXQ+JTXZeLEKlFGzM+
-         VfntOve0i+IQbyZbODrOvuLSgatUWdC2PTrNTXP7DVrAiHyiiT+9eknIiUV2fE0gRg6V
-         1RmjtvSmSgwYH9Cg5ww55ATkh2g4akyfVbmxBA2HR6cgaId5U8kUUWUc+txV9w2qKxyx
-         N8d+NLsC2sk/WQg829bsa6gp39PBPUGTxiWyUDN6ZEPxhvJbzIqYCQ6spC0e+OmTeGSi
-         QffA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaA+js85aEVLs48d7uIIeUHCY0c/ROd/q7OAkccrJBADLzdOAc8AUbTT4BuLHWraJ5rOocaglz@vger.kernel.org, AJvYcCWp7lfGyaXacgW4tiGkuYdZdSN66zheghCmklOGKhA1tJCyYM+LjWBcHDWVrT+L1buz2bOrX1sipYuN@vger.kernel.org, AJvYcCXuI46egPlWg+N2uU8E+BjWjj6JMy4A2E9n9Iqtnr9yHlYt95mfl4d50BnJWyfwhEU3pqYYpYUoEZyno+4D@vger.kernel.org
-X-Gm-Message-State: AOJu0YzofOwxO+M9JVVSohy0RwmDngplMVepYii42kSytYh8vo+3QJCn
-	VnvMx59UwqME2UfnpFC73VPyeqkSnlnyMbyukQ/oP/qCX5QUwI5qixxPpLurNe0=
-X-Gm-Gg: ASbGnctgGXH2FzbkvgdeDE0aKEFoLZp+XG6XSoRh4fOL59YTXDe4bjvY3KIG3JdaBX+
-	AtVqdU8ZC79XqIt7k953PUIftjTBcgzU3BAdwyqxaLk+65KU3/6ZJNvK04+E36vkpsHpCDSQVzr
-	xy2pLl6fO3O/w98YfWEIu5Huckko+SnhhGSl3Z7QN5WDpZkWwU61LdLNDPGjFelU/bQOXdfDUrN
-	SdmiciYqeT9ti0iR+G4ZTYbF2gCd8Phkvss03hXi9LopsCo0N5NnWIhLipk7ZNaHptEa630/l+U
-	fVXHP8fCIuj9Thuo+JQb6I6jtV+mBTX+o+IqkHEFFSudWF+ZtILzkWGU6SRW1Cz5gwo3KQoQ3CQ
-	Pz70feL6K
-X-Google-Smtp-Source: AGHT+IEOemKhKGhg4a4tg8ITb1dquc69hh1KYuf5vsdw87ScX1yRti50XS5o1E8t+CiITwRmsLaS+w==
-X-Received: by 2002:a05:6e02:318a:b0:3d6:d147:81c9 with SMTP id e9e14a558f8ab-3d93b46e94fmr97825505ab.12.1745732601683;
-        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com. [209.85.166.174])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824a42153sm1610801173.56.2025.04.26.22.43.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d8e9f26b96so31895555ab.1;
-        Sat, 26 Apr 2025 22:43:21 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUDw9ZPPBno6JfuX6flLfwbObWdv7VTwvh+ObJc75bsUegOQNgGp1tnhC8iBdp32bCR5mg+0qT8irkH@vger.kernel.org, AJvYcCWV28s41ojcs/HxNWTXGfbBGGsq3n76H7eYSyHwpB10yCpMmDfRA8/8OFwsxGS9Oto7qwGUJf/+MbpeQgTB@vger.kernel.org, AJvYcCXGmNaHZpDaD5EuR6Qk3tY0ukg23/5rVL47P/OrCMLho8ePdas2F+P7QpQ8WcYJk2EQs0IAEPmH@vger.kernel.org
-X-Received: by 2002:a92:ca48:0:b0:3d8:1d34:4edf with SMTP id
- e9e14a558f8ab-3d93b5cd78fmr81686365ab.15.1745732601011; Sat, 26 Apr 2025
- 22:43:21 -0700 (PDT)
+	s=arc-20240116; t=1745734635; c=relaxed/simple;
+	bh=gbSMFJmbFCs8UxyB41r2trmHJs9hJWBd2mtskWj+NY8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=obzJ66VcUHM3ZfgP/1S+4aJZvU6F+oLUhdStTPrEKVm6/5I8uEQ9qyC8G2SUqbAuYfWUeY7Xq/t1fda4uVWIWcxGBp8gYX3yptwrMtTK+MokjsJuyjci3/eMd0f6ghTktHZJfE6M01PuMbQDZmXrCa9oOyowq7KnZl6nRdEbehw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aliyun.com; spf=pass smtp.mailfrom=aliyun.com; dkim=pass (1024-bit key) header.d=aliyun.com header.i=@aliyun.com header.b=QnrpRDGZ; arc=none smtp.client-ip=115.124.30.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aliyun.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aliyun.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=aliyun.com; s=s1024;
+	t=1745734629; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=ewz3YKdZUxD2ycD/PcdBcvNZjRxN+t3Ej5aU5o05fNA=;
+	b=QnrpRDGZQqWjjoFLrtI+kT+7ENmGwYztLudweAVDfSfGtLLHiqbZDJ+XqSJCqz/Tpjd7yJ6pJqpUQUOFw1LkJ/i/t9Ry74LBVtLwgRUXLOegyIh3tHfYYtOedQafFm0OT1LpCNHaBlIjxZEA+Ds27UJ4y+zh0B+e1KttfNkzhEU=
+Received: from wdhh6.sugon.cn(mailfrom:wdhh6@aliyun.com fp:SMTPD_---0WY7wnYI_1745734628 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 27 Apr 2025 14:17:09 +0800
+From: Chaohai Chen <wdhh6@aliyun.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	paul@paul-moore.com,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	Chaohai Chen <wdhh6@aliyun.com>
+Subject: [PATCH] net:ipv4: Use shift left 2 to calculate the length of the IPv4 header.
+Date: Sun, 27 Apr 2025 14:17:06 +0800
+Message-Id: <20250427061706.391920-1-wdhh6@aliyun.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org> <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
-In-Reply-To: <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
-Reply-To: wens@csie.org
-From: Chen-Yu Tsai <wens@csie.org>
-Date: Sun, 27 Apr 2025 13:43:06 +0800
-X-Gmail-Original-Message-ID: <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
-X-Gm-Features: ATxdqUH2fWJgqqz2HBql7fBmhdeRPMb6pK4jyUd7a8JS30hjhTPhRmRmPYt9c6Q
-Message-ID: <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] dt-bindings: arm: sunxi: Add A523 EMAC0 compatible
-To: Yixun Lan <dlan@gentoo.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andre Przywara <andre.przywara@arm.com>, Corentin Labbe <clabbe.montjoie@gmail.com>, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 24, 2025 at 6:09=E2=80=AFPM Yixun Lan <dlan@gentoo.org> wrote:
->
-> Allwinner A523 SoC variant (A527/T527) contains an "EMAC0" Ethernet
-> MAC compatible to the A64 version.
+Encapsulate the IPV4_HEADER_LEN macro and use shift left 2 to calculate
+the length of the IPv4 header instead of multiplying 4 everywhere.
 
-The patch subject prefix should be "dt-bindings: net: sun8i-emac: ".
+Signed-off-by: Chaohai Chen <wdhh6@aliyun.com>
+---
+ include/net/ip.h                    | 2 ++
+ net/ipv4/ah4.c                      | 8 ++++----
+ net/ipv4/cipso_ipv4.c               | 4 ++--
+ net/ipv4/ip_input.c                 | 8 ++++----
+ net/ipv4/netfilter/nf_reject_ipv4.c | 4 ++--
+ 5 files changed, 14 insertions(+), 12 deletions(-)
 
-And this needs an Ack from the DT binding maintainers.
+diff --git a/include/net/ip.h b/include/net/ip.h
+index ba7b43447775..0fa172d73a52 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -38,6 +38,8 @@
+ #define IPV4_MAX_PMTU		65535U		/* RFC 2675, Section 5.1 */
+ #define IPV4_MIN_MTU		68			/* RFC 791 */
+ 
++#define IPV4_HEADER_LEN(ihl)    (ihl << 2)
++
+ extern unsigned int sysctl_fib_sync_mem;
+ extern unsigned int sysctl_fib_sync_mem_min;
+ extern unsigned int sysctl_fib_sync_mem_max;
+diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
+index 64aec3dff8ec..d09e07408c2e 100644
+--- a/net/ipv4/ah4.c
++++ b/net/ipv4/ah4.c
+@@ -77,7 +77,7 @@ static inline struct scatterlist *ah_req_sg(struct crypto_ahash *ahash,
+ static int ip_clear_mutable_options(const struct iphdr *iph, __be32 *daddr)
+ {
+ 	unsigned char *optptr = (unsigned char *)(iph+1);
+-	int  l = iph->ihl*4 - sizeof(struct iphdr);
++	int  l = IPV4_HEADER_LEN(iph->ihl) - sizeof(struct iphdr);
+ 	int  optlen;
+ 
+ 	while (l > 0) {
+@@ -134,7 +134,7 @@ static void ah_output_done(void *data, int err)
+ 	top_iph->frag_off = iph->frag_off;
+ 	if (top_iph->ihl != 5) {
+ 		top_iph->daddr = iph->daddr;
+-		memcpy(top_iph+1, iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
++		memcpy(top_iph + 1, iph + 1, IPV4_HEADER_LEN(top_iph->ihl) - sizeof(struct iphdr));
+ 	}
+ 
+ 	kfree(AH_SKB_CB(skb)->tmp);
+@@ -194,7 +194,7 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
+ 
+ 	if (top_iph->ihl != 5) {
+ 		iph->daddr = top_iph->daddr;
+-		memcpy(iph+1, top_iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
++		memcpy(iph + 1, top_iph + 1, IPV4_HEADER_LEN(top_iph->ihl) - sizeof(struct iphdr));
+ 		err = ip_clear_mutable_options(top_iph, &top_iph->daddr);
+ 		if (err)
+ 			goto out_free;
+@@ -250,7 +250,7 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
+ 	top_iph->frag_off = iph->frag_off;
+ 	if (top_iph->ihl != 5) {
+ 		top_iph->daddr = iph->daddr;
+-		memcpy(top_iph+1, iph+1, top_iph->ihl*4 - sizeof(struct iphdr));
++		memcpy(top_iph + 1, iph + 1, IPV4_HEADER_LEN(top_iph->ihl) - sizeof(struct iphdr));
+ 	}
+ 
+ out_free:
+diff --git a/net/ipv4/cipso_ipv4.c b/net/ipv4/cipso_ipv4.c
+index 740af8541d2f..9134d31bd64b 100644
+--- a/net/ipv4/cipso_ipv4.c
++++ b/net/ipv4/cipso_ipv4.c
+@@ -1501,7 +1501,7 @@ unsigned char *cipso_v4_optptr(const struct sk_buff *skb)
+ 	int optlen;
+ 	int taglen;
+ 
+-	for (optlen = iph->ihl*4 - sizeof(struct iphdr); optlen > 1; ) {
++	for (optlen = IPV4_HEADER_LEN(iph->ihl) - sizeof(struct iphdr); optlen > 1; ) {
+ 		switch (optptr[0]) {
+ 		case IPOPT_END:
+ 			return NULL;
+@@ -1728,7 +1728,7 @@ void cipso_v4_error(struct sk_buff *skb, int error, u32 gateway)
+ 	 */
+ 
+ 	memset(opt, 0, sizeof(struct ip_options));
+-	opt->optlen = ip_hdr(skb)->ihl*4 - sizeof(struct iphdr);
++	opt->optlen = IPV4_HEADER_LEN(ip_hdr(skb)->ihl) - sizeof(struct iphdr);
+ 	rcu_read_lock();
+ 	res = __ip_options_compile(dev_net(skb->dev), opt, skb, NULL);
+ 	rcu_read_unlock();
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index 30a5e9460d00..235553f50b6c 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -276,7 +276,7 @@ static inline bool ip_rcv_options(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	iph = ip_hdr(skb);
+ 	opt = &(IPCB(skb)->opt);
+-	opt->optlen = iph->ihl*4 - sizeof(struct iphdr);
++	opt->optlen = IPV4_HEADER_LEN(iph->ihl) - sizeof(struct iphdr);
+ 
+ 	if (ip_options_compile(dev_net(dev), opt, skb)) {
+ 		__IP_INC_STATS(dev_net(dev), IPSTATS_MIB_INHDRERRORS);
+@@ -501,7 +501,7 @@ static struct sk_buff *ip_rcv_core(struct sk_buff *skb, struct net *net)
+ 		       IPSTATS_MIB_NOECTPKTS + (iph->tos & INET_ECN_MASK),
+ 		       max_t(unsigned short, 1, skb_shinfo(skb)->gso_segs));
+ 
+-	if (!pskb_may_pull(skb, iph->ihl*4))
++	if (!pskb_may_pull(skb, IPV4_HEADER_LEN(iph->ihl)))
+ 		goto inhdr_error;
+ 
+ 	iph = ip_hdr(skb);
+@@ -514,7 +514,7 @@ static struct sk_buff *ip_rcv_core(struct sk_buff *skb, struct net *net)
+ 		drop_reason = SKB_DROP_REASON_PKT_TOO_SMALL;
+ 		__IP_INC_STATS(net, IPSTATS_MIB_INTRUNCATEDPKTS);
+ 		goto drop;
+-	} else if (len < (iph->ihl*4))
++	} else if (len < IPV4_HEADER_LEN(iph->ihl))
+ 		goto inhdr_error;
+ 
+ 	/* Our transport medium may have padded the buffer out. Now we know it
+@@ -527,7 +527,7 @@ static struct sk_buff *ip_rcv_core(struct sk_buff *skb, struct net *net)
+ 	}
+ 
+ 	iph = ip_hdr(skb);
+-	skb->transport_header = skb->network_header + iph->ihl*4;
++	skb->transport_header = skb->network_header + IPV4_HEADER_LEN(iph->ihl);
+ 
+ 	/* Remove any debris in the socket control block */
+ 	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index 87fd945a0d27..ec2d8d93c241 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -27,10 +27,10 @@ static int nf_reject_iphdr_validate(struct sk_buff *skb)
+ 	len = ntohs(iph->tot_len);
+ 	if (skb->len < len)
+ 		return 0;
+-	else if (len < (iph->ihl*4))
++	else if (len < IPV4_HEADER_LEN(iph->ihl))
+ 		return 0;
+ 
+-	if (!pskb_may_pull(skb, iph->ihl*4))
++	if (!pskb_may_pull(skb, IPV4_HEADER_LEN(iph->ihl)))
+ 		return 0;
+ 
+ 	return 1;
+-- 
+2.34.1
 
-ChenYu
-
-
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Yixun Lan <dlan@gentoo.org>
-> ---
->  Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml | 1=
- +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-e=
-mac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.=
-yaml
-> index 7fe0352dff0f8d74a08f3f6aac5450ad685e6a08..7b6a2fde8175353621367c8d8=
-f7a956e4aac7177 100644
-> --- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yam=
-l
-> +++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yam=
-l
-> @@ -23,6 +23,7 @@ properties:
->                - allwinner,sun20i-d1-emac
->                - allwinner,sun50i-h6-emac
->                - allwinner,sun50i-h616-emac0
-> +              - allwinner,sun55i-a523-emac0
->            - const: allwinner,sun50i-a64-emac
->
->    reg:
->
-> --
-> 2.49.0
->
->
 
