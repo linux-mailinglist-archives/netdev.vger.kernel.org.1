@@ -1,242 +1,118 @@
-Return-Path: <netdev+bounces-186314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5343A9E353
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 15:41:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE00A9E359
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 15:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB739189FEC1
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 13:41:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C60189AA38
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 13:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF3A17CA1B;
-	Sun, 27 Apr 2025 13:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0713D14885D;
+	Sun, 27 Apr 2025 13:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="NoabVIaX"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C92D7E110
-	for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 13:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535F32AE89
+	for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 13:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745761280; cv=none; b=euHFMhywm9j7ro+lbk6PW274Jm4VApGptFzhuPlQCSQ+/etAh5r07VlIyOMAIvEMLNOJCxXUg+Q6WPMRRibpuvd6rQXWQcYuPRG090GWBBMvizg2Ep0umMLH3yDGxnY0AmffLJRjMTyPj5DExjGU+p+YX+sc/eKXuDJFFqDEWJA=
+	t=1745761400; cv=none; b=Nca+DcQGhOZxtleThvcZ4SYAgMipPTGh46AkjzZk40D4LAgsayqBG1vziIR7uxZz7fAFlbHjald9AFzxnqhgXwr5y5A/dyR6SGVJzgX3Euqf+g2BfguZdqnhI8PaYizB/N15WuwxoRCahnbggYcdSBbhC49VnAAXQnVg2ECPCdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745761280; c=relaxed/simple;
-	bh=ikFGBs4KPnaLHm/wpDtXdgUB435DQd98kOARQxyqFsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ri4o11q/tOZiTXMKqqzNB5JsYJglowOmS9kepsoboxm1dkhyEPPr0nn0Nc48siia24Xa/vlMdkE0FV37p4L/dC5qJF2LEfa01DVd47tPzG+PgvRNxf+PVVSh+7QoZ5axIU2p3NKgsM4AjKtxYgjw50BusqyglDpbaBWUzocMe/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u92FO-0002FE-Jm; Sun, 27 Apr 2025 15:40:42 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u92FI-002N5b-32;
-	Sun, 27 Apr 2025 15:40:36 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u92FI-00AJYY-2k;
-	Sun, 27 Apr 2025 15:40:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v2 1/1] Documentation: networking: expand and clarify EEE_GET/EEE_SET documentation
-Date: Sun, 27 Apr 2025 15:40:34 +0200
-Message-Id: <20250427134035.2458430-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1745761400; c=relaxed/simple;
+	bh=REZ0z+XUzHW/ptwizPeESYAMDlgEamrUX13FRsJPeO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u53ey1eCYF5IJViGB6853GWqa96pug0aZQZmtBQ4lcyzlyCu1Ixn7zbaEVmhZpVKM2VqqzXbVexpNX5qHV+XSoVETjjBgCAr/3lDB6u6CKJ7hzB/wdhUffP8bK09pbkF+qTu5MN2qUu/xTC4DElcp//rBHPC7Jp0HlMaqtnem2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=NoabVIaX; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac289147833so681962666b.2
+        for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 06:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1745761398; x=1746366198; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z4+/5/aJ00yUVo743NQIajtPIPLeDpfyWDZMv+sSR0I=;
+        b=NoabVIaX/mUUlaXpXXTOxHW6OsMQf+NouNsY2/GwxWZZc7hbDnucB1DuatPnBJOd0d
+         9OoFs3OsZ91n2tha3E2YCuPptq8Jyk2UEw1WMbKqC83T2Qu892v4cM0fp6qAYmg5M6Jx
+         DwsvuZHqU7g5YgDsahiu2W6zWrSNnqyQJld2YX6ZvxtqfbHA+yia2MO64fvTskKmewR2
+         /AFZ3kOUW1MqFQnXh6AsceEU9zw1xCgif0yiZm358IFJI/pr973HF8tpPh5RipoeUUbq
+         nbLVhTDdlar8DW5KnzhYjVLJX9bw5ZDLCP/tJAJ/3ooonWLot2QSazFRKGAduaI364J3
+         1QHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745761398; x=1746366198;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z4+/5/aJ00yUVo743NQIajtPIPLeDpfyWDZMv+sSR0I=;
+        b=LlHs3ZH1whQjvbu7dh3kOvtK08C+GkbW436PegNI36dYqt3QrjZUhdlSeExx+TPJ6Q
+         55QjJ0DpyGHiP/tgsF9jdgCk9jIOLPe83dzJrQFPLZgFQXo2uLvjvCgShYoms+I9elaA
+         oHJWh2oChXS+70k/b6adPlVOf1ZQcc4iwZq2KRC9rGYT9f/yevE7RsxnHgz+pgsF9FjX
+         0Dohw/gdQ9QFze9fuO0EZ1MeLCmKxj74CJmsTcfjB2f+tAK+wjAUgImcFLM8LkyUnXVR
+         mrFnY5+J9RckzuqbuFUG1NRJSyHqv7dp+Wvk0/Cs+yvPPKGo4iwKzxwHMkEQ9n2L3x8I
+         Jm9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUTDA1EQ364joNZ0fR7kr+BocKvYD7IoRUzr7m/g0s0BPMxdhmrl2Pppybvz77I0WsYUx8OUzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw96yd8+Te/pkmnXERzK6QqH+/iR7tz1kF9v1lW7kcbbbd37yml
+	lyI+0FsZhRmA2078N16qDItuqZ85ZnrnRwFkOgDzQ6Ppr+7XEytpsazltQVTxTc=
+X-Gm-Gg: ASbGncsB/F0Cu3VoYB0oEoHmF7NNEk15kycRGj3iPGhX3Rbo+iONDPM7i7mqtVz7ooP
+	jasmyTd0m8xgVRJKnVzrUindSbz+09KmanWFPYx03VEYZd550c/xQ5g9TVAVXcL6z00jLBr5Pks
+	0Vy6YVYdhyyHs6tCVUU0dYmHEfRt/4yZAFEQvfz3uyAs/d0eVzVsfU2U6CbaK8bEekcZww7phFP
+	Q5zSb/CyY74CADOuSZAJSpc3VFGLyOt43M0N00c9KUO1PLqGgz9eJCwP9/xfo7ZVWW12WdAO3DE
+	bCGBtA6ibyoGDJFV0J1Wdx8XQ6E0l/zaEZdLC7hX/00tJHyW/a3V8vaZCCK/
+X-Google-Smtp-Source: AGHT+IGRwUVwOyuzymMCwS+0qn15iMV9FUUdCVvXLMQI1GdB2QpaBU0EsMQ7nsFAnRwnHK8jvuB1mg==
+X-Received: by 2002:a17:906:1548:b0:ace:3f00:25f5 with SMTP id a640c23a62f3a-ace848c23f1mr395019466b.2.1745761397537;
+        Sun, 27 Apr 2025 06:43:17 -0700 (PDT)
+Received: from [192.168.50.4] ([82.78.167.145])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ecf82f9sm442101266b.88.2025.04.27.06.43.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Apr 2025 06:43:16 -0700 (PDT)
+Message-ID: <33e56253-32ee-4eff-a7cd-fcf91ca4f37a@tuxon.dev>
+Date: Sun, 27 Apr 2025 16:43:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] ARM: dts: microchip: sama7d65: Add MCP16502 to
+ sama7d65 curiosity
+To: Ryan.Wanner@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, onor+dt@kernel.org, alexandre.belloni@bootlin.com
+Cc: Nicolas.Ferre@microchip.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <cover.1743523114.git.Ryan.Wanner@microchip.com>
+ <60f6b7764227bb42c74404e8ca1388477183b7b5.1743523114.git.Ryan.Wanner@microchip.com>
+ <6e52883b-2811-4ac2-9763-5974ca463274@tuxon.dev>
+ <af92ffff-f900-4f29-8d26-2516a3c91805@microchip.com>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <af92ffff-f900-4f29-8d26-2516a3c91805@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Improve the documentation for ETHTOOL_MSG_EEE_GET and ETHTOOL_MSG_EEE_SET
-to provide accurate descriptions of all netlink attributes involved.
+Hi, Ryan,
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- Documentation/networking/ethtool-netlink.rst | 111 ++++++++++++++++---
- include/uapi/linux/ethtool.h                 |   3 +
- 2 files changed, 96 insertions(+), 18 deletions(-)
+On 14.04.2025 18:38, Ryan.Wanner@microchip.com wrote:
+>>> +                     vldo2: LDO2 {
+>>> +                             regulator-name = "LDO2";
+>>> +                             regulator-min-microvolt = <1200000>;
+>>> +                             regulator-max-microvolt = <3700000>;
+>>> +
+>>> +                             regulator-state-standby {
+>>> +                                     regulator-suspend-microvolt = <1800000>;
+>> I can't find the schematics for this board. Is there a reason for keeping
+>> this @1.8V in suspend?
+> Sorry this was an error on my part, there is no reason to have this
+> @1.8V in suspend mode.
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index b6e9af4d0f1b..78ee481437a4 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1215,20 +1215,16 @@ Kernel response contents:
- 
-   =====================================  ======  ==========================
-   ``ETHTOOL_A_EEE_HEADER``               nested  request header
--  ``ETHTOOL_A_EEE_MODES_OURS``           bool    supported/advertised modes
--  ``ETHTOOL_A_EEE_MODES_PEER``           bool    peer advertised link modes
-+  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  supported/advertised modes
-+  ``ETHTOOL_A_EEE_MODES_PEER``           bitset  peer advertised link modes
-   ``ETHTOOL_A_EEE_ACTIVE``               bool    EEE is actively used
-   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
--  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
--  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
-+  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx LPI enabled
-+  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx LPI timeout (in us)
-   =====================================  ======  ==========================
- 
--In ``ETHTOOL_A_EEE_MODES_OURS``, mask consists of link modes for which EEE is
--enabled, value of link modes for which EEE is advertised. Link modes for which
--peer advertises EEE are listed in ``ETHTOOL_A_EEE_MODES_PEER`` (no mask). The
--netlink interface allows reporting EEE status for all link modes but only
--first 32 are provided by the ``ethtool_ops`` callback.
--
-+For detailed explanation of each attribute, see the ``EEE Attributes``
-+section.
- 
- EEE_SET
- =======
-@@ -1239,17 +1235,96 @@ Request contents:
- 
-   =====================================  ======  ==========================
-   ``ETHTOOL_A_EEE_HEADER``               nested  request header
--  ``ETHTOOL_A_EEE_MODES_OURS``           bool    advertised modes
-+  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  advertised modes
-   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
--  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
--  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
-+  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx LPI enabled
-+  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx LPI timeout (in us)
-   =====================================  ======  ==========================
- 
--``ETHTOOL_A_EEE_MODES_OURS`` is used to either list link modes to advertise
--EEE for (if there is no mask) or specify changes to the list (if there is
--a mask). The netlink interface allows reporting EEE status for all link modes
--but only first 32 can be set at the moment as that is what the ``ethtool_ops``
--callback supports.
-+For detailed explanation of each attribute, see the ``EEE Attributes``
-+section.
-+
-+EEE Attributes
-+==============
-+
-+Limitations:
-+
-+The netlink interface allows configuring all link modes up to
-+``__ETHTOOL_LINK_MODE_MASK_NBITS``, but if the driver relies on legacy
-+``ethtool_ops``, only the first 32 link modes are supported.
-+
-+The following structure is used for the ioctl interface (``ETHTOOL_GEEE`` and
-+``ETHTOOL_SEEE``):
-+
-+.. kernel-doc:: include/uapi/linux/ethtool.h
-+    :identifiers: ethtool_eee
-+
-+Mapping between netlink attributes and struct fields:
-+
-+  ================================  ================================
-+  Netlink attribute                 struct ethtool_eee field
-+  ================================  ================================
-+  ``ETHTOOL_A_EEE_MODES_OURS``       advertised
-+  ``ETHTOOL_A_EEE_MODES_PEER``       lp_advertised
-+  ``ETHTOOL_A_EEE_ACTIVE``           eee_active
-+  ``ETHTOOL_A_EEE_ENABLED``          eee_enabled
-+  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``   tx_lpi_enabled
-+  ``ETHTOOL_A_EEE_TX_LPI_TIMER``     tx_lpi_timer
-+  ================================  ================================
-+
-+
-+``ETHTOOL_A_EEE_MODES_OURS`` (bitset)
-+-------------------------------------
-+- Value: link modes that the driver intends to advertise for EEE.
-+- Mask: subset of link modes supported for EEE by the interface.
-+
-+The advertised EEE capabilities are maintained in software state and persist
-+across toggling EEE on or off. If ``ETHTOOL_A_EEE_ENABLED`` is false, the PHY
-+does not advertise EEE, but the configured value is reported.
-+
-+``ETHTOOL_A_EEE_MODES_PEER`` (bitset)
-+-------------------------------------
-+- Value: link modes that the link partner advertises for EEE.
-+- Mask: empty.
-+
-+This value is typically reported by the hardware and may represent only a
-+subset of the actual capabilities supported and advertised by the link partner.
-+The local hardware may not be able to detect or represent all EEE-capable modes
-+of the peer.
-+
-+``ETHTOOL_A_EEE_ACTIVE`` (bool)
-+-------------------------------
-+Indicates whether EEE is currently active on the link. EEE is considered active
-+if:
-+
-+ - ``ETHTOOL_A_EEE_ENABLED`` is true,
-+ - Autonegotiation is enabled,
-+ - The current link mode is EEE-capable,
-+ - Both the local advertisement and the peer advertisement include this link
-+   mode.
-+
-+``ETHTOOL_A_EEE_ENABLED`` (bool)
-+--------------------------------
-+A software-controlled flag.
-+
-+When ``ETHTOOL_A_EEE_ENABLED`` is set to true and autonegotiation is active,
-+the kernel programs the EEE advertisement settings into the PHY hardware
-+registers. This enables negotiation of EEE capability with the link partner.
-+
-+When ``ETHTOOL_A_EEE_ENABLED`` is set to false, EEE advertisement is disabled.
-+The PHY will not include EEE capability in its autonegotiation pages, and EEE
-+will not be negotiated even if it remains configured in software state.
-+
-+``ETHTOOL_A_EEE_TX_LPI_ENABLED`` (bool)
-+---------------------------------------
-+Controls whether the system may enter the Low Power Idle (LPI) state after
-+transmission has stopped.
-+
-+``ETHTOOL_A_EEE_TX_LPI_TIMER`` (u32)
-+------------------------------------
-+Defines the delay in microseconds after the last transmitted frame before the
-+MAC may enter the Low Power Idle (LPI) state. This value applies globally to
-+all link modes. A higher timer value delays LPI entry.
- 
- 
- TSINFO_GET
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index 84833cca29fe..c596618633bc 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -366,6 +366,9 @@ struct ethtool_eeprom {
-  *	its tx lpi (after reaching 'idle' state). Effective only when eee
-  *	was negotiated and tx_lpi_enabled was set.
-  * @reserved: Reserved for future use; see the note on reserved space.
-+ *
-+ * More detailed documentation can be found in
-+ * Documentation/networking/ethtool-netlink.rst section "EEE Attributes".
-  */
- struct ethtool_eee {
- 	__u32	cmd;
--- 
-2.39.5
-
+OK, I'll drop it while applying, thank you!
 
