@@ -1,116 +1,174 @@
-Return-Path: <netdev+bounces-186283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F23D7A9DE33
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 03:06:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115F8A9DEC8
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 05:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DD731A8461F
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 01:06:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6665C463B13
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 03:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0363C1DED70;
-	Sun, 27 Apr 2025 01:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CD81DE3A8;
+	Sun, 27 Apr 2025 03:07:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8AE42A83;
-	Sun, 27 Apr 2025 01:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB937A930;
+	Sun, 27 Apr 2025 03:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745715975; cv=none; b=nngeVPGkRrTsLzSAFUP62l9CxnIDIQaQI2gRPwaDAy10PUAHvrpalGzmXSO/ZqOgGqoUKNpjbe2mSdtBZbhcAJKeUL726VnYAjhXsihwqpLXaSM8/rbyoItMx7jyMy60LXetahe6AoAAOxJ1WMA9fKxHuJ6Hmi0asirs7sGV0Z0=
+	t=1745723222; cv=none; b=dAcViOB9ywefzHKjIs05HqTX6vN3pPN0dYz3I6MKxwMJ8aSmLFNs3Is1sruDX0SCevc46TrehddNL3GpilVZlxPjjMQnY5vjIzNEqQuMQw5LQtRb2DyIVL9+1O2hR7OELVIB63ZNAYqB0pVje/aN4vFjYmfuwXTot3jf4e6G7Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745715975; c=relaxed/simple;
-	bh=kDctFkkJ2SUzn8l0v91DYSyiok3K2+3MqU3WKVzjD6E=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mQp+uW2JpGy50l3DZQHy4j8du9wqWbeyoclNQCwDV0baTSDnOBltbjPVaek55Kjyp6+6+gpswqUPtqRBr1vebEHcZSFE9Tnh59412jtO1wiX4ZFWGLkRKZqphcHFrqrPdCkRI1r7RjNW+Kf5yy+YTKs00nF3POguNCcul7jL3gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1u8qNO-000000006ZO-2KL7;
-	Sun, 27 Apr 2025 01:06:06 +0000
-Date: Sun, 27 Apr 2025 02:05:44 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Chad Monroe <chad@monroe.io>, Felix Fietkau <nbd@nbd.name>,
-	Bc-Bocun Chen <bc-bocun.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net v2] net: ethernet: mtk_eth_soc: fix SER panic with 4GB+
- RAM
-Message-ID: <4adc2aaeb0fb1b9cdc56bf21cf8e7fa328daa345.1745715843.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1745723222; c=relaxed/simple;
+	bh=rEICvCV1FekVGkUaonF/ktjdSyKg+00nNCVgOU7bKG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hW5ctdc/WgmoUDGF6dKLCN4A1Ww0VQGjUOUT3R7hm+TjpFEFOoLLwU4G4u3DJ8OUE3hMFcYWhHCTsecd3oTKtPEGNJig/mhJblErpGyduFOXt6kFGUf7exNQnGAuqFiCNRLD4yLo6f5Z6aqBn8vuKmKLcAJBDRxQrAJI/jgLM2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZlWc43QQ9z8xCc;
+	Sun, 27 Apr 2025 11:03:16 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 41ED41800B2;
+	Sun, 27 Apr 2025 11:06:41 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 27 Apr 2025 11:06:40 +0800
+Message-ID: <11fb538b-0007-4fe7-96b2-6ddb255b496e@huawei.com>
+Date: Sun, 27 Apr 2025 11:06:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] bonding: hold ops lock around get_link
+To: Stanislav Fomichev <sdf@fomichev.me>, <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jv@jvosburgh.net>, <andrew+netdev@lunn.ch>,
+	<linux-kernel@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+	<syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com>
+References: <20250410161117.3519250-1-sdf@fomichev.me>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <20250410161117.3519250-1-sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-From: Chad Monroe <chad@monroe.io>
 
-If the mtk_poll_rx() function detects the MTK_RESETTING flag, it will
-jump to release_desc and refill the high word of the SDP on the 4GB RFB.
-Subsequently, mtk_rx_clean will process an incorrect SDP, leading to a
-panic.
+在 2025/4/11 0:11, Stanislav Fomichev 写道:
+> syzbot reports a case of ethtool_ops->get_link being called without
+> ops lock:
+>
+>   ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:63
+>   bond_check_dev_link+0x1fb/0x4b0 drivers/net/bonding/bond_main.c:864
+>   bond_miimon_inspect drivers/net/bonding/bond_main.c:2734 [inline]
+>   bond_mii_monitor+0x49d/0x3170 drivers/net/bonding/bond_main.c:2956
+>   process_one_work kernel/workqueue.c:3238 [inline]
+>   process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
+>   worker_thread+0x870/0xd50 kernel/workqueue.c:3400
+>   kthread+0x7b7/0x940 kernel/kthread.c:464
+>   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>
+> Commit 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+> changed to lockless __linkwatch_sync_dev in ethtool_op_get_link.
+> All paths except bonding are coming via locked ioctl. Add necessary
+> locking to bonding.
+>
+> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
+> Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+> v2:
+> - move 'BMSR_LSTATUS : 0' part out (Jakub)
+> ---
+>   drivers/net/bonding/bond_main.c | 13 +++++++++----
+>   1 file changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 950d8e4d86f8..8ea183da8d53 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -850,8 +850,9 @@ static int bond_check_dev_link(struct bonding *bond,
+>   			       struct net_device *slave_dev, int reporting)
+>   {
+>   	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
+> -	struct ifreq ifr;
+>   	struct mii_ioctl_data *mii;
+> +	struct ifreq ifr;
+> +	int ret;
+>   
+>   	if (!reporting && !netif_running(slave_dev))
+>   		return 0;
+> @@ -860,9 +861,13 @@ static int bond_check_dev_link(struct bonding *bond,
+>   		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
+>   
+>   	/* Try to get link status using Ethtool first. */
+> -	if (slave_dev->ethtool_ops->get_link)
+> -		return slave_dev->ethtool_ops->get_link(slave_dev) ?
+> -			BMSR_LSTATUS : 0;
+> +	if (slave_dev->ethtool_ops->get_link) {
+> +		netdev_lock_ops(slave_dev);
+> +		ret = slave_dev->ethtool_ops->get_link(slave_dev);
+> +		netdev_unlock_ops(slave_dev);
+> +
+> +		return ret ? BMSR_LSTATUS : 0;
+> +	}
+>   
+>   	/* Ethtool can't be used, fallback to MII ioctls. */
+>   	if (slave_ops->ndo_eth_ioctl) {
 
-Add patch from MediaTek's SDK to resolve this.
 
-Fixes: 2d75891ebc09 ("net: ethernet: mtk_eth_soc: support 36-bit DMA addressing on MT7988")
-Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/71f47ea785699c6aa3b922d66c2bdc1a43da25b1
-Signed-off-by: Chad Monroe <chad@monroe.io>
----
-Changes since v1:
- * fix Link:
- * improve formatting
+Hello, I find that a WARNING still exists:
 
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+   RTNL: assertion failed at ./include/net/netdev_lock.h (56)
+   WARNING: CPU: 1 PID: 3020 at ./include/net/netdev_lock.h:56 
+netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
+   WARNING: CPU: 1 PID: 3020 at ./include/net/netdev_lock.h:56 
+__linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
+   Modules linked in:
+   CPU: 1 UID: 0 PID: 3020 Comm: kworker/u8:10 Not tainted 
+6.15.0-rc2-syzkaller-00257-gb5c6891b2c5b #0 PREEMPT(full)
+   Hardware name: Google Compute Engine, BIOS Google 02/12/2025
+   Workqueue: bond0 bond_mii_monitor
+   RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 47807b202310..a817fdf468d4 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2252,14 +2252,18 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 		ring->data[idx] = new_data;
- 		rxd->rxd1 = (unsigned int)dma_addr;
- release_desc:
-+		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
-+			if (unlikely(dma_addr == DMA_MAPPING_ERROR))
-+				addr64 = FIELD_GET(RX_DMA_ADDR64_MASK,
-+						   rxd->rxd2);
-+			else
-+				addr64 = RX_DMA_PREP_ADDR64(dma_addr);
-+		}
-+
- 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
- 			rxd->rxd2 = RX_DMA_LSO;
- 		else
--			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size);
--
--		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA) &&
--		    likely(dma_addr != DMA_MAPPING_ERROR))
--			rxd->rxd2 |= RX_DMA_PREP_ADDR64(dma_addr);
-+			rxd->rxd2 = RX_DMA_PREP_PLEN0(ring->buf_size) | addr64;
- 
- 		ring->calc_idx = idx;
- 		done++;
--- 
-2.49.0
+It is report by syzbot (link: 
+https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086).
+
+Because ASSERT_RTNL() failed in netdev_ops_assert_locked().
+
+I wonder if should add rtnl lock in bond_check_dev_link()?
+
+Like this:
+
+   +++ b/drivers/net/bonding/bond_main.c
+   @@ -862,10 +862,12 @@  static int bond_check_dev_link(struct bonding 
+*bond,
+
+        /* Try to get link status using Ethtool first. */
+        if (slave_dev->ethtool_ops->get_link) {
+   -        netdev_lock_ops(slave_dev);
+   -        ret = slave_dev->ethtool_ops->get_link(slave_dev);
+   -        netdev_unlock_ops(slave_dev);
+   -
+   +        if (rtnl_trylock()) {
+   +            netdev_lock_ops(slave_dev);
+   +            ret = slave_dev->ethtool_ops->get_link(slave_dev);
+   +            netdev_unlock_ops(slave_dev);
+   +            rtnl_unlock();
+   +        }
+            return ret ? BMSR_LSTATUS : 0;
+        }
 
 
