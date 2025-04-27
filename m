@@ -1,259 +1,242 @@
-Return-Path: <netdev+bounces-186313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE99A9E34B
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 15:27:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5343A9E353
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 15:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2851899E74
-	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 13:27:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB739189FEC1
+	for <lists+netdev@lfdr.de>; Sun, 27 Apr 2025 13:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38BF13C816;
-	Sun, 27 Apr 2025 13:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FyiZkKXn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF3A17CA1B;
+	Sun, 27 Apr 2025 13:41:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF96C4C80;
-	Sun, 27 Apr 2025 13:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745760416; cv=fail; b=o1HpotDIrbv7A1PtC84GgBdbZsbE5wMtDFY4Pg9SIii7NHUTHsUXz50Scute84JLsyIky/GGYOsqTsJgH9wDo73HKIBBN992hOzXGVdZ+N4Mf2GUrxRkqV4C4NnqFyVVdg8iPE5ZysexFj3nNGyfq289f4SFtGBYJwqd6gpuZkg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745760416; c=relaxed/simple;
-	bh=nsX8ldjwbkttPJwCvgm3WuS25FbCX8h88YWXnWMJ5jc=;
-	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
-	 Content-Type:MIME-Version; b=sILBHtuxOHiF6efj0GJx8wHV1y6AdzheskH2VpbGGS5I+tFXHLH/yXQNYwXBsLkx/ZAVDNaGyHDwq9jDmAyhqYMf/ra0LnXI86ICy4mV8m+liEnUHk/Zsi/XrxH7fpo4O9Ikrc5qm18FW8KiTUzkfSsFsIiITxO6OybeRQlp0cI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FyiZkKXn; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745760414; x=1777296414;
-  h=subject:to:cc:references:from:message-id:date:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nsX8ldjwbkttPJwCvgm3WuS25FbCX8h88YWXnWMJ5jc=;
-  b=FyiZkKXnqvisac135VJNgdFxbeb5H/GwFiC2/yPGsuVLsWVi4RrLDsx4
-   0mDy6y4hmM8W4pfdzlwLLYKZwiSJxy2pEXSVQdZyb54ZCOeaWvo/UcMP7
-   4waGghGoN57UAa6YTn2aqbJt4QgxQNx9j/lgCAH/GThxodNZxoniZ9uUz
-   Fzlnw2tmqXQBr0c+pvkBNoORqHFNgI0LR2v+zJlXFq/Y6U9iS/WA0ndVZ
-   Xo6/lau5hTqpFnZME0TuJSbcXKmCoTdwerzV6Uu1sin99OaKUKzNyBNyw
-   pT9rdClr8+8cS+5vZiA0MNv1eLXBpI9wxXXX2EH02KItwMr6CeiJ87nBu
-   A==;
-X-CSE-ConnectionGUID: ZmuiECHcTVSGOgg9C4lSoQ==
-X-CSE-MsgGUID: hhRSzoEoQdijfmntU2Ej2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="58003614"
-X-IronPort-AV: E=Sophos;i="6.15,244,1739865600"; 
-   d="scan'208";a="58003614"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 06:26:54 -0700
-X-CSE-ConnectionGUID: RKruw989SuaaOQWYk2sMCQ==
-X-CSE-MsgGUID: z6F6WU2cTla+x13R4P+Tlw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,244,1739865600"; 
-   d="scan'208";a="156526469"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 06:26:53 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Sun, 27 Apr 2025 06:26:52 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Sun, 27 Apr 2025 06:26:52 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Sun, 27 Apr 2025 06:26:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SV8j5QIvmBL4+y3XRgw4N1Jk/TiwbOlm5NXi4jWt5uAXcyixgMltT7Kijkc4gttb/MABpQwfPkkxGr9cgHGBmlKi7ZxDj3f6tG7sh4gIo78Q2NH/0zDlTrCY7mwkb1UqntpWMlAG082FAexFtaD5nMSHd37ikUddr1JVoq/ulxFqVSHE0IdtpUobUFIFhf99DtWiA38P0wVIjSKRpNH5tCg8lX9JDStT1A5TFtQSQ3RZgG4MxMx25aCuefrCIy5lP8SRvz+DBGSWhe7dRwYCjGaFHT5frwuH1lvvyEOBpjy2DOJYv21s9pyZvJ4NCLsFqQ2WRzooOMZZZVXOW5W62w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jP+N2wZjGGjwUpK4/E8Yeim9BfVDCOGjuHSqOZ0XO7s=;
- b=zJR1cVVSvPakgq7qvgUZK3SIzLtPH+zLwVfUy6g+zoHrSk7PqD2yz3fzihdaTUOHJAnyXZpHqybpAKh6tE3YAnWQVJvuQx0zwrJPBd0BDkrGZNToSmbwLhVOOVIoBTR4TanYImAtb7sPSNlOsJKVKA4HDXkqXOfopYB0sMauZZHTQMxhyIHFK85CRfQpQh1BWmju2H4FX3uc9jNlp1GFaAXdwEak/B1fp/VQ7gr0n8vbclXN97JlolOyIxrNdfibfjwtEwhby3yTsTTGx70PZfLAX0l9orVTLo6QtcK8kCULehDaBsLLRUdNmBbwl7rNHz/+XLrtSjXUzUbsRXyYdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5934.namprd11.prod.outlook.com (2603:10b6:303:189::7)
- by CY8PR11MB7797.namprd11.prod.outlook.com (2603:10b6:930:76::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Sun, 27 Apr
- 2025 13:26:49 +0000
-Received: from MW4PR11MB5934.namprd11.prod.outlook.com
- ([fe80::96ae:ce0:2a38:7408]) by MW4PR11MB5934.namprd11.prod.outlook.com
- ([fe80::96ae:ce0:2a38:7408%5]) with mapi id 15.20.8678.028; Sun, 27 Apr 2025
- 13:26:49 +0000
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
- when valid checksum mask is not set
-To: Jacek Kowalski <jacek@jacekk.info>, Simon Horman <horms@kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
- <20250424162444.GH3042781@horms.kernel.org>
- <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
- <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
-From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Message-ID: <0530ea8e-eb81-74cd-5056-4ee6db8feb9e@intel.com>
-Date: Sun, 27 Apr 2025 16:26:42 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-In-Reply-To: <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0012.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::12) To MW4PR11MB5934.namprd11.prod.outlook.com
- (2603:10b6:303:189::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C92D7E110
+	for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 13:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745761280; cv=none; b=euHFMhywm9j7ro+lbk6PW274Jm4VApGptFzhuPlQCSQ+/etAh5r07VlIyOMAIvEMLNOJCxXUg+Q6WPMRRibpuvd6rQXWQcYuPRG090GWBBMvizg2Ep0umMLH3yDGxnY0AmffLJRjMTyPj5DExjGU+p+YX+sc/eKXuDJFFqDEWJA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745761280; c=relaxed/simple;
+	bh=ikFGBs4KPnaLHm/wpDtXdgUB435DQd98kOARQxyqFsQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ri4o11q/tOZiTXMKqqzNB5JsYJglowOmS9kepsoboxm1dkhyEPPr0nn0Nc48siia24Xa/vlMdkE0FV37p4L/dC5qJF2LEfa01DVd47tPzG+PgvRNxf+PVVSh+7QoZ5axIU2p3NKgsM4AjKtxYgjw50BusqyglDpbaBWUzocMe/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u92FO-0002FE-Jm; Sun, 27 Apr 2025 15:40:42 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u92FI-002N5b-32;
+	Sun, 27 Apr 2025 15:40:36 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u92FI-00AJYY-2k;
+	Sun, 27 Apr 2025 15:40:36 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	Simon Horman <horms@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v2 1/1] Documentation: networking: expand and clarify EEE_GET/EEE_SET documentation
+Date: Sun, 27 Apr 2025 15:40:34 +0200
+Message-Id: <20250427134035.2458430-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5934:EE_|CY8PR11MB7797:EE_
-X-MS-Office365-Filtering-Correlation-Id: d5d3eead-508e-4db6-e274-08dd858f2a18
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RHBlMzRQU1c5WmRreUp5clFJMkh2KzQyd1k0NXVmY3BXbmdka1BqbGhvVytl?=
- =?utf-8?B?UG02TUgxSXNnbkYwTnRnK2Jkc2JYMVN0bHc0c09zUWJxR2sxSUlxRC96QjlK?=
- =?utf-8?B?U3RKMC9JNE9sS1l0bmRxUXdadVR2SVYrT3ovWWk2ajRaU3BvV21iM2dUNFN1?=
- =?utf-8?B?RzRYTXQvQjgvWU1OVXhwYllOODdta0hCNUVwU0tvdnM3MWN3ZFc1dHRYMWRH?=
- =?utf-8?B?S3lGWUFhWkFZQU14ejNQTExBR25obGd4c2tvTjZZdWIyU3lPQlRjbks0RnV3?=
- =?utf-8?B?dFpQUzNCYngwMmZyMEk5bWErcUdLdWw2WXNnYXhNZTkrc1BCaUpVRlZnY1kx?=
- =?utf-8?B?S0pSb1V3dG5nbFF4T0pxSzhmcnd3eFlFcDRQUkh4ZlZuRkNyY3Y3RkQ2UnFX?=
- =?utf-8?B?SkVnMHJ6anNEMjhiUnhYZzhQV3NnOXRaaW1jMm02WkViL0UzT3hxN2FaT0ZI?=
- =?utf-8?B?OHBlbWFJcjR2YVBkSGxEM3IvUXhtckk0VFpTNElqQ1NHaFdYWUxDendTMnhz?=
- =?utf-8?B?em5qOHd5SjQzVWdSZW9PTjE1emJTaG9HVnRwbXZCQ1FXODJ2RWdnVW8yNE1i?=
- =?utf-8?B?cTRzRjFicGltODdJQVZaNkVDbk9oWWZwd1ljbDhrekxCdFFhem9EOE50bWJP?=
- =?utf-8?B?cXF4dFRyKzUxOFRJbzZjdmZFNnlXRmw1NFZjQVEycUdPZ2NPc1Q2Wjgyd3d4?=
- =?utf-8?B?TDhTRVMyNlZSTStXMFArY1BoM01Vb1BPMzViWEdJTFhLSC9OZVRHdnRLMFpo?=
- =?utf-8?B?TGY4TlBteGVtYzN4QVdKMGJpM2NBbVhJbm52MThjd0RQTEF4NFQ1SktDbzhk?=
- =?utf-8?B?YlJzTk5idzBPV0g5WVdYNEJvWGxTaFptZXM3UUl0NUVCb3hEQTAyWFBZMTFv?=
- =?utf-8?B?QThIdmZZLzd6d0J0bFR2U2E0TStRaWJvTExJL3NnaUVuQjVQUzFoVkV0RGQ1?=
- =?utf-8?B?NVdqdXRlUjM0SXMxMkJPZjJ0dS9tUTFibnBYK01qY0dHdi82dlRQRW10dzNo?=
- =?utf-8?B?YmxmNEtFL3hrQU0xaWFaVk5RR3RnaVE3VCtJeHdibUVJL3puNzRueCt4cSt2?=
- =?utf-8?B?dXRwYzZxcUloWFZNMlRORHkwYkpCSEdVNXpOcWZ2WDlENjJVMTdCdDJEcElR?=
- =?utf-8?B?YU1YWm1MaHA4RW9aV3RzTjdCRVpEbmtqcVRON0RNc2k3bStnME1kbFdEUFAz?=
- =?utf-8?B?QUJKOTJmaVJWdE5Bd1FsaVNnUVllaG51QWszMVVWL3Y5WlpYQVQrYUxRQ3NL?=
- =?utf-8?B?SFVzaTJraEFRQlJqNUtBcmplLytId0w5WnNrWjFWc3pqVUNDODlLdlNmMDkz?=
- =?utf-8?B?aW94aFE3UHQvT2FaNnhTYkRMRUlBK3A3ZVNqZEJrMWNWZ1hrQVg3cksyQWZL?=
- =?utf-8?B?MG9rd3FVeXBqVTFFZFN3aEdzNmNUU0VxM01BVi9hdVZNWFhzN0pKak1XVWp3?=
- =?utf-8?B?UFhkdGVVdjNmY1JOZWM2ejZTTUhKRERRVkdTb291ZjVNY2RlSElQQnJNSXVh?=
- =?utf-8?B?dWdLYlJSbWN3QXVQeUFwNDlWZ2hkSTJZcUxONkt4aTFBcEI1TFUyVGR3WUZm?=
- =?utf-8?B?TFFSbEQ2YjhyMzdPSmpkdVlZMXdidWVucUc4UWwyWE9GTElrN3hnNUZ0UzBy?=
- =?utf-8?B?MzNMRzZ3b0o1Y0lMM0JLdjVMeHZpc0dVZVhsVGZoQ05UcEdmaWtvNXNoMlFq?=
- =?utf-8?B?Y0k5c1RxSWZzOEhFZDZyNDRoYWlESk43SFRFSUJiUDJIenZHLzB4RFVTY1hm?=
- =?utf-8?B?T1pTRHo3Q0ViUXJaWERZSU1lM3hwSjRzeFpEMndSdSt3NUlOL3V5MjB2L3Nx?=
- =?utf-8?B?T3c3L1NPRURtWnpkWUdtTWkrcVRCUjA1NUdreml5ZU5ONGwrUlkzeHh2ZENu?=
- =?utf-8?Q?3/ziIecG9BJRk?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5934.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3lkckpsbnBKT2h0K2ZYRjkvTWNkTm52d0h2WDhuWWhqSXhmQTdEOHM5ZmR6?=
- =?utf-8?B?cFN4WXVnS1BjdHBxZURQT05yM1NBL1J0bHp3ZFZNYkNNTTdWVittUGN4MEFU?=
- =?utf-8?B?MUgvU2dMOFo2WlhyTlFOa2dKZThtTEdNcVViWkJPSDN5d3NoLzhCaklPZ04y?=
- =?utf-8?B?L0tNZjdWWENuWXFpQXhKR1lHWVpieFMzSWRBSFVVZlF4NzBWbUxQczZSTkls?=
- =?utf-8?B?aE1lK25Cbmdnd1NjdjcwNGRONWI5OHNNN2xTUVRWOW10LzFxMFB1T2RnbUJM?=
- =?utf-8?B?ZHZKN3gzdmpjTnV5azFVMXZpdmFlTlhYU2svOWdGeW5FN2VhMHFjUlNzeXds?=
- =?utf-8?B?ekh1YnVPMElLNjdTbXlHZVZoWEhwZzRGS29NdG81bTNQQlU5cGtIQUhpaEpY?=
- =?utf-8?B?MDRlZFJUUVZOS244YU9IdDA3bVd2bGpyKzNHeHJaZUxtUVVlTkJnOG9JWWNw?=
- =?utf-8?B?TzM3dmRzNkRZZGwwYzZ0Y1BvWlhEa0dUMFA3UWFKMU41dktNNStGc0pnbndi?=
- =?utf-8?B?b1hSSEJnQ1Z6S1Q5MzJSTzhDdXNobUZmTE1ocWxNa2ovU1ViaEpWUjZmNEcx?=
- =?utf-8?B?M1ViY2x3YzFBVE5iWS9JcEJsRlFSWWMzZ1AzbFhrTXQ4Vmo3TzRmZ2dwWnVV?=
- =?utf-8?B?cnZoZUp6SXd3dVZpeTJUNFhpcHRzY2hiQ3Q1bHNibDRqTUg5T2J2VE54RlN1?=
- =?utf-8?B?eWJPc2hOL2xjQ2xncUszenp3SVB0dzdRUy9hdG9JOVdJbVZycURMeVo4Q3pI?=
- =?utf-8?B?S3BjcWlPTUJKQjB6SGpXTnhqc0tkbUtRKzhSVVZDMm9haVFWYUdJSllrTTQv?=
- =?utf-8?B?b3J1bGtCOWlQZVJkRFRNcENkTmh2YWZiaXZSK3RrUW9Dc29zVThnS2ExOFEw?=
- =?utf-8?B?NEY5ZkRuZU45K2RRR1pTSW41dHZHOUJTNWwxL0Q1ZXloRHArV3dTRG0rWnZn?=
- =?utf-8?B?KzdQbGhMZlBodDhvZVpCbG92OHJxbFd6MDM3UTZFOTBRdTRZd2RFQVBqZnk5?=
- =?utf-8?B?NmpWbldwSVNtM1NFVGNmbDcrQ1ROMlp1OExiNXl5ZVJZTGF5ZFFTZVNDbHBM?=
- =?utf-8?B?VnpuUFZiVTgzVGNTNnp4Q3RxUHJFeEhMZUNNUGIxaXlyWURFcHFHdU9WQ01o?=
- =?utf-8?B?U1FuMDBCMS83MlQxcmZhbXkrV2JqM0U1dnVxY2doK1hJVkFGTkgrNk1hcXpl?=
- =?utf-8?B?UzJyTjJWVys0MzhHc0lUZzI5Yzc5TDFSREkwNXczbThFRWZBNU1pQTczRmlp?=
- =?utf-8?B?ZmNkdzl5Vms0UytxbVdpUXNtQmVCUVlzRXNSOXozalZkdE9FeGxzaXphYW1q?=
- =?utf-8?B?dFArclBFMEdlb2dMU2RIMXZEVE0zM3RtSS91cGF6ZTU4amtUVUZueVBPWW5z?=
- =?utf-8?B?Mm9RbUJ5Z3BJZFlXbEc3Uk1aN092RnBNTnZKdHZyTXRCc28xRVRnT1M5Sytz?=
- =?utf-8?B?RGovVlRYRU5CVVY4WU0rNE1yM09YUFVDaGUxUmZSeHh2aFpwSzNnbURYUjFN?=
- =?utf-8?B?a0xiRnNBQUNaT0phWHJTT1dKSUZaWjM3SXgxUkVPaDI4TVZmQ3ZlRHN6N25v?=
- =?utf-8?B?bkZsd0VpWWptMGRVVVYzUWxkODM4U0JyMEhKT3A3T1Y1K2gyRjdZT1Z0SnZ3?=
- =?utf-8?B?bmI1blQ1VE5yVm1xemxzRnhQeDBZTWtqWnBGNGM3SzVKQ1FBa2pqM0dXZ2tH?=
- =?utf-8?B?cVg0WGx2SG5rRE5YSVNaU1doc05xQ3FuTUl3bUV3b0VMcFRpYzlZMVBsMmVn?=
- =?utf-8?B?RDZvQnlvcDRXR2FBNlZjK3JybkErdUh4cDB0ZUlnSHI3c1owWnBDTzJQZUVx?=
- =?utf-8?B?NmhIdUNxRHB0K1dqYW9sUExUUXhmenRZamJLTER2UEc1bGg2Yk1JbGFDUlNR?=
- =?utf-8?B?ekswdTBPZUlEL2Jwc3FFaVNXVFhPNmVNUm5pV3lWeFVTRjVlcEgwcFlUVm9S?=
- =?utf-8?B?dktRSElnZjlqVjNHa01mRlBpSk1pZDNtTjFKazV4OVlXVXZOWnBPNmVOWlV4?=
- =?utf-8?B?RUFpYzIxb2FOUzJyZDY4bGZla0VFT2h3bTFSckpFMEZ6bmppVmluN210T0Zs?=
- =?utf-8?B?dHVwdkRzeE8wQkpJNGZDcFVzV3RSZldBWC91RDkrWUVpVEFFVXVZZjlSdjlY?=
- =?utf-8?B?WXA4Mm5xMDdQMTNEY3EwL05rdnAwM0ZzRHRubi9vSVdPckloMGNhU3NnVmVX?=
- =?utf-8?B?N0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5d3eead-508e-4db6-e274-08dd858f2a18
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5934.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2025 13:26:49.0677
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 20j0d1dN7xhHy6/wzsHjTOjeCrXnkAI1+o3A9bqYaCdoamS0CQfOtj1BbWiNZz5uqEpyVmgRy5psQBsPId8l5fbEMoNFlyWgGqYmV+jN5YQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7797
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Improve the documentation for ETHTOOL_MSG_EEE_GET and ETHTOOL_MSG_EEE_SET
+to provide accurate descriptions of all netlink attributes involved.
 
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ Documentation/networking/ethtool-netlink.rst | 111 ++++++++++++++++---
+ include/uapi/linux/ethtool.h                 |   3 +
+ 2 files changed, 96 insertions(+), 18 deletions(-)
 
-On 4/24/2025 8:29 PM, Jacek Kowalski wrote:
-> Hi,
-> 
->>>> Because it is impossible to determine whether the NVM write would 
->>>> finish
->>>> correctly or hang (see 
->>>> https://bugzilla.kernel.org/show_bug.cgi?id=213667)
->>>> it makes sense to skip the validation completely under these 
->>>> conditions.
-> 
->> It is not completely accurate. All the NVMs starting from Tiger Lake 
->> are locked for writes, so NVM writes will always result in a failure.
-> 
-> Check my message in a thread of an earlier patch:
-> 
-> Message-ID: <1c4b00b6-f6e3-4b04-a129-24452df60903@jacekk.info>
-> https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20250407/047551.html 
-> 
-> 
-> On my laptop NVM write operation *does not fail* (nor hangs), driver 
-> loads and ethtool shows corrected checksum.
-> 
-> This lasts only until module reload (rmmod/insmod) or reboot.
-> 
-> I guess only shadow RAM is updated (or something like that) and not the 
-> non-volatile memory, but the operation itself does not error out.
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index b6e9af4d0f1b..78ee481437a4 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -1215,20 +1215,16 @@ Kernel response contents:
+ 
+   =====================================  ======  ==========================
+   ``ETHTOOL_A_EEE_HEADER``               nested  request header
+-  ``ETHTOOL_A_EEE_MODES_OURS``           bool    supported/advertised modes
+-  ``ETHTOOL_A_EEE_MODES_PEER``           bool    peer advertised link modes
++  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  supported/advertised modes
++  ``ETHTOOL_A_EEE_MODES_PEER``           bitset  peer advertised link modes
+   ``ETHTOOL_A_EEE_ACTIVE``               bool    EEE is actively used
+   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
+-  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
+-  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
++  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx LPI enabled
++  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx LPI timeout (in us)
+   =====================================  ======  ==========================
+ 
+-In ``ETHTOOL_A_EEE_MODES_OURS``, mask consists of link modes for which EEE is
+-enabled, value of link modes for which EEE is advertised. Link modes for which
+-peer advertises EEE are listed in ``ETHTOOL_A_EEE_MODES_PEER`` (no mask). The
+-netlink interface allows reporting EEE status for all link modes but only
+-first 32 are provided by the ``ethtool_ops`` callback.
+-
++For detailed explanation of each attribute, see the ``EEE Attributes``
++section.
+ 
+ EEE_SET
+ =======
+@@ -1239,17 +1235,96 @@ Request contents:
+ 
+   =====================================  ======  ==========================
+   ``ETHTOOL_A_EEE_HEADER``               nested  request header
+-  ``ETHTOOL_A_EEE_MODES_OURS``           bool    advertised modes
++  ``ETHTOOL_A_EEE_MODES_OURS``           bitset  advertised modes
+   ``ETHTOOL_A_EEE_ENABLED``              bool    EEE is enabled
+-  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx lpi enabled
+-  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx lpi timeout (in us)
++  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``       bool    Tx LPI enabled
++  ``ETHTOOL_A_EEE_TX_LPI_TIMER``         u32     Tx LPI timeout (in us)
+   =====================================  ======  ==========================
+ 
+-``ETHTOOL_A_EEE_MODES_OURS`` is used to either list link modes to advertise
+-EEE for (if there is no mask) or specify changes to the list (if there is
+-a mask). The netlink interface allows reporting EEE status for all link modes
+-but only first 32 can be set at the moment as that is what the ``ethtool_ops``
+-callback supports.
++For detailed explanation of each attribute, see the ``EEE Attributes``
++section.
++
++EEE Attributes
++==============
++
++Limitations:
++
++The netlink interface allows configuring all link modes up to
++``__ETHTOOL_LINK_MODE_MASK_NBITS``, but if the driver relies on legacy
++``ethtool_ops``, only the first 32 link modes are supported.
++
++The following structure is used for the ioctl interface (``ETHTOOL_GEEE`` and
++``ETHTOOL_SEEE``):
++
++.. kernel-doc:: include/uapi/linux/ethtool.h
++    :identifiers: ethtool_eee
++
++Mapping between netlink attributes and struct fields:
++
++  ================================  ================================
++  Netlink attribute                 struct ethtool_eee field
++  ================================  ================================
++  ``ETHTOOL_A_EEE_MODES_OURS``       advertised
++  ``ETHTOOL_A_EEE_MODES_PEER``       lp_advertised
++  ``ETHTOOL_A_EEE_ACTIVE``           eee_active
++  ``ETHTOOL_A_EEE_ENABLED``          eee_enabled
++  ``ETHTOOL_A_EEE_TX_LPI_ENABLED``   tx_lpi_enabled
++  ``ETHTOOL_A_EEE_TX_LPI_TIMER``     tx_lpi_timer
++  ================================  ================================
++
++
++``ETHTOOL_A_EEE_MODES_OURS`` (bitset)
++-------------------------------------
++- Value: link modes that the driver intends to advertise for EEE.
++- Mask: subset of link modes supported for EEE by the interface.
++
++The advertised EEE capabilities are maintained in software state and persist
++across toggling EEE on or off. If ``ETHTOOL_A_EEE_ENABLED`` is false, the PHY
++does not advertise EEE, but the configured value is reported.
++
++``ETHTOOL_A_EEE_MODES_PEER`` (bitset)
++-------------------------------------
++- Value: link modes that the link partner advertises for EEE.
++- Mask: empty.
++
++This value is typically reported by the hardware and may represent only a
++subset of the actual capabilities supported and advertised by the link partner.
++The local hardware may not be able to detect or represent all EEE-capable modes
++of the peer.
++
++``ETHTOOL_A_EEE_ACTIVE`` (bool)
++-------------------------------
++Indicates whether EEE is currently active on the link. EEE is considered active
++if:
++
++ - ``ETHTOOL_A_EEE_ENABLED`` is true,
++ - Autonegotiation is enabled,
++ - The current link mode is EEE-capable,
++ - Both the local advertisement and the peer advertisement include this link
++   mode.
++
++``ETHTOOL_A_EEE_ENABLED`` (bool)
++--------------------------------
++A software-controlled flag.
++
++When ``ETHTOOL_A_EEE_ENABLED`` is set to true and autonegotiation is active,
++the kernel programs the EEE advertisement settings into the PHY hardware
++registers. This enables negotiation of EEE capability with the link partner.
++
++When ``ETHTOOL_A_EEE_ENABLED`` is set to false, EEE advertisement is disabled.
++The PHY will not include EEE capability in its autonegotiation pages, and EEE
++will not be negotiated even if it remains configured in software state.
++
++``ETHTOOL_A_EEE_TX_LPI_ENABLED`` (bool)
++---------------------------------------
++Controls whether the system may enter the Low Power Idle (LPI) state after
++transmission has stopped.
++
++``ETHTOOL_A_EEE_TX_LPI_TIMER`` (u32)
++------------------------------------
++Defines the delay in microseconds after the last transmitted frame before the
++MAC may enter the Low Power Idle (LPI) state. This value applies globally to
++all link modes. A higher timer value delays LPI entry.
+ 
+ 
+ TSINFO_GET
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index 84833cca29fe..c596618633bc 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -366,6 +366,9 @@ struct ethtool_eeprom {
+  *	its tx lpi (after reaching 'idle' state). Effective only when eee
+  *	was negotiated and tx_lpi_enabled was set.
+  * @reserved: Reserved for future use; see the note on reserved space.
++ *
++ * More detailed documentation can be found in
++ * Documentation/networking/ethtool-netlink.rst section "EEE Attributes".
+  */
+ struct ethtool_eee {
+ 	__u32	cmd;
+-- 
+2.39.5
 
-Yeah, probably this is what happens.
-
-> 
-> It might also be because I've disabled Secure Boot...
-> 
-
-Anyway, I think that the commit message should be precise.
-How about this?
-
-Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the 
-driver cannot perform checksum validation and correction. This means 
-that all NVM images must leave the factory with correct checksum and 
-checksum valid bit set. Since Tiger Lake devices were the first to have 
-this lock, some systems in the field did not meet this requirement. 
-Therefore, for these transitional devices we skip checksum update and 
-verification, if the valid bit is not set.
 
