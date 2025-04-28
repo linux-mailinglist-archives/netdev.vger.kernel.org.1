@@ -1,572 +1,266 @@
-Return-Path: <netdev+bounces-186516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E671AA9F7E7
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:02:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 463ADA9F7F8
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4297D177632
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:02:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55DBB3A7753
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F6A2973C4;
-	Mon, 28 Apr 2025 18:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8A42957AC;
+	Mon, 28 Apr 2025 18:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="l3TX4guu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RNUJfWsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54907296D34
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 18:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C592951DF;
+	Mon, 28 Apr 2025 18:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745863260; cv=none; b=N1J47+WbUiQOoVnAmBozyQYSngcMP6oFW90BLQdrBJxDYJu/XHsLtCrp8hsbCmbjmhVP6xKrxGY7Wym1At2J6FHCPBSzK1QDHlQy5yTwtmVW1oTJ9BGdTJfzgf+FsdnIs74TPq/CYWqzNdGrKuEvzuAKl3sUZGg9WNoCMqvOpNU=
+	t=1745863438; cv=none; b=Thp89GhNvFGlNJJVFQqn9Sqc8bIMjtNqGocsZp0tYKDQ5SZMnaK6HNlVQ9VTrPErRo0CQHpEH8PSXp+w9V1jqjrZMQW/H6JEkbYDcBRAxUpLM7NOSOGaHHIRT093G5GzBd7JVzAcK3j4CvRjFG0wVtNgnuEqg7LlH90mbcUMNQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745863260; c=relaxed/simple;
-	bh=cNXWBHt6J7e3H+76Mh3BMIenbMHu29MKu1h73tRrASw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TlKDQWAo37AP4BqMg6DpYO0Zr4+7gpbWvC3O6s/dOnA3b5nDwG+cZ8KT8Pq5m8bFHiwxDGnjvvLOzFiVxKyM+aTZUaDvgyrZ8GArL9BcqQOy04LDQ/xeC9AmMeUtUvzoXc+pLeZERyrkYJtC0CzrrKCbAurb+Yrl+bbG07QC45I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=l3TX4guu; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b16c64b8cbcso398443a12.3
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 11:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1745863257; x=1746468057; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KaKbW65uYaVDYGMsoIHJ/fjnTr1nbMz9f/dqAmx8e2I=;
-        b=l3TX4guulRbjuYJdPi9rZwS7lVzsZjudoMKN+LtXdvyPjTkA7gNqLpmMnCDq2G/ECN
-         FNyBLT7mzt9wQY9wC/EqvjLlunPXHIT5iLZMd+UaB+Oo/O3A3puNJQane7Xb7Gm+TAo4
-         e9T12K8cigxQEFAI+cZeL0Tix0T9GtyZuIbJqvE+jz9h1AmWHlnKxHAeNWkiMIGZ1wp9
-         r645Ke6uaSZ7/sptVBBMesXrpv3Vd0QjBgPnw5zEwrI1WKEnTD9FKKA4KNwBHp6lpq7V
-         ORXqFY0sISBJVZRXuP1xSFXiv8JKXCGmch8sbwgJzWI6tCtQerxWyn5WYp13JzVJGf34
-         zhEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745863257; x=1746468057;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KaKbW65uYaVDYGMsoIHJ/fjnTr1nbMz9f/dqAmx8e2I=;
-        b=Th6/TURxSeDD0g19yOsfkFdXNEYar6IwnaPh6umywooz2s4bqseWEoB4hsJ5iENNOi
-         HhcghR2eDp96TMVRzgyGcUw5zzYAEvJMuuTGUDO9V9yxWXW0BYUzGiUXekZW/5dglKkL
-         wFqo7qsMt2ndBxUWGNY3Jof4Yxfg2BoKYsEnUuH4yaHfQZQDVV2W8ufIDZrClZH4vdiw
-         E/qK85fQ/HAcfQR390fDq53oOz72TyWE73OV+fSAWKPW/ut+m+uMiE8tGX1j9H7+1PSf
-         Cay1sOkKroVGABfPV7O2UvZPLcjzMMwAlUMUlr8qdLeeBH7TsrWeVk6NTUQqPcClu5jB
-         78Fw==
-X-Gm-Message-State: AOJu0YyPbDNqLBh7QtYEuXgz4G+Ilu7xxgUo8ksmcmINRpOIA4nDVQzX
-	1L1KpXfB1jG4ARTN+EgIEcYRvWSj2vDMJV5s7OPryxwmMoJXPIlnffDcEScmyKHGxhznSmK9pv+
-	DbkU=
-X-Gm-Gg: ASbGncsoG95dsvo+2dhPpupxTjtgnPhi1rzwH0NFir3ISqI2X5YDh+BzF3jpeuwY2Za
-	FRA8uF5i52DBsqXbWTqz3BDxn9pq9ifHuMR6FXwiGgVp7dSbxj/02b6wv3JsXlJXHYFpS51MZK7
-	gDqlJGpviAZnA7xy54eAOby9Wz4WYbuD/3UrntxF3JyEYdsHvDrI2PUFe4h8Ao8xNf6K6HqI76s
-	MEFsZ/t+UkbqS58kBslQxdFv3+1l44z1kULTDntHwQ3Gq6+okdYjYr5qFzkXs+hjbcsuQ2dYHzM
-	AjUc2Ml4ZllTrmxUPdr47OMG0A==
-X-Google-Smtp-Source: AGHT+IH4edu38H+gIHgivJGu/q5L3wx+HNGSX84tUbiK8HG9dcdFV0w5NozcC/eTgmCxtDGdXy8J8g==
-X-Received: by 2002:a17:903:2a88:b0:223:28a8:610b with SMTP id d9443c01a7336-22dbf740e51mr70668285ad.14.1745863257084;
-        Mon, 28 Apr 2025 11:00:57 -0700 (PDT)
-Received: from t14.. ([104.133.9.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db52214ebsm86204235ad.246.2025.04.28.11.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 11:00:56 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Aditi Ghag <aditi.ghag@isovalent.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: [PATCH v6 bpf-next 7/7] selftests/bpf: Add tests for bucket resume logic in UDP socket iterators
-Date: Mon, 28 Apr 2025 11:00:31 -0700
-Message-ID: <20250428180036.369192-8-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250428180036.369192-1-jordan@jrife.io>
-References: <20250428180036.369192-1-jordan@jrife.io>
+	s=arc-20240116; t=1745863438; c=relaxed/simple;
+	bh=3mrunX2wCW3v8UoNSP/xGZpZLdEawxATxyP2Eq6jwvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HIAy62xOvDIVEiy8K2lp6TIwgiyN/BKCVfnDkkVvbn3Gv+Rbgz4HMV5HBiED2D615kNwGcWRkPiT9ZF/jOZk5kEvyT+pxXOXrRdzFANlnT/nQS+t86Ldc56EmhEtI5GXanGrhkZP6haxWUWr3WRtX5h05wsgL3jIis6f64DMoMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RNUJfWsp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1279CC4CEE4;
+	Mon, 28 Apr 2025 18:03:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745863437;
+	bh=3mrunX2wCW3v8UoNSP/xGZpZLdEawxATxyP2Eq6jwvA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RNUJfWspUi7bWN54awdeqtZ35YhV76uh9X5LOJWgO7OCwYtAR0f0BAC3CU/4pecdS
+	 iYWmQ/wrPlJlb0cl5uRjCHlnne9h/wJQ1w/f39RgtheWim/kLv4ewNmHAHVTRFJS2g
+	 srScl+O4IyYI4889G9HgSu7bzb1rbhNDyfLenmk1pf9mXzTZML56oCN5hHgyMQ/UJ4
+	 vLKowqVmECRrzvfBt2GN5IHXTsE5QO87hJPTWPueOquwSezWn33DfWGRAZr+UKEu09
+	 38Nwb/pM9B8X9BzHdm5eXH33EOUe5HRGpY58Mi9k1xOH10XLSAKd5zvLIhd/oJi/FO
+	 mKbzhj3vNSz0A==
+Date: Mon, 28 Apr 2025 19:03:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Lee Trager <lee@trager.us>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	Emil Tantilov <emil.s.tantilov@intel.com>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Josh Hay <joshua.a.hay@intel.com>,
+	Milena Olech <milena.olech@intel.com>, pavan.kumar.linga@intel.com,
+	"Singhai, Anjali" <anjali.singhai@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: Re: [PATCH iwl-next v2 08/14] idpf: refactor idpf to use libie
+ controlq and Xn APIs
+Message-ID: <20250428180349.GF3339421@horms.kernel.org>
+References: <20250424113241.10061-1-larysa.zaremba@intel.com>
+ <20250424113241.10061-9-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250424113241.10061-9-larysa.zaremba@intel.com>
 
-Introduce a set of tests that exercise various bucket resume scenarios:
+On Thu, Apr 24, 2025 at 01:32:31PM +0200, Larysa Zaremba wrote:
+> From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> 
+> Support to initialize and configure controlq, Xn manager,
+> MMIO and reset APIs was introduced in libie. As part of it,
+> most of the existing controlq structures are renamed and
+> modified. Use those APIs in idpf and make all the necessary changes.
+> 
+> Previously for the send and receive virtchnl messages, there
+> used to be a memcpy involved in controlq code to copy the buffer
+> info passed by the send function into the controlq specific
+> buffers. There was no restriction to use automatic memory
+> in that case. The new implementation in libie removed copying
+> of the send buffer info and introduced DMA mapping of the
+> send buffer itself. To accommodate it, use dynamic memory for
+> the send buffers. In case of receive, idpf receives a page pool
+> buffer allocated by the libie and care should be taken to
+> release it after use in the idpf.
+> 
+> The changes are fairly trivial and localized, with a notable exception
+> being the consolidation of idpf_vc_xn_shutdown and idpf_deinit_dflt_mbx
+> under the latter name. This has some additional consequences that are
+> addressed in the following patches.
+> 
+> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> Co-developed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/Kconfig       |    1 +
+>  drivers/net/ethernet/intel/idpf/Makefile      |    2 -
+>  drivers/net/ethernet/intel/idpf/idpf.h        |   42 +-
+>  .../net/ethernet/intel/idpf/idpf_controlq.c   |  624 -------
+>  .../net/ethernet/intel/idpf/idpf_controlq.h   |  130 --
+>  .../ethernet/intel/idpf/idpf_controlq_api.h   |  177 --
+>  .../ethernet/intel/idpf/idpf_controlq_setup.c |  171 --
+>  drivers/net/ethernet/intel/idpf/idpf_dev.c    |   91 +-
+>  drivers/net/ethernet/intel/idpf/idpf_lib.c    |   49 +-
+>  drivers/net/ethernet/intel/idpf/idpf_main.c   |   87 +-
+>  drivers/net/ethernet/intel/idpf/idpf_mem.h    |   20 -
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |    2 +-
+>  drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |   89 +-
+>  .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 1622 ++++++-----------
+>  .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   89 +-
+>  .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  303 ++-
+>  16 files changed, 886 insertions(+), 2613 deletions(-)
 
-* remove_seen resumes iteration after removing a socket from the bucket
-  that we've already processed. Before, with the offset-based approach,
-  this test would have skipped an unseen socket after resuming
-  iteration. With the cookie-based approach, we now see all sockets
-  exactly once.
-* remove_unseen exercises the condition where the next socket that we
-  would have seen is removed from the bucket before we resume iteration.
-  This tests the scenario where we need to scan past the first cookie in
-  our remembered cookies list to find the socket from which to resume
-  iteration.
-* remove_all exercises the condition where all sockets we remembered
-  were removed from the bucket to make sure iteration terminates and
-  returns no more results.
-* add_some exercises the condition where a few, but not enough to
-  trigger a realloc, sockets are added to the head of the current bucket
-  between reads. Before, with the offset-based approach, this test would
-  have repeated sockets we've already seen. With the cookie-based
-  approach, we now see all sockets exactly once.
-* force_realloc exercises the condition that we need to realloc the
-  batch on a subsequent read, since more sockets than can be held in the
-  current batch array were added to the current bucket. This exercies
-  the logic inside bpf_iter_udp_realloc_batch that copies cookies into
-  the new batch to make sure nothing is skipped or repeated.
+This patch is rather large.
+Is there a way it could be split up into more easily reviewable chunks?
 
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 414 ++++++++++++++++++
- 1 file changed, 414 insertions(+)
+>  delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.c
+>  delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.h
+>  delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+>  delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_setup.c
+>  delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_mem.h
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index 74dbe91806a0..218c7258c0e0 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -7,6 +7,7 @@
- 
- #define TEST_NS "sock_iter_batch_netns"
- 
-+static const int init_batch_size = 16;
- static const int nr_soreuse = 4;
- 
- struct iter_out {
-@@ -14,6 +15,418 @@ struct iter_out {
- 	__u64 cookie;
- } __packed;
- 
-+struct sock_count {
-+	__u64 cookie;
-+	int count;
-+};
-+
-+static int insert(__u64 cookie, struct sock_count counts[], int counts_len)
-+{
-+	int insert = -1;
-+	int i = 0;
-+
-+	for (; i < counts_len; i++) {
-+		if (!counts[i].cookie) {
-+			insert = i;
-+		} else if (counts[i].cookie == cookie) {
-+			insert = i;
-+			break;
-+		}
-+	}
-+	if (insert < 0)
-+		return insert;
-+
-+	counts[insert].cookie = cookie;
-+	counts[insert].count++;
-+
-+	return counts[insert].count;
-+}
-+
-+static int read_n(int iter_fd, int n, struct sock_count counts[],
-+		  int counts_len)
-+{
-+	struct iter_out out;
-+	int nread = 1;
-+	int i = 0;
-+
-+	for (; nread > 0 && (n < 0 || i < n); i++) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_EQ(nread, sizeof(out), "nread"))
-+			break;
-+		ASSERT_GE(insert(out.cookie, counts, counts_len), 0, "insert");
-+	}
-+
-+	ASSERT_TRUE(n < 0 || i == n, "n < 0 || i == n");
-+
-+	return i;
-+}
-+
-+static __u64 socket_cookie(int fd)
-+{
-+	__u64 cookie;
-+	socklen_t cookie_len = sizeof(cookie);
-+
-+	if (!ASSERT_OK(getsockopt(fd, SOL_SOCKET, SO_COOKIE, &cookie,
-+				  &cookie_len), "getsockopt(SO_COOKIE)"))
-+		return 0;
-+	return cookie;
-+}
-+
-+static bool was_seen(int fd, struct sock_count counts[], int counts_len)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int i = 0;
-+
-+	for (; cookie && i < counts_len; i++)
-+		if (cookie == counts[i].cookie)
-+			return true;
-+
-+	return false;
-+}
-+
-+static int get_seen_socket(int *fds, struct sock_count counts[], int n)
-+{
-+	int i = 0;
-+
-+	for (; i < n; i++)
-+		if (was_seen(fds[i], counts, n))
-+			return i;
-+	return -1;
-+}
-+
-+static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
-+{
-+	int i, nread, iter_fd;
-+	int nth_sock_idx = -1;
-+	struct iter_out out;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+		return -1;
-+
-+	for (; n >= 0; n--) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_GE(nread, 1, "nread"))
-+			goto done;
-+	}
-+
-+	for (i = 0; i < fds_len && nth_sock_idx < 0; i++)
-+		if (fds[i] >= 0 && socket_cookie(fds[i]) == out.cookie)
-+			nth_sock_idx = i;
-+done:
-+	close(iter_fd);
-+	return nth_sock_idx;
-+}
-+
-+static int get_seen_count(int fd, struct sock_count counts[], int n)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int count = 0;
-+	int i = 0;
-+
-+	for (; cookie && !count && i < n; i++)
-+		if (cookie == counts[i].cookie)
-+			count = counts[i].count;
-+
-+	return count;
-+}
-+
-+static void check_n_were_seen_once(int *fds, int fds_len, int n,
-+				   struct sock_count counts[], int counts_len)
-+{
-+	int seen_once = 0;
-+	int seen_cnt;
-+	int i = 0;
-+
-+	for (; i < fds_len; i++) {
-+		/* Skip any sockets that were closed or that weren't seen
-+		 * exactly once.
-+		 */
-+		if (fds[i] < 0)
-+			continue;
-+		seen_cnt = get_seen_count(fds[i], counts, counts_len);
-+		if (seen_cnt && ASSERT_EQ(seen_cnt, 1, "seen_cnt"))
-+			seen_once++;
-+	}
-+
-+	ASSERT_EQ(seen_once, n, "seen_once");
-+}
-+
-+static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
-+			int *socks, int socks_len, struct sock_count *counts,
-+			int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Close a socket we've already seen to remove it from the bucket. */
-+	close_idx = get_seen_socket(socks, counts, counts_len);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the last socket wasn't skipped and that there were no
-+	 * repeats.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_unseen(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close what would be the next socket in the bucket to exercise the
-+	 * condition where we need to skip past the first cookie we remembered.
-+	 */
-+	close_idx = get_nth_socket(socks, socks_len, link, 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the remaining sockets were seen exactly once and that we
-+	 * didn't repeat the socket that was already seen.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_all(int family, int sock_type, const char *addr,
-+		       __u16 port, int *socks, int socks_len,
-+		       struct sock_count *counts, int counts_len,
-+		       struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx, i;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close all remaining sockets to exhaust the list of saved cookies and
-+	 * exit without putting any sockets into the batch on the next read.
-+	 */
-+	for (i = 0; i < socks_len - 1; i++) {
-+		close_idx = get_nth_socket(socks, socks_len, link, 1);
-+		if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+			return;
-+		close(socks[close_idx]);
-+		socks[close_idx] = -1;
-+	}
-+
-+	/* Make sure there are no more sockets returned */
-+	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
-+}
-+
-+static void add_some(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Double the number of sockets in the bucket. */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each of the original sockets was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	free_fds(new_socks, socks_len);
-+}
-+
-+static void force_realloc(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socket just to initialize the batch. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Double the number of sockets in the bucket to force a realloc on the
-+	 * next read.
-+	 */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each socket from the first set was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	free_fds(new_socks, socks_len);
-+}
-+
-+struct test_case {
-+	void (*test)(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd);
-+	const char *description;
-+	int init_socks;
-+	int max_socks;
-+	int sock_type;
-+	int family;
-+};
-+
-+static struct test_case resume_tests[] = {
-+	{
-+		.description = "udp: resume after removing a seen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_seen,
-+	},
-+	{
-+		.description = "udp: resume after removing one unseen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_unseen,
-+	},
-+	{
-+		.description = "udp: resume after removing all unseen sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_all,
-+	},
-+	{
-+		.description = "udp: resume after adding a few sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET so that new sockets are added to the head of the
-+		 * bucket's list.
-+		 */
-+		.family = AF_INET,
-+		.test = add_some,
-+	},
-+	{
-+		.description = "udp: force a realloc to occur",
-+		.init_socks = init_batch_size,
-+		.max_socks = init_batch_size * 2,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET6 so that new sockets are added to the tail of the
-+		 * bucket's list, needing to be added to the next batch to force
-+		 * a realloc.
-+		 */
-+		.family = AF_INET6,
-+		.test = force_realloc,
-+	},
-+};
-+
-+static void do_resume_test(struct test_case *tc)
-+{
-+	static const __u16 port = 10001;
-+	struct bpf_link *link = NULL;
-+	struct sock_iter_batch *skel;
-+	struct sock_count *counts;
-+	int err, iter_fd = -1;
-+	const char *addr;
-+	int local_port;
-+	int *fds;
-+
-+	counts = calloc(tc->max_socks, sizeof(*counts));
-+	if (!counts)
-+		return;
-+	skel = sock_iter_batch__open();
-+	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
-+		return;
-+
-+	/* Prepare a bucket of sockets in the kernel hashtable */
-+	addr = tc->family == AF_INET6 ? "::1" : "127.0.0.1";
-+	fds = start_reuseport_server(tc->family, tc->sock_type, addr, port, 0,
-+				     tc->init_socks);
-+	if (!ASSERT_OK_PTR(fds, "start_reuseport_server"))
-+		goto done;
-+	local_port = get_socket_local_port(*fds);
-+	if (!ASSERT_GE(local_port, 0, "get_socket_local_port"))
-+		goto done;
-+	skel->rodata->ports[0] = ntohs(local_port);
-+	skel->rodata->sf = tc->family;
-+
-+	err = sock_iter_batch__load(skel);
-+	if (!ASSERT_OK(err, "sock_iter_batch__load"))
-+		goto done;
-+
-+	link = bpf_program__attach_iter(tc->sock_type == SOCK_STREAM ?
-+					skel->progs.iter_tcp_soreuse :
-+					skel->progs.iter_udp_soreuse,
-+					NULL);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		goto done;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+		goto done;
-+
-+	tc->test(tc->family, tc->sock_type, addr, port, fds, tc->init_socks,
-+		 counts, tc->max_socks, link, iter_fd);
-+done:
-+	free(counts);
-+	free_fds(fds, tc->init_socks);
-+	if (iter_fd >= 0)
-+		close(iter_fd);
-+	bpf_link__destroy(link);
-+	sock_iter_batch__destroy(skel);
-+}
-+
-+static void do_resume_tests(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(resume_tests); i++) {
-+		if (test__start_subtest(resume_tests[i].description)) {
-+			do_resume_test(&resume_tests[i]);
-+		}
-+	}
-+}
-+
- static void do_test(int sock_type, bool onebyone)
- {
- 	int err, i, nread, to_read, total_read, iter_fd = -1;
-@@ -135,6 +548,7 @@ void test_sock_iter_batch(void)
- 		do_test(SOCK_DGRAM, true);
- 		do_test(SOCK_DGRAM, false);
- 	}
-+	do_resume_tests();
- 	close_netns(nstoken);
- 
- done:
--- 
-2.43.0
+...
 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+
+...
+
+> @@ -2520,15 +2045,18 @@ static void idpf_finalize_ptype_lookup(struct libeth_rx_pt *ptype)
+>   */
+>  int idpf_send_get_rx_ptype_msg(struct idpf_vport *vport)
+>  {
+> -	struct virtchnl2_get_ptype_info *get_ptype_info __free(kfree) = NULL;
+> -	struct virtchnl2_get_ptype_info *ptype_info __free(kfree) = NULL;
+> +	struct libie_ctlq_xn_send_params xn_params = {
+> +		.timeout_ms	= IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
+> +		.chnl_opcode	= VIRTCHNL2_OP_GET_PTYPE_INFO,
+> +	};
+>  	struct libeth_rx_pt *ptype_lkup __free(kfree) = NULL;
+> +	struct virtchnl2_get_ptype_info *get_ptype_info;
+>  	int max_ptype, ptypes_recvd = 0, ptype_offset;
+>  	struct idpf_adapter *adapter = vport->adapter;
+> -	struct idpf_vc_xn_params xn_params = {};
+> +	struct virtchnl2_get_ptype_info *ptype_info;
+> +	int buf_size = sizeof(*get_ptype_info);
+>  	u16 next_ptype_id = 0;
+> -	ssize_t reply_sz;
+> -	int i, j, k;
+> +	int i, j, k, err = 0;
+>  
+>  	if (vport->rx_ptype_lkup)
+>  		return 0;
+> @@ -2542,22 +2070,11 @@ int idpf_send_get_rx_ptype_msg(struct idpf_vport *vport)
+>  	if (!ptype_lkup)
+>  		return -ENOMEM;
+>  
+> -	get_ptype_info = kzalloc(sizeof(*get_ptype_info), GFP_KERNEL);
+> -	if (!get_ptype_info)
+> -		return -ENOMEM;
+> -
+> -	ptype_info = kzalloc(IDPF_CTLQ_MAX_BUF_LEN, GFP_KERNEL);
+> -	if (!ptype_info)
+> -		return -ENOMEM;
+> -
+> -	xn_params.vc_op = VIRTCHNL2_OP_GET_PTYPE_INFO;
+> -	xn_params.send_buf.iov_base = get_ptype_info;
+> -	xn_params.send_buf.iov_len = sizeof(*get_ptype_info);
+> -	xn_params.recv_buf.iov_base = ptype_info;
+> -	xn_params.recv_buf.iov_len = IDPF_CTLQ_MAX_BUF_LEN;
+> -	xn_params.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC;
+> -
+>  	while (next_ptype_id < max_ptype) {
+> +		get_ptype_info = kzalloc(buf_size, GFP_KERNEL);
+> +		if (!get_ptype_info)
+> +			return -ENOMEM;
+> +
+>  		get_ptype_info->start_ptype_id = cpu_to_le16(next_ptype_id);
+>  
+>  		if ((next_ptype_id + IDPF_RX_MAX_PTYPES_PER_BUF) > max_ptype)
+> @@ -2567,13 +2084,15 @@ int idpf_send_get_rx_ptype_msg(struct idpf_vport *vport)
+>  			get_ptype_info->num_ptypes =
+>  				cpu_to_le16(IDPF_RX_MAX_PTYPES_PER_BUF);
+>  
+> -		reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
+> -		if (reply_sz < 0)
+> -			return reply_sz;
+> +		err = idpf_send_mb_msg(adapter, &xn_params, get_ptype_info,
+> +				       buf_size);
+> +		if (err)
+> +			goto free_tx_buf;
+>  
+> +		ptype_info = xn_params.recv_mem.iov_base;
+>  		ptypes_recvd += le16_to_cpu(ptype_info->num_ptypes);
+>  		if (ptypes_recvd > max_ptype)
+> -			return -EINVAL;
+
+Should err be set to -EINVAL here?
+
+Flagged by Smatch.
+
+> +			goto free_rx_buf;
+>  
+>  		next_ptype_id = le16_to_cpu(get_ptype_info->start_ptype_id) +
+>  				le16_to_cpu(get_ptype_info->num_ptypes);
+> @@ -2589,8 +2108,8 @@ int idpf_send_get_rx_ptype_msg(struct idpf_vport *vport)
+>  					((u8 *)ptype_info + ptype_offset);
+>  
+>  			ptype_offset += IDPF_GET_PTYPE_SIZE(ptype);
+> -			if (ptype_offset > IDPF_CTLQ_MAX_BUF_LEN)
+> -				return -EINVAL;
+> +			if (ptype_offset > LIBIE_CTLQ_MAX_BUF_LEN)
+> +				goto free_rx_buf;
+>  
+>  			/* 0xFFFF indicates end of ptypes */
+>  			if (le16_to_cpu(ptype->ptype_id_10) ==
+> @@ -2720,12 +2239,24 @@ int idpf_send_get_rx_ptype_msg(struct idpf_vport *vport)
+>  
+>  			idpf_finalize_ptype_lookup(&ptype_lkup[k]);
+>  		}
+> +		libie_ctlq_release_rx_buf(adapter->arq,
+> +					  &xn_params.recv_mem);
+> +		if (libie_cp_can_send_onstack(buf_size))
+> +			kfree(get_ptype_info);
+>  	}
+>  
+>  out:
+>  	vport->rx_ptype_lkup = no_free_ptr(ptype_lkup);
+>  
+>  	return 0;
+> +
+> +free_rx_buf:
+> +	libie_ctlq_release_rx_buf(adapter->arq, &xn_params.recv_mem);
+> +free_tx_buf:
+> +	if (libie_cp_can_send_onstack(buf_size))
+> +		kfree(get_ptype_info);
+> +
+> +	return err;
+>  }
+>  
+>  /**
+
+...
 
