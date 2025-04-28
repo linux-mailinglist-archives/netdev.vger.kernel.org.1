@@ -1,204 +1,166 @@
-Return-Path: <netdev+bounces-186543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3644FA9F8F7
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:57:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18AC9A9F92D
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 21:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D7271A80711
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:57:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 702FA1A80585
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 19:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9C0293B6A;
-	Mon, 28 Apr 2025 18:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="z1ectgYm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA657296D28;
+	Mon, 28 Apr 2025 19:05:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11022112.outbound.protection.outlook.com [40.107.200.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BF2288B1;
-	Mon, 28 Apr 2025 18:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745866651; cv=fail; b=tJIUMyn+lQZboiM2BmlYBLz2fEMQhoLyWTf2Q2NhzLNeBVfc6MVyWBQAtYqffovgzMtT8R2UJ3X3B7DTAiHWm3WJEmsROJX6ppaTCQG7eJvbcZDafW/Vh7cDH89suE67MihcwKBtOxKnXSITbvVqgddHn04s8wMWbrjP8f3Ll0I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745866651; c=relaxed/simple;
-	bh=Oi2sTPYJnBJlgPMpUZG/6dRdtjWnLo4Xskf9vcTFx10=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K2a/ZS6+NUq6PGT0ZHPj/wNKpstNdnBLxFbAHYo0uqMAJfrbu7jNO1KqW61uQhCE2kIsk83Ok3MKvf0k6fjcnwB5HVxR3i8wB+WBP6V+5JreF4LLGff7myfTJpDDI8k07eoaAUNY6+77rB5yE6lnEEo/BZOIhGmbE8yixVXKx5I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=z1ectgYm reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.200.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zEL8NAHWyS/XviHf+HETUloJQAvR8UHqN9BVJncY6X5wuu3oc4rf4alRJxDTbiJHYczU0bLW84KpzCjdyjwppj3pXYQLm+95nYehZJYvkd8wE6bimh512/9Wu7Y86AtXPynplL3wJ+NECNWQcfVqCAxLD+6ThvOTl9uITmA6yQkAigmi/7hMJyPSks5TJOnNLd46X4VcT9ugjNJ4q20jtQa6LE8HssVpQSq6z/2vilbbc26nIUajkjZhON3U0yi8vNK8mQ3iw+drMaXzyJLAoKOXjuImjJSdosmwPNAU+wUQXfmbDcFWqt75Zw2OBodmexzTJBerokyZAWA4sfJAmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OiVqu4MwHSOvFpQ30jPaUEdlr+x8ynbcC7vc+nTlJ8k=;
- b=Gpu3mbMYZd4tyOD5qgcT+E/5PGLrVNPdHqCzTIGVHfo5daeLfLF7Pa0JZ2BhssdQ4xh7GnVQXjv+y+cBNcAdxw8jm4jPeF+LD5n9U1qfmthGRMwC7K04JC397Xnbphi65U1ZKZ3AEpju3Cs/PhHka/AHRscTO+EPDaHRiB+F/5k8N3n86XvcnN9EdoMw0iFguGCpDs2on/TtruLkIFLNsh3U/NyghCIr2U/QyhlPy2/zqcJDMGiI5MjelvX8zabuhi8SS08emwv2c5wUR0RHkg/oRUgkLWKpEvgbBDPbcwkHuXHkdW+5oMpI++7lnFukhmH0B6f6b3c/IB7gQJWAcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OiVqu4MwHSOvFpQ30jPaUEdlr+x8ynbcC7vc+nTlJ8k=;
- b=z1ectgYmPNAAwNUOqNNNfOJ+QmU4HdF2cR5poSI8f6Bsip6ajQFzeNqOvzRrokGWai71uu/CWzfAEkGr9gl3PQwSqlwn5RuhFQgKRlexmqGkmaFCTVhTBlKAQgfBNgmFl3rvwc3IPbDH4YbC8nIDEHtLPMerkenVr3R+J/3/ueE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
- CO6PR01MB7434.prod.exchangelabs.com (2603:10b6:303:135::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8678.33; Mon, 28 Apr 2025 18:57:25 +0000
-Received: from BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::3513:ad6e:208c:5dbd]) by BN3PR01MB9212.prod.exchangelabs.com
- ([fe80::3513:ad6e:208c:5dbd%5]) with mapi id 15.20.8678.028; Mon, 28 Apr 2025
- 18:57:25 +0000
-Message-ID: <a12dee5c-2d59-4941-84b5-ae8bffcedd6c@amperemail.onmicrosoft.com>
-Date: Mon, 28 Apr 2025 14:57:19 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 1/1] mctp pcc: Implement MCTP over PCC
- Transport
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- admiyo@os.amperecomputing.com
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>, Huisong Li <lihuisong@huawei.com>
-References: <20250423220142.635223-1-admiyo@os.amperecomputing.com>
- <20250423220142.635223-2-admiyo@os.amperecomputing.com>
- <20250424105752.00007396@huawei.com>
-Content-Language: en-US
-From: Adam Young <admiyo@amperemail.onmicrosoft.com>
-In-Reply-To: <20250424105752.00007396@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0255.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::20) To BN3PR01MB9212.prod.exchangelabs.com
- (2603:10b6:408:2cb::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052F419ABC6
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 19:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745867123; cv=none; b=B1sUzBduJBXETKUZRLs8SMvXMHv6nI6vn9gGu95HS/Te6hBe/T6oOR8M83B3WsZbPVcz3LjgdOOvZpwT2PXaaMYgmqCTl1GEN50qex6/u1fF/UHmgG1ZdkzHCXLNWP/hHsVxVcgcHVQdX1DqdeelWvWyLmOMfDxT/YRQVUh19m4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745867123; c=relaxed/simple;
+	bh=GrJ4TlYWIvOwm5ewrhRvrrk7RniJIEXmtDWAmYFWUN0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uy6nHgI/pzjhZazzHHyamPUCt5fQbMyX91F67mNbGk81RjYwErbe5n5DGR1tp9MMPT0hsVfiF2fAqHLMHtgkR3vdCkvPOf3k1QM9tHND0l4+8KFtdrp4wWBLtXyVevCS8cR3BA7sKWhdxMURRKpMCmpC7rVZ8lCIu1F2O3Jmvj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b5875e250so582363639f.0
+        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 12:05:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745867121; x=1746471921;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hz5dELjQsdYxeuu2b7u4N9XuZqC3CQB3u5mPsKUNGaA=;
+        b=m6Um3+vzH/QiiB4CZTF81sLZIs6PbM38oqT7sf735QV58tpjh3ImO3umlWk3jAeYgV
+         oDwn0gYZbGaqRDg1KWG5bbQ/JKr8oHgDkRMbsCCpRJ2qwOgW86M/Ps7VbG4H0JvS12ZB
+         324juQf5fWEbRt/5Uv22sipBrCYxTFOV+FUSGPnDYe1leCpQzQSmFFJX+QfqZxRDvH1D
+         awDWo6V67I2qMn1rk4VfIk7OYdi4aooZ8t1iq965oR9woqq/Qi/OeuHpYaSJvlzyZmzl
+         9642fuyu1Y8UKjIoUOdJjpdRlBuvswfPKUoe8uC6LoM3lKz5dAM/ZdWIBI/MreyrogaN
+         zMzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWG8rmQSSPoOq329NwIWX0gA0FxdgSjjTdpl+YXXfzJ6MIrb3GR3wxwiX8QzhnPeSirqF220o8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyhl7uq2mywuTYtnzQSf4edIpqfmkZUIkocTOBYmY+KcnEnR/si
+	Zz8Zg+bw4SHZcyYd1YYKRAmSCrDXxZsjOU1Ki4haVKUv82BpeEJJgr1246mbqssfvisJMdDpv33
+	EqfnxfodFIpDUCAGXi08IBNbzeq1iwo5IXXdIOSj+CpKupwajQHIx+A4=
+X-Google-Smtp-Source: AGHT+IF/ciP+C+7gCkf8QtAU5aPBuuGzMsKR79+P4YtYAMyWG9LSjh4jcP7YWw60Foq0aKGOsJcv9XyBuTHy+QQ+s/yTaCgHEBjN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|CO6PR01MB7434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24699136-ae81-4b43-a675-08dd868683de
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|10070799003|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SGNzZ0ZiOFdGMWxPOUk0NDQvVk1ScXRhd1BObnl1RWh0MTVkT01iSFlkSW5k?=
- =?utf-8?B?a0Z4eHpUMFBYY21CVWgyUTVMNEgwdFVaZHErS201RG85eHRQOU1hN3cyd1Rz?=
- =?utf-8?B?aDBSaENkdHgyaWdGeVBVcUVFRmNIQW1ySGZrNTRqTGxkNWFESDBXRWFON1RV?=
- =?utf-8?B?M244elZnY1ZvMkd3NnZUY1RJeWpyamRDUCtZcDhzaDdkWEVycGE3V3ZKQU9h?=
- =?utf-8?B?QzVjNzRwbGxMdmlnMUFwdENwZEU0TjZHN2NnSC94cFdKT3BBSllhNkVxN2ht?=
- =?utf-8?B?S3RPVW9QeTNPdXU0TVFiTStVQlg0U0pMM0JTZC9OVEhpMS96TVBNZjl6RW5T?=
- =?utf-8?B?Yk1uaUNRN1FWTU5lMVM4UUpZM1Q0NnhOSStVZUZjV2NBTFkrYlhrc05iaTlP?=
- =?utf-8?B?M2x5R2VWNWVZRGJlRXBBQUpoUnJwTlBwbUxyeFphVHBNdFlhZEIxd292Z3Q3?=
- =?utf-8?B?MUE5eHhncU12ZjhJVURNc3hyLzVVWFFUQWdoOURTTnF4d09SdzdOdjViMlFo?=
- =?utf-8?B?azNGN0kzS3hoTFVGUlZlSEtabkliTGNuamM1NHQvdVFLb2R1R0sybjMwZUIz?=
- =?utf-8?B?bU5JczdnOW92WTYxWW5ZYk1zYmRtSVBBZXQvRElaY0JxKzdLVmtnV3Z0RVJ6?=
- =?utf-8?B?dUo4WWM1NitEQy9NVFpheCtBOHZ4SU5GVkxocXZ0QStTc0U4Y0tPT1NGMTR1?=
- =?utf-8?B?UzFtYUNsR09RbmhXVWZpdjhpbUkrSkFrY3FsMU82NTRaRmNQUG1Ec2pKRnYv?=
- =?utf-8?B?dVVOTEtqS21HcnkzWWpYNzVScklNQXQ4azlaTlFpRW53ckNnNE9ja2EyNHFi?=
- =?utf-8?B?RFNZRzk4K0RSVjJXREEwZzNocWtkaVZXTHJabnJKTTRHZjllZDFRVHJBbWsv?=
- =?utf-8?B?SUNtTmc1dnUranZ2NXAwYTZJcVN2NUthMEllbDdpaDVydnF2TVprSTF3cGlO?=
- =?utf-8?B?eHhrOVN4TThWZ1dwSVJWREN5RXp6S1BVazd4Q1duU2VjdHIrR2tEZnhueGVl?=
- =?utf-8?B?QjhNYVR1cTVGVmszTWN6M2d3aVh0bkVpTFprVk5vZHJiQisvOHRxNCtWNzlv?=
- =?utf-8?B?SWFma1VpOU9nc1hsbEllVEN2a1ZHZ2lGU29jREJVSmRrWTJwWnlrTitkVkQ1?=
- =?utf-8?B?a1h1TGFXWWlvOWRyYzB0UWsvbC9KSDJxTzBMSkRZbTBxWU1SUzRYdmxidUkv?=
- =?utf-8?B?WEZteTFvVCt3cC94cnpyMWg4MDl0K2hvZmFzLzl0dG8wait0cmZsNmdaU0RJ?=
- =?utf-8?B?RHUrREVKZU9wYlRiUWRiZFZpTCthZkZSMDdLWjRtR1NDYit1cXFlMTlrOHhx?=
- =?utf-8?B?RmFucTJaaXRwR2QyVklXRFNqbE5yN24zTlFkS29UTzg2VHRiR2NPdlV3UWpj?=
- =?utf-8?B?Qk5XUFJJSG9BOXJOcTRBbTg1dUhRYjhGdkgvNndiZWpFT0lQaG81YzBNN3B2?=
- =?utf-8?B?RmkyUU0rOWw1N1Q1M1J2bXJQVklLTFo1dHFCaE9qOGlKYzVJcXJRZUtrZHBN?=
- =?utf-8?B?MXhRRXdGcG5pZ2pLSDIvSWhGN1JsZ2E4US95QVNyRERWYkR1QmFGcjlDd3N0?=
- =?utf-8?B?VmQzY2VacUpGRmFaRU5mMVVYaTZoVFNuVnN1M3liK1VKNSs4eW43aWZTNUxo?=
- =?utf-8?B?RkJsSVlrR3lCVkg2ck5iTVpabDJQUU9JbGZzeVNSVFV2YUJPVDBkVDR0QUJ6?=
- =?utf-8?B?VTdYSkduamdYUTVpVFdFdnlRZGpudTR4UzI5Q0J0eUxsQkJyT1AxaVdaZlJQ?=
- =?utf-8?B?RE5NMm82d1RWK0N4cGlEV2pVcmtEVk9jSHJOS3NZMGIrdlVJM2ppVVg5bnJm?=
- =?utf-8?B?REN2RVpubjVwVGYyYVB3cEZHRVNVUEJybUYvOWwrQndKMzBNdFFtRHBscWdn?=
- =?utf-8?B?UUVBTXpXUk1SdnVWaEZWejlsU0VOVWFZTys5Qi9PRURwUXc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(10070799003)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Mm9hbC82Qzl6NFlObUxPd2oreE03am1jQ2VldUxlKzlzTkJoWEhiUE44MXpG?=
- =?utf-8?B?YkFNbVNRVGFJUFFxRDF3Qmladm1CUTh6TmQ2dFZrcityc2lTRy9Gc2tTY1gx?=
- =?utf-8?B?LzJ4RUE4L2ZoNGRQRnRzOGozVnVKbEdya1VzTHN2UDl0QnR1aCsxQ2N2ZlYr?=
- =?utf-8?B?SEJ1V3V2YXFZZGlaMVM0Nkx0RU5hd1dOdDZpN0ozNGdvRXVDRWg1OGhZempa?=
- =?utf-8?B?VzJRQUtraFdVUDQrNWdybTk0NkpSNGFuYWlqWjhKRjlLT29wVTVpYU9Ub2hp?=
- =?utf-8?B?OUFKZnlreGNYMmdRVTJJT29CZ1FjWTJPQkFkR0pIZVdaN1lEVjZ0R3J2SkZZ?=
- =?utf-8?B?Z1dFSEJJWWVJU3pnSzB5UlVrblh6ZkkxcVA1SHo3amV6eHpFQ2tyZGhERzYy?=
- =?utf-8?B?VE56QkRsZVNKNGFCbk4waU5lMkIyZ0hRaDl4Q0ppRWhVT0JqVDFNaTZUTldt?=
- =?utf-8?B?WjBka1pDV0JBY2EzQVMyTUd5ek9rWkdpZHEraTF4SDlWYTdMK1pBQitic0gy?=
- =?utf-8?B?eWNOSTBQY1A1MEFDWGtjbFpJUG5INDhBTm1QUDBOWkxkQkNnTHBQa25KRnNq?=
- =?utf-8?B?eGJpVmFGckdlK3VmVFgzNjl2anpoTkdyQUJObDdLQndNbXFVM1NBYlRjeUUz?=
- =?utf-8?B?Vmx1T04vVkxiTTNkZTFVLysvdm1SSGkvbmFZWTFRZzlBN3JJK0VoY2Yvd0Zt?=
- =?utf-8?B?N3F0YjdlNFVlL2hqTlVadXBuSzdvdWpMRGU2cDhTZlZEVnYraWZIRkw1QXNO?=
- =?utf-8?B?ZStFVE85L2VHNWp1VndjS055dTBDQVc5SzBQODlZQkZ4MytGcWtmanZwNFIv?=
- =?utf-8?B?RGRZTTBJcm44TkhUUCtuZGRudEJIdHNQOWxHUmQ0RWtDMnRZc1RZQXBYTElR?=
- =?utf-8?B?UFBaQXdwb3NGZ2lubERvTVNFZkRjcTdUVTZITkV1TUcrTm84QTVXek4rbitS?=
- =?utf-8?B?dVBaS2o5Ri92RHJTdnNraHIzZ1hhSnhhaFdvTGZlUXc3VktQc3FxdisrMEFE?=
- =?utf-8?B?NWhkUzJxdkYyeXRJd1FLNGxXWTYreFR3ZHZ6ektOV1ZlTlphck9saUVsZndq?=
- =?utf-8?B?em4wZXorTFpaUTh6bnJiakRpOEx5NTVUOUtTZFI0MDEwSEhNTXR4QmNPMGxN?=
- =?utf-8?B?ZmhkQWJzMzRkMEROVEJTL0I0TDBBNmtBREM2Yy9vQVZSVFFCR1Q1QmRMTEhq?=
- =?utf-8?B?STB4VXZNZkdyYUhtN1cvN21iQ1pMdEVLVFhNUUN5ME1lNnBucHBOa0tjNzFv?=
- =?utf-8?B?R2l5aVJRMk9KbTJ0SkZIZy9UMEdRN1ZoVFVXTE82OXdqaEFKdmQrdisxbDZC?=
- =?utf-8?B?RlJFK2dlNjVjMThaUUVqdFI3MkFydnYrWUEzeXZWYStjM29JRUhvbGNKS0tz?=
- =?utf-8?B?M1BScWdGR3l5b3NqSzFrd21FVlRnbkt4UjR0ejNTSWxYeE1zYTJWOFFNbjI4?=
- =?utf-8?B?MjBUZDd5UEw0NGIrelQrSkl3VXdyRE9DNWFJbFYxd2xXWEF3N3Z2QzROTEww?=
- =?utf-8?B?OGEreTI1Y0pwbGhMLzZVellBa2o5d3BIVHAwNjhHenNEbXp1REpkWXRpK2NE?=
- =?utf-8?B?cktpWUxhZTg4UWxuV1Byd0xvZTRvSXgvSUErYjY1TktCL1Q0NG1TL25vVVhz?=
- =?utf-8?B?amlnOTN3eVpzMWFQOXdsUXM4ckdZck13OWhEMG1oREEvOElWWlZxN2VkMmYz?=
- =?utf-8?B?dEtSR2J1bmMrd0VhS3lqcGZhbHBUMVRsY3NOUnE5QXd5Z0VMZ3h2T3ZjWWI4?=
- =?utf-8?B?UXBKOXZsb3FBZEd1U3M5Qk15TVZ0OWtSb3FhSlBkZVN2b3FsWHNET1V1bWlZ?=
- =?utf-8?B?c1VLTzNQdDRCeW42UXliMjA2YnVmdVJpbldJUUtIOUxxY2FXL1NFQkVtQi9v?=
- =?utf-8?B?TU01V3cwdGQreFhJTWU4S1JsSC9vN2duaGt1azI1NElwdS9Wa3h5T1hvbU56?=
- =?utf-8?B?R3V2MVRhZTNLRnlraWxwYllId2x0bml6dGdJSVNBNjBwSENUVGtKeVpsSnU5?=
- =?utf-8?B?R1dlV2g0ak9QU0UzV2xXajlaK2Q1Qmd0TFFlSVZGMnNxUit2dHJUeXBaZHFJ?=
- =?utf-8?B?ZUN3S3pLQW1mcDZ6amoxNDVVNW5rSHh0cDFhYzIxNFlEcjgxd1A5V084RDZQ?=
- =?utf-8?B?ZUphUXpDSzlDK001WStOcHdqcE5tS0xYVlRJWi9jZ0hLQTRZR0cvOWdZVVFw?=
- =?utf-8?B?QlJZU2VYVEkvbmMrTjZuQXhmRWdVSHdjYzE1RjBrK3VSNE5KSW1mYVF1QVFj?=
- =?utf-8?Q?mrlqK3Y2eJ1jqH4khEXKU55d60tBoGNsep4tyPcmN0=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24699136-ae81-4b43-a675-08dd868683de
-X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 18:57:25.4137
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hOC75kRuVBdBmlf52ki03Ev0qrBkxBtyBFH/gJ5csPQQZY5sIpFqZQ947XMvN5Xsr7YsPhNTRclrQP97u7obsik3SccmlSDm8LZMS2r9qc/7X+kwxBJx2C/tHkzxyNJp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR01MB7434
+X-Received: by 2002:a05:6602:3fd0:b0:862:ba37:eb0e with SMTP id
+ ca18e2360f4ac-8645cd71475mr1635299339f.12.1745867121165; Mon, 28 Apr 2025
+ 12:05:21 -0700 (PDT)
+Date: Mon, 28 Apr 2025 12:05:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <680fd171.050a0220.2b69d1.045e.GAE@google.com>
+Subject: [syzbot] [wireless?] UBSAN: array-index-out-of-bounds in ieee80211_request_ibss_scan
+From: syzbot <syzbot+4bcdddd48bb6f0be0da1@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    5bc1018675ec Merge tag 'pci-v6.15-fixes-3' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17ca0374580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=90837c100b88a636
+dashboard link: https://syzkaller.appspot.com/bug?extid=4bcdddd48bb6f0be0da1
+compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a39d74580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106fa270580000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-5bc10186.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3a2f39285e07/vmlinux-5bc10186.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2a37a55f34fb/bzImage-5bc10186.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/cc5918853785/mount_4.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4bcdddd48bb6f0be0da1@syzkaller.appspotmail.com
+
+wlan1: Created IBSS using preconfigured BSSID 50:50:50:50:50:50
+wlan1: Creating new IBSS network, BSSID 50:50:50:50:50:50
+wlan1: Trigger new scan to find an IBSS to join
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:1208:5
+index 0 is out of range for type 'struct ieee80211_channel *[] __counted_by(n_channels)' (aka 'struct ieee80211_channel *[]')
+CPU: 0 UID: 0 PID: 131 Comm: kworker/u4:5 Not tainted 6.15.0-rc3-syzkaller-00342-g5bc1018675ec #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ ubsan_epilogue+0xa/0x40 lib/ubsan.c:231
+ __ubsan_handle_out_of_bounds+0xe9/0xf0 lib/ubsan.c:453
+ ieee80211_request_ibss_scan+0x600/0x8b0 net/mac80211/scan.c:1208
+ ieee80211_sta_find_ibss net/mac80211/ibss.c:-1 [inline]
+ ieee80211_ibss_work+0xde7/0x1060 net/mac80211/ibss.c:1670
+ cfg80211_wiphy_work+0x2dc/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+---[ end trace ]---
+Kernel panic - not syncing: UBSAN: panic_on_warn set ...
+CPU: 0 UID: 0 PID: 131 Comm: kworker/u4:5 Not tainted 6.15.0-rc3-syzkaller-00342-g5bc1018675ec #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x99/0x250 lib/dump_stack.c:120
+ panic+0x2db/0x790 kernel/panic.c:354
+ check_panic_on_warn+0x89/0xb0 kernel/panic.c:243
+ __ubsan_handle_out_of_bounds+0xe9/0xf0 lib/ubsan.c:453
+ ieee80211_request_ibss_scan+0x600/0x8b0 net/mac80211/scan.c:1208
+ ieee80211_sta_find_ibss net/mac80211/ibss.c:-1 [inline]
+ ieee80211_ibss_work+0xde7/0x1060 net/mac80211/ibss.c:1670
+ cfg80211_wiphy_work+0x2dc/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
 
 
-On 4/24/25 05:57, Jonathan Cameron wrote:
->> +
->> +	mctp_pcc_header = skb_push(skb, sizeof(struct mctp_pcc_hdr));
-> I'd use sizeof(*mctp_pcc_header) for these to avoid the reader needing to check
-> types. There are a bunch of these you could do the same with to slightly
-> improve readability.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-I get a compilation error when I try that:
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-drivers/net/mctp/mctp-pcc.c: In function ‘mctp_pcc_client_rx_callback’:
-drivers/net/mctp/mctp-pcc.c:80:30: error: invalid type argument of unary 
-‘*’ (have ‘struct mctp_pcc_hdr’)
-    80 |                       sizeof(*mctp_pcc_hdr));
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Maybe a compiler flag difference?
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
+If you want to undo deduplication, reply with:
+#syz undup
 
