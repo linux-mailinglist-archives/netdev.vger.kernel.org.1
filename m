@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-186455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF35A9F329
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:08:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D634A9F355
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E553A85B2
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:08:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB2D7463264
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCC9268C65;
-	Mon, 28 Apr 2025 14:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46C026C387;
+	Mon, 28 Apr 2025 14:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="skb4qs5G"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Un5qawjW"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D532C85;
-	Mon, 28 Apr 2025 14:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F521527B4;
+	Mon, 28 Apr 2025 14:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745849315; cv=none; b=Rhnd1HXowxDDHh8VZOlHlzWQnwCuJT7XExnnA4f4ifBRIAOEvA8ZYdGS0FTYEyj/Ido1EbJ6RmSbjppoUIDR3dO1Px2nYSvwZZfIFG2Nj9QrKBQLUq8tb7tqa4fJjR8vJgjNkSOFlOs45CH6n0H9ySGhLVHS2FWDdg20dNplFQg=
+	t=1745850189; cv=none; b=Avi0XkBu0R5H6G02w28xPZ446G6xfPYZea8Hkvzt8HOoNRPKB9d6SIfAIKE8rSDIExTgqizw7zU4HE/7Tlk6+jQP05f/3KB1HCMEOBPPcEvirJ5vRp3qQK3RAP4ogu6j95o1rfTDtNYIgCbGSAJo7j5qQFK/25cItmVVn5B/8Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745849315; c=relaxed/simple;
-	bh=N82UuaGkcXSgDvbJ/SYZp0qqmioxEerlUofG5QQN/bY=;
+	s=arc-20240116; t=1745850189; c=relaxed/simple;
+	bh=pkWJKi2o7+wr978ci73S7Jnm3yZMHVsqZR/8sngjnNY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VN3Gceo61DJQBQRjxEekz6U3OAt3CeRSfrORhW9WDduvZ/b4anl4c9matqEvTxxDE9LW1soo+Rt/KB3zjWGjThWLiGDLX8QakLlxvmh4yhx2/kMnzeBFpKovSeugV4rENC7bXW991Bg4DZA6248Q36DweE8E1VCcJqmnycdXXEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=skb4qs5G; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RSrF6GZVIArmDQlfsDnijfYy7xutKzJOICtzMtkMWOSFHnY6rc3ddqM8on4FRnmiBpwGdrRZT8sfZFiIArVxf90QsvVT5TSr487CNxXZF6A+0XvwiGnL9fMUt97Y1cAU6e0DigkilyHaRIvNfs66QER/zAJ7oHT376vr/2tdZeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Un5qawjW; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,41 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aIpoS0ND3fqgX9y156pe5+DTr/v2sx0BpH1llI6WOd0=; b=skb4qs5GVkbEEle4HYIM/yPAtD
-	2wnqyHXOICSwi0UCqYjBEO3Mr2FyKKapL7KS1cf8RfobEAdNTs1diMML0dUhuOKZ+PkYas6k8h4eV
-	gvAG3s8P1cP6asKazO8WG/M0XtoSyIOok25LS48Gp/bGqPv/+keIUJJJ2TYaOR/1TirI=;
+	bh=KgWHsUCUBEFv7Ycjxi4yK47joNYceiEjUCO7mVk084w=; b=Un5qawjWiRpBR2oqejia2d9Kj/
+	xECAGDlhKTvArROD6H9+JryYC0fxjNWD9oZitkfGUwAdn/SV5iv060Pep1TabLnggefqREufbzmH3
+	JUZbiAHQ/cfufXb8dNwg2sgOb07ukMIm/J6qv1J0tIjtOaoOKldhb93bWuFUKUxqyeXQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u9P9W-00AqR4-GB; Mon, 28 Apr 2025 16:08:10 +0200
-Date: Mon, 28 Apr 2025 16:08:10 +0200
+	id 1u9PNr-00AqV3-I3; Mon, 28 Apr 2025 16:22:59 +0200
+Date: Mon, 28 Apr 2025 16:22:59 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <aAaafd8LZ3Ks-AoT@shell.armlinux.org.uk>
- <a53b5f22-d603-4b7d-9765-a1fc8571614d@lunn.ch>
- <aAe2NFFrcXDice2Z@shell.armlinux.org.uk>
- <fdc02e46e4906ba92b562f8d2516901adc85659b.camel@ew.tq-group.com>
+To: Qasim Ijaz <qasdev00@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on
+ non-zero PHY ID
+Message-ID: <3a84b8a8-f295-472c-8c3f-0655ff53f5cc@lunn.ch>
+References: <20250412183829.41342-1-qasdev00@gmail.com>
+ <20250412183829.41342-6-qasdev00@gmail.com>
+ <b49e6c21-8e0a-4e54-86eb-c18f1446c430@lunn.ch>
+ <20250415205230.01f56679@kernel.org>
+ <20250415205648.4aa937c9@kernel.org>
+ <aAD-RDUdJaL_sIqQ@gmail.com>
+ <b492cef9-7cdd-464e-80fe-8ce3276395a4@lunn.ch>
+ <aAtgOLMnsmuukU42@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,28 +70,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fdc02e46e4906ba92b562f8d2516901adc85659b.camel@ew.tq-group.com>
+In-Reply-To: <aAtgOLMnsmuukU42@gmail.com>
 
-> > However, with the yaml stuff, if that is basically becoming "DT
-> > specification" then it needs to be clearly defined what each value
-> > actually means for the system, and not this vague airy-fairy thing
-> > we have now.
+On Fri, Apr 25, 2025 at 11:13:12AM +0100, Qasim Ijaz wrote:
+> Hi Andrew, Jakub
+> 
+> Just pinging on my last message. Any thoughts on how to proceed with
+> this patch series, I left my thoughts in the previous message.
 
- 
-> I agree with Russell that it seems preferable to make it unambiguous whether
-> delays are added on the MAC or PHY side, in particular for fine-tuning. If
-> anything is left to the implementation, we should make the range of acceptable
-> driver behavior very clear in the documentation.
-
-I think we should try the "Informative" route first, see what the DT
-Maintainers think when we describe in detail how Linux interprets
-these values.
-
-I don't think a whole new set of properties will solve anything. I
-would say the core of the problem is that there are multiple ways of
-getting a working system, many of which don't fit the DT binding. But
-DT developers don't care about that, they are just happy when it
-works. Adding a different set of properties won't change that.
+I would suggest you do the minimum, low risk changes. Don't be driven
+to fix all the syzbot warnings just to make syzbot quiet. What really
+matters is you don't break the driver for users. syzbot is secondary.
 
 	Andrew
 
