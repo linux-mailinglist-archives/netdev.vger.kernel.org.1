@@ -1,139 +1,521 @@
-Return-Path: <netdev+bounces-186375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88AF0A9EB61
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:02:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD11A9EB82
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA743A85A6
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:02:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B9C3B05CF
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F9225EFB8;
-	Mon, 28 Apr 2025 09:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5FA25EFB8;
+	Mon, 28 Apr 2025 09:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ksu3Ubrz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EXIJNhcA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6545C2236E5;
-	Mon, 28 Apr 2025 09:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745830971; cv=none; b=oIOXcWdUhXfh3/uSlawJgvOgkFnX7q2iGG35rwyklt4/gilKRqCbEz8mrMPBziYZSo0w3pFUX631W4vIiT8da+xuQXKUZAZeQCUp9GvyU6Bmi4JNUCt7JDpkAwVoyKv4H4h8K8ho/12/JdWeNTL45QMBk4qrIEhMHI8Sr7eP4uU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745830971; c=relaxed/simple;
-	bh=mUezaAAjCJvcIBBQl20BiC4MU7jwp5YtdVwMumDpQuw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pkBsG2poPfD/GCVXVu5bpsxZ1oi32dG0FybQ26r88ck7t6iV/ZSktwZkn3kBFJPXthyyVmpcVCtjKDWx0KpzNHmvoep91lOafjxKsvxiYfhuG/NAmR35vWxzwXBTyj8gOk/AhfkuY4/2sL3rZJ0ctRfnvgqY6DIzViMtIrH/lqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ksu3Ubrz; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3912387cf48so130732f8f.3;
-        Mon, 28 Apr 2025 02:02:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745830968; x=1746435768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBGksg2IxAu1Tmq5JGjOVoyWm+EmXRQlpuLMjgaUXIo=;
-        b=ksu3UbrzqLr88L8X+3QdkI5+BOftcJNvg8Zphu8lgMxNt1eyzXXipmibL2Rto4kwVb
-         d8+zzRVDY0xdYUVDVPbLtYiZaU0kMIiHQ9I/WaRMU7uHCeJDUYWYarBFKHJHcnj1zkvo
-         HCeXh6mltVXouoOr70XDVDTjBe/CDFLLaOD8VbuTq+U3nacGZw1Y3+/4fxHrr9+YwAy9
-         zib5SfVgbEkyFNp/R0igZxtSqa6KnufcmBIVzJ0mMUlO36IPUjx4M9nBIryEizd3fifQ
-         O+sajJALKYyTa+TPiafxVvndhJyIPeDEzq1vt5qYZrpoOU3/auisADNs9oDYGRMMyYNn
-         CYhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745830968; x=1746435768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rBGksg2IxAu1Tmq5JGjOVoyWm+EmXRQlpuLMjgaUXIo=;
-        b=v1z8iYRVrCD7bFBzVyNxLfeUGfg48VRht0iCQywUacEB7VCZIUhqqhERSKw8V7Ca+S
-         1b0enFQqRbllGxvQ4QHJEFBkM+g63Q+IL2t0NhUCb1u2/n3zWu4hARaQEyajxtZ3ca7Q
-         brc8BW6EqLqt+bOjCAnv7MAtE/YaZBioW9n8pascXziC3NNF+nmv5+uUn0PJegYZjTqU
-         57fyHxY31h2dA92fXV4qS4nWLMpmkkXSxcaFxJsUtgCiRbwbtUr4aTawvNzCbS/YRf3g
-         Wbv8S8lOGj2oqxYMmlMr2nnRUfoJTFiG+hT1jnEEb4D6er3SWf8KG5ZWTjZHh2L/S0Bl
-         vEkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVptS7T5efyzyv0P+1NGiWuhgqJETFkP3gLFX9+2mnjZ5pudqiufdOfHA4E/bQRbwDAlfxQg75Fgdsxux0=@vger.kernel.org, AJvYcCWMDyDdouj+UyaJPcSVIbu4ut0JEtazo4RO4WbVd0fcvJ5raAhhLRNr4uQwfLuFoieAd9f+Jy7M@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHIrh54vxWoYN6F28lZI37z+FRy2v9PvQluejQ+X22zCwYla8x
-	jlYegqBILRakfO53gAf3bReLVfK4EjqNwI9HOnO+Ho1++V7jbEQh
-X-Gm-Gg: ASbGnctE8fyJVpSQFjZ/szAWRz42aC0jQGxVWHAmX67GydhVvQ++vU/e9VHV3+YUNjl
-	R1G07AvjlVEtcxHeJB6kJgGNHCvL3azPxsDKPvu2laA8dMKAVrLhn2HUBK1KOeqlTfdHMrdswGl
-	hXVJlKoywpSlkj3bdtD0/9Qx31dmtGoepYucbwGcARuE1P19K7XMWRmJyPhCXScCrTbQ5HVDj32
-	RGJlkl8fCNYmXCnntbnaOrnRak+GReGm7ESL9LPz16aGUeKoZ4cgWBZij2tEB77yg8l1izwA5v7
-	zzvi1B4VumgmsxXmisxUUEC3HH35
-X-Google-Smtp-Source: AGHT+IH95kWZIl9MkZDgw7fmG1bBonr030oaRnnaazBkxqkiOcALWz2eFk9yqTnyD0OELAIfXOAALg==
-X-Received: by 2002:adf:ef8d:0:b0:3a0:782e:9185 with SMTP id ffacd0b85a97d-3a0782e93f6mr2122002f8f.2.1745830967400;
-        Mon, 28 Apr 2025 02:02:47 -0700 (PDT)
-Received: from skbuf ([188.25.50.178])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073ca511asm10277169f8f.26.2025.04.28.02.02.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 02:02:46 -0700 (PDT)
-Date: Mon, 28 Apr 2025 12:02:44 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: fix VLAN 0 filter imbalance when toggling
- filtering
-Message-ID: <20250428090244.phg3xijxhhtczkvk@skbuf>
-References: <20250422184913.20155-1-jonas.gorski@gmail.com>
- <cf0d5622-9b35-4a33-8680-2501d61f3cdf@redhat.com>
- <CAOiHx=mkuvuJOBFjmDRMAeSFByW=AZ=RTTOG6poEu53XGkWHbw@mail.gmail.com>
- <CAOiHx=m6Dqo4r9eaSSHDy5Zo8RxBY4DpE-qNeZXTjQRDAZMmaA@mail.gmail.com>
- <20250425075149.esoyz3upzxlnbygw@skbuf>
- <CAOiHx=keOAWqF4Atzqx4VZW+xAccO=WtWCOoVoEPR9iFrDf_zw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BDF623;
+	Mon, 28 Apr 2025 09:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745831481; cv=fail; b=jB/S/DkVWBBS+6FcR6mPx/ND1kWRpcv32g3F6luYq6b9aryMey2bbJrFuU+gHDqlPnfWrWTL5JgBYycwbBdcq6t5O7PlbXJMG5T6HwueHxoqKWpAZFgGffEFGaSsFn+61JymwSBwfjo7yURTbN1FyGLBSxRvfIylJ5AYX5C/Cbc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745831481; c=relaxed/simple;
+	bh=0nHfdzRqvGXSqOcAuZJ4Ez4vxPX2PPljtgMigj4M+lE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KpvtPqDSJnxdBLa/IrfLbp09k0WLOlxGmucsWKhb0WTUKimpztdbbgC3THwFdAgQuZ1HLNGcLYn4tuBKbcoeXrC2DR9F4f57sKW4DIlUbvjXN13Wc7VvUF+zc2mdD29YmwCAhDLsFRBVf8s2iEIs2mU0H/E92qsdznDfxs+xkUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EXIJNhcA; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745831480; x=1777367480;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0nHfdzRqvGXSqOcAuZJ4Ez4vxPX2PPljtgMigj4M+lE=;
+  b=EXIJNhcAv/iszpRmqpPslrtUuARzoRFEh1oX+4PAQFdC8RyNV8ABVkZv
+   bULkR7CT3fM+wY4vemOw9mjissoYy/lSgHdY4OwnufRXumpZ3idKs/qMH
+   MccIMDKoY4oIwWI9K2qJBSo/NZRW4mfDiUZCBOaUUqQSMJgQ3ujMrOPvQ
+   Utg8VdyGXNcW953e6/9JSIm9IYRxHPxRw0KemlqCeO5Z9MhLod25yT8sQ
+   XjPm8BeJfPaSGnb84mxUiHxbajRD/fffG7WQil0WIGy5KC/iiiZY7lYhO
+   vZ4k9sSZBWrVNjNIzbknAVU2i+3+tq52aoglDNooA5wgRN9KWc18uJ+ph
+   A==;
+X-CSE-ConnectionGUID: PrvKQYmYT6ukhU7UQgzjPw==
+X-CSE-MsgGUID: OAyZLf5sS5K9npizFVMkQg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="47323142"
+X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
+   d="scan'208";a="47323142"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 02:11:19 -0700
+X-CSE-ConnectionGUID: sg/FiJaURViJPS8wnrv7LA==
+X-CSE-MsgGUID: uIaHq4EdRKCu0Ur7zWgIWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
+   d="scan'208";a="138280914"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 02:11:18 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 28 Apr 2025 02:11:17 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 28 Apr 2025 02:11:17 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 28 Apr 2025 02:11:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kdEgD3hgWFG6eNuovatEiFCHSjgIud3DdkJtvPqboPoFh4eXO1wG5wsba8JheUv1va20dFU+58fQVKWBmfLJMphrTr/UdL3DDw/Oe/ej5k2dZcXuVcgAD60ykc/L/p1t9jsDd2klseVYObRz4nzIh2J4NBMSZ4Yu/aPkvl94I6+8LMGHKJEq8zalp2isQjOlw3NNH2OBqmq/AQSt1mDrmyWqG+SYUa+qZEuR3xj4iaFgXLhUuVx3fWOP4qN64Uhckp+DNSDCpNFB9Ypb6K/IUbfMc5ansAEzvxt4I7nPBGjnXHeWMq4PhAb8jVAY+4awpNWE3YfpT2O7nfpAUq/5VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UNLBnFe3Ht4PY1i6YZXxESdX6hbXw+BS2FgurXBImDc=;
+ b=m8P+6g2e/T1QUHAdTprM+hIF4i3h48CzEGCrS9bOTmnjDysdVuNgSua0alVOx4a3Sjqrnrqe5ezIygpQ4eEit1DylgNZ0Gg8qW/c8s3VjhEP9zXCYDrjsSicH6JO3NX8BkhnDJG8Cj+SflBE1oSk4KcMHpzI/FSMsyw8zHXv4kEYCb8It8D7tq48DFLGVw9n6omQyCPAeJFvOEgGsR3fHqc/ew991elVLE4FNS9q/uaNB++GnNhH8Ub6DFtA+KUscTfltXSMDl6Gf6rixNk8WiC+j7L5inmCMkVGHKQeZQDd0NOZL6b/U3xMImY2HOSH4K0DRsc3rv3TdSfD2LlrtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
+ by SJ5PPF867D7FF5E.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::83d) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Mon, 28 Apr
+ 2025 09:11:15 +0000
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::265f:31c0:f775:c25b]) by SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::265f:31c0:f775:c25b%3]) with mapi id 15.20.8678.028; Mon, 28 Apr 2025
+ 09:11:15 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Choong, Chwee
+ Lin" <chwee.lin.choong@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 6/8] igc: add preemptible
+ queue support in taprio
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 6/8] igc: add preemptible
+ queue support in taprio
+Thread-Index: AQHbuANaCWkAYaLWIUqtiKw5zr1MFrO4yqXA
+Date: Mon, 28 Apr 2025 09:11:14 +0000
+Message-ID: <SJ0PR11MB5866B4EC7D136421FCF6BBC2E5812@SJ0PR11MB5866.namprd11.prod.outlook.com>
+References: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
+ <20250428060225.1306986-7-faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20250428060225.1306986-7-faizal.abdul.rahim@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|SJ5PPF867D7FF5E:EE_
+x-ms-office365-filtering-correlation-id: f9dbe559-15f9-4d6b-b9e3-08dd8634a0bc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?BVuaXhaThDKr+UkW1WO7GdTkIk4NDk8ZC13a18/5SLNs/W2u1tbYNGgeTWxd?=
+ =?us-ascii?Q?Y1vmlpwrW2IYw+YzoJunUHSNb2hCJRV/JFGuZ2Dls0m+LcMxCtQCuNNB4B+D?=
+ =?us-ascii?Q?Ga3BxnfsKiMTjuK/aOmZNBlX3z8i+oKtZsqmiSLl1EkpyJd3WDBziIlQ24OE?=
+ =?us-ascii?Q?mHdyDVA4AmW4zCuuLoJTKGIORoglsMpEd7V7mynvrhEkVeCJsYaweXpGM6Rr?=
+ =?us-ascii?Q?a+Rzxz8Rg9jf5aK8ZaKGSF+yXwJGbAakxPy1pvYG3ITkLqNAxdZg1Y19nI1A?=
+ =?us-ascii?Q?n0TjNkjtgEjR0wRjmsjxdnLX0rUGZ1C6dnJX/tqqbEKKV02G5hAV/rgOBV8P?=
+ =?us-ascii?Q?968Vro76nFci6ZKuf5Hns5ozbh9BamQLtM0RNZpvh3lZGxAOF09BE5jtqMpL?=
+ =?us-ascii?Q?X5WquxuhGuhfklY/txlowVtbv+5j3iA/cOVL4IK9VIND9q6xIty6908ewH/E?=
+ =?us-ascii?Q?zMGsHIg7u9MLasxlWCKYVoiKGm1JwXXb5imr/6HdzGbkb/HmdUdkFex60GpH?=
+ =?us-ascii?Q?qyaDOSEa5H26kBKWOxGWx6K9TXfj8rnRxuDUGHXCXvR+9Lj19APw8yKkxwRP?=
+ =?us-ascii?Q?fbaLa0ZG0WodIHtEip8xFkPuNh4lTDz30aDr3ABYMefoRuxDrW4w6kdlcuT9?=
+ =?us-ascii?Q?pvrrLzwXUjQaOy9rTzGFGWueSstkHzj463ID4oVW5Yd6BAcJLB2QdUcuI1cY?=
+ =?us-ascii?Q?FrAVAbOIVYkqgSeivF++YyjHN3HvT+83Mim/14YicJCemXwhtZRwwDmDblG6?=
+ =?us-ascii?Q?pzRD8EeQhwZxv6wXloDQlBC7BB8iOKSjf/ych8tRND4d2hrOY7DrGlia8EbZ?=
+ =?us-ascii?Q?JXH4NK++RYgaqNIuVEOVD9Q8MUMB50IfxdsALJnAOGPys63LIa/PB1B18k3L?=
+ =?us-ascii?Q?8uMandMnORmMJng4MEHERXG1xJlz40gGy5ZnMPYbPh8hifpoqWLo5yB0QRe6?=
+ =?us-ascii?Q?pCICnAFeX2oRWQhkYmvNaSnrTlQZajCYfTPUsnFZxaj80P7sBjQAryksrieh?=
+ =?us-ascii?Q?JPYjzTte6pF+rNvLwxNciU65CKyy3FMdRw6qgHExupbAdnahGcckzolfXf8y?=
+ =?us-ascii?Q?w3GqE9TwG1zFloWqs/T88xmQp20ZYkppqCp7rHJdUz75FqpDh37pXJchakpy?=
+ =?us-ascii?Q?InTD3kqhS3hON20U3BLhFt+krt9ErOn8LPt/hliBrLbqNogADHQZJYAzIuOl?=
+ =?us-ascii?Q?ysT68HLANcB0w1mhmi10FS9Gl6Ns6iCVpaGhp9WhMB3QklN3V5snPf4CTwU/?=
+ =?us-ascii?Q?FecnP5bx5qtQjpKR/JqJHxvhuf4fesiUc5dZs/R/UrAyGdkPxHWrDL4GIll9?=
+ =?us-ascii?Q?3uJ4JK5c3lpDOIpS4S4zhdxEC5SXc5MJtX6Se0oodDovp0EMvmHosVHBBB8P?=
+ =?us-ascii?Q?NidX1UixaCkGKCLsA/eNaGzP3i5DrB3IGvMvf/H3T0o0zlUQjiEaO9yJGUbb?=
+ =?us-ascii?Q?qRPVlLb/2z3apmrp2NHZV6Hl6C5rOKLDiapBi2N2KDIgw3nBLngkZEjSUmql?=
+ =?us-ascii?Q?eKH/GC04i09cOhg=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5lqi2OC/kWgjSfCQPbbYOlv49QZvr8JuOFg0UR2PIU5jQWIoc9/dgV2CaMS9?=
+ =?us-ascii?Q?+5qHRzq7wG/iBOQRNLQszTeoRC0xtFNg08BZb/Kh3SCXdIcuLr/zIw/Eo9em?=
+ =?us-ascii?Q?BABKNbIm7IpeHjrf0MBnkfRaPivv9nsDnB3pkmrE4ks+LVqpD4kKQeVJMZnI?=
+ =?us-ascii?Q?VYFFdh3xw4NR8TTlSvekr/vP4+HbUu+FElnOZxrkaHLRKL2/LBDoPcUF/E93?=
+ =?us-ascii?Q?wVeq7wwtTmLTmYoS94Q1V23h0WYueLFzAEmygm96+ss1Jk7DygPhPKm9/25d?=
+ =?us-ascii?Q?Lx/K93MUJAdxRItbheJirz8BlRUlB+Z1wuHi9+A+KfayC3npml1DUf2iZJIr?=
+ =?us-ascii?Q?EBeNKTumqfm2fWMJRcyQj8u0VAY9f52GZ3BOvsbHHyG+SqWPF3r3eJzYLhSu?=
+ =?us-ascii?Q?M9xbg83PuB2fOt5tRFBXv/athngRihUiXmZncw4N0cb5hwqe+BMgiAybOUS0?=
+ =?us-ascii?Q?CoGGKAVomSKiVE7LSIU+bGu2Xidjx65G2qTR4usfZtAi8j1X+kKjqnZ2cYpg?=
+ =?us-ascii?Q?sR5pmVoL53341qbh0OdAmxEbUFDZu601qiR1eLRCLm5yZQJJOJ/3gXFGNAmZ?=
+ =?us-ascii?Q?GmUoRUFTmDIVH7EzBhylrlAGrnh3Nj+xNXhbSm5x99HQQUse6MTQkhJfpQ4m?=
+ =?us-ascii?Q?aFTlykgW8d9EvDneHAETiuk9xrjWji6CpzW6LEIhLb33PKm2Mai5S3rIdDfp?=
+ =?us-ascii?Q?lCKz/7wOs83zxteuHjlKgz7icr+POitAUfaa/anOEEGo1E+MLD5moSVCD51A?=
+ =?us-ascii?Q?yr2DFIo9NAy/pU1uKrvC0Zho4UfhTiAGwFVuXML6sk3kFIyGOjMULAbv9jtd?=
+ =?us-ascii?Q?VBKZHykSBcM4Ldp5vVopCWjPsS63DapnKqEkCv5jOs16J/ctBEtaKDHQttHI?=
+ =?us-ascii?Q?N4894MtJmW92bzQ+ezYxOSlS4NFko92O4MdBHZ3CWiSyQ5yAgvTfQl+VBdfW?=
+ =?us-ascii?Q?cLonJQKxJOOf8GIJ2Xx60jNLbjyZwrLMi3PpQc1TUiRajW0Ez+uqOozaiZjL?=
+ =?us-ascii?Q?FXhfnq3BI0xKTZIgXtAbmp8xa8r7y+K2B0Z1GwcvYrNzu7TmMEi/h1uV7JEg?=
+ =?us-ascii?Q?jymJTewywsx2gt9gtwlD6mccTJXPhxglYPfJuMvgrem/yyDkc7/78YusxzUM?=
+ =?us-ascii?Q?0xdTaI4PyP4xXzGgzRRizk5gcNs5DXFmxU3ayMRyNOQ54Nyhyp8Q6fYBObN8?=
+ =?us-ascii?Q?S+lj5BAw8plFGA992evGpYG6IRJTfmr/tshaVY9QT9BOyDCV2tjbsnkDcNGE?=
+ =?us-ascii?Q?AC1zfzj4oe1WqUafqP4rNzP234HOFIHiGgvSaHc9SXEdQg9fE9qIBxFNNH0l?=
+ =?us-ascii?Q?SIcIvK2cPoWPkkJF6sTZfeOJel1ZTC6r9NcxtlujfF7okm2wdN/vWyxhjjxp?=
+ =?us-ascii?Q?EPDYE6tJAPiH3wDNMyhN9pCWGFsVsPyFqfdDPgnOvGZ/siNG/+kpKgLPXwM4?=
+ =?us-ascii?Q?VbjfOKcwEI5sPXtmpGej4kdDIsZ0L4tl2ofYWYm1wuN7oUCGaiTwOtlVVyTA?=
+ =?us-ascii?Q?GpYylAPsCPtGBr9X8/UCJWgEub6j3fiN63bi/bpvBDI040/fH9YOitFSNH1F?=
+ =?us-ascii?Q?Npk8TywDW+tM/z/MGQf6QRqpouCFIXkseIMxWQ76MN5JhovRenQhxL8sQrNr?=
+ =?us-ascii?Q?3Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOiHx=keOAWqF4Atzqx4VZW+xAccO=WtWCOoVoEPR9iFrDf_zw@mail.gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9dbe559-15f9-4d6b-b9e3-08dd8634a0bc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2025 09:11:14.9600
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kkcQ7IXsRi6MWdN65IoabbPD295fQukISMllkgVt7kNM+u+LnIvk4Dxu2DAjMh+Qk7fNLSmaPJ1y7qACTM46tJXZh6MYSiXq2ssHcFWlIxs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF867D7FF5E
+X-OriginatorOrg: intel.com
 
-On Sat, Apr 26, 2025 at 05:48:26PM +0200, Jonas Gorski wrote:
-> It does need a lot more fixes on top of that. With this patch applied:
-> 
-> TEST: Reception of 802.1p-tagged traffic                            [ OK ]
-> TEST: Dropping of untagged and 802.1p-tagged traffic with no PVID   [FAIL]
->         802.1p-tagged reception succeeded, but should have failed
-> 
-> The latter is no surprise, since b53 does not handle non filtering
-> bridges correctly, or toggling filtering at runtime.
-> 
-> I fixed most issues I found in b53 and it now succeeds in WIP code I
-> have (and most other tests from there).
-> 
-> One thing I struggled a bit is that the second test tests four
-> different scenarios, but only has one generic failure message, so a
-> failure does not tell which of the four setups failed.
-> 
-> The issues I fixed so far locally:
-> 
-> 1. b53 programs the vlan table based on bridge vlans regardless if
-> filtering is on or not
-> 2. b53 allows vlan 0 to be modified from
-> dsa_switch_ops::port_vlan_{add,remove} for bridged ports
-> 3. b53 adds vlan 0 to a port when it leaves a bridge, but does not
-> remove it on join
-> 4. b53 does not handle switching a vlan from pvid to non-pvid
-> 5. stp (and other reserved multicast) requires a PVID vlan.
-> 
-> This makes especially non-filtering bridges not work as expected, or
-> the switch in any way after adding and then removing a filtering
-> bridge.
 
-I'll admit that I'm not very familiar with the b53 driver and that my
-attention span has been quite short (and the passage of the weekend has
-not helped). Please post patches explaining clearly where we are and
-I'll try to follow along.
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Faizal Rahim
+> Sent: Monday, April 28, 2025 8:02 AM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> David S . Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Vladimir Oltean <vladimir.oltean@nxp.com>
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Faizal Rahim <faizal.abdul.rahim@linux.intel.com>=
+;
+> Choong, Chwee Lin <chwee.lin.choong@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v1 6/8] igc: add preemptible q=
+ueue
+> support in taprio
+>=20
+> igc already supports enabling MAC Merge for FPE. This patch adds support =
+for
+> preemptible queues in taprio.
+>=20
+Can you mention what "FPE" stands for (e.g., Frame Preemption) for better u=
+nderstanding? Everything else is fine for me.
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+
+> Changes:
+> 1. Introduce tx_enabled flag to control preemptible queue. tx_enabled
+>    is set via mmsv module based on multiple factors, including link
+>    up/down status, to determine if FPE is active or inactive.
+> 2. Add priority field to TXDCTL for express queue to improve data
+>    fetch performance.
+> 3. Block preemptible queue setup in taprio unless reverse-tsn-txq-prio
+>    private flag is set. Encourages adoption of standard queue priority
+>    scheme for new features.
+>=20
+> Tested preemption with taprio by:
+> 1. Enable FPE:
+>    ethtool --set-mm enp1s0 pmac-enabled on tx-enabled on verify-enabled o=
+n
+> 2. Enable private flag to reverse TX queue priority:
+>    ethtool --set-priv-flags enp1s0 reverse-txq-prio on 3. Enable preempti=
+ble
+> queue in taprio:
+>    taprio num_tc 4 map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
+>    queues 1@0 1@1 1@2 1@3 \
+>    fp P P P E
+>=20
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc.h         |  5 ++
+>  drivers/net/ethernet/intel/igc/igc_defines.h |  1 +
+>  drivers/net/ethernet/intel/igc/igc_main.c    | 12 +++-
+>  drivers/net/ethernet/intel/igc/igc_tsn.c     | 71 ++++++++++++++++++++
+>  drivers/net/ethernet/intel/igc/igc_tsn.h     |  4 ++
+>  5 files changed, 90 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/igc/igc.h
+> b/drivers/net/ethernet/intel/igc/igc.h
+> index 684a11df445c..39444e61003d 100644
+> --- a/drivers/net/ethernet/intel/igc/igc.h
+> +++ b/drivers/net/ethernet/intel/igc/igc.h
+> @@ -43,6 +43,7 @@ void igc_ethtool_set_ops(struct net_device *);  struct
+> igc_fpe_t {
+>  	struct ethtool_mmsv mmsv;
+>  	u32 tx_min_frag_size;
+> +	bool tx_enabled;
+>  };
+>=20
+>  enum igc_mac_filter_type {
+> @@ -163,6 +164,7 @@ struct igc_ring {
+>  	bool launchtime_enable;         /* true if LaunchTime is enabled */
+>  	ktime_t last_tx_cycle;          /* end of the cycle with a launchtime
+> transmission */
+>  	ktime_t last_ff_cycle;          /* Last cycle with an active first flag=
+ */
+> +	bool preemptible;		/* True if preemptible queue, false if
+> express queue */
+>=20
+>  	u32 start_time;
+>  	u32 end_time;
+> @@ -495,6 +497,7 @@ static inline u32 igc_rss_type(const union
+> igc_adv_rx_desc *rx_desc)
+>  #define IGC_TXDCTL_WTHRESH_MASK		GENMASK(20, 16)
+>  #define IGC_TXDCTL_QUEUE_ENABLE_MASK	GENMASK(25, 25)
+>  #define IGC_TXDCTL_SWFLUSH_MASK		GENMASK(26, 26)
+> +#define IGC_TXDCTL_PRIORITY_MASK	GENMASK(27, 27)
+>=20
+>  #define IGC_TXDCTL_PTHRESH(x)
+> 	FIELD_PREP(IGC_TXDCTL_PTHRESH_MASK, (x))
+>  #define IGC_TXDCTL_HTHRESH(x)
+> 	FIELD_PREP(IGC_TXDCTL_HTHRESH_MASK, (x))
+> @@ -504,6 +507,8 @@ static inline u32 igc_rss_type(const union
+> igc_adv_rx_desc *rx_desc)
+>  #define IGC_TXDCTL_QUEUE_ENABLE
+> 	FIELD_PREP(IGC_TXDCTL_QUEUE_ENABLE_MASK, 1)
+>  /* Transmit Software Flush */
+>  #define IGC_TXDCTL_SWFLUSH
+> 	FIELD_PREP(IGC_TXDCTL_SWFLUSH_MASK, 1)
+> +#define IGC_TXDCTL_PRIORITY(x)
+> 	FIELD_PREP(IGC_TXDCTL_PRIORITY_MASK, (x))
+> +#define IGC_TXDCTL_PRIORITY_HIGH	IGC_TXDCTL_PRIORITY(1)
+>=20
+>  #define IGC_RX_DMA_ATTR \
+>  	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING) diff --
+> git a/drivers/net/ethernet/intel/igc/igc_defines.h
+> b/drivers/net/ethernet/intel/igc/igc_defines.h
+> index 7189dfc389ad..86b346687196 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+> @@ -588,6 +588,7 @@
+>  #define IGC_TXQCTL_QUEUE_MODE_LAUNCHT	0x00000001
+>  #define IGC_TXQCTL_STRICT_CYCLE		0x00000002
+>  #define IGC_TXQCTL_STRICT_END		0x00000004
+> +#define IGC_TXQCTL_PREEMPTIBLE		0x00000008
+>  #define IGC_TXQCTL_QAV_SEL_MASK		0x000000C0
+>  #define IGC_TXQCTL_QAV_SEL_CBS0		0x00000080
+>  #define IGC_TXQCTL_QAV_SEL_CBS1		0x000000C0
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c
+> b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 8562565842b1..c6e2cfd630df 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -6419,6 +6419,7 @@ static int igc_qbv_clear_schedule(struct
+> igc_adapter *adapter)
+>  		ring->start_time =3D 0;
+>  		ring->end_time =3D NSEC_PER_SEC;
+>  		ring->max_sdu =3D 0;
+> +		ring->preemptible =3D false;
+>  	}
+>=20
+>  	spin_lock_irqsave(&adapter->qbv_tx_lock, flags); @@ -6484,9
+> +6485,12 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+>  	if (!validate_schedule(adapter, qopt))
+>  		return -EINVAL;
+>=20
+> -	/* preemptible isn't supported yet */
+> -	if (qopt->mqprio.preemptible_tcs)
+> -		return -EOPNOTSUPP;
+> +	if (qopt->mqprio.preemptible_tcs &&
+> +	    !(adapter->flags & IGC_FLAG_TSN_REVERSE_TXQ_PRIO)) {
+> +		NL_SET_ERR_MSG_MOD(qopt->extack,
+> +				   "reverse-tsn-txq-prio private flag must be
+> enabled before setting preemptible tc");
+> +		return -ENODEV;
+> +	}
+>=20
+>  	igc_ptp_read(adapter, &now);
+>=20
+> @@ -6579,6 +6583,8 @@ static int igc_save_qbv_schedule(struct
+> igc_adapter *adapter,
+>  			ring->max_sdu =3D 0;
+>  	}
+>=20
+> +	igc_fpe_save_preempt_queue(adapter, &qopt->mqprio);
+> +
+>  	return 0;
+>  }
+>=20
+> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c
+> b/drivers/net/ethernet/intel/igc/igc_tsn.c
+> index 5dc05b42f53f..897813eb2175 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+> @@ -115,6 +115,18 @@ static int igc_fpe_xmit_smd_frame(struct
+> igc_adapter *adapter,
+>  	return err;
+>  }
+>=20
+> +static void igc_fpe_configure_tx(struct ethtool_mmsv *mmsv, bool
+> +tx_enable) {
+> +	struct igc_fpe_t *fpe =3D container_of(mmsv, struct igc_fpe_t, mmsv);
+> +	struct igc_adapter *adapter;
+> +
+> +	adapter =3D container_of(fpe, struct igc_adapter, fpe);
+> +	adapter->fpe.tx_enabled =3D tx_enable;
+> +
+> +	/* Update config since tx_enabled affects preemptible queue
+> configuration */
+> +	igc_tsn_offload_apply(adapter);
+> +}
+> +
+>  static void igc_fpe_send_mpacket(struct ethtool_mmsv *mmsv,
+>  				 enum ethtool_mpacket type)
+>  {
+> @@ -136,15 +148,50 @@ static void igc_fpe_send_mpacket(struct
+> ethtool_mmsv *mmsv,  }
+>=20
+>  static const struct ethtool_mmsv_ops igc_mmsv_ops =3D {
+> +	.configure_tx =3D igc_fpe_configure_tx,
+>  	.send_mpacket =3D igc_fpe_send_mpacket,
+>  };
+>=20
+>  void igc_fpe_init(struct igc_adapter *adapter)  {
+>  	adapter->fpe.tx_min_frag_size =3D TX_MIN_FRAG_SIZE;
+> +	adapter->fpe.tx_enabled =3D false;
+>  	ethtool_mmsv_init(&adapter->fpe.mmsv, adapter->netdev,
+> &igc_mmsv_ops);  }
+>=20
+> +static u32 igc_fpe_map_preempt_tc_to_queue(const struct igc_adapter
+> *adapter,
+> +					   unsigned long preemptible_tcs)
+> +{
+> +	struct net_device *dev =3D adapter->netdev;
+> +	u32 i, queue =3D 0;
+> +
+> +	for (i =3D 0; i < dev->num_tc; i++) {
+> +		u32 offset, count;
+> +
+> +		if (!(preemptible_tcs & BIT(i)))
+> +			continue;
+> +
+> +		offset =3D dev->tc_to_txq[i].offset;
+> +		count =3D dev->tc_to_txq[i].count;
+> +		queue |=3D GENMASK(offset + count - 1, offset);
+> +	}
+> +
+> +	return queue;
+> +}
+> +
+> +void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
+> +				const struct tc_mqprio_qopt_offload
+> *mqprio) {
+> +	u32 preemptible_queue =3D
+> igc_fpe_map_preempt_tc_to_queue(adapter,
+> +								mqprio-
+> >preemptible_tcs);
+> +
+> +	for (int i =3D 0; i < adapter->num_tx_queues; i++) {
+> +		struct igc_ring *tx_ring =3D adapter->tx_ring[i];
+> +
+> +		tx_ring->preemptible =3D !!(preemptible_queue & BIT(i));
+> +	}
+> +}
+> +
+>  static bool is_any_launchtime(struct igc_adapter *adapter)  {
+>  	int i;
+> @@ -317,9 +364,16 @@ static int igc_tsn_disable_offload(struct igc_adapte=
+r
+> *adapter)
+>  	wr32(IGC_TQAVCTRL, tqavctrl);
+>=20
+>  	for (i =3D 0; i < adapter->num_tx_queues; i++) {
+> +		int reg_idx =3D adapter->tx_ring[i]->reg_idx;
+> +		u32 txdctl;
+> +
+>  		wr32(IGC_TXQCTL(i), 0);
+>  		wr32(IGC_STQT(i), 0);
+>  		wr32(IGC_ENDQT(i), NSEC_PER_SEC);
+> +
+> +		txdctl =3D rd32(IGC_TXDCTL(reg_idx));
+> +		txdctl &=3D ~IGC_TXDCTL_PRIORITY_HIGH;
+> +		wr32(IGC_TXDCTL(reg_idx), txdctl);
+>  	}
+>=20
+>  	wr32(IGC_QBVCYCLET_S, 0);
+> @@ -400,6 +454,7 @@ static int igc_tsn_enable_offload(struct igc_adapter
+> *adapter)
+>=20
+>  	for (i =3D 0; i < adapter->num_tx_queues; i++) {
+>  		struct igc_ring *ring =3D adapter->tx_ring[i];
+> +		u32 txdctl =3D rd32(IGC_TXDCTL(ring->reg_idx));
+>  		u32 txqctl =3D 0;
+>  		u16 cbs_value;
+>  		u32 tqavcc;
+> @@ -433,6 +488,22 @@ static int igc_tsn_enable_offload(struct igc_adapter
+> *adapter)
+>  		if (ring->launchtime_enable)
+>  			txqctl |=3D IGC_TXQCTL_QUEUE_MODE_LAUNCHT;
+>=20
+> +		if (!adapter->fpe.tx_enabled) {
+> +			/* fpe inactive: clear both flags */
+> +			txqctl &=3D ~IGC_TXQCTL_PREEMPTIBLE;
+> +			txdctl &=3D ~IGC_TXDCTL_PRIORITY_HIGH;
+> +		} else if (ring->preemptible) {
+> +			/* fpe active + preemptible: enable preemptible queue
+> + set low priority */
+> +			txqctl |=3D IGC_TXQCTL_PREEMPTIBLE;
+> +			txdctl &=3D ~IGC_TXDCTL_PRIORITY_HIGH;
+> +		} else {
+> +			/* fpe active + express: enable express queue + set
+> high priority */
+> +			txqctl &=3D ~IGC_TXQCTL_PREEMPTIBLE;
+> +			txdctl |=3D IGC_TXDCTL_PRIORITY_HIGH;
+> +		}
+> +
+> +		wr32(IGC_TXDCTL(ring->reg_idx), txdctl);
+> +
+>  		/* Skip configuring CBS for Q2 and Q3 */
+>  		if (i > 1)
+>  			goto skip_cbs;
+> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h
+> b/drivers/net/ethernet/intel/igc/igc_tsn.h
+> index c2a77229207b..f2e8bfef4871 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_tsn.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
+> @@ -4,6 +4,8 @@
+>  #ifndef _IGC_TSN_H_
+>  #define _IGC_TSN_H_
+>=20
+> +#include <net/pkt_sched.h>
+> +
+>  #define IGC_RX_MIN_FRAG_SIZE		60
+>  #define SMD_FRAME_SIZE			60
+>=20
+> @@ -15,6 +17,8 @@ enum igc_txd_popts_type {
+> DECLARE_STATIC_KEY_FALSE(igc_fpe_enabled);
+>=20
+>  void igc_fpe_init(struct igc_adapter *adapter);
+> +void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
+> +				const struct tc_mqprio_qopt_offload
+> *mqprio);
+>  u32 igc_fpe_get_supported_frag_size(u32 frag_size);  int
+> igc_tsn_offload_apply(struct igc_adapter *adapter);  int igc_tsn_reset(st=
+ruct
+> igc_adapter *adapter);
+> --
+> 2.34.1
+
 
