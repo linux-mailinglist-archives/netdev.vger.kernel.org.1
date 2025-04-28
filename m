@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-186580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E06EDA9FCFF
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:20:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6CABA9FD01
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 456FE466DF9
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83995466DD2
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EBB210F4B;
-	Mon, 28 Apr 2025 22:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AEE214237;
+	Mon, 28 Apr 2025 22:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6bKrC9z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rr4FWUkF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D35620E6EC;
-	Mon, 28 Apr 2025 22:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E347920E6EC;
+	Mon, 28 Apr 2025 22:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745878798; cv=none; b=NxI03NgJr6HkWrZe6AvkgfxHY9MNHxpW++JG8XHT0g7V+LRDgJJWmAGJeitLaV/jR//u826H8DWIN91pJMO+1AL3YACdjvohFqAd6v9hV1U6Tfy+wWagUjDdnZ4mLqCh688uc7aVnqQmZKFKHWD9bFNGgX+HSBnW/kwR+OvUWS4=
+	t=1745878800; cv=none; b=QEPBA61aINYlnZpIpdh6khThC490mFSfjhy3CPN3+EoIVjBFCSTc/ZFDixOmBqdzybhkUNksHYTpJnMPJdCXMCPWpFRWh9dUTIbOOEOPfD+I2p7QSdkT533sFtbae5ZG8RygvGuSzMAVThn5ZD7xL0WZmKHC4nI26f1I9zLgsaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745878798; c=relaxed/simple;
-	bh=Lahajb51jEfObe1Hyp6/chmzs0TWo8lfU1EyfH2VAgY=;
+	s=arc-20240116; t=1745878800; c=relaxed/simple;
+	bh=6pcse9wbskV004iMqoCcdC1PU1qixiW4k4E9ldYBJxM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=utwwpBCv8Xv/hdbUScnnRrK/CMhfO5qH1TNHX6N/Td4ASfeqoxRjewQlq5Qc+HKJ4uQ2/xbQS2d/fK+3T2xoODtL2rinsLmNBjoRpYHQSbWjCtkEQ33EKBv8J9ThnP5/2LB4RVeXJTON+RabaCeoM4QsRpcbbUIWoHoC3uwJ1v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6bKrC9z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD0EC4CEE4;
-	Mon, 28 Apr 2025 22:19:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=V5dlX8+aca9B/fuubvhtvx3BrtVgpqJLwGXn/nAWr9GH2x0w7OEB1+bl3+ZbwAUAtWoDVTBv7gIzy+G09YxRR8/nCazXMk7tMzuEHTeIJKS1nlKzHBWbNilvP+IYwOJRQV1KgBTf4+Vv1bMEMtfxxAv9UK+L6fPgBXJEr3oFGBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rr4FWUkF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51911C4CEE4;
+	Mon, 28 Apr 2025 22:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745878797;
-	bh=Lahajb51jEfObe1Hyp6/chmzs0TWo8lfU1EyfH2VAgY=;
+	s=k20201202; t=1745878799;
+	bh=6pcse9wbskV004iMqoCcdC1PU1qixiW4k4E9ldYBJxM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y6bKrC9zrywMNQNOy4nFFHbTO4mnCiiv0aDoz5eFkHF9lqtzfX+uYfRI4RnneU/2e
-	 WFRjTOO1cArBxKU3PHyiVgTYgdPmlS7+J91kkPoO0+2C3CYv+Fnf56edyvCEM01ZEE
-	 BnPJqc6L4DladHKFWT0fAOT5R8yPUXHUNCbjFhfRMa4CM0X9IiQI0I26cuW2RrpQ+k
-	 rtSDiFrhPkz6wAS9YsUEobh1QbSwLTFgcj2Q/dc1f2+PRcCvzrtvJSTZPAU8xiNyyJ
-	 opPofMxVl7hTRs95W9zUd7vIi2i6/2lSPBGzDgyjffOomp9iG+0y/ObR03A/sk3g8G
-	 QmfG/hK3MxzSQ==
+	b=rr4FWUkFYW3WnHWdUzvr68F09StbPoytD50/gmmVB6SOfCQSyK5yVEpOXQPM5e/R7
+	 YQ1LU/PNdizypiKpoCNsXQuAqqoAP/QjNrvJs1SGnsR1Zb+8PymAINM9vb2VBfp7Bs
+	 QG5OEuXFRKDhk+wtXspVzXe5DaEUc0ePCPo2wSC1+PhQa6+MwS3HqQGn3g+l3pkwQD
+	 tIWnWmu6pC3oe1YgYnIiSUbyVc/HTq8M5fbxeqH2Ra00guMsMyhOwssUwOCq7tgzig
+	 1meqGeeim+2s4ydqjIFvaup3gfyVPwc5Q3dzC6BCPudRYV2lAHlW2NslvbAOOICrJp
+	 KcXtvuPamciYQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD3F3822D43;
-	Mon, 28 Apr 2025 22:20:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CB23822D43;
+	Mon, 28 Apr 2025 22:20:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V7 0/2] veth: qdisc backpressure and qdisc check
- refactor
+Subject: Re: [PATCH] mdio: fix CONFIG_MDIO_DEVRES selects
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174587883648.1063939.13609783923065664545.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Apr 2025 22:20:36 +0000
-References: <174559288731.827981.8748257839971869213.stgit@firesoul>
-In-Reply-To: <174559288731.827981.8748257839971869213.stgit@firesoul>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, bpf@vger.kernel.org,
- tom@herbertland.com, eric.dumazet@gmail.com, davem@davemloft.net,
- pabeni@redhat.com, toke@toke.dk, dsahern@kernel.org,
- makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
+ <174587883799.1063939.6255098697937333955.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Apr 2025 22:20:37 +0000
+References: <20250425112819.1645342-1-arnd@kernel.org>
+In-Reply-To: <20250425112819.1645342-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
+ jacob.e.keller@intel.com, chris.packham@alliedtelesis.co.nz, arnd@arndb.de,
+ claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+ xiaoning.wang@nxp.com, linux@armlinux.org.uk, Frank.Li@nxp.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 25 Apr 2025 16:55:25 +0200 you wrote:
-> This patch series addresses TX drops seen on veth devices under load,
-> particularly when using threaded NAPI, which is our setup in production.
+On Fri, 25 Apr 2025 13:27:56 +0200 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> The root cause is that the NAPI consumer often runs on a different CPU
-> than the producer. Combined with scheduling delays or simply slower
-> consumption, this increases the chance that the ptr_ring fills up before
-> packets are drained, resulting in drops from veth_xmit() (ndo_start_xmit()).
+> The newly added rtl9300 driver needs MDIO_DEVRES:
+> 
+> x86_64-linux-ld: drivers/net/mdio/mdio-realtek-rtl9300.o: in function `rtl9300_mdiobus_probe':
+> mdio-realtek-rtl9300.c:(.text+0x941): undefined reference to `devm_mdiobus_alloc_size'
+> x86_64-linux-ld: mdio-realtek-rtl9300.c:(.text+0x9e2): undefined reference to `__devm_mdiobus_register'
+> Since this is a hidden symbol, it needs to be selected by each user,
+> rather than the usual 'depends on'. I see that there are a few other
+> drivers that accidentally use 'depends on', so fix these as well for
+> consistency and to avoid dependency loops.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V7,1/2] net: sched: generalize check for no-queue qdisc on TX queue
-    https://git.kernel.org/netdev/net-next/c/34dd0fecaa02
-  - [net-next,V7,2/2] veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
-    https://git.kernel.org/netdev/net-next/c/dc82a33297fc
+  - mdio: fix CONFIG_MDIO_DEVRES selects
+    https://git.kernel.org/netdev/net-next/c/ccc25158c22b
 
 You are awesome, thank you!
 -- 
