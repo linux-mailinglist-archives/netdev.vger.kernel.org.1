@@ -1,95 +1,138 @@
-Return-Path: <netdev+bounces-186425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4CCEA9F13C
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:45:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA0CA9F13E
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:45:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D9F217714E
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:44:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D143A5A16EE
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCA5269CFA;
-	Mon, 28 Apr 2025 12:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEeG0qDT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D34326A0A0;
+	Mon, 28 Apr 2025 12:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862F7268FFF
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 12:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ADF266B67;
+	Mon, 28 Apr 2025 12:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745844266; cv=none; b=Ild9uWH1bI5ZiWPGjajxiEsWVIMsusGYmfq+E9yCeCbyCzS+ZItaSDwlScoVj9eeA03A4tenTvgC8m6uoLZ/RFgCPm3Wv+i0Qeac4JpXqu+SXKp1N934XLvg0I5vH+FaYSt+yovarV+J+bs/DD/50uRZ0FUwhfxvUWagibbxO5k=
+	t=1745844291; cv=none; b=svVmoj4izGUr+sQ0CxUz0yIhx0qFXGOn/ktpzOM9WxQwaIb6VMEgUEbCqw/klfKcbXrUMDS4msrOjENlWSqNHpQvllZzbLTGHz1zb8YfRAMxuMKZq0i0q2Ve4vnwKnZR6t2OtS8gYEttoIdLZpN1uWHHlxz5ZS/qKmMaVZBzTqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745844266; c=relaxed/simple;
-	bh=gf4bPSuQPO48PU6kXW3j85ZlD9gokzHqQcTu5mNH+Vs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q/09M1GtUUDO8zjq69wOBJqTVIrUqF2DDavXpL6pD/qRSjI21mv08QkvnYZCiMtbb2Ya4FOLBIv+OMaP9nvf/Jx++fp1XELswE7LNwrC9k587pHZC6ZYeYgaJnuoTrwOda/5B1YiO4bSPkq2sYOps0xYjiyasp2F+dtrWHc0V/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEeG0qDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D485AC4CEE4;
-	Mon, 28 Apr 2025 12:44:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745844266;
-	bh=gf4bPSuQPO48PU6kXW3j85ZlD9gokzHqQcTu5mNH+Vs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bEeG0qDTG9MRDU7yK69hacuuSyU+E0pCKPkZvYjTHQICtLa7x5S0HYoa3Rjnzl09i
-	 rmZTl77t1hit5WvRRSUIz9Th2LVO7R/10vfWIYL5qy8+cozb3N9/TmHvac9YmA7li2
-	 pKe83ouhpJpg5are7Wl2iQuQ+M4fdoYSQdGNjfb3JvDEgoWiMnv0ITqNPzLFxS4zwJ
-	 kBA7HsnGeUzQUbvDfAXRWln8YoO7xnjBCaeMclyQyseQSaJITSXW874tedbcW9KgBk
-	 GsXpMRl79yRgc7lLPqu4gp1q5pUQGZbzn7GIr9/HG4Q6q0k/Njs9XV4OJtF1H8YE7U
-	 RKLwLKe5pfh1Q==
-Date: Mon, 28 Apr 2025 13:44:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marcin Szycik <marcin.szycik@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net] iavf: fix reset_task for early reset event
-Message-ID: <20250428124422.GB3339421@horms.kernel.org>
-References: <20250424135012.5138-2-marcin.szycik@linux.intel.com>
+	s=arc-20240116; t=1745844291; c=relaxed/simple;
+	bh=69u4x2iVX3CML3z65mNSFOpfvvJMY1UtVIYXajlF58c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BSinGpThjptCgUMGjc9VGvf2q3u/HgMHfY6kkTXIQbnX7GtN7qwcxCQpeh71bT2rGqsIDnJRMFnqAGFw9C/h8Ce8PHkIr4MxpZhzGMWKVyFfiynVWkMP5Pe35pvtWTfBo3jrUM1OB5KWsK7ugbogz9dB6btQmdp1ISFYAFzXQaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4285E1516;
+	Mon, 28 Apr 2025 05:44:41 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B9463F66E;
+	Mon, 28 Apr 2025 05:44:45 -0700 (PDT)
+Date: Mon, 28 Apr 2025 13:44:35 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Yixun Lan <dlan@gentoo.org>, Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej
+ Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
+ Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Corentin Labbe <clabbe.montjoie@gmail.com>,
+ <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-sunxi@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 1/5] dt-bindings: sram: sunxi-sram: Add A523
+ compatible
+Message-ID: <20250428134435.76e19d29@donnerap.manchester.arm.com>
+In-Reply-To: <20250428122156-GYA56330@gentoo>
+References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
+	<20250424-01-sun55i-emac0-v2-1-833f04d23e1d@gentoo.org>
+	<20250428-vegan-stoic-flamingo-1d1a2a@kuoka>
+	<20250428122156-GYA56330@gentoo>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250424135012.5138-2-marcin.szycik@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 24, 2025 at 03:50:13PM +0200, Marcin Szycik wrote:
-> From: Ahmed Zaki <ahmed.zaki@intel.com>
-> 
-> If a reset event is received from the PF early in the init cycle, the
-> state machine hangs for about 25 seconds.
-> 
-> Reproducer:
->   echo 1 > /sys/class/net/$PF0/device/sriov_numvfs
->   ip link set dev $PF0 vf 0 mac $NEW_MAC
-> 
-> The log shows:
->   [792.620416] ice 0000:5e:00.0: Enabling 1 VFs
->   [792.738812] iavf 0000:5e:01.0: enabling device (0000 -> 0002)
->   [792.744182] ice 0000:5e:00.0: Enabling 1 VFs with 17 vectors and 16 queues per VF
->   [792.839964] ice 0000:5e:00.0: Setting MAC 52:54:00:00:00:11 on VF 0. VF driver will be reinitialized
->   [813.389684] iavf 0000:5e:01.0: Failed to communicate with PF; waiting before retry
->   [818.635918] iavf 0000:5e:01.0: Hardware came out of reset. Attempting reinit.
->   [818.766273] iavf 0000:5e:01.0: Multiqueue Enabled: Queue pair count = 16
-> 
-> Fix it by scheduling the reset task and making the reset task capable of
-> resetting early in the init cycle.
-> 
-> Fixes: ef8693eb90ae3 ("i40evf: refactor reset handling")
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> Tested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> ---
-> This should be applied after "iavf: get rid of the crit lock"
+On Mon, 28 Apr 2025 12:21:56 +0000
+Yixun Lan <dlan@gentoo.org> wrote:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Hi Krzysztof,
+>=20
+> On 09:21 Mon 28 Apr     , Krzysztof Kozlowski wrote:
+> > On Thu, Apr 24, 2025 at 06:08:39PM GMT, Yixun Lan wrote: =20
+> > > The Allwinner A523 family of SoCs have their "system control" registe=
+rs
+> > > compatible to the A64 SoC, so add the new SoC specific compatible str=
+ing.
+> > >=20
+> > > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> > > Signed-off-by: Yixun Lan <dlan@gentoo.org>
+> > > ---
+> > >  .../devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml=
+     | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a=
+10-system-control.yaml b/Documentation/devicetree/bindings/sram/allwinner,s=
+un4i-a10-system-control.yaml
+> > > index a7236f7db4ec34d44c4e2268f76281ef8ed83189..e7f7cf72719ea884d48ff=
+f69620467ff2834913b 100644
+> > > --- a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-syst=
+em-control.yaml
+> > > +++ b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-syst=
+em-control.yaml
+> > > @@ -50,6 +50,7 @@ properties:
+> > >            - enum:
+> > >                - allwinner,sun50i-a100-system-control
+> > >                - allwinner,sun50i-h6-system-control
+> > > +              - allwinner,sun55i-a523-system-control
+> > >            - const: allwinner,sun50i-a64-system-control =20
+> >=20
+> > No update for the children (sram)?
+> >  =20
+> No, I don't think there is sub node for sram
+> From address map of A527, there is total 4KB size space of
+> this section which unlikely has sram available.
+
+That's something else, though. This system controller here *also* contains
+a register to switch access to SRAM blocks between the CPU and the devices.
+The actual SRAM blocks are somewhere else (hence the empty ranges;
+property), check the H616 for instance:
+	syscon: syscon@3000000 {
+		compatible =3D "allwinner,sun50i-h616-system-control";
+		reg =3D <0x03000000 0x1000>;
+		#address-cells =3D <1>;
+		#size-cells =3D <1>;
+		ranges;
+
+		sram_c: sram@28000 {
+			compatible =3D "mmio-sram";
+			reg =3D <0x00028000 0x30000>;
+
+Krzysztof, we haven't worked out the SRAM regions yet, we typically add
+them only when we need them. I think the display engine is a prominent
+user, and support for that is quite a bit out at the moment.
+
+=46rom a compatibility standpoint it should be fine to leave this empty for
+now, if I am not mistaken?
+
+Cheers,
+Andre
+
+> but I do see some BROM/SRAM space from 0x0000 0000 - 0x0006 3FFF ..
+> (which should not be relavant to this patch series..)
+>=20
 
 
