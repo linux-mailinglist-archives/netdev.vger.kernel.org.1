@@ -1,192 +1,262 @@
-Return-Path: <netdev+bounces-186344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033A9A9E89F
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:55:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0344A9E8A8
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C6F93ACCFB
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:55:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEBB13ADC52
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF491D5141;
-	Mon, 28 Apr 2025 06:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544591D5176;
+	Mon, 28 Apr 2025 06:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yam0fW8u"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bbpsld/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAA6610C
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 06:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745823354; cv=none; b=K4rK/jxZAEcDiHgACQD/4zGwb2olqZUupYd+Hl++dtQQZUiPMVIy6nkHeDvWtrgFnUDX9DdUZoCVyxQwopI5VC2Qek1TL729kZj933HNprKONH0VxEGgfoahqsyxXLLv256k7ohRoJvxM4XvrhOK7aJynaFe+iRzTYVk7UHApQ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745823354; c=relaxed/simple;
-	bh=5tJ0l2LxUVOnOuUk7/ZKkE5x1HzMXj9Pk6xuZ6vwECg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K4/kb1yOMgjG9r3QtzCRDLvatouwZBmX4bP4rHtcJFSWhGcug0oJJf/86qDWt0niBrZOWF7E3Nc5/+ZM1iLKj/4JfxVuBDgEICAiY1zouoSRpPCiVKYPANpluIiZ3Vv8K89W8L9f23WeHt1A0hZcIymCQ1umD3btdKu+yA72Igk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yam0fW8u; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2260c91576aso36470825ad.3
-        for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 23:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745823353; x=1746428153; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8TE+ayV+HlhLqI7uVlx4zb0IXbibAaU8X2gniHQ7CpM=;
-        b=Yam0fW8uxrA5VBCP3OXMJXwxM+H7tCGC52qDijE8wbSwiWnyjbS2FEZL2XtqRFLpd3
-         4E5x/Gp51PnviNrnJJ9BUcNAt/vCfuGX1Dzr0j1R5kUiUmVA/MRlb/OjQ4+0N6It1fjX
-         UtbjzYyA4uwYQ8MS2tzyCtd0yRWnfNtVi0r20MvOaw0lQZGRy5aLTnb1xnFuNdfpwxge
-         g6TwWLhDwjr3CeB7Tpc4mogg3kvzWJ5h9lV60NTDBKFESfk4ehfD6DM1CI6T5rXZDFIr
-         DzfKEbguhml9oxCqjxsx339tIgnRuvX3NtDRCUfpntagOIBMMm6uchU+6kWAVtmY24DG
-         sKqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745823353; x=1746428153;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8TE+ayV+HlhLqI7uVlx4zb0IXbibAaU8X2gniHQ7CpM=;
-        b=V27SzItWjFq+oKp44RuavsC8uYylIVCTSd2j1gFMJltvIBpmA5Qwn3EeFEumdhNdJU
-         KSADjVy+P+dxNfKtSAKcFzWq8/cN+fpTAHLdGE/gAcPiWxgnbq+srO7qaOHfdRYhelgH
-         +s9/3zpoCJNGIuZWqlmI54HeyTQm2QYjgHgkOiy4YIK1jBWlFxzkYZTxV+JJwzRsHw7z
-         vxMicw62/bbj+Kb7aAuoSPMomKPcc+2GGgil6N2nMn3zvoI2xwu8UbpV792g7WFRIs73
-         j6d+qw+lZr4I3oazD5g32vB8YxxNvJUl8RumpGKAOMXPMfSu9VRpzHpS657tglfvJICX
-         jDUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUQt1oEN8Rvu917MWPML4jsZrFt9jlbZnqZ7qcTepir3NqAWQJAarSHbsQKef3WO3+2Ofy8+Ak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrPVjIHPgotpxuZVwuPBXB6pLaH839+Ze78Li6w3gd8BxmCsPV
-	5h2SnTsSmY4AR3U8mrvCSjEuDJfMnRKhyQ07OIMGhJPE7qP5XtJeTMWMurIhnjH2nQHCOvmJtL8
-	ZEvuOhjRl5dof4tFcZZNPIjRMu+w=
-X-Gm-Gg: ASbGncsKQ3Qppj3k1/dmIL2pvXZKyqDZMJ1/JU+exG2EcwLAY5gygjokR5mdUShc/9P
-	WXwoa35EzrfxTfLn1XqXLAlUceH2CEUy8b6LACQg/njMI9Z1H1IhP47lhrnNwdIeThx8SW+t63j
-	JXgTNR6Hm5USntFs9pU+xVPqWphVFj+eF85euBUvku25w2WVJtgH60NwLr
-X-Google-Smtp-Source: AGHT+IFc7RZZPMjMS94wTmFX2XjKgLByl0KVaMX0JIbRLpi0ETNeIa00aly3yPdUMNXM9EOTJbts9tbISXzj3aYzACw=
-X-Received: by 2002:a17:902:ea07:b0:224:e33:889b with SMTP id
- d9443c01a7336-22dc6a02897mr137090865ad.12.1745823352610; Sun, 27 Apr 2025
- 23:55:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EA81D5143;
+	Mon, 28 Apr 2025 06:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745823487; cv=fail; b=ptkT+SaXOsnmS3Uu/N9O/ZvAFofyO32Kw4YrNDGBvH2MDsiAAd+gie9xvucAMHvXUIPV3VG34cURXq1URZ4mIvCjLBFTSDRsj9uTXTiOP93VrU0H3D5SDIzVKSZHW9rbHDClWWSOkVVFD2RtAYYCQTJU6caqjQGhNr35N4wgq1g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745823487; c=relaxed/simple;
+	bh=U3YwesuE4DQ+8q+U3uP7MHjiUQsPDWbXoHo9tnMP0Jw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EJkMnqdvux7Ekr0lu2v+k8neUZSPFGrbW29jhOiJn1Z9e1iVG59MgTN4HT7z9zvdSYNSVzClUIQYjQdfJE8BIHE4YoRwR+rQYXkq7TSc3bgaoLxe11OvMNA9vfTE6tAaa+8NzbjcD4GQ5yeRz9f10T++iA9ZBsX6xeMz8q1fHyo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bbpsld/f; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745823485; x=1777359485;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=U3YwesuE4DQ+8q+U3uP7MHjiUQsPDWbXoHo9tnMP0Jw=;
+  b=bbpsld/fus5q8Rv8JbCQ9g7XqEihSUgQv5t9zjESV2ruZA6yCtrdWFn8
+   jwvXG/SEp+O5RF06dUfATNLIIbcSQI9TCKvfZF3GxAF5Kie27VCgZz6DP
+   ACJiWLpVMW1CIfI80kXcJxD4rRvch542Km0cpqRntDEtKLQ4UBmDSyjDz
+   xRoTm5xZfE4gYb94R0Nd2YNWU+BWtNKBkLqMYboZTm9mQVwNBx1Sc6ajO
+   cCETyqL0zOUbV6i36eLgwk5jkWZ5h3cKr5yxuyTPLRX//SZJQpPPr0pkv
+   KtjvpdZhGxDkwM0whAgRmffJLdEsRf6ubWGLcBiec2gCtBO5f82BHqGuS
+   Q==;
+X-CSE-ConnectionGUID: E2G/YvWiRla0PcU5fIdAaQ==
+X-CSE-MsgGUID: w8TSJvWiRG6TMGV1Wmml2g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="47414945"
+X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
+   d="scan'208";a="47414945"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 23:58:01 -0700
+X-CSE-ConnectionGUID: Nc1ZbyxhSrqnXyCKBKwU4g==
+X-CSE-MsgGUID: rFt2Ap51SJqlnCIraUAOFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
+   d="scan'208";a="133404314"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 23:58:01 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 27 Apr 2025 23:58:00 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Sun, 27 Apr 2025 23:58:00 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sun, 27 Apr 2025 23:58:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zLog8SlG6HySATJJNJq9OeDzYGZ//57dmgpMPCjOb4XuLYi9CCWLxqLazOu7t2tZSn9psB+bJrW8/AxvrGH1IoJh+tVxlMxdqv6T1nrvGnx+/YRXKHJphisGIM53SxeiU9cDvrEtNvFuM4vVC4J8XlrSnTYO+n2GVpG70+fcN7uI6FS9wrFsilZLw9zwITcwLfWptH9c0dg4/UIMc7PGqoHYxoH/biQVaER3I8nurk89CeW/I+ShJnDYx3Up7rbFVACwSqlDDmcoKZsZVVXs3LcvxmjtZ6bFTdIf1o0nrGyqec0Zl0/QnNEAHVQ5MXTXrxu9cJsFXgtGsDzVSRvDIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fFLwHVV/D8GrMxuzd7C1xzK4ipm5Ic9M2IFNrZaNqdE=;
+ b=G+gK11p5JpFlvm7jFX5ogpQ3vZ5sELrrO/DUrrcn9ihgf+n9OTqMCvUQHONPPGl3nDYPOSoPXK0xXUYZDMOmoBIndfjtoXgTCth88n7d18qBdehJ7llYsiLbSqBVlsmusQ7jRUmplYrceGpbeNHUv8z3OmNhHunMZYkFEii+1x+Av5cMk8jiJaAKjUCiXbRbO9gO2Y0Zds/KIEalWFg2M4K4eqCPQWAQ90bjvmwq1w2pE2IOlS+SlDS68/xWivkmTNqDuHjT6qDn5dAaOq7QTXfPZqVtuhwymHcpWSMD5ldZV8fHnx6wJZxNlMZ7oJFnZNQGphKhsdaKN1mC7hNIHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN0PR11MB6280.namprd11.prod.outlook.com (2603:10b6:208:3c0::15)
+ by SJ2PR11MB8513.namprd11.prod.outlook.com (2603:10b6:a03:56e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Mon, 28 Apr
+ 2025 06:57:56 +0000
+Received: from MN0PR11MB6280.namprd11.prod.outlook.com
+ ([fe80::3f63:c727:6606:c089]) by MN0PR11MB6280.namprd11.prod.outlook.com
+ ([fe80::3f63:c727:6606:c089%5]) with mapi id 15.20.8678.028; Mon, 28 Apr 2025
+ 06:57:56 +0000
+Message-ID: <524a13fa-eca1-4741-aa70-265a10cf96cb@intel.com>
+Date: Mon, 28 Apr 2025 09:57:50 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 2/8] igc: add TXDCTL prefix
+ to related macros
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Chwee-Lin Choong <chwee.lin.choong@intel.com>
+References: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
+ <20250428060225.1306986-3-faizal.abdul.rahim@linux.intel.com>
+Content-Language: en-US
+From: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
+In-Reply-To: <20250428060225.1306986-3-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0016.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::18) To MN0PR11MB6280.namprd11.prod.outlook.com
+ (2603:10b6:208:3c0::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEFUPH1Erfh9YUctVDHxL8TWsiVfs+Fr8aJLtrjiKECbiGTxHQ@mail.gmail.com>
- <aAjSCwwuRpI8GdB7@shredder> <CAEFUPH0cU-5ZJ_qAevp1DENYrUkSO4zipUTg0vzLmgz16nPbbw@mail.gmail.com>
- <20250424102240.dxyk5uf6t6xfnd2k@skbuf>
-In-Reply-To: <20250424102240.dxyk5uf6t6xfnd2k@skbuf>
-From: SIMON BABY <simonkbaby@gmail.com>
-Date: Sun, 27 Apr 2025 23:55:41 -0700
-X-Gm-Features: ATxdqUFPWAQukvOHrlF1wcEyiOnB1OrsxnrNMOe1-YpUNI36ExfQpGBK9tFi-aE
-Message-ID: <CAEFUPH1uvr1O1RNk6Ru953cs4bbXbudma7hyZyYnWdbkqD8b6Q@mail.gmail.com>
-Subject: Re: query on EAPOL multicast packet with linux bridge interface
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR11MB6280:EE_|SJ2PR11MB8513:EE_
+X-MS-Office365-Filtering-Correlation-Id: db5aa91b-b1b7-4414-ccfd-08dd86220112
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?a2lTRm5wMXJEeWdKakVDZ1I4clJkSlNiRWJ3OFY3ZDVBQlNLMFBUbmcwVnpu?=
+ =?utf-8?B?WHFOa2NMdGdFUkc3ZVQ3UEVLUmk2aTN3d0l0Q2hTMDVtaXZrYmF3SHFGSFNY?=
+ =?utf-8?B?blhOYXhKQUFXbEdwSlI1enh5cG1PdUlOOWhxdUY3Si9mTEIxV3p2ZjdCdDNq?=
+ =?utf-8?B?QW00bXpBR0dMbzJ1VFoxNjhCOUF1SllJUHlNekxIRkl4SFdrNDFsSE5iSjc5?=
+ =?utf-8?B?Rmhla1pkSVJtNDIxWHVGcUppZmt6UTR4cEcrd2ZibVgrNHVFd09LelBMRlYv?=
+ =?utf-8?B?Yml1ZG82UzdNakpNUk1VQ01wYnJqOXlLMk5IMUtEbURHRE16S2xRek50TmFi?=
+ =?utf-8?B?SmpHSVVZbk5yaDRoMm9yMXdNZWFtS1l3dnlpZ3RjcW9PaURCeE9SSTF2bzR1?=
+ =?utf-8?B?dDRHZkpsUWtUSkJpK2UxT2RQMHVSWThYY0VqMFR4cTZhRnJaNXNkcEdvb25P?=
+ =?utf-8?B?ajdhOE05bGZpRnBXTlZ5WFpFdlZHWGY4RXV2cG94UW13NXZYVTNpNlJMd2JY?=
+ =?utf-8?B?RlpHSHNhOU5FQ09LZ25nNEFYRjZEMzk2UHhzQzAxb1hlUHFybTRscVpFcHVy?=
+ =?utf-8?B?cDc3UkpEOG0wY0dUWVIyTDNqQ0RaWmFhWTM4VlJqS0V5dzJyRU14TklUK2o1?=
+ =?utf-8?B?QlZQSFg4aUwvU2t5bkxqRkpCWTNTZHpCOCtqVjZWNW40T1FsRThkc1dLY3BC?=
+ =?utf-8?B?ajdzYm1jNkhSYjhuYmpDdkJ5UDFNbmlCaUtPSEw0VWJ6M2JsNnZwQWp3SzhZ?=
+ =?utf-8?B?eGg2TXdxK1dEdHk3aTkvd05aa3dWZGVGelRzdTdpV2svVEgxY2NRZ0k0SVZK?=
+ =?utf-8?B?MWZZakgxZmdTWlZCWC9FSzM2M05ZSEZkR0NwY1NFSFlaaCtxOHhTaHZnaDhj?=
+ =?utf-8?B?QTE2TTdZRm9zUlJqRzZDWmo1Qll4RU9zK2ZhZUFmWEZvbmRLRmNaVU81UzYv?=
+ =?utf-8?B?RG10ZllSdndEL2F2dzFWR0QyaTJINHhtQ0dpSTdTdm1RcWlib0E5UEJtSDRT?=
+ =?utf-8?B?dG9sY1Noa0NYZUhSamt5bCsrLzFCNTlvSmhXVVBNQXJ5TVhkdkhYdy8xYjc4?=
+ =?utf-8?B?ejZqOTlUV01nUXo0eFJzcmRxVWRyZWwrSlF5STY5KzQzci9NOXUyV3JpOTZy?=
+ =?utf-8?B?YTRDSFBGTW1FeEVSWklzU3VEdDdTdXorL3VXUUdhRDZ6RVg0SGFYVmlMbjM2?=
+ =?utf-8?B?VU5Lbms5WnB2MmlGeDJzV1JFL1VCSnRLaUhBcFMwelZ5SWpIZXdyWnpzN1pu?=
+ =?utf-8?B?THJIT0xSTkRVajNzYldNZGpjd2VJblNHV0ZwSnBWK0ZtVUhGQkt3WU9GMXhp?=
+ =?utf-8?B?NldoV2hyNGZCRmx3Y0U2YnhHTkJlSGhScVNXQjFlWFlvZUFPNHVrcWN0MWVk?=
+ =?utf-8?B?d0t6WUNFYkEyVGNFbldFVXBLRmZWS2hVYTRPWGxFc1RiSEhZN1ZWVnFKMkd5?=
+ =?utf-8?B?bmp4V3lPSlpqR2cycHd4Uk5jTnBYZkJZZTMwNEp5a2Q2SEtaaGRlUGw0OFh1?=
+ =?utf-8?B?K0UwVGR4VVc5NUpRTmpmajhaaFFnbGFibTlGR1ptN0FoTXJESjFrQkgxVmV1?=
+ =?utf-8?B?NzgxSHgxSGh0V0JiWkJpMXNlclpacUlyRWtOMGQvZ2pzWFdlSkxiNXNYcGtF?=
+ =?utf-8?B?K0dFbElORVdrYzBLckxJdHcvMXczQ3NmOFdCOCtuaUhLb3FRYWN5Zk5zSENn?=
+ =?utf-8?B?dEFURW8wOFV0NzI0RERWNkxUWUlsYVBsSlRBYkhVeFdncnFSMUVObTExK3cx?=
+ =?utf-8?B?bFBYcmdLaGJGNEd0UWQ5Uzd4WnczODlNWFBwZ1U2V0xpOXlyODZJVnJ4SE9a?=
+ =?utf-8?B?MVMxcFFhK1BNRlFuVmM2ZVBnVWdZUkRWMWlxaTdscysvRUdpSDkvTlJaU21y?=
+ =?utf-8?B?Mk51RXFwU3luMkF4V2ErMmF3WVFGZzBDeFI5Zlo5dVFSRXVPSFp0TzlsamdN?=
+ =?utf-8?Q?xDe2ahi68MM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6280.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YlpqRjF1OXlubWNNMW56TjhTMUJ5MG5oeldKQ3pLRUdybldVbk5PMDlMMzlR?=
+ =?utf-8?B?NWJER0VVd0tINENwSDBGbllZeUtIZC9IUTIrcjREMkRrN1Urci9wT0U5YXJH?=
+ =?utf-8?B?enhreTNmLzczOUZHR3NJSGJXUkg0dkdTUWVLZ04xd3M0c0ltU0NvQ2E3allQ?=
+ =?utf-8?B?RzZuSnV2eHlYTzJMbGVZemo0aE9va0FvQXY3Ti9Lb2VoekFwS2taSFpQdzB5?=
+ =?utf-8?B?dDcvMHFJdmIxMFBzLzU0b0lCKzg3VUc3U3FOay9BcHdEK0pkNzl0UEFrYm4r?=
+ =?utf-8?B?Q0dqTmpRaTdrV0p6VjNkZE56TnIxTWVpb1lGSmJORndUcjZMWTZUM1hoR2Ft?=
+ =?utf-8?B?cmZrSjdPN1ZORXBvSTZ0STR1ZkRlNEZ6akdOMXdYb1Q2blhZK1BjWVI4ekxj?=
+ =?utf-8?B?eDBvekxieGlZRVlNMnhLS2RxSFhEcnRzODlSdUxkN1I4VDNMK3hOMFhkdlNO?=
+ =?utf-8?B?cTJhaWNaMDR6Z2FPR3JHK3o1UmVyd050TjFwUnVsVlU2OXdtK2hnTXZHUmtC?=
+ =?utf-8?B?d0k3SDFjQkZzanZ6QW04TU1mUmI1cUc0VXJxbFdjRVdQaDU0RmtSdHhLOTg0?=
+ =?utf-8?B?Vk90TVdkcXFLMmRoSmFEajZWYnNjeTlwVkJmdWMvcXg1SW1pV1phRDMwMTho?=
+ =?utf-8?B?NnYyRHNjNGdDK0F6Y3pHK2J5Mm9VV1BQb3RXeVhKdVpxUVQxSTRrci9mUFli?=
+ =?utf-8?B?cVhsWU5nQ0ZZRW0yZW1udFlzSXM3R0o4Q1I4YzR4K05ZdDBiYTl0cjN2SDU0?=
+ =?utf-8?B?RTBLcDU3SVBreHJudXhRd2k1WFZ5T0Jnc09wclkrOHFDcEV6VXJwQmxtL25Y?=
+ =?utf-8?B?MHJJanJhcU1sN05PUVRDMUJXRTVlZG5hVFB1cnYxaUdLcW5WOUVBdU85Rnd3?=
+ =?utf-8?B?Y3lmUjY0QWJXYndvWGgrcEdFcTRxd0hMWmdYSlhIVGhzK29FV2FTQTlIQlM4?=
+ =?utf-8?B?a1NaK2pVL2xVdjRYTU40QURjYndIYkdmbnFoYlJ1Tzdjcng1Z2NpbE9VV2F3?=
+ =?utf-8?B?aEdUQzhYaTk2bjY3cDhTMy9WYVlLb2ltVk1vakJyellxNG8ydVF2NTVzNjcr?=
+ =?utf-8?B?aDlrNS9KcVkzUWRJemRiOTdhSGhOUGdZczVSVkxSbVcxV2lYMDNETVV4MUQr?=
+ =?utf-8?B?NFhVTzFZNTV0NmtiKzB6STk4U3JpMzFiaElPRitZQzNIWjBYdnJ2Mk5BUVVE?=
+ =?utf-8?B?SW11SUtPOC9lWUlFd0xoeFU5NlYvWFdHdmpXWTRTYjZSWk9yb2Z3ckJqVFNp?=
+ =?utf-8?B?T01EcTEva0N4cTd3TjE2TUFqZVRNMXZOeDNPRXpVYlN2OUJhVEUrWERvQUll?=
+ =?utf-8?B?dFBPZW9mNHFUSXAwWmVldW45UHU4OGxFc1Jqd2dWcUpoaS9jMmEvY2Uyc3VS?=
+ =?utf-8?B?Zy9TZ1dRc29KWXAvMlVLZGtnYjVkSDY0aWxRSkdQS29OTCtONGJndkhEQVlI?=
+ =?utf-8?B?OUcweUpvVTExc3gyMWxtK0x1UE01ZDRZckxDSTYwSWJwVzNnU1M5MHBXNDNW?=
+ =?utf-8?B?WTNGcVZjODM1MlppSy92MWhNNDROcm00VDMxYmVKZS9mVnJCR2JEMjVEeWFZ?=
+ =?utf-8?B?dm1VcnhJRzBiVThvcUwzVGhsWXlXa01TeGRsMU04UWE2VXZ5SnJ2SmdxVzJv?=
+ =?utf-8?B?eE9PTXBPNGdpMStDZGhkWHNoei9yQVNzUXZ1WXlDdjdoQXR2VDIwNHBOOVJx?=
+ =?utf-8?B?VlAzZkZWTGJFY3FqRDB4UE5qY0daMlN6aFV4azhLY20weiswaVZuelhTdktK?=
+ =?utf-8?B?RzNOZlB6NnFiRXhZeTZqY2tEVzZaUmYvbG5IMSszeWRWUVdlNnQvTi9WOGkz?=
+ =?utf-8?B?a1h4Vk9aN0hUYmhzZmRaWG1OWjFBNnVucDlKVTlJelRaeFFMeXc2VWgrOVNU?=
+ =?utf-8?B?YytUb2NvWFBHUURqZW9oSzh5eExrS3p0RnB1SGtJa0ozdWwwOTBnaGxoaHpj?=
+ =?utf-8?B?ZTlOL2loV3BxZWlBYncvdWhXUGJrNGdpa2JzN3RXei9RVVVFdm55QnNTZHdH?=
+ =?utf-8?B?QS9aclhHbUNlOFFydmZHcW90YmpZNzdlb1JRbit1VmtkcDNEMDE0cVhQK0RR?=
+ =?utf-8?B?dGxmL1FxUDlmc0pmdVE1Z0hHeWhZWmJyaWdGdXdYem5qNFRQU2NZaGwyc3l4?=
+ =?utf-8?Q?eHospA/Q3LSjTVicuCKF1G2L3?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: db5aa91b-b1b7-4414-ccfd-08dd86220112
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6280.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 06:57:56.3800
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +YsphMvlvxbhLINn0M4ZzIouxQnP2cSDv2JtjraITT2ZzdH0iaRNmjrgGap7r2F5gEiJQU506F4DOdPFTnsWhQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8513
+X-OriginatorOrg: intel.com
 
-Hi,
+On 28/04/2025 9:02, Faizal Rahim wrote:
+> Rename macros to include the TXDCTL_ prefix for consistency and clarity.
+> This aligns naming with the register they configure and improves code
+> readability.
+> 
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc.h      | 6 +++---
+>   drivers/net/ethernet/intel/igc/igc_main.c | 6 +++---
+>   2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+> index e9d180eac015..bc37cc8deefb 100644
+> --- a/drivers/net/ethernet/intel/igc/igc.h
+> +++ b/drivers/net/ethernet/intel/igc/igc.h
+> @@ -487,10 +487,10 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
+>    */
+>   #define IGC_RX_PTHRESH			8
+>   #define IGC_RX_HTHRESH			8
+> -#define IGC_TX_PTHRESH			8
+> -#define IGC_TX_HTHRESH			1
+> +#define IGC_TXDCTL_PTHRESH		8
+> +#define IGC_TXDCTL_HTHRESH		1
+>   #define IGC_RX_WTHRESH			4
+> -#define IGC_TX_WTHRESH			16
+> +#define IGC_TXDCTL_WTHRESH		16
+>   
+>   /* Additional Transmit Descriptor Control definitions */
+>   /* Ena specific Tx Queue */
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 27575a1e1777..725c8f0b9f3d 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -749,9 +749,9 @@ static void igc_configure_tx_ring(struct igc_adapter *adapter,
+>   	wr32(IGC_TDH(reg_idx), 0);
+>   	writel(0, ring->tail);
+>   
+> -	txdctl |= IGC_TX_PTHRESH;
+> -	txdctl |= IGC_TX_HTHRESH << 8;
+> -	txdctl |= IGC_TX_WTHRESH << 16;
+> +	txdctl |= IGC_TXDCTL_PTHRESH;
+> +	txdctl |= IGC_TXDCTL_HTHRESH << 8;
+> +	txdctl |= IGC_TXDCTL_WTHRESH << 16;
+>   
+>   	txdctl |= IGC_TXDCTL_QUEUE_ENABLE;
+>   	wr32(IGC_TXDCTL(reg_idx), txdctl);
 
-Can someone please suggest if we need all the patches in the link
-below for 802.1x to work on a  bridge interface with DSA  marvel ports
-?
-https://lore.kernel.org/lkml/20221022115505.nlnkfy2xrgrq74li@skbuf/T/
-
-I also noticed that the iproute2 package in my kernel version does not
-include the "locked" port option. Is that the cause for the EAPOL
-packets forwarding issue on the bridge interface ?
-
-Regards
-Simon
-
-
-
-
-
-On Thu, Apr 24, 2025 at 3:22=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> Hello Simon,
->
-> On Wed, Apr 23, 2025 at 06:26:40AM -0700, SIMON BABY wrote:
-> > Thank you Ido.
-> >
-> > Here is the details of my setup:
-> >
-> > I have a microchip CPU connected to an 11 port marvell 88E6390 switch.
-> > I am using the marvel  linux DSA driver  so that all the switch ports
-> > (lan1, lan2, lan3 etc) are part of the linux kernel.
-> >
-> > I am using hostapd as an authenticator.
-> >
-> > An 802.1x client device is connected to port lan1 and binds this port
-> > (lan1) to hostapd daemon, I can see EAPOL packets are being forwarded
-> > to a radius server.
-> >
-> > I have created a bridge with vlan filtering with below commands and
-> > bind the bridge (br0) with hostapd daemon. Now EAPOL packets are not
-> > forwarded.
-> >
-> > ip link add name br0 type bridge vlan_filtering 1
-> > ip link set dev lan1 master br0
-> > ip link set dev lan2 master br0
-> > bridge vlan add dev lan1 vid 10 pvid untagged
-> > bridge vlan add dev lan2 vid 10 pvid untagged
-> > ip link set dev br0 up
-> > ip link set dev lan1 up
-> > ip link set dev lan2 up
-> > ip link add link br0 name br0.10 type vlan id 10
-> > ip link set dev br0.10 up
-> > ip addr add 192.168.2.1/24 dev br0.10
-> > bridge vlan add vid 10 dev br0 self
-> >
-> > bridge vlan show
-> > port              vlan-id
-> > lan1              10 PVID Egress Untagged
-> > lan2              10 PVID Egress Untagged
-> > br0                10
-> >
-> > echo 8 > /sys/class/net/br0/bridge/group_fwd_mask
-> > cat /sys/class/net/br0/bridge/group_fwd_mask
-> > 0x8
-> >
-> > root@sama7g5ek-tdy-sd:~# cat /etc/hostapd.conf
-> > ##### hostapd configuration file ######################################=
-########
-> > # Empty lines and lines starting with # are ignored
-> >
-> > # Example configuration file for wired authenticator. See hostapd.conf =
-for
-> > # more details.
-> > interface=3Dbr0
-> > >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>passing br0 as interface to
-> > hostapd.
-> > driver=3Dwired
->
-> Could you please clarify what is the expected data path of EAPOL packets?
-> (I also have no experience with hostapd)
-> Is the forwarding to the RADIUS server something that is handled by
-> hostapd, through an IP socket, or is the kernel responsible for doing
-> that automatically somehow? Is the RADIUS server IP accessible? Does
-> hostapd log the reception of EAPOL packets? I'm trying to understand
-> whether the problem is that hostapd is not receiving or not sending
-> packets.
->
-> I think the hostapd.conf "interface" option can be overridden by '-i'
-> command line options. I'm wondering if there's any chance that is going
-> on, and hostapd is not listening on br0.
->
-> I don't understand the need for group_fwd_mask. In my image, you don't
-> need software forwarding of EAPOL packets among bridge ports (which that
-> option provides). You only need EAPOL frames to be received by a packet
-> socket, and routed using IP to the RADIUS server, correct? Can't you
-> just specify multiple '-i' options to hostapd, for the individual bridge
-> ports like lan1, lan2, and skip the bridge data path processing for
-> these packets, as happens by default when no group_fwd_mask is specified?
->
-> Are you also using some other bridge port options, like 'locked', which
-> you are not showing in the steps above?
+If you do this, I think you should apply the same change to the RXDCTL 
+macros that are right next to the TXDCTL ones. Otherwise you are trading 
+one inconsistency for another. :)
 
