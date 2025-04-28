@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-186354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4A4A9E9D1
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:45:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C335A9E9D9
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340DD3AB6FD
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 07:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7520E172FF8
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 07:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619D61F3FC8;
-	Mon, 28 Apr 2025 07:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D773204866;
+	Mon, 28 Apr 2025 07:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KezSKcYE"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="I+VCG49y"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759251E32BE;
-	Mon, 28 Apr 2025 07:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643CF1CEADB;
+	Mon, 28 Apr 2025 07:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745826305; cv=none; b=pc/nKl72fOOmwMmWWqr73BCp1P/GgpR1BS5SFiY1GRI7Xi/UMe89unSm/utfTToISwWnHDLFHhH4mueNbjwSPtCXdBstDoLsS7xSNjjwHhu1goUM6AjWgjZU11RSP2rYO3F5RRN3AFVIWwapipVW0YwidpiVav0UA9t1YXrv1lE=
+	t=1745826306; cv=none; b=iYKi9mvT//VQQTi6M0B4PlAxoEQSJEXSQpKJEiYg536J88qxAu6YBryxv50YM5v05cNMha3I/YWb57RAFEiDwb1mh2z5Hh8cJcacoLAWvrC/30l1hL2cqvqQ3IMC9kPKWbIt/tao3c8moFXv9lrd2XMf6tb1ZWA/yTjPONOdjsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745826305; c=relaxed/simple;
-	bh=7SuOd+glRhWsI/0pEi92PA0CRNpor8In6aIxj+2KPqY=;
+	s=arc-20240116; t=1745826306; c=relaxed/simple;
+	bh=bJ9nM/4ZGwPuo/W/Ocg7YY/UHaNNBcNzuTSfgh0/tbk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hXqh3rW8GCWh/3cPwe/WyTkjn3i0bRABqEwLHnQd0X8D5dqK2C5BYBtk9yi/OoLouYOUilSvEEfZJH4sQ+NjPQvtyfDCWqB4SeTwsmAcadLjVF/Ve8rRoWsdoEtQvoINKD2gQyh1ai2RoitgxZlTDGWCoBK5ZBXMlfQrVUzX8xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KezSKcYE; arc=none smtp.client-ip=89.58.32.78
+	 MIME-Version; b=jB3Vr8vLZPyAFsRQdkv690D6vr/L6DszHCccAsmuAE+7pU/6bAt/cciXKyJdKwKfizaODUWfsvjXzieYr1JdOTj28AYTw9kaJvxizonxVZ9o9ZdMYROI9AxdpJB6A9L1W2/DSR/t+00Ok6Pg7iBFALM8bunCoSwsbG9CVRXht48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=I+VCG49y; arc=none smtp.client-ip=89.58.32.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 958CE1026CE92;
-	Mon, 28 Apr 2025 09:44:53 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 957CB1026CE9D;
+	Mon, 28 Apr 2025 09:44:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1745826295; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1745826297; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=DcEnKVRRQx6xJdtOXWe6NEw2GPHAi7o4jXCq1mIxKLE=;
-	b=KezSKcYEjDP9JRqBvGE5OReUclU9k3l8NPSSzTnmUv9XyZfuOr7aLlZzrKiokd9r50nv8K
-	ArgzFtElcII1PCrqUrf+Hk5/zHHXurBe6V3nlkhmn/rWEPi0PGemvdqytozUOX4rox4m8X
-	Qy3dz4TQiKeuoxNJOsee+dVQ7kVE+ph4CvZ4m9/8U+SAgTDHWB9qrkLE7cH/A/5oKmFInQ
-	tn4G+pPTo0JB9BQvQ5gtXJzMHyEUuvdFWQehk0LSBFof9PK3go/dH4DNBoXLmdGYGQyfPk
-	0+8jOW9wQxxEzPww3WyBPE7bvYzLUUoyNJlVDc2TT4QKlBez4GCVtDgEmlUv4g==
+	bh=mRff7twpCG2EYv/Ftxf+CznXUmx56RFNcmCITAIuHAA=;
+	b=I+VCG49yWLypy5CiqvDLXmjqQjXjES8iPz6AFecbAYQDsvMz07uu2Fo83ds4LC54XYHpQc
+	/2k0yKFnWajr/tE2718sD/tBPINu8fh7c4Zx42Wyp7x6bE+oVcXHXDH0qGZsjwklXsmP6+
+	gmuYHq1jRevjhUDBqkwMhfRaSCIM6gOAShNbBjl8hanZ6QlwK0SQp9fBw/Z2XpiY+kkZsH
+	TUWsBQOZj00brZCL/sMvO1ZfWbx8RjZ40zqtsVSBT/IHWTIrlganrtOY/xVLmBLVnYCdA6
+	MrruGjS7ELWHx/1rvLiUlBF+kXLJrY/tls6cYOhUV2x6PoERqbg8ELEnolWMKQ==
 From: Lukasz Majewski <lukma@denx.de>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	davem@davemloft.net,
@@ -65,9 +65,9 @@ Cc: Sascha Hauer <s.hauer@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Lukasz Majewski <lukma@denx.de>,
 	Andrew Lunn <andrew@lunn.ch>
-Subject: [net-next v8 2/7] ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
-Date: Mon, 28 Apr 2025 09:44:19 +0200
-Message-Id: <20250428074424.3311978-3-lukma@denx.de>
+Subject: [net-next v8 3/7] ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
+Date: Mon, 28 Apr 2025 09:44:20 +0200
+Message-Id: <20250428074424.3311978-4-lukma@denx.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250428074424.3311978-1-lukma@denx.de>
 References: <20250428074424.3311978-1-lukma@denx.de>
@@ -80,14 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-The current range of 'reg' property is too small to allow full control
-of the L2 switch on imx287.
-
-As this IP block also uses ENET-MAC blocks for its operation, the address
-range for it must be included as well.
-
-Moreover, some SoC common properties (like compatible, clocks, interrupts
-numbers) have been moved to this node.
+The description is similar to the one used with the new CPSW driver.
 
 Signed-off-by: Lukasz Majewski <lukma@denx.de>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
@@ -95,49 +88,107 @@ Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
 
 ---
 Changes for v2:
-- adding extra properties (like compatible, clocks, interupts)
+- Remove properties which are common for the imx28(7) SoC
+- Use mdio properties to perform L2 switch reset (avoid using
+  deprecated properties)
 
 Changes for v3:
-- None
+- Replace IRQ_TYPE_EDGE_FALLING with IRQ_TYPE_LEVEL_LOW
+- Update comment regarding PHY interrupts s/AND/OR/g
 
 Changes for v4:
-- Rename imx287 with imx28 (as the former is not used in kernel anymore)
+- Use GPIO_ACTIVE_LOW instead of 0 in 'reset-gpios'
+- Replace port@[12] with ethernet-port@[12]
 
 Changes for v5:
-- None
+- Add proper multiline comment for IRQs description
 
 Changes for v6:
-- Add interrupt-names property
+- None
 
 Changes for v7:
-- Change switch interrupt name from 'mtipl2sw' to 'enet_switch'
+- None
 
 Changes for v8:
 - None
 ---
- arch/arm/boot/dts/nxp/mxs/imx28.dtsi | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm/boot/dts/nxp/mxs/imx28-xea.dts | 56 +++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/arch/arm/boot/dts/nxp/mxs/imx28.dtsi b/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-index bbea8b77386f..8aff2e87980e 100644
---- a/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-+++ b/arch/arm/boot/dts/nxp/mxs/imx28.dtsi
-@@ -1321,8 +1321,13 @@ mac1: ethernet@800f4000 {
- 			status = "disabled";
- 		};
+diff --git a/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts b/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
+index 6c5e6856648a..69032b29d767 100644
+--- a/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
++++ b/arch/arm/boot/dts/nxp/mxs/imx28-xea.dts
+@@ -5,6 +5,7 @@
+  */
  
--		eth_switch: switch@800f8000 {
--			reg = <0x800f8000 0x8000>;
-+		eth_switch: switch@800f0000 {
-+			compatible = "nxp,imx28-mtip-switch";
-+			reg = <0x800f0000 0x20000>;
-+			interrupts = <100>, <101>, <102>;
-+			interrupt-names = "enet_switch", "enet0", "enet1";
-+			clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-+			clock-names = "ipg", "ahb", "enet_out", "ptp";
- 			status = "disabled";
- 		};
- 	};
+ /dts-v1/;
++#include<dt-bindings/interrupt-controller/irq.h>
+ #include "imx28-lwe.dtsi"
+ 
+ / {
+@@ -90,6 +91,61 @@ &reg_usb_5v {
+ 	gpio = <&gpio0 2 0>;
+ };
+ 
++&eth_switch {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
++	phy-supply = <&reg_fec_3v3>;
++	status = "okay";
++
++	ethernet-ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		mtip_port1: ethernet-port@1 {
++			reg = <1>;
++			label = "lan0";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy0>;
++		};
++
++		mtip_port2: ethernet-port@2 {
++			reg = <2>;
++			label = "lan1";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy1>;
++		};
++	};
++
++	mdio_sw: mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		reset-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;
++		reset-delay-us = <25000>;
++		reset-post-delay-us = <10000>;
++
++		ethphy0: ethernet-phy@0 {
++			reg = <0>;
++			smsc,disable-energy-detect;
++			/*
++			 * Both PHYs (i.e. 0,1) have the same, single GPIO,
++			 * line to handle both, their interrupts (OR'ed)
++			 */
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
++		};
++
++		ethphy1: ethernet-phy@1 {
++			reg = <1>;
++			smsc,disable-energy-detect;
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
++		};
++	};
++};
++
+ &spi2_pins_a {
+ 	fsl,pinmux-ids = <
+ 		MX28_PAD_SSP2_SCK__SSP2_SCK
 -- 
 2.39.5
 
