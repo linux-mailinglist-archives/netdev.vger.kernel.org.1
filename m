@@ -1,138 +1,111 @@
-Return-Path: <netdev+bounces-186426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAA0CA9F13E
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:45:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0BD2A9F168
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D143A5A16EE
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:44:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D74247AD1A1
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D34326A0A0;
-	Mon, 28 Apr 2025 12:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DD4269806;
+	Mon, 28 Apr 2025 12:51:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ADF266B67;
-	Mon, 28 Apr 2025 12:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F44264FB0
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 12:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745844291; cv=none; b=svVmoj4izGUr+sQ0CxUz0yIhx0qFXGOn/ktpzOM9WxQwaIb6VMEgUEbCqw/klfKcbXrUMDS4msrOjENlWSqNHpQvllZzbLTGHz1zb8YfRAMxuMKZq0i0q2Ve4vnwKnZR6t2OtS8gYEttoIdLZpN1uWHHlxz5ZS/qKmMaVZBzTqw=
+	t=1745844704; cv=none; b=qLvoeMRc+KUb57S+/9f7aCsz4yAdVPwDOzcdTLQmodfTBFrbZSxm8eSxNQyHO1y4prMNhCmZtBcO+9FLg+cVEf696COCteh7vvxhX7PIw4EHf4N9Ond7FfQDCqt8RHr3H9MLD5SI0ifPlgdSv9KQqn3GfnEMqrSaxYDQEShhYxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745844291; c=relaxed/simple;
-	bh=69u4x2iVX3CML3z65mNSFOpfvvJMY1UtVIYXajlF58c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BSinGpThjptCgUMGjc9VGvf2q3u/HgMHfY6kkTXIQbnX7GtN7qwcxCQpeh71bT2rGqsIDnJRMFnqAGFw9C/h8Ce8PHkIr4MxpZhzGMWKVyFfiynVWkMP5Pe35pvtWTfBo3jrUM1OB5KWsK7ugbogz9dB6btQmdp1ISFYAFzXQaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4285E1516;
-	Mon, 28 Apr 2025 05:44:41 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B9463F66E;
-	Mon, 28 Apr 2025 05:44:45 -0700 (PDT)
-Date: Mon, 28 Apr 2025 13:44:35 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Yixun Lan <dlan@gentoo.org>, Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, Jernej
- Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>,
- Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Corentin Labbe <clabbe.montjoie@gmail.com>,
- <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-sunxi@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 1/5] dt-bindings: sram: sunxi-sram: Add A523
- compatible
-Message-ID: <20250428134435.76e19d29@donnerap.manchester.arm.com>
-In-Reply-To: <20250428122156-GYA56330@gentoo>
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
-	<20250424-01-sun55i-emac0-v2-1-833f04d23e1d@gentoo.org>
-	<20250428-vegan-stoic-flamingo-1d1a2a@kuoka>
-	<20250428122156-GYA56330@gentoo>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1745844704; c=relaxed/simple;
+	bh=uk7Y3YRIZo49khtn8nhECd6YZErDw92lSstgPpb5TVI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jdog/sFaBnAfpulmZUho96hel1/Max5eEdN7DL+7O3kadz60JZXLvhwYHtcp8A2hlhW980DJHZcpcEekHDy4CwW7cSkRUgwAxD4PV6QY8RzB4UMN61ADELwCsNqDWgs8U13MAGV1kqTT9LfYC97TY4c4HXBdG72vEYHbZ6GIxXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9NxD-0002i5-AO; Mon, 28 Apr 2025 14:51:23 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9NxB-00068F-2k;
+	Mon, 28 Apr 2025 14:51:21 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9NxB-00EK9k-2U;
+	Mon, 28 Apr 2025 14:51:21 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	stable@vger.kernel.org
+Subject: [PATCH net v1 0/2] address EEE regressions on KSZ switches since v6.9 (v6.14+)
+Date: Mon, 28 Apr 2025 14:51:17 +0200
+Message-Id: <20250428125119.3414046-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 28 Apr 2025 12:21:56 +0000
-Yixun Lan <dlan@gentoo.org> wrote:
+This patch series addresses a regression in Energy Efficient Ethernet
+(EEE) handling for KSZ switches with integrated PHYs, introduced in
+kernel v6.9 by commit fe0d4fd9285e ("net: phy: Keep track of EEE
+configuration").
 
-> Hi Krzysztof,
->=20
-> On 09:21 Mon 28 Apr     , Krzysztof Kozlowski wrote:
-> > On Thu, Apr 24, 2025 at 06:08:39PM GMT, Yixun Lan wrote: =20
-> > > The Allwinner A523 family of SoCs have their "system control" registe=
-rs
-> > > compatible to the A64 SoC, so add the new SoC specific compatible str=
-ing.
-> > >=20
-> > > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> > > Signed-off-by: Yixun Lan <dlan@gentoo.org>
-> > > ---
-> > >  .../devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml=
-     | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >=20
-> > > diff --git a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a=
-10-system-control.yaml b/Documentation/devicetree/bindings/sram/allwinner,s=
-un4i-a10-system-control.yaml
-> > > index a7236f7db4ec34d44c4e2268f76281ef8ed83189..e7f7cf72719ea884d48ff=
-f69620467ff2834913b 100644
-> > > --- a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-syst=
-em-control.yaml
-> > > +++ b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-syst=
-em-control.yaml
-> > > @@ -50,6 +50,7 @@ properties:
-> > >            - enum:
-> > >                - allwinner,sun50i-a100-system-control
-> > >                - allwinner,sun50i-h6-system-control
-> > > +              - allwinner,sun55i-a523-system-control
-> > >            - const: allwinner,sun50i-a64-system-control =20
-> >=20
-> > No update for the children (sram)?
-> >  =20
-> No, I don't think there is sub node for sram
-> From address map of A527, there is total 4KB size space of
-> this section which unlikely has sram available.
+The first patch updates the DSA driver to allow phylink to properly
+manage PHY EEE configuration. Since integrated PHYs handle LPI
+internally and ports without integrated PHYs do not document MAC-level
+LPI support, dummy MAC LPI callbacks are provided.
 
-That's something else, though. This system controller here *also* contains
-a register to switch access to SRAM blocks between the CPU and the devices.
-The actual SRAM blocks are somewhere else (hence the empty ranges;
-property), check the H616 for instance:
-	syscon: syscon@3000000 {
-		compatible =3D "allwinner,sun50i-h616-system-control";
-		reg =3D <0x03000000 0x1000>;
-		#address-cells =3D <1>;
-		#size-cells =3D <1>;
-		ranges;
+The second patch removes outdated EEE workarounds from the micrel PHY
+driver, as they are no longer needed with correct phylink handling.
 
-		sram_c: sram@28000 {
-			compatible =3D "mmio-sram";
-			reg =3D <0x00028000 0x30000>;
+This series addresses the regression for mainline and kernels starting
+from v6.14. It is not easily possible to fully fix older kernels due
+to missing infrastructure changes.
 
-Krzysztof, we haven't worked out the SRAM regions yet, we typically add
-them only when we need them. I think the display engine is a prominent
-user, and support for that is quite a bit out at the moment.
+Tested on KSZ9893 hardware.
 
-=46rom a compatibility standpoint it should be fine to leave this empty for
-now, if I am not mistaken?
+Oleksij Rempel (2):
+  net: dsa: microchip: let phylink manage PHY EEE configuration on KSZ
+    switches
+  net: phy: micrel: remove KSZ9477 EEE quirks now handled by phylink
 
-Cheers,
-Andre
+ drivers/net/dsa/microchip/ksz_common.c | 97 ++++++++++++++++++--------
+ drivers/net/phy/micrel.c               |  7 --
+ include/linux/micrel_phy.h             |  1 -
+ 3 files changed, 69 insertions(+), 36 deletions(-)
 
-> but I do see some BROM/SRAM space from 0x0000 0000 - 0x0006 3FFF ..
-> (which should not be relavant to this patch series..)
->=20
+--
+2.39.5
 
 
