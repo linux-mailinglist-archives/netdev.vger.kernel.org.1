@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-186437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 466EDA9F1B8
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:08:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2C8A9F1B9
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B853BFC93
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:06:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14EAD1A835A2
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49BB270549;
-	Mon, 28 Apr 2025 13:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033F32741A7;
+	Mon, 28 Apr 2025 13:05:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B06626A1DB
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 13:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8885F26F44B
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 13:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745845556; cv=none; b=ERwbumBTRdLVDwYEZ3AXzdjfLzL7umxzkcJQw99eM/N+P808s/ACCaEDqzOk7H1Ht/L3H/2HSrOdQAK1BPaRv82o15WUp/BYBLRMOd493C3yUhI9WCVyHTss631Fh4giJEu9LYvW5xImzvAp6L4pVJXpArtPWa1GZHZZDWowjtE=
+	t=1745845557; cv=none; b=m7jqE7GTA2jRZaRN3IKuCPXShbeBmspHGoLyCE0ea6wE+z9G3GCt3bdAejRghJk8qL/zwaTFN2680yQFWkUB2q5rGgMoqGwx9pkOKN7QUgZyvlAz2KDEhj3vxADynda30ecHAnkm2DEcHm7/DOUmFB7RjqlHZghs4z/K93b+YlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745845556; c=relaxed/simple;
-	bh=czQrwqSOCU4ro8+9cqoU25PAcGWoBynUwIf9q024yyM=;
+	s=arc-20240116; t=1745845557; c=relaxed/simple;
+	bh=yDBPrVSL+UwTdx3j7DqwG9mfpeNf/ZqzrDQtnxyuIIs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KwL1rA+z2T3ClenpL74G8OONvOyA+BVF8yWa8bgfl0Nvh2bSRZyjak2UUkI3vHsoTWgL4o7Bmx0Yw4mbiOJtLz7/daMZvTpTLvfVpuMfZwMLXHSNbQ98soVUZmyOJDS1saMf/TeRGIt70Mt+Au8H+QeT0tXanafFN4CWXKDEtis=
+	 MIME-Version; b=rLhUPQSYXmKK2Dh/OduoooQi07/0ivxvt2nwc7uQMfDK92f5NxitoB7lztOUIglUf2VkOqN/qnUn5ZXYYnaUN+kJTTQNgOASh4xuoRIlNxkLD3CXb6/op1D3OLryQfk+Y7hvoHejNA5MupqIEUibK+NflvqIMa6ihSxfl6ysxBg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1u9OB7-0000MX-L6; Mon, 28 Apr 2025 15:05:45 +0200
+	id 1u9OB7-0000MS-L7; Mon, 28 Apr 2025 15:05:45 +0200
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1u9OB6-0006FO-19;
+	id 1u9OB6-0006FQ-0n;
 	Mon, 28 Apr 2025 15:05:44 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1u9OB6-00GJ8e-0Q;
+	id 1u9OB6-00GJ8z-0U;
 	Mon, 28 Apr 2025 15:05:44 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -62,9 +62,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Phil Elwell <phil@raspberrypi.org>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v7 05/12] net: usb: lan78xx: Extract PHY interrupt acknowledgment to helper
-Date: Mon, 28 Apr 2025 15:05:35 +0200
-Message-Id: <20250428130542.3879769-6-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v7 06/12] net: usb: lan78xx: Refactor USB link power configuration into helper
+Date: Mon, 28 Apr 2025 15:05:36 +0200
+Message-Id: <20250428130542.3879769-7-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250428130542.3879769-1-o.rempel@pengutronix.de>
 References: <20250428130542.3879769-1-o.rempel@pengutronix.de>
@@ -80,55 +80,159 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Move the PHY interrupt acknowledgment logic from lan78xx_link_reset()
-to a new helper function lan78xx_phy_int_ack(). This simplifies the
-code and prepares for reusing the acknowledgment logic independently
-from the full link reset process, such as when using phylink.
+Move the USB link power configuration logic from lan78xx_link_reset()
+to a new helper function lan78xx_configure_usb(). This simplifies the
+main link reset path and isolates USB-specific logic.
 
-No functional change intended.
+The new function handles U1/U2 enablement based on Ethernet link speed,
+but only for SuperSpeed-capable devices (LAN7800 and LAN7801). LAN7850,
+a High-Speed-only device, is explicitly excluded. A warning is logged
+if SuperSpeed is reported unexpectedly for LAN7850.
+
+Add a forward declaration for lan78xx_configure_usb() as preparation for
+the upcoming phylink conversion, where it will also be used from the
+mac_link_up() callback.
+
+Open questions remain:
+
+- Why is the 1000 Mbps configuration split into two steps (U2 disable,
+  then U1 enable), unlike the single-step config used for 10/100 Mbps?
+
+- U1/U2 behavior appears to depend on proper EEPROM configuration.
+  There are known devices in the field without EEPROM. Should the driver
+  enforce safe defaults in such cases?
+
+Due to lack of USB subsystem expertise, no changes were made to this logic
+beyond structural refactoring.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
 changes v6:
 - this patch is added in v6
 ---
- drivers/net/usb/lan78xx.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ drivers/net/usb/lan78xx.c | 90 +++++++++++++++++++++++++--------------
+ 1 file changed, 59 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 07530eef82cb..de2b429e906e 100644
+index de2b429e906e..bff53324c70a 100644
 --- a/drivers/net/usb/lan78xx.c
 +++ b/drivers/net/usb/lan78xx.c
-@@ -1636,6 +1636,20 @@ static int lan78xx_mac_reset(struct lan78xx_net *dev)
- 	return ret;
+@@ -1650,12 +1650,13 @@ static int lan78xx_phy_int_ack(struct lan78xx_net *dev)
+ 	return lan78xx_write_reg(dev, INT_STS, INT_STS_PHY_INT_);
  }
  
-+/**
-+ * lan78xx_phy_int_ack - Acknowledge PHY interrupt
-+ * @dev: pointer to the LAN78xx device structure
-+ *
-+ * This function acknowledges the PHY interrupt by setting the
-+ * INT_STS_PHY_INT_ bit in the interrupt status register (INT_STS).
-+ *
-+ * Return: 0 on success or a negative error code on failure.
-+ */
-+static int lan78xx_phy_int_ack(struct lan78xx_net *dev)
-+{
-+	return lan78xx_write_reg(dev, INT_STS, INT_STS_PHY_INT_);
-+}
++static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed);
 +
  static int lan78xx_link_reset(struct lan78xx_net *dev)
  {
  	struct phy_device *phydev = dev->net->phydev;
-@@ -1644,7 +1658,7 @@ static int lan78xx_link_reset(struct lan78xx_net *dev)
- 	u32 buf;
+ 	struct ethtool_link_ksettings ecmd;
+ 	int ladv, radv, ret, link;
+-	u32 buf;
  
  	/* clear LAN78xx interrupt status */
--	ret = lan78xx_write_reg(dev, INT_STS, INT_STS_PHY_INT_);
-+	ret = lan78xx_phy_int_ack(dev);
- 	if (unlikely(ret < 0))
- 		return ret;
+ 	ret = lan78xx_phy_int_ack(dev);
+@@ -1681,36 +1682,9 @@ static int lan78xx_link_reset(struct lan78xx_net *dev)
  
+ 		phy_ethtool_ksettings_get(phydev, &ecmd);
+ 
+-		if (dev->udev->speed == USB_SPEED_SUPER) {
+-			if (ecmd.base.speed == 1000) {
+-				/* disable U2 */
+-				ret = lan78xx_read_reg(dev, USB_CFG1, &buf);
+-				if (ret < 0)
+-					return ret;
+-				buf &= ~USB_CFG1_DEV_U2_INIT_EN_;
+-				ret = lan78xx_write_reg(dev, USB_CFG1, buf);
+-				if (ret < 0)
+-					return ret;
+-				/* enable U1 */
+-				ret = lan78xx_read_reg(dev, USB_CFG1, &buf);
+-				if (ret < 0)
+-					return ret;
+-				buf |= USB_CFG1_DEV_U1_INIT_EN_;
+-				ret = lan78xx_write_reg(dev, USB_CFG1, buf);
+-				if (ret < 0)
+-					return ret;
+-			} else {
+-				/* enable U1 & U2 */
+-				ret = lan78xx_read_reg(dev, USB_CFG1, &buf);
+-				if (ret < 0)
+-					return ret;
+-				buf |= USB_CFG1_DEV_U2_INIT_EN_;
+-				buf |= USB_CFG1_DEV_U1_INIT_EN_;
+-				ret = lan78xx_write_reg(dev, USB_CFG1, buf);
+-				if (ret < 0)
+-					return ret;
+-			}
+-		}
++		ret = lan78xx_configure_usb(dev, ecmd.base.speed);
++		if (ret < 0)
++			return ret;
+ 
+ 		ladv = phy_read(phydev, MII_ADVERTISE);
+ 		if (ladv < 0)
+@@ -2522,6 +2496,60 @@ static void lan78xx_remove_irq_domain(struct lan78xx_net *dev)
+ 	dev->domain_data.irqdomain = NULL;
+ }
+ 
++/**
++ * lan78xx_configure_usb - Configure USB link power settings
++ * @dev: pointer to the LAN78xx device structure
++ * @speed: negotiated Ethernet link speed (in Mbps)
++ *
++ * This function configures U1/U2 link power management for SuperSpeed
++ * USB devices based on the current Ethernet link speed. It uses the
++ * USB_CFG1 register to enable or disable U1 and U2 low-power states.
++ *
++ * Note: Only LAN7800 and LAN7801 support SuperSpeed (USB 3.x).
++ *       LAN7850 is a High-Speed-only (USB 2.0) device and is skipped.
++ *
++ * Return: 0 on success or a negative error code on failure.
++ */
++static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed)
++{
++	u32 mask, val;
++	int ret;
++
++	/* Only configure USB settings for SuperSpeed devices */
++	if (dev->udev->speed != USB_SPEED_SUPER)
++		return 0;
++
++	/* LAN7850 does not support USB 3.x */
++	if (dev->chipid == ID_REV_CHIP_ID_7850_) {
++		netdev_warn_once(dev->net, "Unexpected SuperSpeed for LAN7850 (USB 2.0 only)\n");
++		return 0;
++	}
++
++	switch (speed) {
++	case SPEED_1000:
++		/* Disable U2, enable U1 */
++		ret = lan78xx_update_reg(dev, USB_CFG1,
++					 USB_CFG1_DEV_U2_INIT_EN_, 0);
++		if (ret < 0)
++			return ret;
++
++		return lan78xx_update_reg(dev, USB_CFG1,
++					  USB_CFG1_DEV_U1_INIT_EN_,
++					  USB_CFG1_DEV_U1_INIT_EN_);
++
++	case SPEED_100:
++	case SPEED_10:
++		/* Enable both U1 and U2 */
++		mask = USB_CFG1_DEV_U1_INIT_EN_ | USB_CFG1_DEV_U2_INIT_EN_;
++		val = mask;
++		return lan78xx_update_reg(dev, USB_CFG1, mask, val);
++
++	default:
++		netdev_warn(dev->net, "Unsupported link speed: %d\n", speed);
++		return -EINVAL;
++	}
++}
++
+ /**
+  * lan78xx_register_fixed_phy() - Register a fallback fixed PHY
+  * @dev: LAN78xx device
 -- 
 2.39.5
 
