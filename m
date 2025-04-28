@@ -1,77 +1,56 @@
-Return-Path: <netdev+bounces-186330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98280A9E6DF
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:02:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 198A3A9E6E6
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:07:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 707A9189160A
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 04:02:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AE3B3B6391
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 04:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B2A1917F4;
-	Mon, 28 Apr 2025 04:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1C012CD88;
+	Mon, 28 Apr 2025 04:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eR9kE+gI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IG8o1cN6"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B53473451;
-	Mon, 28 Apr 2025 04:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590778F4A;
+	Mon, 28 Apr 2025 04:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745812921; cv=none; b=AJ0w29uLJO1bU/wwRzfK5GvLpYIgqCgeuLararfAxPhOEkaxN9VLWVcL2nkNcXelIYqsiO8hOJGJI6a86/g2VcyRmHn97SCEerce0pN/oqFbqOUawmQz9jDIjc9yWneqaZxC3KJR3wdEnX0GTkLyZS/N4QQl/plavj00gHJaZeU=
+	t=1745813249; cv=none; b=TPB9E0kP8bpWnL/E1YTn6mUc39Pu9tI4zzLILHHxrroyywC8ZRMgE0t2cTXPmGbBe92ti50G8Vgvufvwg7cudQOl60jE5Ej5BDGquxijG29VHiW0VHB889tb8ogs05eHtcVyRiS08D6/VvVVnz7gWWvgZJqJQx/pPgSvOGMM/0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745812921; c=relaxed/simple;
-	bh=vjZ+IeCUxWIkl98nDUqWCFXomJ+Lt4Nn3F+vyW0cKns=;
+	s=arc-20240116; t=1745813249; c=relaxed/simple;
+	bh=FDa3IY0GgwpkF7KII9NWs+I70tvBHTz6uJWecx+X7OA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZiKI3hJMraz5Cm/gVkA8DMv+8DHVRxW1Wt8g69RDmDBxrk8rNZ4xuJkyvzg71h1YlEWrNWHasptO2I+eiYNUNV3tUDvecA6dbQgEiEsDpbqdHRvvweTTNsWtiU7cf3q+MBY7z6vcYwYym7jLs+fJ/Zg1MRp1p+cPc8diX2uSXto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eR9kE+gI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 6B0DB204E7CD; Sun, 27 Apr 2025 21:01:53 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6B0DB204E7CD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1745812913;
-	bh=6ORYRjCLYBvY4FGKbLG0z5vkiNwL4q972XjmwAdxSnk=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=N1TewGrICPa+D6fRCJM5NuerCNGYXaqeOnJ7tiVFipt/WIKifMtSBd+T6TnVqX/DgYW7SOnehyH3gnjWfV0c9k5zAWUwR1SMs1F84yWdOwI8jJFYQcbjLsTbl8s0K1va50FPZOLB+OrzfuTzy624BQWqAuD9vnDsPVAT/E3oYUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IG8o1cN6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A25C4CEE4;
+	Mon, 28 Apr 2025 04:07:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745813248;
+	bh=FDa3IY0GgwpkF7KII9NWs+I70tvBHTz6uJWecx+X7OA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eR9kE+gIj5DPlSl9DePllal/B67VdYVxiMn9aHFgZQ2dDK9PlV3/nNgiCTN2k+6ym
-	 8ZVoKuBRomobidrEPCqh7QeAEmjTTThPmDcAJj4tHUL21LUFFc+5Wy9enH3xw63EnT
-	 gWvs6MxQFyPEDn6CKZmwga4Kp/7+O7gsunYlEY/4=
-Date: Sun, 27 Apr 2025 21:01:53 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof Wilczy??ski <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v2 3/3] net: mana: Allocate MSI-X vectors dynamically as
- required
-Message-ID: <20250428040153.GA15037@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1745578407-14689-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1745578478-15195-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20250425093556.30104eda@kernel.org>
+	b=IG8o1cN67tq0dKLWnlT8s7Rf5RBJGfD+afA9CvH08IgW3loK4I000b6fHyuDln+Cn
+	 LOJSjOaWvLAZnq7OLRbB9R64rQJRSzBRcw1qhaCa9rFjRJhIiLcnBKWcwpL61b2jaT
+	 P3qi621fZSrczSR3en4WDWOb47csHNloUZDK+/fHryFgRDvtoQ60ZxKSO7R1Rlf/RU
+	 k2MO9A1obwx7MydCXj6lbC/x5jCFTIskDmIDcbwkPVUPPDPFcjdVUL5IEo0fh2AvLd
+	 FhZTd5lBnrh8XV+615p+LTS96cmw+H4A9vYsS78PcCyZPrmVWOH2CeDrmwXHWvJ+nK
+	 6hZwRGzAHxFpw==
+Date: Sun, 27 Apr 2025 21:07:28 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-block@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+	netdev@vger.kernel.org
+Cc: Zach Brown <zab@zabbo.net>, Matthew Wilcox <willy@infradead.org>
+Subject: Re: Call for Proposals for fossy.us 2025
+Message-ID: <20250428040728.GA1035866@frogsfrogsfrogs>
+References: <20250422033344.GI25700@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,23 +59,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250425093556.30104eda@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20250422033344.GI25700@frogsfrogsfrogs>
 
-On Fri, Apr 25, 2025 at 09:35:56AM -0700, Jakub Kicinski wrote:
-> On Fri, 25 Apr 2025 03:54:38 -0700 Shradha Gupta wrote:
-> > +	spin_lock_irqsave(&gc->irq_ctxs_lock, flags);
-> > +	irqs = kmalloc_array(nvec, sizeof(int), GFP_KERNEL);
+On Mon, Apr 21, 2025 at 08:33:44PM -0700, Darrick J. Wong wrote:
+> Hi folks,
 > 
-> Could you please test your submissions on a kernel with debug options
-> enabled? Thank you!
-> -- 
-> pw-bot: cr
+> I'd like to (very belatedly) invite you all to the 2025 fossy.us
+> conference that's being put on by Software Freedom Conservancy:
+> 
+> https://2025.fossy.us/
+> 
+> This is their third year of operation, and this time they've added a
+> track for Linux kernel topics!  Originally the track was going to be run
+> by willy and I, but he had to drop out for various reasons.  zab has
+> stepped up to fill the gap.
+> 
+> We're looking for people to propose sessions for the track.  These can
+> be informal presentations, discussion sections, or even a panel.  In the
+> past two editions, the attendees have ranged from technical folks from
+> userspace projects to free software advocates who operate in the
+> political and legal spheres.  I think the most interesting topics would
+> involve the kernel <-> userspace barrier, or technical deep-dives into
+> how do the more complex parts of the kernel actually work, but I
+> obviously have kernel-tinted glasses and welcome any strong proposal.
+> 
+> Anyhow, the CfP deadline is April 28th, so please lob whatever proposals
 
-Thank you Jakub. Will send out a newer version with this change.
-Also, would make sure to build with debug options enabled for subsequent
-submissions.
+...and has now been extended until May 5th.  We've gotten a few
+proposals and look forward to the rest! ;)
 
-Regards,
-Shradha.
+--D
+
+> you have soon.  The conference is in Portland, Oregon (USA) at the end
+> of July, which ... I know is going to be problematic for a lot of
+> people.  This is a tough year for conferences (both planning and
+> attending) so if you have questions, please feel free to ask them here
+> or privately.
+> 
+> --Darrick (and Zach)
+> 
 
