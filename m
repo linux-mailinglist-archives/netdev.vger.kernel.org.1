@@ -1,86 +1,151 @@
-Return-Path: <netdev+bounces-186456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D634A9F355
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02A48A9F369
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB2D7463264
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D3E5A251C
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46C026C387;
-	Mon, 28 Apr 2025 14:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84AB26D4FC;
+	Mon, 28 Apr 2025 14:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Un5qawjW"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GuTa/GwU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F521527B4;
-	Mon, 28 Apr 2025 14:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777EA26B962;
+	Mon, 28 Apr 2025 14:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745850189; cv=none; b=Avi0XkBu0R5H6G02w28xPZ446G6xfPYZea8Hkvzt8HOoNRPKB9d6SIfAIKE8rSDIExTgqizw7zU4HE/7Tlk6+jQP05f/3KB1HCMEOBPPcEvirJ5vRp3qQK3RAP4ogu6j95o1rfTDtNYIgCbGSAJo7j5qQFK/25cItmVVn5B/8Fw=
+	t=1745850560; cv=none; b=K9g79Fv0kcye7b2HmZsh5gE2eixUxtKCd5DZ+1a+66B33g3XCt76fv+ZoCL2P9a6BoaCxhViYtLUY8tayNTHi03ZJuKJQRNFLEKFqBgHQQyGZ5wKPs/KBxv11XmfcyevFCfN4jSeeSKS5CxDBb1ebLaFl6FspCizkDMtlKjwsV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745850189; c=relaxed/simple;
-	bh=pkWJKi2o7+wr978ci73S7Jnm3yZMHVsqZR/8sngjnNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSrF6GZVIArmDQlfsDnijfYy7xutKzJOICtzMtkMWOSFHnY6rc3ddqM8on4FRnmiBpwGdrRZT8sfZFiIArVxf90QsvVT5TSr487CNxXZF6A+0XvwiGnL9fMUt97Y1cAU6e0DigkilyHaRIvNfs66QER/zAJ7oHT376vr/2tdZeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Un5qawjW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KgWHsUCUBEFv7Ycjxi4yK47joNYceiEjUCO7mVk084w=; b=Un5qawjWiRpBR2oqejia2d9Kj/
-	xECAGDlhKTvArROD6H9+JryYC0fxjNWD9oZitkfGUwAdn/SV5iv060Pep1TabLnggefqREufbzmH3
-	JUZbiAHQ/cfufXb8dNwg2sgOb07ukMIm/J6qv1J0tIjtOaoOKldhb93bWuFUKUxqyeXQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u9PNr-00AqV3-I3; Mon, 28 Apr 2025 16:22:59 +0200
-Date: Mon, 28 Apr 2025 16:22:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Qasim Ijaz <qasdev00@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on
- non-zero PHY ID
-Message-ID: <3a84b8a8-f295-472c-8c3f-0655ff53f5cc@lunn.ch>
-References: <20250412183829.41342-1-qasdev00@gmail.com>
- <20250412183829.41342-6-qasdev00@gmail.com>
- <b49e6c21-8e0a-4e54-86eb-c18f1446c430@lunn.ch>
- <20250415205230.01f56679@kernel.org>
- <20250415205648.4aa937c9@kernel.org>
- <aAD-RDUdJaL_sIqQ@gmail.com>
- <b492cef9-7cdd-464e-80fe-8ce3276395a4@lunn.ch>
- <aAtgOLMnsmuukU42@gmail.com>
+	s=arc-20240116; t=1745850560; c=relaxed/simple;
+	bh=rJLdBVQbvCv+TluCWMpZ9vIsstIJLp+u2Vh5mAtrQnQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZiRyNJiId7z+sr3EIppydHh+GXgSfaMGIzZfycpYon07OeODiKudKtqgfUGz+TnCkbaRhNsZWjoE96oawbSigjD6gcw1JHFaqhpKQXM/RueS1nIdaVyPcb4t3wOvzEyl0j7zvSW/Qw029w+GiViRVSzaStBYOt7FICnO5Qp3mwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=GuTa/GwU; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53SESiWF2797224
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Apr 2025 09:28:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1745850524;
+	bh=RBnt6oCOdXftASOE020D1oKxhactwZNgt5XQP4zEG/g=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=GuTa/GwUemjpMPB21SqSYZEWi8J73Q9cSTDCHdOGiWTFgWJZx3Jmjo8ep6SYaL4mT
+	 Sem9HbvtdPMacM3XxfBBejYAxRVA4XBuZ5HlbmNuysJDAgvoSPgF85+JXJcbOJjq0U
+	 jpzx7fhACyOWooFH+E1/3X3luNknWIBdRuTJfFBA=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53SESivY077126
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 28 Apr 2025 09:28:44 -0500
+Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 28
+ Apr 2025 09:28:44 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 28 Apr 2025 09:28:44 -0500
+Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53SESgc4076217;
+	Mon, 28 Apr 2025 09:28:43 -0500
+Date: Mon, 28 Apr 2025 19:58:42 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        "Russell King
+ (Oracle)" <linux@armlinux.org.uk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Andy Whitcroft
+	<apw@canonical.com>,
+        Dwaipayan Ray <dwaipayanray1@gmail.com>,
+        Lukas Bulwahn
+	<lukas.bulwahn@gmail.com>,
+        Joe Perches <joe@perches.com>, Jonathan Corbet
+	<corbet@lwn.net>,
+        Nishanth Menon <nm@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux@ew.tq-group.com>
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
+ update descriptions of RGMII modes
+Message-ID: <8b166e41-8d21-4519-bd59-01b5ae877655@ti.com>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <aAaafd8LZ3Ks-AoT@shell.armlinux.org.uk>
+ <a53b5f22-d603-4b7d-9765-a1fc8571614d@lunn.ch>
+ <aAe2NFFrcXDice2Z@shell.armlinux.org.uk>
+ <fdc02e46e4906ba92b562f8d2516901adc85659b.camel@ew.tq-group.com>
+ <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aAtgOLMnsmuukU42@gmail.com>
+In-Reply-To: <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Fri, Apr 25, 2025 at 11:13:12AM +0100, Qasim Ijaz wrote:
-> Hi Andrew, Jakub
+On Mon, Apr 28, 2025 at 04:08:10PM +0200, Andrew Lunn wrote:
+> > > However, with the yaml stuff, if that is basically becoming "DT
+> > > specification" then it needs to be clearly defined what each value
+> > > actually means for the system, and not this vague airy-fairy thing
+> > > we have now.
 > 
-> Just pinging on my last message. Any thoughts on how to proceed with
-> this patch series, I left my thoughts in the previous message.
+>  
+> > I agree with Russell that it seems preferable to make it unambiguous whether
+> > delays are added on the MAC or PHY side, in particular for fine-tuning. If
+> > anything is left to the implementation, we should make the range of acceptable
+> > driver behavior very clear in the documentation.
+> 
+> I think we should try the "Informative" route first, see what the DT
+> Maintainers think when we describe in detail how Linux interprets
+> these values.
+> 
+> I don't think a whole new set of properties will solve anything. I
+> would say the core of the problem is that there are multiple ways of
+> getting a working system, many of which don't fit the DT binding. But
+> DT developers don't care about that, they are just happy when it
+> works. Adding a different set of properties won't change that.
 
-I would suggest you do the minimum, low risk changes. Don't be driven
-to fix all the syzbot warnings just to make syzbot quiet. What really
-matters is you don't break the driver for users. syzbot is secondary.
+Isn't the ambiguity arising due to an incomplete description wherein we
+are not having an accurate description for the PCB Traces?
 
-	Andrew
+A complete description might be something like:
+
+mac {
+	pcb-traces {
+		mac-to-phy-trace-delay = <X>; // Nanoseconds
+		phy-to-mac-trace-delay = <Y>; // Nanoseconds
+	};
+	phy-mode = "rgmii-*";
+	phy-handle = <&phy>;
+};
+
+In some designs, the "mac-to-phy-trace" and the "phy-to-mac-trace" are
+treated as a part of the MAC block for example. Depending on which block
+contains the trace, the delay is added accordingly.
+
+Regards,
+Siddharth.
 
