@@ -1,129 +1,192 @@
-Return-Path: <netdev+bounces-186343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E924A9E7FB
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:06:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033A9A9E89F
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:55:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A2C3BBAFD
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C6F93ACCFB
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8351DF247;
-	Mon, 28 Apr 2025 06:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF491D5141;
+	Mon, 28 Apr 2025 06:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TEQLkMIE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yam0fW8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E53E1C84AA;
-	Mon, 28 Apr 2025 06:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAA6610C
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 06:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745820233; cv=none; b=aREVpus182FwOsphqYOZ6JKa0cChSZ5UPrzHGh9CCfS6vPdXIZAVqp0r/5cOc6ffEct95DBOJziBT/i2ggYrfAXLgyTEDI+CMV7RYsYDIXHqZ/cTrhdKr6mh5KQv78U05a6LZHmx3Xko8JPWLZDrdS0yk+MYUqWvjwvXGHXpWzc=
+	t=1745823354; cv=none; b=K4rK/jxZAEcDiHgACQD/4zGwb2olqZUupYd+Hl++dtQQZUiPMVIy6nkHeDvWtrgFnUDX9DdUZoCVyxQwopI5VC2Qek1TL729kZj933HNprKONH0VxEGgfoahqsyxXLLv256k7ohRoJvxM4XvrhOK7aJynaFe+iRzTYVk7UHApQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745820233; c=relaxed/simple;
-	bh=Id+TWx5/otkd8lgaTSNghybHj9Zco76B3Ud7RehbGmk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dEckXeUXwJgPc4KuVQ8XHEOiMo941Ex9ZrdHp8Lp+aPr5CPrhodlekAv0l/Uy1UkY3UloV0tSTIJXFmwZjm6o3QocfgkL13SZu/Zkn/wp5hfN+/W9VvWtYrDB3cXa6H9BELOoHyw0jSppi1RgkAhvmPC6fMVlQvZcpDKG7XNthM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TEQLkMIE; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745820233; x=1777356233;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Id+TWx5/otkd8lgaTSNghybHj9Zco76B3Ud7RehbGmk=;
-  b=TEQLkMIEeGDwT2Fn/lIJOPIDrPZ126PiEM14VKNz+hHuqt1IFb0io3dq
-   0BV67FFRYhfscrFFaMPd0XtELGFzNpSyGhHvnjhk6kiw6zbmnZVineGE/
-   ciM5OBwJWYRG7+PjAtUzbZHXLp5H72iqJhx3h/3fmEoMRqyl8zx4IIA06
-   cNwocnaQ+PPwkv5AN001HQeANJJVw2NW2a26kk6cU6UuKzgqAP/bSvFd6
-   XKAeog7BxwoTPxrTPD4/Xh9LVLQGDo5v4qR6sDBcktH9dtDE9P2usmeo7
-   3uw5Emk+9KmInJdAkO//iDX+fOkcXJQi+Az67wc3jHiWOyiHy2pWgvN20
-   A==;
-X-CSE-ConnectionGUID: 3cWobGioRUarIkaOxHxjZg==
-X-CSE-MsgGUID: B105CMFOQsaW9xxMyeAGhA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="51064665"
-X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
-   d="scan'208";a="51064665"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 23:03:52 -0700
-X-CSE-ConnectionGUID: J/lL2KBgTs6w8ezYH0CU9A==
-X-CSE-MsgGUID: h/Gmrk5KRauDuJDkVM/2xg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
-   d="scan'208";a="133340847"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa006.jf.intel.com with ESMTP; 27 Apr 2025 23:03:49 -0700
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: [PATCH iwl-next v1 8/8] igc: SW pad preemptible frames for correct mCRC calculation
-Date: Mon, 28 Apr 2025 02:02:25 -0400
-Message-Id: <20250428060225.1306986-9-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
-References: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1745823354; c=relaxed/simple;
+	bh=5tJ0l2LxUVOnOuUk7/ZKkE5x1HzMXj9Pk6xuZ6vwECg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K4/kb1yOMgjG9r3QtzCRDLvatouwZBmX4bP4rHtcJFSWhGcug0oJJf/86qDWt0niBrZOWF7E3Nc5/+ZM1iLKj/4JfxVuBDgEICAiY1zouoSRpPCiVKYPANpluIiZ3Vv8K89W8L9f23WeHt1A0hZcIymCQ1umD3btdKu+yA72Igk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yam0fW8u; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2260c91576aso36470825ad.3
+        for <netdev@vger.kernel.org>; Sun, 27 Apr 2025 23:55:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745823353; x=1746428153; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8TE+ayV+HlhLqI7uVlx4zb0IXbibAaU8X2gniHQ7CpM=;
+        b=Yam0fW8uxrA5VBCP3OXMJXwxM+H7tCGC52qDijE8wbSwiWnyjbS2FEZL2XtqRFLpd3
+         4E5x/Gp51PnviNrnJJ9BUcNAt/vCfuGX1Dzr0j1R5kUiUmVA/MRlb/OjQ4+0N6It1fjX
+         UtbjzYyA4uwYQ8MS2tzyCtd0yRWnfNtVi0r20MvOaw0lQZGRy5aLTnb1xnFuNdfpwxge
+         g6TwWLhDwjr3CeB7Tpc4mogg3kvzWJ5h9lV60NTDBKFESfk4ehfD6DM1CI6T5rXZDFIr
+         DzfKEbguhml9oxCqjxsx339tIgnRuvX3NtDRCUfpntagOIBMMm6uchU+6kWAVtmY24DG
+         sKqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745823353; x=1746428153;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8TE+ayV+HlhLqI7uVlx4zb0IXbibAaU8X2gniHQ7CpM=;
+        b=V27SzItWjFq+oKp44RuavsC8uYylIVCTSd2j1gFMJltvIBpmA5Qwn3EeFEumdhNdJU
+         KSADjVy+P+dxNfKtSAKcFzWq8/cN+fpTAHLdGE/gAcPiWxgnbq+srO7qaOHfdRYhelgH
+         +s9/3zpoCJNGIuZWqlmI54HeyTQm2QYjgHgkOiy4YIK1jBWlFxzkYZTxV+JJwzRsHw7z
+         vxMicw62/bbj+Kb7aAuoSPMomKPcc+2GGgil6N2nMn3zvoI2xwu8UbpV792g7WFRIs73
+         j6d+qw+lZr4I3oazD5g32vB8YxxNvJUl8RumpGKAOMXPMfSu9VRpzHpS657tglfvJICX
+         jDUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQt1oEN8Rvu917MWPML4jsZrFt9jlbZnqZ7qcTepir3NqAWQJAarSHbsQKef3WO3+2Ofy8+Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrPVjIHPgotpxuZVwuPBXB6pLaH839+Ze78Li6w3gd8BxmCsPV
+	5h2SnTsSmY4AR3U8mrvCSjEuDJfMnRKhyQ07OIMGhJPE7qP5XtJeTMWMurIhnjH2nQHCOvmJtL8
+	ZEvuOhjRl5dof4tFcZZNPIjRMu+w=
+X-Gm-Gg: ASbGncsKQ3Qppj3k1/dmIL2pvXZKyqDZMJ1/JU+exG2EcwLAY5gygjokR5mdUShc/9P
+	WXwoa35EzrfxTfLn1XqXLAlUceH2CEUy8b6LACQg/njMI9Z1H1IhP47lhrnNwdIeThx8SW+t63j
+	JXgTNR6Hm5USntFs9pU+xVPqWphVFj+eF85euBUvku25w2WVJtgH60NwLr
+X-Google-Smtp-Source: AGHT+IFc7RZZPMjMS94wTmFX2XjKgLByl0KVaMX0JIbRLpi0ETNeIa00aly3yPdUMNXM9EOTJbts9tbISXzj3aYzACw=
+X-Received: by 2002:a17:902:ea07:b0:224:e33:889b with SMTP id
+ d9443c01a7336-22dc6a02897mr137090865ad.12.1745823352610; Sun, 27 Apr 2025
+ 23:55:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAEFUPH1Erfh9YUctVDHxL8TWsiVfs+Fr8aJLtrjiKECbiGTxHQ@mail.gmail.com>
+ <aAjSCwwuRpI8GdB7@shredder> <CAEFUPH0cU-5ZJ_qAevp1DENYrUkSO4zipUTg0vzLmgz16nPbbw@mail.gmail.com>
+ <20250424102240.dxyk5uf6t6xfnd2k@skbuf>
+In-Reply-To: <20250424102240.dxyk5uf6t6xfnd2k@skbuf>
+From: SIMON BABY <simonkbaby@gmail.com>
+Date: Sun, 27 Apr 2025 23:55:41 -0700
+X-Gm-Features: ATxdqUFPWAQukvOHrlF1wcEyiOnB1OrsxnrNMOe1-YpUNI36ExfQpGBK9tFi-aE
+Message-ID: <CAEFUPH1uvr1O1RNk6Ru953cs4bbXbudma7hyZyYnWdbkqD8b6Q@mail.gmail.com>
+Subject: Re: query on EAPOL multicast packet with linux bridge interface
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+Hi,
 
-A hardware-padded frame transmitted from the preemptible queue
-results in an incorrect mCRC computation by hardware, as the
-padding bytes are not included in the mCRC calculation.
+Can someone please suggest if we need all the patches in the link
+below for 802.1x to work on a  bridge interface with DSA  marvel ports
+?
+https://lore.kernel.org/lkml/20221022115505.nlnkfy2xrgrq74li@skbuf/T/
 
-To address this, manually pad frames in preemptible queues to a
-minimum length of 60 bytes using skb_padto() before transmission.
-This ensures that the hardware includes the padding bytes in the
-mCRC computation, producing a correct mCRC value.
+I also noticed that the iproute2 package in my kernel version does not
+include the "locked" port option. Is that the cause for the EAPOL
+packets forwarding issue on the bridge interface ?
 
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Regards
+Simon
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 6b14b0d165f0..d495aee58601 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1685,6 +1685,15 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
- 	first->tx_flags = tx_flags;
- 	first->protocol = protocol;
- 
-+	/* For preemptible queue, manually pad the skb so that HW includes
-+	 * padding bytes in mCRC calculation
-+	 */
-+	if (tx_ring->preemptible && skb->len < ETH_ZLEN) {
-+		if (skb_padto(skb, ETH_ZLEN))
-+			goto out_drop;
-+		skb_put(skb, ETH_ZLEN - skb->len);
-+	}
-+
- 	tso = igc_tso(tx_ring, first, launch_time, first_flag, &hdr_len);
- 	if (tso < 0)
- 		goto out_drop;
--- 
-2.34.1
 
+
+
+
+On Thu, Apr 24, 2025 at 3:22=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
+>
+> Hello Simon,
+>
+> On Wed, Apr 23, 2025 at 06:26:40AM -0700, SIMON BABY wrote:
+> > Thank you Ido.
+> >
+> > Here is the details of my setup:
+> >
+> > I have a microchip CPU connected to an 11 port marvell 88E6390 switch.
+> > I am using the marvel  linux DSA driver  so that all the switch ports
+> > (lan1, lan2, lan3 etc) are part of the linux kernel.
+> >
+> > I am using hostapd as an authenticator.
+> >
+> > An 802.1x client device is connected to port lan1 and binds this port
+> > (lan1) to hostapd daemon, I can see EAPOL packets are being forwarded
+> > to a radius server.
+> >
+> > I have created a bridge with vlan filtering with below commands and
+> > bind the bridge (br0) with hostapd daemon. Now EAPOL packets are not
+> > forwarded.
+> >
+> > ip link add name br0 type bridge vlan_filtering 1
+> > ip link set dev lan1 master br0
+> > ip link set dev lan2 master br0
+> > bridge vlan add dev lan1 vid 10 pvid untagged
+> > bridge vlan add dev lan2 vid 10 pvid untagged
+> > ip link set dev br0 up
+> > ip link set dev lan1 up
+> > ip link set dev lan2 up
+> > ip link add link br0 name br0.10 type vlan id 10
+> > ip link set dev br0.10 up
+> > ip addr add 192.168.2.1/24 dev br0.10
+> > bridge vlan add vid 10 dev br0 self
+> >
+> > bridge vlan show
+> > port              vlan-id
+> > lan1              10 PVID Egress Untagged
+> > lan2              10 PVID Egress Untagged
+> > br0                10
+> >
+> > echo 8 > /sys/class/net/br0/bridge/group_fwd_mask
+> > cat /sys/class/net/br0/bridge/group_fwd_mask
+> > 0x8
+> >
+> > root@sama7g5ek-tdy-sd:~# cat /etc/hostapd.conf
+> > ##### hostapd configuration file ######################################=
+########
+> > # Empty lines and lines starting with # are ignored
+> >
+> > # Example configuration file for wired authenticator. See hostapd.conf =
+for
+> > # more details.
+> > interface=3Dbr0
+> > >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>passing br0 as interface to
+> > hostapd.
+> > driver=3Dwired
+>
+> Could you please clarify what is the expected data path of EAPOL packets?
+> (I also have no experience with hostapd)
+> Is the forwarding to the RADIUS server something that is handled by
+> hostapd, through an IP socket, or is the kernel responsible for doing
+> that automatically somehow? Is the RADIUS server IP accessible? Does
+> hostapd log the reception of EAPOL packets? I'm trying to understand
+> whether the problem is that hostapd is not receiving or not sending
+> packets.
+>
+> I think the hostapd.conf "interface" option can be overridden by '-i'
+> command line options. I'm wondering if there's any chance that is going
+> on, and hostapd is not listening on br0.
+>
+> I don't understand the need for group_fwd_mask. In my image, you don't
+> need software forwarding of EAPOL packets among bridge ports (which that
+> option provides). You only need EAPOL frames to be received by a packet
+> socket, and routed using IP to the RADIUS server, correct? Can't you
+> just specify multiple '-i' options to hostapd, for the individual bridge
+> ports like lan1, lan2, and skip the bridge data path processing for
+> these packets, as happens by default when no group_fwd_mask is specified?
+>
+> Are you also using some other bridge port options, like 'locked', which
+> you are not showing in the steps above?
 
