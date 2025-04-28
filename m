@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-186348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3058DA9E92A
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:23:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF75A9E931
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 09:24:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 487B13B5753
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 07:23:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A5B33B8393
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 07:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F341DF26F;
-	Mon, 28 Apr 2025 07:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732461DDC2B;
+	Mon, 28 Apr 2025 07:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nn7zweaZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t94DEvDU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067F61DF267;
-	Mon, 28 Apr 2025 07:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4069F1DB34B;
+	Mon, 28 Apr 2025 07:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745824921; cv=none; b=iXiBrQka0idGBiqKy7U+9OzYp7JhcaPnvPkWkwY4qDYbdqYfMQ4LlggzIMnSKM4IO7jj6B59yXw0eukfa6FX9o+5MXhQDLTdAIB2BaGCdY6Mxh4yBJi0csiDZKVMzbs+ybWbW0PFiWgD6xPAe8yf68d3dLgP15uA/8hXQpq4fLA=
+	t=1745824982; cv=none; b=TkTibaQfPQ7PESXTT8Td7EIrwrhJOUBAEViUvfV+ZSXyj0GT8XRIMIUHYIgOw9twgmwUvu2mtK5o4vouDjgxKrXp1cagynxvcvTF63Xbfq95UG3e3mdZRBmZOQh19wQi/C1ZqmfnczD9ANCfDSOQ1vYzxBddDBRCQFSiaAMHkIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745824921; c=relaxed/simple;
-	bh=lRQiEbQpx7U8/3WtfWFOwT8LyXiXIfna8PPJezfTB5Y=;
+	s=arc-20240116; t=1745824982; c=relaxed/simple;
+	bh=qP/8wVu9kz7JxXZ42YE7w0X2oBw+B6PGhKfko70XC1A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n7xf07eiJV2KgxI+naeQ5B5A4CeVH+NcA2D9r4hxU9kFUbcEOtDIh+ARW3J9pSNQoJfLYiOLJ9X4bjN8Mphr9wBhloxY4wegLZ77bp3VJX+44PExqrljkz5odCqIqE6wPQ5GST3H/+Uki9wtrT8hapF03IGduTFhvLJrcM6QWVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nn7zweaZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E48A9C4CEF1;
-	Mon, 28 Apr 2025 07:21:59 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=lY5vXv91b9kpFK3/sM+TZelj03xGYaB0soDCP08HufA1uKV5A/ChW+9xG7doh82Xq73mqejtKujdQ7T0kHAVREWo/qeYgjxsFLLVinotrqrYrWR3SlDiy+wdI/Bp840K3myoFRpzf7o9KNIBIxn7Ghoc3pHcHcaEv8hhjMywCmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t94DEvDU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC7BC4CEE4;
+	Mon, 28 Apr 2025 07:23:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745824920;
-	bh=lRQiEbQpx7U8/3WtfWFOwT8LyXiXIfna8PPJezfTB5Y=;
+	s=k20201202; t=1745824981;
+	bh=qP/8wVu9kz7JxXZ42YE7w0X2oBw+B6PGhKfko70XC1A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nn7zweaZPy8ychArCeB3fYc2ZUOl+4VZ4+gnyTnQq55xjOU29vKvT804qzRRf0lx3
-	 qM3Rloz1QLn3Igy7DLLnabjLF/4GjJZHnYn2+abes1EdxjEk7jmA2QOo8vmijgOZf7
-	 x1q/W13EOHSdgVAF6lfsG53w+9Ny8p/BpbpOaz94tg8/mGMxu2W5lWN2/AiQ6Hzmni
-	 Mr7gZtURFX2OQrrY5gehZybWOYncZcfU95hvGWXVSpdGH/l2ekmUj6G0xt/IUiXkyT
-	 HDcyfV3wHJVhesMwlI4FNiw+Culk1dLbYsvFgGLx9d3kAB2LaSdaaWB0WpQuWNe7vs
-	 8RMxvFRpD4JvA==
-Date: Mon, 28 Apr 2025 09:21:57 +0200
+	b=t94DEvDU03gDddW43clwxceIcPAB2+GzF2WaZICJGfgbmDrd1Ns4viVu7ZniKI/Zv
+	 dJG6PV3+RmBkV2AGzDsqvuC6UQEpvebsYRWW1JSYJgwj1/ia+GJ7Zc+znQtbp67iYa
+	 4eN68nGvHpFr4MUEkGV3Q5zqBkCx1IUfYohtQoRZtHvK47qxLtGRVH0G1NuZOpTsuC
+	 1yrR/OZ57JtDnLBuTPskbe45xdaN4UkaqYgYkwkBZWAYM8jaIurkvZDBx4ztRe7cWQ
+	 HsDGJqKihvuGc8p+wk32Q/L9HpXztpak8KSDED4aw6D6VxPG9AipDCwWBWqqZrQrLN
+	 mO6hqAQMGF+VQ==
+Date: Mon, 28 Apr 2025 09:22:59 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Yixun Lan <dlan@gentoo.org>
 Cc: Rob Herring <robh@kernel.org>, 
@@ -53,10 +53,10 @@ Cc: Rob Herring <robh@kernel.org>,
 	Andre Przywara <andre.przywara@arm.com>, Corentin Labbe <clabbe.montjoie@gmail.com>, 
 	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] dt-bindings: sram: sunxi-sram: Add A523 compatible
-Message-ID: <20250428-vegan-stoic-flamingo-1d1a2a@kuoka>
+Subject: Re: [PATCH v2 2/5] dt-bindings: arm: sunxi: Add A523 EMAC0 compatible
+Message-ID: <20250428-prehistoric-fragrant-bear-163afa@kuoka>
 References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
- <20250424-01-sun55i-emac0-v2-1-833f04d23e1d@gentoo.org>
+ <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,30 +65,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250424-01-sun55i-emac0-v2-1-833f04d23e1d@gentoo.org>
+In-Reply-To: <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
 
-On Thu, Apr 24, 2025 at 06:08:39PM GMT, Yixun Lan wrote:
-> The Allwinner A523 family of SoCs have their "system control" registers
-> compatible to the A64 SoC, so add the new SoC specific compatible string.
+On Thu, Apr 24, 2025 at 06:08:40PM GMT, Yixun Lan wrote:
+> Allwinner A523 SoC variant (A527/T527) contains an "EMAC0" Ethernet
+> MAC compatible to the A64 version.
 > 
 > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Yixun Lan <dlan@gentoo.org>
 > ---
->  .../devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml     | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> index a7236f7db4ec34d44c4e2268f76281ef8ed83189..e7f7cf72719ea884d48fff69620467ff2834913b 100644
-> --- a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> +++ b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> @@ -50,6 +50,7 @@ properties:
->            - enum:
->                - allwinner,sun50i-a100-system-control
->                - allwinner,sun50i-h6-system-control
-> +              - allwinner,sun55i-a523-system-control
->            - const: allwinner,sun50i-a64-system-control
+>  Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml | 1 +
 
-No update for the children (sram)?
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
