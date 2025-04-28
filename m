@@ -1,151 +1,193 @@
-Return-Path: <netdev+bounces-186457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A48A9F369
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:29:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09B57A9F37F
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D3E5A251C
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:29:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F79168F37
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84AB26D4FC;
-	Mon, 28 Apr 2025 14:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C2C269883;
+	Mon, 28 Apr 2025 14:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GuTa/GwU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ghabFW4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777EA26B962;
-	Mon, 28 Apr 2025 14:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C975C2AD04;
+	Mon, 28 Apr 2025 14:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745850560; cv=none; b=K9g79Fv0kcye7b2HmZsh5gE2eixUxtKCd5DZ+1a+66B33g3XCt76fv+ZoCL2P9a6BoaCxhViYtLUY8tayNTHi03ZJuKJQRNFLEKFqBgHQQyGZ5wKPs/KBxv11XmfcyevFCfN4jSeeSKS5CxDBb1ebLaFl6FspCizkDMtlKjwsV8=
+	t=1745850835; cv=none; b=RUfhY6BUStYBWdWyHMWzg+342leONfzsfy7gOW6APiqf7id2V2EtW+HUSZtRoI7sdNfMt991vyZbLN6U6UG20QIrCEynqpCTP5zi0R6h00DL4yHMz9ujRM4t4ibDaZbgCmEzba2A1gNkBKM3c1yWjtvBYcjiuHtt1okjCj0C+gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745850560; c=relaxed/simple;
-	bh=rJLdBVQbvCv+TluCWMpZ9vIsstIJLp+u2Vh5mAtrQnQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZiRyNJiId7z+sr3EIppydHh+GXgSfaMGIzZfycpYon07OeODiKudKtqgfUGz+TnCkbaRhNsZWjoE96oawbSigjD6gcw1JHFaqhpKQXM/RueS1nIdaVyPcb4t3wOvzEyl0j7zvSW/Qw029w+GiViRVSzaStBYOt7FICnO5Qp3mwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=GuTa/GwU; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53SESiWF2797224
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 28 Apr 2025 09:28:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1745850524;
-	bh=RBnt6oCOdXftASOE020D1oKxhactwZNgt5XQP4zEG/g=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=GuTa/GwUemjpMPB21SqSYZEWi8J73Q9cSTDCHdOGiWTFgWJZx3Jmjo8ep6SYaL4mT
-	 Sem9HbvtdPMacM3XxfBBejYAxRVA4XBuZ5HlbmNuysJDAgvoSPgF85+JXJcbOJjq0U
-	 jpzx7fhACyOWooFH+E1/3X3luNknWIBdRuTJfFBA=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53SESivY077126
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 28 Apr 2025 09:28:44 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 28
- Apr 2025 09:28:44 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 28 Apr 2025 09:28:44 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53SESgc4076217;
-	Mon, 28 Apr 2025 09:28:43 -0500
-Date: Mon, 28 Apr 2025 19:58:42 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        "Russell King
- (Oracle)" <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Andy Whitcroft
-	<apw@canonical.com>,
-        Dwaipayan Ray <dwaipayanray1@gmail.com>,
-        Lukas Bulwahn
-	<lukas.bulwahn@gmail.com>,
-        Joe Perches <joe@perches.com>, Jonathan Corbet
-	<corbet@lwn.net>,
-        Nishanth Menon <nm@ti.com>, Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux@ew.tq-group.com>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <8b166e41-8d21-4519-bd59-01b5ae877655@ti.com>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <aAaafd8LZ3Ks-AoT@shell.armlinux.org.uk>
- <a53b5f22-d603-4b7d-9765-a1fc8571614d@lunn.ch>
- <aAe2NFFrcXDice2Z@shell.armlinux.org.uk>
- <fdc02e46e4906ba92b562f8d2516901adc85659b.camel@ew.tq-group.com>
- <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
+	s=arc-20240116; t=1745850835; c=relaxed/simple;
+	bh=d20GTipVbRB3l5zgAl3x510pauuP792d74b6b3Gl7js=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pAVcw+1zqjeCvAVh2ilpCOCtJas63zQwaZmU+UHNC9sgzRRFPWpyQJuBPthfd4KOTFNqRoKuOW33cLA4onWGKVmw1GB0k/cWUMppmPfaGb6q+oQvuqOKMK7EMnRWhZoNyphvBcmxgibOnlv5RQilVOWYPM0vU/louhqo0z9dAsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ghabFW4Q; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39d83782ef6so4090706f8f.0;
+        Mon, 28 Apr 2025 07:33:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745850832; x=1746455632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eLMBJu2+m8wSyhJfUpw0sbyDZyeYRNuTT+ciFfWuFWs=;
+        b=ghabFW4QeQaTh0R/Yn/vre4oIFoWN4mooZOPggbvnvHCCh0Hz+81naBLJPX8j5HrId
+         G88Qo+Zlm0X8Kr+DT6L+cyBZNHqdL4i/kg2IC3n70jPmq+cJz4pC6Be2aTv4okilQsfv
+         mQBctZD1Ny1sAmeYt1t4I80gEOtRM1EwFrlKOiSkGylKK2QTH8gJI9FZqMj4zCn/me8o
+         Oq8vE2oCc/WE7krHne68bhdze6uiLC+Ga9OWcAFx2Gbqhi9uB9UT67mIYIV8Otv13Jk7
+         2GasXqzkerMXDVJma3KigI4HUGeL2TCtTvBsxD0/MdlBTiyb/+nq0hXznS3Rd5O8iMXl
+         mXQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745850832; x=1746455632;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eLMBJu2+m8wSyhJfUpw0sbyDZyeYRNuTT+ciFfWuFWs=;
+        b=O21EoqbCN52XKrhduXxFgiB5v9eocleSGwwu+ecFJQqDWoNFowJwl+/kCQQzpeyEMI
+         r4+uWBU34K/0IYqf0CJ+UggGCUAiBFBGQDNkRNo9L77kwPz6w2SaRsWTOLRFNFLGnN+b
+         9azaJoy5ezEpH0Ks46t2t4rDRJc5/i6noM/Kqhir7PRVbj7+44hnBS3SSuJJPX+iuv23
+         KQ9dC8/dyEwb27334XyUQmP4XNHO18oq9lh2G3Z1LyD3g4T6xalHQTSJR6HA9Unke3Oc
+         ROHI9dZNVYnB0nxNawHg/BuRYJDfeeTaAnjrPtwJMRbvJM8tG6nsQl/US6/1FawNYYUl
+         SGYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXZjPeprLL9vBb+6dho4o5sE6c5vh1BDgI4JSPbsEm5UZO89TYSCb1gSq+YcHRpOMM0+4uagZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB0vYD/mgAEr3Cd+MPvK4hacnkjg5cQ19yySD4nkchE9AkBWoR
+	Epz0RLECe/ZCF5ZJ2BtX2huBl9FEgAgr9Y8Xn0cgv/ryjlRHAP5p
+X-Gm-Gg: ASbGncu1qr4K1ZoLlFqPn173xYmNnto77BbNfFII/XILB92+rAc6/+57/Wb1Z/8WPyH
+	sCMBCdxH9H+5BmefGLQnO5aejmTip3xEfFUxjRcQjDjQy8IwIVAThE5xFG1wazR1GFjxLMBDYq5
+	4rJdx9MrVVW4dM4faKSoYpk5dXxeRG2arjull3vRdvFnw1sZ1tfvgTiK4+zgGijZmMu4hUOVjdp
+	J+2os9qLlvmyEZs3Y3KrS7s50PrCsXyYFGIb7yee2iYc+vOJ1Wem/63zGQiC9KzRvEQZHHvPIoE
+	vfppNVb4B7+mHSVkvdd9wQju/htPRPuiAuS7zrLVhPeahKcsMFK1v3XCgEHYe65dk+bDKF61ok7
+	YPTY=
+X-Google-Smtp-Source: AGHT+IGVnfynXJTNx19/KSZv+fN8acHct+F6K+RgM/5Dfk7bEbpKJ2i4zN8ruNE8PUthruYMTtl7WQ==
+X-Received: by 2002:a5d:5885:0:b0:39c:266b:feec with SMTP id ffacd0b85a97d-3a074cf147cmr9963691f8f.7.1745850831806;
+        Mon, 28 Apr 2025 07:33:51 -0700 (PDT)
+Received: from fedora.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e46a49sm11421823f8f.61.2025.04.28.07.33.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 07:33:51 -0700 (PDT)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+X-Google-Original-From: Sagi Maimon <sagi.maimon@adtran.com>
+To: jonathan.lemon@gmail.com,
+	vadim.fedorenko@linux.dev,
+	richardcochran@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sagi Maimon <sagi.maimon@adtran.com>
+Subject: [PATCH v1] ptp: ocp: Fix NULL dereference in Adva board SMA sysfs operations
+Date: Mon, 28 Apr 2025 17:33:47 +0300
+Message-ID: <20250428143347.23675-1-sagi.maimon@adtran.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 28, 2025 at 04:08:10PM +0200, Andrew Lunn wrote:
-> > > However, with the yaml stuff, if that is basically becoming "DT
-> > > specification" then it needs to be clearly defined what each value
-> > > actually means for the system, and not this vague airy-fairy thing
-> > > we have now.
-> 
->  
-> > I agree with Russell that it seems preferable to make it unambiguous whether
-> > delays are added on the MAC or PHY side, in particular for fine-tuning. If
-> > anything is left to the implementation, we should make the range of acceptable
-> > driver behavior very clear in the documentation.
-> 
-> I think we should try the "Informative" route first, see what the DT
-> Maintainers think when we describe in detail how Linux interprets
-> these values.
-> 
-> I don't think a whole new set of properties will solve anything. I
-> would say the core of the problem is that there are multiple ways of
-> getting a working system, many of which don't fit the DT binding. But
-> DT developers don't care about that, they are just happy when it
-> works. Adding a different set of properties won't change that.
+On Adva boards, SMA sysfs store/get operations can call
+__handle_signal_outputs() or __handle_signal_inputs() while the `irig`
+and `dcf` pointers are uninitialized, leading to a NULL pointer
+dereference in __handle_signal() and causing a kernel crash. Add
+Adva-specific callbacks ptp_ocp_sma_adva_set_outputs() and
+ptp_ocp_sma_adva_set_inputs() to the ptp_ocp driver, and include NULL
+checks for `irig` and `dcf` to prevent crashes.
 
-Isn't the ambiguity arising due to an incomplete description wherein we
-are not having an accurate description for the PCB Traces?
+Fixes: ef61f5528fca ("ptp: ocp: add Adva timecard support")
+Signed-off-by: Sagi Maimon <sagi.maimon@adtran.com>
+---
+ drivers/ptp/ptp_ocp.c | 62 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 60 insertions(+), 2 deletions(-)
 
-A complete description might be something like:
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index faf6e027f89a..3eaa2005b3b2 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -2578,12 +2578,70 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
+ 	.set_output	= ptp_ocp_sma_fb_set_output,
+ };
+ 
++static int
++ptp_ocp_sma_adva_set_output(struct ptp_ocp *bp, int sma_nr, u32 val)
++{
++	u32 reg, mask, shift;
++	unsigned long flags;
++	u32 __iomem *gpio;
++
++	gpio = sma_nr > 2 ? &bp->sma_map1->gpio2 : &bp->sma_map2->gpio2;
++	shift = sma_nr & 1 ? 0 : 16;
++
++	mask = 0xffff << (16 - shift);
++
++	spin_lock_irqsave(&bp->lock, flags);
++
++	reg = ioread32(gpio);
++	reg = (reg & mask) | (val << shift);
++
++	if (bp->irig_out)
++		ptp_ocp_irig_out(bp, reg & 0x00100010);
++	if (bp->dcf_out)
++		ptp_ocp_dcf_out(bp, reg & 0x00200020);
++
++	iowrite32(reg, gpio);
++
++	spin_unlock_irqrestore(&bp->lock, flags);
++
++	return 0;
++}
++
++static int
++ptp_ocp_sma_adva_set_inputs(struct ptp_ocp *bp, int sma_nr, u32 val)
++{
++	u32 reg, mask, shift;
++	unsigned long flags;
++	u32 __iomem *gpio;
++
++	gpio = sma_nr > 2 ? &bp->sma_map2->gpio1 : &bp->sma_map1->gpio1;
++	shift = sma_nr & 1 ? 0 : 16;
++
++	mask = 0xffff << (16 - shift);
++
++	spin_lock_irqsave(&bp->lock, flags);
++
++	reg = ioread32(gpio);
++	reg = (reg & mask) | (val << shift);
++
++	if (bp->irig_in)
++		ptp_ocp_irig_in(bp, reg & 0x00100010);
++	if (bp->dcf_in)
++		ptp_ocp_dcf_in(bp, reg & 0x00200020);
++
++	iowrite32(reg, gpio);
++
++	spin_unlock_irqrestore(&bp->lock, flags);
++
++	return 0;
++}
++
+ static const struct ocp_sma_op ocp_adva_sma_op = {
+ 	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
+ 	.init		= ptp_ocp_sma_fb_init,
+ 	.get		= ptp_ocp_sma_fb_get,
+-	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
+-	.set_output	= ptp_ocp_sma_fb_set_output,
++	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
++	.set_output	= ptp_ocp_sma_adva_set_output,
+ };
+ 
+ static int
+-- 
+2.47.0
 
-mac {
-	pcb-traces {
-		mac-to-phy-trace-delay = <X>; // Nanoseconds
-		phy-to-mac-trace-delay = <Y>; // Nanoseconds
-	};
-	phy-mode = "rgmii-*";
-	phy-handle = <&phy>;
-};
-
-In some designs, the "mac-to-phy-trace" and the "phy-to-mac-trace" are
-treated as a part of the MAC block for example. Depending on which block
-contains the trace, the delay is added accordingly.
-
-Regards,
-Siddharth.
 
