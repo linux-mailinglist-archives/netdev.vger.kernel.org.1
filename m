@@ -1,178 +1,333 @@
-Return-Path: <netdev+bounces-186478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04156A9F56C
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:16:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3D7A9F5F5
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 543BD4623D5
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:16:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53BEB189D88D
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF482798E6;
-	Mon, 28 Apr 2025 16:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD7627A929;
+	Mon, 28 Apr 2025 16:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="YMSZPJeu"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="Y4ZDUQlg"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012025.outbound.protection.outlook.com [52.101.71.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic313-56.consmr.mail.ne1.yahoo.com (sonic313-56.consmr.mail.ne1.yahoo.com [66.163.185.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E55279359;
-	Mon, 28 Apr 2025 16:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.25
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745857012; cv=fail; b=sQuTTP+PHeZyM/0FXVtSNnNQhNqKZjUsF1KAYMsfiStGIdn6FiDtGM7Vz0FqjELAJr2LYIjQVhC/1fNdjYI0B2S6iNix5lPc0NJoAsDZCdjDeRR2k9hvNkLLpfjaYg10Vw8ptLAM9/KOaC9eurgPfZuc8ZP9SF3MBm7OeVnbMEc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745857012; c=relaxed/simple;
-	bh=Jn4Ur3+o49kOmZe9t8CXlbRVJ1k7taI8CrmoSgHuahI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ETZeGCOrUc24HBeoRlnSIsSNDIEcQltAZ47fF3lfCZo39z0QZq57cynxKrP4UjEgvSYjeWx4odmSZDc8HFg+yH3Z6L3kAEtIrWjQBRj5If3Y1xQRthlg6hgrHqnXBxW3oWuWNpJ96lktBChDmTuEWoOAr0nAue3m/nI3JUqvPro=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=YMSZPJeu; arc=fail smtp.client-ip=52.101.71.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ony06w4zXTapoVPPMhR6Hd2U9YA6khCF7MGZOisQ27WgVASu1Pn1/ZFAwsNjpGhbSyN+MnIiczmeIIxfCTPPIygIP0iNXeFVNbbyVNc1Epd0etM9bu4c7TAHkCrzQ3UgEtjtEH/5ova6DX388zUwrvCoHwNJSb2E7UZcwM8VPh08LNJGpRPJRanVVGWiytxffZBr2S77MV/VlEIiJHJZIPXJ80xfdvzMRzV55bQeeM1Ez/8JG+sCu9jEnkh/5S2N6yvSXHps9MST40ZfdEuPQPZ+7BYjV13VpUP4SK5wsUDDgxvRdqQygC4SKOHCY0LkiNRiN0Ncls/m+iSUtxeG6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jn4Ur3+o49kOmZe9t8CXlbRVJ1k7taI8CrmoSgHuahI=;
- b=FI3RAK/1hCdeHHH7uLJLf2W9BlRixjlQUPVci1ZkIrhgCFdHvcHX0rDpQN9W57EhRrPbttwriV2TdL4D5B7Qc0Z69DXOglAYbncnsv4QWLg3xT34iEVTePdzFik3hBDo8xjtF5Y/xwIks9pkOHV/OYynsp3WXlMDfT+Tir5sUcXZQRBd0HLLTFUYYCDInnuv1pmBfiBxgpDoX6/povDTT3tNJbW610yB3kj4z80W7ZI4wOjZjLc8238wRb4pqSyzkIknvZixTxytRwF5r0VEzfV41cOFf1cfCx9V8Pw0YCEs+qaj0iN2jNFaLyPhnRShMJUE5UAXlgZphULWJ+M2ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jn4Ur3+o49kOmZe9t8CXlbRVJ1k7taI8CrmoSgHuahI=;
- b=YMSZPJeufgjp5zIh0Pu4jXfSQiVRF8pjmnXYXF6vVuL+K6uW6icAaig3AqxmTsNhmGk6gqCU3rsK3W92aP3TN2Uo88xkfc3D/n3UrTU2qMzB4kvuMdycEvksggUkje5mh379pxq1h28qBfuEdClGiYS2Oa6mpm6dyOtBVO6rTpPrm6d49/yAyZSW5Z3akdYe/t8GRnPgkals5e7ezoi8kLva+bhi2blaGOVfcnS/H2716Yu5hKU+aig3bnKMScYIBg+eyCvDreC/ee84VKJlXIdauwkZmEXjBXonvdcbnsFvEdFaUsKayO2wMUTEEBkTKND5KqkP51XfeFAE7+fZ5A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by DUZPR04MB9726.eurprd04.prod.outlook.com (2603:10a6:10:4e3::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Mon, 28 Apr
- 2025 16:16:47 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8678.028; Mon, 28 Apr 2025
- 16:16:47 +0000
-Date: Mon, 28 Apr 2025 19:16:44 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, christophe.leroy@csgroup.eu,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v6 net-next 00/14] Add more features for ENETC v4 - round
- 2
-Message-ID: <20250428161644.ygf3bg6pyyfftccn@skbuf>
-References: <20250428105657.3283130-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428105657.3283130-1-wei.fang@nxp.com>
-X-ClientProxiedBy: VI1P195CA0095.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::48) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DBC27A10B
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 16:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.31
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745858242; cv=none; b=LaJUiQo8SNO6DxeuEj4wLHb8Lj8IiADk0rbSI/YmmFD5j6KCxVCBOOk9QMhj8i9nDK9qPeKUi5fDwk0fFJ1bwHNVCbggnJHq/RUzJBPcvzfTNKTNDvDBoAfzFlD2U3hq/1Z9sAWPMnncIcb5jXEU91o0xdzjh8G+LreEOVQoeYc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745858242; c=relaxed/simple;
+	bh=0VvQeNVU4UgdbwYBHvilrt2m+ijy4wdKBUUD2tIDmIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jp+pzGUDMq/BpMhDZ9sbKZp/sqoUFbNpWChVaPq5k2YKmPekl6Pax1r9b6Ha8auE+HEg1KPZUc6ra9Dd7vrr5KGmnMgw2jWY0tz32dKkZCtXYsKOKtsU7aQCjSGCCchGa2kPUHV4dEA79ctzBYFDuB4mJ6Advx7C5FG32lRmObY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=Y4ZDUQlg; arc=none smtp.client-ip=66.163.185.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1745858240; bh=Bv8soi9tACJn9WGewxRVBUl8fgiOJi3nT89t8VKibUs=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=Y4ZDUQlg6/6JEBQHBtgjD7xnzTJ9Fi7ra+1IythiGshS8ziVXqt/+Us/L4G7WZOaANSjQcAVPGsADWNNH+ZWyfsvB6JpPyHojqtTS4cfFj6VlMHKEVSBMmUjaDEEtnK4xltIed3edX8LJ0Ww2Ud19U1E9IeQcJHIRwE9tIjC5Z/81q5xFNFQeX+yCuqpPBt9uuVXuaTkyLExC4EHX3xNeUswwLKEJ3flt9FrWCvI/V90sgwTPIDNJ7G+1DHBxFnhzC0pZifedGfoxV9kGTkHpMaFqjhAS2xMDvObs8qsRvqNLdjZYn/LdCwRKqL19E3ka8jqMD9d2v84ir2glcHOcA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1745858240; bh=bl8R2d7Z4XhQw7D+8daG5K/LLxBQrXITnX31Ew2egDF=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=bsvo3Zai5LDN2/kHiuhtqFvfcWOgczWKQgy2NZ7d5lgxQAkwnNNeftkY62yJAV6TnMa3/aNd++/ZbtUbeER4DpOYgg/gVeAX+fWmk8kdrxOLNW7iVrGf9+XSewjHAG1eml4eh6IOgKqT7wmiTX/7ZtxibfuMGv40spp/GoqeAwyZUcCkJZhpe8DzYG4iPytgvq9/3gcuHVXK3ufS2qItJKgTERg4+bzlAIge6NezmW9N3+HDdWmfvTfXQwy+gGT1uh/57wrBTv5lBCXnH/hLRA1+LSQFipXpwoYlC1JHoQEQux2lC/HXBOSM3EhusAMhTR9DTzUYVc5rGS4htkT7hw==
+X-YMail-OSG: iMY2u.gVM1l90gKJDkm7xWJB9KcK486jGS.kVjAk2Fb207glp6iGi_9UMrEMMWT
+ vMg8Gh3004OqDAC39tU0WargmSDGDeEXcoCss2RstxZR_bqC7fx_kFsw25ie.qMVI_ncxxFUeyxQ
+ T09IeQJFBk5SnMb0RpZp.prpvs7kvkIyT7atvPI2WWAzqJlGTt9b71oziCTrXCcJSM2Lhf8DQ7Mi
+ P4B1Z.Lv7UzsoI8ukACgq5C0E7qcx17ZjTOTLlBDu2qOmmPNCQqdhXDE6EmcdOUdewaizr0v5FgR
+ B3DMeaZS6F3N2Bmnzq4AfiQdtY.3760ojRfgWxqtsHNaaDm5Qcgdwc..9m7FYOpDZU6uOx1NH2O1
+ .uCePu50linOGtN2TrQYTn24soqboODqufgsV8bX0E3TFKfRrbaA0ZL.bmPAxOk7fpurCZ6vGsGC
+ zAX9xk5fJ1Ou4SoahjqI65noOacynhHnwrnbseX17xCTO1BEzp6TD1Doh0qLyhHACk9DNIdAekzj
+ dzwKWn.MVqXcibFaHnR8FO5RwCW95ZXYH6mj77dxWrICPTaNlm7vIOMfsfJi4qeq3KeLpmlghGaB
+ 4Z5HBFGKK5q2om4gssXIhss97DDSfgbokxUAmwBj2s7yYf6Q6vI85JZsNEWDGNUPZ5gdMRSC04Fd
+ .kxGLKIIeckOGtp_8Kja0TDk0c6dnhLlfleLP4JX2.acbTY6YmRnByhX0NymWSOw3n2EVx2GBlDa
+ 1QGF1WY2yGIi1obHji6Z9kaIRqH665oYz3e9bvQaAAPeV3CGU0Imnw3HdPZx_g3TFP75q3daepbP
+ LrHiB2l.0VmJAZG6wXNoUWS8uAhhicPJCIsPbMP7qdpTGZ8_U3SyAp6z3TpMzD42xIDhKa_IG2WA
+ v4JWsfRVbSm2RB6flqBl0BKJlj5sxiOcUI0RC_TtEFS3mXrw1AKKROBsK8x1o9jptLmvh6_fJ76l
+ 4URHUtDayI1SsPy4GZZnoZ5w92KjXnaC6b2OvlxEW3HZetgb0zn4KTpDiNxX8Db.I9llyaq3wMB9
+ QlogKDH9IgKm0yNOR8FCvvczZBb1ZA9wiViedi22_UD9V9IRY2gsc.PsNB2kskq6TzdJsdAsSa8i
+ XE2Gt7kRavMsL73amiOrbceWP_.vNpcNlDY2Ur33cK.KccCYXgI.aJzGhPDsANfBDY4aBz3n.h4w
+ CM3W_ryojATmbn_o3atofJH8GU353CeRtbFv3oKXmfWSDugzML5pYaej.KIT8Qq5Xxlw8XqDZzVz
+ p5MzLN.4HCQfClnH_I8tZiZzMilzYz2qEz_IkJmb1BPUBHx3agdCJ6IeQ4jrxEDWTt.aerS13qng
+ V32OMbRtC0yMBm0iKi4MODI.lWqk5EAvaUi6OhOQvXxY39FAaGhVi2jSYyQk9nUGvrwwP0vT91Yr
+ 0k2eh21fBpApm9_HUq0RSNoL7kD7DUysgP4nH4tSTCMiPGYir9MUOiSJxtWSR.UAJUxgY5gcK0uP
+ 6HWsjNugCiWzrums8IEAUgKgycA0hqFH5zIVmPvzZt9oTUVUAd5r8wiPLRhq5ouE92vD5RWq.SGF
+ CO0fD.zzq8yJlAg1E5FE2dcGcgoauRh2H97t9uWamKwHXNYJ.WTd7tIjjR376dWLkHBeh4BKjC.Z
+ fxdymB4NyX0EajG93qZ1TiLdI6H4y1ojdGX.xB7iUinZP73H3FZNMSHxCh1Aj3bNNClR.2V9GW4w
+ VBkemrq5EhSHhojiiT8_SpJJH5ZCzu7of6lbRjHX6rBseah0aonGdwDt8j4YyrYXcEPT_Ptu5UmU
+ hp..3CHP.HRbS7sBG6b_UKvwo7jVUIyhi4Y5wAAa3K7D3T5MQLjqgi8hI9VfMZFpHF0FsjksfpDp
+ SIIVrLK9Za0SFvjW9L6v6KdsFxmz3LtVmUbQC8jZG0jcrowP3c4gXKFGjZulo62nSkDOIKxEWYhc
+ aHgm4lg9kcTX_hfdsQsv2TtTJC0AenCXP3G0UJt74O5IcDVZykIm2.KtsdW85.KSBtkoZd2bYaPv
+ 28_pTZYoHI.924vOLysEgI0lXaSIGeSgszQ--
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 6a7dbf5d-0d04-426f-a172-733de4aba77a
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.ne1.yahoo.com with HTTP; Mon, 28 Apr 2025 16:37:20 +0000
+Received: by hermes--production-gq1-74d64bb7d7-w6q4t (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ee4682840e2fd9fd638ea25af20b289c;
+          Mon, 28 Apr 2025 16:17:05 +0000 (UTC)
+Message-ID: <988adabb-4236-4401-9db1-130687b0d84f@schaufler-ca.com>
+Date: Mon, 28 Apr 2025 09:17:04 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DUZPR04MB9726:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9f6c3c7-ff7d-4fce-2c91-08dd8670131d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vPx+WBx42FW0PVl0O1b5sD597yx1F6dddEou7HmXPqkkKQFG1FS+w4Z80i0I?=
- =?us-ascii?Q?cCwTfC8kJqI8ya6ySd//IfVWKjLtmkINQQDY6iMdaxGHII8QsLP7c+Kthlg3?=
- =?us-ascii?Q?e8WRUaLWHeAkhot6ucSFHk2azO9yKUHmhudNDz2rBU00KUmqAatK0dB8lEV4?=
- =?us-ascii?Q?Zb6MaOsWHVWZ94csK3VT5rXBDcW33lWUpS+B+NPxvSMUQybOS3KXtui+1pjf?=
- =?us-ascii?Q?ZcwauLu7fMCOrTN2NtC0E5LxlaV5ZkLiDcoEXf2xDmASWkeT6cn0pDqt4+Q7?=
- =?us-ascii?Q?hF4H0yU29Wd7rfxQUBytGAjqUoJjRZeMXIY6CmT/xe0ivbw8mcgBbHBZJS86?=
- =?us-ascii?Q?RBkIcFsSyrDgZVT4jjN90wKNxbm2NT3SofxrALmtKEytNB0SaUrOYWWaDj4j?=
- =?us-ascii?Q?HjrR6u5dWF6/Gz6RP2VjCmgwKEqkPf+vQiCSk/6KNatw4nzEEIExlc8DNBFC?=
- =?us-ascii?Q?jJ17Q1godId4d+GSk6vmp+38FSUSdHE27x8PqrI/SvQsGqE2+bjXK+OZ3dbV?=
- =?us-ascii?Q?mn7dKVwVWQrbWtt4RAhu6clv7rSqrAmCSb7OyEyuxh7Y4VBz3X8Ht8B4qtwh?=
- =?us-ascii?Q?B/TurAOa7U6OMGUNbi/itEHFmQwR8b32jUrahd6aBtvi/HgtEhBYgJO1hWVT?=
- =?us-ascii?Q?iR29BuOXbjz65Be/AUoP1XNZwAL1nIDPsuKVbkKqE5juvyzxG96BxYASPh94?=
- =?us-ascii?Q?RgAaigokYzKAxLNevtX6BZ9rbNEPO+3aYQ8kKzb1QNamBnBpCOAptR01ikSx?=
- =?us-ascii?Q?iQE9xXhl8PQV5hoHOBAQ0HyusfNRohoRwZoSJmzwKz8KtALgYG9fqi/vuqEo?=
- =?us-ascii?Q?1T2pYhmOA1YbJYvOyOufj0nelvzkXb97u9VML8SUUHikX+WNWGnDTOgqfYlm?=
- =?us-ascii?Q?yw1qlSorv0UmvP9QtIp9f9nc31714uUVtz3IgaUcF9H/Ty0rZAacJaIhlfTQ?=
- =?us-ascii?Q?L2XmI2Tt5bMo5SeGg0AgJvbJXZcaDA9PQQMjtx3NU76ETEWCs0L5gh1ESfhD?=
- =?us-ascii?Q?0e+L6y4ZPV+nnBMUzBdcuQCekwe/Hrb+GhqP14I92NhI+wG0EMgb5u3WAE0P?=
- =?us-ascii?Q?JMNrWoEcJTBp8uayuzFd6h7uo1gmJIu0FEcHr8c3LdX9bknNf+LqECDEdG+T?=
- =?us-ascii?Q?FuPh+jh46lPc4PyCJvYM7HuqvrOQHjtphFWoRPK+AU7szECCnfpyv5+wObl8?=
- =?us-ascii?Q?rARF579/xw/jxSA0102v/ltOu9g6SPfebhjqC1lDgTp3PC5L5squ3rDr6NMM?=
- =?us-ascii?Q?Mwoz6h0w4mMdknYXyxkkRm4Jd8DFkpeiUYKjwKPGGQMTHKINu5itMMJD+NTM?=
- =?us-ascii?Q?1yBuCz/g+eZ1n6N2/1C7nRjCpLIJszzXytDG3d2hAUzgSmFK87E9NoErCb5T?=
- =?us-ascii?Q?zUEV8JTcpO9bdb9vpoP1/7LMIpvhNYEMc/vCtTEnUNqiFa/vd2CZh9KoPszb?=
- =?us-ascii?Q?2MVApZXxGO0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nJcdZ5UjsWX4JR7kMwlXRyPVLj6Pm/dAmKHzOgUiARc7haVyWy/PDoLsvcjp?=
- =?us-ascii?Q?BfwtFcfvGJGxmA1Ixjl0DvNv4tYA9nWQFb7/27vE7f7njKmKzQMjD00NLRBf?=
- =?us-ascii?Q?UFDulKUnV6GV9oV+jcrCm3LKYkOCJTmQn7q+r1lqJq0kTmk82U4ofb6nWeG6?=
- =?us-ascii?Q?ZYKruLymbpei+u1jHEEKaRG+EvaVd78045XnDUazCixl5HRr+En9WXiseglQ?=
- =?us-ascii?Q?hqa9g46OuawOjzQmOvcJ/pO9f1nYkskPxvyCWW2U7kg6fL25gr0SJCKjx1vW?=
- =?us-ascii?Q?HMLH9SiNQuYPeqln9LPqNOeqqZ//GaQJ8pXRt+cHCRaOFNBVONfqZx4/WuA1?=
- =?us-ascii?Q?WC1ldT/IiB6CERgt19D+KAaFvSEybD1+QP8HBhb+DYcD/vEuERUSuNqfmMyL?=
- =?us-ascii?Q?W9mGkl6DlV6lwW1dz5ws/bFEMOiedxt+fI+i8fVmchQM/rRDewoov37Evvl6?=
- =?us-ascii?Q?9/kAAgyE23KT1EcHjIUl1uwZ87xFt+WsrKcHydyyZFb+c8kioj0XUM7XMxOk?=
- =?us-ascii?Q?86CMRiF73oNPOxhcr+HPsvx76xIjekoXa82GVz+2TMkCdD6VN2MViy8SRHtr?=
- =?us-ascii?Q?mohG4WVSF8ZT64TRviJr6R4xour5fs/vMWYe0Fpuy9VWE5VLrkAbtf6JOW70?=
- =?us-ascii?Q?3M0nz6zuMSe29+BfdZCOTnVmiJyV8Qof299cADe59xLFq59FLn3MM5gXzvGo?=
- =?us-ascii?Q?a5Tuh54pZwUam4cxHGjcGPe96j0tG8AqS2avtN2kpDTXjjbE9cIc4usEaIB2?=
- =?us-ascii?Q?GMwfh59DKXIpEaQ4yyoT7m2RkmE6CUBt1I/4Vs8zh76jFJvMGtSHTpFIt04s?=
- =?us-ascii?Q?L4f7HlzrvMhavWInOk8J/7FXV2dYkxLrL1ssv/dyn6WgCzkbsG5r8o7sgoIM?=
- =?us-ascii?Q?LM0UX/lIjulCVPnopjaL8Eqq13AbaYdilTfPSvjcbfDZTR7A6qs5Fscw247t?=
- =?us-ascii?Q?HeK3rYrZVB7gUlX6S0rGdqqTv/k9aEDi3tGLG4rkqVbsNwMZQViDQONTtRC2?=
- =?us-ascii?Q?5O0nr0iQdw81jy98kFAqiikRQS+viPk+8H92lc2xIGQGfpJF5BBpBy6ypmvp?=
- =?us-ascii?Q?L92ortGa+o7VfeedX1X0mlNHGQcQlqqaGGGg8bpRSh5v5jEH+QVjhuFIuWSd?=
- =?us-ascii?Q?m1b5gDdFA81o5ta7IFD1d6lSqWHczRrHmz3Mos2BTwJXHK9cadh3K177M4l+?=
- =?us-ascii?Q?G/ugboDkQBNBIy0F9PP1FeMPPeOo43qM5gb8bhSrs3kKpl9DpTvWeydJ881W?=
- =?us-ascii?Q?NWu9Qq8KN/gXH8FeVK/yJ3l885KDCMW9dc9C47YBwiH2CLuvSqoFsR2bb0YJ?=
- =?us-ascii?Q?zRwGFan3ttVVMym1gVMzVrSovIgpo6TmN3sNunY47+hraoP+Dex5DTog00mQ?=
- =?us-ascii?Q?GgZJ0pzS5RWpOZKExwtiF+8VhUDE3V9w4dkd3QdiZ3pDRtQ5SVKp2DvxJbZC?=
- =?us-ascii?Q?Q+JS/l/eNDe8GVDpWK8qQlE3wfI+RWrO7vPI0p4ytc8tRd24KpZUC4bLAw5g?=
- =?us-ascii?Q?8kjRIg32U/XF0gfeXvSkSaTPvfmqCwIcjkFteI3lF89ZHz31YyZ5zXvKWSmM?=
- =?us-ascii?Q?NrYWDZQrjHHcX5FTXkt0kV+B4kY49DvYH8o3Dj+mOUlxpltfqOBk4jEIjJhG?=
- =?us-ascii?Q?5w=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9f6c3c7-ff7d-4fce-2c91-08dd8670131d
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 16:16:47.6233
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dab0irRcnRX4T+DJOSlwDoyoH93Nbg1adiBUDDmsrZo2RujJHtUnefoLgd98RcVUXnjlBCw15jXP9kYIIsIR1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9726
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] security,fs,nfs,net: update security_inode_listsecurity()
+ interface
+To: Stephen Smalley <stephen.smalley.work@gmail.com>, paul@paul-moore.com
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>,
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, selinux@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20250428155535.6577-2-stephen.smalley.work@gmail.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20250428155535.6577-2-stephen.smalley.work@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.23737 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Hi Wei,
+On 4/28/2025 8:55 AM, Stephen Smalley wrote:
+> Update the security_inode_listsecurity() interface to allow
+> use of the xattr_list_one() helper and update the hook
+> implementations.
+>
+> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.smalley.work@gmail.com/
+>
+> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+> ---
+> This patch is relative to the one linked above, which in theory is on
+> vfs.fixes but doesn't appear to have been pushed when I looked.
+>
+>  fs/nfs/nfs4proc.c             |  9 +++++----
+>  fs/xattr.c                    | 20 ++++++++------------
+>  include/linux/lsm_hook_defs.h |  4 ++--
+>  include/linux/security.h      |  5 +++--
+>  net/socket.c                  |  8 +-------
+>  security/security.c           | 16 ++++++++--------
+>  security/selinux/hooks.c      | 10 +++-------
+>  security/smack/smack_lsm.c    | 13 ++++---------
+>  8 files changed, 34 insertions(+), 51 deletions(-)
+>
+> diff --git a/fs/nfs/nfs4proc.c b/fs/nfs/nfs4proc.c
+> index 970f28dbf253..a1d7cb0acb5e 100644
+> --- a/fs/nfs/nfs4proc.c
+> +++ b/fs/nfs/nfs4proc.c
+> @@ -8023,12 +8023,13 @@ static int nfs4_xattr_get_nfs4_label(const struct xattr_handler *handler,
+>  static ssize_t
+>  nfs4_listxattr_nfs4_label(struct inode *inode, char *list, size_t list_len)
+>  {
+> -	int len = 0;
+> +	ssize_t len = 0;
+> +	int err;
+>  
+>  	if (nfs_server_capable(inode, NFS_CAP_SECURITY_LABEL)) {
+> -		len = security_inode_listsecurity(inode, list, list_len);
+> -		if (len >= 0 && list_len && len > list_len)
+> -			return -ERANGE;
+> +		err = security_inode_listsecurity(inode, &list, &len);
+> +		if (err)
+> +			len = err;
+>  	}
+>  	return len;
+>  }
+> diff --git a/fs/xattr.c b/fs/xattr.c
+> index 2fc314b27120..fdd2f387bfd5 100644
+> --- a/fs/xattr.c
+> +++ b/fs/xattr.c
+> @@ -492,9 +492,12 @@ vfs_listxattr(struct dentry *dentry, char *list, size_t size)
+>  	if (inode->i_op->listxattr) {
+>  		error = inode->i_op->listxattr(dentry, list, size);
+>  	} else {
+> -		error = security_inode_listsecurity(inode, list, size);
+> -		if (size && error > size)
+> -			error = -ERANGE;
+> +		char *buffer = list;
+> +		ssize_t len = 0;
+> +
+> +		error = security_inode_listsecurity(inode, &buffer, &len);
+> +		if (!error)
+> +			error = len;
+>  	}
+>  	return error;
+>  }
+> @@ -1469,17 +1472,10 @@ ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
+>  	if (err)
+>  		return err;
+>  
+> -	err = security_inode_listsecurity(inode, buffer, remaining_size);
+> -	if (err < 0)
+> +	err = security_inode_listsecurity(inode, &buffer, &remaining_size);
+> +	if (err)
+>  		return err;
+>  
+> -	if (buffer) {
+> -		if (remaining_size < err)
+> -			return -ERANGE;
+> -		buffer += err;
+> -	}
+> -	remaining_size -= err;
+> -
+>  	read_lock(&xattrs->lock);
+>  	for (rbp = rb_first(&xattrs->rb_root); rbp; rbp = rb_next(rbp)) {
+>  		xattr = rb_entry(rbp, struct simple_xattr, rb_node);
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index bf3bbac4e02a..3c3919dcdebc 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -174,8 +174,8 @@ LSM_HOOK(int, -EOPNOTSUPP, inode_getsecurity, struct mnt_idmap *idmap,
+>  	 struct inode *inode, const char *name, void **buffer, bool alloc)
+>  LSM_HOOK(int, -EOPNOTSUPP, inode_setsecurity, struct inode *inode,
+>  	 const char *name, const void *value, size_t size, int flags)
+> -LSM_HOOK(int, 0, inode_listsecurity, struct inode *inode, char *buffer,
+> -	 size_t buffer_size)
+> +LSM_HOOK(int, 0, inode_listsecurity, struct inode *inode, char **buffer,
+> +	 ssize_t *remaining_size)
 
-On Mon, Apr 28, 2025 at 06:56:43PM +0800, Wei Fang wrote:
-> This patch set adds the following features.
-> 1. Compared with ENETC v1, the formats of tables and command BD of ENETC
-> v4 have changed significantly, and the two are not compatible. Therefore,
-> in order to support the NETC Table Management Protocol (NTMP) v2.0, we
-> introduced the netc-lib driver and added support for MAC address filter
-> table and RSS table.
-> 2. Add MAC filter and VLAN filter support for i.MX95 ENETC PF.
-> 3. Add RSS support for i.MX95 ENETC PF.
-> 4. Add loopback support for i.MX95 ENETC PF.
+How about "rem", "rsize" or some other name instead of the overly long
+"remaining_size_"? 
 
-I don't see any functional issues with this set. I am also not sure
-whether MAC address filtering is implemented in the simplest way, but I
-suppose it can also be simplified over time.
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+>  LSM_HOOK(void, LSM_RET_VOID, inode_getlsmprop, struct inode *inode,
+>  	 struct lsm_prop *prop)
+>  LSM_HOOK(int, 0, inode_copy_up, struct dentry *src, struct cred **new)
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index cc9b54d95d22..0efc6a0ab56d 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -457,7 +457,7 @@ int security_inode_getsecurity(struct mnt_idmap *idmap,
+>  			       struct inode *inode, const char *name,
+>  			       void **buffer, bool alloc);
+>  int security_inode_setsecurity(struct inode *inode, const char *name, const void *value, size_t size, int flags);
+> -int security_inode_listsecurity(struct inode *inode, char *buffer, size_t buffer_size);
+> +int security_inode_listsecurity(struct inode *inode, char **buffer, ssize_t *remaining_size);
+>  void security_inode_getlsmprop(struct inode *inode, struct lsm_prop *prop);
+>  int security_inode_copy_up(struct dentry *src, struct cred **new);
+>  int security_inode_copy_up_xattr(struct dentry *src, const char *name);
+> @@ -1077,7 +1077,8 @@ static inline int security_inode_setsecurity(struct inode *inode, const char *na
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> -static inline int security_inode_listsecurity(struct inode *inode, char *buffer, size_t buffer_size)
+> +static inline int security_inode_listsecurity(struct inode *inode,
+> +					char **buffer, ssize_t *remaining_size)
+>  {
+>  	return 0;
+>  }
+> diff --git a/net/socket.c b/net/socket.c
+> index 9a0e720f0859..52e3670dc89b 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -562,15 +562,9 @@ static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
+>  	ssize_t len;
+>  	ssize_t used = 0;
+>  
+> -	len = security_inode_listsecurity(d_inode(dentry), buffer, size);
+> +	len = security_inode_listsecurity(d_inode(dentry), &buffer, &used);
+>  	if (len < 0)
+>  		return len;
+> -	used += len;
+> -	if (buffer) {
+> -		if (size < used)
+> -			return -ERANGE;
+> -		buffer += len;
+> -	}
+>  
+>  	len = (XATTR_NAME_SOCKPROTONAME_LEN + 1);
+>  	used += len;
+> diff --git a/security/security.c b/security/security.c
+> index fb57e8fddd91..3985d040d5a9 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -2710,22 +2710,22 @@ int security_inode_setsecurity(struct inode *inode, const char *name,
+>  /**
+>   * security_inode_listsecurity() - List the xattr security label names
+>   * @inode: inode
+> - * @buffer: buffer
+> - * @buffer_size: size of buffer
+> + * @buffer: pointer to buffer
+> + * @remaining_size: pointer to remaining size of buffer
+>   *
+>   * Copy the extended attribute names for the security labels associated with
+> - * @inode into @buffer.  The maximum size of @buffer is specified by
+> - * @buffer_size.  @buffer may be NULL to request the size of the buffer
+> - * required.
+> + * @inode into *(@buffer).  The remaining size of @buffer is specified by
+> + * *(@remaining_size).  *(@buffer) may be NULL to request the size of the
+> + * buffer required. Updates *(@buffer) and *(@remaining_size).
+>   *
+> - * Return: Returns number of bytes used/required on success.
+> + * Return: Returns 0 on success, or -errno on failure.
+>   */
+>  int security_inode_listsecurity(struct inode *inode,
+> -				char *buffer, size_t buffer_size)
+> +				char **buffer, ssize_t *remaining_size)
+>  {
+>  	if (unlikely(IS_PRIVATE(inode)))
+>  		return 0;
+> -	return call_int_hook(inode_listsecurity, inode, buffer, buffer_size);
+> +	return call_int_hook(inode_listsecurity, inode, buffer, remaining_size);
+>  }
+>  EXPORT_SYMBOL(security_inode_listsecurity);
+>  
+> diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> index b8115df536ab..e6c98ebbf7bc 100644
+> --- a/security/selinux/hooks.c
+> +++ b/security/selinux/hooks.c
+> @@ -3612,16 +3612,12 @@ static int selinux_inode_setsecurity(struct inode *inode, const char *name,
+>  	return 0;
+>  }
+>  
+> -static int selinux_inode_listsecurity(struct inode *inode, char *buffer, size_t buffer_size)
+> +static int selinux_inode_listsecurity(struct inode *inode, char **buffer,
+> +				ssize_t *remaining_size)
+>  {
+> -	const int len = sizeof(XATTR_NAME_SELINUX);
+> -
+>  	if (!selinux_initialized())
+>  		return 0;
+> -
+> -	if (buffer && len <= buffer_size)
+> -		memcpy(buffer, XATTR_NAME_SELINUX, len);
+> -	return len;
+> +	return xattr_list_one(buffer, remaining_size, XATTR_NAME_SELINUX);
+>  }
+>  
+>  static void selinux_inode_getlsmprop(struct inode *inode, struct lsm_prop *prop)
+> diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
+> index 99833168604e..3f7ac865532e 100644
+> --- a/security/smack/smack_lsm.c
+> +++ b/security/smack/smack_lsm.c
+> @@ -1619,17 +1619,12 @@ static int smack_inode_getsecurity(struct mnt_idmap *idmap,
+>   * smack_inode_listsecurity - list the Smack attributes
+>   * @inode: the object
+>   * @buffer: where they go
+> - * @buffer_size: size of buffer
+> + * @remaining_size: size of buffer
+>   */
+> -static int smack_inode_listsecurity(struct inode *inode, char *buffer,
+> -				    size_t buffer_size)
+> +static int smack_inode_listsecurity(struct inode *inode, char **buffer,
+> +				    ssize_t *remaining_size)
+>  {
+> -	int len = sizeof(XATTR_NAME_SMACK);
+> -
+> -	if (buffer != NULL && len <= buffer_size)
+> -		memcpy(buffer, XATTR_NAME_SMACK, len);
+> -
+> -	return len;
+> +	return xattr_list_one(buffer, remaining_size, XATTR_NAME_SMACK);
+>  }
+>  
+>  /**
 
