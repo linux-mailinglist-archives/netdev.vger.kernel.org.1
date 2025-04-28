@@ -1,130 +1,127 @@
-Return-Path: <netdev+bounces-186383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF39A9EEA1
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:10:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB21FA9EEE4
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:21:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EBDF7AD9EA
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:09:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3FC017E2B5
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AB2264627;
-	Mon, 28 Apr 2025 11:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D49925F7AA;
+	Mon, 28 Apr 2025 11:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZcJlintl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pDiCebDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EC0263F4C;
-	Mon, 28 Apr 2025 11:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB00EEC8;
+	Mon, 28 Apr 2025 11:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745838628; cv=none; b=miMJq+ll6fLfW2zhO/lH8f7Oz1z0KruZ3Ctgfb2M4WL/ZgfCvjiX8hq8DEvxOeAsHBq2/1x4aT1y2FML1DJo5E4Wl/zFUfBoiqn0p8LRBvQwbHdp60EQ2a6+ERsHUiyQ1gOtECpIoA/tIZWAC4FJfu/dCRV+eq4FG9ELoUVkbW8=
+	t=1745839230; cv=none; b=L6lny13/zBe0YrZbr18hFmubZQQhyJAGLHKeEN3b4O8NVay0X+IHxqGw+vdbrxwgqgHC7mKGAs91YGXZW0npJtEZKnC5vM0r2iXipYHptbE2FFPPfBEuOVg09bL4JzpUQtKwIa/uYR9TU7XRyJVkQ1QEmoVBeJY8fyLBP40+SWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745838628; c=relaxed/simple;
-	bh=bIwFZkm38ynM7HX1Oa10JXlzhPJFAfh/bhhb1iyC5Gs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OzZEaL5Flo+vdJ0j4whr4EMgxve9lfGnbWLuOCM7JQ+ksMhSlWIlXDKTVuNJA2Nq6JngBs7x8X5RF3cVFuZjeWmnFQ6kzDEzb3SMXTcM0kb635UBw5rmF7BECNHrogQD9tNCNldew5YmzNuTGQksH46amuclacCFj2un9/3JhtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZcJlintl; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5f6222c6c4cso7180120a12.1;
-        Mon, 28 Apr 2025 04:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745838624; x=1746443424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZEPaEW3F/zxdw0Y59OhNfESRd9ryJ0bqx54YjVSlNEM=;
-        b=ZcJlintlA++R/TSYw6ypXpDrXKD6ZJlYhQR/xt/exSEUjJkq+Z1pNsolCHYvKon4HC
-         OQaJLdVGGNWBgBeRS2dskk5ssykSjzdTzcxLrL1IEJTVacjR4CH8M2MjmX0NpesNgPqk
-         4kegSbGYBX5akiv0RsH0HJyE5apHo7kOaBpmPgmOHjUcakrJLWFZvbvyYaUStqz5PxxI
-         jxBdXJkjr67p/8UsZjThzo7zEWi7E2yCeTVp8TW1ouxyOc0Rkqn5Y5TzW6zJRz+FjPpu
-         rHZzSw2/V1IiQv4Gq2BvQvxAWttcU5ALMvqlRcAo1ioK6xH5npjhHe+fvnhRnYfTLNf7
-         yH6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745838624; x=1746443424;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZEPaEW3F/zxdw0Y59OhNfESRd9ryJ0bqx54YjVSlNEM=;
-        b=DmM9hJPw+BUJYF045Uy7ZY6OIv4AxA3dhnZJWWpA573lFS/O84dR2EpVUdOa8xz19L
-         u0wW38IYLcRKHDx9bK6AdJt4btnm3n3iMH2AoZU4X9owSx9iFg/RTCVPIyz+rM/q0UAm
-         kqSAtJmpwJ/mtTW5RzZRcSNviCsu25P0OQaDpf49nUykOpAEbLT/SvUoE1Ma6KQJZvTr
-         MP9w4z2W17YAVE/EZjJzKSP9JK+PwfXAGvSHShEXwQAYwRnkaw6y7g/JUde5zeT6vdJz
-         S5b45U3FRkD3c9UnbjFHydGizcPG17eMJ5Z/73RogjbYjxvnD9YUItEz/rmlPTAjQngX
-         ZnfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVfH6/W9egzKn6U4ty6J84L6L68j1YY4ttEOQ8vJOoNAN/r0lEAbetnxAR+4v1rApwvXUwVGS4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYrw+rsPwDSSG0S3Kih398271Vfj2juZo/RUx73DFKkyZD0qOh
-	2CFOJlkd5fVT/EDNrUkDw9PwnH4RukVtlehb3J2iqy6KGvsGlZoG
-X-Gm-Gg: ASbGnctjJdAU4R5acg7np+mpCpJKS0fUK9K7WF6db6GPvu89SoQxDewnL/IhYnG0vUT
-	iD339dN+axQ5BwD6Gkfauvo4Pm0Gpb8IgdUad5/SoabM0bDS6KcsdIO86ZPX0WetxxLbf99dQDB
-	ErhdTBpMrIO0IUeD/drz+59dZt5ps4zBJOIESI8+h1LtZvW6Cd13B4t0pPPIEvLZGc3UzuQsEEr
-	fbhOp+R/yoxdMIVzRQLgnL4rflb0LRyLQEbTiOMCi6064x5O4C5po4HNHgYv90MyglcYCBxK5Vb
-	kFbFgbOYRP3Tq9iBNhd6ylm9SEkHmsejRhduOzIqO3DAa5PgpvP017s7csldrS0yJ4RHGTylNcw
-	tnhF6f/w7GmWJO65oevyeiCo1jL1chdABUCWgYXM=
-X-Google-Smtp-Source: AGHT+IGm+R3U2ff1WmMOdGvIBe2V0PqlZpnpHbbBT6HmOy4sjPS3TwTCnqN1mgE4aPVMMPL6rw7qdA==
-X-Received: by 2002:a05:6402:524f:b0:5f6:c5e3:fa98 with SMTP id 4fb4d7f45d1cf-5f72343471dmr10240290a12.27.1745838624398;
-        Mon, 28 Apr 2025 04:10:24 -0700 (PDT)
-Received: from titan.emea.group.atlascopco.com (static-212-247-106-195.cust.tele2.se. [212.247.106.195])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f7016f5dccsm5686131a12.37.2025.04.28.04.10.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 04:10:24 -0700 (PDT)
-From: mattiasbarthel@gmail.com
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wei.fang@nxp.com,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Mattias Barthel <mattias.barthel@atlascopco.com>
-Subject: [PATCH net] fec: Workaround for ERR007885 on fec_enet_txq_submit_skb()
-Date: Mon, 28 Apr 2025 13:10:18 +0200
-Message-ID: <20250428111018.3048176-1-mattiasbarthel@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1745839230; c=relaxed/simple;
+	bh=lrGpwyIeyfi1QIbcIJ/Tj+3KQ+8NpzxTnUlKvV/xJi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWVCyBnitFzoqE4IdTXMC4sJm9wPTnk1IQJSY6V+/mqY1e3docSKKRxlcqUcvPyzQwYAnWE5stPdRTP34U7AMtVP1lefoCOtWeHgR1Oy/HP1erZ5nFL/jEcGOQadRJ8+tG0DwQQqLPxuyPSLf4yKoraponCf/BL9RwV/SaCdtOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pDiCebDu; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=sh9fvtw3x+0OKhV0VoEJRrPasUJuLRYfxSzZzi6/cg8=; b=pDiCebDuIci7Mk4OEF0McCApuQ
+	FmKEjP5+MQvESpcUKisrKxMFEveGBInusJogYaKdCXiCiCus5aTr62ELhPOBxB7A3iFx5nMfbyjca
+	aF25QoTTyLb5uCnm1z1rKjXRPOHO/LOaH3RkzXLw5MzluhGQ5C317ZIWnpcMZbDwFBaLNOl+CApuM
+	ShLctgazkaiCjWI+bd7hFG0SDzWMbvvrIOP1RldsVCKLBQgfrUC1Wm5ctw9Uq5/eLt5g4Y4LUhCEB
+	1i7Oos4x9bzJD2VjBFQecqi8SPcsWEoqG6K7xT7u2XK1YRHdwwkWJpk+2UxDz6m/gGE45O73p8Ror
+	eTWhswvQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u9MWg-001aq7-24;
+	Mon, 28 Apr 2025 19:19:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:19:54 +0800
+Date: Mon, 28 Apr 2025 19:19:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] crypto/krb5: Fix change to use SG miter to use
+ offset
+Message-ID: <aA9kWu9eViN17ZBs@gondor.apana.org.au>
+References: <3824017.1745835726@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3824017.1745835726@warthog.procyon.org.uk>
 
-From: Mattias Barthel <mattias.barthel@atlascopco.com>
+On Mon, Apr 28, 2025 at 11:22:06AM +0100, David Howells wrote:
+> [Note: Nothing in linus/master uses the krb5lib, though the bug is there,
+>  but it is used by AF_RXRPC's RxGK implementation in net-next, so can it go
+>  through the net-next tree rather than directly to Linus or through
+>  crypto?]
 
-Activate workaround also in fec_enet_txq_submit_skb() for when TSO is not enbabled.
+Sure I'm happy for this to go through net-next.
 
-Errata: ERR007885
-Symptoms: NETDEV WATCHDOG: eth0 (fec): transmit queue 0 timed out
+> The recent patch to make the rfc3961 simplified code use sg_miter rather
+> than manually walking the scatterlist to hash the contents of a buffer
+> described by that scatterlist failed to take the starting offset into
+> account.
+> 
+> This is indicated by the selftests reporting:
+> 
+>     krb5: Running aes128-cts-hmac-sha256-128 mic
+>     krb5: !!! TESTFAIL crypto/krb5/selftest.c:446
+>     krb5: MIC mismatch
+> 
+> Fix this by calling sg_miter_skip() before doing the loop to advance by the
+> offset.
+> 
+> This only affects packet signing modes and not full encryption in RxGK
+> because, for full encryption, the message digest is handled inside the
+> authenc and krb5enc drivers.
+> 
+> Fixes: da6f9bf40ac2 ("crypto: krb5 - Use SG miter instead of doing it by hand")
+> Reported-by: Marc Dionne <marc.dionne@auristor.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Chuck Lever <chuck.lever@oracle.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Simon Horman <horms@kernel.org>
+> cc: linux-afs@lists.infradead.org
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  crypto/krb5/rfc3961_simplified.c |    1 +
+>  1 file changed, 1 insertion(+)
 
-reference commit 37d6017b84f7 ("net: fec: Workaround for imx6sx enet tx hang when enable three queues"),
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Signed-off-by: Mattias Barthel <mattias.barthel@atlascopco.com>
----
- drivers/net/ethernet/freescale/fec_main.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a86cfebedaa8..17e9bddb9ddd 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -714,7 +714,12 @@ static int fec_enet_txq_submit_skb(struct fec_enet_priv_tx_q *txq,
- 	txq->bd.cur = bdp;
- 
- 	/* Trigger transmission start */
--	writel(0, txq->bd.reg_desc_active);
-+	if (!(fep->quirks & FEC_QUIRK_ERR007885) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active))
-+		writel(0, txq->bd.reg_desc_active);
- 
- 	return 0;
- }
+Thanks,
 -- 
-2.43.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
