@@ -1,106 +1,123 @@
-Return-Path: <netdev+bounces-186418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF282A9F085
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:22:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 778A7A9F08B
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E158E3BFCCB
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:21:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAFB846011F
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA13265CA8;
-	Mon, 28 Apr 2025 12:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DDB268C5D;
+	Mon, 28 Apr 2025 12:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pkhNkodw";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NFq8vrNV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC3886323;
-	Mon, 28 Apr 2025 12:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D69263F49;
+	Mon, 28 Apr 2025 12:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745842930; cv=none; b=PeBmYDsYU3NmxiJJ/ywlvsRLnnFFZj6/DYFX/7dsfu2FFcNap2HZVpX6Vtt8lh4W5RJDBKbqj/cY8fkLrQqUtKwnvfbhlCJO7JQlrB/xgvHWQ45zRPgNSt154yyFTz6nELTelkTJKs6PLzprDm0JbgI9sFZcv5NhfydQzqjJNuE=
+	t=1745842982; cv=none; b=erwAzm0dI0OCtgk7/4a/7cu1Tdv+vQMA4K8N2mfjoM4rLeHf1vFOkybAzY6LpAKcgpsgaKaFlmf4vq+MBHZeRG9ZwEI2MxnLtv2zYs+NvVojg2Psi+HYeWH/EY+bkGraycBswMKoUW/wZX+C4hYbELsK6vN7imbwURrq+0a+2/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745842930; c=relaxed/simple;
-	bh=iwCPnTEcqWtPPjwYKnp06t41X8Wuxu0DmYdPFC3IXto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jnpM5ha4mqrVS6WWjhhYoBF8ZifuFQSUkZKVA3aq8mSw4wEFq5JkmK7SpHcAUNe6RDUQJmAtq8Z+qaxEPVaXZ3q3VjsTWJ8x2XXFE9tk2C+U8u3U9kx4Z6MhLuqTm4oiSmmKPsRmle+uk0t3y5lViQTngDlEiIPCODQnylH+efk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (unknown [116.232.18.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id A4D2134307B;
-	Mon, 28 Apr 2025 12:22:07 +0000 (UTC)
-Date: Mon, 28 Apr 2025 12:21:56 +0000
-From: Yixun Lan <dlan@gentoo.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] dt-bindings: sram: sunxi-sram: Add A523 compatible
-Message-ID: <20250428122156-GYA56330@gentoo>
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
- <20250424-01-sun55i-emac0-v2-1-833f04d23e1d@gentoo.org>
- <20250428-vegan-stoic-flamingo-1d1a2a@kuoka>
+	s=arc-20240116; t=1745842982; c=relaxed/simple;
+	bh=qu645lgNZlFFzG0htqALVnBK1i71+x8/vctlUfK0K+M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KEV5rDtGylNZadt3kTzkz+JJ/tHEO6LKH4vpa1+ftqIvgAS0XTlpSxIfMTHKSVK9ib8YDzTYiS5UDfh5AzgaesCSky/rvlwhazD55b6wmV/v9ePWBUNPPQihbmT2pxxyET8nH4eCDswiiN1wwwU0EKpuYOg9HolaFztTnmXZjm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pkhNkodw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NFq8vrNV; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1745842978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9eqbeYenCoXA19FMuRWvc/t4gtyyENrf27sMY4k0b4s=;
+	b=pkhNkodwO4KW67rRMrgKHj8goQcEjLfSkdCc5rgJ+k/ImFFmmRMDNJEZ3fG2y/3RgjJAG8
+	A5IX/fR4cVAZmRogZ1ZH+O+vTWtRJcxBBsHVk8Kd3GrgFndTXJagY9PJsbDoJxNVAOgEpm
+	yXeq4NSQ2euBkVK/y44Gefnsd1LozszWF1YDpok/kKW5+sbejD/Bof/FVk5YAN4nKknOEr
+	1RP0cTuahcxrFMijTXukp7M2R6pDrO4zco/0B6GtpxoxBjE220VdpEBg8rTKiTpvARujQm
+	0aDDIpBbal5EMqSzNvWLWukfGCJ/pfW2muskJQhZhvvRMEgTFg2YZbxY92M5Lg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1745842978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9eqbeYenCoXA19FMuRWvc/t4gtyyENrf27sMY4k0b4s=;
+	b=NFq8vrNVQP+PQ/rGE0c7BJnVMM38KGRo7gMhYmSerEMU6XlRBeoXKuwgnzHdckRs5fHmGR
+	ol0CKgEM1LjXlTAQ==
+To: Bjorn Helgaas <helgaas@kernel.org>, Shradha Gupta
+ <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>, Yury
+ Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan
+ Cameron <Jonathan.Cameron@huwei.com>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, Long Li
+ <longli@microsoft.com>, Bjorn Helgaas <bhelgaas@google.com>, Rob Herring
+ <robh@kernel.org>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
+ <kw@linux.com>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Haiyang Zhang
+ <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Konstantin Taranov
+ <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Leon
+ Romanovsky <leon@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Erni
+ Sri Satya Vennela <ernis@linux.microsoft.com>, Peter Zijlstra
+ <peterz@infradead.org>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>, Shradha
+ Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v2 1/3] PCI: Export pci_msix_prepare_desc() for dynamic
+ MSI-X alloc
+In-Reply-To: <20250425163748.GA546623@bhelgaas>
+References: <20250425163748.GA546623@bhelgaas>
+Date: Mon, 28 Apr 2025 14:22:57 +0200
+Message-ID: <87ldrkqxum.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428-vegan-stoic-flamingo-1d1a2a@kuoka>
+Content-Type: text/plain
 
-Hi Krzysztof,
+On Fri, Apr 25 2025 at 11:37, Bjorn Helgaas wrote:
 
-On 09:21 Mon 28 Apr     , Krzysztof Kozlowski wrote:
-> On Thu, Apr 24, 2025 at 06:08:39PM GMT, Yixun Lan wrote:
-> > The Allwinner A523 family of SoCs have their "system control" registers
-> > compatible to the A64 SoC, so add the new SoC specific compatible string.
-> > 
-> > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> > Signed-off-by: Yixun Lan <dlan@gentoo.org>
-> > ---
-> >  .../devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml     | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> > index a7236f7db4ec34d44c4e2268f76281ef8ed83189..e7f7cf72719ea884d48fff69620467ff2834913b 100644
-> > --- a/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> > +++ b/Documentation/devicetree/bindings/sram/allwinner,sun4i-a10-system-control.yaml
-> > @@ -50,6 +50,7 @@ properties:
-> >            - enum:
-> >                - allwinner,sun50i-a100-system-control
-> >                - allwinner,sun50i-h6-system-control
-> > +              - allwinner,sun55i-a523-system-control
-> >            - const: allwinner,sun50i-a64-system-control
-> 
-> No update for the children (sram)?
-> 
-No, I don't think there is sub node for sram
-From address map of A527, there is total 4KB size space of
-this section which unlikely has sram available.
+Subject prefix wants to be PCI/MSI
 
-but I do see some BROM/SRAM space from 0x0000 0000 - 0x0006 3FFF ..
-(which should not be relavant to this patch series..)
+  git log --format=oneline path/to/file
 
--- 
-Yixun Lan (dlan)
+gives you a pretty decent hint
+
+
+
+> On Fri, Apr 25, 2025 at 03:53:57AM -0700, Shradha Gupta wrote:
+>> For supporting dynamic MSI-X vector allocation by PCI controllers, enabling
+>> the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN is not enough, msix_prepare_msi_desc()
+>> to prepare the desc is also needed.
+
+Please write things out: ... to prepare the MSI descriptor ....
+
+This is not twitter.
+
+>> Export pci_msix_prepare_desc() to allow PCI controllers to support dynamic
+>> MSI-X vector allocation.
+>> 
+>> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+>> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+
+> Thanks for the update and for splitting this from the hv driver
+> update.  Will watch for Thomas's ack here.
+
+Other than that:
+
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
