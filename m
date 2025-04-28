@@ -1,1272 +1,165 @@
-Return-Path: <netdev+bounces-186564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C924FA9FAC9
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:52:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7461A9FB94
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 23:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18341464E59
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:52:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D327F7AAC8B
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 21:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774F81DEFC6;
-	Mon, 28 Apr 2025 20:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2BE211491;
+	Mon, 28 Apr 2025 21:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4DaSyZn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/HhiYNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739D6101C8
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 20:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C34C215F7C;
+	Mon, 28 Apr 2025 21:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745873549; cv=none; b=D56dTvRzyLvnsIIgAIRrRHfVFSCrGyF7arx/mzgIM4V168lQRWWIc4VcISMVqPhkSHAu8Zkp5NvKixA5+QpoFrrX+qby1smK6A6fkRvoV4Efc+KwZO/FFX6NuvcncG5qobf2+oxzlh8L7lCXBYTmXC1kMEUel62pHqxbsKIku/s=
+	t=1745874145; cv=none; b=nxP/2v8NujGJYoTrjXU6OyJRMup+HiBQPoeMn6irFmx0Mi3Ny0vmt6yPh3NFnHHkOzUEvKSmn24mqfR40xbA2KfgywJbgyzzAuHIQ8GmrjbZXMMxgQXozQsZaEwLBFIAOOE1uzHzQERynOEh7XCmYhIRtxNwfXK4EZ2t7j6W/ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745873549; c=relaxed/simple;
-	bh=/81Sq0aWX1l5igol8/Az2Xn8jdXXrIem6C/DLQtD8E4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=WwWjZEflYH0Z6R3kVpwiIiA/1Qu8bubjHIq9jlc1cZ9VdpTUmy7XLcVbdbCp/fqeoCH87FD7qY56JHFwodP13xiE3GzXzHbX14igQNvQCkgfLMrmeOwyTRUIcrPCGfK9BUtcQmLY37TxuOewow0Rd5FZF5bXZPuLYU90NKzmaLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4DaSyZn; arc=none smtp.client-ip=209.85.221.45
+	s=arc-20240116; t=1745874145; c=relaxed/simple;
+	bh=Itbp7clee2hvnWfOWGWjGxRJxSbIg8VzQq6yzzThnsM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUgB63TJSGswHeZN85/a94/YnrYFron3oHvvaq/Unb6mXYWRkr6F0BCPW7W0F5F6ybvA2Q3+bkTLwLFbBV9ppFbU4FPV+kC93TPnb2kcw9K7ZlNimMjfoCANGSEJMP9VmxLYYaQQcBPUoBpsKQOzNuKVgcpTUteClPYmBMZhQAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/HhiYNJ; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-39ee57c0b8cso6159606f8f.0
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 13:52:26 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-736c1cf75e4so4590224b3a.2;
+        Mon, 28 Apr 2025 14:02:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745873545; x=1746478345; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O/juND/7WAHmlqwiJRal2X4lGcMe7rREOmkKwPhn+VY=;
-        b=X4DaSyZnr1xXlpyVC7DEh77i7xZKkMeD/dbNFxOAU7BdwaoVLzF8K1UHzZEnCiFuTI
-         w/2jK2plgq2hM8jZqWSq48tshtMyGW4OZzbORl3sbYl5wYuCLf8r+TxluUapT/Sp50/c
-         hUCsgBNYQQ5relQfVneQTvBSp2FeCXoeryrAPjWV/YaFBHR1W0AMBVfmG33gxqyAsnVS
-         Mdr4+HIIXrLClwASyQLrNfXid/sxoDvfYQLvr7idHFnRXNTbPzJak+GWIicpIfnimlxk
-         Bib/79lSVo6YO+1CwU1icdoitpg1Y7HSXzGqZBf7wT7Gy3FjD0fAH+kd2AtSoqDuPWz+
-         m+lA==
+        d=gmail.com; s=20230601; t=1745874142; x=1746478942; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hXXB00A+dPp6J1rZLZ3Xtsxe/hEjJz2VYrs1MOq8CDM=;
+        b=Y/HhiYNJ9ZELl149/g3NsDz3LJcwL3jfFU1ZCeBn6FgyT/sePacU+qBXIcujPWgaQ5
+         goxRw05nBGWQBlVlHwIaafnPzhjEykcqqRsMRvdjmVuXMRtm3GULQfJoRgpFtLjkl96s
+         OsmiIxur/OryLntdgYhmKs/Uq/i2WcZjegwYHqoRC/F49hppS8GuSUpHbaHvKd4BnZ+k
+         v8YcoIIWCioyk3TFBQ5xEjKnFgruFsxkxMezdIgnCO77pby3rokXSh1K8zaqSxOIH7cO
+         kihB0l7ZwWWyBlVrD1K1L2f5co3494KUeLt2e7jYjGd6GzZkO+08nGX/b4olqt4y6emj
+         LWdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745873545; x=1746478345;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/juND/7WAHmlqwiJRal2X4lGcMe7rREOmkKwPhn+VY=;
-        b=Rh15bAQstxzrwHDVUIDOnLron9Z+f757I1DyKG9AChElIlOkkhY0X5+zCCEgk+S5Ms
-         tyRiMY74upoHGZtEm3mc/g+BpTukaUNElQYQTHkhEthdIKa++ltSDsUPh/TkVom49Xz3
-         5wr0ydDTIsuhz6vyhksH35H/rRYaRpuok6JsyOmHJWX94YM3A2VkkfmVskc7T1xeZ9u8
-         uXmuPAz73GJY3PALkMLm3ua7+ZB3jy9rwx4LywfQ95nuXT1EzKbEWBBuI/gLD5cV2av7
-         i6raoUEQec+Gq8VM6LVun8yuQoChQJREK2tMjdaEdDvo3kDk/kBBbXVIudpO81TyNQ5s
-         vllQ==
-X-Gm-Message-State: AOJu0YzzlrVwIMZm4naQi70Jm58qu+DCy3LAnyJ/TKSMBRHmSGGIYfhx
-	D8exjWVPla88ig8tKo2gJPQiUy0h64CzNiRd+Z7ZZv24yI/MWS+J
-X-Gm-Gg: ASbGnctEwov3m4mD0/TioJf/QHQDFdXlYo1LtfsCiAzT5aARy3BF3drvjwIYcn9viZh
-	D4HUrBjkjPPiiYBg4ucJAtfTaYHHp0CfOlXdZ0j8Y3xJA1onLd6Hf9TjNx2ASohHg6F2CLeEUJv
-	tBq6I/EzdzxYvQ/tD5Kx+6IZZhRsmVkR8ja6EfdbIjPhSwqtGT0fgs7T9/mZaIpx79iFAfhSn4B
-	6b2b0qBDEzh0w81xvvVycea7TDELo0dhGfV/4Id89eFzm73SvfuoeMGMAS8XOVakEtkjpLtVU/M
-	j/HoeWXQGNYHHfdIqNEPQCcI0ZDJv7w1aH/8EZXWab0b/LIFlxYfH5dZqd+mQZrESEymX2zjhOW
-	I0Q+TJ7RV4KYWxiIgVbwOBaj265bucDjQSdlhjI/1S0zgqcw21AnroxdwziXojMNT6Tz1bvrfLv
-	6pYbZgMENBm80iwTGGMtl4aQYF9IQgE/k7
-X-Google-Smtp-Source: AGHT+IGG3t/Sp8fslCdlgXYyd+ynfsawPs/TB996VhlkZi/2coy/fTYgRaSQD6ntBu2z9qvev7nUcQ==
-X-Received: by 2002:a5d:5f4e:0:b0:3a0:7af3:be8f with SMTP id ffacd0b85a97d-3a0890a508dmr1036235f8f.5.1745873544397;
-        Mon, 28 Apr 2025 13:52:24 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:b032:6e00:a05d:150b:7829:9fc1? (dynamic-2a02-3100-b032-6e00-a05d-150b-7829-9fc1.310.pool.telefonica.de. [2a02:3100:b032:6e00:a05d:150b:7829:9fc1])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a073c8d1a5sm12375264f8f.13.2025.04.28.13.52.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Apr 2025 13:52:23 -0700 (PDT)
-Message-ID: <88f05558-21f5-4554-8f3c-ced45019b937@gmail.com>
-Date: Mon, 28 Apr 2025 22:53:47 +0200
+        d=1e100.net; s=20230601; t=1745874142; x=1746478942;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hXXB00A+dPp6J1rZLZ3Xtsxe/hEjJz2VYrs1MOq8CDM=;
+        b=F36kJZxioCLJAE2dL/XuTshBhxpuJ4VmHTjQRDxzFWJMHymceSy/0yGvqRY6PtZVen
+         /0kkpfY2hrFzkWZW7XBYVYOdmGdzjFV0QY4HMya7jn6rweyMXdnZfu+WUfRXU/Eal6TK
+         RSTsFykYbk7caf5MUG334cZK4b8u0fKNRKMSGUifNY1IPBWZuj2YY6y4WT/td59Y6KEC
+         FdylfzjOiNmxfoRYyRyopwxJoYZ2cS30dXDXkaxWUMUU4m2kTWvuij/uVIsM3we9PiIf
+         337Vc4huc5SfnXl6AUZ8AI8iMl1kjA4daWYl3mriGN0lktC0mptXETGGVLkgpz8AXCLe
+         WECg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6kNPN/qbEmrw/NFo4FqKW7Nn81wdB5pkQGx87QpRnQWiujM1VFiE7Pa0/BNm0qVT7A7Pb0lF2@vger.kernel.org, AJvYcCVzMHA3ZJ063mEK8DPJ2n7sHgE1zJAEth4+bnlLCQjxqxKWsDmT1CA1xmAVmtYijaG+b9VTPHW9r+FBsJg=@vger.kernel.org, AJvYcCW+5kMTcPxAqVnVAxW70IPQ+6G8DuwpWyULUHlz2VF/UeoWTZAC87JvGfXG0GIRI4/FiZKNcg2a@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn3KicfdSeRFfP1paiIeKdzL/jTLhn13nvnRv5MZxJwQY99Rny
+	B3cZ5DUqGDCnwqCgxvwqzupICSax4XW7Xnz8IzY+sZt8fp/2uCtI
+X-Gm-Gg: ASbGnctfxX1m5hqS/Cz1CvLcHKZ5DfWK8FMPCNKX8kKSWtHvUdrqFnozZR6MyBk1U2G
+	5Nqjm+8n8NTXQcjpKGgyCQQV5mXiSARVBbdFog40MuksLPFM2RhcO5ue6QJDg0Vi4i1fX1QnmB9
+	KMeAa9W2sJCo6re/oRrDf4ySkTAoKExY3+rluP6k1m8+08LSbRZV5uCPR7usv093WuvMTwOpgvT
+	8ICrJnMsZl4z2fTGvDi75gOvX+y0yvB2/dVfFIZQL35XKgLRqFMqHo3zoGz9fyqIWU4YrdcJlCt
+	52TRVx5mcgIiJuPs5hSyRgpdbtfAFy/b23RJLzj/iWQw
+X-Google-Smtp-Source: AGHT+IGQzTQOkq544Fxw04oa9VgEQc7AcWpngUxeHCjtqSAJ/vTs9P8Z2id3ozh+5cNJhu5851lR7w==
+X-Received: by 2002:a05:6a20:7f87:b0:1f5:8072:d7f3 with SMTP id adf61e73a8af0-2093e724297mr1426828637.30.1745874141571;
+        Mon, 28 Apr 2025 14:02:21 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25aca62csm8484928b3a.167.2025.04.28.14.02.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 14:02:21 -0700 (PDT)
+Date: Mon, 28 Apr 2025 14:02:20 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: "Alan J. Wylie" <alan@wylie.me.uk>
+Cc: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <aA/s3GBuDc5t1nY5@pop-os.localdomain>
+References: <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+ <aAf/K7F9TmCJIT+N@pop-os.localdomain>
+ <20250422214716.5e181523@frodo.int.wylie.me.uk>
+ <aAgO59L0ccXl6kUs@pop-os.localdomain>
+ <20250423105131.7ab46a47@frodo.int.wylie.me.uk>
+ <aAlAakEUu4XSEdXF@pop-os.localdomain>
+ <20250424135331.02511131@frodo.int.wylie.me.uk>
+ <aA6BcLENWhE4pQCa@pop-os.localdomain>
+ <20250427204254.6ae5cd4a@frodo.int.wylie.me.uk>
+ <20250427213548.73efc7b9@frodo.int.wylie.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: factor out provider part from mdio_bus.c
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250427213548.73efc7b9@frodo.int.wylie.me.uk>
 
-After 52358dd63e34 ("net: phy: remove function stubs") there's a
-problem if CONFIG_MDIO_BUS is set, but CONFIG_PHYLIB is not.
-mdiobus_scan() uses phylib functions like get_phy_device().
-Bringing back the stub wouldn't make much sense, because it would
-allow to compile mdiobus_scan(), but the function would be unusable.
-The stub returned NULL, and we have the following in mdiobus_scan():
+On Sun, Apr 27, 2025 at 09:35:48PM +0100, Alan J. Wylie wrote:
+> On Sun, 27 Apr 2025 20:42:54 +0100
+> "Alan J. Wylie" <alan@wylie.me.uk> wrote:
+> 
+> > That would be https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/ ?
+> > 
+> > I've just cloned that. I'll do a build and a test.
+> 
+> $ uname -r
+> 6.15.0-rc3-00109-gf73f05c6f711
+> 
+> It's crashed. Same place as usual. I tried again, same thing.
+> 
+>  htb_dequeue+0x42e/0x610 [sch_htb]
+> 
+> Rather than a ping flood, I was running a Speedtest. Both times it
+> crashed during the upload test, not the download.
+> 
+> https://www.speedtest.net/
+> 
+> Could running an iptables firewall perhaps have anything to do with it?
 
-phydev = get_phy_device(bus, addr, c45);
-        if (IS_ERR(phydev))
-                return phydev;
+I doubt it is related to iptables. I will try some TCP traffic on my
+side later, but I suspect this is related to the type of packets.
 
-So calling mdiobus_scan() w/o CONFIG_PHYLIB would cause a crash later in
-mdiobus_scan(). In general the PHYLIB functionality isn't optional here.
-Consequently, MDIO bus providers depend on PHYLIB.
-Therefore factor it out and build it together with the libphy core
-modules. In addition make all MDIO bus providers under /drivers/net/mdio
-depend on PHYLIB. Same applies to enetc MDIO bus provider. Note that
-PHYLIB selects MDIO_DEVRES, therefore we can omit the dependency here.
+Meanwhile, since I still can't reproduce it here, do you mind applying
+both of my patches on top of -net and test again?
 
-Fixes: 52358dd63e34 ("net: phy: remove function stubs")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202504270639.mT0lh2o1-lkp@intel.com/
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/freescale/enetc/Kconfig |   2 +-
- drivers/net/mdio/Kconfig                     |  16 +-
- drivers/net/phy/Makefile                     |   2 +-
- drivers/net/phy/mdio_bus.c                   | 462 +-----------------
- drivers/net/phy/mdio_bus_provider.c          | 484 +++++++++++++++++++
- include/linux/phy.h                          |   1 +
- 6 files changed, 494 insertions(+), 473 deletions(-)
- create mode 100644 drivers/net/phy/mdio_bus_provider.c
+For your convenience, below is the combined patch of the previous two
+patches, which can be applied on -net.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
-index 6c2779047..7250d3bbf 100644
---- a/drivers/net/ethernet/freescale/enetc/Kconfig
-+++ b/drivers/net/ethernet/freescale/enetc/Kconfig
-@@ -73,7 +73,7 @@ config FSL_ENETC_IERB
- 
- config FSL_ENETC_MDIO
- 	tristate "ENETC MDIO driver"
--	depends on PCI && MDIO_DEVRES && MDIO_BUS
-+	depends on PCI && PHYLIB
- 	help
- 	  This driver supports NXP ENETC Central MDIO controller as a PCIe
- 	  physical function (PF) device.
-diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-index 38a4901da..7868a7752 100644
---- a/drivers/net/mdio/Kconfig
-+++ b/drivers/net/mdio/Kconfig
-@@ -19,30 +19,25 @@ config MDIO_BUS
- 	  reflects whether the mdio_bus/mdio_device code is built as a
- 	  loadable module or built-in.
- 
-+if PHYLIB
-+
- config FWNODE_MDIO
--	def_tristate PHYLIB
--	depends on (ACPI || OF) || COMPILE_TEST
-+	def_tristate (ACPI || OF) || COMPILE_TEST
- 	select FIXED_PHY
- 	help
- 	  FWNODE MDIO bus (Ethernet PHY) accessors
- 
- config OF_MDIO
--	def_tristate PHYLIB
--	depends on OF
--	depends on PHYLIB
-+	def_tristate OF
- 	select FIXED_PHY
- 	help
- 	  OpenFirmware MDIO bus (Ethernet PHY) accessors
- 
- config ACPI_MDIO
--	def_tristate PHYLIB
--	depends on ACPI
--	depends on PHYLIB
-+	def_tristate ACPI
- 	help
- 	  ACPI MDIO bus (Ethernet PHY) accessors
- 
--if MDIO_BUS
--
- config MDIO_DEVRES
- 	tristate
- 
-@@ -57,7 +52,6 @@ config MDIO_SUN4I
- config MDIO_XGENE
- 	tristate "APM X-Gene SoC MDIO bus controller"
- 	depends on ARCH_XGENE || COMPILE_TEST
--	depends on PHYLIB
- 	help
- 	  This module provides a driver for the MDIO busses found in the
- 	  APM X-Gene SoC's.
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 23ce205ae..631859d44 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -3,7 +3,7 @@
- 
- libphy-y			:= phy.o phy-c45.o phy-core.o phy_device.o \
- 				   linkmode.o phy_link_topology.o \
--				   phy_package.o phy_caps.o
-+				   phy_package.o phy_caps.o mdio_bus_provider.o
- mdio-bus-y			+= mdio_bus.o mdio_device.o
- 
- ifdef CONFIG_MDIO_DEVICE
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index ede596c1a..f5ccbe33a 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -8,17 +8,14 @@
- 
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
--#include <linux/delay.h>
- #include <linux/device.h>
- #include <linux/errno.h>
- #include <linux/etherdevice.h>
- #include <linux/ethtool.h>
- #include <linux/gpio/consumer.h>
- #include <linux/init.h>
--#include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
--#include <linux/micrel_phy.h>
- #include <linux/mii.h>
- #include <linux/mm.h>
- #include <linux/module.h>
-@@ -27,7 +24,6 @@
- #include <linux/of_mdio.h>
- #include <linux/phy.h>
- #include <linux/reset.h>
--#include <linux/skbuff.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
- #include <linux/string.h>
-@@ -37,8 +33,6 @@
- #define CREATE_TRACE_POINTS
- #include <trace/events/mdio.h>
- 
--#include "mdio-boardinfo.h"
--
- static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
+Thanks!
+
+----->
+
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 4b9a639b642e..9d88fff120bc 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
+  */
+ static inline void htb_next_rb_node(struct rb_node **n)
  {
- 	/* Deassert the optional reset signal */
-@@ -136,45 +130,6 @@ bool mdiobus_is_registered_device(struct mii_bus *bus, int addr)
+-	*n = rb_next(*n);
++	if (*n)
++		*n = rb_next(*n);
  }
- EXPORT_SYMBOL(mdiobus_is_registered_device);
- 
--/**
-- * mdiobus_alloc_size - allocate a mii_bus structure
-- * @size: extra amount of memory to allocate for private storage.
-- * If non-zero, then bus->priv is points to that memory.
-- *
-- * Description: called by a bus driver to allocate an mii_bus
-- * structure to fill in.
-- */
--struct mii_bus *mdiobus_alloc_size(size_t size)
--{
--	struct mii_bus *bus;
--	size_t aligned_size = ALIGN(sizeof(*bus), NETDEV_ALIGN);
--	size_t alloc_size;
--	int i;
--
--	/* If we alloc extra space, it should be aligned */
--	if (size)
--		alloc_size = aligned_size + size;
--	else
--		alloc_size = sizeof(*bus);
--
--	bus = kzalloc(alloc_size, GFP_KERNEL);
--	if (!bus)
--		return NULL;
--
--	bus->state = MDIOBUS_ALLOCATED;
--	if (size)
--		bus->priv = (void *)bus + aligned_size;
--
--	/* Initialise the interrupts to polling and 64-bit seqcounts */
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		bus->irq[i] = PHY_POLL;
--		u64_stats_init(&bus->stats[i].syncp);
--	}
--
--	return bus;
--}
--EXPORT_SYMBOL(mdiobus_alloc_size);
--
- /**
-  * mdiobus_release - mii_bus device release callback
-  * @d: the target struct device that contains the mii_bus
-@@ -403,11 +358,12 @@ static const struct attribute_group *mdio_bus_groups[] = {
- 	NULL,
- };
- 
--static struct class mdio_bus_class = {
-+const struct class mdio_bus_class = {
- 	.name		= "mdio_bus",
- 	.dev_release	= mdiobus_release,
- 	.dev_groups	= mdio_bus_groups,
- };
-+EXPORT_SYMBOL_GPL(mdio_bus_class);
  
  /**
-  * mdio_find_bus - Given the name of a mdiobus, find the mii_bus.
-@@ -451,422 +407,8 @@ struct mii_bus *of_mdio_find_bus(struct device_node *mdio_bus_np)
- 	return d ? to_mii_bus(d) : NULL;
+@@ -1487,7 +1488,8 @@ static void htb_qlen_notify(struct Qdisc *sch, unsigned long arg)
+ 
+ 	if (!cl->prio_activity)
+ 		return;
+-	htb_deactivate(qdisc_priv(sch), cl);
++	if (!cl->leaf.q->q.qlen)
++		htb_deactivate(qdisc_priv(sch), cl);
  }
- EXPORT_SYMBOL(of_mdio_find_bus);
--
--/* Walk the list of subnodes of a mdio bus and look for a node that
-- * matches the mdio device's address with its 'reg' property. If
-- * found, set the of_node pointer for the mdio device. This allows
-- * auto-probed phy devices to be supplied with information passed in
-- * via DT.
-- * If a PHY package is found, PHY is searched also there.
-- */
--static int of_mdiobus_find_phy(struct device *dev, struct mdio_device *mdiodev,
--			       struct device_node *np)
--{
--	struct device_node *child;
--
--	for_each_available_child_of_node(np, child) {
--		int addr;
--
--		if (of_node_name_eq(child, "ethernet-phy-package")) {
--			/* Validate PHY package reg presence */
--			if (!of_property_present(child, "reg")) {
--				of_node_put(child);
--				return -EINVAL;
--			}
--
--			if (!of_mdiobus_find_phy(dev, mdiodev, child)) {
--				/* The refcount for the PHY package will be
--				 * incremented later when PHY join the Package.
--				 */
--				of_node_put(child);
--				return 0;
--			}
--
--			continue;
--		}
--
--		addr = of_mdio_parse_addr(dev, child);
--		if (addr < 0)
--			continue;
--
--		if (addr == mdiodev->addr) {
--			device_set_node(dev, of_fwnode_handle(child));
--			/* The refcount on "child" is passed to the mdio
--			 * device. Do _not_ use of_node_put(child) here.
--			 */
--			return 0;
--		}
--	}
--
--	return -ENODEV;
--}
--
--static void of_mdiobus_link_mdiodev(struct mii_bus *bus,
--				    struct mdio_device *mdiodev)
--{
--	struct device *dev = &mdiodev->dev;
--
--	if (dev->of_node || !bus->dev.of_node)
--		return;
--
--	of_mdiobus_find_phy(dev, mdiodev, bus->dev.of_node);
--}
--#else /* !IS_ENABLED(CONFIG_OF_MDIO) */
--static inline void of_mdiobus_link_mdiodev(struct mii_bus *mdio,
--					   struct mdio_device *mdiodev)
--{
--}
- #endif
  
--/**
-- * mdiobus_create_device - create a full MDIO device given
-- * a mdio_board_info structure
-- * @bus: MDIO bus to create the devices on
-- * @bi: mdio_board_info structure describing the devices
-- *
-- * Returns 0 on success or < 0 on error.
-- */
--static int mdiobus_create_device(struct mii_bus *bus,
--				 struct mdio_board_info *bi)
--{
--	struct mdio_device *mdiodev;
--	int ret = 0;
--
--	mdiodev = mdio_device_create(bus, bi->mdio_addr);
--	if (IS_ERR(mdiodev))
--		return -ENODEV;
--
--	strscpy(mdiodev->modalias, bi->modalias,
--		sizeof(mdiodev->modalias));
--	mdiodev->bus_match = mdio_device_bus_match;
--	mdiodev->dev.platform_data = (void *)bi->platform_data;
--
--	ret = mdio_device_register(mdiodev);
--	if (ret)
--		mdio_device_free(mdiodev);
--
--	return ret;
--}
--
--static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
--{
--	struct phy_device *phydev = ERR_PTR(-ENODEV);
--	struct fwnode_handle *fwnode;
--	char node_name[16];
--	int err;
--
--	phydev = get_phy_device(bus, addr, c45);
--	if (IS_ERR(phydev))
--		return phydev;
--
--	/* For DT, see if the auto-probed phy has a corresponding child
--	 * in the bus node, and set the of_node pointer in this case.
--	 */
--	of_mdiobus_link_mdiodev(bus, &phydev->mdio);
--
--	/* Search for a swnode for the phy in the swnode hierarchy of the bus.
--	 * If there is no swnode for the phy provided, just ignore it.
--	 */
--	if (dev_fwnode(&bus->dev) && !dev_fwnode(&phydev->mdio.dev)) {
--		snprintf(node_name, sizeof(node_name), "ethernet-phy@%d",
--			 addr);
--		fwnode = fwnode_get_named_child_node(dev_fwnode(&bus->dev),
--						     node_name);
--		if (fwnode)
--			device_set_node(&phydev->mdio.dev, fwnode);
--	}
--
--	err = phy_device_register(phydev);
--	if (err) {
--		phy_device_free(phydev);
--		return ERR_PTR(-ENODEV);
--	}
--
--	return phydev;
--}
--
--/**
-- * mdiobus_scan_c22 - scan one address on a bus for C22 MDIO devices.
-- * @bus: mii_bus to scan
-- * @addr: address on bus to scan
-- *
-- * This function scans one address on the MDIO bus, looking for
-- * devices which can be identified using a vendor/product ID in
-- * registers 2 and 3. Not all MDIO devices have such registers, but
-- * PHY devices typically do. Hence this function assumes anything
-- * found is a PHY, or can be treated as a PHY. Other MDIO devices,
-- * such as switches, will probably not be found during the scan.
-- */
--struct phy_device *mdiobus_scan_c22(struct mii_bus *bus, int addr)
--{
--	return mdiobus_scan(bus, addr, false);
--}
--EXPORT_SYMBOL(mdiobus_scan_c22);
--
--/**
-- * mdiobus_scan_c45 - scan one address on a bus for C45 MDIO devices.
-- * @bus: mii_bus to scan
-- * @addr: address on bus to scan
-- *
-- * This function scans one address on the MDIO bus, looking for
-- * devices which can be identified using a vendor/product ID in
-- * registers 2 and 3. Not all MDIO devices have such registers, but
-- * PHY devices typically do. Hence this function assumes anything
-- * found is a PHY, or can be treated as a PHY. Other MDIO devices,
-- * such as switches, will probably not be found during the scan.
-- */
--static struct phy_device *mdiobus_scan_c45(struct mii_bus *bus, int addr)
--{
--	return mdiobus_scan(bus, addr, true);
--}
--
--static int mdiobus_scan_bus_c22(struct mii_bus *bus)
--{
--	int i;
--
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		if ((bus->phy_mask & BIT(i)) == 0) {
--			struct phy_device *phydev;
--
--			phydev = mdiobus_scan_c22(bus, i);
--			if (IS_ERR(phydev) && (PTR_ERR(phydev) != -ENODEV))
--				return PTR_ERR(phydev);
--		}
--	}
--	return 0;
--}
--
--static int mdiobus_scan_bus_c45(struct mii_bus *bus)
--{
--	int i;
--
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		if ((bus->phy_mask & BIT(i)) == 0) {
--			struct phy_device *phydev;
--
--			/* Don't scan C45 if we already have a C22 device */
--			if (bus->mdio_map[i])
--				continue;
--
--			phydev = mdiobus_scan_c45(bus, i);
--			if (IS_ERR(phydev) && (PTR_ERR(phydev) != -ENODEV))
--				return PTR_ERR(phydev);
--		}
--	}
--	return 0;
--}
--
--/* There are some C22 PHYs which do bad things when where is a C45
-- * transaction on the bus, like accepting a read themselves, and
-- * stomping over the true devices reply, to performing a write to
-- * themselves which was intended for another device. Now that C22
-- * devices have been found, see if any of them are bad for C45, and if we
-- * should skip the C45 scan.
-- */
--static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
--{
--	int i;
--
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		struct phy_device *phydev;
--		u32 oui;
--
--		phydev = mdiobus_get_phy(bus, i);
--		if (!phydev)
--			continue;
--		oui = phydev->phy_id >> 10;
--
--		if (oui == MICREL_OUI)
--			return true;
--	}
--	return false;
--}
--
--/**
-- * __mdiobus_register - bring up all the PHYs on a given bus and attach them to bus
-- * @bus: target mii_bus
-- * @owner: module containing bus accessor functions
-- *
-- * Description: Called by a bus driver to bring up all the PHYs
-- *   on a given bus, and attach them to the bus. Drivers should use
-- *   mdiobus_register() rather than __mdiobus_register() unless they
-- *   need to pass a specific owner module. MDIO devices which are not
-- *   PHYs will not be brought up by this function. They are expected
-- *   to be explicitly listed in DT and instantiated by of_mdiobus_register().
-- *
-- * Returns 0 on success or < 0 on error.
-- */
--int __mdiobus_register(struct mii_bus *bus, struct module *owner)
--{
--	struct mdio_device *mdiodev;
--	struct gpio_desc *gpiod;
--	bool prevent_c45_scan;
--	int i, err;
--
--	if (!bus || !bus->name)
--		return -EINVAL;
--
--	/* An access method always needs both read and write operations */
--	if (!!bus->read != !!bus->write || !!bus->read_c45 != !!bus->write_c45)
--		return -EINVAL;
--
--	/* At least one method is mandatory */
--	if (!bus->read && !bus->read_c45)
--		return -EINVAL;
--
--	if (bus->parent && bus->parent->of_node)
--		bus->parent->of_node->fwnode.flags |=
--					FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD;
--
--	WARN(bus->state != MDIOBUS_ALLOCATED &&
--	     bus->state != MDIOBUS_UNREGISTERED,
--	     "%s: not in ALLOCATED or UNREGISTERED state\n", bus->id);
--
--	bus->owner = owner;
--	bus->dev.parent = bus->parent;
--	bus->dev.class = &mdio_bus_class;
--	bus->dev.groups = NULL;
--	dev_set_name(&bus->dev, "%s", bus->id);
--
--	/* If the bus state is allocated, we're registering a fresh bus
--	 * that may have a fwnode associated with it. Grab a reference
--	 * to the fwnode. This will be dropped when the bus is released.
--	 * If the bus was set to unregistered, it means that the bus was
--	 * previously registered, and we've already grabbed a reference.
--	 */
--	if (bus->state == MDIOBUS_ALLOCATED)
--		fwnode_handle_get(dev_fwnode(&bus->dev));
--
--	/* We need to set state to MDIOBUS_UNREGISTERED to correctly release
--	 * the device in mdiobus_free()
--	 *
--	 * State will be updated later in this function in case of success
--	 */
--	bus->state = MDIOBUS_UNREGISTERED;
--
--	err = device_register(&bus->dev);
--	if (err) {
--		pr_err("mii_bus %s failed to register\n", bus->id);
--		return -EINVAL;
--	}
--
--	mutex_init(&bus->mdio_lock);
--	mutex_init(&bus->shared_lock);
--
--	/* assert bus level PHY GPIO reset */
--	gpiod = devm_gpiod_get_optional(&bus->dev, "reset", GPIOD_OUT_HIGH);
--	if (IS_ERR(gpiod)) {
--		err = dev_err_probe(&bus->dev, PTR_ERR(gpiod),
--				    "mii_bus %s couldn't get reset GPIO\n",
--				    bus->id);
--		device_del(&bus->dev);
--		return err;
--	} else	if (gpiod) {
--		bus->reset_gpiod = gpiod;
--		fsleep(bus->reset_delay_us);
--		gpiod_set_value_cansleep(gpiod, 0);
--		if (bus->reset_post_delay_us > 0)
--			fsleep(bus->reset_post_delay_us);
--	}
--
--	if (bus->reset) {
--		err = bus->reset(bus);
--		if (err)
--			goto error_reset_gpiod;
--	}
--
--	if (bus->read) {
--		err = mdiobus_scan_bus_c22(bus);
--		if (err)
--			goto error;
--	}
--
--	prevent_c45_scan = mdiobus_prevent_c45_scan(bus);
--
--	if (!prevent_c45_scan && bus->read_c45) {
--		err = mdiobus_scan_bus_c45(bus);
--		if (err)
--			goto error;
--	}
--
--	mdiobus_setup_mdiodev_from_board_info(bus, mdiobus_create_device);
--
--	bus->state = MDIOBUS_REGISTERED;
--	dev_dbg(&bus->dev, "probed\n");
--	return 0;
--
--error:
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		mdiodev = bus->mdio_map[i];
--		if (!mdiodev)
--			continue;
--
--		mdiodev->device_remove(mdiodev);
--		mdiodev->device_free(mdiodev);
--	}
--error_reset_gpiod:
--	/* Put PHYs in RESET to save power */
--	if (bus->reset_gpiod)
--		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
--
--	device_del(&bus->dev);
--	return err;
--}
--EXPORT_SYMBOL(__mdiobus_register);
--
--void mdiobus_unregister(struct mii_bus *bus)
--{
--	struct mdio_device *mdiodev;
--	int i;
--
--	if (WARN_ON_ONCE(bus->state != MDIOBUS_REGISTERED))
--		return;
--	bus->state = MDIOBUS_UNREGISTERED;
--
--	for (i = 0; i < PHY_MAX_ADDR; i++) {
--		mdiodev = bus->mdio_map[i];
--		if (!mdiodev)
--			continue;
--
--		if (mdiodev->reset_gpio)
--			gpiod_put(mdiodev->reset_gpio);
--
--		mdiodev->device_remove(mdiodev);
--		mdiodev->device_free(mdiodev);
--	}
--
--	/* Put PHYs in RESET to save power */
--	if (bus->reset_gpiod)
--		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
--
--	device_del(&bus->dev);
--}
--EXPORT_SYMBOL(mdiobus_unregister);
--
--/**
-- * mdiobus_free - free a struct mii_bus
-- * @bus: mii_bus to free
-- *
-- * This function releases the reference to the underlying device
-- * object in the mii_bus.  If this is the last reference, the mii_bus
-- * will be freed.
-- */
--void mdiobus_free(struct mii_bus *bus)
--{
--	/* For compatibility with error handling in drivers. */
--	if (bus->state == MDIOBUS_ALLOCATED) {
--		kfree(bus);
--		return;
--	}
--
--	WARN(bus->state != MDIOBUS_UNREGISTERED,
--	     "%s: not in UNREGISTERED state\n", bus->id);
--	bus->state = MDIOBUS_RELEASED;
--
--	put_device(&bus->dev);
--}
--EXPORT_SYMBOL(mdiobus_free);
--
- static void mdiobus_stats_acct(struct mdio_bus_stats *stats, bool op, int ret)
- {
- 	preempt_disable();
-diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
-new file mode 100644
-index 000000000..65850e362
---- /dev/null
-+++ b/drivers/net/phy/mdio_bus_provider.c
-@@ -0,0 +1,484 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* MDIO Bus provider interface
-+ *
-+ * Author: Andy Fleming
-+ *
-+ * Copyright (c) 2004 Freescale Semiconductor, Inc.
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/errno.h>
-+#include <linux/etherdevice.h>
-+#include <linux/ethtool.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/micrel_phy.h>
-+#include <linux/mii.h>
-+#include <linux/mm.h>
-+#include <linux/netdevice.h>
-+#include <linux/of_device.h>
-+#include <linux/of_mdio.h>
-+#include <linux/phy.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/uaccess.h>
-+#include <linux/unistd.h>
-+
-+#include "mdio-boardinfo.h"
-+
-+/**
-+ * mdiobus_alloc_size - allocate a mii_bus structure
-+ * @size: extra amount of memory to allocate for private storage.
-+ * If non-zero, then bus->priv is points to that memory.
-+ *
-+ * Description: called by a bus driver to allocate an mii_bus
-+ * structure to fill in.
-+ */
-+struct mii_bus *mdiobus_alloc_size(size_t size)
-+{
-+	struct mii_bus *bus;
-+	size_t aligned_size = ALIGN(sizeof(*bus), NETDEV_ALIGN);
-+	size_t alloc_size;
-+	int i;
-+
-+	/* If we alloc extra space, it should be aligned */
-+	if (size)
-+		alloc_size = aligned_size + size;
-+	else
-+		alloc_size = sizeof(*bus);
-+
-+	bus = kzalloc(alloc_size, GFP_KERNEL);
-+	if (!bus)
-+		return NULL;
-+
-+	bus->state = MDIOBUS_ALLOCATED;
-+	if (size)
-+		bus->priv = (void *)bus + aligned_size;
-+
-+	/* Initialise the interrupts to polling and 64-bit seqcounts */
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		bus->irq[i] = PHY_POLL;
-+		u64_stats_init(&bus->stats[i].syncp);
-+	}
-+
-+	return bus;
-+}
-+EXPORT_SYMBOL(mdiobus_alloc_size);
-+
-+#if IS_ENABLED(CONFIG_OF_MDIO)
-+/* Walk the list of subnodes of a mdio bus and look for a node that
-+ * matches the mdio device's address with its 'reg' property. If
-+ * found, set the of_node pointer for the mdio device. This allows
-+ * auto-probed phy devices to be supplied with information passed in
-+ * via DT.
-+ * If a PHY package is found, PHY is searched also there.
-+ */
-+static int of_mdiobus_find_phy(struct device *dev, struct mdio_device *mdiodev,
-+			       struct device_node *np)
-+{
-+	struct device_node *child;
-+
-+	for_each_available_child_of_node(np, child) {
-+		int addr;
-+
-+		if (of_node_name_eq(child, "ethernet-phy-package")) {
-+			/* Validate PHY package reg presence */
-+			if (!of_property_present(child, "reg")) {
-+				of_node_put(child);
-+				return -EINVAL;
-+			}
-+
-+			if (!of_mdiobus_find_phy(dev, mdiodev, child)) {
-+				/* The refcount for the PHY package will be
-+				 * incremented later when PHY join the Package.
-+				 */
-+				of_node_put(child);
-+				return 0;
-+			}
-+
-+			continue;
-+		}
-+
-+		addr = of_mdio_parse_addr(dev, child);
-+		if (addr < 0)
-+			continue;
-+
-+		if (addr == mdiodev->addr) {
-+			device_set_node(dev, of_fwnode_handle(child));
-+			/* The refcount on "child" is passed to the mdio
-+			 * device. Do _not_ use of_node_put(child) here.
-+			 */
-+			return 0;
-+		}
-+	}
-+
-+	return -ENODEV;
-+}
-+
-+static void of_mdiobus_link_mdiodev(struct mii_bus *bus,
-+				    struct mdio_device *mdiodev)
-+{
-+	struct device *dev = &mdiodev->dev;
-+
-+	if (dev->of_node || !bus->dev.of_node)
-+		return;
-+
-+	of_mdiobus_find_phy(dev, mdiodev, bus->dev.of_node);
-+}
-+#endif
-+
-+/**
-+ * mdiobus_create_device - create a full MDIO device given
-+ * a mdio_board_info structure
-+ * @bus: MDIO bus to create the devices on
-+ * @bi: mdio_board_info structure describing the devices
-+ *
-+ * Returns 0 on success or < 0 on error.
-+ */
-+static int mdiobus_create_device(struct mii_bus *bus,
-+				 struct mdio_board_info *bi)
-+{
-+	struct mdio_device *mdiodev;
-+	int ret = 0;
-+
-+	mdiodev = mdio_device_create(bus, bi->mdio_addr);
-+	if (IS_ERR(mdiodev))
-+		return -ENODEV;
-+
-+	strscpy(mdiodev->modalias, bi->modalias,
-+		sizeof(mdiodev->modalias));
-+	mdiodev->bus_match = mdio_device_bus_match;
-+	mdiodev->dev.platform_data = (void *)bi->platform_data;
-+
-+	ret = mdio_device_register(mdiodev);
-+	if (ret)
-+		mdio_device_free(mdiodev);
-+
-+	return ret;
-+}
-+
-+static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
-+{
-+	struct phy_device *phydev = ERR_PTR(-ENODEV);
-+	struct fwnode_handle *fwnode;
-+	char node_name[16];
-+	int err;
-+
-+	phydev = get_phy_device(bus, addr, c45);
-+	if (IS_ERR(phydev))
-+		return phydev;
-+
-+#if IS_ENABLED(CONFIG_OF_MDIO)
-+	/* For DT, see if the auto-probed phy has a corresponding child
-+	 * in the bus node, and set the of_node pointer in this case.
-+	 */
-+	of_mdiobus_link_mdiodev(bus, &phydev->mdio);
-+#endif
-+
-+	/* Search for a swnode for the phy in the swnode hierarchy of the bus.
-+	 * If there is no swnode for the phy provided, just ignore it.
-+	 */
-+	if (dev_fwnode(&bus->dev) && !dev_fwnode(&phydev->mdio.dev)) {
-+		snprintf(node_name, sizeof(node_name), "ethernet-phy@%d",
-+			 addr);
-+		fwnode = fwnode_get_named_child_node(dev_fwnode(&bus->dev),
-+						     node_name);
-+		if (fwnode)
-+			device_set_node(&phydev->mdio.dev, fwnode);
-+	}
-+
-+	err = phy_device_register(phydev);
-+	if (err) {
-+		phy_device_free(phydev);
-+		return ERR_PTR(-ENODEV);
-+	}
-+
-+	return phydev;
-+}
-+
-+/**
-+ * mdiobus_scan_c22 - scan one address on a bus for C22 MDIO devices.
-+ * @bus: mii_bus to scan
-+ * @addr: address on bus to scan
-+ *
-+ * This function scans one address on the MDIO bus, looking for
-+ * devices which can be identified using a vendor/product ID in
-+ * registers 2 and 3. Not all MDIO devices have such registers, but
-+ * PHY devices typically do. Hence this function assumes anything
-+ * found is a PHY, or can be treated as a PHY. Other MDIO devices,
-+ * such as switches, will probably not be found during the scan.
-+ */
-+struct phy_device *mdiobus_scan_c22(struct mii_bus *bus, int addr)
-+{
-+	return mdiobus_scan(bus, addr, false);
-+}
-+EXPORT_SYMBOL(mdiobus_scan_c22);
-+
-+/**
-+ * mdiobus_scan_c45 - scan one address on a bus for C45 MDIO devices.
-+ * @bus: mii_bus to scan
-+ * @addr: address on bus to scan
-+ *
-+ * This function scans one address on the MDIO bus, looking for
-+ * devices which can be identified using a vendor/product ID in
-+ * registers 2 and 3. Not all MDIO devices have such registers, but
-+ * PHY devices typically do. Hence this function assumes anything
-+ * found is a PHY, or can be treated as a PHY. Other MDIO devices,
-+ * such as switches, will probably not be found during the scan.
-+ */
-+static struct phy_device *mdiobus_scan_c45(struct mii_bus *bus, int addr)
-+{
-+	return mdiobus_scan(bus, addr, true);
-+}
-+
-+static int mdiobus_scan_bus_c22(struct mii_bus *bus)
-+{
-+	int i;
-+
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		if ((bus->phy_mask & BIT(i)) == 0) {
-+			struct phy_device *phydev;
-+
-+			phydev = mdiobus_scan_c22(bus, i);
-+			if (IS_ERR(phydev) && (PTR_ERR(phydev) != -ENODEV))
-+				return PTR_ERR(phydev);
-+		}
-+	}
-+	return 0;
-+}
-+
-+static int mdiobus_scan_bus_c45(struct mii_bus *bus)
-+{
-+	int i;
-+
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		if ((bus->phy_mask & BIT(i)) == 0) {
-+			struct phy_device *phydev;
-+
-+			/* Don't scan C45 if we already have a C22 device */
-+			if (bus->mdio_map[i])
-+				continue;
-+
-+			phydev = mdiobus_scan_c45(bus, i);
-+			if (IS_ERR(phydev) && (PTR_ERR(phydev) != -ENODEV))
-+				return PTR_ERR(phydev);
-+		}
-+	}
-+	return 0;
-+}
-+
-+/* There are some C22 PHYs which do bad things when where is a C45
-+ * transaction on the bus, like accepting a read themselves, and
-+ * stomping over the true devices reply, to performing a write to
-+ * themselves which was intended for another device. Now that C22
-+ * devices have been found, see if any of them are bad for C45, and if we
-+ * should skip the C45 scan.
-+ */
-+static bool mdiobus_prevent_c45_scan(struct mii_bus *bus)
-+{
-+	int i;
-+
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		struct phy_device *phydev;
-+		u32 oui;
-+
-+		phydev = mdiobus_get_phy(bus, i);
-+		if (!phydev)
-+			continue;
-+		oui = phydev->phy_id >> 10;
-+
-+		if (oui == MICREL_OUI)
-+			return true;
-+	}
-+	return false;
-+}
-+
-+/**
-+ * __mdiobus_register - bring up all the PHYs on a given bus and attach them to bus
-+ * @bus: target mii_bus
-+ * @owner: module containing bus accessor functions
-+ *
-+ * Description: Called by a bus driver to bring up all the PHYs
-+ *   on a given bus, and attach them to the bus. Drivers should use
-+ *   mdiobus_register() rather than __mdiobus_register() unless they
-+ *   need to pass a specific owner module. MDIO devices which are not
-+ *   PHYs will not be brought up by this function. They are expected
-+ *   to be explicitly listed in DT and instantiated by of_mdiobus_register().
-+ *
-+ * Returns 0 on success or < 0 on error.
-+ */
-+int __mdiobus_register(struct mii_bus *bus, struct module *owner)
-+{
-+	struct mdio_device *mdiodev;
-+	struct gpio_desc *gpiod;
-+	bool prevent_c45_scan;
-+	int i, err;
-+
-+	if (!bus || !bus->name)
-+		return -EINVAL;
-+
-+	/* An access method always needs both read and write operations */
-+	if (!!bus->read != !!bus->write || !!bus->read_c45 != !!bus->write_c45)
-+		return -EINVAL;
-+
-+	/* At least one method is mandatory */
-+	if (!bus->read && !bus->read_c45)
-+		return -EINVAL;
-+
-+	if (bus->parent && bus->parent->of_node)
-+		bus->parent->of_node->fwnode.flags |=
-+					FWNODE_FLAG_NEEDS_CHILD_BOUND_ON_ADD;
-+
-+	WARN(bus->state != MDIOBUS_ALLOCATED &&
-+	     bus->state != MDIOBUS_UNREGISTERED,
-+	     "%s: not in ALLOCATED or UNREGISTERED state\n", bus->id);
-+
-+	bus->owner = owner;
-+	bus->dev.parent = bus->parent;
-+	bus->dev.class = &mdio_bus_class;
-+	bus->dev.groups = NULL;
-+	dev_set_name(&bus->dev, "%s", bus->id);
-+
-+	/* If the bus state is allocated, we're registering a fresh bus
-+	 * that may have a fwnode associated with it. Grab a reference
-+	 * to the fwnode. This will be dropped when the bus is released.
-+	 * If the bus was set to unregistered, it means that the bus was
-+	 * previously registered, and we've already grabbed a reference.
-+	 */
-+	if (bus->state == MDIOBUS_ALLOCATED)
-+		fwnode_handle_get(dev_fwnode(&bus->dev));
-+
-+	/* We need to set state to MDIOBUS_UNREGISTERED to correctly release
-+	 * the device in mdiobus_free()
-+	 *
-+	 * State will be updated later in this function in case of success
-+	 */
-+	bus->state = MDIOBUS_UNREGISTERED;
-+
-+	err = device_register(&bus->dev);
-+	if (err) {
-+		pr_err("mii_bus %s failed to register\n", bus->id);
-+		return -EINVAL;
-+	}
-+
-+	mutex_init(&bus->mdio_lock);
-+	mutex_init(&bus->shared_lock);
-+
-+	/* assert bus level PHY GPIO reset */
-+	gpiod = devm_gpiod_get_optional(&bus->dev, "reset", GPIOD_OUT_HIGH);
-+	if (IS_ERR(gpiod)) {
-+		err = dev_err_probe(&bus->dev, PTR_ERR(gpiod),
-+				    "mii_bus %s couldn't get reset GPIO\n",
-+				    bus->id);
-+		device_del(&bus->dev);
-+		return err;
-+	} else	if (gpiod) {
-+		bus->reset_gpiod = gpiod;
-+		fsleep(bus->reset_delay_us);
-+		gpiod_set_value_cansleep(gpiod, 0);
-+		if (bus->reset_post_delay_us > 0)
-+			fsleep(bus->reset_post_delay_us);
-+	}
-+
-+	if (bus->reset) {
-+		err = bus->reset(bus);
-+		if (err)
-+			goto error_reset_gpiod;
-+	}
-+
-+	if (bus->read) {
-+		err = mdiobus_scan_bus_c22(bus);
-+		if (err)
-+			goto error;
-+	}
-+
-+	prevent_c45_scan = mdiobus_prevent_c45_scan(bus);
-+
-+	if (!prevent_c45_scan && bus->read_c45) {
-+		err = mdiobus_scan_bus_c45(bus);
-+		if (err)
-+			goto error;
-+	}
-+
-+	mdiobus_setup_mdiodev_from_board_info(bus, mdiobus_create_device);
-+
-+	bus->state = MDIOBUS_REGISTERED;
-+	dev_dbg(&bus->dev, "probed\n");
-+	return 0;
-+
-+error:
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		mdiodev = bus->mdio_map[i];
-+		if (!mdiodev)
-+			continue;
-+
-+		mdiodev->device_remove(mdiodev);
-+		mdiodev->device_free(mdiodev);
-+	}
-+error_reset_gpiod:
-+	/* Put PHYs in RESET to save power */
-+	if (bus->reset_gpiod)
-+		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
-+
-+	device_del(&bus->dev);
-+	return err;
-+}
-+EXPORT_SYMBOL(__mdiobus_register);
-+
-+void mdiobus_unregister(struct mii_bus *bus)
-+{
-+	struct mdio_device *mdiodev;
-+	int i;
-+
-+	if (WARN_ON_ONCE(bus->state != MDIOBUS_REGISTERED))
-+		return;
-+	bus->state = MDIOBUS_UNREGISTERED;
-+
-+	for (i = 0; i < PHY_MAX_ADDR; i++) {
-+		mdiodev = bus->mdio_map[i];
-+		if (!mdiodev)
-+			continue;
-+
-+		if (mdiodev->reset_gpio)
-+			gpiod_put(mdiodev->reset_gpio);
-+
-+		mdiodev->device_remove(mdiodev);
-+		mdiodev->device_free(mdiodev);
-+	}
-+
-+	/* Put PHYs in RESET to save power */
-+	if (bus->reset_gpiod)
-+		gpiod_set_value_cansleep(bus->reset_gpiod, 1);
-+
-+	device_del(&bus->dev);
-+}
-+EXPORT_SYMBOL(mdiobus_unregister);
-+
-+/**
-+ * mdiobus_free - free a struct mii_bus
-+ * @bus: mii_bus to free
-+ *
-+ * This function releases the reference to the underlying device
-+ * object in the mii_bus.  If this is the last reference, the mii_bus
-+ * will be freed.
-+ */
-+void mdiobus_free(struct mii_bus *bus)
-+{
-+	/* For compatibility with error handling in drivers. */
-+	if (bus->state == MDIOBUS_ALLOCATED) {
-+		kfree(bus);
-+		return;
-+	}
-+
-+	WARN(bus->state != MDIOBUS_UNREGISTERED,
-+	     "%s: not in UNREGISTERED state\n", bus->id);
-+	bus->state = MDIOBUS_RELEASED;
-+
-+	put_device(&bus->dev);
-+}
-+EXPORT_SYMBOL(mdiobus_free);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 3beaf225e..d62d29202 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2062,6 +2062,7 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
- 		       struct netlink_ext_ack *extack);
- 
- extern const struct bus_type mdio_bus_type;
-+extern const struct class mdio_bus_class;
- 
- struct mdio_board_info {
- 	const char	*bus_id;
--- 
-2.49.0
-
+ static inline int htb_parent_last_child(struct htb_class *cl)
 
