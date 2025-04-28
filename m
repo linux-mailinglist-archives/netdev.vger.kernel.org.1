@@ -1,151 +1,121 @@
-Return-Path: <netdev+bounces-186606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CA6A9FDBC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 01:30:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0F3A9FDD6
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 01:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B3CF465D36
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 23:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21E241A854FF
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 23:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABB61F872A;
-	Mon, 28 Apr 2025 23:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F0F211491;
+	Mon, 28 Apr 2025 23:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKWEuNx/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dl1U3RmC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416302144DD
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 23:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445F418BBBB;
+	Mon, 28 Apr 2025 23:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745883005; cv=none; b=ZG5Gmfji+mvS0j/QC7tkBGNLwp59uWyo54frXUbRo8KyYX4hPH0n19NLKxwLZscNT+LHpe1CeS8WANUcZ8LJ/gLKG6ZSGtHmOmWE4poFimT8l7NlhjbpIZPPV2fEZziqtJChWIROFoXm6G51ltS0os0/axNYtK3Y3cX4Q9n7Tbc=
+	t=1745883485; cv=none; b=oInX2e1Yec7JB2BMFYQGNh5v3ltx5usFiMoueT5x+rnw0Tes3iHi/Cg+dDyisWX79l3a8Ht0LQ+VSizZYoMRMBrl6Dzubn+kFTqeU51LQEFDVf30BwKDDa07ZMnJrJ4NpEtc4eo8OWkFm6S7mfdHpnd2xh/hhdqDQuuSSo4cRuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745883005; c=relaxed/simple;
-	bh=vPX/9G7rGUdixVWH6XEgU5nXw80wp0iVXQEKff6VvOg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OwFmHqsbfzEa6AcHR1ljcmptS29WzSvQtyVJWv/S77rEPYcFRgvkFoIBVrrAjNJ6zRl6OUtpgN2aMFJlnXlOQpPz0azDt4EOl7rutUPM8ZKvwapIQbgU/IRGOJlSTpmJCjdZzcDFyw4sW7IORbCJbYqqIJvS/7NKE/7Ahg4b/mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CKWEuNx/; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1745883485; c=relaxed/simple;
+	bh=oQ3FbEePiwGWAsASS7Z4SAIJv7xHO9jREHRK/Aibiy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lf7FK5W22Xdx9RkTN72quGPU1yHvhFsqkC7MQLiGcL4IUQyrLEEPZVQv1ebmc/fP281bmiD0WRZiMKdr9tWP/NjiOeYg7oRI3wOMRTKeFMnVqGHJ/OgyiuTvuNj5TMoMb4Mdzu7mW+9+HrPobW6JenHmbEzRILsygY/Ccnl0LSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dl1U3RmC; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2254e0b4b79so80857995ad.2
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 16:30:04 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2260c91576aso45732545ad.3;
+        Mon, 28 Apr 2025 16:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745883003; x=1746487803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KGPEKxRe6SATBC+FewuQTdDmNk1fupKOTGShzVD+Mek=;
-        b=CKWEuNx/6PBw80bITud9Xjxe+ngMafQuHDg2EKOvjFOcVquS4E/LwdCLWmqC87dreJ
-         suQD1M1+1aBUKjie7OFViYfe58wyrZzLCcY4cDbUGYMLkIFe9oNLx5QS5tXIdKj1IWiN
-         tHHWvZKCLQEzelHDtoGSe9e+drCW2se3SQquWXtKQk3yvDl+tQ/Ovvtj/LXSAqP217at
-         doO2DotgtLvBHPZ9GgsQ8n38u2rUryHCgxOYSnNNM3BSYvV+POp5eLtDOly8MB01lVYX
-         uDeqy5IUD61sZuus7Rrgq+W73CKeLDNNMNTJP0a9LoAWzr04rVNXDO1qayqvFVENfdw8
-         BYmg==
+        d=gmail.com; s=20230601; t=1745883483; x=1746488283; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dLf00+i5WXU9IavHUl6p2C33/ZAJdIRYZ+FKsvR9muY=;
+        b=Dl1U3RmCcCXb2kWn6LJ4noVAJoFYY+Mk+krek9ULb0tLSK5gsza3I2cDdaBQ83uBRU
+         i+ovQnt64jUQimD52PJbyKhbKdh13S2LiiHHhaAZWUmwUZ3lVYzE0RXyw4xBeLOytQ4L
+         ogYTbiAjKjPuzoqU1AQgnW+pv34Jxho4+2rJtYOyCwhb+75MoJsSgZS4EnqXNXTteDGn
+         6Vqc8aKnbKepJ4DwMZXyIjfyFsm6uVUtujryxPWeiLPtB/93GqfDa0fUPCGFUhP9yj1F
+         a86tPwoTMgpF11EgC8lKX3rwodfJOeRlt54zDeLzrN0I7u1dsK15eSfBu6tZBqGX5q1R
+         QBSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745883003; x=1746487803;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KGPEKxRe6SATBC+FewuQTdDmNk1fupKOTGShzVD+Mek=;
-        b=cZ+Zdbi07OlnaiKyNl/WJrBBMHUrjkGO2db02xDjvXSIT5WUiYUjlooR82Lxn5CW53
-         uFCeXjtqVtaLm486R9aj3SRXI0PdWQ6W9pkxP9cS6aTsMmYto/VdYaG6KLgkfyUBJSiO
-         /PsQnTT+MYT5jDfAg168mMAigOPCNi+JUpQdKmeTZ4CbJ2Oriw/U1DJPw55TPRwnLphi
-         a7ebyhVgikZTn9ajXSo/fUeoqc7ROr2nYkhGxGVnh4D827zXv9nkTbQ15C4ZOSB1X2T4
-         g31JZE/qYnMIR6aTkXALbB/jJ9oeUPmh2Y+b8s5mT8/RBFJ2UZVM/fhhCU1Q5cgcmEjT
-         111g==
-X-Gm-Message-State: AOJu0YypfF4cOLMHS2YrFZjDsXz+H6TUdSDfvWGVyxXGCr/jOoI2EYBv
-	trqWOxsCK9Clt88uBRNubzdbEzPkDLoQtps0Xyqn5+IPN+jIQfEhUCB+Bj9K
-X-Gm-Gg: ASbGnctUe8pQ9eZkFjAK7TExkR+74puUg+Ho50EbL1WLRA2DmAxzgTTSMQe5egwdUg3
-	4DolZBMLBZt4COZy30RM0LbWzICUbDmwkGhm/D+QfXiGRFcTYipGXt0p2odN6k65ud9cVSkq+iR
-	MIq+Su7L6nx2SSTiIowfB+r1068CEGesIK5jYLtx6t4P//88H3zSDMJ/vNWAFsBXvsbe9AS9KuW
-	j9pQmILm2cMmuVLqvJCJkx6ZNuM6cAFHvcmNlul8RFDp9efQ7Bl2DILWk2bQQFEzBInu+8I+pDB
-	LPhmSjF23YbObqK0uoJTQI6DxskAEGEUkUoDCPQ5gt0zMIknSr8=
-X-Google-Smtp-Source: AGHT+IEnBaH20mQ0xo51RaYGiZCUJvsdV9LiS4aCl/M9KFcFTagqxctF3c2oyBizX5aZV5ntbVpL8A==
-X-Received: by 2002:a17:903:2b10:b0:223:668d:eba9 with SMTP id d9443c01a7336-22de5ebb11amr22827535ad.10.1745883003227;
-        Mon, 28 Apr 2025 16:30:03 -0700 (PDT)
-Received: from pop-os.scu.edu ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4db97b3sm89248235ad.55.2025.04.28.16.30.02
+        d=1e100.net; s=20230601; t=1745883483; x=1746488283;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dLf00+i5WXU9IavHUl6p2C33/ZAJdIRYZ+FKsvR9muY=;
+        b=MIhQ65ve+7NUQ091epkYM0SPvOqECkQzoEOWbPaXntjJGxhIexka2HgWK2fIzWVuQx
+         GxBxhlRopgsffolgJveGtDSrt422XWMeeDLlHnNf3Ur/WAkdSVvFCvf9N5l+5xjcM+EX
+         eZdaMo/3rRXg8C9O2g3NEhlrM5MZnLBvzWQ1um+EQ2yqFRQQxu2MXy715xuEvVMZtWxh
+         LzvnZLZpLQ9TjTh4Hq1BUGS+kVXgxaLsQ0WyEbCGPOrQp4AQLK3KFITlU3oNhuQwHDmk
+         RiNSRUBVyEerDLp6uNLVvaFMMBKznqHVIEM0tZbYMKkZmRP4zN9Vrom/uT2mIeJV1z6j
+         ZiAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUC8LYWyQ8LOIrtDNV6pJ9r75TUYyKtVFF/bzTTKkaj2GhMxban5BhmPhu7pO6gNaXQkjjzlpaL@vger.kernel.org, AJvYcCX5tUMgF4XAa1W9v3QVzstu85N4F5iVlUl/zRd9VudusBElSglncrbwsnRzDYByMWbf69m0njdC+0gutSQ=@vger.kernel.org, AJvYcCXZg4D5eMvrQ8AFORP/hvwoi25KseXkmETy1xgoqcOyokBuiDBkZRZNGxiC45sFSRYNfsgamKrN@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRmtaCJWRuIEgdd0LJk3GPkmV5EmCtjs/K/El0eyHU+QziV62p
+	aEMjCfx8uXutAgMpAbWjwNNhVmYBQ4HzW9gJpZeDJnc1eKryEE8M
+X-Gm-Gg: ASbGnctp7Q0qMyR7CwkD931t3FtNlseyZU9PAn3mMvxMYKs+5mznkbJU5owbX+6dNxV
+	tgGsu/fI1xhulOg4s77g8fevQn2q795mSPylSWyLGnKSZs3IqLH2L03ND+FqJvndvQk+8C6nm1d
+	w4pR1kRrxJxBxJve7OzZj812j5NzyaMwgHrH7DUNYQtxQ8t6jbQ7Z4UJa7Xttc12a7Ac4kRq4WE
+	ttxQ3cDM/gUm3pDokb2jU+wYGAqbOjsUnW+B2sV12shR1JgBPIhor8hGnbDeXToHiDO00ATLBW6
+	LSGzfM1a/BJJ9MGpmlrDoHQJR8LhoEHvRmvS0Kg20M0C
+X-Google-Smtp-Source: AGHT+IGkMQz3emXbltwBn1k0bQRrPQBRYhRx9PCGAj8+J4ESGupWLyylRHbo8KPGmReOdBEw7WzX+Q==
+X-Received: by 2002:a17:902:c453:b0:22d:e57a:2795 with SMTP id d9443c01a7336-22de57a2dc4mr22963185ad.47.1745883483560;
+        Mon, 28 Apr 2025 16:38:03 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d76dd2sm90073895ad.26.2025.04.28.16.38.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 16:30:02 -0700 (PDT)
+        Mon, 28 Apr 2025 16:38:02 -0700 (PDT)
+Date: Mon, 28 Apr 2025 16:38:02 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	alan@wylie.me.uk,
-	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: [Patch net 2/2] selftests/tc-testing: Add a test case to cover basic HTB+FQ_CODEL case
-Date: Mon, 28 Apr 2025 16:29:55 -0700
-Message-Id: <20250428232955.1740419-3-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
-References: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Holger =?iso-8859-1?Q?Hoffst=E4tte?= <holger@applied-asynchrony.com>,
+	"Alan J. Wylie" <alan@wylie.me.uk>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, regressions@lists.linux.dev,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	stable@vger.kernel.org
+Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
+ htb_dequeue
+Message-ID: <aBARWmQi6/reosTF@pop-os.localdomain>
+References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
+ <6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
+ <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
+ <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
+ <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
+ <20250421210927.50d6a355@frodo.int.wylie.me.uk>
+ <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
+ <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
+ <2025042831-professor-crazy-ad07@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2025042831-professor-crazy-ad07@gregkh>
 
-Integrate the reproducer from Alan into TC selftests and use scapy to
-generate TCP traffic instead of relying on ping command.
+Hi Greg,
 
-Cc: Alan J. Wylie <alan@wylie.me.uk>
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
----
- .../tc-testing/tc-tests/infra/qdiscs.json     | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+On Mon, Apr 28, 2025 at 01:45:14PM +0200, Greg KH wrote:
+> 
+> Can someone send me a patch series that does the right thing here?
+> After reading this thread I'm confused as to what is needed to be done.
+> 
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index e26bbc169783..5a8c21735b3a 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -352,5 +352,40 @@
-             "$TC qdisc del dev $DUMMY handle 1:0 root",
-             "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
-         ]
-+    },
-+    {
-+        "id": "62c4",
-+        "name": "Test HTB with FQ_CODEL - basic functionality",
-+        "category": [
-+            "qdisc",
-+            "htb",
-+            "fq_codel"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 root handle 1: htb default 11",
-+            "$TC class add dev $DEV1 parent 1: classid 1:1 htb rate 10kbit",
-+            "$TC class add dev $DEV1 parent 1:1 classid 1:11 htb rate 10kbit prio 0 quantum 1486",
-+            "$TC qdisc add dev $DEV1 parent 1:11 fq_codel quantum 300 noecn",
-+            "sleep 0.5"
-+        ],
-+        "scapy": {
-+            "iface": "$DEV0",
-+            "count": 5,
-+            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/TCP(sport=12345, dport=80)"
-+        },
-+        "cmdUnderTest": "$TC -s qdisc show dev $DEV1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -s qdisc show dev $DEV1 | grep -A 5 'qdisc fq_codel'",
-+        "matchPattern": "Sent [0-9]+ bytes [0-9]+ pkt",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 handle 1: root"
-+        ]
-     }
- ]
--- 
-2.34.1
+I just sent out a fix for the regression reported here, so after it gets
+merged, I will send you a list of commits (probably 2, since we don't
+backport selftests) that need to go for -stable.
 
+Sorry for the regression and confusion here.
+
+Thanks!
 
