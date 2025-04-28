@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-186464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D682FA9F40A
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 17:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 130ACA9F40C
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 17:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF7AE1A83591
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:04:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1B381A83EE5
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33C62797A3;
-	Mon, 28 Apr 2025 15:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B1126FDA7;
+	Mon, 28 Apr 2025 15:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="E65aspVO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KJcVEsAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2081.outbound.protection.outlook.com [40.107.212.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE1827979D;
-	Mon, 28 Apr 2025 15:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3D727979D;
+	Mon, 28 Apr 2025 15:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745852610; cv=fail; b=XzCC+rWQrKxH42rc2ajwCCOYuy4+I6tRCH7815u058I7b4gaVfv4xmFYVuI2Y73JtAcGuqUevYVH0HdSiH17S1XmLOamNaH3r0E0dHBYQJDwu7MAjbs9xhHB9KatZei9R4bAo5jLAtDehj7vlGX/SHJ7R1VGGVMSvqlFdOGL8Z0=
+	t=1745852619; cv=fail; b=Umx/LmmsfXsPIvveCr9NBxoMWZILIcZKxmZnJEHcwMeXehhyTHViFmQMrDbKoawh00xNmwQs8M0JSfpTRWL0daZ/pAupCOrVYyT/R2AG8C+N8Pe/D8C3WPohefOKbwOCu7sFGXX5/qHsYBjIDRQplXeTbyQv647im+g+B4+v7DQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745852610; c=relaxed/simple;
-	bh=a0tYdyfZvuq/BBlaF1KWkW9J1kPFPcsm4LDbQvSpJbw=;
+	s=arc-20240116; t=1745852619; c=relaxed/simple;
+	bh=q0cU5Z+YRaXcdqMmpZOfeDGma4FMsAA/q0/6w7m6nME=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wr4GuHxlElQHUfvl89qP7uXgCmSrKV05A2Gw31T5PVd0UfSmB4XFe7dJa7dj9ZykEGBuHWykkLEY/xQRWEoelQtH/y2Rx9eAvm3CtMMzejp0enThKVnAusnwDtlzLe9llVSR+f2FTyxFeFLM4Y0MizoNzN62BqvXeECmD2tJ5SU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=E65aspVO; arc=fail smtp.client-ip=40.107.223.64
+	 MIME-Version:Content-Type; b=RVcROZhl0Jtr7+hyixLoCKqOAM9vXynFL72CzfvUE1Ad8m8fbv1D6erYUfzNAAtbqgrSKbFEHJNSTmYHP1MnrdsEHIJ6hecYSNm7JqTlSkrgLibg5hk3kLrJ7pULnfcF32zyrogZpUTU6sKrawlWS2HVBxg5k1ldUrdF6f+BE3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KJcVEsAz; arc=fail smtp.client-ip=40.107.212.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KGhg2KJESVC7FlgUgcM/Ue7+P+wXudi4Sz4bePzI97K3WxMeQYHnZXPBQEXkSDZb3ctKWa7VYROTsDALYJgESgiWeKiwSX+W9l49OJ+SEcME3znsBgChgZX9YxTMA7mXSzIIdxSBlVb9w1+N3g4cbvSws2XBCUODjwL6C5UlA89b7q4Cqj4QEKFtBBolZGbUmaiCGQZNpPSpr0Zz+nXIvSNCYRzIeZmDBAgaDPOxvc0/6CVKHnQB2StBECKqnQjR+RmVAXt1x1RBg1J+nJoBR0vH7617ckVtyo8P7XMdxfqyhY1T+tWguAgbGGu/3eUGgrrEYnUlFULyu1ztyz6foA==
+ b=HXuFAFTL1MfuaI9Awz3/nEpRskHr9xLuQf23K9XUbcnrKPQ1o3WJwrgTYrP+5Oy4MnqGcPv9UI3oZieHF/2BAyCs5csztu5qSN1tH5VmF2Ady0Lp7m9dZG4N9lFv0e2EGlonxbf/xKL4xbuDvtS34MfnnfaA8uihgucto3l95z8H2yfomuU04/N2ILCzGQGeuLysv2gjnjgSS8tk9d356jL8mvbmp3X32kxbGEzhW614qeLHiPIAi5I1a2Hz6mzLkTdBIfiS671E/LGd06bwm95OZp2soi8qmcQWZmE8ckhVNyUP5ytUfOPyHgt/0R0U7lq4kqCT0LMUagFvbu4tvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hu4HOaDmvnqn4B8PMt/3KXSjpnIFSBCKTczGLEfMLeA=;
- b=oQyHo42ieLBWUpzVvbyYYhm8CySkyyLT+WU6V7+5Vv7IPtkUujZTQJJQs1UaWvBS05F2yOiNHwK0/9QMzGKM50w/jXCv9EjxU5f/WqcLdwKeUMF1Z3BNBlANKrVt/TnMuOhHODIB8VCUSnf75t8qikrbe3eKs1tLF3sjMkWNb0XoBGkRyr3Uo0xA7rHyQPasB0Fsa+2Hj8DOigufZyx05MygUJPD9bEPVdeiRi2tKcM04RGzJnF3sD2km2evOpTzaexfL4hFxO4tSYyu29VQsAMLlW5tAyxE08R3OX1kdVGp32bKMKiXRtB626+LKv1UU8Cw7kPLbYickyu5RZFPOA==
+ bh=gteq0E/w+FmmLlcYW+gOBXaRtezpWB5jc7wG0Q7WiHY=;
+ b=Ewl/bEtEpxL3bvl5oiatTrF0Cds2LLiWY5pI6Ne8Ka27lLqnysAR/LsnNUJ2SLnSQAr5xMBUppkKVg/VrrWH/h98cqAqeJ37He1tbiy2Zckstdbs5urErZ/Srua4asCfJG7MkbIpC+t/QKfSXzgdkYQV5yOOqskC9cA6HPs/wKrd62cRXog934T+WsWKv50l2vY7zHsvxnu6dcTqSs/+K8cyeJbysuJpaiEDsLzCbbhkQ++E2NOuvXr0EZB2KJ+/c72SNQcLGnovMsP/jLoKqqxl/VlP7f+ouKR5REsWjwx4P6KD83nvBrrSHD2Onx8clz0oalWWeupMRKjw+RAd6g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hu4HOaDmvnqn4B8PMt/3KXSjpnIFSBCKTczGLEfMLeA=;
- b=E65aspVOvqIyJ/9tubflyK0X4lo5K/C/o+4RDfq8l7xUlYMZa8t3JgkAw/Qd5Bc/gQv27kwxDVylTRQnkT8mcVgVS2nimgSCEpQcourYaUB/3G3/2Hsn2z13JRza/SzbzA88SaTTHlJniglsRI66Tzm30Lzknd4bzVC883aFxXk=
-Received: from SA9PR10CA0010.namprd10.prod.outlook.com (2603:10b6:806:a7::15)
- by LV2PR12MB5968.namprd12.prod.outlook.com (2603:10b6:408:14f::7) with
+ bh=gteq0E/w+FmmLlcYW+gOBXaRtezpWB5jc7wG0Q7WiHY=;
+ b=KJcVEsAzwlUaDUr7SV+QAVpHtgCDgnYJFNdVEF1Kn4W18aSyAdQbG4Iqj4pjr0IbF8SKuLnFEYs0Xy6+Jm+cigI6FY9Com1VFcRosCXi7ONCYJ6nuYnEth2F02ojfiBMaHp0xu3gh1pgs3sWxNwHK5JG/Q042pml+wYxOOhI3f4=
+Received: from SA9PR03CA0025.namprd03.prod.outlook.com (2603:10b6:806:20::30)
+ by SN7PR12MB7227.namprd12.prod.outlook.com (2603:10b6:806:2aa::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Mon, 28 Apr
- 2025 15:03:25 +0000
-Received: from SN1PEPF0002636B.namprd02.prod.outlook.com
- (2603:10b6:806:a7:cafe::d5) by SA9PR10CA0010.outlook.office365.com
- (2603:10b6:806:a7::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.40 via Frontend Transport; Mon,
- 28 Apr 2025 15:03:24 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Mon, 28 Apr
+ 2025 15:03:33 +0000
+Received: from SN1PEPF00026369.namprd02.prod.outlook.com
+ (2603:10b6:806:20:cafe::38) by SA9PR03CA0025.outlook.office365.com
+ (2603:10b6:806:20::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.35 via Frontend Transport; Mon,
+ 28 Apr 2025 15:03:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,22 +63,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002636B.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SN1PEPF00026369.mail.protection.outlook.com (10.167.241.134) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8678.33 via Frontend Transport; Mon, 28 Apr 2025 15:03:24 +0000
+ 15.20.8678.33 via Frontend Transport; Mon, 28 Apr 2025 15:03:32 +0000
 Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 28 Apr
- 2025 10:03:21 -0500
+ 2025 10:03:29 -0500
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>, "Sudheesh
- Mavila" <sudheesh.mavila@amd.com>
-Subject: [PATCH net-next v2 3/5] amd-xgbe: add support for new XPCS routines
-Date: Mon, 28 Apr 2025 20:32:33 +0530
-Message-ID: <20250428150235.2938110-4-Raju.Rangoju@amd.com>
+	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v2 4/5] amd-xgbe: Add XGBE_XPCS_ACCESS_V3 support to xgbe_pci_probe()
+Date: Mon, 28 Apr 2025 20:32:34 +0530
+Message-ID: <20250428150235.2938110-5-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250428150235.2938110-1-Raju.Rangoju@amd.com>
 References: <20250428150235.2938110-1-Raju.Rangoju@amd.com>
@@ -94,254 +93,162 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636B:EE_|LV2PR12MB5968:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01a26543-284d-40ea-6a52-08dd8665d32e
+X-MS-TrafficTypeDiagnostic: SN1PEPF00026369:EE_|SN7PR12MB7227:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b7305e8-2077-476d-47f8-08dd8665d7fe
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bn1Bjb5t0MWRlAkN0H3DoZSBzdWFSSAaEwzpcUpCWG/AfHIPGOALI2koPHT1?=
- =?us-ascii?Q?VOWwk0TZTPr47YMjg5EbQy6EmYBhztCS8ayj/am4jejNeIyP4nKxJt20rXT3?=
- =?us-ascii?Q?dINe34vp7Mi/Ksk6OxZBh6Xcs3qMQrGDt7a1vKC4DTw6XGWZUBOglAuonDpS?=
- =?us-ascii?Q?95QxbFpWUA8wcYYnPiEY6Td2hja5a5JtpvWziw69nNBd66gbrdto8f/qqH95?=
- =?us-ascii?Q?89PLJxom6rgbiXvPd7kgDxxAPvykK1n/oLH497wfeBPkbhfUo3bbdDIqqwZA?=
- =?us-ascii?Q?t5QiYuh+9LDsWJxhv3xu2F/mM6xPO18288t7grmvmRX517lqtt0722a9I+gP?=
- =?us-ascii?Q?Do9ipLUO8H+DLxs2Y7SiCA4CpcEIDo97ocLSRV3RumzzU8WkffOEsQMc6iaP?=
- =?us-ascii?Q?hxgwdq7T983dT6p1uBhp5oGwPin9U5yILpyHOklDPyhy35BcGCRyC/i5Rg8F?=
- =?us-ascii?Q?G7Q0CiyXR6+06oLHGrC7ff5kBcnz+/rB2dwkad23kO7/tGDxTXyN+sTWloZs?=
- =?us-ascii?Q?GztiBdgKiwBumS1/cnO43NzUO9rSkM9WQqhtYJStThnfvFreX/RWBY/MG4xS?=
- =?us-ascii?Q?v/T6Cui43QDmmB5IOYmEncHShwh/qCLUxXen7ZweqiCIsn1HlUUzrPTxM7ZV?=
- =?us-ascii?Q?y6l7MOjUP/VgoV9hudnGZykzF04CnzQLw9AO1d7c6K4tQjRQooCCwYJ6ggLQ?=
- =?us-ascii?Q?NYL66ZEMAL1oTtHbj6PN6sfp3zjXMWu+vfAavt8jbPSU9LqY1EDd5t5LESN0?=
- =?us-ascii?Q?ORmE0/ie31j6kUfgPk8Ma2UvlnoruUBHYhi+uiasp6xswOYIIagebwq1iJRx?=
- =?us-ascii?Q?mEbVatyc456V8vtjJGfdhyQOnxvqBm3Q6ZtJ2uNgsPow2X2JutNvrcnpwUuL?=
- =?us-ascii?Q?xWobZlvlIEumDc2Qex8/HNcA59Wa2tbbyPpzyMUl5OV0w7D2kpH0/ETdGn0J?=
- =?us-ascii?Q?I6pun9DuODcUyjckOe5/VzOCJH/fbVaeUfVi/cu/P9wk0Z7ZOnPnkGFLH86U?=
- =?us-ascii?Q?zkGj92lZjxHITbQDQnQCvRHnD3oBKiCvvZkS+85c6pCLuP8vJ+UmKDJdNmT2?=
- =?us-ascii?Q?iFSYpO3tPpYXbp93XKvqQiUWNiyjHZq2Lj28p2k9W9rIwez5QMi2aRKP3DGu?=
- =?us-ascii?Q?6nU2z+HRw9SwiVx82D5Jep5ERT6nzXWfndCVPNLw2TMwyAfu6oSvdUWV0Cvm?=
- =?us-ascii?Q?lYLnCIDM9dToSiOapQbEbXlHBq2hB3bBU9XbWS4fNnEVDCtD6gtJnF27pWx/?=
- =?us-ascii?Q?QdGlJUV6qQfUeZON/nZqLzPyP1dOfkBYqAWAJPTQZQL119PEJRyTVeCUzv75?=
- =?us-ascii?Q?HIPsIdmhs0+0tF3ExnmaU+85DjYVOfF0ee10yKbm3KR7xZ3sbk9BunwFlg/8?=
- =?us-ascii?Q?mbLQ4zAUGfE6fXDwCpI2cYvk9PmLYl7rEcFtBgqRDVKGJCHfvYtC384wRO8i?=
- =?us-ascii?Q?Pg07A4MtThmHflCTty9KCUrLmqyq3S5gIPtMn1uQWSaWXwujW95Q1sRIvHae?=
- =?us-ascii?Q?nh0qfXCQPPSvvbAyIWmI9sAnmRGga1pwxgiY?=
+	=?us-ascii?Q?992s2XB7owPEGE1DBR+bOzyx1hIeHj1g25mBPKwp7B6e8rZSq+Wa48F/XZkv?=
+ =?us-ascii?Q?yBeLmJOGwjMgllHOhCGZq9cAQ1klqKy4xte2mcTdoYSk3qvB7NN3EV2OPS2W?=
+ =?us-ascii?Q?VvX62plvwPQp7gDQAGLoGnsXWTGtYd8Y4OQ3tD2OdsshzvebdGlWSbE2HahO?=
+ =?us-ascii?Q?9E+6jLsZgDMF47qhEERKRPwUVQO3f0A0Jl3tew2cCV+jMjmzX2tD6tdwZlpw?=
+ =?us-ascii?Q?4dyGkZSy0yxInmspImptMGjSpuGLMPd6AXq5lsfsajt/SrVGBNBGCaSteLxa?=
+ =?us-ascii?Q?7mEm2611emqFYpgOkS3XJ3nQTrN/Qvsecxg+Wpeu8sCkp/T0/iYtbdEIBmNT?=
+ =?us-ascii?Q?nX+b4vapZ1eiAcrHi0o6x5pfe97p8kWegrmByJKCTC9eI21G9ZKqoJDP17Lr?=
+ =?us-ascii?Q?YwBhYSVFCFxyCGSU9hRcKzd2WMRfjbuH1WAGQr1EVi2JF7+oLD0SyWP1kApK?=
+ =?us-ascii?Q?NueDPGkNTTtr2UNu4Z7fifQ/uUar9j2u8RLtBiey798VXIWV6fAegHmlO8bG?=
+ =?us-ascii?Q?mcaECCUN8xXPkeJ/tRM6+7bRAhUkpyde2WeLUyx72GpvtK+UJ3AedZTvpuOR?=
+ =?us-ascii?Q?mtiRTd/DDFuWty7gMdwVfrtQnLFQN7w/hGazBWLfjyvdyf5b1UD9RKePZeWV?=
+ =?us-ascii?Q?dyO9+wA1PGHYmgqXvj/Qyzf1KOMW2dhhqKHxRzmr0gVvhUgPBB3LxnlRc8UQ?=
+ =?us-ascii?Q?zEWHx98WjM6Fdci0xExGXzw9qGYkTlGzPSPw86K4HtoivpZhuDa+QzUS25HB?=
+ =?us-ascii?Q?UA5yfJgY/7WWJm4CIRlYpjFA7OR2IbpHfjJFIGl1JSoSDmTHPkrIkSWx84oy?=
+ =?us-ascii?Q?RHenNws818dLz3gju/eklncxLw4whc7mzK9yUeR1AVc/qwZe3pvDxf+R2Dgi?=
+ =?us-ascii?Q?gSed7XOM9oeJx9zRCNryKnDu8TCdEseSv90mAlLj2+qc4FgnQG3H/0GVTZ5n?=
+ =?us-ascii?Q?kcI6p53QYgOW1Lh6eXPt1eLbaaJ5lz11ezUOwKmCUA9PIsr1g4hrk+opQHrU?=
+ =?us-ascii?Q?WtUnclJIInR4E+rCz8y6AqsD3Gr8QTWVNGolr5+dMn1tZlugH7ktKa4PZQH7?=
+ =?us-ascii?Q?uJLl11DDSJYQd0T104HGJQChsDejM6euU7pl8Z9eY9+7mzlK8UGhQc0Bb1OT?=
+ =?us-ascii?Q?UWDZz0sFT6COl4sxkZm5utXEbsyrIgRmHbh5G0t3GCYJPfAASNyvMERxWpz8?=
+ =?us-ascii?Q?24miTmLVEyj8SVZeoL1TPz1zEE/hs8l/aFlCb9WXORgXre+Jp+03s27vcdQ0?=
+ =?us-ascii?Q?/VWmarjYNwg7s5o/9jA6yXm54mZiaSRMUSxkzUwNAX/1nAnIayRi6TSWmaWp?=
+ =?us-ascii?Q?mNFbQd+fOWLDA0WCe7xY6G4HdMq2nMqgGzrJx+vEhUZtRLAfGjtPXVkAomA+?=
+ =?us-ascii?Q?vFosV2E7tBS9H5ThnSrw2Cc/xoUQBpv2P5zPvH2AZHblxECD4bycCRZy6W44?=
+ =?us-ascii?Q?yQS7pFnN6ti+f1V9y4gBnnVVTMKSLn7F+KIsfwmwUBU91bl4rI3mOsy/A47F?=
+ =?us-ascii?Q?ueKyImrhOvPJmER+NXh2d93jTSThXTosypHg?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 15:03:24.8694
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 15:03:32.7765
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01a26543-284d-40ea-6a52-08dd8665d32e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b7305e8-2077-476d-47f8-08dd8665d7fe
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636B.namprd02.prod.outlook.com
+	SN1PEPF00026369.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5968
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7227
 
-Add the necessary support to enable Crater ethernet device. Since the
-BAR1 address cannot be used to access the XPCS registers on Crater, use
-the smn functions.
+A new version of XPCS access routines have been introduced, add the
+support to xgbe_pci_probe() to use these routines.
 
-Some of the ethernet add-in-cards have dual PHY but share a single MDIO
-line (between the ports). In such cases, link inconsistencies are
-noticed during the heavy traffic and during reboot stress tests. Using
-smn calls helps avoid such race conditions.
-
-Suggested-by: Sudheesh Mavila <sudheesh.mavila@amd.com>
 Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 ---
 - PCI config accesses can race with other drivers performing SMN accesses
   so, fall back to AMD SMN API to avoid race.
+ 
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h |  5 +++
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c    | 34 ++++++++++++++++-----
+ drivers/net/ethernet/amd/xgbe/xgbe.h        |  1 +
+ 3 files changed, 33 insertions(+), 7 deletions(-)
 
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 81 ++++++++++++++++++++++++
- drivers/net/ethernet/amd/xgbe/xgbe-smn.h | 30 +++++++++
- drivers/net/ethernet/amd/xgbe/xgbe.h     |  6 ++
- 3 files changed, 117 insertions(+)
- create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index 765f20b24722..5f367922e705 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -14,6 +14,7 @@
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+index e3d33f5b9642..e1296cbf4ff3 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+@@ -791,6 +791,11 @@
+ #define PCS_V2_RV_WINDOW_SELECT		0x1064
+ #define PCS_V2_YC_WINDOW_DEF		0x18060
+ #define PCS_V2_YC_WINDOW_SELECT		0x18064
++#define PCS_V3_RN_WINDOW_DEF		0xf8078
++#define PCS_V3_RN_WINDOW_SELECT		0xf807c
++
++#define PCS_RN_SMN_BASE_ADDR		0x11e00000
++#define PCS_RN_PORT_ADDR_SIZE		0x100000
+ 
+ /* PCS register entry bit positions and sizes */
+ #define PCS_V2_WINDOW_DEF_OFFSET_INDEX	6
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+index d36446e76d0a..718534d30651 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+@@ -9,6 +9,7 @@
+ #include <linux/device.h>
+ #include <linux/pci.h>
+ #include <linux/log2.h>
++#include "xgbe-smn.h"
  
  #include "xgbe.h"
  #include "xgbe-common.h"
-+#include "xgbe-smn.h"
+@@ -98,14 +99,14 @@ static int xgbe_config_irqs(struct xgbe_prv_data *pdata)
  
- static inline unsigned int xgbe_get_max_frame(struct xgbe_prv_data *pdata)
+ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  {
-@@ -1066,6 +1067,80 @@ static void xgbe_get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
- 	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
- }
+-	struct xgbe_prv_data *pdata;
+-	struct device *dev = &pdev->dev;
+ 	void __iomem * const *iomap_table;
+-	struct pci_dev *rdev;
++	unsigned int port_addr_size, reg;
++	struct device *dev = &pdev->dev;
++	struct xgbe_prv_data *pdata;
+ 	unsigned int ma_lo, ma_hi;
+-	unsigned int reg;
+-	int bar_mask;
+-	int ret;
++	struct pci_dev *rdev;
++	int bar_mask, ret;
++	u32 address;
  
-+static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
-+				 int mmd_reg)
-+{
-+	unsigned int mmd_address, index, offset;
-+	int mmd_data;
-+	int ret;
+ 	pdata = xgbe_alloc_pdata(dev);
+ 	if (IS_ERR(pdata)) {
+@@ -181,6 +182,10 @@ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 			/* Yellow Carp devices do not need rrc */
+ 			pdata->vdata->enable_rrc = 0;
+ 			break;
++		case XGBE_RN_PCI_DEVICE_ID:
++			pdata->xpcs_window_def_reg = PCS_V3_RN_WINDOW_DEF;
++			pdata->xpcs_window_sel_reg = PCS_V3_RN_WINDOW_SELECT;
++			break;
+ 		default:
+ 			pdata->xpcs_window_def_reg = PCS_V2_WINDOW_DEF;
+ 			pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
+@@ -193,7 +198,22 @@ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	pci_dev_put(rdev);
+ 
+ 	/* Configure the PCS indirect addressing support */
+-	reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
++	if (pdata->vdata->xpcs_access == XGBE_XPCS_ACCESS_V3) {
++		reg = XP_IOREAD(pdata, XP_PROP_0);
++		port_addr_size = PCS_RN_PORT_ADDR_SIZE *
++				 XP_GET_BITS(reg, XP_PROP_0, PORT_ID);
++		pdata->smn_base = PCS_RN_SMN_BASE_ADDR + port_addr_size;
 +
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
-+
-+	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
-+
-+	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
-+	if (ret)
-+		return ret;
-+
-+	ret = amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
-+	if (ret)
-+		return ret;
-+
-+	mmd_data = (offset % 4) ? FIELD_GET(XGBE_GEN_HI_MASK, mmd_data) :
-+				  FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
-+
-+	return mmd_data;
-+}
-+
-+static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
-+				   int mmd_reg, int mmd_data)
-+{
-+	unsigned int pci_mmd_data, hi_mask, lo_mask;
-+	unsigned int mmd_address, index, offset;
-+	struct pci_dev *dev;
-+	int ret;
-+
-+	dev = pdata->pcidev;
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
-+
-+	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
-+
-+	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
-+	if (ret) {
-+		pci_err(dev, "Failed to write data 0x%x\n", index);
-+		return;
-+	}
-+
-+	ret = amd_smn_read(0, pdata->smn_base + offset, &pci_mmd_data);
-+	if (ret) {
-+		pci_err(dev, "Failed to read data\n");
-+		return;
-+	}
-+
-+	if (offset % 4) {
-+		hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK, mmd_data);
-+		lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, pci_mmd_data);
++		address = pdata->smn_base + (pdata->xpcs_window_def_reg);
++		ret = amd_smn_read(0, address, &reg);
++		if (ret) {
++			pci_err(pdata->pcidev, "Failed to read data\n");
++			goto err_pci_enable;
++		}
 +	} else {
-+		hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK,
-+				     FIELD_GET(XGBE_GEN_HI_MASK, pci_mmd_data));
-+		lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
++		reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
 +	}
 +
-+	pci_mmd_data = hi_mask | lo_mask;
-+
-+	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
-+	if (ret) {
-+		pci_err(dev, "Failed to write data 0x%x\n", index);
-+		return;
-+	}
-+
-+	ret = amd_smn_write(0, (pdata->smn_base + offset), pci_mmd_data);
-+	if (ret) {
-+		pci_err(dev, "Failed to write data 0x%x\n", pci_mmd_data);
-+		return;
-+	}
-+}
-+
- static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
- 				 int mmd_reg)
- {
-@@ -1160,6 +1235,9 @@ static int xgbe_read_mmd_regs(struct xgbe_prv_data *pdata, int prtad,
- 	case XGBE_XPCS_ACCESS_V2:
- 	default:
- 		return xgbe_read_mmd_regs_v2(pdata, prtad, mmd_reg);
-+
-+	case XGBE_XPCS_ACCESS_V3:
-+		return xgbe_read_mmd_regs_v3(pdata, prtad, mmd_reg);
- 	}
- }
- 
-@@ -1170,6 +1248,9 @@ static void xgbe_write_mmd_regs(struct xgbe_prv_data *pdata, int prtad,
- 	case XGBE_XPCS_ACCESS_V1:
- 		return xgbe_write_mmd_regs_v1(pdata, prtad, mmd_reg, mmd_data);
- 
-+	case XGBE_XPCS_ACCESS_V3:
-+		return xgbe_write_mmd_regs_v3(pdata, prtad, mmd_reg, mmd_data);
-+
- 	case XGBE_XPCS_ACCESS_V2:
- 	default:
- 		return xgbe_write_mmd_regs_v2(pdata, prtad, mmd_reg, mmd_data);
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-smn.h b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-new file mode 100644
-index 000000000000..a1763aa648bd
---- /dev/null
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-@@ -0,0 +1,30 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
-+/*
-+ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
-+ * Copyright (c) 2014, Synopsys, Inc.
-+ * All rights reserved
-+ *
-+ * Author: Raju Rangoju <Raju.Rangoju@amd.com>
-+ */
-+
-+#ifndef __SMN_H__
-+#define __SMN_H__
-+
-+#ifdef CONFIG_AMD_NB
-+
-+#include <asm/amd_nb.h>
-+
-+#else
-+
-+static inline int amd_smn_write(u16 node, u32 address, u32 value)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int amd_smn_read(u16 node, u32 address, u32 *value)
-+{
-+	return -ENODEV;
-+}
-+
-+#endif
-+#endif
+ 	pdata->xpcs_window = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, OFFSET);
+ 	pdata->xpcs_window <<= 6;
+ 	pdata->xpcs_window_size = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, SIZE);
 diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 2e9b3be44ff8..fab3db036576 100644
+index fab3db036576..8f4416442171 100644
 --- a/drivers/net/ethernet/amd/xgbe/xgbe.h
 +++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -242,6 +242,10 @@
+@@ -241,6 +241,7 @@
+ /* XGBE PCI device id */
  #define XGBE_RV_PCI_DEVICE_ID	0x15d0
  #define XGBE_YC_PCI_DEVICE_ID	0x14b5
++#define XGBE_RN_PCI_DEVICE_ID	0x1630
  
-+ /* Generic low and high masks */
-+#define XGBE_GEN_HI_MASK	GENMASK(31, 16)
-+#define XGBE_GEN_LO_MASK	GENMASK(15, 0)
-+
- struct xgbe_prv_data;
- 
- struct xgbe_packet_data {
-@@ -460,6 +464,7 @@ enum xgbe_speed {
- enum xgbe_xpcs_access {
- 	XGBE_XPCS_ACCESS_V1 = 0,
- 	XGBE_XPCS_ACCESS_V2,
-+	XGBE_XPCS_ACCESS_V3,
- };
- 
- enum xgbe_an_mode {
-@@ -951,6 +956,7 @@ struct xgbe_prv_data {
- 	struct device *dev;
- 	struct platform_device *phy_platdev;
- 	struct device *phy_dev;
-+	unsigned int smn_base;
- 
- 	/* Version related data */
- 	struct xgbe_version_data *vdata;
+  /* Generic low and high masks */
+ #define XGBE_GEN_HI_MASK	GENMASK(31, 16)
 -- 
 2.34.1
 
