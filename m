@@ -1,127 +1,132 @@
-Return-Path: <netdev+bounces-186399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB21FA9EEE4
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:21:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55486A9EEEE
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3FC017E2B5
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FB051A80D1E
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 11:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D49925F7AA;
-	Mon, 28 Apr 2025 11:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216A6262FF9;
+	Mon, 28 Apr 2025 11:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pDiCebDu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LI0ek4yE"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB00EEC8;
-	Mon, 28 Apr 2025 11:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8651FFC45;
+	Mon, 28 Apr 2025 11:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745839230; cv=none; b=L6lny13/zBe0YrZbr18hFmubZQQhyJAGLHKeEN3b4O8NVay0X+IHxqGw+vdbrxwgqgHC7mKGAs91YGXZW0npJtEZKnC5vM0r2iXipYHptbE2FFPPfBEuOVg09bL4JzpUQtKwIa/uYR9TU7XRyJVkQ1QEmoVBeJY8fyLBP40+SWQ=
+	t=1745839237; cv=none; b=iT0RCjmIoA+k68qX0jmEAVrtCwmanOnNE2fQIdiQVr3e+PHp8qeruO+Lmh+WcOQKH64JPY4Juu15Wq8YqiWcXCxMBJ+Oj1hBz+YD3SIsMErXZ8u3lBYkelKjVRBCQgYpc+x9c6SPJnIwe31kZ99Clni648gkGxWP+0d0ala+rrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745839230; c=relaxed/simple;
-	bh=lrGpwyIeyfi1QIbcIJ/Tj+3KQ+8NpzxTnUlKvV/xJi8=;
+	s=arc-20240116; t=1745839237; c=relaxed/simple;
+	bh=1MAE2vSA2ExeGztIwI2W5Euf1qO2TGGX1pDG/xYRq5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWVCyBnitFzoqE4IdTXMC4sJm9wPTnk1IQJSY6V+/mqY1e3docSKKRxlcqUcvPyzQwYAnWE5stPdRTP34U7AMtVP1lefoCOtWeHgR1Oy/HP1erZ5nFL/jEcGOQadRJ8+tG0DwQQqLPxuyPSLf4yKoraponCf/BL9RwV/SaCdtOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pDiCebDu; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=sh9fvtw3x+0OKhV0VoEJRrPasUJuLRYfxSzZzi6/cg8=; b=pDiCebDuIci7Mk4OEF0McCApuQ
-	FmKEjP5+MQvESpcUKisrKxMFEveGBInusJogYaKdCXiCiCus5aTr62ELhPOBxB7A3iFx5nMfbyjca
-	aF25QoTTyLb5uCnm1z1rKjXRPOHO/LOaH3RkzXLw5MzluhGQ5C317ZIWnpcMZbDwFBaLNOl+CApuM
-	ShLctgazkaiCjWI+bd7hFG0SDzWMbvvrIOP1RldsVCKLBQgfrUC1Wm5ctw9Uq5/eLt5g4Y4LUhCEB
-	1i7Oos4x9bzJD2VjBFQecqi8SPcsWEoqG6K7xT7u2XK1YRHdwwkWJpk+2UxDz6m/gGE45O73p8Ror
-	eTWhswvQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u9MWg-001aq7-24;
-	Mon, 28 Apr 2025 19:19:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Apr 2025 19:19:54 +0800
-Date: Mon, 28 Apr 2025 19:19:54 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Opps29npTV0idvh5eZtFgJaK2y/DK0BZKX9IwknQj0tjAKg19goK/QndCZAVuS3NvoJKYz5kYn7D8MrlH2LKAPfnr5zMlgtBNNzDNO2VPdyTRn1SiWIt06BI9YfXRPNh0wPYVuUSShIS5Fmc7yFpplWn0FJtIZJhK2L5giWXTSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LI0ek4yE; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22c336fcdaaso53406475ad.3;
+        Mon, 28 Apr 2025 04:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745839235; x=1746444035; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zeoiKe2W1Yc48k3zPSEuqht0Q72/jv/tcMqw/BIER4c=;
+        b=LI0ek4yEsEuvqsi9LPXeMurrr9T28GPxNd51CuJd1XtPqle3ODF1LWFlQHt5qxGEr6
+         12XMoTVYYJX4kxQAhWiCCZesNKS3tAtKW2lpybCgh57jXvAkTDtC/LGPD3A7wZ8qZztE
+         bH8lbzitHwOEUf5G1Arg5o+7IM7cZLh/3qaLet9nUQqJqLaCWlTbENL17VH/f5YJKw14
+         CQD0nmjX1/hNES1g1lWdkbcQtspOChZt28hdc1ZUgHeIg7MwvZrLg8hLbBBVn6Rm0Zex
+         +NaM3OxhLHEfEyZYsnDXKQtCD430vxcGdX9xniKJFBYe29meK9mCRaU4RpV6RTtmgP0p
+         d9zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745839235; x=1746444035;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zeoiKe2W1Yc48k3zPSEuqht0Q72/jv/tcMqw/BIER4c=;
+        b=e9eaiugJQ7NSzGbL7yVNRONQWHgYDzRQv3Bj89Ld/HrdW8X2DMTQ6D7UIe1cs0Kjdg
+         KxI2q6iNKGFErJFcj773j7D6FHhAQdbxNMXIrJ6QRqs20vKZyvkp2IKR4ZbOSmHOLda3
+         fmfdWF0uJVkL9lOHNv94ookeH0lZxivBnktDvwGBHRsnZ7PgazhrD4auHus6+35zT/Qb
+         gohgM2rdARuHX4TpqBb85xaBxoYioVWC5atCCznk9iCuFz8hmVvRZ0j0h8y2Xh8icmw+
+         c+rb6yqwa+d/bd++pS78YmcWuZUnicyCIgqe71jXP/qwknZWXLs2O/UAgkRG7qPCrHSG
+         Q+9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWAu2M1/KQxRK3zv8rI7qaHz07aNLwJwi7zdGdyjkB4bSLfQYim6b0y1CpuEAM7Jerc/J5yAvY9KYmZ3R83@vger.kernel.org, AJvYcCWnfggQ/ftEFgHsmLr7/GJkJTv3ry08E8u3N7NcaXgInX8X0Xti0ysJgCrlLFnjq1hthL9znodYtj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX8zdGOG+w2ND++qOrAOzwuJxmJJ8OPhU1YcErY99+DqprFSJA
+	YGivWAKAihMBJAzmV3RM/qG93Ztp2vhLhmxR999mP6VbuYzhSu6u
+X-Gm-Gg: ASbGncu843+6qcbtyOJSfMzzks+uUGfOamaAib8KZCP3p8gUtXo3rpJpHagbqbXKecL
+	349N0t857VINBE5jqqiWAnRKog1ZGnlPDv6ezlY0O+t9xu4SnwZKeVfmWtu/mHu0nNTLQf8AHoy
+	DxK4nowqLktWYOj/2/rIobf8uy6VXLOtYQhcujpJ48a+0BobuwF2yN8gR4ZnwxM1K6ko4pDuImM
+	ByG9dpsuecVAOVdvV8UxejO8rmatZmyFdxOmQwEYfi5N5RCQ4YXYwmtDzAvoEsB1iv+3FtRiq30
+	+MRVDMWfTrjRp9GRH1BChqRcbCvu2VW9F+JMbGIv
+X-Google-Smtp-Source: AGHT+IFGo7DVUABwaW2xSoYjag2d0XbhQQHIzS6EBrTnK+orzIMck6P4yW4cL4RcL+wb9o2csFNgUg==
+X-Received: by 2002:a17:90b:2f4c:b0:2ee:dd9b:e402 with SMTP id 98e67ed59e1d1-309f7da68f2mr22025870a91.12.1745839234596;
+        Mon, 28 Apr 2025 04:20:34 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50ea440sm80008005ad.123.2025.04.28.04.20.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 04:20:33 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id F23A941CA464; Mon, 28 Apr 2025 18:20:30 +0700 (WIB)
+Date: Mon, 28 Apr 2025 18:20:30 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: rsworktech@outlook.com, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] crypto/krb5: Fix change to use SG miter to use
- offset
-Message-ID: <aA9kWu9eViN17ZBs@gondor.apana.org.au>
-References: <3824017.1745835726@warthog.procyon.org.uk>
+Subject: Re: [PATCH net] docs: tproxy: fix code block style
+Message-ID: <aA9kfiqQpbONuv6W@archie.me>
+References: <20250427-tproxy-docs-fix-v1-1-988e94844ccb@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="zdG46O1MrI4y82Oq"
 Content-Disposition: inline
-In-Reply-To: <3824017.1745835726@warthog.procyon.org.uk>
+In-Reply-To: <20250427-tproxy-docs-fix-v1-1-988e94844ccb@outlook.com>
 
-On Mon, Apr 28, 2025 at 11:22:06AM +0100, David Howells wrote:
-> [Note: Nothing in linus/master uses the krb5lib, though the bug is there,
->  but it is used by AF_RXRPC's RxGK implementation in net-next, so can it go
->  through the net-next tree rather than directly to Linus or through
->  crypto?]
 
-Sure I'm happy for this to go through net-next.
+--zdG46O1MrI4y82Oq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The recent patch to make the rfc3961 simplified code use sg_miter rather
-> than manually walking the scatterlist to hash the contents of a buffer
-> described by that scatterlist failed to take the starting offset into
-> account.
-> 
-> This is indicated by the selftests reporting:
-> 
->     krb5: Running aes128-cts-hmac-sha256-128 mic
->     krb5: !!! TESTFAIL crypto/krb5/selftest.c:446
->     krb5: MIC mismatch
-> 
-> Fix this by calling sg_miter_skip() before doing the loop to advance by the
-> offset.
-> 
-> This only affects packet signing modes and not full encryption in RxGK
-> because, for full encryption, the message digest is handled inside the
-> authenc and krb5enc drivers.
-> 
-> Fixes: da6f9bf40ac2 ("crypto: krb5 - Use SG miter instead of doing it by hand")
-> Reported-by: Marc Dionne <marc.dionne@auristor.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Chuck Lever <chuck.lever@oracle.com>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Simon Horman <horms@kernel.org>
-> cc: linux-afs@lists.infradead.org
-> cc: linux-nfs@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
->  crypto/krb5/rfc3961_simplified.c |    1 +
->  1 file changed, 1 insertion(+)
+On Sun, Apr 27, 2025 at 10:36:59PM +0800, Levi Zim via B4 Relay wrote:
+>  Or the following rule to nft:
+> =20
+> -# nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark set=
+ 1 accept
+> +    # nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark=
+ set 1 accept
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Use double-colon syntax instead to wrap the rule above in literal code block
+like in other rules.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--zdG46O1MrI4y82Oq
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaA9kdQAKCRD2uYlJVVFO
+oy7iAQD/6Huyhp7ZIhbYOVeO5jcZVhkqnIyi9AuJZwfdpLSMsgEApUqTiO64fBoN
+nwgDjHv7yQAAyInl9yKYLEB5nxdR0ww=
+=ax8J
+-----END PGP SIGNATURE-----
+
+--zdG46O1MrI4y82Oq--
 
