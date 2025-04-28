@@ -1,116 +1,139 @@
-Return-Path: <netdev+bounces-186486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19938A9F5D5
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:30:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61514A9F642
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 18:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0093ABD7F
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:30:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA9B21896D1C
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 16:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488DA27A10A;
-	Mon, 28 Apr 2025 16:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7226028469B;
+	Mon, 28 Apr 2025 16:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0kdEaGTd"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="GmACvsoH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from sonic309-27.consmr.mail.ne1.yahoo.com (sonic309-27.consmr.mail.ne1.yahoo.com [66.163.184.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CCF27A10D
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 16:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49F2284683
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 16:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745857815; cv=none; b=JwGBQ1gMkgMbYYq9urH/pmXfWJ38H7xk/0Bfj87jjp23y4G4jtWS1Eb92LWR52mtVE2SnBLz9D1qIIOy/DxU/u8AWXPABAbO+uNn0cEAUq7C3DCX7PiA3T8o9epTZbHo0llPp9hgtqJnYpwJKjn7JWuVQdQqnhlIbLRSTHEfB/4=
+	t=1745859166; cv=none; b=FC1ccRMOiVFo1sOlj+RJmwbs9wDGUmmpwb0E8clMD4+bUIMRhhQrBu0YlRpehVnKhWnSefUIM6BkfvAerd2Rw4lAdlqdnomC4NXb0glvMsgE5WyJ4UqPfZpJyVwfnz1324zoluFdN99SevMoRnOeJxHwBH6LF3gVC3U0uUqrv/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745857815; c=relaxed/simple;
-	bh=rgWGCaPEut3Sq1Q77Ef5DzARVmWfDHJR1UaK/ONKD/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjL3a+dvVP9PqZ4ACK58aYaXxR+CEqRtkzsKXtckqJWJt7CPaL6qOLfV9LvLnHWv7pCiQu+IlH2CHlT+lUbty8xrl79J12jDDDBa7pqhIK+pujCjEhD4kB2LRBER8Fcfvh+LkJSgGBqPc2MAU+1jAzxCJMh+aiSJzdlUJfcm6lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0kdEaGTd; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so47574245e9.1
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 09:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745857812; x=1746462612; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FuJOxYPlqCw8gPPVBRRb44B+5zXaYBpyH/3cY9Vx8mI=;
-        b=0kdEaGTdcQeXsuafyzc/VaNQUAdIHXv8BZLAHsp46f36nsNanGQ8IJnz7pcMgEetVp
-         11ZvvEKYxel8+aDNik7HziiQqK98xePoJTTYWpwYBZkbsSlJeTFOqaBd5sGPln5P1TFC
-         D89Eef3CxN1RB9ilmNNkN07SPJuGPUPjSbvmWX2353y5AqOqzFZc/HXpuJfwLhYYASez
-         /xOTQcCM2+FaE5uMwYYQeq5wAzk8vJxbXBd6fcw7hWATDV5+wg0JfqHrBbiNwZc/HHex
-         udIxxdOAKlvjmWH/EVZDZLbQWqEYgQYHzTDwHwr4pPgPBtSYRUGFFo9DpNgaXBGZlo4u
-         YHiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745857812; x=1746462612;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FuJOxYPlqCw8gPPVBRRb44B+5zXaYBpyH/3cY9Vx8mI=;
-        b=WfjVE1W/0QxldXhsQOM4hIPLjGUR9Xk8StSa971XBUjABAdgDfXVlRo9fqLMtiuzx4
-         IDT6gJJSpgo3O9rwbeJEiMqyrAaVzoa30nhe9mkq75ys0lFBv0fv2KqflWpjC5IpEfLP
-         k3ps3LGpV+OZbt7u0/KSepd0wGZrZGKUIj+M/TLlKC7Q2mVRST25DBVHt8BevmCCKH3s
-         91NuRWNMnZJ5Vt2QdlaCXHbD4+mixFUTrDORtPIHtnqGDgsvau5tQEGwWjRI8oboNF5e
-         n6xzqYk93IWS4OaxJXe+s4yM8H91yYxzxqal0TUIs7G7zjgub/IK9ripGrb4huGFC2rK
-         5SyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWEajI+6TRZ0FDlBJnAT86fd5dc8W0TbQEAQ+fozYEPZPkUmUfOKJFbKQDaOAdPCtZIFewNpnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc02xoH+hALLLsVnAQ5UbpCdRVpo7yY3oObvg02HYv8t5VmZlJ
-	31a0idyKsNB1f4OdIJsh0QawRLyDJp6EKFasbKIzXq+KQzkDEtXTNjHLLcN2Trs=
-X-Gm-Gg: ASbGncu3SAcy5/aw0Rh7v8oJMBBgiDys38R35B0XJE21IbiZsnNNE/NI75eOzywi2qs
-	htQUqnqdCfy9H5o0pSItNqSnYHD1yuKO2v6nmEdGSNQm0+yfYhRnTcjAGf0Hn0TAf4mcuDfIRsT
-	MiaHYVcMXVwF00ehtZMXnVlOZtlOl/wg9lC0SJVuG2wXmG5ZQahzb+J3RkHX2U1WMmqc7kYLmJD
-	zPtElZq93jlWMUcQbJ30hbIdGDanCd81p1VIDAlZ3YqPTZXsCl/79YpLXVu0mp0Vb/99vbyMKt6
-	pEi9t652h8uegtvqmwhcql8jTSTDAP+9JgZ5183HUJQ=
-X-Google-Smtp-Source: AGHT+IGaaz3CYcksWmUnsuWsQ3KB9jzWWAhT4gaxPA4FOa4HSZGlGOlTGXbO9xt9wIHJVIR9r09odQ==
-X-Received: by 2002:a5d:6947:0:b0:3a0:8325:8090 with SMTP id ffacd0b85a97d-3a0890ab7dfmr384630f8f.18.1745857811363;
-        Mon, 28 Apr 2025 09:30:11 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073c8c968sm11412748f8f.8.2025.04.28.09.30.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 09:30:10 -0700 (PDT)
-Date: Mon, 28 Apr 2025 18:30:04 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Moshe Shemesh <moshe@nvidia.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink
- port function
-Message-ID: <z2ihsuor3mq4fkohk5snh6dkmcm7wvwdlj2camvdfpbjfa4she@bpvcb2er23pi>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
- <20250424162425.1c0b46d1@kernel.org>
- <l5sll5gx4vw4ykf65vukex3huj677ar5l47iheh4l63e3xtf42@72g3vl5whmek>
- <20250425105145.6095c111@kernel.org>
+	s=arc-20240116; t=1745859166; c=relaxed/simple;
+	bh=6xY2nc0RaB26C8Wx9+EpDD+pS50ZQFFzgqmN0vDJVM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dR/qztW0PbMP9hc97YNsPbxFw1CGmQ3EJ3GP/VvQ7CKi4gYCErbdVCCKRtz66Vcu/mHbgNTdXlG1XH3gK7JRHMdB/lbq6I8LeV20Y9T1jDhV0SRggpUgB5yDHCOi1UfkRJMjny5+46JOHTCdVYlVIKvv5XRG9a0+3udbR9TWvQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=GmACvsoH; arc=none smtp.client-ip=66.163.184.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1745859163; bh=sqVT6q/gS2IO11mPSx1zGKMYT49soEThtm+blh315uA=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=GmACvsoHXlxILyaikfUoKLiYquV+g+Dm+9yoy6+BzOM6CcTlqOMuqYNQwh0Cju40d+0T/JL83xMgAb5jIJisTiE9mCFKD1UL+fe5sR88HmnmOjw4iGisJWXDJSc2xogdPC2I6xhahA/Fq/opWPzBaY/7kyZcfV/GimgeRlNERJaB1/dr0CbA98Wb22a5/eHpiY5jxpvH+cUt7GUQUy4R9xg5iiQBbS2wAXeH08lc5WwtmOjk/ErW6fpB7mBAtiolbTSDAXvVyBLY4h4HtdnPdmdVHQeYd6VprDaL+d6LzIOlKMA2y0r8wCQ2NHdnglv+o8kgp5tdShRsIAJQyD36OQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1745859163; bh=xuc7xdeFIul51izgMiAXJw/PkJaQhaQxeomygHzUYHA=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=q/870ecJrMOuEUZCuLd+8HzNZGmVLlFw1sMQ4TYYRtfLl5ccFv4f11razpcraodz67h+890xBSVZpkcAqtny0sVUp1VzRNhXSu5xkaIE6hvOFdtNJkSy8ulHJsJdNaJpt45nZ5lUbLzrqd3mcZPLafV9UCHq25gY64vYkvKTQjz2FWOR/BZ+fMYAhH0seVl8uF7dD4W44xYNy5UBNPIOaCngvpSwWFrexMn0No5lFyRLY4QsTjrEwnO13hxWMRSIk3C22w6pfPJtZ1psfuvtEkmar9h8A3E0OikxVTSNrBT2NXLaVvsQQrdtwiuYFm9e+qhP/SFxwyTxK/8Wrs/RCg==
+X-YMail-OSG: UYxsJJYVM1nve9Q1xFVLkeERBzVnVqyeHNPd50KUB7jgbH3qnYdOeQSyfMHuvbW
+ qdxenoAyQY4kfeXtpWqZncnvV4pEA65QrNlhYkSBm5eHxEzqJaN_MrUWFi4HLAdU3NTv9ONO8gLT
+ cLAu_MOBPS_LgVGCglF1z0Y3_8ytqhiuFo_TP8MCy0UFNM6a1IbxYWDG86Cox61EjEcmypBIvpe1
+ uWuUd4TD4tK.3ul8yWMxqrd25_WVjmqzIPeI2kQxA80v8bDSvAvS9fRfgBQie1dFmB7b.lMgWFOP
+ ZilW7mYqGAUAEd5sIHhRbM5sX06GQSi1mpsVcYkc8PJknupzijLUWFVZter12xVOFjb0BA55oSAH
+ 77H4.ISHRjuvqylanW3b5ADWiS95coLks.f8xOjtuxNenvVMAg8nqxpdtyEdsA_UdRr4ecIQECqE
+ bmgJN.bhYwx3oMX6z3Jz1bkOJklFDEYmnAKw3D3str.Nht9hC_xVNgrbLJZ9.rNr.mOFSxqa6jfR
+ NzTWQm.Ytw63L55tA06hyzHHdrjVR2OXcgnBOkat708FMl_IPur7I3GO7c4xZx1cLwYxLsVyQlM2
+ vLwoPcqv2JNGJlx.k_S6poZ78DMhnZPo1Fi5UANnyldKm0qx2nvSkgFeSxH_dSA2oUxF38Jv05Ex
+ uPnh4LNRt2ILoAAhOXhYaQBMOFAHUmDPQjBMyjx8eZA84SDu2cVeBZrZdVN01GhuztLQNAVp294G
+ ULILjvCOs.54DRfxU1wtH17Sk79MRyUWr7F2m1MfzeT0xDCQ2oSEuRMV9JWeS7rkBFeYtUEFcUW.
+ Ps03SFKOZwHHSe7i1CUN1AQL79JqCpL2D2vGFmZElBKd654KIWGglrDvQzz9go6t_dnC_0XNuFFz
+ Wqfs7cwGDr1KAQbGHT1tMMN62xIPoyd_lYLpXpPLS6T.i1PVqtCeHq0agMU62JEcFBVVHeNq0Q5y
+ mMIR8R_58uuJGV80TTO8N1InesdhPtkZG17KfzZZvINBYepDdFtaqqkiiBMdwmDvIJnUKUTq8RqS
+ x80QqukyMnMk8ThsUJYJh7MuGF59h2T8N7GxnM7K9zgIZvCApcvG2ecW.Hagm535fBKgeZ0GuN6T
+ wiN7fj8CSnxIEf_0tjTs2hd_CtNjs8SOo.FceppCmCHalLAesziEagVow2DCsId4mAsLZ71.1NYv
+ UM92W_x6lVQ2vZW8fpmNtXDjV6DeZgshzQGWrjWc5lF9TmZ55DoTsPTGyMcqDW8Mhi8Y4z9i5EMw
+ CWoPC1chtCz9ZdvpDp4qoHVc_j3gH9PNFj8xOBHxZOnW6EAV76Srgpn_yfaAL6R1qRitIkQ3zVba
+ se2GMNKCv42Z4LlEa6TVZnzW7d.s1xmc4I5nEbAM6as4EXDBMCURXjgZkS8G2BpYfHRXrvrLN9An
+ Plqi._0rEVZ2rLX5T9oTpcEATS9cFX7LHkTPtZQDEEDSiq5419tp0MLu0nUE0Mzc_BaWFqe7j6MV
+ lJUinby15mI.gtJVB88ANtxOgY0xa4bjspGMx0ECpJNHzOzwvRhcjz6fru4tXGfll_EI0ippPIKM
+ W8anfa3hFd3u5KeQF0v38m8BShW4c229uA06WOCdxy16JBMDZNRX6wC8iiwbUX6O8zmrAjhjzGCq
+ 8DBAN9gSguBrMmyQfB9o1y_vYNPbiRJhNk5BckAjmHuytY.ZPhAU6RKnJsxHUkntiUL3Yj_vuUv0
+ ZApsmGak9pq3qlG5QUcnQvs6v0DMvfgq50PynoFhABZkdJVH0q9P8DdveQcOMI7OKHSgrLik59kD
+ zaAPDwdXDMgvaHXZGiHD_O7bBbCYplhKf2VkM9JNis2_GH.mGmPc0wDqk2xNoJsy_iRm4YJQmnZ1
+ Jw2c_L2ut7ybkHC9Psxxp_7UnGIAXvGz0NIIJuf8qh4T._FjQXNr69vuYWFV7T76pOB8boFnM5ja
+ l7YhKZuFRVmZ5L9nsUvkc.gHXv1JPVQofrP2YOb4NQ0c2zJhGP9RqrTDcMjCUxhYdYydxislMlC9
+ 5h9hTDI2E0ppdVWQHyCCtUufdASICa2N11Z._oEMpPJA4daZpCA_mE.C2jtNPkKssc5BJ9BN9lrt
+ nLrLJj3TroWEET.3j7WUAXcboQKa9astOlpVySbvvahbPdIInXS0_eNLewaYQdPs9jgfKzFjlmfK
+ T1srwHLociI00t176XO8hSn3oi0EoSBcwNnUUgDQU6Y_pXmS753OvERIzjlzBKsc_l58.0hGdfjW
+ a2f_2_EOabiLHJtwbquFCYOboie.Js47cjFkCbFEceb5TxLWGaqgqoGFms5rdJF23KIRecTSMtda
+ VUg--
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: dc9f098f-28ea-41ed-87ec-fab9cfeed3e1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.ne1.yahoo.com with HTTP; Mon, 28 Apr 2025 16:52:43 +0000
+Received: by hermes--production-gq1-74d64bb7d7-4ndhm (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 0d3d3196c6fbd5ff60aed6348ba5f11a;
+          Mon, 28 Apr 2025 16:32:29 +0000 (UTC)
+Message-ID: <f24142d4-e0eb-4d35-b230-80dff1e58331@schaufler-ca.com>
+Date: Mon, 28 Apr 2025 09:32:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250425105145.6095c111@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] security,fs,nfs,net: update security_inode_listsecurity()
+ interface
+To: Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: paul@paul-moore.com, Trond Myklebust <trondmy@kernel.org>,
+ Anna Schumaker <anna@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>,
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ netdev@vger.kernel.org, selinux@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20250428155535.6577-2-stephen.smalley.work@gmail.com>
+ <988adabb-4236-4401-9db1-130687b0d84f@schaufler-ca.com>
+ <CAEjxPJ66vErSdqaMkdx8H2xcYXQ1hrscLpkWDSQ906q8c2VTFQ@mail.gmail.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <CAEjxPJ66vErSdqaMkdx8H2xcYXQ1hrscLpkWDSQ906q8c2VTFQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.23737 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Fri, Apr 25, 2025 at 07:51:45PM +0200, kuba@kernel.org wrote:
->On Fri, 25 Apr 2025 13:26:01 +0200 Jiri Pirko wrote:
->>> Makes sense, tho, could you please use UUID?
->>> Let's use industry standards when possible, not "arbitrary strings".  
->> 
->> Well, you could make the same request for serial number of asic and board.
->> Could be uuids too, but they aren't. I mean, it makes sense to have all
->> uids as uuid, but since the fw already exposes couple of uids as
->> arbitrary strings, why this one should be treated differently all of the
->> sudden?
->
->Are you asking me what the difference is here, or you're just telling
->me that I'm wrong and inconsistent?
+On 4/28/2025 9:23 AM, Stephen Smalley wrote:
+> On Mon, Apr 28, 2025 at 12:17 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
+>> On 4/28/2025 8:55 AM, Stephen Smalley wrote:
+>>> Update the security_inode_listsecurity() interface to allow
+>>> use of the xattr_list_one() helper and update the hook
+>>> implementations.
+>>>
+>>> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.smalley.work@gmail.com/
+>>>
+>>> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+>>> ---
+>>> This patch is relative to the one linked above, which in theory is on
+>>> vfs.fixes but doesn't appear to have been pushed when I looked.
+>>> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+>>> index bf3bbac4e02a..3c3919dcdebc 100644
+>>> --- a/include/linux/lsm_hook_defs.h
+>>> +++ b/include/linux/lsm_hook_defs.h
+>>> @@ -174,8 +174,8 @@ LSM_HOOK(int, -EOPNOTSUPP, inode_getsecurity, struct mnt_idmap *idmap,
+>>>        struct inode *inode, const char *name, void **buffer, bool alloc)
+>>>  LSM_HOOK(int, -EOPNOTSUPP, inode_setsecurity, struct inode *inode,
+>>>        const char *name, const void *value, size_t size, int flags)
+>>> -LSM_HOOK(int, 0, inode_listsecurity, struct inode *inode, char *buffer,
+>>> -      size_t buffer_size)
+>>> +LSM_HOOK(int, 0, inode_listsecurity, struct inode *inode, char **buffer,
+>>> +      ssize_t *remaining_size)
+>> How about "rem", "rsize" or some other name instead of the overly long
+>> "remaining_size_"?
+> I don't especially care either way but was just being consistent with
+> the xattr_list_one() code.
 
-Both I guess? I'm just trying to understand the rationale behind the
-request, that's all.
+Sigh. Then I'd leave it as is.
+
 
