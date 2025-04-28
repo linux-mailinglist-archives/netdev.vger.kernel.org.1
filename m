@@ -1,152 +1,119 @@
-Return-Path: <netdev+bounces-186420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A85FA9F0A3
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:28:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D19FA9F0C7
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 14:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F225A1EEC
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:28:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F9FC3B1472
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 12:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83110269D0D;
-	Mon, 28 Apr 2025 12:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B388926A1AC;
+	Mon, 28 Apr 2025 12:31:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.itouring.de (mail.itouring.de [85.10.202.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E70269AE7;
-	Mon, 28 Apr 2025 12:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.202.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF5426A0F9;
+	Mon, 28 Apr 2025 12:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745843307; cv=none; b=KH1SC/MKMzWprh/jxNAwuRNws4cREFyhqpuMwVdXSJVFaaL3mY86tek5/e9SdD/PnKSSTXWhkO+zAtKmEluzUlQPu4MNm1LRoi5P0oF8dWMMIr1LDjZIO1fJjiB0fM4YACapy5mt7VdTCFCqs4YtgtaFUJxnuOBFJ8PYXQILzZ0=
+	t=1745843494; cv=none; b=DLNP++fpLq7ZaSHWxpo/xd2F+ECI7l1fA+hAI2xn/5wBcomqbfuE7z+MK+0EDtQ+bd1VQra5W0aHvIid9wu/1ijCvDpPBLzHl9RbcLPYBBiWUL+j+VmV0GM6o//27/VbMq3tbC6jN/4muWGHnCGq9a9mmKdlmoqXcMxDkjkMgzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745843307; c=relaxed/simple;
-	bh=hYE/FFn1Zx/Bkgve92oN5dvvbZLRI9e7+gvkZnj8Ys4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Dc5PYZEJ8GrV5cPZu5yzZb6dzRVIcKc8+Ip0zs6oj+RfvmbbadnKR0+LDvtE0qwSrIt4T6b/LvQSNT2P/xgB0nSMY23I3b0He7msiuVZsxtwLWfIHNoxH8Qp91ong9J7hsqOsW9f+Moqb5skZDwOtoC3EPNiCSevoFm6+029YAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com; spf=pass smtp.mailfrom=applied-asynchrony.com; arc=none smtp.client-ip=85.10.202.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=applied-asynchrony.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=applied-asynchrony.com
-Received: from tux.applied-asynchrony.com (p5b07e9b7.dip0.t-ipconnect.de [91.7.233.183])
-	by mail.itouring.de (Postfix) with ESMTPSA id E1214103765;
-	Mon, 28 Apr 2025 14:28:14 +0200 (CEST)
-Received: from [192.168.100.223] (ragnarok.applied-asynchrony.com [192.168.100.223])
-	by tux.applied-asynchrony.com (Postfix) with ESMTP id 919566018BE80;
-	Mon, 28 Apr 2025 14:28:14 +0200 (CEST)
-Subject: Re: [REGRESSION] 6.14.3 panic - kernel NULL pointer dereference in
- htb_dequeue
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: "Alan J. Wylie" <alan@wylie.me.uk>, Jamal Hadi Salim <jhs@mojatatu.com>,
- regressions@lists.linux.dev, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Octavian Purdila <tavip@google.com>,
- =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- stable@vger.kernel.org
-References: <20250421104019.7880108d@frodo.int.wylie.me.uk>
- <6fa68b02-cf82-aeca-56e6-e3b8565b22f4@applied-asynchrony.com>
- <20250421131000.6299a8e0@frodo.int.wylie.me.uk>
- <20250421200601.5b2e28de@frodo.int.wylie.me.uk>
- <89301960-1758-5b2e-6d91-81ef06843e14@applied-asynchrony.com>
- <20250421210927.50d6a355@frodo.int.wylie.me.uk>
- <20250422175145.1cb0bd98@frodo.int.wylie.me.uk>
- <4e2a6522-d455-f0ce-c77d-b430c3047d7c@applied-asynchrony.com>
- <2025042831-professor-crazy-ad07@gregkh>
-From: =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <c8110ec8-a868-b531-a230-f4b645f5ac73@applied-asynchrony.com>
-Date: Mon, 28 Apr 2025 14:28:14 +0200
+	s=arc-20240116; t=1745843494; c=relaxed/simple;
+	bh=gwBWdi3DsQDSGAcw91QNj4uRRTHDHP7U6CL+tA4Yvgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cuqAaMF63gvyVlC1Ff4SsETAsR2Df3wgoR8Q9DIA5SoVdLQX07RlzAwzuoXgjBI2kwVx+Sd3JDdXt3mOtkBaCjnQs0BrvK05unArzXb62sGDe4EyT3Gueam+NAMUYE2aWtZup0ZGY7AnfUsAEf1G43x0AqPXXSYmcSIYFQY97Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from localhost (unknown [116.232.18.46])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dlan)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id DB59234306D;
+	Mon, 28 Apr 2025 12:31:31 +0000 (UTC)
+Date: Mon, 28 Apr 2025 12:31:27 +0000
+From: Yixun Lan <dlan@gentoo.org>
+To: Chen-Yu Tsai <wens@csie.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] dt-bindings: arm: sunxi: Add A523 EMAC0 compatible
+Message-ID: <20250428123127-GYB56330@gentoo>
+References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
+ <20250424-01-sun55i-emac0-v2-2-833f04d23e1d@gentoo.org>
+ <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2025042831-professor-crazy-ad07@gregkh>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGb2v64vy9Zx-mJgT7dLMMcx4nbAeQ3n8pbvwT6QkuMTL6kQTg@mail.gmail.com>
 
-On 2025-04-28 13:45, Greg KH wrote:
-> On Tue, Apr 22, 2025 at 07:20:24PM +0200, Holger Hoffstätte wrote:
->> (cc: Greg KH)
->>
->> On 2025-04-22 18:51, Alan J. Wylie wrote:
->>> On Mon, 21 Apr 2025 21:09:27 +0100
->>> "Alan J. Wylie" <alan@wylie.me.uk> wrote:
->>>
->>>> On Mon, 21 Apr 2025 21:47:44 +0200
->>>> Holger Hoffstätte <holger@applied-asynchrony.com> wrote:
->>>>
->>>>>> I'm afraid that didn't help. Same panic.
->>>>>
->>>>> Bummer :-(
->>>>>
->>>>> Might be something else missing then - so for now the only other
->>>>> thing I'd suggest is to revert the removal of the qlen check in
->>>>> fq_codel.
->>>>
->>>> Like this?
->>>>
->>>> $ git diff  sch_fq_codel.c
->>>> diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
->>>> index 6c9029f71e88..4fdf317b82ec 100644
->>>> --- a/net/sched/sch_fq_codel.c
->>>> +++ b/net/sched/sch_fq_codel.c
->>>> @@ -316,7 +316,7 @@ static struct sk_buff *fq_codel_dequeue(struct
->>>> Qdisc *sch) qdisc_bstats_update(sch, skb);
->>>>           flow->deficit -= qdisc_pkt_len(skb);
->>>> -       if (q->cstats.drop_count) {
->>>> +       if (q->cstats.drop_count && sch->q.qlen) {
->>>>                   qdisc_tree_reduce_backlog(sch, q->cstats.drop_count,
->>>>                                             q->cstats.drop_len);
->>>>                   q->cstats.drop_count = 0;
->>>> $
->>>>
->>>
->>> It's been about 21 hours and no crash yet. I had an excellent day down
->>> a cave, so there's not been as much Internet traffic as usual, but
->>> there's a good chance the above patch as at least worked around, if not
->>> fixed the issue.
->>
->> Thought so .. \o/
->>
->> I guess now the question is what to do about it. IIUC the fix series [1]
->> addressed some kind of UAF problem, but obviously was not applied
->> correctly or is missing follow-ups. It's also a bit mysterious why
->> adding the HTB patch didn't work.
->>
->> Maybe Cong Wang can advise what to do here?
->>
->> So unless someone else has any ideas: Greg, please revert:
->>
->> 6.14.y/a57fe60ef4cf96bfbb6b58397ec28bdb5a5c6b31
->> ("codel: remove sch->q.qlen check before qdisc_tree_reduce_backlog()")
->>
->> and probably from 6.12 as well.
+Hi All,
+
+On 13:43 Sun 27 Apr     , Chen-Yu Tsai wrote:
+> On Thu, Apr 24, 2025 at 6:09 PM Yixun Lan <dlan@gentoo.org> wrote:
+> >
+> > Allwinner A523 SoC variant (A527/T527) contains an "EMAC0" Ethernet
+> > MAC compatible to the A64 version.
 > 
-> Why only those 2 branches?  What about all others, and mainline?
+> The patch subject prefix should be "dt-bindings: net: sun8i-emac: ".
+> 
+Ok, I can update in next version
 
-All branches that received upstream 342debc12183 aka
-"codel: remove sch->q.qlen check before qdisc_tree_reduce_backlog()"
-should be reverted for now. I previously didn't check them all.
+> And this needs an Ack from the DT binding maintainers.
+> 
+I'd assume Krzysztof Kozlowski also fine to have his ack kept in next version
+with above subject updated, since I saw he already gave an ack to this patch.
 
-It was part of a series, and the rest of the series is missing (not
-picked by autosel). Luckily that does not matter because mainline
-is apparently also buggy, so applying the rest of the series
-would not help. This is currently still being debugged/worked on.
+Thanks
 
-Just reverting this one commit provably fixes the crash for people
-using -stable in e.g. gateway/router setups, with a htb->fq_codel chain.
-The crash does not affect people using fq_codel as root qdisc.
+Yixun Lan
 
-Reverting is not the greatest solution since it reintroduces a potential
-UAF, which has been there since fq_codel was first committed.
-IIUC this potential UAF can only be induced with admin privileges.
-
-I don't know how to explain this any better; all I did was try to
-help Alan. :-(
-
--h
+> ChenYu
+> 
+> 
+> > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Yixun Lan <dlan@gentoo.org>
+> > ---
+> >  Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
+> > index 7fe0352dff0f8d74a08f3f6aac5450ad685e6a08..7b6a2fde8175353621367c8d8f7a956e4aac7177 100644
+> > --- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
+> > +++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
+> > @@ -23,6 +23,7 @@ properties:
+> >                - allwinner,sun20i-d1-emac
+> >                - allwinner,sun50i-h6-emac
+> >                - allwinner,sun50i-h616-emac0
+> > +              - allwinner,sun55i-a523-emac0
+> >            - const: allwinner,sun50i-a64-emac
+> >
+> >    reg:
+> >
+> > --
+> > 2.49.0
+> >
+> >
 
