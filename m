@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-186338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A26A9E7F5
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:05:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C03A9E7F4
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 08:04:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2235916F2EE
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:04:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD663BABA7
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 06:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097F71D61B7;
-	Mon, 28 Apr 2025 06:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F041D54FE;
+	Mon, 28 Apr 2025 06:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cHxiehA+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cABZjbWU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5143D1D54FE;
-	Mon, 28 Apr 2025 06:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0E329CEB;
+	Mon, 28 Apr 2025 06:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745820214; cv=none; b=CmiXY6gOeq+vGTAtXQxzM5DyLegmN4iUa45cf4W1mCtHnl4pZkf8yqJDAaZR5IDGXWIJRma7mXeK/INkWnN7LZq6z3lSRmyZoQyr/P2PNXnf2Vyb0p2oeJ452IV+t/DTtl4477PUYQYdUAxZAxL7L70fEEoKyomhfOOyM85grao=
+	t=1745820218; cv=none; b=JJBDLiCT/9Oy6UwWtYrag4s314DPpUI1GInm1+frySnoMPRVD0jzwd+1JeZxMlxrEEqWvehXfY9x9hpXZ5OFgMv2zJqBIGLCBUHC/4cYozyL6XDBfi9V58eU13bXusqTnGquuMhIuzDWm0VKMEdyTYewx/tmB1NvRKYXiYEakoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745820214; c=relaxed/simple;
-	bh=pS4q/Yjxbmtc0fCQ3ldogllC9oASKz4SUbDlI70Yroo=;
+	s=arc-20240116; t=1745820218; c=relaxed/simple;
+	bh=/QIuqWTdwt7nPBLknBo+J/kNdfRzmk7RzzTj44VYNQQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QPuFzs+D98kR/r422bebTdtFDDaCMUT/SMjHmZn/XSR6OM3na+NxMvjVftxO+66jqYWJizAKsLhVMSxdTJ+AsRHLvW5Wo01fbVGRsAqNuFpjWnc3pe3TpoTMos4ZFOuHczy9aYpKD2EGHaxiO/d4bt2XnUVtjBh5H2GQhZxeC2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cHxiehA+; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version:Content-Type; b=jP5MOFi4Omf6/xfk7brgguOBhOAYRaiS1g2m1ccqMtiu3ZL8dGMrvXO3+2BKRMd3dgMJvdTnfIjEDrBGHyljxj/06D0DMgfkMvXFnnc4yt3Nklsng52Mq15qFpWt4qcBdxWkPyJ47UhiUQ+viVpx8D8F5qziIy/y9lmj5lL5LIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cABZjbWU; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745820214; x=1777356214;
+  t=1745820218; x=1777356218;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pS4q/Yjxbmtc0fCQ3ldogllC9oASKz4SUbDlI70Yroo=;
-  b=cHxiehA+NYkhg0le5XKv1mlbs6jWeCUVuuigvTUf414bHgmddecU6CAi
-   dDI5VqGRbOQyD1SHnBdeTKa0kJ1/EgkH9yv8Kfk8GXfQmSA7aoG7M7tHb
-   l7aQuGeDQuj0/P3V7CYIyUSwdjs2cR3hbhL01R5aljiyru1zoo3zQXF/l
-   edfS2F9b0pHQ1XifaDfs+kZcQnQgn5tbVsCWYksJjZUojy+RBiE+TN9Vu
-   2focc2rp3MYsCdVHkMNxUNrjSPzk9EvL1FuXlQppm8nizOS3XBbHHetdU
-   n0ZIH24hcvIjAZt1hCEm0wMgtzK8eiTEEBzmayxxvntrDGMIy8ErE6r9x
-   w==;
-X-CSE-ConnectionGUID: sR3zcGrnR++mCDBoQtM4Ew==
-X-CSE-MsgGUID: STHZL5aQTg2eY/a3AcectA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="51064613"
+  bh=/QIuqWTdwt7nPBLknBo+J/kNdfRzmk7RzzTj44VYNQQ=;
+  b=cABZjbWUNTCQIfXHruKDwLBujUilTiq/I/JEHpnnYbJkOkRIMebcDg0m
+   3CIsFSkVH1sk4pqeHeN7cDUFGl98QoH4M4wIfuqTV7PYeF5KmJRuQxJfT
+   gMPeJI3lFpqdA3bdduyHCxrEw1OeVELGkGXVodfJHINMI2/fW0SyePK0s
+   F5voUWbejktyqjdLo63yiC+C7wC3ru/KK4h6qcX0csOGo/USLjVpxboKi
+   jvoF/hDkqGTP23IKiKP5qudxSlIB3Gv645t+M8fidPS6Hwx37CtEIWxTW
+   /RWI4pdIwMS/YGjZ99ethoUpJ+OhG5QxSQLdJnNLyespefi9WaY72BBqu
+   A==;
+X-CSE-ConnectionGUID: UdtAq8EmSFuEJvPyh0375g==
+X-CSE-MsgGUID: awzUClGrRLyqIN114IYdtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="51064625"
 X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
-   d="scan'208";a="51064613"
+   d="scan'208";a="51064625"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 23:03:34 -0700
-X-CSE-ConnectionGUID: MNq7LqucQVCwYbZseCh3PQ==
-X-CSE-MsgGUID: kKBHL5XaQna9TZ6tL/LZEQ==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 23:03:37 -0700
+X-CSE-ConnectionGUID: mr+AJPE/SoOtEp1SbApwqg==
+X-CSE-MsgGUID: 7S4E6Wg+RPO+VpRanwl/Nw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,245,1739865600"; 
-   d="scan'208";a="133340764"
+   d="scan'208";a="133340787"
 Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa006.jf.intel.com with ESMTP; 27 Apr 2025 23:03:31 -0700
+  by orviesa006.jf.intel.com with ESMTP; 27 Apr 2025 23:03:34 -0700
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -72,9 +72,9 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org,
 	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
 	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: [PATCH iwl-next v1 3/8] igc: refactor TXDCTL macros to use FIELD_PREP and GEN_MASK
-Date: Mon, 28 Apr 2025 02:02:20 -0400
-Message-Id: <20250428060225.1306986-4-faizal.abdul.rahim@linux.intel.com>
+Subject: [PATCH iwl-next v1 4/8] igc: assign highest TX queue number as highest priority in mqprio
+Date: Mon, 28 Apr 2025 02:02:21 -0400
+Message-Id: <20250428060225.1306986-5-faizal.abdul.rahim@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
 References: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
@@ -84,68 +84,146 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-Refactor TXDCTL macro handling to use FIELD_PREP and GENMASK macros.
-This prepares the code for adding a new TXDCTL priority field in an
-upcoming patch.
+Previously, TX arbitration prioritized queues based on the TC they were
+mapped to. A queue mapped to TC 3 had higher priority than one mapped to
+TC 0.
+
+To improve code reuse for upcoming patches and align with typical NIC
+behavior, this patch updates the logic to prioritize higher queue numbers
+when mqprio is used. As a result, queue 0 becomes the lowest priority and
+queue 3 becomes the highest.
+
+This patch also introduces igc_tsn_is_tc_to_queue_priority_ordered() to
+preserve the original TC-based priority rule and reject configurations
+where a higher TC maps to a lower queue offset.
 
 Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc.h      | 16 +++++++++++-----
- drivers/net/ethernet/intel/igc/igc_main.c |  6 ++----
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_main.c | 19 ++++++++++++
+ drivers/net/ethernet/intel/igc/igc_tsn.c  | 35 ++++++++++++++---------
+ 2 files changed, 41 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index bc37cc8deefb..4e44304b0608 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -487,16 +487,22 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
-  */
- #define IGC_RX_PTHRESH			8
- #define IGC_RX_HTHRESH			8
--#define IGC_TXDCTL_PTHRESH		8
--#define IGC_TXDCTL_HTHRESH		1
- #define IGC_RX_WTHRESH			4
--#define IGC_TXDCTL_WTHRESH		16
- 
-+#define IGC_TXDCTL_PTHRESH_MASK		GENMASK(4, 0)
-+#define IGC_TXDCTL_HTHRESH_MASK		GENMASK(12, 8)
-+#define IGC_TXDCTL_WTHRESH_MASK		GENMASK(20, 16)
-+#define IGC_TXDCTL_QUEUE_ENABLE_MASK	GENMASK(25, 25)
-+#define IGC_TXDCTL_SWFLUSH_MASK		GENMASK(26, 26)
-+
-+#define IGC_TXDCTL_PTHRESH(x)		FIELD_PREP(IGC_TXDCTL_PTHRESH_MASK, (x))
-+#define IGC_TXDCTL_HTHRESH(x)		FIELD_PREP(IGC_TXDCTL_HTHRESH_MASK, (x))
-+#define IGC_TXDCTL_WTHRESH(x)		FIELD_PREP(IGC_TXDCTL_WTHRESH_MASK, (x))
- /* Additional Transmit Descriptor Control definitions */
- /* Ena specific Tx Queue */
--#define IGC_TXDCTL_QUEUE_ENABLE	0x02000000
-+#define IGC_TXDCTL_QUEUE_ENABLE		FIELD_PREP(IGC_TXDCTL_QUEUE_ENABLE_MASK, 1)
- /* Transmit Software Flush */
--#define IGC_TXDCTL_SWFLUSH	0x04000000
-+#define IGC_TXDCTL_SWFLUSH		FIELD_PREP(IGC_TXDCTL_SWFLUSH_MASK, 1)
- 
- #define IGC_RX_DMA_ATTR \
- 	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
 diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 725c8f0b9f3d..86716fabf6a9 100644
+index 86716fabf6a9..1b58811f8cfa 100644
 --- a/drivers/net/ethernet/intel/igc/igc_main.c
 +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -749,11 +749,9 @@ static void igc_configure_tx_ring(struct igc_adapter *adapter,
- 	wr32(IGC_TDH(reg_idx), 0);
- 	writel(0, ring->tail);
- 
--	txdctl |= IGC_TXDCTL_PTHRESH;
--	txdctl |= IGC_TXDCTL_HTHRESH << 8;
--	txdctl |= IGC_TXDCTL_WTHRESH << 16;
-+	txdctl |= IGC_TXDCTL_PTHRESH(8) | IGC_TXDCTL_HTHRESH(1) |
-+		  IGC_TXDCTL_WTHRESH(16) | IGC_TXDCTL_QUEUE_ENABLE;
- 
--	txdctl |= IGC_TXDCTL_QUEUE_ENABLE;
- 	wr32(IGC_TXDCTL(reg_idx), txdctl);
+@@ -6724,6 +6724,19 @@ static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_tc,
+ 		adapter->queue_per_tc[i] = offset[i];
  }
  
++static bool igc_tsn_is_tc_to_queue_priority_ordered(struct tc_mqprio_qopt_offload *mqprio)
++{
++	int i;
++	int num_tc = mqprio->qopt.num_tc;
++
++	for (i = 1; i < num_tc; i++) {
++		if (mqprio->qopt.offset[i - 1] > mqprio->qopt.offset[i])
++			return false;
++	}
++
++	return true;
++}
++
+ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
+ 				 struct tc_mqprio_qopt_offload *mqprio)
+ {
+@@ -6756,6 +6769,12 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
+ 		}
+ 	}
+ 
++	if (!igc_tsn_is_tc_to_queue_priority_ordered(mqprio)) {
++		NL_SET_ERR_MSG_MOD(mqprio->extack,
++				   "tc to queue mapping must preserve increasing priority (higher tc → higher queue)");
++		return -EOPNOTSUPP;
++	}
++
+ 	/* Preemption is not supported yet. */
+ 	if (mqprio->preemptible_tcs) {
+ 		NL_SET_ERR_MSG_MOD(mqprio->extack,
+diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+index e964b11feab1..e1e1c5c89989 100644
+--- a/drivers/net/ethernet/intel/igc/igc_tsn.c
++++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+@@ -12,6 +12,13 @@
+ #define TX_MIN_FRAG_SIZE		64
+ #define TX_MAX_FRAG_SIZE	(TX_MIN_FRAG_SIZE * (MAX_MULTPLIER_TX_MIN_FRAG + 1))
+ 
++enum tx_queue {
++	TX_QUEUE_0 = 0,
++	TX_QUEUE_1,
++	TX_QUEUE_2,
++	TX_QUEUE_3,
++};
++
+ DEFINE_STATIC_KEY_FALSE(igc_fpe_enabled);
+ 
+ static int igc_fpe_init_smd_frame(struct igc_ring *ring,
+@@ -236,7 +243,7 @@ bool igc_tsn_is_taprio_activated_by_user(struct igc_adapter *adapter)
+ 		adapter->taprio_offload_enable;
+ }
+ 
+-static void igc_tsn_tx_arb(struct igc_adapter *adapter, u16 *queue_per_tc)
++static void igc_tsn_tx_arb(struct igc_adapter *adapter, bool reverse_prio)
+ {
+ 	struct igc_hw *hw = &adapter->hw;
+ 	u32 txarb;
+@@ -248,10 +255,17 @@ static void igc_tsn_tx_arb(struct igc_adapter *adapter, u16 *queue_per_tc)
+ 		   IGC_TXARB_TXQ_PRIO_2_MASK |
+ 		   IGC_TXARB_TXQ_PRIO_3_MASK);
+ 
+-	txarb |= IGC_TXARB_TXQ_PRIO_0(queue_per_tc[3]);
+-	txarb |= IGC_TXARB_TXQ_PRIO_1(queue_per_tc[2]);
+-	txarb |= IGC_TXARB_TXQ_PRIO_2(queue_per_tc[1]);
+-	txarb |= IGC_TXARB_TXQ_PRIO_3(queue_per_tc[0]);
++	if (reverse_prio) {
++		txarb |= IGC_TXARB_TXQ_PRIO_0(TX_QUEUE_3);
++		txarb |= IGC_TXARB_TXQ_PRIO_1(TX_QUEUE_2);
++		txarb |= IGC_TXARB_TXQ_PRIO_2(TX_QUEUE_1);
++		txarb |= IGC_TXARB_TXQ_PRIO_3(TX_QUEUE_0);
++	} else {
++		txarb |= IGC_TXARB_TXQ_PRIO_0(TX_QUEUE_0);
++		txarb |= IGC_TXARB_TXQ_PRIO_1(TX_QUEUE_1);
++		txarb |= IGC_TXARB_TXQ_PRIO_2(TX_QUEUE_2);
++		txarb |= IGC_TXARB_TXQ_PRIO_3(TX_QUEUE_3);
++	}
+ 
+ 	wr32(IGC_TXARB, txarb);
+ }
+@@ -282,7 +296,6 @@ static void igc_tsn_set_rxpbsize(struct igc_adapter *adapter, u32 rxpbs_exp_bmc_
+  */
+ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ {
+-	u16 queue_per_tc[4] = { 3, 2, 1, 0 };
+ 	struct igc_hw *hw = &adapter->hw;
+ 	u32 tqavctrl;
+ 	int i;
+@@ -315,7 +328,7 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	/* Restore the default Tx arbitration: Priority 0 has the highest
+ 	 * priority and is assigned to queue 0 and so on and so forth.
+ 	 */
+-	igc_tsn_tx_arb(adapter, queue_per_tc);
++	igc_tsn_tx_arb(adapter, false);
+ 
+ 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
+ 
+@@ -381,12 +394,8 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ 	if (igc_is_device_id_i226(hw))
+ 		igc_tsn_set_retx_qbvfullthreshold(adapter);
+ 
+-	if (adapter->strict_priority_enable) {
+-		/* Configure queue priorities according to the user provided
+-		 * mapping.
+-		 */
+-		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
+-	}
++	if (adapter->strict_priority_enable)
++		igc_tsn_tx_arb(adapter, true);
+ 
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
+ 		struct igc_ring *ring = adapter->tx_ring[i];
 -- 
 2.34.1
 
