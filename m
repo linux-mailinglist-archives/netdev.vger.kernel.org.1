@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-186579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27872A9FCF9
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:19:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E06EDA9FCFF
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D5971A87AC9
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:20:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 456FE466DF9
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D3620F062;
-	Mon, 28 Apr 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EBB210F4B;
+	Mon, 28 Apr 2025 22:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuUYy4aU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6bKrC9z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C6015ECD7;
-	Mon, 28 Apr 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D35620E6EC;
+	Mon, 28 Apr 2025 22:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745878790; cv=none; b=bUXJVUpbi5yeuQ23/BMSlLONSaRSbuDEqDczwxJ06knLMMzs69ng8onFp5Ltyn3u8yJ6PnM4ZHr4Pk5ZR9Dcvh1Wvy/CjBTLpz7yzanJ22lclznN/6PDWWVod5i71fzW+5LnolEFWDaTbOpLrwF7nqPB3guFbZfXqmUtUFpoUxg=
+	t=1745878798; cv=none; b=NxI03NgJr6HkWrZe6AvkgfxHY9MNHxpW++JG8XHT0g7V+LRDgJJWmAGJeitLaV/jR//u826H8DWIN91pJMO+1AL3YACdjvohFqAd6v9hV1U6Tfy+wWagUjDdnZ4mLqCh688uc7aVnqQmZKFKHWD9bFNGgX+HSBnW/kwR+OvUWS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745878790; c=relaxed/simple;
-	bh=TxMhwn7cp9w0K/g0g69tL17XWFr1iuc73PU8ZOzh1vs=;
+	s=arc-20240116; t=1745878798; c=relaxed/simple;
+	bh=Lahajb51jEfObe1Hyp6/chmzs0TWo8lfU1EyfH2VAgY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=i8UH86/Q7Zfsix6Y9SGjzlQ+YJha7InofryXAdNsv9bHooPgJSu3zUahu1y0sH6tOrpWoAG1a6xyDmcEmADPhyLlDojCgn9CeFK4Hq4WtSfkjflhuSuodAJByFwee7b9UhMoutgzPMuYc9F1Lr1upmgfczbvm86ZptlUo77sK9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuUYy4aU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0BCC4CEEA;
-	Mon, 28 Apr 2025 22:19:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=utwwpBCv8Xv/hdbUScnnRrK/CMhfO5qH1TNHX6N/Td4ASfeqoxRjewQlq5Qc+HKJ4uQ2/xbQS2d/fK+3T2xoODtL2rinsLmNBjoRpYHQSbWjCtkEQ33EKBv8J9ThnP5/2LB4RVeXJTON+RabaCeoM4QsRpcbbUIWoHoC3uwJ1v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6bKrC9z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD0EC4CEE4;
+	Mon, 28 Apr 2025 22:19:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745878790;
-	bh=TxMhwn7cp9w0K/g0g69tL17XWFr1iuc73PU8ZOzh1vs=;
+	s=k20201202; t=1745878797;
+	bh=Lahajb51jEfObe1Hyp6/chmzs0TWo8lfU1EyfH2VAgY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NuUYy4aUE66I9IE1M+lRnbwMpt9VnTfcHul8i50csGbSqZIItacXLie/5/FuW7l8H
-	 lVelmmXsW6zLylokc7yopTAOcuwuVohTWMpvkimOZ8WuSuJbJx6HshS0pcDcpEjqXD
-	 94DxjoY3puWJujUcwPseP/5KjGEPzHasoSoZ/sSfMdnN/ePROntkvqRd5FPAVMf/nc
-	 T18fhnOyG1V2cEFsk+VQPrDDOKp211bMvx5qgiblD1qcAQTFTdRMF12+NSTjJLjMHI
-	 44PnWlfeOcAv+uqj2wXUTlFeCvvzK+CB2lj1reQk9C01HHdus7pCYNbRVVwjzj2qiQ
-	 XEkkAMMYGF91A==
+	b=Y6bKrC9zrywMNQNOy4nFFHbTO4mnCiiv0aDoz5eFkHF9lqtzfX+uYfRI4RnneU/2e
+	 WFRjTOO1cArBxKU3PHyiVgTYgdPmlS7+J91kkPoO0+2C3CYv+Fnf56edyvCEM01ZEE
+	 BnPJqc6L4DladHKFWT0fAOT5R8yPUXHUNCbjFhfRMa4CM0X9IiQI0I26cuW2RrpQ+k
+	 rtSDiFrhPkz6wAS9YsUEobh1QbSwLTFgcj2Q/dc1f2+PRcCvzrtvJSTZPAU8xiNyyJ
+	 opPofMxVl7hTRs95W9zUd7vIi2i6/2lSPBGzDgyjffOomp9iG+0y/ObR03A/sk3g8G
+	 QmfG/hK3MxzSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D213822D43;
-	Mon, 28 Apr 2025 22:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD3F3822D43;
+	Mon, 28 Apr 2025 22:20:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: sync mtk_clks_source_name
- array
+Subject: Re: [PATCH net-next V7 0/2] veth: qdisc backpressure and qdisc check
+ refactor
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174587882900.1063939.12238416302643279123.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Apr 2025 22:20:29 +0000
-References: <d075e706ff1cebc07f9ec666736d0b32782fd487.1745555321.git.daniel@makrotopia.org>
-In-Reply-To: <d075e706ff1cebc07f9ec666736d0b32782fd487.1745555321.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, lorenzo@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+ <174587883648.1063939.13609783923065664545.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Apr 2025 22:20:36 +0000
+References: <174559288731.827981.8748257839971869213.stgit@firesoul>
+In-Reply-To: <174559288731.827981.8748257839971869213.stgit@firesoul>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, bpf@vger.kernel.org,
+ tom@herbertland.com, eric.dumazet@gmail.com, davem@davemloft.net,
+ pabeni@redhat.com, toke@toke.dk, dsahern@kernel.org,
+ makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 25 Apr 2025 05:29:53 +0100 you wrote:
-> When removing the clock bits for clocks which aren't used by the
-> Ethernet driver their names should also have been removed from the
-> mtk_clks_source_name array.
+On Fri, 25 Apr 2025 16:55:25 +0200 you wrote:
+> This patch series addresses TX drops seen on veth devices under load,
+> particularly when using threaded NAPI, which is our setup in production.
 > 
-> Remove them now as enum mtk_clks_map needs to match the
-> mtk_clks_source_name array so the driver can make sure that all required
-> clocks are present and correctly name missing clocks.
+> The root cause is that the NAPI consumer often runs on a different CPU
+> than the producer. Combined with scheduling delays or simply slower
+> consumption, this increases the chance that the ptr_ring fills up before
+> packets are drained, resulting in drops from veth_xmit() (ndo_start_xmit()).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: ethernet: mtk_eth_soc: sync mtk_clks_source_name array
-    https://git.kernel.org/netdev/net/c/8c47d5753a11
+  - [net-next,V7,1/2] net: sched: generalize check for no-queue qdisc on TX queue
+    https://git.kernel.org/netdev/net-next/c/34dd0fecaa02
+  - [net-next,V7,2/2] veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
+    https://git.kernel.org/netdev/net-next/c/dc82a33297fc
 
 You are awesome, thank you!
 -- 
