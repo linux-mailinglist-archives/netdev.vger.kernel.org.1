@@ -1,232 +1,262 @@
-Return-Path: <netdev+bounces-186551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C006A9F9FC
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 21:54:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36ABFA9FA03
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 21:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E74C07A2718
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 19:52:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43CF33B8346
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 19:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EA92951A9;
-	Mon, 28 Apr 2025 19:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3B4296D29;
+	Mon, 28 Apr 2025 19:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QIL4U9OC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yxv0FS0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067ED42AA6
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 19:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E192973AE
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 19:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745870033; cv=none; b=OUoN9+3f52NHWdBrBpBggaWSEQQWRbobYqyhA7I05T+sDwHhKRN6s+mDJZwDdK8TFBAaZ06tv10oajY4qJ2Rzu7XNj64J69PZw+1lGvX124rnjSuclk4xqOw/oAxnDDayKTYehWqVT6dPvvZifT4SHuXuvwCnVxnzOKFnpi5PbY=
+	t=1745870153; cv=none; b=bxofJMNxQx8hN3EevEPpVc2d6pic2aw2pZagAE5TC8AOQIg/ncVFbAm+qT6rwi1Oz05G6J6FySu/P+C/sp0XPuC/sMvbYWYbsrYeRXTD7805Xg1v5jgkk/QweR8/FSjmZ0LPA5PPOyyPJTHtM9ESrsu16R/cgSYUKyIWg2xO49A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745870033; c=relaxed/simple;
-	bh=RH3Efm76eu7ZnuFTMdg/XPD3M3JO+DHMqucHRSGnAg8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGyHOcLkBvdWlD0ljm08+ZF7jbGhu5pMjQGksf+U1EepoG6NT9qEEdY6DPv6xjdf5Hji46f1QhAhWr/egvTvgkuYptuFFvEokhd4U/QI0FNjWLQfesPyyPxLUO+RKnAR0d8E10z7Lg3moXXZgUJS7WY4YDR2BPi0Pxu56eYLqMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QIL4U9OC; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-224100e9a5cso63636885ad.2
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 12:53:51 -0700 (PDT)
+	s=arc-20240116; t=1745870153; c=relaxed/simple;
+	bh=MaA81J+3HtofT3J1tOR6wMfPW9HqOJsPPsy7qd6wKiU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uVDi4DrjJLQZQCjneDZzwjoHtBEaZnGIa0s8YEjCVj+9ae7N1jMu9Av6bqubVA+vo2VycfURx6gE9SCSFgBBhe5ri4c9B2JPRC4QjFTwlYvk5CV1dBk/TCxf986VmQY6JfM7G7K3B49qKwfVd1k1YZnOBwj2EvNlL+WUu/40mok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yxv0FS0C; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-73c09e99069so5263989b3a.0
+        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 12:55:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745870031; x=1746474831; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SpdGJjnsSwwmG68ERmNMyjNRpTnG1J41eQ2Ct1pjNr0=;
-        b=QIL4U9OCy5xCXHJ4hVpft0zI/DeRqNoaxPxkYGvYk36xqdj1nEIuXbcNykzJNizJg9
-         X3gABnGcRolUdvqj84uFBHTt1ft3cq2nz6nVfeH8VbNnHajGhGBjoZVodS1hNEBbtp5O
-         COkCCU20FS5701UGTgcIqSHBUsojXD+dF6e2oPWZlmi1FPaPWzz4lWSY6nHmzKJK2hga
-         oEG87mYKi/9vUZuPxHLQo0BCnSqijBiFR67+k69Yh2uIMrFxw8ModRIcMOqdSvq/e2cS
-         aXE46wziFUJ89n5j3z1hPzcjNMVsSW+iLszMMP1QY6PV+IbrvdGd8igx4wsnU7tKZV9O
-         UdyQ==
+        d=google.com; s=20230601; t=1745870150; x=1746474950; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WF1rdyAsoL1EvhWVSLVqE87e6m1CGCQ1ONSXKdBqozE=;
+        b=Yxv0FS0C8oW7Q+cTSSiVaFQtW1pGKzXw+jspheiK7MTQCyMrNVDjEal3Zm07WLPs6K
+         IywT32VR3Zn+2jYTx97T9IKMvGldz14Ztio+NuZ9K6D4cl8YjhAIJX3Aq87JkAeXyuDN
+         4IgF3huZYydXsZk/3nmlV811gi+oLkFMcg3vDoAxhGsjlvDU3TzLRw0MjV2h+vbIEvKd
+         pjl7BvzGDl63saNVXzLukonOH5kuxfXQX2/L6JXGn/jnmFtdGyaAmnjFqpW0uOH6DpRn
+         RLdrOod1Gu9QffK++CMTMkb0GCdfjzfKAZtLIaPlSCTXGNskr2yDELo1lr3jBONEdejI
+         GLVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745870031; x=1746474831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SpdGJjnsSwwmG68ERmNMyjNRpTnG1J41eQ2Ct1pjNr0=;
-        b=IPrVwxFx4uwyRLWRDPRqI/wwfI0oKjJjlMI/2yycV2gpUK2fUo5r3Ck84D4FAK9pdW
-         EDjv6AG5UiNcXIBOv0PwiC3x5iLUQXe0Tp7XNomNl4v3ygzVIxiEjMO+S8D2Ira/pd+o
-         OZ+VNGEPAbSBXKKF4s9uQ5SKtvPTuQwmASIIH2e7ctsBcw/PN2IZJun1aCrDGy6gqbGh
-         u/5GkjIMPz0fvkOcjO9QKq+pU7KTVwAYkGlaWEghw++4O+3jROS3ijycF5amesBEglo/
-         1c7NkgzLc59e6fwe4zRmoZMspKMseW2I4FLNemkIIyrf260aAse6wqMaizeO8/H0tprf
-         ZqWA==
-X-Gm-Message-State: AOJu0YxreoVFEwUasdp4UigVecOFgnfuoHZjFxUbLo9g0Q/q3LKV4H2Y
-	tnk2WC601x6N1qiXVuIiaHyNku4KQVR7cSQHxJkJlepIiKsmBxM481V0mqBo
-X-Gm-Gg: ASbGncvkbmEVoxmptNYymN0vu1ZzGBCFeCbk5gf562o+ka5Oszah6wC2QEuLYkc6aV+
-	vrhWXjsvGBlaltH7KnAVCk7NdzydvVkbr3Vx0dC2iHyX62+96XLGxdZFoptpZPoqqWMrT6rc/b1
-	CRXsV9G7zLlkj24FrKGelKjCdswgsC/J6fPwmSoL5NkdDTvig//Gr3uCHldYL7rlp2Up0GC5NQW
-	+B60uquE62X0jjCzB7eMOPXSQWvQXdRIfEMRlo6Vw0y7SUYvVmkLwlC+ceYYsK4y2IJ/ewcbS+Q
-	G/O0s3xu1qDFZFAoaDoaUGtgUIZ3myxnaoHdr19BCZdH
-X-Google-Smtp-Source: AGHT+IHmGiMsGUGZ+c6Nfgir3sLJ8nU5rsz25H5tW9lQAnQEpCPWMSOprPqrcfhzWFoz+ePnyr5kMg==
-X-Received: by 2002:a17:902:ceca:b0:224:1781:a950 with SMTP id d9443c01a7336-22de5fccc75mr13192195ad.14.1745870031068;
-        Mon, 28 Apr 2025 12:53:51 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d771b3sm87122035ad.36.2025.04.28.12.53.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 12:53:50 -0700 (PDT)
-Date: Mon, 28 Apr 2025 12:53:49 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Will <willsroot@protonmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Savy <savy@syst3mfailure.io>, jhs@mojatatu.com, jiri@resnulli.us
-Subject: Re: [BUG] net/sched: Race Condition and Null Dereference in
- codel_change, pie_change, fq_pie_change, fq_codel_change, hhf_change
-Message-ID: <aA/czQYEtPmMim0G@pop-os.localdomain>
-References: <UTd8zf-_MMCqMv9R15RSDZybxtCeV9czSvpeaslK7984UCPTX8pbSFVyWhzqiaA6HYFZtHIldd7guvr7_8xVfkk9xSUHnY3e8dSWi7pdVsE=@protonmail.com>
- <aA1kmZ/Hs0a33l5j@pop-os.localdomain>
- <B2ZSzsBR9rUWlLkrgrMrCzqOGeSFxXIkYImvul6994v5tDSqykWo1UaWKRV-SNkNKJurgVzRcnPN07ZAVYykRaYhADyIwTxQ18OQfKDpILQ=@protonmail.com>
+        d=1e100.net; s=20230601; t=1745870150; x=1746474950;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WF1rdyAsoL1EvhWVSLVqE87e6m1CGCQ1ONSXKdBqozE=;
+        b=T0seMfAgipaXcivMcbc0CV0AfYvdALpd/X+qLiZpfYgKJmC+4Hc21+FwGKuI4OyQ08
+         7uOu38wASgrC4Il3J50hG5j/NK18hjRLJ4tGW345JyPoaHDhPJLiyPGzwA5k2N7BwzMn
+         nqjaywNPYwaS3du7oI6Soeg5+f92kaau1ApP/C79+J4WEzD8YTg/QFAbjA07lV1ZIJUA
+         DVDU5XRj9F2Ep+2VdAqgRrwZUL2EyY1mpZyLXVYW/q0T8VLO8adWCP+KCfFlTPSJYHeK
+         7AQ3zBflScFDnf/TpsvQ9hxj4GWMok8mCqOQ4RPNjmKj64MSM53kdN4HgcRmJWPCtzGR
+         jPmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWg1R8FN69pkqkufk7uafmd4hbh941OUkvjl0VpucU5Ba4ecsYBGnKZFEzy9236QTVPT5Jy2SU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFqtNUloA5ggSuNaKezEHTbT+/9rvdIlfKI97h9V/mFdSHIz7r
+	UKe/3cPmT6scDsjmAeUkYw9Y28JvYJJprHhCWWbYbckjOAa8fGtUaOE4Y6g2q4p84Lmz2uF1uJ0
+	eH0MzMA==
+X-Google-Smtp-Source: AGHT+IGgzi/mmJ2yTIATM1jhnypep6TvOgCGYfDJkP79jyyBpEEK6EumSZueXfXDpyYjfteBqr8NEmlR8IGO
+X-Received: from pfbcl15.prod.google.com ([2002:a05:6a00:32cf:b0:740:65f:220a])
+ (user=brianvv job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:cfa4:b0:1f5:58b9:6d97
+ with SMTP id adf61e73a8af0-2093e52803amr1192392637.35.1745870150677; Mon, 28
+ Apr 2025 12:55:50 -0700 (PDT)
+Date: Mon, 28 Apr 2025 19:55:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B2ZSzsBR9rUWlLkrgrMrCzqOGeSFxXIkYImvul6994v5tDSqykWo1UaWKRV-SNkNKJurgVzRcnPN07ZAVYykRaYhADyIwTxQ18OQfKDpILQ=@protonmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.901.g37484f566f-goog
+Message-ID: <20250428195532.1590892-1-brianvv@google.com>
+Subject: [iwl-net PATCH v2] idpf: fix a race in txq wakeup
+From: Brian Vazquez <brianvv@google.com>
+To: Brian Vazquez <brianvv.kernel@gmail.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org
+Cc: David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, emil.s.tantilov@intel.com, 
+	Brian Vazquez <brianvv@google.com>, Josh Hay <joshua.a.hay@intel.com>, 
+	Luigi Rizzo <lrizzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Apr 27, 2025 at 09:26:43PM +0000, Will wrote:
-> Hi Cong,
-> 
-> Thank you for the reply. On further analysis, we realized that you are correct - it is not a race condition between xxx_change and xxx_dequeue. The root cause is more complicated and actually relates to the parent tbf qdisc. The bug is still a race condition though.
-> 
-> __qdisc_dequeue_head() can still return null even if sch->q.qlen is non-zero because of qdisc_peek_dequeued, which is the vulnerable qdiscs' peek handler, and tbf_dequeue calls it (https://elixir.bootlin.com/linux/v6.15-rc3/source/net/sched/sch_tbf.c#L280). There, the inner qdisc dequeues content before, adds it back to gso_skb, and increments qlen (https://elixir.bootlin.com/linux/v6.15-rc3/source/include/net/sch_generic.h#L1133). A queue state consistency issue arises when tbf does not have enough tokens (https://elixir.bootlin.com/linux/v6.15-rc3/source/net/sched/sch_tbf.c#L302) for dequeuing. The qlen value will be fixed when sufficient tokens exist and the watchdog fires again. However, there is a window for the inner qdisc to encounter this inconsistency and thus hit the null dereference.
-> 
-> Savy made this diagram below to showcase the interactions to trigger the bug.
-> 
-> Packet 1 is sent:
-> 
->     tbf_enqueue()
->         qdisc_enqueue()
->             codel_qdisc_enqueue() // Codel qlen is 0
->                 qdisc_enqueue_tail()
->                 // Packet 1 is added to the queue
->                 // Codel qlen = 1
-> 
->     tbf_dequeue()
->         qdisc_peek_dequeued()
->             skb_peek(&sch->gso_skb) // sch->gso_skb is empty
->             codel_qdisc_dequeue() // Codel qlen is 1
->                 qdisc_dequeue_head()
->                 // Packet 1 is removed from the queue
->                 // Codel qlen = 0
->             __skb_queue_head(&sch->gso_skb, skb); // Packet 1 is added to gso_skb list
->             sch->q.qlen++ // Codel qlen = 1
->         qdisc_dequeue_peeked()
->             skb = __skb_dequeue(&sch->gso_skb) // Packet 1 is removed from the gso_skb list
->             sch->q.qlen-- // Codel qlen = 0
-> 
-> Packet 2 is sent:
-> 
->     tbf_enqueue()
->         qdisc_enqueue()
->             codel_qdisc_enqueue() // Codel qlen is 0
->                 qdisc_enqueue_tail()
->                 // Packet 2 is added to the queue
->                 // Codel qlen = 1
-> 
->     tbf_dequeue()
->         qdisc_peek_dequeued()
->             skb_peek(&sch->gso_skb) // sch->gso_skb is empty
->             codel_qdisc_dequeue() // Codel qlen is 1
->                 qdisc_dequeue_head()
->                 // Packet 2 is removed from the queue
->                 // Codel qlen = 0
->             __skb_queue_head(&sch->gso_skb, skb); // Packet 2 is added to gso_skb list
->             sch->q.qlen++ // Codel qlen = 1
-> 
->         // TBF runs out of tokens and reschedules itself for later
->         qdisc_watchdog_schedule_ns()
-> 
-> 
-> Notice here how codel is left in an "inconsistent" state, as sch->q.qlen > 0, but there are no packets left in the codel queue (sch->q.head is NULL)
-> 
-> At this point, codel_change() can be used to update the limit to 0. However, even if  sch->q.qlen > 0, there are no packets in the queue, so __qdisc_dequeue_head() returns NULL and the null-ptr-deref occurs.
-> 
+Add a helper function to correctly handle the lockless
+synchronization when the sender needs to block. The paradigm is
 
-Excellent analysis!
+        if (no_resources()) {
+                stop_queue();
+                barrier();
+                if (!no_resources())
+                        restart_queue();
+        }
 
-Do you mind testing the following patch?
+netif_subqueue_maybe_stop already handles the paradigm correctly, but
+the code split the check for resources in three parts, the first one
+(descriptors) followed the protocol, but the other two (completions and
+tx_buf) were only doing the first part and so race prone.
 
-Note:
+Luckily netif_subqueue_maybe_stop macro already allows you to use a
+function to evaluate the start/stop conditions so the fix only requires
+the right helper function to evaluate all the conditions at once.
 
-1) We can't just test NULL, because otherwise we would leak the skb's
-in gso_skb list. 
+The patch removes idpf_tx_maybe_stop_common since it's no longer needed
+and instead adjusts separately the conditions for singleq and splitq.
 
-2) I am totally aware that _maybe_ there are some other cases need the
-same fix, but I want to be conservative here since this will be
-targeting for -stable. It is why I intentionally keep my patch minimum.
+Note that idpf_rx_buf_hw_update doesn't need to check for resources
+since that will be covered in idpf_tx_splitq_frame.
 
-Thanks!
+To reproduce:
 
---------------->
+Reduce the threshold for pending completions to increase the chances of
+hitting this pause by changing your kernel:
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index d48c657191cd..5a4840678ce5 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1031,6 +1031,25 @@ static inline struct sk_buff *__qdisc_dequeue_head(struct qdisc_skb_head *qh)
- 	return skb;
+drivers/net/ethernet/intel/idpf/idpf_txrx.h
+
+-#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 1)
++#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 4)
+
+Use pktgen to force the host to push small pkts very aggressively:
+
+./pktgen_sample02_multiqueue.sh -i eth1 -s 100 -6 -d $IP -m $MAC \
+  -p 10000-10000 -t 16 -n 0 -v -x -c 64
+
+Fixes: 6818c4d5b3c2 ("idpf: add splitq start_xmit")
+Signed-off-by: Josh Hay <joshua.a.hay@intel.com>
+Signed-off-by: Brian Vazquez <brianvv@google.com>
+Signed-off-by: Luigi Rizzo <lrizzo@google.com>
+---
+v2:
+- Fix typos
+- Fix RCT in singleq function
+- No inline in c files
+- Submit to iwl-net and add Fixes tag
+
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  9 ++--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 45 +++++++------------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  8 ----
+ 3 files changed, 22 insertions(+), 40 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index eae1b6f474e6..6ade54e21325 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -362,17 +362,18 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
+ {
+ 	struct idpf_tx_offload_params offload = { };
+ 	struct idpf_tx_buf *first;
++	int csum, tso, needed;
+ 	unsigned int count;
+ 	__be16 protocol;
+-	int csum, tso;
+ 
+ 	count = idpf_tx_desc_count_required(tx_q, skb);
+ 	if (unlikely(!count))
+ 		return idpf_tx_drop_skb(tx_q, skb);
+ 
+-	if (idpf_tx_maybe_stop_common(tx_q,
+-				      count + IDPF_TX_DESCS_PER_CACHE_LINE +
+-				      IDPF_TX_DESCS_FOR_CTX)) {
++	needed = count + IDPF_TX_DESCS_PER_CACHE_LINE + IDPF_TX_DESCS_FOR_CTX;
++	if (!netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
++				       IDPF_DESC_UNUSED(tx_q),
++				       needed, needed)) {
+ 		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
+ 
+ 		u64_stats_update_begin(&tx_q->stats_sync);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index bdf52cef3891..a6ca2f55b5d5 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2132,6 +2132,19 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
+ 	desc->flow.qw1.compl_tag = cpu_to_le16(params->compl_tag);
  }
  
-+static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch)
++/* Global conditions to tell whether the txq (and related resources)
++ * has room to allow the use of "size" descriptors.
++ */
++static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 size)
 +{
-+	struct sk_buff *skb;
-+
-+	skb = __skb_dequeue(&sch->gso_skb);
-+	if (skb != NULL) {
-+		if (qdisc_is_percpu_stats(sch)) {
-+			qdisc_qstats_cpu_backlog_dec(sch, skb);
-+			qdisc_qstats_cpu_qlen_dec(sch);
-+		} else {
-+			qdisc_qstats_backlog_dec(sch, skb);
-+			sch->q.qlen--;
-+		}
-+		return skb;
-+	}
-+	skb = __qdisc_dequeue_head(&sch->q);
-+	return skb;
++	if (IDPF_DESC_UNUSED(tx_q) < size ||
++	    IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
++		IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq) ||
++	    IDPF_TX_BUF_RSV_LOW(tx_q))
++		return 0;
++	return 1;
 +}
 +
- static inline struct sk_buff *qdisc_dequeue_head(struct Qdisc *sch)
+ /**
+  * idpf_tx_maybe_stop_splitq - 1st level check for Tx splitq stop conditions
+  * @tx_q: the queue to be checked
+@@ -2142,29 +2155,11 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
+ static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
+ 				     unsigned int descs_needed)
  {
- 	struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
-index 12dd71139da3..e1bf4919d258 100644
---- a/net/sched/sch_codel.c
-+++ b/net/sched/sch_codel.c
-@@ -144,10 +144,9 @@ static int codel_change(struct Qdisc *sch, struct nlattr *opt,
+-	if (idpf_tx_maybe_stop_common(tx_q, descs_needed))
+-		goto out;
+-
+-	/* If there are too many outstanding completions expected on the
+-	 * completion queue, stop the TX queue to give the device some time to
+-	 * catch up
+-	 */
+-	if (unlikely(IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
+-		     IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq)))
+-		goto splitq_stop;
+-
+-	/* Also check for available book keeping buffers; if we are low, stop
+-	 * the queue to wait for more completions
+-	 */
+-	if (unlikely(IDPF_TX_BUF_RSV_LOW(tx_q)))
+-		goto splitq_stop;
+-
+-	return 0;
+-
+-splitq_stop:
+-	netif_stop_subqueue(tx_q->netdev, tx_q->idx);
++	if (netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
++				      idpf_txq_has_room(tx_q, descs_needed),
++				      1, 1))
++		return 0;
  
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch);
+-out:
+ 	u64_stats_update_begin(&tx_q->stats_sync);
+ 	u64_stats_inc(&tx_q->q_stats.q_busy);
+ 	u64_stats_update_end(&tx_q->stats_sync);
+@@ -2190,12 +2185,6 @@ void idpf_tx_buf_hw_update(struct idpf_tx_queue *tx_q, u32 val,
+ 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
+ 	tx_q->next_to_use = val;
  
- 		dropped += qdisc_pkt_len(skb);
--		qdisc_qstats_backlog_dec(sch, skb);
- 		rtnl_qdisc_drop(skb, sch);
- 	}
- 	qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index 3771d000b30d..b6ed94976e69 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -195,10 +195,9 @@ static int pie_change(struct Qdisc *sch, struct nlattr *opt,
- 	/* Drop excess packets if new limit is lower */
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch);
+-	if (idpf_tx_maybe_stop_common(tx_q, IDPF_TX_DESC_NEEDED)) {
+-		u64_stats_update_begin(&tx_q->stats_sync);
+-		u64_stats_inc(&tx_q->q_stats.q_busy);
+-		u64_stats_update_end(&tx_q->stats_sync);
+-	}
+-
+ 	/* Force memory writes to complete before letting h/w
+ 	 * know there are new descriptors to fetch.  (Only
+ 	 * applicable for weak-ordered memory model archs,
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index b029f566e57c..c192a6c547dd 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -1037,12 +1037,4 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rxq,
+ 				      u16 cleaned_count);
+ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off);
  
- 		dropped += qdisc_pkt_len(skb);
--		qdisc_qstats_backlog_dec(sch, skb);
- 		rtnl_qdisc_drop(skb, sch);
- 	}
- 	qdisc_tree_reduce_backlog(sch, qlen - sch->q.qlen, dropped);
+-static inline bool idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q,
+-					     u32 needed)
+-{
+-	return !netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
+-					  IDPF_DESC_UNUSED(tx_q),
+-					  needed, needed);
+-}
+-
+ #endif /* !_IDPF_TXRX_H_ */
+-- 
+2.49.0.901.g37484f566f-goog
+
 
