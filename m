@@ -1,92 +1,72 @@
-Return-Path: <netdev+bounces-186562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6A4A9FAA1
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:30:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB16A9FAB8
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:42:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11051686A7
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:30:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5A843B16D3
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 20:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558DA1E282D;
-	Mon, 28 Apr 2025 20:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0571DF980;
+	Mon, 28 Apr 2025 20:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TmLSXyUh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9vSUbCA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5A21E1A3B;
-	Mon, 28 Apr 2025 20:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD8C1D6DAA;
+	Mon, 28 Apr 2025 20:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745872189; cv=none; b=qMiW31G6HY66ouUCdx5rcbG5ektvVI36QcZ1LGum/UrnKSqCDTxRvuwEDg3RrRCpM9wypDhbm51H/YJdgmSlQFOL8w3FOMAwLm0XjPEwJm5xfevz9Oov/a+XkD8b0AcYTFWFO33zJHG0oerejA6X4eJgSqlnOGE74PwwgTP60x4=
+	t=1745872968; cv=none; b=YMqp8fKLQsjO0dFDX4vjbTULPuaXWw7ad+43ILkWc/5O7SS+qStmHCSOb80GRuTxdMIrgxO7WMhG6rQoJHu79R9p9iqqGt+m8bFqdwQWK/107YR81eganZFgD1Tgc2odMBlKAIK/SucpzdlGnyuZPJ8Oq/gUlg326ygI6Y8Se1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745872189; c=relaxed/simple;
-	bh=47psVaE5nkmJt7uoBLOWTjqlM9HaiJAlg0BKVekboFw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZsF3BKaNlStauImi8jEHx1DHu+hc1Ea+dfLGP3nf7YqWy0ZxsuHkAo6d8l8HUECQe8ny26j9IkHAMZlszPDubZd9caOjV25VWfTcy+GbBxD2merQVc7of4aMMJBagaLFHHYvwRgUYp/YfupZThtn7NTfg1vUkdDrhD/DqkG7YIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TmLSXyUh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9184FC4CEE4;
-	Mon, 28 Apr 2025 20:29:48 +0000 (UTC)
+	s=arc-20240116; t=1745872968; c=relaxed/simple;
+	bh=C2zdz80i6gBuvh137M5BVc3/T9DXTWftX7glQeg6OrQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f9/2g9gry/6slEQI5GCV7ZXSsWTYnAS9veI2MDUNmtTn/kpLe0hRyuLHErFiY7NRcmOMEMAVi1gbYUnBst8mokGDOcdjVDSpigfK/KLcL+MvL9bkH0o+DxkbD+EEQLK8m9lWpjrcWtyorHVMvf0oaQeVySriImFb7zgiKG5QDSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9vSUbCA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FA7C4CEE4;
+	Mon, 28 Apr 2025 20:42:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745872188;
-	bh=47psVaE5nkmJt7uoBLOWTjqlM9HaiJAlg0BKVekboFw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TmLSXyUhblduqBc+qveGVQ/hqjWkdC3dTze5ClhVXh0Jtm4oALNqbSH29UDudz0jw
-	 LRuM1DEHNgPf6uH915fWgHdoDlCzTcOibWpKc4tOcEp4rNdCbik/vDbLOTY1J0Lc5y
-	 +iyeKsWPhI1Gd3Uy+ANS1SsK5iXL+XiM9FsqhTgV6QURjS5g5I9PYcZYyJM1Uhh5KF
-	 MS6nzOPCyHEoxgX7LQ4d+HjmmfmN+h106gla5wfMNm6CxN+K1pZJjdEAW57mZYFV4F
-	 At7xntfJFylnLm7d/QjwUXjUy4yVjhnSBAkr+9iVcW/U7cA646zglx6yXvtD6UCplK
-	 CVPmm3iypgAHg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE523822D43;
-	Mon, 28 Apr 2025 20:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745872967;
+	bh=C2zdz80i6gBuvh137M5BVc3/T9DXTWftX7glQeg6OrQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C9vSUbCA06VS87rHetFaB/Xc/eb2SXOOy5Hy08CStbDfWionIkJqU/adqpXDOhALN
+	 1CgkRCu2twER7gAm00xq/sNzrXgCKsViEiXd4Uxy1yb/p39mTYDkhSGKLLiILy4vCv
+	 pXUSLiFvxfCFrLEyIXFBmXsC4HtI2HlW4dEu5YOl3My8sxlXRG4+1mBmrqahfo+egN
+	 845oh2760hQIDbwJ6IXYC4/3i5LPdGoBVFD9YrrkXBRtDP4OXf9brhsVKtmBncyeJ5
+	 o7Xy7lSWrvxFkgnbVoZLRAv2p8a80Rhnt9tiVJHqZtj3sPZf13xcl+ng4Gx9fZYNCP
+	 iyGv9W3LGPiGA==
+Date: Mon, 28 Apr 2025 13:42:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Chaohai Chen <wdhh6@aliyun.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, steffen.klassert@secunet.com,
+ herbert@gondor.apana.org.au, paul@paul-moore.com, pablo@netfilter.org,
+ kadlec@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org
+Subject: Re: [PATCH] net:ipv4: Use shift left 2 to calculate the length of
+ the IPv4 header.
+Message-ID: <20250428134246.147b02fe@kernel.org>
+In-Reply-To: <20250427061706.391920-1-wdhh6@aliyun.com>
+References: <20250427061706.391920-1-wdhh6@aliyun.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174587222750.1034980.3975715369800147055.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Apr 2025 20:30:27 +0000
-References: <20867a4e60802de191bfb1010f55021569f4fb01.1745751821.git.pav@iki.fi>
-In-Reply-To: <20867a4e60802de191bfb1010f55021569f4fb01.1745751821.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, kerneljasonxing@gmail.com, andrew@lunn.ch,
- luiz.dentz@gmail.com, kuba@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sun, 27 Apr 2025 14:17:06 +0800 Chaohai Chen wrote:
+> Encapsulate the IPV4_HEADER_LEN macro and use shift left 2 to calculate
+> the length of the IPv4 header instead of multiplying 4 everywhere.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sun, 27 Apr 2025 14:27:25 +0300 you wrote:
-> Bluetooth needs some way for user to get supported so_timestamping flags
-> for the different socket types.
-> 
-> Use SIOCETHTOOL API for this purpose. As hci_dev is not associated with
-> struct net_device, the existing implementation can't be reused, so we
-> add a small one here.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7a53e2a5836c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Doesn't seem worth the churn, sorry.
 
