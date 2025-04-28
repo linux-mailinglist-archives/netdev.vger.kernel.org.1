@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-186586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11263A9FD56
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:59:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D16A9FD58
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 896A95A6E21
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:59:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7132F173998
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1202135D7;
-	Mon, 28 Apr 2025 22:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D15E213E97;
+	Mon, 28 Apr 2025 22:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YPCVDy9x"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RJV98jna"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EED1F872D
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 22:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061412139B5
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 22:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745881182; cv=none; b=lCRsXLOI4ifsCD0L/0xzYXoAnPT1jDKfi/K1GnPyCwJtKhr1SNjOOdn+RXReT4JgCiJr1N/mgcqC9sSNKp6YYVQmx0AwGyppVyOzDPfKsLNk6gRAF3s3/oewnpM5/i+uS6zMWfJ9CwE2f6ygWKDbIvWgh3sv8MP0lXrRaFhm3zY=
+	t=1745881184; cv=none; b=il79zSghv1baSCIwVhqmzeoTlR94wx2RillGRX/RigRRlEleAIicz/daxcqjjZzsr/BKKIzIQuV3RdD68JQ9EMwfCFr1h4LClk5Lef3qtZYmEDfOvB+IHuLvca1zY5e35oRxhggFDqDL8o69eIXRP6U4sAhaD8Xuvr2NDikFc8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745881182; c=relaxed/simple;
-	bh=td+xKpw1VMkDj9tSHXr8ZJiXGmbzXrw835ydwcYIqP4=;
+	s=arc-20240116; t=1745881184; c=relaxed/simple;
+	bh=84hdRISUrScMUTSVg7dqkxMj9y1P8NK+MmF4jeahLFg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E1ZIrgED5ONcsF7QlP7ROhm2rWxEYokKJCoKsqUw0BsFwMQS64PglSnOcwMwXgFaAdVVt045tOAPaD3po6X+mzeeH3Dq1nPvdHh+j8w0rwa+GuEgBoan3GFOUiZOwK8A8cNkMTAy21G8G5Sy/o9o/PES0FLwHNhBZ+i9zeaGFbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YPCVDy9x; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=PcPMXednisgGS+YR0vjTt5zQrzQcfiEOdzAacRakuuf740xUdJUHoPHJxqyE11V3T8v3Mkhgjo9Q6uh0e9S5AY8APf6OQGNU0STGK6lFp7ZjLdYbiXfghdeAaMVhdFvCiXnjNRbFW8ycFkANDqQqFuB0c9VtsOxGYuFkccFAoA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RJV98jna; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7399838db7fso5523666b3a.0
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 15:59:40 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-73bb647eb23so4465311b3a.0
+        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 15:59:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1745881180; x=1746485980; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1745881181; x=1746485981; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zMw2R1VGAKvJrYiGYeAbInETuYOeWRg28018dzpJl3s=;
-        b=YPCVDy9xxr20I7e4Y/KQLzqhQLXRdKk4hzKdp5ZWBGT8UVxgMDuoxOK71MuyNCY3js
-         9U3D7mEGxCZUm+A7Cqlva5id9FFc9iCPILokodwnTFvCB5DeJfR1bNtbkm0AWrvOahsU
-         I95aw5H57XIXgbviiZk/joAYfVoHocAY2iVF0=
+        bh=sRDMivPWqMs4F4Yxq3ncEeO1sTWOCi4jEB3Cacnc5Qk=;
+        b=RJV98jnaiOAPyfgLpvTZuYG143GN8QaQ28iRKWeULgj32C/WDpeZK8HS2LW8dHDeeT
+         zBS/iGSAWkVeYJIR6Tux3KmWXCDXg3elHK8bfYmMB8d71JTMpqmgMt4Wyw6JtemsGuGk
+         ZjAKYmozujNnr36pGHNBJ2/OekCr9SK9di240=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745881180; x=1746485980;
+        d=1e100.net; s=20230601; t=1745881181; x=1746485981;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zMw2R1VGAKvJrYiGYeAbInETuYOeWRg28018dzpJl3s=;
-        b=qEnRM4htIBSe0vZN/X/oTCSOyPKC/h/4d1p/VqsF65e8ApVZx1x6zkUtlv4/rd1qzX
-         WLlDUyswFmFYb1E5VSFlKzlWTiDrev1I5zzgjr5x56Ch8vHm4Pnh4uToxjuF4hlPvKj7
-         DRioLn2zxo+0tWfB7ut7A+hAZJi/jtgMWb9qyLgtzeqlQif3UYZn3Bkilg5m3+hcDDvt
-         4jXDRCM8XiG9LWOCc09lYV2NHaHlgrBjxYCUtSEa+zRGJ6AZtHjhp6hvEgTYO7VpXiAo
-         Eh2hW+yDUgdFhfUR7XWSF1W/YBvi3o0R4rMK2EA7teVxoX9orR+uDmfmBoa7ZO6vZ7gL
-         Lq3Q==
-X-Gm-Message-State: AOJu0YwYoFWz/y6b7lbJuuxuNcAfiz/lKc4GLxBNDdHaoxI34DtM+MVY
-	tPEX8d+HD8rwICw+F/zElIkrb5wR8FSI2pDPiiZflujQHeN4lE1u2UpCtLtqgw==
-X-Gm-Gg: ASbGncuSw3V1wvI1hNQSfmHLg4w74206BhGupVKOFeM3bXPZkvdamJOz06zBgv+l9Gm
-	f0+4vfQfCuyIVrqWtyNIgbOrwWm0umDoDDkUIKfEyQSGf6gXxQlcvjTw62jYve0oe2V6NYMLyOt
-	QZF7RKB6hvlQKh3sOzSub+IUDzlhoy0nlXuiEQdUDproNG120Th7NVM4YkwzSCL/avtiQc6xAka
-	76OH+U95OizxeD8fE/O+77H41ILzQSsdDriZcqREiWXXfLyc7NizS50EXcUiT1hKDKptnQscgOE
-	e09WO6zdnQ8LWcWQw89mOrrXHQYJdtOiamnVtYB57gVkpHtQ9UX0+tLp5Chxmt9j3SV6upDzSpb
-	y8oLipLMFRityvzyJ
-X-Google-Smtp-Source: AGHT+IFCCWpxyO7tudoxv0/nE5WkEfZ4Cos/GJ1bxA5NedftROQSJDlKg7kPDH1GlsPZXpZXnLasgA==
-X-Received: by 2002:a05:6a00:2d1c:b0:736:b3cb:5db with SMTP id d2e1a72fcca58-74028b0a63dmr1449729b3a.11.1745881180097;
-        Mon, 28 Apr 2025 15:59:40 -0700 (PDT)
+        bh=sRDMivPWqMs4F4Yxq3ncEeO1sTWOCi4jEB3Cacnc5Qk=;
+        b=LuJavRP6xOnLW2m2Vb5vxK1Lj3BUVqRp/4FgDWgS4oekNTAyNrlb9QwV1Dr01qz5K9
+         ar71DkKPb9r3eO6CqRQExpszZErY9C7inp2JaT+iBIe36HC0J8qe2pZi9kGA+T1pXTC+
+         P/Pc5evXIUwZ9TGP4bfCyu9MYJJpuL9JNv4Pe5DTKCYuVIEp/40y+Lksp5PQ3l5aUoZj
+         xsUUqb/BisgWosDXjWmhsH6W+pX6hu30LOtjuPsdNyU1v/Q+KWRcNqUF3Ew2BLzgqJYT
+         e4Ym24EcvpFlK8DhnW/Zs9fp3uDVbqi6qd0GBC1A3R7++6l8Yb8owCZ/7xJk4p8Jo4uE
+         plog==
+X-Gm-Message-State: AOJu0YxMCH+Va+epraK5zefutSR2FMhPAjCyxX1i9jAx48k+9H77m5DV
+	oDjdfOPs7slf0hqpnmXaoJiYGLuhK1j2241DZxzZiZJr3IG1yfDRGpzT0WfuMg==
+X-Gm-Gg: ASbGnct3/detqzzlMPb2gChXeHKGI848HMMbQtFk9uyT8M7+Z31wSti6U+QBbBe95UD
+	XLtpqnLkUAKZyAUpZvT8qtJU8Zog/mbqXlCTxbXlhiAQyQJn7OtPzXa+rBGhLt8iiEYkVgHCtjg
+	n8agPKZalsBczAQVigRt4U39wsk0XOPLFG1m43V3M5dx+QQKfzr+X5w5upcCAodE95ZFD9y8SzT
+	vXxDxLemfiEg9i+/GAMB1DK8JgI0l2uxFoljNCjJpi6xSABQupD9D7kNB04ANotBsgfk5/TVE7J
+	agajkxlvHXjQ1hdXrxGjQkB2mio12Tg+dpTMpc+GTkWEoUQzffy8v3Mpgj2ptWftrBb1/JF1cnN
+	xUIRFydkJbvpmyzRJ4qPC3PAYE2A=
+X-Google-Smtp-Source: AGHT+IGdKyJbq1x4dX5Zz+0IhB1eTFyLs7qz5fG170y7hKDv2uOL+aD+W5EMizWEtF6A4H4wvb99OQ==
+X-Received: by 2002:a05:6a21:1515:b0:1f5:8153:93fb with SMTP id adf61e73a8af0-2046a465dd6mr15082540637.10.1745881181301;
+        Mon, 28 Apr 2025 15:59:41 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25aca4e8sm8534344b3a.162.2025.04.28.15.59.38
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73e25aca4e8sm8534344b3a.162.2025.04.28.15.59.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 15:59:39 -0700 (PDT)
+        Mon, 28 Apr 2025 15:59:40 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -78,11 +78,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Shravya KN <shravya.k-n@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net 1/8] bnxt_en: Fix error handling path in bnxt_init_chip()
-Date: Mon, 28 Apr 2025 15:58:56 -0700
-Message-ID: <20250428225903.1867675-2-michael.chan@broadcom.com>
+Subject: [PATCH net 2/8] bnxt_en: Fix ethtool selftest output in one of the failure cases
+Date: Mon, 28 Apr 2025 15:58:57 -0700
+Message-ID: <20250428225903.1867675-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250428225903.1867675-1-michael.chan@broadcom.com>
 References: <20250428225903.1867675-1-michael.chan@broadcom.com>
@@ -94,44 +94,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shravya KN <shravya.k-n@broadcom.com>
+From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-WARN_ON() is triggered in __flush_work() if bnxt_init_chip() fails
-because we call cancel_work_sync() on dim work that has not been
-initialized.
+When RDMA driver is loaded, running offline self test is not
+supported and driver returns failure early. But it is not clearing
+the input buffer and hence the application prints some junk
+characters for individual test results.
 
-WARNING: CPU: 37 PID: 5223 at kernel/workqueue.c:4201 __flush_work.isra.0+0x212/0x230
+Fix it by clearing the buffer before returning.
 
-The driver relies on the BNXT_STATE_NAPI_DISABLED bit to check if dim
-work has already been cancelled.  But in the bnxt_open() path,
-BNXT_STATE_NAPI_DISABLED is not set and this causes the error
-path to think that it needs to cancel the uninitalized dim work.
-Fix it by setting BNXT_STATE_NAPI_DISABLED during initialization.
-The bit will be cleared when we enable NAPI and initialize dim work.
-
-Fixes: 40452969a506 ("bnxt_en: Fix DIM shutdown")
-Suggested-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Fixes: 895621f1c816 ("bnxt_en: Don't support offline self test when RoCE driver is loaded")
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Shravya KN <shravya.k-n@broadcom.com>
+Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2c8e2c19d854..c4bccc683597 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -11602,6 +11602,9 @@ static void bnxt_init_napi(struct bnxt *bp)
- 		poll_fn = bnxt_poll_p5;
- 	else if (BNXT_CHIP_TYPE_NITRO_A0(bp))
- 		cp_nr_rings--;
-+
-+	set_bit(BNXT_STATE_NAPI_DISABLED, &bp->state);
-+
- 	for (i = 0; i < cp_nr_rings; i++) {
- 		bnapi = bp->bnapi[i];
- 		netif_napi_add_config_locked(bp->dev, &bnapi->napi, poll_fn,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 48dd5922e4dd..7be37976f3e4 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -4991,6 +4991,7 @@ static void bnxt_self_test(struct net_device *dev, struct ethtool_test *etest,
+ 	if (!bp->num_tests || !BNXT_PF(bp))
+ 		return;
+ 
++	memset(buf, 0, sizeof(u64) * bp->num_tests);
+ 	if (etest->flags & ETH_TEST_FL_OFFLINE &&
+ 	    bnxt_ulp_registered(bp->edev)) {
+ 		etest->flags |= ETH_TEST_FL_FAILED;
+@@ -4998,7 +4999,6 @@ static void bnxt_self_test(struct net_device *dev, struct ethtool_test *etest,
+ 		return;
+ 	}
+ 
+-	memset(buf, 0, sizeof(u64) * bp->num_tests);
+ 	if (!netif_running(dev)) {
+ 		etest->flags |= ETH_TEST_FL_FAILED;
+ 		return;
 -- 
 2.30.1
 
