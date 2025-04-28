@@ -1,118 +1,154 @@
-Return-Path: <netdev+bounces-186571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F0EA9FC99
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 23:56:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D353A9FCCA
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F0CD1A825CE
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 21:56:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829071A869F0
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 22:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C2620B21F;
-	Mon, 28 Apr 2025 21:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AC6210F4B;
+	Mon, 28 Apr 2025 22:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b="kotAu3yC"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="NIyMM2NA";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="eEcQRG0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic317-21.consmr.mail.gq1.yahoo.com (sonic317-21.consmr.mail.gq1.yahoo.com [98.137.66.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB971EB194
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 21:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.66.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06207B3E1;
+	Mon, 28 Apr 2025 22:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745877368; cv=none; b=fTir090Mx8GWFRyycYZKQMECElfUedW9A51gR+Pk0Sy4eBYCaXjKGo4ojMaGTYNynXvEfsqItg+UMcbnv3rQ4/HaoFYrpV28WAiCAzSrEY90Cy7kmSGTsHuPyl4Bd4Lc4j/XyrEe3665vcCR0z6va8IXztD1q2gYGp1y9VlidxM=
+	t=1745878396; cv=none; b=VDaTl/ww7lZapM+qqZ+5G1MJeT4mgmkF+etInBSeoTI3kDuq8a3qgH6fChk76wUowwiMOvVJp1PvQfOaTGbSvckGi2DGptdao4NqHP+S7kVY4CEvUUJD/ycHEy9gT7c3A2j00d4b/uArA7of0nhU5KAZjoUR9OFq+lZyuwMzq40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745877368; c=relaxed/simple;
-	bh=UK1WR5qcbjzmeuxtiBz6g3s1ELshNbYR/RwkJXnTAIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=TzAu3k1qKmMvueB1WyvywptrYrOSIZYOR7VvZBtiCUYYl+vLPreBdQ6Fwws6YlPltZn0TYPYYSWPYRsnkwLxj5iKzofTvCXOTeN/DVITPGbEG/Ef27HbceT8rzjLrhXDLKFkROnNk8yFcSFQfXMMQ3ya0WADmomZzyieubRUa7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com; spf=pass smtp.mailfrom=aol.com; dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b=kotAu3yC; arc=none smtp.client-ip=98.137.66.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aol.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aol.com; s=a2048; t=1745877360; bh=xrQ402hDmXhIGLMGlTkkKu4IW3npqxbKqXFrbo82aDg=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=kotAu3yC9yx8BQgH6sTdzeANGRWHY+2gp96mr3T5LQsD9E3RhJYzTCXfX9LxzeR4H0+IAo5qoW1fxT4RmJ7vnye9gazaftsJW6eLrgz3D7H78GG+kogfKOxSrpYXG0YavXUFDcuTTX9Ck8T7oxM9m0LRV/E0zaA4mfv+5cuEOfxW5aulwJDdwcTMrkN3pCt3m8UMcp4DMV/eR7Z+1of1md2KrEUva2ru0SczM4MySbvec7qLzV3B2bcm2mdOgfDWnJqQeV0a2Ekvs2S1JjUIeyhBv2U+rsKknnEtRaiHkg4mMJbBD3NXXLPWvHdFuOtxH7NyBLUaniJEYL9c8soOSw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1745877360; bh=SQ71c0k6ZXxnkcMzwXIP2dtgjNvRhgTZQpSNGqp+Pqx=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=scn8zC0ArDql71aIx15kbnqKj9sPs0Ph7p9LnQ7gzDeciRxQqP54dwM9nJZsof+grEDx4MOn0JsBJoVW749ZZ6pgIgkOD8A9V7+leBROJT8NFs63E1/yRSbDr4J2AZFIPks/1rcueFlxDfjw0d1JsHewrQcDeKqU5mqk+/bqXQGHkG9+LA2Uo9wpcCYmFMFKXFqTyrqUOVHW9uUXuZR1rnPCPVKqes/JzhWshR/a1tQvGmU45/Tgwqpbl3VPqUNyVPIAJjpfFBdsnnSBRfIMMJO4hhpmgzsQYDtzfXu4c8N/5tmPd9eJ7cCSbjEyvgyaOQB7i+iS1Y6hEg8DWE4vYw==
-X-YMail-OSG: da.KyFcVM1kcBABO2iZGVhpDe4DL_sa2kRmyQuRrac3YW8ma_1VacHJbMsQmCKs
- fKItt_M5Gw2bwTon3xnjlNTOwSCN3qcr.xC0uhe6JOM2gaYDEWNaV0XxQjI7uNHxmP0QcGeGlDEa
- RPdQBajEEQRrfHThAg0NEy7gCYQWO893qj3ihu4LJonvp6cbpj74SRcekOpxlx24pLCL9OfyK3uW
- NXRe3MhBMhkiYPDIDLPZkaLXKqFXh_LP0_hOdnVjcdHtaua9JyB4JYjSlgDuUlg8BRhcp1lTEtW4
- kao4xICR20wQfEzMMiJVqckUV0LvSmBy9.20ah9z4J9QnThCq.2m7BNT5YER_RQ9gzjKXxKPpHTg
- 3VoMxVP605mXXezQgOmprJXimQX0PgfHcXYRrXf7gAIqKCoeNNxDWLnhxpQlQ.v0wzoaJx5UjNla
- 0ok9wAFotIfqw.7jp6XlnEMnxE3Wj9hEOWqgHhxNQMOvJy4Loas02ewWSOB0nEUs6p9l2uuGWoTl
- kTQ3racmOEWSECjqHti0QStBvSx_6hXyS9twkEke82TaCtqWLLoYpQKdihtNml0mQeBpv2n92lov
- neyNGORVp0Xm0MmaBQbEFl93mNNntuJt2Hul3X.CglDdGFqfgq0dUq4qhgiv5Tsqbw5rrGhI9c7J
- pe.bZlWg1jjGU9BvS_5CMy8H1J.Mk1Ws7VS4RHVCP11xYf1fJRTGeG5JhXhJdto4UysPamhQJW_K
- BhBB6I92dJ1VvEUai77HqFXz7B_5Eq4kIG2iB3s5aG2_lRFQCIDRkPat0Ag0pvgkByChC5Irxs1b
- yTtl.RMliwrjk7410pHkiCehI5bhYm8.sNdzolTdCV4Cgk4rSw88Z6If.H8iyuuagndcoLZE.H7S
- HAmdu0yj4s8gHiYe9l5e2.hCnYq6Oj7vSQjlZqfOb3yHh5HU5WNI9pSMHsus41tJO1S4_TqnTuyK
- nOO688Ooxtqlz6UXIHhVKqOXBDnBF8TIHlSOfav81Muptk6phdXuKtk6tn1fhyVi8erlRPvRlGCj
- dIE9t9FxAV_gRltH0_uM8Qa8QC4tyuNDv2OjjNjWEhVuf4_BF3BKbRCg0dX2tl..6QZiA.feg09S
- 594xI0X.rrz59olAAF4mS8Ozso5YjLFlJpPsZjzMdlVU7JSpYL.6uuC_.HZN2tkCP07VFqIt5gHO
- MrJ0zj4RU5Mk8JG9PJBWJOaVsEhLgENHuKWIvOVDWZNoBs3Ff_leUr6yXOAmny52Yy6V32lqRjjX
- b5pBO993ght6oNM9TMH57v6mWUoW9usrD9kSIuIiQHr663Fp6yafH_N9ytIaMpXEUafjmf7b0AI9
- 1sPjqNcDdejRBb5XTRYWC68gWsj0OwZiLt2pP8vADQfvjmOP1AQQnOYMeges2npJvqoD0s2yzyeb
- tZj0fDUjd51gGsKThS6p4C8NS0zFl6TSEc5R1.NogIlMgGrpZ.a6ZI8s6quLj4ad8OykL6s9UrJ6
- emZ8HNqAK5ZhOibQGLNaWwzN82ZUUpZE.PsMWozFX_juZ.yJUOkRskJ2PzEtAXQZpsjriWq7j2aM
- pdhW74e0WZvKAv1Blg5MnUeQrYzDcfqVmw44zXcI5NSbXH2QT5je0sJ4SycZekJjdurXHmOSeDI4
- 6K3A7TEH5xLAraaj4dKUvAIWhNLQK6VIL5UMtRJ42ygl_FVqtTkfhbEY0j.909OT5h0n5eEbCh8J
- Ov9D_uNvkpUgEW05taCHXJZtFsZFukFnqYokJkFcIUCJc16gdHajQ9JDRRzkr6FTg_3DKNlbJoZC
- kDmtOq3RyR8jDyWjvqBjhihUhWXhf4Eu4OATQ2IqTm7J9aFxTFsbobCRQJyYmdLygV_EDxylxRRu
- JjQMJ0pgNbil_P._ascuijCJQPMnrwYx7zessarOf.MFMACZ6igPHG1oRMvqe5CunXChGWxq9D_.
- mS_voqM12R7w.GL3fZVqWd3HVuznn9qQjf3bhvtfQVKsYVN7920gNTc5JdDnl3CdArz3P9H5hC2A
- UX6VaXcMjeQqu3zBPwauZCubrxeZCVCv3UpP8il0hBPcDjddc1iNvTfGUI6lRFmgQh0wmepgFY20
- oJCjDcE9yazJ4.myF4PHAj4gSQD_kihGtMgTcAa5Xvp1Vvn252qy_ckxIomV.Syqkewt1iWlq8eq
- w3eTSOKmvSVMrSaaDaFsgT69YtlgHeZTbIvgUQgmQYAh7c5NqZ3N6YXyQv2s2ca2yf_MKK92A8q1
- uWDXJq564yNg9wNey9wsG5ujMcemwA9IOpRST3cVi.7S_cI0NHvZ34MYC6ZkSFSzm6g--
-X-Sonic-MF: <rubenru09@aol.com>
-X-Sonic-ID: 23f2c882-767b-4d23-a227-ed68ecb7fbb1
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.gq1.yahoo.com with HTTP; Mon, 28 Apr 2025 21:56:00 +0000
-Received: by hermes--production-ir2-858bd4ff7b-mfhj2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 4064065ebd14d1b300d04e09e97902b5;
-          Mon, 28 Apr 2025 21:55:55 +0000 (UTC)
-From: Ruben Wauters <rubenru09@aol.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Ruben Wauters <rubenru09@aol.com>,
+	s=arc-20240116; t=1745878396; c=relaxed/simple;
+	bh=IW9t+ogoJrKf1tGo7dCWEzFKtzb0ltwJAR/0ddCywXM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OjCQ2ukROLxmpONULBfQGcc80qD35GxvbjXJaJM526EhZ87ZaihLhFHqFocMR4dh1EMX5gD2cvh+QzV5/W2C7XSrEc3o43EWxZoRwTg0caCiVdyCSvaKmYeraioVMIHpYEd1watIosKh52u0rLxNdjqqd3qRzb64E6anbOiIf+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=NIyMM2NA; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=eEcQRG0C; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id AE5D46039A; Tue, 29 Apr 2025 00:13:11 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745878391;
+	bh=GSqzb+QX46oi8M4p3sN2hC88lDcDqUr58PeyDAxq0Yc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NIyMM2NASr020wDuFqaXP4pgfxHwqAu7qwjlQqFt7QjN+aBc+pye7u0h55Bn9aDP6
+	 FYG7DG+Ip6i8/o6TL4+YhW8kRJUeEIO0nvI9k5X1tXuK6SsDWN3qCX8Vx4f8YbOqD6
+	 XgootqmdkjnIVc4FYGST57rVkzhWpgZ+xGkZ8p+Ta/wveGaRu2dkRN3a42bQnASlMC
+	 DvKYYEI9sFAt2TsBe/ebgUxcVp0ZBzyVVHFDBkG+OGNzaMfwOfFdjDRpdMQBmYj7g/
+	 CsYlUsot2WUqmF/ljep1vQ30MLXG6cK+CBWQ2t4keSlYLozIguxrWXesqbdSlm6YI9
+	 3VuEN3251GNfg==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 732766039A;
+	Tue, 29 Apr 2025 00:13:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1745878390;
+	bh=GSqzb+QX46oi8M4p3sN2hC88lDcDqUr58PeyDAxq0Yc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eEcQRG0CPjzPxmyTw71qNxmjzbSGY9g+Sv1PChTk/ROuXa1tWxkftbFMe18WzKMCU
+	 S1WCaRIZGzRP0l8hZD1AbZs0LiHf9h0JWM8MRsucpOp4PQiZ0dFKfwcoaImY5V4gGu
+	 UyrTLwTMkPV0CCUf/MZiZshViOQ6jpmw7tFumeZRd+e/HocaPTnZ4Ojb1wOSXgh5wG
+	 o2J6qNbDjPxrnP0lkeFQ8aVc4vk9qlUdL7e+EkJd1JH3d+ODUrjg1wcl9GoV40dJ5v
+	 /S2Xnky+U+GzDTxdWWBpkOHyhxQFUTvt9FV+la9h1NDNZZfOpzYTloIv5TEeXmcygr
+	 cxarL3oJpQVpg==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] tools: ynl: fix typo in info string
-Date: Mon, 28 Apr 2025 22:51:09 +0100
-Message-ID: <20250428215541.6029-1-rubenru09@aol.com>
-X-Mailer: git-send-email 2.48.1
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net-next 0/6,v3] Netfilter updates for net-next
+Date: Tue, 29 Apr 2025 00:12:48 +0200
+Message-Id: <20250428221254.3853-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-References: <20250428215541.6029-1-rubenru09.ref@aol.com>
 
-replaces formmated with formatted
-also corrects grammar by replacing a with an, and capitalises RST
+Hi,
 
-Signed-off-by: Ruben Wauters <rubenru09@aol.com>
----
- tools/net/ynl/pyynl/ynl_gen_rst.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The following batch contains Netfilter updates for net-next:
 
-diff --git a/tools/net/ynl/pyynl/ynl_gen_rst.py b/tools/net/ynl/pyynl/ynl_gen_rst.py
-index 6c56d0d726b4..0cb6348e28d3 100755
---- a/tools/net/ynl/pyynl/ynl_gen_rst.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_rst.py
-@@ -392,7 +392,7 @@ def parse_arguments() -> argparse.Namespace:
- 
- 
- def parse_yaml_file(filename: str) -> str:
--    """Transform the YAML specified by filename into a rst-formmated string"""
-+    """Transform the YAML specified by filename into an RST-formatted string"""
-     with open(filename, "r", encoding="utf-8") as spec_file:
-         yaml_data = yaml.safe_load(spec_file)
-         content = parse_yaml(yaml_data)
--- 
-2.48.1
+1) Replace msecs_to_jiffies() by secs_to_jiffies(), from Easwar Hariharan.
 
+2) Allow to compile xt_cgroup with cgroupsv2 support only,
+   from Michal Koutny.
+
+3) Prepare for sock_cgroup_classid() removal by wrapping it around
+   ifdef, also from Michal Koutny.
+
+4) Remove redundant pointer fetch on conntrack template, from Xuanqiang Luo.
+
+5) Re-format one block in the tproxy documentation for consistency,
+   from Chen Linxuan.
+
+6) Expose set element count and type via netlink attributes,
+   from Florian Westphal.
+
+I have put to sleep the patch "Disable xtables legacy with PREEMPT_RT"
+as suggested by Jakub Kicinski.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-04-29
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit bef4f1156b74721b7d111114538659031119b6f2:
+
+  net: phy: marvell-88q2xxx: Enable temperature sensor for mv88q211x (2025-04-24 13:19:51 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-04-29
+
+for you to fetch changes up to 0014af802193aa3547484b5db0f1a258bad28c81:
+
+  netfilter: nf_tables: export set count and backend name to userspace (2025-04-29 00:00:27 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-04-29
+
+----------------------------------------------------------------
+Chen Linxuan (1):
+      docs: tproxy: fix formatting for nft code block
+
+Easwar Hariharan (1):
+      netfilter: xt_IDLETIMER: convert timeouts to secs_to_jiffies()
+
+Florian Westphal (1):
+      netfilter: nf_tables: export set count and backend name to userspace
+
+Michal Koutný (2):
+      netfilter: xt_cgroup: Make it independent from net_cls
+      net: cgroup: Guard users of sock_cgroup_classid()
+
+Xuanqiang Luo (1):
+      netfilter: conntrack: Remove redundant NFCT_ALIGN call
+
+ Documentation/networking/tproxy.rst      |  4 ++--
+ include/uapi/linux/netfilter/nf_tables.h |  4 ++++
+ net/ipv4/inet_diag.c                     |  2 +-
+ net/netfilter/Kconfig                    |  2 +-
+ net/netfilter/nf_conntrack_core.c        |  4 +---
+ net/netfilter/nf_tables_api.c            | 26 ++++++++++++++++++++++++++
+ net/netfilter/xt_IDLETIMER.c             | 12 ++++++------
+ net/netfilter/xt_cgroup.c                | 26 ++++++++++++++++++++++++++
+ 8 files changed, 67 insertions(+), 13 deletions(-)
 
