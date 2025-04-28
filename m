@@ -1,132 +1,91 @@
-Return-Path: <netdev+bounces-186443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E49A9F1C2
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:09:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6F4A9F1E1
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 15:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 753C61A843D1
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:08:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DE0C3BFF93
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 13:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7337A274FD5;
-	Mon, 28 Apr 2025 13:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5688126FDA6;
+	Mon, 28 Apr 2025 13:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UHDq3OKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744C5270EA5
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 13:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE41C26F466;
+	Mon, 28 Apr 2025 13:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745845559; cv=none; b=dPFdzSN7K0gADOMk+7BcBieDqqoG6RymI96Kz45uQwbX4VXN4NRdqWHUvXmlZvvb8BGYRi8eR2Mj/eIoMHV4hEzRtjDo+mc0ILyq3X0GLVjYDnngTPcvZVS4jli4K/qVF8l2Weba6xvUrqpf4K4lhX3YOyisSKJ5hqPXtuFwl2Q=
+	t=1745845644; cv=none; b=HY4THS1gmqwVvUrhhmvnfMEstYERPjIYnDAGhtrj36qZnj1kzwglTn/ucKizoEL/XuzByefNkQjKzvQdxVTmSEvnL05tbP310BYaisJal6po3y4HybpMPuel2kBm2w1vWQ9DH0wIMJjtbFHX8kF0UyALglOuTje/2EMfllKKHCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745845559; c=relaxed/simple;
-	bh=p5K3m/2awqH/wsJhZKbELlqT5m3wW53cDzS4wBXBhoc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=InwO59zCXKW9x+HSFr1ZFcHuStdcsI9/eKqGkzI9zmWXhgEh0xIQvMlb40C4sQZH/ctzC49twXNSDfGGSfECqTAwTw5+Qw8D8L12YrcHeIMsm7F+djr8d2DWU7JSQWV1ehKg47a7gmTjku9M6qxucrikwCCkaywYdOIrfjnd1PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9OBB-0000MZ-Oh; Mon, 28 Apr 2025 15:05:49 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9OB6-0006Fe-1S;
-	Mon, 28 Apr 2025 15:05:44 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9OB6-00GJBg-0o;
-	Mon, 28 Apr 2025 15:05:44 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
+	s=arc-20240116; t=1745845644; c=relaxed/simple;
+	bh=Ax891Nox1a2xec8/ZkKufmRYmTPkJZe4DC1uvxb1cAg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tQn5BNJhxGS62Gj42oNmG+JmYMYUACiFemNjaUk0qazCmU6n3eOob6c363t5+EZ74ycFE/E1S9fRhzvCYUqkD6grYSOxX9s59s6UiSR68qKC959F/hpg/HoLaAhYvjUA+W34XsJcXMS2SqhuH/6rAz6RydpEK6sNrdWGl3IxmWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UHDq3OKX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7Qyt7PxI9KUj05U+lBS44OxK0DlxvfZjT7Dm3aqvak0=; b=UHDq3OKXHzpa6ys65nE3S88D0j
+	9eNZR0UCJWMkO4tqTOmrzicJohICgz+9CbP4r8naHbYZleQUaZflFGpOxNhuMdz5InVDGGbskznyu
+	HhR+5fWTYiJjmGOKhLI9frE/Yggri3A19pIw26xZBf63aDkvKvvAx2p53UdxumRZvw7Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u9OCY-00Aq7R-J8; Mon, 28 Apr 2025 15:07:14 +0200
+Date: Mon, 28 Apr 2025 15:07:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: mattiasbarthel@gmail.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wei.fang@nxp.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Phil Elwell <phil@raspberrypi.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v7 12/12] net: usb: lan78xx: remove unused struct members
-Date: Mon, 28 Apr 2025 15:05:42 +0200
-Message-Id: <20250428130542.3879769-13-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250428130542.3879769-1-o.rempel@pengutronix.de>
-References: <20250428130542.3879769-1-o.rempel@pengutronix.de>
+	Mattias Barthel <mattias.barthel@atlascopco.com>
+Subject: Re: [PATCH net] fec: Workaround for ERR007885 on
+ fec_enet_txq_submit_skb()
+Message-ID: <e17a1459-c388-4ad2-b79c-ba158edf340c@lunn.ch>
+References: <20250428114920.3051153-1-mattiasbarthel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250428114920.3051153-1-mattiasbarthel@gmail.com>
 
-Remove unused members from struct lan78xx_net, including:
+On Mon, Apr 28, 2025 at 01:49:20PM +0200, mattiasbarthel@gmail.com wrote:
+> From: Mattias Barthel <mattias.barthel@atlascopco.com>
+> 
+> Activate workaround also in fec_enet_txq_submit_skb()
+> when TSO is not enbabled.
+> 
+> Errata: ERR007885
+> Symptoms: NETDEV WATCHDOG: eth0 (fec): transmit queue 0 timed out
 
-    driver_priv
-    suspend_count
-    mdix_ctrl
+This is rather brief. I had to look at the reference commit to
+understand what this patch is doing. Ideally the commit message should
+to sufficient on its own. Please consider cut/paste some of the commit
+message from 37d6017b84f7/
+> 
+> Fixes: 53bb20d1faba ("net: fec: add variable reg_desc_active to speed things up")
+> Signed-off-by: Mattias Barthel <mattias.barthel@atlascopco.com>
 
-These fields are no longer used in the driver and can be safely removed
-as part of a cleanup.
+Please wait at least 24 hours between posts.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+    Andrew
+
 ---
-changes v6:
-- drop only those fields not already removed in previous patches
-- align patch structure with review feedback from Russell King
----
- drivers/net/usb/lan78xx.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index ba6a6cda779e..647ab9d66334 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -414,7 +414,6 @@ struct lan78xx_net {
- 	struct net_device	*net;
- 	struct usb_device	*udev;
- 	struct usb_interface	*intf;
--	void			*driver_priv;
- 
- 	unsigned int		tx_pend_data_len;
- 	size_t			n_tx_urbs;
-@@ -449,15 +448,12 @@ struct lan78xx_net {
- 	unsigned long		flags;
- 
- 	wait_queue_head_t	*wait;
--	unsigned char		suspend_count;
- 
- 	unsigned int		maxpacket;
- 	struct timer_list	stat_monitor;
- 
- 	unsigned long		data[5];
- 
--	u8			mdix_ctrl;
--
- 	u32			chipid;
- 	u32			chiprev;
- 	struct mii_bus		*mdiobus;
--- 
-2.39.5
-
+pw-bot: cr
 
