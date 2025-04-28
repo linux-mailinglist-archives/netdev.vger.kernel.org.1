@@ -1,265 +1,143 @@
-Return-Path: <netdev+bounces-186505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28E0A9F777
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 19:37:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B35CA9F78E
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 19:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E8075A1825
-	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 17:36:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B29A7ABAD6
+	for <lists+netdev@lfdr.de>; Mon, 28 Apr 2025 17:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770D02957A5;
-	Mon, 28 Apr 2025 17:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A392951A9;
+	Mon, 28 Apr 2025 17:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T28Fxvd9"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="rPJUCXhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8852951CD
-	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 17:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D09B25D90F
+	for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 17:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745861782; cv=none; b=udxU1qlB4jNKZ0FDwF0M2izTHYW3chm4eB5TN1oFwvHtTorZxTWIxSQlSCi02N67nMXpYg/hmfplWpj4BeKaMqTu4DIRwdzbuedOcAEQQfcvlWD7mWRbd2kyOcVy0i0jYY/yfQwktBZl3acGvqZm/Kpa21DCMIGRAADpf+RfRn4=
+	t=1745861999; cv=none; b=o71cLqWqI6W+LKQHFa3LR1VxbHKdBJf1REd3s8LoUnQOKcr/An0a71uF1mW+0PWVdyrKju+ATLpzc4Cc6rmDVc4BfklAA1m1uuFf1OKasXv3lWFKMr4Ts//I4ksQu0qt/VgUfMk7tVeN4dr6MY3YmMgP6D7ysmhcpr9aAyKZO7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745861782; c=relaxed/simple;
-	bh=BNFkoBafcRpKD7g3EU+TWMT34AYUnIMSn+a4D7DvFks=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P+/A7SXOgYClpYLvlfBrH8dz/zoGrHC8NNVtIrWlgmoRTwXkCoIn0FC8P05hy/6RZXjVYBr8mgJzC7mUdaOk7YiHEpgSvEi/MfH8q/nOtIusIbw2tTvgaPVSHDBt0LzAAtr8+YEBomrhIteupgWZvYD+Y6wcDpMC1egOGieK+2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T28Fxvd9; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745861780; x=1777397780;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BNFkoBafcRpKD7g3EU+TWMT34AYUnIMSn+a4D7DvFks=;
-  b=T28Fxvd9Vgz5ktURVcsu0yKd3Edwrz18XjdeUuz4M/fW4BBMSC4rgnRF
-   DrI4aUMxxyGSZ2UmDnJnrpp4lxNbYHx2LTmoVNISxi/UUXgTjk56EgcW2
-   MXRvkAyPNH/cZvWGL+50ya0Sxcpgxy96jXZntfRRUtEWyY1ljNtTqHZaI
-   V8AEn5kAJFJBugg6q3oG0wPJZ3eX9kqbkkA69vE8+XRDceS+5P2SntTev
-   o6cJdvY1x1Gn2jMVAAEfXqAva++EFC9Or52E/2LuK7uJZBt80HJAnTC32
-   6BjHs0tupMLOBSRCPBFyq4Heqsjggs1Vr4OsZ0ZWmRyQKxwTB9NYKwLV4
-   g==;
-X-CSE-ConnectionGUID: xPBKCESsRkKrfumTI1Z7dA==
-X-CSE-MsgGUID: bDk2ETztSLieAUAYqMZFmw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="58452171"
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="58452171"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 10:36:15 -0700
-X-CSE-ConnectionGUID: 3Mc+T+VOTLakAqU6j3+aMA==
-X-CSE-MsgGUID: f+S6kH/nTiCUlP9Zr3/M5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="138679053"
-Received: from unknown (HELO localhost.jf.intel.com) ([10.166.80.55])
-  by fmviesa004.fm.intel.com with ESMTP; 28 Apr 2025 10:36:14 -0700
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	milena.olech@intel.com,
-	anton.nadezhdin@intel.com,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [PATCH iwl-next v3 9/9] idpf: generalize mailbox API
-Date: Mon, 28 Apr 2025 10:35:52 -0700
-Message-ID: <20250428173552.2884-10-pavan.kumar.linga@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250428173552.2884-1-pavan.kumar.linga@intel.com>
-References: <20250428173552.2884-1-pavan.kumar.linga@intel.com>
+	s=arc-20240116; t=1745861999; c=relaxed/simple;
+	bh=NYz2itbSwekwu/LchEZp7yqkeh2PRz+a4UFgb+Trfyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iedn9j8B/hGF+rG/bKLt3krezZQunFd+vyyq79fB/40RF1lneN0GM8DitMuTc3mcACPH4zUkwcEWNgMSlv5F3fxgPE+V3PAtZOT1+hno3XekQboYC5hlZKfJv2xmQPwIDtB/n4XA7vD9wsO3hDOku8JKIRMQTx2+1U1CfBIuQ+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=rPJUCXhy; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-30332dfc820so6274683a91.2
+        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 10:39:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1745861996; x=1746466796; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NYz2itbSwekwu/LchEZp7yqkeh2PRz+a4UFgb+Trfyo=;
+        b=rPJUCXhyS3RH7zMCn615ZS0TjRWkBKURA0zVFnWo80Vl0DJe+GX3vTLYWa+ca3qDba
+         FHPhHdaZQ+xudBq9E5rl6V2E2pnu6cpmv0TfUZQQwwvBusH0WONYm+ZeChyGKIwq//sy
+         7wY8FPybWSuxyIJomFZ8VvLklf3PvCJlYCQuo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745861996; x=1746466796;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NYz2itbSwekwu/LchEZp7yqkeh2PRz+a4UFgb+Trfyo=;
+        b=S3V3Q0KWC8kvN/IMIUjLUT891emql1e+EWWJiDrLqSg7V1xbjUQ9JJrkPoKDsA6bss
+         Q5or6jsdMfHTnhePMSeNpCvrJCbsaxB6IUWw9VZ92CUKr8yumIPUygIKZKftr6Vi/ocM
+         FUiM1NCcEdfIaHU52gqWAmB6GdtL995wTjjmt/t1xIwRO8TwFY0y1ljWIxqLs11X5+rZ
+         /0UGYTLcPorKKRTiQc40uTsaBivJ7+7g42sHaBrkFhe1s310TIO3MhZKTicessj7oGuK
+         Osyh87J0RC7fRvYELA2eXx8AL7LrQuK/jPcEUjqi8ChhWZ/RjxIe4Rx3x2tUZ/oMfkAX
+         Sddg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1Dd/7oopuBwYa0G1BOOCvfKU7Rs5nrAguhnorNLUBXKHJdW69WAGpnahlt/f9rEOVgul3sZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl7fZlawBCzc91789IuvAu939MYCRq6PzDVXrLklpSBdbMHhzY
+	kJEr376NgDWoyClm5LSIWxxtJKWoFber1QvbwRraplzwahRVSqkhPNl3SybQIA4=
+X-Gm-Gg: ASbGnctoI2vrnBwTrX+JUvVRLN3/mkNvnx89XNYdlANu2DsCpFMlHgXcPKPch5K2ZCk
+	8A/fTa/7dyj710PjGkVvhx8Aj3JPRUGAAyjuVNce+vSZEfnTCYSKiLDkOQgw0+rvQU5/zso7JRw
+	bfOFsNWqj1rcZrgv5GTrAcW7+Xqb5JjTTjMHWA4jPmwh5h5J6fMpehDRCXnlnj/EJwf5jBnLlNL
+	f4JBPkK7/ca0md4rW8IjLjZlssKJLUfMnITvRCKhS+GA6eI21xIjosRvC9Bv55yCLd3BoI+hGSP
+	YJuyXteUofMkQiGder4+psfbj/hjkaV3clM3VDFk7Lw5mBOCmY+l8wUM7Aeb19ReiDdjr5oVPUs
+	TZQ6dBAk=
+X-Google-Smtp-Source: AGHT+IEfnxoLniP7ETR0MqplRE0pz+8Pe03rgmilaE8Rr6NyHip77Cn/yZkx56q/G692xuIjeqa2Ng==
+X-Received: by 2002:a17:90a:d888:b0:309:eb54:9ea2 with SMTP id 98e67ed59e1d1-309f7e00a65mr17970892a91.20.1745861995585;
+        Mon, 28 Apr 2025 10:39:55 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309f782d07dsm7503407a91.32.2025.04.28.10.39.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 10:39:54 -0700 (PDT)
+Date: Mon, 28 Apr 2025 10:39:52 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 0/4] Add support to do threaded napi busy poll
+Message-ID: <aA-9aEokobuckLtV@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, netdev@vger.kernel.org
+References: <20250424200222.2602990-1-skhawaja@google.com>
+ <52e7cf72-6655-49ed-984c-44bd1ecb0d95@uwaterloo.ca>
+ <680fb23bb1953_23f881294d9@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <680fb23bb1953_23f881294d9@willemb.c.googlers.com.notmuch>
 
-Add a control queue parameter to all mailbox APIs in order to
-make use of those APIs for non-default mailbox as well.
+On Mon, Apr 28, 2025 at 12:52:11PM -0400, Willem de Bruijn wrote:
+> Martin Karsten wrote:
+> > On 2025-04-24 16:02, Samiullah Khawaja wrote:
 
-Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c    |  2 +-
- drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  3 +-
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 33 ++++++++++---------
- .../net/ethernet/intel/idpf/idpf_virtchnl.h   |  6 ++--
- 4 files changed, 24 insertions(+), 20 deletions(-)
+> Ack on documentation of the pros/cons.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 7dabf5ddbf16..492b03d8f718 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1202,7 +1202,7 @@ void idpf_mbx_task(struct work_struct *work)
- 		queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task,
- 				   msecs_to_jiffies(300));
- 
--	idpf_recv_mb_msg(adapter);
-+	idpf_recv_mb_msg(adapter, adapter->hw.arq);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-index 0bb07bcb974b..ac091280e828 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-@@ -146,7 +146,8 @@ static void idpf_vf_trigger_reset(struct idpf_adapter *adapter,
- 	/* Do not send VIRTCHNL2_OP_RESET_VF message on driver unload */
- 	if (trig_cause == IDPF_HR_FUNC_RESET &&
- 	    !test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
--		idpf_send_mb_msg(adapter, VIRTCHNL2_OP_RESET_VF, 0, NULL, 0);
-+		idpf_send_mb_msg(adapter, adapter->hw.asq,
-+				 VIRTCHNL2_OP_RESET_VF, 0, NULL, 0);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 6863e53ae399..bdeaab65dcb0 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -116,13 +116,15 @@ static void idpf_recv_event_msg(struct idpf_adapter *adapter,
- 
- /**
-  * idpf_mb_clean - Reclaim the send mailbox queue entries
-- * @adapter: Driver specific private structure
-+ * @adapter: driver specific private structure
-+ * @asq: send control queue info
-  *
-  * Reclaim the send mailbox queue entries to be used to send further messages
-  *
-  * Returns 0 on success, negative on failure
-  */
--static int idpf_mb_clean(struct idpf_adapter *adapter)
-+static int idpf_mb_clean(struct idpf_adapter *adapter,
-+			 struct idpf_ctlq_info *asq)
- {
- 	u16 i, num_q_msg = IDPF_DFLT_MBX_Q_LEN;
- 	struct idpf_ctlq_msg **q_msg;
-@@ -133,7 +135,7 @@ static int idpf_mb_clean(struct idpf_adapter *adapter)
- 	if (!q_msg)
- 		return -ENOMEM;
- 
--	err = idpf_ctlq_clean_sq(adapter->hw.asq, &num_q_msg, q_msg);
-+	err = idpf_ctlq_clean_sq(asq, &num_q_msg, q_msg);
- 	if (err)
- 		goto err_kfree;
- 
-@@ -205,7 +207,8 @@ static void idpf_prepare_ptp_mb_msg(struct idpf_adapter *adapter, u32 op,
- 
- /**
-  * idpf_send_mb_msg - Send message over mailbox
-- * @adapter: Driver specific private structure
-+ * @adapter: driver specific private structure
-+ * @asq: control queue to send message to
-  * @op: virtchnl opcode
-  * @msg_size: size of the payload
-  * @msg: pointer to buffer holding the payload
-@@ -215,8 +218,8 @@ static void idpf_prepare_ptp_mb_msg(struct idpf_adapter *adapter, u32 op,
-  *
-  * Returns 0 on success, negative on failure
-  */
--int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
--		     u16 msg_size, u8 *msg, u16 cookie)
-+int idpf_send_mb_msg(struct idpf_adapter *adapter, struct idpf_ctlq_info *asq,
-+		     u32 op, u16 msg_size, u8 *msg, u16 cookie)
- {
- 	struct idpf_ctlq_msg *ctlq_msg;
- 	struct idpf_dma_mem *dma_mem;
-@@ -230,7 +233,7 @@ int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
- 	if (idpf_is_reset_detected(adapter))
- 		return 0;
- 
--	err = idpf_mb_clean(adapter);
-+	err = idpf_mb_clean(adapter, asq);
- 	if (err)
- 		return err;
- 
-@@ -266,7 +269,7 @@ int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
- 	ctlq_msg->ctx.indirect.payload = dma_mem;
- 	ctlq_msg->ctx.sw_cookie.data = cookie;
- 
--	err = idpf_ctlq_send(&adapter->hw, adapter->hw.asq, 1, ctlq_msg);
-+	err = idpf_ctlq_send(&adapter->hw, asq, 1, ctlq_msg);
- 	if (err)
- 		goto send_error;
- 
-@@ -462,7 +465,7 @@ ssize_t idpf_vc_xn_exec(struct idpf_adapter *adapter,
- 	cookie = FIELD_PREP(IDPF_VC_XN_SALT_M, xn->salt) |
- 		 FIELD_PREP(IDPF_VC_XN_IDX_M, xn->idx);
- 
--	retval = idpf_send_mb_msg(adapter, params->vc_op,
-+	retval = idpf_send_mb_msg(adapter, adapter->hw.asq, params->vc_op,
- 				  send_buf->iov_len, send_buf->iov_base,
- 				  cookie);
- 	if (retval) {
-@@ -661,12 +664,13 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapter,
- 
- /**
-  * idpf_recv_mb_msg - Receive message over mailbox
-- * @adapter: Driver specific private structure
-+ * @adapter: driver specific private structure
-+ * @arq: control queue to receive message from
-  *
-  * Will receive control queue message and posts the receive buffer. Returns 0
-  * on success and negative on failure.
-  */
--int idpf_recv_mb_msg(struct idpf_adapter *adapter)
-+int idpf_recv_mb_msg(struct idpf_adapter *adapter, struct idpf_ctlq_info *arq)
- {
- 	struct idpf_ctlq_msg ctlq_msg;
- 	struct idpf_dma_mem *dma_mem;
-@@ -678,7 +682,7 @@ int idpf_recv_mb_msg(struct idpf_adapter *adapter)
- 		 * actually received on num_recv.
- 		 */
- 		num_recv = 1;
--		err = idpf_ctlq_recv(adapter->hw.arq, &num_recv, &ctlq_msg);
-+		err = idpf_ctlq_recv(arq, &num_recv, &ctlq_msg);
- 		if (err || !num_recv)
- 			break;
- 
-@@ -694,8 +698,7 @@ int idpf_recv_mb_msg(struct idpf_adapter *adapter)
- 		else
- 			err = idpf_vc_xn_forward_reply(adapter, &ctlq_msg);
- 
--		post_err = idpf_ctlq_post_rx_buffs(&adapter->hw,
--						   adapter->hw.arq,
-+		post_err = idpf_ctlq_post_rx_buffs(&adapter->hw, arq,
- 						   &num_recv, &dma_mem);
- 
- 		/* If post failed clear the only buffer we supplied */
-@@ -2825,7 +2828,7 @@ int idpf_init_dflt_mbx(struct idpf_adapter *adapter)
- void idpf_deinit_dflt_mbx(struct idpf_adapter *adapter)
- {
- 	if (adapter->hw.arq && adapter->hw.asq) {
--		idpf_mb_clean(adapter);
-+		idpf_mb_clean(adapter, adapter->hw.asq);
- 		idpf_ctlq_deinit(&adapter->hw);
- 	}
- 	adapter->hw.arq = NULL;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-index f29536eed707..93b540e49b82 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-@@ -115,9 +115,9 @@ bool idpf_sideband_action_ena(struct idpf_vport *vport,
- 			      struct ethtool_rx_flow_spec *fsp);
- unsigned int idpf_fsteer_max_rules(struct idpf_vport *vport);
- 
--int idpf_recv_mb_msg(struct idpf_adapter *adapter);
--int idpf_send_mb_msg(struct idpf_adapter *adapter, u32 op,
--		     u16 msg_size, u8 *msg, u16 cookie);
-+int idpf_recv_mb_msg(struct idpf_adapter *adapter, struct idpf_ctlq_info *arq);
-+int idpf_send_mb_msg(struct idpf_adapter *adapter, struct idpf_ctlq_info *asq,
-+		     u32 op, u16 msg_size, u8 *msg, u16 cookie);
- 
- int idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q);
- u32 idpf_get_vport_id(struct idpf_vport *vport);
--- 
-2.43.0
+In my mind this includes documenting CPU usage which I know is
+considered as "non-goal" of this series. It can be a "non-goal" but
+it is still very relevant to the conversation and documentation.
 
+> There is also a functional argument for this feature. It brings
+> parity with userspace network stacks like DPDK and Google's SNAP [1].
+> These also run packet (and L4+) network processing on dedicated cores,
+> and by default do so in polling mode. An XDP plane currently lacks
+> this well understood configuration. This brings it closer to parity.
+
+It would be good if this could also be included in the cover letter,
+I think, possibly with example use cases.
+
+> Users of such advanced environments can be expected to be well
+> familiar with the cost of polling. The cost/benefit can be debated
+> and benchmarked for individual applications. But there clearly are
+> active uses for polling, so I think it should be an operating system
+> facility.
+
+You mention users of advanced environments, but I think it's
+important to consider the average user who is not necessarily a
+kernel programmer.
+
+Will that user understand that not all apps support this? Or will
+they think that they can simply run a few YNL commands burning CPUs at
+100% for apps that don't even support this thinking they are making
+their networking faster?
+
+I think providing a mechanism to burn CPU cores at 100% CPU by
+enabling threaded busy poll has serious consequences on power
+consumption, cooling requirements, and, errr, earth. I don't think
+it's a decision to be taken lightly.
 
