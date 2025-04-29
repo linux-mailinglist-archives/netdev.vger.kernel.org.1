@@ -1,236 +1,200 @@
-Return-Path: <netdev+bounces-186734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8667CAA0B34
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:10:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89BE7AA0B4D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCD91B673EF
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:10:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4584B3A49F4
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2236C2C1E3A;
-	Tue, 29 Apr 2025 12:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B46C2C10B9;
+	Tue, 29 Apr 2025 12:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpvZtfhL"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TazUkZnT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B8B27A90A
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 12:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A80021325C
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 12:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745928623; cv=none; b=u5tmyk4OzcY1abuj3YplCnGq3bb5IyJalViA2CTj7X+/2sjzAZjkaOaXtbYtMa5IQu8IMfFTJeyhQkxOin0EtsLmmQZd5EdBgA5C6HyaPpGiRETYU1lpvwU1NUQVylQGxSXfV9i3nJwiYnbTJ8LCSviDHZttQz32StjXMPugnXk=
+	t=1745928801; cv=none; b=oWqMa8aWvjSYtYy4Jup6NallBbE3EmpTreiUaWPbFL0N2d+gyMC8qnlaICig1Sr8vFb+ffq4cMU2NBwT4+3gnc3toNTKUyMxsRa5XbE2RwbMVHuXchVhzTzXepM9+CxoNDSC0lNbaeHirZZMdL4/Y3jgswLiYRDrDsIS7U4WpW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745928623; c=relaxed/simple;
-	bh=mb17IOCgVVpSucIMd87jlf64vKog/jviBeBcDvP1YQc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=XUNP7XfiSKCYqTHz1bxHOW0ck4vSZWzk0929uD2jUzWPGAPzE3l0OKH4FruyJgU1JwzFjPcooOtjYOsDQJRe2DdTx3xTzfkDcUakbtov8LWBik1nKSbpk3N0kLNKfaf4N70rQCG8E8wyMlBMtI+wMwe6WvzIxTu0Dpb9Swp9syk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KpvZtfhL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745928617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TnFM2K3257UGzeSI3eOkJDuCGJ4N6zCW6N/z7ul8q7U=;
-	b=KpvZtfhLIX+JwZ9algV5/gTxIs36S+HwKs8nape8hEisDMGXz6xqPZNIaV8C5OJejJoDFR
-	SFChuIKmEXYcu1I0s+y6ZDWfe7V9C9wA6y43vFh9YwRsafN2SqBqzbiSbw5NH8OwA5a18X
-	a5DPFWsD6WsXnSD9Ll7XKIjQUO0Iamo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-U5zCs31GN8ugq4NxkPaebw-1; Tue, 29 Apr 2025 08:10:12 -0400
-X-MC-Unique: U5zCs31GN8ugq4NxkPaebw-1
-X-Mimecast-MFC-AGG-ID: U5zCs31GN8ugq4NxkPaebw_1745928612
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac297c7a0c2so376298566b.3
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 05:10:12 -0700 (PDT)
+	s=arc-20240116; t=1745928801; c=relaxed/simple;
+	bh=GQiTk/htn7/1BJVac7ftCVKE98dbVakVfVbslKTnr/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNr5cYvOtgGlCFV6f4kh0aHsdo6ln1WA+HVyGSjPT7prSqHBGLGryQJNwoG/rDQlcuKICuSKu3WQu4W3nG3IjJzYZLAmSqUALRfP0XRyY+kKd7ZTiS3Bd6LuK5nKanQKfWegjO6xsOsb7nMpr+UVusJ8SHiZDJIaSwjgsrsmcTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TazUkZnT; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb1eso6293342a12.0
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 05:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1745928798; x=1746533598; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XGwtrgjfssbRJnnLGAioENkMU7oIKogOgkQ9Ev2GRas=;
+        b=TazUkZnT+3u7GG3XZtebYztPDVTZ2sRpxc52gskp937d5dikBOAFCCWOU6YrS3zjqu
+         gt1whZRuJOBHd9KXPCK65YkuLzcMKTh3GeC+JvTNqZMSDnG6weU1zjfmy4IQaruyOX/r
+         GMxVGUpu4+uxQEQXc+R/mWlegAybsB4Wpdkbq6XEIPhLCAvVp7TPpy0obTQMRe0KK2Wm
+         zARFY8dbXaib5uDeyPnzqKz57vgXxkSWGQZK+xvzBkxH3ZgccEcmJYW/XuhdHsfN2ELX
+         3uB2WD3gbpNBVRrqmtvJrTezgGJJ7R/1qSy00JJOaZUFklZmra5cd/JUV2oNpRhvnOBj
+         hr6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745928611; x=1746533411;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TnFM2K3257UGzeSI3eOkJDuCGJ4N6zCW6N/z7ul8q7U=;
-        b=tXwC3JahJj1EPV4wnZUxZBPBka/s4dSOGqQWVeVu27f/snRNIiqbVRqKTqICq/He6m
-         lYRupnmBct51g/tDqOZpGm7vqftngnWZkTf4a8RQj6trI3FVEMJ5Bq2++ebma+x4UO5f
-         2u9/UfVbB8OlylGmOqelUXEKCdVUg++/EziKEQmSL/xdLkQyJyVCtT5WyjyydObNeMEK
-         rcX8Ec1ndR4wiLQf4g0wyHbvbqW5DOeJ5I+wlkOZyvRJ3NPQATbjdcMezyu8BA+UiZpl
-         mVRDpUK0Lq6xdXIq+IRinrp6CSvW+Rv7CYfttkwbQ6lTnSCqCv9j+r1ttz85Xpn0u6Wq
-         2HHw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9JEwrF4WcweV5563qupnvsSJq62LGUgLWZlbn0l+7L/LXJqKy8LIAMPPzJHYWRM2XJkDZL5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX2pzAn95bKYbqzhF8Ppa/n1yZPWiZQ+NFmH5ODN4EIx5A5Mbr
-	gcybWHU3Tg0Gfx2kXRGVCRpaLFPrn4o7wXB3w1oSGG/Qp2RQ02yIjCTGEkZwol1iAAI+x4LOtPD
-	fzjzfZD2/cRbbzZCDe5x4nnG3hf5E+pAFYrZpbc8UF2r3fmWDeqd9pNaMt8kcDwi+
-X-Gm-Gg: ASbGncsT3hc/grypvCyDIrrFlXOLSuVWQIrNfFu/GQwMTBioWLpWKPEZLY3wLAlWvD+
-	v5zl5/imTytIfsULK9ErHp2L2/rsOSjO4DVb3fQpwqpVNFaOxExr0F4+E798BV/dzDV27PU9JM5
-	8EeB4DktkHs+XkNFPHIhOoq5V0Uo9TcafQgmL3fjlbkyl9kqZC7fu0WKOdSN5sdf0vNsnfdUjhM
-	BbJMcgpH8YZ4jC4P6IB9/kmf7DPNbzOcA3zji9WqZcg/dnOaaVf0INem3rlK4Huf65hIV0IEwzO
-	gEIkNzTeuFCQOj7SQ2ALxmSnmudntybS9TVhNel6JvYs3ZlthyxH1lRckcY=
-X-Received: by 2002:a17:907:3fa5:b0:ac3:3e40:e183 with SMTP id a640c23a62f3a-acec84b7f9amr291012966b.3.1745928611318;
-        Tue, 29 Apr 2025 05:10:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhPtGWXOZLT3mFaQPhUAK8VlJ77Tme05C3lCQT5D5BXFTuMnjP5AuORU6+ROxdywsJiFjHLQ==
-X-Received: by 2002:a17:907:3fa5:b0:ac3:3e40:e183 with SMTP id a640c23a62f3a-acec84b7f9amr291008666b.3.1745928610750;
-        Tue, 29 Apr 2025 05:10:10 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897? ([2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41c736sm787561366b.12.2025.04.29.05.10.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 05:10:10 -0700 (PDT)
-Message-ID: <0a5c7897-ed95-4198-9896-ddae64335083@redhat.com>
-Date: Tue, 29 Apr 2025 14:10:08 +0200
+        d=1e100.net; s=20230601; t=1745928798; x=1746533598;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XGwtrgjfssbRJnnLGAioENkMU7oIKogOgkQ9Ev2GRas=;
+        b=Y+cMrqYTHy47IBpVdLxiHVDWbDAz1uuszM703Ql5UofUZJx4bLAqJ+44JbdoqqDOWo
+         MdO15dpHiCF+DpmIzVdnZ656s7CvMyKtZNBg+cuQcOTafndzjdUJqUcfyZq+iLZ51Dvd
+         DjPqk5NGMpwm5M30w1iezprb/PXwpxg3Pmrq2qIy5B9iZiaTXHfoxQMxPFF/pcITINHB
+         tZGFhlYN0x2KVCrSQMzaKiSwo19jdiwsLzRlucIf1IKq8rfAKX0aKjO9eLX/wiEAIo+8
+         v2kQCwqmN8YPc+1TfgebBajZg8tL2FPMVmt+Ls2ty1BpmeBWkJscMeGJLF8Fs19yFW/5
+         yWhA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/PgXh/sEC8H79JK/8rzc2BEbj642/+r5PycWelBmUD892uvS5aYJyh2OA+qYA6cb1PD077XA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5tJqL3JHzXoZKubkvpDRUMrCN3WHv3EcNhoW7WdQZDqCt3GxM
+	OAz+zoL0RxC/F1wSfNWxUlVw73DEIZI2QaaBqmVfHcowp38+ot0W6ZQVPMUZ+XI=
+X-Gm-Gg: ASbGnctW18WnHet71TYfzTTkpDzHAIzBHTvvD7F0ondnyXRCIAZaMDUbo4mDa3I2Ovb
+	hcreFCNNPK9PAoZTQLMNNTxlkEWNJnJmj6qbecu/1U05TPaksXpP67k9qbAqwdE0Z5t/tFzofMh
+	5ovtBMq463XzrgH6Xbhrk+KCFOomrpst/L6MLFUN1aclXwOthWMPLs697v2Rpvrn8QbTOiyEq0M
+	yMELGGGJPFzrwhbeYKZdwG8+TotsxHs02NZc3H7yfg9K6yo7DAS7D6mp+q9g8M1+0obePxnItyw
+	8uOG3MDpPF79W5azftrnL34JVN9D/ptDM1OQCbLcbesV8Er4mN6YKA==
+X-Google-Smtp-Source: AGHT+IEo5qlskE04ChdYwUfeG14jGRzrfDGg7ko0hloQlCXfAEEdIv4iz53wIbhKxTpKz7/q/ZoqMg==
+X-Received: by 2002:a05:6402:5112:b0:5ed:bab5:3093 with SMTP id 4fb4d7f45d1cf-5f839b24397mr2697613a12.16.1745928797630;
+        Tue, 29 Apr 2025 05:13:17 -0700 (PDT)
+Received: from localhost (109-81-85-148.rct.o2.cz. [109.81.85.148])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5f7038328f1sm7319317a12.70.2025.04.29.05.13.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 05:13:17 -0700 (PDT)
+Date: Tue, 29 Apr 2025 14:13:16 +0200
+From: Michal Hocko <mhocko@suse.com>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org,
+	cgroups@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+Message-ID: <aBDCXB_Tb2Iaihua@tiehlicka>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 10/15] tcp: accecn: AccECN option send control
-To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
- kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
- <20250422153602.54787-11-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250422153602.54787-11-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250416180229.2902751-1-shakeel.butt@linux.dev>
 
-On 4/22/25 5:35 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Ilpo Järvinen <ij@kernel.org>
+On Wed 16-04-25 11:02:29, Shakeel Butt wrote:
+> Memory cgroup accounting is expensive and to reduce the cost, the kernel
+> maintains per-cpu charge cache for a single memcg. So, if a charge
+> request comes for a different memcg, the kernel will flush the old
+> memcg's charge cache and then charge the newer memcg a fixed amount (64
+> pages), subtracts the charge request amount and stores the remaining in
+> the per-cpu charge cache for the newer memcg.
 > 
-> Instead of sending the option in every ACK, limit sending to
-> those ACKs where the option is necessary:
-> - Handshake
-> - "Change-triggered ACK" + the ACK following it. The
->   2nd ACK is necessary to unambiguously indicate which
->   of the ECN byte counters in increasing. The first
->   ACK has two counters increasing due to the ecnfield
->   edge.
-> - ACKs with CE to allow CEP delta validations to take
->   advantage of the option.
-> - Force option to be sent every at least once per 2^22
->   bytes. The check is done using the bit edges of the
->   byte counters (avoids need for extra variables).
-> - AccECN option beacon to send a few times per RTT even if
->   nothing in the ECN state requires that. The default is 3
->   times per RTT, and its period can be set via
->   sysctl_tcp_ecn_option_beacon.
+> This mechanism is based on the assumption that the kernel, for locality,
+> keep a process on a CPU for long period of time and most of the charge
+> requests from that process will be served by that CPU's local charge
+> cache.
 > 
-> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> However this assumption breaks down for incoming network traffic in a
+> multi-tenant machine. We are in the process of running multiple
+> workloads on a single machine and if such workloads are network heavy,
+> we are seeing very high network memory accounting cost. We have observed
+> multiple CPUs spending almost 100% of their time in net_rx_action and
+> almost all of that time is spent in memcg accounting of the network
+> traffic.
+> 
+> More precisely, net_rx_action is serving packets from multiple workloads
+> and is observing/serving mix of packets of these workloads. The memcg
+> switch of per-cpu cache is very expensive and we are observing a lot of
+> memcg switches on the machine. Almost all the time is being spent on
+> charging new memcg and flushing older memcg cache. So, definitely we
+> need per-cpu cache that support multiple memcgs for this scenario.
+> 
+> This patch implements a simple (and dumb) multiple memcg percpu charge
+> cache. Actually we started with more sophisticated LRU based approach but
+> the dumb one was always better than the sophisticated one by 1% to 3%,
+> so going with the simple approach.
+
+Makes sense to start simple and go for a more sophisticated (has table
+appraoch maybe) later when a clear gain could be demonstrated.
+
+> Some of the design choices are:
+> 
+> 1. Fit all caches memcgs in a single cacheline.
+
+Could you be more specific about the reasoning? I suspect it is for the
+network receive path you are mentioning above, right?
+
+> 2. The cache array can be mix of empty slots or memcg charged slots, so
+>    the kernel has to traverse the full array.
+> 3. The cache drain from the reclaim will drain all cached memcgs to keep
+>    things simple.
+> 
+> To evaluate the impact of this optimization, on a 72 CPUs machine, we
+> ran the following workload where each netperf client runs in a different
+> cgroup. The next-20250415 kernel is used as base.
+> 
+>  $ netserver -6
+>  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
+> 
+> number of clients | Without patch | With patch
+>   6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
+>   12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
+>   18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
+>   24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
+>   30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
+>   36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
+> 
+> The results show drastic improvement for network intensive workloads.
+> 
+> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+
+Just a minor suggestion below. Other than that looks good to me (with
+follow up fixes) in this thread.
+Acked-by: Michal Hocko <mhocko@suse.com>
+Thanks!
+
 > ---
->  include/linux/tcp.h        |  3 +++
->  include/net/netns/ipv4.h   |  1 +
->  include/net/tcp.h          |  1 +
->  net/ipv4/sysctl_net_ipv4.c |  9 ++++++++
->  net/ipv4/tcp.c             |  5 ++++-
->  net/ipv4/tcp_input.c       | 36 +++++++++++++++++++++++++++++++-
->  net/ipv4/tcp_ipv4.c        |  1 +
->  net/ipv4/tcp_minisocks.c   |  2 ++
->  net/ipv4/tcp_output.c      | 42 ++++++++++++++++++++++++++++++--------
->  9 files changed, 90 insertions(+), 10 deletions(-)
+>  mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 91 insertions(+), 37 deletions(-)
 > 
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 0e032d9631ac..acb0727855f8 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -309,8 +309,11 @@ struct tcp_sock {
->  	u8	received_ce_pending:4, /* Not yet transmit cnt of received_ce */
->  		unused2:4;
->  	u8	accecn_minlen:2,/* Minimum length of AccECN option sent */
-> +		prev_ecnfield:2,/* ECN bits from the previous segment */
-> +		accecn_opt_demand:2,/* Demand AccECN option for n next ACKs */
->  		est_ecnfield:2;/* ECN field for AccECN delivered estimates */
->  	u32	app_limited;	/* limited until "delivered" reaches this val */
-> +	u64	accecn_opt_tstamp;	/* Last AccECN option sent timestamp */
-
-AFAICS this field is only access in the tx path, while this chunk belong
-to the tcp_sock_write_txrx group.
-
-> @@ -740,6 +740,15 @@ static struct ctl_table ipv4_net_table[] = {
->  		.extra1		= SYSCTL_ZERO,
->  		.extra2		= SYSCTL_TWO,
->  	},
-> +	{
-> +		.procname	= "tcp_ecn_option_beacon",
-> +		.data		= &init_net.ipv4.sysctl_tcp_ecn_option_beacon,
-> +		.maxlen		= sizeof(u8),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dou8vec_minmax,
-> +		.extra1		= SYSCTL_ZERO,
-> +		.extra2		= SYSCTL_FOUR,
-
-The number of new sysctl is concerning high, and I don't see any
-documentation update yet.
-
-> @@ -6291,9 +6294,36 @@ void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *skb,
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 1ad326e871c1..0a02ba07561e 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
+>  	pr_cont(" are going to be killed due to memory.oom.group set\n");
+>  }
 >  
->  		if (payload_len > 0) {
->  			u8 minlen = tcp_ecnfield_to_accecn_optfield(ecnfield);
-> +			u32 oldbytes = tp->received_ecn_bytes[ecnfield - 1];
-> +
->  			tp->received_ecn_bytes[ecnfield - 1] += payload_len;
->  			tp->accecn_minlen = max_t(u8, tp->accecn_minlen,
->  						  minlen);
-> +
-> +			/* Demand AccECN option at least every 2^22 bytes to
-> +			 * avoid overflowing the ECN byte counters.
-> +			 */
-> +			if ((tp->received_ecn_bytes[ecnfield - 1] ^ oldbytes) &
-> +			    ~((1 << 22) - 1)) {
-> +				u8 opt_demand = max_t(u8, 1,
-> +						      tp->accecn_opt_demand);
-> +
-> +				tp->accecn_opt_demand = opt_demand;
-> +			}
 
-I guess this explains the u32 values for such counters. Some comments in
-the previous patch could be useful.
-
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index 3f3e285fc973..2e95dad66fe3 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -3451,6 +3451,7 @@ static int __net_init tcp_sk_init(struct net *net)
->  {
->  	net->ipv4.sysctl_tcp_ecn = 2;
->  	net->ipv4.sysctl_tcp_ecn_option = 2;
-> +	net->ipv4.sysctl_tcp_ecn_option_beacon = 3;
->  	net->ipv4.sysctl_tcp_ecn_fallback = 1;
-
-Human readable macros instead of magic numbers could help.
-
-> @@ -1237,13 +1253,18 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
+/* Make sure nr_pages and cached fit into a single cache line */
+> +#define NR_MEMCG_STOCK 7
+>  struct memcg_stock_pcp {
+>  	local_trylock_t stock_lock;
+> -	struct mem_cgroup *cached; /* this never be root cgroup */
+> -	unsigned int nr_pages;
+> +	uint8_t nr_pages[NR_MEMCG_STOCK];
+> +	struct mem_cgroup *cached[NR_MEMCG_STOCK];
 >  
->  	if (tcp_ecn_mode_accecn(tp) &&
->  	    sock_net(sk)->ipv4.sysctl_tcp_ecn_option) {
-> -		int saving = opts->num_sack_blocks > 0 ? 2 : 0;
-> -		int remaining = MAX_TCP_OPTION_SPACE - size;
-> -
-> -		opts->ecn_bytes = tp->received_ecn_bytes;
-> -		size += tcp_options_fit_accecn(opts, tp->accecn_minlen,
-> -					       remaining,
-> -					       saving);
-> +		if (sock_net(sk)->ipv4.sysctl_tcp_ecn_option >= 2 ||
-> +		    tp->accecn_opt_demand ||
-> +		    tcp_accecn_option_beacon_check(sk)) {
-
-Why a nested if here and just not expanding the existing one?
-
-/P
-
+>  	struct obj_cgroup *cached_objcg;
+>  	struct pglist_data *cached_pgdat;
+[...]
+-- 
+Michal Hocko
+SUSE Labs
 
