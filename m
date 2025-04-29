@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-186715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B251EAA07F0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:04:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90E8AA0801
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F045516D406
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:04:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87C7E46261D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02F12BE7A8;
-	Tue, 29 Apr 2025 10:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18352BE7C3;
+	Tue, 29 Apr 2025 10:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="0fKUcyOo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="0JOzSXfq"
 X-Original-To: netdev@vger.kernel.org
 Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E77270ECF;
-	Tue, 29 Apr 2025 10:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3531D22E40E;
+	Tue, 29 Apr 2025 10:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745921046; cv=none; b=gmlXC49rkRqNtU5JDQA4V9JjWoE3yyEFUDFNxyCTQc7h8xGswfT/zwmCMuLS3h2v2J03Q2T+rbcfPxe4TMqdLiYVGgCV1Ed+kyarWrFgJ3DEDM8t0L0eS3PNSqcgkSeGH2Wnf/bifOrajK+AJPq0WQC0zdvXOuSJHQdSRXbtTd8=
+	t=1745921114; cv=none; b=mwbE4i6VW36ff868XkWXUFNFWjIw2f64c7f0KDOd3D0EaEoBB4lD01UV0YmTaYWDpopHGimM5YBMBkwKqitmuQbnjx/lERuNoazczkM/3Kil8eR10KH1unoLZvjstO95hGBmktpwWOhoqc7fWQLvks4hBW8N2dcSPmQjau43KE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745921046; c=relaxed/simple;
-	bh=RF6o8GHfj1ttEiwuBJivOFM9iu0SmwBpRTbAzQir5Hw=;
+	s=arc-20240116; t=1745921114; c=relaxed/simple;
+	bh=oT8jmdKRD53dK1OsOJGBSBEwoTPzjwLFCjZkXjFpL0w=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=AnUKFSYK5yeqCtcLF3LwGQzfG6i9xQ47tdDsA40Zq+3a0Fsf2ZUbQw19dI5pTvNnxj6t6lTHf8Yq0s8mPN+9ozU/FJ2/YH150KR72X4gvfdBDDsAf68vcBB6oPVzMw+FpbH+TvKSpJHzOLffyDe7gAYKHCa0o9njoXzJxhqb/08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=0fKUcyOo; arc=none smtp.client-ip=162.240.238.73
+	 MIME-Version:Content-Type; b=YKiwEsEavb/7yNVRdlhOoG6hZfeImuSLL++hPIzI1DiI63xnJhsR3wXwKVFEzfxzp509ykHLaxp0ZVD8SErOWJn0l27XAAFcZilLI/tuDq3pb0Rqx/uYPzLclQCVEkDOrFRzwl0Ej+seJZs42JxdK2JKItuyWTlM1+5YXl6vbPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=0JOzSXfq; arc=none smtp.client-ip=162.240.238.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
@@ -37,31 +37,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=UMcULxUbcMjQJ66Cg9wMoxO/ZD9NbgZNU7gRtsbDIj8=; b=0fKUcyOocXqLlYVibtRCQmj/Y0
-	MZupjRZEn+QJ3q29KzxFTb8mgttNr6sWZfz08u+r/H3mO1QYspyV6exnz6uyXZaYwrZa6dgNA2SiW
-	QNIw4CSCVViUbilfAcfjvGWSJe24/QUHibOb9rZqCJ1gjVJ3Ctk/7v2ou6UFCmh61E0IiaYfh/tXC
-	X0H35EfvdU2gND1BE1OolJg96IGZ0GB8Kxhk0euJD9s7I7bfeVOuCxax95SIKCnTyxuk2KknQThPE
-	oaoAooVeB82AQhdcz0zWLu9t7fuHoOJzknKIveu+TCsLDc0a1WRrsupSD6h+uJPOtOnZ9+NzVxl6D
-	iR4goHcQ==;
-Received: from [122.175.9.182] (port=6139 helo=zimbra.couthit.local)
+	bh=oT8jmdKRD53dK1OsOJGBSBEwoTPzjwLFCjZkXjFpL0w=; b=0JOzSXfqdcMYGwC0bPRPLnnAcf
+	PCwW6kpNicsWBKSdKcaD29OYqQG3kreVd+vU8ncE8bDZufHD3/huCJRuajpikIbr/zacfgk6YYDv6
+	Yg34PKJjMp2V3I5yNfTcd8VRGbhf13g3JMoHcy6p6vHXNh2b/MPs9ZR7v9ZGS6hZXALr8xT3Boloe
+	vvAi3f3QXTgo3UWC8xw/FAd/Zfi3rWyPp24XIfWiNEtZZdOpPdaHcjhFPKEcmnXDD10H6g45EG9Uo
+	usiMcM79UHCrk8AOuBNWRit2KTMmiFiwu1pLlK/+PwBEuLr3vb2slyshnWvu/GCbqjfooCLz00Xvg
+	Sw+o+dVQ==;
+Received: from [122.175.9.182] (port=32794 helo=zimbra.couthit.local)
 	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.1)
 	(envelope-from <parvathi@couthit.com>)
-	id 1u9hob-000000008Sv-3slT;
-	Tue, 29 Apr 2025 15:33:50 +0530
+	id 1u9hpq-000000008U8-2FW1;
+	Tue, 29 Apr 2025 15:35:06 +0530
 Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 991321782431;
-	Tue, 29 Apr 2025 15:33:41 +0530 (IST)
+	by zimbra.couthit.local (Postfix) with ESMTPS id 58E801783FDC;
+	Tue, 29 Apr 2025 15:34:54 +0530 (IST)
 Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 75066178245B;
-	Tue, 29 Apr 2025 15:33:41 +0530 (IST)
+	by zimbra.couthit.local (Postfix) with ESMTP id 48A6D178245B;
+	Tue, 29 Apr 2025 15:34:54 +0530 (IST)
 Received: from zimbra.couthit.local ([127.0.0.1])
 	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id HxMW6xCJqpGW; Tue, 29 Apr 2025 15:33:41 +0530 (IST)
+	with ESMTP id qr0AbpeTHHwl; Tue, 29 Apr 2025 15:34:54 +0530 (IST)
 Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 185171782431;
-	Tue, 29 Apr 2025 15:33:41 +0530 (IST)
-Date: Tue, 29 Apr 2025 15:33:40 +0530 (IST)
+	by zimbra.couthit.local (Postfix) with ESMTP id 108DD1782431;
+	Tue, 29 Apr 2025 15:34:54 +0530 (IST)
+Date: Tue, 29 Apr 2025 15:34:53 +0530 (IST)
 From: Parvathi Pudi <parvathi@couthit.com>
 To: kuba <kuba@kernel.org>
 Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>, 
@@ -88,11 +88,11 @@ Cc: parvathi <parvathi@couthit.com>, danishanwar <danishanwar@ti.com>,
 	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
 	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
 	mohan <mohan@couthit.com>
-Message-ID: <772474665.1172924.1745921020429.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250424191350.7bf69fdb@kernel.org>
-References: <20250423060707.145166-1-parvathi@couthit.com> <20250423072356.146726-5-parvathi@couthit.com> <20250424191350.7bf69fdb@kernel.org>
-Subject: Re: [PATCH net-next v6 04/11] net: ti: prueth: Adds link detection,
- RX and TX support.
+Message-ID: <663252690.1172927.1745921093992.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250424191600.50d7974c@kernel.org>
+References: <20250423060707.145166-1-parvathi@couthit.com> <20250423072356.146726-7-parvathi@couthit.com> <20250424191600.50d7974c@kernel.org>
+Subject: Re: [PATCH net-next v6 06/11] net: ti: prueth: Adds HW timestamping
+ support for PTP using PRU-ICSS IEP module
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,10 +100,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds link detection, RX and TX support.
-Thread-Index: e9vQTHb25dOlfaA340zfiKRfwAC3Tg==
+Thread-Topic: prueth: Adds HW timestamping support for PTP using PRU-ICSS IEP module
+Thread-Index: rMCkv9aSBafPeayIWiLctpQIplkvYA==
 X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
 X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
 X-AntiAbuse: Original Domain - vger.kernel.org
@@ -117,19 +117,15 @@ X-Source-Dir:
 
 Hi,
 
-> On Wed, 23 Apr 2025 12:53:49 +0530 Parvathi Pudi wrote:
->> +static inline void icssm_prueth_write_reg(struct prueth *prueth,
->> +					  enum prueth_mem region,
->> +					  unsigned int reg, u32 val)
->> +{
->> +	writel_relaxed(val, prueth->mem[region].va + reg);
->> +}
-> 
-> Please don't use "inline" unnecessarily.
-> The compiler will inline a single-line static function.
+> On Wed, 23 Apr 2025 12:53:51 +0530 Parvathi Pudi wrote:
+>> +static inline void icssm_prueth_ptp_ts_enable(struct prueth_emac *emac)
+>=20
+> Also do not use "inline" for functions which are not called from
+> the fast path. Basically no "inline" unless you can measure real
+> perf impact.
 
-
-Understood. We will address this in the next version.
+We will review and remove =E2=80=9Cinline=E2=80=9D keyword in the next vers=
+ion.
 
 Thanks and Regards,
 Parvathi.
