@@ -1,140 +1,135 @@
-Return-Path: <netdev+bounces-186763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D2BAA0F91
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:51:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91EE3AA0F82
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 644783AFA28
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:49:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21BAE188EF05
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00870215F6C;
-	Tue, 29 Apr 2025 14:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848F3215073;
+	Tue, 29 Apr 2025 14:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiK4NZ2O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfK2BZ12"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C836213E67
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 14:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5721E21504F;
+	Tue, 29 Apr 2025 14:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745938155; cv=none; b=FrcbeOdkeUM2VDYY1nZGFFNo5eMpMNkmPrG+FtkQjh3ynMWHxLBnEXXmCjHaYeaUGS6p++nkwhEQmtYI5ly8L7VU0H4KHHar9vW8UnkvJU+nXf2EI41g08pBo7DgbED/03ctcJ4Pi9Xz6rNGUU4C/dKtBK57NvMpo3tT4WKzSQU=
+	t=1745938212; cv=none; b=J3GwZGgqaSbuDg3khRV4M5qWqhn304fDYDV0ZqLRra4RlklO39FwtWNdQzZPmIErrzKtDYJo/2pq8AwTE55+a+XxAulp4578YDZG9TnJ/y2GbvUKhMzLthod4zIsqtGgADEgR73VjgPuTbCzxp+xiljoGLLaz8JUkeMzOb/RxnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745938155; c=relaxed/simple;
-	bh=GLzAW9i8G2S790fvJT54iIGjcBXQWF5+pxqBgUrcd5Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHuAhsCogT7X9mDuWk8p2EEh936wf1Wb95DeGpV6zqwTKrclIGZ9uKwJ4kh2rPJt+pPmDbWSsW+KskrsOHFG2fFEmBEp2lVkVUuktMdmIbA7f86EBk8CZlsoy6QjQmXyTnfrt4aL9d/N3REGKQt0iHBOPhzQ8gYGgExnIhkn6nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UiK4NZ2O; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745938153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zRLeE5mXTuY3mhtQAJn1s429K2TNKhmag459CJyPsyA=;
-	b=UiK4NZ2ON7bMG5MjXReadolO1MzrsNJx4qP779bJGuY7n5VVeO33t8S1zh5Gss3r9ml1hY
-	55kXfT/U5RH/ffUY6dkhTDhRhD90goqrAoPMG6KIivvg4pGG6MYHE5pWENabrQ+QDgQ2/Y
-	+kwIeGdS2HCVvCqwetxhLcgJpKwqJuY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-341-zJVOpuxzN8KtbLi05BAl-A-1; Tue, 29 Apr 2025 10:49:10 -0400
-X-MC-Unique: zJVOpuxzN8KtbLi05BAl-A-1
-X-Mimecast-MFC-AGG-ID: zJVOpuxzN8KtbLi05BAl-A_1745938149
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-440a4e2bad7so17204715e9.0
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 07:49:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745938149; x=1746542949;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRLeE5mXTuY3mhtQAJn1s429K2TNKhmag459CJyPsyA=;
-        b=ucmCTwZfnWkIZlI/1cU3YLbPvzkng+r48yO6GOf1SrLeqPMZw82KsQBXQsnQaIXLyt
-         it2Pq+0kitEaNiOTFO9TjuDR8QqdBI1j+b5YcZ99uBcwF7RWJQUMtbUGlBWeiPXzF1jw
-         qzYjW25svWXHgDpzK1TgY6A9tFLdu3RPTpzWycy+OjcwSGMjrwideWtZeFa5Eyj3LdSG
-         KPrLnPFG+tCXMdgm2cmMNXgZpppXkH6vAp7MSxzf0ZyIcZNx+JRAvXT2AC3TrV0PvhR+
-         tBcaetYr3bNaREX7HTFsE5ruGFQXqyBz4XlYU9Ri59+D/jniPrG+4WwqRncziElpZhL8
-         MtCw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4nFc6WtGCiCrd1EWYLNuND2yxKjl0L0RtXMa8l0aq0egjzPQ5kCw5Ms9AfXViqrGvwJ1etu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDMXPxNsLdYafSw5uxzxhUEL8XhgRwJ58OJrMwKjeCMUl5bSxe
-	nrWN5PZeo8h4jawqsPRvuLEf15JoZ3+dK73BjuRfoZSY9WECj1vW45aGKx5knnPDiFXILs26NJR
-	3CBCZNRZwYOBvCnIsa0C2I8Y8ygeVJ9ron8XO/L4+efGJzTmHHJD+5A==
-X-Gm-Gg: ASbGncuRDbH4lImosxRYBKuXna3msIANz29XoAVoRSGOfyS9meH3G6Tz0c9S9y9tymg
-	wT3VYMXM8BrXEiGkbLo+uQq27SIdKj17LPVlSlVFF4hxaYVfsBtpuuC5sUGXwdeTyA8dC95DQ7t
-	tiTM1F48VpyJtwPdVXQsv+1sRXRA2yqRAxop5iggCVk7GPpLRD9x5ZzKtQEhsjrrS6uZ1vYWTQd
-	E1S9k9joe0Z5Nltap48F4sQuCskAtWhm2Ykihs7KOB1lViVGMDUEpKRzNhmWbNowV1Cytz4QYEb
-	x5XpNxoAqaqOfsrZ9Oc=
-X-Received: by 2002:a7b:cb88:0:b0:43b:baf7:76e4 with SMTP id 5b1f17b1804b1-441acaa8d6amr27372775e9.1.1745938149541;
-        Tue, 29 Apr 2025 07:49:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGAU/uIt3jIn6qteBdEJpE7YYQmT2sXmtYbeftFAijdpp1guCLQBM3tVBZM1Yl/ZYHze6lAag==
-X-Received: by 2002:a7b:cb88:0:b0:43b:baf7:76e4 with SMTP id 5b1f17b1804b1-441acaa8d6amr27372525e9.1.1745938149201;
-        Tue, 29 Apr 2025 07:49:09 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2726:1910::f39? ([2a0d:3344:2726:1910::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-440a5303c68sm158323505e9.12.2025.04.29.07.49.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 07:49:08 -0700 (PDT)
-Message-ID: <6f9d20d9-8037-438f-8281-7eac82289696@redhat.com>
-Date: Tue, 29 Apr 2025 16:49:07 +0200
+	s=arc-20240116; t=1745938212; c=relaxed/simple;
+	bh=Uy3lf6ShP5oCjnAZKa0yP+gSLA9pi9fUNrGuoryF1I4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JZdgS/BN/Q8AxkrIWkZHtlb2NPLdmrqViPALpwHLmSgl4/EUJjq8sg5l+TTsV9/sJs5OXgsnbqR1xpGuFzH9JYxt92fnxUsmWnN0wkiXzJV5hkFvussi/W8dguvjwVF/ncbaXan0c9VH8/+i2oG9iXlVuRerSV2y3qi57/V9y7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QfK2BZ12; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1A860C4CEEE;
+	Tue, 29 Apr 2025 14:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745938212;
+	bh=Uy3lf6ShP5oCjnAZKa0yP+gSLA9pi9fUNrGuoryF1I4=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=QfK2BZ122ILkjblPC2DYF+bxXv42KhvQwhWqsSqsxuA5D74qHtB2+g1MVGuZ/LtUO
+	 XW8L9dvTznLyrJiANqh6fg5wIxTjQq9PQhQyk9xTCwgTNFRsNL6sa9oh3iTDiuAMAM
+	 lwTTmeuu+P87+9qCodwqXdDxsmLA3hqzNbwafJoozojfbXp7TDXM79cGWg/GcgO4EJ
+	 GqZQ7cPMS5RquwS9pQA1b4MvXBsKl0s0LgiizDJS7QBRU+537yYYIZIwVRGm9qkOtA
+	 ArrbcdxQ8KHhgZl6ZT8umokghx96VqCMn/+lpq6ZRbdgkgeUHRwKISX9vP/Mtnm4A/
+	 Ubv4eZG378VfA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 113E7C369DC;
+	Tue, 29 Apr 2025 14:50:12 +0000 (UTC)
+From: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>
+Date: Tue, 29 Apr 2025 22:49:37 +0800
+Subject: [PATCH net v2] docs: tproxy: fix code block style
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: net: exit cleanly on SIGTERM /
- timeout
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- andrew+netdev@lunn.ch, horms@kernel.org, petrm@nvidia.com,
- willemb@google.com, sdf@fomichev.me, linux-kselftest@vger.kernel.org
-References: <20250425151757.1652517-1-kuba@kernel.org>
- <680cf896280c4_193a06294a6@willemb.c.googlers.com.notmuch>
- <20250428132425.318f2a51@kernel.org>
- <68102b0477fcc_2609d429482@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <68102b0477fcc_2609d429482@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250429-tproxy-docs-fix-v2-1-20cbe0d91827@outlook.com>
+X-B4-Tracking: v=1; b=H4sIAADnEGgC/3WNwQ7CIBBEf6XZs2taQiP15H+YHoQulqjdBpC0a
+ fh3CXeP8ybz5oBA3lGAa3OAp+SC46UEcWrAzI/lSeimkkG0om+luGBcPW87TmwCWrehMVprK0U
+ vBwtltXoquBrvsFCEscDZhch+ry+pq9VfYeqww0EpGqSSsuhv/I1v5tfZ8AfGnPMP4NGXbbUAA
+ AA=
+X-Change-ID: 20250427-tproxy-docs-fix-ccbbbf42549f
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>, 
+ Levi Zim <rsworktech@outlook.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1513;
+ i=rsworktech@outlook.com; s=not_default; h=from:subject:message-id;
+ bh=NKjV0mTkVlgZ5Qae4uXgQi5NGdHyS6jBKgNza+UO9ck=;
+ b=owEBbQKS/ZANAwAIAW87mNQvxsnYAcsmYgBoEOcaFCexvq7uGJB1WvGKOAK/+N2YlYX7U4MvE
+ Xj/h1GjLKuJAjMEAAEIAB0WIQQolnD5HDY18KF0JEVvO5jUL8bJ2AUCaBDnGgAKCRBvO5jUL8bJ
+ 2GzgD/9ioRWNEeQIjH1V0ALiE+1n0soTvI/Ck2yvHO7h9Byser86y8ZveLp5TV2+jvQME2HtupI
+ UecwXF/GWFqM3aWN3+D3j4bzW72yxxP+9EtL90PIiZWdB48sgGae02oMFnQIH45gISVANiWwg8Q
+ 5E/sCCopJEObePMgvy6FHgoRk6l4Qh+nxqGMYfbgpBIHoWloWy89s/+r5OFc9jJ9y5i4qkqtvZf
+ IIJH9Wm/qDX3W2gY9Q8RzIAedV2LXI44dGGEMaA5AUA8o//PvMSOjyTi1bQ9QcvIYgoS2sWVKjn
+ arViX4i3ZgTNDxcXyeE2oYNrrQ4OOQjKuAlyIkMIXWuVimRTnAvpPKBaj6h8O0iJQAJupDhhZVi
+ gfn1gpLrqENeq5nSqNrn853Bt1dU3ui+gH5xKa4vJrMckhl/R00YAXwUVNpzetuWHbvtkUxdMH6
+ qlRZxgr05Pzsursh/JK9smWnwW18I4NFfz+kjfiWrcuHgVvdzcLE4M+PKeihWxkgGKgkZSz3QIS
+ 95/wypwNELvyBbP5zgyJ+h9b7ph7mAc9dzmo+W4+Y/TBk0uKyvZV5a8bW8GGciudPG4kkhjLoRa
+ 4qEUMZAiPyWKWMSFmoLTpyY3U2RjvxJjKbNy5+cJSZmyyPBxtTbeu7BKE7qwq5CJ3Y0ziSYB1nR
+ Nt7QWQk4zLEhCtA==
+X-Developer-Key: i=rsworktech@outlook.com; a=openpgp;
+ fpr=17AADD6726DDC58B8EE5881757670CCFA42CCF0A
+X-Endpoint-Received: by B4 Relay for rsworktech@outlook.com/not_default
+ with auth_id=390
+X-Original-From: Levi Zim <rsworktech@outlook.com>
+Reply-To: rsworktech@outlook.com
 
-On 4/29/25 3:27 AM, Willem de Bruijn wrote:
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> 
-> Jakub Kicinski wrote:
->> On Sat, 26 Apr 2025 11:15:34 -0400 Willem de Bruijn wrote:
->>>> @@ -193,6 +198,19 @@ KSFT_DISRUPTIVE = True
->>>>      return env
->>>>  
->>>>  
->>>> +term_cnt = 0
->>>> +  
->>>
->>> A bit ugly to initialize this here. Also, it already is initialized
->>> below.
->>
->> We need a global so that the signal handler can access it.
->> Python doesn't have syntax to define a variable without a value.
->> Or do you suggest term_cnt = None ?
-> 
-> I meant that the "global term_cnt" in ksft_run below already creates
-> the global var, and is guaranteed to do so before _ksft_intr, so no
-> need to also define it outside a function.
-> 
-> Obviously not very important, don't mean to ask for a respin. LGTM.
+From: Levi Zim <rsworktech@outlook.com>
 
-FWIW I think it's better to avoid the unneeded assignment in global
-scope, so I would suggest either follow-up or a v2, whatever is simpler.
+The last command is not indented thus does not show as code block when
+rendered. This patch fixes it.
 
-Thanks,
+Fixes: 4ac0b122ee63 ("docs: networking: convert tproxy.txt to ReST")
+Signed-off-by: Levi Zim <rsworktech@outlook.com>
+---
+Changes in v2:
+- Add double colons to the end of paragraph before the code block
+- Link to v1: https://lore.kernel.org/r/20250427-tproxy-docs-fix-v1-1-988e94844ccb@outlook.com
+---
+ Documentation/networking/tproxy.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/Documentation/networking/tproxy.rst b/Documentation/networking/tproxy.rst
+index 7f7c1ff6f159ed98d96c63d99c98ddbaefd47124..72ba41a10bb22b1f1054af55702423fa8086d98d 100644
+--- a/Documentation/networking/tproxy.rst
++++ b/Documentation/networking/tproxy.rst
+@@ -69,9 +69,9 @@ add rules like this to the iptables ruleset above::
+     # iptables -t mangle -A PREROUTING -p tcp --dport 80 -j TPROXY \
+       --tproxy-mark 0x1/0x1 --on-port 50080
+ 
+-Or the following rule to nft:
++Or the following rule to nft:::
+ 
+-# nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark set 1 accept
++    # nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark set 1 accept
+ 
+ Note that for this to work you'll have to modify the proxy to enable (SOL_IP,
+ IP_TRANSPARENT) for the listening socket.
+
+---
+base-commit: f73f05c6f711fd1628c7565441b9febc0c4d6c58
+change-id: 20250427-tproxy-docs-fix-ccbbbf42549f
+
+Best regards,
+-- 
+Levi Zim <rsworktech@outlook.com>
+
 
 
