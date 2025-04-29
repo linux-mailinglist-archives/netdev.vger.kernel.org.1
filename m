@@ -1,94 +1,123 @@
-Return-Path: <netdev+bounces-186809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C3DCAA1621
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:34:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05244AA1671
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A20BE16D767
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:30:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1D311885825
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D01250C15;
-	Tue, 29 Apr 2025 17:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152EA2517A8;
+	Tue, 29 Apr 2025 17:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YlIigFi5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUItvwgE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3B1233713
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 17:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725BC250C15;
+	Tue, 29 Apr 2025 17:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745947810; cv=none; b=Rm6tOT4mD2uaxFGRtc8jHD8vd05IbFgJpJKONfpgXRWZlmggnCi5ZCMtzpDVV7pEXGAEPJNqsL/r3lB6ArO2fcJn7o2dc7rCh0pVO89unSsNx7ArdRAiMiosfVaMZMQBifg2TkZzhOZ/tRosViWNlMYYvYPWVb2di7OQ9LYbJDg=
+	t=1745948056; cv=none; b=r6KAxkHBiI4yNeb2XjQjGxxCg8xx9CbdmpRG+s0GmugUIALbV3/A/Jafhccv4ubPaPlHywVan/uolaBH3LM5Lwyvq6yPuI2r0eCmGh96zCX9q0BlDmWoVeOtbanoTnCZ4/DmnIX2JS+Ux0bNsZIhobfaNAzuAHrWwMV+qSWt7xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745947810; c=relaxed/simple;
-	bh=zcsVVeTA0p6UAc+EOvSEtRfxfVwh/1UWE5hbRidnBTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IwG2XwJbel7S60QcKr5y9jt2bQIXZd1NLvC4kJxFcDLmD0cEIreGtcUxuQK6SUnkfCl1kjsz9aoJlDQtuHd/ud935DE77O/IIDNAiWJcw30AJPL/GENaeFSOU8h8znBggIOI3pI4+fX/Mv9P3trDVx8esswUpcounfklbjwK1qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YlIigFi5; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ae064b92-1d9d-47a8-ac26-1172076e5bcb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1745947804;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ATlrEW58fdp+KUFferXGbfoEARKyrYWPAY00eE8UZW4=;
-	b=YlIigFi5S2mnIfIGqYTeDe5OGnSXQrd72C2kK7dAgo/qZCClJTdzvcDcgEeT7td+mv33bU
-	eFRRPqVh93UqKTUVGIgjOOGhww4xs6c8YgUxg1aa93GR5zcGxPOpCC4h6j9CVytbDuF7/0
-	72kMI/fxL9AAnRLjv+7HXibLk7k/xPI=
-Date: Tue, 29 Apr 2025 10:29:48 -0700
+	s=arc-20240116; t=1745948056; c=relaxed/simple;
+	bh=d5V8elTkHGnnuKPLDFPs1e9b5tOMXPDhsj+gi96a3qw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KCJG61t7fX2pu4lSbR8AR3vfZw2uMUr2pTUxVRzk2VyrWnIk1NoCCEkKjjS9RLG80eqto8pb9Uaak/XbUSau11/GOe5s6ROigSJkYDSjJxS4VF08XKH2CKRUKxa8rfGno3LVLZ6jdLfFlO7mxsuANR6bWSqEGuXZIYw+0oB7nXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUItvwgE; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c546334bdeso545594185a.2;
+        Tue, 29 Apr 2025 10:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745948053; x=1746552853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q2BlWprHgUULyWpepcai3eQsAD4wofT/O/1QU5FajYk=;
+        b=EUItvwgEjz3SH5jLVZwl2HEfmwS7giGbJI9p/2cGvwRU5Kxhi/y/WS1VTWmvdabRAL
+         M1NUspqkzrpwHmd8fa1GXQNh0K5jW0QRCWv0S9G53OSvNmrAhpxQjkLVj1kDr9ywAOB6
+         T56ojOXY/44YBIEyT6GbqSJ9Z1+uokvAi+N9VEHQ9gNmogLpueKW0mvsi4v3NqKVhaSs
+         w6CdWMvzh0gBPtvJH8wKrFkpEztemEgbwzjPFIpmbMergFSPHvC/dDp5RLSh/YR+jT3+
+         lygpqwriFXFVjn3iEJOLEOQlmpb3IhA2YP1iUW/w8aRk2ELC9yeM1sfS/2bUrNqYjYiI
+         Frfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745948053; x=1746552853;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=q2BlWprHgUULyWpepcai3eQsAD4wofT/O/1QU5FajYk=;
+        b=bZGvG9nKtSrwv1kt06joinwq4862eB+2OJtoJQWN1bolf3/FymzjLtYcb776x8mU6T
+         3C59OCpcPJIypDV8pc6E9xuZBVyfbl8pZariduw+Q371egOCLVBqr0XHzoNs6VjIcvjd
+         Wm+F/SWHKDqo02PU1Wm7gcliccgKl6XFCcTEkl1t7m9zCsEzhMO3Cmy10PQ5gSqPcvpg
+         Jgf9MhcvfpsMEyLlPZ/6aDdbyPpS6rktytt6WLharaioTxbn7cB2fwtjaVleuSovIPRu
+         5oKucxvxawvuNHGsaWTI0ctI8qOqTt0Vwh8nbvJkK0UqHjk+7DjWuko+OZOz5ee6pmpl
+         WJvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkqgeVMdNs0Jxz2h+kauDsuqDsP+8QxU01F05iNPH45oY1keK8kNKZ+lUHnJU7BF1Zch4B2Y6C9G+t3FjtT48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYeOelHia4XwF8rOwTmXlhdhJsASeMOSTR2UWkQo4d40aH2XsV
+	l4DHsFtYMWcOeGCMDoMxHBQ4RvFx4eTlTirerGVuReeOvppcf7au
+X-Gm-Gg: ASbGncu8ZCZXOViC4ZdZ/fx29MPbhZm9MumFfGBjECLMvn1pp1kLztL5xanuk/4spXu
+	N4B7QKV/2SajjNUD1pNzhCcKgvUBgVYApwrbTk7XH3TuK9s21pdXQve7ZwOoH0tF66PfmInZ+Xz
+	kKfqGXWYOrgblOZzuuks42qtFvLkak89hjfGGRjtN/tOKjmHDIRJDt+L+FGqKyF1s0U1IPxoE8n
+	LOr+Qcrv+gAG9+2sy+T/QccmO3qpAqOBBHXrNq+HToZWaTWtL5kVmUrP3PtyiDD3CG909vnvsvV
+	RP2aMETYv58gUQu8PQDnErJI6TXFN62Exh4a9vCD9hzTaGtyKarQHoE0suhw7dvU54HIr8095o/
+	YQvhddEt12Z4ZIUgANVT5
+X-Google-Smtp-Source: AGHT+IFFXFzJNyFiyEqCbrtNcx5BvBlOj81hFo+xiuTzcLYEVa4GvHb4oE2pd3AGLE1gsGgbSgYvdw==
+X-Received: by 2002:a05:620a:1793:b0:7c7:bb3f:fd40 with SMTP id af79cd13be357-7c9668634c1mr1976762685a.5.1745948053141;
+        Tue, 29 Apr 2025 10:34:13 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c958cbd99esm757597985a.37.2025.04.29.10.34.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 10:34:12 -0700 (PDT)
+Date: Tue, 29 Apr 2025 13:34:11 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ petrm@nvidia.com, 
+ willemb@google.com, 
+ sdf@fomichev.me, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <68110d93972c2_29818629436@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250429170804.2649622-1-kuba@kernel.org>
+References: <20250429170804.2649622-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2] selftests: net: exit cleanly on SIGTERM /
+ timeout
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net] bpf: net_sched: Fix using bpf qdisc as
- default qdisc
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, xiyou.wangcong@gmail.com, kernel-team@meta.com
-References: <20250422225808.3900221-1-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250422225808.3900221-1-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/22/25 3:58 PM, Amery Hung wrote:
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index db6330258dda..1cda7e7feb32 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -208,7 +208,7 @@ static struct Qdisc_ops *qdisc_lookup_default(const char *name)
->   
->   	for (q = qdisc_base; q; q = q->next) {
->   		if (!strcmp(name, q->id)) {
-> -			if (!try_module_get(q->owner))
-> +			if (!bpf_try_module_get(q, q->owner))
->   				q = NULL;
->   			break;
->   		}
-> @@ -238,7 +238,7 @@ int qdisc_set_default(const char *name)
->   
->   	if (ops) {
->   		/* Set new default */
-> -		module_put(default_qdisc_ops->owner);
-> +		bpf_module_put(ops, default_qdisc_ops->owner);
+Jakub Kicinski wrote:
+> ksft runner sends 2 SIGTERMs in a row if a test runs out of time.
+> Handle this in a similar way we handle SIGINT - cleanup and stop
+> running further tests.
+> 
+> Because we get 2 signals we need a bit of logic to ignore
+> the subsequent one, they come immediately one after the other
+> (due to commit 9616cb34b08e ("kselftest/runner.sh: Propagate SIGTERM
+> to runner child")).
+> 
+> This change makes sure we run cleanup (scheduled defer()s)
+> and also print a stack trace on SIGTERM, which doesn't happen
+> by default. Tests occasionally hang in NIPA and it's impossible
+> to tell what they are waiting from or doing.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-The first arg, should it be the "default_qdisc_ops" instead?
-
-
->   		default_qdisc_ops = ops;
->   	}
->   	write_unlock(&qdisc_mod_lock);
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
