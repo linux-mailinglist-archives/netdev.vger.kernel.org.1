@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-186799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2462AA130C
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:02:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A62AA1303
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AA9D16B1AD
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:59:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A30EE7B39E9
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA23250C15;
-	Tue, 29 Apr 2025 16:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ED42459C9;
+	Tue, 29 Apr 2025 17:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nvQ0eYrH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDAuJJJ7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC4B24EAB2
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 16:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CD57E110
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 17:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745945891; cv=none; b=M/9sxv4iKuqxe5Wcyx5yCwD5dx+LRBr2lkB5wZSQ3vPaTsrnX30/2BFZGNpMbXcuOurAyitjH6kpTAMdgIr6PJwikwjybJSvkjnsnM/UJoqNQloXaMA8t1N5pTcKXoormvLrEcGh1SgI7Gz/lM5sXeSO/5CxcgzUxHQfRUfo0JY=
+	t=1745946100; cv=none; b=G3QAOoBPEme2u/1ctGGXRVz7YnpCdmbJqXhZa8E0yUtu0yQe4a1I7tSIEshoOZbNGYuOk3LBRpHI5o7/ftRmDgtkWAEHBkTPO+rKfZsLmdVdKErO2ljRlKk9zkGT+AV2wC737tNmv0PUbZeJiaOb/8Pk2kXb+grpYCSvO8g5o7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745945891; c=relaxed/simple;
-	bh=CXeuuacRQiUPgfGn9X2aS8wImkw75hTDe3VXsb8Myj8=;
+	s=arc-20240116; t=1745946100; c=relaxed/simple;
+	bh=xMeHUOM8Amp8g7lHgn3J5XDoc1S22zLXow+jI3sI3Ww=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hyqmtO/wBNRikPzhUWXqS1aPxPTQOmhwyK9sAdybhP5xgGGApjdFp247SVvLAJE4+fMR8cKKh7iE7HZMHYqV/N8e91qwnazKNpz+AzHcy/QmgYf766QdevJg2amSVPbswTrvZUek5pkmQVaHl7rlXm+lWZTepBQEQ7jDP7fqw7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nvQ0eYrH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA705C4CEF0;
-	Tue, 29 Apr 2025 16:58:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Cf9ful1yxFyU8z4p5ph8HLwl+u9I+kWnlQefTnRamf5P/HRu3uXanXTqtjQKpOYg1vIVIcb/8Wuxvp+XICkenVr7IoUjzH3nLhDJYMJn49laO1GDenoRMwn8rM22gViuMcNpi8B9IlvFUaHe1K2bHAYvz8a3r+fsR0fR2hD9PUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SDAuJJJ7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A40D2C4CEEA;
+	Tue, 29 Apr 2025 17:01:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745945891;
-	bh=CXeuuacRQiUPgfGn9X2aS8wImkw75hTDe3VXsb8Myj8=;
+	s=k20201202; t=1745946100;
+	bh=xMeHUOM8Amp8g7lHgn3J5XDoc1S22zLXow+jI3sI3Ww=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nvQ0eYrHWezaM1eJIGRWGli/n3nD7urFiIN2S2A5grk160A3LEbiyx25UQ8maguUy
-	 s6rF3xZnZ73Xv5v9S0k/dvyAJlmxjKFJyUY5deCC6GAXgt6jJyKnhGSArE5e2w5zU8
-	 1E11mMbPT9RkDtuTMx8DZ8CYf9FHk0BzHAgG60E6kiSaoBgoR4/B0hX/kozGYG5Jh3
-	 pdSMEz+8mOMje9VjP2m1RdStAAY4HF05ZkEnQVwVCX9k6q+UlNtdYKFW4HmeCggdzI
-	 imI5SwwAVZTIf1kvNScykRYasGMqXzB99qDA+ko2wESTbspW5kQEwS2wEi4YjE7d/9
-	 fX4hW7QhLwGkg==
-Date: Tue, 29 Apr 2025 09:58:09 -0700
+	b=SDAuJJJ7z0MQHwaL9eoDq+dE5icMQzWbTAddhDU232tjI7wOa65C+NrnHF1NQbcuo
+	 ZDvCQQdtxssMQcVnfLU4XspXTcn0rqDQABc0o0ifmeqWewpw7pvic75i4HF/rGDMg3
+	 5HNkrgkIwxI1ogXputuIknQHs/tKHyjtMX8/nRei6RI44vWbErGoYin/5qdHJKu5Ak
+	 2GmpVNjEilLMxEFoOiQYWLTV5mepB77a4bG7ZqOe0h66LH/LR5ppmZGhvrDFMIop9/
+	 5CFTRMwhSLJDStbxVf/coIGnssAoheEiSggGJ71g0qGLtC+/noq6Pfct/838EdEzq7
+	 U9e8eqylFGRPg==
+Date: Tue, 29 Apr 2025 10:01:38 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jiri Pirko <jiri@resnulli.us>
 Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
@@ -50,41 +50,45 @@ Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
  netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
  <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
  <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V3 14/15] devlink: Implement devlink param
- multi attribute nested data values
-Message-ID: <20250429095809.1cbabba4@kernel.org>
-In-Reply-To: <bdk3jo2w7mg5meofpj7c5v6h5ngo46x4zev7buh7iqw3uil3yx@3rljgtc3l464>
+Subject: Re: [PATCH net-next V3 02/15] devlink: define enum for attr types
+ of dynamic attributes
+Message-ID: <20250429100138.0454967a@kernel.org>
+In-Reply-To: <fy5y73vfqfajxnm6hkzd5h4rw4xohz6tormbi6mgnnerptomlv@jwsxzuqdn7io>
 References: <20250425214808.507732-1-saeed@kernel.org>
-	<20250425214808.507732-15-saeed@kernel.org>
-	<20250428161732.43472b2a@kernel.org>
-	<bdk3jo2w7mg5meofpj7c5v6h5ngo46x4zev7buh7iqw3uil3yx@3rljgtc3l464>
+	<20250425214808.507732-3-saeed@kernel.org>
+	<20250428161031.2e64b41f@kernel.org>
+	<ospcqxhtsx62h4zktieruueip7uighwzaeagyohuhpd5m3s4gw@ec4oxjsu4isy>
+	<fy5y73vfqfajxnm6hkzd5h4rw4xohz6tormbi6mgnnerptomlv@jwsxzuqdn7io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 29 Apr 2025 13:34:57 +0200 Jiri Pirko wrote:
-> >I'd really rather not build any more complexity into this funny
-> >indirect attribute construct. Do you have many more arrays to expose?  
-> 
-> How else do you imagine to expose arrays in params?
-> Btw, why is it "funny"? I mean, if you would be designing it from
-> scratch, how would you do that (params with multiple types) differently?
-> From netlink perspective there's nothing wrong with it, is it?
+On Tue, 29 Apr 2025 13:49:16 +0200 Jiri Pirko wrote:
+> >>Why do you keep the DEVLINK_PARAM_TYPE_* defines around?
+> >>IMO it'd be fine to just use them directly instead of adding=20
+> >>the new enum, fmsg notwithstanding. But failing that we can rename=20
+> >>in the existing in-tree users to DEVLINK_VAR_ATTR_TYPE_* right?
+> >>What does this translating back and forth buy us? =20
+> >
+> >Sure, I can do that in a separate patch. I think I will send these
+> >patchset separatelly prior to Saeed's patchset. =20
+>=20
+> Hmm, on a second thought, we expose DEVLINK_PARAM_TYPE_* to drivers to
+> specify type of driver-specific params:
+> git grep DEVLINK_PARAM_TYPE_
+> I would like to keep it as part of devlink param api. Looks nicer to me.
+> Downside is this switch-case, but who really cares?
 
-The attribute type (nla_type) should define the nested type. Having 
-the nested type carried as a value in another attribute makes writing
-generic parsers so much harder. I made a similar mistake in one the the
-ethtool commands.
+Who cares about pointless, duplicated code? I do =E2=9C=8B=EF=B8=8F
 
-We should have basically have separate attr types for each of the value
-sizes:
-	DEVLINK_ATTR_PARAM_VALUE_DATA_U32
-	DEVLINK_ATTR_PARAM_VALUE_DATA_BOOL
-etc. They should be in a separate attr space, not the main devlink_attr
-one, but every type should have its own value_data attr type.
+Why do you think it's "nicer" to have DEVLINK_PARAM_TYPE_ and
+DEVLINK_VAR_ATTR_TYPE_ be separate things if they define=20
+the same, exact, identical values?
+If it's because DEVLINK_VAR_ATTR_TYPE_ has the word _ATTR in=20
+it then I totally agree, lets call it DEVLINK_VAR_TYPE_ :)
 
