@@ -1,117 +1,236 @@
-Return-Path: <netdev+bounces-186733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04300AA0B3A
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:11:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8667CAA0B34
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3024B7A7DF1
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:07:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBCD91B673EF
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FAC26FDA7;
-	Tue, 29 Apr 2025 12:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2236C2C1E3A;
+	Tue, 29 Apr 2025 12:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SkZtFKRB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpvZtfhL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C42128E0F;
-	Tue, 29 Apr 2025 12:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B8B27A90A
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 12:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745928503; cv=none; b=swMkRb/E212yZPR2fMEa210wBGCpkrNjcFOn90hMP6Jw8ZuzlCs5a/nzAf42Ehs4jph2go0gMKbTvkF/ITL+NIwSMUClRwLiugGhywxwuU8SDR0az/B755DePBFpEtM61yH84oBC2xO7MQR6NZ4XOKGsyKZ5cjjz/d3p6/KKu4I=
+	t=1745928623; cv=none; b=u5tmyk4OzcY1abuj3YplCnGq3bb5IyJalViA2CTj7X+/2sjzAZjkaOaXtbYtMa5IQu8IMfFTJeyhQkxOin0EtsLmmQZd5EdBgA5C6HyaPpGiRETYU1lpvwU1NUQVylQGxSXfV9i3nJwiYnbTJ8LCSviDHZttQz32StjXMPugnXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745928503; c=relaxed/simple;
-	bh=u2KDSl6Z8S8d/VXvdkeAcfQ+QeA7wKWNNDMj2h67vhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KCtt/FyH3E8AYYyE2qvcPfGt9Wf/7rNXboaupqp5kW2kcFJIovij0Qsaggpwp/eH6H0tXHVqg9E6kzErjvkohGF/qQ0qka4Xjz8aHOmdxjQ1nTjJDI5AsL0xzTReci1VbqNtcTEQlfkVpVtz0+wbLNBPj3cd3ESw/t3UDCm+1rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SkZtFKRB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KBTM9WY09lm/gGdZhulr7/dP5G3uqnfHYWiy8iUJ1N4=; b=SkZtFKRBDYSjtCqVbzOhcQEuRj
-	DWyy1aTiVIPrrCWaBx6JUhx9WKbn3kEKxrlq7I9x/KVZ1HuLvhkN1sL/+Z0ziDpGobC1e/avHvFAC
-	psMCCdKOBLmsghcs3mywZeA3U6QJA7FBD12XTQa0tvtrNQ3osLdKcoOXs9/Fv47Zw9+E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u9jkn-00Avy8-8E; Tue, 29 Apr 2025 14:08:01 +0200
-Date: Tue, 29 Apr 2025 14:08:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Whitcroft <apw@canonical.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: ethernet-controller:
- update descriptions of RGMII modes
-Message-ID: <d00838cc-5035-463b-9932-491c708dc7ac@lunn.ch>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <218a27ae2b2ef2db53fdb3573b58229659db65f9.1744710099.git.matthias.schiffer@ew.tq-group.com>
- <aAaafd8LZ3Ks-AoT@shell.armlinux.org.uk>
- <a53b5f22-d603-4b7d-9765-a1fc8571614d@lunn.ch>
- <aAe2NFFrcXDice2Z@shell.armlinux.org.uk>
- <fdc02e46e4906ba92b562f8d2516901adc85659b.camel@ew.tq-group.com>
- <9b9fc5d0-e973-4f4f-8dd5-d3896bf29093@lunn.ch>
- <b75c6a2cf10e2acf878c38f8ca2ff46708a2c0a1.camel@ew.tq-group.com>
+	s=arc-20240116; t=1745928623; c=relaxed/simple;
+	bh=mb17IOCgVVpSucIMd87jlf64vKog/jviBeBcDvP1YQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XUNP7XfiSKCYqTHz1bxHOW0ck4vSZWzk0929uD2jUzWPGAPzE3l0OKH4FruyJgU1JwzFjPcooOtjYOsDQJRe2DdTx3xTzfkDcUakbtov8LWBik1nKSbpk3N0kLNKfaf4N70rQCG8E8wyMlBMtI+wMwe6WvzIxTu0Dpb9Swp9syk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KpvZtfhL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745928617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TnFM2K3257UGzeSI3eOkJDuCGJ4N6zCW6N/z7ul8q7U=;
+	b=KpvZtfhLIX+JwZ9algV5/gTxIs36S+HwKs8nape8hEisDMGXz6xqPZNIaV8C5OJejJoDFR
+	SFChuIKmEXYcu1I0s+y6ZDWfe7V9C9wA6y43vFh9YwRsafN2SqBqzbiSbw5NH8OwA5a18X
+	a5DPFWsD6WsXnSD9Ll7XKIjQUO0Iamo=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-644-U5zCs31GN8ugq4NxkPaebw-1; Tue, 29 Apr 2025 08:10:12 -0400
+X-MC-Unique: U5zCs31GN8ugq4NxkPaebw-1
+X-Mimecast-MFC-AGG-ID: U5zCs31GN8ugq4NxkPaebw_1745928612
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac297c7a0c2so376298566b.3
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 05:10:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745928611; x=1746533411;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TnFM2K3257UGzeSI3eOkJDuCGJ4N6zCW6N/z7ul8q7U=;
+        b=tXwC3JahJj1EPV4wnZUxZBPBka/s4dSOGqQWVeVu27f/snRNIiqbVRqKTqICq/He6m
+         lYRupnmBct51g/tDqOZpGm7vqftngnWZkTf4a8RQj6trI3FVEMJ5Bq2++ebma+x4UO5f
+         2u9/UfVbB8OlylGmOqelUXEKCdVUg++/EziKEQmSL/xdLkQyJyVCtT5WyjyydObNeMEK
+         rcX8Ec1ndR4wiLQf4g0wyHbvbqW5DOeJ5I+wlkOZyvRJ3NPQATbjdcMezyu8BA+UiZpl
+         mVRDpUK0Lq6xdXIq+IRinrp6CSvW+Rv7CYfttkwbQ6lTnSCqCv9j+r1ttz85Xpn0u6Wq
+         2HHw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9JEwrF4WcweV5563qupnvsSJq62LGUgLWZlbn0l+7L/LXJqKy8LIAMPPzJHYWRM2XJkDZL5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX2pzAn95bKYbqzhF8Ppa/n1yZPWiZQ+NFmH5ODN4EIx5A5Mbr
+	gcybWHU3Tg0Gfx2kXRGVCRpaLFPrn4o7wXB3w1oSGG/Qp2RQ02yIjCTGEkZwol1iAAI+x4LOtPD
+	fzjzfZD2/cRbbzZCDe5x4nnG3hf5E+pAFYrZpbc8UF2r3fmWDeqd9pNaMt8kcDwi+
+X-Gm-Gg: ASbGncsT3hc/grypvCyDIrrFlXOLSuVWQIrNfFu/GQwMTBioWLpWKPEZLY3wLAlWvD+
+	v5zl5/imTytIfsULK9ErHp2L2/rsOSjO4DVb3fQpwqpVNFaOxExr0F4+E798BV/dzDV27PU9JM5
+	8EeB4DktkHs+XkNFPHIhOoq5V0Uo9TcafQgmL3fjlbkyl9kqZC7fu0WKOdSN5sdf0vNsnfdUjhM
+	BbJMcgpH8YZ4jC4P6IB9/kmf7DPNbzOcA3zji9WqZcg/dnOaaVf0INem3rlK4Huf65hIV0IEwzO
+	gEIkNzTeuFCQOj7SQ2ALxmSnmudntybS9TVhNel6JvYs3ZlthyxH1lRckcY=
+X-Received: by 2002:a17:907:3fa5:b0:ac3:3e40:e183 with SMTP id a640c23a62f3a-acec84b7f9amr291012966b.3.1745928611318;
+        Tue, 29 Apr 2025 05:10:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhPtGWXOZLT3mFaQPhUAK8VlJ77Tme05C3lCQT5D5BXFTuMnjP5AuORU6+ROxdywsJiFjHLQ==
+X-Received: by 2002:a17:907:3fa5:b0:ac3:3e40:e183 with SMTP id a640c23a62f3a-acec84b7f9amr291008666b.3.1745928610750;
+        Tue, 29 Apr 2025 05:10:10 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897? ([2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41c736sm787561366b.12.2025.04.29.05.10.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Apr 2025 05:10:10 -0700 (PDT)
+Message-ID: <0a5c7897-ed95-4198-9896-ddae64335083@redhat.com>
+Date: Tue, 29 Apr 2025 14:10:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b75c6a2cf10e2acf878c38f8ca2ff46708a2c0a1.camel@ew.tq-group.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 10/15] tcp: accecn: AccECN option send control
+To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
+ kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250422153602.54787-11-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250422153602.54787-11-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 29, 2025 at 09:24:49AM +0200, Matthias Schiffer wrote:
-> On Mon, 2025-04-28 at 16:08 +0200, Andrew Lunn wrote:
-> > 
-> > > > However, with the yaml stuff, if that is basically becoming "DT
-> > > > specification" then it needs to be clearly defined what each value
-> > > > actually means for the system, and not this vague airy-fairy thing
-> > > > we have now.
-> > 
-> >  
-> > > I agree with Russell that it seems preferable to make it unambiguous whether
-> > > delays are added on the MAC or PHY side, in particular for fine-tuning. If
-> > > anything is left to the implementation, we should make the range of acceptable
-> > > driver behavior very clear in the documentation.
-> > 
-> > I think we should try the "Informative" route first, see what the DT
-> > Maintainers think when we describe in detail how Linux interprets
-> > these values.
+On 4/22/25 5:35 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Ilpo Järvinen <ij@kernel.org>
 > 
-> Oh, we should not be Linux-specific. We should describe in detail how *any OS*
-> must interpret values.
+> Instead of sending the option in every ACK, limit sending to
+> those ACKs where the option is necessary:
+> - Handshake
+> - "Change-triggered ACK" + the ACK following it. The
+>   2nd ACK is necessary to unambiguously indicate which
+>   of the ECN byte counters in increasing. The first
+>   ACK has two counters increasing due to the ecnfield
+>   edge.
+> - ACKs with CE to allow CEP delta validations to take
+>   advantage of the option.
+> - Force option to be sent every at least once per 2^22
+>   bytes. The check is done using the bit edges of the
+>   byte counters (avoids need for extra variables).
+> - AccECN option beacon to send a few times per RTT even if
+>   nothing in the ECN state requires that. The default is 3
+>   times per RTT, and its period can be set via
+>   sysctl_tcp_ecn_option_beacon.
+> 
+> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  include/linux/tcp.h        |  3 +++
+>  include/net/netns/ipv4.h   |  1 +
+>  include/net/tcp.h          |  1 +
+>  net/ipv4/sysctl_net_ipv4.c |  9 ++++++++
+>  net/ipv4/tcp.c             |  5 ++++-
+>  net/ipv4/tcp_input.c       | 36 +++++++++++++++++++++++++++++++-
+>  net/ipv4/tcp_ipv4.c        |  1 +
+>  net/ipv4/tcp_minisocks.c   |  2 ++
+>  net/ipv4/tcp_output.c      | 42 ++++++++++++++++++++++++++++++--------
+>  9 files changed, 90 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 0e032d9631ac..acb0727855f8 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -309,8 +309,11 @@ struct tcp_sock {
+>  	u8	received_ce_pending:4, /* Not yet transmit cnt of received_ce */
+>  		unused2:4;
+>  	u8	accecn_minlen:2,/* Minimum length of AccECN option sent */
+> +		prev_ecnfield:2,/* ECN bits from the previous segment */
+> +		accecn_opt_demand:2,/* Demand AccECN option for n next ACKs */
+>  		est_ecnfield:2;/* ECN field for AccECN delivered estimates */
+>  	u32	app_limited;	/* limited until "delivered" reaches this val */
+> +	u64	accecn_opt_tstamp;	/* Last AccECN option sent timestamp */
 
-There is two things here. One is related to delays on the PCB. Those
-are OS agnostic and clearly you are describing hardware. But once you
-get to implementing the delay in the MAC or the PHY, it is policy if
-the PHY does it, or the MAC does it. Different OSes can have different
-policy. We cannot force other OSes to do the same as Linux.
- 
-I drafted some text last night. I need to review it because i often
-make typos, and then i will post it.
+AFAICS this field is only access in the tx path, while this chunk belong
+to the tcp_sock_write_txrx group.
 
-	Andrew
+> @@ -740,6 +740,15 @@ static struct ctl_table ipv4_net_table[] = {
+>  		.extra1		= SYSCTL_ZERO,
+>  		.extra2		= SYSCTL_TWO,
+>  	},
+> +	{
+> +		.procname	= "tcp_ecn_option_beacon",
+> +		.data		= &init_net.ipv4.sysctl_tcp_ecn_option_beacon,
+> +		.maxlen		= sizeof(u8),
+> +		.mode		= 0644,
+> +		.proc_handler	= proc_dou8vec_minmax,
+> +		.extra1		= SYSCTL_ZERO,
+> +		.extra2		= SYSCTL_FOUR,
+
+The number of new sysctl is concerning high, and I don't see any
+documentation update yet.
+
+> @@ -6291,9 +6294,36 @@ void tcp_ecn_received_counters(struct sock *sk, const struct sk_buff *skb,
+>  
+>  		if (payload_len > 0) {
+>  			u8 minlen = tcp_ecnfield_to_accecn_optfield(ecnfield);
+> +			u32 oldbytes = tp->received_ecn_bytes[ecnfield - 1];
+> +
+>  			tp->received_ecn_bytes[ecnfield - 1] += payload_len;
+>  			tp->accecn_minlen = max_t(u8, tp->accecn_minlen,
+>  						  minlen);
+> +
+> +			/* Demand AccECN option at least every 2^22 bytes to
+> +			 * avoid overflowing the ECN byte counters.
+> +			 */
+> +			if ((tp->received_ecn_bytes[ecnfield - 1] ^ oldbytes) &
+> +			    ~((1 << 22) - 1)) {
+> +				u8 opt_demand = max_t(u8, 1,
+> +						      tp->accecn_opt_demand);
+> +
+> +				tp->accecn_opt_demand = opt_demand;
+> +			}
+
+I guess this explains the u32 values for such counters. Some comments in
+the previous patch could be useful.
+
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index 3f3e285fc973..2e95dad66fe3 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -3451,6 +3451,7 @@ static int __net_init tcp_sk_init(struct net *net)
+>  {
+>  	net->ipv4.sysctl_tcp_ecn = 2;
+>  	net->ipv4.sysctl_tcp_ecn_option = 2;
+> +	net->ipv4.sysctl_tcp_ecn_option_beacon = 3;
+>  	net->ipv4.sysctl_tcp_ecn_fallback = 1;
+
+Human readable macros instead of magic numbers could help.
+
+> @@ -1237,13 +1253,18 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
+>  
+>  	if (tcp_ecn_mode_accecn(tp) &&
+>  	    sock_net(sk)->ipv4.sysctl_tcp_ecn_option) {
+> -		int saving = opts->num_sack_blocks > 0 ? 2 : 0;
+> -		int remaining = MAX_TCP_OPTION_SPACE - size;
+> -
+> -		opts->ecn_bytes = tp->received_ecn_bytes;
+> -		size += tcp_options_fit_accecn(opts, tp->accecn_minlen,
+> -					       remaining,
+> -					       saving);
+> +		if (sock_net(sk)->ipv4.sysctl_tcp_ecn_option >= 2 ||
+> +		    tp->accecn_opt_demand ||
+> +		    tcp_accecn_option_beacon_check(sk)) {
+
+Why a nested if here and just not expanding the existing one?
+
+/P
+
 
