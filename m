@@ -1,219 +1,130 @@
-Return-Path: <netdev+bounces-186726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB907AA09BA
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:34:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4016AA09E0
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4A261B660DB
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 309F71B65193
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8782F2BF3F0;
-	Tue, 29 Apr 2025 11:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDBE2C17AC;
+	Tue, 29 Apr 2025 11:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGS28uN1"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="txA6Yruw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C621277808;
-	Tue, 29 Apr 2025 11:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CEA29DB8D
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 11:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745926421; cv=none; b=TwA5HrbLLSoHpZOU65jH4/CHsu1m6hcJpTnWm7qwKSHy4cVUMlBGFUfCAUvP4mEvMY8Mb2YhCvxp6A6l0DYK1U1BVs5tkDfrIS2l6ILQsj1YIOhculmLLnJl1FYATORpqet4k1KbJS8GR/cWyo6Q7l/6v3AjGQnBjEC2Y99pUPk=
+	t=1745926504; cv=none; b=p8YETbp4KhbAyK9PLXXtoVFH2tgHh5m4wjrOIKJEOhPkitcHYklS/V8lzgjl6sRoI+nwFCXZePkWynYrfWgza/oHANRt7lFfGqNvMn/XAv6L1YvBubBD8c8ryCyY347Kn2xG07s+aaC23beGThtqRKLdKfmVU3jUdyyqdxs9M/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745926421; c=relaxed/simple;
-	bh=l6P88ZvKx9SHY+7Cw/SBc0i2yBfXPm2GWkr2HlIxcmQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=AIAj2FAxgkMD9BY1ONRGRv+KkFC9zzRHRmIj2ZcfkWPfHN9p5U1bi2ONusSj886YVwZ+7kxSu0LRZK7FGIUwjCEME4SvnY6EdeC9Wx4/bzX5PVK5XoMyiB4o+uT0hV5XzmJ1G+cYQqy5X+U8vOO/PceWJNHbyglC+i29iAW5a6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGS28uN1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BF002C4CEE3;
-	Tue, 29 Apr 2025 11:33:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745926420;
-	bh=l6P88ZvKx9SHY+7Cw/SBc0i2yBfXPm2GWkr2HlIxcmQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=dGS28uN1Ik9Isvs+4hNd2wUTX21ViVfHfuqPHYYFsd9rfFaw0YhMb3w9eywN8jee1
-	 0euGyfdV10VvnyjKnt0lC6HpqCCAx6sxXMxqEoxyQ9gzgobIbCxHXHP7kXIoY8SBCx
-	 sHRy0EHvihTRTUU7UpKGUW/vG5YtRiFIozhTG4TzeMmEipyDX7VSTwWKTD2dwZGna3
-	 BfheG0WleyFlIwmNZkhUxKRDfWQsLHwQiI+lrgnDzbpkRb7vIQ0unflpD0o+duUh3I
-	 ff+nDM4rb64E3XGxi3nv6KkjVKb0/62qekzmAk1o+13IDJf5AKoWcV3QvjURj4Tmz7
-	 35MMjq/jgVR/w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4F2C369DC;
-	Tue, 29 Apr 2025 11:33:40 +0000 (UTC)
-From: Daniel Braunwarth via B4 Relay <devnull+daniel.braunwarth.kuka.com@kernel.org>
-Date: Tue, 29 Apr 2025 13:33:37 +0200
-Subject: [PATCH net-next v2] net: phy: realtek: Add support for WOL magic
- packet on RTL8211F
+	s=arc-20240116; t=1745926504; c=relaxed/simple;
+	bh=pVE+TS3UFmo22UMkEa2+Hs0xhwwQ9GwiJ5XYAhW6OW0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HoeS54YkpeU0YkkYED5LaH+0g+sqZBZ6pwfC6L2RlmOcfES7aGSpLXRgWP2lQxsKrxIcXJmwSl6HTn2qeBFDFxMSkmAcSmlmSX6WEfTVcyObyd7Ksbia0lSIhsEiQ/zNZXJs/LIOO/APSha74regBOyxBzmRVDLdPmsppDP8N0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=txA6Yruw; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cf628cb14so49255605e9.1
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 04:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745926500; x=1746531300; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wdeLMSXfLsPfIkuKL3CYMpFq7DN5R1rUsOpR1/VAQ2Y=;
+        b=txA6YruwDVb5CqeZdAmdTGVvZW+rkquTBiHHhuRkKoMxEKGNLDpfXo3y9EiHr+3XOz
+         BczsJUKeEfRS5WsTteznv79a59F8UtYByaGurxBNGMAAqkmRxo/Sx5NmE3aaos/3GasM
+         1UuMbaeD4e5L3Ewg1C7PXBpAy3MJ0aAIMrqvhU6wyHoZ97kT1HE1Y2JU0tfzwRAsZJIh
+         Cmky5jPzReHN57XpMuqPSwxIYJ6cKPnJAezbSG7pje7f395dezsdMzQadoFA6fvwXYdr
+         JAhnUgnPTI0UQEU1pv9x3uk03fUmJAuhNdt6VvGigexPrq6/aqu83T6BGRWGjGhBMBSr
+         jxYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745926500; x=1746531300;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wdeLMSXfLsPfIkuKL3CYMpFq7DN5R1rUsOpR1/VAQ2Y=;
+        b=IDrJpzeFdtQaZ1xKiwSr/1D0uakcdOUxCDfGkZOqXHvo3oCuSGq94INzTcnxZj3giR
+         m3LJf57ZN5MoXLLWf3LL2BX/0HDNe1XRnRE8BOefZp4beBGoN3RQ25Pg87E/zs7F9wk3
+         SMCF3iU/Vevemee4lsVC2HQAbD/xqZOqUS5hzhG5MZeL5mHS6ymwye3GaLvRuy5pa0OM
+         Rso1MEPcR91/p2V5jYZpGFmsri+Blo1X1Dnb4NDjEhWpjQiDeEDchO0Ryd2J5eBMFfKr
+         pt4E2nXIWovAAM2Q5hytU9UeY7JQA9pb1St4BOQXLWAErg/20t9l4+s70ObXV6KD0IB9
+         4iNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUR39Hu1H5BELXZuqSbUnuGpIANkd9+hfXs7HGK6zZCDcoob9gDmgpYEdtyPm09Nrb9E44IoE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1iI+fl+O+0cYL1Exj1cuBO1M5+GDpphDsPvwlentQ+vHvyqLl
+	CDDiLQy/yq86P2AGyoTsrAuvuao7ycieq2z2VXuC9CIYubhvGWLUaSHywQLBptA=
+X-Gm-Gg: ASbGncud3FHKaWRxFDujuSjRCe3CBdmT1aU/dW/xN/7PGsFqPttF8LX7yCfbsK4h1wR
+	Q43Bw9J/h/wvhgEGA++sBIv7yE6iRU9jmhs/Oq+mzxxyH+waVtfFHDZ4BKcaJ/8S1VUMM+dhDWM
+	u0X0knY+6u2kU7seWlpNHZSMelX0idwUUOHD3Oz/Ejnyz3O+GXkKeNp5LIjm9n3JmUUw1TrzNy8
+	OI1n/9Qun/zz6i0wQAtDzjILQYwlMHjXn87EcDpSvDuByt5HGLCES+QWWU5ZdmvngveVd0RD+Xv
+	N48b2BAt4+w7U1eOmrSku+XL0IuQEjDNt6iq1/eiuijr6vt/WwiBg+BfWuypFwrrGLtB
+X-Google-Smtp-Source: AGHT+IH0VbMXgmjJHZdWbrj5HO86BmznBkXT2FSqE+ixt8hbPQWyY3/WwY9MgR1MAhU41dlc3y61yA==
+X-Received: by 2002:a05:600c:4711:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-441acb462c8mr20729015e9.10.1745926500515;
+        Tue, 29 Apr 2025 04:35:00 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2abf73sm186503325e9.20.2025.04.29.04.34.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 04:35:00 -0700 (PDT)
+Date: Tue, 29 Apr 2025 13:34:57 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V3 14/15] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <bdk3jo2w7mg5meofpj7c5v6h5ngo46x4zev7buh7iqw3uil3yx@3rljgtc3l464>
+References: <20250425214808.507732-1-saeed@kernel.org>
+ <20250425214808.507732-15-saeed@kernel.org>
+ <20250428161732.43472b2a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250429-realtek_wol-v2-1-8f84def1ef2c@kuka.com>
-X-B4-Tracking: v=1; b=H4sIABC5EGgC/1WNQQrCMBREr1L+2kjz20p05T2kSEh+bGhNShJrp
- eTuhuJGZvUY5s0GkYKlCJdqg0CLjda7AnioQA3SPYhZXRiwxq5usWOB5JRovL/9xE6E2giSQhm
- EspgDGbvuths4SszRmqAvzWBj8uGz3yx8739G8WdcOCvpNDW8OetWiOv4GuVR+Sf0OecvlqjPA
- K8AAAA=
-X-Change-ID: 20250425-realtek_wol-6e2df8ea8cf2
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Daniel Braunwarth <daniel.braunwarth@kuka.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1745926419; l=4645;
- i=daniel.braunwarth@kuka.com; s=20250425; h=from:subject:message-id;
- bh=ChV+u/ks2Uqcp91+NgxHSn2KSL8dX25AcJihbW7i1X8=;
- b=BA5/W37PJ/01mpYTddzw6c/DQFIjmwfcLaa4gaEhNK4XOKB7AwCgRC8N3HZXubbIY2rXgeWr6
- eq7RFbM5sxKD6FOdsJ9K107LG0Yx5ZvNdAKfnOfsT6aAnDmG2yH0MOT
-X-Developer-Key: i=daniel.braunwarth@kuka.com; a=ed25519;
- pk=fTSYKvKU5SCGGLHVz5NaznQ2MbXNWUZzdqPihgCfYms=
-X-Endpoint-Received: by B4 Relay for daniel.braunwarth@kuka.com/20250425
- with auth_id=388
-X-Original-From: Daniel Braunwarth <daniel.braunwarth@kuka.com>
-Reply-To: daniel.braunwarth@kuka.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250428161732.43472b2a@kernel.org>
 
-From: Daniel Braunwarth <daniel.braunwarth@kuka.com>
+Tue, Apr 29, 2025 at 01:17:32AM +0200, kuba@kernel.org wrote:
+>On Fri, 25 Apr 2025 14:48:07 -0700 Saeed Mahameed wrote:
+>> +	case DEVLINK_PARAM_TYPE_ARR_U32:
+>> +		len = 0;
+>> +		nla_for_each_attr_type(param_data,
+>> +				       DEVLINK_ATTR_PARAM_VALUE_DATA,
+>> +				       genlmsg_data(info->genlhdr),
+>> +				       genlmsg_len(info->genlhdr), rem) {
+>> +			if (nla_len(param_data) != sizeof(u32)) {
+>> +				NL_SET_ERR_MSG_MOD(extack,
+>> +						   "Array element size must be 4 bytes");
+>> +				return -EINVAL;
+>> +			}
+>> +			if (++len > __DEVLINK_PARAM_MAX_ARRAY_SIZE) {
+>> +				NL_SET_ERR_MSG_MOD(extack,
+>> +						   "Array size exceeds maximum");
+>> +				return -EINVAL;
+>> +			}
+>> +		}
+>> +		if (len)
+>> +			return 0;
+>> +		NL_SET_ERR_MSG_MOD(extack,
+>> +				   "Value array must have at least one entry");
+>> +		break;
+>
+>I'd really rather not build any more complexity into this funny
+>indirect attribute construct. Do you have many more arrays to expose?
 
-The RTL8211F supports multiple WOL modes. This patch adds support for
-magic packets.
-
-The PHY notifies the system via the INTB/PMEB pin when a WOL event
-occurs.
-
-Signed-off-by: Daniel Braunwarth <daniel.braunwarth@kuka.com>
----
-Changes in v2:
-- Read current WOL configuration from PHY
-- Replace magic numbers with defines
-- Link to v1: https://lore.kernel.org/r/20250428-realtek_wol-v1-1-15de3139d488@kuka.com
----
- drivers/net/phy/realtek/realtek_main.c | 69 ++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 893c824796715a905bab99646a474c3bea95ec11..05c4f4d394a5ff32b43dd51f0bff08f437ad0494 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -10,6 +10,7 @@
- #include <linux/bitops.h>
- #include <linux/of.h>
- #include <linux/phy.h>
-+#include <linux/netdevice.h>
- #include <linux/module.h>
- #include <linux/delay.h>
- #include <linux/clk.h>
-@@ -38,6 +39,24 @@
- 
- #define RTL8211F_INSR				0x1d
- 
-+/* RTL8211F WOL interrupt configuration */
-+#define RTL8211F_INTBCR_PAGE			0xd40
-+#define RTL8211F_INTBCR				0x16
-+#define RTL8211F_INTBCR_INTB_PMEB		BIT(5)
-+
-+/* RTL8211F WOL settings */
-+#define RTL8211F_WOL_SETTINGS_PAGE		0xd8a
-+#define RTL8211F_WOL_SETTINGS_EVENTS		16
-+#define RTL8211F_WOL_EVENT_MAGIC		BIT(12)
-+#define RTL8211F_WOL_SETTINGS_STATUS		17
-+#define RTL8211F_WOL_STATUS_RESET		(BIT(15) | 0x1fff)
-+
-+/* RTL8211F Unique phyiscal and multicast address (WOL) */
-+#define RTL8211F_PHYSICAL_ADDR_PAGE		0xd8c
-+#define RTL8211F_PHYSICAL_ADDR_WORD0		16
-+#define RTL8211F_PHYSICAL_ADDR_WORD1		17
-+#define RTL8211F_PHYSICAL_ADDR_WORD2		18
-+
- #define RTL8211F_LEDCR				0x10
- #define RTL8211F_LEDCR_MODE			BIT(15)
- #define RTL8211F_LEDCR_ACT_TXRX			BIT(4)
-@@ -123,6 +142,7 @@ struct rtl821x_priv {
- 	u16 phycr2;
- 	bool has_phycr2;
- 	struct clk *clk;
-+	u32 saved_wolopts;
- };
- 
- static int rtl821x_read_page(struct phy_device *phydev)
-@@ -354,6 +374,53 @@ static irqreturn_t rtl8211f_handle_interrupt(struct phy_device *phydev)
- 	return IRQ_HANDLED;
- }
- 
-+static void rtl8211f_get_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
-+{
-+	wol->supported = WAKE_MAGIC;
-+	if (phy_read_paged(dev, RTL8211F_WOL_SETTINGS_PAGE, RTL8211F_WOL_SETTINGS_EVENTS)
-+	    & RTL8211F_WOL_EVENT_MAGIC)
-+		wol->wolopts = WAKE_MAGIC;
-+}
-+
-+static int rtl8211f_set_wol(struct phy_device *dev, struct ethtool_wolinfo *wol)
-+{
-+	const u8 *mac_addr = dev->attached_dev->dev_addr;
-+	int oldpage;
-+
-+	oldpage = phy_save_page(dev);
-+	if (oldpage < 0)
-+		goto err;
-+
-+	if (wol->wolopts & WAKE_MAGIC) {
-+		/* Store the device address for the magic packet */
-+		rtl821x_write_page(dev, RTL8211F_PHYSICAL_ADDR_PAGE);
-+		__phy_write(dev, RTL8211F_PHYSICAL_ADDR_WORD0, mac_addr[1] << 8 | (mac_addr[0]));
-+		__phy_write(dev, RTL8211F_PHYSICAL_ADDR_WORD1, mac_addr[3] << 8 | (mac_addr[2]));
-+		__phy_write(dev, RTL8211F_PHYSICAL_ADDR_WORD2, mac_addr[5] << 8 | (mac_addr[4]));
-+
-+		/* Enable magic packet matching and reset WOL status */
-+		rtl821x_write_page(dev, RTL8211F_WOL_SETTINGS_PAGE);
-+		__phy_write(dev, RTL8211F_WOL_SETTINGS_EVENTS, RTL8211F_WOL_EVENT_MAGIC);
-+		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
-+
-+		/* Enable the WOL interrupt */
-+		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
-+		__phy_set_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+	} else {
-+		/* Disable the WOL interrupt */
-+		rtl821x_write_page(dev, RTL8211F_INTBCR_PAGE);
-+		__phy_clear_bits(dev, RTL8211F_INTBCR, RTL8211F_INTBCR_INTB_PMEB);
-+
-+		/* Disable magic packet matching and reset WOL status */
-+		rtl821x_write_page(dev, RTL8211F_WOL_SETTINGS_PAGE);
-+		__phy_write(dev, RTL8211F_WOL_SETTINGS_EVENTS, 0);
-+		__phy_write(dev, RTL8211F_WOL_SETTINGS_STATUS, RTL8211F_WOL_STATUS_RESET);
-+	}
-+
-+err:
-+	return phy_restore_page(dev, oldpage, 0);
-+}
-+
- static int rtl8211_config_aneg(struct phy_device *phydev)
- {
- 	int ret;
-@@ -1400,6 +1467,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.read_status	= rtlgen_read_status,
- 		.config_intr	= &rtl8211f_config_intr,
- 		.handle_interrupt = rtl8211f_handle_interrupt,
-+		.set_wol	= rtl8211f_set_wol,
-+		.get_wol	= rtl8211f_get_wol,
- 		.suspend	= rtl821x_suspend,
- 		.resume		= rtl821x_resume,
- 		.read_page	= rtl821x_read_page,
-
----
-base-commit: 4acf6d4f6afc3478753e49c495132619667549d9
-change-id: 20250425-realtek_wol-6e2df8ea8cf2
-
-Best regards,
--- 
-Daniel Braunwarth <daniel.braunwarth@kuka.com>
-
-
+How else do you imagine to expose arrays in params?
+Btw, why is it "funny"? I mean, if you would be designing it from
+scratch, how would you do that (params with multiple types) differently?
+From netlink perspective there's nothing wrong with it, is it?
 
