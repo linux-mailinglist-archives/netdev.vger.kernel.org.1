@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-186784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5897AA10E3
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:48:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB7BAA10E1
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88BD79218A3
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:47:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADA1C1BA1997
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5E524293B;
-	Tue, 29 Apr 2025 15:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E333242D65;
+	Tue, 29 Apr 2025 15:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIM5PkIs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMncklhL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90F9242931
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE03224293D
 	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 15:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745941636; cv=none; b=g+1ABc6MHVGlD1oxeglFfxOqgbn63l3qdFH0SauPbFrwDw1za4+zWJ8LcSGdKI49msiGBpq6DlRGQTLhYC5Xe4P924CqV7+0oaynn0i8cjMQiDbznT1nSXDvnjPaPBcfNxXGfGyQ/NHRkUeYuZmE4wnqXaIixqyQz4+icjjnOu0=
+	t=1745941637; cv=none; b=VevxrInC6V6ftVOgQna1iFtm9sT00E2mTBbIQ2PJ8R+ZlbkiYN1e3QRiKETLhIRLmYxZxTDTb9k/UHIoIJ6/lGqqJEzZJF0CMihFkfCZm/M1l3Hb9qYtHs+Dwsk/7iRKg0KJtWdsD4Uy/pw+ZjyrX3h0aXMRE4YC7ndWGX8w3v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745941636; c=relaxed/simple;
-	bh=czRZBYgFBLd4byPmcXNnoV4VAH7E9hBOruihpCIsO1o=;
+	s=arc-20240116; t=1745941637; c=relaxed/simple;
+	bh=66izQXNyU2IQY2Ys3dlmdf04oin403I53sfxnCYySrQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B31TDEPYLDc6/n6jY0Y3TBP8DsO656uJjX0BpY7h7mJdOLubmTHNDkRFDIupDcpoez5kTr4pVA/BkCC42LhP4BGu4F/7oyGLRd2a5Tgetf/0uk/tikIBLIPDWYNrcogpRA48u/Ms7YsXp4T20LYvel54biEqhAFaG8C7xMeM31Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIM5PkIs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1540C4CEE9;
-	Tue, 29 Apr 2025 15:47:15 +0000 (UTC)
+	 MIME-Version; b=Ap/ZwuzNMUuDYkJm6yxBoKSbpd9zV7eN3Bhoo8UoWqgK2ToY/NbkyZfUF5OCXNzh1gTqlfp/gW6orgBa+cqZdLpwghku+bJJ5P2zram6tqXnFkPIKW1ydNZq9L6aEttFaWk/rgBZYQd1xdln4p/L4Ww/3+4noUtBLsPjMS0YupU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMncklhL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AA33C4CEED;
+	Tue, 29 Apr 2025 15:47:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745941636;
-	bh=czRZBYgFBLd4byPmcXNnoV4VAH7E9hBOruihpCIsO1o=;
+	bh=66izQXNyU2IQY2Ys3dlmdf04oin403I53sfxnCYySrQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IIM5PkIs+InFYtI7nlXSC/tfGz1XIxMD6i4PFT8OFETAqGqUWPoBsp29wD4no9dn2
-	 DlMzTg+Ne6CZYyLe0TkgEKLeHgIeZkL9m+EndAQa+VI2O0NLpFDTwycw0/Oy8viR+9
-	 e/PQ0xy8DeUcH54uw/ggsyNRlOYYxlfoouWhZ9Xx12zyn+4XbdqLAMW1PhU2rpWPDP
-	 8fnXZ27uBTn9LRmol5ivYXumfCeSa0N2nv2Fs1pqH/3cVuSfhsKy0GS4tHOEh9xufV
-	 J5HAcsKto45C9+Y3xIVsrG5d1TeRbMR/tKta8NO3SF1zUxOR2Xe6SCwHQbG+9SCryR
-	 4ykB5Xzl/MAMg==
+	b=AMncklhLqXiVVfrS+31XAewHFj0BASAkeY0Twaq6NQ/jb/7AVcgfJONmX9fd3LVsT
+	 +nhUzGbX3g9WHSPYFlmzMWdB+bs+kqgEcN7RkM/bTYKpBIrIPyEV1vLP2jmOvBQhNO
+	 ujiAk8LUFEuq4XCeLsZdQYTcHk6vixKdsqLBjHRmllW+xqE7Tq6IpQjCpSSczLDut3
+	 mfLZzRxACcRN8BGYqg5U9lgEGRDxhv7RB1m8EEyDIP+CNJ7Q+AaAIGFycRtwDmBSz+
+	 xd3OsZb4GhUmbnN5VJ5qmep+ov/3ydtMM58BeGIQbPz8MDWxgf1i4OwpiHmcJkDtEU
+	 jmG237uyi4yLw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jdamato@fastly.com,
 	nicolas.dichtel@6wind.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 08/12] tools: ynl-gen: mutli-attr: support binary types with struct
-Date: Tue, 29 Apr 2025 08:47:00 -0700
-Message-ID: <20250429154704.2613851-9-kuba@kernel.org>
+Subject: [PATCH net-next v3 09/12] tools: ynl-gen: array-nest: support put for scalar
+Date: Tue, 29 Apr 2025 08:47:01 -0700
+Message-ID: <20250429154704.2613851-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250429154704.2613851-1-kuba@kernel.org>
 References: <20250429154704.2613851-1-kuba@kernel.org>
@@ -68,78 +68,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Binary types with struct are fixed size, relatively easy to
-handle for multi attr. Declare the member as a pointer.
-Count the members, allocate an array, copy in the data.
-Allow the netlink attr to be smaller or larger than our view
-of the struct in case the build headers are newer or older
-than the running kernel.
+C codegen supports ArrayNest AKA indexed-array carrying scalars,
+but only for the netlink -> struct parsing. Support rendering
+from struct to netlink.
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 28 +++++++++++++++++++++++++---
+ 1 file changed, 25 insertions(+), 3 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 895bc1ca9505..a969762d557b 100755
+index a969762d557b..a4e65da19696 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -640,6 +640,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-     def _complex_member_type(self, ri):
-         if 'type' not in self.attr or self.attr['type'] == 'nest':
-             return self.nested_struct_type
-+        elif self.attr['type'] == 'binary' and 'struct' in self.attr:
-+            return None  # use arg_member()
-         elif self.attr['type'] == 'string':
-             return 'struct ynl_string *'
-         elif self.attr['type'] in scalars:
-@@ -648,6 +650,12 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         else:
-             raise Exception(f"Sub-type {self.attr['type']} not supported yet")
+@@ -747,6 +747,23 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+                      '}']
+         return get_lines, None, local_vars
  
-+    def arg_member(self, ri):
-+        if self.type == 'binary' and 'struct' in self.attr:
-+            return [f'struct {c_lower(self.attr["struct"])} *{self.c_name}',
-+                    f'unsigned int n_{self.c_name}']
-+        return super().arg_member(ri)
++    def attr_put(self, ri, var):
++        ri.cw.p(f'array = ynl_attr_nest_start(nlh, {self.enum_name});')
++        if self.sub_type in scalars:
++            put_type = self.sub_type
++            ri.cw.block_start(line=f'for (i = 0; i < {var}->n_{self.c_name}; i++)')
++            ri.cw.p(f"ynl_attr_put_{put_type}(nlh, i, {var}->{self.c_name}[i]);")
++            ri.cw.block_end()
++        else:
++            raise Exception(f"Put for ArrayNest sub-type {self.attr['sub-type']} not supported, yet")
++        ri.cw.p('ynl_attr_nest_end(nlh, array);')
 +
-     def free_needs_iter(self):
-         return self.attr['type'] in {'nest', 'string'}
++    def _setter_lines(self, ri, member, presence):
++        # For multi-attr we have a count, not presence, hack up the presence
++        presence = presence[:-(len('_present.') + len(self.c_name))] + "n_" + self.c_name
++        return [f"{member} = {self.c_name};",
++                f"{presence} = n_{self.c_name};"]
++
  
-@@ -655,6 +663,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         lines = []
-         if self.attr['type'] in scalars:
-             lines += [f"free({var}->{ref}{self.c_name});"]
-+        elif self.attr['type'] == 'binary' and 'struct' in self.attr:
-+            lines += [f"free({var}->{ref}{self.c_name});"]
-         elif self.attr['type'] == 'string':
-             lines += [
-                 f"for (i = 0; i < {var}->{ref}n_{self.c_name}; i++)",
-@@ -685,6 +695,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             put_type = self.type
-             ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-             ri.cw.p(f"ynl_attr_put_{put_type}(nlh, {self.enum_name}, {var}->{self.c_name}[i]);")
-+        elif self.attr['type'] == 'binary' and 'struct' in self.attr:
-+            ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-+            ri.cw.p(f"ynl_attr_put(nlh, {self.enum_name}, &{var}->{self.c_name}[i], sizeof(struct {c_lower(self.attr['struct'])}));")
-         elif self.attr['type'] == 'string':
-             ri.cw.p(f"for (i = 0; i < {var}->n_{self.c_name}; i++)")
-             ri.cw.p(f"ynl_attr_put_str(nlh, {self.enum_name}, {var}->{self.c_name}[i]->str);")
-@@ -1847,6 +1860,12 @@ _C_KW = {
-             ri.cw.p('return YNL_PARSE_CB_ERROR;')
-         elif aspec.type in scalars:
-             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.type}(attr);")
-+        elif aspec.type == 'binary' and 'struct' in aspec:
-+            ri.cw.p('size_t len = ynl_attr_data_len(attr);')
-+            ri.cw.nl()
-+            ri.cw.p(f'if (len > sizeof(dst->{aspec.c_name}[0]))')
-+            ri.cw.p(f'len = sizeof(dst->{aspec.c_name}[0]);')
-+            ri.cw.p(f"memcpy(&dst->{aspec.c_name}[i], ynl_attr_data(attr), len);")
-         elif aspec.type == 'string':
-             ri.cw.p('unsigned int len;')
-             ri.cw.nl()
+ class TypeNestTypeValue(Type):
+     def _complex_member_type(self, ri):
+@@ -1728,10 +1745,15 @@ _C_KW = {
+     local_vars.append('struct nlattr *nest;')
+     init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
+ 
++    has_anest = False
++    has_count = False
+     for _, arg in struct.member_list():
+-        if arg.presence_type() == 'count':
+-            local_vars.append('unsigned int i;')
+-            break
++        has_anest |= arg.type == 'indexed-array'
++        has_count |= arg.presence_type() == 'count'
++    if has_anest:
++        local_vars.append('struct nlattr *array;')
++    if has_count:
++        local_vars.append('unsigned int i;')
+ 
+     put_req_nested_prototype(ri, struct, suffix='')
+     ri.cw.block_start()
 -- 
 2.49.0
 
