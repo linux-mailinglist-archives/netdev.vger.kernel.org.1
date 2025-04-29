@@ -1,139 +1,96 @@
-Return-Path: <netdev+bounces-186826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62BAAA1B0B
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:01:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC8EAA1B0E
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 478713A5E72
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD0417BD0E
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AD2254B03;
-	Tue, 29 Apr 2025 18:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D58253948;
+	Tue, 29 Apr 2025 19:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9g5QemO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yCjeIAQG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354224C81;
-	Tue, 29 Apr 2025 18:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98131DB366;
+	Tue, 29 Apr 2025 19:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745953176; cv=none; b=bPtKcxBIYmmJcDHPurr8HcuSc9zS6qDKBc7VfcFjJzgAcMrtThT/M+tnLtPIbYNQzHzV9jBEpV0yYRakaePtnBHIY0S9MorPRFynvoPgTzpuBIrZE+xCE6zJXMpQHh9LVqQq4icwJrDA3L+LFEJTkpajCkyaS26FTR0XYm/JNuk=
+	t=1745953220; cv=none; b=k7IfFU8P+xK5xjYVdmN3UoIU1BU41dd5kuREnogsGb+lfOZnJn58QLnf8VdPUkgjvHh9gmBUdnei+Cbxpy2Aawmul+XRTKsRm2c7cc5I5yNC/9vZnOF+xD4Ba9EEM5KAEPO8Q2miTJ6ouYBca+b4/I1vRiR/XYh6zaPs5ZCwPt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745953176; c=relaxed/simple;
-	bh=IwuY276gXMXUoDkxiZng8S0b2nH7rkCxOVSBBBNPPHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UC133/IDjPV+zUvHRaGS2D9HdkOpw0rRdrKpnKlwqhY0s8GlFaLHgBe5C63WYr3IUDqoFcsU8CKlgOn1jFCl+1BgLHwXWvuWwLGIFbR5ONNZihvyPVBkDrEP4odP2FeVm0SVaKvEmNudPhQEA7PAJn27aTqpBVKzZTdfw2i/BLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9g5QemO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0CE5C4CEE3;
-	Tue, 29 Apr 2025 18:59:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745953175;
-	bh=IwuY276gXMXUoDkxiZng8S0b2nH7rkCxOVSBBBNPPHo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I9g5QemOAHdnQP3jwshUtWUdAIhUeA0ZudSeeYQ9aho1qlqq8hw29fKCK3/77J5kf
-	 KE8ZAUpRm6RF0B92g9n/NH2WBesJZFIgM3j314/szT1RNYzGoQ6A0zZ5MKSaJbQ6Tn
-	 eYtJkOVSS4yM5Ddc/RNsUE8SFyWid3Qk/ZpwVAtWToqyy/x3EQBnycXN02XPWlcl+x
-	 kZcYcFy3JLiVipz3uVqL4/GUBrwCSiLLsaczly9Lqt9zWZmqn6TmBSr6PtahTzlbrX
-	 djrSBIbEWo8/sFQegLWXnS7U2eASvpk9MirsSBnCHih0Hnzfe92otAzfAdxU47K9IU
-	 WQeK+ByCTOGcQ==
-Date: Tue, 29 Apr 2025 11:59:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko
- <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Prathosh Satish
- <Prathosh.Satish@microchip.com>, Lee Jones <lee@kernel.org>, Kees Cook
- <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v5 4/8] mfd: zl3073x: Add support for devlink
- device info
-Message-ID: <20250429115933.53a1914c@kernel.org>
-In-Reply-To: <20250425170935.740102-5-ivecera@redhat.com>
-References: <20250425170935.740102-1-ivecera@redhat.com>
-	<20250425170935.740102-5-ivecera@redhat.com>
+	s=arc-20240116; t=1745953220; c=relaxed/simple;
+	bh=Z1qh8OBGmXNvwpBBCX1H8kIisGUVStApXgDJ+jChMjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eg3NJesaymMokkMN2SKrbNyFBP/Enynu5H5UZsY01wROMGWDpBN9H7/O+b6wGqMTR5lYukA164/J7JXv9CtsSHAqdVSKFwgR0WLHd9QZPsmYtv//ryPJ7jDLPKUNtYDJBBOCNj90xQK9tRp++G4aq7oahtI6+Jmx9QxPcxTbLLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yCjeIAQG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4D4yC/lzo71KEI1Abi+DFBdXVlGZkBuOIOydyjBJlM4=; b=yCjeIAQGCcGsSMT+mR4wrPoSCC
+	PtFNohXv1cfKGpIOJmp36yM1zAamxaLZxE1T/ahR1alPp3pTZhY6zeedsLVAMwQK/kreZ8V0AuPiT
+	vQQhD/QZGbufd1hEMbfoncdeTbisvG34IjR9xqjOw8Jxo3GkFyVi6+1Cfa+WCiffCJRk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u9qBZ-00AyT4-Pt; Tue, 29 Apr 2025 21:00:05 +0200
+Date: Tue, 29 Apr 2025 21:00:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>,
+	george.moussalem@outlook.com, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Subject: Re: [PATCH] net: dsa: qca8k: fix led devicename when using external
+ mdio bus
+Message-ID: <6940ad35-1840-4b3b-ae71-27d91f648702@lunn.ch>
+References: <20250425-qca8k-leds-v1-1-6316ad36ad22@outlook.com>
+ <20250429114128.5b7790ad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250429114128.5b7790ad@kernel.org>
 
-On Fri, 25 Apr 2025 19:09:31 +0200 Ivan Vecera wrote:
-> +static int zl3073x_devlink_info_get(struct devlink *devlink,
-> +				    struct devlink_info_req *req,
-> +				    struct netlink_ext_ack *extack)
-> +{
-> +	struct zl3073x_dev *zldev = devlink_priv(devlink);
-> +	u16 id, revision, fw_ver;
-> +	char buf[16];
-> +	u32 cfg_ver;
-> +	int rc;
-> +
-> +	rc = zl3073x_read_u16(zldev, ZL_REG_ID, &id);
-> +	if (rc)
-> +		return rc;
-> +
-> +	snprintf(buf, sizeof(buf), "%X", id);
-> +	rc = devlink_info_version_fixed_put(req,
-> +					    DEVLINK_INFO_VERSION_GENERIC_ASIC_ID,
-> +					    buf);
-> +	if (rc)
-> +		return rc;
-> +
-> +	rc = zl3073x_read_u16(zldev, ZL_REG_REVISION, &revision);
-> +	if (rc)
-> +		return rc;
-> +
-> +	snprintf(buf, sizeof(buf), "%X", revision);
-> +	rc = devlink_info_version_fixed_put(req,
-> +					    DEVLINK_INFO_VERSION_GENERIC_ASIC_REV,
-> +					    buf);
-> +	if (rc)
-> +		return rc;
-> +
-> +	rc = zl3073x_read_u16(zldev, ZL_REG_FW_VER, &fw_ver);
-> +	if (rc)
-> +		return rc;
-> +
-> +	snprintf(buf, sizeof(buf), "%u", fw_ver);
-> +	rc = devlink_info_version_fixed_put(req,
-> +					    DEVLINK_INFO_VERSION_GENERIC_FW,
+On Tue, Apr 29, 2025 at 11:41:28AM -0700, Jakub Kicinski wrote:
+> On Fri, 25 Apr 2025 10:49:55 +0400 George Moussalem via B4 Relay wrote:
+> > From: George Moussalem <george.moussalem@outlook.com>
+> > 
+> > The qca8k dsa switch can use either an external or internal mdio bus.
+> > This depends on whether the mdio node is defined under the switch node
+> > itself and, as such, the internal_mdio_mask is populated with its
+> > internal phys. Upon registering the internal mdio bus, the slave_mii_bus
+> > of the dsa switch is assigned to this bus. When an external mdio bus is
+> > used, it is left unassigned, though its id is used to create the device
+> > names of the leds.
+> > This leads to the leds being named '(efault):00:green:lan' and so on as
+> > the slave_mii_bus is null. So let's fix this by adding a null check and
+> > use the devicename of the external bus instead when an external bus is
+> > configured.
+> 
+> Hi Andrew, would you mind taking a quick look?
 
-Are you sure FW version is fixed? Fixed is for unchangeable
-properties like ASIC revision or serial numbers.
+There is a somewhat ongoing discussion which could affect this:
 
-> +					    buf);
-> +	if (rc)
-> +		return rc;
-> +
-> +	rc = zl3073x_read_u32(zldev, ZL_REG_CUSTOM_CONFIG_VER, &cfg_ver);
-> +	if (rc)
-> +		return rc;
-> +
-> +	/* No custom config version */
-> +	if (cfg_ver == U32_MAX)
-> +		return 0;
-> +
-> +	snprintf(buf, sizeof(buf), "%lu.%lu.%lu.%lu",
-> +		 FIELD_GET(GENMASK(31, 24), cfg_ver),
-> +		 FIELD_GET(GENMASK(23, 16), cfg_ver),
-> +		 FIELD_GET(GENMASK(15, 8), cfg_ver),
-> +		 FIELD_GET(GENMASK(7, 0), cfg_ver));
-> +
-> +	return devlink_info_version_running_put(req, "cfg.custom_ver", buf);
+https://patchwork.kernel.org/project/netdevbpf/patch/20250425151309.30493-1-kabel@kernel.org/
 
-You need to document the custom versions and properties in a driver
-specific file under Documentation/networking/device_drivers/
--- 
-pw-bot: cr
+It could well be there is no internal and external MDIO bus, its just
+one bus with two bus masters. LED names are somewhere ABI, so i think
+we need to resolve the other thread first.
+
+	Andrew
 
