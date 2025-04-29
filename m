@@ -1,226 +1,162 @@
-Return-Path: <netdev+bounces-186643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E372AAA0099
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:36:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC5BAA009D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:37:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA15C3AB139
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:35:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08DF11A8309A
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99542638B2;
-	Tue, 29 Apr 2025 03:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA4F19F40F;
+	Tue, 29 Apr 2025 03:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQDKGnzV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hOgxxjHf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A46554769;
-	Tue, 29 Apr 2025 03:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BA31D540;
+	Tue, 29 Apr 2025 03:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745897772; cv=none; b=JWB+YDuLNSS7z69WpWD7vKxXreeZUtuOyllhCz6mz/WdsYW7KD0UZJOfGwa8cuZLZG8lVNKyvd23EMdEKR1gnzdQpjK7Y0LW72YaZBwhPimHB87rgMqWMQXQ49QEk+am+/VL4xMiPEJlgjvnX3/SGwOovEYscqDFGauIjbP3lJc=
+	t=1745897824; cv=none; b=lA4Sx8gr6fYW7Q9ZcVzxWqwvU08FHKkNdkpzeTxiAvIsUoD/9s1Ausu/DmvgeJHX6tkixWBc0eJbOjxtsBQrBaclBFyO4+DVK5MYetACLThi6YNRGqByFcBJl3KXFDzomNh9k03xR0reBAH56yRB/fcfVhGzhzn0PFZ+sMzrUF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745897772; c=relaxed/simple;
-	bh=YqRpaNuy2JgbzQUagG9PVmgqunYn9gBcbJjSu43l+KY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ug7gYz16Tn7O4fG38eDnb44kXIIzdUILxJj1+ur2Z1/12KA/PosYKsapwePgj27vNZavce9qP6xBr+sMBfLhj0C0QqqM4hlM1PuPfmwUq1lhbpK+qtdLDdE08+8GdpdxkzG0m2RslSuG5bUzndvgZzSfBTBqChDwcx2WRb70rmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQDKGnzV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ECF53C4CEE3;
-	Tue, 29 Apr 2025 03:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745897772;
-	bh=YqRpaNuy2JgbzQUagG9PVmgqunYn9gBcbJjSu43l+KY=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=KQDKGnzVbOfqok+d5wYTKFIMiGDa/uevuE+Amab+EL4eRmo1RTNl5c+0y60dfbQOH
-	 /G4cdjYimP3wVwBf5gqO28y1RVR2EtK8DscnMimRA4wLpKKKubaFNFbIKAU+ZqH4/o
-	 3YB6AOMclp967j/LqdPrICIgZkB3ujrKKheBX4koPBA7OOO0a+Ttx4sEnpHUwmCZXI
-	 G3ilGCHXMHvIxNb1wzn8/ybyTqm7vzimFrrLBJGtmygEgxwOh0vlJkX9+sR7vkruy0
-	 8hPwJytou9BFeVMeJeRUYNoLpZ1mLRJ3KEKNpIpdB2jdf3qdtI9Pgbk2OHUQCRc1GT
-	 4WhovtAzAgQ3A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59A4C369D9;
-	Tue, 29 Apr 2025 03:36:11 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Tue, 29 Apr 2025 11:35:51 +0800
-Subject: [PATCH] iso: add BT_ISO_TS optional to enable ISO timestamp
+	s=arc-20240116; t=1745897824; c=relaxed/simple;
+	bh=J8ow/rnNH8xEu4UhfA9BOL3uvWtte0jR7ktfsoarV38=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=af1Q0dUacxl+y0sL4Euut2z7I6GBj2RpzPIQ61C5CX7iz5btfybZGNFCz71DmxrLs5KhT/ERdvnvMPskPoysi8GjUgixEjSXyRsH52eFWWnPsaTqd+F+sqPFvZEODpEVm+dwnzK0w8ql7gEPwinwufd+mNcifdQAJde76OIAFgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hOgxxjHf; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745897823; x=1777433823;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=J8ow/rnNH8xEu4UhfA9BOL3uvWtte0jR7ktfsoarV38=;
+  b=hOgxxjHfGZQcSkMv5cerj1GwRZkZDlkpE0k+DSkXtsGZJUaeu7/R7NQ8
+   VgkkTMG4oGbZURxz7fI3SrRzmiet+v80v7vFnLc68SLRzYPk1aA+zMJJN
+   eNaNI57DfCH6IGt3fbcahOqzd3QpT0Z+s4rZhWXiaIvYZL0BpD43MaF7A
+   lSXq94/dFnD+XUbgvfT9sW/VUpQKqcp5AwIg41JlDV9EAriaM7s+zKeHT
+   nU93q9QpPSD8yHjCl8Z91W3yyclH4ltFd9J9sVnE1EAmO3RU30e9anhmi
+   EK3mYRtzizkFuxBevtnNPulbaKw5yynBUnH3ZajADa5RTPLQopxuAeCAj
+   A==;
+X-CSE-ConnectionGUID: r/+SkequSKia53K7TD2XCQ==
+X-CSE-MsgGUID: g/OW5uPaS3CA7qIQdItUfA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="47598863"
+X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
+   d="scan'208";a="47598863"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 20:37:02 -0700
+X-CSE-ConnectionGUID: 0qgXs45zTyKuUWwhvF7+ug==
+X-CSE-MsgGUID: 5bB2k/8qQU22LGzgpyvGdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
+   d="scan'208";a="156932012"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.22.166]) ([10.247.22.166])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 20:37:00 -0700
+Message-ID: <dd046c43-1491-4d2c-b4f2-5946ac55441e@linux.intel.com>
+Date: Tue, 29 Apr 2025 11:36:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIABZJEGgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDEyND3czi/PiSYt1kC6NEYwODxFRzCxMloOKCotS0zAqwQdGxtbUARtp
- HWlgAAAA=
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1745897770; l=3821;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=7V3ep2vGxaAYLV1WXhSaBss+Dq4jK4u8OsBDNgsTPZg=;
- b=CPGdUZ6fjHNrQEwv0zuBPrpvP20XmSn1aYRNkQnZBqX2gPuk3O+sgQbMt2vn4WodgQrrcaLoA
- fJESvmPeLMZCypa8d2dtx6YwmGUF/Jjwg2mvWDkok1OBAaNtNaC8xCy
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 1/8] igc: move
+ IGC_TXDCTL_QUEUE_ENABLE and IGC_TXDCTL_SWFLUSH
+To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Chwee-Lin Choong <chwee.lin.choong@intel.com>
+References: <20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com>
+ <20250428060225.1306986-2-faizal.abdul.rahim@linux.intel.com>
+ <cabea2f2-49f7-40f8-a305-2c102ceb4012@intel.com>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <cabea2f2-49f7-40f8-a305-2c102ceb4012@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Yang Li <yang.li@amlogic.com>
 
-Application layer programs (like pipewire) need to use
-iso timestamp information for audio synchronization.
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- include/net/bluetooth/bluetooth.h |  4 ++-
- net/bluetooth/iso.c               | 58 +++++++++++++++++++++++++++++++++------
- 2 files changed, 52 insertions(+), 10 deletions(-)
+On 28/4/2025 3:01 pm, Ruinskiy, Dima wrote:
+> On 28/04/2025 9:02, Faizal Rahim wrote:
+>> Consolidate TXDCTL-related macros for better organization and readability.
+>>
+>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/igc/igc.h      | 6 ++++++
+>>   drivers/net/ethernet/intel/igc/igc_base.h | 4 ----
+>>   2 files changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/ 
+>> intel/igc/igc.h
+>> index 859a15e4ccba..e9d180eac015 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc.h
+>> +++ b/drivers/net/ethernet/intel/igc/igc.h
+>> @@ -492,6 +492,12 @@ static inline u32 igc_rss_type(const union 
+>> igc_adv_rx_desc *rx_desc)
+>>   #define IGC_RX_WTHRESH            4
+>>   #define IGC_TX_WTHRESH            16
+>> +/* Additional Transmit Descriptor Control definitions */
+>> +/* Ena specific Tx Queue */
+>> +#define IGC_TXDCTL_QUEUE_ENABLE    0x02000000
+>> +/* Transmit Software Flush */
+>> +#define IGC_TXDCTL_SWFLUSH    0x04000000
+>> +
+>>   #define IGC_RX_DMA_ATTR \
+>>       (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_base.h b/drivers/net/ 
+>> ethernet/intel/igc/igc_base.h
+>> index 6320eabb72fe..4a56c634977b 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_base.h
+>> +++ b/drivers/net/ethernet/intel/igc/igc_base.h
+>> @@ -86,10 +86,6 @@ union igc_adv_rx_desc {
+>>       } wb;  /* writeback */
+>>   };
+>> -/* Additional Transmit Descriptor Control definitions */
+>> -#define IGC_TXDCTL_QUEUE_ENABLE    0x02000000 /* Ena specific Tx Queue */
+>> -#define IGC_TXDCTL_SWFLUSH    0x04000000 /* Transmit Software Flush */
+>> -
+>>   /* Additional Receive Descriptor Control definitions */
+>>   #define IGC_RXDCTL_QUEUE_ENABLE    0x02000000 /* Ena specific Rx Queue */
+>>   #define IGC_RXDCTL_SWFLUSH        0x04000000 /* Receive Software Flush */
+> 
+> Is there an intrinsic value for moving these definitions from one H file to 
+> another? And if so, why move the Tx defs and leave the Rx defs where they are?
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index bbefde319f95..a102bd76647c 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -242,6 +242,7 @@ struct bt_codecs {
- #define BT_CODEC_MSBC		0x05
- 
- #define BT_ISO_BASE		20
-+#define BT_ISO_TS		21
- 
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
-@@ -390,7 +391,8 @@ struct bt_sock {
- enum {
- 	BT_SK_DEFER_SETUP,
- 	BT_SK_SUSPEND,
--	BT_SK_PKT_STATUS
-+	BT_SK_PKT_STATUS,
-+	BT_SK_ISO_TS
- };
- 
- struct bt_sock_list {
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 2f348f48e99d..2c1fdea4b8c1 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1718,7 +1718,21 @@ static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
- 		iso_pi(sk)->base_len = optlen;
- 
- 		break;
-+	case BT_ISO_TS:
-+		if (optlen != sizeof(opt)) {
-+			err = -EINVAL;
-+			break;
-+		}
- 
-+		err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
-+		if (err)
-+			break;
-+
-+		if (opt)
-+			set_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
-+		break;
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-@@ -1789,7 +1803,16 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 			err = -EFAULT;
- 
- 		break;
-+	case BT_ISO_TS:
-+		if (len < sizeof(u32)) {
-+			err = -EINVAL;
-+			break;
-+		}
- 
-+		if (put_user(test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags),
-+			    (u32 __user *)optval))
-+			err = -EFAULT;
-+		break;
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-@@ -2271,13 +2294,21 @@ static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
- void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- {
- 	struct iso_conn *conn = hcon->iso_data;
-+	struct sock *sk;
- 	__u16 pb, ts, len;
- 
- 	if (!conn)
- 		goto drop;
- 
--	pb     = hci_iso_flags_pb(flags);
--	ts     = hci_iso_flags_ts(flags);
-+	iso_conn_lock(conn);
-+	sk = conn->sk;
-+	iso_conn_unlock(conn);
-+
-+	if (!sk)
-+		goto drop;
-+
-+	pb = hci_iso_flags_pb(flags);
-+	ts = hci_iso_flags_ts(flags);
- 
- 	BT_DBG("conn %p len %d pb 0x%x ts 0x%x", conn, skb->len, pb, ts);
- 
-@@ -2294,17 +2325,26 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		if (ts) {
- 			struct hci_iso_ts_data_hdr *hdr;
- 
--			/* TODO: add timestamp to the packet? */
--			hdr = skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
--			if (!hdr) {
--				BT_ERR("Frame is too short (len %d)", skb->len);
--				goto drop;
--			}
-+			if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
-+				hdr = (struct hci_iso_ts_data_hdr *)skb->data;
-+				len = hdr->slen + HCI_ISO_TS_DATA_HDR_SIZE;
-+			} else {
-+				hdr = skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
-+				if (!hdr) {
-+					BT_ERR("Frame is too short (len %d)", skb->len);
-+					goto drop;
-+				}
- 
--			len = __le16_to_cpu(hdr->slen);
-+				len = __le16_to_cpu(hdr->slen);
-+			}
- 		} else {
- 			struct hci_iso_data_hdr *hdr;
- 
-+			if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
-+				BT_ERR("Invalid option BT_SK_ISO_TS");
-+				clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
-+			}
-+
- 			hdr = skb_pull_data(skb, HCI_ISO_DATA_HDR_SIZE);
- 			if (!hdr) {
- 				BT_ERR("Frame is too short (len %d)", skb->len);
+Hi Dima,
 
----
-base-commit: 16b4f97defefd93cfaea017a7c3e8849322f7dde
-change-id: 20250421-iso_ts-c82a300ae784
+I moved and refactored the TXDCTL macros because this patch series
+modifies the TXDCTL register, specifically setting new bitfields.
+Consolidating `IGC_TXDCTL_QUEUE_ENABLE` and `IGC_TXDCTL_SWFLUSH`
+alongside the existing TXDCTL macros improves readability and makes it
+easier to cross-reference the TXDCTL bitfield mapping, as documented in
+Section 8.11.16 of the i226 Software User Manual. The grouping now
+matches that layout directly:
 
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+#define IGC_TXDCTL_PTHRESH_MASK       GENMASK(4, 0)
+#define IGC_TXDCTL_HTHRESH_MASK        GENMASK(12, 8)
+#define IGC_TXDCTL_WTHRESH_MASK        GENMASK(20, 16)
+#define IGC_TXDCTL_QUEUE_ENABLE_MASK   GENMASK(25, 25)
+#define IGC_TXDCTL_SWFLUSH_MASK        GENMASK(26, 26)
+#define IGC_TXDCTL_PRIORITY_MASK       GENMASK(27, 27)
 
+Since RXDCTL is a separate register with its own bitfield mapping
+section in the i226 Software User Manual, and this patch series does
+not modify it, I left the RXDCTL macros untouched. They are used
+independently in separate functions within the driver.
+
+That said, I can move the RXDCTL macros as well for consistency.
 
 
