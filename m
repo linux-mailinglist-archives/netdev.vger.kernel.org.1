@@ -1,132 +1,140 @@
-Return-Path: <netdev+bounces-186624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC963A9FEA4
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 02:56:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DAB0A9FEF4
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2FA41A82802
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 00:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EB0917B5F3
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 01:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C9913C9B3;
-	Tue, 29 Apr 2025 00:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D855153836;
+	Tue, 29 Apr 2025 01:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOaF0xhJ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BVVpLy3R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88977E107;
-	Tue, 29 Apr 2025 00:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ADD433C4
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 01:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745888184; cv=none; b=OflwaZnFliDhhYG3HbXfS3DC8dZs2wBqU2Y9SXVx5c2rtPFP3A8EJDAh3/nw3K2o6s9GKUspeRM/Nc3acOFQZ3F9zDEBR/6ZfTsoY2rQISdDm9qxcFx+q5jtr3FONiLdP5LKbY0npw6rmuiS9JzSdphwaLmh2HmggJ33LzWXe0w=
+	t=1745889671; cv=none; b=cWDgCItE87Ky2Cv79RaW5KiD+kyErl0x4elDHuwJbwgGn6AP/UCooyYKYKrodN+vaIQTJEtypPevfiaz0FjYVUxiX9iHb75jR7j9aj7oav2rsYdkUffZVeFUAscZiZkHlUsKtaordK2/fGnxrbAox7f3z2GyS6mnmxPDFRv7oxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745888184; c=relaxed/simple;
-	bh=UGHLeiApJf7V1C8ImguoPGkGXxAG1MLhiPDBuTxIWCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lVm8QJgQDD7BEre5OZjQvkyzaFIY/iKrya2/3aWJAmQAU9sSZETylkwDnBs5TSvA+dtSv9luaisWmXfYMyfwBg0naLTn8m1Hkbec6+cmC+Q6XWR+T2YNVym3JQ9e0MdegGRoGu6EYfPJopKeFcmo+krw+zGVVuZepHRQKG/EydY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOaF0xhJ; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-736dd9c4b40so5689518b3a.0;
-        Mon, 28 Apr 2025 17:56:22 -0700 (PDT)
+	s=arc-20240116; t=1745889671; c=relaxed/simple;
+	bh=sT6k8d9O83uMHGT9GCAnavue927D2pB5YuDu1taIrwY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H7nv2VMBkMH1gFHRYdHT99GVbJbrFvuiXVXesy7PbAdvtWSd183CJLSNO72ZVtg67j7qWgwD/Vzc0fdjwx29J3GO4XOvc85w+zDa38YMIlwYo3vVEPP73UOosoCecnRFp7V/Z8L9Kt/9D32ddRdpJGpEpPR41hnSTvZ1qIDCCsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BVVpLy3R; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745888182; x=1746492982; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YtB+mT0E8TIrbKFCUfN6M50HTfM9YyB2DMZzb9JngOs=;
-        b=WOaF0xhJ1LUbDMEqIG0qeuxtwOWMP5omy5if+8BPU5qaIGk4Jcnq2F2ij9y2whaLLY
-         C7kE8lJhGn1wv8ZKwiL/68MYJlUEkpE+pfBTGd8/8irZ4naxCaCU+mQ5sJjpB2k/PZy6
-         JFynKoBSoLPXPt0ja94K3l2cBwyzahADs3vCvVgIxjrWCyMk9+PC/5LPhAfjCjnNvX1Y
-         lG/K/wZ5B+I+hdDv0N1SSHqRFFCQ0GQAxYZAF6DGyAfbU+lXLDg3N06oR+5QrVc6msUN
-         r8DX9E58x+gZ40JXCLg5hQnDqZ1qCEUFkJq1PAOrV4+0pjB/5JQWtddaKuQCX0KD87aY
-         yTgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745888182; x=1746492982;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YtB+mT0E8TIrbKFCUfN6M50HTfM9YyB2DMZzb9JngOs=;
-        b=b9NKNvuQqADUpkZEHot+MdNwmyeBVpu8OWf/Yzc2OJPAFDq7M4QhC2MzSTGB/FNk5R
-         0tD8/OGhRhaafwMqRkhyEwzbZNpHhAD+HvBiNIDbiE3nK/3ktg6KtYOuePvcxldUqeEn
-         GzwVaXrpVEY0lAje6DdWZ+xXv1rkElVPuJxSZeL6iu2glpXr+hxWXACyAHpZyUJpBxMy
-         98hFxjuO20Tw6neF9rH6OIEH+alWnwsMMX5SueYLyeI8LXt2Vj4BXodOWV0z2o/x1SUd
-         WKMIV2BbvCicfQWvw3iH2wRlvRZwly+d6gWXuBtFYCGcCEKDqoIi+FRmylNXAU3VUHu1
-         Zcog==
-X-Forwarded-Encrypted: i=1; AJvYcCU+1gLxNgYj0bCrGIKKV5XcuvFyrOgAdIo4lGNFwjeU6cTVRfNriBUuhKLYsowVDTbWgzehvmlDWc1lgpco@vger.kernel.org, AJvYcCV63mgyK0YbS1tnfGFkz8dYUKuB92vAuA5AzF/E9DTqjue6NYXW0RK9yiBpHdetY6Ai5wb07jwDNGAhKHNAYTmO@vger.kernel.org, AJvYcCWzvYxz2YMPdiJa7mFqvcQqhOIbaf6dTqdhfyZN05l5I5Jj8pjJQXianBVb2gqTU30laStJJ6uR+PI=@vger.kernel.org, AJvYcCXZPll0sn0UGZVvlGK1VJC+KWSu4tqadp34/ONR3NYr+xiPBqIubmXjluStqfSW6MGDguEWplDE@vger.kernel.org
-X-Gm-Message-State: AOJu0YytJT+U940XxRMA0tTUzKmvyyDsVBiRVVW+ozVob3f686GzzBDZ
-	xPyckdpzoJTl5LrF3715M4nqWKyatHwXmC+X7k3jbll6eh+FrvJU
-X-Gm-Gg: ASbGncvWg9WtpmOXOREyr4QYv+THFuO2HlOFYvQgBIo/fjETd2qB8pjc9PTuT9CA/I3
-	SYNcKRQqeT/ngAEfcOwWeb1JoRqtCZMCXInf8paV9ZiqLAH5ZfzxeI/4iem7rOTjCX2wYjyGYyO
-	841LKMEhGrbMpeO4DkLV9eJ4y08l5HheXsgU30OJBhSn+PKJROE0LhqZWDYa3WIh6RvWbGrcf7y
-	VkGL+KOuY5s4mTM4XxKkpxLVS0NguzrfSlEBQVQDVtTwWpSV42kVkqNPOvy6itHwXaw5Les4KOg
-	Q1QfyUqAAhCW5/q4kpU7ufW8RcoANnd2x4lDL8mmVUWL
-X-Google-Smtp-Source: AGHT+IH0mSCIzf4YRTszhlxszcJ5ZHkUQ+VCosBGzav/EA6LiA9LnwUdkxmQ5kQYAzOP/f/ImW8wjw==
-X-Received: by 2002:a05:6a20:9c8b:b0:1f3:383e:7739 with SMTP id adf61e73a8af0-2094f670068mr1713198637.7.1745888182032;
-        Mon, 28 Apr 2025 17:56:22 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15faded634sm7990861a12.73.2025.04.28.17.56.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 17:56:21 -0700 (PDT)
-Date: Mon, 28 Apr 2025 17:56:20 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: Introduce a new kfunc for
- sockmap
-Message-ID: <aBAjtATRrVNegYjm@pop-os.localdomain>
-References: <20250428081744.52375-1-jiayuan.chen@linux.dev>
- <20250428081744.52375-2-jiayuan.chen@linux.dev>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1745889670; x=1777425670;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LXI5eyFnc4eBm3PGUpKmquGMwMt35sR9NVwpmEPXQn0=;
+  b=BVVpLy3RwXOEIy6AaafG81bAQFqc4o4crsh5mdTFmGVbSAwlbPP6lwVd
+   Xsyjgv+mGOdOme+iGUDDkw0aLbWboth1xoEcoOqTN6czej5EZnSoFZrvN
+   AAmJDz7yZWWpIjJT/yNpoIeOopq02OEelIWB3c2LdUDN0muxQaMoJ/udV
+   s=;
+X-IronPort-AV: E=Sophos;i="6.15,247,1739836800"; 
+   d="scan'208";a="14492000"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 01:21:04 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:26008]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.114:2525] with esmtp (Farcaster)
+ id d49f810d-507d-44aa-8b15-f206d11125a2; Tue, 29 Apr 2025 01:21:03 +0000 (UTC)
+X-Farcaster-Flow-ID: d49f810d-507d-44aa-8b15-f206d11125a2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 29 Apr 2025 01:21:02 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.170.247) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 29 Apr 2025 01:20:59 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <yi1.lai@linux.intel.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzkaller-bugs@googlegroups.com>, <yi1.lai@intel.com>
+Subject: Re: [PATCH v3 net-next 03/15] ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
+Date: Mon, 28 Apr 2025 18:20:36 -0700
+Message-ID: <20250429012052.58601-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <aBAcKDEFoN/LntBF@ly-workstation>
+References: <aBAcKDEFoN/LntBF@ly-workstation>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428081744.52375-2-jiayuan.chen@linux.dev>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Apr 28, 2025 at 04:16:52PM +0800, Jiayuan Chen wrote:
-> +bpf_sk_skb_set_redirect_cpu()
-> +^^^^^^^^^^^^^^^^^^^^^^
-> +.. code-block:: c
-> +
-> +    int bpf_sk_skb_set_redirect_cpu(struct __sk_buff *s, int redir_cpu)
-> +
-> +This kfunc ``bpf_sk_skb_set_redirect_cpu()`` is available to
-> +``BPF_PROG_TYPE_SK_SKB`` BPF programs. It sets the CPU affinity, allowing the
-> +sockmap packet redirecting process to run on the specified CPU as much as
-> +possible, helping users reduce the interference between the sockmap redirecting
-> +background thread and other threads.
-> +
+From: "Lai, Yi" <yi1.lai@linux.intel.com>
+Date: Tue, 29 Apr 2025 08:24:08 +0800
+> Hi Kuniyuki Iwashima,
+> 
+> Greetings!
+> 
+> I used Syzkaller and found that there is KASAN: use-after-free Read in ip6_route_info_create in linux-next tag - next-20250428.
+> 
+> After bisection and the first bad commit is:
+> "
+> fa76c1674f2e ipv6: Move some validation from ip6_route_info_create() to rtm_to_fib6_config().
+> "
+> 
+> All detailed into can be found at:
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create
+> Syzkaller repro code:
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create/repro.c
+> Syzkaller repro syscall steps:
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create/repro.prog
+> Syzkaller report:
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create/repro.report
+> Kconfig(make olddefconfig):
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create/kconfig_origin
+> Bisect info:
+> https://github.com/laifryiee/syzkaller_logs/tree/main/250429_005622_ip6_route_info_create/bisect_info.log
+> bzImage:
+> https://github.com/laifryiee/syzkaller_logs/raw/refs/heads/main/250429_005622_ip6_route_info_create/bzImage_33035b665157558254b3c21c3f049fd728e72368
+> Issue dmesg:
+> https://github.com/laifryiee/syzkaller_logs/blob/main/250429_005622_ip6_route_info_create/33035b665157558254b3c21c3f049fd728e72368_dmesg.log
+> 
+> "
+> [   17.307248] ==================================================================
+> [   17.307611] BUG: KASAN: slab-use-after-free in ip6_route_info_create+0xb84/0xc30
+> [   17.307993] Read of size 1 at addr ffff8880100b8a94 by task repro/727
+> [   17.308291] 
+> [   17.308389] CPU: 0 UID: 0 PID: 727 Comm: repro Not tainted 6.15.0-rc4-next-20250428-33035b665157 #1 PREEMPT(voluntary) 
+> [   17.308397] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> [   17.308405] Call Trace:
+> [   17.308412]  <TASK>
+> [   17.308414]  dump_stack_lvl+0xea/0x150
+> [   17.308439]  print_report+0xce/0x660
+> [   17.308469]  ? ip6_route_info_create+0xb84/0xc30
+> [   17.308475]  ? kasan_complete_mode_report_info+0x80/0x200
+> [   17.308482]  ? ip6_route_info_create+0xb84/0xc30
+> [   17.308489]  kasan_report+0xd6/0x110
+> [   17.308496]  ? ip6_route_info_create+0xb84/0xc30
+> [   17.308504]  __asan_report_load1_noabort+0x18/0x20
+> [   17.308509]  ip6_route_info_create+0xb84/0xc30
+> [   17.308516]  ip6_route_add+0x32/0x320
+> [   17.308524]  ipv6_route_ioctl+0x414/0x5a0
 
-I am wondering if it is a better idea to use BPF_MAP_TYPE_CPUMAP for
-redirection here instead? Like we did for bpf_redirect_map(). At least
-we would not need to store CPU in psock with this approach.
+Thanks for the report.
 
-Thanks.
+It seems I accidentally removed validation from the ioctl path,
+not sure why I missed the path...
+
+Will post a fix soon.
 
