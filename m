@@ -1,493 +1,399 @@
-Return-Path: <netdev+bounces-186880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2462AA3B69
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 00:27:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1386BAA3B77
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 00:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEACC7B4126
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:25:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5700F7AC7D2
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50F72749ED;
-	Tue, 29 Apr 2025 22:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D612749CA;
+	Tue, 29 Apr 2025 22:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KuwOcnqz"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="KGXMAr0w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020098.outbound.protection.outlook.com [52.101.193.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E2E26B96E
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 22:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745965620; cv=none; b=MT5uqfX5IA3xTeZan4/mI7TmGbnVCplH9WYuHPsuBMzTIl8SGOLBhHiV4901GQTc2KeKEm86i+VIUCKmA0pg1LmCh5HFjcP3+mwbvr453tWfAvtaOjoBz0XdkUlh0J8707GBHPM3TSMSI1Rpm89Pdv0mnP4rVLQ5mFRBtLYnnXY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745965620; c=relaxed/simple;
-	bh=P19oN3TSB41Zb9Rp2rMUpEqqjsH9knNLQf/ODY+iQEQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V8tR8lR0o9uUqiAblT8B3idxHaentdosVj7BSCuR5iKOdZclF8fih4Gt5OM3auAFPNMLEytNKwSOOGywutaYbd06r6r8Ps3LRJ0UtMobrldbU0KmBNaZyJBXjJKWDQrWJ+LF8UogbM7sk5d2VYVV4C0/7PYWIqAUTQ+Tb/EZ87Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KuwOcnqz; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-309c6e43a9aso10007912a91.2
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 15:26:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3132326B96E;
+	Tue, 29 Apr 2025 22:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745965691; cv=fail; b=ijQPKnujsT1NDWy/Z8xObTpyZTGK7StHJnwcLrTdfmZvDrnWXdyJYCrSjE+fJsxDxogqtAxp0lLhLoi9M5rceJY1iJVaPx4xjdn7UQGLBCP06t05g+PW+074vkEsXQrRl1+YSBpwGpeZGb030CySWbilDa/QGX2Rvrvb07RoKrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745965691; c=relaxed/simple;
+	bh=CzZGjD12dtlZF6dKLg6UGFjiN2JRbWsaXB5eK7KteZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pRw13X74xcn/uLtgbbhErI+0NHhWh8Aw5yp5Uss/3RymvXp0RtcL3OAJfuyJFYG9GeKfM3IIDaOQoRqR9zLFeOVvAW+BYlWRDVJ95AcVMe5HRMQjET87ma/HFC4woCPPwogFpKfR2oAbQ//e3drWThkSAkEMj+/xLwDwsNPJIyA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=KGXMAr0w; arc=fail smtp.client-ip=52.101.193.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JvtVTC0DTk4iunpnsyrmxvuQT/YiPWWM4HhqBowGpd+H0JWLSOtwj2ilpc9/agHycSJcSuhLwyrhJQK7CRgTMDWYokHCUpHzGxzhFPTkzOQtjmNMztVW2VZKUnNrXxUbKA0KUOScQ8dyLAe8PW5QSpTbDfg1MEwDyaj7HB+yLBWsiQVmxwf1rRqmXKsvnxdGkr+1Cw9TVqfYpFtteqzj3i91L7/0lpUh6HyKKJwJEAbk/eV/yh6JE0/E0Rbcmzrp2rRtGMfPTsnLYHw4rC/aKPKSxhp5QeS7Qa+TcqRru//HcUhK7L3b6bpnhwaKWwINWV+pcM5jJ9GaJtX2ofrKNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CcakV7H3DUcH7Jk2gq4ShC1QJwbXwk4gT8Uf7XnjHgU=;
+ b=af55+giPbklZpCWZEYEqqcH4aBgp45c7ys8sMe1Xw9MyYQ1xf5Eq5rvsW7qDdBnovzlrSc1WttwtlWlYDT804dDv6MuDQyqx/WajUS187FffC2nlcV/0FsV9Ia9XjlU7VqYApDOSDZPBnKrRJIKEwKqMCzJuI0NgwkuY/YTrHaqTc5R/d8aTxCC8qq5e1MdpHMFwwRF5TIPD/af1sIU1QpnEOya2tG6sHuRJ9rrqaQUKLWr77Ga+VGiIp3hMOuh1IJn4LN8/KoSE5R9xQ6RhR1SvPgLuzMSf3MD4ktw/k0h/GJAtTrO6kvOdc7FpdWsqPpOB0gODLH2ZyExkRwx9Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745965618; x=1746570418; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MYojEMOzYbDBNQaXXNQDx0qi67ucH9z/J6brMAnDm2A=;
-        b=KuwOcnqz7fXT3ZQlMZP4uTARcMMFLsGouJjkerrv4ynn5d+42gWebOkaFeNk/y+UWU
-         NYq5uNZTbQzHRGdRwlFrWnsaZqXMaY9n45TAztGWpqbIbACHtH4YDuSXOm2bNs+lw49w
-         AzE3xHeFH5NOO31lPnck37REDBdpz30oj8AezLd/cDar2r90ymL8Xl4YvmwYtLx1T3FX
-         EB/y6KTGGbBr3Zb00il8xG4U2F3XPGrTJeU8s8LjG+6d4Npg96tYKQ6BeqJ5lFwrLt1Y
-         2PFIOMHqHDER+kSTlncZtgOunKNL440+tVeDsaom8zyG48QgL//oDDOSIAo60DJoFUrn
-         2fFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745965618; x=1746570418;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MYojEMOzYbDBNQaXXNQDx0qi67ucH9z/J6brMAnDm2A=;
-        b=SLqcHOps7TLY7NO0dGM7VrijQjpmx0GJjSMsuw1csdEz22DmZq0QKqmnvNudF66q5h
-         MQoBZteANTOqVVWovbpPMGAFGf4JZh3NjqM6vuK6gMwMtsZiIInpmdzFiFmC/erPG9pF
-         34lisS9Zvjx0AkCR7+4Ka/DZGdA9VaCrksJYT50AQXn1OF63+SZac8ulyJigoWFDhE2I
-         cIdNi3pKRUWFUPtkFFO+vEqyETOMzIIj6nHhQ0+e4qHJZ59Cku70cWwnr8LIIIytlER4
-         dmBtw0z9jZLwmDoIpbGmL9ZoZgS9KnqakuSfAWGep3pzwDwFa1DYRzvbquuXAPWxmkD2
-         UhVg==
-X-Gm-Message-State: AOJu0Ywk1jwh8kqKwginMzidtS4UtgAy9ptLCkzjz1aop0TQL/lGywm9
-	YGlnyYmOaCg0MGi5lT/0MMXeZsOLaqxFUb+vnrnmT2iVd5pVzIRhLHzxREZa/xhKzd8OI/bA6kW
-	2xQ0/LMaMzQ==
-X-Google-Smtp-Source: AGHT+IG/qN45nQ9othtPkoxH9YDurHLv+DjwfVAfvvMrc8VLCrpCG/Gg0c+zj+Bd5fZn5WB9XBCIRE/nST45MQ==
-X-Received: from pjj13.prod.google.com ([2002:a17:90b:554d:b0:2fa:1803:2f9f])
- (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:4984:b0:2ff:58b8:5c46 with SMTP id 98e67ed59e1d1-30a344025abmr514554a91.8.1745965618206;
- Tue, 29 Apr 2025 15:26:58 -0700 (PDT)
-Date: Tue, 29 Apr 2025 22:26:56 +0000
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CcakV7H3DUcH7Jk2gq4ShC1QJwbXwk4gT8Uf7XnjHgU=;
+ b=KGXMAr0wIYygiztZBSCgCyPpGUKfQzSiQzkih53JuJ8v3ruNkmsn9nVK7kBtOuORGPSKy+84Ga0OBimzmUJl5lpiRwfmbb7jKvyb7bek3GE5+eybOsSakplqxHklRqRzr43PJ8XVpV9tgjBvlNNrbUdYyLYsAJoAUrTWAskTJis=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from BN3PR01MB9212.prod.exchangelabs.com (2603:10b6:408:2cb::8) by
+ SA3PR01MB8016.prod.exchangelabs.com (2603:10b6:806:318::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8678.33; Tue, 29 Apr 2025 22:28:05 +0000
+Received: from BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::3513:ad6e:208c:5dbd]) by BN3PR01MB9212.prod.exchangelabs.com
+ ([fe80::3513:ad6e:208c:5dbd%5]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
+ 22:28:05 +0000
+From: admiyo@os.amperecomputing.com
+To:
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: [PATCH net-next v21 0/1] MCTP Over PCC Transport
+Date: Tue, 29 Apr 2025 18:27:57 -0400
+Message-ID: <20250429222759.138627-1-admiyo@os.amperecomputing.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR07CA0062.namprd07.prod.outlook.com
+ (2603:10b6:a03:60::39) To BN3PR01MB9212.prod.exchangelabs.com
+ (2603:10b6:408:2cb::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.901.g37484f566f-goog
-Message-ID: <20250429222656.936279-1-skhawaja@google.com>
-Subject: [PATCH net-next v6] Add support to set napi threaded for individual napi
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, jdamato@fastly.com, mkarsten@uwaterloo.ca
-Cc: netdev@vger.kernel.org, skhawaja@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PR01MB9212:EE_|SA3PR01MB8016:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54a52ad2-61fb-457a-1615-08dd876d1c6b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|7416014|366016|10070799003|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7mAuAyM8TDD5tNhmzLd40/jk8jVwcdaYcJRQNjEqB/hMchVrc06MdmbuBq4n?=
+ =?us-ascii?Q?2E9tEY3i0z06oHZub9yTvN8B2a9u1lTkb3CQHCpz5W0YcGAhlRey7frCBCY8?=
+ =?us-ascii?Q?BlfSggeg4+Fo8j8Xbf6U/awxbvJ+xxFgrAF5CMNpyPnt9TV36qNacuLeaChA?=
+ =?us-ascii?Q?eVZWcQ0H5EVat4mge8MHwH2qvuKnznmQF0uPkJblyiJUraN2RVgDrzohv1zm?=
+ =?us-ascii?Q?JrUPUSGX30Wgp2hZ9f+W9I9e69mDcgUaia01oCiN7R6FIZpDzLSCETx/535v?=
+ =?us-ascii?Q?YW1p6oXBF5lwmcGv8onY88eaxk5G+IpTfJ+mFxsD+hTVIeKfftybEEQXnUpC?=
+ =?us-ascii?Q?Nmnr0oO6eF15FRdhYQ40F67uefIRhLOG7EYOaL7H+1NhKZ8HxyvS7YQyo6wX?=
+ =?us-ascii?Q?S/LHR8db9zI+121IzYuM+VxQXRYDnXnmkvm6PQuNRxxr0serX+X80VkV3dfd?=
+ =?us-ascii?Q?Fm0Ia7LUSRe5O+hy8mct6BXjyNsC5yPERNjIvXJsbrMsTfHVknE2N2aFcc9+?=
+ =?us-ascii?Q?q4MI/zJq06ABssscOv3Xwt3QkugoVS6MbEvjJMf77waywUMaaUoFb88U4Jv9?=
+ =?us-ascii?Q?ZVE7xxKpDWyKgNB8Hj4lxDaoOYqWRG7iEKU7IoCP1k92oDXHvc2+ddj+er8U?=
+ =?us-ascii?Q?YITJzx2RrNqVHpKRauagrx9oJxy9x9lxvCUNQSqpdevczyu0vrEvf4Oy0w3O?=
+ =?us-ascii?Q?sHcB+nnCpZDH0Y1lWRpqmA4APOW0objXP4QOTnbcVX4x0rJhnyEyL7VNHsAE?=
+ =?us-ascii?Q?m2jU/ynIH0qaotBb8L9s8UuRcInjJc3mT2caxDrtM3CThRLJTzmtc6cv6Mri?=
+ =?us-ascii?Q?ieNfrqy17YDJFfzud/HTukp99CdvsZeXsa1bAQQpU37c4V0HCVxJ0x6OPC8Y?=
+ =?us-ascii?Q?6kISNoZNlhZi3+A51UlK6IQzUhMP+qstUF35pyre7CxhV8prLHdgAfDIg+7u?=
+ =?us-ascii?Q?IfRcCBJj63iPFh/bLk4aP4YtZbWDNZRjNjVL5FfU7uqK39NwrRyt/80i8JmT?=
+ =?us-ascii?Q?M7fhb9HAYx6qKEcZoxLrlT+tuiJbRDN7e7MQ51Bhb6kq6gIVtWmH5Z7kD4P4?=
+ =?us-ascii?Q?esJfD+IJzA2O1nUlB94NXKWYVIP/rD+VydmDjOtcVyS3JVQoeY9IoG3A/ZXo?=
+ =?us-ascii?Q?6yti3cBjkFf1m2zzid/VOtvFCUccEB3mRYIvOOmyQgw983wgljWdLqv/n1nb?=
+ =?us-ascii?Q?4VRx0xVMWcUw5V9Jog2OhOJQFzAVWh0c45KwUEAkCD8fMvU9oEzkTJOy90IC?=
+ =?us-ascii?Q?C6q6Doco8HuJ5hWar20qmHVENcPRWjhICnj4O/IQ/a613MUcYS7EwxuP1HKO?=
+ =?us-ascii?Q?6JSQO9m91K6VwBDLsEGTRuT0lHN1j2HJMyEaCXgL3sNkkusI6RWhC69lDCxK?=
+ =?us-ascii?Q?z3g7bO0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN3PR01MB9212.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(366016)(10070799003)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NrIPF+jR+ZuDi1bdTgpebR253l+6dFYs1DsXRNe3dr0vJw9ol4OAE2jrcFwA?=
+ =?us-ascii?Q?GsMy/Zq9MDNDw7ibwbmqFpOoWtrBm+dePn4si2uS6i1Y1ivxsG+tO6pKu3AK?=
+ =?us-ascii?Q?VemvjrRBzgP2pmWEc5n8LRyj1+aTIRIkxBOepI6OQAtU0W3mc1QiRR89G81+?=
+ =?us-ascii?Q?xhztb4bmov6geldCnFMbvXTwxq54yBQ/U9W2a8JhFqzHJk9yzu4tdokpiqya?=
+ =?us-ascii?Q?Pl6BERnpMBaRlKr7hlLq1mOrzp9TeJUHozIVWGXJv41CODFF1jleqIVnePJ2?=
+ =?us-ascii?Q?QLX1bOBtGCSrgB6FWEmLLoDke4OsJrKkzPE7TOM80nIot1W3kx+t1IUC4S1m?=
+ =?us-ascii?Q?QmGGV0njxmjImDjAPgq0hy6BCvvlFqFNIJmTtEjVETxIqzdWmO8vpYZ8Hdl9?=
+ =?us-ascii?Q?5Av4movbfjZMwo0lSk7DtXulvxWec+y33pCnasDuC1OCEtR+FYkbQ8UIEy/g?=
+ =?us-ascii?Q?01XVXZ758Zm5pqvMAzLjsKvxqpzbT0+Gfp1SRVU0YBCQ7XDC48GWQLRCOfUO?=
+ =?us-ascii?Q?78aewb/qThpufCWiCFgJNsMmAv295ucQ545cfa+zzIafn1vvtvL1pVXKKGtg?=
+ =?us-ascii?Q?TS3f1w6n3EeUIrWCWxSAQcoTB3P//kgTkmuns5OHCh/yyucinTd0uEwjrxPK?=
+ =?us-ascii?Q?rTlT59SF7ncU6VAV6ILbqZk5ek/Dz1BFCwLamjGnvh4mz5HGYusFrLY06XtY?=
+ =?us-ascii?Q?CSlVar/hVJTzknA0ZLCAWXWaEOh1QxsCyy4KuoTHFiNWGhPgItlDENtwWKG4?=
+ =?us-ascii?Q?YvE4VOhQeZ1/s4vRgCgi5ozeiJA3OBLuOiJ/H6LS+2uJd5yWQRmXS5Sw+nhT?=
+ =?us-ascii?Q?t2lVnO5QsaNB9oljVgGgT2wWSPimsvohd6tgb9nzaUBGVOHEPa0KdbiUlWCX?=
+ =?us-ascii?Q?irHxhKVohFZAxkFb2I5WkZ/HwATDjAQ1x5xxLQbThPRjqhXIomTFwDByWUtl?=
+ =?us-ascii?Q?Zq08IrHeP0H5KMrdqgEfBntq792q2ru6PvL8SYp0j2uXyqEtiY+MjOFKPA1B?=
+ =?us-ascii?Q?8hAlV4m2vzpm4BjfzDJeyUltyl5lutt1iYXU2pKUbCtnF9YTgulNNnAbKhEF?=
+ =?us-ascii?Q?AjERW1IiXzMhqz+WJ3m8ArX81gJsuQ7ry6JRRwsd2g7KuJTcbf26O78ufdM/?=
+ =?us-ascii?Q?Cf54hJtS6ueTMg31rZipF4qHZ/WsB6SwGBWlZSLZLahLfzTb+WCtx3CSN2Kc?=
+ =?us-ascii?Q?k3FlRX+RooAjiBXWz5ezDb2oNl2svpBiv1gD0sCsgKFmgS6RK/UHjIoTU8cx?=
+ =?us-ascii?Q?M0dt0kV3Ss04+q41L68C5Hk4B1QWP8h90cn388H/6lMj9mK04FF2B1K1rprA?=
+ =?us-ascii?Q?Q4qFz/70wb3nz6DU5rXRilTtZVTEZKHRcq6bMOSpy/P1vc68OYPI6rkT5heQ?=
+ =?us-ascii?Q?YK5HWM05p7g3J15UN/4/zHYt/pRg0HDWbRR+Ws1FArDdW6IEAsWIBdKYarYA?=
+ =?us-ascii?Q?NobWl3Ub5OsfMeN1PL0BVGsq1eGAh24Q8YvdB1jSA2+EAszuLtmb0t54Aiz5?=
+ =?us-ascii?Q?k7xHiDpFFJ+PgJOJ5JJzLkaqWt44exCRv7/F8XRoXBOED0+/tmeLjpTNalxC?=
+ =?us-ascii?Q?o41MUYZhv3ibDAGopy0xAsUKcuZc21V7ziONYNN3ypB0SmkGlhdDtmDLJ0is?=
+ =?us-ascii?Q?1IKKH5OtaAzS6fIdf+zol+wFgLXxSfgIcEgXLCRK/cj09WtaPGe/u19W8s29?=
+ =?us-ascii?Q?Ouego8NbS11Uy9U6eFAvGMADvBg=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54a52ad2-61fb-457a-1615-08dd876d1c6b
+X-MS-Exchange-CrossTenant-AuthSource: BN3PR01MB9212.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 22:28:05.7240
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lEYWKNRw5FuLumErJKIxzsmj+8nkcjhQSbUX9pODFrdeWLX5Y0qEZqIi7AAgxZhTzokOHodr5ZiCi/m/ssa85ydkA7a4LaBJnmVuHC6A3j1uJq+pos8no+jgW2o4rlvs
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR01MB8016
 
-A net device has a threaded sysctl that can be used to enable threaded
-napi polling on all of the NAPI contexts under that device. Allow
-enabling threaded napi polling at individual napi level using netlink.
+From: Adam Young <admiyo@os.amperecomputing.com>
 
-Extend the netlink operation `napi-set` and allow setting the threaded
-attribute of a NAPI. This will enable the threaded polling on a napi
-context.
+This series adds support for the Management Control Transport Protocol (MCTP)
+over the Platform Communication Channel (PCC) mechanism.
 
-Add a test in `nl_netdev.py` that verifies various cases of threaded
-napi being set at napi and at device level.
+DMTF DSP:0292
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
 
-Tested
- ./tools/testing/selftests/net/nl_netdev.py
- TAP version 13
- 1..6
- ok 1 nl_netdev.empty_check
- ok 2 nl_netdev.lo_check
- ok 3 nl_netdev.page_pool_check
- ok 4 nl_netdev.napi_list_check
- ok 5 nl_netdev.napi_set_threaded
- ok 6 nl_netdev.nsim_rxq_reset_down
- # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
+MCTP defines a communication model intended to
+facilitate communication between Management controllers
+and other management controllers, and between Management
+controllers and management devices
 
-v6:
- - Set the threaded property at device level even if the currently set
-   value is same. This is to override any per napi settings. Update
-   selftest to verify this scenario.
- - Use u8 instead of uint in netdev_nl_napi_set_config implementation.
- - Extend the selftest to verify the existing behaviour that the PID
-   stays valid once threaded napi is enabled. It stays valid even after
-   disabling the threaded napi. Also verify that the same kthread(PID)
-   is reused when threaded napi is enabled again. Will keep this
-   behaviour as based on the discussion on v5.
+PCC is a mechanism for communication between components within
+the  Platform.  It is a composed of shared memory regions,
+interrupt registers, and status registers.
 
-v5:
- - This patch was part of:
- https://lore.kernel.org/netdev/Z92e2kCYXQ_RsrJh@LQ3V64L9R2/T/
- It is being sent separately for the first time.
- - Change threaded attribute type to uint
- - Set napi threaded state when set at napi level. When set at device
-   level overwrite the state of each napi. This is the `write all`
-   symantics that is also followed by other configurations.
- - Add a test to verify `write all` symantics.
+The MCTP over PCC driver makes use of two PCC channels. For
+sending messages, it uses a Type 3 channel, and for receiving
+messages it uses the paired Type 4 channel.  The device
+and corresponding channels are specified via ACPI.
 
-Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
----
- Documentation/netlink/specs/netdev.yaml  | 10 +++
- Documentation/networking/napi.rst        | 13 +++-
- include/linux/netdevice.h                |  1 +
- include/uapi/linux/netdev.h              |  1 +
- net/core/dev.c                           | 26 ++++++-
- net/core/dev.h                           | 20 ++++++
- net/core/netdev-genl-gen.c               |  5 +-
- net/core/netdev-genl.c                   | 10 +++
- tools/include/uapi/linux/netdev.h        |  1 +
- tools/testing/selftests/net/nl_netdev.py | 89 +++++++++++++++++++++++-
- 10 files changed, 169 insertions(+), 7 deletions(-)
+The first patch in the series implements a mechanism to allow the driver
+to indicate whether an ACK should be sent back to the caller
+after processing the interrupt.  This is an optional feature in
+the PCC code, but has been made explicitly required in another driver.
+The implementation here maintains the backwards compatibility of that
+driver.
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index f5e0750ab71d..c9d190fe1f05 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -280,6 +280,14 @@ attribute-sets:
-         doc: The timeout, in nanoseconds, of how long to suspend irq
-              processing, if event polling finds events
-         type: uint
-+      -
-+        name: threaded
-+        doc: Whether the napi is configured to operate in threaded polling
-+             mode. If this is set to `1` then the NAPI context operates
-+             in threaded polling mode.
-+        type: uint
-+        checks:
-+          max: 1
-   -
-     name: xsk-info
-     attributes: []
-@@ -691,6 +699,7 @@ operations:
-             - defer-hard-irqs
-             - gro-flush-timeout
-             - irq-suspend-timeout
-+            - threaded
-       dump:
-         request:
-           attributes:
-@@ -743,6 +752,7 @@ operations:
-             - defer-hard-irqs
-             - gro-flush-timeout
-             - irq-suspend-timeout
-+            - threaded
- 
- kernel-family:
-   headers: [ "net/netdev_netlink.h"]
-diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
-index d0e3953cae6a..63f98c05860f 100644
---- a/Documentation/networking/napi.rst
-+++ b/Documentation/networking/napi.rst
-@@ -444,7 +444,18 @@ dependent). The NAPI instance IDs will be assigned in the opposite
- order than the process IDs of the kernel threads.
- 
- Threaded NAPI is controlled by writing 0/1 to the ``threaded`` file in
--netdev's sysfs directory.
-+netdev's sysfs directory. It can also be enabled for a specific napi using
-+netlink interface.
-+
-+For example, using the script:
-+
-+.. code-block:: bash
-+
-+  $ kernel-source/tools/net/ynl/pyynl/cli.py \
-+            --spec Documentation/netlink/specs/netdev.yaml \
-+            --do napi-set \
-+            --json='{"id": 66,
-+                     "threaded": 1}'
- 
- .. rubric:: Footnotes
- 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d8544f6a680c..3817720e8b24 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -369,6 +369,7 @@ struct napi_config {
- 	u64 irq_suspend_timeout;
- 	u32 defer_hard_irqs;
- 	cpumask_t affinity_mask;
-+	bool threaded;
- 	unsigned int napi_id;
- };
- 
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 7600bf62dbdf..fac1b8ffeb55 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -134,6 +134,7 @@ enum {
- 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
- 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
- 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+	NETDEV_A_NAPI_THREADED,
- 
- 	__NETDEV_A_NAPI_MAX,
- 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d0563ddff6ca..4197bfaf2c33 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6888,6 +6888,27 @@ static enum hrtimer_restart napi_watchdog(struct hrtimer *timer)
- 	return HRTIMER_NORESTART;
- }
- 
-+int napi_set_threaded(struct napi_struct *napi, bool threaded)
-+{
-+	if (threaded) {
-+		if (!napi->thread) {
-+			int err = napi_kthread_create(napi);
-+
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	if (napi->config)
-+		napi->config->threaded = threaded;
-+
-+	/* Make sure kthread is created before THREADED bit is set. */
-+	smp_mb__before_atomic();
-+	assign_bit(NAPI_STATE_THREADED, &napi->state, threaded);
-+
-+	return 0;
-+}
-+
- int dev_set_threaded(struct net_device *dev, bool threaded)
- {
- 	struct napi_struct *napi;
-@@ -6895,9 +6916,6 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
- 
- 	netdev_assert_locked_or_invisible(dev);
- 
--	if (dev->threaded == threaded)
--		return 0;
--
- 	if (threaded) {
- 		list_for_each_entry(napi, &dev->napi_list, dev_list) {
- 			if (!napi->thread) {
-@@ -7144,6 +7162,8 @@ static void napi_restore_config(struct napi_struct *n)
- 		napi_hash_add(n);
- 		n->config->napi_id = n->napi_id;
- 	}
-+
-+	napi_set_threaded(n, n->config->threaded);
- }
- 
- static void napi_save_config(struct napi_struct *n)
-diff --git a/net/core/dev.h b/net/core/dev.h
-index e93f36b7ddf3..b50d118ad014 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -315,6 +315,26 @@ static inline void napi_set_irq_suspend_timeout(struct napi_struct *n,
- 	WRITE_ONCE(n->irq_suspend_timeout, timeout);
- }
- 
-+/**
-+ * napi_get_threaded - get the napi threaded state
-+ * @n: napi struct to get the threaded state from
-+ *
-+ * Return: the per-NAPI threaded state.
-+ */
-+static inline bool napi_get_threaded(struct napi_struct *n)
-+{
-+	return test_bit(NAPI_STATE_THREADED, &n->state);
-+}
-+
-+/**
-+ * napi_set_threaded - set napi threaded state
-+ * @n: napi struct to set the threaded state on
-+ * @threaded: whether this napi does threaded polling
-+ *
-+ * Return 0 on success and negative errno on failure.
-+ */
-+int napi_set_threaded(struct napi_struct *n, bool threaded);
-+
- int rps_cpumask_housekeeping(struct cpumask *mask);
- 
- #if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 739f7b6506a6..2791b6b232fa 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -92,11 +92,12 @@ static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_FD + 1]
- };
- 
- /* NETDEV_CMD_NAPI_SET - do */
--static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT + 1] = {
-+static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_THREADED + 1] = {
- 	[NETDEV_A_NAPI_ID] = { .type = NLA_U32, },
- 	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_napi_defer_hard_irqs_range),
- 	[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .type = NLA_UINT, },
- 	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
-+	[NETDEV_A_NAPI_THREADED] = NLA_POLICY_MAX(NLA_UINT, 1),
- };
- 
- /* Ops table for netdev */
-@@ -187,7 +188,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.cmd		= NETDEV_CMD_NAPI_SET,
- 		.doit		= netdev_nl_napi_set_doit,
- 		.policy		= netdev_napi_set_nl_policy,
--		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+		.maxattr	= NETDEV_A_NAPI_THREADED,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
- };
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index b64c614a00c4..60bad7a23c94 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -184,6 +184,10 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
- 		goto nla_put_failure;
- 
-+	if (nla_put_uint(rsp, NETDEV_A_NAPI_THREADED,
-+			 napi_get_threaded(napi)))
-+		goto nla_put_failure;
-+
- 	if (napi->thread) {
- 		pid = task_pid_nr(napi->thread);
- 		if (nla_put_u32(rsp, NETDEV_A_NAPI_PID, pid))
-@@ -322,8 +326,14 @@ netdev_nl_napi_set_config(struct napi_struct *napi, struct genl_info *info)
- {
- 	u64 irq_suspend_timeout = 0;
- 	u64 gro_flush_timeout = 0;
-+	u8 threaded = 0;
- 	u32 defer = 0;
- 
-+	if (info->attrs[NETDEV_A_NAPI_THREADED]) {
-+		threaded = nla_get_u8(info->attrs[NETDEV_A_NAPI_THREADED]);
-+		napi_set_threaded(napi, !!threaded);
-+	}
-+
- 	if (info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]) {
- 		defer = nla_get_u32(info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]);
- 		napi_set_defer_hard_irqs(napi, defer);
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 7600bf62dbdf..fac1b8ffeb55 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -134,6 +134,7 @@ enum {
- 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
- 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
- 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
-+	NETDEV_A_NAPI_THREADED,
- 
- 	__NETDEV_A_NAPI_MAX,
- 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
-index beaee5e4e2aa..79379b94491f 100755
---- a/tools/testing/selftests/net/nl_netdev.py
-+++ b/tools/testing/selftests/net/nl_netdev.py
-@@ -2,6 +2,7 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- import time
-+from os import system
- from lib.py import ksft_run, ksft_exit, ksft_pr
- from lib.py import ksft_eq, ksft_ge, ksft_busy_wait
- from lib.py import NetdevFamily, NetdevSimDev, ip
-@@ -34,6 +35,92 @@ def napi_list_check(nf) -> None:
-                 ksft_eq(len(napis), 100,
-                         comment=f"queue count after reset queue {q} mode {i}")
- 
-+def napi_set_threaded(nf) -> None:
-+    """
-+    Test that verifies various cases of napi threaded
-+    set and unset at napi and device level.
-+    """
-+    with NetdevSimDev(queue_count=2) as nsimdev:
-+        nsim = nsimdev.nsims[0]
-+
-+        ip(f"link set dev {nsim.ifname} up")
-+
-+        napis = nf.napi_get({'ifindex': nsim.ifindex}, dump=True)
-+        ksft_eq(len(napis), 2)
-+
-+        napi0_id = napis[0]['id']
-+        napi1_id = napis[1]['id']
-+
-+        # set napi threaded and verify
-+        nf.napi_set({'id': napi0_id, 'threaded': 1})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+
-+        ip(f"link set dev {nsim.ifname} down")
-+        ip(f"link set dev {nsim.ifname} up")
-+
-+        # verify if napi threaded is still set
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        # save napi0 pid
-+        napi0_pid = napi0['pid']
-+
-+        # unset napi threaded and verify
-+        nf.napi_set({'id': napi0_id, 'threaded': 0})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0['pid'], napi0_pid)
-+
-+        # set napi threaded for napi0
-+        nf.napi_set({'id': napi0_id, 'threaded': 1})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+
-+        # check it is not set for napi1
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1.get('pid'), None)
-+
-+        # set threaded at device level
-+        system(f"echo 1 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is set for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_eq(napi0['pid'], napi0_pid)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 1)
-+
-+        # save napi1 pid
-+        napi1_pid = napi1['pid']
-+
-+        # unset threaded at device level
-+        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is unset for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0['pid'], napi0_pid)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1['pid'], napi1_pid)
-+
-+        # set napi threaded for napi0
-+        nf.napi_set({'id': napi0_id, 'threaded': 1})
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 1)
-+        ksft_eq(napi0['pid'], napi0_pid)
-+
-+        # unset threaded at device level
-+        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
-+
-+        # check napi threaded is unset for both napis
-+        napi0 = nf.napi_get({'id': napi0_id})
-+        ksft_eq(napi0['threaded'], 0)
-+        ksft_eq(napi0['pid'], napi0_pid)
-+        napi1 = nf.napi_get({'id': napi1_id})
-+        ksft_eq(napi1['threaded'], 0)
-+        ksft_eq(napi1['pid'], napi1_pid)
- 
- def nsim_rxq_reset_down(nf) -> None:
-     """
-@@ -122,7 +209,7 @@ def page_pool_check(nf) -> None:
- def main() -> None:
-     nf = NetdevFamily()
-     ksft_run([empty_check, lo_check, page_pool_check, napi_list_check,
--              nsim_rxq_reset_down],
-+              napi_set_threaded, nsim_rxq_reset_down],
-              args=(nf, ))
-     ksft_exit()
- 
+MCTP is a general purpose  protocol so  it would  be impossible to enumerate
+all the use cases, but some of the ones that are most topical are attestation
+and RAS support.  There are a handful of protocols built on top of MCTP, to
+include PLDM and SPDM, both specified by the DMTF.
 
-base-commit: b65999e7238e6f2a48dc77c8c2109c48318ff41b
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0240_1.0.0.pdf
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.3.0.pd
+
+SPDM entails various usages, including device identity collection, device
+authentication, measurement collection, and device secure session establishment.
+
+PLDM is more likely to be used  for hardware support: temperature, voltage, or
+fan sensor control.
+
+At least two companies have devices that can make use of the mechanism. One is
+Ampere Computing, my employer.
+
+The mechanism it uses is called Platform Communication Channels is part of the
+ACPI spec: https://uefi.org/htmlspecs/ACPI_Spec_6_4_html/14_Platform_Communications_Channel/Platform_Comm_Channel.html
+
+Since it is a socket interface, the system administrator also has  the ability
+to ignore an MCTP link that they do not want to enable.  This link would be visible
+to the end user, but would not be usable.
+
+If MCTP support is disabled in the Kernel, this driver would also be disabled.
+
+PCC is based on a shared buffer and a set of I/O mapped memory locations that the
+Spec calls registers.  This mechanism exists regardless of the existence of the
+driver. Thus, if the user has the ability to map these  physical location to
+virtual locations, they have the ability to drive the hardware.  Thus, there
+is a security aspect to this mechanism that extends beyond the responsibilities
+of the operating system.
+
+If the hardware does not expose the PCC in the ACPI table, this device will never
+be enabled.  Thus it is only an issue on hard that does support PCC.  In that case,
+it is up to the remote controller to sanitize communication; MCTP will be exposed
+as a socket interface, and userland can send any crafted packet it wants.  It would
+thus also be incumbent on the hardware manufacturer to allow the end user to disable
+MCTP over PCC communication if they did not want to expose it.
+
+Previous Version:
+https://lore.kernel.org/lkml/20250423220142.635223-1-admiyo@os.amperecomputing.com/
+
+Changes in V21:
+- Use existing constants PCC_SIGNATURE and PCC_CMD_COMPLETION_NOTIFY
+- Check return code on call to send_data and drop packet if failed
+- use sizeof(*mctp_pcc_header) etc,  instead of structs for resizing buffers
+- simplify check for ares->type != PCC_DWORD_TYPE
+- simply return result devm_add_action_or_reset
+- reduce initializer for  mctp_pcc_lookup_context context = {};
+- move initialization of mbox dev into mctp_pcc_initialize_mailbox
+- minor spacing changes
+
+Changes in V20:
+- corrected typo in RFC version
+- removed spurious space
+- tx spin lock only controls access to shared memory buffer
+- tx spin lock not eheld on error condition
+- tx returns OK if skb can't be expanded
+
+Changes in V19:
+- Rebased on changes to PCC mailbox handling
+- checks for cloned SKB prior to transmission
+- converted doulbe slash comments to C comments
+
+Changes in V18:
+- Added Acked-By
+- Fix minor spacing issue
+
+Changes in V17:
+- No new changes. Rebased on net-next post 6.13 release.
+
+Changes in V16:
+- do not duplicate cleanup after devm_add_action_or_reset calls
+
+Changes in V15:
+- corrected indentation formatting error
+- Corrected TABS issue in MAINTAINER entry
+
+Changes in V14:
+- Do not attempt to unregister a netdev that is never registered
+- Added MAINTAINER entry
+
+Changes in V13:
+- Explicitly Convert PCC header from little endian to machine native
+
+Changes in V12:
+- Explicitly use little endian conversion for PCC header signature
+- Builds clean with make C=1
+
+Changes in V11:
+- Explicitly use little endian types for PCC header
+
+Changes in V11:
+- Switch Big Endian data types to machine local for PCC header
+- use mctp specific function for registering netdev
+
+Changes in V10:
+- sync with net-next branch
+- use dstats helper functions
+- remove duplicate drop stat
+- remove more double spaces
+
+Changes in V9:
+- Prerequisite patch for PCC mailbox has been merged
+- Stats collection now use helper functions
+- many double spaces reduced to single
+
+Changes in V8:
+- change 0 to NULL for pointer check of shmem
+- add semi for static version of pcc_mbox_ioremap
+- convert pcc_mbox_ioremap function to static inline when client code is not being built
+- remove shmem comment from struct pcc_chan_info descriptor
+- copy rx_dropped in mctp_pcc_net_stats
+- removed trailing newline on error message
+- removed double space in dev_dbg string
+- use big endian for header members
+- Fix use full spec ID in description
+- Fix typo in file description
+- Form the complete outbound message in the sk_buff
+
+Changes in V7:
+- Removed the Hardware address as specification is not published.
+- Map the shared buffer in the mailbox and share the mapped region with the driver
+- Use the sk_buff memory to prepare the message before copying to shared region
+
+Changes in V6:
+- Removed patch for ACPICA code that has merged
+- Includes the hardware address in the network device
+- Converted all device resources to devm resources
+- Removed mctp_pcc_driver_remove function
+- uses acpi_driver_module for initialization
+- created helper structure for in and out mailboxes
+- Consolidated code for initializing mailboxes in the add_device function
+- Added specification references
+- Removed duplicate constant PCC_ACK_FLAG_MASK
+- Use the MCTP_SIGNATURE_LENGTH define
+- made naming of header structs consistent
+- use sizeof local variables for offset calculations
+- prefix structure name to avoid potential clash
+- removed unnecessary null initialization from acpi_device_id
+
+Changes in V5
+- Removed Owner field from ACPI module declaration
+- removed unused next field from struct mctp_pcc_ndev
+- Corrected logic reading  RX ACK flag.
+- Added comment for struct pcc_chan_info field shmem_base_addr
+- check against current mtu instead of max mtu for packet length\
+- removed unnecessary lookups of pnd->mdev.dev
+
+Changes in V4
+- Read flags out of shared buffer to trigger ACK for Type 4 RX
+- Remove list of netdevs and cleanup from devices only
+- tag PCCT protocol headers as little endian
+- Remove unused constants
+
+Changes in V3
+- removed unused header
+- removed spurious space
+- removed spurious semis after functiomns
+- removed null assignment for init
+- remove redundant set of device on skb
+- tabify constant declarations
+- added  rtnl_link_stats64 function
+- set MTU to minimum to start
+- clean up logic on driver removal
+- remove cast on void * assignment
+- call cleanup function directly
+- check received length before allocating skb
+- introduce symbolic constatn for ACK FLAG MASK
+- symbolic constant for PCC header flag.
+- Add namespace ID to PCC magic
+- replaced readls with copy from io of PCC header
+- replaced custom modules init and cleanup with ACPI version
+
+Changes in V2
+
+- All Variable Declarations are in reverse Xmass Tree Format
+- All Checkpatch Warnings Are Fixed
+- Removed Dead code
+- Added packet tx/rx stats
+- Removed network physical address.  This is still in
+  disucssion in the spec, and will be added once there
+  is consensus. The protocol can be used with out it.
+  This also lead to the removal of the Big Endian
+  conversions.
+- Avoided using non volatile pointers in copy to and from io space
+- Reorderd the patches to put the ACK check for the PCC Mailbox
+  as a pre-requisite.  The corresponding change for the MCTP
+  driver has been inlined in the main patch.
+- Replaced magic numbers with constants, fixed typos, and other
+  minor changes from code review.
+
+Adam Young (1):
+  mctp pcc: Implement MCTP over PCC Transport
+
+ MAINTAINERS                 |   5 +
+ drivers/net/mctp/Kconfig    |  13 ++
+ drivers/net/mctp/Makefile   |   1 +
+ drivers/net/mctp/mctp-pcc.c | 305 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 324 insertions(+)
+ create mode 100644 drivers/net/mctp/mctp-pcc.c
+
 -- 
-2.49.0.850.g28803427d3-goog
+2.43.0
 
 
