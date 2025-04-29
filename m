@@ -1,129 +1,88 @@
-Return-Path: <netdev+bounces-186797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8605DAA11C6
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:43:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D422AA12B2
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 160B31B658A3
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:43:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCD91BA412F
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7D6243364;
-	Tue, 29 Apr 2025 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F166E253F34;
+	Tue, 29 Apr 2025 16:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q32lQCkF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMCcA1od"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD43242D6E;
-	Tue, 29 Apr 2025 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92932522A2;
+	Tue, 29 Apr 2025 16:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745945006; cv=none; b=KNV0GHq9ZKXxOrBMKnetuFAhOhKME29cJpP5txBIg2H5eI3TGnJa2e6kecC4G6h0wjLAVXCk6rMBwZjk6UiugvR4ECgPN9LRxXcaXk2ocnl7BcaHpT/OlSNCIq2cgDl7kTJ1C/PCcz5uhXCKXxvbbvUc3nNJE4r6uHs+OA3xNzE=
+	t=1745945666; cv=none; b=Z3O7aTpGnkhYtbC9AEkvtaxUjVHuFzalLGhhWh8V/HQ8gLFQBdoZuPEUqvWkntKfialJ5as+/zSXNfdKOcLzsYEO0D/Qn4ERRGbU5vTsLTsY1g5T159EQHgWvvoF3M8Yy3gOpcED71ZrB9+QlJ81bxpFmM6wQ89V85Q18eUQe48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745945006; c=relaxed/simple;
-	bh=v4HYRW3IdUqTT2QWf/d9Tt5mMI3zidThP9+8m01Fppc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WmTv2x1AUeXbhh2YgvLdrnbukkMHeQgFPzQlIfPN017UK0bWvXwbRdzVsMh/PZAvriWKw9aGOgJn/+3nu3lub4UhZmDTXegs77Kmy8JTIgY2cEWZW/ldte+VreNvxpkNcDHZcdaz12ZGeToAVSB2XwcnQSN8z1VS3N0/XMUlXc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q32lQCkF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEABC4CEE3;
-	Tue, 29 Apr 2025 16:43:25 +0000 (UTC)
+	s=arc-20240116; t=1745945666; c=relaxed/simple;
+	bh=AdoYyKISP36xJeQD9woyN2YEZghocYxvykppZ9AflqU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fr8mieE96j94cMt/wnYY8R/S/ztsNGL0vBCqyrlyDP2EutBbj6Q2a9AUwzcIITeFS5czrogRg6++i97KY1ursM37ITSqqxdObZkTB5AINYh1IjVi1aMaTBMCdPJQxtPthmspeSowrfLtBrtW4BeEwX33REfTe31oJe8w9n8Fwk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMCcA1od; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9792FC4CEF7;
+	Tue, 29 Apr 2025 16:54:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745945006;
-	bh=v4HYRW3IdUqTT2QWf/d9Tt5mMI3zidThP9+8m01Fppc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=q32lQCkFNSkYeE2Pyl+ZWmnc95ZLWQ2abEqGokSsfHwhlwSEmhvRIgWIO7xm144ff
-	 /nokDyZx1nnXW378xCZAhlxEVsP0Ls3BhPNRWk+AtWDVb+F4wtGsu67IkRDr8+ogDf
-	 VYJ015xR2haIikjqbNZg0TKtCO7sMnLk+SY7YkZHU4+H02tFd11F7tzcO+fNLIsmh4
-	 N6NJkdEIdlw5aDu1v+UmDlQm8fITG9UVX9mdcnKZZ573Su1qcFVn549TUcM7AbdnDS
-	 POZ6USkiv0nSNrfSQlKNT5Rv6v/kYmY1fuhix4cS5J8HUsqfQBzP1dv+pjkEPQUHP/
-	 ier68dPLY3w/Q==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	virtualization@lists.linux.dev,
-	minhquangbui99@gmail.com
-Subject: [PATCH net] virtio-net: free xsk_buffs on error in virtnet_xsk_pool_enable()
-Date: Tue, 29 Apr 2025 09:43:23 -0700
-Message-ID: <20250429164323.2637891-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1745945666;
+	bh=AdoYyKISP36xJeQD9woyN2YEZghocYxvykppZ9AflqU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oMCcA1ody40ilGXC0Qybb7DD6sqJxB52dAXTz8M0wbK6IB+bf8EDHo+zzXnykV1B2
+	 ZI1MDHferuz/WYILmf64MfVy+QwDtMwoK9hJu5FENIHEjcHPdsmJr8V+2NcyUZWQR/
+	 Zdf6orSEajxT7dZqQA6CDJXGCy0o17kNrAxtAudher8AP/WyxvfA6LVxGJvT4OZ6pS
+	 0bIxAIDtB15QnFrdc3oEUAdhVzZGoHIszrH1ZT2KmV1CIzLZA5KlnpXlD58F78ji4B
+	 Ov8zQU6zZvoTI9gS8fwNBEguGszOBuHXgZ+V74f8H1IwxjKGkr04VtKNjQAL2PJNdg
+	 FAAdjY9cCvHBQ==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac2a81e41e3so1117676566b.1;
+        Tue, 29 Apr 2025 09:54:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVA6wy6LKyHIWE/uLdFhDoQrCh21Q5Mq21OOZjzan7z8Xv56yoO3P18NBME+R++5GiL8NmCnayM@vger.kernel.org, AJvYcCVQs0Y9bFooAFPxEFfnw5zELioFUW3uMJHjSt5bZmCwuTe54h65WT9JohIEQePN/4ebNRAuF9xeYgU6ASA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/eRoh90BjKxmXTGKInplZgFI7V+d58WIIZZZMvtX1s4LZotwv
+	3ZRkDqcjn7h5rKsMnV6zuJitYB3Qjvl30qFamazsi7gyPpC8ZUbUyZUakSQKC5Q8ECbSiScqXNs
+	1s3gtPcdFgEOBeeJTBvcR6T/Lf/E=
+X-Google-Smtp-Source: AGHT+IG7skFkYmrh78r3PBufunbwFhCyH6bMAAQyF6iwtL4SiSNbNImHJcW3bMTneYB2TP8fzRb2vISMbXZRWbUX/Vo=
+X-Received: by 2002:a17:907:3d0d:b0:ac7:eb12:dc69 with SMTP id
+ a640c23a62f3a-acedc6226e0mr11217966b.28.1745945665026; Tue, 29 Apr 2025
+ 09:54:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250428105657.3283130-1-wei.fang@nxp.com> <20250428105657.3283130-6-wei.fang@nxp.com>
+In-Reply-To: <20250428105657.3283130-6-wei.fang@nxp.com>
+From: Timur Tabi <timur@kernel.org>
+Date: Tue, 29 Apr 2025 11:53:47 -0500
+X-Gmail-Original-Message-ID: <CAOZdJXWxX6BKqt8=z-dWNO15AunjbhNBkSi5Cpfx6Dn3Yw4BaQ@mail.gmail.com>
+X-Gm-Features: ATxdqUH2vDIYWUftzeH4CwoDWqiZzAE9yKFOOu8ghijiqo79WRaU9jaZG_afqrM
+Message-ID: <CAOZdJXWxX6BKqt8=z-dWNO15AunjbhNBkSi5Cpfx6Dn3Yw4BaQ@mail.gmail.com>
+Subject: Re: [PATCH v6 net-next 05/14] net: enetc: add debugfs interface to
+ dump MAC filter
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, christophe.leroy@csgroup.eu, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The selftests added to our CI by Bui Quang Minh recently reveals
-that there is a mem leak on the error path of virtnet_xsk_pool_enable():
+On Mon, Apr 28, 2025 at 6:19=E2=80=AFAM Wei Fang <wei.fang@nxp.com> wrote:
+> +void enetc_remove_debugfs(struct enetc_si *si)
+> +{
+> +       debugfs_remove_recursive(si->debugfs_root);
 
-unreferenced object 0xffff88800a68a000 (size 2048):
-  comm "xdp_helper", pid 318, jiffies 4294692778
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 0):
-    __kvmalloc_node_noprof+0x402/0x570
-    virtnet_xsk_pool_enable+0x293/0x6a0 (drivers/net/virtio_net.c:5882)
-    xp_assign_dev+0x369/0x670 (net/xdp/xsk_buff_pool.c:226)
-    xsk_bind+0x6a5/0x1ae0
-    __sys_bind+0x15e/0x230
-    __x64_sys_bind+0x72/0xb0
-    do_syscall_64+0xc1/0x1d0
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+You can just call debugfs_remove() here.  debugfs_remove_recursive()
+is deprecated:
 
-Fixes: e9f3962441c0 ("virtio_net: xsk: rx: support fill with xsk buffer")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: mst@redhat.com
-CC: jasowang@redhat.com
-CC: xuanzhuo@linux.alibaba.com
-CC: eperezma@redhat.com
-CC: hawk@kernel.org
-CC: john.fastabend@gmail.com
-CC: virtualization@lists.linux.dev
-CC: minhquangbui99@gmail.com
----
- drivers/net/virtio_net.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 848fab51dfa1..a3d4e666c2a0 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -5886,7 +5886,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
- 	hdr_dma = virtqueue_dma_map_single_attrs(sq->vq, &xsk_hdr, vi->hdr_len,
- 						 DMA_TO_DEVICE, 0);
- 	if (virtqueue_dma_mapping_error(sq->vq, hdr_dma))
--		return -ENOMEM;
-+		goto err_free_buffs;
- 
- 	err = xsk_pool_dma_map(pool, dma_dev, 0);
- 	if (err)
-@@ -5914,6 +5914,8 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
- err_xsk_map:
- 	virtqueue_dma_unmap_single_attrs(rq->vq, hdr_dma, vi->hdr_len,
- 					 DMA_TO_DEVICE, 0);
-+err_free_buffs:
-+	kvfree(rq->xsk_buffs);
- 	return err;
- }
- 
--- 
-2.49.0
-
+void debugfs_remove(struct dentry *dentry);
+#define debugfs_remove_recursive debugfs_remove
 
