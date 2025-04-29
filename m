@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-186843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074C4AA1BF0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:18:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3988AA1BF3
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:18:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4709A5CD0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:17:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21DE21BA7B91
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75007265628;
-	Tue, 29 Apr 2025 20:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E32D267B85;
+	Tue, 29 Apr 2025 20:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDtx6dYH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdipxO7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A503E262813;
-	Tue, 29 Apr 2025 20:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7879F263F30;
+	Tue, 29 Apr 2025 20:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745957853; cv=none; b=D5e7Knq81IDU7YqmyCNEdSujEiPQdkwK38HGae2a8objOshlmGcwZAuL/Rua0KZoZFZOx7Yx/gh/3Wr2SUvV41TpzCGY+PV4thUu1MzsXwarSXATj5j4eqYBq35qBwnxunx8pwEu9quHkPptURL0Usf+o4+J3u8cun3zpvvaoAI=
+	t=1745957854; cv=none; b=BlgrP+7K0YGT9XwI5Bi1vj99fMGJKljSgDcn16j3/a5u02sqxlr8dcMdK9sbYDv9kZAc5mwApbn2R1T2bc821BMqvvZAH/YpTHVE1FoMz3hJ0pqGvz16h+qxCGKMu8XKBE/hrXE8PZCp+cYDLgcQYq9BbyNWsOSKO+fgD1YVt78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745957853; c=relaxed/simple;
-	bh=nDXJMRI8RRGWu/sT7bwwt2Ds1ltVyY2w1KlKeqFxM3g=;
+	s=arc-20240116; t=1745957854; c=relaxed/simple;
+	bh=VPHjNFmaazifb+K6wHzWOxmAQtWD4cFqQPpv0T7UAro=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VvJllRTu0/6aT/BqOoQuC79e/LnPw3NieELjxiiq7+R3s82CR64U0lbXntBO3NOaRdFndDh1NDq2Fs6wduy0C7IJHYpnHGjfVHsWUMqIXAYNECbxnpx1Wt8pF38ew3g4I3HGRETpEXjOAGxT/H4jPUcfGI5GgT+V3DG9WxQtQqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDtx6dYH; arc=none smtp.client-ip=209.85.167.47
+	 MIME-Version; b=e24YG4WytLzEftRxwjTKoKw8r6Gx+k6DjRCk78cuIz3ZaoJsdMj7bRPeEQQ6XRhWPa08MtirXrujB306i1qacy2NbEX+cueWQpA7K3WQI5YvXnvBdkZOSDG7HXj4q7ajExZaZ5ZWbfkHhKO1Y6SUZAfnUcgnjevpcUKUUlaywdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdipxO7w; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54af20849adso221586e87.1;
-        Tue, 29 Apr 2025 13:17:31 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso1402800166b.0;
+        Tue, 29 Apr 2025 13:17:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745957850; x=1746562650; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745957851; x=1746562651; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NvC51MQbZRhHiX+q/EfkjiAsnNDHuxTQtXPBubp72ME=;
-        b=DDtx6dYHC0U9tp5jUUr+PEO8sf8QQAtCjGDUsSlxxU0S3oCtD9Fm8S6tCLjBsuMUV4
-         7kS3WWc41HUcmSkyIfFT0YyxKCecTHUJVUKyjPLou8iE+DK5RSGto//PcFQd6+aGGYKB
-         hbV68tAeUorViEnIU7BNRLPi/ob7Mc7zn/0RHlYOQli1vXQWTMD9RUGR0g8T+XKxwPE9
-         hvuYVivhCJe/UqX1tcRxMoPAQ271KezoRIDa9ivEeyyfWBA62+WKC6/1mHQ7KPLL6tdO
-         UEyBbBu4G+GwW/eWa1w4+D1/Z0IAHPMJQkCT4BWW/eEEYCTFQ85wWEGGyPVEa+cq2r9Q
-         gF8A==
+        bh=tI5IVVmmMWscuzX6mqYN0L5taOLHq280xXdP7NoKx4w=;
+        b=YdipxO7wwXsjfHVOhpnGWzVLCHwExjp54X/jekBoTtK4b3JWtu1sfKA986HjCuOYN4
+         dJfnAWfqagOxniC6wgO8CvfpndvCDzeo7Atfhr6BSamasnNQ7utjzaJoJuhU/KoJGc6V
+         giqwzw62EhueRV2eUDz5LwncpPm60JhPBNBVxtpcQA7Z7/gMaefNm444e1ka6rfoPBbU
+         OxvfAIhRcR3FYH8f90bZ7lNDSJqi+RKp3Hb0Ey3E69IBvVINlGv8uYnP8WznwpW4Fb2V
+         yyJeGGCqow6SUKcBubCwFV2a/rSjabi3uOoKoU8hvJaJ5Bk8929TxFsADV2ecoB1DkwA
+         STeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745957850; x=1746562650;
+        d=1e100.net; s=20230601; t=1745957851; x=1746562651;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NvC51MQbZRhHiX+q/EfkjiAsnNDHuxTQtXPBubp72ME=;
-        b=RbeD9I/Ryj67yzOH+F0h2K6+v+hKnV/nrhzcwfKUPOLgKwOpMAqtVngGihVPP62hcA
-         y4WdFR8cDkD1XAaqtyeO0cEcSNDAKsLqKJUd8BFsLeNbMFqPBAkHUU9Irx+wOmxBHcIO
-         u5R+umccSb1BiFVnNBfbE6gVdXO4PZP7Bgm9eHSIt9PlJ89VtyFSSueP8CIfo70nojtG
-         NXJNzbsOGY7CXugF0YNWuHl2mYcJjOeTQz2USYNNzPsZJy+OETcADaPL6AaL7SL64hib
-         0gr7U0tvVI4ip+x3gCIMvIsU/5uo/R7vNfFLQMReDY/MUbiysdCNqUGxTwA4Uc8OnaCP
-         /kIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqIpuvGnaKSvZT9Xbjjwt8rgbDtoJBLD+aoN5Lowx+WWYlCC7NZ1gPoxGET7/c5TCFBSvf9vr3Ol9aniM=@vger.kernel.org, AJvYcCWmDeUT2n+Rur1BT5YQjePpIqXxiHCzJmNXzyYkE8RNT4JftTX8qMwnJz0Dfo94EeXY1C81mg98@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkMUc4Y3T6MLIJDXHqR2ObVPK3CeBShQJsNWiM2vwpFr49xBXd
-	HkssR7BAQgPOk+bpvZQXokZwhgIh8wQuzmOgvLbzw643KSih72Oy
-X-Gm-Gg: ASbGnctx3BIYpJNhux3SCrcjLTUnujKKKs8D8wU/FBpEls+ahzf7GVo5Ofu+pLzF9M3
-	lCGjHBwe7w8eLCAUTqX+YvYLInXqA+Bicny81swtB6cmeNB0GumtQptJ8DMHWIYBNmivnh+p2zs
-	j3Z+95BEdXT3u057BM68eJ7JT5/7ItkVucKz5MEOqouSd8gNbD8mBPdWzBhy890hmiTP31nf7Cz
-	8N8CQjuqaH7vnZWUZXq+Yo5PdTdt5WDgd3QNWyo2+VfEo3LDAMva9pXVOv8NPkyrQpEQ2R9JQAe
-	i4YWvnNwBPYk7qY/Qd7VIPT3U2LVSQrY3kC9MYOMOFa53dU5Z37VloVspCn8wVX+mtYywTol1KQ
-	wMA7VDDlZmDTnZdNPeyg=
-X-Google-Smtp-Source: AGHT+IHIFuMg7jyYSGFsgMUD8LxKFxpwMNtRJOSrhtWUD8EnDztxeTKPlXhm8J16TdWRJem+yP+ADw==
-X-Received: by 2002:a05:6512:2206:b0:549:94c4:9f01 with SMTP id 2adb3069b0e04-54ea37d22cbmr80804e87.6.1745957849339;
-        Tue, 29 Apr 2025 13:17:29 -0700 (PDT)
+        bh=tI5IVVmmMWscuzX6mqYN0L5taOLHq280xXdP7NoKx4w=;
+        b=nDojN/IVg5uILp5Rou9a+PqP49k7S64r55j4HWEM2/jlxmE6552rMI8dXWMwmi9uwI
+         BOFQ+NNstdk9847WFBbs7uo80Tpfmd9pTOYL8CK4YKNRUiTZ1E+Nj4F6ZPs/CFd3lPoA
+         JFwyu8Ok+1iBc3iuPhYWRFe/YA3cK8rliouPMaA8rNJLIgmYaw20nwGjMJ965Wm1JwqH
+         GAN1VI9CR4gy+fV+Bluu25GkM+FcBIcJizVtXLG4HfuIFp528MJLX71BdwEixXANtsC6
+         7psvHo3EYjDEU3Wfr3L8rC0/o3lcpMWRbO7Xn3tgejFLE6VsHKNM7j/V4PR3HCIjbnHB
+         4oTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUj5WNZ9FskJ3kDz1qV/7wtuGZNdYtqqY4eIap8EgcfkNQqnmqKV68JIYdoeO069njLfS7oePdm@vger.kernel.org, AJvYcCXPeAqT/4NHRpbKIuO4Dr2OuJPGuwUTe1bh5lqRxdsNC7WfPZbLvFu4JrwTS2wMoGIPqh+l/sNg9WNeKik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMXBk7fxmtDT1h10JZhCmobnBKG8sScdZ79eaeT922UDDxRTgK
+	8W1MWdxLzb1bzrSvovRkHrsW2VgoffO+rxjd49E0a31yOUBqzWAE
+X-Gm-Gg: ASbGncs3pqw6RRloSu/cMAQERHrA1VEdghBqKLU4rvcDV1RRX5d5aiSIwECSUb4Zu3f
+	tZNvFG1yq3ThboGvp+LC4kugueh1z74WA1Dwd7dnAu692BfP4fTJ4qTiFrgLsuqBmXx+MPajQpI
+	VnCCAvki+Z/3ik2jwVqfiywaEsl7jS+lQZ5Y6tdkW9eEkOlRmd59vozYnU7G0pnawoaQvEorxl5
+	m/U59KQ0AZmtO/ElWtNjSYcuxt7wehFmfFSdo6HM7zTLqzVpa7JrjLGha5M+SAhU88ka/J1AVDV
+	j1T8d7T2oxjjTnHPNaBq3JGuru0jJcPxDZHtEATh+UjX+Wl9s1/jKa8QH5VcgYzeLCic/ZX1bKK
+	3IsVKzaLR6quBUBVumOM=
+X-Google-Smtp-Source: AGHT+IHnd+ayfnOME7pGWyrc+45sfFNXyd6LeRpU4Hei6WSpO5/z7+NbUYnxSoFUbSe6KH3aCc1pvw==
+X-Received: by 2002:a17:907:3e05:b0:ac7:322d:779c with SMTP id a640c23a62f3a-acedc793324mr63478566b.50.1745957850521;
+        Tue, 29 Apr 2025 13:17:30 -0700 (PDT)
 Received: from localhost (dslb-002-205-023-067.002.205.pools.vodafone-ip.de. [2.205.23.67])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f703831b5csm7863022a12.65.2025.04.29.13.17.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ecf8603sm819056066b.112.2025.04.29.13.17.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 13:17:27 -0700 (PDT)
+        Tue, 29 Apr 2025 13:17:30 -0700 (PDT)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -86,9 +86,9 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 01/11] net: dsa: b53: allow leaky reserved multicast
-Date: Tue, 29 Apr 2025 22:17:00 +0200
-Message-ID: <20250429201710.330937-2-jonas.gorski@gmail.com>
+Subject: [PATCH net 02/11] net: dsa: b53: keep CPU port always tagged again
+Date: Tue, 29 Apr 2025 22:17:01 +0200
+Message-ID: <20250429201710.330937-3-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250429201710.330937-1-jonas.gorski@gmail.com>
 References: <20250429201710.330937-1-jonas.gorski@gmail.com>
@@ -100,42 +100,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow reserved multicast to ignore VLAN membership so STP and other
-management protocols work without a PVID VLAN configured when using a
-vlan aware bridge.
+The Broadcom management header does not carry the original VLAN tag
+state information, just the ingress port, so for untagged frames we do
+not know from which VLAN they originated.
 
-Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitch")
+Therefore keep the CPU port always tagged except for VLAN 0.
+
+Fixes the following setup:
+
+$ ip link add br0 type bridge vlan_filtering 1
+$ ip link set sw1p1 master br0
+$ bridge vlan add dev br0 pvid untagged self
+$ ip link add sw1p2.10 link sw1p2 type vlan id 10
+
+Where VID 10 would stay untagged on the CPU port.
+
+Fixes: 2c32a3d3c233 ("net: dsa: b53: Do not force CPU to be always tagged")
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/dsa/b53/b53_common.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index e5ba71897906..62866165ad03 100644
+index 62866165ad03..9d4fb54b4ced 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -373,9 +373,11 @@ static void b53_enable_vlan(struct b53_device *dev, int port, bool enable,
- 		b53_read8(dev, B53_VLAN_PAGE, B53_VLAN_CTRL5, &vc5);
- 	}
+@@ -1135,6 +1135,11 @@ static int b53_setup(struct dsa_switch *ds)
+ 	 */
+ 	ds->untag_bridge_pvid = dev->tag_protocol == DSA_TAG_PROTO_NONE;
  
-+	vc1 &= ~VC1_RX_MCST_FWD_EN;
++	/* The switch does not tell us the original VLAN for untagged
++	 * packets, so keep the CPU port always tagged.
++	 */
++	ds->untag_vlan_aware_bridge_pvid = true;
 +
- 	if (enable) {
- 		vc0 |= VC0_VLAN_EN | VC0_VID_CHK_EN | VC0_VID_HASH_VID;
--		vc1 |= VC1_RX_MCST_UNTAG_EN | VC1_RX_MCST_FWD_EN;
-+		vc1 |= VC1_RX_MCST_UNTAG_EN;
- 		vc4 &= ~VC4_ING_VID_CHECK_MASK;
- 		if (enable_filtering) {
- 			vc4 |= VC4_ING_VID_VIO_DROP << VC4_ING_VID_CHECK_S;
-@@ -393,7 +395,7 @@ static void b53_enable_vlan(struct b53_device *dev, int port, bool enable,
+ 	ret = b53_reset_switch(dev);
+ 	if (ret) {
+ 		dev_err(ds->dev, "failed to reset switch\n");
+@@ -1545,6 +1550,9 @@ int b53_vlan_add(struct dsa_switch *ds, int port,
+ 	if (vlan->vid == 0 && vlan->vid == b53_default_pvid(dev))
+ 		untagged = true;
  
- 	} else {
- 		vc0 &= ~(VC0_VLAN_EN | VC0_VID_CHK_EN | VC0_VID_HASH_VID);
--		vc1 &= ~(VC1_RX_MCST_UNTAG_EN | VC1_RX_MCST_FWD_EN);
-+		vc1 &= ~VC1_RX_MCST_UNTAG_EN;
- 		vc4 &= ~VC4_ING_VID_CHECK_MASK;
- 		vc5 &= ~VC5_DROP_VTABLE_MISS;
- 
++	if (vlan->vid > 0 && dsa_is_cpu_port(ds, port))
++		untagged = false;
++
+ 	vl->members |= BIT(port);
+ 	if (untagged && !b53_vlan_port_needs_forced_tagged(ds, port))
+ 		vl->untag |= BIT(port);
 -- 
 2.43.0
 
