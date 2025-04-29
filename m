@@ -1,171 +1,172 @@
-Return-Path: <netdev+bounces-186659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1BC9AA0379
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:35:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7318DAA03B5
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:48:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232C01B629FE
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 06:35:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5740B3B3564
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 06:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D66D2741B2;
-	Tue, 29 Apr 2025 06:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60565275105;
+	Tue, 29 Apr 2025 06:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="VjXzgqO9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iyT3/HZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12705D2FB
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 06:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CD6184E
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 06:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745908529; cv=none; b=c2vuYCmWLsbsksMN9R5O2XHiiebZf1weH+bixY/5mfXxkkzIU0sJefIivohW10zFM443/YbDEDpDgJPM0oTevGzfEUbkeAvVdWVqhL59RvwZsFOduA3NuYDtIZues0BFiKhj4eMKKAzcbtS0qb4Y54ve6/xBAvrg4Eozsi2kfpU=
+	t=1745909314; cv=none; b=Z+SEEAptr+lpR/45EabbmUtIGLgw/NG7EfBbWOF1v2iiy82FqyOxED1Y/KbB7xQHoCaiaK+doKrZVGzs3KHkjNV8rzh2rgJymZjf3PSeUzTp/VOvzE817yXLthtWwogbFkNhgDjKtOEVAcW/ixzY7a1MuK8ZaLWz2BFT9p1UlXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745908529; c=relaxed/simple;
-	bh=fNSISWcNIZYbU8tYTE7rnlYgAI8Ecdmlmw9BWxFFeIk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=OuGDtRHh4Xm70Sq7ssXLlHaV7b1lR3V5JdOXpCuJCXmluuhJaVXiObQgdeCChLGtFk5l7j6CqXlXRByNRPVM+zCRoLf17hSyfQ9HGSuGKo0GEWwnu7RILN72961bZ3u1LbEX05WgjL9KWSY3KcJVje0YqvMuRqm0DeGqzYQFi6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=VjXzgqO9 reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=KqvZnnpkFjCC2LY4Q0EVBasUocpU9UqNnZaWKy0Drlk=; b=V
-	jXzgqO96zyephE+DU7TZ7bt2T9YcIuK9BcamQrFHzRb4YDFODZspVYzvKJujzB6D
-	dqOTsrfuE4zacIJtz0xped3iGXqpNjliKJEwsUv4pJJRQYQPgIPF4IJ88kSUFtyZ
-	2UY4IcU8Q8VsI0nR1jJ/P4po2oPmpVIVktx+iI9dXY=
-Received: from slark_xiao$163.com (
- [2409:895b:3824:282e:cc72:e4a1:8587:694a] ) by ajax-webmail-wmsvr-40-122
- (Coremail) ; Tue, 29 Apr 2025 14:34:04 +0800 (CST)
-Date: Tue, 29 Apr 2025 14:34:04 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Muhammad Nuzaihan Kamal Luddin" <zaihan@unrealasia.net>
-Cc: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>,
-	"Loic Poulain" <loic.poulain@oss.qualcomm.com>,
-	"Johannes Berg" <johannes@sipsolutions.net>,
-	"Andrew Lunn" <andrew+netdev@lunn.ch>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"David S Miller" <davem@davemloft.net>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Abeni Paolo" <pabeni@redhat.com>, netdev@vger.kernel.org,
-	"Qiang Yu" <quic_qianyu@quicinc.com>,
-	"Manivannan Sadhasivam" <manivannan.sadhasivam@linaro.org>,
-	"Johan Hovold" <johan@kernel.org>
-Subject: Re:Re: [RFC PATCH 4/6] net: wwan: add NMEA port support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
- Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <4D47E70F-D3F3-4EB6-8AE0-D50452865E58@unrealasia.net>
-References: <7aed94ce.2dca.1967b8257af.Coremail.slark_xiao@163.com>
- <4D47E70F-D3F3-4EB6-8AE0-D50452865E58@unrealasia.net>
-X-NTES-SC: AL_Qu2fB/Wbt0wv4iKaZ+kfmkkXg+c4XsW5vfwu1IVRPJp+jDHp9iknZmVSJXHU1+O0LB6ImgmGUQlT2PxKeKJCdaMaFThJe3LXOEtucDiyLaJpvQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1745909314; c=relaxed/simple;
+	bh=9CyJ9vrui2u8M8iSVZFuwmIfqoRlB9IonBcSStjHu8I=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AOpNgIHZbyDh0qWePWocm1eDuLFpJKj6fWfPDpn5OvoDP2wwqR7P12uC3Ofyvwp8nMRL5gifRkU85WYYaX9pHe9Bhfaw8So7CxxT+Ssd2hInGMZI6eFa1kNi98cZElnN7qg6H/bBqQWhjlaNS4QKgVtFXsitejIZJAJoFwDvpig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iyT3/HZg; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-877d7fa49e0so2011942241.2
+        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 23:48:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745909310; x=1746514110; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sXi/SUjRC6MuKQgZypsU6mTKwVzFc0J4r/au1GEfB6U=;
+        b=iyT3/HZgpiqmf7DF03di20xDkVBEbYu1C+QZNAiQqhAxDSO1UPEhw+NA4Vxa2dIWy7
+         4cbL3hUzveYTlhwcg1p7NcPt1aC2/MPVmnkzmGkron4plEboNAkRtvOSV/WNE9XIMjSt
+         xwv9+t2G58DRlPMGB0XPLbeVWgaxNyP9R9Z18PHhcY/7G2uchOLIfpYPA7iWVTNqTY7I
+         rU6bP5s/WorU6jmn2JTB7DDtIZQ/HmjH7xBjtOAYsfxXsaqnRCXQLXDI2mcnpnvsx7fH
+         QU/oCryrlLo+gsFKibT94x5udjn1HVT9XJXpo1FRPxhCq0C0iQc46eUwbXA/DrOzGpSt
+         D3vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745909310; x=1746514110;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sXi/SUjRC6MuKQgZypsU6mTKwVzFc0J4r/au1GEfB6U=;
+        b=pZToVwG/MSZ1MK2dpZwXan38xQ4Ku+on6/DaXwNFmvauoDdZk1VDnJ1J6rUYzqfYwe
+         PAe6hIJwpjlcmTlkpeWFqnn0S2Agitc93M44Mzy8UYIhV8qDsxFgYMK1D77DSvFFRPgi
+         taVqfqDrX3hfhdJTwMgaGdLjX28jW5uEyspPUsq60SmfHE4B09C3yIIbYOZEbPjaQG47
+         Qw8FiGIm2x7JSbU7oQWX4A39TtA2s5eAlbFGAZG5UPeBYEkiBN7syaSJKj0jXMDGordZ
+         F8t7ygKp/RWtJ9QAgfiwlQPRRg6wjrOVYD//9chRap5zcEYT4TwqPQOi6+CtDpAvyQgc
+         o/FQ==
+X-Gm-Message-State: AOJu0YxDlgU9v5sQIHQK3VdC+WrXSx0xGiGzzzN0rd2ACV61nK35UbzK
+	4aeD6/PVLX9nTycmJAs39z2lvPMv8tMwTrp9SvqbQk0WRxmaTjV/BpP9nnsmJB/NoFR83rBg+1t
+	rkDZ3PdE2ohu8PEhnrPJOU2ha6UGwU6rqryFJOrsrR7FwXZa3DY4=
+X-Gm-Gg: ASbGncu52NXw9BNqewymTurTW8HbWJ5L7IIJyzHZsGBGWU6nEFyTExaF13GUHdLclPi
+	pcjskfNNjZZamGNYdD9Z/vP2I3MSk2TrvSRy8mMislLjl2+CklCLhQgKZOVnXqOjg9/6VyRHXq7
+	JH7hTjKFkZA1Yr2L0VN+IUbxXUAjpcq4DygdZEAuDGAA53AgTMiefYaW8=
+X-Google-Smtp-Source: AGHT+IE/wW4rey32KhYXnxm7YMuvinzWZGvhxBn7qZf2ls6SaJNTx93pWcEcAKsoRl631YWuZ2kxHHUmOj06rOZzMfs=
+X-Received: by 2002:a05:6102:3f12:b0:4c1:71b6:6c with SMTP id
+ ada2fe7eead31-4da7f52f85cmr1891727137.7.1745909309952; Mon, 28 Apr 2025
+ 23:48:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1127dc09.55cb.1968040ac46.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:eigvCgBHz8HdchBogx+hAA--.32279W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiMBE9ZGgP9bFnlgACso
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 29 Apr 2025 12:18:18 +0530
+X-Gm-Features: ATxdqUFl-SyW1AweGtS7b9hyai4LUeaBQ5GoyXRjUVKMKKGjw-9Kv4VCa9Ay_TE
+Message-ID: <CA+G9fYs+7-Jut2PM1Z8fXOkBaBuGt0WwTUvU=4cu2O8iQdwUYw@mail.gmail.com>
+Subject: next-20250428: drivers/net/ethernet/qlogic/qede/qede_main.c error:
+ field name not in record or union initializer
+To: Netdev <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	lkft-triage@lists.linaro.org, Linux Regressions <regressions@lists.linux.dev>
+Cc: Anders Roxell <anders.roxell@linaro.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-CgpBdCAyMDI1LTA0LTI4IDIxOjIzOjUzLCAiTXVoYW1tYWQgTnV6YWloYW4gS2FtYWwgTHVkZGlu
-IiA8emFpaGFuQHVucmVhbGFzaWEubmV0PiB3cm90ZToKPkhpIFNsYXJrLAo+Cj55b3UgY2FiIGFk
-ZCB1ZGV2IHJ1bGVzIHRvIHNldCB0aGUgcGVybWlzc2lvbnMuCj4KPlJlZ2FyZHMsCj5aYWloYW4K
-PlNlbnQgZnJvbSBteSBpUGhvbmUKPgpIaSBaYWloYW4sClRoYW5rcyBmb3IgeW91ciBhZHZpY2Uu
-CkJ1dCBJIHRyaWVkIGluIG15IGxvY2FsLCBubyBtYXR0ZXIgdGhlIG1vZGUgaXMgNjQ0IG9yIDc1
-NSwgc2ltaWxhciBpc3N1ZSBzdGlsbCBleGlzdC4KQlRXLCB0aGlzIGVycm9yIG9ubHkgd2FzIHJl
-cG9ydGVkIHdoZW4gSSBjYWxsICJncHNtb24iIG9yICJjZ3BzIiBjb21tYW5kLgoKdGVzdCByZWZl
-cmVuY2UgYXMgYmVsb3c6CmpiZEBqYmQ6fiQgY2F0IC9ldGMvdWRldi9ydWxlcy5kLzk5LWdwcy5y
-dWxlcyAKS0VSTkVMPT0iZ25zczAiLCBNT0RFPSIwNzU1IiwgR1JPVVA9ImRpYWxvdXQiCgo05pyI
-IDI5IDE0OjA4OjE3IGpiZCBncHNkWzM1NDRdOiBncHNkOkVSUk9SOiBTRVI6IGRldmljZSBvcGVu
-IG9mIC9kZXYvZ25zczAgZmFpbGVkOiBQZXJtaXNzaW9uIGRlbmllZCAtIHJldHJ5aW5nIHJlYWQt
-b25seQo05pyIIDI5IDE0OjA4OjE3IGpiZCBncHNkWzM1NDRdOiBncHNkOkVSUk9SOiBTRVI6IHJl
-YWQtb25seSBkZXZpY2Ugb3BlbiBvZiAvZGV2L2duc3MwIGZhaWxlZDogUGVybWlzc2lvbiBkZW5p
-ZWQKNOaciCAyOSAxNDowODoxNyBqYmQgZ3BzZFszNTQ0XTogZ3BzZDpFUlJPUjogL2Rldi9nbnNz
-MDogZGV2aWNlIGFjdGl2YXRpb24gZmFpbGVkLCBmcmVlaW5nIGRldmljZS4KamJkQGpiZDp+JCAK
-amJkQGpiZDp+JCBscyAtbCAvZGV2L2duc3MwIApjcnd4ci14ci14IDEgcm9vdCBkaWFsb3V0IDIz
-NywgMCAgNOaciCAyOSAxNDowNSAvZGV2L2duc3MwCgpUaGFua3MKPj4gT24gMjggQXByIDIwMjUs
-IGF0IDQ6MjjigK9QTSwgU2xhcmsgWGlhbyA8c2xhcmtfeGlhb0AxNjMuY29tPiB3cm90ZToKPj4g
-Cj4+IO+7vwo+PiBBdCAyMDI1LTA0LTA5IDE4OjQyOjU5LCAiU2VyZ2V5IFJ5YXphbm92IiA8cnlh
-emFub3Yucy5hQGdtYWlsLmNvbT4gd3JvdGU6Cj4+Pj4gT24gQXByaWwgOSwgMjAyNSAxMTozMDo1
-OCBBTSBHTVQrMDM6MDAsIFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4gd3JvdGU6Cj4+
-Pj4gCj4+Pj4gSGkgU2VyZ2V5LAo+Pj4+IERldmljZSBwb3J0IC9kZXYvZ25zczAgaXMgZW51bWVy
-YXRlZCAuIERvZXMgaXQgYmUgZXhwZWN0ZWQ/Cj4+Pj4gSSBjYW4gZ2V0IHRoZSBOTUVBIGRhdGEg
-ZnJvbSB0aGlzIHBvcnQgYnkgY2F0IG9yIG1pbmljb20gY29tbWFuZC4KPj4+PiBCdXQgdGhlIGdw
-c2Quc2VydmljZSBhbHNvIGNhbiBub3QgYmUgaW5pdGlhbGl6ZWQgbm9ybWFsbHkuIEl0IHJlcG9y
-dHM6Cj4+Pj4gCj4+Pj4gVHJpZ2dlcmVkQnk6IOKXjyBncHNkLnNvY2tldAo+Pj4+ICAgUHJvY2Vz
-czogMzgyNCBFeGVjU3RhcnRQcmU9L2Jpbi9zdHR5IHNwZWVkIDExNTIwMCAtRiAkREVWSUNFUyAo
-Y29kZT1leGl0ZWQsIHN0YXR1cz0xL0ZBSUxVUkUpCj4+Pj4gICAgICAgQ1BVOiA3bXMKPj4+PiAK
-Pj4+PiA05pyIIDA5IDE2OjA0OjE2IGpiZCBzeXN0ZW1kWzFdOiBTdGFydGluZyBHUFMgKEdsb2Jh
-bCBQb3NpdGlvbmluZyBTeXN0ZW0pIERhZW1vbi4uLgo+Pj4+IDTmnIggMDkgMTY6MDQ6MTcgamJk
-IHN0dHlbMzgyNF06IC9iaW4vc3R0eTogL2Rldi9nbnNzMDogSW5hcHByb3ByaWF0ZSBpb2N0bCBm
-b3IgZGV2aWNlCj4+Pj4gNOaciCAwOSAxNjowNDoxNyBqYmQgc3lzdGVtZFsxXTogZ3BzZC5zZXJ2
-aWNlOiBDb250cm9sIHByb2Nlc3MgZXhpdGVkLCBjb2RlPWV4aXRlZCwgc3RhdHVzPTEvRkFJTFVS
-RQo+Pj4+IDTmnIggMDkgMTY6MDQ6MTcgamJkIHN5c3RlbWRbMV06IGdwc2Quc2VydmljZTogRmFp
-bGVkIHdpdGggcmVzdWx0ICdleGl0LWNvZGUnLgo+Pj4+IDTmnIggMDkgMTY6MDQ6MTcgamJkIHN5
-c3RlbWRbMV06IEZhaWxlZCB0byBzdGFydCBHUFMgKEdsb2JhbCBQb3NpdGlvbmluZyBTeXN0ZW0p
-IERhZW1vbi4KPj4+PiAKPj4+PiBTZWVtcyBpdCdzIG5vdCBhIHNlcmlhbCBwb3J0Lgo+Pj4gCj4+
-PiBJdCBpcyBhIGNoYXIgZGV2IGxhY2tpbmcgc29tZSBJT0NUTHMgc3VwcG9ydC4gWWVhaC4KPj4+
-IAo+Pj4+IEFueSBhZHZpY2U/Cj4+PiAKPj4+IFllcC4gUmVtb3ZlIHRoYXQgc3R0eSBpbnZvY2F0
-aW9uIGZyb20gdGhlIHNlcnZpY2UgZGVmaW5pdGlvbi4gRm9yIG1lLCBncHNkIHdvcmtzIGZsYXds
-ZXNzbHkuIFlvdSBjYW4gdHJ5IHRvIHN0YXJ0IGl0IG1hbnVhbGx5IGZyb20gYSB0ZXJtaW5hbC4K
-Pj4+IAo+Pj4gLS0KPj4+IFNlcmdleQo+PiBIaSBTZXJnZXksCj4+IE15IGRldmljZSBjb3VsZCBv
-dXRwdXQgdGhlIE5NRUEgZGF0YSBieSBwb3J0IC9kZXYvZ25zczAuIFNvbWV0aGluZyBsaWtlIGJl
-bG93Ogo+PiAKPj4gJEdQUk1DLDA3MTYzNC4wMCxBLDIyMzkuMzcyMDY3LE4sMTE0MDIuNjUzMDQ4
-LEUsLCwyODA0MjUsLCxBLFYqMkQKPj4gJEdBUk1DLDA3MTYzNC4wMCxBLDIyMzkuMzcyMDY3LE4s
-MTE0MDIuNjUzMDQ4LEUsLCwyODA0MjUsLCxBLFYqM0MKPj4gJEdCUk1DLDA3MTYzNC4wMCxBLDIy
-MzkuMzcyMDY3LE4sMTE0MDIuNjUzMDQ4LEUsLCwyODA0MjUsLCxBLFYqM0YKPj4gJEdOUk1DLDA3
-MTYzNC4wMCxBLDIyMzkuMzcyMDY3LE4sMTE0MDIuNjUzMDQ4LEUsLCwyODA0MjUsLCxBLFYqMzMK
-Pj4gJEdOR05TLDA3MTYzNC4wMCwyMjM5LjM3MjA2NyxOLDExNDAyLjY1MzA0OCxFLE5BQU5OTiww
-Miw1MDAuMCwsLCwsVioxNQo+PiAkR1BHR0EsMDcxNjM0LjAwLDIyMzkuMzcyMDY3LE4sMTE0MDIu
-NjUzMDQ4LEUsMSwwMCw1MDAuMCwsLCwsLCo1OQo+PiAkR0FHR0EsMDcxNjM0LjAwLDIyMzkuMzcy
-MDY3LE4sMTE0MDIuNjUzMDQ4LEUsMSwwMSw1MDAuMCwsLCwsLCo0OQo+PiAkR0JHR0EsMDcxNjM0
-LjAwLDIyMzkuMzcyMDY3LE4sMTE0MDIuNjUzMDQ4LEUsMSwwMCw1MDAuMCwsLCwsLCo0Qgo+PiAk
-R05HR0EsMDcxNjM0LjAwLDIyMzkuMzcyMDY3LE4sMTE0MDIuNjUzMDQ4LEUsMSwwMiw1MDAuMCws
-LCwsLCo0NQo+PiAkR1BHU1YsNCwxLDEzLDA0LDAwLDAzOCwsMDUsMzMsMjQwLCwwNiw0MSwwMzMs
-LDA5LDI1LDA1OCwsMSo2Rgo+PiAkR1BHU1YsNCwyLDEzLDExLDQ3LDM0NCwsMTIsMzMsMjg2LCwx
-MywwOSwxODUsLDE3LDI5LDEyOCwsMSo2RQo+PiAkR1BHU1YsNCwzLDEzLDE5LDU0LDExMywsMjAs
-NjIsMjg0LCwyMiwxNSwxNzQsLDI1LDA5LDMxMSwsMSo2OAo+PiAkR1BHU1YsNCw0LDEzLDQwLDAw
-LDAwMCwyOCwxKjU4Cj4+ICRHTEdTViwzLDEsMDksMTAsMTksMjQ1LCwwNiwzOCwxODUsLDA5LDA2
-LDIwMywsMTEsMTMsMjk2LCwxKjc5Cj4+ICRHTEdTViwzLDIsMDksMDUsNjAsMDY0LCwyMCwzOSww
-MTMsLDE5LDE3LDA4NCwsMjEsMTUsMzIxLCwxKjdFCj4+ICRHTEdTViwzLDMsMDksMDQsMTYsMDMw
-LCwxKjQxCj4+ICRHQUdTViwzLDEsMTEsMDIsMzAsMjk3LCwwNCwzMiwwNzYsLDA1LDEwLDE4OCws
-MDYsNDEsMTA3LCw3Kjc4Cj4+ICRHQUdTViwzLDIsMTEsMDksMzksMTQwLCwxMCwyNiwwNTUsLDEx
-LDQyLDAyNywsMTIsMDksMDcxLCw3KjdFCj4+ICRHQUdTViwzLDMsMTEsMTYsMzYsMTk4LCwyNCwx
-OSwxNzYsLDM2LDM5LDMxNywsNyo0NQo+PiAkR0JHU1YsNCwxLDE1LDAxLDQ3LDEyMiwsMDIsNDYs
-MjM0LCwwMyw2MywxODksLDA0LDM0LDEwOCwsMSo3RAo+PiAkR0JHU1YsNCwyLDE1LDA1LDIzLDI1
-MywsMDYsMDQsMTg3LCwwNyw4NiwxOTQsLDA4LDY4LDI4NCwsMSo3NQo+PiAkR0JHU1YsNCwzLDE1
-LDA5LDAzLDIwMSwsMTAsNzgsMjk5LCwxMSw1NiwwMjUsLDEyLDI5LDA5NCwsMSo3MQo+PiAKPj4g
-QnV0IHRoZSBncHNkIHByb2dyZXNzIHdlcmUgc3R1Y2sgd2l0aCBiZWxvdyBlcnJvcnM6Cj4+IOKX
-jyBncHNkLnNlcnZpY2UgLSBHUFMgKEdsb2JhbCBQb3NpdGlvbmluZyBTeXN0ZW0pIERhZW1vbgo+
-PiAgICAgTG9hZGVkOiBsb2FkZWQgKC9saWIvc3lzdGVtZC9zeXN0ZW0vZ3BzZC5zZXJ2aWNlOyBl
-bmFibGVkOyB2ZW5kb3IgcHJlc2V0OiBlbmFibGVkKQo+PiAgICAgQWN0aXZlOiBhY3RpdmUgKHJ1
-bm5pbmcpIHNpbmNlIE1vbiAyMDI1LTA0LTI4IDIzOjE2OjQ3IENTVDsgMjBzIGFnbwo+PiBUcmln
-Z2VyZWRCeTog4pePIGdwc2Quc29ja2V0Cj4+ICAgIFByb2Nlc3M6IDUyODEgRXhlY1N0YXJ0PS91
-c3Ivc2Jpbi9ncHNkICRHUFNEX09QVElPTlMgJE9QVElPTlMgJERFVklDRVMgKGNvZGU9ZXhpdGVk
-LCBzdGF0dXM9MC9TVUNDRVNTKQo+PiAgIE1haW4gUElEOiA1MjgzIChncHNkKQo+PiAgICAgIFRh
-c2tzOiAxIChsaW1pdDogMzcyNzIpCj4+ICAgICBNZW1vcnk6IDY1Mi4wSwo+PiAgICAgICAgQ1BV
-OiAxMG1zCj4+ICAgICBDR3JvdXA6IC9zeXN0ZW0uc2xpY2UvZ3BzZC5zZXJ2aWNlCj4+ICAgICAg
-ICAgICAgIOKUlOKUgDUyODMgL3Vzci9zYmluL2dwc2QgLUYgL3Zhci9ydW4vZ3BzZC5zb2NrIC9k
-ZXYvZ25zczAKPj4gCj4+IDTmnIggMjggMjM6MTY6NDcgamJkIHN5c3RlbWRbMV06IFN0YXJ0aW5n
-IEdQUyAoR2xvYmFsIFBvc2l0aW9uaW5nIFN5c3RlbSkgRGFlbW9uLi4uCj4+IDTmnIggMjggMjM6
-MTY6NDcgamJkIHN5c3RlbWRbMV06IFN0YXJ0ZWQgR1BTIChHbG9iYWwgUG9zaXRpb25pbmcgU3lz
-dGVtKSBEYWVtb24uCj4+IDTmnIggMjggMjM6MTc6MDIgamJkIGdwc2RbNTI4M106IGdwc2Q6RVJS
-T1I6IFNFUjogZGV2aWNlIG9wZW4gb2YgL2Rldi9nbnNzMCBmYWlsZWQ6IFBlcm1pc3Npb24gZGVu
-aWVkIC0gcmV0cnlpbmcgcmVhZC1vbmx5Cj4+IDTmnIggMjggMjM6MTc6MDIgamJkIGdwc2RbNTI4
-M106IGdwc2Q6RVJST1I6IFNFUjogcmVhZC1vbmx5IGRldmljZSBvcGVuIG9mIC9kZXYvZ25zczAg
-ZmFpbGVkOiBQZXJtaXNzaW9uIGRlbmllZAo+PiA05pyIIDI4IDIzOjE3OjAyIGpiZCBncHNkWzUy
-ODNdOiBncHNkOkVSUk9SOiAvZGV2L2duc3MwOiBkZXZpY2UgYWN0aXZhdGlvbiBmYWlsZWQsIGZy
-ZWVpbmcgZGV2aWNlLgo+PiAKPj4gQW5kIEkgY2hlY2tlZCB0aGUgZ25zcyBkZXZpY2UgYXR0cmli
-dXRlLCBpdCByZXBvcnRzOgo+PiBjcnctLS0tLS0tIDEgcm9vdCByb290IDIzNywgMCAgNOaciCAy
-OCAgMjAyNSAvZGV2L2duc3MwCj4+IAo+PiBNYXkgSSBrbm93IGhvdyBkbyB5b3UgZml4IHRoaXM/
-Cj4+IAo+PiBUaGFua3MKPj4gCj4+IAo=
+Regressions on arm64, s390 and riscv with allyesconfig config build failed
+with gcc-13, clang-20 and clang-nightly toolchains on Linux next-20250428.
+
+First seen on the next-20250428
+ Good: next-20250424
+ Bad:  next-20250428
+
+Build regressions:
+* arm64, build
+* riscv, build
+* s390, build
+  - gcc-13-allyesconfig
+  - clang-20-allyesconfig
+  - clang-nightlty-allyesconfig
+
+Regression Analysis:
+ - New regression? Yes
+ - Reproducibility? Yes
+
+Build regression: arm64 riscv s390 allyesconfig qedf_main.c field name
+not in record or union initializer
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+## Build error:
+drivers/scsi/qedf/qedf_main.c:702:9: error: positional initialization
+of field in 'struct' declared with 'designated_init' attribute
+[-Werror=designated-init]
+  702 |         {
+      |         ^
+drivers/scsi/qedf/qedf_main.c:702:9: note: (near initialization for
+'qedf_cb_ops')
+drivers/net/ethernet/qlogic/qede/qede_main.c:206:9: error: braces
+around scalar initializer [-Werror]
+  206 |         {
+      |         ^
+drivers/net/ethernet/qlogic/qede/qede_main.c:206:9: note: (near
+initialization for 'qede_ll_ops.ports_update')
+drivers/net/ethernet/qlogic/qede/qede_main.c:208:17: error: field name
+not in record or union initializer
+  208 |                 .arfs_filter_op = qede_arfs_filter_op,
+      |                 ^
+drivers/net/ethernet/qlogic/qede/qede_main.c:208:17: note: (near
+initialization for 'qede_ll_ops.ports_update')
+drivers/net/ethernet/qlogic/qede/qede_main.c:208:35: error:
+initialization of 'void (*)(void *, u16,  u16)' {aka 'void (*)(void *,
+short unsigned int,  short unsigned int)'} from incompatible pointer
+type 'void (*)(void *, void *, u8)' {aka 'void (*)(void *, void *,
+unsigned char)'} [-Werror=incompatible-pointer-types]
+  208 |                 .arfs_filter_op = qede_arfs_filter_op,
+      |                                   ^~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/qlogic/qede/qede_main.c:210:17: note: (near
+initialization for 'qede_ll_ops.ports_update')
+drivers/net/ethernet/qlogic/qede/qede_main.c:210:32: error: excess
+elements in scalar initializer [-Werror]
+  210 |                 .link_update = qede_link_update,
+      |                                ^~~~~~~~~~~~~~~~
+
+## Source
+* Kernel version: next-20250428
+* Git tree:  https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next.git
+* Git sha: 33035b665157558254b3c21c3f049fd728e72368
+* Git describe: next-20250428
+* Project details:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250428/
+* Architectures: arm64 s390 riscv
+* Toolchains: gcc-13, clang-20, clang-nightly
+* Kconfigs: allyesconfig
+
+## Build
+* Build log: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250428/testrun/28249321/suite/build/test/gcc-13-allyesconfig/log
+* Build history:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250428/testrun/28249321/suite/build/test/gcc-13-allyesconfig/history/
+* Build details:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250428/testrun/28249321/suite/build/test/gcc-13-allyesconfig/details/
+* Build link: https://storage.tuxsuite.com/public/linaro/lkft/builds/2wMJhRaVybixSxTSIyLTw8JqNxe/
+* Kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2wMJhRaVybixSxTSIyLTw8JqNxe/config
+
+## Steps to reproduce on arm64
+ # tuxmake --runtime podman --target-arch arm64 --toolchain gcc-13
+--kconfig allyesconfig
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
