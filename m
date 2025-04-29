@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-186884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D10DAA3C14
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:27:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56333AA3C10
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD415189D2A2
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:27:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBDEB4C7D5F
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DCE2DAF8C;
-	Tue, 29 Apr 2025 23:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617CF2750E6;
+	Tue, 29 Apr 2025 23:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgDlLGqh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ess5L7vC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993782BE0E7;
-	Tue, 29 Apr 2025 23:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FD626F44C;
+	Tue, 29 Apr 2025 23:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745969200; cv=none; b=RI3/aLzUo58Cc54A5FjorvSMM77ls8uvHR+W6+GzfuET57GiLQw7Z/7y+rqOnXQro3swggDUC0ya2Osn6hZhZmD3qXN4TVpnGhzXqJFSo9VpsQXzebUXt9DwvTjW23wnYV5HvWgVMBrck7JFrb2dFcQ7n4OppRKNzoIsHyw/U2M=
+	t=1745969227; cv=none; b=P18rqBhfXHlEgDeg22pNlJXCBSoHzWA8S5YmusQLWgdgyutC9/jBuFmKsncusZPsT4gzPRGKuvAddOq0rc7WUIgdeDSUzHzMLseLyReRIBcizT5ffi276yBfcw6CpQBhyTgwNAWN8yAO8da+b3b86yFQfJIALFMcPi3XCHut3Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745969200; c=relaxed/simple;
-	bh=gLU5bTmzAEhOlzZzVyqUxAhX9otof8GitmxtEhirTV4=;
+	s=arc-20240116; t=1745969227; c=relaxed/simple;
+	bh=28MtSgjbjXrdZ/jTsaxL32vyuTpnpiiBB72nh4Z88AE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M754BcycX/0K4UJu4lZv4QPsGiUSWGnKlbFJGluuP64liyuTmhio8YnSintAdMqZA8HZegIrn75kEBaRN8f5ApyQ7t6c5e9IMPGHzwQLoj3NAx1t+xzXn4hhAYPqtshzcccgYbTKUfRts637mIrET9EqEMTdyONGrzTuwr/iO/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgDlLGqh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A5A7C4CEE3;
-	Tue, 29 Apr 2025 23:26:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=V3grbqN7J9vLYiiXK3KbcCliyDDdan7PQKxmsvZvohqib78vkWhbaz7Ep+tWnh8lr1LBUuCKSeP7EW4vsJz7abbQe1+HblNhEMvaRA7s/3OOZyiLnbKB0rYuR/h8gaJaZYJ70UeY3QcmxivOVd5uvSMh9LNkdBHaNH8Cj6yRBkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ess5L7vC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C87C4CEE3;
+	Tue, 29 Apr 2025 23:27:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745969200;
-	bh=gLU5bTmzAEhOlzZzVyqUxAhX9otof8GitmxtEhirTV4=;
+	s=k20201202; t=1745969226;
+	bh=28MtSgjbjXrdZ/jTsaxL32vyuTpnpiiBB72nh4Z88AE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CgDlLGqhAl5Lj7X309PtgVdI8yxsnCfWAIkUGfGdUTqbplV+WJrwhgPq1i9qoIkMG
-	 4rLDFaLuwQRW4dBOpQJ+1pFF2FNId/8VJIRU6F/6UKb1J7qlrJbgW+p1VLvfiWiC1I
-	 p2CkcgNAkF66dmwhYdJfkEF8JIv1XeCQ1aWlXgu8Od8OmD/WW9BSKG8VrIVcxOYWAY
-	 BEqza099VlJKRlWHwm0YpYF+yRFru9oM0Q268xgsA8bt2Mrt5ihKNjaoDsG6b75iOF
-	 81qav3ACB6GizH+rN9BmgSOcjN8Vs8fXGYVe+dYkrBJYYhBjTug/6u8eqrHrdgFL40
-	 98DJ6F7KdYMxg==
-Date: Tue, 29 Apr 2025 16:26:38 -0700
+	b=ess5L7vCYQuQNPTszqhQ8yNwaFKuFM7yTi8nS01JB+1uQt/NHg5DISJ7tmQVMFWmI
+	 19odnC67quc5WilZYhQWCPm+/RhYU3JM6Luwlh7d3p26T19U4qBssbFqzKo9L0NObQ
+	 cPt2iAmVOBS7BXca6dm/qqYP+VGEF7qbtHhY/qbTfxYEy0/aavQXb+aGIVphQUo0yj
+	 tPEyn6Ba/DKZgcJpz3sSLajjfvtRwYzdLGOTSBNlknsKRkoGdTFMDhFDLTFOtfBltp
+	 RkGGEHjXI2YGLcOr07kp5vLD8Nk4keMydMUjBCm7CDzGl3NkxZWyjEHYI3qQ4GSPDs
+	 L4QyZ2zOKMNsQ==
+Date: Tue, 29 Apr 2025 16:27:04 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jeff Layton <jlayton@kernel.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
@@ -55,13 +55,13 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
  Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, Nathan
  Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Thomas
- =?UTF-8?B?V2Vpw59zY2h1aA==?= <thomas.weissschuh@linutronix.de>
-Subject: Re: [PATCH v5 00/10] ref_tracker: add ability to register a debugfs
- file for a ref_tracker_dir
-Message-ID: <20250429162638.0a8ff24d@kernel.org>
-In-Reply-To: <20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org>
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org
+Subject: Re: [PATCH v5 04/10] ref_tracker: allow pr_ostream() to print
+ directly to a seq_file
+Message-ID: <20250429162704.4729a76a@kernel.org>
+In-Reply-To: <20250428-reftrack-dbgfs-v5-4-1cbbdf2038bd@kernel.org>
 References: <20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org>
+	<20250428-reftrack-dbgfs-v5-4-1cbbdf2038bd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,16 +71,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 28 Apr 2025 11:26:23 -0700 Jeff Layton wrote:
-> This one is quite a bit of a change from the last set. I've gone back to
-> auto-registering the debugfs files for every ref_tracker_dir. With this,
-> the callers should pass in a static string as a classname instead of an
-> individual name string that gets copied. The debugfs file is given a
-> name "class@%px" The output format is switched to print "class@%p"
-> instead of "name@%p".
+On Mon, 28 Apr 2025 11:26:27 -0700 Jeff Layton wrote:
+> Allow pr_ostream to also output directly to a seq_file without an
+> intermediate buffer.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-Nice, I like this version!
-
-Since it applies to net-next now I can point out various (transient)
-build issues :)
+lib/ref_tracker.c:316:12: warning: unused function 'ref_tracker_dir_seq_print' [-Wunused-function]
+  316 | static int ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
 
