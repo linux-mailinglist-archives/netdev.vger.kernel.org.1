@@ -1,214 +1,231 @@
-Return-Path: <netdev+bounces-186838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A91AA1BC1
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:03:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57629AA1BCD
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 519699A41DC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:03:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87E71B67D72
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32102550AD;
-	Tue, 29 Apr 2025 20:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F0725A2DE;
+	Tue, 29 Apr 2025 20:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="RVntNIXZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oO/GIdjM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tcb3Dqxa"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534201B0435;
-	Tue, 29 Apr 2025 20:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745956995; cv=none; b=ZqQDK2qshZCv3k4kIIkkBmp7ipM2jwFu1bjkd5R2WSNW7Hk3R5NgXueDPpJ7aGu1v3FBkOOXaZBshTpRTSv3WaAxipOLaC/VDp0fwrxzIWJsKFso7aAZYy1Bb85nNP3yXHMXthC0lPpQNNw1tBu4l/EJ9ao/R2MMQcRLn+pDviU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745956995; c=relaxed/simple;
-	bh=aO9aMrkZ5K2W18zUDGkZSijzehNQqwY1ybI6RLazBVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G56GcPsPBY7a6kVQQOEd8cmOJ64l/J7FrCHU2MKh502FSfgrOdm6Yfyf9GvemvBciS1pTQH5my1TJjZItiVbWPWQ/slKqDZaFxzbwkqL1GMwx6DLUJlT5MqCUVh4N6giC+rV2TMEDAMyv2PuRHug0/ka8evvPPHu2aMztp3Ya9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=RVntNIXZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oO/GIdjM; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id CF66B2540099;
-	Tue, 29 Apr 2025 16:03:10 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Tue, 29 Apr 2025 16:03:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1745956990;
-	 x=1746043390; bh=YmGmxW/3EzBEDDM5WhrpnGIZNKJhitZq/d0jkwAbi7U=; b=
-	RVntNIXZI5DUa/NhOsTi7BBEN9uooMtsj1c4cxYVme6T8PAtzYXiDZ9Apr08h85p
-	zHXSNRQfQjF6rSRyXVqBJ6hhrQ0j9xsiX/eRbaV88iOGeDUXZjTbN9K6kuO1HdKj
-	mM5C3zyjIvEyZMtIkC0EZFvedEGFL/y7DGpCo+1QtI7bymCTP7uNhWbW88n0g/cm
-	rrODQEGEf8y3CPnI7ZCGJMo7psFycSVOZJHPEYpN+4WEq+KB5pzjbXwMLyS7jqI4
-	Vhc2+bwUc0ak1lINuiedi/EkbHe1qhOFVw8u3cA5oFI9v171UdOK9/yReFtuFMoI
-	Dkq7jMOYci5uw96avhXrxw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1745956990; x=
-	1746043390; bh=YmGmxW/3EzBEDDM5WhrpnGIZNKJhitZq/d0jkwAbi7U=; b=o
-	O/GIdjMLHB9F43IW4NmRrb5RA3G+qWhYxxNpZlNM/U7CWiOhFQPW2O0YRtbxgB0l
-	Wwa+I3E0dOiwrmJ2USbma7Xap3eKu/lf/AwueFDM+XDzHlEHHpuC17dBQ0G/2u1b
-	UBgEbPmWY0M21Vn2v4LidEW67jFuHU+Vty5K+E1wvUFQbOlnlCml5oBt6Fz6sHgl
-	Ww+Znt6wB/IXFEPs5L7tQ+BmtGSvLfeuigQzCTOMyynmUoSdd81b7G4dO9njjji/
-	iHC0BEJWb3JaaeO2Exd3N6XvmsiQ/fX+6QEXjKsdkTE0lTTkYpi3OeeajTKr2BgC
-	eXFh8SJ+7yTPMFRNWk8kw==
-X-ME-Sender: <xms:fTARaKBsboOy54XcIacVFqR3vRVwxDzHhIoBxYcf20U3csgpyFy2FA>
-    <xme:fTARaEgcElcG1liI7GZiVb_5-rg9CvqUMc2SrVrnCSojibck4jGVHeyvLZgQUFMES
-    M3nNoq57Fq5HtFxaCE>
-X-ME-Received: <xmr:fTARaNkS39EiSajLdt1GKt7LOGxGINjM_WY85LrgGIiht787wbH28WrZSgRdeU5Sp5dSqCUgoTNTI-aJJ1phc6o2yTEvzjy33w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvieegjedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrsh
-    houggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffr
-    rghtthgvrhhnpeffkefgudekgefhhfejtedviedtgeetieekffeiudfhgeevteejvedtff
-    dvkefftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihii
-    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunh
-    guodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepudef
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguihhmrgdrfhgvughrrghusehgmh
-    grihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthht
-    ohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugi
-    esrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehgrhgvghhorhdrhhgvrhgsuhhrgh
-    gvrhesvgifrdhtqhdqghhrohhuphdrtghomh
-X-ME-Proxy: <xmx:fTARaIxo2ZmuRmLRE5unf8F5cOoXqX9kHFTVaFjQ2Y7JE01xFvXZtQ>
-    <xmx:fTARaPQP09pwXxFc62ffpEZ0ZQvV7Oc9wDSf_C3FP2BqLuPt_KiuUg>
-    <xmx:fTARaDafCZoiKrBWFsMBZVQrDihzHymFUD4CWUwyeujQVjwj8cd9gw>
-    <xmx:fTARaITfiEfo0bs1VGqlVSTp8j5baoRqqL38IwsX-8tiLiTCcMVkSA>
-    <xmx:fjARaJbV1xMi2gI21JHobFYGTCu1AyKCmbjjSGVXU8ICWQgJSHNvmP5U>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 29 Apr 2025 16:03:08 -0400 (EDT)
-Date: Tue, 29 Apr 2025 22:03:06 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH net-next v3] net: phy: marvell-88q2xxx: Enable
- temperature measurement in probe again
-Message-ID: <20250429200306.GE1969140@ragnatech.se>
-References: <20250429-marvell-88q2xxx-hwmon-enable-at-probe-v3-1-0351ccd9127e@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85E925A2A5
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 20:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745957230; cv=fail; b=dIVhWz/fKYSl8BWYoEMxf36wqr+JD63+qhw+yz7+E4REd++XtvDgks/fzOQouu1RRWMf8/EgAf10NPINOdbx31AKEX3qs/UwHdTL5xrmCpwQFqC7KH8eQbLrG5vuzm7p3bO8ZMNJLN3quVyZOYTUUw1R9RhweY1dHeigm3XwHD4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745957230; c=relaxed/simple;
+	bh=aRIjT//mE37SDipbiGVetb/h1zLL8gc6NuMDFPu+fOg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iRMqwyauV47fgAHQ08gvVVXl2n9zQHwjYdeTvu0/Gy1ofWKiXlt7QWgxrov9NkFMEZJisc3dY2jzWy/BzBDKHmLs1uZZsmI1t3iI+N5L9Vluq+b2JtgJGXyn+NE9hZJ+Jlky1vgb8CXLp5JnhGNj1O9AJpbVjuNO0Ij7aHfTEts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tcb3Dqxa; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745957228; x=1777493228;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aRIjT//mE37SDipbiGVetb/h1zLL8gc6NuMDFPu+fOg=;
+  b=Tcb3Dqxa0LYj/h5WHzM3fv8EPkwljRj1blNqPzfn4rPb4+CgSjXnPg1T
+   PaWSrdKkz3wFUzjLq1ccrN0pLtHQVlckWtAOLMHsadOgd3cxbt/Mio57h
+   B1bXiJslfz2UehwrRtEUeoXp86gvsddtTGA1BxqR9wv6vzqopgzMxtxsu
+   ybFyhl8+ZnPMXzDpGF4R+gB1wVzn4oLb7S6JbVwMLVpMYEYTKyjDWrbdf
+   aSD54EkAgwMj2+CsJqGcEgtb0twlRcxATjK/ZW15QIq22jmFcTIwZRKTi
+   A+pm7kaJk/kJpYmtd+PD4Pbx9Af5p99F5M9TSaMEBPzlCPz1O8sNY8GvY
+   Q==;
+X-CSE-ConnectionGUID: j5fxP8D6R4qbk2CN+l63/A==
+X-CSE-MsgGUID: pyQ9CMPITBuuwNciKmgKjg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="58974148"
+X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
+   d="scan'208";a="58974148"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 13:07:04 -0700
+X-CSE-ConnectionGUID: px8837/RTfyW8QOttYdD9g==
+X-CSE-MsgGUID: pFggPvARQjKa6mpEdfftMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
+   d="scan'208";a="134874534"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 13:07:04 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 29 Apr 2025 13:07:03 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 29 Apr 2025 13:07:03 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 29 Apr 2025 13:07:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Wj+2nTEpwSTRFALab7VfpMJ48W7ddlzM4HMYlL7TSriOEtFRuNsD92FvPv6ZAX6i/zcFUkjxb5/Re+rahSKpIjA3vGmR3CrSb8NX7GiDedsn/unh1QobCvj+cEx5QZC0ENtKqaAbLOhVnJhmFQEA+f7qjm/q6T38EFxjRseNnDw8/jJjP6n8BzK6BuG08fAc1j6lsla9P0ijJUOukpPQTyd9G/hShOtDIFWaPfdaTlnwmeURYdISAz8SZO0i678JVd47q7YzMxwLqHqwDYZBgwPJJHPpWksNe1VyG+I+suAptzjz6Q41xf82qaGqFjNHbEimIvI4mNgw1nM3Evsw6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9EjjFZV2yqaZLOPSQs6ltoLfDKtFgee4Elw4rDo9Wm0=;
+ b=zO4VhOZGOwoGcPUrWx+YDKtJ9GZ7hzSmgyahR2UowBh40V+GKLqSQC7LtNnULvGQbs7p2Pt99fdhi80AuFOZR1VMb0eFcmKuIoj9t/J/aKQAqk0wcyDt5CSXiY6mK11PT6IbrbJ3H5HxBtkrxqa53pfkSapQoj/7WzS3DZMFlAhc7REYuakwWEzaOiFOnw8KnQoSODDx7lcuEAINOrgoipFTv2XmTezcsTrnchdDlNCBfrH9+nq97tLgpoztlLEELsGgFc49bhrCBv1F6LW5iREjxLZlbj4hQkihmsJ85sM0abvJsVLvWWuL5lIiEyrw3KpY4QKPCKc4/GhGxTol3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SA1PR11MB7039.namprd11.prod.outlook.com (2603:10b6:806:2b5::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Tue, 29 Apr
+ 2025 20:06:56 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
+ 20:06:54 +0000
+Message-ID: <40f89f87-0590-433c-b490-95ecc5f50435@intel.com>
+Date: Tue, 29 Apr 2025 13:06:52 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 10/11] idpf: add Tx timestamp flows
+To: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Milena Olech
+	<milena.olech@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<richardcochran@gmail.com>, Josh Hay <joshua.a.hay@intel.com>, Samuel Salin
+	<Samuel.salin@intel.com>
+References: <20250425215227.3170837-1-anthony.l.nguyen@intel.com>
+ <20250425215227.3170837-11-anthony.l.nguyen@intel.com>
+ <20250428173718.2f70e465@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20250428173718.2f70e465@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0187.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::12) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250429-marvell-88q2xxx-hwmon-enable-at-probe-v3-1-0351ccd9127e@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA1PR11MB7039:EE_
+X-MS-Office365-Filtering-Correlation-Id: ef3e72e9-a272-411d-0be3-08dd8759630e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SEpNdDVUZjIrQitoL1orWDRYR01XSWdYVEZZckJqaXJxNkJGQkJGaWxPNzd0?=
+ =?utf-8?B?WUo0WU1peGNmd0svREZmU0t4NDhJOXVXV09KN2JiZnNpL3B0RFBGUUE0Y1Vj?=
+ =?utf-8?B?bjJ0OGpsNFV3TDBLSFk4QnZ1alV4YStqZ1NNRkRKcHE3OTdKYWxMY3Nyam9H?=
+ =?utf-8?B?QkZZSFk5YU5JK2JaeHN6YzBNbXI5aTl6VDZDdkZBNytmSDhMTzQ2WjNkcVQw?=
+ =?utf-8?B?V290L3o4alBCZnJxcGFQNnVyUW9IVkV4Q2xBNmNXRDRhWnJPNDAzTDh3a1pm?=
+ =?utf-8?B?RVQzUUlwdzN3UEdCa0V0aW0reXV4WDNQcGtxWkYvajArRVV4QjNJSm5Uay9I?=
+ =?utf-8?B?RkFvK2dRM1AyaGd4dkRqdVFwN1gyeEIzS0lnYU1GMG9IQVNkZDNwTUxYelBq?=
+ =?utf-8?B?Y1VXTDZyd04vRWUzVW9RK3ltSi9KZDNEY093NlBTbW5qWE9QZ1l4NGlqNDI0?=
+ =?utf-8?B?N2VUSFh4VExQNVlhdVQ1UlRUOGhiVVZBY3BFSzFheFBMS2c2WTVNUjZMbG5B?=
+ =?utf-8?B?Zml2WFlmU2VDTlM4QmRFSGpFU0NyK0IvNE5BMktuMGx4TGtuTUFVQTJ4czZ3?=
+ =?utf-8?B?STBGT1d4bXdLbGl6bUJhV1BKQk5ScWhmSm1PRWIzbDJIaWs1T203d0k1NnZR?=
+ =?utf-8?B?eUFrTTlZaUIycG00T2Y4R2dNaDhUNmpCbHNGdUhnd0xzOHBMS3l3T3ZDZjUr?=
+ =?utf-8?B?SDBIbEZacmVTT2NQSHJjbFJmTFpMTWRXSWtKR3pkY0NoVVFldGlvZW1ORU1W?=
+ =?utf-8?B?aTdyYTBQT2xQU0k5ZzJHVS9CZVBPVjFPbVJUWVlEMENaUHlhem0zVW5laUdo?=
+ =?utf-8?B?MENHYlNYcHJrV2d6M29peGIrZXliQys4cEtxSVpRRHUwQmovZ3VlQ21jNVhz?=
+ =?utf-8?B?dXRMa1dObndhUkZuYXFjc3l2RGpJNU5CUnlSZTRCSWpWNXFEUEhnb0t6YkNC?=
+ =?utf-8?B?cEJoWXR3SHJiSG9hZDNjUmtaTXNLd1Q4OVZ2aHpsOElKNUZPek1tcGNRK1RF?=
+ =?utf-8?B?STQvSXhUNkxRVTBHQjZQYlNNbW5ZQlJSdGU1K0l1ZFk3T2h5M2JJaTlxNFZP?=
+ =?utf-8?B?cStoL3lqSUNPZHpsMEViNy81OXNRQUNBcDVJekVlVFpvemxHUm95YXp5ekVB?=
+ =?utf-8?B?ZG5sMVJiVGN0WGdTRWo4eHFqeXFvSUxzUm5BcFd2WG1obGtnQ1h5ZXZGWGVF?=
+ =?utf-8?B?TFBNb0FEVmhpQmVFOGlnUUk3YzZrb1J5ODYvbm8xazluTHFXaDhJdGRKMEpo?=
+ =?utf-8?B?WU9kZmgzZFcwN0NuSW00dGxNUWpHTm5SdVJzOWg1T1BCdkhFcm5VMVRRZEJY?=
+ =?utf-8?B?eFBjRTFKZlhLNTRGVDJNeTcwNjUraW5Fa3BPRWttZFNZRG5aTGNnYVFJZlhX?=
+ =?utf-8?B?WjRJY24rbzBDT3RlcktuRm9RMEVnK3p0R1RweW5TT0dyTmd4UnhkeVByZ00y?=
+ =?utf-8?B?ZVh3Y0FJTXFKYkowYWpCSkhXQ2JwejVkYktiYTZVd044RTBRNUNhOXIrYnNC?=
+ =?utf-8?B?Ung1N21KdEVralIwOGlTdHlJbU9OUGlaZCs5VmVzYmJ6YXQzWUdlclNjM3FI?=
+ =?utf-8?B?Y3RrUXEwa1dWNWpienpTK1RuWmE2VXQ5RDl5RjdocE1hVjZOQXBMZWRiMVRT?=
+ =?utf-8?B?YkVyUTJyZUxGRUpHNHRKUDk4QWJUcUZUT3MwS2dtNDhLd2lhY1lPcTE5OStV?=
+ =?utf-8?B?UEc0b2JVOTRqdTEwSVpKNkZIT25TNGRwRDJ6bUJHSTJMM3RyOVhCcFYrRmY4?=
+ =?utf-8?B?SGZwaU4yQXhmclI4NFk0ZzlBL1JVWTgxTUtPcXdnbVhySEVQbnZHY3NRN0Fj?=
+ =?utf-8?B?TTE5aGI4V3hQc1g2SUg4SEhkVkgwdmF0NjlNaDdNMTRmZmRXeU50K2I1QVU4?=
+ =?utf-8?B?Uk1DN0IyWmRxRkd4SW1jeG4xbGpUK0pnWFlmamU5M2JtNFA4UVN6dE9weUdk?=
+ =?utf-8?Q?yeUVrcugZWU=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjAwK21rQUJWU1IrSzJqK2RGYTVpZ1ZZczNTZDd2QlIyUkQ5eGlZMkhNc1dY?=
+ =?utf-8?B?VnRNMjZlTnBUdE01dCtINGlXRExWMlA2dFZ0ZTJuOHc5SC9Zd0ZKZEVsUWtn?=
+ =?utf-8?B?SEhNekJZb3p0WjBJR2Fid0MvWWVsZTdWVE4wcGFHNDVFY25FeXB6eVdWcnho?=
+ =?utf-8?B?d213K0FGallHZVZZWW1lVCs2cU1wSkpmRkRhSG5WYVRZbHZDOWNJdklsVHpw?=
+ =?utf-8?B?SVRiS2ZxTTdrWjY3Ukg0N2FVMnFRdWN3amVqVVhMaVBlSUdqaFdNcFl0M0tn?=
+ =?utf-8?B?NFIvT3I4bU9qZFBTY0pjVTJwenQrSHp4dEwrQ3J6R0l0Tkk0YTlRYjJFQU1r?=
+ =?utf-8?B?THROcWJVQnd0ZEZJcFFyMkk5ZFpzblVuZmp1cnNoSXZuZzNiWDdIdWN1OGJH?=
+ =?utf-8?B?OTRqeWNIdklzd3ZLeU5Bc2Z4a2JGeW1WaEU4bDBhb0o2bWU5RlRYS2lBZ0xE?=
+ =?utf-8?B?cWlISWJVem5tQ0ZvYXQyYTREL2RPUlBsZ1U0RTI2NkRML0gvSnFvVjh3V3E4?=
+ =?utf-8?B?bkpDOTduQXB6YmtydzB4L3U5ODZXTWFKKy9VZnRlME5HR1I2ck5odFk1VmRO?=
+ =?utf-8?B?UktTLzRpa2g0QjFMVnNNL3hnYlRtRkpISk9RbmFFWENMdDNXUStvaXpWeUpR?=
+ =?utf-8?B?aDcxRUZFWWczbkxENFZZK3FrMFZCc3dvaFZqditSWllGdXFUK3RQWG55NXVQ?=
+ =?utf-8?B?bTRnNTJzMm9aQTlJRzlETHROYUdGZFp6K1lMY2dXcDVOOW15U1g0UjFNQU5K?=
+ =?utf-8?B?VDhmYXBKOXRxYU9Bb2R1azd6Vml3TXdhOHJzdVVycnI2MGw2N0dhcWxkcS8z?=
+ =?utf-8?B?VWVTYndpK0ZqVkVPY3pDTGpjOGdsWnU5bVZvWFpydkFJUVdqcGxzSVlEUUtS?=
+ =?utf-8?B?bGNDMnNlZjVQK0ZWMjB5aTVHbmFoVjAza2ZRZ2l0czJyeUIvQUJqMnBxRmpZ?=
+ =?utf-8?B?RXJnV2s2Z3QzY0d3V2dWSnhYd2owRCs0cHJxYWlXUG8yK3AwTWtsVWZzMGpk?=
+ =?utf-8?B?Q3gyQ0p4czU4VlFZNHlsRWFyS2xMcFM1VGxHbHJ0S2wzOVFHN3NoVStXaTdE?=
+ =?utf-8?B?Vmw2alNkM3VUNWt1OTFPMGlRRUxiWHdyd0wwTXZ5enJPN3NiZlpodE5VV1lZ?=
+ =?utf-8?B?WHZJNCs3Z2s5TnF3KytsSU8zdFBEdlIyTUFiN0pVYi85dW80VWs2UERuVFdY?=
+ =?utf-8?B?TDVGRmwxdUhZcDdCOVVkQmMxcDdZWWw1Z1RBUVVkbkoxU0FicXZDRGZNNjN1?=
+ =?utf-8?B?RmtJYU4xdlo4NUZQTVBWVUtEMjM2SC90TGNiYVM3M3VISmR5bm5zMUplOHpJ?=
+ =?utf-8?B?OFZCcWdUNUxoWlp3U0lKeWhMV3lsNkp4SUJaRlg2b0p2SW1uM2VHTkwyRzFo?=
+ =?utf-8?B?R2JPRlVnVm01VTQ3ZUtlcW4zMkVHU3Y0djFDTVNJVmpsc0VPRlVibGJLc3o1?=
+ =?utf-8?B?K3ZZVmlSVEJiTDBmWCthZHlYdGlpVi9DdmZIUEpLQXE0bzAyblZEaExpTlAy?=
+ =?utf-8?B?WDZlTnlwK2ZVbVVDL01VU0hpV0xlYUsweWlENzFxbkc0VHFBOW1ERXNTQ2ov?=
+ =?utf-8?B?Sk9wUUhiK1ZEYlcrWU5hUllEaHpuUU9NY1JBbzhCZk54YXEyb0gyU01PMmky?=
+ =?utf-8?B?UEZQdDIzYUZaVGRsTXNickJSbkJITnM3MmdrT2YrOWlWRlovd0dSU1RyeVhx?=
+ =?utf-8?B?QWZDSmNDN2E1aVpLOWZmSnY2WS82V3NacmVwWWpWQTczM3g1Yk9LRjYwM2tC?=
+ =?utf-8?B?TjZqbnF2S3l2eDlKOFJLOHVibVRlQVduRFNWbEwrRFFWanArR00ycWNVVEkx?=
+ =?utf-8?B?Rk5PUUQxSFZ3QTRIeVJvYkgxTnUvc2h3cDh4MWRwZE05SzhBeGQ4UWVYY1Zp?=
+ =?utf-8?B?R3JrR1FaSFhsNzFYYWprcTI2V0RZMlhDZzVpU1V4MFVFMXpXUCs4eEU4d2FT?=
+ =?utf-8?B?eXptVklZL2lXcGp3UG52dTBnS3JaSkZiU3RWSDlaZksxYWpKeHYzOTdtLytn?=
+ =?utf-8?B?K0ZhMWllT1UwazRaeU1qUENadklzNlJwNFI1bmZ1R0NTbzJiRkhPVGxSSHJP?=
+ =?utf-8?B?VGlQaFlGQU0zU3NSMXlIcXIvZStMZytzNEVMU08wcDJaUkRkZmRMZFhhN25C?=
+ =?utf-8?B?Q0RRWE5jOGFFcDBkRkJ1T1FPNTAxMkRrelFnbWU3azlWNURCbEpmSFpZZS9o?=
+ =?utf-8?B?WVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef3e72e9-a272-411d-0be3-08dd8759630e
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 20:06:54.2708
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rfGSQSaO6cXwK46iClZv1qsBpf20lR+z99118xeuxzKnw2X1Ce44wHE+8aPsPXNxmceKnAICZyQdwiaKp6p+9uifKCG9MSWeH7507ONWX+I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7039
+X-OriginatorOrg: intel.com
 
-Hi Dimitri,
 
-Thanks for your work.
 
-On 2025-04-29 08:54:25 +0200, Dimitri Fedrau wrote:
-> Enabling of the temperature sensor was moved from mv88q2xxx_hwmon_probe to
-> mv88q222x_config_init with the consequence that the sensor is only
-> usable when the PHY is configured. Enable the sensor in
-> mv88q2xxx_hwmon_probe as well to fix this.
+On 4/28/2025 5:37 PM, Jakub Kicinski wrote:
+> On Fri, 25 Apr 2025 14:52:24 -0700 Tony Nguyen wrote:
+>> @@ -479,6 +480,9 @@ static const struct idpf_stats idpf_gstrings_port_stats[] = {
+>>  	IDPF_PORT_STAT("tx-unicast_pkts", port_stats.vport_stats.tx_unicast),
+>>  	IDPF_PORT_STAT("tx-multicast_pkts", port_stats.vport_stats.tx_multicast),
+>>  	IDPF_PORT_STAT("tx-broadcast_pkts", port_stats.vport_stats.tx_broadcast),
+>> +	IDPF_PORT_STAT("tx-hwtstamp_skipped", port_stats.tx_hwtstamp_skipped),
+>> +	IDPF_PORT_STAT("tx-hwtstamp_flushed", tstamp_stats.tx_hwtstamp_flushed),
+>> +	IDPF_PORT_STAT("tx-hwtstamp_discarded", tstamp_stats.tx_hwtstamp_discarded),
+>>  };
 > 
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> ---
-> Changes in v3:
-> - Remove patch "net: phy: marvell-88q2xxx: Prevent hwmon access with asserted reset"
->   from series. There will be a separate patch handling this and I'm not
->   sure if it is going to be accepted. Separating this is necessary
->   because the temperature reading is somehow odd at the moment, because
->   the interface has to be brought up for it to work. See:
->   https://lore.kernel.org/netdev/20250418145800.2420751-1-niklas.soderlund+renesas@ragnatech.se/
-> - Link to v2: https://lore.kernel.org/r/20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-0-78b2838a62da@gmail.com
-> 
-> Changes in v2:
-> - Add comment in mv88q2xxx_config_init why the temperature sensor is
->   enabled again (Stefan)
-> - Fix commit message by adding the information why the PHY reset might
->   be asserted. (Andrew)
-> - Remove fixes tags (Andrew)
-> - Switch to net-next (Andrew)
-> - Return ENETDOWN instead of EIO when PHYs reset is asserted in
->   mv88q2xxx_hwmon_read (Andrew)
-> - Add check if PHYs reset is asserted in mv88q2xxx_hwmon_write as it was
->   done in mv88q2xxx_hwmon_read
-> - Link to v1: https://lore.kernel.org/r/20250218-marvell-88q2xxx-hwmon-enable-at-probe-v1-0-999a304c8a11@gmail.com
-> ---
->  drivers/net/phy/marvell-88q2xxx.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> index 5c687164b8e068f3f09e91cd4dd198f24782682e..5d2fbbf332933ffe06f4506058e380fbc7c52921 100644
-> --- a/drivers/net/phy/marvell-88q2xxx.c
-> +++ b/drivers/net/phy/marvell-88q2xxx.c
-> @@ -513,7 +513,10 @@ static int mv88q2xxx_config_init(struct phy_device *phydev)
->  			return ret;
->  	}
->  
-> -	/* Enable temperature sense */
-> +	/* Enable temperature sense again. There might have been a hard reset
-> +	 * of the PHY and in this case the register content is restored to
-> +	 * defaults and we need to enable it again.
-> +	 */
->  	if (priv->enable_temp) {
->  		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
->  				     MDIO_MMD_PCS_MV_TEMP_SENSOR2,
-> @@ -765,6 +768,13 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
->  	struct mv88q2xxx_priv *priv = phydev->priv;
->  	struct device *dev = &phydev->mdio.dev;
->  	struct device *hwmon;
-> +	int ret;
-> +
-> +	/* Enable temperature sense */
-> +	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TEMP_SENSOR2,
-> +			     MDIO_MMD_PCS_MV_TEMP_SENSOR2_DIS_MASK, 0);
-> +	if (ret < 0)
-> +		return ret;
+> I don't see the implementation of the standard stats via get_ts_stats
+> You must implement standard stats before exposing custom breakdown.
 
-nit: I wonder if it make sens to create a helper function to enable the 
-sensor? My worry being this procedure growing in the future and only 
-being fixed in one location and not the other. It would also reduce code 
-duplication and could be stubbed to be compiled out with the existing 
-IS_ENABLED(CONFIG_HWMON) guard for other hwmon functions.
+Good point. I missed that during my review.
 
-That being said I tested this with mv88q211x and the temp sensor and PHY 
-keeps working as expected.
-
-Tested-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
->  
->  	priv->enable_temp = true;
->  
-> 
-> ---
-> base-commit: 0d15a26b247d25cd012134bf8825128fedb15cc9
-> change-id: 20250217-marvell-88q2xxx-hwmon-enable-at-probe-2a2666325985
-> 
-> Best regards,
-> -- 
-> Dimitri Fedrau <dima.fedrau@gmail.com>
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
+Thanks,
+Jake
 
