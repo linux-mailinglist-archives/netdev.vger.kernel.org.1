@@ -1,149 +1,97 @@
-Return-Path: <netdev+bounces-186859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A6EAA1C98
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:04:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2CF0AA1C93
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 065637AB7D7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:03:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1C717A99C1
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A32D267B6B;
-	Tue, 29 Apr 2025 21:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="E9f552v1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA50B2620FA;
+	Tue, 29 Apr 2025 21:00:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AB713AC1;
-	Tue, 29 Apr 2025 21:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED00253F2C
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 21:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745960682; cv=none; b=W6N83ePIpIWUcUIzjhnK65lC/JzYdvm28vjymeXKXr/pqalAKHTw94SRwsaRchRwIZm4ww4OInuKjr94neAm1N4VPrQEscYxfqaVeK73lFpitnER3B8xssBujAS+twarciad4z/o5cf2sLW8dTqAoqaPz9caZF+W7kyM+4Wpjjo=
+	t=1745960414; cv=none; b=fO3Zp1khENRyme9TgsqDjGVthsxN+PC3uDFBhjuf79zaPZt2yAFlTt+u+4dCww/x9mxTajRQBNIasKSlxCrqaY0eFA98H7KE1gcQfnJj/qC5pYhSWW+Ll1pdf91GTSIfcWU7nraWOIUGj4SQENDDi7UZgQbd/FUU2TW1wsRPjRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745960682; c=relaxed/simple;
-	bh=9MN7EzPl8Ix41M3eTmAMrKzzZ19Zdur1bzdSLBkorjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oEJ3tlSO7AaguX4Huz3UrclCQtKTYsqhitU3uYh5SXzN1rfk4D+bjy+xRd3I3MsGji+mJJ5gpHWU3Q4y8FapUQz/8iCWuISWHuouOCsaDsNRirmksnPYfovTkVrogwC2JHbQLK7hawIWxM/okezn9Fmqpy7hiVTtKD5TSRKmtFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=E9f552v1; arc=none smtp.client-ip=80.12.242.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 9rzNumpcYN5mI9rzQuMyVC; Tue, 29 Apr 2025 22:55:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1745960147;
-	bh=NqrZP5JivyxldFmAi4UVOQoQCnpE7WmY52m/wQ8PrDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=E9f552v1eFs2M5RxbiunKLS2gnnjSGCo6hzrEh6jaPK03065K+1nT5dkBAszEdjKw
-	 AI7xqWuvhsHem6Nx4H3rcjsJjPr4H96CMKKa4y457EgNOCUnZXzkrERuC1M4FRE3JW
-	 dDRKGu7+CG3ebjSU4g+UPa7cel34II0iYK8xkp7mp7bzgahLXjhqrUIzQy5NEDaxHB
-	 cvVaEyaeGmOV/NVfldXu6B0KHjLejiTB+i6UdaBwqg41vpfyHsVQAh/hCFnnDPcL9S
-	 eS+6vHW+diXwf6syIkCNoKqXzhQh6lO4XWGs9GOGdq5JdkmQ9hZzvCyaPdVPhEzYsU
-	 CVV4zdRpzrBFQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Tue, 29 Apr 2025 22:55:47 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <85758958-0e67-4492-a9e0-40f25c554e8c@wanadoo.fr>
-Date: Tue, 29 Apr 2025 22:55:37 +0200
+	s=arc-20240116; t=1745960414; c=relaxed/simple;
+	bh=sXo0fgS8TalrcfMC8zTyTPNoeowX0Qo4jX6/Af3oWa4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LG2LDKJ2g/wNHRvSIcwEqhvnoxXMn5jzgAVH2YLdScboupVGhTWxJNuN/3Tj7iqKbWBcVFXELGV3CAhWPo9Ulzfpv4SJHAC5UJ2cEQ0ae1B3RqwWuUItIeFyUXKqSQhvwunYlPsxHYBSl41Kfvm1DyLnqWa+2HntUWJCeoScVis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=basealt.ru; arc=none smtp.client-ip=193.43.8.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=basealt.ru
+Received: from localhost (broadband-46-242-4-129.ip.moscow.rt.ru [46.242.4.129])
+	(Authenticated sender: gremlin)
+	by air.basealt.ru (Postfix) with ESMTPSA id 4532B2336D;
+	Wed, 30 Apr 2025 00:00:01 +0300 (MSK)
+Date: Wed, 30 Apr 2025 00:00:00 +0300
+From: "Alexey V. Vissarionov" <gremlin@altlinux.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "Alexey V. Vissarionov" <gremlin@altlinux.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Derek Chickles <derek.chickles@cavium.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Felix Manlunas <felix.manlunas@cavium.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: [PATCH net] liquidio: check other_oct before dereferencing
+Message-ID: <20250429210000.GB1820@altlinux.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: airoha: Fix an error handling path in airoha_probe()
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
-References: <f4a420f3a8b4a6fe72798f9774ec9aff2291522d.1744977434.git.christophe.jaillet@wanadoo.fr>
- <aAJFgqrOFL_xAqtW@lore-desk> <aBDglZH4VaBlWU2a@lore-desk>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <aBDglZH4VaBlWU2a@lore-desk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-Le 29/04/2025 Ã  16:22, Lorenzo Bianconi a Ã©critÂ :
->>> If an error occurs after a successful airoha_hw_init() call,
->>> airoha_ppe_deinit() needs to be called as already done in the remove
->>> function.
->>>
->>> Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
->>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->>> ---
->>> Compile tested-only
->>> ---
->>>   drivers/net/ethernet/airoha/airoha_eth.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
->>> index 69e523dd4186..252b32ceb064 100644
->>> --- a/drivers/net/ethernet/airoha/airoha_eth.c
->>> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->>> @@ -2631,6 +2631,8 @@ static int airoha_probe(struct platform_device *pdev)
->>>   		}
->>>   	}
->>>   	free_netdev(eth->napi_dev);
->>> +
->>> +	airoha_ppe_deinit(eth);
->>>   	platform_set_drvdata(pdev, NULL);
->>>   
->>>   	return err;
->>> -- 
->>> 2.49.0
->>>
->>
->> Hi Christophe,
->>
->> I agree we are missing a airoha_ppe_deinit() call in the probe error path,
->> but we should move it above after stopping the NAPI since if airoha_hw_init()
->> fails we will undo the work done by airoha_ppe_init(). Something like:
->>
->> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
->> index 16c7896f931f..37d9678798d1 100644
->> --- a/drivers/net/ethernet/airoha/airoha_eth.c
->> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->> @@ -2959,6 +2959,7 @@ static int airoha_probe(struct platform_device *pdev)
->>   error_napi_stop:
->>   	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
->>   		airoha_qdma_stop_napi(&eth->qdma[i]);
->> +	airoha_ppe_init(eth);
->>   error_hw_cleanup:
->>   	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
->>   		airoha_hw_cleanup(&eth->qdma[i]);
->>
-> 
-> Hi Christophe,
-> 
-> any plan to repost this fix?
+get_other_octeon_device() may return NULL; avoid dereferencing the
+other_oct pointer in that case.
 
-Hi,
+Found by ALT Linux Team (altlinux.org) and Linux Verification Center
+(linuxtesting.org).
 
-I'll send a v2, but I currently don't have time to look at it.
-Will need a few more days.
+Fixes: bb54be589c7a ("liquidio: fix Octeon core watchdog timeout false alarm")
+Signed-off-by: Alexey V. Vissarionov <gremlin@altlinux.org>
+---
+ drivers/net/ethernet/cavium/liquidio/lio_main.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-CJ
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 1d79f6eaa41f6cbf..7b255126289b9fcd 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -796,10 +796,11 @@ static int liquidio_watchdog(void *param)
+ 
+ #ifdef CONFIG_MODULE_UNLOAD
+ 		vfs_mask1 = READ_ONCE(oct->sriov_info.vf_drv_loaded_mask);
+-		vfs_mask2 = READ_ONCE(other_oct->sriov_info.vf_drv_loaded_mask);
+-
+-		vfs_referencing_pf  = hweight64(vfs_mask1);
+-		vfs_referencing_pf += hweight64(vfs_mask2);
++		vfs_referencing_pf = hweight64(vfs_mask1);
++		if (other_oct) {
++			vfs_mask2 = READ_ONCE(other_oct->sriov_info.vf_drv_loaded_mask);
++			vfs_referencing_pf += hweight64(vfs_mask2);
++		}
+ 
+ 		refcount = module_refcount(THIS_MODULE);
+ 		if (refcount >= vfs_referencing_pf) {
 
-> 
-> Regards,
-> Lorenzo
-> 
->>
->> Agree?
->>
->> Regards,
->> Lorenzo
-> 
-> 
 
+-- 
+Alexey V. Vissarionov
+gremlin ðòé altlinux ôþë org; +vii-cmiii-ccxxix-lxxix-xlii
+GPG: 0D92F19E1C0DC36E27F61A29CD17E2B43D879005 @ hkp://keys.gnupg.net
 
