@@ -1,96 +1,85 @@
-Return-Path: <netdev+bounces-186867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A98EAA3A2A
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:50:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A71AA3A32
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78CBF16F1C4
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:50:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 468091BC3A04
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72F126FA77;
-	Tue, 29 Apr 2025 21:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A971F22173C;
+	Tue, 29 Apr 2025 21:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7B2W2Cx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZwuOSV+3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75119132103;
-	Tue, 29 Apr 2025 21:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850C7214234
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 21:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745963394; cv=none; b=RgqVPY510mlaV9ELY8tGlUAkVJe1vVR3/EHT1DON5/gm9RzdWaWG9UkYtVmu+mpa7iiUEFN/9vQzuvuS5J1MiODjagHsDc6UqN9K3W2Ww5Wirq0RIXJvO0OgdlCq9SslLWEMbPw8RlR6INDSV1oOcIfiUsD4LDDUS9RAj79DsOo=
+	t=1745963552; cv=none; b=XTYnNMRePb4Xmvy79hsrgr+fbjqPi1YtjmSpudfL9raorQEJL3C7ruJMXdMcvyCjLnSQ9yi9xA1P6JLxfIUsFcZqzt/xvSdmcrhXSfy3AV2c4/a2RLUf9Banp0cNg3NK9/RimMbViCDJyVecHpQjqUL5WoGPJIu99y20vt+MyGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745963394; c=relaxed/simple;
-	bh=UjdCZlm7WDqcusIhWqtA1R5cnw9YVjL6XEiRR7s38DE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=N3aMu0rmGHLGeFrcP+M1aZi/cG7SzRk/ONiK3cAH+SaxN7//s1wno9Kg/lFL/GEpJBmwwMT7LrQ26A07f1htpzsAL3UniljNQr34EWSBgDcOni36PAwMoufLLzGdqW0+QNFDMPzVlGU/P8uo/YBl/O1E030yduSG1qKwTji9OPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7B2W2Cx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAF52C4CEEA;
-	Tue, 29 Apr 2025 21:49:53 +0000 (UTC)
+	s=arc-20240116; t=1745963552; c=relaxed/simple;
+	bh=oE/4O2rTKrnUGitKHVq/MUr5Mpzdlv7N3Fql62gAXsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DKfGRTcbDj9dZ49u+uR76buMjsTO0VSXQ+3hz2VtV7Qt/KrFPXwqUoNZsGyBuA9S+uCY+JzxRHvkoLEYc2zPJQZPtJO5+iATKXV4xaYsIdMUF3Mo5Cj9EsAxAUIiugkJcJeP+cCHvclQgRcQ1kH+RKI5yi7NWnza1w6ypg7fsaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwuOSV+3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48974C4CEE3;
+	Tue, 29 Apr 2025 21:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745963393;
-	bh=UjdCZlm7WDqcusIhWqtA1R5cnw9YVjL6XEiRR7s38DE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S7B2W2CxVfXVIXga/XZ/s1ih+xgEKADkxWQ/pNgSYjJasHsvyS44SQLnbh9hc+XXQ
-	 sZIMGbYibbNXdJsTXvNDUpY7FcRkH3XIhL/kQ+OsoUlcGJSmDTfBAGeM4aVpXEYaws
-	 hIE6GE+I340K1X20xw33PiR3bjam4jpjOvj/GFMv9R8vWQCMw0zzB+vVRxbzsri/5m
-	 TynzfVg0vvL4bpwr9nRu8Ue6qaq7iNQb7Ox8ufY1bmS8Rw42y7Wt0CIMCmWdn2oYCa
-	 HLwqSH36HjtLKGMMeO3qhaZE02MvyDvMmV3YDRWga7v/XL/PPTxAqQTEGu6uRJNyy3
-	 o59MpG71+cyZQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB01B3822D4E;
-	Tue, 29 Apr 2025 21:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1745963550;
+	bh=oE/4O2rTKrnUGitKHVq/MUr5Mpzdlv7N3Fql62gAXsg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZwuOSV+3ec9JjSGRVs9fnv2N0SVFuwdZ6ve0FHvrToA7oGyKlLgrVtFtVlWnj4Dz4
+	 B+nDSTBlTnq1Os4vrJiQw/DBhEIJvqz9l+KnUjja86VHo8k3D1c3n4mhIlYpJbXXqD
+	 3JmDnNT4zPMKXXCGKLQUdlYBR3bGOHmrYAydf6t+BBKQ0WMYMZWV6tQv6d5CYv9Jm3
+	 XcncbfHiSMqqOCZ8nGfHZavaI1tJEthLRQkKBd7JSwbLawwRtSxlXuw+YSXdlO9y8O
+	 ySN/T5uexLgInP0TQZaGns5WT6olPbNU3Em3s0J0HV2ZscfWmod14pYsofoSxzxmil
+	 wZSqs8x3RJcIQ==
+Date: Tue, 29 Apr 2025 14:52:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+ <milena.olech@intel.com>, <przemyslaw.kitszel@intel.com>,
+ <jacob.e.keller@intel.com>, <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next v2 00/11][pull request] idpf: add initial PTP
+ support
+Message-ID: <20250429145229.67ee90ea@kernel.org>
+In-Reply-To: <17fe4f5a-d9ad-41bc-b43a-71cbdab53eea@intel.com>
+References: <20250425215227.3170837-1-anthony.l.nguyen@intel.com>
+	<20250428173906.37441022@kernel.org>
+	<17fe4f5a-d9ad-41bc-b43a-71cbdab53eea@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix SER panic with 4GB+
- RAM
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174596343260.1806681.7860771179526030169.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Apr 2025 21:50:32 +0000
-References: <4adc2aaeb0fb1b9cdc56bf21cf8e7fa328daa345.1745715843.git.daniel@makrotopia.org>
-In-Reply-To: <4adc2aaeb0fb1b9cdc56bf21cf8e7fa328daa345.1745715843.git.daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: chad@monroe.io, nbd@nbd.name, bc-bocun.chen@mediatek.com,
- sean.wang@mediatek.com, lorenzo@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 27 Apr 2025 02:05:44 +0100 you wrote:
-> From: Chad Monroe <chad@monroe.io>
+On Tue, 29 Apr 2025 14:41:30 -0700 Tony Nguyen wrote:
+> On 4/28/2025 5:39 PM, Jakub Kicinski wrote:
+> > On Fri, 25 Apr 2025 14:52:14 -0700 Tony Nguyen wrote:  
+> >>   18 files changed, 2933 insertions(+), 103 deletions(-)  
+> > 
+> > This is still huge. I'd appreciate if you could leave some stuff out
+> > and make the series smaller.  
 > 
-> If the mtk_poll_rx() function detects the MTK_RESETTING flag, it will
-> jump to release_desc and refill the high word of the SDP on the 4GB RFB.
-> Subsequently, mtk_rx_clean will process an incorrect SDP, leading to a
-> panic.
-> 
-> [...]
+> The obvious stuff that jumps out to me that can be moved out 
+> easily/logically doesn't save that many lines but, perhaps, Milena has 
+> some other ideas.
 
-Here is the summary with links:
-  - [net,v2] net: ethernet: mtk_eth_soc: fix SER panic with 4GB+ RAM
-    https://git.kernel.org/netdev/net/c/6e0490fc36cd
+Right, nothing too obvious, maybe cross timestmaping. But it takes 
+me 30min to just read the code, before I start finding bugs I have 
+to switch to doing something else:(
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+It's not a deal breaker, but I keep trickling in review comments 2 
+at a time, please don't blame me, I'm doing my best :)
 
