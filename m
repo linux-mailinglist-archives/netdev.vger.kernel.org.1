@@ -1,129 +1,168 @@
-Return-Path: <netdev+bounces-186728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5EFAA0ABA
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 910E2AA0ACC
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A033B1A857FA
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:51:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3453E1B6618B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6105D2C2593;
-	Tue, 29 Apr 2025 11:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552E02C2585;
+	Tue, 29 Apr 2025 11:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IN0QNytk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mgMlg5tj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0B02BEC49;
-	Tue, 29 Apr 2025 11:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7897554654
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 11:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745927211; cv=none; b=ckmUL4IYaaB6OGABO0PwfZIpRk/MDzOXhlDw14h2hn8hyXGfQa5oxWHeQW1cKsDgCcyiSSJMD3q4gcIhJNLaXD/AI0fClUnSt4540IS/KzKZZPBKCVlY4DOQpsWPW5GVl7sYAQiJSpRdKaEuPs+P4vxyj0U3hQvAB1pkI6cMy2Y=
+	t=1745927363; cv=none; b=WmxT7vDb8lB+Vw6Pwl50pfNNdqsxvFrPJD9YtN8dcbk2C4aeFIYCm+LMqi+W2DJEhuU6vbRVQkSSzRpPo4iMv/r7IiHjL8empk3o659/SlKokTHF7Z72zo7ix3FB8xTnFiPtD9DH2BYO4KtodWF1V0qkHybf4Ul0MpIkaGCaneU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745927211; c=relaxed/simple;
-	bh=3dh4cSlwqNafxDi1eoskuMMskOU14nSu2voZZz+IISI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Reyi0Qb5suO/NS7kOVdeQP2wifbPea53GBRjZQgho+h8k7GvcNt4nBXxlga+Mea30GlmQLW9H5COJKY0/CCoIm7LtQ0boZ9Na9LdNEBnzJgyBfMHBk5nDWUYg87whLL8nE2qGsZ9ExCZfW5bl9hJiZtt1zZP+Y1WJLQnAyLrtAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IN0QNytk; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T6nggI024868;
-	Tue, 29 Apr 2025 04:46:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=lMYcX+6NRtn1bfaz92OoF0m
-	EjFbSPiTLQI7sXGqkxkE=; b=IN0QNytkIeursvsjY1jMvW2fmWYQETH/EFMcHuD
-	1NPCS4y/c3rPYaUcSGFSTlixcL0mb3ByYzmz92ihgQsZF2DbQW1RroGVmjL1Ivlv
-	jQ3muIKe+3HxEkBd6E+QgeCN5SZAHIMqAqpN283L2zCY4SerD6/ZycQsb0nj0GRQ
-	VjCLCufpZNiNKx97f4qZLtu4AF41OcLxl16hxEI1N9ZA/WJ1ESlXyftL62ggFZJe
-	5v4b+3UEpASYSLFiSLXU7kPgm3wKEGm5skeLTFnJwH+jCVyCSzExBNvsRHxJq5hJ
-	focFQetyE8P+gUebZ8UrJRQdSOMhHM5TI/vfV0P+crQbifQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 469krcccsb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Apr 2025 04:46:29 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 29 Apr 2025 04:46:29 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 29 Apr 2025 04:46:28 -0700
-Received: from sburla-PowerEdge-T630.sclab.marvell.com (unknown [10.106.27.217])
-	by maili.marvell.com (Postfix) with ESMTP id 58B2D3F70D9;
-	Tue, 29 Apr 2025 04:46:28 -0700 (PDT)
-From: Sathesh B Edara <sedara@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Abhijit Ayarekar <aayarekar@marvell.com>
-Subject: [PATCH net] octeon_ep: Fix host hang issue during device reboot
-Date: Tue, 29 Apr 2025 04:46:24 -0700
-Message-ID: <20250429114624.19104-1-sedara@marvell.com>
-X-Mailer: git-send-email 2.36.0
+	s=arc-20240116; t=1745927363; c=relaxed/simple;
+	bh=S1KXbpbgbkY0HRKJbRzwryfsgt4Q8unJV85Ro7hxvdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lkWjPAZ8KT92dU9Mfsb7Yzg+0VNZmGTiy7hIYT4vU336l1IyVicROoyfkp3vRAWrfpnYLG9AwuHgp1wmF94FBf/gOZ4uBMUncafOJiaHiZK8L/e2PVBPKUpEiZ38t7sp1S5LgqihvxmlOt+98eXljgVLDdE+Ou+Fl5suaVnen28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mgMlg5tj; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43ede096d73so39967505e9.2
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 04:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745927359; x=1746532159; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6Ep7JQLbh/0OSttSyB3ZrT5OcRbXsWFcwrDvopJDMQ=;
+        b=mgMlg5tj+XRIwfDHAOr2xH7YG/kW9y09/ifCRR9YMt//NfDfivTi7XnOY5oMv19PFK
+         4Su9MmUlSfOkh7VmaTCxrr1quUiZh0sracaOts9aRZ8ykwYBnLA0o1RwZK8OhQ/Nys+3
+         D4+RCRGAZXb3/jvdEi4o49GbBmrRXoPvUoTZG7WcfcdWVBRvX6Vytz6NcUEBt4OQUZdX
+         Ck6amPtLA74Wegw4ThBo6kSGrEi3M6I5Gwtr92t8PtGMjqWt+umRy135crEWGCxxpzAx
+         9nQS5VhxMxarzYgBbkPPpnbicGPZN4Ls8upPPnbmD9GDB/RIDSQjnOyulszqyJL8vJ5P
+         yM0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745927359; x=1746532159;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S6Ep7JQLbh/0OSttSyB3ZrT5OcRbXsWFcwrDvopJDMQ=;
+        b=ukT7FGDfAbgd9YvxhTEzaULcgHew7HwF4R2wFr0AQs1iGspto27cjW1volMedr4FG7
+         YXUfw3soNOvIPNZp/O2VIFc7E88TCIOne+sSoI/dI1Mfo2g2kFDvX5axyjKke2HXbBsb
+         D8i3MqnYKV1TsmBihtPT6lfyb7HSrE2q6jC1FsYlVJgd1PMdLS3Z4bVgBPGiOv30wskF
+         DFSEJ07i2qas548oH1+fPOBjRDcJSYMNhc3wrVn1FmBlQaqJIy11SNwAzNdxL19IPZow
+         16MpELYo58CFYk/FBwCdoCz5wa9bisAoq7TIn0jIE7/ar/QZvivsfpbAaSnj4AhO+GUO
+         iLQA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3OtNJfPX4N/5g9CVr+E4ku21HkVXR5appbWpTatOhTeAYo67n/4wLnVyC7M2+BvR4eiJZLKc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywk3ffCEanrpuwOy4kKg4ex3zGOFNqai2jf0trZ/WOz4vTdOeoS
+	Bn/l54o7FmkisE9Ib8lODFV51z99Tor/kRzhvpf179tQ9IMSdsTt8/j2n4ekltM=
+X-Gm-Gg: ASbGncuQf+hJeQEfMPqdTh3j//jLUiH9TxLoPQw8ZG6VtbLmC/cm8mAqXn15Jljyd16
+	oxOFTYsm5Ggz+TV6b/80JADv35/7bc6z9zGiijuueRKmyZ/a+/q8dLDJn0NVNiQ+cmKI+5Pv5wL
+	IhVyYd/PLWNluNPbB0ZG3GikqJMdWESQsWEcAnMsZhZR41ED1hiRAsghwQRyZ+UH1vfmu68fkHr
+	AnrJTYZ1D11RCw98pJZZXF5BmopInQfwZz0I0Gg9xTDhZqv2b6AGirCESiWKwsOriAaDl6pSCq8
+	xnfA4ChzJoqT0HjMY23MpGR9gXfWJrIqVHb0Kf7VHfI/2lyT5GyXGRNtt13IyjS4THd5
+X-Google-Smtp-Source: AGHT+IEUjvyH0tgnDxelZAHB/MKhdUs/tGd45sq0OoA+2vbaVv+OIG7YaWT9Y8qZpRSDyz+/1d7jJw==
+X-Received: by 2002:a05:600c:a016:b0:434:fa55:eb56 with SMTP id 5b1f17b1804b1-441ac84f216mr28642265e9.7.1745927359430;
+        Tue, 29 Apr 2025 04:49:19 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-440a5303c08sm153150445e9.13.2025.04.29.04.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 04:49:18 -0700 (PDT)
+Date: Tue, 29 Apr 2025 13:49:16 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V3 02/15] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <fy5y73vfqfajxnm6hkzd5h4rw4xohz6tormbi6mgnnerptomlv@jwsxzuqdn7io>
+References: <20250425214808.507732-1-saeed@kernel.org>
+ <20250425214808.507732-3-saeed@kernel.org>
+ <20250428161031.2e64b41f@kernel.org>
+ <ospcqxhtsx62h4zktieruueip7uighwzaeagyohuhpd5m3s4gw@ec4oxjsu4isy>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Gdk_q4JLrARwBEnrBMpTqzczb2E_F_0o
-X-Authority-Analysis: v=2.4 cv=f61IBPyM c=1 sm=1 tr=0 ts=6810bc18 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=XR8D0OoHHMoA:10 a=M5GUcnROAAAA:8 a=Bsf_nmtMMKoVPQtrbQ8A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA4NyBTYWx0ZWRfXyJ5Z+YjPySVu csjnui5hfng4OityfJxwmo32k3qeyMj2l7HWYXqVvm75qOJ8t7E+oO0JLoGl9z6tyWHVsda9MZ8 ugviDjePM2si4BSidHRFkFFgaipV4FiuQSG9ghUEqaUSQMdI0yrq1QWrL54iLopiYzTwuAUNOd/
- abzSUuKM0Ej/hKdHoklYEoWs/mJjy7nQi5AEddWHL13JWUDX/+z1awtRZme1kcsfTo/+HTQGdfD uhe4PrReOfBYtPsGBt/Fb5WcPN8huhF1lIWo+NzkoG5eyJ06vGvrnOJ+8sMo6Mfe199aEyTIouq ACOcTdwkQ/RznQVnGxPDrAQpwDQdobnK8QvMUuFO0rXufqf7F0X7BlkhM/LRVdjx3yY9iBMAkdw
- Z4aTbmXPjbx+UUck8l3kJM/uE+KBefWNpgiJljrEgBLsXs/LWnW6Tf6UAlpL5E9RNGl3Rs2J
-X-Proofpoint-ORIG-GUID: Gdk_q4JLrARwBEnrBMpTqzczb2E_F_0o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-29_04,2025-04-24_02,2025-02-21_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ospcqxhtsx62h4zktieruueip7uighwzaeagyohuhpd5m3s4gw@ec4oxjsu4isy>
 
-When the host loses heartbeat messages from the device,
-the driver calls the device-specific ndo_stop function,
-which frees the resources. If the driver is unloaded in
-this scenario, it calls ndo_stop again, attempting to free
-resources that have already been freed, leading to a host
-hang issue. To resolve this, dev_close should be called
-instead of the device-specific stop function.dev_close
-internally calls ndo_stop to stop the network interface
-and performs additional cleanup tasks. During the driver
-unload process, if the device is already down, ndo_stop
-is not called.
+Tue, Apr 29, 2025 at 09:20:40AM +0200, jiri@resnulli.us wrote:
+>Tue, Apr 29, 2025 at 01:10:31AM +0200, kuba@kernel.org wrote:
+>>On Fri, 25 Apr 2025 14:47:55 -0700 Saeed Mahameed wrote:
+>>> +/**
+>>> + * enum devlink_var_attr_type - Dynamic attribute type type.
+>>
+>>we no longer have "dynamic" in the name
+>>
+>>> + */
+>>> +enum devlink_var_attr_type {
+>>> +	/* Following values relate to the internal NLA_* values */
+>>> +	DEVLINK_VAR_ATTR_TYPE_U8 = 1,
+>>> +	DEVLINK_VAR_ATTR_TYPE_U16,
+>>> +	DEVLINK_VAR_ATTR_TYPE_U32,
+>>> +	DEVLINK_VAR_ATTR_TYPE_U64,
+>>> +	DEVLINK_VAR_ATTR_TYPE_STRING,
+>>> +	DEVLINK_VAR_ATTR_TYPE_FLAG,
+>>> +	DEVLINK_VAR_ATTR_TYPE_NUL_STRING = 10,
+>>> +	DEVLINK_VAR_ATTR_TYPE_BINARY,
+>>> +	__DEVLINK_VAR_ATTR_TYPE_CUSTOM_BASE = 0x80,
+>>> +	/* Any possible custom types, unrelated to NLA_* values go below */
+>>> +};
+>>> +
+>>>  enum devlink_attr {
+>>>  	/* don't change the order or add anything between, this is ABI! */
+>>>  	DEVLINK_ATTR_UNSPEC,
+>>
+>>>  static int
+>>> -devlink_param_type_to_nla_type(enum devlink_param_type param_type)
+>>> +devlink_param_type_to_var_attr_type(enum devlink_param_type param_type)
+>>>  {
+>>>  	switch (param_type) {
+>>>  	case DEVLINK_PARAM_TYPE_U8:
+>>> -		return NLA_U8;
+>>> +		return DEVLINK_VAR_ATTR_TYPE_U8;
+>>>  	case DEVLINK_PARAM_TYPE_U16:
+>>> -		return NLA_U16;
+>>> +		return DEVLINK_VAR_ATTR_TYPE_U16;
+>>>  	case DEVLINK_PARAM_TYPE_U32:
+>>> -		return NLA_U32;
+>>> +		return DEVLINK_VAR_ATTR_TYPE_U32;
+>>>  	case DEVLINK_PARAM_TYPE_STRING:
+>>> -		return NLA_STRING;
+>>> +		return DEVLINK_VAR_ATTR_TYPE_STRING;
+>>>  	case DEVLINK_PARAM_TYPE_BOOL:
+>>> -		return NLA_FLAG;
+>>> +		return DEVLINK_VAR_ATTR_TYPE_FLAG;
+>>>  	default:
+>>>  		return -EINVAL;
+>>
+>>Why do you keep the DEVLINK_PARAM_TYPE_* defines around?
+>>IMO it'd be fine to just use them directly instead of adding 
+>>the new enum, fmsg notwithstanding. But failing that we can rename 
+>>in the existing in-tree users to DEVLINK_VAR_ATTR_TYPE_* right?
+>>What does this translating back and forth buy us?
+>
+>Sure, I can do that in a separate patch. I think I will send these
+>patchset separatelly prior to Saeed's patchset.
 
-Fixes: 5cb96c29aa0e ("octeon_ep: add heartbeat monitor")
-Signed-off-by: Sathesh B Edara <sedara@marvell.com>
----
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hmm, on a second thought, we expose DEVLINK_PARAM_TYPE_* to drivers to
+specify type of driver-specific params:
+git grep DEVLINK_PARAM_TYPE_
+I would like to keep it as part of devlink param api. Looks nicer to me.
+Downside is this switch-case, but who really cares?
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 0a679e95196f..24499bb36c00 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1223,7 +1223,7 @@ static void octep_hb_timeout_task(struct work_struct *work)
- 		miss_cnt);
- 	rtnl_lock();
- 	if (netif_running(oct->netdev))
--		octep_stop(oct->netdev);
-+		dev_close(oct->netdev);
- 	rtnl_unlock();
- }
- 
--- 
-2.36.0
+Thanks!
 
+>
+>>
 
