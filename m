@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-186865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F44AA3A09
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:42:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0E1AA3A27
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B79B9C0056
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:42:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBD849C034B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC58253F2C;
-	Tue, 29 Apr 2025 21:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EC12698BF;
+	Tue, 29 Apr 2025 21:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udVGbX89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWJu0GT5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545412701C4;
-	Tue, 29 Apr 2025 21:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B99D132103;
+	Tue, 29 Apr 2025 21:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745962942; cv=none; b=uMqo7LsBKQRoZfxpLt6lG1FrywmDiPQbND1mwEKoWf7yE1vwIcM5Yx+AESVAnHkPzOrZ2tCGKHEPNI8yOwpLMeNAx1Hldu/c1TqSiumZqv1auuraxXYSozKcJmRWrHwROQc9aZwVXnXFQ8qMk0MoSHRsOgYEjf/XNpLLteyNkVs=
+	t=1745963390; cv=none; b=s4tDrPXfgNVuSi1qqMrIcGsiOdsG03zZArltlB7kwRcNeJmDS0/n/CUv9uNcHMMqbZihwRUjNbLOf3M4aCRqh+iXz7rS2FS9MJC6lWZz/TSxxre8Dg1fzETV+n7OG/F/7AyQ3coqp3TMm3CVy6OwB3KDwGxbL/moaz/1ixux4+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745962942; c=relaxed/simple;
-	bh=ZcjOsmCvWQ9kEExyzI58z4KQxafFY5Y4gSQ0njQDjII=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BC+oAycd8n52k7wqPlqKfWIoUY4fzeAVM+V6iXgdC4CmhdUc5Sl+3v+NvBC71ChhNb0dL0Jrs7+L+7x/5+Ga3lTTNzmPzc3kj9qD1dUEcbyQLasmR068HdZjszlqv5EoOWMNtkxWFcrDtTCrI6IbNYh0jpoQ/BNPlJNoO3tP2ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udVGbX89; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0DFC4CEE3;
-	Tue, 29 Apr 2025 21:42:21 +0000 (UTC)
+	s=arc-20240116; t=1745963390; c=relaxed/simple;
+	bh=AVB47antGnRuSOkz4VXQX+zDZwDN54Dnu1gRBZtYLFY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=O6OKTkR5IyQfagZoqAAygXukntdanxPR4iW4eEEzpgaea+C2a7bm+JLGRPwpvSmk+qjsZjVzIQeOHe86KVu1X+9/Cps+f72oioZXwpFHNUUOwrQMrUDrxkgyEaHpGKhThm+bNAPx32Zo+9yMGk+Z67l2XunxIEmBtkaWCJr+VSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KWJu0GT5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE757C4CEE3;
+	Tue, 29 Apr 2025 21:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745962941;
-	bh=ZcjOsmCvWQ9kEExyzI58z4KQxafFY5Y4gSQ0njQDjII=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=udVGbX89zU8DeYmtFGU+gzWJlcMtURBcxIH4Psb+cVWjOfnZupIH1yPFYAcfS2wpH
-	 8vxF5+/cJtINC7hRKLxvR8VVewkoJjKdxjFpi/3OFf+rs43TeGnIo72DrUTimtSMEP
-	 NWnq94MKjTZvke7TabGqu/VEfkZZ1Dgb8JUPz5r5gyKaNClUv3kHTP7BI84oaSRpLR
-	 uHZlXnMon8R4kZjlXXXlwPxWCQ3qI1E8cuPwEBWJXYNeVMP6na6Ne5cgbE3hG1IpK0
-	 p+CAet7cAUBatY9HTflZ3Lm4C22ZXKusib7ZZ6WvnspIt8R7UK2u1tK/snOxJ2lgBQ
-	 A6YG+6b3YwIsA==
-Date: Tue, 29 Apr 2025 14:42:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Chad Monroe <chad@monroe.io>, Felix Fietkau <nbd@nbd.name>, Bc-Bocun
- Chen <bc-bocun.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix SER panic with
- 4GB+ RAM
-Message-ID: <20250429144220.5d22fc1f@kernel.org>
-In-Reply-To: <4adc2aaeb0fb1b9cdc56bf21cf8e7fa328daa345.1745715843.git.daniel@makrotopia.org>
-References: <4adc2aaeb0fb1b9cdc56bf21cf8e7fa328daa345.1745715843.git.daniel@makrotopia.org>
+	s=k20201202; t=1745963389;
+	bh=AVB47antGnRuSOkz4VXQX+zDZwDN54Dnu1gRBZtYLFY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KWJu0GT5CDE5nJqp495YZgnGD7uCgUZYqp07QofV2fFTGZkH6ObM/1Eshb2vf3F3/
+	 gOvhENP6QEQBzT/67kvZ2q5d50A/0PywbJdYN3L4ZoqKHn4JVRl5QaGVuOlf+R8bd0
+	 7JVfTjI/FhnftfaQV4zaJ2hlRhcYywx2ARz0ije9n+oG/FmaeqrYgIthVzHyCaDv1Z
+	 FjbYQXL7iL1OHsthM2E5mVWBhz3JqX85XlzkZKOabDbc28GPeH7ICuJHtI6RZ3FJQ2
+	 ioicw5ZCDmzUKViGTUMFODlrMl5jvgJw4MmsQbkhSqcDSzySbi+E+CfuCxCZX9DTBV
+	 zMyuX2z+stdaA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB38A3822D4E;
+	Tue, 29 Apr 2025 21:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next/net v2 1/1] bpf: net_sched: Fix using bpf qdisc as
+ default qdisc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174596342875.1806681.1358143960820509677.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Apr 2025 21:50:28 +0000
+References: <20250429192128.3860571-1-ameryhung@gmail.com>
+In-Reply-To: <20250429192128.3860571-1-ameryhung@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+ andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org,
+ xiyou.wangcong@gmail.com, kernel-team@meta.com
 
-On Sun, 27 Apr 2025 02:05:44 +0100 Daniel Golle wrote:
-> +		if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
-> +			if (unlikely(dma_addr =3D=3D DMA_MAPPING_ERROR))
-> +				addr64 =3D FIELD_GET(RX_DMA_ADDR64_MASK,
-> +						   rxd->rxd2);
-> +			else
-> +				addr64 =3D RX_DMA_PREP_ADDR64(dma_addr);
+Hello:
 
-I guess it's correct but FWIW it reads slightly weird that in one
-branch we use FIELD_GET() and in the other "PREP". I get that the
-macros are a bit complicated but to the reader its not obvious whether
-the value stored in addr64 is expected to be shifted or not =F0=9F=A4=B7=EF=
-=B8=8F
+This patch was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-> + rxd->rxd2 =3D RX_DMA_PREP_PLEN0(ring->buf_size) | addr64;=20
+On Tue, 29 Apr 2025 12:21:28 -0700 you wrote:
+> Use bpf_try_module_get()/bpf_module_put() instead of try_module_get()/
+> module_put() when handling default qdisc since users can assign a bpf
+> qdisc to it.
+> 
+> To trigger the bug:
+> $ bpftool struct_ops register bpf_qdisc_fq.bpf.o /sys/fs/bpf
+> $ echo bpf_fq > /proc/sys/net/core/default_qdisc
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next/net,v2,1/1] bpf: net_sched: Fix using bpf qdisc as default qdisc
+    https://git.kernel.org/bpf/bpf-next/c/7625645e6945
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
