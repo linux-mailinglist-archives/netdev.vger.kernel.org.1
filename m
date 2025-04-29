@@ -1,129 +1,146 @@
-Return-Path: <netdev+bounces-186648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5976FAA00AD
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:40:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CE9AA00E8
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 638F35A1903
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:39:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A281F7A342A
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDC325F7AB;
-	Tue, 29 Apr 2025 03:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DEC205E25;
+	Tue, 29 Apr 2025 03:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtR7Al/S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki6bYbb6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314E01D540
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 03:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6326F1876;
+	Tue, 29 Apr 2025 03:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745897996; cv=none; b=VihrW4Mwda0O+cH+Bm3dxyaywfXFio+XMvAhwIj8kylLAxmXk9MSMp2Mm9fhy4N8LhB6cbCbUd0zYgtj0qTfXpZFHomciSp1OEgOartm++CV5BCifd9vyLv/W6+wrKLZl03NQ4gyndLoylE9tKld2O5Jjqx0/8cRpLwpEzvPQJ0=
+	t=1745898774; cv=none; b=Jwu49Ku67cI8VLEJeSNVX2on9iOHQnaQGay7y026/rZZwS8B6LC16mkx7KxcA7OouoZiogovTe6m2lqN80zvK2ySjexfwzpE9hvCzdxyoS5xWmKVm/gCGHuG8QqUHQu2LQFoBScgeCOMISLmrphB9i2hj3syVZoYlqsuLXNSIgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745897996; c=relaxed/simple;
-	bh=CZ+mWcXOnoNmB5QyyZZqqFpy5PLSEtLDvf2WP/DW33Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P5IY81P7k903i7L0zL2MQmKDFL2LxcWVt8FcyBPu5xQr0UeMXxVr3y+2AvoWMv1/ecoizQ7FKC3gGrBGAewoxYnnUG9F1YyUKEzq23U4wVuGm+IB4YT1fcyVMGfdw47467mQOkibIzYqn2RWlLM2Mkibn7wHAqi+hexEniVda4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtR7Al/S; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745897994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CZ+mWcXOnoNmB5QyyZZqqFpy5PLSEtLDvf2WP/DW33Y=;
-	b=YtR7Al/SvAHD8T1A6ELqi2CJzDK2Dzw/a7NkdgYu+CTNT5u8DEezCWV1F2GV2xjbG/HY+j
-	S7gpVmnSdcEaNzXe/pasMmdAqHqLdZj1Id0AsKbwWElYa0sEYZ2Cm+l2/lSnloZ8cxzrI3
-	TBD+UWEGvaFf9aQLipNs5iWYLWJTY6A=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-aUxPNY-FOD-3jeBQDz57bA-1; Mon, 28 Apr 2025 23:39:52 -0400
-X-MC-Unique: aUxPNY-FOD-3jeBQDz57bA-1
-X-Mimecast-MFC-AGG-ID: aUxPNY-FOD-3jeBQDz57bA_1745897991
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3087a704c6bso5416884a91.2
-        for <netdev@vger.kernel.org>; Mon, 28 Apr 2025 20:39:52 -0700 (PDT)
+	s=arc-20240116; t=1745898774; c=relaxed/simple;
+	bh=hHqvzdsTuzIMlvA7HoDNTV7xHO1P/qj1EWq5+5j7pPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tT1mNbmRCLH3gpD0iATbsxx3YYAiasUWv1eeOmuMIyc1iudbh3eb+AnJwlUeLVbAWItnYxUyfWvrrjpN+5rwGJCTzlmyLqXn5PDxQesonEq4qgOvdOlrk4L9iPqBRZpkP/tobYqJP/juEOHfuRK7jpZKL0ImEbsJVxoicj4yGP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ki6bYbb6; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-73bf1cef6ceso5536465b3a.0;
+        Mon, 28 Apr 2025 20:52:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745898771; x=1746503571; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xmezqW1YeoBrK/Hp7omIeEHWydcgRF3JWD7dlwVguIM=;
+        b=ki6bYbb6BPQsLr0SOh8hjXqbzsH6UMWDTyOUUpdsyN4L4k17+flubOgUYLuhUuD0ZO
+         gfAEerQimM5lZB+XSH60NHuklvNBqpSBPeOA8rzZ0/DwFNKOvrNRfaZLCaaU3706v3YF
+         mF3WM6Mby03tCFpe28em9fw7vs+FLQ0m9aAqdqwYpWL665bLDWFWqnZM2qZEe0LJeTMG
+         8CPQUOgjwWM/+7QLmgaBtVB2xgrTQyDVk4toG577tQoqe14ZjzFgX6eKnxiHEhEzvDmA
+         S2rvuqaHHGdh3a1lZ1qctKkJSmIzkO6S8s8KXdG4xS8AU9pHdohfMGbYfDjjdlzYtoj8
+         XeWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745897991; x=1746502791;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CZ+mWcXOnoNmB5QyyZZqqFpy5PLSEtLDvf2WP/DW33Y=;
-        b=FbqjmLfV9iaNqiAPFVCBGc/bXS5q5PT+4hIHJlOzQHi1UPEYIdedJxGjtYlKLg0rQv
-         NCXlUfW3gSDKFLVEMrTnQSjq9MXLi+mtoLVZxh9vTBs8nLxcKLYB7/ozPyMBrOBfx56N
-         aHASZfFXjxOYSPAiXDpWTJoFIlBC3G4id9BOpst7d4wXSZ06mRBcFn3RHa+zgEwmzTGt
-         kvLhFexMxzZy3tl5WXZKiv/zfVzhaXws7sv3gU2OEl2MFDMwD4OO+n4+AdXke4XtpZ9x
-         Q1DpgybYqyhUnOahIQ3ten6CvV0vBB6LwC35a19R71v1PTJpv7yunST0DWC7VJjHy1b9
-         8tww==
-X-Forwarded-Encrypted: i=1; AJvYcCV2uEyAO2wrXBujPcBBYUvNnCkOTfoZE4x+1/Q4jDsC0BLOwZEm9ywK6GrWYakLyta4HWm5KiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA6i1ULtXvXITQsNT+Zn1ulzHtkyyXUkCG9ZTnDfLFGVp4+kIB
-	5MMo22POiC6UoMTo1/uBJpnXIIpg2TkwhAwE8uQZPcS+fWYcgVrA2udflz+vLLCuWmotnuhY6Ov
-	c0Al0VQKq0laS3S+eQ3HmhTUchbUYT1+Qdy7ygsrSFXRSDY6zhiCg7rQEiaFcw/Z0W6di7bbuPI
-	eSFaKiEPT/wuGlbU2f+o659FvXmG+T
-X-Gm-Gg: ASbGnctymbqpIAm+RcZ559+k7vwNIwksSiLHcuw4DvuyQq029fOz1iMxd9+c186gXGv
-	DdSkE2824XZ+mZ5PTrQUL+KOOok1pNJNZs15KMnYl2FxcWe+pe3L1Aw7ST0kuvY3+uQ==
-X-Received: by 2002:a17:90b:4cc4:b0:305:5f25:59a5 with SMTP id 98e67ed59e1d1-30a215a9e6cmr3195106a91.35.1745897991094;
-        Mon, 28 Apr 2025 20:39:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGO25nt6hV3dV111j+arayWq9RJrat5QwpIGcVcLMQhppu+t5T6cKy8dvsGeNPzrwkLvZvBpyPz/UcGeHutQWE=
-X-Received: by 2002:a17:90b:4cc4:b0:305:5f25:59a5 with SMTP id
- 98e67ed59e1d1-30a215a9e6cmr3195076a91.35.1745897990674; Mon, 28 Apr 2025
- 20:39:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745898771; x=1746503571;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xmezqW1YeoBrK/Hp7omIeEHWydcgRF3JWD7dlwVguIM=;
+        b=j373gXjDarubpz7mkJoQ3YnZl15GU5kewsSlwFJMrZzzLMbVdrFGviPs5HwLBmVArR
+         2VSJQSTFdl1KmF2NGvWJ7sNzdwy/C/j57VN0B2X3rLWPDj4n0rvf+YOHvpPsjdJ+b6/e
+         iXtsVZBGgsxq6JHMivrbIAhJTS7Eba7qHiIYfXQFZmDdyrqKEvD3X8YcUleJBo9hkqCG
+         ukqGOT5SMt3XzYU5QZg2oMA9uqs/r6L3slUqcEJJ3RzRDKTm0hyYJE3u3sRmhMwEoRxW
+         FUg6PWRs6nOOP603j7Pp7B3TonWrtZRmZPHjkRd3GbbsgSK2LXYKRFwZ8tHrNa88jEsp
+         b/eQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUi9ZY8+4HtOE/rgj+k80xyfMXptScP7I8llWrZyyFZ03920M/mtSf/erbRvqnErLIhD4z80iLD@vger.kernel.org, AJvYcCVWOdWB19fuX8eISkIfEwxGV1V+YaNCawicSHTka4j7O3iwDZTTKRZzIrNDSxhE8vsr+XRk1HeKalAS5VY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMc9cH/wezZpW0SvQaZOnR5dGJvBPc8M9iZoU8vaLetL57JINx
+	s5aEhqBtiunBGicXEq6r6D9hZtQDa2a+xRyMPGyEHucvyseZriYM
+X-Gm-Gg: ASbGnct04Pj4+TNYtbI+NqNZndRXCCtF86+mK1btymp/SVBSvPrSmsk6RZwxzeeB4tU
+	Gii2sg8CXC2h6hAa24HmpO06NhfrkH0q8NOl6Evc+medZMixhVL0CiwRe0fnCJLpkuDSRrqaUzZ
+	Mw+N3kLiGKCvPEl/e1PhCd3saN+TU+eynF26JtcMFt84mTtwbqehpcB6SmUlBH8+GK7O0Gtju2c
+	jW1JtSpyBCXtfwqWfEoAzur3vPMAdWVnrVa6uRIvFnc7Jq+uhXTxk7qxLsheIxTMdJKAg8uSy7J
+	8GAahYZkPFumnk3TXRWHKliTlWUrcCi84aSC8v3N3HH/Gw==
+X-Google-Smtp-Source: AGHT+IGJA9OLPgA1vG6BAHW8IqhsATbJmiY+nsWH5A89H1retTnvipH5EJniCl3fYfAS/FbOPCQwdw==
+X-Received: by 2002:a05:6a20:9d93:b0:1f5:7eb5:72dc with SMTP id adf61e73a8af0-2046a3abe8amr14500891637.3.1745898771504;
+        Mon, 28 Apr 2025 20:52:51 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15f7ec1c4bsm6611476a12.21.2025.04.28.20.52.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 20:52:50 -0700 (PDT)
+Date: Tue, 29 Apr 2025 03:52:44 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: Wang Liang <wangliang74@huawei.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org,
+	syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] bonding: hold ops lock around get_link
+Message-ID: <aBBNDOmGiuq_BXT0@fedora>
+References: <20250410161117.3519250-1-sdf@fomichev.me>
+ <11fb538b-0007-4fe7-96b2-6ddb255b496e@huawei.com>
+ <aA7hwMhd3kyKpvUu@fedora>
+ <804583.1745853040@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421024457.112163-1-lulu@redhat.com> <20250421024457.112163-5-lulu@redhat.com>
- <CACGkMEt-ewTqeHDMq847WDEGiW+x-TEPG6GTDDUbayVmuiVvzg@mail.gmail.com> <CACGkMEte6Lobr+tFM9ZmrDWYOpMtN6Xy=rzvTy=YxSPkHaVdPA@mail.gmail.com>
-In-Reply-To: <CACGkMEte6Lobr+tFM9ZmrDWYOpMtN6Xy=rzvTy=YxSPkHaVdPA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 29 Apr 2025 11:39:37 +0800
-X-Gm-Features: ATxdqUEwpamsgyJSROjElXTifDP9gzLG-yrcg3CrQ8683svXB8ELNH4GnXFNWQM
-Message-ID: <CACGkMEstbCKdHahYE6cXXu1kvFxiVGoBw3sr4aGs4=MiDE4azg@mail.gmail.com>
-Subject: Re: [PATCH v9 4/4] vhost: Add a KConfig knob to enable IOCTL VHOST_FORK_FROM_OWNER
-To: mst@redhat.com
-Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <804583.1745853040@famine>
 
-On Mon, Apr 21, 2025 at 11:46=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
->
-> On Mon, Apr 21, 2025 at 11:45=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
- wrote:
+On Mon, Apr 28, 2025 at 08:10:40AM -0700, Jay Vosburgh wrote:
 > >
-> > On Mon, Apr 21, 2025 at 10:45=E2=80=AFAM Cindy Lu <lulu@redhat.com> wro=
-te:
-> > >
-> > > Introduce a new config knob `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL`,
-> > > to control the availability of the `VHOST_FORK_FROM_OWNER` ioctl.
-> > > When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set to n, the ioctl
-> > > is disabled, and any attempt to use it will result in failure.
-> >
-> > I think we need to describe why the default value was chosen to be fals=
-e.
-> >
-> > What's more, should we document the implications here?
-> >
-> > inherit_owner was set to false: this means "legacy" userspace may
->
-> I meant "true" actually.
+> >What if rtnl_trylock() failed? This will return ret directly.
+> >Maybe
+> >	if (slave_dev->ethtool_ops->get_link && rtnl_trylock()) {
+> >		netdev_lock_ops(slave_dev);
+> >		ret = slave_dev->ethtool_ops->get_link(slave_dev);
+> >		netdev_unlock_ops(slave_dev);
+> >		rtnl_unlock();
+> >		return ret ? BMSR_LSTATUS : 0;
+> >	}
+> 
+> 	This is on me; I had worked up a patch to remove all of this
+> logic entirely and deprecate use_carrier, but got sidetracked.  Let me
+> rebase it and repost it for real.
+> 
+> 	For reference, the original patch is below; it still needs an
+> update to Documentation/networking/bonding.rst.
+> 
+> Subject: [PATCH RFC net-next] bonding: Remove support for use_carrier
+> 
+> 	 Remove the implementation of use_carrier, the link monitoring
+> method that utilizes ethtool or ioctl to determine the link state of an
+> interface in a bond.  The ability to set or query the use_carrier option
+> remains, but bonding now always behaves as if use_carrier=1, which relies
+> on netif_carrier_ok() to determine the link state of interfaces.
+> 
+> 	To avoid acquiring RTNL many times per second, bonding inspects
+> link state under RCU, but not under RTNL.  However, ethtool
+> implementations in drivers may sleep, and therefore this strategy is
+> unsuitable for use with calls into driver ethtool functions.
+> 
+> 	The use_carrier option was introduced in 2003, to provide
+> backwards compatibility for network device drivers that did not support
+> the then-new netif_carrier_ok/on/off system.  Device drivers are now
+> expected to support netif_carrier_*, and the use_carrier backwards
+> compatibility logic is no longer necessary.
+> 
+> Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com/
+> Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid/
+> Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
+> 
 
-MIchael, I'd expect inherit_owner to be false. Otherwise legacy
-applications need to be modified in order to get the behaviour
-recovered which is an impossible taks.
+Thanks, The patch looks good to me.
 
-Any idea on this?
-
-Thanks
-
+Regards
+Hangbin
 
