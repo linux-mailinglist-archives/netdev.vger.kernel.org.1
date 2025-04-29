@@ -1,81 +1,129 @@
-Return-Path: <netdev+bounces-186887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4AB1AA3C4E
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:34:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B86AA3C57
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779CF1A84D7C
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:34:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28065460D66
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D08B2BE0F2;
-	Tue, 29 Apr 2025 23:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC2F2DCB66;
+	Tue, 29 Apr 2025 23:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXXHsUoC"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="QDm1WH5a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BD1215764;
-	Tue, 29 Apr 2025 23:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658FB2DCB41
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 23:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745969651; cv=none; b=QJKjtUtLdgk0TEVzbH7J0Ie8Q8DIvdpCcEbgCUhxEAT2Rbp5Zf0hgvQ/Y4zF5FiQlmfYcGBOcbqvHk3/rZu7fxVj6pGEmWi2/m3CCqYbpvXxlYsDVLkqR87KDly1uDPLvYgAC1BnfKzj/+uFM/aLEZJGcWyCZD5XykCDU1kLtUY=
+	t=1745969712; cv=none; b=KjBzXqcwQFsQw3ncgD9ebAf5uDjrklw+FF8tMKcZTvmdgOeBpR/LpX4+11vGWYnju9TZygluwwo7VI7VSKv2R49/7/Z54Hn//PVCST393xl6hPUN1LVLBJpy1fnvQ6e7vtJyfeMqbtuHnnh3YiIafDI/o6XAFLOeQdLuMoST9Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745969651; c=relaxed/simple;
-	bh=PI1bWM9PSBAB+xNlqE8e1e3TgpJcG5zMWUncSkFgR3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fh9KBTiUzSY2XzBPUBgrW2wULiFoTcqWdtnTLQRrTN736JJcNcy33vB3wWafOH7Tu/EChffZ4kyeAZcnfvNdJrsi+1qoYZlT3O9Cm1QT22RDTPEKjzhHS8sBy2kYHW8W2gW0BLq+R89C6/hYnA2DJFHR4JBfeeY7mOLrrUbZ0EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXXHsUoC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68121C4CEE3;
-	Tue, 29 Apr 2025 23:34:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745969650;
-	bh=PI1bWM9PSBAB+xNlqE8e1e3TgpJcG5zMWUncSkFgR3w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HXXHsUoCX6PRG9Y7LdiUBHlexrPbMvWpWtg4XGDUDxbCflpmtz0GrH55jLmnbc+Vs
-	 /yvlQtGzeZ3vk7R/uyVy3tP0mjuZ+TzWLeHhtxuf2xlqnCiASJt8HJUSwYVlRsgyu4
-	 ytuDoVvbab99pQE2V42cH0ryBs3l+djmCg4zP4yJZZcR0uLxA4H073+MX7nCP4CUB6
-	 8Icv8GJGvFQS4zh95dt3gKkMl5+ZocDmvizhOwR1K3mTDX0Qg1Q97CG/NEavSFv/an
-	 PXYXEPmFPJ7Itb6xZp3Bxqoi/VCdiGXwgBTTt6+3k+ngKhJbiz3JxPNohic81XL5mq
-	 Nyq4evUdG1iZg==
-Date: Tue, 29 Apr 2025 16:34:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v3 3/4] net: selftests: add checksum mode
- support and SW checksum handling
-Message-ID: <20250429163409.2b7e8c65@kernel.org>
-In-Reply-To: <20250429074103.2991006-4-o.rempel@pengutronix.de>
-References: <20250429074103.2991006-1-o.rempel@pengutronix.de>
-	<20250429074103.2991006-4-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1745969712; c=relaxed/simple;
+	bh=rsEl9UaP3K3oS3AXEGJ4//+d9JcVZzKygP7EoztCreI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uaLNEdW6g7b4sLO0dIu3lumi7nURgpFd+E5HGadXwm+WH9i1Yr4RARu2/4WW8MotKAuNSVr6N3q2rIQePdxynphd0TiADJaMUZMbuHWMMjQYquBKOwTdM/grB+v0OHeymVP2tyvm5DQBkyHTmIJvY+u5nauNpEOAZ2aZylzdXXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=QDm1WH5a; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e589c258663so5973421276.1
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 16:35:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1745969708; x=1746574508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RmnUMSIYfYwpn2HyiLKQyNsn7KSrfP3LbpSrKf+5Aoo=;
+        b=QDm1WH5aDX3S3onHkINlqKhU3r9HLrw9D1iA4hyEWhENRuaD2NoLbOYORnp9+t083B
+         2ZEG+KjLVuRtm8hoXk4HbUQXHgx+8/3YuC1MUHB0OOR8YumhPW3x93lR3uV7dh6TAJ1C
+         Cg4Z53TupJMN7ljgn/spNJm2j6L6EQV2CMOHBEoDRkHyXWg8IADMRpxcZ1Q/6YcaWszZ
+         xQQ8xpM3l//Dvo1h8453Bv0azTO8mUYPBv3lktXIg75qLusprpBitm76RUHAREgu2bHP
+         RAr2MZ4YMrOhy3JzoxkSDgZ38hXSb0YTYXcIWZBqWyfh3MgB3P1ll09FlnC3C4fZqfNm
+         rVZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745969708; x=1746574508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RmnUMSIYfYwpn2HyiLKQyNsn7KSrfP3LbpSrKf+5Aoo=;
+        b=gFvvsPFH6MXloY0zfFWZA+IbvZFeLYK2IrO9JBmsXvRu/+QCvJX0aaEhiR03kinXIC
+         4Wt3dbcpnYQH4hXpbP9pVuQHgboDcfsr8KWQjrppi4DOBCbfZMRxiMmrjt5lV25sQG6O
+         GPmPlVAGK6ds1mfHIL6AzO/NTvth5ztgMq97/m929Nurt0na8xCSRJyMi2cPNJHvIvr8
+         Nn2sxLHFQ89hHdHYKEI+gwjAiGGjsiV0f6Zp2D67FLObLlAy2vzMx8qb2a9iVnzbMUII
+         q4N/0/hCP3/m5+eUASPpfA5J9rp3aS7AC/RsVQNU9PLdNxoGG3N+PsNANp6iaiE2LOEa
+         S7Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCXeJjGP1XXk2KtCdK5TrLQrMhZhnWUOnQtDk5NON46s1gZPThhZQDwY8IdddqDq8G8tgNm+O/w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX7dl3iZPXFXZ6QfNQOIXUMvy6IzDEGaG/SD0M6CXo0K5UU3X9
+	9ixO8AHfo5ZyjmNVqKNs87lHf+hGcE+xKDknZbIZ6AuVVdnHCtpVDGCOR3l7Y6wW/uwIsYDtoSc
+	zD6O6IV+mJR2dL/JN9ZtQaq80zKQu0zJRPGIY
+X-Gm-Gg: ASbGncvUxzsypunN05jQH28JkzZmfAdzO8qAtgpbzEor/M/YyqcHYOQHng9Cm7KyFFq
+	alT0A4uWTkrw4cNX8ELg5lyjuNF4kAYzXO4d+NUr2kJnsKirqtJQtKyTWe/HsbAMeLgUVag+Rfs
+	E8hMZcZIppVh1B0pcaxpr2Pg==
+X-Google-Smtp-Source: AGHT+IF/PA17pzv+wdeYWaRIlp9MG3hOQmLeL81RAcqY50BbqvkWNnzjIoFkoR7L0ftuH1lvEReltyIjrUvBDvzq1Oo=
+X-Received: by 2002:a05:6902:18d0:b0:e6d:d996:d8e2 with SMTP id
+ 3f1490d57ef6-e73ea8e46c4mr1522551276.14.1745969708362; Tue, 29 Apr 2025
+ 16:35:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
+In-Reply-To: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 29 Apr 2025 19:34:57 -0400
+X-Gm-Features: ATxdqUErdvmLNdYZ_wWU2pMeCgVPQbMkXZvEOfiOk_QLBFdZZaZpYQrTWKeaZ3k
+Message-ID: <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
+Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
+ interface
+To: Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler <casey@schaufler-ca.com>, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	selinux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 29 Apr 2025 09:41:02 +0200 Oleksij Rempel wrote:
-> +/**
-> + * net_test_setup_sw_csum - Compute and apply software checksum
-> + *                          (CHECKSUM_COMPLETE)
-> + * @skb: Socket buffer with transport header set
-> + * @iph: Pointer to IPv4 header inside skb
-> + *
-> + * This function computes and fills the transport layer checksum (TCP or UDP),
-> + * and sets skb->ip_summed = CHECKSUM_COMPLETE.
-> + *
-> + * Returns 0 on success, or negative error code on failure.
+On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
+<stephen.smalley.work@gmail.com> wrote:
+>
+> Update the security_inode_listsecurity() interface to allow
+> use of the xattr_list_one() helper and update the hook
+> implementations.
+>
+> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.small=
+ey.work@gmail.com/
+>
+> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+> ---
+> This patch is relative to the one linked above, which in theory is on
+> vfs.fixes but doesn't appear to have been pushed when I looked.
+>
+>  fs/nfs/nfs4proc.c             | 10 ++++++----
+>  fs/xattr.c                    | 19 +++++++------------
+>  include/linux/lsm_hook_defs.h |  4 ++--
+>  include/linux/security.h      |  5 +++--
+>  net/socket.c                  | 17 +++++++----------
+>  security/security.c           | 16 ++++++++--------
+>  security/selinux/hooks.c      | 10 +++-------
+>  security/smack/smack_lsm.c    | 13 ++++---------
+>  8 files changed, 40 insertions(+), 54 deletions(-)
 
-Has to be Return: or Returns: for kdoc to be happy
--- 
-pw-bot: cr
+Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Smack
+folks I can pull this into the LSM tree.
+
+--=20
+paul-moore.com
 
