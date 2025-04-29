@@ -1,82 +1,125 @@
-Return-Path: <netdev+bounces-186737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79594AA0BA7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:29:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7F00AA0BB2
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E56DA1A855A2
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:29:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56DD117D55C
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF472C257F;
-	Tue, 29 Apr 2025 12:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2ED2C2AB3;
+	Tue, 29 Apr 2025 12:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MfWx5slO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c5BJl+7K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487A0524F;
-	Tue, 29 Apr 2025 12:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C0F524F;
+	Tue, 29 Apr 2025 12:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745929730; cv=none; b=F1ORXhwTecoJDdSK6o7FULu1uKnx9sXrY4tMiBqeITgqpLTAqZdUojdb9K4jAsIBBgxwy+QzoSOLzpIC2mItRuzF5lVCdlRMsFaWSQfdDHfYt3O6emIAZGjFhF8NovZqu+EriZdjfG3ZfxGnHZ59QJkKXyiWNjvWGi8GvjMxnvs=
+	t=1745929779; cv=none; b=O/GAyftsfEUKRpu4dsJZ4XmgQ4YO0XVo1IJH6Dm5Xq47+9QqM4POtRCHmSsfhZAc1dhYdMIkN5q+r24fpxuBkF7cdwxukxV/Od0XDysMYs/rJAe9RzttVQRzHoDsCX1lZpdnQvTWxbRRN+pJiJyiXWmSwWBLk0/GDJ0fVbAx3bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745929730; c=relaxed/simple;
-	bh=jqowjZvlBiorAne8OamkMAWE/1Sis1GBvUHwc1czNHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vFv52zA2W1p51GCNNWqy9OscL59a8CMyYnyEnLNkhaE/EftPSU1Z8j17dOv7krwGCG3yane9twmZC3owr63FMjxhj6sarPPxp2w6zMoNeq9EAHf5OcLrJ6neNctB35urODxSIX93Cvqa2SO//7CeK9hbWTVaUg4Ju5fvU4Xx/CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MfWx5slO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=po7aA4vJqUXSpskhIE3e8lkgayysJvhbX54JD8OfIHE=; b=MfWx5slOJV/JFEGXhaiZ0ejvmp
-	lkS0+oUoMEnwnDObgtOP6U21T8gOnEzi6Wsj/WHxmYfUGPl78I9nDd5JtDLzT3wlkn6WPPPPX5riX
-	nmHP41hxeQUea9vk0Ibf6qCx5K4ZdUiWMnXYCgS/+Iec5yqxVm/nMq00BCR8ixwVsbH8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u9k4l-00Aw6Q-AI; Tue, 29 Apr 2025 14:28:39 +0200
-Date: Tue, 29 Apr 2025 14:28:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: daniel.braunwarth@kuka.com
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: phy: realtek: Add support for WOL magic
- packet on RTL8211F
-Message-ID: <fefb3642-b741-483d-beaa-bba557306d68@lunn.ch>
-References: <20250429-realtek_wol-v2-1-8f84def1ef2c@kuka.com>
+	s=arc-20240116; t=1745929779; c=relaxed/simple;
+	bh=R4hIbiasEfWJ6KpbYMDWZDcsupzXecQo/dfwa/BA+Y4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m2ndm0DCaa0MvEXquYd2sJmL9WznTyIbS5slqcS3sGitNAKvotXbsHiifRBXwYXfVWwxIHEa0yG1M8jlrNsaLR0qFfsIuPKkrFIcDEh8YLbrwFHATApEgB2l7x0byscxvbd6eUaXnQcGZ8RqYfkuv+8z7+pBWS1P9qiId9cV+H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c5BJl+7K; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4381243AF0;
+	Tue, 29 Apr 2025 12:29:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1745929775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=omuNp2b6rybMb7GMAP26voHy5cNldstelBvz6qt6wuY=;
+	b=c5BJl+7KmJVkPYdSDB5vSRXnvCdO1iSQhgT6po339KJX9iYhcnvYkj8SCRk1eiBGkCLVzB
+	NGwM6Atw+QlakitMYQQwOGboBiKAAB+Xvk/i0GWFs8bWzvaza0n05VWKpOG0vOOYmvADQE
+	UUCyjGq23ka66F5kt1HgrF3XpHqqihb6TpaI3WAHZJQIZtqZJTD+0bf/SYaBJP7PBCPCI0
+	0q5tAgboqQsKKOtzOhjefCpmpYcyvyONVR5H0yNahEL8RW4z/2xynLxM5PUx7kFhsio2Ya
+	MAgbY+QC2U4nn+TFQeLBkGlATZyztb9awAC+YXZZaMH9tEy+kWb3X4Zpo0itPA==
+Date: Tue, 29 Apr 2025 14:29:32 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
+ <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+ <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Mark
+ Brown <broonie@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v9 03/13] net: pse-pd: tps23881: Add support
+ for PSE events and interrupts
+Message-ID: <20250429142932.718a8415@kmaincent-XPS-13-7390>
+In-Reply-To: <366c8743-224b-4715-a2ff-399b16996621@redhat.com>
+References: <20250422-feature_poe_port_prio-v9-0-417fc007572d@bootlin.com>
+	<20250422-feature_poe_port_prio-v9-3-417fc007572d@bootlin.com>
+	<366c8743-224b-4715-a2ff-399b16996621@redhat.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250429-realtek_wol-v2-1-8f84def1ef2c@kuka.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvieefkedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughum
+ hgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Apr 29, 2025 at 01:33:37PM +0200, Daniel Braunwarth via B4 Relay wrote:
-> From: Daniel Braunwarth <daniel.braunwarth@kuka.com>
-> 
-> The RTL8211F supports multiple WOL modes. This patch adds support for
-> magic packets.
-> 
-> The PHY notifies the system via the INTB/PMEB pin when a WOL event
-> occurs.
-> 
-> Signed-off-by: Daniel Braunwarth <daniel.braunwarth@kuka.com>
+On Tue, 29 Apr 2025 11:07:04 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> On 4/22/25 4:56 PM, Kory Maincent wrote:
+> > +/* Convert interrupt events to 0xff to be aligned with the chan
+> > + * number.
+> > + */
+> > +static u8 tps23881_irq_export_chans_helper(u16 reg_val, u8 field_offse=
+t)
+> > +{
+> > +	u8 val;
+> > +
+> > +	val =3D (reg_val >> (4 + field_offset) & 0xf0) |
+> > +	      (reg_val >> field_offset & 0x0f); =20
+>=20
+> I'm probably low on coffee but I don't see why the above could not be
+> replaced with:
+>=20
+> 	return reg_val >> field_offset;
+>=20
+> (given that the return type is u8)
 
-    Andrew
+Shift takes precedence to bit operation.
+So the calculation is like:
+val =3D ((reg_val >> (4 + field_offset)) & 0xf0) |=20
+      ((reg_val >> field_offset) & 0x0f)
+
+Supposing reg_val =3D 0xabcd;
+
+- If field_offset =3D 0, we return 0xbd;
+- If field_offset =3D 4, we return 0xac
+
+Regards
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
