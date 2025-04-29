@@ -1,213 +1,167 @@
-Return-Path: <netdev+bounces-186742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E8EAA0D89
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:33:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B86AA0D9D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3F616F97D
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:33:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB6BD4676A7
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436102BE7C0;
-	Tue, 29 Apr 2025 13:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A4B2D1F74;
+	Tue, 29 Apr 2025 13:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b="GmeLQZ0h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.38])
+Received: from mail-24422.protonmail.ch (mail-24422.protonmail.ch [109.224.244.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5090284A35;
-	Tue, 29 Apr 2025 13:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACEF2C2AC8
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 13:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745933598; cv=none; b=nNbuSPbQvIntdqruFyXzJmrLWhg/Az6BAdI+yxr5uab/ow09o2O3VouP4bRG8fQeZJ6b4apVX4neVZy8v8vgCfzE4pDVTA28uE2W3tp011C8fpvN7bQrRz7m29/Gj0s+dnixoOyD29gSdlKWq/8m9XDvgcqpuvuZvTZMZ9eu+vM=
+	t=1745934096; cv=none; b=gSvtYN92eQkidN5CcuhATiQ+CxZNS/W6AhiOf3CrSjazFnoCJWkzCljqLeLxDJD6VgC3CnAa3to1iy0awjKmNM+yOGMs/GQ6r4zdR3LlE7XuGCebguQWDThWa40lF5FFNoILzK6gFFw+D2cDxaYxEXsxV9kQRdnUAl6K0N0V6Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745933598; c=relaxed/simple;
-	bh=dhfOGYE/ifFpnk7DyKqjBVByUrNA1ms2k80mmNiL4Mw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cuYhryYh1PGbvQJHemRmDuiIRLevySOsr9V2xLmzFlt7eA9U8DGebUjuAnSManF8+Dgvazodj55ELFnFOsj69rAcCYGuJg+Soc6yO1ea0qtW0m08S1SSSEI5Y04EW45RkA6ZEp0WC9tgSIaVvL0gRxokYBV/aBXsd1i94pGNIjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from localhost.localdomain ([160.80.103.126])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 53TDPMc6009034
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 29 Apr 2025 15:25:23 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-        Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org
-Cc: Stefano Salsano <stefano.salsano@uniroma2.it>,
-        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: [net-next] ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during seg6local LWT setup
-Date: Tue, 29 Apr 2025 15:24:53 +0200
-Message-Id: <20250429132453.31605-1-andrea.mayer@uniroma2.it>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1745934096; c=relaxed/simple;
+	bh=FbLQN++8XrYxCWc7f00ETR7/f2G1tEbjbbvM1AokLTQ=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i28fiIkC1jw2mNVTlW/Iy3fXz60FBUscC2sR0FwZl+UbJzfCN80LB0NS2EUb3UmHcbpLQQXNElsAA8HlJJFU6+THW2EquW4PCHKw5PKKNmJWoCzDU1VlnITivCWITFTnMdAH0QZpQ7+LEc7iaiFGxZKT4CrDGfJfgB21Za4tbg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io; spf=pass smtp.mailfrom=syst3mfailure.io; dkim=pass (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b=GmeLQZ0h; arc=none smtp.client-ip=109.224.244.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=syst3mfailure.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syst3mfailure.io;
+	s=protonmail2; t=1745934083; x=1746193283;
+	bh=JjUmW77xKhN7h+ALaHwcjyJXu3OU7GgSJ9M/6/iovrs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=GmeLQZ0h98VxaB7fzHHIiZNUTwqeR9DbJQEgMREwk9pqr+rjtioRaXMx7r8nRUEWO
+	 OStxg3oVSgmYa1mQlxXnjbmHn/zGg7d5xrA8VsQGn3jo2ipnLn7cetopPrZfNq+NrQ
+	 fwA/E+2rIN9Lv9OZ1TNNRym8it4Q1l2h/Cz5+Ri1eX6x47dw4BoD8s16iIw7wKtkwY
+	 n5YF+SQZW7XddAJx+LPRQHKChIcJUQm5jFq1plgYwDtqJOjPpuxM4rvRosMjymq2Wt
+	 +b+7BQkQVq1qENc8tWXczB4REhkvgSPxvQhmpSdr7D7sbGXlZCfU6JBo9mnpm83j0r
+	 nKIek5pPuJUrA==
+Date: Tue, 29 Apr 2025 13:41:19 +0000
+To: Cong Wang <xiyou.wangcong@gmail.com>
+From: Savy <savy@syst3mfailure.io>
+Cc: Will <willsroot@protonmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, jhs@mojatatu.com, jiri@resnulli.us
+Subject: Re: [BUG] net/sched: Race Condition and Null Dereference in codel_change, pie_change, fq_pie_change, fq_codel_change, hhf_change
+Message-ID: <EBHeQZeq5AJteszZoHrsiJv6EGOnuByQ-XNejgA9WiqQ8g2jIXowzoGjuJowDcV6xi9xBgyMTwNlS8wN0zUOlRl4Bl2Mv-x883IKCvdySyU=@syst3mfailure.io>
+In-Reply-To: <aA/czQYEtPmMim0G@pop-os.localdomain>
+References: <UTd8zf-_MMCqMv9R15RSDZybxtCeV9czSvpeaslK7984UCPTX8pbSFVyWhzqiaA6HYFZtHIldd7guvr7_8xVfkk9xSUHnY3e8dSWi7pdVsE=@protonmail.com> <aA1kmZ/Hs0a33l5j@pop-os.localdomain> <B2ZSzsBR9rUWlLkrgrMrCzqOGeSFxXIkYImvul6994v5tDSqykWo1UaWKRV-SNkNKJurgVzRcnPN07ZAVYykRaYhADyIwTxQ18OQfKDpILQ=@protonmail.com> <aA/czQYEtPmMim0G@pop-os.localdomain>
+Feedback-ID: 69690694:user:proton
+X-Pm-Message-ID: 0c96cae8ae674ff75774ab21355bcd13c41a41ca
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Recent updates to the locking mechanism that protects IPv6 routing tables
-[1] have affected the SRv6 networking subsystem. Such changes cause
-problems with some SRv6 Endpoints behaviors, like End.B6.Encaps and also
-impact SRv6 counters.
 
-Starting from commit 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and
-RTM_NEWROUTE."), the inet6_rtm_newroute() function no longer needs to
-acquire the RTNL lock for creating and configuring IPv6 routes and set up
-lwtunnels.
-The RTNL lock can be avoided because the ip6_route_add() function
-finishes setting up a new route in a section protected by RCU.
-This makes sure that no dev/nexthops can disappear during the operation.
-Because of this, the steps for setting up lwtunnels - i.e., calling
-lwtunnel_build_state() - are now done in a RCU lock section and not
-under the RTNL lock anymore.
+On Monday, April 28th, 2025 at 7:53 PM, Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
 
-However, creating and configuring a lwtunnel instance in an
-RCU-protected section can be problematic when that tunnel needs to
-allocate memory using the GFP_KERNEL flag.
-For example, the following trace shows what happens when an SRv6
-End.B6.Encaps behavior is instantiated after commit 169fd62799e8 ("ipv6:
-Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE."):
+>=20
+>=20
+> Excellent analysis!
+>=20
+> Do you mind testing the following patch?
+>=20
+> Note:
+>=20
+> 1) We can't just test NULL, because otherwise we would leak the skb's
+> in gso_skb list.
+>=20
+> 2) I am totally aware that maybe there are some other cases need the
+> same fix, but I want to be conservative here since this will be
+> targeting for -stable. It is why I intentionally keep my patch minimum.
+>=20
+> Thanks!
+>=20
+> --------------->
+>=20
 
-[ 3061.219696] BUG: sleeping function called from invalid context at ./include/linux/sched/mm.h:321
-[ 3061.226136] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 445, name: ip
-[ 3061.232101] preempt_count: 0, expected: 0
-[ 3061.235414] RCU nest depth: 1, expected: 0
-[ 3061.238622] 1 lock held by ip/445:
-[ 3061.241458]  #0: ffffffff83ec64a0 (rcu_read_lock){....}-{1:3}, at: ip6_route_add+0x41/0x1e0
-[ 3061.248520] CPU: 1 UID: 0 PID: 445 Comm: ip Not tainted 6.15.0-rc3-micro-vm-dev-00590-ge527e891492d #2058 PREEMPT(full)
-[ 3061.248532] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
-[ 3061.248549] Call Trace:
-[ 3061.248620]  <TASK>
-[ 3061.248633]  dump_stack_lvl+0xa9/0xc0
-[ 3061.248846]  __might_resched+0x218/0x360
-[ 3061.248871]  __kmalloc_node_track_caller_noprof+0x332/0x4e0
-[ 3061.248889]  ? rcu_is_watching+0x3a/0x70
-[ 3061.248902]  ? parse_nla_srh+0x56/0xa0
-[ 3061.248938]  kmemdup_noprof+0x1c/0x40
-[ 3061.248952]  parse_nla_srh+0x56/0xa0
-[ 3061.248969]  seg6_local_build_state+0x2e0/0x580
-[ 3061.248992]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.249013]  ? do_raw_spin_lock+0x111/0x1d0
-[ 3061.249027]  ? __pfx_seg6_local_build_state+0x10/0x10
-[ 3061.249068]  ? lwtunnel_build_state+0xe1/0x3a0
-[ 3061.249274]  lwtunnel_build_state+0x10d/0x3a0
-[ 3061.249303]  fib_nh_common_init+0xce/0x1e0
-[ 3061.249337]  ? __pfx_fib_nh_common_init+0x10/0x10
-[ 3061.249352]  ? in6_dev_get+0xaf/0x1f0
-[ 3061.249369]  ? __rcu_read_unlock+0x64/0x2e0
-[ 3061.249392]  fib6_nh_init+0x290/0xc30
-[ 3061.249422]  ? __pfx_fib6_nh_init+0x10/0x10
-[ 3061.249447]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.249459]  ? _raw_spin_unlock_irqrestore+0x22/0x70
-[ 3061.249624]  ? ip6_route_info_create+0x423/0x520
-[ 3061.249641]  ? rcu_is_watching+0x3a/0x70
-[ 3061.249683]  ip6_route_info_create_nh+0x190/0x390
-[ 3061.249715]  ip6_route_add+0x71/0x1e0
-[ 3061.249730]  ? __pfx_inet6_rtm_newroute+0x10/0x10
-[ 3061.249743]  inet6_rtm_newroute+0x426/0xc50
-[ 3061.249764]  ? avc_has_perm_noaudit+0x13d/0x360
-[ 3061.249853]  ? __pfx_inet6_rtm_newroute+0x10/0x10
-[ 3061.249905]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.249962]  ? rtnetlink_rcv_msg+0x52f/0x890
-[ 3061.249996]  ? __pfx_inet6_rtm_newroute+0x10/0x10
-[ 3061.250012]  rtnetlink_rcv_msg+0x551/0x890
-[ 3061.250040]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-[ 3061.250065]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.250092]  netlink_rcv_skb+0xbd/0x1f0
-[ 3061.250108]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-[ 3061.250124]  ? __pfx_netlink_rcv_skb+0x10/0x10
-[ 3061.250179]  ? netlink_deliver_tap+0x10b/0x700
-[ 3061.250210]  netlink_unicast+0x2e7/0x410
-[ 3061.250232]  ? __pfx_netlink_unicast+0x10/0x10
-[ 3061.250241]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.250280]  netlink_sendmsg+0x366/0x670
-[ 3061.250306]  ? __pfx_netlink_sendmsg+0x10/0x10
-[ 3061.250313]  ? find_held_lock+0x2d/0xa0
-[ 3061.250344]  ? import_ubuf+0xbc/0xf0
-[ 3061.250370]  ? __pfx_netlink_sendmsg+0x10/0x10
-[ 3061.250381]  __sock_sendmsg+0x13e/0x150
-[ 3061.250420]  ____sys_sendmsg+0x33d/0x450
-[ 3061.250442]  ? __pfx_____sys_sendmsg+0x10/0x10
-[ 3061.250453]  ? __pfx_copy_msghdr_from_user+0x10/0x10
-[ 3061.250489]  ? __pfx_slab_free_after_rcu_debug+0x10/0x10
-[ 3061.250514]  ___sys_sendmsg+0xe5/0x160
-[ 3061.250530]  ? __pfx____sys_sendmsg+0x10/0x10
-[ 3061.250568]  ? __lock_acquire+0xaff/0x1cd0
-[ 3061.250617]  ? find_held_lock+0x2d/0xa0
-[ 3061.250678]  ? __virt_addr_valid+0x199/0x340
-[ 3061.250704]  ? preempt_count_sub+0xf/0xc0
-[ 3061.250736]  __sys_sendmsg+0xca/0x140
-[ 3061.250750]  ? __pfx___sys_sendmsg+0x10/0x10
-[ 3061.250786]  ? syscall_exit_to_user_mode+0xa2/0x1e0
-[ 3061.250825]  do_syscall_64+0x62/0x140
-[ 3061.250844]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 3061.250855] RIP: 0033:0x7f0b042ef914
-[ 3061.250868] Code: 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b5 0f 1f 80 00 00 00 00 48 8d 05 e9 5d 0c 00 8b 00 85 c0 75 13 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 41 54 41 89 d4 55 48 89 f5 53
-[ 3061.250876] RSP: 002b:00007ffc2d113ef8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-[ 3061.250885] RAX: ffffffffffffffda RBX: 00000000680f93fa RCX: 00007f0b042ef914
-[ 3061.250891] RDX: 0000000000000000 RSI: 00007ffc2d113f60 RDI: 0000000000000003
-[ 3061.250897] RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000008
-[ 3061.250902] R10: fffffffffffff26d R11: 0000000000000246 R12: 0000000000000001
-[ 3061.250907] R13: 000055a961f8a520 R14: 000055a961f63eae R15: 00007ffc2d115270
-[ 3061.250952]  </TASK>
+Hi Cong,
 
-To solve this issue, we replace the GFP_KERNEL flag with the GFP_ATOMIC
-one in those SRv6 Endpoints that need to allocate memory during the
-setup phase. This change makes sure that memory allocations are handled
-in a way that works with RCU critical sections.
+Thank you for the reply. We have tested your patch and can confirm that it =
+resolves the issue.
+However, regarding point [1], we conducted some tests to verify if there is=
+ a skb leak in the gso_skb list,=20
+but the packet remains in the list only for a limited amount of time.
 
-[1] - https://lore.kernel.org/all/20250418000443.43734-1-kuniyu@amazon.com/
+In our POC we set a very low TBF rate, so when the Qdisc runs out of tokens=
+,=20
+it reschedules itself via qdisc watchdog after approximately 45 seconds.
 
-Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
-Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
----
- net/ipv6/seg6_local.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Returning to the example above, here is what happens when the watchdog time=
+r fires:
 
-diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-index ac1dbd492c22..ee5e448cc7a8 100644
---- a/net/ipv6/seg6_local.c
-+++ b/net/ipv6/seg6_local.c
-@@ -1671,7 +1671,7 @@ static int parse_nla_srh(struct nlattr **attrs, struct seg6_local_lwt *slwt,
- 	if (!seg6_validate_srh(srh, len, false))
- 		return -EINVAL;
- 
--	slwt->srh = kmemdup(srh, len, GFP_KERNEL);
-+	slwt->srh = kmemdup(srh, len, GFP_ATOMIC);
- 	if (!slwt->srh)
- 		return -ENOMEM;
- 
-@@ -1911,7 +1911,7 @@ static int parse_nla_bpf(struct nlattr **attrs, struct seg6_local_lwt *slwt,
- 	if (!tb[SEG6_LOCAL_BPF_PROG] || !tb[SEG6_LOCAL_BPF_PROG_NAME])
- 		return -EINVAL;
- 
--	slwt->bpf.name = nla_memdup(tb[SEG6_LOCAL_BPF_PROG_NAME], GFP_KERNEL);
-+	slwt->bpf.name = nla_memdup(tb[SEG6_LOCAL_BPF_PROG_NAME], GFP_ATOMIC);
- 	if (!slwt->bpf.name)
- 		return -ENOMEM;
- 
-@@ -1994,7 +1994,7 @@ static int parse_nla_counters(struct nlattr **attrs,
- 		return -EINVAL;
- 
- 	/* counters are always zero initialized */
--	pcounters = seg6_local_alloc_pcpu_counters(GFP_KERNEL);
-+	pcounters = seg6_local_alloc_pcpu_counters(GFP_ATOMIC);
- 	if (!pcounters)
- 		return -ENOMEM;
- 
--- 
-2.20.1
+[ ... ]
 
+Packet 2 is sent:
+
+    [ ... ]
+
+    tbf_dequeue()
+        qdisc_peek_dequeued()
+            skb_peek(&sch->gso_skb) // sch->gso_skb is empty
+            codel_qdisc_dequeue() // Codel qlen is 1
+                qdisc_dequeue_head()
+                // Packet 2 is removed from the queue
+                // Codel qlen =3D 0
+            __skb_queue_head(&sch->gso_skb, skb); // Packet 2 is added to g=
+so_skb list
+            sch->q.qlen++ // Codel qlen =3D 1
+
+        // TBF runs out of tokens and reschedules itself for later
+        qdisc_watchdog_schedule_ns()=20
+
+    codel_change() // Patched, (!skb) break;, does not crash
+
+    // ... ~45 seconds later the qdisc watchdog timer fires
+
+    tbf_dequeue()
+        qdisc_peek_dequeued()
+            skb_peek(&sch->gso_skb) // sch->gso_skb is _not_ empty (contain=
+s Packet 2)
+        // TBF now has enough tokens
+        qdisc_dequeue_peeked()
+            skb =3D __skb_dequeue(&sch->gso_skb) // Packet 2 is removed fro=
+m the gso_skb list
+            sch->q.qlen-- // Codel qlen =3D 0
+
+Notice how the gso_skb list is correctly cleaned up when the watchdog timer=
+ fires.
+We also examined some edge cases, such as when the watchdog is canceled=20
+and there are still packets left in the gso_skb list, and it is always clea=
+ned up:
+
+Qdisc destruction case:
+
+    tbf_destroy()
+        qdisc_put()
+            __qdisc_destroy()
+               qdisc_reset()
+                   __skb_queue_purge(&qdisc->gso_skb);
+
+Qdisc reset case:
+
+    tbf_reset()
+        qdisc_reset()
+            __skb_queue_purge(&qdisc->gso_skb);
+
+Perhaps the skb leak you mentioned occurs in another edge case that we over=
+looked?=20
+In any case, we believe your patch is technically more correct,
+as it makes sense to clean up packets in the gso_skb list first when the li=
+mit changes.
+
+Best regards,
+Savy
+Will
 
