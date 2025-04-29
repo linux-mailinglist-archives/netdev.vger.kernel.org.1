@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-186719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D257EAA0840
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:14:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71741AA08B4
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 330F7462C1C
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:14:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84EAD7A72A7
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCD72798E6;
-	Tue, 29 Apr 2025 10:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFD12BE0FF;
+	Tue, 29 Apr 2025 10:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9mO1sDp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/CJsyhv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044822222B4
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 10:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D23293B58
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 10:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745921664; cv=none; b=iTMuBOfQmjCkUiZIhq/WWGMAGdkbPkNEVOx5Rd6PYn01ea6YiB+NE9eureEwY/1RG1uogI2jg90GXnvr1CG8v+S3biK9d/mAFUzwwCNhlUYnfFPVJm3HFXFrZqo9VDQInZ6VqE1TEQE6UH3uKgy8JmtHor0SVG4nTrexbfvVAHE=
+	t=1745923004; cv=none; b=lNEhjnmxSQNIVoaQ1RaKI5dWIuvxWezp24J/g94mCIFdHMRthtp/gV3pBJlj9H7BdJYavKE+TD9Un9JbEBHlWdz0Pxmjb7ixnNu6huo0JdUZQLg/Qhp7hks2QALgl/mEEZBc7ime2A25nVzGsKTW8t/DpCh6SZKxEsG01W/M3WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745921664; c=relaxed/simple;
-	bh=cEIrYuPRZUs7ZJmrpUmdpxqXw7U5nJD6GFuhUWjnoYI=;
+	s=arc-20240116; t=1745923004; c=relaxed/simple;
+	bh=z4O32WXMbZp6KoDD/rLAOJVdIV2a6ApoC4W1W2ysjr0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JeYVeA2TU64/oPfmC7JFdSOpC4qPRRJJC+5st/lH5GrPhSH/ien9685Q9wZaPKfn7uyYRUsBLpeBbhyiz/2TzXAH+ErpsVbMOZ4Wa/cQHOBHIMJ+t+AKkIGb6Fd9ST7W1SVDBxYdCQNra1RRsIGRuqno/MwGlde5EJWWFNd8lc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P9mO1sDp; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=lmLXj3CK2ONNAdl6/Pf6CcGl0sLSdYKT23dHIVcumTuUB1GlklQji9hy+m7UCVnIXWZKVeB//LpLiua0jyTdvO23Vr0sUstvUp7Qzx6Q0vXKZpR6ad2Y65yVqd+LxqGcXoDUFlm3JXCDDbYnDz96LBRNY2RNMZPxpcrkICr5XYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/CJsyhv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745921661;
+	s=mimecast20190719; t=1745923001;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fDnpwUOmOz7kzZb7HBQPT0GNq1K5yEXjiMWvxnB9eWw=;
-	b=P9mO1sDpHWhuAuLFkX5ooIaDFfDwzMUJFf7nX/lWr54yIgLpzgNiaprz5s/mkydfVu3mH4
-	VVW16DHDij+nFrF2xsSieADGHkvw0KLwcGCLa/MEJ5CE1vsJ+hgme5s8SaiPiDnSIcjhq4
-	jQqcuw6896wEfNj682tbVxtVpIdYp10=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jnnK4v0ZhrRY7uhbTKq6B6d9n3dw0rEk4NULWBTSKCY=;
+	b=T/CJsyhvaVEaDlqiw+TZ+j1CRFfOqOJpRZF5vvX1Emi5qG2wqBLMPezHh+CQETm2yV2PMT
+	JYVf40O08YJBL7mhr34WNg5SuMQh+fP4tBJtdYTkZQP9DZn/5Zx78HNL8tTexvTBylcXwd
+	vGZHokXADtfNJvsokAQ5MPD9f+rwl5k=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-bVkiUPNWP2mj9HljfEKiYQ-1; Tue, 29 Apr 2025 06:14:20 -0400
-X-MC-Unique: bVkiUPNWP2mj9HljfEKiYQ-1
-X-Mimecast-MFC-AGG-ID: bVkiUPNWP2mj9HljfEKiYQ_1745921659
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac2aa3513ccso414388066b.0
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 03:14:20 -0700 (PDT)
+ us-mta-546-r9YLIPIhMU2psgit3x6WZA-1; Tue, 29 Apr 2025 06:36:39 -0400
+X-MC-Unique: r9YLIPIhMU2psgit3x6WZA-1
+X-Mimecast-MFC-AGG-ID: r9YLIPIhMU2psgit3x6WZA_1745922999
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-acbbb00099eso540541766b.2
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 03:36:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745921659; x=1746526459;
+        d=1e100.net; s=20230601; t=1745922998; x=1746527798;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fDnpwUOmOz7kzZb7HBQPT0GNq1K5yEXjiMWvxnB9eWw=;
-        b=WPkFCATAInu54SKPCLHW7CKAHuUsBkhYNkJJb0NqmvzwDfP5P4gB5y3Vq/ZDZusS+o
-         mhpAxpgaUy6WORGeIeC0aonsVNkaw2owoImkVfn3pS/q314erWzsG+fVoxGIIJG5zKrR
-         JdMgSNR9fm2HKLELA9YyCjtrMNmqVnlWRWvuAaaJLi7/gvsMxUVDOwb79HQ2UtzR1EBK
-         c60eTqtB/YCGMxi802shyz5xPvpof7ApsCv4JblUhL22DIUG24ulruIVATYlX54LRiRp
-         B25BXJmffTUZIaBi/9VMpvLkU9tC5wLczRGU1r9ec254iVqhiWSdgZNtK7TbD5ePHR2Z
-         LK3A==
-X-Forwarded-Encrypted: i=1; AJvYcCX0BAGCEUAkqPP/BhQ/aqpAs2ID5tZpWHDFAP4uj3MPLr2jiHUc9anNkiktyuJChjuzWWBBUBI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX8k35wuTwtzxt0UmI/JMjMuE6N7OLZSIDSA5JnvKKZjtoN5MS
-	JH1tfVGLxtiIebRCs3QN+7qM1F0eKjR9e3pDsQmVkXOElHoeDe6e77NvQgroFJ8w2plbSHonlFK
-	Ry5TIpAQkHxze4zIfompfzIKHMd2tO8FVpDaLn8UYfAzPvKuSd1VA5A==
-X-Gm-Gg: ASbGnctn1er1DRZd+T2fHdvuYPWXNCL5UW4EA6rrOdlTvfJeWD8QQGLk0T8/4w5J7UY
-	9tE1/aY9HaiERK1b+q8+C4l5PnGL+P57ffZzaIM+miWhlWXLYLgI1p3XWbm3wZCrdnPgUDpnzeV
-	7r6McYi6WKalZ/PW0214SGf1xxAZG50+E1AW/ze2mmcGnii3o5VDb+Ly9r+DNa6ZDAG2b7G+WKn
-	IT2+eUpcXmgOdgHPqU/lOeUdQRB2TCJab44Qw+Z/XiWXiBsNErcAtToDIlu/HTgj4OAk1Gmacs4
-	OLSDRZ+dpiymoasl1NSQ3sDK/Pw3qRkq4hwTJqPmA1FWFmW9vDl0GNZrpmA=
-X-Received: by 2002:a17:907:7f0f:b0:ac3:446d:142 with SMTP id a640c23a62f3a-acec84b8840mr215446366b.2.1745921659036;
-        Tue, 29 Apr 2025 03:14:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGAwg/f5jfjr9fEDrekbGYeHvluxL2RH3FHETuMmtFe0+8lfoKQ9k+3naGTi4EzFHoniRq+8g==
-X-Received: by 2002:a17:907:7f0f:b0:ac3:446d:142 with SMTP id a640c23a62f3a-acec84b8840mr215442666b.2.1745921658572;
-        Tue, 29 Apr 2025 03:14:18 -0700 (PDT)
+        bh=jnnK4v0ZhrRY7uhbTKq6B6d9n3dw0rEk4NULWBTSKCY=;
+        b=c6R6GdklZSYAwERRwhid8uiquKFgrxnbVzg77q0sKb/0o0RzlMY3wAFLZUTBBNAaiA
+         6A9+wo49d/INRmCOPowLCOMzcIQ8EABqQvwtbOT4yYG+qegdNOqUgzIXj/HtN1lZ2XvW
+         dC1jeHzdGD+4QmetqeEx3c4WoHQzDkfT2/+2stGwH1wH47Vbh3n/oqmzCHJMo9V+BI4O
+         pxjVPUAA9a2kOssAm7yUZWG4JVqHVx20CAMoJ29cPs0vpt5o4SSNItsyJuCeH5rHlFIM
+         PgOrtJGHRek9McY6nqC8SHaCoNRG30c0pjsGAX8zfkN+T1gTp1VkX1OUqx6oPQ/RZ0o5
+         jW2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUfeUluTBLplTb2p4Ytwiyemukn+prVSZoN81M/tRPuT8ob+GWxELeK+XrlbWcvp8z5kVwiKyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0/A6j+1PWRjSrtDVwHWuah0d7a8Izsydkjq/yslsQtOh4OYJr
+	rLdFhGkV4wuqtFJ3sxbK72ZVXszfO9UjsnPugXFsxgMl1bCP5lB/KKpFZRB14GGGyqMm/1YsAux
+	FbK19VUxJOl74IP66jSAyIHxOybrg6bwxt3ffJ0Se3zBq2C8FqgM3aA==
+X-Gm-Gg: ASbGncvbEj5OSwAyGYzxLxJcLzGvQW0NbuOedW49+vNJuruxovlqVsC4gS/4okMhhkx
+	GoJvNSAsqfn3zkDu/uy12vF70z0/w48huIX7GnZp3timcLhRtWFpoVa1OFD4lR5Q5MEC10axFsy
+	f/rZRgitMkkdZlZXDDaD8OMJcIV8VYCpt/wbsnsicRuC6+r9BT+nuAxtivHZo6AW3/usC1ZPwqR
+	UXVZypkKLkmSv9DacLuRB0t6RtrJ1gO3dW2ckq7sxdFMiNIZEG0cYhZsQe7LeY0pxmD4LltuWkv
+	QVrUhe4p9lxchZv4Q9g5UqUJLpUAr284pA3/SDg0Uq4jj8XG2pfYiW12uoo=
+X-Received: by 2002:a17:906:6a23:b0:ac6:bca0:eb70 with SMTP id a640c23a62f3a-ace84b55d83mr1257181766b.56.1745922998601;
+        Tue, 29 Apr 2025 03:36:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGYLnutURY9GSI8aMToCMoJnbXPAocgDQCYLVDcJVZnEaipHJS5GvmH6c6UiyLPyLaX/DhufA==
+X-Received: by 2002:a17:906:6a23:b0:ac6:bca0:eb70 with SMTP id a640c23a62f3a-ace84b55d83mr1257178266b.56.1745922998154;
+        Tue, 29 Apr 2025 03:36:38 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897? ([2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ed49c2fsm750532966b.124.2025.04.29.03.14.15
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ed701eesm770725066b.140.2025.04.29.03.36.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 03:14:18 -0700 (PDT)
-Message-ID: <62a1b3ac-a36b-4812-a014-c04a078eed36@redhat.com>
-Date: Tue, 29 Apr 2025 12:14:14 +0200
+        Tue, 29 Apr 2025 03:36:37 -0700 (PDT)
+Message-ID: <4124e050-5614-424c-969c-9521ff02bee3@redhat.com>
+Date: Tue, 29 Apr 2025 12:36:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 03/15] tcp: AccECN core
+Subject: Re: [PATCH v5 net-next 04/15] tcp: accecn: AccECN negotiation
 To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
  kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
  dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
@@ -102,73 +102,109 @@ To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
  Jason_Livingood@comcast.com, vidhi_goel@apple.com
 Cc: Olivier Tilmans <olivier.tilmans@nokia.com>
 References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
- <20250422153602.54787-4-chia-yu.chang@nokia-bell-labs.com>
+ <20250422153602.54787-5-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250422153602.54787-4-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250422153602.54787-5-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 4/22/25 5:35 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> @@ -298,6 +298,9 @@ struct tcp_sock {
->  	u32	snd_up;		/* Urgent pointer		*/
->  	u32	delivered;	/* Total data packets delivered incl. rexmits */
->  	u32	delivered_ce;	/* Like the above but only ECE marked packets */
-> +	u32	received_ce;	/* Like the above but for rcvd CE marked pkts */
-> +	u8	received_ce_pending:4, /* Not yet transmit cnt of received_ce */
-> +		unused2:4;
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index e36018203bd0..af38fff24aa4 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -156,6 +156,10 @@ struct tcp_request_sock {
+>  #if IS_ENABLED(CONFIG_MPTCP)
+>  	bool				drop_req;
+>  #endif
+> +	u8				accecn_ok  : 1,
+> +					syn_ect_snt: 2,
+> +					syn_ect_rcv: 2;
+> +	u8				accecn_fail_mode:4;
 
-AFAICS this uses a 4 bytes hole present prior to this patch after
-"rcv_wnd", leaving a 3 bytes hole after 'unused2'. Possibly should be
-worth mentioning the hole presence.
+AFAICS this will create a 3 bytes hole. That could be bad if it will
+also increase the number of cachelines used by struct tcp_request_sock.
+Please include the pahole info and struct size in the commit message.
 
-@Eric: would it make sense use this hole for
-'noneagle'/'rate_app_limited' and shrink the 'tcp_sock_write_txrx' group
-a bit?
+If there is no size problem I guess you are better off using a 'bool'
+for 'accecn_ok'
+
+>  	u32				txhash;
+>  	u32				rcv_isn;
+>  	u32				snt_isn;
+> @@ -376,7 +380,10 @@ struct tcp_sock {
+>  	u8	compressed_ack;
+>  	u8	dup_ack_counter:2,
+>  		tlp_retrans:1,	/* TLP is a retransmission */
+> -		unused:5;
+> +		syn_ect_snt:2,	/* AccECN ECT memory, only */
+> +		syn_ect_rcv:2,	/* ... needed durign 3WHS + first seqno */
+> +		wait_third_ack:1; /* Wait 3rd ACK in simultaneous open */
+
+A good bunch of conditionals will be added to the fast path checking
+this flag. Is simult open really a thing for AccECN? Can we simple
+disable AccECN in such scenarios and simplify the code a bit? In my
+limited experience only syzkaller reliably use it.
+
+> +	u8	accecn_fail_mode:4;     /* AccECN failure handling */
+
+This is outside the fastpath area, so possibly the struct size increase
+is less critical, but AFAICS this will create a 6bits hole (as the next
+u8 has only 6bit used). I think it's better to read the 'unused' field
+to mark such hole.
+
+>  	u8	thin_lto    : 1,/* Use linear timeouts for thin streams */
+>  		fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
+>  		fastopen_no_cookie:1, /* Allow send/recv SYN+data without a cookie */
 
 [...]
-> @@ -5095,7 +5097,7 @@ static void __init tcp_struct_check(void)
->  	/* 32bit arches with 8byte alignment on u64 fields might need padding
->  	 * before tcp_clock_cache.
+> +/* See Table 2 of the AccECN draft */
+> +static void tcp_ecn_rcv_synack(struct sock *sk, const struct tcphdr *th,
+> +			       u8 ip_dsfield)
+> +{
+> +	struct tcp_sock *tp = tcp_sk(sk);
+> +	u8 ace = tcp_accecn_ace(th);
+> +
+> +	switch (ace) {
+> +	case 0x0:
+> +	case 0x7:
+>  		tcp_ecn_mode_set(tp, TCP_ECN_DISABLED);
+> +		break;
+> +	case 0x1:
+> +	case 0x5:
+
+Possibly some human readable defines could help instead of magic numbers
+here.
+
+[...]
+> @@ -6171,16 +6252,27 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+>  	 * RFC 5961 4.2 : Send a challenge ack
 >  	 */
-> -	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 92 + 4);
-> +	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 97 + 7);
+>  	if (th->syn) {
+> +		if (tcp_ecn_mode_accecn(tp))
+> +			send_accecn_reflector = true;
+>  		if (sk->sk_state == TCP_SYN_RECV && sk->sk_socket && th->ack &&
+>  		    TCP_SKB_CB(skb)->seq + 1 == TCP_SKB_CB(skb)->end_seq &&
+>  		    TCP_SKB_CB(skb)->seq + 1 == tp->rcv_nxt &&
+> -		    TCP_SKB_CB(skb)->ack_seq == tp->snd_nxt)
+> +		    TCP_SKB_CB(skb)->ack_seq == tp->snd_nxt) {
+> +			if (!tcp_ecn_disabled(tp)) {
+> +				u8 ect = tp->syn_ect_rcv;
+> +
+> +				tp->wait_third_ack = true;
+> +				__tcp_send_ack(sk, tp->rcv_nxt,
+> +					       !send_accecn_reflector ? 0 :
+> +					       tcp_accecn_reflector_flags(ect));
 
-Really? I *think* the change here should not move the cacheline end
-around, due to holes. Could you please include the relevant pahole
-(trimmed) output prior to this patch and after in the commit message?
+The same expression is used above possibly you can create a new helper
+for this statement.
 
-[...]
-> @@ -384,17 +387,16 @@ static void tcp_data_ecn_check(struct sock *sk, const struct sk_buff *skb)
->  		if (tcp_ca_needs_ecn(sk))
->  			tcp_ca_event(sk, CA_EVENT_ECN_IS_CE);
->  
-> -		if (!(tp->ecn_flags & TCP_ECN_DEMAND_CWR)) {
-> +		if (!(tp->ecn_flags & TCP_ECN_DEMAND_CWR) &&
-> +		    tcp_ecn_mode_rfc3168(tp)) {
->  			/* Better not delay acks, sender can have a very low cwnd */
->  			tcp_enter_quickack_mode(sk, 2);
->  			tp->ecn_flags |= TCP_ECN_DEMAND_CWR;
->  		}
-> -		tp->ecn_flags |= TCP_ECN_SEEN;
+...
 
-At this point is not entirely clear to me why the removal of the above
-line is needed/correct.
-
-[...]
-> @@ -4056,6 +4118,11 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
->  
->  	tcp_rack_update_reo_wnd(sk, &rs);
->  
-> +	if (tcp_ecn_mode_accecn(tp))
-> +		ecn_count = tcp_accecn_process(sk, skb,
-> +					       tp->delivered - delivered,
-> +					       &flag);
-
-AFAICS the above could set FLAG_ECE in flags, menaning the previous
-tcp_clean_rtx_queue() will run with such flag cleared and the later
-function checking such flag will not. I wondering if this inconsistency
-could cause problems?
+This patch is quite huge. Any hope to break id down to a more palatable
+size? i.e. moving the 3rd ack/self connect handling to a separate patch
+(if that thing is really needed).
 
 /P
 
