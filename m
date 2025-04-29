@@ -1,56 +1,64 @@
-Return-Path: <netdev+bounces-186825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A03AA1AEC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D62BAAA1B0B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 21:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66BCC3B3933
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:49:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 478713A5E72
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF80244670;
-	Tue, 29 Apr 2025 18:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AD2254B03;
+	Tue, 29 Apr 2025 18:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFaUaECC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9g5QemO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69D1367;
-	Tue, 29 Apr 2025 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354224C81;
+	Tue, 29 Apr 2025 18:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745952609; cv=none; b=RLABrxyYPp4tMTvs5nvu7AvVBsFyfJdRNcttVCI/sMHxpRtreswjl2+cU6lKRaMQvoeVJ0G77gR6QAP29NSOf5BYZUX61LQ6wzXygI11f39NMS/x9jmmIP26bUfKdrY6jo2xBmRApHf/QJjV0olpd1u1pYQd2Cgc0tBPcTGvUwo=
+	t=1745953176; cv=none; b=bPtKcxBIYmmJcDHPurr8HcuSc9zS6qDKBc7VfcFjJzgAcMrtThT/M+tnLtPIbYNQzHzV9jBEpV0yYRakaePtnBHIY0S9MorPRFynvoPgTzpuBIrZE+xCE6zJXMpQHh9LVqQq4icwJrDA3L+LFEJTkpajCkyaS26FTR0XYm/JNuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745952609; c=relaxed/simple;
-	bh=gUTlekWoOXWSqClwmax5ebx7LlIR/bJhdqMP6ILtIgE=;
+	s=arc-20240116; t=1745953176; c=relaxed/simple;
+	bh=IwuY276gXMXUoDkxiZng8S0b2nH7rkCxOVSBBBNPPHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bYov/KEqwL9liTQax/rGVZF34YytbDY6vuMqjZPQWvaYZLQWkFeq9HLVWlvyi78r9Z8jo8hU2snFZM/o26AfgkaCnQv8FetL+atOGZUpNOTy/0+0b7siVZTO1jElJWMViOcp8a2/rQDEMTt+PrGLD5l5npSYHM6JUjxj0/T+hzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFaUaECC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80442C4CEE3;
-	Tue, 29 Apr 2025 18:50:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UC133/IDjPV+zUvHRaGS2D9HdkOpw0rRdrKpnKlwqhY0s8GlFaLHgBe5C63WYr3IUDqoFcsU8CKlgOn1jFCl+1BgLHwXWvuWwLGIFbR5ONNZihvyPVBkDrEP4odP2FeVm0SVaKvEmNudPhQEA7PAJn27aTqpBVKzZTdfw2i/BLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9g5QemO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0CE5C4CEE3;
+	Tue, 29 Apr 2025 18:59:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745952608;
-	bh=gUTlekWoOXWSqClwmax5ebx7LlIR/bJhdqMP6ILtIgE=;
+	s=k20201202; t=1745953175;
+	bh=IwuY276gXMXUoDkxiZng8S0b2nH7rkCxOVSBBBNPPHo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oFaUaECCbl+tVPZx685vvTxIODoSj/3bqA4MtbU6jhJW88pULu4yP2BREteSHfHny
-	 BPZRX4rNAnuJWF2RUTINKH0M9tx2E8oL6aWkwubaMOW8QhZJWzWbkGAxN4y5jfKKHW
-	 /Cg5cjvXyJc0t6qNGMxKdsts/coZz97zxExv8eQx76Ns6o70rxgXrKLkQn+VCPHc5r
-	 hAs0WUiod1gK/BSbZ9IwYogtqFdb/E8+fBFWBvTH3gqDsIO+BSaV6tLXhDUu1lC5W/
-	 yTu0qKqV4od8R6weL3kJm2F8XEIScuvTMRmrBlLdHJexI+0Z3rSPIr9SD5VI/nsukW
-	 ExX76Iv5Bfy6A==
-Date: Tue, 29 Apr 2025 11:50:07 -0700
+	b=I9g5QemOAHdnQP3jwshUtWUdAIhUeA0ZudSeeYQ9aho1qlqq8hw29fKCK3/77J5kf
+	 KE8ZAUpRm6RF0B92g9n/NH2WBesJZFIgM3j314/szT1RNYzGoQ6A0zZ5MKSaJbQ6Tn
+	 eYtJkOVSS4yM5Ddc/RNsUE8SFyWid3Qk/ZpwVAtWToqyy/x3EQBnycXN02XPWlcl+x
+	 kZcYcFy3JLiVipz3uVqL4/GUBrwCSiLLsaczly9Lqt9zWZmqn6TmBSr6PtahTzlbrX
+	 djrSBIbEWo8/sFQegLWXnS7U2eASvpk9MirsSBnCHih0Hnzfe92otAzfAdxU47K9IU
+	 WQeK+ByCTOGcQ==
+Date: Tue, 29 Apr 2025 11:59:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tobias Junghans <tobias.junghans@inhub.de>
-Cc: Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-leds@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] leds: trigger: netdev: refactor dev matching in
- netdev_trig_notify()
-Message-ID: <20250429115007.12f8af38@kernel.org>
-In-Reply-To: <20250425132059.393144-1-tobias.junghans@inhub.de>
-References: <20250425132059.393144-1-tobias.junghans@inhub.de>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Prathosh Satish
+ <Prathosh.Satish@microchip.com>, Lee Jones <lee@kernel.org>, Kees Cook
+ <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v5 4/8] mfd: zl3073x: Add support for devlink
+ device info
+Message-ID: <20250429115933.53a1914c@kernel.org>
+In-Reply-To: <20250425170935.740102-5-ivecera@redhat.com>
+References: <20250425170935.740102-1-ivecera@redhat.com>
+	<20250425170935.740102-5-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,38 +68,72 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 25 Apr 2025 15:20:45 +0200 Tobias Junghans wrote:
-> If there are network devices with the same name in different
-> namespaces, ledtrig-netdev gets confused easily and switches between
-> these devices whenever there are NETDEV_CHANGENAME/NETDEV_REGISTER
-> notifications.  This happens since ledtrig-netdev only checks for
-> device name equality regardless of previous associations with another
-> network device with the same name.
-> 
-> Real world example: eth0 is the primary physical network interface and
-> ledltrig-netdev is associated with that interface. If now Docker creates
-> a virtual Ethernet interface (vethXXXX), moves it to the
-> container's net namespace and renames it to eth0, ledtrig-netdev
-> switches to this device and the LED no longer blinks for the original
-> (physical) network device.
-> 
-> Fix this by refactoring the conditions under which to return early with
-> NOTIFY_DONE inside netdev_trig_notify():
-> 
-> - For processing NETDEV_REGISTER events, the device name has to match
->   and no association with a net_dev must exist.
-> 
-> - For processing NETDEV_CHANGENAME events, the associated and notified
->   network device have to match. Alternatively the device name has to
->   match and no association with a net_dev must exist.
-> 
-> - For all other events, the associated and notified network device have
->   to match.
+On Fri, 25 Apr 2025 19:09:31 +0200 Ivan Vecera wrote:
+> +static int zl3073x_devlink_info_get(struct devlink *devlink,
+> +				    struct devlink_info_req *req,
+> +				    struct netlink_ext_ack *extack)
+> +{
+> +	struct zl3073x_dev *zldev = devlink_priv(devlink);
+> +	u16 id, revision, fw_ver;
+> +	char buf[16];
+> +	u32 cfg_ver;
+> +	int rc;
+> +
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_ID, &id);
+> +	if (rc)
+> +		return rc;
+> +
+> +	snprintf(buf, sizeof(buf), "%X", id);
+> +	rc = devlink_info_version_fixed_put(req,
+> +					    DEVLINK_INFO_VERSION_GENERIC_ASIC_ID,
+> +					    buf);
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_REVISION, &revision);
+> +	if (rc)
+> +		return rc;
+> +
+> +	snprintf(buf, sizeof(buf), "%X", revision);
+> +	rc = devlink_info_version_fixed_put(req,
+> +					    DEVLINK_INFO_VERSION_GENERIC_ASIC_REV,
+> +					    buf);
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc = zl3073x_read_u16(zldev, ZL_REG_FW_VER, &fw_ver);
+> +	if (rc)
+> +		return rc;
+> +
+> +	snprintf(buf, sizeof(buf), "%u", fw_ver);
+> +	rc = devlink_info_version_fixed_put(req,
+> +					    DEVLINK_INFO_VERSION_GENERIC_FW,
 
-Could you split this into two patches for ease of review?
-First which factors out all the logic related to deciding if the event
-needs to be handled, move it to a new helper which takes the relevant
-args are turns bool of whether we should return NOTIFY_DONE immediately
-or not. And then a second patch which modifies this logic.
-Having the refactor squashed with the change makes it harder to review.
+Are you sure FW version is fixed? Fixed is for unchangeable
+properties like ASIC revision or serial numbers.
+
+> +					    buf);
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc = zl3073x_read_u32(zldev, ZL_REG_CUSTOM_CONFIG_VER, &cfg_ver);
+> +	if (rc)
+> +		return rc;
+> +
+> +	/* No custom config version */
+> +	if (cfg_ver == U32_MAX)
+> +		return 0;
+> +
+> +	snprintf(buf, sizeof(buf), "%lu.%lu.%lu.%lu",
+> +		 FIELD_GET(GENMASK(31, 24), cfg_ver),
+> +		 FIELD_GET(GENMASK(23, 16), cfg_ver),
+> +		 FIELD_GET(GENMASK(15, 8), cfg_ver),
+> +		 FIELD_GET(GENMASK(7, 0), cfg_ver));
+> +
+> +	return devlink_info_version_running_put(req, "cfg.custom_ver", buf);
+
+You need to document the custom versions and properties in a driver
+specific file under Documentation/networking/device_drivers/
+-- 
+pw-bot: cr
 
