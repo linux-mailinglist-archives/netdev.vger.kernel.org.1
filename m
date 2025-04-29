@@ -1,146 +1,199 @@
-Return-Path: <netdev+bounces-186652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD8AAA01B8
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:23:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C17C2AA01BB
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C9261891126
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:23:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8EC3B4681
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:23:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3133720D4E2;
-	Tue, 29 Apr 2025 05:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE7D25D549;
+	Tue, 29 Apr 2025 05:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="q/gAZJ6+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nBjiG5rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E1053A7;
-	Tue, 29 Apr 2025 05:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA893221F37
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 05:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745904201; cv=none; b=B6Cwnggl2wA3UnuLBwYPTTMdTN9CWZYtK2ZvIlI3zkFKxJbeRh/S45LtmUg9Y4Dv4l2KFu+neIdPYOc19NcZBkO48HY9AXbWPmKDzYxCCDrBF5kz4PH7N5Dsj8sXWKPqjxeE4EEXk6qSedgtkhTFMYAPTEW3+JchmYXoUDi0u6U=
+	t=1745904211; cv=none; b=AicHy4N7+n++Gu0fAKas+Esdmnnu6/safNwPGs3wQldBYb0A1rBTLxQ+IzUFhM+HDVuOv00xJzzlNcrmkBjGAkLjUHoCRhrWmsyK1JpmpiqCDWB1ECJqYVt6d/Y86WOcQdhhWNi/Mp6sh1aTLzAR8U3nwywXS0OxZFQFnk4td8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745904201; c=relaxed/simple;
-	bh=HiOtJxJOS45krxl+rXdVOJhoKOAGrcR1Z0Qi4OTbykY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ndkXa4ZOaGy0cBeY+izGXqA1hhrluBZacKRluo6KN6KdbxeZnJfMR28gIJpbwSKjWL38AViHbm6DOKp1RhVK5e+/YcYt9hyKQDsxmZGkWatQI1QIFgKHiXG8clurgFgh/5HDpD3fTNlYkxCd9IPxeT00QiZom4OpIE7SsIgrJBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=q/gAZJ6+; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1745904200; x=1777440200;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L5gjFUr5qsPK60vv0m8DA23aqaqW45pKAGmG+x4L5C8=;
-  b=q/gAZJ6+hmdLpW/tjzGfowtjAUJOkVUheOT/HUhmT3xU6SeGhbYyIquQ
-   6XjJ0LzqPZjomBvnjXuMXvf6uUmYqv23rFDisw/j/Ke8WMup/mgBTwCWK
-   tjPSNV726ZWvETbV4nTnsmT4xXcSwxi4l/5glRWcrBepJB4WMpmiHofv+
-   E=;
-X-IronPort-AV: E=Sophos;i="6.15,248,1739836800"; 
-   d="scan'208";a="493482829"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 05:23:16 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:53436]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.231:2525] with esmtp (Farcaster)
- id b565944f-2627-4c62-81c2-19d2c33a37c5; Tue, 29 Apr 2025 05:23:15 +0000 (UTC)
-X-Farcaster-Flow-ID: b565944f-2627-4c62-81c2-19d2c33a37c5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 29 Apr 2025 05:23:14 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.170.247) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 29 Apr 2025 05:23:11 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kees@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-hardening@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH] ipv4: fib: Fix fib_info_hash_alloc() allocation type
-Date: Mon, 28 Apr 2025 22:22:56 -0700
-Message-ID: <20250429052303.88052-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <89BC8935-21D1-45A9-AEA1-A4E52D193434@kernel.org>
-References: <89BC8935-21D1-45A9-AEA1-A4E52D193434@kernel.org>
+	s=arc-20240116; t=1745904211; c=relaxed/simple;
+	bh=HHmgpEroABzp2ffx9Nlts99YbN0fSxzHKeZhG8cZWbI=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=rmY3xK6r04lZJjdo35ox7sHVAGMfFtzJsawble7qHwPayA33KA7nnQOc+IK5+SYy8E68IHP7LSJN+lOLa5FX9xnscvgejBJmvcwN75I4QCikqAEXEVCKzAGV3OiQkMDVeriHuJHtXVOdGu11y+thPIB/gMPivpU21zHPxnyogsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nBjiG5rj; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745904197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xzKVHcxUNgUZ3k5cuqFhdfyUp6ng16+RrHnkO59Dl68=;
+	b=nBjiG5rjSc42h9jBukLq9YEhF0bdYT/OukI1198vedefrPnmNqYaAJZjGJTPc+UjnqyxFU
+	0fZyQJFULfRypaSlU4GL1GSyxSRMSJr0LuWMLeU/DW8g4Ydwp14DSXJeYwGQYHAxYzv2ZZ
+	FWpIcyzWRE+8oPy14JNIo2vJy3LMqPs=
+Date: Tue, 29 Apr 2025 05:23:14 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <8a5d5b162a1462568c4d342c93896c919950cbe9@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: Introduce a new kfunc for
+ sockmap
+To: "Cong Wang" <xiyou.wangcong@gmail.com>
+Cc: bpf@vger.kernel.org, mrpre@163.com, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ "Yonghong Song" <yonghong.song@linux.dev>, "John Fastabend"
+ <john.fastabend@gmail.com>, "KP Singh" <kpsingh@kernel.org>, "Stanislav
+ Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>, "Jiri Olsa"
+ <jolsa@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>, "Jakub Sitnicki"
+ <jakub@cloudflare.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "Kuniyuki Iwashima" <kuniyu@amazon.com>, "Willem de Bruijn"
+ <willemb@google.com>, "Mykola Lysenko" <mykolal@fb.com>, "Shuah Khan"
+ <shuah@kernel.org>, "Jiapeng Chong" <jiapeng.chong@linux.alibaba.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+In-Reply-To: <aBAjtATRrVNegYjm@pop-os.localdomain>
+References: <20250428081744.52375-1-jiayuan.chen@linux.dev>
+ <20250428081744.52375-2-jiayuan.chen@linux.dev>
+ <aBAjtATRrVNegYjm@pop-os.localdomain>
+X-Migadu-Flow: FLOW_OUT
 
-From: Kees Cook <kees@kernel.org>
-Date: Mon, 28 Apr 2025 20:52:59 -0700
-> On April 28, 2025 5:43:05 PM PDT, Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >Thanks for CC me, David.
-> >
-> >From: David Ahern <dsahern@kernel.org>
-> >Date: Mon, 28 Apr 2025 16:50:53 -0600
-> >> On 4/25/25 11:05 PM, Kees Cook wrote:
-> >> > In preparation for making the kmalloc family of allocators type aware,
-> >> > we need to make sure that the returned type from the allocation matches
-> >> > the type of the variable being assigned. (Before, the allocator would
-> >> > always return "void *", which can be implicitly cast to any pointer type.)
-> >> > 
-> >> > This was allocating many sizeof(struct hlist_head *) when it actually
-> >> > wanted sizeof(struct hlist_head). Luckily these are the same size.
-> >> > Adjust the allocation type to match the assignment.
-> >> > 
-> >> > Signed-off-by: Kees Cook <kees@kernel.org>
-> >> > ---
-> >> > Cc: "David S. Miller" <davem@davemloft.net>
-> >> > Cc: David Ahern <dsahern@kernel.org>
-> >> > Cc: Eric Dumazet <edumazet@google.com>
-> >> > Cc: Jakub Kicinski <kuba@kernel.org>
-> >> > Cc: Paolo Abeni <pabeni@redhat.com>
-> >> > Cc: Simon Horman <horms@kernel.org>
-> >> > Cc: <netdev@vger.kernel.org>
-> >> > ---
-> >> >  net/ipv4/fib_semantics.c | 2 +-
-> >> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >> > 
-> >> > diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-> >> > index f68bb9e34c34..37d12b0bc6be 100644
-> >> > --- a/net/ipv4/fib_semantics.c
-> >> > +++ b/net/ipv4/fib_semantics.c
-> >> > @@ -365,7 +365,7 @@ static struct hlist_head *fib_info_laddrhash_bucket(const struct net *net,
-> >> >  static struct hlist_head *fib_info_hash_alloc(unsigned int hash_bits)
-> >> >  {
-> >> >  	/* The second half is used for prefsrc */
-> >> > -	return kvcalloc((1 << hash_bits) * 2, sizeof(struct hlist_head *),
-> >> > +	return kvcalloc((1 << hash_bits) * 2, sizeof(struct hlist_head),
-> >> >  			GFP_KERNEL);
-> >> >  }
-> >> >  
-> >> 
-> >> Reviewed-by: David Ahern <dsahern@kernel.org>
-> >> 
-> >> Fixes: fa336adc100e ("ipv4: fib: Allocate fib_info_hash[] and
-> >> fib_info_laddrhash[] by kvcalloc().)
-> >
-> >I agree this should target net.git as the last statement
-> >will be false with LOCKDEP.
-> 
-> Which will be false with lockdep? Unless I'm missing it, I think hlist_head is always pointer sized:
+2025/4/29 08:56, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
 
-Oh sorry, now I'm not sure why I mentioned lockdep...
-maybe confused with other code :/
+>=20
+>=20On Mon, Apr 28, 2025 at 04:16:52PM +0800, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> +bpf_sk_skb_set_redirect_cpu()
+> >=20
+>=20>  +^^^^^^^^^^^^^^^^^^^^^^
+> >=20
+>=20>  +.. code-block:: c
+> >=20
+>=20>  +
+> >=20
+>=20>  + int bpf_sk_skb_set_redirect_cpu(struct __sk_buff *s, int redir_c=
+pu)
+> >=20
+>=20>  +
+> >=20
+>=20>  +This kfunc ``bpf_sk_skb_set_redirect_cpu()`` is available to
+> >=20
+>=20>  +``BPF_PROG_TYPE_SK_SKB`` BPF programs. It sets the CPU affinity, =
+allowing the
+> >=20
+>=20>  +sockmap packet redirecting process to run on the specified CPU as=
+ much as
+> >=20
+>=20>  +possible, helping users reduce the interference between the sockm=
+ap redirecting
+> >=20
+>=20>  +background thread and other threads.
+> >=20
+>=20>  +
+> >=20
+>=20
+> I am wondering if it is a better idea to use BPF_MAP_TYPE_CPUMAP for
+>=20
+>=20redirection here instead? Like we did for bpf_redirect_map(). At leas=
+t
+>=20
+>=20we would not need to store CPU in psock with this approach.
+>=20
+>=20Thanks.
+>
+
+You mean to use BPF_MAP_TYPE_CPUMAP with XDP to redirect packets to a
+specific CPU?
+
+I tested and found such overhead:
+1=E3=80=81Needing to parse the L4 header from the L2 header to obtain the=
+ 5-tuple,
+  and then maintaining an additional map to store the relationship betwee=
+n
+  each five-tuple and process/CPU. Compared to multi-process scenario, wi=
+th
+  one process binding to one CPU and one map, I can directly use a global
+  variable to let the BPF program know which thread it should use, especi=
+ally
+  for programs that enable reuseport.
 
 
+2=E3=80=81Furthermore, regarding performance, I tested with cpumap and th=
+e results
+   were lower than expected. This is because loopback only has xdp_generi=
+c
+   mode and the problem I described in cover letter is actually occurred
+   on loopback...
 
-> 
-> struct hlist_head {
-> 	struct hlist_node *first;
-> };
+Code:
+'''
+struct {
+      __uint(type, BPF_MAP_TYPE_CPUMAP);
+      __uint(key_size, sizeof(__u32));
+      __uint(value_size, sizeof(struct bpf_cpumap_val));
+      __uint(max_entries, 64);
+} cpu_map SEC(".maps");
+
+
+SEC("xdp")
+int  xdp_stats1_func(struct xdp_md *ctx)
+{
+      /* Real world:
+       * 1. get 5-tuple from ctx
+       * 2. get corresponding cpu of current skb through XX_MAP
+       */
+      int ret =3D bpf_redirect_map(&cpu_map, 3, 0); // redirct to 3
+      return ret;
+}
+'''
+
+Result:
+'''
+./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress --no-verify
+Setting up benchmark 'sockmap'...
+create socket fd c1:14 p1:15 c2:16 p2:17
+Benchmark 'sockmap' started.
+Iter   0 ( 36.439us): Send Speed  561.496 MB/s ... Rcv Speed   33.264 MB/=
+s
+Iter   1 ( -7.448us): Send Speed  558.443 MB/s ... Rcv Speed   32.611 MB/=
+s
+Iter   2 ( -2.245us): Send Speed  557.131 MB/s ... Rcv Speed   33.004 MB/=
+s
+Iter   3 ( -2.845us): Send Speed  547.374 MB/s ... Rcv Speed   33.331 MB/=
+s
+Iter   4 (  0.745us): Send Speed  562.891 MB/s ... Rcv Speed   34.117 MB/=
+s
+Iter   5 ( -2.056us): Send Speed  560.994 MB/s ... Rcv Speed   33.069 MB/=
+s
+Iter   6 (  5.343us): Send Speed  562.038 MB/s ... Rcv Speed   33.200 MB/=
+s
+'''
+
+Instead, we can introduce a new kfunc to specify the CPU used by the
+backlog running thread, which can avoid using XDP. After all, this is a
+"problem" brought by the BPF L7 framework itself, and it's better to solv=
+e
+it ourselves.
 
