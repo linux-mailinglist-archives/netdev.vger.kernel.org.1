@@ -1,83 +1,97 @@
-Return-Path: <netdev+bounces-186820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE7FBAA1ACB
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:41:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F5CAA1AD9
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27D15A7C11
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:41:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63F8B16C780
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED784253959;
-	Tue, 29 Apr 2025 18:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4341725486E;
+	Tue, 29 Apr 2025 18:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="anMjw+PL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="th0mMmCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E1425335B;
-	Tue, 29 Apr 2025 18:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287F5254858
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 18:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745952089; cv=none; b=au5xUJaXtNVF4w2we4Ad1Z8i0YaT9A55HxccZjpldIURBMPnF+5tnmm1YrLiA9UBV8CnO8jvdgwaiRxQRLr8aSfY4dAdWEKEyqVhwmOnBeC7L5vNb7ArWS/mlX2hHKBLEcYm2wiWxJ6DGGKM9mKvpzgfaJlSr6RwrpqWQR4dYAI=
+	t=1745952230; cv=none; b=cADOCHT+9Q/TWhBlvOts4k5lTSH+CiNg+PuoCMj+9TzjxqFILwCSmmIl58bMYGqgnJ5NhjgCZfLTJP90ibddvQcqAd58dFoPuSH0oNgdWvxo2rX3SC70Q+LxnzxPBRCqnnSf/KjHR7EGntIpD+X0nU8mQbjHYmEPIJiuU9wIV5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745952089; c=relaxed/simple;
-	bh=/jY1q7+JnkzS1w96PQzgOEj3Ya1LRtB8bbfspqeb6jo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DPgnvjD0ERg4FeWnS9Wn9aqPCYe3NewtT4cgafW/NVf/T0U7SE9p7Ith0Pv9I1GITY/5rVAp0hQklJ1A3tnvEheDUYw6kUkxvC20A90sc1QjeoJAmcRHW6m8KV7Qh4uT33AhFyXcWjU7/DvmWeFNYJNfGCENFaTm0ziPmDRjxiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anMjw+PL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7781C4CEE3;
-	Tue, 29 Apr 2025 18:41:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745952089;
-	bh=/jY1q7+JnkzS1w96PQzgOEj3Ya1LRtB8bbfspqeb6jo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=anMjw+PLpXbFhZahCBbgFcHCsuvWVwtksuDFlFbXJ/GM1AokiEtLTc52CskgnSSu4
-	 YwV1tmKu/3W2cz+WZHbjLSBmryKeRLuX76eF5Ky883xtzi+6B2iPoKPYLmJLVRrLcr
-	 nUDa5mdb/DMou1zF44JBF+aEsyw+ohzL7liGARHE1b/8/u81y4zwtI3NA92g34xTIS
-	 o5fo040scxHmnWki3opg2RNkhRnsMiHZ26maT06DY+pN/JkG64LBfAzuzmSiwTtkav
-	 fdpVB9BB5NKdawcAWVBPYr/1zu/03jfyiSwddA86e7eFgQOCSlcwT2XE2PdsVz+ckb
-	 mlV5Y0rOMi1FQ==
-Date: Tue, 29 Apr 2025 11:41:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: George Moussalem via B4 Relay
- <devnull+george.moussalem.outlook.com@kernel.org>,
- george.moussalem@outlook.com, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: qca8k: fix led devicename when using external
- mdio bus
-Message-ID: <20250429114128.5b7790ad@kernel.org>
-In-Reply-To: <20250425-qca8k-leds-v1-1-6316ad36ad22@outlook.com>
-References: <20250425-qca8k-leds-v1-1-6316ad36ad22@outlook.com>
+	s=arc-20240116; t=1745952230; c=relaxed/simple;
+	bh=CdC9ruIWZ1FfGLg3NH2skEI1pGGNzHOxvsNypspemcI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lTyUSo3YAWT1ToVFUc4j/34d3vZ0/PokChqzDI84XFwjwiMViqj/Kt1smPFUqn50fHwqOoQw0V/SEbTWlBrwT0/1vfIzJ5h9uE3u3Jx7ToilDXB9Vh8jdkvNmAvORqMkJ2TrhubUSD9uR+beQhoZVEREAoRZub3vlNyahNJ9+PI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=th0mMmCL; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 29 Apr 2025 11:43:29 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1745952215;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PbGSqBzLNpWlOS59XTKfG+qwmbQZ2wA+xkjLCzhbwfE=;
+	b=th0mMmCLdit+le/j4472txhxqiQcrL+ghmVRPSbgSFWYuubbc7mCKTwcJ/8gtlSNYbV/Cq
+	amWkvQki/LnEQ+Q2e78TSE/02jvxqg6JlAIbTwSlCuMgOjGW700pSlaywf9veMyy7FBwtX
+	sd92hxP6UYYqX6qUnmCuylOhU3Q9wsw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Michal Hocko <mhocko@suse.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Muchun Song <muchun.song@linux.dev>, Vlastimil Babka <vbabka@suse.cz>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Meta kernel team <kernel-team@meta.com>
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+Message-ID: <qt5jtbsgjym655tbnoddlo5c7cemndcgsqwy4wp7m7ki3venxz@cfp637s7eqo6>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+ <aBDCXB_Tb2Iaihua@tiehlicka>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBDCXB_Tb2Iaihua@tiehlicka>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 25 Apr 2025 10:49:55 +0400 George Moussalem via B4 Relay wrote:
-> From: George Moussalem <george.moussalem@outlook.com>
+On Tue, Apr 29, 2025 at 02:13:16PM +0200, Michal Hocko wrote:
 > 
-> The qca8k dsa switch can use either an external or internal mdio bus.
-> This depends on whether the mdio node is defined under the switch node
-> itself and, as such, the internal_mdio_mask is populated with its
-> internal phys. Upon registering the internal mdio bus, the slave_mii_bus
-> of the dsa switch is assigned to this bus. When an external mdio bus is
-> used, it is left unassigned, though its id is used to create the device
-> names of the leds.
-> This leads to the leds being named '(efault):00:green:lan' and so on as
-> the slave_mii_bus is null. So let's fix this by adding a null check and
-> use the devicename of the external bus instead when an external bus is
-> configured.
+> > Some of the design choices are:
+> > 
+> > 1. Fit all caches memcgs in a single cacheline.
+> 
+> Could you be more specific about the reasoning? I suspect it is for the
+> network receive path you are mentioning above, right?
+> 
 
-Hi Andrew, would you mind taking a quick look?
+Here I meant why I chose NR_MEMCG_STOCK to be 7. Basically the first
+cacheline of per-cpu stock has all the cached memcg, so checking if a
+given memcg is cached or not should be comparable cheap as single cached
+memcg. You suggested comment already mentioned this.
+
+However please note that we may find in future that 2 cachelines worth of
+cached memcgs are better for wider audience/workloads but for simplicity
+let's start with single cacheline worth of cached memcgs.
+
+[...]
+> 
+> Just a minor suggestion below. Other than that looks good to me (with
+> follow up fixes) in this thread.
+> Acked-by: Michal Hocko <mhocko@suse.com>
+> Thanks!
+> 
+
+Thanks, I will send a diff for Andrew to squash it into original patch.
 
