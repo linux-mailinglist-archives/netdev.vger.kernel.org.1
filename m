@@ -1,119 +1,104 @@
-Return-Path: <netdev+bounces-186696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0985AA06FE
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:23:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51FF2AA073B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B432B7A1F05
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9742E3B54E5
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1CF1F8ADB;
-	Tue, 29 Apr 2025 09:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4EA2C1786;
+	Tue, 29 Apr 2025 09:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QdVboiFC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caRYV4q4"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1832AEE1;
-	Tue, 29 Apr 2025 09:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1772C1794;
+	Tue, 29 Apr 2025 09:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745918625; cv=none; b=ppJZ9dQEfXxO97d06ywxo4CVICr+VnG+EBduUpvjgTC/Zkanw526ca+AR892fSnjeh/Y9aFzCNnjeB7jSUV7m+wL/ritZ5G9s+PtJGrKZ8kj8u5tHDgA4bARNLQ6Ak0sk0507JjO8OBK7VkhT61ZdDyddEZxfdUXtSThWoi93L4=
+	t=1745918859; cv=none; b=qPPAmbctQdrn67pboX2MOvHTyCUwaUs9cgQrTyh4yhuxK6M4jS+P+OIubL47X4TUMbunAOjFKvjCKQivWafJDrEv4t29YdMy8Kr0pGaiod1023kxNw6ci1UNqS02GKBz+I4txxl8bKvlvaRUaRmLv0KxmNg48ROOgEo0sLy+4rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745918625; c=relaxed/simple;
-	bh=bxXi4bzflUGg0XRChcdu0vilXlrsAE9J350glGTXHc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NnHj5vNdFwkJxznXKqWOJTszZcabmNxULuk5cN49LepS3a26+mXTmaRk+uPTQJ1wLW1lYl/rwPQ3BDhvZmmvZc17CdghlZCdELju9MGotqsM75KjCcni4ygmAOrhJJsbH8GtPWo5kfB6GEAS4MyqS0EpszG4CFSVMSswWDBGgZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QdVboiFC; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=x3bWo1ELL19pa+d0Sb967tWb6OV53ljAQpQ/pusGFUM=; b=QdVboiFCpHr/Orl+7h5UJxnfPZ
-	hdLs16FtVQaFTKC1TP7KW15TTm63H7983/ASTjWHimV6khmEn9j/+UYMp2rNuZiLYITxq5egqkcrz
-	/FUXDgPIokyVMnv+IIZuTRxhswRwyeZ3TlphFakhtwwtMvyYM0SsLFoaJptffjX0lAX5iSRMqx2EL
-	ap9r3KHVXBk5UJmb88OCrfvg7VK/cqS+C0iMIqMJYpsa3pEYF+8QG2eDq010coHphPydf98uGDqr8
-	gPxr3vgwFc2nKtp4xyZ55OdSz5XSYQZ6YcW9Fgfb24AfmJGq1iGFNC1q6ZU2w1+21iPoWcsj0fsqI
-	8D1hn0zQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u9hBe-0000000DFRA-117H;
-	Tue, 29 Apr 2025 09:23:34 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id B12EF30035E; Tue, 29 Apr 2025 11:23:33 +0200 (CEST)
-Date: Tue, 29 Apr 2025 11:23:33 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>
-Subject: Re: [PATCH net-next v2 06/18] netfilter: nf_dup{4, 6}: Move
- duplication check to task_struct
-Message-ID: <20250429092333.GG4198@noisy.programming.kicks-ass.net>
-References: <20250414160754.503321-1-bigeasy@linutronix.de>
- <20250414160754.503321-7-bigeasy@linutronix.de>
+	s=arc-20240116; t=1745918859; c=relaxed/simple;
+	bh=pKdrAsC78yKJBlRfTV47EWhjNqUPsyLtnbdr254TIak=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=qUDQO5B2qZHnERkX3nzzo/xLtwYl3+8v84DYBzRoJQVswOcHVIW1LPEw/Lddn9RZC+tz8WByJRwVkxtw4/2k9F+wMi4cRY2yVjdfK76NKZ2NQSHduMQd+I2RyHwfmlZEurcB1OuiSQ2PQW61fiGhEAYUvQp82RVkSlsdkv9IVT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caRYV4q4; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso50965425e9.2;
+        Tue, 29 Apr 2025 02:27:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745918856; x=1746523656; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pKdrAsC78yKJBlRfTV47EWhjNqUPsyLtnbdr254TIak=;
+        b=caRYV4q4JnXKLHRzvs49gXoDqFG3DZtgRWuPpGitqJXaQkx9Cf/cgaTTbpbWrMwAG6
+         j+cfP/tvjMPz3Ca/S3KIRKiU8betiqkavlp3XGEvPsQRmqj1yZwOimoHVLzywmlr0ucW
+         0po5k2VyVJtcDSVS8MXwABFOM49nGxUmICL2uWBdgDSrlV803rfevkdKxzpv9FJ7kO9M
+         CXIisRyHMjUzTo9M4SiEaA7De6xvMGxo7UQMxSkH27oTIpZZZtO4JTXRCe9gwKdHXNsc
+         OYwJbvsHVlJIU0k5jX8vgsHAbHtV9L4j5tuDH8mDAzg98sYNsNE3nMWDgVhdQHE/bqf4
+         RD+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745918856; x=1746523656;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pKdrAsC78yKJBlRfTV47EWhjNqUPsyLtnbdr254TIak=;
+        b=UFnJwegMbDrXndUfSty25cRwyYXvJz5bXp5jzAtT6Qt9bwtr3zwkYZWLoVrgZ46Bte
+         az/cIxbsYs6zJa82XS2ZGpAfyt+iEZ4+S4hPNCMZkAmMO/6BDyOWKcHb/7JzKuf4/f3T
+         Yxd14VFwc7dOfHU7nHITxaqk3lO1WzDqwWztxNOaqGkYMATCqnWditIJ7Uoc7xlK6KZh
+         HMosz+LTKRALQaiJ99K6hSoeeExMUUOm/9lUmA4lm4O3qsQrw/N7w2vdz4eQb+I2n3pi
+         WuXrw4tff9+Q9Bhs6c346AsUIa6/S2lUvlBP1pXung3b4g0rIucDU34gTNV9I1ItpkOK
+         03cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVR7iL3pbzz15BvMih4ruU6ggAFbwLv9UxSrc/1UA9ZMn3LVl68liEyC9BHzwhhjikbupcoLRiEASF9S5U=@vger.kernel.org, AJvYcCVTejEWfnuuGCrpKf32HcQk1sTrEd9J13on/8JlSlo3y9JMvMK9QkWlzh2ApHvV4IMymDtjhxkB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIY2EJ+X25BikskyGRk8PBtDcHEBzhiE3E6ruGx9D3SdG3cJo1
+	7i0D4EWJRU5QJkiFFu7D0IAUov7lXkpDF8SCzR4GviO0YbV2bSXxNgbvfQ==
+X-Gm-Gg: ASbGnct6oJLRx0lFJPZTapLYkkgFg9uoWcgMaKKWQzFo+p06h9e2tN4t2m6LqAlsZ/Z
+	Ys2FutdfN9RMRdgaUAnE9Pmycvz+62LzIXLwjCjz+NAF3jlRhNX1oRyoxyNv94RzBDtGsCrZC5B
+	PTC2Gmry6a+TAMtdw1xBpgdA1Qke39N/EsKrSiSVxCqysnoEzkFiD2XlzOhTDvUp6GjyPD7vjuH
+	E1+bdRLi8eYluVChu0mk6YIexKMMvDcapvtkl+pXIGYWeE1fnolhqhAs0MUT5vwE7uL7x3tEDSh
+	rlQdpF7fLNucgblEVEqwJgxrt+da9hDBr1aE915BooIic61DKaSASAYe6yR83cws
+X-Google-Smtp-Source: AGHT+IE8JSijoGNvW4HYfi5pARde+mkn5gH6F7xQrm36fW+QYoBBa/pBtyJZpJfc5TEgBKoY19TQcA==
+X-Received: by 2002:a05:6000:3112:b0:3a0:8ac6:d5b8 with SMTP id ffacd0b85a97d-3a08ac6d5d6mr1645390f8f.53.1745918855945;
+        Tue, 29 Apr 2025 02:27:35 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:251e:25a2:6a2b:eaaa])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073c8c973sm13445245f8f.5.2025.04.29.02.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 02:27:35 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Ruben Wauters <rubenru09@aol.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] tools: ynl: fix typo in info string
+In-Reply-To: <20250428215541.6029-1-rubenru09@aol.com> (Ruben Wauters's
+	message of "Mon, 28 Apr 2025 22:51:09 +0100")
+Date: Tue, 29 Apr 2025 10:24:52 +0100
+Message-ID: <m2v7qnpbff.fsf@gmail.com>
+References: <20250428215541.6029-1-rubenru09.ref@aol.com>
+	<20250428215541.6029-1-rubenru09@aol.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414160754.503321-7-bigeasy@linutronix.de>
+Content-Type: text/plain
 
-On Mon, Apr 14, 2025 at 06:07:42PM +0200, Sebastian Andrzej Siewior wrote:
-> nf_skb_duplicated is a per-CPU variable and relies on disabled BH for its
-> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-> this data structure requires explicit locking.
-> 
-> Due to the recursion involved, the simplest change is to make it a
-> per-task variable.
-> 
-> Move the per-CPU variable nf_skb_duplicated to task_struct and name it
-> in_nf_duplicate. Add it to the existing bitfield so it doesn't use
-> additional memory.
-> 
-> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Juri Lelli <juri.lelli@redhat.com>
-> Cc: Vincent Guittot <vincent.guittot@linaro.org>
-> Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Ben Segall <bsegall@google.com>
-> Cc: Mel Gorman <mgorman@suse.de>
-> Cc: Valentin Schneider <vschneid@redhat.com>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  include/linux/netfilter.h        | 11 -----------
->  include/linux/sched.h            |  1 +
->  net/ipv4/netfilter/ip_tables.c   |  2 +-
->  net/ipv4/netfilter/nf_dup_ipv4.c |  6 +++---
->  net/ipv6/netfilter/ip6_tables.c  |  2 +-
->  net/ipv6/netfilter/nf_dup_ipv6.c |  6 +++---
->  net/netfilter/core.c             |  3 ---
->  7 files changed, 9 insertions(+), 22 deletions(-)
+Ruben Wauters <rubenru09@aol.com> writes:
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> replaces formmated with formatted
+> also corrects grammar by replacing a with an, and capitalises RST
+>
+> Signed-off-by: Ruben Wauters <rubenru09@aol.com>
 
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
