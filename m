@@ -1,119 +1,111 @@
-Return-Path: <netdev+bounces-186666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC46AA0443
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:22:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E25C9AA044D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4141B639F7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:22:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0F7217F3D3
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE63026F47F;
-	Tue, 29 Apr 2025 07:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="MhpWzX8G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0205B2777E4;
+	Tue, 29 Apr 2025 07:23:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AE9276028
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 07:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1A727605F
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 07:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745911354; cv=none; b=pJIuT/G7nFPfiG0MYbfeXcKXNrwg8fCTlBoV2lFeAdAGibeXdqL6SVthJ0KwNuRo+H91m3gk14Vt1vi6fyczZz5UDgVr/oSqWl61KcLw4+1I+CgpARQF2PuQ2kp8PZUBoAKjrjlIBsjI7kIoiFRgTD5AbSXyCpPvfavNe7vd86o=
+	t=1745911412; cv=none; b=PrzUCvGHhHfPeYNfPuj2wmc3jA6feLzLslSR9Fie7nzp8k5KBIljn0+uOAKIzH4Rphbs4SwJRCsCA267/vY/IRLkTJcuiEzefVQ4qu7r/zx6s6IlHerfF562jFaUj6ZN8PxUMSC8SEsPlcA/3A/XSHAuuYhDV7Y7uP/XpCO+Ads=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745911354; c=relaxed/simple;
-	bh=5jgYIag01F1yrBElkPV8J4+N6kc8KaJRZ54SOgKVcpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RWk3Jnhm799scgTeZ9uAYiCuljTBWgPxGJYXScSvuiUU1STuJAvDmhHVzqODrZ80HjxEDFYZ9bsPbjVHm/6bynVxRJaCZ9n/l+ulQzilhT1qUABOTDzGqNqi6h120GZiI+3bhtV6wH0ZwfBH0mfGMoAYuTiwiuvGRtGkl+KDHlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=MhpWzX8G; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a064a3e143so2840863f8f.3
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 00:22:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745911351; x=1746516151; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DE+ZZwi8ZZrhc7Bfug1do48IXKytzcdLLJ9EtDstdGQ=;
-        b=MhpWzX8GKjHyYSbe4MZdIVD1j97oh9lOp+0SD4Xavk8LumzcwFrflGEadIXOCMxKSo
-         SrLT6YqIfWDEOg1EzfbiBeYNWiAZ/zneh+YyGnXfpoRcw3QG5i4pyZSx3rLakjfqZq59
-         RE9eVfe13JWgcWEE72s0mtdA/EvthAGLxMUfXyox7rilitN8mCUyQMnkl5gfI1dGYrzD
-         vJjsildIzUfgHcfz6nzwo/4RuLhJqJY8PVf6ck2iQAA1SLd9sxFpeU75mbPKx35+sc5p
-         /JneEdhvV57p5lf7W53VxZ/ODhhFt3e7iZ1yAq3B3si+gTzAEH4/GPWdkMVvipGtVMfS
-         ONvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745911351; x=1746516151;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DE+ZZwi8ZZrhc7Bfug1do48IXKytzcdLLJ9EtDstdGQ=;
-        b=rBaRSpA38xGNUdTgnnKVEvswUa5falngsE3D8BxhfMRM6EvwscSTx3+JxwsofuwQYb
-         E8epPdFJEJygb4sJnZIARqxXENqeYGNbrLvsK1u6S79M6lL3v0MX8C9NTPfINOBjR3/k
-         7i/K3sc7vh7R2BQrX6388gbKgfwvDo4qPyk34O9gUWij/4spSXhUpCKnLn3CZ1NdpP3+
-         xh56XvyO3KcR/XFgbPbsv3nw0/G3APjPokBApvq66jvcrfeay4CVScqtGb/AVTCPTteu
-         Gb4BKRZ1vIEU0BfeE6UZriAiENDh+ac9HEZpl7uLZYuC2IXecmLO6AHJ7yuklqqfyPtd
-         LAPg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2xtFO7RDaFhGUOFh+psptnYSXD2FuHznbdQazTdu6oddMb3tiL8N1D1P05s/VmnevllT7Ge0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXT2F5YGaTXQWnm/7utmY912cr+eAqU45ej86pf3eS+L2QN/ol
-	SvHlOcVuPwTMFVFmBrbaeVk8l3K7O40x/9tiAQ8OJ/u2N2OwEY3ZQamczNklB+U=
-X-Gm-Gg: ASbGncvB3XV/I+/TQ3zFoVt2GPuh43oiTLwLqH8xSUOgUN7y9G269JGByUGe/FCR4I3
-	hVDzp82kMhc4Icc3ZBRRs7HTdSEn2GdnG8MOqSGXdDZva+P+7ldw9TZJ9ysUZ4Cw6ooIl0G6hXH
-	GilTtJihmBcHk1A1Bl6ZlTl0r69EbqDbry0zvHT4SNVELi/B49GN054GbkxypQKPOHdpmkLa4Jb
-	cXiZAl3lIwz8yMULdtKmeddrKq8eVIuVJAE6QaGcDK5rScTfAm9o+KhtXL8POr28ZxxnYyfIYs+
-	rCue6I4zuS7VqEtbGfTKj9pykdx9+NS2XJmfVidWh6F5rLFE
-X-Google-Smtp-Source: AGHT+IG6f2WyGSZ7WS08MtDoTcRvrkelQ14nBFjxhuTum36TKN1UESdXQUfC0EmRBpRwi0ydV8vvMQ==
-X-Received: by 2002:adf:fb45:0:b0:3a0:85aa:cc4e with SMTP id ffacd0b85a97d-3a08949fe80mr1603781f8f.44.1745911351307;
-        Tue, 29 Apr 2025 00:22:31 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073cbf04dsm13331457f8f.52.2025.04.29.00.22.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 00:22:30 -0700 (PDT)
-Date: Tue, 29 Apr 2025 09:22:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V3 01/15] tools: ynl-gen: allow noncontiguous
- enums
-Message-ID: <eeyl5eri5dqeir5at4fpcbb3zsanrbfbx7janiz6ntf6ffk5m7@q5ensvdqfvrl>
-References: <20250425214808.507732-1-saeed@kernel.org>
- <20250425214808.507732-2-saeed@kernel.org>
- <20250428160611.226e3e61@kernel.org>
+	s=arc-20240116; t=1745911412; c=relaxed/simple;
+	bh=0DjVB5bsxhzbNAMeRyZa4FifU108HCJLKTchWTnfluc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GmxrapPmuodgCEt0KVRamOPje64Bvv/6pCWdmTb5CiplLUYPRZrs0VgAtlPYGgZ+ggugQPIJ1QFr6hY0XaSKMEr/g1Y5RvpHVjRvomwcjBoK7VjdBvXygvvgK+yYkTTGaHC6hHFiA+nQFQzEpAmtevCd2Bm0EDY4ZAJlRa5PuRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9fJH-0005zL-D8; Tue, 29 Apr 2025 09:23:19 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9fJG-000DwR-1W;
+	Tue, 29 Apr 2025 09:23:18 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u9fJG-00CVpH-1G;
+	Tue, 29 Apr 2025 09:23:18 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	stable@vger.kernel.org
+Subject: [PATCH net v2 0/2] address EEE regressions on KSZ switches since v6.9 (v6.14+)
+Date: Tue, 29 Apr 2025 09:23:15 +0200
+Message-Id: <20250429072317.2982256-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428160611.226e3e61@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Tue, Apr 29, 2025 at 01:06:11AM +0200, kuba@kernel.org wrote:
->On Fri, 25 Apr 2025 14:47:54 -0700 Saeed Mahameed wrote:
->> In case the enum has holes, instead of hard stop, avoid the policy value
->> checking and it to the code.
->
->We guarantee that YNL generates full type validation for enum types.
->IOW that the policy will reject values outside of the enum.
->We need to preserve this guarantee.
->Best we can do for sparse enums is probably to generate a function
->callback that does the checking.
+This patch series addresses a regression in Energy Efficient Ethernet
+(EEE) handling for KSZ switches with integrated PHYs, introduced in
+kernel v6.9 by commit fe0d4fd9285e ("net: phy: Keep track of EEE
+configuration").
 
-Okay, will do that.
+The first patch updates the DSA driver to allow phylink to properly
+manage PHY EEE configuration. Since integrated PHYs handle LPI
+internally and ports without integrated PHYs do not document MAC-level
+LPI support, dummy MAC LPI callbacks are provided.
 
+The second patch removes outdated EEE workarounds from the micrel PHY
+driver, as they are no longer needed with correct phylink handling.
 
->We could add something like a bitmap validation for small sparse values
->(treat the mask in the policy as mask of allowed values).
->But hard to justify the complexity with just a single case of the
->problem. (actually classic netlink has a similar problem for AF_*
->values, but there "->mask as a bitmap" validation don't do, since 
->the elements of the enum go up to 256).
->
+This series addresses the regression for mainline and kernels starting
+from v6.14. It is not easily possible to fully fix older kernels due
+to missing infrastructure changes.
+
+Tested on KSZ9893 hardware.
+
+Oleksij Rempel (2):
+  net: dsa: microchip: let phylink manage PHY EEE configuration on KSZ
+    switches
+  net: phy: micrel: remove KSZ9477 EEE quirks now handled by phylink
+
+ drivers/net/dsa/microchip/ksz_common.c | 134 +++++++++++++++++++------
+ drivers/net/phy/micrel.c               |   7 --
+ include/linux/micrel_phy.h             |   1 -
+ 3 files changed, 106 insertions(+), 36 deletions(-)
+
+--
+2.39.5
+
 
