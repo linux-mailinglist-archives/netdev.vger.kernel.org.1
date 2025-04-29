@@ -1,191 +1,283 @@
-Return-Path: <netdev+bounces-186751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7302CAA0EB0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:25:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 776D3AA0F10
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F157844822
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:25:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C07693B2A48
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF1B2D3A60;
-	Tue, 29 Apr 2025 14:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFA6204C07;
+	Tue, 29 Apr 2025 14:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WGVBBsbV"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="jcpjU+oY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10D22D321B;
-	Tue, 29 Apr 2025 14:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745936739; cv=none; b=DpW/miOa/SjbSlaPPbZA18RXrXCdZLa3yfIApdV0VX+EXXahN911WxLdq5DsnJH5/316I5hr1zzGkfcdPxe3t8dpsfMHIEfRgIXI6XpbalsRc4oPgmyQPW6Zw2UD2bzHVBoAjSoxVrB9VZqO+jTTyYTK5VOdyYCMX0QyO3/mCZI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745936739; c=relaxed/simple;
-	bh=L0Bez4zWVrlwauQ1MnYALwpvxMsSNYXYNxE7pfwLXaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ntDuC91on0h52YqS52y9gwBgeA35aQDWnMbMxGiQ0XMINYCm0BCsfYOin5W75bQGvm2d+8bfrwdlFjXwZAKHHM49QzoUm6lEoTcFQMfa2wAufv6pLOuJX9ucsBfGJAZTMbo/2VhBojWQ2oGGaa8zTDl/t5jTq9nhLC2oyxYCiqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WGVBBsbV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0vA9Rec61rX04rxqvUMiHk6ImQ7asJ7mfPfkjKKAiA8=; b=WGVBBsbVVEPSajhc0uRNknEfrv
-	pZGzepnQDbgwUi1ty4f7yqdC5CDC5Tq1kLehk6qqejbN9+/st2TkhJpOugwvF13Lad67bGme2ryg0
-	MVDlg0cTXX6sjbvWvEbClJkIOEa9c5/b2pvNGF/ILuMcRV0ruFfpQ7B2Yzjf3jhf3DnAwfaKboYGc
-	G9PKsqZMtpKcEVtAXBkb0ju9wQbmoS2bCrNTjyKSLQZZRNklP/KrlN87NpGY9/vFQktt+7xr7KwLd
-	bU/nx6/NnB+JXKb6m4/tWCzbIA0gVOG96K5zt/mKixdUnw7NpMI/fi16At4iZrUh/VVyc35rMqOfY
-	7LJgCnZw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37870)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u9ltb-0005xf-01;
-	Tue, 29 Apr 2025 15:25:15 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u9ltV-0006D4-07;
-	Tue, 29 Apr 2025 15:25:09 +0100
-Date: Tue, 29 Apr 2025 15:25:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-Message-ID: <aBDhRH2TlyxKmaaW@shell.armlinux.org.uk>
-References: <20250429-v6-15-rc3-net-rgmii-delays-v1-1-f52664945741@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F9518A93F;
+	Tue, 29 Apr 2025 14:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745937358; cv=pass; b=bAll3Gbv0oykvjFQZ8S+eqn+MqBvv30oXQErn5Hns4C860AyCHVzRai3qCaGJ+6pNgfE5BC6IC+gJDDIGFfjY4ivNXJmLwT1Rb+2ydkw370nN01Y63o9zmjD5kmaRyXdsHeSuSMxqK/02aBoATZcRUXiNLnF2GyPy5BwBn+nxSc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745937358; c=relaxed/simple;
+	bh=B4ZhHOPWXTLD+jks4hLgkwngmiPIC29s07o73k+klWM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IFxCX/4QK0FKXRtC6NYth9+My6zz/KVO9uk2iFTPRqxN4IgfPfgA5rlAA7umoAcPh810tvgSZsiq+ni1c3mMmxplpmPfTG7zepo5g15mpXvVrIovIEVc1q2dLRqgXYu5/io4igvRt4tRTdKNTmy6AtJpISdxFGVK5jvjWbcR/I8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=jcpjU+oY; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Zn2gm0h4Lz49QKR;
+	Tue, 29 Apr 2025 17:26:43 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1745936805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+LPdLHldj8m4kLlIoSXyLpt2zuVRo5HpVSDqROrbTwA=;
+	b=jcpjU+oYZWfAmdwZqBXAq5dqSSkR08KOfneCg5jCFxpM9RiGYqb8aaQirhlNQF8YXS5Ww5
+	P3P34p0ttU4LFwCEDR9eAshs6EKfVWCY4GxtCmIbfZfALxlxn4QriNjKh9yr3p4VhRvPn9
+	/cAmf4YvNKGtY+t0xaP+weFcMmW4YUpGThS/r8OquEMvyK+61rdmxOOyQvO69/1M2sSf4E
+	kBoaTZ2Llm6Guqh8HK6JUTr5Apha1jJRF4J/kLJfw/vgxL2WkXeF/nbhGw3wRWXPBSs1YO
+	1CZBIz4IzkawiR3gIUPt2STkfUGHqI1nHzIBZmDyS+wS3Fh9FzzZmX4HrifU1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1745936805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+LPdLHldj8m4kLlIoSXyLpt2zuVRo5HpVSDqROrbTwA=;
+	b=jGNnfwlGOe/v/Y5/ZRjeE4BteZl/yixU1pkAV+7LYSVY8VxI41zF3YmevgtKlUTKDze9sD
+	N6QSJ+1Igtesqv3F5Qhtk4Ew+uSUprxsdqCLDDqILqYlUcmdB8+ZvdJGeyaRol/ups9BBK
+	IZVN/wyZFa4ROp96ElB3C3NQ3+CEyfI3zNsjt9WXL7/zkUlCO0AC2gbp4Mw6tAMAqUlB81
+	eEuVe5iBLJWoRXbdkV8uA7AC6wecVrmpx9K/ONtFPuLQGUJ3FCqRz8y6cKTVPcB6O8msRE
+	OUsHB/i+Dga3PJkyxutHb2pI2kM3OsSvwamPvmGECiYDrqD2nb2atr+9AOtyuw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1745936805; a=rsa-sha256;
+	cv=none;
+	b=FyS/OxLn+S7c8FR6FhZ4NnfgqZRj4JLKtThvq3sen4IphZZh3poxIHMvXRtKtIojhcxAA/
+	DJQOUhM3xGEPY+IhrpnZq4BY8FQUxf5Ji/6XYokiLJXHOP4O1UolJQerNiORK0tN9HYTif
+	K3ez+SgpOKaje4Tx3Q43HWfcjun7kFHOwT/uMhRWT1C2sOg7f03tKC42yGUFVRYKpnYxaW
+	NCBw39hrMUGOnSSrgm0HDBkCToBeqFhAYg7/sDmQGSX9FY5DAQPLEWElwqYSblNjguAdpO
+	mjji26fF+gpTCOFAgnjg2RTq2z2lE7N0IyBS2RHLBwyxt9hQT17m15FV5Z0/QQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <e8190a3bedc0c477347d0799f5a4c16480bfb4e9.camel@iki.fi>
+Subject: Re: [PATCH] iso: add BT_ISO_TS optional to enable ISO timestamp
+From: Pauli Virtanen <pav@iki.fi>
+To: yang.li@amlogic.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Luiz Augusto
+ von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 29 Apr 2025 17:26:41 +0300
+In-Reply-To: <20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com>
+References: <20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
+ ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
+ cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
+ aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
+ cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
+ +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
+ n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
+ 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
+ QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
+ dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
+ QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
+ aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
+ 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
+ /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
+ g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
+ T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
+ xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
+ Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
+ BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
+ ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
+ dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
+ wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
+ IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
+ Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
+ G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
+ S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
+ XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
+ xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
+ LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
+ 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
+ WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250429-v6-15-rc3-net-rgmii-delays-v1-1-f52664945741@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Apr 29, 2025 at 07:55:14AM -0500, Andrew Lunn wrote:
-> +# Informative
-> +# ===========
-> +#
-> +# 'phy-modes' & 'phy-connection-type' properties 'rgmii', 'rgmii-id',
-> +# 'rgmii-rxid', and 'rgmii-txid' are frequently used wrongly by
-> +# developers. This informative section clarifies their usage.
-> +#
-> +# The RGMII specification requires a 2ns delay between the data and
-> +# clock signals on the RGMII bus. How this delay is implemented is not
-> +# specified.
-> +#
-> +# One option is to make the clock traces on the PCB longer than the
-> +# data traces. A sufficiently difference in length can provide the 2ns
-> +# delay. If both the RX and TX delays are implemented in this manor,
+Hi,
 
-manner
+ti, 2025-04-29 kello 11:35 +0800, Yang Li via B4 Relay kirjoitti:
+> From: Yang Li <yang.li@amlogic.com>
+>=20
+> Application layer programs (like pipewire) need to use
+> iso timestamp information for audio synchronization.
 
-> +# 'rgmii' should be used, so indicating the PCB adds the delays.
-> +#
-> +# If the PCB does not add these delays via extra long traces,
-> +# 'rgmii-id' should be used. Here, 'id' refers to 'internal delay',
-> +# where either the MAC or PHY adds the delay.
-> +#
-> +# If only one of the two delays are implemented via extra long clock
-> +# lines, either 'rgmii-rxid' or 'rgmii-txid' should be used,
-> +# indicating the MAC or PHY should implement one of the delays
-> +# internally, while the PCB implements the other delay.
-> +#
-> +# Device Tree describes hardware, and in this case, it describes the
-> +# PCB between the MAC and the PHY, if the PCB implements delays or
-> +# not.
-> +#
-> +# In practice, very few PCBs make use of extra long clock lines. Hence
-> +# any RGMII phy mode other than 'rgmii-id' is probably wrong, and is
-> +# unlikely to be accepted during review.
+I think the timestamp should be put into CMSG, same ways as packet
+status is. The packet body should then always contain only the payload.
 
-Maybe add "without details provided in the commit description."
+>=20
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  include/net/bluetooth/bluetooth.h |  4 ++-
+>  net/bluetooth/iso.c               | 58 +++++++++++++++++++++++++++++++++=
+------
+>  2 files changed, 52 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index bbefde319f95..a102bd76647c 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -242,6 +242,7 @@ struct bt_codecs {
+>  #define BT_CODEC_MSBC		0x05
+> =20
+>  #define BT_ISO_BASE		20
+> +#define BT_ISO_TS		21
+> =20
+>  __printf(1, 2)
+>  void bt_info(const char *fmt, ...);
+> @@ -390,7 +391,8 @@ struct bt_sock {
+>  enum {
+>  	BT_SK_DEFER_SETUP,
+>  	BT_SK_SUSPEND,
+> -	BT_SK_PKT_STATUS
+> +	BT_SK_PKT_STATUS,
+> +	BT_SK_ISO_TS
+>  };
+> =20
+>  struct bt_sock_list {
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 2f348f48e99d..2c1fdea4b8c1 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1718,7 +1718,21 @@ static int iso_sock_setsockopt(struct socket *sock=
+, int level, int optname,
+>  		iso_pi(sk)->base_len =3D optlen;
+> =20
+>  		break;
+> +	case BT_ISO_TS:
+> +		if (optlen !=3D sizeof(opt)) {
+> +			err =3D -EINVAL;
+> +			break;
+> +		}
+> =20
+> +		err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
+> +		if (err)
+> +			break;
+> +
+> +		if (opt)
+> +			set_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
+> +		else
+> +			clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
+> +		break;
+>  	default:
+>  		err =3D -ENOPROTOOPT;
+>  		break;
+> @@ -1789,7 +1803,16 @@ static int iso_sock_getsockopt(struct socket *sock=
+, int level, int optname,
+>  			err =3D -EFAULT;
+> =20
+>  		break;
+> +	case BT_ISO_TS:
+> +		if (len < sizeof(u32)) {
+> +			err =3D -EINVAL;
+> +			break;
+> +		}
+> =20
+> +		if (put_user(test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags),
+> +			    (u32 __user *)optval))
+> +			err =3D -EFAULT;
+> +		break;
+>  	default:
+>  		err =3D -ENOPROTOOPT;
+>  		break;
+> @@ -2271,13 +2294,21 @@ static void iso_disconn_cfm(struct hci_conn *hcon=
+, __u8 reason)
+>  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+>  	struct iso_conn *conn =3D hcon->iso_data;
+> +	struct sock *sk;
+>  	__u16 pb, ts, len;
+> =20
+>  	if (!conn)
+>  		goto drop;
+> =20
+> -	pb     =3D hci_iso_flags_pb(flags);
+> -	ts     =3D hci_iso_flags_ts(flags);
+> +	iso_conn_lock(conn);
+> +	sk =3D conn->sk;
+> +	iso_conn_unlock(conn);
+> +
+> +	if (!sk)
+> +		goto drop;
+> +
+> +	pb =3D hci_iso_flags_pb(flags);
+> +	ts =3D hci_iso_flags_ts(flags);
+> =20
+>  	BT_DBG("conn %p len %d pb 0x%x ts 0x%x", conn, skb->len, pb, ts);
+> =20
+> @@ -2294,17 +2325,26 @@ void iso_recv(struct hci_conn *hcon, struct sk_bu=
+ff *skb, u16 flags)
+>  		if (ts) {
+>  			struct hci_iso_ts_data_hdr *hdr;
+> =20
+> -			/* TODO: add timestamp to the packet? */
+> -			hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
+> -			if (!hdr) {
+> -				BT_ERR("Frame is too short (len %d)", skb->len);
+> -				goto drop;
+> -			}
+> +			if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
+> +				hdr =3D (struct hci_iso_ts_data_hdr *)skb->data;
+> +				len =3D hdr->slen + HCI_ISO_TS_DATA_HDR_SIZE;
+> +			} else {
+> +				hdr =3D skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
+> +				if (!hdr) {
+> +					BT_ERR("Frame is too short (len %d)", skb->len);
+> +					goto drop;
+> +				}
+> =20
+> -			len =3D __le16_to_cpu(hdr->slen);
+> +				len =3D __le16_to_cpu(hdr->slen);
+> +			}
+>  		} else {
+>  			struct hci_iso_data_hdr *hdr;
+> =20
+> +			if (test_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags)) {
+> +				BT_ERR("Invalid option BT_SK_ISO_TS");
+> +				clear_bit(BT_SK_ISO_TS, &bt_sk(sk)->flags);
+> +			}
+> +
+>  			hdr =3D skb_pull_data(skb, HCI_ISO_DATA_HDR_SIZE);
+>  			if (!hdr) {
+>  				BT_ERR("Frame is too short (len %d)", skb->len);
+>=20
+> ---
+> base-commit: 16b4f97defefd93cfaea017a7c3e8849322f7dde
+> change-id: 20250421-iso_ts-c82a300ae784
+>=20
+> Best regards,
 
-> +#
-> +# When the PCB does not implement the delays, the MAC or PHY must.  As
-> +# such, this is software configuration, and so not described in Device
-> +# Tree.
-> +#
-> +# The following describes how Linux implements the configuration of
-> +# the MAC and PHY to add these delays when the PCB does not. As stated
-> +# above, developers often get this wrong, and the aim of this section
-> +# is reduce the frequency of these errors by Linux developers. Other
-> +# users of the Device Tree may implement it differently, and still be
-> +# consistent with both the normative and informative description
-> +# above.
-> +#
-> +# By default in Linux, the MAC is expected to read the 'phy-mode' from
-> +# Device Tree, not implement any delays, and pass the value to the
-> +# PHY.
-
-I'd suggest "By default in Linux, when using phylib/phylink, "... as
-we do have MACs that do not use phylib but talk to the PHY, and may be
-cross-platform drivers that follow some other methodology.
-
-> The PHY will then implement delays as specified by the
-> +# 'phy-mode'. The PHY should always be reconfigured to implement the
-> +# needed delays, replacing any setting performed by strapping or the
-> +# bootloader, etc.
-> +#
-> +# Experience to date is that all PHYs which implement RGMII also
-> +# implement the ability to add or not add the needed delays. Hence
-> +# this default is expected to work in all cases. Ignoring this default
-> +# is likely to be questioned by Reviews, and require a strong argument
-> +# to be accepted.
-> +#
-> +# There are a small number of cases where the MAC has hard coded
-> +# delays which cannot be disabled. The 'phy-mode' only describes the
-> +# PCB.  The inability to disable the delays in the MAC does not change
-> +# the meaning of 'phy-mode'. It does however mean that a 'phy-mode' of
-> +# 'rgmii' is now invalid, it cannot be supported, since both the PCB
-> +# and the MAC and PHY adding delays cannot result in a functional
-> +# link. Thus the MAC should report a fatal error for any modes which
-> +# cannot be supported. When the MAC implements the delay, it must
-> +# ensure that the PHY does not also implement the same delay. So it
-> +# must modify the phy-mode it passes to the PHY, removing the delay it
-> +# has added. Failure to remove the delay will result in a
-> +# non-functioning link.
-> +#
-> +# Sometimes there is a need to fine tune the delays. Often the MAC or
-> +# PHY can perform this fine tuning. In the MAC node, the Device Tree
-> +# properties 'rx-internal-delay-ps' and 'tx-internal-delay-ps' should
-> +# be used to indicate fine tuning performed by the MAC. The values
-> +# expected here are small. A value of 2000ps, i.e 2ns, and a phy-mode
-> +# of 'rgmii' will not be accepted by Reviewers.
-> +#
-> +# If the PHY is to perform fine tuning, the properties
-> +# 'rx-internal-delay-ps' and 'tx-internal-delay-ps' in the PHY node
-> +# should be used. When the PHY is implementing delays, these
-> +# properties should have a value near to 2000ps.
-
-... according to the phy-mode used (as they're documented to be
-dependent on that.)
-
-I'm wondering whether they should be dependent on which rgmii-* mode
-is being used, as delays << 2ns could be used to finely adjust the
-PCB delays if the PHY supports that. I haven't looked closely enough
-at PHY datasheets to know whether that's possible or not though.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Pauli Virtanen
 
