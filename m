@@ -1,242 +1,124 @@
-Return-Path: <netdev+bounces-186688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD819AA05FC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:42:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B44AA0605
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:43:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2435E4A0632
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:42:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E387D4A065A
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AB228B51F;
-	Tue, 29 Apr 2025 08:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417B529345D;
+	Tue, 29 Apr 2025 08:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TnOQ1nkc"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DfMUzp7s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EE52512E6;
-	Tue, 29 Apr 2025 08:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB21322422F;
+	Tue, 29 Apr 2025 08:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745916153; cv=none; b=c869JkDec4IGOMA6WdEbZyx0M/uV4kaJM2lWUecJENkV7NtCvzA2B8m+ZGDbFu+u8tbVW6VY+pehycu0ZQkB1RRRvdMap2U0JM19qUaeQLf6Rr09MVMbuPPGj6NaaegyLdwpnynBnRbw4d9ZnRHlFN3aJN1mezvItkGBgD4K8cw=
+	t=1745916222; cv=none; b=gOP8YY1SE/UK2N90UBUiwQJ1nMdlAuz5/w3sme4YHjE8dBru8ObDuIBL36W5CZDDj/Z+VaTLKkwPaX04rYgC5VUI3yaVFFjkEvDQiM41dOeWbqW82dodeEeRZQlzaxJrqxf0Zmeoxgs+XMg88P6rZhsRpY1uEWWu0Gp8fvfYuw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745916153; c=relaxed/simple;
-	bh=CXbPy436EifD5EG3lHLWxpZF845jKZCutFVoT2XFuf0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D/THnaLBIudmAkXWPQkJ5RECAkgysAlSNuhw0ZnuSJx+wh5iVJLsehflV1g1QA8Dvv4RnDsrA+0zLP/HhlYHcoF03JWdSgq1wrffRO0+gFXo+ZxLrRkksiFiq5yJiEtQPGJKduClb7xzoGCg/hk3eYpqWqyY18AS1+fgWLM1vjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TnOQ1nkc; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac3b12e8518so963524666b.0;
-        Tue, 29 Apr 2025 01:42:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745916149; x=1746520949; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ToMiRGUzkQ1Ik/gxaxy5aFixXwQGUH4mfGg/aR/GNTA=;
-        b=TnOQ1nkcJmSxI5DfGneOp1gNUDXirDe/Y93T5bF3Sh6QVeuYzOMZ08s8kUFt9A4tfE
-         YOzBz7GlMxv/KcHDFLiX13n5WlMRAzYdhBgZ/aLv6OnFGOHiVUgTO1fpuKlZJ/MNfHWq
-         8KpdL8OhdV/n+Bl14zKaMSQIQgsuX2mZosxKOw5/n6sqXzeuZFiKCYJSd9npLpvnU9Qg
-         6aAja9Vc7y1K74vz2+2zOdAHdAEiN6QppdqSZ3v1DDcbAH34LfrP5Ox/vBuqb8rGDcIk
-         FUY1x6KdM02pDDWTaU7JJNXIKvYx4qcUoyyKq6LDg1ufcwx5bHMENYYrQa6CG/ieN9c1
-         CpHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745916149; x=1746520949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ToMiRGUzkQ1Ik/gxaxy5aFixXwQGUH4mfGg/aR/GNTA=;
-        b=bEGfdNDS2g73nsJObT8LQzEgjEeP8CSb4E5lgwKA/ZMJfybXiTenfR8Qq+cBqIC7Z4
-         aVTo5O/2jSbvLthuZH8K8aYl6HGXGwEoEZw8F7FtWlYGI3rhCjie1tbEV9Od1wY0gmUX
-         cgFpw3+rdx5tTeFWd0KZfbZIMx7m1CGgbwv7fNJua0RDS3oJCJ5/QM9A2AXnm5hM3NFf
-         GSUVDuAfp/KAMJzwpRZaCAzRDiNjxqxdLuPhenc13hoa1laxuTxtCKWjvuCAi7h4faEP
-         vbUSsx2PbO8QY2c0Uwu5RsmJlxSyvuYnVHZG4Gh8wJN4hO7V16ePCwD6dDHK6lfm9puZ
-         SomQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFeoSF2wuv5lW7E+okq4Uf2W5RhXsTzjNFJNU8QaxBrUciI/iJObAN0LfX+94JMYyE7X+R1gd1@vger.kernel.org, AJvYcCWqboz0ChFsiwrKLozC9HKSxCZMif3BSRR+zCpIl+7bTEQ/d/saZwcii9APzekaT+/5Q7OkJWa1ZgZ0gos=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxktR9xKkW0z9XqSZDR7I5jEhZytkya26NO2bd7Ec0SFccxPomX
-	GBrfe/rx38Q//hX80tTbECfJLGsgN9ZGXmeFpHKJgHqJNzo1lc4pQq4StSlh/YssDHza9DZpuwi
-	ntH/GDchplO9RxDkAEFb2nKacgoI=
-X-Gm-Gg: ASbGncsHAZlSER4fQR8W/CsySR2b1GzjJzu6HMqDp+iNn72wDCpYZouVv7jy3zkPCoN
-	cyhqXXekr7QLr2Eh+/t9o/3xfTy3nQI2N+PllCnDUwsEOnAsNde6ySWgiPRijnVqldWyQZbU1nx
-	B11ACJkwK7lJHi/c8t/WOU
-X-Google-Smtp-Source: AGHT+IHUXlvcJkx900HQTsgDMIdKlW/ZeeL9afbnQyPHkTJ6qnwBtdIUCFzf6ooEyTr9qZEbAXaN9dzXcKgKJYwPH+o=
-X-Received: by 2002:a17:907:3ea3:b0:ac6:b729:9285 with SMTP id
- a640c23a62f3a-ace84b55b08mr1089871666b.55.1745916149347; Tue, 29 Apr 2025
- 01:42:29 -0700 (PDT)
+	s=arc-20240116; t=1745916222; c=relaxed/simple;
+	bh=gt9yqUMAyVr3pWh2vCa1j58/QxEYy6y71QRDSOzfzsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GAPlccNHFTJ+aSSz3hq9oVnjsgXWEaxgzkfZ1LGOqwhdIOQQ0yGELWeV1siEumxRZLafX4a97DdDfrZvi9K5aUtJzDZZunQOTPPyaKeWETkqYUSQSmU16vVfxirCMsXUn2sJKKkaFcISZ8KGe0O3F/40fXNHLPXEFdll+UQ/9TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=DfMUzp7s; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 1967920BCAD1; Tue, 29 Apr 2025 01:43:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1967920BCAD1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1745916214;
+	bh=MLMI0YGgePRRieH5KhOgSTTxPGhA0u8+OCwx8w9CvY0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DfMUzp7s2Yb7IFsfitPC0jmnzTNngOmgTbu0WzU27qJqIjE5K4rlQSVrhqBrtC6hd
+	 Jqhv7WgTVOO/XMQTG3FcYuT+LGzqC2r0WJeZgdIVAYk0g+fawZ/g+ICp5WaU0pBBJk
+	 YEl7ZuFlmttDh59oXrIo9omNL43JHUpxcsTXROhQ=
+Date: Tue, 29 Apr 2025 01:43:34 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-hyperv@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof Wilczy??ski <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v2 1/3] PCI: Export pci_msix_prepare_desc() for dynamic
+ MSI-X alloc
+Message-ID: <20250429084334.GA10839@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20250425163748.GA546623@bhelgaas>
+ <87ldrkqxum.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414085412.117120-1-maimon.sagi@gmail.com>
- <b6aea926-ebb6-48fe-a1be-6f428a648eae@linux.dev> <CAMuE1bG_+qj++Q0OXfBe3Z_aA-zFj3nmzr9CHCuKJ_Jr19oWEg@mail.gmail.com>
- <aa9a1485-0a0b-442b-b126-a00ee5d4801c@linux.dev> <CAMuE1bETL1+sGo9wq46O=Ad-_aa8xNLK0kWC63Mm5rTFdebp=w@mail.gmail.com>
- <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev> <CAMuE1bHsPeaokc-_qR4Ai8o=b3Qpbosv6MiR5_XufyRTtE4QFQ@mail.gmail.com>
- <44b67f86-ed27-49e8-9e15-917fa2b75a60@linux.dev> <CAMuE1bFk=LFTWfu8RFJeSoPtjO8ieJDdEHhHpKYr4QxqB-7BBg@mail.gmail.com>
- <507eb775-d7df-4dd2-a7d1-626d5a51c1de@linux.dev> <CAMuE1bFLB24ELFOSG=v+0hxJ+a+KGNWc8=Z3=kbXOs03PtLFOA@mail.gmail.com>
- <fd813f14-ea75-4f5a-a99e-d2925c25ccd2@linux.dev>
-In-Reply-To: <fd813f14-ea75-4f5a-a99e-d2925c25ccd2@linux.dev>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Tue, 29 Apr 2025 11:42:02 +0300
-X-Gm-Features: ATxdqUEks4OZsBQ5J835aP-TOiJX7VYVAqgJmn1uDnVwMEsfZ95mbQCzlsHZYVo
-Message-ID: <CAMuE1bEH0e+GAsCumED0TdXihtsmYV4T5uRLmz7_pePt8RNQzQ@mail.gmail.com>
-Subject: Re: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: jonathan.lemon@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ldrkqxum.ffs@tglx>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Apr 16, 2025 at 5:45=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 16/04/2025 14:59, Sagi Maimon wrote:
-> > On Wed, Apr 16, 2025 at 1:35=E2=80=AFPM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> >>
-> >> On 16/04/2025 07:33, Sagi Maimon wrote:
-> >>> On Mon, Apr 14, 2025 at 4:55=E2=80=AFPM Vadim Fedorenko
-> >>> <vadim.fedorenko@linux.dev> wrote:
-> >>>>
-> >>>> On 14/04/2025 14:43, Sagi Maimon wrote:
-> >>>>> On Mon, Apr 14, 2025 at 4:01=E2=80=AFPM Vadim Fedorenko
-> >>>>> <vadim.fedorenko@linux.dev> wrote:
-> >>>>>>
-> >>>>>> On 14/04/2025 12:38, Sagi Maimon wrote:
-> >>>>>>> On Mon, Apr 14, 2025 at 2:09=E2=80=AFPM Vadim Fedorenko
-> >>>>>>> <vadim.fedorenko@linux.dev> wrote:
-> >>>>>>>>
-> >>>>>>>> On 14/04/2025 11:56, Sagi Maimon wrote:
-> >>>>>>>>> On Mon, Apr 14, 2025 at 12:37=E2=80=AFPM Vadim Fedorenko
-> >>>>>>>>> <vadim.fedorenko@linux.dev> wrote:
-> >>>>>>>>>>
-> >>>>>>>>>> On 14/04/2025 09:54, Sagi Maimon wrote:
-> >>>>>>>>>>> Sysfs signal show operations can invoke _signal_summary_show =
-before
-> >>>>>>>>>>> signal_out array elements are initialized, causing a NULL poi=
-nter
-> >>>>>>>>>>> dereference. Add NULL checks for signal_out elements to preve=
-nt kernel
-> >>>>>>>>>>> crashes.
-> >>>>>>>>>>>
-> >>>>>>>>>>> Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and upd=
-ate sysfs nodes")
-> >>>>>>>>>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> >>>>>>>>>>> ---
-> >>>>>>>>>>>        drivers/ptp/ptp_ocp.c | 3 +++
-> >>>>>>>>>>>        1 file changed, 3 insertions(+)
-> >>>>>>>>>>>
-> >>>>>>>>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> >>>>>>>>>>> index 7945c6be1f7c..4c7893539cec 100644
-> >>>>>>>>>>> --- a/drivers/ptp/ptp_ocp.c
-> >>>>>>>>>>> +++ b/drivers/ptp/ptp_ocp.c
-> >>>>>>>>>>> @@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s=
-, struct ptp_ocp *bp, int nr)
-> >>>>>>>>>>>            bool on;
-> >>>>>>>>>>>            u32 val;
-> >>>>>>>>>>>
-> >>>>>>>>>>> +     if (!bp->signal_out[nr])
-> >>>>>>>>>>> +             return;
-> >>>>>>>>>>> +
-> >>>>>>>>>>>            on =3D signal->running;
-> >>>>>>>>>>>            sprintf(label, "GEN%d", nr + 1);
-> >>>>>>>>>>>            seq_printf(s, "%7s: %s, period:%llu duty:%d%% phas=
-e:%llu pol:%d",
-> >>>>>>>>>>
-> >>>>>>>>>> That's not correct, the dereference of bp->signal_out[nr] happ=
-ens before
-> >>>>>>>>>> the check. But I just wonder how can that even happen?
-> >>>>>>>>>>
-> >>>>>>>>> The scenario (our case): on ptp_ocp_adva_board_init we
-> >>>>>>>>> initiate only signals 0 and 1 so 2 and 3 are NULL.
-> >>>>>>>>> Later ptp_ocp_summary_show runs on all 4 signals and calls _sig=
-nal_summary_show
-> >>>>>>>>> when calling signal 2 or 3  the dereference occurs.
-> >>>>>>>>> can you please explain: " the dereference of bp->signal_out[nr]=
- happens before
-> >>>>>>>>> the check", where exactly? do you mean in those lines:
-> >>>>>>>>> struct signal_reg __iomem *reg =3D bp->signal_out[nr]->mem;
-> >>>>>>>>         ^^^
-> >>>>>>>> yes, this is the line which dereferences the pointer.
-> >>>>>>>>
-> >>>>>>>> but in case you have only 2 pins to configure, why the driver ex=
-poses 4
-> >>>>>>>> SMAs? You can simply adjust the attributes (adva_timecard_attrs)=
-.
-> >>>>>>>>
-> >>>>>>> I can (and will) expose only 2 sma in adva_timecard_attrs, but st=
-ill
-> >>>>>>> ptp_ocp_summary_show runs
-> >>>>>>> on all 4 signals and not only on the on that exposed, is it not a=
- bug?
-> >>>>>>
-> >>>>>> Yeah, it's a bug, but different one, and we have to fix it other w=
-ay.
-> >>>>>>
-> >>>>> Do you want to instruct me how to fix it , or will you fix it?
-> >>>>
-> >>>> well, the original device structure was not designed to have the amo=
-unt
-> >>>> of SMAs less than 4. We have to introduce another field to store act=
-ual
-> >>>> amount of SMAs to work with, and adjust the code to check the value.=
- The
-> >>>> best solution would be to keep maximum amount of 4 SMAs in the struc=
-ture
-> >>>> but create a helper which will init new field and will have
-> >>>> BUILD_BUG_ON() to prevent having more SMAs than fixed size array for
-> >>>> them. That will solve your problem, but I will need to check it on t=
-he
-> >>>> HW we run.
-> >>>>
-> >>> just to be clear you will write the fix and test it on your HW, so yo=
-u
-> >>> don't want me to write the fix?
-> >>
-> >> Well, it would be great if you can write the code which will make SMA
-> >> functions flexible to the amount of pin the HW has. All our HW has fix=
-ed
-> >> amount of 4 pins that's why the driver was coded with constants. Now
-> >> your hardware has slightly different amount of pins, so it needs
-> >> adjustments to the driver to work properly. I just want to be sure tha=
-t
-> >> any adjustments will not break my HW - that's what I meant saying I'll
-> >> test it.
-> >>
-> > Just to be clear (correct me please if I am wrong):
-> > I will write the code, then create a patch and upstream to the vanilla
-> > you will test my change on your HW and only then approve the patch
->
-> Yes, that's correct
->
-On altera we have implemented 2 signals and 4 SMAs (does not make sense, bu=
-t...)
-The original fix is regarding struct ptp_ocp_signal signal[4], but on
-your fix suggestion
-you mension SMAs.
-So what to do? fix the SMA array or signal array or both?
-and if both should we establish some connection between the two
-meaning if we have only
-two SMAs then we can initiate only two signals?
-please advise
-> >>>>>>>>> struct ptp_ocp_signal *signal =3D &bp->signal[nr];
-> >>>>>>>>>> I believe the proper fix is to move ptp_ocp_attr_group_add() c=
-loser to
-> >>>>>>>>>> the end of ptp_ocp_adva_board_init() like it's done for other =
-boards.
-> >>>>>>>>>>
-> >>>>>>>>>> --
-> >>>>>>>>>> pw-bot: cr
-> >>>>>>>>
-> >>>>>>
-> >>>>
-> >>
->
+On Mon, Apr 28, 2025 at 02:22:57PM +0200, Thomas Gleixner wrote:
+> On Fri, Apr 25 2025 at 11:37, Bjorn Helgaas wrote:
+> 
+> Subject prefix wants to be PCI/MSI
+> 
+>   git log --format=oneline path/to/file
+> 
+> gives you a pretty decent hint
+> 
+> 
+> 
+> > On Fri, Apr 25, 2025 at 03:53:57AM -0700, Shradha Gupta wrote:
+> >> For supporting dynamic MSI-X vector allocation by PCI controllers, enabling
+> >> the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN is not enough, msix_prepare_msi_desc()
+> >> to prepare the desc is also needed.
+> 
+> Please write things out: ... to prepare the MSI descriptor ....
+> 
+> This is not twitter.
+> 
+> >> Export pci_msix_prepare_desc() to allow PCI controllers to support dynamic
+> >> MSI-X vector allocation.
+> >> 
+> >> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> >> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> 
+> > Thanks for the update and for splitting this from the hv driver
+> > update.  Will watch for Thomas's ack here.
+> 
+> Other than that:
+> 
+> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+
+Thank you for all the comments Thomas.
+I'll be mindful of these going forward.
+
+regards,
+Shradha.
 
