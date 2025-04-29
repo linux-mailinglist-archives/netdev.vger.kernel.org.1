@@ -1,189 +1,184 @@
-Return-Path: <netdev+bounces-186723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8F4AA08FC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 12:57:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51103AA0959
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDE7B3AF6C7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:57:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06C678404B0
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298A42C1781;
-	Tue, 29 Apr 2025 10:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32A22C10B1;
+	Tue, 29 Apr 2025 11:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5C6YxeT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glx0RWkF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48A32C10A9
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 10:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFD22BEC43;
+	Tue, 29 Apr 2025 11:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745924243; cv=none; b=OJM80dtmodppZY2LtLD07PBWFXzIf/MThbFnvHlon1O0w/MZRLe5FA13BikLfFS/pSlCFyRV/LupmqsNtevywnJUkiz9JAf1g1NiEt9Gx6YZAivs062IOhBmJPvtikpQhjLWYBGXysd1VSow+3pbFIGxxCsENV1GOsKanmd0MXw=
+	t=1745925173; cv=none; b=uaDDYT7D7Ngxh6tT7C096wht++rrOrcbKFbYvgsqSG25V9D5BtRWYxX3HqRZbjmdwT3DNsADut96X7uHQuQfplEBtWBpuNZJaWctER+BjJtq9sAG7VGB1GYSKEc9XniykeLIvaKQs5Pk5oKXr3bLaezcUbLtSLMR/8x0vYziwTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745924243; c=relaxed/simple;
-	bh=E0OPxLkNygm8USuIrlqcZJClXsTtsoX726UOJ72djK4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NoLiSunLJmWmUpamHiXH0aSLyDaOLyYJX26PJNuGvAK1Huw47ifEQzddvpXeNKe5G+h+sz+cwy6ctlwIJOC8Q2RwvDb2kVwDyQ3opv3qIQeCjV/aQsAF+yUW2BTEhAzOdUtwqBnD5tC2F/CczOSt07tNuhwqATtjTfgZSkExbIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e5C6YxeT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745924239;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N32jCRGy40LR70yv+XWjgcmG1isI4rJ5byTryD47s3k=;
-	b=e5C6YxeT+2smYXchneRxQdfSY9X6zlU3B7N9b/xccoSD4Bd+S2HX0V5IEcqegUYPKoEsxR
-	zhkH2aDjkcyXQmPgMDp/RM61FcVw85hZLXHO3OozemjxOP83iQVNDJTz0OqUdbJYgh9EOf
-	WK8lW0B4f8bsutm+eRKBqbokNSMBo90=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-O55yT6l9MXKKYsc8b7nj1w-1; Tue, 29 Apr 2025 06:57:18 -0400
-X-MC-Unique: O55yT6l9MXKKYsc8b7nj1w-1
-X-Mimecast-MFC-AGG-ID: O55yT6l9MXKKYsc8b7nj1w_1745924237
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-acb8d1231ffso433183466b.2
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 03:57:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745924237; x=1746529037;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N32jCRGy40LR70yv+XWjgcmG1isI4rJ5byTryD47s3k=;
-        b=geIXG/N6pKPfwwF9tVH5TzT0QwxopVOOAIMXsmV46qVqrRbOI0raTZ5z/LjJPJtBwn
-         /wzd5DRVroXwGgOJ40BWH/XuPcrXi+Qq9VTSqpKQpxGVSM2T8Tq3xSRzw4GRcGmlzk6V
-         tm8UT1NsYrBAyZnvbpPLU1cqDRBKgtpQxoVr/3M2b8gSZstDHW8uhB/vbEC/Xp1erYTH
-         Ot27Y4UiQNIksFY9wx+lMpNLLs4P+9oepqpgFmlUsbT+SVzJVxJHOyZJHECGBwF+TOOo
-         i7pRkLAbiocy4Sd8B0228XLeeKKK9SO6u3lwosDPT5k7VBRjnZg3VByhoRQKItoiRX2r
-         RRrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWi7EAvAsH39lB7+j6Fg7ZxtRhcOS+7Sw6ekWdHtJZ7BV3YTKaWMuTgEixAc8Dtv7s0HAuhu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw214b7Y1idMgfMhJ7Lko0qpqwB1Ee8v2rm0pQE4Be0uWkDypdN
-	AXgD0LtOKIiiyJzECFBLW6bbulPXBL0AtmJokmXeda1vtRjYUEY3UVxWrtNv76UOT5b9sMC9ifc
-	d0DhHeLM48HLOuOPi3hZtjBj1jfqrMlTGOeVn/m0uDSKWqod6Hhl3FQ==
-X-Gm-Gg: ASbGncsetcnj7tr++JPY9OIV/GNSOb44e7xVy9BWCMbi6PN6anZctIkl1mW0AIA6FUE
-	qjv+PpFqBbeXlxHQQgcIFonxGCwIf5SmyAARiXgmnor6mEuPVY19W/DXaxR0A8LxzPMMeH6AplJ
-	MzITFYoloGWpe+MBohtMBVRnW4FCdZ5We2jYVfL1FgM0wrwcUFn3Ep2GQgXJ8pbwc+Lj6b4Qnvm
-	gQfkbAsC7EZ2Yrm0T39u3jvAwdVaYfmY8UHJaTvPse8l9JOwSjP5i7CFGRt8l/UNXFMy2T3m52f
-	rO1QFvWZXEhIXPO6Jz2IyEN7u2zvHmRDG7Soj9RrW9NQN1ywBXfvFYzfxek=
-X-Received: by 2002:a17:907:2da3:b0:ace:3643:1959 with SMTP id a640c23a62f3a-acec4b404d3mr314486166b.7.1745924237093;
-        Tue, 29 Apr 2025 03:57:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/jnW581mQ3SHUDuxVAhF02Euf5vxmHyY7s5LblelgJiI21k8fqSpEuo/N+KjPdIUHg6RjQQ==
-X-Received: by 2002:a17:907:2da3:b0:ace:3643:1959 with SMTP id a640c23a62f3a-acec4b404d3mr314483466b.7.1745924236627;
-        Tue, 29 Apr 2025 03:57:16 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897? ([2a0d:3344:2726:1910:4ca0:1e29:d7a3:b897])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acec3d78514sm137841166b.131.2025.04.29.03.57.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 03:57:16 -0700 (PDT)
-Message-ID: <2067a9f7-eba4-476d-a095-3d6301e14830@redhat.com>
-Date: Tue, 29 Apr 2025 12:57:13 +0200
+	s=arc-20240116; t=1745925173; c=relaxed/simple;
+	bh=gbagDXiDhv29hsU2kJSrNOrvcjmmOaIpBSD1tfhYSfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hlmXLHTUyykQSsNTyfHTEbPYf6wMEdtojZmbaqBDIhOsBQh/E1+J0KCBpiN0XlMhMzLgFD2AvVN79w4zSILZ13O0XekTUdqXBaXXFwKQArN//CyK7HVkVpvBzcjzpiXjkLmyMovg9PUjUAceU6Pe+mTV5xarVgoZuzbpfQNHnGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=glx0RWkF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077BAC4CEE3;
+	Tue, 29 Apr 2025 11:12:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745925173;
+	bh=gbagDXiDhv29hsU2kJSrNOrvcjmmOaIpBSD1tfhYSfg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=glx0RWkFdw8QmEXfShT9CWGf1cd1q7pZAJUFQ+ImP3wrE23G0ULD6CBq3yNlVAS+R
+	 /VfzVoJkMv3QwR7l0RYcfS7lDgpByDN28v4icV8yP7Gtu2pIPa1FB5NtLIuf+q0C1t
+	 7thN3e1s4RMwbE9Eoi+V67c5Xt7HGMzEnyBKNm+uyX1Ln6X16+LsEF6m40vLztx5c+
+	 X1gdLkAqHzvIz3OCuZjlNHRmA4/nxhy4RxRyAN7fBUhzTV63Km9Rkp1irn4wj8TYZG
+	 5suIn3V2zOYoujReEFv5IfJ+KF5f37l1yOIv/cBc2GZ6ml0VubpMOfs5m7c7EeXhPn
+	 HHWWlsW/C/kvA==
+Date: Tue, 29 Apr 2025 12:12:49 +0100
+From: Lee Jones <lee@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, stable@vger.kernel.org,
+	netdev@vger.kernel.org, Lei Lu <llfamsec@gmail.com>
+Subject: Re: [PATCH stable 5.15/6.1/6.6] af_unix: Clear oob_skb in
+ scan_inflight().
+Message-ID: <20250429111249.GA2619229@google.com>
+References: <20250304030149.82265-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 07/15] tcp: allow embedding leftover into
- option padding
-To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
- kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com>
- <20250422153602.54787-8-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250422153602.54787-8-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250304030149.82265-1-kuniyu@amazon.com>
 
-On 4/22/25 5:35 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> @@ -709,6 +709,8 @@ static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
->  	return ptr;
->  }
+On Mon, 03 Mar 2025, Kuniyuki Iwashima wrote:
+
+> Embryo socket is not queued in gc_candidates, so we can't drop
+> a reference held by its oob_skb.
+> 
+> Let's say we create listener and embryo sockets, send the
+> listener's fd to the embryo as OOB data, and close() them
+> without recv()ing the OOB data.
+> 
+> There is a self-reference cycle like
+> 
+>   listener -> embryo.oob_skb -> listener
+> 
+> , so this must be cleaned up by GC.  Otherwise, the listener's
+> refcnt is not released and sockets are leaked:
+> 
+>   # unshare -n
+>   # cat /proc/net/protocols | grep UNIX-STREAM
+>   UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
+> 
+>   # python3
+>   >>> from array import array
+>   >>> from socket import *
+>   >>>
+>   >>> s = socket(AF_UNIX, SOCK_STREAM)
+>   >>> s.bind('\0test\0')
+>   >>> s.listen()
+>   >>>
+>   >>> c = socket(AF_UNIX, SOCK_STREAM)
+>   >>> c.connect(s.getsockname())
+>   >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
+>   1
+>   >>> quit()
+> 
+>   # cat /proc/net/protocols | grep UNIX-STREAM
+>   UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
+>                         ^^^
+>                         3 sockets still in use after FDs are close()d
+> 
+> Let's drop the embryo socket's oob_skb ref in scan_inflight().
+> 
+> This also fixes a racy access to oob_skb that commit 9841991a446c
+> ("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
+> lock.") fixed for the new Tarjan's algo-based GC.
+> 
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Reported-by: Lei Lu <llfamsec@gmail.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+> This has no upstream commit because I replaced the entire GC in
+> 6.10 and the new GC does not have this bug, and this fix is only
+> applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
+> ---
+> ---
+>  net/unix/garbage.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+
+Tested-by: Lee Jones <lee@kernel.org>
+
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index 2a758531e102..b3fbdf129944 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -102,13 +102,14 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
+>  			/* Process the descriptors of this socket */
+>  			int nfd = UNIXCB(skb).fp->count;
+>  			struct file **fp = UNIXCB(skb).fp->fp;
+> +			struct unix_sock *u;
 >  
-> +#define NOP_LEFTOVER	((TCPOPT_NOP << 8) | TCPOPT_NOP)
-> +
->  /* Write previously computed TCP options to the packet.
->   *
->   * Beware: Something in the Internet is very sensitive to the ordering of
-> @@ -727,8 +729,10 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  			      struct tcp_out_options *opts,
->  			      struct tcp_key *key)
->  {
-> +	u16 leftover_bytes = NOP_LEFTOVER;      /* replace next NOPs if avail */
->  	__be32 *ptr = (__be32 *)(th + 1);
->  	u16 options = opts->options;	/* mungable copy */
-> +	int leftover_size = 2;
+>  			while (nfd--) {
+>  				/* Get the socket the fd matches if it indeed does so */
+>  				struct sock *sk = unix_get_socket(*fp++);
 >  
->  	if (tcp_key_is_md5(key)) {
->  		*ptr++ = htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP << 16) |
-> @@ -763,17 +767,22 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  	}
+>  				if (sk) {
+> -					struct unix_sock *u = unix_sk(sk);
+> +					u = unix_sk(sk);
 >  
->  	if (unlikely(OPTION_SACK_ADVERTISE & options)) {
-> -		*ptr++ = htonl((TCPOPT_NOP << 24) |
-> -			       (TCPOPT_NOP << 16) |
-> +		*ptr++ = htonl((leftover_bytes << 16) |
->  			       (TCPOPT_SACK_PERM << 8) |
->  			       TCPOLEN_SACK_PERM);
-> +		leftover_bytes = NOP_LEFTOVER;
-
-Why? isn't leftover_bytes already == NOP_LEFTOVER?
-
->  	}
+>  					/* Ignore non-candidates, they could
+>  					 * have been added to the queues after
+> @@ -122,6 +123,13 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
+>  				}
+>  			}
+>  			if (hit && hitlist != NULL) {
+> +#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> +				u = unix_sk(x);
+> +				if (u->oob_skb) {
+> +					WARN_ON_ONCE(skb_unref(u->oob_skb));
+> +					u->oob_skb = NULL;
+> +				}
+> +#endif
+>  				__skb_unlink(skb, &x->sk_receive_queue);
+>  				__skb_queue_tail(hitlist, skb);
+>  			}
+> @@ -299,17 +307,9 @@ void unix_gc(void)
+>  	 * which are creating the cycle(s).
+>  	 */
+>  	skb_queue_head_init(&hitlist);
+> -	list_for_each_entry(u, &gc_candidates, link) {
+> +	list_for_each_entry(u, &gc_candidates, link)
+>  		scan_children(&u->sk, inc_inflight, &hitlist);
 >  
->  	if (unlikely(OPTION_WSCALE & options)) {
-> -		*ptr++ = htonl((TCPOPT_NOP << 24) |
-> +		u8 highbyte = TCPOPT_NOP;
-> +
-> +		if (unlikely(leftover_size == 1))
+> -#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
+> -		if (u->oob_skb) {
+> -			kfree_skb(u->oob_skb);
+> -			u->oob_skb = NULL;
+> -		}
+> -#endif
+> -	}
+> -
+>  	/* not_cycle_list contains those sockets which do not make up a
+>  	 * cycle.  Restore these to the inflight list.
+>  	 */
+> -- 
+> 2.39.5 (Apple Git-154)
+> 
 
-How can the above conditional be true?
-
-> +			highbyte = leftover_bytes >> 8;
-> +		*ptr++ = htonl((highbyte << 24) |
->  			       (TCPOPT_WINDOW << 16) |
->  			       (TCPOLEN_WINDOW << 8) |
->  			       opts->ws);
-> +		leftover_bytes = NOP_LEFTOVER;
-
-Why? isn't leftover_bytes already == NOP_LEFTOVER?
-
->  	}
->  
->  	if (unlikely(opts->num_sack_blocks)) {
-> @@ -781,8 +790,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  			tp->duplicate_sack : tp->selective_acks;
->  		int this_sack;
->  
-> -		*ptr++ = htonl((TCPOPT_NOP  << 24) |
-> -			       (TCPOPT_NOP  << 16) |
-> +		*ptr++ = htonl((leftover_bytes << 16) |
->  			       (TCPOPT_SACK <<  8) |
->  			       (TCPOLEN_SACK_BASE + (opts->num_sack_blocks *
->  						     TCPOLEN_SACK_PERBLOCK)));
-> @@ -794,6 +802,10 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  		}
->  
->  		tp->rx_opt.dsack = 0;
-> +	} else if (unlikely(leftover_bytes != NOP_LEFTOVER)) {
-
-I really feel like I'm missing some code chunk, but I don't see any
-possible value for leftover_bytes other than NOP_LEFTOVER
-
-/P
-
+-- 
+Lee Jones [李琼斯]
 
