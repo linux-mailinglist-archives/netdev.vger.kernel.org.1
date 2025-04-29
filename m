@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-186897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3917CAA3CE9
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:48:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AACAA3CEA
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65E569A27F0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:47:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D10E9A530A
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F954246796;
-	Tue, 29 Apr 2025 23:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0189C255F29;
+	Tue, 29 Apr 2025 23:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kS8jBvtN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEEKhyJZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53863246769
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 23:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2333B24678B
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 23:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745970426; cv=none; b=IYhBOjhHX+W7tzdmnnK6D/CTy3Y//TJTpN6lsHthcKBmgeAH7741LYrApCvYM1I0Mf392CROaxRfbgv4unjjSWgk27jZI0aLqla74jmlzjLH2HfN+wsPkJWjIlpCGyQSrkqdPRAvHc8VQaFTG8DpDWjPaJ49F9URhNhZ6vEZHWU=
+	t=1745970426; cv=none; b=smszTK+SUnC/4CeS0W/bxl3uOpyXfFyecIypcNrmt1DGOhBKmWo4EFAtYcP0/br7v/KKH7X3lRjGvd6HHO2yqDMfCfSy1iFiM6dzbgZs2tkOPMqQXWOBDodfCaLM4DF/x5OPC16Z+rvdbMzJItA0PCfipRFtX7FNTSpIE1K0zrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745970426; c=relaxed/simple;
-	bh=fI2YRKcMNymoqjAOmXIng5Uxo7qFe3oStieL03pd5fg=;
+	bh=ZbgEhEmewsCsLrQJXRIg8bEnHZYpGiaZkYUr1Bbj/Pw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e0ZyvkTLXqgcmsb0MtOtndD0i7cXudRoApkCQBFnOXk8ixBbf9HmZcdCFbQF5ampmlRHHThghVxruNRGlJ+0btR6SbeInyXGDzeY7xJ7t6eqhuVgOLw+Y3u9x3RwkCAH9UKgh4f+GW7yrKDz6C++eh21S/eAwKozUpKUgNa0d5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kS8jBvtN; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=Bg6jTETVLdPDVLuFqi+u5/IwzqKeQ0FF2/zVX2p3wqvM+ACrtYIQDHKE2unYL2occhg1d9qQz2Dh8NPcRlPYNsIhY6lR9SJDwom0lcauaLE+++ZYS1cZs2WsJjRv3kj9VZOO67WxKNAE69VCrk7MFh2RtC/AJkh6p5432jzElfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEEKhyJZ; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745970425; x=1777506425;
+  t=1745970426; x=1777506426;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fI2YRKcMNymoqjAOmXIng5Uxo7qFe3oStieL03pd5fg=;
-  b=kS8jBvtNoMZO4cmOfaOJWqeUm9XBdEPSYrKkQxEeGo2x3uqUV+E5C4Nd
-   Db51IMsB2/ufnj7Tv1ohPnIb9Y9TMPJuM5nvWB2ZqoYQNMds1q2s4IuK3
-   vRkobPrgBEa31CjdDIhDDhGpoQj4cWYKDELkaD7o3D6glxFR9sM2f6M38
-   R1GADZ2xdgFIeJsspQkqAYIOARuez9Z5WK7mq+FXF73UyWMnYKTMIG0hg
-   +2efdM70HS04L35wYc2JdRJAjjMtCSD4edprq1fepdqjgEgBKTUM5NoHE
-   Ker9ZY0a6iwCkV8wmhXw/C+NTi3PCP72xdPOTFQjbXliT0kwmWyQkcw1C
-   A==;
-X-CSE-ConnectionGUID: i/pZ7ZBpS+ezvGItfftq/w==
-X-CSE-MsgGUID: 8tDQapSPSkuJ7x9JTZPbHQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="58990109"
+  bh=ZbgEhEmewsCsLrQJXRIg8bEnHZYpGiaZkYUr1Bbj/Pw=;
+  b=HEEKhyJZOFTwu22lB+IkbarwKWwVCQUVHM5+HZoMJYhg5j1muT7jwSuy
+   jaoZ3ftKnz5Iv3t8l1Mrs1Uh91b++KDUh4ahZMvNhxQsOujZJakfPrrTf
+   G1WAlAyJuSWKGpQ8Aprc00TrIDL6MYZ9qn0n2lTqHcvZsazKrWiK/GdqW
+   u2vVWoR7SmCwcARslZUHp11okFKKjjpHA4TanBZFQ8Br5MqQ2fAZdZWYb
+   h9qf8Zukp56CAoInh90M19oNcFsFukgOaCgA4twY5kLJA/aq57hpn8tdX
+   xCZkHslWcOU3+XHsbSQHholfPFKF8bJpJca0dgEnauXhWN1+s1pg9Wavf
+   w==;
+X-CSE-ConnectionGUID: nRDrRn9BRRm+Rr5AHJqjfw==
+X-CSE-MsgGUID: Hyxj/EL+Sp6B+uBhbQi/DQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="58990115"
 X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
-   d="scan'208";a="58990109"
+   d="scan'208";a="58990115"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
   by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 16:47:03 -0700
-X-CSE-ConnectionGUID: 2j6AKF4KT2W406cO1gLsMg==
-X-CSE-MsgGUID: bn8cceyTRoe6sJoZ5EPsaw==
+X-CSE-ConnectionGUID: i7fLRHJFQ9CqYe4+LxVHzQ==
+X-CSE-MsgGUID: 2DE6y43lSzqFmB5UzRtsKg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
-   d="scan'208";a="137979631"
+   d="scan'208";a="137979634"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 29 Apr 2025 16:47:01 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 29 Apr 2025 16:47:02 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -67,12 +67,13 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
 	anthony.l.nguyen@intel.com,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Bharath R <bharath.r@intel.com>
-Subject: [PATCH net-next 07/13] ixgbe: create E610 specific ethtool_ops structure
-Date: Tue, 29 Apr 2025 16:46:42 -0700
-Message-ID: <20250429234651.3982025-8-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 08/13] ixgbe: add support for ACPI WOL for E610
+Date: Tue, 29 Apr 2025 16:46:43 -0700
+Message-ID: <20250429234651.3982025-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
 References: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
@@ -86,119 +87,88 @@ Content-Transfer-Encoding: 8bit
 
 From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 
-E610's implementation of various ethtool ops is different than
-the ones corresponding to ixgbe legacy products. Therefore create
-separate E610 ethtool_ops struct which will be filled out in the
-forthcoming patches.
+Currently only APM (Advanced Power Management) is supported by
+the ixgbe driver. It works for magic packets only, as for different
+sources of wake-up E610 adapter utilizes different feature.
 
-Add adequate ops struct basing on MAC type. This step requires
-changing a bit the flow of probing by placing ixgbe_set_ethtool_ops
-after hw.mac.type is assigned. So move the whole netdev assignment
-block after hw.mac.type is known. This step doesn't have any additional
-impact on probing sequence.
+Add E610 specific implementation of ixgbe_set_wol() callback. When
+any of broadcast/multicast/unicast wake-up is set, disable APM and
+configure ACPI (Advanced Configuration and Power Interface).
 
-Suggested-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Bharath R <bharath.r@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 52 ++++++++++++++++++-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 10 ++--
- 2 files changed, 56 insertions(+), 6 deletions(-)
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 46 ++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index c86103eccc8a..83d9ee3941e5 100644
+index 83d9ee3941e5..abc8c279192a 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3650,7 +3650,57 @@ static const struct ethtool_ops ixgbe_ethtool_ops = {
- 	.set_link_ksettings     = ixgbe_set_link_ksettings,
- };
- 
-+static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
-+	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
-+	.get_drvinfo            = ixgbe_get_drvinfo,
-+	.get_regs_len           = ixgbe_get_regs_len,
-+	.get_regs               = ixgbe_get_regs,
-+	.get_wol                = ixgbe_get_wol,
-+	.set_wol                = ixgbe_set_wol,
-+	.nway_reset             = ixgbe_nway_reset,
-+	.get_link               = ethtool_op_get_link,
-+	.get_eeprom_len         = ixgbe_get_eeprom_len,
-+	.get_eeprom             = ixgbe_get_eeprom,
-+	.set_eeprom             = ixgbe_set_eeprom,
-+	.get_ringparam          = ixgbe_get_ringparam,
-+	.set_ringparam          = ixgbe_set_ringparam,
-+	.get_pause_stats	= ixgbe_get_pause_stats,
-+	.get_pauseparam         = ixgbe_get_pauseparam,
-+	.set_pauseparam         = ixgbe_set_pauseparam,
-+	.get_msglevel           = ixgbe_get_msglevel,
-+	.set_msglevel           = ixgbe_set_msglevel,
-+	.self_test              = ixgbe_diag_test,
-+	.get_strings            = ixgbe_get_strings,
-+	.set_phys_id            = ixgbe_set_phys_id,
-+	.get_sset_count         = ixgbe_get_sset_count,
-+	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
-+	.get_coalesce           = ixgbe_get_coalesce,
-+	.set_coalesce           = ixgbe_set_coalesce,
-+	.get_rxnfc		= ixgbe_get_rxnfc,
-+	.set_rxnfc		= ixgbe_set_rxnfc,
-+	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
-+	.get_rxfh_key_size	= ixgbe_get_rxfh_key_size,
-+	.get_rxfh		= ixgbe_get_rxfh,
-+	.set_rxfh		= ixgbe_set_rxfh,
-+	.get_eee		= ixgbe_get_eee,
-+	.set_eee		= ixgbe_set_eee,
-+	.get_channels		= ixgbe_get_channels,
-+	.set_channels		= ixgbe_set_channels,
-+	.get_priv_flags		= ixgbe_get_priv_flags,
-+	.set_priv_flags		= ixgbe_set_priv_flags,
-+	.get_ts_info		= ixgbe_get_ts_info,
-+	.get_module_info	= ixgbe_get_module_info,
-+	.get_module_eeprom	= ixgbe_get_module_eeprom,
-+	.get_link_ksettings     = ixgbe_get_link_ksettings,
-+	.set_link_ksettings     = ixgbe_set_link_ksettings,
-+};
-+
- void ixgbe_set_ethtool_ops(struct net_device *netdev)
- {
--	netdev->ethtool_ops = &ixgbe_ethtool_ops;
-+	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
-+
-+	if (adapter->hw.mac.type == ixgbe_mac_e610)
-+		netdev->ethtool_ops = &ixgbe_ethtool_ops_e610;
-+	else
-+		netdev->ethtool_ops = &ixgbe_ethtool_ops;
+@@ -2365,6 +2365,50 @@ static int ixgbe_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
+ 	return 0;
  }
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index cdfafc477ee0..40daab34e4fe 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -11433,11 +11433,6 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_ioremap;
- 	}
  
--	netdev->netdev_ops = &ixgbe_netdev_ops;
--	ixgbe_set_ethtool_ops(netdev);
--	netdev->watchdog_timeo = 5 * HZ;
--	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
--
- 	/* Setup hw api */
- 	hw->mac.ops   = *ii->mac_ops;
- 	hw->mac.type  = ii->mac;
-@@ -11467,6 +11462,11 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->phy.mdio.mdio_read = ixgbe_mdio_read;
- 	hw->phy.mdio.mdio_write = ixgbe_mdio_write;
- 
-+	netdev->netdev_ops = &ixgbe_netdev_ops;
-+	ixgbe_set_ethtool_ops(netdev);
-+	netdev->watchdog_timeo = 5 * HZ;
-+	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
++static int ixgbe_set_wol_acpi(struct net_device *netdev,
++			      struct ethtool_wolinfo *wol)
++{
++	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
++	struct ixgbe_hw *hw = &adapter->hw;
++	u32 grc;
 +
- 	/* setup the private structure */
- 	err = ixgbe_sw_init(adapter, ii);
- 	if (err)
++	if (ixgbe_wol_exclusion(adapter, wol))
++		return wol->wolopts ? -EOPNOTSUPP : 0;
++
++	/* disable APM wakeup */
++	grc = IXGBE_READ_REG(hw, IXGBE_GRC_X550EM_a);
++	grc &= ~IXGBE_GRC_APME;
++	IXGBE_WRITE_REG(hw, IXGBE_GRC_X550EM_a, grc);
++
++	/* erase existing filters */
++	IXGBE_WRITE_REG(hw, IXGBE_WUFC, 0);
++	adapter->wol = 0;
++
++	if (wol->wolopts & WAKE_UCAST)
++		adapter->wol |= IXGBE_WUFC_EX;
++	if (wol->wolopts & WAKE_MCAST)
++		adapter->wol |= IXGBE_WUFC_MC;
++	if (wol->wolopts & WAKE_BCAST)
++		adapter->wol |= IXGBE_WUFC_BC;
++
++	IXGBE_WRITE_REG(hw, IXGBE_WUC, IXGBE_WUC_PME_EN);
++	IXGBE_WRITE_REG(hw, IXGBE_WUFC, adapter->wol);
++
++	hw->wol_enabled = adapter->wol;
++	device_set_wakeup_enable(&adapter->pdev->dev, adapter->wol);
++
++	return 0;
++}
++
++static int ixgbe_set_wol_e610(struct net_device *netdev,
++			      struct ethtool_wolinfo *wol)
++{
++	if (wol->wolopts & (WAKE_UCAST | WAKE_MCAST | WAKE_BCAST))
++		return ixgbe_set_wol_acpi(netdev, wol);
++	else
++		return ixgbe_set_wol(netdev, wol);
++}
++
+ static int ixgbe_nway_reset(struct net_device *netdev)
+ {
+ 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
+@@ -3656,7 +3700,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
+ 	.get_regs_len           = ixgbe_get_regs_len,
+ 	.get_regs               = ixgbe_get_regs,
+ 	.get_wol                = ixgbe_get_wol,
+-	.set_wol                = ixgbe_set_wol,
++	.set_wol                = ixgbe_set_wol_e610,
+ 	.nway_reset             = ixgbe_nway_reset,
+ 	.get_link               = ethtool_op_get_link,
+ 	.get_eeprom_len         = ixgbe_get_eeprom_len,
 -- 
 2.47.1
 
