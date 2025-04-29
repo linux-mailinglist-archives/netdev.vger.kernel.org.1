@@ -1,114 +1,101 @@
-Return-Path: <netdev+bounces-186771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9AE6AA1058
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:22:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A0FAA106E
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:27:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68C7B1B65A52
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:23:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 668677B397B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 15:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F0A2206BD;
-	Tue, 29 Apr 2025 15:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319DD221DA1;
+	Tue, 29 Apr 2025 15:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xz3vLE3Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fi9osQRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77F1D2FB;
-	Tue, 29 Apr 2025 15:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AC7221D8B;
+	Tue, 29 Apr 2025 15:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745940167; cv=none; b=puLXp09J5QFARGM8WzAtErLS518QTj9bf1mK4mB21mic/8Ck+sw0v/AnTGEwN6G+lr110OCq6dMg1RoUQtv37VW+9NGhBtQeI++97VT0iQTMyCGkAITFBXxyw/Ets+IBu9CIMff6XGcVHEdccwUECKQe0VZ0Y+l4E409VPMsG5s=
+	t=1745940407; cv=none; b=MhuY4n2K1E94U8kuLBAGzZvBfGtKIeYGaYWvCGSJsPe3TMaM6UUmv9bUBHBiEsq/kGhvbPwcSKmqLHtvXbFdnjmwaEr1DIM3czPyzzRtIbmEqTJO746VTy9/OmSwxqdVHMkAn9rIkfpfPyToHpg+Xn1ZvmkQN0OdG1QJMjZ9n3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745940167; c=relaxed/simple;
-	bh=sLZTqkYX+I6t5xbGQiBFcDp6YarT8zcQhgI0CSYOOCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LnVZbKUON/nF56bjIf55csPTa0ZjFWLCHLh7bfo7QMbWzjC+4zRd09UPCzOGYYTEAI3OIoiDFA4/orXGYGqc6dsmgasJTwgSLg6MAx7OBhipWvA+erB1KMKHB9WklhKQnAgCythDPbzOMc4dTbcN/g1RjXRjxg8X0gpVUtGoZzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xz3vLE3Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02CDBC4CEE3;
-	Tue, 29 Apr 2025 15:22:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745940167;
-	bh=sLZTqkYX+I6t5xbGQiBFcDp6YarT8zcQhgI0CSYOOCQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Xz3vLE3YgOtNoghCWwd+di0me0x3CibIHQ6DTZE5k5vBifjscY/i/WSHYvlG+i/Z4
-	 yCUXEGZv0LKOy014aI7FyfqUWvmD9dfmyvu3kSmzlax7y//kLQ6UUItr/8dJi60sIp
-	 vhqdbgXDVYEyPmfxEBD6GTBuHmWaIJBdO1fZbgQL60af5yBx0yl/5k8A3dqOSiTkYl
-	 sRSNUJYGikrZEYts+C1wO8RrlTpepXL3zORcrY8aUJNscuUCdxMmrf4/HfPZxpae05
-	 EekrL2CWwW44KPdkIKp2hQgefenk2N3n/0pS8enatpwTkJcNOEYwmpfx1UMOpKzXvy
-	 rluDQZwMtX0/A==
-Message-ID: <c3855595-d8b4-4b4b-b1fb-0efa44d064b0@kernel.org>
-Date: Tue, 29 Apr 2025 09:22:46 -0600
+	s=arc-20240116; t=1745940407; c=relaxed/simple;
+	bh=nTH8UfUeo2dOVQ7p0AA8nZBOT1sXEh05Hwz/YzGOoSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ucyn61TQ+DVDIP6oX1bX+t2LRPTaDesppMWJGIoIJ7w4YYEBxMVSuCQZanN0nW+fIlEjNWsExFjFO1CLfkhWtpKgoEFXIb4xDFPFb6HqcylRfpA9kkS9EWO4FkL/XDS8v0C+akMtr4IsPAFZBInAMe8YL9CB74jT8y9xg7WI3mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fi9osQRR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/f9THZOQn+1tNgvt8I2ZTq9Z2mlHTRdXjKcrrEcqPdc=; b=fi9osQRR0vdMRwiR+ivU6bGQIy
+	Lq1wq6jM/JpBPWYG1Pw3Uu36CzTEszgZYLqvVbqAsXEWhV5/dIudPHkKKWS9fe2CAE1A/6t974b3/
+	yr1z2f0kYvYACAhf48W28OaJh3tHdJSkAdu2JnH9t6JTtsQzDvlAruNKav0b0cYJb41w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u9mqo-00AxD6-2x; Tue, 29 Apr 2025 17:26:26 +0200
+Date: Tue, 29 Apr 2025 17:26:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] dt-bindings: net: ethernet-controller: Add
+ informative text about RGMII delays
+Message-ID: <73ffdfe2-ecf2-44e9-8850-c00ed9ff388c@lunn.ch>
+References: <20250429-v6-15-rc3-net-rgmii-delays-v1-1-f52664945741@lunn.ch>
+ <aBDhRH2TlyxKmaaW@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next] ipv6: sr: switch to GFP_ATOMIC flag to allocate memory
- during seg6local LWT setup
-Content-Language: en-US
-To: Andrea Mayer <andrea.mayer@uniroma2.it>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
-Cc: Stefano Salsano <stefano.salsano@uniroma2.it>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- Ahmed Abdelsalam <ahabdels.dev@gmail.com>
-References: <20250429132453.31605-1-andrea.mayer@uniroma2.it>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250429132453.31605-1-andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBDhRH2TlyxKmaaW@shell.armlinux.org.uk>
 
-On 4/29/25 6:24 AM, Andrea Mayer wrote:
-> Recent updates to the locking mechanism that protects IPv6 routing tables
-> [1] have affected the SRv6 networking subsystem. Such changes cause
-> problems with some SRv6 Endpoints behaviors, like End.B6.Encaps and also
-> impact SRv6 counters.
+> > +# In practice, very few PCBs make use of extra long clock lines. Hence
+> > +# any RGMII phy mode other than 'rgmii-id' is probably wrong, and is
+> > +# unlikely to be accepted during review.
 > 
-> Starting from commit 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and
-> RTM_NEWROUTE."), the inet6_rtm_newroute() function no longer needs to
-> acquire the RTNL lock for creating and configuring IPv6 routes and set up
-> lwtunnels.
-> The RTNL lock can be avoided because the ip6_route_add() function
-> finishes setting up a new route in a section protected by RCU.
-> This makes sure that no dev/nexthops can disappear during the operation.
-> Because of this, the steps for setting up lwtunnels - i.e., calling
-> lwtunnel_build_state() - are now done in a RCU lock section and not
-> under the RTNL lock anymore.
-> 
-> However, creating and configuring a lwtunnel instance in an
-> RCU-protected section can be problematic when that tunnel needs to
-> allocate memory using the GFP_KERNEL flag.
-> For example, the following trace shows what happens when an SRv6
-> End.B6.Encaps behavior is instantiated after commit 169fd62799e8 ("ipv6:
-> Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE."):
-> 
+> Maybe add "without details provided in the commit description."
 
-...
+I was thinking about that. And i would actually prefer a comment in
+the DT explicitly saying the PCB adds delays.
 
+> > +# If the PHY is to perform fine tuning, the properties
+> > +# 'rx-internal-delay-ps' and 'tx-internal-delay-ps' in the PHY node
+> > +# should be used. When the PHY is implementing delays, these
+> > +# properties should have a value near to 2000ps.
 > 
-> To solve this issue, we replace the GFP_KERNEL flag with the GFP_ATOMIC
-> one in those SRv6 Endpoints that need to allocate memory during the
-> setup phase. This change makes sure that memory allocations are handled
-> in a way that works with RCU critical sections.
+> ... according to the phy-mode used (as they're documented to be
+> dependent on that.)
 > 
-> [1] - https://lore.kernel.org/all/20250418000443.43734-1-kuniyu@amazon.com/
-> 
-> Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  net/ipv6/seg6_local.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
+> I'm wondering whether they should be dependent on which rgmii-* mode
+> is being used, as delays << 2ns could be used to finely adjust the
+> PCB delays if the PHY supports that. I haven't looked closely enough
+> at PHY datasheets to know whether that's possible or not though.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Yes, i was trying to express that with the 'When the PHY is
+implementing delays'. If the PHY is not adding delays, 'rgmii', small
+fine tuning delays are O.K. And some PHYs do support this, they cover
+the full range from 0ps to > 2000ps in steps.
 
+	Andrew
 
