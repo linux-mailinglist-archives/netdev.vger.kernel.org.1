@@ -1,139 +1,104 @@
-Return-Path: <netdev+bounces-186650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41B9AA00EA
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 05:53:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5076AA0146
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 06:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35DC07A475D
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 03:52:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC5DF16974B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 04:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989DD267714;
-	Tue, 29 Apr 2025 03:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42226270EC8;
+	Tue, 29 Apr 2025 04:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXPe+xK7"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="TnBwMGIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B34205E25;
-	Tue, 29 Apr 2025 03:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB9270EB3;
+	Tue, 29 Apr 2025 04:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745898784; cv=none; b=sWajYS36IQQzGjMV5K/1qlZo6iHmCP9n+27b0FM3Sq4ley+0BipsJKnMzx8hHyZZVky/THBkjT6FZ3hQyzEuazt/ZC6fOMHuGAmP7selE2pbnodjUO1ROd3yXsrj2K0EqHvUeuLQC/iEa+vmBQnwG4vhHFPeH4KY1LthKkvLiEw=
+	t=1745899711; cv=none; b=S7UOxzciOwF2L7d9MOtR7sOyt4b6CK4PGFn4nN7cNRZFvyEHb41MHsIc/r6duaGZPhA9j3rCizDUcyUaHgtdWwkfYLbzN6rl3L9FTE0Ji49sqOiNf6mE+3bQKk19EilX79adPPhM+WlxZxHSZXQf7STfAcYL3K0L6+K+heIPYwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745898784; c=relaxed/simple;
-	bh=JWP+LbOHv+wP6QUKbnuoS82KW8BLjO/OX50Wl4RrBvA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Y9K89FjMTOD0MQc9XuoZi1oPOY+HoTBeJ8NHsDt+Qy0U3FS4HqQRIYDAZIV6+IFU0XzSZSoHWxUZGbwJG32uNnTPEngKO21CKVkhOqvH/SjN4akGrc9f+3B7DvCmfKow1OWP70DWKjt+EbgUK/XkTZkdd1FyBMQtGGbgRLIMmT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXPe+xK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9267C4CEE3;
-	Tue, 29 Apr 2025 03:53:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745898783;
-	bh=JWP+LbOHv+wP6QUKbnuoS82KW8BLjO/OX50Wl4RrBvA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=UXPe+xK7W1n6JfmrEvk3rT8BlQ5a83ZevoU2kyn+wzd8Ar7yChP+jqoJfqqsfi/m4
-	 lxtZUIlU53ngV541nq+Q8TGiLWcXTbwtMCXuGiS5GjIt/8arD37Tm4YJ508NGThi2q
-	 hPj9pGmrJa0tUWwoVZm3t8ogVz7x+AIIwhhLxmdunt6dUGYa0Ii7btT5RQLcH4st5l
-	 xlQ5Z9ebYjqHs25Hs1OJ3QQC442cXCu6Ulhazo9ByaFjO9QSSYgyeZ2ebThmLkZmFj
-	 qF/hWhAhCIuaDfOozGzGl9M4T9na4MDLAfbGDB4fUsQXCPuIOyx2zLZqX+H8fVFfcm
-	 GrMCC6O5hXJSQ==
-Date: Mon, 28 Apr 2025 20:52:59 -0700
-From: Kees Cook <kees@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, dsahern@kernel.org
-CC: davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
- kuniyu@amazon.com, linux-hardening@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH] ipv4: fib: Fix fib_info_hash_alloc() allocation type
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250429004310.52559-1-kuniyu@amazon.com>
-References: <12141842-39ff-47fc-ac2b-7a72d778117a@kernel.org> <20250429004310.52559-1-kuniyu@amazon.com>
-Message-ID: <89BC8935-21D1-45A9-AEA1-A4E52D193434@kernel.org>
+	s=arc-20240116; t=1745899711; c=relaxed/simple;
+	bh=/6SbwFGaIGJYp1bM141cJ0NASTjd0wU7ITA/Ybycy9k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=q2gyozgMyRRFMJ35dy04NDcm+IFZPceCUTfj7KPK3AjhzHPIugy0GPdq9Fc7S7R32QOpmg2Zy8S0vx87WGThOfvFmgQoJ5qWDYWEkIfRlSbLwsvHm79fLbLzRz8njAQ1TSSytNvBpxtjeEW4sP3Ix2AK66ypyb4r3EDsPvUd6po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=TnBwMGIW; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1745899706;
+	bh=78fe1AmPBykWQw2YACNo5j4kpf/GLlS9wjHBhSz3CtM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=TnBwMGIWfmAkjNatWNrJfEyKsE/B773vPquIwWqDy0uRCt5xUdufK6Piw69IHSlic
+	 W/gJYO3Xsi8rLkRrNctBSWgLBXq7ZnIe6tRfdgr5FGHS3eYZTzhC4XLgfVqyc6hooy
+	 TPgbV1C72u2wgsekmKEq5dAKhvQkP+I9N7ZgcjANVKCuuT57CY0Z1vo/cy7HlYIFe9
+	 Nsw7efjPuo+Vf/v4RRFCTkJFldd2Nu7nViM9WdLUDOPJ6asfEjqzUelb1cP2Wz4EG2
+	 WI3jB6bgLL9gyswry+k5wxFt3kEwQP+CdRiR5MqQlQbYhr2wsXxjSpzl5R0HyU/x07
+	 HPnGtxTCINoMQ==
+Received: from [192.168.72.171] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 117E67F93A;
+	Tue, 29 Apr 2025 12:08:25 +0800 (AWST)
+Message-ID: <9d62e4a57f66cc8462ee1f5ee3491d5f46c650ce.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net-next v20 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, Jonathan Cameron
+	 <Jonathan.Cameron@huawei.com>, admiyo@os.amperecomputing.com
+Cc: Matt Johnston <matt@codeconstruct.com.au>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  Sudeep Holla <sudeep.holla@arm.com>, Huisong
+ Li <lihuisong@huawei.com>
+Date: Tue, 29 Apr 2025 12:08:24 +0800
+In-Reply-To: <a12dee5c-2d59-4941-84b5-ae8bffcedd6c@amperemail.onmicrosoft.com>
+References: <20250423220142.635223-1-admiyo@os.amperecomputing.com>
+	 <20250423220142.635223-2-admiyo@os.amperecomputing.com>
+	 <20250424105752.00007396@huawei.com>
+	 <a12dee5c-2d59-4941-84b5-ae8bffcedd6c@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+
+Hi Adam,
+> I get a compilation error when I try that:
+>=20
+> drivers/net/mctp/mctp-pcc.c: In function =E2=80=98mctp_pcc_client_rx_call=
+back=E2=80=99:
+> drivers/net/mctp/mctp-pcc.c:80:30: error: invalid type argument of unary=
+=20
+> =E2=80=98*=E2=80=99 (have =E2=80=98struct mctp_pcc_hdr=E2=80=99)
+> =C2=A0=C2=A0=C2=A0 80 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 sizeof(*mctp_pcc_hdr));
+>=20
+>=20
+> Maybe a compiler flag difference?
 
 
+In the rx path, `mctp_pcc_hdr` is the struct itself, just drop the
+dereference for the push:
 
-On April 28, 2025 5:43:05 PM PDT, Kuniyuki Iwashima <kuniyu@amazon=2Ecom> =
-wrote:
->Thanks for CC me, David=2E
->
->From: David Ahern <dsahern@kernel=2Eorg>
->Date: Mon, 28 Apr 2025 16:50:53 -0600
->> On 4/25/25 11:05 PM, Kees Cook wrote:
->> > In preparation for making the kmalloc family of allocators type aware=
-,
->> > we need to make sure that the returned type from the allocation match=
-es
->> > the type of the variable being assigned=2E (Before, the allocator wou=
-ld
->> > always return "void *", which can be implicitly cast to any pointer t=
-ype=2E)
->> >=20
->> > This was allocating many sizeof(struct hlist_head *) when it actually
->> > wanted sizeof(struct hlist_head)=2E Luckily these are the same size=
-=2E
->> > Adjust the allocation type to match the assignment=2E
->> >=20
->> > Signed-off-by: Kees Cook <kees@kernel=2Eorg>
->> > ---
->> > Cc: "David S=2E Miller" <davem@davemloft=2Enet>
->> > Cc: David Ahern <dsahern@kernel=2Eorg>
->> > Cc: Eric Dumazet <edumazet@google=2Ecom>
->> > Cc: Jakub Kicinski <kuba@kernel=2Eorg>
->> > Cc: Paolo Abeni <pabeni@redhat=2Ecom>
->> > Cc: Simon Horman <horms@kernel=2Eorg>
->> > Cc: <netdev@vger=2Ekernel=2Eorg>
->> > ---
->> >  net/ipv4/fib_semantics=2Ec | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >=20
->> > diff --git a/net/ipv4/fib_semantics=2Ec b/net/ipv4/fib_semantics=2Ec
->> > index f68bb9e34c34=2E=2E37d12b0bc6be 100644
->> > --- a/net/ipv4/fib_semantics=2Ec
->> > +++ b/net/ipv4/fib_semantics=2Ec
->> > @@ -365,7 +365,7 @@ static struct hlist_head *fib_info_laddrhash_buck=
-et(const struct net *net,
->> >  static struct hlist_head *fib_info_hash_alloc(unsigned int hash_bits=
-)
->> >  {
->> >  	/* The second half is used for prefsrc */
->> > -	return kvcalloc((1 << hash_bits) * 2, sizeof(struct hlist_head *),
->> > +	return kvcalloc((1 << hash_bits) * 2, sizeof(struct hlist_head),
->> >  			GFP_KERNEL);
->> >  }
->> > =20
->>=20
->> Reviewed-by: David Ahern <dsahern@kernel=2Eorg>
->>=20
->> Fixes: fa336adc100e ("ipv4: fib: Allocate fib_info_hash[] and
->> fib_info_laddrhash[] by kvcalloc()=2E)
->
->I agree this should target net=2Egit as the last statement
->will be false with LOCKDEP=2E
+    skb_pull(skb, sizeof(mctp_pcc_hdr));
 
-Which will be false with lockdep? Unless I'm missing it, I think hlist_hea=
-d is always pointer sized:
+But on tx, mctp_pcc_hdr is a pointer, so:
 
-struct hlist_head {
-	struct hlist_node *first;
-};
+    mctp_pcc_hdr =3D skb_push(skb, sizeof(*mctp_pcc_hdr));
 
->
->Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon=2Ecom>
+Cheers,
 
-Thanks!
 
---=20
-Kees Cook
+Jeremy
 
