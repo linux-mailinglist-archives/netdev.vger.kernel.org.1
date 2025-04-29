@@ -1,190 +1,286 @@
-Return-Path: <netdev+bounces-186747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411DAAA0E81
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:16:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86884AA0E95
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A76B1B688D3
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BC983B153D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 14:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BBD2D29DC;
-	Tue, 29 Apr 2025 14:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF732D29DC;
+	Tue, 29 Apr 2025 14:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="Bb7Or9NV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRTUinlA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A602F2D29D7;
-	Tue, 29 Apr 2025 14:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410B32C17AE;
+	Tue, 29 Apr 2025 14:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745935965; cv=none; b=Q6UgSTOUPjHqHQ97up/QwxPbS7T6Nxsvq5/D6mvrwrwENCFziVb8lxE8lFfm1eqy6W0808tW4oviTd1oka0E078WQ0pkUzUTUTWvpifzZhTErrcskqhs5D3bl/iLe5f4QsTL1LTln7lRAVzOO270nmki2YxWz+7xVLlkGPG/i7A=
+	t=1745936170; cv=none; b=NXTR3OSUpUU/Wdkpd34/eijqoeV4pLyz/ffwZcbtgMfQ0YqnA7TdzOJlug3m1Z4gwX+EqI19w6LMS8/cbnFZWWWhmxJhRD05KHcdlDIWuXMX9DrI99HPCHWvHH60JhuDyD5LeqsPqF8j9uM5kUcHDG2QcxOODBbnMyWhtxiY2NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745935965; c=relaxed/simple;
-	bh=2cwFB8DtoLlkXn0pVIrWf4KCKsrM4yJaSqWNCg1DZ6g=;
-	h=Date:From:To:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=qto2Lk1pbdkGW7otflwwo6YHHaOJqUPrZWuNuTlOECOM6knN+HqP1OO/E/dlAXwlrpTUx2tDF9b/CrcQtBQk5d8/XoUgKbWlvBB5QCJ3yGIE3oaNHy7ys+BAErp/gS57HPXOGb1QpoKtU3iIeTN9561LtSF1v4Zoadexqs2IAQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=Bb7Or9NV; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1745935945; x=1746540745; i=frank-w@public-files.de;
-	bh=imsoYydlGnAzqSvS+Cgaf9J/PO2EBb7ogqV0YK6n2ZE=;
-	h=X-UI-Sender-Class:Date:From:To:Subject:Reply-to:In-Reply-To:
-	 References:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=Bb7Or9NVfzguMEnkuzp0m4GpQBTLG5zW9fGSeybTB5dL9qXZT9PU3phGLD3BeY1q
-	 AnSeuHg5wxb6FowfU38f7J9BhSfPSwYe0ckI+JCmkX2jBtSlNUF13NKOsZDcTWZ+G
-	 vxyz99NXJQuonSuJ5Fmpjlqrxc5E/TvxY23EqGgs5FMJ5aXV/v1hIqeEcpOS7qDyw
-	 iCQ+rA0a4uUbjSw7hWte0RX9y7gilxZk9SeWwq46/l+hHLkymgtqXJnE5izS7JW9M
-	 D/T8czDrtBHlcnFxYadqX2GhTHq819z7zpVNeyIAtjjiKgvUWkgfyGYP5dBuITumz
-	 VAF3PoqH8odLqnYlWQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [127.0.0.1] ([217.61.153.176]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MQ5rU-1uMshd2CsS-00VQEL; Tue, 29
- Apr 2025 16:12:25 +0200
-Date: Tue, 29 Apr 2025 16:12:19 +0200
-From: Frank Wunderlich <frank-w@public-files.de>
-To: linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>,
- Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
- Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
- Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
- Sky Huang <skylake.huang@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next=5D_net=3A_ethernet=3A_mtk=5Feth=5F?=
- =?US-ASCII?Q?soc=3A_add_support_for_MT7988_internal_2=2E5G_PHY?=
-User-Agent: K-9 Mail for Android
-Reply-to: frank-w@public-files.de
-In-Reply-To: <aAwV4AOKYs3TljM0@makrotopia.org>
-References: <ab77dc679ed7d9669e82d8efeab41df23b524b1f.1745617638.git.daniel@makrotopia.org> <aAwV4AOKYs3TljM0@makrotopia.org>
-Message-ID: <687380A7-A580-41EB-8278-73B9942E4280@public-files.de>
+	s=arc-20240116; t=1745936170; c=relaxed/simple;
+	bh=Fjo7SXXhsO3fgXkYg77gSjxrqlP0ofEHk1fTSqv5NgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JSBcA3+NWK5te1IR7NHySKdmUOWNXkDsE7DOspllthYSCWORZeKRcd1nyHDL42SBJMHGhAQ/1Qz5rkWJuyy0Zz+/CdeI2cr6Nujhtv8sOIGylDCL7ccXE9gZgd0M06t8PqI/H6sxicV5TLz4DBRM89fxLCfMlfDYRycJ7Ie4d1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRTUinlA; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ac3b12e8518so1028347466b.0;
+        Tue, 29 Apr 2025 07:16:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745936166; x=1746540966; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AS1sep8XsSLqx0Mlv2Ehtu5SaCFyrXvSF5bnyKYo9Rw=;
+        b=NRTUinlAoQKQVqmvk9k5zGRR9IGNPybbvV6oiVVwR3XFouGbkzM4QBfUp6bPGz4z0x
+         a+Gx/YpWQo73mRtYXRjgE8jilUhsC2neII5LrzqieJbhkUQnmYPrh+sRJGSxrIhGsSji
+         v9/u5e0ChF/M5XgnFVdbUYbTW0NbkwOs1zolSrk38b9cpajlmXxpfpFWGwWT6biktIKx
+         S40pdhpjdSW78MB6lWCP9vJ/2YMuKJlQUO0i7J3wjjXlITMUT0Ed9FRLoiTGT3xutw+z
+         nWeXhFQhBQb9x7deyBd7hJ4kyS4hjTKTcbQnkFT3e7M0MHbhfBkhPs5NW8toKS5cqfpp
+         25cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745936166; x=1746540966;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AS1sep8XsSLqx0Mlv2Ehtu5SaCFyrXvSF5bnyKYo9Rw=;
+        b=is4APmmh09OQQcMTczv/oiQ3/JM3eexUZ4T+g799ZlG/yMbqu+8F57If/4ULXMJ/fo
+         S97yn830OOD+cgunTCBQvB4Djphok1ncdTvGqwB24xhNXJ3Ngcg9nIRvQHZ3LALVGg+t
+         +GLqo+OM8anAZKx1lMWDCixmwgzSlZJNwTLOkQ6GhUkI1cbNHQNd7iJ+ZO1JC1T2ZI4m
+         GHM9cxfeCLVwni5qxtrIWs7NoiFY4rWWEy2pjIGRfa0avo3ZKRIhLAYHJbzs1BifGVVS
+         LT3HC+w3j34/0+PfW+ztKltregH6mjjzsFD9/DLbs1XQbQ1jS9BtULq2ocdiEo+9KugJ
+         PFuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVYvJRdXVy9Q7u+z112MQBKwg4xnnt9G9jpGjVu/ZE20hDDiDvXR2X85sXW77H5KVyWZrhTQZdm4VvLlJ4=@vger.kernel.org, AJvYcCVhEVc6ZsO9MhmnLwVY5casRf1anXws1YBNHVjWbGEPoUXjmp3r80/GumMGS9aYhBJWfLSDCjWC@vger.kernel.org
+X-Gm-Message-State: AOJu0YygB5OgQRnYx6WOjqZLI8J6tkxDoYuSewL6rSG7xjZ404dP5BvU
+	m/QtQd3O8fHuwSrgMxoMw7R/rx4Ao0ab8Xk2Zo9LXfYcYfloUNvU
+X-Gm-Gg: ASbGncsBqgwU5kYw4n8pnuTjm52mT8N06+r+9+NCetq0NoUxjE1BixEVNwv7Ba6dExN
+	wrowW7bD2JfWpSPetZjuHXxommRcAVJv/KtmJv6X5f+Sh6Ol57AgGAq0ZVuFXbXPFYh8G03vinG
+	+42XNRyQT+Q7oZbs52BCvqfr0EhsRQ4ev6VfqMSlyobX5GtcKnMOcF683lrpkYqnYlFtunIw1i6
+	xiYN/TGoJJU+HnC3S6xIwwqM8a9OM6PbvE6dY+OydaadCEhXGoa9w5zPDmoj+UfWw8jS7Db71zk
+	Ain5//JBlbTakclUZga3+ak8/mvhQfS85rWg45McXWyZxtFsW+nj
+X-Google-Smtp-Source: AGHT+IHre+matt/IjaW7JAmHRwwQiOdzdio16HWgALdclq1dIRZFzRMJeCvhleSUIX++ascZvDE0MA==
+X-Received: by 2002:a17:907:86ac:b0:abf:19ac:771 with SMTP id a640c23a62f3a-ace848c03c8mr1231291766b.2.1745936166035;
+        Tue, 29 Apr 2025 07:16:06 -0700 (PDT)
+Received: from [10.27.99.142] ([193.170.124.198])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ecf7397sm800699566b.92.2025.04.29.07.16.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Apr 2025 07:16:05 -0700 (PDT)
+Message-ID: <03ccb65b-a5f8-4afc-84f5-e46f1caf96b0@gmail.com>
+Date: Tue, 29 Apr 2025 16:16:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:LCZ0cZToW3QDgS4il2LDpUb80XsrcmZ8Bs18A2wtEoO1pa2kLQS
- zYN+be3fphd6c2i93tEmaDrunFYtlUWaj/U0ncO1/kT+m4tztyCDr1V9yv8+XPv3+GOKp2G
- uXzoYIxQaIsttmpcrvsukm55jp7fm59kvMuzGy/Cns56pboft4pCVmE9HgSBaw0S8+N0LIJ
- STySUJpaJ30gtxJB71TKw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:LYEblK1YRis=;yPsTQbRPNKDUObP2u7qs6CGmfF/
- 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
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 5/6] rust: time: Add wrapper for fsleep() function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, a.hindborg@kernel.org
+Cc: rust-for-linux@vger.kernel.org, gary@garyguo.net, aliceryhl@google.com,
+ me@kloenk.dev, daniel.almeida@collabora.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+ arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com,
+ david.laight.linux@gmail.com, boqun.feng@gmail.com, pbonzini@redhat.com,
+ jfalempe@redhat.com, linux@armlinux.org.uk, linus.walleij@linaro.org
+References: <6qQX4d2uzNlS_1BySS6jrsBgbZtaF9rsbHDza0bdk8rdArVf_YmGDTnaoo6eeNiU4U_tAg1-RkEOm2Wtcj7fhg==@protonmail.internalid>
+ <20250423192857.199712-6-fujita.tomonori@gmail.com>
+ <871ptc40ds.fsf@kernel.org>
+ <20250429.221733.2034231929519765445.fujita.tomonori@gmail.com>
+Content-Language: en-US, de-DE
+From: Christian Schrefl <chrisi.schrefl@gmail.com>
+In-Reply-To: <20250429.221733.2034231929519765445.fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am 26=2E April 2025 01:08:16 MESZ schrieb Daniel Golle <daniel@makrotopia=
-=2Eorg>:
->On Fri, Apr 25, 2025 at 10:51:18PM +0100, Daniel Golle wrote:
->> The MediaTek MT7988 SoC comes with an single built-in Ethernet PHY
->> supporting 2500Base-T/1000Base-T/100Base-TX/10Base-T link partners in
->> addition to the built-in MT7531-like 1GE switch=2E The built-in PHY onl=
-y
->> supports full duplex=2E
->>=20
->> Add muxes allowing to select GMAC2->2=2E5G PHY path and add basic suppo=
-rt
->> for XGMAC as the built-in 2=2E5G PHY is internally connected via XGMII=
-=2E
->> The XGMAC features will also be used by 5GBase-R, 10GBase-R and USXGMII
->> SerDes modes which are going to be added once support for standalone PC=
-S
->> drivers is in place=2E
->>=20
->> In order to make use of the built-in 2=2E5G PHY the appropriate PHY dri=
-ver
->> as well as (proprietary) PHY firmware has to be present as well=2E
->>=20
->> Signed-off-by: Daniel Golle <daniel@makrotopia=2Eorg>
->> ---
->> [=2E=2E=2E]
->> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh b/drivers/ne=
-t/ethernet/mediatek/mtk_eth_soc=2Eh
->> index 88ef2e9c50fc=2E=2Ee3a8b24dd3d3 100644
->> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh
->> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc=2Eh
->> [=2E=2E=2E]
->> @@ -587,6 +603,10 @@
->>  #define GEPHY_MAC_SEL          BIT(1)
->> =20
->>  /* Top misc registers */
->> +#define TOP_MISC_NETSYS_PCS_MUX	0x84
->
->This offset still assumes topmisc syscon to start at 0x11d10000=2E
->If the pending series[1] adding that syscon at 0x11d10084 gets merged
->first, this offset will have to be changed to
->#define TOP_MISC_NETSYS_PCS_MUX	0x0
->
->[1]: https://patchwork=2Ekernel=2Eorg/project/linux-mediatek/patch/202504=
-22132438=2E15735-8-linux@fw-web=2Ede/
+On 29.04.25 3:17 PM, FUJITA Tomonori wrote:
+> On Mon, 28 Apr 2025 20:16:47 +0200
+> Andreas Hindborg <a.hindborg@kernel.org> wrote:
+> 
+>> Hi Tomonori,
+>>
+>> "FUJITA Tomonori" <fujita.tomonori@gmail.com> writes:
+>>
+>>> Add a wrapper for fsleep(), flexible sleep functions in
+>>> include/linux/delay.h which typically deals with hardware delays.
+>>>
+>>> The kernel supports several sleep functions to handle various lengths
+>>> of delay. This adds fsleep(), automatically chooses the best sleep
+>>> method based on a duration.
+>>>
+>>> sleep functions including fsleep() belongs to TIMERS, not
+>>> TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
+>>> abstraction for TIMEKEEPING. To make Rust abstractions match the C
+>>> side, add rust/kernel/time/delay.rs for this wrapper.
+>>>
+>>> fsleep() can only be used in a nonatomic context. This requirement is
+>>> not checked by these abstractions, but it is intended that klint [1]
+>>> or a similar tool will be used to check it in the future.
+>>
+>> I get an error when building this patch for arm32:
+>>
+>>   + kernel-make -j 96 O=/home/aeh/src/linux-rust/test-build-arm-1.78.0 vmlinux modules
+>>   ld.lld: error: undefined symbol: __aeabi_uldivmod
+>>   >>> referenced by kernel.df165ca450b1fd1-cgu.0
+>>   >>>               rust/kernel.o:(kernel::time::delay::fsleep) in archive vmlinux.a
+>>   >>> did you mean: __aeabi_uidivmod
+>>   >>> defined in: vmlinux.a(arch/arm/lib/lib1funcs.o)
+>>
+>> Looks like a division function of some sort is not defined. Can you
+>> reproduce?
+> 
+> Ah, 64-bit integer division on 32-bit architectures.
+> 
+> I think that the DRM QR driver has the same problem:
+> 
+> https://lore.kernel.org/rust-for-linux/CANiq72ke45eOwckMhWHvmwxc03dxr4rnxxKvx+HvWdBLopZfrQ@mail.gmail.com/
+> 
+> It appears that there is still no consensus on how to resolve it. CC
+> the participants in the above thread.
 
-Imho this should be changed as well
+From what I remember from the thread is that generally 64 bit divisions
+should be avoided (like the solution for DRM).
 
-#define USB_PHY_SWITCH_REG	0x218
+> I think that we can drop this patch and better to focus on Instant and
+> Delta types in this merge window.
+> 
+> With the patch below, this issue could be resolved like the C side,
+> but I'm not sure whether we can reach a consensus quickly.
 
-To
+I think adding rust bindings for this is fine (and most likely needed),
+for cases where it is required.
 
-0x194
+> 
+> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+> index 48143cdd26b3..c44d45960eb1 100644
+> --- a/rust/helpers/helpers.c
+> +++ b/rust/helpers/helpers.c
+> @@ -19,6 +19,7 @@
+>  #include "io.c"
+>  #include "jump_label.c"
+>  #include "kunit.c"
+> +#include "math64.c"
+>  #include "mutex.c"
+>  #include "page.c"
+>  #include "platform.c"
+> diff --git a/rust/helpers/math64.c b/rust/helpers/math64.c
+> new file mode 100644
+> index 000000000000..f94708cf8fcb
+> --- /dev/null
+> +++ b/rust/helpers/math64.c
+> @@ -0,0 +1,8 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/math64.h>
+> +
+> +s64 rust_helper_div64_s64(s64 dividend, s64 divisor)
+> +{
+> +	return div64_s64(dividend, divisor);
+> +}
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index de07aadd1ff5..d272e0b0b05d 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -60,6 +60,7 @@
+>  #[cfg(CONFIG_KUNIT)]
+>  pub mod kunit;
+>  pub mod list;
+> +pub mod math64;
+>  pub mod miscdevice;
+>  #[cfg(CONFIG_NET)]
+>  pub mod net;
+> diff --git a/rust/kernel/math64.rs b/rust/kernel/math64.rs
+> new file mode 100644
+> index 000000000000..523e47911859
+> --- /dev/null
+> +++ b/rust/kernel/math64.rs
+> @@ -0,0 +1,12 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +//! 64-bit integer arithmetic helpers.
+> +//!
+> +//! C header: [`include/linux/math64.h`](srctree/include/linux/math64.h)
+> +
+> +/// Divide a signed 64-bit integer by another signed 64-bit integer.
+> +#[inline]
+> +pub fn div64_s64(dividend: i64, divisor: i64) -> i64 {
+> +    // SAFETY: Calling `div64_s64()` is safe as long as `divisor` is non-zero.
+The safety comment is not valid, nowhere is it guaranteed divisor is non-zero.
 
-It is used in mtk_eth_path=2Ec set_mux_u3_gmac2_to_qphy
+There's three solutions I can think of:
+* Mark this function as `unsafe` and give the responsibility of checking
+  this to the caller,
+* return a `Result` with a division by zero error type or
+* change the type of divisor to `NonZeroI64` [0].
 
-regards Frank
+Probably the best way is to use `NonZeroI64` since that way
+it's statically guaranteed.
+
+In that case it would also make sense to change `NSEC_PER_USEC` to be `NonZeroI64`.
+
+
+Link: https://doc.rust-lang.org/nightly/core/num/type.NonZeroI64.html [0]
+> +    unsafe { bindings::div64_s64(dividend, divisor) }
+
+Is `s64` just a typedef for `int64_t` and if so this true for every
+architecture? (I don't know the C side very well).
+
+If not there might need to be some kind of conversion to make sure
+they are passed correctly.
+
+> +}
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index 863385905029..7b5255893929 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -24,6 +24,8 @@
+>  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
+>  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
+>  
+> +use crate::math64;
+> +
+>  pub mod delay;
+>  pub mod hrtimer;
+>  
+> @@ -229,13 +231,16 @@ pub const fn as_nanos(self) -> i64 {
+>      /// Return the smallest number of microseconds greater than or equal
+>      /// to the value in the [`Delta`].
+>      #[inline]
+> -    pub const fn as_micros_ceil(self) -> i64 {
+> -        self.as_nanos().saturating_add(NSEC_PER_USEC - 1) / NSEC_PER_USEC
+> +    pub fn as_micros_ceil(self) -> i64 {
+> +        math64::div64_s64(
+It would make sense to change `NSEC_PER_USEC` to be `NonZeroI64`.
+
+> +            self.as_nanos().saturating_add(NSEC_PER_USEC - 1),
+> +            NSEC_PER_USEC,
+> +        )
+>      }
+>  
+>      /// Return the number of milliseconds in the [`Delta`].
+>      #[inline]
+> -    pub const fn as_millis(self) -> i64 {
+> -        self.as_nanos() / NSEC_PER_MSEC
+> +    pub fn as_millis(self) -> i64 {
+> +        math64::div64_s64(self.as_nanos(), NSEC_PER_MSEC)
+>      }
+>  }
+> 
+> base-commit: da37ddd3f607897d039d82e6621671c3f7baa886
+
+Cheers
+Christian
+
 
