@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-186903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC97AA3CEB
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:48:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C09AA3CEF
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5BB97A27DB
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 729A71BC4B71
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 23:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9844026B2C0;
-	Tue, 29 Apr 2025 23:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B1D255F49;
+	Tue, 29 Apr 2025 23:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l6xBzYh2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ehJjIKtn"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046E9255F2A;
-	Tue, 29 Apr 2025 23:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EAE255F2E
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 23:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745970430; cv=none; b=ASp2UKKtr3drb9AjpfGmbZbfy6+J8ryuGJYG5QPfiqDtfx0X5FAQbPKGAXB3Hv2z0Gd5lDCEdc2fMR7pJ0t2lS+K7OqmNtKauAHnff91T4VIm+VndxI8SdTOq2Yz6e56n6BfwDIa4qP24WMDcT04h+hHZC+oGPVg0j3uhghqGcQ=
+	t=1745970429; cv=none; b=fmECSOC4+NP8yIBLCeFJoU3PO/zgA1TPgmTovjw4Hhfhm1iL0hmPRLMjSRedANNobPHRcLrW3HSOqlwLJZITlXkGkQDEP9/D09yGqMbYFeaAigZfdM2DmK8L4+8uteuoVSn/pV3GW7gaKEXXwvtbCnivbsE/KbGGsMuOi9yuoJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745970430; c=relaxed/simple;
-	bh=zrBetzUAMFBFqyi8pf4c9o7czLMKh6LL2X3Yr1ZekTc=;
+	s=arc-20240116; t=1745970429; c=relaxed/simple;
+	bh=M5Jb2m9Koy4SZ7pUljBsm8wk5n7oWDpNEUXuY4zAz38=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lJc3V4zmHWKEykzcyvEDdhz1LYlWikF0KyElwawEDUjo7a6oEtGZCpFx1zq/Zkw2zLE4SbWmYXGmVn5l///GoWRWUWVOoHZrW19hiCg8FYRNi+utvRP0OT+EhdGqJWrM8ECYDsTa9390OgxVkaJSkx/7vDjzIDQjJ8ND2opVtS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l6xBzYh2; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=ex3dvWh7BnaJ/u+RpDpLGasrTcRlp5JanLhgnflTMOF/s1lmatUAB2bfNMiDpO5R4u0/S/1nhCnwjsqsiqw68G1hDvyObhUEAGSKHSc2LjnYo2LPyrhCxEFUzgG5Y7CupkYj8NDj3oXSz3jua9bnwXeRGIOCvACtgRMJthhnZu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ehJjIKtn; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745970427; x=1777506427;
+  t=1745970428; x=1777506428;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zrBetzUAMFBFqyi8pf4c9o7czLMKh6LL2X3Yr1ZekTc=;
-  b=l6xBzYh2vnWuTVOvMLib+rkWH4AReIytfZ/i1UwS3DXrsGnCokR8jj+f
-   cVTPHdEh/1se2rq7/EDG0EPXHHkiYSMRbNEzv2HjJg1pZ7fNjwwu75SFJ
-   nWr3+iVpOsFmEVDXOk79hKcPo+Y4cZO1OlMdhAHufP9VmxzfH94U8aKph
-   ML78EhlItvHaoIiiRudou71jZPsZifoj3p78TIZflDl/eRBI1LcyltPjK
-   z4oFMpedjIy3ch+tdr073vRvUlfdS4JouoXXCyOqYYj7SXsX2w19ZnhIx
-   HeKLYouwYlsuEXoBX9OrZeZQmVeWvEnkAy6kgADGJADHK+T5kjMkbUK16
-   g==;
-X-CSE-ConnectionGUID: gRapZ70BSoudGWaOiEhNsQ==
-X-CSE-MsgGUID: npX5mGIaRcuaaBJyIbGtgQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="58990134"
+  bh=M5Jb2m9Koy4SZ7pUljBsm8wk5n7oWDpNEUXuY4zAz38=;
+  b=ehJjIKtnk7Fmg5NDC8pHQgyukNhCO9ABah6Pem04CACT/1EqlNUVcdC/
+   qm5EdYDtI0Xhk9NXkGKzG+hw97DL95AKE9HArBs0jSpflKkl9aI91EZsM
+   wfhOMqC9A2CpQxWHurN4WVkX6GDkBhmB52nbmVx4lDAbvVpXG5rMvPHN0
+   J7YZk0f7s90MW9WYyAxWE3Wd5Q6AcQ3HRQMd6hDRNUe9Dpn1f3Xumm2s8
+   1r1VCGTsea740h1HoETR+IqXqi/6oUBASfrH+K7GOFTsaAWGsXlfP2VRN
+   O9rcj+vzVD5Emp1NK9/a/A8Uf/Pz7FBsSw+tg2w0tn4DcIocnt93j/S1S
+   w==;
+X-CSE-ConnectionGUID: tdEFdFRvTbOn1x3jk1P7Iw==
+X-CSE-MsgGUID: s+Pjx+3qS4O0BnHqGGQTKA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="58990142"
 X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
-   d="scan'208";a="58990134"
+   d="scan'208";a="58990142"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 16:47:04 -0700
-X-CSE-ConnectionGUID: Os5qmAWaRFWXCHlKQyzgWA==
-X-CSE-MsgGUID: 5XAwkUjEQa6A2V9ofSJblw==
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 16:47:05 -0700
+X-CSE-ConnectionGUID: 6Z2HnPP5SxiojK9gk8Y90g==
+X-CSE-MsgGUID: p4iMfR31QCqTlkNtEMkcnw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
-   d="scan'208";a="137979649"
+   d="scan'208";a="137979653"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa003.fm.intel.com with ESMTP; 29 Apr 2025 16:47:03 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,18 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>,
+Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	anthony.l.nguyen@intel.com,
-	jiri@resnulli.us,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org,
-	horms@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Bharath R <bharath.r@intel.com>
-Subject: [PATCH net-next 11/13] ixgbe: devlink: add devlink region support for E610
-Date: Tue, 29 Apr 2025 16:46:46 -0700
-Message-ID: <20250429234651.3982025-12-anthony.l.nguyen@intel.com>
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Samuel Salin <Samuel.salin@intel.com>
+Subject: [PATCH net-next 12/13] idpf: assign extracted ptype to struct libeth_rqe_info field
+Date: Tue, 29 Apr 2025 16:46:47 -0700
+Message-ID: <20250429234651.3982025-13-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
 References: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
@@ -88,458 +84,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-Provide support for the following devlink cmds:
- -DEVLINK_CMD_REGION_GET
- -DEVLINK_CMD_REGION_NEW
- -DEVLINK_CMD_REGION_DEL
- -DEVLINK_CMD_REGION_READ
+Assign the ptype extracted from qword to the ptype field of struct
+libeth_rqe_info.
+Remove the now excess ptype param of idpf_rx_singleq_extract_fields(),
+idpf_rx_singleq_extract_base_fields() and
+idpf_rx_singleq_extract_flex_fields().
 
-ixgbe devlink region implementation, similarly to the ice one,
-lets user to create snapshots of content of Non Volatile Memory,
-content of Shadow RAM, and capabilities of the device.
-
-For both NVM and SRAM regions provide .read() handler to let user
-read their contents without the need to create full snapshots.
-
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
-Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Tested-by: Bharath R <bharath.r@intel.com>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- Documentation/networking/devlink/ixgbe.rst    |  49 +++
- drivers/net/ethernet/intel/ixgbe/Makefile     |   3 +-
- .../ethernet/intel/ixgbe/devlink/devlink.h    |   2 +
- .../net/ethernet/intel/ixgbe/devlink/region.c | 290 ++++++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   3 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   3 +
- 6 files changed, 349 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/region.c
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 25 ++++++++-----------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/networking/devlink/ixgbe.rst b/Documentation/networking/devlink/ixgbe.rst
-index 3fce291348fa..c27d1436c70e 100644
---- a/Documentation/networking/devlink/ixgbe.rst
-+++ b/Documentation/networking/devlink/ixgbe.rst
-@@ -120,3 +120,52 @@ EMP firmware image.
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index eae1b6f474e6..2e356dd10812 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -891,7 +891,6 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
+  * idpf_rx_singleq_extract_base_fields - Extract fields from the Rx descriptor
+  * @rx_desc: the descriptor to process
+  * @fields: storage for extracted values
+- * @ptype: pointer that will store packet type
+  *
+  * Decode the Rx descriptor and extract relevant information including the
+  * size and Rx packet type.
+@@ -901,21 +900,20 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
+  */
+ static void
+ idpf_rx_singleq_extract_base_fields(const union virtchnl2_rx_desc *rx_desc,
+-				    struct libeth_rqe_info *fields, u32 *ptype)
++				    struct libeth_rqe_info *fields)
+ {
+ 	u64 qword;
  
- The driver does not currently support reloading the driver via
- ``DEVLINK_RELOAD_ACTION_DRIVER_REINIT``.
-+
-+Regions
-+=======
-+
-+The ``ixgbe`` driver implements the following regions for accessing internal
-+device data.
-+
-+.. list-table:: regions implemented
-+    :widths: 15 85
-+
-+    * - Name
-+      - Description
-+    * - ``nvm-flash``
-+      - The contents of the entire flash chip, sometimes referred to as
-+        the device's Non Volatile Memory.
-+    * - ``shadow-ram``
-+      - The contents of the Shadow RAM, which is loaded from the beginning
-+        of the flash. Although the contents are primarily from the flash,
-+        this area also contains data generated during device boot which is
-+        not stored in flash.
-+    * - ``device-caps``
-+      - The contents of the device firmware's capabilities buffer. Useful to
-+        determine the current state and configuration of the device.
-+
-+Both the ``nvm-flash`` and ``shadow-ram`` regions can be accessed without a
-+snapshot. The ``device-caps`` region requires a snapshot as the contents are
-+sent by firmware and can't be split into separate reads.
-+
-+Users can request an immediate capture of a snapshot for all three regions
-+via the ``DEVLINK_CMD_REGION_NEW`` command.
-+
-+.. code:: shell
-+
-+    $ devlink region show
-+    pci/0000:01:00.0/nvm-flash: size 10485760 snapshot [] max 1
-+    pci/0000:01:00.0/device-caps: size 4096 snapshot [] max 10
-+
-+    $ devlink region new pci/0000:01:00.0/nvm-flash snapshot 1
-+
-+    $ devlink region dump pci/0000:01:00.0/nvm-flash snapshot 1
-+    0000000000000000 0014 95dc 0014 9514 0035 1670 0034 db30
-+    0000000000000010 0000 0000 ffff ff04 0029 8c00 0028 8cc8
-+    0000000000000020 0016 0bb8 0016 1720 0000 0000 c00f 3ffc
-+    0000000000000030 bada cce5 bada cce5 bada cce5 bada cce5
-+
-+    $ devlink region read pci/0000:01:00.0/nvm-flash snapshot 1 address 0 length 16
-+    0000000000000000 0014 95dc 0014 9514 0035 1670 0034 db30
-+
-+    $ devlink region delete pci/0000:01:00.0/device-caps snapshot 1
-diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-index ce447540d146..2e7738f41c58 100644
---- a/drivers/net/ethernet/intel/ixgbe/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-@@ -10,7 +10,8 @@ obj-$(CONFIG_IXGBE) += ixgbe.o
- ixgbe-y := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
-            ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
-            ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
--           ixgbe_xsk.o ixgbe_e610.o devlink/devlink.o ixgbe_fw_update.o
-+           ixgbe_xsk.o ixgbe_e610.o devlink/devlink.o ixgbe_fw_update.o \
-+	   devlink/region.o
+ 	qword = le64_to_cpu(rx_desc->base_wb.qword1.status_error_ptype_len);
  
- ixgbe-$(CONFIG_IXGBE_DCB) +=  ixgbe_dcb.o ixgbe_dcb_82598.o \
-                               ixgbe_dcb_82599.o ixgbe_dcb_nl.o
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-index 0b27653a3407..381558058048 100644
---- a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-@@ -6,5 +6,7 @@
+ 	fields->len = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_LEN_PBUF_M, qword);
+-	*ptype = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_PTYPE_M, qword);
++	fields->ptype = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_PTYPE_M, qword);
+ }
  
- struct ixgbe_adapter *ixgbe_allocate_devlink(struct device *dev);
- int ixgbe_devlink_register_port(struct ixgbe_adapter *adapter);
-+void ixgbe_devlink_init_regions(struct ixgbe_adapter *adapter);
-+void ixgbe_devlink_destroy_regions(struct ixgbe_adapter *adapter);
+ /**
+  * idpf_rx_singleq_extract_flex_fields - Extract fields from the Rx descriptor
+  * @rx_desc: the descriptor to process
+  * @fields: storage for extracted values
+- * @ptype: pointer that will store packet type
+  *
+  * Decode the Rx descriptor and extract relevant information including the
+  * size and Rx packet type.
+@@ -925,12 +923,12 @@ idpf_rx_singleq_extract_base_fields(const union virtchnl2_rx_desc *rx_desc,
+  */
+ static void
+ idpf_rx_singleq_extract_flex_fields(const union virtchnl2_rx_desc *rx_desc,
+-				    struct libeth_rqe_info *fields, u32 *ptype)
++				    struct libeth_rqe_info *fields)
+ {
+ 	fields->len = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PKT_LEN_M,
+ 				le16_to_cpu(rx_desc->flex_nic_wb.pkt_len));
+-	*ptype = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PTYPE_M,
+-			   le16_to_cpu(rx_desc->flex_nic_wb.ptype_flex_flags0));
++	fields->ptype = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PTYPE_M,
++				  le16_to_cpu(rx_desc->flex_nic_wb.ptype_flex_flags0));
+ }
  
- #endif /* _IXGBE_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/region.c b/drivers/net/ethernet/intel/ixgbe/devlink/region.c
-new file mode 100644
-index 000000000000..76f6571c3c34
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/region.c
-@@ -0,0 +1,290 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025, Intel Corporation. */
-+
-+#include "ixgbe.h"
-+#include "devlink.h"
-+
-+#define IXGBE_DEVLINK_READ_BLK_SIZE (1024 * 1024)
-+
-+static const struct devlink_region_ops ixgbe_nvm_region_ops;
-+static const struct devlink_region_ops ixgbe_sram_region_ops;
-+
-+static int ixgbe_devlink_parse_region(struct ixgbe_hw *hw,
-+				      const struct devlink_region_ops *ops,
-+				      bool *read_shadow_ram, u32 *nvm_size)
-+{
-+	if (ops == &ixgbe_nvm_region_ops) {
-+		*read_shadow_ram = false;
-+		*nvm_size = hw->flash.flash_size;
-+	} else if (ops == &ixgbe_sram_region_ops) {
-+		*read_shadow_ram = true;
-+		*nvm_size = hw->flash.sr_words * 2u;
-+	} else {
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_nvm_snapshot - Capture a snapshot of the NVM content
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region being snapshotted
-+ * @extack: extended ACK response structure
-+ * @data: on exit points to snapshot data buffer
-+ *
-+ * This function is called in response to the DEVLINK_CMD_REGION_NEW cmd.
-+ *
-+ * Capture a snapshot of the whole requested NVM region.
-+ *
-+ * No need to worry with freeing @data, devlink core takes care if it.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP for unsupported regions, -EBUSY when
-+ * cannot lock NVM, -ENOMEM when cannot alloc mem and -EIO when error
-+ * occurs during reading.
-+ */
-+static int ixgbe_devlink_nvm_snapshot(struct devlink *devlink,
-+				      const struct devlink_region_ops *ops,
-+				      struct netlink_ext_ack *extack, u8 **data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	bool read_shadow_ram;
-+	u8 *nvm_data, *buf;
-+	u32 nvm_size, left;
-+	u8 num_blks;
-+	int err;
-+
-+	err = ixgbe_devlink_parse_region(hw, ops, &read_shadow_ram, &nvm_size);
-+	if (err)
-+		return err;
-+
-+	nvm_data = kvzalloc(nvm_size, GFP_KERNEL);
-+	if (!nvm_data)
-+		return -ENOMEM;
-+
-+	num_blks = DIV_ROUND_UP(nvm_size, IXGBE_DEVLINK_READ_BLK_SIZE);
-+	buf = nvm_data;
-+	left = nvm_size;
-+
-+	for (int i = 0; i < num_blks; i++) {
-+		u32 read_sz = min_t(u32, IXGBE_DEVLINK_READ_BLK_SIZE, left);
-+
-+		/* Need to acquire NVM lock during each loop run because the
-+		 * total period of reading whole NVM is longer than the maximum
-+		 * period the lock can be taken defined by the IXGBE_NVM_TIMEOUT.
-+		 */
-+		err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+		if (err) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Failed to acquire NVM semaphore");
-+			kvfree(nvm_data);
-+			return -EBUSY;
-+		}
-+
-+		err = ixgbe_read_flat_nvm(hw, i * IXGBE_DEVLINK_READ_BLK_SIZE,
-+					  &read_sz, buf, read_shadow_ram);
-+		if (err) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Failed to read RAM content");
-+			ixgbe_release_nvm(hw);
-+			kvfree(nvm_data);
-+			return -EIO;
-+		}
-+
-+		ixgbe_release_nvm(hw);
-+
-+		buf += read_sz;
-+		left -= read_sz;
-+	}
-+
-+	*data = nvm_data;
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_devcaps_snapshot - Capture a snapshot of device capabilities
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region being snapshotted
-+ * @extack: extended ACK response structure
-+ * @data: on exit points to snapshot data buffer
-+ *
-+ * This function is called in response to the DEVLINK_CMD_REGION_NEW for
-+ * the device-caps devlink region.
-+ *
-+ * Capture a snapshot of the device capabilities reported by firmware.
-+ *
-+ * No need to worry with freeing @data, devlink core takes care if it.
-+ *
-+ * Return: 0 on success, -ENOMEM when cannot alloc mem, or return code of
-+ * the reading operation.
-+ */
-+static int ixgbe_devlink_devcaps_snapshot(struct devlink *devlink,
-+					  const struct devlink_region_ops *ops,
-+					  struct netlink_ext_ack *extack,
-+					  u8 **data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_aci_cmd_list_caps_elem *caps;
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	int err;
-+
-+	caps = kvzalloc(IXGBE_ACI_MAX_BUFFER_SIZE, GFP_KERNEL);
-+	if (!caps)
-+		return -ENOMEM;
-+
-+	err = ixgbe_aci_list_caps(hw, caps, IXGBE_ACI_MAX_BUFFER_SIZE, NULL,
-+				  ixgbe_aci_opc_list_dev_caps);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read device capabilities");
-+		kvfree(caps);
-+		return err;
-+	}
-+
-+	*data = (u8 *)caps;
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_nvm_read - Read a portion of NVM flash content
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region to snapshot
-+ * @extack: extended ACK response structure
-+ * @offset: the offset to start at
-+ * @size: the amount to read
-+ * @data: the data buffer to read into
-+ *
-+ * This function is called in response to DEVLINK_CMD_REGION_READ to directly
-+ * read a section of the NVM contents.
-+ *
-+ * Read from either the nvm-flash region either shadow-ram region.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP for unsupported regions, -EBUSY when
-+ * cannot lock NVM, -ERANGE when buffer limit exceeded and -EIO when error
-+ * occurs during reading.
-+ */
-+static int ixgbe_devlink_nvm_read(struct devlink *devlink,
-+				  const struct devlink_region_ops *ops,
-+				  struct netlink_ext_ack *extack,
-+				  u64 offset, u32 size, u8 *data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	bool read_shadow_ram;
-+	u32 nvm_size;
-+	int err;
-+
-+	err = ixgbe_devlink_parse_region(hw, ops, &read_shadow_ram, &nvm_size);
-+	if (err)
-+		return err;
-+
-+	if (offset + size > nvm_size) {
-+		NL_SET_ERR_MSG_MOD(extack, "Cannot read beyond the region size");
-+		return -ERANGE;
-+	}
-+
-+	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to acquire NVM semaphore");
-+		return -EBUSY;
-+	}
-+
-+	err = ixgbe_read_flat_nvm(hw, (u32)offset, &size, data, read_shadow_ram);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read NVM contents");
-+		ixgbe_release_nvm(hw);
-+		return -EIO;
-+	}
-+
-+	ixgbe_release_nvm(hw);
-+	return 0;
-+}
-+
-+static const struct devlink_region_ops ixgbe_nvm_region_ops = {
-+	.name = "nvm-flash",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_nvm_snapshot,
-+	.read = ixgbe_devlink_nvm_read,
-+};
-+
-+static const struct devlink_region_ops ixgbe_sram_region_ops = {
-+	.name = "shadow-ram",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_nvm_snapshot,
-+	.read = ixgbe_devlink_nvm_read,
-+};
-+
-+static const struct devlink_region_ops ixgbe_devcaps_region_ops = {
-+	.name = "device-caps",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_devcaps_snapshot,
-+};
-+
-+/**
-+ * ixgbe_devlink_init_regions - Initialize devlink regions
-+ * @adapter: adapter instance
-+ *
-+ * Create devlink regions used to enable access to dump the contents of the
-+ * flash memory of the device.
-+ */
-+void ixgbe_devlink_init_regions(struct ixgbe_adapter *adapter)
-+{
-+	struct devlink *devlink = adapter->devlink;
-+	struct device *dev = &adapter->pdev->dev;
-+	u64 nvm_size, sram_size;
-+
-+	if (adapter->hw.mac.type != ixgbe_mac_e610)
-+		return;
-+
-+	nvm_size = adapter->hw.flash.flash_size;
-+	adapter->nvm_region = devl_region_create(devlink, &ixgbe_nvm_region_ops,
-+						 1, nvm_size);
-+	if (IS_ERR(adapter->nvm_region)) {
-+		dev_err(dev,
-+			"Failed to create NVM devlink region, err %ld\n",
-+			PTR_ERR(adapter->nvm_region));
-+		adapter->nvm_region = NULL;
-+	}
-+
-+	sram_size = adapter->hw.flash.sr_words * 2u;
-+	adapter->sram_region = devl_region_create(devlink, &ixgbe_sram_region_ops,
-+						  1, sram_size);
-+	if (IS_ERR(adapter->sram_region)) {
-+		dev_err(dev,
-+			"Failed to create shadow-ram devlink region, err %ld\n",
-+			PTR_ERR(adapter->sram_region));
-+		adapter->sram_region = NULL;
-+	}
-+
-+	adapter->devcaps_region = devl_region_create(devlink,
-+						     &ixgbe_devcaps_region_ops,
-+						     10, IXGBE_ACI_MAX_BUFFER_SIZE);
-+	if (IS_ERR(adapter->devcaps_region)) {
-+		dev_err(dev,
-+			"Failed to create device-caps devlink region, err %ld\n",
-+			PTR_ERR(adapter->devcaps_region));
-+		adapter->devcaps_region = NULL;
-+	}
-+}
-+
-+/**
-+ * ixgbe_devlink_destroy_regions - Destroy devlink regions
-+ * @adapter: adapter instance
-+ *
-+ * Remove previously created regions for this adapter instance.
-+ */
-+void ixgbe_devlink_destroy_regions(struct ixgbe_adapter *adapter)
-+{
-+	if (adapter->hw.mac.type != ixgbe_mac_e610)
-+		return;
-+
-+	if (adapter->nvm_region)
-+		devl_region_destroy(adapter->nvm_region);
-+
-+	if (adapter->sram_region)
-+		devl_region_destroy(adapter->sram_region);
-+
-+	if (adapter->devcaps_region)
-+		devl_region_destroy(adapter->devcaps_region);
-+}
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 23c2e2c2649c..47311b134a7a 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -616,6 +616,9 @@ struct ixgbe_adapter {
- 	struct mii_bus *mii_bus;
- 	struct devlink *devlink;
- 	struct devlink_port devlink_port;
-+	struct devlink_region *nvm_region;
-+	struct devlink_region *sram_region;
-+	struct devlink_region *devcaps_region;
+ /**
+@@ -938,18 +936,17 @@ idpf_rx_singleq_extract_flex_fields(const union virtchnl2_rx_desc *rx_desc,
+  * @rx_q: Rx descriptor queue
+  * @rx_desc: the descriptor to process
+  * @fields: storage for extracted values
+- * @ptype: pointer that will store packet type
+  *
+  */
+ static void
+ idpf_rx_singleq_extract_fields(const struct idpf_rx_queue *rx_q,
+ 			       const union virtchnl2_rx_desc *rx_desc,
+-			       struct libeth_rqe_info *fields, u32 *ptype)
++			       struct libeth_rqe_info *fields)
+ {
+ 	if (rx_q->rxdids == VIRTCHNL2_RXDID_1_32B_BASE_M)
+-		idpf_rx_singleq_extract_base_fields(rx_desc, fields, ptype);
++		idpf_rx_singleq_extract_base_fields(rx_desc, fields);
+ 	else
+-		idpf_rx_singleq_extract_flex_fields(rx_desc, fields, ptype);
++		idpf_rx_singleq_extract_flex_fields(rx_desc, fields);
+ }
  
- 	unsigned long state;
+ /**
+@@ -972,7 +969,6 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
+ 		struct libeth_rqe_info fields = { };
+ 		union virtchnl2_rx_desc *rx_desc;
+ 		struct idpf_rx_buf *rx_buf;
+-		u32 ptype;
  
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 40daab34e4fe..03d31e5b131d 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -11317,6 +11317,7 @@ static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)
- 	ixgbe_devlink_register_port(adapter);
- 	SET_NETDEV_DEVLINK_PORT(adapter->netdev,
- 				&adapter->devlink_port);
-+	ixgbe_devlink_init_regions(adapter);
- 	devl_register(adapter->devlink);
- 	devl_unlock(adapter->devlink);
+ 		/* get the Rx desc from Rx queue based on 'next_to_clean' */
+ 		rx_desc = &rx_q->rx[ntc];
+@@ -993,7 +989,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
+ 		 */
+ 		dma_rmb();
  
-@@ -11824,6 +11825,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (err)
- 		goto err_netdev;
+-		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields, &ptype);
++		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields);
  
-+	ixgbe_devlink_init_regions(adapter);
- 	devl_register(adapter->devlink);
- 	devl_unlock(adapter->devlink);
- 	return 0;
-@@ -11882,6 +11884,7 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 	netdev  = adapter->netdev;
- 	devl_lock(adapter->devlink);
- 	devl_unregister(adapter->devlink);
-+	ixgbe_devlink_destroy_regions(adapter);
- 	ixgbe_dbg_adapter_exit(adapter);
+ 		rx_buf = &rx_q->rx_buf[ntc];
+ 		if (!libeth_rx_sync_for_cpu(rx_buf, fields.len))
+@@ -1037,7 +1033,8 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
+ 		total_rx_bytes += skb->len;
  
- 	set_bit(__IXGBE_REMOVING, &adapter->state);
+ 		/* protocol */
+-		idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype);
++		idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc,
++						   fields.ptype);
+ 
+ 		/* send completed skb up the stack */
+ 		napi_gro_receive(rx_q->pp->p.napi, skb);
 -- 
 2.47.1
 
