@@ -1,194 +1,178 @@
-Return-Path: <netdev+bounces-186677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07F0AA04BE
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 381A2AA04E9
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A8F189FFD7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:41:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DCB01B659A1
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 07:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADB427CCD7;
-	Tue, 29 Apr 2025 07:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9646B26B968;
+	Tue, 29 Apr 2025 07:45:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD2627817E
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 07:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896B627933A;
+	Tue, 29 Apr 2025 07:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745912475; cv=none; b=CUhnMW8TiOj0sgF0mKpSYCaO5M+E3Jdb0dE9aDFFzhogVk4zdQ4V8hwcAWcMAwHHZnLBe4nmrb3CaBSr2ZTgJpcDF2qjdQsFU9Qd4GNjYVyjE/aFCz5lJ+kfpxv5u7jofu7eoOusiG6EVAbWFB+Xul2kNNN5rjVIe+etw4m7A5U=
+	t=1745912716; cv=none; b=cwBS6dmBnJInKljlyNeVlPaXO1Mxm293OYrq8GHZB9+O0w97p54hBgX/6fz68MsDvgPBGQbp7DIHTd+lYUO/zo2ksUtF57QpdfI5RDrS6VOCN8dwyasW6+Xo0z6OL22RdxWa92C56NDvpAFQLswhwg0V6V51yPmVChM8p1S/LOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745912475; c=relaxed/simple;
-	bh=MBFWwb46UQQNdOkUo56hW2ui2l2iYYiZr5TxJR/PPC4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ovBiCKY4gvAWRh6qPhQaTGrE3KqH6SSDrwusxjgUYIc2i+/2uyGfxmNsXMmblETsKaeRYvhneicboHThBgcISyfpKtJYCQs95JjD+l6x7+6f7zxjZTnipuW1rTwgFmltD+XPV3dSsfWDEBOrE1YnbO7N5LfQIdW0meH9F54/CtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9faT-0006KR-Sj; Tue, 29 Apr 2025 09:41:05 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9faS-000E3G-1e;
-	Tue, 29 Apr 2025 09:41:04 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u9faS-00CY78-1Q;
-	Tue, 29 Apr 2025 09:41:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v3 4/4] net: selftests: add PHY loopback tests with HW checksum offload
-Date: Tue, 29 Apr 2025 09:41:03 +0200
-Message-Id: <20250429074103.2991006-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250429074103.2991006-1-o.rempel@pengutronix.de>
-References: <20250429074103.2991006-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1745912716; c=relaxed/simple;
+	bh=G8dU/8ZraGb4ZDw4STUDdNEQVI98PTS1z3Ot10oXmVU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H2+vmiVCBLwVDCBmJlW9z4EVIh+uaKe2+D6xnOHcB5UhH9P2T9NDWyOGvmK4bgwxxGFTuj2iGGugC6Z5hwfENpcmDxRqm9p+HHg/ymct2ewdSPkAvGZLriJBbg538KnHZ/S5ANWu0t/hwPjYIFWtfa1zPh02phNb91WX6tPUQzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T3kYcd006268;
+	Tue, 29 Apr 2025 00:45:01 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 468y0ksmxx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 29 Apr 2025 00:45:01 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Tue, 29 Apr 2025 00:45:00 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Tue, 29 Apr 2025 00:44:57 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jianqi.ren.cn@windriver.com>, <jhs@mojatatu.com>,
+        <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <michal.swiatkowski@linux.intel.com>, <zhe.he@windriver.com>
+Subject: [PATCH 6.1.y v3] net/sched: act_mirred: don't override retval if we already lost the skb
+Date: Tue, 29 Apr 2025 15:44:56 +0800
+Message-ID: <20250429074456.3626604-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA1NyBTYWx0ZWRfX1Nc8ZcZ8rBQT QBwUzFC1J0xE8XOfxC9iBJn4HgRDdmKMnWfn/FxuvVvlJvxkRGoRect+QTs8bSzVF3xh4D4Q9lk X37auw/naTAmxWvLXbSk518A5FggQGI32rkV0s0uzqDpN01eVf+qaZVTnNSsGAGhWsQI6SrdmK2
+ h90fj3wd7nOgX+wXuD6b246qiZefyW3QnlkzQsg3d+3GoFYo/OY/052VTYhwdenRN75mmzpHp1/ VLz8xMMtezVT2UEyCzMS6BTTOLumqxSwyaYi550DwXcRjBF8/8z8RzhkiT4VTxyly7pi3XzKI+Z cRJSHCsT3T2s35By/3/vbXFsCl3YoaOEzvoF+sBfw+Yu+qu5jxG+Ie8U20GubkwDy1sCojKihXP
+ dvFwUemZRBfBjw9frCKpMXNDQ/CZXPKl/X4nYFm02SL2T0D7WYV/lzNQxM5YvNVWegRfsjsS
+X-Proofpoint-ORIG-GUID: rIVTkqjRQilyT82V_WNgSXcEnFdkaigz
+X-Authority-Analysis: v=2.4 cv=O8A5vA9W c=1 sm=1 tr=0 ts=6810837d cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=XR8D0OoHHMoA:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=QyXUC8HyAAAA:8 a=A7XncKjpAAAA:8 a=J1Y8HTJGAAAA:8 a=t7CeM3EgAAAA:8
+ a=46DbhiKqDBczhwNKROYA:9 a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: rIVTkqjRQilyT82V_WNgSXcEnFdkaigz
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-29_02,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0 malwarescore=0
+ phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2504290057
 
-Introduce two new PHY loopback tests that validate hardware checksum
-offload functionality using UDP and TCP packets. These tests set
-csum_mode = CHECKSUM_PARTIAL, allowing the NIC to compute transport
-checksums.
+From: Jakub Kicinski <kuba@kernel.org>
 
-Tests are only executed if the device advertises NETIF_F_HW_CSUM
-support. If not, they are skipped with -EOPNOTSUPP.
+[ Upstream commit 166c2c8a6a4dc2e4ceba9e10cfe81c3e469e3210 ]
 
-Also register the tests under descriptive names in the test list.
+If we're redirecting the skb, and haven't called tcf_mirred_forward(),
+yet, we need to tell the core to drop the skb by setting the retcode
+to SHOT. If we have called tcf_mirred_forward(), however, the skb
+is out of our hands and returning SHOT will lead to UaF.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Move the retval override to the error path which actually need it.
+
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Fixes: e5cf1baf92cb ("act_mirred: use TC_ACT_REINSERT when possible")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+[Minor conflict resolved due to code context change.]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
- net/core/selftests.c | 80 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+v2: Fix the following issue
+net/sched/act_mirred.c:265:6: error: variable 'is_redirect' is used
+uninitialized whenever 'if' condition is true
+found by the following tuxmake
+(https://lore.kernel.org/stable/CA+G9fYu+FEZ-3ye30Hk2sk1+LFsw7iO5AHueUa9H1Ub=JO-k2g@mail.gmail.com/)
+Verified the build test by cmd(tuxmake --runtime podman --target-arch arm
+ --toolchain clang-20 --kconfig allmodconfig LLVM=1 LLVM_IAS=1)
+---
+ net/sched/act_mirred.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/net/core/selftests.c b/net/core/selftests.c
-index 591686978dd7..e751dc677858 100644
---- a/net/core/selftests.c
-+++ b/net/core/selftests.c
-@@ -539,6 +539,79 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
- 	return __net_test_loopback(ndev, &attr);
- }
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 36395e5db3b4..bbc34987bd09 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -255,31 +255,31 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
  
-+/**
-+ * net_test_phy_loopback_udp_hwcsum - PHY loopback test using UDP with HW
-+ *                                    checksum
-+ * @ndev: The network device to test
-+ *
-+ * Sends and receives a UDP packet through the device's internal PHY loopback
-+ * path. The packet is configured for hardware checksum offload
-+ * (CHECKSUM_PARTIAL), allowing the NIC to compute the transport checksum.
-+ *
-+ * Expected packet path:
-+ *   Test code → MAC driver → MAC HW → xMII → PHY →
-+ *   internal PHY loopback → xMII → MAC HW → MAC driver → test code
-+ *
-+ * The test frame includes Ethernet (14B), IPv4 (20B), UDP (8B), and a
-+ * small payload (13B), totaling 55 bytes before MAC padding/FCS. Most
-+ * MACs pad this to the minimum Ethernet payload (60 bytes before FCS).
-+ *
-+ * If the device does not support NETIF_F_HW_CSUM, the test is skipped
-+ * and -EOPNOTSUPP is returned.
-+ *
-+ * Returns 0 on success, or negative error code on failure.
-+ */
-+static int net_test_phy_loopback_udp_hwcsum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
+ 	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
+ 	m_eaction = READ_ONCE(m->tcfm_eaction);
++	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
+ 	retval = READ_ONCE(m->tcf_action);
+ 	dev = rcu_dereference_bh(m->tcfm_dev);
+ 	if (unlikely(!dev)) {
+ 		pr_notice_once("tc mirred: target device is gone\n");
+-		goto out;
++		goto err_cant_do;
+ 	}
+ 
+ 	if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
+ 		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
+ 				       dev->name);
+-		goto out;
++		goto err_cant_do;
+ 	}
+ 
+ 	/* we could easily avoid the clone only if called by ingress and clsact;
+ 	 * since we can't easily detect the clsact caller, skip clone only for
+ 	 * ingress - that covers the TC S/W datapath.
+ 	 */
+-	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
+ 	at_ingress = skb_at_tc_ingress(skb);
+ 	use_reinsert = at_ingress && is_redirect &&
+ 		       tcf_mirred_can_reinsert(retval);
+ 	if (!use_reinsert) {
+ 		skb2 = skb_clone(skb, GFP_ATOMIC);
+ 		if (!skb2)
+-			goto out;
++			goto err_cant_do;
+ 	}
+ 
+ 	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
+@@ -321,12 +321,16 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 	}
+ 
+ 	err = tcf_mirred_forward(want_ingress, skb2);
+-	if (err) {
+-out:
++	if (err)
+ 		tcf_action_inc_overlimit_qstats(&m->common);
+-		if (tcf_mirred_is_act_redirect(m_eaction))
+-			retval = TC_ACT_SHOT;
+-	}
++	__this_cpu_dec(mirred_nest_level);
 +
-+	if (!(ndev->features & NETIF_F_HW_CSUM))
-+		return -EOPNOTSUPP;
++	return retval;
 +
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = false;
-+	attr.csum_mode = NET_TEST_CHECKSUM_PARTIAL;
-+
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
-+/**
-+ * net_test_phy_loopback_tcp_hwcsum - PHY loopback test using TCP with HW
-+ *                                    checksum
-+ * @ndev: The network device to test
-+ *
-+ * Sends and receives a TCP packet through the device's internal PHY loopback
-+ * path. The packet is configured for hardware checksum offload
-+ * (CHECKSUM_PARTIAL), allowing the NIC to compute the transport checksum.
-+ *
-+ * Expected packet path:
-+ *   Test code → MAC driver → MAC HW → xMII → PHY →
-+ *   internal PHY loopback → xMII → MAC HW → MAC driver → test code
-+ *   (via packet_type handler)
-+ *
-+ * The test frame includes Ethernet (14B), IPv4 (20B), TCP (20B),
-+ * and a small payload (13B), totaling 67 bytes before FCS.
-+ * No additional padding is required.
-+ *
-+ * If the device does not support NETIF_F_HW_CSUM, the test is skipped
-+ * and -EOPNOTSUPP is returned.
-+ *
-+ * Returns 0 on success, or negative error code on failure.
-+ */
-+static int net_test_phy_loopback_tcp_hwcsum(struct net_device *ndev)
-+{
-+	struct net_packet_attrs attr = { };
-+
-+	if (!(ndev->features & NETIF_F_HW_CSUM))
-+		return -EOPNOTSUPP;
-+
-+	attr.dst = ndev->dev_addr;
-+	attr.tcp = true;
-+	attr.csum_mode = NET_TEST_CHECKSUM_PARTIAL;
-+
-+	return __net_test_loopback(ndev, &attr);
-+}
-+
- static const struct net_test {
- 	char name[ETH_GSTRING_LEN];
- 	int (*fn)(struct net_device *ndev);
-@@ -562,6 +635,13 @@ static const struct net_test {
- 	}, {
- 		.name = "PHY loopback TCP (SW csum)    ",
- 		.fn = net_test_phy_loopback_tcp,
-+	}, {
-+		/* Conditional HW checksum tests */
-+		.name = "PHY loopback UDP (HW csum)    ",
-+		.fn = net_test_phy_loopback_udp_hwcsum,
-+	}, {
-+		.name = "PHY loopback TCP (HW csum)    ",
-+		.fn = net_test_phy_loopback_tcp_hwcsum,
- 	}, {
- 		/* This test should be done after all PHY loopback test */
- 		.name = "PHY internal loopback, disable",
++err_cant_do:
++	if (is_redirect)
++		retval = TC_ACT_SHOT;
++	tcf_action_inc_overlimit_qstats(&m->common);
+ 	__this_cpu_dec(mirred_nest_level);
+ 
+ 	return retval;
 -- 
-2.39.5
+2.34.1
 
 
