@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-186727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4016AA09E0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:36:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5EFAA0ABA
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 13:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 309F71B65193
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:36:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A033B1A857FA
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDBE2C17AC;
-	Tue, 29 Apr 2025 11:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6105D2C2593;
+	Tue, 29 Apr 2025 11:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="txA6Yruw"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IN0QNytk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CEA29DB8D
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 11:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0B02BEC49;
+	Tue, 29 Apr 2025 11:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745926504; cv=none; b=p8YETbp4KhbAyK9PLXXtoVFH2tgHh5m4wjrOIKJEOhPkitcHYklS/V8lzgjl6sRoI+nwFCXZePkWynYrfWgza/oHANRt7lFfGqNvMn/XAv6L1YvBubBD8c8ryCyY347Kn2xG07s+aaC23beGThtqRKLdKfmVU3jUdyyqdxs9M/A=
+	t=1745927211; cv=none; b=ckmUL4IYaaB6OGABO0PwfZIpRk/MDzOXhlDw14h2hn8hyXGfQa5oxWHeQW1cKsDgCcyiSSJMD3q4gcIhJNLaXD/AI0fClUnSt4540IS/KzKZZPBKCVlY4DOQpsWPW5GVl7sYAQiJSpRdKaEuPs+P4vxyj0U3hQvAB1pkI6cMy2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745926504; c=relaxed/simple;
-	bh=pVE+TS3UFmo22UMkEa2+Hs0xhwwQ9GwiJ5XYAhW6OW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HoeS54YkpeU0YkkYED5LaH+0g+sqZBZ6pwfC6L2RlmOcfES7aGSpLXRgWP2lQxsKrxIcXJmwSl6HTn2qeBFDFxMSkmAcSmlmSX6WEfTVcyObyd7Ksbia0lSIhsEiQ/zNZXJs/LIOO/APSha74regBOyxBzmRVDLdPmsppDP8N0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=txA6Yruw; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43cf628cb14so49255605e9.1
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 04:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745926500; x=1746531300; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wdeLMSXfLsPfIkuKL3CYMpFq7DN5R1rUsOpR1/VAQ2Y=;
-        b=txA6YruwDVb5CqeZdAmdTGVvZW+rkquTBiHHhuRkKoMxEKGNLDpfXo3y9EiHr+3XOz
-         BczsJUKeEfRS5WsTteznv79a59F8UtYByaGurxBNGMAAqkmRxo/Sx5NmE3aaos/3GasM
-         1UuMbaeD4e5L3Ewg1C7PXBpAy3MJ0aAIMrqvhU6wyHoZ97kT1HE1Y2JU0tfzwRAsZJIh
-         Cmky5jPzReHN57XpMuqPSwxIYJ6cKPnJAezbSG7pje7f395dezsdMzQadoFA6fvwXYdr
-         JAhnUgnPTI0UQEU1pv9x3uk03fUmJAuhNdt6VvGigexPrq6/aqu83T6BGRWGjGhBMBSr
-         jxYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745926500; x=1746531300;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wdeLMSXfLsPfIkuKL3CYMpFq7DN5R1rUsOpR1/VAQ2Y=;
-        b=IDrJpzeFdtQaZ1xKiwSr/1D0uakcdOUxCDfGkZOqXHvo3oCuSGq94INzTcnxZj3giR
-         m3LJf57ZN5MoXLLWf3LL2BX/0HDNe1XRnRE8BOefZp4beBGoN3RQ25Pg87E/zs7F9wk3
-         SMCF3iU/Vevemee4lsVC2HQAbD/xqZOqUS5hzhG5MZeL5mHS6ymwye3GaLvRuy5pa0OM
-         Rso1MEPcR91/p2V5jYZpGFmsri+Blo1X1Dnb4NDjEhWpjQiDeEDchO0Ryd2J5eBMFfKr
-         pt4E2nXIWovAAM2Q5hytU9UeY7JQA9pb1St4BOQXLWAErg/20t9l4+s70ObXV6KD0IB9
-         4iNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUR39Hu1H5BELXZuqSbUnuGpIANkd9+hfXs7HGK6zZCDcoob9gDmgpYEdtyPm09Nrb9E44IoE0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1iI+fl+O+0cYL1Exj1cuBO1M5+GDpphDsPvwlentQ+vHvyqLl
-	CDDiLQy/yq86P2AGyoTsrAuvuao7ycieq2z2VXuC9CIYubhvGWLUaSHywQLBptA=
-X-Gm-Gg: ASbGncud3FHKaWRxFDujuSjRCe3CBdmT1aU/dW/xN/7PGsFqPttF8LX7yCfbsK4h1wR
-	Q43Bw9J/h/wvhgEGA++sBIv7yE6iRU9jmhs/Oq+mzxxyH+waVtfFHDZ4BKcaJ/8S1VUMM+dhDWM
-	u0X0knY+6u2kU7seWlpNHZSMelX0idwUUOHD3Oz/Ejnyz3O+GXkKeNp5LIjm9n3JmUUw1TrzNy8
-	OI1n/9Qun/zz6i0wQAtDzjILQYwlMHjXn87EcDpSvDuByt5HGLCES+QWWU5ZdmvngveVd0RD+Xv
-	N48b2BAt4+w7U1eOmrSku+XL0IuQEjDNt6iq1/eiuijr6vt/WwiBg+BfWuypFwrrGLtB
-X-Google-Smtp-Source: AGHT+IH0VbMXgmjJHZdWbrj5HO86BmznBkXT2FSqE+ixt8hbPQWyY3/WwY9MgR1MAhU41dlc3y61yA==
-X-Received: by 2002:a05:600c:4711:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-441acb462c8mr20729015e9.10.1745926500515;
-        Tue, 29 Apr 2025 04:35:00 -0700 (PDT)
-Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2abf73sm186503325e9.20.2025.04.29.04.34.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 04:35:00 -0700 (PDT)
-Date: Tue, 29 Apr 2025 13:34:57 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next V3 14/15] devlink: Implement devlink param multi
- attribute nested data values
-Message-ID: <bdk3jo2w7mg5meofpj7c5v6h5ngo46x4zev7buh7iqw3uil3yx@3rljgtc3l464>
-References: <20250425214808.507732-1-saeed@kernel.org>
- <20250425214808.507732-15-saeed@kernel.org>
- <20250428161732.43472b2a@kernel.org>
+	s=arc-20240116; t=1745927211; c=relaxed/simple;
+	bh=3dh4cSlwqNafxDi1eoskuMMskOU14nSu2voZZz+IISI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Reyi0Qb5suO/NS7kOVdeQP2wifbPea53GBRjZQgho+h8k7GvcNt4nBXxlga+Mea30GlmQLW9H5COJKY0/CCoIm7LtQ0boZ9Na9LdNEBnzJgyBfMHBk5nDWUYg87whLL8nE2qGsZ9ExCZfW5bl9hJiZtt1zZP+Y1WJLQnAyLrtAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IN0QNytk; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53T6nggI024868;
+	Tue, 29 Apr 2025 04:46:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=lMYcX+6NRtn1bfaz92OoF0m
+	EjFbSPiTLQI7sXGqkxkE=; b=IN0QNytkIeursvsjY1jMvW2fmWYQETH/EFMcHuD
+	1NPCS4y/c3rPYaUcSGFSTlixcL0mb3ByYzmz92ihgQsZF2DbQW1RroGVmjL1Ivlv
+	jQ3muIKe+3HxEkBd6E+QgeCN5SZAHIMqAqpN283L2zCY4SerD6/ZycQsb0nj0GRQ
+	VjCLCufpZNiNKx97f4qZLtu4AF41OcLxl16hxEI1N9ZA/WJ1ESlXyftL62ggFZJe
+	5v4b+3UEpASYSLFiSLXU7kPgm3wKEGm5skeLTFnJwH+jCVyCSzExBNvsRHxJq5hJ
+	focFQetyE8P+gUebZ8UrJRQdSOMhHM5TI/vfV0P+crQbifQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 469krcccsb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Apr 2025 04:46:29 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 29 Apr 2025 04:46:29 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 29 Apr 2025 04:46:28 -0700
+Received: from sburla-PowerEdge-T630.sclab.marvell.com (unknown [10.106.27.217])
+	by maili.marvell.com (Postfix) with ESMTP id 58B2D3F70D9;
+	Tue, 29 Apr 2025 04:46:28 -0700 (PDT)
+From: Sathesh B Edara <sedara@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>,
+        Veerasenareddy Burru
+	<vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Abhijit Ayarekar <aayarekar@marvell.com>
+Subject: [PATCH net] octeon_ep: Fix host hang issue during device reboot
+Date: Tue, 29 Apr 2025 04:46:24 -0700
+Message-ID: <20250429114624.19104-1-sedara@marvell.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428161732.43472b2a@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Gdk_q4JLrARwBEnrBMpTqzczb2E_F_0o
+X-Authority-Analysis: v=2.4 cv=f61IBPyM c=1 sm=1 tr=0 ts=6810bc18 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=XR8D0OoHHMoA:10 a=M5GUcnROAAAA:8 a=Bsf_nmtMMKoVPQtrbQ8A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI5MDA4NyBTYWx0ZWRfXyJ5Z+YjPySVu csjnui5hfng4OityfJxwmo32k3qeyMj2l7HWYXqVvm75qOJ8t7E+oO0JLoGl9z6tyWHVsda9MZ8 ugviDjePM2si4BSidHRFkFFgaipV4FiuQSG9ghUEqaUSQMdI0yrq1QWrL54iLopiYzTwuAUNOd/
+ abzSUuKM0Ej/hKdHoklYEoWs/mJjy7nQi5AEddWHL13JWUDX/+z1awtRZme1kcsfTo/+HTQGdfD uhe4PrReOfBYtPsGBt/Fb5WcPN8huhF1lIWo+NzkoG5eyJ06vGvrnOJ+8sMo6Mfe199aEyTIouq ACOcTdwkQ/RznQVnGxPDrAQpwDQdobnK8QvMUuFO0rXufqf7F0X7BlkhM/LRVdjx3yY9iBMAkdw
+ Z4aTbmXPjbx+UUck8l3kJM/uE+KBefWNpgiJljrEgBLsXs/LWnW6Tf6UAlpL5E9RNGl3Rs2J
+X-Proofpoint-ORIG-GUID: Gdk_q4JLrARwBEnrBMpTqzczb2E_F_0o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-29_04,2025-04-24_02,2025-02-21_01
 
-Tue, Apr 29, 2025 at 01:17:32AM +0200, kuba@kernel.org wrote:
->On Fri, 25 Apr 2025 14:48:07 -0700 Saeed Mahameed wrote:
->> +	case DEVLINK_PARAM_TYPE_ARR_U32:
->> +		len = 0;
->> +		nla_for_each_attr_type(param_data,
->> +				       DEVLINK_ATTR_PARAM_VALUE_DATA,
->> +				       genlmsg_data(info->genlhdr),
->> +				       genlmsg_len(info->genlhdr), rem) {
->> +			if (nla_len(param_data) != sizeof(u32)) {
->> +				NL_SET_ERR_MSG_MOD(extack,
->> +						   "Array element size must be 4 bytes");
->> +				return -EINVAL;
->> +			}
->> +			if (++len > __DEVLINK_PARAM_MAX_ARRAY_SIZE) {
->> +				NL_SET_ERR_MSG_MOD(extack,
->> +						   "Array size exceeds maximum");
->> +				return -EINVAL;
->> +			}
->> +		}
->> +		if (len)
->> +			return 0;
->> +		NL_SET_ERR_MSG_MOD(extack,
->> +				   "Value array must have at least one entry");
->> +		break;
->
->I'd really rather not build any more complexity into this funny
->indirect attribute construct. Do you have many more arrays to expose?
+When the host loses heartbeat messages from the device,
+the driver calls the device-specific ndo_stop function,
+which frees the resources. If the driver is unloaded in
+this scenario, it calls ndo_stop again, attempting to free
+resources that have already been freed, leading to a host
+hang issue. To resolve this, dev_close should be called
+instead of the device-specific stop function.dev_close
+internally calls ndo_stop to stop the network interface
+and performs additional cleanup tasks. During the driver
+unload process, if the device is already down, ndo_stop
+is not called.
 
-How else do you imagine to expose arrays in params?
-Btw, why is it "funny"? I mean, if you would be designing it from
-scratch, how would you do that (params with multiple types) differently?
-From netlink perspective there's nothing wrong with it, is it?
+Fixes: 5cb96c29aa0e ("octeon_ep: add heartbeat monitor")
+Signed-off-by: Sathesh B Edara <sedara@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index 0a679e95196f..24499bb36c00 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -1223,7 +1223,7 @@ static void octep_hb_timeout_task(struct work_struct *work)
+ 		miss_cnt);
+ 	rtnl_lock();
+ 	if (netif_running(oct->netdev))
+-		octep_stop(oct->netdev);
++		dev_close(oct->netdev);
+ 	rtnl_unlock();
+ }
+ 
+-- 
+2.36.0
+
 
