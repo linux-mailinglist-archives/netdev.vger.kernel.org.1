@@ -1,144 +1,119 @@
-Return-Path: <netdev+bounces-186695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB29AA06A8
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:09:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0985AA06FE
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 11:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6423F7A2814
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:07:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B432B7A1F05
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 09:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D550229DB7C;
-	Tue, 29 Apr 2025 09:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1CF1F8ADB;
+	Tue, 29 Apr 2025 09:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTWyLcur"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QdVboiFC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177E31F416A;
-	Tue, 29 Apr 2025 09:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1832AEE1;
+	Tue, 29 Apr 2025 09:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745917711; cv=none; b=ME0QZeHD0WTFkyKnRot5SGv4+jKOfn5P6LRtt39e0lDKpFctm4gkk5yZldK1K/BM90Bq9hkvjfjnkCSIdPPG54z3g1yg64Y5IxkX4+5w4vnbJ96TNQH+UZMPUp0t3CipH0IF7NRyWJxT0p4cz9HOceD4pGALrPlg25qP0Z4iG4U=
+	t=1745918625; cv=none; b=ppJZ9dQEfXxO97d06ywxo4CVICr+VnG+EBduUpvjgTC/Zkanw526ca+AR892fSnjeh/Y9aFzCNnjeB7jSUV7m+wL/ritZ5G9s+PtJGrKZ8kj8u5tHDgA4bARNLQ6Ak0sk0507JjO8OBK7VkhT61ZdDyddEZxfdUXtSThWoi93L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745917711; c=relaxed/simple;
-	bh=7tKkj3J8Tt+kCDm7+jBhWB+A/hvph8GxctRTX3yGEII=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lA91r8headcg24nVpoAbIEWXdnZbQB21rMCdf0l3rozU6xUOiwub0D4Kk5SYGTjAJ+f/cxHg825/x2amaUE1U571FYDY52nq386rd3UzzKwBLeKTeesaAlUxmOV4ibx5fNEwMOdDvLn5xaVL3XQpiDr4DfP57FQd/WgmF9haPF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FTWyLcur; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5e5dce099f4so7514657a12.1;
-        Tue, 29 Apr 2025 02:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745917708; x=1746522508; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oUz53Saw6cMVXBIDBX+3gyUruKRB/Beug22u3wURK4s=;
-        b=FTWyLcurHOP0O94CkNppG0JiPqhZ0v6aN4pNlhOilbSit622gB9fOA4dVVew6xJQxb
-         19zWN5M05LoC0poJJn2APp6X0a0NrtcsppMTw3FAZofWEiVAtnE3d3y8TTVBsXsr2DqY
-         ZEglgronFFOezWdp273Coe3HH5IFIbb/hiisCz26zObjzaDxHvssimnjSllQDQjEAOMp
-         KqJYMHHtq+CaG6+gkFq1VrkRrqjYLstYbBbNhpIiJ3YQ3BxyYpV8jgLOp3pp/t3++2oX
-         QuG6saBcObAgP+pYPwfvdJj17y/D8Pq1rDE7F7yEf6pL6BjCiTdfSUpN0EmB52ufNPon
-         TtDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745917708; x=1746522508;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oUz53Saw6cMVXBIDBX+3gyUruKRB/Beug22u3wURK4s=;
-        b=rfEU0mAi2Eioiq4hSAyRIEIuWLaFMKuIlNU8eOD/gOlzFNxLnxy92mpYQYZo+P14tW
-         ROTO5fTylwrJM/HPYYsogve3nq+5aHX6E0H3SvOP49TM3j1C0pahoBtGjt9MuniaqK68
-         1fjDDZLRKBb+PRKLf6ysolLvmCkrddAVeV+7ICKOV2P0P3ouFLUR1zr8fMYEAWWNx/I+
-         Cv/jQfmHbTbtl1oE7DICNDfLD7paT8ZuJ1Ewz+j4uzUUayghgHIMF+1WgihJZFO3R9rn
-         cdolAhruRNajLZFSDzTkKgRjvd3OWw+iuMY//s7AwsWFFSSDXQS0r0be8UBtXXk5j+tE
-         bmMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXH6OxIdEUUglC1JrQPzPyFR6bHG8CN8L/SrEnyy35Z4p86nAQ5KTzmjHZe4ug4YNMGyttNjjFd@vger.kernel.org, AJvYcCXsYMWp0Dnq4PJu6vYKfwACP8CTmOVrcOjZ7kV9KVySU0pbjzEsqtGSsAJif3nA/M1Ee6Lx41rcAd2Dqxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8GnhFaX8cts8LsKq3sHY9A412bDrxWjbtzincYC2L9hinv1M1
-	PB1kkE6QsnvsC/GsxNzZTaqecv1fLxH+RcsTwbuLNsJA9j78rAV5
-X-Gm-Gg: ASbGncv/9+OK5Letn2U5HSXm7mkBxb52mJkKIS3mcm2mm3YRcE6tW+I/PARV0cVMpY1
-	pULPBf/fE/AIds5GuAb3HNMfqAjzv3HaijPioeYjEJgPKqvef3MSKKtbiETHKbew/gU0/WuauND
-	0RHdoe2KXQ+hAB29P8bHKP0/PCoYahi+uemE1tU/fd4IgRkHA6wAjg0FSMFPoSP7IGO0P9zxYkW
-	VvyWik2K8Ojv86uXRkdF66E73hirUIQqaY538Kx7XMbFBZFrY7Cu0p6Wl07TyL8TOOk9IWhJJNE
-	Z0hG/+r44G7D4Fs7RxftS3WTXpfN0sutrMQLqfIuRPwUmogftNIHHLurVfj3/gXoAZOt0Gecek6
-	nIHu7U4NIU8gI+Z+4qwBfORQrVnSAmjvSC0dC/tk=
-X-Google-Smtp-Source: AGHT+IH0x6YL+2cpf45cN/k9GbVeXNWiPGIKjy2ZeOFTUUYtd3wRJNwtsQ+bN+GZ2H91QNv6Y+XNNA==
-X-Received: by 2002:a05:6402:e86:b0:5f6:c4ed:e266 with SMTP id 4fb4d7f45d1cf-5f83884b6c1mr1945283a12.8.1745917708122;
-        Tue, 29 Apr 2025 02:08:28 -0700 (PDT)
-Received: from titan.emea.group.atlascopco.com (static-212-247-106-195.cust.tele2.se. [212.247.106.195])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f7016f5dccsm7144159a12.37.2025.04.29.02.08.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 02:08:27 -0700 (PDT)
-From: mattiasbarthel@gmail.com
-To: wei.fang@nxp.com,
-	shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	troy.kisky@boundarydevices.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mattias Barthel <mattias.barthel@atlascopco.com>
-Subject: [PATCH net v1] net: fec: ERR007885 Workaround for conventional TX
-Date: Tue, 29 Apr 2025 11:08:26 +0200
-Message-ID: <20250429090826.3101258-1-mattiasbarthel@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1745918625; c=relaxed/simple;
+	bh=bxXi4bzflUGg0XRChcdu0vilXlrsAE9J350glGTXHc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NnHj5vNdFwkJxznXKqWOJTszZcabmNxULuk5cN49LepS3a26+mXTmaRk+uPTQJ1wLW1lYl/rwPQ3BDhvZmmvZc17CdghlZCdELju9MGotqsM75KjCcni4ygmAOrhJJsbH8GtPWo5kfB6GEAS4MyqS0EpszG4CFSVMSswWDBGgZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QdVboiFC; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=x3bWo1ELL19pa+d0Sb967tWb6OV53ljAQpQ/pusGFUM=; b=QdVboiFCpHr/Orl+7h5UJxnfPZ
+	hdLs16FtVQaFTKC1TP7KW15TTm63H7983/ASTjWHimV6khmEn9j/+UYMp2rNuZiLYITxq5egqkcrz
+	/FUXDgPIokyVMnv+IIZuTRxhswRwyeZ3TlphFakhtwwtMvyYM0SsLFoaJptffjX0lAX5iSRMqx2EL
+	ap9r3KHVXBk5UJmb88OCrfvg7VK/cqS+C0iMIqMJYpsa3pEYF+8QG2eDq010coHphPydf98uGDqr8
+	gPxr3vgwFc2nKtp4xyZ55OdSz5XSYQZ6YcW9Fgfb24AfmJGq1iGFNC1q6ZU2w1+21iPoWcsj0fsqI
+	8D1hn0zQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1u9hBe-0000000DFRA-117H;
+	Tue, 29 Apr 2025 09:23:34 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B12EF30035E; Tue, 29 Apr 2025 11:23:33 +0200 (CEST)
+Date: Tue, 29 Apr 2025 11:23:33 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>
+Subject: Re: [PATCH net-next v2 06/18] netfilter: nf_dup{4, 6}: Move
+ duplication check to task_struct
+Message-ID: <20250429092333.GG4198@noisy.programming.kicks-ass.net>
+References: <20250414160754.503321-1-bigeasy@linutronix.de>
+ <20250414160754.503321-7-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414160754.503321-7-bigeasy@linutronix.de>
 
-From: Mattias Barthel <mattias.barthel@atlascopco.com>
+On Mon, Apr 14, 2025 at 06:07:42PM +0200, Sebastian Andrzej Siewior wrote:
+> nf_skb_duplicated is a per-CPU variable and relies on disabled BH for its
+> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+> this data structure requires explicit locking.
+> 
+> Due to the recursion involved, the simplest change is to make it a
+> per-task variable.
+> 
+> Move the per-CPU variable nf_skb_duplicated to task_struct and name it
+> in_nf_duplicate. Add it to the existing bitfield so it doesn't use
+> additional memory.
+> 
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Juri Lelli <juri.lelli@redhat.com>
+> Cc: Vincent Guittot <vincent.guittot@linaro.org>
+> Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Ben Segall <bsegall@google.com>
+> Cc: Mel Gorman <mgorman@suse.de>
+> Cc: Valentin Schneider <vschneid@redhat.com>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  include/linux/netfilter.h        | 11 -----------
+>  include/linux/sched.h            |  1 +
+>  net/ipv4/netfilter/ip_tables.c   |  2 +-
+>  net/ipv4/netfilter/nf_dup_ipv4.c |  6 +++---
+>  net/ipv6/netfilter/ip6_tables.c  |  2 +-
+>  net/ipv6/netfilter/nf_dup_ipv6.c |  6 +++---
+>  net/netfilter/core.c             |  3 ---
+>  7 files changed, 9 insertions(+), 22 deletions(-)
 
-Activate TX hang workaround also in
-fec_enet_txq_submit_skb() when TSO is not enabled.
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 
-Errata: ERR007885
-
-Symptoms: NETDEV WATCHDOG: eth0 (fec): transmit queue 0 timed out
-
-commit 37d6017b84f7 ("net: fec: Workaround for imx6sx enet tx hang when enable three queues")
-There is a TDAR race condition for mutliQ when the software sets TDAR
-and the UDMA clears TDAR simultaneously or in a small window (2-4 cycles).
-This will cause the udma_tx and udma_tx_arbiter state machines to hang.
-
-So, the Workaround is checking TDAR status four time, if TDAR cleared by
-    hardware and then write TDAR, otherwise don't set TDAR.
-
-Fixes: 53bb20d1faba ("net: fec: add variable reg_desc_active to speed things up")
-Signed-off-by: Mattias Barthel <mattias.barthel@atlascopco.com>
----
- drivers/net/ethernet/freescale/fec_main.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a86cfebedaa8..17e9bddb9ddd 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -714,7 +714,12 @@ static int fec_enet_txq_submit_skb(struct fec_enet_priv_tx_q *txq,
- 	txq->bd.cur = bdp;
- 
- 	/* Trigger transmission start */
--	writel(0, txq->bd.reg_desc_active);
-+	if (!(fep->quirks & FEC_QUIRK_ERR007885) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active) ||
-+	    !readl(txq->bd.reg_desc_active))
-+		writel(0, txq->bd.reg_desc_active);
- 
- 	return 0;
- }
--- 
-2.43.0
 
 
