@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-186848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ADABAA1BFB
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B250AA1BFD
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 458EB1BC08AC
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:19:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C28A1BC24CB
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAECC270EDB;
-	Tue, 29 Apr 2025 20:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265ED2749FB;
+	Tue, 29 Apr 2025 20:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2h1M0uk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TgwhIlgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D2126D4D5;
-	Tue, 29 Apr 2025 20:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C60726FDBB;
+	Tue, 29 Apr 2025 20:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745957859; cv=none; b=jAPnpA9+A6g9kbLxkbQrbU3Rc+8criN5VpBmCnOLkbawiEj7RBx86AS37vtNw+vGXJs9e7okVtObRfl5sQCa/E5Dsg7xvK5uCfbBsZTb/72g2c47RbvwJS6g5xhme52sOKoaaj7x00e7LhVOZOZydMElXuD3gpLHg8TQtPnpifk=
+	t=1745957861; cv=none; b=QlL3Ry12gH8g/nJ5y6edALXcm8LnFsNbgX/f2L6uT8K9Y9w4F57G8LueY7om21HnzgW1GwcFrwWZ7WpbIg70XO5m9JuwgbtGKRDLt56hEjFdJDFV4Usgj774iCQXUCg3nskyzO9Ojo2OMm5vOKMuyL21VP+LgES5b7gNFNr/FCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745957859; c=relaxed/simple;
-	bh=OyfoL4dg4jOrrHgAB98UspsGy9e2jurahMZb59aN27g=;
+	s=arc-20240116; t=1745957861; c=relaxed/simple;
+	bh=so66WP6Aaj8gptbBVhszIWMXAn7ZiaCYJOt4hGq8KfI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DRkNOIaWttY4cWfvRsF0KOEldsDVNko3ldzZrdEPmZXA+JLORBb6ZTDiiBJ7YR63PHW3oZndV5cJgY5m79SQuGp5lVq9r48HDW4dFcMzyIHsL5kP360y8Kg66C9XYhfr5nnA9gw3QwaKs6auv6WnwgYkb6Iicbdv+bMRsS3WTFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2h1M0uk; arc=none smtp.client-ip=209.85.208.45
+	 MIME-Version; b=p067m3gCU6IEcDC7lQs3oMkV4Pop5Eff592f1uiJwyYJoHWQbAWkXxJLu885Jl4gDUnMAc4eD/ClOErkJfaPg4v6xVywqSvqwvIwCZiuxQI8lQRF3y5QnjBoI8+l2dSXJL+0A1O6QJp/0fiECBLJFaTwiTdRuHv+TEZrRrryU/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TgwhIlgq; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e61d91a087so10268636a12.0;
-        Tue, 29 Apr 2025 13:17:37 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5f62d3ed994so11726708a12.2;
+        Tue, 29 Apr 2025 13:17:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745957856; x=1746562656; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745957857; x=1746562657; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6YluLA/cjNdRsPKzNlcYRBddzxqszjgxx9cIg46mMLU=;
-        b=J2h1M0ukouOP4GLgkjbcE0EfRz6yN2SSXT4UsXMQJZHKpmbcWnjySIzcdDQUr6wIBf
-         +6nBXBPZ5AFjYOWKMhMgxz7hI6DCIStI71wYLilcPCGhTl3AweN1xP2xUioKuzbu4vDC
-         0sBGF+T73nBkkAc4TQrxh1on/QrvWh2ZGxOJ/GmrreVcSK3LDxrTn1mM/08cfVWf13GH
-         wVzsNU5m1+oZncdgSkyTvUqqwVXpZclk8TYhD7btvCAw3hgIJT7KWAr7cqZxHP+i3uWb
-         UKvXonLVxgMWoCQN+nae+Rv3n9ia2hqbXMd1ISBjmw3HbGfluArlvvefAxwLz1MZC0c+
-         PEpg==
+        bh=KDK49dhMLFcxQ+vwRz/oOcCQxP4BCt5EiPYfwgbH7bk=;
+        b=TgwhIlgq90cF/Z1ekiZF1eRRJXTOetp0fAm58HlwMYdm6smxvox1dGFNpVBYidDNyW
+         87kH22i/8SZINZoy62/qY0kNuGYnSeU9g8iMJKZAoV2W324Fg0d04mmKknAeR772lYwb
+         CrvGoTrwaP2KSnNCrHvSkMSjUNAEYVfQ+gfrPvfV9QL1lQ1uJReqeMiFc/yCsdRT34zj
+         75h58AhHYBB9r3ZSG+Anry1MtU98CTNLy7E+a8sFan35OME039bIwb8dTziTPSzzUJrw
+         tggqLdAAP0uAAUqhJ7HbL5D2RI7JUm9i5ioBHp6elJLlTE8RXf/4f3E4D3J3doD8NYls
+         +R3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745957856; x=1746562656;
+        d=1e100.net; s=20230601; t=1745957857; x=1746562657;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6YluLA/cjNdRsPKzNlcYRBddzxqszjgxx9cIg46mMLU=;
-        b=WAQAlw+dipxD9KnEwNU+qsnPI3lVcezQfn+PAMcqU/Zc2n0M0xjM30gn29dy4S/2K4
-         ELNkCXmpCK5wo7+p7OVH1Cz8j+uKe402XHGb/birMrslzjDrsDNru3apvJgDhnaJh8j/
-         s+Pb7SRxQtsUxXJLykpn6jlZRFVtN49ONoyUlRDxn7QSAYVXTOw7Ypfo5qZ3BTluh4vA
-         dUVVd1WN8rGEw1QXLXeSB4OjdftHrygXQl3hHoqBERjBUrOLgbyOphvntWD+hcD0bqDg
-         yyj5eAtBLO1j+pUzuLT0yU090LEICc7alIF4ef330lzlNtZtwFHUMPqUntZaOpJ78JcI
-         wwDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFSO4gMawM1/tGGbo2HGK51B/vuDkRxAcZWdvZ/xL88zAoyMza5ii5LwCkwMc0sqNRg6IRZP7sJtC1u10=@vger.kernel.org, AJvYcCUSqDAN/clX2cDvonGXx8W8CLpOWDfp/Xa28ZQ92ZIUk/RZlBNkgfrfkF2hr8RKuXAVAP/nXxpe@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3eWm5YsaX4TL1RaksrC+xzBgQaWanUDlRzku5BU4Uqj9UyUGQ
-	gGh8Qbt6HnBlFNFh1LvF8rF5aqNJ/cHuMwwCasVYjFuNZ8Xcq3Jy
-X-Gm-Gg: ASbGncuHcKWv8Ma2uhjCiKVIt87wSCIbArVRtNImAAyl0JH3qTu4gbmpyHAW2912QXX
-	2p0u8YCVjRMZkxvrDbIpoTogZnecC9gA87AaCHvHSQgB7cs5QjagrE1URzlkD/O8JdWxo3x9hcC
-	bGe/AkEZ/yLuDg0R71QdsymETzPD5rst3gLJrxs97BFXcL8aKz89BnVgzZQO885rXdpmTWc7ShQ
-	l+vxFFFbO3ECR5I+MPIqrGYg1SOGlElkUMdUAC8jfRFV41LD2e1lkjojfGfkYKq1IN53lcw6uWo
-	NSuNpLF/wn3Y5fvMzlWtev96KicJqR8ZfYXMplB+o45Qx3Lij+36Tm/vcbl3Xa9v9T57LuJVXL8
-	whkUBztavdULtOHcD5Ng=
-X-Google-Smtp-Source: AGHT+IGHrAknJLWCPmutveio/sagjgn2a5P1tnFbq7zD6jMc6dYaoAYEfMo8PoPIf7dFuogQdh/iQQ==
-X-Received: by 2002:a17:907:3e0b:b0:ac2:9c7d:e144 with SMTP id a640c23a62f3a-acedc734163mr69274566b.40.1745957855997;
-        Tue, 29 Apr 2025 13:17:35 -0700 (PDT)
+        bh=KDK49dhMLFcxQ+vwRz/oOcCQxP4BCt5EiPYfwgbH7bk=;
+        b=Ho2dXoph0MZblF9t/Ym5VeeVS4qSmHgW9vodoOpMeH1KE/k9yg6GDAcmdUyILAWtHa
+         t88QJy/+Kk4s/5dNJgg2Tz3kZA3E7/Rbt3SuQdxcKCs0CI/hrqU7PwBlmSNgHarWNbLI
+         jvRe3ZBKE4zkUvXtUfb6izp/9p2HvOaeidkIytGJjlju4K9lZPS1i+/2Y6GXgpebq5u6
+         IwJlnaN8uPL7sZvV8YhP6bLp0xkY6bpIyJoLPAc8GO12Cd0W6bnNcsX2laAhNT3SDWxM
+         gqGQYe+j2qSAh1sN0Boc3HsjiXg9J14wbOULKmt+UcEcV4bQiaJoB9zVpxb3hgLUaixZ
+         vGVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7TyEPf4TYfQmmPrTwNkalsI3Sq+l63UI9Gekjw5ovvIi/raFlPo2dALqh1hD91btNXlGerhqZ@vger.kernel.org, AJvYcCXVecSLw3gfiz2NqI9Z04fjN0wahNWnCx39zLD3C1TK/Vd5Q/94Zc0OlcpnoMoU5gLfgKvYB36G1lOArYs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze2/5wiU7JKSKDk8oaazTBajaUfL27gqOZLy+Gqvk5fAIFJJMd
+	Da+lqcffBTJ/Xpv2NvnxPFhccaP/VtsWL62oKuGTu19V1fciExxg
+X-Gm-Gg: ASbGncuYcKdjKRqWW4cAwEXkAB4Is5x6y1DUG4pWpQAvc9pDSvZL1cFioh6Cw3lwghi
+	4GPHu54sFGBR56U4rDaIJrDrVM5wHpHOWTKUWHfiD/HpAS0HS4BmY8lYX5BsBe7WzswDUAtysjE
+	8Ly8u+Lg6qgxKR64UsmbyA7CluoxUZgLYBl8RJTj4ipEJPQRmneaAz/90egPVt5WLyfbKLoc4CF
+	Gz0EstJFJqPTb32IbMM5svsP5Nrh6GO0sd6uXhts80Dugu1NZ9DLcCOWOzvLvsPPoyCTN6215YB
+	CU/vFckw/gJ5KZ2DBRaImzI/IGu6KdcZyCuyeStWKOVc76f2krkhAHj3sVtXGZhmlnAoC//ajwc
+	6DLVKuKd2HfRStfJdMNc=
+X-Google-Smtp-Source: AGHT+IGszZUFVe/1fddVKVtCKfE/40i3EkrAuwBiACY9MJT5CbfqgtSjDYTyBgYNXiONMne6C6giDA==
+X-Received: by 2002:a17:906:1119:b0:acb:bbc4:3344 with SMTP id a640c23a62f3a-acedc5e042cmr54989166b.22.1745957857174;
+        Tue, 29 Apr 2025 13:17:37 -0700 (PDT)
 Received: from localhost (dslb-002-205-023-067.002.205.pools.vodafone-ip.de. [2.205.23.67])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ecf77dasm822417066b.87.2025.04.29.13.17.35
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41c491sm822230866b.34.2025.04.29.13.17.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 13:17:35 -0700 (PDT)
+        Tue, 29 Apr 2025 13:17:36 -0700 (PDT)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -86,9 +86,9 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 06/11] net: dsa: b53: always rejoin default untagged VLAN on bridge leave
-Date: Tue, 29 Apr 2025 22:17:05 +0200
-Message-ID: <20250429201710.330937-7-jonas.gorski@gmail.com>
+Subject: [PATCH net 07/11] net: dsa: b53: do not allow to configure VLAN 0
+Date: Tue, 29 Apr 2025 22:17:06 +0200
+Message-ID: <20250429201710.330937-8-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250429201710.330937-1-jonas.gorski@gmail.com>
 References: <20250429201710.330937-1-jonas.gorski@gmail.com>
@@ -100,36 +100,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-While JOIN_ALL_VLAN allows to join all VLANs, we still need to keep the
-default VLAN enabled so that untagged traffic stays untagged.
+Since we cannot set forwarding destinations per VLAN, we should not have
+a VLAN 0 configured, as it would allow untagged traffic to work across
+ports on VLAN aware bridges regardless if a PVID untagged VLAN exists.
 
-So rejoin the default VLAN even for switches with JOIN_ALL_VLAN support.
+So remove the VLAN 0 on join, an re-add it on leave. But only do so if
+we have a VLAN aware bridge, as without it, untagged traffic would
+become tagged with VID 0 on a VLAN unaware bridge.
 
-Fixes: 48aea33a77ab ("net: dsa: b53: Add JOIN_ALL_VLAN support")
+Fixes: a2482d2ce349 ("net: dsa: b53: Plug in VLAN support")
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/dsa/b53/b53_common.c | 36 ++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index c60b552b945c..4871e117f5ef 100644
+index 4871e117f5ef..0b28791cca52 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -2021,12 +2021,12 @@ void b53_br_leave(struct dsa_switch *ds, int port, struct dsa_bridge bridge)
- 		if (!(reg & BIT(cpu_port)))
- 			reg |= BIT(cpu_port);
- 		b53_write16(dev, B53_VLAN_PAGE, B53_JOIN_ALL_VLAN_EN, reg);
--	} else {
--		b53_get_vlan_entry(dev, pvid, vl);
--		vl->members |= BIT(port) | BIT(cpu_port);
--		vl->untag |= BIT(port) | BIT(cpu_port);
--		b53_set_vlan_entry(dev, pvid, vl);
- 	}
+@@ -1544,6 +1544,9 @@ int b53_vlan_add(struct dsa_switch *ds, int port,
+ 	if (err)
+ 		return err;
+ 
++	if (vlan->vid == 0)
++		return 0;
 +
-+	b53_get_vlan_entry(dev, pvid, vl);
-+	vl->members |= BIT(port) | BIT(cpu_port);
-+	vl->untag |= BIT(port) | BIT(cpu_port);
-+	b53_set_vlan_entry(dev, pvid, vl);
+ 	b53_read16(dev, B53_VLAN_PAGE, B53_VLAN_PORT_DEF_TAG(port), &old_pvid);
+ 	if (pvid)
+ 		new_pvid = vlan->vid;
+@@ -1556,10 +1559,7 @@ int b53_vlan_add(struct dsa_switch *ds, int port,
+ 
+ 	b53_get_vlan_entry(dev, vlan->vid, vl);
+ 
+-	if (vlan->vid == 0 && vlan->vid == b53_default_pvid(dev))
+-		untagged = true;
+-
+-	if (vlan->vid > 0 && dsa_is_cpu_port(ds, port))
++	if (dsa_is_cpu_port(ds, port))
+ 		untagged = false;
+ 
+ 	vl->members |= BIT(port);
+@@ -1589,6 +1589,9 @@ int b53_vlan_del(struct dsa_switch *ds, int port,
+ 	struct b53_vlan *vl;
+ 	u16 pvid;
+ 
++	if (vlan->vid == 0)
++		return 0;
++
+ 	b53_read16(dev, B53_VLAN_PAGE, B53_VLAN_PORT_DEF_TAG(port), &pvid);
+ 
+ 	vl = &dev->vlans[vlan->vid];
+@@ -1935,8 +1938,9 @@ int b53_br_join(struct dsa_switch *ds, int port, struct dsa_bridge bridge,
+ 		bool *tx_fwd_offload, struct netlink_ext_ack *extack)
+ {
+ 	struct b53_device *dev = ds->priv;
++	struct b53_vlan *vl;
+ 	s8 cpu_port = dsa_to_port(ds, port)->cpu_dp->index;
+-	u16 pvlan, reg;
++	u16 pvlan, reg, pvid;
+ 	unsigned int i;
+ 
+ 	/* On 7278, port 7 which connects to the ASP should only receive
+@@ -1945,6 +1949,9 @@ int b53_br_join(struct dsa_switch *ds, int port, struct dsa_bridge bridge,
+ 	if (dev->chip_id == BCM7278_DEVICE_ID && port == 7)
+ 		return -EINVAL;
+ 
++	pvid = b53_default_pvid(dev);
++	vl = &dev->vlans[pvid];
++
+ 	/* Make this port leave the all VLANs join since we will have proper
+ 	 * VLAN entries from now on
+ 	 */
+@@ -1956,6 +1963,15 @@ int b53_br_join(struct dsa_switch *ds, int port, struct dsa_bridge bridge,
+ 		b53_write16(dev, B53_VLAN_PAGE, B53_JOIN_ALL_VLAN_EN, reg);
+ 	}
+ 
++	if (ds->vlan_filtering) {
++		b53_get_vlan_entry(dev, pvid, vl);
++		vl->members &= ~BIT(port);
++		if (vl->members == BIT(cpu_port))
++			vl->members &= ~BIT(cpu_port);
++		vl->untag = vl->members;
++		b53_set_vlan_entry(dev, pvid, vl);
++	}
++
+ 	b53_read16(dev, B53_PVLAN_PAGE, B53_PVLAN_PORT_MASK(port), &pvlan);
+ 
+ 	b53_for_each_port(dev, i) {
+@@ -2023,10 +2039,12 @@ void b53_br_leave(struct dsa_switch *ds, int port, struct dsa_bridge bridge)
+ 		b53_write16(dev, B53_VLAN_PAGE, B53_JOIN_ALL_VLAN_EN, reg);
+ 	}
+ 
+-	b53_get_vlan_entry(dev, pvid, vl);
+-	vl->members |= BIT(port) | BIT(cpu_port);
+-	vl->untag |= BIT(port) | BIT(cpu_port);
+-	b53_set_vlan_entry(dev, pvid, vl);
++	if (ds->vlan_filtering) {
++		b53_get_vlan_entry(dev, pvid, vl);
++		vl->members |= BIT(port) | BIT(cpu_port);
++		vl->untag |= BIT(port) | BIT(cpu_port);
++		b53_set_vlan_entry(dev, pvid, vl);
++	}
  }
  EXPORT_SYMBOL(b53_br_leave);
  
