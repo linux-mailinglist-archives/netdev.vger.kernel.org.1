@@ -1,371 +1,216 @@
-Return-Path: <netdev+bounces-186804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B19AAA14AB
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:19:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2290AA14B4
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:19:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FD491BA4B2A
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:16:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1991BA6D20
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F24D24A07D;
-	Tue, 29 Apr 2025 17:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EA025393E;
+	Tue, 29 Apr 2025 17:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FM3/RfEf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAKnOquk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D607245007;
-	Tue, 29 Apr 2025 17:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDD8253354;
+	Tue, 29 Apr 2025 17:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745946917; cv=none; b=MP5Q0GX9Dkf1voozel+cdddO+gyO24Vi+NClUB32DsOZWUxwC10eGHzlljr+PnMRYRtSoSpFxikBPa4oZaLYiSNBlRjPjbeOGF7vj2f8NHohYO9KjKh/0TQsN9GQbBi3nzH2VbJRIyBzm/w7Gf64AKqtri0UpzJ07rFVFwk6zZ8=
+	t=1745946925; cv=none; b=saTU7ckFyj4ijoU+Vfl3LWRIjvP5/4TSlVTM6cj+qRTAR2z4ITv8HwQeJtuY5O8uqltnnznyMHUSyZE8WsbLbiyQtH9lr5CcYjmsrGr4AlA8puOzNmR+tylQE3+DWwGwq3ygl2rlll/5y+PDLXscUcCOTDts0PwZvFbo5R70zXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745946917; c=relaxed/simple;
-	bh=3mg4I7QyOW1gVwOz/6rYaIXF4k7NSz/cTj9ZXZq/4CA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IROGE1zGsbuxO/Nr5FnDZi8lkwU1ysE0M1tqpNG2vuCAR0I7HFJZXA7uim2tgbDYK6zrDxznmrFTm7Z48c7zNz0JnOg7KI16RWzfqu6pO5atJ+aCwx2ZHdMUAaSL55Us9KC6vXwiJLyUTGREsVeJZywMBRF4keRk57HhggPPkQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FM3/RfEf; arc=none smtp.client-ip=209.85.167.182
+	s=arc-20240116; t=1745946925; c=relaxed/simple;
+	bh=J2dDK33QVlVsGOMfWBz/CSOixKepXiTCR9mMLhsRO2E=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=msqjUrKVKnuVN4G2Sqn+Pow/+37/MNSKs7bB95ZAV5G/3bBRmLOwTzjozgs9b/2dWX95qXFWzGgbmSP4j91cQkoIOl5WWwbXtzp6W18r1k15xv3JmhEds++XT452fZ6sQaqocu6xhTGRACaOIktxqiPmctV+FdBbyeaj93WcGYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lAKnOquk; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3f8d2f8d890so4087477b6e.0;
-        Tue, 29 Apr 2025 10:15:14 -0700 (PDT)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4774ce422easo76493741cf.1;
+        Tue, 29 Apr 2025 10:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745946914; x=1746551714; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FmofmemgoWFhRw05fKVJOk2vZV3Pg/3zezcHkaC2gPM=;
-        b=FM3/RfEfqxEA8rRIvUkJwI4wEwoQAlMPzJEAwmYlH0yPTy85NmvZnJVOqpOl/QbV9/
-         1PGOAcaJEjAj96vjADqyamoLk7DiiieQ7gs1uHWYF4LxU70lSGN/LN8oiFmBFhvSWv8q
-         1HjSUPXW8+Bjh/YMPezPrjEk95d8KjSVvJ6KwrAVvM8JC98PR3IpuyqBFqgBS0BhukDV
-         3iBcBv22IxFqNaSeUQQkKhz6QpMXEtCPvg4eV6OpEGzeoi3EGHYi2aQUOAKjA0SGHFre
-         B4DIpXNVJzfZ3QAKLJUGmZzY44TFsoEvFdlMqwXXJxWgvvsYEa5vCb6CEIJpAjcm99Oj
-         ZL9g==
+        d=gmail.com; s=20230601; t=1745946923; x=1746551723; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XqCfwz88Yr+Nnr1Fpu/NIeG2sCG+K67kbeALk/yJmQ=;
+        b=lAKnOqukofR8irEb1/vnwUul4Avflv0oFixqzp9BNlUU7uLGOtiHQrajSKF4OOAxtZ
+         f/GeFNoQjr85osNoYjnDnnkopKJ6y4yU7qpaYF3axmSus686JOTHhsUSnXBZssT49CWe
+         I7+vJNzmch/z9I/leXymOHaSRJPXwPy2OGGeBi3/TwlgsczyaTNWAyYIcqtij36u3PnY
+         UqDX79PsGdJgRLs++FVpJEM7u/xvBQz/JqkPmi7spq1vEknQoWibTXw6+MhymIJvdfaM
+         RBWOAYohEBUf1J2XUbkBJXgOeJXbbdX+vu+d5YlpTGQ9+5A07CZSv24t7DTXprZhS9Yp
+         VYHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745946914; x=1746551714;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FmofmemgoWFhRw05fKVJOk2vZV3Pg/3zezcHkaC2gPM=;
-        b=Rg7qr/EPeM08zBqHE0Bb0vunfHqn+Fq2NRUKxr1Dxg67sJ3Fj7R4fGnop39T+OJftU
-         1qp0tD/CdeBmVW6yDtV6vZGj2Q7TfBkL1/qPXw8fSA/6ZZse3KiBRoIwIQHYle0bSWfQ
-         UX/Rsiwn6ucDoVFSa8UUcVcQslUeHbEhIoODQRetkZw68xsGEuZsuqJlMtjZJYOP3+7y
-         wOzXWlB+ucyL9EL9v91LYufy+dkeitsjq6XzXMhs0tdO5eHMOo2LwwqK4l0TTfwMRO0i
-         HuJoemuzvRwUlELefnG+REN85dyv9gxvvL2mxYsnsj+WaqRYtL87palxk2dBeDzrsWyZ
-         IS9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVMeJ/3faDT4SDkadpTlFjJFH5CbnbLEi/MVjj3o0wkD83gTrXZYRYjHTgEHlBUdj8CVyiIo0uq@vger.kernel.org, AJvYcCVhZN4/kiHCLMM6BGVPEgXOoqskmsXMpPwsZxG0dRaaLI1tqEuDmGJj1JxO+b7HHPHHCElhYY7VaeQg1FkFbF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTG4F5pgMe0kIw0bUubp79wf8jZJ80MK+xiRvCw5su6W0rLN6a
-	dT24tn4JMlkd2ocIdQfyE0TMJVvlpKd32G94o9b+hFqgk5LVtj+PYSRJvF3+J/3efOu2R/in6aZ
-	xBPT8quVwdChPd3+GCHW5lQAmNRI=
-X-Gm-Gg: ASbGncuzGicjL3SpTtqtSylM4QZJfbZ6QRFngRvMuNaIgI7BuCxPgsZKQyDVJS+N/HW
-	/6aIL5c/jBsNvyXiNCh08XKh0oezxqCT9REhM71T93PkhjRhCoBJwNb8wzzONoTDwkhlggTNiMo
-	UkTfOVwtzB2eNuvrikrhYURnsA2GfGZmvM9feXNvkCQM+jYThr04dw70jdvknSQus=
-X-Google-Smtp-Source: AGHT+IGVvH53UuIhNspPIC2B/maPvHC2bXaEeIwWfgVsATYlEe7sf/gZkW4Qf1oFMcDZb68RVR0J4Pse5D35aI2S37g=
-X-Received: by 2002:a05:6808:3194:b0:3f8:91d1:d950 with SMTP id
- 5614622812f47-4024399b8b3mr116588b6e.38.1745946914208; Tue, 29 Apr 2025
- 10:15:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745946923; x=1746551723;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0XqCfwz88Yr+Nnr1Fpu/NIeG2sCG+K67kbeALk/yJmQ=;
+        b=n61/BLnMdpOyQCW5xkLMAl79jyMfu/Yn8wnRl2Olh3o3UPMjFmThXNo6uDAgWU07FH
+         R0MLMHNCXrYMDIIuTDj/3gCLXILeQg3CqXBwYsxVlBi9wPko1AsUrIjVwD+2n5PPBTN9
+         820e8p1+fu3J/XgjxLhXgp/KNmjw7EAqq5vIXdY7MPw4heLPbJMWLwYAW4zgunbM/uR2
+         BFTP2PnGrSuM60a2T4OqRTRUfkwQ3EDXJDmENrp28xtyejojYejbxyeELczJ5cHsHJ1K
+         n1avDwcI4JvtEcWc+tLt631/ORlZuUyxJsrbBDVFZdZkLK1nSQ4wmigd7ggFMgv+j4Ko
+         ajRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7mWpX4wx/UXliWdZc6TZ1F8HGmBbMXb5vi4b1g41FhgiEpAQFLkPBtVAtAh70cYPjkUQPOM9q@vger.kernel.org, AJvYcCVg/12s7jS/9IX7GEQFRb510cBTUA2qM2HJHSYFRw9t3niTDmPcUrINO8P6zqY+h5LGvEvlIVIex1EbpLR9JXc=@vger.kernel.org, AJvYcCXZ0woYEXey9RdLjD9blXJ0q0EMDmfKM2F/i5gzAYo9IW0LYAQojnNuRQivk4CNTb0UjBOQL+o7HP+wNaE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBsq5joVd41HSl0OyD+2HcuirjKGD27FajDFD1fbnOnQPUaBHd
+	v5mdB7sDqas+giagJPb4ydnAbmD/LCX+PsqPZnfzRAkHvyGrX5Yl
+X-Gm-Gg: ASbGncuZtq9XZ6M18saoxRInbZS0PUqj4fN4dKKpDGAUurQR4A+QtGJGb128Un5Ma2u
+	WXNaEQ9fuXI6ZkYRnG9spH+/JAFeET2bK6GJOITwqVVyj9WuBJs2TZkNmqLgsAWKE5xsc/Wqkhj
+	x396UIbH4WowV27xop41Dq/r4ujb1aLH/pgWWAtau//2lp6o2AWcJwSzGTn0bxdj1iL/SjD3+K0
+	jZBBzoChpSr7cxeE+as27DMFZCyEhu67Jnh4+9LFuE7Fy+nKKu6lLisLA91hbwrZwtsuY7XkGq6
+	xOTYKtJ2Rrqy1h0W1vnQDuBV9qJaTYnO7bY53Gvia8e+UcYJ6MoehRdXJ4EUyyvCGM0SLSSE14t
+	O2enD3NhHyvmZUA0/FBYTzRAGYDF7HcE=
+X-Google-Smtp-Source: AGHT+IF84CyHlEuo5GJQfLI/neYy1T6WPo9fcqPp+3+2ph4jT5u/Vsi4HxpHyDu/W1EES00OqZBfwQ==
+X-Received: by 2002:ac8:5755:0:b0:476:c656:4e80 with SMTP id d75a77b69052e-48132e8c0c0mr250826151cf.34.1745946922788;
+        Tue, 29 Apr 2025 10:15:22 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47e9f0cf12fsm83203531cf.21.2025.04.29.10.15.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 10:15:22 -0700 (PDT)
+Message-ID: <6811092a.050a0220.27f104.5603@mx.google.com>
+X-Google-Original-Message-ID: <aBEJJvS2enY0Icns@winterfell.>
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 59C111200043;
+	Tue, 29 Apr 2025 13:15:21 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 29 Apr 2025 13:15:21 -0400
+X-ME-Sender: <xms:KQkRaFcQssbYdF8bXv09rQ4_iEt5Q-K1E1w4yqGS8NbXMFUdtEGTUQ>
+    <xme:KQkRaDM7qV6EUXGZCHlXWQnK4w7G83qBj3ohjV4YSTqD7qxNo2Q05WFifmpOmYGOr
+    QADgsrVGIIlMJXtGg>
+X-ME-Received: <xmr:KQkRaOheoh3HJ9kI-Ao52G9j0JWs1v5DJ9eIPxoAUzDWlcj0G3pz0XCxEQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvieegfeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeetgedujeejudehveekteetfeefhfffheet
+    gfeugfetffekieetiedtudehgfffgfenucffohhmrghinhepghhithhhuhgsrdgtohhmpd
+    hkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgr
+    ihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqd
+    eiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhl
+    rdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepgedtpdhmohguvgepsh
+    hmthhpohhuthdprhgtphhtthhopegrrhhnugesrghrnhgusgdruggvpdhrtghpthhtohep
+    fhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopegrrd
+    hhihhnuggsohhrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhr
+    qdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepghgrrhihse
+    hgrghrhihguhhordhnvghtpdhrtghpthhtoheprghlihgtvghrhihhlhesghhoohhglhgv
+    rdgtohhmpdhrtghpthhtohepmhgvsehklhhovghnkhdruggvvhdprhgtphhtthhopegurg
+    hnihgvlhdrrghlmhgvihgurgestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopehl
+    ihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:KQkRaO9EKnJAUUNmHmqkvLZR89ctTlTOvjYdKcqqA4LAkRNcchrAsQ>
+    <xmx:KQkRaBvYhaCWlByxqJZxSnY34EPFnxImDe9uB66G0D53e6LHsIxIrQ>
+    <xmx:KQkRaNHh77xBpJfF0c4GhmVRaRqunokSrMOu26joUiZzuNbeBr95-A>
+    <xmx:KQkRaIN9TtQcHoYSwHJuHZdrHPkvspssTYI7djBUgxTaNRP269G_4w>
+    <xmx:KQkRaKPvo0ED7Ki1F1gLQkRMVinssHoqbT1BAICB5FFVleB56s57EeYs>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 29 Apr 2025 13:15:20 -0400 (EDT)
+Date: Tue, 29 Apr 2025 10:15:18 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,	rust-for-linux@vger.kernel.org,
+ Gary Guo <gary@garyguo.net>,	Alice Ryhl <aliceryhl@google.com>,
+ me@kloenk.dev,	daniel.almeida@collabora.com,
+ linux-kernel@vger.kernel.org,	Netdev <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>,	Heiner Kallweit <hkallweit1@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Anna-Maria Gleixner <anna-maria@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,	John Stultz <jstultz@google.com>,
+ Stephen Boyd <sboyd@kernel.org>,	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Benjamin Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>, tgunders@redhat.com,
+	david.laight.linux@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	Jocelyn Falempe <jfalempe@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Schrefl <chrisi.schrefl@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH v15 5/6] rust: time: Add wrapper for fsleep() function
+References: <6qQX4d2uzNlS_1BySS6jrsBgbZtaF9rsbHDza0bdk8rdArVf_YmGDTnaoo6eeNiU4U_tAg1-RkEOm2Wtcj7fhg==@protonmail.internalid>
+ <20250423192857.199712-6-fujita.tomonori@gmail.com>
+ <871ptc40ds.fsf@kernel.org>
+ <20250429.221733.2034231929519765445.fujita.tomonori@gmail.com>
+ <5c18acfc-7893-4731-9292-dc69a7acdff2@app.fastmail.com>
+ <de778f47-9bc6-4f4b-bb4f-828305ad4217@app.fastmail.com>
+ <1b9e8761-b71f-4015-bf7d-29072b02f2ac@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250426172025.9459-1-chia-yu.chang@nokia-bell-labs.com> <20250426172025.9459-2-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250426172025.9459-2-chia-yu.chang@nokia-bell-labs.com>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Tue, 29 Apr 2025 18:15:03 +0100
-X-Gm-Features: ATxdqUFemhdUNz5EampAyUMbPYK2LpYqGKPxoiCRao4tXy6UeqtfaouvhsvFTH0
-Message-ID: <CAD4GDZxPrgfMFLTG4Mc1VK0hM5ODP2tTFF771EhMzWnbC8BwaQ@mail.gmail.com>
-Subject: Re: [PATCH v13 net-next 1/5] Documentation: netlink: specs: tc: Add
- DualPI2 specification
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com, 
-	pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org, 
-	stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	andrew+netdev@lunn.ch, ast@fiberby.net, liuhangbin@gmail.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b9e8761-b71f-4015-bf7d-29072b02f2ac@app.fastmail.com>
 
-On Sat, 26 Apr 2025 at 18:20, <chia-yu.chang@nokia-bell-labs.com> wrote:
->
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
->
-> Introduce the specification of tc qdisc DualPI2 stats and attributes,
-> which is the reference implementation of IETF RFC9332 DualQ Coupled AQM
-> (https://datatracker.ietf.org/doc/html/rfc9332) providing two different
-> queues: low latency queue (L-queue) and classic queue (C-queue).
+On Tue, Apr 29, 2025 at 06:11:02PM +0200, Arnd Bergmann wrote:
+> On Tue, Apr 29, 2025, at 18:03, Boqun Feng wrote:
+> > On Tue, Apr 29, 2025, at 8:51 AM, Arnd Bergmann wrote:
+> >> On Tue, Apr 29, 2025, at 15:17, FUJITA Tomonori wrote:
+> >>> On Mon, 28 Apr 2025 20:16:47 +0200 Andreas Hindborg <a.hindborg@kernel.org> wrote:
+> >>>      /// Return the number of milliseconds in the [`Delta`].
+> >>>      #[inline]
+> >>> -    pub const fn as_millis(self) -> i64 {
+> >>> -        self.as_nanos() / NSEC_PER_MSEC
+> >>> +    pub fn as_millis(self) -> i64 {
+> >>> +        math64::div64_s64(self.as_nanos(), NSEC_PER_MSEC)
+> >>>      }
+> >>>  }
+> >>
+> >> I think simply calling ktime_to_ms()/ktime_to_us() should result
+> >> in reasonably efficient code, since the C version is able to
+> >> convert the constant divisor into a multiply/shift operation.
+> >>
+> >
+> > Well, before we jump into this, I would like to understand why
+> > this is not optimized with multiply/shift operations on arm in
+> > Rust code. Ideally all the dividing constants cases should not
+> > need to call a C function.
+> 
+> I think it's just because nobody has rewritten the
+> macros from include/asm-generic/div64.h into rust code.
+> 
+> The compiler could do the same transformation, but they
+> generally just fall back to calling a libgcc function.
+> 
 
-General comment is that this does not work. Please test it like this:
+FWIW, I found this:
 
-sudo tc qdisc add dev eth0 handle 1: root dualpi2
-./tools/net/ynl/pyynl/cli.py \
-    --spec Documentation/netlink/specs/tc.yaml --dump getqdisc
+	https://github.com/llvm/llvm-project/issues/63731
 
-Consider moving this patch to the end of the series so that it can be
-tested against the implementation patches.
+seems a WIP though.
 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> ---
->  Documentation/netlink/specs/tc.yaml | 166 ++++++++++++++++++++++++++++
->  1 file changed, 166 insertions(+)
->
-> diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
-> index aacccea5dfe4..9eaab15cc216 100644
-> --- a/Documentation/netlink/specs/tc.yaml
-> +++ b/Documentation/netlink/specs/tc.yaml
-> @@ -51,6 +51,31 @@ definitions:
->        - tundf
->        - tunoam
->        - tuncrit
-> +  -
-> +    name: tc-dualpi2-drop-overload-flags
-> +    type: flags
-> +    entries:
-> +      - drop
-> +      - overflow
+Would it make sense if we rely on compiler optimization when it's
+avaiable (for x86_64, arm64, riscv, etc), and only call ktime_to_ms() if
+not? The downside of calling ktime_to_ms() are:
 
-These enums need to be defined as part of the UAPI in pkt_sched.h and
-this file needs to be in sync with those definitions.
+* it's a call function, and cannot be inlined with LTO or INLINE_HELPER:
 
-This enum seems to contradict the comment in sch_dualpi2.c:
+	https://lore.kernel.org/all/20250319205141.3528424-1-gary@garyguo.net/
 
-bool drop_overload; /* Drop (1) on overload, or overflow (0) */
+* it doesn't provide the overflow checking even if
+  CONFIG_RUST_OVERFLOW_CHECKS=y
 
-> +  -
-> +    name: tc-dualpi2-drop-early-flags
-> +    type: flags
-> +    entries:
-> +      - drop-enqueue
-> +      - drop-dequeue
+Thoughts?
 
-Also contradicts comment in sch_dualpi2.c:
+Regards,
+Boqun
 
-bool drop_early; /* Drop at enqueue instead of dequeue if true */
-
-> +  -
-> +    name: tc-dualpi2-ecn-mask-flags
-> +    type: flags
-> +    entries:
-> +      - l4s-ect
-> +      - any-ect
-> +      - none
-> +  -
-> +    name: tc-dualpi2-credit-queue-flags
-> +    type: flags
-> +    entries:
-> +      - C-queue
-> +      - L-queue
->    -
->      name: tc-stats
->      type: struct
-> @@ -816,6 +841,64 @@ definitions:
->        -
->          name: drop-overmemory
->          type: u32
-> +  -
-> +    name: tc-dualpi2-xstats
-> +    type: struct
-> +    members:
-> +      -
-> +        name: prob
-> +        type: u32
-> +        doc: Current probability
-> +      -
-> +        name: delay-c
-> +        type: u32
-> +        doc: Current C-queue delay in microseconds
-> +      -
-> +        name: delay-l
-> +        type: u32
-> +        doc: Current L-queue delay in microseconds
-> +      -
-> +        name: pkts-in-c
-> +        type: u32
-> +        doc: Number of packets enqueued in the C-queue
-> +      -
-> +        name: pkts-in-l
-> +        type: u32
-> +        doc: Number of packets enqueued in the L-queue
-> +      -
-> +        name: maxq
-> +        type: u32
-> +        doc: Maximum number of packets seen by the DualPI2
-> +      -
-> +        name: ecn-mark
-> +        type: u32
-> +        doc: All packets marked with ecn
-> +      -
-> +        name: step-mark
-> +        type: u32
-> +        doc: Only packets marked with ecn due to L-queue step AQM
-> +      -
-> +        name: credit
-> +        type: s32
-> +        doc: Current credit value for WRR
-
-The credit member is declared in the wrong place here. The struct
-members must match those from struct tc_dualpi2_xstats, in exactly the
-same order.
-
-> +      -
-> +        name: credit-queue
-> +        type: u8
-> +        doc: Current credit queue
-> +        enum: tc-dualpi2-credit-queue-flags
-> +        enum-as-flags: true
-
-The credit-queue member does not exist in struct tc_dualpi2_xstats so
-should be removed from here.
-
-> +      -
-> +        name: memory-used
-> +        type: u32
-> +        doc: Memory used in bytes by the DualPI2
-> +      -
-> +        name: max-memory-used
-> +        type: u32
-> +        doc: Maximum memory used in bytes by the DualPI2
-> +      -
-> +        name: memory-limit
-> +        type: u32
-> +        doc: Memory limit in bytes
->    -
->      name: tc-fq-pie-xstats
->      type: struct
-> @@ -2299,6 +2382,83 @@ attribute-sets:
->        -
->          name: quantum
->          type: u32
-> +  -
-> +    name: tc-dualpi2-attrs
-> +    attributes:
-> +      -
-> +        name: limit
-> +        type: uint
-> +        doc: Limit of total number of packets in queue
-> +      -
-> +        name: memlimit
-
-The convention used in YNL specs is to use the same naming as the enum
-definition from the header, with the prefix stripped off. For this
-attribute that would be TCA_DUALPI2_MEMORY_LIMIT -> memory-limit
-
-> +        type: uint
-> +        doc: Memory limit of total number of packets in queue
-> +      -
-> +        name: target
-> +        type: uint
-> +        doc: Classic target delay in microseconds
-> +      -
-> +        name: tupdate
-> +        type: uint
-> +        doc: Drop probability update interval time in microseconds
-> +      -
-> +        name: alpha
-> +        type: uint
-> +        doc: Integral gain factor in Hz for PI controller
-> +      -
-> +        name: beta
-> +        type: uint
-> +        doc: Proportional gain factor in Hz for PI controller
-> +      -
-> +        name: step-thresh
-> +        type: uint
-> +        doc: L4S step marking threshold (see also step-packets)
-> +      -
-> +        name: step-packets
-> +        type: flag
-> +        doc: L4S Step marking threshold unit in packets (otherwise is in microseconds)
-> +      -
-> +        name: min-qlen-step
-> +        type: uint
-> +        doc: Packets enqueued to the L-queue can apply the step threshold when the queue length of L-queue is larger than this value. (0 is recommended)
-> +      -
-> +        name: coupling-factor
-
-The definition is TCA_DUALPI2_COUPLING so either this should be
-"coupling" or the enum name should be expanded.
-
-> +        type: uint
-> +        doc: Probability coupling factor between Classic and L4S (2 is recommended)
-> +      -
-> +        name: overload
-
-The definition is TCA_DUALPI2_DROP_OVERLOAD so this should be "drop-overload"
-
-> +        type: uint
-> +        doc: Control the overload strategy (drop to preserve latency or let the queue overflow)
-> +        enum: tc-dualpi2-drop-overload-flags
-> +        enum-as-flags: true
-> +      -
-> +        name: drop-early
-> +        type: uint
-> +        doc: Decide where the Classic packets are PI-based dropped or marked
-> +        enum: tc-dualpi2-drop-early-flags
-> +        enum-as-flags: true
-> +      -
-> +        name: classic-protection
-
-Also does not match the eum definition. Should the enum name be expanded?
-
-> +        type: uint
-> +        doc: Classic WRR weight in percentage (from 0 to 100)
-> +      -
-> +        name: ecn-mask
-> +        type: uint
-> +        doc: Configure the L-queue ECN classifier
-> +        enum: tc-dualpi2-ecn-mask-flags
-> +        enum-as-flags: true
-> +      -
-> +        name: split-gso
-> +        type: flag
-> +        doc: Split aggregated skb or not
-> +      -
-> +        name: max-rtt
-
-Does not exist in the DUALPI2 enum so should be removed.
-
-> +        type: uint
-> +        doc: The maximum expected RTT of the traffic that is controlled by DualPI2 in usec
-> +      -
-> +        name: typical-rtt
-
-Also does not exist in the DUALPI2 enum so should be removed.
-
-> +        type: uint
-> +        doc: The typical base RTT of the traffic that is controlled by DualPI2 in usec
->    -
->      name: tc-ematch-attrs
->      attributes:
-> @@ -3679,6 +3839,9 @@ sub-messages:
->        -
->          value: drr
->          attribute-set: tc-drr-attrs
-> +      -
-> +        value: dualpi2
-> +        attribute-set: tc-dualpi2-attrs
->        -
->          value: etf
->          attribute-set: tc-etf-attrs
-> @@ -3846,6 +4009,9 @@ sub-messages:
->        -
->          value: codel
->          fixed-header: tc-codel-xstats
-> +      -
-> +        value: dualpi2
-> +        fixed-header: tc-dualpi2-xstats
->        -
->          value: fq
->          fixed-header: tc-fq-qd-stats
-> --
-> 2.34.1
->
+>      Arnd
 
