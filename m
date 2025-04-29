@@ -1,129 +1,94 @@
-Return-Path: <netdev+bounces-186811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F041AA16AF
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:39:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1632AA188F
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 20:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32877188F21E
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:37:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72AB64A3129
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335AC24A07D;
-	Tue, 29 Apr 2025 17:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9EC1252914;
+	Tue, 29 Apr 2025 17:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g43szRVv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdypGX9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F61E82C60;
-	Tue, 29 Apr 2025 17:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A8A248883;
+	Tue, 29 Apr 2025 17:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745948237; cv=none; b=sltmwWyDsQAwUXHJ4BxePOXcLnAWiZjvt2/BxC81fgxMVAQLT3DfoAgyRO4L68BiFQqec29HFRNgbx994ojuKQOwPObTdVUQJaGTqgAZpwL4LoOW6K5D6q9VmfOYk+S3BUJ/Ax1V6GJf8etiGc/+PPWpnPHibu/yKhTZj8ku058=
+	t=1745949590; cv=none; b=ER7JUI8m+EPeoTVQS++ugVe9H/MEDrXvLBaUIvf57qod6w3QiZNxNYRFJCE1iiqRU3x1Mvd0clX2eauHbHAdDGEJLDEuMQ02k/YhaP/zeAittuzSchPevrvWPdngHtfhr4iEH8zB15C55GtYwxs5+rm5tXoDhoV9vcLJx3sxr2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745948237; c=relaxed/simple;
-	bh=J40wyeNhpWU4brfiX4kXhvh3pSUU7Zeqd0HHOZCDBmE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=syYiQE+1dlrY3Y5295xfSJbV5V04DnvU1YwPBoEt5nEk9/oSHRapgOXCxF03u+gefPCdSYl//vMvIlTNJNzZeFisyIKwWgcxIGdY5qAuqaxPUkSXC9sy7ljCEYd9xNvmMjNpXGCdH2VnAw4cRGTkaXKordMBCKjoTE7OfPJ70xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g43szRVv; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e733cd55f9eso2369096276.1;
-        Tue, 29 Apr 2025 10:37:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745948233; x=1746553033; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YQLA1DjAwGvc147yeNV2dgLh47BJHeWkb7DFfNZy16I=;
-        b=g43szRVveIt+ou0HhTRh+SHQU2qJRl4AzezmNV9xT5nxzsh675cjyb6t9nngMs9HVx
-         AF6SbUMwdO85gyZL4e9+9FkBNkhMiuPLXl9HAyxm6wRZ32WzA+zZ+ro0QAEPS/2ayxf2
-         HQtwg+qb3El0X9fXvIn1XvqLrUVMX1g33pL1Opbhqaq2fDQwye7tZh4kgZUKLqKz+goW
-         cQU5IrcS4C/OR/8gmcu758R9Oe4y00FN4v8Zax30tmDz2TaR9b/LU3opY/J1XStTty4n
-         Cn+8swNu20sjOAwMTdY0eY/Nb6HOV7x9rmy2qXQ7W9nu7AExzYtWOh92zp56CxgrYpBX
-         yesg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745948233; x=1746553033;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YQLA1DjAwGvc147yeNV2dgLh47BJHeWkb7DFfNZy16I=;
-        b=aln4RBbPrWV5Hhn9gTUMoPCMANIMTMlTAV4ndas743Vhc24/UQc1JnDcLE5z19R/7w
-         J6lxsz6KVCGn8+G8CMtz0GVPJxEIQHIqGKdFV96JrBV5ukRJ4nQcRB2wWrt1DTMM1GW5
-         x9iamaIUKDpNvRTkgwM1iBbM7vapypK1uZ30XxXVqDhC4XAmW3fJjZbTxPfPaRg6MZ4S
-         nmD2Kl0NWmTKh+gPpLlxmhPraedI75QK/tsbrENmwtp89sgLLxjPMPlCz1CVARHmmD/m
-         S3muH22elIa+hN6OnSTrfv5vcNUtoRH1tfQw4Oll1q0maKzeYdHE5LjPs4PkR52AKN9r
-         Lt0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUwPESeETFiqfp6xBq8nzTQo7+BhAUwe1uFR2VuMnI1wm54CfKPu0q9DiRHR2d3Ef/z7IQP/3s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+izycH5QKSFIQozSV0fue6PCff/+iu+DQQS6fCWvXv7by9mNj
-	gYJA1jETyeJ/Yn0Owatz3Cb3tRzOx7dpjgpdnVFnEdYgah5T1YsbeTVt5BhxytU1cyg9NkQx1hV
-	tak5N6UAQN31Jtra/2+FuNam9rGQ=
-X-Gm-Gg: ASbGncsfXkWNt5FX8PrYIll1napZMbOqvmN040cBTjA1U08jInBxU+QJie0BG77VY9v
-	DQ0jUuHXIFDdU8NZBelu6NNF9wwj0aAzQsb4AaKQmEd8VVFvI6cADPGSIFM82MmmG4EvSnFP5Yr
-	wGVG77R20m9M9wnu2heqVkZmkrl8lpwy+fi7lnTA==
-X-Google-Smtp-Source: AGHT+IHa2XNC3KDB6z+P2WVheariWz4E5Kj+Us6RNhQd57YTNaF1OTvjOUZxtYR+s+fRyqS+YFEXTNuQEb88QBlDJds=
-X-Received: by 2002:a05:6902:2388:b0:e73:930:cc30 with SMTP id
- 3f1490d57ef6-e73eaadcdf4mr42956276.16.1745948233589; Tue, 29 Apr 2025
- 10:37:13 -0700 (PDT)
+	s=arc-20240116; t=1745949590; c=relaxed/simple;
+	bh=Mlv5QPLKqqnLLlp3l4YB9mb0TbR4nnACnfhCeWOJ2qA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZsLTwHop0rjL122qlo4gv18tsGEYj2CaPiNCB577iFAvFPBqYF8Lk5WaXo7FKEl/Sp/rFIoGz3RLWkerz12m4H5WaiRrVAKdLSqt8hKDnIhnXrsB7pq/L2mFFe+6WeDin3k/bKFaWPqHHpZrgCZXXzMwJQJHYVHI6JAKkz8t1+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdypGX9E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4733EC4CEE3;
+	Tue, 29 Apr 2025 17:59:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745949590;
+	bh=Mlv5QPLKqqnLLlp3l4YB9mb0TbR4nnACnfhCeWOJ2qA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jdypGX9EoMqhhPmCwvvegpsjmhqEgXTFWnH4WpuPGQ4+/8hsuc1tcsk2l0TpBC/zF
+	 AHgeIkuc+4KzHbJWvcqnnv/0Aq578yjcI/+Jt5KQD1JRNOWfKVV8QrN6KDXYSxIK9O
+	 zv1BJoArVE6EoVUSz+4Q5LSEL5B51N/2tegpShYs70D5B3iAf5BupfX8jSh3J8hXVp
+	 K6rG/19hqLBSA9SL8C6Igw7FoG2/pvd5+VEDrAU6mHMzL1+lTWNvvoVU/puLKUNLQn
+	 qPXonvrb5MCSQIu+XsTpNiR1vL9NT+X1Azoi/dY5zTnxIFx7tKlC9Xev74XhLUWlnX
+	 xvmwew0w3wu+g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D7E3822D4C;
+	Tue, 29 Apr 2025 18:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422225808.3900221-1-ameryhung@gmail.com> <ae064b92-1d9d-47a8-ac26-1172076e5bcb@linux.dev>
-In-Reply-To: <ae064b92-1d9d-47a8-ac26-1172076e5bcb@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 29 Apr 2025 10:37:02 -0700
-X-Gm-Features: ATxdqUEUeaF_2-GyhGA3DDYRIWeHqzc4XQhfhed_VBzY0Z4YY0lWFR9QmuserHc
-Message-ID: <CAMB2axP9PZOPjKMfod40bo=t==vjCG0TvJj5SW67X69K-gSiww@mail.gmail.com>
-Subject: Re: [PATCH bpf-next/net] bpf: net_sched: Fix using bpf qdisc as
- default qdisc
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
-	xiyou.wangcong@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ipv4: fib: Fix fib_info_hash_alloc() allocation type
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174594962925.1753982.13626856832986893239.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Apr 2025 18:00:29 +0000
+References: <20250426060529.work.873-kees@kernel.org>
+In-Reply-To: <20250426060529.work.873-kees@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 
-On Tue, Apr 29, 2025 at 10:30=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
->
-> On 4/22/25 3:58 PM, Amery Hung wrote:
-> > diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> > index db6330258dda..1cda7e7feb32 100644
-> > --- a/net/sched/sch_api.c
-> > +++ b/net/sched/sch_api.c
-> > @@ -208,7 +208,7 @@ static struct Qdisc_ops *qdisc_lookup_default(const=
- char *name)
-> >
-> >       for (q =3D qdisc_base; q; q =3D q->next) {
-> >               if (!strcmp(name, q->id)) {
-> > -                     if (!try_module_get(q->owner))
-> > +                     if (!bpf_try_module_get(q, q->owner))
-> >                               q =3D NULL;
-> >                       break;
-> >               }
-> > @@ -238,7 +238,7 @@ int qdisc_set_default(const char *name)
-> >
-> >       if (ops) {
-> >               /* Set new default */
-> > -             module_put(default_qdisc_ops->owner);
-> > +             bpf_module_put(ops, default_qdisc_ops->owner);
->
-> The first arg, should it be the "default_qdisc_ops" instead?
->
+Hello:
 
-You are right. I will fix this sloppy mistake and resend.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks,
-Amery
+On Fri, 25 Apr 2025 23:05:30 -0700 you wrote:
+> In preparation for making the kmalloc family of allocators type aware,
+> we need to make sure that the returned type from the allocation matches
+> the type of the variable being assigned. (Before, the allocator would
+> always return "void *", which can be implicitly cast to any pointer type.)
+> 
+> This was allocating many sizeof(struct hlist_head *) when it actually
+> wanted sizeof(struct hlist_head). Luckily these are the same size.
+> Adjust the allocation type to match the assignment.
+> 
+> [...]
 
->
-> >               default_qdisc_ops =3D ops;
-> >       }
-> >       write_unlock(&qdisc_mod_lock);
+Here is the summary with links:
+  - ipv4: fib: Fix fib_info_hash_alloc() allocation type
+    https://git.kernel.org/netdev/net-next/c/fca6170f5a03
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
