@@ -1,175 +1,140 @@
-Return-Path: <netdev+bounces-186794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A090AA117F
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:26:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D12AA119D
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 18:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A2EB17C1CD
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:26:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D406692634B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 16:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A1724336D;
-	Tue, 29 Apr 2025 16:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878BC23E340;
+	Tue, 29 Apr 2025 16:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jLCPHVff"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JHgIfWkQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB01B3D561
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 16:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4222FB2
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 16:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745944008; cv=none; b=LQfNxZxuYSoG56s8tGb73emSetvUwFOXOQHG7Ml1izBHKGvvCZl31iFHiQPu/rp0CMTXtBXZCLYt5P05oz2fuM2MLK8eOKmg9QMnUfocif6+kYyfL5uHnZbntkY2EiO2i/yE19Wj4GmzKQq/cC1EPB/D09Bp/xLaz+Vy9KICG64=
+	t=1745944393; cv=none; b=t0h/fJMYPUijU8Ir06mLB6ajtiNKXj3O835xZR1K+9+IAN9Ni7+hzoU66d9SW+9RdCuNinap0We2wNKGoen9d2XSduPmYMR0J5Ku1uUyEWqjw497sf5DP2AeoToXfc3k4/tev/DwkbB/PdGuo1YpMwD9o4mtIYqps/DOYYFBKuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745944008; c=relaxed/simple;
-	bh=3H0JTSYEGxPhjlYRtn/Nv0Vv9nZxrJjvYoSjVLqecN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pY+wuvFKCR1CM2anJRD/LI+Xz682Omc8H3bu6Iag8VTy1xBhIKeiSVpf+9DBGx8Ijlm99M2VlDn8O5Inna8J72SZYAuzfsVsfEFFvqLB4HQ+nNolew6b+DfBPErQExKS7azlPZIrBmIUdetZbzHG3CmfSVRpmd3ipoa0AKq+qhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jLCPHVff; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-879d2e419b9so5535997a12.2
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 09:26:46 -0700 (PDT)
+	s=arc-20240116; t=1745944393; c=relaxed/simple;
+	bh=3l/J50LAxjzZIN0nBXmfVN0pXHb+Hs8oBaEtreimozs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ah6grz+fQ0Tb0c7Z8ypX6JkRhbYi1FipnKgahuPlXKsQ4EE9tPssciHWIbpHqAsvy4ToNUTuyPphmNexB7hKfpLgYY+Q4q8Snv4vnSUn9jcmxxNTTzM08V7p+VGPhrUxFYmncR8QQ71TeQqDFpEv8gULOWUMFNcH8XGEfyxudOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=JHgIfWkQ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-39c30d9085aso4591357f8f.1
+        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 09:33:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745944006; x=1746548806; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CGCEkSX+59MDfrCtQdhXXvbqwMXoqiT57UYCG87NkWo=;
-        b=jLCPHVffJrmUpOAbuYP2UFYeG2OxaeZss8yiBMRk+hfg5ZbQUdRaPA9vbZYwiDSm+r
-         xewg3Xwe5k92NGofW646c6eBFZVnhdVO7H2Nwo1Pr14uIjQlEbheTTT4bT6ZMj/y8MZ0
-         /QCNCO7h3kn/mqjE3KahgEzPkv4JcyXMoHPz+IIcPUDtVv9VxdsJljge8k+D7JSq50ix
-         BDmAIxjduzJvTy1CwPInuC78qPK3prkRzsTULto8/d9Odp4cwQO9aolSCrsJPvL3t/le
-         KuewSVgAAKoCq4ef11CTSlK2CdPGpoMzPGLHeO6SSjnw2RthGIIFf82WZilH8UcKZEx1
-         A9zw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1745944388; x=1746549188; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BHwms0OLmRTXUiM+zOk6HXSX355HVOm9GG1Sq1Zbn2I=;
+        b=JHgIfWkQ0sFqfhvtsTz/+ELX8+mNnuhkqVnUrQQp00iqXtIrOw7zW6dIWKRe0CBtTY
+         R0QLVrSqr3ejdJYlfrjNfHO8q0pwZA3k9bT7gOc9oQSBnoEO9uqhx1uTahwM5simRw+t
+         ipC3jLxOSEEqlX64D77Nrke2yu7/1iWfq0WKCI436WhBvn0YPATEjqgS9jlpseXUzxUd
+         qs3BI+jFgK7rDnilzV+EQejZQ002l9MC8CpxSc1/APyRPobkYblPr3ho0JtJNzVChkLw
+         rVlqqBQv5bmssMlTSqeY2CNaKAAzFaZRlwwQS3TVj0vpdIz0qDe4Yb5C+rsz0rIKHXMG
+         4dNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745944006; x=1746548806;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CGCEkSX+59MDfrCtQdhXXvbqwMXoqiT57UYCG87NkWo=;
-        b=XfL8vP3VvT0XvxQr1HK5g0k2bZyMQU7C+1lprDfZNaTjz3qMtQQoMDKqLJCbK07woB
-         +u9Ka0ou/6r3wpl2XSwSn55rtXlHYkpvPOc43fCa5iSNcy62DUANjGRA1jIYNdG17v4p
-         e3mG0RR2O4D+q9A1M/vU7PKHAsL+WBUIMox2dS7io29N38qaA+Vw4ph5zgRn3Xhnx8oM
-         +LgWbewHycxAlAJWXw3UUwAY+dydiDBwtPlC1BO7sIpH5vbACa/lWH8E94391LKSAYJq
-         +P2GLiH4VOustkb3bNlFx7JnmsoNBAx5j8DZ2yYUIB5j/YMIY9ORgq2CK3ab/ZMG1Obj
-         9StQ==
-X-Gm-Message-State: AOJu0YxKdd15WFmyAmhW2l6VjyUsuaHl9FtjLkoEc7mBFgqDYqyS51vX
-	WtqIyk7sidcBnAqCPiuiLVyhnAI5rojSLHo3B5uQ/y3rRFdeD01E
-X-Gm-Gg: ASbGncsx+0FC42JhLNRP0gPx5eSb1Ymg2JuT2kjZwqONMQjvaAEZNz4yJ2wHwWJoPKx
-	AB6DWwyqa9w8XW0mXFPgSoljHf5xau8oBAU4Q9bwiFrFVIr0L8xF44VUjIvXY8/pgFdqDwJOyia
-	n0B4b+nHJ85hOlo+dveS5K8E8FXDJOTFK6P+skPmi6+XyOz5d/VJFvh0WGeFYYodv0eH93ZtYV8
-	oileZi+kOc+zsOFZ6kyECf8b2wOLXvU+zPLNCp7j4D+RgIf9qLiINCCjYBfbxgvqHrYNxJPcH+M
-	Op7yrDyHCYzeO6ney++xqBlDpp+LIPygIdnguPkZIRyIOuChpkW4pWsPBRuNRQGcoldtyh5klal
-	iBveZQT4i3YJPepzvRRk=
-X-Google-Smtp-Source: AGHT+IFYtxVTfVoUCdjEWv7KpPL5vInCXNQ/fvHP67A7c8ZKhmTj/5x4uwxkwIzoTVsCd3Lvt0ThGg==
-X-Received: by 2002:a17:90b:586b:b0:2fe:8902:9ecd with SMTP id 98e67ed59e1d1-30a23dc1f81mr4052117a91.1.1745944005793;
-        Tue, 29 Apr 2025 09:26:45 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f0e:fb30:8dc5:2d78:200a:494d? ([2001:ee0:4f0e:fb30:8dc5:2d78:200a:494d])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-309f782d4d6sm9637291a91.38.2025.04.29.09.26.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 09:26:45 -0700 (PDT)
-Message-ID: <ed15f7f3-b74d-4884-bdce-afa8f35b841a@gmail.com>
-Date: Tue, 29 Apr 2025 23:26:37 +0700
+        d=1e100.net; s=20230601; t=1745944388; x=1746549188;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BHwms0OLmRTXUiM+zOk6HXSX355HVOm9GG1Sq1Zbn2I=;
+        b=qEPVfJ22gSLIRAS+orhFdSGDERO3IMeNDzjmyOTwe09sHYokfc05L3OBURu56uGREw
+         dSItaxoiFwRk4klVURpryRWBp5Qnc5oBHFqxPx3D2imGWgj6r+T8ve/bHKD7R9RdCQkF
+         h78szXgidcpML7fiWhVsEpzquRvsvn3ZxljSl8RoMkYeMAfw5j7+Jz7by9bCz0i4e980
+         pRJOxzzbXPuHhLX85Rrj+st9uWaXFpvzybqm0CnJMQmzP/ArcqzwlIKYHME3dgNnIot1
+         af1A59uTmHT/fAUOUvdzSZfpvfiX724FKVwv9uBXfBl5IR4JIAigIhzcx/XEvD8YZdEC
+         mM2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVUmDNfwj7t68Fi5jy529v9OiVMO0p/+eLioIsk2Gl2sywg5rfvgfoiCXO6N00NyA1FI08P05U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylXPUC8kfLjfqw5+YbqTiPCBvXWBiAFQK3MeBS6eAgzfR1qD9P
+	5i1cRA2BMTuUNGnmTrIsKmlb1Oec+KkElnKWzeDyHC+r44fCH8Y00VE5YBXClx0=
+X-Gm-Gg: ASbGncvEaG4MU12MG5x/pglaWG1hSXZAB9f+w0WTg/wcieobFXj+CBspM+b3yqyFa8/
+	OQRRmZvDivXLCbjXJOvTYpEipiGrHLgxI25pJ31wlNtM+4341B8i4tMnsJSu9E0XdXW7P2vxjAu
+	vUwJuJPshN3ZSm+M7m5mvqA4QZq4tCJHVQhx2hS1z/3ur8DpXsNZ4rBMza/smLwGspyhhBiXm+v
+	2y/dy7YaKUnC/K123MQmHbbIxgxpBqZjdr2xuB9Qo07Imtt65ik8mf3eshhkfDxGOLXmwonzVKD
+	vJDecbtZRSiiJ/IrTbz1BrszZvcCNQNRBtTzuJR4yQizL35x7WLeMM1E6gP9r1ndSyqK
+X-Google-Smtp-Source: AGHT+IGbSS46/RQN8/ySUrEXm3UXESFHhkFDgqJLMCUVnarUc4CfPSaleX1KNdCKtSFPtQ+BpDHFtA==
+X-Received: by 2002:a5d:584f:0:b0:391:4559:8761 with SMTP id ffacd0b85a97d-3a08f7a3021mr21683f8f.36.1745944388229;
+        Tue, 29 Apr 2025 09:33:08 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073c8c95dsm14134636f8f.3.2025.04.29.09.33.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 09:33:07 -0700 (PDT)
+Date: Tue, 29 Apr 2025 18:33:05 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V3 14/15] devlink: Implement devlink param multi
+ attribute nested data values
+Message-ID: <pdk3mppsxfyuot7cfej2xy5xfszcyqyme2i6l2uqr3pnmgp22d@6zf74g2qwhol>
+References: <20250425214808.507732-1-saeed@kernel.org>
+ <20250425214808.507732-15-saeed@kernel.org>
+ <20250428161732.43472b2a@kernel.org>
+ <bdk3jo2w7mg5meofpj7c5v6h5ngo46x4zev7buh7iqw3uil3yx@3rljgtc3l464>
+ <b7a4d9cf-2606-4d0f-8164-ae3e05069388@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] virtio-net: don't re-enable refill work too early
- when NAPI is disabled
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- romieu@fr.zoreil.com, kuniyu@amazon.com, virtualization@lists.linux.dev
-References: <20250429143104.2576553-1-kuba@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20250429143104.2576553-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b7a4d9cf-2606-4d0f-8164-ae3e05069388@intel.com>
 
-On 4/29/25 21:31, Jakub Kicinski wrote:
-> Commit 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> fixed a deadlock between reconfig paths and refill work trying to disable
-> the same NAPI instance. The refill work can't run in parallel with reconfig
-> because trying to double-disable a NAPI instance causes a stall under the
-> instance lock, which the reconfig path needs to re-enable the NAPI and
-> therefore unblock the stalled thread.
+Tue, Apr 29, 2025 at 03:54:53PM +0200, przemyslaw.kitszel@intel.com wrote:
+>On 4/29/25 13:34, Jiri Pirko wrote:
+>> Tue, Apr 29, 2025 at 01:17:32AM +0200, kuba@kernel.org wrote:
+>> > On Fri, 25 Apr 2025 14:48:07 -0700 Saeed Mahameed wrote:
+>> > > +	case DEVLINK_PARAM_TYPE_ARR_U32:
+>> > > +		len = 0;
+>> > > +		nla_for_each_attr_type(param_data,
+>> > > +				       DEVLINK_ATTR_PARAM_VALUE_DATA,
+>> > > +				       genlmsg_data(info->genlhdr),
+>> > > +				       genlmsg_len(info->genlhdr), rem) {
+>> > > +			if (nla_len(param_data) != sizeof(u32)) {
+>> > > +				NL_SET_ERR_MSG_MOD(extack,
+>> > > +						   "Array element size must be 4 bytes");
+>> > > +				return -EINVAL;
+>> > > +			}
+>> > > +			if (++len > __DEVLINK_PARAM_MAX_ARRAY_SIZE) {
+>> > > +				NL_SET_ERR_MSG_MOD(extack,
+>> > > +						   "Array size exceeds maximum");
+>> > > +				return -EINVAL;
+>> > > +			}
+>> > > +		}
+>> > > +		if (len)
+>> > > +			return 0;
+>> > > +		NL_SET_ERR_MSG_MOD(extack,
+>> > > +				   "Value array must have at least one entry");
+>> > > +		break;
+>> > 
+>> > I'd really rather not build any more complexity into this funny
+>> > indirect attribute construct. Do you have many more arrays to expose?
+>> 
+>> How else do you imagine to expose arrays in params?
+>> Btw, why is it "funny"? I mean, if you would be designing it from
+>> scratch, how would you do that (params with multiple types) differently?
+>>  From netlink perspective there's nothing wrong with it, is it?
+>> 
 >
-> There are two cases where we re-enable refill too early. One is in the
-> virtnet_set_queues() handler. We call it when installing XDP:
->
->     virtnet_rx_pause_all(vi);
->     ...
->     virtnet_napi_tx_disable(..);
->     ...
->     virtnet_set_queues(..);
->     ...
->     virtnet_rx_resume_all(..);
->
-> We want the work to be disabled until we call virtnet_rx_resume_all(),
-> but virtnet_set_queues() kicks it before NAPIs were re-enabled.
->
-> The other case is a more trivial case of mis-ordering in
-> __virtnet_rx_resume() found by code inspection.
->
-> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: mst@redhat.com
-> CC: jasowang@redhat.com
-> CC: xuanzhuo@linux.alibaba.com
-> CC: eperezma@redhat.com
-> CC: minhquangbui99@gmail.com
-> CC: romieu@fr.zoreil.com
-> CC: kuniyu@amazon.com
-> CC: virtualization@lists.linux.dev
-> ---
->   drivers/net/virtio_net.c | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 848fab51dfa1..4c904e176495 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3383,12 +3383,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->   				bool refill)
->   {
->   	bool running = netif_running(vi->dev);
-> +	bool schedule_refill = false;
->   
->   	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
-> -		schedule_delayed_work(&vi->refill, 0);
-> -
-> +		schedule_refill = true;
->   	if (running)
->   		virtnet_napi_enable(rq);
-> +
-> +	if (schedule_refill)
-> +		schedule_delayed_work(&vi->refill, 0);
->   }
->   
->   static void virtnet_rx_resume_all(struct virtnet_info *vi)
-> @@ -3728,7 +3731,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->   succ:
->   	vi->curr_queue_pairs = queue_pairs;
->   	/* virtnet_open() will refill when device is going to up. */
-> -	if (dev->flags & IFF_UP)
-> +	if (dev->flags & IFF_UP && vi->refill_enabled)
->   		schedule_delayed_work(&vi->refill, 0);
->   
->   	return 0;
+>I would put name, type (array of u32's), array len, then the content.
 
-Reviewed-by: Bui Quang Minh <minhquangbui99@gmail.com>
-
-Thanks,
-Quang Minh.
+Isn't that exactly what we do here in devlink params? Am I missing
+something?
 
