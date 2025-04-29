@@ -1,190 +1,161 @@
-Return-Path: <netdev+bounces-186686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA71DAA05E7
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:38:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FF78AA05F0
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 10:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98CFF3B53E0
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7EE5462D31
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 08:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EF3277004;
-	Tue, 29 Apr 2025 08:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F4328A408;
+	Tue, 29 Apr 2025 08:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hsn+weLm"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="l1S1RSh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2060.outbound.protection.outlook.com [40.107.244.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8512B1F4199
-	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 08:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745915899; cv=fail; b=E+tETgzngPaFn6sCbhiEvbu7IzSUUykLcKKCBrHkrIkh5Hz8h4+I/hHv1RxIwnPZ3vK43NYONkl0J5g0bHpX+iv4tg6+47eCMEFWH9Ma/eqZYgGVFF57BrLB0VqCN/mRqNBWNXhr2qTwbEEyWauN0PaZ3mYwgfZRtFYFgUrpVaM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745915899; c=relaxed/simple;
-	bh=T5qLgVNTubjaRawMNbv2N3oXuMu/lOxlaS2lRRYnGKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VwBc9zOlpzpKnglybrl5rKGE32qdzfyRzVnihqdr1Dpx0CU2yysfkJCLrdaKpfGaGJFivPwP07slb/sPdTnf0WCP4R/V4RJctxvCRvgQG7F8sDojlYZCgYkrCWeheLRF62E6knyiCiQFRWqv32/CvxgtGxb38h/h1hnF827ZtPc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hsn+weLm; arc=fail smtp.client-ip=40.107.244.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YRcGj7uBWs0ed2AqVzt0AHmOBz1e5YokpJ7uxABj2vw5XFB5Mx+oZzByri7PFwzbXJZdHtOP9p+NdwlT+/Voh26AzWnh8Eg8r+3sph1EOWQujxVxTfW64pq9JFZ5lE5TUFPMZ8FoJvSXdOnbsc8lFQESfJv57TGeDF1G1NrqEFuQC6lbHXHQMaTtgHChWc80QlcdQhW5pkEIqCTmRm/HEUI/b2KYl4F+1xp1lh4HyoQox38ZSjCNB6la7us4lFDBl40nVgiZuQP/TcPKYC7AqiueaRj4XEe8pkU46vB7rw2q9BAp+qqGZQ2osQeUo6JKEsq8FIq6GoPmgj4+h1kO8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UbzcxFW2vPVOAfVHfe0RlRmBO13niGRyLnDBvM4Vu/M=;
- b=rkCf4rJBn4zvY0QSorw+BEHo+FSZZyMdg2hcbymxCJcrGpQS4/KhI5cJ6TKtiVxGJ3orF2mgWCYhcIyVN5o9uJhqiwqcu3IBpWbRPNAsuxO/uReMvJsn96+9+x2JWPUd7MYP/CUbFyIrUGGbE5SoLCBz/c148BICV42uAbK6f+7fx2ATMHGJily6R1v81HbD4fLI3rDZ26M3kpitVZRZwfsNOnAOGK5OcSuCO/x2SPPiGGqwRWa4Zz5up1uSqmMC3SPNLsJ/MMF4qaj7FKSflFccQ1FCw7xiswEJpZhvxHjWaAl/k+Z+z4dXYXTojb6xScanXES1xZo2wPwhWljTCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UbzcxFW2vPVOAfVHfe0RlRmBO13niGRyLnDBvM4Vu/M=;
- b=hsn+weLmMRqkCy6aTrBYH3bB79htUQvWRJ+5U7q9smuMEuOJea07KobfKQ85D3LvfSbv7cqPX07pSvtafa2IxCbnL6m38NVAZ/fwtmcArf5/kGJ/ySg5+4zmODfF/wgzIf4/5RNyAhfI9Iz7dbYPn5F1dSCPxOtsNs7KXWNg2EG1hLSdpvs7ZHrYj43caTYhOGP8MqxYHu+uWHyT+I3HbM7fP1IWXxCieg7BnZ2175altLiKQXJZais+I/Fs7/FWY4lOlSd89YwK65hNpeTtw0J5HdXvqJKOa6FuG7jVsgRheSa3kq4LbMFv/x1POH1qsMzTlxI4YJataWhAD9cuJw==
-Received: from SA0PR11CA0021.namprd11.prod.outlook.com (2603:10b6:806:d3::26)
- by LV8PR12MB9668.namprd12.prod.outlook.com (2603:10b6:408:295::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.29; Tue, 29 Apr
- 2025 08:38:12 +0000
-Received: from SA2PEPF00003F68.namprd04.prod.outlook.com
- (2603:10b6:806:d3:cafe::a4) by SA0PR11CA0021.outlook.office365.com
- (2603:10b6:806:d3::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.40 via Frontend Transport; Tue,
- 29 Apr 2025 08:38:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00003F68.mail.protection.outlook.com (10.167.248.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8678.33 via Frontend Transport; Tue, 29 Apr 2025 08:38:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 29 Apr
- 2025 01:37:56 -0700
-Received: from [10.223.2.16] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Apr
- 2025 01:37:52 -0700
-Message-ID: <507c9e1f-f31a-489c-8161-3e61ae425615@nvidia.com>
-Date: Tue, 29 Apr 2025 11:37:51 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF51027FD70;
+	Tue, 29 Apr 2025 08:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745916022; cv=none; b=pTDdzlQM3P5HLrD4cr90yGYD6ZePEJqFOYUJpJkX5FeJYhxOv2qIGU7WTAdY7Bq+aLau9YgZmKxtRXBud/wpoDhta5kc34+KQXTO4dcRdGld9U17RVDlc/91kbJjusf3uXxz9Uo4Ia0vBz9S/YbT/LfYOo7gAj708mnHjv9mGv8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745916022; c=relaxed/simple;
+	bh=j12eYWd/fxQAB51x01tD6d/Td9XPVxu5Ngf9D7Bibug=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sa4UShdd/tRqtzw8Eotg3KisUhuqtMomHpfaIV8s9OtxMGvhRvQjASc82lsrhTE4d3amJuuHDBdiZuq/FaNxQXAIjj1IyvoR+SCOpYSg2b8A/anbxFga0iJ5YA4oM/sXmTuNUmuOsYo9ilkVnskn25V70l4oiXJ5FU63pH4FUbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=l1S1RSh7; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53T8dYX11431601, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1745915974; bh=j12eYWd/fxQAB51x01tD6d/Td9XPVxu5Ngf9D7Bibug=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=l1S1RSh7e/l3UMksXQjyh67q3dgLza40FSvzQRaUxiGu7ODmzaHc6MbmfsaXnrhIB
+	 lu1hFAvI5lWDpVSeOQm0zjw8T2CCWa28hHARdXUqwO1+VC8FFQxh68z4b71nkr/rM1
+	 7R2DvI1TLQshPUybXgBOArs9AUUJxBO+FP2BryhyixzHYpGXd7z3lB9kzzOtHB8kAw
+	 rWa/hugBAebBTKMljGFPQ5QoMTYt413GAduF7a403SYhgosUMvZRCorQMWEPZ0KoJm
+	 1NFxCJAiLZE/tKzCNeyma+ieKEBSviqNWPQ1/EPoI4gw0gfqRyWyV5/Ttjg/+8W5MG
+	 JSVfX3AiNf6HQ==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53T8dYX11431601
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 29 Apr 2025 16:39:34 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 29 Apr 2025 16:39:35 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 29 Apr 2025 16:39:34 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Tue, 29 Apr 2025 16:39:34 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: David Laight <david.laight.linux@gmail.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net v2 3/3] rtase: Fix a type error in min_t
+Thread-Topic: [PATCH net v2 3/3] rtase: Fix a type error in min_t
+Thread-Index: AQHbrs2sHT6BFvalLE26yBqqUlL/zbO236AAgAOGx2A=
+Date: Tue, 29 Apr 2025 08:39:34 +0000
+Message-ID: <c5036c8c87c34b558e29428e9133d4d7@realtek.com>
+References: <20250416124534.30167-1-justinlai0215@realtek.com>
+	<20250416124534.30167-4-justinlai0215@realtek.com>
+ <20250427114646.4253b39d@pumpkin>
+In-Reply-To: <20250427114646.4253b39d@pumpkin>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink port
- function
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
-	<jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
- <20250424162425.1c0b46d1@kernel.org>
- <95888476-26e8-425b-b6ae-c2576125f484@nvidia.com>
- <20250428111909.16dd7488@kernel.org>
-Content-Language: en-US
-From: Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <20250428111909.16dd7488@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F68:EE_|LV8PR12MB9668:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fb94692-6c18-469e-4902-08dd86f92d66
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R21GdGkwbEZFOU12a0hsRERTUU1pb2R0UnNGRGZxTERoR2RQeHROZ1NGMWF5?=
- =?utf-8?B?RnhrWW1zS0M1MlVqY1FKdUxIcjJrMWZadHZyandRR0xGUWw0TE5YS0Q0aUxx?=
- =?utf-8?B?OXBLdjBIN1lWL25jb2xGTk5xeHZud0NPR0w5Q04xdXJjOTZuOEZ0d0xVbVRX?=
- =?utf-8?B?cVpZelFrVVQ4Q1RjZnE0cW5JcmxXckk5SGVNOC9wNzZWQnQyZjRHdE94aFRu?=
- =?utf-8?B?aDhSMVk3U0tNTm9lZXlaYXZ3aExRcW9yemZOL3JTVU5YZU5Qam10NDYyc2Vi?=
- =?utf-8?B?dGtHWkFnLzU3bkZGcWdDVzdUSXZ3ZWJVUTdsYXVQQlBBdERxY1B3eTdMbUZU?=
- =?utf-8?B?aldmandXaWQ3eHJOTkZZR1VrenVmUDV2K3pGTzdQYlMxMW5JUWExR05uTmJF?=
- =?utf-8?B?a2pFcktTRzlGbU5VN0tXRmpyd1JkS3Zlb0JSYlYwQnE1ejRuNHcrUjRnNmJ1?=
- =?utf-8?B?UXpPK1cwUWtyMXRGeWVWTEx4VkZVT1VVYVM3T0RLM3lLRFdwTGZScHlJQmYw?=
- =?utf-8?B?YlJ2ZlRuRy9QejNaM29IZm5CWFdHMGZLc3JRc3ZxaXNzcFJpRnBEeXV3eFB3?=
- =?utf-8?B?cmYxbVoxb2xDdFprdmx5NDBvTUtkYnp4aXFVa0M0ZW1paGI1anJhYjFZalBV?=
- =?utf-8?B?V2VBd2xBa0dXd3Njd1dKNVdtLzZoYUZMWEpBMkV0OFB1Tlh1V0RUYTNCZEVX?=
- =?utf-8?B?YXB4aTJvR0JqZi81Vy9PZUJpQWIxa0RlNVo5TmZXSHRwelpFb0FqNlFTdFVS?=
- =?utf-8?B?YWJkRm9oNHZFQjVYR09ZTnY0dVJkNEx1RHkwcUpKd3BzY2NGSjdNWnpIdkZx?=
- =?utf-8?B?ekV3OERIb2J3N2VvN2V3R3BOMSsyUXNkdDMyakN1bHcwbkxSV2p0bktFVWo0?=
- =?utf-8?B?YVNiZmdtaVBOWm4xdXdtaFhVbS92ZlFHMnErKysvQWlTVmNDR3VPRVVxbkQw?=
- =?utf-8?B?ZFQxTk1IeGZ4Sm8yR0NUS0ZhN2xwNkQvUmJSazluNFoyVWhaVWpVZ3M0YnRm?=
- =?utf-8?B?S0QvQ2c4ZEtuUWhEazQ1ZWdmazdZQVI4bXRVcWxIczEvWlpRS056REp1WlFv?=
- =?utf-8?B?ek9QTFhIekVQbTZNMWJwek1taldJNDMwWUdpVlBvYVl0RkxBc01vdGVnRmxN?=
- =?utf-8?B?WlJERlZUbFk1VVdlR1pwNXJPWnlnMnAzbmtnL2VCMnpNam5XZ1AvdHk3WmdD?=
- =?utf-8?B?MGNZck5DbC9wNzljTWhKVE9kN1FFRDlpY1pVQ3RQYmpEV3NKZTNTeWJTb1c5?=
- =?utf-8?B?dndnOEVnVDV6YVV1SElMRXEyRDVTZUFZL09RRXVXVWVzcUdYQmdKcm5KRWhZ?=
- =?utf-8?B?ckdDRnIzblluQ0dGa1FKSmR3bnJxMDYvZm1JeWRRa0tXQXJ6UGFTVU1nVzQ5?=
- =?utf-8?B?RklhMmtUYXVDdzJHQXdRaFpXQU1NWnJMUFZBMmRXV2kraHJETVA3OUhTSzVI?=
- =?utf-8?B?KzhqNGdoY25ERThoZXR1WERZWmJkSG1uazl2dTEzU0JSTUFoWmR6a2I1ZVY3?=
- =?utf-8?B?UDk5WWQ3a3lidllFaWZabXdSeTM4Q3JMbHJuNUs5dCtva2JDcDdEVUhzUGx0?=
- =?utf-8?B?UU1CSUxKMGs0RTRuT1ZBUStZendKYnZQdTV5SnhJRTFCSUh5ZkF4N2lPb04y?=
- =?utf-8?B?RzJiemxPWDllODhQc3RwalVtVjBFem40VWZpR2lHYTJpQ3dQWUdWM0JwcFRh?=
- =?utf-8?B?aUE3U1FOSlRna2UzbHgzSmMwVWxMbC9VdU5WcUYrKytkeWE5TFdweTRVNkVP?=
- =?utf-8?B?Q004a1Nwc0sreit2c29RTG1kanFFK3lXdkpWcTdEVVZpY2dFQ1hSRFhpaEFE?=
- =?utf-8?B?R2hSYis3dE9uTmlsS0VCa1VuMlRxWUl4QTl0UEZ0UTd1R213OTBLNW8xeEdu?=
- =?utf-8?B?NE9QdVVoYmtRTWp6S1RvWGZIM2RlVm9yUlE2ZGxIUUlEV1FiZ3l5NkhaZmNN?=
- =?utf-8?B?T3JSM0w1VUMrMFU4REZiUzZqczkzNEpNTWZyMTZwUHlqWjVmT2REd0pQL040?=
- =?utf-8?B?b3R6Q282aGVQQ2VQT2wxeFg0Ymh6cVk2OStnS0RXc3VFeVZZaWpnOEkzeUpU?=
- =?utf-8?Q?+A+Pki?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 08:38:12.1733
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb94692-6c18-469e-4902-08dd86f92d66
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F68.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9668
 
+> On Wed, 16 Apr 2025 20:45:34 +0800
+> Justin Lai <justinlai0215@realtek.com> wrote:
+>=20
+> > Fix a type error in min_t.
+>=20
+> NAK, in particular u16 is likely to be buggy Consider what would happen i=
+f
+> RTBASE_MITI_MAX_PKT_NUM was 65536.
+> (Yes, I know that isn't the intent of the code...)
+>=20
+> As pointed out earlier using min() shouldn't generate a compile warning a=
+nd
+> won't mask off significant bits.
+>=20
+> Also I think it isn't a bug in any sense because the two functions have a=
+ single
+> caller that passes a constant.
+>=20
+>         David
 
+Hi David,
 
-On 4/28/2025 9:19 PM, Jakub Kicinski wrote:
-> 
-> On Mon, 28 Apr 2025 15:11:04 +0300 Moshe Shemesh wrote:
->>> Makes sense, tho, could you please use UUID?
->>> Let's use industry standards when possible, not "arbitrary strings".
->>
->> UUID is limited, like it has to be 128 bits, while here it is variable
->> length up to the vendor.
->> We would like to keep it flexible per vendor. If vendor wants to use
->> UUID here, it will work too.
-> 
-> Could you please provide at least one clear user scenario for
-> the discussion? Matching up the ports to function is presumably
-> a means to an end for the user.
+This is indeed not a bug fix, and I have modified it to use min instead
+of min_t, and posted it to net-next.
 
-Sure. Multi-host system with smart-NIC, on the smart-NIC internal host 
-we will see a representor for each PF on each of the external hosts.
-However, we can't tell which representor belongs to which host. 
-Actually, each host doesn't know about the others or where it is in the 
-topology. The function uid can help the user match the host PF to the 
-representor on the smart-NIC internal host and use the right representor 
-to config the required host function.
+Thanks,
+Justin
+
+>=20
+>=20
+> >
+> > Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this
+> > module")
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > ---
+> >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 55b8d3666153..bc856fb3d6f3 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > @@ -1923,7 +1923,7 @@ static u16 rtase_calc_time_mitigation(u32
+> time_us)
+> >       u8 msb, time_count, time_unit;
+> >       u16 int_miti;
+> >
+> > -     time_us =3D min_t(int, time_us, RTASE_MITI_MAX_TIME);
+> > +     time_us =3D min_t(u32, time_us, RTASE_MITI_MAX_TIME);
+> >
+> >       if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
+> >               msb =3D fls(time_us);
+> > @@ -1945,7 +1945,7 @@ static u16 rtase_calc_packet_num_mitigation(u16
+> pkt_num)
+> >       u8 msb, pkt_num_count, pkt_num_unit;
+> >       u16 int_miti;
+> >
+> > -     pkt_num =3D min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> > +     pkt_num =3D min_t(u16, pkt_num, RTASE_MITI_MAX_PKT_NUM);
+> >
+> >       if (pkt_num > 60) {
+> >               pkt_num_unit =3D RTASE_MITI_MAX_PKT_NUM_IDX;
+
 
