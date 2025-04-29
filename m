@@ -1,187 +1,110 @@
-Return-Path: <netdev+bounces-186869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26F0AA3B03
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 00:07:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45BCAA3B09
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 00:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D402188E09A
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:07:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 481574C4D4C
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 22:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B9526FD9D;
-	Tue, 29 Apr 2025 22:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E7426988C;
+	Tue, 29 Apr 2025 22:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1FaOVp4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bbkcpsmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D86B268FF9;
-	Tue, 29 Apr 2025 22:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350152459E7
+	for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 22:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745964420; cv=none; b=HjXSorIwfkOz3Xlccl33VH7xEt9F9kdy/ix1l09OJFjKUGQOKdiaMxFaD9DumNceDyK7HC8bQbqEplc64Csm+cFMX0o96T6V3WC4xXwDHjUYT7SuB1Zuwuqz+UxmjYq8dw1k9WQaMyc8xU1T2VSRpgwWqS7KTy0P7DCwOKvw8Sc=
+	t=1745964640; cv=none; b=V9zFsSd+F7hDzM5zyawFLsXEn/nSnAiSIQCz2bA6DqhbHd9Uj16AKs4N0jziA/S6dD7FzBtKafxzonqtTMc+RCnoNcBU6VVuzgC6m4omx0e1Xys91psKciqa8SxSigPcYKqKR57+65UmgNJbnDpikElKK6Hi+D+eHI3g0L6RhUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745964420; c=relaxed/simple;
-	bh=rbjUHm4vjSzvx1jL+WAkU6QZDtxg0tARkYNO803VokE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TuvmgiK6ALWj5/qgwctTINCTGF8p6fLTAInL45xG/7CLtxle7TIMXJunMaJnEVoXEkGETWRwACoBjN/3jKrnTIjV4ZTWyvzmycfI4UZlRu2do4FBNr9TiP1Do4HQlM/1XJrcUu5VjL+nClAtzTLsrp+PCPykdZWeV7FvM/I6Vbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1FaOVp4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA51AC4CEE3;
-	Tue, 29 Apr 2025 22:06:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745964419;
-	bh=rbjUHm4vjSzvx1jL+WAkU6QZDtxg0tARkYNO803VokE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W1FaOVp4vPjJOVaFgQpccjGeKpQRbecEknN1GqBvoKOQ6E4P+nz6dbQYNZEXu9IpE
-	 JbcKLRKLakHdWad43gUWHVGnNso8m1GCmEfEIqM9E6TkRF+qDdo89DaJYjLlXqWVfM
-	 2nzBDx99ftFBXBozrFAI4jsCUwwaP4JyKf482eyaRqs+hORdoM39rctNgXC6rYRb7g
-	 dkow2i/PFMI+7XCgvNZh5g/440VEVK+SOhceTnB0roYTnQdfG2xV+96kJcwSStSrYm
-	 xIsP+a81krD7lAB/TWTjwaFfSp+5zIXranaMwrCFST2+gdEdmqrXk0QSjPtrl1Fwc+
-	 ns1LNv2vE+5Qg==
-Date: Tue, 29 Apr 2025 15:06:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Xing <kernelxing@tencent.com>, Richard Cochran
- <richardcochran@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next] net: Add support for providing the PTP
- hardware source in tsinfo
-Message-ID: <20250429150657.1f32a10c@kernel.org>
-In-Reply-To: <20250425-feature_ptp_source-v1-1-c2dfe7b2b8b4@bootlin.com>
-References: <20250425-feature_ptp_source-v1-1-c2dfe7b2b8b4@bootlin.com>
+	s=arc-20240116; t=1745964640; c=relaxed/simple;
+	bh=1fjod31MygIbrzpd7VRoLGTI62t/BR6FAKZrwmib4Kg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SFdGIgf9/a+5tCap/IZveQA7eXW4QIYIRUPR1UlLk4FxXfpwllvrqG0KxEsrFpq7RPWJ3osQIokW50f1gk8hQxBisaXetzJrej0nWnsUYk5fBVOCRc3US5j6scvlN8Q0+gbdFC1yLh2FlfNo1JeR+ETCtiUOOVOLOgwOQdFnQJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bbkcpsmW; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745964638; x=1777500638;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1fjod31MygIbrzpd7VRoLGTI62t/BR6FAKZrwmib4Kg=;
+  b=bbkcpsmWSwT8IuOTFD7f9qiqrpbytL+2xOW9RM/Pls6V0n08rwE2w59R
+   DpRv+eDngP/diRU8qv2vqsvq/PcqzF1PD9y0bS/nbhqYVJczQIJP3PvlE
+   WHtyyiZ/Hd+7gKVfnfgDZYBHdqOR6RZ2XTHmrCq3W7XECMRZHxVueJmmL
+   v9DnVy2pCJGp23j0y7iFftyfSP0NM8+Ha7qptseTnvENnkTV1LXXDcohT
+   HUXFmPjtW6Oiofgs/OwS859IR8D1ouO33ZShcngYbMhCVkBLSQqBkJ3My
+   UNS2d303GDapQk+o0Tb9EvmP17lw7habSwUu62L24Rx4wW4IU9o4yvQUd
+   g==;
+X-CSE-ConnectionGUID: gIFDJxqLSWy6SrYQG8z/pQ==
+X-CSE-MsgGUID: MLfhgxTuRImfq+ES104/VA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="47620115"
+X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
+   d="scan'208";a="47620115"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 15:10:37 -0700
+X-CSE-ConnectionGUID: DcD3ZXKaQdCGdcYTJDy0ng==
+X-CSE-MsgGUID: gMVF4ybXSq2/u0ogw/FSNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,250,1739865600"; 
+   d="scan'208";a="138750754"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa003.jf.intel.com with ESMTP; 29 Apr 2025 15:10:37 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates 2025-04-29 (idpf, igc)
+Date: Tue, 29 Apr 2025 15:10:30 -0700
+Message-ID: <20250429221034.3909139-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 25 Apr 2025 19:42:43 +0200 Kory Maincent wrote:
-> Multi-PTP source support within a network topology has been merged,
-> but the hardware timestamp source is not yet exposed to users.
-> Currently, users only see the PTP index, which does not indicate
-> whether the timestamp comes from a PHY or a MAC.
-> 
-> Add support for reporting the hwtstamp source using a
-> hwtstamp-source field, alongside hwtstamp-phyindex, to describe
-> the origin of the hardware timestamp.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> Not sure moving the hwtstamp_source enum to uapi/linux/net_tstamp.h and
-> adding this header to ynl/Makefile.deps is the best choice. Maybe it is
-> better to move the enum directly to ethtool.h header.
+For idpf:
+Michal fixes error path handling to remove memory leak.
 
-Weak preference for the YAML and therefore ethtool.h from my side.
-That way the doc strings will propagate to more places, like the HTML
-docs.
+Larysa prevents reset from being called during shutdown.
 
-> diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-> index ff0758e88ea1008efe533cde003b12719bf4fcd3..1414aed0b6adeae15b56e7a99a7d9eeb43ba0b6c 100644
-> --- a/include/linux/net_tstamp.h
-> +++ b/include/linux/net_tstamp.h
-> @@ -13,12 +13,6 @@
->  					 SOF_TIMESTAMPING_TX_HARDWARE | \
->  					 SOF_TIMESTAMPING_RAW_HARDWARE)
->  
-> -enum hwtstamp_source {
-> -	HWTSTAMP_SOURCE_UNSPEC,
+For igc:
+Jake adjusts locking order to resolve sleeping in atomic context.
 
-when is unspec used in practice? Only path I could spot that may not
-set it is if we fetch the data by PHC index?
+The following are changes since commit d4cb1ecc22908ef46f2885ee2978a4f22e90f365:
+  Merge branch 'intel-net-queue-100GbE'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
 
-> -	HWTSTAMP_SOURCE_NETDEV,
-> -	HWTSTAMP_SOURCE_PHYLIB,
-> -};
-> -
->  /**
->   * struct hwtstamp_provider_desc - hwtstamp provider description
->   *
+Jacob Keller (1):
+  igc: fix lock order in igc_ptp_reset
 
-> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
-> index a93e6ea37fb3a69f331b1c90851d4e68cb659a83..bf5fb9f7acf5c03aaa121e0cda3c0b1d83e49f71 100644
-> --- a/include/uapi/linux/net_tstamp.h
-> +++ b/include/uapi/linux/net_tstamp.h
-> @@ -13,6 +13,19 @@
->  #include <linux/types.h>
->  #include <linux/socket.h>   /* for SO_TIMESTAMPING */
->  
-> +/**
-> + * enum hwtstamp_source - Source of the hardware timestamp
-> + * @HWTSTAMP_SOURCE_UNSPEC: Source not specified or unknown
-> + * @HWTSTAMP_SOURCE_NETDEV: Hardware timestamp comes from the net device
+Larysa Zaremba (1):
+  idpf: protect shutdown from reset
 
-We should probably document that netdev here means that the timestamp
-comes from a MAC or device which has MAC and PHY integrated together?
+Michal Swiatkowski (1):
+  idpf: fix potential memory leak on kcalloc() failure
 
-> + * @HWTSTAMP_SOURCE_PHYLIB: Hardware timestamp comes from one of the PHY
-> + *			    devices of the network topology
-> + */
-> +enum hwtstamp_source {
-> +	HWTSTAMP_SOURCE_UNSPEC,
-> +	HWTSTAMP_SOURCE_NETDEV,
-> +	HWTSTAMP_SOURCE_PHYLIB,
-> +};
+ drivers/net/ethernet/intel/idpf/idpf_lib.c  | 19 +++++++++++--------
+ drivers/net/ethernet/intel/idpf/idpf_main.c |  1 +
+ drivers/net/ethernet/intel/igc/igc_ptp.c    |  6 ++++--
+ 3 files changed, 16 insertions(+), 10 deletions(-)
 
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -920,12 +920,20 @@ int ethtool_get_ts_info_by_phc(struct net_device *dev,
->  		struct phy_device *phy;
->  
->  		phy = ethtool_phy_get_ts_info_by_phc(dev, info, hwprov_desc);
-> -		if (IS_ERR(phy))
-> +		if (IS_ERR(phy)) {
->  			err = PTR_ERR(phy);
-> -		else
-> -			err = 0;
-> +			goto out;
-> +		}
-> +
-> +		info->phc_source = HWTSTAMP_SOURCE_PHYLIB;
-> +		info->phc_phyindex = phy->phyindex;
-> +		err = 0;
-> +		goto out;
-
-The goto before the else looks a bit odd now.
-Can we return directly in the error cases?
-There is no cleanup to be done.
-
-> +	} else {
-> +		info->phc_source = HWTSTAMP_SOURCE_NETDEV;
->  	}
->  
-> +out:
->  	info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE |
->  				 SOF_TIMESTAMPING_SOFTWARE;
->  
-> @@ -947,10 +955,14 @@ int __ethtool_get_ts_info(struct net_device *dev,
->  
->  		ethtool_init_tsinfo(info);
->  		if (phy_is_default_hwtstamp(phydev) &&
-> -		    phy_has_tsinfo(phydev))
-> +		    phy_has_tsinfo(phydev)) {
->  			err = phy_ts_info(phydev, info);
-> -		else if (ops->get_ts_info)
-> +			info->phc_source = HWTSTAMP_SOURCE_PHYLIB;
-> +			info->phc_phyindex = phydev->phyindex;
-> +		} else if (ops->get_ts_info) {
->  			err = ops->get_ts_info(dev, info);
-> +			info->phc_source = HWTSTAMP_SOURCE_NETDEV;
-
-Let's move the assignment before the calls if we can?
-Otherwise someone adding code below may miss the fact that err may
-already be carrying an unhandled error.
+-- 
+2.47.1
 
 
