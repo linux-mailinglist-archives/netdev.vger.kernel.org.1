@@ -1,250 +1,526 @@
-Return-Path: <netdev+bounces-186807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 902A3AA157D
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:28:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79CF6AA15F3
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 19:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 928537AC997
-	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:27:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0741A8472B
+	for <lists+netdev@lfdr.de>; Tue, 29 Apr 2025 17:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401E2250C15;
-	Tue, 29 Apr 2025 17:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C708024C098;
+	Tue, 29 Apr 2025 17:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="dl5+1MRV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdHBdioG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6B124A047;
-	Tue, 29 Apr 2025 17:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B9724503E;
+	Tue, 29 Apr 2025 17:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745947687; cv=none; b=Lya/z+p2Mc/kSt4iTO807Tfd7avahWjl2yOC0MDenTS32/ilsaBrgALAU9g0hClDWFmM8Ep5ZzqMI0k+29KC+1PTXNMBzoMcBYP7jybdbfxtAurs62AAgqCiYRAt+HsrZAxsC64ebnj/ZBgHBc6k51HkC2kyQ+kl6aKaP4cUyAw=
+	t=1745947726; cv=none; b=SZrSOm0KlEC0Cw17xJfRfgl/GNaYh3ny0upjiq7hpQxbXQoOANrcPTGNzJW3RcOVab1hIvXcBJJglgiPBlJm4PWLKv46K6whxXGt0nYjmRLnm+1l3y8KU50LOMTJX77xhxA2+wMiIgNn0vsvv0jygKsrM2F9hBkZR3EmnhtteBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745947687; c=relaxed/simple;
-	bh=PVYVePB1lbPvKBWI8S6NDXuosqAzYQbVsfIh1jwWuVA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sHqfE4g0jqTWml/auAgjmvHzh43eo6mH2vkxi8Ioki2/vmXRMjjAQAK0cFZpvA85XiI4hPSk5jiexPKDqONtZ4BJaxqnIHmQGBQAh7v8VOFhqjmxKW3mBrmGqXUzLNFPx7MvwoGJ0uZCkLaO0JIgOCavdCo/RJzI1CfdRM99Oyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=dl5+1MRV; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53THR949509822
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 29 Apr 2025 10:27:09 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53THR949509822
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745947632;
-	bh=bi2Aevh2QzYHJjU5ZT4PV0lJuEojRhQww5I9NeYJf50=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dl5+1MRV352QgdzCN55c3h5YzJsglVUunIeznoTZvR86tIRDHDduoKYAilNdy8UVy
-	 OEGai/Yt9OZDvSPgIzIhkxcj5ShG9kvXTjGlJ2zesdY1/FbO18R7e2/VTEIl7GKjaO
-	 xK07wa+p3OMX38teq7q76S09I4+Yz7Pt2REmAngLro9casDIXZcpeegj2EJx1I2ig2
-	 0/6ceuNx+bbiqR41148AXDkYgIeIfISQrjLKScf+66Hnx0A5RHGDmj07zcwLcWBYtD
-	 nuOvbzvclQP9Rcm7KE8EOSlR4rY0H6lR8tUdU/bUWP3YHocv+vO11bc0h3sHbn5MNb
-	 tpVmjIEc6McWQ==
-Message-ID: <7df3c16b-9353-4f30-a13b-1f0eb8563e69@zytor.com>
-Date: Tue, 29 Apr 2025 10:27:09 -0700
+	s=arc-20240116; t=1745947726; c=relaxed/simple;
+	bh=crxJSW7Mlim0gbWgcniOHK+DbZqStkkaN0kB4fA75Tg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OgBXvO8ZoYeEkHbRydVo7AHm1/eWYZSc2iJNYJNaurAJFoJojEa8H2fWuxH/lERidICjbe9hSPmG4bWv/aLaf2v0yG53zzbg+/lObQhCKBmNc0TxHgTsVt4f/bb3Xaz3rIU1RDjTFaBDBJEJVHX1kSyeemlESjGyTPxX7lv/Fks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdHBdioG; arc=none smtp.client-ip=209.85.210.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-72ecc30903cso3768599a34.0;
+        Tue, 29 Apr 2025 10:28:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745947723; x=1746552523; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/GaGDk3bb35kB6YYtwMAXWW7gKiyRliyngdehMPZJQ=;
+        b=GdHBdioGEoraOpvpy5bK0mA+oYGmii+U6ncmYYEaQ9xgAKbVk19ipDiBL/BA5RXB4O
+         kmK7u5nZNnu8kcZEO/GwYLzafy9I1OtUIGuGDke0PQqdJ4/Y4hb4e7k9Nl/LV/7A9aXz
+         idk9wE52gN/G4ePdZR6AFiZ4JXo5INPEwIJS9dNgzOn3dN3dHxuFkG1W2OgjTiNCXD05
+         5uJQkt/2Ruc9dsyl5ov78rLNUOD0dqy1Xr5r20OzSgpfS1LD2vqwgN6kVf7EcgiBeQQy
+         wCi4LmisvCf0ijb7WrtMw2LCBtRb5LgDvsjcbl72cGhvP0yGqtWzm2IJP1QXcHOx4Lnt
+         vQpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745947723; x=1746552523;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N/GaGDk3bb35kB6YYtwMAXWW7gKiyRliyngdehMPZJQ=;
+        b=eza6ImmeVzIrPYpx8rJASIrgtoSldgovr5SS6w0mk4ZhWyCzTBpqqMOUmp49niPdw9
+         0cgDGBUMudsAwSLyqGpj05OZzHueXxmOhOq5mdRdZASgqwOdwpuWOMb/OD5R5K83f+e/
+         PoNkJraQcm2pzEdfLY8Ezlk+GgKi468PZYkbNHeJ4JZ8sL3OuIhBHiZELB8ZGBH2Heam
+         Iwc8HofzLexMBwH3Qn55zVhj0pZ9j2pyB17ttWdFXL0HsCbMMLTZfdM8FkKZ3PBp5RxU
+         3wVY5a/JmaWB4ODH4igVPodQ05BRIMY1EAnFLit++LSkERMlI3BLUkPxHnc/0B7zRwRP
+         bImg==
+X-Forwarded-Encrypted: i=1; AJvYcCUP1XuUC3eaRpAzjZWrfcCfSVy7D3m5tTydiiF+GUVXvW3952mT0SlFf9/uBeenBQzyFM6DWNMD@vger.kernel.org, AJvYcCVBhtSPwWSK3l7xv9hWwk3sw93d05mIvHNv0RJjgsukO35ksZibBcflrqTCPR08Nuw9GrivwiArWrYe3MQTdYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrtaoyZjJuTmi94py96w0vUtIm/bP4Vo8v5u3KZhK9VJ8EtiF0
+	N/MgUf8ogbVECVV0gSkc9uO4tgpARTO/jNBt6kV3Gqeyeslpg9I7/bmk2LBUjeikYiTEb+zgAz8
+	Sbdg0iH1RImn5oRoiJ/hcPtN7QEA=
+X-Gm-Gg: ASbGncuSEYTEcLS1q/D+QvRgyBzocXTJ9XLN4jy3JpzQF6ZR0L8NJlSe4mTiD5Na6/D
+	q0Hghmk5GKLOXXvFcAdFsfUtXqa+vohvRDTDyWX/MvD8OgCpGIQFRrcx2W4QYVCRtauoupwxBCn
+	eIbnaLbCp9wCGbJa7OA/zeCy2P0BV5384eqK+LAEexy7MRXq+4jsS5
+X-Google-Smtp-Source: AGHT+IGHK5QE2qNMtBzcDRDlKbHvLm6goR18DS3/Z6KARixEvZy3FTz/Pfc7gl8PIyIPZKb95vWb9UHiiO5zDGQP9c4=
+X-Received: by 2002:a05:6830:2691:b0:72a:1821:aa9c with SMTP id
+ 46e09a7af769-731c0a0d172mr26518a34.8.1745947723354; Tue, 29 Apr 2025 10:28:43
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/15] x86/msr: Add missing includes of <asm/msr.h>
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com,
-        dapeng1.mi@linux.intel.com
-References: <20250427092027.1598740-1-xin@zytor.com>
- <20250427092027.1598740-2-xin@zytor.com>
- <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250426172025.9459-1-chia-yu.chang@nokia-bell-labs.com> <20250426172025.9459-4-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20250426172025.9459-4-chia-yu.chang@nokia-bell-labs.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Tue, 29 Apr 2025 18:28:32 +0100
+X-Gm-Features: ATxdqUF4E4oL4kRKM2HOUJvJEa7UVPpgLQeHOyCQERwfbmuOO2Up0UAXD9byt0g
+Message-ID: <CAD4GDZxJg9Z_Xe7onROEAxg3pTo=OGC5qfyycT5nWd9d5mVXaw@mail.gmail.com>
+Subject: Re: [PATCH v13 net-next 3/5] sched: Struct definition and parsing of
+ dualpi2 qdisc
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com, 
+	pabeni@redhat.com, jhs@mojatatu.com, kuba@kernel.org, 
+	stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	andrew+netdev@lunn.ch, ast@fiberby.net, liuhangbin@gmail.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
+	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/29/2025 2:45 AM, Ilpo Järvinen wrote:
-> On Sun, 27 Apr 2025, Xin Li (Intel) wrote:
-> 
->> For some reason, there are some TSC-related functions in the MSR
->> header even though there is a tsc.h header.
->>
->> To facilitate the relocation of rdtsc{,_ordered}() from <asm/msr.h>
->> to <asm/tsc.h> and to eventually eliminate the inclusion of
->> <asm/msr.h> in <asm/tsc.h>, add <asm/msr.h> to the source files that
->> reference definitions from <asm/msr.h>.
->>
->> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
->> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
->> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
->> ---
->>
->> Change in v4:
->> *) Add missing includes in a different patch (Ilpo Järvinen).
->> *) Add all necessary direct inclusions for msr.h (Ilpo Järvinen).
->>
->> Change in v3:
->> * Add a problem statement to the changelog (Dave Hansen).
->> ---
->>   arch/x86/events/msr.c                                         | 3 +++
->>   arch/x86/events/perf_event.h                                  | 1 +
->>   arch/x86/events/probe.c                                       | 2 ++
-> 
-> Under arch/x86/events/ a few files seem to be missing the include?
-> 
->>   arch/x86/hyperv/ivm.c                                         | 1 +
-> 
-> Also under hyperv/ not all files are covered but I'm a bit hesitant to
-> suggest a change there since I'm not sure if they (hypervisors) do
-> something special w.r.t. msr.
-> 
->>   arch/x86/include/asm/fred.h                                   | 1 +
->>   arch/x86/include/asm/microcode.h                              | 2 ++
->>   arch/x86/include/asm/mshyperv.h                               | 1 +
->>   arch/x86/include/asm/msr.h                                    | 1 +
->>   arch/x86/include/asm/suspend_32.h                             | 1 +
->>   arch/x86/include/asm/suspend_64.h                             | 1 +
->>   arch/x86/include/asm/switch_to.h                              | 2 ++
-> 
-> arch/x86/kernel/acpi/ ?
-> acrh/x86/kernel/cet.c ?
-> ...
-> 
-> There seem to be quite many under arch/x86/ that still don't have it, I
-> didn't list them all as there were so many after this point.
-> 
-> But that's up to x86 maintainers how throughout they want you to be.
-> 
-> This command may be helpful to exclude the files which already have the
-> include so you can focus on the ones that may still be missing it:
-> 
-> git grep -l -e rdmsr -e wrmsr | grep -v -f <(git grep -l -e 'asm/msr\.h')
-> 
->>   arch/x86/kernel/cpu/resctrl/pseudo_lock.c                     | 1 +
->>   arch/x86/kernel/fpu/xstate.h                                  | 1 +
->>   arch/x86/kernel/hpet.c                                        | 1 +
->>   arch/x86/kernel/process_64.c                                  | 1 +
->>   arch/x86/kernel/trace_clock.c                                 | 2 +-
->>   arch/x86/kernel/tsc_sync.c                                    | 1 +
->>   arch/x86/lib/kaslr.c                                          | 2 +-
->>   arch/x86/mm/mem_encrypt_identity.c                            | 1 +
->>   arch/x86/realmode/init.c                                      | 1 +
->>   drivers/acpi/acpi_extlog.c                                    | 1 +
->>   drivers/acpi/processor_perflib.c                              | 1 +
->>   drivers/acpi/processor_throttling.c                           | 3 ++-
->>   drivers/char/agp/nvidia-agp.c                                 | 1 +
->>   drivers/cpufreq/amd-pstate-ut.c                               | 2 ++
->>   drivers/crypto/ccp/sev-dev.c                                  | 1 +
->>   drivers/edac/amd64_edac.c                                     | 1 +
->>   drivers/edac/ie31200_edac.c                                   | 1 +
->>   drivers/edac/mce_amd.c                                        | 1 +
->>   drivers/hwmon/hwmon-vid.c                                     | 4 ++++
->>   drivers/idle/intel_idle.c                                     | 1 +
->>   drivers/misc/cs5535-mfgpt.c                                   | 1 +
->>   drivers/net/vmxnet3/vmxnet3_drv.c                             | 4 ++++
->>   drivers/platform/x86/intel/ifs/core.c                         | 1 +
->>   drivers/platform/x86/intel/ifs/load.c                         | 1 +
->>   drivers/platform/x86/intel/ifs/runtest.c                      | 1 +
->>   drivers/platform/x86/intel/pmc/cnp.c                          | 1 +
->>   drivers/platform/x86/intel/speed_select_if/isst_if_common.c   | 1 +
->>   drivers/platform/x86/intel/speed_select_if/isst_if_mbox_msr.c | 1 +
->>   drivers/platform/x86/intel/speed_select_if/isst_tpmi_core.c   | 1 +
->>   drivers/platform/x86/intel/turbo_max_3.c                      | 1 +
->>   .../platform/x86/intel/uncore-frequency/uncore-frequency.c    | 1 +
->>   drivers/powercap/intel_rapl_common.c                          | 1 +
->>   drivers/powercap/intel_rapl_msr.c                             | 1 +
->>   .../thermal/intel/int340x_thermal/processor_thermal_device.c  | 1 +
->>   drivers/thermal/intel/intel_tcc_cooling.c                     | 1 +
->>   drivers/thermal/intel/x86_pkg_temp_thermal.c                  | 1 +
->>   drivers/video/fbdev/geode/display_gx.c                        | 1 +
->>   drivers/video/fbdev/geode/gxfb_core.c                         | 1 +
->>   drivers/video/fbdev/geode/lxfb_ops.c                          | 1 +
-> 
-> Under drivers/ this looked pretty complete. Nice work.
-> 
-> Acked-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com> # for pdx86
+On Sat, 26 Apr 2025 at 18:20, <chia-yu.chang@nokia-bell-labs.com> wrote:
+>
+> diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+> index 9ea874395717..b4caeccbea72 100644
+> --- a/include/uapi/linux/pkt_sched.h
+> +++ b/include/uapi/linux/pkt_sched.h
+> @@ -1210,4 +1210,28 @@ enum {
+>
+>  #define TCA_ETS_MAX (__TCA_ETS_MAX - 1)
+>
+> +/* DUALPI2 */
+> +enum {
+> +       TCA_DUALPI2_UNSPEC,
+> +       TCA_DUALPI2_LIMIT,              /* Packets */
+> +       TCA_DUALPI2_MEMORY_LIMIT,       /* Bytes */
+> +       TCA_DUALPI2_TARGET,             /* us */
+> +       TCA_DUALPI2_TUPDATE,            /* us */
+> +       TCA_DUALPI2_ALPHA,              /* Hz scaled up by 256 */
+> +       TCA_DUALPI2_BETA,               /* HZ scaled up by 256 */
+> +       TCA_DUALPI2_STEP_THRESH,        /* Packets or us */
+> +       TCA_DUALPI2_STEP_PACKETS,       /* Whether STEP_THRESH is in packets */
+> +       TCA_DUALPI2_MIN_QLEN_STEP,      /* Minimum qlen to apply STEP_THRESH */
+> +       TCA_DUALPI2_COUPLING,           /* Coupling factor between queues */
+> +       TCA_DUALPI2_DROP_OVERLOAD,      /* Whether to drop on overload */
+> +       TCA_DUALPI2_DROP_EARLY,         /* Whether to drop on enqueue */
+> +       TCA_DUALPI2_C_PROTECTION,       /* Percentage */
+> +       TCA_DUALPI2_ECN_MASK,           /* L4S queue classification mask */
+> +       TCA_DUALPI2_SPLIT_GSO,          /* Split GSO packets at enqueue */
+> +       TCA_DUALPI2_PAD,
+> +       __TCA_DUALPI2_MAX
+> +};
+> +
+> +#define TCA_DUALPI2_MAX   (__TCA_DUALPI2_MAX - 1)
 
-Thanks a lot!
+Need to define enums here as part of UAPI for each of the new enum
+types you include in the tc.yaml patch.
 
+>  #endif
+> diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+> new file mode 100644
+> index 000000000000..bb3d9982b572
+> --- /dev/null
+> +++ b/net/sched/sch_dualpi2.c
+> @@ -0,0 +1,554 @@
+> +// SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +/* Copyright (C) 2024 Nokia
+> + *
+> + * Author: Koen De Schepper <koen.de_schepper@nokia-bell-labs.com>
+> + * Author: Olga Albisser <olga@albisser.org>
+> + * Author: Henrik Steen <henrist@henrist.net>
+> + * Author: Olivier Tilmans <olivier.tilmans@nokia.com>
+> + * Author: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> + *
+> + * DualPI Improved with a Square (dualpi2):
+> + * - Supports congestion controls that comply with the Prague requirements
+> + *   in RFC9331 (e.g. TCP-Prague)
+> + * - Supports coupled dual-queue with PI2 as defined in RFC9332
+> + * - Supports ECN L4S-identifier (IP.ECN==0b*1)
+> + *
+> + * note: Although DCTCP and BBRv3 can use shallow-threshold ECN marks,
+> + *   they do not meet the 'Prague L4S Requirements' listed in RFC 9331
+> + *   Section 4, so they can only be used with DualPI2 in a datacenter
+> + *   context.
+> + *
+> + * References:
+> + * - RFC9332: https://datatracker.ietf.org/doc/html/rfc9332
+> + * - De Schepper, Koen, et al. "PI 2: A linearized AQM for both classic and
+> + *   scalable TCP."  in proc. ACM CoNEXT'16, 2016.
+> + */
+> +
+> +#include <linux/errno.h>
+> +#include <linux/hrtimer.h>
+> +#include <linux/if_vlan.h>
+> +#include <linux/kernel.h>
+> +#include <linux/limits.h>
+> +#include <linux/module.h>
+> +#include <linux/skbuff.h>
+> +#include <linux/types.h>
+> +
+> +#include <net/gso.h>
+> +#include <net/inet_ecn.h>
+> +#include <net/pkt_cls.h>
+> +#include <net/pkt_sched.h>
+> +
+> +/* 32b enable to support flows with windows up to ~8.6 * 1e9 packets
+> + * i.e., twice the maximal snd_cwnd.
+> + * MAX_PROB must be consistent with the RNG in dualpi2_roll().
+> + */
+> +#define MAX_PROB U32_MAX
+> +
+> +/* alpha/beta values exchanged over netlink are in units of 256ns */
+> +#define ALPHA_BETA_SHIFT 8
+> +
+> +/* Scaled values of alpha/beta must fit in 32b to avoid overflow in later
+> + * computations. Consequently (see and dualpi2_scale_alpha_beta()), their
+> + * netlink-provided values can use at most 31b, i.e. be at most (2^23)-1
+> + * (~4MHz) as those are given in 1/256th. This enable to tune alpha/beta to
+> + * control flows whose maximal RTTs can be in usec up to few secs.
+> + */
+> +#define ALPHA_BETA_MAX ((1U << 31) - 1)
+> +
+> +/* Internal alpha/beta are in units of 64ns.
+> + * This enables to use all alpha/beta values in the allowed range without loss
+> + * of precision due to rounding when scaling them internally, e.g.,
+> + * scale_alpha_beta(1) will not round down to 0.
+> + */
+> +#define ALPHA_BETA_GRANULARITY 6
+> +
+> +#define ALPHA_BETA_SCALING (ALPHA_BETA_SHIFT - ALPHA_BETA_GRANULARITY)
+> +
+> +/* We express the weights (wc, wl) in %, i.e., wc + wl = 100 */
+> +#define MAX_WC 100
+> +
+> +struct dualpi2_sched_data {
+> +       struct Qdisc *l_queue;  /* The L4S Low latency queue (L-queue) */
+> +       struct Qdisc *sch;      /* The Classic queue (C-queue) */
+> +
+> +       /* Registered tc filters */
+> +       struct tcf_proto __rcu *tcf_filters;
+> +       struct tcf_block *tcf_block;
+> +
+> +       /* PI2 parameters */
+> +       u64     pi2_target;     /* Target delay in nanoseconds */
+> +       u32     pi2_tupdate;    /* Timer frequency in nanoseconds */
+> +       u32     pi2_prob;       /* Base PI probability */
+> +       u32     pi2_alpha;      /* Gain factor for the integral rate response */
+> +       u32     pi2_beta;       /* Gain factor for the proportional response */
+> +       struct hrtimer pi2_timer; /* prob update timer */
+> +
+> +       /* Step AQM (L-queue only) parameters */
+> +       u32     step_thresh;    /* Step threshold */
+> +       bool    step_in_packets; /* Whether the step is in packets or time */
+> +
+> +       /* C-queue starvation protection */
+> +       s32     c_protection_credit; /* Credit (sign indicates which queue) */
+> +       s32     c_protection_init; /* Reset value of the credit */
+> +       u8      c_protection_wc; /* C-queue weight (between 0 and MAX_WC) */
+> +       u8      c_protection_wl; /* L-queue weight (MAX_WC - wc) */
+> +
+> +       /* General dualQ parameters */
+> +       u32     memory_limit;   /* Memory limit of both queues */
+> +       u8      coupling_factor;/* Coupling factor (k) between both queues */
+> +       u8      ecn_mask;       /* Mask to match packets into L-queue */
+> +       u32     min_qlen_step;  /* Minimum queue length to apply step thresh */
+> +       bool    drop_early;     /* Drop at enqueue instead of dequeue if true */
+> +       bool    drop_overload;  /* Drop (1) on overload, or overflow (0) */
+> +       bool    split_gso;      /* Split aggregated skb (1) or leave as is */
+> +
+> +       /* Statistics */
+> +       u64     c_head_ts;      /* Enqueue timestamp of the C-queue head */
+> +       u64     l_head_ts;      /* Enqueue timestamp of the L-queue head */
+> +       u64     last_qdelay;    /* Q delay val at the last probability update */
+> +       u32     packets_in_c;   /* Enqueue packet counter of the C-queue */
+> +       u32     packets_in_l;   /* Enqueue packet counter of the L-queue */
+> +       u32     maxq;           /* Maximum queue size of the C-queue */
+> +       u32     ecn_mark;       /* ECN mark pkt counter due to PI probability */
+> +       u32     step_marks;     /* ECN mark pkt counter due to step AQM */
+> +       u32     memory_used;    /* Memory used of both queues */
+> +       u32     max_memory_used;/* Maximum used memory */
+> +};
+> +
+> +static u32 dualpi2_scale_alpha_beta(u32 param)
+> +{
+> +       u64 tmp = ((u64)param * MAX_PROB >> ALPHA_BETA_SCALING);
+> +
+> +       do_div(tmp, NSEC_PER_SEC);
+> +       return tmp;
+> +}
+> +
+> +static ktime_t next_pi2_timeout(struct dualpi2_sched_data *q)
+> +{
+> +       return ktime_add_ns(ktime_get_ns(), q->pi2_tupdate);
+> +}
+> +
+> +static void dualpi2_reset_c_protection(struct dualpi2_sched_data *q)
+> +{
+> +       q->c_protection_credit = q->c_protection_init;
+> +}
+> +
+> +/* This computes the initial credit value and WRR weight for the L queue (wl)
+> + * from the weight of the C queue (wc).
+> + * If wl > wc, the scheduler will start with the L queue when reset.
+> + */
+> +static void dualpi2_calculate_c_protection(struct Qdisc *sch,
+> +                                          struct dualpi2_sched_data *q, u32 wc)
+> +{
+> +       q->c_protection_wc = wc;
+> +       q->c_protection_wl = MAX_WC - wc;
+> +       q->c_protection_init = (s32)psched_mtu(qdisc_dev(sch)) *
+> +               ((int)q->c_protection_wc - (int)q->c_protection_wl);
+> +       dualpi2_reset_c_protection(q);
+> +}
+> +
+> +static s64 __scale_delta(u64 diff)
+> +{
+> +       do_div(diff, 1 << ALPHA_BETA_GRANULARITY);
+> +       return diff;
+> +}
+> +
+> +static void get_queue_delays(struct dualpi2_sched_data *q, u64 *qdelay_c,
+> +                            u64 *qdelay_l)
+> +{
+> +       u64 now, qc, ql;
+> +
+> +       now = ktime_get_ns();
+> +       qc = READ_ONCE(q->c_head_ts);
+> +       ql = READ_ONCE(q->l_head_ts);
+> +
+> +       *qdelay_c = qc ? now - qc : 0;
+> +       *qdelay_l = ql ? now - ql : 0;
+> +}
+> +
+> +static u32 calculate_probability(struct Qdisc *sch)
+> +{
+> +       struct dualpi2_sched_data *q = qdisc_priv(sch);
+> +       u32 new_prob;
+> +       u64 qdelay_c;
+> +       u64 qdelay_l;
+> +       u64 qdelay;
+> +       s64 delta;
+> +
+> +       get_queue_delays(q, &qdelay_c, &qdelay_l);
+> +       qdelay = max(qdelay_l, qdelay_c);
+> +       /* Alpha and beta take at most 32b, i.e, the delay difference would
+> +        * overflow for queuing delay differences > ~4.2sec.
+> +        */
+> +       delta = ((s64)qdelay - q->pi2_target) * q->pi2_alpha;
+> +       delta += ((s64)qdelay - q->last_qdelay) * q->pi2_beta;
+> +       if (delta > 0) {
+> +               new_prob = __scale_delta(delta) + q->pi2_prob;
+> +               if (new_prob < q->pi2_prob)
+> +                       new_prob = MAX_PROB;
+> +       } else {
+> +               new_prob = q->pi2_prob - __scale_delta(~delta + 1);
+> +               if (new_prob > q->pi2_prob)
+> +                       new_prob = 0;
+> +       }
+> +       q->last_qdelay = qdelay;
+> +       /* If we do not drop on overload, ensure we cap the L4S probability to
+> +        * 100% to keep window fairness when overflowing.
+> +        */
+> +       if (!q->drop_overload)
+> +               return min_t(u32, new_prob, MAX_PROB / q->coupling_factor);
+> +       return new_prob;
+> +}
+> +
+> +static u32 get_memory_limit(struct Qdisc *sch, u32 limit)
+> +{
+> +       /* Apply rule of thumb, i.e., doubling the packet length,
+> +        * to further include per packet overhead in memory_limit.
+> +        */
+> +       u64 memlim = mul_u32_u32(limit, 2 * psched_mtu(qdisc_dev(sch)));
+> +
+> +       if (upper_32_bits(memlim))
+> +               return 0xffffffff;
+> +       else
+> +               return lower_32_bits(memlim);
+> +}
+> +
+> +static enum hrtimer_restart dualpi2_timer(struct hrtimer *timer)
+> +{
+> +       struct dualpi2_sched_data *q = from_timer(q, timer, pi2_timer);
+> +
+> +       WRITE_ONCE(q->pi2_prob, calculate_probability(q->sch));
+> +
+> +       hrtimer_set_expires(&q->pi2_timer, next_pi2_timeout(q));
+> +       return HRTIMER_RESTART;
+> +}
+> +
+> +static struct netlink_range_validation dualpi2_alpha_beta_range = {
+> +       .min = 1,
+> +       .max = ALPHA_BETA_MAX,
+> +};
+> +
+> +static struct netlink_range_validation dualpi2_wc_range = {
+> +       .min = 0,
+> +       .max = MAX_WC,
+> +};
+> +
+> +static const struct nla_policy dualpi2_policy[TCA_DUALPI2_MAX + 1] = {
+> +       [TCA_DUALPI2_LIMIT]             = NLA_POLICY_MIN(NLA_U32, 1),
+> +       [TCA_DUALPI2_MEMORY_LIMIT]      = NLA_POLICY_MIN(NLA_U32, 1),
+> +       [TCA_DUALPI2_TARGET]            = {.type = NLA_U32},
+> +       [TCA_DUALPI2_TUPDATE]           = NLA_POLICY_MIN(NLA_U32, 1),
+> +       [TCA_DUALPI2_ALPHA]             =
+> +               NLA_POLICY_FULL_RANGE(NLA_U32, &dualpi2_alpha_beta_range),
+> +       [TCA_DUALPI2_BETA]              =
+> +               NLA_POLICY_FULL_RANGE(NLA_U32, &dualpi2_alpha_beta_range),
+> +       [TCA_DUALPI2_STEP_THRESH]       = {.type = NLA_U32},
+> +       [TCA_DUALPI2_STEP_PACKETS]      = {.type = NLA_FLAG},
+> +       [TCA_DUALPI2_MIN_QLEN_STEP]     = {.type = NLA_U32},
+> +       [TCA_DUALPI2_COUPLING]          = NLA_POLICY_MIN(NLA_U8, 1),
+> +       [TCA_DUALPI2_DROP_OVERLOAD]     = {.type = NLA_U8},
+> +       [TCA_DUALPI2_DROP_EARLY]        = {.type = NLA_U8},
+> +       [TCA_DUALPI2_C_PROTECTION]      =
+> +               NLA_POLICY_FULL_RANGE(NLA_U8, &dualpi2_wc_range),
+> +       [TCA_DUALPI2_ECN_MASK]          = {.type = NLA_U8},
+> +       [TCA_DUALPI2_SPLIT_GSO]         = {.type = NLA_U8},
+> +};
+> +
+> +static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
+> +                         struct netlink_ext_ack *extack)
+> +{
+> +       struct nlattr *tb[TCA_DUALPI2_MAX + 1];
+> +       struct dualpi2_sched_data *q;
+> +       int old_backlog;
+> +       int old_qlen;
+> +       int err;
+> +
+> +       if (!opt)
+> +               return -EINVAL;
+> +       err = nla_parse_nested(tb, TCA_DUALPI2_MAX, opt, dualpi2_policy,
+> +                              extack);
+> +       if (err < 0)
+> +               return err;
+> +
+> +       q = qdisc_priv(sch);
+> +       sch_tree_lock(sch);
+> +
+> +       if (tb[TCA_DUALPI2_LIMIT]) {
+> +               u32 limit = nla_get_u32(tb[TCA_DUALPI2_LIMIT]);
+> +
+> +               WRITE_ONCE(sch->limit, limit);
+> +               WRITE_ONCE(q->memory_limit, get_memory_limit(sch, limit));
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_MEMORY_LIMIT])
+> +               WRITE_ONCE(q->memory_limit,
+> +                          nla_get_u32(tb[TCA_DUALPI2_MEMORY_LIMIT]));
+> +
+> +       if (tb[TCA_DUALPI2_TARGET]) {
+> +               u64 target = nla_get_u32(tb[TCA_DUALPI2_TARGET]);
+> +
+> +               WRITE_ONCE(q->pi2_target, target * NSEC_PER_USEC);
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_TUPDATE]) {
+> +               u64 tupdate = nla_get_u32(tb[TCA_DUALPI2_TUPDATE]);
+> +
+> +               WRITE_ONCE(q->pi2_tupdate, tupdate * NSEC_PER_USEC);
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_ALPHA]) {
+> +               u32 alpha = nla_get_u32(tb[TCA_DUALPI2_ALPHA]);
+> +
+> +               WRITE_ONCE(q->pi2_alpha, dualpi2_scale_alpha_beta(alpha));
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_BETA]) {
+> +               u32 beta = nla_get_u32(tb[TCA_DUALPI2_BETA]);
+> +
+> +               WRITE_ONCE(q->pi2_beta, dualpi2_scale_alpha_beta(beta));
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_STEP_THRESH]) {
+> +               u32 step_th = nla_get_u32(tb[TCA_DUALPI2_STEP_THRESH]);
+> +               bool step_pkt = nla_get_flag(tb[TCA_DUALPI2_STEP_PACKETS]);
+> +
+> +               WRITE_ONCE(q->step_in_packets, step_pkt);
+> +               WRITE_ONCE(q->step_thresh,
+> +                          step_pkt ? step_th : (step_th * NSEC_PER_USEC));
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_MIN_QLEN_STEP])
+> +               WRITE_ONCE(q->min_qlen_step,
+> +                          nla_get_u32(tb[TCA_DUALPI2_MIN_QLEN_STEP]));
+> +
+> +       if (tb[TCA_DUALPI2_COUPLING]) {
+> +               u8 coupling = nla_get_u8(tb[TCA_DUALPI2_COUPLING]);
+> +
+> +               WRITE_ONCE(q->coupling_factor, coupling);
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_DROP_OVERLOAD])
+> +               WRITE_ONCE(q->drop_overload,
+> +                          !!nla_get_u8(tb[TCA_DUALPI2_DROP_OVERLOAD]));
 
-> 
-> I also noticed these files might not need to include msr.h:
-> 
-> drivers/cpufreq/elanfreq.c
-> drivers/cpufreq/sc520_freq.c
-> drivers/accel/habanalabs/common/habanalabs_ioctl.c
-> 
-> ...so if you want, you may consider optionally adding a cleanup patch to
-> remove the include from them.
-> 
->> --- a/drivers/video/fbdev/geode/gxfb_core.c
->> +++ b/drivers/video/fbdev/geode/gxfb_core.c
->> @@ -30,6 +30,7 @@
->>   #include <linux/cs5535.h>
->>   
->>   #include <asm/olpc.h>
->> +#include <asm/msr.h>
-> 
-> In wrong order.
->>   
->>   #include "gxfb.h"
-> 
+You declared an enum for this in tc.yaml so this should be implemented
+using an enum that you define as part of UAPI in pkt_sched.h
 
-I am more than happy to send v4A to address all your comments.
+> +
+> +       if (tb[TCA_DUALPI2_DROP_EARLY])
+> +               WRITE_ONCE(q->drop_early,
+> +                          !!nla_get_u8(tb[TCA_DUALPI2_DROP_EARLY]));
+
+You declared an enum for this in tc.yaml so this should be implemented
+using an enum that you define as part of UAPI in pkt_sched.h
+
+> +
+> +       if (tb[TCA_DUALPI2_C_PROTECTION]) {
+> +               u8 wc = nla_get_u8(tb[TCA_DUALPI2_C_PROTECTION]);
+> +
+> +               dualpi2_calculate_c_protection(sch, q, wc);
+> +       }
+> +
+> +       if (tb[TCA_DUALPI2_ECN_MASK])
+> +               WRITE_ONCE(q->ecn_mask,
+> +                          nla_get_u8(tb[TCA_DUALPI2_ECN_MASK]));
+
+You declared flags for this in tc.yaml so this should be implemented
+using flags that you define as part of UAPI in pkt_sched.h and you
+should check the provided value for validity before accepting it.
+
+> +
+> +       if (tb[TCA_DUALPI2_SPLIT_GSO])
+> +               WRITE_ONCE(q->split_gso,
+> +                          !!nla_get_u8(tb[TCA_DUALPI2_SPLIT_GSO]));
+
+This looks like another flag or enum but it is declared as a u8 in
+tc.yaml. Please fix the discrepancy.
+
+> +
+> +       old_qlen = qdisc_qlen(sch);
+> +       old_backlog = sch->qstats.backlog;
+> +       while (qdisc_qlen(sch) > sch->limit ||
+> +              q->memory_used > q->memory_limit) {
+> +               struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
+> +
+> +               q->memory_used -= skb->truesize;
+> +               qdisc_qstats_backlog_dec(sch, skb);
+> +               rtnl_qdisc_drop(skb, sch);
+> +       }
+> +       qdisc_tree_reduce_backlog(sch, old_qlen - qdisc_qlen(sch),
+> +                                 old_backlog - sch->qstats.backlog);
+> +
+> +       sch_tree_unlock(sch);
+> +       return 0;
+> +}
+> +
 
