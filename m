@@ -1,154 +1,129 @@
-Return-Path: <netdev+bounces-187030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739C7AA480D
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 12:14:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85635AA485E
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 12:31:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84B874A6D6B
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:14:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A673A8CF8
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9D125A352;
-	Wed, 30 Apr 2025 10:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC2248889;
+	Wed, 30 Apr 2025 10:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhGDSItM"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="LdSsqH6P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A6D25A33A
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 10:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615DA21ADAB;
+	Wed, 30 Apr 2025 10:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746007944; cv=none; b=TkSqAF5irrkSyvfEIJKQtHu626IaVUnHyQ76kT8ATZgB4+wfgCgKHdSR5ueDVGvB2G8msPuZI2xKyyjueMfgd6vkM3IeqMkC0pvYAEcN36K+GWJXM/SRVUdvXcFz4CY9Dt3IY1AYuc905Nin738PpgXOxzCUArWpksDZAAsLQTw=
+	t=1746008951; cv=none; b=Dk/gQvG6G6RsE9LFcWq2J9WC+nv9j9Oca+OGv+kkh0ZbI+xzUULyH/G1o/Z9leGGvHwQXdKh247/0zxZ8heunEMLUKfps8TAqPaaWJiM/PGXJTG4Nn399jSywlmvMtn1xLFy9nMYjr2Q8nsswhLdma6wHPb4Zff9cdYIyE7Dvtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746007944; c=relaxed/simple;
-	bh=ecy6qqaWhM2xobngJ8fvS5peWhfAmVtAcOtECYDOYpw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=amg9BG6K/y8S0ry85QBHAJ19LwArjL8Kz60KYIx/ZgZV6vGP+tZCRFb3+hRpiXCVKARP8vqA9AndfP/p3a/X9B9RwF4jz59LSABsXG0OcAqzM7UAW7ZilwTuX+7q3IHZBBe98HKmzomzcivTms7vxfOlVth/2brq5QhpnnygnQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RhGDSItM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746007941;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Djj8tsy+Ba85/DDYqso23/cXw9EWu4CIgtP3vOGRebo=;
-	b=RhGDSItMpYmkPNyCfp+yG6ncIx61JE5n+GXHUrE0mo+e1x9/zpyUm5278lyPt0pet7NQhN
-	mXlR/6nLLEbCl4lbLX0T0P7EOxYDMKvSL3tMVb6S+/rmeI5gWVwo8BioDIH9iX8eg20JB2
-	uPFUwS6v6oXzabkOctNuWFKXRy/NzbM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-509-UUO7kGRMOp2Up6SB1LyAMg-1; Wed,
- 30 Apr 2025 06:12:17 -0400
-X-MC-Unique: UUO7kGRMOp2Up6SB1LyAMg-1
-X-Mimecast-MFC-AGG-ID: UUO7kGRMOp2Up6SB1LyAMg_1746007935
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 648CC19560AA;
-	Wed, 30 Apr 2025 10:12:15 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.44.33.50])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B53BA1956094;
-	Wed, 30 Apr 2025 10:12:10 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v6 8/8] mfd: zl3073x: Register DPLL sub-device during init
-Date: Wed, 30 Apr 2025 12:11:26 +0200
-Message-ID: <20250430101126.83708-9-ivecera@redhat.com>
-In-Reply-To: <20250430101126.83708-1-ivecera@redhat.com>
-References: <20250430101126.83708-1-ivecera@redhat.com>
+	s=arc-20240116; t=1746008951; c=relaxed/simple;
+	bh=pM465M1gUSTXgy6ApQoIj3s3S8XdAFXFLP63XZjXkIU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YXjpt/aROIDc6GxNaeWyPXS1jU18XLqN2nUL890S3727LClgFhLJKAkh8uyrlhc5yDgZ6qfrxGQcGIWfSLv4mzljfDRAl+Sw36V/QOMLeQ9f4hYb9uHtNr8MMAmsYA+VUtibN4IvqBZinsg9LgcDzFzIKXl9Y3m38GEGdI1KEV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=LdSsqH6P; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uA4gV-006P72-D9; Wed, 30 Apr 2025 12:28:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=a3Vdz3L4ux7x7a4EC16mwI0DPhJL1mCNStK+TchLXCQ=; b=LdSsqH6PQV5lBPEFpd380a9iBv
+	3wUCeW0lZoKH7+NmJsST7dEpjZraxwXsKWx+OKKyLEhG7gYhu0OMSCUzTZsFhjydyHUfBrMjEdxno
+	m5YGYSIbO2o78XXRLJ4NoAEBuHCCSd1c8nhV6qGKi/iWc+14ernge0M9TnNNB0qMqLt8oyUSl0fsO
+	pVDcFvpy47kfbdQ56mx+yKnQLw51Yg0AqBVPlOyJi49ubNLwD9ca5AgClNAS4HGdW4rSANbSwStZS
+	3jRGuj0lAO4l0ndqZ7S/61F7LDZC3/JMrSjCoNoWmWQMQWILPR0PWo46SX1CiMjxsitiP7ughARaO
+	TBSA0dyA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uA4gU-0004EV-Ae; Wed, 30 Apr 2025 12:28:58 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uA4gM-000mo7-DV; Wed, 30 Apr 2025 12:28:50 +0200
+Message-ID: <23bcd402-86f9-4c05-bb83-360c8e4438fc@rbox.co>
+Date: Wed, 30 Apr 2025 12:28:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/4] vsock/virtio: Linger on unsent data
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co>
+ <20250430-vsock-linger-v3-1-ddbe73b53457@rbox.co>
+ <x3kkxnrqujqjkrtptr2qdd3227ncof2vb7jbrcg3aibvwjfqxa@hbinpxjuk3qe>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <x3kkxnrqujqjkrtptr2qdd3227ncof2vb7jbrcg3aibvwjfqxa@hbinpxjuk3qe>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Register DPLL sub-devices to expose the functionality provided
-by ZL3073x chip family. Each sub-device represents one of
-the available DPLL channels.
+On 4/30/25 11:26, Stefano Garzarella wrote:
+> On Wed, Apr 30, 2025 at 11:10:27AM +0200, Michal Luczaj wrote:
+>> Currently vsock's lingering effectively boils down to waiting (or timing
+>> out) until packets are consumed or dropped by the peer; be it by receiving
+>> the data, closing or shutting down the connection.
+>>
+>> To align with the semantics described in the SO_LINGER section of man
+>> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
+>> of a lingering close(): instead of waiting for all data to be handled,
+>> block until data is considered sent from the vsock's transport point of
+>> view. That is until worker picks the packets for processing and decrements
+>> virtio_vsock_sock::bytes_unsent down to 0.
+>>
+>> Note that (some interpretation of) lingering was always limited to
+>> transports that called virtio_transport_wait_close() on transport release.
+>> This does not change, i.e. under Hyper-V and VMCI no lingering would be
+>> observed.
+>>
+>> The implementation does not adhere strictly to man page's interpretation of
+>> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
+>>
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>> net/vmw_vsock/virtio_transport_common.c | 8 ++++++--
+>> 1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index 7f7de6d8809655fe522749fbbc9025df71f071bd..49c6617b467195ba385cc3db86caa4321b422d7a 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -1196,12 +1196,16 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
+>> {
+>> 	if (timeout) {
+>> 		DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>> +		ssize_t (*unsent)(struct vsock_sock *vsk);
+>> +		struct vsock_sock *vsk = vsock_sk(sk);
+>> +
+>> +		unsent = vsk->transport->unsent_bytes;
+> 
+> Just use `virtio_transport_unsent_bytes`, we don't need to be generic on 
+> transport here.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-v4->v6:
-* no change
-v3->v4:
-* use static mfd cells
----
- drivers/mfd/zl3073x-core.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+All right.
 
-diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
-index 050dc57c90c3..3e665cdf228f 100644
---- a/drivers/mfd/zl3073x-core.c
-+++ b/drivers/mfd/zl3073x-core.c
-@@ -7,6 +7,7 @@
- #include <linux/device.h>
- #include <linux/export.h>
- #include <linux/math64.h>
-+#include <linux/mfd/core.h>
- #include <linux/mfd/zl3073x.h>
- #include <linux/module.h>
- #include <linux/netlink.h>
-@@ -755,6 +756,14 @@ static void zl3073x_devlink_unregister(void *ptr)
- 	devlink_unregister(ptr);
- }
- 
-+static const struct mfd_cell zl3073x_dpll_cells[] = {
-+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 0),
-+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 1),
-+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2),
-+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 3),
-+	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 4),
-+};
-+
- /**
-  * zl3073x_dev_probe - initialize zl3073x device
-  * @zldev: pointer to zl3073x device
-@@ -826,6 +835,16 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
- 	if (rc)
- 		return rc;
- 
-+	/* Add DPLL sub-device cell for each DPLL channel */
-+	rc = devm_mfd_add_devices(zldev->dev, PLATFORM_DEVID_AUTO,
-+				  zl3073x_dpll_cells, chip_info->num_channels,
-+				  NULL, 0, NULL);
-+	if (rc) {
-+		dev_err_probe(zldev->dev, rc,
-+			      "Failed to add DPLL sub-device\n");
-+		return rc;
-+	}
-+
- 	/* Register the device as devlink device */
- 	devlink = priv_to_devlink(zldev);
- 	devlink_register(devlink);
--- 
-2.49.0
+Thanks
 
 
