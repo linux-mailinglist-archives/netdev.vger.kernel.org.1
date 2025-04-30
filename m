@@ -1,276 +1,119 @@
-Return-Path: <netdev+bounces-187166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848F8AA5684
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 23:11:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A5F0AA5769
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 23:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A889A3FAB
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:08:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF67F5061C3
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB292798FD;
-	Wed, 30 Apr 2025 21:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC732D1138;
+	Wed, 30 Apr 2025 21:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts8AtnpA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bw9tfX2s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBAA347C7;
-	Wed, 30 Apr 2025 21:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B12297A7F;
+	Wed, 30 Apr 2025 21:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746047356; cv=none; b=JTkb2iQqyWTcDhL8LIWOh3j8tLxdPd32o5cqvImYSbZc2iAL4fCsB4+yEG6oKaR8fHrUhl6n4BnF5il3RAqpiZOr95aweCaLktHuk0UVqtEXgG//V4ADbBzasWNOTQibRGFc/1CRRk832zRe7LyLUrvATZ8iEK34WOwKChCPf4Q=
+	t=1746048576; cv=none; b=aaKhaKKO3gA+KR7D/I/kh0tq9pjBSuVv90NH5GRsPhZ4k71/UzAnyXyP3XR032JQ1W0n3Gb1/6wM+e92w4gLIErC2Hb2aIr/8nOy3H5woyl0ZoZoPIm07ajBpFLMfVZn96iMJ6rD4A7n5tjGMAdcAgGpgasis7LbPp+1YSAExUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746047356; c=relaxed/simple;
-	bh=OXlR22NeZujfiOd6a7VlXw5AasuYrIFa2Xex6TgyW/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lyfEmpQ644y/58hjeMvZXu4TGJC7R7WDzfkUOzbxyFtDq1pbg/ixu5UExf5kyNYUDCyCz60cP04gaogLX2y7K6sJTtvIV7p1+JiIC1KkSwu+ByQ+7G00xsSrbP4PRWEqwL4K2Kd3EdB/ajSsvyN5gBweGdOKKYxQ9sKBe0sE5YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts8AtnpA; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b061a06f127so201275a12.2;
-        Wed, 30 Apr 2025 14:09:14 -0700 (PDT)
+	s=arc-20240116; t=1746048576; c=relaxed/simple;
+	bh=lIKIbLtONHYjXLdhuP4peo4Z8DDsc4FDnAj/KpC7OMA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CW5jiL40O8yKedoz/bbUe0p+9bPKv8It9rRPM3vhGEtTREeVt/sDlXK7i1qx8+rc3w0K42ijOpeNZd1Rp0Y/eZWD40lQWP746O3eyvVOpqHbizJ/6UjmQeFKcUBFmH5g7lUhGwRNrte4KQH7NXYmp2e4xX4+6NWecWptpzc7KfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bw9tfX2s; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746047354; x=1746652154; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a3HKRMSHrP9RGCuuggYrpkcFnv1xm24FX7npNpab07w=;
-        b=Ts8AtnpA5Fy9y291NMDVmjzFxWMTEFvW2PfEmgVjz+m+R1EOqUrccQs1TW/MgFCLGs
-         1OgsgjiOLj8bN5XtOejJMF8748leP3p9+ozgkQ4G/yMvI35WL/4ilzvCJcjTqNwfsSaj
-         NxX6IZ+AdyklJSROQ7PNKL1RgUq3gY421570ftXF/C8eSxjbsQI7HWMsL7A6Yy+p0M5t
-         SU3ic24qfnn/ondhsxqW5SocJ/oetAUMeT3rWe/mWQNs0s0DbT3MBFvs535xud3hQPA0
-         NhtsFN96rgztFbFtAAJxV3ICJ9kSkD0/AegGLGyiAPXY4eudfnx8pgsq2KvV9wKTxq36
-         uJog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746047354; x=1746652154;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a3HKRMSHrP9RGCuuggYrpkcFnv1xm24FX7npNpab07w=;
-        b=J0s2nr19w60a3To/GwbptzVf8NPfT7Gnwzt3V2coZgF3QfBsHZ92lTlfdmLNASSkFz
-         RJkpih+wAp4MGKz35xilmZyWFGkcUsH6gngQd61zGSQb6uIeUAwtCEVproSaxUFkXFOE
-         uLqL+JXhJvm9IxEEWrAPszQtxLY5hlXTrXnIONfTGHaPio14jtMk6/SDEQrM28zPD/rY
-         wggf6DxsZ7JE8ArmT4pLMHK3uSJEeCF7NWkCVlk/WPtfHpeGuiZRdP54L2naURiGNQcJ
-         5Qv0swbb9y13vpeOgEFWcwp1id9KOUxLf8zDJsIgZxnMkRGCtiy7yotWi+Q+HJQFCzz+
-         MaNg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHz8i3KJ5TP6ykUlLas+eLxcGurY3CvB3sOfCVY/D2YqJdsONbh2uKT3QcCbhWgvVAIGLKP6qhGpdxzEmE@vger.kernel.org, AJvYcCVIft904eKO8y06iwbXDusJrRTWKDjoUiD8Kk+sxx8Y/fW7dOG9mrfCaLHmM/BidogTsSA=@vger.kernel.org, AJvYcCVlZxf6oZFv+5ZFKHSxRuMbz60sShJvw047KxvJ43JRHcS+HwUjSPVT2PmAlRlnk17+yRW6FZlB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/6N0/+D1mo9/ppUXt6L2zS3ZgmaCgTJkgs1pqLzuvSHrUzh1+
-	rdVKRiUgFFGhRB/5nP+v9ctLdYF09DhzsKxARwJZqSzSdvsqqAc=
-X-Gm-Gg: ASbGnctb+CihlvYRCqLNYbfJTEnDmF9RdPS7XSonD+sgspmMUNAlW9PmIXbZZQIOmNK
-	yD7ebNeuaVpNY516kXKfL1QnH42zUl+i0j2vxC2ZS63FOGH17UhyA6A/pzNg/yoWT38nyqRwiY7
-	b07klaalmirUxH84qmkWTC6aBKajmAy1k1yJft+11iGuF4SG1V6VUptMDzU96fS7irKUCNxmpjE
-	su31I9yyNMpjZOG10s/RqQ2R3oZ2AC+OBxpp8ge3REDeHleEijiE6jGGUBTlSNdqCp+TWrxVoC1
-	BaotLh76Lnep4/SrJDX1ephFORL3p/rZkH9e2QWIEG+Y0Czr3FOPUNg46lN3b5qItz5bJvs9rbg
-	=
-X-Google-Smtp-Source: AGHT+IFXQCXHicJFO1hNA94Emd+k12JQXrYMfIw1qxJUNTY3zVjzX+7mSkKMVuJEo5+CRvCD6UBoLw==
-X-Received: by 2002:a17:90b:5826:b0:2ff:5a9d:9390 with SMTP id 98e67ed59e1d1-30a41d19e3emr331100a91.8.1746047353508;
-        Wed, 30 Apr 2025 14:09:13 -0700 (PDT)
-Received: from localhost (c-73-170-40-124.hsd1.ca.comcast.net. [73.170.40.124])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30a34a00039sm2147830a91.19.2025.04.30.14.09.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 14:09:13 -0700 (PDT)
-Date: Wed, 30 Apr 2025 14:09:12 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v2] xdp: Add helpers for head length, headroom,
- and metadata length
-Message-ID: <aBKReJUy2Z-JQwr4@mini-arch>
-References: <20250430201120.1794658-1-jon@nutanix.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746048572; x=1777584572;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yyT2mE4AxoVDIQ/9ei0bjwOO32J4Gut3ZMT5pI4UU7E=;
+  b=bw9tfX2sQx1b2LtmuKGIYP0rLWwwsWNDvNAPOkZQEzIq8PLRUs3IreeQ
+   y2Qg9S9FPzA1pMLWg1SShalQbCAmO7k5JvAepVHM7+hr9XzZCh51RsnYN
+   AS5RyaYtr/loDRRn16dhki5abo4X9cEWvu4CgCYJHzEqfHmP4Bb5Ii2uq
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.15,252,1739836800"; 
+   d="scan'208";a="718487481"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 21:29:27 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:32139]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.121:2525] with esmtp (Farcaster)
+ id 62e930e0-868d-4088-b8d6-eaf92158a546; Wed, 30 Apr 2025 21:29:26 +0000 (UTC)
+X-Farcaster-Flow-ID: 62e930e0-868d-4088-b8d6-eaf92158a546
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 30 Apr 2025 21:29:26 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 30 Apr 2025 21:29:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jlayton@kernel.org>
+CC: <airlied@gmail.com>, <akpm@linux-foundation.org>, <andrew@lunn.ch>,
+	<davem@davemloft.net>, <dri-devel@lists.freedesktop.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <intel-gfx@lists.freedesktop.org>,
+	<jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>,
+	<nathan@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<qasdev00@gmail.com>, <rodrigo.vivi@intel.com>, <simona@ffwll.ch>,
+	<tursulin@ursulin.net>, <tzimmermann@suse.de>
+Subject: Re: [PATCH v6 08/10] net: add symlinks to ref_tracker_dir for netns
+Date: Wed, 30 Apr 2025 14:29:07 -0700
+Message-ID: <20250430212913.27147-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250430-reftrack-dbgfs-v6-8-867c29aff03a@kernel.org>
+References: <20250430-reftrack-dbgfs-v6-8-867c29aff03a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250430201120.1794658-1-jon@nutanix.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 04/30, Jon Kohler wrote:
-> Introduce new XDP helpers:
-> - xdp_headlen: Similar to skb_headlen
-> - xdp_headroom: Similar to skb_headroom
-> - xdp_metadata_len: Similar to skb_metadata_len
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 30 Apr 2025 08:06:54 -0700
+> After assigning the inode number to the namespace, use it to create a
+> unique name for each netns refcount tracker with the ns.inum value in
+> it, and register a symlink to the debugfs file for it.
 > 
-> Integrate these helpers into tap, tun, and XDP implementation to start.
+> init_net is registered before the ref_tracker dir is created, so add a
+> late_initcall() to register its files and symlinks.
 > 
-> No functional changes introduced.
-> 
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 > ---
-> v1->v2: Integrate feedback from Willem
-> https://patchwork.kernel.org/project/netdevbpf/patch/20250430182921.1704021-1-jon@nutanix.com/
+>  net/core/net_namespace.c | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
 > 
->  drivers/net/tap.c |  6 +++---
->  drivers/net/tun.c | 12 +++++------
->  include/net/xdp.h | 54 +++++++++++++++++++++++++++++++++++++++++++----
->  net/core/xdp.c    | 12 +++++------
->  4 files changed, 65 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index d4ece538f1b2..a62fbca4b08f 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -1048,7 +1048,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
->  	struct sk_buff *skb;
->  	int err, depth;
->  
-> -	if (unlikely(xdp->data_end - xdp->data < ETH_HLEN)) {
-> +	if (unlikely(xdp_headlen(xdp) < ETH_HLEN)) {
->  		err = -EINVAL;
->  		goto err;
->  	}
-> @@ -1062,8 +1062,8 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
->  		goto err;
->  	}
->  
-> -	skb_reserve(skb, xdp->data - xdp->data_hard_start);
-> -	skb_put(skb, xdp->data_end - xdp->data);
-> +	skb_reserve(skb, xdp_headroom(xdp));
-> +	skb_put(skb, xdp_headlen(xdp));
->  
->  	skb_set_network_header(skb, ETH_HLEN);
->  	skb_reset_mac_header(skb);
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 7babd1e9a378..4c47eed71986 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1567,7 +1567,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
->  			dev_core_stats_rx_dropped_inc(tun->dev);
->  			return err;
->  		}
-> -		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
-> +		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
->  		break;
->  	case XDP_TX:
->  		err = tun_xdp_tx(tun->dev, xdp);
-> @@ -1575,7 +1575,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
->  			dev_core_stats_rx_dropped_inc(tun->dev);
->  			return err;
->  		}
-> -		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
-> +		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
->  		break;
->  	case XDP_PASS:
->  		break;
-> @@ -2355,7 +2355,7 @@ static int tun_xdp_one(struct tun_struct *tun,
->  		       struct xdp_buff *xdp, int *flush,
->  		       struct tun_page *tpage)
->  {
-> -	unsigned int datasize = xdp->data_end - xdp->data;
-> +	unsigned int datasize = xdp_headlen(xdp);
->  	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
->  	struct virtio_net_hdr *gso = &hdr->gso;
->  	struct bpf_prog *xdp_prog;
-> @@ -2415,14 +2415,14 @@ static int tun_xdp_one(struct tun_struct *tun,
->  		goto out;
->  	}
->  
-> -	skb_reserve(skb, xdp->data - xdp->data_hard_start);
-> -	skb_put(skb, xdp->data_end - xdp->data);
-> +	skb_reserve(skb, xdp_headroom(xdp));
-> +	skb_put(skb, xdp_headlen(xdp));
->  
->  	/* The externally provided xdp_buff may have no metadata support, which
->  	 * is marked by xdp->data_meta being xdp->data + 1. This will lead to a
->  	 * metasize of -1 and is the reason why the condition checks for > 0.
->  	 */
-> -	metasize = xdp->data - xdp->data_meta;
-> +	metasize = xdp_metadata_len(xdp);
->  	if (metasize > 0)
->  		skb_metadata_set(skb, metasize);
->  
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index 48efacbaa35d..044345b18305 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -151,10 +151,56 @@ xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
->  	return (struct skb_shared_info *)xdp_data_hard_end(xdp);
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index 008de9675ea98fa8c18628b2f1c3aee7f3ebc9c6..6cbc8eabb8e56c847fc34fa8ec9994e8b275b0af 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -763,12 +763,38 @@ struct net *get_net_ns_by_pid(pid_t pid)
 >  }
+>  EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
 >  
-> +/**
-> + * xdp_headlen - Calculate the length of the data in an XDP buffer
-> + * @xdp: Pointer to the XDP buffer structure
-> + *
-> + * Compute the length of the data contained in the XDP buffer. Does not
-> + * include frags, use xdp_get_buff_len() for that instead.
-> + *
-> + * Analogous to skb_headlen().
-> + *
-> + * Return: The length of the data in the XDP buffer in bytes.
-> + */
-> +static inline unsigned int xdp_headlen(const struct xdp_buff *xdp)
+> +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
+> +static void net_ns_net_debugfs(struct net *net)
 > +{
-> +	return xdp->data_end - xdp->data;
-> +}
-> +
-> +/**
-> + * xdp_headroom - Calculate the headroom available in an XDP buffer
-> + * @xdp: Pointer to the XDP buffer structure
-> + *
-> + * Compute the headroom in an XDP buffer.
-> + *
-> + * Analogous to the skb_headroom().
-> + *
-> + * Return: The size of the headroom in bytes.
-> + */
-> +static inline unsigned int xdp_headroom(const struct xdp_buff *xdp)
-> +{
-> +	return xdp->data - xdp->data_hard_start;
-> +}
-> +
-> +/**
-> + * xdp_metadata_len - Calculate the length of metadata in an XDP buffer
-> + * @xdp: Pointer to the XDP buffer structure
-> + *
-> + * Compute the length of the metadata region in an XDP buffer.
-> + *
-> + * Analogous to skb_metadata_len().
-> + *
-> + * Return: The length of the metadata in bytes.
-> + */
-> +static inline unsigned int xdp_metadata_len(const struct xdp_buff *xdp)
+> +	ref_tracker_dir_symlink(&net->refcnt_tracker, "netns-%u-refcnt", net->ns.inum);
+> +	ref_tracker_dir_symlink(&net->notrefcnt_tracker, "netns-%u-notrefcnt", net->ns.inum);
 
-I believe this has to return int, not unsigned int. There are places
-where we do data_meta = data + 1, and the callers check whether
-the result is signed or sunsigned.
+Could you use net->net_cookie ?
 
-> +{
-> +	return xdp->data - xdp->data_meta;
-> +}
-> +
->  static __always_inline unsigned int
->  xdp_get_buff_len(const struct xdp_buff *xdp)
->  {
-> -	unsigned int len = xdp->data_end - xdp->data;
-> +	unsigned int len = xdp_headlen(xdp);
->  	const struct skb_shared_info *sinfo;
->  
->  	if (likely(!xdp_buff_has_frags(xdp)))
-> @@ -364,8 +410,8 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
->  	int metasize, headroom;
->  
->  	/* Assure headroom is available for storing info */
-> -	headroom = xdp->data - xdp->data_hard_start;
-> -	metasize = xdp->data - xdp->data_meta;
-> +	headroom = xdp_headroom(xdp);
-> +	metasize = xdp_metadata_len(xdp);
->  	metasize = metasize > 0 ? metasize : 0;
-
-^^ like here
+net->ns.inum is always 1 when CONFIG_PROC_FS=n.
 
