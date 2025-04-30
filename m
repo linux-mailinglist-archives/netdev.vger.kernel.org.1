@@ -1,211 +1,161 @@
-Return-Path: <netdev+bounces-187016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09890AA47A5
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:53:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90554AA47B3
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A05C21BC112B
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E1D69A8368
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D8A1E1021;
-	Wed, 30 Apr 2025 09:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D382356D9;
+	Wed, 30 Apr 2025 09:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bgh+Q5/j"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fXiVsn/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E252376E0
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400F623184F
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746006773; cv=none; b=AI3GiZ2R2aRa6IYBQ98YgSGvduikfxtywaqrt6uwJ0aBODbZ/AMhIjX9t49bz0JLnGiHhe+ge6UUGI8qvW52e0g/WgmpoU98xF8F7wQkS3J4JjwZsHIHlRyCR0Bcq+/Bs72UhJv+4WUcCw97+UJVmquRlB039aNq3vb5AjHJiXQ=
+	t=1746006869; cv=none; b=CvAO1GdfkdXtwFBcsmsAt+JSVuyIrzOkyAlBu1JpPs2EJphtVo78amhG0LdKiNn9LS9N9JiTa3lkr4HaWVYbSyd+GZJQsWJS/YsHxDToO2wgGglIt3z24GNKBuW9UjgwAjvxfEmAe0p5P0gJp3Akn3TiDNllOGKCgvXzW+wBggw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746006773; c=relaxed/simple;
-	bh=oc9dl2byWPPO3Vq6aQgy6QzXniyIDx/pj6vtzDnjH5E=;
+	s=arc-20240116; t=1746006869; c=relaxed/simple;
+	bh=OPZigiWpxwHv1lnOkpeezwZwtsRjjBDFCG5NyXPV4cw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a9Fv4L+nvDFVXrYKZHiMOdN8xr4W8AVdEQZFg8YmMJJKvsYe0GXdRZkjFZxXxba0X9MY7ioJwv2DAwV0N5U+r+7+DYfsbeRR6GgLsRGEZI7m8y6tVc3hk0jbmoKB7bhsSDLbcha7G50sfGzO7cxdKmjnoX/b2Ve5sWXWHs16JYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bgh+Q5/j; arc=none smtp.client-ip=95.215.58.183
+	 In-Reply-To:Content-Type; b=hsd3Muu0gGqQIG6NSEFcwAVyidJ3sQaXZu0GR4qTyW1gn9jP5IfL4i2epsdvcHV2F5TapAIQHtjJi6RmPp1qhaY1C6UHp2bomopK78SYxvd3qYglzcxSbUq56Yo8bmkHY8x6EeaxcjszYck2tV8WhsgEuPbik2A3FNHWJWzmQcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fXiVsn/S; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <86889fb9-1d6f-4d6c-8ea8-3fbf2389dae9@linux.dev>
+Message-ID: <2d86bf48-6588-4051-8eb8-30bd4e1a34ca@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746006759;
+	t=1746006864;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HNorE4s0n1wq6lXGuCVhLcwvXE+qiMHLcQOcVIjIMR8=;
-	b=Bgh+Q5/jFJZi5Rm1sSqdGNz+pCkAhllDI2GZhw+GaE3buzO67DQ5NmNDoTWWK7VySDjmHl
-	XkIY3Q7qUchpJfkPuAWE4qCt2T7Ged/oaeruewgc/1crwYLbzJEyBk6i8hNaJh+o0MR2xm
-	4Em4A1/tZMjy492JjK5Uy/5qnWpKAks=
-Date: Wed, 30 Apr 2025 10:52:24 +0100
+	bh=QbLQyfbFYW96SBXE2wDxy7CIZhwc9mKxQpduRfQsUX4=;
+	b=fXiVsn/SnD01eZr6ljJuAh/mBiFOY+JikmiV1F9soSKz418wlLMGa6KUBIkhCF952LU+yZ
+	RXj477ysmHZd4Fc9jb+rXKolte8iCJHTk1DfqIMQvvGGPfmn4irweA//UKh1dM9taHSMnN
+	LXslZ6zPp5r21G7PndrEJ34zMWxdbUA=
+Date: Wed, 30 Apr 2025 10:54:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: jonathan.lemon@gmail.com, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250414085412.117120-1-maimon.sagi@gmail.com>
- <b6aea926-ebb6-48fe-a1be-6f428a648eae@linux.dev>
- <CAMuE1bG_+qj++Q0OXfBe3Z_aA-zFj3nmzr9CHCuKJ_Jr19oWEg@mail.gmail.com>
- <aa9a1485-0a0b-442b-b126-a00ee5d4801c@linux.dev>
- <CAMuE1bETL1+sGo9wq46O=Ad-_aa8xNLK0kWC63Mm5rTFdebp=w@mail.gmail.com>
- <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev>
- <CAMuE1bHsPeaokc-_qR4Ai8o=b3Qpbosv6MiR5_XufyRTtE4QFQ@mail.gmail.com>
- <44b67f86-ed27-49e8-9e15-917fa2b75a60@linux.dev>
- <CAMuE1bFk=LFTWfu8RFJeSoPtjO8ieJDdEHhHpKYr4QxqB-7BBg@mail.gmail.com>
- <507eb775-d7df-4dd2-a7d1-626d5a51c1de@linux.dev>
- <CAMuE1bFLB24ELFOSG=v+0hxJ+a+KGNWc8=Z3=kbXOs03PtLFOA@mail.gmail.com>
- <fd813f14-ea75-4f5a-a99e-d2925c25ccd2@linux.dev>
- <CAMuE1bEH0e+GAsCumED0TdXihtsmYV4T5uRLmz7_pePt8RNQzQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ptp: ocp: Fix NULL dereference in Adva board SMA sysfs
+ operations
+To: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
+ richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Sagi Maimon <sagi.maimon@adtran.com>
+References: <20250429073320.33277-1-maimon.sagi@gmail.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAMuE1bEH0e+GAsCumED0TdXihtsmYV4T5uRLmz7_pePt8RNQzQ@mail.gmail.com>
+In-Reply-To: <20250429073320.33277-1-maimon.sagi@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-On 29/04/2025 09:42, Sagi Maimon wrote:
-> On Wed, Apr 16, 2025 at 5:45 PM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 16/04/2025 14:59, Sagi Maimon wrote:
->>> On Wed, Apr 16, 2025 at 1:35 PM Vadim Fedorenko
->>> <vadim.fedorenko@linux.dev> wrote:
->>>>
->>>> On 16/04/2025 07:33, Sagi Maimon wrote:
->>>>> On Mon, Apr 14, 2025 at 4:55 PM Vadim Fedorenko
->>>>> <vadim.fedorenko@linux.dev> wrote:
->>>>>>
->>>>>> On 14/04/2025 14:43, Sagi Maimon wrote:
->>>>>>> On Mon, Apr 14, 2025 at 4:01 PM Vadim Fedorenko
->>>>>>> <vadim.fedorenko@linux.dev> wrote:
->>>>>>>>
->>>>>>>> On 14/04/2025 12:38, Sagi Maimon wrote:
->>>>>>>>> On Mon, Apr 14, 2025 at 2:09 PM Vadim Fedorenko
->>>>>>>>> <vadim.fedorenko@linux.dev> wrote:
->>>>>>>>>>
->>>>>>>>>> On 14/04/2025 11:56, Sagi Maimon wrote:
->>>>>>>>>>> On Mon, Apr 14, 2025 at 12:37 PM Vadim Fedorenko
->>>>>>>>>>> <vadim.fedorenko@linux.dev> wrote:
->>>>>>>>>>>>
->>>>>>>>>>>> On 14/04/2025 09:54, Sagi Maimon wrote:
->>>>>>>>>>>>> Sysfs signal show operations can invoke _signal_summary_show before
->>>>>>>>>>>>> signal_out array elements are initialized, causing a NULL pointer
->>>>>>>>>>>>> dereference. Add NULL checks for signal_out elements to prevent kernel
->>>>>>>>>>>>> crashes.
->>>>>>>>>>>>>
->>>>>>>>>>>>> Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and update sysfs nodes")
->>>>>>>>>>>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
->>>>>>>>>>>>> ---
->>>>>>>>>>>>>         drivers/ptp/ptp_ocp.c | 3 +++
->>>>>>>>>>>>>         1 file changed, 3 insertions(+)
->>>>>>>>>>>>>
->>>>>>>>>>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
->>>>>>>>>>>>> index 7945c6be1f7c..4c7893539cec 100644
->>>>>>>>>>>>> --- a/drivers/ptp/ptp_ocp.c
->>>>>>>>>>>>> +++ b/drivers/ptp/ptp_ocp.c
->>>>>>>>>>>>> @@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
->>>>>>>>>>>>>             bool on;
->>>>>>>>>>>>>             u32 val;
->>>>>>>>>>>>>
->>>>>>>>>>>>> +     if (!bp->signal_out[nr])
->>>>>>>>>>>>> +             return;
->>>>>>>>>>>>> +
->>>>>>>>>>>>>             on = signal->running;
->>>>>>>>>>>>>             sprintf(label, "GEN%d", nr + 1);
->>>>>>>>>>>>>             seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
->>>>>>>>>>>>
->>>>>>>>>>>> That's not correct, the dereference of bp->signal_out[nr] happens before
->>>>>>>>>>>> the check. But I just wonder how can that even happen?
->>>>>>>>>>>>
->>>>>>>>>>> The scenario (our case): on ptp_ocp_adva_board_init we
->>>>>>>>>>> initiate only signals 0 and 1 so 2 and 3 are NULL.
->>>>>>>>>>> Later ptp_ocp_summary_show runs on all 4 signals and calls _signal_summary_show
->>>>>>>>>>> when calling signal 2 or 3  the dereference occurs.
->>>>>>>>>>> can you please explain: " the dereference of bp->signal_out[nr] happens before
->>>>>>>>>>> the check", where exactly? do you mean in those lines:
->>>>>>>>>>> struct signal_reg __iomem *reg = bp->signal_out[nr]->mem;
->>>>>>>>>>          ^^^
->>>>>>>>>> yes, this is the line which dereferences the pointer.
->>>>>>>>>>
->>>>>>>>>> but in case you have only 2 pins to configure, why the driver exposes 4
->>>>>>>>>> SMAs? You can simply adjust the attributes (adva_timecard_attrs).
->>>>>>>>>>
->>>>>>>>> I can (and will) expose only 2 sma in adva_timecard_attrs, but still
->>>>>>>>> ptp_ocp_summary_show runs
->>>>>>>>> on all 4 signals and not only on the on that exposed, is it not a bug?
->>>>>>>>
->>>>>>>> Yeah, it's a bug, but different one, and we have to fix it other way.
->>>>>>>>
->>>>>>> Do you want to instruct me how to fix it , or will you fix it?
->>>>>>
->>>>>> well, the original device structure was not designed to have the amount
->>>>>> of SMAs less than 4. We have to introduce another field to store actual
->>>>>> amount of SMAs to work with, and adjust the code to check the value. The
->>>>>> best solution would be to keep maximum amount of 4 SMAs in the structure
->>>>>> but create a helper which will init new field and will have
->>>>>> BUILD_BUG_ON() to prevent having more SMAs than fixed size array for
->>>>>> them. That will solve your problem, but I will need to check it on the
->>>>>> HW we run.
->>>>>>
->>>>> just to be clear you will write the fix and test it on your HW, so you
->>>>> don't want me to write the fix?
->>>>
->>>> Well, it would be great if you can write the code which will make SMA
->>>> functions flexible to the amount of pin the HW has. All our HW has fixed
->>>> amount of 4 pins that's why the driver was coded with constants. Now
->>>> your hardware has slightly different amount of pins, so it needs
->>>> adjustments to the driver to work properly. I just want to be sure that
->>>> any adjustments will not break my HW - that's what I meant saying I'll
->>>> test it.
->>>>
->>> Just to be clear (correct me please if I am wrong):
->>> I will write the code, then create a patch and upstream to the vanilla
->>> you will test my change on your HW and only then approve the patch
->>
->> Yes, that's correct
->>
-> On altera we have implemented 2 signals and 4 SMAs (does not make sense, but...)
-> The original fix is regarding struct ptp_ocp_signal signal[4], but on
-> your fix suggestion
-> you mension SMAs.
-> So what to do? fix the SMA array or signal array or both?
-> and if both should we establish some connection between the two
-> meaning if we have only
-> two SMAs then we can initiate only two signals?
-> please advise
+On 29/04/2025 08:33, Sagi Maimon wrote:
+> From: Sagi Maimon <sagi.maimon@adtran.com>
+> 
+> On Adva boards, SMA sysfs store/get operations can call
+> __handle_signal_outputs() or __handle_signal_inputs() while the `irig`
+> and `dcf` pointers are uninitialized, leading to a NULL pointer
+> dereference in __handle_signal() and causing a kernel crash. Adva boards
+> don't use `irig` or `dcf` functionality, so add Adva-specific callbacks
+> `ptp_ocp_sma_adva_set_outputs()` and `ptp_ocp_sma_adva_set_inputs()` that
+> avoid invoking `irig` or `dcf` input/output routines.
+> 
+> Fixes: ef61f5528fca ("ptp: ocp: add Adva timecard support")
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> ---
+> Addressed comments from Vadim Fedorenko:
+>   - https://www.spinics.net/lists/kernel/msg5659845.html
+> Changes since v1:
+>   - Remove unused `irig` and `dcf` code.
+> ---
+> ---
+>   drivers/ptp/ptp_ocp.c | 52 +++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 50 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index faf6e027f89a..2ccdca4f6960 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -2578,12 +2578,60 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
+>   	.set_output	= ptp_ocp_sma_fb_set_output,
+>   };
+>   
+> +static int
+> +ptp_ocp_sma_adva_set_output(struct ptp_ocp *bp, int sma_nr, u32 val)
+> +{
+> +	u32 reg, mask, shift;
+> +	unsigned long flags;
+> +	u32 __iomem *gpio;
+> +
+> +	gpio = sma_nr > 2 ? &bp->sma_map1->gpio2 : &bp->sma_map2->gpio2;
+> +	shift = sma_nr & 1 ? 0 : 16;
+> +
+> +	mask = 0xffff << (16 - shift);
+> +
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +
+> +	reg = ioread32(gpio);
+> +	reg = (reg & mask) | (val << shift);
+> +
+> +	iowrite32(reg, gpio);
+> +
+> +	spin_unlock_irqrestore(&bp->lock, flags);
+> +
+> +	return 0;
+> +}
+> +
+> +static int
+> +ptp_ocp_sma_adva_set_inputs(struct ptp_ocp *bp, int sma_nr, u32 val)
+> +{
+> +	u32 reg, mask, shift;
+> +	unsigned long flags;
+> +	u32 __iomem *gpio;
+> +
+> +	gpio = sma_nr > 2 ? &bp->sma_map2->gpio1 : &bp->sma_map1->gpio1;
+> +	shift = sma_nr & 1 ? 0 : 16;
+> +
+> +	mask = 0xffff << (16 - shift);
+> +
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +
+> +	reg = ioread32(gpio);
+> +	reg = (reg & mask) | (val << shift);
+> +
+> +	iowrite32(reg, gpio);
+> +
+> +	spin_unlock_irqrestore(&bp->lock, flags);
+> +
+> +	return 0;
+> +}
+> +
+>   static const struct ocp_sma_op ocp_adva_sma_op = {
+>   	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
+>   	.init		= ptp_ocp_sma_fb_init,
+>   	.get		= ptp_ocp_sma_fb_get,
+> -	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
+> -	.set_output	= ptp_ocp_sma_fb_set_output,
+> +	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
+> +	.set_output	= ptp_ocp_sma_adva_set_output,
+>   };
+>   
+>   static int
 
-Ok, now I got it. Previously, the ptp_ocp driver assumed that the amount
-of SMAs is equal to the amount signals supported as well as frequency
-outputs and always equals to 4. With the details you provided the
-assumption is wrong and we have to make proper code for such cases.
-
-I would suggest to introduce 3 fields of u8 which will store the real
-amount of SMAs/signals/frequencies supported by probed hardware. And
-reuse this fields in any show/set functions.
-
->>>>>>>>>>> struct ptp_ocp_signal *signal = &bp->signal[nr];
->>>>>>>>>>>> I believe the proper fix is to move ptp_ocp_attr_group_add() closer to
->>>>>>>>>>>> the end of ptp_ocp_adva_board_init() like it's done for other boards.
->>>>>>>>>>>>
->>>>>>>>>>>> --
->>>>>>>>>>>> pw-bot: cr
->>>>>>>>>>
->>>>>>>>
->>>>>>
->>>>
->>
-
+LGTM,
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
