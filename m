@@ -1,270 +1,155 @@
-Return-Path: <netdev+bounces-187144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD74AA5340
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:06:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86F9AA53DA
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 924D13A9FBD
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:03:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BAAC1C22DEA
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792C827A122;
-	Wed, 30 Apr 2025 18:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CA0265CDE;
+	Wed, 30 Apr 2025 18:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Xc63y4ma";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="bDm0rXUm"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="djGIGcf4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-002c1b01.pphosted.com (mx0a-002c1b01.pphosted.com [148.163.151.68])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1A3276025;
-	Wed, 30 Apr 2025 17:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.151.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746036000; cv=fail; b=cm/JntFHu1ixNfkmDj+QsonRqqV3LQVSPJshedp6dsr8nFmrJiCN1GV59dhhKzPQX49YgF/zOMseBmc3PoSHaRvW46rl3bI7tsb2ff+BNOKsPsFzKQBlRBHiThI7fUYHjSc0PJuPzWmtk60me4pa8RL+skn1AT9Nr0uV7PMM2QY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746036000; c=relaxed/simple;
-	bh=6sMu0KXkj7R3FYF1SPX9+c49xE7pQkxWJ/ocTPyPNdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=nI8MD2WRjwObHQnpAbGAhgyyrA+iez16MESG21PMwixdsQ4wxRLLVYjLKwpEcynqPkbGvaTIZVVnajWKKq5kYNS3+sblqbZaLzDaBFzhcPwQ2clxDZW8Q0ERyvPwrioZSxKepHjlGZJ9kF7rYjRAlgsOYGhC/GdTyesiS7WZ0T0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Xc63y4ma; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=bDm0rXUm; arc=fail smtp.client-ip=148.163.151.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
-	by mx0a-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53UC5seh006811;
-	Wed, 30 Apr 2025 10:59:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=proofpoint20171006; bh=2WHCZnFBw5UJE
-	oJjmlVkgY/BM35GcbVoqD2vorxqRlI=; b=Xc63y4madwXW0G8DWfdaaclsY/NQd
-	7J04QcYWDNa/T0KHo38sMmq7QxrN7D5cI2pWzSL1VzIBLI6fkfYIo43iFZO3PCIj
-	gIOnAuJOgGabSO6OwB6uzBcuuTKEmBPr27yMSgK1zRj0Oz6m3pxjzuPcTLjAkjbW
-	hCbZUlX69Ux0Oua9WHiUTZ560bqO4ifWFl39uyPGC5orHJ+Rt47RVcuOs0MIOSEt
-	qo8yE3IBAFg5uFYnTJGFH673f+7BflFoCr0oJMGSX6/Nr/vqySLudmp6d9LTXzrw
-	eM2byxscLLFII6ymhtnKk+iIf99uUAnxWp6ieUCD6MzMGjRoe2dOBtqNQ==
-Received: from dm1pr04cu001.outbound.protection.outlook.com (mail-centralusazlp17010002.outbound.protection.outlook.com [40.93.13.2])
-	by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 46b9g623cy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Apr 2025 10:59:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AN1IirSbTXOkRjQLQuNQ1lZHajHUHrcCM/EXmHg7G5wZ3KtIuxe3aWvigmtppGOrb5Hf3dNe/CfMWqstQrqlks0XvMAwHlDLgGUTLJ7S5aMxRzCKD7xcOE2EvMXvAL5SPilqQg1X6J1nAwj9NFtHfWdiTEl8jhbA1/bEPMtqKLSFDENhXaGbzQAwtHjLwQ6KNdRWjOTavyVKhySig9ampSFEk/7G0q3M1biAB37B25Er3F2hJxe9QD3Jcn2t7XbpCYWnJAC+vaxnlvKGl9NL8rHQAVA6FNhyhhltGaQUdLT+jKn0GhqdbmL/xVuYmaPxjFMS4M+xUKXD5qlmkDcbsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2WHCZnFBw5UJEoJjmlVkgY/BM35GcbVoqD2vorxqRlI=;
- b=BztUwwIeDdZF6Qnxr2BUybyXz2/VDXAPfsUixoFzWQIFJoTNcY65U0NSlWbi9NFn8o/djPqqZ3q8/LV3lpft6MCLCfquokX2OY871GkG+Zc7XsUFJkbreviEhtiwQTdyDaIVsD24h7JCEHR9UUiPLkKBRA3eew6Jrg4/j0x6zPAnRiZPDm2sq/vYJfStgLvE/aYjvMlAMQgC8fVqKWjB0Lw//Yxn5/cVJqbM0gxHlBb/KDzlfUiVFcexWQC4K9n4WaGPrCahHKwYkgjQAxyPVz4U33Kl50L9d7eFrB3D6vq1xaxERQPp6n7FKp3g08OKxRARts77TntteDiKPuXs/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2WHCZnFBw5UJEoJjmlVkgY/BM35GcbVoqD2vorxqRlI=;
- b=bDm0rXUm/sh7m2xIwloyvVPFIWGxajWpvCn7tfuOs32PB8OM9PExAzA9WtiJ6l1irbXVRs+MCa2WtjP06NLZ7KwnJHV3RL024p32UKoDXmBA8CmfYWsxaf/0rsBU0AdDNhS+YVizSTnnv3Izq6BQ3LSxf/ABgGu37dc0swEEvnxd5lOsRPrtVJJ6RJ6kyYLY2ujN8YbMlgBEhO+foDHofcb465vW5LD9Qo0t3aPkBN/5G32nh9EV5bUYF6EOHaFUzx+IaA3qYsj+sBJoBAhO8JR/iPCS7pGrMxPknuYKHiHVM1piP6W7IAAqjdqoZ2wLGW4hO5sNQUUPLkZgTLvykA==
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10) by PH0PR02MB8761.namprd02.prod.outlook.com
- (2603:10b6:510:4b::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.21; Wed, 30 Apr
- 2025 17:59:11 +0000
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8699.012; Wed, 30 Apr 2025
- 17:59:11 +0000
-From: Jon Kohler <jon@nutanix.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>
-Subject: [PATCH net-next] xdp: add xdp_skb_reserve_put helper
-Date: Wed, 30 Apr 2025 11:29:20 -0700
-Message-ID: <20250430182921.1704021-1-jon@nutanix.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0192.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::17) To LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF661EEA46;
+	Wed, 30 Apr 2025 18:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746038464; cv=none; b=qgDTC8hMo5b8Oj2FPBDKX8JstPYdAqCU2IKj+UcYnN1cAGm9TlX5aWmdN2KrHU7RYBAiv2ASAFx6I6BNjkRxMsPE2Fal5fPit+FClsq5p8g88trqvT4BWY+j5BWKZiQknF9UTCLjrDfvCcYvdaLILYzQjR8FN0jladb5PVvad8U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746038464; c=relaxed/simple;
+	bh=qgP2YJEKl9lEJVENCb1FcgNjLrhMpIE3abDrsfh/gKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=up6BQp3ly2eGbaZT4GhCyjbpCAzNGjpADTgefF61OvaiaEDMljzx6Baw57GFFnfE3NYOpWetIToLUE/ywOQDzwLiMpZ3Y8bQ9QNL23xIrtxfy9HICvasA4oaBSxN60mlbANLLUkRdZ1ALbE+prHCk+k8cfOGMScF+LUG+z7dyV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=djGIGcf4; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=OUllq6b9V2eoDzegUA8tEgJIXHBEsF3AfNjaXAcUvpI=; b=djGIGcf4B2z1il8ld4CUNIeIJ8
+	ArdCoL23pBcwo2FFZwm/YtsyYpYqKtQRMrMMV6Db2y9H0KeAzgnyLh4MVfhlah9Sux140QippLpJE
+	9Q4gU8xnzJbD16M7kUPKkFxIB7B06/kCk55Eef11WVhg74ehenGBNfh+/Df3j6hw98eEdxLH5OicT
+	RJdZzlYGyDunNwnbdGDGzDZNDZapYbMXCtpH2vHtwDWFBJlVflLCHdFL4BVyc7jesKTniCoCAVN9T
+	OudsHz92MU8AaOH0l+xbwY2C6oFgNFa7EtgEai2EPn5TqzP3V7LBBqU3JLfX5sYyUMmKtmAO8FtfD
+	Rz/x8GFQ==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uACMS-000Px5-2F;
+	Wed, 30 Apr 2025 20:40:49 +0200
+Received: from [85.195.247.12] (helo=[192.168.1.114])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uACMS-0008Fj-1q;
+	Wed, 30 Apr 2025 20:40:48 +0200
+Message-ID: <a6a8625c-9d20-48eb-b894-7bd6673a16d3@iogearbox.net>
+Date: Wed, 30 Apr 2025 20:40:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB8761:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85b378f4-ceab-4b57-f6f3-08dd8810b5ce
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|52116014|376014|7416014|366016|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KO7e5zerSy/D/cVeNVfvcbrE151e9Ql1Lm948TUBhXZ0eRckEYVHoZlNSSFj?=
- =?us-ascii?Q?1jStw8h79ZwnVHIszxNrKZYzWB5t6olv+CATw8UlWOCVOyWEJs7FfCcsQIOP?=
- =?us-ascii?Q?in8JjUJBjxy3mTtE6+CvcbWIsBII4zOOvvEUuyYKH0hAZwLLGKEk8GwY4S6F?=
- =?us-ascii?Q?vOqXzkdd/OyShk36fZ+YergHGdPArdXbqy31O0xSnDV8rv+MYUe0EEoDyr/o?=
- =?us-ascii?Q?LKomsPuoUVJRdlxN1cID+uI9Dy5Yocvau8xqrhYR+v1LvFSO3udw1N4Kb6nq?=
- =?us-ascii?Q?3N3pqnak7hobukeuB5DY06pox3pVao20AWhbF6m25DJjCyXbG5Fgl0SdmcLq?=
- =?us-ascii?Q?jqbqzOXeLnxpoSn9uY/INqYf5Zg9hTCUSRIRoHutfTz3FC9lZQzYLXMXGMzF?=
- =?us-ascii?Q?pqJTwH2+Uu1uGVQusZnzd2+nuEUabO8enoJhP7M2T6PF/2PMkKgqbVrNgetE?=
- =?us-ascii?Q?yY7FU9tz+9c9m78qR/ihC1pdVMLimP6O4K27P5UZ8NdHrIammXF4tiaowNdu?=
- =?us-ascii?Q?lRhL4yjHNx8mc+yv0Dc/cktUpyqzD/yWN7c4/Kzcu55cAjSykNUnU+M5wmle?=
- =?us-ascii?Q?aBex7Iyw6rqTAU988fb6QtQh1dvTNAu4dTXbGvGPHtcdgdOIddCGg3jrx4B5?=
- =?us-ascii?Q?UFfFjHS+nHnpFnrrYhqWciuSvrLawUHjKLC1oLxEvroI+axcOAI8t/1PtPf6?=
- =?us-ascii?Q?Wj+qpKHSxqgLQrnW7qyDAQ9LRgNej4Gqi6zUIsUtd669Y+YLGLZ+mii2Bz0y?=
- =?us-ascii?Q?SYS6y+v9ENLPeLiAQNtvSoPwg3dW+CXbbU09EcBOWdoc+/B8DvgAXnLpoy3d?=
- =?us-ascii?Q?U2JX0bsWWEQ/ZtFHurEfaYex2rS+mvkdgpkjLjvZVb+vljTCPSyE4DDrWmT6?=
- =?us-ascii?Q?QQVMzkJIVowiIarXeMC+ef5eJY6ProhW5V6k83yBN3XiEzc1a541nl87snxN?=
- =?us-ascii?Q?jrZy7meB9nWAcUyVgw1JE3t4/iz2E6mwAedEr7kWUwgfgcDFUJdYYPrfeXhO?=
- =?us-ascii?Q?twOKG6TdVL9LSjBJzOuxY51Bg+RkZcCEBGcrACQ/uPQHwvg9/dIAoUbzGVfT?=
- =?us-ascii?Q?KinHpTCvZ+TUaoSbOQcpJgeA9Np1mBNcRicq3ISn6SCRLkaTWmLF+DNZzr1w?=
- =?us-ascii?Q?85Jjw6cMwIzIEe8isRTeGTNegUUzdsM60VFzV76IjT38DeGa95sA/FRztl+Y?=
- =?us-ascii?Q?oWyoA1UO1ZFI2MsRblXdNrczos3TwPVMsiZD/0JUv9QbeoO9uqWPCCU9o0WN?=
- =?us-ascii?Q?TcqbWOWhGZOxbvj3AiI0tLZzv9DFDzEpWgJHV8nDAMnGR3MHHtMw1KM0hqFd?=
- =?us-ascii?Q?29xQC341oYNbKZOBRAjtfwoNdMQygg1IqX3ObZdeT260OffJw7bPlMcTv3Ju?=
- =?us-ascii?Q?m8l1H1zxD7Cdyv5HQSXK2edh5+LUuU6piS/tSnws9kGUHPgAQFAazfO1uswv?=
- =?us-ascii?Q?1Z/u2Q5Mwv+TuCg/53rOYHPAhuY6CA06hU+glF2va9E63hE30vLQ0IquIwLn?=
- =?us-ascii?Q?w+iTAjmZHqS2n0w=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(7416014)(366016)(38350700014)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2I3SgyV/w6RvVEUjv2KTYcRSbzTHXoix5i8Wgq6oJE1BBnVaEAHOdM5cmG9z?=
- =?us-ascii?Q?vZCMGQAch2p2KzZDa9JSGr6E8n8TouYBcMI8Xvt/UDIDfJtFNGg2y4YNXQuA?=
- =?us-ascii?Q?rmUexotp1NejebB4dqw4y8dGCr94Q2QF7QkCYHF7JlalHi+oZRIJ2Qt6j7mH?=
- =?us-ascii?Q?n3ceKWqJvTW5mFWaHyso1BpYAS7qrUqCEQJML7T2/LALNQU7DAKT5JKVL6FN?=
- =?us-ascii?Q?u5abwYusk7BtM07GyA/rVx1XRO74NGO2YoV6/BFY8wsznXc9u68ryWz4rGBD?=
- =?us-ascii?Q?29tiGaPJm8Ts0IBLbn5NSaq3/u0ycwg2ug9qFZBj6rZCmn/lu53Y5cqQETMA?=
- =?us-ascii?Q?A+1AHGZIa1aXoqpaMRA0TCF1GjlWcvQ4Efe4aZC8AzcxpYXeUG1G7W4HYsPN?=
- =?us-ascii?Q?1wqQYZcraOM/zrZbqUXsiCvpLYlmRFfyV1fFRYoZKjX6kMkzfWv3aBHhsuFH?=
- =?us-ascii?Q?+ohhDU3A6e8K0DcbSt850FunfU0ah2O8qOZDK+XXOPABH/KWVYsbBxzR7CdV?=
- =?us-ascii?Q?iafjQ4zhUz5adryrlOcnmQKrmh7HDSiKCHC+59CNbJ3VdoNnmJa8hK3ns/e5?=
- =?us-ascii?Q?NXCpX/UnKptAgkJqxU2dFNWbEQQznIxnzZIfhmDOSCWeJzglQu8GpACnFtHx?=
- =?us-ascii?Q?vA57gzCTE4eeazMRqNwPYgjCd+vmxx/u1mvngWtqE0YKzttH+sqTCDkdAV4L?=
- =?us-ascii?Q?ZOUsYu0kRYOL/1GYk2x0idXjAG9xiFy8nKOHzINZL18+r0UWPdh+VdQfCPYg?=
- =?us-ascii?Q?pcfEvno/Dc9RJlK13M5BgkX4UP+QZ60/9HxFf2rqUao6SSeXKpoGAQ07rkDq?=
- =?us-ascii?Q?Z5QoYmX8F5pLi4emgujYLJQ0zpxGFCQyJy9i3SeNwa5b9YjC7MtJ3a93gBj6?=
- =?us-ascii?Q?6QiJxlSkCI5PcgV4jW5sZBviJR4V96vfPfTCKVFzcaVy+xHJjY0ns23xJaTK?=
- =?us-ascii?Q?TksBxgAM+LpdM4MdANcvyFP1tQ4/rtLAk3fqUZMJQPIIDTdyE//imyCUTRR5?=
- =?us-ascii?Q?OaH3aQzFoocJrOiuKn3knerrjCP9Y7IjrRXTWKZOIX6F8V3cXVrpenScU54C?=
- =?us-ascii?Q?MEFaYSas+D300UpQR67cBy+JzC/wKMyEA0F540n2JJfpFuBZOgJaHb2Plz56?=
- =?us-ascii?Q?DRpkF4vQe6sp0cn+eINhZgBbr+3FgXSH5oX8EvpyyePciANff5N/LrWhgR5M?=
- =?us-ascii?Q?FkRg7F+muHZZiUZE2WPLnrti7AdR1g99zkDIbfZIwhB8GAnttCXtIFkV+kqO?=
- =?us-ascii?Q?LPOPVfCxgY8HaaDw2OIkWFM4spxoCwhxvHzdlgH55Iod2OwcjYutHOZqN1mp?=
- =?us-ascii?Q?Vois7CVMrCF6tGBYaW0UyGroDwQeb0JCnt/lHVZs8UQvtekhC45E/9kRkKf5?=
- =?us-ascii?Q?asoB3icx2V8jKvYKZtVE2/oIzzLKFdzUgr56dYx60a6NpTPrASiNvpKY+OI4?=
- =?us-ascii?Q?sK6txwblWrmja34TLLSJ6tuxVso3pZqSVikXyhpdaqQGzdZdpnajymrhWEz+?=
- =?us-ascii?Q?dxI664/7greatHYqYgSOTNdvR7GtZfZGpmzL7fleB+vZtExHBPK9QBQm0OT/?=
- =?us-ascii?Q?o80nzSN5+R0seUeEd8Kdz/EIH7JVHrc4X7Y6lvgs4SQOI5ugkKs5N2Bo+V+4?=
- =?us-ascii?Q?zg=3D=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85b378f4-ceab-4b57-f6f3-08dd8810b5ce
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 17:59:10.9416
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6pBbpHo9JiWEBTbuUZQHJsJ4Fr+vQEatDSiT9c41p4DwzZqX9oPvvLoEGpbC7RyN5y/mvSJS9HZ+9/0+MtwmMcMVSTTfeqJVFpctJ1Az3XA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB8761
-X-Authority-Analysis: v=2.4 cv=GolC+l1C c=1 sm=1 tr=0 ts=681264f5 cx=c_pps a=rknZK0v7KRh+kGA6vhtu4g==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=XR8D0OoHHMoA:10
- a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8 a=uhLky4AAz20MDxUL2KsA:9
-X-Proofpoint-GUID: F-07X2CkJKEvBZ-L3so64Ah6PRI6y4O_
-X-Proofpoint-ORIG-GUID: F-07X2CkJKEvBZ-L3so64Ah6PRI6y4O_
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDMwMDEzMCBTYWx0ZWRfX0qCazWYNvv9m MFPwzXcNXd9N8vTZAYRbFS3Ac51o6T5FuIB3rxQGGQ2KnNxXQUWc1GrxsX/tn1NgWLgl3XITIBF 2Fsoo0iFxIUAP28JHXJEmef6F4MY6/ZxUoSmabnlPCJv+WhvA4sFm8hmhFWWV+E3ceaip5zO6k/
- M2IR9wKMp4mh2jGUTr09eNwlFOZzk16ygKjBT8EpeDMZC5P/GquFVRNAgzAuqkmVUK4iBo3Cf1G +NwvPw42b9qHh+paMgUHSQYjQWNLjVhzfGrv5yBeVxIXRDIeqUeCkotaGyya2zZQoaSVwhvgICo zj/46NOILizMre/qOPyCMjnFklBBkVyay7u/dzzYYVyRl4S31SX82FUkBZ87vvzV61qzbgz9w4D
- BWqrlFpRTznvrWTvvrWUg54dD/QRJnNHKToYwXaOl7E1czGJmhx8Fx59i1xMuRSFvc9Ijx3q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-30_05,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Reason: safe
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] xdp: add xdp_skb_reserve_put helper
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250430182921.1704021-1-jon@nutanix.com>
+ <68126b09c77f7_3080df29453@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ xsFNBGNAkI0BEADiPFmKwpD3+vG5nsOznvJgrxUPJhFE46hARXWYbCxLxpbf2nehmtgnYpAN
+ 2HY+OJmdspBntWzGX8lnXF6eFUYLOoQpugoJHbehn9c0Dcictj8tc28MGMzxh4aK02H99KA8
+ VaRBIDhmR7NJxLWAg9PgneTFzl2lRnycv8vSzj35L+W6XT7wDKoV4KtMr3Szu3g68OBbp1TV
+ HbJH8qe2rl2QKOkysTFRXgpu/haWGs1BPpzKH/ua59+lVQt3ZupePpmzBEkevJK3iwR95TYF
+ 06Ltpw9ArW/g3KF0kFUQkGXYXe/icyzHrH1Yxqar/hsJhYImqoGRSKs1VLA5WkRI6KebfpJ+
+ RK7Jxrt02AxZkivjAdIifFvarPPu0ydxxDAmgCq5mYJ5I/+BY0DdCAaZezKQvKw+RUEvXmbL
+ 94IfAwTFA1RAAuZw3Rz5SNVz7p4FzD54G4pWr3mUv7l6dV7W5DnnuohG1x6qCp+/3O619R26
+ 1a7Zh2HlrcNZfUmUUcpaRPP7sPkBBLhJfqjUzc2oHRNpK/1mQ/+mD9CjVFNz9OAGD0xFzNUo
+ yOFu/N8EQfYD9lwntxM0dl+QPjYsH81H6zw6ofq+jVKcEMI/JAgFMU0EnxrtQKH7WXxhO4hx
+ 3DFM7Ui90hbExlFrXELyl/ahlll8gfrXY2cevtQsoJDvQLbv7QARAQABzSZEYW5pZWwgQm9y
+ a21hbm4gPGRhbmllbEBpb2dlYXJib3gubmV0PsLBkQQTAQoAOxYhBCrUdtCTcZyapV2h+93z
+ cY/jfzlXBQJjQJCNAhsDBQkHhM4ACAsJCAcNDAsKBRUKCQgLAh4BAheAAAoJEN3zcY/jfzlX
+ dkUQAIFayRgjML1jnwKs7kvfbRxf11VI57EAG8a0IvxDlNKDcz74mH66HMyhMhPqCPBqphB5
+ ZUjN4N5I7iMYB/oWUeohbuudH4+v6ebzzmgx/EO+jWksP3gBPmBeeaPv7xOvN/pPDSe/0Ywp
+ dHpl3Np2dS6uVOMnyIsvmUGyclqWpJgPoVaXrVGgyuer5RpE/a3HJWlCBvFUnk19pwDMMZ8t
+ 0fk9O47HmGh9Ts3O8pGibfdREcPYeGGqRKRbaXvcRO1g5n5x8cmTm0sQYr2xhB01RJqWrgcj
+ ve1TxcBG/eVMmBJefgCCkSs1suriihfjjLmJDCp9XI/FpXGiVoDS54TTQiKQinqtzP0jv+TH
+ 1Ku+6x7EjLoLH24ISGyHRmtXJrR/1Ou22t0qhCbtcT1gKmDbTj5TcqbnNMGWhRRTxgOCYvG0
+ 0P2U6+wNj3HFZ7DePRNQ08bM38t8MUpQw4Z2SkM+jdqrPC4f/5S8JzodCu4x80YHfcYSt+Jj
+ ipu1Ve5/ftGlrSECvy80ZTKinwxj6lC3tei1bkI8RgWZClRnr06pirlvimJ4R0IghnvifGQb
+ M1HwVbht8oyUEkOtUR0i0DMjk3M2NoZ0A3tTWAlAH8Y3y2H8yzRrKOsIuiyKye9pWZQbCDu4
+ ZDKELR2+8LUh+ja1RVLMvtFxfh07w9Ha46LmRhpCzsFNBGNAkI0BEADJh65bNBGNPLM7cFVS
+ nYG8tqT+hIxtR4Z8HQEGseAbqNDjCpKA8wsxQIp0dpaLyvrx4TAb/vWIlLCxNu8Wv4W1JOST
+ wI+PIUCbO/UFxRy3hTNlb3zzmeKpd0detH49bP/Ag6F7iHTwQQRwEOECKKaOH52tiJeNvvyJ
+ pPKSKRhmUuFKMhyRVK57ryUDgowlG/SPgxK9/Jto1SHS1VfQYKhzMn4pWFu0ILEQ5x8a0RoX
+ k9p9XkwmXRYcENhC1P3nW4q1xHHlCkiqvrjmWSbSVFYRHHkbeUbh6GYuCuhqLe6SEJtqJW2l
+ EVhf5AOp7eguba23h82M8PC4cYFl5moLAaNcPHsdBaQZznZ6NndTtmUENPiQc2EHjHrrZI5l
+ kRx9hvDcV3Xnk7ie0eAZDmDEbMLvI13AvjqoabONZxra5YcPqxV2Biv0OYp+OiqavBwmk48Z
+ P63kTxLddd7qSWbAArBoOd0wxZGZ6mV8Ci/ob8tV4rLSR/UOUi+9QnkxnJor14OfYkJKxot5
+ hWdJ3MYXjmcHjImBWplOyRiB81JbVf567MQlanforHd1r0ITzMHYONmRghrQvzlaMQrs0V0H
+ 5/sIufaiDh7rLeZSimeVyoFvwvQPx5sXhjViaHa+zHZExP9jhS/WWfFE881fNK9qqV8pi+li
+ 2uov8g5yD6hh+EPH6wARAQABwsF8BBgBCgAmFiEEKtR20JNxnJqlXaH73fNxj+N/OVcFAmNA
+ kI0CGwwFCQeEzgAACgkQ3fNxj+N/OVfFMhAA2zXBUzMLWgTm6iHKAPfz3xEmjtwCF2Qv/TT3
+ KqNUfU3/0VN2HjMABNZR+q3apm+jq76y0iWroTun8Lxo7g89/VDPLSCT0Nb7+VSuVR/nXfk8
+ R+OoXQgXFRimYMqtP+LmyYM5V0VsuSsJTSnLbJTyCJVu8lvk3T9B0BywVmSFddumv3/pLZGn
+ 17EoKEWg4lraXjPXnV/zaaLdV5c3Olmnj8vh+14HnU5Cnw/dLS8/e8DHozkhcEftOf+puCIl
+ Awo8txxtLq3H7KtA0c9kbSDpS+z/oT2S+WtRfucI+WN9XhvKmHkDV6+zNSH1FrZbP9FbLtoE
+ T8qBdyk//d0GrGnOrPA3Yyka8epd/bXA0js9EuNknyNsHwaFrW4jpGAaIl62iYgb0jCtmoK/
+ rCsv2dqS6Hi8w0s23IGjz51cdhdHzkFwuc8/WxI1ewacNNtfGnorXMh6N0g7E/r21pPeMDFs
+ rUD9YI1Je/WifL/HbIubHCCdK8/N7rblgUrZJMG3W+7vAvZsOh/6VTZeP4wCe7Gs/cJhE2gI
+ DmGcR+7rQvbFQC4zQxEjo8fNaTwjpzLM9NIp4vG9SDIqAm20MXzLBAeVkofixCsosUWUODxP
+ owLbpg7pFRJGL9YyEHpS7MGPb3jSLzucMAFXgoI8rVqoq6si2sxr2l0VsNH5o3NgoAgJNIg=
+In-Reply-To: <68126b09c77f7_3080df29453@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27624/Wed Apr 30 10:39:44 2025)
 
-Add helper for calling skb_{put|reserve} to reduce repetitive pattern
-across various drivers.
+On 4/30/25 8:25 PM, Willem de Bruijn wrote:
+> Jon Kohler wrote:
+>> Add helper for calling skb_{put|reserve} to reduce repetitive pattern
+>> across various drivers.
+>>
+>> Plumb into tap and tun to start.
+>>
+>> No functional change intended.
+>>
+>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+>> ---
+>>   drivers/net/tap.c | 3 +--
+>>   drivers/net/tun.c | 3 +--
+>>   include/net/xdp.h | 8 ++++++++
+>>   net/core/xdp.c    | 3 +--
+>>   4 files changed, 11 insertions(+), 6 deletions(-)
+> 
+> Subjective, but I prefer the existing code. I understand what
+> skb_reserve and skb_put do. While xdp_skb_reserve_put adds a layer of
+> indirection that I'd have to follow.
+> 
+> Sometimes deduplication makes sense, sometimes the indirection adds
+> more mental load than it's worth. In this case the code savings are
+> small. As said, subjective. Happy to hear other opinions.
 
-Plumb into tap and tun to start.
-
-No functional change intended.
-
-Signed-off-by: Jon Kohler <jon@nutanix.com>
----
- drivers/net/tap.c | 3 +--
- drivers/net/tun.c | 3 +--
- include/net/xdp.h | 8 ++++++++
- net/core/xdp.c    | 3 +--
- 4 files changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index d4ece538f1b2..54ce492da5e9 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1062,8 +1062,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 		goto err;
- 	}
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	skb_put(skb, xdp->data_end - xdp->data);
-+	xdp_skb_reserve_put(xdp, skb);
- 
- 	skb_set_network_header(skb, ETH_HLEN);
- 	skb_reset_mac_header(skb);
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 7babd1e9a378..30701ad5c27d 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2415,8 +2415,7 @@ static int tun_xdp_one(struct tun_struct *tun,
- 		goto out;
- 	}
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	skb_put(skb, xdp->data_end - xdp->data);
-+	xdp_skb_reserve_put(xdp, skb);
- 
- 	/* The externally provided xdp_buff may have no metadata support, which
- 	 * is marked by xdp->data_meta being xdp->data + 1. This will lead to a
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 48efacbaa35d..0e7414472464 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -345,6 +345,14 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					 struct net_device *dev);
- struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
- 
-+static __always_inline
-+void xdp_skb_reserve_put(const struct xdp_buff *xdp,
-+			 struct sk_buff *skb)
-+{
-+	skb_reserve(skb, xdp->data - xdp->data_hard_start);
-+	__skb_put(skb, xdp->data_end - xdp->data);
-+}
-+
- static inline
- void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
- 			       struct xdp_buff *xdp)
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index f86eedad586a..1fca2aa1d1fe 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -646,8 +646,7 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
- 	if (unlikely(!skb))
- 		return NULL;
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	__skb_put(skb, xdp->data_end - xdp->data);
-+	xdp_skb_reserve_put(xdp, skb);
- 
- 	metalen = xdp->data - xdp->data_meta;
- 	if (metalen > 0)
--- 
-2.43.0
-
++1, agree with Willem
 
