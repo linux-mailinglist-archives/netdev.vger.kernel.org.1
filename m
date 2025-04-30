@@ -1,275 +1,174 @@
-Return-Path: <netdev+bounces-186934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7D0DAA4220
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:08:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1270AA422C
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:18:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3245C1BC635F
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:08:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A71279A1311
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A74E1482E8;
-	Wed, 30 Apr 2025 05:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6FD1E25E8;
+	Wed, 30 Apr 2025 05:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XnKl94Z9"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Z0nbmGqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA6BEC2
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 05:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745989716; cv=fail; b=A7iZUgf5OqcjOmgmPurQBPo5ePNw/iA+EXTbcFDe5wkWiVkD0NxZ98aBlH1BaSqck2LbXI6VRsqyZ5IJptA4q9rxiyI0kk/xf/t2puMlXBhAgl83F0RBGgaUXPnAbkdmI8FS1HmoROL9eQdZme3rGt2hHBdAGMy8hKF8kJVOaGU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745989716; c=relaxed/simple;
-	bh=19VPOg2xsZEuQBGsLHBS/FxBBWQPgbDYy6RA8oBN6ck=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gh68YDnwYTVHZlLv92Ti6gIZOEHMHUzrRjuTuUOEaforEjePxV6FLsg81L3+YEq1TZclxLPz5Aypl85+lh1+yn97dfJCXwhc4ixfQGX9OaNMAqQUByFtRta5rfhc22CZxFPwqKPNQ91KkLHmjGjP/WckUaob0GxwktMLKbv9Sw4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XnKl94Z9; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745989714; x=1777525714;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=19VPOg2xsZEuQBGsLHBS/FxBBWQPgbDYy6RA8oBN6ck=;
-  b=XnKl94Z9Rwc8DBT8b5EkdqpWx1zXqJoFZoc12v4CyrnGdh4Zw3WxEYDU
-   ecBXi0KDv18RzsKZjm/91XvJoKO1zlfdok5hhd/ixSa4g7tA7fFjG7M7V
-   UMMrL+eP2BPP3ib7XWihFycgWzrzlb4KeuS6jdzFxIVi27p+zowyJqN4+
-   +MSbah68AYAacUbbG+q+fC6rjwWV/gvuQpuVF7psdyQpeBisKuiyzN0GT
-   IaY1u2mk1VWxrzsndePpJQpq3THDxBZMzeA5+YvW8o1i6095UhGnIiGBV
-   CusFHzxOhj/tqsxQb2K1SkbycyChnAfrDhWziqLqm8PUpRpr87kl6K1C+
-   Q==;
-X-CSE-ConnectionGUID: Zxyfp9Z5TqSZUfDsMFu27A==
-X-CSE-MsgGUID: EWWKLaMrQXyBpA/rYbf8Zg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="65173668"
-X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
-   d="scan'208";a="65173668"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 22:08:33 -0700
-X-CSE-ConnectionGUID: m4jypQawS5+21+lUrgg7Ng==
-X-CSE-MsgGUID: GKm+CY5dTVG2BdUGQrfYTw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
-   d="scan'208";a="134331503"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2025 22:08:33 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 29 Apr 2025 22:08:32 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 29 Apr 2025 22:08:32 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.47) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 29 Apr 2025 22:08:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=j8L/ISMURkbCOoArTkZFqaUq0gewGB8tkVwhwt0g0rjWlYXLl27HOOL7xHwVoB2cvDuI9t5VVdtn+THtuMipz3t0CaYAtqSyxN25/PVC6Z/FWFAOxFK80pspfvVs5RLwgvKRbE17z+0X4MPPkCFL8Co7AZ+wRhyM+zZNsn2DzSrtPl3KXmdYHcmzAsb/OW/6fsuxzk7cYhzu4fXfmsNiyyUZ+orkfEIMg5ArfbZUI8o+FVqQceEY61K38b5Uw4Udikywt8mATjECcEghzM1YJHPaIVR/YBxTVUda56IDhAmv999iYy1/hFidX6as5KO9goTPCHDLfIbqXk+327Hb5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oNItP5PVk2j/fN12UNSeC/XDU2rq6Gp2PZ7Xt20wxrU=;
- b=bhmODakjVFzbXD8QMfEGiEXCGDfurEu9QhWcX2Ak6M667nOl8/5KfMH1SQcFgvDFSCB8OsoDL8uGGA500sZ9ZW0QLx3nFumQAafrC0MXk4gOk8VlLertRNJlYnJcDMp00NyMioFDa+vxzWNoJ/Lg/vRMAXsV22T8i6b8l9pXdfir69/f78Vy2T1suPdUU68JPMnjHMTSYSEVEMPiUaLbUuOP/XWYtEDB2UQlvpHPcwsXBt5jHSj/LIc0LSOlozbutW8/hSwWaguFm7JWVHM6daswo2aGU6CINEOTZk26CkfG62G39Ho2Wik1j///pu71fTAtrm72s7IUMN3x7sKwaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.34; Wed, 30 Apr
- 2025 05:07:45 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::90b0:6aad:5bb6:b3ae%6]) with mapi id 15.20.8678.028; Wed, 30 Apr 2025
- 05:07:45 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
-CC: Jiri Pirko <jiri@resnulli.us>, "Temerkhanov, Sergey"
-	<sergey.temerkhanov@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "Kolacinski, Karol"
-	<karol.kolacinski@intel.com>, "Kubiak, Michal" <michal.kubiak@intel.com>,
-	Simon Horman <horms@kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v4] ice: use DSN instead of PCI
- BDF for ice_adapter index
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v4] ice: use DSN instead of PCI
- BDF for ice_adapter index
-Thread-Index: AQHbrT//aTgnMzn8SkmC/+hYW59DcLO7vXcg
-Date: Wed, 30 Apr 2025 05:07:45 +0000
-Message-ID: <IA1PR11MB624112E2C04D751315976D938B832@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250414131241.122855-1-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20250414131241.122855-1-przemyslaw.kitszel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|DM4PR11MB6117:EE_
-x-ms-office365-filtering-correlation-id: b6ddc622-63e0-4689-8ff3-08dd87a4f185
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?bOfVcFgrdzir0wGa6C7VzpbLdXt1hRFQroxiuzNn9vtSl57mmN7WZK+8S2Dc?=
- =?us-ascii?Q?s1fksYgpl8u3xIopq0G4efMI2RH686fD2v+QsgirpB6GAizyB4XEaXq0DumT?=
- =?us-ascii?Q?xmTWJFLqR9M6g4BVSDr/bUVf6rmhQPaioA9NEyojLFxtEPe2uOUK8cF7et7d?=
- =?us-ascii?Q?HvGVwwuNb+8BEDmw0CIM2+AQa8Haqcu0iIGq/fJtCyUXjq6/CdEU0+yd3+aV?=
- =?us-ascii?Q?Cr6A/c7kbLIGzRI5mdxbIdkY/vIOB0l8/dEgPz6xNFp3/RHwcydBh4EwzISI?=
- =?us-ascii?Q?qMuP8bWgA+BNOWPtEzK72e/EgUFnAugn/ZQ5+iH5CTDufkLes6fTuxE0Em1x?=
- =?us-ascii?Q?Inctcy0Wz4OhBhpaLeyHtNWocq4GqDHDAwGVj4MAqnlbl+T/iJKavwRv6QJ6?=
- =?us-ascii?Q?SAsacUefWT8QwLqgou9uBySnC13GxkZgtASyZ5HiVRMFfMGsQL3R1HO6S/8Y?=
- =?us-ascii?Q?Gyg9VpA4oMA370VHiJDR4Pgde7VpSZ/MHhDKE/Wu4oSulTiTV71HWGq6aLNf?=
- =?us-ascii?Q?+odWyruMMWachKmE9cRJkg0DAUgl3js3/NCO6njkmBdnEv3CQOA6/CC1VhRQ?=
- =?us-ascii?Q?jxvRcBobwMCh+xiwZoPdGlVQVSlkYDczaSsEjXInQOQhK6nHiCC4E50SZq7v?=
- =?us-ascii?Q?itdPaMGtAhmkwpVyNCk5bTlHt5o066ZHlkuaPSZSybIBgk76IMseImSw2W3o?=
- =?us-ascii?Q?zD3Y4TQKGSzKXZVj3KbkS1LQVYpfyioscqzf/EhONcweWIk6Vctz/e1EVlFu?=
- =?us-ascii?Q?ZzzqVIyCv5jCVh0UT8e4v17/z1w7c0hF/6Q3XsngnWB1xHup5wCymSURXhM2?=
- =?us-ascii?Q?5JEv/Z/LcfRroSZSbDrBj8mxbiZAA94/cOBGog7R7GcyxjpJql03KV49/QlV?=
- =?us-ascii?Q?bPM8W+5AQoo8dmh2CEIs9bcpfzJAdAv2BefspA+Ziy8eVz0D1mEojmWfdRDL?=
- =?us-ascii?Q?+Udin0B6TaNaX/ZzQgkYdW1eFdlk8EWMvPKjmiBEkmzhn5fyTjMShTwFMcm6?=
- =?us-ascii?Q?W+dDu0Xc7QbtLfWuNVtDxWkB59R4JHfW8KIsq9ifoHPC+7uQcsUzU1+t4nrz?=
- =?us-ascii?Q?8weo9e+ymp66v4/ty1Dhajov2xEhXlQaS0cxscpuVbypcCUOudrmfpg0b/8l?=
- =?us-ascii?Q?5pNN4pdhm2o3Allzo7g2MGO85PgxpeWhM9xmvbAIXe15bW5ZSyOPJOMy1Tuy?=
- =?us-ascii?Q?qxjv72wWHZm2YM3nI807UYSiSLBlitQrN9WfORad+bSZaxFpeLo75voUNDu4?=
- =?us-ascii?Q?XP3TY+HqunWgTtBM33U/IRachxuIOCgEZJEMU5+f+cELpOfHse1Hq60TFeSw?=
- =?us-ascii?Q?9+WMthhwXT+TYEJq9G7UDGFoOwq0a5TIgAfgAfmRwnqlXmY62hfr68Nko3cI?=
- =?us-ascii?Q?wNtVJD2ZjAoU5WmjIvM788x5j+F0+L+g/2mlVws16GkuBhUm+6mR4nvWGkpG?=
- =?us-ascii?Q?eBSP8JL4JbH7umczH0Lnf+/mN8SZH+eioiU+xbZxlsWi7cKlpbsjZ9XY7pOs?=
- =?us-ascii?Q?PBzc4oITt0C2bEc=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Qik90q7oZVhIlC5JtKmuCbb3MXtvT9t8Wn6gXdyqjWmKKI+UoQEzgYGhdtEa?=
- =?us-ascii?Q?as41ttgZAUkxiRqacpGE6UL5PS7UWuBRFiKSugJ3FZL2wqNM1KPHFZmLD0pc?=
- =?us-ascii?Q?gZXUe/E1a547/AhwKOLPuc4Q2wOkVuU0GauFYU26bqUk+PrFDUVnOpN13EXP?=
- =?us-ascii?Q?lQcqnaDhQADlugzSgM83MSnNITJ+Y5UOfrszycc1/hhigzc/zePkgWEBAhpn?=
- =?us-ascii?Q?DY6hlRo7/boh/bm0ZH733Vl/70Sn0wDEcRecVrSCi4SF/g0UAcTSPXeSH4u5?=
- =?us-ascii?Q?2hM71LaGeeIqRLDixVFgduwapwDZ2ZFkCbuTHEc0IzHljlRszHtg6jFLSazw?=
- =?us-ascii?Q?j5ZjDWRTQEnqX6U5vD3t8ehReTwHyfCsxeN8puRa2bCt1vFwLH3qVHXDKvAj?=
- =?us-ascii?Q?yMhpfLlx3hYO3noGkaTMvvMccVmIenqikPxyPgwALdoqsR4XLqDx+/E/awde?=
- =?us-ascii?Q?3JC3JL4vlJy4JPnyeEhwdmr+fIwK3nXEIwxOzMjSlNbNWh5DD12l/sCJtQfC?=
- =?us-ascii?Q?Ru+5cH9I0JOi2Ql+xQ01zAYwRn2+9FlQWRvC4IeR8uBmPotr9JA4+FyfDgJn?=
- =?us-ascii?Q?cHce1QCHBLjDLtZe1ApyHZ1khKOc54j6SwH3AQJkdAemQZLvbVQpgn2J2eiE?=
- =?us-ascii?Q?TDyeTCjPuo1kgK2JrSEWTHULP/ETH5Knx75bSLk9NjVLWm1/dwBkdLNmkGDq?=
- =?us-ascii?Q?rzemxeGxhtpbvQinCJVKe4ubxC1JLbX5b1WQM1e3q7yN5jCyj549dhcBNgqD?=
- =?us-ascii?Q?i4skqES+0WIndln4AkO+kA229pMdQh8KUB0YiJ/ZYp/lf1olOVXPr7cCBWpR?=
- =?us-ascii?Q?DKaO5EIDUNX2uHYoCruKiAF/QfksrjslO63seflYZVZzUz//XpsI7tpZYItz?=
- =?us-ascii?Q?MsRFR33lZrL7ZacEf4g/mZOD74JZEjl7d5ZimbllJKt61tqdAZ9tcERYcsFS?=
- =?us-ascii?Q?xF6K6WRM04PeQPXJPWC4kzdvnHFfB/NJ43jkyKIhw/YW9TWJXN2YSfWAuRnf?=
- =?us-ascii?Q?JKctAvDg4+lw605HdlP8psk5pD96KY7QoIX1RX9p+h6yyIpOv0lPeXb+OCSy?=
- =?us-ascii?Q?d45Qr10XrRBLFDAzwLB63Jf4uTZNWrvjVlKLWfJeOvp7Y6VDSOdHORCB77Pe?=
- =?us-ascii?Q?P4yf8vugNKSKDQrRsqttF9WJ0/IH8FhVCIeyUCWkC7tkSUojKkbDJhx3nTZ4?=
- =?us-ascii?Q?X77JNR2WwAGFxHzh1mRuGAmDq6/ELpdcK1r/MSuYHPBr3jPOHdYcoNXhij0X?=
- =?us-ascii?Q?gLDn9iqWcAwSOXDPIQMNiLMsXd78deA6P0NVpcvzVyVrPOY4CND6Lp0mWKQh?=
- =?us-ascii?Q?NiX8uULw+Sosk4G0HUlzm3kgcMNdMEeYY/CSZsvJ9OF4mzoprda6u33PWYfw?=
- =?us-ascii?Q?4kdZdhpJHZKbGA6brWpOxQWBByRRffDbTmDpiQh1OWfEV+kw9M22zoUuuD5l?=
- =?us-ascii?Q?/hfQC9gFqbiRYePFm6fTxD98ggoGHcRd/P9K9xBBiYSfCV4jT2nx0ndynMjY?=
- =?us-ascii?Q?vMH9EMHVdooqApBwnhoSBEM2w+p95ybRu2Zsm/bE/95znLnQqtkdcvI7dP/c?=
- =?us-ascii?Q?2T+J1f7+GpntpAtSmSwRy+YRIdjFnnfStar3YkVu?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0848EA921;
+	Wed, 30 Apr 2025 05:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745990310; cv=none; b=MTv0wR0CDkqDc2UTzAGgojOQvyDX4MASycQ0EjoToNjd6SzttJcKLMujMIkKRl6k+p0OcHZ3VPV7qWU2rS2fTQAi/OANWfUfOHKBFNZpvLxgMNQiI6lFLoN7GJtRz+cWk7qLDJDewEHFdsCAIdObVnABNbF0MwtXcaAorOkW9jk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745990310; c=relaxed/simple;
+	bh=lPl54U/qqBrHjOX1YYhAPaRKXabra0RM17t6IxKVe2A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=osNxxO39TN401Mq0dHQ2UX2OElwV4AE5yN5gVEpP9QhsgVdkWq/vprWEfxt0Fya+5fYz+L65EmqS7m2yqjPDIzMxE8V0x2FrfIYRbHBAVJNyFxwnN4m52HyOf9EUgsxwjj00cOh5vh2oFHSSLieudoy5iDT32JxtAV4I/ClNLq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Z0nbmGqB; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1B7891026CE8F;
+	Wed, 30 Apr 2025 07:18:19 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1745990304; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=TErDts74dOF/38EZE2pPpZ6LyWNto2lM7fBOGJnyoqw=;
+	b=Z0nbmGqBGuQlaK0UMu2UDILnle5P3mLp60rmNGS8qhDWHsnD4O04A5jd9zCa7/Y2FRyrZu
+	FKqEzf4b+i2PvcjOncAgHPSHNV05TQJBRllYjDduBiQbsBC11+uX+OEKHyKG5WFuUBD+ch
+	wNO2JvFLqNfi8NJov1ua437F69uIX/C75euS7DlOWOZz2DAG+ifmFgs6GtFeg4VgDu+pha
+	vNROB6Sv8Odfxij8Rthj3T0mT/ZG8ZMghL6P6dCmJD+L5k93exVEOE7NDiBi7UdhzDWDGC
+	d0SUK/U7m4R7Tnr5RNAArxdJ9AjfKYoqQ5LUvLgtur40xXCCQQ+zGnpwq8P/xQ==
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Stefan Wahren <wahrenst@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [net-next v9 0/7] net: mtip: Add support for MTIP imx287 L2 switch driver
+Date: Wed, 30 Apr 2025 07:17:49 +0200
+Message-Id: <20250430051756.574067-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6ddc622-63e0-4689-8ff3-08dd87a4f185
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2025 05:07:45.2370
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1eQsPp7NOqNC9yDteU+YIoKdsdhO3C1+jWmfuEPoY0HzJdTDpVBGLdf31sqpnoqSPStYO/01J8YoLVlnXNhQmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6117
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
-rzemek Kitszel
-> Sent: 14 April 2025 18:43
-> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen=
-@intel.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>; Temerkhanov, Sergey <sergey.temerkhano=
-v@intel.com>; netdev@vger.kernel.org; Loktionov, Aleksandr <aleksandr.lokti=
-onov@intel.com>; Kolacinski, Karol <karol.kolacinski@intel.com>; Kubiak, > =
-Michal <michal.kubiak@intel.com>; Simon Horman <horms@kernel.org>; Kitszel,=
- Przemyslaw <przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.e.keller=
-@intel.com>; Jakub Kicinski <kuba@kernel.org>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v4] ice: use DSN instead of PCI=
- BDF for ice_adapter index
->
-> Use Device Serial Number instead of PCI bus/device/function for the index=
- of struct ice_adapter.
->
-> Functions on the same physical device should point to the very same ice_a=
-dapter instance, but with two PFs, when at least one of them is PCI-e passe=
-d-through to a VM, it is no longer the case - PFs will get seemingly random=
- PCI BDF values, and thus indices, what finally leds to each of them being =
-on their own instance of ice_adapter. That causes them to don't attempt any=
- synchronization of the PTP HW clock usage, or any other future resources.
->
-> DSN works nicely in place of the index, as it is "immutable" in terms of =
-virtualization.
->
-> Fixes: 0e2bddf9e5f9 ("ice: add ice_adapter for shared data across PFs on =
-the same NIC")
-> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
-> CC: Karol Kolacinski <karol.kolacinski@intel.com>
-> CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> CC: Michal Schmidt <mschmidt@redhat.com>
-> CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> CC: Michal Kubiak <michal.kubiak@intel.com>
-> CC: Simon Horman <horms@kernel.org>
->
-> v4:
-> - Add fixes tag for real... (Simon)
-> - extend commit message (Simon)
-> - pass dsn to ice_adapter_new() to have simpler code
->   (I happened to do that as (local) followup) (me)
->
-> v3:
-> https://lore.kernel.org/intel-wired-lan/20250408134655.4287-1-przemyslaw.=
-kitszel@intel.com/
-> - Add fixes tag (Michal K)
-> - add missing braces (lkp bot), turns out it's hard to purge C++ from you=
-r mind
-> - (no changes in the collision handling on 32bit systems)
->
-> v2:
-> https://lore.kernel.org/intel-wired-lan/20250407112005.85468-1-przemyslaw=
-.kitszel@intel.com/
-> - target to -net (Jiri)
-> - mix both halves of u64 DSN on 32bit systems (Jiri)
-> - (no changes in terms of fallbacks for pre-prod HW)
-> - warn when there is DSN collision after reducing to 32bit
->
-> v1:
-> https://lore.kernel.org/netdev/20250306211159.3697-2-przemyslaw.kitszel@i=
-ntel.com
-> ---
-> drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-  drivers/net/ethern=
-et/intel/ice/ice_adapter.c | 47 ++++++++------------
-> 2 files changed, 22 insertions(+), 31 deletions(-)
->
+This patch series adds support for More Than IP's L2 switch driver embedded
+in some NXP's SoCs. This one has been tested on imx287, but is also available
+in the vf610.
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+In the past there has been performed some attempts to upstream this driver:
+
+1. The 4.19-cip based one [1]
+2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
+   with NO tag appended.
+3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
+   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
+   the driver uses already configured MAC and PHY to also configure PHY.
+
+All three approaches were not accepted as eligible for upstreaming.
+
+The driver from this series has floowing features:
+
+1. It is fully separated from fec_main - i.e. can be used interchangeable
+   with it. To be more specific - one can build them as modules and
+   if required switch between them when e.g. bridge offloading is required.
+
+   To be more specific:
+        - Use FEC_MAIN: When one needs support for two ETH ports with separate
+          uDMAs used for both and bridging can be realized in SW.
+
+        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
+          attached to switch and bridging shall be offloaded to HW. 
+
+2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
+   separation at boot time. Port separation is disabled when bridging is
+   required.
+
+3. Example usage:
+        Configuration:
+        ip link set lan0 up; sleep 1;
+        ip link set lan1 up; sleep 1;
+        ip link add name br0 type bridge;
+        ip link set br0 up; sleep 1;
+        ip link set lan0 master br0;
+        ip link set lan1 master br0;
+        bridge link;
+        ip addr add 192.168.2.17/24 dev br0;
+        ping -c 5 192.168.2.222
+
+        Removal:
+        ip link set br0 down;
+        ip link delete br0 type bridge;
+        ip link set dev lan1 down
+        ip link set dev lan0 down
+
+4. Limitations:
+        - Driver enables and disables switch operation with learning and ageing.
+        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
+          on purpose, as up till now we didn't had consensus about how the driver
+          shall be added to Linux.
+
+Links:
+[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
+[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
+[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
+
+Lukasz Majewski (7):
+  dt-bindings: net: Add MTIP L2 switch description
+  ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
+  ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
+  net: mtip: The L2 switch driver for imx287
+  ARM: mxs_defconfig: Enable CONFIG_NFS_FSCACHE
+  ARM: mxs_defconfig: Update mxs_defconfig to 6.15-rc1
+  ARM: mxs_defconfig: Enable CONFIG_FEC_MTIP_L2SW to support MTIP L2
+    switch
+
+ .../bindings/net/nxp,imx28-mtip-switch.yaml   |  149 ++
+ MAINTAINERS                                   |    7 +
+ arch/arm/boot/dts/nxp/mxs/imx28-xea.dts       |   56 +
+ arch/arm/boot/dts/nxp/mxs/imx28.dtsi          |    9 +-
+ arch/arm/configs/mxs_defconfig                |   13 +-
+ drivers/net/ethernet/freescale/Kconfig        |    1 +
+ drivers/net/ethernet/freescale/Makefile       |    1 +
+ drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
+ .../net/ethernet/freescale/mtipsw/Makefile    |    4 +
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 1978 +++++++++++++++++
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  771 +++++++
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  120 +
+ .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  436 ++++
+ 13 files changed, 3547 insertions(+), 11 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+
+-- 
+2.39.5
+
 
