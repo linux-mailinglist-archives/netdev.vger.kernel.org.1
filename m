@@ -1,119 +1,190 @@
-Return-Path: <netdev+bounces-187167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A5F0AA5769
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 23:33:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CF6AA57FD
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF67F5061C3
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494E61B64CC2
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC732D1138;
-	Wed, 30 Apr 2025 21:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE41225779;
+	Wed, 30 Apr 2025 22:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bw9tfX2s"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="irIMxvfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B12297A7F;
-	Wed, 30 Apr 2025 21:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D13221271
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 22:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746048576; cv=none; b=aaKhaKKO3gA+KR7D/I/kh0tq9pjBSuVv90NH5GRsPhZ4k71/UzAnyXyP3XR032JQ1W0n3Gb1/6wM+e92w4gLIErC2Hb2aIr/8nOy3H5woyl0ZoZoPIm07ajBpFLMfVZn96iMJ6rD4A7n5tjGMAdcAgGpgasis7LbPp+1YSAExUQ=
+	t=1746052740; cv=none; b=dO4GdQ0LkL0w5n4JmRbRTxqs7LxkUPRtsU62Xz5her+sF8znRv030zSpB8XgOTrENhd2vjUUosv35iSoBATGBmDCHc5DO/twJmk/gwjotLgWbGff2k64097d9Ko7lFhpjpwP+jtmjPh+v3IBt7PTee9wjHHgfPwQjSXYnECNmoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746048576; c=relaxed/simple;
-	bh=lIKIbLtONHYjXLdhuP4peo4Z8DDsc4FDnAj/KpC7OMA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CW5jiL40O8yKedoz/bbUe0p+9bPKv8It9rRPM3vhGEtTREeVt/sDlXK7i1qx8+rc3w0K42ijOpeNZd1Rp0Y/eZWD40lQWP746O3eyvVOpqHbizJ/6UjmQeFKcUBFmH5g7lUhGwRNrte4KQH7NXYmp2e4xX4+6NWecWptpzc7KfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bw9tfX2s; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746048572; x=1777584572;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yyT2mE4AxoVDIQ/9ei0bjwOO32J4Gut3ZMT5pI4UU7E=;
-  b=bw9tfX2sQx1b2LtmuKGIYP0rLWwwsWNDvNAPOkZQEzIq8PLRUs3IreeQ
-   y2Qg9S9FPzA1pMLWg1SShalQbCAmO7k5JvAepVHM7+hr9XzZCh51RsnYN
-   AS5RyaYtr/loDRRn16dhki5abo4X9cEWvu4CgCYJHzEqfHmP4Bb5Ii2uq
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.15,252,1739836800"; 
-   d="scan'208";a="718487481"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 21:29:27 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:32139]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.121:2525] with esmtp (Farcaster)
- id 62e930e0-868d-4088-b8d6-eaf92158a546; Wed, 30 Apr 2025 21:29:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 62e930e0-868d-4088-b8d6-eaf92158a546
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 30 Apr 2025 21:29:26 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 30 Apr 2025 21:29:21 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jlayton@kernel.org>
-CC: <airlied@gmail.com>, <akpm@linux-foundation.org>, <andrew@lunn.ch>,
-	<davem@davemloft.net>, <dri-devel@lists.freedesktop.org>,
-	<edumazet@google.com>, <horms@kernel.org>, <intel-gfx@lists.freedesktop.org>,
-	<jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>,
-	<nathan@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<qasdev00@gmail.com>, <rodrigo.vivi@intel.com>, <simona@ffwll.ch>,
-	<tursulin@ursulin.net>, <tzimmermann@suse.de>
-Subject: Re: [PATCH v6 08/10] net: add symlinks to ref_tracker_dir for netns
-Date: Wed, 30 Apr 2025 14:29:07 -0700
-Message-ID: <20250430212913.27147-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250430-reftrack-dbgfs-v6-8-867c29aff03a@kernel.org>
-References: <20250430-reftrack-dbgfs-v6-8-867c29aff03a@kernel.org>
+	s=arc-20240116; t=1746052740; c=relaxed/simple;
+	bh=Olqlsi/dn7CGyfD/R62RM1zOogi1s3ET6AQNrdK5oHI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e6dziP6gqsJd3U+saykMaAXwQxrM1lcFK/20EvAFJuOZb+GwikCqIC4rrNJBGwtikLR31Kce0LlkrGf89FrEMcCbrkJqTmiYfAy6ErxRciAkVbvq5eufVkjLiAeLVE1CFow+80ZPxeXL+gLfwh+KkYXxKjOQUzgAGRDGJRYFDQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=irIMxvfO; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c962b740-4cbc-4d1f-9dda-02820dc54daa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746052733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eZZpX1P9cVxiJcNSp3L/SE/Da+WLS+g2KXg93KHLKag=;
+	b=irIMxvfObr5yBe6lg1g8+747zkOc/Zq+9dq9Jl2fjZbHgIvJ/T8WBl8aEcqnLxQLk7BPgE
+	LTsxgq6hGZFgucMKtoncqpA4J5Bj7oljj0klpBRE4N/I5MhCVXW9dAcq6AAWAREhvGpi8v
+	fp1wd4rUeaEuvl0FAWucYRtS+K0tdQk=
+Date: Wed, 30 Apr 2025 23:38:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH net-next v2 1/5] amd-xgbe: reorganize the code of XPCS
+ access
+To: Raju Rangoju <Raju.Rangoju@amd.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Shyam-sundar.S-k@amd.com
+References: <20250428150235.2938110-1-Raju.Rangoju@amd.com>
+ <20250428150235.2938110-2-Raju.Rangoju@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250428150235.2938110-2-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 30 Apr 2025 08:06:54 -0700
-> After assigning the inode number to the namespace, use it to create a
-> unique name for each netns refcount tracker with the ns.inum value in
-> it, and register a symlink to the debugfs file for it.
+On 28/04/2025 16:02, Raju Rangoju wrote:
+> The xgbe_{read/write}_mmd_regs_v* functions have common code which can
+> be moved to helper functions. Add new helper functions to calculate the
+> mmd_address for v1/v2 of xpcs access.
 > 
-> init_net is registered before the ref_tracker dir is created, so add a
-> late_initcall() to register its files and symlinks.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 > ---
->  net/core/net_namespace.c | 28 +++++++++++++++++++++++++++-
->  1 file changed, 27 insertions(+), 1 deletion(-)
+> Changes since v1:
+> - add the xgbe_ prefix to new functions
 > 
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index 008de9675ea98fa8c18628b2f1c3aee7f3ebc9c6..6cbc8eabb8e56c847fc34fa8ec9994e8b275b0af 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -763,12 +763,38 @@ struct net *get_net_ns_by_pid(pid_t pid)
->  }
->  EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
->  
-> +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
-> +static void net_ns_net_debugfs(struct net *net)
+>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 63 ++++++++++--------------
+>   1 file changed, 27 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> index b51a3666dddb..765f20b24722 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> @@ -1041,18 +1041,17 @@ static int xgbe_set_gpio(struct xgbe_prv_data *pdata, unsigned int gpio)
+>   	return 0;
+>   }
+>   
+> -static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+> -				 int mmd_reg)
+> +static unsigned int xgbe_get_mmd_address(struct xgbe_prv_data *pdata, int mmd_reg)
+>   {
+> -	unsigned long flags;
+> -	unsigned int mmd_address, index, offset;
+> -	int mmd_data;
+> -
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	return (mmd_reg & XGBE_ADDR_C45) ?
+> +		mmd_reg & ~XGBE_ADDR_C45 :
+> +		(pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +}
+>   
+> +static void xgbe_get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
+> +					  unsigned int mmd_address,
+> +					  unsigned int *index, unsigned int *offset)
 > +{
-> +	ref_tracker_dir_symlink(&net->refcnt_tracker, "netns-%u-refcnt", net->ns.inum);
-> +	ref_tracker_dir_symlink(&net->notrefcnt_tracker, "netns-%u-notrefcnt", net->ns.inum);
+>   	/* The PCS registers are accessed using mmio. The underlying
+>   	 * management interface uses indirect addressing to access the MMD
+>   	 * register sets. This requires accessing of the PCS register in two
+> @@ -1063,8 +1062,20 @@ static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+>   	 * offset 1 bit and reading 16 bits of data.
+>   	 */
+>   	mmd_address <<= 1;
+> -	index = mmd_address & ~pdata->xpcs_window_mask;
+> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +	*index = mmd_address & ~pdata->xpcs_window_mask;
+> +	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +}
+> +
+> +static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+> +				 int mmd_reg)
+> +{
+> +	unsigned long flags;
+> +	unsigned int mmd_address, index, offset;
+> +	int mmd_data;
 
-Could you use net->net_cookie ?
+Please, follow reverse Xmass tree ordering
 
-net->ns.inum is always 1 when CONFIG_PROC_FS=n.
+> +
+> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+> +
+> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>   
+>   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+>   	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
+> @@ -1080,23 +1091,9 @@ static void xgbe_write_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+>   	unsigned long flags;
+>   	unsigned int mmd_address, index, offset;
+>   
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+>   
+> -	/* The PCS registers are accessed using mmio. The underlying
+> -	 * management interface uses indirect addressing to access the MMD
+> -	 * register sets. This requires accessing of the PCS register in two
+> -	 * phases, an address phase and a data phase.
+> -	 *
+> -	 * The mmio interface is based on 16-bit offsets and values. All
+> -	 * register offsets must therefore be adjusted by left shifting the
+> -	 * offset 1 bit and writing 16 bits of data.
+> -	 */
+> -	mmd_address <<= 1;
+> -	index = mmd_address & ~pdata->xpcs_window_mask;
+> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>   
+>   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+>   	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
+> @@ -1111,10 +1108,7 @@ static int xgbe_read_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
+>   	unsigned int mmd_address;
+>   	int mmd_data;
+>   
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+>   
+>   	/* The PCS registers are accessed using mmio. The underlying APB3
+>   	 * management interface uses indirect addressing to access the MMD
+> @@ -1139,10 +1133,7 @@ static void xgbe_write_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
+>   	unsigned int mmd_address;
+>   	unsigned long flags;
+>   
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+>   
+>   	/* The PCS registers are accessed using mmio. The underlying APB3
+>   	 * management interface uses indirect addressing to access the MMD
+
 
