@@ -1,138 +1,215 @@
-Return-Path: <netdev+bounces-187091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A986AA4E1E
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:11:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0223AA4E56
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8ADB4E628E
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:11:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 216804E8028
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4781125D8F6;
-	Wed, 30 Apr 2025 14:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2211DD889;
+	Wed, 30 Apr 2025 14:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q91X8Er2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIHwdswV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92EF254848;
-	Wed, 30 Apr 2025 14:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C075925A2AF;
+	Wed, 30 Apr 2025 14:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746022268; cv=none; b=lQlQiDeGhs1hknU3GBAJenH+L2hAEsDfHgC7pJiee+mgEzYSZCC3mRpHVW9iiHFHFC5Epl12ZHN3aG5dnN7qmt/Bhfv52BYTwcu70jAa0q40g54SS5CrEysGMMIvv5vOo2jPrk7T4x2TtYHhVSwr0KdBKWCZ2Gpy3XYeu12Bpdc=
+	t=1746022855; cv=none; b=aYE9pfprv8wsXa24CybCeEeRGxDPljBZYeWEvrkiTEWVzpXLKIc/M9BQXcT6ad40yP9JGD5tcAZMevDCHC01Lg/Q3KYnYPq1/UzdUE40JgSCx7C6ZFSHW978aP8CuD1m23JKvz4wfz+M2AuyxLO+y0BB+oMAJiTbpyF8e8bYohA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746022268; c=relaxed/simple;
-	bh=dsud/2U/NzgyuLT4SAm3RqXxWU7GCVGgm+BpDHgFKOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ES22lZTRkfoRAb5pNwOvAVA2D3PNMlHtAno+urtWvEKP0WKMC1UAi7cjgV8EXL/5y/OZxbqblHiBFWtnBFGFF8sTxDdaKUu/auS9CF+5dUsztdO11kUxDxCXuVW54f2jl3NHoGZALovFIoPx72ZK+MR6rm30nJf7RZu00eiJSX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q91X8Er2; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22423adf751so74399965ad.2;
-        Wed, 30 Apr 2025 07:11:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746022266; x=1746627066; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dsud/2U/NzgyuLT4SAm3RqXxWU7GCVGgm+BpDHgFKOM=;
-        b=Q91X8Er2FWy5XuziDzEhyuXEpbFeztavwyS5Lz9NtiAw/9M0PKhS17wn6/11Fw7D01
-         pR0hHxSdaAdxpoeqp3McTIB18TKn2Lxea/vZGr0HLfCOvTiPUB0gMz4lOhs/lH09jC0H
-         hcEoZBWhMK7J9Tzj49Dx3uHdZtMK0/SXjYpIFjN9kRQALWgtWDBYW4k48fQ1CbedKbbE
-         TNqiWbS/LWvnjh3nA0CxXEOTsi+fJ646/NUx472kSSMW56l4wB/4DI1Yd909kaMWauyM
-         cjX5K/QlilZv+yXD5t4hVxW0my+RJmrrbwUYG5yifdpmWvhzivLhH4SbuIFmbYe7F3p7
-         s3+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746022266; x=1746627066;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dsud/2U/NzgyuLT4SAm3RqXxWU7GCVGgm+BpDHgFKOM=;
-        b=cZfcxkImocnJydPtjxqReFU22RIrkuUl2eD7b4KzbOzUrjTSMY/xWUCjOdIgWdf/Oc
-         BYDb0tRIUYolMulSUyO9MaSUbl7ISJADOvaW+v7rRhKuXRgU0ruvjg9UG6mLWDFWHNOh
-         dihDkRJY6m2NIUnTkrXb5JvHcIH2oImPbLZUlV6Jbd8jHFP2Izri73kKjoVBT2P36uOg
-         ZLTvbVHxe6QQHNQs3ShOgrYjxgLdBWr5wnPBSqm9PFdYafEQlXx/z3k0yoVaCMC+crTa
-         w/czzJtOQbR2bNtUOJ10b1zxXDFwbTRFFQjBw+9EzQeRGF5QZVamlRSSYk0jRz3BIpV7
-         I8Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUCF3SBgOLhuk6yc9WrFAU056NM9n9XZl/YtNL0i+LnYsYDYLRDVEQVmvYnC3Ukr8Pek7YbqcDB/rIUMfof@vger.kernel.org, AJvYcCUh+dXPaUgcdngbG9Ni/IELDwv4H1tXKRkj1aMP6WxWO23YARDBys0tkp8ohymOMTwpYB7kKPvD@vger.kernel.org, AJvYcCX34bLABcwFq7lZpyTvgBt84ahJc+A8EK+I1hHDN3PwgMd3FqHRR9H057ml0aZ/hxwP6Js43x0rj9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWwet+bh2G38ptf6a2iYDNpyPzu7gKNMmJV+dBv/cwLifCv6Oi
-	w1CZxTV2DRYWDIESMaTVG1UKDDfxp47VQRFTOpmkej+n0G7z9Qq8
-X-Gm-Gg: ASbGncuRBfVOgo3A7bzfTx+UvfFwVcOtC35n8M6vs8GiKFRVJ8zu/axNyMfFpUWK1uv
-	9yatsqrWJpTwzv/Mm5YxMwKL3rrUEZUVXpdpHlhfj0f4YgxMQQCOdg0lQIKCn/eCb/iX632epOK
-	JJfknY9c6V4WQd62y+9LgCP4QWBzlZxNcaLXzAR18uUkTWqjjCax30LymGijm19Ij1+SPd5o8Ct
-	QfBUTdSLW5swbU21GhVnXk9+oOXXR8LZ5q3LRJkCTIsJKA8G0VAQSUCPlX+msaH5aqwiLJKDfYj
-	oQq7WqFE4OCWInN32VQxNKMxy5KF9HU0YyGQkxuW
-X-Google-Smtp-Source: AGHT+IF0trVfcRYBBwO9lBLK8KETXWSFQfqRdeh2DW8hkHBJS+ZTFbNfty9mP4zPhIeEhtDyItzp+A==
-X-Received: by 2002:a17:903:4405:b0:21a:8300:b9ce with SMTP id d9443c01a7336-22df35cad23mr55838435ad.49.1746022265792;
-        Wed, 30 Apr 2025 07:11:05 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db50e7a9fsm121976415ad.111.2025.04.30.07.11.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 07:11:04 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 8AADD4208F70; Wed, 30 Apr 2025 21:11:02 +0700 (WIB)
-Date: Wed, 30 Apr 2025 21:11:02 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux PowerPC <linuxppc-dev@lists.ozlabs.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Andrew Donnellan <ajd@linux.ibm.com>,
-	Vamsi Attunuru <vattunuru@marvell.com>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Alyssa Ross <hi@alyssa.is>, Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH] Documentation: ioctl-number: Extend "Include File"
- column width
-Message-ID: <aBIvdqKy9cCQPLox@archie.me>
-References: <20250429130524.33587-2-bagasdotme@gmail.com>
- <66e4a803-05bd-4fbe-96bf-84415eefe412@linux.ibm.com>
+	s=arc-20240116; t=1746022855; c=relaxed/simple;
+	bh=SNye59+q6J7dszg3XbC1nFoBaJJWL336n0A0UOKURjM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ct8ZvKxhkgaEcFbpjiL4oRxPKcSobdiG6SiKd1a4GXkXcdKLuDlU2syLMVzsNmuiBSJUUWFKleiQVJTOSgW+A7vGzTZ5ez4RvDTzMB7IUAf77noAFo0HjRo7nqCsv7bITxwjTBKUHuj4wWzOgWHsP7QIpQAeGiYjq/7yznjU6Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIHwdswV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B0F7C4CEE7;
+	Wed, 30 Apr 2025 14:20:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746022855;
+	bh=SNye59+q6J7dszg3XbC1nFoBaJJWL336n0A0UOKURjM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kIHwdswVPesfFoZt7A0WWlk9I1Cfp+Sppm8022OzrdPVB0syvoZw9xc0lamgq19rA
+	 8eBQqXptgLGdmUXDJZstNp6NYDI3mpiXHmebIMLoFeybxyi+IZzY9wSzS0W7AmxHPg
+	 IIM9wNkUL8f/RgS9Z+xWUOD2C48S+ptDY5hU2LZf3Sdl4y6kDnO0iywD463n+UdrTs
+	 tl7iPULdin+la5ubX2zpjMHo+cHZNJ4Wt2vzXlytwkb0YJb4dzjeqH16eloTpqavt2
+	 xgXObB1dE8NvnBn9qaw94hGqhUdcxxYW2h0sZhgSSxXm46dqqlHJoGgqFAyzb5RH3k
+	 QfFnHX8SrzI7w==
+Message-ID: <b57160d1-e370-43ff-a7ea-cb548e19843c@kernel.org>
+Date: Wed, 30 Apr 2025 16:20:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="JY5zQzvXTsAY1P1v"
-Content-Disposition: inline
-In-Reply-To: <66e4a803-05bd-4fbe-96bf-84415eefe412@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 05/18] xdp: Use nested-BH locking for
+ system_page_pool
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ Toke Hoiland Jorgensen <toke@redhat.com>
+References: <20250430124758.1159480-1-bigeasy@linutronix.de>
+ <20250430124758.1159480-6-bigeasy@linutronix.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250430124758.1159480-6-bigeasy@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Cc. Toke
 
---JY5zQzvXTsAY1P1v
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 30, 2025 at 06:38:27PM +0530, Venkat Rao Bagalkote wrote:
->=20
-> Note: There is other patch [1] <https://lore.kernel.org/linuxppc-dev/aBHo=
-dTu4IjqzZeXb@archie.me/T/#m013297a6731d3ca3dc1e0f23d161774850d6b41c>
-> which has a different approach to fix the reported issue.
-
-Then let the maintainers decide...
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---JY5zQzvXTsAY1P1v
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaBIvcAAKCRD2uYlJVVFO
-o/EaAPwKtcQ1wbetpC3zLm+DuLSa5qEQtOm51qI4RngKFscKnQEAmrD6Y/Ovyazo
-mBa6qHv4bKKYjW2KLekEMQyFs4iPHg0=
-=NWAu
------END PGP SIGNATURE-----
-
---JY5zQzvXTsAY1P1v--
+On 30/04/2025 14.47, Sebastian Andrzej Siewior wrote:
+> system_page_pool is a per-CPU variable and relies on disabled BH for its
+> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+> this data structure requires explicit locking.
+> 
+> Make a struct with a page_pool member (original system_page_pool) and a
+> local_lock_t and use local_lock_nested_bh() for locking. This change
+> adds only lockdep coverage and does not alter the functional behaviour
+> for !PREEMPT_RT.
+> 
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>   include/linux/netdevice.h |  7 ++++++-
+>   net/core/dev.c            | 15 ++++++++++-----
+>   net/core/xdp.c            | 11 +++++++++--
+>   3 files changed, 25 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 2d11d013cabed..2018e2432cb56 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3502,7 +3502,12 @@ struct softnet_data {
+>   };
+>   
+>   DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+> -DECLARE_PER_CPU(struct page_pool *, system_page_pool);
+> +
+> +struct page_pool_bh {
+> +	struct page_pool *pool;
+> +	local_lock_t bh_lock;
+> +};
+> +DECLARE_PER_CPU(struct page_pool_bh, system_page_pool);
+>   
+>   #ifndef CONFIG_PREEMPT_RT
+>   static inline int dev_recursion_level(void)
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1be7cb73a6024..b56becd070bc7 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -462,7 +462,9 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
+>    * PP consumers must pay attention to run APIs in the appropriate context
+>    * (e.g. NAPI context).
+>    */
+> -DEFINE_PER_CPU(struct page_pool *, system_page_pool);
+> +DEFINE_PER_CPU(struct page_pool_bh, system_page_pool) = {
+> +	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
+> +};
+>   
+>   #ifdef CONFIG_LOCKDEP
+>   /*
+> @@ -5238,7 +5240,10 @@ netif_skb_check_for_xdp(struct sk_buff **pskb, const struct bpf_prog *prog)
+>   	struct sk_buff *skb = *pskb;
+>   	int err, hroom, troom;
+>   
+> -	if (!skb_cow_data_for_xdp(this_cpu_read(system_page_pool), pskb, prog))
+> +	local_lock_nested_bh(&system_page_pool.bh_lock);
+> +	err = skb_cow_data_for_xdp(this_cpu_read(system_page_pool.pool), pskb, prog);
+> +	local_unlock_nested_bh(&system_page_pool.bh_lock);
+> +	if (!err)
+>   		return 0;
+>   
+>   	/* In case we have to go down the path and also linearize,
+> @@ -12629,7 +12634,7 @@ static int net_page_pool_create(int cpuid)
+>   		return err;
+>   	}
+>   
+> -	per_cpu(system_page_pool, cpuid) = pp_ptr;
+> +	per_cpu(system_page_pool.pool, cpuid) = pp_ptr;
+>   #endif
+>   	return 0;
+>   }
+> @@ -12759,13 +12764,13 @@ static int __init net_dev_init(void)
+>   		for_each_possible_cpu(i) {
+>   			struct page_pool *pp_ptr;
+>   
+> -			pp_ptr = per_cpu(system_page_pool, i);
+> +			pp_ptr = per_cpu(system_page_pool.pool, i);
+>   			if (!pp_ptr)
+>   				continue;
+>   
+>   			xdp_unreg_page_pool(pp_ptr);
+>   			page_pool_destroy(pp_ptr);
+> -			per_cpu(system_page_pool, i) = NULL;
+> +			per_cpu(system_page_pool.pool, i) = NULL;
+>   		}
+>   	}
+>   
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index f86eedad586a7..b2a5c934fe7b7 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -737,10 +737,10 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+>    */
+>   struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+>   {
+> -	struct page_pool *pp = this_cpu_read(system_page_pool);
+>   	const struct xdp_rxq_info *rxq = xdp->rxq;
+>   	u32 len = xdp->data_end - xdp->data_meta;
+>   	u32 truesize = xdp->frame_sz;
+> +	struct page_pool *pp;
+>   	struct sk_buff *skb;
+>   	int metalen;
+>   	void *data;
+> @@ -748,13 +748,18 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+>   	if (!IS_ENABLED(CONFIG_PAGE_POOL))
+>   		return NULL;
+>   
+> +	local_lock_nested_bh(&system_page_pool.bh_lock);
+> +	pp = this_cpu_read(system_page_pool.pool);
+>   	data = page_pool_dev_alloc_va(pp, &truesize);
+> -	if (unlikely(!data))
+> +	if (unlikely(!data)) {
+> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
+>   		return NULL;
+> +	}
+>   
+>   	skb = napi_build_skb(data, truesize);
+>   	if (unlikely(!skb)) {
+>   		page_pool_free_va(pp, data, true);
+> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
+>   		return NULL;
+>   	}
+>   
+> @@ -773,9 +778,11 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+>   
+>   	if (unlikely(xdp_buff_has_frags(xdp)) &&
+>   	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
+> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
+>   		napi_consume_skb(skb, true);
+>   		return NULL;
+>   	}
+> +	local_unlock_nested_bh(&system_page_pool.bh_lock);
+>   
+>   	xsk_buff_free(xdp);
+>   
 
