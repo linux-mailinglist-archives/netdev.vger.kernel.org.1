@@ -1,137 +1,185 @@
-Return-Path: <netdev+bounces-186949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1FEAA4277
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:34:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B660BAA429B
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:48:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12C121C01238
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:34:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FF187B692D
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617B81E1DF1;
-	Wed, 30 Apr 2025 05:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2903B1DF25A;
+	Wed, 30 Apr 2025 05:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U0WCWih2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4BF1E2853;
-	Wed, 30 Apr 2025 05:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745991198; cv=none; b=ZZDTkwl8gLbzNcb0HYDgrdW/KnFAx8tAI3gEGoSwaVUkShBC07bDZFBpzHK1Zd18yTd7ut6qWdlu1JHg9dJBbeoFoArsU62+U/vIL0609B3sxRgzjwqsO1qcKup6K3BbQG9cudbECA5/9fbApqs0npUtBfHBV7wek9J4hV1OvJA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745991198; c=relaxed/simple;
-	bh=KQtVVkxqKgq++RrOtQPY3AP4zXz78fWySFRMQ+WV2cw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DYY6T/AjO6SSqB1ZQYw7CMDUw5JHVBqScC21/uictsg5qw4XDfMDS0d7sUrz3iF+5ndr2NSgOUFldM5Ks3EFSYHJ4wXQLwqzQbYIt1UJqK12xBUnvCKtCVNFPzEfadJnI2MpLscMphuTrUxPVf6IMIJVtaWWlupQZzp/cNbO15w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from [127.0.0.1] (unknown [116.232.147.253])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dlan)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id D62F4342FF8;
-	Wed, 30 Apr 2025 05:33:10 +0000 (UTC)
-From: Yixun Lan <dlan@gentoo.org>
-Date: Wed, 30 Apr 2025 13:32:07 +0800
-Subject: [PATCH v3 5/5] arm64: dts: allwinner: t527: add EMAC0 to Avaota-A1
- board
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3571DE3BE;
+	Wed, 30 Apr 2025 05:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745992100; cv=fail; b=YB5pfIMz2d1oceTL5s5qiDC6AklyKKFT8wSrQgjrn/xRPc9vtJL/TMRz6AmKB6zEV5wDFjj0umNxSre4a7OCQ/H+th1fZ2PGY/TGV9tjytXXKmQwRTUKK76AogBkEAcHD2j2xvdQWXB/xyH9JOWANI4ROdQA8Y11yFf2rTUyTRE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745992100; c=relaxed/simple;
+	bh=BLhufPOWBg6iRCrfywlbq9EivH4OpdhCHf0r3U4LPc8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QycEjGt1A5SPzPGCIuTELRGY6ETGyOkvzTTFCW8047uhz0y2xI2fEQCWowb2iC/cTetus3IZO2nbEuWXXwnqXxX5Pl9DJfjT3sDq7zApmgtNMxTL7DNXJoBCgo8M8AZAyQux13HHBulIMosu37ZzpE/UzM/Q8GDw7zUDMRCZNb0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U0WCWih2; arc=fail smtp.client-ip=40.107.244.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=F4NkNz8JCS2bbrbxiKp4/7PLxgZgXAEllcLVx7p6X93NnPBVdQvAhfM5QbpP1yDq79W4eDNO/zwZ2X+kQLkfZSGbZFJuG/WQzPMOJx8tg0Vot8OH8+5SUpjer/WLBkxfvTdK5+Gnf3NFFLT9ix7h7K4+moh2o9G1dJviNyJmSr0T8bOF5Xt4PJmeZtoeO4s4x5Hh7DaOrxOf0wkGs8qZYd1isG75ed1xKH7gq7IF1RC9vxoo6j7yn4rcMHKB+/Qt+Vav3dufc5k7Nlvarihd8WWRakuVUFCRQc4uBZx3EV/TcvoCyiDIWw498YqJPOJvW/smVjYP7zmE4XO6kbonWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Kj1KF1fv0nSUs91JFiqyJWHSQeKJjYmuS7r92ZwFdiU=;
+ b=PvHBABWSOZnIAZBAE++1pHF9yEgwGJZerCAjsuY+jY5mB4INdIbybA62vZ7I+q0QXgTzd4q9ScdnI4S3Ss5nL7bWsBHsaEn5JUcW8KiIfIz9RM3v+Uiy+FE1ycnkR9Hp063IQTY47U1rhBmFNTcd6mVS/0d+Y95ZA+tlLztfPE/OcaQhOK6FhzSLkK34wgh15xuBLYSQZMgqby81SLGZFWXH6ilUzCn9nVzKja0sU24S0B0QklU5vAx5qOdo4Gc0/iTcGsUZqEsTjqnQjNozbTK0tNAjMWev/Cc0ExL3SwsSHjCy/lck21/MWHSxdTnzEQwB6b4mGF8h3+rn0yp2ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Kj1KF1fv0nSUs91JFiqyJWHSQeKJjYmuS7r92ZwFdiU=;
+ b=U0WCWih22IC30/fGIzRaxekunQ/XLsV6ZL21iZJhEMpCYhhxe+PzLIT/MImxLD/zdSXicfvkNLfJtUCeY/DWscKYaS3d0Pm6xMfZvf/NTPAPIIMzW5vzxszpMUsAhgdU7J6fdmyymUcGEuY3zcnZg/i37o1M++DAPGFjyYxEUhOmk856QPh0EzoPGFeCALRVUV1KAFYtowzZe19R/ghNjtoXgW3Qy6dv4MycBQ0zV3+PtAGN7CYk0+Ia61Q+Blzbw2j4EHy0CWPdPoUbb5zpN7Kf9ZrCDOwQ7toKRREUuzcE6Ze2g+5VHrt5290lT3Qer4U+W+yzS2PfXp9XQ3jY6A==
+Received: from PH1PEPF000132EA.NAMP220.PROD.OUTLOOK.COM (2603:10b6:518:1::2e)
+ by CY8PR12MB8316.namprd12.prod.outlook.com (2603:10b6:930:7a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Wed, 30 Apr
+ 2025 05:48:13 +0000
+Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
+ (2a01:111:f403:f910::2) by PH1PEPF000132EA.outlook.office365.com
+ (2603:1036:903:47::3) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.32 via Frontend Transport; Wed,
+ 30 Apr 2025 05:48:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8699.20 via Frontend Transport; Wed, 30 Apr 2025 05:48:12 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 29 Apr
+ 2025 22:47:54 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Apr
+ 2025 22:47:53 -0700
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 29
+ Apr 2025 22:47:51 -0700
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Shuah Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, "Gal
+ Pressman" <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>
+Subject: [PATCH net-next v2] selftests: drv-net: rss_input_xfrm: Check test prerequisites before running
+Date: Wed, 30 Apr 2025 08:48:01 +0300
+Message-ID: <20250430054801.750646-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250430-01-sun55i-emac0-v3-5-6fc000bbccbd@gentoo.org>
-References: <20250430-01-sun55i-emac0-v3-0-6fc000bbccbd@gentoo.org>
-In-Reply-To: <20250430-01-sun55i-emac0-v3-0-6fc000bbccbd@gentoo.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, 
- Jernej Skrabec <jernej.skrabec@gmail.com>, 
- Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, 
- Corentin Labbe <clabbe.montjoie@gmail.com>, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Yixun Lan <dlan@gentoo.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1431; i=dlan@gentoo.org;
- h=from:subject:message-id; bh=KQtVVkxqKgq++RrOtQPY3AP4zXz78fWySFRMQ+WV2cw=;
- b=owEBzQIy/ZANAwAKATGq6kdZTbvtAcsmYgBoEbXxaftpe1NJ9cfpRt022XLIsXHhvqeP/+lrN
- m3gmTKPy3uJApMEAAEKAH0WIQS1urjJwxtxFWcCI9wxqupHWU277QUCaBG18V8UgAAAAAAuAChp
- c3N1ZXItZnByQG5vdGF0aW9ucy5vcGVucGdwLmZpZnRoaG9yc2VtYW4ubmV0QjVCQUI4QzlDMzF
- CNzExNTY3MDIyM0RDMzFBQUVBNDc1OTREQkJFRAAKCRAxqupHWU277dNvEACeKULnlu5Zk1MfpK
- yFz42975F08U5nXUWjXpJ+dsJ+loBIeJ/f2vkvtVqTj89Rm7vG3CLPPpjS7Oy7EEumMogyINsP5
- q9F8GateiqiLR7QU5FsoaB90gavEActY7+USEUqEE5UmFxuRX6AhhKG6aUy8VVkyiPokgkptcvB
- pz3pPsyg22fBo3Tz4TBVp7O9TyJLGvW+++BPewKoc0PFPUOlcarVraKMm+I+9uAwLsgGSjL0hz5
- Ka6uCcZVQf6VpkUMBfoVj+CqUfbrLAdrMs2SUgxUC2QwMLKRtthXF41CKYSSrVtw/isObSgBPPw
- 932xGk//aOyGX4mEYRTttXm5mgFUnB84/y6N/s8FrVUK0/+y1fVSqi0MnX1NsGa/LOsQn4+CBWs
- NhThpLovc21IjaVakM3bgkL2QzGKfOmA6e/Qek4c3Iq78GGNJ8WccjktK1I/+uWer/4FUePaRQL
- +I0IPjaTSFiG4Qkgv/0NJUFcMSO5R9J3ddEwFLjyuEzOUk/3L3OkPBevxnUN8uTBrYa13Yq3QLu
- puGs9vF+R+41UZFqAOl3nAsQmUwHqY5XGusqKXaDukMAK6Uh3iFENHt7saULfWyY/J4MLu5oP82
- mITBKX8eCawg617cCed6gQvKRtTJWR5aXcV4d880ZlDm2eJIdFSZW2+Db43GwT+/CXJg==
-X-Developer-Key: i=dlan@gentoo.org; a=openpgp;
- fpr=50B03A1A5CBCD33576EF8CD7920C0DBCAABEFD55
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|CY8PR12MB8316:EE_
+X-MS-Office365-Filtering-Correlation-Id: 577d1f2c-b928-4309-fc26-08dd87aa984c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xt6ZQNDc4Oe9YbGNEaJ3M3RZhRawXwtE3fNXfX0k0xgK/VUL+w2pEUtn9XuW?=
+ =?us-ascii?Q?qFY0jcV4ywWaEHsF5oyN5UqLzxp0S8UDHHiV7ptU8xk42n+3NaEHiKXZVQPh?=
+ =?us-ascii?Q?BHeM6yHMNC/lH3SMskEve5iwzIcilYUbkKCEqL7lfTUUyE9+e6u/jo0cRib0?=
+ =?us-ascii?Q?O0U/JPkO/r9QaL8xvRusJ96uE75D5XDDY2e90rbpDoRGMC/KbSjTERimesOn?=
+ =?us-ascii?Q?tTbB8kAOyXPjcQmx4qsH03U+uYn+EdICjHGCdcYhaGcE7QA7Z9fvDaVIcyKd?=
+ =?us-ascii?Q?PfcE4kIebsP23wTbGMBW/3fzATyv4GG+2LqA2oPhJR4dMwER9dCnqQ1TYUO+?=
+ =?us-ascii?Q?imGtdXx2Dh6L4XJxult1iClWkEWHqymMDeQsdh1sT0kDwW4o3KUTHEgvRBq5?=
+ =?us-ascii?Q?5rngsX+CyCVb7k/lEuTyLcdohZHOcRS+pfbkNyg0Y6MLmYqw0stJh7+P9fOK?=
+ =?us-ascii?Q?ra/9FAjLQHlG3e3ZfM6uoCx9N9r19vQlZrM1dEhrot9UE5Qunf/LBgVEi3tv?=
+ =?us-ascii?Q?3KbFxFJdEsPtDaURSEkFeLxP7a3jtkSPBQrWB06g0JHmHLdYgfsZnV9a62Nn?=
+ =?us-ascii?Q?Y3kdSgUn0JhkK4NS5L8zPIOZxmSy/dufhRdcZWLr/bFePyI+4Kpjmr+vVh63?=
+ =?us-ascii?Q?2vRj2E5Js1RgNkaCEBkZVyU3qm+P9+gRf6iQn/G74563eTsAsCwDnLEmoWfQ?=
+ =?us-ascii?Q?4P4owEf4SE5dY3X+wfDEIRevOz3DRc4VgJ09RcEHp2qGVFqOS2VAsM6iWNyw?=
+ =?us-ascii?Q?162z+OTwSi1wm95WOwbuUmDpjzSxct1fHhU1bCkYHTduu/7qhVpgyg7IvhuF?=
+ =?us-ascii?Q?bzK/dZcEzSvdpjCN7QZ2hVEAthXULFB7N6ExZih5RwA5JRVbddEFyiod6dVq?=
+ =?us-ascii?Q?Wwb5QLIsy4KbqJRCMKCNmR3Npbs3k7UiOsYbi6XlwNcnFapVcPS6az/VSf1l?=
+ =?us-ascii?Q?42nVJZ57ITOOIf0Pn1YAeYlIbVgE8sF1+2udP92A5SfANYiJ2qTCYgGNPl7R?=
+ =?us-ascii?Q?ngCZXrSL9fHIr1ZDRRxdsz6n1c4Rfkg2m2B5XocAq8cPJEsaZDRJ94nK7v4o?=
+ =?us-ascii?Q?v5He+ChiOuNZpbnSMavj+BqRSNLFXt3OrdALuW7LLz/pxdoqcnnuhsMVrB/B?=
+ =?us-ascii?Q?vl0pgB6KzREF/LAHAQtq2K4sHe51TWnEJG0EnfYXgesJP6GpYAOyIEwhVSeA?=
+ =?us-ascii?Q?4urOOwXkMOv4KvEczeMhQLsq6puOr4+6BxxHdM0zE9sJHYI9QBBepOSb59zG?=
+ =?us-ascii?Q?p8vfFkrCX8CQ7SxPDBk9ApvmjaqrAkvovHX5/Qo4xEYM4EGwXrv75W/oqCVa?=
+ =?us-ascii?Q?QYzZuE8YNv/FgyzU6ottLysEAnroAQdlf+gv6YjSf6mhIPSS8n7CLpvU7h/d?=
+ =?us-ascii?Q?nZl5098X9NLwBct5Zrxu1oIF9sjf1h8V1QsqZ1FneAjLaFCBKt2aYggqtjBK?=
+ =?us-ascii?Q?+QBx1Gx6aq0Bsi3nu+/b1BDCLErHPzpsnBATfiTSPGho0incSJUiTa6nC1Uw?=
+ =?us-ascii?Q?XQh+983nzEXqay0JF4QCS383naZhyaRqqgUYJQZQtj+9stpPDwTU6+NZOQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 05:48:12.4370
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 577d1f2c-b928-4309-fc26-08dd87aa984c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE38.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8316
 
-On Avaota A1 board, the EMAC0 connect to an external RTL8211F-CG PHY,
-which features a 25MHz crystal, and using PH8 pin as PHY reset.
+Ensure the following prerequisites before executing the test:
+1. 'socat' is installed on the remote host.
+2. Python version supports socket.SO_INCOMING_CPU (available since v3.11).
 
-Signed-off-by: Yixun Lan <dlan@gentoo.org>
+Skip the test if either prerequisite is not met.
+
+Reviewed-by: Nimrod Oren <noren@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
 ---
-I don't own this board, only compose this patch according to the
-schematics. Let me know if it works.
+Changelog -
+v1->v2: https://lore.kernel.org/netdev/20250317123149.364565-1-gal@nvidia.com/
+* Use require_cmd() helper (Jakub).
 ---
- .../boot/dts/allwinner/sun55i-t527-avaota-a1.dts      | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-index 85a546aecdbe149d6bad10327fca1fb7dafff6ad..4524a195e86d20089cc35610495424ed2dec7e95 100644
---- a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
-@@ -12,6 +12,7 @@ / {
- 	compatible = "yuzukihd,avaota-a1", "allwinner,sun55i-t527";
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
+index 53bb08cc29ec..f439c434ba36 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
+@@ -32,6 +32,11 @@ def test_rss_input_xfrm(cfg, ipver):
+     if multiprocessing.cpu_count() < 2:
+         raise KsftSkipEx("Need at least two CPUs to test symmetric RSS hash")
  
- 	aliases {
-+		ethernet0 = &emac0;
- 		serial0 = &uart0;
- 	};
++    cfg.require_cmd("socat", remote=True)
++
++    if not hasattr(socket, "SO_INCOMING_CPU"):
++        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
++
+     input_xfrm = cfg.ethnl.rss_get(
+         {'header': {'dev-name': cfg.ifname}}).get('input_xfrm')
  
-@@ -64,6 +65,24 @@ &ehci1 {
- 	status = "okay";
- };
- 
-+&emac0 {
-+	phy-mode = "rgmii-id";
-+	phy-handle = <&ext_rgmii_phy>;
-+	phy-supply = <&reg_dcdc4>;
-+
-+	allwinner,tx-delay-ps = <100>;
-+	allwinner,rx-delay-ps = <300>;
-+
-+	status = "okay";
-+};
-+
-+&mdio0 {
-+	ext_rgmii_phy: ethernet-phy@1 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <1>;
-+	};
-+};
-+
- &mmc0 {
- 	vmmc-supply = <&reg_cldo3>;
- 	cd-gpios = <&pio 5 6 (GPIO_ACTIVE_LOW | GPIO_PULL_DOWN)>; /* PF6 */
-
 -- 
-2.49.0
+2.40.1
 
 
