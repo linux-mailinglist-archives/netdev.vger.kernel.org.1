@@ -1,187 +1,112 @@
-Return-Path: <netdev+bounces-186964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911FBAA45F8
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:52:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38739AA4603
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 236B51BA34B6
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:52:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996674637CB
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D079C1EEA46;
-	Wed, 30 Apr 2025 08:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21174218EB9;
+	Wed, 30 Apr 2025 08:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m1lJ8wzZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDBYw/qy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5032AEE1;
-	Wed, 30 Apr 2025 08:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860FE2DC768
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 08:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746003148; cv=none; b=aM5Bu52PLJj8ixrKM4zOzeeiGeAD9hD3Zk4pVzDrwLojlCJP66XqSrZRcyUoBlQiEHEAoQ/O1yIe5LeNiRwN3XIAzdMmQD3E6VxlGX8/ksLpyJYC8ZmfOXDJOGESiEpGyy5GJxury6C7nzN9Swg2Vhm92ZOFm7+eA7lHOAo1+hI=
+	t=1746003334; cv=none; b=URpjSyiZTIpa2+VfjWQSqIqC7fH9fnqeqRQDOyhLt05yn/YHj1WWgEUfc63V1jRTWq8rZEatsHsA3lK17pJexygbcEUcRanl9cvcSGat7AFtzocNeExByFuMsvEsy1dpkJp3V2MtxfXWfWUP1ccRZgGDcyPpnZ5BMzUqMMvusFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746003148; c=relaxed/simple;
-	bh=7Cul/zndrL+/IVYzqfi6IU1dEFCIVPUdV6j259m69G4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a4oZTvmYj4muIx0aZdlG6ovra7vXrM5qVXHWnealPI+18Sg07Fj/5XeJv/YR59LkXHH3wS/OwhcJl0Aq2x9Y5D6u6kIL5thYm3k0OSM16c0cHzu7wb7XbT/AUt1cfFvStCEW+Leo/FmY9ASkTcNdj2gUbLvDhi7+onYA/4fr8aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m1lJ8wzZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 941A3C4CEE9;
-	Wed, 30 Apr 2025 08:52:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746003148;
-	bh=7Cul/zndrL+/IVYzqfi6IU1dEFCIVPUdV6j259m69G4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m1lJ8wzZTPM8DhfyWr4/2HegX1ltD3jb9oyGwEsxQnggTzFu4BmhN+FDUo2zeu1RN
-	 giDLlf5a2a05M1NTM0TyNM+3EdxGFIjko0NcwuH8tmM4waxKh+taOw9pETLP/OGysx
-	 y6q41rNWMiXvecfuO5utnba6X+/RrlRRRG0Zyp779JD4OXsp8BT5vKLho9xhVLhP01
-	 L3pek8e8yF1Kz3U+jqQ8zO6NCEaQ1htsGbDQh30QnW28U8lUEpb18UeDTpFssre9i9
-	 UMhCihDPn7fYp+FgDTScyGj9IhAcqbLQNWIY9xOmFsozHxD0z0V8xLXR1vNNBZ07+D
-	 pBH9xsh9vL2PA==
-Date: Wed, 30 Apr 2025 09:52:20 +0100
-From: Simon Horman <horms@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
-	mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v5 04/14] net: phy: dp83822: Add support for
- phy_port representation
-Message-ID: <20250430085220.GS3339421@horms.kernel.org>
-References: <20250425141511.182537-1-maxime.chevallier@bootlin.com>
- <20250425141511.182537-5-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1746003334; c=relaxed/simple;
+	bh=MAtLAD56QOPPSbm74mSzW0LRN2+jjBX+qq4vmsqEOYI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i+hPW4KBKRMs9O2oMNf9UBrlAEMRWINwuv71phTNU81IOCB3YawdDEG+OstAjK6UC1sZXhQJi3AZTDU0/iLG37wLbkRaFGvyR0aum7E+6KEqRs1+x+Dj5n12Hpo9+mpbifqxJOh4UzvubNUEgS084U3IuMOMHmvY5G2I+Y0S8zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDBYw/qy; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746003333; x=1777539333;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MAtLAD56QOPPSbm74mSzW0LRN2+jjBX+qq4vmsqEOYI=;
+  b=mDBYw/qyjXdchDhe0Esjt2S84zqHdUZrQmvoSZI0sbAJFfqzNHkin0SE
+   c+qCiWbTyEuTM9JcDeCs67OEnB5FLcm8H857wgOwl2MQc87CsDLQEcMGv
+   WNS2JFOQdXnjK1IsR1xFfdKyKVEs6XZJD3fqcNN5aktlvRastKF1m5sG4
+   pmH2fIfDqV753pScpceLU9xvSk6Hz/Lh40fYVjIQKFZxEGMTlmCSul5PY
+   1OD/jpZFZ3GZJDjkNHp68ebuST2eBRlKixbnaJi5s5svOEyFrab9woJuN
+   PpgN9cYz4ZgZlNGLbfM4aTavhzr/Se6KONEr+eCqlXCtSZF4p+0LhsYwr
+   A==;
+X-CSE-ConnectionGUID: W+/JDetkRoirTTvdtY+Lzg==
+X-CSE-MsgGUID: 9+/MibyaRSaLmIkJTQ/ekg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="51473558"
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="51473558"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 01:55:32 -0700
+X-CSE-ConnectionGUID: 9zYzTEY/S9OmEGRlOgoJjw==
+X-CSE-MsgGUID: s009mo7cQjSj0j7CF7wssg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="133961827"
+Received: from gomezolx-mobl.ger.corp.intel.com (HELO [10.245.87.99]) ([10.245.87.99])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 01:55:30 -0700
+Message-ID: <d1485d62-a746-4660-82d2-35965a349a34@linux.intel.com>
+Date: Wed, 30 Apr 2025 10:55:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250425141511.182537-5-maxime.chevallier@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ixgbe: fix ndo_xdp_xmit()
+ workloads
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+ magnus.karlsson@intel.com, michal.kubiak@intel.com,
+ =?UTF-8?Q?Tobias_B=C3=B6hm?= <tobias.boehm@hetzner-cloud.de>,
+ Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+References: <20250429155205.1444438-1-maciej.fijalkowski@intel.com>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20250429155205.1444438-1-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 25, 2025 at 04:14:57PM +0200, Maxime Chevallier wrote:
-> With the phy_port representation intrduced, we can use .attach_port to
-> populate the port information based on either the straps or the
-> ti,fiber-mode property. This allows simplifying the probe function and
-> allow users to override the strapping configuration.
+On 2025-04-29 5:52 PM, Maciej Fijalkowski wrote:
+> Currently ixgbe driver checks periodically in its watchdog subtask if
+> there is anything to be transmitted (consdidering both Tx and XDP rings)
+
+typo: s/consdidering/considering
+
+> under state of carrier not being 'ok'. Such event is interpreted as Tx
+> hang and therefore results in interface reset.
 > 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->  drivers/net/phy/dp83822.c | 70 ++++++++++++++++++++++++---------------
->  1 file changed, 44 insertions(+), 26 deletions(-)
+> This is currently problematic for ndo_xdp_xmit() as it is allowed to
+> produce descriptors when interface is going through reset or its carrier
+> is turned off.
 > 
-> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-> index 490c9f4e5d4e..bbbe509f3bd9 100644
-> --- a/drivers/net/phy/dp83822.c
-> +++ b/drivers/net/phy/dp83822.c
-> @@ -11,6 +11,7 @@
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/phy.h>
-> +#include <linux/phy_port.h>
->  #include <linux/netdevice.h>
->  #include <linux/bitfield.h>
->  
-> @@ -814,17 +815,6 @@ static int dp83822_of_init(struct phy_device *phydev)
->  	int i, ret;
->  	u32 val;
->  
-> -	/* Signal detection for the PHY is only enabled if the FX_EN and the
-> -	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
-> -	 * is strapped otherwise signal detection is disabled for the PHY.
-> -	 */
-> -	if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> -		dp83822->fx_signal_det_low = device_property_present(dev,
-> -								     "ti,link-loss-low");
-> -	if (!dp83822->fx_enabled)
-> -		dp83822->fx_enabled = device_property_present(dev,
-> -							      "ti,fiber-mode");
-> -
->  	if (!device_property_read_string(dev, "ti,gpio2-clk-out", &of_val)) {
->  		if (strcmp(of_val, "mac-if") == 0) {
->  			dp83822->gpio2_clk_out = DP83822_CLK_SRC_MAC_IF;
-> @@ -953,6 +943,47 @@ static int dp83822_read_straps(struct phy_device *phydev)
->  	return 0;
->  }
->  
-> +static int dp83822_attach_port(struct phy_device *phydev, struct phy_port *port)
-> +{
-> +	struct dp83822_private *dp83822 = phydev->priv;
-> +	struct device *dev = &phydev->mdio.dev;
+> Furthermore, XDP rings should not really be objects of Tx hang
+> detection. This mechanism is rather a matter of ndo_tx_timeout() being
+> called from dev_watchdog against Tx rings exposed to networking stack.
+> 
+> Taking into account issues described above, let us have a two fold fix -
+> do not respect XDP rings in local ixgbe watchdog and do not produce Tx
+> descriptors in ndo_xdp_xmit callback when there is some problem with
+> carrier currently. For now, keep the Tx hang checks in clean Tx irq
+> routine, but adjust it to not execute it for XDP rings.
 
-Hi Maxime,
+suggestion: s/adjust it to not execute it/adjust it to not execute
 
-A nit from my side:
-
-dev is unused if CONFIG_OF_MDIO is not defined.
-
-Perhaps it's scope can be reduced somehow.
-Or &phydev->mdio.dev can be used directly?
-Or the code guarded by CONFIG_OF_MDIO could be moved into a separate
-function that makes use if IS_ENABLED to return early if there is nothing
-to do (maybe the best option if possible, as it would increase compile
-coverage).
-Or ...
-
-> +	int ret;
-> +
-> +	if (port->mediums) {
-> +		if (phy_port_is_fiber(port))
-> +			dp83822->fx_enabled = true;
-> +	} else {
-> +		ret = dp83822_read_straps(phydev);
-> +		if (ret)
-> +			return ret;
-> +
-> +#ifdef CONFIG_OF_MDIO
-> +		if (dp83822->fx_enabled && dp83822->fx_sd_enable)
-> +			dp83822->fx_signal_det_low =
-> +				device_property_present(dev, "ti,link-loss-low");
-> +
-> +		/* ti,fiber-mode is still used for backwards compatibility, but
-> +		 * has been replaced with the mdi node definition, see
-> +		 * ethernet-port.yaml
-> +		 */
-> +		if (!dp83822->fx_enabled)
-> +			dp83822->fx_enabled =
-> +				device_property_present(dev, "ti,fiber-mode");
-> +#endif
-> +
-> +		if (dp83822->fx_enabled) {
-> +			port->lanes = 1;
-> +			port->mediums = BIT(ETHTOOL_LINK_MEDIUM_BASEF);
-> +		} else {
-> +			/* This PHY can only to 100BaseTX max, so on 2 lanes */
-> +			port->lanes = 2;
-> +			port->mediums = BIT(ETHTOOL_LINK_MEDIUM_BASET);
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-
-...
+Best regards,
+Dawid
 
