@@ -1,947 +1,245 @@
-Return-Path: <netdev+bounces-187136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E42AA5269
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 19:12:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC204AA526A
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 19:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D461B66EE3
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:12:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D1FC4A7D95
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD78263F36;
-	Wed, 30 Apr 2025 17:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B937C25F980;
+	Wed, 30 Apr 2025 17:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZMpGH3d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HfYKKkSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50EA25C805
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 17:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746033152; cv=none; b=gjU1Hlk2F9B21G4hQHaJfj4lXxmhqowxEendv2M2rBhiBducWlNgkmUYxcyqF5Aub1SU53jQtel1QIk+xRhnuh3KYH2A3jw87iAH7BURI0mdA3OdDkQvukxQUsYyg9woqHbCRRuPav62xyehsNgoQMfhvfcnT/NAGEfZ4SIxsPc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746033152; c=relaxed/simple;
-	bh=8CwOg65Gf/OK6Mmon+gU/ES/l8rNFG5l1SCb1dx4ESA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SqRfQf3mPDuE14fk4IHYT2K4KUOAyor/LNLaMepYxwb4301yMuTxSTq0Wa92avKDWuKEvHxxd5zd/fJkFmDXgo9xDkXXWyLRVv0xzOJJ9Kt0qDuhTiXR/RGXBtCOxocejOWJFcf+1smIjVEnXkUYSBKUOWflkWEseupr5arRmRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZMpGH3d; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C421DD0C7
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 17:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746033192; cv=fail; b=SqWqC4VF4+stv289MZkeROVT/U4d7EyGDLrFN7IbzGNj5J2EOM4zGY+7sc0uxBwC7CDiTacmb1/gHvAMHt1YYVq+1OUY3aO0J2Z3U9QWJLFj6xG1fGprFkGm6kUYGGeN6/QcokXEX9nBz/p62vpeoJmbxqlTDqAf4hrxNlD3HsY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746033192; c=relaxed/simple;
+	bh=C0AhXm54Z5tXaHw+5KJ5EOgEA9DgfiQsdqQPMKObVyY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BxBUqFg9rE2iwe5dPncFAn/SxMNEr2P8BFOtUBP+3lfIfsXKnwXm9AyGLfKI+3FoljcvznP9kybuN885duItIirf9bv4YssFMZ9C4zFImVXzs3GgopL113RGAN3NzBPkdMQ0rgp7tBBwS9q00VSAQMeTx5MEc1vM5Ec6ZWlw06g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HfYKKkSL; arc=fail smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746033150; x=1777569150;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=8CwOg65Gf/OK6Mmon+gU/ES/l8rNFG5l1SCb1dx4ESA=;
-  b=AZMpGH3dLQuO7a0x+i49VBY7h+kCAZwU4xqO+7hVHJhpnzI7KHiOMdZ2
-   OJqArfKhww76uvKCEu0lQFMqiR6L1QA/9qKVaw069EqVaJprAieWDmJLC
-   wIHG54aU8eS7mlx/C2Zyj3xzVLfva+B3cQS915NpNqBp/t6Mlz0OeAb9C
-   msfNGMzcqffYqIdwy4YldeLAxU/Wt0WGlQTNHGaG6Ly1o9CTZPLDHKEWH
-   nuY3GrdaS6vgykyRTGQsBlxzyuFjHWDSBuydhLkHd8D2TeKJxdb5QjqHF
-   Ksnv6Wo/8FId7gDtKIn+VWH1WeRvCaLGkaWlOCEdYwO5lhXBdTM26DEOH
+  t=1746033188; x=1777569188;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=C0AhXm54Z5tXaHw+5KJ5EOgEA9DgfiQsdqQPMKObVyY=;
+  b=HfYKKkSLXY22wzCxs2n+G29nxmU1InfOyg3BK7ow9dJOC4Hb6oiBMbxA
+   lQpm8DCmZhqWHyZF66+EO49e9Fu2GkLLF95ycDE3+Wncu7+NgVTmAfWF3
+   KUHHFa9l/sK15aGdP5r0rgjSJo38iw4NgXZTzTfOacjZQR8ApQWMX7YXr
+   R9zPLEU6FRPKL8DrsDB8ejdgO8helbrnHOD9fCYHdEoKWXL4JGBcqzOU1
+   jOVjVUDVYiEa2sa3yhmTk1Y/477nA7jJeUxO+vGlUMrLNAj1Gw7X5z3tW
+   hNNNZj1QBvh4KDEdScLpwGMUf3TB/G6qQQU5ihkGtJKoZF4q5gRkLp4vg
    w==;
-X-CSE-ConnectionGUID: ulNR9Zd/S466KYz39NgM7A==
-X-CSE-MsgGUID: z6BFaUj6QsmxcTCrhgb2iA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="51370088"
+X-CSE-ConnectionGUID: 7h1NtKIrT1C5s6Fz6nFdhw==
+X-CSE-MsgGUID: DMnWS2c6TUq9JtD7JKowdQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="57903857"
 X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
-   d="scan'208";a="51370088"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 10:12:16 -0700
-X-CSE-ConnectionGUID: AhPwJmTcT/+s0uJ0w7KtBw==
-X-CSE-MsgGUID: x+ohZpV5R+qTXrLDQ5rd0A==
+   d="scan'208";a="57903857"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 10:13:07 -0700
+X-CSE-ConnectionGUID: kSxEvbkyTgSggNO4240nJw==
+X-CSE-MsgGUID: AoX/jephT3a8y6vsX57fbA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
-   d="scan'208";a="139358956"
-Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 10:12:15 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 30 Apr 2025 10:11:53 -0700
-Subject: [PATCH iwl-next 2/2] net: intel: move RSS packet classifier types
- to libie
+   d="scan'208";a="134120097"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 10:13:06 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 30 Apr 2025 10:13:06 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 30 Apr 2025 10:13:06 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 30 Apr 2025 10:13:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mp9CBE7Zh21XHdti9IZ080zfvMg2vbk2IcV6gln5pQoODTT58TiDCx3Emht44/f9IG1ANGxta7H+UwHgDtdUQ7ocEUnAYE61brbRtzYAqT0JoaoIz0EKMjp8aH+/l7dYDeev/n4J9RnPAHcUfA3h2gvEJ+e8hPA+igAgSmi9eCrmnTA+RhlzVqPS0Yxh9pocKhcJhm+JKOZG4pYn3VEFKbYHaZhst/v1jWjbnatM8vPEngZDr6jWWBkn+X0DYlojm2b71Gj8RfEXv2ECZTqQKs36uJMEyBFV0+JZj21Pz1k/3q5r1oXfsGiL8NxmzwP4OC4CdvAAfdfBTzpWYsdXjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cikuqC5YJD1ObrNO+4JIYX+ekAlWZyhvEtY8T/K2Iu8=;
+ b=aWmn4hjFMS8oqBg0VERH2yrp7wangKx1PUJynC5fEoWu6ydwLbKLXV5Kty/tAW2Dh+Zzti6QC5H7LS/GLVU6AKpuILnQBD+FfcK6QQF7kMdF5uoB5yMzyt4TR7S+QRs3Sc8RpGgr6kN1mqdQuDwn2VbN63ksmvCx9hmloOEk0i8WLJHBhAzMgKo+FJQKRO1SuwLPM+xdjOuw18IWijLUltc1uM3/cspULdHssOh++5+w1BUClDYCsMTAY9EqengKfQNjTw2zriPnnXc53bOJwK7UYU5YPUeLwWh9isIClICNO4T/CUtwu50qT24pjqAA5TAcL5UYgS/Q+5wCHzA8dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by CH3PR11MB8467.namprd11.prod.outlook.com (2603:10b6:610:1bd::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.29; Wed, 30 Apr
+ 2025 17:12:54 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.8699.019; Wed, 30 Apr 2025
+ 17:12:54 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: Vadim Fedorenko <vadfed@meta.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, "Pavan
+ Chebbi" <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
+CC: Richard Cochran <richardcochran@gmail.com>, Taehee Yoo
+	<ap420073@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH net] bnxt_en: fix module unload sequence
+Thread-Topic: [PATCH net] bnxt_en: fix module unload sequence
+Thread-Index: AQHbufHveYoeyMSrkU+P2g+EQ+b1JLO8ckFg
+Date: Wed, 30 Apr 2025 17:12:54 +0000
+Message-ID: <CO1PR11MB5089C0D4D11B2E01255F0692D6832@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20250430170343.759126-1-vadfed@meta.com>
+In-Reply-To: <20250430170343.759126-1-vadfed@meta.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|CH3PR11MB8467:EE_
+x-ms-office365-filtering-correlation-id: bf41b9ff-c39d-452a-ad21-08dd880a3f08
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?hhRxCY4R6GpGAEakk6e3JPgXTym2CrfvlvWUI76R/RPTt6KquLBfFdZuIPUL?=
+ =?us-ascii?Q?Mh7lejx2/8nFpyewDioIiD+u7Jfrno0w9p898xTAmvmhNVRJMuFg2IKkQkOg?=
+ =?us-ascii?Q?SD9Jlsle+HnZj0lalthi27DSu4HkLhOhf27f8M+AKR2fNNH54AUTTEqTVhFB?=
+ =?us-ascii?Q?QUC/JBDDaBwZqiIYE2ddYC9ieoowTuZQ3lzz7cbUmKZcQiq/cVNNMNJPNoSY?=
+ =?us-ascii?Q?uKy9KHlDbaH25Y5RytB9PX9XP4GW27OfmIpxosPnJ56s4BVPzt9i7Ju9fPoZ?=
+ =?us-ascii?Q?T/RkpX3CMtcj061gHcmQ25mnYrd3Mkbf3EqnQIsb6kiFq8fV2wQVkglYDuEo?=
+ =?us-ascii?Q?rd/a4rditI7rOmNaI+tfgzcNjJDCGhRgxuiewk+qesXstE7NmX9RSBsPGrW2?=
+ =?us-ascii?Q?u/XovT25Oq4jv+SvNO1J5z92hnIRHqM5WtuUWMsuHZOAwmyjteewEeTzLH8n?=
+ =?us-ascii?Q?vScYMbnYehQ7t4jQigAGJth63Jgp+DxUoJcdM+bJ0wjLbH7xfV+FU0bRUp4m?=
+ =?us-ascii?Q?XI/a5XmoIMNRYVr3e/+AAK7qJc6NCWTluJiTSiBtrAj/JntWAJxWa8lW9M4/?=
+ =?us-ascii?Q?HYoqmIxzhnPUc4nU20eLmia1dZ9zlzKwXIbVLbNiqsULm7HQOdXZ1R3hvvjf?=
+ =?us-ascii?Q?4/ebBqj1X8OTvw3jFi3gWfHJC+AKW2S0OYJgIfq+Lg5Zmc143QPQuwEerF63?=
+ =?us-ascii?Q?cBI551Bx75qd+sxhQSj8o41RfddTm7yW7n/8KGVCrksNid2GdppGLKlMr8pv?=
+ =?us-ascii?Q?TKaYJrAy6HZ+vQS8iXv1jESIpPGtlOjsvArMPfTdP13Q0vVqIdg2VDshDb1B?=
+ =?us-ascii?Q?tanDsS1XYNxONS2OQoGW0sUz7bkKAy8ZGYlwuj2UIGNTeJ1ivFokMR5NzOBt?=
+ =?us-ascii?Q?mZ3JC2v8ELa37/IrB1Vxn6msHo/gapMVWLwJhODPTsxAgZUUazZZD9ohUIi6?=
+ =?us-ascii?Q?UjgzfCcENMPmdrrDx1zEpCIYM//D5xkj5MQoVYg1RlujPtP0R9ZmIB+5XUiS?=
+ =?us-ascii?Q?5jh3gSsVEOMCDJANNSMeqDuncqx3n+5W1qHS7b7UK7VzdzP3JN6t46HC8F8T?=
+ =?us-ascii?Q?/j+BcHg/W44F4MwXWK8pTyzqazrsUEGVH85WwSjklzK9NWXJTy/Fun3WCSMW?=
+ =?us-ascii?Q?Pd1dxAREtIte8TGA5w/Lgo+apOwopCgOupp6Dq6rVdo6btTaiuh/yTSroJ1N?=
+ =?us-ascii?Q?NO1hfqHCWTIdMhjiHEgGpZHvohEqENj/VZBdbO+6R18Ma6VoJLdGK6z7CM/1?=
+ =?us-ascii?Q?oBeSEqoJy47NiAjeOP93J5p2vNaFkfX6tgZ+RHcgICsHrU0BnhrQ+YVwiFxQ?=
+ =?us-ascii?Q?5MhOjHLGTNR7KVUjnjpABgdoCnP+YcA4sTfQYXpjk3y/PPwmUxBr9iyEHnwF?=
+ =?us-ascii?Q?PGGdiYskuxWl5FZ1A0sFR4DU0ogoPp/uKGWDtU9lbtPCTls1abVpXzl1tnGx?=
+ =?us-ascii?Q?Fpjjd1TEPPSEv82QfsC4HOWoCIqSs8JJKU8vi6Lx12W4r725tyra3UG9XShB?=
+ =?us-ascii?Q?Z9smhjVrcyJeWAo=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?whzdI5XK6KlFqx74AcfgWNB82KYWKNHPWr8IeWqYi+LLqk8+QreqvXXqEW3u?=
+ =?us-ascii?Q?rimyHSgQ6LhyCet8v9ilwL2rrDqvIw98e6EJ3jPl+yKlZDs3Xv4PvC0whnXS?=
+ =?us-ascii?Q?bpb13UFJXB7gDJkDANaPOWGtUC9lzFfnp8zF9tZGmk7mvbalP/e6m+FXs9OW?=
+ =?us-ascii?Q?/arnwTR09JLJtnKqn/QPLOLCPeayn80JTjHs1+DgUpl4Vr1TNCURA3Fivb+w?=
+ =?us-ascii?Q?NRAEKcFnMKvFICqd6VuCpjbqw1ZtC6yMp/omgo+9/kuza8NevZk20DhGy7WQ?=
+ =?us-ascii?Q?UciP6ydm6LuDGrkXerly6EZ38Vl53b+JtAMM1C7ukRrP8PKkj8lIXBgYYXS9?=
+ =?us-ascii?Q?0CYbGAjxd6AZwcf8Li29P+jkSvhrGpfMZGZ2YT0kTxNkb1AN79gH2gIClNy7?=
+ =?us-ascii?Q?srR+DJ/ADgvyApIhuzOjo00bauyzb0kl9lW8APJ+TsIVd05dwUOGyeAiGWsh?=
+ =?us-ascii?Q?1GOeDl1BOF2s+X6KwB3JKe6wKMTIZpRL0b91drRWx1yokAFuVvXL/hMJIalO?=
+ =?us-ascii?Q?uJVmCm5uWniz63vXBZfsr00jW49mbK0EgNGNS35CqZP+cTCv25YdPkV18Lbu?=
+ =?us-ascii?Q?azL1TDzfIs6jvM2cOm+HUwzwfsUmI028MeGloHOvfD013b6dDd8zFeRoPg9v?=
+ =?us-ascii?Q?Qli7lk06jmZ0S+JDAgXPKgiXcK0yeJ/Kh3mBOgDJ5hAclL38Yaybwm+oi46X?=
+ =?us-ascii?Q?D8aBPA5Rt0mVacVn0zHh3NZRSQT8khyqgqQ+wVBqU34cCp8fb8M4aPvIt8Ba?=
+ =?us-ascii?Q?TY8KoAeU+dIUpy0MaaqczJYThkfjHmpWcMeUWMYnLbQdTc2scTcTPdloMW/q?=
+ =?us-ascii?Q?CTGPBBVvdvjXu3GQNjumOXCem1dW4qyCGyXnSZWQNqjscG8qRRdpn8PQpzTQ?=
+ =?us-ascii?Q?byblKAOxYxljrlMKF92RPFKtJTwITcUmqA2G8rwqHJAFuSSFwjQopo9u/jqF?=
+ =?us-ascii?Q?tqVTWKqRx3v2gDo+P/0vFIyZyGvuRwqHm4S5AGJXxWU3I2EpT1Thxv3SMlLB?=
+ =?us-ascii?Q?thWEgvLWzD8Fc9moJQnaNqc5AH3Le9ebGQZ680gDpTyB20DRcLNoV1ctD2KP?=
+ =?us-ascii?Q?jObaSPUvTCkMLdzY3lrfxK82J389A261z5GSwo/d1wgnjD3cO9RxXC1scwiD?=
+ =?us-ascii?Q?SrYbBeuGqjDl3TZnqlhEaFyZ48IGJXn+CwusLjFQZSuA96tu6dGFhlh+3WHJ?=
+ =?us-ascii?Q?tHj9agcsjqtNuCUPWrcBDR/NiR03qjOKL/yzS15tM5y76Dw8MyV2duXEO7lU?=
+ =?us-ascii?Q?6eEHGVVxKlNL963hm5SY2phQ2jCqTlovKR7uZlKuhIJ8mqeI9N2JMlQIWrrb?=
+ =?us-ascii?Q?jaRF41zb0k6m5tShad6q6qYrtC4JGY58XggFYE2xEwRz89efix7eVWMENauH?=
+ =?us-ascii?Q?UF8nk4evbwQHgnS6CE+ypNQAGFNk828UvcBqF10uWYXiHCD9IduMYx684osl?=
+ =?us-ascii?Q?fi8PvlidAJx4UWYjZxTNoCqbGM6WFwYrQGeB+YSHhNW4gGVbF59hsr/heom9?=
+ =?us-ascii?Q?uLjZ/n96Oc8VJ91TafVuTigFYcNwq7FgCDk/G5A9kb2JBJ773mQNWYG2KkKH?=
+ =?us-ascii?Q?p24FCMh37LowX164x+u5M5U8snPudK9pKo3kRBRe?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250430-jk-hash-ena-refactor-v1-2-8310a4785472@intel.com>
-References: <20250430-jk-hash-ena-refactor-v1-0-8310a4785472@intel.com>
-In-Reply-To: <20250430-jk-hash-ena-refactor-v1-0-8310a4785472@intel.com>
-To: netdev <netdev@vger.kernel.org>, 
- Anthony Nguyen <anthony.l.nguyen@intel.com>, 
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-X-Mailer: b4 0.14.2
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf41b9ff-c39d-452a-ad21-08dd880a3f08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2025 17:12:54.4610
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dPK3lJUmYJQ0BXgvJqd5mJUDZvh6Mlc6icju9cXdbe7V+wLq07t0bOj4l1B+aB7g6W5MiUEVdl2fwIDrnLp0o0R08CV8W7EVlKKh+pnYfrs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8467
+X-OriginatorOrg: intel.com
 
-The Intel i40e, iavf, and ice drivers all include a definition of the
-packet classifier filter types used to program RSS hash enable bits. For
-i40e, these bits are used for both the PF and VF to configure the PFQF_HENA
-and VFQF_HENA registers.
 
-For ice and iAVF, these bits are used to communicate the desired hash
-enable filter over virtchnl via its struct virtchnl_rss_hashena. The
-virtchnl.h header makes no mention of where the bit definitions reside.
 
-Maintaining a separate copy of these bits across three drivers is
-cumbersome. Move the definition to libie as a new pctype.h header file.
-Each driver can include this, and drop its own definition.
+> -----Original Message-----
+> From: Vadim Fedorenko <vadfed@meta.com>
+> Sent: Wednesday, April 30, 2025 10:04 AM
+> To: Vadim Fedorenko <vadim.fedorenko@linux.dev>; Michael Chan
+> <michael.chan@broadcom.com>; Pavan Chebbi
+> <pavan.chebbi@broadcom.com>; Jakub Kicinski <kuba@kernel.org>
+> Cc: Richard Cochran <richardcochran@gmail.com>; Taehee Yoo
+> <ap420073@gmail.com>; netdev@vger.kernel.org
+> Subject: [PATCH net] bnxt_en: fix module unload sequence
+>=20
+> Recent updates to the PTP part of bnxt changed the way PTP FIFO is
+> cleared, skbs waiting for TX timestamps are now cleared during
+> ndo_close() call. To do clearing procedure, the ptp structure must
+> exist and point to a valid address. Module destroy sequence had ptp
+> clear code running before netdev close causing invalid memory access and
+> kernel crash. Change the sequence to destroy ptp structure after device
+> close.
+>=20
+> Fixes: 8f7ae5a85137 ("bnxt_en: improve TX timestamping FIFO configuration=
+")
+> Reported-by: Taehee Yoo <ap420073@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAMArcTWDe2cd41=3Dub=3DzzvYifaYcYv=
+-N-
+> csxfqxUvejy_L0D6UQ@mail.gmail.com/
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
 
-The ice implementation also defined a ICE_AVF_FLOW_FIELD_INVALID, intending
-to use this to indicate when there were no hash enable bits set. This is
-confusing, since the enumeration is using bit positions. A value of 0
-*should* indicate the first bit. Instead, rewrite the code that uses
-ICE_AVF_FLOW_FIELD_INVALID to just check if the avf_hash is zero. From
-context this should be clear that we're checking if none of the bits are
-set.
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-The values are kept as bit positions instead of encoding the BIT_ULL
-directly into their value. While most users will simply use BIT_ULL
-immediately, i40e uses the macros both with BIT_ULL and test_bit/set_bit
-calls.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_txrx.h    | 35 +++++------
- drivers/net/ethernet/intel/i40e/i40e_type.h    | 32 ----------
- drivers/net/ethernet/intel/iavf/iavf_txrx.h    | 36 ++++++------
- drivers/net/ethernet/intel/iavf/iavf_type.h    | 32 ----------
- drivers/net/ethernet/intel/ice/ice_flow.h      | 64 ++++++--------------
- include/linux/avf/virtchnl.h                   |  1 +
- include/linux/net/intel/libie/pctype.h         | 44 ++++++++++++++
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 81 +++++++++++++-------------
- drivers/net/ethernet/intel/i40e/i40e_main.c    | 23 ++++----
- drivers/net/ethernet/intel/i40e/i40e_txrx.c    | 25 ++++----
- drivers/net/ethernet/intel/ice/ice_flow.c      | 45 +++++++-------
- 11 files changed, 188 insertions(+), 230 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-index b007a84268a7ba0378bb6a99012be2cb2beb7e1e..1e5fd63d47f47c10e5e669259dd0d7af1194f451 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-@@ -4,6 +4,7 @@
- #ifndef _I40E_TXRX_H_
- #define _I40E_TXRX_H_
- 
-+#include <linux/net/intel/libie/pctype.h>
- #include <net/xdp.h>
- #include "i40e_type.h"
- 
-@@ -72,25 +73,25 @@ enum i40e_dyn_idx {
- 
- /* Supported RSS offloads */
- #define I40E_DEFAULT_RSS_HASHCFG ( \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_UDP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_UDP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_TCP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_L2_PAYLOAD))
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_L2_PAYLOAD))
- 
- #define I40E_DEFAULT_RSS_HASHCFG_EXPANDED (I40E_DEFAULT_RSS_HASHCFG | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
--	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
- 
- #define i40e_pf_get_default_rss_hashcfg(pf) \
- 	(test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, (pf)->hw.caps) ? \
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-index 28568e126850e143d194f76c0fec69fcb724419b..a09ed83835ffef72d84fedb2600ef2fcbb0b251b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-@@ -929,38 +929,6 @@ struct i40e_filter_program_desc {
- #define I40E_TXD_FLTR_QW0_PCTYPE_MASK	(0x3FUL << \
- 					 I40E_TXD_FLTR_QW0_PCTYPE_SHIFT)
- 
--/* Packet Classifier Types for filters */
--enum i40e_filter_pctype {
--	/* Note: Values 0-28 are reserved for future use.
--	 * Value 29, 30, 32 are not supported on XL710 and X710.
--	 */
--	I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
--	I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
--	I40E_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
--	I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
--	I40E_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
--	I40E_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
--	I40E_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
--	I40E_FILTER_PCTYPE_FRAG_IPV4			= 36,
--	/* Note: Values 37-38 are reserved for future use.
--	 * Value 39, 40, 42 are not supported on XL710 and X710.
--	 */
--	I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
--	I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
--	I40E_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
--	I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
--	I40E_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
--	I40E_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
--	I40E_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
--	I40E_FILTER_PCTYPE_FRAG_IPV6			= 46,
--	/* Note: Value 47 is reserved for future use */
--	I40E_FILTER_PCTYPE_FCOE_OX			= 48,
--	I40E_FILTER_PCTYPE_FCOE_RX			= 49,
--	I40E_FILTER_PCTYPE_FCOE_OTHER			= 50,
--	/* Note: Values 51-62 are reserved for future use */
--	I40E_FILTER_PCTYPE_L2_PAYLOAD			= 63,
--};
--
- enum i40e_filter_program_desc_dest {
- 	I40E_FILTER_PROGRAM_DESC_DEST_DROP_PACKET		= 0x0,
- 	I40E_FILTER_PROGRAM_DESC_DEST_DIRECT_PACKET_QINDEX	= 0x1,
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index 94b324f212bd9c909e3bc1c9d9f68c6e8f0ee994..df49b0b1d54a881a53fe0d895d8ce4df8fc69d19 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -4,6 +4,8 @@
- #ifndef _IAVF_TXRX_H_
- #define _IAVF_TXRX_H_
- 
-+#include <linux/net/intel/libie/pctype.h>
-+
- /* Interrupt Throttling and Rate Limiting Goodies */
- #define IAVF_DEFAULT_IRQ_WORK      256
- 
-@@ -60,25 +62,25 @@ enum iavf_dyn_idx_t {
- 
- /* Supported RSS offloads */
- #define IAVF_DEFAULT_RSS_HASHCFG ( \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_UDP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_FRAG_IPV4) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_UDP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_TCP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_FRAG_IPV6) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_L2_PAYLOAD))
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_L2_PAYLOAD))
- 
- #define IAVF_DEFAULT_RSS_HASHCFG_EXPANDED (IAVF_DEFAULT_RSS_HASHCFG | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
--	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
- 
- /* How many Rx Buffers do we bundle into one write to the hardware ? */
- #define IAVF_RX_INCREMENT(r, i) \
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h b/drivers/net/ethernet/intel/iavf/iavf_type.h
-index f9e1319620f451ac09ac64d90d2f970f3c8af2bb..cb12e86ba4a6b10a49182d21903395a64e46e02b 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_type.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
-@@ -463,38 +463,6 @@ enum iavf_tx_ctx_desc_cmd_bits {
- 	IAVF_TX_CTX_DESC_SWPE		= 0x40
- };
- 
--/* Packet Classifier Types for filters */
--enum iavf_filter_pctype {
--	/* Note: Values 0-28 are reserved for future use.
--	 * Value 29, 30, 32 are not supported on XL710 and X710.
--	 */
--	IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
--	IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
--	IAVF_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
--	IAVF_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
--	IAVF_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
--	IAVF_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
--	IAVF_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
--	IAVF_FILTER_PCTYPE_FRAG_IPV4			= 36,
--	/* Note: Values 37-38 are reserved for future use.
--	 * Value 39, 40, 42 are not supported on XL710 and X710.
--	 */
--	IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
--	IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
--	IAVF_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
--	IAVF_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
--	IAVF_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
--	IAVF_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
--	IAVF_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
--	IAVF_FILTER_PCTYPE_FRAG_IPV6			= 46,
--	/* Note: Value 47 is reserved for future use */
--	IAVF_FILTER_PCTYPE_FCOE_OX			= 48,
--	IAVF_FILTER_PCTYPE_FCOE_RX			= 49,
--	IAVF_FILTER_PCTYPE_FCOE_OTHER			= 50,
--	/* Note: Values 51-62 are reserved for future use */
--	IAVF_FILTER_PCTYPE_L2_PAYLOAD			= 63,
--};
--
- #define IAVF_TXD_CTX_QW1_TSO_LEN_SHIFT	30
- #define IAVF_TXD_CTX_QW1_TSO_LEN_MASK	(0x3FFFFULL << \
- 					 IAVF_TXD_CTX_QW1_TSO_LEN_SHIFT)
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
-index b1313fb61677f0bbfedfb937a5ce3f87d4adc9e1..52f906d89eca1de0ba23c2061a6ee43a941c22f0 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.h
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.h
-@@ -4,6 +4,8 @@
- #ifndef _ICE_FLOW_H_
- #define _ICE_FLOW_H_
- 
-+#include <linux/net/intel/libie/pctype.h>
-+
- #include "ice_flex_type.h"
- #include "ice_parser.h"
- 
-@@ -264,57 +266,27 @@ enum ice_flow_field {
- #define ICE_FLOW_HASH_FLD_GTPU_DWN_TEID \
- 	BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID)
- 
--/* Flow headers and fields for AVF support */
--enum ice_flow_avf_hdr_field {
--	/* Values 0 - 28 are reserved for future use */
--	ICE_AVF_FLOW_FIELD_INVALID		= 0,
--	ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP	= 29,
--	ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP,
--	ICE_AVF_FLOW_FIELD_IPV4_UDP,
--	ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK,
--	ICE_AVF_FLOW_FIELD_IPV4_TCP,
--	ICE_AVF_FLOW_FIELD_IPV4_SCTP,
--	ICE_AVF_FLOW_FIELD_IPV4_OTHER,
--	ICE_AVF_FLOW_FIELD_FRAG_IPV4,
--	/* Values 37-38 are reserved */
--	ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP	= 39,
--	ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP,
--	ICE_AVF_FLOW_FIELD_IPV6_UDP,
--	ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK,
--	ICE_AVF_FLOW_FIELD_IPV6_TCP,
--	ICE_AVF_FLOW_FIELD_IPV6_SCTP,
--	ICE_AVF_FLOW_FIELD_IPV6_OTHER,
--	ICE_AVF_FLOW_FIELD_FRAG_IPV6,
--	ICE_AVF_FLOW_FIELD_RSVD47,
--	ICE_AVF_FLOW_FIELD_FCOE_OX,
--	ICE_AVF_FLOW_FIELD_FCOE_RX,
--	ICE_AVF_FLOW_FIELD_FCOE_OTHER,
--	/* Values 51-62 are reserved */
--	ICE_AVF_FLOW_FIELD_L2_PAYLOAD		= 63,
--	ICE_AVF_FLOW_FIELD_MAX
--};
--
- /* Supported RSS offloads  This macro is defined to support
-  * VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS ops. PF driver sends the RSS hardware
-  * capabilities to the caller of this ops.
-  */
- #define ICE_DEFAULT_RSS_HASHCFG ( \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_UDP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_OTHER) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV4) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_UDP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_OTHER) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV6) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP) | \
--	BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP))
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
-+	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
- 
- enum ice_rss_cfg_hdr_type {
- 	ICE_RSS_OUTER_HEADERS, /* take outer headers as inputset. */
-diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
-index 362d1cdc8cd8adc99467ebb1f7e6e28b1817f7cb..5be1881abbb66a1c1298d99a78840a43d09671d8 100644
---- a/include/linux/avf/virtchnl.h
-+++ b/include/linux/avf/virtchnl.h
-@@ -982,6 +982,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(4, virtchnl_rss_lut);
-  * traffic types that are hashed by the hardware.
-  */
- struct virtchnl_rss_hashcfg {
-+	/* Bits defined by enum libie_filter_pctype */
- 	u64 hashcfg;
- };
- 
-diff --git a/include/linux/net/intel/libie/pctype.h b/include/linux/net/intel/libie/pctype.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..78723c8a33a084fb1120743427273af4b982c835
---- /dev/null
-+++ b/include/linux/net/intel/libie/pctype.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#ifndef __LIBIE_PCTYPE_H
-+#define __LIBIE_PCTYPE_H
-+
-+/**
-+ * enum libie_filter_pctype - Packet Classifier Types for filters
-+ *
-+ * Packet Classifier Type indexes, used to set the xxQF_HENA registers. Also
-+ * communicated over the virtchnl API as part of struct virtchnl_rss_hashena.
-+ */
-+enum libie_filter_pctype {
-+	/* Note: Values 0-28 are reserved for future use.
-+	 * Value 29, 30, 32 are not supported on XL710 and X710.
-+	 */
-+	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
-+	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
-+	LIBIE_FILTER_PCTYPE_FRAG_IPV4			= 36,
-+	/* Note: Values 37-38 are reserved for future use.
-+	 * Value 39, 40, 42 are not supported on XL710 and X710.
-+	 */
-+	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
-+	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
-+	LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
-+	LIBIE_FILTER_PCTYPE_FRAG_IPV6			= 46,
-+	/* Note: Value 47 is reserved for future use */
-+	LIBIE_FILTER_PCTYPE_FCOE_OX			= 48,
-+	LIBIE_FILTER_PCTYPE_FCOE_RX			= 49,
-+	LIBIE_FILTER_PCTYPE_FCOE_OTHER			= 50,
-+	/* Note: Values 51-62 are reserved for future use */
-+	LIBIE_FILTER_PCTYPE_L2_PAYLOAD			= 63
-+};
-+
-+#endif /* __LIBIE_PCTYPE_H */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 8a7a83f83ee510a791cdafb75ac65bf302b30104..814e20325feb70d7aff894962ce3432df8c77ffe 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -3,6 +3,7 @@
- 
- /* ethtool support for i40e */
- 
-+#include <linux/net/intel/libie/pctype.h>
- #include "i40e_devids.h"
- #include "i40e_diag.h"
- #include "i40e_txrx_common.h"
-@@ -3146,16 +3147,16 @@ static int i40e_get_rss_hash_opts(struct i40e_pf *pf, struct ethtool_rxnfc *cmd)
- 
- 	switch (cmd->flow_type) {
- 	case TCP_V4_FLOW:
--		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
-+		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
- 		break;
- 	case UDP_V4_FLOW:
--		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
-+		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
- 		break;
- 	case TCP_V6_FLOW:
--		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
-+		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
- 		break;
- 	case UDP_V6_FLOW:
--		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
-+		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
- 		break;
- 	case SCTP_V4_FLOW:
- 	case AH_ESP_V4_FLOW:
-@@ -3412,28 +3413,28 @@ static int i40e_get_ethtool_fdir_entry(struct i40e_pf *pf,
- 
- 	switch (rule->flow_type) {
- 	case SCTP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_SCTP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP;
- 		break;
- 	case TCP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
- 		break;
- 	case UDP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
- 		break;
- 	case SCTP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_SCTP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP;
- 		break;
- 	case TCP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
- 		break;
- 	case UDP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
- 		break;
- 	case IP_USER_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
- 		break;
- 	case IPV6_USER_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
- 		break;
- 	default:
- 		/* If we have stored a filter with a flow type not listed here
-@@ -3643,40 +3644,40 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
- 
- 	switch (nfc->flow_type) {
- 	case TCP_V4_FLOW:
--		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP, flow_pctypes);
-+		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP, flow_pctypes);
- 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
- 			     pf->hw.caps))
--			set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK,
- 				flow_pctypes);
- 		break;
- 	case TCP_V6_FLOW:
--		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP, flow_pctypes);
-+		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP, flow_pctypes);
- 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
- 			     pf->hw.caps))
--			set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK,
- 				flow_pctypes);
- 		break;
- 	case UDP_V4_FLOW:
--		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_UDP, flow_pctypes);
-+		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP, flow_pctypes);
- 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
- 			     pf->hw.caps)) {
--			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP,
- 				flow_pctypes);
--			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP,
- 				flow_pctypes);
- 		}
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4);
- 		break;
- 	case UDP_V6_FLOW:
--		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_UDP, flow_pctypes);
-+		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP, flow_pctypes);
- 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
- 			     pf->hw.caps)) {
--			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP,
- 				flow_pctypes);
--			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP,
-+			set_bit(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP,
- 				flow_pctypes);
- 		}
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6);
- 		break;
- 	case AH_ESP_V4_FLOW:
- 	case AH_V4_FLOW:
-@@ -3685,7 +3686,7 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
- 		if ((nfc->data & RXH_L4_B_0_1) ||
- 		    (nfc->data & RXH_L4_B_2_3))
- 			return -EINVAL;
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER);
- 		break;
- 	case AH_ESP_V6_FLOW:
- 	case AH_V6_FLOW:
-@@ -3694,15 +3695,15 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
- 		if ((nfc->data & RXH_L4_B_0_1) ||
- 		    (nfc->data & RXH_L4_B_2_3))
- 			return -EINVAL;
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER);
- 		break;
- 	case IPV4_FLOW:
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER) |
--			BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) |
-+			BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4);
- 		break;
- 	case IPV6_FLOW:
--		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER) |
--			BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6);
-+		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) |
-+			BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -4312,36 +4313,36 @@ static int i40e_check_fdir_input_set(struct i40e_vsi *vsi,
- 
- 	switch (fsp->flow_type & ~FLOW_EXT) {
- 	case SCTP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_SCTP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP;
- 		fdir_filter_count = &pf->fd_sctp4_filter_cnt;
- 		break;
- 	case TCP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
- 		fdir_filter_count = &pf->fd_tcp4_filter_cnt;
- 		break;
- 	case UDP_V4_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
- 		fdir_filter_count = &pf->fd_udp4_filter_cnt;
- 		break;
- 	case SCTP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_SCTP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP;
- 		fdir_filter_count = &pf->fd_sctp6_filter_cnt;
- 		break;
- 	case TCP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
- 		fdir_filter_count = &pf->fd_tcp6_filter_cnt;
- 		break;
- 	case UDP_V6_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
- 		fdir_filter_count = &pf->fd_udp6_filter_cnt;
- 		break;
- 	case IP_USER_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
- 		fdir_filter_count = &pf->fd_ip4_filter_cnt;
- 		flex_l3 = true;
- 		break;
- 	case IPV6_USER_FLOW:
--		index = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
-+		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
- 		fdir_filter_count = &pf->fd_ip6_filter_cnt;
- 		flex_l3 = true;
- 		break;
-@@ -4677,8 +4678,8 @@ static int i40e_check_fdir_input_set(struct i40e_vsi *vsi,
- 	 * separate support, we'll always assume and enforce that the two flow
- 	 * types must have matching input sets.
- 	 */
--	if (index == I40E_FILTER_PCTYPE_NONF_IPV4_OTHER)
--		i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV4,
-+	if (index == LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER)
-+		i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV4,
- 					new_mask);
- 
- 	/* Add the new offset and update table, if necessary */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 516e07b58161de8acf4c742c246fcf94d1e22c02..67faf5a8dcbfedf547ed340b98d16eac854c673d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -3,6 +3,7 @@
- 
- #include <generated/utsrelease.h>
- #include <linux/crash_dump.h>
-+#include <linux/net/intel/libie/pctype.h>
- #include <linux/if_bridge.h>
- #include <linux/if_macvlan.h>
- #include <linux/module.h>
-@@ -9188,47 +9189,47 @@ static void i40e_fdir_filter_exit(struct i40e_pf *pf)
- 	i40e_reset_fdir_filter_cnt(pf);
- 
- 	/* Reprogram the default input set for TCP/IPv4 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_TCP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for TCP/IPv6 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_TCP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP,
- 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for UDP/IPv4 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_UDP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for UDP/IPv6 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_UDP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP,
- 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for SCTP/IPv4 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_SCTP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for SCTP/IPv6 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_SCTP,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP,
- 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
- 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
- 	/* Reprogram the default input set for Other/IPv4 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_OTHER,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
- 
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV4,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV4,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
- 
- 	/* Reprogram the default input set for Other/IPv6 */
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_OTHER,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
- 
--	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV6,
-+	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV6,
- 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
- }
- 
-@@ -9656,7 +9657,7 @@ static void i40e_reenable_fdir_atr(struct i40e_pf *pf)
- 		 * settings. It is safe to restore the default input set
- 		 * because there are no active TCPv4 filter rules.
- 		 */
--		i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_TCP,
-+		i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP,
- 					I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
- 					I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
- 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-index c006f716a3bdbeddeb4bc79c713859a7d09acd89..048c3303913094f0a7b97e8f36ea0dd640f0dc69 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-@@ -2,6 +2,7 @@
- /* Copyright(c) 2013 - 2018 Intel Corporation. */
- 
- #include <linux/bpf_trace.h>
-+#include <linux/net/intel/libie/pctype.h>
- #include <linux/net/intel/libie/rx.h>
- #include <linux/prefetch.h>
- #include <linux/sctp.h>
-@@ -397,12 +398,12 @@ static int i40e_add_del_fdir_udp(struct i40e_vsi *vsi,
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_UDPIP_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV4_UDP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP);
- 	else
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_UDPIP6_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV6_UDP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP);
- 
- 	if (ret) {
- 		kfree(raw_packet);
-@@ -444,12 +445,12 @@ static int i40e_add_del_fdir_tcp(struct i40e_vsi *vsi,
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_TCPIP_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV4_TCP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP);
- 	else
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_TCPIP6_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV6_TCP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP);
- 
- 	if (ret) {
- 		kfree(raw_packet);
-@@ -499,12 +500,12 @@ static int i40e_add_del_fdir_sctp(struct i40e_vsi *vsi,
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_SCTPIP_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV4_SCTP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP);
- 	else
- 		ret = i40e_prepare_fdir_filter
- 			(pf, fd_data, add, raw_packet,
- 			 I40E_SCTPIP6_DUMMY_PACKET_LEN,
--			 I40E_FILTER_PCTYPE_NONF_IPV6_SCTP);
-+			 LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP);
- 
- 	if (ret) {
- 		kfree(raw_packet);
-@@ -543,11 +544,11 @@ static int i40e_add_del_fdir_ip(struct i40e_vsi *vsi,
- 	int i;
- 
- 	if (ipv4) {
--		iter_start = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
--		iter_end = I40E_FILTER_PCTYPE_FRAG_IPV4;
-+		iter_start = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
-+		iter_end = LIBIE_FILTER_PCTYPE_FRAG_IPV4;
- 	} else {
--		iter_start = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
--		iter_end = I40E_FILTER_PCTYPE_FRAG_IPV6;
-+		iter_start = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
-+		iter_end = LIBIE_FILTER_PCTYPE_FRAG_IPV6;
- 	}
- 
- 	for (i = iter_start; i <= iter_end; i++) {
-@@ -2948,9 +2949,9 @@ static void i40e_atr(struct i40e_ring *tx_ring, struct sk_buff *skb,
- 	flex_ptype = FIELD_PREP(I40E_TXD_FLTR_QW0_QINDEX_MASK,
- 				tx_ring->queue_index);
- 	flex_ptype |= (tx_flags & I40E_TX_FLAGS_IPV4) ?
--		      (I40E_FILTER_PCTYPE_NONF_IPV4_TCP <<
-+		      (LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP <<
- 		       I40E_TXD_FLTR_QW0_PCTYPE_SHIFT) :
--		      (I40E_FILTER_PCTYPE_NONF_IPV6_TCP <<
-+		      (LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP <<
- 		       I40E_TXD_FLTR_QW0_PCTYPE_SHIFT);
- 
- 	flex_ptype |= tx_ring->vsi->id << I40E_TXD_FLTR_QW0_DEST_VSI_SHIFT;
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-index d97b751052f221e7225fe996c50d472521bb807a..278e576862740e150c49c8b0d0897fd1f777b62d 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-@@ -2573,38 +2573,38 @@ ice_rem_rss_cfg(struct ice_hw *hw, u16 vsi_handle,
-  * convert its values to their appropriate flow L3, L4 values.
-  */
- #define ICE_FLOW_AVF_RSS_IPV4_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_OTHER) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV4))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4))
- #define ICE_FLOW_AVF_RSS_TCP_IPV4_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP))
- #define ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_UDP))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP))
- #define ICE_FLOW_AVF_RSS_ALL_IPV4_MASKS \
- 	(ICE_FLOW_AVF_RSS_TCP_IPV4_MASKS | ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS | \
--	 ICE_FLOW_AVF_RSS_IPV4_MASKS | BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP))
-+	 ICE_FLOW_AVF_RSS_IPV4_MASKS | BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP))
- 
- #define ICE_FLOW_AVF_RSS_IPV6_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_OTHER) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV6))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6))
- #define ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_UDP))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP))
- #define ICE_FLOW_AVF_RSS_TCP_IPV6_MASKS \
--	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK) | \
--	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP))
-+	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
-+	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP))
- #define ICE_FLOW_AVF_RSS_ALL_IPV6_MASKS \
- 	(ICE_FLOW_AVF_RSS_TCP_IPV6_MASKS | ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS | \
--	 ICE_FLOW_AVF_RSS_IPV6_MASKS | BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP))
-+	 ICE_FLOW_AVF_RSS_IPV6_MASKS | BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP))
- 
- /**
-  * ice_add_avf_rss_cfg - add an RSS configuration for AVF driver
-  * @hw: pointer to the hardware structure
-  * @vsi: VF's VSI
-- * @avf_hash: hash bit fields (ICE_AVF_FLOW_FIELD_*) to configure
-+ * @avf_hash: hash bit fields (LIBIE_FILTER_PCTYPE_*) to configure
-  *
-  * This function will take the hash bitmap provided by the AVF driver via a
-  * message, convert it to ICE-compatible values, and configure RSS flow
-@@ -2621,8 +2621,7 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
- 		return -EINVAL;
- 
- 	vsi_handle = vsi->idx;
--	if (avf_hash == ICE_AVF_FLOW_FIELD_INVALID ||
--	    !ice_is_vsi_valid(hw, vsi_handle))
-+	if (!avf_hash || !ice_is_vsi_valid(hw, vsi_handle))
- 		return -EINVAL;
- 
- 	/* Make sure no unsupported bits are specified */
-@@ -2658,11 +2657,11 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
- 					ICE_FLOW_HASH_UDP_PORT;
- 				hash_flds &= ~ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS;
- 			} else if (hash_flds &
--				   BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP)) {
-+				   BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP)) {
- 				rss_hash = ICE_FLOW_HASH_IPV4 |
- 					ICE_FLOW_HASH_SCTP_PORT;
- 				hash_flds &=
--					~BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP);
-+					~BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP);
- 			}
- 		} else if (hash_flds & ICE_FLOW_AVF_RSS_ALL_IPV6_MASKS) {
- 			if (hash_flds & ICE_FLOW_AVF_RSS_IPV6_MASKS) {
-@@ -2679,11 +2678,11 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
- 					ICE_FLOW_HASH_UDP_PORT;
- 				hash_flds &= ~ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS;
- 			} else if (hash_flds &
--				   BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP)) {
-+				   BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP)) {
- 				rss_hash = ICE_FLOW_HASH_IPV6 |
- 					ICE_FLOW_HASH_SCTP_PORT;
- 				hash_flds &=
--					~BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP);
-+					~BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP);
- 			}
- 		}
- 
-
--- 
-2.48.1.397.gec9d649cc640
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 78e496b0ec26..86a5de44b6f3 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -16006,8 +16006,8 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+>=20
+>  	bnxt_rdma_aux_device_del(bp);
+>=20
+> -	bnxt_ptp_clear(bp);
+>  	unregister_netdev(dev);
+> +	bnxt_ptp_clear(bp);
+>=20
+>  	bnxt_rdma_aux_device_uninit(bp);
+>=20
+> --
+> 2.47.1
+>=20
 
 
