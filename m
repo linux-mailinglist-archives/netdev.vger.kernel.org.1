@@ -1,174 +1,181 @@
-Return-Path: <netdev+bounces-187102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA45AA4FC1
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:09:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACA1DAA4FC9
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:10:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BD5F1C2051F
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FBA6188E3BE
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0F11BEF6D;
-	Wed, 30 Apr 2025 15:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759591BC073;
+	Wed, 30 Apr 2025 15:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LFQKKNP+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XIBabOrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142301B4244;
-	Wed, 30 Apr 2025 15:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4764F1B4244;
+	Wed, 30 Apr 2025 15:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746025540; cv=none; b=qMDlz+nsZa+7Mh47GrUYpOUNAoTZpwXCEN6qjJBlTBzEmq5hMNVDytQPmKEtdu5Hcc7iIEN6LvhJMrfOK+uRPVKgBYnpEYgQyzRl+3cTZ5NiDMFfFpZb+60bs04TzCisYHSjmXIW+1cg4RkFdgNuWfLi/mO/wy1CLTrKrXZx11s=
+	t=1746025623; cv=none; b=eIJIBtcRb+iRBpyMp28zu+EDHhIziFelxoY99JG4cFIgH1rOt1xJUoY7sATtjGNWx8QT7JsweXadEbMij2yMBi4S2MkvEXZj63JezlshZHKxlbNDpi2Ia+HihcYM93Ke8FOK8JyHNS//YiJKxmcUkJ4UkqK2PxmxddkZC9B9pQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746025540; c=relaxed/simple;
-	bh=/Y8Xcw4X9LJX/QnqM3TAw0gkwR279WtZkcGhFdVGfDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MZMrsn7T630CjU2qXXGQXm771ohrKtf9RrwU8NBPQSZ/CtR2DFxNYFWJKRHgCAsGHVWxE7QWSfJQNDVNYlae4TH8JrHNsyKqMm4CI5RShFxEdYD9gKH4b0eq/9IxlnrkEriWgRw7aLEI+vN6+/ER38efct7rkkYk2ql1du3YwC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LFQKKNP+; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 30 Apr 2025 08:05:22 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746025534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WpIQNCU7S/pOp1j7VaB6fj72/ADMB01oQnJ2fNfA0oQ=;
-	b=LFQKKNP+gwd7xNP/gx4JfwFegBctJsu/O3SYGudvRa2cQmE64BDj7Wo5WP2MZnB7AOHCn/
-	ZnNdly5JqjBnyqgalB9AFwfkB0223ycyy8tekHGM4NRGkoFIzAly5VyhlylxcRf0pQTOlV
-	VmbZuN2yvrekUUTFXDMnlg/PhSCfo6U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>
-Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
-Message-ID: <f4uoxrjr4xer3w4mgwpxypdfdopynwqi4mwc6yskvotbd4ty2f@y4bqddqxoamw>
-References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
- <f3e0c710-0815-44ad-844c-0e8a079bf663@suse.cz>
+	s=arc-20240116; t=1746025623; c=relaxed/simple;
+	bh=r4W7UK6VId5X4X90Hb+OqrSmtTfxJkdDYqm0TdhLa44=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uvRd+i+kf0q+cEmWJZ2QIyP70IRn1KNr7Efsvv5mm71yLgdlE3ayObp/Lfny1Rclx0SHA8S5RhjIsL7rVtISpSj6U+4Sv9/MU3cKVyrLSsR1jj71xfd51W2qP++Nd7PV/T8IvxW0UNGfFhp5qMVBvqoiLjJmhhaVAjaJ1OLpYyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XIBabOrt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0EABC4CEE7;
+	Wed, 30 Apr 2025 15:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746025622;
+	bh=r4W7UK6VId5X4X90Hb+OqrSmtTfxJkdDYqm0TdhLa44=;
+	h=From:Subject:Date:To:Cc:From;
+	b=XIBabOrtGfQ5dXjam4puFKGo0A1cokvNqVVd/6fPd75felZY1iZoX6dILL7u4MaQe
+	 4n1BcCD6PFZFVm/d65Lyjf0vnzdDcxaGKOLNXoDuGH3uAvaYZkpe9uxSwhsKaQaXDQ
+	 V4rDJFpuahAN3hOEOO1R0Q5ye9rH58uW8j6QJ1oIpxWQLcdZbJ4jfjfD6bEIoq9dYv
+	 K2mjMrlPIospSRVQMyEPvOhNRUmlwMoID1vpyU4punxNkicYXnibYnJHqKMyW6nH0Y
+	 F6M39u5iqCGvMH1pHrAhnhbUrZVPBPWKK7ziDzckDSEsPrOPCr4396X31GQLDVI//s
+	 Xb4JHaeUxrtmg==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v6 00/10] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Date: Wed, 30 Apr 2025 08:06:46 -0700
+Message-Id: <20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3e0c710-0815-44ad-844c-0e8a079bf663@suse.cz>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIc8EmgC/2XPTWrDMBCG4asErasizWhiuaveo3ShX0ek2EUKJ
+ iH47p0ECm61/EY8L+guWqolNfF2uIua1tLKMvM4vhxEOLl5SrJE3gIUkDIaZU35Ul04y+in3CQ
+ Ox8GjwgTZCUbf/F6uz+DHJ+9TaZel3p79VT+uvynzP7VqqWRWSJYsAih8P6c6p6/XpU7i0Vph7
+ 6nzwN5rG4zzUQPkzuPeD51H9gE1jQZssNl33uy97bxhT8FRGOw4kjGdp52H3hN7HbyPmT9vffz
+ jt237AXIsOHCtAQAA
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4062; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=r4W7UK6VId5X4X90Hb+OqrSmtTfxJkdDYqm0TdhLa44=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBoEjyNXqxw6nyk1FblIzq6mWVlgjFIA87b77jll
+ 3HAH9RlaWOJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaBI8jQAKCRAADmhBGVaC
+ FQ3pD/0TsmOcqqHioqrgnl/qIAaObykbwezcD1n1j9iShimAwdpVaTgKiAKUEHOvUOWjq52FBrY
+ O61pcSpM9GiOKsLOlpHh9uHW4V9kyk4VPhqGKZnGYMbi3V/luArvxHHWWJozwx1inFFD5SUZVlj
+ n0NxfRaaf34LRjer2ubDDQDE+Q1E7Ra0EaSJ0Z/ebbwx3yMRazgv/KBJi9gfjftfmvKQjQT+kud
+ VspuBs9dxXzDqCrEJynPctx3lwh/9luRZye4P7PmJjN5DH6e/KaluYJKajBUicIUhcoEvkpLsGq
+ J2sHhkBILX/6CZSSGvCLjZoE5eJC7CELz6yuESNnl1AWKi4u570Vf+EsZhxcZK6j2E9nlvl8l94
+ +kdkzGWLxLAnfy/X0svb8VhbRCFCAOAfzUzCwDiB9kBLnZEUylU+vr1L8TO/JzKhN/tcskredMx
+ oYiCUKv+b9chnVXeA7xLjb14iU6IkQxXxDqVgVE7GkC4WvP2+Ix/lnFzm9JCYKnUW+kmsCVqC9x
+ 5dfKY5vHwjNTNWuep7qrAF27E2vA93B6P4sjW3l8UXUagbraBEZoBdfmyoaHxpaHLEGMHArtKu8
+ ZS+p69ShkwccQK+194r0ZpR5chzZVdauAWtk4MTKlSXBsCqf61Gs6Jr6/R2OSMC/2UqHYXcyNen
+ N5ezk9bbbIhCilg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Wed, Apr 30, 2025 at 11:57:13AM +0200, Vlastimil Babka wrote:
-> On 4/16/25 20:02, Shakeel Butt wrote:
-> > Memory cgroup accounting is expensive and to reduce the cost, the kernel
-> > maintains per-cpu charge cache for a single memcg. So, if a charge
-> > request comes for a different memcg, the kernel will flush the old
-> > memcg's charge cache and then charge the newer memcg a fixed amount (64
-> > pages), subtracts the charge request amount and stores the remaining in
-> > the per-cpu charge cache for the newer memcg.
-> > 
-> > This mechanism is based on the assumption that the kernel, for locality,
-> > keep a process on a CPU for long period of time and most of the charge
-> > requests from that process will be served by that CPU's local charge
-> > cache.
-> > 
-> > However this assumption breaks down for incoming network traffic in a
-> > multi-tenant machine. We are in the process of running multiple
-> > workloads on a single machine and if such workloads are network heavy,
-> > we are seeing very high network memory accounting cost. We have observed
-> > multiple CPUs spending almost 100% of their time in net_rx_action and
-> > almost all of that time is spent in memcg accounting of the network
-> > traffic.
-> > 
-> > More precisely, net_rx_action is serving packets from multiple workloads
-> > and is observing/serving mix of packets of these workloads. The memcg
-> > switch of per-cpu cache is very expensive and we are observing a lot of
-> > memcg switches on the machine. Almost all the time is being spent on
-> > charging new memcg and flushing older memcg cache. So, definitely we
-> > need per-cpu cache that support multiple memcgs for this scenario.
-> > 
-> > This patch implements a simple (and dumb) multiple memcg percpu charge
-> > cache. Actually we started with more sophisticated LRU based approach but
-> > the dumb one was always better than the sophisticated one by 1% to 3%,
-> > so going with the simple approach.
-> > 
-> > Some of the design choices are:
-> > 
-> > 1. Fit all caches memcgs in a single cacheline.
-> > 2. The cache array can be mix of empty slots or memcg charged slots, so
-> >    the kernel has to traverse the full array.
-> > 3. The cache drain from the reclaim will drain all cached memcgs to keep
-> >    things simple.
-> > 
-> > To evaluate the impact of this optimization, on a 72 CPUs machine, we
-> > ran the following workload where each netperf client runs in a different
-> > cgroup. The next-20250415 kernel is used as base.
-> > 
-> >  $ netserver -6
-> >  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
-> > 
-> > number of clients | Without patch | With patch
-> >   6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
-> >   12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
-> >   18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
-> >   24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
-> >   30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
-> >   36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
-> > 
-> > The results show drastic improvement for network intensive workloads.
-> > 
-> > Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
-> 
-> Acked-by: Vlastimil Babka <vbabka@suse.cz>
-> 
-> See below
-> 
-> > ---
-> >  mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
-> >  1 file changed, 91 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> > index 1ad326e871c1..0a02ba07561e 100644
-> > --- a/mm/memcontrol.c
-> > +++ b/mm/memcontrol.c
-> > @@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
-> >  	pr_cont(" are going to be killed due to memory.oom.group set\n");
-> >  }
-> >  
-> > +#define NR_MEMCG_STOCK 7
-> >  struct memcg_stock_pcp {
-> >  	local_trylock_t stock_lock;
-> > -	struct mem_cgroup *cached; /* this never be root cgroup */
-> > -	unsigned int nr_pages;
-> > +	uint8_t nr_pages[NR_MEMCG_STOCK];
-> > +	struct mem_cgroup *cached[NR_MEMCG_STOCK];
-> 
-> I have noticed memcg_stock is a DEFINE_PER_CPU and not
-> DEFINE_PER_CPU_ALIGNED so I think that the intended cacheline usage isn't
-> guaranteed now.
-> 
-> Actually tried compiling and got in objdump -t vmlinux:
-> 
-> ffffffff83a26e60 l     O .data..percpu  0000000000000088 memcg_stock
-> 
-> AFAICS that's aligned to 32 bytes only (0x60 is 96) bytes, not 64.
-> 
-> changing to _ALIGNED gives me:
-> 
-> ffffffff83a2c5c0 l     O .data..percpu  0000000000000088 memcg_stock
-> 
-> 0xc0 is 192 so multiple of 64, so seems to work as intended and indeed
-> necessary. So you should change it too while adding the comment.
-> 
+This one is quite a bit of a change from the last set. I've gone back to
+auto-registering the debugfs files for every ref_tracker_dir. With this,
+the callers should pass in a static string as a classname instead of an
+individual name string that gets copied. The debugfs file is given a
+name "class@%px" The output format is switched to print "class@%p"
+instead of "name@%p".
 
-Wow I didn't notice this at all. Thanks a lot. I will fix this in the
-next fix diff.
+To allow for human-readable names, I've added the ability to add a
+symlink in the debugfs dir that can be set to an arbitrary name. This is
+optional. I've only added them to the netns and i915 trackers in this
+series.
+
+Finally, with the above changes, we can eliminate the "name" field in
+the ref_tracker_dir which shrinks it by 16 bytes on a 64 bit host.
+
+The original plan was to merge this via the networking tree. That's
+probably still doable but there are some display port and i915 changes
+in here too. Note that those are untested, mostly because I don't have
+the necessary hardware handy.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v6:
+- clean up kerneldoc comment for ref_tracker_dir_debugfs()
+- add missing stub function for ref_tracker_dir_symlink()
+- temporary __maybe_unused on ref_tracker_dir_seq_print() to silence compiler warning
+- Link to v5: https://lore.kernel.org/r/20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org
+
+Changes in v5:
+- add class string to each ref_tracker_dir
+- auto-register debugfs file for every tracker in ref_tracker_dir_init
+- add function to allow adding a symlink for each tracker
+- add patches to create symlinks for netns's and i915 entries
+- change output format to print class@%p instead of name@%p
+- eliminate the name field in ref_tracker_dir
+- fix off-by-one bug when NULL terminating name string
+- Link to v4: https://lore.kernel.org/r/20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org
+
+Changes in v4:
+- Drop patch to widen ref_tracker_dir_.name, use NAME_MAX+1 (256) instead since this only affects dentry name
+- Link to v3: https://lore.kernel.org/r/20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org
+
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
+
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+
+---
+Jeff Layton (10):
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: add a static classname string to each ref_tracker_dir
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: automatically register a file in debugfs for a ref_tracker_dir
+      ref_tracker: add a way to create a symlink to the ref_tracker_dir debugfs file
+      net: add symlinks to ref_tracker_dir for netns
+      i915: add ref_tracker_dir symlinks for each tracker
+      ref_tracker: eliminate the ref_tracker_dir name field
+
+ drivers/gpu/drm/display/drm_dp_tunnel.c |   2 +-
+ drivers/gpu/drm/i915/intel_runtime_pm.c |   4 +-
+ drivers/gpu/drm/i915/intel_wakeref.c    |   3 +-
+ include/linux/ref_tracker.h             |  44 +++++++-
+ lib/ref_tracker.c                       | 192 +++++++++++++++++++++++++++++---
+ net/core/dev.c                          |   2 +-
+ net/core/net_namespace.c                |  32 +++++-
+ 7 files changed, 253 insertions(+), 26 deletions(-)
+---
+base-commit: 5bc1018675ec28a8a60d83b378d8c3991faa5a27
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
