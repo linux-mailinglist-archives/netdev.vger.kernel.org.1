@@ -1,133 +1,133 @@
-Return-Path: <netdev+bounces-187147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACDBAA5394
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:18:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF27EAA5399
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B67A9C75C8
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:18:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 633B01895B7C
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686622750F1;
-	Wed, 30 Apr 2025 18:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF89B1EB196;
+	Wed, 30 Apr 2025 18:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRVgvaBA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF1S0Vdc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A8B265CCB
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 18:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F13829408
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 18:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746037021; cv=none; b=HyzN57UX5VzNyJRQpLgQG7MfDVx056baqS/P64Z/wycnWHzN/oqHkZuJt8xjv3iIdWJB5rtGuVkagguLbfKFoerSV3erj/SwpZz/c1wg6MTtvTFG8d/+wqbN6sA9j6ouvo7gUORomnA+3oRt2H0+IYI6kEedpYGGi5rlApELWwY=
+	t=1746037273; cv=none; b=EbGIEKUaPT+EfQccAgcjdOo83MRCQ+IBHmtaYCpZG8XogbduRifq+Uf4tTAUzY857VgGqIro+07xaxYgRqCvlt6Y7i/8qwHOfIGeNg6oL+sm31/4VzgjovOozaFhH5OsFjpfyxebmqgrabSw5KYuYthk0Zw0rs9YNGO6tS1sdmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746037021; c=relaxed/simple;
-	bh=Nxdi4CYJTAlreKYjukkBrN0GQ02KL+2tFbybLRBhZF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SwWmYa9dCKkWaP8zefJs6xpiFO7kMZjajjEF9E9rUDsx1Tq0mJlyGm+NGQCCnc9Jmz9rwNKiD0SoL4UovD+jbMpAsX9H8yO6c40200QKmZaz/wkWNbgbM9i7jS3KKlI08K0KNDwHoHDOlG8Bg05tHW6WAugNslGScgNR2lYDqzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRVgvaBA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AD12C4CEE7;
-	Wed, 30 Apr 2025 18:16:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746037020;
-	bh=Nxdi4CYJTAlreKYjukkBrN0GQ02KL+2tFbybLRBhZF0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KRVgvaBAQ6TUC9Pejw4EY6FFKLYi+9Yy6AmweeUDU6iRlELIaqiK5TIWTywFv6MF/
-	 Q6LGGUBVSZYsGhmJonMmGURvjW2eaOE+G4W/4p4rOpkn0jTk3otN+a2WDh8ZbPeynv
-	 cPCBqe9yJJ3KfXsCti96XH9Iwoo8cNy9Pe/bpigWuh2ZlPRxOyGvNDBGjyKYCPN/Cp
-	 ZHtPfUBwadooo1aQz+JdbzMzUuTLJUqGfg+oawVtgONtfaLLuqpetafhWNtf6upPLg
-	 +xPzFRw3h506Glc/o4Qpv4UlDTM1XTfKs7EqYsfp2DaH/csaGdJlHFFuJpheuqJ1//
-	 dkks0UYGMUYdQ==
-Date: Wed, 30 Apr 2025 19:16:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shankari <shankari.ak0208@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH v2] net: rds: Replace strncpy with strscpy in connection
- setup
-Message-ID: <20250430181657.GW3339421@horms.kernel.org>
-References: <20250424183634.02c51156@kernel.org>
- <20250426192113.47012-1-shankari.ak0208@gmail.com>
- <CAPRMd3mRUi+ESqDy04c-r38JoSWxo8Ka0Et9gZbe+jRrL6G_nQ@mail.gmail.com>
+	s=arc-20240116; t=1746037273; c=relaxed/simple;
+	bh=za7xdjLE9bp2NMnr6s/Q5MyeV6qERXmYYVibZOeePI4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WdsGwx8mOFjnrxMb769ru4R35Ayv4IFFP5eGKBMPFmVA3riuSxTJLITlGHHJUuVkDqGdLFHJAu88QhK6DbjMaQAARy6f1awXGQ8hRuVF9BhypMM4mAQxX1VS0CU9T2Q3MJJe1bU3m7d+GJM+d0Rc0ZnoKafUHqxPo3X1CY8n4c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OF1S0Vdc; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac34257295dso16380966b.2
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 11:21:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746037270; x=1746642070; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oQqDlcZHlKX6vCp3zS/Qk4GtsSiia+cM4MSYqtKcMHs=;
+        b=OF1S0Vdcf2A9z80W7fcAPJenQDXM2wAqjmq/dLTqhappLLujiyXjlIZKSxuVmDxg8y
+         JUytnxEmtXNKLyovvMgZUSN8+nbFuKDrBZAODTzgotnVl/L510Ks7mUzhcMLlOodK3Lg
+         riK34cMTkqPG/Nu4fgWF76V6AFl6kALw6WlFawY1VtnWIzg11Vh8j0fQcEXy6PojW5ii
+         KTvYuiPoJObMg/S9OTjiH5NXDOLhceD2lqKiUhw0zYTgl/xnkUnjOTLmx7Uz31ZbTWIo
+         dzE82tGaMiS3pZF/Sn+FxJqd4FE+CcMn4TkKW31pJHeMzEV3vukiM9O0g6lHW/kyn08c
+         wK0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746037270; x=1746642070;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oQqDlcZHlKX6vCp3zS/Qk4GtsSiia+cM4MSYqtKcMHs=;
+        b=Zl5pWtwuo49YU8d+cnmP9sr2gRgVttILLqGD4hP5uUhNuH66xikuY8sq0XOVml9l2k
+         uls4FPOQFzK+NISJ/nyPeqc6hqjFAHp1Wh2J9tyTI7b6xsoZ+tFYYx4aPG0VcoNekuw3
+         +F/+sW3JbtvoV9MjnTHfEf+ZlF3WILrolTOTCvmJBs1WLJftzSaLWLhw9RxKiHwQ6/Vg
+         YZ6eCmzHr+SK86GjisUk+6TSi6bk0CUCqH+HXJBj2LRAYL8NcGrNmgYKEyB6MtJPufpi
+         usfyz47VGPWnL1sx8hBUzQUobKiHKMJYmxfdO3KqFSDG8x3N8pG/56ft30NKZF6GmD4I
+         b02g==
+X-Forwarded-Encrypted: i=1; AJvYcCXlpIwXu0EraAJQmpjMorWTaPlcgF1O8U7UtfMwed07nNoOa+SpS8rGFbKGJgzqmIsSWwivXwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yykpkk4PueJqNuf2xxS3mE4JpMzM+A2wkRE43HxCtT/0YD3CBTw
+	+TsGV1g/em+nlfSJOS0cu0P3PbG3xE+JX6yZ2WSzDNBjI022EMM/yCeNgQOx6QCV4RJuo4jdNE7
+	NADdmkbQIOhwniHYr/V8tw2z0E74=
+X-Gm-Gg: ASbGncsKOg7SOlhfgVwHgE1d2qNftuFDNKTQbSeW+PX9StnnPxz1jL+n1btbM3DQ10c
+	bjRDF+72JlCgQlYvhlxryXSnto1RgXQ/tfbPJo8S8CAhHlNy44EpIfx5dGdBEdhZbEYrY6Z+RVB
+	dNGzB7HdV/CKSY/CJUcW0xZt0=
+X-Google-Smtp-Source: AGHT+IFWsVi6IoH6BfgcKcg5vmilVdk+v3ykK3VxShp5N16rkJHxuTuhOv0ZjpySQzEFcYlgGAyD+PxKyQSXuyLP6UE=
+X-Received: by 2002:a17:907:944c:b0:acb:85da:8e09 with SMTP id
+ a640c23a62f3a-acedc5deed0mr429040666b.21.1746037270101; Wed, 30 Apr 2025
+ 11:21:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPRMd3mRUi+ESqDy04c-r38JoSWxo8Ka0Et9gZbe+jRrL6G_nQ@mail.gmail.com>
+References: <20250430170343.759126-1-vadfed@meta.com>
+In-Reply-To: <20250430170343.759126-1-vadfed@meta.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 1 May 2025 03:20:58 +0900
+X-Gm-Features: ATxdqUFeMX9b2Neh4Aj_5wp0FYIoHHfhxMkxHsQ2UX7_cLjpSBFL5xRDGg_zAdM
+Message-ID: <CAMArcTWM+4hry2Zf=a8eYH54icov0J73vnEDX79RDEkxd6wX2w@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt_en: fix module unload sequence
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 27, 2025 at 12:56:14AM +0530, Shankari wrote:
-> Hi Jacub,
-> 
-> I have implemented the changes in the v2 patch. Thanks for your review.
-> 
-> On Sun, Apr 27, 2025 at 12:51 AM Shankari Anand
-> <shankari.ak0208@gmail.com> wrote:
-> >
-> > From: Shankari02 <shankari.ak0208@gmail.com>
-> >
-> > This patch replaces strncpy() with strscpy(), which is the preferred, safer
-> > alternative for bounded string copying in the Linux kernel. strscpy() guarantees
-> > null-termination as long as the destination buffer is non-zero in size and provides
-> > a return value to detect truncation.
-> >
-> > Padding of the 'transport' field is not necessary because it is treated purely
-> > as a null-terminated string and is not used for binary comparisons or direct
-> > memory operations that would rely on padding. Therefore, switching to strscpy()
-> > is safe and appropriate here.
-> >
-> > This change is made in accordance with the Linux kernel documentation, which
-> > marks strncpy() as deprecated for bounded string operations:
-> > https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy
-> >
-> > Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
-> > ---
-> >  net/rds/connection.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/rds/connection.c b/net/rds/connection.c
-> > index c749c5525b40..fb2f14a1279a 100644
-> > --- a/net/rds/connection.c
-> > +++ b/net/rds/connection.c
-> > @@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
-> >         cinfo->laddr = conn->c_laddr.s6_addr32[3];
-> >         cinfo->faddr = conn->c_faddr.s6_addr32[3];
-> >         cinfo->tos = conn->c_tos;
-> > -       strncpy(cinfo->transport, conn->c_trans->t_name,
-> > +       strscpy(cinfo->transport, conn->c_trans->t_name,
-> >                 sizeof(cinfo->transport));
+On Thu, May 1, 2025 at 2:03=E2=80=AFAM Vadim Fedorenko <vadfed@meta.com> wr=
+ote:
+>
+> Recent updates to the PTP part of bnxt changed the way PTP FIFO is
+> cleared, skbs waiting for TX timestamps are now cleared during
+> ndo_close() call. To do clearing procedure, the ptp structure must
+> exist and point to a valid address. Module destroy sequence had ptp
+> clear code running before netdev close causing invalid memory access and
+> kernel crash. Change the sequence to destroy ptp structure after device
+> close.
+>
+> Fixes: 8f7ae5a85137 ("bnxt_en: improve TX timestamping FIFO configuration=
+")
+> Reported-by: Taehee Yoo <ap420073@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAMArcTWDe2cd41=3Dub=3DzzvYifaYcYv=
+-N-csxfqxUvejy_L0D6UQ@mail.gmail.com/
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 
-Because cinfo->transport is an array it's length is sizeof(cinfo->transport),
-as used above. But for the same reason the two-argument version of
-strscpy() can be used here.
+Tested-by: Taehee Yoo <ap420073@gmail.com>
 
-	strscpy(cinfo->transport, conn->c_trans->t_name);
-
-Similarly if, based on my understanding of Jakub's feedback,
-strscpy_pad() should be used.
-
-> >         cinfo->flags = 0;
-> >
-> > @@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
-> >         cinfo6->next_rx_seq = cp->cp_next_rx_seq;
-> >         cinfo6->laddr = conn->c_laddr;
-> >         cinfo6->faddr = conn->c_faddr;
-> > -       strncpy(cinfo6->transport, conn->c_trans->t_name,
-> > +       strscpy(cinfo6->transport, conn->c_trans->t_name,
-> >                 sizeof(cinfo6->transport));
-
-Ditto.
-
-> >         cinfo6->flags = 0;
-> >
-> > --
-> > 2.34.1
-> >
-> 
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.c
+> index 78e496b0ec26..86a5de44b6f3 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -16006,8 +16006,8 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+>
+>         bnxt_rdma_aux_device_del(bp);
+>
+> -       bnxt_ptp_clear(bp);
+>         unregister_netdev(dev);
+> +       bnxt_ptp_clear(bp);
+>
+>         bnxt_rdma_aux_device_uninit(bp);
+>
+> --
+> 2.47.1
+>
 
