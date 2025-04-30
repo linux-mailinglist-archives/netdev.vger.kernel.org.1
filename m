@@ -1,78 +1,54 @@
-Return-Path: <netdev+bounces-186960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C80AA44D7
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:07:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79B9AA45B7
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AAD24E321D
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:07:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB07C4E3C96
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D54A2139B5;
-	Wed, 30 Apr 2025 08:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55548219307;
+	Wed, 30 Apr 2025 08:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bYxocgHi"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="RJT6OmDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57407FBA2
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 08:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56719213E85;
+	Wed, 30 Apr 2025 08:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746000432; cv=none; b=Yv/BSjN3+rh8kHsTWCmdOzZQdtQJ1wKjoKCwO1BrIzgvnphkZUhh+Jp+1bmuWyRKFeuI7K89lCnzKkunA7Xkb5t+/HJ3TmMnuGQVu804F/efv6PP671gz3w7i9Li3GBu0VWAxyjHn9QQZxStbeIb6k43/qgTQ/2L6Ba0RMe83HQ=
+	t=1746002530; cv=none; b=inDGjJeOW0iuFqDkoRJjAtUPOzMU4XjN0bT44DEkvw+nM48O6s/LuZXFIdwXTvK6Mi49J8K7xr17CHD82cyzjIZIbBJRDI2eWql6X2cOmRTZkQ+o1ZxLEbfMjGsZxSpsrboE9BlqsekuBeZAe1CUFbLVOeQdpcaAGkJEbN2f6IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746000432; c=relaxed/simple;
-	bh=kj8MnihaZ7l+xSJ0ul1JcIed7CGN/pkbiVSMjR9ZINM=;
+	s=arc-20240116; t=1746002530; c=relaxed/simple;
+	bh=opIdtlH9FxubqDCmTmFXZCwSpsZlw8Xv63oX88tUBpI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QaR4lXC1AFlVnkw46C47HeKZEsi+V39jgxw62YY4XkK+z7pF/YH7jZXnXdCucUeXYvce2MaeYPfB+oPYXT60mVpzDAoD6tVS1HwBwZY3MThJ8YcpFJxv5CtL08V2v/vB2UjzemVDSW2/jXVEe4Lm/mzH6Zr9Itr2q0pReW4PC6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bYxocgHi; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b074d908e56so5163812a12.2
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 01:07:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1746000429; x=1746605229; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tNCjzmDAsZlbXnWegieKePzLMYEar9QJf6Kl2b6MKpI=;
-        b=bYxocgHi7iwWFGN1FemM/GkE0w2W5/3zgeXfPwFgMkRqgodMfZ8hV3YOH0J4m8Wdkh
-         GaBzX0MYtHyA1zei0aLbss/xx/RtKIEaFFcMwXgha1KXmUVnOcQfHy+AeqG7O9PhbBD/
-         geOytb2btX+B8gVp/1Mg5kFQsIxYOv7dMxcnE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746000429; x=1746605229;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tNCjzmDAsZlbXnWegieKePzLMYEar9QJf6Kl2b6MKpI=;
-        b=gaoc5+LKWIMNh9KaFlGc7cxGqFo8Dmd/bOdeZqsy+i5ZmtRA99hZQ7CrNUPoyh0/05
-         PN0I5Vio5uj+JZpnh6tzSDfVYnG421jDlfGrYjB0qOp/VBKRWu2Okup5XD5srC0cJXK0
-         uOuUQ+xzZyk9srwuBrpB4+I2h6sKreky5oxmv3P7C40RFbZNvkpFfnUKZZFF93OnPfso
-         ab8mUWK2yZCBvMh0iPGCR0q4zeEcSKRLSNaNpU0LBbh4el1UVaveDWAZTDOfUkEDP5bL
-         tgU6YCXUSfkR32Q+OJtCmQ1NG76nNW3/b/Hc1qnFqL8z951JyskPjSbnsd10+Rh9fHdq
-         MsfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnfwzGcOCZVea3l3qrIHaubujfMVat8DQjkJNDY4WR20o/H+ffzo8ORREesZT8WSVyOhiL6Xc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiNsHuDA6522ZG3tuysjnY6XExkuToLBp9lvdfaTdzgZfwjgpK
-	NHoOpxeVY2IX7us04WlCecXRqaEoHAqTXpUP6KD6WCmrN9QEwcaFdXKd/9OobQ==
-X-Gm-Gg: ASbGncthdJ90xwAXJ72c5Et12HwQVHCzB5g6y17D9Utk3QyDYuRxAG5ORIHzolNzZRy
-	M7Mt1HfJtflHGdzFAUc54JpKoZLymG8O/M4fNg5AaQadJGcezPqrbEBxxfDJjIlHWyhC55lcLlg
-	icymPPgOX3aBF0Z7qOb/u2e6f58WhNaQrEuMxFfvQk1P1r8S6SdxIXYk/M6oIVqXppXt/HmWPxH
-	QcmmQSxeTUQpLSuWJ7jCTDiMeM9ClR8dAK+JPWNc0qL2HPz0cgYRM6RP3p1IVqiVnNZxds8LNs6
-	t9nzns7z8v+ndkWRh7s4teToIVdsmTycB3C/L1Mz8Augr/YeAdkBJUazqWBScfukDYLbUwSRhqB
-	fzJI=
-X-Google-Smtp-Source: AGHT+IE2Wf34OP5aP/4XXzvwXOVRoJ+64fMYoNjsOKD9q02NrP0D4aZ0MPYwkfLQYNofq42CWf2ofw==
-X-Received: by 2002:a17:90b:2e10:b0:2ee:f80c:6889 with SMTP id 98e67ed59e1d1-30a3446bb6cmr2919932a91.33.1746000428963;
-        Wed, 30 Apr 2025 01:07:08 -0700 (PDT)
-Received: from [192.168.0.24] (home.mimichou.net. [82.67.5.108])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a34a615a1sm947031a91.49.2025.04.30.01.07.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 01:07:07 -0700 (PDT)
-Message-ID: <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
-Date: Wed, 30 Apr 2025 10:07:07 +0200
+	 In-Reply-To:Content-Type; b=aryEQfYEQh31biNJ/NJEkuP44U6yyLLWcgphbERSlc4KDGZH7p2mSAoXaZzfNqV0K235mgtkO54Jh7vD4k+yzmtvyrEtiTdhmC5h6Tr5Mnbcdj1eYwNsAxek4qzNtnYdWKTxTEpSuaQzneMNLaiPnEm6he8b7wo1zHcwEumMFo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=RJT6OmDA; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53U8f73s812541
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 30 Apr 2025 01:41:07 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53U8f73s812541
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1746002472;
+	bh=2/QHRN+D8/djEoWuIZIlllhMwAZHSg2wUWQdlu6s4Ik=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RJT6OmDAoNn/cc5MacwB1vC5wQ1M64qGWRanjOVN66rVpkGlXaLeGE7PE7eD7mISD
+	 /dIdmza3K+wfDZyQexgmDwpxPQNN4+/Fbw41fhxlT3K0uT/PJjyGzdwaAn+yyr9k0A
+	 CWJPVsS03uahIX8JX2uLwg3Z3hye2BZ7LId8jWJUQAdh/it1N65JzEiy3LsHYL9aJT
+	 C68Y5ccPbfaA9gH+J9F27HnzlVWkht45bvdBotMjohzZpoa3XaE99KXAA3Fc4+U100
+	 OtHQ9EQb/i6ZeoBsZ7v43PfIbFra7Pd1cFeKQ0RpDx0DYLCFE4fbEUVwSoFN8jeJCO
+	 fS0vj6MT1+Cdw==
+Message-ID: <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
+Date: Wed, 30 Apr 2025 01:41:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,114 +56,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
-To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250429201710.330937-1-jonas.gorski@gmail.com>
+Subject: Re: [PATCH v4 01/15] x86/msr: Add missing includes of <asm/msr.h>
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
+        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+        wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com,
+        dapeng1.mi@linux.intel.com
+References: <20250427092027.1598740-1-xin@zytor.com>
+ <20250427092027.1598740-2-xin@zytor.com>
+ <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
 Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250429201710.330937-1-jonas.gorski@gmail.com>
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+
+On 4/29/2025 2:45 AM, Ilpo Järvinen wrote:
+>>   arch/x86/events/msr.c                                         | 3 +++
+>>   arch/x86/events/perf_event.h                                  | 1 +
+>>   arch/x86/events/probe.c                                       | 2 ++
+> Under arch/x86/events/ a few files seem to be missing the include?
 
 
+Most C files in arch/x86/events/ include arch/x86/events/perf_event.h,
+thus they don't need to include <asm/msr.h> directly once
+arch/x86/events/perf_event.h includes <asm/msr.h>, and this patch does
+that.
 
-On 4/29/2025 10:16 PM, Jonas Gorski wrote:
-> This patchset aims at fixing most issues observed while running the
-> vlan_unaware_bridge, vlan_aware_bridge and local_termination selftests.
-> 
-> Most tests succeed with these patches on BCM53115, connected to a
-> BCM6368.
-> 
-> It took me a while to figure out that a lot of tests will fail if all
-> ports have the same MAC address, as the switches drop any frames with
-> DA == SA. Luckily BCM63XX boards often have enough MACs allocated for
-> all ports, so I just needed to assign them.
-> 
-> The still failing tests are:
-> 
-> FDB learning, both vlan aware aware and unaware:
-> 
-> This is expected, as b53 currently does not implement changing the
-> ageing time, and both the bridge code and DSA ignore that, so the
-> learned entries don't age out as expected.
-> 
-> ping and ping6 in vlan unaware:
-> 
-> These fail because of the now fixed learning, the switch trying to
-> forward packet ingressing on one of the standalone ports to the learned
-> port of the mac address when the packets ingressed on the bridged port.
 
-Sorry not quite getting that part, can you expand a bit more?
+The following files include arch/x86/events/intel/uncore.h which 
+includes arch/x86/events/perf_event.h, thus no change needed:
+     arch/x86/events/intel/uncore.c
+     arch/x86/events/intel/uncore_discovery.c
+     arch/x86/events/intel/uncore_nhmex.c
+     arch/x86/events/intel/uncore_snb.c
+     arch/x86/events/intel/uncore_snbep.c
 
-> 
-> The port VLAN masks only prevent forwarding to other ports, but the ARL
-> lookup will still happen, and the packet gets dropped because the port
-> isn't allowed to forward there.
+The following 2 files don't include arch/x86/events/perf_event.h so they
+include <asm/msr.h> directly with this patch:
+     arch/x86/events/msr.c
+     arch/x86/events/probe.c
 
-OK.
+arch/x86/events/amd/uncore.c doesn't include
+arch/x86/events/perf_event.h but includes <asm/msr.h> already.
 
-> 
-> I have a fix/workaround for that, but as it is a bit more controversial
-> and makes use of an unrelated feature, I decided to hold off from that
-> and post it later.
 
-Can you expand on the fix/workaround you have?
+So we are good in this directory, but it should be a separate patch with
+the above explanation then.
 
-> 
-> This wasn't noticed so far, because learning was never working in VLAN
-> unaware mode, so the traffic was always broadcast (which sidesteps the
-> issue).
-> 
-> Finally some of the multicast tests from local_termination fail, where
-> the reception worked except it shouldn't. This doesn't seem to me as a
-> super serious issue, so I didn't attempt to debug/fix these yet.
-> 
-> I'm not super confident I didn't break sf2 along the way, but I did
-> compile test and tried to find ways it cause issues (I failed to find
-> any). I hope Florian will tell me.
-
-I am currently out of the office but intend to test your patch series at 
-some point in the next few days. Let's gather some review feedback in 
-the meantime, thanks for submitting those fixes!
--- 
-Florian
 
 
