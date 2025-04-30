@@ -1,161 +1,242 @@
-Return-Path: <netdev+bounces-187018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90554AA47B3
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:54:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9E9AA47BD
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:57:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E1D69A8368
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:54:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DECB7A7B85
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D382356D9;
-	Wed, 30 Apr 2025 09:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D196D238142;
+	Wed, 30 Apr 2025 09:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fXiVsn/S"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dieam/H3";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kbsTSOfI";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S0odmGrE";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FsXnafmM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400F623184F
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC2B231859
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746006869; cv=none; b=CvAO1GdfkdXtwFBcsmsAt+JSVuyIrzOkyAlBu1JpPs2EJphtVo78amhG0LdKiNn9LS9N9JiTa3lkr4HaWVYbSyd+GZJQsWJS/YsHxDToO2wgGglIt3z24GNKBuW9UjgwAjvxfEmAe0p5P0gJp3Akn3TiDNllOGKCgvXzW+wBggw=
+	t=1746007040; cv=none; b=ETHBq2gmrAILqbBZlkIls5mMIU90ty0M83HX9iTBw9yZbdl6RFatWBWWRKx9rRRFOTmJdUk8A0nRRFT5vPVa6iPjlsIv9jzCIBlrTdryXjoXPw/Iu1gYQ4Is/MlSr1bBl7kPmTMjclLQ4w3DKkuEPQjteLTkpk+j8IM212EHtjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746006869; c=relaxed/simple;
-	bh=OPZigiWpxwHv1lnOkpeezwZwtsRjjBDFCG5NyXPV4cw=;
+	s=arc-20240116; t=1746007040; c=relaxed/simple;
+	bh=2N/gZ2xEz4587NZSPxfEBAB/1ICXtlQSDrPwawJJivE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hsd3Muu0gGqQIG6NSEFcwAVyidJ3sQaXZu0GR4qTyW1gn9jP5IfL4i2epsdvcHV2F5TapAIQHtjJi6RmPp1qhaY1C6UHp2bomopK78SYxvd3qYglzcxSbUq56Yo8bmkHY8x6EeaxcjszYck2tV8WhsgEuPbik2A3FNHWJWzmQcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fXiVsn/S; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2d86bf48-6588-4051-8eb8-30bd4e1a34ca@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746006864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=udUY0lY0pBZ7UXr6NKw+TJQLKV+NDmByACfKCuRgXkHdHiI6v/WOAhzNVjgpZL5I1o0lGm9sb6kG9lTpgqPgrtmkviwSKSa/80uzO8kyIMlsrpB00g+hmxW8DaDZZ9tnzVSgtNjE4U9+kdfPr5JZwh5D82iih27G+9qCVm+u+Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dieam/H3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kbsTSOfI; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S0odmGrE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FsXnafmM; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id F3C0C1F7BD;
+	Wed, 30 Apr 2025 09:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1746007035; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QbLQyfbFYW96SBXE2wDxy7CIZhwc9mKxQpduRfQsUX4=;
-	b=fXiVsn/SnD01eZr6ljJuAh/mBiFOY+JikmiV1F9soSKz418wlLMGa6KUBIkhCF952LU+yZ
-	RXj477ysmHZd4Fc9jb+rXKolte8iCJHTk1DfqIMQvvGGPfmn4irweA//UKh1dM9taHSMnN
-	LXslZ6zPp5r21G7PndrEJ34zMWxdbUA=
-Date: Wed, 30 Apr 2025 10:54:20 +0100
+	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
+	b=dieam/H3ocYHiQr07Lfty8bGaKeGdej3g3gXK4x56a5/WCu17ZxIdzdAgxcN2st1xKbAQL
+	rQAkevx69JHnxdSLSzRC1NHgF/doKacmq5e4rPXtploYNjHuzIF/ZM2Mel+KgENpbCL7Ux
+	E0lPJ5sCQMZKbrfD3Qy5hH7VzsP3t7E=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1746007035;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
+	b=kbsTSOfI1gx6O3dLXj96daBHGv1GOVwaqshDWb8bEKI/5zUqxwD/3jXPASE8FuoXQx9rrU
+	bXADThEJUpXIhQDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1746007034; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
+	b=S0odmGrElF8esTIguluV7jCAIbKgwRJaPPcTdAB2R8Jlg1F9I/jFR8tj11LnvrPBqn5V4K
+	McsCYKW/+a5XqgyVJXX979ZPOgs+eTXERcKd851mRYzqz7WMYpFJtM3GvksDaEi7SE1k+n
+	l8QxvIV+Yb6r2Qu6AKFBOxuEQokcrtc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1746007034;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
+	b=FsXnafmMc971EpWD+JvgNQbDsYWK+pu39zsiI8otOFBph3Y6o7zqYQ+tauYRw+ADQQ6I+w
+	uvUKofsz++0l40Aw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D9A14139E7;
+	Wed, 30 Apr 2025 09:57:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id D120NPnzEWh4LQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 30 Apr 2025 09:57:13 +0000
+Message-ID: <f3e0c710-0815-44ad-844c-0e8a079bf663@suse.cz>
+Date: Wed, 30 Apr 2025 11:57:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] ptp: ocp: Fix NULL dereference in Adva board SMA sysfs
- operations
-To: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
- richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Sagi Maimon <sagi.maimon@adtran.com>
-References: <20250429073320.33277-1-maimon.sagi@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+To: Shakeel Butt <shakeel.butt@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Soheil Hassas Yeganeh
+ <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Meta kernel team <kernel-team@meta.com>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250429073320.33277-1-maimon.sagi@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:mid,linux.dev:email,oom.group:url,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On 29/04/2025 08:33, Sagi Maimon wrote:
-> From: Sagi Maimon <sagi.maimon@adtran.com>
+On 4/16/25 20:02, Shakeel Butt wrote:
+> Memory cgroup accounting is expensive and to reduce the cost, the kernel
+> maintains per-cpu charge cache for a single memcg. So, if a charge
+> request comes for a different memcg, the kernel will flush the old
+> memcg's charge cache and then charge the newer memcg a fixed amount (64
+> pages), subtracts the charge request amount and stores the remaining in
+> the per-cpu charge cache for the newer memcg.
 > 
-> On Adva boards, SMA sysfs store/get operations can call
-> __handle_signal_outputs() or __handle_signal_inputs() while the `irig`
-> and `dcf` pointers are uninitialized, leading to a NULL pointer
-> dereference in __handle_signal() and causing a kernel crash. Adva boards
-> don't use `irig` or `dcf` functionality, so add Adva-specific callbacks
-> `ptp_ocp_sma_adva_set_outputs()` and `ptp_ocp_sma_adva_set_inputs()` that
-> avoid invoking `irig` or `dcf` input/output routines.
+> This mechanism is based on the assumption that the kernel, for locality,
+> keep a process on a CPU for long period of time and most of the charge
+> requests from that process will be served by that CPU's local charge
+> cache.
 > 
-> Fixes: ef61f5528fca ("ptp: ocp: add Adva timecard support")
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> ---
-> Addressed comments from Vadim Fedorenko:
->   - https://www.spinics.net/lists/kernel/msg5659845.html
-> Changes since v1:
->   - Remove unused `irig` and `dcf` code.
-> ---
-> ---
->   drivers/ptp/ptp_ocp.c | 52 +++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 50 insertions(+), 2 deletions(-)
+> However this assumption breaks down for incoming network traffic in a
+> multi-tenant machine. We are in the process of running multiple
+> workloads on a single machine and if such workloads are network heavy,
+> we are seeing very high network memory accounting cost. We have observed
+> multiple CPUs spending almost 100% of their time in net_rx_action and
+> almost all of that time is spent in memcg accounting of the network
+> traffic.
 > 
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index faf6e027f89a..2ccdca4f6960 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -2578,12 +2578,60 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
->   	.set_output	= ptp_ocp_sma_fb_set_output,
->   };
->   
-> +static int
-> +ptp_ocp_sma_adva_set_output(struct ptp_ocp *bp, int sma_nr, u32 val)
-> +{
-> +	u32 reg, mask, shift;
-> +	unsigned long flags;
-> +	u32 __iomem *gpio;
-> +
-> +	gpio = sma_nr > 2 ? &bp->sma_map1->gpio2 : &bp->sma_map2->gpio2;
-> +	shift = sma_nr & 1 ? 0 : 16;
-> +
-> +	mask = 0xffff << (16 - shift);
-> +
-> +	spin_lock_irqsave(&bp->lock, flags);
-> +
-> +	reg = ioread32(gpio);
-> +	reg = (reg & mask) | (val << shift);
-> +
-> +	iowrite32(reg, gpio);
-> +
-> +	spin_unlock_irqrestore(&bp->lock, flags);
-> +
-> +	return 0;
-> +}
-> +
-> +static int
-> +ptp_ocp_sma_adva_set_inputs(struct ptp_ocp *bp, int sma_nr, u32 val)
-> +{
-> +	u32 reg, mask, shift;
-> +	unsigned long flags;
-> +	u32 __iomem *gpio;
-> +
-> +	gpio = sma_nr > 2 ? &bp->sma_map2->gpio1 : &bp->sma_map1->gpio1;
-> +	shift = sma_nr & 1 ? 0 : 16;
-> +
-> +	mask = 0xffff << (16 - shift);
-> +
-> +	spin_lock_irqsave(&bp->lock, flags);
-> +
-> +	reg = ioread32(gpio);
-> +	reg = (reg & mask) | (val << shift);
-> +
-> +	iowrite32(reg, gpio);
-> +
-> +	spin_unlock_irqrestore(&bp->lock, flags);
-> +
-> +	return 0;
-> +}
-> +
->   static const struct ocp_sma_op ocp_adva_sma_op = {
->   	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
->   	.init		= ptp_ocp_sma_fb_init,
->   	.get		= ptp_ocp_sma_fb_get,
-> -	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
-> -	.set_output	= ptp_ocp_sma_fb_set_output,
-> +	.set_inputs	= ptp_ocp_sma_adva_set_inputs,
-> +	.set_output	= ptp_ocp_sma_adva_set_output,
->   };
->   
->   static int
+> More precisely, net_rx_action is serving packets from multiple workloads
+> and is observing/serving mix of packets of these workloads. The memcg
+> switch of per-cpu cache is very expensive and we are observing a lot of
+> memcg switches on the machine. Almost all the time is being spent on
+> charging new memcg and flushing older memcg cache. So, definitely we
+> need per-cpu cache that support multiple memcgs for this scenario.
+> 
+> This patch implements a simple (and dumb) multiple memcg percpu charge
+> cache. Actually we started with more sophisticated LRU based approach but
+> the dumb one was always better than the sophisticated one by 1% to 3%,
+> so going with the simple approach.
+> 
+> Some of the design choices are:
+> 
+> 1. Fit all caches memcgs in a single cacheline.
+> 2. The cache array can be mix of empty slots or memcg charged slots, so
+>    the kernel has to traverse the full array.
+> 3. The cache drain from the reclaim will drain all cached memcgs to keep
+>    things simple.
+> 
+> To evaluate the impact of this optimization, on a 72 CPUs machine, we
+> ran the following workload where each netperf client runs in a different
+> cgroup. The next-20250415 kernel is used as base.
+> 
+>  $ netserver -6
+>  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
+> 
+> number of clients | Without patch | With patch
+>   6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
+>   12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
+>   18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
+>   24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
+>   30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
+>   36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
+> 
+> The results show drastic improvement for network intensive workloads.
+> 
+> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
 
-LGTM,
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
+
+See below
+
+> ---
+>  mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 91 insertions(+), 37 deletions(-)
+> 
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 1ad326e871c1..0a02ba07561e 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
+>  	pr_cont(" are going to be killed due to memory.oom.group set\n");
+>  }
+>  
+> +#define NR_MEMCG_STOCK 7
+>  struct memcg_stock_pcp {
+>  	local_trylock_t stock_lock;
+> -	struct mem_cgroup *cached; /* this never be root cgroup */
+> -	unsigned int nr_pages;
+> +	uint8_t nr_pages[NR_MEMCG_STOCK];
+> +	struct mem_cgroup *cached[NR_MEMCG_STOCK];
+
+I have noticed memcg_stock is a DEFINE_PER_CPU and not
+DEFINE_PER_CPU_ALIGNED so I think that the intended cacheline usage isn't
+guaranteed now.
+
+Actually tried compiling and got in objdump -t vmlinux:
+
+ffffffff83a26e60 l     O .data..percpu  0000000000000088 memcg_stock
+
+AFAICS that's aligned to 32 bytes only (0x60 is 96) bytes, not 64.
+
+changing to _ALIGNED gives me:
+
+ffffffff83a2c5c0 l     O .data..percpu  0000000000000088 memcg_stock
+
+0xc0 is 192 so multiple of 64, so seems to work as intended and indeed
+necessary. So you should change it too while adding the comment.
+
+>  	struct obj_cgroup *cached_objcg;
+>  	struct pglist_data *cached_pgdat;
 
