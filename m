@@ -1,157 +1,231 @@
-Return-Path: <netdev+bounces-187131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C61FDAA521E
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:54:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1B11AA524D
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98D421BC1D52
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:54:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A529830D8
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803472641E3;
-	Wed, 30 Apr 2025 16:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0666264F96;
+	Wed, 30 Apr 2025 16:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="RIIokNeC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tc5nYqWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EFF1D7984
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 16:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2927A29D0E
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 16:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746032016; cv=none; b=cFfUe3NAe3/YOGFTN9sEDsGgXf1sibKuuJQmFI3EoCgVepT2Xulpm9S9wHTRhpZLnrFSRqLZQpslD+53R0FjxIlCyTpv52ElmMC5TVr+U2FMdmR2qcTEdScs3crg55TbZzWPmrQh8R6zZQ+R/88IQ0DQAs6AeaEjqhulpumNd38=
+	t=1746032319; cv=none; b=C1UGdf5uAYBAl3aJwAsERglgb1sRifS4Gu4dIy9HKSwV9yDq7dcT2lGvdqfwnhJXLWTbMPiIRL23RZexV1cQ1noDk5Nqd+KueKV3L9N6PQfMiea+PB0iPx5CIa3MjfM8NDLPFhPzAtMYxDuW5M6jwkjdxOuXHOTxTAVqUl+Fq54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746032016; c=relaxed/simple;
-	bh=KLmuA2sXWxeYzvZaSBT1OXio9W3Wqg/uWe8O5Z2jE1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlM+/0DRpzeZ1M1iEh97qSdL0I4XBYAyS7B5TKT53+WSBuMd+IEbMUrSPHnYHCeuJnu/vZKJhXn0EmpyLAbqwFJw0g+BFmXZDgYUKFzB20MQdoCN37vWCn0DHC0502IC25Do7wVVt4XsO9vYDjV40+trdEVpnOHv4QTJ3KBaayg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=RIIokNeC; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-73712952e1cso147835b3a.1
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:53:34 -0700 (PDT)
+	s=arc-20240116; t=1746032319; c=relaxed/simple;
+	bh=MVzV0b03ifPMAQ1TmUhGpIYIbToVjVggup774KrQO34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cEPfcNf3sjPDB8tYnpVkV3IaLmAkLgSrRhBNYGqqiD/k7PlHkoZzNXzm/7oP/tJJvRVrrrKfdSxEzBWdWQrY0N8mIb4c8qy2qWO/xOtwWDSlFhSmLOSAZjiFx314BweW2RtDZ6vCCMCwevMmx4Rof6aKRZzIT1i9KYZR/GlTDg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tc5nYqWY; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2240aad70f2so20505ad.0
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:58:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1746032014; x=1746636814; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lb1G8E4eXsJcf046Vl0RQBeGECFD75fJKtaKk5HRkJE=;
-        b=RIIokNeCdGgf/PqWdeA88hmg+3qHAn0/Hu7EohQ71mwyV3yvCSWcW29XXQa3+HJUqU
-         XIOTQdIILBCvb46L/m9IEPc5YTGVDherzFFspVZ4WciTWCgNZ0vjgPVD1D7H0C28/zZu
-         Cs/a34q6MniGLZ/7tnBngUP/VoUhqUdmD+/Ts=
+        d=google.com; s=20230601; t=1746032317; x=1746637117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QfchzJA/myuq6yLs9cewuhb35n7v6x7R/JKXR7PgTYI=;
+        b=Tc5nYqWY/E04+ibRs2alcY4MsgXfiPkG8SIWTWVw/ecQ92+MSHxxXX2Dey4zHpyCJ4
+         Pm0yh9Oc7Gh3Sa48WsEflQui/fdYTly3iaXkZLFTbjLrfsoOJ/3Cdme9xQVGR3R8Tu/E
+         v4RG68mSh+qduwZzQUqIlGFfh9+NkLy67ELsh9MH1sMHT0FDpmQRiwN5jk2ZQ3HxPidV
+         /YYfSJJ0zz2ugcCGEpJEX4kTr6LOfN0ZqrHTWpjquUyda1nmfjXVvmv+QQCnX7xJBQAA
+         Dn/WjQbs+vVKsarvMM7EOp8RJTTDSa1B53UT4ZCNRte9bYmTrzwGxmxHUouXWdl8hzT9
+         M6Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746032014; x=1746636814;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Lb1G8E4eXsJcf046Vl0RQBeGECFD75fJKtaKk5HRkJE=;
-        b=ZVXbJJXvi2FcnAV3QH+TNhhd6HgUsCD49pioiuBGYhKXCyP5+tgnwtOQKDFjaRWmDU
-         u5jgg4DkbrGn72ARHPfZ8/d567G7DAFPcYhZ5+cSGWasmskrn8/NFPFUMESV3Z5Sa5Dd
-         UXz0Fi4jAzCp2z2CwiBujMpEXuZrCtXMCQHoE8urQLDiZ/j6MhtABEzxrrywBWVzp+1g
-         c+1FJnxBO6AJV3hFg076UdGLjBq+3/J+ozrTnY1p5QTHYUXmBRjvCWCv2oa2X75OvEEJ
-         aYa/VoXgf0EEBUkTMmKShm0UHLtSSxvB5kCd9iTem6+T/mV9wnEuDX4cWEybAMUQUXFO
-         k9jw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbNtJlHAExIOT7S09zFAvAFkK8qejeWBySQZwOobPwMxb+lUrMyxjS/sY5mgY+0N1aqPzosoA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJsuE0kShG38BPRPm5HQ6/dKKZnfDZt4iwjXX3i44FE+t8PDlM
-	Myr7zjVjvalzNirF7Vy/kbvSE1ArcB4I5JKiHX81Iq59NzY+NYE1YSbT0MJ6n+I=
-X-Gm-Gg: ASbGncvdQwFNwUOSSUji5DC0fRm0fBCNWAi8mAVLqe6V5rsja9SwNKHa5DZP4aFVajq
-	OrShaA1Efx0TRoHeWLuSmceomcyxEydhq06ybKr5mrYZuj6Uq2jkX2tgnpuWB+fRlyqT92tH48O
-	wWDbIg8nd9+RCsNklnS+hF3u4GMo1JhqF15gwU/abCwhvztBTe2BGTJozDCmvDSVOxHhEgm8Fbp
-	dxlXKSHXdD9WPM3s6mM+THvHAalAaoayw4Nh3S/FAHpA9Wkh9WTyBn2c5W83vsKqoFqkg0yvisI
-	THhLyIPzNLWuvL3sUxxfdUm84yoQgzsgYlPTK+teE0zji6a6F4QRtu1sMTg6QFd2d0oXlv+mhCX
-	ywXjWwKg=
-X-Google-Smtp-Source: AGHT+IHVrN7jDRElfevrLfPVr8B/9yKIO4w3xiNQiHtti3lP8Hy9IlcVEfHCgXSCmpVIo5BipxuPYw==
-X-Received: by 2002:a05:6a00:4b05:b0:736:ff65:3fcc with SMTP id d2e1a72fcca58-7403a811bbfmr5175385b3a.16.1746032014058;
-        Wed, 30 Apr 2025 09:53:34 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740398f975fsm1896375b3a.6.2025.04.30.09.53.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 09:53:33 -0700 (PDT)
-Date: Wed, 30 Apr 2025 09:53:31 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v6] Add support to set napi threaded for
- individual napi
-Message-ID: <aBJVi0LmwqAtQxv_@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-References: <20250429222656.936279-1-skhawaja@google.com>
- <aBFnU2Gs0nRZbaKw@LQ3V64L9R2>
- <CAAywjhQZDd2rJiF35iyYqMd86zzgDbLVinfEcva0b1=6tne3Pg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1746032317; x=1746637117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QfchzJA/myuq6yLs9cewuhb35n7v6x7R/JKXR7PgTYI=;
+        b=IqGlU4B0QS9L+QOu8TvJtpQ2A/9hDW7UMY7o7blYVDe/u90IJsKMF8choP8CHIgAY5
+         Gsv+SZL2xnqPW4uyZtDDOW7obaUco086HFzYb3zitsRh1fL6zr/INmA7h3h+lG9jd6w2
+         iutIimcBntsm1XkorexU/h1Zlo2/XZhn2lFl/+1zIcp2yGOClsRxwHex1HxtImOWRZVM
+         fuS2IqrSA0uXMFvIG0IIfCsNnpzxbOS5UyCrmxImb4MyWJXspFz0YvzzFgRKxIdnbBZW
+         gxGBndyCIeVwVNFtV4C/3SQKZSgYNkJBLUsv5kq1G2Rmghi3WC8z213OVGdAyW0YyluC
+         Eu9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWTpQ21BSyJHlhQobCXOxrkdB88u90CpihHaAcgMhTFOSB4oqKP9cUlciLKNmtU4xTlXiq/gHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQPp3ZmNxeyXJUTT8VifgoljuxTm/p70bKJSCYDfb5bLdoNjMW
+	2H1A6IuR/G1j/MciXoEMMLdJghniE43jXGIDTxE65sI3ooTe5utpdLOg6ExOpiZThgvvZjpb5jV
+	Uqi0FaZRjbGv0UlrNBrESUDhZyMDnvbOuYeKI5WgNiWxYf1rTsE9TB/0=
+X-Gm-Gg: ASbGncvt4vT9tUY5GARhM6g71R6+zVbX/0uhDaSu5kSp8gKHR2gkUB+pRhcBlZMdRVJ
+	nSOM4Dab1Zm4is3CWVa3mLDpWdztt4T+ujZhn2OLYxjshUFcXeAgj7SuRrZiAD0Jc3WvNHYXJQm
+	F+QgLHQWznvJq1CI57U2s1+YYJmbXt3LCKXM9enII/cI/NC9jV+Z1EhGlmz3oQi+83bQ==
+X-Google-Smtp-Source: AGHT+IEVViSpziJMseHnj0B3GL7cVDNyLuOt4tmw9cGc1bfsfvD7CvavwPJG7JGB4Tr0Cbtev5FxEU2b3wS6UCC8D2Q=
+X-Received: by 2002:a17:903:2f8e:b0:21f:2ded:bfa0 with SMTP id
+ d9443c01a7336-22df548f145mr3153565ad.25.1746032316939; Wed, 30 Apr 2025
+ 09:58:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAywjhQZDd2rJiF35iyYqMd86zzgDbLVinfEcva0b1=6tne3Pg@mail.gmail.com>
+References: <20250424200222.2602990-1-skhawaja@google.com> <52e7cf72-6655-49ed-984c-44bd1ecb0d95@uwaterloo.ca>
+ <db35fe8a-05c3-4227-9b2b-eeca8b7cb75a@uwaterloo.ca>
+In-Reply-To: <db35fe8a-05c3-4227-9b2b-eeca8b7cb75a@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Wed, 30 Apr 2025 09:58:25 -0700
+X-Gm-Features: ATxdqUGeBnklRp3cE4m4aX9xT8yRCSCLgZ9s5PYoIfDsl0wNEEFsj--i1vBNjQ0
+Message-ID: <CAAywjhRM8wd67DwUttU76+6KrKUki-w9hgkbVskhVG+nJ4JNig@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 0/4] Add support to do threaded napi busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, jdamato@fastly.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 29, 2025 at 06:16:29PM -0700, Samiullah Khawaja wrote:
-> On Tue, Apr 29, 2025 at 4:57 PM Joe Damato <jdamato@fastly.com> wrote:
+On Wed, Apr 30, 2025 at 8:23=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo.=
+ca> wrote:
+>
+> On 2025-04-28 09:50, Martin Karsten wrote:
+> > On 2025-04-24 16:02, Samiullah Khawaja wrote:
+>
+> [snip]
+>
+> >> | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NAPI
+> >> threaded |
+> >> |---|---|---|---|---|
+> >> | 12 Kpkt/s + 0us delay | | | | |
+> >> |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
+> >> |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
+> >> |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
+> >> |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
+> >> | 32 Kpkt/s + 30us delay | | | | |
+> >> |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
+> >> |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
+> >> |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
+> >> |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
+> >> | 125 Kpkt/s + 6us delay | | | | |
+> >> |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
+> >> |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
+> >> |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
+> >> |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
+> >> | 12 Kpkt/s + 78us delay | | | | |
+> >> |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
+> >> |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
+> >> |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
+> >> |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
+> >> | 25 Kpkt/s + 38us delay | | | | |
+> >> |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
+> >> |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
+> >> |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
+> >> |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
+> >>
+> >>   ## Observations
+> >>
+> >> - Here without application processing all the approaches give the same
+> >>    latency within 1usecs range and NAPI threaded gives minimum latency=
+.
+> >> - With application processing the latency increases by 3-4usecs when
+> >>    doing inline polling.
+> >> - Using a dedicated core to drive napi polling keeps the latency same
+> >>    even with application processing. This is observed both in userspac=
+e
+> >>    and threaded napi (in kernel).
+> >> - Using napi threaded polling in kernel gives lower latency by
+> >>    1-1.5usecs as compared to userspace driven polling in separate core=
+.
+> >> - With application processing userspace will get the packet from recv
+> >>    ring and spend some time doing application processing and then do n=
+api
+> >>    polling. While application processing is happening a dedicated core
+> >>    doing napi polling can pull the packet of the NAPI RX queue and
+> >>    populate the AF_XDP recv ring. This means that when the application
+> >>    thread is done with application processing it has new packets ready=
+ to
+> >>    recv and process in recv ring.
+> >> - Napi threaded busy polling in the kernel with a dedicated core gives
+> >>    the consistent P5-P99 latency.
+> > I've experimented with this some more. I can confirm latency savings of
+> > about 1 usec arising from busy-looping a NAPI thread on a dedicated cor=
+e
+> > when compared to in-thread busy-polling. A few more comments:
+Thanks for the experiments and reproducing this. I really appreciate it.
 > >
-> > On Tue, Apr 29, 2025 at 10:26:56PM +0000, Samiullah Khawaja wrote:
+> > 1) I note that the experiment results above show that 'interrupts' is
+> > almost as fast as 'NAPI threaded' in the base case. I cannot confirm
+> > these results, because I currently only have (very) old hardware
+> > available for testing. However, these results worry me in terms of
+> > necessity of the threaded busy-polling mechanism - also see Item 4) bel=
+ow.
+>
+> I want to add one more thought, just to spell this out explicitly:
+> Assuming the latency benefits result from better cache utilization of
+> two shorter processing loops (NAPI and application) using a dedicated
+> core each, it would make sense to see softirq processing on the NAPI
+> core being almost as fast. While there might be small penalty for the
+> initial hardware interrupt, the following softirq processing does not
+The interrupt experiment in the last row demonstrates the penalty you
+mentioned. While this effect might be acceptable for some use cases,
+it could be problematic in scenarios sensitive to jitter (P99
+latency).
+> differ much from what a NAPI spin-loop does? The experiments seem to
+> corroborate this, because latency results for 'interrupts' and 'NAPI
+> threaded' are extremely close.
+>
+> In this case, it would be essential that interrupt handling happens on a
+> dedicated empty core, so it can react to hardware interrupts right away
+> and its local cache isn't dirtied by other code than softirq processing.
+> While this also means dedicating a entire core to NAPI processing, at
+> least the core wouldn't have to spin all the time, hopefully reducing
+> power consumption and heat generation.
+>
+> Thanks,
+> Martin
+> > 2) The experiments reported here are symmetric in that they use the sam=
+e
+> > polling variant at both the client and the server. When mixing things u=
+p
+> > by combining different polling variants, it becomes clear that the
+> > latency savings are split between both ends. The total savings of 1 use=
+c
+> > are thus a combination of 0.5 usec are either end. So the ultimate
+> > trade-off is 0.5 usec latency gain for burning 1 core.
 > >
-> > > v6:
-> > >  - Set the threaded property at device level even if the currently set
-> > >    value is same. This is to override any per napi settings. Update
-> > >    selftest to verify this scenario.
-> > >  - Use u8 instead of uint in netdev_nl_napi_set_config implementation.
-> > >  - Extend the selftest to verify the existing behaviour that the PID
-> > >    stays valid once threaded napi is enabled. It stays valid even after
-> > >    disabling the threaded napi. Also verify that the same kthread(PID)
-> > >    is reused when threaded napi is enabled again. Will keep this
-> > >    behaviour as based on the discussion on v5.
+> > 3) I believe the savings arise from running two tight loops (separate
+> > NAPI and application) instead of one longer loop. The shorter loops
+> > likely result in better cache utilization on their respective dedicated
+> > cores (and L1 caches). However I am not sure right how to explicitly
+> > confirm this.
 > >
-> > This doesn't address the feedback from Jakub in the v5 [1] [2]:
+> > 4) I still believe that the additional experiments with setting both
+> > delay and period are meaningless. They create corner cases where rate *
+> > delay is about 1. Nobody would run a latency-critical system at 100%
+> > load. I also note that the experiment program xsk_rr fails when trying
+> > to increase the load beyond saturation (client fails with 'xsk_rr:
+> > oustanding array full').
 > >
-> >  - Jakub said the netlink attributes need to make sense from day 1.
-> >    Threaded = 0 and pid = 1234 does not make sense, and
-> Jakub mentioned following in v5 and that is the existing behaviour:
-> ```
-> That part I think needs to stay as is, the thread can be started and
-> stopped on napi_add / del, IMO.
-> ```
-> Please see my reply to him in v5 also to confirm this. I also quoted
-> the original reason, when this was added, behind not doing
-> kthread_stop when unsetting napi threaded.
-
-Here's what [2] says:
-
-  We need to handle the case Joe pointed out. The new Netlink attributes
-  must make sense from day 1. I think it will be cleanest to work on
-  killing the thread first, but it can be a separate series.
-
-In this v6 as I understand it, it is possible to get:
-
-    threaded = 0
-    pid = 1234
-
-I don't think that makes sense and it goes against my interpretation
-of Jakub's message which seemed clear to me that this must be fixed.
-
-If you disagree and think my interpretation of what Jakub said
-is off, we can let him weigh in again.
-
+> > 5) I worry that a mechanism like this might be misinterpreted as some
+> > kind of magic wand for improving performance and might end up being use=
+d
+> > in practice and cause substantial overhead without much gain. If
+> > accepted, I would hope that this will be documented very clearly and
+> > have appropriate warnings attached. Given that the patch cover letter i=
+s
+> > often used as a basis for documentation, I believe this should be
+> > spelled out in the cover letter.
 > >
-> >  - The thread should be started and stopped.
+> > With the above in mind, someone else will need to judge whether (at
+> > most) 0.5 usec for burning a core is a worthy enough trade-off to
+> > justify inclusion of this mechanism. Maybe someone else can take a
+> > closer look at the 'interrupts' variant on modern hardware.
 > >
-> > [1]: https://lore.kernel.org/netdev/20250425201220.58bf25d7@kernel.org/
-> > [2]: https://lore.kernel.org/netdev/20250428112306.62ff198b@kernel.org/
+> > Thanks,
+> > Martin
+>
 
