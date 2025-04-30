@@ -1,156 +1,206 @@
-Return-Path: <netdev+bounces-186961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79B9AA45B7
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:42:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46362AA45CD
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB07C4E3C96
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:42:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8932C188D39A
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55548219307;
-	Wed, 30 Apr 2025 08:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F70219E8C;
+	Wed, 30 Apr 2025 08:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="RJT6OmDA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmiWafS3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56719213E85;
-	Wed, 30 Apr 2025 08:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7A02192E3;
+	Wed, 30 Apr 2025 08:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746002530; cv=none; b=inDGjJeOW0iuFqDkoRJjAtUPOzMU4XjN0bT44DEkvw+nM48O6s/LuZXFIdwXTvK6Mi49J8K7xr17CHD82cyzjIZIbBJRDI2eWql6X2cOmRTZkQ+o1ZxLEbfMjGsZxSpsrboE9BlqsekuBeZAe1CUFbLVOeQdpcaAGkJEbN2f6IY=
+	t=1746002635; cv=none; b=VP8QAp/EzBYqCTM67kOZtiZUZtPR0Z/nd+/evpN89f9+jg0d/mEuDg4LY8LMi10muYw8L3U8p03AWvxWE2uCeVphkPjBTu6PSm4/HiZADwYeEuq8mVm3TSjvruXq8k3v1B+wDkrNcrtLx4CMQxpf8vPPl6g2hNszr+6j85jMKa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746002530; c=relaxed/simple;
-	bh=opIdtlH9FxubqDCmTmFXZCwSpsZlw8Xv63oX88tUBpI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aryEQfYEQh31biNJ/NJEkuP44U6yyLLWcgphbERSlc4KDGZH7p2mSAoXaZzfNqV0K235mgtkO54Jh7vD4k+yzmtvyrEtiTdhmC5h6Tr5Mnbcdj1eYwNsAxek4qzNtnYdWKTxTEpSuaQzneMNLaiPnEm6he8b7wo1zHcwEumMFo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=RJT6OmDA; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53U8f73s812541
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 30 Apr 2025 01:41:07 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53U8f73s812541
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1746002472;
-	bh=2/QHRN+D8/djEoWuIZIlllhMwAZHSg2wUWQdlu6s4Ik=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RJT6OmDAoNn/cc5MacwB1vC5wQ1M64qGWRanjOVN66rVpkGlXaLeGE7PE7eD7mISD
-	 /dIdmza3K+wfDZyQexgmDwpxPQNN4+/Fbw41fhxlT3K0uT/PJjyGzdwaAn+yyr9k0A
-	 CWJPVsS03uahIX8JX2uLwg3Z3hye2BZ7LId8jWJUQAdh/it1N65JzEiy3LsHYL9aJT
-	 C68Y5ccPbfaA9gH+J9F27HnzlVWkht45bvdBotMjohzZpoa3XaE99KXAA3Fc4+U100
-	 OtHQ9EQb/i6ZeoBsZ7v43PfIbFra7Pd1cFeKQ0RpDx0DYLCFE4fbEUVwSoFN8jeJCO
-	 fS0vj6MT1+Cdw==
-Message-ID: <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
-Date: Wed, 30 Apr 2025 01:41:06 -0700
+	s=arc-20240116; t=1746002635; c=relaxed/simple;
+	bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eWbBOURzvNn1J8wBnE7fapfUlykssKlr8nulk03waErAUMbxzG4GmuYYgj+n8Ou+P0+Z0CBsp9wdlMZntjQlE0ls2GGTX3hTV//P21Qbe83hbvyvN9tJUSi/KYl4whQVjZHRG28+64HAu50rWIkFoJBRuGmJ6mxTv4twcBcpd6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GmiWafS3; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e63a159525bso5874348276.2;
+        Wed, 30 Apr 2025 01:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746002631; x=1746607431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
+        b=GmiWafS3V7c8bjXlbk4OxAgBNgMdMDRL4V0Vw+CPlm5DNTXxIcss9IxS8NzF0tjYnj
+         9iqxKJh3IZfR9VFEZVfrw+jC6bIVJby0N506XXM/QiWSUTCKAM9OKM3bfLQM/VKdVH48
+         NyTyUH3MNiczNSx6BoEU2aNnJgyhNmoADQIG2ITsmP+uOl/yPCznPExhvJnh1zOvKkQF
+         gP6dfMQJBop2vdSldCvpKxIdQ99KCYSdgRqipz2Wiwru7PUIIXgfNE0y0NXhiJbSpbWM
+         jFARAN0JdouirBgMlFe6nB090TgqQyYAqcuEjW6QKe1lnPP4hfhfXBj7qjM+Mxk/kwi4
+         1eXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746002631; x=1746607431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
+        b=i6WgjYscued8SlUcFxRfM0BpmqPOJCo1fNCVNUEOu/7jrhFZM96eDA+rR3G01/7xwI
+         sK7yaj+WkWpVmL6SaV9qkLSZrW8P9L7CnEyLDaGYM7cFHw04JUL2f93Te5gLdvkqmc/J
+         ySjuz6qK9nBIsdhRT6R6w1YJsR/OdHyieoIbi3U9G05HMk9yaKromfYax/FXi+Mv9JEE
+         3DF2jBqqQJpIuuwS21HDgKo83rJ21wWDjZMAlXmTJL0vTHH02UfjWXuHfM8LzoxPCqM9
+         0R3oK2TTF+eITyrHyNYEOmY3tmiPuxkogB7ECnUp/xXS3upQ0jX9TZLu3sjxO94rfWTK
+         Zfug==
+X-Forwarded-Encrypted: i=1; AJvYcCV5EjUD5/8tJMBqYyCiHWVuyr6oibeOIhpsOanUrQrgpDRt01BdrPOwUZmkXFnJIsPccx+IJ/qu@vger.kernel.org, AJvYcCVXCmj4KE3bseheJIAZH7j0iD2QsIDUAgSF8N+8RE1/kW4+IJSQ+Be4rZPncdhyqz6Qo7bjSFJiRO3GyOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9kLQGf+e2FwoyZBORxOD7eThievN0pZW58ftwY/vRprY45z1b
+	NVkRfx46lKVNjPtFEz8QFPLM/wL86y3NNtLN/Wc9frO9rkL00yDLD78aiOb11YXDp6Gd+ohNZCt
+	CjGHfVsimp+nMVXfXvtkFYUhCIBY=
+X-Gm-Gg: ASbGncvEUssB0Frz6ztSerWXM+164AMVPCkc7RhE6J5ttM/rnL83JlWUkySXu+Zk6uE
+	+8EIjfCGkFsKm5qFhS/8uMXhwlPLaXkZpG/H98n8sOmGRrhFLW3eTvpOBdeA+gmvdRjYTauD42b
+	8kODWEd33gQuI8NCHoUyw=
+X-Google-Smtp-Source: AGHT+IEhkfAwWL8fVju4Lkb0QFOaKJJL8P4xY667SzVOwX2PIzzJstixARlzcso7JHOoO0ZjEw+VVPDctr4hEApCZ3s=
+X-Received: by 2002:a05:6902:a86:b0:e73:91a:9311 with SMTP id
+ 3f1490d57ef6-e73ea21119cmr2996051276.6.1746002631281; Wed, 30 Apr 2025
+ 01:43:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/15] x86/msr: Add missing includes of <asm/msr.h>
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com,
-        dapeng1.mi@linux.intel.com
-References: <20250427092027.1598740-1-xin@zytor.com>
- <20250427092027.1598740-2-xin@zytor.com>
- <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250429201710.330937-1-jonas.gorski@gmail.com> <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
+In-Reply-To: <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Wed, 30 Apr 2025 10:43:40 +0200
+X-Gm-Features: ATxdqUFI7CkDXiAPdAxAFb4q56LGJGrb1AR7EqNZNEXKnpODFXQ2kT5IcrZ2LP8
+Message-ID: <CAOiHx=n_f9CXZf_x1Rd36Fm5ELFd03a9vbLe+wUqWajfaSY5jg@mail.gmail.com>
+Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Russell King <linux@armlinux.org.uk>, Kurt Kanzenbach <kurt@linutronix.de>, 
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/29/2025 2:45 AM, Ilpo Järvinen wrote:
->>   arch/x86/events/msr.c                                         | 3 +++
->>   arch/x86/events/perf_event.h                                  | 1 +
->>   arch/x86/events/probe.c                                       | 2 ++
-> Under arch/x86/events/ a few files seem to be missing the include?
+On Wed, Apr 30, 2025 at 10:07=E2=80=AFAM Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+>
+>
+>
+> On 4/29/2025 10:16 PM, Jonas Gorski wrote:
+> > This patchset aims at fixing most issues observed while running the
+> > vlan_unaware_bridge, vlan_aware_bridge and local_termination selftests.
+> >
+> > Most tests succeed with these patches on BCM53115, connected to a
+> > BCM6368.
+> >
+> > It took me a while to figure out that a lot of tests will fail if all
+> > ports have the same MAC address, as the switches drop any frames with
+> > DA =3D=3D SA. Luckily BCM63XX boards often have enough MACs allocated f=
+or
+> > all ports, so I just needed to assign them.
+> >
+> > The still failing tests are:
+> >
+> > FDB learning, both vlan aware aware and unaware:
+> >
+> > This is expected, as b53 currently does not implement changing the
+> > ageing time, and both the bridge code and DSA ignore that, so the
+> > learned entries don't age out as expected.
+> >
+> > ping and ping6 in vlan unaware:
+> >
+> > These fail because of the now fixed learning, the switch trying to
+> > forward packet ingressing on one of the standalone ports to the learned
+> > port of the mac address when the packets ingressed on the bridged port.
+>
+> Sorry not quite getting that part, can you expand a bit more?
 
+The ping test uses four network ports, where two pairs are linked via
+a network cable. So the setup is
 
-Most C files in arch/x86/events/ include arch/x86/events/perf_event.h,
-thus they don't need to include <asm/msr.h> directly once
-arch/x86/events/perf_event.h includes <asm/msr.h>, and this patch does
-that.
+sw1p1 <- cable -> sw1p2 <- bridge -> sw1p3 <- cable ->sw1p4
 
+And it tries to ping from sw1p1 to sw1p4.
 
-The following files include arch/x86/events/intel/uncore.h which 
-includes arch/x86/events/perf_event.h, thus no change needed:
-     arch/x86/events/intel/uncore.c
-     arch/x86/events/intel/uncore_discovery.c
-     arch/x86/events/intel/uncore_nhmex.c
-     arch/x86/events/intel/uncore_snb.c
-     arch/x86/events/intel/uncore_snbep.c
+In the vlan_aware test, the bridge uses VLAN 1 pvid untagged, so it
+learns in VLAN 1, while the standalone ports use VLAN 0. Different
+FIDs, so no issue.
 
-The following 2 files don't include arch/x86/events/perf_event.h so they
-include <asm/msr.h> directly with this patch:
-     arch/x86/events/msr.c
-     arch/x86/events/probe.c
+In the vlan_unaware test, untagged traffic uses VLAN 0 everywhere, so
+the following happens:
 
-arch/x86/events/amd/uncore.c doesn't include
-arch/x86/events/perf_event.h but includes <asm/msr.h> already.
+- switch learns swp1p's MAC at sw1p2
+- switch learns sw1p4's MAC at sw1p3
 
+when sw1p1 sends a unicast to sw1p4' mac it egresses on swp1p3 and
+then ingresses on sw1p4 again. The switch see's sw1p2's MAC as DA and
+then ARL lookup says "sw1p3", but the port VLAN mask disallows sending
+from sw1p4 to sw1p3, so it gets dropped.
 
-So we are good in this directory, but it should be a separate patch with
-the above explanation then.
+Without learning, all packets are flooded, so connectivity works, as
+the standalone ports are always part of the flood masks.
 
+> > The port VLAN masks only prevent forwarding to other ports, but the ARL
+> > lookup will still happen, and the packet gets dropped because the port
+> > isn't allowed to forward there.
+>
+> OK.
+>
+> >
+> > I have a fix/workaround for that, but as it is a bit more controversial
+> > and makes use of an unrelated feature, I decided to hold off from that
+> > and post it later.
+>
+> Can you expand on the fix/workaround you have?
 
+It's setting EAP mode to simplified on standalone ports, where it
+redirects all frames to the CPU port where there is no matching ARL
+entry for that SA and port. That should work on everything semi recent
+(including BCM63XX), and should work regardless of VLAN. It might
+cause more traffic than expected to be sent to the switch, as I'm not
+sure if multicast filtering would still work (not that I'm sure that
+it currently works lol).
+
+At first I moved standalone ports to VID 4095 for untagged traffic,
+but that only fixed the issue for untagged traffic, and you would have
+had the same issue again when using VLAN uppers. And VLAN uppers have
+the same issue on vlan aware bridges, so the above would be a more
+complete workaround.
+
+> > This wasn't noticed so far, because learning was never working in VLAN
+> > unaware mode, so the traffic was always broadcast (which sidesteps the
+> > issue).
+> >
+> > Finally some of the multicast tests from local_termination fail, where
+> > the reception worked except it shouldn't. This doesn't seem to me as a
+> > super serious issue, so I didn't attempt to debug/fix these yet.
+> >
+> > I'm not super confident I didn't break sf2 along the way, but I did
+> > compile test and tried to find ways it cause issues (I failed to find
+> > any). I hope Florian will tell me.
+>
+> I am currently out of the office but intend to test your patch series at
+> some point in the next few days. Let's gather some review feedback in
+> the meantime, thanks for submitting those fixes!
+
+If you are awake at this hour I guess your are back "home" ;-)
+
+Sure thing, take your time! All I wanted to implement is MST support,
+but then I noticed some things not working as expected, and then I
+became aware of the selftests, and then I suddenly had accumulated a
+lot of fixes trying to make everything say "Okay" (and sometimes
+wondering why other stuff broke when I fixed things, like the learning
+in unaware mode).
+
+Best regards,
+Jonas
 
