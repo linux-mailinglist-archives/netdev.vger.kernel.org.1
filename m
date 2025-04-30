@@ -1,136 +1,91 @@
-Return-Path: <netdev+bounces-187089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D47AA4DF9
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:57:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC14AA4E04
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:02:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63C981BA7F48
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 13:57:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F5ED4E4368
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2DC25332B;
-	Wed, 30 Apr 2025 13:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B642512D9;
+	Wed, 30 Apr 2025 14:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+7uvLIb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvgqftpJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB945111AD;
-	Wed, 30 Apr 2025 13:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1427101E6;
+	Wed, 30 Apr 2025 14:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746021460; cv=none; b=nAN1Mg5ACu5mwWKr5CTMhUX/VZWn5yYsD/9Q5G3YWg0H/ZwxVImt8h9jNt7EJnrQdQcsQ/qRv/e/tRhNFBChJFnzM5b5akDOUm3kfB+FWjodg2KQCvYf6GtCrDCtjCSzyoBTr2Y40RHKZ2PYVETm07ke1gAAJoX0mj9UtMZ9D40=
+	t=1746021727; cv=none; b=gYTyWExmPwACgjGNZvKc1chXBJZM+SUjUDd8MNGyh5T6b+hOvbWpIYqgfeKdmMAolxF+mKjLxo9ML5is2PErUfMcfceY9j414+cbkx3913CAgLtVDBL107Gjls4uMDYYJe0I3TxbVIaxsdY/lyVzPi/EqFocaAxpeBUqa3eA5i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746021460; c=relaxed/simple;
-	bh=+c9XrTAN8J1a90cuN4IhW/qyLi+qE6W0bg5bOqCAlB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pxWzG0uazgJQvMUW0MLLxQgceJAzZNjjU2hvf87Tf8rV8uZGxVFFCDmYf5A+HfHbrXOgN/auJUHdHGj9/K+Ylb/gLmDpGVxhWkfPlZW93dHA55taamWKfM+yMKFnKS5lViAYaWBmJsNuOVbNkZWogbNVoaSgSnj9PfmekXeEs0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+7uvLIb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82854C4CEE7;
-	Wed, 30 Apr 2025 13:57:37 +0000 (UTC)
+	s=arc-20240116; t=1746021727; c=relaxed/simple;
+	bh=NAsBTwFVPS7juHrtzSxt4siydlB9BQ3vucA7U6SK+vA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EJ5Jqq3j5bPg2KDblZBq9ogSH0A7pqoqg7JIQj8n/C//uHHZCeAyvRRzXA2ySG5MIHQbZRFaY7/y0fXW1iGR3iCY8QgHOSt8VFp3wqfnT3JirZeyjPmfplaecMpt8kmTiFXNER7L2LjfXd1uzRasnimOIlVcnYnZmrxzz/fdYyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvgqftpJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFE96C4CEE9;
+	Wed, 30 Apr 2025 14:02:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746021460;
-	bh=+c9XrTAN8J1a90cuN4IhW/qyLi+qE6W0bg5bOqCAlB8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F+7uvLIbzzz0tyb4YaSAQyP3nNcZEdkL0GeoB5t0U/MTRTgnYc1jvuEl46aBl2L8d
-	 I8vcAzXIaYTpJ1X9KoasxyyxAPN5q/ChRr331Qv2IhG7Zzn5B8wQpe2I0e7WmqyT2k
-	 CS8+HwXBouvE8BuHIj0MapvQhbkPeT4c+CPBs/MuFssM1PiQbeVzxyBRECwaaiu54f
-	 f30VeDzp/piBILyJ1MlYs4QT4g+SXwVjGmBi6DWMkvFC2uYM+XrID3Q9YHvIN3kcqX
-	 VRXs83zOC09WtD1Jn/mlIWKApzzA3gYnMEPYGNQ67eI3VN4cJtutAQtFliGRF1IHFV
-	 +CswkjC5mCRHA==
-Date: Wed, 30 Apr 2025 14:57:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, mst@redhat.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, hawk@kernel.org, john.fastabend@gmail.com,
-	virtualization@lists.linux.dev, minhquangbui99@gmail.com
-Subject: Re: [PATCH net] virtio-net: free xsk_buffs on error in
- virtnet_xsk_pool_enable()
-Message-ID: <20250430135735.GU3339421@horms.kernel.org>
-References: <20250429164323.2637891-1-kuba@kernel.org>
+	s=k20201202; t=1746021727;
+	bh=NAsBTwFVPS7juHrtzSxt4siydlB9BQ3vucA7U6SK+vA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kvgqftpJMvJpu9PJtUkOaSz8xWn3mKJstUFpQ3lxq/kDq1xPACnGu4abv2xmw1Z9W
+	 +8xXHHWbzag+YinvB5rN84JlkZ0fNDE6YHyapOC8PO/bwOFvtEK+RZZTA31yUQLhFI
+	 pbXhaZRqE2U2HAzyODxwfEX5LjxIwe9gp6rxfqWwDXFMbJa6POzYZG2K0HmkG6AnvE
+	 BqMdV9BLN52W2PFWamzRT2N2rn+pL5ZPbcKc3VZICvrTHDQPBxYn8Ui0e98IbzmJl+
+	 PmTOXzpmYuKqA2ocqFtVusfUyfhQpyy9enUDHurLPpxULTkOiLFzuiboze+85o1qhc
+	 hB/M6J25SjLEg==
+Date: Wed, 30 Apr 2025 07:02:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, minhquangbui99@gmail.com, romieu@fr.zoreil.com,
+ kuniyu@amazon.com, virtualization@lists.linux.dev
+Subject: Re: [PATCH net] virtio-net: don't re-enable refill work too early
+ when NAPI is disabled
+Message-ID: <20250430070205.09a4ea5d@kernel.org>
+In-Reply-To: <20250430012856-mutt-send-email-mst@kernel.org>
+References: <20250429143104.2576553-1-kuba@kernel.org>
+	<CACGkMEs0LuLDdEphRcdmKthdJeNAJzHBqKTe8Euhm2adOS=k2w@mail.gmail.com>
+	<20250430012856-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250429164323.2637891-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 29, 2025 at 09:43:23AM -0700, Jakub Kicinski wrote:
-> The selftests added to our CI by Bui Quang Minh recently reveals
-> that there is a mem leak on the error path of virtnet_xsk_pool_enable():
+On Wed, 30 Apr 2025 01:29:06 -0400 Michael S. Tsirkin wrote:
+> > > @@ -3728,7 +3731,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+> > >  succ:
+> > >         vi->curr_queue_pairs = queue_pairs;
+> > >         /* virtnet_open() will refill when device is going to up. */
+> > > -       if (dev->flags & IFF_UP)
+> > > +       if (dev->flags & IFF_UP && vi->refill_enabled)
+> > >                 schedule_delayed_work(&vi->refill, 0);  
+> > 
+> > This has the assumption that the toggle of the refill_enabled is under
+> > RTNL.
+
+Yes, this line of code must be under rtnl_lock to be correct, since 
+it is also checking flags & IFF_UP. I was thinking of moving it to
+virtnet_restore(), AFAIU that's the only place that needs it.
+But that's more of a -next change.
+
+> > Though it's true now but it looks to me it's better to protect
+> > it against refill_lock.
 > 
-> unreferenced object 0xffff88800a68a000 (size 2048):
->   comm "xdp_helper", pid 318, jiffies 4294692778
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 0):
->     __kvmalloc_node_noprof+0x402/0x570
->     virtnet_xsk_pool_enable+0x293/0x6a0 (drivers/net/virtio_net.c:5882)
->     xp_assign_dev+0x369/0x670 (net/xdp/xsk_buff_pool.c:226)
->     xsk_bind+0x6a5/0x1ae0
->     __sys_bind+0x15e/0x230
->     __x64_sys_bind+0x72/0xb0
->     do_syscall_64+0xc1/0x1d0
->     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: e9f3962441c0 ("virtio_net: xsk: rx: support fill with xsk buffer")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: mst@redhat.com
-> CC: jasowang@redhat.com
-> CC: xuanzhuo@linux.alibaba.com
-> CC: eperezma@redhat.com
-> CC: hawk@kernel.org
-> CC: john.fastabend@gmail.com
-> CC: virtualization@lists.linux.dev
-> CC: minhquangbui99@gmail.com
-> ---
->  drivers/net/virtio_net.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 848fab51dfa1..a3d4e666c2a0 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -5886,7 +5886,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
->  	hdr_dma = virtqueue_dma_map_single_attrs(sq->vq, &xsk_hdr, vi->hdr_len,
->  						 DMA_TO_DEVICE, 0);
->  	if (virtqueue_dma_mapping_error(sq->vq, hdr_dma))
-> -		return -ENOMEM;
+> Good point.
 
-Hi Jakub,
-
-I think you need the following here:
-
-		err = -ENOMEM;
-
-Else err is uninitialised when jumping to the err_free_buffs label.
-
-Flagged by clang 20.1.3 [-Wsometimes-uninitialized], and Smatch.
-
-> +		goto err_free_buffs;
->  
->  	err = xsk_pool_dma_map(pool, dma_dev, 0);
->  	if (err)
-> @@ -5914,6 +5914,8 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
->  err_xsk_map:
->  	virtqueue_dma_unmap_single_attrs(rq->vq, hdr_dma, vi->hdr_len,
->  					 DMA_TO_DEVICE, 0);
-> +err_free_buffs:
-> +	kvfree(rq->xsk_buffs);
->  	return err;
->  }
->  
-> -- 
-> 2.49.0
-> 
+Sure. I'll wrap the check and the call to schedule_.. with the lock.
 
