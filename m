@@ -1,408 +1,700 @@
-Return-Path: <netdev+bounces-187074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898DDAA4C84
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:05:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C767AA4D0C
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3EEF3B8842
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 13:01:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E76531C0415D
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 13:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807A525F7B9;
-	Wed, 30 Apr 2025 13:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9664F25C700;
+	Wed, 30 Apr 2025 13:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+k6WGku"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSewjpW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E892AE8B
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 13:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9003259C8A
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 13:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746018015; cv=none; b=kHoBKgRVT5N9NR1FQEvAIxpcKsURydgPiIOzUyrKoWkJ5TLpdpre48oY8Yoo/Mm0zA8YGXfBlxnJSPUsHXeWcTNGY1A2CtpARge7vBXOZWKk1LX030gsHLiahpt8DT8TcBeHbWT576Z/JhqCPDcRq6miMdOU5/TaDbiF+fN0LJc=
+	t=1746018391; cv=none; b=mAub2tTuXyvJjRb3sBFT+bIxz4FfQiRFNWjdKKyCHBjLLIA70ChwWTItHOCAtQDwrU72yXWZUOTabOlRr0B0uvaakR8A6jWypKAqZ1CHn1OjYHdQF9VwfFVx4oC3LHxlwUzWmzUpeNkb0AffeEUhF1KMLDwP1fhCcAhUnk0WC8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746018015; c=relaxed/simple;
-	bh=Vz5oWI8ZAn9vhYvM7eNEYiDApymK+MKfVHVrsCCoRQU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QPddkuGhYVGCjX26+3T+1Etr7PNBSw7pStBxqvS8X3BzZjcprEJQSdRunLB6hK032t7STf61+LoMV8QCKROYofCjTmp0ZcwC++oZAz9Z1m+/0CLuJVMcZ0FEXgsp4IDzmMU97KYLZf30cfek3Aetin/3qtlIv+sdsiZ0MjKd+W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I+k6WGku; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5f62d3ed994so528708a12.2
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 06:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746018011; x=1746622811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c+DYJDxXcqILpnqG9bHNtG/qhQrQSSUbxz2lrQm8R3k=;
-        b=I+k6WGkuAPzKgQTBq0KsBoMF1L1VGjd0NTozt5WtiXrMA2QjteZGo9tOBrCYEblINQ
-         zEfLyAlFRDPEgbRAXXMLIjDgxPK/CyCc0T2ktm6Hqt4labMl5vruYuU88w3a5YpUskNM
-         55qOx5Mx5GX7hXHzxVis69KnJrCTSbLs5VCxLF9XanbydKgito6Zkt5Lqx6T8Ymqxc9Q
-         KeLMV5QiguBiQ9e2mIbDNi2n1X6xEH7VCe5gmCCRxFbFLMs7cveApzbxfDSi7o2UtpXP
-         Nd9L/t8VoNDOifVX2djRvQHLqUwajp2iF31s8/CwVOoFb7uv09m7zEBPaF/zSoLV5XNl
-         u9YA==
+	s=arc-20240116; t=1746018391; c=relaxed/simple;
+	bh=tKOpGUC7ICWYqzLR0Sa9YobzLH3alk5fppaf96BIteo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cFXx8asSRsLUv911mcQTMC9UfEK2NNHljV4iIzOCZ7pRr6W0006i7+GdYWzDrIQqdlLjvi+9CxSqayfRhsYJN8eyXNrZ/PS3gLa42J6YoUBrC4GHmJM/1FPoM3v6x16Ihi57hmh0gNtMR7/O21RkBw1fJCcWR6duA+iuiPPCMV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSewjpW+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746018386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6yU7j6MTB7ETLLbsy2XV7Tf/pFyt+c5jKYMEFcLpSFU=;
+	b=ZSewjpW+trADu00DcEXGmkcf64SrwtnSKvGEjwsiiCMgfbk57+qS/jyK8ydZLurciRHmeQ
+	V/IX/hbALP5vOpPqgRGE2Im2KPZ0L1Wq1Qr43nbOH1bxHSibkyW6CGXaRi2uOMwLauBLU/
+	2WkMkQiJpFV6JhlXQXnmtzcUWrlD0FM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-502-I2My54lJPE6fBQ_0s5p_jQ-1; Wed, 30 Apr 2025 09:06:24 -0400
+X-MC-Unique: I2My54lJPE6fBQ_0s5p_jQ-1
+X-Mimecast-MFC-AGG-ID: I2My54lJPE6fBQ_0s5p_jQ_1746018383
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac28a2c7c48so627516366b.3
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 06:06:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746018011; x=1746622811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c+DYJDxXcqILpnqG9bHNtG/qhQrQSSUbxz2lrQm8R3k=;
-        b=UzkxS8F627VOeRQMoTbd2oWXVBfSXXTNSfhZ/a8PLJ/CTqKQmuVrolqWY5fl2jbE57
-         o+PuxU/sabG8+rtupzyCQNTzF6Vfne50O7r61KZFKaIC1CYw+qxNdy8gLWutf0YVVz2W
-         /CvtBWihdx/C9S0Z7Nc7CK3ERQUZiRcSwRfnT06aSxRkuyQU4FwsNI5V0WUOBJjlIhfh
-         I79VCm7CFrAr5XbT2ohui4tdTuP0v6SPZpkFUCX2Ev7KUZFTN5sqbJJPBFewnIL3XZXs
-         QvwHNhcizMg9sgi5YrgTMdtWb3VI1sOeQx12mgq/wP1MxS3sfmOOrRDXK4sUNAT1ufya
-         4t7g==
-X-Forwarded-Encrypted: i=1; AJvYcCV0qTUIAGQwPqEO35vnEbk8HT05J2NUy7sWrt5jgZv8K8uFLDBzJ1nAXRBxGZXOYv77THnzrbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybtWIALHyIpbQNqOWVz1/G3+QMsz4/2M0UFXQziLQo79VFlY89
-	gvFIb6CxXV30v531cGr3ABR8+6E9CL7S3JiFbTyddXeG/jY6WTUeC6jzHiKoD6KAk+CeeEGcUK3
-	/oHbO+wAA15jJV9kGUaKKMIdWtoU=
-X-Gm-Gg: ASbGncs1mx3Bc3WDi9tNR7WkVJbOwv2qhgSyDy+7nep5RDkMze44RNdaY0kTHHVtLwI
-	umtdQFGc2hO6FnaG+4oWaF1Cx5t0A46iNJplTtexrg+jwwn4pmETkz31wUfy9YDaQoSSlPqaxBS
-	94FqPaC232AsXemAkYvxHUcks=
-X-Google-Smtp-Source: AGHT+IH1w4gM6ENMZg8MCMHcw2gq/uNhccO80qwldSRAnQEUMh4A1rW7ENoXBMecXlQh7wjUnD2m1sXLcE2Owp/KeAM=
-X-Received: by 2002:a05:6402:2155:b0:5f8:e6de:fd0f with SMTP id
- 4fb4d7f45d1cf-5f8e6df0554mr314330a12.15.1746018011144; Wed, 30 Apr 2025
- 06:00:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746018383; x=1746623183;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6yU7j6MTB7ETLLbsy2XV7Tf/pFyt+c5jKYMEFcLpSFU=;
+        b=Fg4x9pop3Hvt9ASurQ90pvMxMtVZC/ChzW1YyWCd5Ps2TOfqVIrzRmgF44mgktkVit
+         b5injz6HF5wHT2+YBnFMOp2mKfpxxS5RLeMZD7BpokcpTXlJf4GOmixJcsirWiEYNZHk
+         EkZ0bZ5wTUMM36pyQRR9wK5gqGpLY5hZLV7ElPM24jux+JZZUp8p/2NuYeGQZcb5fXG3
+         y8cf4BwB7EIqWn5Zv359U1e+UB9SwHhd7zvLu5qoBQddjJrLQQHKqNQ6ZsPpn17+E0+G
+         SXP85p2b+UdFg/4+nzbNxYKlicBkwJ+yslgfoZrUNvTEk0wWqxAVBcOBi9Kfl+m/hYG9
+         O/kA==
+X-Forwarded-Encrypted: i=1; AJvYcCXou4TYVFkgepi/uByMFftEIDHs6bXdzW0I3XE1RyELQ+xK6KXxWZdDz+dijGkoorHvFMgPwXs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1e1JBmbcAM8qkgCDAdUhYBZL1Hii367gXPJHeNkl+BKEwm2SE
+	BSaKpONSt35LNnpG/GG4YJRszEgxRzROo36JAzRRuVOIDKFZCg774o2Z6ua2L0KwmrI/EUesKBP
+	9tBxvxcJ0LVg/gHHIIp1dsyH5kgJqTmv4g64m/dUFpccRGWN4bKTi1w==
+X-Gm-Gg: ASbGnct04CEsZeJlPqpjBVTcrPZUf+jXR0R5e2g/9Q3N6Io4sbC2axZKS3Ca39yzG7x
+	5iXOv54MX07xV/mNYBAv5d6NHmyHc39X6zihCf6XY2++ejJUMII04y9mXJtJabzVHxx+uv7oAVl
+	Lm9eEyr0jblNbczSkWD+Y/FxxbuT1zvqa/7304vYk1NoT6CJMaQfqWraiRbHWyDLhp8MQDPf0lK
+	yAi/IRE/HmLRTQEZywPpkJL9Xi9fOesGK7zP0/qDJU7CpFHOUCNoE7DDJ3Zwd+hy/yLeo/pIQwm
+	ETQ5jDoXTQVMUXm7eQ==
+X-Received: by 2002:a17:907:2099:b0:ace:d7af:15e1 with SMTP id a640c23a62f3a-acee21ec8b4mr205106166b.28.1746018382508;
+        Wed, 30 Apr 2025 06:06:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFYM5fS7I6UHbH7CWPIdKmdFRlBemomh5FZ88zMTxLzOAyKgsE5jQCVcdciPzBDyRXU4COoQ==
+X-Received: by 2002:a17:907:2099:b0:ace:d7af:15e1 with SMTP id a640c23a62f3a-acee21ec8b4mr205096466b.28.1746018381215;
+        Wed, 30 Apr 2025 06:06:21 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.200.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6e41cb35sm921922766b.31.2025.04.30.06.06.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Apr 2025 06:06:20 -0700 (PDT)
+Date: Wed, 30 Apr 2025 15:06:11 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3] selftests/vsock: add initial vmtest.sh for
+ vsock
+Message-ID: <a57wg5kmprrpk2dm3zlzvegb3gzj73ubs5lxeukyinc4edlcsw@itkgfcm44qu2>
+References: <20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424125547.460632-1-vadfed@meta.com>
-In-Reply-To: <20250424125547.460632-1-vadfed@meta.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 30 Apr 2025 21:59:59 +0900
-X-Gm-Features: ATxdqUG9Tq38K_hj964uL7A6SX4-G5Cj20IRJymJ7CGLGnTyf5pTj-y-o192iL0
-Message-ID: <CAMArcTWDe2cd41=ub=zzvYifaYcYv-N-csxfqxUvejy_L0D6UQ@mail.gmail.com>
-Subject: Re: [PATCH net v4] bnxt_en: improve TX timestamping FIFO configuration
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com>
 
-On Thu, Apr 24, 2025 at 10:11=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> =
-wrote:
+On Mon, Apr 28, 2025 at 04:48:11PM -0700, Bobby Eshleman wrote:
+>This commit introduces a new vmtest.sh runner for vsock.
+>
+>It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+>H2G, and loopback. The testing tools from tools/testing/vsock/ are
+>reused. Currently, only vsock_test is used.
+>
+>VMCI and hyperv support is automatically built, though not used.
+>
+>Only tested on x86.
+>
+>To run:
+>
+>  $ tools/testing/selftests/vsock/vmtest.sh
+
+I tried and it's working, but I have a lot of these messages in the
+output:
+     dmesg: read kernel buffer failed: Operation not permitted
+
+I'm on Fedora 41:
+
+$ uname -r
+6.14.4-200.fc41.x86_64
+
+>
+>or
+>
+>  $ make -C tools/testing/selftests TARGETS=vsock run_tests
+>
+>Results:
+>	# linux/tools/testing/selftests/vsock/vmtest.log
+>	setup:  Building kernel and tests
+>	setup:  Booting up VM
+>	setup:  VM booted up
+>	test:vm_server_host_client:guest:       Control socket listening on 0.0.0.0:51000
+>	test:vm_server_host_client:guest:       Control socket connection accepted...
+>	[...]
+>	test:vm_loopback:guest: 30 - SOCK_STREAM retry failed connect()...ok
+>	test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref...ok
+>	test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref...ok
+>
+>Future work can include vsock_diag_test.
+>
+>vmtest.sh is loosely based off of tools/testing/selftests/net/pmtu.sh,
+>which was picked out of the bag of tests I knew to work with NIPA.
+>
+>Because vsock requires a VM to test anything other than loopback, this
+>patch adds vmtest.sh as a kselftest itself. This is different than other
+>systems that have a "vmtest.sh", where it is used as a utility script to
+>spin up a VM to run the selftests as a guest (but isn't hooked into
+>kselftest). This aspect is worth review, as I'm not aware of all of the
+>enviroments where this would run.
+
+Yeah, an opinion from net maintainers on this would be great.
+
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+>---
+>Changes in v3:
+>- use common conditional syntax for checking variables
+>- use return value instead of global rc
+>- fix typo TEST_HOST_LISTENER_PORT -> TEST_HOST_PORT_LISTENER
+>- use SIGTERM instead of SIGKILL on cleanup
+>- use peer-cid=1 for loopback
+>- change sleep delay times into globals
+>- fix test_vm_loopback logging
+>- add test selection in arguments
+>- make QEMU an argument
+>- check that vng binary is on path
+>- use QEMU variable
+>- change <tab><backslash> to <space><backslash>
+>- fix hardcoded file paths
+>- add comment in commit msg about script that vmtest.sh was based off of
+>- Add tools/testing/selftest/vsock/Makefile for kselftest
+>- Link to v2: https://lore.kernel.org/r/20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com
+>
+>Changes in v2:
+>- add kernel oops and warnings checker
+>- change testname variable to use FUNCNAME
+>- fix spacing in test_vm_server_host_client
+>- add -s skip build option to vmtest.sh
+>- add test_vm_loopback
+>- pass port to vm_wait_for_listener
+>- fix indentation in vmtest.sh
+>- add vmci and hyperv to config
+>- changed whitespace from tabs to spaces in help string
+>- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
+>---
+> MAINTAINERS                                |   1 +
+> tools/testing/selftests/vsock/.gitignore   |   1 +
+> tools/testing/selftests/vsock/Makefile     |   9 +
+> tools/testing/selftests/vsock/config.vsock |  10 +
+> tools/testing/selftests/vsock/settings     |   1 +
+> tools/testing/selftests/vsock/vmtest.sh    | 354 +++++++++++++++++++++++++++++
+> 6 files changed, 376 insertions(+)
+
+While applying git warned about trailing spaces, but also checkpatch is 
+warning about them, please can you fix at least the errors (and maybe 
+the misspelling):
+
+$ ./scripts/checkpatch.pl --strict -g master..HEAD --codespell
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit 
+description?)
+#31: 
+	test:vm_server_host_client:guest:       Control socket listening on 0.0.0.0:51000
+
+WARNING: 'enviroments' may be misspelled - perhaps 'environments'?
+#48: 
+enviroments where this would run.
+^^^^^^^^^^^
+
+ERROR: trailing whitespace
+#174: FILE: tools/testing/selftests/vsock/vmtest.sh:47:
++^Ivm_server_host_client^IRun vsock_test in server mode on the VM and in client mode on the host.^I$
+
+WARNING: line length of 104 exceeds 100 columns
+#174: FILE: tools/testing/selftests/vsock/vmtest.sh:47:
++	vm_server_host_client	Run vsock_test in server mode on the VM and in client mode on the host.	
+
+ERROR: trailing whitespace
+#175: FILE: tools/testing/selftests/vsock/vmtest.sh:48:
++^Ivm_client_host_server^IRun vsock_test in client mode on the VM and in server mode on the host.^I$
+
+WARNING: line length of 104 exceeds 100 columns
+#175: FILE: tools/testing/selftests/vsock/vmtest.sh:48:
++	vm_client_host_server	Run vsock_test in client mode on the VM and in server mode on the host.	
+
+ERROR: trailing whitespace
+#176: FILE: tools/testing/selftests/vsock/vmtest.sh:49:
++^Ivm_loopback^I^IRun vsock_test using the loopback transport in the VM.^I$
+
+ERROR: trailing whitespace
+#443: FILE: tools/testing/selftests/vsock/vmtest.sh:316:
++IFS="^I$
+
+total: 4 errors, 4 warnings, 0 checks, 382 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+       mechanically convert to the typical style using --fix or --fix-inplace.
+
+NOTE: Whitespace errors detected.
+       You may wish to use scripts/cleanpatch or scripts/cleanfile
+
+Commit ffa17d673263 ("selftests/vsock: add initial vmtest.sh for vsock") has style problems, please review.
+
+NOTE: If any of the errors are false positives, please report
+       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+>
+>diff --git a/MAINTAINERS b/MAINTAINERS
+>index 657a67f9031ef7798c19ac63e6383d4cb18a9e1f..3fbdd7bbfce7196a3cc7db70203317c6bd0e51fd 100644
+>--- a/MAINTAINERS
+>+++ b/MAINTAINERS
+>@@ -25751,6 +25751,7 @@ F:	include/uapi/linux/vm_sockets.h
+> F:	include/uapi/linux/vm_sockets_diag.h
+> F:	include/uapi/linux/vsockmon.h
+> F:	net/vmw_vsock/
+>+F:	tools/testing/selftests/vsock/
+> F:	tools/testing/vsock/
+>
+> VMALLOC
+>diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..1950aa8ac68c0831c12c1aaa429da45bbe41e60f
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/.gitignore
+>@@ -0,0 +1 @@
+>+vsock_selftests.log
+>diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/selftests/vsock/Makefile
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..6fded8c4d593541a6f7462147bffcb719def378f
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/Makefile
+>@@ -0,0 +1,9 @@
+>+# SPDX-License-Identifier: GPL-2.0
+>+.PHONY: all
+>+all:
+>+
+>+TEST_PROGS := vmtest.sh
+>+EXTRA_CLEAN := vmtest.log
+>+
+>+include ../lib.mk
+>+
+>diff --git a/tools/testing/selftests/vsock/config.vsock b/tools/testing/selftests/vsock/config.vsock
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..9e0fb2270e6a2fc0beb5f0d9f0bc37158d0a9d23
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/config.vsock
+>@@ -0,0 +1,10 @@
+>+CONFIG_VSOCKETS=y
+>+CONFIG_VSOCKETS_DIAG=y
+>+CONFIG_VSOCKETS_LOOPBACK=y
+>+CONFIG_VMWARE_VMCI_VSOCKETS=y
+>+CONFIG_VIRTIO_VSOCKETS=y
+>+CONFIG_VIRTIO_VSOCKETS_COMMON=y
+>+CONFIG_HYPERV_VSOCKETS=y
+>+CONFIG_VMWARE_VMCI=y
+>+CONFIG_VHOST_VSOCK=y
+>+CONFIG_HYPERV=y
+>diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/selftests/vsock/settings
+>new file mode 100644
+>index 0000000000000000000000000000000000000000..e7b9417537fbc4626153b72e8f295ab4594c844b
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/settings
+>@@ -0,0 +1 @@
+>+timeout=0
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>new file mode 100755
+>index 0000000000000000000000000000000000000000..d70b9446e531d6d20beb24ddeda2cf0a9f7e9a39
+>--- /dev/null
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -0,0 +1,354 @@
+>+#!/bin/bash
+>+# SPDX-License-Identifier: GPL-2.0
+>+#
+>+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
+>+#
+>+# Dependencies:
+>+#		* virtme-ng
+>+#		* busybox-static (used by virtme-ng)
+>+#		* qemu	(used by virtme-ng)
+>+
+>+SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+>+KERNEL_CHECKOUT=$(realpath ${SCRIPT_DIR}/../../../..)
+>+QEMU=$(command -v qemu-system-$(uname -m))
+>+VERBOSE=0
+>+SKIP_BUILD=0
+>+VSOCK_TEST=${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
+>+
+>+TEST_GUEST_PORT=51000
+>+TEST_HOST_PORT=50000
+>+TEST_HOST_PORT_LISTENER=50001
+>+SSH_GUEST_PORT=22
+>+SSH_HOST_PORT=2222
+>+VSOCK_CID=1234
+>+WAIT_PERIOD=3
+>+WAIT_PERIOD_MAX=20
+>+
+>+QEMU_PIDFILE=/tmp/qemu.pid
+>+
+>+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
+>+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
+>+# adding an additional port to forward to the device created from "--ssh" and
+>+# virtme-init mistakenly sets identical IPs to the ssh device and additional
+>+# devices, we instead opt out of using --ssh, add the device manually, and also
+>+# add the kernel cmdline options that virtme-init uses to setup the interface.
+>+QEMU_OPTS=""
+>+QEMU_OPTS="${QEMU_OPTS} -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
+>+QEMU_OPTS="${QEMU_OPTS},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
+>+QEMU_OPTS="${QEMU_OPTS} -device virtio-net-pci,netdev=n0"
+>+QEMU_OPTS="${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=${VSOCK_CID}"
+>+QEMU_OPTS="${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
+
+What about:
+
+QEMU_OPTS=" \
+     -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT} \
+     -device virtio-net-pci,netdev=n0 \
+     -device vhost-vsock-pci,guest-cid=${VSOCK_CID} \
+     --pidfile ${QEMU_PIDFILE}
+"
+
+Not a strong opinion, just I see too much "QEMU_OPTS="${QEMU_OPTS}" xD
+You can leave it in that way if you prefer.
+
+>+KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
+>+
+>+LOG=${SCRIPT_DIR}/vmtest.log
+>+
+>+#		Name				Description
+>+avail_tests="
+>+	vm_server_host_client	Run vsock_test in server mode on the VM and in client mode on the host.	
+>+	vm_client_host_server	Run vsock_test in client mode on the VM and in server mode on the host.	
+>+	vm_loopback		Run vsock_test using the loopback transport in the VM.	
+>+"
+>+
+>+usage() {
+>+	echo
+>+	echo "$0 [OPTIONS] [TEST]..."
+>+	echo "If no TEST argument is given, all tests will be run."
+>+	echo
+>+	echo "Options"
+>+	echo "  -v: verbose output"
+>+	echo "  -s: skip build"
+>+	echo
+>+	echo "Available tests${avail_tests}"
+>+	exit 1
+>+}
+>+
+>+die() {
+>+	echo "$*" >&2
+>+	exit 1
+>+}
+>+
+>+vm_ssh() {
+>+	ssh -q -o UserKnownHostsFile=/dev/null -p 2222 localhost $*
+
+${SSH_HOST_PORT} instead of 2222, right?
+
+The rest LGTM!
+
+Thanks,
+Stefano
+
+>+	return $?
+>+}
+>+
+>+cleanup() {
+>+	if [[ -f "${QEMU_PIDFILE}" ]]; then
+>+		pkill -SIGTERM -F ${QEMU_PIDFILE} 2>&1 >/dev/null
+>+	fi
+>+}
+>+
+>+build() {
+>+	log_setup "Building kernel and tests"
+>+
+>+	pushd ${KERNEL_CHECKOUT} >/dev/null
+>+	vng \
+>+		--kconfig \
+>+		--config ${KERNEL_CHECKOUT}/tools/testing/selftests/vsock/config.vsock
+>+	make -j$(nproc)
+>+	make -C ${KERNEL_CHECKOUT}/tools/testing/vsock
+>+	popd >/dev/null
+>+	echo
+>+}
+>+
+>+vm_setup() {
+>+	local VNG_OPTS=""
+>+	if [[ "${VERBOSE}" = 1 ]]; then
+>+		VNG_OPTS="--verbose"
+>+	fi
+>+	vng \
+>+		$VNG_OPTS \
+>+		--run ${KERNEL_CHECKOUT} \
+>+		--qemu-opts="${QEMU_OPTS}" \
+>+		--qemu="${QEMU}" \
+>+		--user root \
+>+		--append "${KERNEL_CMDLINE}" \
+>+		--rw  2>&1 >/dev/null &
+>+}
+>+
+>+vm_wait_for_ssh() {
+>+	i=0
+>+	while [[ true ]]; do
+>+		if [[ ${i} > ${WAIT_PERIOD_MAX} ]]; then
+>+			die "Timed out waiting for guest ssh"
+>+		fi
+>+		vm_ssh -- true
+>+		if [[ $? -eq 0 ]]; then
+>+			break
+>+		fi
+>+		i=$(( i + 1 ))
+>+		sleep ${WAIT_PERIOD}
+>+	done
+>+}
+>+
+>+wait_for_listener() {
+>+	local PORT=$1
+>+	local i=0
+>+	while ! ss -ltn | grep -q ":${PORT}"; do
+>+		if [[ ${i} > ${WAIT_PERIOD_MAX} ]]; then
+>+			die "Timed out waiting for listener on port ${PORT}"
+>+		fi
+>+		i=$(( i + 1 ))
+>+		sleep ${WAIT_PERIOD}
+>+	done
+>+}
+>+
+>+vm_wait_for_listener() {
+>+	local port=$1
+>+	vm_ssh -- "$(declare -f wait_for_listener); wait_for_listener ${port}"
+>+}
+>+
+>+host_wait_for_listener() {
+>+	wait_for_listener ${TEST_HOST_PORT_LISTENER}
+>+}
+>+
+>+log() {
+>+	local prefix="$1"
+>+	shift
+>+
+>+	if [[ "$#" -eq 0 ]]; then
+>+		cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
+>+	else
+>+		echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
+>+	fi
+>+}
+>+
+>+log_setup() {
+>+	log "setup" "$@"
+>+}
+>+
+>+log_host() {
+>+	testname=$1
+>+	shift
+>+	log "test:${testname}:host" "$@"
+>+}
+>+
+>+log_guest() {
+>+	testname=$1
+>+	shift
+>+	log "test:${testname}:guest" "$@"
+>+}
+>+
+>+test_vm_server_host_client() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+
+>+	vm_ssh -- "${VSOCK_TEST}" \
+>+		--mode=server \
+>+		--control-port="${TEST_GUEST_PORT}" \
+>+		--peer-cid=2 \
+>+		2>&1 | log_guest "${testname}" &
+>+
+>+	vm_wait_for_listener ${TEST_GUEST_PORT}
+>+
+>+	${VSOCK_TEST} \
+>+		--mode=client \
+>+		--control-host=127.0.0.1 \
+>+		--peer-cid="${VSOCK_CID}" \
+>+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
+>+
+>+	return $?
+>+}
+>+
+>+test_vm_client_host_server() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+
+>+	${VSOCK_TEST} \
+>+		--mode "server" \
+>+		--control-port "${TEST_HOST_PORT_LISTENER}" \
+>+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
+>+
+>+	host_wait_for_listener
+>+
+>+	vm_ssh -- "${VSOCK_TEST}" \
+>+		--mode=client \
+>+		--control-host=10.0.2.2 \
+>+		--peer-cid=2 \
+>+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
+>+
+>+	return $?
+>+}
+>+
+>+test_vm_loopback() {
+>+	local testname="${FUNCNAME[0]#test_}"
+>+	local port=60000 # non-forwarded local port
+>+
+>+	vm_ssh -- ${VSOCK_TEST} \
+>+		--mode=server \
+>+		--control-port="${port}" \
+>+		--peer-cid=1 2>&1 | log_guest "${testname}" &
+>+
+>+	vm_wait_for_listener ${port}
+>+
+>+	vm_ssh -- ${VSOCK_TEST} \
+>+		--mode=client \
+>+		--control-host="127.0.0.1" \
+>+		--control-port="${port}" \
+>+		--peer-cid=1 2>&1 | log_guest "${testname}"
+>+
+>+	return $?
+>+}
+>+
+>+run_test() {
+>+	unset IFS
+>+	local host_oops_cnt_before
+>+	local host_warn_cnt_before
+>+	local vm_oops_cnt_before
+>+	local vm_warn_cnt_before
+>+	local host_oops_cnt_after
+>+	local host_warn_cnt_after
+>+	local vm_oops_cnt_after
+>+	local vm_warn_cnt_after
+>+	local name
+>+	local rc
+>+
+>+	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
+>+	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
+>+	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
+>+	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+
+>+	name=$(echo "${1}" | awk '{ print $1 }')
+>+	eval test_"${name}"
+>+
+>+	host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
+>+	if [[ ${host_oops_cnt_after} > ${host_oops_cnt_before} ]]; then
+>+		echo "${name}: kernel oops detected on host" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	host_warn_cnt_after=$(dmesg --level=warn | wc -l)
+>+	if [[ ${host_warn_cnt_after} > ${host_warn_cnt_before} ]]; then
+>+		echo "${name}: kernel warning detected on host" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
+>+	if [[ ${vm_oops_cnt_after} > ${vm_oops_cnt_before} ]]; then
+>+		echo "${name}: kernel oops detected on vm" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+	if [[ ${vm_warn_cnt_after} > ${vm_warn_cnt_before} ]]; then
+>+		echo "${name}: kernel warning detected on vm" | log_host ${name}
+>+		rc=1
+>+	fi
+>+
+>+	return ${rc}
+>+}
+>+
+>+while getopts :hvsq: o
+>+do
+>+	case $o in
+>+	v) VERBOSE=1;;
+>+	s) SKIP_BUILD=1;;
+>+	q) QEMU=$OPTARG;;
+>+	h|*) usage;;
+>+	esac
+>+done
+>+shift $((OPTIND-1))
+>+
+>+trap cleanup EXIT
+>+
+>+if [[ ! -x "$(command -v vng)" ]]; then
+>+	die "vng not found."
+>+fi
+>+
+>+if [[ ! -x "${QEMU}" ]]; then
+>+	die "${QEMU} not found."
+>+fi
+>+
+>+rm -f "${LOG}"
+>+if [[ "${SKIP_BUILD}" != 1 ]]; then
+>+	build
+>+fi
+>+log_setup "Booting up VM"
+>+vm_setup
+>+vm_wait_for_ssh
+>+log_setup "VM booted up"
+>+
+>+for arg in "$@"; do
+>+	if ! command -v > /dev/null "test_${arg}"; then
+>+		echo "Test ${arg} not found"
+>+		die "${usage}"
+>+	fi
+>+done
+>+
+>+IFS="	
+>+"
+>+cnt=0
+>+name=""
+>+desc=""
+>+for t in ${avail_tests}; do
+>+	[ "${name}" = "" ] && name="${t}" && continue
+>+	# desc is unused, but we need to eat it.
+>+	[ "${desc}" = "" ] && desc="${t}"
+>+
+>+	run_this=0
+>+	if [[ "${#}" -eq 0 ]]; then
+>+		run_this=1
+>+	else
+>+		for arg in "$@"; do
+>+			if [[ "${arg}" = "${name}" ]]; then
+>+				run_this=1
+>+			fi
+>+		done
+>+	fi
+>+
+>+	if [[ "${run_this}" = 1 ]]; then
+>+		run_test "${name}"
+>+		rc=$?
+>+		if [[ ${rc} != 0 ]]; then
+>+			cnt=$(( cnt + 1 ))
+>+		fi
+>+	fi
+>+	name=""
+>+	desc=""
+>+done
+>+
+>+if [[ ${cnt} = 0 ]]; then
+>+	echo OK
+>+else
+>+	echo FAILED: ${cnt}
+>+fi
+>+echo "Log: ${LOG}"
+>+exit ${cnt}
+>
+>---
+>base-commit: 8066e388be48f1ad62b0449dc1d31a25489fa12a
+>change-id: 20250325-vsock-vmtest-b3a21d2102c2
+>
+>Best regards,
+>-- 
+>Bobby Eshleman <bobbyeshleman@gmail.com>
 >
 
-Hi Vadim,
-Thanks for this work!
-
-> Reconfiguration of netdev may trigger close/open procedure which can
-> break FIFO status by adjusting the amount of empty slots for TX
-> timestamps. But it is not really needed because timestamps for the
-> packets sent over the wire still can be retrieved. On the other side,
-> during netdev close procedure any skbs waiting for TX timestamps can be
-> leaked because there is no cleaning procedure called. Free skbs waiting
-> for TX timestamps when closing netdev.
->
-> Fixes: 8aa2a79e9b95 ("bnxt_en: Increase the max total outstanding PTP TX =
-packets to 4")
-> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-> ---
-> v3 -> v4:
-> * actually remove leftover unused variable in bnxt_ptp_clear()
-> (v3 was not committed before preparing unfortunately)
-> v2 -> v3:
-> * remove leftover unused variable in bnxt_ptp_clear()
-> v1 -> v2:
-> * move clearing of TS skbs to bnxt_free_tx_skbs
-> * remove spinlock as no TX is possible after bnxt_tx_disable()
-> * remove extra FIFO clearing in bnxt_ptp_clear()
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  5 ++--
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 29 ++++++++++++++-----
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h |  1 +
->  3 files changed, 25 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index c8e3468eee61..2c8e2c19d854 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -3414,6 +3414,9 @@ static void bnxt_free_tx_skbs(struct bnxt *bp)
->
->                 bnxt_free_one_tx_ring_skbs(bp, txr, i);
->         }
-> +
-> +       if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-> +               bnxt_ptp_free_txts_skbs(bp->ptp_cfg);
->  }
->
->  static void bnxt_free_one_rx_ring(struct bnxt *bp, struct bnxt_rx_ring_i=
-nfo *rxr)
-> @@ -12797,8 +12800,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool =
-irq_re_init, bool link_re_init)
->         /* VF-reps may need to be re-opened after the PF is re-opened */
->         if (BNXT_PF(bp))
->                 bnxt_vf_reps_open(bp);
-> -       if (bp->ptp_cfg && !(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
-> -               WRITE_ONCE(bp->ptp_cfg->tx_avail, BNXT_MAX_TX_TS);
->         bnxt_ptp_init_rtc(bp, true);
->         bnxt_ptp_cfg_tstamp_filters(bp);
->         if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_ptp.c
-> index 2d4e19b96ee7..0669d43472f5 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -794,6 +794,27 @@ static long bnxt_ptp_ts_aux_work(struct ptp_clock_in=
-fo *ptp_info)
->         return HZ;
->  }
->
-> +void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp)
-> +{
-> +       struct bnxt_ptp_tx_req *txts_req;
-> +       u16 cons =3D ptp->txts_cons;
-> +
-> +       /* make sure ptp aux worker finished with
-> +        * possible BNXT_STATE_OPEN set
-> +        */
-> +       ptp_cancel_worker_sync(ptp->ptp_clock);
-> +
-> +       ptp->tx_avail =3D BNXT_MAX_TX_TS;
-> +       while (cons !=3D ptp->txts_prod) {
-> +               txts_req =3D &ptp->txts_req[cons];
-> +               if (!IS_ERR_OR_NULL(txts_req->tx_skb))
-> +                       dev_kfree_skb_any(txts_req->tx_skb);
-> +               cons =3D NEXT_TXTS(cons);
-> +       }
-> +       ptp->txts_cons =3D cons;
-> +       ptp_schedule_worker(ptp->ptp_clock, 0);
-> +}
-> +
->  int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod)
->  {
->         spin_lock_bh(&ptp->ptp_tx_lock);
-> @@ -1105,7 +1126,6 @@ int bnxt_ptp_init(struct bnxt *bp)
->  void bnxt_ptp_clear(struct bnxt *bp)
->  {
->         struct bnxt_ptp_cfg *ptp =3D bp->ptp_cfg;
-> -       int i;
->
->         if (!ptp)
->                 return;
-> @@ -1117,12 +1137,5 @@ void bnxt_ptp_clear(struct bnxt *bp)
->         kfree(ptp->ptp_info.pin_config);
->         ptp->ptp_info.pin_config =3D NULL;
->
-> -       for (i =3D 0; i < BNXT_MAX_TX_TS; i++) {
-> -               if (ptp->txts_req[i].tx_skb) {
-> -                       dev_kfree_skb_any(ptp->txts_req[i].tx_skb);
-> -                       ptp->txts_req[i].tx_skb =3D NULL;
-> -               }
-> -       }
-> -
->         bnxt_unmap_ptp_regs(bp);
->  }
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_ptp.h
-> index a95f05e9c579..0481161d26ef 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-> @@ -162,6 +162,7 @@ int bnxt_ptp_cfg_tstamp_filters(struct bnxt *bp);
->  void bnxt_ptp_reapply_pps(struct bnxt *bp);
->  int bnxt_hwtstamp_set(struct net_device *dev, struct ifreq *ifr);
->  int bnxt_hwtstamp_get(struct net_device *dev, struct ifreq *ifr);
-> +void bnxt_ptp_free_txts_skbs(struct bnxt_ptp_cfg *ptp);
->  int bnxt_ptp_get_txts_prod(struct bnxt_ptp_cfg *ptp, u16 *prod);
->  void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod);
->  int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts);
-> --
-> 2.47.1
->
->
-
-I=E2=80=99ve encountered a kernel panic that I think is related to this pat=
-ch.
-Could you please investigate it?
-
-Reproducer:
-    ip link set $interface up
-    modprobe -rv bnxt_en
-
-Splat looks like:
-Oops: general protection fault, probably for non-canonical address
-0xdffffc00000000fd:I
-KASAN: null-ptr-deref in range [0x00000000000007e8-0x00000000000007ef]
-CPU: 2 UID: 0 PID: 1963 Comm: modprobe Not tainted 6.15.0-rc3+ #5
-PREEMPT(undef)  78b5b
-RIP: 0010:__kthread_cancel_work_sync (/kernel/kthread.c:1476)
-Code: 00 48 b8 00 00 00 00 00 fc ff df 41 57 4c 8d 7f 18 41 56 4c 89
-fa 41 55 48 c1 ea4
-
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0:   00 48 b8                add    %cl,-0x48(%rax)
-   3:   00 00                   add    %al,(%rax)
-   5:   00 00                   add    %al,(%rax)
-   7:   00 fc                   add    %bh,%ah
-   9:   ff                      (bad)
-   a:   df 41 57                filds  0x57(%rcx)
-   d:   4c 8d 7f 18             lea    0x18(%rdi),%r15
-  11:   41 56                   push   %r14
-  13:   4c 89 fa                mov    %r15,%rdx
-  16:   41 55                   push   %r13
-  18:   48                      rex.W
-  19:   c1                      .byte 0xc1
-  1a:   a4                      movsb  %ds:(%rsi),%es:(%rdi)
-RSP: 0018:ffff888111857608 EFLAGS: 00010292
-RAX: dffffc0000000000 RBX: 00000000000007d0 RCX: ffff8881330ece8e
-RDX: 00000000000000fd RSI: 0000000000000001 RDI: 00000000000007d0
-RBP: ffff888198ad8e00 R08: 0000000000000001 R09: ffff888198b800d8
-R10: ffff888198b8019f R11: 0000000000000000 R12: ffff888198ad9008
-R13: 0000000000000001 R14: ffff888198ad8e88 R15: 00000000000007e8
-FS:  00007f831f921080(0000) GS:ffff888888405000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005655646882e0 CR3: 000000014c52e000 CR4: 00000000007506f0
-PKRU: 55555554
-Call Trace:
-<TASK>
-bnxt_ptp_free_txts_skbs
-(/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:807) bnxt_en
-__bnxt_close_nic.constprop.0
-(/drivers/net/ethernet/broadcom/bnxt/bnxt.c:3513
-/drivers/net/ethernet/broadcom/bnxt/bnxt.c:3523
-/drivers/net/ethernet/broadcom/bnxt/bnxt.c:12965) bnxt_en
-? __lock_acquire (/kernel/locking/lockdep.c:5246)
-? __pfx___bnxt_close_nic.constprop.0
-(/drivers/net/ethernet/broadcom/bnxt/bnxt.c:12940) bnxt_en
-bnxt_close_nic (/drivers/net/ethernet/broadcom/bnxt/bnxt.c:12980) bnxt_en
-? do_raw_spin_trylock (/./arch/x86/include/asm/atomic.h:107
-/./include/linux/atomic/atomic-arch-fallback.h:2170
-/./include/linux/atomic/atomic-instrumented.h:1302
-/./include/asm-generic/qspinlock.h:97
-/kernel/locking/spinlock_debug.c:123)
-? __pfx_bnxt_close_nic
-(/drivers/net/ethernet/broadcom/bnxt/bnxt.c:12980) bnxt_en
-? __local_bh_enable_ip (/./arch/x86/include/asm/irqflags.h:42
-/./arch/x86/include/asm/irqflags.h:119 /kernel/softirq.c:412)
-? lockdep_hardirqs_on (/./arch/x86/include/generated/asm/syscalls_64.h:316)
-? dev_deactivate_many (/net/sched/sch_generic.c:1325
-/net/sched/sch_generic.c:1383)
-? __local_bh_enable_ip (/./arch/x86/include/asm/irqflags.h:42
-/./arch/x86/include/asm/irqflags.h:119 /kernel/softirq.c:412)
-bnxt_close (/drivers/net/ethernet/broadcom/bnxt/bnxt.c:12215
-/drivers/net/ethernet/broadcom/bnxt/bnxt.c:13015) bnxt_en
-? __pfx_bnxt_close (/drivers/net/ethernet/broadcom/bnxt/bnxt.c:13011) bnxt_=
-en
-? notifier_call_chain (/kernel/notifier.c:85)
-__dev_close_many (/net/core/dev.c:1702)
-? __pfx___dev_close_many (/net/core/dev.c:1663)
-? __pfx___mutex_lock (/arch/x86/entry/syscall_32.c:46)
-dev_close_many (/net/core/dev.c:1729)
-? __pfx_dev_close_many (/net/core/dev.c:1719)
-unregister_netdevice_many_notify (/net/core/dev.c:11946)
-? rcu_is_watching (/./include/linux/context_tracking.h:128
-/kernel/rcu/tree.c:736)
-? __mutex_lock (/arch/x86/entry/syscall_32.c:46)
-? __pfx_unregister_netdevice_many_notify (/net/core/dev.c:11909)
-? rtnl_net_dev_lock (/net/core/dev.c:2093)
-? __pfx___mutex_lock (/arch/x86/entry/syscall_32.c:46)
-unregister_netdevice_queue (/net/core/dev.c:11891)
-? __pfx_unregister_netdevice_queue (/net/core/dev.c:11880)
-? rtnl_net_dev_lock (/./include/linux/rcupdate.h:331
-/./include/linux/rcupdate.h:841 /net/core/dev.c:2084)
-? rtnl_net_dev_lock (/net/core/dev.c:2093)
-unregister_netdev (/./include/net/net_namespace.h:409
-/./include/linux/netdevice.h:2708 /net/core/dev.c:2104
-/net/core/dev.c:12065)
-bnxt_remove_one (/drivers/net/ethernet/broadcom/bnxt/bnxt.c:16012) bnxt_en
-pci_device_remove (/drivers/pci/pci-driver.c:474)
-device_release_driver_internal (/drivers/base/dd.c:1275 /drivers/base/dd.c:=
-1296)
-driver_detach (/drivers/base/dd.c:1360)
-bus_remove_driver (/drivers/base/bus.c:748)
-pci_unregister_driver (/./include/linux/spinlock.h:351
-/drivers/pci/pci-driver.c:85 /drivers/pci/pci-driver.c:1465)
-bnxt_exit (/drivers/net/ethernet/broadcom/bnxt/bnxt.c:1588) bnxt_en
-__do_sys_delete_module.constprop.0 (/kernel/module/main.c:781)
-? __pfx___do_sys_delete_module.constprop.0 (/kernel/module/main.c:724)
-? __pfx_rseq_syscall (/kernel/rseq.c:458)
-? ksys_write (/fs/read_write.c:736)
-? __pfx_ksys_write (/fs/read_write.c:726)
-? rcu_is_watching (/./include/linux/context_tracking.h:128
-/kernel/rcu/tree.c:736)
-? do_syscall_64 (/./include/trace/events/initcall.h:10)
-do_syscall_64 (/./include/trace/events/initcall.h:10)
-entry_SYSCALL_64_after_hwframe (/./include/trace/events/initcall.h:27)
-RIP: 0033:0x7f831f12ac9b
-Code: 73 01 c3 48 8b 0d 7d 81 0d 00 f7 d8 64 89 01 48 83 c8 ff c3 66
-2e 0f 1f 84 00 008
-
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0:   73 01                   jae    0x3
-   2:   c3                      ret
-   3:   48 8b 0d 7d 81 0d 00    mov    0xd817d(%rip),%rcx        # 0xd8187
-   a:   f7 d8                   neg    %eax
-   c:   64 89 01                mov    %eax,%fs:(%rcx)
-   f:   48 83 c8 ff             or     $0xffffffffffffffff,%rax
-  13:   c3                      ret
-  14:   66                      data16
-  15:   2e                      cs
-  16:   0f                      .byte 0xf
-  17:   1f                      (bad)
-  18:   84 00                   test   %al,(%rax)
-  1a:   08                      .byte 0x8
-RSP: 002b:00007ffdfb651448 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-RAX: ffffffffffffffda RBX: 000055fb93ae5fa0 RCX: 00007f831f12ac9b
-RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055fb93ae6008
-RBP: 00007ffdfb651470 R08: 0000000000000073 R09: 0000000000000000
-R10: 00000000ffffffff R11: 0000000000000206 R12: 0000000000000000
-R13: 00007ffdfb6514a0 R14: 0000000000000000 R15: 0000000000000000
-</TASK>
-Modules linked in: xt_nat xt_tcpudp veth xt_conntrack nft_chain_nat
-xt_MASQUERADE nf_c]
----[ end trace 0000000000000000 ]---
-RIP: 0010:__kthread_cancel_work_sync (/kernel/kthread.c:1476)
-Code: 00 48 b8 00 00 00 00 00 fc ff df 41 57 4c 8d 7f 18 41 56 4c 89
-fa 41 55 48 c1 ea4
-
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0:   00 48 b8                add    %cl,-0x48(%rax)
-   3:   00 00                   add    %al,(%rax)
-   5:   00 00                   add    %al,(%rax)
-   7:   00 fc                   add    %bh,%ah
-   9:   ff                      (bad)
-   a:   df 41 57                filds  0x57(%rcx)
-   d:   4c 8d 7f 18             lea    0x18(%rdi),%r15
-  11:   41 56                   push   %r14
-  13:   4c 89 fa                mov    %r15,%rdx
-  16:   41 55                   push   %r13
-  18:   48                      rex.W
-  19:   c1                      .byte 0xc1
-  1a:   a4                      movsb  %ds:(%rsi),%es:(%rdi)
-RSP: 0018:ffff888111857608 EFLAGS: 00010292
-RAX: dffffc0000000000 RBX: 00000000000007d0 RCX: ffff8881330ece8e
-RDX: 00000000000000fd RSI: 0000000000000001 RDI: 00000000000007d0
-RBP: ffff888198ad8e00 R08: 0000000000000001 R09: ffff888198b800d8
-R10: ffff888198b8019f R11: 0000000000000000 R12: ffff888198ad9008
-R13: 0000000000000001 R14: ffff888198ad8e88 R15: 00000000000007e8
-FS:  00007f831f921080(0000) GS:ffff888888405000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005655646882e0 CR3: 000000014c52e000 CR4: 00000000007506f0
-PKRU: 55555554
-Kernel panic - not syncing: Fatal exception
-Kernel Offset: 0x6000000 from 0xffffffff81000000 (relocation range:
-0xffffffff80000000)
-
-Thanks a lot!
-Taehee Yoo
 
