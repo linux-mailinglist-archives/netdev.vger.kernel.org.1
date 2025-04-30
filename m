@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-187124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE56FAA51C5
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:38:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE5B2AA51C7
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 277B09E1AB0
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:38:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DC1F7AB844
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5B2609D4;
-	Wed, 30 Apr 2025 16:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0F62609FA;
+	Wed, 30 Apr 2025 16:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daDImLdX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+nJPxvK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A532609CA;
-	Wed, 30 Apr 2025 16:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98A72609CB;
+	Wed, 30 Apr 2025 16:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746031088; cv=none; b=DO9+43XZPTGdj0ccoj64PIMXPB6HifeNoRGTLffGT+MI2TsTVyAdDdiZZVQPejSMgpTDlayJeCHzjVyxnvAvt2P211lep88dyxvrP3FXZa7GDJCH2ENQKg3tcNBvqIvuu3Dd+JtiylZ6hpBTiFS1bWVg7T0NMmyaeOs4Sqb5ovQ=
+	t=1746031120; cv=none; b=ojagNVH6V0xDoIvRQNBnF7MqpD9TH95eNv2kJEBxSo068SnBj/thgntrQkMSo1h4AnqT/Z394xtGoAyRZ17Wc6g8aiCJW9ZzvWHvWzeLlXITetealHKmFcvL5zj9n9encURcSqNYC7zgWuwxwLn6iAzwFpP5VmAXbVIxE1lc07U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746031088; c=relaxed/simple;
-	bh=Kwh+D250+lz6tQ6Lf6LcLo7vr/SWVWmbcIzExKcLGiA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fqKUfILf3kz7nFNNbGJyB2wbOHHHW9z8X7agY94hZFKADLZgUUt6vaouMhyK6ECGGCgApJsopXITgfY1b4WMaCNaVZ4riG7oYAvlpKcMniyjlgi9LMw2IxOD6J31q9Rj/J0Wk5OyaEBiUG0SCJeJbqFsZt5tZ5xgXsVntpM8xPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daDImLdX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200E3C4CEE7;
-	Wed, 30 Apr 2025 16:38:07 +0000 (UTC)
+	s=arc-20240116; t=1746031120; c=relaxed/simple;
+	bh=sTUHXrpvWbBmLoVSvQCq6iPznegP/mPeO9mAVlWZ1kw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pys/gW8ubqDxq0WOHI5y1w+EXt1iZXeFipJF+EuU53nQYCeXjZCotOhTbcadcpqysFZuCymEVAsiP1d0HXES9brJB5fBkYnLp+XP2dA0tJbCQP8pPsS0cWGJTLiKH0IfAOSA6/h855/Di2JsF70aZ3p4EXxqyXceovFOvxuKLx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+nJPxvK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC4D7C4CEE7;
+	Wed, 30 Apr 2025 16:38:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746031087;
-	bh=Kwh+D250+lz6tQ6Lf6LcLo7vr/SWVWmbcIzExKcLGiA=;
+	s=k20201202; t=1746031119;
+	bh=sTUHXrpvWbBmLoVSvQCq6iPznegP/mPeO9mAVlWZ1kw=;
 	h=From:To:Cc:Subject:Date:From;
-	b=daDImLdXwxrnlZiVPC2+mWqe4o84V5Vc+FmbO9JXve8VUI+0e8poHICdC9UxB+eqh
-	 xgymxEK/aghoCo8v2hK00dylWpe48/1dsF4cSIl4z1kJSdrWbEd6sHT6eqUXr2ybTZ
-	 WIMlJ6J/wYTumdqHekjzjKlCpPvGZMbla/5Oqcom5xIeyYP8TmMUlr14CykUNqfjNU
-	 PXsHsjXKBEls/LFkZHbZbyDzsPElItNzNnQ94Vzsy/fXKHnHpR5VSCZolBV36ZVOFK
-	 xZ7cAGrQWnVF1GiE27iP0mmny/hPe522Nreve0wAQG773CWw5L215zAEdwLEVcRoqd
-	 07uvBQU0D+jaA==
+	b=Z+nJPxvKgMChoR0FLK79zGQeL/3sOLIrIAECg1z4BB+0WFoIUNctuiJxdyjAaPoc3
+	 o8lb1E2Ij1AqpxAZu63v47EzhcdyJPqrmWPQBIxBiiADwRsyoPFBVoPXoP3UkO+4Rw
+	 EeMGVR5nNxEaZxUqne1/c5mqbl3ZYVBoBoJW54lKLSmLYLSFgABkoFvl5RcQSKtVDz
+	 tDlYDWBjqNkv8ToJlvQ5kK25LZmyiBwdChyIthUzdeIDu9+j1vKawBsgMNzRATdhdw
+	 cb8mJreqpaokaIQxR5uxvpgMVjN0oGT9/44bO4mSXqlj8WMFkdL8HOCdcz+/e3ThUw
+	 XSwZtg+XB2mZg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,17 +48,17 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Bui Quang Minh <minhquangbui99@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
 	mst@redhat.com,
-	jasowang@redhat.com,
 	xuanzhuo@linux.alibaba.com,
 	eperezma@redhat.com,
-	romieu@fr.zoreil.com,
-	kuniyu@amazon.com,
-	virtualization@lists.linux.dev
-Subject: [PATCH net v2] virtio-net: don't re-enable refill work too early when NAPI is disabled
-Date: Wed, 30 Apr 2025 09:37:58 -0700
-Message-ID: <20250430163758.3029367-1-kuba@kernel.org>
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	virtualization@lists.linux.dev,
+	minhquangbui99@gmail.com
+Subject: [PATCH net v2] virtio-net: free xsk_buffs on error in virtnet_xsk_pool_enable()
+Date: Wed, 30 Apr 2025 09:38:36 -0700
+Message-ID: <20250430163836.3029761-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -68,89 +68,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-fixed a deadlock between reconfig paths and refill work trying to disable
-the same NAPI instance. The refill work can't run in parallel with reconfig
-because trying to double-disable a NAPI instance causes a stall under the
-instance lock, which the reconfig path needs to re-enable the NAPI and
-therefore unblock the stalled thread.
+The selftests added to our CI by Bui Quang Minh recently reveals
+that there is a mem leak on the error path of virtnet_xsk_pool_enable():
 
-There are two cases where we re-enable refill too early. One is in the
-virtnet_set_queues() handler. We call it when installing XDP:
+unreferenced object 0xffff88800a68a000 (size 2048):
+  comm "xdp_helper", pid 318, jiffies 4294692778
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 0):
+    __kvmalloc_node_noprof+0x402/0x570
+    virtnet_xsk_pool_enable+0x293/0x6a0 (drivers/net/virtio_net.c:5882)
+    xp_assign_dev+0x369/0x670 (net/xdp/xsk_buff_pool.c:226)
+    xsk_bind+0x6a5/0x1ae0
+    __sys_bind+0x15e/0x230
+    __x64_sys_bind+0x72/0xb0
+    do_syscall_64+0xc1/0x1d0
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-   virtnet_rx_pause_all(vi);
-   ...
-   virtnet_napi_tx_disable(..);
-   ...
-   virtnet_set_queues(..);
-   ...
-   virtnet_rx_resume_all(..);
-
-We want the work to be disabled until we call virtnet_rx_resume_all(),
-but virtnet_set_queues() kicks it before NAPIs were re-enabled.
-
-The other case is a more trivial case of mis-ordering in
-__virtnet_rx_resume() found by code inspection.
-
-Taking the spin lock in virtnet_set_queues() (requested during review)
-may be unnecessary as we are under rtnl_lock and so are all paths writing
-to ->refill_enabled.
-
-Reviewed-by: Bui Quang Minh <minhquangbui99@gmail.com>
-Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+Acked-by: Jason Wang <jasowang@redhat.com>
+Fixes: e9f3962441c0 ("virtio_net: xsk: rx: support fill with xsk buffer")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 v2:
- - wrap schedule under the spin lock
-v1: https://lore.kernel.org/20250429143104.2576553-1-kuba@kernel.org
+ - remember to set the err
+v1: https://lore.kernel.org/20250429164323.2637891-1-kuba@kernel.org
 
 CC: mst@redhat.com
 CC: jasowang@redhat.com
 CC: xuanzhuo@linux.alibaba.com
 CC: eperezma@redhat.com
-CC: minhquangbui99@gmail.com
-CC: romieu@fr.zoreil.com
-CC: kuniyu@amazon.com
+CC: hawk@kernel.org
+CC: john.fastabend@gmail.com
 CC: virtualization@lists.linux.dev
+CC: minhquangbui99@gmail.com
 ---
- drivers/net/virtio_net.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ drivers/net/virtio_net.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c107916b685e..f9e3e628ec4d 100644
+index 848fab51dfa1..c107916b685e 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -3383,12 +3383,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
- 				bool refill)
- {
- 	bool running = netif_running(vi->dev);
-+	bool schedule_refill = false;
+@@ -5885,8 +5885,10 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
  
- 	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
--		schedule_delayed_work(&vi->refill, 0);
--
-+		schedule_refill = true;
- 	if (running)
- 		virtnet_napi_enable(rq);
-+
-+	if (schedule_refill)
-+		schedule_delayed_work(&vi->refill, 0);
+ 	hdr_dma = virtqueue_dma_map_single_attrs(sq->vq, &xsk_hdr, vi->hdr_len,
+ 						 DMA_TO_DEVICE, 0);
+-	if (virtqueue_dma_mapping_error(sq->vq, hdr_dma))
+-		return -ENOMEM;
++	if (virtqueue_dma_mapping_error(sq->vq, hdr_dma)) {
++		err = -ENOMEM;
++		goto err_free_buffs;
++	}
+ 
+ 	err = xsk_pool_dma_map(pool, dma_dev, 0);
+ 	if (err)
+@@ -5914,6 +5916,8 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
+ err_xsk_map:
+ 	virtqueue_dma_unmap_single_attrs(rq->vq, hdr_dma, vi->hdr_len,
+ 					 DMA_TO_DEVICE, 0);
++err_free_buffs:
++	kvfree(rq->xsk_buffs);
+ 	return err;
  }
  
- static void virtnet_rx_resume_all(struct virtnet_info *vi)
-@@ -3728,8 +3731,10 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- succ:
- 	vi->curr_queue_pairs = queue_pairs;
- 	/* virtnet_open() will refill when device is going to up. */
--	if (dev->flags & IFF_UP)
-+	spin_lock_bh(&vi->refill_lock);
-+	if (dev->flags & IFF_UP && vi->refill_enabled)
- 		schedule_delayed_work(&vi->refill, 0);
-+	spin_unlock_bh(&vi->refill_lock);
- 
- 	return 0;
- }
 -- 
 2.49.0
 
