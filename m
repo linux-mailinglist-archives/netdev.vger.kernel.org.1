@@ -1,190 +1,149 @@
-Return-Path: <netdev+bounces-187168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CF6AA57FD
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:39:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66746AA582A
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494E61B64CC2
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:39:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 230F53B8552
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE41225779;
-	Wed, 30 Apr 2025 22:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7F3226CF8;
+	Wed, 30 Apr 2025 22:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="irIMxvfO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MYOCqhMU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D13221271
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 22:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAFC34545
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 22:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746052740; cv=none; b=dO4GdQ0LkL0w5n4JmRbRTxqs7LxkUPRtsU62Xz5her+sF8znRv030zSpB8XgOTrENhd2vjUUosv35iSoBATGBmDCHc5DO/twJmk/gwjotLgWbGff2k64097d9Ko7lFhpjpwP+jtmjPh+v3IBt7PTee9wjHHgfPwQjSXYnECNmoE=
+	t=1746053503; cv=none; b=XIHAle6RK52LKyHCUmjbQkID22czCTPl3tbWSTwUlCpYbt9dqHpXcW22KWKWbB7GzGocA/b53FGm9cZaIGSdFHFFbrJv6M/h3Qatejjormyj4dP4kfaReREt4JqsPNvek6ohO+7077IT4yC9U6VZ2IPNiUyrwdi5exwsB+U/7wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746052740; c=relaxed/simple;
-	bh=Olqlsi/dn7CGyfD/R62RM1zOogi1s3ET6AQNrdK5oHI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e6dziP6gqsJd3U+saykMaAXwQxrM1lcFK/20EvAFJuOZb+GwikCqIC4rrNJBGwtikLR31Kce0LlkrGf89FrEMcCbrkJqTmiYfAy6ErxRciAkVbvq5eufVkjLiAeLVE1CFow+80ZPxeXL+gLfwh+KkYXxKjOQUzgAGRDGJRYFDQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=irIMxvfO; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c962b740-4cbc-4d1f-9dda-02820dc54daa@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746052733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eZZpX1P9cVxiJcNSp3L/SE/Da+WLS+g2KXg93KHLKag=;
-	b=irIMxvfObr5yBe6lg1g8+747zkOc/Zq+9dq9Jl2fjZbHgIvJ/T8WBl8aEcqnLxQLk7BPgE
-	LTsxgq6hGZFgucMKtoncqpA4J5Bj7oljj0klpBRE4N/I5MhCVXW9dAcq6AAWAREhvGpi8v
-	fp1wd4rUeaEuvl0FAWucYRtS+K0tdQk=
-Date: Wed, 30 Apr 2025 23:38:51 +0100
+	s=arc-20240116; t=1746053503; c=relaxed/simple;
+	bh=KK3dNEhgw/GTE+XcYq3o2kJsiK5m4hTbVIgJsntdH1E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=n8ijB+cbMaNjLmJ2Kz5xGAds+2dc6UyVG8yVgbDYsnly8Q/TQztSkxaAbvn2dMtX3tFGXx20AOB4kJE3MatKN/bZk/l6DhlkmOnMnVo+JYxHbkNIN+TEbQW/PGWMKuYGJiaoWD88hh3dKKyuaQ135vpNwQ+prAYgrU7Vsu7fzSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MYOCqhMU; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746053501; x=1777589501;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=KK3dNEhgw/GTE+XcYq3o2kJsiK5m4hTbVIgJsntdH1E=;
+  b=MYOCqhMUT7ASytJm42fMI2bsrmwJhTF32fh/FoZUcVQlFmAkBuP7jtNl
+   XMjgRbUZ1AGhjjgJGwCnr6lP1d5F1T0LMFZ3HHyO+SvpyCOO4lR5yfgma
+   +PT+CVGnlw7w11vOVXUBR/qeEPSPv03QtWA1EPHZvThHaB/VZydAEiI9H
+   vRFCikffyLYBzPjl4kvPrCqPfvuaHO02WjMlxfL8S5t7+qbG9NDCtZZ1e
+   Tius7I2XMt718BeiFh83xp+eO+5M8eZcFzFxe9fu1ok7OzjhOr3nNydqn
+   INVvHaJDfCnEjgukOwW8aMlDYBRpK485sBVGrXy5q89SY2G5rqZRhXgxL
+   A==;
+X-CSE-ConnectionGUID: 52cshEvSSW6gR0WQElvDPg==
+X-CSE-MsgGUID: +643FzUjRlitga9E/UWsGg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="73120884"
+X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
+   d="scan'208";a="73120884"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 15:51:40 -0700
+X-CSE-ConnectionGUID: Jumn1DZUQPipNouzckLrQQ==
+X-CSE-MsgGUID: aOggiD2ATSGiAlPZ9hp06A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
+   d="scan'208";a="134145065"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 15:51:40 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH v3 00/15] ice: Separate TSPLL from PTP and clean up
+Date: Wed, 30 Apr 2025 15:51:31 -0700
+Message-Id: <20250430-kk-tspll-improvements-alignment-v3-0-ab8472e86204@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 1/5] amd-xgbe: reorganize the code of XPCS
- access
-To: Raju Rangoju <Raju.Rangoju@amd.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Shyam-sundar.S-k@amd.com
-References: <20250428150235.2938110-1-Raju.Rangoju@amd.com>
- <20250428150235.2938110-2-Raju.Rangoju@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250428150235.2938110-2-Raju.Rangoju@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-B4-Tracking: v=1; b=H4sIAHOpEmgC/x2NywqEMAwAf0VyNlDr+vwV8dDVqMFaSyMiiP++X
+ W8zl5kbhAKTQJvcEOhk4d1FydMEhsW4mZDH6KCVLtQnq3Bd8RBvLfLmw37SRu4QNJZn90fUw1d
+ VtRmnpswgVnygia/30PXP8wM1doexcQAAAA==
+X-Change-ID: 20250417-kk-tspll-improvements-alignment-2cb078adf961
+To: Anthony Nguyen <anthony.l.nguyen@intel.com>, 
+ netdev <netdev@vger.kernel.org>, 
+ Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Milena Olech <milena.olech@intel.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>, 
+ Karol Kolacinski <karol.kolacinski@intel.com>
+X-Mailer: b4 0.14.2
 
-On 28/04/2025 16:02, Raju Rangoju wrote:
-> The xgbe_{read/write}_mmd_regs_v* functions have common code which can
-> be moved to helper functions. Add new helper functions to calculate the
-> mmd_address for v1/v2 of xpcs access.
-> 
-> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
-> ---
-> Changes since v1:
-> - add the xgbe_ prefix to new functions
-> 
->   drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 63 ++++++++++--------------
->   1 file changed, 27 insertions(+), 36 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-> index b51a3666dddb..765f20b24722 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-> @@ -1041,18 +1041,17 @@ static int xgbe_set_gpio(struct xgbe_prv_data *pdata, unsigned int gpio)
->   	return 0;
->   }
->   
-> -static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
-> -				 int mmd_reg)
-> +static unsigned int xgbe_get_mmd_address(struct xgbe_prv_data *pdata, int mmd_reg)
->   {
-> -	unsigned long flags;
-> -	unsigned int mmd_address, index, offset;
-> -	int mmd_data;
-> -
-> -	if (mmd_reg & XGBE_ADDR_C45)
-> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
-> -	else
-> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-> +	return (mmd_reg & XGBE_ADDR_C45) ?
-> +		mmd_reg & ~XGBE_ADDR_C45 :
-> +		(pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-> +}
->   
-> +static void xgbe_get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
-> +					  unsigned int mmd_address,
-> +					  unsigned int *index, unsigned int *offset)
-> +{
->   	/* The PCS registers are accessed using mmio. The underlying
->   	 * management interface uses indirect addressing to access the MMD
->   	 * register sets. This requires accessing of the PCS register in two
-> @@ -1063,8 +1062,20 @@ static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
->   	 * offset 1 bit and reading 16 bits of data.
->   	 */
->   	mmd_address <<= 1;
-> -	index = mmd_address & ~pdata->xpcs_window_mask;
-> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-> +	*index = mmd_address & ~pdata->xpcs_window_mask;
-> +	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-> +}
-> +
-> +static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
-> +				 int mmd_reg)
-> +{
-> +	unsigned long flags;
-> +	unsigned int mmd_address, index, offset;
-> +	int mmd_data;
+Separate TSPLL related functions and definitions from all PTP-related
+files and clean up the code by implementing multiple helpers.
 
-Please, follow reverse Xmass tree ordering
+Adjust TSPLL wait times and fall back to TCXO on lock failure to ensure
+proper init flow of TSPLL.
 
-> +
-> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
-> +
-> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
->   
->   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
->   	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
-> @@ -1080,23 +1091,9 @@ static void xgbe_write_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
->   	unsigned long flags;
->   	unsigned int mmd_address, index, offset;
->   
-> -	if (mmd_reg & XGBE_ADDR_C45)
-> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
-> -	else
-> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
->   
-> -	/* The PCS registers are accessed using mmio. The underlying
-> -	 * management interface uses indirect addressing to access the MMD
-> -	 * register sets. This requires accessing of the PCS register in two
-> -	 * phases, an address phase and a data phase.
-> -	 *
-> -	 * The mmio interface is based on 16-bit offsets and values. All
-> -	 * register offsets must therefore be adjusted by left shifting the
-> -	 * offset 1 bit and writing 16 bits of data.
-> -	 */
-> -	mmd_address <<= 1;
-> -	index = mmd_address & ~pdata->xpcs_window_mask;
-> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
->   
->   	spin_lock_irqsave(&pdata->xpcs_lock, flags);
->   	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
-> @@ -1111,10 +1108,7 @@ static int xgbe_read_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
->   	unsigned int mmd_address;
->   	int mmd_data;
->   
-> -	if (mmd_reg & XGBE_ADDR_C45)
-> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
-> -	else
-> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
->   
->   	/* The PCS registers are accessed using mmio. The underlying APB3
->   	 * management interface uses indirect addressing to access the MMD
-> @@ -1139,10 +1133,7 @@ static void xgbe_write_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
->   	unsigned int mmd_address;
->   	unsigned long flags;
->   
-> -	if (mmd_reg & XGBE_ADDR_C45)
-> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
-> -	else
-> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
->   
->   	/* The PCS registers are accessed using mmio. The underlying APB3
->   	 * management interface uses indirect addressing to access the MMD
+Change default clock source for E825-C from TCXO to TIME_REF if its
+available.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v3:
+- Add SPDX headers to new files
+- Fix .dest_dev assignments in patch #1
+- Drop accidental re-sizing of e82x misc15 field in v2 #2
+- Split v2 patch #6, with behavioral changes in new patch #3 and #8
+- Split v2 patch #3, with removal of E825-C array to its own patch #4
+- Fix kernel doc warnings
+- Add a patch to also update the default E825-C clock source to TIME_REF
+- Link to v2: https://lore.kernel.org/intel-wired-lan/20250409122830.1977644-12-karol.kolacinski@intel.com/
+
+---
+Jacob Keller (4):
+      ice: fix E825-C TSPLL register definitions
+      ice: clear time_sync_en field for E825-C during reprogramming
+      ice: read TSPLL registers again before reporting status
+      ice: change default clock source for E825-C
+
+Karol Kolacinski (11):
+      ice: move TSPLL functions to a separate file
+      ice: rename TSPLL and CGU functions and definitions
+      ice: remove ice_tspll_params_e825 definitions
+      ice: use designated initializers for TSPLL consts
+      ice: add TSPLL log config helper
+      ice: add ICE_READ/WRITE_CGU_REG_OR_DIE helpers
+      ice: use bitfields instead of unions for CGU regs
+      ice: add multiple TSPLL helpers
+      ice: wait before enabling TSPLL
+      ice: fall back to TCXO on TSPLL lock fail
+      ice: move TSPLL init calls to ice_ptp.c
+
+ drivers/net/ethernet/intel/ice/ice.h            |   1 +
+ drivers/net/ethernet/intel/ice/ice_cgu_regs.h   | 181 --------
+ drivers/net/ethernet/intel/ice/ice_common.h     |  58 +++
+ drivers/net/ethernet/intel/ice/ice_ptp_consts.h | 177 +-------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h     |  54 +--
+ drivers/net/ethernet/intel/ice/ice_tspll.h      |  31 ++
+ drivers/net/ethernet/intel/ice/ice_type.h       |  20 +-
+ drivers/net/ethernet/intel/ice/ice_common.c     |  71 ++-
+ drivers/net/ethernet/intel/ice/ice_ptp.c        |  14 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c     | 564 +-----------------------
+ drivers/net/ethernet/intel/ice/ice_tspll.c      | 518 ++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/Makefile         |   2 +-
+ 12 files changed, 712 insertions(+), 979 deletions(-)
+---
+base-commit: deeed351e982ac4d521598375b34b071304533b0
+change-id: 20250417-kk-tspll-improvements-alignment-2cb078adf961
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
 
 
