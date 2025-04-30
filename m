@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-187175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F70AA583F
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:52:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF9BAA583C
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216113BE669
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:51:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45F0D503664
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEBD22A1E6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF35229B36;
 	Wed, 30 Apr 2025 22:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QSDzajk+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W7nMvFN9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CFE228CB8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C972288EA
 	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 22:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746053509; cv=none; b=rYpMyAVhe7tvEt+ylaaIrMhbF5IphAIEbL3vco7wEOHMKvdyQjPXFGuXvVzsvaJ2NhQWzvL5WlC00i9/0jAzNCTuVn+5XshgmTaEtU4DDPthsHehIBhHBCosPaaWq9rl2lNA8ZpWVcCl0+5ct9UU6AUk5Z67PEbmv4MCMtpwcSk=
+	t=1746053509; cv=none; b=oJTUB949B9fsK/e3H6ONdvliESGwqGDt7sQ4dc83Pv1YmcOJ6zDi/pO1p1vDMgMk0OFmozdUEU1Qc31bdc7Sw+pQsL71CyfOEPQ9L0Qw3YgHXFZkz04ItnhP8tz7naLPfqXmhqmStWVlU51Mo++NUXevravDEWPJ0Drr/rZvyEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746053509; c=relaxed/simple;
-	bh=X7lId7WwhQNC4nb7A9C9GnLralUdmn3VDaw3pZp3Glg=;
+	bh=zlaO3QYSYwnZak08jUO77o8/ShIkdj6nb0W+ifcFRr4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kAdcoxF1Mhbd+qb5RRz2DB5E6EkxJ9QJooiTk/L8BxSV/YPx4iYb1qzQW+g60gbLkhLcrZdJWehXrSTVG1pFn0J7z764b52WvKMoSlSvIiprskp6MlduM5b19d97RbhqVbHKW2Wes/qLupdTwxdph97IvypjNsOW+C2oB45e2RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QSDzajk+; arc=none smtp.client-ip=192.198.163.7
+	 In-Reply-To:To:Cc; b=F1H/4ePkWXJjZTBJYUL3vxoqGFIsL1nG+nikGmNslLZDiyLL4J/ne3eJEqbPf/W7JYmbw4mZoJa+lhKgiX3TJ3Iw6xfz4VebuUS2BptFkQVxrQZmKOM2ra9VWVjTIL+fP9me6Hoh6z9Sezc7NatDh3p/5MahC40xm/NdxWWnyfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W7nMvFN9; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746053508; x=1777589508;
+  t=1746053507; x=1777589507;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=X7lId7WwhQNC4nb7A9C9GnLralUdmn3VDaw3pZp3Glg=;
-  b=QSDzajk+amT/xZA+wjZWYBvTB5zbvQ5n8Mdd39qx+2WQEh2D0tVvpNFE
-   CiQe2BDiUocd/e50fYlxdgZ6jmC9RXhI6TasIdxGPSwMYq7gmAf97jQ2h
-   jNDoSWJuu/KvOAQ02+t8KB1M3znGi4hmMA4p75uCkJYBRCDq4UJVKQRK9
-   IZMYmcxe9Xk47NSpRb/K87Vcm6lN+Ks9dN+GQnlfsp4p0yFi0AfUhkyE4
-   yfYRB7fz+iLrB7z/zc7hLtenS3e9jJkocvHLsI6l4K+hf0KaA1T8yc1si
-   709YZZxkn7gJ33Rxj9Qeg9MFSd3K8f3NN52eeSPpOT9jlsEWo80SfaQ1l
-   Q==;
-X-CSE-ConnectionGUID: G1JNN7PXTBeZCESQmCjdTQ==
-X-CSE-MsgGUID: GKDJEHjSQU+N5RUxK722pQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="73120899"
+  bh=zlaO3QYSYwnZak08jUO77o8/ShIkdj6nb0W+ifcFRr4=;
+  b=W7nMvFN9wQr6X6uTFr9uJNzEzqvZF4YaUc+Vp/N5modbdzRVXSGjrpo4
+   A5zxzfq85CMXNjM+aiQrNUlZ4Ufp+IoTZF1xqiCZdmOLfSua8MAeQWoWW
+   DEsaYEW4wcMNMmSAu24MWHC2qat0SDJL8LuyValM6vqe9/k6o4w3bv/yb
+   bIhlv1nXs+P9WjK2rfGyq+0zwvZ0HjQI+Yx/QBzMF3PhHMEF2SXfZmdmS
+   aT2vX7NVdr7QdJzFLHqeok7AWOUgWldNnF4zNV3sFDvUyJtDYqErQFx4O
+   PMlDFQVyMCNhq86LJdeqgJL2p7cu8S3GVAOlXh2J+260mjJc4wEnBxlYF
+   g==;
+X-CSE-ConnectionGUID: 7AbQ4NjiQVqzfJVHGFHuBA==
+X-CSE-MsgGUID: 3cioZcXUSBaGEqVUQwja8g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="73120900"
 X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
-   d="scan'208";a="73120899"
+   d="scan'208";a="73120900"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 15:51:41 -0700
-X-CSE-ConnectionGUID: 0bLUkZs/R7uE7p9VN28Grw==
-X-CSE-MsgGUID: cEsZJrlITK2gikvMcjPMfA==
+X-CSE-ConnectionGUID: NXPOzSGRTmC5KqT2K+3B9A==
+X-CSE-MsgGUID: RUSwuAhDRcSJGTRSaOb3Dg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,252,1739865600"; 
-   d="scan'208";a="134145082"
+   d="scan'208";a="134145085"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
   by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 15:51:40 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 30 Apr 2025 15:51:36 -0700
-Subject: [PATCH v3 05/15] ice: use designated initializers for TSPLL consts
+Date: Wed, 30 Apr 2025 15:51:37 -0700
+Subject: [PATCH v3 06/15] ice: add TSPLL log config helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250430-kk-tspll-improvements-alignment-v3-5-ab8472e86204@intel.com>
+Message-Id: <20250430-kk-tspll-improvements-alignment-v3-6-ab8472e86204@intel.com>
 References: <20250430-kk-tspll-improvements-alignment-v3-0-ab8472e86204@intel.com>
 In-Reply-To: <20250430-kk-tspll-improvements-alignment-v3-0-ab8472e86204@intel.com>
 To: Anthony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -85,157 +85,109 @@ X-Mailer: b4 0.14.2
 
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Instead of multiple comments, use designated initializers for TSPLL
-consts.
-
-Adjust ice_tspll_params_e82x fields sizes.
+Add a helper function to print new/current TSPLL config. This helps
+avoid unnecessary casts from u8 to enums.
 
 Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 Reviewed-by: Milena Olech <milena.olech@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_tspll.h |  8 +--
- drivers/net/ethernet/intel/ice/ice_tspll.c | 95 ++++++++++--------------------
- 2 files changed, 34 insertions(+), 69 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_tspll.c | 54 +++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.h b/drivers/net/ethernet/intel/ice/ice_tspll.h
-index 7aef430258e23e8e65cfc37ef8436ac158fa7ee5..c0b1232cc07c3ebd73264d16fc9cd8bfaec29fec 100644
---- a/drivers/net/ethernet/intel/ice/ice_tspll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_tspll.h
-@@ -7,18 +7,18 @@
- /**
-  * struct ice_tspll_params_e82x - E82X TSPLL parameters
-  * @refclk_pre_div: Reference clock pre-divisor
-+ * @post_pll_div: Post PLL divisor
-  * @feedback_div: Feedback divisor
-  * @frac_n_div: Fractional divisor
-- * @post_pll_div: Post PLL divisor
-  *
-  * Clock Generation Unit parameters used to program the PLL based on the
-  * selected TIME_REF/TCXO frequency.
-  */
- struct ice_tspll_params_e82x {
--	u32 refclk_pre_div;
--	u32 feedback_div;
-+	u8 refclk_pre_div;
-+	u8 post_pll_div;
-+	u8 feedback_div;
- 	u32 frac_n_div;
--	u32 post_pll_div;
- };
- 
- #define ICE_TSPLL_CK_REFCLKFREQ_E825		0x1F
 diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.c b/drivers/net/ethernet/intel/ice/ice_tspll.c
-index e973e1db2b51c9741a71ff593361dfabc5e9f2df..2c91dcd45df2e3c420e693442b4a58dd85be3ec5 100644
+index 2c91dcd45df2e3c420e693442b4a58dd85be3ec5..a338cfb1044869f9c844bbd0d6d77987f275f945 100644
 --- a/drivers/net/ethernet/intel/ice/ice_tspll.c
 +++ b/drivers/net/ethernet/intel/ice/ice_tspll.c
-@@ -7,76 +7,41 @@
+@@ -89,6 +89,26 @@ static const char *ice_tspll_clk_src_str(enum ice_clk_src clk_src)
+ 	}
+ }
  
- static const struct
- ice_tspll_params_e82x e82x_tspll_params[NUM_ICE_TSPLL_FREQ] = {
--	/* ICE_TSPLL_FREQ_25_000 -> 25 MHz */
--	{
--		/* refclk_pre_div */
--		1,
--		/* feedback_div */
--		197,
--		/* frac_n_div */
--		2621440,
--		/* post_pll_div */
--		6,
-+	[ICE_TSPLL_FREQ_25_000] = {
-+		.refclk_pre_div = 1,
-+		.post_pll_div = 6,
-+		.feedback_div = 197,
-+		.frac_n_div = 2621440,
- 	},
--
--	/* ICE_TSPLL_FREQ_122_880 -> 122.88 MHz */
--	{
--		/* refclk_pre_div */
--		5,
--		/* feedback_div */
--		223,
--		/* frac_n_div */
--		524288,
--		/* post_pll_div */
--		7,
-+	[ICE_TSPLL_FREQ_122_880] = {
-+		.refclk_pre_div = 5,
-+		.post_pll_div = 7,
-+		.feedback_div = 223,
-+		.frac_n_div = 524288
- 	},
--
--	/* ICE_TSPLL_FREQ_125_000 -> 125 MHz */
--	{
--		/* refclk_pre_div */
--		5,
--		/* feedback_div */
--		223,
--		/* frac_n_div */
--		524288,
--		/* post_pll_div */
--		7,
-+	[ICE_TSPLL_FREQ_125_000] = {
-+		.refclk_pre_div = 5,
-+		.post_pll_div = 7,
-+		.feedback_div = 223,
-+		.frac_n_div = 524288
- 	},
--
--	/* ICE_TSPLL_FREQ_153_600 -> 153.6 MHz */
--	{
--		/* refclk_pre_div */
--		5,
--		/* feedback_div */
--		159,
--		/* frac_n_div */
--		1572864,
--		/* post_pll_div */
--		6,
-+	[ICE_TSPLL_FREQ_153_600] = {
-+		.refclk_pre_div = 5,
-+		.post_pll_div = 6,
-+		.feedback_div = 159,
-+		.frac_n_div = 1572864
- 	},
--
--	/* ICE_TSPLL_FREQ_156_250 -> 156.25 MHz */
--	{
--		/* refclk_pre_div */
--		5,
--		/* feedback_div */
--		159,
--		/* frac_n_div */
--		1572864,
--		/* post_pll_div */
--		6,
-+	[ICE_TSPLL_FREQ_156_250] = {
-+		.refclk_pre_div = 5,
-+		.post_pll_div = 6,
-+		.feedback_div = 159,
-+		.frac_n_div = 1572864
- 	},
--
--	/* ICE_TSPLL_FREQ_245_760 -> 245.76 MHz */
--	{
--		/* refclk_pre_div */
--		10,
--		/* feedback_div */
--		223,
--		/* frac_n_div */
--		524288,
--		/* post_pll_div */
--		7,
-+	[ICE_TSPLL_FREQ_245_760] = {
-+		.refclk_pre_div = 10,
-+		.post_pll_div = 7,
-+		.feedback_div = 223,
-+		.frac_n_div = 524288
- 	},
- };
++/**
++ * ice_tspll_log_cfg - Log current/new TSPLL configuration
++ * @hw: Pointer to the HW struct
++ * @enable: CGU enabled/disabled
++ * @clk_src: Current clock source
++ * @tspll_freq: Current clock frequency
++ * @lock: CGU lock status
++ * @new_cfg: true if this is a new config
++ */
++static void ice_tspll_log_cfg(struct ice_hw *hw, bool enable, u8 clk_src,
++			      u8 tspll_freq, bool lock, bool new_cfg)
++{
++	dev_dbg(ice_hw_to_dev(hw),
++		"%s TSPLL configuration -- %s, src %s, freq %s, PLL %s\n",
++		new_cfg ? "New" : "Current", enable ? "enabled" : "disabled",
++		ice_tspll_clk_src_str((enum ice_clk_src)clk_src),
++		ice_tspll_clk_freq_str((enum ice_tspll_freq)tspll_freq),
++		lock ? "locked" : "unlocked");
++}
++
+ /**
+  * ice_tspll_cfg_e82x - Configure the Clock Generation Unit TSPLL
+  * @hw: Pointer to the HW struct
+@@ -144,12 +164,9 @@ static int ice_tspll_cfg_e82x(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 	if (err)
+ 		return err;
  
+-	/* Log the current clock configuration */
+-	ice_debug(hw, ICE_DBG_PTP, "Current TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  dw24.ts_pll_enable ? "enabled" : "disabled",
+-		  ice_tspll_clk_src_str(dw24.time_ref_sel),
+-		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+-		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
++	ice_tspll_log_cfg(hw, dw24.ts_pll_enable, dw24.time_ref_sel,
++			  dw9.time_ref_freq_sel, bwm_lf.plllock_true_lock_cri,
++			  false);
+ 
+ 	/* Disable the PLL before changing the clock source or frequency */
+ 	if (dw24.ts_pll_enable) {
+@@ -222,12 +239,8 @@ static int ice_tspll_cfg_e82x(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 		return -EBUSY;
+ 	}
+ 
+-	/* Log the current clock configuration */
+-	ice_debug(hw, ICE_DBG_PTP, "New TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  dw24.ts_pll_enable ? "enabled" : "disabled",
+-		  ice_tspll_clk_src_str(dw24.time_ref_sel),
+-		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+-		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
++	ice_tspll_log_cfg(hw, dw24.ts_pll_enable, clk_src, clk_freq, true,
++			  true);
+ 
+ 	return 0;
+ }
+@@ -316,12 +329,9 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 	if (err)
+ 		return err;
+ 
+-	/* Log the current clock configuration */
+-	ice_debug(hw, ICE_DBG_PTP, "Current TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  dw23.ts_pll_enable ? "enabled" : "disabled",
+-		  ice_tspll_clk_src_str(dw23.time_ref_sel),
+-		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+-		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
++	ice_tspll_log_cfg(hw, dw23.ts_pll_enable, dw23.time_ref_sel,
++			  dw9.time_ref_freq_sel,
++			  ro_lock.plllock_true_lock_cri, false);
+ 
+ 	/* Disable the PLL before changing the clock source or frequency */
+ 	if (dw23.ts_pll_enable) {
+@@ -414,12 +424,8 @@ static int ice_tspll_cfg_e825c(struct ice_hw *hw, enum ice_tspll_freq clk_freq,
+ 		return -EBUSY;
+ 	}
+ 
+-	/* Log the current clock configuration */
+-	ice_debug(hw, ICE_DBG_PTP, "New TSPLL configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+-		  dw23.ts_pll_enable ? "enabled" : "disabled",
+-		  ice_tspll_clk_src_str(dw23.time_ref_sel),
+-		  ice_tspll_clk_freq_str(dw9.time_ref_freq_sel),
+-		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
++	ice_tspll_log_cfg(hw, dw23.ts_pll_enable, clk_src, clk_freq, true,
++			  true);
+ 
+ 	return 0;
+ }
 
 -- 
 2.48.1.397.gec9d649cc640
