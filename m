@@ -1,206 +1,213 @@
-Return-Path: <netdev+bounces-186962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46362AA45CD
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:45:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8886AAA45E9
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:48:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8932C188D39A
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:44:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42FDA189E8A9
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F70219E8C;
-	Wed, 30 Apr 2025 08:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmiWafS3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169B121ABB1;
+	Wed, 30 Apr 2025 08:47:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7A02192E3;
-	Wed, 30 Apr 2025 08:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E81219314;
+	Wed, 30 Apr 2025 08:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746002635; cv=none; b=VP8QAp/EzBYqCTM67kOZtiZUZtPR0Z/nd+/evpN89f9+jg0d/mEuDg4LY8LMi10muYw8L3U8p03AWvxWE2uCeVphkPjBTu6PSm4/HiZADwYeEuq8mVm3TSjvruXq8k3v1B+wDkrNcrtLx4CMQxpf8vPPl6g2hNszr+6j85jMKa4=
+	t=1746002853; cv=none; b=cwSGN86ymxWIHlAUQrOmTzpCUNIbA0VbLXsRTcoyVgsRaw5yIk4SFWhLTdw2SQACU3C2uk6BhkaYrRnamXvy/Nv++a6X2evDHg2j3ci6ebpNWOOOMlrZOMMw0aygD4PqQy0z7J1JJSFkYsjJzZFIidYMl9L2KIdSbyzZ+aWTsBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746002635; c=relaxed/simple;
-	bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eWbBOURzvNn1J8wBnE7fapfUlykssKlr8nulk03waErAUMbxzG4GmuYYgj+n8Ou+P0+Z0CBsp9wdlMZntjQlE0ls2GGTX3hTV//P21Qbe83hbvyvN9tJUSi/KYl4whQVjZHRG28+64HAu50rWIkFoJBRuGmJ6mxTv4twcBcpd6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GmiWafS3; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e63a159525bso5874348276.2;
-        Wed, 30 Apr 2025 01:43:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746002631; x=1746607431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
-        b=GmiWafS3V7c8bjXlbk4OxAgBNgMdMDRL4V0Vw+CPlm5DNTXxIcss9IxS8NzF0tjYnj
-         9iqxKJh3IZfR9VFEZVfrw+jC6bIVJby0N506XXM/QiWSUTCKAM9OKM3bfLQM/VKdVH48
-         NyTyUH3MNiczNSx6BoEU2aNnJgyhNmoADQIG2ITsmP+uOl/yPCznPExhvJnh1zOvKkQF
-         gP6dfMQJBop2vdSldCvpKxIdQ99KCYSdgRqipz2Wiwru7PUIIXgfNE0y0NXhiJbSpbWM
-         jFARAN0JdouirBgMlFe6nB090TgqQyYAqcuEjW6QKe1lnPP4hfhfXBj7qjM+Mxk/kwi4
-         1eXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746002631; x=1746607431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uCbpG3QrjrqIEpeYmGwYvqptFCLTfdx524GgbmyrHrc=;
-        b=i6WgjYscued8SlUcFxRfM0BpmqPOJCo1fNCVNUEOu/7jrhFZM96eDA+rR3G01/7xwI
-         sK7yaj+WkWpVmL6SaV9qkLSZrW8P9L7CnEyLDaGYM7cFHw04JUL2f93Te5gLdvkqmc/J
-         ySjuz6qK9nBIsdhRT6R6w1YJsR/OdHyieoIbi3U9G05HMk9yaKromfYax/FXi+Mv9JEE
-         3DF2jBqqQJpIuuwS21HDgKo83rJ21wWDjZMAlXmTJL0vTHH02UfjWXuHfM8LzoxPCqM9
-         0R3oK2TTF+eITyrHyNYEOmY3tmiPuxkogB7ECnUp/xXS3upQ0jX9TZLu3sjxO94rfWTK
-         Zfug==
-X-Forwarded-Encrypted: i=1; AJvYcCV5EjUD5/8tJMBqYyCiHWVuyr6oibeOIhpsOanUrQrgpDRt01BdrPOwUZmkXFnJIsPccx+IJ/qu@vger.kernel.org, AJvYcCVXCmj4KE3bseheJIAZH7j0iD2QsIDUAgSF8N+8RE1/kW4+IJSQ+Be4rZPncdhyqz6Qo7bjSFJiRO3GyOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9kLQGf+e2FwoyZBORxOD7eThievN0pZW58ftwY/vRprY45z1b
-	NVkRfx46lKVNjPtFEz8QFPLM/wL86y3NNtLN/Wc9frO9rkL00yDLD78aiOb11YXDp6Gd+ohNZCt
-	CjGHfVsimp+nMVXfXvtkFYUhCIBY=
-X-Gm-Gg: ASbGncvEUssB0Frz6ztSerWXM+164AMVPCkc7RhE6J5ttM/rnL83JlWUkySXu+Zk6uE
-	+8EIjfCGkFsKm5qFhS/8uMXhwlPLaXkZpG/H98n8sOmGRrhFLW3eTvpOBdeA+gmvdRjYTauD42b
-	8kODWEd33gQuI8NCHoUyw=
-X-Google-Smtp-Source: AGHT+IEhkfAwWL8fVju4Lkb0QFOaKJJL8P4xY667SzVOwX2PIzzJstixARlzcso7JHOoO0ZjEw+VVPDctr4hEApCZ3s=
-X-Received: by 2002:a05:6902:a86:b0:e73:91a:9311 with SMTP id
- 3f1490d57ef6-e73ea21119cmr2996051276.6.1746002631281; Wed, 30 Apr 2025
- 01:43:51 -0700 (PDT)
+	s=arc-20240116; t=1746002853; c=relaxed/simple;
+	bh=2V3oi+zTqj6+6yjxoEi2u/vt/w1/hvUqDh25JFcZBjg=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vq5+1E8ziDppc22EjA/EVyjGrXjPZDrJrZC92XQ2YAjXJBEZKS0Kobcub16jYIBFfLdAjTFApP7d4lZ3QSXY8JO2uKNmll78nsJzvZogkSC67Jtuf8H0FZamSFwgw/hzJhVyLXD/kkFM10+6IXnHJg2FIOEs6PjbFxgi3u9xJDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZnW0B6JHsz6K9YP;
+	Wed, 30 Apr 2025 16:42:34 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 152FC1402EE;
+	Wed, 30 Apr 2025 16:47:28 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 30 Apr
+ 2025 10:47:27 +0200
+Date: Wed, 30 Apr 2025 09:47:25 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <admiyo@os.amperecomputing.com>
+CC: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
+	<matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sudeep Holla
+	<sudeep.holla@arm.com>, Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH net-next v21 1/1] mctp pcc: Implement MCTP over PCC
+ Transport
+Message-ID: <20250430094725.000031ac@huawei.com>
+In-Reply-To: <20250429222759.138627-2-admiyo@os.amperecomputing.com>
+References: <20250429222759.138627-1-admiyo@os.amperecomputing.com>
+	<20250429222759.138627-2-admiyo@os.amperecomputing.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250429201710.330937-1-jonas.gorski@gmail.com> <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
-In-Reply-To: <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Wed, 30 Apr 2025 10:43:40 +0200
-X-Gm-Features: ATxdqUFI7CkDXiAPdAxAFb4q56LGJGrb1AR7EqNZNEXKnpODFXQ2kT5IcrZ2LP8
-Message-ID: <CAOiHx=n_f9CXZf_x1Rd36Fm5ELFd03a9vbLe+wUqWajfaSY5jg@mail.gmail.com>
-Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, Kurt Kanzenbach <kurt@linutronix.de>, 
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, Apr 30, 2025 at 10:07=E2=80=AFAM Florian Fainelli
-<florian.fainelli@broadcom.com> wrote:
->
->
->
-> On 4/29/2025 10:16 PM, Jonas Gorski wrote:
-> > This patchset aims at fixing most issues observed while running the
-> > vlan_unaware_bridge, vlan_aware_bridge and local_termination selftests.
-> >
-> > Most tests succeed with these patches on BCM53115, connected to a
-> > BCM6368.
-> >
-> > It took me a while to figure out that a lot of tests will fail if all
-> > ports have the same MAC address, as the switches drop any frames with
-> > DA =3D=3D SA. Luckily BCM63XX boards often have enough MACs allocated f=
-or
-> > all ports, so I just needed to assign them.
-> >
-> > The still failing tests are:
-> >
-> > FDB learning, both vlan aware aware and unaware:
-> >
-> > This is expected, as b53 currently does not implement changing the
-> > ageing time, and both the bridge code and DSA ignore that, so the
-> > learned entries don't age out as expected.
-> >
-> > ping and ping6 in vlan unaware:
-> >
-> > These fail because of the now fixed learning, the switch trying to
-> > forward packet ingressing on one of the standalone ports to the learned
-> > port of the mac address when the packets ingressed on the bridged port.
->
-> Sorry not quite getting that part, can you expand a bit more?
+On Tue, 29 Apr 2025 18:27:58 -0400
+admiyo@os.amperecomputing.com wrote:
 
-The ping test uses four network ports, where two pairs are linked via
-a network cable. So the setup is
+> From: Adam Young <admiyo@os.amperecomputing.com>
+> 
+> Implementation of network driver for
+> Management Control Transport Protocol(MCTP)
+> over Platform Communication Channel(PCC)
+Hi Adam,
 
-sw1p1 <- cable -> sw1p2 <- bridge -> sw1p3 <- cable ->sw1p4
+> 
+> DMTF DSP:0292
+> https://www.dmtf.org/sites/default/files/standards/documents/\
+> DSP0292_1.0.0WIP50.pdf
 
-And it tries to ping from sw1p1 to sw1p4.
+Don't line break a link.
 
-In the vlan_aware test, the bridge uses VLAN 1 pvid untagged, so it
-learns in VLAN 1, while the standalone ports use VLAN 0. Different
-FIDs, so no issue.
+Is the WIP status something we should be concerned about?
 
-In the vlan_unaware test, untagged traffic uses VLAN 0 everywhere, so
-the following happens:
 
-- switch learns swp1p's MAC at sw1p2
-- switch learns sw1p4's MAC at sw1p3
+> 
+> MCTP devices are specified via ACPI by entries
+> in DSDT/SDST and reference channels specified
+> in the PCCT.  Messages are sent on a type 3 and
+> received on a type 4 channel.  Communication with
+> other devices use the PCC based doorbell mechanism;
+> a shared memory segment with a corresponding
+> interrupt and a memory register used to trigger
+> remote interrupts.
+> 
 
-when sw1p1 sends a unicast to sw1p4' mac it egresses on swp1p3 and
-then ingresses on sw1p4 again. The switch see's sw1p2's MAC as DA and
-then ARL lookup says "sw1p3", but the port VLAN mask disallows sending
-from sw1p4 to sw1p3, so it gets dropped.
+Very short wrap.  Convention for patch descriptions tends to be around
+75 chars.
 
-Without learning, all packets are flooded, so connectivity works, as
-the standalone ports are always part of the flood masks.
+> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
 
-> > The port VLAN masks only prevent forwarding to other ports, but the ARL
-> > lookup will still happen, and the packet gets dropped because the port
-> > isn't allowed to forward there.
->
-> OK.
->
-> >
-> > I have a fix/workaround for that, but as it is a bit more controversial
-> > and makes use of an unrelated feature, I decided to hold off from that
-> > and post it later.
->
-> Can you expand on the fix/workaround you have?
+A couple more trivial things on a final look through from me.
+Obviously the netdev and mctp bits aren't my specialty as I only dip
+into them occasionally, but with that in mind and some concerns
+about possibility for this getting abused as a work around for things
+should have more specific kernel level support...
 
-It's setting EAP mode to simplified on standalone ports, where it
-redirects all frames to the CPU port where there is no matching ARL
-entry for that SA and port. That should work on everything semi recent
-(including BCM63XX), and should work regardless of VLAN. It might
-cause more traffic than expected to be sent to the switch, as I'm not
-sure if multicast filtering would still work (not that I'm sure that
-it currently works lol).
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-At first I moved standalone ports to VID 4095 for untagged traffic,
-but that only fixed the issue for untagged traffic, and you would have
-had the same issue again when using VLAN uppers. And VLAN uppers have
-the same issue on vlan aware bridges, so the above would be a more
-complete workaround.
 
-> > This wasn't noticed so far, because learning was never working in VLAN
-> > unaware mode, so the traffic was always broadcast (which sidesteps the
-> > issue).
-> >
-> > Finally some of the multicast tests from local_termination fail, where
-> > the reception worked except it shouldn't. This doesn't seem to me as a
-> > super serious issue, so I didn't attempt to debug/fix these yet.
-> >
-> > I'm not super confident I didn't break sf2 along the way, but I did
-> > compile test and tried to find ways it cause issues (I failed to find
-> > any). I hope Florian will tell me.
->
-> I am currently out of the office but intend to test your patch series at
-> some point in the next few days. Let's gather some review feedback in
-> the meantime, thanks for submitting those fixes!
+> diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
+> new file mode 100644
+> index 000000000000..aa5c5701d581
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-pcc.c
+> @@ -0,0 +1,305 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * mctp-pcc.c - Driver for MCTP over PCC.
+> + * Copyright (c) 2024, Ampere Computing LLC
+> + */
+> +
+> +/* Implementation of MCTP over PCC DMTF Specification DSP0256
+> + * https://www.dmtf.org/sites/default/files/standards/documents/DSP0256_2.0.0WIP50.pdf
 
-If you are awake at this hour I guess your are back "home" ;-)
+https://www.dmtf.org/sites/default/files/standards/documents/DSP0256_2.0.0.pdf
 
-Sure thing, take your time! All I wanted to implement is MST support,
-but then I noticed some things not working as expected, and then I
-became aware of the selftests, and then I suddenly had accumulated a
-lot of fixes trying to make everything say "Okay" (and sometimes
-wondering why other stuff broke when I fixed things, like the learning
-in unaware mode).
+Looks to be final version of that doc, but it's not what your title says...
 
-Best regards,
-Jonas
+
+
+
+> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+> +{
+> +	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
+> +	struct mctp_pcc_hdr *mctp_pcc_header;
+> +	void __iomem *buffer;
+> +	unsigned long flags;
+> +	int len = skb->len;
+> +	int rc;
+> +
+> +	rc = skb_cow_head(skb, sizeof(*mctp_pcc_header));
+> +	if (rc)
+> +		goto err_drop;
+> +
+> +	mctp_pcc_header = skb_push(skb, sizeof(mctp_pcc_header));
+> +	mctp_pcc_header->signature = cpu_to_le32(PCC_SIGNATURE | mpnd->outbox.index);
+> +	mctp_pcc_header->flags = cpu_to_le32(PCC_CMD_COMPLETION_NOTIFY);
+> +	memcpy(mctp_pcc_header->mctp_signature, MCTP_SIGNATURE,
+> +	       MCTP_SIGNATURE_LENGTH);
+> +	mctp_pcc_header->length = cpu_to_le32(len + MCTP_SIGNATURE_LENGTH);
+> +
+> +	spin_lock_irqsave(&mpnd->lock, flags);
+> +	buffer = mpnd->outbox.chan->shmem;
+> +	memcpy_toio(buffer, skb->data, skb->len);
+> +	rc = mpnd->outbox.chan->mchan->mbox->ops->send_data
+> +		(mpnd->outbox.chan->mchan, NULL);
+
+Not the most readable of line wraps. I'd just go long on this one for readability.
+It's still < 100 chars. Or use a local pointer to outbox chan.
+That will shorten this and at least one other place.
+
+
+	rc = mpnd->outbox.chan->mchan->mbox->ops->send_data(mpnd->outbox.chan->mchan, NULL);
+
+
+> +	spin_unlock_irqrestore(&mpnd->lock, flags);
+> +	if ACPI_FAILURE(rc)
+> +		goto err_drop;
+> +	dev_dstats_tx_add(ndev, len);
+> +	dev_consume_skb_any(skb);
+> +	return NETDEV_TX_OK;
+> +err_drop:
+> +	dev_dstats_tx_dropped(ndev);
+> +	kfree_skb(skb);
+> +	return NETDEV_TX_OK;
+> +}
+
+> +
+> +static acpi_status lookup_pcct_indices(struct acpi_resource *ares,
+> +				       void *context)
+> +{
+> +	struct mctp_pcc_lookup_context *luc = context;
+> +	struct acpi_resource_address32 *addr;
+> +
+> +	if (ares->type != PCC_DWORD_TYPE)
+> +		return AE_OK;
+> +
+> +	addr = ACPI_CAST_PTR(struct acpi_resource_address32, &ares->data);
+> +	switch (luc->index) {
+> +	case 0:
+> +		luc->outbox_index = addr[0].address.minimum;
+Really trivial but as this is a walk of the resources, I'd expect it
+to be conceptually providing one resource per walk iteration.
+As such, is 
+		luc->outbox_index = addr->address.minimum;
+
+more representative of what is going on here than an array look up?
+
+> +		break;
+> +	case 1:
+> +		luc->inbox_index = addr[0].address.minimum;
+> +		break;
+> +	}
+> +	luc->index++;
+> +	return AE_OK;
+> +}
+
+
 
