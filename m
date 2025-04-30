@@ -1,223 +1,157 @@
-Return-Path: <netdev+bounces-187123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9120AA51B1
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:29:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE56FAA51C5
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02829E29BB
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:29:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 277B09E1AB0
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B81264630;
-	Wed, 30 Apr 2025 16:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5B2609D4;
+	Wed, 30 Apr 2025 16:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gH0USNqy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daDImLdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5048C2641D8;
-	Wed, 30 Apr 2025 16:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A532609CA;
+	Wed, 30 Apr 2025 16:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746030559; cv=none; b=AcZSsI7af2GksZ8BRSnG3WkFN0VugUbPglDTEFH2Fs7b/8rp7KxYmxttG3HzfDM9ZcqPru2e9sLk+GhLV8Aow+vnGdh3ZEodbmYXkOlY5MXYFbGhOySQ4bK8Pz+PJ3SfOCDKFJkI6XAKRlchHgESsKvAIA7O8WUCfA0cnmCbINs=
+	t=1746031088; cv=none; b=DO9+43XZPTGdj0ccoj64PIMXPB6HifeNoRGTLffGT+MI2TsTVyAdDdiZZVQPejSMgpTDlayJeCHzjVyxnvAvt2P211lep88dyxvrP3FXZa7GDJCH2ENQKg3tcNBvqIvuu3Dd+JtiylZ6hpBTiFS1bWVg7T0NMmyaeOs4Sqb5ovQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746030559; c=relaxed/simple;
-	bh=u70XBbVPx5nQc5CRmhxK7SEVU/8+kQaEYawHPX70naA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fm0TYxbJxaiBWi0HNfELRiat5mtZq0vbGN72FESVoZNdwIdh8CMtFxJ7hxUDpKbTbRswkxqWSFkFHPZidixFYUuXl9C6H7lFsxezEj8tBs5+aN6U+sz3KD77UfFUSv0xnuse1hKC0/XFpgzXJq8kS7jeyWW6ITHpxrzm3yewuRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gH0USNqy; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43edecbfb46so33165e9.0;
-        Wed, 30 Apr 2025 09:29:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746030555; x=1746635355; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vJZLV0Sll2PYEUOZWtyGELHHAeYU3ZMvyo1o32OOZOo=;
-        b=gH0USNqycEw+1dw8uKEvY4YBLBY7FglB4YUw4xwsgUNa+l3JyMytabzsraDTg6eSia
-         l4aZ6S9OB02lPBvsgqzQvgxBWDW2SoQCL5DD+tDOSOMC4axKsoXgdRpcWp+01D9cSnwx
-         0FPmdYEoIdqRnoouw8bRQFL6Jq2cCDVYnPD0+KZhdD+bBuZMdZ5SKCochAtOlJU2iPqw
-         iXe3E4eFeR+fmE7HHMHw0CTk+Ud1yrz2KpP+QQLJGpCkhz3ql2n7Ajq+BcZkpfWxuLdA
-         klEfqXrOQZImWDKhI+nqK9s5F6xrAqSGaBvts2towUvb2ihjeLwT4wutoHEN5Ysfc1PA
-         QWIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746030555; x=1746635355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vJZLV0Sll2PYEUOZWtyGELHHAeYU3ZMvyo1o32OOZOo=;
-        b=XkQx8YzvarY5bLd/8czMPJ3JysJFezUPSBpYHbBUNgdJ1u9dEE1+qwZCgeSmjronfU
-         kjiul/VccP1DbaKCLFJSJ9TMNoXy5X+fbMWtsokm9fAfcrEQfSGcOIGsJ5VSWM0gf1sV
-         zMqw+holU26qcNKEDw8u3it2YI4rq3uNbXovrpM8jqcLzUJ7gy/XCVDbp0f67SDnZdw6
-         PLAuzVZ/VQJRJbWI1OffJh+LJlqXjli/meJ0FqLdPltF60+EXEi+ikdGqygiU9fMqkZI
-         THWT8hYDKUCJ4/+GWX3kIfQ1+iyUMQHazpZPzlSM0R8r9q7Uz2bYkHGHbC0n1q3zKTXK
-         ZxFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGImrX+QFNCjBsoVbnVLVdNpJCcu01/urARlxVRDULEI+Ksy7Iev0gxXFLDqkWJ8qqyyE=@vger.kernel.org, AJvYcCWYqoRCaUoa+5PfGRhec6T6ijfZPlc4Lm0DhgVO/Yj3OQUXsgFlqPEPa+8EIn+tzrv3sBj+zaFv@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWHzRy55Fjj0/j1/RsjFqGAG5tHCBytKZ1v1x2SrFW/1RSDBLS
-	ruy8p2PacyjA4GaSBfbmEs5d5XvEVD9MR5HmQ7Tym0piNxP+E4sFmh+Z98mNQktfCQZrvYBvFwr
-	jSNp+Qi/gv/oZqE1HS8kN5JoeBLM=
-X-Gm-Gg: ASbGncvPfZxvaR3HDeDWXHFwylvyNjL0L1nzGs9k/xn5KD2PCkxTJ612EXKEvxtXYET
-	rpmetiVeXr0+P6DERpN0UYi3aUhm98zCKBjD/0rg7T6UmaTTHmAXUEHKFBE1XxIKQAZBIC1KyzF
-	QVacFXRvILgFfhySovsKu4ZmlmuNOpDfTLzs090g==
-X-Google-Smtp-Source: AGHT+IHtfElgtG61hW/u6Xd1EZLtQ0iSGf0kTetWxLhfpufDWQSp+FSq5OoY16Z1ctreST2E4KRVyKDCaF5WzTUHDaM=
-X-Received: by 2002:a05:600c:4ecc:b0:43d:fa58:8378 with SMTP id
- 5b1f17b1804b1-441b2696cd2mr24821685e9.33.1746030555265; Wed, 30 Apr 2025
- 09:29:15 -0700 (PDT)
+	s=arc-20240116; t=1746031088; c=relaxed/simple;
+	bh=Kwh+D250+lz6tQ6Lf6LcLo7vr/SWVWmbcIzExKcLGiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fqKUfILf3kz7nFNNbGJyB2wbOHHHW9z8X7agY94hZFKADLZgUUt6vaouMhyK6ECGGCgApJsopXITgfY1b4WMaCNaVZ4riG7oYAvlpKcMniyjlgi9LMw2IxOD6J31q9Rj/J0Wk5OyaEBiUG0SCJeJbqFsZt5tZ5xgXsVntpM8xPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daDImLdX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200E3C4CEE7;
+	Wed, 30 Apr 2025 16:38:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746031087;
+	bh=Kwh+D250+lz6tQ6Lf6LcLo7vr/SWVWmbcIzExKcLGiA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=daDImLdXwxrnlZiVPC2+mWqe4o84V5Vc+FmbO9JXve8VUI+0e8poHICdC9UxB+eqh
+	 xgymxEK/aghoCo8v2hK00dylWpe48/1dsF4cSIl4z1kJSdrWbEd6sHT6eqUXr2ybTZ
+	 WIMlJ6J/wYTumdqHekjzjKlCpPvGZMbla/5Oqcom5xIeyYP8TmMUlr14CykUNqfjNU
+	 PXsHsjXKBEls/LFkZHbZbyDzsPElItNzNnQ94Vzsy/fXKHnHpR5VSCZolBV36ZVOFK
+	 xZ7cAGrQWnVF1GiE27iP0mmny/hPe522Nreve0wAQG773CWw5L215zAEdwLEVcRoqd
+	 07uvBQU0D+jaA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Bui Quang Minh <minhquangbui99@gmail.com>,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	romieu@fr.zoreil.com,
+	kuniyu@amazon.com,
+	virtualization@lists.linux.dev
+Subject: [PATCH net v2] virtio-net: don't re-enable refill work too early when NAPI is disabled
+Date: Wed, 30 Apr 2025 09:37:58 -0700
+Message-ID: <20250430163758.3029367-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com>
- <20250422-afabre-traits-010-rfc2-v2-1-92bcc6b146c9@arthurfabre.com>
- <CAADnVQJeCC5j4_ss2+G2zjMbAcn=G3JLeAJCBZRC8uzfsVAjMA@mail.gmail.com>
- <D9FYTORERFI7.36F4WG8G3NHGX@arthurfabre.com> <CAADnVQKe3Jfd+pVt868P32-m2a-moP4H7ms_kdZnrYALCxx53Q@mail.gmail.com>
- <87frhqnh0e.fsf@toke.dk>
-In-Reply-To: <87frhqnh0e.fsf@toke.dk>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 30 Apr 2025 09:29:04 -0700
-X-Gm-Features: ATxdqUErKzZImGgqgFULhi6t18jxh2W3jtQ4NzOOT9a4hopKuAG6uSJBEggZxVs
-Message-ID: <CAADnVQ+V3Tp1zgFb6yfZQgC8m9WhdQOZmmrAFetDb5sZNxXLQQ@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next v2 01/17] trait: limited KV store for packet metadata
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Arthur Fabre <arthur@arthurfabre.com>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Yan Zhai <yan@cloudflare.com>, jbrandeburg@cloudflare.com, 
-	lbiancon@redhat.com, Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 30, 2025 at 2:19=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
->
-> > On Fri, Apr 25, 2025 at 12:27=E2=80=AFPM Arthur Fabre <arthur@arthurfab=
-re.com> wrote:
-> >>
-> >> On Thu Apr 24, 2025 at 6:22 PM CEST, Alexei Starovoitov wrote:
-> >> > On Tue, Apr 22, 2025 at 6:23=E2=80=AFAM Arthur Fabre <arthur@arthurf=
-abre.com> wrote:
-> >> > >
-> >> > > +/**
-> >> > > + * trait_set() - Set a trait key.
-> >> > > + * @traits: Start of trait store area.
-> >> > > + * @hard_end: Hard limit the trait store can currently grow up ag=
-ainst.
-> >> > > + * @key: The key to set.
-> >> > > + * @val: The value to set.
-> >> > > + * @len: The length of the value.
-> >> > > + * @flags: Unused for now. Should be 0.
-> >> > > + *
-> >> > > + * Return:
-> >> > > + * * %0       - Success.
-> >> > > + * * %-EINVAL - Key or length invalid.
-> >> > > + * * %-EBUSY  - Key previously set with different length.
-> >> > > + * * %-ENOSPC - Not enough room left to store value.
-> >> > > + */
-> >> > > +static __always_inline
-> >> > > +int trait_set(void *traits, void *hard_end, u64 key, const void *=
-val, u64 len, u64 flags)
-> >> > > +{
-> >> > > +       if (!__trait_valid_key(key) || !__trait_valid_len(len))
-> >> > > +               return -EINVAL;
-> >> > > +
-> >> > > +       struct __trait_hdr *h =3D (struct __trait_hdr *)traits;
-> >> > > +
-> >> > > +       /* Offset of value of this key. */
-> >> > > +       int off =3D __trait_offset(*h, key);
-> >> > > +
-> >> > > +       if ((h->high & (1ull << key)) || (h->low & (1ull << key)))=
+Commit 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+fixed a deadlock between reconfig paths and refill work trying to disable
+the same NAPI instance. The refill work can't run in parallel with reconfig
+because trying to double-disable a NAPI instance causes a stall under the
+instance lock, which the reconfig path needs to re-enable the NAPI and
+therefore unblock the stalled thread.
+
+There are two cases where we re-enable refill too early. One is in the
+virtnet_set_queues() handler. We call it when installing XDP:
+
+   virtnet_rx_pause_all(vi);
+   ...
+   virtnet_napi_tx_disable(..);
+   ...
+   virtnet_set_queues(..);
+   ...
+   virtnet_rx_resume_all(..);
+
+We want the work to be disabled until we call virtnet_rx_resume_all(),
+but virtnet_set_queues() kicks it before NAPIs were re-enabled.
+
+The other case is a more trivial case of mis-ordering in
+__virtnet_rx_resume() found by code inspection.
+
+Taking the spin lock in virtnet_set_queues() (requested during review)
+may be unnecessary as we are under rtnl_lock and so are all paths writing
+to ->refill_enabled.
+
+Reviewed-by: Bui Quang Minh <minhquangbui99@gmail.com>
+Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - wrap schedule under the spin lock
+v1: https://lore.kernel.org/20250429143104.2576553-1-kuba@kernel.org
+
+CC: mst@redhat.com
+CC: jasowang@redhat.com
+CC: xuanzhuo@linux.alibaba.com
+CC: eperezma@redhat.com
+CC: minhquangbui99@gmail.com
+CC: romieu@fr.zoreil.com
+CC: kuniyu@amazon.com
+CC: virtualization@lists.linux.dev
+---
+ drivers/net/virtio_net.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c107916b685e..f9e3e628ec4d 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3383,12 +3383,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+ 				bool refill)
  {
-> >> > > +               /* Key is already set, but with a different length=
- */
-> >> > > +               if (__trait_total_length(__trait_and(*h, (1ull << =
-key))) !=3D len)
-> >> > > +                       return -EBUSY;
-> >> > > +       } else {
-> >> > > +               /* Figure out if we have enough room left: total l=
-ength of everything now. */
-> >> > > +               if (traits + sizeof(struct __trait_hdr) + __trait_=
-total_length(*h) + len > hard_end)
-> >> > > +                       return -ENOSPC;
-> >> >
-> >> > I'm still not excited about having two metadata-s
-> >> > in front of the packet.
-> >> > Why cannot traits use the same metadata space ?
-> >> >
-> >> > For trait_set() you already pass hard_end and have to check it
-> >> > at run-time.
-> >> > If you add the same hard_end to trait_get/del the kfuncs will deal
-> >> > with possible corruption of metadata by the program.
-> >> > Transition from xdp to skb will be automatic. The code won't care th=
-at traits
-> >> > are there. It will just copy all metadata from xdp to skb. Corrupted=
- or not.
-> >> > bpf progs in xdp and skb might even use the same kfuncs
-> >> > (or two different sets if the verifier is not smart enough right now=
-).
-> >>
-> >> Good idea, that would solve the corruption problem.
-> >>
-> >> But I think storing metadata at the "end" of the headroom (ie where
-> >> XDP metadata is today) makes it harder to persist in the SKB layer.
-> >> Functions like __skb_push() assume that skb_headroom() bytes are
-> >> available just before skb->data.
-> >>
-> >> They can be updated to move XDP metadata out of the way, but this
-> >> assumption seems pretty pervasive.
-> >
-> > The same argument can be flipped.
-> > Why does the skb layer need to push?
-> > If it needs to encapsulate it will forward to tunnel device
-> > to go on the wire. At this point any kind of metadata is going
-> > to be lost on the wire. bpf prog would need to convert
-> > metadata into actual on the wire format or stash it
-> > or send to user space.
-> > I don't see a use case where skb layer would move medadata by N
-> > bytes, populate these N bytes with "???" and pass to next skb layer.
-> > skb layers strip (pop) the header when it goes from ip to tcp to user s=
-pace.
-> > No need to move metadata.
-> >
-> >> By using the "front" of the headroom, we can hide that from the rest o=
-f
-> >> the SKB code. We could even update skb->head to completely hide the
-> >> space used at the front of the headroom.
-> >> It also avoids the cost of moving the metadata around (but maybe that
-> >> would be insignificant).
-> >
-> > That's a theory. Do you actually have skb layers pushing things
-> > while metadata is there?
->
-> Erm, any encapsulation? UDP tunnels, wireguard, WiFi, etc. There are
-> almost 1000 calls to skb_push() all over the kernel. One of the primary
-> use cases for traits is to tag a packet with an ID to follow it
-> throughout its lifetime inside the kernel. This absolutely includes
-> encapsulation; in fact, having the tracing ID survive these kinds of
-> transformations is one of the primary motivators for this work.
+ 	bool running = netif_running(vi->dev);
++	bool schedule_refill = false;
+ 
+ 	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+-		schedule_delayed_work(&vi->refill, 0);
+-
++		schedule_refill = true;
+ 	if (running)
+ 		virtnet_napi_enable(rq);
++
++	if (schedule_refill)
++		schedule_delayed_work(&vi->refill, 0);
+ }
+ 
+ static void virtnet_rx_resume_all(struct virtnet_info *vi)
+@@ -3728,8 +3731,10 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ succ:
+ 	vi->curr_queue_pairs = queue_pairs;
+ 	/* virtnet_open() will refill when device is going to up. */
+-	if (dev->flags & IFF_UP)
++	spin_lock_bh(&vi->refill_lock);
++	if (dev->flags & IFF_UP && vi->refill_enabled)
+ 		schedule_delayed_work(&vi->refill, 0);
++	spin_unlock_bh(&vi->refill_lock);
+ 
+ 	return 0;
+ }
+-- 
+2.49.0
 
-and the assumption here is that placing traits in the front will
-be enough for all possible encaps that the stack can do?
-Hopefully not. Moving traits due to skb_push() is mandatory anyway.
-
-The other point you're arguing is that the current metadata approach
-is broken, since it doesn't work for encap?
-pskb_expand_head() does skb_metadata_clear().
-Though I don't remember anyone complaining of that behavior,
-let's assume it's a problem indeed.
-With traits in front the pskb_expand_head() should either fail or move
-traits when it runs out of room.
-Let's be consistent and do the same for regular metadata.
-
-My main point is we should not introduce a second kind of metadata.
-If the current metadata doesn't quite work, fix it instead of adding
-a new one.
 
