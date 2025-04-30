@@ -1,242 +1,210 @@
-Return-Path: <netdev+bounces-187019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9E9AA47BD
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:57:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E89AA47D5
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 12:04:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DECB7A7B85
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:56:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A72B5A8728
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 10:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D196D238142;
-	Wed, 30 Apr 2025 09:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B6222259B;
+	Wed, 30 Apr 2025 10:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dieam/H3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="kbsTSOfI";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S0odmGrE";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FsXnafmM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M68ARbv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2088.outbound.protection.outlook.com [40.107.92.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC2B231859
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746007040; cv=none; b=ETHBq2gmrAILqbBZlkIls5mMIU90ty0M83HX9iTBw9yZbdl6RFatWBWWRKx9rRRFOTmJdUk8A0nRRFT5vPVa6iPjlsIv9jzCIBlrTdryXjoXPw/Iu1gYQ4Is/MlSr1bBl7kPmTMjclLQ4w3DKkuEPQjteLTkpk+j8IM212EHtjw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746007040; c=relaxed/simple;
-	bh=2N/gZ2xEz4587NZSPxfEBAB/1ICXtlQSDrPwawJJivE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=udUY0lY0pBZ7UXr6NKw+TJQLKV+NDmByACfKCuRgXkHdHiI6v/WOAhzNVjgpZL5I1o0lGm9sb6kG9lTpgqPgrtmkviwSKSa/80uzO8kyIMlsrpB00g+hmxW8DaDZZ9tnzVSgtNjE4U9+kdfPr5JZwh5D82iih27G+9qCVm+u+Xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dieam/H3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=kbsTSOfI; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S0odmGrE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FsXnafmM; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F3C0C1F7BD;
-	Wed, 30 Apr 2025 09:57:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746007035; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
-	b=dieam/H3ocYHiQr07Lfty8bGaKeGdej3g3gXK4x56a5/WCu17ZxIdzdAgxcN2st1xKbAQL
-	rQAkevx69JHnxdSLSzRC1NHgF/doKacmq5e4rPXtploYNjHuzIF/ZM2Mel+KgENpbCL7Ux
-	E0lPJ5sCQMZKbrfD3Qy5hH7VzsP3t7E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746007035;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
-	b=kbsTSOfI1gx6O3dLXj96daBHGv1GOVwaqshDWb8bEKI/5zUqxwD/3jXPASE8FuoXQx9rrU
-	bXADThEJUpXIhQDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1746007034; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
-	b=S0odmGrElF8esTIguluV7jCAIbKgwRJaPPcTdAB2R8Jlg1F9I/jFR8tj11LnvrPBqn5V4K
-	McsCYKW/+a5XqgyVJXX979ZPOgs+eTXERcKd851mRYzqz7WMYpFJtM3GvksDaEi7SE1k+n
-	l8QxvIV+Yb6r2Qu6AKFBOxuEQokcrtc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1746007034;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fsHh1btTbSAA8CgjYdGISaW5MiMmd0VLCDwrfkvkSAU=;
-	b=FsXnafmMc971EpWD+JvgNQbDsYWK+pu39zsiI8otOFBph3Y6o7zqYQ+tauYRw+ADQQ6I+w
-	uvUKofsz++0l40Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D9A14139E7;
-	Wed, 30 Apr 2025 09:57:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id D120NPnzEWh4LQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 30 Apr 2025 09:57:13 +0000
-Message-ID: <f3e0c710-0815-44ad-844c-0e8a079bf663@suse.cz>
-Date: Wed, 30 Apr 2025 11:57:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DFD237194
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 10:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746007414; cv=fail; b=bZ9sOQJ4pjCuarB/d5NnhnlViHrtU2NhyOD0JbMIkTIu4GFTpa/hqRa2EtxXtxp+xLc9BTiWa4gp/eX3jWX3aFt9yYvDvump/PzG5+qYxsTjggh4p795zW6kq2EWsPyhPldyw4fSgwbCc6ia9518iP5x9W5m+bhGhvZC616G9y0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746007414; c=relaxed/simple;
+	bh=3JTvl88MoW/+jHq/Vr+k1Wyppq6/Y52QlbfZFfXpX40=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CfqSf5hyux9fFhTlA2UYfd/bs+0Q1s8AmpnhI8iStdBtv6fHmHz7u2Egg48ibaoaWmpS5yKl1w+pczmMXKqrS10USxUOELcLZKqjacnimZGmfgEKWwSZy9g/Rz1moXtG8Ci1Ps5OShqhltCZFQ8ML1AyTBtERHyQMp0Oo62jlJY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M68ARbv8; arc=fail smtp.client-ip=40.107.92.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MUFOoFn8FZGc9cImgfJth6SG6w/Y2zLi0mKmAv+UlJ3YVGP+DZ8H8KWAQO8/r8DdNKuNWIBJR45kEntvNjCeZMHLhegNe2b8EKLmPifYAjPq2xMd2nq8zTTAwNHg4TVvR6FcAudmmUKsxn2voE2dYnALejSPuhsSCWph19gPDJG2j7E1Ptx1tmCtifnDXy4sxI8luUOppNMJR6OHziOXUlS8BrNnbyQN4vkaO7NjsIRU5GDm7Ulqph/mGhjQE/eQomyYcAI7qW/b0+hq3fKL8Ioobvn1XjNkIKRiWyhsIJol2nEVtAzYEKiLQg30B5ZRhGKFJcY4SPyS7pLw7uJa8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zFz1v5TIyQQWdEw2SlJZh/2IPUaGuOESpJxOBCyvEvg=;
+ b=UWWwN5AAXSnjIVG0FxwAzY2pBC/vqaJo2Z6Qx8ZXRe6aTe9tLLZaik2KLIjiPYmO7EvsO/NluayJZUIvDagsYP/++PD/IIBx/Y7TVCcd5CxTZoHRFl90vp63FulC0i9fUCidOnmgZ5Ab1gr1fm3wJbr2zeHy4Ri1JMegnXTatfnj0f4e/QFbWtV+/V8TOWcKwxKniB+DDadlK4YMFftUOndSACBKw0MEfKeoOpzBL5CJvg79ok10Tsal2F9lN9QGO8B1y3+9ulvTkmVWCW9ycJuWaR73YDnBKOcCWfPMipwDIGfjWSLNUj4L1/3HcNwPvVydQlGHpsiBcrppIyPdOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zFz1v5TIyQQWdEw2SlJZh/2IPUaGuOESpJxOBCyvEvg=;
+ b=M68ARbv8XiQdeEr6d+I8phrJHFWPnHJatWFOLElS4kB48wox6PAizH2oVmt5Ucq5L8TbSzM6Qa7KLBwO4vG0/az6D6zZIhUXiY2w3B1o07r0mEI9NXmqSu9GXAY5kf13d1jbeDpKeqhNrytulCp3UJvYOHVdwa8B+9NJThhZ6kOFIjRhGs+36C1SgLiEoI7JGYsob0alBq+HActZKn/aRAZUwbSG3DjP7eC2JuDkz6wceJmWQnk3hKQy3qpDsr2k/3dufjvtSAcW2vmPp+EAXphaRsmZ+a2gzvkSnZUnUgSiFLXMOgkkteKpKQf8kliKaRGzsz4rU9XDScBpC6AnKQ==
+Received: from CH5P220CA0018.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1ef::25)
+ by DS2PR12MB9639.namprd12.prod.outlook.com (2603:10b6:8:27a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.20; Wed, 30 Apr
+ 2025 10:03:28 +0000
+Received: from CH3PEPF0000000A.namprd04.prod.outlook.com
+ (2603:10b6:610:1ef:cafe::ea) by CH5P220CA0018.outlook.office365.com
+ (2603:10b6:610:1ef::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.41 via Frontend Transport; Wed,
+ 30 Apr 2025 10:03:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH3PEPF0000000A.mail.protection.outlook.com (10.167.244.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8699.20 via Frontend Transport; Wed, 30 Apr 2025 10:03:27 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 30 Apr
+ 2025 03:03:16 -0700
+Received: from shredder.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 30 Apr
+ 2025 03:03:13 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dsahern@kernel.org>, <horms@kernel.org>,
+	<willemb@google.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next] ipv4: Honor "ignore_routes_with_linkdown" sysctl in nexthop selection
+Date: Wed, 30 Apr 2025 13:02:40 +0300
+Message-ID: <20250430100240.484636-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
-To: Shakeel Butt <shakeel.butt@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Soheil Hassas Yeganeh
- <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Meta kernel team <kernel-team@meta.com>
-References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20250416180229.2902751-1-shakeel.butt@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:mid,linux.dev:email,oom.group:url,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF0000000A:EE_|DS2PR12MB9639:EE_
+X-MS-Office365-Filtering-Correlation-Id: a424c28d-691d-4fb6-0103-08dd87ce40da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?egfdUTYttgsbj7XQqDHSuFtEas90g/T+kUotuSnZ0WnJMTUOqh3iYnCLFym6?=
+ =?us-ascii?Q?Z0lm2wRxusYcO3QGrwg18OVggNnQW4RhJSVZsrcikAEFDH0av5Ft4lcGKqp0?=
+ =?us-ascii?Q?z1QOn/zcjNdbZPTTSfCY+MEg9cnkSYrNkxKy38eXIAqhGJsvzs80oBZguU6y?=
+ =?us-ascii?Q?Pf+03qNfhVSHfPv61OInEjjv64/ZfgqGTBstDjSquGwEYyPRbdECnTb5IEEm?=
+ =?us-ascii?Q?3yqfjVWrjuWh0LDKhHpC54moxeiwC4Wp+LO4Uyaqf/DmyCKVnkRAUyV7b3X4?=
+ =?us-ascii?Q?2K/OPs+dHFcb5I3q7k41SbNsQDSOyMfsbojRHFExh9RGmNqJ92MDRAZkX1Dy?=
+ =?us-ascii?Q?xRpAdSUWDKC9RROq5mRd3BR22z6H1mX0ENZHdmO+Psf29tIs9jgWPFLI+JMM?=
+ =?us-ascii?Q?T51Fp9Rtw4d2c70LRRlbs6KA1qYItim278sahjSrMpt92cqi+ZqlZr6/pT0O?=
+ =?us-ascii?Q?7m0J39n+LV3bNBOuZNy7e/rh/1ig/ejrLif9NOGMIqojYyuBflown+JrTrNQ?=
+ =?us-ascii?Q?pB6YWFPjLm3AEaMAYxAudilr/IaGV8eNKBFgdjz0Ng7e0+1xCWIxw6k6+uOS?=
+ =?us-ascii?Q?TJrKpOZuGoNBB6Zpurj7QfC/8wTUyG9xCYDo6YqxrurbS53myGxj54iqlyJS?=
+ =?us-ascii?Q?Iq4VS2FZQ170o8lnXstfbTV5m8dwwrQpuAVPNduRjEe7/UbRUJPwojlCRzTy?=
+ =?us-ascii?Q?5E3FLW9y/d+Z8dAN/F5l51dkM8dkRHYzqls5Ynvry6mglwL6+FCIbZNqEpQS?=
+ =?us-ascii?Q?xBBCVt4W+zBWPoHoVlOVd2seyjq53skHyVzVm9eW6bxzP0RByQKmSa3uk/z+?=
+ =?us-ascii?Q?EhCkKrYAW/l9oAAtZpm+lRdh0SeeW6WG/oHcmjgjLGO1zuuj9SPOoLFQ+zBb?=
+ =?us-ascii?Q?L94OxDmh/tAnXjsYvtWuSyuRkp4pv2d0Fty94E8Y/KHyDAksEvIkMQkM0PsD?=
+ =?us-ascii?Q?l3TjI8XO1LAIFI7s0dAGa8+uo3gR/RH4oxVkhaByf91yc06XBGrAsLzZDPNN?=
+ =?us-ascii?Q?VoMAGJ55tqXth8HF+bB7TTOOV7tZgacM6rg851YyQ5hqhdAneRcQR3nd9u5e?=
+ =?us-ascii?Q?Hpi9jft020IGg+8vtXmwD2d9qSX+UxCETBHLFSLbpmmDYztlmxS7Y8by5nOc?=
+ =?us-ascii?Q?6kz4+ltknlI1mwZq+QshBlkvKhXjAkfFvXLQITt556yMd7nKFISPYy75qVGC?=
+ =?us-ascii?Q?BIWbTd8TlC7yNNu+oX6X+LR/vzeNr42mYxOQHONfostUIPcX4nKJ8nSJOxgV?=
+ =?us-ascii?Q?Y9p6anRfDGrB2LSQKwMvJiIZk00nb8UUYXX4araJJaa5hskZ4L0QlR+Kfi7S?=
+ =?us-ascii?Q?DmOO7fg5CPxgGNKmAhROxV4XHheFjWqc8bIMTIu5LjeHL8/4qEOOz9excnfQ?=
+ =?us-ascii?Q?9QkX6caqcOgLhq+mew36a1eVe/F0b8raw5ON7BoHBrrdrKIIp0YI4p8VHQwH?=
+ =?us-ascii?Q?3l6v6SzRbCeDYypk82N/SpH/XxGwre53PyTikNhXGQaxWIkF02XVHbXqCCLB?=
+ =?us-ascii?Q?0q0c8+cpGjwvuTyK/VX0Yi6yX+l00/7LBj/E?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 10:03:27.5985
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a424c28d-691d-4fb6-0103-08dd87ce40da
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF0000000A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9639
 
-On 4/16/25 20:02, Shakeel Butt wrote:
-> Memory cgroup accounting is expensive and to reduce the cost, the kernel
-> maintains per-cpu charge cache for a single memcg. So, if a charge
-> request comes for a different memcg, the kernel will flush the old
-> memcg's charge cache and then charge the newer memcg a fixed amount (64
-> pages), subtracts the charge request amount and stores the remaining in
-> the per-cpu charge cache for the newer memcg.
-> 
-> This mechanism is based on the assumption that the kernel, for locality,
-> keep a process on a CPU for long period of time and most of the charge
-> requests from that process will be served by that CPU's local charge
-> cache.
-> 
-> However this assumption breaks down for incoming network traffic in a
-> multi-tenant machine. We are in the process of running multiple
-> workloads on a single machine and if such workloads are network heavy,
-> we are seeing very high network memory accounting cost. We have observed
-> multiple CPUs spending almost 100% of their time in net_rx_action and
-> almost all of that time is spent in memcg accounting of the network
-> traffic.
-> 
-> More precisely, net_rx_action is serving packets from multiple workloads
-> and is observing/serving mix of packets of these workloads. The memcg
-> switch of per-cpu cache is very expensive and we are observing a lot of
-> memcg switches on the machine. Almost all the time is being spent on
-> charging new memcg and flushing older memcg cache. So, definitely we
-> need per-cpu cache that support multiple memcgs for this scenario.
-> 
-> This patch implements a simple (and dumb) multiple memcg percpu charge
-> cache. Actually we started with more sophisticated LRU based approach but
-> the dumb one was always better than the sophisticated one by 1% to 3%,
-> so going with the simple approach.
-> 
-> Some of the design choices are:
-> 
-> 1. Fit all caches memcgs in a single cacheline.
-> 2. The cache array can be mix of empty slots or memcg charged slots, so
->    the kernel has to traverse the full array.
-> 3. The cache drain from the reclaim will drain all cached memcgs to keep
->    things simple.
-> 
-> To evaluate the impact of this optimization, on a 72 CPUs machine, we
-> ran the following workload where each netperf client runs in a different
-> cgroup. The next-20250415 kernel is used as base.
-> 
->  $ netserver -6
->  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
-> 
-> number of clients | Without patch | With patch
->   6               | 42584.1 Mbps  | 48603.4 Mbps (14.13% improvement)
->   12              | 30617.1 Mbps  | 47919.7 Mbps (56.51% improvement)
->   18              | 25305.2 Mbps  | 45497.3 Mbps (79.79% improvement)
->   24              | 20104.1 Mbps  | 37907.7 Mbps (88.55% improvement)
->   30              | 14702.4 Mbps  | 30746.5 Mbps (109.12% improvement)
->   36              | 10801.5 Mbps  | 26476.3 Mbps (145.11% improvement)
-> 
-> The results show drastic improvement for network intensive workloads.
-> 
-> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+Commit 32607a332cfe ("ipv4: prefer multipath nexthop that matches source
+address") changed IPv4 nexthop selection to prefer a nexthop whose
+nexthop device is assigned the specified source address for locally
+generated traffic.
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+While the selection honors the "fib_multipath_use_neigh" sysctl and will
+not choose a nexthop with an invalid neighbour, it does not honor the
+"ignore_routes_with_linkdown" sysctl and can choose a nexthop without a
+carrier:
 
-See below
+ $ sysctl net.ipv4.conf.all.ignore_routes_with_linkdown
+ net.ipv4.conf.all.ignore_routes_with_linkdown = 1
+ $ ip route show 198.51.100.0/24
+ 198.51.100.0/24
+         nexthop via 192.0.2.2 dev dummy1 weight 1
+         nexthop via 192.0.2.18 dev dummy2 weight 1 dead linkdown
+ $ ip route get 198.51.100.1 from 192.0.2.17
+ 198.51.100.1 from 192.0.2.17 via 192.0.2.18 dev dummy2 uid 0
 
-> ---
->  mm/memcontrol.c | 128 ++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 91 insertions(+), 37 deletions(-)
-> 
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index 1ad326e871c1..0a02ba07561e 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -1769,10 +1769,11 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
->  	pr_cont(" are going to be killed due to memory.oom.group set\n");
->  }
->  
-> +#define NR_MEMCG_STOCK 7
->  struct memcg_stock_pcp {
->  	local_trylock_t stock_lock;
-> -	struct mem_cgroup *cached; /* this never be root cgroup */
-> -	unsigned int nr_pages;
-> +	uint8_t nr_pages[NR_MEMCG_STOCK];
-> +	struct mem_cgroup *cached[NR_MEMCG_STOCK];
+Solve this by skipping over nexthops whose assigned hash upper bound is
+minus one, which is the value assigned to nexthops that do not have a
+carrier when the "ignore_routes_with_linkdown" sysctl is set.
 
-I have noticed memcg_stock is a DEFINE_PER_CPU and not
-DEFINE_PER_CPU_ALIGNED so I think that the intended cacheline usage isn't
-guaranteed now.
+In practice, this probably does not matter a lot as the initial route
+lookup for the source address would not choose a nexthop that does not
+have a carrier in the first place, but the change does make the code
+clearer.
 
-Actually tried compiling and got in objdump -t vmlinux:
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/ipv4/fib_semantics.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-ffffffff83a26e60 l     O .data..percpu  0000000000000088 memcg_stock
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 03959c60d128..dabe2b7044ab 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -2188,7 +2188,14 @@ void fib_select_multipath(struct fib_result *res, int hash,
+ 	saddr = fl4 ? fl4->saddr : 0;
+ 
+ 	change_nexthops(fi) {
+-		if (use_neigh && !fib_good_nh(nexthop_nh))
++		int nh_upper_bound;
++
++		/* Nexthops without a carrier are assigned an upper bound of
++		 * minus one when "ignore_routes_with_linkdown" is set.
++		 */
++		nh_upper_bound = atomic_read(&nexthop_nh->fib_nh_upper_bound);
++		if (nh_upper_bound == -1 ||
++		    (use_neigh && !fib_good_nh(nexthop_nh)))
+ 			continue;
+ 
+ 		if (!found) {
+@@ -2197,7 +2204,7 @@ void fib_select_multipath(struct fib_result *res, int hash,
+ 			found = !saddr || nexthop_nh->nh_saddr == saddr;
+ 		}
+ 
+-		if (hash > atomic_read(&nexthop_nh->fib_nh_upper_bound))
++		if (hash > nh_upper_bound)
+ 			continue;
+ 
+ 		if (!saddr || nexthop_nh->nh_saddr == saddr) {
+-- 
+2.49.0
 
-AFAICS that's aligned to 32 bytes only (0x60 is 96) bytes, not 64.
-
-changing to _ALIGNED gives me:
-
-ffffffff83a2c5c0 l     O .data..percpu  0000000000000088 memcg_stock
-
-0xc0 is 192 so multiple of 64, so seems to work as intended and indeed
-necessary. So you should change it too while adding the comment.
-
->  	struct obj_cgroup *cached_objcg;
->  	struct pglist_data *cached_pgdat;
 
