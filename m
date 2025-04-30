@@ -1,185 +1,238 @@
-Return-Path: <netdev+bounces-186950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B660BAA429B
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:48:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2CDAA42F5
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 08:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FF187B692D
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:47:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42431BC3740
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 06:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2903B1DF25A;
-	Wed, 30 Apr 2025 05:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28FC1E5B60;
+	Wed, 30 Apr 2025 06:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U0WCWih2"
+	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="wYZ8EB20"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2071.outbound.protection.outlook.com [40.107.236.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3571DE3BE;
-	Wed, 30 Apr 2025 05:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81421DF98B;
+	Wed, 30 Apr 2025 06:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745992100; cv=fail; b=YB5pfIMz2d1oceTL5s5qiDC6AklyKKFT8wSrQgjrn/xRPc9vtJL/TMRz6AmKB6zEV5wDFjj0umNxSre4a7OCQ/H+th1fZ2PGY/TGV9tjytXXKmQwRTUKK76AogBkEAcHD2j2xvdQWXB/xyH9JOWANI4ROdQA8Y11yFf2rTUyTRE=
+	t=1745993624; cv=fail; b=WLH6tASkyaMPe05mY7ZX69GNYdaRJzEd61oJgWPLCUKNb3L+dzFdiqBfaxbH+5sEE5z5xWBUatAcNgK/vSJECrR4B2q12wQflpaPpH+9mBa9e8YW1j1+22hVU8Thf0m2FCFSxWDD1Lr7Xk8Iz9z8Su1X0a9N/G2EXuM65qtovag=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745992100; c=relaxed/simple;
-	bh=BLhufPOWBg6iRCrfywlbq9EivH4OpdhCHf0r3U4LPc8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QycEjGt1A5SPzPGCIuTELRGY6ETGyOkvzTTFCW8047uhz0y2xI2fEQCWowb2iC/cTetus3IZO2nbEuWXXwnqXxX5Pl9DJfjT3sDq7zApmgtNMxTL7DNXJoBCgo8M8AZAyQux13HHBulIMosu37ZzpE/UzM/Q8GDw7zUDMRCZNb0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U0WCWih2; arc=fail smtp.client-ip=40.107.244.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1745993624; c=relaxed/simple;
+	bh=Oed2qUEmOY/Ong6Ma6SY4oBtRaaHvxecnDlLJASCqzw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YHCA7BkWBQgwDPpWDwjLpSBbH+xc5JQTAI+siY/npUuUiAnOMynB2QbwBbqTHaKPzYrsNB6PeEkQlj+hW8W6J1K0cVDmeFRy+kUBm5Gkw1gcqtiscS9Q2Gl6J6foN/i150rXmEDHPFkTivShtD/JoqB4KfwTN86CrsrKtN76OFI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=wYZ8EB20; arc=fail smtp.client-ip=40.107.236.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F4NkNz8JCS2bbrbxiKp4/7PLxgZgXAEllcLVx7p6X93NnPBVdQvAhfM5QbpP1yDq79W4eDNO/zwZ2X+kQLkfZSGbZFJuG/WQzPMOJx8tg0Vot8OH8+5SUpjer/WLBkxfvTdK5+Gnf3NFFLT9ix7h7K4+moh2o9G1dJviNyJmSr0T8bOF5Xt4PJmeZtoeO4s4x5Hh7DaOrxOf0wkGs8qZYd1isG75ed1xKH7gq7IF1RC9vxoo6j7yn4rcMHKB+/Qt+Vav3dufc5k7Nlvarihd8WWRakuVUFCRQc4uBZx3EV/TcvoCyiDIWw498YqJPOJvW/smVjYP7zmE4XO6kbonWA==
+ b=zUgmKx88F9GDBPAea1a0IX0uN4d+BEuM6lNaahbW7U+vmUOhffKv79Ca6rn3j167F88DO9YKJ4jPAUACIB2f5H2XaFcHlvXRsVQC88kHYy7vRZM0XvKntj7j3kl+8AK5BZGQ8Fjxnqzw7twlCiCMxSyj0ZeYoS3/4dP7m/k1lwrCegb/amsKIKPvxJZFWsHkY+JJdiKCsd74XgwZ9puvbryxR4dXZ36jKnZd7KYTJpHz7qLmMsQwz2/wHvubLwV58OkCn+tv15V1ViX6DWGHJGPI0uK8OAvnUaQWRbV8QYZjpROlwt1DbNxp32jytOB6j5K7N2lLyy3xYWNCCqgCLA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Kj1KF1fv0nSUs91JFiqyJWHSQeKJjYmuS7r92ZwFdiU=;
- b=PvHBABWSOZnIAZBAE++1pHF9yEgwGJZerCAjsuY+jY5mB4INdIbybA62vZ7I+q0QXgTzd4q9ScdnI4S3Ss5nL7bWsBHsaEn5JUcW8KiIfIz9RM3v+Uiy+FE1ycnkR9Hp063IQTY47U1rhBmFNTcd6mVS/0d+Y95ZA+tlLztfPE/OcaQhOK6FhzSLkK34wgh15xuBLYSQZMgqby81SLGZFWXH6ilUzCn9nVzKja0sU24S0B0QklU5vAx5qOdo4Gc0/iTcGsUZqEsTjqnQjNozbTK0tNAjMWev/Cc0ExL3SwsSHjCy/lck21/MWHSxdTnzEQwB6b4mGF8h3+rn0yp2ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=TeCyw32QqhEy6rLUjCRZJ8l6PfDyWm0B67y/uXdaVro=;
+ b=fRZX47Y9rKWVklPfXk/UcQeuNeeaVcfJPssQTiN7o1kfxYTml3ksYlePHLEzzSXKHfiLXHty/jBnNXLwnXeo27bZTNwxAy7EL01OTllHNDTY5eCHDWbN4T1suXYpYN0bqgISpCOza7dULte0cyzcPm80QYqSv8P6LLU71WVXs99Cn7rzi96pdbj/LeJHp2i7egF8x/An9Bft+55sSUQywPeWDceSCQsQJdOywQ/NFfGarDft8qH4dx8YQMUDUqXxik7oF18S/swMDbqocQVm3oeJqhqtsvUo7mAf3Jxqx0DHxXeBzUv2bEYYPdqNToCzTBENhb6sM459QFisKsrF5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
+ pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kj1KF1fv0nSUs91JFiqyJWHSQeKJjYmuS7r92ZwFdiU=;
- b=U0WCWih22IC30/fGIzRaxekunQ/XLsV6ZL21iZJhEMpCYhhxe+PzLIT/MImxLD/zdSXicfvkNLfJtUCeY/DWscKYaS3d0Pm6xMfZvf/NTPAPIIMzW5vzxszpMUsAhgdU7J6fdmyymUcGEuY3zcnZg/i37o1M++DAPGFjyYxEUhOmk856QPh0EzoPGFeCALRVUV1KAFYtowzZe19R/ghNjtoXgW3Qy6dv4MycBQ0zV3+PtAGN7CYk0+Ia61Q+Blzbw2j4EHy0CWPdPoUbb5zpN7Kf9ZrCDOwQ7toKRREUuzcE6Ze2g+5VHrt5290lT3Qer4U+W+yzS2PfXp9XQ3jY6A==
-Received: from PH1PEPF000132EA.NAMP220.PROD.OUTLOOK.COM (2603:10b6:518:1::2e)
- by CY8PR12MB8316.namprd12.prod.outlook.com (2603:10b6:930:7a::18) with
+ bh=TeCyw32QqhEy6rLUjCRZJ8l6PfDyWm0B67y/uXdaVro=;
+ b=wYZ8EB20vAkgIaKw4U4bSQ8lXA/JH95PiWdabI6sv4R4G5uKVjDtDy4FFbvsBSf+wmPIcF34u8hFs1/3bpWbOxYy1HWrvrWkg+7kqieHXz1tPnjoOxLUy5eRH4j+iFnxIzyzNUd9IBbKiqVgoMGc5FR5SUjaYqSFCxrkLxavT9liWuBxDmugpCGc/u9UgRpVJWLbkq7dfZMASrJGpz3ruIYq83GJXrogBn+eVp6mgNwCNJh/GTLlX3NTZ6T1SJPAqk50Cybdg9u4hdyN/yWTeaSPVKFpYoYevYqJHefV+oFlQ8ZzDiSQ0zCQ45Q3kRJCRQzLGGWyIlfVmKu4tY3qbQ==
+Received: from PH8PR15CA0015.namprd15.prod.outlook.com (2603:10b6:510:2d2::23)
+ by SN7PR22MB4026.namprd22.prod.outlook.com (2603:10b6:806:2e1::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Wed, 30 Apr
- 2025 05:48:13 +0000
-Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
- (2a01:111:f403:f910::2) by PH1PEPF000132EA.outlook.office365.com
- (2603:1036:903:47::3) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.32 via Frontend Transport; Wed,
- 30 Apr 2025 05:48:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.10) with Microsoft
+ 2025 06:13:38 +0000
+Received: from SA2PEPF000015C7.namprd03.prod.outlook.com
+ (2603:10b6:510:2d2:cafe::6e) by PH8PR15CA0015.outlook.office365.com
+ (2603:10b6:510:2d2::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.40 via Frontend Transport; Wed,
+ 30 Apr 2025 06:13:38 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
+ smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
+Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
+ not designate 165.85.157.49 as permitted sender)
+ receiver=protection.outlook.com; client-ip=165.85.157.49;
+ helo=atlrelay1.compute.ge-healthcare.net;
+Received: from atlrelay1.compute.ge-healthcare.net (165.85.157.49) by
+ SA2PEPF000015C7.mail.protection.outlook.com (10.167.241.197) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8699.20 via Frontend Transport; Wed, 30 Apr 2025 05:48:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 29 Apr
- 2025 22:47:54 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 29 Apr
- 2025 22:47:53 -0700
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 29
- Apr 2025 22:47:51 -0700
-From: Gal Pressman <gal@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Shuah Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, "Gal
- Pressman" <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>
-Subject: [PATCH net-next v2] selftests: drv-net: rss_input_xfrm: Check test prerequisites before running
-Date: Wed, 30 Apr 2025 08:48:01 +0300
-Message-ID: <20250430054801.750646-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+ 15.20.8699.20 via Frontend Transport; Wed, 30 Apr 2025 06:13:38 +0000
+Received: from 0ec9f3ddc3bf (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
+	by builder1.fihel.lab.ge-healthcare.net (Postfix) with SMTP id BB28FCFB78;
+	Wed, 30 Apr 2025 09:13:34 +0300 (EEST)
+Date: Wed, 30 Apr 2025 09:13:34 +0300
+From: Ian Ray <ian.ray@gehealthcare.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	brian.ruley@gehealthcare.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	ian.ray@gehealthcare.com
+Subject: Re: [PATCH] igb: Fix watchdog_task race with shutdown
+Message-ID: <aBG_jm62ngj0Mqq-@0ec9f3ddc3bf>
+References: <20250428115450.639-1-ian.ray@gehealthcare.com>
+ <20250429152021.GP3339421@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250429152021.GP3339421@horms.kernel.org>
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|CY8PR12MB8316:EE_
-X-MS-Office365-Filtering-Correlation-Id: 577d1f2c-b928-4309-fc26-08dd87aa984c
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C7:EE_|SN7PR22MB4026:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62a368ce-baa0-49e7-90ff-08dd87ae25c4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|13003099007;
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xt6ZQNDc4Oe9YbGNEaJ3M3RZhRawXwtE3fNXfX0k0xgK/VUL+w2pEUtn9XuW?=
- =?us-ascii?Q?qFY0jcV4ywWaEHsF5oyN5UqLzxp0S8UDHHiV7ptU8xk42n+3NaEHiKXZVQPh?=
- =?us-ascii?Q?BHeM6yHMNC/lH3SMskEve5iwzIcilYUbkKCEqL7lfTUUyE9+e6u/jo0cRib0?=
- =?us-ascii?Q?O0U/JPkO/r9QaL8xvRusJ96uE75D5XDDY2e90rbpDoRGMC/KbSjTERimesOn?=
- =?us-ascii?Q?tTbB8kAOyXPjcQmx4qsH03U+uYn+EdICjHGCdcYhaGcE7QA7Z9fvDaVIcyKd?=
- =?us-ascii?Q?PfcE4kIebsP23wTbGMBW/3fzATyv4GG+2LqA2oPhJR4dMwER9dCnqQ1TYUO+?=
- =?us-ascii?Q?imGtdXx2Dh6L4XJxult1iClWkEWHqymMDeQsdh1sT0kDwW4o3KUTHEgvRBq5?=
- =?us-ascii?Q?5rngsX+CyCVb7k/lEuTyLcdohZHOcRS+pfbkNyg0Y6MLmYqw0stJh7+P9fOK?=
- =?us-ascii?Q?ra/9FAjLQHlG3e3ZfM6uoCx9N9r19vQlZrM1dEhrot9UE5Qunf/LBgVEi3tv?=
- =?us-ascii?Q?3KbFxFJdEsPtDaURSEkFeLxP7a3jtkSPBQrWB06g0JHmHLdYgfsZnV9a62Nn?=
- =?us-ascii?Q?Y3kdSgUn0JhkK4NS5L8zPIOZxmSy/dufhRdcZWLr/bFePyI+4Kpjmr+vVh63?=
- =?us-ascii?Q?2vRj2E5Js1RgNkaCEBkZVyU3qm+P9+gRf6iQn/G74563eTsAsCwDnLEmoWfQ?=
- =?us-ascii?Q?4P4owEf4SE5dY3X+wfDEIRevOz3DRc4VgJ09RcEHp2qGVFqOS2VAsM6iWNyw?=
- =?us-ascii?Q?162z+OTwSi1wm95WOwbuUmDpjzSxct1fHhU1bCkYHTduu/7qhVpgyg7IvhuF?=
- =?us-ascii?Q?bzK/dZcEzSvdpjCN7QZ2hVEAthXULFB7N6ExZih5RwA5JRVbddEFyiod6dVq?=
- =?us-ascii?Q?Wwb5QLIsy4KbqJRCMKCNmR3Npbs3k7UiOsYbi6XlwNcnFapVcPS6az/VSf1l?=
- =?us-ascii?Q?42nVJZ57ITOOIf0Pn1YAeYlIbVgE8sF1+2udP92A5SfANYiJ2qTCYgGNPl7R?=
- =?us-ascii?Q?ngCZXrSL9fHIr1ZDRRxdsz6n1c4Rfkg2m2B5XocAq8cPJEsaZDRJ94nK7v4o?=
- =?us-ascii?Q?v5He+ChiOuNZpbnSMavj+BqRSNLFXt3OrdALuW7LLz/pxdoqcnnuhsMVrB/B?=
- =?us-ascii?Q?vl0pgB6KzREF/LAHAQtq2K4sHe51TWnEJG0EnfYXgesJP6GpYAOyIEwhVSeA?=
- =?us-ascii?Q?4urOOwXkMOv4KvEczeMhQLsq6puOr4+6BxxHdM0zE9sJHYI9QBBepOSb59zG?=
- =?us-ascii?Q?p8vfFkrCX8CQ7SxPDBk9ApvmjaqrAkvovHX5/Qo4xEYM4EGwXrv75W/oqCVa?=
- =?us-ascii?Q?QYzZuE8YNv/FgyzU6ottLysEAnroAQdlf+gv6YjSf6mhIPSS8n7CLpvU7h/d?=
- =?us-ascii?Q?nZl5098X9NLwBct5Zrxu1oIF9sjf1h8V1QsqZ1FneAjLaFCBKt2aYggqtjBK?=
- =?us-ascii?Q?+QBx1Gx6aq0Bsi3nu+/b1BDCLErHPzpsnBATfiTSPGho0incSJUiTa6nC1Uw?=
- =?us-ascii?Q?XQh+983nzEXqay0JF4QCS383naZhyaRqqgUYJQZQtj+9stpPDwTU6+NZOQ?=
- =?us-ascii?Q?=3D=3D?=
+	=?us-ascii?Q?T6HKDHg5n2OMH0MhPiuE6WxmraM0+pzlajnHdUDHqCQab+ixwe0VOiQzIeOC?=
+ =?us-ascii?Q?2tpejVJor5dFSLUquMSjvMwuKRGwR2hUIf9YY/tdk+5ABYMkNrENtdEBN39z?=
+ =?us-ascii?Q?i0W1Fled53SeUvigbqVnQAvbx+icW75mboKet+3KmQKcQGJZfRZdbid4aq04?=
+ =?us-ascii?Q?VD9ZQNal0oUO61vT9Ljo3fI5T5eVDX/YHtkkYYanmgyGqjy9GamKWqGOUi1e?=
+ =?us-ascii?Q?ehG+c4uV6VG5S5/+Am4QL5zEuVhSV+6OBbyvEkW4dbCtTCR+JY6Tyt+Re6gZ?=
+ =?us-ascii?Q?npcbua8tpLUeoYCBakeeLj7be5bzRBOfpG4KDsBbG1gR7Tu0S3qfjAvK0Wl1?=
+ =?us-ascii?Q?awwGTk3As8UieVa1b9VAHeRHGTpY9N06Ezw+xR4uEooh+gsKJqzksCH+1GWt?=
+ =?us-ascii?Q?MSYhZEtkLxVQaCpdASmbBFdp7a5AKBhw3KbSo19HQs4ydeKCiOcMdo8lQVRq?=
+ =?us-ascii?Q?CO/qEKBqqQY0PfsY3pDnAdkXi/La2x22zCdeWZ3+FnGHACs4Kci6r7lfqN2z?=
+ =?us-ascii?Q?gO1ftlKDHd9L6CDvdQnT7x/5aaSUCtdu6mwGAgB77wNRpoSqiHcv2I0ttIhy?=
+ =?us-ascii?Q?c3mTqIHEea/PDYxgI1mVEfIjnPvub+Vu4q5qdurMq4gaaOjYWTICH5H5BeVd?=
+ =?us-ascii?Q?bs5pmasLFy3fuokapOMDLK7WJmf0yeMl1dstfyqSy/iCVQZTCZpfLPeqQi0O?=
+ =?us-ascii?Q?nWgkDFNm8sR8VEAJ0c9pqZ/bAZ2zto2PbhjlLRx0PyOZfmxXD8rLhnukt8H+?=
+ =?us-ascii?Q?4SitzxFo+4OOwGd9AGoYwxtEIv48lB/blBGXHL2n84Iwp4eerJKY8Gf19arI?=
+ =?us-ascii?Q?27E13b0mQ8JkGDchX9MuczG7/fmXiX7av6KA08V41xwLlKJSaKhXGZ+inJVe?=
+ =?us-ascii?Q?nakfiHTFIoNFznyhFX2pgpDi0PB3UYPTb76Sq6mPiK5SvNYeMfBV1BMeG/FX?=
+ =?us-ascii?Q?hytJDrxdqDK7P/ljRTlGjbuMQnvW6AuauNGyhMHRWWtOd1huVuSNsDHa3dEJ?=
+ =?us-ascii?Q?9M9ccsJcj/qV9qIDH158kuX1I+Ew/rYfciQ+6OWIoO9ixGiMRK+sZEe1h5bv?=
+ =?us-ascii?Q?ZDbW3Z08akKrDZ9Iz4VzSAKdySi32xMkSzYbBpwLfa+hUvOHw41bXvlQLHSu?=
+ =?us-ascii?Q?lDy3UJbT/a7DaDAFG/k9iqAn0585FzU8MdMDWCnd/0wCoe19mUynDMw+Xm8Z?=
+ =?us-ascii?Q?qI8QmjKxULzVHIjNTtJgVI321ZPKe/iAjkPR9KcRphKKTvoOclF32/c/YS13?=
+ =?us-ascii?Q?lFse01+wGnW/Zls2t+OjLf5OOQS/aqsfq6mAMSIBSHywc8A41GgHn6QBAvuQ?=
+ =?us-ascii?Q?LUZUiuA/dnlOFC1X5cyuXvVZiK9idT9FUbmHbA9+8MctYUSimHixk+qEcoEa?=
+ =?us-ascii?Q?RNZBep4bXco30xXy4rS+BWyPOs1QzGj0P2J/c9DPHc1qbX7e9tJvV2E+kBL3?=
+ =?us-ascii?Q?q0nCXor/g+2RIhEujTgUYxcpBaRiMt6wAe0hLliHa6rvoGXlC4k9aWozexUJ?=
+ =?us-ascii?Q?AG6qNIIrG1JRLccxJoBTb6gl/xZORkEj9P9Z?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 05:48:12.4370
+	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:atlrelay1.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: gehealthcare.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 06:13:38.1014
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 577d1f2c-b928-4309-fc26-08dd87aa984c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE38.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62a368ce-baa0-49e7-90ff-08dd87ae25c4
+X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[atlrelay1.compute.ge-healthcare.net]
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-SA2PEPF000015C7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8316
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR22MB4026
 
-Ensure the following prerequisites before executing the test:
-1. 'socat' is installed on the remote host.
-2. Python version supports socket.SO_INCOMING_CPU (available since v3.11).
+On Tue, Apr 29, 2025 at 04:20:21PM +0100, Simon Horman wrote:
+> + Toke
+> 
+> On Mon, Apr 28, 2025 at 02:54:49PM +0300, Ian Ray wrote:
+> > A rare [1] race condition is observed between the igb_watchdog_task and
+> > shutdown on a dual-core i.MX6 based system with two I210 controllers.
+> >
+> > Using printk, the igb_watchdog_task is hung in igb_read_phy_reg because
+> > __igb_shutdown has already called __igb_close.
+> >
+> > Fix this by locking in igb_watchdog_task (in the same way as is done in
+> > igb_reset_task).
+> >
+> > reboot             kworker
+> >
+> > __igb_shutdown
+> >   rtnl_lock
+> >   __igb_close
+> >   :                igb_watchdog_task
+> >   :                :
+> >   :                igb_read_phy_reg (hung)
+> >   rtnl_unlock
+> >
+> > [1] Note that this is easier to reproduce with 'initcall_debug' logging
+> > and additional and printk logging in igb_main.
+> >
+> > Signed-off-by: Ian Ray <ian.ray@gehealthcare.com>
+> 
+> Hi Ian,
+> 
+> Thanks for your patch.
+> 
+> While I think that the simplicity of this approach may well be appropriate
+> as a fix for the problem described I do have a concern.
+> 
+> I am worried that taking RTNL each time the watchdog tasks will create
+> unnecessary lock contention. That may manifest in weird and wonderful ways
+> in future.  Maybe this patch doesn't make things materially worse in that
+> regard.  But it would be nice to have a plan to move away from using RTNL,
+> as is happening elsewhere.
+> 
+> ...
 
-Skip the test if either prerequisite is not met.
+Hi Simon,
 
-Reviewed-by: Nimrod Oren <noren@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
----
-Changelog -
-v1->v2: https://lore.kernel.org/netdev/20250317123149.364565-1-gal@nvidia.com/
-* Use require_cmd() helper (Jakub).
----
- tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py | 5 +++++
- 1 file changed, 5 insertions(+)
+Many thanks for the review.  I've been reflecting on the patch (and
+discussing internally) and I think it would be better to model the
+behaviour on igb_remove instead of igb_reset_task.  Meaning that the
+timer should be deleted, and the work cancelled, after setting bit
+IGB_DOWN.  This would mirror igb_up.  (And has the advantage of not
+using the RTNL.)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-index 53bb08cc29ec..f439c434ba36 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-@@ -32,6 +32,11 @@ def test_rss_input_xfrm(cfg, ipver):
-     if multiprocessing.cpu_count() < 2:
-         raise KsftSkipEx("Need at least two CPUs to test symmetric RSS hash")
- 
-+    cfg.require_cmd("socat", remote=True)
+(As you can probably tell) I am not very familiar with this subsystem,
+but the modified proposal, below, works well in my testing.  I will
+happily send a V2 if you think this is a better direction.
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 291348505868..d4b905469cc2 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -2173,10 +2173,14 @@ void igb_down(struct igb_adapter *adapter)
+        u32 tctl, rctl;
+        int i;
+
+-       /* signal that we're down so the interrupt handler does not
+-        * reschedule our watchdog timer
++       /* The watchdog timer may be rescheduled, so explicitly
++        * disable watchdog from being rescheduled.
+         */
+        set_bit(__IGB_DOWN, &adapter->state);
++       del_timer_sync(&adapter->watchdog_timer);
++       del_timer_sync(&adapter->phy_info_timer);
 +
-+    if not hasattr(socket, "SO_INCOMING_CPU"):
-+        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
-+
-     input_xfrm = cfg.ethnl.rss_get(
-         {'header': {'dev-name': cfg.ifname}}).get('input_xfrm')
- 
--- 
-2.40.1
++       cancel_work_sync(&adapter->watchdog_task);
 
+        /* disable receives in the hardware */
+        rctl = rd32(E1000_RCTL);
+@@ -2207,11 +2211,6 @@ void igb_down(struct igb_adapter *adapter)
+                }
+        }
+
+-       del_timer_sync(&adapter->watchdog_timer);
+-       del_timer_sync(&adapter->phy_info_timer);
+-
+-       cancel_work_sync(&adapter->watchdog_task);
+-
+        /* record the stats before reset*/
+        spin_lock(&adapter->stats64_lock);
+        igb_update_stats(adapter);
 
