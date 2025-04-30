@@ -1,154 +1,99 @@
-Return-Path: <netdev+bounces-187120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00FBFAA50E5
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:55:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34964AA5157
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635E33B27C4
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:55:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 953EF1C05D46
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F20F261584;
-	Wed, 30 Apr 2025 15:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EB920C463;
+	Wed, 30 Apr 2025 16:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jEUP/GLo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l6ZVDLUp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910C117CA17
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 15:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3884178CC8;
+	Wed, 30 Apr 2025 16:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746028520; cv=none; b=aPLeiX0ukB/z3BpZWGkE6p4nFequ/El3UPzEu9o/jOQdLqkMSGy3owzmL9MgYu5EK1p8ZHRZ7tijecrWs7ulN0IGdS4OVusUtdCYoA0DR6at2uX4jwWY+e99ZO6u3ss4mFE36IxCNQpEjBaNbC/kWvnkED5eTzcF017sEBdkvBk=
+	t=1746029780; cv=none; b=BiXs+5wCPu37w3rH0mfeYkIY4GgMjRsWtYg+KMc7B/52ehkVpLwq2sMK3D0SUppZBxxp6sCESoUiPM9dg6NH2F9MfWipuK/S0CihKlv5Ken2dzJ7PFUQl/cRrLdhp2KDDTMaFSSfR8s66txgoNoynphMew/DHnd6aqXGbsk9CEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746028520; c=relaxed/simple;
-	bh=itiBlsf6zR4RTlm3hf+QfHFNY4vVsdzz2uVhJ45Z5FI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qMxfAyD6aELkq1JWG9790Gt2yhZI3T0ixQhPeW97kZocB3VeKXBCVZ3wg4/IKE5ZIrjubhnK0QOBYz77m9xcJtASsFBRCTpOXkUafurm91Cla2MdQLMpX0Neb4qPCvWJme75zU9zfQWgsVTZ6rI31BQrQmBzshWhbvZC+/DJsWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jEUP/GLo; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f951b81f-1b46-4219-82fd-0839e27ab3f3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746028504;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x01/YentqQxiWV+z2dsRSAIeIX6UbbCKUGdMPakv0qE=;
-	b=jEUP/GLoxJGvhRlAHo8UUY72GYTKU2U7nYQiDnmfjuRerBfvwIZZMpmwdytWhh/xlnA4yk
-	jTrmdGlsY2YmIOSEJ+DH24bkZzjHXIG/QOIjHqjNAslgaJR3ZYdM4p74rpLyDEv/HqR/5U
-	MM7aIhHbnP3NPMi6VPkKCuFv9s+4YvM=
-Date: Wed, 30 Apr 2025 23:54:46 +0800
+	s=arc-20240116; t=1746029780; c=relaxed/simple;
+	bh=eMd2c87o8So+qenhBw3u7v5a+xmgGXAoQedapOD7Obg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOLDFC4B4nn+ebAewFyRqk9uSRlPRcqpxlqHWr/JbTOQ/Rh885bYCO+k/FQssfkEVVZn52rdU/o/qMzLZyGJP5KxYIa0CxsZ2wIvpMcEZp5KjGCbfhuKCW/I9Tc1fAa7imh9WCEz+VNinE1uloVKW+jAy/IqdrfBwlrp6c91lgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l6ZVDLUp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VHw++ueBqMA9gHPPexHywPa7lWGoLeLxlqgC8EeY1Tg=; b=l6ZVDLUpbXfufkgK/4b2kUf+jE
+	nsA4cuy09Jzm8ybkngc8Pu5wOAY/mAprZYa442w/X14ne7YT0VvKpV4hEomb2YzzMpEcODfmf4bBf
+	d85owhf7d6dld/+bD84rEQUrFmpQwZ2jgahbx8NMTutobJXEnlM8qoDXRjrAlG4C3cmM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uAA6J-00BFbx-N9; Wed, 30 Apr 2025 18:15:59 +0200
+Date: Wed, 30 Apr 2025 18:15:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Tero Kristo <kristo@kernel.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com
+Subject: Re: [PATCH net-next 3/4] net: ethernet: ti: am65-cpsw: fixup PHY
+ mode for fixed RGMII TX delay
+Message-ID: <26696cfd-85f2-4876-9a56-f005eedc8380@lunn.ch>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <32e0dffa7ea139e7912607a08e391809d7383677.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <07c540a2-c645-460c-bfad-c9229d5d5ad0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/4] bpf: Allow get_func_[arg|arg_cnt] helpers in
- raw tracepoint programs
-To: Kafai Wan <mannkafai@gmail.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Song Liu <song@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Matt Bobrowski <mattbobrowski@google.com>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- bpf <bpf@vger.kernel.org>,
- linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-References: <20250426160027.177173-1-mannkafai@gmail.com>
- <20250426160027.177173-2-mannkafai@gmail.com>
- <CAADnVQ+DF18nKEf9i1RKEQN+ybH+duu7U-91YZDaa_PiqUx17g@mail.gmail.com>
- <CALqUS-6XtJ0Bb9jiykdC3jAY_OHjGuirj06Kzssjvo7eW_so2A@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <CALqUS-6XtJ0Bb9jiykdC3jAY_OHjGuirj06Kzssjvo7eW_so2A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07c540a2-c645-460c-bfad-c9229d5d5ad0@kernel.org>
 
-
-
-On 2025/4/30 20:43, Kafai Wan wrote:
-> On Wed, Apr 30, 2025 at 10:46 AM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
->>
->> On Sat, Apr 26, 2025 at 9:00 AM KaFai Wan <mannkafai@gmail.com> wrote:
->>>
-
-[...]
-
->>> @@ -2312,7 +2322,7 @@ void __bpf_trace_run(struct bpf_raw_tp_link *link, u64 *args)
->>>  #define REPEAT(X, FN, DL, ...)         REPEAT_##X(FN, DL, __VA_ARGS__)
->>>
->>>  #define SARG(X)                u64 arg##X
->>> -#define COPY(X)                args[X] = arg##X
->>> +#define COPY(X)                args[X + 1] = arg##X
->>>
->>>  #define __DL_COM       (,)
->>>  #define __DL_SEM       (;)
->>> @@ -2323,9 +2333,10 @@ void __bpf_trace_run(struct bpf_raw_tp_link *link, u64 *args)
->>>         void bpf_trace_run##x(struct bpf_raw_tp_link *link,             \
->>>                               REPEAT(x, SARG, __DL_COM, __SEQ_0_11))    \
->>>         {                                                               \
->>> -               u64 args[x];                                            \
->>> +               u64 args[x + 1];                                        \
->>> +               args[0] = x;                                            \
->>>                 REPEAT(x, COPY, __DL_SEM, __SEQ_0_11);                  \
->>> -               __bpf_trace_run(link, args);                            \
->>> +               __bpf_trace_run(link, args + 1);                        \
->>
->> This is neat, but what is this for?
->> The program that attaches to a particular raw_tp knows what it is
->> attaching to and how many arguments are there,
->> so bpf_get_func_arg_cnt() is a 5th wheel.
->>
->> If the reason is "for completeness" then it's not a good reason
->> to penalize performance. Though it's just an extra 8 byte of stack
->> and a single store of a constant.
->>
-> If we try to capture all arguments of a specific raw_tp in tracing programs,
-> We first obtain the arguments count from the format file in debugfs or BTF
-> and pass this count to the BPF program via .bss section or cookie (if
-> available).
+On Wed, Apr 30, 2025 at 05:56:29PM +0300, Roger Quadros wrote:
+> Matthias,
 > 
-> If we store the count in ctx and get it via get_func_arg_cnt helper in
-> the BPF program，
-> a) It's easier and more efficient to get the arguments count in the BPF program.
-> b) It could use a single BPF program to capture arguments for multiple raw_tps,
-> reduce the number of BPF programs when massive tracing.
-> 
+> On 15/04/2025 13:18, Matthias Schiffer wrote:
+> > All am65-cpsw controllers have a fixed TX delay, so the PHY interface
+> > mode must be fixed up to account for this.
+> > 
+> > Modes that claim to a delay on the PCB can't actually work. Warn people
+> Could you please help me understand this statement? Which delay? TX or RX?
 
+See if this helper:
 
-bpf_get_func_arg() will be very helpful for bpfsnoop[1] when tracing tp_btf.
+https://patchwork.kernel.org/project/netdevbpf/patch/20250429-v6-15-rc3-net-rgmii-delays-v1-1-f52664945741@lunn.ch/
 
-In bpfsnoop, it can generate a small snippet of bpf instructions to use
-bpf_get_func_arg() for retrieving and filtering arguments. For example,
-with the netif_receive_skb tracepoint, bpfsnoop can use
-bpf_get_func_arg() to filter the skb argument using pcap-filter(7)[2] or
-a custom attribute-based filter. This will allow bpfsnoop to trace
-multiple tracepoints using a single bpf program code.
+There will be a V2 soon.
 
-[1] https://github.com/bpfsnoop/bpfsnoop
-[2] https://www.tcpdump.org/manpages/pcap-filter.7.html
-
-Thanks,
-Leon
-
+      Andrew
 
