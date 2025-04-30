@@ -1,193 +1,139 @@
-Return-Path: <netdev+bounces-186943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C473AA4252
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:29:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C08AEAA4266
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 07:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA8B89A5912
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:29:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29CF04A1E25
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 05:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE351DED63;
-	Wed, 30 Apr 2025 05:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGbcMrDQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1841DED66;
+	Wed, 30 Apr 2025 05:32:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D9F1C84C7
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 05:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8836B1D9663;
+	Wed, 30 Apr 2025 05:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745990959; cv=none; b=lKsn8dfJx8V/k638hjSUMPH11bsN0+zwE7TJSjdv5yc3r57fKFb2CVDo5WPCLbWISe21HgFdy4C7JzWgP55Z59GCfB0ajRgJQP+xBma+lUAHUJ1Yp/yveR2McOY7SL/Q++Dkk6gGt3MkyaLRaaDIP0j5dCPvMtNe38Z29YjvIrQ=
+	t=1745991166; cv=none; b=KYL7lE2pHXKmaaAjxM2bScu8S1S0BwFPwb4DVCUcDf6DSU+YdXINR/Sm5ttXv6kAhmCfAJp4tgWKC7JU6RD1iafv/TNYVXmaFSnjA/v3Y4OVFci5bO/7pDTe8jWJlnNMDSzpJOVDhiE4IW34L1tVSGDO+uQslFUGM2fyIcGPcqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745990959; c=relaxed/simple;
-	bh=UjpFNPRZFpPfDQcsq9EWAoTrdLGsSoBD33nEJeC3Jj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yn8R+kqVQF1T2cwuGHzqu2VWbR7wwzd5xzNqLJh4J7EnQ5oH60GBjIew2Uixypqb9sOk3OQU4srBZE4PUvfidrlWBo1wUTpIUpM5ZEfhLvyqGNwifcYYHoqnYQ3AZ1lNrzZP6tjO267QcDBHn/Vg1mabZaXBmnl145DTR5EE040=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZGbcMrDQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745990955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HrsAd6dSn628uJcdkrQWGVp8f1VXho8/Cq4Atym3MwY=;
-	b=ZGbcMrDQrBxH9BIPQLuvIdLcVIl/eSkVEnt+YkU+BL7xGYMchGDlqL68+j54Pv8gMoBCoa
-	jrgLXrRCSoDF959Heza4ISguedvPS/IAeIe2y3A6pXq1qP2KduHT74OsVV7COMzQ/fm7Zl
-	jbbFpkE+u1A8TACUx3wfBihTmuIOO20=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-125-eZdGE4cHO0uQC9cFj-RAKQ-1; Wed, 30 Apr 2025 01:29:12 -0400
-X-MC-Unique: eZdGE4cHO0uQC9cFj-RAKQ-1
-X-Mimecast-MFC-AGG-ID: eZdGE4cHO0uQC9cFj-RAKQ_1745990952
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912fc9861cso1924996f8f.1
-        for <netdev@vger.kernel.org>; Tue, 29 Apr 2025 22:29:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745990952; x=1746595752;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HrsAd6dSn628uJcdkrQWGVp8f1VXho8/Cq4Atym3MwY=;
-        b=Yfdakyvd1leYd4NlGayX62saucKC+0FNUpxEd1fZh9w6KTLuCGzTf1BcluDKwsfouW
-         aEZ99qKvQBvdYc+IHqnp7CYBe96NNvXLjY1kgTUrsol/rD9xgahfrH9RJOi4j63w0j3s
-         Me68TO8DHPTeEmWbz/9m+wQHWEOX4jJeLnlKc6SPlbOVXOmukXmRk+xCPKxv8LkDboEa
-         zyenqwk6pICJ4tLqeX5h2iWT8KcHmS8SaYWT91qwfByxDqOKThOd9IQhB2Q+CtIs5crc
-         97huATWNoiPkPKB2uG+A5lNI0bbWmMNx+K6Fj9X1JtS2y9+zeQb3Xr4YAUeDhn+piCaX
-         5WUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPH521d3cA66CbiayG1+s4y5BIi81RNRxaWH0Yd6qTIrMsadg2QWblMbBs9mXQiK9OmeOeiOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzifvyAakTbvRdgex4zLZWZsYyiDjQ8jUEM+A5dikCDoOuVbh70
-	0NbbYsmnIEEX0LxFDoWnW01xxITog4TSYPfbzOSlasTjsECkvwPUxgguNDQFp2YhrSHSfBqja2k
-	tMpi39yj0+rQGda1LSZWzeQ+XNY9FpT+jEtI5Bu1WWXHBj8tKfUtttg==
-X-Gm-Gg: ASbGncstwd0R2fvK+Yb2Jx21bQf+66MWKH7y+FU2rOWDzm60VQOeq/U2wHxg8dkeuR/
-	kW+7A24KF2vm+KHGktWAP95TDVXzqWIOPpeVa98lKfU8JX2820uABpktIKwe2cigC/kICOYPlfx
-	vDtszkajoEmPoRt6/ozfsmRhBMMd9VRxC/2aVSaqn20cvu1LSVA9jBeeWUm9cOW4xZ8KfvHAuBi
-	gFxENb9go2debHfwjzkN/PagPsFOO1W+ihk6UdRnTnAyZSBNAOSdh6+uqbseT+z0YcmDnq7VFjT
-	+05ssw==
-X-Received: by 2002:a05:6000:4382:b0:3a0:8495:cb75 with SMTP id ffacd0b85a97d-3a08f7985f5mr1389196f8f.9.1745990951767;
-        Tue, 29 Apr 2025 22:29:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFiH7uMgCfGvd2/j6i6NapwDI1qvZgSgAio3hl0KdvKSaeaW6jBZchdAwR/MSNWbcy3zYtLQ==
-X-Received: by 2002:a05:6000:4382:b0:3a0:8495:cb75 with SMTP id ffacd0b85a97d-3a08f7985f5mr1389173f8f.9.1745990951429;
-        Tue, 29 Apr 2025 22:29:11 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e47307sm16052695f8f.65.2025.04.29.22.29.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Apr 2025 22:29:09 -0700 (PDT)
-Date: Wed, 30 Apr 2025 01:29:06 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, minhquangbui99@gmail.com, romieu@fr.zoreil.com,
-	kuniyu@amazon.com, virtualization@lists.linux.dev
-Subject: Re: [PATCH net] virtio-net: don't re-enable refill work too early
- when NAPI is disabled
-Message-ID: <20250430012856-mutt-send-email-mst@kernel.org>
-References: <20250429143104.2576553-1-kuba@kernel.org>
- <CACGkMEs0LuLDdEphRcdmKthdJeNAJzHBqKTe8Euhm2adOS=k2w@mail.gmail.com>
+	s=arc-20240116; t=1745991166; c=relaxed/simple;
+	bh=3wAx5EeU7nOBuaCjATrMwZ8fnjoWWozoQiVr7g+qGjc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lrAYFk8jF5V8koHHXMHJ1oqk2OU9UPJsT3XFbBoyv1q9xdlg2vRZPish6qfNublR3t1I1z88/gtUVgqToc8r+Dd8EDn3W9fC5FT7DT/LpWm1ibt16zlE0o+qMiZJf/lAVJv+dW+pXR8TSlkc4OLsaZ7zc+6q9RoslC7etUx6I4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from [127.0.0.1] (unknown [116.232.147.253])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dlan)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id 18B17342FEF;
+	Wed, 30 Apr 2025 05:32:36 +0000 (UTC)
+From: Yixun Lan <dlan@gentoo.org>
+Subject: [PATCH v3 0/5] allwinner: Add EMAC0 support to A523 variant SoC
+Date: Wed, 30 Apr 2025 13:32:02 +0800
+Message-Id: <20250430-01-sun55i-emac0-v3-0-6fc000bbccbd@gentoo.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEs0LuLDdEphRcdmKthdJeNAJzHBqKTe8Euhm2adOS=k2w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANK1EWgC/3XNTQrCMBCG4auUrB2Z/JXqynuIi5hO2ixMJKlBK
+ b27aVeKuHw/mGdmlil5yuzYzCxR8dnHUEPuGmZHEwYC39dmAoVGJSQgh/wIWnugm7EImuRBmw5
+ de3WsXt0TOf/cxPOl9ujzFNNre1D4uv63CgcE1RIp22lNaE4DhSnGfUwDW7EiPgH1C4gKdFI6V
+ L2QxPsvYFmWN3W06e3wAAAA
+X-Change-ID: 20250423-01-sun55i-emac0-5e395a80f6bf
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>, 
+ Jernej Skrabec <jernej.skrabec@gmail.com>, 
+ Samuel Holland <samuel@sholland.org>, Maxime Ripard <mripard@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, 
+ Corentin Labbe <clabbe.montjoie@gmail.com>, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Yixun Lan <dlan@gentoo.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1824; i=dlan@gentoo.org;
+ h=from:subject:message-id; bh=3wAx5EeU7nOBuaCjATrMwZ8fnjoWWozoQiVr7g+qGjc=;
+ b=owEBzQIy/ZANAwAKATGq6kdZTbvtAcsmYgBoEbXgMAZe5RsVVOEfV453pwn+DCn61EB/ahujk
+ TAJ0movAeaJApMEAAEKAH0WIQS1urjJwxtxFWcCI9wxqupHWU277QUCaBG14F8UgAAAAAAuAChp
+ c3N1ZXItZnByQG5vdGF0aW9ucy5vcGVucGdwLmZpZnRoaG9yc2VtYW4ubmV0QjVCQUI4QzlDMzF
+ CNzExNTY3MDIyM0RDMzFBQUVBNDc1OTREQkJFRAAKCRAxqupHWU277bhGD/0eQyU6ElyjXOhRvu
+ 2KUKWEums5dVrS3J1TE61ryswgT0B6wqDnyaBzrIWfkhlkCF/TQcnY0m6GhJ0oT3mi0IQRuX6ib
+ VIB826pQoS4EH6DJMOENAt6PQ1RJTQD4Dzc24+7439PK/mk1OZcoqZByNfga5LLMG1Zny8m0jhn
+ grAMRzbbWIpURKUqZ+bPIUbaH/Jdtg+lw2JkXEGfJN2mPdJJHNMyHK0uOlRLV1O3x5lWT6DJuCS
+ +BwCJMOoOQ+c6kEgDztgbmO1a1PCEZ8VFGVeob28mK6KIgFeb9wJ+Wjah3PP/O0Y3VVSLgARasc
+ qkgHeIQcb0A8oDtIboDJAAAbYYXkQom8yR6PCCL+GgAH5GtXb76ueia3fWu4xsopsmZBaBs3Mvw
+ j6845YhpwA25bAR+PEhU3aGbDpZy+uKpRtw9P7FtJQ0TAoELOqOMcflcjkJrga8XBkQvtu6UE62
+ XH76nvDwDQx+ZkycLp12Wp/e6pcS5zioe4mXDfR4P5kc3Adx8uaK6MqYn6husvJ9E/Jtf8x5vPi
+ prurA0YJme7acHGO84/vyAJ5n0PdEq2w8JcY2fJ9kXFp+MiPtAp4+nmk5NYIxwDQgqzW8jV5qiA
+ HyzlpLdMeJnYjyhgF4ZmmAk9qakVdASTEhQcyfYgpgiCe2ncnDwCCq0nNqEAmwTAkBtg==
+X-Developer-Key: i=dlan@gentoo.org; a=openpgp;
+ fpr=50B03A1A5CBCD33576EF8CD7920C0DBCAABEFD55
 
-On Wed, Apr 30, 2025 at 11:49:15AM +0800, Jason Wang wrote:
-> On Tue, Apr 29, 2025 at 10:31 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > Commit 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> > fixed a deadlock between reconfig paths and refill work trying to disable
-> > the same NAPI instance. The refill work can't run in parallel with reconfig
-> > because trying to double-disable a NAPI instance causes a stall under the
-> > instance lock, which the reconfig path needs to re-enable the NAPI and
-> > therefore unblock the stalled thread.
-> >
-> > There are two cases where we re-enable refill too early. One is in the
-> > virtnet_set_queues() handler. We call it when installing XDP:
-> >
-> >    virtnet_rx_pause_all(vi);
-> >    ...
-> >    virtnet_napi_tx_disable(..);
-> >    ...
-> >    virtnet_set_queues(..);
-> >    ...
-> >    virtnet_rx_resume_all(..);
-> >
-> > We want the work to be disabled until we call virtnet_rx_resume_all(),
-> > but virtnet_set_queues() kicks it before NAPIs were re-enabled.
-> >
-> > The other case is a more trivial case of mis-ordering in
-> > __virtnet_rx_resume() found by code inspection.
-> >
-> > Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> > Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > ---
-> > CC: mst@redhat.com
-> > CC: jasowang@redhat.com
-> > CC: xuanzhuo@linux.alibaba.com
-> > CC: eperezma@redhat.com
-> > CC: minhquangbui99@gmail.com
-> > CC: romieu@fr.zoreil.com
-> > CC: kuniyu@amazon.com
-> > CC: virtualization@lists.linux.dev
-> > ---
-> >  drivers/net/virtio_net.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 848fab51dfa1..4c904e176495 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -3383,12 +3383,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
-> >                                 bool refill)
-> >  {
-> >         bool running = netif_running(vi->dev);
-> > +       bool schedule_refill = false;
-> >
-> >         if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
-> > -               schedule_delayed_work(&vi->refill, 0);
-> > -
-> > +               schedule_refill = true;
-> >         if (running)
-> >                 virtnet_napi_enable(rq);
-> > +
-> > +       if (schedule_refill)
-> > +               schedule_delayed_work(&vi->refill, 0);
-> >  }
-> >
-> >  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-> > @@ -3728,7 +3731,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
-> >  succ:
-> >         vi->curr_queue_pairs = queue_pairs;
-> >         /* virtnet_open() will refill when device is going to up. */
-> > -       if (dev->flags & IFF_UP)
-> > +       if (dev->flags & IFF_UP && vi->refill_enabled)
-> >                 schedule_delayed_work(&vi->refill, 0);
-> 
-> This has the assumption that the toggle of the refill_enabled is under
-> RTNL. Though it's true now but it looks to me it's better to protect
-> it against refill_lock.
-> 
-> Thanks
+This patch series is trying to add EMAC0 ethernet MAC support
+to the A523 variant SoCs, including A523, A527/T527 chips.
 
-Good point.
+This MAC0 is compatible to previous A64 SoC, so introduce a new DT
+compatible but make it as a fallback to A64's compatible.
 
-> >
-> >         return 0;
-> > --
-> > 2.49.0
-> >
+In this version, the PHYRSTB pin which routed to external phy
+has not been populated in DT. It's kind of optional for now,
+but we probably should handle it well later.
+
+I've tested only on Radxa A5E board.
+
+Signed-off-by: Yixun Lan <dlan@gentoo.org>
+---
+Changes in v3:
+- collect tags
+- update commit prefix
+- add bias-disable to pins
+- Link to v2: https://lore.kernel.org/r/20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org
+
+Changes in v2:
+- add ethernet alias node
+- add phy-supply
+- change to rgmii-id
+- drop PH13, rename pin name
+- drop bias-pull-up
+- collect Review tags
+- improve commit log
+- Link to v1: https://lore.kernel.org/r/20250423-01-sun55i-emac0-v1-0-46ee4c855e0a@gentoo.org
+
+---
+Yixun Lan (5):
+      dt-bindings: sram: sunxi-sram: Add A523 compatible
+      dt-bindings: net: sun8i-emac: Add A523 EMAC0 compatible
+      arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC
+      arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E board
+      arm64: dts: allwinner: t527: add EMAC0 to Avaota-A1 board
+
+ .../bindings/net/allwinner,sun8i-a83t-emac.yaml    |  1 +
+ .../sram/allwinner,sun4i-a10-system-control.yaml   |  1 +
+ arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi     | 41 ++++++++++++++++++++++
+ .../boot/dts/allwinner/sun55i-a527-radxa-a5e.dts   | 19 ++++++++++
+ .../boot/dts/allwinner/sun55i-t527-avaota-a1.dts   | 19 ++++++++++
+ 5 files changed, 81 insertions(+)
+---
+base-commit: 69714722df19a7d9e81b7e8f208ca8f325af4502
+change-id: 20250423-01-sun55i-emac0-5e395a80f6bf
+
+Best regards,
+-- 
+Yixun Lan
 
 
