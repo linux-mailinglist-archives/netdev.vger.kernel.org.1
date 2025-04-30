@@ -1,202 +1,157 @@
-Return-Path: <netdev+bounces-187130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B45AA521B
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:53:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C61FDAA521E
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A0819C27E7
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:53:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98D421BC1D52
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DABD26460D;
-	Wed, 30 Apr 2025 16:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803472641E3;
+	Wed, 30 Apr 2025 16:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j5+jhZFo"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="RIIokNeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F171D7984;
-	Wed, 30 Apr 2025 16:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EFF1D7984
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 16:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746032010; cv=none; b=tCRrLQEPBVKG91S4IYbEPgr/DtBTTG/L2PiAciDWyeyBwZR5DZKqaD9gaeCgihfW4i0rc5Ocdogcstc+iaV+NQl2imOBY99mPXKjCLO6N4NMPG+1ermQbcVyZFEhg2BDzZJopQ7DDpjeL6gSRYtK7V1Nxg0FSqIkZ37mF1leiV8=
+	t=1746032016; cv=none; b=cFfUe3NAe3/YOGFTN9sEDsGgXf1sibKuuJQmFI3EoCgVepT2Xulpm9S9wHTRhpZLnrFSRqLZQpslD+53R0FjxIlCyTpv52ElmMC5TVr+U2FMdmR2qcTEdScs3crg55TbZzWPmrQh8R6zZQ+R/88IQ0DQAs6AeaEjqhulpumNd38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746032010; c=relaxed/simple;
-	bh=BBMsd/oizy20IUV96EPxJNmvZVs0GIKVqE5EGiMLivc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dtTx7XYG9NLeeVFdcBjJh4SrW4kUngxg3fLrN+7YgmnN2t4JU3c8RY93tffQSFBb6o+F+vUQmtQzzTAoKLCkWNVpNLyBLJqqBYidUjeipRxSRcXlyD2EVTrTOfkmBp5aK2tncIc4IYr2LiMwImpXRQrsD+O/166jlWOPWMOy0Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j5+jhZFo; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-39c1ef4ae3aso67523f8f.1;
-        Wed, 30 Apr 2025 09:53:28 -0700 (PDT)
+	s=arc-20240116; t=1746032016; c=relaxed/simple;
+	bh=KLmuA2sXWxeYzvZaSBT1OXio9W3Wqg/uWe8O5Z2jE1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RlM+/0DRpzeZ1M1iEh97qSdL0I4XBYAyS7B5TKT53+WSBuMd+IEbMUrSPHnYHCeuJnu/vZKJhXn0EmpyLAbqwFJw0g+BFmXZDgYUKFzB20MQdoCN37vWCn0DHC0502IC25Do7wVVt4XsO9vYDjV40+trdEVpnOHv4QTJ3KBaayg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=RIIokNeC; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-73712952e1cso147835b3a.1
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:53:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746032007; x=1746636807; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iyqoFwnx1rN119y/EQDLgAAtG+9Od9yyi7V0yRmYe1Y=;
-        b=j5+jhZFo1DiaCKv+6sWRLRfvn+bdSHbxC02gj9bjsob0pP/9GFhw8/33JlZGS/O/cx
-         3sLdfnkLHDX1D/kdvW2tUTYAufC14MELRGdGzxdGooMdR23PcNhd/7zDNL+GVNnhMx1Z
-         3/+5+BBnkzjMDnlPSJBHDbldm/IikqBdVqe86lqQha1Dnol71EpIqMshs+PCK2ItKKiE
-         HujqYIDHWypVsb7kHmCsiLbU/kqhXtZNt3T33Utt03JQP4Ln7giRCPCGl+F/CNkeDrH4
-         jOOGeSlD1U6nZh4rUY95PkIYFA5I6HGoItTCDXsSEY3GzbsWnKDV29nfEBpi5tIMEKR/
-         H6gQ==
+        d=fastly.com; s=google; t=1746032014; x=1746636814; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lb1G8E4eXsJcf046Vl0RQBeGECFD75fJKtaKk5HRkJE=;
+        b=RIIokNeCdGgf/PqWdeA88hmg+3qHAn0/Hu7EohQ71mwyV3yvCSWcW29XXQa3+HJUqU
+         XIOTQdIILBCvb46L/m9IEPc5YTGVDherzFFspVZ4WciTWCgNZ0vjgPVD1D7H0C28/zZu
+         Cs/a34q6MniGLZ/7tnBngUP/VoUhqUdmD+/Ts=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746032007; x=1746636807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iyqoFwnx1rN119y/EQDLgAAtG+9Od9yyi7V0yRmYe1Y=;
-        b=FFHjlgCEqfU5cCPAEV39tUsTIa9KSWb1puzn+NaLTGPaq7MbDdl7JhLsRopjcJ3cBB
-         JdKfWk4AssMkqUACxoF3DH8Kv4n+mL8AcqR5pQWo7/xbWZXhcHgJw2GMW9qlTjv/XyKA
-         XvHJTtVgEZQ+3K4381aUDP0ciu0g/ElePqSkXBnZxikeUB/K2fXv23GnuzbK0TBvlzow
-         2fET6zyjoC99WMeBkfPXH3cvKivmLtVWNa3LubCcQTcz1x1Zlei9Ud+PsRTzgH+aKdxA
-         MkH9eb0ERcl52gAPHoZdjwWaaxJ6Vr7LMA5gXmSxANPxPXBh65vbPtL8xZH2f4DnkHfb
-         w/NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2rupEOH1+xPm8eyOReT7gGoBRPNIYhB+yV+qn9xgusjpkdMEQYv+HuYTuulGuupjTsfQ=@vger.kernel.org, AJvYcCUB7XXtMfRJdfw9tU5RXX9dGbXSAc8yHR/eQdCIayYgyWwd+RUFENrp7E1HPWtxIZidM8ONMzkucukuZqgN@vger.kernel.org, AJvYcCV+BwuKtHcygL4Ho7Uw059D6/SsqJfx2NOynYpSwkWgRsvp35zrHZ9U3SSFb9L1zGhC0XFww2Sw@vger.kernel.org, AJvYcCXSkOr64L3kHRgID4O0gloeVd5I53p5js1attL++W0XkU1DU5rdVZh0AM1vTDOBNoEAEH4AJt3g3+vEPhEhHU1fB45L@vger.kernel.org, AJvYcCXyOICrzdowK6K6UaGFFpfNQI6wZOvSolGvYG4Xx1qeD35HIW0necr/fA3VWsBuQcueh7XkLIJKpfoPI+I4MSi3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/2TJax06/rkuF5WTzGloPodJ/RdpyGVkfWVyrRcWt41nFz8O/
-	r5UHjWUpKipofo9BJGa9vsRe+DCwO+sPsX934VhuDvHQiyMJsd3LH+KN9H5G8CDw0/zSkzl6C09
-	IqLQadg1j6FHs4KHTs4/5/J71TD0=
-X-Gm-Gg: ASbGnctlze7WOMKhjESb8wCcAj6rGAV5nQTbXzhPCl6Chs4KDbWJWGhVACHlAU/U8V4
-	Eu4dySs/cSX1q+fTHMJFdAZ8Kr+2ZNAYFDnzeFe4twV46BZRUf1xpaQ82gkolrgCYcCyPMY1TcH
-	caLrx+nyD2oMKIkm+nPIXvUuTi45E+c9pMyL8lPg==
-X-Google-Smtp-Source: AGHT+IGktp2atpBKpp4ur5fbFBTf4kR6IH2vBfdClEMDlfV8ktjOsDPmmtEvHUeJRGc4jX1Itzt6phHMVfWVJf1Cjrg=
-X-Received: by 2002:a05:6000:64a:b0:38d:ae1e:2f3c with SMTP id
- ffacd0b85a97d-3a092d0230cmr179055f8f.25.1746032006951; Wed, 30 Apr 2025
- 09:53:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746032014; x=1746636814;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lb1G8E4eXsJcf046Vl0RQBeGECFD75fJKtaKk5HRkJE=;
+        b=ZVXbJJXvi2FcnAV3QH+TNhhd6HgUsCD49pioiuBGYhKXCyP5+tgnwtOQKDFjaRWmDU
+         u5jgg4DkbrGn72ARHPfZ8/d567G7DAFPcYhZ5+cSGWasmskrn8/NFPFUMESV3Z5Sa5Dd
+         UXz0Fi4jAzCp2z2CwiBujMpEXuZrCtXMCQHoE8urQLDiZ/j6MhtABEzxrrywBWVzp+1g
+         c+1FJnxBO6AJV3hFg076UdGLjBq+3/J+ozrTnY1p5QTHYUXmBRjvCWCv2oa2X75OvEEJ
+         aYa/VoXgf0EEBUkTMmKShm0UHLtSSxvB5kCd9iTem6+T/mV9wnEuDX4cWEybAMUQUXFO
+         k9jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbNtJlHAExIOT7S09zFAvAFkK8qejeWBySQZwOobPwMxb+lUrMyxjS/sY5mgY+0N1aqPzosoA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJsuE0kShG38BPRPm5HQ6/dKKZnfDZt4iwjXX3i44FE+t8PDlM
+	Myr7zjVjvalzNirF7Vy/kbvSE1ArcB4I5JKiHX81Iq59NzY+NYE1YSbT0MJ6n+I=
+X-Gm-Gg: ASbGncvdQwFNwUOSSUji5DC0fRm0fBCNWAi8mAVLqe6V5rsja9SwNKHa5DZP4aFVajq
+	OrShaA1Efx0TRoHeWLuSmceomcyxEydhq06ybKr5mrYZuj6Uq2jkX2tgnpuWB+fRlyqT92tH48O
+	wWDbIg8nd9+RCsNklnS+hF3u4GMo1JhqF15gwU/abCwhvztBTe2BGTJozDCmvDSVOxHhEgm8Fbp
+	dxlXKSHXdD9WPM3s6mM+THvHAalAaoayw4Nh3S/FAHpA9Wkh9WTyBn2c5W83vsKqoFqkg0yvisI
+	THhLyIPzNLWuvL3sUxxfdUm84yoQgzsgYlPTK+teE0zji6a6F4QRtu1sMTg6QFd2d0oXlv+mhCX
+	ywXjWwKg=
+X-Google-Smtp-Source: AGHT+IHVrN7jDRElfevrLfPVr8B/9yKIO4w3xiNQiHtti3lP8Hy9IlcVEfHCgXSCmpVIo5BipxuPYw==
+X-Received: by 2002:a05:6a00:4b05:b0:736:ff65:3fcc with SMTP id d2e1a72fcca58-7403a811bbfmr5175385b3a.16.1746032014058;
+        Wed, 30 Apr 2025 09:53:34 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740398f975fsm1896375b3a.6.2025.04.30.09.53.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Apr 2025 09:53:33 -0700 (PDT)
+Date: Wed, 30 Apr 2025 09:53:31 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v6] Add support to set napi threaded for
+ individual napi
+Message-ID: <aBJVi0LmwqAtQxv_@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+	netdev@vger.kernel.org
+References: <20250429222656.936279-1-skhawaja@google.com>
+ <aBFnU2Gs0nRZbaKw@LQ3V64L9R2>
+ <CAAywjhQZDd2rJiF35iyYqMd86zzgDbLVinfEcva0b1=6tne3Pg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250426160027.177173-1-mannkafai@gmail.com> <20250426160027.177173-2-mannkafai@gmail.com>
- <CAADnVQ+DF18nKEf9i1RKEQN+ybH+duu7U-91YZDaa_PiqUx17g@mail.gmail.com>
- <CALqUS-6XtJ0Bb9jiykdC3jAY_OHjGuirj06Kzssjvo7eW_so2A@mail.gmail.com> <f951b81f-1b46-4219-82fd-0839e27ab3f3@linux.dev>
-In-Reply-To: <f951b81f-1b46-4219-82fd-0839e27ab3f3@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 30 Apr 2025 09:53:15 -0700
-X-Gm-Features: ATxdqUHCM_hgru1Pfc1BqXTKZ-VBkhd7Cw8k1b6R1YPnD0rN_9RdWCr9fvClEug
-Message-ID: <CAADnVQ+FANha0fO_BF+iHJ4iZSCPtDfoUkzR8mMFwOakw8+eCg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/4] bpf: Allow get_func_[arg|arg_cnt] helpers in
- raw tracepoint programs
-To: Leon Hwang <leon.hwang@linux.dev>
-Cc: Kafai Wan <mannkafai@gmail.com>, Song Liu <song@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Matt Bobrowski <mattbobrowski@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAywjhQZDd2rJiF35iyYqMd86zzgDbLVinfEcva0b1=6tne3Pg@mail.gmail.com>
 
-On Wed, Apr 30, 2025 at 8:55=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev> w=
-rote:
->
->
->
-> On 2025/4/30 20:43, Kafai Wan wrote:
-> > On Wed, Apr 30, 2025 at 10:46=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> >>
-> >> On Sat, Apr 26, 2025 at 9:00=E2=80=AFAM KaFai Wan <mannkafai@gmail.com=
-> wrote:
-> >>>
->
-> [...]
->
-> >>> @@ -2312,7 +2322,7 @@ void __bpf_trace_run(struct bpf_raw_tp_link *li=
-nk, u64 *args)
-> >>>  #define REPEAT(X, FN, DL, ...)         REPEAT_##X(FN, DL, __VA_ARGS_=
-_)
-> >>>
-> >>>  #define SARG(X)                u64 arg##X
-> >>> -#define COPY(X)                args[X] =3D arg##X
-> >>> +#define COPY(X)                args[X + 1] =3D arg##X
-> >>>
-> >>>  #define __DL_COM       (,)
-> >>>  #define __DL_SEM       (;)
-> >>> @@ -2323,9 +2333,10 @@ void __bpf_trace_run(struct bpf_raw_tp_link *l=
-ink, u64 *args)
-> >>>         void bpf_trace_run##x(struct bpf_raw_tp_link *link,          =
-   \
-> >>>                               REPEAT(x, SARG, __DL_COM, __SEQ_0_11)) =
-   \
-> >>>         {                                                            =
-   \
-> >>> -               u64 args[x];                                         =
-   \
-> >>> +               u64 args[x + 1];                                     =
-   \
-> >>> +               args[0] =3D x;                                       =
-     \
-> >>>                 REPEAT(x, COPY, __DL_SEM, __SEQ_0_11);               =
-   \
-> >>> -               __bpf_trace_run(link, args);                         =
-   \
-> >>> +               __bpf_trace_run(link, args + 1);                     =
-   \
-> >>
-> >> This is neat, but what is this for?
-> >> The program that attaches to a particular raw_tp knows what it is
-> >> attaching to and how many arguments are there,
-> >> so bpf_get_func_arg_cnt() is a 5th wheel.
-> >>
-> >> If the reason is "for completeness" then it's not a good reason
-> >> to penalize performance. Though it's just an extra 8 byte of stack
-> >> and a single store of a constant.
-> >>
-> > If we try to capture all arguments of a specific raw_tp in tracing prog=
-rams,
-> > We first obtain the arguments count from the format file in debugfs or =
-BTF
-> > and pass this count to the BPF program via .bss section or cookie (if
-> > available).
+On Tue, Apr 29, 2025 at 06:16:29PM -0700, Samiullah Khawaja wrote:
+> On Tue, Apr 29, 2025 at 4:57 PM Joe Damato <jdamato@fastly.com> wrote:
 > >
-> > If we store the count in ctx and get it via get_func_arg_cnt helper in
-> > the BPF program=EF=BC=8C
-> > a) It's easier and more efficient to get the arguments count in the BPF=
- program.
-> > b) It could use a single BPF program to capture arguments for multiple =
-raw_tps,
-> > reduce the number of BPF programs when massive tracing.
+> > On Tue, Apr 29, 2025 at 10:26:56PM +0000, Samiullah Khawaja wrote:
 > >
->
->
-> bpf_get_func_arg() will be very helpful for bpfsnoop[1] when tracing tp_b=
-tf.
->
-> In bpfsnoop, it can generate a small snippet of bpf instructions to use
-> bpf_get_func_arg() for retrieving and filtering arguments. For example,
-> with the netif_receive_skb tracepoint, bpfsnoop can use
-> bpf_get_func_arg() to filter the skb argument using pcap-filter(7)[2] or
-> a custom attribute-based filter. This will allow bpfsnoop to trace
-> multiple tracepoints using a single bpf program code.
+> > > v6:
+> > >  - Set the threaded property at device level even if the currently set
+> > >    value is same. This is to override any per napi settings. Update
+> > >    selftest to verify this scenario.
+> > >  - Use u8 instead of uint in netdev_nl_napi_set_config implementation.
+> > >  - Extend the selftest to verify the existing behaviour that the PID
+> > >    stays valid once threaded napi is enabled. It stays valid even after
+> > >    disabling the threaded napi. Also verify that the same kthread(PID)
+> > >    is reused when threaded napi is enabled again. Will keep this
+> > >    behaviour as based on the discussion on v5.
+> >
+> > This doesn't address the feedback from Jakub in the v5 [1] [2]:
+> >
+> >  - Jakub said the netlink attributes need to make sense from day 1.
+> >    Threaded = 0 and pid = 1234 does not make sense, and
+> Jakub mentioned following in v5 and that is the existing behaviour:
+> ```
+> That part I think needs to stay as is, the thread can be started and
+> stopped on napi_add / del, IMO.
+> ```
+> Please see my reply to him in v5 also to confirm this. I also quoted
+> the original reason, when this was added, behind not doing
+> kthread_stop when unsetting napi threaded.
 
-I doubt you thought it through end to end.
-When tracepoint prog attaches we have this check:
-        /*
-         * check that program doesn't access arguments beyond what's
-         * available in this tracepoint
-         */
-        if (prog->aux->max_ctx_offset > btp->num_args * sizeof(u64))
-                return -EINVAL;
+Here's what [2] says:
 
-So you cannot have a single bpf prog attached to many tracepoints
-to read many arguments as-is.
-You can hack around that limit with probe_read,
-but the values won't be trusted and you won't be able to pass
-such untrusted pointers into skb and other helpers/kfuncs.
+  We need to handle the case Joe pointed out. The new Netlink attributes
+  must make sense from day 1. I think it will be cleanest to work on
+  killing the thread first, but it can be a separate series.
+
+In this v6 as I understand it, it is possible to get:
+
+    threaded = 0
+    pid = 1234
+
+I don't think that makes sense and it goes against my interpretation
+of Jakub's message which seemed clear to me that this must be fixed.
+
+If you disagree and think my interpretation of what Jakub said
+is off, we can let him weigh in again.
+
+> >
+> >  - The thread should be started and stopped.
+> >
+> > [1]: https://lore.kernel.org/netdev/20250425201220.58bf25d7@kernel.org/
+> > [2]: https://lore.kernel.org/netdev/20250428112306.62ff198b@kernel.org/
 
