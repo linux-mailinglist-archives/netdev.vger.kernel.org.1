@@ -1,133 +1,200 @@
-Return-Path: <netdev+bounces-187148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF27EAA5399
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:21:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7946AAA539E
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 633B01895B7C
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:21:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DE207A6882
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF89B1EB196;
-	Wed, 30 Apr 2025 18:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002862620F1;
+	Wed, 30 Apr 2025 18:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF1S0Vdc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTn+/oCN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F13829408
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 18:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFC7190676;
+	Wed, 30 Apr 2025 18:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746037273; cv=none; b=EbGIEKUaPT+EfQccAgcjdOo83MRCQ+IBHmtaYCpZG8XogbduRifq+Uf4tTAUzY857VgGqIro+07xaxYgRqCvlt6Y7i/8qwHOfIGeNg6oL+sm31/4VzgjovOozaFhH5OsFjpfyxebmqgrabSw5KYuYthk0Zw0rs9YNGO6tS1sdmo=
+	t=1746037517; cv=none; b=DaQwifFsiH8UGcGNSLgSfEyexoYHdyqVw0hzTUR9HKjJG+MnBSskqQP/ltvtdijRQ/KXXyw5I+8x7EvIoRXxxsDcflglMkMxgkwgQfr284ute1HP3JFmeRxN3Ct1WkyL8WZlFq7Qyc+NWEb/WK/MhbZTC8nhZ2Et1Dz6z4I8XDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746037273; c=relaxed/simple;
-	bh=za7xdjLE9bp2NMnr6s/Q5MyeV6qERXmYYVibZOeePI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WdsGwx8mOFjnrxMb769ru4R35Ayv4IFFP5eGKBMPFmVA3riuSxTJLITlGHHJUuVkDqGdLFHJAu88QhK6DbjMaQAARy6f1awXGQ8hRuVF9BhypMM4mAQxX1VS0CU9T2Q3MJJe1bU3m7d+GJM+d0Rc0ZnoKafUHqxPo3X1CY8n4c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OF1S0Vdc; arc=none smtp.client-ip=209.85.218.49
+	s=arc-20240116; t=1746037517; c=relaxed/simple;
+	bh=dntHkSUODIQLMMzWfdC0ZCYDVYeurZEYNyJyydXvyRw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=sl14xvP/oRxtbLJUmNlfehRO6MJuxkQmySD4v5k9SPm+aJfhj8TBM7gkgRUnbPmb46YVxwAzoRBCz8hiYhA2ZaiIxTb28QTf8Ixo661vPKQxH5XQZJ5d3pGzgTsfY9B5mI54c1IymoWObHzYu+FwagntLA668YRPRiNNzY+Y92Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTn+/oCN; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac34257295dso16380966b.2
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 11:21:11 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c53b9d66fdso14620285a.3;
+        Wed, 30 Apr 2025 11:25:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746037270; x=1746642070; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1746037515; x=1746642315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oQqDlcZHlKX6vCp3zS/Qk4GtsSiia+cM4MSYqtKcMHs=;
-        b=OF1S0Vdcf2A9z80W7fcAPJenQDXM2wAqjmq/dLTqhappLLujiyXjlIZKSxuVmDxg8y
-         JUytnxEmtXNKLyovvMgZUSN8+nbFuKDrBZAODTzgotnVl/L510Ks7mUzhcMLlOodK3Lg
-         riK34cMTkqPG/Nu4fgWF76V6AFl6kALw6WlFawY1VtnWIzg11Vh8j0fQcEXy6PojW5ii
-         KTvYuiPoJObMg/S9OTjiH5NXDOLhceD2lqKiUhw0zYTgl/xnkUnjOTLmx7Uz31ZbTWIo
-         dzE82tGaMiS3pZF/Sn+FxJqd4FE+CcMn4TkKW31pJHeMzEV3vukiM9O0g6lHW/kyn08c
-         wK0A==
+        bh=PuU9dJ/Di5OmDAwUgi7sluax8cJiERF6LgVjZOwJylI=;
+        b=gTn+/oCNzjLr+nmBrguxMBuw6h7efJyEJ2deGl5IWBqGJJsAr8DpROa7XZn1ray+mG
+         x7Uw9VCvbwm2bavdF95FXr+VXElejFG7j2YsYqjrV5v2t/rPD0jw/stA1ElfFA3NgK6l
+         fPdyxpu67kt5XtNODVMTRu1jqownHqTbJOlTTsQ76NLsr26/ymg03mq5R7hLA+Am3fx5
+         xMeS3HOTax9wOrxJxwZrGqorYlFhinEOG95qr9RRBHee3+1pPvDD+3HVKLX+2qcWeBm6
+         zs6ze/AcTEruusdjTwiv9qepMDDZ/pZjwthpEIr751z0STS8bYsKC3KIH9aCl30Zo+Zp
+         2isQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746037270; x=1746642070;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oQqDlcZHlKX6vCp3zS/Qk4GtsSiia+cM4MSYqtKcMHs=;
-        b=Zl5pWtwuo49YU8d+cnmP9sr2gRgVttILLqGD4hP5uUhNuH66xikuY8sq0XOVml9l2k
-         uls4FPOQFzK+NISJ/nyPeqc6hqjFAHp1Wh2J9tyTI7b6xsoZ+tFYYx4aPG0VcoNekuw3
-         +F/+sW3JbtvoV9MjnTHfEf+ZlF3WILrolTOTCvmJBs1WLJftzSaLWLhw9RxKiHwQ6/Vg
-         YZ6eCmzHr+SK86GjisUk+6TSi6bk0CUCqH+HXJBj2LRAYL8NcGrNmgYKEyB6MtJPufpi
-         usfyz47VGPWnL1sx8hBUzQUobKiHKMJYmxfdO3KqFSDG8x3N8pG/56ft30NKZF6GmD4I
-         b02g==
-X-Forwarded-Encrypted: i=1; AJvYcCXlpIwXu0EraAJQmpjMorWTaPlcgF1O8U7UtfMwed07nNoOa+SpS8rGFbKGJgzqmIsSWwivXwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yykpkk4PueJqNuf2xxS3mE4JpMzM+A2wkRE43HxCtT/0YD3CBTw
-	+TsGV1g/em+nlfSJOS0cu0P3PbG3xE+JX6yZ2WSzDNBjI022EMM/yCeNgQOx6QCV4RJuo4jdNE7
-	NADdmkbQIOhwniHYr/V8tw2z0E74=
-X-Gm-Gg: ASbGncsKOg7SOlhfgVwHgE1d2qNftuFDNKTQbSeW+PX9StnnPxz1jL+n1btbM3DQ10c
-	bjRDF+72JlCgQlYvhlxryXSnto1RgXQ/tfbPJo8S8CAhHlNy44EpIfx5dGdBEdhZbEYrY6Z+RVB
-	dNGzB7HdV/CKSY/CJUcW0xZt0=
-X-Google-Smtp-Source: AGHT+IFWsVi6IoH6BfgcKcg5vmilVdk+v3ykK3VxShp5N16rkJHxuTuhOv0ZjpySQzEFcYlgGAyD+PxKyQSXuyLP6UE=
-X-Received: by 2002:a17:907:944c:b0:acb:85da:8e09 with SMTP id
- a640c23a62f3a-acedc5deed0mr429040666b.21.1746037270101; Wed, 30 Apr 2025
- 11:21:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746037515; x=1746642315;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PuU9dJ/Di5OmDAwUgi7sluax8cJiERF6LgVjZOwJylI=;
+        b=NBkZw6/MyFXoZC9INkCDeBCvzQ8htfwia64+KyN40lbYUYNAzvTBmDayBoqc/9SJ7p
+         bDpGP5HjM75adXAf75iyeb9f2X36NXgjGXPI4bbQ1CBcNCSD7SeXxd+z5j5nSh7Q/jc8
+         RC1bRqSQSjGv1bLQYgHlaBkmKN8fTXCyuFd46lyWqgPwxH6LMDwqPhso7Wmz/SDeDorF
+         warKLDp1cDNjCH62Uz28fv96zcHD8XgKCMWuVwHotBgc8Hkuyh5+8y97vWof7plI4x0a
+         Mqr2Ro7fe8y9N8JEN0Y/HKPs0iwA6dO7WU83DCmgIRk9Hwy1Ydf59n3eUVY417YWOxG2
+         YqrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJJ6KocnC41WZLBZni2JTjKDBrSXilz7CaihIzWWyh5auwGuRin77PUuDeCjDuYLaXtXMVcyw6@vger.kernel.org, AJvYcCVT+AampspA74ie5TGk9xJiIly60u1iIbCEqRXbKEWustDm7GJWYUMn6fg0bRBDDqIfOjA=@vger.kernel.org, AJvYcCVus+kmXsSHIOp2rlFIM+7Za3DLYadnAUV/H/XCEV3EDP8FvjJ0EZTaxtg6n+d0YDCILPMcwxEn5HuWXax9@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMo+MAdHUeyUbYPcNYEpV6A1nZfTi5WpvB1RKEfQTBZs5Gf65L
+	/X/oUhPMLBPz46+3BdAkgbtOzPFTJbRcHFxXrPcYtZYMgcrsYfjN
+X-Gm-Gg: ASbGnctXVYX2sQWJuMF51OQzh047BNAI+DcfEsEmgHsQ7yViNmt3ghOXGjCyTWmLuPU
+	g9O1eTo3qbQlGSE58D2sXQOpkLA02OU0ykgCbbogYRK5V2k5RK4Vw0NIYNPuyM4Z298mi4Gu0I5
+	auMP8iIEIbADACcyC0+akkIBHO1esnZisyxFTzOyOKVunnyw8gbigm2knxpZo90IFUuo4TeBoDQ
+	vTRxWH24FD/Xk8u3ZZ99qBAiWilAqKaEe0aWoCXobnKAM8TSq3jCwL49rMp0Ol0mqLjZxYo/nqR
+	CWQ4aVluLxPtCPTgtUCYHeniqV0zEoTP+Oe801CAvCMrjEJciRcr/eAs2fIonfywpIY9nsLpRno
+	zeX3QXXAeX5c54yw4pddLigt8hOdzkYA=
+X-Google-Smtp-Source: AGHT+IEdeBQS0rsgRgLgNnw2i5fBYy2oC7eKu5y/CBRhlsW9hDSYvHIxDh4yZVpXcWMS8fpuh7OTog==
+X-Received: by 2002:a05:620a:17a7:b0:7c5:57b1:1fd1 with SMTP id af79cd13be357-7cac7ea001dmr572603585a.47.1746037514950;
+        Wed, 30 Apr 2025 11:25:14 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c958e7bdfesm887579985a.75.2025.04.30.11.25.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Apr 2025 11:25:14 -0700 (PDT)
+Date: Wed, 30 Apr 2025 14:25:13 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org
+Cc: Jon Kohler <jon@nutanix.com>
+Message-ID: <68126b09c77f7_3080df29453@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250430182921.1704021-1-jon@nutanix.com>
+References: <20250430182921.1704021-1-jon@nutanix.com>
+Subject: Re: [PATCH net-next] xdp: add xdp_skb_reserve_put helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250430170343.759126-1-vadfed@meta.com>
-In-Reply-To: <20250430170343.759126-1-vadfed@meta.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 1 May 2025 03:20:58 +0900
-X-Gm-Features: ATxdqUFeMX9b2Neh4Aj_5wp0FYIoHHfhxMkxHsQ2UX7_cLjpSBFL5xRDGg_zAdM
-Message-ID: <CAMArcTWM+4hry2Zf=a8eYH54icov0J73vnEDX79RDEkxd6wX2w@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: fix module unload sequence
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 1, 2025 at 2:03=E2=80=AFAM Vadim Fedorenko <vadfed@meta.com> wr=
-ote:
->
-> Recent updates to the PTP part of bnxt changed the way PTP FIFO is
-> cleared, skbs waiting for TX timestamps are now cleared during
-> ndo_close() call. To do clearing procedure, the ptp structure must
-> exist and point to a valid address. Module destroy sequence had ptp
-> clear code running before netdev close causing invalid memory access and
-> kernel crash. Change the sequence to destroy ptp structure after device
-> close.
->
-> Fixes: 8f7ae5a85137 ("bnxt_en: improve TX timestamping FIFO configuration=
-")
-> Reported-by: Taehee Yoo <ap420073@gmail.com>
-> Closes: https://lore.kernel.org/netdev/CAMArcTWDe2cd41=3Dub=3DzzvYifaYcYv=
--N-csxfqxUvejy_L0D6UQ@mail.gmail.com/
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-
-Tested-by: Taehee Yoo <ap420073@gmail.com>
-
+Jon Kohler wrote:
+> Add helper for calling skb_{put|reserve} to reduce repetitive pattern
+> across various drivers.
+> 
+> Plumb into tap and tun to start.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 78e496b0ec26..86a5de44b6f3 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -16006,8 +16006,8 @@ static void bnxt_remove_one(struct pci_dev *pdev)
->
->         bnxt_rdma_aux_device_del(bp);
->
-> -       bnxt_ptp_clear(bp);
->         unregister_netdev(dev);
-> +       bnxt_ptp_clear(bp);
->
->         bnxt_rdma_aux_device_uninit(bp);
->
-> --
-> 2.47.1
->
+>  drivers/net/tap.c | 3 +--
+>  drivers/net/tun.c | 3 +--
+>  include/net/xdp.h | 8 ++++++++
+>  net/core/xdp.c    | 3 +--
+>  4 files changed, 11 insertions(+), 6 deletions(-)
+
+Subjective, but I prefer the existing code. I understand what
+skb_reserve and skb_put do. While xdp_skb_reserve_put adds a layer of
+indirection that I'd have to follow.
+
+Sometimes deduplication makes sense, sometimes the indirection adds
+more mental load than it's worth. In this case the code savings are
+small. As said, subjective. Happy to hear other opinions.
+
+> 
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index d4ece538f1b2..54ce492da5e9 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -1062,8 +1062,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
+>  		goto err;
+>  	}
+>  
+> -	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+> -	skb_put(skb, xdp->data_end - xdp->data);
+> +	xdp_skb_reserve_put(xdp, skb);
+>  
+>  	skb_set_network_header(skb, ETH_HLEN);
+>  	skb_reset_mac_header(skb);
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 7babd1e9a378..30701ad5c27d 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -2415,8 +2415,7 @@ static int tun_xdp_one(struct tun_struct *tun,
+>  		goto out;
+>  	}
+>  
+> -	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+> -	skb_put(skb, xdp->data_end - xdp->data);
+> +	xdp_skb_reserve_put(xdp, skb);
+>  
+>  	/* The externally provided xdp_buff may have no metadata support, which
+>  	 * is marked by xdp->data_meta being xdp->data + 1. This will lead to a
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index 48efacbaa35d..0e7414472464 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -345,6 +345,14 @@ struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+>  					 struct net_device *dev);
+>  struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
+>  
+> +static __always_inline
+> +void xdp_skb_reserve_put(const struct xdp_buff *xdp,
+> +			 struct sk_buff *skb)
+> +{
+> +	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+> +	__skb_put(skb, xdp->data_end - xdp->data);
+> +}
+> +
+>  static inline
+>  void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
+>  			       struct xdp_buff *xdp)
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index f86eedad586a..1fca2aa1d1fe 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -646,8 +646,7 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
+>  	if (unlikely(!skb))
+>  		return NULL;
+>  
+> -	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+> -	__skb_put(skb, xdp->data_end - xdp->data);
+> +	xdp_skb_reserve_put(xdp, skb);
+>  
+>  	metalen = xdp->data - xdp->data_meta;
+>  	if (metalen > 0)
+> -- 
+> 2.43.0
+> 
+
+
 
