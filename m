@@ -1,136 +1,166 @@
-Return-Path: <netdev+bounces-186998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06918AA46C6
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CBBFAA46CA
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99D271892003
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:17:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA7111895F81
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452A221B9F6;
-	Wed, 30 Apr 2025 09:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DC421ABCB;
+	Wed, 30 Apr 2025 09:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deepl.com header.i=@deepl.com header.b="YrF6d4MF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FmVVrpX3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068F6220688
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D4C288CC;
+	Wed, 30 Apr 2025 09:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746004610; cv=none; b=EyB4Gbijb6zeN4qJaHhGYdMHOLLQNosxy66B1vKTDAI6QWvGzRSauPyBjDjUFmjwnzZ9atkvBpyFK0DG0Be3/nGDRSs5HoPOYrml8U4TlN1xsvjYOuzMGW2Tsj93b1OOYrrIGvnEmqHGBV2dvkOyTuFOG1Vpxe2c6kgs/+hCCDI=
+	t=1746004645; cv=none; b=DkdgxIT3hRuVFklGnFICk2a2Jo94nVjDSgVCUULIyQEmnnXKJNVz8RK8o81TxJycx28ebfrMOFwZDK92wgYS+fyikj24hdBDH+WUl77gGWtiIBXngvndHyqRdmJBq3m+jpqyc6OH58vug2afb82AcEZsZAXR7jRldduHob+q98k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746004610; c=relaxed/simple;
-	bh=BevedQaQvBBiX06J3pCcK0pE+p6oQauzPpWiXiQ4MHM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=AmKCE11Z01LutEBsT/+U1ZFAB9ifI1vCDCMp1Fi+nH8niqrOLW/4Vm54dzRpB/SWLKmIXFkCccyS+LiYQryMqY0g7ojb3WHzhQWUQM24DxYHFEcoZCZFN9EdcJvEA5PeW7vVe3ltHCtzanXSSZe1NdLtkD9PpHUmBduMwuTXV1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=deepl.com; spf=pass smtp.mailfrom=deepl.com; dkim=pass (2048-bit key) header.d=deepl.com header.i=@deepl.com header.b=YrF6d4MF; arc=none smtp.client-ip=209.85.208.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=deepl.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deepl.com
-Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-30bf7d0c15eso66988891fa.0
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 02:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=deepl.com; s=google; t=1746004605; x=1746609405; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WA46efbq59rSlpszzI4OCPZsjnfo4xMXGMCSysDJ0i4=;
-        b=YrF6d4MF1Q82S8oSLGqGG7k3i+tKmp9nEKTF7wnQ5z4YjQVhxoIompkWUQccVfhodC
-         dOetOCfmH8u45sd9eQit7WXMgJfUOVeF0bzKeMacHQQwa5AttjK0UlUG2Q8j8GMBfKzt
-         QR/E4j6yRu5Z/LcHxmvFlqOagR7pXhVeWaw7bwMUXm4q7pfjhjgbnt7iS3BP1s/TNE2c
-         8ikcN6m009XgQDfNVuzmjagvwDFaCWMRbCQMNcDW7JuJGuvMtUkJ784oFTxy7GpJvQ12
-         JxjtsHFXaZ86KuE8fqU9mOLZLHLt930JWgl6iql0xZVdGJJAycYbju/w25qkiW25gLES
-         uPog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746004605; x=1746609405;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WA46efbq59rSlpszzI4OCPZsjnfo4xMXGMCSysDJ0i4=;
-        b=WZjDbGrtbg1nDguCNHviJHNfnLZ5VNBv7/KnMB5Kr9PFzzU3J+Au0SkXw/88EE0dru
-         vU4WDd+o9Gl/xcGuOEcktgcrnK8GQrY9t8GOccXk2CLquhU4G5p4jca8Z0enO1hG1KaV
-         yvqBrQPnbBCiLw/siUZzubi8PeclQ/3/Lw+IEK3ZFL2TlK37gcfomk0uNXbtl6yAd0ox
-         J98dMVjHOzECNMHf1O05Pl0YKNFHjLupBl53j9SHyDbTB6l1V0zXbtL6nvanT9D80lyq
-         UdTJF/VHxPGJDLZFxY/8IgV4cbT3nf0d75GTY3Q5TWdDM+EtVS0XBFC9IbiHcFqde+HP
-         PwBQ==
-X-Gm-Message-State: AOJu0YzxzWCedmSntPCZqEiaTbbatvU0XqFf7yqIecwdlDaxqqXpne9m
-	coNK7EChoBvXZYdBDS4bRVa885kAM5YcrSUfqW2vOCgaD48MO63jG4d9KyU1CsRlRiWO9O0no3O
-	C2uE3qg==
-X-Gm-Gg: ASbGncsx7+D5q/sGQtiOuBvqZ5zTc8BBOzV6QjjHtQB5Ls40HbKyhhOf8jk3JNYdott
-	qJulPLGenK56V9jrUF/fdGS9hMHk3y4cAL53Kgmi2FGrclOwnHtNIL7/vXTALmEPeSDEw4n7/jc
-	bC1I+hwTCPreyr6rBaDG7hVn6dT/a/scXwK3QhptrvdMXou9n5wLIRzWIOG9V36NuD83GFeFp1Y
-	7OEFFiHlxpg3E5xRfWmW21sEUvfXxJWafJ+5G6HYNiI+3J9B9vjbS6ZBfR6pPROFeD4SG3ggpMi
-	Xm6IVdBERQ9M/CrVzFiMG3moLv9uxCmZRcW3u3lwV+3kOs5jm9lW+yZshkq+fAv4EFyrvXaPuWZ
-	KNOK8yYHRfaYTdxdtEj0E9qaIQBbahg==
-X-Google-Smtp-Source: AGHT+IHx3VYhA2aMrwNs8vQTpI2UgqHUPMkPns3e2BzwS2z1Mhcnx7mM70ON5gnnTZcJrWhXRuWpIg==
-X-Received: by 2002:a2e:a5c2:0:b0:309:1fee:378d with SMTP id 38308e7fff4ca-31ea328b924mr6203821fa.19.1746004605027;
-        Wed, 30 Apr 2025 02:16:45 -0700 (PDT)
-Received: from ?IPV6:2a00:6020:ad81:dc00:46ab:9962:9b00:76f8? ([2a00:6020:ad81:dc00:46ab:9962:9b00:76f8])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-31e93f8323esm1796001fa.13.2025.04.30.02.16.44
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 02:16:44 -0700 (PDT)
-Message-ID: <f5f8a9a0-a590-467e-81ad-81e1feea3b79@deepl.com>
-Date: Wed, 30 Apr 2025 11:16:44 +0200
+	s=arc-20240116; t=1746004645; c=relaxed/simple;
+	bh=0MRDc7XkKAhdLo9NoWiZ7a37tKdrUj31jPMIXHPElEQ=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=RRBgKXohTast61fKl91rf3h/rwcItulzGAOl+ke5XhQwtP25bSfVXUz87MaiXjeom57bwORqkQlTji+OM/ywpXf8NxybgKyN73F8GhzrAjA5rD5xwNd/4BaGrjR/vQRTnuPUs2Quz1qniNn+W65J5pQbPlqUFBGrjCtDvTQK2kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FmVVrpX3; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746004644; x=1777540644;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=0MRDc7XkKAhdLo9NoWiZ7a37tKdrUj31jPMIXHPElEQ=;
+  b=FmVVrpX31idIr+m1wN1XNNIjWkNf4aLWdVD/AxCrITc/5edUx6E0zNP8
+   aDIYb8DZbnlk1HuNqZvJVBIEUfB1iNau/84wrUaIOFqxfwY4MhRnCC+Yg
+   0XgjPd3e8V9CMTZhrBbmPEij4eQYVnsQqhqa0KqZpC2KV/BuPRZPpkid2
+   NufZNOoersoL9rdQEkBBwE1TJlC/0oEv7X2bfxTgiMJNaAZ9qJFaBOITF
+   h2mZSuqvzT40KyLxAyAi4yj7Hz7mw3Bl2tr4C2uuHKvPE1XznOTY3NuZk
+   U360C4u8lFW8pGfAIjedX0IdhMo1gfqVtQpjfwbtb27FVl5h8M9IQsstS
+   A==;
+X-CSE-ConnectionGUID: 6FmHRodMRnS6OZ1GM+ACqg==
+X-CSE-MsgGUID: Y20vUwSeT2+ehYln9NDrSA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="73044385"
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="73044385"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 02:17:22 -0700
+X-CSE-ConnectionGUID: /a7mAvi6S1y/UJBA/L4NuA==
+X-CSE-MsgGUID: NSdWhcCYRFm9Gy2+IE0YuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="139249217"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 02:17:10 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Wed, 30 Apr 2025 12:17:06 +0300 (EEST)
+To: Xin Li <xin@zytor.com>
+cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
+    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+    virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
+    linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
+    linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
+    tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+    dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+    acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com, 
+    peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com, 
+    alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
+    adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org, 
+    ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
+    tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com, 
+    seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com, 
+    kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
+    dapeng1.mi@linux.intel.com
+Subject: Re: [PATCH v4 01/15] x86/msr: Add missing includes of <asm/msr.h>
+In-Reply-To: <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
+Message-ID: <d1bf0657-1cc5-b6ec-5601-f31efefacd9a@linux.intel.com>
+References: <20250427092027.1598740-1-xin@zytor.com> <20250427092027.1598740-2-xin@zytor.com> <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com> <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Possible Memory tracking bug with Intel ICE driver and jumbo
- frames
-From: Christoph Petrausch <christoph.petrausch@deepl.com>
-To: netdev@vger.kernel.org
-References: <06415c07-5f29-4e1d-99c3-29e76cc2f1ae@deepl.com>
-Content-Language: en-US
-In-Reply-To: <06415c07-5f29-4e1d-99c3-29e76cc2f1ae@deepl.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; BOUNDARY="8323328-830254077-1746003796=:7433"
+Content-ID: <b1309532-f075-10c2-3416-1951dccf3d32@linux.intel.com>
 
-Sorry, my mail client fucked up the format of the commands how to 
-reproduce the issue. Here is a corrected version.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-On 4/30/25 10:59, Christoph Petrausch wrote:
->
-> We can't reproduce the problem on kernel 5.15, but have seen it on 
-> v5.17,v5,18 and v6.1, v6.2, v6.6.85, v6.8 and 
-> v6.15-rc4-42-gb6ea1680d0ac. I'm in the process of git bisecting to 
-> find the commit that introduced this broken behaviour.
->
-> On kernel 5.15, jumbo frames are received normally after the memory 
-> pressure is gone.
->
->
-> To reproduce, we currently use 2 servers (server-rx, server-tx)with an 
-> Intel E810-XXV NIC. To generate network traffic, we run 2 iperf3 
-> processes with 100 threads each on the load generating server server-tx
->
-> iperf3 -c server-rx -P 100 -t 3000 -p 5201
-> iperf3 -c server-rx -P 100 -t 3000 -p 5202
->
-> On the receiving server server-rx, we setup two iperf3 servers:
->
-> iperf3 -s -p 5201
-> iperf3 -s -p 5202
->
-> To generate memory pressure, we start stress-ng on the server-rx:
-> stress-ng --vm 1000 --vm-bytes $(free -g -L | awk '{ print $8 }')G 
-> --vm-keep --timeout 1200s
->
-> This consumes all the currently free memory. As soon as the 
-> PFMemallocDrop counter increases, we stop stress-ng. Now we see plenty 
-> of free memory again, but the counter is still increasing and we have 
-> seen problems with new TCP sessions, as soon as their packet size is 
-> above 1500 bytes.
->
-> [1] https://github.com/intel/ethernet-linux-ice
->
-> Best regards, Christoph Petrausch 
+--8323328-830254077-1746003796=:7433
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <d13050cf-2b1d-6913-5e66-9452e1353593@linux.intel.com>
 
+On Wed, 30 Apr 2025, Xin Li wrote:
+
+> On 4/29/2025 2:45 AM, Ilpo J=E4rvinen wrote:
+> > >   arch/x86/events/msr.c                                         | 3 +=
+++
+> > >   arch/x86/events/perf_event.h                                  | 1 +
+> > >   arch/x86/events/probe.c                                       | 2 +=
++
+> > Under arch/x86/events/ a few files seem to be missing the include?
+>=20
+>=20
+> Most C files in arch/x86/events/ include arch/x86/events/perf_event.h,
+> thus they don't need to include <asm/msr.h> directly once
+> arch/x86/events/perf_event.h includes <asm/msr.h>, and this patch does
+> that.
+>=20
+>=20
+> The following files include arch/x86/events/intel/uncore.h which includes
+> arch/x86/events/perf_event.h, thus no change needed:
+>     arch/x86/events/intel/uncore.c
+>     arch/x86/events/intel/uncore_discovery.c
+>     arch/x86/events/intel/uncore_nhmex.c
+>     arch/x86/events/intel/uncore_snb.c
+>     arch/x86/events/intel/uncore_snbep.c
+>=20
+> The following 2 files don't include arch/x86/events/perf_event.h so they
+> include <asm/msr.h> directly with this patch:
+>     arch/x86/events/msr.c
+>     arch/x86/events/probe.c
+>=20
+> arch/x86/events/amd/uncore.c doesn't include
+> arch/x86/events/perf_event.h but includes <asm/msr.h> already.
+>=20
+>=20
+> So we are good in this directory, but it should be a separate patch with
+> the above explanation then.
+
+Hi,
+
+While this is not my subsystem so don't have the final say here, you had=20
+to explain quite much to prove that (and reviewer would have to go through=
+=20
+the same places to check). Wouldn't it be much simpler for all if all=20
+those .c files would just include <asm/msr.h> directly? No need to explain=
+=20
+anything then.
+
+Also, similar to what you're doing for some tsc related things in this=20
+series, somebody could in the future decide that hey, these static inline=
+=20
+functions (that use .*msr.*) belong to some other file, allowing msr.h to=
+=20
+be removed from arch/x86/events/perf_event.h. Again, we'd need to add=20
+asm/msr.h into more .c files. This is the problem with relying on indirect=
+=20
+includes, they create hard to track dependencies for #includes done in .h=
+=20
+files. If we actively encourage to depend on indirect #include=20
+dependencies like that, it makes it very hard to  _remove_ any #include=20
+from a header file (as you have yourself discovered).
+
+--=20
+ i.
+--8323328-830254077-1746003796=:7433--
 
