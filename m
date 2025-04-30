@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-187092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0223AA4E56
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:20:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B524AA4E64
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 216804E8028
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 314943A3F52
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2211DD889;
-	Wed, 30 Apr 2025 14:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F8325A632;
+	Wed, 30 Apr 2025 14:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIHwdswV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1Q7eU9v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C075925A2AF;
-	Wed, 30 Apr 2025 14:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D619D2AE8B;
+	Wed, 30 Apr 2025 14:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746022855; cv=none; b=aYE9pfprv8wsXa24CybCeEeRGxDPljBZYeWEvrkiTEWVzpXLKIc/M9BQXcT6ad40yP9JGD5tcAZMevDCHC01Lg/Q3KYnYPq1/UzdUE40JgSCx7C6ZFSHW978aP8CuD1m23JKvz4wfz+M2AuyxLO+y0BB+oMAJiTbpyF8e8bYohA=
+	t=1746022984; cv=none; b=R9k120v+g/EaeNb8S6Hy93eZFhqpskx02ehezG2+wGNUDlI2HyUeHUUtOgjmVEMwxClo8iQ2n27ypJ8J+4/aR8ZZoBOIxM7/Dlv2rWLXEUQtpPxdfKXr1QXDyWJ+wAW79o3JPHxQ/ccdgGLo2VSEou25nMbkBny2naRMNh6sifQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746022855; c=relaxed/simple;
-	bh=SNye59+q6J7dszg3XbC1nFoBaJJWL336n0A0UOKURjM=;
+	s=arc-20240116; t=1746022984; c=relaxed/simple;
+	bh=EHmJoyT1t1HTWr93T5cTrjOvhbK6j7Z+nBdrivtN+KM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ct8ZvKxhkgaEcFbpjiL4oRxPKcSobdiG6SiKd1a4GXkXcdKLuDlU2syLMVzsNmuiBSJUUWFKleiQVJTOSgW+A7vGzTZ5ez4RvDTzMB7IUAf77noAFo0HjRo7nqCsv7bITxwjTBKUHuj4wWzOgWHsP7QIpQAeGiYjq/7yznjU6Dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIHwdswV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B0F7C4CEE7;
-	Wed, 30 Apr 2025 14:20:52 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=d4BOsLeFQabFOuuDUMEDTRijEed8hf4jgJtW5kTJbgvOPD+hXzJyaNp4tqK1TcSMGiRp9YKoxCFAXsQD7QnotWVgqALmoWk8DXtx6YlkYV3zqTM88UFViy0Bt7/bKyhRDe0PDnPjV3xNVSl7IYrxBVEYJM3T9V8YQ480Sb+WcDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1Q7eU9v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBEAC4CEE7;
+	Wed, 30 Apr 2025 14:22:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746022855;
-	bh=SNye59+q6J7dszg3XbC1nFoBaJJWL336n0A0UOKURjM=;
+	s=k20201202; t=1746022983;
+	bh=EHmJoyT1t1HTWr93T5cTrjOvhbK6j7Z+nBdrivtN+KM=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kIHwdswVPesfFoZt7A0WWlk9I1Cfp+Sppm8022OzrdPVB0syvoZw9xc0lamgq19rA
-	 8eBQqXptgLGdmUXDJZstNp6NYDI3mpiXHmebIMLoFeybxyi+IZzY9wSzS0W7AmxHPg
-	 IIM9wNkUL8f/RgS9Z+xWUOD2C48S+ptDY5hU2LZf3Sdl4y6kDnO0iywD463n+UdrTs
-	 tl7iPULdin+la5ubX2zpjMHo+cHZNJ4Wt2vzXlytwkb0YJb4dzjeqH16eloTpqavt2
-	 xgXObB1dE8NvnBn9qaw94hGqhUdcxxYW2h0sZhgSSxXm46dqqlHJoGgqFAyzb5RH3k
-	 QfFnHX8SrzI7w==
-Message-ID: <b57160d1-e370-43ff-a7ea-cb548e19843c@kernel.org>
-Date: Wed, 30 Apr 2025 16:20:49 +0200
+	b=i1Q7eU9v9c9LhftrfG98JhwjvdtIX79CBeve9Lm9W0p/zaxBB/CR370V7cwfPUGci
+	 25KfK/1vS7TQX5ECZxwu+KE077rM4bgeBY+Q/Vtv8oUdIKqvqUPWg+zIQoDpln+Tlb
+	 /TmX2lawn/mb7tU5xdarnbQtwswtW2SXMG7yWVd7b11VeE5I/sEmxz3OBrWqOvf1hF
+	 pPAbH8QqUv3ecrfsUEyv/l2zqHdiapP/8qWa2Scgq1L/bPXKK460WXhOCZTtnrkGG9
+	 K0OYKkZNdYznUBJ/H2RS9SuWz723aSULxpMKAJ2v7Tqkm9OG9KQUJiCsJwpLHNFFI/
+	 dK5uXZw+L4CHQ==
+Message-ID: <06268dcb-4a49-468e-8ebd-d9366a2cf0c2@kernel.org>
+Date: Wed, 30 Apr 2025 17:22:54 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,166 +50,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 05/18] xdp: Use nested-BH locking for
- system_page_pool
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- Toke Hoiland Jorgensen <toke@redhat.com>
-References: <20250430124758.1159480-1-bigeasy@linutronix.de>
- <20250430124758.1159480-6-bigeasy@linutronix.de>
+Subject: Re: [PATCH net-next 2/4] dt-bindings: net: ti: k3-am654-cpsw-nuss:
+ update phy-mode in example
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andy Whitcroft <apw@canonical.com>,
+ "mike .." <wingman205@gmx.com>
+Cc: Dwaipayan Ray <dwaipayanray1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>,
+ Jonathan Corbet <corbet@lwn.net>, Nishanth Menon <nm@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Tero Kristo <kristo@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+ <4216050f7b33ce4e5ce54f32023ec6ce093bd83c.1744710099.git.matthias.schiffer@ew.tq-group.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250430124758.1159480-6-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <4216050f7b33ce4e5ce54f32023ec6ce093bd83c.1744710099.git.matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Cc. Toke
+Hi Matthias,
 
-On 30/04/2025 14.47, Sebastian Andrzej Siewior wrote:
-> system_page_pool is a per-CPU variable and relies on disabled BH for its
-> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-> this data structure requires explicit locking.
+On 15/04/2025 13:18, Matthias Schiffer wrote:
+> k3-am65-cpsw-nuss controllers have a fixed internal TX delay, so RXID
+> mode is not actually possible and will result in a warning from the
+> driver going forward.
 > 
-> Make a struct with a page_pool member (original system_page_pool) and a
-> local_lock_t and use local_lock_nested_bh() for locking. This change
-> adds only lockdep coverage and does not alter the functional behaviour
-> for !PREEMPT_RT.
-> 
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Cc: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> Cc: John Fastabend <john.fastabend@gmail.com>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 > ---
->   include/linux/netdevice.h |  7 ++++++-
->   net/core/dev.c            | 15 ++++++++++-----
->   net/core/xdp.c            | 11 +++++++++--
->   3 files changed, 25 insertions(+), 8 deletions(-)
+>  .../devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml          | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 2d11d013cabed..2018e2432cb56 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3502,7 +3502,12 @@ struct softnet_data {
->   };
->   
->   DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
-> -DECLARE_PER_CPU(struct page_pool *, system_page_pool);
-> +
-> +struct page_pool_bh {
-> +	struct page_pool *pool;
-> +	local_lock_t bh_lock;
-> +};
-> +DECLARE_PER_CPU(struct page_pool_bh, system_page_pool);
->   
->   #ifndef CONFIG_PREEMPT_RT
->   static inline int dev_recursion_level(void)
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 1be7cb73a6024..b56becd070bc7 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -462,7 +462,9 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
->    * PP consumers must pay attention to run APIs in the appropriate context
->    * (e.g. NAPI context).
->    */
-> -DEFINE_PER_CPU(struct page_pool *, system_page_pool);
-> +DEFINE_PER_CPU(struct page_pool_bh, system_page_pool) = {
-> +	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
-> +};
->   
->   #ifdef CONFIG_LOCKDEP
->   /*
-> @@ -5238,7 +5240,10 @@ netif_skb_check_for_xdp(struct sk_buff **pskb, const struct bpf_prog *prog)
->   	struct sk_buff *skb = *pskb;
->   	int err, hroom, troom;
->   
-> -	if (!skb_cow_data_for_xdp(this_cpu_read(system_page_pool), pskb, prog))
-> +	local_lock_nested_bh(&system_page_pool.bh_lock);
-> +	err = skb_cow_data_for_xdp(this_cpu_read(system_page_pool.pool), pskb, prog);
-> +	local_unlock_nested_bh(&system_page_pool.bh_lock);
-> +	if (!err)
->   		return 0;
->   
->   	/* In case we have to go down the path and also linearize,
-> @@ -12629,7 +12634,7 @@ static int net_page_pool_create(int cpuid)
->   		return err;
->   	}
->   
-> -	per_cpu(system_page_pool, cpuid) = pp_ptr;
-> +	per_cpu(system_page_pool.pool, cpuid) = pp_ptr;
->   #endif
->   	return 0;
->   }
-> @@ -12759,13 +12764,13 @@ static int __init net_dev_init(void)
->   		for_each_possible_cpu(i) {
->   			struct page_pool *pp_ptr;
->   
-> -			pp_ptr = per_cpu(system_page_pool, i);
-> +			pp_ptr = per_cpu(system_page_pool.pool, i);
->   			if (!pp_ptr)
->   				continue;
->   
->   			xdp_unreg_page_pool(pp_ptr);
->   			page_pool_destroy(pp_ptr);
-> -			per_cpu(system_page_pool, i) = NULL;
-> +			per_cpu(system_page_pool.pool, i) = NULL;
->   		}
->   	}
->   
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index f86eedad586a7..b2a5c934fe7b7 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -737,10 +737,10 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
->    */
->   struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
->   {
-> -	struct page_pool *pp = this_cpu_read(system_page_pool);
->   	const struct xdp_rxq_info *rxq = xdp->rxq;
->   	u32 len = xdp->data_end - xdp->data_meta;
->   	u32 truesize = xdp->frame_sz;
-> +	struct page_pool *pp;
->   	struct sk_buff *skb;
->   	int metalen;
->   	void *data;
-> @@ -748,13 +748,18 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
->   	if (!IS_ENABLED(CONFIG_PAGE_POOL))
->   		return NULL;
->   
-> +	local_lock_nested_bh(&system_page_pool.bh_lock);
-> +	pp = this_cpu_read(system_page_pool.pool);
->   	data = page_pool_dev_alloc_va(pp, &truesize);
-> -	if (unlikely(!data))
-> +	if (unlikely(!data)) {
-> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->   		return NULL;
-> +	}
->   
->   	skb = napi_build_skb(data, truesize);
->   	if (unlikely(!skb)) {
->   		page_pool_free_va(pp, data, true);
-> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->   		return NULL;
->   	}
->   
-> @@ -773,9 +778,11 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
->   
->   	if (unlikely(xdp_buff_has_frags(xdp)) &&
->   	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
-> +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->   		napi_consume_skb(skb, true);
->   		return NULL;
->   	}
-> +	local_unlock_nested_bh(&system_page_pool.bh_lock);
->   
->   	xsk_buff_free(xdp);
->   
+> diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> index b11894fbaec47..c8128b8ca74fb 100644
+> --- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> +++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+> @@ -282,7 +282,7 @@ examples:
+>                      ti,syscon-efuse = <&mcu_conf 0x200>;
+>                      phys = <&phy_gmii_sel 1>;
+>  
+> -                    phy-mode = "rgmii-rxid";
+> +                    phy-mode = "rgmii-id";
+>                      phy-handle = <&phy0>;
+>                  };
+>              };
+
+FYI the following TI boards using this driver are using "rgmii-rxid".
+Will you be sending fixes to the device trees files?
+
+arch/arm64/boot/dts/ti
+k3-am625-beagleplay.dts:	phy-mode = "rgmii-rxid";
+k3-am625-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am625-sk.dts.orig:	phy-mode = "rgmii-rxid";
+k3-am62a7-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am62a-phycore-som.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62p5-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am62p5-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am62-phycore-som.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62-verdin-dev.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62-verdin.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62-verdin-ivy.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62x-phyboard-lyra.dtsi:	phy-mode = "rgmii-rxid";
+k3-am62x-sk-common.dtsi:	phy-mode = "rgmii-rxid";
+k3-am642-evm.dts:	phy-mode = "rgmii-rxid";
+k3-am642-evm.dts:	phy-mode = "rgmii-rxid";
+k3-am642-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am642-sk.dts:	phy-mode = "rgmii-rxid";
+k3-am642-tqma64xxl-mbax4xxl.dts:	phy-mode = "rgmii-rxid";
+k3-am642-tqma64xxl-mbax4xxl.dts:	/* phy-mode is fixed up to rgmii-rxid by prueth driver to account for
+k3-am64-phycore-som.dtsi:	phy-mode = "rgmii-rxid";
+k3-am654-base-board.dts:	phy-mode = "rgmii-rxid";
+k3-am67a-beagley-ai.dts:	phy-mode = "rgmii-rxid";
+k3-am68-sk-base-board.dts:	phy-mode = "rgmii-rxid";
+k3-am69-sk.dts:	phy-mode = "rgmii-rxid";
+k3-j7200-common-proc-board.dts:	phy-mode = "rgmii-rxid";
+k3-j721e-beagleboneai64.dts:	phy-mode = "rgmii-rxid";
+k3-j721e-common-proc-board.dts:	phy-mode = "rgmii-rxid";
+k3-j721e-evm-gesi-exp-board.dtso:	phy-mode = "rgmii-rxid";
+k3-j721e-evm-gesi-exp-board.dtso:	phy-mode = "rgmii-rxid";
+k3-j721e-evm-gesi-exp-board.dtso:	phy-mode = "rgmii-rxid";
+k3-j721e-evm-gesi-exp-board.dtso:	phy-mode = "rgmii-rxid";
+k3-j721e-sk.dts:	phy-mode = "rgmii-rxid";
+k3-j721s2-common-proc-board.dts:	phy-mode = "rgmii-rxid";
+k3-j721s2-evm-gesi-exp-board.dtso:	phy-mode = "rgmii-rxid";
+k3-j722s-evm.dts:	phy-mode = "rgmii-rxid";
+k3-j784s4-j742s2-evm-common.dtsi:	phy-mode = "rgmii-rxid";
+k3-j784s4-j742s2-evm-common.dtsi:	phy-mode = "rgmii-rxid";
+
+-- 
+cheers,
+-roger
+
 
