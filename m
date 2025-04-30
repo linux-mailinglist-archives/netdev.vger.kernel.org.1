@@ -1,407 +1,264 @@
-Return-Path: <netdev+bounces-187155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2EBAA54D7
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:42:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADDE0AA558E
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 22:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD829A3F68
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 19:41:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78F8D9A720D
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9E81F0990;
-	Wed, 30 Apr 2025 19:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4133C296FD2;
+	Wed, 30 Apr 2025 20:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="aVE5YBy2";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Rqp1EOyo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pTdClufq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4072A1EDA3C;
-	Wed, 30 Apr 2025 19:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746042123; cv=fail; b=M0cE7nZvgH/cWMoZbDg74ZXbY/+VYW0IGzNcmncnk1wxSu+40gFs+xEJD5vtX+3Sj3lBuCwmb36IIWt+mw/KbIUbZXc91YsO7okIgSRwMnkGlM0fe5n/WEugoiWY/X7UhzzJ5FMQDwb+Hars2sOpNGoyAfWeoOYIs7aEB8/tX3M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746042123; c=relaxed/simple;
-	bh=YbMTc/y+Q6XNZLlIBgiolisCvaQT84Ve40vVEvSrKk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=JwwyBeIjxfI8IzvYfYeQmup5DKMT8bQzPaPhA5SjJh31Tspkke3qVJHb9934WNeyw9lJFnXCpL8sBPXqHvk7lEbJmlG19YvY36HlVM4iicfB5wlGbI0+IYTX477ES4UD/RInFqTYh2OKh5h3gjXfd7fIbSWsDZa0y/5b0yWC5Io=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=aVE5YBy2; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Rqp1EOyo; arc=fail smtp.client-ip=148.163.155.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53UJ5CZ2010420;
-	Wed, 30 Apr 2025 12:41:20 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=proofpoint20171006; bh=S9H2AimZ5U2EZ
-	FlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=; b=aVE5YBy2KKsOXTQ/Mzs+2OJ9XCTIT
-	j0G4grRi1B/s/cMzOMFX5wmqzx3uNYoXtU/EhqXynidrOQ5+EmxuN9PZhRO8z27r
-	pxvx6+warwaqt3XOq/PfOYWnVhShr2bEzbfyG0LHak5Hv0gVImBgMCpeMpYUh6/R
-	W0KvrYjOpwzNQsrjla91jUTLpoRVNrKd+qZJq4EBslW6TMYd7NcPaQ636B1aLb3x
-	B2QyWO392bkCpkUsPRmJEVpO4r+gE8KhkZvrJ4c+nbQ4s2YfgoK+tIUYGuhnD8Ej
-	qUgX3zVshZSehGy8miU9AKKogINUPxVn4ba/smaE2D/MKLGIs1tLhlRPg==
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2174.outbound.protection.outlook.com [104.47.57.174])
-	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 468y109ydn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Apr 2025 12:41:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vLaCOnKxzGownQnIkuTKiFTiIHhiYQO4eXm2rDt3hovFrFPthzXNEoiiWp8E+JcToWIGQM6mVhl3TnPhvz/GMQy3N78Lsgk0CAFnHVHJclBJ0i0qTUTNyv5JbjYnOEMhR41kdjKxUKPLOsSu6QJzRjZXflzzYA189yYZQtAIrT4dpaxzuS0XN4RsBveanzsw6vVf7X6bChDQBhYo8yTLJy6qefKGZGrKOshLDIILJ+rtcwbg/tyizqzdXqqR54vzzWfSYDOxEsMkbzFeDj2PFi4keWpvx+selUXgz6J24a1K+jpHyWomXv3nOqbGnrFLq51kOIC/2t1pgEo3hUQctw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S9H2AimZ5U2EZFlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=;
- b=HAL5WPUqB1NccG9i5qOmXa7opSXs3p3sixM78b9eK2Ct/4QnDiJTQvq3vtlTnuljhggd2GVNqAZqN48hOtBOu7tfy2wo8Zw1eIobjx/TYGBmCBXp7lXzrg1MouAHByT86w2oODLMNNiUf7iHQXrg+sUuAAl2lOVGU+b48dGv4svggrCfLqNWye+VOyJqxMehwa2a3wLHXp5+FiaZH+7r9m1AlXp7bva9kEYyGWwJ8gIvOAEEJT3sWkvvAoTcYotPxp7xmUb28jNVucO/aa0cLxqKDneM+adcCLVWL4Hlk4DjS0Yt67Zerrilo9C6Kz9tiWaW44jtUjMKbgfseCM7Hg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S9H2AimZ5U2EZFlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=;
- b=Rqp1EOyoL37zAlBoAYYXcaT1ficXh/1ziZW+Na7uzD200dEHYj2Qg8cBG4Flu0UCyr3ubXsMzXSinqTlLuTNbiLwZ+88FTgSvgcWgi/6R/UrnKBRqvULq1Urr+RsgYuOIDyOm9xMcZdNt1qwnG6EljL/ryXMTpNZxD8hvDxMzBLMuUJjN2eMsrw6+xnpGAr6S+558XtXo+kEcBU4M91TFDdjiigDAKRFYugtib9DF/jsmurrwM84WaJ4CYIAWxXlbZ+2E7gmCWPGIZnD46URT8lV2D73zeDCvi2E6ijTqCKBBB8tBMZ5kI3LiRJfh76r7jsJXeCfh4Ti4NDYKfcfTA==
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10) by PH0PR02MB7736.namprd02.prod.outlook.com
- (2603:10b6:510:50::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Wed, 30 Apr
- 2025 19:41:18 +0000
-Received: from LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
- ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8699.012; Wed, 30 Apr 2025
- 19:41:17 +0000
-From: Jon Kohler <jon@nutanix.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Cc: Jon Kohler <jon@nutanix.com>
-Subject: [PATCH net-next v2] xdp: Add helpers for head length, headroom, and metadata length
-Date: Wed, 30 Apr 2025 13:11:18 -0700
-Message-ID: <20250430201120.1794658-1-jon@nutanix.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR13CA0024.namprd13.prod.outlook.com
- (2603:10b6:208:160::37) To LV8PR02MB10287.namprd02.prod.outlook.com
- (2603:10b6:408:1fa::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78255298CB2
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 20:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746045215; cv=none; b=N/qLfsnCDpdbWTkiOCwMeyaQF7ojDORrQZo2KQph4SMCa8+/4OB/xMSzemQkdzFO2G8SjYVdP4lasFpi1m9Pvr91Ojti8O1she3x5/EB1AfvdFZRFJBpbB3GBM4pnXCWQiHpz5QVjZrkz+5DTqrTPbr7JCGTWOjeeF1KAr8Yjoc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746045215; c=relaxed/simple;
+	bh=4SIYk9/JNkn1HsNKyrm1AEz+RQscX+Lfkoh1zhUoPew=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sfXb12cREmUyvMrRRWKpJNoqrt1qPS0A8EIFsm9UqsdQ7vPMkN94nsb/Dbc3OailG4qNzmOYRnsjoN38J9rrWKiOmPkNSB9iFUjIf56IdZ8uvNP4JEAoq9cs+P5149WBwgmGKwQlHme9VC0+K8YyJit3MrNdldJfL4Boy/DjHqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pTdClufq; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2263428c8baso4515ad.1
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 13:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746045212; x=1746650012; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RcCy/KINzcIPmyNbZq3HCq/O9U+fA/Gu6z5IxeN6cus=;
+        b=pTdClufq2Cr1ENE9w2ODRnIma3y0YZmYXVRXIiu3uBMhWL2Xp7eW7IkYpjKLLyZiQK
+         PAUesg05y6yIN8LekB7ZcBxY6d65c6ZCgAQsYe8h1caFhBfWGDFXnJQW5vfJ2hfwP9ly
+         NrsxpsCqwnkPeBm5PSUBkg1rS94pApMzXppqOMA7ZY7qUYBYSPuYu0bn1f0BJ1e617C3
+         OMCBTwWLAbut70Y7HsxL0GDidgoubY2lt3Yv6UG/55AzVJ7McjVCH28gBcZg0511xKhi
+         aZyh8IRMyeYvUA3PhWNXqv6aDLUuSxrFY2bWrGuCtBAp6W4GKl1MjnyL9ogsDOhw9SlA
+         lIkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746045212; x=1746650012;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RcCy/KINzcIPmyNbZq3HCq/O9U+fA/Gu6z5IxeN6cus=;
+        b=EahF7X4IMfuzTPy8tugck+nKx9UXIyFaR4qPoTH6mJUqoAhzwtZe3/T8aV7G4OBoA/
+         BORdCVIuVB88ftXU7hDK5/GwoMxXZF7/AquVQmgROUYJehbEuw1Mhas3+YTs8eclxF11
+         YDdgcy+rd4voUdIOm0u0e865bBX63vSvtMc5gzQ8wgTsa5Vz0FclhXq7umD+jMDN8ZzG
+         2olAjSiL0Pph4DMaIGWIgvN35A/jMfneD76BxXAZfElm2nqZu/rRMIlRfA2G81zP8Viw
+         IPqpXgL3tyaGpf40X9T0sCJP9oS+PpJvQ2fvBGiVzeWNgdCvbQXcIn0gVIsJwsc7w4oS
+         eC3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXO0pN/JdJfP5GTRK+otjox/9cNfQil2/g0GqLwqyjX+VxLVDN6Sh6lCTPpUmQKJt+Cm4JsZos=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMCgXVYtQctQamDFAeQVJctjuT6c42sJrIwFaY67HkhrtpZaMJ
+	aorUEAgxYNXVNQ4POpWDK6i3vz+ipSEN9+tvJNKx9AHbesFcEVc+jk+1qnuwLFgfQHHFrDpHw2w
+	cIBLSEXP7CUHB3YMFBvZAqt/e4+kySFFA5PWd
+X-Gm-Gg: ASbGncuBLkXozk40kBa5lC8wN9YDTRmgD9e8eqM4SII/MlmSFro9r4pmW3YwJH7jLiY
+	YqMp9ow7UHsEFkdCdXmrIaIwosqWUOkvsbO4VDTnB0qvkOglr2UDUACJo/JILA9CHFK6Y2hoN19
+	jleSehZElRVNnhdtAPL3vsoNoukSI3KYYI93hZFFjUWIdlJ8vXTcBCjRk=
+X-Google-Smtp-Source: AGHT+IFnreYD6mIRLHOM3vY53ytsEznQqEksrXxjHjDhJAZJSVAyl7Mrh7HbxKZNKROFM+ASAmJmYSjsWf3VEQ3Ija0=
+X-Received: by 2002:a17:902:c402:b0:21f:4986:c7d5 with SMTP id
+ d9443c01a7336-22e03d08e31mr804315ad.8.1746045212205; Wed, 30 Apr 2025
+ 13:33:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB7736:EE_
-X-MS-Office365-Filtering-Correlation-Id: ae290281-cd3c-47f0-0437-08dd881ef9c2
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|52116014|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?tYUF+sV33/Tb+dJulcvKO5TfcW7KKEMmnuW02Q6M99fjNgollDDX2mdIJB7I?=
- =?us-ascii?Q?ddJR2lsX/LLFFKLfxkklkJVCIGjDGm1GswwaQ9jrI7w8dfIygOGxjG/roUXx?=
- =?us-ascii?Q?eZfIfzSVWUFYiY8LbiC+XFTQNyWvfgkawplZeuTkZ9/mHncRSSbv5AJDHNcn?=
- =?us-ascii?Q?lXDTlXvHuKdazTHLDM4EV9WrZ9qpFOw4NH5hLfJbwFh4tLGyS8R9lRNHCvKS?=
- =?us-ascii?Q?n4eCq0CwpSTMiqItq6roeEj0AeUcITvqthrwA69xBHWc9Yb5CKzGkP48WB+A?=
- =?us-ascii?Q?zZCXjQKuOLPkcvTZ/2Gninx4r+AVpxFig8Na7llArmY13bfpvYePSX75HSUx?=
- =?us-ascii?Q?bbbpQp+dovpls68/MmH5kb4LI2Sh7d1OOQOc0reDD2hpMn4EdAN9LCRMuPZr?=
- =?us-ascii?Q?lcu13xRyaa44/2qnz8cGwroA+4Jq844SyxihKdGaO+lzOvgQYO+k/uWeTffx?=
- =?us-ascii?Q?xED1FMJZUNtxNr6XS9UjY+ytD14y1366dPNbU2pLq3lBlaZgCxCJwUfbIj/p?=
- =?us-ascii?Q?+3nB+Xxq9cLa+Fp8PvTRzome0wrXeplQB3CGZWthH35OpIN8ZZgAUhisSF6u?=
- =?us-ascii?Q?qtfH+NxL59x53Vfax1eCM/ZlZvtqqAgp6ya0tAubjaBBe1PSfCQNptEeaNRh?=
- =?us-ascii?Q?kISpFjM0VCVuGb0g+6k5lB8xYuy4SykSRXyeSHrDIthTbqZKnzLVIqslldZ7?=
- =?us-ascii?Q?m/8lGLxECxgVsK6yXBBkXi8c3UFfA05xFiDIeAZPlDnCFRapNpwcs+PY/Try?=
- =?us-ascii?Q?d28ybpdK2sAMoySGZmBaasPqdGeZXM+eErH/369CZ3uH3P9FZSZXRtmI7BRD?=
- =?us-ascii?Q?uPjcWfEDMDoc7zEJQwa3k884P8VSF3/yzt/m6/uxzPcHTTbZ65LC1/ee+5p4?=
- =?us-ascii?Q?4aXlxJ9XCbNJa+4SvQcbfsBBBrJs/FgHtYCCNVelz1cF/rNldDoM0+HFyrmG?=
- =?us-ascii?Q?jFH5zljzaKMGhLwcnXnWiEyIuYl42PBFJk0qewlv4NznghXJLHhAfkKN/N1e?=
- =?us-ascii?Q?0ukb3UrVT5nw0s5ZMy0Df+/talbKGFUaSCeyof5fBQJauf0ipbIcb2BLRaWd?=
- =?us-ascii?Q?lqb/Zycx9EGoXK1ouILvOuWAsnhNQhM5rr8uSheIGZcSK7T9hUCMaDHA6ZpL?=
- =?us-ascii?Q?ff58xLz32HjrHFNpVQa4Mtcfe1xZsz83d3JtnFbPacVZmxS5YAal6YA12tQk?=
- =?us-ascii?Q?yFKV+Tqb1RqI+SLTxQNFgaGYlHsgtCri2UQRbdCs1o+C4VkPhMHMhFfzUdMW?=
- =?us-ascii?Q?Z7BtbcbpDXlcZszaTzWCTHPQGDr0AkYuyxA1tLKY4wlwOLryofXPUcHHGE1h?=
- =?us-ascii?Q?MWk68q8cccJdwxCgcQJmZRNB6Xh2HF2OAW2ZbVmrPja6V5X0vlHki5F/RqWW?=
- =?us-ascii?Q?gGdDNpvHxaDWVd9nGblgjdAQ8rkYjJWJftq3z72FdD0bI5wtaTSx56oUhOlN?=
- =?us-ascii?Q?ewA9vqsytrLPs7dLWV5hDFLKDNRTSkehzyAVeR5ysJVw/rarMf+0ZG+WR9vv?=
- =?us-ascii?Q?oF6rfrWUTOdLDTs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(52116014)(921020)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PBRF9fVhxuyl/BJBLsvceFEpZBN4QKlsKPIwsp+VlTHfeg8QhwmRlq6sgJWF?=
- =?us-ascii?Q?KVge2Xea1t7YOzpx7KMJOCT/ritN3yHQcXB9aRhenGoRlP23Y7P4YHMz/neu?=
- =?us-ascii?Q?6QX+Ir+FizHOCcCrQBSrkynbByTRM1QuV9xa27TPD9jz0R0A4Y69oFxJDLXd?=
- =?us-ascii?Q?EAKBVLRPE2EeXF7M09Ag9ac0dCqXT4EQCVDwDiBiCeeIZTULCaDyiiUNP7U7?=
- =?us-ascii?Q?DbC4divl32HX7QCE8h7n4ZYiJ+47vd47vdp9jchhdSfn19vVf4YM3L8OEUsN?=
- =?us-ascii?Q?YHjzvWHiOZ3yVwBMnYmY0HCuSDB7JTW/JEPwG0y1EDR3DGjoPtXi5XREyIrO?=
- =?us-ascii?Q?3FmEI+g+kah8yKgPYVKzqwLMtYyoTWHVxo6Y6sfNP8wjiuX2grreYiGchUNO?=
- =?us-ascii?Q?XZlPW96hTdYvFFR0qxR95KmeyTnkVM7oU9GurH48/qMum8yl3Z0snKmPV6Gm?=
- =?us-ascii?Q?Ym1Tj/gOMu5hVS/V8/264AWmb3RjNXvDw8hugzU5rZLpzTEnobckvSeoKhBG?=
- =?us-ascii?Q?Dbh+K+PLyssieAKv7IA1xmQ3vBGKB564EvLuolAkTJArKnnPUm+s4aNqH3RG?=
- =?us-ascii?Q?VIPzyD4S34Lcr6X09FornTGZU2KLMUlge0PnjjH2IN97rlKmXz44vWu3/r5T?=
- =?us-ascii?Q?95iN9Cd3W1Ug6Uxs4Gv+ksCPYo3DVKSjqRP54aWdnf38wnodq1tvyzEnYa13?=
- =?us-ascii?Q?U1GE8Othj9U8M+oNJ3NZ5pbD0xzAl1uNFhOOd73Ibh5QaKZf8d9nCTsClIEZ?=
- =?us-ascii?Q?UlpDGVabi0oQCQjIM13+fX0Q3cbEHk0Vxadx0TQXt0GFIusG1KUHkC52sQjk?=
- =?us-ascii?Q?f00w2uqXbkhYEiuPL99KiWd5NaPGn3ADAdSqrEar5BEQkD5A9MHyj7BQWBcz?=
- =?us-ascii?Q?KXtsExbiaUoaZmlqeUimznuEDx8zBS1chpzwvhjiao9tqVuayJorpYg1M63g?=
- =?us-ascii?Q?df4OPEe/a3DStYputgBflxr7BdbpqPxUifJBS4CruEZxtMDeLYh/xVQNAaGU?=
- =?us-ascii?Q?XRCLdrcFvgnoQ4ag6IL3SEscSGZOdHjDSMSI2e539QOdjlhF6jbF4xoU2LlU?=
- =?us-ascii?Q?hWPZQ+3mv+8h5gYvOc/jNAfcOSp2zsZU07VcsBgkPZOk3eryudr+uzJ6/ZNV?=
- =?us-ascii?Q?HSpLcz/2GYBORegPFrIa7H2Z7K+qQJhez+QicfMPUK2FOLYmmKo2OcJ8lHlu?=
- =?us-ascii?Q?WanmVdvk6AywHijwOAA1D19sQtqGoyIcHHyAN//6XVf8z5Upacgz5f0VnxqW?=
- =?us-ascii?Q?JChPPycNk/4QCZVuRSLtvF7Y/kZsPCrmkQr6AGhJVCcez4Fzi1H4hQ0xnQw3?=
- =?us-ascii?Q?8ZuNXkKoslSGV62cqYrwdg6flaneZv5pL6hZ07GYaqOAD/KuVyokyBfMKD9e?=
- =?us-ascii?Q?SX6lBG0hImLLApVN//k/PThIZ5SGTrzcZPU9Dec4OxVNkbtSjF+d9tGuLqCx?=
- =?us-ascii?Q?Ny5y+zPToi+2mYNEVXHFZCtxshjeyRUCzxN6JzR7BPjKQr1tbv1uMLoX1mlL?=
- =?us-ascii?Q?IeEv40JDy1Qtv31ulhicRpKJQjy0XK4N+vyCRi1y1lqReoJ9d17RBH9PN1XO?=
- =?us-ascii?Q?VFhDd3vx9IOvnoh3nRSZQg1eRj8oJgecqirG9WTm6e+ziNbB8yxzqZyono+2?=
- =?us-ascii?Q?/w=3D=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae290281-cd3c-47f0-0437-08dd881ef9c2
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 19:41:17.9234
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FBvFbdWT1AlsOop8/2XpEosenfCu7XT/tKM8OlANfyVvYaiga6O1S7eMJR7WNjUeCZCi8MEjKi04f0zByeCjnM8bxymCm7z4FnHUopmtAoM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7736
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDMwMDE0NCBTYWx0ZWRfX2E2ppwFQbMs7 Ko04d1QlAdR+LSSBLZI5n5syFkwjHR+S0I/+VUiZOMglhgqk929jQikL2e4rO/6dCYo/O9ca7x0 +KsGEUFz4VH0qLOufWoAag4tn/uvzDiUis1nDNrbI25hp2Xb+m4A1cY7ZN8NK/X3kN3nmR0Xmkf
- diu73vUCZvLl9/9VX107JS/l9ynPM08rSPbP0HQLfkTzQmWcbH6o5IDHJP9w3ILnvxtrf2IRcY2 oVzt+6dizLbC5bTbk6mSJ8xPtxBKVDsxOXSoE3qwyiU/c7odWiqJdbYKA2eZfrV57tfHZ5qZm1B pyMg+ZfCdXPiqQjXkpZ5oJ6tXz0jcFbQIxjKIDc9rnXRsy5sz5W5vdPGhbH075Htc56Jag041CP
- AGfCZ9HrY0NPNTNz+lt3TJO9Q9AI3wnswQ9t0unuxJlMbWyf6frjsRIIcYn00jbZQJ3wIVmm
-X-Authority-Analysis: v=2.4 cv=MNVgmNZl c=1 sm=1 tr=0 ts=68127ce0 cx=c_pps a=dIBsZBmI1wyUZqnlzmwqRg==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=XR8D0OoHHMoA:10
- a=0kUYKlekyDsA:10 a=VwQbUJbxAAAA:8 a=64Cc0HZtAAAA:8 a=51KnYewcZuRi7D_KieYA:9
-X-Proofpoint-GUID: bySJR8mZlY3hCKvcHvzGtasbWRnI_pja
-X-Proofpoint-ORIG-GUID: bySJR8mZlY3hCKvcHvzGtasbWRnI_pja
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-04-30_06,2025-04-24_02,2025-02-21_01
-X-Proofpoint-Spam-Reason: safe
+References: <20250424200222.2602990-1-skhawaja@google.com> <52e7cf72-6655-49ed-984c-44bd1ecb0d95@uwaterloo.ca>
+ <db35fe8a-05c3-4227-9b2b-eeca8b7cb75a@uwaterloo.ca> <CAAywjhRM8wd67DwUttU76+6KrKUki-w9hgkbVskhVG+nJ4JNig@mail.gmail.com>
+ <a8a7ed7f-af44-4f15-9e30-651a2b9b86ba@uwaterloo.ca>
+In-Reply-To: <a8a7ed7f-af44-4f15-9e30-651a2b9b86ba@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Wed, 30 Apr 2025 13:33:20 -0700
+X-Gm-Features: ATxdqUHd-vSVkOV5JwqJ1S7CuXuoIeLaE0CQ9rYArTa6IST6Y4UNp8u2r5nYNSw
+Message-ID: <CAAywjhRnV9t_64DA1XLuDx89u2oMSEep0RCYO84YRKn5PxsUkA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 0/4] Add support to do threaded napi busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, jdamato@fastly.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce new XDP helpers:
-- xdp_headlen: Similar to skb_headlen
-- xdp_headroom: Similar to skb_headroom
-- xdp_metadata_len: Similar to skb_metadata_len
-
-Integrate these helpers into tap, tun, and XDP implementation to start.
-
-No functional changes introduced.
-
-Signed-off-by: Jon Kohler <jon@nutanix.com>
----
-v1->v2: Integrate feedback from Willem
-https://patchwork.kernel.org/project/netdevbpf/patch/20250430182921.1704021-1-jon@nutanix.com/
-
- drivers/net/tap.c |  6 +++---
- drivers/net/tun.c | 12 +++++------
- include/net/xdp.h | 54 +++++++++++++++++++++++++++++++++++++++++++----
- net/core/xdp.c    | 12 +++++------
- 4 files changed, 65 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index d4ece538f1b2..a62fbca4b08f 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1048,7 +1048,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 	struct sk_buff *skb;
- 	int err, depth;
- 
--	if (unlikely(xdp->data_end - xdp->data < ETH_HLEN)) {
-+	if (unlikely(xdp_headlen(xdp) < ETH_HLEN)) {
- 		err = -EINVAL;
- 		goto err;
- 	}
-@@ -1062,8 +1062,8 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
- 		goto err;
- 	}
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	skb_put(skb, xdp->data_end - xdp->data);
-+	skb_reserve(skb, xdp_headroom(xdp));
-+	skb_put(skb, xdp_headlen(xdp));
- 
- 	skb_set_network_header(skb, ETH_HLEN);
- 	skb_reset_mac_header(skb);
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 7babd1e9a378..4c47eed71986 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1567,7 +1567,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 			dev_core_stats_rx_dropped_inc(tun->dev);
- 			return err;
- 		}
--		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
-+		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
- 		break;
- 	case XDP_TX:
- 		err = tun_xdp_tx(tun->dev, xdp);
-@@ -1575,7 +1575,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 			dev_core_stats_rx_dropped_inc(tun->dev);
- 			return err;
- 		}
--		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
-+		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
- 		break;
- 	case XDP_PASS:
- 		break;
-@@ -2355,7 +2355,7 @@ static int tun_xdp_one(struct tun_struct *tun,
- 		       struct xdp_buff *xdp, int *flush,
- 		       struct tun_page *tpage)
- {
--	unsigned int datasize = xdp->data_end - xdp->data;
-+	unsigned int datasize = xdp_headlen(xdp);
- 	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
- 	struct virtio_net_hdr *gso = &hdr->gso;
- 	struct bpf_prog *xdp_prog;
-@@ -2415,14 +2415,14 @@ static int tun_xdp_one(struct tun_struct *tun,
- 		goto out;
- 	}
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	skb_put(skb, xdp->data_end - xdp->data);
-+	skb_reserve(skb, xdp_headroom(xdp));
-+	skb_put(skb, xdp_headlen(xdp));
- 
- 	/* The externally provided xdp_buff may have no metadata support, which
- 	 * is marked by xdp->data_meta being xdp->data + 1. This will lead to a
- 	 * metasize of -1 and is the reason why the condition checks for > 0.
- 	 */
--	metasize = xdp->data - xdp->data_meta;
-+	metasize = xdp_metadata_len(xdp);
- 	if (metasize > 0)
- 		skb_metadata_set(skb, metasize);
- 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 48efacbaa35d..044345b18305 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -151,10 +151,56 @@ xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
- 	return (struct skb_shared_info *)xdp_data_hard_end(xdp);
- }
- 
-+/**
-+ * xdp_headlen - Calculate the length of the data in an XDP buffer
-+ * @xdp: Pointer to the XDP buffer structure
-+ *
-+ * Compute the length of the data contained in the XDP buffer. Does not
-+ * include frags, use xdp_get_buff_len() for that instead.
-+ *
-+ * Analogous to skb_headlen().
-+ *
-+ * Return: The length of the data in the XDP buffer in bytes.
-+ */
-+static inline unsigned int xdp_headlen(const struct xdp_buff *xdp)
-+{
-+	return xdp->data_end - xdp->data;
-+}
-+
-+/**
-+ * xdp_headroom - Calculate the headroom available in an XDP buffer
-+ * @xdp: Pointer to the XDP buffer structure
-+ *
-+ * Compute the headroom in an XDP buffer.
-+ *
-+ * Analogous to the skb_headroom().
-+ *
-+ * Return: The size of the headroom in bytes.
-+ */
-+static inline unsigned int xdp_headroom(const struct xdp_buff *xdp)
-+{
-+	return xdp->data - xdp->data_hard_start;
-+}
-+
-+/**
-+ * xdp_metadata_len - Calculate the length of metadata in an XDP buffer
-+ * @xdp: Pointer to the XDP buffer structure
-+ *
-+ * Compute the length of the metadata region in an XDP buffer.
-+ *
-+ * Analogous to skb_metadata_len().
-+ *
-+ * Return: The length of the metadata in bytes.
-+ */
-+static inline unsigned int xdp_metadata_len(const struct xdp_buff *xdp)
-+{
-+	return xdp->data - xdp->data_meta;
-+}
-+
- static __always_inline unsigned int
- xdp_get_buff_len(const struct xdp_buff *xdp)
- {
--	unsigned int len = xdp->data_end - xdp->data;
-+	unsigned int len = xdp_headlen(xdp);
- 	const struct skb_shared_info *sinfo;
- 
- 	if (likely(!xdp_buff_has_frags(xdp)))
-@@ -364,8 +410,8 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
- 	int metasize, headroom;
- 
- 	/* Assure headroom is available for storing info */
--	headroom = xdp->data - xdp->data_hard_start;
--	metasize = xdp->data - xdp->data_meta;
-+	headroom = xdp_headroom(xdp);
-+	metasize = xdp_metadata_len(xdp);
- 	metasize = metasize > 0 ? metasize : 0;
- 	if (unlikely((headroom - metasize) < sizeof(*xdp_frame)))
- 		return -ENOSPC;
-@@ -377,7 +423,7 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
- 	}
- 
- 	xdp_frame->data = xdp->data;
--	xdp_frame->len  = xdp->data_end - xdp->data;
-+	xdp_frame->len  = xdp_headlen(xdp);
- 	xdp_frame->headroom = headroom - sizeof(*xdp_frame);
- 	xdp_frame->metasize = metasize;
- 	xdp_frame->frame_sz = xdp->frame_sz;
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index f86eedad586a..0d56320a7ff9 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -581,8 +581,8 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
- 
- 	/* Clone into a MEM_TYPE_PAGE_ORDER0 xdp_frame. */
- 	metasize = xdp_data_meta_unsupported(xdp) ? 0 :
--		   xdp->data - xdp->data_meta;
--	totsize = xdp->data_end - xdp->data + metasize;
-+		   xdp_metadata_len(xdp);
-+	totsize = xdp_headlen(xdp) + metasize;
- 
- 	if (sizeof(*xdpf) + totsize > PAGE_SIZE)
- 		return NULL;
-@@ -646,10 +646,10 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
- 	if (unlikely(!skb))
- 		return NULL;
- 
--	skb_reserve(skb, xdp->data - xdp->data_hard_start);
--	__skb_put(skb, xdp->data_end - xdp->data);
-+	skb_reserve(skb, xdp_headroom(xdp));
-+	__skb_put(skb, xdp_headlen(xdp));
- 
--	metalen = xdp->data - xdp->data_meta;
-+	metalen = xdp_metadata_len(xdp);
- 	if (metalen > 0)
- 		skb_metadata_set(skb, metalen);
- 
-@@ -763,7 +763,7 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
- 
- 	memcpy(__skb_put(skb, len), xdp->data_meta, LARGEST_ALIGN(len));
- 
--	metalen = xdp->data - xdp->data_meta;
-+	metalen = xdp_metadata_len(xdp);
- 	if (metalen > 0) {
- 		skb_metadata_set(skb, metalen);
- 		__skb_pull(skb, metalen);
--- 
-2.43.0
-
+On Wed, Apr 30, 2025 at 12:57=E2=80=AFPM Martin Karsten <mkarsten@uwaterloo=
+.ca> wrote:
+>
+> On 2025-04-30 12:58, Samiullah Khawaja wrote:
+> > On Wed, Apr 30, 2025 at 8:23=E2=80=AFAM Martin Karsten <mkarsten@uwater=
+loo.ca> wrote:
+> >>
+> >> On 2025-04-28 09:50, Martin Karsten wrote:
+> >>> On 2025-04-24 16:02, Samiullah Khawaja wrote:
+> >>
+> >> [snip]
+> >>
+> >>>> | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NA=
+PI
+> >>>> threaded |
+> >>>> |---|---|---|---|---|
+> >>>> | 12 Kpkt/s + 0us delay | | | | |
+> >>>> |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
+> >>>> |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
+> >>>> |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
+> >>>> |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
+> >>>> | 32 Kpkt/s + 30us delay | | | | |
+> >>>> |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
+> >>>> |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
+> >>>> |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
+> >>>> |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
+> >>>> | 125 Kpkt/s + 6us delay | | | | |
+> >>>> |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
+> >>>> |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
+> >>>> |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
+> >>>> |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
+> >>>> | 12 Kpkt/s + 78us delay | | | | |
+> >>>> |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
+> >>>> |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
+> >>>> |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
+> >>>> |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
+> >>>> | 25 Kpkt/s + 38us delay | | | | |
+> >>>> |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
+> >>>> |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
+> >>>> |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
+> >>>> |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
+> >>>>
+> >>>>    ## Observations
+> >>>>
+> >>>> - Here without application processing all the approaches give the sa=
+me
+> >>>>     latency within 1usecs range and NAPI threaded gives minimum late=
+ncy.
+> >>>> - With application processing the latency increases by 3-4usecs when
+> >>>>     doing inline polling.
+> >>>> - Using a dedicated core to drive napi polling keeps the latency sam=
+e
+> >>>>     even with application processing. This is observed both in users=
+pace
+> >>>>     and threaded napi (in kernel).
+> >>>> - Using napi threaded polling in kernel gives lower latency by
+> >>>>     1-1.5usecs as compared to userspace driven polling in separate c=
+ore.
+> >>>> - With application processing userspace will get the packet from rec=
+v
+> >>>>     ring and spend some time doing application processing and then d=
+o napi
+> >>>>     polling. While application processing is happening a dedicated c=
+ore
+> >>>>     doing napi polling can pull the packet of the NAPI RX queue and
+> >>>>     populate the AF_XDP recv ring. This means that when the applicat=
+ion
+> >>>>     thread is done with application processing it has new packets re=
+ady to
+> >>>>     recv and process in recv ring.
+> >>>> - Napi threaded busy polling in the kernel with a dedicated core giv=
+es
+> >>>>     the consistent P5-P99 latency.
+> >>> I've experimented with this some more. I can confirm latency savings =
+of
+> >>> about 1 usec arising from busy-looping a NAPI thread on a dedicated c=
+ore
+> >>> when compared to in-thread busy-polling. A few more comments:
+> > Thanks for the experiments and reproducing this. I really appreciate it=
+.
+> >>>
+> >>> 1) I note that the experiment results above show that 'interrupts' is
+> >>> almost as fast as 'NAPI threaded' in the base case. I cannot confirm
+> >>> these results, because I currently only have (very) old hardware
+> >>> available for testing. However, these results worry me in terms of
+> >>> necessity of the threaded busy-polling mechanism - also see Item 4) b=
+elow.
+> >>
+> >> I want to add one more thought, just to spell this out explicitly:
+> >> Assuming the latency benefits result from better cache utilization of
+> >> two shorter processing loops (NAPI and application) using a dedicated
+> >> core each, it would make sense to see softirq processing on the NAPI
+> >> core being almost as fast. While there might be small penalty for the
+> >> initial hardware interrupt, the following softirq processing does not
+> > The interrupt experiment in the last row demonstrates the penalty you
+> > mentioned. While this effect might be acceptable for some use cases,
+> > it could be problematic in scenarios sensitive to jitter (P99
+> > latency).
+>
+> Just to be clear andexplicit: The difference is 200 nsecs for P99 (13200
+> vs 13000), i.e, 100 nsecs per core burned on either side. As I mentioned
+> before, I don't think the 100%-load experiments (those with nonzero
+> delay setting) are representative of any real-world scenario.
+oh.. you are only considering the first row. Yes, with zero delay it
+would (mostly) be equal. I agree with you that there is very little
+difference in that particular scenario.
+>
+> Thanks,
+> Martin
+>
+> >> differ much from what a NAPI spin-loop does? The experiments seem to
+> >> corroborate this, because latency results for 'interrupts' and 'NAPI
+> >> threaded' are extremely close.
+> >>
+> >> In this case, it would be essential that interrupt handling happens on=
+ a
+> >> dedicated empty core, so it can react to hardware interrupts right awa=
+y
+> >> and its local cache isn't dirtied by other code than softirq processin=
+g.
+> >> While this also means dedicating a entire core to NAPI processing, at
+> >> least the core wouldn't have to spin all the time, hopefully reducing
+> >> power consumption and heat generation.
+> >>
+> >> Thanks,
+> >> Martin
+> >>> 2) The experiments reported here are symmetric in that they use the s=
+ame
+> >>> polling variant at both the client and the server. When mixing things=
+ up
+> >>> by combining different polling variants, it becomes clear that the
+> >>> latency savings are split between both ends. The total savings of 1 u=
+sec
+> >>> are thus a combination of 0.5 usec are either end. So the ultimate
+> >>> trade-off is 0.5 usec latency gain for burning 1 core.
+> >>>
+> >>> 3) I believe the savings arise from running two tight loops (separate
+> >>> NAPI and application) instead of one longer loop. The shorter loops
+> >>> likely result in better cache utilization on their respective dedicat=
+ed
+> >>> cores (and L1 caches). However I am not sure right how to explicitly
+> >>> confirm this.
+> >>>
+> >>> 4) I still believe that the additional experiments with setting both
+> >>> delay and period are meaningless. They create corner cases where rate=
+ *
+> >>> delay is about 1. Nobody would run a latency-critical system at 100%
+> >>> load. I also note that the experiment program xsk_rr fails when tryin=
+g
+> >>> to increase the load beyond saturation (client fails with 'xsk_rr:
+> >>> oustanding array full').
+> >>>
+> >>> 5) I worry that a mechanism like this might be misinterpreted as some
+> >>> kind of magic wand for improving performance and might end up being u=
+sed
+> >>> in practice and cause substantial overhead without much gain. If
+> >>> accepted, I would hope that this will be documented very clearly and
+> >>> have appropriate warnings attached. Given that the patch cover letter=
+ is
+> >>> often used as a basis for documentation, I believe this should be
+> >>> spelled out in the cover letter.
+> >>>
+> >>> With the above in mind, someone else will need to judge whether (at
+> >>> most) 0.5 usec for burning a core is a worthy enough trade-off to
+> >>> justify inclusion of this mechanism. Maybe someone else can take a
+> >>> closer look at the 'interrupts' variant on modern hardware.
+> >>>
+> >>> Thanks,
+> >>> Martin
+> >>
+>
 
