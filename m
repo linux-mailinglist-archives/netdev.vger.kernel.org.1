@@ -1,118 +1,144 @@
-Return-Path: <netdev+bounces-187096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F49AA4ED5
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 16:38:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD7BAA4FDF
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C828B188A1CD
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 14:38:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B405616A424
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9959525D1F4;
-	Wed, 30 Apr 2025 14:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64741C07D9;
+	Wed, 30 Apr 2025 15:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PUrxa8lb"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="GY8trVzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21422B9A9;
-	Wed, 30 Apr 2025 14:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC9F1C1F13
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 15:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746023890; cv=none; b=cR6CrsVlhbVfy1xpY0sGCec5SzDuxwBwcggc3UwcKKUJ0CisgYscEhcvmAz7xaINWlroNZbfGFS+t+8aWKTRTp8rqSusqtrLWRg6MTGYyHmXMZn+usSr1qRtzzICH0L5cPbVwdmzZTwzSLPblqD8hgfX9TP4qO6B0cMzE3O/WsA=
+	t=1746025663; cv=none; b=USxLDpEf9ZukzXf8/zfCBBEO/MzXFJd8kixbtoAGLQJIXNyKinJMTPhz3CNZz/PYokc8ynJUz1hhHWdzY+SILrGnteAZhyAvzaD5PiD7aUERZ10kh9rd5T8uKuY4RcXDQaT3n3e09KdtHT1jpfR0q8fwcRm/xpuM9zayE7NK4AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746023890; c=relaxed/simple;
-	bh=XTeb/V05SMLTptJNxoOGRKH8ypSvBSWvVzWBfz9OxAQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RbR+nHzZFMg58sxslkDicQ/Ji9bXAgsyjzzwN4kHPpBaGFKYlvz/vEqmh8yyfLNhofxEO8+WsGD64hTUSc1x2vplfocxt+fFWigd0OR/VQTxPSm+CsDG0QxavSSa396Kgy+G6S9fx4OuvJkywsLz4hJfZCDDykn4Obyt9AkgV1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PUrxa8lb; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746023889; x=1777559889;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XTeb/V05SMLTptJNxoOGRKH8ypSvBSWvVzWBfz9OxAQ=;
-  b=PUrxa8lb79sUcH3Uh4xdcBJR0fXKzfVJg89QoxKQoy+x/jr9qRmOrCzl
-   EM8i4M7z45y1qv8q1H31OxSqq0iWQ2NEJnLt3lgoUXZ9GYfCAsd4ICxPP
-   fg5jAIlFS5MWQgHkn7n0Mm1cIP+/r/0iwojsRsqdGh/QhtZz3lPg5MX6z
-   a9djtD3hkT1ygH82CWTNtTi8VL4gyqYPPABFYijreOP8gBGdoipVwwgOY
-   u1xPgCywkmZEQ9T3dC5Z685x8c86lucSIySy8q1o+mpKrD8PZVU+lZscX
-   HQGQprzJMB8ZuArbpvUuZZaD/QrM+qA06i59Kk0nduLuvxEqYiuoKUM6c
-   Q==;
-X-CSE-ConnectionGUID: 99pyfKB2R9i8LpP6lxWFQQ==
-X-CSE-MsgGUID: U+j1aAzPQcyJtBOHnymEsw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11419"; a="73072879"
-X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
-   d="scan'208";a="73072879"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 07:38:08 -0700
-X-CSE-ConnectionGUID: LGD0t8ZzRQOKnM0888XfNw==
-X-CSE-MsgGUID: NZlU0TNiT0yVl6Qq0PZnLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
-   d="scan'208";a="138946263"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa003.jf.intel.com with ESMTP; 30 Apr 2025 07:38:05 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 4F8859F; Wed, 30 Apr 2025 17:38:03 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] net: phy: Refactor fwnode_get_phy_node()
-Date: Wed, 30 Apr 2025 17:38:02 +0300
-Message-ID: <20250430143802.3714405-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1746025663; c=relaxed/simple;
+	bh=JcSIk0Gk88GbM15qjPlsMD7b2UlOmbDf6LzZ3sR3k/w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rrRFckrLZiNg22I1jqgK8w7mtBM/UsKXfVsJhuURkvhK+yr7bXvSk/hbs7g7c56ZwjIiQxYlzM1J5ljHAuKd203rn/mKgRVQpMFa+OL3DNpNXNWpOhqDMaTT++NkiMcIJMf3uuGZ9H7BFCAj+FJ8BraANTLbpdsGqb9y05Ib3Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=GY8trVzz; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=FgH271E5UhHWL7UBf06R1vnRmS6aAfFmCY8z1Ia+CAU=; b=GY8trVzzwn6GlfiFw9Fe2UH2XG
+	I0JX9ttNhFnaG+XaEndVIKf067pR9kkFot+hGuJuHBRET8DO4JjvWpDSR1FVDMBWKMkNGlrsL9xBO
+	FL7kkld8xWAeOTVHLVOVAYnyQhhTAIeML1O2ox4vkC96MMVq7quTPb/MjVaX1KSHss+6MM12N/iR2
+	IZKkwQWZ3AJMq9MwLs1JrkpFGXsP20sRFVf1bmxDJPKtDhnIii10dDfYi30Mhs4xi+rkcOnqQpnCb
+	rXrnVKUzMUHjjqr1Dqb6gmCAORIT01n/mBbWZABTyKW1CPQm6HUrpKNXe+XMSqCe6L4vNfCdfqVNt
+	PH51YL2g==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1uA8ew-00GRtq-Bs; Wed, 30 Apr 2025 14:43:38 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 90822BE2DE0; Wed, 30 Apr 2025 16:43:37 +0200 (CEST)
+Date: Wed, 30 Apr 2025 16:43:37 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Petter Reinholdtsen <pere@debian.org>, netdev@vger.kernel.org,
+	Robert Scheck <fedora@robert-scheck.de>,
+	AsciiWolf <mail@asciiwolf.com>
+Subject: Re: [mail@asciiwolf.com: Re: ethtool: Incorrect component type in
+ AppStream metainfo causes issues and possible breakages]
+Message-ID: <aBI3GZ_yLdfkZuTP@eldamar.lan>
+References: <p3e5khlw5gcofvjnx7whj7y64bwmjy2t7ogu3xnbhlzw7scbl4@3rceiook7pwu>
+ <CAB-mu-QjxGvBHGzaVmwBpq-0UXALzdSpzcvVQPvyXjFAnxZkqA@mail.gmail.com>
+ <CAB-mu-TgZ5ewRzn45Q5LrGtEKWGhrafP39enmV0DAYvTkU5mwQ@mail.gmail.com>
+ <CAB-mu-QE0v=eUdvu_23gq4ncUpXu20NErH3wkAz9=hAL+rh0zQ@mail.gmail.com>
+ <aAo8q1X882NYUHmk@eldamar.lan>
+ <i6bv6u7bepyqueeagzcpkzonicgupqk47wijpynz24mylvumzq@td444peudd2u>
+ <aAvknd6dv1haJl3A@eldamar.lan>
+ <utlmo4lzclx5u3w3a7kp6jrpsv2zkjobzxnb6meusclp3dxv6j@43t6mqbglfqb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <utlmo4lzclx5u3w3a7kp6jrpsv2zkjobzxnb6meusclp3dxv6j@43t6mqbglfqb>
+X-Debian-User: carnil
 
-Refactor to check if the fwnode we got is correct and return if so,
-otherwise do additional checks. Using same pattern in all conditionals
-makes it slightly easier to read and understand.
+Hi,
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/phy/phy_device.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Tue, Apr 29, 2025 at 10:37:36PM +0200, Michal Kubecek wrote:
+> On Fri, Apr 25, 2025 at 09:38:05PM +0200, Salvatore Bonaccorso wrote:
+> > From 7daa26e40d0888c13a2346053638408c03376015 Mon Sep 17 00:00:00 2001
+> > From: Salvatore Bonaccorso <carnil@debian.org>
+> > Date: Fri, 11 Apr 2025 15:58:55 +0200
+> > Subject: [PATCH] Set type property to console-application for provided
+> >  AppStream metainfo XML
+> > 
+> > As pointed out in the Debian downstream report, as ethtool is a
+> > command-line tool the XML root myst have the type property set to
+> > console-application.
+> > 
+> > Additionally with the type propety set to desktop, ethtool is user
+> > uninstallable via GUI (such as GNOME Software or KDE Discover).
+> > 
+> > console-application AppStream metainfo XML at least one binary provided
+> > must be listed in the <binary> tag, thus add the required value along.
+> > 
+> > Fixes: 02d505bba6fe ("Add AppStream metainfo XML with modalias documented supported hardware.")
+> > Reported-by: Daniel Rusek <asciiwolf@seznam.cz>
+> > Co-Developed-by: Daniel Rusek <asciiwolf@seznam.cz>
+> > Link: https://bugs.debian.org/1102647
+> > Link: https://bugzilla.redhat.com/show_bug.cgi?id=2359069
+> > Link: https://freedesktop.org/software/appstream/docs/sect-Metadata-ConsoleApplication.html
+> > Tested-by: Petter Reinholdtsen <pere@hungry.com>
+> > Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
+> > ---
+> >  org.kernel.software.network.ethtool.metainfo.xml | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/org.kernel.software.network.ethtool.metainfo.xml b/org.kernel.software.network.ethtool.metainfo.xml
+> > index efe84c17e4cd..7cfacf223af7 100644
+> > --- a/org.kernel.software.network.ethtool.metainfo.xml
+> > +++ b/org.kernel.software.network.ethtool.metainfo.xml
+> > @@ -1,5 +1,5 @@
+> >  <?xml version="1.0" encoding="UTF-8"?>
+> > -<component type="desktop">
+> > +<component type="console-application">
+> >    <id>org.kernel.software.network.ethtool</id>
+> >    <metadata_license>MIT</metadata_license>
+> >    <name>ethtool</name>
+> > @@ -11,6 +11,7 @@
+> >    </description>
+> >    <url type="homepage">https://www.kernel.org/pub/software/network/ethtool/</url>
+> >    <provides>
+> > +    <binary>ethtool</binary>
+> >      <modalias>pci:v*d*sv*sd*bc02sc80i*</modalias>
+> >    </provides>
+> >  </component>
+> > -- 
+> > 2.49.0
+> 
+> Applied now, thank you.
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index f85c172c446c..2eb735e68dd8 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3265,12 +3265,12 @@ struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode)
- 
- 	/* Only phy-handle is used for ACPI */
- 	phy_node = fwnode_find_reference(fwnode, "phy-handle", 0);
--	if (is_acpi_node(fwnode) || !IS_ERR(phy_node))
-+	if (!IS_ERR(phy_node) || is_acpi_node(fwnode))
- 		return phy_node;
- 	phy_node = fwnode_find_reference(fwnode, "phy", 0);
--	if (IS_ERR(phy_node))
--		phy_node = fwnode_find_reference(fwnode, "phy-device", 0);
--	return phy_node;
-+	if (!IS_ERR(phy_node))
-+		return phy_node;
-+	return fwnode_find_reference(fwnode, "phy-device", 0);
- }
- EXPORT_SYMBOL_GPL(fwnode_get_phy_node);
- 
--- 
-2.47.2
+Thank you much appreciated. I just noticed a glitch we have in our
+metainfo file again, claiming the metadata license is MIT license, but
+the rest of upstream files are GPL-2.
 
+If all contributors to the file agree I would like to suggest we
+switch consistently to GPL-2.0.
+
+Regards,
+Salvatore
 
