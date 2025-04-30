@@ -1,233 +1,232 @@
-Return-Path: <netdev+bounces-187007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0EC3AA475C
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:37:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079D5AA4753
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 11:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 780541C04C1D
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:37:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4FD71899BBD
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 09:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF08C235045;
-	Wed, 30 Apr 2025 09:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A3921C197;
+	Wed, 30 Apr 2025 09:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeeTB7Z6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLcIL3rr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFA821A433
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEC5221FCF
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 09:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746005817; cv=none; b=uHxeyDoOBWjhPD3QmeWxZ1f+2nw8042c4MA9LS/l9cgQHH5HBCfaBWrmg2ci8KnFRD6whiLgBpi/YNV0WvrrJG6TGTY8VPB4j/OBOjhVn8OKCkSOgoviYhqXimNdN707qBF5CbQ4BJe6X0G3LxutzL+eJs/PXVX85ctuGYPshjI=
+	t=1746005803; cv=none; b=kkM+YgbPd5GXToS7lfNAlBLVJ4i93CjZi2UnU3bHIX2UBelgPehWJUMT2JyVcgDo6opxITn7eLdhKFIfb6T4f53XjGPIIGZlVKDTAqq5OBtYtSxuIYLqz+WgFj8kGESFlurrttW5HzzzgDiRBA/Zh63ZPs6quAk2pN/JtIyAvWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746005817; c=relaxed/simple;
-	bh=5Ocuw4e8b8MCvcgZG8tAmtt1ISXlU0QTVvz2XLE1ZV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z64InvZWMDiAqfGvj3laXTjlVs32EENPgjKuZ0lghmKs59ngC8/c9glN8eDhAfZZDokgZWRJ0hAaxHW5CpHkN/O0wFM038CGkhw5TuhhAlB4ofO7F23rZdKi8rboHYiH6Ik5Eul7OE2D7oFDiXbFcswltvZOVt1BdE6a9Uv8n80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KeeTB7Z6; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1746005803; c=relaxed/simple;
+	bh=LKbgVgvETQL2Z9FMH1hokLD+1a7kjWCTl8cKHjR38Zs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IuFOI6tWKxFlDkLwtIMkwbDedLLAu9dGhJtO5DLP52y4Mr1Q4ALuYMEezxMSKpLuCWQ3MOwdtYFmoaYOaTf0FL/1OlIhu+cft4sZX8hdtnwZ4l7t0RY2toOW7KkuCW2J92dvW047DaM53kPCmWXGkAAB39dWvzFhCnJrSemUqKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PLcIL3rr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746005812;
+	s=mimecast20190719; t=1746005800;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PklXpf2mtZZMeIyH7dbSdoSYGX/kozHo8SVimCxZe+I=;
-	b=KeeTB7Z6/9MviPxJ8tRBCq53NUHyiBiM1JHQLCQTBNyCUy8Wn0vw9q0D+bL+uvMXkeohPz
-	R5nhldRXpE2XrZPsQszIC7I9bGXqNkm/b6H9pYx5jF2d+El4GgjqB46llChJeftqQ62zdM
-	XsfWAxjBmASMTSZqzMMjcpVEwTynF54=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MSPsTTFeEcnCdwW0Vym+XYLIte4DYBrgKfCXQ1hkyeQ=;
+	b=PLcIL3rrYc7xiiJ2U116/1UToLGEIXW86cA2We/Tsidg7+dh3y480y6Fa3rHIb3mFBa3hw
+	MAY6SCna3WsVDnfSaH+nyxqEO0kkXg1zAboHDG/mWTL8HGZl0CH0Zhog+4VhWIwVrXd6dA
+	/jfsB7J0b+c4ch+SwKuBSdpnnk6VcZQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-202-61ONQVz0N0GDD_uQswPnTg-1; Wed, 30 Apr 2025 05:36:49 -0400
-X-MC-Unique: 61ONQVz0N0GDD_uQswPnTg-1
-X-Mimecast-MFC-AGG-ID: 61ONQVz0N0GDD_uQswPnTg_1746005806
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5f437158fe3so5704397a12.2
-        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 02:36:49 -0700 (PDT)
+ us-mta-81-LNavQ4DMM4GwMIj1PDoJOg-1; Wed, 30 Apr 2025 05:36:38 -0400
+X-MC-Unique: LNavQ4DMM4GwMIj1PDoJOg-1
+X-Mimecast-MFC-AGG-ID: LNavQ4DMM4GwMIj1PDoJOg_1746005798
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39c1b1c0969so4334945f8f.1
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 02:36:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746005806; x=1746610606;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PklXpf2mtZZMeIyH7dbSdoSYGX/kozHo8SVimCxZe+I=;
-        b=mpCuIXgsiSpcTGpSwP6kE/mqpGLkViNqWYv5Z0viBuMt8iYFxiCbmh+xWoykEq0w+l
-         ZsxHBqC+Xvh7C1deTpZ4rnGAocykPBDRmcQ6+yI3wpZsLr2aODOPgHf1WJFTFosc0d0b
-         Ows5Xx2Pe9tSjms5UsBU6gk/iZDr2SZNsxq7xpGmPQ1LVsWxshAJnwKRFovfzgPlew+B
-         zutmGtLZKXsvum4QjHcHzKZkK7rcrb1tmpfgK30aF/6+SniBrEmhmxwu4XkV/OqueqX6
-         6zoK9R7cCM11f69pH/JjBUw3y79Hem8Bo4XZnaeOpKGf7PWptO36meo5w4lFxo/2P5+f
-         8y1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUb1LH7hTcdVpjPDkFrYFOoi8yj8niMtjNih7ro+JeGvJ+L5tFqRj1HYJcytU96l2k3e+9t39k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK3bYp9rlRFT6VfYBRVqY6cjMLdnARFAUFlAlmEZ+c8P763BKU
-	XFFqG/IG+uIk5Ub3pA76qnLSF3MQmzEpn7tsIiOhaG0VRqR5/iFmG1ddZpgfvtd4X3qoRcXg6Ox
-	tlV6q+uZRlgpl+aDdG3RKjBbZZt05ExQYSj5G/jnaBLXuROvVIxMkMg==
-X-Gm-Gg: ASbGncuM13z9+lxlY1jsDxIpl4p8gAPvTlyS7kOrO/UO/4WR11TUznzGay4zEttfOty
-	MSNvEP3r2fqB/CvQUtSbVBieFT08qI4M/A8Gecouyp2nlnIXkQIE3sceriKwHFhmnntGtCTn1dK
-	cCL407Bty03pPvatEMbBz5cAAEf3/vSRcpbHsH4Vsebay1bUxVjomMEdse+ZzmWbMnhGyuQt0a8
-	T8ZP2Fs5WNNtJy6thpKDZbXMzOG3VpfgY7epQEexOvp9h72H60iA7dQVhIdlxWVFDXdI3oYasPO
-	lTwHkEeCFhiA4KZJLg==
-X-Received: by 2002:a05:6402:2709:b0:5f0:48df:25ae with SMTP id 4fb4d7f45d1cf-5f89ab673f7mr1878516a12.2.1746005806254;
-        Wed, 30 Apr 2025 02:36:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHof0+CLIrQBgrHPd0uIgVEPaVcOjpvBaOfPCPKfVxm8p9SM0QtTIrzlcOdGN1NnRYvxDRhEg==
-X-Received: by 2002:a05:6402:2709:b0:5f0:48df:25ae with SMTP id 4fb4d7f45d1cf-5f89ab673f7mr1878477a12.2.1746005805553;
-        Wed, 30 Apr 2025 02:36:45 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.220.254])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f7013fef5esm8463493a12.18.2025.04.30.02.36.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 02:36:44 -0700 (PDT)
-Date: Wed, 30 Apr 2025 11:36:30 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/4] vsock: Move lingering logic to af_vsock
- core
-Message-ID: <oo5tmbu7okyqojwxt4xked4jvq6jqydrddowspz3p66nsjzajt@36mxuduci4am>
-References: <20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co>
- <20250430-vsock-linger-v3-3-ddbe73b53457@rbox.co>
+        d=1e100.net; s=20230601; t=1746005797; x=1746610597;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSPsTTFeEcnCdwW0Vym+XYLIte4DYBrgKfCXQ1hkyeQ=;
+        b=tX32m5xINj464BrqSbSb2miD9WwknaqXuZje5aIqwBhKw9e2ZlqIesdEl9o5yzDJrC
+         Np4xucEpwt2S6zklLALqglMBTyhyi8UihMFgK96nBntmKrhn7yyWTvFBKrBI0V6sVhG7
+         pyJKJBHPVRYRAymjwOEUm4TfMah2e6V1UI7tg78zv490G7EyExDyjTb40DNDOrTpN0bv
+         yu/ZTst4rfvki8etXUY0ZO9oL3K+mcxXa75LCROskIwn4rnWielaq/IFuC28eMxjvk6K
+         Vwjqet4CBvEbgEpSFv1UKyqLBtHzfFFr26NruxKwz6tSprIZEDLzUKSom0VB1sHxA1ac
+         A8RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTF7S60OHLFuG4H06Vtf+lSKhED3l0L4uIOcSSGRBUjaR6aP0cqmxA/W0GqIWOH25SUwJNVo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUFSQFJW8zo322KJiKMVD0H2K10NZoIbGpEVBfsHLkGEzgAp7m
+	h/OF0aGEsYg8FLYAEeYaloM/EOrMlalcrRVgBU8FZLuxIDOnCPnfLyIiFYePoEmy/O4rbA7Lcg6
+	CbOaYc/dAOVPZlwwlxOOMUC/tqNbcu1feZCvA0B3JRotIo60wREbKXw==
+X-Gm-Gg: ASbGnctw8wpGGGoATfw+vT6C1uH5qsdTOxxW34YYHPjuHXqgXDdWNl3pvk7m0eCRz5v
+	+d82/UrKLaOFdMRt2K5j6swQM9CcmAqNwLFQeg7BRDutQsIckk8QQSJst42Y0o9+zPxpYIaWpnq
+	UWp3VjVzUtsneGBXge+b5d01yptv2Hsf21HqYItkjvhTYGIMyrSeweAyTAD3WW2HenKzLEUN3jB
+	UnwKU+RHNVdjsEoQtJJnRJ6kCMplEYJLE2IWuUw5G7JzXyGDDruzJgvyfh20q37K+/gTic1I5Nf
+	yWtxZfMhgojhqoEapfmWy2u2W2gWWCNMkyumSiW2UJ6M
+X-Received: by 2002:a5d:59a8:0:b0:391:3915:cffb with SMTP id ffacd0b85a97d-3a08ff465b4mr1716268f8f.43.1746005797568;
+        Wed, 30 Apr 2025 02:36:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgdj7osQIlrwBtpolueyo0OCJRGNsPw7nP/YnjWorltc/OOlGv2Ls+W6kZFmWgAkKIRYm6lA==
+X-Received: by 2002:a5d:59a8:0:b0:391:3915:cffb with SMTP id ffacd0b85a97d-3a08ff465b4mr1716245f8f.43.1746005797110;
+        Wed, 30 Apr 2025 02:36:37 -0700 (PDT)
+Received: from [172.16.17.99] (pd9ed5a70.dip0.t-ipconnect.de. [217.237.90.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073ca4e50sm16867435f8f.30.2025.04.30.02.36.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Apr 2025 02:36:36 -0700 (PDT)
+Message-ID: <69d35507-f4aa-484c-8e1f-f2a766b4ffd1@redhat.com>
+Date: Wed, 30 Apr 2025 11:36:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250430-vsock-linger-v3-3-ddbe73b53457@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] selftests: can: Document test_raw_filter test cases
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: socketcan@hartkopp.net, mkl@pengutronix.de, shuah@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ dcaratti@redhat.com, fstornio@redhat.com
+References: <cover.1745323279.git.fmaurer@redhat.com>
+ <710557cef8fb8472628862d9b65edcf7aeb32bb5.1745323279.git.fmaurer@redhat.com>
+ <CAMZ6RqKcp=JNcbZjX6xSGo9Hyw=1nXbpS9Nc36xuDkbGG+=wtA@mail.gmail.com>
+ <a28ff624-c73a-4e16-867a-66e423315c29@redhat.com>
+ <08cb8dd7-5685-4a41-b6a9-c8758a804ed1@wanadoo.fr>
+Content-Language: en-US
+From: Felix Maurer <fmaurer@redhat.com>
+In-Reply-To: <08cb8dd7-5685-4a41-b6a9-c8758a804ed1@wanadoo.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 30, 2025 at 11:10:29AM +0200, Michal Luczaj wrote:
->Lingering should be transport-independent in the long run. In preparation
->for supporting other transports, as well the linger on shutdown(), move
->code to core.
->
->Guard against an unimplemented vsock_transport::unsent_bytes() callback.
->
->Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> include/net/af_vsock.h                  |  1 +
-> net/vmw_vsock/af_vsock.c                | 25 +++++++++++++++++++++++++
-> net/vmw_vsock/virtio_transport_common.c | 23 +----------------------
-> 3 files changed, 27 insertions(+), 22 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 9e85424c834353d016a527070dd62e15ff3bfce1..bd8b88d70423051dd05fc445fe37971af631ba03 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -221,6 +221,7 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
-> 				     void (*fn)(struct sock *sk));
-> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
-> bool vsock_find_cid(unsigned int cid);
->+void vsock_linger(struct sock *sk, long timeout);
->
-> /**** TAP ****/
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..946b37de679a0e68b84cd982a3af2a959c60ee57 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1013,6 +1013,31 @@ static int vsock_getname(struct socket *sock,
-> 	return err;
-> }
->
->+void vsock_linger(struct sock *sk, long timeout)
->+{
->+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->+	ssize_t (*unsent)(struct vsock_sock *vsk);
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+
->+	if (!timeout)
->+		return;
->+
->+	/* unsent_bytes() may be unimplemented. */
->+	unsent = vsk->transport->unsent_bytes;
->+	if (!unsent)
->+		return;
->+
->+	add_wait_queue(sk_sleep(sk), &wait);
->+
->+	do {
->+		if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
->+			break;
->+	} while (!signal_pending(current) && timeout);
->+
->+	remove_wait_queue(sk_sleep(sk), &wait);
->+}
->+EXPORT_SYMBOL_GPL(vsock_linger);
->+
-> static int vsock_shutdown(struct socket *sock, int mode)
-> {
-> 	int err;
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 4425802c5d718f65aaea425ea35886ad64e2fe6e..9230b8358ef2ac1f6e72a5961bae39f9093c8884 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1192,27 +1192,6 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
-> 	vsock_remove_sock(vsk);
-> }
->
->-static void virtio_transport_wait_close(struct sock *sk, long timeout)
->-{
->-	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->-	ssize_t (*unsent)(struct vsock_sock *vsk);
->-	struct vsock_sock *vsk = vsock_sk(sk);
->-
->-	if (!timeout)
->-		return;
->-
->-	unsent = vsk->transport->unsent_bytes;
->-
->-	add_wait_queue(sk_sleep(sk), &wait);
->-
->-	do {
->-		if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
->-			break;
->-	} while (!signal_pending(current) && timeout);
->-
->-	remove_wait_queue(sk_sleep(sk), &wait);
->-}
->-
-> static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
-> 					       bool cancel_timeout)
-> {
->@@ -1283,7 +1262,7 @@ static bool virtio_transport_close(struct vsock_sock *vsk)
-> 		(void)virtio_transport_shutdown(vsk, SHUTDOWN_MASK);
->
-> 	if (sock_flag(sk, SOCK_LINGER) && !(current->flags & PF_EXITING))
->-		virtio_transport_wait_close(sk, sk->sk_lingertime);
->+		vsock_linger(sk, sk->sk_lingertime);
+On 24.04.25 17:08, Vincent Mailhol wrote:
+> On 24/04/2025 at 23:02, Felix Maurer wrote:
+>> On 24.04.25 09:44, Vincent Mailhol wrote:
+>>> On Tue. 22 Apr. 2025 at 21:03, Felix Maurer <fmaurer@redhat.com> wrote:
+>> [...]
+>>>> diff --git a/tools/testing/selftests/net/can/test_raw_filter.c b/tools/testing/selftests/net/can/test_raw_filter.c
+>>>> index 7fe11e020a1c..8d43053824d2 100644
+>>>> --- a/tools/testing/selftests/net/can/test_raw_filter.c
+>>>> +++ b/tools/testing/selftests/net/can/test_raw_filter.c
+>>>> @@ -101,94 +101,113 @@ FIXTURE_VARIANT(can_filters) {
+>>>>         int exp_num_rx;
+>>>>         int exp_rxbits;
+>>>>  };
+>>>> +#define T_EFF (CAN_EFF_FLAG >> 28)
+>>>> +#define T_RTR (CAN_RTR_FLAG >> 28)
+>>>
+>>> I do not like this
+>>>
+>>>   >> 28
+>>>
+>>> shift. I understand that it is part of the original design, but for
+>>> me, this is just obfuscation.
+>>>
+>>> Why just not using CAN_EFF_FLAG and CAN_RTR_FLAG as-is for the
+>>> expected values? What benefit does this shift add?
+>>
+>> I agree, that looks like magic numbers and the original design is not
+>> very nice here. The main reason for the >>28 is that later on values are
+>> shifted by T_EFF and/or T_RTR, so they shouldn't be too large (with the
+>>>> 28, the shift value later is in the range 0-14). See below for a
+>> slightly different idea.
+>>
+>>>> +/* Ignore EFF flag in filter ID if not covered by filter mask */
+>>>>  FIXTURE_VARIANT_ADD(can_filters, base_eff) {
+>>>>         .testcase = 2,
+>>>>         .id = ID | CAN_EFF_FLAG,
+>>>>         .mask = CAN_SFF_MASK,
+>>>>         .exp_num_rx = 4,
+>>>> -       .exp_rxbits = 4369,
+>>>> +       .exp_rxbits = (1 | 1 << (T_EFF) | 1 << (T_RTR) | 1 << (T_EFF | T_RTR)),
+>>>                          ^
+>>> What is the meaning of this 1?
+>>
+>> The 1 means that a packet will be received with no flags set.
+> 
+> OK. Now I understand.
+> 
+>> The whole rxbit thing took me a while to understand and the result now
+>> is not straightforward either. Let's see if we can come up with
+>> something better.
+>>
+>> The exp_rxbits is basically a bitfield that describes which flags should
+>> be set on the received frames. Maybe this could be made more explicit
+>> with something like this:
+>>
+>> .exp_rxbits = FRAME_NOFLAGS | FRAME_EFF | FRAME_RTR | FRAME_EFFRTR,
+> 
+> This is better. But yet, how would this scale in the future if we introduce the
+> CAN FD? For n flags, you have n combinations.
+> 
+>> And in the receive loop something like this:
+>>
+>> rxbits |= FRAME_RCVD(frame.can_id);
+>>
+>> Of course, the definitions of these macros would still have the >>28,
+>> but at a central point, with better explanation. Do you think that's
+>> more understandable? Or do you have a different idea?
+> 
+> The
+> 
+>   >> 28
+> 
+> trick just allows to save a couple line but by doing so, adds a ton of
+> complexity. What is wrong in writing this:
 
-Ah, I'd also move the check in that function, I mean:
+I don't see anything wrong with it, I like it :) I'll send an updated
+version of the patches soon (probably squashed as well).
 
-void vsock_linger(struct sock *sk) {
-	...
-	if (!sock_flag(sk, SOCK_LINGER) || (current->flags & PF_EXITING))
-		return;
+>   FIXTURE_VARIANT(can_filters) {
+>   	int testcase;
+>   	canid_t id;
+>   	canid_t mask;
+>   	int exp_num_rx;
+>   	canid_t exp_flags[];
+>   };
+> 
+>   /* Receive all frames when filtering for the ID in standard frame format */
+>   FIXTURE_VARIANT_ADD(can_filters, base) {
+>   	.testcase = 1,
+>   	.id = ID,
+>   	.mask = CAN_SFF_MASK,
+>   	.exp_num_rx = 4,
+>   	.exp_flags = {
+>   		0,
+>   		CAN_EFF_FLAG,
+>   		CAN_RTR_FLAG,
+>   		CAN_EFF_FLAG | CAN_RTR_FLAG,
+>   	},
+>   };
+> 
+> And then, in your TEST_F(), the do {} while loops becomes a:
+> 
+>   for (int i = 0; i <= variant->exp_num_rx; i++) {
+>   	/* FD logic here */
+>   	ret = FD_ISSET(self->sock, &rdfs);
+> 	if (i == variant->exp_num_rx) {
+>   		ASSERT_EQ(ret == 0);
+>   	} else (i < variant->exp_num_rx)
+>   		/* other relevant checks */
+>   		ASSERT_EQ(frame.can_id & ~CAN_ERR_MASK ==
+>   		          variant->exp_flags[i]);
+>   	}
+>   }
+> 
+> Here, you even check that the frames are received in order.
+> 
+> OK, the bitmap saved some memory, but here, we are speaking of selftests. The
+> priority is readability. I will happily get rid of the bitmap and just simplify
+> the logic.
 
-	...
-}
-
-Or, if we move the call to vsock_linger() in __vsock_release(), we can
-do the check there.
-
-Thanks,
-Stefano
-
->
-> 	if (sock_flag(sk, SOCK_DONE)) {
-> 		return true;
->
->-- 
->2.49.0
->
->
+I fully agree, thank you!
+   Felix
 
 
