@@ -1,132 +1,170 @@
-Return-Path: <netdev+bounces-187143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB068AA532C
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:03:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31817AA533B
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 20:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABC794C29CF
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:02:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FBC13BA6D4
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 18:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DD2266566;
-	Wed, 30 Apr 2025 17:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6116C26656F;
+	Wed, 30 Apr 2025 17:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+X3Tdj8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RWQdQ5xR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847BA1C173C;
-	Wed, 30 Apr 2025 17:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64F91AA1FF
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 17:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746035867; cv=none; b=op90X2hrFIQFzXu7+FVGIFOI6WlmYmcMG/97wKe6t405ozX2jqDOQqUwGim9coJ6ChasldB7RUoIdutYgMjobXOVFMFYmgPqVdEg+FsKK/ZJLByHKnjdWx7ses2zW6PADOCSAd3cxFRgkDK+gnTBhcZ7gYjM6e0fHtAGKzAOKcU=
+	t=1746035671; cv=none; b=hGnR0IdwDrRFz5K3DFGuyzoC7qcwvdAq5JGxqC6sOoOGMutAHi1IWqR68XA8jkIZy1lVbk/W2tR0RxB2i6BD8vAKLpHbHfAWpYvv+npN1GNiZuWV6qcVhznncPU4zMjWlTg6VnBz38xNkBlT/N2a4Ud8ms77zJSl9aM9eMA9lys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746035867; c=relaxed/simple;
-	bh=SajprH2K30LIydhzXkAMsM58eECJcqMGzV1nbrQLJqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qA9wtCgA0Yw4/ruoQIdDK57v8lxFqfA3+wzxIkWcFKuY8lSEjNHB6ueEVRDTeDarWDzBQAkQC6PuOYaw+bkGQZGEX8p9+p0zsqOi5WvKhq2g+uOzZFHfaUkOgx4c7wV0Lx37+6sP40MauG+1vTCLJdtmAqssr6btdYulBYmgcd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z+X3Tdj8; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cfa7e7f54so1194875e9.1;
-        Wed, 30 Apr 2025 10:57:44 -0700 (PDT)
+	s=arc-20240116; t=1746035671; c=relaxed/simple;
+	bh=Ljcc3ZAZS+yzcl3OGD3RFYaZpoWN2HMvVtdY5ZCKCo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=W4QTORKyYMUo09OcFjGUVGxsvxTUiPjuE6KWAw5QnFBjcUKymPONm2kPHczlecOwIkxX/mQt9oWsLq6yCoGLW26EvWA0Q6trs4hKIYyFpNt8sBcxWmLx9F3YkwzCGKNIcbU9KVETxQS6JYm6wqX2u+C68tJWipoVvNzS1Qc/3gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RWQdQ5xR; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2242ac37caeso24155ad.1
+        for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 10:54:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746035863; x=1746640663; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=knwkLP8bZlOU4Ot1owL8Zuv0fy61zzZy1KJe8/D0OyI=;
-        b=Z+X3Tdj8ZtyBp02TotbGA5qEsMutK88qx1wWIyBjKwuhC4v9OS8RRa1u9KSumbFlAU
-         QjwSSRkFaTmsOkyajxnolIio+VEY57wSmEWOs9+QV32W6vvS+Bw+JzP25EETYWpD5Pen
-         XEGDaIgVntWRGI3fHNTXWRVwYBYFXHP5JysyrIfqcCqTIuHUoVKNCRQgnKTZxhBCpvLD
-         ILK5COBXbqIdR4nNycqDwOtRWybEMh+tfoRiB4TbiqyuhAK+4DvJXoYivK8LguW8Gzzm
-         daIpe5n6QY+cHjH6m5fYZMkPdMzBXjvw+OP7JUtyIuFHQylTc7zJF2X2PTPgE92DwgeJ
-         rTDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746035863; x=1746640663;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1746035669; x=1746640469; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=knwkLP8bZlOU4Ot1owL8Zuv0fy61zzZy1KJe8/D0OyI=;
-        b=Jcw05qu1o1LJcBzwdIKp2p1h3BwytXR3K1lH6Wg170VyvFNne949iNNps4KqVcOQik
-         9db+NHlpAe43wm1UsuYnCo9sW3imBYZmayN9aiuO1XAz9rCAUtquSAJMfOom8ZvDHrIy
-         yhd8jss5HF2UnwCFnMfezBgRnZXReJCHLdTo18m+pooqpVa51CCcv/taw6LsOhKLnaSX
-         kmufpt1ONZu9x6HpmbK8mjmkEPegZPW+cQ9Xo2TPZDzWQ+5tIHcgMlDGT7f8hZZs9izC
-         yzXQ53LCAuz5E7cuSBCmAbh24oprx0/ZCzf4O5SYrMI6TGpmeguMMgCgJ1JMKEoMHhTv
-         T67A==
-X-Forwarded-Encrypted: i=1; AJvYcCURnUWva1s1NYTe8SQliHFgf9S5nmzT37nF5HJPKuYgl/Cq1Z98VbNrixGuAmxC7YPib0ucj+wSUVau@vger.kernel.org, AJvYcCV/D5qh1n95GoURzWF13A8u5XnZfYhohnk+Kh/gJaTrY+jPegUe/w5vYpP3x3LRMFDqSIDMuISIYpCDK08=@vger.kernel.org, AJvYcCVXYwSO9sFg+n8XdNZ3RGhdKMQTAke2GN/HzIplFoBaJqJfRBJRto0v3lSlf9QW+LNy1Vrlg93x@vger.kernel.org, AJvYcCWKdcZkQVCkD/rP/ksAcLxz7GCiJ2JoQHwkZalRb9UopwV2ZRPO382Io0DddS7ez6e3f4vW+IIT@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLfc/oAa0SBdSUs6PhTIqPK6iY5xJwAPlw/PxpeEAM6F8aZSb3
-	HSgCRKkE4cRqpJWhzNvjxu14yrtsBMpMWUqnCJnxqz/v8EeDHOsD
-X-Gm-Gg: ASbGncvGjstA+B5qXt+AWcdtZJH0JKk3tdz7v5z7AWSEaXxVysh14fPXKZNKcI0uV+H
-	/mZGEuX/C3gHwLlmuxB9vX8RARL726Om8MgoTIquZ2zv57vE+wIDu3AYxH5L/UqfGQAynkMvTgA
-	X/gYw+77bD6xg2lfp7u5g75jGswKC4HlESNDDRAqjyi2FyND5yBBcFLOwkUcp7iohIcCW/EQDdj
-	hym0ksfQxw/lEboVUVE5yqRU59u+fFC5TWNz6ru+5MNEQDSmlgfJA5DrYqEabaoRqVB6QTDlcfN
-	m0kchzUl7C60veFNvgimJ9O10RLzIvG0pXb1JE0=
-X-Google-Smtp-Source: AGHT+IGHNL860r9eXW2UPi9Dvf6qMVbcDrVTUOnwIVHAaIYXX/pj5/TigUadekaluxWYvKoApmG7QQ==
-X-Received: by 2002:a05:600c:46c8:b0:43d:186d:a4bf with SMTP id 5b1f17b1804b1-441b5c1a29bmr4075625e9.0.1746035862479;
-        Wed, 30 Apr 2025 10:57:42 -0700 (PDT)
-Received: from gmail.com ([2a02:c7c:6696:8300:7d1e:a9b9:e7a2:cc4c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2b20c3fsm32274945e9.28.2025.04.30.10.57.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Apr 2025 10:57:42 -0700 (PDT)
-Date: Wed, 30 Apr 2025 18:57:27 +0100
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on
- non-zero PHY ID
-Message-ID: <aBJkh5q_W1xVuv4U@gmail.com>
-References: <20250412183829.41342-1-qasdev00@gmail.com>
- <20250412183829.41342-6-qasdev00@gmail.com>
- <b49e6c21-8e0a-4e54-86eb-c18f1446c430@lunn.ch>
- <20250415205230.01f56679@kernel.org>
- <20250415205648.4aa937c9@kernel.org>
- <aAD-RDUdJaL_sIqQ@gmail.com>
- <b492cef9-7cdd-464e-80fe-8ce3276395a4@lunn.ch>
- <aAtgOLMnsmuukU42@gmail.com>
- <3a84b8a8-f295-472c-8c3f-0655ff53f5cc@lunn.ch>
+        bh=VPbUTi2PYYIIfuKOmYX8yf8KMD2tLvoABDEozQ6vVb4=;
+        b=RWQdQ5xRyBSZI9j4ezcYZw6kHoZWgYKJ2W8IC+LRSuR79DzheQXfk+F3TcaTb+rCVg
+         b1sLBz8qM4lnXZlA3oEzQhAYWJ4WlOaBE2VCDBYPqPrADSCulyJaVL6wxotVwX13Iwa3
+         HUUIB69tMwer6cBYG//pQGOS9pOyXyU0L+TizwKZxhHDhaxSgGfAMYTprQOo5fv8PsyL
+         XrYjJ/SfLE/aF3iRDaZd7tqGK22tDZpF7Qvk/HlUOyt2DqHb/m2PblxaDh8Obut3k0LR
+         Oz/KRa+8zEyANZ3cg9fNbb4l5JJwedHo2YNiiJgCHMIv8+BFTViimPlbi+nW6hIkgChC
+         fVrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746035669; x=1746640469;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VPbUTi2PYYIIfuKOmYX8yf8KMD2tLvoABDEozQ6vVb4=;
+        b=gSL38n2//uMwE3Bo15W97g9WFWEuzxK1q8X0ZbGb40pse3+oCKG17fcsTZngdMOcNn
+         Q74BsQWXiButcbS6JgJz/MSw5J+gZNJJvIq1dApbTlJy+QPU1N7LdbxQvQ9gR2yQyiDl
+         ezXmlEOcWLKkgLnKVKUio/KPxFQpc2bi9+PmWelLMupXhz+pvsb6xZmRuYBqD4+VTNje
+         X9iucarWNbpPKWDzBQ4rBfSI6BXv0KkXfl5CJkdPFsarWL6HMeVdhZn9NgEScFttabjY
+         38p8BpdGym/AI1Qy92q9E+TOszSMvmVBCmhxmeBwllhVuYo6uslCEwYx5nFb68YprkGl
+         8QRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrHiIwPwIK+bb7cxmNIrPGjr3GJ6dUP+Kjv5kuRiR/On7RQSHiFuoDC1Y3StJs5goagJ+u+iQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/URyu4oZEdMz/FrFnfHfb3lIBelRuEw6HGQ8QM2eM+TQHUPGv
+	OcYQ/5XvGA7VKMXCtjl5QHkN6/v1Zr3h5CSxh3Gl2Rq/T+HO2ZAIiQwib4XpFkZ7QsWa3ZrkIc2
+	MubqmuDxom0wJje28DcmM3a02VgqJwE1mxpg7
+X-Gm-Gg: ASbGnctJpOVFrV3hqtYU9BANO+XeKGMrqo6ELefRyheDfXq+ZbLNloVwxEbkoThR9Me
+	WUu0kr6Gxdau78cS9KZQUl7N1CVAHlnsyP0cABRMss05UzRSA1Nzf2tq9jARgps3VpW60N2PwCX
+	jpHIS1gtb/3A1FBY2Skxzh+LVSxIzOuNgp95t8NxMoEIqc/emkvC6LBbI=
+X-Google-Smtp-Source: AGHT+IGAtUTjE1ToVn0X3a2r3Fobwj+ih4T08C12Zh3vsndflqz/st0/DImi+CWIBqvca6vfjpERbh1RGNH0tzvDv54=
+X-Received: by 2002:a17:902:d4d1:b0:215:86bf:7e46 with SMTP id
+ d9443c01a7336-22e0400910bmr19045ad.7.1746035668734; Wed, 30 Apr 2025 10:54:28
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a84b8a8-f295-472c-8c3f-0655ff53f5cc@lunn.ch>
+References: <20250429222656.936279-1-skhawaja@google.com> <aBFnU2Gs0nRZbaKw@LQ3V64L9R2>
+ <CAAywjhQZDd2rJiF35iyYqMd86zzgDbLVinfEcva0b1=6tne3Pg@mail.gmail.com> <aBJVi0LmwqAtQxv_@LQ3V64L9R2>
+In-Reply-To: <aBJVi0LmwqAtQxv_@LQ3V64L9R2>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Wed, 30 Apr 2025 10:54:16 -0700
+X-Gm-Features: ATxdqUEVlZrlbMlWoJi11fTmuCkas696qQEk1_hTru9xa_M7wbTjnF95cYimFto
+Message-ID: <CAAywjhQVdYuc3NuLYNMgf90Ng_zjhFyTQRWLnPR7Mk-2MWQ2JA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6] Add support to set napi threaded for
+ individual napi
+To: Joe Damato <jdamato@fastly.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, mkarsten@uwaterloo.ca, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 28, 2025 at 04:22:59PM +0200, Andrew Lunn wrote:
-> On Fri, Apr 25, 2025 at 11:13:12AM +0100, Qasim Ijaz wrote:
-> > Hi Andrew, Jakub
-> > 
-> > Just pinging on my last message. Any thoughts on how to proceed with
-> > this patch series, I left my thoughts in the previous message.
-> 
-> I would suggest you do the minimum, low risk changes. Don't be driven
-> to fix all the syzbot warnings just to make syzbot quiet. What really
-> matters is you don't break the driver for users. syzbot is secondary.
-> 
+On Wed, Apr 30, 2025 at 9:53=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
+te:
+>
+> On Tue, Apr 29, 2025 at 06:16:29PM -0700, Samiullah Khawaja wrote:
+> > On Tue, Apr 29, 2025 at 4:57=E2=80=AFPM Joe Damato <jdamato@fastly.com>=
+ wrote:
+> > >
+> > > On Tue, Apr 29, 2025 at 10:26:56PM +0000, Samiullah Khawaja wrote:
+> > >
+> > > > v6:
+> > > >  - Set the threaded property at device level even if the currently =
+set
+> > > >    value is same. This is to override any per napi settings. Update
+> > > >    selftest to verify this scenario.
+> > > >  - Use u8 instead of uint in netdev_nl_napi_set_config implementati=
+on.
+> > > >  - Extend the selftest to verify the existing behaviour that the PI=
+D
+> > > >    stays valid once threaded napi is enabled. It stays valid even a=
+fter
+> > > >    disabling the threaded napi. Also verify that the same kthread(P=
+ID)
+> > > >    is reused when threaded napi is enabled again. Will keep this
+> > > >    behaviour as based on the discussion on v5.
+> > >
+> > > This doesn't address the feedback from Jakub in the v5 [1] [2]:
+> > >
+> > >  - Jakub said the netlink attributes need to make sense from day 1.
+> > >    Threaded =3D 0 and pid =3D 1234 does not make sense, and
+> > Jakub mentioned following in v5 and that is the existing behaviour:
+> > ```
+> > That part I think needs to stay as is, the thread can be started and
+> > stopped on napi_add / del, IMO.
+> > ```
+> > Please see my reply to him in v5 also to confirm this. I also quoted
+> > the original reason, when this was added, behind not doing
+> > kthread_stop when unsetting napi threaded.
+>
+> Here's what [2] says:
+>
+>   We need to handle the case Joe pointed out. The new Netlink attributes
+>   must make sense from day 1. I think it will be cleanest to work on
+>   killing the thread first, but it can be a separate series.
+>
+> In this v6 as I understand it, it is possible to get:
+>
+>     threaded =3D 0
+>     pid =3D 1234
+>
+> I don't think that makes sense and it goes against my interpretation
+> of Jakub's message which seemed clear to me that this must be fixed.
+>
+> If you disagree and think my interpretation of what Jakub said
+> is off, we can let him weigh in again.
+Agreed. Also my interpretation of his statement might be incorrect.
+Considering the possible actions,
 
-Right, got it so avoid breaking it at all costs, in that case should we move
-forward with the syzbot fix and the "remove extraneous return that
-prevents error propagation" patches only? 
+- Hiding the PID when "napi threaded" is disabled is likely not ideal,
+as you have pointed out, though I find it acceptable.
+- Stopping the thread when "napi threaded" is set to 0 doesn't align
+with Jakub's following statement,
+```
+That part I think needs to stay as is, the thread can be started and
+stopped on napi_add / del, IMO.
+```
+Also please note the discussion on stopping the thread I shared earlier:
+https://lore.kernel.org/netdev/CAKgT0UdjWGBrv9wOUyOxon5Sn7qSBHL5-KfByPS4uB1=
+_TJ3WiQ@mail.gmail.com/
 
-For the syzbot one we will return a negative on control read failure,
-as the function already does that when encountering an invalid phy_id.
-
-As for the "remove extraneous return that prevents error 
-propagation" change it seems like a simple low risk change 
-from what I can tell (if not please let me know).
-
-Would you guys be happy with this?
-
-Thanks
-Qasim
-> 	Andrew
+>
+> > >
+> > >  - The thread should be started and stopped.
+> > >
+> > > [1]: https://lore.kernel.org/netdev/20250425201220.58bf25d7@kernel.or=
+g/
+> > > [2]: https://lore.kernel.org/netdev/20250428112306.62ff198b@kernel.or=
+g/
 
