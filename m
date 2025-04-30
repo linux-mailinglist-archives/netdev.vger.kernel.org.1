@@ -1,279 +1,152 @@
-Return-Path: <netdev+bounces-187113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0ADAA4FD4
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:12:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C225DAA4FF5
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E78297BBB1D
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1371C00A8A
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5CF2741D4;
-	Wed, 30 Apr 2025 15:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5621C5F10;
+	Wed, 30 Apr 2025 15:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SHiLXyQc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tbPh85mq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA25920F091;
-	Wed, 30 Apr 2025 15:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A26A18CBFB
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 15:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746025634; cv=none; b=uD4GGihzE7CxDY/lnlQZd27hRyWi74JFTFVMS0JQr61aR2jlDuHENFOr8Uk+ofzVliWNsFMic1efnjh7wkdXCfZsyj8xhpqtj4/mv58UyGTBie2/SKSZbI6T3ZZ42nWUS6yg0Sozt9EgaCdJWhr6ZZfZz42DX56APca6xd9e+Tw=
+	t=1746026220; cv=none; b=XdHQl3Bb9SvRKOWvi4z4XisDENtaxssfRobq7kBoxti4EGqlt5c6Kk0HtGa2rdd4i134bQLx4CbSMI+Uc8Eu5pZDqdEshVPX35cNpKzYi0O7uRMGr6Cxfh3yKHM7HP0bMkIilbL2LTrmbvxW3cmus+bE/aYpvfN84kUCLrf4w1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746025634; c=relaxed/simple;
-	bh=te3/SWtYXksBycfmngxcsGWsZSFl9uAYFDEPPLo/BdQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=foDaxkAj4D4ru2JGIxn1BrBFcRCtlv6vAF99/2vulf1KlWbe6Hvta2ZPYL+pphWj6v+2CdMo+ILnSiJ/hsXmzH5PU9cikVzy09e8xYGATzzj8mTJxLmRUsAi5lwQp1yBX62kUstoXx5kEnZJLdhhLB/sUl/DWVlm9FczE2kHh8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SHiLXyQc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E885C4CEEC;
-	Wed, 30 Apr 2025 15:07:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746025633;
-	bh=te3/SWtYXksBycfmngxcsGWsZSFl9uAYFDEPPLo/BdQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=SHiLXyQcxktLUACqltvhyhPGLf6ikVkmv9iDUz73wXUr8P+lOdolIlLl/kpU7Gx4U
-	 q1qWumC1hBLvexZwXiVd6UPoRVkDaeVOWZiD9oZmqVE0peOOBbz2MZxISV6hOuJR85
-	 TNI9DuZ5Bn7XmSsaqPVj6+pyvBJHS3YYrg94/l5e16IfRbc4TA+vrXXj0VZjHLxYFT
-	 SKKpVa6EcARcFCGmjLqu3Jj0U2uTSfPsOi2WWrYTgKGT3PIy39OYXI+4fRtbuNNOxf
-	 4xdlGgPAyLumJ0Ejdfh+c6Fs/VeyOrIpB97ZESxaiJfPn1nC+17mMcYIp7OY7n/dAN
-	 /S8oAzZyeFrng==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 30 Apr 2025 08:06:56 -0700
-Subject: [PATCH v6 10/10] ref_tracker: eliminate the ref_tracker_dir name
- field
+	s=arc-20240116; t=1746026220; c=relaxed/simple;
+	bh=QG8bqgr3qWo8btyscx6Pg1np246S/tBDUlpyBuH76hI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WQlpRAiWHWY7/QYSSRgYcqeX1s5jdE4XJMyPNENzgWLDBhaFxFsJBVlkVlyZWm5pFQBFHFqjylbSkEUCVMBHfqJcPX/GyRTMMCkiTVM6/xZl3skFsIhIKiRzziJ6wffuI5zopi2cQL+I4Am+75bTpbaQfcIVlOeQxpdXEAjKKT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tbPh85mq; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 30 Apr 2025 08:16:40 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746026206;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QuMn9HO2ylHkudtJJgWW+uAsUFq7j0ybDWnjZm1chbA=;
+	b=tbPh85mqFuFE68zG9wwsyzvn0w6q9QuM+tyJK8/hQ/ZBmw8hoZyObkmHYHybSvoObi4+cv
+	QGRo+e36qf+yddQwfi4mYAWAiyTM3HNdl9YrzzAL4Hs0r7nwS2o1DdyRTdYMBuCIWmCZNT
+	3JvPQLMoYKh/+B36R4CstLUfTjk0YDo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Meta kernel team <kernel-team@meta.com>, Hugh Dickins <hughd@google.com>
+Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
+Message-ID: <mjmayud53r2ypus22ab75c7kfaq7izaidde2bju536e2ghifdi@lslljpj2hdtm>
+References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+ <as5cdsm4lraxupg3t6onep2ixql72za25hvd4x334dsoyo4apr@zyzl4vkuevuv>
+ <ae4b9ac8-d67d-471f-89b9-7eeaf58dd1b8@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250430-reftrack-dbgfs-v6-10-867c29aff03a@kernel.org>
-References: <20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org>
-In-Reply-To: <20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Jani Nikula <jani.nikula@linux.intel.com>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7677; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=te3/SWtYXksBycfmngxcsGWsZSFl9uAYFDEPPLo/BdQ=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBoEjyVzvpmChSmuwcar32/JyqDjcAqmdVYdaGh0
- WbmO3mvFHmJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaBI8lQAKCRAADmhBGVaC
- FTvtEAC1gp2ontnydAGEZUVn/t/3vwThev+YLly7R6avr4Cg5IdwjCKvhJuh0Pxlw1oW/inv5f3
- 8zpTEFmGdOFRYk3XSWmxZx6oQkMJVVcDBlLnmqSSKc/2g4oRbHkSs1HXKKBq+7hQIHe71yeHtZI
- j3xpMXOFing6kAgM33ukXEiLBK7wdvhdi2TDpgCrrzEOzpRWfYf7azsvwGGsnmj1WvudmUTWksj
- OqWKQfUHoIukQYx/iblvIguo4vVkoLPdk20JKAXZm4xtmDCkgYUoYpL+LpoBMai/JfPCdWTLwp3
- u8i92tS5bSHwzJbok8JhrniFKUeov3KdH5C2ZEd/1u3yP5DJL30MN1zZo1CVaIpOp7PfNSJ0Ipi
- 7VMd+BtdABMjXdoopgNfhVAVv8qL/eZUY6U+YIL3n7H7s6ZSnzq8S379NckhZMyndhYog9VfRdx
- SMUyzGFehK7xWP5S03sJnWAXhAHgxvHU2TUiSenQE1Qc3NIDJdXUqysJ2HdME2giGo0J6uSTONT
- wdvzDz/np/NpTbVnSOQUCnv+SZaAz5cgqfOzU1ZTCPBBSRGvX+2h40uESuz5Kjf3MXIWLMKbiJz
- F8PDZ0vYBWg4fIv4DIm/oZFZWrBxCOekwTAkfKX8rc1SPB+W//YxF2/ICbXkPeEeIDaLyEqIDH6
- M8WvZ8ot6zjTFZw==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae4b9ac8-d67d-471f-89b9-7eeaf58dd1b8@suse.cz>
+X-Migadu-Flow: FLOW_OUT
 
-Now that we have dentries and the ability to create meaningful symlinks
-to them, don't keep a name string in each tracker. Switch the output
-format to print "class@address", and drop the name field.
+On Wed, Apr 30, 2025 at 12:05:48PM +0200, Vlastimil Babka wrote:
+> On 4/25/25 22:18, Shakeel Butt wrote:
+> > Hi Andrew,
+> > 
+> > Another fix for this patch. Basically simplification of refill_stock and
+> > avoiding multiple cached entries of a memcg.
+> > 
+> > From 6f6f7736799ad8ca5fee48eca7b7038f6c9bb5b9 Mon Sep 17 00:00:00 2001
+> > From: Shakeel Butt <shakeel.butt@linux.dev>
+> > Date: Fri, 25 Apr 2025 13:10:43 -0700
+> > Subject: [PATCH] memcg: multi-memcg percpu charge cache - fix 2
+> > 
+> > Simplify refill_stock by avoiding goto and doing the operations inline
+> > and make sure the given memcg is not cached multiple times.
+> > 
+> > Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+> 
+> It seems to me you could simplify further based on how cached/nr_pages
+> arrays are filled from 0 to higher index and thus if you see a NULL it means
+> all higher indices are also NULL. At least I don't think there's ever a
+> drain_stock() that would "punch a NULL" in the middle? When it's done in
+> refill_stock() for the random index, it's immediately reused.
+> 
+> Of course if that invariant was made official and relied upon, it would need
+> to be documented and care taken not to break it.
+> 
+> But then I think:
+> - refill_stock() could be further simplified
+> - loops in consume_stop() and is_drain_needed() could stop on first NULL
+> cached[i] encountered.
+> 
+> WDYT?
+> 
 
-Also, add a kerneldoc header for ref_tracker_dir_init().
+Please see below.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
- include/linux/ref_tracker.h             | 20 ++++++++++++++------
- lib/ref_tracker.c                       |  6 +++---
- lib/test_ref_tracker.c                  |  2 +-
- net/core/dev.c                          |  2 +-
- net/core/net_namespace.c                |  4 ++--
- 8 files changed, 24 insertions(+), 16 deletions(-)
+> > ---
+> >  mm/memcontrol.c | 27 +++++++++++++++------------
+> >  1 file changed, 15 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > index 997e2da5d2ca..9dfdbb2fcccc 100644
+> > --- a/mm/memcontrol.c
+> > +++ b/mm/memcontrol.c
+> > @@ -1907,7 +1907,8 @@ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+> >  	struct mem_cgroup *cached;
+> >  	uint8_t stock_pages;
+> >  	unsigned long flags;
+> > -	bool evict = true;
+> > +	bool success = false;
+> > +	int empty_slot = -1;
+> >  	int i;
+> >  
+> >  	/*
+> > @@ -1931,26 +1932,28 @@ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+> >  
+> >  	stock = this_cpu_ptr(&memcg_stock);
+> >  	for (i = 0; i < NR_MEMCG_STOCK; ++i) {
+> > -again:
+> >  		cached = READ_ONCE(stock->cached[i]);
+> > -		if (!cached) {
+> > -			css_get(&memcg->css);
+> > -			WRITE_ONCE(stock->cached[i], memcg);
+> > -		}
+> > -		if (!cached || memcg == READ_ONCE(stock->cached[i])) {
+> > +		if (!cached && empty_slot == -1)
+> > +			empty_slot = i;
+> > +		if (memcg == READ_ONCE(stock->cached[i])) {
+> >  			stock_pages = READ_ONCE(stock->nr_pages[i]) + nr_pages;
+> >  			WRITE_ONCE(stock->nr_pages[i], stock_pages);
+> >  			if (stock_pages > MEMCG_CHARGE_BATCH)
+> >  				drain_stock(stock, i);
 
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index f2a8ef6abf34d89a642d7c7708c41e5b1dc9dece..f8d1f9c60e86c5a7b1866e1c9f6425e99d4ca9c6 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
- 
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 94315e952ead9be276298fb2a0200d102005a0c1..d560f94af7a86f1fc139204a4e901eaea22c6ef1 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -60,7 +60,7 @@ static struct drm_i915_private *rpm_to_i915(struct intel_runtime_pm *rpm)
- static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
- 	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
--			     "intel_runtime_pm", dev_name(rpm->kdev));
-+			     "intel_runtime_pm");
- 	ref_tracker_dir_symlink(&rpm->debug, "intel_runtime_pm-%s", dev_name(rpm->kdev));
- }
- 
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 2e0498b3fa7947f994de1339d4d2bed93de1a795..bbd5171ce0a22435e540f10821f2a0dad59c1d2f 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -114,7 +114,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 			 "wakeref.work", &key->work, 0);
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
--	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-+	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref");
- 	ref_tracker_dir_symlink(&wf->debug, "intel_wakeref-%s", name);
- #endif
- }
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index 210f26e2528f23bea3b713a57ac27c730bd100ce..262432d6cbf265ea76bad968a7b00485586dfd60 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -23,7 +23,6 @@ struct ref_tracker_dir {
- 	struct dentry		*dentry;
- 	struct dentry		*symlink;
- #endif
--	char			name[32];
- #endif
- };
- 
-@@ -32,10 +31,21 @@ struct ref_tracker_dir {
- void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir);
- void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...);
- 
-+/**
-+ * ref_tracker_dir_init - initialize a ref_tracker dir
-+ * @dir: ref_tracker_dir to be initialized
-+ * @quarantime_count: max number of entries to be tracked
-+ * @class: pointer to static string that describes object type
-+ *
-+ * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-+ * will also be created for it under the top-level ref_tracker debugfs
-+ * directory.
-+ *
-+ * Note that @class must point to a static string.
-+ */
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- 	INIT_LIST_HEAD(&dir->list);
- 	INIT_LIST_HEAD(&dir->quarantine);
-@@ -49,7 +59,6 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dentry = NULL;
- 	dir->symlink = NULL;
- #endif
--	strscpy(dir->name, name, sizeof(dir->name));
- 	ref_tracker_dir_debugfs(dir);
- 	stack_depot_init();
- }
-@@ -74,8 +83,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- }
- 
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index 16ef752e52c230763f2832c312793d27da47c608..2ec34846aaa354b3e4057e51ec44433fcec9af86 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -136,7 +136,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 	stats = ref_tracker_get_stats(dir, display_limit);
- 	if (IS_ERR(stats)) {
- 		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
--			   s->prefix, dir->name, dir, stats);
-+			   s->prefix, dir->class, dir, stats);
- 		return;
- 	}
- 
-@@ -147,14 +147,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
- 			sbuf[0] = 0;
- 		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
--			   dir->name, dir, stats->stacks[i].count,
-+			   dir->class, dir, stats->stacks[i].count,
- 			   stats->total, sbuf);
- 		skipped -= stats->stacks[i].count;
- 	}
- 
- 	if (skipped)
- 		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
--			   s->prefix, dir->name, dir, skipped, stats->total);
-+			   s->prefix, dir->class, dir, skipped, stats->total);
- 
- 	kfree(sbuf);
- 
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e6fec0072e78ef79 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 380d07bec15a1f62ed27c31a6e211e74f3a5561d..00776cba0276554066c94a6fc86f5ed4df430cfa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11620,7 +11620,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 6cbc8eabb8e56c847fc34fa8ec9994e8b275b0af..d70e058476aafbac59738e1fd88f0ebb32ee0fb2 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -324,8 +324,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
+So, this drain_stock() above can punch a NULL hole in the array but I
+think I do see your point. We can fill this hole by moving the last
+non-NULL here. For now I plan to keep it as is as I have some followup
+plans to make this specific drain_stock() conditional on the caller
+(somewhat similar to commit 5387c90490f7f) and then I will re-check if
+we can eliminate this NULL hole.
 
--- 
-2.49.0
+Thanks a lot for the reviews and suggestions.
 
 
