@@ -1,108 +1,173 @@
-Return-Path: <netdev+bounces-187118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD3FAA5051
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:33:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67A69AA50A8
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 17:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAA879E40D3
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:33:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5597A3C8D
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 15:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD50E25A345;
-	Wed, 30 Apr 2025 15:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20800259C8D;
+	Wed, 30 Apr 2025 15:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fi8laK2a"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yVgF+5QM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mcPaFwYs";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yVgF+5QM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mcPaFwYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6049225A2CF
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 15:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B17017C208
+	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 15:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746027182; cv=none; b=qVay2oi8Dbk6/IQ0dj/80A5VPcfU+wvCftQogwniuUnmL4dDKrSDrBsUQV/G5RLueSuZGLG4lZNf/Zp4TVyihIcBbyRjNvrHJ3j+RdLQ2/+OvjhG9haBjogDTGOQrg2BFVWQeO5c6aVP525g8dCMNsncWD01NT6u2S+UVhdDlQ0=
+	t=1746027952; cv=none; b=tLnkRq5OaS6lNfm3njaPIlfT4nQe2uE/hSIM6UvIcQakatyjUkYCc2H37AGMFLowZeFIElSguLHzyLCwNg2jyKFWySosqCyJ+F8gmSelkZLTvAcICermvCo5oAakd7hck40nba1htPu+RTc0hQCiglwBW0Vj1nrSZ8C1dj1T/GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746027182; c=relaxed/simple;
-	bh=enakpdYLIgVX/IhzgAVByjZqfZ/9xensiv8Vz61Ea5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qIdoIiwZYFVHEfGl3oNa8HhrU4GB9bYa1QWnuyU3ck/KA9kfGayQ6sCK6Fky5dE7aLOUfu/QHU14i4G4R8sQy5Vsd/n3lPOlQvhvHqY97CL2DH4Nd8Ds1oLPFe01ADCmVyAfdl+cjch38YaSFmxW9aICCbmR53sYGB5Ku5z7ShQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fi8laK2a; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 30 Apr 2025 08:32:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746027167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4LQSg4lPMDLS8aZTjD/aS4EZY1NoY2jqFkETsR9szI=;
-	b=Fi8laK2aqqJxcv76DgkLpMtMZEZmfKxIE5IPcSi9L2Au1Ihy+WVIBa4rJq8gLCYbU57e4L
-	TLNKdpvQkfkSS8VWG0nTvOhdSkiEVfeX6DFJ+SFUCdvJ6Y0qYxJOXj4o6HSO1kmzdiczf3
-	F5ttkLxXgD1jLAbhrAQ5+8LM66So18I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Soheil Hassas Yeganeh <soheil@google.com>, linux-mm@kvack.org, 
-	cgroups@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>
-Subject: Re: [PATCH] memcg: multi-memcg percpu charge cache
-Message-ID: <dieeei3squ2gcnqxdjayvxbvzldr266rhnvtl3vjzsqevxkevf@ckui5vjzl2qg>
-References: <20250416180229.2902751-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1746027952; c=relaxed/simple;
+	bh=rJR5I7ZGv2bI0kgfaY9XbuXJycU7KYXZnyb1tGTj8gI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I9C7GgA2Pj0NHVfGC39YF/acFhyWWB8i88iWy/NzX1GC2fn/39b53nsvb0uyaHlRPccn6GefqLnzrJfYxuyl+i1RjKHKHxZEXpUVa6DOeik6AY3D+9lSUW2RYXJmS/RPxqTpoHqrvqt7xGCG1se7YLDUXYSod/iveie/mhXJrtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yVgF+5QM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mcPaFwYs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yVgF+5QM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mcPaFwYs; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 979FE21962;
+	Wed, 30 Apr 2025 15:45:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1746027948; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bCz+FpXULwSM6ut1VDAjt5z4jKj0VzKKYeqjwHlTBaw=;
+	b=yVgF+5QMUh5QRdXsI4yMreUVngrk3Lf/8nsc6TN8uGAJA0Fov8ckwhT+adbRbc6wtlZZUd
+	tI+fBkGPpL4fbxOP2orFrx/xCxWCT5YN0zH3Pkb2nOowdkCw9FOuG+VpCnqLEW6/00eFJb
+	JzXXI3FFA+bCHhtzSfNse3yNsWX2M0M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1746027948;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bCz+FpXULwSM6ut1VDAjt5z4jKj0VzKKYeqjwHlTBaw=;
+	b=mcPaFwYsOeZT/dt2LiWXQJf9jUW4Xk0h+XOCV1UI3ZqV/eYDulvYLfX4reqV4sfP7ilsms
+	xsix3fUUu1vbhDAQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=yVgF+5QM;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=mcPaFwYs
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1746027948; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bCz+FpXULwSM6ut1VDAjt5z4jKj0VzKKYeqjwHlTBaw=;
+	b=yVgF+5QMUh5QRdXsI4yMreUVngrk3Lf/8nsc6TN8uGAJA0Fov8ckwhT+adbRbc6wtlZZUd
+	tI+fBkGPpL4fbxOP2orFrx/xCxWCT5YN0zH3Pkb2nOowdkCw9FOuG+VpCnqLEW6/00eFJb
+	JzXXI3FFA+bCHhtzSfNse3yNsWX2M0M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1746027948;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=bCz+FpXULwSM6ut1VDAjt5z4jKj0VzKKYeqjwHlTBaw=;
+	b=mcPaFwYsOeZT/dt2LiWXQJf9jUW4Xk0h+XOCV1UI3ZqV/eYDulvYLfX4reqV4sfP7ilsms
+	xsix3fUUu1vbhDAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D1485139E7;
+	Wed, 30 Apr 2025 15:45:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Ny7xL6tFEmgfIgAAD6G6ig
+	(envelope-from <pfalcato@suse.de>); Wed, 30 Apr 2025 15:45:47 +0000
+From: Pedro Falcato <pfalcato@suse.de>
+To: Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Pedro Falcato <pfalcato@suse.de>
+Subject: [PATCH] mptcp: Align mptcp_inet6_sk with other protocols
+Date: Wed, 30 Apr 2025 16:45:41 +0100
+Message-ID: <20250430154541.1038561-1-pfalcato@suse.de>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250416180229.2902751-1-shakeel.butt@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 979FE21962
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-Andrew, please find another fix/improvements for this patch below.
+Ever since commit f5f80e32de12 ("ipv6: remove hard coded limitation on
+ipv6_pinfo") that protocols stopped using the old "obj_size -
+sizeof(struct ipv6_pinfo)" way of grabbing ipv6_pinfo, that severely
+restricted struct layout and caused fun, hard to see issues.
 
-From: Shakeel Butt <shakeel.butt@linux.dev>
-Date: Wed, 30 Apr 2025 08:28:23 -0700
-Subject: [PATCH] memcg: multi-memcg percpu charge cache - fix 4
+However, mptcp_inet6_sk wasn't fixed (unlike tcp_inet6_sk). Do so.
+The non-cloned sockets already do the right thing using
+ipv6_pinfo_offset + the generic IPv6 code.
 
-Add comment suggested by Michal and use DEFINE_PER_CPU_ALIGNED instead
-of DEFINE_PER_CPU suggested by Vlastimil.
-
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+Signed-off-by: Pedro Falcato <pfalcato@suse.de>
 ---
- mm/memcontrol.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/mptcp/protocol.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 5a07e0375254..b877287aeb11 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -1775,6 +1775,10 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
- 	pr_cont(" are going to be killed due to memory.oom.group set\n");
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 26ffa06c21e8..c4fd558307f2 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -3142,9 +3142,9 @@ static int mptcp_disconnect(struct sock *sk, int flags)
+ #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+ static struct ipv6_pinfo *mptcp_inet6_sk(const struct sock *sk)
+ {
+-	unsigned int offset = sizeof(struct mptcp6_sock) - sizeof(struct ipv6_pinfo);
++	struct mptcp6_sock *msk6 = container_of(mptcp_sk(sk), struct mptcp6_sock, msk);
+ 
+-	return (struct ipv6_pinfo *)(((u8 *)sk) + offset);
++	return &msk6->np;
  }
  
-+/*
-+ * The value of NR_MEMCG_STOCK is selected to keep the cached memcgs and their
-+ * nr_pages in a single cacheline. This may change in future.
-+ */
- #define NR_MEMCG_STOCK 7
- struct memcg_stock_pcp {
- 	local_trylock_t stock_lock;
-@@ -1791,7 +1795,7 @@ struct memcg_stock_pcp {
- 	unsigned long flags;
- #define FLUSHING_CACHED_CHARGE	0
- };
--static DEFINE_PER_CPU(struct memcg_stock_pcp, memcg_stock) = {
-+static DEFINE_PER_CPU_ALIGNED(struct memcg_stock_pcp, memcg_stock) = {
- 	.stock_lock = INIT_LOCAL_TRYLOCK(stock_lock),
- };
- static DEFINE_MUTEX(percpu_charge_mutex);
+ static void mptcp_copy_ip6_options(struct sock *newsk, const struct sock *sk)
 -- 
-2.47.1
+2.49.0
 
 
