@@ -1,202 +1,770 @@
-Return-Path: <netdev+bounces-186922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-186923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85B54AA40A2
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 03:36:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E995AA40B1
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 03:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D05021BA89FC
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:36:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFF74E5A3A
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 01:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F938224FA;
-	Wed, 30 Apr 2025 01:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA918635B;
+	Wed, 30 Apr 2025 01:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jzIJQciD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncdz/RdK"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013058.outbound.protection.outlook.com [40.107.162.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482292DC786;
-	Wed, 30 Apr 2025 01:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745976982; cv=fail; b=GiY7/ygV+wqe0lKAMK3aqjKNdHRR0ruhmCaugDXDpQvZxzQt1yAny4BuMvx+IUS8yNaHV1vwjoJYqqz8ix/KpKegfySKMcpan+bXNtYdrlT192f7Wsg+eutup4yXxuEBOVWww4abAyk/hL+/KwohP/5D9/S4JkRJ489DP0tqHvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745976982; c=relaxed/simple;
-	bh=6TgTaoys4e//PUHds5mYIJfYHEK41wavWMv4QdbBZgM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gHWKiyMwhdpE3PCcWcVgms28Q0MSSaPuAPOKOj+vPbDSPkwQOH0pjFpwqzeSsjxguhZaTOBmOM3uTXZsin2jTOvvOLld9DM+OP6ZljwSnzY+t67LytDqPHVmb7KQaSHvXyFDj5B1xBJs02lAJm+6aqYMeXTcQYW4vDiDca8OhF8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jzIJQciD; arc=fail smtp.client-ip=40.107.162.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Zm2DRaDPEYvFcbTh0zniMCBifeIgqhmP4y/kTacPf8yZX5eBRjP2zno/0JCC7038EXy/4K+QvySTwshwUS/0XX+3m2bjk2H6A0sTwCIIyvWy9gYcTfZw6voAu3P0AaXvmyGcc7e+JSRg9vih6jzpLoOiJel35beIg19xkGKK7rFkUY62bZBJTVhHb+m8nkJGku6L51vn4ZAFSEcRiYORGlk2wVnOWKJ5/dVXuL1KGtzSgG3rMbjQ8IdvDMnaJ8L1OKiDdVXMVZoWEtQIHQnYiCA+90BjP8uYjQpW/GMJdAg4jGbuc1QWuiQX3UhspgJMO38wDtmFob79Um4ARU+4sQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6TgTaoys4e//PUHds5mYIJfYHEK41wavWMv4QdbBZgM=;
- b=cT7iNU/wJyeOnX466bKvnNJwsWQ1IKufy4B4B/isn0zy6NNnzbSrUCtfFZce9Vgk27Fi8Tj+TgoGUdZMP6nsvKxRTaWAlyyovdOlxTxBHj3rLGaEPI95n2XkiD02noFs80+PTQqGo+qiZW3JvGoOK7C7dYrbRRD2CJqvS3n6MV6q9fmomz683zYARq2lwuJRqIapZGJ+h1ujJVzCLbSEV+Na+0j3inWhLeyGfPhPWgkF5Rvi9p+E/yJdJMqjHn2OChA4XqkQMzPx0ev9oWTspvvKp81PQYHQj0bHf7Ra3FyrOrvBnqdRyGnPTEe4NixvDr7CdXiP54m1EX+SyIHbTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6TgTaoys4e//PUHds5mYIJfYHEK41wavWMv4QdbBZgM=;
- b=jzIJQciDOlarj/Zrudsqf0pBc2ycZ7xJSVLSYAc85nyLzQLoecl7v4szvMtS42ZVNbJeH2Fvk+cB3RHx1l4A98I5CZuIHvi9EPgbG7KWzxIdw3Arw1ggWuHOdhXQVjVjhqIRrLvgVjocKis/ec7I0LXT7TPQYnPpn62aZXVoCXMZzW7ymsf9elg7k6jNoHWELzvy9AoMx3nk6znWY26dQe9b1VGp2VDT5ItjsIV/j3D96l6TevI2n/wsj1hcZ3H7X11n0ZEukCbSWN9hk9x4vwOj5LDKv4xpo+/c8Q7K/olMmOypqHt77jykvAp4OUdjdIheASJcYu3n8ABamPhBaA==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GV1PR04MB10749.eurprd04.prod.outlook.com (2603:10a6:150:204::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Wed, 30 Apr
- 2025 01:36:15 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.8678.025; Wed, 30 Apr 2025
- 01:36:15 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Timur Tabi <timur@kernel.org>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-Subject: RE: [PATCH v6 net-next 05/14] net: enetc: add debugfs interface to
- dump MAC filter
-Thread-Topic: [PATCH v6 net-next 05/14] net: enetc: add debugfs interface to
- dump MAC filter
-Thread-Index: AQHbuC73pHRUZNdlukqvRmRqu3S9hbO63i6AgACR1IA=
-Date: Wed, 30 Apr 2025 01:36:15 +0000
-Message-ID:
- <PAXPR04MB85104FB93BCC89CB5F58F5DA88832@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250428105657.3283130-1-wei.fang@nxp.com>
- <20250428105657.3283130-6-wei.fang@nxp.com>
- <CAOZdJXWxX6BKqt8=z-dWNO15AunjbhNBkSi5Cpfx6Dn3Yw4BaQ@mail.gmail.com>
-In-Reply-To:
- <CAOZdJXWxX6BKqt8=z-dWNO15AunjbhNBkSi5Cpfx6Dn3Yw4BaQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GV1PR04MB10749:EE_
-x-ms-office365-filtering-correlation-id: 18559786-35a1-40c0-b0cf-08dd878765a7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018|7053199007;
-x-microsoft-antispam-message-info:
- =?utf-8?B?emZRVG1pUVNGSzErQnBuR2FleGc5NnhDMUR4QTM1OHY0WHVNcGpsZHh5N0dh?=
- =?utf-8?B?bngxTHF4eDVQSFI3clpQYjZybE9jRm0vbng1RmdFMk5VNmxTcU0zdlJ5bjg1?=
- =?utf-8?B?Q2J4VElWWWROM2dwbTIyK2pxOVlmd3luMEZnR2ZraU0zMDhGTm1COEVIbWgr?=
- =?utf-8?B?UkRuVW1tNGVhS2pTTlpvclR0VDY4MjZJME9SUTh1dFlQM3NuN0FLZDZXQWhW?=
- =?utf-8?B?b0JSbkxIMFF4eGN5TndlQWxINDlmK1I2amwwWDFFVzlxUlVXalJFalljRjRn?=
- =?utf-8?B?elJ3cjc5UytCQzhhdm9FZzlCSGt3alhGNU52c3VCcVd3SVdTMmpsVlpUbEN3?=
- =?utf-8?B?WDZ4UDVxM2lvTXc4aGQydEFZQUNDbXltbzJPRFVlUS9vQTFOVFE5Z1J4TGs3?=
- =?utf-8?B?S0ptTTFLOTQ1VTk3T1NIVUw2VzBCN21QWjFScEtWUDRoNDhwRVRRRG80eDZK?=
- =?utf-8?B?c2Ftcy9ZOVRXSlBXRTFlbVdSNFcyamNmTGFLM1c4OXEwdi9mMzdIZFFhck9E?=
- =?utf-8?B?cWJxOFFGSWxDMnk0TzhiNVFNU0x0QlQwMytYbUJqL3VIbHhvL0JJdzJ1ajRv?=
- =?utf-8?B?MStQL3VtQlIyYnV2ZXZtUDhRYmx1bERXUllTZkdOVGVMYU05YjJTOFRmNzM2?=
- =?utf-8?B?bFZQTUxaNll1MkloWSt4Mk5BaThMb0pKZlFWaktFcUtvV1pJTHRwbnhRWE9t?=
- =?utf-8?B?bFo4Ujg4L1hkQzYzandMdXZYMG1oRzZhMHhYRnlnemswYUdhQ3VaNDZ2MlFw?=
- =?utf-8?B?VzVBanZIdW92MnBCK0tkc1hWdXpXKzY1bkpPdnZadzl1WkFwWHBRbmJMYmUw?=
- =?utf-8?B?ZHhYM29aUkkzM0tzUm5EVzB3MkRuZGZnNlI4VEU2R2phSXVCYVA3Z1FLZlIz?=
- =?utf-8?B?YlhWejNpMnZKbndia0RRQmZlWUs0RUhtUFRWWXNMbVl0eFJZbE40K0llVE5r?=
- =?utf-8?B?NlVZNGV6ZWtybWpMYXhoT0RlVnBmeDlQT21zU0JxbFgxS2x5dlVYVnEzUXRn?=
- =?utf-8?B?a0dwM21RYklDKzBLeDJUbmFQakhMWWZwUE1aWUVRTTRKNExSOTRNQ09UeVFH?=
- =?utf-8?B?RFVVN05TZU11S2ZNUVN6eElSeE5uRDUzeXE3REVJUFhUdUJHRWpnSGRjd0sy?=
- =?utf-8?B?TCtTQk8yM1hWaGFXbWlpZG02dmlhVWtLUnlESEhJcGZ6ZEdIK0FLUEd1c0tz?=
- =?utf-8?B?SFk5TUdoRk1tSERqOEhwQXVLTjBrTHlhTFdQaHNZUEIwYXVWeTFsUGtXcFNR?=
- =?utf-8?B?SS9MNko2V1ZSaWtFdi96TEtEeDRNcXVKSHdaYzAzTDhCUGx4Y3ZwY09mZjRC?=
- =?utf-8?B?MHlJTXZVQjh1U29qdzhxRXlNeEJlV2x3V1RoTWNFNTA4M1VYdVpiVkRTbkZG?=
- =?utf-8?B?REZSaldWZVZxMUVIemdocVAvMnRQdXoxN2N3OGR5ZUtPd3RHSXBSM2d0Vnl5?=
- =?utf-8?B?alp5VWFNQUZhUXZIZkJ1V3MxY1MrMjJPVEpnU2lFd1ExQ3NJbXYrQTJybndP?=
- =?utf-8?B?eVZ5VFNqbEJTMFovVlJpeDNYRGcvZ044T1NNTW90K083VzZxUDIvcDlXMGJC?=
- =?utf-8?B?MGhGamxzVXh3S1NqazRySVpzWGNadWdxemliRGtVY3c1NHh1bzlHT21BT215?=
- =?utf-8?B?dTNyS2tmcUNVNnhTcERDVjF6NWJqYU5JMWJaaExRTW5OcW9uZWIzS2dlQUI1?=
- =?utf-8?B?cFJNL2NBNTdoVkRwb3I2TEo0aW11ZE01TmxGZ0JmTDY2WWVaT1lvTEZrZ0lw?=
- =?utf-8?B?SFRMaHZUNzEra1NkOGNreGRTaEhDaWRpam9OeFl4MTBRODY1UTVwKzBoM2tv?=
- =?utf-8?B?ZWZUSG1mSFR1aFBhclI4Vitvb3hDM2xtWVl6ODNjcndhUHNaQUpuc051d2Qv?=
- =?utf-8?B?cHhCTGZrbDFvdUFpVm9IeFZUT25zTjgvWXVFSXJKZy9qdlB4UUpJMGp3OGxV?=
- =?utf-8?B?cUJ0VG5rUUY5ampEeGxqTnFlNjRIM1RQa2hRSWVXcE5LNzBYbDhkWlNtZFhz?=
- =?utf-8?B?eTNpVVBRa0VnPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dUdhUlJuS25GbVRaSUJkY29VN3lvUEZJZFNxV3FBZ3hnb3ZaMmdyV3ZzS2Vq?=
- =?utf-8?B?dHRnTU9ic2ZacG1wRFlqTXM3V3NaeWZXazdjbU1QdHRaeTJNbnJsRTlsRzl2?=
- =?utf-8?B?NDdqb2N1NHRWcXppZW4vT0dWdzk5S3dJdGdSWWc0MDB1b0ZnYU5BQ0tZM1Jo?=
- =?utf-8?B?bXNZaHR4NlpIZHM2T1NRcWxTa3FlVVZQcVdhTDhxQUNzMUVFclV1VFZ3bHNX?=
- =?utf-8?B?SE5VM3ZHYVczd3B1T2RYSHRiY1RlNVhyQWZBREVnWjBmY2F2S2ZLNzRJSzNU?=
- =?utf-8?B?OHhIWGM4clBsbmJmeVJCVTJzMVJXOVVEYmxNU1FnVDRSb2VJcktTeWxBdjdQ?=
- =?utf-8?B?TEZkMUxFMkRaek9QcGVBY0N4MU1mTkhKSnNMajZFbGhrQ2h0SWtGampRZmV0?=
- =?utf-8?B?TGRmQ0lyQndvRnhXZGd1WDE5ZVZDQ3dJbXZYa2tuMXRTa2hQcENzZXhFeXRH?=
- =?utf-8?B?RFprMmlsbEpkZlFxV1libGI3T21UeEQxVjkzWlVTa1pDNzVWY0c0bW0yOWUw?=
- =?utf-8?B?NHAvQVNvWEFNaGtVRjNXdFMxZ2QzU2I4ZVR1Ry9ucU8ySEg4ZkovbUMvcXBF?=
- =?utf-8?B?bitBUjE5U0dsaTFuNFI2LzVtRXZKUVd6WVhRU2dhc0t5bkwzUUM1NWFJalZN?=
- =?utf-8?B?Yk5jSE51RUxwTFZNRHJsTE1aSFYrTDdHc0ZndXQydkd2NktqMmJhbFlBSldG?=
- =?utf-8?B?K2FKUlZNU3RLM0pwNXE5V1VnMjRTV1ZYa3BWeE1QbTJ3OGovYTRzOSsyQzQ1?=
- =?utf-8?B?Q25LRXM5UFQ5VzZ4dUVVQVFxYjkvdTVwaVBBMVJjdzhZd21aVDBVbEdrKzFG?=
- =?utf-8?B?RUNxM3pqaEJib3daWDdnTk5aTnZKV0U0WXd4NjVqT3NVMnBVVGsvQXhVWmZa?=
- =?utf-8?B?SmZUTHo5cnBRT2ZNTStHTCtUSUdTYVVtd21YS1JsdXJWTXNraXE5Rm1aTlF3?=
- =?utf-8?B?QkFKWHdaUkNvMEFJQ3JFbWZRdlZWQkxEUGJPUldOMllHNW5QZDc1Uk93dFp3?=
- =?utf-8?B?OHdQTHdiTm5iSU54SlVMT2lFNElOa3IvL0hSUHl1Uzc0RktuaE5BWXkvanJD?=
- =?utf-8?B?bzlFUXdnS0w2V3dZNEt5ZDA5cEFwdlZMQXV1NUdQNXRURENDSFRJUTk2NTNU?=
- =?utf-8?B?T0ZNanVaMm5RZ2M2R3VacDFXTjZWYjBqYUpINW5Tc0dXbzlhYUtzT2ZVUHB3?=
- =?utf-8?B?TlZFOUYzVitPS1U1allxbTE1SGpWNmpZNGhWRy90UmJwaHVuak9WM0c5UjB5?=
- =?utf-8?B?eUJ0cS9BZS94WEJiZ2xqSGsxcFc2T0l3eEJFdHRPSllFeDlNMXNIMTFJZENG?=
- =?utf-8?B?YWdPK0hXM2dTMVdPUW83STNZTEthZ1JvS2RIS3BYVzJkQm5oVUpzaXZlL2RU?=
- =?utf-8?B?Zk1QZ1JLU01SbVhMdGgzNEthYzFOUlEwWmw1QjFDTktaWXFqdUxsZklQdk1l?=
- =?utf-8?B?VFA1Y3JuUFVKaUNielBaMHltUlpJckdGaTg5cEJKRUNDT04yS0dhRTB1LzVM?=
- =?utf-8?B?YldUemdhU2hGNE5DbC96SVgySytIUC84d2Z2aWhweWFFd2pqd1N1eUZlUk9u?=
- =?utf-8?B?V1RKVDRXblJFSDJ0MlhXSGlzTVZSSWFhOFBkQ0NaTFR4V250Um9GendaSldK?=
- =?utf-8?B?TWRGWkMrUk8rVXFiY1hZMHpUaXRZc1dZbmo4N1dNRVJoYWJGSVJUQlJ0MmVM?=
- =?utf-8?B?TUJWQjIzRmtpbDFaalZ6UUR3ZjRMQ1BjMEx2VUFpaTBsZHdjUnljTDI3Qi9l?=
- =?utf-8?B?V3JFamJ4cEgrcXN0b2htb3lTMkdGdU95dnVRR3dwaWZxSUtQU2pGT0xkU1RX?=
- =?utf-8?B?b1h2c0ZTR1JsZjBlMXZYbnhzZEozcVlRMkliZUJQYTR3czlQVlYwV0VRYTl2?=
- =?utf-8?B?c1V2dElyajBYRmdicjVDczdzbjl3NEZJci80RlNqNnl6VXdPV0Y0K25LRXlB?=
- =?utf-8?B?Mzd6N21BRG5CYzFmb2tlL0dTZzdNeHF6MWxacDFtVjhmbFhHZmRFYjZuREFL?=
- =?utf-8?B?Uk1DUEdQZURJT0diUmMwWDNkRXBNRzMvVHNEQzFGZG52STNuTUNrc016cC9R?=
- =?utf-8?B?OFNxQXp1MVdKVTRVb3lOQTFndEovZDZhN1hXdS9ja01qRzNGQm11WXVqd1hw?=
- =?utf-8?Q?1j68=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB6278F39;
+	Wed, 30 Apr 2025 01:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745977507; cv=none; b=qSH1z+yqEgCwvg12B2ge6/QoJehNPLgMs6ZJe9BzxqPRLciY97RtFVHVxOue9Qb4UMcs6YUGmc5qw4hJVsQC/+8ynRwUOJXRNsybFOCXsBV7GKUbaR1kikoCMbfYruEdmn/i3wV1IBs87KclHHb62DCOJSRy8qSIe5FFdNqLV8I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745977507; c=relaxed/simple;
+	bh=k0umfqcrL1QGMVN4QfOyBFk1VOZc/btWp3YrFqr/Wkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Tit/vHZAcNDjNqhOX0tAbTxNosF/Pc98QNHuFUeuqCSt+7N8iFKD7Id1FS8Qv/qOy9GVKRD7uyuE5MhD7Y5/RGTNbj94qaxCP5+6qr+valsXoBsOIAKpsHuYvn5yCNmEbEHffBncKxhLQE7iX0kd0Ur4waqDXwoRKx+ien1XAXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ncdz/RdK; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-391342fc0b5so4882984f8f.3;
+        Tue, 29 Apr 2025 18:45:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1745977503; x=1746582303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9RxRxgVqGC67eXDqsgxyqsi6YJLAeLoONFQJpWWAtiM=;
+        b=ncdz/RdKTwpl220lB4RjMN/NLcZsiUfrn1RjKLDvtzq/y7DyyLJ1Hx31dg3a4ULKl5
+         bOoNnAlJ9Vyrhm65ReT9ynXITllP4C5/uATblL9O/8BGjqCcN4V/NCVi/ok3kthr5n1n
+         3IBrJIqKmtZZuag+y22Y8acn1U/8NUMzDlx+dxuuJMSu3pmL70JInpIat0hw3qcUvoRA
+         3+Fro42OsoOqWfi0nTIJiCKQ7Fz4lB0wsl2Vb6kdRNwT8s4QfCvI7UZlLbeZtOdQ9gYX
+         DGy8JSS+XDLF9vSZ1U/A1FMrCu7gznsspWy6wOkclCblamNfLZ7EmNO9bmucO7sJM8Np
+         2uHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745977503; x=1746582303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9RxRxgVqGC67eXDqsgxyqsi6YJLAeLoONFQJpWWAtiM=;
+        b=tx6yhHXKmucZcGjqbAW7/xxEZQqM3j0gidgKrf3FcC/ajANEmPoOAqPBl4hND4X6xd
+         9ofoPqMfZY7pdCxhoP8ZUexBLXlo0iWXWnD5A9qRx5T9NqJCAN4KcvJLTfWh/mBJ7Yli
+         FP/Xp4Ld3vntsegb5lNvZzb5WB9ig/gLBKKzX/WPZsZ/vgkY/W5HE5fhIVerkbudSjNm
+         vR1IZhklzul3mRuuhd2NcUh3sUAK/D+JU4yWCn8qeJukNLxml2bpEulPhHdG6pacjEnS
+         MfcNTMof6rB7Xdu3yQ4VnB7grPAwpi1BmrcLHhSOtOclrCzCiNHVq52rkTHt0crCkogu
+         pdug==
+X-Forwarded-Encrypted: i=1; AJvYcCXdGVukP0zDDq1vziU+Qhi5+icIuJ1aiJzP7j1GoVy841Bo6LYDYuZlT6z6PLp1ZIKaFwVbtGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywtpvc/YYOgrCR6w6oV9T6hwXfZv7M7jdd+O0Opw9uvFEVqISi6
+	mtoimy38A5k6/Cl1qYKnvEfoKFTcLl1+JgL0JjfdAM46Qtv1NB0h662+8p5QVtbSp0EUa+v39ze
+	/35iF5ZHgNBlgFgyovWnHqxlOCS4dhykO
+X-Gm-Gg: ASbGnctJ8HeJBWn5oo2K14FkZFsTxx56C3rIT16k30rsImy7R5WTVDwUfVESpZL8VaV
+	9t5SvkMQgSrnKFVU+J9YgsCoh+OmlDJZP+UqsumbqG7YMa5KaZ44kNof1pBIFwln1QolvzAs/GA
+	2M+KZ9+eYj1I2+kDRDBTFIJmTjZzg+6znsvvE+6w==
+X-Google-Smtp-Source: AGHT+IFCvZ2whLo7VIpRh6nzAJ4qKzdDBWv/hDi0hrQPDHGIRUsqOk9+cqRpQJ38O4i94tdebWt3vaPXMditDAtEddA=
+X-Received: by 2002:a05:6000:40c9:b0:3a0:831c:e7e5 with SMTP id
+ ffacd0b85a97d-3a08ff376cfmr425757f8f.20.1745977502851; Tue, 29 Apr 2025
+ 18:45:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18559786-35a1-40c0-b0cf-08dd878765a7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2025 01:36:15.2051
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vQ2rlg+gNYSri9qzR7q9kNyeK1wXHKMEVAYbRDk1AXDqjrOVmPywxFyvIFhfgkV5aFFl113akSdNTfr63QGIkQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10749
+References: <20250425214039.2919818-1-ameryhung@gmail.com> <20250425214039.2919818-2-ameryhung@gmail.com>
+In-Reply-To: <20250425214039.2919818-2-ameryhung@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 29 Apr 2025 18:44:50 -0700
+X-Gm-Features: ATxdqUFju8TJm9p7AgBQsrrR_sFQrby9ZuScBeK2HyFJ0qEDD4UQ35yod-A4VhY
+Message-ID: <CAADnVQKw0C+7bA+trc2DDfX823VZJovdp3Ndcg5yepdd-Y44og@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 1/2] selftests/bpf: Introduce task local data
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Tejun Heo <tj@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiBbU29tZSBwZW9wbGUgd2hvIHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBkb24ndCBvZnRlbiBnZXQg
-ZW1haWwgZnJvbQ0KPiB0aW11ckBrZXJuZWwub3JnLiBMZWFybiB3aHkgdGhpcyBpcyBpbXBvcnRh
-bnQgYXQNCj4gaHR0cHM6Ly9ha2EubXMvTGVhcm5BYm91dFNlbmRlcklkZW50aWZpY2F0aW9uIF0N
-Cj4gDQo+IE9uIE1vbiwgQXByIDI4LCAyMDI1IGF0IDY6MTnigK9BTSBXZWkgRmFuZyA8d2VpLmZh
-bmdAbnhwLmNvbT4gd3JvdGU6DQo+ID4gK3ZvaWQgZW5ldGNfcmVtb3ZlX2RlYnVnZnMoc3RydWN0
-IGVuZXRjX3NpICpzaSkNCj4gPiArew0KPiA+ICsgICAgICAgZGVidWdmc19yZW1vdmVfcmVjdXJz
-aXZlKHNpLT5kZWJ1Z2ZzX3Jvb3QpOw0KPiANCj4gWW91IGNhbiBqdXN0IGNhbGwgZGVidWdmc19y
-ZW1vdmUoKSBoZXJlLiAgZGVidWdmc19yZW1vdmVfcmVjdXJzaXZlKCkNCj4gaXMgZGVwcmVjYXRl
-ZDoNCj4gDQo+IHZvaWQgZGVidWdmc19yZW1vdmUoc3RydWN0IGRlbnRyeSAqZGVudHJ5KTsNCj4g
-I2RlZmluZSBkZWJ1Z2ZzX3JlbW92ZV9yZWN1cnNpdmUgZGVidWdmc19yZW1vdmUNCg0KT2theSwg
-SSB3aWxsIHJlcGxhY2UgaXQgd2l0aCBkZWJ1Z2ZzX3JlbW92ZSgpLCB0aGFua3MNCg0K
+On Fri, Apr 25, 2025 at 2:40=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
+ote:
+>
+> Task local data provides simple and fast bpf and user space APIs to
+> exchange per-task data through task local storage map. The user space
+> first declares task local data using bpf_tld_type_key_var() or
+> bpf_tld_type_var(). The data is a thread-specific variable which
+> every thread has its own copy. Then, a bpf_tld_thread_init() needs to
+> be called for every thread to share the data with bpf. Finally, users
+> can directly read/write thread local data without bpf syscall.
+>
+> For bpf programs to see task local data, every data need to be
+> initialized once for every new task using bpf_tld_init_var(). Then
+> bpf programs can retrieve pointers to the data with bpf_tld_lookup().
+>
+> The core of task local storage implementation relies on UPTRs. They
+> pin user pages to the kernel so that user space can share data with bpf
+> programs without syscalls. Both data and the metadata used to access
+> data are pinned via UPTRs.
+>
+> A limitation of UPTR makes the implementation of task local data
+> less trivial than it sounds: memory pinned to UPTR cannot exceed a
+> page and must not cross the page boundary. In addition, the data
+> declaration uses __thread identifier and therefore does not have
+> directly control over the memory allocation. Therefore, several
+> tricks and checks are used to make it work.
+>
+> First, task local data declaration APIs place data in a custom "udata"
+> section so that data from different compilation units will be contiguous
+> in the memory and can be pinned using two UPTRs if they are smaller than
+> one page.
+>
+> To avoid each data from spanning across two pages, they are each aligned
+> to the smallest power of two larget than their sizes.
+>
+> As we don't control the memory allocation for data, we need to figure
+> out the layout of user defined data. This is done by the data
+> declaration API and bpf_tld_thread_init(). The data declaration API
+> will insert constructors for all data, and they are used to find the
+> size and offset of data as well as the beginning and end of the whole
+> udata section. Then, bpf_tld_thread_init() performs a per-thread check
+> to make sure no data will cross the page boundary as udata can start at
+> different offset in a page.
+>
+> Note that for umetadata, we directly aligned_alloc() memory for it and
+> assigned to the UPTR. This is only done once for every process as every
+> tasks shares the same umetadata. The actual thread-specific data offset
+> will be adjusted in the bpf program when calling bpf_tld_init_var().
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  .../bpf/prog_tests/task_local_data.c          | 159 +++++++++++++++
+>  .../bpf/prog_tests/task_local_data.h          |  58 ++++++
+>  .../selftests/bpf/progs/task_local_data.h     | 181 ++++++++++++++++++
+>  .../selftests/bpf/task_local_data_common.h    |  41 ++++
+>  4 files changed, 439 insertions(+)
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_dat=
+a.c
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_dat=
+a.h
+>  create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.h
+>  create mode 100644 tools/testing/selftests/bpf/task_local_data_common.h
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/task_local_data.c b/t=
+ools/testing/selftests/bpf/prog_tests/task_local_data.c
+> new file mode 100644
+> index 000000000000..5a21514573d2
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/task_local_data.c
+> @@ -0,0 +1,159 @@
+> +#include <fcntl.h>
+> +#include <errno.h>
+> +#include <stdio.h>
+> +#include <pthread.h>
+> +
+> +#include <bpf/bpf.h>
+> +
+> +#include "bpf_util.h"
+> +#include "task_local_data.h"
+> +#include "task_local_storage_helpers.h"
+> +
+> +#define PIDFD_THREAD       O_EXCL
+> +
+> +/* To find the start of udata for each thread, insert a dummy variable t=
+o udata.
+
+Pls use kernel comment style instead of networking.
+
+> + * Contructors generated for every task local data will figured out the =
+offset
+
+constructors.
+
+> + * from the beginning of udata to the dummy symbol. Then, every thread c=
+an infer
+> + * the start of udata by subtracting the offset from the address of dumm=
+y.
+> + */
+
+Pls add the full algorithm involving udata_dummy here.
+How it can be anywhere in the udata section...
+then constructors will keep adjusting udata_start_dummy_off
+and eventually km->off -=3D udata_start_dummy_off.
+These steps are very tricky.
+So big and detailed comments are necessary.
+
+> +static __thread struct udata_dummy {} udata_dummy SEC("udata");
+> +
+> +static __thread bool task_local_data_thread_inited;
+> +
+> +struct task_local_data {
+> +       void *udata_start;
+> +       void *udata_end;
+> +       int udata_start_dummy_off;
+> +       struct meta_page *umetadata;
+> +       int umetadata_cnt;
+> +       bool umetadata_init;
+> +       short udata_sizes[64];
+> +       pthread_mutex_t lock;
+> +} task_local_data =3D {
+> +       .udata_start =3D (void *)-1UL,
+> +       .lock =3D PTHREAD_MUTEX_INITIALIZER,
+> +};
+> +
+> +static void tld_set_data_key_meta(int i, const char *key, short off)
+> +{
+> +       task_local_data.umetadata->meta[i].off =3D off;
+> +       strncpy(task_local_data.umetadata->meta[i].key, key, TASK_LOCAL_D=
+ATA_KEY_LEN);
+> +}
+> +
+> +static struct key_meta *tld_get_data_key_meta(int i)
+> +{
+> +       return &task_local_data.umetadata->meta[i];
+> +}
+> +
+> +static void tld_set_data_size(int i, int size)
+> +{
+> +       task_local_data.udata_sizes[i] =3D size;
+> +}
+> +
+> +static int tld_get_data_size(int i)
+> +{
+> +       return task_local_data.udata_sizes[i];
+> +}
+
+The above 4 helpers are single use.
+If nothing else is using them, open code them directly.
+Otherwise it only makes it harder to understand the logic.
+
+> +
+> +void __bpf_tld_var_init(const char *key, void *var, int size)
+> +{
+> +       int i;
+> +
+> +       i =3D task_local_data.umetadata_cnt++;
+> +
+> +       if (!task_local_data.umetadata) {
+> +               if (task_local_data.umetadata_cnt > 1)
+> +                       return;
+> +
+> +               task_local_data.umetadata =3D aligned_alloc(PAGE_SIZE, PA=
+GE_SIZE);
+> +               if (!task_local_data.umetadata)
+> +                       return;
+> +       }
+> +
+> +       if (var < task_local_data.udata_start) {
+> +               task_local_data.udata_start =3D var;
+> +               task_local_data.udata_start_dummy_off =3D
+> +                       (void *)&udata_dummy - task_local_data.udata_star=
+t;
+> +       }
+> +
+> +       if (var + size > task_local_data.udata_end)
+> +               task_local_data.udata_end =3D var + size;
+> +
+> +       tld_set_data_key_meta(i, key, var - (void *)&udata_dummy);
+> +       tld_set_data_size(i, size);
+> +}
+> +
+> +int bpf_tld_thread_init(void)
+> +{
+> +       unsigned long udata_size, udata_start, udata_start_page, udata_en=
+d_page;
+> +       struct task_local_data_map_value map_val;
+> +       int i, task_id, task_fd, map_fd, err;
+> +
+> +       if (!task_local_data.umetadata_cnt || task_local_data_thread_init=
+ed)
+> +               return 0;
+> +
+> +       if (task_local_data.umetadata_cnt && !task_local_data.umetadata)
+> +               return -ENOMEM;
+> +
+> +       udata_start =3D (unsigned long)&udata_dummy + task_local_data.uda=
+ta_start_dummy_off;
+> +
+> +       pthread_mutex_lock(&task_local_data.lock);
+
+can we drop this?
+
+If .c is part of .h just this line will drag -lpthread dependency.
+I think it's an artifact on the selftest.
+The selftest/library/application can have its own mutex to protect
+or this function can use simple xchg() like exclusion
+without mutexes.
+
+> +       for (i =3D 0; i < task_local_data.umetadata_cnt; i++) {
+> +               struct key_meta *km =3D tld_get_data_key_meta(i);
+> +               int size =3D tld_get_data_size(i);
+> +               int off;
+> +
+> +               if (!task_local_data.umetadata_init) {
+> +                       /* Constructors save the offset from udata_dummy =
+to each data
+> +                        * Now as all ctors have run and the offset betwe=
+en the start of
+> +                        * udata and udata_dummy is known, adjust the off=
+sets of data
+> +                        * to be relative to the start of udata
+> +                        */
+> +                       km->off -=3D task_local_data.udata_start_dummy_of=
+f;
+> +
+> +                       /* Data exceeding a page may not be able to be co=
+vered by
+> +                        * two udata UPTRs in every thread
+> +                        */
+> +                       if (km->off >=3D PAGE_SIZE)
+> +                               return -EOPNOTSUPP;
+
+returns without releasing the mutex...
+One more reason to avoid it.
+
+> +               }
+> +
+> +               /* A task local data should not span across two pages. */
+> +               off =3D km->off + udata_start;
+> +               if ((off & PAGE_MASK) !=3D ((off + size - 1) & PAGE_MASK)=
+)
+> +                       return -EOPNOTSUPP;
+> +       }
+> +       task_local_data.umetadata_init =3D true;
+> +       pthread_mutex_unlock(&task_local_data.lock);
+> +
+> +       udata_size =3D task_local_data.udata_end - task_local_data.udata_=
+start;
+> +       udata_start_page =3D udata_start & PAGE_MASK;
+> +       udata_end_page =3D (udata_start + udata_size) & PAGE_MASK;
+> +
+> +       /* The whole udata can span across two pages for a thread. Use tw=
+o UPTRs
+> +        * to cover the second page in case it happens.
+> +        */
+> +       map_val.udata_start =3D udata_start & ~PAGE_MASK;
+> +       map_val.udata[0].page =3D (struct data_page *)(udata_start_page);
+> +       map_val.udata[1].page =3D (udata_start_page =3D=3D udata_end_page=
+) ? NULL :
+> +               (struct data_page *)(udata_start_page + PAGE_SIZE);
+> +
+> +       /* umetadata is shared by all threads under the assumption that a=
+ll
+> +        * task local data are defined statically and linked together
+> +        */
+> +       map_val.umetadata =3D task_local_data.umetadata;
+> +       map_val.umetadata_cnt =3D task_local_data.umetadata_cnt;
+> +
+> +       map_fd =3D bpf_obj_get(TASK_LOCAL_DATA_MAP_PIN_PATH);
+> +       if (map_fd < 0)
+> +               return -errno;
+> +
+> +       task_id =3D sys_gettid();
+> +       task_fd =3D sys_pidfd_open(task_id, PIDFD_THREAD);
+> +       err =3D bpf_map_update_elem(map_fd, &task_fd, &map_val, 0);
+> +       if (err)
+> +               return err;
+> +
+> +       task_local_data_thread_inited =3D true;
+> +       return 0;
+> +}
+> diff --git a/tools/testing/selftests/bpf/prog_tests/task_local_data.h b/t=
+ools/testing/selftests/bpf/prog_tests/task_local_data.h
+> new file mode 100644
+> index 000000000000..c928e8d2c0a6
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/task_local_data.h
+> @@ -0,0 +1,58 @@
+> +#ifndef __BPF_TASK_LOCAL_DATA_H__
+> +#define __BPF_TASK_LOCAL_DATA_H__
+> +
+> +#include "task_local_data_common.h"
+> +
+> +#define SEC(name) __attribute__((section(name), used))
+> +#define __aligned(x) __attribute__((aligned(x)))
+> +
+> +#define ROUND_UP_POWER_OF_TWO(x) (1UL << (sizeof(x) * 8 - __builtin_clzl=
+(x - 1)))
+> +
+> +void __bpf_tld_var_init(const char *key, void *var, int size);
+
+If possible, let's try to put everything into .h, so it's easier
+to distribute. Otherwise extra .c becomes a headache.
+
+> +
+> +/**
+> + * @brief bpf_tld_key_type_var() declares a task local data shared with =
+bpf
+> + * programs. The data will be a thread-specific variable which a user sp=
+ace
+> + * program can directly read/write, while bpf programs will need to look=
+up
+> + * with the string key.
+> + *
+> + * @param key The string key a task local data will be associated with. =
+The
+> + * string will be truncated if the length exceeds TASK_LOCAL_DATA_KEY_LE=
+N
+> + * @param type The type of the task local data
+> + * @param var The name of the task local data
+> + */
+> +#define bpf_tld_key_type_var(key, type, var)                            =
+       \
+> +__thread type var SEC("udata") __aligned(ROUND_UP_POWER_OF_TWO(sizeof(ty=
+pe))); \
+> +                                                                        =
+       \
+> +__attribute__((constructor))                                            =
+       \
+> +void __bpf_tld_##var##_init(void)                                       =
+       \
+> +{                                                                       =
+       \
+> +       _Static_assert(sizeof(type) < PAGE_SIZE,                         =
+       \
+> +                      "data size must not exceed a page");              =
+       \
+> +       __bpf_tld_var_init(key, &var, sizeof(type));                     =
+       \
+> +}
+> +
+> +/**
+> + * @brief bpf_tld_key_type_var() declares a task local data shared with =
+bpf
+> + * programs. The data will be a thread-specific variable which a user sp=
+ace
+> + * program can directly read/write, while bpf programs will need to look=
+up
+> + * the data with the string key same as the variable name.
+> + *
+> + * @param type The type of the task local data
+> + * @param var The name of the task local data as well as the name of the
+> + * key. The key string will be truncated if the length exceeds
+> + * TASK_LOCAL_DATA_KEY_LEN.
+> + */
+> +#define bpf_tld_type_var(type, var) \
+> +       bpf_tld_key_type_var(#var, type, var)
+
+Hiding string obfuscates it too much.
+This API doesn't have analogous APIs either in bpf or user space.
+So let's make everything explicit.
+In this case bpf_tld_key_type_var()-like should be the only api
+to declare a variable.
+I would call it bpf_tld_var().
+
+> +
+> +/**
+> + * @brief bpf_tld_thread_init() initializes the task local data for the =
+current
+> + * thread. All data are undefined from a bpf program's point of view unt=
+il
+> + * bpf_tld_thread_init() is called.
+> + *
+> + * @return 0 on success; negative error number on failure
+> + */
+> +int bpf_tld_thread_init(void);
+> +
+> +#endif
+> diff --git a/tools/testing/selftests/bpf/progs/task_local_data.h b/tools/=
+testing/selftests/bpf/progs/task_local_data.h
+> new file mode 100644
+> index 000000000000..7358993ee634
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/task_local_data.h
+> @@ -0,0 +1,181 @@
+> +#include <errno.h>
+> +#include <bpf/bpf_helpers.h>
+> +
+> +#include "task_local_data_common.h"
+> +
+> +#define PAGE_IDX_MASK 0x8000
+> +
+> +/* Overview
+> + *
+> + * Task local data (TLD) allows sharing per-task information between use=
+rs and
+> + * bpf programs without explicit storage layout managenent. TLD APIs use=
+ to
+> + * string keys to access data. Internally, TLD shares user pages throguh=
+ two
+> + * UPTRs in a task local storage: udata and umetadata. Data are stored i=
+n udata.
+> + * Keys and the offsets of the corresponding data in udata are stored in=
+ umetadata.
+> + *
+> + * Usage
+> + *
+> + * Users should initialize every task local data once for every new task=
+ before
+> + * using them with bpf_tld_init_var(). It should be done ideally in non-=
+critical
+> + * paths first (e.g., sched_ext_ops::init_task) as it compare key string=
+s and
+> + * cache the offsets of data.
+> + *
+> + * First, user should define struct task_local_data_offsets, which will =
+be used
+> + * to cache the offsets of task local data. Each member of the struct sh=
+ould
+> + * be a short integer with name same as the key name defined in the user=
+ space.
+> + * Another task local storage map will be created to save the offsets. F=
+or example:
+> + *
+> + * struct task_local_data_offsets {
+> + *     short priority;
+> + *     short in_critical_section;
+> + * };
+
+The use of 'short' is unusual.
+The kernel and bpf progs always use either u16 or s16.
+
+> + *
+> + * Task local data APIs take a pointer to bpf_task_local_data object as =
+the first
+> + * argument. The object should be declared as a stack variable and initi=
+alized via
+> + * bpf_tld_init(). Then, in a bpf program, to cache the offset for a key=
+-value pair,
+> + * call bpf_tld_init_var(). For example, in init_task program:
+> + *
+> + *     struct bpf_task_local_data tld;
+> + *
+> + *     err =3D bpf_tld_init(task, &tld);
+> + *     if (err)
+> + *         return 0;
+> + *
+> + *     bpf_tld_init_var(&tld, priority);
+> + *     bpf_tld_init_var(&tld, in_critical_section);
+> + *
+> + * Subsequently and in other bpf programs, to lookup task local data, ca=
+ll
+> + * bpf_tld_lookup(). For example:
+> + *
+> + *     int *p;
+> + *
+> + *     p =3D bpf_tld_lookup(&tld, priority, sizeof(int));
+> + *     if (p)
+> + *         // do something depending on *p
+> + */
+> +
+> +struct task_local_data_offsets;
+> +
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+> +       __uint(map_flags, BPF_F_NO_PREALLOC);
+> +       __type(key, int);
+> +       __type(value, struct task_local_data_map_value);
+> +       __uint(pinning, LIBBPF_PIN_BY_NAME);
+> +} task_local_data_map SEC(".maps");
+> +
+> +struct {
+> +       __uint(type, BPF_MAP_TYPE_TASK_STORAGE);
+> +       __uint(map_flags, BPF_F_NO_PREALLOC);
+> +       __type(key, int);
+> +       __type(value, struct task_local_data_offsets);
+> +} task_local_data_off_map SEC(".maps");
+> +
+> +struct bpf_task_local_data {
+> +       struct task_local_data_map_value *data_map;
+> +       struct task_local_data_offsets *off_map;
+> +};
+> +
+> +/**
+> + * @brief bpf_tld_init() initializes a bpf_task_local_data object.
+> + *
+> + * @param task The task_struct of the target task
+> + * @param tld A pointer to a bpf_task_local_data object to be initialize=
+d
+> + * @return -EINVAL if task KV store is not initialized by the user space=
+ for this task;
+> + * -ENOMEM if cached offset map creation fails. In both cases, users can=
+ abort, or
+> + * conitnue without calling task KV store APIs as if no key-value pairs =
+are set.
+
+continue
+
+> + */
+> +__attribute__((unused))
+> +static int bpf_tld_init(struct task_struct *task, struct bpf_task_local_=
+data *tld)
+> +{
+> +       tld->data_map =3D bpf_task_storage_get(&task_local_data_map, task=
+, 0, 0);
+> +       if (!tld->data_map)
+> +               return -EINVAL;
+> +
+> +       tld->off_map =3D bpf_task_storage_get(&task_local_data_off_map, t=
+ask, 0,
+> +                                           BPF_LOCAL_STORAGE_GET_F_CREAT=
+E);
+> +       if (!tld->off_map)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+> +/**
+> + * @brief bpf_tld_init_var() lookups the metadata with a key and caches =
+the offset of
+> + * the value corresponding to the key.
+> + *
+> + * @param tld A pointer to a valid bpf_task_local_data object initialize=
+d by bpf_tld_init()
+> + * @param key The key used to lookup the task KV store. Should be one of=
+ the
+> + * symbols defined in struct task_local_data_offsets, not a string
+> + */
+> +#define bpf_tld_init_var(tld, key)                                     \
+> +       ({                                                              \
+> +               (tld)->off_map->key =3D bpf_tld_fetch_off(tld, #key);    =
+ \
+> +       })
+> +
+> +__attribute__((unused))
+> +static short bpf_tld_fetch_off(struct bpf_task_local_data *tld, const ch=
+ar *key)
+> +{
+> +       int i, umetadata_off, umetadata_cnt, udata_start;
+> +       void *umetadata, *key_i, *off_i;
+> +       short off =3D 0;
+> +
+> +       if (!tld->data_map || !tld->data_map->umetadata)
+> +               goto out;
+> +
+> +       udata_start =3D tld->data_map->udata_start;
+> +       umetadata_cnt =3D tld->data_map->umetadata_cnt;
+> +       umetadata =3D tld->data_map->umetadata->meta;
+> +
+> +       bpf_for(i, 0, umetadata_cnt) {
+> +               umetadata_off =3D i * sizeof(struct key_meta);
+> +               if (umetadata_off > PAGE_SIZE - sizeof(struct key_meta))
+> +                       break;
+> +
+> +               key_i =3D umetadata + umetadata_off + offsetof(struct key=
+_meta, key);
+> +               off_i =3D umetadata + umetadata_off + offsetof(struct key=
+_meta, off);
+> +
+> +               if (!bpf_strncmp(key_i, TASK_LOCAL_DATA_KEY_LEN, key)) {
+> +                       off =3D *(short *)(off_i) + udata_start;
+> +                       if (off >=3D PAGE_SIZE)
+> +                               off =3D (off - PAGE_SIZE) | PAGE_IDX_MASK=
+;
+> +                       /* Shift cached offset by 1 so that 0 means not i=
+nitialized */
+> +                       off +=3D 1;
+> +                       break;
+> +               }
+> +       }
+> +out:
+> +       return off;
+> +}
+> +
+> +/**
+> + * @brief bpf_tld_lookup() lookups the task KV store using the cached of=
+fset
+> + * corresponding to the key.
+> + *
+> + * @param tld A pointer to a valid bpf_task_local_data object initialize=
+d by bpf_tld_init()
+> + * @param key The key used to lookup the task KV store. Should be one of=
+ the
+> + * symbols defined in struct task_local_data_offsets, not a string
+> + * @param size The size of the value. Must be a known constant value
+> + * @return A pointer to the value corresponding to the key; NULL if the =
+offset
+> + * if not cached or the size is too big
+> + */
+> +#define bpf_tld_lookup(tld, key, size) __bpf_tld_lookup(tld, (tld)->off_=
+map->key, size)
+> +__attribute__((unused))
+> +static void *__bpf_tld_lookup(struct bpf_task_local_data *tld, short cac=
+hed_off, int size)
+> +{
+> +       short page_off, page_idx;
+> +
+> +       if (!cached_off--)
+> +               return NULL;
+> +
+> +       page_off =3D cached_off & ~PAGE_IDX_MASK;
+> +       page_idx =3D !!(cached_off & PAGE_IDX_MASK);
+> +
+> +       if (page_idx) {
+> +               return (tld->data_map->udata[1].page && page_off < PAGE_S=
+IZE - size) ?
+> +                       (void *)tld->data_map->udata[1].page + page_off :=
+ NULL;
+> +       } else {
+> +               return (tld->data_map->udata[0].page && page_off < PAGE_S=
+IZE - size) ?
+> +                       (void *)tld->data_map->udata[0].page + page_off :=
+ NULL;
+> +       }
+> +}
+> diff --git a/tools/testing/selftests/bpf/task_local_data_common.h b/tools=
+/testing/selftests/bpf/task_local_data_common.h
+> new file mode 100644
+> index 000000000000..2a0bb724c77c
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/task_local_data_common.h
+> @@ -0,0 +1,41 @@
+> +#ifndef __BPF_TASK_KV_STORE_COMMON_H__
+> +#define __BPF_TASK_KV_STORE_COMMON_H__
+> +
+> +#ifdef __BPF__
+> +struct data_page *dummy_data_page;
+> +struct meta_page *dummy_meta_page;
+> +#else
+> +#define __uptr
+> +#endif
+> +
+> +
+> +#define TASK_LOCAL_DATA_MAP_PIN_PATH "/sys/fs/bpf/task_local_data_map"
+> +#define TASK_LOCAL_DATA_KEY_LEN 62
+> +#define PAGE_SIZE 4096
+
+We have
+enum page_size_enum {
+        __PAGE_SIZE =3D PAGE_SIZE
+};
+inside kernel/bpf/core.c
+
+and bpf progs that include vmlinux.h can use it directly as __PAGE_SIZE.
+
+Let's think through upfront how the whole thing works on
+architectures with different page size.
+
+> +#define PAGE_MASK (~(PAGE_SIZE - 1))
+> +
+> +struct data_page {
+> +       char data[PAGE_SIZE];
+> +};
+> +
+> +struct data_page_entry {
+> +       struct data_page __uptr *page;
+> +};
+> +
+> +struct key_meta {
+> +       char key[TASK_LOCAL_DATA_KEY_LEN];
+> +       short off;
+> +};
+> +
+> +struct meta_page {
+> +       struct key_meta meta[64];
+> +};
+> +
+> +struct task_local_data_map_value {
+> +       struct data_page_entry udata[2];
+> +       struct meta_page __uptr *umetadata;
+> +       short umetadata_cnt;
+> +       short udata_start;
+> +};
+> +
+> +#endif
+> --
+> 2.47.1
+>
 
