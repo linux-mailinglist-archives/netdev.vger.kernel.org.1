@@ -1,95 +1,97 @@
-Return-Path: <netdev+bounces-187157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A57AAA5524
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:57:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2EBAA54D7
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 21:42:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9701D188A2DB
-	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 19:57:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD829A3F68
+	for <lists+netdev@lfdr.de>; Wed, 30 Apr 2025 19:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA9D2750E4;
-	Wed, 30 Apr 2025 19:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9E81F0990;
+	Wed, 30 Apr 2025 19:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uwaterloo.ca header.i=@uwaterloo.ca header.b="kSWX6ks6"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="aVE5YBy2";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="Rqp1EOyo"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.hc503-62.ca.iphmx.com (esa.hc503-62.ca.iphmx.com [216.71.131.47])
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF370264FA0
-	for <netdev@vger.kernel.org>; Wed, 30 Apr 2025 19:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.131.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4072A1EDA3C;
+	Wed, 30 Apr 2025 19:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746043049; cv=fail; b=HCSnuM4NefS4t3ngbwEy5BgvLTBfihJjC76gUTMx1s/B/3mzAwl2HcoD9WnbgQZY8FoGGyYmFdO7YgRU0GMpOq5eoOeX6yXhj9RnGzOrtX6KqaM6Rhdv/V11JxSbixrrTHiEn7HWaPF9hJIKic53emmhQeWMdnmtHrBocZ39I+E=
+	t=1746042123; cv=fail; b=M0cE7nZvgH/cWMoZbDg74ZXbY/+VYW0IGzNcmncnk1wxSu+40gFs+xEJD5vtX+3Sj3lBuCwmb36IIWt+mw/KbIUbZXc91YsO7okIgSRwMnkGlM0fe5n/WEugoiWY/X7UhzzJ5FMQDwb+Hars2sOpNGoyAfWeoOYIs7aEB8/tX3M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746043049; c=relaxed/simple;
-	bh=8hyWshHtCdBjwIZRriEH8BmF8Mj043yTVICQPetSWUM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=o0adedr4LMqUxUWp1c1LViha3mGu5iTOszaVvHDa0jAfuA13+jiHq7iMV/BKklaqeHrWlVxxXizd9Wl8URP+iMtMbPAFWAgT3lCuu32Hzy8cMcgPKTA8yhVXGfFa4a4+BC1jMkZpNEm7orcugh3IY7I4sHpvMjKKQs2n6xKAcoA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uwaterloo.ca; spf=pass smtp.mailfrom=uwaterloo.ca; dkim=pass (1024-bit key) header.d=uwaterloo.ca header.i=@uwaterloo.ca header.b=kSWX6ks6; arc=fail smtp.client-ip=216.71.131.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uwaterloo.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uwaterloo.ca
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=uwaterloo.ca; i=@uwaterloo.ca; q=dns/txt; s=default;
-  t=1746043048; x=1777579048;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8hyWshHtCdBjwIZRriEH8BmF8Mj043yTVICQPetSWUM=;
-  b=kSWX6ks6ErK4SFYw/IB/IrJ/rH1MqSHTRBlVRI+U2VRq+Fvp9bhAw3jD
-   K5h/R3XRZmePiCoKtWeyvSaEBm9e7KzSJKK3P5OeWRJxkDXQuTIt5AeTv
-   6h2aUEk0aj9qjuC7Lbcvw5MLl4tZXy05z9zLl+UpSd0uxiBdYCIE2mcHM
-   g=;
-X-CSE-ConnectionGUID: AKqqBsNeQs6apafKAXLYYw==
-X-CSE-MsgGUID: ymTuJ2E+Qmiepw6TKYlAUg==
-X-Talos-CUID: =?us-ascii?q?9a23=3AtE+cCGnybHeCuqRYvfQ14VwzJtzXOVT+1W76OGm?=
- =?us-ascii?q?1MH03QaWcR3y5yIdVotU7zg=3D=3D?=
-X-Talos-MUID: 9a23:beh4ygtQWKIDOykfFM2nlTReKeUyzueXDUEAiYpYh+q1MQVNNGLI
-Received: from mail-canadacentralazlp17011054.outbound.protection.outlook.com (HELO YT5PR01CU002.outbound.protection.outlook.com) ([40.93.18.54])
-  by ob1.hc503-62.ca.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 15:57:26 -0400
+	s=arc-20240116; t=1746042123; c=relaxed/simple;
+	bh=YbMTc/y+Q6XNZLlIBgiolisCvaQT84Ve40vVEvSrKk0=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=JwwyBeIjxfI8IzvYfYeQmup5DKMT8bQzPaPhA5SjJh31Tspkke3qVJHb9934WNeyw9lJFnXCpL8sBPXqHvk7lEbJmlG19YvY36HlVM4iicfB5wlGbI0+IYTX477ES4UD/RInFqTYh2OKh5h3gjXfd7fIbSWsDZa0y/5b0yWC5Io=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=aVE5YBy2; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=Rqp1EOyo; arc=fail smtp.client-ip=148.163.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53UJ5CZ2010420;
+	Wed, 30 Apr 2025 12:41:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=S9H2AimZ5U2EZ
+	FlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=; b=aVE5YBy2KKsOXTQ/Mzs+2OJ9XCTIT
+	j0G4grRi1B/s/cMzOMFX5wmqzx3uNYoXtU/EhqXynidrOQ5+EmxuN9PZhRO8z27r
+	pxvx6+warwaqt3XOq/PfOYWnVhShr2bEzbfyG0LHak5Hv0gVImBgMCpeMpYUh6/R
+	W0KvrYjOpwzNQsrjla91jUTLpoRVNrKd+qZJq4EBslW6TMYd7NcPaQ636B1aLb3x
+	B2QyWO392bkCpkUsPRmJEVpO4r+gE8KhkZvrJ4c+nbQ4s2YfgoK+tIUYGuhnD8Ej
+	qUgX3zVshZSehGy8miU9AKKogINUPxVn4ba/smaE2D/MKLGIs1tLhlRPg==
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2174.outbound.protection.outlook.com [104.47.57.174])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 468y109ydn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Apr 2025 12:41:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zQPP5IMq5FMCVVA8mmkoVCnZVleqkfL9gD+IjMTuTZRbhY2IU6i7cyhaL51auncdskyhxrvHnQx93Gdr20IUln7q/JTk7hVYKgJpriEqLjGOaW+ZK9Dshuq3JerIEgjjXQjnXd1Y+LK7utOKLCXr+vz500FcX21J2tQU9pVkMm0TF9SwUYgLJdHYoO6hzYAZdxUzDob2YIHXaxPWuuAs+8X4/xcm9uChOTFAZOEA6pX2rWZc+SWrrErTeEKrYUF627q/GxpE6JIokmBDndv8XCLXZfYJhWVhlqdoJ1O1S2RjHDjTneryObYGgRNHrOX2p1nIDCs+MFQbF4JYvmxY0g==
+ b=vLaCOnKxzGownQnIkuTKiFTiIHhiYQO4eXm2rDt3hovFrFPthzXNEoiiWp8E+JcToWIGQM6mVhl3TnPhvz/GMQy3N78Lsgk0CAFnHVHJclBJ0i0qTUTNyv5JbjYnOEMhR41kdjKxUKPLOsSu6QJzRjZXflzzYA189yYZQtAIrT4dpaxzuS0XN4RsBveanzsw6vVf7X6bChDQBhYo8yTLJy6qefKGZGrKOshLDIILJ+rtcwbg/tyizqzdXqqR54vzzWfSYDOxEsMkbzFeDj2PFi4keWpvx+selUXgz6J24a1K+jpHyWomXv3nOqbGnrFLq51kOIC/2t1pgEo3hUQctw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+mPa7FgvN1pKuupxVkHlZaviI73IJToXY1K28k+rgYo=;
- b=C3RfQqHAnfL6oPW94v0MsOvQ0mTZCBh4T7XHY2+JQnjZQMJqAXO5LAy1jqREUx3qAEw9yMP77oI7O2lIITN0hNbdr40T/JFNt83JcDzZjsEDEcTf9uANDyfpa7EYMOs76mcxcnb+AIZmrcmFFdCKlu6yTtoHKkKJZGKeeGwK5WNQv5Y6Bw5w2vQmk+dr51U5MZAy+58Ui38jvr7DDOl4T52yceViyHxnMUH5f1VSqACe14NF/odpXiqjpUQOhOy6mwj7NfYGametYmn08DusTz8TlkJDBnQcRyUWSp+mw2Ty/O6Sw9JCYwjAa6IlGTtSWBXeqauUDEuQAkmJnjgLsA==
+ bh=S9H2AimZ5U2EZFlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=;
+ b=HAL5WPUqB1NccG9i5qOmXa7opSXs3p3sixM78b9eK2Ct/4QnDiJTQvq3vtlTnuljhggd2GVNqAZqN48hOtBOu7tfy2wo8Zw1eIobjx/TYGBmCBXp7lXzrg1MouAHByT86w2oODLMNNiUf7iHQXrg+sUuAAl2lOVGU+b48dGv4svggrCfLqNWye+VOyJqxMehwa2a3wLHXp5+FiaZH+7r9m1AlXp7bva9kEYyGWwJ8gIvOAEEJT3sWkvvAoTcYotPxp7xmUb28jNVucO/aa0cLxqKDneM+adcCLVWL4Hlk4DjS0Yt67Zerrilo9C6Kz9tiWaW44jtUjMKbgfseCM7Hg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=uwaterloo.ca; dmarc=pass action=none header.from=uwaterloo.ca;
- dkim=pass header.d=uwaterloo.ca; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=uwaterloo.ca;
-Received: from YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:4b::13) by YT2PR01MB6029.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:59::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.22; Wed, 30 Apr
- 2025 19:57:23 +0000
-Received: from YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::d36e:ef93:93fd:930]) by YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::d36e:ef93:93fd:930%5]) with mapi id 15.20.8678.028; Wed, 30 Apr 2025
- 19:57:23 +0000
-Message-ID: <a8a7ed7f-af44-4f15-9e30-651a2b9b86ba@uwaterloo.ca>
-Date: Wed, 30 Apr 2025 15:57:21 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 0/4] Add support to do threaded napi busy poll
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com,
- jdamato@fastly.com, netdev@vger.kernel.org
-References: <20250424200222.2602990-1-skhawaja@google.com>
- <52e7cf72-6655-49ed-984c-44bd1ecb0d95@uwaterloo.ca>
- <db35fe8a-05c3-4227-9b2b-eeca8b7cb75a@uwaterloo.ca>
- <CAAywjhRM8wd67DwUttU76+6KrKUki-w9hgkbVskhVG+nJ4JNig@mail.gmail.com>
-Content-Language: en-CA, de-DE
-From: Martin Karsten <mkarsten@uwaterloo.ca>
-In-Reply-To: <CAAywjhRM8wd67DwUttU76+6KrKUki-w9hgkbVskhVG+nJ4JNig@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S9H2AimZ5U2EZFlpkN5jEDKk5XlaC+DbCNvxR++kT8Q=;
+ b=Rqp1EOyoL37zAlBoAYYXcaT1ficXh/1ziZW+Na7uzD200dEHYj2Qg8cBG4Flu0UCyr3ubXsMzXSinqTlLuTNbiLwZ+88FTgSvgcWgi/6R/UrnKBRqvULq1Urr+RsgYuOIDyOm9xMcZdNt1qwnG6EljL/ryXMTpNZxD8hvDxMzBLMuUJjN2eMsrw6+xnpGAr6S+558XtXo+kEcBU4M91TFDdjiigDAKRFYugtib9DF/jsmurrwM84WaJ4CYIAWxXlbZ+2E7gmCWPGIZnD46URT8lV2D73zeDCvi2E6ijTqCKBBB8tBMZ5kI3LiRJfh76r7jsJXeCfh4Ti4NDYKfcfTA==
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10) by PH0PR02MB7736.namprd02.prod.outlook.com
+ (2603:10b6:510:50::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Wed, 30 Apr
+ 2025 19:41:18 +0000
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8699.012; Wed, 30 Apr 2025
+ 19:41:17 +0000
+From: Jon Kohler <jon@nutanix.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Cc: Jon Kohler <jon@nutanix.com>
+Subject: [PATCH net-next v2] xdp: Add helpers for head length, headroom, and metadata length
+Date: Wed, 30 Apr 2025 13:11:18 -0700
+Message-ID: <20250430201120.1794658-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.43.0
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: YQBPR01CA0085.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:3::21) To YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:4b::13)
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR13CA0024.namprd13.prod.outlook.com
+ (2603:10b6:208:160::37) To LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,235 +99,309 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: YQBPR0101MB6572:EE_|YT2PR01MB6029:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7a48edb-4020-47c6-b2b6-08dd88213902
+X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB7736:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae290281-cd3c-47f0-0437-08dd881ef9c2
+x-proofpoint-crosstenant: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|52116014|921020|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZFpjUkpHUU0yTzU1WWxBR0JqY2o2NlJHNmVGcU9ocUZRaWJheU9PT3B6VDRS?=
- =?utf-8?B?NURnb2lUZ1habGR2cjloNjNpdHE4S3pldytNQVNFd1RwYXF1NEM1YkJGUlFH?=
- =?utf-8?B?SlZSZlVraFppOU82cjFNbi9UNDJDTEx4OHR1djlFSmNYOXo0OWZvR08zTUor?=
- =?utf-8?B?K0dCYmd4eG9oL0wxMzVFS2c1RkZqK0RBU1ZsZVZFSDdzY0pEbEVjZU0xbXI1?=
- =?utf-8?B?NjUydE1BK3Fnenc4MktIcGVjSFV1V09nMWhyUGFYR0UzeldtckNVTC9JV3Vp?=
- =?utf-8?B?WHRvSTlVSVg4ZDdlM3poMTczaTN6WVdiRUJ4dXdZaFZ0MW1xcnVGV3ZFMHVO?=
- =?utf-8?B?NGErV0laV292MTMvTGhJa2JIMVBNZFg2SHNXSk1NOVBHR3FhZlFzSU9jMVBM?=
- =?utf-8?B?Y014akdWcjVUM2k5bHFwSXdoVXhPL0pHLzNBeGVWV0JuT1B3SlRYRDk4blZB?=
- =?utf-8?B?Tmx1VnVHS1JERzJqb29iWTFRTS9vQ21xQWl6cHNKbkNLdFVTb2ZETzBlRHpz?=
- =?utf-8?B?aVJqYnhyanowc3Y2Q3BYZnB0UG00b1o3b0JSKy9jNjFJMjYxREo5NWttSVV0?=
- =?utf-8?B?T1dFS2dFTitzS05JUVRMeldyNU93WlY5c3UvQ2VtVi9vdTkrUjFXYzNKcDBi?=
- =?utf-8?B?WXBMd3lWQTNRYTFPZnVTRWV2YWxIQzNSWTFCZE5DT0kzd1VGWFdoS2YvZndU?=
- =?utf-8?B?NG9lOE1jcEZoZ09sVXF3dDNxVW9PMkhvdzVCWEQybWZmbDB3OXhSdkRqYnVI?=
- =?utf-8?B?RktkOUN5dFBuSnBuYWhZQjlPNlF3YXhWdFRkVHR6L2h1L05TMUo3bVp0ME1P?=
- =?utf-8?B?ZWZsZllEeFR5R250T29iWWVGVW93UTFuYXZiWWtMcmtuY3Y1VEFXRzMwZXM2?=
- =?utf-8?B?cGwvdk9SMDV5OVJCYzgwODBIbS9oZGlGRXVCTnVxU0xnUVRnejczUldlWFZl?=
- =?utf-8?B?cnpFbG5UVzVVQjJKV3Y1UkJNc2NwOWJQRTFKeGlnSUNIUW1NOXZJYjJkZGN2?=
- =?utf-8?B?STI0Mngvay9nV0QrS01TdmUvSnJoRStld0hzODVOOW0zWlo0RXZONmFMUm1Y?=
- =?utf-8?B?TG5Rc2RHN3FFZXNRV25oeWJLeENnaDJ3QUN4Zkpkd01FdUU5Z1hCaGtwVXpr?=
- =?utf-8?B?a3lQTjhPWW45bWRWUjV0bSt5QnorV3docmwxRUZsTmdqUWFQVTB5NlMwNzJN?=
- =?utf-8?B?YWd1Q21Db25LL1k2VEwyQU80bzVNajh6dUprRnFKeTkwOGhiSXIrQ3RPRDZL?=
- =?utf-8?B?Y2J4OTF6aytUc0FVdVlBNjJ1Sm5Ydm8zU0tOeEtTaExCcE51MXNnUWFFM0F6?=
- =?utf-8?B?QWp2RENyWEZXVHE3cFhmbGg5cEVid0ZlV3p4bTVKMW1GVCtDTTdjTkFoQmlF?=
- =?utf-8?B?aFcwenlwN1QzN1ZFeVQzWVlQV3piQjZFNFFrRkZocUxZNThRZkQzTlBBSnIz?=
- =?utf-8?B?dWRyTGIzN3lXSDhXVjNYcWFKY3V5dmpkZk1WREZFQjJ2cUR5UHgvR2lFdDZo?=
- =?utf-8?B?c2RLVTIyTHcyZnM0MXU1djVCSWN1UXY1NWJ2ZFFtTTBsMnBUVXlwajZLbWI4?=
- =?utf-8?B?UTgrNnJCRG5wcXo1K3YwRjRINld1a3NHaGlYRmVhdG50TjcxVnpPbnJkcEZR?=
- =?utf-8?B?UmpiTkZiMnRZMHJQVmNiM2c5OUlPcUxlUDlzbHN1dGQvMmFrcjdtVzMyc0l0?=
- =?utf-8?B?eVhBUkVCUktqU1FieXhpNjlMbUxqcXVaU1JZSU9YOGsveXk0cFZWK281T2JQ?=
- =?utf-8?B?VldYb09lMFVaWTRPNEUyNXRWeVFLUDJ5VGhvcVowTFliVzdvaEs0U2dlRzdm?=
- =?utf-8?B?Y0xlYVg4d1lKRlNxUm5oczhIcG10Zlp6M3VBUENsWW9hZVZJV1ZTYjAyRWNL?=
- =?utf-8?B?QWVhd1YyWERyVVE2WlhIWTFIaGs0YWNHWVJWZldxSTN0cDJoNXJUcXhPUXVa?=
- =?utf-8?Q?PcK4yfs+ZhA=3D?=
+	=?us-ascii?Q?tYUF+sV33/Tb+dJulcvKO5TfcW7KKEMmnuW02Q6M99fjNgollDDX2mdIJB7I?=
+ =?us-ascii?Q?ddJR2lsX/LLFFKLfxkklkJVCIGjDGm1GswwaQ9jrI7w8dfIygOGxjG/roUXx?=
+ =?us-ascii?Q?eZfIfzSVWUFYiY8LbiC+XFTQNyWvfgkawplZeuTkZ9/mHncRSSbv5AJDHNcn?=
+ =?us-ascii?Q?lXDTlXvHuKdazTHLDM4EV9WrZ9qpFOw4NH5hLfJbwFh4tLGyS8R9lRNHCvKS?=
+ =?us-ascii?Q?n4eCq0CwpSTMiqItq6roeEj0AeUcITvqthrwA69xBHWc9Yb5CKzGkP48WB+A?=
+ =?us-ascii?Q?zZCXjQKuOLPkcvTZ/2Gninx4r+AVpxFig8Na7llArmY13bfpvYePSX75HSUx?=
+ =?us-ascii?Q?bbbpQp+dovpls68/MmH5kb4LI2Sh7d1OOQOc0reDD2hpMn4EdAN9LCRMuPZr?=
+ =?us-ascii?Q?lcu13xRyaa44/2qnz8cGwroA+4Jq844SyxihKdGaO+lzOvgQYO+k/uWeTffx?=
+ =?us-ascii?Q?xED1FMJZUNtxNr6XS9UjY+ytD14y1366dPNbU2pLq3lBlaZgCxCJwUfbIj/p?=
+ =?us-ascii?Q?+3nB+Xxq9cLa+Fp8PvTRzome0wrXeplQB3CGZWthH35OpIN8ZZgAUhisSF6u?=
+ =?us-ascii?Q?qtfH+NxL59x53Vfax1eCM/ZlZvtqqAgp6ya0tAubjaBBe1PSfCQNptEeaNRh?=
+ =?us-ascii?Q?kISpFjM0VCVuGb0g+6k5lB8xYuy4SykSRXyeSHrDIthTbqZKnzLVIqslldZ7?=
+ =?us-ascii?Q?m/8lGLxECxgVsK6yXBBkXi8c3UFfA05xFiDIeAZPlDnCFRapNpwcs+PY/Try?=
+ =?us-ascii?Q?d28ybpdK2sAMoySGZmBaasPqdGeZXM+eErH/369CZ3uH3P9FZSZXRtmI7BRD?=
+ =?us-ascii?Q?uPjcWfEDMDoc7zEJQwa3k884P8VSF3/yzt/m6/uxzPcHTTbZ65LC1/ee+5p4?=
+ =?us-ascii?Q?4aXlxJ9XCbNJa+4SvQcbfsBBBrJs/FgHtYCCNVelz1cF/rNldDoM0+HFyrmG?=
+ =?us-ascii?Q?jFH5zljzaKMGhLwcnXnWiEyIuYl42PBFJk0qewlv4NznghXJLHhAfkKN/N1e?=
+ =?us-ascii?Q?0ukb3UrVT5nw0s5ZMy0Df+/talbKGFUaSCeyof5fBQJauf0ipbIcb2BLRaWd?=
+ =?us-ascii?Q?lqb/Zycx9EGoXK1ouILvOuWAsnhNQhM5rr8uSheIGZcSK7T9hUCMaDHA6ZpL?=
+ =?us-ascii?Q?ff58xLz32HjrHFNpVQa4Mtcfe1xZsz83d3JtnFbPacVZmxS5YAal6YA12tQk?=
+ =?us-ascii?Q?yFKV+Tqb1RqI+SLTxQNFgaGYlHsgtCri2UQRbdCs1o+C4VkPhMHMhFfzUdMW?=
+ =?us-ascii?Q?Z7BtbcbpDXlcZszaTzWCTHPQGDr0AkYuyxA1tLKY4wlwOLryofXPUcHHGE1h?=
+ =?us-ascii?Q?MWk68q8cccJdwxCgcQJmZRNB6Xh2HF2OAW2ZbVmrPja6V5X0vlHki5F/RqWW?=
+ =?us-ascii?Q?gGdDNpvHxaDWVd9nGblgjdAQ8rkYjJWJftq3z72FdD0bI5wtaTSx56oUhOlN?=
+ =?us-ascii?Q?ewA9vqsytrLPs7dLWV5hDFLKDNRTSkehzyAVeR5ysJVw/rarMf+0ZG+WR9vv?=
+ =?us-ascii?Q?oF6rfrWUTOdLDTs=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(52116014)(921020)(38350700014);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aTZzaG9iS25oNVRnLzVMdFpEcXVZSkxDd0lCUEVjd0dNNlBNTG52QS9Oc0dn?=
- =?utf-8?B?Z1VpRmt1LzROSE5IRHptQlJTZjY5OS9qOFQ4Sk9wa1M3YnFZNjE3REI2Szgz?=
- =?utf-8?B?MUtndEhEZ2lMSmFnbjd4eVJaV0g2Q3JzZEZ5dUE0Y2VNVVB3UitEK3BQQjZs?=
- =?utf-8?B?VVRYWFl5QnRpekU4OTI5L2xTZzZERDltdmcvQ0Fzb2Z5YzJEbDZYY3F5SVhR?=
- =?utf-8?B?K3V3dDVJRFBVTjNrSmlMZThKWW41Y0xnUEZWWFZiTmh0dkJOQ04zN2dnUWkv?=
- =?utf-8?B?Qzd3bmNmaXpaK29mMHJQTmRISm9WVDJUMmJPQnp0bXUwZzJuSFE2Q2FiVkRo?=
- =?utf-8?B?ZmcxeGxOMWVRVkpjakJhVmpqZGN1V2dGbTlYM3kzY3l3MFZiTVBBR1lPMklE?=
- =?utf-8?B?TlB4dXVTN01JNHZYMlhSVGlxb0I1R0hVZkFqRzZrZGpjcEoxbVhYaDlrdjhh?=
- =?utf-8?B?dmZIRllkNjBUVC81cE9lcXlWRUNGdVhNRVNwQjhLTEQ0Tk5jYklFZU01QjRj?=
- =?utf-8?B?WjFhaFI3akRra3ZwbGZhNDZseWk4dklBV3ltWjVnQjkzc0FZL2doM0VjVGZY?=
- =?utf-8?B?c3dHMXI0dVpnRiszQUtDZHkydVVBT3ZqcHBDc1BmTmNFVlBkWEhLT3k4R25w?=
- =?utf-8?B?Y2lucGJjZFU1TDgydGdVVFhlQ2p3K1U0SUVaN1dUYmJFY3ZaRmNlSUVmT0Vu?=
- =?utf-8?B?ZndkRUJSUmlqcDNmbTg0ZHpRZWZ4ZXZrMzEyeWdFQWpEa0dVQ1JvZURCQXNn?=
- =?utf-8?B?MytPL1lZVm03VC9WaHhaTm1tL254TVhhcXFqVWYxY1BQK2tQWG1JT0swTDVl?=
- =?utf-8?B?N2t4dEpPTkwxV3pEUnp2WTFWT0hRb2NURjhhYjk2VHZ3am4wbytnV1NBTmdu?=
- =?utf-8?B?Ti9FbXJ5S0pKRUF6cmJsN0hxbERPd1EwOVVmK0ZZUXR6UTZCMjh4Z280aUw5?=
- =?utf-8?B?RDRWOFlJNzB6TndTeVo0dklVTkNpQnl3cjhJNUlvSHVpOXZLMk1vcmJZdVdQ?=
- =?utf-8?B?ZndPVGx4b2JuOXpRaGdxQ0NtNVVWcGdNc2FSYlNpMm8ycFV3Vnk4ZGx2WEJQ?=
- =?utf-8?B?MGY1UUJrbHFrTEg0RzFESU4zK3R3YmFESHhwMmhGZU5paW02eWhMK3o4eG5X?=
- =?utf-8?B?VVhRbGtwWlgxU2J3Sy9aTU9OUTM4eWIxTmZ2SjZKUlV5T05WN1B2elJ6MS9S?=
- =?utf-8?B?eU1MdkZ1cXdCQVhWK05RTzM5L3I3d2l3MGVkNHJWQTR2RXhiaUcxMTh3VGpQ?=
- =?utf-8?B?eU8zTS9KMTQ4bkc0TndEVTdKSXUvQzVvblRjaHNYN1B2UXBkOTJHNDJWMHRG?=
- =?utf-8?B?YXZ5TE92R1owZS9WbTZUK244QjBjM3VWM2wwekZBNFJmcm1NbGFxQ2FHalRV?=
- =?utf-8?B?ZlE2c0pkZmlWbmJDL2RKZ1lLa1RRMmNwQ3dMYytrZUY1QWw5ZzJ0NVNNYjFZ?=
- =?utf-8?B?VGFIWGVrY1ZkRk93TFVXWnMxVGVFNXdsUFVZVnVIaE05WG9jTjY3Q2NCdHNB?=
- =?utf-8?B?ZHR4ZGh2c3JwQk9CdE1RQlBPRE0rbURoMUdWbHQ4SW5iNWJOMlJyUGRmTUI2?=
- =?utf-8?B?UTNkVFMrWlY2V3c2QmxoQmJkOStLK3RWRHNvRGl5RGlXeDlQMG1QMS9HZktL?=
- =?utf-8?B?U1hJM0t0TVBNYTJyZU05YUNWbHBXZVJ6YzNRRFhNTGRtdHRRVHdZRGdBKzdQ?=
- =?utf-8?B?VUV4dHZyV2QyTU1ORi92NXVpSUxteEJuWGJlWC9KOVF2QkFiRTlTKzFXVktC?=
- =?utf-8?B?Wjl6WUsvYkZqOVEwcHhFM3FjWTZaRUJPSzlGVWVEdkFHb3ViUURQdGsyYXFr?=
- =?utf-8?B?Y3A4Z2R1VEIzQUsrYzB4eVZVRmZiYVRiOCttaFdiWjB1VlJPTVBZVzlobjlh?=
- =?utf-8?B?SkN2QlJTTlpvclNzQnZFa2l1SytJd1dkWkRCOVl1emNRQWVPQTE3T2k2Q0JM?=
- =?utf-8?B?eUpUdmRsYkgrR2RiYnIrOUFtQ0hPcnluWG5uK215WXVaYlpjbHIyN24xZDBy?=
- =?utf-8?B?aFIzbHBKWU1oUXVmRTVEQUxWNmMwcjhTK3U0a3JPOWZzMWlVQW9UYkJ4RVd3?=
- =?utf-8?B?VHlaS0xINTMwRkZVZ0RWL1l0Ylg2YnBERytobENRcUJmUU9yVzJ6Mm5Dc3hp?=
- =?utf-8?Q?4sVyhk3KZwzx9cPxxhudGidRv?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	3HTuWMjrKCtsMwsWm8P1gYk0T0NzzBMbMk0Z/XrLQK5KwtR3/UHv5KVrFRU3CjZLQruXdYwfuQe38VUiG0JUU9j0x1xweYxJ1b5pmLUeaOggSYrSmhRrzWTa1b9Z8A//SzYxV2xSZ7bLfOGS1eohKb+pYowc3bi1HpBSEW/NOaX/kNrYUsnpKWtvTOguHTAd1+RChsBI6RdfMOlG4H9ZhG4LVTB0cBhN+TqjTcUtidbwUqW8VmqEIoF9TFDp2AINJNc50iUKZmgs6XSNDiK5T5n4zH2ne29lekBKVLh5LtDittWZGYW+tVHn/3OvwgIQBHYpeN49HnnI59z9wB2a54RQftiwlbhnvTGmek3bCSpcdcKCmvvkm0nwXJhapruQpe87ZOI9ZwJjckPJjOkrJRDUn8mPPh/st3Lty2sKpMKPqLz1/QA5XAfdS1fQKmLE4hGwpzFE81E/yUC1+4i1rjw1vNUKdxgeUPv9hEBvtQuCAm2UuhztR/XHZ1gW3BSLV2x5wcSP4k7bDALaiJlezTslvOIDZXPKT4BXPsA6jFV0cwUggYOBmhUVhEv2Vn0yY+W5AHL6UQSediXf6o45/fTibTxUyIUAN1On7LLdFbwOC966yw6KwOEB1MBPsNhg
-X-OriginatorOrg: uwaterloo.ca
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7a48edb-4020-47c6-b2b6-08dd88213902
-X-MS-Exchange-CrossTenant-AuthSource: YQBPR0101MB6572.CANPRD01.PROD.OUTLOOK.COM
+	=?us-ascii?Q?PBRF9fVhxuyl/BJBLsvceFEpZBN4QKlsKPIwsp+VlTHfeg8QhwmRlq6sgJWF?=
+ =?us-ascii?Q?KVge2Xea1t7YOzpx7KMJOCT/ritN3yHQcXB9aRhenGoRlP23Y7P4YHMz/neu?=
+ =?us-ascii?Q?6QX+Ir+FizHOCcCrQBSrkynbByTRM1QuV9xa27TPD9jz0R0A4Y69oFxJDLXd?=
+ =?us-ascii?Q?EAKBVLRPE2EeXF7M09Ag9ac0dCqXT4EQCVDwDiBiCeeIZTULCaDyiiUNP7U7?=
+ =?us-ascii?Q?DbC4divl32HX7QCE8h7n4ZYiJ+47vd47vdp9jchhdSfn19vVf4YM3L8OEUsN?=
+ =?us-ascii?Q?YHjzvWHiOZ3yVwBMnYmY0HCuSDB7JTW/JEPwG0y1EDR3DGjoPtXi5XREyIrO?=
+ =?us-ascii?Q?3FmEI+g+kah8yKgPYVKzqwLMtYyoTWHVxo6Y6sfNP8wjiuX2grreYiGchUNO?=
+ =?us-ascii?Q?XZlPW96hTdYvFFR0qxR95KmeyTnkVM7oU9GurH48/qMum8yl3Z0snKmPV6Gm?=
+ =?us-ascii?Q?Ym1Tj/gOMu5hVS/V8/264AWmb3RjNXvDw8hugzU5rZLpzTEnobckvSeoKhBG?=
+ =?us-ascii?Q?Dbh+K+PLyssieAKv7IA1xmQ3vBGKB564EvLuolAkTJArKnnPUm+s4aNqH3RG?=
+ =?us-ascii?Q?VIPzyD4S34Lcr6X09FornTGZU2KLMUlge0PnjjH2IN97rlKmXz44vWu3/r5T?=
+ =?us-ascii?Q?95iN9Cd3W1Ug6Uxs4Gv+ksCPYo3DVKSjqRP54aWdnf38wnodq1tvyzEnYa13?=
+ =?us-ascii?Q?U1GE8Othj9U8M+oNJ3NZ5pbD0xzAl1uNFhOOd73Ibh5QaKZf8d9nCTsClIEZ?=
+ =?us-ascii?Q?UlpDGVabi0oQCQjIM13+fX0Q3cbEHk0Vxadx0TQXt0GFIusG1KUHkC52sQjk?=
+ =?us-ascii?Q?f00w2uqXbkhYEiuPL99KiWd5NaPGn3ADAdSqrEar5BEQkD5A9MHyj7BQWBcz?=
+ =?us-ascii?Q?KXtsExbiaUoaZmlqeUimznuEDx8zBS1chpzwvhjiao9tqVuayJorpYg1M63g?=
+ =?us-ascii?Q?df4OPEe/a3DStYputgBflxr7BdbpqPxUifJBS4CruEZxtMDeLYh/xVQNAaGU?=
+ =?us-ascii?Q?XRCLdrcFvgnoQ4ag6IL3SEscSGZOdHjDSMSI2e539QOdjlhF6jbF4xoU2LlU?=
+ =?us-ascii?Q?hWPZQ+3mv+8h5gYvOc/jNAfcOSp2zsZU07VcsBgkPZOk3eryudr+uzJ6/ZNV?=
+ =?us-ascii?Q?HSpLcz/2GYBORegPFrIa7H2Z7K+qQJhez+QicfMPUK2FOLYmmKo2OcJ8lHlu?=
+ =?us-ascii?Q?WanmVdvk6AywHijwOAA1D19sQtqGoyIcHHyAN//6XVf8z5Upacgz5f0VnxqW?=
+ =?us-ascii?Q?JChPPycNk/4QCZVuRSLtvF7Y/kZsPCrmkQr6AGhJVCcez4Fzi1H4hQ0xnQw3?=
+ =?us-ascii?Q?8ZuNXkKoslSGV62cqYrwdg6flaneZv5pL6hZ07GYaqOAD/KuVyokyBfMKD9e?=
+ =?us-ascii?Q?SX6lBG0hImLLApVN//k/PThIZ5SGTrzcZPU9Dec4OxVNkbtSjF+d9tGuLqCx?=
+ =?us-ascii?Q?Ny5y+zPToi+2mYNEVXHFZCtxshjeyRUCzxN6JzR7BPjKQr1tbv1uMLoX1mlL?=
+ =?us-ascii?Q?IeEv40JDy1Qtv31ulhicRpKJQjy0XK4N+vyCRi1y1lqReoJ9d17RBH9PN1XO?=
+ =?us-ascii?Q?VFhDd3vx9IOvnoh3nRSZQg1eRj8oJgecqirG9WTm6e+ziNbB8yxzqZyono+2?=
+ =?us-ascii?Q?/w=3D=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae290281-cd3c-47f0-0437-08dd881ef9c2
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 19:57:23.1703
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2025 19:41:17.9234
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 723a5a87-f39a-4a22-9247-3fc240c01396
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GEdXGcMx1WjBQau/abO+PmWD1S24k64Bu8aodIJVrQBSS2nRc1AQw4wjzkWjH/ZnN/AwmoYTDa3gnyy5kT9ZFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: YT2PR01MB6029
+X-MS-Exchange-CrossTenant-UserPrincipalName: FBvFbdWT1AlsOop8/2XpEosenfCu7XT/tKM8OlANfyVvYaiga6O1S7eMJR7WNjUeCZCi8MEjKi04f0zByeCjnM8bxymCm7z4FnHUopmtAoM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7736
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDMwMDE0NCBTYWx0ZWRfX2E2ppwFQbMs7 Ko04d1QlAdR+LSSBLZI5n5syFkwjHR+S0I/+VUiZOMglhgqk929jQikL2e4rO/6dCYo/O9ca7x0 +KsGEUFz4VH0qLOufWoAag4tn/uvzDiUis1nDNrbI25hp2Xb+m4A1cY7ZN8NK/X3kN3nmR0Xmkf
+ diu73vUCZvLl9/9VX107JS/l9ynPM08rSPbP0HQLfkTzQmWcbH6o5IDHJP9w3ILnvxtrf2IRcY2 oVzt+6dizLbC5bTbk6mSJ8xPtxBKVDsxOXSoE3qwyiU/c7odWiqJdbYKA2eZfrV57tfHZ5qZm1B pyMg+ZfCdXPiqQjXkpZ5oJ6tXz0jcFbQIxjKIDc9rnXRsy5sz5W5vdPGhbH075Htc56Jag041CP
+ AGfCZ9HrY0NPNTNz+lt3TJO9Q9AI3wnswQ9t0unuxJlMbWyf6frjsRIIcYn00jbZQJ3wIVmm
+X-Authority-Analysis: v=2.4 cv=MNVgmNZl c=1 sm=1 tr=0 ts=68127ce0 cx=c_pps a=dIBsZBmI1wyUZqnlzmwqRg==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=XR8D0OoHHMoA:10
+ a=0kUYKlekyDsA:10 a=VwQbUJbxAAAA:8 a=64Cc0HZtAAAA:8 a=51KnYewcZuRi7D_KieYA:9
+X-Proofpoint-GUID: bySJR8mZlY3hCKvcHvzGtasbWRnI_pja
+X-Proofpoint-ORIG-GUID: bySJR8mZlY3hCKvcHvzGtasbWRnI_pja
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-30_06,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Reason: safe
 
-On 2025-04-30 12:58, Samiullah Khawaja wrote:
-> On Wed, Apr 30, 2025 at 8:23 AM Martin Karsten <mkarsten@uwaterloo.ca> wrote:
->>
->> On 2025-04-28 09:50, Martin Karsten wrote:
->>> On 2025-04-24 16:02, Samiullah Khawaja wrote:
->>
->> [snip]
->>
->>>> | Experiment | interrupts | SO_BUSYPOLL | SO_BUSYPOLL(separate) | NAPI
->>>> threaded |
->>>> |---|---|---|---|---|
->>>> | 12 Kpkt/s + 0us delay | | | | |
->>>> |  | p5: 12700 | p5: 12900 | p5: 13300 | p5: 12800 |
->>>> |  | p50: 13100 | p50: 13600 | p50: 14100 | p50: 13000 |
->>>> |  | p95: 13200 | p95: 13800 | p95: 14400 | p95: 13000 |
->>>> |  | p99: 13200 | p99: 13800 | p99: 14400 | p99: 13000 |
->>>> | 32 Kpkt/s + 30us delay | | | | |
->>>> |  | p5: 19900 | p5: 16600 | p5: 13100 | p5: 12800 |
->>>> |  | p50: 21100 | p50: 17000 | p50: 13700 | p50: 13000 |
->>>> |  | p95: 21200 | p95: 17100 | p95: 14000 | p95: 13000 |
->>>> |  | p99: 21200 | p99: 17100 | p99: 14000 | p99: 13000 |
->>>> | 125 Kpkt/s + 6us delay | | | | |
->>>> |  | p5: 14600 | p5: 17100 | p5: 13300 | p5: 12900 |
->>>> |  | p50: 15400 | p50: 17400 | p50: 13800 | p50: 13100 |
->>>> |  | p95: 15600 | p95: 17600 | p95: 14000 | p95: 13100 |
->>>> |  | p99: 15600 | p99: 17600 | p99: 14000 | p99: 13100 |
->>>> | 12 Kpkt/s + 78us delay | | | | |
->>>> |  | p5: 14100 | p5: 16700 | p5: 13200 | p5: 12600 |
->>>> |  | p50: 14300 | p50: 17100 | p50: 13900 | p50: 12800 |
->>>> |  | p95: 14300 | p95: 17200 | p95: 14200 | p95: 12800 |
->>>> |  | p99: 14300 | p99: 17200 | p99: 14200 | p99: 12800 |
->>>> | 25 Kpkt/s + 38us delay | | | | |
->>>> |  | p5: 19900 | p5: 16600 | p5: 13000 | p5: 12700 |
->>>> |  | p50: 21000 | p50: 17100 | p50: 13800 | p50: 12900 |
->>>> |  | p95: 21100 | p95: 17100 | p95: 14100 | p95: 12900 |
->>>> |  | p99: 21100 | p99: 17100 | p99: 14100 | p99: 12900 |
->>>>
->>>>    ## Observations
->>>>
->>>> - Here without application processing all the approaches give the same
->>>>     latency within 1usecs range and NAPI threaded gives minimum latency.
->>>> - With application processing the latency increases by 3-4usecs when
->>>>     doing inline polling.
->>>> - Using a dedicated core to drive napi polling keeps the latency same
->>>>     even with application processing. This is observed both in userspace
->>>>     and threaded napi (in kernel).
->>>> - Using napi threaded polling in kernel gives lower latency by
->>>>     1-1.5usecs as compared to userspace driven polling in separate core.
->>>> - With application processing userspace will get the packet from recv
->>>>     ring and spend some time doing application processing and then do napi
->>>>     polling. While application processing is happening a dedicated core
->>>>     doing napi polling can pull the packet of the NAPI RX queue and
->>>>     populate the AF_XDP recv ring. This means that when the application
->>>>     thread is done with application processing it has new packets ready to
->>>>     recv and process in recv ring.
->>>> - Napi threaded busy polling in the kernel with a dedicated core gives
->>>>     the consistent P5-P99 latency.
->>> I've experimented with this some more. I can confirm latency savings of
->>> about 1 usec arising from busy-looping a NAPI thread on a dedicated core
->>> when compared to in-thread busy-polling. A few more comments:
-> Thanks for the experiments and reproducing this. I really appreciate it.
->>>
->>> 1) I note that the experiment results above show that 'interrupts' is
->>> almost as fast as 'NAPI threaded' in the base case. I cannot confirm
->>> these results, because I currently only have (very) old hardware
->>> available for testing. However, these results worry me in terms of
->>> necessity of the threaded busy-polling mechanism - also see Item 4) below.
->>
->> I want to add one more thought, just to spell this out explicitly:
->> Assuming the latency benefits result from better cache utilization of
->> two shorter processing loops (NAPI and application) using a dedicated
->> core each, it would make sense to see softirq processing on the NAPI
->> core being almost as fast. While there might be small penalty for the
->> initial hardware interrupt, the following softirq processing does not
-> The interrupt experiment in the last row demonstrates the penalty you
-> mentioned. While this effect might be acceptable for some use cases,
-> it could be problematic in scenarios sensitive to jitter (P99
-> latency).
+Introduce new XDP helpers:
+- xdp_headlen: Similar to skb_headlen
+- xdp_headroom: Similar to skb_headroom
+- xdp_metadata_len: Similar to skb_metadata_len
 
-Just to be clear andexplicit: The difference is 200 nsecs for P99 (13200 
-vs 13000), i.e, 100 nsecs per core burned on either side. As I mentioned 
-before, I don't think the 100%-load experiments (those with nonzero 
-delay setting) are representative of any real-world scenario.
+Integrate these helpers into tap, tun, and XDP implementation to start.
 
-Thanks,
-Martin
+No functional changes introduced.
 
->> differ much from what a NAPI spin-loop does? The experiments seem to
->> corroborate this, because latency results for 'interrupts' and 'NAPI
->> threaded' are extremely close.
->>
->> In this case, it would be essential that interrupt handling happens on a
->> dedicated empty core, so it can react to hardware interrupts right away
->> and its local cache isn't dirtied by other code than softirq processing.
->> While this also means dedicating a entire core to NAPI processing, at
->> least the core wouldn't have to spin all the time, hopefully reducing
->> power consumption and heat generation.
->>
->> Thanks,
->> Martin
->>> 2) The experiments reported here are symmetric in that they use the same
->>> polling variant at both the client and the server. When mixing things up
->>> by combining different polling variants, it becomes clear that the
->>> latency savings are split between both ends. The total savings of 1 usec
->>> are thus a combination of 0.5 usec are either end. So the ultimate
->>> trade-off is 0.5 usec latency gain for burning 1 core.
->>>
->>> 3) I believe the savings arise from running two tight loops (separate
->>> NAPI and application) instead of one longer loop. The shorter loops
->>> likely result in better cache utilization on their respective dedicated
->>> cores (and L1 caches). However I am not sure right how to explicitly
->>> confirm this.
->>>
->>> 4) I still believe that the additional experiments with setting both
->>> delay and period are meaningless. They create corner cases where rate *
->>> delay is about 1. Nobody would run a latency-critical system at 100%
->>> load. I also note that the experiment program xsk_rr fails when trying
->>> to increase the load beyond saturation (client fails with 'xsk_rr:
->>> oustanding array full').
->>>
->>> 5) I worry that a mechanism like this might be misinterpreted as some
->>> kind of magic wand for improving performance and might end up being used
->>> in practice and cause substantial overhead without much gain. If
->>> accepted, I would hope that this will be documented very clearly and
->>> have appropriate warnings attached. Given that the patch cover letter is
->>> often used as a basis for documentation, I believe this should be
->>> spelled out in the cover letter.
->>>
->>> With the above in mind, someone else will need to judge whether (at
->>> most) 0.5 usec for burning a core is a worthy enough trade-off to
->>> justify inclusion of this mechanism. Maybe someone else can take a
->>> closer look at the 'interrupts' variant on modern hardware.
->>>
->>> Thanks,
->>> Martin
->>
+Signed-off-by: Jon Kohler <jon@nutanix.com>
+---
+v1->v2: Integrate feedback from Willem
+https://patchwork.kernel.org/project/netdevbpf/patch/20250430182921.1704021-1-jon@nutanix.com/
+
+ drivers/net/tap.c |  6 +++---
+ drivers/net/tun.c | 12 +++++------
+ include/net/xdp.h | 54 +++++++++++++++++++++++++++++++++++++++++++----
+ net/core/xdp.c    | 12 +++++------
+ 4 files changed, 65 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index d4ece538f1b2..a62fbca4b08f 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1048,7 +1048,7 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
+ 	struct sk_buff *skb;
+ 	int err, depth;
+ 
+-	if (unlikely(xdp->data_end - xdp->data < ETH_HLEN)) {
++	if (unlikely(xdp_headlen(xdp) < ETH_HLEN)) {
+ 		err = -EINVAL;
+ 		goto err;
+ 	}
+@@ -1062,8 +1062,8 @@ static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
+ 		goto err;
+ 	}
+ 
+-	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+-	skb_put(skb, xdp->data_end - xdp->data);
++	skb_reserve(skb, xdp_headroom(xdp));
++	skb_put(skb, xdp_headlen(xdp));
+ 
+ 	skb_set_network_header(skb, ETH_HLEN);
+ 	skb_reset_mac_header(skb);
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 7babd1e9a378..4c47eed71986 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1567,7 +1567,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
+ 			dev_core_stats_rx_dropped_inc(tun->dev);
+ 			return err;
+ 		}
+-		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
++		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
+ 		break;
+ 	case XDP_TX:
+ 		err = tun_xdp_tx(tun->dev, xdp);
+@@ -1575,7 +1575,7 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
+ 			dev_core_stats_rx_dropped_inc(tun->dev);
+ 			return err;
+ 		}
+-		dev_sw_netstats_rx_add(tun->dev, xdp->data_end - xdp->data);
++		dev_sw_netstats_rx_add(tun->dev, xdp_headlen(xdp));
+ 		break;
+ 	case XDP_PASS:
+ 		break;
+@@ -2355,7 +2355,7 @@ static int tun_xdp_one(struct tun_struct *tun,
+ 		       struct xdp_buff *xdp, int *flush,
+ 		       struct tun_page *tpage)
+ {
+-	unsigned int datasize = xdp->data_end - xdp->data;
++	unsigned int datasize = xdp_headlen(xdp);
+ 	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+ 	struct virtio_net_hdr *gso = &hdr->gso;
+ 	struct bpf_prog *xdp_prog;
+@@ -2415,14 +2415,14 @@ static int tun_xdp_one(struct tun_struct *tun,
+ 		goto out;
+ 	}
+ 
+-	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+-	skb_put(skb, xdp->data_end - xdp->data);
++	skb_reserve(skb, xdp_headroom(xdp));
++	skb_put(skb, xdp_headlen(xdp));
+ 
+ 	/* The externally provided xdp_buff may have no metadata support, which
+ 	 * is marked by xdp->data_meta being xdp->data + 1. This will lead to a
+ 	 * metasize of -1 and is the reason why the condition checks for > 0.
+ 	 */
+-	metasize = xdp->data - xdp->data_meta;
++	metasize = xdp_metadata_len(xdp);
+ 	if (metasize > 0)
+ 		skb_metadata_set(skb, metasize);
+ 
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index 48efacbaa35d..044345b18305 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -151,10 +151,56 @@ xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
+ 	return (struct skb_shared_info *)xdp_data_hard_end(xdp);
+ }
+ 
++/**
++ * xdp_headlen - Calculate the length of the data in an XDP buffer
++ * @xdp: Pointer to the XDP buffer structure
++ *
++ * Compute the length of the data contained in the XDP buffer. Does not
++ * include frags, use xdp_get_buff_len() for that instead.
++ *
++ * Analogous to skb_headlen().
++ *
++ * Return: The length of the data in the XDP buffer in bytes.
++ */
++static inline unsigned int xdp_headlen(const struct xdp_buff *xdp)
++{
++	return xdp->data_end - xdp->data;
++}
++
++/**
++ * xdp_headroom - Calculate the headroom available in an XDP buffer
++ * @xdp: Pointer to the XDP buffer structure
++ *
++ * Compute the headroom in an XDP buffer.
++ *
++ * Analogous to the skb_headroom().
++ *
++ * Return: The size of the headroom in bytes.
++ */
++static inline unsigned int xdp_headroom(const struct xdp_buff *xdp)
++{
++	return xdp->data - xdp->data_hard_start;
++}
++
++/**
++ * xdp_metadata_len - Calculate the length of metadata in an XDP buffer
++ * @xdp: Pointer to the XDP buffer structure
++ *
++ * Compute the length of the metadata region in an XDP buffer.
++ *
++ * Analogous to skb_metadata_len().
++ *
++ * Return: The length of the metadata in bytes.
++ */
++static inline unsigned int xdp_metadata_len(const struct xdp_buff *xdp)
++{
++	return xdp->data - xdp->data_meta;
++}
++
+ static __always_inline unsigned int
+ xdp_get_buff_len(const struct xdp_buff *xdp)
+ {
+-	unsigned int len = xdp->data_end - xdp->data;
++	unsigned int len = xdp_headlen(xdp);
+ 	const struct skb_shared_info *sinfo;
+ 
+ 	if (likely(!xdp_buff_has_frags(xdp)))
+@@ -364,8 +410,8 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
+ 	int metasize, headroom;
+ 
+ 	/* Assure headroom is available for storing info */
+-	headroom = xdp->data - xdp->data_hard_start;
+-	metasize = xdp->data - xdp->data_meta;
++	headroom = xdp_headroom(xdp);
++	metasize = xdp_metadata_len(xdp);
+ 	metasize = metasize > 0 ? metasize : 0;
+ 	if (unlikely((headroom - metasize) < sizeof(*xdp_frame)))
+ 		return -ENOSPC;
+@@ -377,7 +423,7 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
+ 	}
+ 
+ 	xdp_frame->data = xdp->data;
+-	xdp_frame->len  = xdp->data_end - xdp->data;
++	xdp_frame->len  = xdp_headlen(xdp);
+ 	xdp_frame->headroom = headroom - sizeof(*xdp_frame);
+ 	xdp_frame->metasize = metasize;
+ 	xdp_frame->frame_sz = xdp->frame_sz;
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index f86eedad586a..0d56320a7ff9 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -581,8 +581,8 @@ struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp)
+ 
+ 	/* Clone into a MEM_TYPE_PAGE_ORDER0 xdp_frame. */
+ 	metasize = xdp_data_meta_unsupported(xdp) ? 0 :
+-		   xdp->data - xdp->data_meta;
+-	totsize = xdp->data_end - xdp->data + metasize;
++		   xdp_metadata_len(xdp);
++	totsize = xdp_headlen(xdp) + metasize;
+ 
+ 	if (sizeof(*xdpf) + totsize > PAGE_SIZE)
+ 		return NULL;
+@@ -646,10 +646,10 @@ struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+-	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+-	__skb_put(skb, xdp->data_end - xdp->data);
++	skb_reserve(skb, xdp_headroom(xdp));
++	__skb_put(skb, xdp_headlen(xdp));
+ 
+-	metalen = xdp->data - xdp->data_meta;
++	metalen = xdp_metadata_len(xdp);
+ 	if (metalen > 0)
+ 		skb_metadata_set(skb, metalen);
+ 
+@@ -763,7 +763,7 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+ 
+ 	memcpy(__skb_put(skb, len), xdp->data_meta, LARGEST_ALIGN(len));
+ 
+-	metalen = xdp->data - xdp->data_meta;
++	metalen = xdp_metadata_len(xdp);
+ 	if (metalen > 0) {
+ 		skb_metadata_set(skb, metalen);
+ 		__skb_pull(skb, metalen);
+-- 
+2.43.0
 
 
