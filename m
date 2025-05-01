@@ -1,79 +1,61 @@
-Return-Path: <netdev+bounces-187203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCA27AA5A10
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 05:51:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236DDAA5A16
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 05:52:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952613AE320
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 03:51:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 757C77B8CD6
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 03:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9D61EB193;
-	Thu,  1 May 2025 03:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6F123183A;
+	Thu,  1 May 2025 03:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Uog9HKG9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pUrl7qfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1CB194080;
-	Thu,  1 May 2025 03:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E4922FDF1;
+	Thu,  1 May 2025 03:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746071493; cv=none; b=SXOXZjXGAM0Hz54mEy/GpaINdjL2NI/izjZWRLopSj9Tff4I7qpdofR7ePD1JEjJy6H9Sm8ZFO+PBUF6nwUfsIea56SGHjb3+18U4U09F3Ajp25/+9EaDrONBoIexHZGIynkSr2L83OC6i65/+zVuLTTILlYMiRWRNBtmXE1k+I=
+	t=1746071546; cv=none; b=iBB1dTw/I6z65WI4+5o2Qz8cgy9DXnwv3w66NxhWsjlwLOOcp+A6kqCS+K7Amt0SLTxUV20k6kXdOqoeCTNN20tCfX5SCf9Y1wMQh0Nhb/+uO/UpuDAcUeoWz08sRbWMPpKVDuY0pZAlxGkBRCgDbIgqagD3mqFJL9Tpc+sX6MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746071493; c=relaxed/simple;
-	bh=KVlMb35ubI+FQLca5L5hYJe3JN5pCP4/Z8oYHZx0BoA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HPnkfBsQFNs7DCGkl5ON8pdGUhk262ZTp9qMZ2Q/vA9LE69p7kFBPT0O29vNuYZo4SP/nx/FYNUFnabvpjlqlmP3QLCqAVaiO/qX/MJfDV8cXiHvS43E4O6WEe5T6rlYMr1ubnth0CtvvI8g4CfT3zLU+kIjFiLBA1vD9t+gy5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Uog9HKG9; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746071492; x=1777607492;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ieN6Uufg5eN4Yl9eD7qnOlPh9TDKaa21BdQlQv6AVLs=;
-  b=Uog9HKG9oX89jZ0z8OkNZc5M8dq/NqX+UWudZm4ypCdF8Xgv+I6koDWe
-   DHiXHw9KVj8ExIkn2F8W/oX4aKC5JJsBUBJ4APhwfkj8bf0N+8F2OYrSa
-   OlgsLsdGA6J/0TlgEUtktoTS9clpazhlv9APdSh1pOE85dkzAFqD38Sww
-   M=;
-X-IronPort-AV: E=Sophos;i="6.15,253,1739836800"; 
-   d="scan'208";a="45594019"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 03:51:30 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:42164]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.114:2525] with esmtp (Farcaster)
- id 7bc7e118-2ba3-4338-9316-07c9580be08c; Thu, 1 May 2025 03:51:29 +0000 (UTC)
-X-Farcaster-Flow-ID: 7bc7e118-2ba3-4338-9316-07c9580be08c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 03:51:28 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 03:51:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jlayton@kernel.org>
-CC: <airlied@gmail.com>, <akpm@linux-foundation.org>, <andrew@lunn.ch>,
-	<davem@davemloft.net>, <dri-devel@lists.freedesktop.org>,
-	<edumazet@google.com>, <horms@kernel.org>, <intel-gfx@lists.freedesktop.org>,
-	<jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>,
-	<nathan@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<qasdev00@gmail.com>, <rodrigo.vivi@intel.com>, <simona@ffwll.ch>,
-	<tursulin@ursulin.net>, <tzimmermann@suse.de>
-Subject: Re: [PATCH v6 08/10] net: add symlinks to ref_tracker_dir for netns
-Date: Wed, 30 Apr 2025 20:50:49 -0700
-Message-ID: <20250501035115.76182-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cf11e228dfa247476a498a37f88a96d8e0e2585c.camel@kernel.org>
-References: <cf11e228dfa247476a498a37f88a96d8e0e2585c.camel@kernel.org>
+	s=arc-20240116; t=1746071546; c=relaxed/simple;
+	bh=39IOGPGemYqMgPsgi7Xt8KWzR7zEQRPrG3lVcmjfL64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MEgmndEX15V7VSuo3riSItg/zzQMLO5DWgjwHYh8FVJQRo3ANI0Im7GcbnI3ZvKIGyJtHLYePa/gUgpzCi3QneR/LWbMAt/Mq5u9cPVQZQxyXFe6bsVI++3PULfN54zelrSdjRuzBg1b7Rerkh1+6M6bmi7p13HoYSa6aQdNEzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pUrl7qfO; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746071532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x4IzOhxyRF1krYhh7iapiMZajQWSUqZZCDSXkt0jpIQ=;
+	b=pUrl7qfOqIBEI9lkJOE1EDQxJHigOA1j/ASbnBX9B0Xs3oHPH1cTHTiBTNrnKODyPgHF6p
+	veHPla/BOFnVJjmBTLkdlPu7Q8OSfdOJta+FVpbllfRsVXZ5RXzz4EKD9/PDgt2mNQKG0b
+	ni1EeXpopA6zawTiG1Sewva6gvS7z1s=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC net-next v1 1/2] udp: Introduce UDP_STOP_RCV option for UDP
+Date: Thu,  1 May 2025 11:51:08 +0800
+Message-ID: <20250501035116.69391-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,76 +63,147 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Migadu-Flow: FLOW_OUT
 
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 30 Apr 2025 20:42:40 -0700
-> On Wed, 2025-04-30 at 20:07 -0700, Kuniyuki Iwashima wrote:
-> > From: Jeff Layton <jlayton@kernel.org>
-> > Date: Wed, 30 Apr 2025 19:59:23 -0700
-> > > On Wed, 2025-04-30 at 14:29 -0700, Kuniyuki Iwashima wrote:
-> > > > From: Jeff Layton <jlayton@kernel.org>
-> > > > Date: Wed, 30 Apr 2025 08:06:54 -0700
-> > > > > After assigning the inode number to the namespace, use it to create a
-> > > > > unique name for each netns refcount tracker with the ns.inum value in
-> > > > > it, and register a symlink to the debugfs file for it.
-> > > > > 
-> > > > > init_net is registered before the ref_tracker dir is created, so add a
-> > > > > late_initcall() to register its files and symlinks.
-> > > > > 
-> > > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > > > ---
-> > > > >  net/core/net_namespace.c | 28 +++++++++++++++++++++++++++-
-> > > > >  1 file changed, 27 insertions(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > > > > index 008de9675ea98fa8c18628b2f1c3aee7f3ebc9c6..6cbc8eabb8e56c847fc34fa8ec9994e8b275b0af 100644
-> > > > > --- a/net/core/net_namespace.c
-> > > > > +++ b/net/core/net_namespace.c
-> > > > > @@ -763,12 +763,38 @@ struct net *get_net_ns_by_pid(pid_t pid)
-> > > > >  }
-> > > > >  EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
-> > > > >  
-> > > > > +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
-> > > > > +static void net_ns_net_debugfs(struct net *net)
-> > > > > +{
-> > > > > +	ref_tracker_dir_symlink(&net->refcnt_tracker, "netns-%u-refcnt", net->ns.inum);
-> > > > > +	ref_tracker_dir_symlink(&net->notrefcnt_tracker, "netns-%u-notrefcnt", net->ns.inum);
-> > > > 
-> > > > Could you use net->net_cookie ?
-> > > > 
-> > > > net->ns.inum is always 1 when CONFIG_PROC_FS=n.
-> > > 
-> > > My main use-case for this is to be able to match the inode number in
-> > > the /proc/<pid>/ns/net symlink with the correct ref_tracker debugfs
-> > > file. Is there a way to use the net_cookie to make that association?
-> > 
-> > It's roundabout, but  net_cookie can be retrieved by creating a
-> > random socket in the netns and calling setsockopt(SO_NETNS_COOKIE).
-> > 
-> > Ido proposed a handy ip-netns subcommand here, and I guess it will
-> > be implemented soon(?)
-> > https://lore.kernel.org/netdev/1d99d7ccfc3a7a18840948ab6ba1c0b5fad90901.camel@fejes.dev/
-> 
-> For the cases where I was looking at netns leaks, there were no more
-> processes in the container, so there was no way to enter the container
-> and spawn a socket at that point.
+For some services we are using "established-over-unconnected" model.
 
-Then how do you get net->ns.inum ?
+'''
+// create unconnected socket and 'listen()'
+srv_fd = socket(AF_INET, SOCK_DGRAM)
+setsockopt(srv_fd, SO_REUSEPORT)
+bind(srv_fd, SERVER_ADDR, SERVER_PORT)
 
+// 'accept()'
+data, client_addr = recvmsg(srv_fd)
 
-> 
-> The point of the symlinks is to have a way to easily identify what
-> you're tracking. NAME_MAX is 255. We could do something like this
-> instead:
-> 
->    snprintf(..., "netns-%u-%llx-refcnt", net->ns.inum, net->net_cookie);
-> 
-> Obviously the inums would all be 1 when PROC_FS=n, but the cookies
-> would be unique. Would that work?
+// create a connected socket for this request
+cli_fd = socket(AF_INET, SOCK_DGRAM)
+setsockopt(cli_fd, SO_REUSEPORT)
+bind(cli_fd, SERVER_ADDR, SERVER_PORT)
+connect(cli, client_addr)
+...
+// do handshake with cli_fd
+'''
 
-This works, but depending on the question above, there's no point in
-using inum ?
+This programming pattern simulates accept() using UDP, creating a new
+socket for each client request. The server can then use separate sockets
+to handle client requests, avoiding the need to use a single UDP socket
+for I/O transmission.
+
+But there is a race condition between the bind() and connect() of the
+connected socket:
+We might receive unexpected packets belonging to the unconnected socket
+before connect() is executed, which is not what we need.
+(Of course, before connect(), the unconnected socket will also receive
+packets from the connected socket, which is easily resolved because
+upper-layer protocols typically require explicit boundaries, and we
+receive a complete packet before creating a connected socket.)
+
+Before this patch, the connected socket had to filter requests at recvmsg
+time, acting as a dispatcher to some extent. With this patch, we can
+consider the bind and connect operations to be atomic.
+
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+---
+ include/linux/udp.h      |  1 +
+ include/uapi/linux/udp.h |  1 +
+ net/ipv4/udp.c           | 13 ++++++++++---
+ net/ipv6/udp.c           |  5 +++--
+ 4 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/udp.h b/include/linux/udp.h
+index 895240177f4f..8d281a0c0d9d 100644
+--- a/include/linux/udp.h
++++ b/include/linux/udp.h
+@@ -42,6 +42,7 @@ enum {
+ 	UDP_FLAGS_ENCAP_ENABLED, /* This socket enabled encap */
+ 	UDP_FLAGS_UDPLITE_SEND_CC, /* set via udplite setsockopt */
+ 	UDP_FLAGS_UDPLITE_RECV_CC, /* set via udplite setsockopt */
++	UDP_FLAGS_STOP_RCV, /* Stop receiving packets */
+ };
+ 
+ struct udp_sock {
+diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
+index edca3e430305..bb8e0a749a55 100644
+--- a/include/uapi/linux/udp.h
++++ b/include/uapi/linux/udp.h
+@@ -34,6 +34,7 @@ struct udphdr {
+ #define UDP_NO_CHECK6_RX 102	/* Disable accepting checksum for UDP6 */
+ #define UDP_SEGMENT	103	/* Set GSO segmentation size */
+ #define UDP_GRO		104	/* This socket can receive UDP GRO packets */
++#define UDP_STOP_RCV	105	/* This socket will not receive any packets */
+ 
+ /* UDP encapsulation types */
+ #define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* unused  draft-ietf-ipsec-nat-t-ike-00/01 */
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index f9f5b92cf4b6..764d337ab1b3 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -376,7 +376,8 @@ static int compute_score(struct sock *sk, const struct net *net,
+ 
+ 	if (!net_eq(sock_net(sk), net) ||
+ 	    udp_sk(sk)->udp_port_hash != hnum ||
+-	    ipv6_only_sock(sk))
++	    ipv6_only_sock(sk) ||
++	    udp_test_bit(STOP_RCV, sk))
+ 		return -1;
+ 
+ 	if (sk->sk_rcv_saddr != daddr)
+@@ -494,7 +495,7 @@ static struct sock *udp4_lib_lookup2(const struct net *net,
+ 
+ 			result = inet_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
+ 						       saddr, sport, daddr, hnum, udp_ehashfn);
+-			if (!result) {
++			if (!result || udp_test_bit(STOP_RCV, result)) {
+ 				result = sk;
+ 				continue;
+ 			}
+@@ -3031,7 +3032,9 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+ 		set_xfrm_gro_udp_encap_rcv(up->encap_type, sk->sk_family, sk);
+ 		sockopt_release_sock(sk);
+ 		break;
+-
++	case UDP_STOP_RCV:
++		udp_assign_bit(STOP_RCV, sk, valbool);
++		break;
+ 	/*
+ 	 * 	UDP-Lite's partial checksum coverage (RFC 3828).
+ 	 */
+@@ -3120,6 +3123,10 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+ 		val = udp_test_bit(GRO_ENABLED, sk);
+ 		break;
+ 
++	case UDP_STOP_RCV:
++		val = udp_test_bit(STOP_RCV, sk);
++		break;
++
+ 	/* The following two cannot be changed on UDP sockets, the return is
+ 	 * always 0 (which corresponds to the full checksum coverage of UDP). */
+ 	case UDPLITE_SEND_CSCOV:
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 7317f8e053f1..55896a78e94b 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -137,7 +137,8 @@ static int compute_score(struct sock *sk, const struct net *net,
+ 
+ 	if (!net_eq(sock_net(sk), net) ||
+ 	    udp_sk(sk)->udp_port_hash != hnum ||
+-	    sk->sk_family != PF_INET6)
++	    sk->sk_family != PF_INET6 ||
++	    udp_test_bit(STOP_RCV, sk))
+ 		return -1;
+ 
+ 	if (!ipv6_addr_equal(&sk->sk_v6_rcv_saddr, daddr))
+@@ -245,7 +246,7 @@ static struct sock *udp6_lib_lookup2(const struct net *net,
+ 
+ 			result = inet6_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
+ 							saddr, sport, daddr, hnum, udp6_ehashfn);
+-			if (!result) {
++			if (!result || udp_test_bit(STOP_RCV, result)) {
+ 				result = sk;
+ 				continue;
+ 			}
+-- 
+2.47.1
+
 
