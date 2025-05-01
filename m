@@ -1,139 +1,192 @@
-Return-Path: <netdev+bounces-187342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A38AA6785
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:43:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4CAAA6799
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC86A3B1BEF
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:43:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AA9A9881D0
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296B1266B7E;
-	Thu,  1 May 2025 23:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2D92609EC;
+	Thu,  1 May 2025 23:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JQfzeLGL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v4XTPbg6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B5D21B90B;
-	Thu,  1 May 2025 23:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF57833987
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 23:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746143021; cv=none; b=WWcj4X0AwpX5QMeHL8bPAYch1fP1KuDoDoh9njN6p/v9n5oHPSA15sJI6IY4EqqBbdvq0zWUSQeXEVhUe3v4/5b47mFF5WSTCnchd4sIVDFixjrYyTmMS4syHG6I42vCOCJrKsgQRTkU2F6J2jQ455o4dwgWHgQyNlfkTlINRbA=
+	t=1746143909; cv=none; b=U82UjutpynUNm5AYotgJT2+hnGa/K5HmF3+K+Yndb+UYhuq4KY5ZI2LFXkJOJi8UL5zPdDry00aM/HR3NjbIsQLATDH/dNCYNg9dtL8YoDZA6TYDEvflN278aN7Zv9eXNAdkjg/sCe0o06rpOTx909sMjfOWdtSo/rCFKoSPkGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746143021; c=relaxed/simple;
-	bh=nLAsd5GSdVN9zKoXT91AxBNtMuRg3WxVOfOoRjJiQck=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IKgDXHW/JR6YkFdB0Y1PZPfJRdZw8N3jhP43YhdvjaJen8AZQyuEszplEw6GVQA5FU79Js45fF12gJuCH3qVLrU6XReAEK5WoVmgF4I6Xff2ZtUBA4OwFZr//6uaRB5Ktb/pr0oWZ4zYhzge/6Q9W4Dm/8DTKtpm6fkNfNXx4dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JQfzeLGL; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746143020; x=1777679020;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SVVIXsRBiNGC5/+e/CeOhQZlrKYSsltgQ/G0Xe1FZXM=;
-  b=JQfzeLGLd41mzembaG/et4fSmSo0uZagLxJqC0KKC5UcTIEu0VxNb2Vy
-   PM+oUFLET7J2ADkFodJaJ3x5j7cqmIkMRQqnEPhcQZQp0RXtiNTFljEsv
-   Ac4iGn+1CmZcUI4FNvVE+Wqnn3wShRydGMVCtvPLsMhUcXmkIjU2I36d+
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.15,254,1739836800"; 
-   d="scan'208";a="488237012"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 23:43:35 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:6136]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.105:2525] with esmtp (Farcaster)
- id e8b08c5e-f1bd-46be-a9b2-4ca9a932d8b8; Thu, 1 May 2025 23:43:33 +0000 (UTC)
-X-Farcaster-Flow-ID: e8b08c5e-f1bd-46be-a9b2-4ca9a932d8b8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 23:43:33 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.41) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 23:43:30 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+9596c1b9df18e0ae7261@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
-Subject: Re: [syzbot] [net?] WARNING in ipv6_addr_prefix
-Date: Thu, 1 May 2025 16:43:13 -0700
-Message-ID: <20250501234322.55091-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <681357d6.050a0220.14dd7d.000b.GAE@google.com>
-References: <681357d6.050a0220.14dd7d.000b.GAE@google.com>
+	s=arc-20240116; t=1746143909; c=relaxed/simple;
+	bh=I5u9d8HWSZ/ZH/v+9KgdHorfTXAGHqr6+YiS97kzkxs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VebgMA7MQW6S0MmrHUKtMx3lvXt63GvVpOjVyescZdFufYExIZNXNWiK3C6U0kGH0CJDFqfl3Rmohr6sN8JLJHTQhRWjbs6Vk0Q0O/2H4WriFAzlZgWvzYmElRl9lJNxu5N2hxeoKiqwlkyQ1btNeVwSVIoZmw6lWqCib7IhLX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v4XTPbg6; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <83c8f387-c4a9-4293-9996-fec285d34c94@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746143895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tncfEf9FYDlLvfP3M87721xQwzJy/xmBPxmLH4uisu4=;
+	b=v4XTPbg6220J33yOMAVDdpprkK87l1JXWgxAgOApGYxk0I/YoR08sx2fqAnPMDmTzM6YLc
+	1PkQzC5n4zZqRe1WDqyAlVEvZ3IeEkx72YaD4BTjWdL1RDdztSd4/e6qWuhjPvhlB2zOoT
+	B6dgECqCriWZJd1UEHSy9ApluSWVrQA=
+Date: Thu, 1 May 2025 16:58:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH bpf-next/net v1 2/5] selftests/bpf: Test setting and
+ creating bpf qdisc as default qdisc
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, xiyou.wangcong@gmail.com, kernel-team@meta.com
+References: <20250501223025.569020-1-ameryhung@gmail.com>
+ <20250501223025.569020-3-ameryhung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250501223025.569020-3-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: syzbot <syzbot+9596c1b9df18e0ae7261@syzkaller.appspotmail.com>
-Date: Thu, 01 May 2025 04:15:34 -0700
-> Hello,
+On 5/1/25 3:30 PM, Amery Hung wrote:
+> First, test that bpf qdisc can be set as default qdisc. Then, attach
+> an mq qdisc to see if bpf qdisc can be successfully created and grafted.
 > 
-> syzbot found the following issue on:
+> The test is a sequential test as net.core.default_qdisc is global.
 > 
-> HEAD commit:    5565acd1e6c4 Merge git://git.kernel.org/pub/scm/linux/kern..
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1178cecc580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2e3745cb659ef5d9
-> dashboard link: https://syzkaller.appspot.com/bug?extid=9596c1b9df18e0ae7261
-> compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122efd9b980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e99574580000
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>   .../selftests/bpf/prog_tests/bpf_qdisc.c      | 78 +++++++++++++++++++
+>   1 file changed, 78 insertions(+)
 > 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/80798769614c/disk-5565acd1.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/435ecb0f1371/vmlinux-5565acd1.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/7790d5f923b6/bzImage-5565acd1.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+9596c1b9df18e0ae7261@syzkaller.appspotmail.com
-> 
-> UDPLite6: UDP-Lite is deprecated and scheduled to be removed in 2025, please contact the netdev mailing list
-> ------------[ cut here ]------------
-> memcpy: detected field-spanning write (size 898) of single field "pfx->in6_u.u6_addr8" at ./include/net/ipv6.h:614 (size 16)
-> WARNING: CPU: 0 PID: 5838 at ./include/net/ipv6.h:614 ipv6_addr_prefix+0x124/0x1d0 include/net/ipv6.h:614
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5838 Comm: syz-executor414 Not tainted 6.15.0-rc3-syzkaller-00557-g5565acd1e6c4 #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-> RIP: 0010:ipv6_addr_prefix+0x124/0x1d0 include/net/ipv6.h:614
-> Code: cc e8 70 eb af f7 c6 05 b8 a8 59 05 01 90 b9 10 00 00 00 48 c7 c7 a0 86 7d 8c 4c 89 fe 48 c7 c2 c0 8d 7d 8c e8 4d 4a 74 f7 90 <0f> 0b 90 90 e9 33 ff ff ff e8 3e eb af f7 44 89 e6 48 c7 c7 c0 53
-> RSP: 0018:ffffc90003eb7920 EFLAGS: 00010246
-> RAX: 8f8f704687b6a900 RBX: ffff8880337f5c50 RCX: ffff88803326da00
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-> RBP: 0000000000000000 R08: ffffc90003eb7607 R09: 1ffff920007d6ec0
-> R10: dffffc0000000000 R11: fffff520007d6ec1 R12: 0000000000000382
-> R13: 1ffff920007d6f4e R14: ffffc90003eb7a84 R15: 0000000000000382
-> FS:  0000555594768380(0000) GS:ffff8881260b2000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000055d1681c9000 CR3: 0000000078e3e000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  ip6_route_info_create+0x5cc/0xa70 net/ipv6/route.c:3810
->  ip6_route_add+0x29/0x2f0 net/ipv6/route.c:3902
->  ipv6_route_ioctl+0x35c/0x480 net/ipv6/route.c:4539
->  inet6_ioctl+0x219/0x280 net/ipv6/af_inet6.c:577
+> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> index c9a54177c84e..c954cc2ae64f 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> @@ -159,6 +159,79 @@ static void test_qdisc_attach_to_non_root(void)
+>   	bpf_qdisc_fifo__destroy(fifo_skel);
+>   }
+>   
+> +static int get_default_qdisc(char *qdisc_name)
+> +{
+> +	FILE *f;
+> +	int num;
+> +
+> +	f = fopen("/proc/sys/net/core/default_qdisc", "r");
+> +	if (!f)
+> +		return -errno;
+> +
+> +	num = fscanf(f, "%s", qdisc_name);
+> +	fclose(f);
+> +
+> +	return num == 1 ? 0 : -EFAULT;
+> +}
+> +
+> +static void test_default_qdisc_attach_to_mq(void)
+> +{
+> +	struct bpf_qdisc_fifo *fifo_skel;
+> +	char default_qdisc[IFNAMSIZ];
+> +	struct netns_obj *netns;
+> +	char tc_qdisc_show[64];
+> +	struct bpf_link *link;
+> +	char *str_ret;
+> +	FILE *tc;
+> +	int err;
+> +
+> +	fifo_skel = bpf_qdisc_fifo__open_and_load();
+> +	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+> +		return;
+> +
+> +	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
 
-This will fix it.
-https://lore.kernel.org/netdev/20250501005335.53683-1-kuniyu@amazon.com/
+	fifo_skel->links.fifo = bpf_map__attach_struct_ops(....);
 
-so speculatively:
+Then no need to bpf_link__destroy(link). bpf_qdisc_fifo__destroy() should do.
 
-#syz fix: ipv6: Restore fib6_config validation for SIOCADDRT.
+> +	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
+> +		bpf_qdisc_fifo__destroy(fifo_skel);
+> +		return;
+> +	}
+> +
+> +	err = get_default_qdisc(default_qdisc);
+> +	if (!ASSERT_OK(err, "read sysctl net.core.default_qdisc"))
+> +		goto out;
+> +
+> +	err = write_sysctl("/proc/sys/net/core/default_qdisc", "bpf_fifo");
+> +	if (!ASSERT_OK(err, "write sysctl net.core.default_qdisc"))
+> +		goto out;
+> +
+> +	netns = netns_new("bpf_qdisc_ns", true);
+> +	if (!ASSERT_OK_PTR(netns, "netns_new"))
+> +		goto out;
+
+This should be 'goto out_restore_dflt_qdisc'.
+
+I would stay with minimum number of cleanup labels if possible. Initialize the 
+variables that need to be cleaned up instead. There is no need to optimize each 
+cleanup case for a test,
+
+e.g. "struct netns_obj netns = NULL; char default_qdisc[IFNAMSIZ] = {};..."
+
+> +
+> +	SYS(out_restore_dflt_qdisc, "ip link add veth0 type veth peer veth1");
+> +	SYS(out_delete_netns, "tc qdisc add dev veth0 root handle 1: mq");
+> +
+> +	tc = popen("tc qdisc show dev veth0 parent 1:1", "r");
+> +	if (!ASSERT_OK_PTR(tc, "tc qdisc show dev veth0 parent 1:1"))
+> +		goto out_delete_netns;
+> +
+> +	str_ret = fgets(tc_qdisc_show, sizeof(tc_qdisc_show), tc);
+> +	if (!ASSERT_OK_PTR(str_ret, "tc qdisc show dev veth0 parent 1:1"))
+> +		goto out_delete_netns;
+> +
+> +	str_ret = strstr(tc_qdisc_show, "qdisc bpf_fifo");
+> +	if (!ASSERT_OK_PTR(str_ret, "check if bpf_fifo is created"))
+> +		goto out_delete_netns;
+
+Instead of pipe and grep, how about having the bpf_fifo_init bpf prog to set a 
+global variable when called and then check the "fifo_skel->bss->init_called == 
+true" here?
+
+> +
+> +	SYS(out_delete_netns, "tc qdisc delete dev veth0 root mq");
+> +out_delete_netns:
+> +	netns_free(netns);
+> +out_restore_dflt_qdisc:
+> +	write_sysctl("/proc/sys/net/core/default_qdisc", default_qdisc);
+> +out:
+> +	bpf_link__destroy(link);
+> +	bpf_qdisc_fifo__destroy(fifo_skel);
+> +}
+> +
+>   void test_bpf_qdisc(void)
+>   {
+>   	struct netns_obj *netns;
+> @@ -178,3 +251,8 @@ void test_bpf_qdisc(void)
+>   
+>   	netns_free(netns);
+>   }
+> +
+> +void serial_test_bpf_qdisc_default(void)
+> +{
+> +	test_default_qdisc_attach_to_mq();
+> +}
+
 
