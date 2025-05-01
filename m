@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-187229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7CA1AA5DEB
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:45:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F237AA5DF8
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:46:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7E059C5AFE
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 11:45:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE681BC4901
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 11:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7301EEA27;
-	Thu,  1 May 2025 11:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E29225416;
+	Thu,  1 May 2025 11:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hK1Y1QeC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lKtWt8kX"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1B711187
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 11:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7B8224B12
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 11:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746099940; cv=none; b=lr+1CvvVyfSbaxhWUv10k13jsr6b5cvj47upQdYfnHkG23L9M5jm6jC2dBhgWgrR1Eq2G4ncbsBsSuj/aBM16jWw/+kcYxLOYnyPaMVFEXmfzjqLwsoariKIiI8zgLbY/YdjgYUICgDGU6EnKNzLdAuOU8RTawGBGyPQLa5EZ8s=
+	t=1746099974; cv=none; b=DLKhIvg73gDq6O3xu1d8Ff8xM/5UUdbQKeMN8S1ThRbL+5H8kQhRgU2wP9cC8E+IW+3YLrDrRGgmZs6q/ki+DIhobuYtprNL0XNkSenXoi46xm4Am80GzHXLeCMW0J8+JHMCJ/fhSHAV8M5edH4Aj94s1SRBypF23kihO4Suk2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746099940; c=relaxed/simple;
-	bh=dm7CcYliIrZ1Rv24/VFqKvDva4teFzCN3hxqeMmtFiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tvTry71P8SsL2j+iea503Sbf3AT7FTbv/t28BzEOO/3GlNAdntLY5i35dDeKoIXpxzC/E+aq1BByPIzAu43bBDnilWLb67KaXnSE/dVjNkHonyAB5EbPH418fHwG/tZaRLsD+8+9OQzuH/f95GBNT8H3DH5muw/6ZRZeK0X0D9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hK1Y1QeC; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1746099974; c=relaxed/simple;
+	bh=nR2EMxi+rY7fLTrDgvNtvKyEGsad1Zdk9KXAbH/8ZX8=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=KAuHYyp1l1ShL3I7dAQJz0Asf4/39K6qUoxANu3dp287Sw8oj9fA1USSQM4+U2QZc59FxYdQaCaZO9nFwDQ1vlX0YHJT6HXJtEzOgnbaVTbLcf77Xf1WbdFgb3aEaOY+ekI7Cb1qCucsrAE48Onlqxim6H7hqV4dyJ0wTgqfVvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lKtWt8kX; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jk5Z4QPc9J8CRieYaOp+Msl4krhLC3Zgsoyy7SV1l8k=; b=hK1Y1QeCPApCKnF+ianQWZIXEC
-	IHN3gx2RJrK2jKbMQ+4C+nZBiIoR/TszssSm6C0daW1H/8pZjRYR+/4n46MDB3CpWtkr02lXmEJe+
-	C80HUytlH6LHmdjrMhtqNsNSAOWARB0rjVygCjLDJPcXxtcyP9TzMN/HkK7jHGp6AclCHlbgv8xHv
-	kfR7bIskJRsM1sVLxGc52m1FnpHT3yvVmc5E4ii314vcbHWbP08ogWVJHEGA+6oVUWTBs0Z+23jfk
-	OWnvEBtJMMKIajNtFCqtZU/l0ojlUPX1FWHsM2mW+wO69MrCLXhcHl/dswyqlxJLbTnqYukZZjcmr
-	l3Fb5Tug==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58470)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vuFYQlpiboXulQVdnqCW/1ad3TJohzHdDO8kExCfgss=; b=lKtWt8kXWhnA4/k3Y+/frnORrS
+	JOrP8BIAc7PoPCw7DvS2Rjlo2CNt5BGWoFoNtQHTY/jp7PhWWBJ5wP1JmLPVp8oKEbipGACerL2Ib
+	4d8sW0w+l7BWElR5d7ekXHCNEeSGHkEfClq69MVtIZPmAPWDJmNBqf386RI33UvbjcOZoCQsn1T3v
+	9CInpFHH9KjtxPaXsdWjmT1vbuht3oIf10nRj+SjmsHMR9rpkOqifREsm/YnPM1j8qA1zcfaCQZsR
+	ob1erFbwKvTRX0cn+TK3x6uFjCzjBzQ5ZmRPfzlJX6HCgXZvmYOhvEIeNtndm8pu+nD9m4lkQUuUf
+	3Q/CtabA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:52288 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uASM1-0008WA-25;
-	Thu, 01 May 2025 12:45:25 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uASLx-000865-3B;
-	Thu, 01 May 2025 12:45:22 +0100
-Date: Thu, 1 May 2025 12:45:21 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uASMf-00005x-1P;
+	Thu, 01 May 2025 12:46:05 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uASM3-0021R3-2B; Thu, 01 May 2025 12:45:27 +0100
+In-Reply-To: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+References: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -63,36 +64,60 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/6] net: stmmac: replace speed_mode_2500() method
-Message-ID: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+Subject: [PATCH net-next 6/6] net: stmmac: remove speed_mode_2500() method
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uASM3-0021R3-2B@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 01 May 2025 12:45:27 +0100
 
-Hi,
+Remove the speed_mode_2500() platform method which is no longer used
+or necessary, being superseded by the more flexible get_interfaces()
+method.
 
-This series replaces the speed_mode_2500() method with a new method
-that is more flexible, allowing the platform glue driver to populate
-phylink's supported_interfaces and set the PHY-side interface mode.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ---
+ include/linux/stmmac.h                            | 1 -
+ 2 files changed, 4 deletions(-)
 
-The only user of this method is currently dwmac-intel, which we
-update to use this new method.
-
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 33 +++++++------
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h |  1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 56 +++++++++++++----------
- include/linux/stmmac.h                            |  3 +-
- 4 files changed, 49 insertions(+), 44 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 5f66f816a249..28b62bd73e23 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7736,9 +7736,6 @@ int stmmac_dvr_probe(struct device *device,
+ 		goto error_mdio_register;
+ 	}
+ 
+-	if (priv->plat->speed_mode_2500)
+-		priv->plat->speed_mode_2500(ndev, priv->plat->bsp_priv);
+-
+ 	ret = stmmac_pcs_setup(ndev);
+ 	if (ret)
+ 		goto error_pcs_setup;
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 537bced69c46..26ddf95d23f9 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -241,7 +241,6 @@ struct plat_stmmacenet_data {
+ 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
+ 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
+ 	void (*serdes_powerdown)(struct net_device *ndev, void *priv);
+-	void (*speed_mode_2500)(struct net_device *ndev, void *priv);
+ 	int (*mac_finish)(struct net_device *ndev,
+ 			  void *priv,
+ 			  unsigned int mode,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
