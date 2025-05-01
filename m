@@ -1,239 +1,147 @@
-Return-Path: <netdev+bounces-187266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74546AA5FF3
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:27:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E7FAA5FF6
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:28:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2745C3B4E1C
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:27:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378981788FC
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9EF1F150B;
-	Thu,  1 May 2025 14:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666831F1512;
+	Thu,  1 May 2025 14:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fk5Ca/yc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUwXcTvk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DDA29CE6;
-	Thu,  1 May 2025 14:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AAF19CC1C;
+	Thu,  1 May 2025 14:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746109667; cv=none; b=sd5UH0uLu3+zRUC0ICIz7XKPIESyAdVPhnjwNnPG+DKuRtEPfiYcM2/rTQhvATEqe/1nFZ3JmmOVYwHs5TugVDqjP1q+ddE3LSax9IqOHDXb0BU+/ByL/XWMqYyLxagfVf/uRUmEurKzBPRhe77fvRh6YuRGnIR0RPFxz6Sg9yE=
+	t=1746109704; cv=none; b=SYTdo7Kvno+cBieCyYCWaWqztyzLELzP4AOUbvd27eCXZwh4fdLHrgOu5NQSEBM++THM4Y8qZHGJo0vHre5Y5qc04Pk//vbWknv3BRUbYlR3Uif6aR5UlFYFkG+TMQK/u2dMA7oJBNEYxyQ/lyze2IckdTaDPebhRJ1AQCvk85c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746109667; c=relaxed/simple;
-	bh=e2WGSGmrKjNzE3VLNswb+N9eUzr1Q80gbtvvRn6mreE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=GmkljRmIk1B0srnh9+s0FHsEjSB/EGxJcKT7ukwCuUErWmkhgY/LKk+YEq2ymF80b1cQM3wy5dFCcE8y/gDmcQDx6oJNk69RuwpMEzyCBxmLB0SnR862cl3m7AgDlBuqm+cD+LhjNht/mdWR/sVF9SEzgyVlyopirydJElN9HIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fk5Ca/yc; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c9376c4dbaso128183285a.0;
-        Thu, 01 May 2025 07:27:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746109664; x=1746714464; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jlhhdp9q6ID/4uXioPB8kF8xFNbK7BMwdnQOnij5DYk=;
-        b=fk5Ca/yc5SSlLBq8MjpQK4edjO5GIY0UNpSd4ih7hL7osUWYuzhNXFbiuwvEtolBsA
-         t1ZKNKIFM7d8wENneMgAGMJ0TF8no6DcnJIHxRWRkzU29Kk5QB169NF9V4A/W195Gjnr
-         nErNs0fxfq9qlmju1EIYWpel+xY5mGpCCfHug0IThfdYQqGxdQoQMteW/O6yQIUsaiQk
-         NIrZgexl+FnnruySmz3C1WWehXFWXigo0EsaUVTWqIWI3Js7MQ284ERo9xWG0DSMZeZP
-         ZLyy2SvNa7htxL8czTDqYpz7b9XawVczu4Lk7Crlth9oU0eDWFw9ZEU7Km5ztlAekJIF
-         rm+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746109664; x=1746714464;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jlhhdp9q6ID/4uXioPB8kF8xFNbK7BMwdnQOnij5DYk=;
-        b=HAUkegzREiilr219Xy7BFQ8atS3Dm1GRTJwO9kSY5JNrNbOXMKB808C7zDC8XhmGxn
-         Htrn3v42h2pq2CTFRtxSCzg50+Un3wP7Nc+87NpQvsIslRnwpFVP89NgQm27qlQdJW+F
-         FV0QXNNJvSr680YN7+6UX5e1jE0CiZV+hpKCRm3Dx9ydPCzWFLhdHmKXIcMsm9t/oKN9
-         dRWYZS9Un1p+hlzxI+q659ykloC3CjnavD0LGpuSyJlhsOE3uDNPkjfBZq2RBVfO/4MO
-         IZp3tynNdqJadsJO+En5ku2m+U4LLxH7wEYPiaJI5TKfzWLlf7j7q529fF/aQFyFaIdk
-         gR0A==
-X-Forwarded-Encrypted: i=1; AJvYcCW62vk8W5RbD/XRCK5wppK8PAqjMq0x+RLfFsuHAEiMNKTNeUnxJjniwyxK0Exhw5Fg1Ub4koQB20rdp2E=@vger.kernel.org, AJvYcCWNp3nIo93HO1BLQ8cmjFUkkWo49EA+2YkA0/zQdC7mRAI7a/a1DkUB6j+jPuYSt33eNjYgyVfN@vger.kernel.org, AJvYcCXs+ANe94wpQ5alsoLVnEEDhheHJutvm6hbgpnHQvtebzqFMSRYzEjmPGcXy129ONGz56OCESyjwZiaPA7l1rPM@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYLr04JcdYPke0ttMl9q5wwgBaA3FELdrU2Xg7AaqjT8PW00BW
-	SYCeI8M7/B5SRZfUPd6Pv/OYIUcEFXDuoJvliH1fCmyfpJNMhH9f
-X-Gm-Gg: ASbGncueYl8XF8974VQCKpOpFF0N0cbaeyUt3yC+xXkw1XfYijgC7q9ebmBxcpNniMB
-	JjEwJ20uGCDFO9zN0zlRXd3f1FdKlYXuvMaHPil6evj86yUU20MygSV/pRi0Ol86GQ82cOD97Eu
-	iE0USrTvj5aNGbbek0EmGba5KydiqMHkaMJwSCwr/WGzQcEGgarrECeKEWhJmBWhAGcoR45huDi
-	FG79HVH9teNtMmCS5qJWfxBKvwbyG7mis6CFOZSlefQYN6brxERZR/FqYcGuUZVQBX5bh7+mjVR
-	CeWOqe1mPE2DsJlxntRy69MBiSZcw23ZjL6tKEB9g4y6z96GCDq/0mX32AQgZNYGq5JcS64ymBE
-	yRhKwEmjSoX++8Z6sQCra
-X-Google-Smtp-Source: AGHT+IGjqqyilZJTQ6JAChTYoPBhygOgNNNZTYMgXQete2ywNqTY8GoZgssKT1j8IztLKLrT7J4vfg==
-X-Received: by 2002:a05:620a:1995:b0:7c7:c1f8:34eb with SMTP id af79cd13be357-7cacea24694mr375669585a.23.1746109664348;
-        Thu, 01 May 2025 07:27:44 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cad242b5cfsm48312685a.70.2025.05.01.07.27.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 May 2025 07:27:43 -0700 (PDT)
-Date: Thu, 01 May 2025 10:27:43 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- jiayuan.chen@linux.dev
-Cc: davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- horms@kernel.org, 
- kuba@kernel.org, 
- kuniyu@amazon.com, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- shuah@kernel.org, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <681384df8e0f1_35e23e294ea@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250501071308.1931-1-kuniyu@amazon.com>
-References: <1f4d3fb4eed397e346efb3ef597e29204e5a2f4b@linux.dev>
- <20250501071308.1931-1-kuniyu@amazon.com>
-Subject: Re: [RFC net-next v1 1/2] udp: Introduce UDP_STOP_RCV option for UDP
+	s=arc-20240116; t=1746109704; c=relaxed/simple;
+	bh=dG/vmRyKkftV3UXTBolH+6yd6BgJNwN/cvqHh6HRxRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PjDeTU4OS+sjZ+1RpQhMkn5/uxxWlJ6oICa7Zw2YRDbAuUg//42CtRTv0DdBRnolvUYA/GxoRd1ytLByMy3WaD5X/t4Xq0a24E6MVqs5CDsjPh/ih5popuEmPgYaehm0/tNY1fjbme5YF6bOX/C/24HKIkl8mirAYaSLFsfeNJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kUwXcTvk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB17C4CEE3;
+	Thu,  1 May 2025 14:28:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746109703;
+	bh=dG/vmRyKkftV3UXTBolH+6yd6BgJNwN/cvqHh6HRxRA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kUwXcTvkkneJCvpsXOtBl99R3OlqklWXCU0ADMe603mh9WyN626b6zE18VejnTqyn
+	 3AFdV0WJ/gyMGYjtJrvfXX3oRa7QfhUjUamPOqzbINRo1EDuxX3Qj0T709Xp2cVv78
+	 DrVNx6bekqF4AUvubwfgc/r6x7SKb1/rtA77OzhJQzXCPRZLyzDkS0dC+F+G0mfowM
+	 cox+Vl4WGQlCyZ+6IA/htz5dq1hMKJPugim/3AZLyQ8eiGFHdEItPgDPSRK/+r7ZWu
+	 Yi54GnwJ5POgKb2iZqoQiAkUvNQzCI0VfpnH9WeGXSLSMsR1EOI4DfiRc+MKD02QBx
+	 GLAKIFsjzh1lw==
+Date: Thu, 1 May 2025 15:28:18 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
+ informative text about RGMII delays
+Message-ID: <20250501-extrude-jot-aa8512a299ec@spud>
+References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="I870tTDMsq2gvFPl"
+Content-Disposition: inline
+In-Reply-To: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
 
-Kuniyuki Iwashima wrote:
-> From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-> Date: Thu, 01 May 2025 06:22:17 +0000
-> > 2025/5/1 12:42, "Kuniyuki Iwashima" <kuniyu@amazon.com> wrote:
-> > 
-> > > 
-> > > From: Jiayuan Chen <jiayuan.chen@linux.dev>
-> > > 
-> > > Date: Thu, 1 May 2025 11:51:08 +0800
-> > > 
-> > > > 
-> > > > For some services we are using "established-over-unconnected" model.
-> > > > 
-> > > >  
-> > > > 
-> > > >  '''
-> > > > 
-> > > >  // create unconnected socket and 'listen()'
-> > > > 
-> > > >  srv_fd = socket(AF_INET, SOCK_DGRAM)
-> > > > 
-> > > >  setsockopt(srv_fd, SO_REUSEPORT)
-> > > > 
-> > > >  bind(srv_fd, SERVER_ADDR, SERVER_PORT)
-> > > > 
-> > > >  
-> > > > 
-> > > >  // 'accept()'
-> > > > 
-> > > >  data, client_addr = recvmsg(srv_fd)
-> > > > 
-> > > >  
-> > > > 
-> > > >  // create a connected socket for this request
-> > > > 
-> > > >  cli_fd = socket(AF_INET, SOCK_DGRAM)
-> > > > 
-> > > >  setsockopt(cli_fd, SO_REUSEPORT)
-> > > > 
-> > > >  bind(cli_fd, SERVER_ADDR, SERVER_PORT)
-> > > > 
-> > > >  connect(cli, client_addr)
-> > > > 
-> > > >  ...
-> > > > 
-> > > >  // do handshake with cli_fd
-> > > > 
-> > > >  '''
-> > > > 
-> > > >  
-> > > > 
-> > > >  This programming pattern simulates accept() using UDP, creating a new
-> > > > 
-> > > >  socket for each client request. The server can then use separate sockets
-> > > > 
-> > > >  to handle client requests, avoiding the need to use a single UDP socket
-> > > > 
-> > > >  for I/O transmission.
-> > > > 
-> > > >  
-> > > > 
-> > > >  But there is a race condition between the bind() and connect() of the
-> > > > 
-> > > >  connected socket:
-> > > > 
-> > > >  We might receive unexpected packets belonging to the unconnected socket
-> > > > 
-> > > >  before connect() is executed, which is not what we need.
-> > > > 
-> > > >  (Of course, before connect(), the unconnected socket will also receive
-> > > > 
-> > > >  packets from the connected socket, which is easily resolved because
-> > > > 
-> > > >  upper-layer protocols typically require explicit boundaries, and we
-> > > > 
-> > > >  receive a complete packet before creating a connected socket.)
-> > > > 
-> > > >  
-> > > > 
-> > > >  Before this patch, the connected socket had to filter requests at recvmsg
-> > > > 
-> > > >  time, acting as a dispatcher to some extent. With this patch, we can
-> > > > 
-> > > >  consider the bind and connect operations to be atomic.
-> > > > 
-> > > 
-> > > SO_ATTACH_REUSEPORT_EBPF is what you want.
-> > > 
-> > > The socket won't receive any packets until the socket is added to
-> > > 
-> > > the BPF map.
-> > > 
-> > > No need to reinvent a subset of BPF functionalities.
-> > >
-> > 
-> > I think this feature is for selecting one socket, not filtering out certain
-> > sockets.
-> > 
-> > Does this mean that I need to first capture all sockets bound to the same
-> > port, and then if the kernel selects a socket that I don't want to receive
-> > packets on, I'll need to implement an algorithm in the BPF program to
-> > choose another socket from the ones I've captured, in order to avoid
-> > returning that socket?
-> 
-> Right.
-> 
-> If you want a set of sockets to listen on the port, you can implement
-> as such with BPF; register the sockets to the BPF map, and if kernel pick
-> up other sockets and triggers the BPF prog, just return one of the
-> registerd sk.
-> 
-> Even when you have connect()ed sockets on the same port, kernel will
-> fall back to the normal scoring to find the best one, and it's not a
-> problem as the last 'result' is one selected by BPF or a connected sk,
-> and the packet won't be routed to not-yet-registered unconnected sk.
-> 
-> 
-> > 
-> > This looks like it completely bypasses the kernel's built-in scoring
-> > logic. Or is expanding BPF_PROG_TYPE_SK_REUSEPORT to have filtering
-> > capabilities also an acceptable solution?
 
-Reuseport BPF exists because we want to avoid having to continue to
-add custom rules in C for each scenario.
+--I870tTDMsq2gvFPl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In this case, I did wonder whether it is possible to avoid hitting
-the soon-to-be connected socket with the standard reuseport
-algorithm in reuseport_select_sock_by_hash.
+On Wed, Apr 30, 2025 at 11:21:35AM -0500, Andrew Lunn wrote:
+> Device Tree and Ethernet MAC driver writers often misunderstand RGMII
+> delays. Rewrite the Normative section in terms of the PCB, is the PCB
+> adding the 2ns delay. This meaning was previous implied by the
+> definition, but often wrongly interpreted due to the ambiguous wording
+> and looking at the definition from the wrong perspective. The new
+> definition concentrates clearly on the hardware, and should be less
+> ambiguous.
+>=20
+> Add an Informative section to the end of the binding describing in
+> detail what the four RGMII delays mean. This expands on just the PCB
+> meaning, adding in the implications for the MAC and PHY.
+>=20
+> Additionally, when the MAC or PHY needs to add a delay, which is
+> software configuration, describe how Linux does this, in the hope of
+> reducing errors. Make it clear other users of device tree binding may
+> implement the software configuration in other ways while still
+> conforming to the binding.
+>=20
+> Fixes: 9d3de3c58347 ("dt-bindings: net: Add YAML schemas for the generic =
+Ethernet options")
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+> Changes in v2:
+> Reword Normative section
+> manor->manner
+> add when using phylib/phylink
+> request details in the commit message and .dts comments
+> clarify PHY -internal-delay-ps values being depending on rgmii-X mode.
+> Link to v1: https://lore.kernel.org/r/20250429-v6-15-rc3-net-rgmii-delays=
+-v1-1-f52664945741@lunn.ch
+> ---
+>  .../bindings/net/ethernet-controller.yaml          | 97 ++++++++++++++++=
+++++--
+>  1 file changed, 90 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.ya=
+ml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 45819b2358002bc75e876eddb4b2ca18017c04bd..a2d4c626f659a57fc7dcd3930=
+1f322c28afed69d 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -74,19 +74,17 @@ properties:
+>        - rev-rmii
+>        - moca
+> =20
+> -      # RX and TX delays are added by the MAC when required
+> +      # RX and TX delays are provided by the PCB. See below
 
-Setting SO_INCOMING_CPU to a cpu on which no packets arrive will
-lower its priority relative to other sockets. It's a bit of a hack,
-but should work?
+I'm not sure that "provided" is the correct word to describe what's
+meant here (implemented might be better), but it's perfectly
+understandable as-is and I don't think worth respinning or splitting
+hairs over...
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+--I870tTDMsq2gvFPl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaBOFAgAKCRB4tDGHoIJi
+0jplAP9zRFU8cq0CrAIupeDxoyotkJxhG0NaXz1GE2mesULpvgD7BF2kqIywMMqL
+jF2DMurlLRkxpRkBUqu61t3g8/rkCwY=
+=FiiL
+-----END PGP SIGNATURE-----
+
+--I870tTDMsq2gvFPl--
 
