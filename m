@@ -1,123 +1,83 @@
-Return-Path: <netdev+bounces-187235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F237AA5DF8
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:46:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69589AA5E1F
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE681BC4901
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 11:46:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14D1F1BA4D1A
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 12:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E29225416;
-	Thu,  1 May 2025 11:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8B3221DAE;
+	Thu,  1 May 2025 12:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lKtWt8kX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FUJDWRTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7B8224B12
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 11:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C7334545
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 12:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746099974; cv=none; b=DLKhIvg73gDq6O3xu1d8Ff8xM/5UUdbQKeMN8S1ThRbL+5H8kQhRgU2wP9cC8E+IW+3YLrDrRGgmZs6q/ki+DIhobuYtprNL0XNkSenXoi46xm4Am80GzHXLeCMW0J8+JHMCJ/fhSHAV8M5edH4Aj94s1SRBypF23kihO4Suk2g=
+	t=1746101458; cv=none; b=kX58bDFXyqj5F9rC2XxD2Q0Z9NXbvAhrldUZSnaVTaxsH80hEC0UCpV8kwi6JnKMKjYaWlXuGLiZHiCiVQlGGq+HawGRB+uTMd7HBxLrTY1VKyPN3ARunOlJ9qMjvkOFqR+oBs4rbdctU6mWm0HXQ02eKmzkY1M0+2Y+nCpjegE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746099974; c=relaxed/simple;
-	bh=nR2EMxi+rY7fLTrDgvNtvKyEGsad1Zdk9KXAbH/8ZX8=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=KAuHYyp1l1ShL3I7dAQJz0Asf4/39K6qUoxANu3dp287Sw8oj9fA1USSQM4+U2QZc59FxYdQaCaZO9nFwDQ1vlX0YHJT6HXJtEzOgnbaVTbLcf77Xf1WbdFgb3aEaOY+ekI7Cb1qCucsrAE48Onlqxim6H7hqV4dyJ0wTgqfVvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lKtWt8kX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vuFYQlpiboXulQVdnqCW/1ad3TJohzHdDO8kExCfgss=; b=lKtWt8kXWhnA4/k3Y+/frnORrS
-	JOrP8BIAc7PoPCw7DvS2Rjlo2CNt5BGWoFoNtQHTY/jp7PhWWBJ5wP1JmLPVp8oKEbipGACerL2Ib
-	4d8sW0w+l7BWElR5d7ekXHCNEeSGHkEfClq69MVtIZPmAPWDJmNBqf386RI33UvbjcOZoCQsn1T3v
-	9CInpFHH9KjtxPaXsdWjmT1vbuht3oIf10nRj+SjmsHMR9rpkOqifREsm/YnPM1j8qA1zcfaCQZsR
-	ob1erFbwKvTRX0cn+TK3x6uFjCzjBzQ5ZmRPfzlJX6HCgXZvmYOhvEIeNtndm8pu+nD9m4lkQUuUf
-	3Q/CtabA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:52288 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uASMf-00005x-1P;
-	Thu, 01 May 2025 12:46:05 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uASM3-0021R3-2B; Thu, 01 May 2025 12:45:27 +0100
-In-Reply-To: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
-References: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1746101458; c=relaxed/simple;
+	bh=ibrBE8S7bEg3Ru8Qb/2M/hfx+D7unnV5KvBTmhCHxlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cc+Auqpn/64GMn8F9BjKMH2hHGWVYSaVzj/YHImmLbrKRrPYxOcLYMK+JFwRz6QB2+0clHrHuONoqXAYUYBoVPwZqWeMjjBtVQ+KOmh2gUlN4FifY3o8s4vPNU0UFqyltG2U1zHmHsFoYukXFbVczGLFXA0fxwssiDNdj238ek4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FUJDWRTO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BY6VyFQTDqYBUiElrgJd+s84pkaJp8j2aD+P0x8/zg4=; b=FUJDWRTO8S4kvzxSLuXO7J+XFa
+	Z2+1nDfhhE9omxTJoislt9CoErTl1SR020mtKVPqfGAd6HuvkzS6roi/ybX8PB7vfNlilhwX/b5bA
+	zB1zSM199AbFiWeWrNkgQolvS9mj5CVbQC3vUhOfjkrMFKLXA+oId9BF0DZWYB9WSqnc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uASkU-00BJGW-1k; Thu, 01 May 2025 14:10:42 +0200
+Date: Thu, 1 May 2025 14:10:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 6/6] net: stmmac: remove speed_mode_2500() method
+Subject: Re: [PATCH net-next 1/6] net: stmmac: use a local variable for
+ priv->phylink_config
+Message-ID: <65321b68-ac8a-42b5-94e5-71732ad71d3c@lunn.ch>
+References: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+ <E1uASLd-0021QR-Cu@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uASM3-0021R3-2B@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 01 May 2025 12:45:27 +0100
+In-Reply-To: <E1uASLd-0021QR-Cu@rmk-PC.armlinux.org.uk>
 
-Remove the speed_mode_2500() platform method which is no longer used
-or necessary, being superseded by the more flexible get_interfaces()
-method.
+On Thu, May 01, 2025 at 12:45:01PM +0100, Russell King (Oracle) wrote:
+> Use a local variable for priv->phylink_config in stmmac_phy_setup()
+> which makes the code a bit easier to read, allowing some lines to be
+> merged.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ---
- include/linux/stmmac.h                            | 1 -
- 2 files changed, 4 deletions(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 5f66f816a249..28b62bd73e23 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7736,9 +7736,6 @@ int stmmac_dvr_probe(struct device *device,
- 		goto error_mdio_register;
- 	}
- 
--	if (priv->plat->speed_mode_2500)
--		priv->plat->speed_mode_2500(ndev, priv->plat->bsp_priv);
--
- 	ret = stmmac_pcs_setup(ndev);
- 	if (ret)
- 		goto error_pcs_setup;
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 537bced69c46..26ddf95d23f9 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -241,7 +241,6 @@ struct plat_stmmacenet_data {
- 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
- 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
- 	void (*serdes_powerdown)(struct net_device *ndev, void *priv);
--	void (*speed_mode_2500)(struct net_device *ndev, void *priv);
- 	int (*mac_finish)(struct net_device *ndev,
- 			  void *priv,
- 			  unsigned int mode,
--- 
-2.30.2
-
+    Andrew
 
