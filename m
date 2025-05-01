@@ -1,135 +1,167 @@
-Return-Path: <netdev+bounces-187222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE73AA5DA4
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:15:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20BA6AA5DA7
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A10253A5F85
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 11:15:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 843294C0823
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 11:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB40C1F1516;
-	Thu,  1 May 2025 11:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318FC223316;
+	Thu,  1 May 2025 11:15:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130228828
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 11:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B17E189F3B
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 11:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746098136; cv=none; b=aCZQelkhWELst0eyvDRgr2kJ2IF93nB088y9Er/983pZ29kf/TtM9JzYzgGKUppAnBcE6u6rBY24wk3d9QWUwKWS5g3ChCD8QP/8y0d7tjBmMSyOyU1NKKGDVEJRyPDKj2Zn/JzlznpaFcRda3B9JXXAMrRzVgO1GMsj0wGGW0k=
+	t=1746098137; cv=none; b=uu1Jcbyj5hzFoqU7L3lBKanWqukEsUB5uV6LRsnY/TD2Y/e/PO75kEL0Laxu+sdjpRoISQbO7wjKEVgI0kpLWvdWjLfBiHayv2QzpBuVYGHTzym27eBc1hO4ZkZEc4jN0cvMpRID4bhxKCL6uzu5NDzZP4UNKhgH3umDXuRug8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746098136; c=relaxed/simple;
-	bh=HfYmV26FgnTt04PVF4jjki/yie5n1YWzt+JcQ2Pae7U=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ciNT0rGwThKBx97p5DrmLoDWQ+0QrF4B4kPb4OmbHQ8VdvIIFeJkfZ+Zi5KCngrvJfVaM6NYXRDm0BW9OAqYRVqyutLaGt2zJKDcCt5YdK+SUg4MdyS2t1B82Aw3ML5c9RitfebgE1Slz8eMM+BXgfH5WQTVjaDGRr3mSr11pu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+	s=arc-20240116; t=1746098137; c=relaxed/simple;
+	bh=AdCnrHlckiLY9w50M2RlnW6B4F1N+rctOdeW1iF/YIY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qG7HMySd/T6O/jjJFUF2hG5JoAH1NVQ99H+OiJUtSkhFFI/Hd575Qpi6X9omcsibOfX6wpZBK+8Ah6U43qe/B1iwbOzbfMSoMhTrORD8x07Mpkh3P+f3GmjFSlBGxDSvgs6t64sg3EuaObJABk/QBsytmdtjX+H8jxPyI0rE4HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d90a7e86f7so20027075ab.2
-        for <netdev@vger.kernel.org>; Thu, 01 May 2025 04:15:34 -0700 (PDT)
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-85b5e46a526so93143739f.1
+        for <netdev@vger.kernel.org>; Thu, 01 May 2025 04:15:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1746098134; x=1746702934;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2V0s1pgtJHSE9wqQW/OwlUPcwO/vYFoDmb+3YSftYxg=;
-        b=Rg/LZkFr921ffQmvYUfGmtJiNwJdedl3oGPJ5ZSZhafd/NVWH+WIeVz8z4HtH2w6mf
-         NY+wl4ehbvLHeAU9XPUhP6fF8GluSxBRM8HTVi9LT9GwDpYeb+1i+xJu/m/1HMoyQalX
-         ikAgmasGb7fR/tg9e91zFdxSkqfnA2MWFW6nj3tfqh/EJtXpP4Ddzd9ABT1O/3A//86c
-         SGsJYko+7zmEuUawR5FnekBm9PP8SuK2ECd3n3pCxNEm2lsnne5hNLLvXSFY2z6qQNAR
-         psd4n421LzSNNPRD6Q2CTEU6ShsEaDEvQRt1bgSx6IRCB94JuxzE1eeYlvhgyWCskNkd
-         Hgvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXdpd8Hk36qqEKn+26IkRxj4bFC4LCvLFTbX4H+C7jT/7dezkIOlbTpbRg5mnVBJeKYRwYKBas=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDQ/eWjgY9KEzvdLCNFx4pavGJJjgdpNIzOXqjb8vTFlR11Iok
-	iaYEOY9vXhqgxw//3n/HAV2k9bp7g/eY5P/5Cl/YLS22lWosQhNHcft8ODW33C3OQJoWTmK0Bfi
-	sJTZ7IJVunVomsd07DMaK/rY+flj2aa4mgkHD0JRy/HFiO1M+5u819Gc=
-X-Google-Smtp-Source: AGHT+IHonOfHpP5MZOdlqgVcIeE9FlZO4d6JZ3BDdp5KDONBJLJOF/2fNqWptp6KT9+D+KJRwpCgnNsmohPvx8dpVolIwtg1osug
+        bh=SQJrXJqX12ekCJI9r32k9hMJcJ8Y6oUBGGTUv5VbCSU=;
+        b=E9xz73p1MfgE7AJpD9mJDpJkJzbXIcass7bLJgMrZw24Nc/rNiX/1t9suP7LYlvd8j
+         9wb+sIA1CadjrhmOFpwEsz1VSgwPzFLWihVDl14ynCezoaPpSTTyWmwyUU9BXt1ebNtT
+         qXLzhM7Qmy6LghL4G+AgJfBGzj0HkaIZa8Ee4J+kZGSSoWzLk56QHYCADuouWUPmqPSe
+         lP0khAw7uOSJY4M0Xs4cuEK01zK9d4AEwj2aLughkPK2uxV+zgYcQWWXgj93ontQE7iD
+         JQlWUJ6bOxY8eTN3R08Hs+dUxjNqR6QArGap0lvSdyIWSlzCgBIk8gpgZiB7fFECGwhf
+         8QRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwKPfQ/nou+4O8pgUZStlC1uWSUxZC6Dk14EUHg0xIILQbqnyz9KOwKDR/n7hfmtL6JyHmEok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy18nP3PHfjj0mp+XRe+pxTdxuYEcND/J9yoA6iVhCpuvbudHJK
+	e0EkO4h/vManU2vmDXwGbZHKEg0zVSqJ/FPKgFhpD+bOPosS6551FXtD+fBrKfPcJ1UD7OXplJ4
+	rLFRf9SvTP7lV4Dn//9LYH9z6oIxMhhV3EC1YgcBQdySK2oDDm+E+020=
+X-Google-Smtp-Source: AGHT+IEvJble2/n4Ejv3r+vofsmt0pigGSfoyD5BKOPJZO8jt7mTTxdmmVYbeyiFJlwxDdVDbrzWuPGpyPvJZeIs7vOdtmPh2qZy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d91:b0:3d9:666f:486d with SMTP id
- e9e14a558f8ab-3d9702672eemr25892835ab.15.1746098134220; Thu, 01 May 2025
+X-Received: by 2002:a05:6602:2989:b0:864:9cc7:b847 with SMTP id
+ ca18e2360f4ac-864a22de042mr320149839f.14.1746098134682; Thu, 01 May 2025
  04:15:34 -0700 (PDT)
 Date: Thu, 01 May 2025 04:15:34 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <681357d6.050a0220.14dd7d.000b.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in ipv6_addr_prefix
-From: syzbot <syzbot+9596c1b9df18e0ae7261@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <681357d6.050a0220.14dd7d.000d.GAE@google.com>
+Subject: [syzbot] [net?] upstream test error: KMSAN: use-after-free in mctp_dump_addrinfo
+From: syzbot <syzbot+1065a199625a388fce60@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jk@codeconstruct.com.au, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	matt@codeconstruct.com.au, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    5565acd1e6c4 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1178cecc580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2e3745cb659ef5d9
-dashboard link: https://syzkaller.appspot.com/bug?extid=9596c1b9df18e0ae7261
+HEAD commit:    4f79eaa2ceac kbuild: Properly disable -Wunterminated-strin..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15bc71b3980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=53c85d265a8f3692
+dashboard link: https://syzkaller.appspot.com/bug?extid=1065a199625a388fce60
 compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122efd9b980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e99574580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/80798769614c/disk-5565acd1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/435ecb0f1371/vmlinux-5565acd1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7790d5f923b6/bzImage-5565acd1.xz
+disk image: https://storage.googleapis.com/syzbot-assets/3594998c29f0/disk-4f79eaa2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2cd908ac5281/vmlinux-4f79eaa2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5ea15b7bacde/bzImage-4f79eaa2.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9596c1b9df18e0ae7261@syzkaller.appspotmail.com
+Reported-by: syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
 
-UDPLite6: UDP-Lite is deprecated and scheduled to be removed in 2025, please contact the netdev mailing list
-------------[ cut here ]------------
-memcpy: detected field-spanning write (size 898) of single field "pfx->in6_u.u6_addr8" at ./include/net/ipv6.h:614 (size 16)
-WARNING: CPU: 0 PID: 5838 at ./include/net/ipv6.h:614 ipv6_addr_prefix+0x124/0x1d0 include/net/ipv6.h:614
-Modules linked in:
-CPU: 0 UID: 0 PID: 5838 Comm: syz-executor414 Not tainted 6.15.0-rc3-syzkaller-00557-g5565acd1e6c4 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:ipv6_addr_prefix+0x124/0x1d0 include/net/ipv6.h:614
-Code: cc e8 70 eb af f7 c6 05 b8 a8 59 05 01 90 b9 10 00 00 00 48 c7 c7 a0 86 7d 8c 4c 89 fe 48 c7 c2 c0 8d 7d 8c e8 4d 4a 74 f7 90 <0f> 0b 90 90 e9 33 ff ff ff e8 3e eb af f7 44 89 e6 48 c7 c7 c0 53
-RSP: 0018:ffffc90003eb7920 EFLAGS: 00010246
-RAX: 8f8f704687b6a900 RBX: ffff8880337f5c50 RCX: ffff88803326da00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-RBP: 0000000000000000 R08: ffffc90003eb7607 R09: 1ffff920007d6ec0
-R10: dffffc0000000000 R11: fffff520007d6ec1 R12: 0000000000000382
-R13: 1ffff920007d6f4e R14: ffffc90003eb7a84 R15: 0000000000000382
-FS:  0000555594768380(0000) GS:ffff8881260b2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055d1681c9000 CR3: 0000000078e3e000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ip6_route_info_create+0x5cc/0xa70 net/ipv6/route.c:3810
- ip6_route_add+0x29/0x2f0 net/ipv6/route.c:3902
- ipv6_route_ioctl+0x35c/0x480 net/ipv6/route.c:4539
- inet6_ioctl+0x219/0x280 net/ipv6/af_inet6.c:577
- sock_do_ioctl+0xd9/0x300 net/socket.c:1190
- sock_ioctl+0x576/0x790 net/socket.c:1311
+=====================================================
+BUG: KMSAN: use-after-free in mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
+ mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
+ rtnl_dump_all+0x3ec/0x5b0 net/core/rtnetlink.c:4380
+ rtnl_dumpit+0xd5/0x2f0 net/core/rtnetlink.c:6824
+ netlink_dump+0x97b/0x1690 net/netlink/af_netlink.c:2309
+ __netlink_dump_start+0x716/0xd60 net/netlink/af_netlink.c:2424
+ netlink_dump_start include/linux/netlink.h:340 [inline]
+ rtnetlink_dump_start net/core/rtnetlink.c:6853 [inline]
+ rtnetlink_rcv_msg+0x1262/0x14b0 net/core/rtnetlink.c:6920
+ netlink_rcv_skb+0x54a/0x680 net/netlink/af_netlink.c:2534
+ rtnetlink_rcv+0x35/0x40 net/core/rtnetlink.c:6982
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0xed5/0x1290 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x10b3/0x1250 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+ __sys_sendto+0x590/0x710 net/socket.c:2180
+ __do_sys_sendto net/socket.c:2187 [inline]
+ __se_sys_sendto net/socket.c:2183 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2183
+ x64_sys_call+0x3c0b/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x1b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_free_hook mm/slub.c:2324 [inline]
+ slab_free mm/slub.c:4656 [inline]
+ kmem_cache_free+0x286/0xf00 mm/slub.c:4758
+ skb_kfree_head net/core/skbuff.c:1056 [inline]
+ skb_free_head net/core/skbuff.c:1070 [inline]
+ skb_release_data+0xe56/0x1110 net/core/skbuff.c:1097
+ skb_release_all net/core/skbuff.c:1162 [inline]
+ __kfree_skb+0x6b/0x260 net/core/skbuff.c:1176
+ consume_skb+0x83/0x230 net/core/skbuff.c:1408
+ netlink_broadcast_filtered+0x21b6/0x2370 net/netlink/af_netlink.c:1524
+ nlmsg_multicast_filtered include/net/netlink.h:1129 [inline]
+ nlmsg_multicast include/net/netlink.h:1148 [inline]
+ nlmsg_notify+0x15b/0x2f0 net/netlink/af_netlink.c:2577
+ rtnl_notify+0xba/0x100 net/core/rtnetlink.c:958
+ inet6_rt_notify+0x27d/0x4a0 net/ipv6/route.c:6270
+ fib6_add_rt2node net/ipv6/ip6_fib.c:1259 [inline]
+ fib6_add+0x33c7/0x6c70 net/ipv6/ip6_fib.c:1488
+ __ip6_ins_rt net/ipv6/route.c:1351 [inline]
+ ip6_ins_rt+0xc0/0x170 net/ipv6/route.c:1361
+ __ipv6_ifa_notify+0x851/0x1990 net/ipv6/addrconf.c:6283
+ ipv6_ifa_notify net/ipv6/addrconf.c:6322 [inline]
+ add_addr+0x301/0x4c0 net/ipv6/addrconf.c:3206
+ init_loopback net/ipv6/addrconf.c:3289 [inline]
+ addrconf_init_auto_addrs+0xb53/0x10e0 net/ipv6/addrconf.c:3564
+ addrconf_notify+0x1643/0x1d10 net/ipv6/addrconf.c:3741
+ notifier_call_chain kernel/notifier.c:85 [inline]
+ raw_notifier_call_chain+0xdd/0x410 kernel/notifier.c:453
+ call_netdevice_notifiers_info+0x1ac/0x2b0 net/core/dev.c:2176
+ call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
+ call_netdevice_notifiers net/core/dev.c:2228 [inline]
+ __dev_notify_flags+0x20d/0x3c0 net/core/dev.c:-1
+ netif_change_flags+0x162/0x1e0 net/core/dev.c:9434
+ dev_change_flags+0x18c/0x320 net/core/dev_api.c:68
+ devinet_ioctl+0x1186/0x2500 net/ipv4/devinet.c:1200
+ inet_ioctl+0x4c0/0x6f0 net/ipv4/af_inet.c:1001
+ sock_do_ioctl+0x9c/0x480 net/socket.c:1190
+ sock_ioctl+0x70b/0xd60 net/socket.c:1311
  vfs_ioctl fs/ioctl.c:51 [inline]
  __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:892
+ __se_sys_ioctl+0x239/0x400 fs/ioctl.c:892
+ __x64_sys_ioctl+0x97/0xe0 fs/ioctl.c:892
+ x64_sys_call+0x1ebe/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:17
  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
+ do_syscall_64+0xd9/0x1b0 arch/x86/entry/syscall_64.c:94
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa5ecea7369
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff70ec1b18 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fff70ec1ce8 RCX: 00007fa5ecea7369
-RDX: 0000200000000340 RSI: 000000000000890b RDI: 0000000000000003
-RBP: 00007fa5ecf1a610 R08: 0000000000000000 R09: 00007fff70ec1ce8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fff70ec1cd8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+
+CPU: 1 UID: 0 PID: 5440 Comm: dhcpcd Not tainted 6.15.0-rc4-syzkaller-00052-g4f79eaa2ceac #0 PREEMPT(undef) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/19/2025
+=====================================================
 
 
 ---
@@ -142,10 +174,6 @@ https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
 If you want to overwrite report's subsystems, reply with:
 #syz set subsystems: new-subsystem
