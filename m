@@ -1,61 +1,77 @@
-Return-Path: <netdev+bounces-187186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D936BAA58FD
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:24:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA6FAA590C
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 978DB984047
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:24:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B22FB4640EB
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B40DEEB2;
-	Thu,  1 May 2025 00:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756DB1A3148;
+	Thu,  1 May 2025 00:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="e7ETvRk4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="o0aguuBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE0F3D6F;
-	Thu,  1 May 2025 00:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43CE19F421;
+	Thu,  1 May 2025 00:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746059054; cv=none; b=qT1e8qQRdHxM0s/Fim91jryAQFxtMddTH/LRoAN2akaaLT+HOkTfkKsGQ5j5U2x5Y6KiKOSYtnXODQuh5+PfDTvyOeIWpO6kafMDki6tVnQ5jqy49aq9uIVSGFsHrfkv+51ARkovcYM7cUZy4Zk0NlkD0tb8AuVtQrwOw34OKRM=
+	t=1746059465; cv=none; b=qQMr2z4ww06CptxGAXDZxWQpH/g0uaJ11g5+mvVrNQoHhc9DzyWhOa5X8EC7JxA3AC30jhb8mV+R1T5DDtl598tnfglHcMiyFxX5yEVTYdYlaCqeNmjzzP1ryl+jfPfwb1hesQvVhPeqf3tnpDQiReB8EKFDgBABJRpcNx8dPxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746059054; c=relaxed/simple;
-	bh=TpkNc50e0XbJDDfLg0F4mw9y1UW4rtfYYJv5YyX/wpA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T+HtZv9hvrjYkxxBfBrP6M4CiLJjTKBmqHo3BE9WLde5oz1ReI4yqVv2QPVsDikwnY83C/Me5VUZ6iITLuARxdJ5CqkyWRZB4jSjPbbFyYMqWV0DnEFskvZqCDIJOThlpNavUnRaAZCtHSQywLSvApCbWin9o+joh2v+LEAE0Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=e7ETvRk4; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=+1CH4qBC7cTdhKvnr6NhhI/DKDeS5VFc40VH44HNgmc=; b=e7ETvRk4rEuyfbp6
-	wQJovOWJfil+gglpz+h4hyKdurr3TCKwovBFYT5nqbeYjcXTX8HZ1wrHrQxRkrJBrmku+EkxyN7Bo
-	9Tx/xCT17Trza275XGC2g4qXHcpugFuE4rJMSIf86KgtU8XELtefM3EaExmMtM7Kgo+v0ifdWTHdi
-	7OHuQOH9O0l/yVgSkLkGNYLLS0frxgsJEn0x12jAl1hZ0V5PYwdIzNo3ZKBuJMn6tm52q9LsFiaAS
-	LQPjAgi40wib/UIuW3w5psQ9KyEZfXah17qxWrCbdKbZ9F7/7UgcrSujv46bIW2qtkp7KfrjuSDbS
-	i6MZt2RqMA9kuqkCfQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1uAHid-000oYV-0f;
-	Thu, 01 May 2025 00:24:03 +0000
-From: linux@treblig.org
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] strparser: Remove unused __strp_unpause
-Date: Thu,  1 May 2025 01:24:02 +0100
-Message-ID: <20250501002402.308843-1-linux@treblig.org>
+	s=arc-20240116; t=1746059465; c=relaxed/simple;
+	bh=Ci0DwSkdku8GewOdySf7cTEu3of/g50Vqk+aMKizZGk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QE0NxB8BdtXS7WbJOwPwNvt8/H1hgRl5gN2h5ZIg38KAWvJ+bCASbJL9Y3Kh6TpHzuhxbYWE0rXR8pM4xDTXPAjZnyoFXyPYczDZLLzc/SVjQmpPEPzhqgHsK6DVxshHjmkKBA5EzZg64emitLfwbKpFUssYfoJrj7L/YpQ/fOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=o0aguuBk; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746059463; x=1777595463;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9S7Rq8JOZsTFJ9lLP4FliEFT/hASyEX4dw+STGpWrg4=;
+  b=o0aguuBkifPhu0e+YKdkVC23huP9c2CT+g5XqR2uW4azrUcP9cx58+W3
+   ng8gquh3tgJOac24dT/6j15pyrh2OqfEHz7Ei+myBvnVQQL9kHArQ2tc4
+   wfi3Zj7c3hHe0Dm75bFau/VxCW6vuKbkz1cqg9Cbuf4Cyeg4s9jfbK1rP
+   g=;
+X-IronPort-AV: E=Sophos;i="6.15,253,1739836800"; 
+   d="scan'208";a="196066862"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 00:31:01 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:64656]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.114:2525] with esmtp (Farcaster)
+ id 0c9374d3-d797-4853-a843-2daf2ecffefa; Thu, 1 May 2025 00:31:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 0c9374d3-d797-4853-a843-2daf2ecffefa
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 1 May 2025 00:31:01 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 1 May 2025 00:30:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <brauner@kernel.org>
+CC: <bluca@debian.org>, <daan.j.demeyer@gmail.com>, <davem@davemloft.net>,
+	<david@readahead.eu>, <edumazet@google.com>, <horms@kernel.org>,
+	<jack@suse.cz>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <me@yhndnzj.com>, <netdev@vger.kernel.org>,
+	<oleg@redhat.com>, <pabeni@redhat.com>, <viro@zeniv.linux.org.uk>,
+	<zbyszek@in.waw.pl>
+Subject: Re: [PATCH RFC 3/3] coredump: support AF_UNIX sockets
+Date: Wed, 30 Apr 2025 17:25:19 -0700
+Message-ID: <20250501003048.49502-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250430-work-coredump-socket-v1-3-2faf027dbb47@kernel.org>
+References: <20250430-work-coredump-socket-v1-3-2faf027dbb47@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,58 +79,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: Christian Brauner <brauner@kernel.org>
+Date: Wed, 30 Apr 2025 13:05:03 +0200
+> @@ -801,6 +837,49 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>  		}
+>  		break;
+>  	}
+> +	case COREDUMP_SOCK: {
+> +		struct file *file __free(fput) = NULL;
+> +		struct sockaddr_un unix_addr = {
+> +			.sun_family = AF_UNIX,
+> +		};
+> +		struct sockaddr_storage *addr;
+> +
+> +		retval = strscpy(unix_addr.sun_path, cn.corename, sizeof(unix_addr.sun_path));
+> +		if (retval < 0)
+> +			goto close_fail;
+> +
+> +		file = __sys_socket_file(AF_UNIX, SOCK_STREAM, 0);
+> +		if (IS_ERR(file))
+> +			goto close_fail;
+> +
+> +		/*
+> +		 * It is possible that the userspace process which is
+> +		 * supposed to handle the coredump and is listening on
+> +		 * the AF_UNIX socket coredumps. This should be fine
+> +		 * though. If this was the only process which was
+> +		 * listen()ing on the AF_UNIX socket for coredumps it
+> +		 * obviously won't be listen()ing anymore by the time it
+> +		 * gets here. So the __sys_connect_file() call will
+> +		 * often fail with ECONNREFUSED and the coredump.
+> +		 *
+> +		 * In general though, userspace should just mark itself
+> +		 * non dumpable and not do any of this nonsense. We
+> +		 * shouldn't work around this.
+> +		 */
+> +		addr = (struct sockaddr_storage *)(&unix_addr);
+> +		retval = __sys_connect_file(file, addr, sizeof(unix_addr), O_CLOEXEC);
 
-The last use of __strp_unpause() was removed in 2022 by
-commit 84c61fe1a75b ("tls: rx: do not use the standard strparser")
+The 3rd argument should be offsetof(struct sockaddr_un, sun_path)
++ retval of strscpy() above ?
 
-Remove it.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- include/net/strparser.h   |  2 --
- net/strparser/strparser.c | 13 -------------
- 2 files changed, 15 deletions(-)
-
-diff --git a/include/net/strparser.h b/include/net/strparser.h
-index 0a83010b3a64..0ed73e364faa 100644
---- a/include/net/strparser.h
-+++ b/include/net/strparser.h
-@@ -114,8 +114,6 @@ static inline void strp_pause(struct strparser *strp)
- 
- /* May be called without holding lock for attached socket */
- void strp_unpause(struct strparser *strp);
--/* Must be called with process lock held (lock_sock) */
--void __strp_unpause(struct strparser *strp);
- 
- static inline void save_strp_stats(struct strparser *strp,
- 				   struct strp_aggr_stats *agg_stats)
-diff --git a/net/strparser/strparser.c b/net/strparser/strparser.c
-index 95696f42647e..d946bfb424c7 100644
---- a/net/strparser/strparser.c
-+++ b/net/strparser/strparser.c
-@@ -485,19 +485,6 @@ int strp_init(struct strparser *strp, struct sock *sk,
- }
- EXPORT_SYMBOL_GPL(strp_init);
- 
--/* Sock process lock held (lock_sock) */
--void __strp_unpause(struct strparser *strp)
--{
--	strp->paused = 0;
--
--	if (strp->need_bytes) {
--		if (strp_peek_len(strp) < strp->need_bytes)
--			return;
--	}
--	strp_read_sock(strp);
--}
--EXPORT_SYMBOL_GPL(__strp_unpause);
--
- void strp_unpause(struct strparser *strp)
- {
- 	strp->paused = 0;
--- 
-2.49.0
-
+I guess you could see an unexpected error when
+CONFIG_INIT_STACK_NONE=y and cn.corename has garbage at tail.
 
